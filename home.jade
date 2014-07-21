@@ -7,16 +7,47 @@ block content
 		.container
 			.row
 				.col-md-12
-					h1 LaTeX,
-						col-md-  Evolved
-					p Introducing the first real-time collaborative LaTeX editor.
+					h1 LaTeX, 
+						span Evolved
+					p The online, easy to use, collaborative LaTeX editor
 			.row
 				.col-md-12
 					img(src="img/screen.png")
-		.container-fluid
-			.row
-				a(href="/register").btn.btn-lg.btn-hero Start Free Trial
-				a(href="/user/subscription/plans").btn.btn-lg.btn-primary.btn-hero Buy Now
+
+		.register-banner
+			.container
+				.row
+					.col-md-12
+						h2 Get started now
+						form.form-inline(async-form="register", name="registerForm", action="/register", ng-cloak)
+							input(name='_csrf', type='hidden', value=csrfToken)
+							input(name='redir', type='hidden', value=redir)
+							form-messages(for="registerForm")
+							.form-group
+								input.form-control.input-lg(
+									type='email',
+									name='email',
+									placeholder="email@example.com"
+									required,
+									ng-model="email",
+									ng-init="email = #{JSON.stringify(new_email)}",
+									ng-model-options="{ updateOn: 'blur' }"
+								)
+							.form-group
+								input.form-control.input-lg(
+									type='password',
+									name='password',
+									placeholder="********",
+									required,
+									ng-model="password"
+								)
+							.form-group
+								button.btn-primary.btn.btn-lg.btn-hero(
+									type='submit'
+									ng-disabled="registerForm.inflight"
+								)
+									span(ng-show="!registerForm.inflight") Register
+									span(ng-show="registerForm.inflight") Registering...
 
 	.universities
 		.container
