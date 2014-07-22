@@ -9,10 +9,11 @@ block content
 				.col-md-12
 					h1 LaTeX, 
 						span Evolved
-					p The online, easy to use, collaborative LaTeX editor
+					p The easy to use, online, collaborative LaTeX editor
 			.row
 				.col-md-12
-					img(src="img/screen.png")
+					.screenshot
+						img(src="img/screen.png")
 
 		.register-banner
 			.container
@@ -49,37 +50,37 @@ block content
 									span(ng-show="!registerForm.inflight") Register
 									span(ng-show="registerForm.inflight") Registering...
 
-	.universities
+	.universities.hidden-xs.hidden-sm
 		.container
 			.row.row-spaced-small
 				div.small ShareLaTeX is used by over <strong>200,000</strong> students and academics at:
 				#slides.container-fluid
 					.row.row-spaced
-						.col-md-3
+						.col-xs-3
 							img(src="/img/crests/harvard.gif", alt="harvard university logo")
-						.col-md-3
+						.col-xs-3
 							img(src="/img/crests/mit.gif", alt="mit university logo")
-						.col-md-3
+						.col-xs-3
 							img(src="/img/crests/oxford.gif", alt="oxford university logo")
-						.col-md-3
+						.col-xs-3
 							img(src="/img/crests/tokyo.png", alt="tokyo university logo")
-					.row.row-spaced
-						.col-md-3
+					.row.row-spaced(style="display: none;")
+						.col-xs-3
 							img(src="/img/crests/cambridge.png", alt="cambridge university logo")
-						.col-md-3
+						.col-xs-3
 							img(src="/img/crests/liverpool.jpg", alt="liverpool university logo")
-						.col-md-3
+						.col-xs-3
 							img(src="/img/crests/icl.png", alt="icl university logo")
-						.col-md-3
+						.col-xs-3
 							img(src="/img/crests/yale.png", alt="yale university logo")
-					.row.row-spaced
-						.col-md-3
+					.row.row-spaced(style="display: none;")
+						.col-xs-3
 							img(src="/img/crests/durham.png", alt="durham university logo")
-						.col-md-3
+						.col-xs-3
 							img(src="/img/crests/nasa.png", alt="nasa university logo")
-						.col-md-3
+						.col-xs-3
 							img(src="/img/crests/toronto.gif", alt="toronto university logo")
-						.col-md-3
+						.col-xs-3
 							img(src="/img/crests/stanford.png", alt="stanford university logo")
 
 	.pattern-container
@@ -87,43 +88,43 @@ block content
 			.long-form-features
 				.row
 					h1.text-center ShareLaTeX Features
-				.row.row-spaced
+				.row
 					.col-md-6
-						.card
+						.card.row-spaced
 							.row
-								.col-md-3
+								.col-md-3.col-xs-2
 									i.fa.fa-group.fa-4x
-								.col-md-9
+								.col-md-9.col-xs-10
 									h2.h1 Collaboration
 									p Keep your LaTeX collaborators up to date by letting everyone access and edit the same LaTeX document.									
 										
 					.col-md-6
-						.card
+						.card.row-spaced
 							.row
-								.col-md-9
+								.col-md-2.col-md-offset-1.col-md-push-9.col-xs-2
+									i.fa.fa-thumbs-up.fa-4x
+								.col-md-9.col-md-pull-3.col-xs-10
 									h2.h1 Easy to Use
 									p ShareLaTeX is the easiest LaTeX editor to get started if you’ve never used LaTeX before. No installation required!
-								.col-md-3.text-right
-									i.fa.fa-thumbs-up.fa-4x
 
-				.row.row-spaced
+				.row
 					.col-md-6
-						.card
+						.card.row-spaced
 							.row
-								.col-md-3
-									i.fa.fa-globe.fa-4x
-								.col-md-9
+								.col-md-3.col-xs-2
+									i.fa.fa-group.fa-4x
+								.col-md-9.col-xs-10
 									h2.h1 Work Anywhere
 									p You can access our LaTeX editor and compile your LaTeX documents from any computer with an internet connection.
 
 					.col-md-6
-						.card
+						.card.row-spaced
 							.row
-								.col-md-9
+								.col-md-2.col-md-offset-1.col-md-push-9.col-xs-2
+									i.fa.fa-dropbox.fa-4x
+								.col-md-9.col-md-pull-3.col-xs-10
 									h2.h1 Sync with Dropbox
 									p Keep all of your LaTeX projects synced to your Dropbox folder.
-								.col-md-3.text-right
-									i.fa.fa-dropbox.fa-4x
 									
 			.row.row-spaced
 				.col-md-12
@@ -136,8 +137,7 @@ block content
 	script(type="text/javascript").
 		$(function() {
 			$('#slides').slidesjs({
-				width: 940,
-				height: 100,
+				height: 80,
 				play: {
 					active: false,
 					auto: true,
