@@ -89,6 +89,59 @@ block content
 				.row
 					h1.text-center ShareLaTeX Features
 				.row
+					script(type="text/javascript").
+						var frames = [{
+							before: "",
+							time: 1000
+						}, {
+							before: "i",
+							time: 100
+						}, {
+							before: "in",
+							time: 200
+						}, {
+							before: "in ",
+							time: 300
+						}, {
+							before: "in r",
+							time: 100
+						}, {
+							before: "in re",
+							time: 200
+						}, {
+							before: "in rea",
+							time: 100
+						}, {
+							before: "in real",
+							time: 200
+						}, {
+							before: "in real ",
+							time: 400
+						}, {
+							before: "in real t",
+							time: 200
+						}, {
+							before: "in real ti",
+							time: 100
+						}, {
+							before: "in real tim",
+							time: 200
+						}, {
+							before: "in real time",
+							time: 2000
+						}];
+						var index = 0;
+						function nextFrame() {
+							var frame = frames[index];
+							index = index + 1;
+							if (index >= frames.length) {
+								index = 0;
+							}
+							$(".real-time-example").html(frame.before + "<div class='cursor'>|</div>");
+							setTimeout(nextFrame, frame.time);
+						}
+						nextFrame();
+						
 					.col-md-6
 						.card.row-spaced
 							.row
@@ -96,7 +149,13 @@ block content
 									i.fa.fa-group.fa-4x
 								.col-md-9.col-xs-10
 									h2.h1 Collaboration
-									p Keep your LaTeX collaborators up to date by letting everyone access and edit the same LaTeX document.									
+									p Work together on a single master copy
+									p.track-changes-example Keep track of what has been 
+										span.added added
+										|  and 
+										span.removed removed
+									p View collaborator edits 
+										span.real-time-example
 										
 					.col-md-6
 						.card.row-spaced
@@ -105,7 +164,10 @@ block content
 									i.fa.fa-thumbs-up.fa-4x
 								.col-md-9.col-md-pull-3.col-xs-10
 									h2.h1 Easy to Use
-									p ShareLaTeX is the easiest LaTeX editor to get started if you’ve never used LaTeX before. No installation required!
+									p No installation
+									p Has all the LaTeX packages you need
+									p Comprehensive gallery of 
+										a(href="/templates") templates and examples
 
 				.row
 					.col-md-6
@@ -115,7 +177,8 @@ block content
 									i.fa.fa-globe.fa-4x
 								.col-md-9.col-xs-10
 									h2.h1 Work Anywhere
-									p You can access our LaTeX editor and compile your LaTeX documents from any computer with an internet connection.
+									p Access your documents from anywhere in the world
+									p Never lose track of an important document
 
 					.col-md-6
 						.card.row-spaced
@@ -123,8 +186,8 @@ block content
 								.col-md-3.col-md-push-9.col-xs-2.text-center
 									i.fa.fa-dropbox.fa-4x
 								.col-md-9.col-md-pull-3.col-xs-10
-									h2.h1 Sync with Dropbox
-									p Keep all of your LaTeX projects synced to your Dropbox folder.
+									h2.h1 Offline Sync
+									p Work offline and sync your files via Dropbox
 									
 			.row.row-spaced
 				.col-md-12
