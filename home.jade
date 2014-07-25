@@ -87,8 +87,6 @@ block content
 		.container
 			.long-form-features
 				.row
-					h1.text-center ShareLaTeX Features
-				.row
 					script(type="text/javascript").
 						var frames = [{
 							before: "",
@@ -149,11 +147,7 @@ block content
 									i.fa.fa-group.fa-4x
 								.col-md-9.col-xs-10
 									h2.h1 Collaboration
-									p Work together on a single master copy
-									p.track-changes-example Keep track of what has been 
-										span.added added
-										|  and 
-										span.removed removed
+									p Work together on a single version
 									p View collaborator edits 
 										span.real-time-example
 										
@@ -163,37 +157,140 @@ block content
 								.col-md-3.col-md-push-9.col-xs-2.text-center
 									i.fa.fa-thumbs-up.fa-4x
 								.col-md-9.col-md-pull-3.col-xs-10
-									h2.h1 Easy to Use
-									p No installation
-									p Has all the LaTeX packages you need
-									p Comprehensive gallery of 
-										a(href="/templates") templates and examples
+									h2.h1 Easy of use
+									p No complicated LaTeX installation
+									p All the packages and 
+										a(href="/templates") templates
+										|  you need
 
 				.row
 					.col-md-6
 						.card.row-spaced
 							.row
 								.col-md-3.col-xs-2.text-center
-									i.fa.fa-globe.fa-4x
+									i.fa.fa-history.fa-4x
 								.col-md-9.col-xs-10
-									h2.h1 Work Anywhere
-									p Access your documents from anywhere in the world
-									p Never lose track of an important document
+									h2.h1 Document history
+									p.track-changes-example See what has been 
+										span.added added
+										|  and 
+										span.removed removed
+									p Restore to any older version
 
 					.col-md-6
 						.card.row-spaced
 							.row
 								.col-md-3.col-md-push-9.col-xs-2.text-center
-									i.fa.fa-dropbox.fa-4x
+									i.fa.fa-globe.fa-4x
 								.col-md-9.col-md-pull-3.col-xs-10
-									h2.h1 Offline Sync
+									h2.h1 Work from anywhere
+									p Access your work from anywhere in the world
 									p Work offline and sync your files via Dropbox
 									
 			.row.row-spaced
 				.col-md-12
 					p.text-center
 						a(href="/user/subscription/plans").btn.btn-primary.btn-lg Sign up now!
-
+			
+			.page-header
+				h2 Ease of Use
+			
+			.row.row-spaced
+				.col-md-12
+					.col-md-4.pull-right
+						.card.card-thin
+							p There are 
+								strong over 400 templates
+								|  in our template gallery, so it's really easy to get started, whether you're writing a journal article, thesis, CV or more.
+							p.text-center
+								a(href="/templates").btn.btn-info View templates
+						p &nbsp;
+					p
+						| There's nothing complicated or difficult for you to install, and you can 
+						strong start using LaTeX right now
+						|, even if you've never seen it before.
+						| ShareLaTeX comes with a complete, ready to go LaTeX environment which runs on our servers. 
+						
+					p
+						| With ShareLaTeX you get the same LaTeX set-up wherever you go. By working with your colleagues
+						| and students on ShareLaTeX, you know that you're not going to hit any version inconsistencies or
+						| package conflicts.
+						
+					p
+						| We support almost all LaTeX features, including inserting images, bibliographies, splitting your document
+						| into multiple files, and much more! You can read about all the exiting things you can do with ShareLaTeX in our 
+						a(href="/learn") LaTeX guides
+						| .
+				.col-md-6
+			.page-header
+				h2 Collaboration
+			
+			.row.row-spaced
+				.col-md-12
+					blockquote 
+						p Waiting for changes to be emailed back before carrying on wastes a huge amount of time. 
+							strong The ability to track changes and the real-time collaborative nature is what sets ShareLaTeX apart.
+						footer Professor Erdogmus, Northeastern University.
+						
+			.row
+				.col-md-8
+					p
+						| ShareLaTeX makes sure that you're always up to date with your collaborators and what they are doing. 
+						| There is only a single master version of each document which everyone has access to. 
+						| It's impossible to make conflicting changes, and you don't have to wait for your colleagues to send you
+						| the latest draft before you can keep working.
+					p
+						| If multiple people want to work on a document at the same time then that's no problem.
+						| You can see where your colleagues are typing directly in the editor and their changes show up on your screen immediately.
+				.col-md-4
+					.real-time-example-code
+						span.highlight \begin
+						| {document}
+						br
+						br
+						| Work directly with your collaborators 
+						span.real-time-example
+						br
+						br
+						span.highlight \end
+						| {document}
+						
+			h3 Work with Word users
+			.row
+				.col-md-12
+					p
+						| ShareLaTeX is so easy to get started with that you'll be able to invite your non-LaTeX colleagues to contribute directly to your LaTeX documents.
+						| They'll be productive from day one and be able to pick up small amounts of LaTeX as they go.
+						
+			.row.row-spaced.text-center
+				a(href="/user/subscription/plans").btn.btn-primary.btn-lg Start using ShareLaTeX now
+					
+			.page-header
+				h2 Document History
+			
+			.row.row-spaced
+				.col-md-4
+					.real-time-example-code.track-changes-example
+						span.highlight \begin
+						| {document}
+						br
+						br
+						| View which changes have been 
+						span.added added
+						|  and 
+						span.removed removed
+						| .
+						br
+						br
+						span.highlight \end
+						| {document}
+				.col-md-8
+					p
+						| ShareLaTeX includes a history of all of your changes so you can see exactly who changed what, and when.
+						| This makes it extremely easy to keep up to date with any progress made by your collaborators and allows you to review recent work.
+					p
+						| In a collaboration or on your own, sometimes mistakes are made.
+						| Reverting back to previous versions is simple and removes the risk of losing work or regretting a change.
 			.row-spaced
 
 	script(src=jsPath + "libs/jquery.slides.min.js")
