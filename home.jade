@@ -8,8 +8,8 @@ block content
 			.row
 				.col-md-12
 					h1 LaTeX, 
-						span Evolved
-					p The easy to use, online, collaborative LaTeX editor
+						span #{translate("Evolved")}
+					p #{translate("the_easy_online_collab_latex_editor")}
 			.row
 				.col-md-12
 					.screenshot
@@ -19,7 +19,7 @@ block content
 			.container
 				.row
 					.col-md-12
-						h2 Get started now
+						h2 #{translate("get_started_now")}
 						form.form-inline(async-form="register", name="registerForm", action="/register", ng-cloak)
 							input(name='_csrf', type='hidden', value=csrfToken)
 							input(name='redir', type='hidden', value=redir)
@@ -47,13 +47,13 @@ block content
 									type='submit'
 									ng-disabled="registerForm.inflight"
 								)
-									span(ng-show="!registerForm.inflight") Register
-									span(ng-show="registerForm.inflight") Registering...
+									span(ng-show="!registerForm.inflight") #{translate("register")}
+									span(ng-show="registerForm.inflight") #{translate("registering")}...
 
 	.universities.hidden-xs.hidden-sm
 		.container
 			.row.row-spaced-small
-				div.small ShareLaTeX is used by over <strong>200,000</strong> students and academics at:
+				div.small #{translate("sl_used_over_x_people_at", {numberOfUsers:"<strong>200,000</strong>"})}
 				#slides.container-fluid
 					.row.row-spaced
 						.col-xs-3
@@ -146,9 +146,9 @@ block content
 								.col-md-3.col-xs-2.text-center
 									i.fa.fa-group.fa-4x
 								.col-md-9.col-xs-10
-									h2.h1 Collaboration
-									p Work together on a single version
-									p View collaborator edits 
+									h2.h1 #{translate("collaboration")}
+									p #{translate("work_on_single_version")} 
+									p #{translate("view_collab_edits")} 
 										span.real-time-example
 										
 					.col-md-6
@@ -157,11 +157,9 @@ block content
 								.col-md-3.col-md-push-9.col-xs-2.text-center
 									i.fa.fa-thumbs-up.fa-4x
 								.col-md-9.col-md-pull-3.col-xs-10
-									h2.h1 Ease of use
-									p No complicated LaTeX installation
-									p All the packages and 
-										a(href="/templates") templates
-										|  you need
+									h2.h1 #{translate("ease_of_use")}
+									p #{translate("no_complicated_latex_install")}
+									p !{translate("all_packages_and_templates", {templatesLink:"<a href='templates'>__templates__</a>", templates: translate("templates") })} 
 
 				.row
 					.col-md-6
@@ -170,12 +168,12 @@ block content
 								.col-md-3.col-xs-2.text-center
 									i.fa.fa-history.fa-4x
 								.col-md-9.col-xs-10
-									h2.h1 Document history
-									p.track-changes-example See what has been 
-										span.added added
-										|  and 
-										span.removed removed
-									p Restore to any older version
+									h2.h1 #{translate("document_history")}
+									p.track-changes-example #{translate("see_what_has_been")}
+										span.added #{translate("added")}
+										| #{translate("and")} 
+										span.removed #{translate("removed")}
+									p #{translate("restore_to_any_older_version")}
 
 					.col-md-6
 						.card.row-spaced
@@ -183,53 +181,40 @@ block content
 								.col-md-3.col-md-push-9.col-xs-2.text-center
 									i.fa.fa-globe.fa-4x
 								.col-md-9.col-md-pull-3.col-xs-10
-									h2.h1 Work from anywhere
-									p Access your work from anywhere in the world
-									p Work offline and sync your files via Dropbox
+									h2.h1 #{translate("work_from_anywhere")}
+									p #{translate("acces_work_from_anywhere")}
+									p #{translate("work_offline_and_sync_with_dropbox")}
 									
 			.row.row-spaced
 				.col-md-12
 					p.text-center
-						a(href="/user/subscription/plans").btn.btn-primary.btn-lg Sign up now!
+						a(href="/user/subscription/plans").btn.btn-primary.btn-lg #{translate("sign_up_now")}!
 						
 			.row-spaced
 	.content.content-alt
 		.container
 			.card
 				.page-header
-					h2 Ease of Use
+					h2 #{translate("ease_of_use")}
 				
 				.row.row-spaced
 					.col-md-12
 						.col-md-4.pull-right
-							.alert.alert-info
-								p There are 
-									strong over 400 templates
-									|  in our template gallery, so it's really easy to get started, whether you're writing a journal article, thesis, CV or something else.
+							.alert.alert-info 
+								p !{translate("over_x_templates_easy_getting_started", {numberoftemplates:"<strong>__over__ 400 __templates__</strong>", over:translate("over"), templates:translate("templates")})}
+
 								p.text-center
-									a(href="/templates").btn.btn-info View templates
+									a(href="/templates").btn.btn-info #{translate("view_templates")}
 							p &nbsp;
-						p
-							| There's nothing complicated or difficult for you to install, and you can 
-							strong start using LaTeX right now
-							|, even if you've never seen it before.
-							| ShareLaTeX comes with a complete, ready to go LaTeX environment which runs on our servers. 
-							
-						p
-							| With ShareLaTeX you get the same LaTeX set-up wherever you go. By working with your colleagues
-							| and students on ShareLaTeX, you know that you're not going to hit any version inconsistencies or
-							| package conflicts.
-							
-						p
-							| We support almost all LaTeX features, including inserting images, bibliographies, equations, and much more! 
-							| Read about all the exciting things you can do with ShareLaTeX in our 
-							a(href="/learn") LaTeX guides
-							| .
+						p !{translate("nothing_to_install_ready_to_go", {start_now:"<strong>__start_now_text__</strong>", start_now_text:translate("start_using_latex_now")})}
+
+						p #{translate("get_same_latex_setup")}
+						p #{translate("support_lots_of_features", {help_guides_link:"<a href='/learn'>__latex_guides__</a>", latex_guides:translate("latex_guides")})}.
 					.col-md-6
 					
 			.card.row-spaced
 				.page-header
-					h2 Collaboration
+					h2 #{translate("collaboration")}
 				
 				.row.row-spaced
 					.col-md-12
@@ -241,36 +226,30 @@ block content
 				.row
 					.col-md-8
 						p
-							| ShareLaTeX makes sure that you're always up to date with your collaborators and what they are doing. 
-							| There is only a single master version of each document which everyone has access to. 
-							| It's impossible to make conflicting changes, and you don't have to wait for your colleagues to send you
-							| the latest draft before you can keep working.
+							| #{translate("single_version_easy_collab_blurb")}
 						p
-							| If multiple people want to work on a document at the same time then that's no problem.
-							| You can see where your colleagues are typing directly in the editor and their changes show up on your screen immediately.
+							| #{translate("can_see_collabs_type_blurb")}
 					.col-md-4
 						.real-time-example-code
 							span.highlight \begin
 							| {document}
 							br
 							br
-							| Work directly with your collaborators 
+							| #{translate("work_directly_with_collabs")} 
 							span.real-time-example
 							br
 							br
 							span.highlight \end
 							| {document}
 							
-				h3 Work with Word users
+				h3 #{translate("work_with_word_users")}
 				.row
 					.col-md-12
-						p
-							| ShareLaTeX is so easy to get started with that you'll be able to invite your non-LaTeX colleagues to contribute directly to your LaTeX documents.
-							| They'll be productive from day one and be able to pick up small amounts of LaTeX as they go.
+						p #{translate("work_with_word_users_blurb")}
 				
 			.card.row-spaced
 				.page-header
-					h2 Document History
+					h2 #{translate("document_history")}
 				
 				.row.row-spaced
 					.col-md-4
@@ -279,25 +258,22 @@ block content
 							| {document}
 							br
 							br
-							| View which changes have been 
-							span.added added
-							|  and 
-							span.removed removed
+							| #{translate("view_which_changes")} 
+							span.added #{translate("added")} 
+							| #{translate("and")} 
+							span.removed #{translate("removed")}
 							| .
 							br
 							br
 							span.highlight \end
 							| {document}
 					.col-md-8
-						p
-							| ShareLaTeX includes a history of all of your changes so you can see exactly who changed what, and when.
-							| This makes it extremely easy to keep up to date with any progress made by your collaborators and allows you to review recent work.
-						p
-							| In a collaboration or on your own, sometimes mistakes are made.
-							| Reverting back to previous versions is simple and removes the risk of losing work or regretting a change.
+						p #{translate("sl_included_history_of_changes_blurb")}
+						p #{translate("can_revert_back_blurb")}
+						
 							
 			.row.row-spaced.text-center
-				a(href="/user/subscription/plans").btn.btn-primary.btn-lg Start using ShareLaTeX now
+				a(href="/user/subscription/plans").btn.btn-primary.btn-lg #{translate("start_using_sl_now")}
 				
 			.row-spaced
 				
