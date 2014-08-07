@@ -8,22 +8,41 @@ block content
 					.page-header
 						h1 #{translate("about_us")}
 					h2 #{translate("meet_team_behind_latex_editor")}
+					
+
 					p.team-profile
 						span.img-container.img-circle
 							img(src='/img/about/henry_oswald.jpg')
-						strong Henry Oswald
+						strong Henry Oswald 
 						| #{translate("about_henry_oswald")} 
-						a(href='https://twitter.com/henryoswald') #{translate("follow_me_on_twitter")}
-						| .
+						br
+						a(href='https://twitter.com/henryoswald') 
+							i.fa.fa-twitter-square
+							|  #{translate("follow_me_on_twitter")}.
+
 					p.team-profile
 						span.img-container.img-circle
 							img(src='/img/about/james_allen.jpg')
-						strong James Allen
-					p(style="clear: both")
-					| #{translate("about_james_allen")}
-					h3 #{translate("motivation")}
-					p #{translate("motivation_behind_sl")}
-					p #{translate("why_we_charge")}
+						strong James Allen 
+						| #{translate("about_james_allen")}
+						br
+						a(href='https://twitter.com/thejpallen') 
+							i.fa.fa-twitter-square
+							|  #{translate("follow_me_on_twitter")}.
 
-					h3 #{translate("technologies")}
-					p #{translate("our_technologies")}
+
+					p(style="clear: both")
+					h3 #{translate("motivation")}
+					p #{translate("two_strong_principles_behind_sl")}
+					ul
+						li 
+							strong #{translate("want_to_improve_workflow_of_as_many_people_as_possible")}
+							|  #{translate("detail_on_improve_peoples_workflow")}
+
+						li
+							strong #{translate("want_to_create_sustainable_lasting_legacy")}
+							|  #{translate("details_on_legacy")}
+
+					h3 #{translate("get_in_touch")}
+					p #{translate("want_to_hear_from_you_email_us_at")}
+						| a(href="mailto:team@sharelatex.com") team@sharelatex.com
