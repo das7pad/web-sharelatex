@@ -2,4 +2,14 @@ hr
 
 h3 #{translate("github_integration")}
 
-strong #{github.enabled}
+if github.error
+	.alert.alert-danger #{translate("error_talking_to_github")}
+
+if github.enabled
+	.alert.alert-success
+		| #{translate("github_account_is_linked")}
+		|  
+		a(href='/github-sync/unlink') #{translate("unlink_github")}
+else
+	p
+		a(href='/github-sync/beginAuth').btn.btn-info #{translate("link_to_github")}

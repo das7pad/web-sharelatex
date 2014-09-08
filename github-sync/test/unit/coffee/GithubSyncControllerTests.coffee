@@ -7,9 +7,10 @@ modulePath = require('path').join __dirname, '../../../app/js/GithubSyncControll
 describe 'GithubSyncController', ->
 	beforeEach ->
 		@GithubSyncController = SandboxedModule.require modulePath, requires:
-			'request': @request = {}
+			'request': @request = sinon.stub()
 			'settings-sharelatex': @settings = {}
 			'logger-sharelatex': @logger = { log: sinon.stub(), error: sinon.stub() }
+			"./GithubSyncApiHandler": @GithubSyncApiHandler = {}
 
 		@settings.apis =
 			githubSync:
@@ -28,15 +29,12 @@ describe 'GithubSyncController', ->
 		beforeEach ->
 			@loginUrl = "https://github.example.com/login/oauth/authorize?client_id=foo"
 			@authUrl = "#{@settings.siteUrl}/github-sync/completeRegistration"
-			@request.get = sinon.stub().callsArgWith(1, null, statusCode: 200, {url: @loginUrl})
+			@GithubSyncApiHandler.getLoginUrl = sinon.stub().callsArgWith(1, null, @loginUrl)
 			@GithubSyncController.login @req, @res
 
 		it "should call fetch the OAuth login URL from the github Sync API", ->
-			@request.get
-				.calledWith({
-					url: "#{@settings.apis.githubSync.url}/user/#{@user_id}/loginUrl"
-					json: true
-				})
+			@GithubSyncApiHandler.getLoginUrl
+				.calledWith(@user_id)
 				.should.equal true
 				
 		it "should redirect to the Github OAuth URL", ->
@@ -49,15 +47,12 @@ describe 'GithubSyncController', ->
 			@req.query =
 				code: "github-code"
 				state: "github-csrf-token"
-			@request.post = sinon.stub().callsArgWith(1, null, statusCode: 200, null)
+			@GithubSyncApiHandler.doAuth = sinon.stub().callsArg(2)
 			@GithubSyncController.auth @req, @res
 
 		it "should call send the request to the github sync api", ->
-			@request.post
-				.calledWith({
-					url: "#{@settings.apis.githubSync.url}/user/#{@user_id}/completeAuth"
-					json: @req.query
-				})
+			@GithubSyncApiHandler.doAuth
+				.calledWith(@user_id, @req.query)
 				.should.equal true
 				
 		it "should redirect to the settings page", ->
