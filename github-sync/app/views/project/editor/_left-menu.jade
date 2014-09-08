@@ -1,0 +1,6 @@
+span(ng-controller="GithubSyncController", ng-show="permissions.admin")
+	ul.list-unstyled.nav()
+		li
+			a(ng-click="openGithubSyncModal()")
+				i.fa.fa-github.fa-fw
+				| &nbsp;&nbsp; Github
