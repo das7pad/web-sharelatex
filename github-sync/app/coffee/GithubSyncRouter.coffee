@@ -1,4 +1,5 @@
 GithubSyncController = require './GithubSyncController'
+GithubSyncMiddlewear = require './GithubSyncMiddlewear'
 AuthenticationController = require "../../../../app/js/Features/Authentication/AuthenticationController"
 
 module.exports =
@@ -6,3 +7,5 @@ module.exports =
 		app.get  '/github-sync/beginAuth', AuthenticationController.requireLogin(),  GithubSyncController.login
 		app.get  '/github-sync/completeRegistration', AuthenticationController.requireLogin(),  GithubSyncController.auth
 		app.get  '/github-sync/unlink', AuthenticationController.requireLogin(),  GithubSyncController.unlink
+		
+		app.get '/user/settings', GithubSyncMiddlewear.injectUserSettings
