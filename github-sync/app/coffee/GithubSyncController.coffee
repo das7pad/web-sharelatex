@@ -21,3 +21,17 @@ module.exports = GithubSyncController =
 		
 	unlink: (req, res, next) ->
 		res.send("hello world from unlink")
+		
+	getUserStatus: (req, res, next) ->
+		user_id = req.session.user._id
+		GithubSyncApiHandler.getUserStatus user_id, (error, status) ->
+			return next(error) if error?
+			res.header("Content-Type", "application/json")
+			res.json(status)
+		
+	getProjectStatus: (req, res, next) ->
+		project_id = req.params.Project_id
+		GithubSyncApiHandler.getProjectStatus project_id, (error, status) ->
+			return next(error) if error?
+			res.header("Content-Type", "application/json")
+			res.json(status)

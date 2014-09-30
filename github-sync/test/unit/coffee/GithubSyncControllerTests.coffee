@@ -24,6 +24,8 @@ describe 'GithubSyncController', ->
 					_id: @user_id
 		@res =
 			redirect: sinon.stub()
+			header: sinon.stub()
+			json: sinon.stub()
 
 	describe "login", ->
 		beforeEach ->
@@ -60,4 +62,42 @@ describe 'GithubSyncController', ->
 				.calledWith("/user/settings")
 				.should.equal true
 
+	describe "getUserStatus", ->
+		beforeEach ->
+			@GithubSyncApiHandler.getUserStatus = sinon.stub().callsArgWith(1, null, @status = { enabled: true })
+			@GithubSyncController.getUserStatus @req, @res
+			
+		it "should get the user status from the github sync api", ->
+			@GithubSyncApiHandler.getUserStatus
+				.calledWith(@user_id)
+				.should.equal true
+				
+		it "should return the status as JSON", ->
+			@res.header
+				.calledWith("Content-Type", "application/json")
+				.should.equal true
+				
+			@res.json
+				.calledWith(@status)
+				.should.equal true
 
+	describe "getProjectStatus", ->
+		beforeEach ->
+			@req.params =
+				Project_id: @project_id = "project-id-123"
+			@GithubSyncApiHandler.getProjectStatus = sinon.stub().callsArgWith(1, null, @status = { enabled: true })
+			@GithubSyncController.getProjectStatus @req, @res
+			
+		it "should get the project status from the github sync api", ->
+			@GithubSyncApiHandler.getProjectStatus
+				.calledWith(@project_id)
+				.should.equal true
+				
+		it "should return the status as JSON", ->
+			@res.header
+				.calledWith("Content-Type", "application/json")
+				.should.equal true
+				
+			@res.json
+				.calledWith(@status)
+				.should.equal true

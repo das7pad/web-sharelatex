@@ -4,3 +4,35 @@ span(ng-controller="GithubSyncController", ng-show="permissions.admin")
 			a(ng-click="openGithubSyncModal()")
 				i.fa.fa-github.fa-fw
 				| &nbsp;&nbsp; Github
+				
+script(type="text/ng-template", id="githubSyncModalTemplate")
+	.modal-header
+		button.close(
+			type="button"
+			data-dismiss="modal"
+			ng-click="cancel()"
+		) &times;
+		h3 #{translate("github_sync")}
+	.modal-body
+		.alert.alert-danger(ng-show="status.error") #{translate("github_sync_error")}
+		
+		.loading(ng-show="!status.error && status.loading")
+			i.fa.fa-refresh.fa-spin.fa-fw
+			span  #{translate("checking_github_sync_status")}
+						
+		div(ng-show="!status.error && !status.loading && !status.user.enabled")
+			p #{translate("account_not_linked_to_github")}
+			
+			
+		div(ng-show="!status.error && !status.loading && status.user.enabled")
+			div(ng-show="!status.project.enabled")
+				p #{translate("project_not_linked_to_github")}
+				
+			div(ng-show="status.project.enabled")
+				p #{translate("project_linked_to_github")}
+
+	.modal-footer()
+		button.btn.btn-default(
+			ng-click="cancel()",
+		)
+			span #{translate("dismiss")}

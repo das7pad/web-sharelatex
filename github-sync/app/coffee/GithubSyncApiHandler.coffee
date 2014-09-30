@@ -21,8 +21,16 @@ module.exports = GithubSyncApiHandler =
 			json: options
 		}, callback
 
-	getStatus: (user_id, callback = (error, status) ->) ->
+	getUserStatus: (user_id, callback = (error, status) ->) ->
 		url = "#{settings.apis.githubSync.url}/user/#{user_id}/status"
+		GithubSyncApiHandler.apiRequest {
+			method: "get",
+			url: url,
+			json: true
+		}, callback
+		
+	getProjectStatus: (project_id, callback = (error, status) ->) ->
+		url = "#{settings.apis.githubSync.url}/project/#{project_id}/status"
 		GithubSyncApiHandler.apiRequest {
 			method: "get",
 			url: url,

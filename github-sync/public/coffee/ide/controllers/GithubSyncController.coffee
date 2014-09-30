@@ -1,6 +1,10 @@
 define [
 	"base"
 ], (App) ->
-	App.controller "GithubSyncController", ($scope) ->
+	App.controller "GithubSyncController", ($scope, $modal) ->
 		$scope.openGithubSyncModal = () ->
-			console.log "opening modal"
+			$modal.open {
+				templateUrl: "githubSyncModalTemplate"
+				controller: "GithubSyncModalController"
+				scope:$scope
+			}
