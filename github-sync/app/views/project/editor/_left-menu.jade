@@ -56,6 +56,12 @@ script(type="text/ng-template", id="githubSyncExportModalTemplate")
 			span  #{translate("loading")}
 
 		div(ng-show="!status.error && !status.loading")
+			.alert.alert-danger(ng-show="form.error")
+				| {{ form.error }}
+				div.small
+					| Please check that the repository name is valid, and that you have
+					| permission to create the repository.
+			
 			form.form
 				.row
 					.col-xs-4

@@ -62,6 +62,8 @@ module.exports = GithubSyncApiHandler =
 			if 200 <= response.statusCode < 300
 				callback null, body
 			else
-				error = new Error("non-success status code returned from github-sync api: #{response.statusCode}")
+				message = body?.error or "github-sync api error"
+				error = new Error(message)
+				error.statusCode = response.statusCode
 				logger.error err:error, body: body, statusCode: response.statusCode, "github-sync api error"
 				callback(error)

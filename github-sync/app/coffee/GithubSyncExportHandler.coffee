@@ -1,4 +1,5 @@
 ProjectEntityHandler = require "../../../../app/js/Features/Project/ProjectEntityHandler"
+DocumentUpdaterHandler = require "../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler"
 Project = require("../../../../app/js/models/Project").Project
 GithubSyncApiHandler = require "./GithubSyncApiHandler"
 settings = require "settings-sharelatex"
@@ -7,9 +8,11 @@ module.exports = GithubSyncExportHandler =
 	exportProject: (project_id, options, callback = (error) ->) ->
 		Project.findById project_id, {owner_ref: 1}, (error, project) ->
 			return callback(error) if error?
-			GithubSyncExportHandler._buildFileList project_id, (error, files) ->
+			DocumentUpdaterHandler.flushProjectToMongo project_id, (error) ->
 				return callback(error) if error?
-				GithubSyncApiHandler.exportProject project_id, project.owner_ref, options, files, callback
+				GithubSyncExportHandler._buildFileList project_id, (error, files) ->
+					return callback(error) if error?
+					GithubSyncApiHandler.exportProject project_id, project.owner_ref, options, files, callback
 		
 	_buildFileList: (project_id, callback = (error, files) ->) ->
 		# This shares similar code with Features/Compile/ClsiManager.coffee#_buildRequest

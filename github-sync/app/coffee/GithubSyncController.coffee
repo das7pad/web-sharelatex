@@ -48,6 +48,14 @@ module.exports = GithubSyncController =
 		project_id = req.params.Project_id
 		options = req.body
 		GithubSyncExportHandler.exportProject project_id, options, (error) ->
-			return next(error) if error?
+			return GithubSyncController._reportError(error, req, res, next) if error?
 			res.status(200).end()
+			
+	_reportError: (error, req, res, next) ->
+		if error.statusCode? and 400 <= error.statusCode < 500 # Validation/client error from upstream API
+			res.status(error.statusCode)
+			res.header("Content-Type", "application/json")
+			res.json({error: error.message})
+		else
+			next(error)
 		

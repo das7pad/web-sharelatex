@@ -41,5 +41,6 @@ define [
 					$modalInstance.dismiss()
 					ide.githubSyncManager.openGithubSyncModal()
 					
-				.error () ->
+				.error (data) ->
+					$scope.form.error = data.error
 					$scope.status.inflight = false
