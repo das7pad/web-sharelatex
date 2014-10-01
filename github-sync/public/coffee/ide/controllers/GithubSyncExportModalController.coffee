@@ -11,9 +11,9 @@ define [
 		}
 		
 		$scope.form = {
-			owner: null
+			org: null
 			name:  ide.$scope.project.name
-			public: "true" # String to work with select box model
+			private: "false" # String to work with select box model
 			description: ""
 		}
 
@@ -22,20 +22,24 @@ define [
 				$scope.status.user = data.user
 				$scope.status.orgs = data.orgs
 				$scope.status.loading = false
-				$scope.form.owner = $scope.status.user.login
+				$scope.form.org = $scope.status.user.login
 				
 			.error () ->
 				$scope.status.error = true
 				
 		$scope.create = () ->
 			$scope.status.inflight = true
-			$http.post("/project/#{ide.project_id}/github-sync/export", {
-					_csrf: window.csrfToken
-					name: $scope.form.name
-					owner: $scope.form.owner
-					description: $scope.form.description
-					public: $scope.form.public == "true"
-				})
+			data = {
+				_csrf: window.csrfToken
+				name: $scope.form.name
+				description: $scope.form.description
+				private: $scope.form.private == "true"
+			}
+			# If the user selected themselves as the owner, we
+			# don't need to send an org
+			if $scope.form.org? and $scope.form.org != $scope.status.user.login
+				data.org = $scope.form.org
+			$http.post("/project/#{ide.project_id}/github-sync/export", data)
 				.success () ->
 					$scope.status.inflight = false
 					$modalInstance.dismiss()

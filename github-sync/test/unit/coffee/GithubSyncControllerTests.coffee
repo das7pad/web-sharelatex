@@ -130,11 +130,19 @@ describe 'GithubSyncController', ->
 				Project_id: @project_id = "project-id-123"
 			@req.body =
 				name: "Test repo"
+				description: "Test description"
+				org: "sharelatex"
+				private: true
 			@GithubSyncExportHandler.exportProject = sinon.stub().callsArgWith(2, null)
 			@GithubSyncController.exportProject @req, @res
 			
 		it "should export the project", ->
 			@GithubSyncExportHandler.exportProject
-				.calledWith(@project_id, @req.body)
+				.calledWith(@project_id, {
+					name: "Test repo"
+					description: "Test description"
+					org: "sharelatex"
+					private: true
+				})
 				.should.equal true
 

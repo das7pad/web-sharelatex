@@ -67,9 +67,9 @@ script(type="text/ng-template", id="githubSyncExportModalTemplate")
 					.col-xs-4
 						.form-group
 							label Owner
-							select.form-control(ng-model="form.owner")
-								option(selected) {{status.user.login}}
-								option(ng-repeat="org in status.orgs", value="org.login") {{ org.login }}
+							select.form-control(ng-model="form.org")
+								option(ng-value="status.user.login", selected) {{status.user.login}}
+								option(ng-repeat="org in status.orgs", ng-value="org.login") {{ org.login }}
 					.col-xs-8
 						.form-group
 							label Repository Name
@@ -86,15 +86,15 @@ script(type="text/ng-template", id="githubSyncExportModalTemplate")
 				.row
 					.col-xs-12
 						label
-							input(type="radio", name="public", value="true", ng-model="form.public")
+							input(type="radio", name="private", value="false", ng-model="form.private")
 							|  Public. 
 						small  Anyone can see this repository. You choose who can commit.
 				.row
 					.col-xs-12
 						label
-							input(type="radio", name="public", value="false", ng-model="form.public")
+							input(type="radio", name="private", value="true", ng-model="form.private")
 							|  Private. 
-						small  You choose who can see and commit to this repository.
+						small  You choose who can see and commit to this repository. (Requires upgraded Github account).
 
 	.modal-footer()
 		button.btn.btn-default(

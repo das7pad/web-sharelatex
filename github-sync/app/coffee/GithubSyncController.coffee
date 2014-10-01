@@ -46,8 +46,14 @@ module.exports = GithubSyncController =
 			
 	exportProject: (req, res, next) ->
 		project_id = req.params.Project_id
-		options = req.body
-		GithubSyncExportHandler.exportProject project_id, options, (error) ->
+		{name, description, org} = req.body
+		priv = req.body.private
+		GithubSyncExportHandler.exportProject project_id, {
+			name: name
+			description: description
+			org: org
+			private: priv
+		}, (error) ->
 			return GithubSyncController._reportError(error, req, res, next) if error?
 			res.status(200).end()
 			
