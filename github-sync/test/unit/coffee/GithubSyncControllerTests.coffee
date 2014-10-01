@@ -11,6 +11,7 @@ describe 'GithubSyncController', ->
 			'settings-sharelatex': @settings = {}
 			'logger-sharelatex': @logger = { log: sinon.stub(), error: sinon.stub() }
 			"./GithubSyncApiHandler": @GithubSyncApiHandler = {}
+			"./GithubSyncExportHandler": @GithubSyncExportHandler = {}
 
 		@settings.apis =
 			githubSync:
@@ -26,6 +27,8 @@ describe 'GithubSyncController', ->
 			redirect: sinon.stub()
 			header: sinon.stub()
 			json: sinon.stub()
+			end: sinon.stub()
+		@res.status = sinon.stub().returns(@res)
 
 	describe "login", ->
 		beforeEach ->
@@ -81,6 +84,25 @@ describe 'GithubSyncController', ->
 				.calledWith(@status)
 				.should.equal true
 
+	describe "getUserLoginAndOrgs", ->
+		beforeEach ->
+			@GithubSyncApiHandler.getUserLoginAndOrgs = sinon.stub().callsArgWith(1, null, @data = { user: { login: "jpallen" }, orgs: [] })
+			@GithubSyncController.getUserLoginAndOrgs @req, @res
+			
+		it "should get the user details from the github sync api", ->
+			@GithubSyncApiHandler.getUserLoginAndOrgs
+				.calledWith(@user_id)
+				.should.equal true
+				
+		it "should return the output as JSON", ->
+			@res.header
+				.calledWith("Content-Type", "application/json")
+				.should.equal true
+				
+			@res.json
+				.calledWith(@data)
+				.should.equal true
+
 	describe "getProjectStatus", ->
 		beforeEach ->
 			@req.params =
@@ -101,3 +123,18 @@ describe 'GithubSyncController', ->
 			@res.json
 				.calledWith(@status)
 				.should.equal true
+				
+	describe "exportProject", ->
+		beforeEach ->
+			@req.params =
+				Project_id: @project_id = "project-id-123"
+			@req.body =
+				name: "Test repo"
+			@GithubSyncExportHandler.exportProject = sinon.stub().callsArgWith(2, null)
+			@GithubSyncController.exportProject @req, @res
+			
+		it "should export the project", ->
+			@GithubSyncExportHandler.exportProject
+				.calledWith(@project_id, @req.body)
+				.should.equal true
+

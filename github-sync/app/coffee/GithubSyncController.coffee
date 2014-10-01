@@ -3,6 +3,7 @@ settings = require "settings-sharelatex"
 logger = require "logger-sharelatex"
 
 GithubSyncApiHandler = require "./GithubSyncApiHandler"
+GithubSyncExportHandler = require "./GithubSyncExportHandler"
 
 module.exports = GithubSyncController =
 	login: (req, res, next) ->
@@ -28,6 +29,13 @@ module.exports = GithubSyncController =
 			return next(error) if error?
 			res.header("Content-Type", "application/json")
 			res.json(status)
+			
+	getUserLoginAndOrgs: (req, res, next) ->
+		user_id = req.session.user._id
+		GithubSyncApiHandler.getUserLoginAndOrgs user_id, (error, data) ->
+			return next(error) if error?
+			res.header("Content-Type", "application/json")
+			res.json(data)
 		
 	getProjectStatus: (req, res, next) ->
 		project_id = req.params.Project_id
@@ -35,3 +43,11 @@ module.exports = GithubSyncController =
 			return next(error) if error?
 			res.header("Content-Type", "application/json")
 			res.json(status)
+			
+	exportProject: (req, res, next) ->
+		project_id = req.params.Project_id
+		options = req.body
+		GithubSyncExportHandler.exportProject project_id, options, (error) ->
+			return next(error) if error?
+			res.status(200).end()
+		

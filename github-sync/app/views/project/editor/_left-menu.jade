@@ -6,6 +6,7 @@ span(ng-controller="GithubSyncController", ng-show="permissions.admin")
 				| &nbsp;&nbsp; Github
 				
 script(type="text/ng-template", id="githubSyncModalTemplate")
+
 	.modal-header
 		button.close(
 			type="button"
@@ -15,18 +16,19 @@ script(type="text/ng-template", id="githubSyncModalTemplate")
 		h3 #{translate("github_sync")}
 	.modal-body
 		.alert.alert-danger(ng-show="status.error") #{translate("github_sync_error")}
-		
+
 		.loading(ng-show="!status.error && status.loading")
 			i.fa.fa-refresh.fa-spin.fa-fw
 			span  #{translate("checking_github_sync_status")}
-						
+
 		div(ng-show="!status.error && !status.loading && !status.user.enabled")
 			p #{translate("account_not_linked_to_github")}
-			
-			
+
 		div(ng-show="!status.error && !status.loading && status.user.enabled")
 			div(ng-show="!status.project.enabled")
 				p #{translate("project_not_linked_to_github")}
+				p
+					button(ng-click="openExportToGithubModal()").btn.btn-primary #{translate("create_project_in_github")}
 				
 			div(ng-show="status.project.enabled")
 				p #{translate("project_linked_to_github")}
@@ -36,3 +38,66 @@ script(type="text/ng-template", id="githubSyncModalTemplate")
 			ng-click="cancel()",
 		)
 			span #{translate("dismiss")}
+			
+script(type="text/ng-template", id="githubSyncExportModalTemplate")
+
+	.modal-header
+		button.close(
+			type="button"
+			data-dismiss="modal"
+			ng-click="cancel()"
+		) &times;
+		h3 #{translate("create_project_in_github")}
+	.modal-body
+		.alert.alert-danger(ng-show="status.error") #{translate("github_sync_error")}
+
+		.loading(ng-show="!status.error && status.loading")
+			i.fa.fa-refresh.fa-spin.fa-fw
+			span  #{translate("loading")}
+
+		div(ng-show="!status.error && !status.loading")
+			form.form
+				.row
+					.col-xs-4
+						.form-group
+							label Owner
+							select.form-control(ng-model="form.owner")
+								option(selected) {{status.user.login}}
+								option(ng-repeat="org in status.orgs", value="org.login") {{ org.login }}
+					.col-xs-8
+						.form-group
+							label Repository Name
+							input.form-control(type="text", ng-model="form.name")
+							
+				.row
+					.col-xs-12
+						.form-group
+							label Description (optional)
+							input.form-control(type="text", ng-model="form.description")
+				
+				hr
+				
+				.row
+					.col-xs-12
+						label
+							input(type="radio", name="public", value="true", ng-model="form.public")
+							|  Public. 
+						small  Anyone can see this repository. You choose who can commit.
+				.row
+					.col-xs-12
+						label
+							input(type="radio", name="public", value="false", ng-model="form.public")
+							|  Private. 
+						small  You choose who can see and commit to this repository.
+
+	.modal-footer()
+		button.btn.btn-default(
+			ng-click="cancel()",
+		)
+			span #{translate("dismiss")}
+		button.btn.btn-primary(
+			ng-disabled="status.inflight"
+			ng-click="create()"
+		)
+			span(ng-hide="status.inflight") #{translate("create")}
+			span(ng-show="status.inflight") #{translate("creating")}...

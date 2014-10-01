@@ -1,0 +1,36 @@
+ProjectEntityHandler = require "../../../../app/js/Features/Project/ProjectEntityHandler"
+Project = require("../../../../app/js/models/Project").Project
+GithubSyncApiHandler = require "./GithubSyncApiHandler"
+settings = require "settings-sharelatex"
+
+module.exports = GithubSyncExportHandler =
+	exportProject: (project_id, options, callback = (error) ->) ->
+		Project.findById project_id, {owner_ref: 1}, (error, project) ->
+			return callback(error) if error?
+			GithubSyncExportHandler._buildFileList project_id, (error, files) ->
+				return callback(error) if error?
+				GithubSyncApiHandler.exportProject project_id, project.owner_ref, options, files, callback
+		
+	_buildFileList: (project_id, callback = (error, files) ->) ->
+		# This shares similar code with Features/Compile/ClsiManager.coffee#_buildRequest
+		# Consider refactoring out shared logic?
+		fileList = []
+		ProjectEntityHandler.getAllDocs project_id, (error, docs = {}) ->
+			return callback(error) if error?
+			ProjectEntityHandler.getAllFiles project_id, (error, files = {}) ->
+				return callback(error) if error?
+				
+				for path, doc of docs
+					fileList.push {
+						path:    path.replace(/^\//, "") # Remove leading /
+						content: doc.lines.join("\n")
+					}
+				
+				for path, file of files
+					fileList.push {
+						path: path.replace(/^\//, "") # Remove leading /
+						url:  "#{settings.apis.filestore.url}/project/#{project_id}/file/#{file._id}"
+					}
+				
+				callback null, fileList
+		

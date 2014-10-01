@@ -36,7 +36,26 @@ module.exports = GithubSyncApiHandler =
 			url: url,
 			json: true
 		}, callback
-				
+		
+	getUserLoginAndOrgs: (user_id, callback = (error, data) ->) ->
+		url = "#{settings.apis.githubSync.url}/user/#{user_id}/orgs"
+		GithubSyncApiHandler.apiRequest {
+			method: "get",
+			url: url,
+			json: true
+		}, callback
+		
+	exportProject: (project_id, owner_id, repo, files, callback = (error) ->) ->
+		url = "#{settings.apis.githubSync.url}/project/#{project_id}/export"
+		GithubSyncApiHandler.apiRequest {
+			method: "post",
+			url: url,
+			json:
+				owner_id: owner_id
+				repo:     repo
+				files:    files
+		}, callback
+		
 	apiRequest: (options, callback = (error, body) ->) ->
 		request options, (error, response, body) ->
 			return callback(error) if error?

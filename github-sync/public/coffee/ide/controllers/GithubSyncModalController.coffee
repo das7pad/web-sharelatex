@@ -1,9 +1,16 @@
 define [
 	"base"
 ], (App) ->
-	App.controller "GithubSyncModalController", ($scope, $modalInstance, $http, ide) ->
+	App.controller "GithubSyncModalController", ($scope, $modalInstance, $http, $modal, ide) ->
 		$scope.cancel = () ->
 			$modalInstance.dismiss()
+			
+		$scope.openExportToGithubModal = () ->
+			$modalInstance.dismiss()
+			$modal.open {
+				templateUrl: "githubSyncExportModalTemplate"
+				controller: "GithubSyncExportModalController"
+			}
 			
 		$scope.status = {
 			loading: true
