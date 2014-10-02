@@ -45,6 +45,14 @@ module.exports = GithubSyncApiHandler =
 			json: true
 		}, callback
 		
+	getUserRepos: (user_id, callback = (error, data) ->) ->
+		url = "#{settings.apis.githubSync.url}/user/#{user_id}/repos"
+		GithubSyncApiHandler.apiRequest {
+			method: "get",
+			url: url,
+			json: true
+		}, callback
+		
 	exportProject: (project_id, owner_id, repo, files, callback = (error) ->) ->
 		url = "#{settings.apis.githubSync.url}/project/#{project_id}/export"
 		GithubSyncApiHandler.apiRequest {

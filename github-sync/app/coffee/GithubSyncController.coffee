@@ -36,6 +36,13 @@ module.exports = GithubSyncController =
 			return next(error) if error?
 			res.header("Content-Type", "application/json")
 			res.json(data)
+			
+	getUserRepos: (req, res, next) ->
+		user_id = req.session.user._id
+		GithubSyncApiHandler.getUserRepos user_id, (error, data) ->
+			return next(error) if error?
+			res.header("Content-Type", "application/json")
+			res.json(data)
 		
 	getProjectStatus: (req, res, next) ->
 		project_id = req.params.Project_id

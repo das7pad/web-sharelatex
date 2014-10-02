@@ -6,3 +6,4 @@ module.exports = GithubSync =
 	viewIncludes:
 		"userSettings"   : "user/_settings"
 		"editorLeftMenu" : "project/editor/_left-menu"
+		"newProjectMenu" : "project/list/_new-project-menu"

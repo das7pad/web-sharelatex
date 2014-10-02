@@ -13,6 +13,7 @@ module.exports =
 		
 		app.get '/user/github-sync/status', AuthenticationController.requireLogin(), GithubSyncController.getUserStatus
 		app.get '/user/github-sync/orgs', AuthenticationController.requireLogin(), GithubSyncController.getUserLoginAndOrgs
+		app.get '/user/github-sync/repos', AuthenticationController.requireLogin(), GithubSyncController.getUserRepos
 		app.get '/project/:Project_id/github-sync/status', SecurityManager.requestCanAccessProject, GithubSyncController.getProjectStatus
 
 		app.post '/project/:Project_id/github-sync/export', SecurityManager.requestIsAdmin, GithubSyncController.exportProject

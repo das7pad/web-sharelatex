@@ -103,6 +103,25 @@ describe 'GithubSyncController', ->
 				.calledWith(@data)
 				.should.equal true
 
+	describe "getUserRepos", ->
+		beforeEach ->
+			@GithubSyncApiHandler.getUserRepos = sinon.stub().callsArgWith(1, null, @repos = [{full_name: "org/repo"}])
+			@GithubSyncController.getUserRepos @req, @res
+			
+		it "should get the user details from the github sync api", ->
+			@GithubSyncApiHandler.getUserRepos
+				.calledWith(@user_id)
+				.should.equal true
+				
+		it "should return the output as JSON", ->
+			@res.header
+				.calledWith("Content-Type", "application/json")
+				.should.equal true
+				
+			@res.json
+				.calledWith(@repos)
+				.should.equal true
+
 	describe "getProjectStatus", ->
 		beforeEach ->
 			@req.params =
