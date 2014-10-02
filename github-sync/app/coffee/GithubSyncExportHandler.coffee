@@ -13,6 +13,13 @@ module.exports = GithubSyncExportHandler =
 				GithubSyncExportHandler._buildFileList project_id, (error, files) ->
 					return callback(error) if error?
 					GithubSyncApiHandler.exportProject project_id, project.owner_ref, options, files, callback
+					
+	mergeProject: (project_id, options, callback = (error) ->) ->
+		DocumentUpdaterHandler.flushProjectToMongo project_id, (error) ->
+			return callback(error) if error?
+			GithubSyncExportHandler._buildFileList project_id, (error, files) ->
+				return callback(error) if error?
+				GithubSyncApiHandler.mergeProject project_id, options, files, callback
 		
 	_buildFileList: (project_id, callback = (error, files) ->) ->
 		# This shares similar code with Features/Compile/ClsiManager.coffee#_buildRequest

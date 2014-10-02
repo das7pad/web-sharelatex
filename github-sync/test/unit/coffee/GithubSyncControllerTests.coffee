@@ -145,4 +145,20 @@ describe 'GithubSyncController', ->
 					private: true
 				})
 				.should.equal true
+				
+	describe "mergeProject", ->
+		beforeEach ->
+			@req.params =
+				Project_id: @project_id = "project-id-123"
+			@req.body =
+				message: "Test message"
+			@GithubSyncExportHandler.mergeProject = sinon.stub().callsArgWith(2, null)
+			@GithubSyncController.mergeProject @req, @res
+			
+		it "should merge the project", ->
+			@GithubSyncExportHandler.mergeProject
+				.calledWith(@project_id, {
+					message: "Test message"
+				})
+				.should.equal true
 

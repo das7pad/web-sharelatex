@@ -56,6 +56,16 @@ module.exports = GithubSyncApiHandler =
 				files:    files
 		}, callback
 		
+	mergeProject: (project_id, options, files, callback = (error) ->) ->
+		url = "#{settings.apis.githubSync.url}/project/#{project_id}/merge"
+		GithubSyncApiHandler.apiRequest {
+			method: "post",
+			url: url,
+			json:
+				message:  options.message
+				files:    files
+		}, callback
+
 	apiRequest: (options, callback = (error, body) ->) ->
 		request options, (error, response, body) ->
 			return callback(error) if error?

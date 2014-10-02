@@ -57,6 +57,15 @@ module.exports = GithubSyncController =
 			return GithubSyncController._reportError(error, req, res, next) if error?
 			res.status(200).end()
 			
+	mergeProject: (req, res, next) ->
+		project_id = req.params.Project_id
+		{message} = req.body
+		GithubSyncExportHandler.mergeProject project_id, {
+			message: message
+		}, (error) ->
+			return GithubSyncController._reportError(error, req, res, next) if error?
+			res.status(200).end()
+			
 	_reportError: (error, req, res, next) ->
 		if error.statusCode? and 400 <= error.statusCode < 500 # Validation/client error from upstream API
 			res.status(error.statusCode)

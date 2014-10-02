@@ -12,6 +12,14 @@ define [
 				controller: "GithubSyncExportModalController"
 			}
 			
+		$scope.openMergeModal = () ->
+			$modalInstance.dismiss()
+			$modal.open {
+				templateUrl: "githubSyncMergeModalTemplate"
+				controller: "GithubSyncMergeModalController"
+			}
+			
+			
 		$scope.status = {
 			loading: true
 			error: false

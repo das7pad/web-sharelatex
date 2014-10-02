@@ -58,6 +58,34 @@ describe "GithubSyncExportHandler", ->
 				)
 				.should.equal true
 				
+	describe "mergeProject", ->
+		beforeEach ->
+			@owner_id = "owner-id-123"
+			@message = "Commit message"
+			@GithubSyncApiHandler.mergeProject = sinon.stub().callsArg(3)
+			@GithubSyncExportHandler._buildFileList = sinon.stub().callsArgWith(1, null, @files = ["mock-files"])
+			@DocumentUpdaterHandler.flushProjectToMongo = sinon.stub().callsArg(1)
+			@GithubSyncExportHandler.mergeProject @project_id, { message: @message }, @callback
+
+		it "should flush the document to Mongo", ->
+			@DocumentUpdaterHandler.flushProjectToMongo
+				.calledWith(@project_id)
+				.should.equal true
+				
+		it "should get the project file list", ->
+			@GithubSyncExportHandler._buildFileList
+				.calledWith(@project_id)
+				.should.equal true
+				
+		it "should send a merge request to the Github API", ->
+			@GithubSyncApiHandler.mergeProject
+				.calledWith(
+					@project_id,
+					{ message: @message }, 
+					@files
+				)
+				.should.equal true
+				
 	describe "_buildFileList", ->
 		beforeEach ->
 			@docs = {

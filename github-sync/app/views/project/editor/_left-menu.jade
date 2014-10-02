@@ -21,23 +21,46 @@ script(type="text/ng-template", id="githubSyncModalTemplate")
 			i.fa.fa-refresh.fa-spin.fa-fw
 			span  #{translate("checking_github_sync_status")}
 
-		div(ng-show="!status.error && !status.loading && !status.user.enabled")
+		div(ng-if="!status.error && !status.loading && !status.user.enabled")
 			p #{translate("account_not_linked_to_github")}
 
-		div(ng-show="!status.error && !status.loading && status.user.enabled")
-			div(ng-show="!status.project.enabled")
+		div(ng-if="!status.error && !status.loading && status.user.enabled")
+			div(ng-if="!status.project.enabled")
 				p #{translate("project_not_linked_to_github")}
 				p
 					button(ng-click="openExportToGithubModal()").btn.btn-primary #{translate("create_project_in_github")}
 				
-			div(ng-show="status.project.enabled")
-				p #{translate("project_linked_to_github")}
+			div(ng-if="status.project.enabled")
+				div(ng-if="status.project.merge_status == 'success'")
+					p.text-center This project is synced with the GitHub repository at 
+						a(ng-href="https://github.com/{{status.project.repo}}", target="_blank") {{status.project.repo}}
+					hr
+					h3 Recent commits in GitHub
+					div
+						span.small.pull-right
+							a(href) ab23dce
+						a(href) Updated my references
+						div.small by jamesallen0108@gmail.com
+					hr
+					p.text-center
+						button(ng-click="openMergeModal()").btn.btn-primary Sync project to GitHub now
+
+				div(ng-if="status.project.merge_status == 'failure'")
+					.alert.alert-danger
+						| Your changes in ShareLaTeX and GitHub could not be automatically merged. Please manually merge the 
+						strong {{ status.project.unmerged_branch }} 
+						| branch into the 
+						strong master 
+						| branch in git. Click below to continue, 
+						em after you have manually merged.
+					p.text-center
+						button(ng-click="openMergeModal()").btn.btn-primary I have manually merged. Continue
 
 	.modal-footer()
 		button.btn.btn-default(
 			ng-click="cancel()",
 		)
-			span #{translate("dismiss")}
+			span #{translate("cancel")}
 			
 script(type="text/ng-template", id="githubSyncExportModalTemplate")
 
@@ -56,6 +79,9 @@ script(type="text/ng-template", id="githubSyncExportModalTemplate")
 			span  #{translate("loading")}
 
 		div(ng-show="!status.error && !status.loading")
+			p Any changes you have made in ShareLaTeX will be committed and merged with
+			| any updates in GitHub.
+		
 			.alert.alert-danger(ng-show="form.error")
 				| {{ form.error }}
 				div.small
@@ -100,10 +126,40 @@ script(type="text/ng-template", id="githubSyncExportModalTemplate")
 		button.btn.btn-default(
 			ng-click="cancel()",
 		)
-			span #{translate("dismiss")}
+			span #{translate("cancel")}
 		button.btn.btn-primary(
 			ng-disabled="status.inflight"
 			ng-click="create()"
 		)
 			span(ng-hide="status.inflight") #{translate("create")}
 			span(ng-show="status.inflight") #{translate("creating")}...
+			
+script(type="text/ng-template", id="githubSyncMergeModalTemplate")
+
+	.modal-header
+		button.close(
+			type="button"
+			data-dismiss="modal"
+			ng-click="cancel()"
+		) &times;
+		h3 #{translate("merge_project_with_github")}
+	.modal-body
+		.alert.alert-danger(ng-show="form.error")
+			| {{ form.error }}
+		
+		form.form
+			.row
+				.col-xs-12
+					textarea(placeholder="Commit message for changes made in ShareLaTeX...", ng-model="form.message").form-control
+
+	.modal-footer()
+		button.btn.btn-default(
+			ng-click="cancel()",
+		)
+			span #{translate("cancel")}
+		button.btn.btn-primary(
+			ng-disabled="status.inflight"
+			ng-click="merge()"
+		)
+			span(ng-hide="status.inflight") #{translate("merge")}
+			span(ng-show="status.inflight") #{translate("merging")}...
