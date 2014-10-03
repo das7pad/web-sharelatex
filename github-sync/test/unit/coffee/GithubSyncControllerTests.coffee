@@ -12,6 +12,7 @@ describe 'GithubSyncController', ->
 			'logger-sharelatex': @logger = { log: sinon.stub(), error: sinon.stub() }
 			"./GithubSyncApiHandler": @GithubSyncApiHandler = {}
 			"./GithubSyncExportHandler": @GithubSyncExportHandler = {}
+			"./GithubSyncImportHandler": @GithubSyncImportHandler = {}
 
 		@settings.apis =
 			githubSync:
@@ -163,6 +164,24 @@ describe 'GithubSyncController', ->
 					org: "sharelatex"
 					private: true
 				})
+				.should.equal true
+				
+	describe "importProject", ->
+		beforeEach ->
+			@req.body =
+				projectName: @name = "Project Name"
+				repo: @repo = "org/repo"
+			@GithubSyncImportHandler.importProject = sinon.stub().callsArgWith(3, null, @project_id = "project-id-123")
+			@GithubSyncController.importProject @req, @res
+			
+		it "should import the project", ->
+			@GithubSyncImportHandler.importProject
+				.calledWith(@user_id, @name, @repo)
+				.should.equal true
+				
+		it "should return the project id to the client", ->
+			@res.json
+				.calledWith(project_id: @project_id)
 				.should.equal true
 				
 	describe "mergeProject", ->

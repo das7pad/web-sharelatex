@@ -4,6 +4,7 @@ logger = require "logger-sharelatex"
 
 GithubSyncApiHandler = require "./GithubSyncApiHandler"
 GithubSyncExportHandler = require "./GithubSyncExportHandler"
+GithubSyncImportHandler = require "./GithubSyncImportHandler"
 
 module.exports = GithubSyncController =
 	login: (req, res, next) ->
@@ -50,6 +51,15 @@ module.exports = GithubSyncController =
 			return next(error) if error?
 			res.header("Content-Type", "application/json")
 			res.json(status)
+			
+	importProject: (req, res, next) ->
+		user_id = req.session.user._id
+		projectName = req.body.projectName?.trim()
+		repo = req.body.repo
+		GithubSyncImportHandler.importProject user_id, projectName, repo, (error, project_id) ->
+			return next(error) if error?
+			res.header("Content-Type", "application/json")
+			res.json(project_id: project_id)
 			
 	exportProject: (req, res, next) ->
 		project_id = req.params.Project_id

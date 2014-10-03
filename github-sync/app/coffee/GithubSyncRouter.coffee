@@ -18,3 +18,4 @@ module.exports =
 
 		app.post '/project/:Project_id/github-sync/export', SecurityManager.requestIsAdmin, GithubSyncController.exportProject
 		app.post '/project/:Project_id/github-sync/merge', SecurityManager.requestIsAdmin, GithubSyncController.mergeProject
+		app.post '/project/new/github-sync', AuthenticationController.requireLogin(), GithubSyncController.importProject

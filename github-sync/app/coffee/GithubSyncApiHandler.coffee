@@ -53,6 +53,16 @@ module.exports = GithubSyncApiHandler =
 			json: true
 		}, callback
 		
+	importProject: (project_id, owner_id, repo, callback = (error) ->) ->
+		url = "#{settings.apis.githubSync.url}/project/#{project_id}/import"
+		GithubSyncApiHandler.apiRequest {
+			method: "post",
+			url: url,
+			json:
+				owner_id: owner_id
+				repo:     repo
+		}, callback
+		
 	exportProject: (project_id, owner_id, repo, files, callback = (error) ->) ->
 		url = "#{settings.apis.githubSync.url}/project/#{project_id}/export"
 		GithubSyncApiHandler.apiRequest {
