@@ -3,7 +3,7 @@ span(ng-controller="GithubSyncController", ng-show="permissions.admin")
 		li
 			a(ng-click="openGithubSyncModal()")
 				i.fa.fa-github.fa-fw
-				| &nbsp;&nbsp; Github
+				| &nbsp;&nbsp; GitHub
 				
 script(type="text/ng-template", id="githubSyncModalTemplate")
 
@@ -16,14 +16,14 @@ script(type="text/ng-template", id="githubSyncModalTemplate")
 		h3 #{translate("github_sync")}
 	.modal-body
 		.alert.alert-danger(ng-show="status.error") #{translate("github_sync_error")}
-
+	
 		.loading(ng-show="!status.error && status.loading")
 			i.fa.fa-refresh.fa-spin.fa-fw
-			span  #{translate("checking_github_sync_status")}
-
+			span  #{translate("checking_project_github_status")}
+	
 		div(ng-if="!status.error && !status.loading && !status.user.enabled")
 			p #{translate("account_not_linked_to_github")}
-
+	
 		div(ng-if="!status.error && !status.loading && status.user.enabled")
 			div(ng-if="!status.project.enabled")
 				p #{translate("project_not_linked_to_github")}
@@ -32,10 +32,10 @@ script(type="text/ng-template", id="githubSyncModalTemplate")
 				
 			div(ng-if="status.project.enabled")
 				div(ng-if="status.project.merge_status == 'success'")
-					p.text-center This project is synced with the GitHub repository at 
+					p.text-center #{translate("project_synced_with_git_repo_at")} 
 						a(ng-href="https://github.com/{{status.project.repo}}", target="_blank") {{status.project.repo}}
 					hr
-					h3 Recent commits in GitHub
+					h3 #{translate("recent_commits_in_github")}
 					div
 						span.small.pull-right
 							a(href) ab23dce
@@ -43,19 +43,13 @@ script(type="text/ng-template", id="githubSyncModalTemplate")
 						div.small by jamesallen0108@gmail.com
 					hr
 					p.text-center
-						button(ng-click="openMergeModal()").btn.btn-primary Sync project to GitHub now
-
+						button(ng-click="openMergeModal()").btn.btn-primary= translate("sync_project_to_github")
+	
 				div(ng-if="status.project.merge_status == 'failure'")
-					.alert.alert-danger
-						| Your changes in ShareLaTeX and GitHub could not be automatically merged. Please manually merge the 
-						strong {{ status.project.unmerged_branch }} 
-						| branch into the 
-						strong master 
-						| branch in git. Click below to continue, 
-						em after you have manually merged.
+					.alert.alert-danger !{translate("github_merge_failed", {sharelatex_branch:"<strong>{{ status.project.unmerged_branch }}</strong>", master_branch:"<strong>master</strong>"})}
 					p.text-center
-						button(ng-click="openMergeModal()").btn.btn-primary I have manually merged. Continue
-
+						button(ng-click="openMergeModal()").btn.btn-primary= translate("continue_github_merge")
+	
 	.modal-footer()
 		button.btn.btn-default(
 			ng-click="cancel()",
@@ -70,7 +64,7 @@ script(type="text/ng-template", id="githubSyncExportModalTemplate")
 			data-dismiss="modal"
 			ng-click="cancel()"
 		) &times;
-		h3 #{translate("create_project_in_github")}
+		h3 #{translate("export_project_to_github")}
 	.modal-body
 		.alert.alert-danger(ng-show="status.error") #{translate("github_sync_error")}
 
@@ -79,32 +73,27 @@ script(type="text/ng-template", id="githubSyncExportModalTemplate")
 			span  #{translate("loading")}
 
 		div(ng-show="!status.error && !status.loading")
-			p Any changes you have made in ShareLaTeX will be committed and merged with
-			| any updates in GitHub.
-		
 			.alert.alert-danger(ng-show="form.error")
 				| {{ form.error }}
-				div.small
-					| Please check that the repository name is valid, and that you have
-					| permission to create the repository.
+				div.small= translate("github_validation_check")
 			
 			form.form
 				.row
 					.col-xs-4
 						.form-group
-							label Owner
+							label= translate("owner")
 							select.form-control(ng-model="form.org")
 								option(ng-value="status.user.login", selected) {{status.user.login}}
 								option(ng-repeat="org in status.orgs", ng-value="org.login") {{ org.login }}
 					.col-xs-8
 						.form-group
-							label Repository Name
+							label= translate("repository_name")
 							input.form-control(type="text", ng-model="form.name")
 							
 				.row
 					.col-xs-12
 						.form-group
-							label Description (optional)
+							label #{translate("description")} (#{translate("optional")})
 							input.form-control(type="text", ng-model="form.description")
 				
 				hr
@@ -113,14 +102,14 @@ script(type="text/ng-template", id="githubSyncExportModalTemplate")
 					.col-xs-12
 						label
 							input(type="radio", name="private", value="false", ng-model="form.private")
-							|  Public. 
-						small  Anyone can see this repository. You choose who can commit.
+							|  #{translate("public")}.
+						small  #{translate("github_public_description")}
 				.row
 					.col-xs-12
 						label
 							input(type="radio", name="private", value="true", ng-model="form.private")
-							|  Private. 
-						small  You choose who can see and commit to this repository. (Requires upgraded Github account).
+							|  #{translate("private")}. 
+						small  #{translate("github_private_description")}
 
 	.modal-footer()
 		button.btn.btn-default(
@@ -142,15 +131,20 @@ script(type="text/ng-template", id="githubSyncMergeModalTemplate")
 			data-dismiss="modal"
 			ng-click="cancel()"
 		) &times;
-		h3 #{translate("merge_project_with_github")}
+		h3 #{translate("sync_project_to_github")}
 	.modal-body
 		.alert.alert-danger(ng-show="form.error")
 			| {{ form.error }}
 		
 		form.form
+			p= translate("sync_project_to_github_explanation")
+		
 			.row
 				.col-xs-12
-					textarea(placeholder="Commit message for changes made in ShareLaTeX...", ng-model="form.message").form-control
+					textarea(
+						placeholder="#{translate('github_commit_message_placeholder')}",
+						ng-model="form.message"
+					).form-control
 
 	.modal-footer()
 		button.btn.btn-default(

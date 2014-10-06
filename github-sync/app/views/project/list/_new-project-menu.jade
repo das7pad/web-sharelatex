@@ -13,16 +13,16 @@ script(type="text/ng-template", id="githubSyncImportModalTemplate")
 			data-dismiss="modal"
 			ng-click="cancel()"
 		) &times;
-		h3 #{translate("import_project_from_github")}
+		h3 #{translate("import_from_github")}
 	.modal-body
 		.alert.alert-danger(ng-show="status.error") #{translate("github_sync_error")}
 
 		.loading(ng-show="!status.error && status.loading")
 			i.fa.fa-refresh.fa-spin.fa-fw
-			span  #{translate("please_wait_while_we_load_your_github_repositories")}
+			span  #{translate("loading_github_repositories")}
 		
 		div(ng-if="status.repos && !status.inflight")
-			p.text-center Select a GitHub repository to import into ShareLaTeX.
+			p.text-center #{translate("select_github_repository")}
 			table.table.table-striped
 				tbody
 					tr(ng-repeat="repo in status.repos")
@@ -31,7 +31,7 @@ script(type="text/ng-template", id="githubSyncImportModalTemplate")
 							.small
 								a(ng-href="https://github.com/{{repo.full_name}}") {{repo.full_name}}
 						td.text-right
-							a(href, ng-click="importRepo(repo)").btn.btn-primary Import to ShareLaTeX
+							a(href, ng-click="importRepo(repo)").btn.btn-primary #{translate("import_to_sharelatex")}
 
 		div(ng-if="status.inflight")
 			i.fa.fa-refresh.fa-spin.fa-fw
