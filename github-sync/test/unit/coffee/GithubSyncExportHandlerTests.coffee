@@ -93,10 +93,12 @@ describe "GithubSyncExportHandler", ->
 					name: "main.tex"
 					_id: "mock-doc-id-1"
 					lines: ["Hello", "world"]
+					rev: 42
 				},
 				"/chapters/chapter1.tex": @doc_2 = {
 					name: "chapter1.tex"
 					_id: "mock-doc-id-2"
+					rev: 24
 					lines: [
 						"Chapter 1"
 					]
@@ -108,6 +110,7 @@ describe "GithubSyncExportHandler", ->
 					name: "image.png"
 					_id:  "mock-file-id-1"
 					created: new Date()
+					rev: 0
 				}
 			}
 
@@ -121,11 +124,17 @@ describe "GithubSyncExportHandler", ->
 				.calledWith(null, [{
 					path:    "main.tex"
 					content: @doc_1.lines.join("\n")
+					id:      "mock-doc-id-1"
+					rev:     42
 				}, {
 					path:    "chapters/chapter1.tex"
 					content: @doc_2.lines.join("\n")
+					id:      "mock-doc-id-2"
+					rev:     24
 				}, {
 					path: "images/image.png"
 					url:  "#{@settings.apis.filestore.url}/project/#{@project_id}/file/#{@file_1._id}"
+					id:   "mock-file-id-1"
+					rev:  0
 				}])
 				.should.equal true

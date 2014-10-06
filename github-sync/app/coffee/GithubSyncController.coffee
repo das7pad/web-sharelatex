@@ -52,6 +52,18 @@ module.exports = GithubSyncController =
 			res.header("Content-Type", "application/json")
 			res.json(status)
 			
+	getProjectUnmergedCommits: (req, res, next) ->
+		project_id = req.params.Project_id
+		GithubSyncApiHandler.getProjectUnmergedCommits project_id, (error, commits) ->
+			return next(error) if error?
+			res.header("Content-Type", "application/json")
+			res.json(
+				commits.map (c) ->
+					message: c.commit.message
+					author: c.commit.author
+					sha: c.sha
+			)
+			
 	importProject: (req, res, next) ->
 		user_id = req.session.user._id
 		projectName = req.body.projectName?.trim()

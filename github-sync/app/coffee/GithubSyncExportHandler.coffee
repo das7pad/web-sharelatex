@@ -34,12 +34,16 @@ module.exports = GithubSyncExportHandler =
 					fileList.push {
 						path:    path.replace(/^\//, "") # Remove leading /
 						content: doc.lines.join("\n")
+						id:      doc._id.toString()
+						rev:     doc.rev
 					}
 				
 				for path, file of files
 					fileList.push {
 						path: path.replace(/^\//, "") # Remove leading /
 						url:  "#{settings.apis.filestore.url}/project/#{project_id}/file/#{file._id}"
+						id:   file._id.toString()
+						rev:  file.rev
 					}
 				
 				callback null, fileList

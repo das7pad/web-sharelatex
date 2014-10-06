@@ -27,6 +27,10 @@ define [
 				enabled: null
 			project:
 				enabled: null
+			commits: {
+				loading: true
+				commits: []
+			}
 		}
 		
 		$http.get("/user/github-sync/status")
@@ -37,6 +41,16 @@ define [
 						.success (projectStatus) ->
 							$scope.status.project = projectStatus
 							$scope.status.loading = false
+							
+							if $scope.status.project.enabled
+								$http.get("/project/#{ide.project_id}/github-sync/commits/unmerged")
+									.success (commits) ->
+										$scope.status.commits.commits = commits
+										$scope.status.commits.loading = false
+										console.log "COMMITS", commits
+										
+									.error () ->
+										$http.status.error = true
 							
 						.error () ->
 							$scope.status.error = true

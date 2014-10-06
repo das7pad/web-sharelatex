@@ -144,6 +144,38 @@ describe 'GithubSyncController', ->
 				.calledWith(@status)
 				.should.equal true
 				
+	describe "getProjectUnmergedCommits", ->
+		beforeEach ->
+			@req.params =
+				Project_id: @project_id = "project-id-123"
+			@commits = [
+				sha: @sha = "mock-sha-123"
+				commit:
+					message: @message = "Hello world"
+					author: @author = { name: "James" }
+				extra: "not included in response"
+			]
+			@GithubSyncApiHandler.getProjectUnmergedCommits = sinon.stub().callsArgWith(1, null, @commits)
+			@GithubSyncController.getProjectUnmergedCommits @req, @res
+			
+		it "should get the commits from the github api", ->
+			@GithubSyncApiHandler.getProjectUnmergedCommits
+				.calledWith(@project_id)
+				.should.equal true
+				
+		it "should send the formatted commits as JSON", ->
+			@res.header
+				.calledWith("Content-Type", "application/json")
+				.should.equal true
+				
+			@res.json
+				.calledWith([{
+					message: @message
+					sha: @sha
+					author: @author
+				}])
+				.should.equal true
+				
 	describe "exportProject", ->
 		beforeEach ->
 			@req.params =

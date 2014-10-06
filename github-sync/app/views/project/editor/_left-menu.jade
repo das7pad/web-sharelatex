@@ -34,14 +34,33 @@ script(type="text/ng-template", id="githubSyncModalTemplate")
 				div(ng-if="status.project.merge_status == 'success'")
 					p.text-center #{translate("project_synced_with_git_repo_at")} 
 						a(ng-href="https://github.com/{{status.project.repo}}", target="_blank") {{status.project.repo}}
+					
 					hr
-					h3 #{translate("recent_commits_in_github")}
-					div
-						span.small.pull-right
-							a(href) ab23dce
-						a(href) Updated my references
-						div.small by jamesallen0108@gmail.com
+					
+					div(ng-show="!status.error && status.commits.loading").text-center
+						i.fa.fa-refresh.fa-spin.fa-fw
+						span  #{translate("loading_recent_github_commits")}
+						
+					div(ng-show="!status.commits.loading && status.commits.commits.length > 0")
+						h3 #{translate("recent_commits_in_github")}
+						div(style="max-height: 200px; overflow: scroll")
+							div(ng-repeat="commit in status.commits.commits")
+								span.small.pull-right
+									a(
+										ng-href="https://github.com/{{status.project.repo}}/commit/{{commit.sha}}"
+										target="_blank"
+									) {{commit.sha.slice(0,6)}}
+								a(
+									ng-href="https://github.com/{{status.project.repo}}/commit/{{commit.sha}}"
+									target="_blank"
+								) {{commit.message}}
+								div.small by {{commit.author.name}} <{{commit.author.email}}>
+					
+					div(ng-show="!status.commits.loading && status.commits.commits.length == 0").text-center
+						p.small #{translate("no_new_commits_in_github")}
+					
 					hr
+					
 					p.text-center
 						button(ng-click="openMergeModal()").btn.btn-primary= translate("sync_project_to_github")
 	

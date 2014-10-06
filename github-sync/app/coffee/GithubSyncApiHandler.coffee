@@ -37,6 +37,14 @@ module.exports = GithubSyncApiHandler =
 			json: true
 		}, callback
 		
+	getProjectUnmergedCommits: (project_id, callback = (error, status) ->) ->
+		url = "#{settings.apis.githubSync.url}/project/#{project_id}/commits/unmerged"
+		GithubSyncApiHandler.apiRequest {
+			method: "get",
+			url: url,
+			json: true
+		}, callback
+		
 	getUserLoginAndOrgs: (user_id, callback = (error, data) ->) ->
 		url = "#{settings.apis.githubSync.url}/user/#{user_id}/orgs"
 		GithubSyncApiHandler.apiRequest {

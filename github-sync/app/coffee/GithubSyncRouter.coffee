@@ -15,6 +15,7 @@ module.exports =
 		app.get '/user/github-sync/orgs', AuthenticationController.requireLogin(), GithubSyncController.getUserLoginAndOrgs
 		app.get '/user/github-sync/repos', AuthenticationController.requireLogin(), GithubSyncController.getUserRepos
 		app.get '/project/:Project_id/github-sync/status', SecurityManager.requestCanAccessProject, GithubSyncController.getProjectStatus
+		app.get '/project/:Project_id/github-sync/commits/unmerged', SecurityManager.requestCanAccessProject, GithubSyncController.getProjectUnmergedCommits
 
 		app.post '/project/:Project_id/github-sync/export', SecurityManager.requestIsAdmin, GithubSyncController.exportProject
 		app.post '/project/:Project_id/github-sync/merge', SecurityManager.requestIsAdmin, GithubSyncController.mergeProject
