@@ -20,6 +20,13 @@ module.exports = GithubSyncApiHandler =
 			url: url
 			json: options
 		}, callback
+		
+	unlink: (user_id, callback = (error) ->) ->
+		url = "#{settings.apis.githubSync.url}/user/#{user_id}/unlink"
+		GithubSyncApiHandler.apiRequest {
+			method: "delete"
+			url: url
+		}, callback
 
 	getUserStatus: (user_id, callback = (error, status) ->) ->
 		url = "#{settings.apis.githubSync.url}/user/#{user_id}/status"

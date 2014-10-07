@@ -5,9 +5,9 @@ SecurityManager = require "../../../../app/js/managers/SecurityManager"
 
 module.exports =
 	apply: (app) ->
-		app.get  '/github-sync/beginAuth', AuthenticationController.requireLogin(),  GithubSyncController.login
-		app.get  '/github-sync/completeRegistration', AuthenticationController.requireLogin(),  GithubSyncController.auth
-		app.get  '/github-sync/unlink', AuthenticationController.requireLogin(),  GithubSyncController.unlink
+		app.get '/github-sync/beginAuth', AuthenticationController.requireLogin(),  GithubSyncController.login
+		app.get '/github-sync/completeRegistration', AuthenticationController.requireLogin(),  GithubSyncController.auth
+		app.post '/github-sync/unlink', AuthenticationController.requireLogin(),  GithubSyncController.unlink
 		
 		app.get '/user/settings', GithubSyncMiddlewear.injectUserSettings
 		

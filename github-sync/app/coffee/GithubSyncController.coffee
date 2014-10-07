@@ -24,7 +24,10 @@ module.exports = GithubSyncController =
 			res.redirect "/user/settings"
 		
 	unlink: (req, res, next) ->
-		res.send("hello world from unlink")
+		user_id = req.session.user._id
+		GithubSyncApiHandler.unlink user_id, (error) ->
+			return next(error) if error?
+			res.redirect "/user/settings"
 		
 	getUserStatus: (req, res, next) ->
 		user_id = req.session.user._id

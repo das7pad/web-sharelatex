@@ -67,6 +67,21 @@ describe 'GithubSyncController', ->
 				.calledWith("/user/settings")
 				.should.equal true
 
+	describe "unlink", ->
+		beforeEach ->
+			@GithubSyncApiHandler.unlink = sinon.stub().callsArg(1)
+			@GithubSyncController.unlink @req, @res
+
+		it "should send an unlink request to the github api", ->
+			@GithubSyncApiHandler.unlink
+				.calledWith(@user_id)
+				.should.equal true
+				
+		it "should redirect to the settings page", ->
+			@res.redirect
+				.calledWith("/user/settings")
+				.should.equal true
+
 	describe "getUserStatus", ->
 		beforeEach ->
 			@user = {
