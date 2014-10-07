@@ -7,7 +7,8 @@ module.exports =
 	apply: (app) ->
 		app.get '/github-sync/beginAuth', AuthenticationController.requireLogin(),  GithubSyncController.login
 		app.get '/github-sync/completeRegistration', AuthenticationController.requireLogin(),  GithubSyncController.auth
-		app.post '/github-sync/unlink', AuthenticationController.requireLogin(),  GithubSyncController.unlink
+		app.post '/github-sync/unlink', AuthenticationController.requireLogin(), GithubSyncController.unlink
+		app.get '/github-sync/linked', AuthenticationController.requireLogin(), GithubSyncController.showLinkedPage
 		
 		app.get '/user/settings', GithubSyncMiddlewear.injectUserSettings
 		

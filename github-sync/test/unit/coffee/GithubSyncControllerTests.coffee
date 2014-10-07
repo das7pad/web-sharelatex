@@ -62,9 +62,9 @@ describe 'GithubSyncController', ->
 				.calledWith(@user_id, @req.query)
 				.should.equal true
 				
-		it "should redirect to the settings page", ->
+		it "should redirect to the linked confirmation page", ->
 			@res.redirect
-				.calledWith("/user/settings")
+				.calledWith("/github-sync/linked")
 				.should.equal true
 
 	describe "unlink", ->

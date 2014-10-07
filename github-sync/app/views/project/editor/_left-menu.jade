@@ -33,7 +33,7 @@
 				div(ng-if="status.user.available && !status.user.enabled")
 					p #{translate("link_to_github_description")}
 					p
-						a(href='/github-sync/beginAuth').btn.btn-info #{translate("link_to_github")}
+						a(href='/github-sync/beginAuth', target="_blank", ng-click="$dismiss()").btn.btn-info #{translate("link_to_github")}
 		
 				div(ng-if="status.user.enabled")
 					div(ng-if="!status.project.enabled")

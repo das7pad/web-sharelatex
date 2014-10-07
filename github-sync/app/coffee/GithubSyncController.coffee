@@ -2,6 +2,8 @@ request = require "request"
 settings = require "settings-sharelatex"
 logger = require "logger-sharelatex"
 
+Path = require "path"
+
 GithubSyncApiHandler = require "./GithubSyncApiHandler"
 GithubSyncExportHandler = require "./GithubSyncExportHandler"
 GithubSyncImportHandler = require "./GithubSyncImportHandler"
@@ -21,13 +23,16 @@ module.exports = GithubSyncController =
 		user_id = req.session.user._id
 		GithubSyncApiHandler.doAuth user_id, req.query, (error) ->
 			return next(error) if error?
-			res.redirect "/user/settings"
+			res.redirect "/github-sync/linked"
 		
 	unlink: (req, res, next) ->
 		user_id = req.session.user._id
 		GithubSyncApiHandler.unlink user_id, (error) ->
 			return next(error) if error?
 			res.redirect "/user/settings"
+			
+	showLinkedPage: (req, res, next) ->
+		res.render __dirname + "/../views/github/linked"
 		
 	getUserStatus: (req, res, next) ->
 		user_id = req.session.user._id
