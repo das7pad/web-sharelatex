@@ -47,7 +47,6 @@ define [
 									.success (commits) ->
 										$scope.status.commits.commits = commits
 										$scope.status.commits.loading = false
-										console.log "COMMITS", commits
 										
 									.error () ->
 										$http.status.error = true

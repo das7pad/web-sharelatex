@@ -13,6 +13,7 @@ describe 'GithubSyncController', ->
 			"./GithubSyncApiHandler": @GithubSyncApiHandler = {}
 			"./GithubSyncExportHandler": @GithubSyncExportHandler = {}
 			"./GithubSyncImportHandler": @GithubSyncImportHandler = {}
+			"../../../../app/js/Features/Authentication/AuthenticationController": @AuthenticationController = {}
 
 		@settings.apis =
 			githubSync:
@@ -68,22 +69,50 @@ describe 'GithubSyncController', ->
 
 	describe "getUserStatus", ->
 		beforeEach ->
+			@user = {
+				features:
+					github: true
+			}
 			@GithubSyncApiHandler.getUserStatus = sinon.stub().callsArgWith(1, null, @status = { enabled: true })
-			@GithubSyncController.getUserStatus @req, @res
+			@AuthenticationController.getLoggedInUser = sinon.stub().callsArgWith(1, null, @user)
 			
-		it "should get the user status from the github sync api", ->
-			@GithubSyncApiHandler.getUserStatus
-				.calledWith(@user_id)
-				.should.equal true
+		describe "with the github feature available", ->
+			beforeEach ->
+				@GithubSyncController.getUserStatus @req, @res
 				
-		it "should return the status as JSON", ->
-			@res.header
-				.calledWith("Content-Type", "application/json")
-				.should.equal true
-				
-			@res.json
-				.calledWith(@status)
-				.should.equal true
+			it "should get the user status from the github sync api", ->
+				@GithubSyncApiHandler.getUserStatus
+					.calledWith(@user_id)
+					.should.equal true
+					
+			it "should return the status as JSON", ->
+				@res.header
+					.calledWith("Content-Type", "application/json")
+					.should.equal true
+					
+				@res.json
+					.calledWith({
+						available: true
+						enabled: @status.enabled
+					})
+					.should.equal true
+					
+		describe "with the github feature not available", ->
+			beforeEach ->
+				@user.features.github = false
+				@GithubSyncController.getUserStatus @req, @res
+					
+			it "should return the status as JSON", ->
+				@res.header
+					.calledWith("Content-Type", "application/json")
+					.should.equal true
+					
+				@res.json
+					.calledWith({
+						available: false
+						enabled: false
+					})
+					.should.equal true
 
 	describe "getUserLoginAndOrgs", ->
 		beforeEach ->

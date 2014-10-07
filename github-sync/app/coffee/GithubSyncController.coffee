@@ -6,6 +6,8 @@ GithubSyncApiHandler = require "./GithubSyncApiHandler"
 GithubSyncExportHandler = require "./GithubSyncExportHandler"
 GithubSyncImportHandler = require "./GithubSyncImportHandler"
 
+AuthenticationController = require "../../../../app/js/Features/Authentication/AuthenticationController"
+
 module.exports = GithubSyncController =
 	login: (req, res, next) ->
 		user_id = req.session.user._id
@@ -26,10 +28,23 @@ module.exports = GithubSyncController =
 		
 	getUserStatus: (req, res, next) ->
 		user_id = req.session.user._id
-		GithubSyncApiHandler.getUserStatus user_id, (error, status) ->
+		AuthenticationController.getLoggedInUser req, (error, user) ->
 			return next(error) if error?
-			res.header("Content-Type", "application/json")
-			res.json(status)
+			available = !!user.features.github
+			if !available
+				res.header("Content-Type", "application/json")
+				res.json({
+					available: false
+					enabled:   false
+				})
+			else
+				GithubSyncApiHandler.getUserStatus user_id, (error, status) ->
+					return next(error) if error?
+					res.header("Content-Type", "application/json")
+					res.json({
+						available: true
+						enabled:   status.enabled
+					})
 			
 	getUserLoginAndOrgs: (req, res, next) ->
 		user_id = req.session.user._id

@@ -10,12 +10,18 @@ define [
 			error: false
 		}
 		
-		$http.get("/user/github-sync/repos")
-			.success (data) ->
-				$scope.status.loading = false
-				$scope.status.repos = data.repos
-				console.log data
-				
+		$http.get("/user/github-sync/status")
+			.success (user) ->
+				$scope.status.user = user
+				if !user.enabled
+					$scope.status.loading = false
+				else
+					$http.get("/user/github-sync/repos")
+						.success (data) ->
+							$scope.status.loading = false
+							$scope.status.repos = data.repos
+						.error () ->
+							$scope.status.error = true
 			.error () ->
 				$scope.status.error = true
 				
