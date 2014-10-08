@@ -107,7 +107,7 @@
 					| {{ form.error }}
 					div.small= translate("github_validation_check")
 				
-				form.form
+				form.form(ng-submit="create()")
 					.row
 						.col-xs-4
 							.form-group
@@ -140,6 +140,8 @@
 								input(type="radio", name="private", value="true", ng-model="form.private")
 								|  #{translate("private")}. 
 							small  #{translate("github_private_description")}
+							
+					input(type="submit", style="display: none;")
 
 		.modal-footer()
 			button.btn.btn-default(
