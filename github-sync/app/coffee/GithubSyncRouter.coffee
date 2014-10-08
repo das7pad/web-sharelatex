@@ -18,6 +18,6 @@ module.exports =
 		app.get '/project/:Project_id/github-sync/status', SecurityManager.requestCanAccessProject, GithubSyncController.getProjectStatus
 		app.get '/project/:Project_id/github-sync/commits/unmerged', SecurityManager.requestCanAccessProject, GithubSyncController.getProjectUnmergedCommits
 
-		app.post '/project/:Project_id/github-sync/export', SecurityManager.requestIsAdmin, GithubSyncController.exportProject
-		app.post '/project/:Project_id/github-sync/merge', SecurityManager.requestIsAdmin, GithubSyncController.mergeProject
+		app.post '/project/:Project_id/github-sync/export', SecurityManager.requestIsOwner, GithubSyncController.exportProject
+		app.post '/project/:Project_id/github-sync/merge', SecurityManager.requestIsOwner, GithubSyncController.mergeProject
 		app.post '/project/new/github-sync', AuthenticationController.requireLogin(), GithubSyncController.importProject
