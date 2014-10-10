@@ -1,4 +1,4 @@
-- if (user.featureSwitches.github)
+- if (typeof(user.featureSwitches) !== 'undefined' && user.featureSwitches.github)
 	hr
 
 	h3 #{translate("github_integration")}
