@@ -1,7 +1,7 @@
 define [
 	"base"
 ], (App) ->
-	App.controller "GithubSyncMergeModalController", ($scope, $modalInstance, $http, ide) ->
+	App.controller "GithubSyncMergeModalController", ($scope, $modalInstance, $http, ide, mergeImmediately) ->
 		$scope.cancel = () ->
 			$modalInstance.dismiss()
 		
@@ -24,3 +24,6 @@ define [
 				.error (data) ->
 					$scope.form.error = data.error
 					$scope.status.inflight = false
+					
+		if mergeImmediately
+			$scope.merge()

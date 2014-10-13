@@ -12,11 +12,13 @@ define [
 				controller: "GithubSyncExportModalController"
 			}
 			
-		$scope.openMergeModal = () ->
+		$scope.openMergeModal = (mergeImmediately = false) ->
 			$modalInstance.dismiss()
 			$modal.open {
 				templateUrl: "githubSyncMergeModalTemplate"
 				controller: "GithubSyncMergeModalController"
+				resolve:
+					mergeImmediately: () -> mergeImmediately
 			}
 			
 			

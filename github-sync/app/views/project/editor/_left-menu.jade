@@ -54,7 +54,7 @@
 								
 							div(ng-show="!status.commits.loading && status.commits.commits.length > 0")
 								h3 #{translate("recent_commits_in_github")}
-								div(style="max-height: 200px; overflow: scroll")
+								div(style="max-height: 200px; overflow: auto")
 									div(ng-repeat="commit in status.commits.commits")
 										span.small.pull-right
 											a(
@@ -66,6 +66,13 @@
 											target="_blank"
 										) {{commit.message}}
 										div.small by {{commit.author.name}} <{{commit.author.email}}>
+								
+								p.text-center.row-spaced
+									button(ng-click="openMergeModal(true)").btn.btn-info
+										i.fa.fa-fw.fa-file
+										i.fa.fa-fw.fa-long-arrow-left
+										i.fa.fa-fw.fa-github
+										| &nbsp; #{translate("pull_github_changes_into_sharelatex")}
 							
 							div(ng-show="!status.commits.loading && status.commits.commits.length == 0").text-center
 								p.small #{translate("no_new_commits_in_github")}
@@ -73,7 +80,11 @@
 							hr
 							
 							p.text-center
-								button(ng-click="openMergeModal()").btn.btn-primary= translate("sync_project_to_github")
+								button(ng-click="openMergeModal()").btn.btn-info
+									i.fa.fa-fw.fa-file
+									i.fa.fa-fw.fa-long-arrow-right
+									i.fa.fa-fw.fa-github
+									| &nbsp; #{translate("push_sharelatex_changes_to_github")}
 			
 						div(ng-if="status.project.merge_status == 'failure'")
 							.alert.alert-danger !{translate("github_merge_failed", {sharelatex_branch:"<strong>{{ status.project.unmerged_branch }}</strong>", master_branch:"<strong>master</strong>"})}
@@ -163,12 +174,12 @@
 				data-dismiss="modal"
 				ng-click="cancel()"
 			) &times;
-			h3 #{translate("sync_project_to_github")}
+			h3 #{translate("merge_project_with_github")}
 		.modal-body
 			.alert.alert-danger(ng-show="form.error")
 				| {{ form.error }}
 			
-			form.form
+			form.form(ng-show="!status.inflight")
 				p= translate("sync_project_to_github_explanation")
 			
 				.row
@@ -177,6 +188,10 @@
 							placeholder="#{translate('github_commit_message_placeholder')}",
 							ng-model="form.message"
 						).form-control
+						
+			.loading(ng-show="status.inflight")
+				i.fa.fa-refresh.fa-spin.fa-fw
+				span  #{translate("merging")}
 
 		.modal-footer()
 			button.btn.btn-default(
