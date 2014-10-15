@@ -156,7 +156,8 @@
 
 		.modal-footer()
 			button.btn.btn-default(
-				ng-click="cancel()",
+				ng-disabled="status.inflight"
+				ng-click="cancel()"
 			)
 				span #{translate("cancel")}
 			button.btn.btn-primary(
@@ -166,7 +167,7 @@
 				span(ng-hide="status.inflight") #{translate("create")}
 				span(ng-show="status.inflight") #{translate("creating")}...
 				
-	script(type="text/ng-template", id="githubSyncMergeModalTemplate")
+	script(type="text/ng-template", id="githubSyncPushToGithubModalTemplate")
 
 		.modal-header
 			button.close(
@@ -174,7 +175,7 @@
 				data-dismiss="modal"
 				ng-click="cancel()"
 			) &times;
-			h3 #{translate("merge_project_with_github")}
+			h3 #{translate("push_sharelatex_changes_to_github")}
 		.modal-body
 			.alert.alert-danger(ng-show="form.error")
 				| {{ form.error }}
@@ -195,12 +196,23 @@
 
 		.modal-footer()
 			button.btn.btn-default(
-				ng-click="cancel()",
+				ng-disabled="status.inflight"
+				ng-click="cancel()"
 			)
 				span #{translate("cancel")}
 			button.btn.btn-primary(
 				ng-disabled="status.inflight"
 				ng-click="merge()"
 			)
-				span(ng-hide="status.inflight") #{translate("merge")}
-				span(ng-show="status.inflight") #{translate("merging")}...
+				span(ng-hide="status.inflight") #{translate("commit")}
+				span(ng-show="status.inflight") #{translate("commiting")}...
+				
+	script(type="text/ng-template", id="githubSyncPullFromGithubModalTemplate")
+	
+		.modal-header
+			h3 #{translate("pull_github_changes_into_sharelatex")}
+		.modal-body
+			.loading(ng-show="status.inflight")
+				i.fa.fa-refresh.fa-spin.fa-fw
+				span  #{translate("importing_and_merging_changes_in_github")}
+

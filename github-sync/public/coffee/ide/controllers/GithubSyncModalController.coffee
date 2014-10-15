@@ -14,8 +14,20 @@ define [
 			
 		$scope.openMergeModal = (mergeImmediately = false) ->
 			$modalInstance.dismiss()
+			# There is no difference in the ShareLaTeX system between
+			# pushing and pulling to Github. The merge request will do both:
+			# push any changes in ShareLaTeX to GitHub, and import any changes
+			# in GitHub back to ShareLaTeX after merging. However, from a UI
+			# point of view, it's much clearer to show two options:
+			# 'push to github', and 'pull from github' depending on the state of
+			# the project and the commits in git. Hence the two different
+			# modals for acheiving the same thing.
+			if mergeImmediately
+				template = "githubSyncPullFromGithubModalTemplate"
+			else
+				template = "githubSyncPushToGithubModalTemplate"
 			$modal.open {
-				templateUrl: "githubSyncMergeModalTemplate"
+				templateUrl: template
 				controller: "GithubSyncMergeModalController"
 				resolve:
 					mergeImmediately: () -> mergeImmediately
