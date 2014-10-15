@@ -10,6 +10,7 @@ define [
 			message: ""
 		
 		$scope.merge = () ->
+			ide.editorManager.startIgnoringExternalUpdates()
 			$scope.status.inflight = true
 			data = {
 				_csrf: window.csrfToken
@@ -20,10 +21,12 @@ define [
 					$scope.status.inflight = false
 					$modalInstance.dismiss()
 					ide.githubSyncManager.openGithubSyncModal()
+					ide.editorManager.stopIgnoringExternalUpdates()
 					
 				.error (data) ->
 					$scope.form.error = data.error
 					$scope.status.inflight = false
+					ide.editorManager.stopIgnoringExternalUpdates()
 					
 		if mergeImmediately
 			$scope.merge()
