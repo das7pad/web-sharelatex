@@ -1,7 +1,7 @@
 define [
 	"base"
 ], (App) ->
-	App.controller "GithubSyncModalController", ($scope, $modalInstance, $http, $modal, ide) ->
+	App.controller "GithubSyncModalController", ($scope, $modalInstance, $http, $modal, $window, $interval, ide) ->
 		$scope.cancel = () ->
 			$modalInstance.dismiss()
 			
@@ -33,42 +33,58 @@ define [
 					mergeImmediately: () -> mergeImmediately
 			}
 			
+		$scope.linkAccount = () ->
+			authWindow = $window.open("/github-sync/beginAuth", "github-sync-auth", "width=700,height=500")
+			poller = $interval () ->
+				# We can get errors when trying to access the URL before it returns 
+				# to a ShareLaTeX URL (security exceptions)
+				try
+					pathname = authWindow.location.pathname
+				catch e
+					pathname = null
+				if authWindow.location.pathname == "/github-sync/linked"
+					authWindow.close()
+					$scope.loadStatus()
+					$interval.cancel(poller)
+			, 1000
+			return true # See https://github.com/angular/angular.js/issues/4853#issuecomment-28491586
 			
-		$scope.status = {
-			loading: true
-			error: false
-			user:
-				enabled: null
-			project:
-				enabled: null
-			commits: {
+		do $scope.loadStatus = () ->
+			$scope.status = {
 				loading: true
-				commits: []
+				error: false
+				user:
+					enabled: null
+				project:
+					enabled: null
+				commits: {
+					loading: true
+					commits: []
+				}
 			}
-		}
-		
-		$http.get("/user/github-sync/status")
-			.success (userStatus) ->
-				$scope.status.user = userStatus
-				if userStatus.enabled
-					$http.get("/project/#{ide.project_id}/github-sync/status")
-						.success (projectStatus) ->
-							$scope.status.project = projectStatus
-							$scope.status.loading = false
-							
-							if $scope.status.project.enabled
-								$http.get("/project/#{ide.project_id}/github-sync/commits/unmerged")
-									.success (commits) ->
-										$scope.status.commits.commits = commits
-										$scope.status.commits.loading = false
-										
-									.error () ->
-										$http.status.error = true
-							
-						.error () ->
-							$scope.status.error = true
-				else
-					$scope.status.loading = false
-				
-			.error () ->
-				$scope.status.error = true
+			
+			$http.get("/user/github-sync/status")
+				.success (userStatus) ->
+					$scope.status.user = userStatus
+					if userStatus.enabled
+						$http.get("/project/#{ide.project_id}/github-sync/status")
+							.success (projectStatus) ->
+								$scope.status.project = projectStatus
+								$scope.status.loading = false
+								
+								if $scope.status.project.enabled
+									$http.get("/project/#{ide.project_id}/github-sync/commits/unmerged")
+										.success (commits) ->
+											$scope.status.commits.commits = commits
+											$scope.status.commits.loading = false
+											
+										.error () ->
+											$http.status.error = true
+								
+							.error () ->
+								$scope.status.error = true
+					else
+						$scope.status.loading = false
+					
+				.error () ->
+					$scope.status.error = true
