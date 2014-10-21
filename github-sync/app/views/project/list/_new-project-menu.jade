@@ -28,7 +28,7 @@
 					.alert.alert-info
 						p #{translate("github_is_premium")}
 						p
-							a.btn.btn-info(href='/user/subscription/plans') #{translate("upgrade")}
+							a.btn.btn-info(ng-click="startFreeTrial('dropbox')") #{translate("start_free_trial")}
 						
 				div(ng-if="status.user.available && !status.user.enabled")
 					p #{translate("link_to_github_description")}
