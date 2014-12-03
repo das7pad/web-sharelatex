@@ -1,4 +1,4 @@
-span(ng-controller="GithubSyncController", ng-show="permissions.readAndWrite")
+span(ng-controller="GithubSyncController", ng-show="permissions.write")
 	ul.list-unstyled.nav()
 		li
 			a(ng-click="openGithubSyncModal()")
@@ -23,73 +23,78 @@ script(type="text/ng-template", id="githubSyncModalTemplate")
 			span  #{translate("checking_project_github_status")}
 	
 		div(ng-if="!status.error && !status.loading")
-			div(ng-if="!status.user.available")
-				p.small #{translate("github_import_description")}
-				.alert.alert-info
-					p #{translate("github_is_premium")}
-					p
-						a.btn.btn-info(ng-click="startFreeTrial('github')") #{translate("start_free_trial")}
-					
-			div(ng-if="status.user.available && !status.user.enabled")
-				p #{translate("link_to_github_description")}
-				p
-					a(href,ng-click="linkAccount()").btn.btn-info #{translate("link_to_github")}
-	
-			div(ng-if="status.user.enabled")
-				div(ng-if="!status.project.enabled")
+			div(ng-if="!status.project.enabled")
+				div(ng-if="!status.user.enabled")
+					div(ng-if="$parent.permissions.admin")
+						div(ng-if="!status.user.available")
+							p.small #{translate("github_import_description")}
+							.alert.alert-info
+								p #{translate("github_is_premium")}
+								p
+									a.btn.btn-info(ng-click="startFreeTrial('github')") #{translate("start_free_trial")}
+								
+						div(ng-if="status.user.available")
+							p #{translate("link_to_github_description")}
+							p
+								a(href,ng-click="linkAccount()").btn.btn-info #{translate("link_to_github")}
+								
+					div(ng-if="!$parent.permissions.admin")
+						p #{translate("please_ask_the_project_owner_to_link_to_github")}
+
+				div(ng-if="status.user.enabled")
 					p #{translate("project_not_linked_to_github")}
 					p
 						button(ng-click="openExportToGithubModal()").btn.btn-primary #{translate("create_project_in_github")}
+
+			div(ng-if="status.project.enabled")
+				div(ng-if="status.project.merge_status == 'success'")
+					p.text-center #{translate("project_synced_with_git_repo_at")} 
+						a(ng-href="https://github.com/{{status.project.repo}}", target="_blank") {{status.project.repo}}
 					
-				div(ng-if="status.project.enabled")
-					div(ng-if="status.project.merge_status == 'success'")
-						p.text-center #{translate("project_synced_with_git_repo_at")} 
-							a(ng-href="https://github.com/{{status.project.repo}}", target="_blank") {{status.project.repo}}
+					hr
+					
+					div(ng-show="!status.error && status.commits.loading").text-center
+						i.fa.fa-refresh.fa-spin.fa-fw
+						span  #{translate("loading_recent_github_commits")}
 						
-						hr
-						
-						div(ng-show="!status.error && status.commits.loading").text-center
-							i.fa.fa-refresh.fa-spin.fa-fw
-							span  #{translate("loading_recent_github_commits")}
-							
-						div(ng-show="!status.commits.loading && status.commits.commits.length > 0")
-							h3 #{translate("recent_commits_in_github")}
-							div(style="max-height: 200px; overflow: auto")
-								div(ng-repeat="commit in status.commits.commits")
-									span.small.pull-right
-										a(
-											ng-href="https://github.com/{{status.project.repo}}/commit/{{commit.sha}}"
-											target="_blank"
-										) {{commit.sha.slice(0,6)}}
+					div(ng-show="!status.commits.loading && status.commits.commits.length > 0")
+						h3 #{translate("recent_commits_in_github")}
+						div(style="max-height: 200px; overflow: auto")
+							div(ng-repeat="commit in status.commits.commits")
+								span.small.pull-right
 									a(
 										ng-href="https://github.com/{{status.project.repo}}/commit/{{commit.sha}}"
 										target="_blank"
-									) {{commit.message}}
-									div.small by {{commit.author.name}} <{{commit.author.email}}>
-							
-							p.text-center.row-spaced
-								button(ng-click="openMergeModal(true)").btn.btn-info
-									i.fa.fa-fw.fa-file
-									i.fa.fa-fw.fa-long-arrow-left
-									i.fa.fa-fw.fa-github
-									| &nbsp; #{translate("pull_github_changes_into_sharelatex")}
+									) {{commit.sha.slice(0,6)}}
+								a(
+									ng-href="https://github.com/{{status.project.repo}}/commit/{{commit.sha}}"
+									target="_blank"
+								) {{commit.message}}
+								div.small by {{commit.author.name}} <{{commit.author.email}}>
 						
-						div(ng-show="!status.commits.loading && status.commits.commits.length == 0").text-center
-							p.small #{translate("no_new_commits_in_github")}
-						
-						hr
-						
-						p.text-center
-							button(ng-click="openMergeModal()").btn.btn-info
+						p.text-center.row-spaced
+							button(ng-click="openMergeModal(true)").btn.btn-info
 								i.fa.fa-fw.fa-file
-								i.fa.fa-fw.fa-long-arrow-right
+								i.fa.fa-fw.fa-long-arrow-left
 								i.fa.fa-fw.fa-github
-								| &nbsp; #{translate("push_sharelatex_changes_to_github")}
-		
-					div(ng-if="status.project.merge_status == 'failure'")
-						.alert.alert-danger !{translate("github_merge_failed", {sharelatex_branch:"<strong>{{ status.project.unmerged_branch }}</strong>", master_branch:"<strong>master</strong>"})}
-						p.text-center
-							button(ng-click="openMergeModal()").btn.btn-primary= translate("continue_github_merge")
+								| &nbsp; #{translate("pull_github_changes_into_sharelatex")}
+					
+					div(ng-show="!status.commits.loading && status.commits.commits.length == 0").text-center
+						p.small #{translate("no_new_commits_in_github")}
+					
+					hr
+					
+					p.text-center
+						button(ng-click="openMergeModal()").btn.btn-info
+							i.fa.fa-fw.fa-file
+							i.fa.fa-fw.fa-long-arrow-right
+							i.fa.fa-fw.fa-github
+							| &nbsp; #{translate("push_sharelatex_changes_to_github")}
+	
+				div(ng-if="status.project.merge_status == 'failure'")
+					.alert.alert-danger !{translate("github_merge_failed", {sharelatex_branch:"<strong>{{ status.project.unmerged_branch }}</strong>", master_branch:"<strong>master</strong>"})}
+					p.text-center
+						button(ng-click="openMergeModal()").btn.btn-primary= translate("continue_github_merge")
 	
 	.modal-footer()
 		button.btn.btn-default(

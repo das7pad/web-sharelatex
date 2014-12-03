@@ -6,6 +6,7 @@ define [
 			$modal.open {
 				templateUrl: "githubSyncModalTemplate"
 				controller: "GithubSyncModalController"
+				scope: $scope
 			}
 			
 		ide.githubSyncManager = {

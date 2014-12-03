@@ -71,25 +71,22 @@ define [
 			$http.get("/user/github-sync/status")
 				.success (userStatus) ->
 					$scope.status.user = userStatus
-					if userStatus.enabled
-						$http.get("/project/#{ide.project_id}/github-sync/status")
-							.success (projectStatus) ->
-								$scope.status.project = projectStatus
-								$scope.status.loading = false
-								
-								if $scope.status.project.enabled
-									$http.get("/project/#{ide.project_id}/github-sync/commits/unmerged")
-										.success (commits) ->
-											$scope.status.commits.commits = commits
-											$scope.status.commits.loading = false
-											
-										.error () ->
-											$http.status.error = true
-								
-							.error () ->
-								$scope.status.error = true
-					else
-						$scope.status.loading = false
+					$http.get("/project/#{ide.project_id}/github-sync/status")
+						.success (projectStatus) ->
+							$scope.status.project = projectStatus
+							$scope.status.loading = false
+							
+							if $scope.status.project.enabled
+								$http.get("/project/#{ide.project_id}/github-sync/commits/unmerged")
+									.success (commits) ->
+										$scope.status.commits.commits = commits
+										$scope.status.commits.loading = false
+										
+									.error () ->
+										$http.status.error = true
+							
+						.error () ->
+							$scope.status.error = true
 					
 				.error () ->
 					$scope.status.error = true
