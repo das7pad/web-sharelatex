@@ -14,8 +14,7 @@ script(type="text/ng-template", id="githubSyncImportModalTemplate")
 			ng-click="cancel()"
 		) &times;
 		h3
-			| #{translate("import_from_github")} 
-			span.label.label-warning Beta
+			| #{translate("import_from_github")}
 	.modal-body
 		.alert.alert-danger(ng-show="status.error") #{translate("github_sync_error")}
 
