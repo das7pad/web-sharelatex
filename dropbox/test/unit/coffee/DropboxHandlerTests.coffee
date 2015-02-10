@@ -2,12 +2,12 @@ SandboxedModule = require('sandboxed-module')
 assert = require('assert')
 require('chai').should()
 sinon = require('sinon')
-modulePath = require('path').join __dirname, '../../../../app/js/Features/Dropbox/DropboxHandler.js'
+modulePath = require('path').join __dirname, '../../../app/js/DropboxHandler.js'
 
 thirdPartyDataStoreApiUrl = "http://third-party-json-store.herokuapp.com"
 siteUrl = "www.sharelatex.com"
 
-describe 'third party data store', ->
+describe 'DropboxHandler', ->
 	user_id = "123nd3ijdks"
 
 	beforeEach ->
