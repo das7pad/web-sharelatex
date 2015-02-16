@@ -44,10 +44,10 @@ define [
 				# We can get errors when trying to access the URL before it returns 
 				# to a ShareLaTeX URL (security exceptions)
 				try
-					pathname = authWindow.location.pathname
+					pathname = authWindow?.location?.pathname
 				catch e
 					pathname = null
-				if authWindow.location.pathname == "/github-sync/linked"
+				if authWindow?.location?.pathname == "/github-sync/linked"
 					authWindow.close()
 					$scope.loadStatus()
 					$interval.cancel(poller)
