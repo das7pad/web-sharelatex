@@ -23,12 +23,12 @@ script(type="text/ng-template", id="githubSyncImportModalTemplate")
 			span  #{translate("loading_github_repositories")}
 			
 		div(ng-if="!status.error && !status.loading")
-			div(ng-if="!status.user.available")
+			div(ng-if="!status.user.available", ng-controller="FreeTrialModalController")
 				p.small #{translate("github_sync_description")}
 				.alert.alert-info
 					p #{translate("github_is_premium")}
 					p
-						a.btn.btn-info(ng-click="startFreeTrial('dropbox')") #{translate("start_free_trial")}
+						a.btn.btn-info(ng-click="startFreeTrial('github')") #{translate("start_free_trial")}
 					
 			div(ng-if="status.user.available && !status.user.enabled")
 				p #{translate("link_to_github_description")}

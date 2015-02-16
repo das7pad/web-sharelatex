@@ -1,0 +1,4 @@
+li(ng-controller="TemplatesController", ng-show="permissions.admin")
+	a(ng-click="openPublishTemplateModal()")
+		i.fa.fa-external-link.fa-fw 
+		| &nbsp;&nbsp; #{translate("publish_as_template")}
