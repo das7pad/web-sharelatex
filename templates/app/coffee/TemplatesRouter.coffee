@@ -18,6 +18,7 @@ module.exports =
 		app.get "/templates/user/:user_id/:tag_name/:template_name", TemplatesWebController.renerTemplateInTag
 
 		app.get "/templates/:template_id/v/:version/:file_type", TemplatesWebController.proxyToTemplatesApi
+		app.get "/templates/:template_id/v/:version/:file_type/:preview_type", TemplatesWebController.proxyToTemplatesApi
 
 		app.post "/project/:Project_id/template/publish", SecurityManager.requestIsOwner, TemplatesController.publishProject
 		app.post "/project/:Project_id/template/unpublish", SecurityManager.requestIsOwner, TemplatesController.unpublishProject
