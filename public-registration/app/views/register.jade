@@ -40,19 +40,21 @@ block content
 									| #{translate("must_be_email_address")}
 							.form-group
 								label(for='password') #{translate("password")}
-								input.form-control(
+								input.form-control#passwordFeild(
 									type='password',
 									name='password',
 									placeholder="********",
 									required,
-									ng-model="password"
+									ng-model="password",
+									complex-password
 								)
-								span.small.text-primary(ng-show="registerForm.password.$invalid && registerForm.password.$dirty")
-									| #{translate("required")}
+								span.small.text-primary(ng-show="registerForm.password.$error.complexPassword", ng-bind-html="complexPasswordErrorMessage")
 							.actions
 								button.btn-primary.btn(
 									type='submit'
-									ng-disabled="registerForm.inflight"
+									ng-disabled="registerForm.inflight || registerForm.password.$error.required|| registerForm.password.$error.complexPassword"
 								)
 									span(ng-show="!registerForm.inflight") #{translate("register")}
 									span(ng-show="registerForm.inflight") #{translate("registering")}...
+	script(type='text/javascript').
+		window.passwordStrengthOptions = !{JSON.stringify(settings.passwordStrengthOptions || {})}
