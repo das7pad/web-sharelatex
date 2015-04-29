@@ -1,6 +1,7 @@
 AdminController = require("./AdminController")
+SecurityManager = require('../../../../app/js/managers/SecurityManager')
 
 module.exports = 
 	apply: (app) ->
-		app.get "/adminpanel", AdminController.renderAdminPanel
-
+		app.get "/adminpanel", SecurityManager.requestIsAdmin, AdminController.renderAdminPanel
+		app.get "/admin/listUsers", SecurityManager.requestIsAdmin, AdminController.listUsers
