@@ -10,7 +10,9 @@ define [
 		$scope.reverse = true
 
 		sendSearch = ->
-			request = $http.get "/admin/searchUsers?q=" + $scope.searchText
+			data._csrf = window.csrfToken
+			data.q = $scope.searchText
+			request = $http.post "/admin/searchUsers", data
 			request.success (data, status)->
 				$scope.users = data.users
 				$scope.updateVisibleUsers()
@@ -37,6 +39,19 @@ define [
 				else
 					# We don`t want hidden selections
 					user.selected = false
+
+		$scope.changePredicate = (newPredicate)->
+			if $scope.predicate == newPredicate
+				$scope.reverse = !$scope.reverse
+			$scope.predicate = newPredicate
+
+		$scope.getSortIconClass = (column)->
+			if column == $scope.predicate and $scope.reverse
+				return "fa-caret-down"
+			else if column == $scope.predicate and !$scope.reverse
+				return "fa-caret-up"
+			else
+				return ""
 
 		$scope.updateVisibleUsers()
 

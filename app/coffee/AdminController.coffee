@@ -22,8 +22,8 @@ module.exports = PublicRegistrationController =
 			res.render Path.resolve(__dirname, "../views/listUsers"), users:users
 
 	searchUsers: (req, res, next)->
-		logger.log body: req.query, "getting request for search users"
-		q = [ {email:new RegExp(req.query.q)}, {name:new RegExp(req.query.q)} ]
+		logger.log body: req.body, "getting request for search users"
+		q = [ {email:new RegExp(req.body.q)}, {name:new RegExp(req.body.q)} ]
 		User.find {$or : q}, 'first_name email lastLoggedIn', (err, users)->
 			if err?
 				logger.err err:err, "error getting data for users list page"
