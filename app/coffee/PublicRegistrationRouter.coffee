@@ -5,3 +5,4 @@ module.exports =
 	apply: (app) ->
 		app.get "/adminpanel", SecurityManager.requestIsAdmin, AdminController.renderAdminPanel
 		app.get "/admin/listUsers", SecurityManager.requestIsAdmin, AdminController.listUsers
+		app.get "/admin/searchUsers", SecurityManager.requestIsAdmin, AdminController.searchUsers

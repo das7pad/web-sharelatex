@@ -2,19 +2,27 @@ define [
 	"base"
 ], (App) ->
 
-	App.controller "AdminPanelController", ($scope) ->
+	App.controller "AdminPanelController", ($scope, $http) ->
 		$scope.users = window.data.users
 		$scope.allSelected = false
 		$scope.selectedUsers = []
 		$scope.predicate = "lastLoggedIn"
 		$scope.reverse = true
 
+		sendSearch = ->
+			request = $http.get "/admin/searchUsers?q=" + $scope.searchText
+			request.success (data, status)->
+				$scope.users = data.users
+				$scope.updateVisibleUsers()
+			request.error (data, status)->
+				console.log "the request failed"
+
 		$scope.clearSearchText = () ->
 			$scope.searchText = ""
 			$scope.$emit "search:clear"
 
 		$scope.searchUsers = ->
-			$scope.updateVisibleUsers()
+			sendSearch()
 
 		$scope.updateSelectedUsers = () ->
 			$scope.selectedUsers = $scope.users.filter (user) -> user.selected
@@ -23,17 +31,13 @@ define [
 			$scope.visibleUsers = []
 			for user in $scope.users
 				visible = true
-				# Only show if it matches any search text
-				if $scope.searchText? and $scope.searchText != ""
-					if !user.first_name.toLowerCase().match($scope.searchText.toLowerCase())
-						visible = false
 
 				if visible
 					$scope.visibleUsers.push user
 				else
 					# We don`t want hidden selections
 					user.selected = false
-					
+
 		$scope.updateVisibleUsers()
 
 	App.controller "UserListItemController", ($scope) ->
