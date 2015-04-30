@@ -1,0 +1,58 @@
+.row
+	.col-xs-12
+		form.user-search.form-horizontal(role="form")
+			.form-group.has-feedback.has-feedback-left.col-md-7.col-xs-12
+				input.form-control.col-md-7.col-xs-12(
+					placeholder="Search users...",
+					autofocus='autofocus',
+					ng-model="searchText",
+					focus-on='search:clear',
+					ng-keyup="searchUsers()"
+				)
+				i.fa.fa-search.form-control-feedback-left
+				i.fa.fa-times.form-control-feedback(
+					ng-click="clearSearchText()",
+					style="cursor: pointer;",
+					ng-show="searchText.length > 0"
+				)
+
+.row.row-spaced
+	.col-xs-12
+		.card.card-thin.user-list-card
+			ul.list-unstyled.user-list.structured-list(
+				select-all-list,
+				ng-if="users.length > 0",
+				ng-cloak
+			)
+				li.container-fluid
+					.row
+						.col-xs-4
+							input.select-all(
+								select-all,
+								type="checkbox"
+							)
+							span.header.clickable(ng-click="changePredicate('name')") Name
+								i.tablesort.fa(ng-class="getSortIconClass('name')")
+						.col-xs-4
+							span.header.clickable(ng-click="changePredicate('email')") Email
+								i.tablesort.fa(ng-class="getSortIconClass('email')")
+						.col-xs-4
+							span.header.clickable(ng-click="changePredicate('lastLoggedIn')") Last logged in
+								i.tablesort.fa(ng-class="getSortIconClass('lastLoggedIn')")
+				li.user_entry.container-fluid(
+					ng-repeat="user in visibleUsers | orderBy:predicate:reverse",
+					ng-controller="UserListItemController"
+				)
+					.row
+						.col-xs-4
+							input.select-item(
+								select-individual,
+								type="checkbox",
+								ng-model="user.selected"
+							)
+							span
+								a.projectName(href="#") {{user.first_name}}
+						.col-xs-4
+							span.owner {{user.email}}
+						.col-xs-4
+							span.last-loggedin {{user.lastLoggedIn | formatDate}}
