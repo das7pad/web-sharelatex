@@ -2,12 +2,13 @@ define [
 	"base"
 ], (App) ->
 
-	App.controller "AdminPanelController", ($scope, $http) ->
+	App.controller "AdminPanelController", ($scope, $http, $timeout) ->
 		$scope.users = window.data.users
 		$scope.allSelected = false
 		$scope.selectedUsers = []
 		$scope.predicate = "lastLoggedIn"
 		$scope.reverse = true
+		$scope.timer
 
 		sendSearch = ->
 			data._csrf = window.csrfToken
@@ -24,7 +25,8 @@ define [
 			$scope.$emit "search:clear"
 
 		$scope.searchUsers = ->
-			sendSearch()
+			$timeout.cancel $scope.timer
+			$scope.timer = $timeout (-> sendSearch()) , 700
 
 		$scope.updateSelectedUsers = () ->
 			$scope.selectedUsers = $scope.users.filter (user) -> user.selected
