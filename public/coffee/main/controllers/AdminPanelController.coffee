@@ -29,6 +29,7 @@ define [
 		$scope.clearSearchText = () ->
 			$scope.searchText = ""
 			$scope.$emit "search:clear"
+			sendSearch()
 
 		$scope.searchUsers = ->
 			$scope.page = 1;
