@@ -4,6 +4,7 @@ define [
 
 	App.controller "AdminPanelController", ($scope, $http, $timeout) ->
 		$scope.users = window.data.users
+		$scope.pages = window.data.pages
 		$scope.allSelected = false
 		$scope.selectedUsers = []
 		$scope.predicate = "lastLoggedIn"
@@ -12,10 +13,12 @@ define [
 
 		sendSearch = ->
 			data._csrf = window.csrfToken
-			data.q = $scope.searchText
+			data.query = $scope.searchText
+			data.page = 0
 			request = $http.post "/admin/searchUsers", data
 			request.success (data, status)->
 				$scope.users = data.users
+				$scope.pages = data.pages
 				$scope.updateVisibleUsers()
 			request.error (data, status)->
 				console.log "the request failed"
@@ -41,6 +44,12 @@ define [
 				else
 					# We don`t want hidden selections
 					user.selected = false
+			$scope.updatePages()
+
+		$scope.updatePages = () ->
+			$scope.pagesList = []
+			if $scope.pages > 1
+				$scope.pagesList.push i for i in [1..$scope.pages]
 
 		$scope.changePredicate = (newPredicate)->
 			if $scope.predicate == newPredicate

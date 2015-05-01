@@ -4,7 +4,8 @@ block content
 
 	script(type="text/javascript").
 		window.data = {
-			users: !{JSON.stringify(users).replace(/\//g, '\\/')}
+			users: !{JSON.stringify(users).replace(/\//g, '\\/')},
+			pages: !{JSON.stringify(pages).replace(/\//g, '\\/')}
 		};
 
 	.content.content-alt(ng-controller="AdminPanelController")

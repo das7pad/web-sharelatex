@@ -31,8 +31,8 @@
 								select-all,
 								type="checkbox"
 							)
-							span.header.clickable(ng-click="changePredicate('name')") Name
-								i.tablesort.fa(ng-class="getSortIconClass('name')")
+							span.header.clickable(ng-click="changePredicate('first_name')") Name
+								i.tablesort.fa(ng-class="getSortIconClass('first_name')")
 						.col-xs-4
 							span.header.clickable(ng-click="changePredicate('email')") Email
 								i.tablesort.fa(ng-class="getSortIconClass('email')")
@@ -51,8 +51,16 @@
 								ng-model="user.selected"
 							)
 							span
-								a.projectName(href="#") {{user.first_name}}
+								a.userName(href="#") {{user.first_name}}
 						.col-xs-4
 							span.owner {{user.email}}
 						.col-xs-4
 							span.last-loggedin {{user.lastLoggedIn | formatDate}}
+	ul.pager(
+		ng-if="pages > 1",
+	)
+		li.page(
+			ng-repeat="page in pagesList"
+		)
+			a(href="#") {{page}}
+
