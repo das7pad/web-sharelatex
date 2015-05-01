@@ -59,8 +59,11 @@
 ul.pager(
 	ng-if="pages > 1",
 )
-	li.page(
-		ng-repeat="page in pagesList"
+	li(
+		ng-repeat="page in pagesList",
+		ng-class="{active: (page == pageSelected)}"
 	)
-		a(href, ng-click="changePage(page)") {{page}}
+		a(href, 
+			ng-click="changePage(page)"
+		) {{page}}
 

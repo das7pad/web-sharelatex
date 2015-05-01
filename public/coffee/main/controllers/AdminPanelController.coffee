@@ -10,12 +10,12 @@ define [
 		$scope.predicate = "first_name"
 		$scope.reverse = false
 		$scope.timer
-		$scope.page = 1
+		$scope.pageSelected = 1
 
 		sendSearch = ->
 			data._csrf = window.csrfToken
 			data.query = $scope.searchText
-			data.page = $scope.page
+			data.page = $scope.pageSelected
 			data.sort = $scope.predicate
 			data.reverse = $scope.reverse
 			request = $http.post "/admin/searchUsers", data
@@ -32,12 +32,12 @@ define [
 			sendSearch()
 
 		$scope.searchUsers = ->
-			$scope.page = 1;
+			$scope.pageSelected = 1;
 			$timeout.cancel $scope.timer
 			$scope.timer = $timeout (-> sendSearch()) , 700
 
 		$scope.changePage = (page) ->
-			$scope.page = page
+			$scope.pageSelected = page
 			sendSearch()
 
 		$scope.updateSelectedUsers = () ->

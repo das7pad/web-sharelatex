@@ -15,7 +15,7 @@ module.exports = AdminController =
 		AdminController._userFind '', 1, 'first_name', false, (err, users, count)->
 			if err?
 				return next(err)
-			pages = count / perPage
+			pages = Math.ceil(count / perPage)
 			res.render Path.resolve(__dirname, "../views/listUsers"), users:users, pages:pages
 
 	searchUsers: (req, res, next)->
@@ -23,7 +23,7 @@ module.exports = AdminController =
 		AdminController._userFind req.body.query, req.body.page, req.body.sort, req.body.reverse, (err, users, count) ->
 			if err?
 				return next(err)
-			pages = count / perPage
+			pages = Math.ceil(count / perPage)
 			res.send 200, {users:users, pages:pages}
 
 	_userFind: (q, page, sortField, reverse, cb) ->
