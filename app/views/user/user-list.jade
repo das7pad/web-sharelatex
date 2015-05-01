@@ -40,7 +40,7 @@
 							span.header.clickable(ng-click="changePredicate('lastLoggedIn')") Last logged in
 								i.tablesort.fa(ng-class="getSortIconClass('lastLoggedIn')")
 				li.user_entry.container-fluid(
-					ng-repeat="user in visibleUsers | orderBy:predicate:reverse",
+					ng-repeat="user in visibleUsers",
 					ng-controller="UserListItemController"
 				)
 					.row
@@ -56,11 +56,11 @@
 							span.owner {{user.email}}
 						.col-xs-4
 							span.last-loggedin {{user.lastLoggedIn | formatDate}}
-	ul.pager(
-		ng-if="pages > 1",
+ul.pager(
+	ng-if="pages > 1",
+)
+	li.page(
+		ng-repeat="page in pagesList"
 	)
-		li.page(
-			ng-repeat="page in pagesList"
-		)
-			a(href="#") {{page}}
+		a(href, ng-click="changePage(page)") {{page}}
 

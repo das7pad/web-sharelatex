@@ -7,14 +7,17 @@ define [
 		$scope.pages = window.data.pages
 		$scope.allSelected = false
 		$scope.selectedUsers = []
-		$scope.predicate = "lastLoggedIn"
-		$scope.reverse = true
+		$scope.predicate = "first_name"
+		$scope.reverse = false
 		$scope.timer
+		$scope.page = 1
 
 		sendSearch = ->
 			data._csrf = window.csrfToken
 			data.query = $scope.searchText
-			data.page = 0
+			data.page = $scope.page
+			data.sort = $scope.predicate
+			data.reverse = $scope.reverse
 			request = $http.post "/admin/searchUsers", data
 			request.success (data, status)->
 				$scope.users = data.users
@@ -28,8 +31,13 @@ define [
 			$scope.$emit "search:clear"
 
 		$scope.searchUsers = ->
+			$scope.page = 1;
 			$timeout.cancel $scope.timer
 			$scope.timer = $timeout (-> sendSearch()) , 700
+
+		$scope.changePage = (page) ->
+			$scope.page = page
+			sendSearch()
 
 		$scope.updateSelectedUsers = () ->
 			$scope.selectedUsers = $scope.users.filter (user) -> user.selected
@@ -55,6 +63,7 @@ define [
 			if $scope.predicate == newPredicate
 				$scope.reverse = !$scope.reverse
 			$scope.predicate = newPredicate
+			sendSearch()
 
 		$scope.getSortIconClass = (column)->
 			if column == $scope.predicate and $scope.reverse
