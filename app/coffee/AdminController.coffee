@@ -3,9 +3,10 @@ metrics = require "metrics-sharelatex"
 _ = require "underscore"
 Path = require("path")
 User = require("../../../../app/js/models/User").User
-perPage = 5
 
 module.exports = AdminController =
+	perPage: 5
+
 	renderAdminPanel : (req, res, next) ->
 		res.render Path.resolve(__dirname, "../views/admin"),
 			title: 'Admin Panel'
@@ -15,7 +16,7 @@ module.exports = AdminController =
 		AdminController._userFind '', 1, 'first_name', false, (err, users, count)->
 			if err?
 				return next(err)
-			pages = Math.ceil(count / perPage)
+			pages = Math.ceil(count / AdminController.perPage)
 			res.render Path.resolve(__dirname, "../views/listUsers"), users:users, pages:pages
 
 	searchUsers: (req, res, next)->
@@ -23,15 +24,15 @@ module.exports = AdminController =
 		AdminController._userFind req.body.query, req.body.page, req.body.sort, req.body.reverse, (err, users, count) ->
 			if err?
 				return next(err)
-			pages = Math.ceil(count / perPage)
+			pages = Math.ceil(count / AdminController.perPage)
 			res.send 200, {users:users, pages:pages}
 
 	_userFind: (q, page, sortField, reverse, cb) ->
 		q = [ {email:new RegExp(q)}, {name:new RegExp(q)} ]
-		skip = (page - 1) * perPage
+		skip = (page - 1) * AdminController.perPage
 		sortOrder = {}
 		sortOrder[sortField] = if reverse then -1 else 1
-		opts = {limit: perPage, skip : skip, sort: sortOrder }
+		opts = {limit: AdminController.perPage, skip : skip, sort: sortOrder }
 		logger.log opts:opts, q:q, "user options and query"
 		User.find {$or : q}, 'first_name email lastLoggedIn', opts, (err, users)->
 			if err?
