@@ -2,7 +2,7 @@ define [
 	"base"
 ], (App) ->
 
-	App.controller "AdminPanelController", ($scope, $http, $timeout) ->
+	App.controller "AdminPanelController", ($scope, $http, $timeout, $window) ->
 		$scope.users = window.data.users
 		$scope.pages = window.data.pages
 		$scope.allSelected = false
@@ -11,6 +11,30 @@ define [
 		$scope.reverse = false
 		$scope.timer
 		$scope.pageSelected = 1
+
+		recalculateUserListHeight = () ->
+			topOffset = $(".user-list-card").offset().top
+			bottomOffset = $("footer").outerHeight() + 25
+			sideBarHeight = $("aside").height() - 56
+			# When footer is visible and page doesnt need to scroll we just make it
+			# span between header and footer
+			height = $window.innerHeight - topOffset - bottomOffset
+			
+			# When page is small enough that this pushes the project list smaller than
+			# the side bar, then the window going to have to scroll to take into account the
+			# footer. So we now start to track to the bottom of the window, with a 25px padding
+			# since the footer is hidden below the fold. Dont ever get bigger than the sidebar
+			# though since thats what triggered this happening in the first place.
+			if height < sideBarHeight
+				height = Math.min(sideBarHeight, $window.innerHeight - topOffset - 25)
+			$scope.userListHeight = height
+		
+		$timeout () ->
+			recalculateUserListHeight()
+		, 0
+		angular.element($window).bind "resize", () ->
+			recalculateUserListHeight()
+			$scope.$apply()
 
 		sendSearch = ->
 			data._csrf = window.csrfToken
@@ -51,7 +75,6 @@ define [
 				if visible
 					$scope.visibleUsers.push user
 				else
-					# We don`t want hidden selections
 					user.selected = false
 			$scope.updatePages()
 
