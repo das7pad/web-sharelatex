@@ -52,7 +52,7 @@
 								ng-model="user.selected"
 							)
 							span
-								a.userName(href="#") {{user.first_name}}
+								a.userName(href="/admin/user/{{user._id}}") {{user.first_name}}
 						.col-xs-4
 							span.owner {{user.email}}
 						.col-xs-4

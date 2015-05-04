@@ -1,0 +1,28 @@
+extends ../../../../app/views/layout
+
+block content
+
+	script(type="text/javascript").
+		window.data = {
+			user: !{JSON.stringify(user).replace(/\//g, '\\/')},
+			projects: !{JSON.stringify(projects).replace(/\//g, '\\/')},
+			tags: {},
+		};
+
+	.content.content-alt(ng-controller="AdminProjectController")
+		.container
+			.row
+				aside.col-md-2.col-xs-3
+					h2  User Info
+
+					label  #{translate("email")}
+					p.small {{user.email}}
+
+					label #{translate("first_name")}
+					p.small {{user.first_name}}
+
+					label #{translate("last_name")}
+					p.small {{user.last_name}}
+
+				.col-md-10.col-xs-9(ng-controller="ProjectPageController")
+					include ../../../../app/views/project/list/project-list
