@@ -2,7 +2,7 @@ define [
 	"base"
 ], (App) ->
 
-	App.controller "AdminProjectController", ($scope) ->
+	App.controller "AdminProjectController", ($scope, $timeout) ->
 		$scope.user = window.data.user
 
 		for project in $scope.projects
@@ -12,3 +12,7 @@ define [
 
 		if $scope.projects.length == 0
 			$scope.projects = [{}]
+
+		$timeout () ->
+			$(".projectName").removeAttr("href")
+		, 10
