@@ -41,7 +41,6 @@
 		.card.card-thin.user-list-card
 			ul.list-unstyled.user-list.structured-list(
 				select-all-list,
-				ng-if="users.length > 0",
 				max-height="userListHeight - 25",
 				ng-cloak
 			)
@@ -77,6 +76,13 @@
 							span.owner {{user.email}}
 						.col-xs-4
 							span.last-loggedin {{user.lastLoggedIn | formatDate}}
+				li(
+					ng-if="visibleUsers.length == 0",
+					ng-cloak
+				)
+					.row
+						.col-xs-12.text-centered
+							small No Users
 ul.pager(
 	ng-if="pages > 1",
 )

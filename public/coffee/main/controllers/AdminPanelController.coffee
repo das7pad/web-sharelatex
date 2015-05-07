@@ -2,7 +2,7 @@ define [
 	"base"
 ], (App) ->
 
-	App.controller "AdminPanelController", ($scope, $http, $timeout, $window) ->
+	App.controller "AdminPanelController", ($scope, $http, $timeout, $window, $modal, queuedHttp) ->
 		$scope.users = window.data.users
 		$scope.pages = window.data.pages
 		$scope.allSelected = false
@@ -55,7 +55,7 @@ define [
 			$scope.$emit "search:clear"
 			sendSearch()
 
-		$scope.searchUsers = ->
+		$scope.searchUsers = () ->
 			$scope.pageSelected = 1;
 			$timeout.cancel $scope.timer
 			$scope.timer = $timeout (-> sendSearch()) , 700
@@ -78,6 +78,9 @@ define [
 					user.selected = false
 			$scope.updatePages()
 
+		$scope.getSelectedUsers = () ->
+			$scope.selectedUsers
+
 		$scope.updatePages = () ->
 			$scope.pagesList = []
 			if $scope.pages > 1
@@ -97,9 +100,47 @@ define [
 			else
 				return ""
 
+		$scope._removeUserFromList = (user) ->
+			index = $scope.users.indexOf(user)
+			if index > -1
+				$scope.users.splice(index, 1)
+
+		$scope.openDeleteUsersModal = () ->
+			modalInstance = $modal.open(
+				templateUrl: "deleteUsersModalTemplate"
+				controller: "DeleteUsersModalController"
+				resolve:
+					users: () -> $scope.getSelectedUsers()
+			)
+			modalInstance.result.then () ->
+				$scope.DeleteSelectedUsers()
+
+		$scope.DeleteSelectedUsers = () ->
+			selected_users = $scope.getSelectedUsers()
+
+			for user in selected_users
+				$scope._removeUserFromList user
+				queuedHttp {
+					method: "DELETE"
+					url: "/admin/user/#{user._id}"
+					headers:
+						"X-CSRF-Token": window.csrfToken
+				}
+
+			$scope.searchUsers()
+
 		$scope.updateVisibleUsers()
 
 	App.controller "UserListItemController", ($scope) ->
 		$scope.$watch "user.selected", (value) ->
 			if value?
 				$scope.updateSelectedUsers()
+
+	App.controller 'DeleteUsersModalController', ($scope, $modalInstance, $timeout, users) ->
+		$scope.users = users
+
+		$scope.delete = () ->
+			$modalInstance.close()
+
+		$scope.cancel = () ->
+			$modalInstance.dismiss('cancel')
