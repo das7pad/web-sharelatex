@@ -26,11 +26,8 @@ define [
 		$scope.updateVisibleProjects()
 
 		$scope.clearSearchText = () ->
-			$scope.searchText = ""
-			$scope.filter = "all"
-			$scope.$emit "search:clear"
-			$scope.updateVisibleProjects()
-
+			$scope.$parent.searchText = $scope.searchText
+			$scope.$parent.clearSearchText()
 
 	App.controller "ProjectListItemController", ($scope) ->
 		$scope.ownerName = () ->
