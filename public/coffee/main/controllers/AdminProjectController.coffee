@@ -1,3 +1,4 @@
+temp = ""
 define [
 	"base",
 	"libs/md5"
@@ -5,7 +6,6 @@ define [
 
 	App.controller "AdminProjectController", ($scope, $timeout) ->
 		$scope.user = window.data.user
-		$scope.projects = window.data.projects
 		$scope.user.gravatar =  CryptoJS.MD5($scope.user.email)
 
 		for project in $scope.projects
@@ -22,3 +22,23 @@ define [
 			$(".projectName").attr 'href', "/admin" + $(".projectName").attr 'href'
 			$(".projectName").attr 'target', "_blank"
 		, 10
+
+		$scope.updateVisibleProjects()
+
+		$scope.clearSearchText = () ->
+			$scope.searchText = ""
+			$scope.filter = "all"
+			$scope.$emit "search:clear"
+			$scope.updateVisibleProjects()
+
+
+	App.controller "ProjectListItemController", ($scope) ->
+		$scope.ownerName = () ->
+			if $scope.project.owner?
+				return "#{$scope.project.owner.first_name} #{$scope.project.owner.last_name}"
+			else
+				return "?"
+
+		$scope.$watch "project.selected", (value) ->
+			if value?
+				$scope.updateSelectedProjects()
