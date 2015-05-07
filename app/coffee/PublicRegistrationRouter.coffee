@@ -9,3 +9,4 @@ module.exports =
 		app.post "/admin/searchUsers", SecurityManager.requestIsAdmin, AdminController.searchUsers
 		app.get "/admin/user/:user_id", SecurityManager.requestIsAdmin, AdminController.getUserInfo
 		app.get "/admin/Project/:Project_id", SecurityManager.requestIsAdmin, ProjectController.loadEditor
+		app.del "/admin/Project/:Project_id", SecurityManager.requestIsAdmin, ProjectController.deleteProject
