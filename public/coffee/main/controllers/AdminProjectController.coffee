@@ -5,7 +5,7 @@ define [
 
 	App.controller "AdminProjectController", ($scope, $timeout, $modal, queuedHttp) ->
 		$scope.user = window.data.user
-		$scope.user.gravatar =  CryptoJS.MD5($scope.user.email)
+		$scope.user.gravatar =  CryptoJS.MD5($scope.user.email).toString()
 
 		for project in $scope.projects
 			project.id = project._id

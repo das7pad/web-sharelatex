@@ -8,5 +8,6 @@ module.exports =
 		app.get "/admin/listUsers", SecurityManager.requestIsAdmin, AdminController.listUsers
 		app.post "/admin/searchUsers", SecurityManager.requestIsAdmin, AdminController.searchUsers
 		app.get "/admin/user/:user_id", SecurityManager.requestIsAdmin, AdminController.getUserInfo
+		app.del "/admin/user/:user_id", SecurityManager.requestIsAdmin, AdminController.deleteUser
 		app.get "/admin/Project/:Project_id", SecurityManager.requestIsAdmin, ProjectController.loadEditor
 		app.del "/admin/Project/:Project_id", SecurityManager.requestIsAdmin, ProjectController.deleteProject

@@ -15,6 +15,26 @@
 					style="cursor: pointer;",
 					ng-show="searchText.length > 0"
 				)
+		.user-tools(ng-cloak)
+			.btn-toolbar
+				.btn-group(ng-hide="selectedUsers.length < 1")
+					a.btn.btn-default(
+						href='#',
+						tooltip="#{translate('delete')}",
+						tooltip-placement="bottom",
+						tooltip-append-to-body="true",
+						ng-click="openDeleteUsersModal()"
+					)
+						i.fa.fa-trash-o
+				.btn-group(ng-hide="selectedUsers.length != 1")
+					a.btn.btn-default(
+						href='#',
+						tooltip="#{translate('set_password')}",
+						tooltip-placement="bottom",
+						tooltip-append-to-body="true",
+						ng-click="openSetPasswordModal()"
+					)
+						i.fa.fa-key
 
 .row.row-spaced
 	.col-xs-12
