@@ -81,6 +81,9 @@ define [
 		$scope.getSelectedUsers = () ->
 			$scope.selectedUsers
 
+		$scope.getFirstSelectedUser = () ->
+			$scope.selectedUsers[0]
+
 		$scope.updatePages = () ->
 			$scope.pagesList = []
 			if $scope.pages > 1
@@ -129,6 +132,27 @@ define [
 
 			$scope.searchUsers()
 
+		$scope.openSetPasswordModal = () ->
+			modalInstance = $modal.open(
+				templateUrl: "setPasswordModalTemplate"
+				controller: "SetPasswordModalController"
+				resolve:
+					user: () -> $scope.getFirstSelectedUser()
+			)
+			modalInstance.result.then(
+				(newPassword) ->
+					$scope.SetUserPassword(newPassword)
+			)
+				
+
+		$scope.SetUserPassword = (newPassword) ->
+			selected_user = $scope.getFirstSelectedUser()
+
+			queuedHttp.post "/admin/user/#{selected_user._id}/setPassword", {
+				newPassword: newPassword
+				_csrf: window.csrfToken
+			}
+
 		$scope.updateVisibleUsers()
 
 	App.controller "UserListItemController", ($scope) ->
@@ -141,6 +165,17 @@ define [
 
 		$scope.delete = () ->
 			$modalInstance.close()
+
+		$scope.cancel = () ->
+			$modalInstance.dismiss('cancel')
+
+	App.controller 'SetPasswordModalController', ($scope, $modalInstance, $timeout, user) ->
+		$scope.user = user
+		$scope.inputs = 
+			newPassword: ""
+
+		$scope.setPassword = () ->
+			$modalInstance.close($scope.inputs.newPassword)
 
 		$scope.cancel = () ->
 			$modalInstance.dismiss('cancel')

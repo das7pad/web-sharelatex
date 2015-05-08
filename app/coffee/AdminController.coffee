@@ -6,6 +6,7 @@ User = require("../../../../app/js/models/User").User
 UserGetter = require "../../../../app/js/Features/User/UserGetter"
 Project = require("../../../../app/js/models/Project").Project
 UserDeleter = require("../../../../app/js/Features/User/UserDeleter")
+AuthenticationManager = require("../../../../app/js/Features/Authentication/AuthenticationManager")
 
 module.exports = AdminController =
 	perPage: 5
@@ -59,6 +60,16 @@ module.exports = AdminController =
 		user_id = req.params.user_id
 		logger.log user_id: user_id, "received admin request to delete user"
 		UserDeleter.deleteUser user_id, (err)->
+			if err?
+				res.send 500
+			else
+				res.send 200
+
+	setUserPassword: (req, res)->
+		user_id = req.params.user_id
+		password = req.body.newPassword
+		logger.log user_id: user_id, "received admin request to set user password"
+		AuthenticationManager.setUserPassword user_id, password, (err)->
 			if err?
 				res.send 500
 			else

@@ -19,3 +19,33 @@ script(type='text/ng-template', id='deleteUsersModalTemplate')
 		button.btn.btn-danger(
 			ng-click="delete()"
 		) #{translate("delete")}
+
+script(type='text/ng-template', id='setPasswordModalTemplate')
+	.modal-header
+		button.close(
+			type="button"
+			data-dismiss="modal"
+			ng-click="cancel()"
+		) &times;
+		h3 #{translate("set_new_password")} for: {{user.first_name}}
+	.modal-body
+		form(name="newPasswordForm", novalidate)
+			input.form-control(
+				type="text",
+				placeholder="New Password",
+				required,
+				ng-model="inputs.newPassword",
+				on-enter="setPassword()",
+				focus-on="open",
+				stop-propagation="click"
+			)
+	.modal-footer
+		button.btn.btn-default(
+			ng-click="cancel()"
+			stop-propagation="click"
+		) #{translate("cancel")}
+		button.btn.btn-primary(
+			ng-disabled="newPasswordForm.$invalid"
+			ng-click="setPassword()"
+			stop-propagation="click"
+		) #{translate("set_password")}
