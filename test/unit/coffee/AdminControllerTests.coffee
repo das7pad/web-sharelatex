@@ -15,9 +15,6 @@ describe "AdminController", ->
 		@UserGetter =
 			getUser: sinon.stub()
 
-		@Project =
-			findAllUsersProjects: sinon.stub()
-
 		@UserDeleter =
 			deleteUser: sinon.stub().callsArgWith(1)
 
@@ -29,13 +26,13 @@ describe "AdminController", ->
 				log:->
 				err:->
 			"../../../../app/js/Features/User/UserGetter":@UserGetter
-			"../../../../app/js/models/Project":Project:@Project
 			"../../../../app/js/Features/User/UserDeleter":@UserDeleter
 			"../../../../app/js/Features/Authentication/AuthenticationManager":@AuthenticationManager
 			"../../../../app/js/infrastructure/mongojs":
 				db: @db =
 					projects: {}
 					users: {}
+				ObjectId: ObjectId
 
 		@user = {user_id:1,first_name:'James'}
 		@users = [{first_name:'James'}, {first_name:'Henry'}]
@@ -46,8 +43,7 @@ describe "AdminController", ->
 
 		@db.users.count = sinon.stub().callsArgWith(1, null, @users.length)
 
-		@Project.findAllUsersProjects = (user_id, fields, callback) =>
-			callback null, @projects
+		@db.projects.find = sinon.stub().callsArgWith(2, null, @projects)
 
 		@UserGetter.getUser = (user_id, fields, callback) =>
 			callback null, @user

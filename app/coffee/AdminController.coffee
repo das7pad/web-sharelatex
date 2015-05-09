@@ -3,12 +3,12 @@ metrics = require "metrics-sharelatex"
 _ = require "underscore"
 Path = require("path")
 UserGetter = require "../../../../app/js/Features/User/UserGetter"
-Project = require("../../../../app/js/models/Project").Project
 UserDeleter = require("../../../../app/js/Features/User/UserDeleter")
 AuthenticationManager = require("../../../../app/js/Features/Authentication/AuthenticationManager")
 
 mongojs = require("../../../../app/js/infrastructure/mongojs")
 db = mongojs.db
+ObjectId = mongojs.ObjectId
 
 module.exports = AdminController =
 	perPage: 5
@@ -53,7 +53,7 @@ module.exports = AdminController =
 	getUserInfo: (req, res, next)->
 		logger.log "getting admin request for user info"
 		UserGetter.getUser req.params.user_id, { _id: true, first_name: true, last_name: true, email: true}, (err, user) ->
-			Project.findAllUsersProjects req.params.user_id, 'name lastUpdated publicAccesLevel archived owner_ref', (err, projects) ->
+			db.projects.find {owner_ref:ObjectId(req.params.user_id)}, {name:1, lastUpdated:1, publicAccesLevel:1, archived:1, owner_ref:1,}, (err, projects) ->
 					if err?
 						return next(err)
 					res.render Path.resolve(__dirname, "../views/userInfo"), user:user, projects:projects
