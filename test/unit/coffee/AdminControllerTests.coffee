@@ -12,10 +12,6 @@ Path = require "path"
 describe "AdminController", ->
 	beforeEach ->
 
-		@UserModel =
-			find: sinon.stub()
-			count: sinon.stub()
-
 		@UserGetter =
 			getUser: sinon.stub()
 
@@ -32,22 +28,23 @@ describe "AdminController", ->
 			"logger-sharelatex": 
 				log:->
 				err:->
-			"../../../../app/js/models/User":User:@UserModel
 			"../../../../app/js/Features/User/UserGetter":@UserGetter
 			"../../../../app/js/models/Project":Project:@Project
 			"../../../../app/js/Features/User/UserDeleter":@UserDeleter
 			"../../../../app/js/Features/Authentication/AuthenticationManager":@AuthenticationManager
+			"../../../../app/js/infrastructure/mongojs":
+				db: @db =
+					projects: {}
+					users: {}
 
 		@user = {user_id:1,first_name:'James'}
 		@users = [{first_name:'James'}, {first_name:'Henry'}]
 		@projects = [{lastUpdated:1, _id:1, owner_ref: "user-1"}, {lastUpdated:2, _id:2, owner_ref: "user-2"}]
 		@perPage = @AdminController.perPage
 
-		@UserModel.find = (query, fields, opts, callback) =>
-			callback null, @users
+		@db.users.find = sinon.stub().callsArgWith(3, null, @users)
 
-		@UserModel.count = (query, callback) =>
-			callback null, @users.length
+		@db.users.count = sinon.stub().callsArgWith(1, null, @users.length)
 
 		@Project.findAllUsersProjects = (user_id, fields, callback) =>
 			callback null, @projects
@@ -129,7 +126,7 @@ describe "AdminController", ->
 				pageName.should.equal  Path.resolve(__dirname + "../../../../")+ "/app/views/userInfo"
 				done()
 			@AdminController.getUserInfo @req, @res
-		
+
 		it "should send the user", (done)->
 			@res.render = (pageName, opts)=>
 				opts.user.should.deep.equal @user

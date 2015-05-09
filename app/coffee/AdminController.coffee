@@ -2,11 +2,13 @@ logger = require "logger-sharelatex"
 metrics = require "metrics-sharelatex"
 _ = require "underscore"
 Path = require("path")
-User = require("../../../../app/js/models/User").User
 UserGetter = require "../../../../app/js/Features/User/UserGetter"
 Project = require("../../../../app/js/models/Project").Project
 UserDeleter = require("../../../../app/js/Features/User/UserDeleter")
 AuthenticationManager = require("../../../../app/js/Features/Authentication/AuthenticationManager")
+
+mongojs = require("../../../../app/js/infrastructure/mongojs")
+db = mongojs.db
 
 module.exports = AdminController =
 	perPage: 5
@@ -38,11 +40,11 @@ module.exports = AdminController =
 		sortOrder[sortField] = if reverse then -1 else 1
 		opts = {limit: AdminController.perPage, skip : skip, sort: sortOrder }
 		logger.log opts:opts, q:q, "user options and query"
-		User.find {$or : q}, 'first_name email lastLoggedIn', opts, (err, users)->
+		db.users.find {$or : q}, {first_name:1, email:1, lastLoggedIn:1}, opts,(err, users)->
 			if err?
 				logger.err err:err, "error getting admin data for users list page"
 				return cb(err)
-			User.count {$or : q}, (err, count)->
+			db.users.count {$or : q}, (err, count)->
 				if err?
 					logger.err err:err, "error counting admin data for users list page"
 					return cb(err)
