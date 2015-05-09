@@ -16,13 +16,31 @@ describe "AdminController", ->
 			find: sinon.stub()
 			count: sinon.stub()
 
+		@UserGetter =
+			getUser: sinon.stub()
+
+		@Project =
+			findAllUsersProjects: sinon.stub()
+
+		@UserDeleter =
+			deleteUser: sinon.stub().callsArgWith(1)
+
+		@AuthenticationManager =
+			setUserPassword: sinon.stub()
+
 		@AdminController = SandboxedModule.require modulePath, requires:
 			"logger-sharelatex": 
 				log:->
 				err:->
 			"../../../../app/js/models/User":User:@UserModel
+			"../../../../app/js/Features/User/UserGetter":@UserGetter
+			"../../../../app/js/models/Project":Project:@Project
+			"../../../../app/js/Features/User/UserDeleter":@UserDeleter
+			"../../../../app/js/Features/Authentication/AuthenticationManager":@AuthenticationManager
 
+		@user = {user_id:1,first_name:'James'}
 		@users = [{first_name:'James'}, {first_name:'Henry'}]
+		@projects = [{lastUpdated:1, _id:1, owner_ref: "user-1"}, {lastUpdated:2, _id:2, owner_ref: "user-2"}]
 		@perPage = @AdminController.perPage
 
 		@UserModel.find = (query, fields, opts, callback) =>
@@ -30,6 +48,12 @@ describe "AdminController", ->
 
 		@UserModel.count = (query, callback) =>
 			callback null, @users.length
+
+		@Project.findAllUsersProjects = (user_id, fields, callback) =>
+			callback null, @projects
+
+		@UserGetter.getUser = (user_id, fields, callback) =>
+			callback null, @user
 
 		@req = 
 			body:
@@ -91,3 +115,66 @@ describe "AdminController", ->
 				json.pages.should.equal Math.ceil(@users.length / @perPage)
 				done()
 			@AdminController.searchUsers @req, @res
+
+	describe "getUserInfo", ->
+
+		beforeEach ->
+
+			@req = 
+				params:
+					user_id: 'user_id_here'
+		
+		it "should render the admin/userInfo page", (done)->
+			@res.render = (pageName, opts)=>
+				pageName.should.equal  Path.resolve(__dirname + "../../../../")+ "/app/views/userInfo"
+				done()
+			@AdminController.getUserInfo @req, @res
+		
+		it "should send the user", (done)->
+			@res.render = (pageName, opts)=>
+				opts.user.should.deep.equal @user
+				done()
+			@AdminController.getUserInfo @req, @res
+
+		it "should send the user projects", (done)->
+			@res.render = (pageName, opts)=>
+				opts.projects.should.deep.equal @projects
+				done()
+			@AdminController.getUserInfo @req, @res
+
+	describe "deleteUser", ->
+
+		it "should delete the user", (done)->
+			@req = 
+				params:
+					user_id: 'user_id_here'	
+			@UserDeleter.deleteUser.calledWith(1)
+			@res.send = (code)=>
+				@UserDeleter.deleteUser.calledWith('user_id_here').should.equal true
+				code.should.equal 200
+				done()
+			@AdminController.deleteUser @req, @res
+
+	describe "setUserPassword", ->
+
+		beforeEach ->
+
+			@req = 
+				body:
+					newPassword: 'my great secret password'
+				params:
+					user_id: 'user_id_here'
+
+		it "should set the user password", (done)->
+			@AuthenticationManager.setUserPassword.callsArgWith(2)
+			@res.send = (code)=>
+				code.should.equal 200
+				done()
+			@AdminController.setUserPassword @req, @res
+
+		it "should set the user id", (done)->
+			@AuthenticationManager.setUserPassword.callsArgWith(2)
+			@res.send = (code)=>
+				@AuthenticationManager.setUserPassword.calledWith('user_id_here', 'my great secret password').should.equal true
+				done()
+			@AdminController.setUserPassword @req, @res
