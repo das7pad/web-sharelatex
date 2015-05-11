@@ -40,7 +40,7 @@ module.exports = AdminController =
 		sortOrder[sortField] = if reverse then -1 else 1
 		opts = {limit: AdminController.perPage, skip : skip, sort: sortOrder }
 		logger.log opts:opts, q:q, "user options and query"
-		db.users.find {$or : q}, {first_name:1, email:1, lastLoggedIn:1}, opts,(err, users)->
+		db.users.find {$or : q}, {first_name:1, email:1, lastLoggedIn:1, loginCount:1}, opts,(err, users)->
 			if err?
 				logger.err err:err, "error getting admin data for users list page"
 				return cb(err)
@@ -53,7 +53,7 @@ module.exports = AdminController =
 	getUserInfo: (req, res, next)->
 		logger.log "getting admin request for user info"
 		UserGetter.getUser req.params.user_id, { _id: true, first_name: true, last_name: true, email: true}, (err, user) ->
-			db.projects.find {owner_ref:ObjectId(req.params.user_id)}, {name:1, lastUpdated:1, publicAccesLevel:1, archived:1, owner_ref:1,}, (err, projects) ->
+			db.projects.find {owner_ref:ObjectId(req.params.user_id)}, {name:1, lastUpdated:1, publicAccesLevel:1, archived:1, owner_ref:1}, (err, projects) ->
 					if err?
 						return next(err)
 					res.render Path.resolve(__dirname, "../views/userInfo"), user:user, projects:projects

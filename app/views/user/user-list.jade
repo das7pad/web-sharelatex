@@ -51,14 +51,18 @@
 								select-all,
 								type="checkbox"
 							)
-							span.header.clickable(ng-click="changePredicate('first_name')") Name
-								i.tablesort.fa(ng-class="getSortIconClass('first_name')")
-						.col-xs-4
-							span.header.clickable(ng-click="changePredicate('email')") Email
-								i.tablesort.fa(ng-class="getSortIconClass('email')")
-						.col-xs-4
 							span.header.clickable(ng-click="changePredicate('lastLoggedIn')") Last logged in
 								i.tablesort.fa(ng-class="getSortIconClass('lastLoggedIn')")
+						.col-xs-3
+							span.header.clickable(ng-click="changePredicate('first_name')") Name
+								i.tablesort.fa(ng-class="getSortIconClass('first_name')")
+						.col-xs-3
+							span.header.clickable(ng-click="changePredicate('email')") Email
+								i.tablesort.fa(ng-class="getSortIconClass('email')")
+						.col-xs-2
+							span.header.clickable(ng-click="changePredicate('loginCount')") Login Count
+								i.tablesort.fa(ng-class="getSortIconClass('loginCount')")
+
 				li.user_entry.container-fluid(
 					ng-repeat="user in visibleUsers",
 					ng-controller="UserListItemController"
@@ -70,12 +74,15 @@
 								type="checkbox",
 								ng-model="user.selected"
 							)
+							span.last-loggedin {{user.lastLoggedIn | formatDate}}
+						.col-xs-3
 							span
 								a.userName(href="/admin/user/{{user._id}}") {{user.first_name}}
-						.col-xs-4
+						.col-xs-3
 							span.owner {{user.email}}
-						.col-xs-4
-							span.last-loggedin {{user.lastLoggedIn | formatDate}}
+						.col-xs-2
+							span.owner {{user.loginCount}}
+							
 				li(
 					ng-if="visibleUsers.length == 0",
 					ng-cloak

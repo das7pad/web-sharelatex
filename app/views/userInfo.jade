@@ -9,8 +9,8 @@ block content
 			tags: {},
 		};
 
-	.content.content-alt(ng-controller="ProjectPageController as projectController")
-		.container(ng-controller="AdminProjectController")
+	.content.content-alt(ng-controller="AdminProjectController")
+		.container
 			.row
 				aside.col-md-2.col-xs-3
 					h2  User Info
@@ -30,6 +30,6 @@ block content
 					p.small {{user.last_name}}
 
 				.col-md-10.col-xs-9
-					include ../../../../app/views/project/list/project-list
+					include ./user/project-list
 
 		include ../../../../app/views/project/list/modals

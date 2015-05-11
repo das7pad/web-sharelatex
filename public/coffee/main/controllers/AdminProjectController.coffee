@@ -5,34 +5,25 @@ define [
 
 	App.controller "AdminProjectController", ($scope, $timeout, $modal, queuedHttp) ->
 		$scope.user = window.data.user
+		$scope.projects = window.data.projects
 		$scope.user.gravatar =  CryptoJS.MD5($scope.user.email).toString()
+		$scope.selectedProjects = []
 
 		for project in $scope.projects
-			project.id = project._id
-			project.archived = false
 			project.accessLevel = "owner"
-			if project.owner_ref == $scope.user._id
-				project.owner = $scope.user
-
-		if $scope.projects.length == 0
-			$scope.projects = [{}]
-
-		$timeout () ->
-			$(".projectName").attr 'href', "/admin" + $(".projectName").attr 'href'
-			$(".projectName").attr 'target', "_blank"
-			$(".dropdown.btn-group").hide()
-			$("[tooltip=Download]").hide()
-		, 10
-
-		$scope.updateVisibleProjects()
 
 		$scope.clearSearchText = () ->
 			$scope.searchText = ""
-			$scope.$parent.clearSearchText()
+			$scope.updateVisibleProjects()
 
 		$scope.searchProjects = () ->
-			$scope.$parent.searchText = $scope.searchText
-			$scope.$parent.updateVisibleProjects()
+			$scope.updateVisibleProjects()
+
+		$scope.updateSelectedProjects = () ->
+			$scope.selectedProjects = $scope.projects.filter (project) -> project.selected
+
+		$scope.getSelectedProjects = () ->
+			$scope.selectedProjects
 
 		$scope.openArchiveProjectsModal = () ->
 			modalInstance = $modal.open(
@@ -46,25 +37,48 @@ define [
 
 		$scope.archiveOrLeaveSelectedProjects = () ->
 			selected_projects = $scope.getSelectedProjects()
-			selected_project_ids = $scope.getSelectedProjectIds()
 			
 			for project in selected_projects
+					project.archived = true;
 					queuedHttp {
 						method: "DELETE"
-						url: "/admin/project/#{project.id}"
+						url: "/admin/project/#{project._id}"
 						headers:
 							"X-CSRF-Token": window.csrfToken
 					}
 
 			$scope.updateVisibleProjects()
 
-	App.controller "ProjectListItemController", ($scope) ->
-		$scope.ownerName = () ->
-			if $scope.project.owner?
-				return "#{$scope.project.owner.first_name} #{$scope.project.owner.last_name}"
-			else
-				return "?"
+		$scope.updateVisibleProjects = () ->
+			$scope.visibleProjects = []
 
+			for project in $scope.projects
+				visible = true
+				# Only show if it matches any search text
+				if $scope.searchText? and $scope.searchText != ""
+					if !project.name.toLowerCase().match($scope.searchText.toLowerCase())
+						visible = false
+
+				if visible
+					$scope.visibleProjects.push project
+				else
+					# We dont want hidden selections
+					project.selected = false
+
+		$scope.updateVisibleProjects()
+
+	App.controller "ProjectListItemController", ($scope) ->
 		$scope.$watch "project.selected", (value) ->
 			if value?
 				$scope.updateSelectedProjects()
+
+	App.controller 'DeleteProjectsModalController', ($scope, $modalInstance, $timeout, projects) ->
+		$scope.projectsToDelete = projects
+
+		$scope.action = "Delete"
+
+		$scope.delete = () ->
+			$modalInstance.close()
+
+		$scope.cancel = () ->
+			$modalInstance.dismiss('cancel')
