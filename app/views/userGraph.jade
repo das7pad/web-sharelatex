@@ -5,10 +5,10 @@ block content
 	script(type="text/javascript").
 		window.data = {
 			user: !{JSON.stringify(user).replace(/\//g, '\\/')},
-			projects: !{JSON.stringify(projects).replace(/\//g, '\\/')},
+			graph: !{JSON.stringify(graph).replace(/\//g, '\\/')}
 		};
 
-	.content.content-alt(ng-controller="AdminProjectController")
+	.content.content-alt(ng-controller="AdminGraphController")
 		.container
 			.row
 				aside.col-md-2.col-xs-3
@@ -29,6 +29,5 @@ block content
 					p.small {{user.last_name}}
 
 				.col-md-10.col-xs-9
-					include ./user/project-list
-
-		include ../../../../app/views/project/list/modals
+					#graph
+						span Your Graph Here!

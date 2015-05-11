@@ -10,5 +10,6 @@ module.exports =
 		app.get "/admin/user/:user_id", SecurityManager.requestIsAdmin, AdminController.getUserInfo
 		app.post "/admin/user/:user_id/setPassword", SecurityManager.requestIsAdmin, AdminController.setUserPassword
 		app.del "/admin/user/:user_id", SecurityManager.requestIsAdmin, AdminController.deleteUser
+		app.get "/admin/user/graph/:user_id", SecurityManager.requestIsAdmin, AdminController.userGraph
 		app.get "/admin/Project/:Project_id", SecurityManager.requestIsAdmin, ProjectController.loadEditor
 		app.del "/admin/Project/:Project_id", SecurityManager.requestIsAdmin, ProjectController.deleteProject

@@ -35,6 +35,15 @@
 						ng-click="openSetPasswordModal()"
 					)
 						i.fa.fa-key
+				.btn-group(ng-hide="selectedUsers.length != 1")
+					a.btn.btn-default(
+						href='#',
+						tooltip="User Graph",
+						tooltip-placement="bottom",
+						tooltip-append-to-body="true",
+						ng-click="gotoUserGraph()"
+					)
+						i.fa.fa-share-alt
 
 .row.row-spaced
 	.col-xs-12

@@ -52,7 +52,7 @@ module.exports = AdminController =
 				
 	getUserInfo: (req, res, next)->
 		logger.log "getting admin request for user info"
-		UserGetter.getUser req.params.user_id, { _id: true, first_name: true, last_name: true, email: true}, (err, user) ->
+		UserGetter.getUser req.params.user_id, { _id:1, first_name:1, last_name:1, email:1}, (err, user) ->
 			db.projects.find {owner_ref:ObjectId(req.params.user_id)}, {name:1, lastUpdated:1, publicAccesLevel:1, archived:1, owner_ref:1}, (err, projects) ->
 					if err?
 						return next(err)
@@ -76,3 +76,11 @@ module.exports = AdminController =
 				res.send 500
 			else
 				res.send 200
+
+	userGraph: (req, res, next)->
+		logger.log "getting admin request for user graph"
+		UserGetter.getUser req.params.user_id, { _id:1, first_name:1, last_name:1, email:1}, (err, user) ->
+			db.projects.find {owner_ref:ObjectId(req.params.user_id)}, {_id:1, owner_ref:1, readOnly_refs:1, collaberator_refs:1}, (err, relations) ->
+					if err?
+						return next(err)
+					res.render Path.resolve(__dirname, "../views/userGraph"), user:user, graph:relations

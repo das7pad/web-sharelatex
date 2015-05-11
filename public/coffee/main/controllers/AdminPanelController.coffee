@@ -143,7 +143,6 @@ define [
 				(newPassword) ->
 					$scope.SetUserPassword(newPassword)
 			)
-				
 
 		$scope.SetUserPassword = (newPassword) ->
 			selected_user = $scope.getFirstSelectedUser()
@@ -152,6 +151,10 @@ define [
 				newPassword: newPassword
 				_csrf: window.csrfToken
 			}
+
+		$scope.gotoUserGraph = () ->
+			selected_user = $scope.getFirstSelectedUser()
+			window.location = "/admin/user/graph/#{selected_user._id}"
 
 		$scope.updateVisibleUsers()
 
