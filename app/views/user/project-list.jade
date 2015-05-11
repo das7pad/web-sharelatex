@@ -46,7 +46,8 @@
 							span.header.clickable(ng-click="changePredicate('name')") #{translate("title")}
 								i.tablesort.fa(ng-class="getSortIconClass('name')")
 						.col-xs-2
-							span.header Archived
+							span.header.clickable(ng-click="changePredicate('archived')") Archived
+								i.tablesort.fa(ng-class="getSortIconClass('archived')")
 						.col-xs-4
 							span.header.clickable(ng-click="changePredicate('lastUpdated')") #{translate("last_modified")}
 								i.tablesort.fa(ng-class="getSortIconClass('lastUpdated')")

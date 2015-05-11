@@ -8,6 +8,9 @@ define [
 		$scope.projects = window.data.projects
 		$scope.user.gravatar =  CryptoJS.MD5($scope.user.email).toString()
 		$scope.selectedProjects = []
+		$scope.predicate = "lastUpdated"
+		$scope.reverse = true
+		$scope.allSelected = false
 
 		for project in $scope.projects
 			project.accessLevel = "owner"
@@ -48,6 +51,19 @@ define [
 					}
 
 			$scope.updateVisibleProjects()
+
+		$scope.changePredicate = (newPredicate)->
+			if $scope.predicate == newPredicate
+				$scope.reverse = !$scope.reverse
+			$scope.predicate = newPredicate
+
+		$scope.getSortIconClass = (column)->
+			if column == $scope.predicate and $scope.reverse
+				return "fa-caret-down"
+			else if column == $scope.predicate and !$scope.reverse
+				return "fa-caret-up"
+			else
+				return ""
 
 		$scope.updateVisibleProjects = () ->
 			$scope.visibleProjects = []
