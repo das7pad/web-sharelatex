@@ -9,8 +9,24 @@ db = mongojs.db
 ObjectId = mongojs.ObjectId
 
 module.exports = AdminGraphController =
+	
+	_2ndLevel: (graphOne, cb) ->
+		usersObjId = []
+		for node in graphOne.nodes
+			usersObjId.push(ObjectId(node.id))
 
-	_genGraph: (relations, cb) ->
+		q = [{owner_ref:{ $in : usersObjId }}, {readOnly_refs:{ $in : usersObjId }}, {collaberator_refs:{ $in : usersObjId }}]
+		db.projects.find {$or : q}, {_id:1, owner_ref:1, readOnly_refs:1, collaberator_refs:1}, (err, relations) ->
+			AdminGraphController._genGraph relations, 1, (err, graph2nd) ->
+				if err?
+					return cb(err)
+				for node in graph2nd.nodes
+					AdminGraphController._addNode graphOne.nodes, node.id, node.label, '#CCCCCC'
+				graphOne.edges = graphOne.edges.concat(graph2nd.edges)	
+
+				cb(null, graphOne)
+
+	_genGraph: (relations, level, cb) ->
 		nodes = []
 		edges = []
 
@@ -45,7 +61,11 @@ module.exports = AdminGraphController =
 					if node.id == user._id.toString()
 						node.label = user.first_name
 
-			cb(null, {nodes:nodes, edges:edges})
+			if level == 2
+				AdminGraphController._2ndLevel {nodes:nodes, edges:edges}, (err, graph) ->
+					return cb(null, graph)
+
+			return cb(null, {nodes:nodes, edges:edges})
 
 	_addNode: (nodes, ref, name, color) ->
 		exists = false
@@ -68,7 +88,7 @@ module.exports = AdminGraphController =
 			userObjId = ObjectId(req.params.user_id)
 			q = [{owner_ref:userObjId}, {readOnly_refs:userObjId}, {collaberator_refs:userObjId}]
 			db.projects.find {$or : q}, {_id:1, owner_ref:1, readOnly_refs:1, collaberator_refs:1}, (err, relations) ->
-					AdminGraphController._genGraph relations, (err, graph) ->
+					AdminGraphController._genGraph relations, 1, (err, graph) ->
 						if err?
 							return next(err)
 						logger.log graph:graph, "graph"
