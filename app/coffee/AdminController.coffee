@@ -94,7 +94,8 @@ module.exports = AdminController =
 
 	_addNode: (nodes, ref, name) ->
 		exists = false
-		coord = nodes.length
+		coordX = nodes.length
+		coordY = Math.floor((Math.random() * 10) + 1);
 
 		for node in nodes
 			if node.id == ref
@@ -102,7 +103,7 @@ module.exports = AdminController =
 				break
 
 		if !exists
-			nodes.push({id:ref,label:ref, x:coord, y:coord, size: 2});
+			nodes.push({id:ref,label:ref, x:coordX, y:coordY, size: 2});
 			
 		return nodes
 

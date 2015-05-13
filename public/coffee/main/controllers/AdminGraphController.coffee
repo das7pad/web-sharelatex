@@ -1,7 +1,8 @@
 define [
 	"base",
 	"libs/md5",
-	"https://cdnjs.cloudflare.com/ajax/libs/sigma.js/1.0.3/sigma.min.js"
+	"http://cdn.imnjb.me/libs/sigma.js/1.0.2/sigma.min.js",
+	"http://cdn.imnjb.me/libs/sigma.js/1.0.2/plugins/sigma.layout.forceAtlas2.min.js"
 ], (App) ->
 
 	App.controller "AdminGraphController", ($scope, $timeout) ->
@@ -17,4 +18,5 @@ define [
 
 		s = new sigma $scope.config
 		s.graph.read $scope.graph
+		s.startForceAtlas2({worker: true, barnesHutOptimize: false})
 		s.refresh()
