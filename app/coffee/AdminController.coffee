@@ -94,6 +94,7 @@ module.exports = AdminController =
 
 	_addNode: (nodes, ref, name) ->
 		exists = false
+		coord = nodes.length
 
 		for node in nodes
 			if node.id == ref
@@ -101,7 +102,7 @@ module.exports = AdminController =
 				break
 
 		if !exists
-			nodes.push({id:ref,label:ref});
+			nodes.push({id:ref,label:ref, x:coord, y:coord, size: 2});
 			
 		return nodes
 
