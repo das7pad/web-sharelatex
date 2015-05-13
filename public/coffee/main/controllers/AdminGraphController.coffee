@@ -8,3 +8,14 @@ define [
 		$scope.user = window.data.user
 		$scope.graph = window.data.graph
 		$scope.user.gravatar =  CryptoJS.MD5($scope.user.email).toString()
+
+		$scope.config = 
+			container: 'graph'
+			settings:
+				defaultNodeColor: '#ec5148'
+
+
+
+
+		s = new sigma $scope.config
+		s.graph.read $scope.graph
