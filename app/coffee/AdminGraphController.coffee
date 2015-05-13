@@ -28,7 +28,7 @@ module.exports = AdminGraphController =
 				nodes = AdminGraphController._addNode nodes, ref, '', '#458B00'
 				edges.push({id:Math.random().toString(), source: edge.owner_ref, target: ref})
 				projectNodes.push(ref.toString())
-			# generate a complete graph for this project
+			# generate a complete graph for this project, cause an edge overhead number
 			for nodeS in projectNodes
 				for nodeT in projectNodes
 					edges.push({id:Math.random().toString(), source: nodeS, target: nodeT})

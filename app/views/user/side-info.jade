@@ -13,3 +13,11 @@ p.small {{user.first_name}}
 
 label #{translate("last_name")}
 p.small {{user.last_name}}
+
+a.btn.btn-default(
+	href="/admin/user/graph/{{user._id}}",
+	tooltip="User Graph",
+	tooltip-placement="bottom",
+	tooltip-append-to-body="true",
+)
+	i.fa.fa-share-alt
