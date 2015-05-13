@@ -12,7 +12,7 @@ ObjectId = mongojs.ObjectId
 
 module.exports = AdminGraphController =
 
-	_genGraph: (relations) ->
+	_genGraph: (relations, cb) ->
 		nodes = []
 		edges = []
 
@@ -33,7 +33,21 @@ module.exports = AdminGraphController =
 				for nodeT in projectNodes
 					edges.push({id:Math.random().toString(), source: nodeS, target: nodeT})
 
-		return {nodes:nodes, edges:edges}
+		usersObjId = []
+		for node in nodes
+			usersObjId.push(ObjectId(node.id))
+
+		db.users.find {_id : { $in : usersObjId } }, {first_name:1}, (err, users)->
+			if err?
+				logger.err err:err, "error getting users name in admin graphGen"
+				return cb(err)
+
+			for user in users
+				for node in nodes
+					if node.id == user._id.toString()
+						node.label = user.first_name
+
+			cb(null, {nodes:nodes, edges:edges})
 
 	_addNode: (nodes, ref, name, color) ->
 		exists = false
@@ -56,8 +70,8 @@ module.exports = AdminGraphController =
 			userObjId = ObjectId(req.params.user_id)
 			q = [{owner_ref:userObjId}, {readOnly_refs:userObjId}, {collaberator_refs:userObjId}]
 			db.projects.find {$or : q}, {_id:1, owner_ref:1, readOnly_refs:1, collaberator_refs:1}, (err, relations) ->
-					if err?
-						return next(err)
-					graph = AdminGraphController._genGraph relations
-					logger.log graph:graph, "graph"
-					res.render Path.resolve(__dirname, "../views/userGraph"), user:user, graph:graph
+					AdminGraphController._genGraph relations, (err, graph) ->
+						if err?
+							return next(err)
+						logger.log graph:graph, "graph"
+						res.render Path.resolve(__dirname, "../views/userGraph"), user:user, graph:graph
