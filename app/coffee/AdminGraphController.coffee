@@ -3,8 +3,6 @@ metrics = require "metrics-sharelatex"
 _ = require "underscore"
 Path = require("path")
 UserGetter = require "../../../../app/js/Features/User/UserGetter"
-UserDeleter = require("../../../../app/js/Features/User/UserDeleter")
-AuthenticationManager = require("../../../../app/js/Features/Authentication/AuthenticationManager")
 
 mongojs = require("../../../../app/js/infrastructure/mongojs")
 db = mongojs.db
