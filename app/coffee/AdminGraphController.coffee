@@ -65,7 +65,8 @@ module.exports = AdminGraphController =
 			# generate a complete graph for this project, cause an edge number overhead 
 			for nodeS in projectNodes
 				for nodeT in projectNodes
-					edges.push({id:Math.random().toString(), source: nodeS, target: nodeT})
+					if nodeS != nodeT
+						edges.push({id:Math.random().toString(), source: nodeS, target: nodeT})
 
 		# create a list to get users name
 		usersObjId = []
