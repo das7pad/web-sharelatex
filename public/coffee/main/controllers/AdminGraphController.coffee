@@ -26,4 +26,4 @@ define [
 		
 		$timeout () -> 
 			$scope.sGraph.stopForceAtlas2() 
-		, 1000
+		, 2000
