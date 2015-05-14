@@ -21,7 +21,7 @@ module.exports = AdminGraphController =
 				if err?
 					return cb(err)
 				for node in graph2nd.nodes
-					AdminGraphController._addNode graphOne.nodes, node.id, node.label, '#CCCCCC'
+					AdminGraphController._addNode graphOne.nodes, node.id, node.label, '#CCC'
 				graphOne.edges = graphOne.edges.concat(graph2nd.edges)	
 
 				cb(null, graphOne)
@@ -64,10 +64,10 @@ module.exports = AdminGraphController =
 			if level == 2
 				AdminGraphController._2ndLevel {nodes:nodes, edges:edges}, (err, graph) ->
 					return cb(null, graph)
+			else
+				return cb(null, {nodes:nodes, edges:edges})
 
-			return cb(null, {nodes:nodes, edges:edges})
-
-	_addNode: (nodes, ref, name, color) ->
+	_addNode: (nodes, ref, label, color) ->
 		exists = false
 		coordX = nodes.length
 		coordY = Math.floor((Math.random() * 10) + 1);
@@ -78,7 +78,7 @@ module.exports = AdminGraphController =
 				break
 
 		if !exists
-			nodes.push({id:ref.toString(),label:ref, x:coordX, y:coordY, size: 2, color:color});
+			nodes.push({id:ref.toString(),label:label, x:coordX, y:coordY, size: 2, color:color});
 			
 		return nodes
 

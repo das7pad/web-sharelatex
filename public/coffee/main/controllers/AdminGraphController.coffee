@@ -24,6 +24,6 @@ define [
 
 		$scope.sGraph.refresh()
 		
-		$timeout () ->
-			$scope.sGraph.stopForceAtlas2()
+		$timeout () -> 
+			$scope.sGraph.stopForceAtlas2() 
 		, 1000
