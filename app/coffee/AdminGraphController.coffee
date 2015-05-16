@@ -18,11 +18,11 @@ module.exports = AdminGraphController =
 
 		q = [{owner_ref:{ $in : usersObjId }}, {readOnly_refs:{ $in : usersObjId }}, {collaberator_refs:{ $in : usersObjId }}]
 		db.projects.find {$or : q}, {_id:1, owner_ref:1, readOnly_refs:1, collaberator_refs:1}, (err, relations) ->
-			AdminGraphController._genGraph relations, mainUserObjId, false, (err, graph2nd) ->
+			AdminGraphController._genSigmaJSGraph relations, mainUserObjId, false, (err, graph2nd) ->
 				if err?
 					return cb(err)
 				for node in graph2nd.nodes
-					AdminGraphController._addNode graphOne.nodes, node.id, node.label, '#CCC'
+					graphOne.nodes = AdminGraphController._addSigmaJSNode graphOne.nodes, node.id, node.label, '#CCC'
 
 				# really, graph2nd.edges already have graphOne.edges
 				# cause previous level owner_ref is in graphOne.nodes
@@ -30,12 +30,12 @@ module.exports = AdminGraphController =
 
 				cb(null, graphOne)
 
-	_genGraph: (relations, mainUserObjId, Nextlevel, cb) ->
+	_genSigmaJSGraph: (relations, mainUserObjId, Nextlevel, cb) ->
 		nodes = []
 		edges = []
 
 		# main user node: orange
-		AdminGraphController._addNode nodes, mainUserObjId, '', '#FFA500'
+		nodes = AdminGraphController._addSigmaJSNode nodes, mainUserObjId, '', '#FFA500'
 
 		# create the node and edge list
 		for edge in relations
@@ -46,20 +46,20 @@ module.exports = AdminGraphController =
 
 			# readOnly user node: blue
 			for ref in edge.readOnly_refs
-				nodes = AdminGraphController._addNode nodes, ref, '', '#0000FF'
+				nodes = AdminGraphController._addSigmaJSNode nodes, ref, '', '#0000FF'
 				projectNodes.push(ref.toString())
 				if ref.toString() == mainUserObjId.toString()
 					ownerColor = '#0000FF'
 
 			# collaberator user node: green
 			for ref in edge.collaberator_refs
-				nodes = AdminGraphController._addNode nodes, ref, '', '#458B00'
+				nodes = AdminGraphController._addSigmaJSNode nodes, ref, '', '#458B00'
 				projectNodes.push(ref.toString())
 				if ref.toString() == mainUserObjId.toString()
 					ownerColor = '#458B00'
 
 			# switch owner color depends on main user permission in this project
-			AdminGraphController._addNode nodes, edge.owner_ref, '', ownerColor
+			nodes = AdminGraphController._addSigmaJSNode nodes, edge.owner_ref, '', ownerColor
 			projectNodes.push(edge.owner_ref.toString())
 
 			# generate a complete graph for this project, cause an edge number overhead 
@@ -89,7 +89,7 @@ module.exports = AdminGraphController =
 			else
 				return cb(null, {nodes:nodes, edges:edges})
 
-	_addNode: (nodes, ref, label, color) ->
+	_addSigmaJSNode: (nodes, ref, label, color) ->
 		exists = false
 		coordX = nodes.length
 		coordY = Math.floor((Math.random() * 10) + 1);
@@ -111,7 +111,7 @@ module.exports = AdminGraphController =
 			userObjId = ObjectId(req.params.user_id)
 			q = [{owner_ref:userObjId}, {readOnly_refs:userObjId}, {collaberator_refs:userObjId}]
 			db.projects.find {$or : q}, {_id:1, owner_ref:1, readOnly_refs:1, collaberator_refs:1}, (err, relations) ->
-					AdminGraphController._genGraph relations, userObjId, true, (err, graph) ->
+					AdminGraphController._genSigmaJSGraph relations, userObjId, true, (err, graph) ->
 						if err?
 							return next(err)
 						logger.log graph:graph, "graph"
