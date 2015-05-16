@@ -29,12 +29,13 @@ describe "AdminGraphController", ->
 		@users = [
 			{_id:"5542b29b3109c21db2fcde67",first_name:'James'}, 
 			{_id:"55530be4ea96f52a21e3bbe8", first_name:'Henry'},
-			{_id:"5542b2de3109c21db2fcde6e", first_name:'Teddy'}
+			{_id:"5542b2de3109c21db2fcde6e", first_name:'Teddy'},
+			{_id:"553c4e35fd6eddeb9c3aaa06", first_name:'Harry'}
 		]
 
 		@projects = [
 			{_id:1, owner_ref: "5542b29b3109c21db2fcde67", readOnly_refs: [], collaberator_refs: []}, 
-			{_id:2, owner_ref: "5542b29b3109c21db2fcde67", readOnly_refs: [], collaberator_refs: ["5542b2de3109c21db2fcde6e"]},
+			{_id:2, owner_ref: "5542b29b3109c21db2fcde67", readOnly_refs: ["553c4e35fd6eddeb9c3aaa06"], collaberator_refs: ["5542b2de3109c21db2fcde6e"]},
 			{_id:3, owner_ref: "5542b29b3109c21db2fcde67", readOnly_refs: ["55530be4ea96f52a21e3bbe8"], collaberator_refs: []},
 			{_id:4, owner_ref: "55530be4ea96f52a21e3bbe8", readOnly_refs: ["5542b29b3109c21db2fcde67"], collaberator_refs: []},
 		]
@@ -58,6 +59,8 @@ describe "AdminGraphController", ->
 		@req = 
 			params:
 				user_id: 'user_id_here'
+			query:
+				SecondLevel: false
 
 		@res = 
 			locals:
@@ -129,9 +132,9 @@ describe "AdminGraphController", ->
 			@AdminGraphController._genSigmaJSGraph @projects, @users[0]._id, false, @callback
 
 
-		it "should create 1-level graph with six edges", (done)-> 
+		it "should create 1-level graph with five edges", (done)-> 
 			@AdminGraphController._genSigmaJSGraph @projects, @users[0]._id, false, (err, graph) ->
-				assert.equal graph.edges.length, 6
+				assert.equal graph.edges.length, 5
 				done()
 
 		it "should create 1-level graph with id in all edges", (done)-> 

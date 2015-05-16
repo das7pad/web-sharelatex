@@ -10,11 +10,13 @@ define [
 		$scope.user = window.data.user
 		$scope.user.gravatar =  CryptoJS.MD5($scope.user.email).toString()
 
+		# https://github.com/jacomyal/sigma.js/wiki/Settings
 		$scope.config = 
 			graph: window.data.graph
 			container: 'graph'
 			settings:
-				defaultNodeColor: '#ec5148'
+				defaultNodeColor: '#ccc'
+				edgeColor: 'source'
 
 		sigma.renderers.def = sigma.renderers.canvas
 
