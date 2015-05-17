@@ -152,10 +152,6 @@ define [
 				_csrf: window.csrfToken
 			}
 
-		$scope.gotoUserGraph = () ->
-			selected_user = $scope.getFirstSelectedUser()
-			window.location = "/admin/user/graph/#{selected_user._id}"
-
 		$scope.updateVisibleUsers()
 
 	App.controller "UserListItemController", ($scope) ->

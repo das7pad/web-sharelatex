@@ -16,7 +16,7 @@ define [
 			container: 'graph'
 			settings:
 				defaultNodeColor: '#ccc'
-				edgeColor: 'source'
+				edgeColor: 'target'
 
 		sigma.renderers.def = sigma.renderers.canvas
 
