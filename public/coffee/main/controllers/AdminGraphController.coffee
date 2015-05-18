@@ -1,9 +1,9 @@
 define [
 	"base",
 	"libs/md5",
-	"http://cdn.imnjb.me/libs/sigma.js/1.0.2/sigma.min.js",
-	"http://cdn.imnjb.me/libs/sigma.js/1.0.2/plugins/sigma.layout.forceAtlas2.min.js",
-	"http://cdn.imnjb.me/libs/sigma.js/1.0.2/plugins/sigma.plugins.dragNodes.min.js"
+	"/js/libs/sigma-v1.0.3/sigma.min.js",
+	"/js/libs/sigma-v1.0.3/plugins/sigma.layout.forceAtlas2.min.js",
+	"/js/libs/sigma-v1.0.3/plugins/sigma.plugins.dragNodes.min.js"
 ], (App) ->
 
 	App.controller "AdminGraphController", ($scope, $timeout) ->
