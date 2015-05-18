@@ -73,7 +73,8 @@
 								type="checkbox",
 								ng-model="user.selected"
 							)
-							span.owner {{user.email}}
+							span.owner 
+								a.userName(href="/admin/user/{{user._id}}") {{user.email}}
 						.col-xs-3
 							span
 								a.userName(href="/admin/user/{{user._id}}") {{user.first_name}}
