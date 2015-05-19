@@ -24,7 +24,7 @@ Regards, <br>
 Henry <br>
 ShareLaTeX Co-founder
 </p>
-<p>PS. We love talking to our users about ShareLaTeX. Reply to this email to get in touch us with us directly, whatever the reason. Questions, comments, problems, suggestions, all welcome!<p>
+<p>PS. We love talking to our users about ShareLaTeX. Reply to this email to get in touch with us directly, whatever the reason. Questions, comments, problems, suggestions, all welcome!<p>
 """
 
 module.exports = PublicRegistrationController =
@@ -46,6 +46,7 @@ module.exports = PublicRegistrationController =
 			
 	register: (req, res, next) ->
 		logger.log email: req.body.email, "attempted register"
+		console.log req.body
 		redir = Url.parse(req.body.redir or "/project").path
 		UserRegistrationHandler.registerNewUser req.body, (err, user)->
 			if err? and err?.message == "EmailAlreadyRegistered"
