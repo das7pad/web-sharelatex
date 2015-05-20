@@ -9,7 +9,7 @@ ObjectId = mongojs.ObjectId
 
 module.exports = AdminGraphController =
 	
-	_2ndLevel: (mainUserObjId, graphOne, cb) ->
+	_nextLevel: (mainUserObjId, graphOne, level, cb) ->
 		usersObjId = []
 
 		# create an array with all Ids of previous graph
@@ -18,7 +18,7 @@ module.exports = AdminGraphController =
 
 		q = [{owner_ref:{ $in : usersObjId }}, {readOnly_refs:{ $in : usersObjId }}, {collaberator_refs:{ $in : usersObjId }}]
 		db.projects.find {$or : q}, {_id:1, owner_ref:1, readOnly_refs:1, collaberator_refs:1}, (err, relations) ->
-			AdminGraphController._genSigmaJSGraph relations, mainUserObjId, false, (err, graph2nd) ->
+			AdminGraphController._genSigmaJSGraph relations, mainUserObjId, level, (err, graph2nd) ->
 				if err?
 					return cb(err)
 				for node in graph2nd.nodes
@@ -30,7 +30,8 @@ module.exports = AdminGraphController =
 
 				cb(null, graphOne)
 
-	_genSigmaJSGraph: (relations, mainUserObjId, Nextlevel, cb) ->
+	_genSigmaJSGraph: (relations, mainUserObjId, level, cb) ->
+		logger.log whichLevel:level, "calling _genSigmaJSGraph"
 		nodes = []
 		edges = []
 
@@ -84,8 +85,8 @@ module.exports = AdminGraphController =
 					if node.id == user._id.toString()
 						node.label = user.first_name
 
-			if Nextlevel
-				AdminGraphController._2ndLevel mainUserObjId, {nodes:nodes, edges:edges}, (err, graph) ->
+			if level-1
+				AdminGraphController._nextLevel mainUserObjId, {nodes:nodes, edges:edges}, level-1, (err, graph) ->
 					return cb(null, graph)
 			else
 				return cb(null, {nodes:nodes, edges:edges})
@@ -110,10 +111,13 @@ module.exports = AdminGraphController =
 		logger.log "getting admin request for user graph"
 		UserGetter.getUser req.params.user_id, { _id:1, first_name:1, last_name:1, email:1}, (err, user) ->
 			userObjId = ObjectId(req.params.user_id)
-			SecondLevel = req.query.SecondLevel?
+			if !req.query.level?
+				Level = 1
+			else
+				Level = req.query.level
 			q = [{owner_ref:userObjId},{readOnly_refs:userObjId},{collaberator_refs:userObjId}]
 			db.projects.find {$or : q}, {_id:1, owner_ref:1, readOnly_refs:1, collaberator_refs:1}, (err, relations) ->
-					AdminGraphController._genSigmaJSGraph relations, userObjId, SecondLevel, (err, graph) ->
+					AdminGraphController._genSigmaJSGraph relations, userObjId, Level, (err, graph) ->
 						if err?
 							return next(err)
 						logger.log graph:graph, "graph"
