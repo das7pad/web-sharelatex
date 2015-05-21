@@ -3,12 +3,14 @@ define [
 	"libs/md5",
 	"/js/libs/sigma-v1.0.3/sigma.min.js",
 	"/js/libs/sigma-v1.0.3/plugins/sigma.layout.forceAtlas2.min.js",
-	"/js/libs/sigma-v1.0.3/plugins/sigma.plugins.dragNodes.min.js"
+	"/js/libs/sigma-v1.0.3/plugins/sigma.plugins.dragNodes.min.js",
 ], (App) ->
-	
+
 	App.controller "AdminGraphController", ($scope, $timeout, $location) ->
 		$scope.user = window.data.user
 		$scope.user.gravatar =  CryptoJS.MD5($scope.user.email).toString()
+		url = $location.absUrl()
+		$scope.level = url.substr(url.indexOf('level')+6,1)
 
 		# https://github.com/jacomyal/sigma.js/wiki/Settings
 		$scope.config = 
