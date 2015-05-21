@@ -1,10 +1,7 @@
 define [
 	"base",
 	"libs/md5",
-	"/js/libs/sigma-v1.0.3/sigma.min.js",
-	"/js/libs/sigma-v1.0.3/plugins/sigma.layout.forceAtlas2.min.js",
-	"/js/libs/sigma-v1.0.3/plugins/sigma.plugins.dragNodes.min.js",
-], (App) ->
+], (App, md5) ->
 
 	App.controller "AdminGraphController", ($scope, $timeout, $location) ->
 		$scope.user = window.data.user
