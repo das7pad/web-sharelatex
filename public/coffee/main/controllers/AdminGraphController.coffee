@@ -10,7 +10,7 @@ define [
 		$scope.user = window.data.user
 		$scope.user.gravatar =  CryptoJS.MD5($scope.user.email).toString()
 		url = $location.absUrl()
-		$scope.level = url.substr(url.indexOf('level')+6,1)
+		$scope.level = url.substr(url.indexOf('level=')+6,1)
 
 		# https://github.com/jacomyal/sigma.js/wiki/Settings
 		$scope.config = 
