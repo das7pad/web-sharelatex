@@ -13,16 +13,16 @@ define [
 		$scope.config = 
 			graph: window.data.graph
 			container: 'graph'
+			type: 'canvas'
 			settings:
 				defaultNodeColor: '#ccc'
 				edgeColor: 'target'
+				edgeLabelSize: 'proportional'
 
 		sigma.renderers.def = sigma.renderers.canvas
 
 		$scope.sGraph = new sigma $scope.config
 		$scope.sGraph.startForceAtlas2({worker: true, barnesHutOptimize: false})
-		# sigma.plugins.dragNodes($scope.sGraph, $scope.sGraph.renderers[0]);
-
 		$scope.sGraph.refresh()
 		
 		$timeout () -> 

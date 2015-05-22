@@ -15,7 +15,7 @@ module.exports = AdminGraphController =
 
 		idsToSearch = [] 
 		if graphPrev.nodes.length > 0
-			#create a list with node not searched
+			#create a list with nodes not searched
 			for node in graphPrev.nodes
 				if usersObjId.indexOf(node.id) == -1
 					idsToSearch.push(ObjectId(node.id))
@@ -25,7 +25,7 @@ module.exports = AdminGraphController =
 			idsToSearch.push(ObjectId(usersObjId[0]))
 
 		q = [{owner_ref:{ $in : idsToSearch }}, {readOnly_refs:{ $in : idsToSearch }}, {collaberator_refs:{ $in : idsToSearch }}]
-		db.projects.find {$or : q}, {_id:1, owner_ref:1, readOnly_refs:1, collaberator_refs:1}, (err, relations) ->
+		db.projects.find {$or : q}, {_id:1, owner_ref:1, readOnly_refs:1, collaberator_refs:1, name:1}, (err, relations) ->
 			if err?
 				return cb(err)
 			AdminGraphController._genSigmaJSGraph relations, usersObjId, level, graphPrev, (err, graphNext) ->
@@ -71,7 +71,7 @@ module.exports = AdminGraphController =
 			for nodeS in projectNodes
 				projectNodesT.shift()
 				for nodeT in projectNodesT
-					graph.edges.push({id:Math.random().toString(), source: nodeS, target: nodeT})
+					graph.edges.push({id:Math.random().toString(), label: edge.name, source: nodeS, target: nodeT, type: 'curve', count: Math.floor((Math.random() * 10) + 1)})
 
 
 		AdminGraphController._getNames graph, (err, graphNamed)->
