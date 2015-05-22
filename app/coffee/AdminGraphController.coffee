@@ -71,7 +71,16 @@ module.exports = AdminGraphController =
 			for nodeS in projectNodes
 				projectNodesT.shift()
 				for nodeT in projectNodesT
-					graph.edges.push({id:Math.random().toString(), label: edge.name, source: nodeS, target: nodeT, type: 'curve', count: Math.floor((Math.random() * 10) + 1)})
+					graph.edges.push({
+						id:Math.random().toString(), 
+						label: edge.name, 
+						source: nodeS, 
+						target: nodeT, 
+						type: 'curve', 
+						count: Math.floor((Math.random() * 10) + 1),
+						size: 2,
+						projectId: edge._id
+					})
 
 
 		AdminGraphController._getNames graph, (err, graphNamed)->
