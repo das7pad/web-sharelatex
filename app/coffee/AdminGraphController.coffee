@@ -28,11 +28,16 @@ module.exports = AdminGraphController =
 		db.projects.find {$or : q}, {_id:1, owner_ref:1, readOnly_refs:1, collaberator_refs:1, name:1}, (err, relations) ->
 			if err?
 				return cb(err)
-			AdminGraphController._genSigmaJSGraph relations, usersObjId, level, graphPrev, (err, graphNext) ->
-				cb(null, graphNext)
+			AdminGraphController._genSigmaJSGraph relations, usersObjId, graphPrev, (err, graphNext) ->
+				AdminGraphController._getNames graphNext, (err, graphNamed)->
+					if level-1
+						AdminGraphController._nextLevel usersObjId, graphNamed, level-1, (err, graphLevel) ->
+							return cb(null, graphLevel)
+					else
+						return cb(null, graphNamed)
 
-	_genSigmaJSGraph: (relations, usersObjId, level, graph, cb) ->
-		logger.log whichLevel:level, "calling _genSigmaJSGraph"
+	_genSigmaJSGraph: (relations, usersObjId, graph, cb) ->
+		logger.log "calling _genSigmaJSGraph"
 
 		# usersObjId[0], seed user node : orange
 		readOnlyColor = collaberatorColor = ''
@@ -70,7 +75,7 @@ module.exports = AdminGraphController =
 			projectNodesT = projectNodes.slice(0)
 			for nodeS in projectNodes
 				projectNodesT.shift()
-				for nodeT in projectNodesT
+				for nodeT in projectNodes
 					graph.edges.push({
 						id:Math.random().toString(), 
 						label: edge.name, 
@@ -82,14 +87,7 @@ module.exports = AdminGraphController =
 						projectId: edge._id
 					})
 
-
-		AdminGraphController._getNames graph, (err, graphNamed)->
-
-			if level-1
-				AdminGraphController._nextLevel usersObjId, graphNamed, level-1, (err, graphNext) ->
-					return cb(null, graphNext)
-			else
-				return cb(null, graphNamed)
+		return cb(null, graph)
 
 	_getNames: (graph, cb) ->
 		# create a list to get users name

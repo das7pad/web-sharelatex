@@ -27,22 +27,21 @@ describe "AdminGraphController", ->
 				ObjectId: ObjectId
 
 		@users = [
-			{_id:"5542b29b3109c21db2fcde67",first_name:'James'}, 
-			{_id:"55530be4ea96f52a21e3bbe8", first_name:'Henry'},
-			{_id:"5542b2de3109c21db2fcde6e", first_name:'Teddy'},
-			{_id:"553c4e35fd6eddeb9c3aaa06", first_name:'Harry'}
+			{_id:ObjectId(),first_name:'James'}, 
+			{_id:ObjectId(), first_name:'Henry'},
+			{_id:ObjectId(), first_name:'Teddy'},
+			{_id:ObjectId(), first_name:'Harry'}
 		]
 
 		@projects = [
-			{_id:1, owner_ref: "5542b29b3109c21db2fcde67", readOnly_refs: [], collaberator_refs: []}, 
-			{_id:2, owner_ref: "5542b29b3109c21db2fcde67", readOnly_refs: ["553c4e35fd6eddeb9c3aaa06"], collaberator_refs: ["5542b2de3109c21db2fcde6e"]},
-			{_id:3, owner_ref: "5542b29b3109c21db2fcde67", readOnly_refs: ["55530be4ea96f52a21e3bbe8"], collaberator_refs: []},
-			{_id:4, owner_ref: "55530be4ea96f52a21e3bbe8", readOnly_refs: ["5542b29b3109c21db2fcde67"], collaberator_refs: []},
+			{_id:1, owner_ref: @users[0]._id, readOnly_refs: [], collaberator_refs: []}, 
+			{_id:2, owner_ref: @users[0]._id, readOnly_refs: @users[2]._id, collaberator_refs: @users[3]._id},
+			{_id:3, owner_ref: @users[0]._id, readOnly_refs: @users[1]._id, collaberator_refs: []},
+			{_id:4, owner_ref: @users[1]._id, readOnly_refs: @users[0]._id, collaberator_refs: []},
 		]
 
-		@db.users.find = sinon.stub().callsArgWith(2, null, @users)
 		@db.projects.find = sinon.stub().callsArgWith(2, null, @projects)
-
+		@db.users.find = sinon.stub().callsArgWith(2, null, @users)
 		@UserGetter.getUser = (user_id, fields, callback) =>
 			callback null, @users[0]
 
@@ -51,9 +50,9 @@ describe "AdminGraphController", ->
 			edges: []
 
 		@nodes = [
-			{id:"5542b29b3109c21db2fcde67", label:''}, 
-			{id:"55530be4ea96f52a21e3bbe8", label:''},
-			{id:"5542b2de3109c21db2fcde6e", label:''}
+			{id:@users[0]._id.toString(), label:''}, 
+			{id:@users[1]._id.toString(), label:''},
+			{id:@users[2]._id.toString(), label:''}
 		]
 
 		@req = 
@@ -72,7 +71,7 @@ describe "AdminGraphController", ->
 
 		beforeEach ->
 
-			@AdminGraphController._genSigmaJSGraph = sinon.stub().callsArgWith(3, null, @emptyGraph)
+			@AdminGraphController._nextLevel = sinon.stub().callsArgWith(3, null, @emptyGraph)
 
 		it "should render the graph page", (done)->
 			@res.render = (pageName, opts)=>
@@ -120,30 +119,23 @@ describe "AdminGraphController", ->
 
 			@AdminGraphController._addSigmaJSNode = sinon.stub().withArgs(4).returns(@nodes)
 
-		it "should create 1-level graph with three nodes", (done)-> 
-			@AdminGraphController._genSigmaJSGraph @projects, @users[0]._id, false, (err, graph) ->
+		it "should create graph with three nodes", (done)-> 
+			@AdminGraphController._genSigmaJSGraph @projects, [@users[0]._id.toString()], @emptyGraph, (err, graph) ->
 				assert.equal graph.nodes.length, 3
 				done()
 
-		it "should create 1-level graph with labeled node", (done)-> 
-			@callback = (err, graph)=>
-				graph.nodes[0].label.should.equal @users[0].first_name
-				done()
-			@AdminGraphController._genSigmaJSGraph @projects, @users[0]._id, false, @callback
-
-
-		it "should create 1-level graph with five edges", (done)-> 
-			@AdminGraphController._genSigmaJSGraph @projects, @users[0]._id, false, (err, graph) ->
-				assert.equal graph.edges.length, 5
+		it "should create graph with five edges", (done)-> 
+			@AdminGraphController._genSigmaJSGraph @projects, [@users[0]._id.toString()], @emptyGraph, (err, graph) ->
+				assert.equal graph.edges.length, 4
 				done()
 
-		it "should create 1-level graph with id in all edges", (done)-> 
-			@AdminGraphController._genSigmaJSGraph @projects, @users[0]._id, false, (err, graph) ->
+		it "should create graph with id in all edges", (done)-> 
+			@AdminGraphController._genSigmaJSGraph @projects, [@users[0]._id.toString()], @emptyGraph, (err, graph) ->
 				for edge in graph.edges
 					should.exist edge.id
 				done()
 
-	describe "_2ndLevel", ->
+	describe "_nextLevel", ->
 
 		beforeEach ->
 
@@ -152,20 +144,18 @@ describe "AdminGraphController", ->
 				edges: [1,2,3,4]
 			}
 
-			@SecondLevelGraph = {
-				nodes: @nodes,
-				edges: [5,6,7,8]
-			}
+			@AdminGraphController._genSigmaJSGraph = sinon.stub().callsArgWith(3, null, @OneLevelGraph)
+			@AdminGraphController._getNames = sinon.stub().callsArgWith(1, null, @OneLevelGraph)
 
-			@AdminGraphController._genSigmaJSGraph = sinon.stub().callsArgWith(3, null, @SecondLevelGraph)
-			@AdminGraphController._addSigmaJSNode = sinon.stub().withArgs(4).returns(@nodes)
-
-		it "should create 2-level graph with three nodes", (done)-> 
-			@AdminGraphController._2ndLevel @users[0]._id, @OneLevelGraph, (err, graph) ->
+		it "should create 1-level graph", (done)-> 
+			@AdminGraphController._nextLevel [@users[0]._id.toString()], @emptyGraph, 1, (err, graph) ->
 				assert.equal graph.nodes.length, 3
 				done()
 
-		it "should create 2-level graph with eigth edges", (done)-> 
-			@AdminGraphController._2ndLevel @users[0]._id, @OneLevelGraph, (err, graph) ->
-				assert.equal graph.edges.length, 8
+	describe "_getNames", ->
+
+		it "should add name to nodes", (done)-> 
+			@AdminGraphController._getNames {@nodes, edges:[]}, (err, graph) ->
+				for node in graph.nodes
+					node.label.should.not.equal ''
 				done()
