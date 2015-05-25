@@ -15,6 +15,13 @@ describe "AdminGraphController", ->
 		@UserGetter =
 			getUser: sinon.stub()
 
+		@SigmaJSGraph = 
+			nodes: []
+			edges: []
+			addNode: sinon.stub()
+			addEdge: sinon.stub()
+			new: sinon.stub()
+
 		@AdminGraphController = SandboxedModule.require modulePath, requires:
 			"logger-sharelatex": 
 				log:->
@@ -25,6 +32,7 @@ describe "AdminGraphController", ->
 					projects: {}
 					users: {}
 				ObjectId: ObjectId
+			"./SigmaJSGraph": @SigmaJSGraph
 
 		@users = [
 			{_id:ObjectId(),first_name:'James'}, 
@@ -71,7 +79,7 @@ describe "AdminGraphController", ->
 
 		beforeEach ->
 
-			@AdminGraphController._nextLevel = sinon.stub().callsArgWith(3, null, @emptyGraph)
+			@AdminGraphController._nextLevel = sinon.stub().callsArgWith(3, null, @SigmaJSGraph)
 
 		it "should render the graph page", (done)->
 			@res.render = (pageName, opts)=>
@@ -87,52 +95,22 @@ describe "AdminGraphController", ->
 
 		it "should send the user graph", (done)->
 			@res.render = (pageName, opts)=>
-				opts.graph.should.deep.equal @emptyGraph
+				opts.graph.should.deep.equal @SigmaJSGraph
 				done()
 			@AdminGraphController.userGraph @req, @res
 
-	describe "_addSigmaJSNode", ->
-
-		it "should add a new node", (done)-> 
-			nodes = @AdminGraphController._addSigmaJSNode [], 'ref', 'label', 'color'
-			assert.equal nodes.length, 1
-			done()
-
-		it "should add a node with label", (done)-> 
-			nodes = @AdminGraphController._addSigmaJSNode [], 'ref', 'label', 'color'
-			assert.equal nodes[0].label, 'label'
-			done()
-
-		it "should add a node with color", (done)-> 
-			nodes = @AdminGraphController._addSigmaJSNode [], 'ref', 'label', 'color'
-			assert.equal nodes[0].color, 'color'
-			done()
-
-		it "shouldn't add a existing node", (done)-> 
-			nodes = @AdminGraphController._addSigmaJSNode [{id:'ref'}], 'ref', 'label', 'color'
-			assert.equal nodes.length, 1
-			done()
-
-	describe "_genSigmaJSGraph", ->
+	describe "_genGraph", ->
 
 		beforeEach ->
 
-			@AdminGraphController._addSigmaJSNode = sinon.stub().withArgs(4).returns(@nodes)
-
-		it "should create graph with three nodes", (done)-> 
-			@AdminGraphController._genSigmaJSGraph @projects, [@users[0]._id.toString()], @emptyGraph, (err, graph) ->
-				assert.equal graph.nodes.length, 3
+		it "should create graph with nodes", (done)-> 
+			@AdminGraphController._genGraph @projects, [@users[0]._id.toString()], @SigmaJSGraph, (err, graph) ->
+				graph.nodes.should.exists
 				done()
 
-		it "should create graph with five edges", (done)-> 
-			@AdminGraphController._genSigmaJSGraph @projects, [@users[0]._id.toString()], @emptyGraph, (err, graph) ->
-				assert.equal graph.edges.length, 4
-				done()
-
-		it "should create graph with id in all edges", (done)-> 
-			@AdminGraphController._genSigmaJSGraph @projects, [@users[0]._id.toString()], @emptyGraph, (err, graph) ->
-				for edge in graph.edges
-					should.exist edge.id
+		it "should create graph with edges", (done)-> 
+			@AdminGraphController._genGraph @projects, [@users[0]._id.toString()], @SigmaJSGraph, (err, graph) ->
+				graph.edges.should.exists
 				done()
 
 	describe "_nextLevel", ->
@@ -144,7 +122,7 @@ describe "AdminGraphController", ->
 				edges: [1,2,3,4]
 			}
 
-			@AdminGraphController._genSigmaJSGraph = sinon.stub().callsArgWith(3, null, @OneLevelGraph)
+			@AdminGraphController._genGraph = sinon.stub().callsArgWith(3, null, @OneLevelGraph)
 			@AdminGraphController._getNames = sinon.stub().callsArgWith(1, null, @OneLevelGraph)
 
 		it "should create 1-level graph", (done)-> 

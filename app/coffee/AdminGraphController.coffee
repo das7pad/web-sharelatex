@@ -6,6 +6,7 @@ UserGetter = require "../../../../app/js/Features/User/UserGetter"
 mongojs = require("../../../../app/js/infrastructure/mongojs")
 db = mongojs.db
 ObjectId = mongojs.ObjectId
+sigmaGraph = require("./SigmaJSGraph")
 
 module.exports = AdminGraphController =
 	unknownName: 'unknown'
@@ -28,7 +29,7 @@ module.exports = AdminGraphController =
 		db.projects.find {$or : q}, {_id:1, owner_ref:1, readOnly_refs:1, collaberator_refs:1, name:1}, (err, relations) ->
 			if err?
 				return cb(err)
-			AdminGraphController._genSigmaJSGraph relations, usersObjId, graphPrev, (err, graphNext) ->
+			AdminGraphController._genGraph relations, usersObjId, graphPrev, (err, graphNext) ->
 				AdminGraphController._getNames graphNext, (err, graphNamed)->
 					if level-1
 						AdminGraphController._nextLevel usersObjId, graphNamed, level-1, (err, graphLevel) ->
@@ -36,13 +37,13 @@ module.exports = AdminGraphController =
 					else
 						return cb(null, graphNamed)
 
-	_genSigmaJSGraph: (relations, usersObjId, graph, cb) ->
-		logger.log "calling _genSigmaJSGraph"
+	_genGraph: (relations, usersObjId, graph, cb) ->
+		logger.log "calling _genGraph"
 
 		# usersObjId[0], seed user node : orange
 		readOnlyColor = collaberatorColor = ''
 		if usersObjId.length == 1
-			graph.nodes = AdminGraphController._addSigmaJSNode graph.nodes, usersObjId[0], AdminGraphController.unknownName, '#FFA500'
+			graph.addNode usersObjId[0], AdminGraphController.unknownName, '#FFA500'
 			readOnlyColor = '#0000FF'
 			collaberatorColor = '#458B00'
 
@@ -55,37 +56,28 @@ module.exports = AdminGraphController =
 
 			# readOnly user node: blue
 			for ref in edge.readOnly_refs
-				graph.nodes = AdminGraphController._addSigmaJSNode graph.nodes, ref, AdminGraphController.unknownName, readOnlyColor
+				graph.addNode ref, AdminGraphController.unknownName, readOnlyColor
 				projectNodes.push(ref.toString())
 				if ref.toString() == usersObjId[0]
 					ownerColor = readOnlyColor
 
 			# collaberator user node: green
 			for ref in edge.collaberator_refs
-				graph.nodes = AdminGraphController._addSigmaJSNode graph.nodes, ref, AdminGraphController.unknownName, collaberatorColor
+				graph.addNode ref, AdminGraphController.unknownName, collaberatorColor
 				projectNodes.push(ref.toString())
 				if ref.toString() == usersObjId[0]
 					ownerColor = collaberatorColor
 
 			# switch owner color depends on seed user permission in this project
-			graph.nodes = AdminGraphController._addSigmaJSNode graph.nodes, edge.owner_ref, AdminGraphController.unknownName, ownerColor
+			graph.addNode edge.owner_ref, AdminGraphController.unknownName, ownerColor
 			projectNodes.push(edge.owner_ref.toString())
 
 			# generate a complete graph for this project 
 			projectNodesT = projectNodes.slice(0)
 			for nodeS in projectNodes
 				projectNodesT.shift()
-				for nodeT in projectNodes
-					graph.edges.push({
-						id:Math.random().toString(), 
-						label: edge.name, 
-						source: nodeS, 
-						target: nodeT, 
-						type: 'curve', 
-						count: Math.floor((Math.random() * 10) + 1),
-						size: 2,
-						projectId: edge._id
-					})
+				for nodeT in projectNodesT
+					graph.addEdge nodeS, nodeT, edge
 
 		return cb(null, graph)
 
@@ -108,23 +100,6 @@ module.exports = AdminGraphController =
 
 			return cb(null, graph)
 
-
-	_addSigmaJSNode: (nodes, ref, label, color) ->
-		exists = false
-		coordX = nodes.length
-		coordY = Math.floor((Math.random() * 10) + 1);
-
-		# avoid duplicate nodes
-		for node in nodes
-			if node.id == ref.toString()
-				exists = true
-				break
-
-		if !exists
-			nodes.push({id:ref.toString(),label:label, x:coordX, y:coordY, size: 2, color:color});
-			
-		return nodes
-
 	userGraph: (req, res, next)->
 		logger.log "getting admin request for user graph"
 		UserGetter.getUser req.params.user_id, { _id:1, first_name:1, last_name:1, email:1}, (err, user) ->
@@ -133,7 +108,7 @@ module.exports = AdminGraphController =
 				Level = 1
 			else
 				Level = req.query.level
-			AdminGraphController._nextLevel [userObjId], {nodes:[],edges:[]}, Level, (err, graph) ->
+			AdminGraphController._nextLevel [userObjId], sigmaGraph.new() , Level, (err, graph) ->
 				if err?
 					return next(err)
 				logger.log graph:graph, "graph"
