@@ -9,8 +9,6 @@ module.exports = SigmaJSGraph =
 		return this
 
 	addNode: (ref, label, color) ->
-		coordX = this.nodes.length
-		coordY = Math.floor((Math.random() * 10) + 1);
 
 		# avoid duplicate nodes
 		exists = false
@@ -23,8 +21,8 @@ module.exports = SigmaJSGraph =
 			this.nodes.push({
 				id:ref.toString(),
 				label:label, 
-				x:coordX, 
-				y:coordY, 
+				x:this.nodes.length, 
+				y:Math.floor((Math.random() * 10) + 1), 
 				size: 2, 
 				color:color
 			});
