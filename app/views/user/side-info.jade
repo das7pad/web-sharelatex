@@ -2,21 +2,26 @@ h2  User Info
 
 img(src="http://www.gravatar.com/avatar/{{user.gravatar}}.jpg?s=140")
 
-label  User ID
-p.small {{user._id}}
+.span
+	label  User ID
+	p.small {{user._id}}
 
-label  #{translate("email")}
-p.small {{user.email}}
+.span
+	label  #{translate("email")}
+	p.small {{user.email}}
 
-label #{translate("first_name")}
-p.small {{user.first_name}}
+.span
+	label #{translate("first_name")}
+	p.small {{user.first_name}}
 
-label #{translate("last_name")}
-p.small {{user.last_name}}
+.span
+	label #{translate("last_name")}
+	p.small {{user.last_name}}
 
-label #{translate("links")}
-ul.list-unstyled
-	li
-		a(href="/admin/user/{{user._id}}") User Projects
-	li
-		a(href="/admin/user/graph/{{user._id}}?level=1") User Graph
+.span
+	label #{translate("links")}
+	ul.list-unstyled
+		li
+			a(href="/admin/user/{{user._id}}") User Projects
+		li
+			a(href="/admin/user/graph/{{user._id}}?level=1") User Graph
