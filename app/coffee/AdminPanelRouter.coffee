@@ -5,7 +5,6 @@ ProjectController = require("../../../../app/js/Features/Project/ProjectControll
 
 module.exports = 
 	apply: (app) ->
-		app.get "/adminpanel", SecurityManager.requestIsAdmin, AdminController.renderAdminPanel
 		app.get "/admin/listUsers", SecurityManager.requestIsAdmin, AdminController.listUsers
 		app.post "/admin/searchUsers", SecurityManager.requestIsAdmin, AdminController.searchUsers
 		app.get "/admin/user/:user_id", SecurityManager.requestIsAdmin, AdminController.getUserInfo
