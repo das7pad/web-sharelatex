@@ -42,7 +42,7 @@ define [
 			data.page = $scope.pageSelected
 			data.sort = $scope.predicate
 			data.reverse = $scope.reverse
-			request = $http.post "/admin/searchUsers", data
+			request = $http.post "/admin/user/search", data
 			request.success (data, status)->
 				$scope.users = data.users
 				$scope.pages = data.pages
