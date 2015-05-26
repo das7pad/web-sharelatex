@@ -1,10 +1,10 @@
 (function() {
-  var PublicRegistrationRouter, Templates;
+  var AdminPanelRouter, Templates;
 
-  PublicRegistrationRouter = require("./app/js/PublicRegistrationRouter");
+  AdminPanelRouter = require("./app/js/AdminPanelRouter");
 
   module.exports = Templates = {
-    router: PublicRegistrationRouter
+    router: AdminPanelRouter
   };
 
 }).call(this);
