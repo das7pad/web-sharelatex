@@ -13,10 +13,6 @@ ObjectId = mongojs.ObjectId
 module.exports = AdminController =
 	perPage: 5
 
-	renderAdminPanel : (req, res, next) ->
-		res.render Path.resolve(__dirname, "../views/admin"),
-			title: 'Admin Panel'
-
 	listUsers: (req, res, next)->
 		logger.log "getting admin request for list of users"
 		AdminController._userFind '', 1, 'first_name', false, (err, users, count)->

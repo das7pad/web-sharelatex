@@ -1,4 +1,4 @@
-PublicRegistrationRouter = require "./app/js/PublicRegistrationRouter"
+AdminPanelRouter = require "./app/js/AdminPanelRouter"
 
 module.exports = Templates =
-	router: PublicRegistrationRouter
+	router: AdminPanelRouter
