@@ -48,7 +48,7 @@ define [
 
 		$timeout () -> 
 			$scope.sGraph.stopForceAtlas2() 
-		, 2000
+		, 500
 
 		$scope.openGraphModal = () ->
 			modalInstance = $modal.open(
