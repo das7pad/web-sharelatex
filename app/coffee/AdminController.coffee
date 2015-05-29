@@ -12,6 +12,7 @@ ObjectId = mongojs.ObjectId
 
 module.exports = AdminController =
 	perPage: 5
+	perSearch: 15
 
 	listUsers: (req, res, next)->
 		logger.log "getting admin request for list of users"
@@ -34,17 +35,13 @@ module.exports = AdminController =
 		skip = (page - 1) * AdminController.perPage
 		sortOrder = {}
 		sortOrder[sortField] = if reverse then -1 else 1
-		opts = {limit: AdminController.perPage, skip : skip, sort: sortOrder }
+		opts = {limit: AdminController.perSearch, skip : skip, sort: sortOrder }
 		logger.log opts:opts, q:q, "user options and query"
 		db.users.find {$or : q}, {first_name:1, email:1, lastLoggedIn:1, loginCount:1}, opts,(err, users)->
 			if err?
 				logger.err err:err, "error getting admin data for users list page"
 				return cb(err)
-			db.users.count {$or : q}, (err, count)->
-				if err?
-					logger.err err:err, "error counting admin data for users list page"
-					return cb(err)
-				cb(err, users, count)
+			cb(err, users, users.length)
 				
 	getUserInfo: (req, res, next)->
 		logger.log "getting admin request for user info"
