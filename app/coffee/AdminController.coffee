@@ -11,7 +11,7 @@ db = mongojs.db
 ObjectId = mongojs.ObjectId
 
 module.exports = AdminController =
-	perPage: 5
+	perPage: 10
 
 	listUsers: (req, res, next)->
 		logger.log "getting admin request for list of users"
