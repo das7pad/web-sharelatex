@@ -5,7 +5,7 @@ metrics = require "metrics-sharelatex"
 ReferalAllocator = require "../../../../app/js/Features/Referal/ReferalAllocator"
 AuthenticationController = require("../../../../app/js/Features/Authentication/AuthenticationController")
 UserRegistrationHandler = require("../../../../app/js/Features/User/UserRegistrationHandler")
-SubscriptionDomainAllocator = require("../../../../app/js/Features/Subscription/SubscriptionDomainAllocator")
+SubscriptionDomainHandler = require("../../../../app/js/Features/Subscription/SubscriptionDomainHandler")
 EmailHandler = require("../../../../app/js/Features/Email/EmailHandler")
 EmailBuilder = require("../../../../app/js/Features/Email/EmailBuilder")
 PersonalEmailLayout = require("../../../../app/js/Features/Email/Layouts/PersonalEmailLayout")
@@ -47,7 +47,6 @@ module.exports = PublicRegistrationController =
 	register: (req, res, next) ->
 		logger.log email: req.body.email, "attempted register"
 		console.log req.body
-		redir = Url.parse(req.body.redir or "/project").path
 		UserRegistrationHandler.registerNewUser req.body, (err, user)->
 			if err? and err?.message == "EmailAlreadyRegistered"
 				return AuthenticationController.login req, res
@@ -56,12 +55,14 @@ module.exports = PublicRegistrationController =
 			else
 				metrics.inc "user.register.success"
 				ReferalAllocator.allocate req.session.referal_id, user._id, req.session.referal_source, req.session.referal_medium
-				SubscriptionDomainAllocator.autoAllocate(user)
 
 				EmailHandler.sendEmail "welcome", {
 					first_name:user.first_name
 					to: user.email
 				}, () ->
+
+				verifyLink = SubscriptionDomainHandler.getDomainLicencePage(user)
+				redir = Url.parse(req.body.redir or verifyLink or "/project").path
 
 				AuthenticationController.establishUserSession req, user, (error) ->
 					return callback(error) if error?

@@ -23,7 +23,7 @@ describe "UserController", ->
 			establishUserSession: sinon.stub().callsArg(2)
 		@ReferalAllocator =
 			allocate:sinon.stub()
-		@SubscriptionDomainAllocator = 
+		@SubscriptionDomainHandler = 
 			autoAllocate:sinon.stub()
 		@UserUpdater =
 			changeEmailAddress:sinon.stub()
@@ -33,7 +33,7 @@ describe "UserController", ->
 			"../../../../app/js/Features/User/UserRegistrationHandler":@UserRegistrationHandler
 			"../../../../app/js/Features/Authentication/AuthenticationController": @AuthenticationController
 			"../../../../app/js/Features/Referal/ReferalAllocator":@ReferalAllocator
-			"../../../../app/js/Features/Subscription/SubscriptionDomainAllocator":@SubscriptionDomainAllocator
+			"../../../../app/js/Features/Subscription/SubscriptionDomainHandler":@SubscriptionDomainHandler
 			"../../../../app/js/Features/Email/EmailHandler": @EmailHandler
 			"logger-sharelatex": {log:->}
 			"metrics-sharelatex": { inc: () ->}
@@ -107,7 +107,7 @@ describe "UserController", ->
 		it "should auto allocate the subscription for that domain", (done)->
 			@UserRegistrationHandler.registerNewUser.callsArgWith(1, null, @user)
 			@res.send = (opts)=>
-				@SubscriptionDomainAllocator.autoAllocate.calledWith(@user).should.equal true
+				@SubscriptionDomainHandler.autoAllocate.calledWith(@user).should.equal true
 				done()
 			@PublicRegistrationController.register @req, @res
 
