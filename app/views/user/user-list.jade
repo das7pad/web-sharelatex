@@ -90,8 +90,14 @@
 					.row
 						.col-xs-12.text-centered
 							small No Users
+.row.row-spaced(
+	ng-show="visibleUsers.length > 14"
+)
+	.col-xs-12.text-centered
+		span Search limit has been reached. For more users, improve your filter.
 ul.pager(
 	ng-if="pages > 1",
+	ng-show="false"
 )
 	li(
 		ng-repeat="page in pagesList",
