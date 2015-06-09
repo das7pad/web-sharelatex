@@ -83,7 +83,7 @@ define [
 
 		$scope.updateVisibleProjects()
 
-	App.controller "ProjectListItemController", ($scope) ->
+	App.controller "AdminProjectListItemController", ($scope) ->
 		$scope.$watch "project.selected", (value) ->
 			if value?
 				$scope.updateSelectedProjects()
