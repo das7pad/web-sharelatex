@@ -56,14 +56,6 @@ describe "AdminController", ->
 			locals:
 				jsPath:"js path here"
 
-	describe "renderAdminPanel", ->
-
-		it "should render the admin page", (done)->
-			@res.render = (pageName, opts)=>
-				pageName.should.equal  Path.resolve(__dirname + "../../../../")+ "/app/views/admin"
-				done()
-			@AdminController.renderAdminPanel @req, @res
-
 	describe "listUsers", ->
 
 		it "should render the admin/listUsers page", (done)->
