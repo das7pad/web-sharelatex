@@ -8,7 +8,7 @@ events = require "events"
 ObjectId = require("mongojs").ObjectId
 assert = require("assert")
 
-describe "UserController", ->
+describe "PublicRegistrationController", ->
 	beforeEach ->
 		@user_id = "323123"
 
@@ -24,7 +24,7 @@ describe "UserController", ->
 		@ReferalAllocator =
 			allocate:sinon.stub()
 		@SubscriptionDomainHandler = 
-			autoAllocate:sinon.stub()
+			getDomainLicencePage:sinon.stub()
 		@UserUpdater =
 			changeEmailAddress:sinon.stub()
 		@EmailHandler =
@@ -104,10 +104,13 @@ describe "UserController", ->
 				done()
 			@PublicRegistrationController.register @req, @res			
 			
-		it "should auto allocate the subscription for that domain", (done)->
+		it "should send user to verifiy link if they are part of domain licnece", (done)->
 			@UserRegistrationHandler.registerNewUser.callsArgWith(1, null, @user)
+			stubbedVerifiyLink = "/go/here/domain/person"
+			@SubscriptionDomainHandler.getDomainLicencePage.returns(stubbedVerifiyLink)
 			@res.send = (opts)=>
-				@SubscriptionDomainHandler.autoAllocate.calledWith(@user).should.equal true
+				@SubscriptionDomainHandler.getDomainLicencePage.calledWith(@user).should.equal true
+				opts.redir.should.equal stubbedVerifiyLink
 				done()
 			@PublicRegistrationController.register @req, @res
 

@@ -43,10 +43,9 @@ module.exports = PublicRegistrationController =
 			sharedProjectData: sharedProjectData
 			newTemplateData: newTemplateData
 			new_email:req.query.new_email || ""
-			
+					
 	register: (req, res, next) ->
 		logger.log email: req.body.email, "attempted register"
-		console.log req.body
 		UserRegistrationHandler.registerNewUser req.body, (err, user)->
 			if err? and err?.message == "EmailAlreadyRegistered"
 				return AuthenticationController.login req, res
@@ -63,6 +62,7 @@ module.exports = PublicRegistrationController =
 
 				verifyLink = SubscriptionDomainHandler.getDomainLicencePage(user)
 				redir = Url.parse(req.body.redir or verifyLink or "/project").path
+
 
 				AuthenticationController.establishUserSession req, user, (error) ->
 					return callback(error) if error?
