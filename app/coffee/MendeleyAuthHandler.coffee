@@ -43,3 +43,13 @@ module.exports = MendeleyAuthHandler =
 					res.redirect '/bibtex'
 			return
 
+	unlink: (req, res, next) ->
+		update = 
+			$unset:
+				mendeley: true
+		console.log "unlink", req.session?.user?._id, update
+		UserUpdater.updateUser req.session?.user?._id, update, (err)->
+			if err?
+				logger.err err:err, result:result, "error unlinking mendeley info on user"
+			res.redirect "/user/settings"
+

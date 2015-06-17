@@ -1,22 +1,25 @@
 hr
 
-h3
-	| #{translate("mendeley_intergration")}
+#mendeley-intergration(ng-controller="MendeleyUnlinkController")
 
-- if (!user.features.mendeley)
-	p.small #{translate("mendeley_sync_description")}
-	.alert.alert-info
-		p #{translate("mendeley_is_premium")}
+	h3
+		| #{translate("mendeley_intergration")}
+
+	- if (!user.features.mendeley)
+		p.small #{translate("mendeley_sync_description")}
+		.alert.alert-info
+			p #{translate("mendeley_is_premium")}
+			p
+				a.btn.btn-info(href='/user/subscription/plans') #{translate("upgrade")}
+	- else if(user.mendeley)
+		p you are linked
 		p
-			a.btn.btn-info(href='/user/subscription/plans') #{translate("upgrade")}
-- else if(user.mendeley)
-	p you are linked
-	p todo: add unlink button, which removes the mendeley details from mongo, use #mendeleyUnlinkModalTemplate below
-- else
-	p.small #{translate("mendeley_sync_description")}
-	p.small #{translate("link_to_mendeley_description")}
-	p
-		a(href='/mendeley/oauth').btn.btn-info #{translate("link_to_mendeley")}
+			a(href, ng-click="unlinkAccount()")  #{translate("unlink_to_mendeley")}
+	- else
+		p.small #{translate("mendeley_sync_description")}
+		p.small #{translate("link_to_mendeley_description")}
+		p
+			a(href='/mendeley/oauth').btn.btn-info #{translate("link_to_mendeley")}
 		
 script(type="text/ng-template", id="mendeleyUnlinkModalTemplate")
 
@@ -36,7 +39,7 @@ script(type="text/ng-template", id="mendeleyUnlinkModalTemplate")
 		)
 			span #{translate("cancel")}
 		| 
-		form(action="/mendeley-sync/unlink", method="POST", style="display: inline;")
+		form(action="/mendeley/unlink", method="POST", style="display: inline;")
 			input(type="hidden", name="_csrf", value=csrfToken)
 			button.btn.btn-info(
 				type="submit"
