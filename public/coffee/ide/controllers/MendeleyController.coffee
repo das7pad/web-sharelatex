@@ -9,6 +9,6 @@ define [
 				scope: $scope
 			}
 			
-		ide.githubSyncManager = {
+		ide.mendeleyManager = {
 			openMendeleyModal: () -> $scope.openMendeleyModal()
 		}

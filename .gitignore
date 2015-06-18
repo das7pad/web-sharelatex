@@ -38,6 +38,7 @@ node_modules/*
 data/*
 
 app.js
+index.js
 app/js/*
 test/UnitTests/js/*
 test/unit/js/*
