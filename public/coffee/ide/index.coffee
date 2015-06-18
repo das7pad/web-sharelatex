@@ -1,6 +1,6 @@
 define [
-	"ide/github-sync/controllers/GithubSyncController"
-	"ide/github-sync/controllers/GithubSyncModalController"
-	"ide/github-sync/controllers/GithubSyncExportModalController"
-	"ide/github-sync/controllers/GithubSyncMergeModalController"
+	"ide/references/controllers/MendeleyController"
+	"ide/references/controllers/MendeleyModalController"
+	"ide/references/controllers/GithubSyncExportModalController"
+	"ide/references/controllers/GithubSyncMergeModalController"
 ], () ->

@@ -1,25 +1,27 @@
 hr
 
-#mendeley-intergration(ng-controller="MendeleyUnlinkController")
+h3
+	| #{translate("mendeley_integration")}
 
-	h3
-		| #{translate("mendeley_intergration")}
-
-	- if (!user.features.mendeley)
-		p.small #{translate("mendeley_sync_description")}
-		.alert.alert-info
-			p #{translate("mendeley_is_premium")}
-			p
-				a.btn.btn-info(href='/user/subscription/plans') #{translate("upgrade")}
-	- else if(user.mendeley)
-		p you are linked
+- if (!user.features.mendeley)
+	p.small #{translate("mendeley_sync_description")}
+	.alert.alert-info
+		p #{translate("mendeley_is_premium")}
 		p
-			a(href, ng-click="unlinkAccount()")  #{translate("unlink_to_mendeley")}
-	- else
-		p.small #{translate("mendeley_sync_description")}
-		p.small #{translate("link_to_mendeley_description")}
-		p
-			a(href='/mendeley/oauth').btn.btn-info #{translate("link_to_mendeley")}
+			a.btn.btn-info(href='/user/subscription/plans') #{translate("upgrade")}
+- else if(user.mendeley)
+	p you are linked
+	p
+		a(
+			href, 
+			ng-click="unlinkAccount()",
+			ng-controller="MendeleyUnlinkController"
+		)  #{translate("unlink_to_mendeley")}
+- else
+	p.small #{translate("mendeley_sync_description")}
+	p.small #{translate("link_to_mendeley_description")}
+	p
+		a(href='/mendeley/oauth').btn.btn-info #{translate("link_to_mendeley")}
 		
 script(type="text/ng-template", id="mendeleyUnlinkModalTemplate")
 
