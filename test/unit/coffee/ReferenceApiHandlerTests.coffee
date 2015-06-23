@@ -17,8 +17,10 @@ describe 'ReferencesApiHandler', ->
 				mongo:
 					url: "mongodb://localhost/sharelatex"		
 			'mongojs':
-				connect:-> @db = { users: { findOne : sinon.stub().callsArgWith(2, null, { features: {mendeley:true}, mendeley:true}) } }
+				connect:-> @db = { users: { findOne : sinon.stub().callsArgWith(2, null, { features: {refProvider:true}, refProvider:true}) } }
 				ObjectId: ObjectId
+			'../../../../app/js/Features/User/UserUpdater': @UserUpdater =
+				updateUser: sinon.stub().callsArgWith(2, null)
 
 		@user_id = ObjectId().toString()
 
@@ -26,6 +28,8 @@ describe 'ReferencesApiHandler', ->
 			session:
 				user:
 					_id: @user_id
+			params:
+				ref_provider: 'refProvider'
 		@res =
 			redirect: sinon.stub()
 			json: sinon.stub()
@@ -63,8 +67,8 @@ describe 'ReferencesApiHandler', ->
 			@result =
 				user: 
 					features:
-						mendeley: true
-					mendeley: true
+						refProvider: true
+					refProvider: true
 				reindex: true
 
 			@ReferencesApiHandler.makeRequest = sinon.stub().callsArgWith(1, null, {}, {})
@@ -75,3 +79,17 @@ describe 'ReferencesApiHandler', ->
 			@ReferencesApiHandler.makeRequest = sinon.stub().callsArgWith(1, true, {}, {})
 			@ReferencesApiHandler.reindex @req, @res, @next
 			@res.send.calledWith(500).should.equal true
+
+	describe "unlink", ->
+		beforeEach ->
+			@update =
+				$unset:
+					refProvider: true
+
+			@ReferencesApiHandler.unlink @req, @res, @next
+
+		it "should unset user reference info", ->
+			@UserUpdater.updateUser.calledWith(@user_id, @update).should.equal true
+
+		it "should redirect to user settings page", ->
+			@res.redirect.calledWith("/user/settings").should.equal true
