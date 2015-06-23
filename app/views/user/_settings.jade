@@ -1,27 +1,37 @@
-hr
+each item in ['mendeley','refme']
+	hr
 
-h3
-	| #{translate("mendeley_integration")}
+	h3
+		| #{translate(item+"_integration")}
 
-- if (!user.features.mendeley)
-	p.small #{translate("mendeley_sync_description")}
-	.alert.alert-info
-		p #{translate("mendeley_is_premium")}
+	- var feature = false
+	- var option = false
+	- if (item == 'mendeley') 
+		- feature = user.features.mendeley
+		- option = user.mendeley
+	- if (item == 'refme') 
+		- feature = user.features.refme
+		- option = user.refme
+
+	- if (!feature)
+		p.small #{translate(item+"sync_description")}
+		.alert.alert-info
+			p #{translate(item+"_is_premium")}
+			p
+				a.btn.btn-info(href='/user/subscription/plans') #{translate("upgrade")}
+	- else if(option)
+		p you are linked
 		p
-			a.btn.btn-info(href='/user/subscription/plans') #{translate("upgrade")}
-- else if(user.mendeley)
-	p you are linked
-	p
-		a(
-			href, 
-			ng-click="unlinkAccount()",
-			ng-controller="MendeleyUnlinkController"
-		)  #{translate("unlink_to_mendeley")}
-- else
-	p.small #{translate("mendeley_sync_description")}
-	p.small #{translate("link_to_mendeley_description")}
-	p
-		a(href='/mendeley/oauth').btn.btn-info #{translate("link_to_mendeley")}
+			a(
+				href, 
+				ng-click="unlinkAccount('#{item}')",
+				ng-controller="MendeleyUnlinkController"
+			)  #{translate("unlink_to_"+item)}
+	- else
+		p.small #{translate(item+"_sync_description")}
+		p.small #{translate("link_to_"+item+"_description")}
+		p
+			a(href='/#{item}/oauth').btn.btn-info #{translate("link_to_"+item)}
 		
 script(type="text/ng-template", id="mendeleyUnlinkModalTemplate")
 
@@ -31,9 +41,9 @@ script(type="text/ng-template", id="mendeleyUnlinkModalTemplate")
 			data-dismiss="modal"
 			ng-click="$dismiss()"
 		) &times;
-		h3 #{translate("unlink_mendeley")}
+		h3 #{translate("unlink_reference")} {{provider}}
 	.modal-body
-		p #{translate("unlink_mendeley_warning")}
+		p #{translate("unlink_warning_reference")} {{provider}}
 	
 	.modal-footer()
 		button.btn.btn-default(
@@ -41,7 +51,7 @@ script(type="text/ng-template", id="mendeleyUnlinkModalTemplate")
 		)
 			span #{translate("cancel")}
 		| 
-		form(action="/mendeley/unlink", method="POST", style="display: inline;")
+		form(action="{{providerUnlink}}", method="POST", style="display: inline;")
 			input(type="hidden", name="_csrf", value=csrfToken)
 			button.btn.btn-info(
 				type="submit"
