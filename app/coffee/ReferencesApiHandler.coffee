@@ -43,24 +43,29 @@ module.exports = ReferencesApiHandler =
 				referencesUrl: "#{referencesUrl}/user/#{user_id}/#{ref_provider}/bibtex"
 
 
-		result =
+		result = 
 			user: 
-				features:
-					mendeley: false
-				mendeley: false
+				features: {}
 			reindex: false
 
-		db.users.findOne _id: ObjectId(user_id), {mendeley:1,features:1}, (err, user)->
-			result.user.features.mendeley = user.features.mendeley
-			result.user.mendeley = user.mendeley?
+		result.user[ref_provider] = false
+		result.user.features[ref_provider] = false
 
-			if !user.mendeley
-				console.log userId:user_id, "has no reference info on user"
+		projection = {}
+		projection[ref_provider] = 1
+		projection['features'] = 1
+
+		db.users.findOne _id: ObjectId(user_id), projection, (err, user)->
+			result.user.features[ref_provider] = user.features[ref_provider]
+			result.user[ref_provider] = user[ref_provider]?
+
+			if !user[ref_provider]
+				console.log userId:user_id, "has no reference info on user" + ref_provider
 				res.json result
 			else
 				ReferencesApiHandler.makeRequest opts, (err, response, body)->
 					if err?
-						console.log err:err, 'error reindexing mendeley'
+						console.log err:err, 'error reindexing reference' + ref_provider
 						res.send 500
 					else
 						console.log body, 'log body'
@@ -69,11 +74,14 @@ module.exports = ReferencesApiHandler =
 
 	unlink: (req, res, next) ->
 		ref_provider = req.params.ref_provider
+
+		ref = {}
+		ref[ref_provider] = true
 		update = 
-			$unset:
-				mendeley: true
+			$unset: ref
+
 		console.log "unlink", req.session?.user?._id, update
 		UserUpdater.updateUser req.session?.user?._id, update, (err)->
 			if err?
-				logger.err err:err, result:result, "error unlinking mendeley info on user"
+				logger.err err:err, result:result, "error unlinking reference info on user" + ref_provider
 			res.redirect "/user/settings"

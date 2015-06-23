@@ -1,3 +1,3 @@
 define [
-	"main/references/controllers/MendeleyUnlinkController"
+	"main/references/controllers/ReferenceUnlinkController"
 ], () ->

@@ -16,7 +16,7 @@ each item in ['mendeley','refme']
 			a(
 				href, 
 				ng-click="unlinkAccount('#{item}')",
-				ng-controller="MendeleyUnlinkController"
+				ng-controller="ReferenceUnlinkController"
 			)  #{translate("unlink_to_"+item)}
 	- else
 		p.small #{translate(item+"_sync_description")}
@@ -24,7 +24,7 @@ each item in ['mendeley','refme']
 		p
 			a(href='/#{item}/oauth').btn.btn-info #{translate("link_to_"+item)}
 		
-script(type="text/ng-template", id="mendeleyUnlinkModalTemplate")
+script(type="text/ng-template", id="referenceUnlinkModalTemplate")
 
 	.modal-header
 		button.close(
