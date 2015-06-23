@@ -4,22 +4,13 @@ each item in ['mendeley','refme']
 	h3
 		| #{translate(item+"_integration")}
 
-	- var feature = false
-	- var option = false
-	- if (item == 'mendeley') 
-		- feature = user.features.mendeley
-		- option = user.mendeley
-	- if (item == 'refme') 
-		- feature = user.features.refme
-		- option = user.refme
-
-	- if (!feature)
+	- if (!user.features[item])
 		p.small #{translate(item+"sync_description")}
 		.alert.alert-info
 			p #{translate(item+"_is_premium")}
 			p
 				a.btn.btn-info(href='/user/subscription/plans') #{translate("upgrade")}
-	- else if(option)
+	- else if(user[item])
 		p you are linked
 		p
 			a(
