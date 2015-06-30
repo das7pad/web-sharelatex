@@ -5,17 +5,16 @@ DropboxMiddlewear = require "./DropboxMiddlewear"
 SecurityManager = require "../../../../app/js/managers/SecurityManager"
 
 module.exports =
-	apply: (app) ->
-		app.get  '/user/settings', DropboxMiddlewear.injectUserSettings
+	apply: (webRouter, apiRouter) ->
+		webRouter.get  '/user/settings', DropboxMiddlewear.injectUserSettings
 		
-		app.get  '/dropbox/beginAuth', DropboxUserController.redirectUserToDropboxAuth
-		app.get  '/dropbox/completeRegistration', DropboxUserController.completeDropboxRegistration
-		app.get  '/dropbox/unlink', DropboxUserController.unlinkDropbox
+		webRouter.get  '/dropbox/beginAuth', DropboxUserController.redirectUserToDropboxAuth
+		webRouter.get  '/dropbox/completeRegistration', DropboxUserController.completeDropboxRegistration
+		webRouter.get  '/dropbox/unlink', DropboxUserController.unlinkDropbox
 		
-		app.get  '/dropbox/webhook', DropboxWebhookController.verify
-		app.post '/dropbox/webhook', DropboxWebhookController.webhook
-		app.ignoreCsrf('post', '/dropbox/webhook')
+		apiRouter.get  '/dropbox/webhook', DropboxWebhookController.verify
+		apiRouter.post '/dropbox/webhook', DropboxWebhookController.webhook
 
-		app.get '/project/:Project_id/dropbox/status', SecurityManager.requestIsOwner, DropboxProjectController.getStatus
+		webRouter.get '/project/:Project_id/dropbox/status', SecurityManager.requestIsOwner, DropboxProjectController.getStatus
 
 

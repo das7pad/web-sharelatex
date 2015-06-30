@@ -4,7 +4,6 @@ DropboxWebhookHandler = require("./DropboxWebhookHandler")
 module.exports = DropboxWebhookController =
 	verify: (req, res, next = (error) ->) ->
 		res.send(req.query.challenge)
-		req.session.destroy()
 		
 	webhook: (req, res, next = (error) ->) ->
 		dropbox_uids = req.body?.delta?.users
@@ -18,4 +17,3 @@ module.exports = DropboxWebhookController =
 				logger.error err: error, dropbox_uids: dropbox_uids, "error in webhook"
 		
 		res.send(200)
-		req.session.destroy()
