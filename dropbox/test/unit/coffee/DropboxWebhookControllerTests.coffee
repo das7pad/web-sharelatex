@@ -35,7 +35,7 @@ describe 'DropboxWebhookController', ->
 						"123456",
 						"789123"
 					]
-			@res.send = sinon.stub()
+			@res.sendStatus = sinon.stub()
 			@DropboxWebhookHandler.pollDropboxUids = sinon.stub().callsArg(1)
 			@DropboxWebhookController.webhook(@req, @res)
 			
@@ -45,7 +45,7 @@ describe 'DropboxWebhookController', ->
 				.should.equal true
 				
 		it "should return success", ->
-			@res.send
+			@res.sendStatus
 				.calledWith(200)
 				.should.equal true
 
