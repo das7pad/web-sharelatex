@@ -134,7 +134,7 @@ describe "AdminController", ->
 				params:
 					user_id: 'user_id_here'	
 			@UserDeleter.deleteUser.calledWith(1)
-			@res.send = (code)=>
+			@res.sendStatus = (code)=>
 				@UserDeleter.deleteUser.calledWith('user_id_here').should.equal true
 				code.should.equal 200
 				done()
@@ -152,14 +152,14 @@ describe "AdminController", ->
 
 		it "should set the user password", (done)->
 			@AuthenticationManager.setUserPassword.callsArgWith(2)
-			@res.send = (code)=>
+			@res.sendStatus = (code)=>
 				code.should.equal 200
 				done()
 			@AdminController.setUserPassword @req, @res
 
 		it "should set the user id", (done)->
 			@AuthenticationManager.setUserPassword.callsArgWith(2)
-			@res.send = (code)=>
+			@res.sendStatus = (code)=>
 				@AuthenticationManager.setUserPassword.calledWith('user_id_here', 'my great secret password').should.equal true
 				done()
 			@AdminController.setUserPassword @req, @res

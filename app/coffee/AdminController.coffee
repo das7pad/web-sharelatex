@@ -56,9 +56,9 @@ module.exports = AdminController =
 		logger.log user_id: user_id, "received admin request to delete user"
 		UserDeleter.deleteUser user_id, (err)->
 			if err?
-				res.send 500
+				res.sendStatus 500
 			else
-				res.send 200
+				res.sendStatus 200
 
 	setUserPassword: (req, res)->
 		user_id = req.params.user_id
@@ -66,6 +66,6 @@ module.exports = AdminController =
 		logger.log user_id: user_id, "received admin request to set user password"
 		AuthenticationManager.setUserPassword user_id, password, (err)->
 			if err?
-				res.send 500
+				res.sendStatus 500
 			else
-				res.send 200
+				res.sendStatus 200
