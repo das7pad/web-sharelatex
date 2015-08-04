@@ -1,0 +1,60 @@
+span(ng-controller="EnagoController")
+	ul.list-unstyled.nav()
+		li
+			a(ng-click="openEnagoModal()")
+				i.fa.fa-pencil.fa-fw
+				| &nbsp;&nbsp; Editing by Enago
+
+script(type="text/ng-template", id="enagoModalTemplate")
+	.modal-header
+		button.close(
+			type="button"
+			data-dismiss="modal"
+			ng-click="cancel()"
+		) &times;
+		h3 Enago Editing Services
+	.modal-body.modal-body-share
+
+		.row
+			.col-md-7.col-xs-7
+				div ShareLaTeX has partnered with 
+					a(href="http://www.sharelatex.enago.com") Enago 
+					| to offer a varity of 
+					a(href="http://www.sharelatex.enago.com") Editing Services.
+			.col-md-5.col-xs-5
+				img(src="/img/enago.png")
+
+
+		.row
+			.col-md-12.col-xs-12
+				div.services
+					h2
+						a(href="/somewhere") Language Check
+					p For those who want one quick round of language and grammar check.	
+		.row
+			.col-md-12.col-xs-12
+				div.services
+					hr.small
+					h2
+						a(href="/somewhere") Copy Editing
+					p For quality-conscious ESL authors who require a thorough and complete language check for their manuscripts.
+		.row
+			.col-md-12.col-xs-12
+				div.services
+					hr.small
+					h2
+						a(href="/somewhere") Substantive Editing
+					p The top-tier premium service maximising an author’s chances of getting published as the level of intervention by the highest ranked and the most skilled editors are used.
+		.row
+			.col-md-12.col-xs-12
+				div.services
+					hr.small
+					h2
+						a(href="/somewhere") Formating
+					p Formatting outputed in either TeX files or Microsoft Word
+			
+
+	.modal-footer()
+
+		a.btn.btn-info(href="http://www.sharelatex.enago.com")
+			span #{translate("visit_enago")}
