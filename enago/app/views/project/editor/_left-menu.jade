@@ -3,7 +3,7 @@ span(ng-controller="EnagoController")
 		li
 			a(ng-click="openEnagoModal()")
 				i.fa.fa-pencil.fa-fw
-				| &nbsp;&nbsp; Editing by Enago
+				| &nbsp;&nbsp; #{translate("editing_by_enago")}
 
 script(type="text/ng-template", id="enagoModalTemplate")
 	.modal-header
@@ -12,15 +12,13 @@ script(type="text/ng-template", id="enagoModalTemplate")
 			data-dismiss="modal"
 			ng-click="cancel()"
 		) &times;
-		h3 Enago Editing Services
+		h3 #{translate("enago_editing_services")}
 	.modal-body.modal-body-share
 
 		.row
 			.col-md-7.col-xs-7
-				div ShareLaTeX has partnered with 
-					a(href="http://www.sharelatex.enago.com") Enago 
-					| to offer a varity of 
-					a(href="http://www.sharelatex.enago.com") Editing Services.
+
+				div !{translate("sharelatex_partnered_with_company_variety_of_services", {companyname:"<a href='http://www.sharelatex.enago.com'>Enago</a>"})}
 			.col-md-5.col-xs-5
 				img(src="/img/enago.png")
 
@@ -29,29 +27,29 @@ script(type="text/ng-template", id="enagoModalTemplate")
 			.col-md-12.col-xs-12
 				div.services
 					h2
-						a(href="http://www.sharelatex.enago.com/language-check.htm", target="_blank") Language Check
-					p One quick round of language and grammar check.	
+						a(href="http://www.sharelatex.enago.com/language-check.htm", target="_blank") #{translate("language_check")}
+					p  #{translate("one_round_of_checking")}
 		.row
 			.col-md-12.col-xs-12
 				div.services
 					hr.small
 					h2
-						a(href="http://www.sharelatex.enago.com/copyediting.htm", target="_blank") Copy Editing
-					p A thorough and complete language check for your manuscript.
+						a(href="http://www.sharelatex.enago.com/copyediting.htm", target="_blank") #{translate("copy_editing")}
+					p #{translate("thorough_and_complete_language_check")}
 		.row
 			.col-md-12.col-xs-12
 				div.services
 					hr.small
 					h2
-						a(href="http://www.sharelatex.enago.com/substantive-editing.htm", target="_blank") Substantive Editing
-					p A focus on not only on the proper use of the English language, but also the overall presentation of your paper, including the logical flow and structure.
+						a(href="http://www.sharelatex.enago.com/substantive-editing.htm", target="_blank") #{translate("substantive_editing")}
+					p #{translate("substantive_editing_details")}
 		.row
 			.col-md-12.col-xs-12
 				div.services
 					hr.small
 					h2
-						a(href="http://www.sharelatex.enago.com/tex-latex-format.htm", target="_blank") Formatting
-					p Formatted output in either TeX files or Microsoft Word.
+						a(href="http://www.sharelatex.enago.com/tex-latex-format.htm", target="_blank") #{translate("formatting")}
+					p #{translate("formetted_in_tex_or_ms")}
 			
 
 	.modal-footer()
