@@ -30,16 +30,18 @@ block content
 							div !{template.description}
 							div(ng-controller="openInSlController", ng-cloak).download-buttons
 								a.btn.btn-primary.btn-large(href=template.open_in_sharelatex_url, ng-click='open()', ng-disabled="isDisabled", rel='nofollow') {{openInSlText}}
-								| &nbsp;
-
 								a.btn.btn-default(
 									href="#{template.zipUrl}?name=#{template.name}",
-									rel='nofollow', 
+									rel='nofollow',
 									ng-click='downloadZip()',
 									tooltip-placement="bottom",
 									tooltip="#{translate('download_zip_file')}"
 								)
 									i.fa.fa-cloud-download
+
+								a.btn.btn-info(href='#') #{translate("unpublish")}
+								a.btn.btn-primary(href='#') #{translate("republish")}
+
 						- if(settings.templates.showSocialButtons)
 							.template-details-section.social_buttons
 								.addthis_toolbox.addthis_default_style.addthis_32x32_style
@@ -66,5 +68,3 @@ block content
 							a.dsq-brlink(href='http://disqus.com')
 								| comments powered by
 								span.logo-disqus Disqus
-
-
