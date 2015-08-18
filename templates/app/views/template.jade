@@ -39,8 +39,9 @@ block content
 								)
 									i.fa.fa-cloud-download
 
-								a.btn.btn-info(href='#') #{translate("unpublish")}
-								a.btn.btn-primary(href='#') #{translate("republish")}
+								if(currentUserIsOwner)
+									a.btn.btn-info(href='#') #{translate("unpublish")}
+									a.btn.btn-primary(href='#') #{translate("republish")}
 
 						- if(settings.templates.showSocialButtons)
 							.template-details-section.social_buttons
