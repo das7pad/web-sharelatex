@@ -2,10 +2,13 @@ define [
 	"base"
 ], (App) ->
 
-	App.controller "openInSlController", ($scope) ->
+	App.controller "openInSlController", ($scope, $http) ->
 
 		$scope.openInSlText = "Open in ShareLaTeX"
 		$scope.isDisabled = false
+		$scope.state =
+			unpublishInFlight: false
+			republishInFlight: false
 
 		$scope.open = ->
 			$scope.openInSlText = "Creating..."
@@ -15,6 +18,24 @@ define [
 		$scope.downloadZip = ->
 			ga('send', 'event', 'template-site', 'download-zip', $('.page-header h1').text())
 
+		$scope.republish = ->
+			console.log('>> republish')
+
+		$scope.unpublish = (projectId) ->
+			console.log('>> unpublish')
+			$scope.state.unpublishInFlight = true
+			$http
+				.post("/project/#{projectId}/template/unpublish", {
+					_csrf: window.csrfToken
+				})
+				.success () ->
+					$scope.state.unpublishInFlight = false
+					# TODO: do whatever comes next
+					console.log '>> unpub successful'
+				.error () ->
+					$scope.state.unpublishInFlight = false
+					# TODO: error handling
+					console.log '>> unpub failed'
 
 	App.factory "algolia", ->
 		if window?.sharelatex?.algolia?.app_id?
@@ -74,4 +95,3 @@ define [
 	App.controller "MissingTemplateModalController", ($scope, $modalInstance) ->
 		$scope.cancel = () ->
 			$modalInstance.dismiss()
-
