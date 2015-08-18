@@ -57,8 +57,9 @@ module.exports = TemplatesWebController =
 			res.send 500
 
 	_renderCanonicalPage: (req, res)->
+		current_user_id = req.session?.user?._id
 		{user_id, template_id} = req.params
-		logger.log user_id:user_id, template_id:template_id, "rendering template page"
+		logger.log current_user_id: current_user_id, user_id:user_id, template_id:template_id, "rendering template page"
 		TemplatesWebController._getDataFromTemplatesApi "/user/#{user_id}/template/#{template_id}", (err, data)->
 			if err? and err == 404
 				return ErrorController.notFound req, res
