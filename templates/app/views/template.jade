@@ -40,12 +40,16 @@ block content
 									i.fa.fa-cloud-download
 
 								if(currentUserIsOwner)
-									a.btn.btn-info(
-										href='#',
-										ng-click="unpublish('#{template.projectId}')")
-										| #{translate("unpublish")}
-									a.btn.btn-primary(
-										href='#',
+									// Unpublish Button
+									button.btn.btn-info(
+										ng-click="unpublish('#{template.projectId}')",
+										ng-disabled="state.unpublishInFlight")
+										span(ng-show="!state.unpublishInFlight")
+											| #{translate("unpublish")}
+										span(ng-show="state.unpublishInFlight")
+											| #{translate("unpublishing")}...
+									// Republish Button
+									button.btn.btn-primary(
 										ng-click="republish('#{template.projectId}')")
 										| #{translate("republish")}
 
@@ -73,5 +77,5 @@ block content
 								| Please enable JavaScript to view the
 								a(href='http://disqus.com/?ref_noscript') comments powered by Disqus.
 							a.dsq-brlink(href='http://disqus.com')
-								| comments powered by
+								| comments powered by&nbsp;
 								span.logo-disqus Disqus

@@ -2,7 +2,7 @@ define [
 	"base"
 ], (App) ->
 
-	App.controller "openInSlController", ($scope, $http) ->
+	App.controller "openInSlController", ($scope, $http, $window, $timeout) ->
 
 		$scope.openInSlText = "Open in ShareLaTeX"
 		$scope.isDisabled = false
@@ -22,7 +22,6 @@ define [
 			console.log('>> republish')
 
 		$scope.unpublish = (projectId) ->
-			console.log('>> unpublish')
 			$scope.state.unpublishInFlight = true
 			$http
 				.post("/project/#{projectId}/template/unpublish", {
@@ -30,8 +29,12 @@ define [
 				})
 				.success () ->
 					$scope.state.unpublishInFlight = false
-					# TODO: do whatever comes next
-					console.log '>> unpub successful'
+					$timeout(
+						() ->
+							$window.location.href = '/templates'
+						,
+						1000
+					)
 				.error () ->
 					$scope.state.unpublishInFlight = false
 					# TODO: error handling
