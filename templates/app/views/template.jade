@@ -48,10 +48,15 @@ block content
 											| #{translate("unpublish")}
 										span(ng-show="state.unpublishInFlight")
 											| #{translate("unpublishing")}...
+
 									// Republish Button
 									button.btn.btn-primary(
 										ng-click="republish('#{template.projectId}')")
 										| #{translate("republish")}
+
+								// Error Message
+								div(ng-if="state.apiProblem")
+									span #{translate("problem_talking_to_publishing_service")}
 
 						- if(settings.templates.showSocialButtons)
 							.template-details-section.social_buttons

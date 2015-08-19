@@ -9,6 +9,7 @@ define [
 		$scope.state =
 			unpublishInFlight: false
 			republishInFlight: false
+			apiProblem: false
 
 		$scope.open = ->
 			$scope.openInSlText = "Creating..."
@@ -29,6 +30,7 @@ define [
 				})
 				.success () ->
 					$scope.state.unpublishInFlight = false
+					$scope.state.apiProblem = false
 					$timeout(
 						() ->
 							$window.location.href = '/templates'
@@ -39,6 +41,7 @@ define [
 					$scope.state.unpublishInFlight = false
 					# TODO: error handling
 					console.log '>> unpub failed'
+					$scope.state.apiProblem = true
 
 	App.factory "algolia", ->
 		if window?.sharelatex?.algolia?.app_id?
