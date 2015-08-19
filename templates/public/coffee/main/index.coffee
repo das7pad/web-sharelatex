@@ -20,7 +20,6 @@ define [
 			ga('send', 'event', 'template-site', 'download-zip', $('.page-header h1').text())
 
 		$scope.republish = (projectId) ->
-			console.log('>> republish')
 			$scope.state.republishInFlight = true
 			$http
 				.post("/project/#{projectId}/template/publish", {
@@ -29,7 +28,7 @@ define [
 				.success () ->
 					$scope.state.republishInFlight = false
 					$scope.state.apiProblem = false
-					$window.location.href = $window.location.href
+					$window.location.reload()  # Reload this page
 				.error () ->
 					$scope.state.republishInFlight = false
 					$scope.state.apiProblem = false
@@ -47,7 +46,7 @@ define [
 						() ->
 							$window.location.href = '/templates'
 						,
-						1000
+						500
 					)
 				.error () ->
 					$scope.state.unpublishInFlight = false
