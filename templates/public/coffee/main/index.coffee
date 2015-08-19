@@ -19,8 +19,20 @@ define [
 		$scope.downloadZip = ->
 			ga('send', 'event', 'template-site', 'download-zip', $('.page-header h1').text())
 
-		$scope.republish = ->
+		$scope.republish = (projectId) ->
 			console.log('>> republish')
+			$scope.state.republishInFlight = true
+			$http
+				.post("/project/#{projectId}/template/publish", {
+					_csrf: window.csrfToken
+				})
+				.success () ->
+					$scope.state.republishInFlight = false
+					$scope.state.apiProblem = false
+					$window.location.href = $window.location.href
+				.error () ->
+					$scope.state.republishInFlight = false
+					$scope.state.apiProblem = false
 
 		$scope.unpublish = (projectId) ->
 			$scope.state.unpublishInFlight = true
