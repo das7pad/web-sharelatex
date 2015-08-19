@@ -40,8 +40,14 @@ block content
 									i.fa.fa-cloud-download
 
 								if(currentUserIsOwner)
-									a.btn.btn-info(href='#', ng-click="unpublish('#{template.projectId}')") #{translate("unpublish")}
-									a.btn.btn-primary(href='#', ng-click="republish('#{template.projectId}')") #{translate("republish")}
+									a.btn.btn-info(
+										href='#',
+										ng-click="unpublish('#{template.projectId}')")
+										| #{translate("unpublish")}
+									a.btn.btn-primary(
+										href='#',
+										ng-click="republish('#{template.projectId}')")
+										| #{translate("republish")}
 
 						- if(settings.templates.showSocialButtons)
 							.template-details-section.social_buttons
