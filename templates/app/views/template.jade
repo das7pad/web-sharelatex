@@ -51,8 +51,12 @@ block content
 
 									// Republish Button
 									button.btn.btn-primary(
-										ng-click="republish('#{template.projectId}')")
-										| #{translate("republish")}
+										ng-click="republish('#{template.projectId}')",
+										ng-disabled="state.republishInFlight")
+										span(ng-show="!state.republishInFlight")
+											| #{translate("republish")}
+										span(ng-show="state.republishInFlight")
+											| #{translate("publishing")}...
 
 								// Error Message
 								div(ng-if="state.apiProblem")
