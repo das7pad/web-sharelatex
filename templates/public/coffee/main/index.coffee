@@ -11,6 +11,9 @@ define [
 			republishInFlight: false
 			apiProblem: false
 
+		$scope.buttonsDisabled = () ->
+			$scope.state.unpublishInFlight or $scope.state.republishInFlight
+
 		$scope.open = ->
 			$scope.openInSlText = "Creating..."
 			$scope.isDisabled = true

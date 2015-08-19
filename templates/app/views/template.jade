@@ -43,7 +43,7 @@ block content
 									// Unpublish Button
 									button.btn.btn-info(
 										ng-click="unpublish('#{template.projectId}')",
-										ng-disabled="state.unpublishInFlight")
+										ng-disabled="buttonsDisabled()")
 										span(ng-show="!state.unpublishInFlight")
 											| #{translate("unpublish")}
 										span(ng-show="state.unpublishInFlight")
@@ -52,7 +52,7 @@ block content
 									// Republish Button
 									button.btn.btn-primary(
 										ng-click="republish('#{template.projectId}')",
-										ng-disabled="state.republishInFlight")
+										ng-disabled="buttonsDisabled()")
 										span(ng-show="!state.republishInFlight")
 											| #{translate("republish")}
 										span(ng-show="state.republishInFlight")
