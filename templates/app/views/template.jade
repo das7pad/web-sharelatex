@@ -40,6 +40,10 @@ block content
 									i.fa.fa-cloud-download
 
 								if(currentUserIsOwner)
+									hr
+									p
+										| #{translate("this_is_your_template")} 
+										a(href='/project/#{template.projectId}') #{template.name}
 									// Unpublish Button
 									button.btn.btn-info(
 										ng-click="unpublish('#{template.projectId}')",
