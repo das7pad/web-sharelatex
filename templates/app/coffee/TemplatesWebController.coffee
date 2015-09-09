@@ -40,16 +40,16 @@ module.exports = TemplatesWebController =
 
 	proxyToTemplatesApi: (req, res)->
 		url = req.url
-		
+
 		name = req.query.name or "Template"
 		if req.query.inline?
 			disposition = "inline"
 		else
 			disposition = "attachment"
 		res.header({"content-disposition": "#{disposition}; filename=\"#{name.replace("\"", "-")}.#{req.params.file_type}\""})
-		
+
 		logger.log url:url, template_name: name, disposition: disposition, "proxying request to templates api"
-		
+
 		getReq = request.get("#{settings.apis.templates.url}#{url}")
 		getReq.pipe(res)
 		getReq.on "error", (error) ->
@@ -57,8 +57,9 @@ module.exports = TemplatesWebController =
 			res.send 500
 
 	_renderCanonicalPage: (req, res)->
+		current_user_id = req.session?.user?._id
 		{user_id, template_id} = req.params
-		logger.log user_id:user_id, template_id:template_id, "rendering template page"
+		logger.log current_user_id: current_user_id, user_id:user_id, template_id:template_id, "rendering template page"
 		TemplatesWebController._getDataFromTemplatesApi "/user/#{user_id}/template/#{template_id}", (err, data)->
 			if err? and err == 404
 				return ErrorController.notFound req, res
@@ -67,6 +68,7 @@ module.exports = TemplatesWebController =
 				return res.send 500
 			data.title = data?.template?.name
 			data.tag = null
+			data.currentUserIsOwner = current_user_id and current_user_id == data.template.userId
 			res.render Path.resolve(__dirname, "../views/template"), data
 
 	_renderAllTemplatesPage: (req, res)->
@@ -94,7 +96,7 @@ module.exports = TemplatesWebController =
 			res.render Path.resolve(__dirname, "../views/tag"), data
 
 	_getDataFromTemplatesApi: (path, callback)->
-		opts = 
+		opts =
 			url: "#{settings.apis.templates.url}#{path}"
 			json:true
 		request.get opts, (err, response, data)->
