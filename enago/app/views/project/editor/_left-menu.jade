@@ -27,32 +27,32 @@ script(type="text/ng-template", id="enagoModalTemplate")
 			.col-md-12.col-xs-12
 				div.services
 					h2
-						a(href="http://www.sharelatex.enago.com/language-check.htm", target="_blank") #{translate("language_check")}
+						a(href="http://www.sharelatex.enago.com/language-check.htm", target="_blank" ng-click='enagoLink("language-check")') #{translate("language_check")}
 					p  #{translate("one_round_of_checking")}
 		.row
 			.col-md-12.col-xs-12
 				div.services
 					hr.small
 					h2
-						a(href="http://www.sharelatex.enago.com/copyediting.htm", target="_blank") #{translate("copy_editing")}
+						a(href="http://www.sharelatex.enago.com/copyediting.htm", target="_blank" ng-click='enagoLink("copyediting")') #{translate("copy_editing")}
 					p #{translate("thorough_and_complete_language_check")}
 		.row
 			.col-md-12.col-xs-12
 				div.services
 					hr.small
 					h2
-						a(href="http://www.sharelatex.enago.com/substantive-editing.htm", target="_blank") #{translate("substantive_editing")}
+						a(href="http://www.sharelatex.enago.com/substantive-editing.htm", target="_blank" ng-click='enagoLink("substantive-editing")') #{translate("substantive_editing")}
 					p #{translate("substantive_editing_details")}
 		.row
 			.col-md-12.col-xs-12
 				div.services
 					hr.small
 					h2
-						a(href="http://www.sharelatex.enago.com/tex-latex-format.htm", target="_blank") #{translate("formatting")}
+						a(href="http://www.sharelatex.enago.com/tex-latex-format.htm", target="_blank" ng-click='enagoLink("tex-latex-format")') #{translate("formatting")}
 					p #{translate("formetted_in_tex_or_ms")}
 			
 
 	.modal-footer()
 
-		a.btn.btn-info(href="http://www.sharelatex.enago.com", target="_blank")
+		a.btn.btn-info(href="http://www.sharelatex.enago.com", target="_blank" ng-click='enagoLink("footer-button")')
 			span #{translate("visit_enago")}
