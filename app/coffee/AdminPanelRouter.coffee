@@ -12,5 +12,4 @@ module.exports =
 		webRouter.post "/admin/user/:user_id/setPassword", SecurityManager.requestIsAdmin, AdminController.setUserPassword
 		webRouter.delete "/admin/user/:user_id", SecurityManager.requestIsAdmin, AdminController.deleteUser
 		webRouter.get "/admin/user/graph/:user_id", SecurityManager.requestIsAdmin, AdminGraphController.userGraph
-		webRouter.get "/admin/Project/:Project_id", SecurityManager.requestIsAdmin, ProjectController.loadEditor
 		webRouter.delete "/admin/Project/:Project_id", SecurityManager.requestIsAdmin, ProjectController.deleteProject
