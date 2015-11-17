@@ -27,10 +27,43 @@ script(type="text/ng-template", id="githubSyncModalTemplate")
 					div(ng-if="$parent.permissions.admin")
 						div(ng-if="!status.user.available")
 							p.small #{translate("github_import_description")}
-							.alert.alert-info
-								p #{translate("github_is_premium")}
-								p
-									a.btn.btn-info(ng-click="startFreeTrial('github')") #{translate("start_free_trial")}
+							div.text-center
+								p #{translate("upgrade_to_get_feature", {feature:"Github Sync"})}
+
+								h4 
+									i.fa.fa-check &nbsp;
+									| #{translate("unlimited_projects")}
+								
+								h4
+									i.fa.fa-check &nbsp;
+									| #{translate("collabs_per_proj", {collabcount:'Multiple'})}
+								
+								h4 
+									i.fa.fa-check &nbsp;
+									| #{translate("full_doc_history")}
+								
+								h4 
+									i.fa.fa-check &nbsp;
+									| #{translate("sync_to_dropbox")}
+
+								h4 
+									i.fa.fa-check &nbsp;
+									| #{translate("sync_to_github")}
+
+								h4  
+									i.fa.fa-check &nbsp;
+									|#{translate("compile_larger_projects")}
+
+								p(ng-controller="FreeTrialModalController")
+									a.btn.btn-success(
+										href
+										ng-class="buttonClass"
+										sixpack-convert="track_changes_feature_info"
+										ng-click="startFreeTrial('github')"
+									) #{translate("start_free_trial")}
+
+								p.small(ng-show="startedFreeTrial")
+									| #{translate("refresh_page_after_starting_free_trial")}
 								
 						div(ng-if="status.user.available")
 							p #{translate("link_to_github_description")}
