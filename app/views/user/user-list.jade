@@ -26,15 +26,16 @@
 						ng-click="openDeleteUsersModal()"
 					)
 						i.fa.fa-trash-o
-				.btn-group(ng-hide="selectedUsers.length != 1")
-					a.btn.btn-default(
-						href='#',
-						tooltip="#{translate('set_password')}",
-						tooltip-placement="bottom",
-						tooltip-append-to-body="true",
-						ng-click="openSetPasswordModal()"
-					)
-						i.fa.fa-key
+				if !externalAuthenticationSystemUsed()
+					.btn-group(ng-hide="selectedUsers.length != 1")
+						a.btn.btn-default(
+							href='#',
+							tooltip="#{translate('set_password')}",
+							tooltip-placement="bottom",
+							tooltip-append-to-body="true",
+							ng-click="openSetPasswordModal()"
+						)
+							i.fa.fa-key
 
 .row.row-spaced
 	.col-xs-12
