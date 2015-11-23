@@ -61,7 +61,7 @@ module.exports = PublicRegistrationController =
 				}, () ->
 
 				verifyLink = SubscriptionDomainHandler.getDomainLicencePage(user)
-				redir = Url.parse(req.body.redir or verifyLink or "/project").path
+				redir = Url.parse(verifyLink or req.body.redir or "/project").path
 
 
 				AuthenticationController.establishUserSession req, user, (error) ->
