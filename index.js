@@ -1,10 +1,10 @@
 (function() {
-  var Mendeley, MendeleyRouter;
+  var References, ReferencesRouter;
 
-  MendeleyRouter = require("./app/js/MendeleyRouter");
+  ReferencesRouter = require("./app/js/ReferencesRouter");
 
-  module.exports = Mendeley = {
-    router: MendeleyRouter,
+  module.exports = References = {
+    router: ReferencesRouter,
     viewIncludes: {
       "userSettings": "user/_settings",
       "editorLeftMenu:sync": "project/editor/_left-menu"

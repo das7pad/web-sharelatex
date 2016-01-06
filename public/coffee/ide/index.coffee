@@ -1,5 +1,5 @@
 define [
-	"ide/references/controllers/MendeleyController"
-	"ide/references/controllers/MendeleyModalController"
-	#"ide/references/editor/References"
+	"ide/references-sharelatex-webmodule/controllers/ReferencesController"
+	"ide/references-sharelatex-webmodule/controllers/ReferencesModalController"
+	#"ide/references-sharelatex-webmodule/editor/References"
 ], () ->

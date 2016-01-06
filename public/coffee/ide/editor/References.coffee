@@ -1,7 +1,7 @@
 define [
 	"base"
 	"ace/ace"
-	"ide/references/editor/ReferencesManager"
+	"ide/references-sharelatex-webmodule/editor/ReferencesManager"
 ], (App, Ace, ReferencesManager) ->
 
 	App.directive "aceEditor", () ->

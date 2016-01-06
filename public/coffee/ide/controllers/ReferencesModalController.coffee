@@ -1,7 +1,7 @@
 define [
 	"base"
 ], (App) ->
-	App.controller "MendeleyModalController", ($scope, $modalInstance, $http, $modal, $window, $interval, ide) ->
+	App.controller "ReferencesModalController", ($scope, $modalInstance, $http, $modal, $window, $interval, ide) ->
 		$scope.cancel = () ->
 			$modalInstance.dismiss()
 

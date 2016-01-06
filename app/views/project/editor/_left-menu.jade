@@ -1,11 +1,11 @@
-span(ng-controller="MendeleyController")
+span(ng-controller="ReferencesController")
 	ul.list-unstyled.nav()
 		li
-			a(ng-click="openMendeleyModal()")
+			a(ng-click="openReferencesModal()")
 				i.fa.fa-file-text-o
 				| &nbsp;&nbsp; Mendeley
 				
-script(type="text/ng-template", id="mendeleyModalTemplate")
+script(type="text/ng-template", id="referencesModalTemplate")
 
 	.modal-header
 		button.close(
