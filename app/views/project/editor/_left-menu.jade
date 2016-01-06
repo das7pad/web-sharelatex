@@ -1,9 +1,10 @@
 span(ng-controller="ReferencesController")
 	ul.list-unstyled.nav()
-		li
-			a(ng-click="openReferencesModal()")
-				i.fa.fa-file-text-o
-				| &nbsp;&nbsp; Mendeley
+		each item in ['mendeley','refme','zotero']
+			li
+				a(ng-click="openReferencesModal('#{item}')")
+					i.fa.fa-file-text-o
+					| &nbsp;&nbsp; #{translate(item)}
 				
 script(type="text/ng-template", id="referencesModalTemplate")
 
@@ -13,31 +14,31 @@ script(type="text/ng-template", id="referencesModalTemplate")
 			data-dismiss="modal"
 			ng-click="cancel()"
 		) &times;
-		h3 #{translate("mendeley_integration")}
+		h3 {{provider}} #{translate("reference_integration")}
 	.modal-body
-		.alert.alert-danger(ng-show="status.error") #{translate("mendeley_reindex_error")}
+		.alert.alert-danger(ng-show="status.error") {{provider}} #{translate("reference_reindex_error")}
 	
 		.loading(ng-show="!status.error && status.loading")
 			i.fa.fa-refresh.fa-spin.fa-fw
-			span  #{translate("mendeley_reindexing")}
+			span  #{translate("reference_reindexing")} {{provider}} 
 	
 		.success(ng-show="!status.error && status.reindex")
 			i.fa.fa-check
-			span  #{translate("mendeley_reindex_success")}
+			span  {{provider}} #{translate("reference_reindex_success")}
 	
 		div(ng-if="!status.error && !status.loading")
-			div(ng-if="status.user.features.mendeley")
-				div(ng-if="!status.user.mendeley")
-					p #{translate("link_to_mendeley_description")}
+			div(ng-if="status.user.features[provider]")
+				div(ng-if="!status.user[provider]")
+					p #{translate("link_to_reference_description")} {{provider}} 
 					p
-						a(href,ng-click="linkAccount()").btn.btn-info #{translate("link_to_mendeley")}
+						a(href,ng-click="linkAccount()").btn.btn-info #{translate("link_to_reference")} {{provider}} 
 
-			div(ng-if="!status.user.features.mendeley")
-				p.small #{translate("mendeley_sync_description")}
+			div(ng-if="!status.user.features[provider]")
+				p.small {{provider}} #{translate("reference_sync_description")}
 				.alert.alert-info
-					p #{translate("mendeley_is_premium")}
+					p {{provider}} #{translate("reference_is_premium")}
 					p
-						a.btn.btn-info(ng-click="startFreeTrial('mendeley')") #{translate("start_free_trial")}
+						a.btn.btn-info(ng-click="startFreeTrial(provider)") #{translate("start_free_trial")}
 
 	.modal-footer()
 		button.btn.btn-default(

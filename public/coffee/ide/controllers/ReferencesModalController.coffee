@@ -1,7 +1,9 @@
 define [
 	"base"
 ], (App) ->
-	App.controller "ReferencesModalController", ($scope, $modalInstance, $http, $modal, $window, $interval, ide) ->
+	App.controller "ReferencesModalController", ($scope, $modalInstance, $http, $modal, $window, $interval, ide, provider) ->
+		$scope.provider = provider
+
 		$scope.cancel = () ->
 			$modalInstance.dismiss()
 
@@ -11,7 +13,7 @@ define [
 			$scope.startedFreeTrial = true
 		
 		$scope.linkAccount = () ->
-			authWindow = $window.open("/mendeley/oauth", "mendeley-auth", "width=700,height=500")
+			authWindow = $window.open("/" + provider + "/oauth", "reference-auth", "width=700,height=500")
 			poller = $interval () ->
 				# We can get errors when trying to access the URL before it returns 
 				# to a ShareLaTeX URL (security exceptions)
@@ -34,7 +36,7 @@ define [
 				user: false
 			}
 			
-			$http.get("/mendeley/reindex")
+			$http.get("/" + provider + "/reindex")
 				.success (data) ->
 					$scope.status.reindex = data.reindex
 					$scope.status.user = data.user
