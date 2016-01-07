@@ -6,6 +6,7 @@ mongojs = require "mongojs"
 db = mongojs.connect(settings.mongo.url, ["users"])
 ObjectId = mongojs.ObjectId
 UserUpdater = require("../../../../app/js/Features/User/UserUpdater")
+logger = require("logger-sharelatex")
 
 module.exports = ReferencesApiHandler =
 
@@ -17,7 +18,7 @@ module.exports = ReferencesApiHandler =
 			url: "/user/#{user_id}/#{ref_provider}/oauth"
 			json:true
 		ReferencesApiHandler.make3rdRequest opts, (err, response, body)->
-			console.log body, Object.keys(body)
+			logger.log body:body, statusCode:response.statusCode, "thirdparty return"
 			res.redirect(body.redirect)
 
 	completeAuth: (req, res)->
@@ -66,13 +67,14 @@ module.exports = ReferencesApiHandler =
 			result.user[ref_provider] = user[ref_provider]?
 
 			if !user[ref_provider]
-				console.log userId:user_id, "has no reference info on user " + ref_provider
+				logger.err user_id:user_id, "has no reference info on user #{ref_provider}"
 				res.json result
 			else
 				ReferencesApiHandler.makeRefRequest opts, (err, response, body)->
-					console.log body, 'log body', response.statusCode
+
+					logger.log body:body, statusCode:response.statusCode, "reference api return"
 					if err? || response.statusCode == 500
-						console.log err:err, 'error reindexing reference ' + ref_provider
+						logger.err err:err, "error reindexing reference #{ref_provider}"
 						res.sendStatus 500
 					else
 						result.reindex = true
@@ -86,7 +88,7 @@ module.exports = ReferencesApiHandler =
 		update = 
 			$unset: ref
 
-		console.log "unlink", req.session?.user?._id, update
+		logger.log user_id:req.session?.user?._id, update:update, "reference unlink"
 		UserUpdater.updateUser req.session?.user?._id, update, (err)->
 			if err?
 				logger.err err:err, result:result, "error unlinking reference info on user " + ref_provider
