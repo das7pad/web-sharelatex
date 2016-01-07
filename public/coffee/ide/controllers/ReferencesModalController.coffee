@@ -13,7 +13,7 @@ define [
 			$scope.startedFreeTrial = true
 		
 		$scope.linkAccount = () ->
-			authWindow = $window.open("/" + provider + "/oauth", "reference-auth", "width=700,height=500")
+			authWindow = $window.open("/#{provider}/oauth", "reference-auth", "width=700,height=500")
 			poller = $interval () ->
 				# We can get errors when trying to access the URL before it returns 
 				# to a ShareLaTeX URL (security exceptions)
@@ -36,7 +36,7 @@ define [
 				user: false
 			}
 			
-			$http.get("/" + provider + "/reindex")
+			$http.get("/#{provider}/reindex/project_id/#{ide.project_id}")
 				.success (data) ->
 					$scope.status.reindex = data.reindex
 					$scope.status.user = data.user

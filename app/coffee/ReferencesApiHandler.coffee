@@ -1,6 +1,7 @@
 settings = require("settings-sharelatex")
 request = require("request")
-referencesUrl = settings.apis.references?.url || "http://localhost:3023"
+thirdpartyUrl = settings.apis.thirdpartyreferences?.url || "http://localhost:3023"
+referencesUrl = settings.apis.references?.url || "http://localhost:3040"
 mongojs = require "mongojs"
 db = mongojs.connect(settings.mongo.url, ["users"])
 ObjectId = mongojs.ObjectId
@@ -15,7 +16,7 @@ module.exports = ReferencesApiHandler =
 			method:"get"
 			url: "/user/#{user_id}/#{ref_provider}/oauth"
 			json:true
-		ReferencesApiHandler.makeRequest opts, (err, response, body)->
+		ReferencesApiHandler.make3rdRequest opts, (err, response, body)->
 			console.log body, Object.keys(body)
 			res.redirect(body.redirect)
 
@@ -26,21 +27,26 @@ module.exports = ReferencesApiHandler =
 			method:"get"
 			url: "/user/#{user_id}/#{ref_provider}/tokenexchange"
 			qs:req.query
-		ReferencesApiHandler.makeRequest opts, (err, response, body)->
+		ReferencesApiHandler.make3rdRequest opts, (err, response, body)->
 			res.redirect "/user/settings"
 
-	makeRequest: (opts, callback)->
+	make3rdRequest: (opts, callback)->
+		opts.url = "#{thirdpartyUrl}#{opts.url}"
+		request opts, callback
+
+	makeRefRequest: (opts, callback)->
 		opts.url = "#{referencesUrl}#{opts.url}"
 		request opts, callback
 
 	reindex: (req, res)->
 		user_id = req.session?.user?._id
+		project_id = req.params.project_id
 		ref_provider = req.params.ref_provider
 		opts =
 			method:"post"
-			url:"/user/#{user_id}"
+			url:"/project/#{project_id}"
 			json:
-				referencesUrl: "#{referencesUrl}/user/#{user_id}/#{ref_provider}/bibtex"
+				referencesUrl: "#{thirdpartyUrl}/user/#{user_id}/#{ref_provider}/bibtex"
 
 
 		result = 
@@ -60,15 +66,15 @@ module.exports = ReferencesApiHandler =
 			result.user[ref_provider] = user[ref_provider]?
 
 			if !user[ref_provider]
-				console.log userId:user_id, "has no reference info on user" + ref_provider
+				console.log userId:user_id, "has no reference info on user " + ref_provider
 				res.json result
 			else
-				ReferencesApiHandler.makeRequest opts, (err, response, body)->
-					if err?
-						console.log err:err, 'error reindexing reference' + ref_provider
-						res.send 500
+				ReferencesApiHandler.makeRefRequest opts, (err, response, body)->
+					console.log body, 'log body', response.statusCode
+					if err? || response.statusCode == 500
+						console.log err:err, 'error reindexing reference ' + ref_provider
+						res.sendStatus 500
 					else
-						console.log body, 'log body'
 						result.reindex = true
 						res.json result
 
@@ -83,5 +89,5 @@ module.exports = ReferencesApiHandler =
 		console.log "unlink", req.session?.user?._id, update
 		UserUpdater.updateUser req.session?.user?._id, update, (err)->
 			if err?
-				logger.err err:err, result:result, "error unlinking reference info on user" + ref_provider
+				logger.err err:err, result:result, "error unlinking reference info on user " + ref_provider
 			res.redirect "/user/settings"
