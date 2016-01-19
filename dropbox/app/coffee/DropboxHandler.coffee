@@ -46,7 +46,8 @@ module.exports =
 				success = body.success
 				logger.log user_id:user_id, success:body.success, "completing dropbox register"
 				if success
-					@flushUsersProjectToDropbox user_id
+					@flushUsersProjectToDropbox user_id, (err)->
+						logger.err err:err, "error flushing all users projects to dropbox"
 				callback err, body.success
 
 
@@ -67,7 +68,10 @@ module.exports =
 			logger.log projectIds:projectIds, user_id:user_id, "flushing all a users projects to tpds"
 			jobs = projectIds.map (project_id)->
 				return (cb)->
-					projectEntityHandler.flushProjectToThirdPartyDataStore project_id, cb
+					projectEntityHandler.flushProjectToThirdPartyDataStore project_id, (err)->
+						if err?
+							logger.err err:err, project_id:project_id, user_id:user_id, "error flushing project to dropbox for first time"
+						cb() #process all projects even if 1 of them errored
 			async.series jobs, callback
 
 safelyGetResponse = (err, res, body, callback)->
