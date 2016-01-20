@@ -21,6 +21,9 @@ describe 'ReferencesApiHandler', ->
 				ObjectId: ObjectId
 			'../../../../app/js/Features/User/UserUpdater': @UserUpdater =
 				updateUser: sinon.stub().callsArgWith(2, null)
+			'logger-sharelatex': @logger =
+				log:->
+				err:->
 
 		@user_id = ObjectId().toString()
 
@@ -33,12 +36,12 @@ describe 'ReferencesApiHandler', ->
 		@res =
 			redirect: sinon.stub()
 			json: sinon.stub()
-			send: sinon.stub()
+			sendStatus: sinon.stub()
 
 	describe "startAuth", ->
 		beforeEach ->
 			@redirect = "http://localhost/tokenexchange"
-			@ReferencesApiHandler.makeRequest = sinon.stub().callsArgWith(1, true, {}, {redirect: @redirect} )
+			@ReferencesApiHandler.make3rdRequest = sinon.stub().callsArgWith(1, null, {}, {redirect: @redirect} )
 			@ReferencesApiHandler.startAuth @req, @res
 
 		it "should redirect to the complete auth url", ->
@@ -46,18 +49,18 @@ describe 'ReferencesApiHandler', ->
 
 	describe "completeAuth", ->
 		beforeEach ->
-			@ReferencesApiHandler.makeRequest = sinon.stub().callsArgWith(1, true, {}, {} )
+			@ReferencesApiHandler.make3rdRequest = sinon.stub().callsArgWith(1, true, {}, {} )
 			@ReferencesApiHandler.completeAuth @req, @res
 
 		it "should redirect to user settings page", ->
 			@res.redirect.calledWith("/user/settings").should.equal true
 
-	describe "makeRequest", ->
+	describe "makeRefRequest", ->
 
 		it "should call request with right params", ->
 			@opts = 
 				url: "/someUrl"
-			@ReferencesApiHandler.makeRequest @opts
+			@ReferencesApiHandler.makeRefRequest @opts
 			@opts.url = "#{@settings.apis.references.url}#{@opts.url}"
 			@request.calledWith(@opts).should.equal true
 
@@ -71,14 +74,14 @@ describe 'ReferencesApiHandler', ->
 					refProvider: true
 				reindex: true
 
-			@ReferencesApiHandler.makeRequest = sinon.stub().callsArgWith(1, null, {}, {})
+			@ReferencesApiHandler.makeRefRequest = sinon.stub().callsArgWith(1, null, {}, {})
 			@ReferencesApiHandler.reindex @req, @res, @next
 			@res.json.calledWith(@result).should.equal true
 
 		it "should return an error", ->
-			@ReferencesApiHandler.makeRequest = sinon.stub().callsArgWith(1, true, {}, {})
+			@ReferencesApiHandler.makeRefRequest = sinon.stub().callsArgWith(1, true, {}, {})
 			@ReferencesApiHandler.reindex @req, @res, @next
-			@res.send.calledWith(500).should.equal true
+			@res.sendStatus.calledWith(500).should.equal true
 
 	describe "unlink", ->
 		beforeEach ->
