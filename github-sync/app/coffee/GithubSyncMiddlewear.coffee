@@ -3,6 +3,8 @@ logger = require "logger-sharelatex"
 
 module.exports = GithubSyncMiddlewear =
 	injectUserSettings: (req, res, next) ->
+		if !req.session.user?
+			return next()
 		user_id = req.session.user._id
 		GithubSyncApiHandler.getUserStatus user_id, (error, status) ->
 			logger.log status: status, enabled: status?.enabled, "got github status"
