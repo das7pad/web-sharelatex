@@ -3,6 +3,8 @@ logger = require "logger-sharelatex"
 
 module.exports = DropboxMiddlewear =
 	injectUserSettings: (req, res, next) ->
+		if !req.session.user?
+			return next()
 		user_id = req.session.user._id
 		DropboxHandler.getUserRegistrationStatus user_id, (error, status) ->
 			logger.log status: status, "got dropbox status"
