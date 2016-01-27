@@ -64,6 +64,7 @@ module.exports =
 			projectList = projectList.concat(projects)
 			projectList = projectList.concat(collabertions)
 			projectList = projectList.concat(readOnlyProjects)
+			projectList = _.filter projectList, (project)-> project.archived != true
 			projectIds = _.pluck(projectList, "_id")
 			logger.log projectIds:projectIds, user_id:user_id, "flushing all a users projects to tpds"
 			jobs = projectIds.map (project_id)->

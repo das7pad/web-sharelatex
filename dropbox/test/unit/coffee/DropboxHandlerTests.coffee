@@ -71,13 +71,21 @@ describe 'DropboxHandler', ->
 
 	it 'should tell the project entity handler to flush project to tpds', (done)->
 		user_id = "123u9oijllkj"
-		projectList = [{_id:"123lk"}, {_id:"12ji3ojio"}, {_id:"2jiojdoi"}]
-		collabProjectList = [{_id:"213ds"}]
+		projectList = [{_id:"123lk"}, {_id:"12ji3ojio"}, {_id:"12ji3oddsadasjio", archived:true}, {_id:"2jiojdoi"}, {_id:"not this one", archived:true}, {_id:"2jiojdsasdoi"}]
+		collabProjectList = [{_id:"213ds"}, {_id:"12ji3oddsadasjio", archived:true}, {_id:"213dsdsad", archived:false}]
 		@projectModel.findAllUsersProjects.callsArgWith(2, null, projectList, collabProjectList)
 		@handler.flushUsersProjectToDropbox user_id, =>
 			@projectEntityHandler.flushProjectToThirdPartyDataStore.calledWith(projectList[0]._id).should.equal true
 			@projectEntityHandler.flushProjectToThirdPartyDataStore.calledWith(projectList[1]._id).should.equal true
-			@projectEntityHandler.flushProjectToThirdPartyDataStore.calledWith(projectList[2]._id).should.equal true
+			@projectEntityHandler.flushProjectToThirdPartyDataStore.calledWith(projectList[3]._id).should.equal true
+			@projectEntityHandler.flushProjectToThirdPartyDataStore.calledWith(projectList[5]._id).should.equal true
+
+			@projectEntityHandler.flushProjectToThirdPartyDataStore.calledWith(projectList[2]._id).should.equal false
+			@projectEntityHandler.flushProjectToThirdPartyDataStore.calledWith(projectList[4]._id).should.equal false
+
 			@projectEntityHandler.flushProjectToThirdPartyDataStore.calledWith(collabProjectList[0]._id).should.equal true
+			@projectEntityHandler.flushProjectToThirdPartyDataStore.calledWith(collabProjectList[1]._id).should.equal false
+			@projectEntityHandler.flushProjectToThirdPartyDataStore.calledWith(collabProjectList[2]._id).should.equal true
+
 			done()
 
