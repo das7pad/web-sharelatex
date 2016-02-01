@@ -29,7 +29,7 @@ script(type="text/ng-template", id="dropboxModalTemplate")
 			div(ng-show="dbState.hasDropboxFeature && dbState.userIsLinkedToDropbox")
 				p.small
 					| #{translate("this_project_will_appear_in_your_dropbox_folder_at")}
-					strong Dropbox/sharelatex/{{ project.name }}
+					strong apps/sharelatex/{{ project.name }}
 			div.text-center(ng-hide="dbState.hasDropboxFeature")
 				p #{translate("upgrade_to_get_feature", {feature:"Dropbox Sync"})}
 
