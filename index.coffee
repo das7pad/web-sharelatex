@@ -1,7 +1,8 @@
 logger = require 'logger-sharelatex'
+ReferencesSearchRouter = require './app/js/ReferencesSearchRouter'
 
 module.exports = ReferencesSearch =
-	router: null
+	router: ReferencesSearchRouter
 
 	viewIncludes: {}
 
