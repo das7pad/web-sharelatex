@@ -1,7 +1,7 @@
 define [
 	"base"
 ], (App) ->
-	App.controller "ReferencesSearchModalController", ($scope, $modalInstance, $http, $modal, $window, $interval, ide, provider) ->
-		$scope.provider = provider
+	App.controller "ReferencesSearchModalController", ($scope, $modalInstance, $http, $window, $interval, ide) ->
 
-		console.log ">> init ReferencseSearchModalController"
+		$scope.cancel = () ->
+			$modalInstance.dismiss('cancel')

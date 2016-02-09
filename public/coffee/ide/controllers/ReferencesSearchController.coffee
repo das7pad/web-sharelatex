@@ -3,20 +3,26 @@ define [
 ], (App) ->
 
 	App.controller "ReferencesSearchController", ($scope, $modal, ide) ->
+
+		$scope.searchEnabled = () ->
+			ide?.$scope?.project?.features?.references == true
+
 		console.log ">> init ReferencesSearchController"
 
-		$scope.referencesSearchEnabled = ide?.$scope?.project?.features?.references == true
+		window._xx = () ->
+			$scope.openReferencesSearchModal()
 
-		$scope.openReferencesSearchModal = (providerStr) ->
-			if $scope.referencesSearchEnabled
+		$scope.openReferencesSearchModal = () ->
+			if $scope.searchEnabled()
+				console.log ">> opening modal"
 				$modal.open {
 					templateUrl: "referencesSearchModalTemplate"
 					controller: "ReferencesSearchModalController"
 					scope: $scope
-					resolve:
-						provider: () -> providerStr
 				}
+			else
+				console.log ">> nope"
 
 		ide.referencesSearchManager = {
-			openReferencesModal: (providerStr) -> $scope.openReferencesModal(providerStr)
+			openReferencesModal: (providerStr) -> $scope.openReferencesSearchModal(providerStr)
 		}
