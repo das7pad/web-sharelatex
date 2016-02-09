@@ -12,6 +12,10 @@ script(type="text/ng-template", id="referencesSearchModalTemplate")
 		| test
 	
 	.modal-footer()
+		button.btn.btn-primary(
+			ng-click="accept()"
+		)
+			span #{translate("ok")}
 		button.btn.btn-default(
 			ng-click="cancel()",
 		)
