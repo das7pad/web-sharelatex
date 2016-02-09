@@ -1,9 +1,10 @@
-logger = require 'logger-sharelatex'
+logger = require('logger-sharelatex')
 ReferencesSearchRouter = require './app/js/ReferencesSearchRouter'
 
 module.exports = ReferencesSearch =
 	router: ReferencesSearchRouter
 
-	viewIncludes: {}
+	viewIncludes:
+		"editorLeftMenu:actions": "project/editor/_left-menu"
 
 	init: () ->
