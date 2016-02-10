@@ -11,6 +11,7 @@ module.exports = ReferencesSearchHandler =
 		logger.log {projectId, query}, "sending search request to references search backend"
 		request.get {
 			url: "#{settings.apis.references.url}/project/#{projectId}/search?q=#{query}"
+			json: true
 		}, (err, res, data) ->
 			if err
 				logger.err {err, projectId}, "error communicating with references api"

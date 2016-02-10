@@ -3,24 +3,25 @@ define [
 ], (App) ->
 	App.controller "ReferencesSearchModalController", ($scope, $modalInstance, $http, $window, $interval, ide) ->
 
-		$scope.queryText = ""
-		$scope.searchResults = []
-		$scope.selected = null
-		$scope.currentlySearching = false
+		$scope.state =
+			queryText: ""
+			searchResults: null
+			selected: null
+			currentlySearching: false
 
 		$scope.doSearch = () ->
 			console.log ">> doing search"
 			opts =
-				query: $scope.queryText
+				query: $scope.state.queryText
 				_csrf: window.csrfToken
 			$.post(
 				"/project/#{$scope.project_id}/references/search",
 				opts,
-				(data) =>
-					console.log ">> got search results", data
-					@_storeReferencesKeys(data)
+				(data) ->
+					console.log data
+					$scope.state.searchResults = data.hits
+					$scope.$digest()
 			)
-
 
 		$scope.selectItem = () ->
 

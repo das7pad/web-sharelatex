@@ -13,7 +13,7 @@ script(type="text/ng-template", id="referencesSearchModalTemplate")
 			.col-md-12
 				form(navalidate, name="referencesSearchForm").form-inline.search-form
 						input.form-control.text-monospace(
-							ng-model="queryText",
+							ng-model="state.queryText",
 							placeholder="Search references...",
 							on-enter="doSearch()",
 							focus-on="open",
@@ -24,9 +24,11 @@ script(type="text/ng-template", id="referencesSearchModalTemplate")
 							ng-disabled="currentlySearching"
 						).btn.btn-primary.search-button.pull-right
 							| Search
-		div(ng-if="searchResults").row.search-results
+		div(ng-show="state.searchResults").row.search-results
 			.col-md-12
-				| results go here
+				div(ng-repeat="hit in state.searchResults")
+					| {{hit.Fields.title}}
+
 	
 	.modal-footer()
 		button.btn.btn-primary(
