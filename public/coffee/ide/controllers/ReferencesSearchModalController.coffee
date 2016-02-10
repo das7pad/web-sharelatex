@@ -10,6 +10,17 @@ define [
 
 		$scope.doSearch = () ->
 			console.log ">> doing search"
+			opts =
+				query: $scope.queryText
+				_csrf: window.csrfToken
+			$.post(
+				"/project/#{$scope.project_id}/references/search",
+				opts,
+				(data) =>
+					console.log ">> got search results", data
+					@_storeReferencesKeys(data)
+			)
+
 
 		$scope.selectItem = () ->
 

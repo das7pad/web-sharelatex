@@ -4,8 +4,8 @@ ReferencesSearchHandler = require('./ReferencesSearchHandler')
 
 module.exports = ReferencesSearchController =
 
-	_shouldDoSearh: (userId, callback=(err, should)->) ->
-		UserGetter.getUser req.session.user._id, (err, user) ->
+	_shouldDoSearch: (userId, callback=(err, should)->) ->
+		UserGetter.getUser userId, (err, user) ->
 			callback(err, user?.features?.references? == true)
 
 	search: (req, res) ->
