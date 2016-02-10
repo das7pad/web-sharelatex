@@ -26,8 +26,18 @@ script(type="text/ng-template", id="referencesSearchModalTemplate")
 							| Search
 		div(ng-show="state.searchResults").row.search-results
 			.col-md-12
-				div(ng-repeat="hit in state.searchResults").hit
-					| {{hit.Fields.title}}
+				div(ng-repeat="hit in state.searchResults").search-result-hit
+					.row
+						.col-md-12
+							span.hit-title
+								| {{hit.Fields.title}}
+					.row
+						.col-md-12
+							span.hit-author
+								| {{hit.Fields.author}}
+							span.hit-year.small
+								| &nbsp;— {{hit.Fields.year}}
+							
 
 	
 	.modal-footer()

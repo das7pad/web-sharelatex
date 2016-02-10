@@ -67,7 +67,8 @@ define [
 					scope: $scope
 					size: 'lg'
 					animation: false
-					backdrop: false
+					backdrop: true
+					backdropClass: 'references-search-modal-backdrop'
 					keyboard: true
 				}
 				modal.result.then (result) ->
