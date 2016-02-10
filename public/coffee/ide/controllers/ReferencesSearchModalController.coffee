@@ -6,6 +6,7 @@ define [
 		$scope.queryText = ""
 		$scope.searchResults = []
 		$scope.selected = null
+		$scope.currentlySearching = false
 
 		$scope.doSearch = () ->
 			console.log ">> doing search"

@@ -19,6 +19,7 @@ define [
 					templateUrl: "referencesSearchModalTemplate"
 					controller: "ReferencesSearchModalController"
 					scope: $scope
+					size: 'lg'
 				}
 			else
 				console.log ">> nope"
