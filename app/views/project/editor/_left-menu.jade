@@ -11,12 +11,12 @@ script(type="text/ng-template", id="referencesSearchModalTemplate")
 	.modal-body.references-search-modal
 		.row
 			.col-md-12
-				form(navalidate, name="referencesSearchForm").form-inline.search-form
+				form.form-inline.search-form
 						input.form-control.text-monospace(
 							ng-model="state.queryText",
 							placeholder="Search references...",
 							on-enter="doSearch()",
-							focus-on="open",
+							autofocus="autofocus",
 							autocomplete="off"
 						)
 						button(

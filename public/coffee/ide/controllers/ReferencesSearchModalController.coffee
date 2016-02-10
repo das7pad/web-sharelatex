@@ -3,6 +3,8 @@ define [
 ], (App) ->
 	App.controller "ReferencesSearchModalController", ($scope, $modalInstance, $http, $window, $interval, ide) ->
 
+		console.log $modalInstance
+
 		$scope.state =
 			queryText: ""
 			searchResults: null
