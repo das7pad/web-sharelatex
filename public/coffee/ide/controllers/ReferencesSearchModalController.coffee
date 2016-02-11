@@ -42,8 +42,14 @@ define [
 						$scope.state.selectedIndex = null
 
 		$scope.handleInputKeyDown = (e) ->
-			console.log ">> handle"
-			if e.keyCode == 9
+			console.log ">> handle", e
+			if e.keyCode == 40  # down
+				e.preventDefault()
+				$scope.moveSelectionForward()
+			if e.keyCode == 38  # up
+				e.preventDefault()
+				$scope.moveSelectionBackward()
+			if e.keyCode == 9  # tab
 				e.preventDefault()
 				if e.shiftKey
 					$scope.moveSelectionBackward()
@@ -68,10 +74,9 @@ define [
 			)
 			# stop searching state after 30 seconds
 			$timeout(
-				(state) ->
-					state.currentlySearching = false
+				() ->
+					$scope.state.currentlySearching = false
 				, 30000
-				, $scope.state
 			)
 
 		$scope.selectItem = () ->
