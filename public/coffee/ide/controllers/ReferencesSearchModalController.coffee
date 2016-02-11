@@ -1,28 +1,77 @@
 define [
 	"base"
 ], (App) ->
-	App.controller "ReferencesSearchModalController", ($scope, $modalInstance, $http, $window, $interval, ide) ->
+	App.controller "ReferencesSearchModalController", ($scope, $modalInstance, $http, $window, $timeout, ide) ->
 
-		console.log $modalInstance
+		$scope.setup = () ->
+			console.log ">> setup key stuff"
+			domElements = {}
+			domElements.modal = document.querySelector('.references-search-modal')
+			domElements.input = domElements.modal.querySelector('input.query-text')
+			domElements.hiddenInput = domElements.modal.querySelector('input.hidden')
+
+			$scope.domElements = domElements
 
 		$scope.state =
 			queryText: ""
 			searchResults: null
-			selected: null
+			selectedIndex: null
 			currentlySearching: false
+
+		$scope.moveSelectionForward = () ->
+			# if document.activeElement == $scope.domElements.input
+			if $scope.state.selectedIndex == null
+				if $scope.state.searchResults && $scope.state.searchResults.length > 0
+					$scope.state.selectedIndex = 0
+			else
+				if $scope.state.searchResults && $scope.state.searchResults.length > 0
+					$scope.state.selectedIndex++
+					lastIndex = $scope.state.searchResults.length - 1
+					if $scope.state.selectedIndex > lastIndex
+						$scope.state.selectedIndex = lastIndex
+
+		$scope.moveSelectionBackward = () ->
+			# if document.activeElement == $scope.domElements.input
+			if $scope.state.selectedIndex == null
+				# do nothing
+				return
+			else
+				if $scope.state.searchResults && $scope.state.searchResults.length > 0
+					$scope.state.selectedIndex--
+					if $scope.state.selectedIndex < 0
+						$scope.state.selectedIndex = null
+
+		$scope.handleInputKeyDown = (e) ->
+			console.log ">> handle"
+			if e.keyCode == 9
+				e.preventDefault()
+				if e.shiftKey
+					$scope.moveSelectionBackward()
+				else
+					$scope.moveSelectionForward()
 
 		$scope.doSearch = () ->
 			console.log ">> doing search"
 			opts =
 				query: $scope.state.queryText
 				_csrf: window.csrfToken
+			$scope.state.currentlySearching = true
 			$.post(
 				"/project/#{$scope.project_id}/references/search",
 				opts,
 				(data) ->
 					console.log data
 					$scope.state.searchResults = data.hits
+					$scope.state.selectedIndex = null
+					$scope.state.currentlySearching = false
 					$scope.$digest()
+			)
+			# stop searching state after 30 seconds
+			$timeout(
+				(state) ->
+					state.currentlySearching = false
+				, 30000
+				, $scope.state
 			)
 
 		$scope.selectItem = () ->

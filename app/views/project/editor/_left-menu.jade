@@ -11,41 +11,29 @@ script(type="text/ng-template", id="referencesSearchModalTemplate")
 	.modal-body.references-search-modal
 		.row
 			.col-md-12
-				form.form-inline.search-form
-						input.form-control.text-monospace(
+				form.search-form
+						input.form-control.text-monospace.query-text(
 							ng-model="state.queryText",
 							placeholder="Search references...",
 							on-enter="doSearch()",
 							autofocus="autofocus",
-							autocomplete="off"
+							autocomplete="off",
+							ng-keydown="handleInputKeyDown($event)",
+							ng-init="setup()"
 						)
-						button(
-							ng-click="doSearch()"
-							ng-disabled="currentlySearching"
-						).btn.btn-primary.search-button.pull-right
-							| Search
 		div(ng-show="state.searchResults").row.search-results
 			.col-md-12
-				div(ng-repeat="hit in state.searchResults").search-result-hit
+				div(
+					ng-repeat="hit in state.searchResults"
+					ng-class="{'selected-search-result-hit': $index == state.selectedIndex}"
+				).search-result-hit
 					.row
 						.col-md-12
 							span.hit-title
-								| {{hit.Fields.title}}
+								| {{hit.Fields.title}} {{$index}}
 					.row
 						.col-md-12
 							span.hit-author
 								| {{hit.Fields.author}}
 							span.hit-year.small
 								| &nbsp;— {{hit.Fields.year}}
-							
-
-	
-	//- .modal-footer()
-	//- 	button.btn.btn-primary(
-	//- 		ng-click="accept()"
-	//- 	)
-	//- 		span #{translate("ok")}
-	//- 	button.btn.btn-default(
-	//- 		ng-click="cancel()",
-	//- 	)
-	//- 		span #{translate("dismiss")}
