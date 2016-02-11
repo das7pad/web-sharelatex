@@ -10,17 +10,16 @@ script(type="text/ng-template", id="referencesSearchModalTemplate")
 		h3 #{translate("search_references")}
 	.modal-body.references-search-modal
 		.row
-			.col-md-12
-				form.search-form
-						input.form-control.text-monospace.query-text(
-							ng-model="state.queryText",
-							placeholder="Search references...",
-							on-enter="doSearch()",
-							autofocus="autofocus",
-							autocomplete="off",
-							ng-keydown="handleInputKeyDown($event)",
-							ng-init="setup()"
-						)
+			form.col-md-12.search-form
+					input.form-control.text-monospace.query-text(
+						ng-model="state.queryText",
+						placeholder="Search references...",
+						on-enter="doSearch()",
+						autofocus="autofocus",
+						autocomplete="off",
+						ng-keydown="handleInputKeyDown($event)",
+						ng-init="setup()"
+					)
 		div(ng-show="state.searchResults").row.search-results
 			.col-md-12
 				div(
@@ -30,10 +29,10 @@ script(type="text/ng-template", id="referencesSearchModalTemplate")
 					.row
 						.col-md-12
 							span.hit-title
-								| {{hit.Fields.title}} {{$index}}
+								| {{hit.Fields.title}}
 					.row
 						.col-md-12
 							span.hit-author
 								| {{hit.Fields.author}}
-							span.hit-year.small
+							span(ng-if="hit.Fields.year").hit-year.small
 								| &nbsp;— {{hit.Fields.year}}
