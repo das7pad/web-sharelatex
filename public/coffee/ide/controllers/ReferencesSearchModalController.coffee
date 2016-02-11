@@ -42,19 +42,28 @@ define [
 						$scope.state.selectedIndex = null
 
 		$scope.handleInputKeyDown = (e) ->
-			console.log ">> handle", e
 			if e.keyCode == 40  # down
 				e.preventDefault()
 				$scope.moveSelectionForward()
+				return
+
 			if e.keyCode == 38  # up
 				e.preventDefault()
 				$scope.moveSelectionBackward()
+				return
+
 			if e.keyCode == 9  # tab
 				e.preventDefault()
 				if e.shiftKey
 					$scope.moveSelectionBackward()
 				else
 					$scope.moveSelectionForward()
+				return
+
+			if e.keyCode == 13  # enter
+				e.preventDefault()
+				$scope.acceptSelectedSearchResult()
+				return
 
 		$scope.doSearch = () ->
 			console.log ">> doing search"
@@ -81,8 +90,8 @@ define [
 
 		$scope.selectItem = () ->
 
-		$scope.accept = () ->
-			console.log ">> accept search result"
+		$scope.acceptSelectedSearchResult = () ->
+			console.log ">> accept search result #{$scope.state.selectedIndex}"
 
 		$scope.cancel = () ->
 			$modalInstance.dismiss('cancel')
