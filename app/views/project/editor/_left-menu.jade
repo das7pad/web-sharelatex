@@ -30,6 +30,8 @@ script(type="text/ng-template", id="referencesSearchModalTemplate")
 						.col-md-12
 							span.hit-title
 								| {{hit.Fields.title}}
+							span.hit-key.pull-right
+								| {{hit.EntryKey}}
 					.row
 						.col-md-12
 							span.hit-author
