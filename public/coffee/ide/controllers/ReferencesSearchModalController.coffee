@@ -95,7 +95,7 @@ define [
 		$scope.selectItem = () ->
 
 		$scope.acceptSelectedSearchResult = () ->
-			if $scope.state.searchResults && $scope.state.selectedIndex
+			if $scope.state.searchResults && $scope.state.selectedIndex != null
 				result = $scope.state.searchResults[$scope.state.selectedIndex]
 				$modalInstance.close(result.EntryKey)
 

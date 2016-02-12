@@ -57,6 +57,15 @@ define [
 		$scope.$on 'project:joined', () ->
 			$scope.setup()
 
+		$scope.insertKeyAtCursor = (key) ->
+			editor = window.editors[0]
+			if !editor
+				console.error('no editor found at window.editors[0]')
+				return
+			cursorPosition = editor.getCursorPosition()
+			session = editor.getSession()
+			session.insert(cursorPosition, key)
+
 		$scope.openReferencesSearchModal = () ->
 			if $scope.searchEnabled()
 				console.log ">> opening modal"
@@ -70,8 +79,9 @@ define [
 					backdropClass: 'references-search-modal-backdrop'
 					keyboard: true
 				}
-				modal.result.then (result) ->
-					console.log ">> closed modal", result
+				modal.result.then (keyString) ->
+					console.log ">> closed modal", keyString
+					$scope.insertKeyAtCursor(keyString)
 
 		ide.referencesSearchManager = {
 			openReferencesModal: (providerStr) -> $scope.openReferencesSearchModal(providerStr)
