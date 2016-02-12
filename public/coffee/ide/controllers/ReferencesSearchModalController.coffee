@@ -92,7 +92,9 @@ define [
 				, 30000
 			)
 
-		$scope.selectItem = () ->
+		$scope.selectIndex = (index) ->
+			if $scope.state.searchResults
+				$scope.state.selectedIndex = index
 
 		$scope.acceptSelectedSearchResult = () ->
 			if $scope.state.searchResults && $scope.state.selectedIndex != null

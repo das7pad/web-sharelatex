@@ -25,6 +25,9 @@ script(type="text/ng-template", id="referencesSearchModalTemplate")
 				div(
 					ng-repeat="hit in state.searchResults"
 					ng-class="{'selected-search-result-hit': $index == state.selectedIndex}"
+					ng-mouseenter="selectIndex($index)"
+					ng-mouseleave="selectIndex(null)"
+					ng-click="acceptSelectedSearchResult()"
 				).search-result-hit
 					.row
 						.col-md-12
