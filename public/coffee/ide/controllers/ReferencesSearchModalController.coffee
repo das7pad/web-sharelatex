@@ -4,7 +4,6 @@ define [
 	App.controller "ReferencesSearchModalController", ($scope, $modalInstance, $http, $window, $timeout, ide) ->
 
 		$scope.setup = () ->
-			console.log ">> setup key stuff"
 			domElements = {}
 			domElements.modal = document.querySelector('.references-search-modal')
 			domElements.input = domElements.modal.querySelector('input.query-text')
@@ -70,7 +69,6 @@ define [
 				return
 
 		$scope.doSearch = () ->
-			console.log ">> doing search"
 			opts =
 				query: $scope.state.queryText
 				_csrf: window.csrfToken
@@ -79,7 +77,6 @@ define [
 				"/project/#{$scope.project_id}/references/search",
 				opts,
 				(data) ->
-					console.log data
 					$scope.state.searchResults = data.hits
 					$scope.state.selectedIndex = null
 					$scope.state.currentlySearching = false

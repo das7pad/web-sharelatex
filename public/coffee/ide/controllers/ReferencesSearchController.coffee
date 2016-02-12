@@ -42,11 +42,9 @@ define [
 						pos = ed.getCursorPosition()
 						range = new Range(pos.row, 0, pos.row, pos.column)
 						lineUpToCursor = ed.getSession().getTextRange(range)
-						console.log lineUpToCursor
 						commandFragment = getLastCommandFragment(lineUpToCursor)
 						if commandFragment
 							citeMatch = commandFragment.match(/^~?\\(cite[a-z]?){(.*,)?(\w*)/)
-							console.log citeMatch
 							if citeMatch
 								$scope.openReferencesSearchModal()
 					else
@@ -68,7 +66,6 @@ define [
 
 		$scope.openReferencesSearchModal = () ->
 			if $scope.searchEnabled()
-				console.log ">> opening modal"
 				modal = $modal.open {
 					templateUrl: "referencesSearchModalTemplate"
 					controller: "ReferencesSearchModalController"
@@ -80,7 +77,6 @@ define [
 					keyboard: true
 				}
 				modal.result.then (keyString) ->
-					console.log ">> closed modal", keyString
 					$scope.insertKeyAtCursor(keyString)
 
 		ide.referencesSearchManager = {
