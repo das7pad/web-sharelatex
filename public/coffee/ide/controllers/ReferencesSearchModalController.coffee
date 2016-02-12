@@ -3,13 +3,8 @@ define [
 ], (App) ->
 	App.controller "ReferencesSearchModalController", ($scope, $modalInstance, $window, $timeout, ide) ->
 
+		# triggered by ng-init on the input element
 		$scope.setup = () ->
-			domElements = {}
-			domElements.modal = document.querySelector('.references-search-modal')
-			domElements.input = domElements.modal.querySelector('input.query-text')
-			domElements.hiddenInput = domElements.modal.querySelector('input.hidden')
-
-			$scope.domElements = domElements
 
 		$scope.state =
 			queryText: ""
@@ -17,29 +12,6 @@ define [
 			selectedIndex: null
 			currentlySearching: false
 			errorMessage: null
-
-		$scope.moveSelectionForward = () ->
-			# if document.activeElement == $scope.domElements.input
-			if $scope.state.selectedIndex == null
-				if $scope.state.searchResults && $scope.state.searchResults.length > 0
-					$scope.state.selectedIndex = 0
-			else
-				if $scope.state.searchResults && $scope.state.searchResults.length > 0
-					$scope.state.selectedIndex++
-					lastIndex = $scope.state.searchResults.length - 1
-					if $scope.state.selectedIndex > lastIndex
-						$scope.state.selectedIndex = lastIndex
-
-		$scope.moveSelectionBackward = () ->
-			# if document.activeElement == $scope.domElements.input
-			if $scope.state.selectedIndex == null
-				# do nothing
-				return
-			else
-				if $scope.state.searchResults && $scope.state.searchResults.length > 0
-					$scope.state.selectedIndex--
-					if $scope.state.selectedIndex < 0
-						$scope.state.selectedIndex = null
 
 		$scope.handleInputKeyDown = (e) ->
 			if e.keyCode == 40  # down
@@ -68,6 +40,27 @@ define [
 			if e.keyCode in [8, 37, 39]  # backspace, left and right
 				$scope.state.selectedIndex = null
 				return
+
+		$scope.moveSelectionForward = () ->
+			if $scope.state.selectedIndex == null
+				if $scope.state.searchResults && $scope.state.searchResults.length > 0
+					$scope.state.selectedIndex = 0
+			else
+				if $scope.state.searchResults && $scope.state.searchResults.length > 0
+					$scope.state.selectedIndex++
+					lastIndex = $scope.state.searchResults.length - 1
+					if $scope.state.selectedIndex > lastIndex
+						$scope.state.selectedIndex = lastIndex
+
+		$scope.moveSelectionBackward = () ->
+			if $scope.state.selectedIndex == null
+				# do nothing
+				return
+			else
+				if $scope.state.searchResults && $scope.state.searchResults.length > 0
+					$scope.state.selectedIndex--
+					if $scope.state.selectedIndex < 0
+						$scope.state.selectedIndex = null
 
 		$scope.doSearch = () ->
 			opts =
