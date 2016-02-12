@@ -42,7 +42,6 @@ define [
 						$scope.state.selectedIndex = null
 
 		$scope.handleInputKeyDown = (e) ->
-			console.log e
 			if e.keyCode == 40  # down
 				e.preventDefault()
 				$scope.moveSelectionForward()
@@ -66,7 +65,7 @@ define [
 				$scope.acceptSelectedSearchResult()
 				return
 
-			if e.keyCode == 8  # backspace
+			if e.keyCode in [8, 37, 39]  # backspace, left and right
 				$scope.state.selectedIndex = null
 				return
 
