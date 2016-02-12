@@ -20,7 +20,6 @@ define [
 		$scope.setup = () ->
 			if $scope._inited
 				return
-			console.log ">> init ReferencesSearchController"
 			# try to get the 'main' editor and it's `startAutocomplete` (Ctrl-Space)
 			# key-command object
 			editor = window.editors[0]
