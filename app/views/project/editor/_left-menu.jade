@@ -20,8 +20,15 @@ script(type="text/ng-template", id="referencesSearchModalTemplate")
 						ng-keydown="handleInputKeyDown($event)",
 						ng-init="setup()"
 					)
+		div(ng-if="state.errorMessage").row
+			.col-md-12
+				div.alert.alert-danger
+					| {{state.errorMessage}}
 		div(ng-show="state.searchResults").row.search-results
 			.col-md-12
+				div(ng-if="state.searchResults != null && state.searchResults.length == 0").no-results-message
+					div.text-center
+						| No Results
 				div(
 					ng-repeat="hit in state.searchResults"
 					ng-class="{'selected-search-result-hit': $index == state.selectedIndex}"

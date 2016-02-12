@@ -1,7 +1,7 @@
 define [
 	"base"
 ], (App) ->
-	App.controller "ReferencesSearchModalController", ($scope, $modalInstance, $http, $window, $timeout, ide) ->
+	App.controller "ReferencesSearchModalController", ($scope, $modalInstance, $window, $timeout, ide) ->
 
 		$scope.setup = () ->
 			domElements = {}
@@ -16,6 +16,7 @@ define [
 			searchResults: null
 			selectedIndex: null
 			currentlySearching: false
+			errorMessage: null
 
 		$scope.moveSelectionForward = () ->
 			# if document.activeElement == $scope.domElements.input
@@ -73,15 +74,22 @@ define [
 				query: $scope.state.queryText
 				_csrf: window.csrfToken
 			$scope.state.currentlySearching = true
-			$.post(
-				"/project/#{$scope.project_id}/references/search",
-				opts,
-				(data) ->
-					$scope.state.searchResults = data.hits
+			ide.$http.post("/project/#{$scope.project_id}/references/search", {
+				query: $scope.state.queryText
+				_csrf: window.csrfToken
+			}).then(
+				(successResponse) ->
+					$scope.state.searchResults = successResponse.data.hits
 					$scope.state.selectedIndex = null
 					$scope.state.currentlySearching = false
-					$scope.$digest()
+					$scope.state.errorMessage = null
+				(errorResponse) ->
+					console.error ">> error searching references", errorResponse
+					$scope.state.selectedIndex = null
+					$scope.state.currentlySearching = false
+					$scope.state.errorMessage = "something's gone wrong :("
 			)
+
 			# stop searching state after 30 seconds
 			$timeout(
 				() ->
