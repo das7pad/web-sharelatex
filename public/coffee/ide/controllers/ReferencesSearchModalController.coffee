@@ -41,6 +41,19 @@ define [
 				$scope.state.selectedIndex = null
 				return
 
+			if e.keyCode == 16  # shift-key alone
+				return
+
+			# for all other key strokes
+			# do autosearch in next cycle
+			$timeout $scope.handleAutoSearch, 0
+
+		$scope.handleAutoSearch = () ->
+			state = $scope.state
+			if !state.currentlySearching
+				if state.queryText && state.queryText.length >= 3
+					$scope.doSearch()
+
 		$scope.moveSelectionForward = () ->
 			if $scope.state.selectedIndex == null
 				if $scope.state.searchResults && $scope.state.searchResults.length > 0
@@ -63,6 +76,8 @@ define [
 						$scope.state.selectedIndex = null
 
 		$scope.doSearch = () ->
+			if $scope.state.queryText == ''
+				return
 			opts =
 				query: $scope.state.queryText
 				_csrf: window.csrfToken
