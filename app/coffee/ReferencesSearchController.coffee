@@ -27,4 +27,9 @@ module.exports = ReferencesSearchController =
 				if err
 					logger.err {err, projectId, userId}, "error searching for references"
 					return res.send 500
+				# setTimeout(
+				# 	() ->
+				# 		res.json data
+				# 	, 1000
+				# )
 				res.json data

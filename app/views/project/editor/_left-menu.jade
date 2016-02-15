@@ -11,6 +11,7 @@ script(type="text/ng-template", id="referencesSearchModalTemplate")
 	.modal-body.references-search-modal
 		.row
 			form.col-md-12.search-form
+				.form-group.has-feedback
 					input.form-control.text-monospace.query-text(
 						ng-model="state.queryText",
 						placeholder="Search references...",
@@ -19,6 +20,9 @@ script(type="text/ng-template", id="referencesSearchModalTemplate")
 						autocomplete="off",
 						ng-keydown="handleInputKeyDown($event)",
 						ng-init="setup()"
+					)
+					i.form-control-feedback.fa.fa-spinner.fa-spin(
+						ng-if="state.currentlySearching"
 					)
 		div(ng-if="state.errorMessage").row
 			.col-md-12

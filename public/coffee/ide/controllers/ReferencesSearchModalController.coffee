@@ -47,6 +47,7 @@ define [
 			# for all other key strokes
 			# do autosearch in next cycle
 			$timeout $scope.handleAutoSearch, 0
+			return
 
 		$scope.handleAutoSearch = () ->
 			state = $scope.state
