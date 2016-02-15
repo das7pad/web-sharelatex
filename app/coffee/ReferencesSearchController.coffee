@@ -6,7 +6,7 @@ module.exports = ReferencesSearchController =
 
 	_shouldDoSearch: (userId, callback=(err, should)->) ->
 		UserGetter.getUser userId, (err, user) ->
-			callback(err, user?.features?.references? == true)
+			callback(err, user?.features?.references == true)
 
 	search: (req, res) ->
 		projectId = req.params.Project_id
