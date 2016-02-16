@@ -46,10 +46,10 @@ define [
 
 			# for all other key strokes
 			# do autosearch in next cycle
-			$timeout $scope.handleAutoSearch, 0
+			$timeout $scope.doAutoSearch, 0
 			return
 
-		$scope.handleAutoSearch = () ->
+		$scope.doAutoSearch = () ->
 			state = $scope.state
 			if !state.currentlySearching
 				if state.queryText && state.queryText.length >= 3
