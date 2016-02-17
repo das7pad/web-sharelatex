@@ -9,10 +9,11 @@ script(type="text/ng-template", id="referencesSearchModalTemplate")
 		) &times;
 		h3 #{translate("search_references")}
 	.modal-body.references-search-modal
-		div(ng-if="!searchEnabled").references-search-upgrade-prompt
+		div(
+			ng-if="!searchEnabled"
+			style="background-image: url('/img/references-search/search_example.gif');"
+		).references-search-upgrade-prompt
 			div.upgrade-prompt
-				div
-					img(src="/img/references-search/search_example.gif").preview-gif
 				.message.call-to-action
 					| #{translate("upgrade_to_get_feature", {feature:"References Search"})}
 
@@ -62,7 +63,7 @@ script(type="text/ng-template", id="referencesSearchModalTemplate")
 					.form-group.has-feedback
 						input.form-control.text-monospace.query-text(
 							ng-model="state.queryText",
-							placeholder="#{translate('search_references')...",
+							placeholder="#{translate('search_references')}…",
 							on-enter="doSearch()",
 							autofocus="autofocus",
 							autocomplete="off",
