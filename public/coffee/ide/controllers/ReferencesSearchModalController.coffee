@@ -8,7 +8,7 @@ define [
 			searchResults: null
 			selectedIndex: null
 			currentlySearching: false
-			errorMessage: null
+			error: false
 
 		$scope.handleInputKeyDown = (e) ->
 			if e.keyCode == 40  # down
@@ -88,12 +88,12 @@ define [
 					$scope.state.searchResults = successResponse.data.hits
 					$scope.state.selectedIndex = null
 					$scope.state.currentlySearching = false
-					$scope.state.errorMessage = null
+					$scope.state.error = false
 				(errorResponse) ->
 					console.error ">> error searching references", errorResponse
 					$scope.state.selectedIndex = null
 					$scope.state.currentlySearching = false
-					$scope.state.errorMessage = "something's gone wrong :("
+					$scope.state.error = true
 			)
 
 			# stop searching state after 30 seconds

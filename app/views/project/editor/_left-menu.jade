@@ -14,7 +14,7 @@ script(type="text/ng-template", id="referencesSearchModalTemplate")
 				div
 					img(src="/img/references-search/search_example.gif").preview-gif
 				.message
-					| Upgrade to use References Search
+					| #{translate("upgrade_to_get_feature", {feature:"References Search"})}
 	
 				.message(ng-show="project.owner._id == user.id")
 					p(ng-controller="FreeTrialModalController")
@@ -36,7 +36,7 @@ script(type="text/ng-template", id="referencesSearchModalTemplate")
 					.form-group.has-feedback
 						input.form-control.text-monospace.query-text(
 							ng-model="state.queryText",
-							placeholder="Search references...",
+							placeholder="#{translate('search_references')...",
 							on-enter="doSearch()",
 							autofocus="autofocus",
 							autocomplete="off",
@@ -49,12 +49,12 @@ script(type="text/ng-template", id="referencesSearchModalTemplate")
 			div(ng-if="state.errorMessage").row
 				.col-md-12
 					div.alert.alert-danger
-						| {{state.errorMessage}}
+						| #{translate("generic_something_went_wrong")}
 			div(ng-show="state.searchResults").row.search-results
 				.col-md-12
 					div(ng-if="state.searchResults != null && state.searchResults.length == 0").no-results-message
 						div.text-center
-							| No Results
+							| #{translate("no_search_results")}
 					div(
 						ng-repeat="hit in state.searchResults"
 						ng-class="{'selected-search-result-hit': $index == state.selectedIndex}"
