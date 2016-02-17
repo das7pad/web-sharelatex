@@ -3,9 +3,6 @@ define [
 ], (App) ->
 	App.controller "ReferencesSearchModalController", ($scope, $modalInstance, $window, $timeout, ide) ->
 
-		# triggered by ng-init on the input element
-		$scope.setup = () ->
-
 		$scope.state =
 			queryText: ""
 			searchResults: null

@@ -12,6 +12,8 @@ define [
 
 	App.controller "ReferencesSearchController", ($scope, $modal, ide, $timeout) ->
 
+		$scope.searchEnabled = ide?.$scope?.project?.features?.references == true
+
 		$scope.isCursorAtCitation = (editor) ->
 			# FIXME: duped code from AutocompletManager
 			pos = editor.getCursorPosition()
@@ -23,9 +25,6 @@ define [
 				if citeMatch
 					return true
 			return false
-
-		$scope.searchEnabled = () ->
-			ide?.$scope?.project?.features?.references == true
 
 		$scope._hintNode = null
 		$scope._buildHintNode = () ->
@@ -121,6 +120,7 @@ define [
 					else
 						oldExec(ed)
 				startAutocomplete._sl_patched = true
+			$scope._inited = true
 
 		# do setup when project loads
 		$scope.$on 'project:joined', () ->
@@ -136,19 +136,18 @@ define [
 			session.insert(cursorPosition, key)
 
 		$scope.openReferencesSearchModal = () ->
-			if $scope.searchEnabled()
-				modal = $modal.open {
-					templateUrl: "referencesSearchModalTemplate"
-					controller: "ReferencesSearchModalController"
-					scope: $scope
-					size: 'lg'
-					animation: false
-					backdrop: true
-					backdropClass: 'references-search-modal-backdrop'
-					keyboard: true
-				}
-				modal.result.then (keyString) ->
-					$scope.insertKeyAtCursor(keyString)
+			modal = $modal.open {
+				templateUrl: "referencesSearchModalTemplate"
+				controller: "ReferencesSearchModalController"
+				scope: $scope
+				size: 'lg'
+				animation: false
+				backdrop: true
+				backdropClass: 'references-search-modal-backdrop'
+				keyboard: true
+			}
+			modal.result.then (keyString) ->
+				$scope.insertKeyAtCursor(keyString)
 
 		ide.referencesSearchManager = {
 			openReferencesModal: (providerStr) -> $scope.openReferencesSearchModal(providerStr)
