@@ -13,9 +13,35 @@ script(type="text/ng-template", id="referencesSearchModalTemplate")
 			div.upgrade-prompt
 				div
 					img(src="/img/references-search/search_example.gif").preview-gif
-				.message
+				.message.call-to-action
 					| #{translate("upgrade_to_get_feature", {feature:"References Search"})}
-	
+
+				.message
+					ul.list-unstyled
+						li
+							i.fa.fa-check &nbsp;
+							| #{translate("unlimited_projects")}
+
+						li
+							i.fa.fa-check &nbsp;
+							| #{translate("collabs_per_proj", {collabcount:'Multiple'})}
+
+						li
+							i.fa.fa-check &nbsp;
+							| #{translate("full_doc_history")}
+
+						li
+							i.fa.fa-check &nbsp;
+							| #{translate("sync_to_dropbox")}
+
+						li
+							i.fa.fa-check &nbsp;
+							| #{translate("sync_to_github")}
+
+						li
+							i.fa.fa-check &nbsp;
+							|#{translate("compile_larger_projects")}
+
 				.message(ng-show="project.owner._id == user.id")
 					p(ng-controller="FreeTrialModalController")
 						a.btn.btn-success(
