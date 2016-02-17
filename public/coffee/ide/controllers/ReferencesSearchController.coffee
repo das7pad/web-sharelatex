@@ -12,7 +12,7 @@ define [
 
 	App.controller "ReferencesSearchController", ($scope, $modal, ide, $timeout) ->
 
-		$scope.searchEnabled = ide?.$scope?.project?.features?.references == true
+		$scope.searchEnabled = false
 
 		$scope.isCursorAtCitation = (editor) ->
 			# FIXME: duped code from AutocompletManager
@@ -94,6 +94,7 @@ define [
 		# set up key bindings for references search
 		$scope._inited = false
 		$scope.setup = () ->
+			$scope.searchEnabled = ide?.$scope?.project?.features?.references == true
 			if $scope._inited
 				return
 			# try to get the 'main' editor and it's `startAutocomplete` (Ctrl-Space)
