@@ -62,13 +62,30 @@ script(type="text/ng-template", id="referencesSearchModalTemplate")
 					).search-result-hit
 						.row
 							.col-md-12
+								// use either the highlight (if present) or the normal text
 								span.hit-title
-									| {{hit.Fields.title}}
+									span(ng-if="!hit.highlight['Fields.title']")
+										| {{hit._source.Fields.title}}
+									span(
+										ng-if="hit.highlight['Fields.title']"
+										ng-bind-html="hit.highlight['Fields.title'][0]"
+									)
 								span.hit-key.pull-right
-									| {{hit.EntryKey}}
+									| {{hit._source.EntryKey}}
 						.row
 							.col-md-12
 								span.hit-author
-									| {{hit.Fields.author}}
-								span(ng-if="hit.Fields.year").hit-year.small
-									| &nbsp;— {{hit.Fields.year}}
+									span(ng-if="!hit.highlight['Fields.author']")
+										| {{hit._source.Fields.author}}
+									span(
+										ng-if="hit.highlight['Fields.author']"
+										ng-bind-html="hit.highlight['Fields.author'][0]"
+									)
+								span(ng-if="hit._source.Fields.year").hit-year.small
+									| &nbsp;—&nbsp;
+									span(ng-if="!hit.highlight['Fields.year']")
+										| {{hit._source.Fields.year}}
+									span(
+										ng-if="hit.highlight['Fields.year']"
+										ng-bind-html="hit.highlight['Fields.year'][0]"
+									)
