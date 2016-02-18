@@ -36,6 +36,7 @@ describe 'ReferencesSearchController', ->
 			features:
 				references: true
 		@fakeSearchData =
+			projectId: @projectId
 			hits: []
 
 	describe 'search', ->
