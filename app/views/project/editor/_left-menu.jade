@@ -100,7 +100,12 @@ script(type="text/ng-template", id="referencesSearchModalTemplate")
 										ng-bind-html="hit.highlight['Fields.title'][0]"
 									)
 								span.hit-key.pull-right
-									| {{hit._source.EntryKey}}
+									span(ng-if="!hit.highlight['EntryKey']")
+										| {{hit._source.EntryKey}}
+									span(
+										ng-if="hit.highlight['EntryKey']"
+										ng-bind-html="hit.highlight['EntryKey'][0]"
+									)
 						.row
 							.col-md-12
 								span.hit-author
