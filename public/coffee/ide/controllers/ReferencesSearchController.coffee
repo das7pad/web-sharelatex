@@ -107,21 +107,31 @@ define [
 			if !startAutocomplete
 				console.error('could not find startAutocomplete command')
 				return
+
 			# only do this patchery once
 			if !startAutocomplete._sl_patched
-				# wrap the existing `exec` function of the Ctrl-Space key-action,
+				# wrap the existing `exec` function of startAutocomplete,
+				# use it to update the hint node
+				oldExec = startAutocomplete.exec
+				startAutocomplete.exec = (ed, a, b, c, d) ->
+					$timeout((-> $scope.updateHintNode(ed)), 0)
+					oldExec(ed)
+				startAutocomplete._sl_patched = true
+
+				# on Ctrl-space:
 				# if we're already showing the popup for a `\cite{}` block
 				# then show the References Search modal, otherwise do the default behaviour
-				oldExec = startAutocomplete.exec
-				startAutocomplete.exec = (ed) ->
-					$timeout((-> $scope.updateHintNode(ed)), 0)
-					if ed?.completer?.popup?.isOpen == true
-						if $scope.isCursorAtCitation(ed)
+				editor.commands.addCommand({
+					name: "triggerReferencesSearchPopup",
+					exec: (ed) ->
+						$timeout((-> $scope.updateHintNode(ed)), 0)
+						if ed?.completer?.popup?.isOpen == true && $scope.isCursorAtCitation(ed)
 							$scope.openReferencesSearchModal()
-					else
-						oldExec(ed)
-				startAutocomplete._sl_patched = true
-			$scope._inited = true
+						else
+							startAutocomplete.exec(ed)
+					bindKey: "Ctrl-Space"
+				})
+				$scope._inited = true
 
 		# do setup when project loads
 		$scope.$on 'project:joined', () ->
