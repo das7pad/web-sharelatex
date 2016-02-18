@@ -110,7 +110,7 @@ define [
 		$scope.acceptSelectedSearchResult = () ->
 			if $scope.state.searchResults && $scope.state.selectedIndex != null
 				result = $scope.state.searchResults[$scope.state.selectedIndex]
-				$modalInstance.close(result.EntryKey)
+				$modalInstance.close(result._source.EntryKey)
 
 		$scope.cancel = () ->
 			$modalInstance.dismiss('cancel')
