@@ -30,7 +30,7 @@ describe 'ReferencesSearchController', ->
 				user:
 					_id: @user_id
 		@res =
-			send: sinon.stub()
+			sendStatus: sinon.stub()
 			json: sinon.stub()
 		@fakeUser =
 			features:
@@ -55,8 +55,8 @@ describe 'ReferencesSearchController', ->
 
 		it 'should not produce an error', (done) ->
 			@call () =>
-				@res.send.callCount.should.equal 0
-				@res.send.calledWith(500).should.equal false
+				@res.sendStatus.callCount.should.equal 0
+				@res.sendStatus.calledWith(500).should.equal false
 				done()
 
 		it 'should produce search data', (done) ->
@@ -83,8 +83,8 @@ describe 'ReferencesSearchController', ->
 
 			it 'should send a 500 response', (done) ->
 				@call () =>
-					@res.send.callCount.should.equal 1
-					@res.send.calledWith(500).should.equal true
+					@res.sendStatus.callCount.should.equal 1
+					@res.sendStatus.calledWith(500).should.equal true
 					done()
 
 			it 'should not call handler.search', (done) ->
@@ -99,8 +99,8 @@ describe 'ReferencesSearchController', ->
 
 			it 'should send a 500 response', (done) ->
 				@call () =>
-					@res.send.callCount.should.equal 1
-					@res.send.calledWith(500).should.equal true
+					@res.sendStatus.callCount.should.equal 1
+					@res.sendStatus.calledWith(500).should.equal true
 					done()
 
 			it 'should not call handler.search', (done) ->
@@ -117,6 +117,6 @@ describe 'ReferencesSearchController', ->
 
 			it 'should send a 500 response', (done) ->
 				@call () =>
-					@res.send.callCount.should.equal 1
-					@res.send.calledWith(500).should.equal true
+					@res.sendStatus.callCount.should.equal 1
+					@res.sendStatus.calledWith(500).should.equal true
 					done()
