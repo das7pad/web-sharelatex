@@ -142,9 +142,24 @@ define [
 			if !editor
 				console.error('no editor found at window.editors[0]')
 				return
-			cursorPosition = editor.getCursorPosition()
+			pos = editor.getCursorPosition()
 			session = editor.getSession()
-			session.insert(cursorPosition, key)
+			# check if the user has partially typed a key already,
+			# example: `\cite{one:1,tw|}`
+			# in this case we need to delete back to the ',' and then insert the new key
+			lineUpToCursor = editor.getSession().getTextRange(new Range(pos.row, 0, pos.row, pos.column))
+			lastSeparatorPosition = Math.max(
+				lineUpToCursor.lastIndexOf('{'),
+				lineUpToCursor.lastIndexOf(',')
+			)
+			if lastSeparatorPosition < (pos.column - 1)
+				# delete back to the last separator, then insert new key
+				session.remove(new Range(pos.row, lastSeparatorPosition + 1, pos.row, pos.column))
+				pos = editor.getCursorPosition()
+				session.insert(pos, key)
+			else
+				# just insert the new key
+				session.insert(pos, key)
 
 		$scope.openReferencesSearchModal = () ->
 			modal = $modal.open {

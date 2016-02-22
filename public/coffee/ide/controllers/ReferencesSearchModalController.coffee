@@ -34,8 +34,13 @@ define [
 				$scope.acceptSelectedSearchResult()
 				return
 
-			if e.keyCode in [8, 37, 39]  # backspace, left and right
+			if e.keyCode in [37, 39]  # left and right
 				$scope.state.selectedIndex = null
+				return
+
+			if e.keyCode in [8]  # backspace
+				$scope.state.selectedIndex = null
+				$timeout $scope.doAutoSearch, 0
 				return
 
 			if e.keyCode == 16  # shift-key alone
