@@ -56,9 +56,8 @@ define [
 
 		$scope.doAutoSearch = () ->
 			state = $scope.state
-			if !state.currentlySearching
-				if state.queryText && state.queryText.length >= 3
-					$scope.doSearch()
+			if state.queryText && state.queryText.length >= 3
+				$scope.doSearch()
 
 		$scope.moveSelectionForward = () ->
 			if $scope.state.selectedIndex == null
