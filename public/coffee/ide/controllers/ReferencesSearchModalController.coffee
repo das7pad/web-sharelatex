@@ -3,6 +3,9 @@ define [
 ], (App) ->
 	App.controller "ReferencesSearchModalController", ($scope, $modalInstance, $window, $timeout, ide) ->
 
+		if !window._BIB_SEARCH_ENABLED
+			return
+
 		$scope.state =
 			queryText: ""
 			searchResults: null

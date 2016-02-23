@@ -12,6 +12,9 @@ define [
 
 	App.controller "ReferencesSearchController", ($scope, $modal, ide, $timeout) ->
 
+		if !window._BIB_SEARCH_ENABLED
+			return
+
 		$scope.searchEnabled = false
 
 		$scope.isCursorAtCitation = (editor) ->
