@@ -46,7 +46,8 @@ define [
 				$timeout $scope.doAutoSearch, 0
 				return
 
-			if e.keyCode == 16  # shift-key alone
+			# ignore shift-key alone and keypresses with alt/cmd/ctrl
+			if e.keyCode == 16 || e.altKey || e.ctrlKey || e.metaKey
 				return
 
 			# for all other key strokes
