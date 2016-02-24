@@ -3,7 +3,7 @@ define [
 ], (App) ->
 	App.controller "ReferencesSearchModalController", ($scope, $modalInstance, $window, $timeout, ide) ->
 
-		if !window._BIB_SEARCH_ENABLED
+		if !($scope.searchFeatureEnabled())
 			return
 
 		$scope.state =
