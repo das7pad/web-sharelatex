@@ -58,20 +58,17 @@ define [
 		# and make it visible if the cursor is currently
 		# in a `cite` block.
 		$scope.updateHintNode = (editor) ->
-			# console.log ">> update hint"
 			if editor?.completer?.popup?.isOpen == true
 				if !$scope._hintNode
 					if $scope.isCursorAtCitation(editor)
 						# we need to create the hint dom-node and
 						# attach it to the popup
-						# console.log ">> create node"
 						newNode = $scope._buildHintNode()
 						container = editor?.completer?.popup?.renderer?.container
 						if !container
 							console.err("Error attaching search hint: could not find popup container")
 							return
 						container.style.overflow = 'visible'
-						# console.log ">> attach new node"
 						$(container).append(newNode)
 						$scope._hintNode = newNode
 						# hook into the `hide` method on the popup,
