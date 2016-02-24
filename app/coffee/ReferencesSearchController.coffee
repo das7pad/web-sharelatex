@@ -15,7 +15,7 @@ module.exports = ReferencesSearchController =
 		if !query
 			logger.err {projectId, userId}, "error: no query supplied for references search"
 			return res.sendStatus 400
-		logger.log {projectId, userId}, "search for references"
+		logger.log {projectId, userId, query}, "search for references"
 		ReferencesSearchController._shouldDoSearch userId, (err, shouldDoSearch) ->
 			if err
 				logger.err {err, projectId, userId}, "error checking if search should proceed"
