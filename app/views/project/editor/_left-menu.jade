@@ -115,6 +115,14 @@ script(type="text/ng-template", id="referencesSearchModalTemplate")
 										ng-if="hit.highlight['Fields.author']"
 										ng-bind-html="hit.highlight['Fields.author'][0]"
 									)
+								span(ng-if="hit._source.Fields.journal").hit-journal.small
+									| &nbsp;—&nbsp;
+									span(ng-if="!hit.highlight['Fields.journal']")
+										| {{hit._source.Fields.journal}}
+									span(
+										ng-if="hit.highlight['Fields.journal']"
+										ng-bind-html="hit.highlight['Fields.journal'][0]"
+									)
 								span(ng-if="hit._source.Fields.year").hit-year.small
 									| &nbsp;—&nbsp;
 									span(ng-if="!hit.highlight['Fields.year']")
