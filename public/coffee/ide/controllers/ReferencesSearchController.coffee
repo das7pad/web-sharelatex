@@ -44,10 +44,12 @@ define [
 			node.appendChild(inner)
 
 			node.style.position = 'absolute'
-			node.style.bottom = '-26px'
+			node.style.bottom = '-22px'
+			node.style.left = '-1px'
 			node.style.right = '0px'
+			node.style.textAlign = 'center'
 			node.style.padding = '2px'
-			node.style.background = 'white'
+			node.style.background = 'rgb(218,226,250)'
 			node.style.border = '1px solid #ddd'
 			node.style.visibility = 'visible'
 			node.style.boxShadow = '2px 3px 5px rgba(0,0,0,.2)'
