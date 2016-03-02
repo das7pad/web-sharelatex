@@ -39,6 +39,7 @@ define [
 			# create a new div
 			inner = document.createElement('span')
 			inner.innerText = 'Press CTRL-Space to Search'
+			inner.style.color = 'black'
 			node = document.createElement('div')
 			node.classList.add("sl_references_search_hint")
 			node.appendChild(inner)
@@ -49,8 +50,8 @@ define [
 			node.style.right = '0px'
 			node.style.textAlign = 'center'
 			node.style.padding = '2px'
-			node.style.background = 'rgb(218,226,250)'
-			node.style.border = '1px solid #ddd'
+			node.style.background = 'rgb(202, 214, 250)'
+			node.style.border = '1px solid lightgray'
 			node.style.visibility = 'visible'
 			node.style.boxShadow = '2px 3px 5px rgba(0,0,0,.2)'
 
