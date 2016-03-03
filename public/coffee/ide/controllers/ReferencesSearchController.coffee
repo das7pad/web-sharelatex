@@ -36,26 +36,15 @@ define [
 
 		$scope._hintNode = null
 		$scope._buildHintNode = () ->
-			# create a new div
-			inner = document.createElement('span')
-			inner.innerText = 'Press CTRL-Space to Search'
-			inner.style.color = 'black'
-			node = document.createElement('div')
-			node.classList.add("sl_references_search_hint")
-			node.appendChild(inner)
-
-			node.style.position = 'absolute'
-			node.style.bottom = '-22px'
-			node.style.left = '-1px'
-			node.style.right = '0px'
-			node.style.textAlign = 'center'
-			node.style.padding = '2px'
-			node.style.background = 'rgb(202, 214, 250)'
-			node.style.border = '1px solid lightgray'
-			node.style.visibility = 'visible'
-			node.style.boxShadow = '2px 3px 5px rgba(0,0,0,.2)'
-
-			return node
+			# pluck the hidden node out of the dom,
+			# make it visible then hand it over to the caller
+			hintNode = $('.sl_references_search_hint')[0]
+			if !hintNode
+				console.error("Error: could not find .sl_references_search_hint node in dom")
+				return
+			hintNode.style.display = 'block'
+			hintNode.style.visibility = 'visible'
+			return hintNode
 
 		# set up the search hint text on the popup,
 		# and make it visible if the cursor is currently
@@ -69,7 +58,7 @@ define [
 						newNode = $scope._buildHintNode()
 						container = editor?.completer?.popup?.renderer?.container
 						if !container
-							console.err("Error attaching search hint: could not find popup container")
+							console.error("Error attaching search hint: could not find popup container")
 							return
 						container.style.overflow = 'visible'
 						$(container).append(newNode)

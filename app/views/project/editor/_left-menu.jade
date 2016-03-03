@@ -1,5 +1,11 @@
 span(ng-controller="ReferencesSearchController")
 
+	// the search hint, kept hidden initially,
+	// will be attached to the autocomplete popup and revealed
+	// once autocomplete has been triggered in a `cite` block
+	div(style="display: none; visibility: hidden").sl_references_search_hint
+		span #{translate("references_search_hint")}
+
 script(type="text/ng-template", id="referencesSearchModalTemplate")
 	.modal-header
 		button.close(
