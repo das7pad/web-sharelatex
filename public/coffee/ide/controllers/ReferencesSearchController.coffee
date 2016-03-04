@@ -10,7 +10,7 @@ define [
 		else
 			return null
 
-	App.controller "ReferencesSearchController", ($scope, $modal, ide, $timeout) ->
+	App.controller "ReferencesSearchController", ($scope, $modal, ide, $timeout, sixpack) ->
 
 		$scope.searchFeatureEnabled = () ->
 			return (
@@ -122,7 +122,16 @@ define [
 					name: "triggerReferencesSearchPopup",
 					exec: (ed) ->
 						$timeout((-> $scope.updateHintNode(ed)), 0)
-						if ed?.completer?.popup?.isOpen == true && $scope.isCursorAtCitation(ed)
+						isAtCitation = $scope.isCursorAtCitation(ed)
+						if isAtCitation == true
+							sixpack.participate(
+								'references-search-popup-conversion'
+								, ['alt-one', 'alt-two']
+								, (view, rawResponse) ->  # don't wait for this to come back
+							)
+						if ed?.completer?.popup?.isOpen == true && isAtCitation == true
+							console.log ">> let's convert"
+							sixpack.convert 'references-search-popup-conversion', () ->
 							$scope.openReferencesSearchModal()
 						else
 							startAutocomplete.exec(ed)
