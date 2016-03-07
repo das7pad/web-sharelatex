@@ -126,17 +126,13 @@ define [
 						isAtCitation = $scope.isCursorAtCitation(ed)
 						if isAtCitation == true && !$scope._sixpackParticipating
 							sixpack.participate(
-								'references-search-popup-conversion'
+								'references-search-popup'
 								, ['alt-one', 'alt-two']
-								, (view, rawResponse) ->  # don't wait for this to come back
-									# console.log ">> participate"
-									$scope._sixpackParticipating = true
+								, (view, rawResponse) -> $scope._sixpackParticipating = true
 							)
 						if ed?.completer?.popup?.isOpen == true && isAtCitation == true
 							if $scope._sixpackParticipating
-								sixpack.convert 'references-search-popup-conversion', () ->
-									# console.log ">> convert"
-									$scope._sixpackParticipating = false
+								sixpack.convert 'references-search-popup', () -> $scope._sixpackParticipating = false
 							$scope.openReferencesSearchModal()
 						else
 							startAutocomplete.exec(ed)
