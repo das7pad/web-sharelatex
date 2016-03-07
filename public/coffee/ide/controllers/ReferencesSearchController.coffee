@@ -90,6 +90,7 @@ define [
 
 		# set up key bindings for references search
 		$scope._inited = false
+		$scope._sixpackParticipating = false
 		$scope.setup = () ->
 			$scope.searchEnabled = ide?.$scope?.project?.features?.references == true
 			if $scope._inited
@@ -123,15 +124,19 @@ define [
 					exec: (ed) ->
 						$timeout((-> $scope.updateHintNode(ed)), 0)
 						isAtCitation = $scope.isCursorAtCitation(ed)
-						if isAtCitation == true
+						if isAtCitation == true && !$scope._sixpackParticipating
 							sixpack.participate(
 								'references-search-popup-conversion'
 								, ['alt-one', 'alt-two']
 								, (view, rawResponse) ->  # don't wait for this to come back
+									# console.log ">> participate"
+									$scope._sixpackParticipating = true
 							)
 						if ed?.completer?.popup?.isOpen == true && isAtCitation == true
-							console.log ">> let's convert"
-							sixpack.convert 'references-search-popup-conversion', () ->
+							if $scope._sixpackParticipating
+								sixpack.convert 'references-search-popup-conversion', () ->
+									# console.log ">> convert"
+									$scope._sixpackParticipating = false
 							$scope.openReferencesSearchModal()
 						else
 							startAutocomplete.exec(ed)
