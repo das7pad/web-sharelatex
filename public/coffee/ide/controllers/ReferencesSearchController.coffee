@@ -13,9 +13,10 @@ define [
 	App.controller "ReferencesSearchController", ($scope, $modal, ide, $timeout, sixpack) ->
 
 		$scope.searchFeatureEnabled = () ->
-			return (
-				window._BIB_SEARCH_ENABLED || window?.location?.search in ['?ft=ersreraprf', '?ft=references']
-			)
+			return true
+			# return (
+			# 	window._BIB_SEARCH_ENABLED || window?.location?.search in ['?ft=ersreraprf', '?ft=references']
+			# )
 
 		if !($scope.searchFeatureEnabled())
 			return
