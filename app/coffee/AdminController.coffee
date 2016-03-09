@@ -37,10 +37,11 @@ module.exports = AdminController =
 		sortOrder[sortField] = if reverse then -1 else 1
 		opts = {limit: AdminController.perSearch, skip : skip, sort: sortOrder }
 		logger.log opts:opts, q:q, "user options and query"
-		db.users.find {$or : q}, {first_name:1, email:1, lastLoggedIn:1, loginCount:1}, opts,(err, users)->
+		db.users.find {$or : q}, {first_name:1, email:1, lastLoggedIn:1, loginCount:1}, opts, (err, users)->
 			if err?
 				logger.err err:err, "error getting admin data for users list page"
 				return cb(err)
+			logger.log opts:opts, q:q, users_length:users?.length, "found users for admin search"
 			cb(err, users, users.length)
 				
 	getUserInfo: (req, res, next)->
