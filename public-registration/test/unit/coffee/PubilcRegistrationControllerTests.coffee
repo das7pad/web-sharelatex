@@ -35,6 +35,8 @@ describe "PublicRegistrationController", ->
 			"../../../../app/js/Features/Referal/ReferalAllocator":@ReferalAllocator
 			"../../../../app/js/Features/Subscription/SubscriptionDomainHandler":@SubscriptionDomainHandler
 			"../../../../app/js/Features/Email/EmailHandler": @EmailHandler
+			"../../../../app/js/Features/Email/Layouts/PersonalEmailLayout":{}
+			"../../../../app/js/Features/Email/EmailBuilder": templates:{welcome:{}}
 			"logger-sharelatex": {log:->}
 			"metrics-sharelatex": { inc: () ->}
 
