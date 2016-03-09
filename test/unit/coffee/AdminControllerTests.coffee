@@ -33,6 +33,8 @@ describe "AdminController", ->
 					projects: {}
 					users: {}
 				ObjectId: ObjectId
+			"metrics-sharelatex": 
+				gauge:->
 
 		@user = {user_id:1,first_name:'James'}
 		@users = [{first_name:'James'}, {first_name:'Henry'}]

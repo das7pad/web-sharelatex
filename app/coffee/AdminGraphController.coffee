@@ -1,5 +1,4 @@
 logger = require "logger-sharelatex"
-metrics = require "metrics-sharelatex"
 _ = require "underscore"
 Path = require("path")
 UserGetter = require "../../../../app/js/Features/User/UserGetter"
