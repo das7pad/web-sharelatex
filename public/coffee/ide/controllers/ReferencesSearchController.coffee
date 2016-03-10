@@ -73,6 +73,13 @@ define [
 								$scope._hideHint()
 								oldHide()
 							popup.hide._sl_patched = true
+						# participate in a sixpack A-A experiment
+						if $scope.isCursorAtCitation(editor) == true && !$scope._sixpackParticipating
+							sixpack.participate(
+								'references-search-popup-redux'
+								, ['alt-one', 'alt-two']
+								, (view, rawResponse) -> $scope._sixpackParticipating = true
+							)
 
 			# as a fail-safe, always update visibility if the node exists
 			if $scope._hintNode
@@ -125,15 +132,9 @@ define [
 					exec: (ed) ->
 						$timeout((-> $scope.updateHintNode(ed)), 0)
 						isAtCitation = $scope.isCursorAtCitation(ed)
-						if isAtCitation == true && !$scope._sixpackParticipating
-							sixpack.participate(
-								'references-search-popup'
-								, ['alt-one', 'alt-two']
-								, (view, rawResponse) -> $scope._sixpackParticipating = true
-							)
 						if ed?.completer?.popup?.isOpen == true && isAtCitation == true
 							if $scope._sixpackParticipating
-								sixpack.convert 'references-search-popup', () -> $scope._sixpackParticipating = false
+								sixpack.convert 'references-search-popup-redux', () -> $scope._sixpackParticipating = false
 							$scope.openReferencesSearchModal()
 						else
 							startAutocomplete.exec(ed)
