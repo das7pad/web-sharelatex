@@ -2,7 +2,7 @@ DropboxUserController = require './DropboxUserController'
 DropboxWebhookController = require './DropboxWebhookController'
 DropboxProjectController = require "./DropboxProjectController"
 DropboxMiddlewear = require "./DropboxMiddlewear"
-SecurityManager = require "../../../../app/js/managers/SecurityManager"
+AuthorizationMiddlewear = require "../../../../app/js/Features/Authorization/AuthorizationMiddlewear"
 
 module.exports =
 	apply: (webRouter, apiRouter) ->
@@ -15,6 +15,6 @@ module.exports =
 		apiRouter.get  '/dropbox/webhook', DropboxWebhookController.verify
 		apiRouter.post '/dropbox/webhook', DropboxWebhookController.webhook
 
-		webRouter.get '/project/:Project_id/dropbox/status', SecurityManager.requestIsOwner, DropboxProjectController.getStatus
+		webRouter.get '/project/:Project_id/dropbox/status', AuthorizationMiddlewear.ensureUserCanAdminProject, DropboxProjectController.getStatus
 
 

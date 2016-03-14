@@ -14,10 +14,10 @@ describe 'DropboxHandler', ->
 		@stubGet = sinon.stub()
 		@stubDel = sinon.stub()
 		@projectEntityHandler = flushProjectToThirdPartyDataStore:sinon.stub().callsArgWith(1)
-		@projectModel = findAllUsersProjects : sinon.stub()
+		@ProjectGetter = findAllUsersProjects : sinon.stub()
 		@handler = SandboxedModule.require modulePath, requires:
 			"settings-sharelatex": {siteUrl:siteUrl, apis: {thirdPartyDataStore: {url: thirdPartyDataStoreApiUrl}}}
-			"../../../../app/js/models/Project":{Project:@projectModel}
+			"../../../../app/js/Features/Project/ProjectGetter":@ProjectGetter
 			'../../../../app/js/Features/Project/ProjectEntityHandler':@projectEntityHandler
 			"request":
 				get:@stubGet
@@ -73,7 +73,7 @@ describe 'DropboxHandler', ->
 		user_id = "123u9oijllkj"
 		projectList = [{_id:"123lk"}, {_id:"12ji3ojio"}, {_id:"12ji3oddsadasjio", archived:true}, {_id:"2jiojdoi"}, {_id:"not this one", archived:true}, {_id:"2jiojdsasdoi"}]
 		collabProjectList = [{_id:"213ds"}, {_id:"12ji3oddsadasjio", archived:true}, {_id:"213dsdsad", archived:false}]
-		@projectModel.findAllUsersProjects.callsArgWith(2, null, projectList, collabProjectList)
+		@ProjectGetter.findAllUsersProjects.callsArgWith(2, null, projectList, collabProjectList)
 		@handler.flushUsersProjectToDropbox user_id, =>
 			@projectEntityHandler.flushProjectToThirdPartyDataStore.calledWith(projectList[0]._id).should.equal true
 			@projectEntityHandler.flushProjectToThirdPartyDataStore.calledWith(projectList[1]._id).should.equal true

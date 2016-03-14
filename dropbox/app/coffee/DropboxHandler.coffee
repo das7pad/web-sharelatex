@@ -1,7 +1,7 @@
 request = require('request')
 settings = require('settings-sharelatex')
 logger = require('logger-sharelatex')
-Project = require('../../../../app/js/models/Project').Project
+ProjectGetter = require('../../../../app/js/Features/Project/ProjectGetter')
 projectEntityHandler = require '../../../../app/js/Features/Project/ProjectEntityHandler'
 _ = require('underscore')
 async = require('async')
@@ -59,7 +59,7 @@ module.exports =
 			callback(err)
 
 	flushUsersProjectToDropbox: (user_id, callback)->
-		Project.findAllUsersProjects user_id, '_id archived', (err, projects = [], collabertions = [], readOnlyProjects = [])->
+		ProjectGetter.findAllUsersProjects user_id, '_id archived', (err, projects = [], collabertions = [], readOnlyProjects = [])->
 			projectList = []
 			projectList = projectList.concat(projects)
 			projectList = projectList.concat(collabertions)

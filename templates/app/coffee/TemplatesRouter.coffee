@@ -1,4 +1,4 @@
-SecurityManager = require "../../../../app/js/managers/SecurityManager"
+AuthorizationMiddlewear = require "../../../../app/js/Features/Authorization/AuthorizationMiddlewear"
 AuthenticationController = require("../../../../app/js/Features/Authentication/AuthenticationController")
 TemplatesWebController = require("./TemplatesWebController")
 TemplatesController = require("./TemplatesController")
@@ -20,12 +20,12 @@ module.exports =
 		app.get "/templates/:template_id/v/:version/:file_type", TemplatesWebController.proxyToTemplatesApi
 		app.get "/templates/:template_id/v/:version/:file_type/:preview_type", TemplatesWebController.proxyToTemplatesApi
 
-		app.post "/project/:Project_id/template/publish", SecurityManager.requestIsOwner, TemplatesController.publishProject
-		app.post "/project/:Project_id/template/unpublish", SecurityManager.requestIsOwner, TemplatesController.unpublishProject
-		app.post "/project/:Project_id/template/description", SecurityManager.requestCanModifyProject, TemplatesController.updateProjectDescription
+		app.post "/project/:Project_id/template/publish", AuthorizationMiddlewear.ensureUserCanAdminProject, TemplatesController.publishProject
+		app.post "/project/:Project_id/template/unpublish", AuthorizationMiddlewear.ensureUserCanAdminProject, TemplatesController.unpublishProject
+		app.post "/project/:Project_id/template/description", AuthorizationMiddlewear.ensureUserCanWriteProjectContent, TemplatesController.updateProjectDescription
 
 		# Make sure the /project/new/template route comes before the /project/:project_id/template route
 		# This is a get request so that it can be linked to.
 		app.get '/project/new/template', TemplatesMiddlewear.saveTemplateDataInSession, AuthenticationController.requireLogin(), TemplatesController.createProjectFromZipTemplate
 		
-		app.get  "/project/:Project_id/template", SecurityManager.requestCanAccessProject, TemplatesController.getTemplateDetails
+		app.get  "/project/:Project_id/template", AuthorizationMiddlewear.ensureUserCanReadProject, TemplatesController.getTemplateDetails
