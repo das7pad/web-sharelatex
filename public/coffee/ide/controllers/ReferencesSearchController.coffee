@@ -70,7 +70,13 @@ define [
 						if !popup.hide._sl_patched
 							oldHide = popup.hide.bind(popup)
 							popup.hide = () ->
-								$scope._hideHint()
+								# delay the decision to hide the hint, prevents flickering
+								$timeout(
+									() ->
+										if !$scope.isCursorAtCitation(editor)
+											$scope._hideHint()
+									, 0
+								)
 								oldHide()
 							popup.hide._sl_patched = true
 						# participate in a sixpack A-A experiment
