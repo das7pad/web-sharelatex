@@ -163,6 +163,8 @@ define [
 			# example: `\cite{one:1,tw|}`
 			# in this case we need to delete back to the ',' and then insert the new key
 			lineUpToCursor = editor.getSession().getTextRange(new Range(pos.row, 0, pos.row, pos.column))
+			lineBeyondCursor = editor.getSession().getTextRange(new Range(pos.row, pos.column, pos.row, 99999))
+			needsClosingBrace = !lineBeyondCursor.match(/\w*}/)
 			lastSeparatorPosition = Math.max(
 				lineUpToCursor.lastIndexOf('{'),
 				lineUpToCursor.lastIndexOf(',')
@@ -175,6 +177,8 @@ define [
 			else
 				# just insert the new key
 				session.insert(pos, key)
+			if needsClosingBrace
+				session.insert(editor.getCursorPosition(), '}')
 
 		$scope.openReferencesSearchModal = () ->
 			modal = $modal.open {
