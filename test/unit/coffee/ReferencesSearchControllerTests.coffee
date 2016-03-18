@@ -7,6 +7,9 @@ modulePath = require('path').join __dirname, '../../../app/js/ReferencesSearchCo
 describe 'ReferencesSearchController', ->
 
 	beforeEach ->
+		@project_id = "abd123"
+		@user_id = "abc123"
+		@query = 'whatever'
 		@controller = SandboxedModule.require modulePath, requires:
 			'./ReferencesSearchHandler': @handler = {
 				search: sinon.stub()
@@ -14,13 +17,13 @@ describe 'ReferencesSearchController', ->
 			'../../../../app/js/Features/User/UserGetter': @UserGetter = {
 				getUser: sinon.stub()
 			}
+			"../../../../app/js/Features/Project/ProjectGetter": @ProjectGetter = {
+				getProject: sinon.stub()
+			}
 			'logger-sharelatex': @logger = {
 				log:->
 				err:->
 			}
-		@project_id = "project-id-123"
-		@user_id = "user-id-123"
-		@query = 'whatever'
 		@req =
 			body:
 				query: @query
@@ -32,9 +35,6 @@ describe 'ReferencesSearchController', ->
 		@res =
 			sendStatus: sinon.stub()
 			json: sinon.stub()
-		@fakeUser =
-			features:
-				references: true
 		@fakeSearchData =
 			projectId: @projectId
 			hits: []
@@ -42,11 +42,15 @@ describe 'ReferencesSearchController', ->
 	describe 'search', ->
 
 		beforeEach ->
+			@fakeProject =
+				owner_ref: "abc"
 			@fakeUser =
+				_id: @fakeProject.owner_ref
 				features:
 					references: true
 			@fakeSearchData =
 				hits: []
+			@ProjectGetter.getProject.callsArgWith(2, null, @fakeProject)
 			@UserGetter.getUser.callsArgWith(1, null, @fakeUser)
 			@handler.search.callsArgWith(2, null, @fakeSearchData)
 			@call = (callback) =>
@@ -108,10 +112,33 @@ describe 'ReferencesSearchController', ->
 					@handler.search.callCount.should.equal 0
 					done()
 
+		describe 'when projectgetter.getproject produces an error', ->
+
+			beforeEach ->
+				@ProjectGetter.getProject.callsArgWith(2, new Error('woops'))
+				@UserGetter.getUser.callsArgWith(1, new Error('woops'))
+
+			it 'should send a 500 response', (done) ->
+				@call () =>
+					@res.sendStatus.callCount.should.equal 1
+					@res.sendStatus.calledWith(500).should.equal true
+					done()
+
+			it 'should not call getuser', (done) ->
+				@call () =>
+					@UserGetter.getUser.callCount.should.equal 0
+					done()
+
+			it 'should not call handler.search', (done) ->
+				@call () =>
+					@handler.search.callCount.should.equal 0
+					done()
+
 		describe 'when search produces an error', ->
 
 			beforeEach ->
 				@fakeUser.features.references = true
+				@ProjectGetter.getProject.callsArgWith(2, null, @fakeProject)
 				@UserGetter.getUser.callsArgWith(1, null, @fakeUser)
 				@handler.search.callsArgWith(2, new Error('woops'))
 
