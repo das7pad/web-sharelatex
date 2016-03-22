@@ -1,12 +1,17 @@
 logger = require('logger-sharelatex')
+ProjectGetter = require "../../../../app/js/Features/Project/ProjectGetter"
 UserGetter = require('../../../../app/js/Features/User/UserGetter')
 ReferencesSearchHandler = require('./ReferencesSearchHandler')
 
 module.exports = ReferencesSearchController =
 
-	_shouldDoSearch: (userId, callback=(err, should)->) ->
-		UserGetter.getUser userId, (err, user) ->
-			callback(err, user?.features?.references == true)
+	_shouldDoSearch: (projectId, callback=(err, should)->) ->
+		ProjectGetter.getProject projectId, {owner_ref: 1}, (err, project) ->
+			if err
+				logger.err {err, projectId}, "error fetching project"
+				return callback(err)
+			UserGetter.getUser project.owner_ref, (err, owner) ->
+				callback(err, owner?.features?.references == true)
 
 	search: (req, res) ->
 		projectId = req.params.Project_id
@@ -16,7 +21,7 @@ module.exports = ReferencesSearchController =
 			logger.err {projectId, userId}, "error: no query supplied for references search"
 			return res.sendStatus 400
 		logger.log {projectId, userId, query}, "search for references"
-		ReferencesSearchController._shouldDoSearch userId, (err, shouldDoSearch) ->
+		ReferencesSearchController._shouldDoSearch projectId, (err, shouldDoSearch) ->
 			if err
 				logger.err {err, projectId, userId}, "error checking if search should proceed"
 				return res.sendStatus 500

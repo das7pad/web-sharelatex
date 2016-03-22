@@ -1,6 +1,6 @@
 ReferencesSearchController = require './ReferencesSearchController'
-SecurityManager = require('../../../../app/js/managers/SecurityManager')
 RateLimiterMiddlewear = require('../../../../app/js/Features/Security/RateLimiterMiddlewear')
+AuthorizationMiddlewear = require('../../../../app/js/Features/Authorization/AuthorizationMiddlewear')
 
 module.exports = ReferencesSearchRouter =
 
@@ -13,6 +13,6 @@ module.exports = ReferencesSearchRouter =
 				maxRequests: 100
 				timeInterval: 60
 			}),
-			SecurityManager.requestCanAccessProject,
+			AuthorizationMiddlewear.ensureUserCanReadProject,
 			ReferencesSearchController.search
 		)
