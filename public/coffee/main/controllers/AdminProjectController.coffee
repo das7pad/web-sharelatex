@@ -31,7 +31,7 @@ define [
 		$scope.openArchiveProjectsModal = () ->
 			modalInstance = $modal.open(
 				templateUrl: "deleteProjectsModalTemplate"
-				controller: "DeleteProjectsModalController"
+				controller: "AdminDeleteProjectsModalController"
 				resolve:
 					projects: () -> $scope.getSelectedProjects()
 			)
@@ -88,7 +88,7 @@ define [
 			if value?
 				$scope.updateSelectedProjects()
 
-	App.controller 'DeleteProjectsModalController', ($scope, $modalInstance, $timeout, projects) ->
+	App.controller 'AdminDeleteProjectsModalController', ($scope, $modalInstance, $timeout, projects) ->
 		$scope.projectsToDelete = projects
 
 		$scope.action = "Delete"
