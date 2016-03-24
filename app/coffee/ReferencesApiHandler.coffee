@@ -10,7 +10,7 @@ logger = require("logger-sharelatex")
 
 module.exports = ReferencesApiHandler =
 
-	startAuth: (req, res)->
+	startAuth: (req, res, next)->
 		user_id = req.session?.user?._id
 		ref_provider = req.params.ref_provider
 		opts =
@@ -18,10 +18,12 @@ module.exports = ReferencesApiHandler =
 			url: "/user/#{user_id}/#{ref_provider}/oauth"
 			json:true
 		ReferencesApiHandler.make3rdRequest opts, (err, response, body)->
+			if err
+				next(err)
 			logger.log body:body, statusCode:response.statusCode, "thirdparty return"
 			res.redirect(body.redirect)
 
-	completeAuth: (req, res)->
+	completeAuth: (req, res, next)->
 		user_id = req.session?.user?._id
 		ref_provider = req.params.ref_provider
 		opts =
@@ -29,6 +31,8 @@ module.exports = ReferencesApiHandler =
 			url: "/user/#{user_id}/#{ref_provider}/tokenexchange"
 			qs:req.query
 		ReferencesApiHandler.make3rdRequest opts, (err, response, body)->
+			if err
+				next(err)
 			res.redirect "/user/settings"
 
 	make3rdRequest: (opts, callback)->
@@ -50,8 +54,8 @@ module.exports = ReferencesApiHandler =
 				referencesUrl: "#{thirdpartyUrl}/user/#{user_id}/#{ref_provider}/bibtex"
 
 
-		result = 
-			user: 
+		result =
+			user:
 				features: {}
 			reindex: false
 
@@ -85,7 +89,7 @@ module.exports = ReferencesApiHandler =
 
 		ref = {}
 		ref[ref_provider] = true
-		update = 
+		update =
 			$unset: ref
 
 		logger.log user_id:req.session?.user?._id, update:update, "reference unlink"

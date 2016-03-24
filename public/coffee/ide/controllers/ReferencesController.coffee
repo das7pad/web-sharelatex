@@ -10,7 +10,7 @@ define [
 				resolve:
 					provider: () -> providerStr
 			}
-			
+
 		ide.referencesManager = {
 			openReferencesModal: (providerStr) -> $scope.openReferencesModal(providerStr)
 		}
