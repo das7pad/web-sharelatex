@@ -97,3 +97,17 @@ module.exports = ReferencesApiHandler =
 			if err?
 				logger.err err:err, result:result, "error unlinking reference info on user " + ref_provider
 			res.redirect "/user/settings"
+
+	bibtex: (req, res, next) ->
+		user_id = req.session?.user?._id
+		ref_provider = req.params.ref_provider
+		opts =
+			method:"get"
+			url: "/user/#{user_id}/#{ref_provider}/bibtex"
+		logger.log {user_id, ref_provider}, "getting bibtex from third-party-references"
+		ReferencesApiHandler.make3rdRequest opts, (err, response, body)->
+			if err
+				logger.err {user_id, ref_provider}, "error getting bibtex from third-party-references"
+				return next(err)
+			logger.log {user_id, ref_provider}, "got bibtex from third-party-references, returning to client"
+			res.json body

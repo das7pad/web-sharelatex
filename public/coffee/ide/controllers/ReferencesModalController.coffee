@@ -11,11 +11,11 @@ define [
 			ga?('send', 'event', 'subscription-funnel', 'upgraded-free-trial', source)
 			window.open("/user/subscription/new?planCode=student_free_trial_7_days")
 			$scope.startedFreeTrial = true
-		
+
 		$scope.linkAccount = () ->
 			authWindow = $window.open("/#{provider}/oauth", "reference-auth", "width=700,height=500")
 			poller = $interval () ->
-				# We can get errors when trying to access the URL before it returns 
+				# We can get errors when trying to access the URL before it returns
 				# to a ShareLaTeX URL (security exceptions)
 				try
 					pathname = authWindow?.location?.pathname
@@ -27,21 +27,23 @@ define [
 					$interval.cancel(poller)
 			, 1000
 			return true # See https://github.com/angular/angular.js/issues/4853#issuecomment-28491586
-			
-		do $scope.loadStatus = () ->
+
+		do $scope.loadBibtex = () ->
 			$scope.status = {
 				loading: true
 				error: false
 				reindex: false
 				user: false
 			}
-			
-			$http.get("/#{provider}/reindex/project_id/#{ide.project_id}")
+
+			$http.get("/#{provider}/bibtex")
 				.success (data) ->
-					$scope.status.reindex = data.reindex
-					$scope.status.user = data.user
+					# $scope.status.reindex = data.reindex
+					# $scope.status.user = data.user
+					console.log ">> yay"
+					console.log data
 					$scope.status.loading = false
-					
+
 				.error () ->
 					$scope.status.error = true
 					$scope.status.loading = false

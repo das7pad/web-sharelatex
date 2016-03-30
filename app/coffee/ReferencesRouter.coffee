@@ -6,4 +6,5 @@ module.exports =
 		app.get '/:ref_provider/oauth', AuthenticationController.requireLogin(),  ReferencesApiHandler.startAuth
 		app.get '/:ref_provider/oauth/token-exchange', AuthenticationController.requireLogin(),  ReferencesApiHandler.completeAuth
 		app.post '/:ref_provider/unlink', AuthenticationController.requireLogin(),  ReferencesApiHandler.unlink
-		app.get '/:ref_provider/reindex/project_id/:project_id', AuthenticationController.requireLogin(),  ReferencesApiHandler.reindex
+		# app.get '/:ref_provider/reindex/project_id/:project_id', AuthenticationController.requireLogin(),  ReferencesApiHandler.reindex
+		app.get '/:ref_provider/bibtex', AuthenticationController.requireLogin(),  ReferencesApiHandler.bibtex
