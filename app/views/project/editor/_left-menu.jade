@@ -1,10 +1,10 @@
 span(ng-controller="ReferencesController")
-	ul.list-unstyled.nav()
-		each item in ['mendeley','refme','zotero']
-			li
-				a(ng-click="openReferencesModal('#{item}')")
-					i.fa.fa-file-text-o
-					| &nbsp;&nbsp; #{translate(item)}
+	//- ul.list-unstyled.nav()
+	//- 	each item in ['mendeley','refme','zotero']
+	//- 		li
+	//- 			a(ng-click="openReferencesModal('#{item}')")
+	//- 				i.fa.fa-file-text-o
+	//- 				| &nbsp;&nbsp; #{translate(item)}
 				
 script(type="text/ng-template", id="referencesModalTemplate")
 

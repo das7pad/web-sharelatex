@@ -27,23 +27,3 @@ define [
 					$interval.cancel(poller)
 			, 1000
 			return true # See https://github.com/angular/angular.js/issues/4853#issuecomment-28491586
-
-		do $scope.loadBibtex = () ->
-			$scope.status = {
-				loading: true
-				error: false
-				reindex: false
-				user: false
-			}
-
-			$http.get("/#{provider}/bibtex")
-				.success (data) ->
-					# $scope.status.reindex = data.reindex
-					# $scope.status.user = data.user
-					console.log ">> yay"
-					console.log data
-					$scope.status.loading = false
-
-				.error () ->
-					$scope.status.error = true
-					$scope.status.loading = false
