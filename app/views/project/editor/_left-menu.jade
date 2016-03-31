@@ -18,7 +18,8 @@ script(type="text/ng-template", id="referencesModalTemplate")
 	.modal-body
 		div
 			button.btn.btn-default(ng-click="loadBibtex()")
-				| Load
+				| Load Bibtex
+
 		.alert.alert-danger(ng-show="status.error") {{provider}} #{translate("reference_loading_error")}
 	
 		.loading(ng-show="!status.error && status.loading")
@@ -29,6 +30,12 @@ script(type="text/ng-template", id="referencesModalTemplate")
 			i.fa.fa-check
 			span  {{provider}} #{translate("reference_loading_success")}
 	
+		div(ng-if="bibtexData")
+			hr
+			div(style="max-height: 200px; overflow: scroll; white-space: pre")
+				| {{bibtexData}}
+			hr
+
 		div(ng-if="!status.error && !status.loading")
 			div(ng-if="status.user.features[provider]")
 				div(ng-if="!status.user[provider]")

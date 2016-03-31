@@ -2,8 +2,9 @@ define [
 	"base"
 ], (App) ->
 	App.controller "ReferencesModalController", ($scope, $modalInstance, $http, $modal, $window, $interval, ide, provider) ->
-		$scope.provider = provider
 
+		$scope.provider = provider
+		$scope.bibtexData = null
 		$scope.status = {
 			loading: false
 			error: false
@@ -47,6 +48,7 @@ define [
 				.success (data) ->
 					console.log ">> yay"
 					console.log data
+					$scope.bibtexData = data
 					$scope.status.loading = false
 
 				.error () ->
