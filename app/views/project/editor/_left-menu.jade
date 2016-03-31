@@ -1,10 +1,10 @@
 span(ng-controller="ReferencesController")
-	//- ul.list-unstyled.nav()
-	//- 	each item in ['mendeley','refme','zotero']
-	//- 		li
-	//- 			a(ng-click="openReferencesModal('#{item}')")
-	//- 				i.fa.fa-file-text-o
-	//- 				| &nbsp;&nbsp; #{translate(item)}
+	ul.list-unstyled.nav()
+		each item in ['mendeley','refme','zotero']
+			li
+				a(ng-click="openReferencesModal('#{item}')")
+					i.fa.fa-file-text-o
+					| &nbsp;&nbsp; #{translate(item)}
 				
 script(type="text/ng-template", id="referencesModalTemplate")
 
@@ -16,15 +16,18 @@ script(type="text/ng-template", id="referencesModalTemplate")
 		) &times;
 		h3 {{provider}} #{translate("reference_integration")}
 	.modal-body
-		.alert.alert-danger(ng-show="status.error") {{provider}} #{translate("reference_reindex_error")}
+		div
+			button.btn.btn-default(ng-click="loadBibtex()")
+				| Load
+		.alert.alert-danger(ng-show="status.error") {{provider}} #{translate("reference_loading_error")}
 	
 		.loading(ng-show="!status.error && status.loading")
 			i.fa.fa-refresh.fa-spin.fa-fw
-			span  #{translate("reference_reindexing")} {{provider}} 
+			span  #{translate("reference_loading")} {{provider}} 
 	
-		.success(ng-show="!status.error && status.reindex")
+		.success(ng-show="!status.error && status.loading")
 			i.fa.fa-check
-			span  {{provider}} #{translate("reference_reindex_success")}
+			span  {{provider}} #{translate("reference_loading_success")}
 	
 		div(ng-if="!status.error && !status.loading")
 			div(ng-if="status.user.features[provider]")

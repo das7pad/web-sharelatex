@@ -4,6 +4,13 @@ define [
 	App.controller "ReferencesModalController", ($scope, $modalInstance, $http, $modal, $window, $interval, ide, provider) ->
 		$scope.provider = provider
 
+		$scope.status = {
+			loading: false
+			error: false
+			loading: false
+			user: false
+		}
+
 		$scope.cancel = () ->
 			$modalInstance.dismiss()
 
@@ -27,3 +34,21 @@ define [
 					$interval.cancel(poller)
 			, 1000
 			return true # See https://github.com/angular/angular.js/issues/4853#issuecomment-28491586
+
+		$scope.loadBibtex = () ->
+			$scope.status = {
+				loading: true
+				error: false
+				loading: false
+				user: false
+			}
+
+			$http.get("/#{provider}/bibtex")
+				.success (data) ->
+					console.log ">> yay"
+					console.log data
+					$scope.status.loading = false
+
+				.error () ->
+					$scope.status.error = true
+					$scope.status.loading = false
