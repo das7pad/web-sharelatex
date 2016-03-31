@@ -1,6 +1,6 @@
 span(ng-controller="ReferencesController")
 	ul.list-unstyled.nav()
-		each item in ['mendeley','refme','zotero']
+		each item in ['mendeley','zotero']
 			li
 				a(ng-click="openReferencesModal('#{item}')")
 					i.fa.fa-file-text-o
