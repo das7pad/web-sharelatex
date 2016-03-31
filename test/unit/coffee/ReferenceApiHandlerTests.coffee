@@ -7,7 +7,9 @@ modulePath = require('path').join __dirname, '../../../app/js/ReferencesApiHandl
 
 describe 'ReferencesApiHandler', ->
 	beforeEach ->
-
+		@user =
+			features:
+				refProvider: true
 		@ReferencesApiHandler = SandboxedModule.require modulePath, requires:
 			'request': @request = sinon.stub()
 			'settings-sharelatex': @settings =
@@ -15,7 +17,7 @@ describe 'ReferencesApiHandler', ->
 					references:
 						url: "http://references.example.com"
 				mongo:
-					url: "mongodb://localhost/sharelatex"		
+					url: "mongodb://localhost/sharelatex"
 			'mongojs':
 				connect:-> @db = { users: { findOne : sinon.stub().callsArgWith(2, null, { features: {refProvider:true}, refProvider:true}) } }
 				ObjectId: ObjectId
@@ -24,10 +26,13 @@ describe 'ReferencesApiHandler', ->
 			'logger-sharelatex': @logger =
 				log:->
 				err:->
+			'../../../../app/js/Features/User/UserGetter': {
+				getUser: sinon.stub().callsArgWith(1, null, @user)
+			}
 
 		@user_id = ObjectId().toString()
 
-		@req = 
+		@req =
 			session:
 				user:
 					_id: @user_id
@@ -37,6 +42,7 @@ describe 'ReferencesApiHandler', ->
 			redirect: sinon.stub()
 			json: sinon.stub()
 			sendStatus: sinon.stub()
+			send: sinon.stub()
 
 	describe "startAuth", ->
 		beforeEach ->
@@ -49,7 +55,7 @@ describe 'ReferencesApiHandler', ->
 
 	describe "completeAuth", ->
 		beforeEach ->
-			@ReferencesApiHandler.make3rdRequest = sinon.stub().callsArgWith(1, true, {}, {} )
+			@ReferencesApiHandler.make3rdRequest = sinon.stub().callsArgWith(1, null, {}, {} )
 			@ReferencesApiHandler.completeAuth @req, @res
 
 		it "should redirect to user settings page", ->
@@ -58,7 +64,7 @@ describe 'ReferencesApiHandler', ->
 	describe "makeRefRequest", ->
 
 		it "should call request with right params", ->
-			@opts = 
+			@opts =
 				url: "/someUrl"
 			@ReferencesApiHandler.makeRefRequest @opts
 			@opts.url = "#{@settings.apis.references.url}#{@opts.url}"
@@ -68,7 +74,7 @@ describe 'ReferencesApiHandler', ->
 
 		it "should return json result", ->
 			@result =
-				user: 
+				user:
 					features:
 						refProvider: true
 					refProvider: true

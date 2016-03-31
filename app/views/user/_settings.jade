@@ -23,7 +23,9 @@ each item in ['mendeley','zotero']
 		p.small #{translate("link_to_"+item+"_description")}
 		p
 			a(href='/#{item}/oauth').btn.btn-info #{translate("link_to_"+item)}
-		
+
+			
+// Unlink modal
 script(type="text/ng-template", id="referenceUnlinkModalTemplate")
 
 	.modal-header
