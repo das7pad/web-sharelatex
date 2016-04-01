@@ -19,41 +19,41 @@ script(type="text/ng-template", id="referencesModalTemplate")
 		h3 {{provider}} #{translate("reference_integration")}
 	.modal-body
 
-		div(ng-if="!userHasFeature")
+		div(ng-if="!userHasProviderFeature")
 			p.small {{provider}} #{translate("reference_sync_description")}
 			.alert.alert-info
 				p {{provider}} #{translate("reference_is_premium")}
 				p
 					a.btn.btn-info(ng-click="startFreeTrial(provider)") #{translate("start_free_trial")}
 		
-		
-		div(ng-if="userHasFeature")
-			div
-				button.btn.btn-default(ng-click="loadBibtex()")
-					| Load Bibtex
+		div(ng-if="userHasProviderFeature")
 
-			.alert.alert-danger(ng-show="status.error") {{provider}} #{translate("reference_loading_error")}
+			div(ng-if="!userHasProviderLink")
+				p #{translate("link_to_reference_description")} {{provider}} 
+				p
+					a(href,ng-click="linkAccount()").btn.btn-info #{translate("link_to_reference")} {{provider}} 
+			
+			div(ng-if="userHasProviderLink")
 
-			.loading(ng-show="!status.error && status.loading")
-				i.fa.fa-refresh.fa-spin.fa-fw
-				span  #{translate("reference_loading")} {{provider}} 
+				div
+					button.btn.btn-default(ng-click="loadBibtex()")
+						| Load Bibtex
 
-			.success(ng-show="!status.error && status.loading")
-				i.fa.fa-check
-				span  {{provider}} #{translate("reference_loading_success")}
+				.alert.alert-danger(ng-show="status.error") {{provider}} #{translate("reference_loading_error")}
 
-			div(ng-if="bibtexData")
-				hr
-				div(style="max-height: 200px; overflow: scroll; white-space: pre")
-					| {{bibtexData}}
-				hr
+				.loading(ng-show="!status.error && status.loading")
+					i.fa.fa-refresh.fa-spin.fa-fw
+					span  #{translate("reference_loading")} {{provider}} 
 
-			div(ng-if="!status.error && !status.loading")
-				div(ng-if="status.user.features[provider]")
-					div(ng-if="!status.user[provider]")
-						p #{translate("link_to_reference_description")} {{provider}} 
-						p
-							a(href,ng-click="linkAccount()").btn.btn-info #{translate("link_to_reference")} {{provider}} 
+				.success(ng-show="!status.error && status.loading")
+					i.fa.fa-check
+					span  {{provider}} #{translate("reference_loading_success")}
+
+				div(ng-if="bibtexData")
+					hr
+					div(style="max-height: 200px; overflow: scroll; white-space: pre")
+						| {{bibtexData}}
+					hr
 
 
 	.modal-footer()

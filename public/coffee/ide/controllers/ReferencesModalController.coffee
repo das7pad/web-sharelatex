@@ -4,7 +4,9 @@ define [
 	App.controller "ReferencesModalController", ($scope, $modalInstance, $http, $modal, $window, $interval, ide, provider) ->
 
 		$scope.provider = provider
-		$scope.userHasFeature = ide.$scope.user?.features?[provider] == true
+		$scope.userHasProviderFeature = ide.$scope.user?.features?[provider]
+		$scope.userHasProviderLink = ide.$scope.user?.refProviders?[provider]
+
 		$scope.bibtexData = null
 		$scope.status = {
 			loading: false
