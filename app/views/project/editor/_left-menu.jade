@@ -19,6 +19,7 @@ script(type="text/ng-template", id="referencesModalTemplate")
 		h3 {{provider}} #{translate("reference_integration")}
 	.modal-body
 
+		// When the user doesn't have this feature
 		div(ng-if="!userHasProviderFeature")
 			p.small {{provider}} #{translate("reference_sync_description")}
 			.alert.alert-info
@@ -26,13 +27,16 @@ script(type="text/ng-template", id="referencesModalTemplate")
 				p
 					a.btn.btn-info(ng-click="startFreeTrial(provider)") #{translate("start_free_trial")}
 		
+		// When the user does have access to this feature
 		div(ng-if="userHasProviderFeature")
 
+			// When the user has not linked to the provider
 			div(ng-if="!userHasProviderLink")
 				p #{translate("link_to_reference_description")} {{provider}} 
 				p
 					a(href,ng-click="linkAccount()").btn.btn-info #{translate("link_to_reference")} {{provider}} 
 			
+			// When the user has linked, the happy path
 			div(ng-if="userHasProviderLink")
 
 				div

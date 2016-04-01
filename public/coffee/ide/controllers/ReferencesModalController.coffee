@@ -12,7 +12,6 @@ define [
 			loading: false
 			error: false
 			loading: false
-			user: false
 		}
 
 		$scope.cancel = () ->
@@ -49,8 +48,6 @@ define [
 
 			$http.get("/#{provider}/bibtex")
 				.success (data) ->
-					console.log ">> yay"
-					console.log data
 					$scope.bibtexData = data
 					$scope.status.loading = false
 
