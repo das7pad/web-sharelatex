@@ -10,7 +10,7 @@ each item in ['mendeley','zotero']
 			p #{translate(item+"_is_premium")}
 			p
 				a.btn.btn-info(href='/user/subscription/plans') #{translate("upgrade")}
-	- else if(user[item])
+	- else if(user.refProviders && user.refProviders[item])
 		p you are linked
 		p
 			a(
