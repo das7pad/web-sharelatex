@@ -59,11 +59,8 @@ define [
 				return
 			# TODO: make this not suck
 			targetFileName = "#{$scope.provider}.bib"
-			console.log ">> importing to #{targetFileName}"
 			targetFile = ide.fileTreeManager.findEntityByPath(targetFileName)
-			console.log targetFile
 			updateFileContents = (target) ->
-				console.log ">> updating file contents", target
 				_ide.editorManager.openDoc(target)
 				$timeout(
 					() ->
