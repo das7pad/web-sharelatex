@@ -58,52 +58,6 @@ module.exports = ReferencesApiHandler =
 		opts.url = "#{referencesUrl}#{opts.url}"
 		request opts, callback
 
-	reindex: (req, res)->
-		user_id = req.session?.user?._id
-		project_id = req.params.project_id
-		ref_provider = req.params.ref_provider
-		ReferencesApiHandler.userCanMakeRequest user_id, ref_provider, (err, canMakeRequest) ->
-			if err
-				return next(err)
-			if !canMakeRequest
-				return res.send 403
-			opts =
-				method:"post"
-				url:"/project/#{project_id}"
-				json:
-					referencesUrl: "#{thirdpartyUrl}/user/#{user_id}/#{ref_provider}/bibtex"
-
-
-			result =
-				user:
-					features: {}
-				reindex: false
-
-			result.user[ref_provider] = false
-			result.user.features[ref_provider] = false
-
-			projection = {}
-			projection[ref_provider] = 1
-			projection['features'] = 1
-
-			db.users.findOne _id: ObjectId(user_id), projection, (err, user)->
-				result.user.features[ref_provider] = user.features[ref_provider]
-				result.user[ref_provider] = user[ref_provider]?
-
-				if !user[ref_provider]
-					logger.err user_id:user_id, "has no reference info on user #{ref_provider}"
-					res.json result
-				else
-					ReferencesApiHandler.makeRefRequest opts, (err, response, body)->
-
-						logger.log body:body, statusCode:response.statusCode, "reference api return"
-						if err? || response.statusCode == 500
-							logger.err err:err, "error reindexing reference #{ref_provider}"
-							res.sendStatus 500
-						else
-							result.reindex = true
-							res.json result
-
 	unlink: (req, res, next) ->
 		ref_provider = req.params.ref_provider
 

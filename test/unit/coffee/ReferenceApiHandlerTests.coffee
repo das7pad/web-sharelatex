@@ -70,25 +70,6 @@ describe 'ReferencesApiHandler', ->
 			@opts.url = "#{@settings.apis.references.url}#{@opts.url}"
 			@request.calledWith(@opts).should.equal true
 
-	describe "reindex", ->
-
-		it "should return json result", ->
-			@result =
-				user:
-					features:
-						refProvider: true
-					refProvider: true
-				reindex: true
-
-			@ReferencesApiHandler.makeRefRequest = sinon.stub().callsArgWith(1, null, {}, {})
-			@ReferencesApiHandler.reindex @req, @res, @next
-			@res.json.calledWith(@result).should.equal true
-
-		it "should return an error", ->
-			@ReferencesApiHandler.makeRefRequest = sinon.stub().callsArgWith(1, true, {}, {})
-			@ReferencesApiHandler.reindex @req, @res, @next
-			@res.sendStatus.calledWith(500).should.equal true
-
 	describe "unlink", ->
 		beforeEach ->
 			@update =
