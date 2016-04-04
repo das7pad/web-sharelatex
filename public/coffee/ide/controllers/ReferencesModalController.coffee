@@ -30,9 +30,14 @@ define [
 					pathname = authWindow?.location?.pathname
 				catch e
 					pathname = null
-				if authWindow?.location?.pathname == "/user/settings"
+				if pathname == "/user/settings"
 					authWindow.close()
-					$scope.loadStatus()
+					$scope.userHasProviderLink = true
+					$timeout(
+						() ->
+							$scope.loadBibtex()
+						, 100
+					)
 					$interval.cancel(poller)
 			, 1000
 			return true # See https://github.com/angular/angular.js/issues/4853#issuecomment-28491586
