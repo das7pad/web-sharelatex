@@ -64,7 +64,9 @@ module.exports = ReferencesApiHandler =
 		ref = {}
 		ref[ref_provider] = true
 		update =
-			$unset: ref
+			$unset:
+				refProviders:
+					ref
 
 		logger.log user_id:req.session?.user?._id, update:update, "reference unlink"
 		UserUpdater.updateUser req.session?.user?._id, update, (err)->
