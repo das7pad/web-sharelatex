@@ -1,7 +1,7 @@
 define [
 	"base"
 ], (App) ->
-	App.controller "ReferencesModalController", ($scope, $modalInstance, $http, $modal, $window, $interval, ide, provider) ->
+	App.controller "ReferencesModalController", ($scope, $modalInstance, $http, $modal, $window, $interval, $timeout, ide, provider) ->
 
 		$scope.provider = provider
 		$scope.userHasProviderFeature = ide.$scope.user?.features?[provider]
@@ -11,7 +11,6 @@ define [
 		$scope.status = {
 			loading: false
 			error: false
-			loading: false
 		}
 
 		$scope.cancel = () ->
@@ -39,18 +38,57 @@ define [
 			return true # See https://github.com/angular/angular.js/issues/4853#issuecomment-28491586
 
 		$scope.loadBibtex = () ->
-			$scope.status = {
-				loading: true
-				error: false
-				loading: false
-				user: false
-			}
+			$scope.status.loading = true
+			$scope.status.error = false
 
 			$http.get("/#{provider}/bibtex")
 				.success (data) ->
 					$scope.bibtexData = data
 					$scope.status.loading = false
-
 				.error () ->
 					$scope.status.error = true
 					$scope.status.loading = false
+
+		$scope.importBibtex = () ->
+			if !$scope.bibtexData
+				return
+			# TODO: make this not suck
+			targetFileName = "#{$scope.provider}.bib"
+			console.log ">> importing to #{targetFileName}"
+			targetFile = ide.fileTreeManager.findEntityByPath(targetFileName)
+			console.log targetFile
+			updateFileContents = (target) ->
+				console.log ">> updating file contents", target
+				_ide.editorManager.openDoc(target)
+				$timeout(
+					() ->
+						editor = window.editors[0]
+						if ide.editorManager.getCurrentDocId() == target.id
+							editor.setValue($scope.bibtexData)
+						else
+							console.error "Wrong doc open when trying to input bibtex data into #{target.name}"
+					, 500
+				)
+
+			if targetFile
+				updateFileContents(targetFile)
+			else
+				ide.fileTreeManager.createDoc(targetFileName).then (response) ->
+					# TODO: check status code
+					console.log response.data
+					newDocId = response.data._id
+					$timeout(
+						() ->
+							targetFile = ide.fileTreeManager.findEntityById(newDocId)
+							console.log ">> target is", targetFile
+							updateFileContents(targetFile)
+						, 0
+					)
+
+		# automatically load the bibtex from provider
+		$timeout(
+			() ->
+				if $scope.userHasProviderFeature && $scope.userHasProviderLink
+					$scope.loadBibtex()
+			, 0
+		)

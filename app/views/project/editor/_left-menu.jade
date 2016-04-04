@@ -39,25 +39,26 @@ script(type="text/ng-template", id="referencesModalTemplate")
 			// When the user has linked, the happy path
 			div(ng-if="userHasProviderLink")
 
-				div
-					button.btn.btn-default(ng-click="loadBibtex()")
-						| Load Bibtex
-
 				.alert.alert-danger(ng-show="status.error") {{provider}} #{translate("reference_loading_error")}
 
 				.loading(ng-show="!status.error && status.loading")
-					i.fa.fa-refresh.fa-spin.fa-fw
-					span  #{translate("reference_loading")} {{provider}} 
+					div.text-center
+						i.fa.fa-refresh.fa-spin.fa-fw
+						div #{translate("reference_loading")} {{provider}} 
 
-				.success(ng-show="!status.error && status.loading")
-					i.fa.fa-check
-					span  {{provider}} #{translate("reference_loading_success")}
+				.success(ng-show="bibtexData && !status.error && !status.loading")
+					div.text-center
+						i.fa.fa-check
+						span  {{provider}} #{translate("reference_loading_success")}
 
-				div(ng-if="bibtexData")
-					hr
-					div(style="max-height: 200px; overflow: scroll; white-space: pre")
+				// data display, scroll and import button
+				div(ng-if="bibtexData && !status.loading", style="margin-top:15px;")
+					div(style="max-height: 360px; overflow: scroll; white-space: pre")
 						| {{bibtexData}}
 					hr
+					div.text-center
+						button.btn.btn-success(ng-click="importBibtex()")
+							span #{translate("reference_import_button")} {{provider}}.bib
 
 
 	.modal-footer()
