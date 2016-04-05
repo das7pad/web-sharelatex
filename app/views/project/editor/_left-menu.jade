@@ -10,55 +10,57 @@ span(ng-controller="ReferencesController")
 // Menedeley|Zotero References Modal
 script(type="text/ng-template", id="referencesModalTemplate")
 
-	.modal-header
-		button.close(
-			type="button"
-			data-dismiss="modal"
-			ng-click="cancel()"
-		) &times;
-		h3 {{provider}} #{translate("reference_integration")}
-	.modal-body
+	each item in ['mendeley', 'zotero']
+		div(ng-if="provider == '#{item}'")
+			.modal-header
+				button.close(
+					type="button"
+					data-dismiss="modal"
+					ng-click="cancel()"
+				) &times;
+				h3 {{provider}} #{translate(item+"_integration")}
+			.modal-body
 
-		// When the user doesn't have this feature
-		div(ng-if="!userHasProviderFeature")
-			p.small {{provider}} #{translate("reference_sync_description")}
-			.alert.alert-info
-				p {{provider}} #{translate("reference_is_premium")}
-				p
-					a.btn.btn-info(ng-click="startFreeTrial(provider)") #{translate("start_free_trial")}
-		
-		// When the user does have access to this feature
-		div(ng-if="userHasProviderFeature")
+				// When the user doesn't have this feature
+				div(ng-if="!userHasProviderFeature")
+					p.small #{translate(item+"_sync_description")}
+					.alert.alert-info
+						p #{translate(item+"_is_premium")}
+						p
+							a.btn.btn-info(ng-click="startFreeTrial(provider)") #{translate("start_free_trial")}
 
-			// When the user has not linked to the provider
-			div(ng-if="!userHasProviderLink")
-				p #{translate("link_to_reference_description")} {{provider}} 
-				p
-					a(href,ng-click="linkAccount()").btn.btn-info #{translate("link_to_reference")} {{provider}} 
-			
-			// When the user has linked, the happy path
-			div(ng-if="userHasProviderLink")
+				// When the user does have access to this feature
+				div(ng-if="userHasProviderFeature")
 
-				.alert.alert-danger(ng-show="status.error") {{provider}} #{translate("reference_loading_error")}
+					// When the user has not linked to the provider
+					div(ng-if="!userHasProviderLink")
+						p #{translate("link_to_"+item+"_description")} 
+						p
+							a(href,ng-click="linkAccount()").btn.btn-info #{translate("link_to_"+item)}
 
-				.loading(ng-show="!status.error && status.loading")
-					div.text-center
-						i.fa.fa-refresh.fa-spin.fa-fw
-						div #{translate("reference_loading")} {{provider}} 
+					// When the user has linked, the happy path
+					div(ng-if="userHasProviderLink")
 
-				.success(ng-show="bibtexData && !status.error && !status.loading")
-					div.text-center
-						i.fa.fa-check
-						span  {{provider}} #{translate("reference_loading_success")}
+						.alert.alert-danger(ng-show="status.error") #{translate(item+"_reference_loading_error")}
 
-				// data display, scroll and import button
-				div(ng-if="bibtexData && !status.loading", style="margin-top:15px;")
-					div(style="max-height: 360px; overflow: scroll; white-space: pre")
-						| {{bibtexData}}
-					hr
-					div.text-center
-						button.btn.btn-success(ng-click="importBibtex()")
-							span #{translate("reference_import_button")} {{provider}}.bib
+						.loading(ng-show="!status.error && status.loading")
+							div.text-center
+								i.fa.fa-refresh.fa-spin.fa-fw
+								div #{translate(item+"_reference_loading")}
+
+						.success(ng-show="bibtexData && !status.error && !status.loading")
+							div.text-center
+								i.fa.fa-check
+								span #{translate(item+"_reference_loading_success")}
+
+						// data display, scroll and import button
+						div(ng-if="bibtexData && !status.loading", style="margin-top:15px;")
+							div(style="max-height: 360px; overflow: scroll; white-space: pre")
+								| {{bibtexData}}
+							hr
+							div.text-center
+								button.btn.btn-success(ng-click="importBibtex()")
+									span #{translate("reference_import_button")} {{provider}}.bib
 
 
 	.modal-footer()

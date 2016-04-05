@@ -5,7 +5,7 @@ each item in ['mendeley','zotero']
 		| #{translate(item+"_integration")}
 
 	- if (!user.features[item])
-		p.small #{translate(item+"sync_description")}
+		p.small #{translate(item+"_sync_description")}
 		.alert.alert-info
 			p #{translate(item+"_is_premium")}
 			p
