@@ -18,7 +18,7 @@ script(type="text/ng-template", id="referencesModalTemplate")
 					data-dismiss="modal"
 					ng-click="cancel()"
 				) &times;
-				h3 {{provider}} #{translate(item+"_integration")}
+				h3 #{translate(item+"_integration")}
 			.modal-body
 
 				// When the user doesn't have this feature
@@ -34,7 +34,7 @@ script(type="text/ng-template", id="referencesModalTemplate")
 
 					// When the user has not linked to the provider
 					div(ng-if="!userHasProviderLink")
-						p #{translate("link_to_"+item+"_description")} 
+						p #{translate(item+"_sync_description" )} 
 						p
 							a(href,ng-click="linkAccount()").btn.btn-info #{translate("link_to_"+item)}
 

@@ -33,6 +33,7 @@ define [
 				if pathname == "/user/settings"
 					authWindow.close()
 					$scope.userHasProviderLink = true
+					ide.$scope.user.refProviders[provider] = true
 					$timeout(
 						() ->
 							$scope.loadBibtex()
