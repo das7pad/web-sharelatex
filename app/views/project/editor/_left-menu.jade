@@ -1,7 +1,8 @@
 // Left-hand menu entries
 span(ng-controller="ReferencesController")
 	ul.list-unstyled.nav()
-		each item in ['mendeley','zotero']
+		//each item in ['mendeley','zotero']
+		each item in ['mendeley']
 			li
 				a(ng-click="openReferencesModal('#{item}')")
 					i.fa.fa-file-text-o
