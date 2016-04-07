@@ -43,6 +43,7 @@ describe 'ReferencesApiHandler', ->
 			json: sinon.stub()
 			sendStatus: sinon.stub()
 			send: sinon.stub()
+		@next = sinon.stub()
 
 	describe "startAuth", ->
 		beforeEach ->
@@ -74,7 +75,8 @@ describe 'ReferencesApiHandler', ->
 		beforeEach ->
 			@update =
 				$unset:
-					refProvider: true
+					refProviders:
+						refProvider: true
 
 			@ReferencesApiHandler.unlink @req, @res, @next
 
@@ -83,3 +85,54 @@ describe 'ReferencesApiHandler', ->
 
 		it "should redirect to user settings page", ->
 			@res.redirect.calledWith("/user/settings").should.equal true
+
+	describe 'bibtex', ->
+
+		beforeEach ->
+			@fakeResponseData = {a: 1}
+			@ReferencesApiHandler.userCanMakeRequest = sinon.stub().callsArgWith(2, null, true)
+			@ReferencesApiHandler.make3rdRequest = sinon.stub().callsArgWith(
+				1,
+				null,
+				{statusCode: 200},
+				@fakeResponseData
+			)
+
+		describe 'when all goes well', ->
+
+			beforeEach ->
+				@ReferencesApiHandler.bibtex @req, @res
+
+			it 'should send json data', ->
+				@res.json.callCount.should.equal 1
+				@res.json.calledWith(@fakeResponseData).should.equal true
+
+		describe 'when user cannot make the request', ->
+
+			beforeEach ->
+				@ReferencesApiHandler.userCanMakeRequest = sinon.stub().callsArgWith(2, null, false)
+				@ReferencesApiHandler.bibtex @req, @res, @next
+
+			it 'should send 403', ->
+				@res.send.callCount.should.equal 1
+				@res.send.calledWith(403).should.equal true
+
+		describe 'when userCanMakeRequest produces an error', ->
+
+			beforeEach ->
+				@ReferencesApiHandler.userCanMakeRequest = sinon.stub().callsArgWith(2, new Error('woops'))
+				@ReferencesApiHandler.bibtex @req, @res, @next
+
+			it 'should pass error to next handler', ->
+				@next.callCount.should.equal 1
+				@next.firstCall.args[0].should.be.instanceof Error
+
+		describe 'when remote request fails', ->
+
+			beforeEach ->
+				@ReferencesApiHandler.make3rdRequest = sinon.stub().callsArgWith(1, new Error('woops'))
+				@ReferencesApiHandler.bibtex @req, @res, @next
+
+			it 'should pass error to next handler', ->
+				@next.callCount.should.equal 1
+				@next.firstCall.args[0].should.be.instanceof Error
