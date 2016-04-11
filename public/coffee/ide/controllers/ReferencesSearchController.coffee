@@ -3,13 +3,6 @@ define [
 	"ace/ace"
 ], (App) ->
 	Range = ace.require("ace/range").Range
-	browserIsSafari = () ->
-		userAgent = navigator.userAgent
-		(
-			userAgent.match(/.*Safari\/.*/) &&
-			!userAgent.match(/.*Chrome\/.*/) &&
-			!userAgent.match(/.*Chromium\/.*/)
-		)
 
 	getLastCommandFragment = (lineUpToCursor) ->
 		if m = lineUpToCursor.match(/(\\[^\\]+)$/)
@@ -153,7 +146,7 @@ define [
 				# BUG: Safari/Ace/Ctrl-Space don't seem to get along.
 				# If we detect we're in Safari, just add a key listener to the
 				# #editor node, otherwise register a command with ace
-				if browserIsSafari()
+				if ide.browserIsSafari
 					document.querySelector('#editor').onkeyup = (e) ->
 						if e.ctrlKey && e.keyCode == 32
 							handleControlSpace(editor)
