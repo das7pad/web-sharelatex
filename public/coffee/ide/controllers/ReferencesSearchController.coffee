@@ -3,6 +3,13 @@ define [
 	"ace/ace"
 ], (App) ->
 	Range = ace.require("ace/range").Range
+	browserIsSafari = () ->
+		userAgent = navigator.userAgent
+		(
+			userAgent.match(/.*Safari\/.*/) &&
+			!userAgent.match(/.*Chrome\/.*/) &&
+			!userAgent.match(/.*Chromium\/.*/)
+		)
 
 	getLastCommandFragment = (lineUpToCursor) ->
 		if m = lineUpToCursor.match(/(\\[^\\]+)$/)
@@ -133,19 +140,30 @@ define [
 				# on Ctrl-space:
 				# if we're already showing the popup for a `\cite{}` block
 				# then show the References Search modal, otherwise do the default behaviour
-				editor.commands.addCommand({
-					name: "triggerReferencesSearchPopup",
-					exec: (ed) ->
-						$timeout((-> $scope.updateHintNode(ed)), 0)
-						isAtCitation = $scope.isCursorAtCitation(ed)
-						if ed?.completer?.popup?.isOpen == true && isAtCitation == true
-							if $scope._sixpackParticipating
-								sixpack.convert 'references-search-popup-redux', () -> $scope._sixpackParticipating = false
-							$scope.openReferencesSearchModal()
-						else
-							startAutocomplete.exec(ed)
-					bindKey: "Ctrl-Space"
-				})
+				handleControlSpace = (ed) ->
+					$timeout((-> $scope.updateHintNode(ed)), 0)
+					isAtCitation = $scope.isCursorAtCitation(ed)
+					if ed?.completer?.popup?.isOpen == true && isAtCitation == true
+						if $scope._sixpackParticipating
+							sixpack.convert 'references-search-popup-redux', () -> $scope._sixpackParticipating = false
+						$scope.openReferencesSearchModal()
+					else
+						startAutocomplete.exec(ed)
+
+				# BUG: Safari/Ace/Ctrl-Space don't seem to get along.
+				# If we detect we're in Safari, just add a key listener to the
+				# #editor node, otherwise register a command with ace
+				if browserIsSafari()
+					document.querySelector('#editor').onkeyup = (e) ->
+						if e.ctrlKey && e.keyCode == 32
+							handleControlSpace(editor)
+				else
+					editor.commands.addCommand({
+						name: "triggerReferencesSearchPopup",
+						exec: handleControlSpace
+						bindKey: startAutocomplete.bindKey
+					})
+
 				$scope._inited = true
 
 		# do setup when project loads
