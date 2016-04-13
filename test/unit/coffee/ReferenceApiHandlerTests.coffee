@@ -52,6 +52,7 @@ describe 'ReferencesApiHandler', ->
 					_id: @user_id
 			params:
 				ref_provider: 'refProvider'
+				Project_id: @project_id
 		@res =
 			redirect: sinon.stub()
 			json: sinon.stub()
@@ -105,7 +106,7 @@ describe 'ReferencesApiHandler', ->
 		beforeEach ->
 			@doc =
 				_id: ObjectId().toString()
-				name: "#{@ref_provider}.bib"
+				name: "refProvider.bib"
 				lines: []
 			@fakeResponseData = '{a: 1}'
 			@folder_id = ObjectId().toString()
@@ -125,16 +126,42 @@ describe 'ReferencesApiHandler', ->
 			describe 'when document is already present', ->
 
 				beforeEach ->
-					@allDocs["/#{@refProvider}.bib"] = {_id: ObjectId().toString(), lines: []}
+					@allDocs["/refProvider.bib"] = {_id: ObjectId().toString(), lines: []}
+					@ProjectEntityHandler.getAllDocs.callsArgWith(1, null, @allDocs)
 					@ReferencesApiHandler.importBibtex @req, @res, @next
 
 				it 'should send back a 201 response', ->
 					@res.send.callCount.should.equal 1
 					@res.send.calledWith(201).should.equal true
 
+				it 'should not call next with an error', ->
+					@next.callCount.should.equal 0
+
+				it 'should call make3rdRequest', ->
+					@ReferencesApiHandler.make3rdRequest.callCount.should.equal 1
+
+				it 'should call getAllDocs', ->
+					@ProjectEntityHandler.getAllDocs.callCount.should.equal 1
+
+				it 'should call DocumentUpdaterHandler.setDocument', ->
+					@DocumentUpdaterHandler.setDocument.callCount.should.equal 1
+
+				it 'should not call EditorRealTimeController.emitToRoom', ->
+					@EditorRealTimeController.emitToRoom.callCount.should.equal 0
+
 			describe 'when document is absent', ->
 
 				beforeEach ->
+
+				# it 'should call ProjectEntityHandler.addDoc', ->
+				# 	@ProjectEntityHandler.addDoc.callCount.should.equal 1
+				# 	@ProjectEntityHandler.addDoc.calledWith(
+				# 		@project_id,
+				# 		undefined,
+				# 		"#{@refProvider}.bib",
+				# 		@fakeResponseData.split('\n')
+				# 	).should.equal true
+
 
 		describe 'when user is not allowed to do this', ->
 
