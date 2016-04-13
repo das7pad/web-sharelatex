@@ -10,6 +10,9 @@ describe 'ReferencesApiHandler', ->
 		@user =
 			features:
 				refProvider: true
+		@allDocs =
+			'/main.tex':  {_id: 'aaa', name: 'main.tex',  lines: ['one', 'two', 'three']}
+			'/other.tex': {_id: 'bbb', name: 'other.tex', lines: ['four', 'five']}
 		@ReferencesApiHandler = SandboxedModule.require modulePath, requires:
 			'request': @request = sinon.stub()
 			'settings-sharelatex': @settings =
@@ -26,11 +29,22 @@ describe 'ReferencesApiHandler', ->
 			'logger-sharelatex': @logger =
 				log:->
 				err:->
-			'../../../../app/js/Features/User/UserGetter': {
+			'../../../../app/js/Features/User/UserGetter': @UserGetter = {
 				getUser: sinon.stub().callsArgWith(1, null, @user)
+			}
+			'../../../../app/js/Features/Project/ProjectEntityHandler': @ProjectEntityHandler = {
+				getAllDocs: sinon.stub().callsArgWith(1, null, @allDocs)
+				addDoc: sinon.stub()
+			}
+			'../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler': @DocumentUpdaterHandler = {
+				setDocument: sinon.stub()
+			}
+			'../../../../app/js/Features/Editor/EditorRealTimeController': @EditorRealTimeController = {
+				emitToRoom: sinon.stub()
 			}
 
 		@user_id = ObjectId().toString()
+		@project_id = ObjectId().toString()
 
 		@req =
 			session:
@@ -86,10 +100,60 @@ describe 'ReferencesApiHandler', ->
 		it "should redirect to user settings page", ->
 			@res.redirect.calledWith("/user/settings").should.equal true
 
+	describe 'importBibtex', ->
+
+		beforeEach ->
+			@doc =
+				_id: ObjectId().toString()
+				name: "#{@ref_provider}.bib"
+				lines: []
+			@fakeResponseData = '{a: 1}'
+			@folder_id = ObjectId().toString()
+			@ReferencesApiHandler.userCanMakeRequest = sinon.stub().callsArgWith(2, null, true)
+			@ReferencesApiHandler.make3rdRequest = sinon.stub().callsArgWith(
+				1,
+				null,
+				{statusCode: 200},
+				@fakeResponseData
+			)
+			@ProjectEntityHandler.getAllDocs.callsArgWith(1, null, @allDocs)
+			@DocumentUpdaterHandler.setDocument.callsArgWith(5, null)
+			@ProjectEntityHandler.addDoc.callsArgWith(4, null, @doc, @folder_id)
+
+		describe 'when all goes well', ->
+
+			describe 'when document is already present', ->
+
+				beforeEach ->
+					@allDocs["/#{@refProvider}.bib"] = {_id: ObjectId().toString(), lines: []}
+					@ReferencesApiHandler.importBibtex @req, @res, @next
+
+				it 'should send back a 201 response', ->
+					@res.send.callCount.should.equal 1
+					@res.send.calledWith(201).should.equal true
+
+			describe 'when document is absent', ->
+
+				beforeEach ->
+
+		describe 'when user is not allowed to do this', ->
+
+		describe 'when remote api produces an error', ->
+
+		describe 'when getAllDocs produces an error', ->
+
+		describe 'when setDocument produces an error', ->
+
+		describe 'when addDoc produces an error', ->
+
+
+
+
+
 	describe 'bibtex', ->
 
 		beforeEach ->
-			@fakeResponseData = {a: 1}
+			@fakeResponseData = '{a: 1}'
 			@ReferencesApiHandler.userCanMakeRequest = sinon.stub().callsArgWith(2, null, true)
 			@ReferencesApiHandler.make3rdRequest = sinon.stub().callsArgWith(
 				1,
