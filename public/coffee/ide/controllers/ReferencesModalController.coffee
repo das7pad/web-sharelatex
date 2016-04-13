@@ -58,37 +58,22 @@ define [
 		$scope.importBibtex = () ->
 			if !$scope.bibtexData
 				return
-			# TODO: make this not suck
-			targetFileName = "#{$scope.provider}.bib"
-			targetFile = ide.fileTreeManager.findEntityByPath(targetFileName)
-			updateFileContents = (target) ->
-				_ide.editorManager.openDoc(target)
-				$timeout(
-					() ->
-						editor = window.editors[0]
-						if ide.editorManager.getCurrentDocId() == target.id
-							editor.setValue($scope.bibtexData)
-						else
-							console.error "Wrong doc open when trying to input bibtex data into #{target.name}"
-					, 500
-				)
+			if $scope.status.importing
+				return
+			$scope.status.importing = true
+			$http.post(
+				"/project/#{ide.project_id}/#{provider}/bibtex/import",
+				{_csrf: window.csrfToken}
+			)
+				.success (data) ->
+					$scope.status.error = false
+					$scope.status.importing = false
+					$scope.cancel()
+				.error () ->
+					$scope.status.error = true
+					$scope.status.importing = false
 
-			if targetFile
-				updateFileContents(targetFile)
-			else
-				ide.fileTreeManager.createDoc(targetFileName).then (response) ->
-					# TODO: check status code
-					console.log response.data
-					newDocId = response.data._id
-					$timeout(
-						() ->
-							targetFile = ide.fileTreeManager.findEntityById(newDocId)
-							console.log ">> target is", targetFile
-							updateFileContents(targetFile)
-						, 0
-					)
-
-		# automatically load the bibtex from provider
+		# automatically load the bibtex from provider when the modal loads
 		$timeout(
 			() ->
 				if $scope.userHasProviderFeature && $scope.userHasProviderLink

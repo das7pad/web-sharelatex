@@ -8,6 +8,9 @@ ObjectId = mongojs.ObjectId
 UserUpdater = require("../../../../app/js/Features/User/UserUpdater")
 logger = require("logger-sharelatex")
 UserGetter = require('../../../../app/js/Features/User/UserGetter')
+ProjectEntityHandler = require('../../../../app/js/Features/Project/ProjectEntityHandler')
+DocumentUpdaterHandler = require('../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler')
+EditorRealTimeController = require('../../../../app/js/Features/Editor/EditorRealTimeController')
 
 module.exports = ReferencesApiHandler =
 
@@ -92,3 +95,44 @@ module.exports = ReferencesApiHandler =
 					return next(err)
 				logger.log {user_id, ref_provider}, "got bibtex from third-party-references, returning to client"
 				res.json body
+
+	importBibtex: (req, res, next) ->
+		user_id = req.session?.user?._id
+		ref_provider = req.params.ref_provider
+		project_id = req.params.Project_id
+		ReferencesApiHandler.userCanMakeRequest user_id, ref_provider, (err, canMakeRequest) ->
+			if err
+				return next(err)
+			if !canMakeRequest
+				return res.send 403
+			opts =
+				method:"get"
+				url: "/user/#{user_id}/#{ref_provider}/bibtex"
+			logger.log {user_id, ref_provider, project_id}, "importing bibtex from third-party-references"
+			ReferencesApiHandler.make3rdRequest opts, (err, response, body)->
+				if err
+					logger.err {user_id, ref_provider, project_id}, "error getting bibtex from third-party-references"
+					return next(err)
+				logger.log {user_id, ref_provider, project_id}, "got bibtex from third-party-references, returning to client"
+				# do the thing
+				lines = body.split('\n')
+				ProjectEntityHandler.getAllDocs project_id, (err, allDocs) ->
+					if err
+						logger.err {user_id, ref_provider, project_id}, "error getting all docs for project"
+						return next(err)
+					targetDocName = "#{ref_provider}.bib"
+					if doc = allDocs["/#{targetDocName}"]
+						logger.log {user_id, ref_provider, project_id, targetDocName}, "updating document with bibtex content"
+						DocumentUpdaterHandler.setDocument project_id, doc._id, user_id, lines, 'references-import', (err) ->
+							if err
+								logger.err {user_id, ref_provider, project_id, doc_id:doc._id, err}, "error updating doc with imported bibtex"
+								return next(err)
+							return res.send 201
+					else
+						logger.log {user_id, ref_provider, project_id, targetDocName}, "creating new document with bibtex content"
+						ProjectEntityHandler.addDoc project_id, undefined, targetDocName, lines, (err, doc, folder_id) ->
+							if err
+								logger.err {user_id, ref_provider, project_id, doc_id:doc._id, err}, "error updating doc with imported bibtex"
+								return next(err)
+							EditorRealTimeController.emitToRoom(project_id, 'reciveNewDoc', folder_id, doc, "references-import")
+							return res.send 201

@@ -60,7 +60,7 @@ script(type="text/ng-template", id="referencesModalTemplate")
 								| {{bibtexData}}
 							hr
 							div.text-center
-								button.btn.btn-success(ng-click="importBibtex()")
+								button.btn.btn-success(ng-click="importBibtex()", ng-disabled="status.importing")
 									span #{translate("reference_import_button")} {{provider}}.bib
 
 
