@@ -123,6 +123,33 @@ describe 'ReferencesApiHandler', ->
 
 		describe 'when all goes well', ->
 
+			describe 'when document is absent', ->
+
+				beforeEach ->
+					@ReferencesApiHandler.importBibtex @req, @res, @next
+
+				it 'should send back a 201 response', ->
+					@res.send.callCount.should.equal 1
+					@res.send.calledWith(201).should.equal true
+
+				it 'should not call next with an error', ->
+					@next.callCount.should.equal 0
+
+				it 'should call make3rdRequest', ->
+					@ReferencesApiHandler.make3rdRequest.callCount.should.equal 1
+
+				it 'should call getAllDocs', ->
+					@ProjectEntityHandler.getAllDocs.callCount.should.equal 1
+
+				it 'should call addDoc', ->
+					@ProjectEntityHandler.addDoc.callCount.should.equal 1
+
+				it 'should call EditorRealTimeController.emitToRoom', ->
+					@EditorRealTimeController.emitToRoom.callCount.should.equal 1
+
+				it 'should not call DocumentUpdaterHandler.setDocument', ->
+					@DocumentUpdaterHandler.setDocument.callCount.should.equal 0
+
 			describe 'when document is already present', ->
 
 				beforeEach ->
@@ -146,22 +173,11 @@ describe 'ReferencesApiHandler', ->
 				it 'should call DocumentUpdaterHandler.setDocument', ->
 					@DocumentUpdaterHandler.setDocument.callCount.should.equal 1
 
+				it 'should not call addDoc', ->
+					@ProjectEntityHandler.addDoc.callCount.should.equal 0
+
 				it 'should not call EditorRealTimeController.emitToRoom', ->
 					@EditorRealTimeController.emitToRoom.callCount.should.equal 0
-
-			describe 'when document is absent', ->
-
-				beforeEach ->
-
-				# it 'should call ProjectEntityHandler.addDoc', ->
-				# 	@ProjectEntityHandler.addDoc.callCount.should.equal 1
-				# 	@ProjectEntityHandler.addDoc.calledWith(
-				# 		@project_id,
-				# 		undefined,
-				# 		"#{@refProvider}.bib",
-				# 		@fakeResponseData.split('\n')
-				# 	).should.equal true
-
 
 		describe 'when user is not allowed to do this', ->
 
