@@ -109,6 +109,7 @@ module.exports = ReferencesApiHandler =
 				method:"get"
 				url: "/user/#{user_id}/#{ref_provider}/bibtex"
 			logger.log {user_id, ref_provider, project_id}, "importing bibtex from third-party-references"
+			# get the bibtex from remote api
 			ReferencesApiHandler.make3rdRequest opts, (err, response, body)->
 				if err
 					logger.err {user_id, ref_provider, project_id}, "error getting bibtex from third-party-references"
@@ -116,13 +117,16 @@ module.exports = ReferencesApiHandler =
 				logger.log {user_id, ref_provider, project_id}, "got bibtex from third-party-references, returning to client"
 				# do the thing
 				lines = body.split('\n')
+				# get all documents currently in project,
 				ProjectEntityHandler.getAllDocs project_id, (err, allDocs) ->
 					if err
 						logger.err {user_id, ref_provider, project_id}, "error getting all docs for project"
 						return next(err)
+					# check if our target file is in this project
 					targetDocName = "#{ref_provider}.bib"
 					if doc = allDocs["/#{targetDocName}"]
 						logger.log {user_id, ref_provider, project_id, targetDocName}, "updating document with bibtex content"
+						# set document contents to the bibtex payload
 						DocumentUpdaterHandler.setDocument project_id, doc._id, user_id, lines, 'references-import', (err) ->
 							if err
 								logger.err {user_id, ref_provider, project_id, doc_id:doc._id, err}, "error updating doc with imported bibtex"
@@ -130,6 +134,7 @@ module.exports = ReferencesApiHandler =
 							return res.send 201
 					else
 						logger.log {user_id, ref_provider, project_id, targetDocName}, "creating new document with bibtex content"
+						# add a new doc, with bibtex payload
 						ProjectEntityHandler.addDoc project_id, undefined, targetDocName, lines, (err, doc, folder_id) ->
 							if err
 								logger.err {user_id, ref_provider, project_id, doc_id:doc._id, err}, "error updating doc with imported bibtex"
