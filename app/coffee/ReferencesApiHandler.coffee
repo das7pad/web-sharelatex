@@ -137,7 +137,7 @@ module.exports = ReferencesApiHandler =
 						# add a new doc, with bibtex payload
 						ProjectEntityHandler.addDoc project_id, undefined, targetDocName, lines, (err, doc, folder_id) ->
 							if err
-								logger.err {user_id, ref_provider, project_id, doc_id:doc._id, err}, "error updating doc with imported bibtex"
+								logger.err {user_id, ref_provider, project_id, err}, "error updating doc with imported bibtex"
 								return next(err)
 							EditorRealTimeController.emitToRoom(project_id, 'reciveNewDoc', folder_id, doc, "references-import")
 							return res.send 201
