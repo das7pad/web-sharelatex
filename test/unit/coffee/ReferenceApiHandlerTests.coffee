@@ -140,12 +140,26 @@ describe 'ReferencesApiHandler', ->
 
 				it 'should call getAllDocs', ->
 					@ProjectEntityHandler.getAllDocs.callCount.should.equal 1
+					@ProjectEntityHandler.getAllDocs.calledWith(@project_id).should.equal true
 
 				it 'should call addDoc', ->
 					@ProjectEntityHandler.addDoc.callCount.should.equal 1
+					@ProjectEntityHandler.addDoc.calledWith(
+						@project_id,
+						undefined,
+						"refProvider.bib",
+						@fakeResponseData.split('\n')
+					).should.equal true
 
 				it 'should call EditorRealTimeController.emitToRoom', ->
 					@EditorRealTimeController.emitToRoom.callCount.should.equal 1
+					@EditorRealTimeController.emitToRoom.calledWith(
+						@project_id,
+						'reciveNewDoc',
+						@folder_id,
+						@doc,
+						'references-import'
+					).should.equal true
 
 				it 'should not call DocumentUpdaterHandler.setDocument', ->
 					@DocumentUpdaterHandler.setDocument.callCount.should.equal 0
@@ -169,9 +183,16 @@ describe 'ReferencesApiHandler', ->
 
 				it 'should call getAllDocs', ->
 					@ProjectEntityHandler.getAllDocs.callCount.should.equal 1
+					@ProjectEntityHandler.getAllDocs.calledWith(@project_id).should.equal true
 
 				it 'should call DocumentUpdaterHandler.setDocument', ->
 					@DocumentUpdaterHandler.setDocument.callCount.should.equal 1
+					@DocumentUpdaterHandler.setDocument.calledWith(
+						@project_id,
+						@allDocs["/refProvider.bib"]._id,
+						@user_id,
+						@fakeResponseData.split('\n'), 'references-import'
+					).should.equal true
 
 				it 'should not call addDoc', ->
 					@ProjectEntityHandler.addDoc.callCount.should.equal 0
@@ -181,13 +202,24 @@ describe 'ReferencesApiHandler', ->
 
 		describe 'when user is not allowed to do this', ->
 
+			beforeEach ->
+
+
 		describe 'when remote api produces an error', ->
+
+			beforeEach ->
 
 		describe 'when getAllDocs produces an error', ->
 
+			beforeEach ->
+
 		describe 'when setDocument produces an error', ->
 
+			beforeEach ->
+
 		describe 'when addDoc produces an error', ->
+
+			beforeEach ->
 
 
 
