@@ -203,7 +203,30 @@ describe 'ReferencesApiHandler', ->
 		describe 'when user is not allowed to do this', ->
 
 			beforeEach ->
+				@ReferencesApiHandler.userCanMakeRequest = sinon.stub().callsArgWith(2, null, false)
+				@ReferencesApiHandler.importBibtex @req, @res, @next
 
+			it 'should send back a 403 response', ->
+				@res.send.callCount.should.equal 1
+				@res.send.calledWith(403).should.equal true
+
+			it 'should not call make3rdRequest', ->
+				@ReferencesApiHandler.make3rdRequest.callCount.should.equal 0
+
+			it 'should not call getAllDocs', ->
+				@ProjectEntityHandler.getAllDocs.callCount.should.equal 0
+
+			it 'should not call DocumentUpdaterHandler.setDocument', ->
+				@DocumentUpdaterHandler.setDocument.callCount.should.equal 0
+
+			it 'should not call addDoc', ->
+				@ProjectEntityHandler.addDoc.callCount.should.equal 0
+
+			it 'should not call DocumentUpdaterHandler.setDocument', ->
+				@DocumentUpdaterHandler.setDocument.callCount.should.equal 0
+
+			it 'should not call EditorRealTimeController.emitToRoom', ->
+				@EditorRealTimeController.emitToRoom.callCount.should.equal 0
 
 		describe 'when remote api produces an error', ->
 
