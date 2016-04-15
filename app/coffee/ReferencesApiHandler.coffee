@@ -32,7 +32,7 @@ module.exports = ReferencesApiHandler =
 				json:true
 			ReferencesApiHandler.make3rdRequest opts, (err, response, body)->
 				if err
-					next(err)
+					return next(err)
 				logger.log body:body, statusCode:response.statusCode, "thirdparty return"
 				res.redirect(body.redirect)
 
