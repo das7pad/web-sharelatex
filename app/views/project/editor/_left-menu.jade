@@ -41,7 +41,16 @@ script(type="text/ng-template", id="referencesModalTemplate")
 					// When the user has linked, the happy path
 					div(ng-if="userHasProviderLink")
 
-						.alert.alert-danger(ng-show="status.error") #{translate(item+"_reference_loading_error")}
+						// error message
+						.alert.alert-danger(ng-show="status.error")
+							div(ng-show="status.errorType == 'default'")
+								| #{translate(item+"_reference_loading_error")}
+
+							div(ng-show="status.errorType == 'expired'")
+								| #{translate(item+"_reference_loading_error_expired")}
+
+							div(ng-show="status.errorType == 'forbidden'")
+								| #{translate(item+"_reference_loading_error_forbidden")}
 
 						.loading(ng-show="!status.error && status.loading")
 							div.text-center

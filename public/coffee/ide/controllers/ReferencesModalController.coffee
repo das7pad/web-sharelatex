@@ -11,6 +11,7 @@ define [
 		$scope.status = {
 			loading: false
 			error: false
+			errorType: 'default'  # || 'expired' || 'forbidden'
 		}
 
 		$scope.cancel = () ->
@@ -46,12 +47,17 @@ define [
 		$scope.loadBibtex = () ->
 			$scope.status.loading = true
 			$scope.status.error = false
+			$scope.status.errorType = 'default'
 
 			$http.get("/#{provider}/bibtex")
 				.success (data) ->
 					$scope.bibtexData = data
 					$scope.status.loading = false
-				.error () ->
+				.error (data, statusCode) ->
+					if statusCode == 401
+						$scope.status.errorType = 'expired'
+					if statusCode == 403
+						$scope.status.errorType = 'forbidden'
 					$scope.status.error = true
 					$scope.status.loading = false
 

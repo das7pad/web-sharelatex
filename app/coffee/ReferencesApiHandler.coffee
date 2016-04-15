@@ -93,8 +93,12 @@ module.exports = ReferencesApiHandler =
 				if err
 					logger.err {user_id, ref_provider}, "error getting bibtex from third-party-references"
 					return next(err)
-				logger.log {user_id, ref_provider}, "got bibtex from third-party-references, returning to client"
-				res.json body
+				if 200 <= response.statusCode < 300
+					logger.log {user_id, ref_provider}, "got bibtex from third-party-references, returning to client"
+					res.json body
+				else
+					logger.log {user_id, ref_provider, statusCode:response.statusCode}, "error code from remote api"
+					res.send response.statusCode
 
 	importBibtex: (req, res, next) ->
 		user_id = req.session?.user?._id
