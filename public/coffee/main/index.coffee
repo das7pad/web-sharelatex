@@ -1,3 +1,3 @@
 define [
-	"main/references-sharelatex-webmodule/controllers/ReferenceUnlinkController"
+	"main/tpr-webmodule/controllers/ReferenceUnlinkController"
 ], () ->
