@@ -21,8 +21,10 @@ module.exports = ReferencesApiHandler =
 	startAuth: (req, res, next)->
 		user_id = req.session?.user?._id
 		ref_provider = req.params.ref_provider
+		logger.log {user_id, ref_provider}, "starting references auth process"
 		ReferencesApiHandler.userCanMakeRequest user_id, ref_provider, (err, canMakeRequest) ->
 			if err
+				logger.error {user_id, ref_provider, err}, "error determining if user can make this request"
 				return next(err)
 			if !canMakeRequest
 				return res.send 403
@@ -32,6 +34,7 @@ module.exports = ReferencesApiHandler =
 				json:true
 			ReferencesApiHandler.make3rdRequest opts, (err, response, body)->
 				if err
+					logger.error {user_id, ref_provider, err}, "error contacting tpr api"
 					return next(err)
 				logger.log body:body, statusCode:response.statusCode, "thirdparty return"
 				res.redirect(body.redirect)
@@ -50,15 +53,19 @@ module.exports = ReferencesApiHandler =
 				qs: req.query
 			ReferencesApiHandler.make3rdRequest opts, (err, response, body)->
 				if err
+					logger.error {user_id, ref_provider, err}, "error contacting tpr api"
 					next(err)
+				logger.log {user_id, ref_provider}, "auth complete"
 				res.redirect "/user/settings"
 
 	make3rdRequest: (opts, callback)->
 		opts.url = "#{thirdpartyUrl}#{opts.url}"
+		logger.log {url: opts.url}, 'making request to third-party-references api'
 		request opts, callback
 
 	makeRefRequest: (opts, callback)->
 		opts.url = "#{referencesUrl}#{opts.url}"
+		logger.log {url: opts.url}, 'making request to third-party-references api'
 		request opts, callback
 
 	unlink: (req, res, next) ->
