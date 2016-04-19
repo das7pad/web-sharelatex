@@ -1,11 +1,12 @@
 // Left-hand menu entries
 span(ng-controller="ReferencesController")
-	ul.list-unstyled.nav()
-		each item in ['mendeley','zotero']
-			li
-				a(ng-click="openReferencesModal('#{item}')")
-					i.fa.fa-file-text-o
-					| &nbsp;&nbsp; #{translate(item)}
+	div(ng-if="thirdPartyReferencesEnabled")
+		ul.list-unstyled.nav()
+			each item in ['mendeley','zotero']
+				li
+					a(ng-click="openReferencesModal('#{item}')")
+						i.fa.fa-file-text-o
+						| &nbsp;&nbsp; #{translate(item)}
 
 // Menedeley|Zotero References Modal
 script(type="text/ng-template", id="referencesModalTemplate")

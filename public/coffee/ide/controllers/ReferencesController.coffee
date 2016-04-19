@@ -2,6 +2,7 @@ define [
 	"base"
 ], (App) ->
 	App.controller "ReferencesController", ($scope, $modal, ide, $http) ->
+		$scope.thirdPartyReferencesEnabled = ide.featureToggle == 'tpr'
 		$scope.openReferencesModal = (providerStr) ->
 			$modal.open {
 				templateUrl: "referencesModalTemplate"
