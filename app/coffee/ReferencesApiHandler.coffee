@@ -54,7 +54,7 @@ module.exports = ReferencesApiHandler =
 			ReferencesApiHandler.make3rdRequest opts, (err, response, body)->
 				if err
 					logger.error {user_id, ref_provider, err}, "error contacting tpr api"
-					next(err)
+					return next(err)
 				logger.log {user_id, ref_provider}, "auth complete"
 				res.redirect "/user/settings"
 
