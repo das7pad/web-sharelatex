@@ -21,7 +21,7 @@ if getReqQueryParam('ft') === 'tpr'
 				)  #{translate("unlink_to_"+item)}
 		- else
 			p.small #{translate(item+"_sync_description")}
-			p.small #{translate("link_to_"+item+"_description")}
+			//p.small #{translate("link_to_"+item+"_description")}
 			p
 				a(href='/#{item}/oauth').btn.btn-info #{translate("link_to_"+item)}
 

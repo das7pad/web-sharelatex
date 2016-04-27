@@ -61,7 +61,8 @@ script(type="text/ng-template", id="referencesModalTemplate")
 						.success(ng-show="bibtexData && !status.error && !status.loading")
 							div.text-center
 								i.fa.fa-check
-								span #{translate(item+"_reference_loading_success")}
+								span
+									| &nbsp;#{translate(item+"_reference_loading_success")}
 
 						// data display, scroll and import button
 						div(ng-if="bibtexData && !status.loading", style="margin-top:15px;")
