@@ -16,7 +16,7 @@ module.exports = ReferencesApiHandler =
 
 	userCanMakeRequest: (userId, ref_provider, callback=(err, canMakeRequest)->) ->
 		UserGetter.getUser userId, (err, user) ->
-			callback(err, user?.features?[ref_provider] == true)
+			callback(err, user?.features?.references == true)
 
 	startAuth: (req, res, next)->
 		user_id = req.session?.user?._id

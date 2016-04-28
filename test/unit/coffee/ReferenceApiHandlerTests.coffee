@@ -9,7 +9,7 @@ describe 'ReferencesApiHandler', ->
 	beforeEach ->
 		@user =
 			features:
-				refProvider: true
+				references: true
 		@allDocs =
 			'/main.tex':  {_id: 'aaa', name: 'main.tex',  lines: ['one', 'two', 'three']}
 			'/other.tex': {_id: 'bbb', name: 'other.tex', lines: ['four', 'five']}
@@ -22,7 +22,7 @@ describe 'ReferencesApiHandler', ->
 				mongo:
 					url: "mongodb://localhost/sharelatex"
 			'mongojs':
-				connect:-> @db = { users: { findOne : sinon.stub().callsArgWith(2, null, { features: {refProvider:true}, refProvider:true}) } }
+				connect:-> @db = { users: { findOne : sinon.stub().callsArgWith(2, null, { features: {references:true}, refProvider:true}) } }
 				ObjectId: ObjectId
 			'../../../../app/js/Features/User/UserUpdater': @UserUpdater =
 				updateUser: sinon.stub().callsArgWith(2, null)

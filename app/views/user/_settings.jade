@@ -5,7 +5,7 @@ if getReqQueryParam('ft') === 'tpr'
 		h3
 			| #{translate(item+"_integration")}
 
-		- if (!user.features[item])
+		- if (!user.features.references)
 			p.small #{translate(item+"_sync_description")}
 			.alert.alert-info
 				p #{translate(item+"_is_premium")}

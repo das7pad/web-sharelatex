@@ -4,7 +4,7 @@ define [
 	App.controller "ReferencesModalController", ($scope, $modalInstance, $http, $modal, $window, $interval, $timeout, ide, provider) ->
 
 		$scope.provider = provider
-		$scope.userHasProviderFeature = ide.$scope.user?.features?[provider]
+		$scope.userHasProviderFeature = ide.$scope.user?.features?.references
 		$scope.userHasProviderLink = ide.$scope.user?.refProviders?[provider]
 
 		$scope.bibtexData = null
