@@ -65,7 +65,7 @@ script(type="text/ng-template", id="referencesModalTemplate")
 									| &nbsp;#{translate(item+"_reference_loading_success")}
 
 						// data display, scroll and import button
-						div(ng-if="bibtexData && !status.loading", style="margin-top:15px;")
+						div(ng-if="bibtexData && !status.loading && !status.error", style="margin-top:15px;")
 							div(style="max-height: 360px; overflow: scroll; white-space: pre")
 								| {{bibtexData}}
 							hr
