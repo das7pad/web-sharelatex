@@ -53,6 +53,14 @@ script(type="text/ng-template", id="referencesModalTemplate")
 							div(ng-show="status.errorType == 'forbidden'")
 								| #{translate(item+"_reference_loading_error_forbidden")}
 
+						.alert.alert-danger(ng-show="status.error")
+							div
+								div
+									| #{translate("reference_error_relink_hint")} &nbsp;
+								div
+									a(href="/user/settings", target="_blank", style="font-weight: bold")
+										| #{translate("account_settings")}
+
 						.loading(ng-show="!status.error && status.loading")
 							div.text-center
 								i.fa.fa-refresh.fa-spin.fa-fw
