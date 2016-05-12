@@ -30,7 +30,7 @@ define [
 			lineUpToCursor = editor.getSession().getTextRange(range)
 			commandFragment = getLastCommandFragment(lineUpToCursor)
 			if commandFragment
-				citeMatch = commandFragment.match(/^~?\\([a-z]*cite[a-z]*(?:\[.*])?){([^}]*,)?(\w*)/)
+				citeMatch = commandFragment.match(/^~?\\([a-z]*cite[a-z]*(?:\[.*])?){([^}]*, *)?(\w*)/)
 				if citeMatch
 					return true
 			return false
@@ -178,7 +178,8 @@ define [
 			needsClosingBrace = !lineBeyondCursor.match(/^[^{]*}/)
 			lastSeparatorPosition = Math.max(
 				lineUpToCursor.lastIndexOf('{'),
-				lineUpToCursor.lastIndexOf(',')
+				lineUpToCursor.lastIndexOf(','),
+				lineUpToCursor.lastIndexOf(' ')
 			)
 			if lastSeparatorPosition < (pos.column - 1)
 				# delete back to the last separator, then insert new key
