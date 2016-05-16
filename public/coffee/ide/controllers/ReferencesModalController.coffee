@@ -58,6 +58,8 @@ define [
 						$scope.status.errorType = 'expired'
 					if statusCode == 403
 						$scope.status.errorType = 'forbidden'
+					if statusCode == 400
+						$scope.status.errorType = 'refresh-failed'
 					$scope.status.error = true
 					$scope.status.loading = false
 

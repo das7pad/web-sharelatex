@@ -53,7 +53,17 @@ script(type="text/ng-template", id="referencesModalTemplate")
 							div(ng-show="status.errorType == 'forbidden'")
 								| #{translate(item+"_reference_loading_error_forbidden")}
 
-						.alert.alert-danger(ng-show="status.error")
+							div(ng-show="status.errorType == 'refresh-failed'")
+								| #{translate(item+"_reference_loading_error_expired")}
+
+						// token refresh failed, prompt to relink account
+						div(ng-show="status.error && status.errorType == 'refresh-failed'")
+							div()
+								p #{translate(item+"_sync_description" )} 
+								p
+									a(href,ng-click="linkAccount()").btn.btn-info #{translate("link_to_"+item)}
+
+						div(ng-show="status.error && status.errorType != 'refresh-failed' ")
 							div
 								div
 									| #{translate("reference_error_relink_hint")} &nbsp;
