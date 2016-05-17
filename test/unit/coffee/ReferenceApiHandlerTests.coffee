@@ -172,200 +172,206 @@ describe 'ReferencesApiHandler', ->
 				it 'should not call DocumentUpdaterHandler.setDocument', ->
 					@DocumentUpdaterHandler.setDocument.callCount.should.equal 0
 
-		# 	describe 'when document is already present', ->
+			describe 'when document is already present', ->
 
-		# 		beforeEach ->
-		# 			@allFiles["/refProvider.bib"] = {_id: ObjectId().toString()}
-		# 			@ProjectEntityHandler.getAllFiles.callsArgWith(1, null, @allFile)
-		# 			@ReferencesApiHandler.importBibtex @req, @res, @next
+				beforeEach ->
+					@allFiles["/refProvider.bib"] = {_id: ObjectId().toString()}
+					@ProjectEntityHandler.getAllFiles.callsArgWith(1, null, @allFiles)
+					@ReferencesApiHandler.importBibtex @req, @res, @next
+					@readStream.emit('data', 'hi')
+					@readStream.emit('end')
 
-		# 		it 'should send back a 201 response', ->
-		# 			@res.send.callCount.should.equal 1
-		# 			@res.send.calledWith(201).should.equal true
+				it 'should send back a 201 response', ->
+					@res.send.callCount.should.equal 1
+					@res.send.calledWith(201).should.equal true
 
-		# 		it 'should not call next with an error', ->
-		# 			@next.callCount.should.equal 0
+				it 'should not call next with an error', ->
+					@next.callCount.should.equal 0
 
-		# 		it 'should call make3rdRequest', ->
-		# 			@ReferencesApiHandler.make3rdRequest.callCount.should.equal 1
+				it 'should call make3rdRequestStream', ->
+					@ReferencesApiHandler.make3rdRequestStream.callCount.should.equal 1
 
-		# 		it 'should call getAllDocs', ->
-		# 			@ProjectEntityHandler.getAllDocs.callCount.should.equal 1
-		# 			@ProjectEntityHandler.getAllDocs.calledWith(@project_id).should.equal true
+				it 'should call getAllFiles', ->
+					@ProjectEntityHandler.getAllFiles.callCount.should.equal 1
+					@ProjectEntityHandler.getAllFiles.calledWith(@project_id).should.equal true
 
-		# 		it 'should call DocumentUpdaterHandler.setDocument', ->
-		# 			@DocumentUpdaterHandler.setDocument.callCount.should.equal 1
-		# 			@DocumentUpdaterHandler.setDocument.calledWith(
-		# 				@project_id,
-		# 				@allDocs["/refProvider.bib"]._id,
-		# 				@user_id,
-		# 				@fakeResponseData.split('\n'), 'references-import'
-		# 			).should.equal true
+				it 'should call ProjectEntityHandler.replaceFile', ->
+					@ProjectEntityHandler.replaceFile.callCount.should.equal 1
+					@ProjectEntityHandler.replaceFile.calledWith(
+						@project_id,
+						@allFiles["/refProvider.bib"]._id,
+						@writeStream.path
+					).should.equal true
 
-		# 		it 'should not call addDoc', ->
-		# 			@ProjectEntityHandler.addDoc.callCount.should.equal 0
+				it 'should not call addFile', ->
+					@ProjectEntityHandler.addFile.callCount.should.equal 0
 
-		# 		it 'should not call EditorRealTimeController.emitToRoom', ->
-		# 			@EditorRealTimeController.emitToRoom.callCount.should.equal 0
+				it 'should not call EditorRealTimeController.emitToRoom', ->
+					@EditorRealTimeController.emitToRoom.callCount.should.equal 0
 
-		# describe 'when user is not allowed to do this', ->
+		describe 'when user is not allowed to do this', ->
 
-		# 	beforeEach ->
-		# 		@ReferencesApiHandler.userCanMakeRequest = sinon.stub().callsArgWith(2, null, false)
-		# 		@ReferencesApiHandler.importBibtex @req, @res, @next
+			beforeEach ->
+				@ReferencesApiHandler.userCanMakeRequest = sinon.stub().callsArgWith(2, null, false)
+				@ReferencesApiHandler.importBibtex @req, @res, @next
 
-		# 	it 'should send back a 403 response', ->
-		# 		@res.send.callCount.should.equal 1
-		# 		@res.send.calledWith(403).should.equal true
+			it 'should send back a 403 response', ->
+				@res.send.callCount.should.equal 1
+				@res.send.calledWith(403).should.equal true
 
-		# 	it 'should not call make3rdRequest', ->
-		# 		@ReferencesApiHandler.make3rdRequest.callCount.should.equal 0
+			it 'should not call make3rdRequestStream', ->
+				@ReferencesApiHandler.make3rdRequestStream.callCount.should.equal 0
 
-		# 	it 'should not call getAllDocs', ->
-		# 		@ProjectEntityHandler.getAllDocs.callCount.should.equal 0
+			it 'should not call getAllFiles', ->
+				@ProjectEntityHandler.getAllFiles.callCount.should.equal 0
 
-		# 	it 'should not call DocumentUpdaterHandler.setDocument', ->
-		# 		@DocumentUpdaterHandler.setDocument.callCount.should.equal 0
+			it 'should not call ProjectEntityHandler.replaceFile', ->
+				@ProjectEntityHandler.replaceFile.callCount.should.equal 0
 
-		# 	it 'should not call addDoc', ->
-		# 		@ProjectEntityHandler.addDoc.callCount.should.equal 0
+			it 'should not call addFile', ->
+				@ProjectEntityHandler.addFile.callCount.should.equal 0
 
-		# 	it 'should not call EditorRealTimeController.emitToRoom', ->
-		# 		@EditorRealTimeController.emitToRoom.callCount.should.equal 0
+			it 'should not call EditorRealTimeController.emitToRoom', ->
+				@EditorRealTimeController.emitToRoom.callCount.should.equal 0
 
-		# describe 'when userCanMakeRequest produces an error', ->
+		describe 'when userCanMakeRequest produces an error', ->
 
-		# 	beforeEach ->
-		# 		@err = new Error('woops')
-		# 		@ReferencesApiHandler.userCanMakeRequest = sinon.stub().callsArgWith(2, @err)
-		# 		@ReferencesApiHandler.importBibtex @req, @res, @next
+			beforeEach ->
+				@err = new Error('woops')
+				@ReferencesApiHandler.userCanMakeRequest = sinon.stub().callsArgWith(2, @err)
+				@ReferencesApiHandler.importBibtex @req, @res, @next
 
-		# 	it 'should call next with the error', ->
-		# 		@next.callCount.should.equal 1
-		# 		@next.calledWith(@err).should.equal true
+			it 'should call next with the error', ->
+				@next.callCount.should.equal 1
+				@next.calledWith(@err).should.equal true
 
-		# 	it 'should not call make3rdRequest', ->
-		# 		@ReferencesApiHandler.make3rdRequest.callCount.should.equal 0
+			it 'should not call make3rdRequestStream', ->
+				@ReferencesApiHandler.make3rdRequestStream.callCount.should.equal 0
 
-		# 	it 'should not call getAllDocs', ->
-		# 		@ProjectEntityHandler.getAllDocs.callCount.should.equal 0
+			it 'should not call getAllFiles', ->
+				@ProjectEntityHandler.getAllFiles.callCount.should.equal 0
 
-		# 	it 'should not call DocumentUpdaterHandler.setDocument', ->
-		# 		@DocumentUpdaterHandler.setDocument.callCount.should.equal 0
+			it 'should not call ProjectEntityHandler.replaceFile', ->
+				@ProjectEntityHandler.replaceFile.callCount.should.equal 0
 
-		# 	it 'should not call addDoc', ->
-		# 		@ProjectEntityHandler.addDoc.callCount.should.equal 0
+			it 'should not call addFile', ->
+				@ProjectEntityHandler.addFile.callCount.should.equal 0
 
-		# 	it 'should not call EditorRealTimeController.emitToRoom', ->
-		# 		@EditorRealTimeController.emitToRoom.callCount.should.equal 0
+			it 'should not call EditorRealTimeController.emitToRoom', ->
+				@EditorRealTimeController.emitToRoom.callCount.should.equal 0
 
-		# describe 'when remote api produces an error', ->
+		describe 'when remote api produces an error', ->
 
-		# 	beforeEach ->
-		# 		@err = new Error('woops')
-		# 		@ReferencesApiHandler.make3rdRequest = sinon.stub().callsArgWith(1, @err)
-		# 		@ReferencesApiHandler.importBibtex @req, @res, @next
+			beforeEach ->
+				@err = new Error('woops')
+				@ReferencesApiHandler.importBibtex @req, @res, @next
+				@readStream.emit('data', 'hi')
+				@readStream.emit('error', @err)
 
-		# 	it 'should call next with the error', ->
-		# 		@next.callCount.should.equal 1
-		# 		@next.calledWith(@err).should.equal true
+			it 'should call next with the error', ->
+				@next.callCount.should.equal 1
+				@next.calledWith(@err).should.equal true
 
-		# 	it 'should have called userCanMakeRequest', ->
-		# 		@ReferencesApiHandler.userCanMakeRequest.callCount.should.equal 1
+			it 'should have called userCanMakeRequest', ->
+				@ReferencesApiHandler.userCanMakeRequest.callCount.should.equal 1
 
-		# 	it 'should not call getAllDocs', ->
-		# 		@ProjectEntityHandler.getAllDocs.callCount.should.equal 0
+			it 'should not call getAllFiles', ->
+				@ProjectEntityHandler.getAllFiles.callCount.should.equal 0
 
-		# 	it 'should not call DocumentUpdaterHandler.setDocument', ->
-		# 		@DocumentUpdaterHandler.setDocument.callCount.should.equal 0
+			it 'should not call ProjectEntityHandler.replaceFile', ->
+				@ProjectEntityHandler.replaceFile.callCount.should.equal 0
 
-		# 	it 'should not call addDoc', ->
-		# 		@ProjectEntityHandler.addDoc.callCount.should.equal 0
+			it 'should not call addFile', ->
+				@ProjectEntityHandler.addFile.callCount.should.equal 0
 
-		# 	it 'should not call EditorRealTimeController.emitToRoom', ->
-		# 		@EditorRealTimeController.emitToRoom.callCount.should.equal 0
-
-
-		# describe 'when getAllDocs produces an error', ->
-
-		# 	beforeEach ->
-		# 		@err = new Error('woops')
-		# 		@ProjectEntityHandler.getAllDocs = sinon.stub().callsArgWith(1, @err)
-		# 		@ReferencesApiHandler.importBibtex @req, @res, @next
-
-		# 	it 'should call next with the error', ->
-		# 		@next.callCount.should.equal 1
-		# 		@next.calledWith(@err).should.equal true
-
-		# 	it 'should have called userCanMakeRequest', ->
-		# 		@ReferencesApiHandler.userCanMakeRequest.callCount.should.equal 1
-
-		# 	it 'should have called make3rdRequest', ->
-		# 		@ReferencesApiHandler.make3rdRequest.callCount.should.equal 1
-
-		# 	it 'should not call DocumentUpdaterHandler.setDocument', ->
-		# 		@DocumentUpdaterHandler.setDocument.callCount.should.equal 0
-
-		# 	it 'should not call addDoc', ->
-		# 		@ProjectEntityHandler.addDoc.callCount.should.equal 0
-
-		# 	it 'should not call EditorRealTimeController.emitToRoom', ->
-		# 		@EditorRealTimeController.emitToRoom.callCount.should.equal 0
+			it 'should not call EditorRealTimeController.emitToRoom', ->
+				@EditorRealTimeController.emitToRoom.callCount.should.equal 0
 
 
-		# describe 'when document is present, and setDocument produces an error', ->
+		describe 'when getAllDocs produces an error', ->
 
-		# 	beforeEach ->
-		# 		@err = new Error('woops')
-		# 		@allDocs["/refProvider.bib"] = {_id: ObjectId().toString(), lines: []}
-		# 		@DocumentUpdaterHandler.setDocument = sinon.stub().callsArgWith(5, @err)
-		# 		@ReferencesApiHandler.importBibtex @req, @res, @next
+			beforeEach ->
+				@err = new Error('woops')
+				@ProjectEntityHandler.getAllFiles = sinon.stub().callsArgWith(1, @err)
+				@ReferencesApiHandler.importBibtex @req, @res, @next
+				@readStream.emit('data', 'hi')
+				@readStream.emit('end')
 
-		# 	it 'should call next with the error', ->
-		# 		@next.callCount.should.equal 1
-		# 		@next.calledWith(@err).should.equal true
+			it 'should call next with the error', ->
+				@next.callCount.should.equal 1
+				@next.calledWith(@err).should.equal true
 
-		# 	it 'should have called userCanMakeRequest', ->
-		# 		@ReferencesApiHandler.userCanMakeRequest.callCount.should.equal 1
+			it 'should have called userCanMakeRequest', ->
+				@ReferencesApiHandler.userCanMakeRequest.callCount.should.equal 1
 
-		# 	it 'should have called make3rdRequest', ->
-		# 		@ReferencesApiHandler.make3rdRequest.callCount.should.equal 1
+			it 'should have called make3rdRequestStream', ->
+				@ReferencesApiHandler.make3rdRequestStream.callCount.should.equal 1
 
-		# 	it 'should have called getAllDocs', ->
-		# 		@ProjectEntityHandler.getAllDocs.callCount.should.equal 1
+			it 'should not call ProjectEntityHandler.replaceFile', ->
+				@ProjectEntityHandler.replaceFile.callCount.should.equal 0
 
-		# 	it 'should not call addDoc', ->
-		# 		@ProjectEntityHandler.addDoc.callCount.should.equal 0
+			it 'should not call addFile', ->
+				@ProjectEntityHandler.addFile.callCount.should.equal 0
 
-		# 	it 'should not call EditorRealTimeController.emitToRoom', ->
-		# 		@EditorRealTimeController.emitToRoom.callCount.should.equal 0
+			it 'should not call EditorRealTimeController.emitToRoom', ->
+				@EditorRealTimeController.emitToRoom.callCount.should.equal 0
 
+		describe 'when document is present, and replaceFile produces an error', ->
 
-		# describe 'when document is absent, and addDoc produces an error', ->
+			beforeEach ->
+				@err = new Error('woops')
+				@allFiles["/refProvider.bib"] = {_id: ObjectId().toString()}
+				@ProjectEntityHandler.replaceFile = sinon.stub().callsArgWith(3, @err)
+				@ReferencesApiHandler.importBibtex @req, @res, @next
+				@readStream.emit('data', 'hi')
+				@readStream.emit('end')
 
-		# 	beforeEach ->
-		# 		@err = new Error('woops')
-		# 		@ProjectEntityHandler.addDoc.callsArgWith(4, @err)
-		# 		@ReferencesApiHandler.importBibtex @req, @res, @next
+			it 'should call next with the error', ->
+				@next.callCount.should.equal 1
+				@next.calledWith(@err).should.equal true
 
-		# 	it 'should call next with the error', ->
-		# 		@next.callCount.should.equal 1
-		# 		@next.calledWith(@err).should.equal true
+			it 'should have called userCanMakeRequest', ->
+				@ReferencesApiHandler.userCanMakeRequest.callCount.should.equal 1
 
-		# 	it 'should have called userCanMakeRequest', ->
-		# 		@ReferencesApiHandler.userCanMakeRequest.callCount.should.equal 1
+			it 'should have called make3rdRequestStream', ->
+				@ReferencesApiHandler.make3rdRequestStream.callCount.should.equal 1
 
-		# 	it 'should have called make3rdRequest', ->
-		# 		@ReferencesApiHandler.make3rdRequest.callCount.should.equal 1
+			it 'should have called getAllFiles', ->
+				@ProjectEntityHandler.getAllFiles.callCount.should.equal 1
 
-		# 	it 'should have called getAllDocs', ->
-		# 		@ProjectEntityHandler.getAllDocs.callCount.should.equal 1
+			it 'should not call addFile', ->
+				@ProjectEntityHandler.addFile.callCount.should.equal 0
 
-		# 	it 'should not call DocumentUpdaterHandler.setDocument', ->
-		# 		@DocumentUpdaterHandler.setDocument.callCount.should.equal 0
+			it 'should not call EditorRealTimeController.emitToRoom', ->
+				@EditorRealTimeController.emitToRoom.callCount.should.equal 0
 
-		# 	it 'should not call EditorRealTimeController.emitToRoom', ->
-		# 		@EditorRealTimeController.emitToRoom.callCount.should.equal 0
+		describe 'when document is absent, and addDoc produces an error', ->
+
+			beforeEach ->
+				@err = new Error('woops')
+				@ProjectEntityHandler.addFile.callsArgWith(4, @err)
+				@ReferencesApiHandler.importBibtex @req, @res, @next
+				@readStream.emit('data', 'hi')
+				@readStream.emit('end')
+
+			it 'should call next with the error', ->
+				@next.callCount.should.equal 1
+				@next.calledWith(@err).should.equal true
+
+			it 'should have called userCanMakeRequest', ->
+				@ReferencesApiHandler.userCanMakeRequest.callCount.should.equal 1
+
+			it 'should have called make3rdRequestStream', ->
+				@ReferencesApiHandler.make3rdRequestStream.callCount.should.equal 1
+
+			it 'should have called getAllFiles', ->
+				@ProjectEntityHandler.getAllFiles.callCount.should.equal 1
+
+			it 'should not call ProjectEntityHandler.replaceFile', ->
+				@ProjectEntityHandler.replaceFile.callCount.should.equal 0
+
+			it 'should not call EditorRealTimeController.emitToRoom', ->
+				@EditorRealTimeController.emitToRoom.callCount.should.equal 0
 
 
 	describe 'bibtex', ->
