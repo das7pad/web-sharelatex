@@ -38,7 +38,7 @@ define [
 					$timeout(
 						() ->
 							$scope.loadBibtex()
-						, 100
+						, 400
 					)
 					$interval.cancel(poller)
 			, 1000
@@ -86,5 +86,5 @@ define [
 			() ->
 				if $scope.userHasProviderFeature && $scope.userHasProviderLink
 					$scope.loadBibtex()
-			, 0
+			, 10
 		)
