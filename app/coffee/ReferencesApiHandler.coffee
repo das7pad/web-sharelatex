@@ -109,58 +109,11 @@ module.exports = ReferencesApiHandler =
 					logger.log {user_id, ref_provider, statusCode:response.statusCode}, "error code from remote api"
 					res.send response.statusCode
 
-	_make3rdRequest: (opts)->
+	make3rdRequestStream: (opts)->
 		opts.url = "#{thirdpartyUrl}#{opts.url}"
 		logger.log {url: opts.url}, 'making request to third-party-references api'
-		stream = request opts, callback
+		stream = request opts
 		return stream
-
-	_importBibtex: (req, res, next) ->
-		user_id = req.session?.user?._id
-		ref_provider = req.params.ref_provider
-		project_id = req.params.Project_id
-		ReferencesApiHandler.userCanMakeRequest user_id, ref_provider, (err, canMakeRequest) ->
-			if err
-				return next(err)
-			if !canMakeRequest
-				return res.send 403
-			opts =
-				method:"get"
-				url: "/user/#{user_id}/#{ref_provider}/bibtex"
-			logger.log {user_id, ref_provider, project_id}, "importing bibtex from third-party-references"
-			# get the bibtex from remote api
-			tempWriteStream = temp.createWriteStream()
-			tempFilePath = tempWriteStream.path
-			requestStream = ReferencesApiHandler._make3rdRequest opts
-			requestStream.on 'error', (err) ->
-				logger.err {err, user_id, project_id, ref_provider}, "error streaming bibtex from third-party-references"
-				return next(err)
-			requestStream.on 'end', () ->
-				ProjectEntityHandler.getAllFiles project_id, (err, allFiles) ->
-					if err
-						logger.err {user_id, ref_provider, project_id}, "error getting all files"
-						return next(err)
-					targetFileName = "#{ref_provider}.bib"
-					# check if file exists
-					if file = allFiles["/#{targetFileName}"]
-						# file exists already
-						logger.log {user_id, ref_provider, project_id, targetDocName}, "updating file with bibtex content"
-						# set document contents to the bibtex payload
-						ProjectEntityHandler.replaceFile project_id, file._id, tempFilePath, (err) ->
-							if err
-								logger.err {user_id, ref_provider, project_id}, 'error replacing file'
-								return next(err)
-							return res.send 201
-					else
-						# file is new
-						logger.log {user_id, ref_provider, project_id, targetDocName}, "creating new file with bibtex content"
-						# add a new doc, with bibtex payload
-						ProjectEntityHandler.addFile project_id, undefined, targetFileName, tempFilePath, (err, fileRef, folder_id) ->
-							if err
-								logger.err {user_id, ref_provider, project_id}, 'error adding file'
-								return next(err)
-							return res.send 201
-			requestStream.pipe tempWriteStream
 
 	importBibtex: (req, res, next) ->
 		user_id = req.session?.user?._id
@@ -176,34 +129,36 @@ module.exports = ReferencesApiHandler =
 				url: "/user/#{user_id}/#{ref_provider}/bibtex"
 			logger.log {user_id, ref_provider, project_id}, "importing bibtex from third-party-references"
 			# get the bibtex from remote api
-			ReferencesApiHandler.make3rdRequest opts, (err, response, body)->
-				if err
-					logger.err {user_id, ref_provider, project_id}, "error getting bibtex from third-party-references"
-					return next(err)
-				logger.log {user_id, ref_provider, project_id}, "got bibtex from third-party-references, returning to client"
-				# do the thing
-				lines = body.split('\n')
-				# get all documents currently in project,
-				ProjectEntityHandler.getAllDocs project_id, (err, allDocs) ->
+			tempWriteStream = temp.createWriteStream()
+			tempFilePath = tempWriteStream.path
+			requestStream = ReferencesApiHandler.make3rdRequestStream opts
+			requestStream.on 'error', (err) ->
+				logger.err {err, user_id, project_id, ref_provider}, "error streaming bibtex from third-party-references"
+				return next(err)
+			requestStream.on 'end', () ->
+				ProjectEntityHandler.getAllFiles project_id, (err, allFiles) ->
 					if err
-						logger.err {user_id, ref_provider, project_id}, "error getting all docs for project"
+						logger.err {user_id, ref_provider, project_id}, "error getting all files"
 						return next(err)
-					# check if our target file is in this project
-					targetDocName = "#{ref_provider}.bib"
-					if doc = allDocs["/#{targetDocName}"]
-						logger.log {user_id, ref_provider, project_id, targetDocName}, "updating document with bibtex content"
+					targetFileName = "#{ref_provider}.bib"
+					# check if file exists
+					if file = allFiles["/#{targetFileName}"]
+						# file exists already
+						logger.log {user_id, ref_provider, project_id, targetFileName}, "updating file with bibtex content"
 						# set document contents to the bibtex payload
-						DocumentUpdaterHandler.setDocument project_id, doc._id, user_id, lines, 'references-import', (err) ->
+						ProjectEntityHandler.replaceFile project_id, file._id, tempFilePath, (err) ->
 							if err
-								logger.err {user_id, ref_provider, project_id, doc_id:doc._id, err}, "error updating doc with imported bibtex"
+								logger.err {user_id, ref_provider, project_id}, 'error replacing file'
 								return next(err)
 							return res.send 201
 					else
-						logger.log {user_id, ref_provider, project_id, targetDocName}, "creating new document with bibtex content"
+						# file is new
+						logger.log {user_id, ref_provider, project_id, targetFileName}, "creating new file with bibtex content"
 						# add a new doc, with bibtex payload
-						ProjectEntityHandler.addDoc project_id, undefined, targetDocName, lines, (err, doc, folder_id) ->
+						ProjectEntityHandler.addFile project_id, undefined, targetFileName, tempFilePath, (err, fileRef, folder_id) ->
 							if err
-								logger.err {user_id, ref_provider, project_id, err}, "error updating doc with imported bibtex"
+								logger.err {user_id, ref_provider, project_id}, 'error adding file'
 								return next(err)
-							EditorRealTimeController.emitToRoom(project_id, 'reciveNewDoc', folder_id, doc, "references-import")
+							EditorRealTimeController.emitToRoom(project_id, 'reciveNewFile', folder_id, fileRef, "references-import")
 							return res.send 201
+			requestStream.pipe tempWriteStream
