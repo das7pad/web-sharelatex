@@ -76,7 +76,7 @@ define [
 				.success (data) ->
 					$scope.status.error = false
 					$scope.status.importing = false
-					$scope.$emit 'references:imported', {}
+					$scope.$emit 'references:should-reindex', {}
 					$scope.cancel()
 				.error () ->
 					$scope.status.error = true
