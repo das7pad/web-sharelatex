@@ -51,7 +51,11 @@ define [
 
 			$http.get("/#{provider}/bibtex")
 				.success (data) ->
-					$scope.bibtexData = data
+					limit = 1 * 1024 * 1024
+					if data.length > limit
+						$scope.bibtexData = "#{data.slice(0, limit)}\n..."
+					else
+						$scope.bibtexData = data
 					$scope.status.loading = false
 				.error (data, statusCode) ->
 					if statusCode == 401
