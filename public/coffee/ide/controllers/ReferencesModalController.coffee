@@ -12,6 +12,7 @@ define [
 			loading: false
 			error: false
 			errorType: 'default'  # || 'expired' || 'forbidden'
+			done: false
 		}
 
 		$scope.cancel = () ->
@@ -47,6 +48,7 @@ define [
 		$scope.loadBibtex = () ->
 			$scope.status.loading = true
 			$scope.status.error = false
+			$scope.status.done = false
 			$scope.status.errorType = 'default'
 
 			$http.get("/#{provider}/bibtex")
@@ -81,7 +83,8 @@ define [
 					$scope.status.error = false
 					$scope.status.importing = false
 					$scope.$emit 'references:should-reindex', {}
-					$scope.cancel()
+					$scope.status.done = true
+					$timeout($scope.cancel, 1200)
 				.error () ->
 					$scope.status.error = true
 					$scope.status.importing = false

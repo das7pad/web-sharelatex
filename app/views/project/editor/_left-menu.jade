@@ -92,6 +92,9 @@ script(type="text/ng-template", id="referencesModalTemplate")
 							div.text-center
 								button.btn.btn-success(ng-click="importBibtex()", ng-disabled="status.importing")
 									span #{translate("reference_import_button")} {{provider}}.bib
+									span(ng-if="status.done")
+										| &nbsp;
+										i.fa.fa-check
 
 
 	.modal-footer()
