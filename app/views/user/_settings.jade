@@ -1,10 +1,11 @@
-if getReqQueryParam('ft') === 'tpr'
+if (user.features.betaProgram === true)
 	//each item in ['mendeley','zotero']
 	each item in ['mendeley']
 		hr
 
 		h3
-			| #{translate(item+"_integration")}
+			| #{translate(item+"_integration")}&nbsp;
+			span.label.label-danger(tooltip="Beta Feature" tooltip-placement="right") β
 
 		- if (!user.features.references)
 			p.small #{translate(item+"_sync_description")}
@@ -26,28 +27,28 @@ if getReqQueryParam('ft') === 'tpr'
 			p
 				a(href='/#{item}/oauth').btn.btn-info #{translate("link_to_"+item)}
 
-			
-// Unlink modal
-script(type="text/ng-template", id="referenceUnlinkModalTemplate")
+if (user.features.betaProgram === true)
+	// Unlink modal
+	script(type="text/ng-template", id="referenceUnlinkModalTemplate")
 
-	.modal-header
-		button.close(
-			type="button"
-			data-dismiss="modal"
-			ng-click="$dismiss()"
-		) &times;
-		h3 #{translate("unlink_reference")} {{provider}}
-	.modal-body
-		p #{translate("unlink_warning_reference")} {{provider}}
-	
-	.modal-footer()
-		button.btn.btn-default(
-			ng-click="$dismiss()",
-		)
-			span #{translate("cancel")}
-		| 
-		form(action="{{providerUnlink}}", method="POST", style="display: inline;")
-			input(type="hidden", name="_csrf", value=csrfToken)
-			button.btn.btn-info(
-				type="submit"
-			) #{translate("unlink")}
+		.modal-header
+			button.close(
+				type="button"
+				data-dismiss="modal"
+				ng-click="$dismiss()"
+			) &times;
+			h3 #{translate("unlink_reference")} {{provider}}
+		.modal-body
+			p #{translate("unlink_warning_reference")} {{provider}}
+
+		.modal-footer()
+			button.btn.btn-default(
+				ng-click="$dismiss()",
+			)
+				span #{translate("cancel")}
+			| 
+			form(action="{{providerUnlink}}", method="POST", style="display: inline;")
+				input(type="hidden", name="_csrf", value=csrfToken)
+				button.btn.btn-info(
+					type="submit"
+				) #{translate("unlink")}
