@@ -23,7 +23,9 @@ if (user.features.betaProgram === true)
 						data-dismiss="modal"
 						ng-click="cancel()"
 					) &times;
-					h3 #{translate(item+"_integration")} β
+					h3
+						| #{translate(item+"_integration")}&nbsp;
+						span.label.label-danger(tooltip="Beta Feature" tooltip-placement="right") β
 				.modal-body
 
 					// When the user doesn't have this feature

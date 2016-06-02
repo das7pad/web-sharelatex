@@ -37,7 +37,9 @@ if (user.features.betaProgram === true)
 				data-dismiss="modal"
 				ng-click="$dismiss()"
 			) &times;
-			h3 #{translate("unlink_reference")} {{provider}}
+			h3
+				| #{translate("unlink_reference")} {{provider}}&nbsp;
+				span.label.label-danger(tooltip="Beta Feature" tooltip-placement="right") β
 		.modal-body
 			p #{translate("unlink_warning_reference")} {{provider}}
 
