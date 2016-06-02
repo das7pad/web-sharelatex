@@ -9,7 +9,7 @@ if (user.features.betaProgram === true)
 						a(ng-click="openReferencesModal('#{item}')")
 							i.fa.fa-book
 							| &nbsp;&nbsp; #{translate(item)}&nbsp;
-							span.label.label-danger(tooltip="Beta Feature" tooltip-placement="right") β
+							span.label.label-warning(style="padding-bottom: 2px;", tooltip="Beta Feature" tooltip-placement="right") β
 
 	// Menedeley|Zotero References Modal
 	script(type="text/ng-template", id="referencesModalTemplate")
@@ -25,7 +25,7 @@ if (user.features.betaProgram === true)
 					) &times;
 					h3
 						| #{translate(item+"_integration")}&nbsp;
-						span.label.label-danger(tooltip="Beta Feature" tooltip-placement="right") β
+						span.label.label-warning(tooltip="Beta Feature" tooltip-placement="right") β
 				.modal-body
 
 					// When the user doesn't have this feature

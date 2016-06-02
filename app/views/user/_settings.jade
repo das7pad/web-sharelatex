@@ -5,7 +5,7 @@ if (user.features.betaProgram === true)
 
 		h3
 			| #{translate(item+"_integration")}&nbsp;
-			span.label.label-danger(tooltip="Beta Feature" tooltip-placement="right") β
+			span.label.label-warning(tooltip="Beta Feature" tooltip-placement="right") β
 
 		- if (!user.features.references)
 			p.small #{translate(item+"_sync_description")}
@@ -39,7 +39,7 @@ if (user.features.betaProgram === true)
 			) &times;
 			h3
 				| #{translate("unlink_reference")} {{provider}}&nbsp;
-				span.label.label-danger(tooltip="Beta Feature" tooltip-placement="right") β
+				span.label.label-warning(tooltip="Beta Feature" tooltip-placement="right") β
 		.modal-body
 			p #{translate("unlink_warning_reference")} {{provider}}
 
