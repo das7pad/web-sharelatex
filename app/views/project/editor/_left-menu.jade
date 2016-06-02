@@ -1,4 +1,4 @@
-if (user.features.betaProgram === true)
+if (user.features.betaProgram === true || getReqQueryParam('ft') === 'tpr')
 	// Left-hand menu entries
 	span(ng-controller="ReferencesController")
 		div(ng-if="thirdPartyReferencesEnabled")
