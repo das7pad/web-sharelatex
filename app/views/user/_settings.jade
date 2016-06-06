@@ -27,7 +27,7 @@ if (user.betaProgram === true || getReqQueryParam('ft') === 'tpr')
 			p
 				a(href='/#{item}/oauth').btn.btn-info #{translate("link_to_"+item)}
 
-if (user.features.betaProgram === true)
+if (user.betaProgram === true)
 	// Unlink modal
 	script(type="text/ng-template", id="referenceUnlinkModalTemplate")
 
