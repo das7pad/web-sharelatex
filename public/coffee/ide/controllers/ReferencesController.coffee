@@ -4,7 +4,7 @@ define [
 	App.controller "ReferencesController", ($scope, $modal, ide, $http) ->
 		user = ide.$scope.user
 		$scope.thirdPartyReferencesEnabled = (
-			(user?.features?.betaProgram == true || ide.featureToggle == 'tpr') && user?.features?.references == true
+			(user?.betaProgram == true || ide.featureToggle == 'tpr') && user?.features?.references == true
 		)
 		$scope.openReferencesModal = (providerStr) ->
 			$modal.open {
