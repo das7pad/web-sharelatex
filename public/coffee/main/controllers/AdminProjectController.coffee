@@ -15,6 +15,16 @@ define [
 		for project in $scope.projects
 			project.accessLevel = "owner"
 
+		$scope.enableBetaForUser = () ->
+			queuedHttp({
+				method: 'POST'
+				url: "/admin/user/#{$scope.user._id}/enableBeta"
+				headers:
+					"X-CSRF-Token": window.csrfToken
+			})
+				.success(() -> $scope.user.betaProgram = true)
+				.error((err) -> console.error("Error", err))
+
 		$scope.clearSearchText = () ->
 			$scope.searchText = ""
 			$scope.updateVisibleProjects()
@@ -40,7 +50,7 @@ define [
 
 		$scope.archiveOrLeaveSelectedProjects = () ->
 			selected_projects = $scope.getSelectedProjects()
-			
+
 			for project in selected_projects
 					project.archived = true;
 					queuedHttp {

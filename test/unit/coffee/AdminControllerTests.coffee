@@ -21,8 +21,11 @@ describe "AdminController", ->
 		@AuthenticationManager =
 			setUserPassword: sinon.stub()
 
+		@BetaProgramHandler =
+			optIn: sinon.stub().callsArgWith(1, null)
+
 		@AdminController = SandboxedModule.require modulePath, requires:
-			"logger-sharelatex": 
+			"logger-sharelatex":
 				log:->
 				err:->
 			"../../../../app/js/Features/User/UserGetter":@UserGetter
@@ -33,8 +36,9 @@ describe "AdminController", ->
 					projects: {}
 					users: {}
 				ObjectId: ObjectId
-			"metrics-sharelatex": 
+			"metrics-sharelatex":
 				gauge:->
+			"../../../../app/js/Features/BetaProgram/BetaProgramHandler": @BetaProgramHandler
 
 		@user = {user_id:1,first_name:'James'}
 		@users = [{first_name:'James'}, {first_name:'Henry'}]
@@ -50,11 +54,11 @@ describe "AdminController", ->
 		@UserGetter.getUser = (user_id, fields, callback) =>
 			callback null, @user
 
-		@req = 
+		@req =
 			body:
 				query: ''
 
-		@res = 
+		@res =
 			locals:
 				jsPath:"js path here"
 
@@ -82,7 +86,7 @@ describe "AdminController", ->
 
 		beforeEach ->
 
-			@req = 
+			@req =
 				body:
 					query: ''
 					page: 1
@@ -107,10 +111,10 @@ describe "AdminController", ->
 
 		beforeEach ->
 
-			@req = 
+			@req =
 				params:
 					user_id: 'user_id_here'
-		
+
 		it "should render the admin/userInfo page", (done)->
 			@res.render = (pageName, opts)=>
 				pageName.should.equal  Path.resolve(__dirname + "../../../../")+ "/app/views/userInfo"
@@ -132,9 +136,9 @@ describe "AdminController", ->
 	describe "deleteUser", ->
 
 		it "should delete the user", (done)->
-			@req = 
+			@req =
 				params:
-					user_id: 'user_id_here'	
+					user_id: 'user_id_here'
 			@UserDeleter.deleteUser.calledWith(1)
 			@res.sendStatus = (code)=>
 				@UserDeleter.deleteUser.calledWith('user_id_here').should.equal true
@@ -146,7 +150,7 @@ describe "AdminController", ->
 
 		beforeEach ->
 
-			@req = 
+			@req =
 				body:
 					newPassword: 'my great secret password'
 				params:
@@ -165,3 +169,34 @@ describe "AdminController", ->
 				@AuthenticationManager.setUserPassword.calledWith('user_id_here', 'my great secret password').should.equal true
 				done()
 			@AdminController.setUserPassword @req, @res
+
+	describe "enableBeta", ->
+
+		beforeEach ->
+			@req =
+				params:
+					user_id: "some_id"
+
+		it "should send a 200 response", (done) ->
+			@res.sendStatus = (code)=>
+				code.should.equal 200
+				done()
+			@AdminController.enableBeta @req, @res
+
+		it "should call BetaProgramHandler.optIn", (done) ->
+			@res.sendStatus = (code)=>
+				@BetaProgramHandler.optIn.callCount.should.equal 1
+				@BetaProgramHandler.optIn.calledWith('some_id').should.equal true
+				done()
+			@AdminController.enableBeta @req, @res
+
+		describe "when BetaProgramHandler.optIn produces an error", ->
+
+			beforeEach ->
+				@BetaProgramHandler.optIn.callsArgWith(1, new Error('woops'))
+
+			it "should send a 500 response", (done) ->
+				@res.sendStatus = (code)=>
+					code.should.equal 500
+					done()
+				@AdminController.enableBeta @req, @res
