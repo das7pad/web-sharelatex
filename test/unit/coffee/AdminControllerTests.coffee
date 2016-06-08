@@ -23,6 +23,7 @@ describe "AdminController", ->
 
 		@BetaProgramHandler =
 			optIn: sinon.stub().callsArgWith(1, null)
+			optOut: sinon.stub().callsArgWith(1, null)
 
 		@AdminController = SandboxedModule.require modulePath, requires:
 			"logger-sharelatex":
@@ -170,33 +171,80 @@ describe "AdminController", ->
 				done()
 			@AdminController.setUserPassword @req, @res
 
-	describe "enableBeta", ->
+	describe "setBetaStatus", ->
 
 		beforeEach ->
 			@req =
 				params:
 					user_id: "some_id"
+				body: {}
 
-		it "should send a 200 response", (done) ->
-			@res.sendStatus = (code)=>
-				code.should.equal 200
-				done()
-			@AdminController.enableBeta @req, @res
-
-		it "should call BetaProgramHandler.optIn", (done) ->
-			@res.sendStatus = (code)=>
-				@BetaProgramHandler.optIn.callCount.should.equal 1
-				@BetaProgramHandler.optIn.calledWith('some_id').should.equal true
-				done()
-			@AdminController.enableBeta @req, @res
-
-		describe "when BetaProgramHandler.optIn produces an error", ->
+		describe "when beta=true", ->
 
 			beforeEach ->
-				@BetaProgramHandler.optIn.callsArgWith(1, new Error('woops'))
+				@req.body.beta = true
 
-			it "should send a 500 response", (done) ->
+			it "should send a 200 response", (done) ->
 				@res.sendStatus = (code)=>
-					code.should.equal 500
+					code.should.equal 200
 					done()
-				@AdminController.enableBeta @req, @res
+				@AdminController.setBetaStatus @req, @res
+
+			it "should call BetaProgramHandler.optIn", (done) ->
+				@res.sendStatus = (code)=>
+					@BetaProgramHandler.optIn.callCount.should.equal 1
+					@BetaProgramHandler.optIn.calledWith('some_id').should.equal true
+					done()
+				@AdminController.setBetaStatus @req, @res
+
+			it "should not call BetaProgramHandler.optOut", (done) ->
+				@res.sendStatus = (code)=>
+					@BetaProgramHandler.optOut.callCount.should.equal 0
+					done()
+				@AdminController.setBetaStatus @req, @res
+
+			describe "when BetaProgramHandler.optIn produces an error", ->
+
+				beforeEach ->
+					@BetaProgramHandler.optIn.callsArgWith(1, new Error('woops'))
+
+				it "should send a 500 response", (done) ->
+					@res.sendStatus = (code)=>
+						code.should.equal 500
+						done()
+					@AdminController.setBetaStatus @req, @res
+
+		describe "when beta=false", ->
+
+			beforeEach ->
+				@req.body.beta = false
+
+			it "should send a 200 response", (done) ->
+				@res.sendStatus = (code)=>
+					code.should.equal 200
+					done()
+				@AdminController.setBetaStatus @req, @res
+
+			it "should call BetaProgramHandler.optOut", (done) ->
+				@res.sendStatus = (code)=>
+					@BetaProgramHandler.optOut.callCount.should.equal 1
+					@BetaProgramHandler.optOut.calledWith('some_id').should.equal true
+					done()
+				@AdminController.setBetaStatus @req, @res
+
+			it "should not call BetaProgramHandler.optIn", (done) ->
+				@res.sendStatus = (code)=>
+					@BetaProgramHandler.optIn.callCount.should.equal 0
+					done()
+				@AdminController.setBetaStatus @req, @res
+
+			describe "when BetaProgramHandler.optOut produces an error", ->
+
+				beforeEach ->
+					@BetaProgramHandler.optOut.callsArgWith(1, new Error('woops'))
+
+				it "should send a 500 response", (done) ->
+					@res.sendStatus = (code)=>
+						code.should.equal 500
+						done()
+					@AdminController.setBetaStatus @req, @res

@@ -28,8 +28,11 @@ img(src="http://www.gravatar.com/avatar/{{user.gravatar}}.jpg?s=140")
 	
 .span
 	label #{translate("sharelatex_beta_program")}
-	p.small(ng-if="user.betaProgram")
-		| #{translate("user_in_beta_program")}
+	div(ng-if="user.betaProgram")
+		p.small
+			| #{translate("user_in_beta_program")}
+		a.btn.btn-primary(ng-click="disableBetaForUser()")
+			span #{translate("disable_beta")}
 	div(ng-if="!user.betaProgram")
 		a.btn.btn-primary(ng-click="enableBetaForUser()")
 			span #{translate("enable_beta")}

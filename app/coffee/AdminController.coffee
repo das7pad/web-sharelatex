@@ -72,11 +72,13 @@ module.exports = AdminController =
 			else
 				res.sendStatus 200
 
-	enableBeta: (req, res) ->
+	setBetaStatus: (req, res) ->
 		user_id = req.params.user_id
-		logger.log {user_id}, "enabling beta features for user"
-		BetaProgramHandler.optIn user_id, (err) ->
+		betaStatus = req.body.beta
+		logger.log {user_id, betaStatus}, "enabling beta features for user"
+		action = if betaStatus == true then BetaProgramHandler.optIn else BetaProgramHandler.optOut
+		action user_id, (err) ->
 			if err
-				logger.err {err, user_id}, "error enabling beta features for user"
+				logger.err {err, user_id}, "error updating beta status for user"
 				return res.sendStatus 500
 			res.sendStatus 200

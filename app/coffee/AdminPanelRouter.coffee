@@ -13,4 +13,4 @@ module.exports =
 		webRouter.delete "/admin/user/:user_id", AuthorizationMiddlewear.ensureUserIsSiteAdmin, AdminController.deleteUser
 		webRouter.get "/admin/user/graph/:user_id", AuthorizationMiddlewear.ensureUserIsSiteAdmin, AdminGraphController.userGraph
 		webRouter.delete "/admin/Project/:Project_id", AuthorizationMiddlewear.ensureUserIsSiteAdmin, ProjectController.deleteProject
-		webRouter.post "/admin/user/:user_id/enableBeta", AuthorizationMiddlewear.ensureUserIsSiteAdmin, AdminController.enableBeta
+		webRouter.post "/admin/user/:user_id/setBetaStatus", AuthorizationMiddlewear.ensureUserIsSiteAdmin, AdminController.setBetaStatus

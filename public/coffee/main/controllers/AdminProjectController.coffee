@@ -20,11 +20,28 @@ define [
 			$scope.enableBetaError = false
 			queuedHttp({
 				method: 'POST'
-				url: "/admin/user/#{$scope.user._id}/enableBeta"
+				url: "/admin/user/#{$scope.user._id}/setBetaStatus"
 				headers:
 					"X-CSRF-Token": window.csrfToken
+					"Content-Type": "application/json"
+				data:
+					beta: true
 			})
 				.success(() -> $scope.user.betaProgram = true)
+				.error((err) -> console.error("Error", err); $scope.enableBetaError = true)
+
+		$scope.disableBetaForUser = () ->
+			$scope.enableBetaError = false
+			queuedHttp({
+				method: 'POST'
+				url: "/admin/user/#{$scope.user._id}/setBetaStatus"
+				headers:
+					"X-CSRF-Token": window.csrfToken
+					"Content-Type": "application/json"
+				data:
+					beta: false
+			})
+				.success(() -> $scope.user.betaProgram = false)
 				.error((err) -> console.error("Error", err); $scope.enableBetaError = true)
 
 		$scope.clearSearchText = () ->
