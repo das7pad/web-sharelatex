@@ -11,11 +11,13 @@ define [
 		$scope.predicate = "lastUpdated"
 		$scope.reverse = true
 		$scope.allSelected = false
+		$scope.enableBetaError = false
 
 		for project in $scope.projects
 			project.accessLevel = "owner"
 
 		$scope.enableBetaForUser = () ->
+			$scope.enableBetaError = false
 			queuedHttp({
 				method: 'POST'
 				url: "/admin/user/#{$scope.user._id}/enableBeta"
@@ -23,7 +25,7 @@ define [
 					"X-CSRF-Token": window.csrfToken
 			})
 				.success(() -> $scope.user.betaProgram = true)
-				.error((err) -> console.error("Error", err))
+				.error((err) -> console.error("Error", err); $scope.enableBetaError = true)
 
 		$scope.clearSearchText = () ->
 			$scope.searchText = ""
