@@ -33,6 +33,5 @@ img(src="http://www.gravatar.com/avatar/{{user.gravatar}}.jpg?s=140")
 	div(ng-if="!user.betaProgram")
 		a.btn.btn-primary(ng-click="enableBetaForUser()")
 			span #{translate("enable_beta")}
-			span.beta-feature-badge
 	div.small.alert.alert-danger(ng-if="enableBetaError")
 		| #{translate("error")}
