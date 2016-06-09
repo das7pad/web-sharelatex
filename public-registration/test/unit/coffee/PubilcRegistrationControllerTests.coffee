@@ -29,6 +29,9 @@ describe "PublicRegistrationController", ->
 			changeEmailAddress:sinon.stub()
 		@EmailHandler =
 			sendEmail:sinon.stub().callsArgWith(2)
+		@UserHandler =
+			populateGroupLicenceInvite: sinon.stub().callsArgWith(1)
+
 		@PublicRegistrationController = SandboxedModule.require modulePath, requires:
 			"../../../../app/js/Features/User/UserRegistrationHandler":@UserRegistrationHandler
 			"../../../../app/js/Features/Authentication/AuthenticationController": @AuthenticationController
@@ -37,6 +40,7 @@ describe "PublicRegistrationController", ->
 			"../../../../app/js/Features/Email/EmailHandler": @EmailHandler
 			"../../../../app/js/Features/Email/Layouts/PersonalEmailLayout":{}
 			"../../../../app/js/Features/Email/EmailBuilder": templates:{welcome:{}}
+			"../../../../app/js/Features/User/UserHandler": @UserHandler
 			"logger-sharelatex": {log:->}
 			"metrics-sharelatex": { inc: () ->}
 
@@ -105,7 +109,15 @@ describe "PublicRegistrationController", ->
 				@ReferalAllocator.allocate.calledWith(@req.session.referal_id, @user._id, @req.session.referal_source, @req.session.referal_medium).should.equal true
 				done()
 			@PublicRegistrationController.register @req, @res			
-			
+	
+		it "should call populateGroupLicenceInvite", (done)->
+			@UserRegistrationHandler.registerNewUser.callsArgWith(1, null, @user)
+			@res.send = (opts)=>
+				@UserHandler.populateGroupLicenceInvite.calledWith(@user).should.equal true
+				done()
+			@PublicRegistrationController.register @req, @res
+
+
 		it "should send user to verifiy link if they are part of domain licnece", (done)->
 			@UserRegistrationHandler.registerNewUser.callsArgWith(1, null, @user)
 			stubbedVerifiyLink = "/go/here/domain/person"

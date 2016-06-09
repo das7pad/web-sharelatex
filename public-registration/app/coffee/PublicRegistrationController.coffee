@@ -10,6 +10,7 @@ EmailHandler = require("../../../../app/js/Features/Email/EmailHandler")
 EmailBuilder = require("../../../../app/js/Features/Email/EmailBuilder")
 PersonalEmailLayout = require("../../../../app/js/Features/Email/Layouts/PersonalEmailLayout")
 _ = require "underscore"
+UserHandler = require("../../../../app/js/Features/User/UserHandler")
 
 EmailBuilder.templates.welcome =
 	subject:  _.template "Welcome to ShareLaTeX"
@@ -60,6 +61,7 @@ module.exports = PublicRegistrationController =
 					to: user.email
 				}, () ->
 
+				UserHandler.populateGroupLicenceInvite(user, ->)
 				verifyLink = SubscriptionDomainHandler.getDomainLicencePage(user)
 				redir = Url.parse(verifyLink or req.body.redir or "/project").path
 
