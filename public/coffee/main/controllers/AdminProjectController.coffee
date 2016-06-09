@@ -94,6 +94,52 @@ define [
 			else
 				return ""
 
+
+		# delete user
+		$scope.openDeleteUserModal = () ->
+			modalInstance = $modal.open(
+				templateUrl: "deleteUsersModalTemplate"
+				controller: "DeleteUsersModalController"
+				resolve:
+					users: () -> [$scope.user]
+			)
+			modalInstance.result.then () ->
+				$scope.DeleteUser()
+
+		$scope.DeleteUser = () ->
+			user = $scope.user
+			queuedHttp({
+				method: "DELETE"
+				url: "/admin/user/#{user._id}"
+				headers:
+					"X-CSRF-Token": window.csrfToken
+			}).then(() ->
+				setTimeout(
+					() ->
+						window.location.href = '/admin/user'
+					, 100
+				)
+			)
+
+
+		# Set user password
+		$scope.openSetPasswordModal = () ->
+			modalInstance = $modal.open(
+				templateUrl: "setPasswordModalTemplate"
+				controller: "SetPasswordModalController"
+				resolve:
+					user: () -> $scope.user
+			)
+			modalInstance.result.then(
+				(newPassword) ->
+					$scope.SetUserPassword(newPassword)
+			)
+		$scope.SetUserPassword = (newPassword) ->
+			queuedHttp.post "/admin/user/#{$scope.user._id}/setPassword", {
+				newPassword: newPassword
+				_csrf: window.csrfToken
+			}
+
 		$scope.updateVisibleProjects = () ->
 			$scope.visibleProjects = []
 

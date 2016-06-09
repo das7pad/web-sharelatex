@@ -38,3 +38,28 @@ img(src="http://www.gravatar.com/avatar/{{user.gravatar}}.jpg?s=140")
 			span #{translate("enable_beta")}
 	div.small.alert.alert-danger(ng-if="enableBetaError")
 		| #{translate("error")}
+	
+.span
+	hr
+	label #{translate("actions")}
+	p
+		a.btn.btn-default(
+			href='#',
+			tooltip="#{translate('delete')}",
+			tooltip-placement="bottom",
+			tooltip-append-to-body="true",
+			ng-click="openDeleteUserModal()"
+		)
+			i.fa.fa-trash-o
+			| &nbsp; #{translate('delete')} #{translate('user')}
+	if !externalAuthenticationSystemUsed()
+		p
+			a.btn.btn-default(
+				href='#',
+				tooltip="#{translate('set_password')}",
+				tooltip-placement="bottom",
+				tooltip-append-to-body="true",
+				ng-click="openSetPasswordModal()"
+			)
+				i.fa.fa-key
+				| &nbsp;#{translate('set_password')}
