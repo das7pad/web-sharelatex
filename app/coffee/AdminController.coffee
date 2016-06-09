@@ -32,7 +32,9 @@ module.exports = AdminController =
 			res.send 200, {users:users, pages:pages}
 
 	_userFind: (q, page, sortField, reverse, cb) ->
-		q = [ {email:new RegExp(q)}, {name:new RegExp(q)} ]
+		# if the query is empty, then just match all, rather than regex matching,
+		# should perform better against large data sets
+		q = if q == '' then [{}] else [ {email:new RegExp(q)}, {name:new RegExp(q)} ]
 		skip = (page - 1) * AdminController.perPage
 		sortOrder = {}
 		sortOrder[sortField] = if reverse then -1 else 1
