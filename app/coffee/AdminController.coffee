@@ -17,7 +17,7 @@ module.exports = AdminController =
 
 	listUsers: (req, res, next)->
 		logger.log "getting admin request for list of users"
-		AdminController._userFind '', 1, 'first_name', false, (err, users, count)->
+		AdminController._userFind '', 1, '_id', false, (err, users, count)->
 			if err?
 				return next(err)
 			pages = Math.ceil(count / AdminController.perPage)
