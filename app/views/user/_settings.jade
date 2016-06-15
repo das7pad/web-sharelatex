@@ -7,13 +7,16 @@ if (user.betaProgram === true)
 			| #{translate(item+"_integration")}&nbsp;
 			span.label.label-warning(tooltip="Beta Feature" tooltip-placement="right") β
 
-		- if (!user.features.references)
-			p.small #{translate(item+"_sync_description")}
-			.alert.alert-info
-				p #{translate(item+"_is_premium")}
-				p
-					a.btn.btn-info(href='/user/subscription/plans') #{translate("upgrade")}
-		- else if(user.refProviders && user.refProviders[item])
+		// TODO: re-enable the 'please upgrade' prompt once beta program ends
+
+		//- - if (!user.features.references )  
+		//- 	p.small #{translate(item+"_sync_description")}
+		//- 	.alert.alert-info
+		//- 		p #{translate(item+"_is_premium")}
+		//- 		p
+		//- 			a.btn.btn-info(href='/user/subscription/plans') #{translate("upgrade")}
+		//- - else if(user.refProviders && user.refProviders[item])
+		if(user.refProviders && user.refProviders[item])
 			p you are linked
 			p
 				a(
