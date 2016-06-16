@@ -20,6 +20,7 @@ if (user.betaProgram === true)
 			p you are linked
 			p
 				a(
+					id="#{item}-unlink",
 					href, 
 					ng-click="unlinkAccount('#{item}')",
 					ng-controller="ReferenceUnlinkController"
@@ -28,7 +29,7 @@ if (user.betaProgram === true)
 			p.small #{translate(item+"_sync_description")}
 			//p.small #{translate("link_to_"+item+"_description")}
 			p
-				a(href='/#{item}/oauth').btn.btn-info #{translate("link_to_"+item)}
+				a(id="#{item}-link", href='/#{item}/oauth').btn.btn-info #{translate("link_to_"+item)}
 
 if (user.betaProgram === true)
 	// Unlink modal
@@ -52,7 +53,7 @@ if (user.betaProgram === true)
 			)
 				span #{translate("cancel")}
 			| 
-			form(action="{{providerUnlink}}", method="POST", style="display: inline;")
+			form(id="{{provider}}-unlink", action="{{providerUnlink}}", method="POST", style="display: inline;")
 				input(type="hidden", name="_csrf", value=csrfToken)
 				button.btn.btn-info(
 					type="submit"

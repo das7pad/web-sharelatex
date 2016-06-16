@@ -1,7 +1,9 @@
 define [
 	"base"
 ], (App) ->
-	App.controller "ReferencesModalController", ($scope, $modalInstance, $http, $modal, $window, $interval, $timeout, ide, provider) ->
+	App.controller "ReferencesModalController", ($scope, $modalInstance, $http, $modal, $window, $interval, $timeout, event_tracking, ide, provider) ->
+
+		event_tracking.send("references-#{provider}", "modal", "open")
 
 		$scope.provider = provider
 		$scope.userHasProviderFeature = ide.$scope.user?.features?.references || ide.$scope.user?.betaProgram
@@ -25,6 +27,7 @@ define [
 
 		$scope.linkAccount = () ->
 			authWindow = $window.open("/#{provider}/oauth", "reference-auth", "width=700,height=500")
+			event_tracking.send("references-#{provider}", "modal", "start-link-account")
 			poller = $interval () ->
 				# We can get errors when trying to access the URL before it returns
 				# to a ShareLaTeX URL (security exceptions)
@@ -34,6 +37,7 @@ define [
 					pathname = null
 				if pathname == "/user/settings"
 					authWindow.close()
+					event_tracking.send("references-#{provider}", "modal", "end-link-account")
 					$scope.userHasProviderLink = true
 					ide.$scope.user.refProviders[provider] = true
 					$timeout(
@@ -50,6 +54,7 @@ define [
 			$scope.status.error = false
 			$scope.status.done = false
 			$scope.status.errorType = 'default'
+			event_tracking.send("references-#{provider}", "modal", "load-bibtex")
 
 			$http.get("/#{provider}/bibtex")
 				.success (data) ->
@@ -74,6 +79,7 @@ define [
 				return
 			if $scope.status.importing
 				return
+			event_tracking.send("references-#{provider}", "modal", "import-bibtex")
 			$scope.status.importing = true
 			$http.post(
 				"/project/#{ide.project_id}/#{provider}/bibtex/import",
