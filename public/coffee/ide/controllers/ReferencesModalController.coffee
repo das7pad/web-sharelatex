@@ -18,6 +18,7 @@ define [
 		}
 
 		$scope.cancel = () ->
+			event_tracking.send("references-#{provider}", "modal", "close")
 			$modalInstance.dismiss()
 
 		$scope.startFreeTrial = (source) ->
