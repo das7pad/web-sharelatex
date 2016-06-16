@@ -17,8 +17,10 @@ define [
 			done: false
 		}
 
-		$scope.cancel = () ->
+		$scope.$on 'modal.closing', () ->
 			event_tracking.send("references-#{provider}", "modal", "close")
+
+		$scope.cancel = () ->
 			$modalInstance.dismiss()
 
 		$scope.startFreeTrial = (source) ->
