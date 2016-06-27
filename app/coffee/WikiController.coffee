@@ -7,6 +7,8 @@ AuthenticationController = require("../../../../app/js/Features/Authentication/A
 async = require("async")
 other_lngs = ["es"]
 
+baseWikiUrl = settings.apis.wiki?.url or "http://learn.sharelatex.com"
+
 module.exports = WikiController = 
 
 	_checkIfLoginIsNeeded: (req, res, next)->
@@ -61,7 +63,8 @@ module.exports = WikiController =
 
 
 	proxy: (req, res, next)->
-		url = "#{settings.apis.wiki.url}#{req.url}"
+		url = "#{baseWikiUrl}#{req.url}"
+		logger.log url:url, "proxying page request to learn wiki"
 		oneMinute = 1000 * 60
 		urlStream = request.get({url: url, timeout: oneMinute})
 
@@ -72,7 +75,7 @@ module.exports = WikiController =
 
 	_getPageContent: (page, callback = (error, data = { content: "", title: "" }) ->) ->
 		request {
-			url: "#{settings.apis.wiki.url}/learn-scripts/api.php"
+			url: "#{baseWikiUrl}/learn-scripts/api.php"
 			qs: {
 				page: decodeURI(page)
 				action: "parse"
