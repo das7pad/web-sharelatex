@@ -4,14 +4,13 @@ block vars
 	- var meta = "Over 500 LaTeX templates for journal articles, theses, CV and resumes, posters, presentations, and much more"
 
 block content
-	.content.content-alt
+	.content.content-alt.ng-cloak
 		.container
 			.row.template-page-header(ng-controller="SearchController")
-				
 				.col-md-2
 					h2
 						a(href="/templates") #{translate("templates")}
-				.col-md-8
+				.col-md-8(ng-show='showSearch')
 					form.project-search.form-horizontal(role="form")
 						.form-group.has-feedback.has-feedback-left.col-md-12
 							input.form-control.col-md-12(type='text', ng-model='searchQueryText', ng-keyup='search()', placeholder="Search template library....")
@@ -21,7 +20,7 @@ block content
 								style="cursor: pointer;",
 								ng-show="searchQueryText.length > 0"
 							)
-				.col-md-2(ng-controller="MissingTemplateController")
+				.col-md-2(ng-controller="MissingTemplateController", ng-show='showSearch')
 					a.btn.btn-primary(ng-click="showMissingTemplateModal()") #{translate("missing_template_question")}
 				.col-md-8(ng-cloak)
 					ul.list-unstyled

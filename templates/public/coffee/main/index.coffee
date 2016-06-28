@@ -65,8 +65,10 @@ define [
 
 
 
-	App.controller "SearchController", ($scope, algolia, _) ->
+	App.controller "SearchController", ($scope, algolia, _, $window) ->
 		$scope.hits = []
+
+		$scope.showSearch = $window.sharelatex.algolia?.indexes?.templates?
 
 		$scope.clearSearchText = ->
 			$scope.searchQueryText = ""

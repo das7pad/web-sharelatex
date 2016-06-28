@@ -14,7 +14,6 @@ module.exports = TemplatesWebController =
 				return next 500
 			data.title = "latex_templates"
 			viewPath = Path.resolve(__dirname, "../views/index")
-			console.log viewPath, "viewPath", data
 			res.render viewPath, data
 
 	renerTemplateInTag: (req, res)->
