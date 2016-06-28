@@ -6,6 +6,9 @@ _ = require("underscore")
 AuthenticationController = require("../../../../app/js/Features/Authentication/AuthenticationController")
 async = require("async")
 other_lngs = ["es"]
+path = require("path")
+
+
 
 baseWikiUrl = settings.apis.wiki?.url or "http://learn.sharelatex.com"
 
@@ -27,10 +30,7 @@ module.exports = WikiController =
 			isFile = page.toLowerCase().indexOf("file:") != -1
 
 			if isFile
-				return WikiController._proxy(req, res, next)
-
-
-
+				return WikiController.proxy(req, res, next)
 
 			logger.log page: page, "getting page from wiki"
 			if _.include(other_lngs, req.lng)
@@ -98,8 +98,9 @@ module.exports = WikiController =
 			title = "Documentation"
 		else
 			title = page.title
-			
-		res.render "wiki/page", {
+		viewPath = path.join(__dirname, "../views/page")
+
+		res.render viewPath, {
 			page: page
 			contents: contents
 			title: title
