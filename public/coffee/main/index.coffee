@@ -62,6 +62,8 @@ define [
 			client = new AlgoliaSearch(window.sharelatex.algolia?.app_id, window.sharelatex.algolia?.api_key)
 			index = client.initIndex(window.sharelatex.algolia?.indexes?.templates)
 			return index
+		else
+			return {}
 
 
 
