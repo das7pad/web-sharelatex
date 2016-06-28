@@ -49,7 +49,7 @@ module.exports =
 			logger.log user_id:user_id, project_id:project_id, "receiving request to publish project as template"
 			TemplatesPublisher.publish user_id, project_id, (error) ->
 				return next(error) if error?
-				res.send 204
+				res.sendStatus 204
 
 	unpublishProject: (req, res, next) ->
 		project_id = req.params.Project_id
@@ -59,14 +59,14 @@ module.exports =
 			logger.log user_id:user_id, project_id:project_id, "receiving request to unpublish project"
 			TemplatesPublisher.unpublish user_id, project_id, (error) ->
 				return next(error) if error?
-				res.send 204
+				res.sendStatus 204
 				
 	updateProjectDescription: (req, res, next) ->
 		project_id = req.params.Project_id
 		{description} = req.body
 		EditorController.updateProjectDescription project_id, description, (error) ->
 			return next(error) if error?
-			res.send 204
+			res.sendStatus 204
 
 	getTemplateDetails: (req, res, next)->
 		project_id = req.params.Project_id

@@ -6,14 +6,16 @@ Path = require "path"
 
 module.exports = TemplatesWebController =
 
-	renderTemplatesIndexPage: (req, res)->
+	renderTemplatesIndexPage: (req, res, next)->
 		logger.log "rendering index page of templates"
 		TemplatesWebController._getDataFromTemplatesApi "/user/#{req.params.user_id}", (err, data)->
 			if err? or !data?
 				logger.err err:err, "something went wrong in renderTemplatesIndexPage"
-				return res.send 500
+				return next 500
 			data.title = "latex_templates"
-			res.render Path.resolve(__dirname, "../views/index"), data
+			viewPath = Path.resolve(__dirname, "../views/index")
+			console.log viewPath, "viewPath", data
+			res.render viewPath, data
 
 	renerTemplateInTag: (req, res)->
 		{user_id, tag_name, template_name} = req.params
@@ -23,7 +25,7 @@ module.exports = TemplatesWebController =
 				return ErrorController.notFound req, res
 			if err? or !data?
 				logger.err err:err, user_id:user_id, tag_name:tag_name, template_name:template_name, "something went wrong in renerTemplateInTag"
-				return res.send 500
+				return next 500
 			data.title = data?.template?.name
 			res.render Path.resolve(__dirname, "../views/template"), data
 
@@ -36,7 +38,7 @@ module.exports = TemplatesWebController =
 			TemplatesWebController._renderTagPage(req, res)
 		else
 			logger.log params:req.params, "problem rendering tagOrCanonicalPage"
-			res.send 500
+			next 500
 
 	proxyToTemplatesApi: (req, res)->
 		url = req.url
@@ -55,7 +57,7 @@ module.exports = TemplatesWebController =
 		getReq.pipe(res)
 		getReq.on "error", (error) ->
 			logger.error err: error, "templates proxy API error"
-			res.send 500
+			next 500
 
 	_renderCanonicalPage: (req, res)->
 		current_user_id = req.session?.user?._id
@@ -66,7 +68,7 @@ module.exports = TemplatesWebController =
 				return ErrorController.notFound req, res
 			if err?
 				logger.err err:err, user_id:user_id, template_id:template_id, "something went wrong in _renderCanonicalPage"
-				return res.send 500
+				return next 500
 			data.title = data?.template?.name
 			data.tag = null
 			data.currentUserIsOwner = current_user_id and current_user_id == data.template.userId
@@ -80,7 +82,7 @@ module.exports = TemplatesWebController =
 				return ErrorController.notFound req, res
 			if err?
 				logger.err err:err, user_id:user_id, "something went wrong in _renderCanonicalPage"
-				return res.send 500
+				return next 500
 			data.title = "all_templates"
 			res.render Path.resolve(__dirname, "../views/tag"), data
 
@@ -92,7 +94,7 @@ module.exports = TemplatesWebController =
 				return ErrorController.notFound req, res
 			if err?
 				logger.err err:err, user_id:user_id, tag_name:tag_name, "something went wrong in _renderCanonicalPage"
-				return res.send 500
+				return next 500
 			data.title = data?.tag?.name
 			res.render Path.resolve(__dirname, "../views/tag"), data
 
@@ -102,7 +104,10 @@ module.exports = TemplatesWebController =
 			json:true
 		request.get opts, (err, response, data)->
 			if err?
+				return callback 500
+			else if response?.statusCode == 404
 				return callback 404
-			if response?.statusCode == 404
-				return callback 404
-			callback err, data
+			else if response.statusCode != 200
+				return callback 500
+			else
+				return callback err, data

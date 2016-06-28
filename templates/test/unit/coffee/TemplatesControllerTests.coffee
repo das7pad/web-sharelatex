@@ -96,7 +96,7 @@ describe 'TemplatesController', ->
 			@user_id = "user-id-123"
 			@project_id = "project-id-123"
 			@res =
-				send: sinon.stub()
+				sendStatus: sinon.stub()
 			@req.params =
 				Project_id: @project_id
 				
@@ -115,14 +115,14 @@ describe 'TemplatesController', ->
 				.should.equal true
 				
 		it "should return a success status", ->
-			@res.send.calledWith(204).should.equal true
+			@res.sendStatus.calledWith(204).should.equal true
 
 	describe 'unpublishProject', ->
 		beforeEach ->
 			@user_id = "user-id-123"
 			@project_id = "project-id-123"
 			@res =
-				send: sinon.stub()
+				sendStatus: sinon.stub()
 			@req.params =
 				Project_id: @project_id
 				
@@ -141,7 +141,7 @@ describe 'TemplatesController', ->
 				.should.equal true
 				
 		it "should return a success status", ->
-			@res.send.calledWith(204).should.equal true
+			@res.sendStatus.calledWith(204).should.equal true
 
 	describe 'settings the compiler from the query string', ->
 		it 'should use the said compiler', (done)->
@@ -163,7 +163,7 @@ describe 'TemplatesController', ->
 		beforeEach ->
 			@EditorController.updateProjectDescription = sinon.stub().callsArg(2)
 			@res =
-				send: sinon.stub()
+				sendStatus: sinon.stub()
 			@req.params =
 				Project_id: @project_id = "project-id-123"
 			@req.body =
@@ -177,7 +177,7 @@ describe 'TemplatesController', ->
 				.should.equal true
 				
 		it "should return a success code", ->
-			@res.send.calledWith(204).should.equal true
+			@res.sendStatus.calledWith(204).should.equal true
 
 	describe 'getTemplateDetails', ->
 		beforeEach ->
