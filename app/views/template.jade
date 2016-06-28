@@ -1,0 +1,94 @@
+extends ../../../../app/views/layout
+
+block vars
+	- var meta = template.description
+	- title = title + " - LaTeX Template"
+
+block content
+	.content.content-alt
+		.container
+			.row
+				.page-header
+					h2
+						a(href="/templates") #{translate("templates")}
+						|  ›
+						- if(tag)
+							a(href=tag.tagPagePath)  #{tag.name}
+							|  ›
+						|  #{template.name}
+				.row
+					.col-md-6
+						.entry
+							.row
+								.col-md-12.template-large-pdf-preview
+									a(href="#{template.pdfUrl}?inline=true&name=#{template.name}")
+										img(src="#{template.previewUrl}")
+
+					.col-md-6
+						.template-details-section
+							h3 #{translate("about")}
+							div !{template.description}
+							div(ng-controller="openInSlController", ng-cloak).download-buttons
+								a.btn.btn-primary.btn-large(href=template.open_in_sharelatex_url, ng-click='open()', ng-disabled="isDisabled", rel='nofollow') {{openInSlText}}
+								a.btn.btn-default(
+									href="#{template.zipUrl}?name=#{template.name}",
+									rel='nofollow',
+									ng-click='downloadZip()',
+									tooltip-placement="bottom",
+									tooltip="#{translate('download_zip_file')}"
+								)
+									i.fa.fa-cloud-download
+
+								if(currentUserIsOwner)
+									hr
+									p
+										| #{translate("this_is_your_template")} 
+										a(href='/project/#{template.projectId}') #{template.name}
+									// Unpublish Button
+									button.btn.btn-info(
+										ng-click="unpublish('#{template.projectId}')",
+										ng-disabled="buttonsDisabled()")
+										span(ng-show="!state.unpublishInFlight")
+											| #{translate("unpublish")}
+										span(ng-show="state.unpublishInFlight")
+											| #{translate("unpublishing")}...
+
+									// Republish Button
+									button.btn.btn-primary(
+										ng-click="republish('#{template.projectId}')",
+										ng-disabled="buttonsDisabled()")
+										span(ng-show="!state.republishInFlight")
+											| #{translate("republish")}
+										span(ng-show="state.republishInFlight")
+											| #{translate("publishing")}...
+
+								// Error Message
+								div(ng-if="state.apiProblem")
+									span #{translate("problem_talking_to_publishing_service")}
+
+						- if(settings.templates.showSocialButtons)
+							.template-details-section.social_buttons
+								.addthis_toolbox.addthis_default_style.addthis_32x32_style
+									a.addthis_button_facebook
+									a.addthis_button_twitter
+									a.addthis_button_google_plusone_share
+									a.addthis_button_compact
+								script(type='text/javascript', src='//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-517c16586439faa7')
+						- if(settings.templates.showComments)
+							h3 #{translate("comment")}
+							#disqus_thread
+							script(type='text/javascript').
+								/* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+								var disqus_shortname = 'sharelatextemplates'; // required: replace example with your forum shortname
+								/* * * DON'T EDIT BELOW THIS LINE * * */
+								(function() {
+								var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+								dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+								(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+								})();
+							noscript
+								| Please enable JavaScript to view the
+								a(href='http://disqus.com/?ref_noscript') comments powered by Disqus.
+							a.dsq-brlink(href='http://disqus.com')
+								| comments powered by 
+								span.logo-disqus Disqus
