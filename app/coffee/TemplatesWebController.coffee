@@ -16,7 +16,7 @@ module.exports = TemplatesWebController =
 			viewPath = Path.resolve(__dirname, "../views/index")
 			res.render viewPath, data
 
-	renerTemplateInTag: (req, res)->
+	renerTemplateInTag: (req, res, next)->
 		{user_id, tag_name, template_name} = req.params
 		logger.log user_id:user_id, tag_name:tag_name, template_name:template_name, "rendering latex template page"
 		TemplatesWebController._getDataFromTemplatesApi "/user/#{user_id}/tag/#{tag_name}/template/#{template_name}", (err, data)->
@@ -28,7 +28,7 @@ module.exports = TemplatesWebController =
 			data.title = data?.template?.name
 			res.render Path.resolve(__dirname, "../views/template"), data
 
-	tagOrCanonicalPage: (req, res)->
+	tagOrCanonicalPage: (req, res, next)->
 		if req.params.template_id?
 			TemplatesWebController._renderCanonicalPage(req, res)
 		else if req.params.tag_name?.toLowerCase() == "all"
@@ -39,7 +39,7 @@ module.exports = TemplatesWebController =
 			logger.log params:req.params, "problem rendering tagOrCanonicalPage"
 			next 500
 
-	proxyToTemplatesApi: (req, res)->
+	proxyToTemplatesApi: (req, res, next)->
 		url = req.url
 
 		name = req.query.name or "Template"
@@ -58,7 +58,7 @@ module.exports = TemplatesWebController =
 			logger.error err: error, "templates proxy API error"
 			next 500
 
-	_renderCanonicalPage: (req, res)->
+	_renderCanonicalPage: (req, res, next)->
 		current_user_id = req.session?.user?._id
 		{user_id, template_id} = req.params
 		logger.log current_user_id: current_user_id, user_id:user_id, template_id:template_id, "rendering template page"
@@ -73,7 +73,7 @@ module.exports = TemplatesWebController =
 			data.currentUserIsOwner = current_user_id and current_user_id == data.template.userId
 			res.render Path.resolve(__dirname, "../views/template"), data
 
-	_renderAllTemplatesPage: (req, res)->
+	_renderAllTemplatesPage: (req, res, next)->
 		{user_id} = req.params
 		logger.log user_id:user_id, "rendering all templates page"
 		TemplatesWebController._getDataFromTemplatesApi "/user/#{user_id}/all", (err, data)->
@@ -85,7 +85,7 @@ module.exports = TemplatesWebController =
 			data.title = "all_templates"
 			res.render Path.resolve(__dirname, "../views/tag"), data
 
-	_renderTagPage:  (req, res)->
+	_renderTagPage:  (req, res, next)->
 		{user_id, tag_name} = req.params
 		logger.log user_id:user_id, tag_name:tag_name, "rendinging tag page for templates"
 		TemplatesWebController._getDataFromTemplatesApi "/user/#{user_id}/tag/#{tag_name}", (err, data)->
