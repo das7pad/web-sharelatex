@@ -35,7 +35,7 @@ module.exports =
 			ProjectUploadManager.createProjectFromZipArchive req.session.user._id, req.session.templateData.templateName, dumpPath, (err, project)->
 				if err?
 					logger.err err:err, zipUrl:zipUrl, "problem building project from zip"
-					return res.send 500
+					return res.sendStatus 500
 				setCompiler project._id, req.session.templateData.compiler, ->
 					fs.unlink dumpPath, ->
 					delete req.session.templateData
