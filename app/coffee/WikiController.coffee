@@ -98,7 +98,7 @@ module.exports = WikiController =
 
 	_renderPage: (page, contents, res)->
 		if page.redirects?.length > 0
-			return res.redirect "/learn/#{page.redirects[0].to}"
+			return res.redirect "/learn/#{encodeURIComponent(page.redirects[0].to)}"
 		if page.revid == 0
 			return ErrorController.notFound(null, res)
 		
