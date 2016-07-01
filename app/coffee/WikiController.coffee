@@ -76,6 +76,7 @@ module.exports = WikiController =
 				page: decodeURI(page)
 				action: "parse"
 				format: "json"
+				redirects: true
 			}
 		}, (err, response, data)->
 			return callback(err) if err?
@@ -86,10 +87,17 @@ module.exports = WikiController =
 			result = 
 				content: data?.parse?.text?['*']
 				title: data?.parse?.title
+				revid: data?.parse?.revid
+				redirects: data?.parse?.redirects
 			callback null, result
 
 
 	_renderPage: (page, contents, res)->
+		if page.redirects.length > 0
+			return res.redirect "/learn/#{page.redirects[0].to}"
+		if page.revid == 0
+			return ErrorController.notFound(null, res)
+		
 		if page.title == "Main Page"
 			title = "Documentation"
 		else
