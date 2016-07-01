@@ -49,6 +49,10 @@ module.exports = WikiController =
 
 				if pageData.title?.toLowerCase()?.indexOf("errors") == 0
 					pageData.title = pageData.title.slice(7)
+				
+				# '.'s mess up translation keys
+				# See https://github.com/i18next/i18next-node/issues/78
+				pageData.title = pageData.title.replace(/\./g, "")
 					
 				WikiController._renderPage(pageData, contents, res)
 			else
