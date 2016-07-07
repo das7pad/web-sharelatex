@@ -43,12 +43,8 @@ module.exports = WikiController =
 			if pageData.content?.length > 280
 				if _.include(other_lngs, req.lng)
 					pageData.title = pageData.title.slice(0, pageData.title.length - (req.lng.length+1) )
-
-				if pageData.title?.toLowerCase()?.indexOf("kb") == 0
-					pageData.title = pageData.title.slice(3)
-
-				if pageData.title?.toLowerCase()?.indexOf("errors") == 0
-					pageData.title = pageData.title.slice(7)
+					
+				pageData.title = (pageData.title or "").split("/").pop()
 				
 				# '.'s mess up translation keys
 				# See https://github.com/i18next/i18next-node/issues/78
