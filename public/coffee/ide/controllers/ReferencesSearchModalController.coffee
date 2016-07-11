@@ -1,7 +1,7 @@
 define [
 	"base"
 ], (App) ->
-	App.controller "ReferencesSearchModalController", ($scope, $modalInstance, $window, $timeout, ide) ->
+	App.controller "ReferencesSearchModalController", ($scope, $modalInstance, $window, $timeout, ide, event_tracking) ->
 
 		if !($scope.searchFeatureEnabled())
 			return
@@ -117,6 +117,7 @@ define [
 
 		$scope.acceptSelectedSearchResult = () ->
 			if $scope.state.searchResults && $scope.state.selectedIndex != null
+				event_tracking.sendCountly "bib-search-result-inserted"
 				result = $scope.state.searchResults[$scope.state.selectedIndex]
 				$modalInstance.close(result._source.EntryKey)
 

@@ -10,7 +10,7 @@ define [
 		else
 			return null
 
-	App.controller "ReferencesSearchController", ($scope, $modal, ide, $timeout, sixpack) ->
+	App.controller "ReferencesSearchController", ($scope, $modal, ide, $timeout, sixpack, event_tracking) ->
 
 		$scope.searchFeatureEnabled = () ->
 			return true
@@ -37,6 +37,7 @@ define [
 
 		$scope._hintNode = null
 		$scope._buildHintNode = () ->
+			event_tracking.sendCountly "bib-search-hint-shown"
 			# pluck the hidden node out of the dom,
 			# make it visible then hand it over to the caller
 			hintNode = $('.sl_references_search_hint')[0]
@@ -139,6 +140,7 @@ define [
 					if ed?.completer?.popup?.isOpen == true && isAtCitation == true
 						if $scope._sixpackParticipating
 							sixpack.convert 'references-search-popup-redux', () -> $scope._sixpackParticipating = false
+						event_tracking.sendCountly "bib-search-modal-opened"
 						$scope.openReferencesSearchModal()
 					else
 						startAutocomplete.exec(ed)
