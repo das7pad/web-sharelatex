@@ -102,8 +102,8 @@ module.exports = WikiController =
 		else
 			title = page.title
 		viewPath = path.join(__dirname, "../views/page")
-		if settings.cdn?.host?
-			page.content = page.content.replace(/src="([^"]+)"/g, "src='#{settings.cdn?.host}$1'");
+		if settings.cdn?.wiki?.host?
+			page.content = page.content.replace(/src="([^"]+)"/g, "src='#{settings.cdn?.wiki?.host}$1'");
 		res.render viewPath, {
 			page: page
 			contents: contents
