@@ -42,12 +42,12 @@ module.exports = WikiController =
 			if pageData.content?.length > 280
 				if _.include(other_lngs, req.lng)
 					pageData.title = pageData.title.slice(0, pageData.title.length - (req.lng.length+1) )
-
-				if pageData.title?.toLowerCase()?.indexOf("kb") == 0
-					pageData.title = pageData.title.slice(3)
-
-				if pageData.title?.toLowerCase()?.indexOf("errors") == 0
-					pageData.title = pageData.title.slice(7)
+					
+				pageData.title = (pageData.title or "").split("/").pop()
+				
+				# '.'s mess up translation keys
+				# See https://github.com/i18next/i18next-node/issues/78
+				pageData.title = pageData.title.replace(/\./g, "")
 					
 				WikiController._renderPage(pageData, contents, res)
 			else
@@ -72,9 +72,10 @@ module.exports = WikiController =
 		request {
 			url: "#{baseWikiUrl}/learn-scripts/api.php"
 			qs: {
-				page: decodeURI(page)
+				page: decodeURIComponent(page)
 				action: "parse"
 				format: "json"
+				redirects: true
 			}
 		}, (err, response, data)->
 			return callback(err) if err?
@@ -85,10 +86,17 @@ module.exports = WikiController =
 			result = 
 				content: data?.parse?.text?['*']
 				title: data?.parse?.title
+				revid: data?.parse?.revid
+				redirects: data?.parse?.redirects
 			callback null, result
 
 
 	_renderPage: (page, contents, res)->
+		if page.redirects?.length > 0
+			return res.redirect "/learn/#{encodeURIComponent(page.redirects[0].to)}"
+		if page.revid == 0
+			return ErrorController.notFound(null, res)
+		
 		if page.title == "Main Page"
 			title = "Documentation"
 		else
