@@ -5,7 +5,6 @@ ErrorController = require "../../../../app/js/Features/Errors/ErrorController"
 _ = require("underscore")
 AuthenticationController = require("../../../../app/js/Features/Authentication/AuthenticationController")
 
-"../../../../app/js/"
 async = require("async")
 other_lngs = ["es"]
 path = require("path")
@@ -95,7 +94,8 @@ module.exports = WikiController =
 		else
 			title = page.title
 		viewPath = path.join(__dirname, "../views/page")
-
+		if settings.cdn?.host?
+			page.content = page.content.replace(/src="([^"]+)"/g, "src='#{settings.cdn?.host}$1'");
 		res.render viewPath, {
 			page: page
 			contents: contents
