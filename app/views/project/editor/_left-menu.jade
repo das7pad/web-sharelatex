@@ -14,7 +14,7 @@ script(type="text/ng-template", id="referencesModalTemplate")
 
 	//each item in ['mendeley', 'zotero']
 	each item in ['mendeley']
-		div(ng-if="provider == '#{item}'")
+		div(ng-if="provider == '#{item}'").referencesImportModal
 			.modal-header
 				button.close(
 					type="button"
@@ -86,10 +86,9 @@ script(type="text/ng-template", id="referencesModalTemplate")
 									| &nbsp;#{translate(item+"_reference_loading_success")}
 
 						// data display, scroll and import button
-						div(ng-if="bibtexData && !status.loading && !status.error", style="margin-top:15px;")
-							div(style="max-height: 360px; overflow: scroll; white-space: pre")
+						div(ng-if="bibtexData && !status.loading && !status.error").referencesImportPreview
+							div().referencesImportPreviewScroller
 								| {{bibtexData}}
-							hr
 							div.text-center
 								button.btn.btn-success(ng-click="importBibtex()", ng-disabled="status.importing")
 									span #{translate("reference_import_button")} {{provider}}.bib
