@@ -57,31 +57,31 @@ block content
 				#slides.container-fluid
 					.row.row-spaced
 						.col-xs-3
-							img(src="/img/crests/harvard.gif", alt="harvard university logo")
+							img(src=buildImgPath("crests/harvard.gif"), alt="harvard university logo")
 						.col-xs-3
-							img(src="/img/crests/mit.gif", alt="mit university logo")
+							img(src=buildImgPath("crests/mit.gif"), alt="mit university logo")
 						.col-xs-3
-							img(src="/img/crests/oxford.gif", alt="oxford university logo")
+							img(src=buildImgPath("crests/oxford.gif"), alt="oxford university logo")
 						.col-xs-3
-							img(src="/img/crests/tokyo.png", alt="tokyo university logo")
+							img(src=buildImgPath("crests/tokyo.png"), alt="tokyo university logo")
 					.row.row-spaced(style="display: none;")
 						.col-xs-3
-							img(src="/img/crests/cambridge.png", alt="cambridge university logo")
+							img(src=buildImgPath("crests/cambridge.png"), alt="cambridge university logo")
 						.col-xs-3
-							img(src="/img/crests/liverpool.jpg", alt="liverpool university logo")
+							img(src=buildImgPath("crests/liverpool.jpg"), alt="liverpool university logo")
 						.col-xs-3
-							img(src="/img/crests/icl.png", alt="icl university logo")
+							img(src=buildImgPath("crests/icl.png"), alt="icl university logo")
 						.col-xs-3
-							img(src="/img/crests/yale.png", alt="yale university logo")
+							img(src=buildImgPath("crests/yale.png"), alt="yale university logo")
 					.row.row-spaced(style="display: none;")
 						.col-xs-3
-							img(src="/img/crests/durham.png", alt="durham university logo")
+							img(src=buildImgPath("crests/durham.png"), alt="durham university logo")
 						.col-xs-3
-							img(src="/img/crests/nasa.png", alt="nasa university logo")
+							img(src=buildImgPath("crests/nasa.png"), alt="nasa university logo")
 						.col-xs-3
-							img(src="/img/crests/toronto.gif", alt="toronto university logo")
+							img(src=buildImgPath("crests/toronto.gif"), alt="toronto university logo")
 						.col-xs-3
-							img(src="/img/crests/stanford.png", alt="stanford university logo")
+							img(src=buildImgPath("crests/stanford.png"), alt="stanford university logo")
 
 	.pattern-container
 		.container
@@ -278,7 +278,7 @@ block content
 			.row-spaced
 				
 
-	script(src=jsPath + "libs/jquery.slides.min.js")
+	script(src=buildJsPath("libs/jquery.slides.min.js"))
 	script(type="text/javascript").
 		$(function() {
 			$('#slides').slidesjs({
