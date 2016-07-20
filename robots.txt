@@ -5,6 +5,7 @@ Disallow: /minjs/*
 Disallow: /project/*
 Disallow: /github/repos/*
 Disallow: /recurly.com
+Disallow: /user/password/set
 Allow: /
 
 User-Agent: AhrefsBot
