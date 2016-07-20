@@ -278,7 +278,7 @@ block content
 			.row-spaced
 				
 
-	script(src=buildJsPath("libs/jquery.slides.min.js"))
+	script(src=buildJsPath("libs/jquery.slides.min.js", {fingerprint:false}))
 	script(type="text/javascript").
 		$(function() {
 			$('#slides').slidesjs({
