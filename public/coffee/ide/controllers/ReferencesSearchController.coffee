@@ -11,7 +11,6 @@ define [
 			return null
 
 	App.controller "ReferencesSearchController", ($scope, $modal, ide, $timeout, sixpack, event_tracking) ->
-
 		$scope.searchFeatureEnabled = () ->
 			return true
 			# return (
@@ -22,6 +21,11 @@ define [
 			return
 
 		$scope.searchEnabled = false
+
+		_abTestStartDate = new Date(Date.UTC(2016, 6, 22))
+		_userSignUpDate = new Date(window.user.signUpDate)
+
+		$scope.shouldABTestBibSearch = _userSignUpDate > _abTestStartDate
 
 		$scope.isCursorAtCitation = (editor) ->
 			# FIXME: duped code from AutocompletManager
@@ -141,9 +145,14 @@ define [
 						if $scope._sixpackParticipating
 							sixpack.convert 'references-search-popup-redux', () -> $scope._sixpackParticipating = false
 						event_tracking.sendCountly "bib-search-modal-opened"
+						sixpack.convert 'bib-search-highlight'
 						$scope.openReferencesSearchModal()
 					else
 						startAutocomplete.exec(ed)
+
+				# Expose the handleControlSpace method to the scope, in order to bind it
+				# via ng-click.
+				$scope.handleOpenSearch = () -> handleControlSpace(editor)
 
 				# BUG: Safari/Ace/Ctrl-Space don't seem to get along.
 				# If we detect we're in Safari, just add a key listener to the

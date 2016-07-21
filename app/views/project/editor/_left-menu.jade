@@ -3,8 +3,27 @@ span(ng-controller="ReferencesSearchController")
 	// the search hint, kept hidden initially,
 	// will be attached to the autocomplete popup and revealed
 	// once autocomplete has been triggered in a `cite` block
-	div(style="display: none; visibility: hidden").sl_references_search_hint
-		span #{translate("references_search_hint")}
+
+	div(style="display: none;").sl_references_search_hint
+		div(ng-if="shouldABTestBibSearch")
+			div(sixpack-switch="bib-search-highlight")
+				div(sixpack-default).sl_references_search_hint-varDefault
+					span #{translate("references_search_hint")}
+				div(sixpack-when="button").sl_references_search_hint-varButton
+					hr
+					// Have to use the `mousedown` event, as Ace
+					// captures `click` at the capture phase.
+					button.btn.btn-info(
+						ng-mousedown="handleOpenSearch();"
+						title="Search your references"
+					)
+						i.fa.fa-search(aria-hidden="true")
+						span Search your references
+						kbd (Ctrl + Space)
+		div(ng-if="!shouldABTestBibSearch")
+			div.sl_references_search_hint-varDefault
+				span #{translate("references_search_hint")}
+
 
 script(type="text/ng-template", id="referencesSearchModalTemplate")
 	.modal-header
