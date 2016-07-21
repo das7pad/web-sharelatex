@@ -11,7 +11,6 @@ define [
 			return null
 
 	App.controller "ReferencesSearchController", ($scope, $modal, ide, $timeout, sixpack, event_tracking) ->
-
 		$scope.searchFeatureEnabled = () ->
 			return true
 			# return (
@@ -141,6 +140,7 @@ define [
 						if $scope._sixpackParticipating
 							sixpack.convert 'references-search-popup-redux', () -> $scope._sixpackParticipating = false
 						event_tracking.sendCountly "bib-search-modal-opened"
+						sixpack.convert 'bib-search-highlight'
 						$scope.openReferencesSearchModal()
 					else
 						startAutocomplete.exec(ed)
