@@ -3,8 +3,17 @@ span(ng-controller="ReferencesSearchController")
 	// the search hint, kept hidden initially,
 	// will be attached to the autocomplete popup and revealed
 	// once autocomplete has been triggered in a `cite` block
-	div(style="display: none; visibility: hidden").sl_references_search_hint
-		span #{translate("references_search_hint")}
+
+	div(style="display: none;" sixpack-switch="bib-search-highlight").sl_references_search_hint
+		div(sixpack-default)
+			span #{translate("references_search_hint")}
+		div(sixpack-when="button")
+			hr
+			button.btn.btn-info(title="#{translate('references_search_hint_B')}")
+				i.fa.fa-search(aria-hidden="true")
+				span #{translate("references_search_hint_B")}
+				span.sl_references_search_hint_keybinding #{translate("references_search_hint_keybinding")}
+
 
 script(type="text/ng-template", id="referencesSearchModalTemplate")
 	.modal-header
