@@ -22,6 +22,11 @@ define [
 
 		$scope.searchEnabled = false
 
+		_abTestStartDate = new Date(Date.UTC(2016, 6, 22))
+		_userSignUpDate = new Date(window.user.signUpDate)
+
+		$scope.shouldABTestBibSearch = _userSignUpDate > _abTestStartDate
+
 		$scope.isCursorAtCitation = (editor) ->
 			# FIXME: duped code from AutocompletManager
 			pos = editor.getCursorPosition()
