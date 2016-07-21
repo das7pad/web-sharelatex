@@ -145,6 +145,10 @@ define [
 					else
 						startAutocomplete.exec(ed)
 
+				# Expose the handleControlSpace method to the scope, in order to bind it
+				# via ng-click.
+				$scope.handleOpenSearch = () -> handleControlSpace(editor)
+
 				# BUG: Safari/Ace/Ctrl-Space don't seem to get along.
 				# If we detect we're in Safari, just add a key listener to the
 				# #editor node, otherwise register a command with ace
