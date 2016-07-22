@@ -144,8 +144,11 @@ define [
 					if ed?.completer?.popup?.isOpen == true && isAtCitation == true
 						if $scope._sixpackParticipating
 							sixpack.convert 'references-search-popup-redux', () -> $scope._sixpackParticipating = false
+							
 						event_tracking.sendCountly "bib-search-modal-opened"
-						sixpack.convert 'bib-search-highlight'
+
+						sixpack.convert 'bib-search-highlight' if $scope.shouldABTestBibSearch
+
 						$scope.openReferencesSearchModal()
 					else
 						startAutocomplete.exec(ed)
