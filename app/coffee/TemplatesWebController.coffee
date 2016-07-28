@@ -99,7 +99,7 @@ module.exports = TemplatesWebController =
 
 	_getDataFromTemplatesApi: (path, callback)->
 		opts =
-			url: "#{settings.apis.templates.url}#{path}"
+			url: "#{settings.apis.templates.url}#{encodeURI(path)}"
 			json:true
 		request.get opts, (err, response, data)->
 			if response?.statusCode == 404
@@ -108,6 +108,7 @@ module.exports = TemplatesWebController =
 				logger.err err:err, path:path, "error getting data from templates api"
 				return callback 500
 			else if response?.statusCode != 200
+				logger.err statusCode:response?.statusCode, opts:opts, "got non 200 back from templates"
 				return callback 500
 			else
 				return callback err, data
