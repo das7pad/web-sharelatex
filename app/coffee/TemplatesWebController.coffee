@@ -30,11 +30,11 @@ module.exports = TemplatesWebController =
 
 	tagOrCanonicalPage: (req, res, next)->
 		if req.params.template_id?
-			TemplatesWebController._renderCanonicalPage(req, res)
+			TemplatesWebController._renderCanonicalPage(req, res, next)
 		else if req.params.tag_name?.toLowerCase() == "all"
-			TemplatesWebController._renderAllTemplatesPage(req, res)
+			TemplatesWebController._renderAllTemplatesPage(req, res, next)
 		else if req.params.tag_name?
-			TemplatesWebController._renderTagPage(req, res)
+			TemplatesWebController._renderTagPage(req, res, next)
 		else
 			logger.log params:req.params, "problem rendering tagOrCanonicalPage"
 			next 500
@@ -102,11 +102,12 @@ module.exports = TemplatesWebController =
 			url: "#{settings.apis.templates.url}#{path}"
 			json:true
 		request.get opts, (err, response, data)->
-			if err?
-				return callback 500
-			else if response?.statusCode == 404
+			if response?.statusCode == 404
 				return callback 404
-			else if response.statusCode != 200
+			else if err?
+				logger.err err:err, path:path, "error getting data from templates api"
+				return callback 500
+			else if response?.statusCode != 200
 				return callback 500
 			else
 				return callback err, data
