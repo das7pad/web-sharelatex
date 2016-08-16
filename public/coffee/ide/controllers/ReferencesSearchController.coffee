@@ -41,7 +41,7 @@ define [
 
 		$scope._hintNode = null
 		$scope._buildHintNode = () ->
-			event_tracking.sendCountly "bib-search-hint-shown"
+			event_tracking.sendMBOnce "bib-search-hint-shown-once"
 			# pluck the hidden node out of the dom,
 			# make it visible then hand it over to the caller
 			hintNode = $('.sl_references_search_hint')[0]
@@ -145,7 +145,7 @@ define [
 						if $scope._sixpackParticipating
 							sixpack.convert 'references-search-popup-redux', () -> $scope._sixpackParticipating = false
 							
-						event_tracking.sendCountly "bib-search-modal-opened"
+						event_tracking.sendMB "bib-search-modal-opened"
 
 						sixpack.convert 'bib-search-highlight' if $scope.shouldABTestBibSearch
 

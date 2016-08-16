@@ -117,7 +117,7 @@ define [
 
 		$scope.acceptSelectedSearchResult = () ->
 			if $scope.state.searchResults && $scope.state.selectedIndex != null
-				event_tracking.sendCountly "bib-search-result-inserted"
+				event_tracking.sendMB "bib-search-result-inserted"
 				result = $scope.state.searchResults[$scope.state.selectedIndex]
 				$modalInstance.close(result._source.EntryKey)
 
