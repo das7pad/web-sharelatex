@@ -108,4 +108,5 @@ module.exports = WikiController =
 			page: page
 			contents: contents
 			title: title
+			meta: "A comprehensive LaTeX guide with easy to understand examples and how-tos."
 		}
