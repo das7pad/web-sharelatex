@@ -11,6 +11,7 @@ UserGetter = require('../../../../app/js/Features/User/UserGetter')
 ProjectEntityHandler = require('../../../../app/js/Features/Project/ProjectEntityHandler')
 DocumentUpdaterHandler = require('../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler')
 EditorRealTimeController = require('../../../../app/js/Features/Editor/EditorRealTimeController')
+AuthenticationController = require('../../../../app/js/Features/Authentication/AuthenticationController')
 temp = require('temp')
 temp.track()
 
@@ -21,7 +22,7 @@ module.exports = ReferencesApiHandler =
 			callback(err, user?.features?.references == true)
 
 	startAuth: (req, res, next)->
-		user_id = req.session?.user?._id
+		user_id = AuthenticationController.getLoggedInUserId(req)
 		ref_provider = req.params.ref_provider
 		logger.log {user_id, ref_provider}, "starting references auth process"
 		ReferencesApiHandler.userCanMakeRequest user_id, ref_provider, (err, canMakeRequest) ->
@@ -42,7 +43,7 @@ module.exports = ReferencesApiHandler =
 				res.redirect(body.redirect)
 
 	completeAuth: (req, res, next)->
-		user_id = req.session?.user?._id
+		user_id = AuthenticationController.getLoggedInUserId(req)
 		ref_provider = req.params.ref_provider
 		ReferencesApiHandler.userCanMakeRequest user_id, ref_provider, (err, canMakeRequest) ->
 			if err
@@ -72,6 +73,7 @@ module.exports = ReferencesApiHandler =
 
 	unlink: (req, res, next) ->
 		ref_provider = req.params.ref_provider
+		user_id = AuthenticationController.getLoggedInUserId(req)
 
 		ref = {}
 		ref[ref_provider] = true
@@ -80,14 +82,14 @@ module.exports = ReferencesApiHandler =
 				refProviders:
 					ref
 
-		logger.log user_id:req.session?.user?._id, update:update, "reference unlink"
-		UserUpdater.updateUser req.session?.user?._id, update, (err)->
+		logger.log {user_id, update:update}, "reference unlink"
+		UserUpdater.updateUser user_id, update, (err)->
 			if err?
 				logger.err err:err, result:result, "error unlinking reference info on user " + ref_provider
 			res.redirect "/user/settings"
 
 	bibtex: (req, res, next) ->
-		user_id = req.session?.user?._id
+		user_id = AuthenticationController.getLoggedInUserId(req)
 		ref_provider = req.params.ref_provider
 		ReferencesApiHandler.userCanMakeRequest user_id, ref_provider, (err, canMakeRequest) ->
 			if err
@@ -116,7 +118,7 @@ module.exports = ReferencesApiHandler =
 		return stream
 
 	importBibtex: (req, res, next) ->
-		user_id = req.session?.user?._id
+		user_id = AuthenticationController.getLoggedInUserId(req)
 		ref_provider = req.params.ref_provider
 		project_id = req.params.Project_id
 		ReferencesApiHandler.userCanMakeRequest user_id, ref_provider, (err, canMakeRequest) ->
