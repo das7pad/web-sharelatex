@@ -11,6 +11,7 @@ EmailBuilder = require("../../../../app/js/Features/Email/EmailBuilder")
 PersonalEmailLayout = require("../../../../app/js/Features/Email/Layouts/PersonalEmailLayout")
 _ = require "underscore"
 UserHandler = require("../../../../app/js/Features/User/UserHandler")
+UserSessionsManager = require("../../../../app/js/Features/User/UserSessionsManager")
 
 EmailBuilder.templates.welcome =
 	subject:  _.template "Welcome to ShareLaTeX"
@@ -44,12 +45,18 @@ module.exports = PublicRegistrationController =
 			sharedProjectData: sharedProjectData
 			newTemplateData: newTemplateData
 			new_email:req.query.new_email || ""
-					
+
 	register: (req, res, next) ->
 		logger.log email: req.body.email, "attempted register"
 		UserRegistrationHandler.registerNewUser req.body, (err, user)->
+			verifyLink = SubscriptionDomainHandler.getDomainLicencePage(user)
+			redir = Url.parse(verifyLink or req.body.redir or "/project").path
 			if err? and err?.message == "EmailAlreadyRegistered"
-				return AuthenticationController.login req, res
+				req.login user, (err) ->
+					if err?
+						return next(err)
+					UserSessionsManager.trackSession(user, req.sessionID, () ->)
+					res.json {redir: redir}
 			else if err?
 				next(err)
 			else
@@ -62,14 +69,12 @@ module.exports = PublicRegistrationController =
 				}, () ->
 
 				UserHandler.populateGroupLicenceInvite(user, ->)
-				verifyLink = SubscriptionDomainHandler.getDomainLicencePage(user)
-				redir = Url.parse(verifyLink or req.body.redir or "/project").path
 
-
-				AuthenticationController.establishUserSession req, user, (error) ->
+				req.login user, (err) ->
 					return callback(error) if error?
 					req.session.justRegistered = true
-					res.send
+					UserSessionsManager.trackSession(user, req.sessionID, () ->)
+					res.json
 						redir:redir
 						id:user._id.toString()
 						first_name: user.first_name
