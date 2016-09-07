@@ -24,6 +24,8 @@ describe 'ReferencesSearchController', ->
 				log:->
 				err:->
 			}
+			'../../../../app/js/Features/Authentication/AuthenticationController': @AuthenticationController =
+				getLoggedInUserId: sinon.stub().returns(@user_id)
 		@req =
 			body:
 				query: @query

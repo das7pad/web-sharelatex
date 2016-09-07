@@ -1,6 +1,7 @@
 logger = require('logger-sharelatex')
 ProjectGetter = require "../../../../app/js/Features/Project/ProjectGetter"
 UserGetter = require('../../../../app/js/Features/User/UserGetter')
+AuthenticationController = require('../../../../app/js/Features/Authentication/AuthenticationController')
 ReferencesSearchHandler = require('./ReferencesSearchHandler')
 
 module.exports = ReferencesSearchController =
@@ -15,7 +16,7 @@ module.exports = ReferencesSearchController =
 
 	search: (req, res) ->
 		projectId = req.params.Project_id
-		userId = req?.session?.user?._id
+		userId = AuthenticationController.getLoggedInUserId(req)
 		query = req.body.query
 		if !query
 			logger.err {projectId, userId}, "error: no query supplied for references search"
