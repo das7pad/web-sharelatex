@@ -8,7 +8,10 @@ stream = require('stream')
 
 describe 'ReferencesApiHandler', ->
 	beforeEach ->
+		@user_id = ObjectId().toString()
+		@project_id = ObjectId().toString()
 		@user =
+			_id: @user_id
 			features:
 				references: true
 		@allFiles =
@@ -48,9 +51,8 @@ describe 'ReferencesApiHandler', ->
 				track: sinon.stub()
 				createWriteStream: sinon.stub()
 			}
-
-		@user_id = ObjectId().toString()
-		@project_id = ObjectId().toString()
+			'../../../../app/js/Features/Authentication/AuthenticationController': @AuthenticationController =
+				getLoggedInUserId: sinon.stub().returns(@user_id)
 
 		@req =
 			session:
