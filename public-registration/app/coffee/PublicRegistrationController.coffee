@@ -3,7 +3,6 @@ Url = require "url"
 logger = require "logger-sharelatex"
 metrics = require "metrics-sharelatex"
 ReferalAllocator = require "../../../../app/js/Features/Referal/ReferalAllocator"
-AuthenticationController = require("../../../../app/js/Features/Authentication/AuthenticationController")
 UserRegistrationHandler = require("../../../../app/js/Features/User/UserRegistrationHandler")
 SubscriptionDomainHandler = require("../../../../app/js/Features/Subscription/SubscriptionDomainHandler")
 EmailHandler = require("../../../../app/js/Features/Email/EmailHandler")

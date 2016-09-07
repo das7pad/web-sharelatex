@@ -8,19 +8,21 @@ modulePath = require('path').join __dirname, '../../../app/js/DropboxUserControl
 describe 'DropboxUserController', ->
 
 	beforeEach ->
+		@user_id = "23j21lk3j1312j321jkljkl"
 		@DropboxHandler =
 			getDropboxRegisterUrl: sinon.stub()
 			completeRegistration: sinon.stub()
 			unlinkAccount: sinon.stub()
-
+		@AuthenticationController =
+			getLoggedInUserId: sinon.stub().returns(@user_id)
 		@controller = SandboxedModule.require modulePath, requires:
 			'./DropboxHandler': @DropboxHandler
 			'logger-sharelatex':
 				log:->
 				err:->
+			'../../../../app/js/Features/Authentication/AuthenticationController': @AuthenticationController
 
-		@user_id = "23j21lk3j1312j321jkljkl"
-		@req = 
+		@req =
 			session:
 				user:
 					_id: @user_id
@@ -67,4 +69,3 @@ describe 'DropboxUserController', ->
 				done()
 
 			@controller.unlinkDropbox @req, @res
-

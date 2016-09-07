@@ -6,6 +6,9 @@ modulePath = require('path').join __dirname, '../../../app/js/GithubSyncControll
 
 describe 'GithubSyncController', ->
 	beforeEach ->
+		@user_id = "user-id-123"
+		@AuthenticationController =
+			getLoggedInUserId: sinon.stub().returns(@user_id)
 		@GithubSyncController = SandboxedModule.require modulePath, requires:
 			'request': @request = sinon.stub()
 			'settings-sharelatex': @settings = {}
@@ -13,15 +16,14 @@ describe 'GithubSyncController', ->
 			"./GithubSyncApiHandler": @GithubSyncApiHandler = {}
 			"./GithubSyncExportHandler": @GithubSyncExportHandler = {}
 			"./GithubSyncImportHandler": @GithubSyncImportHandler = {}
-			"../../../../app/js/Features/Authentication/AuthenticationController": @AuthenticationController = {}
+			"../../../../app/js/Features/Authentication/AuthenticationController": @AuthenticationController
 
 		@settings.apis =
 			githubSync:
 				url: "http://github-sync.example.com"
 		@settings.siteUrl = "http://sharelatex.example.com"
 
-		@user_id = "user-id-123"
-		@req = 
+		@req =
 			session:
 				user:
 					_id: @user_id
@@ -43,7 +45,7 @@ describe 'GithubSyncController', ->
 			@GithubSyncApiHandler.getLoginUrl
 				.calledWith(@user_id)
 				.should.equal true
-				
+
 		it "should redirect to the Github OAuth URL", ->
 			@res.redirect
 				.calledWith(@loginUrl + "&redirect_uri=#{@authUrl}")
@@ -61,7 +63,7 @@ describe 'GithubSyncController', ->
 			@GithubSyncApiHandler.doAuth
 				.calledWith(@user_id, @req.query)
 				.should.equal true
-				
+
 		it "should redirect to the linked confirmation page", ->
 			@res.redirect
 				.calledWith("/github-sync/linked")
@@ -76,7 +78,7 @@ describe 'GithubSyncController', ->
 			@GithubSyncApiHandler.unlink
 				.calledWith(@user_id)
 				.should.equal true
-				
+
 		it "should redirect to the settings page", ->
 			@res.redirect
 				.calledWith("/user/settings")
@@ -90,38 +92,38 @@ describe 'GithubSyncController', ->
 			}
 			@GithubSyncApiHandler.getUserStatus = sinon.stub().callsArgWith(1, null, @status = { enabled: true })
 			@AuthenticationController.getLoggedInUser = sinon.stub().callsArgWith(1, null, @user)
-			
+
 		describe "with the github feature available", ->
 			beforeEach ->
 				@GithubSyncController.getUserStatus @req, @res
-				
+
 			it "should get the user status from the github sync api", ->
 				@GithubSyncApiHandler.getUserStatus
 					.calledWith(@user_id)
 					.should.equal true
-					
+
 			it "should return the status as JSON", ->
 				@res.header
 					.calledWith("Content-Type", "application/json")
 					.should.equal true
-					
+
 				@res.json
 					.calledWith({
 						available: true
 						enabled: @status.enabled
 					})
 					.should.equal true
-					
+
 		describe "with the github feature not available", ->
 			beforeEach ->
 				@user.features.github = false
 				@GithubSyncController.getUserStatus @req, @res
-					
+
 			it "should return the status as JSON", ->
 				@res.header
 					.calledWith("Content-Type", "application/json")
 					.should.equal true
-					
+
 				@res.json
 					.calledWith({
 						available: false
@@ -133,17 +135,17 @@ describe 'GithubSyncController', ->
 		beforeEach ->
 			@GithubSyncApiHandler.getUserLoginAndOrgs = sinon.stub().callsArgWith(1, null, @data = { user: { login: "jpallen" }, orgs: [] })
 			@GithubSyncController.getUserLoginAndOrgs @req, @res
-			
+
 		it "should get the user details from the github sync api", ->
 			@GithubSyncApiHandler.getUserLoginAndOrgs
 				.calledWith(@user_id)
 				.should.equal true
-				
+
 		it "should return the output as JSON", ->
 			@res.header
 				.calledWith("Content-Type", "application/json")
 				.should.equal true
-				
+
 			@res.json
 				.calledWith(@data)
 				.should.equal true
@@ -152,17 +154,17 @@ describe 'GithubSyncController', ->
 		beforeEach ->
 			@GithubSyncApiHandler.getUserRepos = sinon.stub().callsArgWith(1, null, @repos = [{full_name: "org/repo"}])
 			@GithubSyncController.getUserRepos @req, @res
-			
+
 		it "should get the user details from the github sync api", ->
 			@GithubSyncApiHandler.getUserRepos
 				.calledWith(@user_id)
 				.should.equal true
-				
+
 		it "should return the output as JSON", ->
 			@res.header
 				.calledWith("Content-Type", "application/json")
 				.should.equal true
-				
+
 			@res.json
 				.calledWith(@repos)
 				.should.equal true
@@ -173,21 +175,21 @@ describe 'GithubSyncController', ->
 				Project_id: @project_id = "project-id-123"
 			@GithubSyncApiHandler.getProjectStatus = sinon.stub().callsArgWith(1, null, @status = { enabled: true })
 			@GithubSyncController.getProjectStatus @req, @res
-			
+
 		it "should get the project status from the github sync api", ->
 			@GithubSyncApiHandler.getProjectStatus
 				.calledWith(@project_id)
 				.should.equal true
-				
+
 		it "should return the status as JSON", ->
 			@res.header
 				.calledWith("Content-Type", "application/json")
 				.should.equal true
-				
+
 			@res.json
 				.calledWith(@status)
 				.should.equal true
-				
+
 	describe "getProjectUnmergedCommits", ->
 		beforeEach ->
 			@req.params =
@@ -201,17 +203,17 @@ describe 'GithubSyncController', ->
 			]
 			@GithubSyncApiHandler.getProjectUnmergedCommits = sinon.stub().callsArgWith(1, null, @commits)
 			@GithubSyncController.getProjectUnmergedCommits @req, @res
-			
+
 		it "should get the commits from the github api", ->
 			@GithubSyncApiHandler.getProjectUnmergedCommits
 				.calledWith(@project_id)
 				.should.equal true
-				
+
 		it "should send the formatted commits as JSON", ->
 			@res.header
 				.calledWith("Content-Type", "application/json")
 				.should.equal true
-				
+
 			@res.json
 				.calledWith([{
 					message: @message
@@ -219,7 +221,7 @@ describe 'GithubSyncController', ->
 					author: @author
 				}])
 				.should.equal true
-				
+
 	describe "exportProject", ->
 		beforeEach ->
 			@req.params =
@@ -231,7 +233,7 @@ describe 'GithubSyncController', ->
 				private: true
 			@GithubSyncExportHandler.exportProject = sinon.stub().callsArgWith(2, null)
 			@GithubSyncController.exportProject @req, @res
-			
+
 		it "should export the project", ->
 			@GithubSyncExportHandler.exportProject
 				.calledWith(@project_id, {
@@ -241,7 +243,7 @@ describe 'GithubSyncController', ->
 					private: true
 				})
 				.should.equal true
-				
+
 	describe "importProject", ->
 		beforeEach ->
 			@req.body =
@@ -249,17 +251,17 @@ describe 'GithubSyncController', ->
 				repo: @repo = "org/repo"
 			@GithubSyncImportHandler.importProject = sinon.stub().callsArgWith(3, null, @project_id = "project-id-123")
 			@GithubSyncController.importProject @req, @res
-			
+
 		it "should import the project", ->
 			@GithubSyncImportHandler.importProject
 				.calledWith(@user_id, @name, @repo)
 				.should.equal true
-				
+
 		it "should return the project id to the client", ->
 			@res.json
 				.calledWith(project_id: @project_id)
 				.should.equal true
-				
+
 	describe "mergeProject", ->
 		beforeEach ->
 			@req.params =
@@ -268,11 +270,10 @@ describe 'GithubSyncController', ->
 				message: "Test message"
 			@GithubSyncExportHandler.mergeProject = sinon.stub().callsArgWith(2, null)
 			@GithubSyncController.mergeProject @req, @res
-			
+
 		it "should merge the project", ->
 			@GithubSyncExportHandler.mergeProject
 				.calledWith(@project_id, {
 					message: "Test message"
 				})
 				.should.equal true
-
