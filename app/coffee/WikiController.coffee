@@ -8,16 +8,15 @@ AuthenticationController = require("../../../../app/js/Features/Authentication/A
 async = require("async")
 other_lngs = ["es"]
 path = require("path")
-
-
+Url = require "url"
 
 baseWikiUrl = settings.apis.wiki?.url or "http://learn.sharelatex.com"
 
 module.exports = WikiController = 
 
 	getPage: (req, res, next) ->
-		
-		page = req.url.replace(/^\/learn/, "").replace(/^\//, "")
+		page = Url.parse(req.url).pathname
+		page = page.replace(/^\/learn/, "").replace(/^\//, "")
 		if page == ""
 			page = "Main_Page"
 
