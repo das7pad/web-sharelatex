@@ -6,6 +6,7 @@ Disallow: /project/*
 Disallow: /github/repos/*
 Disallow: /recurly.com
 Disallow: /user/password/set
+Disallow: /learn-scripts/*
 Allow: /
 
 User-Agent: AhrefsBot
