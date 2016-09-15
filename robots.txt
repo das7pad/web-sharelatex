@@ -1,7 +1,6 @@
 # robots.txt for https://www.sharelatex.com/
 
 User-agent: *
-Disallow: /minjs/*
 Disallow: /project/*
 Disallow: /github/repos/*
 Disallow: /recurly.com
