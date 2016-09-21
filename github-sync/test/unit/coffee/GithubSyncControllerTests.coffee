@@ -17,6 +17,7 @@ describe 'GithubSyncController', ->
 			"./GithubSyncExportHandler": @GithubSyncExportHandler = {}
 			"./GithubSyncImportHandler": @GithubSyncImportHandler = {}
 			"../../../../app/js/Features/Authentication/AuthenticationController": @AuthenticationController
+			"../../../../app/js/Features/User/UserGetter": @UserGetter = {getUser: sinon.stub()}
 
 		@settings.apis =
 			githubSync:
@@ -91,7 +92,7 @@ describe 'GithubSyncController', ->
 					github: true
 			}
 			@GithubSyncApiHandler.getUserStatus = sinon.stub().callsArgWith(1, null, @status = { enabled: true })
-			@AuthenticationController.getLoggedInUser = sinon.stub().callsArgWith(1, null, @user)
+			@UserGetter.getUser = sinon.stub().callsArgWith(1, null, @user)
 
 		describe "with the github feature available", ->
 			beforeEach ->

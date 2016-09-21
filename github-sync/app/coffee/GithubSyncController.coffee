@@ -9,6 +9,7 @@ GithubSyncExportHandler = require "./GithubSyncExportHandler"
 GithubSyncImportHandler = require "./GithubSyncImportHandler"
 
 AuthenticationController = require "../../../../app/js/Features/Authentication/AuthenticationController"
+UserGetter = require "../../../../app/js/Features/User/UserGetter"
 
 module.exports = GithubSyncController =
 	login: (req, res, next) ->
@@ -36,7 +37,7 @@ module.exports = GithubSyncController =
 
 	getUserStatus: (req, res, next) ->
 		user_id = AuthenticationController.getLoggedInUserId(req)
-		AuthenticationController.getLoggedInUser req, (error, user) ->
+		UserGetter.getUser user_id, (error, user) ->
 			return next(error) if error?
 			available = !!user.features.github
 			if !available
