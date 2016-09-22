@@ -36,11 +36,12 @@ describe 'TemplatesController', ->
 			'../../../../app/js/Features/Project/ProjectDetailsHandler':@ProjectDetailsHandler
 			'../../../../app/js/Features/Project/ProjectGetter':@ProjectGetter = {}
 			'../../../../app/js/Features/Editor/EditorController': @EditorController = {}
+			'../../../../app/js/Features/Authentication/AuthenticationController': @AuthenticationController = {getLoggedInUserId: sinon.stub()}
 			'./TemplatesPublisher':@TemplatesPublisher
-			"logger-sharelatex": 
+			"logger-sharelatex":
 				log:->
 				err:->
-			"settings-sharelatex": 
+			"settings-sharelatex":
 				path:
 					dumpFolder:@dumpFolder
 				siteUrl: "http://localhost:3000"
@@ -58,10 +59,11 @@ describe 'TemplatesController', ->
 		@req =
 			session:
 				user: _id:@user_id
-				templateData: 
+				templateData:
 					zipUrl: @zipUrl
 					templateName: @templateName
 		@redirect = {}
+		@AuthenticationController.getLoggedInUserId.returns(@user_id)
 
 	describe 'reciving a request to create project from templates.sharelatex.com', ->
 

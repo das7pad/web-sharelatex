@@ -4,6 +4,7 @@ ProjectOptionsHandler = require("../../../../app/js/Features/Project/ProjectOpti
 ProjectDetailsHandler = require('../../../../app/js/Features/Project/ProjectDetailsHandler')
 ProjectGetter = require('../../../../app/js/Features/Project/ProjectGetter')
 EditorController = require('../../../../app/js/Features/Editor/EditorController')
+AuthenticationController = require('../../../../app/js/Features/Authentication/AuthenticationController')
 TemplatesPublisher = require("./TemplatesPublisher")
 settings = require('settings-sharelatex')
 fs = require('fs')
@@ -14,12 +15,13 @@ async = require("async")
 
 
 module.exports =
-		
+
 	createProjectFromZipTemplate: (req, res)->
+		currentUserId = AuthenticationController.getLoggedInUserId(req)
 		logger.log body:req.session.templateData, "creating project from zip"
 		if !req.session.templateData?
 			return res.redirect "/project"
-			
+
 		dumpPath = "#{settings.path.dumpFolder}/#{uuid.v4()}"
 		writeStream = fs.createWriteStream(dumpPath)
 		zipUrl = req.session.templateData.zipUrl
@@ -32,7 +34,7 @@ module.exports =
 			logger.error err: error, "error getting zip from template API"
 		zipReq.pipe(writeStream)
 		writeStream.on 'close', ->
-			ProjectUploadManager.createProjectFromZipArchive req.session.user._id, req.session.templateData.templateName, dumpPath, (err, project)->
+			ProjectUploadManager.createProjectFromZipArchive currentUserId, req.session.templateData.templateName, dumpPath, (err, project)->
 				if err?
 					logger.err err:err, zipUrl:zipUrl, "problem building project from zip"
 					return res.sendStatus 500
