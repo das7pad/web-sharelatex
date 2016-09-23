@@ -72,6 +72,8 @@ module.exports = PublicRegistrationController =
 				req.login user, (err) ->
 					return callback(error) if error?
 					req.session.justRegistered = true
+					# copy to the old `session.user` location, for backward-comptability
+					req.session.user = req.session.passport.user
 					UserSessionsManager.trackSession(user, req.sessionID, () ->)
 					res.json
 						redir:redir
