@@ -10,16 +10,17 @@ describe "TemplatesWebController", ->
 
 	beforeEach ->
 
-		@settings = 
+		@settings =
 			apis:
 				templates_api:
 					url:"templates.sharelatex.env"
 		@TemplatesWebController = SandboxedModule.require modulePath, requires:
 			"settings-sharelatex":@settings
-			"logger-sharelatex": 
+			"logger-sharelatex":
 				log:->
 				err:->
-		@stubbedApiData = 
+			"../../../../app/js/Features/Errors/ErrorController": @ErrorController = {notFound: sinon.stub()}
+		@stubbedApiData =
 			template:{_id:"12312321", name:"bob"}
 			tag: {name:"tag name"}
 
@@ -29,8 +30,8 @@ describe "TemplatesWebController", ->
 		@tag_name = "tag-name-here"
 		@template_name = "template-name-here"
 		@template_id = "template_id_here"
-		@req = 
-			params: 
+		@req =
+			params:
 				user_id: @user_id
 		@res = {}
 
@@ -144,7 +145,3 @@ describe "TemplatesWebController", ->
 				tag_name:@tag_name
 
 			@TemplatesWebController._renderTagPage @req, @res
-
-
-
-
