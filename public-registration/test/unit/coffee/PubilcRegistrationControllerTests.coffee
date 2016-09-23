@@ -52,6 +52,10 @@ describe "PublicRegistrationController", ->
 		@next = sinon.stub()
 
 	describe "register", ->
+
+		beforeEach ->
+			@req.session.passport = {user: {_id: @user_id}}
+
 		it "should ask the UserRegistrationHandler to register user", (done)->
 			@UserRegistrationHandler.registerNewUser.callsArgWith(1, null, @user)
 			@res.json = =>
@@ -101,6 +105,7 @@ describe "PublicRegistrationController", ->
 				referal_id : "23123"
 				referal_source : "email"
 				referal_medium : "bob"
+				passport: {user: {_id: @user_id}}
 
 			@UserRegistrationHandler.registerNewUser.callsArgWith(1, null, @user)
 			@req.body.redir = "/somewhere"
