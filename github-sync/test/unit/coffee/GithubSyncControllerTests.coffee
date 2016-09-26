@@ -30,6 +30,7 @@ describe 'GithubSyncController', ->
 			header: sinon.stub()
 			json: sinon.stub()
 			end: sinon.stub()
+			setTimeout: sinon.stub()
 		@res.status = sinon.stub().returns(@res)
 
 	describe "login", ->
@@ -259,6 +260,9 @@ describe 'GithubSyncController', ->
 			@res.json
 				.calledWith(project_id: @project_id)
 				.should.equal true
+		
+		it "should set the response timeout to 10 minutes", ->
+			@res.setTimeout.calledWith(10 * 60 * 1000).should.equal true
 				
 	describe "mergeProject", ->
 		beforeEach ->

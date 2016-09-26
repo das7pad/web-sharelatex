@@ -88,6 +88,7 @@ module.exports = GithubSyncController =
 			)
 			
 	importProject: (req, res, next) ->
+		res.setTimeout(10 * 60 * 1000) # Imports can take a while
 		user_id = req.session.user._id
 		projectName = req.body.projectName?.trim()
 		repo = req.body.repo
