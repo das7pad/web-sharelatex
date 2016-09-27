@@ -29,6 +29,8 @@ describe "PublicRegistrationController", ->
 			sendEmail:sinon.stub().callsArgWith(2)
 		@UserHandler =
 			populateGroupLicenceInvite: sinon.stub().callsArgWith(1)
+		@AuthenticationController =
+			passportLogin: sinon.stub()
 		@PublicRegistrationController = SandboxedModule.require modulePath, requires:
 			"../../../../app/js/Features/User/UserRegistrationHandler":@UserRegistrationHandler
 			"../../../../app/js/Features/Referal/ReferalAllocator":@ReferalAllocator
@@ -37,6 +39,7 @@ describe "PublicRegistrationController", ->
 			"../../../../app/js/Features/Email/Layouts/PersonalEmailLayout":{}
 			"../../../../app/js/Features/Email/EmailBuilder": templates:{welcome:{}}
 			"../../../../app/js/Features/User/UserHandler": @UserHandler
+			"../../../../app/js/Features/Authentication/AuthenticationController": @AuthenticationController
 			"logger-sharelatex": {log:->}
 			"metrics-sharelatex": { inc: () ->}
 
@@ -66,12 +69,11 @@ describe "PublicRegistrationController", ->
 		it "should try and log the user in if there is an EmailAlreadyRegistered error", (done)->
 
 			@UserRegistrationHandler.registerNewUser.callsArgWith(1, new Error("EmailAlreadyRegistered"))
-			# @AuthenticationController.login = (req, res)=>
-			# 	assert.deepEqual req, @req
-			# 	assert.deepEqual res, @res
-			# 	done()
-			@PublicRegistrationController.register @req, @res
-			@req.login.callCount.should.equal 1
+			@PublicRegistrationController.register @req, @res, @next
+			@req.login.callCount.should.equal 0
+			@req.login.calledWith(@user).should.equal false
+			@AuthenticationController.passportLogin.callCount.should.equal 1
+			@AuthenticationController.passportLogin.calledWith(@req, @res, @next).should.equal true
 			done()
 
 		it "should put the user on the session and mark them as justRegistered", (done)->

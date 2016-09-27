@@ -11,6 +11,7 @@ PersonalEmailLayout = require("../../../../app/js/Features/Email/Layouts/Persona
 _ = require "underscore"
 UserHandler = require("../../../../app/js/Features/User/UserHandler")
 UserSessionsManager = require("../../../../app/js/Features/User/UserSessionsManager")
+AuthenticationController = require("../../../../app/js/Features/Authentication/AuthenticationController")
 
 EmailBuilder.templates.welcome =
 	subject:  _.template "Welcome to ShareLaTeX"
@@ -51,11 +52,8 @@ module.exports = PublicRegistrationController =
 			verifyLink = SubscriptionDomainHandler.getDomainLicencePage(user)
 			redir = Url.parse(verifyLink or req.body.redir or "/project").path
 			if err? and err?.message == "EmailAlreadyRegistered"
-				req.login user, (err) ->
-					if err?
-						return next(err)
-					UserSessionsManager.trackSession(user, req.sessionID, () ->)
-					res.json {redir: redir}
+				req._redir = redir
+				return AuthenticationController.passportLogin req, res, next
 			else if err?
 				next(err)
 			else
