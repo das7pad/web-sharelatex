@@ -12,7 +12,7 @@ each item in ['mendeley']
 			p
 				a.btn.btn-info(href='/user/subscription/plans') #{translate("upgrade")}
 	- else if(user.refProviders && user.refProviders[item])
-		p you are linked
+		p #{translate("account_is_linked")}.
 		p
 			a(
 				id="#{item}-unlink",
@@ -38,7 +38,7 @@ script(type="text/ng-template", id="referenceUnlinkModalTemplate")
 		h3
 			| #{translate("unlink_reference")} {{provider}}
 	.modal-body
-		p #{translate("unlink_warning_reference")} {{provider}}
+		p #{translate("unlink_warning_reference")}
 
 	.modal-footer()
 		button.btn.btn-default(
