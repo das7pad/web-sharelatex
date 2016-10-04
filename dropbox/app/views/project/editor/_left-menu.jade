@@ -30,6 +30,7 @@ script(type="text/ng-template", id="dropboxModalTemplate")
 				p.small
 					| #{translate("this_project_will_appear_in_your_dropbox_folder_at")}
 					strong apps/sharelatex/{{ project.name }}
+					
 			div(ng-hide="dbState.hasDropboxFeature")
 				div(sixpack-switch="teaser-dropbox")
 					div(sixpack-default)
@@ -65,7 +66,7 @@ script(type="text/ng-template", id="dropboxModalTemplate")
 							a.btn.btn-success(
 								href
 								ng-class="buttonClass"
-								sixpack-convert="track_changes_feature_info"
+								sixpack-convert="teaser-dropbox"
 								ng-click="startFreeTrial('dropbox')"
 							) #{translate("start_free_trial")}
 
@@ -104,7 +105,7 @@ script(type="text/ng-template", id="dropboxModalTemplate")
 							a.btn.btn-success(
 								href
 								ng-class="buttonClass"
-								sixpack-convert="track_changes_feature_info"
+								sixpack-convert="teaser-dropbox"
 								ng-click="startFreeTrial('dropbox')"
 							) Try it for free
 
@@ -140,7 +141,7 @@ script(type="text/ng-template", id="dropboxModalTemplate")
 							a.btn.btn-success(
 								href
 								ng-class="buttonClass"
-								sixpack-convert="track_changes_feature_info"
+								sixpack-convert="teaser-dropbox"
 								ng-click="startFreeTrial('dropbox')"
 							) Try it for free
 
