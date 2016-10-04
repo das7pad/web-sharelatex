@@ -1,4 +1,4 @@
-span(ng-controller="DropboxController")
+pr-ab-test-dropbox-teaserspan(ng-controller="DropboxController")
 	ul.list-unstyled.nav()
 		li
 			a(ng-click="openDropboxModal()")
@@ -31,44 +31,82 @@ script(type="text/ng-template", id="dropboxModalTemplate")
 					| #{translate("this_project_will_appear_in_your_dropbox_folder_at")}
 					strong apps/sharelatex/{{ project.name }}
 			div(ng-hide="dbState.hasDropboxFeature")
-				p.text-center #{translate("upgrade_to_get_feature", {feature:"Dropbox Sync"})}
-				.row
-					.col-md-8.col-md-offset-2
-						ul.list-unstyled
-							li 
-								i.fa.fa-check &nbsp;
-								| #{translate("unlimited_projects")}
-							
-							li
-								i.fa.fa-check &nbsp;
-								| #{translate("collabs_per_proj", {collabcount:'Multiple'})}
-							
-							li 
-								i.fa.fa-check &nbsp;
-								| #{translate("full_doc_history")}
-							
-							li 
-								i.fa.fa-check &nbsp;
-								| #{translate("sync_to_dropbox")}
+				div(sixpack-switch="teaser-dropbox")
+					div(sixpack-default)
+						p.text-center #{translate("upgrade_to_get_feature", {feature:"Dropbox Sync"})}
+						.row
+							.col-md-8.col-md-offset-2
+								ul.list-unstyled
+									li 
+										i.fa.fa-check &nbsp;
+										| #{translate("unlimited_projects")}
+									
+									li
+										i.fa.fa-check &nbsp;
+										| #{translate("collabs_per_proj", {collabcount:'Multiple'})}
+									
+									li 
+										i.fa.fa-check &nbsp;
+										| #{translate("full_doc_history")}
+									
+									li 
+										i.fa.fa-check &nbsp;
+										| #{translate("sync_to_dropbox")}
 
-							li 
-								i.fa.fa-check &nbsp;
-								| #{translate("sync_to_github")}
+									li 
+										i.fa.fa-check &nbsp;
+										| #{translate("sync_to_github")}
 
-							li  
-								i.fa.fa-check &nbsp;
-								|#{translate("compile_larger_projects")}
+									li  
+										i.fa.fa-check &nbsp;
+										|#{translate("compile_larger_projects")}
 
-				p.text-center.row-spaced-thin(ng-controller="FreeTrialModalController")
-					a.btn.btn-success(
-						href
-						ng-class="buttonClass"
-						sixpack-convert="track_changes_feature_info"
-						ng-click="startFreeTrial('dropbox')"
-					) #{translate("start_free_trial")}
+						p.text-center.row-spaced-thin(ng-controller="FreeTrialModalController")
+							a.btn.btn-success(
+								href
+								ng-class="buttonClass"
+								sixpack-convert="track_changes_feature_info"
+								ng-click="startFreeTrial('dropbox')"
+							) #{translate("start_free_trial")}
 
-				p.small(ng-show="startedFreeTrial")
-					| #{translate("refresh_page_after_starting_free_trial")}
+						p.small(ng-show="startedFreeTrial")
+							| #{translate("refresh_page_after_starting_free_trial")}
+
+					div(sixpack-when="focused")
+						h4.dropbox-teaser-title Easily manage your project files, everywhere
+						img.dropbox-teaser-img(
+							src="/img/teasers/dropbox/teaser-dropbox-editor.png"
+							alt="Dropbox"
+						)
+						p.small(ng-show="startedFreeTrial")
+							| #{translate("refresh_page_after_starting_free_trial")}
+
+						.row
+							.col-md-8.col-md-offset-2
+								ul.list-unstyled
+									li 
+										i.fa.fa-check &nbsp;
+										| Manage files from your Dropbox folder
+									
+									li
+										i.fa.fa-check &nbsp;
+										| Have an extra backup
+									
+									li 
+										i.fa.fa-check &nbsp;
+										| Work with non ShareLaTeX users
+									
+									li 
+										i.fa.fa-check &nbsp;
+										| Work offline
+
+						.row.text-center(ng-controller="FreeTrialModalController")
+							a.btn.btn-success(
+								href
+								ng-class="buttonClass"
+								sixpack-convert="track_changes_feature_info"
+								ng-click="startFreeTrial('dropbox')"
+							) Try it for free
 
 		div(ng-hide="dbState.gotLinkStatus")
 			i.fa.fa-refresh.fa-spin 
