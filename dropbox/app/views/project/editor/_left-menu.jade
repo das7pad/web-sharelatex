@@ -108,6 +108,42 @@ script(type="text/ng-template", id="dropboxModalTemplate")
 								ng-click="startFreeTrial('dropbox')"
 							) Try it for free
 
+					div(sixpack-when="focused-anim")
+						.dropbox-teaser-video-container
+							video.dropbox-teaser-video(autoplay, loop)
+								source(src="/img/teasers/dropbox/teaser-dropbox.mp4", type="video/mp4")
+								img(src="/img/teasers/dropbox/teaser-dropbox.gif")
+					
+						p.small(ng-show="startedFreeTrial")
+							| #{translate("refresh_page_after_starting_free_trial")}
+
+						.row
+							.col-md-8.col-md-offset-2
+								ul.list-unstyled
+									li 
+										i.fa.fa-check &nbsp;
+										| Manage files from your Dropbox folder
+									
+									li
+										i.fa.fa-check &nbsp;
+										| Have an extra backup
+									
+									li 
+										i.fa.fa-check &nbsp;
+										| Work with non ShareLaTeX users
+									
+									li 
+										i.fa.fa-check &nbsp;
+										| Work offline
+
+						.row.text-center(ng-controller="FreeTrialModalController")
+							a.btn.btn-success(
+								href
+								ng-class="buttonClass"
+								sixpack-convert="track_changes_feature_info"
+								ng-click="startFreeTrial('dropbox')"
+							) Try it for free
+
 		div(ng-hide="dbState.gotLinkStatus")
 			i.fa.fa-refresh.fa-spin 
 			span.small &nbsp; #{translate("checking_dropbox_status")}
