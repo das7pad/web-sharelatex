@@ -25,7 +25,7 @@ define [
 
 		$scope.startFreeTrial = (source) ->
 			ga?('send', 'event', 'subscription-funnel', 'upgraded-free-trial', source)
-			window.open("/user/subscription/new?planCode=student_free_trial_7_days")
+			window.open("/user/subscription/new?planCode=#{$scope.startTrialPlanCode}")
 			$scope.startedFreeTrial = true
 
 		$scope.linkAccount = () ->
