@@ -31,6 +31,8 @@ describe "PublicRegistrationController", ->
 			populateGroupLicenceInvite: sinon.stub().callsArgWith(1)
 		@AuthenticationController =
 			passportLogin: sinon.stub()
+		@UserSessionsManager =
+			trackSession:sinon.stub()
 		@PublicRegistrationController = SandboxedModule.require modulePath, requires:
 			"../../../../app/js/Features/User/UserRegistrationHandler":@UserRegistrationHandler
 			"../../../../app/js/Features/Referal/ReferalAllocator":@ReferalAllocator
@@ -40,6 +42,7 @@ describe "PublicRegistrationController", ->
 			"../../../../app/js/Features/Email/EmailBuilder": templates:{welcome:{}}
 			"../../../../app/js/Features/User/UserHandler": @UserHandler
 			"../../../../app/js/Features/Authentication/AuthenticationController": @AuthenticationController
+			"../../../../app/js/Features/User/UserSessionsManager":@UserSessionsManager
 			"logger-sharelatex": {log:->}
 			"metrics-sharelatex": { inc: () ->}
 
