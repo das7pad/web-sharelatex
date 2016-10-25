@@ -1,7 +1,7 @@
 define [
 	"base"
 ], (App) ->
-	App.controller "ReferencesModalController", ($scope, $modalInstance, $http, $modal, $window, $interval, $timeout, event_tracking, ide, provider) ->
+	App.controller "ReferencesModalController", ($scope, $modalInstance, $http, $modal, $window, $interval, $timeout, event_tracking, ide, provider, sixpack) ->
 
 		event_tracking.send("references-#{provider}", "modal", "open")
 
@@ -23,10 +23,21 @@ define [
 		$scope.cancel = () ->
 			$modalInstance.dismiss()
 
+		# TODO: reduce duplication, use FreeTrialModalController.startFreeTrial
 		$scope.startFreeTrial = (source) ->
+			plan = 'collaborator_free_trial_7_days'
 			ga?('send', 'event', 'subscription-funnel', 'upgraded-free-trial', source)
-			window.open("/user/subscription/new?planCode=#{$scope.startTrialPlanCode}")
-			$scope.startedFreeTrial = true
+			w = window.open()
+			go = () ->
+				$scope.startedFreeTrial = true
+				w.location = "/user/subscription/new?planCode=#{plan}&ssp=true"
+			if $scope.shouldABTestPlans
+				sixpack.participate 'plans-1610', ['default', 'heron', 'ibis'], (chosenVariation, rawResponse)->
+					if chosenVariation in ['heron', 'ibis']
+						plan = "collaborator_#{chosenVariation}"
+					go()
+			else
+				go()
 
 		$scope.linkAccount = () ->
 			authWindow = $window.open("/#{provider}/oauth", "reference-auth", "width=700,height=500")
