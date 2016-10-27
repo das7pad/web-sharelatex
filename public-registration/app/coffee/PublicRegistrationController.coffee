@@ -17,6 +17,19 @@ EmailBuilder.templates.welcome =
 	subject:  _.template "Welcome to ShareLaTeX"
 	layout: PersonalEmailLayout
 	type:"lifecycle"
+	plainTextTemplate: _.template """
+Hi <%= first_name %>,
+
+Thanks for signing up to ShareLaTeX! If you ever get lost, you can log in again (<%= siteUrl %>/login) with the email address "<%= to %>".
+If you're new to LaTeX, take a look at our Help Guides ("<%= siteUrl %>/learn") and Templates (<%= siteUrl %>/templates).
+
+Regards
+
+Henry
+ShareLaTeX Co-founder
+
+PS. We love talking to our users about ShareLaTeX. Reply to this email to get in touch with us directly, whatever the reason. Questions, comments, problems, suggestions, all welcome!
+"""
 	compiledTemplate: _.template """
 <p>Hi <%= first_name %>,</p>
 <p>Thanks for signing up to ShareLaTeX! If you ever get lost, you can log in again <a href="<%= siteUrl %>/login">here</a> with the email address "<%= to %>".</p>
