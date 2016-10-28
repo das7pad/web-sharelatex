@@ -21,7 +21,7 @@ EmailBuilder.templates.welcome =
 Hi <%= first_name %>,
 
 Thanks for signing up to ShareLaTeX! If you ever get lost, you can log in again (<%= siteUrl %>/login) with the email address "<%= to %>".
-If you're new to LaTeX, take a look at our Help Guides ("<%= siteUrl %>/learn") and Templates (<%= siteUrl %>/templates).
+If you're new to LaTeX, take a look at our Help Guides (<%= siteUrl %>/learn) and Templates (<%= siteUrl %>/templates).
 
 Regards
 
