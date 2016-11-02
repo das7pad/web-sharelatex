@@ -111,6 +111,8 @@ define [
 		$scope._inited = false
 		$scope._sixpackParticipating = false
 		$scope.setup = () ->
+			if $scope.settings.autoComplete == false
+				return
 			$scope.searchEnabled = ide?.$scope?.project?.features?.references == true
 			if $scope._inited
 				return
