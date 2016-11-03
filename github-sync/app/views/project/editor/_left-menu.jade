@@ -71,7 +71,41 @@ script(type="text/ng-template", id="githubSyncModalTemplate")
 											| #{translate("refresh_page_after_starting_free_trial")}
 										
 								div(sixpack-when="focused")
+									h4.teaser-title Push to GitHub, pull to ShareLaTeX
+									img.teaser-img(
+										src="/img/teasers/github/teaser-github.png"
+										alt="GitHub"
+									)
 									
+									p.text-center.small(ng-show="startedFreeTrial")
+										| #{translate("refresh_page_after_starting_free_trial")}
+
+									.row
+										.col-md-8.col-md-offset-2
+											ul.list-unstyled
+												li
+													i.fa.fa-check &nbsp;
+													| Work offline, then pull to ShareLaTeX
+												
+												li
+													i.fa.fa-check &nbsp;
+													| Import existing projects from GitHub
+
+												li
+													i.fa.fa-check &nbsp;
+													| Have an extra backup
+												
+												li
+													i.fa.fa-check &nbsp;
+													| Work with other GitHub users
+
+									.row.text-center(ng-controller="FreeTrialModalController")
+										a.btn.btn-success(
+											href
+											ng-class="buttonClass"
+											sixpack-convert="teaser-github"
+											ng-click="startFreeTrial('github')"
+										) Try it for free
 
 								div(sixpack-when="focused-anim")
 								
