@@ -34,12 +34,12 @@ script(type="text/ng-template", id="dropboxModalTemplate")
 			div(ng-hide="dbState.hasDropboxFeature")
 				div(sixpack-switch="teaser-dropbox-text")
 					div(sixpack-default)
-						img.dropbox-teaser-img(
+						img.teaser-img(
 							src="/img/teasers/dropbox/teaser-dropbox-editor.png"
 							alt="Dropbox"
 						)
 
-						h4.dropbox-teaser-title #{translate("upgrade_to_get_feature", {feature:"Dropbox Sync"})}
+						h4.teaser-title #{translate("upgrade_to_get_feature", {feature:"Dropbox Sync"})}
 						
 						p.small(ng-show="startedFreeTrial")
 							| #{translate("refresh_page_after_starting_free_trial")}
@@ -81,8 +81,8 @@ script(type="text/ng-template", id="dropboxModalTemplate")
 
 
 					div(sixpack-when="dropbox-focused")
-						h4.dropbox-teaser-title Easily manage your project files, everywhere
-						img.dropbox-teaser-img(
+						h4.teaser-title Easily manage your project files, everywhere
+						img.teaser-img(
 							src="/img/teasers/dropbox/teaser-dropbox-editor.png"
 							alt="Dropbox"
 						)
