@@ -54,7 +54,6 @@ module.exports = PublicRegistrationController =
 
 		res.render Path.resolve(__dirname, "../views/register"),
 			title: 'register'
-			redir: req.query.redir
 			sharedProjectData: sharedProjectData
 			newTemplateData: newTemplateData
 			new_email:req.query.new_email || ""
@@ -63,9 +62,8 @@ module.exports = PublicRegistrationController =
 		logger.log email: req.body.email, "attempted register"
 		UserRegistrationHandler.registerNewUser req.body, (err, user)->
 			verifyLink = SubscriptionDomainHandler.getDomainLicencePage(user)
-			redir = Url.parse(verifyLink or req.body.redir or "/project").path
+			redir = verifyLink or AuthenticationController._getRedirectFromSession(req) or "/project"
 			if err? and err?.message == "EmailAlreadyRegistered"
-				req._redir = redir
 				return AuthenticationController.passportLogin req, res, next
 			else if err?
 				next(err)
@@ -85,10 +83,12 @@ module.exports = PublicRegistrationController =
 					req.session.justRegistered = true
 					# copy to the old `session.user` location, for backward-comptability
 					req.session.user = req.session.passport.user
+					AuthenticationController._clearRedirectFromSession(req)
 					UserSessionsManager.trackSession(user, req.sessionID, () ->)
+
 					res.json
-						redir:redir
-						id:user._id.toString()
+						redir: redir
+						id: user._id.toString()
 						first_name: user.first_name
 						last_name: user.last_name
 						email: user.email

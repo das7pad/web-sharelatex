@@ -31,6 +31,8 @@ describe "PublicRegistrationController", ->
 			populateGroupLicenceInvite: sinon.stub().callsArgWith(1)
 		@AuthenticationController =
 			passportLogin: sinon.stub()
+			_getRedirectFromSession: sinon.stub().returns("/somewhere")
+			_clearRedirectFromSession: sinon.stub()
 		@UserSessionsManager =
 			trackSession:sinon.stub()
 		@PublicRegistrationController = SandboxedModule.require modulePath, requires:
@@ -46,7 +48,6 @@ describe "PublicRegistrationController", ->
 			"logger-sharelatex": {log:->}
 			"metrics-sharelatex": { inc: () ->}
 
-
 		@req =
 			session:
 				destroy:->
@@ -60,6 +61,7 @@ describe "PublicRegistrationController", ->
 	describe "register", ->
 
 		beforeEach ->
+			@AuthenticationController._getRedirectFromSession = sinon.stub().returns(null)
 			@req.session.passport = {user: {_id: @user_id}}
 
 		it "should ask the UserRegistrationHandler to register user", (done)->
@@ -96,10 +98,9 @@ describe "PublicRegistrationController", ->
 				done()
 			@PublicRegistrationController.register @req, @res
 
-
 		it "should redirect passed redir if it exists", (done)->
 			@UserRegistrationHandler.registerNewUser.callsArgWith(1, null, @user)
-			@req.body.redir = "/somewhere"
+			@AuthenticationController._getRedirectFromSession = sinon.stub().returns('/somewhere')
 			@res.json = (opts)=>
 				opts.redir.should.equal "/somewhere"
 				done()
@@ -113,7 +114,7 @@ describe "PublicRegistrationController", ->
 				passport: {user: {_id: @user_id}}
 
 			@UserRegistrationHandler.registerNewUser.callsArgWith(1, null, @user)
-			@req.body.redir = "/somewhere"
+			@AuthenticationController._getRedirectFromSession = sinon.stub().returns('/somewhere')
 			@res.json = (opts)=>
 				@ReferalAllocator.allocate.calledWith(@req.session.referal_id, @user._id, @req.session.referal_source, @req.session.referal_medium).should.equal true
 				done()
