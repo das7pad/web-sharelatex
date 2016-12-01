@@ -12,6 +12,8 @@ ProjectEntityHandler = require('../../../../app/js/Features/Project/ProjectEntit
 DocumentUpdaterHandler = require('../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler')
 EditorRealTimeController = require('../../../../app/js/Features/Editor/EditorRealTimeController')
 AuthenticationController = require('../../../../app/js/Features/Authentication/AuthenticationController')
+_ = require('underscore')
+fs = require('fs')
 temp = require('temp')
 temp.track()
 
@@ -134,14 +136,25 @@ module.exports = ReferencesApiHandler =
 			tempWriteStream = temp.createWriteStream()
 			tempFilePath = tempWriteStream.path
 			requestStream = ReferencesApiHandler.make3rdRequestStream opts
+			# always clean up the temp file
+			_cleanup = _.once(
+				(cb) ->
+					fs.unlink tempFilePath, (err) ->
+						if err?
+							logger.err {tempFilePath, err}, "error removing file after streaming references"
+						tempWriteStream.destroy()
+						cb(null)
+			)
 			requestStream.on 'error', (err) ->
 				logger.err {err, user_id, project_id, ref_provider}, "error streaming bibtex from third-party-references"
-				return next(err)
+				_cleanup () ->
+					return next(err)
 			requestStream.on 'end', () ->
 				ProjectEntityHandler.getAllFiles project_id, (err, allFiles) ->
-					if err
+					if err?
 						logger.err {user_id, ref_provider, project_id}, "error getting all files"
-						return next(err)
+						return _cleanup () ->
+							next(err)
 					targetFileName = "#{ref_provider}.bib"
 					# check if file exists
 					if file = allFiles["/#{targetFileName}"]
@@ -151,8 +164,10 @@ module.exports = ReferencesApiHandler =
 						ProjectEntityHandler.replaceFile project_id, file._id, tempFilePath, (err) ->
 							if err
 								logger.err {user_id, ref_provider, project_id}, 'error replacing file'
-								return next(err)
-							return res.send 201
+								return _cleanup () ->
+									next(err)
+							_cleanup () ->
+								res.send 201
 					else
 						# file is new
 						logger.log {user_id, ref_provider, project_id, targetFileName}, "creating new file with bibtex content"
@@ -160,7 +175,9 @@ module.exports = ReferencesApiHandler =
 						ProjectEntityHandler.addFile project_id, undefined, targetFileName, tempFilePath, (err, fileRef, folder_id) ->
 							if err
 								logger.err {user_id, ref_provider, project_id}, 'error adding file'
-								return next(err)
+								return _cleanup () ->
+									next(err)
 							EditorRealTimeController.emitToRoom(project_id, 'reciveNewFile', folder_id, fileRef, "references-import")
-							return res.send 201
+							return _cleanup () ->
+								res.send 201
 			requestStream.pipe tempWriteStream

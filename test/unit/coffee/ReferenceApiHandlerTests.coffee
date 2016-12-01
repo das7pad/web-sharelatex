@@ -19,6 +19,7 @@ describe 'ReferencesApiHandler', ->
 			'/other.tex': {_id: 'bbb', name: 'other.tex'}
 		@ReferencesApiHandler = SandboxedModule.require modulePath, requires:
 			'request': @request = sinon.stub()
+			'fs': @fs = {unlink: sinon.stub().callsArgWith(1, null)}
 			'settings-sharelatex': @settings =
 				apis:
 					references:
@@ -116,6 +117,7 @@ describe 'ReferencesApiHandler', ->
 				_id: ObjectId().toString()
 				name: "refProvider.bib"
 			@fakeResponseData = '{a: 1}'
+			@fs.unlink = sinon.stub().callsArgWith(1, null)
 			@folder_id = ObjectId().toString()
 			@ReferencesApiHandler.userCanMakeRequest = sinon.stub().callsArgWith(2, null, true)
 			@readStream = new stream.Readable()
@@ -123,6 +125,7 @@ describe 'ReferencesApiHandler', ->
 			@writeStream = new stream.Writable()
 			@writeStream._write = () ->
 			@writeStream.path = '/tmp/whatever'
+			@writeStream.destroy = sinon.stub()
 			@ReferencesApiHandler.make3rdRequestStream = sinon.stub().returns(@readStream)
 			@temp.createWriteStream = sinon.stub().returns(@writeStream)
 			@ProjectEntityHandler.getAllFiles.callsArgWith(1, null, @allFiles)
@@ -174,6 +177,10 @@ describe 'ReferencesApiHandler', ->
 				it 'should not call DocumentUpdaterHandler.setDocument', ->
 					@DocumentUpdaterHandler.setDocument.callCount.should.equal 0
 
+				it 'should call fs.unlink', ->
+					@fs.unlink.callCount.should.equal 1
+					@fs.unlink.calledWith(@writeStream.path).should.equal true
+
 			describe 'when document is already present', ->
 
 				beforeEach ->
@@ -211,6 +218,10 @@ describe 'ReferencesApiHandler', ->
 				it 'should not call EditorRealTimeController.emitToRoom', ->
 					@EditorRealTimeController.emitToRoom.callCount.should.equal 0
 
+				it 'should call fs.unlink', ->
+					@fs.unlink.callCount.should.equal 1
+					@fs.unlink.calledWith(@writeStream.path).should.equal true
+
 		describe 'when user is not allowed to do this', ->
 
 			beforeEach ->
@@ -235,6 +246,9 @@ describe 'ReferencesApiHandler', ->
 
 			it 'should not call EditorRealTimeController.emitToRoom', ->
 				@EditorRealTimeController.emitToRoom.callCount.should.equal 0
+
+			it 'should not call fs.unlink', ->
+				@fs.unlink.callCount.should.equal 0
 
 		describe 'when userCanMakeRequest produces an error', ->
 
@@ -261,6 +275,9 @@ describe 'ReferencesApiHandler', ->
 
 			it 'should not call EditorRealTimeController.emitToRoom', ->
 				@EditorRealTimeController.emitToRoom.callCount.should.equal 0
+
+			it 'should not call fs.unlink', ->
+				@fs.unlink.callCount.should.equal 0
 
 		describe 'when remote api produces an error', ->
 
@@ -289,6 +306,9 @@ describe 'ReferencesApiHandler', ->
 			it 'should not call EditorRealTimeController.emitToRoom', ->
 				@EditorRealTimeController.emitToRoom.callCount.should.equal 0
 
+			it 'should call fs.unlink', ->
+				@fs.unlink.callCount.should.equal 1
+				@fs.unlink.calledWith(@writeStream.path).should.equal true
 
 		describe 'when getAllDocs produces an error', ->
 
@@ -317,6 +337,10 @@ describe 'ReferencesApiHandler', ->
 
 			it 'should not call EditorRealTimeController.emitToRoom', ->
 				@EditorRealTimeController.emitToRoom.callCount.should.equal 0
+
+			it 'should call fs.unlink', ->
+				@fs.unlink.callCount.should.equal 1
+				@fs.unlink.calledWith(@writeStream.path).should.equal true
 
 		describe 'when document is present, and replaceFile produces an error', ->
 
@@ -347,10 +371,15 @@ describe 'ReferencesApiHandler', ->
 			it 'should not call EditorRealTimeController.emitToRoom', ->
 				@EditorRealTimeController.emitToRoom.callCount.should.equal 0
 
+			it 'should call fs.unlink', ->
+				@fs.unlink.callCount.should.equal 1
+				@fs.unlink.calledWith(@writeStream.path).should.equal true
+
 		describe 'when document is absent, and addDoc produces an error', ->
 
 			beforeEach ->
 				@err = new Error('woops')
+				@fs.unlink = sinon.stub().callsArgWith(1, null)
 				@ProjectEntityHandler.addFile.callsArgWith(4, @err)
 				@ReferencesApiHandler.importBibtex @req, @res, @next
 				@readStream.emit('data', 'hi')
@@ -375,6 +404,9 @@ describe 'ReferencesApiHandler', ->
 			it 'should not call EditorRealTimeController.emitToRoom', ->
 				@EditorRealTimeController.emitToRoom.callCount.should.equal 0
 
+			it 'should call fs.unlink', ->
+				@fs.unlink.callCount.should.equal 1
+				@fs.unlink.calledWith(@writeStream.path).should.equal true
 
 	describe 'bibtex', ->
 
