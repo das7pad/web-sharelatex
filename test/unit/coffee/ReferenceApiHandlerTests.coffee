@@ -222,6 +222,26 @@ describe 'ReferencesApiHandler', ->
 					@fs.unlink.callCount.should.equal 1
 					@fs.unlink.calledWith(@writeStream.path).should.equal true
 
+			describe 'when fs.unlink produces an error', ->
+
+				beforeEach ->
+					@allFiles["/refProvider.bib"] = {_id: ObjectId().toString()}
+					@ProjectEntityHandler.getAllFiles.callsArgWith(1, null, @allFiles)
+					@res.send = sinon.stub()
+					@next = sinon.stub()
+					@fs.unlink = sinon.stub().callsArgWith(1, new Error('woops'))
+					@ReferencesApiHandler.importBibtex @req, @res, @next
+					@readStream.emit('data', 'hi')
+					@readStream.emit('end')
+
+				it 'should call next with an error', ->
+					@next.callCount.should.equal 1
+					@next.lastCall.args[0].should.be.instanceof Error
+
+				it 'should not send back a 201 response', ->
+					@res.send.callCount.should.equal 0
+					@res.send.calledWith(201).should.equal false
+
 		describe 'when user is not allowed to do this', ->
 
 			beforeEach ->

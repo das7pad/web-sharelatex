@@ -15,7 +15,6 @@ AuthenticationController = require('../../../../app/js/Features/Authentication/A
 _ = require('underscore')
 fs = require('fs')
 temp = require('temp')
-temp.track()
 
 module.exports = ReferencesApiHandler =
 
@@ -140,10 +139,12 @@ module.exports = ReferencesApiHandler =
 			_cleanup = _.once(
 				(cb) ->
 					fs.unlink tempFilePath, (err) ->
+						tempWriteStream.destroy()
 						if err?
 							logger.err {tempFilePath, err}, "error removing file after streaming references"
-						tempWriteStream.destroy()
-						cb(null)
+							next(err)
+						else
+							cb(null)
 			)
 			requestStream.on 'error', (err) ->
 				logger.err {err, user_id, project_id, ref_provider}, "error streaming bibtex from third-party-references"
