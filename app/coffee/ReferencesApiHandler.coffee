@@ -138,8 +138,8 @@ module.exports = ReferencesApiHandler =
 			# always clean up the temp file
 			_cleanup = _.once(
 				(cb) ->
+					tempWriteStream.destroy()
 					fs.unlink tempFilePath, (err) ->
-						tempWriteStream.destroy()
 						if err?
 							logger.err {tempFilePath, err}, "error removing file after streaming references"
 							next(err)
