@@ -1,5 +1,6 @@
 .dropdown
-	a.btn.btn-primary(
-		href="/admin/register"
-	)
-		| New User
+	if !externalAuthenticationSystemUsed()
+		a.btn.btn-primary(
+			href="/admin/register"
+		)
+			| New User
