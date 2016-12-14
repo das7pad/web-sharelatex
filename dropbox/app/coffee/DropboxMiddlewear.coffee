@@ -1,11 +1,12 @@
 DropboxHandler = require "./DropboxHandler"
 logger = require "logger-sharelatex"
+AuthenticationController = require "../../../../app/js/Features/Authentication/AuthenticationController"
 
 module.exports = DropboxMiddlewear =
 	injectUserSettings: (req, res, next) ->
-		if !req.session.user?
+		if !AuthenticationController.isUserLoggedIn(req)?
 			return next()
-		user_id = req.session.user._id
+		user_id = AuthenticationController.getLoggedInUserId(req)
 		DropboxHandler.getUserRegistrationStatus user_id, (error, status) ->
 			logger.log status: status, "got dropbox status"
 			if error?
