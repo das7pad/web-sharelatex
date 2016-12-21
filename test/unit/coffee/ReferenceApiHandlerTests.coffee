@@ -17,6 +17,15 @@ describe 'ReferencesApiHandler', ->
 		@allFiles =
 			'/main.tex':  {_id: 'aaa', name: 'main.tex'}
 			'/other.tex': {_id: 'bbb', name: 'other.tex'}
+		@db = {
+			users: {
+				findOne : sinon.stub().callsArgWith(2, null, { features: {references:true}, refProvider:true})
+			}
+		}
+		@mongojs = () =>
+			@db
+		@mongojs.ObjectId = ObjectId
+
 		@ReferencesApiHandler = SandboxedModule.require modulePath, requires:
 			'request': @request = sinon.stub()
 			'fs': @fs = {unlink: sinon.stub().callsArgWith(1, null)}
@@ -26,9 +35,7 @@ describe 'ReferencesApiHandler', ->
 						url: "http://references.example.com"
 				mongo:
 					url: "mongodb://localhost/sharelatex"
-			'mongojs':
-				connect:-> @db = { users: { findOne : sinon.stub().callsArgWith(2, null, { features: {references:true}, refProvider:true}) } }
-				ObjectId: ObjectId
+			'mongojs': @mongojs
 			'../../../../app/js/Features/User/UserUpdater': @UserUpdater =
 				updateUser: sinon.stub().callsArgWith(2, null)
 			'logger-sharelatex': @logger =
@@ -71,6 +78,9 @@ describe 'ReferencesApiHandler', ->
 
 	describe "startAuth", ->
 		beforeEach ->
+			console.log ">> woot"
+			console.log ">>", @ReferencesApiHandler.make3rdRequest
+			console.log ">>", @ReferencesApiHandler.startAuth
 			@redirect = "http://localhost/tokenexchange"
 			@ReferencesApiHandler.make3rdRequest = sinon.stub().callsArgWith(1, null, {}, {redirect: @redirect} )
 			@ReferencesApiHandler.startAuth @req, @res
