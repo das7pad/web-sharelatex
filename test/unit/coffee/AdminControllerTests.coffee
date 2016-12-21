@@ -67,7 +67,7 @@ describe "AdminController", ->
 
 		it "should render the admin/listUsers page", (done)->
 			@res.render = (pageName, opts)=>
-				pageName.should.equal  Path.resolve(__dirname + "../../../../")+ "/app/views/listUsers"
+				pageName.should.equal  Path.resolve(__dirname + "/../../../")+ "/app/views/listUsers"
 				done()
 			@AdminController.listUsers @req, @res
 
@@ -118,7 +118,7 @@ describe "AdminController", ->
 
 		it "should render the admin/userInfo page", (done)->
 			@res.render = (pageName, opts)=>
-				pageName.should.equal  Path.resolve(__dirname + "../../../../")+ "/app/views/userInfo"
+				pageName.should.equal  Path.resolve(__dirname + "/../../../")+ "/app/views/userInfo"
 				done()
 			@AdminController.getUserInfo @req, @res
 
