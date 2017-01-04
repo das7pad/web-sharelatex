@@ -12,6 +12,9 @@ Url = require "url"
 
 baseWikiUrl = settings.apis.wiki?.url or "http://learn.sharelatex.com"
 
+
+
+
 module.exports = WikiController = 
 
 	getPage: (req, res, next) ->

@@ -22,3 +22,7 @@ module.exports =
 				timeInterval: 60
 			}), WikiController.getPage
 
+			# I am not happy about putting this here, shout at me in future about it. HO.
+			if JSON.stringify(settings.nav.header).indexOf("/learn") == -1
+				settings.nav.header.unshift({text: "help", class: "subdued", dropdown: [{text: "documentation", url: "/learn"}] })
+
