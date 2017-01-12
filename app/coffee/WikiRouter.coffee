@@ -28,7 +28,7 @@ module.exports =
 			# or on it's own. If not, add it, either on it's own or in the `Help` menu,
 			# whichever is most appropriate.
 			_getHelp = (someList) ->
-				_.find(someList, ((e)-> e.text == 'Help' && e.dropdown?))
+				_.find(someList, ((e)-> e?.text?.toLowerCase?() == 'help' && e.dropdown?))
 			_getLearn = (someList) ->
 				_.find(someList, ((element)-> element.url == '/learn'))
 			_addLearn = (targetList, optionalClass) ->
