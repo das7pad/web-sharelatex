@@ -1,6 +1,8 @@
 RateLimiterMiddlewear = require("../../../../app/js/Features/Security/RateLimiterMiddlewear.js")
 WikiController = require("./WikiController")
 settings = require("settings-sharelatex")
+logger = require('logger-sharelatex')
+_ = require('lodash')
 
 
 module.exports =
@@ -22,7 +24,25 @@ module.exports =
 				timeInterval: 60
 			}), WikiController.getPage
 
-			# I am not happy about putting this here, shout at me in future about it. HO.
-			if JSON.stringify(settings.nav.header).indexOf("/learn") == -1
-				settings.nav.header.unshift({text: "help", class: "subdued", dropdown: [{text: "documentation", url: "/learn"}] })
-
+			# Check if a `/learn` link exists in header_extras, either under the `Help` menu
+			# or on it's own. If not, add it, either on it's own or in the `Help` menu,
+			# whichever is most appropriate.
+			_getHelp = (someList) ->
+				_.find(someList, ((e)-> e.text == 'Help' && e.dropdown?))
+			_getLearn = (someList) ->
+				_.find(someList, ((element)-> element.url == '/learn'))
+			_addLearn = (targetList, optionalClass) ->
+				targetList.unshift({url: '/learn', text: 'documentation', class: optionalClass})
+			webRouter.use (req, res, next) ->
+				try
+					if res.locals?.nav?.header_extras?
+						header_extras = res.locals.nav.header_extras
+						if help = _getHelp(header_extras)
+							if !_getLearn(help.dropdown)
+								_addLearn(help.dropdown)
+						else
+							if !_getLearn(header_extras)
+								_addLearn(header_extras, 'subdued')
+				catch e
+					logger.error {error: e.message}, "could not automatically add `/learn` link to header"
+				next()
