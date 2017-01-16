@@ -78,9 +78,6 @@ describe 'ReferencesApiHandler', ->
 
 	describe "startAuth", ->
 		beforeEach ->
-			console.log ">> woot"
-			console.log ">>", @ReferencesApiHandler.make3rdRequest
-			console.log ">>", @ReferencesApiHandler.startAuth
 			@redirect = "http://localhost/tokenexchange"
 			@ReferencesApiHandler.make3rdRequest = sinon.stub().callsArgWith(1, null, {}, {redirect: @redirect} )
 			@ReferencesApiHandler.startAuth @req, @res
