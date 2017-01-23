@@ -9,7 +9,7 @@ TemplatesPublisher = require("./TemplatesPublisher")
 settings = require('settings-sharelatex')
 fs = require('fs')
 request = require('request')
-uuid = require('node-uuid')
+uuid = require('uuid')
 logger = require('logger-sharelatex')
 async = require("async")
 

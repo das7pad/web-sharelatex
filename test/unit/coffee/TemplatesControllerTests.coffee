@@ -50,7 +50,7 @@ describe 'TemplatesController', ->
 						url: @templateApiUrl="http://templates.sharelatex.env"
 					web:
 						url: @webApiUrl="http://web-api.sharelatex.env"
-			"node-uuid":v4:=>@uuid
+			"uuid":v4:=>@uuid
 			"request": @request
 			"fs":@fs
 		@zipUrl = "%2Ftemplates%2F52fb86a81ae1e566597a25f6%2Fv%2F4%2Fzip&templateName=Moderncv%20Banking&compiler=pdflatex"
