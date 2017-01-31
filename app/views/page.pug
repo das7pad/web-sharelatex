@@ -54,7 +54,7 @@ block content
 				label.desc
 					| #{translate("email")} (#{translate("optional")})
 				.form-group
-					input.field.text.medium.span8.form-control(ng-model="form.email",  ng-init="form.email = '#{getUserEmail()}'", type='email', spellcheck='false', value='', maxlength='255', tabindex='2')
+					input.field.text.medium.span8.form-control(ng-model="form.email",  ng-init="form.email = '"+getUserEmail()+"'", type='email', spellcheck='false', value='', maxlength='255', tabindex='2')
 				label.desc
 					| #{translate("suggestion")}
 				.form-group
