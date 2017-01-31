@@ -20,7 +20,7 @@
 				.btn-group(ng-hide="selectedUsers.length < 1")
 					a.btn.btn-default(
 						href='#',
-						tooltip="#{translate('delete')}",
+						tooltip=translate('delete'),
 						tooltip-placement="bottom",
 						tooltip-append-to-body="true",
 						ng-click="openDeleteUsersModal()"
@@ -30,7 +30,7 @@
 					.btn-group(ng-hide="selectedUsers.length != 1")
 						a.btn.btn-default(
 							href='#',
-							tooltip="#{translate('set_password')}",
+							tooltip=translate('set_password'),
 							tooltip-placement="bottom",
 							tooltip-append-to-body="true",
 							ng-click="openSetPasswordModal()"

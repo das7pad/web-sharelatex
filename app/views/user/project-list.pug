@@ -3,7 +3,7 @@
 		form.project-search.form-horizontal(role="form")
 			.form-group.has-feedback.has-feedback-left.col-md-7.col-xs-12
 				input.form-control.col-md-7.col-xs-12(
-					placeholder="#{translate('search_projects')}…",
+					placeholder=translate('search_projects')+"…",
 					autofocus='autofocus',
 					ng-model="searchText",
 					focus-on='search:clear',
@@ -21,7 +21,7 @@
 				.btn-group
 					a.btn.btn-default(
 						href='#',
-						tooltip="#{translate('delete')}",
+						tooltip=translate('delete'),
 						tooltip-placement="bottom",
 						tooltip-append-to-body="true",
 						ng-click="openArchiveProjectsModal()"
