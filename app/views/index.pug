@@ -39,13 +39,13 @@ block content
 
 
 			.row
-				-each tag in tags
+				each tag in tags
 					-if(tag.totalNumberOfTemplates > 0)
 						.template-section-header.col-md-12
 							h2 
 								a(href=tag.tagPagePath) #{tag.name}
 						.row
-							-each template in tag.exampleTemplates
+							each template in tag.exampleTemplates
 								.col-md-3.template-thumbnail
 									a(href=template.templatePagePath ? template.templatePagePath : template.canonicalUrl).thumbnail
 										img(src=template.thumbnailUrl)

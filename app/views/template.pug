@@ -21,8 +21,8 @@ block content
 						.entry
 							.row
 								.col-md-12.template-large-pdf-preview
-									a(href="#{template.pdfUrl}?inline=true&name=#{template.name}")
-										img(src="#{template.previewUrl}")
+									a(href=template.pdfUrl+"?inline=true&name="+template.name)
+										img(src=template.previewUrl)
 
 					.col-md-6
 						.template-details-section
@@ -31,11 +31,11 @@ block content
 							div(ng-controller="openInSlController", ng-cloak).download-buttons
 								a.btn.btn-primary.btn-large(href=template.open_in_sharelatex_url, ng-click='open()', ng-disabled="isDisabled", rel='nofollow') {{openInSlText}}
 								a.btn.btn-default(
-									href="#{template.zipUrl}?name=#{template.name}",
+									href=template.zipUrl+"?name="+template.name,
 									rel='nofollow',
 									ng-click='downloadZip()',
 									tooltip-placement="bottom",
-									tooltip="#{translate('download_zip_file')}"
+									tooltip=translate('download_zip_file')
 								)
 									i.fa.fa-cloud-download
 
@@ -43,10 +43,10 @@ block content
 									hr
 									p
 										| #{translate("this_is_your_template")} 
-										a(href='/project/#{template.projectId}') #{template.name}
+										a(href='/project/'+template.projectId) #{template.name}
 									// Unpublish Button
 									button.btn.btn-info(
-										ng-click="unpublish('#{template.projectId}')",
+										ng-click="unpublish('"+template.projectId+"')",
 										ng-disabled="buttonsDisabled()")
 										span(ng-show="!state.unpublishInFlight")
 											| #{translate("unpublish")}
@@ -55,7 +55,7 @@ block content
 
 									// Republish Button
 									button.btn.btn-primary(
-										ng-click="republish('#{template.projectId}')",
+										ng-click="republish('"+template.projectId+"')",
 										ng-disabled="buttonsDisabled()")
 										span(ng-show="!state.republishInFlight")
 											| #{translate("republish")}
