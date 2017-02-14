@@ -15,16 +15,16 @@ each item in ['mendeley']
 		p #{translate("account_is_linked")}.
 		p
 			a(
-				id="#{item}-unlink",
+				id=item+"-unlink",
 				href, 
-				ng-click="unlinkAccount('#{item}')",
+				ng-click="unlinkAccount('"+item+"')",
 				ng-controller="ReferenceUnlinkController"
 			)  #{translate("unlink_to_"+item)}
 	- else
 		p.small #{translate(item+"_sync_description")}
 		//p.small #{translate("link_to_"+item+"_description")}
 		p
-			a(id="#{item}-link", href='/#{item}/oauth').btn.btn-info #{translate("link_to_"+item)}
+			a(id=item+"-link", href='/'+item+'/oauth').btn.btn-info #{translate("link_to_"+item)}
 
 // Unlink modal
 script(type="text/ng-template", id="referenceUnlinkModalTemplate")
