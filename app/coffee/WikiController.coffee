@@ -25,6 +25,13 @@ module.exports = WikiController =
 
 		isFile = page.toLowerCase().indexOf("file:") != -1
 
+		mediaWikiPages = ["help:", "special:", "template:"]
+		isMediaWikiPage = _.some mediaWikiPages, (substring)->
+			return page.toLowerCase().indexOf(substring) != -1
+
+		if isMediaWikiPage
+			return ErrorController.notFound(null, res)
+
 		if isFile
 			return WikiController.proxy(req, res, next)
 
