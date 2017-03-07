@@ -13,7 +13,11 @@ html(itemscope, itemtype='http://schema.org/Product')
 					| Introducing 
 					span.rfp-highlight-brand ShareLaTeX 
 					| comments and track changes
-				img.rfp-screenshot-masthead(src="/img/feature-page/hero-img.png")
+				video.rfp-video.rfp-video-masthead(
+					autoplay
+					loop
+				)
+					source(src="/img/feature-page/intro.mp4", type="video/mp4")
 				p.rfp-lead We remember the old days where you had to choose between using Track Changes in Word, or typesetting with LaTeX.
 				p.rfp-lead.rfp-lead-strong Now you can do both.
 			section.rfp-section.rfp-section-blockquote
@@ -25,32 +29,56 @@ html(itemscope, itemtype='http://schema.org/Product')
 							p.rfp-quoted-person-name July 
 							a.rfp-quoted-person-link(href="www.google.com") Some Great University
 			section.rfp-section.rfp-section-feature 
-				h2.rfp-h2 
-					span.rfp-highlight Discuss 
-					| Within ShareLaTeX
-				p.rfp-p With real-time commenting, you can discuss your work without having to switch to email, printed versions or any other tool.
-				p.rfp-p Leave comments, give quick feedback and resolve issues much more effectively with everything happening inside a single tool.
+				.rfp-feature-description-container
+					h2.rfp-h2 
+						span.rfp-highlight Discuss 
+						| Within ShareLaTeX
+					p.rfp-p With real-time commenting, you can discuss your work without having to switch to email, printed versions or any other tool.
+					p.rfp-p Leave comments, give quick feedback and resolve issues much more effectively with everything happening inside a single tool.
+				.rfp-feature-video-container
+					video.rfp-video.rfp-video-anim#video-1(
+						loop
+					)
+						source(src="/img/feature-page/feat-discuss.mp4", type="video/mp4")
 			section.rfp-section.rfp-section-feature.rfp-section-feature-alt
-				h2.rfp-h2 
-					| Track All 
-					span.rfp-highlight Changes
-				p.rfp-p Keep track of every change made to the document, along with the person making the change.
-				p.rfp-p ShareLaTeX is the only LaTeX editor with real time tracked changes. Now there's nothing holding you back from being able to collaborate using LaTeX.
-			section.rfp-section.rfp-section-feature 
-				h2.rfp-h2 
-					| Keep One 
-					span.rfp-highlight To-do 
-					| List
-				p.rfp-p Keep an up-to-date list of all of the things you need to work through, without having to sift through out-of-date notes or dig out old emails.
-				p.rfp-p Comments alongside your work are a great way to keep a todo list, reminding you of everything that still needs to be done.
+				.rfp-feature-description-container
+					h2.rfp-h2 
+						| Track All 
+						span.rfp-highlight Changes
+					p.rfp-p Keep track of every change made to the document, along with the person making the change.
+					p.rfp-p ShareLaTeX is the only LaTeX editor with real time tracked changes. Now there's nothing holding you back from being able to collaborate using LaTeX.
+				.rfp-feature-video-container
+					video.rfp-video.rfp-video-anim.rfp-video-anim-alt#video-2(
+						loop
+					)
+						source(src="/img/feature-page/feat-changes.mp4", type="video/mp4")
+			section.rfp-section.rfp-section-feature
+				.rfp-feature-description-container
+					h2.rfp-h2 
+						| Keep One 
+						span.rfp-highlight To-do 
+						| List
+					p.rfp-p Keep an up-to-date list of all of the things you need to work through, without having to sift through out-of-date notes or dig out old emails.
+					p.rfp-p Comments alongside your work are a great way to keep a todo list, reminding you of everything that still needs to be done.
+				.rfp-feature-video-container
+					video.rfp-video.rfp-video-anim#video-3(
+						loop
+					)
+						source(src="/img/feature-page/feat-todos.mp4", type="video/mp4")
 			section.rfp-section.rfp-section-feature.rfp-section-feature-alt
-				h2.rfp-h2 
-					span.rfp-highlight Accept 
-					| and 
-					span.rfp-highlight Reject 
-					| Changes
-				p.rfp-p Easily find what your co-authors or reviewers have changed see how it impacts the document.
-				p.rfp-p Accept or reject individual changes quickly with the click of a button, and move onto the next change needing your attention.
+				.rfp-feature-description-container
+					h2.rfp-h2 
+						span.rfp-highlight Accept 
+						| and 
+						span.rfp-highlight Reject 
+						| Changes
+					p.rfp-p Easily find what your co-authors or reviewers have changed see how it impacts the document.
+					p.rfp-p Accept or reject individual changes quickly with the click of a button, and move onto the next change needing your attention.
+				.rfp-feature-video-container
+					video.rfp-video.rfp-video-anim.rfp-video-anim-alt#video-4(
+						loop
+					)
+						source(src="/img/feature-page/feat-accept.mp4", type="video/mp4")
 			section.rfp-section.rfp-section-testimonials
 				h2.rfp-h2 ShareLaTeX is Revolutionizing LaTeX collaboration (again)
 				p.rfp-lead We're obsessed with making ShareLaTeX as helpful as possible. In our conversations with users, we kept hearing how frustrating it could be to figure out what changes had been made by other collaborators.
@@ -86,3 +114,74 @@ html(itemscope, itemtype='http://schema.org/Product')
 					a.rfp-cta(href="#") 
 						span.rfp-cta-main Start using ShareLaTeX
 						span.rfp-cta-extra Get 7 days free
+		script(type="text/javascript").
+			(function(){
+				var initialized = false;
+				var elements = [
+					{ id: 'video-1', node: undefined, position: undefined, viewed: false },
+					{ id: 'video-2', node: undefined, position: undefined, viewed: false },
+					{ id: 'video-3', node: undefined, position: undefined, viewed: false },
+					{ id: 'video-4', node: undefined, position: undefined, viewed: false },
+				];
+
+				function getCoords (node) { // crossbrowser version
+					var box = node.getBoundingClientRect();
+
+					var body = document.body;
+					var docEl = document.documentElement;
+
+					var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
+					var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+
+					var clientTop = docEl.clientTop || body.clientTop || 0;
+					var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+
+					var top  = box.top +  scrollTop - clientTop;
+					var left = box.left + scrollLeft - clientLeft;
+
+					return { top: Math.round(top), left: Math.round(left) };
+				}
+
+				function refreshEls (shouldInitialize) {
+					if (shouldInitialize) {
+						initialized = true;
+					}
+
+					// do the coord refresh
+					if (initialized) {
+						for (var i = 0; i < elements.length; i++) {
+							var curEl = elements[i];
+
+							if (!curEl.node) {
+								curEl.node = document.getElementById(curEl.id);
+							}
+
+							curEl.position = getCoords(curEl.node).top + (curEl.node.offsetHeight * 0.2);
+						}
+
+						handleScroll();
+					}
+				}
+
+				function handleScroll () {
+					var windowPos = window.pageYOffset + window.innerHeight;
+
+					for (var i = 0; i < elements.length; i++) {
+						var curEl = elements[i];
+						if (windowPos > curEl.position && !curEl.viewed) {
+							curEl.viewed = true;
+							curEl.node.classList.add('rfp-video-anim-in');
+							// TODO Start playing the video.
+						}
+					}
+				}
+
+				// TODO debounce and throttle.
+				window.addEventListener('resize', refreshEls);
+				window.addEventListener('orientationchange', refreshEls);
+				window.addEventListener('scroll', handleScroll);
+
+				document.addEventListener('DOMContentLoaded', function () {
+					refreshEls(true);
+				});
+			}());
