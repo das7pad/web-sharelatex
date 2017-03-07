@@ -171,7 +171,7 @@ html(itemscope, itemtype='http://schema.org/Product')
 						if (windowPos > curEl.position && !curEl.viewed) {
 							curEl.viewed = true;
 							curEl.node.classList.add('rfp-video-anim-in');
-							// TODO Start playing the video.
+							curEl.node.play();
 						}
 					}
 				}
