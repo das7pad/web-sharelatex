@@ -7,7 +7,13 @@ html(itemscope, itemtype='http://schema.org/Product')
 			link(rel='stylesheet', href=buildCssPath('/style.css'))
 		link(href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css",rel="stylesheet")
 	body
-		main.rfp-main
+		main.rfp-main#main
+			header.rfp-header
+				.rfp-header-wrapper
+					a(href="/")
+						img.rfp-header-logo(src="/img/logo-white@2x.png")
+					a.rfp-cta.rfp-cta-header(href="#") Register
+
 			section.rfp-section.rfp-section-masthead#intro
 				.rfp-section-wrapper
 					h1.rfp-h1.rfp-h1-masthead
@@ -231,6 +237,7 @@ html(itemscope, itemtype='http://schema.org/Product')
 				};
 
 				var initialized = false;
+				var mainNode = null;
 				var elements = [
 					{ id: 'intro',   visibleClass: 'rfp-section-masthead-in', node: undefined, position: undefined, viewed: false },
 					{ id: 'video-1', visibleClass: 'rfp-video-anim-in', node: undefined, position: undefined, viewed: false },
@@ -263,6 +270,10 @@ html(itemscope, itemtype='http://schema.org/Product')
 					}
 					// do the coord refresh
 					if (initialized) {
+						if (!mainNode) {
+							mainNode = document.getElementById('main');
+						}
+
 						for (var i = 0; i < elements.length; i++) {
 							var curEl = elements[i];
 							if (!curEl.node) {
@@ -288,6 +299,12 @@ html(itemscope, itemtype='http://schema.org/Product')
 								curEl.node.play();
 							}
 						}
+					}
+
+					if (window.pageYOffset > 100) {
+						mainNode.classList.add('rfp-main-header-collapsed');
+					} else {
+						mainNode.classList.remove('rfp-main-header-collapsed');
 					}
 				}
 
