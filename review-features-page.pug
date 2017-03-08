@@ -8,13 +8,13 @@ html(itemscope, itemtype='http://schema.org/Product')
 		link(href="//netdna.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css",rel="stylesheet")
 	body
 		main.rfp-main
-			section.rfp-section.rfp-section-masthead
+			section.rfp-section.rfp-section-masthead#intro
 				h1.rfp-h1.rfp-h1-masthead
-					span.rfp-highlight Track changes 
-					| and 
-					span.rfp-highlight comments 
-					| in 
-					span.rfp-highlight LaTeX
+					span.rfp-h1-masthead-portion.rfp-highlight Track changes&nbsp;
+					span.rfp-h1-masthead-portion and&nbsp;
+					span.rfp-h1-masthead-portion.rfp-highlight comments&nbsp;
+					span.rfp-h1-masthead-portion in&nbsp;
+					span.rfp-h1-masthead-portion.rfp-highlight LaTeX
 				video.rfp-video.rfp-video-masthead(
 					autoplay
 					loop
@@ -122,10 +122,11 @@ html(itemscope, itemtype='http://schema.org/Product')
 			(function(){
 				var initialized = false;
 				var elements = [
-					{ id: 'video-1', node: undefined, position: undefined, viewed: false },
-					{ id: 'video-2', node: undefined, position: undefined, viewed: false },
-					{ id: 'video-3', node: undefined, position: undefined, viewed: false },
-					{ id: 'video-4', node: undefined, position: undefined, viewed: false },
+					{ id: 'intro',   visibleClass: 'rfp-section-masthead-in', node: undefined, position: undefined, viewed: false },
+					{ id: 'video-1', visibleClass: 'rfp-video-anim-in', node: undefined, position: undefined, viewed: false },
+					{ id: 'video-2', visibleClass: 'rfp-video-anim-in', node: undefined, position: undefined, viewed: false },
+					{ id: 'video-3', visibleClass: 'rfp-video-anim-in', node: undefined, position: undefined, viewed: false },
+					{ id: 'video-4', visibleClass: 'rfp-video-anim-in', node: undefined, position: undefined, viewed: false },
 				];
 
 				function getCoords (node) { // crossbrowser version
@@ -150,19 +151,15 @@ html(itemscope, itemtype='http://schema.org/Product')
 					if (shouldInitialize) {
 						initialized = true;
 					}
-
 					// do the coord refresh
 					if (initialized) {
 						for (var i = 0; i < elements.length; i++) {
 							var curEl = elements[i];
-
 							if (!curEl.node) {
 								curEl.node = document.getElementById(curEl.id);
 							}
-
-							curEl.position = getCoords(curEl.node).top + (curEl.node.offsetHeight * 0.2);
+							curEl.position = getCoords(curEl.node).top + (curEl.node.offsetHeight * 0.5);
 						}
-
 						handleScroll();
 					}
 				}
@@ -173,9 +170,12 @@ html(itemscope, itemtype='http://schema.org/Product')
 					for (var i = 0; i < elements.length; i++) {
 						var curEl = elements[i];
 						if (windowPos > curEl.position && !curEl.viewed) {
+							console.log('showing ' + curEl.id);
 							curEl.viewed = true;
-							curEl.node.classList.add('rfp-video-anim-in');
-							curEl.node.play();
+							curEl.node.classList.add(curEl.visibleClass);
+							if (curEl.node.tagName.toLowerCase() === 'video') {
+								curEl.node.play();
+							}
 						}
 					}
 				}
