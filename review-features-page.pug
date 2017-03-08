@@ -1,7 +1,7 @@
 doctype html
 html(itemscope, itemtype='http://schema.org/Product')
 	head
-		title Review features
+		title Track changes and commenting in LaTeX
 		link(rel="icon", href="/favicon.ico")
 		if buildCssPath
 			link(rel='stylesheet', href=buildCssPath('/style.css'))
@@ -10,9 +10,11 @@ html(itemscope, itemtype='http://schema.org/Product')
 		main.rfp-main
 			section.rfp-section.rfp-section-masthead
 				h1.rfp-h1.rfp-h1-masthead
-					| Introducing 
-					span.rfp-highlight-brand ShareLaTeX 
-					| comments and track changes
+					span.rfp-highlight Track changes 
+					| and 
+					span.rfp-highlight comments 
+					| in 
+					span.rfp-highlight LaTeX
 				video.rfp-video.rfp-video-masthead(
 					autoplay
 					loop
@@ -80,8 +82,8 @@ html(itemscope, itemtype='http://schema.org/Product')
 					)
 						source(src="/img/feature-page/feat-accept.mp4", type="video/mp4")
 			section.rfp-section.rfp-section-testimonials
-				h2.rfp-h2 ShareLaTeX is Revolutionizing LaTeX collaboration (again)
-				p.rfp-lead We're obsessed with making ShareLaTeX as helpful as possible. In our conversations with users, we kept hearing how frustrating it could be to figure out what changes had been made by other collaborators.
+				h2.rfp-h2 ShareLaTeX has revolutionized LaTeX collaboration. Again.
+				p.rfp-lead We kept hearing how frustrating it could be to figure out what changes had been made by other collaborators.
 				p.rfp-lead So we put our coding hats on and did something about it.
 				p.rfp-lead Here's what some of our users said when we showed them the new comments and track changes features.
 				.rfp-quote-section
@@ -101,13 +103,15 @@ html(itemscope, itemtype='http://schema.org/Product')
 								a.rfp-quoted-person-link @vladtheman
 			section.rfp-section.rfp-section-final
 				h2.rfp-h2 ShareLaTeX has more than 1 million users around the world, including:
-				div
-					figure
-						img
-					figure
-						img
-					figure
-						img
+				div.rfp-users
+					figure.rfp-user-container
+						img.rfp-user-logo(src="/img/feature-page/user-nasa-jpl.png")
+					figure.rfp-user-container
+						img.rfp-user-logo(src="/img/feature-page/user-caltech.png")
+					figure.rfp-user-container
+						img.rfp-user-logo(src="/img/feature-page/user-deepmind.png")
+					figure.rfp-user-container
+						img.rfp-user-logo(src="/img/feature-page/user-chalmers.png")
 				.rfp-cta-container
 					h3.rfp-h3.rfp-h3-cta Start using ShareLaTeX today to see these features in action.
 					p.rfp-lead.rfp-lead-cta Join more than a million other people using ShareLaTeX.
