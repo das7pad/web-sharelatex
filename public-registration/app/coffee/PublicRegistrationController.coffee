@@ -12,6 +12,8 @@ _ = require "underscore"
 UserHandler = require("../../../../app/js/Features/User/UserHandler")
 UserSessionsManager = require("../../../../app/js/Features/User/UserSessionsManager")
 AuthenticationController = require("../../../../app/js/Features/Authentication/AuthenticationController")
+AnalyticsManager = require("../../../../app/coffee/Features/Analytics/AnalyticsManager")
+
 
 EmailBuilder.templates.welcome =
 	subject:  _.template "Welcome to ShareLaTeX"
@@ -81,11 +83,11 @@ module.exports = PublicRegistrationController =
 				req.login user, (err) ->
 					return callback(error) if error?
 					req.session.justRegistered = true
+					AnalyticsManager.idendifyUser(user._id, req.sessionID)
 					# copy to the old `session.user` location, for backward-comptability
 					req.session.user = req.session.passport.user
 					AuthenticationController._clearRedirectFromSession(req)
 					UserSessionsManager.trackSession(user, req.sessionID, () ->)
-
 					res.json
 						redir: redir
 						id: user._id.toString()
