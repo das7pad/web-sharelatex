@@ -48,7 +48,7 @@ module.exports = GithubSyncController =
 				})
 			else
 				GithubSyncApiHandler.getUserStatus user_id, (error, status) ->
-					return next(error) if error?
+					return GithubSyncController._reportError(error, req, res, next) if error?
 					res.header("Content-Type", "application/json")
 					res.json({
 						available: true
@@ -58,28 +58,28 @@ module.exports = GithubSyncController =
 	getUserLoginAndOrgs: (req, res, next) ->
 		user_id = AuthenticationController.getLoggedInUserId(req)
 		GithubSyncApiHandler.getUserLoginAndOrgs user_id, (error, data) ->
-			return next(error) if error?
+			return GithubSyncController._reportError(error, req, res, next) if error?
 			res.header("Content-Type", "application/json")
 			res.json(data)
 
 	getUserRepos: (req, res, next) ->
 		user_id = AuthenticationController.getLoggedInUserId(req)
 		GithubSyncApiHandler.getUserRepos user_id, (error, data) ->
-			return next(error) if error?
+			return GithubSyncController._reportError(error, req, res, next) if error?
 			res.header("Content-Type", "application/json")
 			res.json(data)
 
 	getProjectStatus: (req, res, next) ->
 		project_id = req.params.Project_id
 		GithubSyncApiHandler.getProjectStatus project_id, (error, status) ->
-			return next(error) if error?
+			return GithubSyncController._reportError(error, req, res, next) if error?
 			res.header("Content-Type", "application/json")
 			res.json(status)
 
 	getProjectUnmergedCommits: (req, res, next) ->
 		project_id = req.params.Project_id
 		GithubSyncApiHandler.getProjectUnmergedCommits project_id, (error, commits) ->
-			return next(error) if error?
+			return GithubSyncController._reportError(error, req, res, next) if error?
 			res.header("Content-Type", "application/json")
 			res.json(
 				commits.map (c) ->
@@ -94,7 +94,7 @@ module.exports = GithubSyncController =
 		projectName = req.body.projectName?.trim()
 		repo = req.body.repo
 		GithubSyncImportHandler.importProject user_id, projectName, repo, (error, project_id) ->
-			return next(error) if error?
+			return GithubSyncController._reportError(error, req, res, next) if error?
 			res.header("Content-Type", "application/json")
 			res.json(project_id: project_id)
 

@@ -10,18 +10,21 @@ define [
 			error: false
 		}
 		
-		$http.get("/user/github-sync/status")
+		$http.get("/user/github-sync/status", { disableAutoLoginRedirect: true })
 			.success (user) ->
 				$scope.status.user = user
 				if !user.enabled
 					$scope.status.loading = false
 				else
-					$http.get("/user/github-sync/repos")
+					$http.get("/user/github-sync/repos", { disableAutoLoginRedirect: true })
 						.success (data) ->
 							$scope.status.loading = false
 							$scope.status.repos = data.repos
-						.error () ->
-							$scope.status.error = true
+						.error (data, statusCode) ->
+							if statusCode?
+								$scope.status.error = { statusCode }
+							else
+								$scope.status.error = true
 			.error () ->
 				$scope.status.error = true
 				
@@ -32,12 +35,16 @@ define [
 					_csrf: window.csrfToken
 					projectName: repo.name
 					repo: repo.full_name
+					disableAutoLoginRedirect: true
 				})
 				.success (data) ->
 					project_id = data.project_id
 					window.location = "/project/#{project_id}"
-				.error (data) ->
+				.error (data, statusCode) ->
 					$scope.status.inflight = false
-					$scope.status.error = true
+					if statusCode?
+						$scope.status.error = { statusCode }
+					else
+						$scope.status.error = true
 					
 

@@ -16,7 +16,11 @@ script(type="text/ng-template", id="githubSyncImportModalTemplate")
 		h3
 			| #{translate("import_from_github")}
 	.modal-body
-		.alert.alert-danger(ng-show="status.error") #{translate("github_sync_error")}
+		.alert.alert-danger(ng-show="status.error")
+			div(ng-show="status.error.statusCode == 401")
+				p #{translate("github_credentials_expired")}
+				a(href="/github-sync/beginAuth").btn.btn-primary #{translate("reauthorize_github_account")}
+			span(ng-show="status.error.statusCode != 401") #{translate("github_sync_error")}
 
 		.loading(ng-show="!status.error && status.loading")
 			i.fa.fa-refresh.fa-spin.fa-fw
