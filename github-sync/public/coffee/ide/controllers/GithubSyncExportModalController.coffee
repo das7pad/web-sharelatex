@@ -17,15 +17,18 @@ define [
 			description: ""
 		}
 
-		$http.get("/user/github-sync/orgs")
+		$http.get("/user/github-sync/orgs", { disableAutoLoginRedirect: true })
 			.success (data) ->
 				$scope.status.user = data.user
 				$scope.status.orgs = data.orgs
 				$scope.status.loading = false
 				$scope.form.org = $scope.status.user.login
 				
-			.error () ->
-				$scope.status.error = true
+			.error (data, statusCode) ->
+				$scope.status.error = {
+					message: data?.error,
+					statusCode: statusCode
+				}
 				
 		$scope.create = () ->
 			$scope.status.inflight = true
