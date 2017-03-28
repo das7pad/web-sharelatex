@@ -88,7 +88,7 @@ define [
 				name : hit._highlightResult.name.value
 				description: hit._highlightResult.description.value
 				url :"/templates/#{hit._id}"
-				image_url: "#{window.sharelatex?.templates?.cdnDomain}/#{hit._id}/v/#{hit.version}/pdf-converted-cache/style-thumbnail"
+				image_url: "#{window.sharelatex?.templates?.cdnDomain}/templates/#{hit._id}/v/#{hit.version}/pdf-converted-cache/style-thumbnail"
 
 		updateHits = (hits)->
 			$scope.safeApply ->
