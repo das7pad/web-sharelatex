@@ -4,6 +4,7 @@ logger = require("logger-sharelatex")
 ErrorController = require "../../../../app/js/Features/Errors/ErrorController"
 _ = require("underscore")
 AuthenticationController = require("../../../../app/js/Features/Authentication/AuthenticationController")
+metrics = require "metrics-sharelatex"
 
 async = require("async")
 other_lngs = ["es"]
@@ -18,6 +19,7 @@ baseWikiUrl = settings.apis.wiki?.url or "http://learn.sharelatex.com"
 module.exports = WikiController = 
 
 	getPage: (req, res, next) ->
+		metrics.inc("wiki.getPage")
 		page = Url.parse(req.url).pathname
 		page = page.replace(/^\/learn/, "").replace(/^\//, "")
 		if page == ""
@@ -67,6 +69,7 @@ module.exports = WikiController =
 
 	# only used for docker image
 	proxy: (req, res, next)->
+		metrics.inc("wiki.proxy")
 		url = "#{baseWikiUrl}#{req.url}"
 		logger.log url:url, "proxying page request to learn wiki"
 		oneMinute = 1000 * 60
