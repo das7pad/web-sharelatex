@@ -47,9 +47,7 @@ module.exports = TemplatesWebController =
 			disposition = "inline"
 		else
 			disposition = "attachment"
-		res.header({
-			"content-disposition": "#{disposition}; filename=\"#{encodeURIComponent(name.replace("\"", "-"))}.#{req.params.file_type}\""
-		})
+		res.setContentDisposition(disposition, {filename: "#{name.replace("\"", "-")}.#{req.params.file_type}"})
 
 		logger.log url:url, template_name: name, disposition: disposition, "proxying request to templates api"
 		if url.indexOf("pdf") != -1 and url.indexOf("converted") == -1
