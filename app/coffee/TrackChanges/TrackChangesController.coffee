@@ -39,7 +39,7 @@ module.exports = TrackChangesController =
 		logger.log {project_id, doc_id }, "request to bulk accept #{ change_ids.length } changes"
 		DocumentUpdaterHandler.bulkAcceptChanges project_id, doc_id, change_ids, (error) ->
 			return next(error) if error?
-			# EditorRealTimeController.emitToRoom project_id, "accept-change", doc_id, change_id, (err)->
+			EditorRealTimeController.emitToRoom project_id, "bulk-accept-changes", doc_id, change_ids, (err)->
 			res.send 204
 
 	toggleTrackChanges: (req, res, next) ->
