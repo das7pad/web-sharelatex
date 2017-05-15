@@ -10,10 +10,9 @@ describe 'DropboxWebhookHandler', ->
 		@DropboxWebhookHandler = SandboxedModule.require modulePath, requires:
 			"../../../../app/js/models/User": User: @User = {}
 			"../../../../app/js/Features/ThirdPartyDataStore/TpdsUpdateSender": @TpdsUpdateSender = {}
-			"redis-sharelatex":
-				createClient: () => @rclient =
+			"../../../../app/js/infrastructure/RedisWrapper":
+				client: () => @rclient =
 					auth: sinon.stub()
-			'settings-sharelatex': redis: web: {}
 			'logger-sharelatex':
 				log:->
 				err:->
