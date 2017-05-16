@@ -1,11 +1,10 @@
 logger = require("logger-sharelatex")
-settings = require("settings-sharelatex")
 async = require "async"
 User = require("../../../../app/js/models/User").User
 TpdsUpdateSender = require "../../../../app/js/Features/ThirdPartyDataStore/TpdsUpdateSender"
 
-redis = require("redis-sharelatex")
-rclient = redis.createClient(settings.redis.web)
+RedisWrapper = require("../../../../app/js/infrastructure/RedisWrapper")
+rclient = RedisWrapper.client("dropbox")
 
 module.exports = DropboxWebhookHandler =
 	pollDropboxUids: (dropbox_uids, callback = (error) ->) ->
