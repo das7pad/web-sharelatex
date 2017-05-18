@@ -6,7 +6,8 @@ module.exports =
 	apply: (webRouter, apiRouter) ->
 		webRouter.get "/project/:project_id/ranges", AuthorizationMiddlewear.ensureUserCanReadProject, TrackChangesController.getAllRanges
 		webRouter.get "/project/:project_id/changes/users", AuthorizationMiddlewear.ensureUserCanReadProject, TrackChangesController.getAllChangesUsers
-		webRouter.post "/project/:project_id/doc/:doc_id/changes/:change_id/accept", AuthorizationMiddlewear.ensureUserCanWriteProjectContent, TrackChangesController.acceptChange
+		webRouter.post "/project/:project_id/doc/:doc_id/changes/:change_id/accept", AuthorizationMiddlewear.ensureUserCanWriteProjectContent, TrackChangesController.acceptChanges
+		webRouter.post "/project/:project_id/doc/:doc_id/changes/accept", AuthorizationMiddlewear.ensureUserCanWriteProjectContent, TrackChangesController.acceptChanges
 		webRouter.post "/project/:project_id/track_changes", AuthorizationMiddlewear.ensureUserCanWriteProjectContent, TrackChangesController.toggleTrackChanges
 
 		# Note: Read only users can still comment

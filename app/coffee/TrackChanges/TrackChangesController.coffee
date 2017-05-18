@@ -23,13 +23,16 @@ module.exports = TrackChangesController =
 			# Get rid of any anonymous/deleted user objects
 			users = users.filter (u) -> u?.id?
 			res.json users
-	
-	acceptChange: (req, res, next) ->
-		{project_id, doc_id, change_id} = req.params
-		logger.log {project_id, doc_id, change_id}, "request to accept change"
-		DocumentUpdaterHandler.acceptChange project_id, doc_id, change_id, (error) ->
+
+	acceptChanges: (req, res, next) ->
+		{project_id, doc_id } = req.params
+		{change_ids} = req.body
+		if !change_ids?
+			change_ids = [ req.params.change_id ]
+		logger.log {project_id, doc_id }, "request to accept #{ change_ids.length } changes"
+		DocumentUpdaterHandler.acceptChanges project_id, doc_id, change_ids, (error) ->
 			return next(error) if error?
-			EditorRealTimeController.emitToRoom project_id, "accept-change", doc_id, change_id, (err)->
+			EditorRealTimeController.emitToRoom project_id, "accept-changes", doc_id, change_ids, (err)->
 			res.send 204
 
 	toggleTrackChanges: (req, res, next) ->
