@@ -35,6 +35,8 @@ describe "PublicRegistrationController", ->
 			_clearRedirectFromSession: sinon.stub()
 		@UserSessionsManager =
 			trackSession:sinon.stub()
+		@AnalyticsManager =
+			identifyUser:sinon.stub()
 		@PublicRegistrationController = SandboxedModule.require modulePath, requires:
 			"../../../../app/js/Features/User/UserRegistrationHandler":@UserRegistrationHandler
 			"../../../../app/js/Features/Referal/ReferalAllocator":@ReferalAllocator
@@ -45,6 +47,7 @@ describe "PublicRegistrationController", ->
 			"../../../../app/js/Features/User/UserHandler": @UserHandler
 			"../../../../app/js/Features/Authentication/AuthenticationController": @AuthenticationController
 			"../../../../app/js/Features/User/UserSessionsManager":@UserSessionsManager
+			"../../../../app/coffee/Features/Analytics/AnalyticsManager": @AnalyticsManager
 			"logger-sharelatex": {log:->}
 			"metrics-sharelatex": { inc: () ->}
 
