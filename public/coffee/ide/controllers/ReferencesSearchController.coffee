@@ -46,7 +46,7 @@ define [
 			# make it visible then hand it over to the caller
 			hintNode = $('.sl_references_search_hint')[0]
 			if !hintNode
-				console.error("Error: could not find .sl_references_search_hint node in dom")
+				console.log("Error: could not find .sl_references_search_hint node in dom")
 				return
 			hintNode.style.display = 'block'
 			hintNode.style.visibility = 'visible'
@@ -64,7 +64,7 @@ define [
 						newNode = $scope._buildHintNode()
 						container = editor?.completer?.popup?.renderer?.container
 						if !container
-							console.error("Error attaching search hint: could not find popup container")
+							console.log("Error attaching search hint: could not find popup container")
 							return
 						container.style.overflow = 'visible'
 						$(container).append(newNode)
@@ -113,11 +113,11 @@ define [
 			# key-command object
 			editor = window.editors[0]
 			if !editor
-				console.error('no editor found at window.editors[0]')
+				console.log('no editor found at window.editors[0]')
 				return
 			startAutocomplete = editor?.commands?.commands?.startAutocomplete
 			if !startAutocomplete
-				console.error('could not find startAutocomplete command')
+				console.log('could not find startAutocomplete command')
 				return
 
 			# only do this patchery once
@@ -173,7 +173,7 @@ define [
 		$scope.insertKeyAtCursor = (key) ->
 			editor = window.editors[0]
 			if !editor
-				console.error('no editor found at window.editors[0]')
+				console.log('no editor found at window.editors[0]')
 				return
 			pos = editor.getCursorPosition()
 			session = editor.getSession()
