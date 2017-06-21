@@ -1,0 +1,14 @@
+extends ../../../../../app/views/layout
+
+block content
+	.content.content-alt
+		.container(ng-cloak)
+			.row
+				.col-md-8.col-md-offset-2.col-lg-6.col-lg-offset-3
+					.card
+						.page-header
+							h1 #{translate("dropbox_sync")}
+						.div(ng-controller="DropboxRegistrationController")
+							span(ng-show="state == 'processing'") #{translate("processing")}
+							span(ng-show="state == 'error'") #{translate("dropbox_sync_error")}
+							span(ng-show="state == 'success'") #{translate("successfull_dropbox_link")}
