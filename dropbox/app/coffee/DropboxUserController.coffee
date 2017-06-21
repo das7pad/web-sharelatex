@@ -18,12 +18,12 @@ module.exports =
 		res.render viewPath
 
 	completeDropboxRegistration: (req, res, next)->
-		{access_token, token_type} = qs.parse(req.body.tokenInfo)
+		{access_token, token_type, uid} = qs.parse(req.body.tokenInfo)
 		token =
 			token_type:token_type.trim().slice(0,32)
 			access_token:access_token.trim().slice(0,64)
 		user_id = AuthenticationController.getLoggedInUserId(req)
-		dropboxHandler.setAccessToken user_id, token, (err)->
+		dropboxHandler.setAccessToken user_id, token, uid, (err)->
 			if err?
 				res.sendStatus 500
 			else

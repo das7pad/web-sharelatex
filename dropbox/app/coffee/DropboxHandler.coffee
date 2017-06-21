@@ -42,7 +42,7 @@ module.exports =
 				logger.log user_id:user_id, url:url, "starting dropbox register"
 				callback err, url
 
-	setAccessToken: (user_id, token, callback)->
+	setAccessToken: (user_id, token, dropbox_uid, callback)->
 		if !user_id?
 			err = new Error("no user id passed to set access_token")
 			logger.err err
@@ -51,6 +51,7 @@ module.exports =
 			url: "#{settings.apis.thirdPartyDataStore.url}/user/#{user_id}/dropbox/setaccesstoken"
 			json:
 				token:token
+				dropbox_uid:dropbox_uid
 			timeout: 5000
 		logger.log user_id:user_id, "compleing dropbox registration"
 		request.post opts, (err, response, body)=>

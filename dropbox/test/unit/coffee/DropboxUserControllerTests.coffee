@@ -25,7 +25,7 @@ describe 'DropboxUserController', ->
 
 		@req =
 			body:
-				tokenInfo: "access_token=dasd&token_type=bearer"
+				tokenInfo: "access_token=dasd&token_type=bearer&uid=myuid"
 			session:
 				user:
 					_id: @user_id
@@ -47,13 +47,13 @@ describe 'DropboxUserController', ->
 
 	describe "completeDropboxRegistration", ->
 		beforeEach ->
-			@DropboxHandler.setAccessToken.callsArgWith(2)
+			@DropboxHandler.setAccessToken.callsArgWith(3)
 
 		it "should call getDropboxRegisterUrl with the user id", (done)->
 
 			@res.sendStatus = (statusCode)=>
 				statusCode.should.equal 200
-				@DropboxHandler.setAccessToken.calledWith(@user_id,{token_type:"bearer", access_token:"dasd"}).should.equal true
+				@DropboxHandler.setAccessToken.calledWith(@user_id,{token_type:"bearer", access_token:"dasd"}, "myuid").should.equal true
 				done()
 
 			@controller.completeDropboxRegistration @req, @res
