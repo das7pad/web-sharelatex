@@ -37,9 +37,19 @@ module.exports = TrackChangesController =
 
 	toggleTrackChanges: (req, res, next) ->
 		{project_id} = req.params
-		track_changes_on = !!req.body.on
-		logger.log {project_id, track_changes_on}, "request to toggle track changes"
-		TrackChangesManager.toggleTrackChanges project_id, track_changes_on, (error) ->
+		
+		if req.body.on?
+			track_changes_state = !!req.body.on
+		else if req.body.on_for?
+			for key, value in req.body.on_for
+				if !key.match(/[a-f0-9]{24}/) or typeof value is not "boolean"
+					return res.send 400 # bad request
+			track_changes_state = req.body.on_for
+		else
+			return res.send 400 # bad reqeust
+			
+		logger.log {project_id, track_changes_state}, "request to toggle track changes"
+		TrackChangesManager.setTrackChangesState project_id, track_changes_state, (error) ->
 			return next(error) if error?
-			EditorRealTimeController.emitToRoom project_id, "toggle-track-changes", track_changes_on, (err)->
+			EditorRealTimeController.emitToRoom project_id, "toggle-track-changes", track_changes_state, (err)->
 			res.send 204
