@@ -35,14 +35,14 @@ module.exports = TrackChangesController =
 			EditorRealTimeController.emitToRoom project_id, "accept-changes", doc_id, change_ids, (err)->
 			res.send 204
 
-	toggleTrackChanges: (req, res, next) ->
+	setTrackChangesState: (req, res, next) ->
 		{project_id} = req.params
 		
 		if req.body.on?
 			track_changes_state = !!req.body.on
 		else if req.body.on_for?
-			for key, value in req.body.on_for
-				if !key.match(/[a-f0-9]{24}/) or typeof value is not "boolean"
+			for key, value of req.body.on_for
+				if !key.match? or !key.match(/^[a-f0-9]{24}$/) or (value != true)
 					return res.send 400 # bad request
 			track_changes_state = req.body.on_for
 		else

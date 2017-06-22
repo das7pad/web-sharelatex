@@ -6,7 +6,7 @@ path = require "path"
 modulePath = path.join __dirname, "../../../app/js/TrackChanges/RangesManager"
 expect = require("chai").expect
 
-describe "RangesManager", ->
+describe "TrackChanges RangesManager", ->
 	beforeEach ->
 		@RangesManager = SandboxedModule.require modulePath, requires:
 			"../../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler": @DocumentUpdaterHandler = {}

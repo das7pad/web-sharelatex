@@ -8,7 +8,7 @@ module.exports =
 		webRouter.get "/project/:project_id/changes/users", AuthorizationMiddlewear.ensureUserCanReadProject, TrackChangesController.getAllChangesUsers
 		webRouter.post "/project/:project_id/doc/:doc_id/changes/:change_id/accept", AuthorizationMiddlewear.ensureUserCanWriteProjectContent, TrackChangesController.acceptChanges
 		webRouter.post "/project/:project_id/doc/:doc_id/changes/accept", AuthorizationMiddlewear.ensureUserCanWriteProjectContent, TrackChangesController.acceptChanges
-		webRouter.post "/project/:project_id/track_changes", AuthorizationMiddlewear.ensureUserCanWriteProjectContent, TrackChangesController.toggleTrackChanges
+		webRouter.post "/project/:project_id/track_changes", AuthorizationMiddlewear.ensureUserCanWriteProjectContent, TrackChangesController.setTrackChangesState
 
 		# Note: Read only users can still comment
 		webRouter.post "/project/:project_id/thread/:thread_id/messages", AuthorizationMiddlewear.ensureUserCanReadProject, CommentsController.sendComment

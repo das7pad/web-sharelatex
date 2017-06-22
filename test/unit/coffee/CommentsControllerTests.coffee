@@ -6,7 +6,7 @@ sinon = require('sinon')
 modulePath = path.join __dirname, "../../../app/js/Comments/CommentsController"
 expect = require("chai").expect
 
-describe "CommentsController", ->
+describe "TrackChanges CommentsController", ->
 	beforeEach ->
 		@user_id = 'mock-user-id'
 		@settings = {}
