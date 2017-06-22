@@ -71,19 +71,21 @@ define [
 			event_tracking.send("references-#{provider}", "modal", "load-bibtex")
 
 			$http.get("/#{provider}/bibtex")
-				.success (data) ->
+				.then (response) ->
+					data = response.data
 					limit = 1 * 1024 * 1024
 					if data.length > limit
 						$scope.bibtexData = "#{data.slice(0, limit)}\n..."
 					else
 						$scope.bibtexData = data
 					$scope.status.loading = false
-				.error (data, statusCode) ->
-					if statusCode == 401
+				.catch (response) ->
+					{ data, status } = response
+					if status == 401
 						$scope.status.errorType = 'expired'
-					if statusCode == 403
+					if status == 403
 						$scope.status.errorType = 'forbidden'
-					if statusCode == 400
+					if status == 400
 						$scope.status.errorType = 'refresh-failed'
 					$scope.status.error = true
 					$scope.status.loading = false
@@ -99,13 +101,13 @@ define [
 				"/project/#{ide.project_id}/#{provider}/bibtex/import",
 				{_csrf: window.csrfToken}
 			)
-				.success (data) ->
+				.then () ->
 					$scope.status.error = false
 					$scope.status.importing = false
 					$scope.$emit 'references:should-reindex', {}
 					$scope.status.done = true
 					$timeout($scope.cancel, 1200)
-				.error () ->
+				.catch () ->
 					$scope.status.error = true
 					$scope.status.importing = false
 
