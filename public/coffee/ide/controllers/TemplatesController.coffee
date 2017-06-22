@@ -30,11 +30,12 @@ define [
 
 		refreshPublishedStatus = ->
 			$http.get("/project/#{ide.project_id}/template")
-				.success (data) ->
+				.then (response) ->
+					data = response.data
 					$scope.templateDetails = data
 					$scope.templateDetails.publishedDate = moment(data.publishedDate).format("Do MMM YYYY, h:mm a")
 					$scope.templateDetails.description = data.description
-				.error () ->
+				.catch () ->
 					problemTalkingToTemplateApi()
 
 		refreshPublishedStatus()
@@ -54,18 +55,18 @@ define [
 		$scope.publishTemplate = ->
 			$scope.state.publishInflight = true
 			updateProjectDescription()
-				.error () ->
-					problemTalkingToTemplateApi()
-				.success () ->
+				.then () ->
 					$http
 						.post("/project/#{ide.project_id}/template/publish", {
 							_csrf: window.csrfToken
 						})
-						.error () ->
-							problemTalkingToTemplateApi()
-						.success () ->
+						.then () ->
 							refreshPublishedStatus()
 							$scope.state.publishInflight = false
+						.catch () ->
+							problemTalkingToTemplateApi()
+				.catch () ->
+					problemTalkingToTemplateApi()
 					
 
 		$scope.unpublishTemplate = ->
@@ -74,10 +75,10 @@ define [
 				.post("/project/#{ide.project_id}/template/unpublish", {
 					_csrf: window.csrfToken
 				})
-				.success () ->
+				.then () ->
 					refreshPublishedStatus()
 					$scope.state.unpublishInflight = false
-				.error () ->
+				.catch () ->
 					problemTalkingToTemplateApi()
 
 		$scope.cancel = () ->
