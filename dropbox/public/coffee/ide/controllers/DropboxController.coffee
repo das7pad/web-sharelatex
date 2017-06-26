@@ -30,9 +30,9 @@ define [
 
 		$http.get("/project/#{ide.project_id}/dropbox/status")
 			.then (response) ->
-				status = response.data
+				dropboxStatus = response.data
 				$scope.dbState.gotLinkStatus = true
-				if status.registered
+				if dropboxStatus.registered
 					$scope.dbState.userIsLinkedToDropbox = true
 					cachedState = $scope.dbState
 		
