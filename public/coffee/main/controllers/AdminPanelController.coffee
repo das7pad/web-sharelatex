@@ -43,11 +43,12 @@ define [
 			data.sort = $scope.predicate
 			data.reverse = $scope.reverse
 			request = $http.post "/admin/user/search", data
-			request.success (data, status)->
+			request.then (response)->
+				data = response.data
 				$scope.users = data.users
 				$scope.pages = data.pages
 				$scope.updateVisibleUsers()
-			request.error (data, status)->
+			request.catch ()->
 				console.log "the request failed"
 
 		$scope.clearSearchText = () ->

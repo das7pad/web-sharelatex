@@ -27,8 +27,8 @@ define [
 				data:
 					beta: true
 			})
-				.success(() -> $scope.user.betaProgram = true)
-				.error((err) -> console.error("Error", err); $scope.enableBetaError = true)
+				.then(() -> $scope.user.betaProgram = true)
+				.catch((response) -> console.error("Error", response.data); $scope.enableBetaError = true)
 
 		$scope.disableBetaForUser = () ->
 			$scope.enableBetaError = false
@@ -41,8 +41,8 @@ define [
 				data:
 					beta: false
 			})
-				.success(() -> $scope.user.betaProgram = false)
-				.error((err) -> console.error("Error", err); $scope.enableBetaError = true)
+				.then(() -> $scope.user.betaProgram = false)
+				.catch((response) -> console.error("Error", response.data); $scope.enableBetaError = true)
 
 		$scope.clearSearchText = () ->
 			$scope.searchText = ""
