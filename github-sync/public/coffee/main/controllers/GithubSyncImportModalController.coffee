@@ -11,21 +11,24 @@ define [
 		}
 		
 		$http.get("/user/github-sync/status", { disableAutoLoginRedirect: true })
-			.success (user) ->
+			.then (response) ->
+				user = response.data
 				$scope.status.user = user
 				if !user.enabled
 					$scope.status.loading = false
 				else
 					$http.get("/user/github-sync/repos", { disableAutoLoginRedirect: true })
-						.success (data) ->
+						.then (response) ->
+							{ data } = response
 							$scope.status.loading = false
 							$scope.status.repos = data.repos
-						.error (data, statusCode) ->
-							if statusCode?
-								$scope.status.error = { statusCode }
+						.catch (response) ->
+							{ data, status } = response
+							if status?
+								$scope.status.error = { status }
 							else
 								$scope.status.error = true
-			.error () ->
+			.catch () ->
 				$scope.status.error = true
 				
 		$scope.importRepo = (repo) ->
@@ -37,13 +40,15 @@ define [
 					repo: repo.full_name
 					disableAutoLoginRedirect: true
 				})
-				.success (data) ->
+				.then (response) ->
+					{ data } = response
 					project_id = data.project_id
 					window.location = "/project/#{project_id}"
-				.error (data, statusCode) ->
+				.catch (response) ->
+					{ data, status } = response
 					$scope.status.inflight = false
-					if statusCode?
-						$scope.status.error = { statusCode }
+					if status?
+						$scope.status.error = { status }
 					else
 						$scope.status.error = true
 					
