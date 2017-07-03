@@ -28,11 +28,11 @@ define [
 				.post("/project/#{projectId}/template/publish", {
 					_csrf: window.csrfToken
 				})
-				.success () ->
+				.then () ->
 					$scope.state.republishInFlight = false
 					$scope.state.apiProblem = false
 					$window.location.reload()  # Reload this page
-				.error () ->
+				.catch () ->
 					$scope.state.republishInFlight = false
 					$scope.state.apiProblem = false
 
@@ -42,7 +42,7 @@ define [
 				.post("/project/#{projectId}/template/unpublish", {
 					_csrf: window.csrfToken
 				})
-				.success () ->
+				.then () ->
 					$scope.state.unpublishInFlight = false
 					$scope.state.apiProblem = false
 					$timeout(
@@ -51,7 +51,7 @@ define [
 						,
 						500
 					)
-				.error () ->
+				.catch () ->
 					$scope.state.unpublishInFlight = false
 					# TODO: error handling
 					console.log '>> unpub failed'
