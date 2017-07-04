@@ -27,12 +27,18 @@ describe "TrackChanges TrackChangesController", ->
 			@project_id = "mock-project-id"
 			@req.params = { @project_id }
 			@TrackChangesManager.setTrackChangesState = sinon.stub().yields()
+			@TrackChangesManager.getTrackChangesState = sinon.stub().yields()
 			@EditorRealTimeController.emitToRoom = sinon.stub().yields()
 
 		describe "when turning on for all users", ->
 			beforeEach ->
 				@req.body = { on: true }
 				@TrackChangesController.setTrackChangesState @req, @res, @next
+
+			it "should call getTrackChangesState to get the current state", ->
+				@TrackChangesManager.getTrackChangesState
+					.calledWith @project_id
+					.should.equal true
 
 			it "should call setTrackChangesState with the state", ->
 				@TrackChangesManager.setTrackChangesState
@@ -49,20 +55,41 @@ describe "TrackChanges TrackChangesController", ->
 		
 		describe "when turning on for some users", ->
 			beforeEach ->
-				@user_id = "aaaabbbbccccddddeeeeffff"
-				@state = {}
-				@state[@user_id] = true
-				@req.body = { on_for: @state }
+				@updated_user_id = "e4b2a7ae4b2a7ae4b2a7ae4b"
+				@existing_user1_id = "3a8dca4c3a8dca4c3a8dca4c"
+				@existing_user2_id = "253d177253d177253d177253"
+
+				@update = {}
+				@update[@updated_user_id] = true
+
+				@existing_state = {}
+				@existing_state[@updated_user_id] = false
+				@existing_state[@existing_user1_id] = true
+				@existing_state[@existing_user2_id] = false
+				
+				@expected_state = {}
+				@expected_state[@updated_user_id] = true
+				@expected_state[@existing_user1_id] = true
+				@expected_state[@existing_user2_id] = false
+
+				@req.body = { on_for: @update }
+
+				@TrackChangesManager.getTrackChangesState = sinon.stub().yields(null, @existing_state)
 				@TrackChangesController.setTrackChangesState @req, @res, @next
 
-			it "should call setTrackChangesState with the state", ->
+			it "should call getTrackChangesState to get the current state", ->
+				@TrackChangesManager.getTrackChangesState
+					.calledWith @project_id
+					.should.equal true
+
+			it "should call setTrackChangesState with the updated state", ->
 				@TrackChangesManager.setTrackChangesState
-					.calledWith @project_id, @state
+					.calledWith @project_id, @expected_state
 					.should.equal true
 			
 			it "should emit the new state to the clients", ->
 				@EditorRealTimeController.emitToRoom
-					.calledWith @project_id, "toggle-track-changes", @state
+					.calledWith @project_id, "toggle-track-changes", @expected_state
 					.should.equal true
 			
 			it "should return a 204 response code", ->
@@ -79,7 +106,7 @@ describe "TrackChanges TrackChangesController", ->
 				@TrackChangesController.setTrackChangesState @req, @res, @next
 				@res.send.calledWith(400).should.equal true
 
-			it "should reject non-true values", ->
+			it "should reject non-boolean values", ->
 				@req.body = { on_for: { "aaaabbbbccccddddeeeeffff": "bar" }}
 				@TrackChangesController.setTrackChangesState @req, @res, @next
 				@res.send.calledWith(400).should.equal true
