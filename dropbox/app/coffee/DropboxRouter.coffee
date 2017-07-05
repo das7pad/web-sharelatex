@@ -14,6 +14,5 @@ module.exports =
 		
 		webRouter.get '/project/:Project_id/dropbox/status', AuthorizationMiddlewear.ensureUserCanAdminProject, DropboxProjectController.getStatus
 
-	applyNonCsrfRouter: (webRouter, privateApiRouter, publicApiRouter) ->
 		publicApiRouter.get  '/dropbox/webhook', DropboxWebhookController.verify
 		publicApiRouter.post '/dropbox/webhook', DropboxWebhookController.webhook
