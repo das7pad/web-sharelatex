@@ -5,7 +5,7 @@ DropboxMiddlewear = require "./DropboxMiddlewear"
 AuthorizationMiddlewear = require "../../../../app/js/Features/Authorization/AuthorizationMiddlewear"
 
 module.exports =
-	apply: (webRouter, apiRouter) ->
+	apply: (webRouter, privateApiRouter, publicApiRouter) ->
 		webRouter.get  '/user/settings', DropboxMiddlewear.injectUserSettings
 		
 		webRouter.get  '/dropbox/beginAuth', DropboxUserController.redirectUserToDropboxAuth
@@ -14,6 +14,5 @@ module.exports =
 		
 		webRouter.get '/project/:Project_id/dropbox/status', AuthorizationMiddlewear.ensureUserCanAdminProject, DropboxProjectController.getStatus
 
-	applyNonCsrfRouter: (webRouter, apiRouter) ->
-		webRouter.get  '/dropbox/webhook', DropboxWebhookController.verify
-		webRouter.post '/dropbox/webhook', DropboxWebhookController.webhook
+		publicApiRouter.get  '/dropbox/webhook', DropboxWebhookController.verify
+		publicApiRouter.post '/dropbox/webhook', DropboxWebhookController.webhook
