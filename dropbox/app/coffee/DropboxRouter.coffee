@@ -12,9 +12,8 @@ module.exports =
 		webRouter.get  '/dropbox/completeRegistration', DropboxUserController.completeDropboxRegistration
 		webRouter.get  '/dropbox/unlink', DropboxUserController.unlinkDropbox
 		
-		webRouter.get  '/dropbox/webhook', DropboxWebhookController.verify
-		webRouter.post '/dropbox/webhook', DropboxWebhookController.webhook
-
 		webRouter.get '/project/:Project_id/dropbox/status', AuthorizationMiddlewear.ensureUserCanAdminProject, DropboxProjectController.getStatus
 
-
+	applyNonCsrfRouter: (webRouter, apiRouter) ->
+		webRouter.get  '/dropbox/webhook', DropboxWebhookController.verify
+		webRouter.post '/dropbox/webhook', DropboxWebhookController.webhook
