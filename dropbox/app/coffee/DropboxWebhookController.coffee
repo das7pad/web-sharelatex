@@ -3,9 +3,11 @@ DropboxWebhookHandler = require("./DropboxWebhookHandler")
 
 module.exports = DropboxWebhookController =
 	verify: (req, res, next = (error) ->) ->
+		req.session?.destroy() # don't create sessions for dropbox polling
 		res.send(req.query.challenge)
 		
 	webhook: (req, res, next = (error) ->) ->
+		req.session?.destroy() # don't create sessions for dropbox polling
 		dropbox_uids = req.body?.delta?.users
 		logger.log dropbox_uids: dropbox_uids, "received webhook request from Dropbox"
 		if !dropbox_uids?
