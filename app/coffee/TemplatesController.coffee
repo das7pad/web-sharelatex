@@ -26,7 +26,7 @@ module.exports =
 		writeStream = fs.createWriteStream(dumpPath)
 		zipUrl = req.session.templateData.zipUrl
 		if zipUrl.slice(0,12).indexOf("templates") == -1
-			zipUrl = "#{settings.apis.web.url}#{zipUrl}"
+			zipUrl = "#{settings.siteUrl}#{zipUrl}"
 		else
 			zipUrl = "#{settings.apis.templates.url}#{zipUrl}"
 		zipReq = request(zipUrl)
