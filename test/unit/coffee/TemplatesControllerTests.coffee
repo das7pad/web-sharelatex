@@ -44,7 +44,7 @@ describe 'TemplatesController', ->
 			"settings-sharelatex":
 				path:
 					dumpFolder:@dumpFolder
-				siteUrl: "http://localhost:3000"
+				siteUrl: @siteUrl = "http://localhost:3000"
 				apis:
 					templates:
 						url: @templateApiUrl="http://templates.sharelatex.env"
@@ -80,7 +80,7 @@ describe 'TemplatesController', ->
 		it "should go to the web api if the url does not contain templates", (done)->
 			@req.session.templateData.zipUrl = @zipUrl = "/project/52fd24abf080d80a22000fbd/download/zip&templateName=Example_Project&compiler=xelatex"
 			redirect = =>
-				@request.calledWith("#{@webApiUrl}#{@zipUrl}").should.equal true
+				@request.calledWith("#{@siteUrl}#{@zipUrl}").should.equal true
 				done()
 			res = redirect:redirect
 			@controller.createProjectFromZipTemplate @req, res
@@ -88,7 +88,7 @@ describe 'TemplatesController', ->
 		it "should go to the web api if the url has template futher down the string", (done)->
 			@req.session.templateData.zipUrl = @zipUrl = "/project/52fd24abf080d80a22000fbd/download/zip&templateName=templates&compiler=xelatex"
 			redirect = =>
-				@request.calledWith("#{@webApiUrl}#{@zipUrl}").should.equal true
+				@request.calledWith("#{@siteUrl}#{@zipUrl}").should.equal true
 				done()
 			res = redirect:redirect
 			@controller.createProjectFromZipTemplate @req, res
