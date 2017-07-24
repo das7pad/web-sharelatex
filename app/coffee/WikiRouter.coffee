@@ -10,7 +10,7 @@ module.exports =
 
 		if settings.apis.wiki?.url? or settings.proxyLearn
 			#used for images onsite installs
-			webRouter.get /^\/learn-scripts/, RateLimiterMiddlewear.rateLimit({
+			webRouter.get /^\/learn-scripts\/images/, RateLimiterMiddlewear.rateLimit({
 				endpointName: "wiki"
 				params: []
 				maxRequests: 60
