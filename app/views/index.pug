@@ -48,7 +48,7 @@ block content
 							each template in tag.exampleTemplates
 								.col-md-3.template-thumbnail
 									a(href=template.templatePagePath ? template.templatePagePath : template.canonicalUrl).thumbnail
-										img(src=template.thumbnailUrl)
+										img(ng-src=template.thumbnailUrl)
 										div.caption
 											h3.txt-middle #{template.name}
 
