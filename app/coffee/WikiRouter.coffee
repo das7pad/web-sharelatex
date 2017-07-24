@@ -17,7 +17,7 @@ module.exports =
 				timeInterval: 60
 			}), WikiController.proxy
 
-			webRouter.get /^\/learn/, RateLimiterMiddlewear.rateLimit({
+			webRouter.get /^\/learn\//, RateLimiterMiddlewear.rateLimit({
 				endpointName: "wiki"
 				params: []
 				maxRequests: 60
