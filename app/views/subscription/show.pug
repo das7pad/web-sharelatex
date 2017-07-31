@@ -10,7 +10,8 @@ block content
 	.content.content-alt(ng-controller="AdminSubscriptionController")
 		.container(ng-cloak)
 			p
-				strong Users
+				strong
+					a(href="/admin/user") Users
 				| &nbsp;&gt;&nbsp;
 				strong 
 					a(href="/admin/user/" + user_id)= user_id
