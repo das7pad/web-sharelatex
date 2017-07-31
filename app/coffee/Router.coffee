@@ -14,6 +14,7 @@ module.exports =
 		adminRouter.get    "/user",          UserController.index
 		adminRouter.post   "/user/search",   UserController.search
 		adminRouter.get    "/user/:user_id", UserController.show
+		adminRouter.post   "/user/:user_id", UserController.update
 		adminRouter.delete "/user/:user_id", UserController.delete
 		adminRouter.post   "/user/:user_id/setBetaStatus", UserController.setBetaStatus
 		

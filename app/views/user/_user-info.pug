@@ -1,9 +1,7 @@
-
-.card
-	h2(style="margin-top: 0") User Info
-
-	p
-		table.table.table-striped.table-condensed
+p
+	form(async-form="adminUser", name="adminUserForm", method="POST", action="/admin/user/" + user._id, novalidate)
+		input(type="hidden", name="_csrf", value=csrfToken)
+		table.table.table-striped.table-bordered
 			tr
 				td
 					label ID
@@ -15,34 +13,154 @@
 				td {{ user.email }}
 
 			tr
-				td
-					label #{translate("first_name")}
-				td {{ user.first_name }}
+				th(colspan=2).text-center Profile
 
 			tr
 				td
-					label #{translate("last_name")}
-				td {{ user.last_name }}
+					label(for="first_name") #{translate("first_name")}
+				td
+					input#first_name.form-control(
+						name='first_name',
+						placeholder="Jane"
+						ng-model="user.first_name"
+					)
 
-	h2 #{translate("actions")}
-	
-	//- Beta program
-	p
-		div(ng-if="user.betaProgram")
-			a.btn.btn-default(ng-click="disableBetaForUser()")
-				span #{translate("disable_beta")}
-		div(ng-if="!user.betaProgram")
-			a.btn.btn-default(ng-click="enableBetaForUser()")
-				span #{translate("enable_beta")}
-		div.small.alert.alert-danger(ng-if="enableBetaError")
-			| #{translate("error")}
+			tr
+				td
+					label(for="last_name") #{translate("last_name")}
+				td
+					input#last_name.form-control(
+						name='last_name',
+						placeholder="Smith"
+						ng-model="user.last_name"
+					)
 
-	p
-		a.btn.btn-danger(
-			href='#',
-			tooltip-placement="bottom",
-			tooltip-append-to-body="true",
-			ng-click="openDeleteUserModal()"
-		)
-			i.fa.fa-trash-o
-			| &nbsp; #{translate('delete')} #{translate('user')}
+			tr
+				th(colspan=2).text-center
+					| Features
+					span.small
+						| &nbsp;(Change to:&nbsp;
+						a(href, ng-click="user.features = {collaborators: 1, versioning: false, dropbox: false, github: false, compileTimeout: 60, compileGroup: 'standard', templates: false, trackChanges: false, references: false}") Free
+						| &nbsp;&middot;&nbsp;
+						a(href, ng-click="user.features = {collaborators: 10, versioning: true, dropbox: true, github: true, compileTimeout: 180, compileGroup: 'priority', templates: true, trackChanges: true, references: true}") Collab.
+						| &nbsp;&middot;&nbsp;
+						a(href, ng-click="user.features = {collaborators: -1, versioning: true, dropbox: true, github: true, compileTimeout: 180, compileGroup: 'priority', templates: true, trackChanges: true, references: true}") Pro.
+						| )
+
+			tr
+				td
+					label(for="collaborators") Collaborators
+				td
+					input#collaborators(
+						name="features.collaborators"
+						ng-model="user.features.collaborators"
+					)
+
+			tr
+				td
+					label(for="versioning") Versioning
+				td
+					input#versioning(
+						type="checkbox"
+						name="features.versioning"
+						ng-model="user.features.versioning"
+					)
+
+			tr
+				td
+					label(for="dropbox") Dropbox
+				td
+					input#dropbox(
+						type="checkbox"
+						name="features.dropbox"
+						ng-model="user.features.dropbox"
+					)
+
+			tr
+				td
+					label(for="github") GitHub
+				td
+					input#github(
+						type="checkbox"
+						name="features.github"
+						ng-model="user.features.github"
+					)
+
+			tr
+				td
+					label(for="compileTimeout") Compile Timeout
+				td
+					input#compileTimeout(
+						name="features.compileTimeout"
+						ng-model="user.features.compileTimeout"
+					)
+
+			tr
+				td
+					label(for="compileGroup") Compile Group
+				td
+					input#compileGroup(
+						name="features.compileGroup"
+						ng-model="user.features.compileGroup"
+					)
+
+			tr
+				td
+					label(for="templates") Templates
+				td
+					input#templates(
+						type="checkbox"
+						name="features.templates"
+						ng-model="user.features.templates"
+					)
+
+			tr
+				td
+					label(for="trackChanges") Track Changes
+				td
+					input#trackChanges(
+						type="checkbox"
+						name="features.trackChanges"
+						ng-model="user.features.trackChanges"
+					)
+
+			tr
+				td
+					label(for="references") References
+				td
+					input#references(
+						type="checkbox"
+						name="features.references"
+						ng-model="user.features.references"
+					)
+
+			tr
+				th(colspan=2).text-center Misc.
+			
+			tr
+				td
+					label(for="betaProgram") Beta Program
+				td
+					input#betaProgram(
+						type="checkbox"
+						name="betaProgram"
+						ng-model="user.betaProgram"
+					)
+
+		form-messages(for="adminUserForm")
+			.alert.alert-success(ng-show="adminUserForm.response.success && !adminUserForm.inflight")
+				| User was successfully updated
+		button.btn.btn-primary(type='submit', ng-disabled="adminUserForm.inflight")
+			span(ng-show="!adminUserForm.inflight") Save
+			span(ng-show="adminUserForm.inflight") Saving...
+
+h2 #{translate("actions")}
+p
+	a.btn.btn-danger(
+		href='#',
+		tooltip-placement="bottom",
+		tooltip-append-to-body="true",
+		ng-click="openDeleteUserModal()"
+	)
+		i.fa.fa-trash-o
+		| &nbsp; #{translate('delete')} #{translate('user')}

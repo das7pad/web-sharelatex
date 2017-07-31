@@ -9,11 +9,15 @@ block content
 
 	.content.content-alt(ng-controller="AdminUserController")
 		.container(ng-cloak)
-			.row
-				aside.col-md-4
+			p
+				strong
+					a(href="/admin/user") Users
+				| &nbsp;&gt;&nbsp;
+				strong {{ user.email }}
+			tabset
+				tab(heading="User Info")
 					include ./_user-info
-
-				.col-md-8
+				tab(heading="Projects")
 					include ./_project-list
 
 		include ../../../../../app/views/project/list/modals

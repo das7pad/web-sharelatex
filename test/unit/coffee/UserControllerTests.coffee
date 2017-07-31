@@ -50,6 +50,8 @@ describe "UserController", ->
 
 		@db.users.count = sinon.stub().callsArgWith(1, null, @users.length)
 
+		@db.users.update = sinon.stub().yields()
+
 		@db.projects.find = sinon.stub().callsArgWith(2, null, @projects)
 
 		@UserGetter.getUser = (user_id, fields, callback) =>
@@ -223,3 +225,76 @@ describe "UserController", ->
 						code.should.equal 500
 						done()
 					@UserController.setBetaStatus @req, @res
+
+	describe "update", ->
+		beforeEach ->
+			@req.params =
+				user_id: @user_id = ObjectId().toString()
+			@res.sendStatus = sinon.stub()
+
+		describe "successfully", ->
+			beforeEach ->
+				@req.body =
+					first_name: "James"
+				@UserController.update @req, @res
+
+			it "should call db.users.update with the updated attributes", ->
+				@db.users.update
+					.calledWith({_id: ObjectId(@user_id)})
+					.should.equal true
+				updateQuery = @db.users.update.args[0][1]
+				updateQuery.$set.first_name.should.equal "James"
+			
+		describe "with attributes of the wrong type", ->
+			beforeEach ->
+				@req.body =
+					first_name: 100
+				@UserController.update @req, @res
+
+			it "should return 400", ->
+				@res.sendStatus.calledWith(400).should.equal true
+			
+			it "should not update the db", ->
+				@db.users.update.called.should.equal false
+			
+		describe "with unknown attribute", ->
+			beforeEach ->
+				@req.body =
+					foo_bar: 100
+				@UserController.update @req, @res
+
+			it "should ignore the attribute", ->
+				@db.users.update
+					.calledWith({_id: ObjectId(@user_id)})
+					.should.equal true
+				updateQuery = @db.users.update.args[0][1]
+				expect(updateQuery.$set.foo_bar).to.equal undefined
+		
+		describe "with boolean attribute set to 'on'", ->
+			beforeEach ->
+				@req.body =
+					'features.versioning': 'on'
+				@UserController.update @req, @res
+
+			it "should set the attribute to true", ->
+				updateQuery = @db.users.update.args[0][1]
+				expect(updateQuery.$set['features.versioning']).to.equal true
+			
+		describe "with missing boolean attribute", ->
+			beforeEach ->
+				@req.body = {}
+				@UserController.update @req, @res
+
+			it "should set the attribute to false", ->
+				updateQuery = @db.users.update.args[0][1]
+				expect(updateQuery.$set['features.versioning']).to.equal false
+		
+		describe "with number attribute", ->
+			beforeEach ->
+				@req.body =
+					'features.compileTimeout': '100'
+				@UserController.update @req, @res
+
+			it "should cast the attribute to a number", ->
+				updateQuery = @db.users.update.args[0][1]
+				expect(updateQuery.$set['features.compileTimeout']).to.equal 100

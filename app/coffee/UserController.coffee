@@ -12,6 +12,44 @@ db = mongojs.db
 ObjectId = mongojs.ObjectId
 
 module.exports = UserController =
+	ATTRIBUTES: [{
+		name: 'betaProgram',
+		type: 'boolean'
+	}, {
+		name: 'first_name',
+		type: 'string'
+	}, {
+		name: 'last_name',
+		type: 'string'
+	}, {
+		name: 'features.collaborators'
+		type: 'number'
+	}, {
+		name: 'features.versioning'
+		type: 'boolean'
+	}, {
+		name: 'features.dropbox'
+		type: 'boolean'
+	}, {
+		name: 'features.github'
+		type: 'boolean'
+	}, {
+		name: 'features.compileTimeout'
+		type: 'number'
+	}, {
+		name: 'features.compileGroup'
+		type: 'string'
+	}, {
+		name: 'features.templates'
+		type: 'boolean'
+	}, {
+		name: 'features.trackChanges'
+		type: 'boolean'
+	}, {
+		name: 'features.references'
+		type: 'boolean'
+	}]
+
 	perPage: 5
 	perSearch: 15
 
@@ -47,7 +85,7 @@ module.exports = UserController =
 
 	show: (req, res, next)->
 		logger.log "getting admin request for user info"
-		UserGetter.getUser req.params.user_id, { _id:1, first_name:1, last_name:1, email:1, betaProgram:1}, (err, user) ->
+		UserGetter.getUser req.params.user_id, { _id:1, first_name:1, last_name:1, email:1, betaProgram:1, features: 1}, (err, user) ->
 			db.projects.find {owner_ref:ObjectId(req.params.user_id)}, {name:1, lastUpdated:1, publicAccesLevel:1, archived:1, owner_ref:1}, (err, projects) ->
 					if err?
 						return next(err)
@@ -61,6 +99,29 @@ module.exports = UserController =
 				res.sendStatus 500
 			else
 				res.sendStatus 200
+
+	update: (req, res, net) ->
+		user_id = req.params.user_id
+		updateParams = { $set: {} }
+		for attribute in UserController.ATTRIBUTES
+			# Unticked checkboxes are not submitted
+			if attribute.type == "boolean" and !req.body[attribute.name]? 
+				req.body[attribute.name] = false
+			# Value of a checkbox is 'on'
+			if attribute.type == "boolean" and req.body[attribute.name] == "on"
+				req.body[attribute.name] = true
+			# Cast strings to numbers
+			if attribute.type == "number" and req.body[attribute.name]?
+				req.body[attribute.name] = parseInt(req.body[attribute.name], 10)
+
+			if req.body[attribute.name]?
+				if typeof req.body[attribute.name] == attribute.type
+					updateParams.$set[attribute.name] = req.body[attribute.name]
+				else
+					return res.sendStatus 400
+		db.users.update {_id: ObjectId(user_id)}, updateParams, (error) ->
+			return next(error) if error?
+			res.sendStatus 204
 
 	setBetaStatus: (req, res) ->
 		user_id = req.params.user_id
