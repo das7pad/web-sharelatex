@@ -1,8 +1,8 @@
 .row
-	.col-xs-12
+	.col-md-9
 		form.project-search.form-horizontal(role="form")
-			.form-group.has-feedback.has-feedback-left.col-md-7.col-xs-12
-				input.form-control.col-md-7.col-xs-12(
+			.form-group.has-feedback.has-feedback-left.col-md-8.col-xs-12
+				input.form-control.col-md-8.col-xs-12(
 					placeholder=translate('search_projects')+"…",
 					autofocus='autofocus',
 					ng-model="searchText",
@@ -27,6 +27,9 @@
 						ng-click="openArchiveProjectsModal()"
 					)
 						i.fa.fa-trash-o
+	.col-md-3.text-right
+		a.btn.btn-default.btn-sm(href="/admin/user/graph/{{user._id}}?level=1") View Project Graph
+
 
 .row.row-spaced
 	.col-xs-12

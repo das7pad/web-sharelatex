@@ -2,21 +2,21 @@ sinon = require('sinon')
 chai = require('chai')
 should = chai.should()
 expect = chai.expect
-modulePath = "../../../app/js/AdminController.js"
+modulePath = "../../../app/js/UserController.js"
 SandboxedModule = require('sandboxed-module')
 events = require "events"
 ObjectId = require("mongojs").ObjectId
 assert = require("assert")
 Path = require "path"
 
-describe "AdminController", ->
+describe "UserController", ->
 	beforeEach ->
 
 		@UserGetter =
 			getUser: sinon.stub()
 
 		@UserDeleter =
-			deleteUser: sinon.stub().callsArgWith(1)
+			delete: sinon.stub().callsArgWith(1)
 
 		@AuthenticationManager =
 			setUserPassword: sinon.stub()
@@ -25,7 +25,7 @@ describe "AdminController", ->
 			optIn: sinon.stub().callsArgWith(1, null)
 			optOut: sinon.stub().callsArgWith(1, null)
 
-		@AdminController = SandboxedModule.require modulePath, requires:
+		@UserController = SandboxedModule.require modulePath, requires:
 			"logger-sharelatex":
 				log:->
 				err:->
@@ -44,7 +44,7 @@ describe "AdminController", ->
 		@user = {user_id:1,first_name:'James'}
 		@users = [{first_name:'James'}, {first_name:'Henry'}]
 		@projects = [{lastUpdated:1, _id:1, owner_ref: "user-1"}, {lastUpdated:2, _id:2, owner_ref: "user-2"}]
-		@perPage = @AdminController.perPage
+		@perPage = @UserController.perPage
 
 		@db.users.find = sinon.stub().callsArgWith(3, null, @users)
 
@@ -63,27 +63,27 @@ describe "AdminController", ->
 			locals:
 				jsPath:"js path here"
 
-	describe "listUsers", ->
+	describe "index", ->
 
-		it "should render the admin/listUsers page", (done)->
+		it "should render the admin/index page", (done)->
 			@res.render = (pageName, opts)=>
-				pageName.should.equal  Path.resolve(__dirname + "/../../../")+ "/app/views/listUsers"
+				pageName.should.equal  Path.resolve(__dirname + "/../../../")+ "/app/views/index"
 				done()
-			@AdminController.listUsers @req, @res
+			@UserController.index @req, @res
 
 		it "should send the users", (done)->
 			@res.render = (pageName, opts)=>
 				opts.users.should.deep.equal @users
 				done()
-			@AdminController.listUsers @req, @res
+			@UserController.index @req, @res
 
 		it "should send the pages", (done)->
 			@res.render = (pageName, opts)=>
 				opts.pages.should.equal Math.ceil(@users.length / @perPage)
 				done()
-			@AdminController.listUsers @req, @res
+			@UserController.index @req, @res
 
-	describe "searchUsers", ->
+	describe "search", ->
 
 		beforeEach ->
 
@@ -99,16 +99,16 @@ describe "AdminController", ->
 				code.should.equal 200
 				json.users.should.deep.equal @users
 				done()
-			@AdminController.searchUsers @req, @res
+			@UserController.search @req, @res
 
 		it "should send the pages", (done)->
 			@res.send = (code, json)=>
 				code.should.equal 200
 				json.pages.should.equal Math.ceil(@users.length / @perPage)
 				done()
-			@AdminController.searchUsers @req, @res
+			@UserController.search @req, @res
 
-	describe "getUserInfo", ->
+	describe "show", ->
 
 		beforeEach ->
 
@@ -120,56 +120,32 @@ describe "AdminController", ->
 			@res.render = (pageName, opts)=>
 				pageName.should.equal  Path.resolve(__dirname + "/../../../")+ "/app/views/userInfo"
 				done()
-			@AdminController.getUserInfo @req, @res
+			@UserController.show @req, @res
 
 		it "should send the user", (done)->
 			@res.render = (pageName, opts)=>
 				opts.user.should.deep.equal @user
 				done()
-			@AdminController.getUserInfo @req, @res
+			@UserController.show @req, @res
 
 		it "should send the user projects", (done)->
 			@res.render = (pageName, opts)=>
 				opts.projects.should.deep.equal @projects
 				done()
-			@AdminController.getUserInfo @req, @res
+			@UserController.show @req, @res
 
-	describe "deleteUser", ->
+	describe "delete", ->
 
 		it "should delete the user", (done)->
 			@req =
 				params:
 					user_id: 'user_id_here'
-			@UserDeleter.deleteUser.calledWith(1)
+			@UserDeleter.delete.calledWith(1)
 			@res.sendStatus = (code)=>
-				@UserDeleter.deleteUser.calledWith('user_id_here').should.equal true
+				@UserDeleter.delete.calledWith('user_id_here').should.equal true
 				code.should.equal 200
 				done()
-			@AdminController.deleteUser @req, @res
-
-	describe "setUserPassword", ->
-
-		beforeEach ->
-
-			@req =
-				body:
-					newPassword: 'my great secret password'
-				params:
-					user_id: 'user_id_here'
-
-		it "should set the user password", (done)->
-			@AuthenticationManager.setUserPassword.callsArgWith(2)
-			@res.sendStatus = (code)=>
-				code.should.equal 200
-				done()
-			@AdminController.setUserPassword @req, @res
-
-		it "should set the user id", (done)->
-			@AuthenticationManager.setUserPassword.callsArgWith(2)
-			@res.sendStatus = (code)=>
-				@AuthenticationManager.setUserPassword.calledWith('user_id_here', 'my great secret password').should.equal true
-				done()
-			@AdminController.setUserPassword @req, @res
+			@UserController.delete @req, @res
 
 	describe "setBetaStatus", ->
 
@@ -188,20 +164,20 @@ describe "AdminController", ->
 				@res.sendStatus = (code)=>
 					code.should.equal 200
 					done()
-				@AdminController.setBetaStatus @req, @res
+				@UserController.setBetaStatus @req, @res
 
 			it "should call BetaProgramHandler.optIn", (done) ->
 				@res.sendStatus = (code)=>
 					@BetaProgramHandler.optIn.callCount.should.equal 1
 					@BetaProgramHandler.optIn.calledWith('some_id').should.equal true
 					done()
-				@AdminController.setBetaStatus @req, @res
+				@UserController.setBetaStatus @req, @res
 
 			it "should not call BetaProgramHandler.optOut", (done) ->
 				@res.sendStatus = (code)=>
 					@BetaProgramHandler.optOut.callCount.should.equal 0
 					done()
-				@AdminController.setBetaStatus @req, @res
+				@UserController.setBetaStatus @req, @res
 
 			describe "when BetaProgramHandler.optIn produces an error", ->
 
@@ -212,7 +188,7 @@ describe "AdminController", ->
 					@res.sendStatus = (code)=>
 						code.should.equal 500
 						done()
-					@AdminController.setBetaStatus @req, @res
+					@UserController.setBetaStatus @req, @res
 
 		describe "when beta=false", ->
 
@@ -223,20 +199,20 @@ describe "AdminController", ->
 				@res.sendStatus = (code)=>
 					code.should.equal 200
 					done()
-				@AdminController.setBetaStatus @req, @res
+				@UserController.setBetaStatus @req, @res
 
 			it "should call BetaProgramHandler.optOut", (done) ->
 				@res.sendStatus = (code)=>
 					@BetaProgramHandler.optOut.callCount.should.equal 1
 					@BetaProgramHandler.optOut.calledWith('some_id').should.equal true
 					done()
-				@AdminController.setBetaStatus @req, @res
+				@UserController.setBetaStatus @req, @res
 
 			it "should not call BetaProgramHandler.optIn", (done) ->
 				@res.sendStatus = (code)=>
 					@BetaProgramHandler.optIn.callCount.should.equal 0
 					done()
-				@AdminController.setBetaStatus @req, @res
+				@UserController.setBetaStatus @req, @res
 
 			describe "when BetaProgramHandler.optOut produces an error", ->
 
@@ -247,4 +223,4 @@ describe "AdminController", ->
 					@res.sendStatus = (code)=>
 						code.should.equal 500
 						done()
-					@AdminController.setBetaStatus @req, @res
+					@UserController.setBetaStatus @req, @res

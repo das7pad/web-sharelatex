@@ -3,7 +3,7 @@ define [
 	"libs/md5"
 ], (App) ->
 
-	App.controller "AdminProjectController", ($scope, $timeout, $modal, queuedHttp) ->
+	App.controller "AdminUserController", ($scope, $timeout, $modal, queuedHttp) ->
 		$scope.user = window.data.user
 		$scope.projects = window.data.projects
 		$scope.user.gravatar =  CryptoJS.MD5($scope.user.email).toString()
@@ -120,25 +120,6 @@ define [
 					, 100
 				)
 			)
-
-
-		# Set user password
-		$scope.openSetPasswordModal = () ->
-			modalInstance = $modal.open(
-				templateUrl: "setPasswordModalTemplate"
-				controller: "SetPasswordModalController"
-				resolve:
-					user: () -> $scope.user
-			)
-			modalInstance.result.then(
-				(newPassword) ->
-					$scope.SetUserPassword(newPassword)
-			)
-		$scope.SetUserPassword = (newPassword) ->
-			queuedHttp.post "/admin/user/#{$scope.user._id}/setPassword", {
-				newPassword: newPassword
-				_csrf: window.csrfToken
-			}
 
 		$scope.updateVisibleProjects = () ->
 			$scope.visibleProjects = []

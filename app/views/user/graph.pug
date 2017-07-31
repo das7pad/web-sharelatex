@@ -1,4 +1,4 @@
-extends ../../../../app/views/layout
+extends ../../../../../app/views/layout
 
 block scripts
 	//sigma does not play well with requirejs, just hard linking it #HO
@@ -17,16 +17,18 @@ block content
 
 	.content.content-alt(ng-controller="AdminGraphController")
 		.container(ng-cloak)
-			.row
-				aside.col-md-3.col-xs-3
-					include ./user/side-info
-
-				.col-md-9.col-xs-9
-					ul.nav.nav-pills
-						li.btn.disabled {{user.first_name}} Graph
-						li
-							.dropdown
-								button.btn.btn-default.dropdown-toggle Graph Level
+			.card.card-thin
+				.container-fluid
+					.row
+						.col-md-8
+							h2(style="margin-top: 0")
+								a(href="/admin/user/{{user._id}}") {{user.email}}
+								| &nbsp;&gt;
+								| Graph
+								| &nbsp;
+						.col-md-4.text-right
+							span.dropdown(dropdown)
+								button.btn.btn-default.dropdown-toggle(dropdown-toggle) Graph Level
 									span 
 										b.caret
 								ul.dropdown-menu(role="menu")
@@ -36,8 +38,8 @@ block content
 									)
 										a(
 											href="/admin/user/graph/{{user._id}}?level={{n}}", 
-										) {{n}} Level
-					.card.card-thin.row.row-spaced
-						#graph(style="max-width: 100%; height: 450px;")
+										) Level {{n}}
+					hr(style="margin: 12px 0")
+					#graph(style="max-width: 100%; height: 450px;")
 
-		include ./user/graphModal
+		include ./_graphModal

@@ -1,0 +1,48 @@
+
+.card
+	h2(style="margin-top: 0") User Info
+
+	p
+		table.table.table-striped.table-condensed
+			tr
+				td
+					label ID
+				td {{ user._id }}
+
+			tr
+				td
+					label #{translate("email")}
+				td {{ user.email }}
+
+			tr
+				td
+					label #{translate("first_name")}
+				td {{ user.first_name }}
+
+			tr
+				td
+					label #{translate("last_name")}
+				td {{ user.last_name }}
+
+	h2 #{translate("actions")}
+	
+	//- Beta program
+	p
+		div(ng-if="user.betaProgram")
+			a.btn.btn-default(ng-click="disableBetaForUser()")
+				span #{translate("disable_beta")}
+		div(ng-if="!user.betaProgram")
+			a.btn.btn-default(ng-click="enableBetaForUser()")
+				span #{translate("enable_beta")}
+		div.small.alert.alert-danger(ng-if="enableBetaError")
+			| #{translate("error")}
+
+	p
+		a.btn.btn-danger(
+			href='#',
+			tooltip-placement="bottom",
+			tooltip-append-to-body="true",
+			ng-click="openDeleteUserModal()"
+		)
+			i.fa.fa-trash-o
+			| &nbsp; #{translate('delete')} #{translate('user')}

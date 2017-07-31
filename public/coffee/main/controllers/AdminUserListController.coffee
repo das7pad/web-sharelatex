@@ -2,7 +2,7 @@ define [
 	"base"
 ], (App) ->
 
-	App.controller "AdminPanelController", ($scope, $http, $timeout, $window, $modal, queuedHttp) ->
+	App.controller "AdminUserListController", ($scope, $http, $timeout, $window, $modal, queuedHttp) ->
 		$scope.users = window.data.users
 		$scope.pages = window.data.pages
 		$scope.allSelected = false

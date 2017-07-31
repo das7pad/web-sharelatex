@@ -1,4 +1,4 @@
-extends ../../../../app/views/layout
+extends ../../../../../app/views/layout
 
 block content
 	script#data(type="application/json").
@@ -7,13 +7,13 @@ block content
 	script(type="text/javascript").
 		window.data = JSON.parse($("#data").text());
 
-	.content.content-alt(ng-controller="AdminPanelController")
+	.content.content-alt(ng-controller="AdminUserListController")
 		.container(ng-cloak)
 			.row
 				aside.col-md-2.col-xs-3
-					include ./user/side-bar
+					include ./_side-bar
 
 				.col-md-10.col-xs-9
-					include ./user/user-list
+					include ./_user-list
 
-		include ./user/modals
+		include ./_modals

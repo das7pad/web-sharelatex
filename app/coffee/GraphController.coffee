@@ -7,7 +7,7 @@ db = mongojs.db
 ObjectId = mongojs.ObjectId
 sigmaGraph = require("./SigmaJSGraph")
 
-module.exports = AdminGraphController =
+module.exports = GraphController =
 	unknownName: 'unknown'
 
 	_nextLevel: (usersObjId, graphPrev, level, cb) ->
@@ -28,10 +28,10 @@ module.exports = AdminGraphController =
 		db.projects.find {$or : q}, {_id:1, owner_ref:1, readOnly_refs:1, collaberator_refs:1, name:1}, (err, relations) ->
 			if err?
 				return cb(err)
-			AdminGraphController._genGraph relations, usersObjId, graphPrev, (err, graphNext) ->
-				AdminGraphController._getNames graphNext, (err, graphNamed)->
+			GraphController._genGraph relations, usersObjId, graphPrev, (err, graphNext) ->
+				GraphController._getNames graphNext, (err, graphNamed)->
 					if level-1
-						AdminGraphController._nextLevel usersObjId, graphNamed, level-1, (err, graphLevel) ->
+						GraphController._nextLevel usersObjId, graphNamed, level-1, (err, graphLevel) ->
 							return cb(null, graphLevel)
 					else
 						return cb(null, graphNamed)
@@ -42,7 +42,7 @@ module.exports = AdminGraphController =
 		# usersObjId[0], seed user node : orange
 		readOnlyColor = collaberatorColor = ''
 		if usersObjId.length == 1
-			graph.addNode usersObjId[0], AdminGraphController.unknownName, '#FFA500'
+			graph.addNode usersObjId[0], GraphController.unknownName, '#FFA500'
 			readOnlyColor = '#0000FF'
 			collaberatorColor = '#458B00'
 
@@ -55,20 +55,20 @@ module.exports = AdminGraphController =
 
 			# readOnly user node: blue
 			for ref in edge.readOnly_refs
-				graph.addNode ref, AdminGraphController.unknownName, readOnlyColor
+				graph.addNode ref, GraphController.unknownName, readOnlyColor
 				projectNodes.push(ref.toString())
 				if ref.toString() == usersObjId[0]
 					ownerColor = readOnlyColor
 
 			# collaberator user node: green
 			for ref in edge.collaberator_refs
-				graph.addNode ref, AdminGraphController.unknownName, collaberatorColor
+				graph.addNode ref, GraphController.unknownName, collaberatorColor
 				projectNodes.push(ref.toString())
 				if ref.toString() == usersObjId[0]
 					ownerColor = collaberatorColor
 
 			# switch owner color depends on seed user permission in this project
-			graph.addNode edge.owner_ref, AdminGraphController.unknownName, ownerColor
+			graph.addNode edge.owner_ref, GraphController.unknownName, ownerColor
 			projectNodes.push(edge.owner_ref.toString())
 
 			# generate a complete graph for this project 
@@ -84,7 +84,7 @@ module.exports = AdminGraphController =
 		# create a list to get users name
 		usersObjId = []
 		for node in graph.nodes
-			if node.label == AdminGraphController.unknownName
+			if node.label == GraphController.unknownName
 				usersObjId.push(ObjectId(node.id))
 
 		db.users.find {_id : { $in : usersObjId } }, {first_name:1}, (err, users)->
@@ -107,8 +107,8 @@ module.exports = AdminGraphController =
 				Level = 1
 			else
 				Level = req.query.level
-			AdminGraphController._nextLevel [userObjId], sigmaGraph.new() , Level, (err, graph) ->
+			GraphController._nextLevel [userObjId], sigmaGraph.new() , Level, (err, graph) ->
 				if err?
 					return next(err)
 				logger.log graph:graph, "graph"
-				res.render Path.resolve(__dirname, "../views/userGraph"), user:user, graph:graph
+				res.render Path.resolve(__dirname, "../views/user/graph"), user:user, graph:graph
