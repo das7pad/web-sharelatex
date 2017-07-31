@@ -83,7 +83,7 @@ describe "GraphController", ->
 
 		it "should render the graph page", (done)->
 			@res.render = (pageName, opts)=>
-				pageName.should.equal  Path.resolve(__dirname + "/../../../")+ "/app/views/userGraph"
+				pageName.should.equal  Path.resolve(__dirname + "/../../../")+ "/app/views/user/graph"
 				done()
 			@GraphController.userGraph @req, @res
 

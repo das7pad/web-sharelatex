@@ -16,7 +16,7 @@ describe "UserController", ->
 			getUser: sinon.stub()
 
 		@UserDeleter =
-			delete: sinon.stub().callsArgWith(1)
+			deleteUser: sinon.stub().callsArgWith(1)
 
 		@AuthenticationManager =
 			setUserPassword: sinon.stub()
@@ -67,7 +67,7 @@ describe "UserController", ->
 
 		it "should render the admin/index page", (done)->
 			@res.render = (pageName, opts)=>
-				pageName.should.equal  Path.resolve(__dirname + "/../../../")+ "/app/views/index"
+				pageName.should.equal  Path.resolve(__dirname + "/../../../")+ "/app/views/user/index"
 				done()
 			@UserController.index @req, @res
 
@@ -118,7 +118,7 @@ describe "UserController", ->
 
 		it "should render the admin/userInfo page", (done)->
 			@res.render = (pageName, opts)=>
-				pageName.should.equal  Path.resolve(__dirname + "/../../../")+ "/app/views/userInfo"
+				pageName.should.equal  Path.resolve(__dirname + "/../../../")+ "/app/views/user/show"
 				done()
 			@UserController.show @req, @res
 
@@ -140,9 +140,8 @@ describe "UserController", ->
 			@req =
 				params:
 					user_id: 'user_id_here'
-			@UserDeleter.delete.calledWith(1)
 			@res.sendStatus = (code)=>
-				@UserDeleter.delete.calledWith('user_id_here').should.equal true
+				@UserDeleter.deleteUser.calledWith('user_id_here').should.equal true
 				code.should.equal 200
 				done()
 			@UserController.delete @req, @res
