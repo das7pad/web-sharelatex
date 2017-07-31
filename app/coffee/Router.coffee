@@ -16,7 +16,6 @@ module.exports =
 		adminRouter.get    "/user/:user_id", UserController.show
 		adminRouter.post   "/user/:user_id", UserController.update
 		adminRouter.delete "/user/:user_id", UserController.delete
-		adminRouter.post   "/user/:user_id/setBetaStatus", UserController.setBetaStatus
-		
+	
 		adminRouter.get    "/user/graph/:user_id", GraphController.userGraph
 		adminRouter.delete "/project/:Project_id", ProjectController.deleteProject

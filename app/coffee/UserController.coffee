@@ -5,7 +5,6 @@ Path = require("path")
 UserGetter = require "../../../../app/js/Features/User/UserGetter"
 UserDeleter = require("../../../../app/js/Features/User/UserDeleter")
 AuthenticationManager = require("../../../../app/js/Features/Authentication/AuthenticationManager")
-BetaProgramHandler = require("../../../../app/js/Features/BetaProgram/BetaProgramHandler")
 
 mongojs = require("../../../../app/js/infrastructure/mongojs")
 db = mongojs.db
@@ -122,14 +121,3 @@ module.exports = UserController =
 		db.users.update {_id: ObjectId(user_id)}, updateParams, (error) ->
 			return next(error) if error?
 			res.sendStatus 204
-
-	setBetaStatus: (req, res) ->
-		user_id = req.params.user_id
-		betaStatus = req.body.beta
-		logger.log {user_id, betaStatus}, "enabling beta features for user"
-		action = if betaStatus == true then BetaProgramHandler.optIn else BetaProgramHandler.optOut
-		action user_id, (err) ->
-			if err
-				logger.err {err, user_id}, "error updating beta status for user"
-				return res.sendStatus 500
-			res.sendStatus 200
