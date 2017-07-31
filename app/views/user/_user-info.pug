@@ -1,7 +1,7 @@
 p
 	form(async-form="adminUser", name="adminUserForm", method="POST", action="/admin/user/" + user._id, novalidate)
 		input(type="hidden", name="_csrf", value=csrfToken)
-		table.table.table-striped.table-bordered
+		table.table.table-striped.table-bordered(style="margin-bottom: 12px;")
 			tr
 				td
 					label ID
@@ -150,17 +150,18 @@ p
 		form-messages(for="adminUserForm")
 			.alert.alert-success(ng-show="adminUserForm.response.success && !adminUserForm.inflight")
 				| User was successfully updated
-		button.btn.btn-primary(type='submit', ng-disabled="adminUserForm.inflight")
-			span(ng-show="!adminUserForm.inflight") Save
-			span(ng-show="adminUserForm.inflight") Saving...
 
-h2 #{translate("actions")}
-p
-	a.btn.btn-danger(
-		href='#',
-		tooltip-placement="bottom",
-		tooltip-append-to-body="true",
-		ng-click="openDeleteUserModal()"
-	)
-		i.fa.fa-trash-o
-		| &nbsp; #{translate('delete')} #{translate('user')}
+		.row
+			.col-md-9
+				button.btn.btn-primary(type='submit', ng-disabled="adminUserForm.inflight")
+					span(ng-show="!adminUserForm.inflight") Save
+					span(ng-show="adminUserForm.inflight") Saving...
+			.col-md-3.text-right
+				a.btn(
+					href='#',
+					tooltip-placement="bottom",
+					tooltip-append-to-body="true",
+					ng-click="openDeleteUserModal()"
+				)
+					i.fa.fa-trash-o
+					| &nbsp; #{translate('delete')} #{translate('user')}
