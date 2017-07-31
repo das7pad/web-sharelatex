@@ -1,0 +1,13 @@
+h2 Personal Subscription
+
+if subscription
+	a(href="/admin/user/" + user._id + "/subscription/" + subscription._id) #{subscription._id}
+else
+	a.btn.btn-primary(href="/admin/subscription/new?admin_id=" + user._id) Create Subscription
+
+h2 Group Subscriptions
+
+for sub in memberSubscriptions
+	div
+		a(href="/admin/user/" + user._id + "/subscription/" + subscription._id) #{subscription._id}
+		

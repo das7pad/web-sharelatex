@@ -5,6 +5,8 @@ Path = require("path")
 UserGetter = require "../../../../app/js/Features/User/UserGetter"
 UserDeleter = require("../../../../app/js/Features/User/UserDeleter")
 AuthenticationManager = require("../../../../app/js/Features/Authentication/AuthenticationManager")
+SubscriptionLocator = require("../../../../app/js/Features/Subscription/SubscriptionLocator")
+async = require "async"
 
 mongojs = require("../../../../app/js/infrastructure/mongojs")
 db = mongojs.db
@@ -83,26 +85,46 @@ module.exports = UserController =
 			cb(err, users, users.length)
 
 	show: (req, res, next)->
-		logger.log "getting admin request for user info"
-		UserGetter.getUser req.params.user_id, { _id:1, first_name:1, last_name:1, email:1, betaProgram:1, features: 1}, (err, user) ->
-			db.projects.find {owner_ref:ObjectId(req.params.user_id)}, {name:1, lastUpdated:1, publicAccesLevel:1, archived:1, owner_ref:1}, (err, projects) ->
-					if err?
-						return next(err)
-					res.render Path.resolve(__dirname, "../views/user/show"), user:user, projects:projects
+		user_id = req.params.user_id
+		logger.log {user_id}, "getting admin request for user info"
+		async.parallel {
+			user: (cb) ->
+				UserGetter.getUser user_id, {
+					_id:1, first_name:1, last_name:1, email:1, betaProgram:1, features: 1
+				}, cb
+			projects: (cb) ->
+				db.projects.find {
+					owner_ref:ObjectId(user_id)
+				}, {
+					name:1, lastUpdated:1, publicAccesLevel:1, archived:1, owner_ref:1
+				}, cb
+			subscription: (cb) ->
+				SubscriptionLocator.getUsersSubscription user_id, cb
+			memberSubscriptions: (cb) ->
+				SubscriptionLocator.getMemberSubscriptions user_id, cb
+		}, (err, data) ->
+			return next(err) if err?
+			res.render Path.resolve(__dirname, "../views/user/show"), data
 
-	delete: (req, res)->
+	delete: (req, res, next)->
 		user_id = req.params.user_id
 		logger.log user_id: user_id, "received admin request to delete user"
 		UserDeleter.deleteUser user_id, (err)->
-			if err?
-				res.sendStatus 500
-			else
-				res.sendStatus 200
+			return next(err) if err?
+			res.sendStatus 200
 
-	update: (req, res, net) ->
+	update: (req, res, next) ->
 		user_id = req.params.user_id
-		updateParams = { $set: {} }
-		for attribute in UserController.ATTRIBUTES
+		{valid, update} = UserController._reqToMongoUpdate(req, UserController.ATTRIBUTES)
+		if !valid
+			return res.sendStatus 400
+		db.users.update {_id: ObjectId(user_id)}, { $set: update }, (err) ->
+			return next(err) if err?
+			res.sendStatus 204
+
+	_reqToMongoUpdate: (req, attributes) ->
+		update = {}
+		for attribute in attributes
 			# Unticked checkboxes are not submitted
 			if attribute.type == "boolean" and !req.body[attribute.name]? 
 				req.body[attribute.name] = false
@@ -112,12 +134,17 @@ module.exports = UserController =
 			# Cast strings to numbers
 			if attribute.type == "number" and req.body[attribute.name]?
 				req.body[attribute.name] = parseInt(req.body[attribute.name], 10)
+			# Cast object ids to an ObjectId
+			if attribute.type == "objectid" and req.body[attribute.name]?
+				req.body[attribute.name] = ObjectId(req.body[attribute.name])
 
 			if req.body[attribute.name]?
-				if typeof req.body[attribute.name] == attribute.type
-					updateParams.$set[attribute.name] = req.body[attribute.name]
+				if attribute.type == "objectid" or typeof req.body[attribute.name] == attribute.type
+					update[attribute.name] = req.body[attribute.name]
 				else
-					return res.sendStatus 400
-		db.users.update {_id: ObjectId(user_id)}, updateParams, (error) ->
-			return next(error) if error?
-			res.sendStatus 204
+					return { valid: false }
+		return {
+			valid: true
+			update: update
+		}
+		
