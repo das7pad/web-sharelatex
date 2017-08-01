@@ -6,6 +6,8 @@ define [
 	App.controller "AdminUserController", ($scope, $timeout, $modal, queuedHttp) ->
 		$scope.user = window.data.user
 		$scope.projects = window.data.projects
+		$scope.searchText =
+			value: ""
 		$scope.selectedProjects = []
 		$scope.predicate = "lastUpdated"
 		$scope.reverse = true
@@ -16,7 +18,7 @@ define [
 			project.accessLevel = "owner"
 
 		$scope.clearSearchText = () ->
-			$scope.searchText = ""
+			$scope.searchText.value = ""
 			$scope.updateVisibleProjects()
 
 		$scope.searchProjects = () ->
@@ -98,8 +100,8 @@ define [
 			for project in $scope.projects
 				visible = true
 				# Only show if it matches any search text
-				if $scope.searchText? and $scope.searchText != ""
-					if !project.name.toLowerCase().match($scope.searchText.toLowerCase())
+				if $scope.searchText.value? and $scope.searchText.value != ""
+					if !project.name.toLowerCase().match($scope.searchText.value.toLowerCase())
 						visible = false
 
 				if visible
