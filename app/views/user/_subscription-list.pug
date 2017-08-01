@@ -1,13 +1,18 @@
-h2 Personal Subscription
+table.table.table-striped.table-bordered
+	tr
+		td
+			strong Personal Subscription
+		td
+			if subscription
+				a(href="/admin/user/" + user._id + "/subscription/" + subscription._id) #{subscription._id}
+			else
+				a.btn.btn-primary(href="/admin/user/" + user._id + "/subscription/new") Create Subscription
 
-if subscription
-	a(href="/admin/user/" + user._id + "/subscription/" + subscription._id) #{subscription._id}
-else
-	a.btn.btn-primary(href="/admin/user/" + user._id + "/subscription/new") Create Subscription
-
-h2 Group Subscriptions
-
-for sub in memberSubscriptions
-	div
-		a(href="/admin/user/" + user._id + "/subscription/" + sub._id) #{sub._id}
+	if memberSubscriptions.length > 0
+		for sub in memberSubscriptions
+			tr
+				td
+					strong Group Subscription
+				td
+					a(href="/admin/user/" + user._id + "/subscription/" + sub._id) #{sub._id}
 		
