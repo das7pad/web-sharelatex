@@ -57,3 +57,30 @@ block content
 									| &nbsp;&middot;&nbsp;
 									a(href, ng-click="deleting = false") No
 								.text-danger(ng-show="deleteError") Something when wrong :(
+					if subscription.groupPlan
+						hr
+						p
+							table.table.table-striped.table-bordered
+								tr
+									th(colspan=2) Group Members
+								for member in members
+									tr
+										td
+											a(href="/admin/user/" + member._id)= member.email
+										td
+											a(href="/admin/user/" + member._id)= member._id
+								if members.length == 0
+									tr
+										td(colspan=2)
+											i None
+						p
+							table.table.table-striped.table-bordered
+								tr
+									th(colspan) Invited Members
+								for email in subscription.invited_emails || []
+									tr
+										td= email
+								if !subscription.invited_emails || subscription.invited_emails.length == 0
+									tr
+										td
+											i None

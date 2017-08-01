@@ -30,6 +30,7 @@ describe "SubscriptionController", ->
 					projects: {}
 					users: {}
 				ObjectId: ObjectId
+			"../../../../app/js/Features/User/UserGetter": @UserGetter = {}
 			"metrics-sharelatex":
 				gauge:->
 		
@@ -48,11 +49,19 @@ describe "SubscriptionController", ->
 	describe "show", ->
 		beforeEach ->
 			@SubscriptionLocator.getSubscription = sinon.stub()
+			@UserGetter.getUser = sinon.stub()
 			@req.params = {@subscription_id, @user_id}
 		
 		describe "successfully", ->
 			beforeEach ->
-				@SubscriptionLocator.getSubscription.yields(null, @subscription = {"mock": "subscription"})
+				@subscription = {
+					"mock": "subscription"
+					member_ids: [ ObjectId(), ObjectId(), ObjectId() ]
+				}
+				member = {"mock": "member"}
+				@members = [member, member, member]
+				@UserGetter.getUser.yields(null, member)
+				@SubscriptionLocator.getSubscription.yields(null, @subscription)
 				@SubscriptionController.show @req, @res
 			
 			it "should look up the subscription", ->
@@ -60,9 +69,15 @@ describe "SubscriptionController", ->
 					.calledWith(@subscription_id)
 					.should.equal true
 			
+			it "should look up the member_ids", ->
+				for user_id in @subscription.member_ids
+					@UserGetter.getUser
+						.calledWith(user_id, { email: 1 })
+						.should.equal true
+			
 			it "should render the subscription page", ->
 				@res.render
-					.calledWith(Path.resolve(__dirname, "../../../app/views/subscription/show"), {@subscription, @user_id})
+					.calledWith(Path.resolve(__dirname, "../../../app/views/subscription/show"), {@subscription, @user_id, @members})
 					.should.equal true
 		
 		describe "when subscription is not found", ->
