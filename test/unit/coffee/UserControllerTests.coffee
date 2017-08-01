@@ -17,6 +17,9 @@ describe "UserController", ->
 
 		@UserDeleter =
 			deleteUser: sinon.stub().callsArgWith(1)
+	
+		@UserUpdater =
+			changeEmailAddress: sinon.stub()
 
 		@AuthenticationManager =
 			setUserPassword: sinon.stub()
@@ -31,6 +34,7 @@ describe "UserController", ->
 				err:->
 			"../../../../app/js/Features/User/UserGetter":@UserGetter
 			"../../../../app/js/Features/User/UserDeleter":@UserDeleter
+			"../../../../app/js/Features/User/UserUpdater":@UserUpdater
 			"../../../../app/js/Features/Authentication/AuthenticationManager":@AuthenticationManager
 			"../../../../app/js/Features/Subscription/SubscriptionLocator": @SubscriptionLocator
 			"../../../../app/js/infrastructure/mongojs":
@@ -64,6 +68,8 @@ describe "UserController", ->
 		@res =
 			locals:
 				jsPath:"js path here"
+			send: sinon.stub()
+			sendStatus: sinon.stub()
 
 	describe "index", ->
 
@@ -232,3 +238,32 @@ describe "UserController", ->
 			it "should cast the attribute to a number", ->
 				updateQuery = @db.users.update.args[0][1]
 				expect(updateQuery.$set['features.compileTimeout']).to.equal 100
+				
+	describe "updateEmail", ->
+		beforeEach ->
+			@req.params =
+				user_id: @user_id = ObjectId().toString()
+			@req.body =
+				email: @email = "jane@example.com"
+			
+		describe "successfully", ->
+			beforeEach ->
+				@UserUpdater.changeEmailAddress.yields(null)
+				@UserController.updateEmail @req, @res
+			
+			it "should update the email", ->
+				@UserUpdater.changeEmailAddress
+					.calledWith(@user_id, @email)
+					.should.equal true
+			
+			it "should return 204", ->
+				@res.sendStatus.calledWith(204).should.equal true
+			
+		describe "with existing email", ->
+			beforeEach ->
+				@UserUpdater.changeEmailAddress.yields({message: "alread_exists"})
+				@UserController.updateEmail @req, @res
+			
+			it "should return 400 with a message", ->
+				@res.send.calledWith(400, {message: "Email is in use by another user"}).should.equal true
+			

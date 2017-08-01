@@ -1,5 +1,5 @@
 p
-	form(async-form="adminUser", name="adminUserForm", method="POST", action="/admin/user/" + user._id, novalidate)
+	form(async-form="adminUserEmail", name="adminUserEmailForm", method="POST", action="/admin/user/" + user._id + "/email", novalidate)
 		input(type="hidden", name="_csrf", value=csrfToken)
 		table.table.table-striped.table-bordered(style="margin-bottom: 12px;")
 			tr
@@ -10,8 +10,31 @@ p
 			tr
 				td
 					label #{translate("email")}
-				td {{ user.email }}
+				td
+					div(ng-show="!editingEmail")
+						| {{ user.email }} &nbsp;
+						a.small(href, ng-click="editingEmail = true") Edit
+					div(ng-show="editingEmail")
+						input#email.form-control(
+							name='email',
+							placeholder="jane@example.com"
+							ng-model="user.email"
+						)
+						.row-spaced-small
+							button.btn.btn-primary(type='submit', ng-disabled="adminUserEmailForm.inflight")
+								span(ng-show="!adminUserEmailForm.inflight") Save
+								span(ng-show="adminUserEmailForm.inflight") Saving...
+							| &nbsp;
+							a.btn.btn-default(href, ng-click="editingEmail = false") Cancel
 
+		form-messages(for="adminUserEmailForm")
+			.alert.alert-success(ng-show="adminUserEmailForm.response.success && !adminUserEmailForm.inflight")
+				| Email was changed
+
+	
+	form(async-form="adminUser", name="adminUserForm", method="POST", action="/admin/user/" + user._id, novalidate)
+		input(type="hidden", name="_csrf", value=csrfToken)
+		table.table.table-striped.table-bordered(style="margin-bottom: 12px;")
 			tr
 				th(colspan=2).text-center Profile
 

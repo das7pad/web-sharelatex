@@ -17,6 +17,7 @@ module.exports =
 		adminRouter.get    "/user/:user_id", UserController.show
 		adminRouter.post   "/user/:user_id", UserController.update
 		adminRouter.delete "/user/:user_id", UserController.delete
+		adminRouter.post   "/user/:user_id/email", UserController.updateEmail
 		
 		adminRouter.get    "/user/:user_id/subscription/new",              SubscriptionController.new
 		adminRouter.get    "/user/:user_id/subscription/:subscription_id", SubscriptionController.show

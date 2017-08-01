@@ -4,6 +4,7 @@ _ = require "underscore"
 Path = require("path")
 UserGetter = require "../../../../app/js/Features/User/UserGetter"
 UserDeleter = require("../../../../app/js/Features/User/UserDeleter")
+UserUpdater = require("../../../../app/js/Features/User/UserUpdater")
 AuthenticationManager = require("../../../../app/js/Features/Authentication/AuthenticationManager")
 SubscriptionLocator = require("../../../../app/js/Features/Subscription/SubscriptionLocator")
 async = require "async"
@@ -121,6 +122,18 @@ module.exports = UserController =
 		db.users.update {_id: ObjectId(user_id)}, { $set: update }, (err) ->
 			return next(err) if err?
 			res.sendStatus 204
+	
+	updateEmail: (req, res, next) ->
+		user_id = req.params.user_id
+		email = req.body.email
+		UserUpdater.changeEmailAddress user_id, email, (err) ->
+			if err?
+				if err.message = "alread_exists"
+					return res.send 400, {message: "Email is in use by another user"}
+				else
+					return next(err)
+			else
+				return res.sendStatus 204
 
 	_reqToMongoUpdate: (req, attributes) ->
 		update = {}
