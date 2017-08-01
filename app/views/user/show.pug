@@ -19,8 +19,9 @@ block content
 					include ./_user-info
 				tab(heading="Projects")
 					include ./_project-list
-				tab(heading="Subscriptions")
-					include ./_subscription-list
+				if settings.enableSubscriptions
+					tab(heading="Subscriptions")
+						include ./_subscription-list
 
 		include ../../../../../app/views/project/list/modals
 		include ./_modals

@@ -61,14 +61,15 @@ p
 			tr
 				th(colspan=2).text-center
 					| Features
-					span.small
-						| &nbsp;(Change to:&nbsp;
-						a(href, ng-click="user.features = {collaborators: 1, versioning: false, dropbox: false, github: false, compileTimeout: 60, compileGroup: 'standard', templates: false, trackChanges: false, references: false}") Free
-						| &nbsp;&middot;&nbsp;
-						a(href, ng-click="user.features = {collaborators: 10, versioning: true, dropbox: true, github: true, compileTimeout: 180, compileGroup: 'priority', templates: true, trackChanges: true, references: true}") Collab.
-						| &nbsp;&middot;&nbsp;
-						a(href, ng-click="user.features = {collaborators: -1, versioning: true, dropbox: true, github: true, compileTimeout: 180, compileGroup: 'priority', templates: true, trackChanges: true, references: true}") Pro.
-						| )
+					if settings.enableSubscriptions
+						span.small
+							| &nbsp;(Change to:&nbsp;
+							a(href, ng-click="user.features = {collaborators: 1, versioning: false, dropbox: false, github: false, compileTimeout: 60, compileGroup: 'standard', templates: false, trackChanges: false, references: false}") Free
+							| &nbsp;&middot;&nbsp;
+							a(href, ng-click="user.features = {collaborators: 10, versioning: true, dropbox: true, github: true, compileTimeout: 180, compileGroup: 'priority', templates: true, trackChanges: true, references: true}") Collab.
+							| &nbsp;&middot;&nbsp;
+							a(href, ng-click="user.features = {collaborators: -1, versioning: true, dropbox: true, github: true, compileTimeout: 180, compileGroup: 'priority', templates: true, trackChanges: true, references: true}") Pro.
+							| )
 
 			tr
 				td
