@@ -30,7 +30,6 @@ describe "SubscriptionController", ->
 					projects: {}
 					users: {}
 				ObjectId: ObjectId
-			"../../../../app/js/Features/User/UserGetter": @UserGetter = {}
 			"metrics-sharelatex":
 				gauge:->
 		
@@ -49,7 +48,7 @@ describe "SubscriptionController", ->
 	describe "show", ->
 		beforeEach ->
 			@SubscriptionLocator.getSubscription = sinon.stub()
-			@UserGetter.getUser = sinon.stub()
+			@db.users.find = sinon.stub()
 			@req.params = {@subscription_id, @user_id}
 		
 		describe "successfully", ->
@@ -58,9 +57,8 @@ describe "SubscriptionController", ->
 					"mock": "subscription"
 					member_ids: [ ObjectId(), ObjectId(), ObjectId() ]
 				}
-				member = {"mock": "member"}
-				@members = [member, member, member]
-				@UserGetter.getUser.yields(null, member)
+				@members = [{"mock": "member2"}, {"mock": "member2"}, {"mock": "member3"}]
+				@db.users.find.yields(null, @members)
 				@SubscriptionLocator.getSubscription.yields(null, @subscription)
 				@SubscriptionController.show @req, @res
 			
@@ -70,10 +68,9 @@ describe "SubscriptionController", ->
 					.should.equal true
 			
 			it "should look up the member_ids", ->
-				for user_id in @subscription.member_ids
-					@UserGetter.getUser
-						.calledWith(user_id, { email: 1 })
-						.should.equal true
+				@db.users.find
+					.calledWith({_id: { $in: @subscription.member_ids }}, { email: 1 })
+					.should.equal true
 			
 			it "should render the subscription page", ->
 				@res.render

@@ -3,7 +3,6 @@ metrics = require "metrics-sharelatex"
 _ = require "underscore"
 Path = require("path")
 UserController = require("./UserController")
-UserGetter = require "../../../../app/js/Features/User/UserGetter"
 SubscriptionLocator = require("../../../../app/js/Features/Subscription/SubscriptionLocator")
 SubscriptionUpdater = require("../../../../app/js/Features/Subscription/SubscriptionUpdater")
 Subscription = require("../../../../app/js/models/Subscription").Subscription
@@ -44,12 +43,9 @@ module.exports = SubscriptionController =
 			return next(err) if err?
 			if !subscription?
 				return ErrorController.notFound req, res
-			async.mapSeries subscription.member_ids,
-				(user_id, cb) ->
-					UserGetter.getUser user_id, { email: 1 }, cb
-				(err, members) ->
-					return next(err) if err?
-					res.render Path.resolve(__dirname, "../views/subscription/show"), {subscription, user_id, members}
+			db.users.find {_id: { $in: subscription.member_ids }}, { email: 1 }, (err, members) ->
+				return next(err) if err?
+				res.render Path.resolve(__dirname, "../views/subscription/show"), {subscription, user_id, members}
 
 	update: (req, res, next) ->
 		{subscription_id, user_id} = req.params
