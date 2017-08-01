@@ -35,6 +35,8 @@ module.exports = SubscriptionController =
 	}]
 
 	show: (req, res, next)->
+		# The user_id isn't used in the look up, it just provides a nice
+		# breadcrumb trail of where we came from for navigation
 		{subscription_id, user_id} = req.params
 		logger.log {subscription_id}, "getting admin request for subscription"
 		SubscriptionLocator.getSubscription subscription_id, (err, subscription) ->
@@ -52,10 +54,10 @@ module.exports = SubscriptionController =
 		Subscription.update {_id: ObjectId(subscription_id)}, { $set: update }, (error) ->
 			return next(error) if error?
 			res.sendStatus 204
-			
+
 	new: (req, res, next) ->
 		res.render Path.resolve(__dirname, "../views/subscription/new"), {admin_id: req.params.user_id}
-	
+
 	create: (req, res, next) ->
 		{valid, update} = UserController._reqToMongoUpdate(req, SubscriptionController.ATTRIBUTES)
 		if !valid

@@ -20,6 +20,10 @@ describe "UserController", ->
 
 		@AuthenticationManager =
 			setUserPassword: sinon.stub()
+	
+		@SubscriptionLocator =
+			getUsersSubscription: sinon.stub().yields(null, @user_subscription = {"mock": "subscription"})
+			getMemberSubscriptions: sinon.stub().yields(null, @member_subscriptions = [{"mock": "subscriptions"}])
 
 		@UserController = SandboxedModule.require modulePath, requires:
 			"logger-sharelatex":
@@ -28,6 +32,7 @@ describe "UserController", ->
 			"../../../../app/js/Features/User/UserGetter":@UserGetter
 			"../../../../app/js/Features/User/UserDeleter":@UserDeleter
 			"../../../../app/js/Features/Authentication/AuthenticationManager":@AuthenticationManager
+			"../../../../app/js/Features/Subscription/SubscriptionLocator": @SubscriptionLocator
 			"../../../../app/js/infrastructure/mongojs":
 				db: @db =
 					projects: {}
@@ -128,6 +133,18 @@ describe "UserController", ->
 		it "should send the user projects", (done)->
 			@res.render = (pageName, opts)=>
 				opts.projects.should.deep.equal @projects
+				done()
+			@UserController.show @req, @res
+		
+		it "should send the user's subscription", (done) ->
+			@res.render = (pageName, opts)=>
+				opts.subscription.should.deep.equal @user_subscription
+				done()
+			@UserController.show @req, @res
+		
+		it "should send the user's subscription", (done) ->
+			@res.render = (pageName, opts)=>
+				opts.memberSubscriptions.should.deep.equal @member_subscriptions
 				done()
 			@UserController.show @req, @res
 
