@@ -4,7 +4,10 @@ _ = require "underscore"
 Path = require("path")
 UserController = require("./UserController")
 SubscriptionLocator = require("../../../../app/js/Features/Subscription/SubscriptionLocator")
+SubscriptionUpdater = require("../../../../app/js/Features/Subscription/SubscriptionUpdater")
 Subscription = require("../../../../app/js/models/Subscription").Subscription
+ErrorController = require("../../../../app/js/Features/Errors/ErrorController")
+async = require "async"
 
 mongojs = require("../../../../app/js/infrastructure/mongojs")
 db = mongojs.db
@@ -36,6 +39,8 @@ module.exports = SubscriptionController =
 		logger.log {subscription_id}, "getting admin request for subscription"
 		SubscriptionLocator.getSubscription subscription_id, (err, subscription) ->
 			return next(err) if err?
+			if !subscription?
+				return ErrorController.notFound req, res
 			res.render Path.resolve(__dirname, "../views/subscription/show"), {subscription, user_id}
 
 	update: (req, res, next) ->
@@ -60,13 +65,15 @@ module.exports = SubscriptionController =
 			return next(error) if error?
 			res.json {subscription}
 
-	# delete: (req, res)->
-	# 	user_id = req.params.user_id
-	# 	logger.log user_id: user_id, "received admin request to delete user"
-	# 	UserDeleter.deleteUser user_id, (err)->
-	# 		if err?
-	# 			res.sendStatus 500
-	# 		else
-	# 			res.sendStatus 200
-	# 
-
+	delete: (req, res)->
+		subscription_id = req.params.subscription_id
+		logger.log subscription_id: subscription_id, "received admin request to delete subscription"
+		SubscriptionLocator.getSubscription subscription_id, (err, subscription) ->
+			return next(err) if err?
+			affected_user_ids = [subscription.admin_id].concat(subscription.member_ids or [])
+			logger.log {subscription_id, affected_user_ids}, "deleting subscription and downgrading users"
+			Subscription.remove {_id: ObjectId(subscription_id)}, (err) ->
+				return next(err) if err?
+				async.mapSeries affected_user_ids, SubscriptionUpdater._setUsersMinimumFeatures, (err) ->
+					return next(err) if err?
+					res.sendStatus 204

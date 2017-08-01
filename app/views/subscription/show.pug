@@ -2,7 +2,7 @@ extends ../../../../../app/views/layout
 
 block content
 	script#data(type="application/json").
-		!{JSON.stringify({subscription: subscription}).replace(/\//g, '\\/')}
+		!{JSON.stringify({subscription: subscription, user_id: user_id}).replace(/\//g, '\\/')}
 
 	script(type="text/javascript").
 		window.data = JSON.parse($("#data").text());
@@ -41,12 +41,19 @@ block content
 								button.btn.btn-primary(type='submit', ng-disabled="adminSubscriptionForm.inflight")
 									span(ng-show="!adminSubscriptionForm.inflight") Save
 									span(ng-show="adminSubscriptionForm.inflight") Saving...
-						//- 	.col-md-3.text-right
-						//- 		a.btn(
-						//- 			href='#',
-						//- 			tooltip-placement="bottom",
-						//- 			tooltip-append-to-body="true",
-						//- 			ng-click="openDeletesubscriptionModal()"
-						//- 		)
-						//- 			i.fa.fa-trash-o
-						//- 			| &nbsp; #{translate('delete')} #{translate('subscription')}
+							.col-md-3.text-right
+								a.btn(
+									href='#',
+									tooltip-placement="bottom",
+									tooltip-append-to-body="true",
+									ng-click="deleting = true",
+									ng-show="!deleting"
+								)
+									i.fa.fa-trash-o
+									| &nbsp; #{translate('delete')} #{translate('subscription')}
+								div(ng-show="deleting")
+									| Are you sure?&nbsp;
+									a(href, ng-click="deleteSubscription()") Yes
+									| &nbsp;&middot;&nbsp;
+									a(href, ng-click="deleting = false") No
+								.text-danger(ng-show="deleteError") Something when wrong :(

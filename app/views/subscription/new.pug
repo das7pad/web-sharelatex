@@ -3,13 +3,7 @@ extends ../../../../../app/views/layout
 block content
 	script(type="text/javascript").
 		window.data = {
-			subscription: {
-				customAccount: true,
-				groupPlan: true,
-				planCode: "professional",
-				membersLimit: 10,
-				admin_id: "#{admin_id}"
-			}
+			admin_id: "#{admin_id}"
 		}
 
 	.content.content-alt(ng-controller="AdminCreateSubscriptionController")
