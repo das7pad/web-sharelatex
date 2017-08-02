@@ -36,7 +36,6 @@ define [
 
 		sendSearch = ->
 			data._csrf = window.csrfToken
-			console.log "SENDING SEARCH", $scope.searchText
 			data.query = $scope.searchText
 			data.page = $scope.pageSelected
 			request = $http.post "/admin/user/search", data
