@@ -2,16 +2,13 @@ logger = require "logger-sharelatex"
 metrics = require "metrics-sharelatex"
 _ = require "underscore"
 Path = require("path")
+UserGetter = require "../../../../app/js/Features/User/UserGetter"
 UserAdminController = require("./UserAdminController")
 SubscriptionLocator = require("../../../../app/js/Features/Subscription/SubscriptionLocator")
 SubscriptionUpdater = require("../../../../app/js/Features/Subscription/SubscriptionUpdater")
 Subscription = require("../../../../app/js/models/Subscription").Subscription
 ErrorController = require("../../../../app/js/Features/Errors/ErrorController")
 async = require "async"
-
-mongojs = require("../../../../app/js/infrastructure/mongojs")
-db = mongojs.db
-ObjectId = mongojs.ObjectId
 
 module.exports = SubscriptionAdminController =
 	show: (req, res, next)->
@@ -23,7 +20,7 @@ module.exports = SubscriptionAdminController =
 			return next(err) if err?
 			if !subscription?
 				return ErrorController.notFound req, res
-			db.users.find {_id: { $in: subscription.member_ids }}, { email: 1 }, (err, members) ->
+			UserGetter.getUsers subscription.member_ids, { email: 1 }, (err, members) ->
 				return next(err) if err?
 				res.render Path.resolve(__dirname, "../views/subscription/show"), {subscription, user_id, members}
 
@@ -44,7 +41,7 @@ module.exports = SubscriptionAdminController =
 			SubscriptionAdminController.BOOLEAN_ATTRIBUTES
 		)
 		logger.log {subscription_id, update}, "updating subscription via admin panel"
-		Subscription.update {_id: ObjectId(subscription_id)}, { $set: update }, (error) ->
+		Subscription.update {_id: subscription_id}, { $set: update }, (error) ->
 			return next(error) if error?
 			res.sendStatus 204
 

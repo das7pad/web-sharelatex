@@ -6,13 +6,10 @@ UserGetter = require "../../../../app/js/Features/User/UserGetter"
 UserDeleter = require("../../../../app/js/Features/User/UserDeleter")
 UserUpdater = require("../../../../app/js/Features/User/UserUpdater")
 {User} = require("../../../../app/js/models/User")
+ProjectGetter = require "../../../../app/js/Features/Project/ProjectGetter"
 AuthenticationManager = require("../../../../app/js/Features/Authentication/AuthenticationManager")
 SubscriptionLocator = require("../../../../app/js/Features/Subscription/SubscriptionLocator")
 async = require "async"
-
-mongojs = require("../../../../app/js/infrastructure/mongojs")
-db = mongojs.db
-ObjectId = mongojs.ObjectId
 
 module.exports = UserAdminController =
 	perPage: 5
@@ -34,14 +31,14 @@ module.exports = UserAdminController =
 			pages = Math.ceil(count / UserAdminController.perPage)
 			res.send 200, {users:users, pages:pages}
 
-	_userFind: (q, page, sortField, reverse, cb) ->
+	_userFind: (q, page, sortField, reverse, cb = () ->) ->
 		q = [ {email:new RegExp(q)}, {name:new RegExp(q)} ]
 		skip = (page - 1) * UserAdminController.perPage
 		sortOrder = {}
 		sortOrder[sortField] = if reverse then -1 else 1
 		opts = {limit: UserAdminController.perSearch, skip : skip, sort: sortOrder }
 		logger.log opts:opts, q:q, "user options and query"
-		db.users.find {$or : q}, {first_name:1, email:1, lastLoggedIn:1, loginCount:1}, opts, (err, users)->
+		User.find {$or : q}, {first_name:1, email:1, lastLoggedIn:1, loginCount:1}, opts, (err, users)->
 			if err?
 				logger.err err:err, "error getting admin data for users list page"
 				return cb(err)
@@ -57,11 +54,11 @@ module.exports = UserAdminController =
 					_id:1, first_name:1, last_name:1, email:1, betaProgram:1, features: 1
 				}, cb
 			projects: (cb) ->
-				db.projects.find {
-					owner_ref:ObjectId(user_id)
-				}, {
+				ProjectGetter.findAllUsersProjects user_id, {
 					name:1, lastUpdated:1, publicAccesLevel:1, archived:1, owner_ref:1
-				}, cb
+				}, (err, owned = [], member = [], readOnly = []) ->
+					return cb(err) if err?
+					return cb(null, owned.concat(member).concat(readOnly))
 			subscription: (cb) ->
 				SubscriptionLocator.getUsersSubscription user_id, cb
 			memberSubscriptions: (cb) ->
@@ -107,7 +104,7 @@ module.exports = UserAdminController =
 			UserAdminController.ALLOWED_ATTRIBUTES,
 			UserAdminController.BOOLEAN_ATTRIBUTES
 		)
-		User.update {_id: ObjectId(user_id)}, { $set: update }, (err) ->
+		User.update {_id: user_id}, { $set: update }, (err) ->
 			return next(err) if err?
 			res.sendStatus 204
 	

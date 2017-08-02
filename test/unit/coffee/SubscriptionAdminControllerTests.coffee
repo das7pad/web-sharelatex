@@ -16,6 +16,7 @@ describe "SubscriptionAdminController", ->
 				log:->
 				err:->
 			"./UserAdminController": @UserAdminController = {}
+			"../../../../app/js/Features/User/UserGetter": @UserGetter = {}
 			"../../../../app/js/Features/Subscription/SubscriptionLocator": @SubscriptionLocator = {}
 			"../../../../app/js/Features/Subscription/SubscriptionUpdater": @SubscriptionUpdater = {}
 			"../../../../app/js/models/Subscription": Subscription: @Subscription =
@@ -25,11 +26,6 @@ describe "SubscriptionAdminController", ->
 					@remove: sinon.stub().yields()
 					@update: sinon.stub().yields()
 			"../../../../app/js/Features/Errors/ErrorController": @ErrorController = {}
-			"../../../../app/js/infrastructure/mongojs":
-				db: @db =
-					projects: {}
-					users: {}
-				ObjectId: ObjectId
 			"metrics-sharelatex":
 				gauge:->
 		
@@ -48,7 +44,7 @@ describe "SubscriptionAdminController", ->
 	describe "show", ->
 		beforeEach ->
 			@SubscriptionLocator.getSubscription = sinon.stub()
-			@db.users.find = sinon.stub()
+			@UserGetter.getUsers = sinon.stub()
 			@req.params = {@subscription_id, @user_id}
 		
 		describe "successfully", ->
@@ -58,7 +54,7 @@ describe "SubscriptionAdminController", ->
 					member_ids: [ ObjectId(), ObjectId(), ObjectId() ]
 				}
 				@members = [{"mock": "member2"}, {"mock": "member2"}, {"mock": "member3"}]
-				@db.users.find.yields(null, @members)
+				@UserGetter.getUsers.yields(null, @members)
 				@SubscriptionLocator.getSubscription.yields(null, @subscription)
 				@SubscriptionAdminController.show @req, @res
 			
@@ -68,8 +64,8 @@ describe "SubscriptionAdminController", ->
 					.should.equal true
 			
 			it "should look up the member_ids", ->
-				@db.users.find
-					.calledWith({_id: { $in: @subscription.member_ids }}, { email: 1 })
+				@UserGetter.getUsers
+					.calledWith(@subscription.member_ids, { email: 1 })
 					.should.equal true
 			
 			it "should render the subscription page", ->
@@ -106,7 +102,7 @@ describe "SubscriptionAdminController", ->
 			
 			it "should update the subscription", ->
 				@Subscription.update
-					.calledWith({_id: ObjectId(@subscription_id)}, { $set: @update })
+					.calledWith({_id: @subscription_id}, { $set: @update })
 					.should.equal true
 			
 			it "should return 204", ->

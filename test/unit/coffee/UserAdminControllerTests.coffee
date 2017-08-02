@@ -11,6 +11,10 @@ Path = require "path"
 
 describe "UserAdminController", ->
 	beforeEach ->
+		@user = {user_id:1,first_name:'James'}
+		@users = users = [{first_name:'James'}, {first_name:'Henry'}]
+		@projects = [{lastUpdated:1, _id:1, owner_ref: "user-1"}, {lastUpdated:2, _id:2, owner_ref: "user-2"}]
+		@perPage = @UserAdminController.perPage
 
 		@UserGetter =
 			getUser: sinon.stub()
@@ -23,6 +27,7 @@ describe "UserAdminController", ->
 		
 		@User = class User
 			@update: sinon.stub().yields()
+			@find: sinon.stub().yields(null, users)
 
 		@AuthenticationManager =
 			setUserPassword: sinon.stub()
@@ -30,6 +35,9 @@ describe "UserAdminController", ->
 		@SubscriptionLocator =
 			getUsersSubscription: sinon.stub().yields(null, @user_subscription = {"mock": "subscription"})
 			getMemberSubscriptions: sinon.stub().yields(null, @member_subscriptions = [{"mock": "subscriptions"}])
+		
+		@ProjectGetter =
+			findAllUsersProjects: sinon.stub().yields(null, @projects)
 
 		@UserAdminController = SandboxedModule.require modulePath, requires:
 			"logger-sharelatex":
@@ -41,26 +49,9 @@ describe "UserAdminController", ->
 			"../../../../app/js/Features/Authentication/AuthenticationManager":@AuthenticationManager
 			"../../../../app/js/Features/Subscription/SubscriptionLocator": @SubscriptionLocator
 			"../../../../app/js/models/User": User: @User
-			"../../../../app/js/infrastructure/mongojs":
-				db: @db =
-					projects: {}
-					users: {}
-				ObjectId: ObjectId
+			"../../../../app/js/Features/Project/ProjectGetter": @ProjectGetter
 			"metrics-sharelatex":
 				gauge:->
-
-		@user = {user_id:1,first_name:'James'}
-		@users = [{first_name:'James'}, {first_name:'Henry'}]
-		@projects = [{lastUpdated:1, _id:1, owner_ref: "user-1"}, {lastUpdated:2, _id:2, owner_ref: "user-2"}]
-		@perPage = @UserAdminController.perPage
-
-		@db.users.find = sinon.stub().callsArgWith(3, null, @users)
-
-		@db.users.count = sinon.stub().callsArgWith(1, null, @users.length)
-
-		@db.users.update = sinon.stub().yields()
-
-		@db.projects.find = sinon.stub().callsArgWith(2, null, @projects)
 
 		@UserGetter.getUser = (user_id, fields, callback) =>
 			callback null, @user
@@ -184,7 +175,7 @@ describe "UserAdminController", ->
 
 			it "should call User.update with the updated attributes", ->
 				@User.update
-					.calledWith({_id: ObjectId(@user_id)})
+					.calledWith({_id: @user_id})
 					.should.equal true
 				updateQuery = @User.update.args[0][1]
 				updateQuery.$set.first_name.should.equal "James"
@@ -197,7 +188,7 @@ describe "UserAdminController", ->
 
 			it "should ignore the attribute", ->
 				@User.update
-					.calledWith({_id: ObjectId(@user_id)})
+					.calledWith({_id: @user_id})
 					.should.equal true
 				updateQuery = @User.update.args[0][1]
 				expect(updateQuery.$set.foo_bar).to.equal undefined
