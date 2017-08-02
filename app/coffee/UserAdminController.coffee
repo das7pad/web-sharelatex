@@ -13,7 +13,7 @@ mongojs = require("../../../../app/js/infrastructure/mongojs")
 db = mongojs.db
 ObjectId = mongojs.ObjectId
 
-module.exports = UserController =
+module.exports = UserAdminController =
 	ATTRIBUTES: [{
 		name: 'betaProgram',
 		type: 'boolean'
@@ -57,26 +57,26 @@ module.exports = UserController =
 
 	index: (req, res, next)->
 		logger.log "getting admin request for list of users"
-		UserController._userFind '', 1, '_id', false, (err, users, count)->
+		UserAdminController._userFind '', 1, '_id', false, (err, users, count)->
 			if err?
 				return next(err)
-			pages = Math.ceil(count / UserController.perPage)
+			pages = Math.ceil(count / UserAdminController.perPage)
 			res.render Path.resolve(__dirname, "../views/user/index"), users:users, pages:pages
 
 	search: (req, res, next)->
 		logger.log body: req.body, "getting admin request for search users"
-		UserController._userFind req.body.query, req.body.page, req.body.sort, req.body.reverse, (err, users, count) ->
+		UserAdminController._userFind req.body.query, req.body.page, req.body.sort, req.body.reverse, (err, users, count) ->
 			if err?
 				return next(err)
-			pages = Math.ceil(count / UserController.perPage)
+			pages = Math.ceil(count / UserAdminController.perPage)
 			res.send 200, {users:users, pages:pages}
 
 	_userFind: (q, page, sortField, reverse, cb) ->
 		q = [ {email:new RegExp(q)}, {name:new RegExp(q)} ]
-		skip = (page - 1) * UserController.perPage
+		skip = (page - 1) * UserAdminController.perPage
 		sortOrder = {}
 		sortOrder[sortField] = if reverse then -1 else 1
-		opts = {limit: UserController.perSearch, skip : skip, sort: sortOrder }
+		opts = {limit: UserAdminController.perSearch, skip : skip, sort: sortOrder }
 		logger.log opts:opts, q:q, "user options and query"
 		db.users.find {$or : q}, {first_name:1, email:1, lastLoggedIn:1, loginCount:1}, opts, (err, users)->
 			if err?
@@ -116,7 +116,7 @@ module.exports = UserController =
 
 	update: (req, res, next) ->
 		user_id = req.params.user_id
-		{valid, update} = UserController._reqToMongoUpdate(req, UserController.ATTRIBUTES)
+		{valid, update} = UserAdminController._reqToMongoUpdate(req, UserAdminController.ATTRIBUTES)
 		if !valid
 			return res.sendStatus 400
 		db.users.update {_id: ObjectId(user_id)}, { $set: update }, (err) ->

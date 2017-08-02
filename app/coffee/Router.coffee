@@ -1,5 +1,5 @@
-UserController = require("./UserController")
-SubscriptionController = require("./SubscriptionController")
+UserAdminController = require("./UserAdminController")
+SubscriptionAdminController = require("./SubscriptionAdminController")
 GraphController = require("./GraphController")
 AuthorizationMiddlewear = require('../../../../app/js/Features/Authorization/AuthorizationMiddlewear')
 ProjectController = require("../../../../app/js/Features/Project/ProjectController")
@@ -12,18 +12,18 @@ module.exports =
 		webRouter.use "/admin", adminRouter
 		
 		adminRouter.use(AuthorizationMiddlewear.ensureUserIsSiteAdmin)
-		adminRouter.get    "/user",          UserController.index
-		adminRouter.post   "/user/search",   UserController.search
-		adminRouter.get    "/user/:user_id", UserController.show
-		adminRouter.post   "/user/:user_id", UserController.update
-		adminRouter.delete "/user/:user_id", UserController.delete
-		adminRouter.post   "/user/:user_id/email", UserController.updateEmail
+		adminRouter.get    "/user",          UserAdminController.index
+		adminRouter.post   "/user/search",   UserAdminController.search
+		adminRouter.get    "/user/:user_id", UserAdminController.show
+		adminRouter.post   "/user/:user_id", UserAdminController.update
+		adminRouter.delete "/user/:user_id", UserAdminController.delete
+		adminRouter.post   "/user/:user_id/email", UserAdminController.updateEmail
 		
-		adminRouter.get    "/user/:user_id/subscription/new",              SubscriptionController.new
-		adminRouter.get    "/user/:user_id/subscription/:subscription_id", SubscriptionController.show
-		adminRouter.post   "/subscription",                  SubscriptionController.create
-		adminRouter.post   "/subscription/:subscription_id", SubscriptionController.update
-		adminRouter.delete "/subscription/:subscription_id", SubscriptionController.delete
+		adminRouter.get    "/user/:user_id/subscription/new",              SubscriptionAdminController.new
+		adminRouter.get    "/user/:user_id/subscription/:subscription_id", SubscriptionAdminController.show
+		adminRouter.post   "/subscription",                  SubscriptionAdminController.create
+		adminRouter.post   "/subscription/:subscription_id", SubscriptionAdminController.update
+		adminRouter.delete "/subscription/:subscription_id", SubscriptionAdminController.delete
 	
 		adminRouter.get    "/user/graph/:user_id", GraphController.userGraph
 		adminRouter.delete "/project/:Project_id", ProjectController.deleteProject

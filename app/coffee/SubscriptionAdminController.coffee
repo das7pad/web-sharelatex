@@ -2,7 +2,7 @@ logger = require "logger-sharelatex"
 metrics = require "metrics-sharelatex"
 _ = require "underscore"
 Path = require("path")
-UserController = require("./UserController")
+UserAdminController = require("./UserAdminController")
 SubscriptionLocator = require("../../../../app/js/Features/Subscription/SubscriptionLocator")
 SubscriptionUpdater = require("../../../../app/js/Features/Subscription/SubscriptionUpdater")
 Subscription = require("../../../../app/js/models/Subscription").Subscription
@@ -13,7 +13,7 @@ mongojs = require("../../../../app/js/infrastructure/mongojs")
 db = mongojs.db
 ObjectId = mongojs.ObjectId
 
-module.exports = SubscriptionController =
+module.exports = SubscriptionAdminController =
 	ATTRIBUTES: [{
 		name: 'admin_id',
 		type: 'objectid'
@@ -49,7 +49,7 @@ module.exports = SubscriptionController =
 
 	update: (req, res, next) ->
 		{subscription_id, user_id} = req.params
-		{valid, update} = UserController._reqToMongoUpdate(req, SubscriptionController.ATTRIBUTES)
+		{valid, update} = UserAdminController._reqToMongoUpdate(req, SubscriptionAdminController.ATTRIBUTES)
 		if !valid
 			return res.sendStatus 400
 		logger.log {subscription_id, update}, "updating subscription via admin panel"
@@ -61,7 +61,7 @@ module.exports = SubscriptionController =
 		res.render Path.resolve(__dirname, "../views/subscription/new"), {admin_id: req.params.user_id}
 
 	create: (req, res, next) ->
-		{valid, update} = UserController._reqToMongoUpdate(req, SubscriptionController.ATTRIBUTES)
+		{valid, update} = UserAdminController._reqToMongoUpdate(req, SubscriptionAdminController.ATTRIBUTES)
 		if !valid
 			return res.sendStatus 400
 		logger.log {update}, "creating subscription via admin panel"

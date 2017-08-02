@@ -2,14 +2,14 @@ sinon = require('sinon')
 chai = require('chai')
 should = chai.should()
 expect = chai.expect
-modulePath = "../../../app/js/UserController.js"
+modulePath = "../../../app/js/UserAdminController.js"
 SandboxedModule = require('sandboxed-module')
 events = require "events"
 ObjectId = require("mongojs").ObjectId
 assert = require("assert")
 Path = require "path"
 
-describe "UserController", ->
+describe "UserAdminController", ->
 	beforeEach ->
 
 		@UserGetter =
@@ -28,7 +28,7 @@ describe "UserController", ->
 			getUsersSubscription: sinon.stub().yields(null, @user_subscription = {"mock": "subscription"})
 			getMemberSubscriptions: sinon.stub().yields(null, @member_subscriptions = [{"mock": "subscriptions"}])
 
-		@UserController = SandboxedModule.require modulePath, requires:
+		@UserAdminController = SandboxedModule.require modulePath, requires:
 			"logger-sharelatex":
 				log:->
 				err:->
@@ -48,7 +48,7 @@ describe "UserController", ->
 		@user = {user_id:1,first_name:'James'}
 		@users = [{first_name:'James'}, {first_name:'Henry'}]
 		@projects = [{lastUpdated:1, _id:1, owner_ref: "user-1"}, {lastUpdated:2, _id:2, owner_ref: "user-2"}]
-		@perPage = @UserController.perPage
+		@perPage = @UserAdminController.perPage
 
 		@db.users.find = sinon.stub().callsArgWith(3, null, @users)
 
@@ -77,19 +77,19 @@ describe "UserController", ->
 			@res.render = (pageName, opts)=>
 				pageName.should.equal  Path.resolve(__dirname + "/../../../")+ "/app/views/user/index"
 				done()
-			@UserController.index @req, @res
+			@UserAdminController.index @req, @res
 
 		it "should send the users", (done)->
 			@res.render = (pageName, opts)=>
 				opts.users.should.deep.equal @users
 				done()
-			@UserController.index @req, @res
+			@UserAdminController.index @req, @res
 
 		it "should send the pages", (done)->
 			@res.render = (pageName, opts)=>
 				opts.pages.should.equal Math.ceil(@users.length / @perPage)
 				done()
-			@UserController.index @req, @res
+			@UserAdminController.index @req, @res
 
 	describe "search", ->
 
@@ -107,14 +107,14 @@ describe "UserController", ->
 				code.should.equal 200
 				json.users.should.deep.equal @users
 				done()
-			@UserController.search @req, @res
+			@UserAdminController.search @req, @res
 
 		it "should send the pages", (done)->
 			@res.send = (code, json)=>
 				code.should.equal 200
 				json.pages.should.equal Math.ceil(@users.length / @perPage)
 				done()
-			@UserController.search @req, @res
+			@UserAdminController.search @req, @res
 
 	describe "show", ->
 
@@ -128,31 +128,31 @@ describe "UserController", ->
 			@res.render = (pageName, opts)=>
 				pageName.should.equal  Path.resolve(__dirname + "/../../../")+ "/app/views/user/show"
 				done()
-			@UserController.show @req, @res
+			@UserAdminController.show @req, @res
 
 		it "should send the user", (done)->
 			@res.render = (pageName, opts)=>
 				opts.user.should.deep.equal @user
 				done()
-			@UserController.show @req, @res
+			@UserAdminController.show @req, @res
 
 		it "should send the user projects", (done)->
 			@res.render = (pageName, opts)=>
 				opts.projects.should.deep.equal @projects
 				done()
-			@UserController.show @req, @res
+			@UserAdminController.show @req, @res
 		
 		it "should send the user's subscription", (done) ->
 			@res.render = (pageName, opts)=>
 				opts.subscription.should.deep.equal @user_subscription
 				done()
-			@UserController.show @req, @res
+			@UserAdminController.show @req, @res
 		
 		it "should send the user's subscription", (done) ->
 			@res.render = (pageName, opts)=>
 				opts.memberSubscriptions.should.deep.equal @member_subscriptions
 				done()
-			@UserController.show @req, @res
+			@UserAdminController.show @req, @res
 
 	describe "delete", ->
 
@@ -164,7 +164,7 @@ describe "UserController", ->
 				@UserDeleter.deleteUser.calledWith('user_id_here').should.equal true
 				code.should.equal 200
 				done()
-			@UserController.delete @req, @res
+			@UserAdminController.delete @req, @res
 
 	describe "update", ->
 		beforeEach ->
@@ -176,7 +176,7 @@ describe "UserController", ->
 			beforeEach ->
 				@req.body =
 					first_name: "James"
-				@UserController.update @req, @res
+				@UserAdminController.update @req, @res
 
 			it "should call db.users.update with the updated attributes", ->
 				@db.users.update
@@ -189,7 +189,7 @@ describe "UserController", ->
 			beforeEach ->
 				@req.body =
 					first_name: 100
-				@UserController.update @req, @res
+				@UserAdminController.update @req, @res
 
 			it "should return 400", ->
 				@res.sendStatus.calledWith(400).should.equal true
@@ -201,7 +201,7 @@ describe "UserController", ->
 			beforeEach ->
 				@req.body =
 					foo_bar: 100
-				@UserController.update @req, @res
+				@UserAdminController.update @req, @res
 
 			it "should ignore the attribute", ->
 				@db.users.update
@@ -214,7 +214,7 @@ describe "UserController", ->
 			beforeEach ->
 				@req.body =
 					'features.versioning': 'on'
-				@UserController.update @req, @res
+				@UserAdminController.update @req, @res
 
 			it "should set the attribute to true", ->
 				updateQuery = @db.users.update.args[0][1]
@@ -223,7 +223,7 @@ describe "UserController", ->
 		describe "with missing boolean attribute", ->
 			beforeEach ->
 				@req.body = {}
-				@UserController.update @req, @res
+				@UserAdminController.update @req, @res
 
 			it "should set the attribute to false", ->
 				updateQuery = @db.users.update.args[0][1]
@@ -233,7 +233,7 @@ describe "UserController", ->
 			beforeEach ->
 				@req.body =
 					'features.compileTimeout': '100'
-				@UserController.update @req, @res
+				@UserAdminController.update @req, @res
 
 			it "should cast the attribute to a number", ->
 				updateQuery = @db.users.update.args[0][1]
@@ -249,7 +249,7 @@ describe "UserController", ->
 		describe "successfully", ->
 			beforeEach ->
 				@UserUpdater.changeEmailAddress.yields(null)
-				@UserController.updateEmail @req, @res
+				@UserAdminController.updateEmail @req, @res
 			
 			it "should update the email", ->
 				@UserUpdater.changeEmailAddress
@@ -262,7 +262,7 @@ describe "UserController", ->
 		describe "with existing email", ->
 			beforeEach ->
 				@UserUpdater.changeEmailAddress.yields({message: "alread_exists"})
-				@UserController.updateEmail @req, @res
+				@UserAdminController.updateEmail @req, @res
 			
 			it "should return 400 with a message", ->
 				@res.send.calledWith(400, {message: "Email is in use by another user"}).should.equal true

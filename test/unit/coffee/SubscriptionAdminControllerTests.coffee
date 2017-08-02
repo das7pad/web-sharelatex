@@ -2,20 +2,20 @@ sinon = require('sinon')
 chai = require('chai')
 should = chai.should()
 expect = chai.expect
-modulePath = "../../../app/js/SubscriptionController.js"
+modulePath = "../../../app/js/SubscriptionAdminController.js"
 SandboxedModule = require('sandboxed-module')
 events = require "events"
 ObjectId = require("mongojs").ObjectId
 assert = require("assert")
 Path = require "path"
 
-describe "SubscriptionController", ->
+describe "SubscriptionAdminController", ->
 	beforeEach ->
-		@SubscriptionController = SandboxedModule.require modulePath, requires:
+		@SubscriptionAdminController = SandboxedModule.require modulePath, requires:
 			"logger-sharelatex":
 				log:->
 				err:->
-			"./UserController": @UserController = {}
+			"./UserAdminController": @UserAdminController = {}
 			"../../../../app/js/Features/Subscription/SubscriptionLocator": @SubscriptionLocator = {}
 			"../../../../app/js/Features/Subscription/SubscriptionUpdater": @SubscriptionUpdater = {}
 			"../../../../app/js/models/Subscription": Subscription: @Subscription =
@@ -60,7 +60,7 @@ describe "SubscriptionController", ->
 				@members = [{"mock": "member2"}, {"mock": "member2"}, {"mock": "member3"}]
 				@db.users.find.yields(null, @members)
 				@SubscriptionLocator.getSubscription.yields(null, @subscription)
-				@SubscriptionController.show @req, @res
+				@SubscriptionAdminController.show @req, @res
 			
 			it "should look up the subscription", ->
 				@SubscriptionLocator.getSubscription
@@ -80,7 +80,7 @@ describe "SubscriptionController", ->
 		describe "when subscription is not found", ->
 			beforeEach ->
 				@SubscriptionLocator.getSubscription.yields(null, null)
-				@SubscriptionController.show @req, @res
+				@SubscriptionAdminController.show @req, @res
 			
 			it "should render the 404 page", ->
 				@ErrorController.notFound
@@ -96,12 +96,12 @@ describe "SubscriptionController", ->
 		
 		describe "successfully", ->
 			beforeEach ->
-				@UserController._reqToMongoUpdate = sinon.stub().returns({valid: true, update: @update = {"mock": "update"}})
-				@SubscriptionController.update @req, @res
+				@UserAdminController._reqToMongoUpdate = sinon.stub().returns({valid: true, update: @update = {"mock": "update"}})
+				@SubscriptionAdminController.update @req, @res
 			
 			it "should convert the body params to an update", ->
-				@UserController._reqToMongoUpdate
-					.calledWith(@req, @SubscriptionController.ATTRIBUTES)
+				@UserAdminController._reqToMongoUpdate
+					.calledWith(@req, @SubscriptionAdminController.ATTRIBUTES)
 					.should.equal true
 			
 			it "should update the subscription", ->
@@ -116,8 +116,8 @@ describe "SubscriptionController", ->
 		
 		describe "when params are not valid", ->
 			beforeEach ->
-				@UserController._reqToMongoUpdate = sinon.stub().returns({valid: false})
-				@SubscriptionController.update @req, @res
+				@UserAdminController._reqToMongoUpdate = sinon.stub().returns({valid: false})
+				@SubscriptionAdminController.update @req, @res
 
 			it "should not update the subscription", ->
 				@Subscription.update.called.should.equal false
@@ -136,12 +136,12 @@ describe "SubscriptionController", ->
 		
 		describe "successfully", ->
 			beforeEach ->
-				@UserController._reqToMongoUpdate = sinon.stub().returns({valid: true, update: @update = {"mock": "update"}})
-				@SubscriptionController.create @req, @res
+				@UserAdminController._reqToMongoUpdate = sinon.stub().returns({valid: true, update: @update = {"mock": "update"}})
+				@SubscriptionAdminController.create @req, @res
 			
 			it "should convert the body params to an update", ->
-				@UserController._reqToMongoUpdate
-					.calledWith(@req, @SubscriptionController.ATTRIBUTES)
+				@UserAdminController._reqToMongoUpdate
+					.calledWith(@req, @SubscriptionAdminController.ATTRIBUTES)
 					.should.equal true
 			
 			it "should create the subscription", ->
@@ -155,8 +155,8 @@ describe "SubscriptionController", ->
 		
 		describe "when params are not valid", ->
 			beforeEach ->
-				@UserController._reqToMongoUpdate = sinon.stub().returns({valid: false})
-				@SubscriptionController.create @req, @res
+				@UserAdminController._reqToMongoUpdate = sinon.stub().returns({valid: false})
+				@SubscriptionAdminController.create @req, @res
 
 			it "should not save the subscription", ->
 				@Subscription::save.called.should.equal false
@@ -176,7 +176,7 @@ describe "SubscriptionController", ->
 			@SubscriptionLocator.getSubscription = sinon.stub().yields(null, @subscription)
 			@SubscriptionUpdater._setUsersMinimumFeatures = sinon.stub().yields()
 			@req.params = {@subscription_id}
-			@SubscriptionController.delete @req, @res
+			@SubscriptionAdminController.delete @req, @res
 			
 		it "should look up the subscription", ->
 			@SubscriptionLocator.getSubscription
