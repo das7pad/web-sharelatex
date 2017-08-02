@@ -5,6 +5,7 @@ Path = require("path")
 UserGetter = require "../../../../app/js/Features/User/UserGetter"
 UserDeleter = require("../../../../app/js/Features/User/UserDeleter")
 UserUpdater = require("../../../../app/js/Features/User/UserUpdater")
+{User} = require("../../../../app/js/models/User")
 AuthenticationManager = require("../../../../app/js/Features/Authentication/AuthenticationManager")
 SubscriptionLocator = require("../../../../app/js/Features/Subscription/SubscriptionLocator")
 async = require "async"
@@ -14,44 +15,6 @@ db = mongojs.db
 ObjectId = mongojs.ObjectId
 
 module.exports = UserAdminController =
-	ATTRIBUTES: [{
-		name: 'betaProgram',
-		type: 'boolean'
-	}, {
-		name: 'first_name',
-		type: 'string'
-	}, {
-		name: 'last_name',
-		type: 'string'
-	}, {
-		name: 'features.collaborators'
-		type: 'number'
-	}, {
-		name: 'features.versioning'
-		type: 'boolean'
-	}, {
-		name: 'features.dropbox'
-		type: 'boolean'
-	}, {
-		name: 'features.github'
-		type: 'boolean'
-	}, {
-		name: 'features.compileTimeout'
-		type: 'number'
-	}, {
-		name: 'features.compileGroup'
-		type: 'string'
-	}, {
-		name: 'features.templates'
-		type: 'boolean'
-	}, {
-		name: 'features.trackChanges'
-		type: 'boolean'
-	}, {
-		name: 'features.references'
-		type: 'boolean'
-	}]
-
 	perPage: 5
 	perSearch: 15
 
@@ -114,12 +77,37 @@ module.exports = UserAdminController =
 			return next(err) if err?
 			res.sendStatus 200
 
+	ALLOWED_ATTRIBUTES: [
+		'betaProgram',
+		'first_name',
+		'last_name',
+		'features.collaborators',
+		'features.versioning',
+		'features.dropbox',
+		'features.github',
+		'features.compileTimeout',
+		'features.compileGroup',
+		'features.templates',
+		'features.trackChanges',
+		'features.references'
+	]
+	BOOLEAN_ATTRIBUTES: [
+		'betaProgram',
+		'features.versioning',
+		'features.dropbox',
+		'features.github',
+		'features.templates',
+		'features.trackChanges',
+		'features.references'
+	]
 	update: (req, res, next) ->
 		user_id = req.params.user_id
-		{valid, update} = UserAdminController._reqToMongoUpdate(req, UserAdminController.ATTRIBUTES)
-		if !valid
-			return res.sendStatus 400
-		db.users.update {_id: ObjectId(user_id)}, { $set: update }, (err) ->
+		update = UserAdminController._reqToMongoUpdate(
+			req.body,
+			UserAdminController.ALLOWED_ATTRIBUTES,
+			UserAdminController.BOOLEAN_ATTRIBUTES
+		)
+		User.update {_id: ObjectId(user_id)}, { $set: update }, (err) ->
 			return next(err) if err?
 			res.sendStatus 204
 	
@@ -135,29 +123,15 @@ module.exports = UserAdminController =
 			else
 				return res.sendStatus 204
 
-	_reqToMongoUpdate: (req, attributes) ->
+	_reqToMongoUpdate: (body, attributes, booleans) ->
 		update = {}
 		for attribute in attributes
-			# Unticked checkboxes are not submitted
-			if attribute.type == "boolean" and !req.body[attribute.name]? 
-				req.body[attribute.name] = false
-			# Value of a checkbox is 'on'
-			if attribute.type == "boolean" and req.body[attribute.name] == "on"
-				req.body[attribute.name] = true
-			# Cast strings to numbers
-			if attribute.type == "number" and req.body[attribute.name]?
-				req.body[attribute.name] = parseInt(req.body[attribute.name], 10)
-			# Cast object ids to an ObjectId
-			if attribute.type == "objectid" and req.body[attribute.name]?
-				req.body[attribute.name] = ObjectId(req.body[attribute.name])
-
-			if req.body[attribute.name]?
-				if attribute.type == "objectid" or typeof req.body[attribute.name] == attribute.type
-					update[attribute.name] = req.body[attribute.name]
-				else
-					return { valid: false }
-		return {
-			valid: true
-			update: update
-		}
-		
+			if !body[attribute]? and (attribute in booleans)
+				# Unticked checkboxes are not submitted
+				update[attribute] = false
+			else if body[attribute] == "on" and (attribute in booleans)
+				# Value of a checkbox is sent as 'on'
+				update[attribute] = true
+			else if body[attribute]?
+				update[attribute] = body[attribute]
+		return update

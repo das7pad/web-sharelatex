@@ -14,26 +14,6 @@ db = mongojs.db
 ObjectId = mongojs.ObjectId
 
 module.exports = SubscriptionAdminController =
-	ATTRIBUTES: [{
-		name: 'admin_id',
-		type: 'objectid'
-	}, {
-		name: 'recurlySubscription_id',
-		type: 'string'
-	}, {
-		name: 'planCode',
-		type: 'string'
-	}, {
-		name: 'membersLimit'
-		type: 'number'
-	}, {
-		name: 'groupPlan'
-		type: 'boolean'
-	}, {
-		name: 'customAccount'
-		type: 'boolean'
-	}]
-
 	show: (req, res, next)->
 		# The user_id isn't used in the look up, it just provides a nice
 		# breadcrumb trail of where we came from for navigation
@@ -47,11 +27,22 @@ module.exports = SubscriptionAdminController =
 				return next(err) if err?
 				res.render Path.resolve(__dirname, "../views/subscription/show"), {subscription, user_id, members}
 
+	ALLOWED_ATTRIBUTES: [
+		'admin_id',
+		'recurlySubscription_id',
+		'planCode',
+		'membersLimit',
+		'groupPlan',
+		'customAccount'
+	]
+	BOOLEAN_ATTRIBUTES: ['groupPlan', 'customAccount']
 	update: (req, res, next) ->
 		{subscription_id, user_id} = req.params
-		{valid, update} = UserAdminController._reqToMongoUpdate(req, SubscriptionAdminController.ATTRIBUTES)
-		if !valid
-			return res.sendStatus 400
+		update = UserAdminController._reqToMongoUpdate(
+			req.body,
+			SubscriptionAdminController.ALLOWED_ATTRIBUTES,
+			SubscriptionAdminController.BOOLEAN_ATTRIBUTES
+		)
 		logger.log {subscription_id, update}, "updating subscription via admin panel"
 		Subscription.update {_id: ObjectId(subscription_id)}, { $set: update }, (error) ->
 			return next(error) if error?
@@ -61,9 +52,7 @@ module.exports = SubscriptionAdminController =
 		res.render Path.resolve(__dirname, "../views/subscription/new"), {admin_id: req.params.user_id}
 
 	create: (req, res, next) ->
-		{valid, update} = UserAdminController._reqToMongoUpdate(req, SubscriptionAdminController.ATTRIBUTES)
-		if !valid
-			return res.sendStatus 400
+		update = UserAdminController._reqToMongoUpdate(req.body, SubscriptionAdminController.ALLOWED_ATTRIBUTES)
 		logger.log {update}, "creating subscription via admin panel"
 		new Subscription(update).save (error, subscription) ->
 			return next(error) if error?

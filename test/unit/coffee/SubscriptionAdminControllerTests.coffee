@@ -96,12 +96,12 @@ describe "SubscriptionAdminController", ->
 		
 		describe "successfully", ->
 			beforeEach ->
-				@UserAdminController._reqToMongoUpdate = sinon.stub().returns({valid: true, update: @update = {"mock": "update"}})
+				@UserAdminController._reqToMongoUpdate = sinon.stub().returns(@update = {"mock": "update"})
 				@SubscriptionAdminController.update @req, @res
 			
 			it "should convert the body params to an update", ->
 				@UserAdminController._reqToMongoUpdate
-					.calledWith(@req, @SubscriptionAdminController.ATTRIBUTES)
+					.calledWith(@req.body, @SubscriptionAdminController.ALLOWED_ATTRIBUTES)
 					.should.equal true
 			
 			it "should update the subscription", ->
@@ -112,19 +112,6 @@ describe "SubscriptionAdminController", ->
 			it "should return 204", ->
 				@res.sendStatus
 					.calledWith(204)
-					.should.equal true
-		
-		describe "when params are not valid", ->
-			beforeEach ->
-				@UserAdminController._reqToMongoUpdate = sinon.stub().returns({valid: false})
-				@SubscriptionAdminController.update @req, @res
-
-			it "should not update the subscription", ->
-				@Subscription.update.called.should.equal false
-			
-			it "should return 400", ->
-				@res.sendStatus
-					.calledWith(400)
 					.should.equal true
 
 	describe "create", ->
@@ -141,7 +128,7 @@ describe "SubscriptionAdminController", ->
 			
 			it "should convert the body params to an update", ->
 				@UserAdminController._reqToMongoUpdate
-					.calledWith(@req, @SubscriptionAdminController.ATTRIBUTES)
+					.calledWith(@req.body, @SubscriptionAdminController.ALLOWED_ATTRIBUTES)
 					.should.equal true
 			
 			it "should create the subscription", ->
@@ -151,19 +138,6 @@ describe "SubscriptionAdminController", ->
 			it "should return the subscription as json", ->
 				@res.json
 					.calledWith({subscription: @new_subscription})
-					.should.equal true
-		
-		describe "when params are not valid", ->
-			beforeEach ->
-				@UserAdminController._reqToMongoUpdate = sinon.stub().returns({valid: false})
-				@SubscriptionAdminController.create @req, @res
-
-			it "should not save the subscription", ->
-				@Subscription::save.called.should.equal false
-			
-			it "should return 400", ->
-				@res.sendStatus
-					.calledWith(400)
 					.should.equal true
 
 	describe "delete", ->

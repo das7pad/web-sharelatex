@@ -20,6 +20,9 @@ describe "UserAdminController", ->
 	
 		@UserUpdater =
 			changeEmailAddress: sinon.stub()
+		
+		@User = class User
+			@update: sinon.stub().yields()
 
 		@AuthenticationManager =
 			setUserPassword: sinon.stub()
@@ -37,6 +40,7 @@ describe "UserAdminController", ->
 			"../../../../app/js/Features/User/UserUpdater":@UserUpdater
 			"../../../../app/js/Features/Authentication/AuthenticationManager":@AuthenticationManager
 			"../../../../app/js/Features/Subscription/SubscriptionLocator": @SubscriptionLocator
+			"../../../../app/js/models/User": User: @User
 			"../../../../app/js/infrastructure/mongojs":
 				db: @db =
 					projects: {}
@@ -178,24 +182,12 @@ describe "UserAdminController", ->
 					first_name: "James"
 				@UserAdminController.update @req, @res
 
-			it "should call db.users.update with the updated attributes", ->
-				@db.users.update
+			it "should call User.update with the updated attributes", ->
+				@User.update
 					.calledWith({_id: ObjectId(@user_id)})
 					.should.equal true
-				updateQuery = @db.users.update.args[0][1]
+				updateQuery = @User.update.args[0][1]
 				updateQuery.$set.first_name.should.equal "James"
-			
-		describe "with attributes of the wrong type", ->
-			beforeEach ->
-				@req.body =
-					first_name: 100
-				@UserAdminController.update @req, @res
-
-			it "should return 400", ->
-				@res.sendStatus.calledWith(400).should.equal true
-			
-			it "should not update the db", ->
-				@db.users.update.called.should.equal false
 			
 		describe "with unknown attribute", ->
 			beforeEach ->
@@ -204,10 +196,10 @@ describe "UserAdminController", ->
 				@UserAdminController.update @req, @res
 
 			it "should ignore the attribute", ->
-				@db.users.update
+				@User.update
 					.calledWith({_id: ObjectId(@user_id)})
 					.should.equal true
-				updateQuery = @db.users.update.args[0][1]
+				updateQuery = @User.update.args[0][1]
 				expect(updateQuery.$set.foo_bar).to.equal undefined
 		
 		describe "with boolean attribute set to 'on'", ->
@@ -217,7 +209,7 @@ describe "UserAdminController", ->
 				@UserAdminController.update @req, @res
 
 			it "should set the attribute to true", ->
-				updateQuery = @db.users.update.args[0][1]
+				updateQuery = @User.update.args[0][1]
 				expect(updateQuery.$set['features.versioning']).to.equal true
 			
 		describe "with missing boolean attribute", ->
@@ -226,18 +218,8 @@ describe "UserAdminController", ->
 				@UserAdminController.update @req, @res
 
 			it "should set the attribute to false", ->
-				updateQuery = @db.users.update.args[0][1]
+				updateQuery = @User.update.args[0][1]
 				expect(updateQuery.$set['features.versioning']).to.equal false
-		
-		describe "with number attribute", ->
-			beforeEach ->
-				@req.body =
-					'features.compileTimeout': '100'
-				@UserAdminController.update @req, @res
-
-			it "should cast the attribute to a number", ->
-				updateQuery = @db.users.update.args[0][1]
-				expect(updateQuery.$set['features.compileTimeout']).to.equal 100
 				
 	describe "updateEmail", ->
 		beforeEach ->
