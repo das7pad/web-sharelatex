@@ -12,38 +12,37 @@ SubscriptionLocator = require("../../../../app/js/Features/Subscription/Subscrip
 async = require "async"
 
 module.exports = UserAdminController =
-	perPage: 5
-	perSearch: 15
+	PER_PAGE: 100
 
 	index: (req, res, next)->
 		logger.log "getting admin request for list of users"
-		UserAdminController._userFind '', 1, '_id', false, (err, users, count)->
-			if err?
-				return next(err)
-			pages = Math.ceil(count / UserAdminController.perPage)
+		UserAdminController._userFind null, 1, (err, users, pages)->
+			return next(err) if err?
 			res.render Path.resolve(__dirname, "../views/user/index"), users:users, pages:pages
 
 	search: (req, res, next)->
 		logger.log body: req.body, "getting admin request for search users"
-		UserAdminController._userFind req.body.query, req.body.page, req.body.sort, req.body.reverse, (err, users, count) ->
-			if err?
-				return next(err)
-			pages = Math.ceil(count / UserAdminController.perPage)
+		UserAdminController._userFind req.body.query, req.body.page, (err, users, pages) ->
+			return next(err) if err?
 			res.send 200, {users:users, pages:pages}
 
-	_userFind: (q, page, sortField, reverse, cb = () ->) ->
-		q = [ {email:new RegExp(q)}, {name:new RegExp(q)} ]
-		skip = (page - 1) * UserAdminController.perPage
-		sortOrder = {}
-		sortOrder[sortField] = if reverse then -1 else 1
-		opts = {limit: UserAdminController.perSearch, skip : skip, sort: sortOrder }
+	_userFind: (query, page, cb = () ->) ->
+		if query? and query != ""
+			q = {email: new RegExp(query)}
+		else
+			q = {}
+		skip = (page - 1) * UserAdminController.PER_PAGE
+		opts = {limit: UserAdminController.PER_PAGE, skip : skip, sort: {email: 1} }
 		logger.log opts:opts, q:q, "user options and query"
-		User.find {$or : q}, {first_name:1, email:1, lastLoggedIn:1, loginCount:1}, opts, (err, users)->
+		User.find q, {first_name:1, email:1, lastLoggedIn:1, loginCount:1}, opts, (err, users)->
 			if err?
 				logger.err err:err, "error getting admin data for users list page"
 				return cb(err)
 			logger.log opts:opts, q:q, users_length:users?.length, "found users for admin search"
-			cb(err, users, users.length)
+			User.count q, (err, count) ->
+				return cb(err) if err?
+				pages = Math.ceil(count / UserAdminController.PER_PAGE)
+				cb(err, users, pages)
 
 	show: (req, res, next)->
 		user_id = req.params.user_id

@@ -14,7 +14,8 @@ describe "UserAdminController", ->
 		@user = {user_id:1,first_name:'James'}
 		@users = users = [{first_name:'James'}, {first_name:'Henry'}]
 		@projects = [{lastUpdated:1, _id:1, owner_ref: "user-1"}, {lastUpdated:2, _id:2, owner_ref: "user-2"}]
-		@perPage = @UserAdminController.perPage
+		@perPage = @UserAdminController.PER_PAGE
+		@user_count = user_count = 35043
 
 		@UserGetter =
 			getUser: sinon.stub()
@@ -28,6 +29,7 @@ describe "UserAdminController", ->
 		@User = class User
 			@update: sinon.stub().yields()
 			@find: sinon.stub().yields(null, users)
+			@count: sinon.stub().yields(null, user_count)
 
 		@AuthenticationManager =
 			setUserPassword: sinon.stub()
@@ -82,7 +84,7 @@ describe "UserAdminController", ->
 
 		it "should send the pages", (done)->
 			@res.render = (pageName, opts)=>
-				opts.pages.should.equal Math.ceil(@users.length / @perPage)
+				opts.pages.should.equal Math.ceil(@user_count / @perPage)
 				done()
 			@UserAdminController.index @req, @res
 
@@ -94,8 +96,6 @@ describe "UserAdminController", ->
 				body:
 					query: ''
 					page: 1
-					sort: 'field_name'
-					reverse: true
 
 		it "should send the users", (done)->
 			@res.send = (code, json)=>
@@ -107,7 +107,7 @@ describe "UserAdminController", ->
 		it "should send the pages", (done)->
 			@res.send = (code, json)=>
 				code.should.equal 200
-				json.pages.should.equal Math.ceil(@users.length / @perPage)
+				json.pages.should.equal Math.ceil(@user_count / @perPage)
 				done()
 			@UserAdminController.search @req, @res
 

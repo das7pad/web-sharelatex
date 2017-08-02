@@ -21,7 +21,7 @@ block content
 									autofocus='autofocus',
 									ng-model="searchText",
 									focus-on='search:clear',
-									ng-keyup="searchUsers()"
+									on-enter="searchUsers()"
 								)
 								i.fa.fa-search.form-control-feedback-left
 								i.fa.fa-times.form-control-feedback(
@@ -62,17 +62,13 @@ block content
 												select-all,
 												type="checkbox"
 											)
-											span.header.clickable(ng-click="changePredicate('email')") Email 
-												i.tablesort.fa(ng-class="getSortIconClass('email')")
+											span.header.clickable(ng-click="changePredicate('email')") Email
 										.col-xs-3
-											span.header.clickable(ng-click="changePredicate('first_name')") Name 
-												i.tablesort.fa(ng-class="getSortIconClass('first_name')")
+											span.header.clickable(ng-click="changePredicate('first_name')") Name
 										.col-xs-3
-											span.header.clickable(ng-click="changePredicate('lastLoggedIn')") Last logged in 
-												i.tablesort.fa(ng-class="getSortIconClass('lastLoggedIn')")
+											span.header.clickable(ng-click="changePredicate('lastLoggedIn')") Last logged in
 										.col-xs-2
-											span.header.clickable(ng-click="changePredicate('loginCount')") Login Count 
-												i.tablesort.fa(ng-class="getSortIconClass('loginCount')")
+											span.header.clickable(ng-click="changePredicate('loginCount')") Login Count
 								li.user_entry.container-fluid(
 									ng-repeat="user in visibleUsers",
 									ng-controller="UserListItemController"
@@ -101,20 +97,16 @@ block content
 									.row
 										.col-xs-12.text-centered
 											small No Users
-				.row.row-spaced(
-					ng-show="visibleUsers.length > 14"
-				)
-					.col-xs-12.text-centered
-						span Search limit has been reached. For more users, improve your filter.
-				ul.pager(
-					ng-if="pages > 1",
-					ng-show="false"
-				)
-					li(
-						ng-repeat="page in pagesList",
-						ng-class="{active: (page == pageSelected)}"
+				div(ng-if="pages > 1")
+					ul.pager(
+						
 					)
-						a(href, ng-click="changePage(page)") {{page}}
+						li Pages:&nbsp;
+						li(
+							ng-repeat="page in pagesList",
+							ng-class="{active: (page == pageSelected)}"
+						)
+							a(href, ng-click="changePage(page)") {{page}}
 
 
 		include ./_modals
