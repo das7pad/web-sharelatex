@@ -168,34 +168,12 @@ describe "SubscriptionAdminController", ->
 
 	describe "delete", ->
 		beforeEach ->
-			@subscription = {
-				"mock": "subscription",
-				admin_id: ObjectId(),
-				member_ids: [ ObjectId(), ObjectId(), ObjectId() ]
-			}
-			@SubscriptionLocator.getSubscription = sinon.stub().yields(null, @subscription)
-			@SubscriptionUpdater._setUsersMinimumFeatures = sinon.stub().yields()
+			@SubscriptionUpdater.deleteSubscription = sinon.stub().yields()
 			@req.params = {@subscription_id}
 			@SubscriptionAdminController.delete @req, @res
-			
-		it "should look up the subscription", ->
-			@SubscriptionLocator.getSubscription
-				.calledWith(@subscription_id)
-				.should.equal true
 		
 		it "should remove the subscription", ->
-			@Subscription.remove
-				.calledWith({_id: ObjectId(@subscription_id)})
+			@SubscriptionUpdater.deleteSubscription
+				.calledWith(@subscription_id)
 				.should.equal true
-		
-		it "should downgrade the admin_id", ->
-			@SubscriptionUpdater._setUsersMinimumFeatures
-				.calledWith(@subscription.admin_id)
-				.should.equal true
-		
-		it "should downgrade all of the members", ->
-			for user_id in @subscription.member_ids
-				@SubscriptionUpdater._setUsersMinimumFeatures
-					.calledWith(user_id)
-					.should.equal true
 			

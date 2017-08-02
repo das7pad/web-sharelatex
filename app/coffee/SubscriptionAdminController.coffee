@@ -72,12 +72,6 @@ module.exports = SubscriptionAdminController =
 	delete: (req, res)->
 		subscription_id = req.params.subscription_id
 		logger.log subscription_id: subscription_id, "received admin request to delete subscription"
-		SubscriptionLocator.getSubscription subscription_id, (err, subscription) ->
+		SubscriptionUpdater.deleteSubscription subscription_id, (err) ->
 			return next(err) if err?
-			affected_user_ids = [subscription.admin_id].concat(subscription.member_ids or [])
-			logger.log {subscription_id, affected_user_ids}, "deleting subscription and downgrading users"
-			Subscription.remove {_id: ObjectId(subscription_id)}, (err) ->
-				return next(err) if err?
-				async.mapSeries affected_user_ids, SubscriptionUpdater._setUsersMinimumFeatures, (err) ->
-					return next(err) if err?
-					res.sendStatus 204
+			res.sendStatus 204
