@@ -2,13 +2,11 @@ define [
 	"base"
 ], (App) ->
 
-	App.controller "AdminPanelController", ($scope, $http, $timeout, $window, $modal, queuedHttp) ->
+	App.controller "AdminUserListController", ($scope, $http, $timeout, $window, $modal, queuedHttp) ->
 		$scope.users = window.data.users
 		$scope.pages = window.data.pages
 		$scope.allSelected = false
 		$scope.selectedUsers = []
-		$scope.predicate = "first_name"
-		$scope.reverse = false
 		$scope.timer
 		$scope.pageSelected = 1
 
@@ -40,8 +38,6 @@ define [
 			data._csrf = window.csrfToken
 			data.query = $scope.searchText
 			data.page = $scope.pageSelected
-			data.sort = $scope.predicate
-			data.reverse = $scope.reverse
 			request = $http.post "/admin/user/search", data
 			request.then (response)->
 				data = response.data
@@ -57,9 +53,8 @@ define [
 			sendSearch()
 
 		$scope.searchUsers = () ->
-			$scope.pageSelected = 1;
-			$timeout.cancel $scope.timer
-			$scope.timer = $timeout (-> sendSearch()) , 700
+			$scope.pageSelected = 1
+			sendSearch()
 
 		$scope.changePage = (page) ->
 			$scope.pageSelected = page
@@ -88,21 +83,7 @@ define [
 		$scope.updatePages = () ->
 			$scope.pagesList = []
 			if $scope.pages > 1
-				$scope.pagesList.push i for i in [1..$scope.pages]
-
-		$scope.changePredicate = (newPredicate)->
-			if $scope.predicate == newPredicate
-				$scope.reverse = !$scope.reverse
-			$scope.predicate = newPredicate
-			sendSearch()
-
-		$scope.getSortIconClass = (column)->
-			if column == $scope.predicate and $scope.reverse
-				return "fa-caret-down"
-			else if column == $scope.predicate and !$scope.reverse
-				return "fa-caret-up"
-			else
-				return ""
+				$scope.pagesList.push i for i in [1..Math.min(100, $scope.pages)]
 
 		$scope._removeUserFromList = (user) ->
 			index = $scope.users.indexOf(user)

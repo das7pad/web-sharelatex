@@ -2,14 +2,14 @@ sinon = require('sinon')
 chai = require('chai')
 should = chai.should()
 expect = chai.expect
-modulePath = "../../../app/js/AdminGraphController.js"
+modulePath = "../../../app/js/GraphController.js"
 SandboxedModule = require('sandboxed-module')
 events = require "events"
 ObjectId = require("mongojs").ObjectId
 assert = require("assert")
 Path = require "path"
 
-describe "AdminGraphController", ->
+describe "GraphController", ->
 	beforeEach ->
 
 		@UserGetter =
@@ -22,7 +22,7 @@ describe "AdminGraphController", ->
 			addEdge: sinon.stub()
 			new: sinon.stub()
 
-		@AdminGraphController = SandboxedModule.require modulePath, requires:
+		@GraphController = SandboxedModule.require modulePath, requires:
 			"logger-sharelatex": 
 				log:->
 				err:->
@@ -79,37 +79,37 @@ describe "AdminGraphController", ->
 
 		beforeEach ->
 
-			@AdminGraphController._nextLevel = sinon.stub().callsArgWith(3, null, @SigmaJSGraph)
+			@GraphController._nextLevel = sinon.stub().callsArgWith(3, null, @SigmaJSGraph)
 
 		it "should render the graph page", (done)->
 			@res.render = (pageName, opts)=>
-				pageName.should.equal  Path.resolve(__dirname + "/../../../")+ "/app/views/userGraph"
+				pageName.should.equal  Path.resolve(__dirname + "/../../../")+ "/app/views/user/graph"
 				done()
-			@AdminGraphController.userGraph @req, @res
+			@GraphController.userGraph @req, @res
 
 		it "should send the user", (done)->
 			@res.render = (pageName, opts)=>
 				opts.user.should.deep.equal @users[0]
 				done()
-			@AdminGraphController.userGraph @req, @res
+			@GraphController.userGraph @req, @res
 
 		it "should send the user graph", (done)->
 			@res.render = (pageName, opts)=>
 				opts.graph.should.deep.equal @SigmaJSGraph
 				done()
-			@AdminGraphController.userGraph @req, @res
+			@GraphController.userGraph @req, @res
 
 	describe "_genGraph", ->
 
 		beforeEach ->
 
 		it "should create graph with nodes", (done)-> 
-			@AdminGraphController._genGraph @projects, [@users[0]._id.toString()], @SigmaJSGraph, (err, graph) ->
+			@GraphController._genGraph @projects, [@users[0]._id.toString()], @SigmaJSGraph, (err, graph) ->
 				graph.nodes.should.exists
 				done()
 
 		it "should create graph with edges", (done)-> 
-			@AdminGraphController._genGraph @projects, [@users[0]._id.toString()], @SigmaJSGraph, (err, graph) ->
+			@GraphController._genGraph @projects, [@users[0]._id.toString()], @SigmaJSGraph, (err, graph) ->
 				graph.edges.should.exists
 				done()
 
@@ -122,18 +122,18 @@ describe "AdminGraphController", ->
 				edges: [1,2,3,4]
 			}
 
-			@AdminGraphController._genGraph = sinon.stub().callsArgWith(3, null, @OneLevelGraph)
-			@AdminGraphController._getNames = sinon.stub().callsArgWith(1, null, @OneLevelGraph)
+			@GraphController._genGraph = sinon.stub().callsArgWith(3, null, @OneLevelGraph)
+			@GraphController._getNames = sinon.stub().callsArgWith(1, null, @OneLevelGraph)
 
 		it "should create 1-level graph", (done)-> 
-			@AdminGraphController._nextLevel [@users[0]._id.toString()], @emptyGraph, 1, (err, graph) ->
+			@GraphController._nextLevel [@users[0]._id.toString()], @emptyGraph, 1, (err, graph) ->
 				assert.equal graph.nodes.length, 3
 				done()
 
 	describe "_getNames", ->
 
 		it "should add name to nodes", (done)-> 
-			@AdminGraphController._getNames {@nodes, edges:[]}, (err, graph) ->
+			@GraphController._getNames {@nodes, edges:[]}, (err, graph) ->
 				for node in graph.nodes
 					node.label.should.not.equal ''
 				done()

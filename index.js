@@ -1,7 +1,7 @@
 (function() {
   var AdminPanelRouter, Templates;
 
-  AdminPanelRouter = require("./app/js/AdminPanelRouter");
+  AdminPanelRouter = require("./app/js/Router");
 
   module.exports = Templates = {
     router: AdminPanelRouter

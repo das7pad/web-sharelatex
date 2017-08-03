@@ -1,0 +1,18 @@
+table.table.table-striped.table-bordered
+	tr
+		td
+			strong Personal Subscription
+		td
+			if subscription
+				a(href="/admin/user/" + user._id + "/subscription/" + subscription._id) #{subscription._id}
+			else
+				a.btn.btn-primary(href="/admin/user/" + user._id + "/subscription/new") Create Subscription
+
+	if memberSubscriptions.length > 0
+		for sub in memberSubscriptions
+			tr
+				td
+					strong Group Subscription
+				td
+					a(href="/admin/user/" + user._id + "/subscription/" + sub._id) #{sub._id}
+		

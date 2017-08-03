@@ -3,10 +3,11 @@ define [
 	"libs/md5"
 ], (App) ->
 
-	App.controller "AdminProjectController", ($scope, $timeout, $modal, queuedHttp) ->
+	App.controller "AdminUserController", ($scope, $timeout, $modal, queuedHttp) ->
 		$scope.user = window.data.user
 		$scope.projects = window.data.projects
-		$scope.user.gravatar =  CryptoJS.MD5($scope.user.email).toString()
+		$scope.searchText =
+			value: ""
 		$scope.selectedProjects = []
 		$scope.predicate = "lastUpdated"
 		$scope.reverse = true
@@ -16,36 +17,8 @@ define [
 		for project in $scope.projects
 			project.accessLevel = "owner"
 
-		$scope.enableBetaForUser = () ->
-			$scope.enableBetaError = false
-			queuedHttp({
-				method: 'POST'
-				url: "/admin/user/#{$scope.user._id}/setBetaStatus"
-				headers:
-					"X-CSRF-Token": window.csrfToken
-					"Content-Type": "application/json"
-				data:
-					beta: true
-			})
-				.then(() -> $scope.user.betaProgram = true)
-				.catch((response) -> console.error("Error", response.data); $scope.enableBetaError = true)
-
-		$scope.disableBetaForUser = () ->
-			$scope.enableBetaError = false
-			queuedHttp({
-				method: 'POST'
-				url: "/admin/user/#{$scope.user._id}/setBetaStatus"
-				headers:
-					"X-CSRF-Token": window.csrfToken
-					"Content-Type": "application/json"
-				data:
-					beta: false
-			})
-				.then(() -> $scope.user.betaProgram = false)
-				.catch((response) -> console.error("Error", response.data); $scope.enableBetaError = true)
-
 		$scope.clearSearchText = () ->
-			$scope.searchText = ""
+			$scope.searchText.value = ""
 			$scope.updateVisibleProjects()
 
 		$scope.searchProjects = () ->
@@ -121,33 +94,14 @@ define [
 				)
 			)
 
-
-		# Set user password
-		$scope.openSetPasswordModal = () ->
-			modalInstance = $modal.open(
-				templateUrl: "setPasswordModalTemplate"
-				controller: "SetPasswordModalController"
-				resolve:
-					user: () -> $scope.user
-			)
-			modalInstance.result.then(
-				(newPassword) ->
-					$scope.SetUserPassword(newPassword)
-			)
-		$scope.SetUserPassword = (newPassword) ->
-			queuedHttp.post "/admin/user/#{$scope.user._id}/setPassword", {
-				newPassword: newPassword
-				_csrf: window.csrfToken
-			}
-
 		$scope.updateVisibleProjects = () ->
 			$scope.visibleProjects = []
 
 			for project in $scope.projects
 				visible = true
 				# Only show if it matches any search text
-				if $scope.searchText? and $scope.searchText != ""
-					if !project.name.toLowerCase().match($scope.searchText.toLowerCase())
+				if $scope.searchText.value? and $scope.searchText.value != ""
+					if !project.name.toLowerCase().match($scope.searchText.value.toLowerCase())
 						visible = false
 
 				if visible
