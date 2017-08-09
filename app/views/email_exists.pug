@@ -1,0 +1,14 @@
+extends ../../../../app/views/layout
+
+block content
+	.content.content-alt
+		.container
+			.row
+				.col-md-8.col-md-offset-2
+					.card
+						.page-header
+							h2 Couldn't set up beta account
+						p
+							| Your email address, <strong>#{email}</strong>, already exists in the beta system
+							| with a ShareLaTeX account, and we don't yet have a way to merge accounts, sorry.
+							| We're working on it!
