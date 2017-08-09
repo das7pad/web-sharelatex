@@ -66,7 +66,13 @@ module.exports = PublicRegistrationController =
 			verifyLink = SubscriptionDomainHandler.getDomainLicencePage(user)
 			redir = verifyLink or AuthenticationController._getRedirectFromSession(req) or "/project"
 			if err? and err?.message == "EmailAlreadyRegistered"
-				return AuthenticationController.passportLogin req, res, next
+				if user?.overleaf?.id?
+					res.json {
+						message: 
+							text: "You are already registered in ShareLaTeX through the Overleaf Beta. Please log in via Overleaf."
+					}
+				else
+					return AuthenticationController.passportLogin req, res, next
 			else if err?
 				next(err)
 			else
