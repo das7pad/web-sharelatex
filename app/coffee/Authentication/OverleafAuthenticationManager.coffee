@@ -1,13 +1,13 @@
 logger = require("logger-sharelatex")
-{User} = require "../../../../app/js/models/User"
-UserCreator = require "../../../../app/js/Features/User/UserCreator"
+{User} = require "../../../../../app/js/models/User"
+UserCreator = require "../../../../../app/js/Features/User/UserCreator"
 request = require "request"
 settings = require "settings-sharelatex"
 
 module.exports = OverleafAuthenticationManager =
 	getUserProfile: (accessToken, callback) ->
 		request.get {
-			url: "#{settings.overleaf_oauth.host}/api/v1/sharelatex/users/current_user/profile"
+			url: "#{settings.overleaf.host}/api/v1/sharelatex/users/current_user/profile"
 			json: true
 			headers:
 				Authorization: "Bearer #{accessToken}"
