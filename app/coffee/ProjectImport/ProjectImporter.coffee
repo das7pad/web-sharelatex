@@ -6,55 +6,81 @@ uuid = require "uuid"
 _ = require "underscore"
 async = require "async"
 fs = require "fs"
+request = require "request"
 
 ProjectCreationHandler = require "../../../../../app/js/Features/Project/ProjectCreationHandler"
 ProjectEntityHandler = require "../../../../../app/js/Features/Project/ProjectEntityHandler"
 {User} = require "../../../../../app/js/models/User"
 
+ENGINE_TO_COMPILER_MAP = {
+	latex_dvipdf: "latex"
+	pdflatex:     "pdflatex"
+	xelatex:      "xelatex"
+	lualatex:     "lualatex"
+}
+
 module.exports = ProjectImporter =
-	importProject: (ol_project_id, user_id, callback = (error, sl_project_id) ->) ->
-		console.log "IMPORTING PROJET"
+	importProject: (ol_doc_id, user_id, callback = (error, project_id) ->) ->
+		logger.log {ol_doc_id, user_id}, "importing project from overleaf"
+		ProjectImporter._getOverleafDoc ol_doc_id, user_id, (error, doc) ->
+			return callback(error) if error?
+			ProjectImporter._initSlProject user_id, doc, (error, project) ->
+				return callback(error) if error?
+				project_id = project._id
+				ProjectImporter._importFiles project_id, doc.files, (error) ->
+					return callback(error) if error?
+					logger.log {project_id, ol_doc_id, user_id}, "finished project import"
+					callback null, project_id
+
+	_getOverleafDoc: (ol_doc_id, user_id, callback = (error, doc) ->) ->
 		User.findOne { "_id": user_id }, { overleaf: true }, (error, user) ->
 			return callback(error) if error?
 			return callback(new Error("user not found")) if !user?
-			console.log "FOUND USER, making request"
 			oAuthRequest user, {
-				url: "#{settings.overleaf.host}/api/v1/sharelatex/docs/#{ol_project_id}"
+				url: "#{settings.overleaf.host}/api/v1/sharelatex/docs/#{ol_doc_id}"
 				method: "GET"
 				json: true
 			}, (error, doc) ->
 				return callback(error) if error?
 				logger.log {doc}, "got doc for project from overleaf"
-				ProjectCreationHandler.createBlankProject user_id, doc.title, (err, project) ->
-					return callback(error) if error?
-					sl_project_id = project._id
-					project.overleaf.id = doc.id
-					project.overleaf.imported_at_version = doc.version
-					project.save (error) ->
-						return callback(error) if error?
-						async.mapSeries doc.files,
-							(file, cb) -> ProjectImporter._importFile sl_project_id, file, cb
-							(error) ->
-								return callback(error) if error?
-								logger.log {sl_project_id, ol_project_id, user_id}, "finished project import"
-								callback null, sl_project_id
-					
-	
-	_importFile: (sl_project_id, file, callback = (error) ->) ->
+				return callback(null, doc)
+
+	_initSlProject: (user_id, doc, callback = (err, project) ->) ->
+		ProjectCreationHandler.createBlankProject user_id, doc.title, (err, project) ->
+			return callback(error) if error?
+			project.overleaf.id = doc.id
+			project.overleaf.imported_at_version = doc.version
+			if ENGINE_TO_COMPILER_MAP[doc.latex_engine]?
+				project.compiler = ENGINE_TO_COMPILER_MAP[doc.latex_engine]
+			project.save (error) ->
+				return callback(error) if error?
+				return callback(null, project)
+
+	_importFiles: (project_id, files, callback = (error) ->) ->
+		async.mapSeries files,
+			(file, cb) -> ProjectImporter._importFile project_id, file, cb
+			callback
+
+	_importFile: (project_id, file, callback = (error) ->) ->
 		path = "/" + file.file
 		dirname = Path.dirname(path)
 		name = Path.basename(path)
-		logger.log {path: file.file, sl_project_id, dirname, name, type: file.type}, "importing file"
-		ProjectEntityHandler.mkdirp sl_project_id, dirname, (error, folders, lastFolder) ->
+		logger.log {path: file.file, project_id, dirname, name, type: file.type}, "importing file"
+		ProjectEntityHandler.mkdirp project_id, dirname, (error, folders, lastFolder) ->
 			return callback(error) if error?
 			folder_id = lastFolder._id
 			if file.type == "src"
-				ProjectEntityHandler.addDoc sl_project_id, folder_id, name, file.latest_content.split("\n"), callback
+				ProjectEntityHandler.addDoc project_id, folder_id, name, file.latest_content.split("\n"), (error, doc) ->
+					return callback(error) if error?
+					if file.main
+						ProjectEntityHandler.setRootDoc project_id, doc._id, callback
+					else
+						callback()
 			else if file.type == "att"
 				url = "#{settings.overleaf.s3.host}/#{file.file_path}"
 				ProjectImporter._writeUrlToDisk url, (error, pathOnDisk) ->
 					return callback(error) if error?
-					ProjectEntityHandler.addFile sl_project_id, folder_id, name, pathOnDisk, callback
+					ProjectEntityHandler.addFile project_id, folder_id, name, pathOnDisk, callback
 			else
 				logger.warn {type: file.type, path: file.file}, "unknown file type"
 				callback()
@@ -77,8 +103,3 @@ module.exports = ProjectImporter =
 
 			writeStream.on "finish", ->
 				callback null, pathOnDisk
-# 
-# ProjectImporter.importProject "243ftrddtmzxkyy", "59958d4dcf11ae281afb5334", "55e1e5ca5ac646cf51a1aeebee68fbd8448cc97af2801c97f9c0e754ec57cc8b", (error, sl_project_id) ->
-# 	throw error if error?
-# 	console.log "IMPORTED: #{sl_project_id}"
-# 	process.exit()
