@@ -6,10 +6,12 @@ OAuthRequest =
 	_doRequest: (user, opts, callback = (error, body) ->) ->
 		if !user?.overleaf?.accessToken?
 			return callback(new Error("user does not have access token for overleaf"))
-		opts.headers ?= {}
-		opts.headers.Authorization = "Bearer #{user.overleaf.accessToken}"
-		logger.log {opts}, "making overleaf request"
-		request opts, (error, response, body) ->
+		optsWithAuth = {}
+		optsWithAuth[k] = v for k,v of opts
+		optsWithAuth.headers ?= {}
+		optsWithAuth.headers.Authorization = "Bearer #{user.overleaf.accessToken}"
+		logger.log {opts: optsWithAuth}, "making overleaf request"
+		request optsWithAuth, (error, response, body) ->
 			return callback(error) if error?
 			if 200 <= response.statusCode < 300
 				return callback null, body
