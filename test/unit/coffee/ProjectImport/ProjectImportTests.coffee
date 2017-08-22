@@ -61,25 +61,53 @@ describe "ProjectImporter", ->
 				version: 1234
 			}
 			@ProjectCreationHandler.createBlankProject = sinon.stub().yields(null, @project)
-			@ProjectImporter._initSlProject @user_id, @doc, @callback
 		
-		it "should create the project", ->
-			@ProjectCreationHandler.createBlankProject
-				.calledWith(@user_id, @doc.title)
-				.should.equal true
+		describe "successfully", ->
+			beforeEach ->
+				@ProjectImporter._initSlProject @user_id, @doc, @callback
+			
+			it "should create the project", ->
+				@ProjectCreationHandler.createBlankProject
+					.calledWith(@user_id, @doc.title)
+					.should.equal true
+			
+			it "should set overleaf metadata on the project", ->
+				@project.overleaf.id.should.equal @doc.id
+				@project.overleaf.imported_at_version.should.equal @doc.version
+			
+			it "should set the appropriate project compiler from the latex_engine", ->
+				@project.compiler.should.equal "latex"
+			
+			it "should save the project", ->
+				@project.save.called.should.equal true
+			
+			it "should return the project", ->
+				@callback.calledWith(null, @project).should.equal true
 		
-		it "should set overleaf metadata on the project", ->
-			@project.overleaf.id.should.equal @doc.id
-			@project.overleaf.imported_at_version.should.equal @doc.version
-		
-		it "should set the appropriate project compiler from the latex_engine", ->
-			@project.compiler.should.equal "latex"
-		
-		it "should save the project", ->
-			@project.save.called.should.equal true
-		
-		it "should return the project", ->
-			@callback.calledWith(null, @project).should.equal true
+		describe "null checks", ->
+			it "should require doc.title", (done) ->
+				delete @doc.title
+				@ProjectImporter._initSlProject @user_id, @doc, (error) ->
+					error.message.should.equal("expected doc title, id, version and latex_engine")
+					done()
+
+			it "should require doc.version", (done) ->
+				delete @doc.version
+				@ProjectImporter._initSlProject @user_id, @doc, (error) ->
+					error.message.should.equal("expected doc title, id, version and latex_engine")
+					done()
+
+			it "should require doc.id", (done) ->
+				delete @doc.id
+				@ProjectImporter._initSlProject @user_id, @doc, (error) ->
+					error.message.should.equal("expected doc title, id, version and latex_engine")
+					done()
+
+			it "should require doc.latex_engine", (done) ->
+				delete @doc.latex_engine
+				@ProjectImporter._initSlProject @user_id, @doc, (error) ->
+					error.message.should.equal("expected doc title, id, version and latex_engine")
+					done()
 			
 	describe "_getOverleafDoc", ->
 		beforeEach ->
@@ -180,3 +208,40 @@ describe "ProjectImporter", ->
 						@project_id, @folder_id, "image.jpeg", "path/on/disk"
 					)
 					.should.equal true
+
+		describe "null checks", ->
+			beforeEach ->
+				@att_file = {
+					file: "images/image.jpeg"
+					file_path: "s3/image.jpeg"
+					type: "att"
+				}
+				@src_file = {
+					file: "folder/chapter1.tex"
+					latest_content: "chapter 1 content"
+					type: "src"
+				}
+				
+			it "should require file.file", (done) ->
+				delete @src_file.file
+				@ProjectImporter._importFile @project_id, @src_file, (error) ->
+					error.message.should.equal("expected file.file and type")
+					done()
+				
+			it "should require file.type", (done) ->
+				delete @src_file.type
+				@ProjectImporter._importFile @project_id, @src_file, (error) ->
+					error.message.should.equal("expected file.file and type")
+					done()
+				
+			it "should require file.latest_content", (done) ->
+				delete @src_file.latest_content
+				@ProjectImporter._importFile @project_id, @src_file, (error) ->
+					error.message.should.equal("expected file.latest_content")
+					done()
+				
+			it "should require file.file_path", (done) ->
+				delete @att_file.file_path
+				@ProjectImporter._importFile @project_id, @att_file, (error) ->
+					error.message.should.equal("expected file.file_path")
+					done()

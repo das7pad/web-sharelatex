@@ -45,7 +45,9 @@ module.exports = ProjectImporter =
 				logger.log {doc}, "got doc for project from overleaf"
 				return callback(null, doc)
 
-	_initSlProject: (user_id, doc, callback = (err, project) ->) ->
+	_initSlProject: (user_id, doc = {}, callback = (err, project) ->) ->
+		if !doc.title? or !doc.id? or !doc.version? or !doc.latex_engine?
+			return callback(new Error("expected doc title, id, version and latex_engine"))
 		ProjectCreationHandler.createBlankProject user_id, doc.title, (err, project) ->
 			return callback(error) if error?
 			project.overleaf.id = doc.id
@@ -56,12 +58,14 @@ module.exports = ProjectImporter =
 				return callback(error) if error?
 				return callback(null, project)
 
-	_importFiles: (project_id, files, callback = (error) ->) ->
+	_importFiles: (project_id, files = [], callback = (error) ->) ->
 		async.mapSeries files,
 			(file, cb) -> ProjectImporter._importFile project_id, file, cb
 			callback
 
 	_importFile: (project_id, file, callback = (error) ->) ->
+		if !file.type? or !file.file?
+			return callback(new Error("expected file.file and type"))
 		path = "/" + file.file
 		dirname = Path.dirname(path)
 		name = Path.basename(path)
@@ -70,6 +74,8 @@ module.exports = ProjectImporter =
 			return callback(error) if error?
 			folder_id = lastFolder._id
 			if file.type == "src"
+				if !file.latest_content?
+					return callback(new Error("expected file.latest_content"))
 				ProjectEntityHandler.addDoc project_id, folder_id, name, file.latest_content.split("\n"), (error, doc) ->
 					return callback(error) if error?
 					if file.main
@@ -77,6 +83,8 @@ module.exports = ProjectImporter =
 					else
 						callback()
 			else if file.type == "att"
+				if !file.file_path?
+					return callback(new Error("expected file.file_path"))
 				url = "#{settings.overleaf.s3.host}/#{file.file_path}"
 				ProjectImporter._writeUrlToDisk url, (error, pathOnDisk) ->
 					return callback(error) if error?
