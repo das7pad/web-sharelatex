@@ -16,7 +16,7 @@ module.exports =
 		webRouter.get '/overleaf/email_exists', OverleafAuthenticationController.emailExists
 
 		webRouter.get(
-			'/overleaf/project/:ol_project_id/import',
+			'/overleaf/project/:ol_doc_id/import',
 			AuthenticationController.requireLogin(),
 			ProjectImportController.importProject
 		)

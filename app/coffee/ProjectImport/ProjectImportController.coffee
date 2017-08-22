@@ -4,9 +4,9 @@ AuthenticationController = require "../../../../../app/js/Features/Authenticatio
 
 module.exports = ProjectImportController =
 	importProject: (req, res, next) ->
-		{ol_project_id} = req.params
+		{ol_doc_id} = req.params
 		user_id = AuthenticationController.getLoggedInUserId req
-		logger.log {user_id, ol_project_id}, "importing project from overleaf"
-		ProjectImporter.importProject ol_project_id, user_id, (error, sl_project_id) ->
+		logger.log {user_id, ol_doc_id}, "importing project from overleaf"
+		ProjectImporter.importProject ol_doc_id, user_id, (error, sl_project_id) ->
 			return next(error) if error?
 			res.redirect "/project/#{sl_project_id}"
