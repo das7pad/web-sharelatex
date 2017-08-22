@@ -42,7 +42,7 @@ module.exports = ProjectImporter =
 				json: true
 			}, (error, doc) ->
 				return callback(error) if error?
-				logger.log {doc}, "got doc for project from overleaf"
+				logger.log {ol_doc_id, user_id, doc}, "got doc for project from overleaf"
 				return callback(null, doc)
 
 	_initSlProject: (user_id, doc = {}, callback = (err, project) ->) ->
@@ -59,9 +59,9 @@ module.exports = ProjectImporter =
 				return callback(null, project)
 
 	_importFiles: (project_id, files = [], callback = (error) ->) ->
-		async.mapSeries files,
-			(file, cb) -> ProjectImporter._importFile project_id, file, cb
-			callback
+		async.mapSeries(files, (file, cb) ->
+			ProjectImporter._importFile project_id, file, cb
+		, callback)
 
 	_importFile: (project_id, file, callback = (error) ->) ->
 		if !file.type? or !file.file?
@@ -90,7 +90,7 @@ module.exports = ProjectImporter =
 					return callback(error) if error?
 					ProjectEntityHandler.addFile project_id, folder_id, name, pathOnDisk, callback
 			else
-				logger.warn {type: file.type, path: file.file}, "unknown file type"
+				logger.warn {type: file.type, path: file.file, project_id}, "unknown file type"
 				callback()
 
 	_writeUrlToDisk: (url, callback = (error, pathOnDisk) ->) ->
