@@ -100,7 +100,6 @@ module.exports = ProjectImporter =
 
 			readStream = request.get url
 			writeStream = fs.createWriteStream(pathOnDisk)
-			readStream.pipe(writeStream)
 
 			onError = (error) ->
 				logger.err {err: error}, "error writing URL to disk"
@@ -111,3 +110,5 @@ module.exports = ProjectImporter =
 
 			writeStream.on "finish", ->
 				callback null, pathOnDisk
+
+			readStream.pipe(writeStream)
