@@ -24,7 +24,7 @@ module.exports = ProjectImporter =
 		logger.log {ol_doc_id, user_id}, "importing project from overleaf"
 		ProjectImporter._getOverleafDoc ol_doc_id, user_id, (error, doc) ->
 			return callback(error) if error?
-			ProjectImporter._initSlProject user_id, doc, (error, project) ->
+			ProjectImporter._initSharelatexProject user_id, doc, (error, project) ->
 				return callback(error) if error?
 				project_id = project._id
 				ProjectImporter._importFiles project_id, doc.files, (error) ->
@@ -45,7 +45,7 @@ module.exports = ProjectImporter =
 				logger.log {ol_doc_id, user_id, doc}, "got doc for project from overleaf"
 				return callback(null, doc)
 
-	_initSlProject: (user_id, doc = {}, callback = (err, project) ->) ->
+	_initSharelatexProject: (user_id, doc = {}, callback = (err, project) ->) ->
 		if !doc.title? or !doc.id? or !doc.version? or !doc.latex_engine?
 			return callback(new Error("expected doc title, id, version and latex_engine"))
 		ProjectCreationHandler.createBlankProject user_id, doc.title, (err, project) ->

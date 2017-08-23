@@ -25,7 +25,7 @@ describe "ProjectImporter", ->
 	describe "importProject", ->
 		beforeEach ->
 			@ProjectImporter._getOverleafDoc = sinon.stub().yields(null, @doc = { files: ["mock-files"] })
-			@ProjectImporter._initSlProject = sinon.stub().yields(null, @project = { _id: "mock-project-id" })
+			@ProjectImporter._initSharelatexProject = sinon.stub().yields(null, @project = { _id: "mock-project-id" })
 			@ProjectImporter._importFiles = sinon.stub().yields()
 			@ProjectImporter.importProject(@ol_doc_id = "mock-ol-doc-id", @user_id = "mock-user-id", @callback)
 	
@@ -35,7 +35,7 @@ describe "ProjectImporter", ->
 				.should.equal true
 		
 		it "should create the SL project", ->
-			@ProjectImporter._initSlProject
+			@ProjectImporter._initSharelatexProject
 				.calledWith(@user_id, @doc)
 				.should.equal true
 		
@@ -46,7 +46,7 @@ describe "ProjectImporter", ->
 		it "should return the new project id", ->
 			@callback.calledWith(null, @project._id).should.equal true
 	
-	describe "_initSlProject", ->
+	describe "_initSharelatexProject", ->
 		beforeEach ->
 			@project = {
 				_id: "mock-project-id"
@@ -64,7 +64,7 @@ describe "ProjectImporter", ->
 		
 		describe "successfully", ->
 			beforeEach ->
-				@ProjectImporter._initSlProject @user_id, @doc, @callback
+				@ProjectImporter._initSharelatexProject @user_id, @doc, @callback
 			
 			it "should create the project", ->
 				@ProjectCreationHandler.createBlankProject
@@ -87,25 +87,25 @@ describe "ProjectImporter", ->
 		describe "null checks", ->
 			it "should require doc.title", (done) ->
 				delete @doc.title
-				@ProjectImporter._initSlProject @user_id, @doc, (error) ->
+				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
 					error.message.should.equal("expected doc title, id, version and latex_engine")
 					done()
 
 			it "should require doc.version", (done) ->
 				delete @doc.version
-				@ProjectImporter._initSlProject @user_id, @doc, (error) ->
+				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
 					error.message.should.equal("expected doc title, id, version and latex_engine")
 					done()
 
 			it "should require doc.id", (done) ->
 				delete @doc.id
-				@ProjectImporter._initSlProject @user_id, @doc, (error) ->
+				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
 					error.message.should.equal("expected doc title, id, version and latex_engine")
 					done()
 
 			it "should require doc.latex_engine", (done) ->
 				delete @doc.latex_engine
-				@ProjectImporter._initSlProject @user_id, @doc, (error) ->
+				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
 					error.message.should.equal("expected doc title, id, version and latex_engine")
 					done()
 			
