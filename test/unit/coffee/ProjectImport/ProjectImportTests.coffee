@@ -14,6 +14,7 @@ describe "ProjectImporter", ->
 			"../../../../../app/js/Features/Project/ProjectCreationHandler": @ProjectCreationHandler = {}
 			"../../../../../app/js/Features/Project/ProjectEntityHandler": @ProjectEntityHandler = {}
 			"../../../../../app/js/models/User": User: @User = {}
+			"../../../../../app/js/models/ProjectInvite": ProjectInvite: @ProjectInvite = {}
 			"../OAuth/OAuthRequest": @oAuthRequest = sinon.stub()
 			"../OverleafUsers/UserMapper": @UserMapper = {}
 			"../../../../../app/js/Features/Collaborators/CollaboratorsHandler": @CollaboratorsHandler = {}
@@ -185,6 +186,61 @@ describe "ProjectImporter", ->
 			it "should add the SL invitee to project, with readAndWrite privilege level", ->
 				@CollaboratorsHandler.addUserIdToProject
 					.calledWith(@project_id, @sl_inviter_id, @sl_invitee_id, PrivilegeLevels.READ_AND_WRITE)
+					.should.equal true
+
+	describe "_importPendingInvite", ->
+		beforeEach ->
+			@project_id = "mock-project-id"
+			@ol_inviter = {
+				id: 54
+				email: "jane@example.com"
+			}
+			@sl_inviter_id = "sl-inviter-id"
+			@UserMapper.getSlIdFromOlUser = sinon.stub()
+			@UserMapper.getSlIdFromOlUser.withArgs(@ol_inviter).yields(null, @sl_inviter_id)
+			@ProjectInvite.create = sinon.stub().yields()
+			@invite = {
+				inviter: @ol_inviter
+				email: "joe@example.com"
+				token: "mock-token"
+				code: "mock-code"
+			}
+
+		describe "with a read-only invite", ->
+			beforeEach (done) ->
+				@invite.access_level = "read_only"
+				@ProjectImporter._importPendingInvite @project_id, @invite, done
+			
+			it "should look up the inviter in SL", ->
+				@UserMapper.getSlIdFromOlUser
+					.calledWith(@ol_inviter)
+					.should.equal true
+			
+			it "should create a ProjectInvite, with readOnly privilege level", ->
+				@ProjectInvite.create
+					.calledWith({
+						projectId: @project_id,
+						token: @invite.code,
+						sendingUserId: @sl_inviter_id, 
+						privileges: PrivilegeLevels.READ_ONLY,
+						email: @invite.email
+					})
+					.should.equal true
+
+		describe "with a read-write invite", ->
+			beforeEach (done) ->
+				@invite.access_level = "read_write"
+				@ProjectImporter._importPendingInvite @project_id, @invite, done
+		
+			it "should create a ProjectInvite, with readAndWrite privilege level", ->
+				@ProjectInvite.create
+					.calledWith({
+						projectId: @project_id,
+						token: @invite.code,
+						sendingUserId: @sl_inviter_id, 
+						privileges: PrivilegeLevels.READ_AND_WRITE,
+						email: @invite.email
+					})
 					.should.equal true
 
 	describe "_importFile", ->

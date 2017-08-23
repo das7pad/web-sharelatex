@@ -13,6 +13,7 @@ UserMapper = require "../OverleafUsers/UserMapper"
 ProjectCreationHandler = require "../../../../../app/js/Features/Project/ProjectCreationHandler"
 ProjectEntityHandler = require "../../../../../app/js/Features/Project/ProjectEntityHandler"
 {User} = require "../../../../../app/js/models/User"
+{ProjectInvite} = require "../../../../../app/js/models/ProjectInvite"
 CollaboratorsHandler = require "../../../../../app/js/Features/Collaborators/CollaboratorsHandler"
 PrivilegeLevels = require "../../../../../app/js/Features/Authorization/PrivilegeLevels"
 
@@ -90,9 +91,17 @@ module.exports = ProjectImporter =
 				CollaboratorsHandler.addUserIdToProject project_id, inviter_user_id, invitee_user_id, privilegeLevel, callback
 		
 	_importPendingInvite: (project_id, invite, callback = (error) ->) ->
-		# TODO
-		logger.warn {project_id, invite}, "cannot import pending invite yet"
-		callback()
+		logger.log {project_id, invite}, "importing pending invite from overleaf"
+		privilegeLevel = ProjectImporter.ACCESS_LEVEL_MAP[invite.access_level]
+		UserMapper.getSlIdFromOlUser invite.inviter, (error, inviter_user_id) ->
+			return callback(error) if error?
+			ProjectInvite.create {
+				email: invite.email
+				token: invite.code
+				sendingUserId: inviter_user_id
+				projectId: project_id
+				privileges: privilegeLevel
+			}, callback
 
 	_importFiles: (project_id, files = [], callback = (error) ->) ->
 		async.mapSeries(files, (file, cb) ->
