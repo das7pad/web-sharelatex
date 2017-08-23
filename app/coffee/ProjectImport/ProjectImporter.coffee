@@ -1,6 +1,5 @@
 logger = require "logger-sharelatex"
 settings = require "settings-sharelatex"
-oAuthRequest = require "../OAuth/OAuthRequest"
 Path = require "path"
 uuid = require "uuid"
 _ = require "underscore"
@@ -8,9 +7,14 @@ async = require "async"
 fs = require "fs"
 request = require "request"
 
+oAuthRequest = require "../OAuth/OAuthRequest"
+UserMapper = require "../OverleafUsers/UserMapper"
+
 ProjectCreationHandler = require "../../../../../app/js/Features/Project/ProjectCreationHandler"
 ProjectEntityHandler = require "../../../../../app/js/Features/Project/ProjectEntityHandler"
 {User} = require "../../../../../app/js/models/User"
+CollaboratorsHandler = require "../../../../../app/js/Features/Collaborators/CollaboratorsHandler"
+PrivilegeLevels = require "../../../../../app/js/Features/Authorization/PrivilegeLevels"
 
 ENGINE_TO_COMPILER_MAP = {
 	latex_dvipdf: "latex"
@@ -27,10 +31,12 @@ module.exports = ProjectImporter =
 			ProjectImporter._initSharelatexProject user_id, doc, (error, project) ->
 				return callback(error) if error?
 				project_id = project._id
-				ProjectImporter._importFiles project_id, doc.files, (error) ->
+				ProjectImporter._importInvites project_id, doc.invites, (error) ->
 					return callback(error) if error?
-					logger.log {project_id, ol_doc_id, user_id}, "finished project import"
-					callback null, project_id
+					ProjectImporter._importFiles project_id, doc.files, (error) ->
+						return callback(error) if error?
+						logger.log {project_id, ol_doc_id, user_id}, "finished project import"
+						callback null, project_id
 
 	_getOverleafDoc: (ol_doc_id, user_id, callback = (error, doc) ->) ->
 		User.findOne { "_id": user_id }, { overleaf: true }, (error, user) ->
@@ -57,6 +63,36 @@ module.exports = ProjectImporter =
 			project.save (error) ->
 				return callback(error) if error?
 				return callback(null, project)
+
+	_importInvites: (project_id, invites = [], callback = (error) ->) ->
+		async.mapSeries(invites, (invite, cb) ->
+			ProjectImporter._importInvite project_id, invite, cb
+		, callback)
+
+	_importInvite: (project_id, invite, callback = (error) ->) ->
+		# TODO: Add null checks
+		if invite.invitee?
+			ProjectImporter._importAcceptedInvite(project_id, invite, callback)
+		else
+			ProjectImporter._importPendingInvite(project_id, invite, callback)
+
+	ACCESS_LEVEL_MAP: {
+		"read_write": PrivilegeLevels.READ_AND_WRITE
+		"read_only": PrivilegeLevels.READ_ONLY
+	}
+	_importAcceptedInvite: (project_id, invite, callback = (error) ->) ->
+		logger.log {project_id, invite}, "importing accepted invite from overleaf"
+		privilegeLevel = ProjectImporter.ACCESS_LEVEL_MAP[invite.access_level]
+		UserMapper.getSlIdFromOlUser invite.inviter, (error, inviter_user_id) ->
+			return callback(error) if error?
+			UserMapper.getSlIdFromOlUser invite.invitee, (error, invitee_user_id) ->
+				return callback(error) if error?
+				CollaboratorsHandler.addUserIdToProject project_id, inviter_user_id, invitee_user_id, privilegeLevel, callback
+		
+	_importPendingInvite: (project_id, invite, callback = (error) ->) ->
+		# TODO
+		logger.warn {project_id, invite}, "cannot import pending invite yet"
+		callback()
 
 	_importFiles: (project_id, files = [], callback = (error) ->) ->
 		async.mapSeries(files, (file, cb) ->

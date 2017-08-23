@@ -6,6 +6,8 @@ modulePath = path.join __dirname, '../../../../app/js/ProjectImport/ProjectImpor
 sinon = require("sinon")
 expect = require("chai").expect
 
+PrivilegeLevels = require "../../../../../../app/js/Features/Authorization/PrivilegeLevels"
+
 describe "ProjectImporter", ->
 	beforeEach ->
 		@ProjectImporter = SandboxedModule.require modulePath, requires:
@@ -13,6 +15,9 @@ describe "ProjectImporter", ->
 			"../../../../../app/js/Features/Project/ProjectEntityHandler": @ProjectEntityHandler = {}
 			"../../../../../app/js/models/User": User: @User = {}
 			"../OAuth/OAuthRequest": @oAuthRequest = sinon.stub()
+			"../OverleafUsers/UserMapper": @UserMapper = {}
+			"../../../../../app/js/Features/Collaborators/CollaboratorsHandler": @CollaboratorsHandler = {}
+			"../../../../../app/js/Features/Authorization/PrivilegeLevels": PrivilegeLevels
 			"request": @request = {}
 			"logger-sharelatex": { log: sinon.stub() }
 			"settings-sharelatex":
@@ -127,7 +132,61 @@ describe "ProjectImporter", ->
 		
 		it "should return the doc", ->
 			@callback.calledWith(null, @doc).should.equal true
-	
+
+	describe "_importAcceptedInvite", ->
+		beforeEach ->
+			@project_id = "mock-project-id"
+			@ol_invitee = {
+				id: 42
+				email: "joe@example.com"
+			}
+			@ol_inviter = {
+				id: 54
+				email: "jane@example.com"
+			}
+			@sl_invitee_id = "sl-invitee-id"
+			@sl_inviter_id = "sl-inviter-id"
+			@UserMapper.getSlIdFromOlUser = sinon.stub()
+			@UserMapper.getSlIdFromOlUser.withArgs(@ol_invitee).yields(null, @sl_invitee_id)
+			@UserMapper.getSlIdFromOlUser.withArgs(@ol_inviter).yields(null, @sl_inviter_id)
+			@CollaboratorsHandler.addUserIdToProject = sinon.stub().yields()
+			@invite = {
+				inviter: @ol_inviter
+				invitee: @ol_invitee
+				email: "joe@example.com"
+				token: "mock-token"
+			}
+
+		describe "with a read-only invite", ->
+			beforeEach (done) ->
+				@invite.access_level = "read_only"
+				@ProjectImporter._importAcceptedInvite @project_id, @invite, done
+			
+			it "should look up the inviter in SL", ->
+				@UserMapper.getSlIdFromOlUser
+					.calledWith(@ol_inviter)
+					.should.equal true
+			
+			it "should look up the invitee in SL", ->
+				@UserMapper.getSlIdFromOlUser
+					.calledWith(@ol_invitee)
+					.should.equal true
+			
+			it "should add the SL invitee to project, with readOnly privilege level", ->
+				@CollaboratorsHandler.addUserIdToProject
+					.calledWith(@project_id, @sl_inviter_id, @sl_invitee_id, PrivilegeLevels.READ_ONLY)
+					.should.equal true
+
+		describe "with a read-write invite", ->
+			beforeEach (done) ->
+				@invite.access_level = "read_write"
+				@ProjectImporter._importAcceptedInvite @project_id, @invite, done
+
+			it "should add the SL invitee to project, with readAndWrite privilege level", ->
+				@CollaboratorsHandler.addUserIdToProject
+					.calledWith(@project_id, @sl_inviter_id, @sl_invitee_id, PrivilegeLevels.READ_AND_WRITE)
+					.should.equal true
+
 	describe "_importFile", ->
 		beforeEach ->
 			@project_id = "mock-project-id"
