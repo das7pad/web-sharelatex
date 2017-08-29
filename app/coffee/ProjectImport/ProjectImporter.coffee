@@ -53,12 +53,12 @@ module.exports = ProjectImporter =
 				return callback(null, doc)
 
 	_initSharelatexProject: (user_id, doc = {}, callback = (err, project) ->) ->
-		if !doc.title? or !doc.id? or !doc.version? or !doc.latex_engine?
-			return callback(new Error("expected doc title, id, version and latex_engine"))
+		if !doc.title? or !doc.id? or !doc.latest_ver_id? or !doc.latex_engine?
+			return callback(new Error("expected doc title, id, latest_ver_id and latex_engine"))
 		ProjectCreationHandler.createBlankProject user_id, doc.title, (err, project) ->
 			return callback(error) if error?
 			project.overleaf.id = doc.id
-			project.overleaf.imported_at_version = doc.version
+			project.overleaf.imported_at_ver_id = doc.latest_ver_id
 			if ENGINE_TO_COMPILER_MAP[doc.latex_engine]?
 				project.compiler = ENGINE_TO_COMPILER_MAP[doc.latex_engine]
 			project.save (error) ->
