@@ -6,13 +6,19 @@ modulePath = path.join __dirname, '../../../../app/js/ProjectImport/ProjectImpor
 sinon = require("sinon")
 expect = require("chai").expect
 
+PrivilegeLevels = require "../../../../../../app/js/Features/Authorization/PrivilegeLevels"
+
 describe "ProjectImporter", ->
 	beforeEach ->
 		@ProjectImporter = SandboxedModule.require modulePath, requires:
 			"../../../../../app/js/Features/Project/ProjectCreationHandler": @ProjectCreationHandler = {}
 			"../../../../../app/js/Features/Project/ProjectEntityHandler": @ProjectEntityHandler = {}
 			"../../../../../app/js/models/User": User: @User = {}
+			"../../../../../app/js/models/ProjectInvite": ProjectInvite: @ProjectInvite = {}
 			"../OAuth/OAuthRequest": @oAuthRequest = sinon.stub()
+			"../OverleafUsers/UserMapper": @UserMapper = {}
+			"../../../../../app/js/Features/Collaborators/CollaboratorsHandler": @CollaboratorsHandler = {}
+			"../../../../../app/js/Features/Authorization/PrivilegeLevels": PrivilegeLevels
 			"request": @request = {}
 			"logger-sharelatex": { log: sinon.stub() }
 			"settings-sharelatex":
@@ -58,7 +64,7 @@ describe "ProjectImporter", ->
 				title: "Test Doc"
 				latex_engine: "latex_dvipdf"
 				id: 42
-				version: 1234
+				latest_ver_id: 1234
 			}
 			@ProjectCreationHandler.createBlankProject = sinon.stub().yields(null, @project)
 		
@@ -73,7 +79,7 @@ describe "ProjectImporter", ->
 			
 			it "should set overleaf metadata on the project", ->
 				@project.overleaf.id.should.equal @doc.id
-				@project.overleaf.imported_at_version.should.equal @doc.version
+				@project.overleaf.imported_at_ver_id.should.equal @doc.latest_ver_id
 			
 			it "should set the appropriate project compiler from the latex_engine", ->
 				@project.compiler.should.equal "latex"
@@ -88,25 +94,25 @@ describe "ProjectImporter", ->
 			it "should require doc.title", (done) ->
 				delete @doc.title
 				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
-					error.message.should.equal("expected doc title, id, version and latex_engine")
+					error.message.should.equal("expected doc title, id, latest_ver_id and latex_engine")
 					done()
 
-			it "should require doc.version", (done) ->
-				delete @doc.version
+			it "should require doc.latest_ver_id", (done) ->
+				delete @doc.latest_ver_id
 				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
-					error.message.should.equal("expected doc title, id, version and latex_engine")
+					error.message.should.equal("expected doc title, id, latest_ver_id and latex_engine")
 					done()
 
 			it "should require doc.id", (done) ->
 				delete @doc.id
 				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
-					error.message.should.equal("expected doc title, id, version and latex_engine")
+					error.message.should.equal("expected doc title, id, latest_ver_id and latex_engine")
 					done()
 
 			it "should require doc.latex_engine", (done) ->
 				delete @doc.latex_engine
 				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
-					error.message.should.equal("expected doc title, id, version and latex_engine")
+					error.message.should.equal("expected doc title, id, latest_ver_id and latex_engine")
 					done()
 			
 	describe "_getOverleafDoc", ->
@@ -127,7 +133,160 @@ describe "ProjectImporter", ->
 		
 		it "should return the doc", ->
 			@callback.calledWith(null, @doc).should.equal true
-	
+
+	describe "_importAcceptedInvite", ->
+		beforeEach ->
+			@project_id = "mock-project-id"
+			@ol_invitee = {
+				id: 42
+				email: "joe@example.com"
+			}
+			@ol_inviter = {
+				id: 54
+				email: "jane@example.com"
+			}
+			@sl_invitee_id = "sl-invitee-id"
+			@sl_inviter_id = "sl-inviter-id"
+			@UserMapper.getSlIdFromOlUser = sinon.stub()
+			@UserMapper.getSlIdFromOlUser.withArgs(@ol_invitee).yields(null, @sl_invitee_id)
+			@UserMapper.getSlIdFromOlUser.withArgs(@ol_inviter).yields(null, @sl_inviter_id)
+			@CollaboratorsHandler.addUserIdToProject = sinon.stub().yields()
+			@invite = {
+				inviter: @ol_inviter
+				invitee: @ol_invitee
+				email: "joe@example.com"
+				token: "mock-token"
+			}
+
+		describe "with a read-only invite", ->
+			beforeEach (done) ->
+				@invite.access_level = "read_only"
+				@ProjectImporter._importAcceptedInvite @project_id, @invite, done
+			
+			it "should look up the inviter in SL", ->
+				@UserMapper.getSlIdFromOlUser
+					.calledWith(@ol_inviter)
+					.should.equal true
+			
+			it "should look up the invitee in SL", ->
+				@UserMapper.getSlIdFromOlUser
+					.calledWith(@ol_invitee)
+					.should.equal true
+			
+			it "should add the SL invitee to project, with readOnly privilege level", ->
+				@CollaboratorsHandler.addUserIdToProject
+					.calledWith(@project_id, @sl_inviter_id, @sl_invitee_id, PrivilegeLevels.READ_ONLY)
+					.should.equal true
+
+		describe "with a read-write invite", ->
+			beforeEach (done) ->
+				@invite.access_level = "read_write"
+				@ProjectImporter._importAcceptedInvite @project_id, @invite, done
+
+			it "should add the SL invitee to project, with readAndWrite privilege level", ->
+				@CollaboratorsHandler.addUserIdToProject
+					.calledWith(@project_id, @sl_inviter_id, @sl_invitee_id, PrivilegeLevels.READ_AND_WRITE)
+					.should.equal true
+		
+		describe "null checks", ->
+			it "should require invite.inviter", (done) ->
+				delete @invite.inviter
+				@ProjectImporter._importAcceptedInvite @project_id, @invite, (error) ->
+					error.message.should.equal("expected invite inviter, invitee and access_level")
+					done()
+
+			it "should require invite.invitee", (done) ->
+				delete @invite.invitee
+				@ProjectImporter._importAcceptedInvite @project_id, @invite, (error) ->
+					error.message.should.equal("expected invite inviter, invitee and access_level")
+					done()
+
+			it "should require invite.access_level", (done) ->
+				delete @invite.access_level
+				@ProjectImporter._importAcceptedInvite @project_id, @invite, (error) ->
+					error.message.should.equal("expected invite inviter, invitee and access_level")
+					done()
+
+	describe "_importPendingInvite", ->
+		beforeEach ->
+			@project_id = "mock-project-id"
+			@ol_inviter = {
+				id: 54
+				email: "jane@example.com"
+			}
+			@sl_inviter_id = "sl-inviter-id"
+			@UserMapper.getSlIdFromOlUser = sinon.stub()
+			@UserMapper.getSlIdFromOlUser.withArgs(@ol_inviter).yields(null, @sl_inviter_id)
+			@ProjectInvite.create = sinon.stub().yields()
+			@invite = {
+				inviter: @ol_inviter
+				email: "joe@example.com"
+				token: "mock-token"
+				code: "mock-code"
+			}
+
+		describe "with a read-only invite", ->
+			beforeEach (done) ->
+				@invite.access_level = "read_only"
+				@ProjectImporter._importPendingInvite @project_id, @invite, done
+			
+			it "should look up the inviter in SL", ->
+				@UserMapper.getSlIdFromOlUser
+					.calledWith(@ol_inviter)
+					.should.equal true
+			
+			it "should create a ProjectInvite, with readOnly privilege level", ->
+				@ProjectInvite.create
+					.calledWith({
+						projectId: @project_id,
+						token: @invite.code,
+						sendingUserId: @sl_inviter_id, 
+						privileges: PrivilegeLevels.READ_ONLY,
+						email: @invite.email
+					})
+					.should.equal true
+
+		describe "with a read-write invite", ->
+			beforeEach (done) ->
+				@invite.access_level = "read_write"
+				@ProjectImporter._importPendingInvite @project_id, @invite, done
+		
+			it "should create a ProjectInvite, with readAndWrite privilege level", ->
+				@ProjectInvite.create
+					.calledWith({
+						projectId: @project_id,
+						token: @invite.code,
+						sendingUserId: @sl_inviter_id, 
+						privileges: PrivilegeLevels.READ_AND_WRITE,
+						email: @invite.email
+					})
+					.should.equal true
+		
+		describe "null checks", ->
+			it "should require invite.inviter", (done) ->
+				delete @invite.inviter
+				@ProjectImporter._importPendingInvite @project_id, @invite, (error) ->
+					error.message.should.equal("expected invite inviter, code, email and access_level")
+					done()
+
+			it "should require invite.code", (done) ->
+				delete @invite.code
+				@ProjectImporter._importPendingInvite @project_id, @invite, (error) ->
+					error.message.should.equal("expected invite inviter, code, email and access_level")
+					done()
+
+			it "should require invite.email", (done) ->
+				delete @invite.email
+				@ProjectImporter._importPendingInvite @project_id, @invite, (error) ->
+					error.message.should.equal("expected invite inviter, code, email and access_level")
+					done()
+
+			it "should require invite.access_level", (done) ->
+				delete @invite.access_level
+				@ProjectImporter._importPendingInvite @project_id, @invite, (error) ->
+					error.message.should.equal("expected invite inviter, code, email and access_level")
+					done()
+
 	describe "_importFile", ->
 		beforeEach ->
 			@project_id = "mock-project-id"

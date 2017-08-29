@@ -1,8 +1,8 @@
 logger = require("logger-sharelatex")
 {User} = require "../../../../../app/js/models/User"
-UserCreator = require "../../../../../app/js/Features/User/UserCreator"
 request = require "request"
 settings = require "settings-sharelatex"
+UserMapper = require "../OverleafUsers/UserMapper"
 
 module.exports = OverleafAuthenticationManager =
 	getUserProfile: (accessToken, callback) ->
@@ -23,18 +23,14 @@ module.exports = OverleafAuthenticationManager =
 	# If we've already seen this user, they will be set up with the overleaf.id, so
 	# return that user. If not, check that the email doesn't conflict in SL before
 	# creating them.
-	setupUser: (accessToken, refreshToken, profile, callback) ->
+	setupUser: (accessToken, refreshToken, profile, callback = (error, user, info) ->) ->
 		logger.log {accessToken, refreshToken, profile}, "authing user via overleaf oauth"
 		User.findOne { "overleaf.id": profile.id }, (err, user) ->
 			return callback(err) if err?
 			if user?
-				user.overleaf.refreshToken = refreshToken
-				user.overleaf.accessToken = accessToken
-				user.save (err) ->
-					return callback(err) if err?
-					return callback(null, user)
+				OverleafAuthenticationManager._updateUserTokens user, accessToken, refreshToken, callback
 			else
-				email = profile.email.trim().toLowerCase()
+				email = UserMapper.getCanonicalEmail(profile.email)
 				User.findOne {email}, (err, user) ->
 					return callback(err) if err?
 					if user?
@@ -43,14 +39,11 @@ module.exports = OverleafAuthenticationManager =
 							email: email
 						})
 					else
-						UserCreator.createNewUser {
-							overleaf: {
-								id: profile.id
-								accessToken: accessToken
-								refreshToken: refreshToken
-							},
-							email: email
-						}, callback
-		
-	_findOrCreateUser: (profile, callback = (err, user, info) ->) ->
-		
+						UserMapper.createSlUser profile, accessToken, refreshToken, callback
+
+	_updateUserTokens: (user, accessToken, refreshToken, callback = (error, user) ->) ->
+		user.overleaf.refreshToken = refreshToken
+		user.overleaf.accessToken = accessToken
+		user.save (err) ->
+			return callback(err) if err?
+			return callback(null, user)

@@ -11,6 +11,7 @@ describe "OverleafAuthenticationManager", ->
 		@OverleafAuthenticationManager = SandboxedModule.require modulePath, requires:
 			"../../../../../app/js/Features/User/UserCreator": @UserCreator = {}
 			"../../../../../app/js/models/User": User: @User = {}
+			"../OverleafUsers/UserMapper": @UserMapper = {}
 			"logger-sharelatex": { log: sinon.stub() }
 			"settings-sharelatex":
 				overleaf:
@@ -56,10 +57,11 @@ describe "OverleafAuthenticationManager", ->
 			@user =
 				overleaf: {}
 				save: sinon.stub().yields()
-			@UserCreator.createNewUser = sinon.stub().yields(null, @user)
+			@UserMapper.createSlUser = sinon.stub().yields(null, @user)
 			@profile =
 				id: "mock-overleaf-id"
-				email: "joe@example.com"
+				email: "Joe@Example.com"
+			@UserMapper.getCanonicalEmail = sinon.stub().withArgs("Joe@Example.com").returns("joe@example.com")
 
 		describe "with no OL or SL user in the system", ->
 			beforeEach ->
@@ -67,14 +69,8 @@ describe "OverleafAuthenticationManager", ->
 				@OverleafAuthenticationManager.setupUser(@accessToken, @refreshToken, @profile, @callback)
 
 			it "should create a user", ->
-				@UserCreator.createNewUser
-					.calledWith({
-						overleaf:
-							id: @profile.id
-							accessToken: @accessToken
-							refreshToken: @refreshToken
-						email: @profile.email
-					})
+				@UserMapper.createSlUser
+					.calledWith(@profile, @accessToken, @refreshToken)
 					.should.equal true
 
 			it "should return the user", ->
@@ -96,16 +92,16 @@ describe "OverleafAuthenticationManager", ->
 		describe "with a conflicting email in SL", ->
 			beforeEach ->
 				@User.findOne.withArgs("overleaf.id": @profile.id).yields(null, null)
-				@User.findOne.withArgs("email": @profile.email).yields(null, @user)
+				@User.findOne.withArgs("email": "joe@example.com").yields(null, @user)
 				@OverleafAuthenticationManager.setupUser(@accessToken, @refreshToken, @profile, @callback)
 
 			it "should not create a new user", ->
-				@UserCreator.createNewUser.called.should.equal false
+				@UserMapper.createSlUser.called.should.equal false
 
 			it "should return a message about the email", ->
 				@callback
 					.calledWith(null, null, {
 						email_exists_in_sl: true
-						email: @profile.email
+						email: "joe@example.com"
 					})
 					.should.equal true
