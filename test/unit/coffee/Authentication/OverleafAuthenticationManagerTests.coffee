@@ -2,18 +2,18 @@ should = require('chai').should()
 SandboxedModule = require('sandboxed-module')
 assert = require('assert')
 path = require('path')
-modulePath = path.join __dirname, '../../../app/js/OverleafAuthenticationManager'
+modulePath = path.join __dirname, '../../../../app/js/Authentication/OverleafAuthenticationManager'
 sinon = require("sinon")
 expect = require("chai").expect
 
 describe "OverleafAuthenticationManager", ->
 	beforeEach ->
 		@OverleafAuthenticationManager = SandboxedModule.require modulePath, requires:
-			"../../../../app/js/Features/User/UserCreator": @UserCreator = {}
-			"../../../../app/js/models/User": User: @User = {}
+			"../../../../../app/js/Features/User/UserCreator": @UserCreator = {}
+			"../../../../../app/js/models/User": User: @User = {}
 			"logger-sharelatex": { log: sinon.stub() }
 			"settings-sharelatex":
-				overleaf_oauth:
+				overleaf:
 					host: @host = "http://overleaf.example.com"
 			"request": @request = {}
 

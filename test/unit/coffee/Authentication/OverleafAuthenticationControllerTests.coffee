@@ -2,14 +2,14 @@ should = require('chai').should()
 SandboxedModule = require('sandboxed-module')
 assert = require('assert')
 path = require('path')
-modulePath = path.join __dirname, '../../../app/js/OverleafAuthenticationController'
+modulePath = path.join __dirname, '../../../../app/js/Authentication/OverleafAuthenticationController'
 sinon = require("sinon")
 expect = require("chai").expect
 
 describe "OverleafAuthenticationController", ->
 	beforeEach ->
 		@OverleafAuthenticationController = SandboxedModule.require modulePath, requires:
-			"../../../../app/js/Features/Authentication/AuthenticationController": @AuthenticationController = {}
+			"../../../../../app/js/Features/Authentication/AuthenticationController": @AuthenticationController = {}
 			"logger-sharelatex": { log: sinon.stub() }
 			"passport": @passport = {}
 		@req =
