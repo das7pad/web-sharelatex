@@ -187,6 +187,25 @@ describe "ProjectImporter", ->
 				@CollaboratorsHandler.addUserIdToProject
 					.calledWith(@project_id, @sl_inviter_id, @sl_invitee_id, PrivilegeLevels.READ_AND_WRITE)
 					.should.equal true
+		
+		describe "null checks", ->
+			it "should require invite.inviter", (done) ->
+				delete @invite.inviter
+				@ProjectImporter._importAcceptedInvite @project_id, @invite, (error) ->
+					error.message.should.equal("expected invite inviter, invitee and access_level")
+					done()
+
+			it "should require invite.invitee", (done) ->
+				delete @invite.invitee
+				@ProjectImporter._importAcceptedInvite @project_id, @invite, (error) ->
+					error.message.should.equal("expected invite inviter, invitee and access_level")
+					done()
+
+			it "should require invite.access_level", (done) ->
+				delete @invite.access_level
+				@ProjectImporter._importAcceptedInvite @project_id, @invite, (error) ->
+					error.message.should.equal("expected invite inviter, invitee and access_level")
+					done()
 
 	describe "_importPendingInvite", ->
 		beforeEach ->
@@ -242,6 +261,31 @@ describe "ProjectImporter", ->
 						email: @invite.email
 					})
 					.should.equal true
+		
+		describe "null checks", ->
+			it "should require invite.inviter", (done) ->
+				delete @invite.inviter
+				@ProjectImporter._importPendingInvite @project_id, @invite, (error) ->
+					error.message.should.equal("expected invite inviter, code, email and access_level")
+					done()
+
+			it "should require invite.code", (done) ->
+				delete @invite.code
+				@ProjectImporter._importPendingInvite @project_id, @invite, (error) ->
+					error.message.should.equal("expected invite inviter, code, email and access_level")
+					done()
+
+			it "should require invite.email", (done) ->
+				delete @invite.email
+				@ProjectImporter._importPendingInvite @project_id, @invite, (error) ->
+					error.message.should.equal("expected invite inviter, code, email and access_level")
+					done()
+
+			it "should require invite.access_level", (done) ->
+				delete @invite.access_level
+				@ProjectImporter._importPendingInvite @project_id, @invite, (error) ->
+					error.message.should.equal("expected invite inviter, code, email and access_level")
+					done()
 
 	describe "_importFile", ->
 		beforeEach ->

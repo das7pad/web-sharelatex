@@ -71,7 +71,6 @@ module.exports = ProjectImporter =
 		, callback)
 
 	_importInvite: (project_id, invite, callback = (error) ->) ->
-		# TODO: Add null checks
 		if invite.invitee?
 			ProjectImporter._importAcceptedInvite(project_id, invite, callback)
 		else
@@ -82,6 +81,8 @@ module.exports = ProjectImporter =
 		"read_only": PrivilegeLevels.READ_ONLY
 	}
 	_importAcceptedInvite: (project_id, invite, callback = (error) ->) ->
+		if !invite.inviter? or !invite.invitee? or !invite.access_level?
+			return callback(new Error("expected invite inviter, invitee and access_level"))
 		logger.log {project_id, invite}, "importing accepted invite from overleaf"
 		privilegeLevel = ProjectImporter.ACCESS_LEVEL_MAP[invite.access_level]
 		UserMapper.getSlIdFromOlUser invite.inviter, (error, inviter_user_id) ->
@@ -91,6 +92,8 @@ module.exports = ProjectImporter =
 				CollaboratorsHandler.addUserIdToProject project_id, inviter_user_id, invitee_user_id, privilegeLevel, callback
 		
 	_importPendingInvite: (project_id, invite, callback = (error) ->) ->
+		if !invite.inviter? or !invite.code? or !invite.email? or !invite.access_level?
+			return callback(new Error("expected invite inviter, code, email and access_level"))
 		logger.log {project_id, invite}, "importing pending invite from overleaf"
 		privilegeLevel = ProjectImporter.ACCESS_LEVEL_MAP[invite.access_level]
 		UserMapper.getSlIdFromOlUser invite.inviter, (error, inviter_user_id) ->

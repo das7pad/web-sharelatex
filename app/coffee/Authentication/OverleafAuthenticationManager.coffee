@@ -28,7 +28,7 @@ module.exports = OverleafAuthenticationManager =
 		User.findOne { "overleaf.id": profile.id }, (err, user) ->
 			return callback(err) if err?
 			if user?
-				OverleafAuthenticationManager._refreshUserTokens user, accessToken, refreshToken, callback
+				OverleafAuthenticationManager._updateUserTokens user, accessToken, refreshToken, callback
 			else
 				email = UserMapper.getCanonicalEmail(profile.email)
 				User.findOne {email}, (err, user) ->
@@ -41,7 +41,7 @@ module.exports = OverleafAuthenticationManager =
 					else
 						UserMapper.createSlUser profile, accessToken, refreshToken, callback
 
-	_refreshUserTokens: (user, accessToken, refreshToken, callback = (error, user) ->) ->
+	_updateUserTokens: (user, accessToken, refreshToken, callback = (error, user) ->) ->
 		user.overleaf.refreshToken = refreshToken
 		user.overleaf.accessToken = accessToken
 		user.save (err) ->
