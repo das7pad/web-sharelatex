@@ -49,7 +49,7 @@ module.exports = SubscriptionAdminController =
 		res.render Path.resolve(__dirname, "../views/subscription/new"), {admin_id: req.params.user_id}
 
 	create: (req, res, next) ->
-		update = UserAdminController._reqToMongoUpdate(req.body, SubscriptionAdminController.ALLOWED_ATTRIBUTES)
+		update = UserAdminController._reqToMongoUpdate(req.body, SubscriptionAdminController.ALLOWED_ATTRIBUTES, SubscriptionAdminController.BOOLEAN_ATTRIBUTES)
 		logger.log {update}, "creating subscription via admin panel"
 		new Subscription(update).save (error, subscription) ->
 			return next(error) if error?
