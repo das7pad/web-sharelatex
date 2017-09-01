@@ -13,7 +13,6 @@ describe "ProjectImporter", ->
 		@ProjectImporter = SandboxedModule.require modulePath, requires:
 			"../../../../../app/js/Features/Project/ProjectCreationHandler": @ProjectCreationHandler = {}
 			"../../../../../app/js/Features/Project/ProjectEntityHandler": @ProjectEntityHandler = {}
-			"../../../../../app/js/models/User": User: @User = {}
 			"../../../../../app/js/models/ProjectInvite": ProjectInvite: @ProjectInvite = {}
 			"../OAuth/OAuthRequest": @oAuthRequest = sinon.stub()
 			"../OverleafUsers/UserMapper": @UserMapper = {}
@@ -33,6 +32,7 @@ describe "ProjectImporter", ->
 			@ProjectImporter._getOverleafDoc = sinon.stub().yields(null, @doc = { files: ["mock-files"] })
 			@ProjectImporter._initSharelatexProject = sinon.stub().yields(null, @project = { _id: "mock-project-id" })
 			@ProjectImporter._importFiles = sinon.stub().yields()
+			@ProjectImporter._flagOverleafDocAsImported = sinon.stub().yields()
 			@ProjectImporter.importProject(@ol_doc_id = "mock-ol-doc-id", @user_id = "mock-user-id", @callback)
 	
 		it "should get the doc from OL", ->
@@ -48,7 +48,13 @@ describe "ProjectImporter", ->
 		it "should import the files", ->
 			@ProjectImporter._importFiles
 				.calledWith(@project._id, @doc.files)
-		
+				.should.equal true
+
+		it "should tell overleaf the project is now in the beta", ->
+			@ProjectImporter._flagOverleafDocAsImported
+				.calledWith(@ol_doc_id, @project._id, @user_id)
+				.should.equal true
+
 		it "should return the new project id", ->
 			@callback.calledWith(null, @project._id).should.equal true
 	
@@ -117,14 +123,12 @@ describe "ProjectImporter", ->
 			
 	describe "_getOverleafDoc", ->
 		beforeEach ->
-			@user = { "mock": "user" }
-			@User.findOne = sinon.stub().yields(null, @user)
 			@oAuthRequest.yields(null, @doc = { "mock": "doc" })
 			@ProjectImporter._getOverleafDoc @ol_doc_id, @user_id, @callback
 		
 		it "should make an oauth request for the doc", ->
 			@oAuthRequest
-				.calledWith(@user, {
+				.calledWith(@user_id, {
 					url: "http://overleaf.example.com/api/v1/sharelatex/docs/#{@ol_doc_id}"
 					method: "GET"
 					json: true
@@ -404,3 +408,28 @@ describe "ProjectImporter", ->
 				@ProjectImporter._importFile @project_id, @att_file, (error) ->
 					error.message.should.equal("expected file.file_path")
 					done()
+			
+	describe "_flagOverleafDocAsImported", ->
+		beforeEach ->
+			@oAuthRequest.yields()
+			@ol_doc_id = "mock-ol-doc-id"
+			@sl_project_id = "mock-project-id"
+			@user_id = "mock-user-id"
+			@ProjectImporter._flagOverleafDocAsImported @ol_doc_id, @sl_project_id, @user_id, @callback
+		
+		it "should make an oauth request for the doc", ->
+			@oAuthRequest
+				.calledWith(@user_id, {
+					url: "http://overleaf.example.com/api/v1/sharelatex/docs/#{@ol_doc_id}"
+					method: "PUT"
+					json: {
+						doc: {
+							in_beta: true
+							beta_project_id: @sl_project_id
+						}
+					}
+				})
+				.should.equal true
+		
+		it "should return the callback", ->
+			@callback.called.should.equal true

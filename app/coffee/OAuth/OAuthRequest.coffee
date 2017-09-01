@@ -1,6 +1,7 @@
 refresh = require('passport-oauth2-refresh')
 request = require 'request'
 logger = require "logger-sharelatex"
+{User} = require "../../../../../app/js/models/User"
 
 OAuthRequest =
 	_doRequest: (user, opts, callback = (error, body) ->) ->
@@ -28,16 +29,19 @@ OAuthRequest =
 			user.overleaf.refreshToken = refreshToken
 			user.save callback
 	
-	request: (user, opts, callback = (error, body) ->) ->
-		OAuthRequest._doRequest user, opts, (error, body) ->
-			if error?
-				if error.statusCode == 401
-					OAuthRequest._refreshAccessToken user, (error) ->
-						return callback(error) if error?
-						return OAuthRequest._doRequest user, opts, callback
+	request: (user_id, opts, callback = (error, body) ->) ->
+		User.findOne { _id: user_id }, { overleaf: true }, (error, user) ->
+			return callback(error) if error?
+			return callback(new Error("user not found")) if !user?
+			OAuthRequest._doRequest user, opts, (error, body) ->
+				if error?
+					if error.statusCode == 401
+						OAuthRequest._refreshAccessToken user, (error) ->
+							return callback(error) if error?
+							return OAuthRequest._doRequest user, opts, callback
+					else
+						return callback(error)
 				else
-					return callback(error)
-			else
-				return callback null, body
+					return callback null, body
 
 module.exports = OAuthRequest.request

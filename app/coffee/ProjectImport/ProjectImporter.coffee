@@ -12,7 +12,6 @@ UserMapper = require "../OverleafUsers/UserMapper"
 
 ProjectCreationHandler = require "../../../../../app/js/Features/Project/ProjectCreationHandler"
 ProjectEntityHandler = require "../../../../../app/js/Features/Project/ProjectEntityHandler"
-{User} = require "../../../../../app/js/models/User"
 {ProjectInvite} = require "../../../../../app/js/models/ProjectInvite"
 CollaboratorsHandler = require "../../../../../app/js/Features/Collaborators/CollaboratorsHandler"
 PrivilegeLevels = require "../../../../../app/js/Features/Authorization/PrivilegeLevels"
@@ -36,23 +35,22 @@ module.exports = ProjectImporter =
 					return callback(error) if error?
 					ProjectImporter._importFiles project_id, doc.files, (error) ->
 						return callback(error) if error?
-						logger.log {project_id, ol_doc_id, user_id}, "finished project import"
-						callback null, project_id
+						ProjectImporter._flagOverleafDocAsImported ol_doc_id, project_id, user_id, (error) ->
+							return callback(error) if error?
+							logger.log {project_id, ol_doc_id, user_id}, "finished project import"
+							callback null, project_id
 
 	_getOverleafDoc: (ol_doc_id, user_id, callback = (error, doc) ->) ->
-		User.findOne { "_id": user_id }, { overleaf: true }, (error, user) ->
+		oAuthRequest user_id, {
+			url: "#{settings.overleaf.host}/api/v1/sharelatex/docs/#{ol_doc_id}"
+			method: "GET"
+			json: true
+		}, (error, doc) ->
 			return callback(error) if error?
-			return callback(new Error("user not found")) if !user?
-			oAuthRequest user, {
-				url: "#{settings.overleaf.host}/api/v1/sharelatex/docs/#{ol_doc_id}"
-				method: "GET"
-				json: true
-			}, (error, doc) ->
-				return callback(error) if error?
-				logger.log {ol_doc_id, user_id, doc}, "got doc for project from overleaf"
-				return callback(null, doc)
+			logger.log {ol_doc_id, user_id, doc}, "got doc for project from overleaf"
+			return callback(null, doc)
 
-	_initSharelatexProject: (user_id, doc = {}, callback = (err, project) ->) ->
+	_initSharelatexProject: (user_id, doc = {}, callback = (error, project) ->) ->
 		if !doc.title? or !doc.id? or !doc.latest_ver_id? or !doc.latex_engine?
 			return callback(new Error("expected doc title, id, latest_ver_id and latex_engine"))
 		ProjectCreationHandler.createBlankProject user_id, doc.title, (err, project) ->
@@ -160,3 +158,13 @@ module.exports = ProjectImporter =
 				callback null, pathOnDisk
 
 			readStream.pipe(writeStream)
+
+	_flagOverleafDocAsImported: (ol_doc_id, sl_project_id, user_id, callback = (error) ->) ->
+		oAuthRequest user_id, {
+			url: "#{settings.overleaf.host}/api/v1/sharelatex/docs/#{ol_doc_id}"
+			method: "PUT"
+			json:
+				doc:
+					in_beta: true
+					beta_project_id: sl_project_id
+		}, callback
