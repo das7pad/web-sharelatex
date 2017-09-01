@@ -114,6 +114,17 @@ describe "ProjectImporter", ->
 				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
 					error.message.should.equal("expected doc title, id, latest_ver_id and latex_engine")
 					done()
+		
+		describe "with blank title", ->
+			beforeEach ->
+				@doc.title = ""
+				@ProjectImporter._initSharelatexProject @user_id, @doc, @callback
+			
+			it "should set the title to 'Untitled'", ->
+				@ProjectCreationHandler.createBlankProject
+					.calledWith(@user_id, 'Untitled')
+					.should.equal true
+			
 			
 	describe "_getOverleafDoc", ->
 		beforeEach ->
