@@ -1,7 +1,8 @@
 define [
 	"base"
 	"ide/permissions/PermissionsManager"
-], (App, PermissionsManager) ->
+	"moment"
+], (App, PermissionsManager, moment) ->
 
 	App.controller "TemplatesController", ($scope, $modal, ide) ->
 		$scope.openPublishTemplateModal = () ->
