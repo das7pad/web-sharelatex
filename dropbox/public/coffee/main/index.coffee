@@ -6,7 +6,7 @@ define [
 	App.controller "DropboxRegistrationController", ($scope, $window, $http, $timeout) ->
 		data = 
 			_csrf : window.csrfToken
-			tokenInfo : window.location.hash.slice(2)
+			tokenInfo : window.location.hash.slice(3)
 		$scope.state = "processing"
 		$http.post("/dropbox/completeRegistration", data)
 			.then () ->
