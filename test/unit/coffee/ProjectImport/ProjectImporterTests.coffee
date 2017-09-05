@@ -71,6 +71,8 @@ describe "ProjectImporter", ->
 				latex_engine: "latex_dvipdf"
 				id: 42
 				latest_ver_id: 1234
+				token: "token"
+				read_token: "read_token"
 			}
 			@ProjectCreationHandler.createBlankProject = sinon.stub().yields(null, @project)
 		
@@ -86,6 +88,8 @@ describe "ProjectImporter", ->
 			it "should set overleaf metadata on the project", ->
 				@project.overleaf.id.should.equal @doc.id
 				@project.overleaf.imported_at_ver_id.should.equal @doc.latest_ver_id
+				@project.overleaf.token.should.equal @doc.token
+				@project.overleaf.read_token.should.equal @doc.read_token
 			
 			it "should set the appropriate project compiler from the latex_engine", ->
 				@project.compiler.should.equal "latex"
@@ -100,25 +104,37 @@ describe "ProjectImporter", ->
 			it "should require doc.title", (done) ->
 				delete @doc.title
 				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
-					error.message.should.equal("expected doc title, id, latest_ver_id and latex_engine")
+					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
 					done()
 
 			it "should require doc.latest_ver_id", (done) ->
 				delete @doc.latest_ver_id
 				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
-					error.message.should.equal("expected doc title, id, latest_ver_id and latex_engine")
+					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
 					done()
 
 			it "should require doc.id", (done) ->
 				delete @doc.id
 				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
-					error.message.should.equal("expected doc title, id, latest_ver_id and latex_engine")
+					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
 					done()
 
 			it "should require doc.latex_engine", (done) ->
 				delete @doc.latex_engine
 				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
-					error.message.should.equal("expected doc title, id, latest_ver_id and latex_engine")
+					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
+					done()
+
+			it "should require doc.token", (done) ->
+				delete @doc.token
+				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
+					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
+					done()
+
+			it "should require doc.read_token", (done) ->
+				delete @doc.read_token
+				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
+					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
 					done()
 		
 		describe "with blank title", ->
