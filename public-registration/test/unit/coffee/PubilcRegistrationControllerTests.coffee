@@ -84,6 +84,13 @@ describe "PublicRegistrationController", ->
 			@AuthenticationController.passportLogin.calledWith(@req, @res, @next).should.equal true
 			done()
 
+		it "should tell the user about the overleaf beta if trying to register with an existing linked overleaf email", (done)->
+			@UserRegistrationHandler.registerNewUser.callsArgWith(1, new Error("EmailAlreadyRegistered"), { overleaf: { id: "exists" }})
+			@res.json = (opts)=>
+				opts.message.text.should.equal "You are already registered in ShareLaTeX through the Overleaf Beta. Please log in via Overleaf."
+				done()
+			@PublicRegistrationController.register @req, @res, @next
+
 		it "should put the user on the session and mark them as justRegistered", (done)->
 			@UserRegistrationHandler.registerNewUser.callsArgWith(1, null, @user)
 			@res.json = =>

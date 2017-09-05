@@ -29,9 +29,10 @@ define [
 		$scope.dbState.hasDropboxFeature = $scope.project.features.dropbox
 
 		$http.get("/project/#{ide.project_id}/dropbox/status")
-			.success (status) ->
+			.then (response) ->
+				dropboxStatus = response.data
 				$scope.dbState.gotLinkStatus = true
-				if status.registered
+				if dropboxStatus.registered
 					$scope.dbState.userIsLinkedToDropbox = true
 					cachedState = $scope.dbState
 		

@@ -18,16 +18,18 @@ define [
 		}
 
 		$http.get("/user/github-sync/orgs", { disableAutoLoginRedirect: true })
-			.success (data) ->
+			.then (response) ->
+				{ data } = response
 				$scope.status.user = data.user
 				$scope.status.orgs = data.orgs
 				$scope.status.loading = false
 				$scope.form.org = $scope.status.user.login
 				
-			.error (data, statusCode) ->
+			.catch (response) ->
+				{ data, status } = response
 				$scope.status.error = {
 					message: data?.error,
-					statusCode: statusCode
+					statusCode: status
 				}
 				
 		$scope.create = () ->
@@ -43,11 +45,12 @@ define [
 			if $scope.form.org? and $scope.form.org != $scope.status.user.login
 				data.org = $scope.form.org
 			$http.post("/project/#{ide.project_id}/github-sync/export", data)
-				.success () ->
+				.then () ->
 					$scope.status.inflight = false
 					$modalInstance.dismiss()
 					ide.githubSyncManager.openGithubSyncModal()
 					
-				.error (data) ->
+				.catch (response) ->
+					{ data } = response
 					$scope.form.error = data.error
 					$scope.status.inflight = false

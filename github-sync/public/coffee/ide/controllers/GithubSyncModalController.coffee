@@ -69,33 +69,40 @@ define [
 			}
 			
 			$http.get("/user/github-sync/status", { disableAutoLoginRedirect: true })
-				.success (userStatus) ->
+				.then (response) ->
+					{ data } = response
+					userStatus = data
 					$scope.status.user = userStatus
 					$http.get("/project/#{ide.project_id}/github-sync/status", { disableAutoLoginRedirect: true })
-						.success (projectStatus) ->
+						.then (response) ->
+							projectStatus = response.data
 							$scope.status.project = projectStatus
 							$scope.status.loading = false
 							
 							if $scope.status.project.enabled
 								$http.get("/project/#{ide.project_id}/github-sync/commits/unmerged", { disableAutoLoginRedirect: true })
-									.success (commits) ->
+									.then (response) ->
+										commits = response.data
 										$scope.status.commits.commits = commits
 										$scope.status.commits.loading = false
 										
-									.error (data, statusCode) ->
-										if statusCode?
-											$scope.status.error = { statusCode }
+									.catch (response) ->
+										{ data, status } = response
+										if status?
+											$scope.status.error = { status }
 										else
 											$scope.status.error = true
 							
-						.error (data, statusCode) ->
-							if statusCode?
-								$scope.status.error = { statusCode }
+						.catch (response) ->
+							{ data, status } = response
+							if status?
+								$scope.status.error = { status }
 							else
 								$scope.status.error = true
 					
-				.error (data, statusCode) ->
-					if statusCode?
-						$scope.status.error = { statusCode }
+				.catch (response) ->
+					{ data, status } = response
+					if status?
+						$scope.status.error = { status }
 					else
 						$scope.status.error = true

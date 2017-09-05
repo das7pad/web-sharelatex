@@ -114,7 +114,7 @@ script(type="text/ng-template", id="githubSyncModalTemplate")
 								div(sixpack-when="focused-anim")
 									.teaser-video-container
 										video.teaser-video(autoplay, loop)
-											source(src="/img/teasers/github/teaser-github.mp4", type="video/mp4")
+											source(ng-src="{{ '/img/teasers/github/teaser-github.mp4' }}", type="video/mp4")
 											img(src="/img/teasers/github/teaser-github.gif")
 									
 									h4.teaser-title Push to GitHub, pull to ShareLaTeX
