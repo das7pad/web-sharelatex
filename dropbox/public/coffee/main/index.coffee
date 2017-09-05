@@ -4,9 +4,10 @@ define [
 
 
 	App.controller "DropboxRegistrationController", ($scope, $window, $http, $timeout) ->
+		sliceLocation = window.location.hash.indexOf("access_token")
 		data = 
 			_csrf : window.csrfToken
-			tokenInfo : window.location.hash.slice(3)
+			tokenInfo : window.location.hash.slice(sliceLocation)
 		$scope.state = "processing"
 		$http.post("/dropbox/completeRegistration", data)
 			.then () ->
