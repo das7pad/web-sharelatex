@@ -9,6 +9,10 @@ async = require('async')
 module.exports =
 
 	getUserRegistrationStatus: (user_id, callback)->
+		if !user_id?
+			err = new Error("no user id passed to getUserRegistrationStatus")
+			logger.err err
+			return callback(err)		
 		logger.log user_id:user_id, "getting dropbox registration status from tpds"
 		opts =
 			url : "#{settings.apis.thirdPartyDataStore.url}/user/#{user_id}/dropbox/status"
@@ -22,6 +26,10 @@ module.exports =
 				callback err, body
 
 	getDropboxRegisterUrl: (user_id, callback)->
+		if !user_id?
+			err = new Error("no user id passed to getDropboxRegisterUrl")
+			logger.err err
+			return callback(err)
 		opts =
 			url: "#{settings.apis.thirdPartyDataStore.url}/user/#{user_id}/dropbox/register"
 			timeout: 5000
@@ -30,28 +38,34 @@ module.exports =
 				if err?
 					logger.err err:err, response:response, "getUserRegistrationStatus problem"
 					return callback err
-				url = "#{body.authorize_url}&oauth_callback=#{settings.siteUrl}/dropbox/completeRegistration"
+				url = body.authorize_url
 				logger.log user_id:user_id, url:url, "starting dropbox register"
 				callback err, url
 
-	completeRegistration: (user_id, callback)->
+	setAccessToken: (user_id, token, dropbox_uid, callback)->
+		if !user_id?
+			err = new Error("no user id passed to set access_token")
+			logger.err err
+			return callback(err)
 		opts =
-			url: "#{settings.apis.thirdPartyDataStore.url}/user/#{user_id}/dropbox/getaccesstoken"
+			url: "#{settings.apis.thirdPartyDataStore.url}/user/#{user_id}/dropbox/setaccesstoken"
+			json:
+				token:token
+				dropbox_uid:dropbox_uid
 			timeout: 5000
-		request.get opts, (err, response, body)=>
-			safelyGetResponse err, response, body, (err, body)=>
-				if err?
-					logger.err err:err, response:response, "getUserRegistrationStatus problem"
-					return callback err
-				success = body.success
-				logger.log user_id:user_id, success:body.success, "completing dropbox register"
-				if success
-					@flushUsersProjectToDropbox user_id, (err)->
-						logger.err err:err, "error flushing all users projects to dropbox"
-				callback err, body.success
+		logger.log user_id:user_id, "compleing dropbox registration"
+		request.post opts, (err, response, body)=>
+			if response.statusCode != 200 or err?
+				logger.err err:err, response:response, "error setting dropbox access token"
+				return callback err
+			callback()
 
 
 	unlinkAccount: (user_id, callback)->
+		if !user_id?
+			err = new Error("no user id passed to unlinkAccount")
+			logger.err err
+			return callback(err)
 		opts =
 			url: "#{settings.apis.thirdPartyDataStore.url}/user/#{user_id}/dropbox"
 			timeout: 5000
@@ -59,6 +73,10 @@ module.exports =
 			callback(err)
 
 	flushUsersProjectToDropbox: (user_id, callback)->
+		if !user_id?
+			err = new Error("no user id passed to flushUsersProjectToDropbox")
+			logger.err err
+			return callback(err)
 		ProjectGetter.findAllUsersProjects user_id, '_id archived', (err, projects = [], collabertions = [], readOnlyProjects = [])->
 			projectList = []
 			projectList = projectList.concat(projects)

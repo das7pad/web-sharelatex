@@ -45,19 +45,7 @@ describe 'DropboxHandler', ->
 			timeout: 5000
 		@stubGet.withArgs(opts).callsArgWith(1, null, {statusCode:200}, body)
 		@handler.getDropboxRegisterUrl user_id, (err, returnedUrl)->
-			returnedUrl.should.equal "#{url}&oauth_callback=#{siteUrl}/dropbox/completeRegistration"
-			done()
-
-	it 'should be able to complete registration and get getAccessToken from dropbox', (done)->
-		body = JSON.stringify({success:true})
-		opts =
-			url: "#{thirdPartyDataStoreApiUrl}/user/#{user_id}/dropbox/getaccesstoken"
-			timeout: 5000
-		@stubGet.withArgs(opts).callsArgWith(1, null, {statusCode:200}, body)
-		@handler.flushUsersProjectToDropbox = sinon.stub()
-		@handler.completeRegistration user_id, (err, successful)=>
-			@handler.flushUsersProjectToDropbox.called.should.equal true
-			successful.should.equal true
+			returnedUrl.should.equal url
 			done()
 
 	it 'should tell the tpds to unlink the account', (done)->
