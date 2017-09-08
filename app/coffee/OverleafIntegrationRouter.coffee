@@ -41,7 +41,7 @@ module.exports =
 		)
 		webRouter.get(
 			'/read/:read_token',
-			ProjectRedirectController.redirectDocByToken
+			ProjectRedirectController.redirectDocByReadToken
 		)
 
 removeRoute = (router, method, path)->
