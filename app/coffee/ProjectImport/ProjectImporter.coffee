@@ -169,6 +169,5 @@ module.exports = ProjectImporter =
 			method: "PUT"
 			json:
 				doc:
-					in_beta: true
 					beta_project_id: sl_project_id
 		}, callback
