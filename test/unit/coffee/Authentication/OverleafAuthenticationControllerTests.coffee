@@ -55,6 +55,8 @@ describe "OverleafAuthenticationController", ->
 			@user = {"mock": "user"}
 			@req.user = @user
 			@AuthenticationController.afterLoginSessionSetup = sinon.stub().yields()
+			@AuthenticationController._getRedirectFromSession = sinon.stub()
+			@AuthenticationController._getRedirectFromSession.withArgs(@req).returns @redir = "/redir/path"
 			@OverleafAuthenticationController.doLogin @req, @res, @next
 
 		it "should call AuthenticationController.afterLoginSessionSetup", ->
@@ -62,7 +64,7 @@ describe "OverleafAuthenticationController", ->
 				.calledWith(@req, @user)
 				.should.equal true
 
-		it "should redirect to /", ->
+		it "should redirect to the stored rediret", ->
 			@res.redirect
-				.calledWith("/")
+				.calledWith(@redir)
 				.should.equal true
