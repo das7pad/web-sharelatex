@@ -12,18 +12,26 @@ describe "OAuthRequest", ->
 			"request": @request = sinon.stub()
 			"logger-sharelatex": { log: sinon.stub() }
 			"passport-oauth2-refresh": @refresh = {}
+			"../../../../../app/js/models/User": User: @User = {}
 
 		@user =
 			overleaf:
 				accessToken: @accessToken = "mock-access-token"
 				refreshToken: @refreshToken = "mock-refresh-token"
 			save: sinon.stub().yields()
+		@user_id = "mock-user-id"
+		@User.findOne = sinon.stub().yields(null, @user)
 		@callback = sinon.stub()
 
 	describe "successfully", ->
 		beforeEach ->
 			@request.yields(null, { statusCode: 200 }, @body = {"mock": "response"})
-			@OAuthRequest(@user, { url: "http://www.example.com" }, @callback)
+			@OAuthRequest(@user_id, { url: "http://www.example.com" }, @callback)
+
+		it "should look up the user", ->
+			@User.findOne
+				.calledWith({ _id: @user_id })
+				.should.equal true
 
 		it "should make an authenticated request", ->
 			@request
@@ -44,7 +52,7 @@ describe "OAuthRequest", ->
 			@refresh.requestNewAccessToken = sinon.stub().yields(
 				null, @accessToken2 = "new-access-token", @refreshToken2 = "new-refresh-token"
 			)
-			@OAuthRequest(@user, { url: "http://www.example.com" }, @callback)
+			@OAuthRequest(@user_id, { url: "http://www.example.com" }, @callback)
 
 		it "should make an authenticated request with the initial access token", ->
 			@request

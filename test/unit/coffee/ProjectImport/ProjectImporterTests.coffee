@@ -13,7 +13,6 @@ describe "ProjectImporter", ->
 		@ProjectImporter = SandboxedModule.require modulePath, requires:
 			"../../../../../app/js/Features/Project/ProjectCreationHandler": @ProjectCreationHandler = {}
 			"../../../../../app/js/Features/Project/ProjectEntityHandler": @ProjectEntityHandler = {}
-			"../../../../../app/js/models/User": User: @User = {}
 			"../../../../../app/js/models/ProjectInvite": ProjectInvite: @ProjectInvite = {}
 			"../OAuth/OAuthRequest": @oAuthRequest = sinon.stub()
 			"../OverleafUsers/UserMapper": @UserMapper = {}
@@ -33,6 +32,7 @@ describe "ProjectImporter", ->
 			@ProjectImporter._getOverleafDoc = sinon.stub().yields(null, @doc = { files: ["mock-files"] })
 			@ProjectImporter._initSharelatexProject = sinon.stub().yields(null, @project = { _id: "mock-project-id" })
 			@ProjectImporter._importFiles = sinon.stub().yields()
+			@ProjectImporter._flagOverleafDocAsImported = sinon.stub().yields()
 			@ProjectImporter.importProject(@ol_doc_id = "mock-ol-doc-id", @user_id = "mock-user-id", @callback)
 	
 		it "should get the doc from OL", ->
@@ -48,7 +48,13 @@ describe "ProjectImporter", ->
 		it "should import the files", ->
 			@ProjectImporter._importFiles
 				.calledWith(@project._id, @doc.files)
-		
+				.should.equal true
+
+		it "should tell overleaf the project is now in the beta", ->
+			@ProjectImporter._flagOverleafDocAsImported
+				.calledWith(@ol_doc_id, @project._id, @user_id)
+				.should.equal true
+
 		it "should return the new project id", ->
 			@callback.calledWith(null, @project._id).should.equal true
 	
@@ -65,6 +71,8 @@ describe "ProjectImporter", ->
 				latex_engine: "latex_dvipdf"
 				id: 42
 				latest_ver_id: 1234
+				token: "token"
+				read_token: "read_token"
 			}
 			@ProjectCreationHandler.createBlankProject = sinon.stub().yields(null, @project)
 		
@@ -80,6 +88,8 @@ describe "ProjectImporter", ->
 			it "should set overleaf metadata on the project", ->
 				@project.overleaf.id.should.equal @doc.id
 				@project.overleaf.imported_at_ver_id.should.equal @doc.latest_ver_id
+				@project.overleaf.token.should.equal @doc.token
+				@project.overleaf.read_token.should.equal @doc.read_token
 			
 			it "should set the appropriate project compiler from the latex_engine", ->
 				@project.compiler.should.equal "latex"
@@ -94,37 +104,58 @@ describe "ProjectImporter", ->
 			it "should require doc.title", (done) ->
 				delete @doc.title
 				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
-					error.message.should.equal("expected doc title, id, latest_ver_id and latex_engine")
+					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
 					done()
 
 			it "should require doc.latest_ver_id", (done) ->
 				delete @doc.latest_ver_id
 				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
-					error.message.should.equal("expected doc title, id, latest_ver_id and latex_engine")
+					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
 					done()
 
 			it "should require doc.id", (done) ->
 				delete @doc.id
 				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
-					error.message.should.equal("expected doc title, id, latest_ver_id and latex_engine")
+					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
 					done()
 
 			it "should require doc.latex_engine", (done) ->
 				delete @doc.latex_engine
 				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
-					error.message.should.equal("expected doc title, id, latest_ver_id and latex_engine")
+					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
 					done()
+
+			it "should require doc.token", (done) ->
+				delete @doc.token
+				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
+					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
+					done()
+
+			it "should require doc.read_token", (done) ->
+				delete @doc.read_token
+				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
+					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
+					done()
+		
+		describe "with blank title", ->
+			beforeEach ->
+				@doc.title = ""
+				@ProjectImporter._initSharelatexProject @user_id, @doc, @callback
+			
+			it "should set the title to 'Untitled'", ->
+				@ProjectCreationHandler.createBlankProject
+					.calledWith(@user_id, 'Untitled')
+					.should.equal true
+			
 			
 	describe "_getOverleafDoc", ->
 		beforeEach ->
-			@user = { "mock": "user" }
-			@User.findOne = sinon.stub().yields(null, @user)
 			@oAuthRequest.yields(null, @doc = { "mock": "doc" })
 			@ProjectImporter._getOverleafDoc @ol_doc_id, @user_id, @callback
 		
 		it "should make an oauth request for the doc", ->
 			@oAuthRequest
-				.calledWith(@user, {
+				.calledWith(@user_id, {
 					url: "http://overleaf.example.com/api/v1/sharelatex/docs/#{@ol_doc_id}"
 					method: "GET"
 					json: true
@@ -404,3 +435,27 @@ describe "ProjectImporter", ->
 				@ProjectImporter._importFile @project_id, @att_file, (error) ->
 					error.message.should.equal("expected file.file_path")
 					done()
+			
+	describe "_flagOverleafDocAsImported", ->
+		beforeEach ->
+			@oAuthRequest.yields()
+			@ol_doc_id = "mock-ol-doc-id"
+			@sl_project_id = "mock-project-id"
+			@user_id = "mock-user-id"
+			@ProjectImporter._flagOverleafDocAsImported @ol_doc_id, @sl_project_id, @user_id, @callback
+		
+		it "should make an oauth request for the doc", ->
+			@oAuthRequest
+				.calledWith(@user_id, {
+					url: "http://overleaf.example.com/api/v1/sharelatex/docs/#{@ol_doc_id}"
+					method: "PUT"
+					json: {
+						doc: {
+							beta_project_id: @sl_project_id
+						}
+					}
+				})
+				.should.equal true
+		
+		it "should return the callback", ->
+			@callback.called.should.equal true

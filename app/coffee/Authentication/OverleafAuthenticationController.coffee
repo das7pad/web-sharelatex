@@ -22,7 +22,8 @@ module.exports = OverleafAuthenticationController =
 		logger.log {user: req.user, info: req.info}, "successful log in from overleaf"
 		AuthenticationController.afterLoginSessionSetup req, req.user, (err) ->
 			return next(err) if err?
-			res.redirect("/")
+			redir = AuthenticationController._getRedirectFromSession(req) || "/project"
+			res.redirect(redir)
 	
 	emailExists: (req, res, next) ->
 		res.render Path.resolve(__dirname, "../views/email_exists"), { email: req.query.email }
