@@ -1,12 +1,12 @@
-OverleafOAuthRouter = require "./app/js/OverleafIntegrationRouter"
+OverleafIntegrationRouter = require "./app/js/OverleafIntegrationRouter"
 OverleafAuthenticationManager = require "./app/js/Authentication/OverleafAuthenticationManager"
 OAuth2Strategy = require('passport-oauth2').Strategy
 refresh = require('passport-oauth2-refresh')
 
 settings = require "settings-sharelatex"
 
-OverleafOAuth =
-	router: OverleafOAuthRouter
+OverleafIntegration =
+	router: OverleafIntegrationRouter
 
 	hooks:
 		passportSetup: (passport) ->
@@ -27,4 +27,4 @@ OverleafOAuth =
 if !settings.overleaf?.oauth?
 	module.exports = {}
 else
-	module.exports = OverleafOAuth
+	module.exports = OverleafIntegration

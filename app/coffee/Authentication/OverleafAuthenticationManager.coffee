@@ -31,12 +31,13 @@ module.exports = OverleafAuthenticationManager =
 				OverleafAuthenticationManager._updateUserTokens user, accessToken, refreshToken, callback
 			else
 				email = UserMapper.getCanonicalEmail(profile.email)
-				User.findOne {email}, (err, user) ->
+				User.findOne {email}, {_id: 1}, (err, user) ->
 					return callback(err) if err?
 					if user?
 						return callback(null, null, {
 							email_exists_in_sl: true
-							email: email
+							profile, accessToken, refreshToken,
+							user_id: user._id.toString()
 						})
 					else
 						UserMapper.createSlUser profile, accessToken, refreshToken, callback

@@ -10,12 +10,22 @@ describe "OverleafAuthenticationController", ->
 	beforeEach ->
 		@OverleafAuthenticationController = SandboxedModule.require modulePath, requires:
 			"../../../../../app/js/Features/Authentication/AuthenticationController": @AuthenticationController = {}
-			"logger-sharelatex": { log: sinon.stub() }
+			"logger-sharelatex": { log: sinon.stub(), err: sinon.stub() }
 			"passport": @passport = {}
+			"settings-sharelatex": @settings =
+				accountMerge:
+					sharelatexHost: "http://sl.example.com"
+					secret: "banana"
+			"jsonwebtoken": @jwt = {}
+			"../OverleafUsers/UserMapper": @UserMapper = {}
 		@req =
 			logIn: sinon.stub()
+			session: {}
 		@res =
 			redirect: sinon.stub()
+			status: sinon.stub()
+			send: sinon.stub()
+		@res.status.returns(@res)
 
 	describe "setupUser", ->
 		describe "with a conflicting email", ->
@@ -29,13 +39,33 @@ describe "OverleafAuthenticationController", ->
 					return (req, res, next) =>
 						method(null, null, {
 							email_exists_in_sl: true
-							email: @email = "test@example.com"
+							profile: @profile = {
+								email: "test@example.com"
+							}
+							accessToken: @accessToken = "access-token"
+							refreshToken: @refreshToken = "refresh-token"
+							user_id: @user_id = "mock-sl-user-id"
 						})
+				@jwt.sign = sinon.stub().returns @token = "mock-token"
 				@OverleafAuthenticationController.setupUser @req, @res, @next
-			
-			it "should redirect to /overleaf/email_exists", ->
+
+			it 'should sign the redirect data in a JWT', ->
+				@jwt.sign
+					.calledWith(
+						{ @user_id, overleaf_email: @profile.email, confirm_merge: true },
+						@settings.accountMerge.secret,
+						{ expiresIn: '1h' }
+					)
+					.should.equal true
+
+			it 'should save the OAuth and user data in the session', ->
+				expect(@req.session.accountMerge).to.deep.equal {
+					@profile, @user_id, @accessToken, @refreshToken
+				}
+	
+			it "should redirect to confirm the users email in SL", ->
 				@res.redirect
-					.calledWith("/overleaf/email_exists?email=#{encodeURIComponent(@email)}")
+					.calledWith("#{@settings.accountMerge.sharelatexHost}/user/confirm_account_merge?token=#{@token}")
 					.should.equal true
 			
 		describe "with a successful user set up", ->
@@ -68,3 +98,72 @@ describe "OverleafAuthenticationController", ->
 			@res.redirect
 				.calledWith(@redir)
 				.should.equal true
+
+	describe "confirmedAccountMerge", ->
+		beforeEach ->
+			@token = "mock-token"
+			@user_id = "mock-user-id"
+			@data = {
+				merge_confirmed: true
+				user_id: @user_id
+			}
+			@UserMapper.mergeWithSlUser = sinon.stub().yields(null, @user = {"mock": "user"})
+			@jwt.verify = sinon.stub()
+			@jwt.verify.withArgs(@token, @settings.accountMerge.secret).yields(null, @data)
+			@req.session.accountMerge = {
+				accessToken: 'mock-access-token'
+				refreshToken: 'mock-refresh-token'
+				user_id: @user_id
+				profile: {
+					email: "jim@example.com"
+				}
+			}
+			@req.query = token: @token
+
+		describe "successfully", ->
+			beforeEach ->
+				@OverleafAuthenticationController.confirmedAccountMerge(@req, @res, @next)
+
+			it "should verify the token", ->
+				@jwt.verify
+					.calledWith(@token, @settings.accountMerge.secret)
+					.should.equal true
+
+			it "should merge with the SL user based on session data", ->
+				@UserMapper.mergeWithSlUser
+					.calledWith(
+						@user_id,
+						@req.session.accountMerge.profile,
+						@req.session.accountMerge.accessToken,
+						@req.session.accountMerge.refreshToken
+					)
+					.should.equal true
+
+			it "should log the user in", ->
+				@req.logIn
+					.calledWith(@user)
+					.should.equal true
+
+		describe "with no token", ->
+			beforeEach ->
+				@req.query = {}
+				@OverleafAuthenticationController.confirmedAccountMerge(@req, @res, @next)
+
+			it "should return a 400 invalid token error", ->
+				@res.status.calledWith(400).should.equal true
+
+		describe "with invalid token (no merge_confirmed parameter)", ->
+			beforeEach ->
+				delete @data.merge_confirmed
+				@OverleafAuthenticationController.confirmedAccountMerge(@req, @res, @next)
+
+			it "should return a 400 invalid token error", ->
+				@res.status.calledWith(400).should.equal true
+
+		describe "when user_id in token doesn't match saved user_id", ->
+			beforeEach ->
+				@data.user_id = "not-the-saved-user-id"
+				@OverleafAuthenticationController.confirmedAccountMerge(@req, @res, @next)
+
+			it "should return a 400 invalid token error", ->
+				@res.status.calledWith(400).should.equal true

@@ -61,3 +61,19 @@ module.exports = UserMapper =
 				UserMapper.removeOlUserStub ol_user.id, (error) ->
 					return callback(error) if error?
 					return callback(null, user)
+
+	mergeWithSlUser: (sl_user_id, ol_user, accessToken, refreshToken, callback = (error, sl_user) ->) ->
+		# TODO: If a stub already exists, we can't set the SL user to this id, so we
+		# need to migrate any projects/history using this stub to the existing SL id.
+		User.findOne {_id: sl_user_id}, (error, user) ->
+			return callback(error) if error?
+			if user.email != UserMapper.getCanonicalEmail(ol_user.email)
+				return callback(new Error('expected OL and SL account emails to match'))
+			user.overleaf = {
+				id: ol_user.id
+				accessToken: accessToken
+				refreshToken: refreshToken
+			}
+			user.save (error) ->
+				return callback(error) if error?
+				return callback null, user

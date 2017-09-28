@@ -126,3 +126,55 @@ describe "UserMapper", ->
 			
 			it "should return the user", ->
 				@callback.calledWith(null, @user).should.equal true
+
+	describe 'mergeWithSlUser', ->
+		beforeEach ->
+			@user_id = "mock-user-id"
+			@sl_user =
+				email: "jane@example.com"
+				save: sinon.stub().yields()
+			@ol_user = {
+				id: 42
+				email: "Jane@Example.com" # Only needs to match up to case
+			}
+			@accessToken = "mock-access-token"
+			@refreshToken = "mock-refresh-token"
+			@User.findOne = sinon.stub().yields(null, @sl_user)
+
+		describe "successfully", ->
+			beforeEach ->
+				@UserMapper.mergeWithSlUser(
+					@user_id, @ol_user, @accessToken, @refreshToken, @callback
+				)
+
+			it "should look up the user from the SL user_id", ->
+				@User.findOne
+					.calledWith({_id: @user_id})
+					.should.equal true
+
+			it "should add the overleaf properties to the user", ->
+				expect(@sl_user.overleaf).to.deep.equal {
+					id: @ol_user.id
+					accessToken: @accessToken
+					refreshToken: @refreshToken
+				}
+
+			it "should save the user", ->
+				@sl_user.save.called.should.equal true
+
+			it "should return the user", ->
+				@callback.calledWith(null, @sl_user).should.equal true
+
+		describe "when emails don't match", ->
+			beforeEach ->
+				@ol_user.email = "different@example.com"
+				@UserMapper.mergeWithSlUser(
+					@user_id, @ol_user, @accessToken, @refreshToken, @callback
+				)
+
+			it "should not save the user", ->
+				@sl_user.save.called.should.equal false
+
+			it "should return the callback with an error", ->
+				@callback.calledWith(new Error('expected OL and SL account emails to match'))
+
