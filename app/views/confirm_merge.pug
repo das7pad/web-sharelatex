@@ -1,0 +1,20 @@
+extends ../../../../app/views/layout
+
+block content
+	.content.content-alt
+		.container
+			.row
+				.col-md-8.col-md-offset-2
+					.card
+						p.text-center
+							img(
+								src="/img/ol_plus_sl.png"
+								style="width: 50%"
+							)
+						p
+							| The new Overleaf editor will also allow you to access your ShareLaTeX projects (you can read more <a href="https://www.overleaf.com/blog/518-exciting-news-sharelatex-is-joining-overleaf">here</a>).
+							| You have an account in ShareLaTeX with the email <strong>#{email}</strong>.
+							| To use the new Overleaf editor, you need to confirm with ShareLaTeX that you'd like to access your ShareLaTeX projects in the new Overleaf editor.
+
+						p.text-center
+							a(href=redirect_url).btn.btn-primary Go to ShareLaTeX to confirm

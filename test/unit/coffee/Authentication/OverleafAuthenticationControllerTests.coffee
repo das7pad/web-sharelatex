@@ -1,8 +1,8 @@
 should = require('chai').should()
 SandboxedModule = require('sandboxed-module')
 assert = require('assert')
-path = require('path')
-modulePath = path.join __dirname, '../../../../app/js/Authentication/OverleafAuthenticationController'
+Path = require('path')
+modulePath = Path.join __dirname, '../../../../app/js/Authentication/OverleafAuthenticationController'
 sinon = require("sinon")
 expect = require("chai").expect
 
@@ -25,6 +25,7 @@ describe "OverleafAuthenticationController", ->
 			redirect: sinon.stub()
 			status: sinon.stub()
 			send: sinon.stub()
+			render: sinon.stub()
 		@res.status.returns(@res)
 
 	describe "setupUser", ->
@@ -63,9 +64,16 @@ describe "OverleafAuthenticationController", ->
 					@profile, @user_id, @accessToken, @refreshToken
 				}
 	
-			it "should redirect to confirm the users email in SL", ->
-				@res.redirect
-					.calledWith("#{@settings.accountMerge.sharelatexHost}/user/confirm_account_merge?token=#{@token}")
+			it "should render the confirmation page", ->
+				@res.render
+					.calledWith(
+						Path.resolve(__dirname, "../../../../app/views/confirm_merge"),
+						{
+							redirect_url: "#{@settings.accountMerge.sharelatexHost}/user/confirm_account_merge?token=#{@token}"
+							email: @profile.email
+							suppressNavbar: true
+						}
+					)
 					.should.equal true
 			
 		describe "with a successful user set up", ->
@@ -167,3 +175,5 @@ describe "OverleafAuthenticationController", ->
 
 			it "should return a 400 invalid token error", ->
 				@res.status.calledWith(400).should.equal true
+
+

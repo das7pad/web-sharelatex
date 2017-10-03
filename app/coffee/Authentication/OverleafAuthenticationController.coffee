@@ -11,7 +11,11 @@ module.exports = OverleafAuthenticationController =
 	setupUser: (req, res, next) ->
 		# This will call OverleafAuthenticationManager.setupUser
 		passport.authenticate("overleaf", (err, user, info) ->
-			return next(err) if err?
+			if err?
+				if err.name == "TokenError"
+					return res.redirect "/overleaf/login" # Token expired, try again
+				else
+					return next(err) 
 			if info?.email_exists_in_sl
 				logger.log {info}, "redirecting to sharelatex to merge accounts"
 				{profile, accessToken, refreshToken, user_id} = info
@@ -25,7 +29,11 @@ module.exports = OverleafAuthenticationController =
 					pathname: "/user/confirm_account_merge",
 					query: {token}
 				})
-				return res.redirect url
+				return res.render Path.resolve(__dirname, "../../views/confirm_merge"), {
+					email: profile.email
+					redirect_url: url
+					suppressNavbar: true
+				}
 			else
 				return req.logIn(user, next)
 		)(req, res, next)
