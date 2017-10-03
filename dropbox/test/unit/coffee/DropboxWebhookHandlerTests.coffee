@@ -86,7 +86,8 @@ describe 'DropboxWebhookHandler', ->
 			
 			it "should return the callback after the delay with shouldPoll=true", ->
 				@shouldPoll.should.equal true
-				expect(@end - @start).to.be.at.least(@DropboxWebhookHandler.POLL_DELAY_IN_MS)
+				ALLOWED_ERROR = 5 #ms
+				expect(@end - @start).to.be.at.least(@DropboxWebhookHandler.POLL_DELAY_IN_MS - ALLOWED_ERROR)
 			
 		describe "when someone else is already polling", ->
 			beforeEach ->
