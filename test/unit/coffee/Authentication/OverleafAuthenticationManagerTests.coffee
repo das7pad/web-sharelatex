@@ -55,6 +55,7 @@ describe "OverleafAuthenticationManager", ->
 		beforeEach ->
 			@User.findOne = sinon.stub()
 			@user =
+				_id: "mock-user-id"
 				overleaf: {}
 				save: sinon.stub().yields()
 			@UserMapper.createSlUser = sinon.stub().yields(null, @user)
@@ -98,10 +99,11 @@ describe "OverleafAuthenticationManager", ->
 			it "should not create a new user", ->
 				@UserMapper.createSlUser.called.should.equal false
 
-			it "should return a message about the email", ->
+			it "should return a the user data for confirmation with SL", ->
 				@callback
 					.calledWith(null, null, {
 						email_exists_in_sl: true
-						email: "joe@example.com"
+						@profile, @accessToken, @refreshToken,
+						user_id: @user._id
 					})
 					.should.equal true

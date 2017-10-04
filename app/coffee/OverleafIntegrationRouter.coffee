@@ -23,7 +23,11 @@ module.exports =
 			OverleafAuthenticationController.doLogin
 		)
 
-		webRouter.get '/overleaf/email_exists', OverleafAuthenticationController.emailExists
+		webRouter.get(
+			'/overleaf/confirmed_account_merge',
+			OverleafAuthenticationController.confirmedAccountMerge,
+			OverleafAuthenticationController.doLogin
+		)
 
 		webRouter.get(
 			'/overleaf/project/:ol_doc_id/import',
