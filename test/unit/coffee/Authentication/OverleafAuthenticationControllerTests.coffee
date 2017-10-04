@@ -160,6 +160,9 @@ describe "OverleafAuthenticationController", ->
 			it "should return a 400 invalid token error", ->
 				@res.status.calledWith(400).should.equal true
 
+			it "should not try to verify the token", ->
+				@jwt.verify.called.should.equal false
+
 		describe "with invalid token (no merge_confirmed parameter)", ->
 			beforeEach ->
 				delete @data.merge_confirmed

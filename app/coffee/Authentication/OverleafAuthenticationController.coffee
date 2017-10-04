@@ -48,7 +48,7 @@ module.exports = OverleafAuthenticationController =
 	confirmedAccountMerge: (req, res, next) ->
 		{token} = req.query
 		if !token?
-			OverleafAuthenticationController._badToken(res, new Error('no token provided'))
+			return OverleafAuthenticationController._badToken(res, new Error('no token provided'))
 		jwt.verify token, Settings.accountMerge.secret, (error, data) ->
 			return OverleafAuthenticationController._badToken(res, error) if error?
 			if !data.merge_confirmed
