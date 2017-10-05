@@ -12,6 +12,7 @@ describe "UserMapper", ->
 			"../../../../../app/js/Features/User/UserCreator": @UserCreator = {}
 			"../../../../../app/js/models/User": User: @User = {}
 			"../../../../../app/js/models/UserStub": UserStub: @UserStub = {}
+			"../../../../../app/js/Features/Collaborators/CollaboratorsHandler": @CollaboratorsHandler = {}
 		@callback = sinon.stub()
 
 	describe "getSlIdFromOlUser", ->
@@ -139,13 +140,21 @@ describe "UserMapper", ->
 			}
 			@accessToken = "mock-access-token"
 			@refreshToken = "mock-refresh-token"
+			@UserMapper.getOlUserStub = sinon.stub().yields()
+			@UserMapper.removeOlUserStub = sinon.stub().yields()
+			@CollaboratorsHandler.transferProjects = sinon.stub().yields()
 			@User.findOne = sinon.stub().yields(null, @sl_user)
 
-		describe "successfully", ->
+		describe "successfully - without an existing UserStub", ->
 			beforeEach ->
 				@UserMapper.mergeWithSlUser(
 					@user_id, @ol_user, @accessToken, @refreshToken, @callback
 				)
+
+			it "should look up whether there is a UserStub", ->
+				@UserMapper.getOlUserStub
+					.calledWith(@ol_user.id)
+					.should.equal true
 
 			it "should look up the user from the SL user_id", ->
 				@User.findOne
@@ -161,6 +170,32 @@ describe "UserMapper", ->
 
 			it "should save the user", ->
 				@sl_user.save.called.should.equal true
+
+			it "should not try to remove any UserStub", ->
+				@UserMapper.removeOlUserStub.called.should.equal false
+
+			it "should not try to transfer any projects", ->
+				@CollaboratorsHandler.transferProjects.called.should.equal false
+
+			it "should return the user", ->
+				@callback.calledWith(null, @sl_user).should.equal true
+
+		describe "successfully - with an existing UserStub", ->
+			beforeEach ->
+				@UserMapper.getOlUserStub = sinon.stub().yields(null, @user_stub = { _id: "user-stub-id" })
+				@UserMapper.mergeWithSlUser(
+					@user_id, @ol_user, @accessToken, @refreshToken, @callback
+				)
+
+			it "should remove the user stub", ->
+				@UserMapper.removeOlUserStub
+					.calledWith(@ol_user.id)
+					.should.equal true
+
+			it "should transfer projects from the user stub to the user", ->
+				@CollaboratorsHandler.transferProjects
+					.calledWith(@user_stub._id, @user_id)
+					.should.equal true
 
 			it "should return the user", ->
 				@callback.calledWith(null, @sl_user).should.equal true

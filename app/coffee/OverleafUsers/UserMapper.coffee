@@ -1,6 +1,7 @@
 {User} = require "../../../../../app/js/models/User"
 {UserStub} = require "../../../../../app/js/models/UserStub"
 UserCreator = require "../../../../../app/js/Features/User/UserCreator"
+CollaboratorsHandler = require "../../../../../app/js/Features/Collaborators/CollaboratorsHandler"
 
 # When we import a project, it may refer to collaborators which
 # have not yet linked their account the beta system. In that case,
@@ -63,17 +64,27 @@ module.exports = UserMapper =
 					return callback(null, user)
 
 	mergeWithSlUser: (sl_user_id, ol_user, accessToken, refreshToken, callback = (error, sl_user) ->) ->
-		# TODO: If a stub already exists, we can't set the SL user to this id, so we
-		# need to migrate any projects/history using this stub to the existing SL id.
-		User.findOne {_id: sl_user_id}, (error, user) ->
+		UserMapper.getOlUserStub ol_user.id, (error, user_stub) ->
 			return callback(error) if error?
-			if user.email != UserMapper.getCanonicalEmail(ol_user.email)
-				return callback(new Error('expected OL and SL account emails to match'))
-			user.overleaf = {
-				id: ol_user.id
-				accessToken: accessToken
-				refreshToken: refreshToken
-			}
-			user.save (error) ->
+			User.findOne {_id: sl_user_id}, (error, user) ->
 				return callback(error) if error?
-				return callback null, user
+				if user.email != UserMapper.getCanonicalEmail(ol_user.email)
+					return callback(new Error('expected OL and SL account emails to match'))
+				user.overleaf = {
+					id: ol_user.id
+					accessToken: accessToken
+					refreshToken: refreshToken
+				}
+				user.save (error) ->
+					return callback(error) if error?
+					if user_stub?
+						# At the moment, UserStub's only track collaborations. If this changes in 
+						# future, this method will need updating to migrate any additional references
+						# to the SL user.
+						CollaboratorsHandler.transferProjects user_stub._id, sl_user_id, (error) ->
+							return callback(error) if error?
+							UserMapper.removeOlUserStub ol_user.id, (error) ->
+								return callback(error) if error?
+								return callback null, user
+					else
+						return callback null, user
