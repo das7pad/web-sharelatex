@@ -6,7 +6,7 @@ projectEntityHandler = require '../../../../app/js/Features/Project/ProjectEntit
 _ = require('underscore')
 async = require('async')
 
-module.exports =
+module.exports = DropboxHandler =
 
 	getUserRegistrationStatus: (user_id, callback)->
 		if !user_id?
@@ -58,8 +58,7 @@ module.exports =
 			if response.statusCode != 200 or err?
 				logger.err err:err, response:response, "error setting dropbox access token"
 				return callback err
-			callback()
-
+			DropboxHandler.flushUsersProjectToDropbox user_id, callback
 
 	unlinkAccount: (user_id, callback)->
 		if !user_id?
