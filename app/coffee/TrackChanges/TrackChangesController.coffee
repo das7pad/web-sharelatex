@@ -37,7 +37,6 @@ module.exports = TrackChangesController =
 
 	setTrackChangesState: (req, res, next) ->
 		{project_id} = req.params
-		
 		logger.log {project_id }, "request to toggle track changes"
 		TrackChangesManager.getTrackChangesState project_id, (error, track_changes_state) ->
 			return next(error) if error?
@@ -56,8 +55,18 @@ module.exports = TrackChangesController =
 							track_changes_state[key] = value
 						else
 							delete track_changes_state[key]
+				if req.body.on_for_guests == true
+					track_changes_state['__guests__'] = true
+				else
+					delete track_changes_state['__guests__']
 			else
 				return res.send 400 # bad request
+
+			if (
+				typeof track_changes_state == 'object' &&
+				Object.keys(track_changes_state).length == 0
+			)
+				track_changes_state = false
 
 			logger.log {project_id, track_changes_state}, "track changes updated state"
 			TrackChangesManager.setTrackChangesState project_id, track_changes_state, (error) ->

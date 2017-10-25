@@ -7,4 +7,4 @@ module.exports = TrackChangesManager =
 	getTrackChangesState: (project_id, callback = (error) ->) ->
 		Project.getProject project_id, "track_changes", (error, project) ->
 			return callback(error) if error?
-			return callback null, project.track_changes
+			return callback null, project.track_changes || {}
