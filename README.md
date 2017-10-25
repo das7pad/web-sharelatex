@@ -1,6 +1,6 @@
 # overleaf-integration-web-module
 
-Service to request tokens from Overleaf and "legacy" ShareLaTeX and verifies them, allowing merging of accounts.
+Service to request tokens from Overleaf and "legacy" ShareLaTeX and verifies them, allowing merging of accounts. Once verified projects can be imported from Overleaf.
 
 ## Installation
 
