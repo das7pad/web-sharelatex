@@ -52,7 +52,7 @@ describe "TrackChanges TrackChangesController", ->
 			
 			it "should return a 204 response code", ->
 				@res.send.calledWith(204).should.equal true
-		
+
 		describe "when turning on for some users", ->
 			beforeEach ->
 				@updated_user_id = "e4b2a7ae4b2a7ae4b2a7ae4b"
@@ -94,7 +94,63 @@ describe "TrackChanges TrackChangesController", ->
 			
 			it "should return a 204 response code", ->
 				@res.send.calledWith(204).should.equal true
-		
+
+		describe 'when turning on for guests', ->
+			describe 'for only guests', ->
+				beforeEach ->
+					@existing_state = true
+					@expected_state = {__guests__: true}
+					@req.body = {on_for_guests: true, on_for: {}}
+					@TrackChangesManager.getTrackChangesState = sinon.stub().yields(null, @existing_state)
+					@TrackChangesController.setTrackChangesState @req, @res, @next
+
+				it "should call getTrackChangesState to get the current state", ->
+					@TrackChangesManager.getTrackChangesState
+						.calledWith @project_id
+						.should.equal true
+
+				it "should call setTrackChangesState with the updated state", ->
+					@TrackChangesManager.setTrackChangesState
+						.calledWith @project_id, @expected_state
+						.should.equal true
+
+				it "should emit the new state to the clients", ->
+					@EditorRealTimeController.emitToRoom
+						.calledWith @project_id, "toggle-track-changes", @expected_state
+						.should.equal true
+
+				it "should return a 204 response code", ->
+					@res.send.calledWith(204).should.equal true
+
+			describe 'for guests and some users', ->
+				beforeEach ->
+					@some_user_id = '59f0992fb1b43b0a4780b717'
+					@existing_state = true
+					@expected_state = {__guests__: true}
+					@expected_state[@some_user_id] = true
+					@req.body = {on_for: {}, on_for_guests: true}
+					@req.body.on_for[@some_user_id] = true
+					@TrackChangesManager.getTrackChangesState = sinon.stub().yields(null, @existing_state)
+					@TrackChangesController.setTrackChangesState @req, @res, @next
+
+				it "should call getTrackChangesState to get the current state", ->
+					@TrackChangesManager.getTrackChangesState
+						.calledWith @project_id
+						.should.equal true
+
+				it "should call setTrackChangesState with the updated state", ->
+					@TrackChangesManager.setTrackChangesState
+						.calledWith @project_id, @expected_state
+						.should.equal true
+
+				it "should emit the new state to the clients", ->
+					@EditorRealTimeController.emitToRoom
+						.calledWith @project_id, "toggle-track-changes", @expected_state
+						.should.equal true
+
+				it "should return a 204 response code", ->
+					@res.send.calledWith(204).should.equal true
+
 		describe "with malformed data", ->
 			it "should reject no data", ->
 				@req.body = {}
