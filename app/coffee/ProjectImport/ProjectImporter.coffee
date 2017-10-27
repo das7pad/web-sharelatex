@@ -55,7 +55,7 @@ module.exports = ProjectImporter =
 			return callback(new Error("expected doc title, id, latest_ver_id, latex_engine, token and read_token"))
 		if doc.title == ""
 			doc.title = "Untitled"
-		ProjectCreationHandler.createBlankProject user_id, doc.title, (error, project) ->
+		ProjectCreationHandler.createBlankProject user_id, doc.title, doc.id, (error, project) ->
 			return callback(error) if error?
 			project.overleaf.id = doc.id
 			project.overleaf.imported_at_ver_id = doc.latest_ver_id

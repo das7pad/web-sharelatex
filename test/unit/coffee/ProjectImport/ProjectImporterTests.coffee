@@ -82,7 +82,7 @@ describe "ProjectImporter", ->
 			
 			it "should create the project", ->
 				@ProjectCreationHandler.createBlankProject
-					.calledWith(@user_id, @doc.title)
+					.calledWith(@user_id, @doc.title, @doc.id)
 					.should.equal true
 			
 			it "should set overleaf metadata on the project", ->
@@ -144,7 +144,7 @@ describe "ProjectImporter", ->
 			
 			it "should set the title to 'Untitled'", ->
 				@ProjectCreationHandler.createBlankProject
-					.calledWith(@user_id, 'Untitled')
+					.calledWith(@user_id, 'Untitled', @doc.id)
 					.should.equal true
 			
 			
