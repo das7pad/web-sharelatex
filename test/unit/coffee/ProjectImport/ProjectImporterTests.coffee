@@ -88,9 +88,9 @@ describe "ProjectImporter", ->
 			it "should set overleaf metadata on the project", ->
 				@project.overleaf.id.should.equal @doc.id
 				@project.overleaf.imported_at_ver_id.should.equal @doc.latest_ver_id
-				@project.overleaf.token.should.equal @doc.token
-				@project.overleaf.read_token.should.equal @doc.read_token
-			
+				@project.tokens.readAndWrite.should.equal @doc.token
+				@project.tokens.readOnly.should.equal @doc.read_token
+
 			it "should set the appropriate project compiler from the latex_engine", ->
 				@project.compiler.should.equal "latex"
 			
