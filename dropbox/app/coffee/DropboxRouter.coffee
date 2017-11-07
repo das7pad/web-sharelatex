@@ -13,7 +13,7 @@ module.exports =
 		webRouter.post  '/dropbox/completeRegistration', AuthenticationController.requireLogin(), DropboxUserController.completeDropboxRegistration
 		webRouter.get  '/dropbox/unlink', AuthenticationController.requireLogin(), DropboxUserController.unlinkDropbox
 		
-		webRouter.get '/project/:Project_id/dropbox/status', AuthorizationMiddlewear.ensureUserCanAdminProject, DropboxProjectController.getStatus
+		webRouter.get '/dropbox/status', AuthenticationController.requireLogin(), DropboxProjectController.getStatus
 
 		publicApiRouter.get  '/dropbox/webhook', DropboxWebhookController.verify
 		publicApiRouter.post '/dropbox/webhook', DropboxWebhookController.webhook
