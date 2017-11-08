@@ -36,6 +36,8 @@ describe "ProjectListGetter", ->
 					url: 'http://overleaf.example.com/api/v1/sharelatex/docs'
 					method: 'GET'
 					json: true
+					qs:
+						per: 100
 				})
 				.should.equal true
 
