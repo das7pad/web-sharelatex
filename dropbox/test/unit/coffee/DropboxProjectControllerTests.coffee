@@ -6,15 +6,17 @@ modulePath = require('path').join __dirname, '../../../app/js/DropboxProjectCont
 
 describe 'DropboxProjectController', ->
 	beforeEach ->
+		@user_id = "user-id-123"
+		@AuthenticationController = 
+			getLoggedInUserId:sinon.stub().returns(@user_id)
 		@DropboxProjectController = SandboxedModule.require modulePath, requires:
 			'./DropboxHandler': @DropboxHandler = {}
-			'../../../../app/js/Features/Project/ProjectGetter': @ProjectGetter = {}
+			"../../../../app/js/Features/Authentication/AuthenticationController":@AuthenticationController 
 			'logger-sharelatex':
 				log:->
 				err:->
 
 		@project_id = "project-id-123"
-		@user_id = "user-id-123"
 		@req = {}
 		@res =
 			json: sinon.stub()
@@ -23,16 +25,11 @@ describe 'DropboxProjectController', ->
 		beforeEach ->
 			@req.params =
 				Project_id: @project_id
-			@ProjectGetter.getProject = sinon.stub().callsArgWith(2, null, { owner_ref: @user_id })
 			@DropboxHandler.getUserRegistrationStatus = sinon.stub().callsArgWith(1, null, @status = {"mock": "status"})
 			@DropboxProjectController.getStatus @req, @res
 
-		it "should look up the project owner", ->
-			@ProjectGetter.getProject
-				.calledWith(@project_id, {owner_ref: 1})
-				.should.equal true
 				
-		it "should get the owner's Dropbox status", ->
+		it "should use user_id for status", ->
 			@DropboxHandler.getUserRegistrationStatus
 				.calledWith(@user_id)
 				.should.equal true

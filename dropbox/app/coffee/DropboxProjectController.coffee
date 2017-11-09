@@ -1,5 +1,4 @@
 DropboxHandler = require "./DropboxHandler"
-ProjectGetter = require "../../../../app/js/Features/Project/ProjectGetter"
 AuthenticationController = require("../../../../app/js/Features/Authentication/AuthenticationController")
 
 module.exports = DropboxProjectController =
