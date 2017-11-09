@@ -1,12 +1,11 @@
 DropboxHandler = require "./DropboxHandler"
 ProjectGetter = require "../../../../app/js/Features/Project/ProjectGetter"
+AuthenticationController = require("../../../../app/js/Features/Authentication/AuthenticationController")
 
 module.exports = DropboxProjectController =
+
 	getStatus: (req, res, next) ->
-		project_id = req.params.Project_id
-		ProjectGetter.getProject project_id, {owner_ref: 1}, (error, project) ->
+		user_id = AuthenticationController.getLoggedInUserId(req)
+		DropboxHandler.getUserRegistrationStatus user_id, (error, status) ->
 			return next(error) if error?
-			DropboxHandler.getUserRegistrationStatus project.owner_ref, (error, status) ->
-				return next(error) if error?
-				res.json status
-	
+			res.json status

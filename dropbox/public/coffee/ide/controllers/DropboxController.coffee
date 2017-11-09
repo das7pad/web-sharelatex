@@ -28,7 +28,7 @@ define [
 		$scope.dbState = cachedState
 		$scope.dbState.hasDropboxFeature = $scope.project.features.dropbox
 
-		$http.get("/project/#{ide.project_id}/dropbox/status")
+		$http.get("/dropbox/status")
 			.then (response) ->
 				dropboxStatus = response.data
 				$scope.dbState.gotLinkStatus = true
