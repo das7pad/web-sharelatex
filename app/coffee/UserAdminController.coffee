@@ -55,9 +55,10 @@ module.exports = UserAdminController =
 			projects: (cb) ->
 				ProjectGetter.findAllUsersProjects user_id, {
 					name:1, lastUpdated:1, publicAccesLevel:1, archived:1, owner_ref:1
-				}, (err, owned = [], member = [], readOnly = []) ->
+				}, (err, projects) ->
+					{owned, readAndWrite, readOnly} = projects
 					return cb(err) if err?
-					return cb(null, owned.concat(member).concat(readOnly))
+					return cb(null, owned.concat(readAndWrite).concat(readOnly))
 			subscription: (cb) ->
 				SubscriptionLocator.getUsersSubscription user_id, cb
 			memberSubscriptions: (cb) ->
