@@ -13,8 +13,7 @@ describe "UserAdminController", ->
 	beforeEach ->
 		@user = {user_id:1,first_name:'James'}
 		@users = users = [{first_name:'James'}, {first_name:'Henry'}]
-		@projects = [{lastUpdated:1, _id:1, owner_ref: "user-1"}, {lastUpdated:2, _id:2, owner_ref: "user-2"}]
-		@perPage = @UserAdminController.PER_PAGE
+		@projects = {owned:[{lastUpdated:1, _id:1, owner_ref: "user-1"}, {lastUpdated:2, _id:2, owner_ref: "user-2"}], readAndWrite:[], readOnly:[]}
 		@user_count = user_count = 35043
 
 		@UserGetter =
@@ -54,6 +53,8 @@ describe "UserAdminController", ->
 			"../../../../app/js/Features/Project/ProjectGetter": @ProjectGetter
 			"metrics-sharelatex":
 				gauge:->
+
+		@perPage = @UserAdminController.PER_PAGE
 
 		@UserGetter.getUser = (user_id, fields, callback) =>
 			callback null, @user
@@ -133,7 +134,7 @@ describe "UserAdminController", ->
 
 		it "should send the user projects", (done)->
 			@res.render = (pageName, opts)=>
-				opts.projects.should.deep.equal @projects
+				opts.projects.should.deep.equal @projects.owned
 				done()
 			@UserAdminController.show @req, @res
 		
