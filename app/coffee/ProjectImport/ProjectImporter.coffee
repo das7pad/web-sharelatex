@@ -63,6 +63,10 @@ module.exports = ProjectImporter =
 				readOnly: doc.read_token,
 				readAndWrite: doc.token
 			}
+			if doc.general_access == 'none'
+				project.publicAccesLevel = 'private'
+			else if doc.general_access == 'read_write'
+				project.publicAccesLevel = 'tokenBased'
 			if ENGINE_TO_COMPILER_MAP[doc.latex_engine]?
 				project.compiler = ENGINE_TO_COMPILER_MAP[doc.latex_engine]
 			project.save (error) ->

@@ -73,6 +73,7 @@ describe "ProjectImporter", ->
 				latest_ver_id: 1234
 				token: "token"
 				read_token: "read_token"
+				general_access: "read_write"
 			}
 			@ProjectCreationHandler.createBlankProject = sinon.stub().yields(null, @project)
 		
@@ -93,6 +94,9 @@ describe "ProjectImporter", ->
 
 			it "should set the appropriate project compiler from the latex_engine", ->
 				@project.compiler.should.equal "latex"
+
+			it 'should set the project to tokenBased', ->
+				@project.publicAccesLevel.should.equal 'tokenBased'
 			
 			it "should save the project", ->
 				@project.save.called.should.equal true
