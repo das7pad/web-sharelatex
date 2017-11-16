@@ -59,8 +59,14 @@ module.exports = ProjectImporter =
 			return callback(error) if error?
 			project.overleaf.id = doc.id
 			project.overleaf.imported_at_ver_id = doc.latest_ver_id
-			project.overleaf.token = doc.token
-			project.overleaf.read_token = doc.read_token
+			project.tokens = {
+				readOnly: doc.read_token,
+				readAndWrite: doc.token
+			}
+			if doc.general_access == 'none'
+				project.publicAccesLevel = 'private'
+			else if doc.general_access == 'read_write'
+				project.publicAccesLevel = 'tokenBased'
 			if ENGINE_TO_COMPILER_MAP[doc.latex_engine]?
 				project.compiler = ENGINE_TO_COMPILER_MAP[doc.latex_engine]
 			project.save (error) ->
