@@ -10,6 +10,7 @@ module.exports = ProjectListGetter =
 			json: true
 			qs:
 				per: 100 # Restrict number of projects to 100, working around potential perf problems
+				exclude_imported: true
 		}, (error, docs) ->
 			return callback(error) if error?
 			logger.log {userId, docs}, "got projects from V1"
