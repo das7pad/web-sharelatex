@@ -38,6 +38,7 @@ describe "ProjectListGetter", ->
 					json: true
 					qs:
 						per: 100
+						exclude_imported: true
 				})
 				.should.equal true
 
