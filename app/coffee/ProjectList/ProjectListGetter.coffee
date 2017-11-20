@@ -10,6 +10,7 @@ module.exports = ProjectListGetter =
 			json: true
 			qs:
 				per: 100 # Restrict number of projects to 100, working around potential perf problems
+				exclude_imported: true
 		}, (error, docs) ->
 			if error?
 				# Specially handle no connection err, so warning can be shown
