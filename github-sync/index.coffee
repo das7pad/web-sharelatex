@@ -1,6 +1,7 @@
 GithubSyncRouter = require "./app/js/GithubSyncRouter"
+Features = require "../../app/js/infrastructure/Features"
 
-module.exports = GithubSync =
+GithubSyncModule =
 	router: GithubSyncRouter
 	
 	viewIncludes:
@@ -8,3 +9,7 @@ module.exports = GithubSync =
 		"editorLeftMenu:sync" : "project/editor/_left-menu"
 		"newProjectMenu" : "project/list/_new-project-menu"
 	
+if Features.hasFeature('github-sync')
+	module.exports = GithubSyncModule
+else
+	module.exports = {}
