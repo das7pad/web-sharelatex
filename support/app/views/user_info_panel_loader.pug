@@ -1,0 +1,26 @@
+doctype html
+html
+	head
+		script(type='text/javascript', src='https://dl.frontapp.com/libs/frontjs.min.js')
+		script(type='text/javascript').
+			Front.on('conversation', function (data) {
+				var userEmail = data.contact.handle;
+				var opts = {
+				method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						email: userEmail,
+						secure_token:"#{secure_token}"
+					})
+				}
+				window.fetch("https://185243ea.ngrok.io/support/user_details", opts)
+					.then(function(response) {
+						return response.text()
+					}).then(function(userDeails) {
+						document.getElementById("user_data").innerHTML = userDeails;
+					})
+				});
+	body
+		#user_data
