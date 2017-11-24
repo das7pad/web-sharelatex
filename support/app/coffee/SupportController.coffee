@@ -39,13 +39,13 @@ module.exports  =
 		userEmail = req.body.email
 		logger.log userEmail:userEmail, "getting request for user detail from front"
 
-		if !userEmail?
-			logger.err query:req.query , "front did not have email in query"
-			return res.sendStatus 404
-
 		if !settings.front.sl_secure_token? or settings.front.sl_secure_token != req.body.sl_secure_token
 			logger.warn sl_secure_token:req.body.sl_secure_token, "secure token does not match for getUserInfo"
 			return res.sendStatus 404
+
+		if !userEmail?
+			logger.err query:req.query , "front did not have email in query"
+			return res.sendStatus 409
 
 		SupportDetailsManager._getDetails userEmail, (err, details)->
 			if err?
