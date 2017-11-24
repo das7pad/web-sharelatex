@@ -32,9 +32,8 @@ module.exports  =
 		if !req.query.auth_secret? or req.query.auth_secret != settings.front.auth_secret
 			logger.warn "someone requested front side panel data without correct auth"
 			return res.sendStatus 404
-		OneTimeTokenHandler.getNewToken SECURE_REQUEST, (err, secure_token)->
-			viewPath = path.join(__dirname, "../views/user_info_panel_loader")
-			res.render viewPath, secure_token:secure_token
+		viewPath = path.join(__dirname, "../views/user_info_panel_loader")
+		res.render viewPath, sl_secure_token:settings.front.sl_secure_token
 
 	getUserInfo: (req, res, next)->
 		userEmail = req.body.email
@@ -42,18 +41,17 @@ module.exports  =
 
 		if !userEmail?
 			logger.err query:req.query , "front did not have email in query"
-			return res.send 404
+			return res.sendStatus 404
 
-		OneTimeTokenHandler.getValueFromTokenAndExpire req.body.secure_token, (err, value)->
-			if value != SECURE_REQUEST
-				logger.warn value:value, "secure token does not match for getUserInfo"
-				return res.send(404)
+		if !settings.front.sl_secure_token? or settings.front.sl_secure_token != req.body.sl_secure_token
+			logger.warn sl_secure_token:req.body.sl_secure_token, "secure token does not match for getUserInfo"
+			return res.sendStatus 404
 
-			SupportDetailsManager._getDetails userEmail, (err, details)->
-				if err?
-					return res.send 500
-				else if !details._id?
-					res.send("<h4>User not registered</h4>")
-				else
-					viewPath = path.join(__dirname, "../views/user_info_panel")
-					res.render viewPath, details
+		SupportDetailsManager._getDetails userEmail, (err, details)->
+			if err?
+				return res.send 500
+			else if !details._id?
+				res.send("<h4>User not registered</h4>")
+			else
+				viewPath = path.join(__dirname, "../views/user_info_panel")
+				res.render viewPath, details
