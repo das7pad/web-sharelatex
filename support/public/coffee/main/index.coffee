@@ -53,18 +53,6 @@ define [
 				$scope.error = true
 				console.log "the request failed"
 
-			Groove.createTicket params, (response)->
-				$scope.sending = false
-				if response.responseText == "" # Blocked request or similar
-					$scope.error = true
-				else
-					data = JSON.parse(response.responseText)
-					if data.errors?
-						$scope.error = true
-					else
-						$scope.sent = true
-				$scope.$apply()
-
 		$scope.$watch "form.subject", (newVal, oldVal) ->
 			if newVal and newVal != oldVal and newVal.length > 3
 				algoliaSearch.searchKB newVal, _handleSearchResults, { 
