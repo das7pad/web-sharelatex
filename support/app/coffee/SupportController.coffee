@@ -5,8 +5,6 @@ SupportDetailsManager = require("./SupportDetailsManager")
 path = require("path")
 OneTimeTokenHandler = require("../../../../app/js/Features/Security/OneTimeTokenHandler")
 
-SECURE_REQUEST = "IS_SECURE_REQUEST"
-
 module.exports  =
 
 	newSupportRequest: (req, res, next)->
