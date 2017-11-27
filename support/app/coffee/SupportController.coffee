@@ -5,12 +5,19 @@ SupportDetailsManager = require("./SupportDetailsManager")
 path = require("path")
 OneTimeTokenHandler = require("../../../../app/js/Features/Security/OneTimeTokenHandler")
 
+inboxes = {
+	"support":"cha_43oh"
+	"accounts":"cha_4081"
+}
 module.exports  =
 
 	newSupportRequest: (req, res, next)->
-		{message, subject, email, about} = req.body
+		{message, subject, email, about, inbox} = req.body
+		inboxId = inboxes[inbox]
+		if !inboxId?
+			return res.sendStatus 500
 		opts =
-			url: "https://api2.frontapp.com/channels/cha_43oh/messages"
+			url: "https://api2.frontapp.com/channels/#{inboxId}/messages"
 			headers:
 				authorization: settings.front.auth_key
 			method: "POST"
@@ -18,7 +25,8 @@ module.exports  =
 				body: message
 				to:[email]
 				subject: subject
-
+				options:
+					archive:false
 		request opts, (err, response, body)->
 			if err? or response.statusCode!= 202
 				logger.err err:err, body:body, statusCode: res.statusCode, "error creating support ticket"

@@ -44,6 +44,7 @@ define [
 				message: message or ""
 				subject: $scope.form.subject + " - [#{ticketNumber}]"
 				labels: "support"
+				inbox: "support"
 				about: "<div>browser: #{platform?.name} #{platform?.version}</div>
 						<div>os: #{platform?.os?.family} #{platform?.os?.version}</div>"
 			request = $http.post "/support", data
