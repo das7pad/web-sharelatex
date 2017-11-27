@@ -56,7 +56,7 @@ module.exports  =
 		SupportDetailsManager._getDetails userEmail, (err, details)->
 			if err?
 				return res.send 500
-			else if !details._id?
+			else if !details?._id?
 				res.send("<h4>User not registered</h4>")
 			else
 				viewPath = path.join(__dirname, "../views/user_info_panel")
