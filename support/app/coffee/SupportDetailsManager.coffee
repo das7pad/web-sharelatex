@@ -10,9 +10,9 @@ module.exports = SupportDetailsManager =
 		
 
 	_getDetails: (userEmail, callback)->
-		UserGetter.getUser email:userEmail, { _id:1, first_name:1, last_name:1, loginCount:1, signUpDate:1, role:1, institution:1, features:1, holdingAccount:1}, (err, user) ->
+		UserGetter.getUser email:userEmail, { _id:1, first_name:1, last_name:1, loginCount:1, signUpDate:1, role:1, institution:1, features:1}, (err, user) ->
 			if err?
-				return next(err)
+				return callback(err)
 			if !user?
 				return callback(null, {})
 			LimitationsManager.userHasSubscriptionOrIsGroupMember user, (err, hasSubOrIsGroupMember, subscription)->
