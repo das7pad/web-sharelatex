@@ -51,7 +51,7 @@ module.exports  =
 
 		if !userEmail?
 			logger.err query:req.query , "front did not have email in query"
-			return res.sendStatus 409
+			return res.sendStatus 422
 
 		SupportDetailsManager._getDetails userEmail, (err, details)->
 			if err?
