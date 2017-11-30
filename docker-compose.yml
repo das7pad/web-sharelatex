@@ -5,5 +5,4 @@ services:
     environment:
       SHARELATEX_CONFIG: /app/$MODULE_DIR/test/acceptance/config/settings.test.coffee
       REDIS_HOST: redis
-      MONGO_HOST: mongo
-      LISTEN_ADDRESS: 0.0.0.0
+      MONGO_URL: 'mongodb://mongo/sharelatex'
