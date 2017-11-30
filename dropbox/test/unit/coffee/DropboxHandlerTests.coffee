@@ -61,7 +61,7 @@ describe 'DropboxHandler', ->
 		user_id = "123u9oijllkj"
 		projectList = [{_id:"123lk"}, {_id:"12ji3ojio"}, {_id:"12ji3oddsadasjio", archived:true}, {_id:"2jiojdoi"}, {_id:"not this one", archived:true}, {_id:"2jiojdsasdoi"}]
 		collabProjectList = [{_id:"213ds"}, {_id:"12ji3oddsadasjio", archived:true}, {_id:"213dsdsad", archived:false}]
-		@ProjectGetter.findAllUsersProjects.callsArgWith(2, null, projectList, collabProjectList)
+		@ProjectGetter.findAllUsersProjects.callsArgWith(2, null, {owned:projectList, readAndWrite:collabProjectList})
 		@handler.flushUsersProjectToDropbox user_id, =>
 			@projectEntityHandler.flushProjectToThirdPartyDataStore.calledWith(projectList[0]._id).should.equal true
 			@projectEntityHandler.flushProjectToThirdPartyDataStore.calledWith(projectList[1]._id).should.equal true
