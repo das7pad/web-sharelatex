@@ -76,12 +76,12 @@ module.exports = DropboxHandler =
 			err = new Error("no user id passed to flushUsersProjectToDropbox")
 			logger.err err
 			return callback(err)
-		ProjectGetter.findAllUsersProjects user_id, '_id archived', (err, projects = [], collabertions = [], readOnlyProjects = [])->
+		ProjectGetter.findAllUsersProjects user_id, '_id archived', (err, allProjects)->
 			projectList = []
-			projectList = projectList.concat(projects)
-			projectList = projectList.concat(collabertions)
-			projectList = projectList.concat(readOnlyProjects)
-			projectList = _.filter projectList, (project)-> project.archived != true
+			projectList = projectList.concat(allProjects.owned || [])
+			projectList = projectList.concat(allProjects.readAndWrite || [])
+			projectList = projectList.concat(allProjects.readOnly || [])
+			projectList = _.filter projectList, (project)-> project?.archived != true
 			projectIds = _.pluck(projectList, "_id")
 			logger.log projectIds:projectIds, user_id:user_id, "flushing all a users projects to tpds"
 			jobs = projectIds.map (project_id)->
