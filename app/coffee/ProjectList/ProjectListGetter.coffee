@@ -3,7 +3,7 @@ logger = require 'logger-sharelatex'
 oAuthRequest = require '../OAuth/OAuthRequest'
 
 # Restrict number of projects to 100, working around potential perf problems
-LIMIT_NO_PROJECTS = 100
+NO_PROJECTS_LIMIT = 100
 
 module.exports = ProjectListGetter =
 	findAllUsersProjects: (userId, callback = (error, projects) ->) ->
@@ -12,7 +12,7 @@ module.exports = ProjectListGetter =
 			method: 'GET'
 			json: true
 			qs:
-				per: LIMIT_NO_PROJECTS
+				per: NO_PROJECTS_LIMIT
 				exclude_imported: true
 		}, (error, docs) ->
 			if error?
@@ -23,5 +23,5 @@ module.exports = ProjectListGetter =
 			callback(null, {
 				projects: docs.projects
 				tags: docs.tags
-				hasHiddenV1Projects: docs.project_pagination.total_items >= LIMIT_NO_PROJECTS
+				hasHiddenV1Projects: docs.project_pagination.total_items >= NO_PROJECTS_LIMIT
 			})
