@@ -8,6 +8,7 @@ WEB_PATH = '../../../../..'
 
 {db, ObjectId} = require "#{WEB_PATH}/app/js/infrastructure/mongojs"
 MockDocstoreApi = require "#{WEB_PATH}/test/acceptance/js/helpers/MockDocstoreApi"
+MockDocUpdaterApi = require "./helpers/MockDocUpdaterApi"
 MockFilestoreApi = require "./helpers/MockFilestoreApi"
 MockOverleafApi = require "./helpers/MockOverleafApi"
 ProjectGetter = require "#{WEB_PATH}/app/js/Features/Project/ProjectGetter"

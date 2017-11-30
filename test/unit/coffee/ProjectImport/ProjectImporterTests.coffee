@@ -47,7 +47,7 @@ describe "ProjectImporter", ->
 		
 		it "should import the files", ->
 			@ProjectImporter._importFiles
-				.calledWith(@project._id, @doc.files)
+				.calledWith(@project._id, @user_id, @doc.files)
 				.should.equal true
 
 		it "should tell overleaf the project is now in the beta", ->
@@ -325,6 +325,7 @@ describe "ProjectImporter", ->
 	describe "_importFile", ->
 		beforeEach ->
 			@project_id = "mock-project-id"
+			@user_id = "mock-user-id"
 			@doc = { _id: @doc_id = "mock-doc-id" }
 			@ProjectEntityHandler.mkdirp = sinon.stub().yields(null, [], { _id: @folder_id = "mock-folder-id" })
 			@ProjectEntityHandler.addDoc = sinon.stub().yields(null, @doc)
@@ -338,7 +339,7 @@ describe "ProjectImporter", ->
 					latest_content: "chapter 1 content"
 					type: "src"
 				}
-				@ProjectImporter._importFile @project_id, @file, done
+				@ProjectImporter._importFile @project_id, @user_id, @file, done
 			
 			it "should create the file's folder", ->
 				@ProjectEntityHandler.mkdirp
@@ -348,7 +349,7 @@ describe "ProjectImporter", ->
 			it "should add the doc to the project", ->
 				@ProjectEntityHandler.addDoc
 					.calledWith(
-						@project_id, @folder_id, "chapter1.tex", ["chapter 1 content"]
+						@project_id, @folder_id, "chapter1.tex", ["chapter 1 content"], @user_id
 					)
 					.should.equal true
 			
@@ -364,7 +365,7 @@ describe "ProjectImporter", ->
 					type: "src"
 					main: true
 				}
-				@ProjectImporter._importFile @project_id, @file, done
+				@ProjectImporter._importFile @project_id, @user_id, @file, done
 			
 			it "should create the file's folder", ->
 				@ProjectEntityHandler.mkdirp
@@ -384,7 +385,7 @@ describe "ProjectImporter", ->
 					type: "att"
 				}
 				@ProjectImporter._writeUrlToDisk = sinon.stub().yields(null, "path/on/disk")
-				@ProjectImporter._importFile @project_id, @file, done
+				@ProjectImporter._importFile @project_id, @user_id, @file, done
 			
 			it "should create the file's folder", ->
 				@ProjectEntityHandler.mkdirp
@@ -399,7 +400,7 @@ describe "ProjectImporter", ->
 			it "should add the file to the project", ->
 				@ProjectEntityHandler.addFile
 					.calledWith(
-						@project_id, @folder_id, "image.jpeg", "path/on/disk"
+						@project_id, @folder_id, "image.jpeg", "path/on/disk", @user_id
 					)
 					.should.equal true
 
@@ -418,25 +419,25 @@ describe "ProjectImporter", ->
 				
 			it "should require file.file", (done) ->
 				delete @src_file.file
-				@ProjectImporter._importFile @project_id, @src_file, (error) ->
+				@ProjectImporter._importFile @project_id, @user_id, @src_file, (error) ->
 					error.message.should.equal("expected file.file and type")
 					done()
 				
 			it "should require file.type", (done) ->
 				delete @src_file.type
-				@ProjectImporter._importFile @project_id, @src_file, (error) ->
+				@ProjectImporter._importFile @project_id, @user_id, @src_file, (error) ->
 					error.message.should.equal("expected file.file and type")
 					done()
 				
 			it "should require file.latest_content", (done) ->
 				delete @src_file.latest_content
-				@ProjectImporter._importFile @project_id, @src_file, (error) ->
+				@ProjectImporter._importFile @project_id, @user_id, @src_file, (error) ->
 					error.message.should.equal("expected file.latest_content")
 					done()
 				
 			it "should require file.file_path", (done) ->
 				delete @att_file.file_path
-				@ProjectImporter._importFile @project_id, @att_file, (error) ->
+				@ProjectImporter._importFile @project_id, @user_id, @att_file, (error) ->
 					error.message.should.equal("expected file.file_path")
 					done()
 			
