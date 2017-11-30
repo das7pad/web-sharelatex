@@ -1,6 +1,6 @@
 module.exports =
 	overleaf:
-		host: "http://overleaf.example.com:5000"
+		host: "http://localhost:5000"
 		s3:
 			host: "https://writelatex-dev.s3.amazonaws.com"
 		oauth:
