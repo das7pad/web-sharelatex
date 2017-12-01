@@ -25,10 +25,10 @@ BLANK_PROJECT = {
 }
 
 getProject = (response, callback) ->
-	expect(response.statusCode).to.equal 302
+	expect(response.statusCode).to.equal 200
 
 	url_regex = /\/project\/(\w*)/
-	redirect_path = response.headers.location
+	redirect_path = JSON.parse(response.body).redir
 	expect(redirect_path).to.match(url_regex)
 
 	project_id = url_regex.exec(redirect_path)[1]
@@ -56,7 +56,7 @@ describe "ProjectImportTests", ->
 			MockOverleafApi.setDoc Object.assign({ id: @ol_project_id }, BLANK_PROJECT)
 
 		it 'should import a project', (done) ->
-			@owner.request.get "/overleaf/project/#{@ol_project_id}/import", (error, response, body) ->
+			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) ->
 				getProject response, (error, project) ->
 					expect(project).to.be.an('object')
 					done()
@@ -73,7 +73,7 @@ describe "ProjectImportTests", ->
 			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, files })
 
 		it 'should import the docs', (done) ->
-			@owner.request.get "/overleaf/project/#{@ol_project_id}/import", (error, response, body) ->
+			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) ->
 				getProject response, (error, project) ->
 					ProjectEntityHandler.getAllEntitiesFromProject project, (error, docs, files) ->
 						throw error if error?
@@ -98,7 +98,7 @@ describe "ProjectImportTests", ->
 			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, files })
 
 		it 'should import the files', (done) ->
-			@owner.request.get "/overleaf/project/#{@ol_project_id}/import", (error, response, body) ->
+			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) ->
 				getProject response, (error, project) ->
 					ProjectEntityHandler.getAllEntitiesFromProject project, (error, docs, files) ->
 						throw error if error?
