@@ -8,7 +8,7 @@ WEB_PATH = '../../../../..'
 
 {db, ObjectId} = require "#{WEB_PATH}/app/js/infrastructure/mongojs"
 MockDocstoreApi = require "#{WEB_PATH}/test/acceptance/js/helpers/MockDocstoreApi"
-MockDocUpdaterApi = require "./helpers/MockDocUpdaterApi"
+MockDocUpdaterApi = require "#{WEB_PATH}/test/acceptance/js/helpers/MockDocUpdaterApi"
 MockFilestoreApi = require "./helpers/MockFilestoreApi"
 MockOverleafApi = require "./helpers/MockOverleafApi"
 ProjectGetter = require "#{WEB_PATH}/app/js/Features/Project/ProjectGetter"
@@ -52,18 +52,22 @@ describe "ProjectImportTests", ->
 				mkdirp Settings.path.dumpFolder, done
 
 	describe 'an empty project', ->
-		before ->
+		before (done) ->
 			@ol_project_id = 1
 			MockOverleafApi.setDoc Object.assign({ id: @ol_project_id }, BLANK_PROJECT)
 
-		it 'should import a project', (done) ->
-			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) ->
-				getProject response, (error, project) ->
-					expect(project).to.be.an('object')
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+				getProject response, (error, project) =>
+					@project = project
 					done()
 
+		it 'should import a project', ->
+			expect(@project).to.be.an('object')
+
 	describe 'a project with docs', ->
-		before ->
+		before (done) ->
 			files = [
 				type: 'src'
 				file: 'main.tex'
@@ -73,18 +77,31 @@ describe "ProjectImportTests", ->
 			@ol_project_id = 2
 			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, files })
 
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+				getProject response, (error, project) =>
+					@project = project
+					done()
+
 		it 'should import the docs', (done) ->
-			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) ->
-				getProject response, (error, project) ->
-					ProjectEntityHandler.getAllEntitiesFromProject project, (error, docs, files) ->
-						throw error if error?
-						expect(files).to.have.lengthOf(0)
-						expect(docs).to.have.lengthOf(1)
-						expect(docs[0].path).to.equal('/main.tex')
-						done()
+			ProjectEntityHandler.getAllEntitiesFromProject @project, (error, docs, files) ->
+				throw error if error?
+				expect(files).to.have.lengthOf(0)
+				expect(docs).to.have.lengthOf(1)
+				expect(docs[0].path).to.equal('/main.tex')
+				done()
+
+		it 'should version importing the doc', ->
+			updates = MockDocUpdaterApi.getProjectStructureUpdates(@project._id).docUpdates
+			expect(updates.length).to.equal(1)
+			update = updates[0]
+			expect(update.userId).to.equal(@owner._id)
+			expect(update.pathname).to.equal("/main.tex")
+			expect(update.docLines).to.equal("Test Content")
 
 	describe 'a project with files', ->
-		before ->
+		before (done) ->
 			file = {
 				id: new ObjectId()
 				stream: fs.createReadStream(Path.resolve(__dirname + '/../files/1pixel.png'))
@@ -98,12 +115,25 @@ describe "ProjectImportTests", ->
 			@ol_project_id = 3
 			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, files })
 
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+				getProject response, (error, project) =>
+					@project = project
+					done()
+
 		it 'should import the files', (done) ->
-			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) ->
-				getProject response, (error, project) ->
-					ProjectEntityHandler.getAllEntitiesFromProject project, (error, docs, files) ->
-						throw error if error?
-						expect(docs).to.have.lengthOf(0)
-						expect(files).to.have.lengthOf(1)
-						expect(files[0].path).to.equal('/1pixel.png')
-						done()
+			ProjectEntityHandler.getAllEntitiesFromProject @project, (error, docs, files) ->
+				throw error if error?
+				expect(docs).to.have.lengthOf(0)
+				expect(files).to.have.lengthOf(1)
+				expect(files[0].path).to.equal('/1pixel.png')
+				done()
+
+		it 'should version importing the file', ->
+			updates = MockDocUpdaterApi.getProjectStructureUpdates(@project._id).fileUpdates
+			expect(updates.length).to.equal(1)
+			update = updates[0]
+			expect(update.userId).to.equal(@owner._id)
+			expect(update.pathname).to.equal("/1pixel.png")
+			expect(update.url).to.be.a('string');
