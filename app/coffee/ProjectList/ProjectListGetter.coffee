@@ -2,8 +2,8 @@ settings = require 'settings-sharelatex'
 logger = require 'logger-sharelatex'
 oAuthRequest = require '../OAuth/OAuthRequest'
 
-# Restrict number of projects to 100, working around potential perf problems
-NO_PROJECTS_LIMIT = 100
+# Restrict number of projects to 1000, working around potential perf problems
+NO_PROJECTS_LIMIT = 1000
 
 module.exports = ProjectListGetter =
 	findAllUsersProjects: (userId, callback = (error, projects) ->) ->
