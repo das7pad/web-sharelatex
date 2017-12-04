@@ -1,11 +1,12 @@
 OverleafAuthenticationController = require "./Authentication/OverleafAuthenticationController"
 ProjectImportController = require "./ProjectImport/ProjectImportController"
 AuthenticationController = require "../../../../app/js/Features/Authentication/AuthenticationController"
+AccountSyncController = require "./AccountSync/AccountSyncController"
 passport = require "passport"
 logger = require "logger-sharelatex"
 
 module.exports = 
-	apply: (webRouter) ->
+	apply: (webRouter, apiRouter) ->
 		removeRoute(webRouter, 'get', '/login')
 		webRouter.get '/login', (req, res) -> res.redirect '/overleaf/login'
 
@@ -33,6 +34,12 @@ module.exports =
 			AuthenticationController.requireLogin(),
 			ProjectImportController.importProject
 		)
+
+		apiRouter.post(
+			'/overleaf/user/:ol_user_id/sync',
+			AccountSyncController.syncHook
+		)
+
 
 removeRoute = (router, method, path)->
 	index = null
