@@ -3,34 +3,10 @@ Settings = require('settings-sharelatex')
 request = require('request')
 logger = require('logger-sharelatex')
 
-# TODO: set the actual features
-PlanFeatures = {
-	'default': Settings.defaultFeatures,
-	pro: {
-		collaborators: 10
-		dropbox: true
-		versioning: true
-		compileTimeout: 200
-		compileGroup: "standard"
-		references: true
-		templates: true
-		trackChanges: true
-	},
-	pro_plus: {
-		collaborators: 20
-		dropbox: true
-		versioning: true
-		compileTimeout: 500
-		compileGroup: "priority"
-		references: true
-		templates: true
-		trackChanges: true
-	}
-}
-
 
 module.exports = AccountSyncManager =
 
+	# planCode = 'ol_pro' | 'ol_pro_plus' | null
 	getPlanNameFromOverleaf: (userId, callback=(err, planCode)->) ->
 		UserGetter.getUser userId, {'overleaf.id': 1}, (err, user) ->
 			return callback(err) if err?
@@ -46,8 +22,10 @@ module.exports = AccountSyncManager =
 					logger.err {err, userId, overleafId},
 						"[AccountSync] got non-200 response from overleaf"
 					return callback(err)
-				return callback(null, body.plan_name)
-
+					planName = body.plan_name
+					if planName
+						planName = "ol_"
+				return callback(null, planName)
 
 	_overleafPlanRequest: (overleafId, callback=(err, response, body)->) ->
 		opts = {
@@ -62,11 +40,3 @@ module.exports = AccountSyncManager =
 				pass: settings.overleaf.basicAuth.password
 			}
 		request opts, callback
-
-	# planName = 'pro' | 'pro_plus' | null
-	getFeaturesForPlanName: (planName, callback=(err, features)->) ->
-		if !planName
-			planName = 'default'
-		features = PlanFeatures[planName] || null
-		return callback(null, features)
-
