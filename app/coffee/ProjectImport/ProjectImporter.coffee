@@ -33,7 +33,7 @@ module.exports = ProjectImporter =
 				project_id = project._id
 				ProjectImporter._importInvites project_id, doc.invites, (error) ->
 					return callback(error) if error?
-					ProjectImporter._importFiles project_id, doc.files, (error) ->
+					ProjectImporter._importFiles project_id, user_id, doc.files, (error) ->
 						return callback(error) if error?
 						ProjectImporter._flagOverleafDocAsImported ol_doc_id, project_id, user_id, (error) ->
 							return callback(error) if error?
@@ -114,12 +114,12 @@ module.exports = ProjectImporter =
 				privileges: privilegeLevel
 			}, callback
 
-	_importFiles: (project_id, files = [], callback = (error) ->) ->
+	_importFiles: (project_id, user_id, files = [], callback = (error) ->) ->
 		async.mapSeries(files, (file, cb) ->
-			ProjectImporter._importFile project_id, file, cb
+			ProjectImporter._importFile project_id, user_id, file, cb
 		, callback)
 
-	_importFile: (project_id, file, callback = (error) ->) ->
+	_importFile: (project_id, user_id, file, callback = (error) ->) ->
 		if !file.type? or !file.file?
 			return callback(new Error("expected file.file and type"))
 		path = "/" + file.file
@@ -132,7 +132,7 @@ module.exports = ProjectImporter =
 			if file.type == "src"
 				if !file.latest_content?
 					return callback(new Error("expected file.latest_content"))
-				ProjectEntityHandler.addDoc project_id, folder_id, name, file.latest_content.split("\n"), (error, doc) ->
+				ProjectEntityHandler.addDoc project_id, folder_id, name, file.latest_content.split("\n"), user_id, (error, doc) ->
 					return callback(error) if error?
 					if file.main
 						ProjectEntityHandler.setRootDoc project_id, doc._id, callback
@@ -144,7 +144,7 @@ module.exports = ProjectImporter =
 				url = "#{settings.overleaf.s3.host}/#{file.file_path}"
 				ProjectImporter._writeUrlToDisk url, (error, pathOnDisk) ->
 					return callback(error) if error?
-					ProjectEntityHandler.addFile project_id, folder_id, name, pathOnDisk, callback
+					ProjectEntityHandler.addFile project_id, folder_id, name, pathOnDisk, user_id, callback
 			else
 				logger.warn {type: file.type, path: file.file, project_id}, "unknown file type"
 				callback()
