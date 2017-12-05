@@ -26,7 +26,10 @@ describe "ProjectListGetter", ->
 				"tags": [{
 					name: 'Mock tag name'
 					project_ids: ['123MockOLId']
-				}]
+				}],
+				"project_pagination": {
+					total_items: 1
+				}
 			})
 			@ProjectListGetter.findAllUsersProjects @userId, @callback
 
@@ -37,10 +40,38 @@ describe "ProjectListGetter", ->
 					method: 'GET'
 					json: true
 					qs:
-						per: 100
+						per: 1000
 						exclude_imported: true
 				})
 				.should.equal true
 
 		it 'should return the projects list', ->
-			@callback.calledWith(null, @list).should.equal true
+			@callback.calledWith(null, {
+				projects: @list.projects
+				tags: @list.tags
+				hasHiddenV1Projects: false
+			}).should.equal true
+
+		describe 'with large number of V1 projects', ->
+			beforeEach ->
+				@oAuthRequest.yields(null, @list = {
+					"projects": [{
+						id: '123MockOLId'
+						title: 'Mock OL title'
+					}],
+					"tags": [{
+						name: 'Mock tag name'
+						project_ids: ['123MockOLId']
+					}],
+					"project_pagination": {
+						total_items: 1001 # Exceeds the limit of 1000 projects
+					}
+				})
+				@ProjectListGetter.findAllUsersProjects @userId, @callback
+
+			it 'should set the hasHiddenV1Projects to true', ->
+				@callback.calledWith(null, {
+					projects: @list.projects
+					tags: @list.tags
+					hasHiddenV1Projects: true
+				}).should.equal true
