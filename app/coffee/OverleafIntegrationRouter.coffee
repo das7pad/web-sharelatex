@@ -29,7 +29,7 @@ module.exports =
 			OverleafAuthenticationController.doLogin
 		)
 
-		webRouter.get(
+		webRouter.post(
 			'/overleaf/project/:ol_doc_id/import',
 			AuthenticationController.requireLogin(),
 			ProjectImportController.importProject
