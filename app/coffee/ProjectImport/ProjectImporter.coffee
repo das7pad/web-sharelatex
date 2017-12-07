@@ -12,6 +12,7 @@ UserMapper = require "../OverleafUsers/UserMapper"
 
 ProjectCreationHandler = require "../../../../../app/js/Features/Project/ProjectCreationHandler"
 ProjectEntityHandler = require "../../../../../app/js/Features/Project/ProjectEntityHandler"
+ProjectDeleter = require "../../../../../app/js/Features/Project/ProjectDeleter"
 {ProjectInvite} = require "../../../../../app/js/models/ProjectInvite"
 CollaboratorsHandler = require "../../../../../app/js/Features/Collaborators/CollaboratorsHandler"
 PrivilegeLevels = require "../../../../../app/js/Features/Authorization/PrivilegeLevels"
@@ -31,14 +32,23 @@ module.exports = ProjectImporter =
 			ProjectImporter._initSharelatexProject user_id, doc, (error, project) ->
 				return callback(error) if error?
 				project_id = project._id
-				ProjectImporter._importInvites project_id, doc.invites, (error) ->
-					return callback(error) if error?
-					ProjectImporter._importFiles project_id, user_id, doc.files, (error) ->
-						return callback(error) if error?
-						ProjectImporter._flagOverleafDocAsImported ol_doc_id, project_id, user_id, (error) ->
-							return callback(error) if error?
-							logger.log {project_id, ol_doc_id, user_id}, "finished project import"
-							callback null, project_id
+				jobs = [
+					(cb)->
+						ProjectImporter._importInvites project_id, doc.invites, cb
+					(cb)->
+						ProjectImporter._importFiles project_id, user_id, doc.files, cb
+					(cb)->
+						ProjectImporter._flagOverleafDocAsImported ol_doc_id, project_id, user_id, cb
+				]
+				async.series jobs, (error)->
+					if error?
+						ProjectDeleter.deleteProject project_id, (err) ->
+							if err?
+								logger.err {err:err, project_id: project_id}, "failed to clean up project"
+							callback error
+					else
+						logger.log {project_id, ol_doc_id, user_id}, "finished project import"
+						callback null, project_id
 
 	_getOverleafDoc: (ol_doc_id, user_id, callback = (error, doc) ->) ->
 		oAuthRequest user_id, {
