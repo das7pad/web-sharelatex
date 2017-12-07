@@ -26,6 +26,9 @@ OverleafIntegration =
 			refresh.use("overleaf", overleafOAuth2Strategy)
 
 		findAllV1Projects: ProjectListGetter.findAllUsersProjects
+		getOverleafPlanCode: () ->
+			AccountSyncManager = require "./app/js/AccountSync/AccountSyncManager"
+			AccountSyncManager.getPlanCodeFromOverleaf
 
 if !settings.overleaf?.oauth?
 	module.exports = {}

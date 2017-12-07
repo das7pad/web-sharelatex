@@ -7,7 +7,7 @@ logger = require('logger-sharelatex')
 module.exports = AccountSyncManager =
 
 	# planCode = 'ol_pro' | 'ol_pro_plus' | null
-	getPlanNameFromOverleaf: (userId, callback=(err, planCode)->) ->
+	getPlanCodeFromOverleaf: (userId, callback=(err, planCode)->) ->
 		UserGetter.getUser userId, {'overleaf.id': 1}, (err, user) ->
 			return callback(err) if err?
 			overleafId = user?.overleaf?.id
