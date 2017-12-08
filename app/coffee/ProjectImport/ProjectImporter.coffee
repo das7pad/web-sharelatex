@@ -32,19 +32,17 @@ module.exports = ProjectImporter =
 			ProjectImporter._initSharelatexProject user_id, doc, (error, project) ->
 				return callback(error) if error?
 				project_id = project._id
-				jobs = [
-					(cb)->
+				async.series [
+					(cb) ->
 						ProjectImporter._importInvites project_id, doc.invites, cb
-					(cb)->
+					(cb) ->
 						ProjectImporter._importFiles project_id, user_id, doc.files, cb
-					(cb)->
+					(cb) ->
 						ProjectImporter._flagOverleafDocAsImported ol_doc_id, project_id, user_id, cb
-				]
-				async.series jobs, (error)->
+				], (error) ->
 					if error?
 						ProjectDeleter.deleteProject project_id, (err) ->
-							if err?
-								logger.err {err:err, project_id: project_id}, "failed to clean up project"
+							logger.err {err:err, project_id: project_id}, "failed to clean up project" if err?
 							callback error
 					else
 						logger.log {project_id, ol_doc_id, user_id}, "finished project import"
