@@ -7,7 +7,7 @@ passport = require "passport"
 logger = require "logger-sharelatex"
 
 module.exports = 
-	apply: (webRouter, apiRouter) ->
+	apply: (webRouter, privateApiRouter, publicApiRouter) ->
 		removeRoute(webRouter, 'get', '/login')
 		webRouter.get '/login', (req, res) -> res.redirect '/overleaf/login'
 
@@ -36,7 +36,7 @@ module.exports =
 			ProjectImportController.importProject
 		)
 
-		apiRouter.post(
+		publicApiRouter.post(
 			'/overleaf/user/:user_id/sync',
 			RateLimiterMiddlewear.rateLimit({
 				endpointName: 'overleaf-user-details-sync',
