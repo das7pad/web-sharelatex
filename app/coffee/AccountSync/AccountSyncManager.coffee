@@ -31,9 +31,8 @@ module.exports = AccountSyncManager =
 			return callback(err) if err?
 			overleafId = user?.overleaf?.id
 			if !overleafId?
-				err = new Error('no overleaf id found for user')
-				logger.err {err, userId}, "[AccountSync] no overleaf id found for user"
-				return callback(err)
+				logger.log {userId}, "[AccountSync] no overleaf id found for user"
+				return callback(null, null)
 			AccountSyncManager._overleafPlanRequest overleafId, (err, response, body) ->
 				return callback(err) if err?
 				if response.statusCode != 200
