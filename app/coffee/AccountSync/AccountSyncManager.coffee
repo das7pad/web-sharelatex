@@ -22,6 +22,9 @@ module.exports = AccountSyncManager =
 			SubscriptionUpdater.refreshSubscription user._id, callback
 
 	# planCode = 'ol_pro' | 'ol_pro_plus' | null
+	# For this to work, we need plans in settings with plan-codes:
+	#   - 'ol_pro'
+	#   - 'ol_pro_plus'
 	getPlanCodeFromOverleaf: (userId, callback=(err, planCode)->) ->
 		logger.log {userId}, "[AccountSync] fetching overleaf plan for user"
 		UserGetter.getUser userId, {'overleaf.id': 1}, (err, user) ->
