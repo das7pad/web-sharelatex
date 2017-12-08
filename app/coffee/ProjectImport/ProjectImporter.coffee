@@ -16,6 +16,7 @@ ProjectDeleter = require "../../../../../app/js/Features/Project/ProjectDeleter"
 {ProjectInvite} = require "../../../../../app/js/models/ProjectInvite"
 CollaboratorsHandler = require "../../../../../app/js/Features/Collaborators/CollaboratorsHandler"
 PrivilegeLevels = require "../../../../../app/js/Features/Authorization/PrivilegeLevels"
+{UnsupportedFileType} = require "../../../../../app/js/Features/Errors/Errors"
 
 ENGINE_TO_COMPILER_MAP = {
 	latex_dvipdf: "latex"
@@ -41,6 +42,7 @@ module.exports = ProjectImporter =
 						ProjectImporter._flagOverleafDocAsImported ol_doc_id, project_id, user_id, cb
 				], (error) ->
 					if error?
+						logger.log {error}, "error importing project"
 						ProjectDeleter.deleteProject project_id, (err) ->
 							logger.err {err:err, project_id: project_id}, "failed to clean up project" if err?
 							callback error
@@ -155,7 +157,7 @@ module.exports = ProjectImporter =
 					ProjectEntityHandler.addFile project_id, folder_id, name, pathOnDisk, user_id, callback
 			else
 				logger.warn {type: file.type, path: file.file, project_id}, "unknown file type"
-				callback()
+				callback(new UnsupportedFileType("unknown file type: #{file.type}"))
 
 	_writeUrlToDisk: (url, callback = (error, pathOnDisk) ->) ->
 			callback = _.once(callback)
