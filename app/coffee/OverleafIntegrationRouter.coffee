@@ -36,7 +36,7 @@ module.exports =
 		)
 
 		apiRouter.post(
-			'/overleaf/user/:ol_user_id/sync',
+			'/overleaf/user/:user_id/sync',
 			AccountSyncController.syncHook
 		)
 
