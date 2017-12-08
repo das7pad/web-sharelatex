@@ -11,5 +11,12 @@ module.exports = AccountSyncController =
 			logger.err {err},
 				"[AccountSync] error parsing overleaf user id from route"
 			return next(err)
-		setTimeout(AccountSyncManager.doSync, 1000, overleafUserId)
+		setTimeout(
+			AccountSyncManager.doSync,
+			1000,
+			overleafUserId,
+			(err) ->
+				if err?
+					logger.err {err, overleafUserId}, "[AccountSync] error syncing account"
+		)
 		return res.sendStatus(200)
