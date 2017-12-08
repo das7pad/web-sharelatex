@@ -44,6 +44,7 @@ module.exports =
 				maxRequests: 10
 				timeInterval: 60
 			}),
+			AuthenticationController.httpAuth, # Requires an user:pass to be set up in settings
 			AccountSyncController.syncHook
 		)
 
