@@ -2,6 +2,7 @@ OverleafAuthenticationController = require "./Authentication/OverleafAuthenticat
 ProjectImportController = require "./ProjectImport/ProjectImportController"
 AuthenticationController = require "../../../../app/js/Features/Authentication/AuthenticationController"
 AccountSyncController = require "./AccountSync/AccountSyncController"
+RateLimiterMiddlewear = require('../../../../app/js/Features/Security/RateLimiterMiddlewear')
 passport = require "passport"
 logger = require "logger-sharelatex"
 
@@ -37,6 +38,12 @@ module.exports =
 
 		apiRouter.post(
 			'/overleaf/user/:user_id/sync',
+			RateLimiterMiddlewear.rateLimit({
+				endpointName: 'overleaf-user-details-sync',
+				params: ["user_id"]
+				maxRequests: 10
+				timeInterval: 60
+			}),
 			AccountSyncController.syncHook
 		)
 
