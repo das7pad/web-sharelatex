@@ -23,7 +23,7 @@ block content
 				.row
 					.col-md-12
 						h2 #{translate("get_started_now")}
-						form.form-inline(async-form="register", name="registerForm", action="/register", ng-cloak)
+						form.form-inline(async-form="register", name="registerForm", action="/register", ng-cloak, captcha)
 							input(name='_csrf', type='hidden', value=csrfToken)
 							input(name='redir', type='hidden', value=redir)
 							form-messages(for="registerForm")
