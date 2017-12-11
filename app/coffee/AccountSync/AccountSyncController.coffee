@@ -13,7 +13,7 @@ module.exports = AccountSyncController =
 			return next(err)
 		setTimeout(
 			AccountSyncManager.doSync,
-			1000,
+			0,
 			overleafUserId,
 			(err) ->
 				if err?
