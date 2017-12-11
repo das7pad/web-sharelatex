@@ -137,3 +137,22 @@ describe "ProjectImportTests", ->
 			expect(update.userId).to.equal(@owner._id)
 			expect(update.pathname).to.equal("/1pixel.png")
 			expect(update.url).to.be.a('string');
+
+	describe 'a project with unsupported file type', ->
+		before (done) ->
+			files = [
+				type: 'ext'
+				file: 'linked_file.pdf'
+				file_path: "file/linked_file.pdf"
+			]
+			@ol_project_id = 4
+			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, files })
+
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+			done()
+
+		it 'should return an error message', (done) ->
+			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+				expect(response.statusCode).to.equal(400)
+				expect(JSON.parse(body).message).to.equal("Sorry! Projects with linked or external files aren't supported yet.")
+				done()
