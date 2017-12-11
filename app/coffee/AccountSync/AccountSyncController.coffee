@@ -5,10 +5,11 @@ AccountSyncManager = require './AccountSyncManager'
 module.exports = AccountSyncController =
 
 	syncHook: (req, res, next) ->
+		v1UserIdStr = req.params.v1_user_id
 		try
-			overleafUserId = parseInt(req.params.user_id)
+			overleafUserId = parseInt(v1UserIdStr)
 		catch err
-			logger.err {err},
+			logger.err {err, v1UserIdStr},
 				"[AccountSync] error parsing overleaf user id from route"
 			return next(err)
 		setTimeout(

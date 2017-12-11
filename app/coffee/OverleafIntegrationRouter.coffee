@@ -37,7 +37,7 @@ module.exports =
 		)
 
 		publicApiRouter.post(
-			'/overleaf/user/:user_id/sync',
+			'/overleaf/user/:v1_user_id/sync',
 			RateLimiterMiddlewear.rateLimit({
 				endpointName: 'overleaf-user-details-sync',
 				params: ["user_id"]
