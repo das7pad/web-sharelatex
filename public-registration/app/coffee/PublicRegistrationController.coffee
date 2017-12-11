@@ -14,7 +14,6 @@ UserSessionsManager = require("../../../../app/js/Features/User/UserSessionsMana
 AuthenticationController = require("../../../../app/js/Features/Authentication/AuthenticationController")
 AnalyticsManager = require("../../../../app/coffee/Features/Analytics/AnalyticsManager")
 
-
 EmailBuilder.templates.welcome =
 	subject:  _.template "Welcome to ShareLaTeX"
 	layout: PersonalEmailLayout

@@ -1,11 +1,13 @@
 PublicRegistrationController = require("./PublicRegistrationController")
+CaptchaMiddleware = require '../../../../app/js/Features/Captcha/CaptchaMiddleware'
+
 logger = require("logger-sharelatex")
 
 module.exports = 
 	apply: (webRouter) ->
 		removeRoute webRouter, "get", "/register"
 		webRouter.get "/register", PublicRegistrationController.showRegisterPage
-		webRouter.post "/register", PublicRegistrationController.register
+		webRouter.post "/register", CaptchaMiddleware.validateCaptcha, PublicRegistrationController.register
 
 removeRoute = (webRouter, method, path)->
 	index = null
