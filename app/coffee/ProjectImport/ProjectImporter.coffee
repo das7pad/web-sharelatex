@@ -40,12 +40,12 @@ module.exports = ProjectImporter =
 						ProjectImporter._importFiles project_id, user_id, doc.files, cb
 					(cb) ->
 						ProjectImporter._flagOverleafDocAsImported ol_doc_id, project_id, user_id, cb
-				], (error) ->
-					if error?
-						logger.log {error}, "error importing project"
-						ProjectDeleter.deleteProject project_id, (err) ->
-							logger.err {err:err, project_id: project_id}, "failed to clean up project" if err?
-							callback error
+				], (importError) ->
+					if importError?
+						logger.log {importError}, "error importing project"
+						ProjectDeleter.deleteProject project_id, (cleanUpError) ->
+							logger.err {err: cleanUpError, project_id: project_id}, "failed to clean up project" if cleanUpError?
+							callback importError
 					else
 						logger.log {project_id, ol_doc_id, user_id}, "finished project import"
 						callback null, project_id
