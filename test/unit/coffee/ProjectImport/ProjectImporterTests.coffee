@@ -7,7 +7,7 @@ sinon = require("sinon")
 expect = require("chai").expect
 
 PrivilegeLevels = require "../../../../../../app/js/Features/Authorization/PrivilegeLevels"
-{UnsupportedFileType} = require "../../../../../../app/js/Features/Errors/Errors"
+{UnsupportedFileTypeError} = require "../../../../../../app/js/Features/Errors/Errors"
 
 describe "ProjectImporter", ->
 	beforeEach ->
@@ -417,7 +417,7 @@ describe "ProjectImporter", ->
 
 			it 'should throw an error', ->
 				@callback
-					.calledWith(new UnsupportedFileType("unknown file type: ext"))
+					.calledWith(new UnsupportedFileTypeError("unknown file type: ext"))
 					.should.equal true
 
 		describe "null checks", ->
@@ -487,7 +487,7 @@ describe "ProjectImporter", ->
 			@ProjectImporter._initSharelatexProject = sinon.stub().yields(null, @project = { _id: "mock-project-id" })
 			@ProjectDeleter.deleteProject = sinon.stub().yields()
 			# Mock import file error
-			@error = new UnsupportedFileType("unknown file type: ext")
+			@error = new UnsupportedFileTypeError("unknown file type: ext")
 			@ProjectImporter._importFiles = sinon.stub().yields(@error)
 			@ProjectImporter.importProject(@ol_doc_id = "mock-ol-doc-id", @user_id = "mock-user-id", @callback)
 

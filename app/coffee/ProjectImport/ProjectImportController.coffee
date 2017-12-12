@@ -1,7 +1,7 @@
 logger = require "logger-sharelatex"
 ProjectImporter = require "./ProjectImporter"
 AuthenticationController = require "../../../../../app/js/Features/Authentication/AuthenticationController"
-{UnsupportedFileType} = require "../../../../../app/js/Features/Errors/Errors"
+{UnsupportedFileTypeError} = require "../../../../../app/js/Features/Errors/Errors"
 
 module.exports = ProjectImportController =
 	importProject: (req, res) ->
@@ -9,7 +9,7 @@ module.exports = ProjectImportController =
 		user_id = AuthenticationController.getLoggedInUserId req
 		logger.log {user_id, ol_doc_id}, "importing project from overleaf"
 		ProjectImporter.importProject ol_doc_id, user_id, (error, sl_project_id) ->
-			if error? && error instanceof UnsupportedFileType
+			if error? && error instanceof UnsupportedFileTypeError
 				return res.status(501).json({
 					message: "Sorry! Projects with linked or external files aren't supported yet."
 				})

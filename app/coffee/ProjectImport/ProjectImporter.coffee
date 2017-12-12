@@ -16,7 +16,7 @@ ProjectDeleter = require "../../../../../app/js/Features/Project/ProjectDeleter"
 {ProjectInvite} = require "../../../../../app/js/models/ProjectInvite"
 CollaboratorsHandler = require "../../../../../app/js/Features/Collaborators/CollaboratorsHandler"
 PrivilegeLevels = require "../../../../../app/js/Features/Authorization/PrivilegeLevels"
-{UnsupportedFileType} = require "../../../../../app/js/Features/Errors/Errors"
+{UnsupportedFileTypeError} = require "../../../../../app/js/Features/Errors/Errors"
 
 ENGINE_TO_COMPILER_MAP = {
 	latex_dvipdf: "latex"
@@ -157,7 +157,7 @@ module.exports = ProjectImporter =
 					ProjectEntityHandler.addFile project_id, folder_id, name, pathOnDisk, user_id, callback
 			else
 				logger.warn {type: file.type, path: file.file, project_id}, "unknown file type"
-				callback(new UnsupportedFileType("unknown file type: #{file.type}"))
+				callback(new UnsupportedFileTypeError("unknown file type: #{file.type}"))
 
 	_writeUrlToDisk: (url, callback = (error, pathOnDisk) ->) ->
 			callback = _.once(callback)
