@@ -42,7 +42,7 @@ module.exports = AccountSyncManager =
 
 	_overleafPlanRequest: (userId, overleafId, callback=(err, body)->) ->
 		oAuthRequest userId, {
-			url: "#{Settings.overleaf.host}/api/v1/sharelatex/users/#{overleafId}/details"
+			url: "#{Settings.overleaf.host}/api/v1/sharelatex/users/current_user/plan_code"
 			method: 'GET'
 			json: true
 			timeout: 5 * 1000
