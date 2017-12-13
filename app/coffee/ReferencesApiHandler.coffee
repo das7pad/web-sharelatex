@@ -162,7 +162,7 @@ module.exports = ReferencesApiHandler =
 						# file exists already
 						logger.log {user_id, ref_provider, project_id, targetFileName}, "updating file with bibtex content"
 						# set document contents to the bibtex payload
-						ProjectEntityHandler.replaceFile project_id, file._id, tempFilePath, (err) ->
+						ProjectEntityHandler.replaceFile project_id, file._id, tempFilePath, user_id, (err) ->
 							if err
 								logger.err {user_id, ref_provider, project_id}, 'error replacing file'
 								return _cleanup () ->
@@ -173,7 +173,7 @@ module.exports = ReferencesApiHandler =
 						# file is new
 						logger.log {user_id, ref_provider, project_id, targetFileName}, "creating new file with bibtex content"
 						# add a new doc, with bibtex payload
-						ProjectEntityHandler.addFile project_id, undefined, targetFileName, tempFilePath, (err, fileRef, folder_id) ->
+						ProjectEntityHandler.addFile project_id, undefined, targetFileName, tempFilePath, user_id, (err, fileRef, folder_id) ->
 							if err
 								logger.err {user_id, ref_provider, project_id}, 'error adding file'
 								return _cleanup () ->

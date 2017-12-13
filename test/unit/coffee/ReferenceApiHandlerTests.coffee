@@ -47,7 +47,7 @@ describe 'ReferencesApiHandler', ->
 			'../../../../app/js/Features/Project/ProjectEntityHandler': @ProjectEntityHandler = {
 				getAllFiles: sinon.stub().callsArgWith(1, null, @allFiles)
 				addFile: sinon.stub()
-				replaceFile: sinon.stub().callsArgWith(2, null)
+				replaceFile: sinon.stub()
 			}
 			'../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler': @DocumentUpdaterHandler = {
 				setDocument: sinon.stub()
@@ -136,8 +136,8 @@ describe 'ReferencesApiHandler', ->
 			@ReferencesApiHandler.make3rdRequestStream = sinon.stub().returns(@readStream)
 			@temp.createWriteStream = sinon.stub().returns(@writeStream)
 			@ProjectEntityHandler.getAllFiles.callsArgWith(1, null, @allFiles)
-			@ProjectEntityHandler.replaceFile.callsArgWith(3, null)
-			@ProjectEntityHandler.addFile.callsArgWith(4, null, @file, @folder_id)
+			@ProjectEntityHandler.replaceFile.callsArgWith(4, null)
+			@ProjectEntityHandler.addFile.callsArgWith(5, null, @file, @folder_id)
 
 		describe 'when all goes well', ->
 
@@ -168,7 +168,8 @@ describe 'ReferencesApiHandler', ->
 						@project_id,
 						undefined,
 						"refProvider.bib",
-						@writeStream.path
+						@writeStream.path,
+            @user_id
 					).should.equal true
 
 				it 'should call EditorRealTimeController.emitToRoom', ->
@@ -216,7 +217,8 @@ describe 'ReferencesApiHandler', ->
 					@ProjectEntityHandler.replaceFile.calledWith(
 						@project_id,
 						@allFiles["/refProvider.bib"]._id,
-						@writeStream.path
+						@writeStream.path,
+            @user_id,
 					).should.equal true
 
 				it 'should not call addFile', ->
@@ -374,7 +376,7 @@ describe 'ReferencesApiHandler', ->
 			beforeEach ->
 				@err = new Error('woops')
 				@allFiles["/refProvider.bib"] = {_id: ObjectId().toString()}
-				@ProjectEntityHandler.replaceFile = sinon.stub().callsArgWith(3, @err)
+				@ProjectEntityHandler.replaceFile = sinon.stub().callsArgWith(4, @err)
 				@ReferencesApiHandler.importBibtex @req, @res, @next
 				@readStream.emit('data', 'hi')
 				@readStream.emit('end')
@@ -407,7 +409,7 @@ describe 'ReferencesApiHandler', ->
 			beforeEach ->
 				@err = new Error('woops')
 				@fs.unlink = sinon.stub().callsArgWith(1, null)
-				@ProjectEntityHandler.addFile.callsArgWith(4, @err)
+				@ProjectEntityHandler.addFile.callsArgWith(5, @err)
 				@ReferencesApiHandler.importBibtex @req, @res, @next
 				@readStream.emit('data', 'hi')
 				@readStream.emit('end')
