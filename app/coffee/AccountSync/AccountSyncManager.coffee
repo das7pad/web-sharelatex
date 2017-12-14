@@ -21,10 +21,11 @@ module.exports = AccountSyncManager =
 				"[AccountSync] updating user subscription and features"
 			SubscriptionUpdater.refreshSubscription user._id, callback
 
-	# planCode = 'v1_pro' | 'v1_pro_plus' | null
+	# Returned planCode = 'v1_pro' | 'v1_pro_plus' | 'v1_student' | null
 	# For this to work, we need plans in settings with plan-codes:
 	#   - 'v1_pro'
 	#   - 'v1_pro_plus'
+	#   - 'v1_student'
 	getPlanCodeFromOverleaf: (userId, callback=(err, planCode)->) ->
 		logger.log {userId}, "[AccountSync] fetching overleaf plan for user"
 		UserGetter.getUser userId, {'overleaf.id': 1}, (err, user) ->
@@ -36,8 +37,11 @@ module.exports = AccountSyncManager =
 			AccountSyncManager._overleafPlanRequest userId, overleafId, (err, body) ->
 				return callback(err) if err?
 				planName = body.plan_name
-				if planName
+				if planName in ['pro', 'pro_plus', 'student']
 					planName = "v1_#{planName}"
+				else
+					# Throw away 'anonymous', 'free', etc as being equivalent to null
+					planName = null
 				return callback(null, planName)
 
 	_overleafPlanRequest: (userId, overleafId, callback=(err, body)->) ->
