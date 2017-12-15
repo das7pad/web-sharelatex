@@ -14,10 +14,10 @@ block content
 								style="width: 50%"
 							)
 						p
-							| Overleaf would like to link with your ShareLaTeX account. This will allow you to:
+							| Overleaf would like to link with your ShareLaTeX account (<a href="https://www.overleaf.com/help/v2">read more here</a>). This will allow you to:
 							ul
-								li Work with your ShareLaTeX projects in the new Overleaf editor
-								li Include any upgrades from Overleaf on your ShareLaTeX account
+								li Work with your ShareLaTeX projects in Overleaf v2; and
+								li Upgrade your ShareLaTeX account for free with an Overleaf subscription.
 						hr
 						if (logged_in_user_id && logged_in_user_id == merge_user_id)
 							form(async-form="confirm", name="confirmForm", action='/user/confirm_account_merge', method="POST", ng-cloak)
