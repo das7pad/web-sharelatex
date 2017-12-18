@@ -61,12 +61,12 @@ describe "SupportController", ->
 				done()
 			@controller.getUserInfo @req, @res
 
-		it "should return 409 if email is not set and secure token is correct", (done)->
+		it "should return 422 if email is not set and secure token is correct", (done)->
 			@req.body.email = undefined
 			@req.body.sl_secure_token = @settings.front.sl_secure_token
 			@res.sendStatus = (statusCode)=>
 				@UserGetter.getUser.called.should.equal false
-				statusCode.should.equal 409
+				statusCode.should.equal 422
 				done()
 			@controller.getUserInfo @req, @res
 
