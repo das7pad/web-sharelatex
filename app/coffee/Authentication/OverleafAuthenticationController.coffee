@@ -6,6 +6,7 @@ Url = require "url"
 Path = require "path"
 Settings = require "settings-sharelatex"
 jwt = require('jsonwebtoken')
+SubscriptionUpdater = require("../../../../../app/js/Features/Subscription/SubscriptionUpdater")
 
 module.exports = OverleafAuthenticationController =
 	setupUser: (req, res, next) ->
@@ -66,10 +67,7 @@ module.exports = OverleafAuthenticationController =
 			)
 			UserMapper.mergeWithSlUser user_id, profile, accessToken, refreshToken,	(error, user) ->
 				return next(error) if error?
-				SubscriptionUpdater = require(
-					"../../../../../app/js/Features/Subscription/SubscriptionUpdater"
-				)
-				setTimeout(SubscriptionUpdater.refreshSubscription, 0, user_id)
+				SubscriptionUpdater.refreshSubscription(user_id)
 				logger.log {user: user}, "merged with SL account, logging in"
 				return req.logIn(user, next)
 
