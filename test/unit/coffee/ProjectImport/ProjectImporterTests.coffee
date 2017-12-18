@@ -64,7 +64,9 @@ describe "ProjectImporter", ->
 		beforeEach ->
 			@project = {
 				_id: "mock-project-id"
-				overleaf: {}
+				overleaf: {
+					history: {}
+				}
 				save: sinon.stub().yields()
 			}
 			@user_id = "mock-user-id"
@@ -91,6 +93,7 @@ describe "ProjectImporter", ->
 			it "should set overleaf metadata on the project", ->
 				@project.overleaf.id.should.equal @doc.id
 				@project.overleaf.imported_at_ver_id.should.equal @doc.latest_ver_id
+				@project.overleaf.history.display.should.equal true
 				@project.tokens.readAndWrite.should.equal @doc.token
 				@project.tokens.readOnly.should.equal @doc.read_token
 
@@ -330,8 +333,8 @@ describe "ProjectImporter", ->
 			@user_id = "mock-user-id"
 			@doc = { _id: @doc_id = "mock-doc-id" }
 			@ProjectEntityHandler.mkdirp = sinon.stub().yields(null, [], { _id: @folder_id = "mock-folder-id" })
-			@ProjectEntityHandler.addDoc = sinon.stub().yields(null, @doc)
-			@ProjectEntityHandler.addFile = sinon.stub().yields()
+			@ProjectEntityHandler.addDocWithoutUpdatingHistory = sinon.stub().yields(null, @doc)
+			@ProjectEntityHandler.addFileWithoutUpdatingHistory = sinon.stub().yields()
 			@ProjectEntityHandler.setRootDoc = sinon.stub().yields()
 			
 		describe "with a src file", ->
@@ -349,7 +352,7 @@ describe "ProjectImporter", ->
 					.should.equal true
 			
 			it "should add the doc to the project", ->
-				@ProjectEntityHandler.addDoc
+				@ProjectEntityHandler.addDocWithoutUpdatingHistory
 					.calledWith(
 						@project_id, @folder_id, "chapter1.tex", ["chapter 1 content"], @user_id
 					)
@@ -400,7 +403,7 @@ describe "ProjectImporter", ->
 					.should.equal true
 			
 			it "should add the file to the project", ->
-				@ProjectEntityHandler.addFile
+				@ProjectEntityHandler.addFileWithoutUpdatingHistory
 					.calledWith(
 						@project_id, @folder_id, "image.jpeg", "path/on/disk", @user_id
 					)

@@ -92,13 +92,9 @@ describe "ProjectImportTests", ->
 				expect(docs[0].path).to.equal('/main.tex')
 				done()
 
-		it 'should version importing the doc', ->
+		it 'should not version importing the doc', ->
 			updates = MockDocUpdaterApi.getProjectStructureUpdates(@project._id).docUpdates
-			expect(updates.length).to.equal(1)
-			update = updates[0]
-			expect(update.userId).to.equal(@owner._id)
-			expect(update.pathname).to.equal("/main.tex")
-			expect(update.docLines).to.equal("Test Content")
+			expect(updates.length).to.equal(0)
 
 	describe 'a project with files', ->
 		before (done) ->
@@ -130,13 +126,9 @@ describe "ProjectImportTests", ->
 				expect(files[0].path).to.equal('/1pixel.png')
 				done()
 
-		it 'should version importing the file', ->
+		it 'should not version importing the file', ->
 			updates = MockDocUpdaterApi.getProjectStructureUpdates(@project._id).fileUpdates
-			expect(updates.length).to.equal(1)
-			update = updates[0]
-			expect(update.userId).to.equal(@owner._id)
-			expect(update.pathname).to.equal("/1pixel.png")
-			expect(update.url).to.be.a('string');
+			expect(updates.length).to.equal(0)
 
 	describe 'a project with unsupported file type', ->
 		before (done) ->
