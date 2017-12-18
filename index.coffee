@@ -28,7 +28,7 @@ OverleafIntegration =
 
 		findAllV1Projects: ProjectListGetter.findAllUsersProjects
 		getV1PlanCode: (args...) ->
-			AccountSyncManager.getPlanCodeFromOverleaf(args...)
+			AccountSyncManager.getPlanCodeFromV1(args...)
 
 if !settings.overleaf?.oauth?
 	module.exports = {}

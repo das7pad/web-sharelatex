@@ -7,17 +7,17 @@ logger = require('logger-sharelatex')
 
 module.exports = AccountSyncManager =
 
-	doSync: (overleafUserId, callback=(err)->) ->
-		logger.log {overleafUserId}, "[AccountSync] starting account sync"
-		UserGetter.getUser {'overleaf.id': overleafUserId}, {_id: 1}, (err, user) ->
+	doSync: (v1UserId, callback=(err)->) ->
+		logger.log {v1UserId}, "[AccountSync] starting account sync"
+		UserGetter.getUser {'overleaf.id': v1UserId}, {_id: 1}, (err, user) ->
 			if err?
-				logger.err {overleafUserId}, "[AccountSync] error getting user"
+				logger.err {v1UserId}, "[AccountSync] error getting user"
 				return callback(err)
 			if !user?._id?
-				err = new Error("no user found for overleaf id")
-				logger.log {overleafUserId}, "[AccountSync] #{err.message}"
+				err = new Error("no user found for v1 id")
+				logger.log {v1UserId}, "[AccountSync] #{err.message}"
 				return callback(err)
-			logger.log {overleafUserId, userId: user._id},
+			logger.log {v1UserId, userId: user._id},
 				"[AccountSync] updating user subscription and features"
 			SubscriptionUpdater.refreshSubscription user._id, callback
 
@@ -26,15 +26,15 @@ module.exports = AccountSyncManager =
 	#   - 'v1_pro'
 	#   - 'v1_pro_plus'
 	#   - 'v1_student'
-	getPlanCodeFromOverleaf: (userId, callback=(err, planCode)->) ->
-		logger.log {userId}, "[AccountSync] fetching overleaf plan for user"
+	getPlanCodeFromV1: (userId, callback=(err, planCode)->) ->
+		logger.log {userId}, "[AccountSync] fetching v1 plan for user"
 		UserGetter.getUser userId, {'overleaf.id': 1}, (err, user) ->
 			return callback(err) if err?
-			overleafId = user?.overleaf?.id
-			if !overleafId?
-				logger.log {userId}, "[AccountSync] no overleaf id found for user"
+			v1Id = user?.overleaf?.id
+			if !v1Id?
+				logger.log {userId}, "[AccountSync] no v1 id found for user"
 				return callback(null, null)
-			AccountSyncManager._overleafPlanRequest userId, overleafId, (err, body) ->
+			AccountSyncManager._v1PlanRequest userId, v1Id, (err, body) ->
 				return callback(err) if err?
 				planName = body.plan_name
 				if planName in ['pro', 'pro_plus', 'student']
@@ -44,7 +44,7 @@ module.exports = AccountSyncManager =
 					planName = null
 				return callback(null, planName)
 
-	_overleafPlanRequest: (userId, overleafId, callback=(err, body)->) ->
+	_v1PlanRequest: (userId, v1Id, callback=(err, body)->) ->
 		oAuthRequest userId, {
 			url: "#{Settings.overleaf.host}/api/v1/sharelatex/users/current_user/plan_code"
 			method: 'GET'
