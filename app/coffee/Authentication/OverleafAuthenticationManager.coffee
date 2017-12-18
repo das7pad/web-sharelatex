@@ -3,6 +3,7 @@ logger = require("logger-sharelatex")
 request = require "request"
 settings = require "settings-sharelatex"
 UserMapper = require "../OverleafUsers/UserMapper"
+SubscriptionUpdater = require("../../../../../app/js/Features/Subscription/SubscriptionUpdater")
 
 module.exports = OverleafAuthenticationManager =
 	getUserProfile: (accessToken, callback) ->
@@ -40,7 +41,10 @@ module.exports = OverleafAuthenticationManager =
 							user_id: user._id.toString()
 						})
 					else
-						UserMapper.createSlUser profile, accessToken, refreshToken, callback
+						UserMapper.createSlUser profile, accessToken, refreshToken, (err, sl_user) ->
+							return callback(err) if err?
+							SubscriptionUpdater.refreshSubscription(sl_user._id)
+							callback(null, sl_user)
 
 	_updateUserTokens: (user, accessToken, refreshToken, callback = (error, user) ->) ->
 		user.overleaf.refreshToken = refreshToken
