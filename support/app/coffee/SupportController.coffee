@@ -3,7 +3,6 @@ request = require("request")
 logger = require("logger-sharelatex")
 SupportDetailsManager = require("./SupportDetailsManager")
 path = require("path")
-OneTimeTokenHandler = require("../../../../app/js/Features/Security/OneTimeTokenHandler")
 
 inboxes = {
 	"support":"cha_43oh"
