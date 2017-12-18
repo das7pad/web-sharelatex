@@ -19,14 +19,14 @@ describe 'AccountSyncManager', ->
 				overleaf:
 					host: @host = "http://overleaf.example.com"
 			"../OAuth/OAuthRequest": @oAuthRequest = {}
-		@AccountSyncManager._overleafPlanRequest = sinon.stub()
+		@AccountSyncManager._v1PlanRequest = sinon.stub()
 		@userId = 'abcd'
-		@overleafUserId = 42
+		@v1UserId = 42
 		@user =
 			_id: @userId
 			email: 'user@example.com'
 			overleaf:
-				id: @overleafUserId
+				id: @v1UserId
 
 
 	describe 'doSync', ->
@@ -36,7 +36,7 @@ describe 'AccountSyncManager', ->
 			@SubscriptionUpdater.refreshSubscription = sinon.stub()
 				.callsArgWith(1, null)
 			@call = (cb) =>
-				@AccountSyncManager.doSync(@overleafUserId, cb)
+				@AccountSyncManager.doSync(@v1UserId, cb)
 
 		describe 'when all goes well', ->
 
@@ -46,7 +46,7 @@ describe 'AccountSyncManager', ->
 						@UserGetter.getUser.callCount
 					).to.equal 1
 					expect(
-						@UserGetter.getUser.calledWith({'overleaf.id': @overleafUserId})
+						@UserGetter.getUser.calledWith({'overleaf.id': @v1UserId})
 					).to.equal true
 					done()
 
@@ -100,17 +100,17 @@ describe 'AccountSyncManager', ->
 					done()
 
 
-	describe 'getPlanCodeFromOverleaf', ->
+	describe 'getPlanCodeFromV1', ->
 		beforeEach ->
 			@responseBody =
 				id: 32,
 				plan_name: 'pro'
 			@UserGetter.getUser = sinon.stub()
 				.callsArgWith(2, null, @user)
-			@AccountSyncManager._overleafPlanRequest = sinon.stub()
+			@AccountSyncManager._v1PlanRequest = sinon.stub()
 				.callsArgWith(2, null, @responseBody)
 			@call = (cb) =>
-				@AccountSyncManager.getPlanCodeFromOverleaf @userId, cb
+				@AccountSyncManager.getPlanCodeFromV1 @userId, cb
 
 		describe 'when all goes well', ->
 
@@ -124,15 +124,15 @@ describe 'AccountSyncManager', ->
 					).to.equal true
 					done()
 
-			it 'should call _overleafPlanRequest', (done) ->
+			it 'should call _v1PlanRequest', (done) ->
 				@call (err, planCode) =>
 					expect(
-						@AccountSyncManager._overleafPlanRequest.callCount
+						@AccountSyncManager._v1PlanRequest.callCount
 					).to.equal 1
 					expect(
-						@AccountSyncManager._overleafPlanRequest.calledWith(
+						@AccountSyncManager._v1PlanRequest.calledWith(
 							@userId,
-							@overleafUserId
+							@v1UserId
 						)
 					).to.equal true
 					done()
@@ -143,7 +143,7 @@ describe 'AccountSyncManager', ->
 					expect(planCode).to.equal 'v1_pro'
 					done()
 
-			describe 'when the plan_name from overleaf is null', ->
+			describe 'when the plan_name from v1 is null', ->
 				beforeEach ->
 					@responseBody.plan_name = null
 
@@ -158,10 +158,10 @@ describe 'AccountSyncManager', ->
 				@UserGetter.getUser = sinon.stub()
 					.callsArgWith(2, new Error('woops'))
 
-			it 'should not call _overleafPlanRequest', (done) ->
+			it 'should not call _v1PlanRequest', (done) ->
 				@call (err, planCode) =>
 					expect(
-						@AccountSyncManager._overleafPlanRequest.callCount
+						@AccountSyncManager._v1PlanRequest.callCount
 					).to.equal 0
 					done()
 
@@ -176,10 +176,10 @@ describe 'AccountSyncManager', ->
 				@UserGetter.getUser = sinon.stub()
 					.callsArgWith(2, null, null)
 
-			it 'should not call _overleafPlanRequest', (done) ->
+			it 'should not call _v1PlanRequest', (done) ->
 				@call (err, planCode) =>
 					expect(
-						@AccountSyncManager._overleafPlanRequest.callCount
+						@AccountSyncManager._v1PlanRequest.callCount
 					).to.equal 0
 					done()
 
@@ -189,9 +189,9 @@ describe 'AccountSyncManager', ->
 					expect(planCode).to.not.exist
 					done()
 
-		describe 'when the request to overleaf fails', ->
+		describe 'when the request to v1 fails', ->
 			beforeEach ->
-				@AccountSyncManager._overleafPlanRequest = sinon.stub()
+				@AccountSyncManager._v1PlanRequest = sinon.stub()
 					.callsArgWith(2, new Error('woops'))
 
 			it 'should produce an error', (done) ->
