@@ -7,7 +7,7 @@ module.exports = AccountSyncController =
 	syncHook: (req, res, next) ->
 		v1UserIdStr = req.params.v1_user_id
 		try
-			overleafUserId = parseInt(v1UserIdStr)
+			overleafUserId = parseInt(v1UserIdStr, 10)
 		catch err
 			logger.err {err, v1UserIdStr},
 				"[AccountSync] error parsing overleaf user id from route"
