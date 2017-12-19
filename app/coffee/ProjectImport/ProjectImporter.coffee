@@ -69,6 +69,7 @@ module.exports = ProjectImporter =
 			return callback(error) if error?
 			project.overleaf.id = doc.id
 			project.overleaf.imported_at_ver_id = doc.latest_ver_id
+			project.overleaf.history.display = true
 			project.tokens = {
 				readOnly: doc.read_token,
 				readAndWrite: doc.token
@@ -142,7 +143,9 @@ module.exports = ProjectImporter =
 			if file.type == "src"
 				if !file.latest_content?
 					return callback(new Error("expected file.latest_content"))
-				ProjectEntityHandler.addDoc project_id, folder_id, name, file.latest_content.split("\n"), user_id, (error, doc) ->
+				# We already have history entries, we just want to get the SL content in the same state,
+				# so don't send add requests to the history service for these new docs
+				ProjectEntityHandler.addDocWithoutUpdatingHistory project_id, folder_id, name, file.latest_content.split("\n"), user_id, (error, doc) ->
 					return callback(error) if error?
 					if file.main
 						ProjectEntityHandler.setRootDoc project_id, doc._id, callback
@@ -154,7 +157,7 @@ module.exports = ProjectImporter =
 				url = "#{settings.overleaf.s3.host}/#{file.file_path}"
 				ProjectImporter._writeUrlToDisk url, (error, pathOnDisk) ->
 					return callback(error) if error?
-					ProjectEntityHandler.addFile project_id, folder_id, name, pathOnDisk, user_id, callback
+					ProjectEntityHandler.addFileWithoutUpdatingHistory project_id, folder_id, name, pathOnDisk, user_id, callback
 			else
 				logger.warn {type: file.type, path: file.file, project_id}, "unknown file type"
 				callback(new UnsupportedFileTypeError("unknown file type: #{file.type}"))
