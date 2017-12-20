@@ -3,6 +3,7 @@ OverleafAuthenticationManager = require "./app/js/Authentication/OverleafAuthent
 ProjectListGetter = require "./app/js/ProjectList/ProjectListGetter"
 OAuth2Strategy = require('passport-oauth2').Strategy
 refresh = require('passport-oauth2-refresh')
+AccountSyncManager = require "./app/js/AccountSync/AccountSyncManager"
 
 settings = require "settings-sharelatex"
 
@@ -26,6 +27,8 @@ OverleafIntegration =
 			refresh.use("overleaf", overleafOAuth2Strategy)
 
 		findAllV1Projects: ProjectListGetter.findAllUsersProjects
+		getV1PlanCode: (args...) ->
+			AccountSyncManager.getPlanCodeFromV1(args...)
 
 if !settings.overleaf?.oauth?
 	module.exports = {}

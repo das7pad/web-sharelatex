@@ -18,6 +18,8 @@ describe "OverleafAuthenticationController", ->
 					secret: "banana"
 			"jsonwebtoken": @jwt = {}
 			"../OverleafUsers/UserMapper": @UserMapper = {}
+			"../../../../../app/js/Features/Subscription/SubscriptionUpdater":
+				@SubscriptionUpdater = {refreshSubscription: sinon.stub()}
 		@req =
 			logIn: sinon.stub()
 			session: {}
