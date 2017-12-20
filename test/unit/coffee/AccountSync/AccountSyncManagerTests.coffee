@@ -14,7 +14,10 @@ describe 'AccountSyncManager', ->
 			"../../../../../app/js/Features/User/UserGetter": @UserGetter = {}
 			"../../../../../app/js/Features/Subscription/SubscriptionUpdater":
 				@SubscriptionUpdater = {}
-			"logger-sharelatex": { log: sinon.stub(), err: sinon.stub() }
+			"logger-sharelatex":
+				log: sinon.stub()
+				err: sinon.stub()
+				warn: sinon.stub()
 			"settings-sharelatex":
 				overleaf:
 					host: @host = "http://overleaf.example.com"
@@ -94,9 +97,9 @@ describe 'AccountSyncManager', ->
 					).to.equal 0
 					done()
 
-			it 'should produce an error', (done) ->
+			it 'should not produce an error', (done) ->
 				@call (err) =>
-					expect(err).to.exist
+					expect(err).to.not.exist
 					done()
 
 

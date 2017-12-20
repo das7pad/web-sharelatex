@@ -14,9 +14,8 @@ module.exports = AccountSyncManager =
 				logger.err {v1UserId}, "[AccountSync] error getting user"
 				return callback(err)
 			if !user?._id?
-				err = new Error("no user found for v1 id")
-				logger.log {v1UserId}, "[AccountSync] #{err.message}"
-				return callback(err)
+				logger.warn {v1UserId}, "[AccountSync] no user found for v1 id"
+				return callback(null)
 			logger.log {v1UserId, userId: user._id},
 				"[AccountSync] updating user subscription and features"
 			SubscriptionUpdater.refreshSubscription user._id, callback
