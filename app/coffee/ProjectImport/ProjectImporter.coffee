@@ -12,9 +12,11 @@ UserMapper = require "../OverleafUsers/UserMapper"
 
 ProjectCreationHandler = require "../../../../../app/js/Features/Project/ProjectCreationHandler"
 ProjectEntityHandler = require "../../../../../app/js/Features/Project/ProjectEntityHandler"
+ProjectDeleter = require "../../../../../app/js/Features/Project/ProjectDeleter"
 {ProjectInvite} = require "../../../../../app/js/models/ProjectInvite"
 CollaboratorsHandler = require "../../../../../app/js/Features/Collaborators/CollaboratorsHandler"
 PrivilegeLevels = require "../../../../../app/js/Features/Authorization/PrivilegeLevels"
+{UnsupportedFileTypeError} = require "../../../../../app/js/Features/Errors/Errors"
 
 ENGINE_TO_COMPILER_MAP = {
 	latex_dvipdf: "latex"
@@ -31,14 +33,22 @@ module.exports = ProjectImporter =
 			ProjectImporter._initSharelatexProject user_id, doc, (error, project) ->
 				return callback(error) if error?
 				project_id = project._id
-				ProjectImporter._importInvites project_id, doc.invites, (error) ->
-					return callback(error) if error?
-					ProjectImporter._importFiles project_id, user_id, doc.files, (error) ->
-						return callback(error) if error?
-						ProjectImporter._flagOverleafDocAsImported ol_doc_id, project_id, user_id, (error) ->
-							return callback(error) if error?
-							logger.log {project_id, ol_doc_id, user_id}, "finished project import"
-							callback null, project_id
+				async.series [
+					(cb) ->
+						ProjectImporter._importInvites project_id, doc.invites, cb
+					(cb) ->
+						ProjectImporter._importFiles project_id, user_id, doc.files, cb
+					(cb) ->
+						ProjectImporter._flagOverleafDocAsImported ol_doc_id, project_id, user_id, cb
+				], (importError) ->
+					if importError?
+						logger.log {importError}, "error importing project"
+						ProjectDeleter.deleteProject project_id, (cleanUpError) ->
+							logger.err {err: cleanUpError, project_id: project_id}, "failed to clean up project" if cleanUpError?
+							callback importError
+					else
+						logger.log {project_id, ol_doc_id, user_id}, "finished project import"
+						callback null, project_id
 
 	_getOverleafDoc: (ol_doc_id, user_id, callback = (error, doc) ->) ->
 		oAuthRequest user_id, {
@@ -59,6 +69,7 @@ module.exports = ProjectImporter =
 			return callback(error) if error?
 			project.overleaf.id = doc.id
 			project.overleaf.imported_at_ver_id = doc.latest_ver_id
+			project.overleaf.history.display = true
 			project.tokens = {
 				readOnly: doc.read_token,
 				readAndWrite: doc.token
@@ -132,7 +143,9 @@ module.exports = ProjectImporter =
 			if file.type == "src"
 				if !file.latest_content?
 					return callback(new Error("expected file.latest_content"))
-				ProjectEntityHandler.addDoc project_id, folder_id, name, file.latest_content.split("\n"), user_id, (error, doc) ->
+				# We already have history entries, we just want to get the SL content in the same state,
+				# so don't send add requests to the history service for these new docs
+				ProjectEntityHandler.addDocWithoutUpdatingHistory project_id, folder_id, name, file.latest_content.split("\n"), user_id, (error, doc) ->
 					return callback(error) if error?
 					if file.main
 						ProjectEntityHandler.setRootDoc project_id, doc._id, callback
@@ -144,10 +157,10 @@ module.exports = ProjectImporter =
 				url = "#{settings.overleaf.s3.host}/#{file.file_path}"
 				ProjectImporter._writeUrlToDisk url, (error, pathOnDisk) ->
 					return callback(error) if error?
-					ProjectEntityHandler.addFile project_id, folder_id, name, pathOnDisk, user_id, callback
+					ProjectEntityHandler.addFileWithoutUpdatingHistory project_id, folder_id, name, pathOnDisk, user_id, callback
 			else
 				logger.warn {type: file.type, path: file.file, project_id}, "unknown file type"
-				callback()
+				callback(new UnsupportedFileTypeError("unknown file type: #{file.type}"))
 
 	_writeUrlToDisk: (url, callback = (error, pathOnDisk) ->) ->
 			callback = _.once(callback)

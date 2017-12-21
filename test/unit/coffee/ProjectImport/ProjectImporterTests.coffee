@@ -7,19 +7,21 @@ sinon = require("sinon")
 expect = require("chai").expect
 
 PrivilegeLevels = require "../../../../../../app/js/Features/Authorization/PrivilegeLevels"
+{UnsupportedFileTypeError} = require "../../../../../../app/js/Features/Errors/Errors"
 
 describe "ProjectImporter", ->
 	beforeEach ->
 		@ProjectImporter = SandboxedModule.require modulePath, requires:
 			"../../../../../app/js/Features/Project/ProjectCreationHandler": @ProjectCreationHandler = {}
 			"../../../../../app/js/Features/Project/ProjectEntityHandler": @ProjectEntityHandler = {}
+			"../../../../../app/js/Features/Project/ProjectDeleter": @ProjectDeleter = {}
 			"../../../../../app/js/models/ProjectInvite": ProjectInvite: @ProjectInvite = {}
 			"../OAuth/OAuthRequest": @oAuthRequest = sinon.stub()
 			"../OverleafUsers/UserMapper": @UserMapper = {}
 			"../../../../../app/js/Features/Collaborators/CollaboratorsHandler": @CollaboratorsHandler = {}
 			"../../../../../app/js/Features/Authorization/PrivilegeLevels": PrivilegeLevels
 			"request": @request = {}
-			"logger-sharelatex": { log: sinon.stub() }
+			"logger-sharelatex": { log: sinon.stub(), warn: sinon.stub() }
 			"settings-sharelatex":
 				overleaf:
 					host: "http://overleaf.example.com"
@@ -62,7 +64,9 @@ describe "ProjectImporter", ->
 		beforeEach ->
 			@project = {
 				_id: "mock-project-id"
-				overleaf: {}
+				overleaf: {
+					history: {}
+				}
 				save: sinon.stub().yields()
 			}
 			@user_id = "mock-user-id"
@@ -89,6 +93,7 @@ describe "ProjectImporter", ->
 			it "should set overleaf metadata on the project", ->
 				@project.overleaf.id.should.equal @doc.id
 				@project.overleaf.imported_at_ver_id.should.equal @doc.latest_ver_id
+				@project.overleaf.history.display.should.equal true
 				@project.tokens.readAndWrite.should.equal @doc.token
 				@project.tokens.readOnly.should.equal @doc.read_token
 
@@ -328,8 +333,8 @@ describe "ProjectImporter", ->
 			@user_id = "mock-user-id"
 			@doc = { _id: @doc_id = "mock-doc-id" }
 			@ProjectEntityHandler.mkdirp = sinon.stub().yields(null, [], { _id: @folder_id = "mock-folder-id" })
-			@ProjectEntityHandler.addDoc = sinon.stub().yields(null, @doc)
-			@ProjectEntityHandler.addFile = sinon.stub().yields()
+			@ProjectEntityHandler.addDocWithoutUpdatingHistory = sinon.stub().yields(null, @doc)
+			@ProjectEntityHandler.addFileWithoutUpdatingHistory = sinon.stub().yields()
 			@ProjectEntityHandler.setRootDoc = sinon.stub().yields()
 			
 		describe "with a src file", ->
@@ -347,7 +352,7 @@ describe "ProjectImporter", ->
 					.should.equal true
 			
 			it "should add the doc to the project", ->
-				@ProjectEntityHandler.addDoc
+				@ProjectEntityHandler.addDocWithoutUpdatingHistory
 					.calledWith(
 						@project_id, @folder_id, "chapter1.tex", ["chapter 1 content"], @user_id
 					)
@@ -398,10 +403,24 @@ describe "ProjectImporter", ->
 					.should.equal true
 			
 			it "should add the file to the project", ->
-				@ProjectEntityHandler.addFile
+				@ProjectEntityHandler.addFileWithoutUpdatingHistory
 					.calledWith(
 						@project_id, @folder_id, "image.jpeg", "path/on/disk", @user_id
 					)
+					.should.equal true
+
+		describe "with an unknown file type", ->
+			beforeEach ->
+				@file = {
+					file: 'linked_file.pdf'
+					file_path: 's3/linked_file.pdf'
+					type: 'ext'
+				}
+				@ProjectImporter._importFile @project_id, @user_id, @file, @callback
+
+			it 'should throw an error', ->
+				@callback
+					.calledWith(new UnsupportedFileTypeError("unknown file type: ext"))
 					.should.equal true
 
 		describe "null checks", ->
@@ -464,3 +483,19 @@ describe "ProjectImporter", ->
 		
 		it "should return the callback", ->
 			@callback.called.should.equal true
+
+	describe 'error handling', ->
+		beforeEach ->
+			@ProjectImporter._getOverleafDoc = sinon.stub().yields(null, @doc = { files: ["mock-files"] })
+			@ProjectImporter._initSharelatexProject = sinon.stub().yields(null, @project = { _id: "mock-project-id" })
+			@ProjectDeleter.deleteProject = sinon.stub().yields()
+			# Mock import file error
+			@error = new UnsupportedFileTypeError("unknown file type: ext")
+			@ProjectImporter._importFiles = sinon.stub().yields(@error)
+			@ProjectImporter.importProject(@ol_doc_id = "mock-ol-doc-id", @user_id = "mock-user-id", @callback)
+
+		it 'should delete the newly created project', ->
+			@ProjectDeleter.deleteProject.calledWith(@project_id)
+
+		it 'should callback with the error', ->
+			@callback.calledWith(@error)
