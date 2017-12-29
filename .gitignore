@@ -71,3 +71,4 @@ Gemfile.lock
 app/views/external
 
 /modules/
+Makefile
