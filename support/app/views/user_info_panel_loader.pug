@@ -15,7 +15,7 @@ html
 						sl_secure_token:"#{sl_secure_token}"
 					})
 				}
-				window.fetch("https://us-central1-henry-test-compute-4803e3ad.cloudfunctions.net/front-proxy", opts)
+				window.fetch("https://us-central1-frontapp-proxy-c30b1ddf.cloudfunctions.net/frontapp-proxy", opts)
 					.then(function(response) {
 						return response.text()
 					}).then(function(userDeails) {
