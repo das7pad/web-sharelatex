@@ -40,7 +40,7 @@ module.exports =
 			'/overleaf/user/:v1_user_id/sync',
 			RateLimiterMiddlewear.rateLimit({
 				endpointName: 'overleaf-user-details-sync',
-				params: ["user_id"]
+				params: ["v1_user_id"]
 				maxRequests: 10
 				timeInterval: 60
 			}),
