@@ -5,27 +5,38 @@ SupportDetailsManager = require("./SupportDetailsManager")
 path = require("path")
 
 inboxes = {
-	"support":"cha_43oh"
-	"accounts":"cha_4081"
+	"support":
+		id:"inb_4g9t"
+		email:"support@sharelatex.com"
+	"accounts":
+		id:"inb_4c3t"
+		email:"accounts@sharelatex.com"
 }
 module.exports  =
 
 	newSupportRequest: (req, res, next)->
 		{message, subject, email, about, inbox} = req.body
-		inboxId = inboxes[inbox]
+		inboxId = inboxes[inbox].id
+		inboxEmail = inboxes[inbox].email
 		if !inboxId?
 			return res.sendStatus 500
 		opts =
-			url: "https://api2.frontapp.com/channels/#{inboxId}/messages"
+			url: "https://api2.frontapp.com/inboxes/#{inboxId}/imported_messages"
 			headers:
 				authorization: settings.front.auth_key
 			method: "POST"
 			json:
 				body: message
-				to:[email]
+				to: [inboxEmail]
+				external_id: Math.random().toString()
 				subject: subject
-				options:
-					archive:false
+				created_at: Date.now()/1000
+				sender:
+					handle: email
+				metadata:
+					is_inbound:true
+					is_archived:false
+
 		request opts, (err, response, body)->
 			if err? or response.statusCode!= 202
 				logger.err err:err, body:body, statusCode: res.statusCode, "error creating support ticket"
