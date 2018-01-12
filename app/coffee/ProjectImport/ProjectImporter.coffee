@@ -80,6 +80,9 @@ module.exports = ProjectImporter =
 				project.publicAccesLevel = 'tokenBased'
 			if ENGINE_TO_COMPILER_MAP[doc.latex_engine]?
 				project.compiler = ENGINE_TO_COMPILER_MAP[doc.latex_engine]
+			# allow imported projects to use a separate image
+			if settings.importedImageName?
+				project.imageName = settings.importedImageName
 			project.save (error) ->
 				return callback(error) if error?
 				return callback(null, project)
