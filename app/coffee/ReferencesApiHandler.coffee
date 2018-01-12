@@ -163,13 +163,12 @@ module.exports = ReferencesApiHandler =
 			requestStream.pipe tempWriteStream
 
 	_addBibTexfile: (project_id, fsPath, ref_provider, user_id, callback=(error)->) ->
-		LockManager.getLock project_id, (err)->
-			if err?
-				logger.err {user_id, ref_provider, project_id, fsPath}, project_id:project_id, source:source,  "could not get lock to _addBibTexfile"
-				return callback(err)
-			ReferencesApiHandler._addBibTexfileWithoutLock project_id, fsPath, ref_provider, user_id, (error)->
-				LockManager.releaseLock project_id, ->
-					callback(error)
+		LockManager.runWithLock project_id,
+			(cb) -> ReferencesApiHandler._addBibTexfileWithoutLock project_id, fsPath, ref_provider, user_id, cb
+			(err) ->
+				if err?
+					logger.err {user_id, ref_provider, project_id, fsPath}, "could not add bibtex file"
+				callback err
 
 	_addBibTexfileWithoutLock: (project_id, fsPath, ref_provider, user_id, callback=(error)->) ->
 		ProjectEntityHandler.getAllFiles project_id, (err, allFiles) ->

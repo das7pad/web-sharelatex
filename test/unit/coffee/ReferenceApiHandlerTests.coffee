@@ -52,8 +52,7 @@ describe 'ReferencesApiHandler', ->
 				replaceFileWithoutLock: sinon.stub().yields()
 			}
 			'../../../../app/js/infrastructure/LockManager': @LockManager = {
-				getLock: sinon.stub().yields()
-				releaseLock: sinon.stub().yields()
+				runWithLock : sinon.spy((key, runner, callback) -> runner(callback))
 			}
 			'temp': @temp = {
 				track: sinon.stub()
