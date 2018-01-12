@@ -13,14 +13,17 @@ module.exports = MockOverleafApi =
 		@files[file.id] = file.path
 
 	run: () ->
-		app.get "/api/v1/sharelatex/docs/:ol_doc_id", (req, res, next) =>
+		app.post "/api/v1/sharelatex/docs/:ol_doc_id/export/start", (req, res, next) =>
 			doc = @docs[req.params.ol_doc_id]
 			if doc
 				res.json doc
 			else
 				res.sendStatus 404
 
-		app.put "/api/v1/sharelatex/docs/:ol_doc_id", (req, res, next) =>
+		app.post "/api/v1/sharelatex/docs/:ol_doc_id/export/confirm", (req, res, next) =>
+      res.sendStatus 204
+
+		app.post "/api/v1/sharelatex/docs/:ol_doc_id/export/cancel", (req, res, next) =>
       res.sendStatus 204
 
 		app.get "/file/:file_id", (req, res, next) =>
