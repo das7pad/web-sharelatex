@@ -13,7 +13,7 @@ module.exports = OverleafAuthenticationManager =
 			headers:
 				Authorization: "Bearer #{accessToken}"
 		}, (err, res, body) ->
-			return cb(err) if err?
+			return callback(err) if err?
 			if 200 <= res.statusCode < 300
 				callback(null, body)
 			else
