@@ -21,4 +21,6 @@ module.exports = ProjectImportController =
 					return unsupportedError("Sorry! Projects with associated journals aren't supported yet.")
 				else if error instanceof UnsupportedExportRecordsError
 					return unsupportedError("Sorry! Projects with an ongoing export aren't supported yet.")
+				else
+					return unsupportedError("Sorry! There was a problem with your import, please try again")
 			res.json({ redir: "/project/#{sl_project_id}" })
