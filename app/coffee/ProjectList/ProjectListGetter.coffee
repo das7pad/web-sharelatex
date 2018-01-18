@@ -13,7 +13,7 @@ module.exports = ProjectListGetter =
 			json: true
 			qs:
 				per: NO_PROJECTS_LIMIT
-				exclude_imported: true
+				exclude_v2_projects: true
 		}, (error, docs) ->
 			if error?
 				# Specially handle no connection err, so warning can be shown
