@@ -145,6 +145,13 @@ describe "ProjectImporter", ->
 				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
 					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
 					done()
+
+		describe "with brand variation", ->
+			it "should prevent import", (done) ->
+				@doc.brand_variation_id = 123
+				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
+					error.message.should.equal("project has brand variation: 123")
+					done()
 		
 		describe "with blank title", ->
 			beforeEach ->
