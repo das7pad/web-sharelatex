@@ -11,9 +11,7 @@ other_lngs = ["es"]
 path = require("path")
 Url = require "url"
 
-baseWikiUrl = settings.apis.wiki?.url or "http://learn.sharelatex.com"
-
-
+baseWikiUrl = settings.apis.wiki?.url or "https://learn.sharelatex.com"
 
 
 module.exports = WikiController = 
