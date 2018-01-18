@@ -153,11 +153,11 @@ describe "ProjectImporter", ->
 					error.message.should.equal("project has brand variation: 123")
 					done()
 
-		describe "with exports", ->
+		describe "with export records", ->
 			it "should prevent import", (done) ->
-				@doc.has_exports = true
+				@doc.has_export_records = true
 				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
-					error.message.should.equal("project has exports")
+					error.message.should.equal("project has export records")
 					done()
 		
 		describe "with blank title", ->

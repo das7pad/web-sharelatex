@@ -19,7 +19,7 @@ PrivilegeLevels = require "../../../../../app/js/Features/Authorization/Privileg
 {
 	UnsupportedFileTypeError,
 	UnsupportedBrandError,
-	UnsupportedPublisherExportsError
+	UnsupportedExportRecordsError
 } = require "../../../../../app/js/Features/Errors/Errors"
 
 ENGINE_TO_COMPILER_MAP = {
@@ -69,8 +69,8 @@ module.exports = ProjectImporter =
 			return callback(new Error("expected doc title, id, latest_ver_id, latex_engine, token and read_token"))
 		if doc.brand_variation_id?
 			return callback(new UnsupportedBrandError("project has brand variation: #{doc.brand_variation_id}"))
-		if doc.has_exports? and doc.has_exports
-			return callback(new UnsupportedPublisherExportsError("project has exports"))
+		if doc.has_export_records? and doc.has_export_records
+			return callback(new UnsupportedExportRecordsError("project has export records"))
 		if doc.title == ""
 			doc.title = "Untitled"
 		ProjectCreationHandler.createBlankProject user_id, doc.title, doc.id, (error, project) ->

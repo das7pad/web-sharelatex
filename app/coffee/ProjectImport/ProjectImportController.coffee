@@ -4,7 +4,7 @@ AuthenticationController = require "../../../../../app/js/Features/Authenticatio
 {
 	UnsupportedFileTypeError,
 	UnsupportedBrandError,
-	UnsupportedPublisherExportsError
+	UnsupportedExportRecordsError
 } = require "../../../../../app/js/Features/Errors/Errors"
 
 module.exports = ProjectImportController =
@@ -12,7 +12,6 @@ module.exports = ProjectImportController =
 		{ol_doc_id} = req.params
 		user_id = AuthenticationController.getLoggedInUserId req
 		logger.log {user_id, ol_doc_id}, "importing project from overleaf"
-
 		unsupportedError = (msg) -> res.status(501).json(message: msg)
 		ProjectImporter.importProject ol_doc_id, user_id, (error, sl_project_id) ->
 			if error?
@@ -20,6 +19,6 @@ module.exports = ProjectImportController =
 					return unsupportedError("Sorry! Projects with linked or external files aren't supported yet.")
 				else if error instanceof UnsupportedBrandError
 					return unsupportedError("Sorry! Projects with associated journals aren't supported yet.")
-				else if error instanceof UnsupportedPublisherExportsError
+				else if error instanceof UnsupportedExportRecordsError
 					return unsupportedError("Sorry! Projects with an ongoing export aren't supported yet.")
 			res.json({ redir: "/project/#{sl_project_id}" })
