@@ -16,7 +16,11 @@ ProjectDeleter = require "../../../../../app/js/Features/Project/ProjectDeleter"
 {ProjectInvite} = require "../../../../../app/js/models/ProjectInvite"
 CollaboratorsHandler = require "../../../../../app/js/Features/Collaborators/CollaboratorsHandler"
 PrivilegeLevels = require "../../../../../app/js/Features/Authorization/PrivilegeLevels"
-{UnsupportedFileTypeError, UnsupportedProjectError} = require "../../../../../app/js/Features/Errors/Errors"
+{
+	UnsupportedFileTypeError,
+	UnsupportedBrandError,
+	UnsupportedPublisherExportsError
+} = require "../../../../../app/js/Features/Errors/Errors"
 
 ENGINE_TO_COMPILER_MAP = {
 	latex_dvipdf: "latex"
@@ -64,9 +68,9 @@ module.exports = ProjectImporter =
 		if !doc.title? or !doc.id? or !doc.latest_ver_id? or !doc.latex_engine? or !doc.token? or !doc.read_token?
 			return callback(new Error("expected doc title, id, latest_ver_id, latex_engine, token and read_token"))
 		if doc.brand_variation_id?
-			return callback(new UnsupportedProjectError("project has brand variation: #{doc.brand_variation_id}"))
+			return callback(new UnsupportedBrandError("project has brand variation: #{doc.brand_variation_id}"))
 		if doc.has_exports? and doc.has_exports
-			return callback(new UnsupportedProjectError("project has exports"))
+			return callback(new UnsupportedPublisherExportsError("project has exports"))
 		if doc.title == ""
 			doc.title = "Untitled"
 		ProjectCreationHandler.createBlankProject user_id, doc.title, doc.id, (error, project) ->

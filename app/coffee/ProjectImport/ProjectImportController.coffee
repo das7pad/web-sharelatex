@@ -1,7 +1,11 @@
 logger = require "logger-sharelatex"
 ProjectImporter = require "./ProjectImporter"
 AuthenticationController = require "../../../../../app/js/Features/Authentication/AuthenticationController"
-{UnsupportedFileTypeError, UnsupportedProjectError} = require "../../../../../app/js/Features/Errors/Errors"
+{
+	UnsupportedFileTypeError,
+	UnsupportedBrandError,
+	UnsupportedPublisherExportsError
+} = require "../../../../../app/js/Features/Errors/Errors"
 
 module.exports = ProjectImportController =
 	importProject: (req, res) ->
@@ -14,8 +18,8 @@ module.exports = ProjectImportController =
 			if error?
 				if error instanceof UnsupportedFileTypeError
 					return unsupportedError("Sorry! Projects with linked or external files aren't supported yet.")
-				else if error instanceof UnsupportedProjectError and error.message.includes('brand variation')
+				else if error instanceof UnsupportedBrandError
 					return unsupportedError("Sorry! Projects with associated journals aren't supported yet.")
-				else if error instanceof UnsupportedProjectError and error.message.includes('exports')
+				else if error instanceof UnsupportedPublisherExportsError
 					return unsupportedError("Sorry! Projects with an ongoing export aren't supported yet.")
 			res.json({ redir: "/project/#{sl_project_id}" })
