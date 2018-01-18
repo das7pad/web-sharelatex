@@ -14,6 +14,8 @@ module.exports = ProjectImportController =
 			if error?
 				if error instanceof UnsupportedFileTypeError
 					return unsupportedError("Sorry! Projects with linked or external files aren't supported yet.")
-				else if error instanceof UnsupportedProjectError
+				else if error instanceof UnsupportedProjectError and error.message.includes('brand variation')
 					return unsupportedError("Sorry! Projects with associated journals aren't supported yet.")
+				else if error instanceof UnsupportedProjectError and error.message.includes('exports')
+					return unsupportedError("Sorry! Projects with an ongoing export aren't supported yet.")
 			res.json({ redir: "/project/#{sl_project_id}" })
