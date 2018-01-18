@@ -203,6 +203,15 @@ module.exports = ProjectImporter =
 		oAuthRequest user_id, {
 			url: "#{settings.overleaf.host}/api/v1/sharelatex/docs/#{v1_project_id}/export/cancel"
 			method: "POST"
-		}, (error) ->
-			return callback(error) if error?
+		}, (cancelError) ->
+			# If the export was cancelled by V1 (timeout) then we'll receive a
+			# conflict response. If there was an internal error on the V1 side then
+			# we'll consider it the responsibility of V1 to make the V1 project
+			# accessible again.
+			# In both cases we want to remove the V2 project so don't short-circuit
+			#
+			# if there's an error cancelling the V1 export.
+			if cancelError?
+				logger.err {err: cancelError, v1_project_id, v2_project_id}, "failed to cancel export"
+
 			ProjectDeleter.deleteProject v2_project_id, callback
