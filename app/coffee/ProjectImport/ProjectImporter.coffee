@@ -65,6 +65,8 @@ module.exports = ProjectImporter =
 			return callback(new Error("expected doc title, id, latest_ver_id, latex_engine, token and read_token"))
 		if doc.brand_variation_id?
 			return callback(new UnsupportedProjectError("project has brand variation: #{doc.brand_variation_id}"))
+		if doc.has_exports? and doc.has_exports
+			return callback(new UnsupportedProjectError("project has exports"))
 		if doc.title == ""
 			doc.title = "Untitled"
 		ProjectCreationHandler.createBlankProject user_id, doc.title, doc.id, (error, project) ->
