@@ -25,10 +25,16 @@ module.exports =
 		dumpPath = "#{settings.path.dumpFolder}/#{uuid.v4()}"
 		writeStream = fs.createWriteStream(dumpPath)
 		zipUrl = req.session.templateData.zipUrl
-		if zipUrl.slice(0,12).indexOf("templates") == -1
-			zipUrl = "#{settings.siteUrl}#{zipUrl}"
-		else
-			zipUrl = "#{settings.apis.templates.url}#{zipUrl}"
+
+		prodV1S3 = ///https:\/\/writelatex\.s3\.amazonaws\.com\/published_ver\/\d*\?X-Amz-Expires///
+		devV1S3 = ///https:\/\/writelatex-dev\.s3\.amazonaws\.com\/published_ver\/\d*\?X-Amz-Expires///
+
+		unless zipUrl.match(prodV1S3)? || zipUrl.match(devV1S3)?
+			if zipUrl.slice(0,12).indexOf("templates") == -1
+				zipUrl = "#{settings.siteUrl}#{zipUrl}"
+			else
+				zipUrl = "#{settings.apis.templates.url}#{zipUrl}"
+
 		zipReq = request(zipUrl)
 		zipReq.on "error", (error) ->
 			logger.error err: error, "error getting zip from template API"
