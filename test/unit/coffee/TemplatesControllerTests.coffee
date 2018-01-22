@@ -93,6 +93,23 @@ describe 'TemplatesController', ->
 			res = redirect:redirect
 			@controller.createProjectFromZipTemplate @req, res
 
+	describe 'reciving a request to create project from v1', ->
+		it "should accept urls from dev bucket", (done)->
+			@req.session.templateData.zipUrl = @zipUrl = "https://writelatex-dev.s3.amazonaws.com/published_ver/17?X-Amz-Expires=14400&X-Amz-Date=20180121T194330Z&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIO4ZDW5EBBQTHJKQ/20180121/us-east-1/s3/aws4_request&X-Amz-SignedHeaders=host&X-Amz-Signature=f65d6e9a8dbf842e06f9d1e3fc1ca5496411724233dbd121a064821439f4a11d"
+			redirect = =>
+				@request.calledWith("#{@zipUrl}").should.equal true
+				done()
+			res = redirect:redirect
+			@controller.createProjectFromZipTemplate @req, res
+
+		it "should accept urls from production bucket", (done)->
+			@req.session.templateData.zipUrl = @zipUrl = "https://writelatex.s3.amazonaws.com/published_ver/17?X-Amz-Expires=14400&X-Amz-Date=20180121T194330Z&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIO4ZDW5EBBQTHJKQ/20180121/us-east-1/s3/aws4_request&X-Amz-SignedHeaders=host&X-Amz-Signature=f65d6e9a8dbf842e06f9d1e3fc1ca5496411724233dbd121a064821439f4a11d"
+			redirect = =>
+				@request.calledWith("#{@zipUrl}").should.equal true
+				done()
+			res = redirect:redirect
+			@controller.createProjectFromZipTemplate @req, res
+
 	describe 'publishProject', ->
 		beforeEach ->
 			@user_id = "user-id-123"
