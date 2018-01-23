@@ -31,35 +31,52 @@ describe "ProjectImporter", ->
 
 	describe "importProject", ->
 		beforeEach ->
-			@ProjectImporter._getOverleafDoc = sinon.stub().yields(null, @doc = { files: ["mock-files"] })
+			@ProjectImporter._startExport = sinon.stub().yields(null, @doc = { files: ["mock-files"] })
 			@ProjectImporter._initSharelatexProject = sinon.stub().yields(null, @project = { _id: "mock-project-id" })
 			@ProjectImporter._importFiles = sinon.stub().yields()
-			@ProjectImporter._flagOverleafDocAsImported = sinon.stub().yields()
-			@ProjectImporter.importProject(@ol_doc_id = "mock-ol-doc-id", @user_id = "mock-user-id", @callback)
-	
-		it "should get the doc from OL", ->
-			@ProjectImporter._getOverleafDoc
-				.calledWith(@ol_doc_id, @user_id)
-				.should.equal true
-		
-		it "should create the SL project", ->
-			@ProjectImporter._initSharelatexProject
-				.calledWith(@user_id, @doc)
-				.should.equal true
-		
-		it "should import the files", ->
-			@ProjectImporter._importFiles
-				.calledWith(@project._id, @user_id, @doc.files)
-				.should.equal true
+			@ProjectImporter._confirmExport = sinon.stub().yields()
+			@ProjectImporter._cancelExport = sinon.stub().yields()
 
-		it "should tell overleaf the project is now in the beta", ->
-			@ProjectImporter._flagOverleafDocAsImported
-				.calledWith(@ol_doc_id, @project._id, @user_id)
-				.should.equal true
+		describe "successfully", ->
+			beforeEach ->
+				@ProjectImporter.importProject(@v1_project_id = "mock-ol-doc-id", @user_id = "mock-user-id", @callback)
 
-		it "should return the new project id", ->
-			@callback.calledWith(null, @project._id).should.equal true
-	
+			it "should get the doc from OL", ->
+				@ProjectImporter._startExport
+					.calledWith(@v1_project_id, @user_id)
+					.should.equal true
+
+			it "should create the SL project", ->
+				@ProjectImporter._initSharelatexProject
+					.calledWith(@user_id, @doc)
+					.should.equal true
+
+			it "should import the files", ->
+				@ProjectImporter._importFiles
+					.calledWith(@project._id, @user_id, @doc.files)
+					.should.equal true
+
+			it "should tell overleaf the project is now in the beta", ->
+				@ProjectImporter._confirmExport
+					.calledWith(@v1_project_id, @project._id, @user_id)
+					.should.equal true
+
+			it "should return the new project id", ->
+				@callback.calledWith(null, @project._id).should.equal true
+
+		describe 'unsuccessfully', ->
+			beforeEach ->
+				# Mock import file error
+				@error = new UnsupportedFileTypeError("unknown file type: ext")
+				@ProjectImporter._importFiles = sinon.stub().yields(@error)
+				@ProjectImporter.importProject(@v1_project_id = "mock-ol-doc-id", @user_id = "mock-user-id", @callback)
+
+			it 'should cancel the import', ->
+				@ProjectImporter._cancelExport.calledWith(@project_id)
+
+			it 'should callback with the error', ->
+				@callback.calledWith(@error)
+
 	describe "_initSharelatexProject", ->
 		beforeEach ->
 			@project = {
@@ -80,16 +97,16 @@ describe "ProjectImporter", ->
 				general_access: "read_write"
 			}
 			@ProjectCreationHandler.createBlankProject = sinon.stub().yields(null, @project)
-		
+
 		describe "successfully", ->
 			beforeEach ->
 				@ProjectImporter._initSharelatexProject @user_id, @doc, @callback
-			
+
 			it "should create the project", ->
 				@ProjectCreationHandler.createBlankProject
 					.calledWith(@user_id, @doc.title, @doc.id)
 					.should.equal true
-			
+
 			it "should set overleaf metadata on the project", ->
 				@project.overleaf.id.should.equal @doc.id
 				@project.overleaf.imported_at_ver_id.should.equal @doc.latest_ver_id
@@ -102,13 +119,13 @@ describe "ProjectImporter", ->
 
 			it 'should set the project to tokenBased', ->
 				@project.publicAccesLevel.should.equal 'tokenBased'
-			
+
 			it "should save the project", ->
 				@project.save.called.should.equal true
-			
+
 			it "should return the project", ->
 				@callback.calledWith(null, @project).should.equal true
-		
+
 		describe "null checks", ->
 			it "should require doc.title", (done) ->
 				delete @doc.title
@@ -159,32 +176,32 @@ describe "ProjectImporter", ->
 				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
 					error.message.should.equal("project has export records")
 					done()
-		
+
 		describe "with blank title", ->
 			beforeEach ->
 				@doc.title = ""
 				@ProjectImporter._initSharelatexProject @user_id, @doc, @callback
-			
+
 			it "should set the title to 'Untitled'", ->
 				@ProjectCreationHandler.createBlankProject
 					.calledWith(@user_id, 'Untitled', @doc.id)
 					.should.equal true
-			
-			
-	describe "_getOverleafDoc", ->
+
+
+	describe "_startExport", ->
 		beforeEach ->
 			@oAuthRequest.yields(null, @doc = { "mock": "doc" })
-			@ProjectImporter._getOverleafDoc @ol_doc_id, @user_id, @callback
-		
+			@ProjectImporter._startExport @v1_project_id, @user_id, @callback
+
 		it "should make an oauth request for the doc", ->
 			@oAuthRequest
 				.calledWith(@user_id, {
-					url: "http://overleaf.example.com/api/v1/sharelatex/docs/#{@ol_doc_id}"
-					method: "GET"
+					url: "http://overleaf.example.com/api/v1/sharelatex/docs/#{@v1_project_id}/export/start"
+					method: "POST"
 					json: true
 				})
 				.should.equal true
-		
+
 		it "should return the doc", ->
 			@callback.calledWith(null, @doc).should.equal true
 
@@ -216,17 +233,17 @@ describe "ProjectImporter", ->
 			beforeEach (done) ->
 				@invite.access_level = "read_only"
 				@ProjectImporter._importAcceptedInvite @project_id, @invite, done
-			
+
 			it "should look up the inviter in SL", ->
 				@UserMapper.getSlIdFromOlUser
 					.calledWith(@ol_inviter)
 					.should.equal true
-			
+
 			it "should look up the invitee in SL", ->
 				@UserMapper.getSlIdFromOlUser
 					.calledWith(@ol_invitee)
 					.should.equal true
-			
+
 			it "should add the SL invitee to project, with readOnly privilege level", ->
 				@CollaboratorsHandler.addUserIdToProject
 					.calledWith(@project_id, @sl_inviter_id, @sl_invitee_id, PrivilegeLevels.READ_ONLY)
@@ -241,7 +258,7 @@ describe "ProjectImporter", ->
 				@CollaboratorsHandler.addUserIdToProject
 					.calledWith(@project_id, @sl_inviter_id, @sl_invitee_id, PrivilegeLevels.READ_AND_WRITE)
 					.should.equal true
-		
+
 		describe "null checks", ->
 			it "should require invite.inviter", (done) ->
 				delete @invite.inviter
@@ -283,18 +300,18 @@ describe "ProjectImporter", ->
 			beforeEach (done) ->
 				@invite.access_level = "read_only"
 				@ProjectImporter._importPendingInvite @project_id, @invite, done
-			
+
 			it "should look up the inviter in SL", ->
 				@UserMapper.getSlIdFromOlUser
 					.calledWith(@ol_inviter)
 					.should.equal true
-			
+
 			it "should create a ProjectInvite, with readOnly privilege level", ->
 				@ProjectInvite.create
 					.calledWith({
 						projectId: @project_id,
 						token: @invite.code,
-						sendingUserId: @sl_inviter_id, 
+						sendingUserId: @sl_inviter_id,
 						privileges: PrivilegeLevels.READ_ONLY,
 						email: @invite.email
 					})
@@ -304,18 +321,18 @@ describe "ProjectImporter", ->
 			beforeEach (done) ->
 				@invite.access_level = "read_write"
 				@ProjectImporter._importPendingInvite @project_id, @invite, done
-		
+
 			it "should create a ProjectInvite, with readAndWrite privilege level", ->
 				@ProjectInvite.create
 					.calledWith({
 						projectId: @project_id,
 						token: @invite.code,
-						sendingUserId: @sl_inviter_id, 
+						sendingUserId: @sl_inviter_id,
 						privileges: PrivilegeLevels.READ_AND_WRITE,
 						email: @invite.email
 					})
 					.should.equal true
-		
+
 		describe "null checks", ->
 			it "should require invite.inviter", (done) ->
 				delete @invite.inviter
@@ -350,7 +367,7 @@ describe "ProjectImporter", ->
 			@ProjectEntityHandler.addDocWithoutUpdatingHistory = sinon.stub().yields(null, @doc)
 			@ProjectEntityHandler.addFileWithoutUpdatingHistory = sinon.stub().yields()
 			@ProjectEntityHandler.setRootDoc = sinon.stub().yields()
-			
+
 		describe "with a src file", ->
 			beforeEach (done) ->
 				@file = {
@@ -359,19 +376,19 @@ describe "ProjectImporter", ->
 					type: "src"
 				}
 				@ProjectImporter._importFile @project_id, @user_id, @file, done
-			
+
 			it "should create the file's folder", ->
 				@ProjectEntityHandler.mkdirp
 					.calledWith(@project_id, "/folder")
 					.should.equal true
-			
+
 			it "should add the doc to the project", ->
 				@ProjectEntityHandler.addDocWithoutUpdatingHistory
 					.calledWith(
 						@project_id, @folder_id, "chapter1.tex", ["chapter 1 content"], @user_id
 					)
 					.should.equal true
-			
+
 			it "should not make the doc the root doc", ->
 				@ProjectEntityHandler.setRootDoc
 					.called.should.equal false
@@ -385,17 +402,17 @@ describe "ProjectImporter", ->
 					main: true
 				}
 				@ProjectImporter._importFile @project_id, @user_id, @file, done
-			
+
 			it "should create the file's folder", ->
 				@ProjectEntityHandler.mkdirp
 					.calledWith(@project_id, "/")
 					.should.equal true
-			
+
 			it "should make the doc the root doc", ->
 				@ProjectEntityHandler.setRootDoc
 					.calledWith(@project_id, @doc_id)
 					.should.equal true
-			
+
 		describe "with an att file", ->
 			beforeEach (done) ->
 				@file = {
@@ -405,17 +422,17 @@ describe "ProjectImporter", ->
 				}
 				@ProjectImporter._writeUrlToDisk = sinon.stub().yields(null, "path/on/disk")
 				@ProjectImporter._importFile @project_id, @user_id, @file, done
-			
+
 			it "should create the file's folder", ->
 				@ProjectEntityHandler.mkdirp
 					.calledWith(@project_id, "/images")
 					.should.equal true
-			
+
 			it "should download the url to disk", ->
 				@ProjectImporter._writeUrlToDisk
 					.calledWith("http://s3.example.com/s3/image.jpeg")
 					.should.equal true
-			
+
 			it "should add the file to the project", ->
 				@ProjectEntityHandler.addFileWithoutUpdatingHistory
 					.calledWith(
@@ -449,67 +466,72 @@ describe "ProjectImporter", ->
 					latest_content: "chapter 1 content"
 					type: "src"
 				}
-				
+
 			it "should require file.file", (done) ->
 				delete @src_file.file
 				@ProjectImporter._importFile @project_id, @user_id, @src_file, (error) ->
 					error.message.should.equal("expected file.file and type")
 					done()
-				
+
 			it "should require file.type", (done) ->
 				delete @src_file.type
 				@ProjectImporter._importFile @project_id, @user_id, @src_file, (error) ->
 					error.message.should.equal("expected file.file and type")
 					done()
-				
+
 			it "should require file.latest_content", (done) ->
 				delete @src_file.latest_content
 				@ProjectImporter._importFile @project_id, @user_id, @src_file, (error) ->
 					error.message.should.equal("expected file.latest_content")
 					done()
-				
+
 			it "should require file.file_path", (done) ->
 				delete @att_file.file_path
 				@ProjectImporter._importFile @project_id, @user_id, @att_file, (error) ->
 					error.message.should.equal("expected file.file_path")
 					done()
-			
-	describe "_flagOverleafDocAsImported", ->
+
+	describe "_confirmExport", ->
 		beforeEach ->
 			@oAuthRequest.yields()
-			@ol_doc_id = "mock-ol-doc-id"
-			@sl_project_id = "mock-project-id"
+			@v1_project_id = "mock-ol-doc-id"
+			@v2_project_id = "mock-project-id"
 			@user_id = "mock-user-id"
-			@ProjectImporter._flagOverleafDocAsImported @ol_doc_id, @sl_project_id, @user_id, @callback
-		
+			@ProjectImporter._confirmExport @v1_project_id, @v2_project_id, @user_id, @callback
+
 		it "should make an oauth request for the doc", ->
 			@oAuthRequest
 				.calledWith(@user_id, {
-					url: "http://overleaf.example.com/api/v1/sharelatex/docs/#{@ol_doc_id}"
-					method: "PUT"
+					url: "http://overleaf.example.com/api/v1/sharelatex/docs/#{@v1_project_id}/export/confirm"
+					method: "POST"
 					json: {
-						doc: {
-							beta_project_id: @sl_project_id
-						}
+						doc: { @v2_project_id }
 					}
 				})
 				.should.equal true
-		
+
 		it "should return the callback", ->
 			@callback.called.should.equal true
 
-	describe 'error handling', ->
+	describe "_cancelExport", ->
 		beforeEach ->
-			@ProjectImporter._getOverleafDoc = sinon.stub().yields(null, @doc = { files: ["mock-files"] })
-			@ProjectImporter._initSharelatexProject = sinon.stub().yields(null, @project = { _id: "mock-project-id" })
+			@oAuthRequest.yields()
+			@v1_project_id = "mock-ol-doc-id"
+			@v2_project_id = "mock-project-id"
+			@user_id = "mock-user-id"
 			@ProjectDeleter.deleteProject = sinon.stub().yields()
-			# Mock import file error
-			@error = new UnsupportedFileTypeError("unknown file type: ext")
-			@ProjectImporter._importFiles = sinon.stub().yields(@error)
-			@ProjectImporter.importProject(@ol_doc_id = "mock-ol-doc-id", @user_id = "mock-user-id", @callback)
+			@ProjectImporter._cancelExport @v1_project_id, @v2_project_id, @user_id, @callback
+
+		it "should make an oauth request for the doc", ->
+			@oAuthRequest
+				.calledWith(@user_id, {
+					url: "http://overleaf.example.com/api/v1/sharelatex/docs/#{@v1_project_id}/export/cancel"
+					method: "POST"
+				})
+				.should.equal true
 
 		it 'should delete the newly created project', ->
-			@ProjectDeleter.deleteProject.calledWith(@project_id)
+			@ProjectDeleter.deleteProject.calledWith(@v2_project_id)
 
-		it 'should callback with the error', ->
-			@callback.calledWith(@error)
+		it "should return the callback", ->
+			@callback.called.should.equal true

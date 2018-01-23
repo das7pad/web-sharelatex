@@ -30,9 +30,9 @@ ENGINE_TO_COMPILER_MAP = {
 }
 
 module.exports = ProjectImporter =
-	importProject: (ol_doc_id, user_id, callback = (error, project_id) ->) ->
-		logger.log {ol_doc_id, user_id}, "importing project from overleaf"
-		ProjectImporter._getOverleafDoc ol_doc_id, user_id, (error, doc) ->
+	importProject: (v1_project_id, user_id, callback = (error, project_id) ->) ->
+		logger.log {v1_project_id, user_id}, "importing project from overleaf"
+		ProjectImporter._startExport v1_project_id, user_id, (error, doc) ->
 			return callback(error) if error?
 			ProjectImporter._initSharelatexProject user_id, doc, (error, project) ->
 				return callback(error) if error?
@@ -43,25 +43,23 @@ module.exports = ProjectImporter =
 					(cb) ->
 						ProjectImporter._importFiles project_id, user_id, doc.files, cb
 					(cb) ->
-						ProjectImporter._flagOverleafDocAsImported ol_doc_id, project_id, user_id, cb
+						ProjectImporter._confirmExport v1_project_id, project_id, user_id, cb
 				], (importError) ->
 					if importError?
-						logger.log {importError}, "error importing project"
-						ProjectDeleter.deleteProject project_id, (cleanUpError) ->
+						ProjectImporter._cancelExport v1_project_id, project_id, user_id, (cleanUpError) ->
 							logger.err {err: cleanUpError, project_id: project_id}, "failed to clean up project" if cleanUpError?
 							callback importError
 					else
-						logger.log {project_id, ol_doc_id, user_id}, "finished project import"
 						callback null, project_id
 
-	_getOverleafDoc: (ol_doc_id, user_id, callback = (error, doc) ->) ->
+	_startExport: (v1_project_id, user_id, callback = (error, doc) ->) ->
 		oAuthRequest user_id, {
-			url: "#{settings.overleaf.host}/api/v1/sharelatex/docs/#{ol_doc_id}"
-			method: "GET"
+			url: "#{settings.overleaf.host}/api/v1/sharelatex/docs/#{v1_project_id}/export/start"
+			method: "POST"
 			json: true
 		}, (error, doc) ->
 			return callback(error) if error?
-			logger.log {ol_doc_id, user_id, doc}, "got doc for project from overleaf"
+			logger.log {v1_project_id, user_id, doc}, "got doc for project from overleaf"
 			return callback(null, doc)
 
 	_initSharelatexProject: (user_id, doc = {}, callback = (err, project) ->) ->
@@ -193,11 +191,27 @@ module.exports = ProjectImporter =
 
 			readStream.pipe(writeStream)
 
-	_flagOverleafDocAsImported: (ol_doc_id, sl_project_id, user_id, callback = (error) ->) ->
+	_confirmExport: (v1_project_id, v2_project_id, user_id, callback = (error) ->) ->
 		oAuthRequest user_id, {
-			url: "#{settings.overleaf.host}/api/v1/sharelatex/docs/#{ol_doc_id}"
-			method: "PUT"
+			url: "#{settings.overleaf.host}/api/v1/sharelatex/docs/#{v1_project_id}/export/confirm"
+			method: "POST"
 			json:
-				doc:
-					beta_project_id: sl_project_id
+				doc: { v2_project_id }
 		}, callback
+
+	_cancelExport: (v1_project_id, v2_project_id, user_id, callback = (error) ->) ->
+		oAuthRequest user_id, {
+			url: "#{settings.overleaf.host}/api/v1/sharelatex/docs/#{v1_project_id}/export/cancel"
+			method: "POST"
+		}, (cancelError) ->
+			# If the export was cancelled by V1 (timeout) then we'll receive a
+			# conflict response. If there was an internal error on the V1 side then
+			# we'll consider it the responsibility of V1 to make the V1 project
+			# accessible again.
+			# In both cases we want to remove the V2 project so don't short-circuit
+			#
+			# if there's an error cancelling the V1 export.
+			if cancelError?
+				logger.err {err: cancelError, v1_project_id, v2_project_id}, "failed to cancel export"
+
+			ProjectDeleter.deleteProject v2_project_id, callback
