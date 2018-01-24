@@ -22,8 +22,6 @@ module.exports =
 		if !req.session.templateData?
 			return res.redirect "/project"
 
-		dumpPath = "#{settings.path.dumpFolder}/#{uuid.v4()}"
-		writeStream = fs.createWriteStream(dumpPath)
 		zipUrl = req.session.templateData.zipUrl
 
 		if zipUrl.slice(0,12).indexOf("templates") == -1
@@ -31,19 +29,12 @@ module.exports =
 		else
 			zipUrl = "#{settings.apis.templates.url}#{zipUrl}"
 
-		zipReq = request(zipUrl)
-		zipReq.on "error", (error) ->
-			logger.error err: error, "error getting zip from template API"
-		zipReq.pipe(writeStream)
-		writeStream.on 'close', ->
-			ProjectUploadManager.createProjectFromZipArchive currentUserId, req.session.templateData.templateName, dumpPath, (err, project)->
-				if err?
-					logger.err err:err, zipUrl:zipUrl, "problem building project from zip"
-					return res.sendStatus 500
-				setCompiler project._id, req.session.templateData.compiler, ->
-					fs.unlink dumpPath, ->
-					delete req.session.templateData
-					res.redirect "/project/#{project._id}"
+		createFromZip(zipUrl, {
+        templateName: req.session.templateData.templateName,
+				currentUserId:currentUserId,
+				compiler: req.session.templateData.compiler
+			}
+		)
 
 	publishProject: (req, res, next) ->
 		project_id = req.params.Project_id
@@ -97,12 +88,37 @@ module.exports =
 		res.render path.resolve(__dirname, "../views/clone"), data
 
 	createProjectFromV1Template: (req, res)->
-		template_id = req.body.templateId
-		template_name = req.body.templateName
-		res.sendStatus 501
+		currentUserId = AuthenticationController.getLoggedInUserId(req)
+		zipUrl =	"#{settings.overleaf.host}/gallery/zip/#{req.body.templateId}"
+		createFromZip(zipUrl,
+      {
+        templateName: req.body.templateName,
+        currentUserId: currentUserId
+      },
+      req,
+      res
+    )
 
 setCompiler = (project_id, compiler, callback)->
 	if compiler?
 		ProjectOptionsHandler.setCompiler project_id, compiler, callback
 	else
 		callback()
+
+createFromZip = (zipUrl, options, req, res)->
+	dumpPath = "#{settings.path.dumpFolder}/#{uuid.v4()}"
+	writeStream = fs.createWriteStream(dumpPath)
+
+	zipReq = request(zipUrl)
+	zipReq.on "error", (error) ->
+    logger.error err: error, "error getting zip from template API"
+		zipReq.pipe(writeStream)
+		writeStream.on 'close', ->
+			ProjectUploadManager.createProjectFromZipArchive options.currentUserId, options.templateName, dumpPath, (err, project)->
+				if err?
+					logger.err err:err, zipUrl:zipUrl, "problem building project from zip"
+					return res.sendStatus 500
+				setCompiler project._id, options.compiler, ->
+					fs.unlink dumpPath, ->
+					delete req.session.templateData
+					res.redirect "/project/#{project._id}"
