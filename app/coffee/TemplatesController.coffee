@@ -93,6 +93,17 @@ module.exports =
 				details.description = results.description
 				res.json details
 
+	getV1Template: (req, res)->
+		data = {}
+		data.id = req.params.Template_id
+		data.name = req.session.templateData.templateName
+		res.render path.resolve(__dirname, "../views/clone"), data
+
+	createProjectFromV1Template: (req, res)->
+		template_id = req.body.templateId
+		template_name = req.body.templateName
+		res.sendStatus 501
+
 setCompiler = (project_id, compiler, callback)->
 	if compiler?
 		ProjectOptionsHandler.setCompiler project_id, compiler, callback

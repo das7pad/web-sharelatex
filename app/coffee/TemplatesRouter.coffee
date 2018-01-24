@@ -27,5 +27,9 @@ module.exports =
 		# Make sure the /project/new/template route comes before the /project/:project_id/template route
 		# This is a get request so that it can be linked to.
 		app.get '/project/new/template', TemplatesMiddlewear.saveTemplateDataInSession, AuthenticationController.requireLogin(), TemplatesController.createProjectFromZipTemplate
-		
+
 		app.get  "/project/:Project_id/template", AuthorizationMiddlewear.ensureUserCanReadProject, TemplatesController.getTemplateDetails
+
+		app.get '/project/new/template/:Template_id', TemplatesMiddlewear.saveTemplateDataInSession, AuthenticationController.requireLogin(), TemplatesController.getV1Template
+
+		app.post '/project/new/template', TemplatesMiddlewear.saveTemplateDataInSession, AuthenticationController.requireLogin(), TemplatesController.createProjectFromV1Template
