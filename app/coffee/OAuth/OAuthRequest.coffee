@@ -3,10 +3,17 @@ request = require 'request'
 logger = require "logger-sharelatex"
 {User} = require "../../../../../app/js/models/User"
 
+NoOverleafTokenError = (message) ->
+	error = new Error(message)
+	error.name = "NoOverleafTokenError"
+	error.__proto__ = NoOverleafTokenError.prototype
+	return error
+NoOverleafTokenError.prototype.__proto___ = Error.prototype
+
 OAuthRequest =
 	_doRequest: (user, opts, callback = (error, body) ->) ->
 		if !user?.overleaf?.accessToken?
-			return callback(new Error("user does not have access token for overleaf"))
+			return callback(new NoOverleafTokenError("user does not have access token for overleaf"))
 		optsWithAuth = {}
 		optsWithAuth[k] = v for k,v of opts
 		optsWithAuth.headers ?= {}
@@ -44,4 +51,5 @@ OAuthRequest =
 				else
 					return callback null, body
 
+OAuthRequest.request.NoOverleafTokenError = NoOverleafTokenError
 module.exports = OAuthRequest.request

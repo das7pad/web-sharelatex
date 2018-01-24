@@ -2,6 +2,7 @@ OverleafAuthenticationController = require "./Authentication/OverleafAuthenticat
 ProjectImportController = require "./ProjectImport/ProjectImportController"
 AuthenticationController = require "../../../../app/js/Features/Authentication/AuthenticationController"
 AccountSyncController = require "./AccountSync/AccountSyncController"
+SharelatexAuthController = require "./SharelatexAuth/SharelatexAuthController"
 RateLimiterMiddlewear = require('../../../../app/js/Features/Security/RateLimiterMiddlewear')
 passport = require "passport"
 logger = require "logger-sharelatex"
@@ -10,11 +11,6 @@ module.exports =
 	apply: (webRouter, privateApiRouter, publicApiRouter) ->
 		removeRoute(webRouter, 'get', '/login')
 		webRouter.get '/login', (req, res) -> res.redirect '/overleaf/login'
-
-		# TODO: This get overridden by the public-registration module which
-		# loads after this, but we need a way to restrict
-		# registration on the beta site.
-		# removeRoute(webRouter, 'get', '/register')
 
 		webRouter.get '/overleaf/login', passport.authenticate("overleaf")
 		
@@ -34,6 +30,11 @@ module.exports =
 			'/overleaf/project/:ol_doc_id/import',
 			AuthenticationController.requireLogin(),
 			ProjectImportController.importProject
+		)
+
+		webRouter.get(
+			'/overleaf/auth_from_sl',
+			SharelatexAuthController.authFromSharelatex
 		)
 
 		publicApiRouter.post(
