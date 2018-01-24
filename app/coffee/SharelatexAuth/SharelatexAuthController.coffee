@@ -31,5 +31,5 @@ module.exports = SharelatexAuthController =
 					res.redirect "/"
 
 	_badToken: (res, error) ->
-		logger.err err: error, "bad token in confirming account"
+		logger.err err: error, "bad token in logging in from sharelatex"
 		res.status(400).send("invalid token")
