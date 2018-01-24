@@ -26,13 +26,10 @@ module.exports =
 		writeStream = fs.createWriteStream(dumpPath)
 		zipUrl = req.session.templateData.zipUrl
 
-		V1S3 = ///https:\/\/writelatex(?:-dev)?\.s3\.amazonaws\.com\/published_ver\/\d*\?X-Amz-Expires///
-
-		unless zipUrl.match(V1S3)?
-			if zipUrl.slice(0,12).indexOf("templates") == -1
-				zipUrl = "#{settings.siteUrl}#{zipUrl}"
-			else
-				zipUrl = "#{settings.apis.templates.url}#{zipUrl}"
+		if zipUrl.slice(0,12).indexOf("templates") == -1
+			zipUrl = "#{settings.siteUrl}#{zipUrl}"
+		else
+			zipUrl = "#{settings.apis.templates.url}#{zipUrl}"
 
 		zipReq = request(zipUrl)
 		zipReq.on "error", (error) ->
