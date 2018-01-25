@@ -6,6 +6,8 @@ logger = require 'logger-sharelatex'
 module.exports = V1ApiController =
 
 	metricsSegmentation: (req, res, next) ->
+		if !settings.overleaf?
+			return res.json({})
 		userId = req.params.user_id
 		if !userId?
 			return next(new Error('[V1Segmentation] user_id required'))
@@ -19,8 +21,8 @@ module.exports = V1ApiController =
 				url: settings.overleaf.host +
 					"/api/v1/sharelatex/users/#{v1_userId}/metrics_segmentation",
 				auth:
-					user: settings.overleaf.v1Auth.user
-					pass: settings.overleaf.v1Auth.pass
+					user: settings.overleaf.v1BasicAuth.user
+					pass: settings.overleaf.v1BasiciAuth.pass
 				json: true,
 				timeout: 5 * 1000
 			}, (err, response, body) ->
