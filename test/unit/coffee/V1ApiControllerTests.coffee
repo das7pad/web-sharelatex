@@ -2,13 +2,13 @@ should = require('chai').should()
 SandboxedModule = require('sandboxed-module')
 assert = require('assert')
 Path = require('path')
-modulePath = Path.join __dirname, '../../../app/js/V1ApiController'
+modulePath = Path.join __dirname, '../../../app/js/MetricsController'
 sinon = require("sinon")
 expect = require("chai").expect
 
-describe "V1ApiController", ->
+describe "MetricsController", ->
 	beforeEach ->
-		@V1ApiController = SandboxedModule.require modulePath, requires:
+		@MetricsController = SandboxedModule.require modulePath, requires:
 			'settings-sharelatex': @Settings =
 				overleaf:
 					host: 'some.host'
@@ -37,7 +37,7 @@ describe "V1ApiController", ->
 				json: sinon.stub()
 			@next = sinon.stub()
 			@call = () =>
-				@V1ApiController.metricsSegmentation(@req, @res, @next)
+				@MetricsController.metricsSegmentation(@req, @res, @next)
 
 		it 'should use the request', (done) ->
 			@call()

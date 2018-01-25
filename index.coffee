@@ -1,4 +1,4 @@
-V1ApiRouter = require './app/js/V1ApiRouter'
+MetricsRouter = require './app/js/MetricsRouter'
 
-module.exports = V1Api =
-	router: V1ApiRouter
+module.exports = Metrics =
+	router: MetricsRouter

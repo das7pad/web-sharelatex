@@ -3,7 +3,7 @@ request = require 'request'
 UserGetter = require '../../../../app/js/Features/User/UserGetter'
 logger = require 'logger-sharelatex'
 
-module.exports = V1ApiController =
+module.exports = MetricsController =
 
 	metricsSegmentation: (req, res, next) ->
 		userId = req.params.user_id

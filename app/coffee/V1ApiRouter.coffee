@@ -1,5 +1,5 @@
 logger = require 'logger-sharelatex'
-V1ApiController = require './V1ApiController'
+MetricsController = require './MetricsController'
 AuthenticationController = require("../../../../app/js/Features/Authentication/AuthenticationController")
 settings = require 'settings-sharelatex'
 
@@ -15,5 +15,5 @@ module.exports =
 		privateApiRouter.get(
 			'/user/:user_id/v1/metrics_segmentation',
 			AuthenticationController.httpAuth,
-			V1ApiController.metricsSegmentation
+			MetricsController.metricsSegmentation
 		)
