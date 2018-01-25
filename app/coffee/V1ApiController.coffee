@@ -20,7 +20,7 @@ module.exports = V1ApiController =
 					"/api/v1/sharelatex/users/#{v1_userId}/metrics_segmentation",
 				auth:
 					user: settings.overleaf.v1BasicAuth.user
-					pass: settings.overleaf.v1BasiciAuth.pass
+					pass: settings.overleaf.v1BasicAuth.pass
 				json: true,
 				timeout: 5 * 1000
 			}, (err, response, body) ->
