@@ -6,8 +6,6 @@ logger = require 'logger-sharelatex'
 module.exports = V1ApiController =
 
 	metricsSegmentation: (req, res, next) ->
-		if !settings.overleaf?
-			return res.json({})
 		userId = req.params.user_id
 		if !userId?
 			return next(new Error('[V1Segmentation] user_id required'))
