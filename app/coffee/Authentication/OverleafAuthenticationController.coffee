@@ -9,6 +9,9 @@ jwt = require('jsonwebtoken')
 SubscriptionUpdater = require("../../../../../app/js/Features/Subscription/SubscriptionUpdater")
 
 module.exports = OverleafAuthenticationController =
+	welcomeScreen: (req, res, next) ->
+		res.render Path.resolve(__dirname, "../../views/welcome")
+
 	setupUser: (req, res, next) ->
 		# This will call OverleafAuthenticationManager.setupUser
 		passport.authenticate("overleaf", (err, user, info) ->

@@ -1,0 +1,33 @@
+extends ../../../../app/views/layout
+
+block content
+	.content.content-alt
+		.container
+			.row
+				.col-md-10.col-md-offset-1
+					.card
+						.page-header
+							h1 Welcome to Overleaf v2!
+						p
+							| Overleaf and ShareLaTeX have
+							|
+							a(href="https://www.overleaf.com/blog/518-exciting-news-sharelatex-is-joining-overleaf") joined forces
+							| . We’re currently beta-testing a new platform called Overleaf v2, which combines the best features from Overleaf and ShareLaTeX.
+						P
+							| You can log-in with either your Overleaf or ShareLaTeX account.
+							|
+							a(href="https://www.overleaf.com/help/342-overleaf-v2-faq") Read more.
+						p.text-center.row-spaced
+							a(href="/overleaf/login").btn.btn-lg.btn-success Log in with Overleaf
+							| &nbsp;
+							a(href=settings.accountMerge.sharelatexHost + "/user/login_to_ol_v2").btn.btn-lg.btn-danger Log in with ShareLaTeX
+						hr
+						.small.text-center
+							| Not looking for Overleaf v2? Go back to
+							|
+							a(href="https://www.overleaf.com") Overleaf
+							|
+							| or
+							|
+							a(href="https://www.sharelatex.com") ShareLaTeX
+							| .
