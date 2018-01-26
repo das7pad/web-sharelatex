@@ -171,6 +171,29 @@ p
 						ng-model="user.betaProgram"
 					)
 
+			tr
+				td
+					label(for="awareOfV2") Aware of v2?
+				td
+					input#betaProgram(
+						type="checkbox"
+						name="awareOfV2"
+						ng-model="user.awareOfV2"
+					)
+
+			tr
+				th(colspan=2).text-center Site Admin.
+
+			tr
+				td
+					label(for="isAdmin") Is Admin?
+				td
+					input#betaProgram(
+						type="checkbox"
+						name="isAdmin"
+						ng-model="user.isAdmin"
+					)
+
 		form-messages(for="adminUserForm")
 			.alert.alert-success(ng-show="adminUserForm.response.success && !adminUserForm.inflight")
 				| User was successfully updated
