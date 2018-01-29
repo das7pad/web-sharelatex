@@ -29,13 +29,16 @@ module.exports =
 		else
 			zipUrl = "#{settings.apis.templates.url}#{zipUrl}"
 
-			createFromZip(zipUrl,
-				{
-					templateName: req.session.templateData.templateName,
-					currentUserId:currentUserId,
-					compiler: req.session.templateData.compiler
-				}
-			)
+		createFromZip(
+			zipUrl,
+			{
+				templateName: req.session.templateData.templateName,
+				currentUserId:currentUserId,
+				compiler: req.session.templateData.compiler
+			},
+			req,
+			res
+		)
 
 	publishProject: (req, res, next) ->
 		project_id = req.params.Project_id
@@ -91,7 +94,8 @@ module.exports =
 	createProjectFromV1Template: (req, res)->
 		currentUserId = AuthenticationController.getLoggedInUserId(req)
 		zipUrl =	"#{settings.overleaf.host}/gallery/zip/#{req.body.templateId}"
-		createFromZip(zipUrl,
+		createFromZip(
+			zipUrl,
 			{
 				templateName: req.body.templateName,
 				currentUserId: currentUserId
@@ -99,6 +103,8 @@ module.exports =
 			req,
 			res
 		)
+
+	createFromZip: createFromZip
 
 setCompiler = (project_id, compiler, callback)->
 	if compiler?
