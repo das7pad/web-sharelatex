@@ -29,12 +29,13 @@ module.exports =
 		else
 			zipUrl = "#{settings.apis.templates.url}#{zipUrl}"
 
-		createFromZip(zipUrl, {
-        templateName: req.session.templateData.templateName,
-				currentUserId:currentUserId,
-				compiler: req.session.templateData.compiler
-			}
-		)
+			createFromZip(zipUrl,
+				{
+					templateName: req.session.templateData.templateName,
+					currentUserId:currentUserId,
+					compiler: req.session.templateData.compiler
+				}
+			)
 
 	publishProject: (req, res, next) ->
 		project_id = req.params.Project_id
@@ -85,19 +86,19 @@ module.exports =
 		data = {}
 		data.id = req.params.Template_id
 		data.name = req.session.templateData.templateName
-		res.render path.resolve(__dirname, "../views/clone"), data
+		res.render path.resolve(__dirname, "../views/new_from_template"), data
 
 	createProjectFromV1Template: (req, res)->
 		currentUserId = AuthenticationController.getLoggedInUserId(req)
 		zipUrl =	"#{settings.overleaf.host}/gallery/zip/#{req.body.templateId}"
 		createFromZip(zipUrl,
-      {
-        templateName: req.body.templateName,
-        currentUserId: currentUserId
-      },
-      req,
-      res
-    )
+			{
+				templateName: req.body.templateName,
+				currentUserId: currentUserId
+			},
+			req,
+			res
+		)
 
 setCompiler = (project_id, compiler, callback)->
 	if compiler?
@@ -111,14 +112,14 @@ createFromZip = (zipUrl, options, req, res)->
 
 	zipReq = request(zipUrl)
 	zipReq.on "error", (error) ->
-    logger.error err: error, "error getting zip from template API"
-		zipReq.pipe(writeStream)
-		writeStream.on 'close', ->
-			ProjectUploadManager.createProjectFromZipArchive options.currentUserId, options.templateName, dumpPath, (err, project)->
-				if err?
-					logger.err err:err, zipUrl:zipUrl, "problem building project from zip"
-					return res.sendStatus 500
-				setCompiler project._id, options.compiler, ->
-					fs.unlink dumpPath, ->
-					delete req.session.templateData
-					res.redirect "/project/#{project._id}"
+		logger.error err: error, "error getting zip from template API"
+	zipReq.pipe(writeStream)
+	writeStream.on 'close', ->
+		ProjectUploadManager.createProjectFromZipArchive options.currentUserId, options.templateName, dumpPath, (err, project)->
+			if err?
+				logger.err err:err, zipUrl:zipUrl, "problem building project from zip"
+				return res.sendStatus 500
+			setCompiler project._id, options.compiler, ->
+				fs.unlink dumpPath, ->
+				delete req.session.templateData
+				res.redirect "/project/#{project._id}"
