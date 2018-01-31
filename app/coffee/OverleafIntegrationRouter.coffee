@@ -10,7 +10,7 @@ logger = require "logger-sharelatex"
 module.exports = 
 	apply: (webRouter, privateApiRouter, publicApiRouter) ->
 		removeRoute(webRouter, 'get', '/login')
-		webRouter.get '/login', (req, res) -> res.redirect '/overleaf/login'
+		webRouter.get '/login', OverleafAuthenticationController.welcomeScreen
 
 		webRouter.get '/overleaf/login', passport.authenticate("overleaf")
 		
