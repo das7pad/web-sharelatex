@@ -16,9 +16,12 @@ module.exports = ProjectListGetter =
 				exclude_v2_projects: true
 		}, (error, docs) ->
 			if error?
-				# Specially handle no connection err, so warning can be shown
-				error = new Error('No V1 connection') if error.code == 'ECONNREFUSED'
-				return callback(error)
+				if error instanceof oAuthRequest.NoOverleafTokenError # Just a SL-only user
+					return callback()
+				else
+					# Specially handle no connection err, so warning can be shown
+					error = new Error('No V1 connection') if error.code == 'ECONNREFUSED'
+					return callback(error)
 			logger.log {userId, docs}, "got projects from V1"
 			callback(null, {
 				projects: docs.projects
