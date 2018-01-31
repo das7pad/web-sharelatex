@@ -7,10 +7,10 @@ module.exports =
 	apply: (webRouter, apiRouter, privateApiRouter) ->
 
 		if !settings.overleaf?
-			logger.log {}, "Overleaf settings not configured, skipping v1-api router"
+			logger.log {}, "Overleaf settings not configured, skipping metrics router"
 			return
 
-		logger.log {}, "Init v1-api router"
+		logger.log {}, "Init metrics router"
 
 		privateApiRouter.get(
 			'/user/:user_id/v1/metrics_segmentation',
