@@ -12,7 +12,7 @@ describe "MetricsController", ->
 			'settings-sharelatex': @Settings =
 				overleaf:
 					host: 'some.host'
-					v1Auth:
+					v1BasicAuth:
 						user: 'one'
 						pass: 'two'
 			'request': @request = sinon.stub()
