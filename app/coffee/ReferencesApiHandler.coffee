@@ -1,20 +1,22 @@
-settings = require("settings-sharelatex")
-request = require("request")
+_ = require 'underscore'
+fs = require 'fs'
+logger = require "logger-sharelatex"
+mongojs = require "mongojs"
+request = require "request"
+settings = require "settings-sharelatex"
+temp = require 'temp'
+
 thirdpartyUrl = settings.apis.thirdpartyreferences?.url || "http://localhost:3023"
 referencesUrl = settings.apis.references?.url || "http://localhost:3040"
-mongojs = require "mongojs"
 db = mongojs(settings.mongo.url, ["users"])
 ObjectId = mongojs.ObjectId
-UserUpdater = require("../../../../app/js/Features/User/UserUpdater")
-logger = require("logger-sharelatex")
-UserGetter = require('../../../../app/js/Features/User/UserGetter')
-ProjectEntityHandler = require('../../../../app/js/Features/Project/ProjectEntityHandler')
-DocumentUpdaterHandler = require('../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler')
-EditorRealTimeController = require('../../../../app/js/Features/Editor/EditorRealTimeController')
+
 AuthenticationController = require('../../../../app/js/Features/Authentication/AuthenticationController')
-_ = require('underscore')
-fs = require('fs')
-temp = require('temp')
+EditorController = require('../../../../app/js/Features/Editor/EditorController')
+LockManager = require('../../../../app/js/infrastructure/LockManager')
+ProjectEntityHandler = require('../../../../app/js/Features/Project/ProjectEntityHandler')
+UserGetter = require('../../../../app/js/Features/User/UserGetter')
+UserUpdater = require("../../../../app/js/Features/User/UserUpdater")
 
 module.exports = ReferencesApiHandler =
 
@@ -126,7 +128,7 @@ module.exports = ReferencesApiHandler =
 			if err
 				return next(err)
 			if !canMakeRequest
-				return res.send 403
+				return res.sendStatus 403
 			opts =
 				method:"get"
 				url: "/user/#{user_id}/#{ref_provider}/bibtex"
@@ -150,35 +152,36 @@ module.exports = ReferencesApiHandler =
 				logger.err {err, user_id, project_id, ref_provider}, "error streaming bibtex from third-party-references"
 				_cleanup () ->
 					return next(err)
-			requestStream.on 'end', () ->
-				ProjectEntityHandler.getAllFiles project_id, (err, allFiles) ->
-					if err?
-						logger.err {user_id, ref_provider, project_id}, "error getting all files"
-						return _cleanup () ->
-							next(err)
-					targetFileName = "#{ref_provider}.bib"
-					# check if file exists
-					if file = allFiles["/#{targetFileName}"]
-						# file exists already
-						logger.log {user_id, ref_provider, project_id, targetFileName}, "updating file with bibtex content"
-						# set document contents to the bibtex payload
-						ProjectEntityHandler.replaceFile project_id, file._id, tempFilePath, user_id, (err) ->
-							if err
-								logger.err {user_id, ref_provider, project_id}, 'error replacing file'
-								return _cleanup () ->
-									next(err)
-							_cleanup () ->
-								res.send 201
-					else
-						# file is new
-						logger.log {user_id, ref_provider, project_id, targetFileName}, "creating new file with bibtex content"
-						# add a new doc, with bibtex payload
-						ProjectEntityHandler.addFile project_id, undefined, targetFileName, tempFilePath, user_id, (err, fileRef, folder_id) ->
-							if err
-								logger.err {user_id, ref_provider, project_id}, 'error adding file'
-								return _cleanup () ->
-									next(err)
-							EditorRealTimeController.emitToRoom(project_id, 'reciveNewFile', folder_id, fileRef, "references-import")
-							return _cleanup () ->
-								res.send 201
+			requestStream.on 'end', (err) ->
+				ReferencesApiHandler._addBibTexfile project_id, tempFilePath, ref_provider, user_id, (err) ->
+					_cleanup () ->
+						if err?
+							next err
+						else
+							res.sendStatus 201
+
 			requestStream.pipe tempWriteStream
+
+	_addBibTexfile: (project_id, fsPath, ref_provider, user_id, callback=(error)->) ->
+		LockManager.runWithLock project_id,
+			(cb) -> ReferencesApiHandler._addBibTexfileWithoutLock project_id, fsPath, ref_provider, user_id, cb
+			(err) ->
+				if err?
+					logger.err {user_id, ref_provider, project_id, fsPath}, "could not add bibtex file"
+				callback err
+
+	_addBibTexfileWithoutLock: (project_id, fsPath, ref_provider, user_id, callback=(error)->) ->
+		ProjectEntityHandler.getAllFiles project_id, (err, allFiles) ->
+			if err?
+				logger.err {user_id, ref_provider, project_id}, "error getting all files"
+				return callback(err)
+			fileName = "#{ref_provider}.bib"
+			# check if file exists
+			if file = allFiles["/#{fileName}"]
+				# file exists already
+				logger.log {user_id, ref_provider, project_id, fileName}, "updating file with bibtex content"
+				# set document contents to the bibtex payload
+				EditorController.replaceFileWithoutLock project_id, file._id, fsPath, "references-import", user_id, callback
+			else
+				logger.log {user_id, ref_provider, project_id, fileName}, "creating new file with bibtex content"
+				EditorController.addFileWithoutLock project_id, null, fileName, fsPath, "references-import", user_id, callback

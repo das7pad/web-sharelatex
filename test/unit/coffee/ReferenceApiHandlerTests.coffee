@@ -46,14 +46,13 @@ describe 'ReferencesApiHandler', ->
 			}
 			'../../../../app/js/Features/Project/ProjectEntityHandler': @ProjectEntityHandler = {
 				getAllFiles: sinon.stub().callsArgWith(1, null, @allFiles)
-				addFile: sinon.stub()
-				replaceFile: sinon.stub()
 			}
-			'../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler': @DocumentUpdaterHandler = {
-				setDocument: sinon.stub()
+			'../../../../app/js/Features/Editor/EditorController': @EditorController = {
+				addFileWithoutLock: sinon.stub().yields()
+				replaceFileWithoutLock: sinon.stub().yields()
 			}
-			'../../../../app/js/Features/Editor/EditorRealTimeController': @EditorRealTimeController = {
-				emitToRoom: sinon.stub()
+			'../../../../app/js/infrastructure/LockManager': @LockManager = {
+				runWithLock : sinon.spy((key, runner, callback) -> runner(callback))
 			}
 			'temp': @temp = {
 				track: sinon.stub()
@@ -136,8 +135,6 @@ describe 'ReferencesApiHandler', ->
 			@ReferencesApiHandler.make3rdRequestStream = sinon.stub().returns(@readStream)
 			@temp.createWriteStream = sinon.stub().returns(@writeStream)
 			@ProjectEntityHandler.getAllFiles.callsArgWith(1, null, @allFiles)
-			@ProjectEntityHandler.replaceFile.callsArgWith(4, null)
-			@ProjectEntityHandler.addFile.callsArgWith(5, null, @file, @folder_id)
 
 		describe 'when all goes well', ->
 
@@ -149,8 +146,8 @@ describe 'ReferencesApiHandler', ->
 					@readStream.emit('end')
 
 				it 'should send back a 201 response', ->
-					@res.send.callCount.should.equal 1
-					@res.send.calledWith(201).should.equal true
+					@res.sendStatus.callCount.should.equal 1
+					@res.sendStatus.calledWith(201).should.equal true
 
 				it 'should not call next with an error', ->
 					@next.callCount.should.equal 0
@@ -162,28 +159,19 @@ describe 'ReferencesApiHandler', ->
 					@ProjectEntityHandler.getAllFiles.callCount.should.equal 1
 					@ProjectEntityHandler.getAllFiles.calledWith(@project_id).should.equal true
 
-				it 'should call addFile', ->
-					@ProjectEntityHandler.addFile.callCount.should.equal 1
-					@ProjectEntityHandler.addFile.calledWith(
+				it 'should not call replaceFileWithoutLock', ->
+					@EditorController.replaceFileWithoutLock.callCount.should.equal 0
+
+				it 'should call addFileWithoutLock', ->
+					@EditorController.addFileWithoutLock.callCount.should.equal 1
+					@EditorController.addFileWithoutLock.calledWith(
 						@project_id,
-						undefined,
+						null,
 						"refProvider.bib",
 						@writeStream.path,
-            @user_id
+						"references-import",
+						@user_id
 					).should.equal true
-
-				it 'should call EditorRealTimeController.emitToRoom', ->
-					@EditorRealTimeController.emitToRoom.callCount.should.equal 1
-					@EditorRealTimeController.emitToRoom.calledWith(
-						@project_id,
-						'reciveNewFile',
-						@folder_id,
-						@file,
-						'references-import'
-					).should.equal true
-
-				it 'should not call DocumentUpdaterHandler.setDocument', ->
-					@DocumentUpdaterHandler.setDocument.callCount.should.equal 0
 
 				it 'should call fs.unlink', ->
 					@fs.unlink.callCount.should.equal 1
@@ -199,8 +187,8 @@ describe 'ReferencesApiHandler', ->
 					@readStream.emit('end')
 
 				it 'should send back a 201 response', ->
-					@res.send.callCount.should.equal 1
-					@res.send.calledWith(201).should.equal true
+					@res.sendStatus.callCount.should.equal 1
+					@res.sendStatus.calledWith(201).should.equal true
 
 				it 'should not call next with an error', ->
 					@next.callCount.should.equal 0
@@ -212,20 +200,18 @@ describe 'ReferencesApiHandler', ->
 					@ProjectEntityHandler.getAllFiles.callCount.should.equal 1
 					@ProjectEntityHandler.getAllFiles.calledWith(@project_id).should.equal true
 
-				it 'should call ProjectEntityHandler.replaceFile', ->
-					@ProjectEntityHandler.replaceFile.callCount.should.equal 1
-					@ProjectEntityHandler.replaceFile.calledWith(
+				it 'should call replaceFileWithoutLock', ->
+					@EditorController.replaceFileWithoutLock.callCount.should.equal 1
+					@EditorController.replaceFileWithoutLock.calledWith(
 						@project_id,
 						@allFiles["/refProvider.bib"]._id,
 						@writeStream.path,
-            @user_id,
+					 "references-import",
+						@user_id,
 					).should.equal true
 
-				it 'should not call addFile', ->
-					@ProjectEntityHandler.addFile.callCount.should.equal 0
-
-				it 'should not call EditorRealTimeController.emitToRoom', ->
-					@EditorRealTimeController.emitToRoom.callCount.should.equal 0
+				it 'should not call addFileWithoutLock', ->
+					@EditorController.addFileWithoutLock.callCount.should.equal 0
 
 				it 'should call fs.unlink', ->
 					@fs.unlink.callCount.should.equal 1
@@ -236,7 +222,6 @@ describe 'ReferencesApiHandler', ->
 				beforeEach ->
 					@allFiles["/refProvider.bib"] = {_id: ObjectId().toString()}
 					@ProjectEntityHandler.getAllFiles.callsArgWith(1, null, @allFiles)
-					@res.send = sinon.stub()
 					@next = sinon.stub()
 					@fs.unlink = sinon.stub().callsArgWith(1, new Error('woops'))
 					@ReferencesApiHandler.importBibtex @req, @res, @next
@@ -248,8 +233,8 @@ describe 'ReferencesApiHandler', ->
 					@next.lastCall.args[0].should.be.instanceof Error
 
 				it 'should not send back a 201 response', ->
-					@res.send.callCount.should.equal 0
-					@res.send.calledWith(201).should.equal false
+					@res.sendStatus.callCount.should.equal 0
+					@res.sendStatus.calledWith(201).should.equal false
 
 		describe 'when user is not allowed to do this', ->
 
@@ -258,8 +243,8 @@ describe 'ReferencesApiHandler', ->
 				@ReferencesApiHandler.importBibtex @req, @res, @next
 
 			it 'should send back a 403 response', ->
-				@res.send.callCount.should.equal 1
-				@res.send.calledWith(403).should.equal true
+				@res.sendStatus.callCount.should.equal 1
+				@res.sendStatus.calledWith(403).should.equal true
 
 			it 'should not call make3rdRequestStream', ->
 				@ReferencesApiHandler.make3rdRequestStream.callCount.should.equal 0
@@ -267,14 +252,11 @@ describe 'ReferencesApiHandler', ->
 			it 'should not call getAllFiles', ->
 				@ProjectEntityHandler.getAllFiles.callCount.should.equal 0
 
-			it 'should not call ProjectEntityHandler.replaceFile', ->
-				@ProjectEntityHandler.replaceFile.callCount.should.equal 0
+			it 'should not call replaceFileWithoutLock', ->
+				@EditorController.replaceFileWithoutLock.callCount.should.equal 0
 
-			it 'should not call addFile', ->
-				@ProjectEntityHandler.addFile.callCount.should.equal 0
-
-			it 'should not call EditorRealTimeController.emitToRoom', ->
-				@EditorRealTimeController.emitToRoom.callCount.should.equal 0
+			it 'should not call addFileWithoutLock', ->
+				@EditorController.addFileWithoutLock.callCount.should.equal 0
 
 			it 'should not call fs.unlink', ->
 				@fs.unlink.callCount.should.equal 0
@@ -296,14 +278,11 @@ describe 'ReferencesApiHandler', ->
 			it 'should not call getAllFiles', ->
 				@ProjectEntityHandler.getAllFiles.callCount.should.equal 0
 
-			it 'should not call ProjectEntityHandler.replaceFile', ->
-				@ProjectEntityHandler.replaceFile.callCount.should.equal 0
+			it 'should not call replaceFileWithoutLock', ->
+				@EditorController.replaceFileWithoutLock.callCount.should.equal 0
 
-			it 'should not call addFile', ->
-				@ProjectEntityHandler.addFile.callCount.should.equal 0
-
-			it 'should not call EditorRealTimeController.emitToRoom', ->
-				@EditorRealTimeController.emitToRoom.callCount.should.equal 0
+			it 'should not call addFileWithoutLock', ->
+				@EditorController.addFileWithoutLock.callCount.should.equal 0
 
 			it 'should not call fs.unlink', ->
 				@fs.unlink.callCount.should.equal 0
@@ -326,14 +305,11 @@ describe 'ReferencesApiHandler', ->
 			it 'should not call getAllFiles', ->
 				@ProjectEntityHandler.getAllFiles.callCount.should.equal 0
 
-			it 'should not call ProjectEntityHandler.replaceFile', ->
-				@ProjectEntityHandler.replaceFile.callCount.should.equal 0
+			it 'should not call replaceFileWithoutLock', ->
+				@EditorController.replaceFileWithoutLock.callCount.should.equal 0
 
-			it 'should not call addFile', ->
-				@ProjectEntityHandler.addFile.callCount.should.equal 0
-
-			it 'should not call EditorRealTimeController.emitToRoom', ->
-				@EditorRealTimeController.emitToRoom.callCount.should.equal 0
+			it 'should not call addFileWithoutLock', ->
+				@EditorController.addFileWithoutLock.callCount.should.equal 0
 
 			it 'should call fs.unlink', ->
 				@fs.unlink.callCount.should.equal 1
@@ -358,25 +334,22 @@ describe 'ReferencesApiHandler', ->
 			it 'should have called make3rdRequestStream', ->
 				@ReferencesApiHandler.make3rdRequestStream.callCount.should.equal 1
 
-			it 'should not call ProjectEntityHandler.replaceFile', ->
-				@ProjectEntityHandler.replaceFile.callCount.should.equal 0
+			it 'should not call replaceFileWithoutLock', ->
+				@EditorController.replaceFileWithoutLock.callCount.should.equal 0
 
-			it 'should not call addFile', ->
-				@ProjectEntityHandler.addFile.callCount.should.equal 0
-
-			it 'should not call EditorRealTimeController.emitToRoom', ->
-				@EditorRealTimeController.emitToRoom.callCount.should.equal 0
+			it 'should not call addFileWithoutLock', ->
+				@EditorController.addFileWithoutLock.callCount.should.equal 0
 
 			it 'should call fs.unlink', ->
 				@fs.unlink.callCount.should.equal 1
 				@fs.unlink.calledWith(@writeStream.path).should.equal true
 
-		describe 'when document is present, and replaceFile produces an error', ->
+		describe 'when document is present, and replaceFileWithoutLock produces an error', ->
 
 			beforeEach ->
 				@err = new Error('woops')
 				@allFiles["/refProvider.bib"] = {_id: ObjectId().toString()}
-				@ProjectEntityHandler.replaceFile = sinon.stub().callsArgWith(4, @err)
+				@EditorController.replaceFileWithoutLock = sinon.stub().yields(@err)
 				@ReferencesApiHandler.importBibtex @req, @res, @next
 				@readStream.emit('data', 'hi')
 				@readStream.emit('end')
@@ -394,22 +367,19 @@ describe 'ReferencesApiHandler', ->
 			it 'should have called getAllFiles', ->
 				@ProjectEntityHandler.getAllFiles.callCount.should.equal 1
 
-			it 'should not call addFile', ->
-				@ProjectEntityHandler.addFile.callCount.should.equal 0
-
-			it 'should not call EditorRealTimeController.emitToRoom', ->
-				@EditorRealTimeController.emitToRoom.callCount.should.equal 0
+			it 'should not call addFileWithoutLock', ->
+				@EditorController.addFileWithoutLock.callCount.should.equal 0
 
 			it 'should call fs.unlink', ->
 				@fs.unlink.callCount.should.equal 1
 				@fs.unlink.calledWith(@writeStream.path).should.equal true
 
-		describe 'when document is absent, and addDoc produces an error', ->
+		describe 'when document is absent, and addFileWithoutLock produces an error', ->
 
 			beforeEach ->
 				@err = new Error('woops')
 				@fs.unlink = sinon.stub().callsArgWith(1, null)
-				@ProjectEntityHandler.addFile.callsArgWith(5, @err)
+				@EditorController.addFileWithoutLock.yields(@err)
 				@ReferencesApiHandler.importBibtex @req, @res, @next
 				@readStream.emit('data', 'hi')
 				@readStream.emit('end')
@@ -427,11 +397,8 @@ describe 'ReferencesApiHandler', ->
 			it 'should have called getAllFiles', ->
 				@ProjectEntityHandler.getAllFiles.callCount.should.equal 1
 
-			it 'should not call ProjectEntityHandler.replaceFile', ->
-				@ProjectEntityHandler.replaceFile.callCount.should.equal 0
-
-			it 'should not call EditorRealTimeController.emitToRoom', ->
-				@EditorRealTimeController.emitToRoom.callCount.should.equal 0
+			it 'should not call replaceFileWithoutLock', ->
+				@EditorController.replaceFileWithoutLock.callCount.should.equal 0
 
 			it 'should call fs.unlink', ->
 				@fs.unlink.callCount.should.equal 1
