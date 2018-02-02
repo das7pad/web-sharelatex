@@ -103,7 +103,8 @@ module.exports =
 			zipReq,
 			{
 				templateName: req.body.templateName,
-				currentUserId: currentUserId
+				currentUserId: currentUserId,
+				compiler: req.session.templateData.latexEngine
 			},
 			req,
 			res
