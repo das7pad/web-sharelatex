@@ -94,6 +94,7 @@ module.exports =
 		res.render path.resolve(__dirname, "../views/new_from_template"), data
 
 	createProjectFromV1Template: (req, res)->
+		return response.writeHead 500 unless String(parseInt(req.body.templateId, 10)) == req.body.templateId
 		currentUserId = AuthenticationController.getLoggedInUserId(req)
 		zipUrl =	"#{settings.overleaf.host}/api/v1/sharelatex/templates/#{req.body.templateId}"
 
