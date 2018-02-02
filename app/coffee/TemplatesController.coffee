@@ -29,8 +29,10 @@ module.exports =
 		else
 			zipUrl = "#{settings.apis.templates.url}#{zipUrl}"
 
+		zipReq = request(zipUrl)
+
 		createFromZip(
-			zipUrl,
+			zipReq,
 			{
 				templateName: req.session.templateData.templateName,
 				currentUserId:currentUserId,
@@ -93,9 +95,12 @@ module.exports =
 
 	createProjectFromV1Template: (req, res)->
 		currentUserId = AuthenticationController.getLoggedInUserId(req)
-		zipUrl =	"#{settings.overleaf.host}/gallery/zip/#{req.body.templateId}"
+		zipUrl =	"#{settings.overleaf.host}/api/v1/sharelatex/templates/#{req.body.templateId}"
+
+		zipReq = request(zipUrl).auth(settings.overleaf.v1Api.user, settings.overleaf.v1Api.password)
+
 		createFromZip(
-			zipUrl,
+			zipReq,
 			{
 				templateName: req.body.templateName,
 				currentUserId: currentUserId
@@ -112,18 +117,17 @@ setCompiler = (project_id, compiler, callback)->
 	else
 		callback()
 
-createFromZip = (zipUrl, options, req, res)->
+createFromZip = (zipReq, options, req, res)->
 	dumpPath = "#{settings.path.dumpFolder}/#{uuid.v4()}"
 	writeStream = fs.createWriteStream(dumpPath)
 
-	zipReq = request(zipUrl)
 	zipReq.on "error", (error) ->
 		logger.error err: error, "error getting zip from template API"
 	zipReq.pipe(writeStream)
 	writeStream.on 'close', ->
 		ProjectUploadManager.createProjectFromZipArchive options.currentUserId, options.templateName, dumpPath, (err, project)->
 			if err?
-				logger.err err:err, zipUrl:zipUrl, "problem building project from zip"
+				logger.err err:err, zipReq:zipReq, "problem building project from zip"
 				return res.sendStatus 500
 			setCompiler project._id, options.compiler, ->
 				fs.unlink dumpPath, ->
