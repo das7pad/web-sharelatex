@@ -88,24 +88,32 @@ module.exports =
 				res.json details
 
 	getV1Template: (req, res)->
+		templateId = req.params.Template_id
+		if !/^[0-9]+$/.test(templateId)
+			logger.err templateId:templateId, "invalid template id"
+			return res.sendStatus 500
 		data = {}
-		data.id = req.params.Template_id
-		data.name = req.session.templateData.templateName
+		data.id = templateId
+		data.name = req.query.templateName
+		data.compiler = req.query.latexEngine
 		res.render path.resolve(__dirname, "../views/new_from_template"), data
 
 	createProjectFromV1Template: (req, res)->
-		return response.writeHead 500 unless String(parseInt(req.body.templateId, 10)) == req.body.templateId
 		currentUserId = AuthenticationController.getLoggedInUserId(req)
 		zipUrl =	"#{settings.overleaf.host}/api/v1/sharelatex/templates/#{req.body.templateId}"
-
-		zipReq = request(zipUrl).auth(settings.overleaf.v1Api.user, settings.overleaf.v1Api.password)
+		zipReq = request(zipUrl, {
+			'auth': {
+				'user': settings.overleaf.v1Api.user,
+				'pass': settings.overleaf.v1Api.password
+			}
+		})
 
 		createFromZip(
 			zipReq,
 			{
 				templateName: req.body.templateName,
 				currentUserId: currentUserId,
-				compiler: req.session.templateData.latexEngine
+				compiler: req.body.compiler
 			},
 			req,
 			res

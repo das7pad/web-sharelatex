@@ -52,6 +52,9 @@ describe 'TemplatesController', ->
 						url: @webApiUrl="http://web-api.sharelatex.env"
 				overleaf:
 					host: @v1Url="http://overleaf.com"
+					v1Api:
+						user: "sharelatex"
+						password: "password"
 			"uuid":v4:=>@uuid
 			"request": @request
 			"fs":@fs
@@ -102,7 +105,7 @@ describe 'TemplatesController', ->
 			@req.body = {templateId: @templateId}
 
 			redirect = =>
-				@request.calledWith("#{@v1Url}/gallery/zip/#{@templateId}").should.equal true
+				@request.calledWith("#{@v1Url}/api/v1/sharelatex/templates/#{@templateId}").should.equal true
 				done()
 			res = redirect:redirect
 			@controller.createProjectFromV1Template @req, res
