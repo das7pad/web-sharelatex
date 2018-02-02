@@ -50,7 +50,7 @@ module.exports = UserAdminController =
 		async.parallel {
 			user: (cb) ->
 				UserGetter.getUser user_id, {
-					_id:1, first_name:1, last_name:1, email:1, betaProgram:1, features: 1
+					_id:1, first_name:1, last_name:1, email:1, betaProgram:1, features: 1, isAdmin: 1, awareOfV2: 1
 				}, cb
 			projects: (cb) ->
 				ProjectGetter.findAllUsersProjects user_id, {
@@ -86,7 +86,9 @@ module.exports = UserAdminController =
 		'features.compileGroup',
 		'features.templates',
 		'features.trackChanges',
-		'features.references'
+		'features.references',
+		'awareOfV2',
+		'isAdmin'
 	]
 	BOOLEAN_ATTRIBUTES: [
 		'betaProgram',
@@ -95,7 +97,9 @@ module.exports = UserAdminController =
 		'features.github',
 		'features.templates',
 		'features.trackChanges',
-		'features.references'
+		'features.references',
+		'awareOfV2',
+		'isAdmin'
 	]
 	update: (req, res, next) ->
 		user_id = req.params.user_id
