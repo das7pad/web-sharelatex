@@ -32,4 +32,4 @@ module.exports =
 
 		app.get '/project/new/template/:Template_id', TemplatesMiddlewear.saveTemplateDataInSession, AuthenticationController.requireLogin(), TemplatesController.getV1Template
 
-		app.post '/project/new/template', TemplatesMiddlewear.saveTemplateDataInSession, AuthenticationController.requireLogin(), TemplatesController.createProjectFromV1Template
+		app.post '/project/new/template', AuthenticationController.requireLogin(), TemplatesController.createProjectFromV1Template

@@ -52,9 +52,9 @@ describe 'TemplatesController', ->
 						url: @webApiUrl="http://web-api.sharelatex.env"
 				overleaf:
 					host: @v1Url="http://overleaf.com"
-					v1Api:
+					v1BasicAuth:
 						user: "sharelatex"
-						password: "password"
+						pass: "password"
 			"uuid":v4:=>@uuid
 			"request": @request
 			"fs":@fs

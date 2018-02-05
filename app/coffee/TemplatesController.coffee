@@ -103,8 +103,8 @@ module.exports =
 		zipUrl =	"#{settings.overleaf.host}/api/v1/sharelatex/templates/#{req.body.templateId}"
 		zipReq = request(zipUrl, {
 			'auth': {
-				'user': settings.overleaf.v1Api.user,
-				'pass': settings.overleaf.v1Api.password
+				'user': settings.overleaf.v1BasicAuth.user,
+				'pass': settings.overleaf.v1BasicAuth.pass
 			}
 		})
 
