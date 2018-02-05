@@ -14,7 +14,7 @@ logger = require('logger-sharelatex')
 async = require("async")
 
 
-module.exports =
+module.exports = TemplatesController =
 
 	createProjectFromZipTemplate: (req, res)->
 		currentUserId = AuthenticationController.getLoggedInUserId(req)
@@ -22,26 +22,25 @@ module.exports =
 		if !req.session.templateData?
 			return res.redirect "/project"
 
-		dumpPath = "#{settings.path.dumpFolder}/#{uuid.v4()}"
-		writeStream = fs.createWriteStream(dumpPath)
 		zipUrl = req.session.templateData.zipUrl
+
 		if zipUrl.slice(0,12).indexOf("templates") == -1
 			zipUrl = "#{settings.siteUrl}#{zipUrl}"
 		else
 			zipUrl = "#{settings.apis.templates.url}#{zipUrl}"
+
 		zipReq = request(zipUrl)
-		zipReq.on "error", (error) ->
-			logger.error err: error, "error getting zip from template API"
-		zipReq.pipe(writeStream)
-		writeStream.on 'close', ->
-			ProjectUploadManager.createProjectFromZipArchive currentUserId, req.session.templateData.templateName, dumpPath, (err, project)->
-				if err?
-					logger.err err:err, zipUrl:zipUrl, "problem building project from zip"
-					return res.sendStatus 500
-				setCompiler project._id, req.session.templateData.compiler, ->
-					fs.unlink dumpPath, ->
-					delete req.session.templateData
-					res.redirect "/project/#{project._id}"
+
+		TemplatesController.createFromZip(
+			zipReq,
+			{
+				templateName: req.session.templateData.templateName,
+				currentUserId:currentUserId,
+				compiler: req.session.templateData.compiler
+			},
+			req,
+			res
+		)
 
 	publishProject: (req, res, next) ->
 		project_id = req.params.Project_id
@@ -87,6 +86,55 @@ module.exports =
 				details = results.details
 				details.description = results.description
 				res.json details
+
+	getV1Template: (req, res)->
+		templateId = req.params.Template_id
+		if !/^[0-9]+$/.test(templateId)
+			logger.err templateId:templateId, "invalid template id"
+			return res.sendStatus 400
+		data = {}
+		data.id = templateId
+		data.name = req.query.templateName
+		data.compiler = req.query.latexEngine
+		res.render path.resolve(__dirname, "../views/new_from_template"), data
+
+	createProjectFromV1Template: (req, res)->
+		currentUserId = AuthenticationController.getLoggedInUserId(req)
+		zipUrl =	"#{settings.overleaf.host}/api/v1/sharelatex/templates/#{req.body.templateId}"
+		zipReq = request(zipUrl, {
+			'auth': {
+				'user': settings.overleaf.v1BasicAuth.user,
+				'pass': settings.overleaf.v1BasicAuth.pass
+			}
+		})
+
+		TemplatesController.createFromZip(
+			zipReq,
+			{
+				templateName: req.body.templateName,
+				currentUserId: currentUserId,
+				compiler: req.body.compiler
+			},
+			req,
+			res
+		)
+
+	createFromZip: (zipReq, options, req, res)->
+		dumpPath = "#{settings.path.dumpFolder}/#{uuid.v4()}"
+		writeStream = fs.createWriteStream(dumpPath)
+
+		zipReq.on "error", (error) ->
+			logger.error err: error, "error getting zip from template API"
+		zipReq.pipe(writeStream)
+		writeStream.on 'close', ->
+			ProjectUploadManager.createProjectFromZipArchive options.currentUserId, options.templateName, dumpPath, (err, project)->
+				if err?
+					logger.err err:err, zipReq:zipReq, "problem building project from zip"
+					return res.sendStatus 500
+				setCompiler project._id, options.compiler, ->
+					fs.unlink dumpPath, ->
+					delete req.session.templateData
+					res.redirect "/project/#{project._id}"
 
 setCompiler = (project_id, compiler, callback)->
 	if compiler?
