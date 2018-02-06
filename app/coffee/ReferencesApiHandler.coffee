@@ -13,8 +13,6 @@ ObjectId = mongojs.ObjectId
 
 AuthenticationController = require('../../../../app/js/Features/Authentication/AuthenticationController')
 EditorController = require('../../../../app/js/Features/Editor/EditorController')
-LockManager = require('../../../../app/js/infrastructure/LockManager')
-ProjectEntityHandler = require('../../../../app/js/Features/Project/ProjectEntityHandler')
 UserGetter = require('../../../../app/js/Features/User/UserGetter')
 UserUpdater = require("../../../../app/js/Features/User/UserUpdater")
 
@@ -153,35 +151,13 @@ module.exports = ReferencesApiHandler =
 				_cleanup () ->
 					return next(err)
 			requestStream.on 'end', (err) ->
-				ReferencesApiHandler._addBibTexfile project_id, tempFilePath, ref_provider, user_id, (err) ->
+				filePath = "/#{ref_provider}.bib"
+				EditorController.upsertFileWithPath project_id, filePath, tempFilePath, "references-import", user_id, (err) ->
 					_cleanup () ->
 						if err?
+							logger.err {user_id, ref_provider, project_id, tempFilePath}, "could not add bibtex file"
 							next err
 						else
 							res.sendStatus 201
 
 			requestStream.pipe tempWriteStream
-
-	_addBibTexfile: (project_id, fsPath, ref_provider, user_id, callback=(error)->) ->
-		LockManager.runWithLock project_id,
-			(cb) -> ReferencesApiHandler._addBibTexfileWithoutLock project_id, fsPath, ref_provider, user_id, cb
-			(err) ->
-				if err?
-					logger.err {user_id, ref_provider, project_id, fsPath}, "could not add bibtex file"
-				callback err
-
-	_addBibTexfileWithoutLock: (project_id, fsPath, ref_provider, user_id, callback=(error)->) ->
-		ProjectEntityHandler.getAllFiles project_id, (err, allFiles) ->
-			if err?
-				logger.err {user_id, ref_provider, project_id}, "error getting all files"
-				return callback(err)
-			fileName = "#{ref_provider}.bib"
-			# check if file exists
-			if file = allFiles["/#{fileName}"]
-				# file exists already
-				logger.log {user_id, ref_provider, project_id, fileName}, "updating file with bibtex content"
-				# set document contents to the bibtex payload
-				EditorController.replaceFileWithoutLock project_id, file._id, fsPath, "references-import", user_id, callback
-			else
-				logger.log {user_id, ref_provider, project_id, fileName}, "creating new file with bibtex content"
-				EditorController.addFileWithoutLock project_id, null, fileName, fsPath, "references-import", user_id, callback

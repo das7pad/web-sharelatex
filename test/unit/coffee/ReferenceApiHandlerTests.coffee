@@ -44,15 +44,8 @@ describe 'ReferencesApiHandler', ->
 			'../../../../app/js/Features/User/UserGetter': @UserGetter = {
 				getUser: sinon.stub().callsArgWith(1, null, @user)
 			}
-			'../../../../app/js/Features/Project/ProjectEntityHandler': @ProjectEntityHandler = {
-				getAllFiles: sinon.stub().callsArgWith(1, null, @allFiles)
-			}
 			'../../../../app/js/Features/Editor/EditorController': @EditorController = {
-				addFileWithoutLock: sinon.stub().yields()
-				replaceFileWithoutLock: sinon.stub().yields()
-			}
-			'../../../../app/js/infrastructure/LockManager': @LockManager = {
-				runWithLock : sinon.spy((key, runner, callback) -> runner(callback))
+				upsertFileWithPath: sinon.stub().yields()
 			}
 			'temp': @temp = {
 				track: sinon.stub()
@@ -117,7 +110,6 @@ describe 'ReferencesApiHandler', ->
 			@res.redirect.calledWith("/user/settings").should.equal true
 
 	describe 'importBibtex', ->
-
 		beforeEach ->
 			@file =
 				_id: ObjectId().toString()
@@ -134,110 +126,51 @@ describe 'ReferencesApiHandler', ->
 			@writeStream.destroy = sinon.stub()
 			@ReferencesApiHandler.make3rdRequestStream = sinon.stub().returns(@readStream)
 			@temp.createWriteStream = sinon.stub().returns(@writeStream)
-			@ProjectEntityHandler.getAllFiles.callsArgWith(1, null, @allFiles)
 
 		describe 'when all goes well', ->
+			beforeEach ->
+				@ReferencesApiHandler.importBibtex @req, @res, @next
+				@readStream.emit('data', 'hi')
+				@readStream.emit('end')
 
-			describe 'when document is absent', ->
+			it 'should send back a 201 response', ->
+				@res.sendStatus.callCount.should.equal 1
+				@res.sendStatus.calledWith(201).should.equal true
 
-				beforeEach ->
-					@ReferencesApiHandler.importBibtex @req, @res, @next
-					@readStream.emit('data', 'hi')
-					@readStream.emit('end')
+			it 'should not call next with an error', ->
+				@next.callCount.should.equal 0
 
-				it 'should send back a 201 response', ->
-					@res.sendStatus.callCount.should.equal 1
-					@res.sendStatus.calledWith(201).should.equal true
+			it 'should call upsertFileWithPath', ->
+				@EditorController.upsertFileWithPath.callCount.should.equal 1
+				@EditorController.upsertFileWithPath.calledWith(
+					@project_id,
+					"/refProvider.bib",
+					@writeStream.path,
+					"references-import",
+					@user_id
+				).should.equal true
 
-				it 'should not call next with an error', ->
-					@next.callCount.should.equal 0
+			it 'should call fs.unlink', ->
+				@fs.unlink.callCount.should.equal 1
+				@fs.unlink.calledWith(@writeStream.path).should.equal true
 
-				it 'should call make3rdRequestStream', ->
-					@ReferencesApiHandler.make3rdRequestStream.callCount.should.equal 1
+		describe 'when fs.unlink produces an error', ->
+			beforeEach ->
+				@next = sinon.stub()
+				@fs.unlink = sinon.stub().callsArgWith(1, new Error('woops'))
+				@ReferencesApiHandler.importBibtex @req, @res, @next
+				@readStream.emit('data', 'hi')
+				@readStream.emit('end')
 
-				it 'should call getAllFiles', ->
-					@ProjectEntityHandler.getAllFiles.callCount.should.equal 1
-					@ProjectEntityHandler.getAllFiles.calledWith(@project_id).should.equal true
+			it 'should call next with an error', ->
+				@next.callCount.should.equal 1
+				@next.lastCall.args[0].should.be.instanceof Error
 
-				it 'should not call replaceFileWithoutLock', ->
-					@EditorController.replaceFileWithoutLock.callCount.should.equal 0
-
-				it 'should call addFileWithoutLock', ->
-					@EditorController.addFileWithoutLock.callCount.should.equal 1
-					@EditorController.addFileWithoutLock.calledWith(
-						@project_id,
-						null,
-						"refProvider.bib",
-						@writeStream.path,
-						"references-import",
-						@user_id
-					).should.equal true
-
-				it 'should call fs.unlink', ->
-					@fs.unlink.callCount.should.equal 1
-					@fs.unlink.calledWith(@writeStream.path).should.equal true
-
-			describe 'when document is already present', ->
-
-				beforeEach ->
-					@allFiles["/refProvider.bib"] = {_id: ObjectId().toString()}
-					@ProjectEntityHandler.getAllFiles.callsArgWith(1, null, @allFiles)
-					@ReferencesApiHandler.importBibtex @req, @res, @next
-					@readStream.emit('data', 'hi')
-					@readStream.emit('end')
-
-				it 'should send back a 201 response', ->
-					@res.sendStatus.callCount.should.equal 1
-					@res.sendStatus.calledWith(201).should.equal true
-
-				it 'should not call next with an error', ->
-					@next.callCount.should.equal 0
-
-				it 'should call make3rdRequestStream', ->
-					@ReferencesApiHandler.make3rdRequestStream.callCount.should.equal 1
-
-				it 'should call getAllFiles', ->
-					@ProjectEntityHandler.getAllFiles.callCount.should.equal 1
-					@ProjectEntityHandler.getAllFiles.calledWith(@project_id).should.equal true
-
-				it 'should call replaceFileWithoutLock', ->
-					@EditorController.replaceFileWithoutLock.callCount.should.equal 1
-					@EditorController.replaceFileWithoutLock.calledWith(
-						@project_id,
-						@allFiles["/refProvider.bib"]._id,
-						@writeStream.path,
-					 "references-import",
-						@user_id,
-					).should.equal true
-
-				it 'should not call addFileWithoutLock', ->
-					@EditorController.addFileWithoutLock.callCount.should.equal 0
-
-				it 'should call fs.unlink', ->
-					@fs.unlink.callCount.should.equal 1
-					@fs.unlink.calledWith(@writeStream.path).should.equal true
-
-			describe 'when fs.unlink produces an error', ->
-
-				beforeEach ->
-					@allFiles["/refProvider.bib"] = {_id: ObjectId().toString()}
-					@ProjectEntityHandler.getAllFiles.callsArgWith(1, null, @allFiles)
-					@next = sinon.stub()
-					@fs.unlink = sinon.stub().callsArgWith(1, new Error('woops'))
-					@ReferencesApiHandler.importBibtex @req, @res, @next
-					@readStream.emit('data', 'hi')
-					@readStream.emit('end')
-
-				it 'should call next with an error', ->
-					@next.callCount.should.equal 1
-					@next.lastCall.args[0].should.be.instanceof Error
-
-				it 'should not send back a 201 response', ->
-					@res.sendStatus.callCount.should.equal 0
-					@res.sendStatus.calledWith(201).should.equal false
+			it 'should not send back a 201 response', ->
+				@res.sendStatus.callCount.should.equal 0
+				@res.sendStatus.calledWith(201).should.equal false
 
 		describe 'when user is not allowed to do this', ->
-
 			beforeEach ->
 				@ReferencesApiHandler.userCanMakeRequest = sinon.stub().callsArgWith(2, null, false)
 				@ReferencesApiHandler.importBibtex @req, @res, @next
@@ -249,20 +182,13 @@ describe 'ReferencesApiHandler', ->
 			it 'should not call make3rdRequestStream', ->
 				@ReferencesApiHandler.make3rdRequestStream.callCount.should.equal 0
 
-			it 'should not call getAllFiles', ->
-				@ProjectEntityHandler.getAllFiles.callCount.should.equal 0
-
-			it 'should not call replaceFileWithoutLock', ->
-				@EditorController.replaceFileWithoutLock.callCount.should.equal 0
-
-			it 'should not call addFileWithoutLock', ->
-				@EditorController.addFileWithoutLock.callCount.should.equal 0
+			it 'should call upsertFileWithPath', ->
+				@EditorController.upsertFileWithPath.callCount.should.equal 0
 
 			it 'should not call fs.unlink', ->
 				@fs.unlink.callCount.should.equal 0
 
 		describe 'when userCanMakeRequest produces an error', ->
-
 			beforeEach ->
 				@err = new Error('woops')
 				@ReferencesApiHandler.userCanMakeRequest = sinon.stub().callsArgWith(2, @err)
@@ -275,20 +201,13 @@ describe 'ReferencesApiHandler', ->
 			it 'should not call make3rdRequestStream', ->
 				@ReferencesApiHandler.make3rdRequestStream.callCount.should.equal 0
 
-			it 'should not call getAllFiles', ->
-				@ProjectEntityHandler.getAllFiles.callCount.should.equal 0
-
-			it 'should not call replaceFileWithoutLock', ->
-				@EditorController.replaceFileWithoutLock.callCount.should.equal 0
-
-			it 'should not call addFileWithoutLock', ->
-				@EditorController.addFileWithoutLock.callCount.should.equal 0
+			it 'should call upsertFileWithPath', ->
+				@EditorController.upsertFileWithPath.callCount.should.equal 0
 
 			it 'should not call fs.unlink', ->
 				@fs.unlink.callCount.should.equal 0
 
 		describe 'when remote api produces an error', ->
-
 			beforeEach ->
 				@err = new Error('woops')
 				@ReferencesApiHandler.importBibtex @req, @res, @next
@@ -302,84 +221,18 @@ describe 'ReferencesApiHandler', ->
 			it 'should have called userCanMakeRequest', ->
 				@ReferencesApiHandler.userCanMakeRequest.callCount.should.equal 1
 
-			it 'should not call getAllFiles', ->
-				@ProjectEntityHandler.getAllFiles.callCount.should.equal 0
-
-			it 'should not call replaceFileWithoutLock', ->
-				@EditorController.replaceFileWithoutLock.callCount.should.equal 0
-
-			it 'should not call addFileWithoutLock', ->
-				@EditorController.addFileWithoutLock.callCount.should.equal 0
+			it 'should call upsertFileWithPath', ->
+				@EditorController.upsertFileWithPath.callCount.should.equal 0
 
 			it 'should call fs.unlink', ->
 				@fs.unlink.callCount.should.equal 1
 				@fs.unlink.calledWith(@writeStream.path).should.equal true
 
-		describe 'when getAllDocs produces an error', ->
-
-			beforeEach ->
-				@err = new Error('woops')
-				@ProjectEntityHandler.getAllFiles = sinon.stub().callsArgWith(1, @err)
-				@ReferencesApiHandler.importBibtex @req, @res, @next
-				@readStream.emit('data', 'hi')
-				@readStream.emit('end')
-
-			it 'should call next with the error', ->
-				@next.callCount.should.equal 1
-				@next.calledWith(@err).should.equal true
-
-			it 'should have called userCanMakeRequest', ->
-				@ReferencesApiHandler.userCanMakeRequest.callCount.should.equal 1
-
-			it 'should have called make3rdRequestStream', ->
-				@ReferencesApiHandler.make3rdRequestStream.callCount.should.equal 1
-
-			it 'should not call replaceFileWithoutLock', ->
-				@EditorController.replaceFileWithoutLock.callCount.should.equal 0
-
-			it 'should not call addFileWithoutLock', ->
-				@EditorController.addFileWithoutLock.callCount.should.equal 0
-
-			it 'should call fs.unlink', ->
-				@fs.unlink.callCount.should.equal 1
-				@fs.unlink.calledWith(@writeStream.path).should.equal true
-
-		describe 'when document is present, and replaceFileWithoutLock produces an error', ->
-
-			beforeEach ->
-				@err = new Error('woops')
-				@allFiles["/refProvider.bib"] = {_id: ObjectId().toString()}
-				@EditorController.replaceFileWithoutLock = sinon.stub().yields(@err)
-				@ReferencesApiHandler.importBibtex @req, @res, @next
-				@readStream.emit('data', 'hi')
-				@readStream.emit('end')
-
-			it 'should call next with the error', ->
-				@next.callCount.should.equal 1
-				@next.calledWith(@err).should.equal true
-
-			it 'should have called userCanMakeRequest', ->
-				@ReferencesApiHandler.userCanMakeRequest.callCount.should.equal 1
-
-			it 'should have called make3rdRequestStream', ->
-				@ReferencesApiHandler.make3rdRequestStream.callCount.should.equal 1
-
-			it 'should have called getAllFiles', ->
-				@ProjectEntityHandler.getAllFiles.callCount.should.equal 1
-
-			it 'should not call addFileWithoutLock', ->
-				@EditorController.addFileWithoutLock.callCount.should.equal 0
-
-			it 'should call fs.unlink', ->
-				@fs.unlink.callCount.should.equal 1
-				@fs.unlink.calledWith(@writeStream.path).should.equal true
-
-		describe 'when document is absent, and addFileWithoutLock produces an error', ->
-
+		describe 'upsertFileWithPath produces an error', ->
 			beforeEach ->
 				@err = new Error('woops')
 				@fs.unlink = sinon.stub().callsArgWith(1, null)
-				@EditorController.addFileWithoutLock.yields(@err)
+				@EditorController.upsertFileWithPath .yields(@err)
 				@ReferencesApiHandler.importBibtex @req, @res, @next
 				@readStream.emit('data', 'hi')
 				@readStream.emit('end')
@@ -393,12 +246,6 @@ describe 'ReferencesApiHandler', ->
 
 			it 'should have called make3rdRequestStream', ->
 				@ReferencesApiHandler.make3rdRequestStream.callCount.should.equal 1
-
-			it 'should have called getAllFiles', ->
-				@ProjectEntityHandler.getAllFiles.callCount.should.equal 1
-
-			it 'should not call replaceFileWithoutLock', ->
-				@EditorController.replaceFileWithoutLock.callCount.should.equal 0
 
 			it 'should call fs.unlink', ->
 				@fs.unlink.callCount.should.equal 1
