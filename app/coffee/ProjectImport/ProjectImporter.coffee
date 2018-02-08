@@ -11,7 +11,7 @@ oAuthRequest = require "../OAuth/OAuthRequest"
 UserMapper = require "../OverleafUsers/UserMapper"
 
 ProjectCreationHandler = require "../../../../../app/js/Features/Project/ProjectCreationHandler"
-ProjectEntityHandler = require "../../../../../app/js/Features/Project/ProjectEntityHandler"
+ProjectEntityUpdateHandler = require "../../../../../app/js/Features/Project/ProjectEntityUpdateHandler"
 ProjectDeleter = require "../../../../../app/js/Features/Project/ProjectDeleter"
 {ProjectInvite} = require "../../../../../app/js/models/ProjectInvite"
 CollaboratorsHandler = require "../../../../../app/js/Features/Collaborators/CollaboratorsHandler"
@@ -146,7 +146,7 @@ module.exports = ProjectImporter =
 		dirname = Path.dirname(path)
 		name = Path.basename(path)
 		logger.log {path: file.file, project_id, dirname, name, type: file.type}, "importing file"
-		ProjectEntityHandler.mkdirp project_id, dirname, (error, folders, lastFolder) ->
+		ProjectEntityUpdateHandler.mkdirp project_id, dirname, (error, folders, lastFolder) ->
 			return callback(error) if error?
 			folder_id = lastFolder._id
 			if file.type == "src"
@@ -154,10 +154,10 @@ module.exports = ProjectImporter =
 					return callback(new Error("expected file.latest_content"))
 				# We already have history entries, we just want to get the SL content in the same state,
 				# so don't send add requests to the history service for these new docs
-				ProjectEntityHandler.addDocWithoutUpdatingHistory project_id, folder_id, name, file.latest_content.split("\n"), user_id, (error, doc) ->
+				ProjectEntityUpdateHandler.addDocWithoutUpdatingHistory project_id, folder_id, name, file.latest_content.split("\n"), user_id, (error, doc) ->
 					return callback(error) if error?
 					if file.main
-						ProjectEntityHandler.setRootDoc project_id, doc._id, callback
+						ProjectEntityUpdateHandler.setRootDoc project_id, doc._id, callback
 					else
 						callback()
 			else if file.type == "att"
@@ -166,7 +166,7 @@ module.exports = ProjectImporter =
 				url = "#{settings.overleaf.s3.host}/#{file.file_path}"
 				ProjectImporter._writeUrlToDisk url, (error, pathOnDisk) ->
 					return callback(error) if error?
-					ProjectEntityHandler.addFileWithoutUpdatingHistory project_id, folder_id, name, pathOnDisk, user_id, callback
+					ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory project_id, folder_id, name, pathOnDisk, user_id, callback
 			else
 				logger.warn {type: file.type, path: file.file, project_id}, "unknown file type"
 				callback(new UnsupportedFileTypeError("unknown file type: #{file.type}"))
