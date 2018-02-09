@@ -6,8 +6,9 @@ settings = require 'settings-sharelatex'
 module.exports =
 	apply: (webRouter, apiRouter, privateApiRouter) ->
 
-		if !settings.overleaf?
-			logger.log {}, "Overleaf settings not configured, skipping metrics router"
+		if !settings?.apis?.v1?.url?
+			logger.log {},
+				"Overleaf v1 api settings not configured, skipping metrics router"
 			return
 
 		logger.log {}, "Init metrics router"

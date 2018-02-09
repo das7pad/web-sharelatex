@@ -16,11 +16,11 @@ module.exports = MetricsController =
 				return res.sendStatus(404)
 			request {
 				method: 'GET',
-				url: settings.overleaf.host +
+				url: settings.apis.v1.url +
 					"/api/v1/sharelatex/users/#{v1_userId}/metrics_segmentation",
 				auth:
-					user: settings.overleaf.v1BasicAuth.user
-					pass: settings.overleaf.v1BasicAuth.pass
+					user: settings.apis.v1.user
+					pass: settings.apis.v1.pass
 				json: true,
 				timeout: 5 * 1000
 			}, (err, response, body) ->
@@ -34,5 +34,5 @@ module.exports = MetricsController =
 						"[V1Segmentation] got non-200 response from v1: #{statusCode}"
 					)
 					logger.err {err, userId}, err.message
-					next(new Error(msg))
+					next(err)
 
