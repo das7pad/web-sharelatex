@@ -20,6 +20,7 @@ block content
 
   form(id='create_form' method='POST' action='/project/new/template/')
     input(type="hidden", name="_csrf", value=csrfToken)
-    input(type="hidden" name="templateId" value=id)
+    input(type="hidden" name="templateId" value=templateId)
+    input(type="hidden" name="templateVersionId" value=templateVersionId)
     input(type="hidden" name="templateName" value=name)
     input(type="hidden" name="compiler" value=compiler)
