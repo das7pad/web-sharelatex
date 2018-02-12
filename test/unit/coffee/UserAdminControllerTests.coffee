@@ -32,6 +32,8 @@ describe "UserAdminController", ->
 
 		@AuthenticationManager =
 			setUserPassword: sinon.stub()
+
+		@AuthenticationController = {}
 	
 		@SubscriptionLocator =
 			getUsersSubscription: sinon.stub().yields(null, @user_subscription = {"mock": "subscription"})
@@ -48,11 +50,13 @@ describe "UserAdminController", ->
 			"../../../../app/js/Features/User/UserDeleter":@UserDeleter
 			"../../../../app/js/Features/User/UserUpdater":@UserUpdater
 			"../../../../app/js/Features/Authentication/AuthenticationManager":@AuthenticationManager
+			"../../../../app/js/Features/Authentication/AuthenticationController":@AuthenticationController
 			"../../../../app/js/Features/Subscription/SubscriptionLocator": @SubscriptionLocator
 			"../../../../app/js/models/User": User: @User
 			"../../../../app/js/Features/Project/ProjectGetter": @ProjectGetter
 			"metrics-sharelatex":
 				gauge:->
+			"settings-sharelatex": @settings = {}
 
 		@perPage = @UserAdminController.PER_PAGE
 
@@ -115,7 +119,7 @@ describe "UserAdminController", ->
 	describe "show", ->
 
 		beforeEach ->
-
+			@UserAdminController._isSuperAdmin = sinon.stub().withArgs(@req).returns(false)
 			@req =
 				params:
 					user_id: 'user_id_here'
@@ -150,6 +154,20 @@ describe "UserAdminController", ->
 				done()
 			@UserAdminController.show @req, @res
 
+		it "should set the super admin state", (done) ->
+			@res.render = (pageName, opts)=>
+				expect(opts.isSuperAdmin).to.equal false
+				done()
+			@UserAdminController.show @req, @res
+
+		it "should set the super admin state to true when super admin", (done) ->
+			@UserAdminController._isSuperAdmin = sinon.stub().withArgs(@req).returns(true)
+			@res.render = (pageName, opts)=>
+				expect(opts.isSuperAdmin).to.equal true
+				done()
+			@UserAdminController.show @req, @res
+
+
 	describe "delete", ->
 
 		it "should delete the user", (done)->
@@ -164,6 +182,7 @@ describe "UserAdminController", ->
 
 	describe "update", ->
 		beforeEach ->
+			@UserAdminController._isSuperAdmin = sinon.stub().withArgs(@req).returns(false)
 			@req.params =
 				user_id: @user_id = ObjectId().toString()
 			@res.sendStatus = sinon.stub()
@@ -212,6 +231,28 @@ describe "UserAdminController", ->
 			it "should set the attribute to false", ->
 				updateQuery = @User.update.args[0][1]
 				expect(updateQuery.$set['features.versioning']).to.equal false
+
+		describe "with super admin only attribute", ->
+			beforeEach ->
+				@req.body =
+					isAdmin: true
+				@UserAdminController.update @req, @res
+
+			it "should ignore the attribute", ->
+				updateQuery = @User.update.args[0][1]
+				expect(updateQuery.$set.isAdmin).to.equal undefined
+
+		describe "with super admin only attribute when a super admin", ->
+			beforeEach ->
+				@UserAdminController._isSuperAdmin = sinon.stub().withArgs(@req).returns(true)
+				@req.body =
+					isAdmin: true
+				@UserAdminController.update @req, @res
+
+			it "should ignore the attribute", ->
+				updateQuery = @User.update.args[0][1]
+				expect(updateQuery.$set.isAdmin).to.equal true
+
 				
 	describe "updateEmail", ->
 		beforeEach ->
@@ -241,3 +282,25 @@ describe "UserAdminController", ->
 			it "should return 400 with a message", ->
 				@res.send.calledWith(400, {message: "Email is in use by another user"}).should.equal true
 			
+	describe "_isSuperAdmin", ->
+		beforeEach ->
+			@current_user_id = 'current_user_id-123'
+			@AuthenticationController.getLoggedInUserId = sinon.stub().withArgs(@req).returns(@current_user_id)
+
+		it "should return false if no super admin setting is set", ->
+			delete @settings.superAdminUserIds
+			expect(
+				@UserAdminController._isSuperAdmin(@req)
+			).to.equal false
+
+		it "should return false if user is not in super admins", ->
+			@settings.superAdminUserIds = ['not-current-user']
+			expect(
+				@UserAdminController._isSuperAdmin(@req)
+			).to.equal false
+
+		it "should return true if user is in super admins", ->
+			@settings.superAdminUserIds = [@current_user_id]
+			expect(
+				@UserAdminController._isSuperAdmin(@req)
+			).to.equal true
