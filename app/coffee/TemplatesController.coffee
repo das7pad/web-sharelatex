@@ -100,11 +100,11 @@ module.exports = TemplatesController =
 
 	createProjectFromV1Template: (req, res)->
 		currentUserId = AuthenticationController.getLoggedInUserId(req)
-		zipUrl =	"#{settings.overleaf.host}/api/v1/sharelatex/templates/#{req.body.templateId}"
+		zipUrl =	"#{settings.apis.v1.url}/api/v1/sharelatex/templates/#{req.body.templateId}"
 		zipReq = request(zipUrl, {
 			'auth': {
-				'user': settings.overleaf.v1BasicAuth.user,
-				'pass': settings.overleaf.v1BasicAuth.pass
+				'user': settings.apis.v1.user,
+				'pass': settings.apis.v1.pass
 			}
 		})
 
