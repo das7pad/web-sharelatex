@@ -155,7 +155,7 @@ module.exports = ReferencesApiHandler =
 				EditorController.upsertFileWithPath project_id, filePath, tempFilePath, "references-import", user_id, (err) ->
 					_cleanup () ->
 						if err?
-							logger.err {user_id, ref_provider, project_id, tempFilePath}, "could not add bibtex file"
+							logger.err {err, user_id, ref_provider, project_id, tempFilePath}, "could not add bibtex file"
 							next err
 						else
 							res.sendStatus 201
