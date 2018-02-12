@@ -181,18 +181,24 @@ p
 						ng-model="user.awareOfV2"
 					)
 
-			tr
-				th(colspan=2).text-center Site Admin.
 
-			tr
-				td
-					label(for="isAdmin") Is Admin?
-				td
-					input#betaProgram(
-						type="checkbox"
-						name="isAdmin"
-						ng-model="user.isAdmin"
-					)
+			if isSuperAdmin
+				tr
+					th(colspan=2).text-center Site Admin.
+
+				tr(ng-show="!showIsAdmin")
+					td(colspan=2)
+						a(href,ng-click="showIsAdmin = true", ng-show="!showIsAdmin") Show
+
+				tr(ng-show="showIsAdmin")
+					td
+						label(for="isAdmin").text-danger Is Site Admin? <br/> (Grants full access to all users and projects!)
+					td
+						input#betaProgram(
+							type="checkbox"
+							name="isAdmin"
+							ng-model="user.isAdmin"
+						)
 
 		form-messages(for="adminUserForm")
 			.alert.alert-success(ng-show="adminUserForm.response.success && !adminUserForm.inflight")

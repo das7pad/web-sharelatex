@@ -8,8 +8,10 @@ UserUpdater = require("../../../../app/js/Features/User/UserUpdater")
 {User} = require("../../../../app/js/models/User")
 ProjectGetter = require "../../../../app/js/Features/Project/ProjectGetter"
 AuthenticationManager = require("../../../../app/js/Features/Authentication/AuthenticationManager")
+AuthenticationController = require("../../../../app/js/Features/Authentication/AuthenticationController")
 SubscriptionLocator = require("../../../../app/js/Features/Subscription/SubscriptionLocator")
 async = require "async"
+settings = require "settings-sharelatex"
 
 module.exports = UserAdminController =
 	PER_PAGE: 100
@@ -65,6 +67,7 @@ module.exports = UserAdminController =
 				SubscriptionLocator.getMemberSubscriptions user_id, cb
 		}, (err, data) ->
 			return next(err) if err?
+			data.isSuperAdmin = UserAdminController._isSuperAdmin(req)
 			res.render Path.resolve(__dirname, "../views/user/show"), data
 
 	delete: (req, res, next)->
@@ -87,7 +90,9 @@ module.exports = UserAdminController =
 		'features.templates',
 		'features.trackChanges',
 		'features.references',
-		'awareOfV2',
+		'awareOfV2'
+	]
+	SUPER_ADMIN_ALLOWED_ATTRIBUTES: [
 		'isAdmin'
 	]
 	BOOLEAN_ATTRIBUTES: [
@@ -103,11 +108,15 @@ module.exports = UserAdminController =
 	]
 	update: (req, res, next) ->
 		user_id = req.params.user_id
+		allowed_attributes = UserAdminController.ALLOWED_ATTRIBUTES
+		if UserAdminController._isSuperAdmin(req)
+			allowed_attributes = allowed_attributes.concat(UserAdminController.SUPER_ADMIN_ALLOWED_ATTRIBUTES)
 		update = UserAdminController._reqToMongoUpdate(
 			req.body,
-			UserAdminController.ALLOWED_ATTRIBUTES,
+			allowed_attributes,
 			UserAdminController.BOOLEAN_ATTRIBUTES
 		)
+		logger.log {user_id, update}, "updating user via admin panel"
 		User.update {_id: user_id}, { $set: update }, (err) ->
 			return next(err) if err?
 			res.sendStatus 204
@@ -136,3 +145,11 @@ module.exports = UserAdminController =
 			else if body[attribute]?
 				update[attribute] = body[attribute]
 		return update
+
+	_isSuperAdmin: (req) ->
+		current_user_id = AuthenticationController.getLoggedInUserId(req)
+		if settings.superAdminUserIds? and current_user_id in settings.superAdminUserIds
+			return true
+		else
+			return false
+
