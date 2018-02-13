@@ -10,7 +10,7 @@ define [
 		else
 			return null
 
-	App.controller "ReferencesSearchController", ($scope, $modal, ide, $timeout, sixpack, event_tracking) ->
+	App.controller "ReferencesSearchController", ($scope, $modal, ide, $timeout, sixpack, event_tracking, $rootScope) ->
 		$scope.searchFeatureEnabled = () ->
 			return true
 			# return (
@@ -111,9 +111,8 @@ define [
 				return
 			# try to get the 'main' editor and it's `startAutocomplete` (Ctrl-Space)
 			# key-command object
-			editor = window.editors[0]
-			if !editor
-				console.log('no editor found at window.editors[0]')
+			if !editor?
+				console.log('no editor found')
 				return
 			startAutocomplete = editor?.commands?.commands?.startAutocomplete
 			if !startAutocomplete
@@ -167,13 +166,14 @@ define [
 				$scope._inited = true
 
 		# do setup when project loads
-		$scope.$on 'project:joined', () ->
-			$scope.setup()
+		editor = null
+		$rootScope.$on 'editor:inited', (event, _editor) ->
+			editor = _editor
+			setTimeout $scope.setup
 
 		$scope.insertKeyAtCursor = (key) ->
-			editor = window.editors[0]
-			if !editor
-				console.log('no editor found at window.editors[0]')
+			if !editor?
+				console.log('no editor found')
 				return
 			pos = editor.getCursorPosition()
 			session = editor.getSession()
