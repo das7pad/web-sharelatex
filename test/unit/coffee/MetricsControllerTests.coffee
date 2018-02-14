@@ -10,9 +10,9 @@ describe "MetricsController", ->
 	beforeEach ->
 		@MetricsController = SandboxedModule.require modulePath, requires:
 			'settings-sharelatex': @Settings =
-				overleaf:
-					host: 'some.host'
-					v1BasicAuth:
+				apis:
+					v1:
+						url: 'some.host'
 						user: 'one'
 						pass: 'two'
 			'request': @request = sinon.stub()
