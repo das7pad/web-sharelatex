@@ -4,7 +4,7 @@ AuthenticationController = require("../../../../app/js/Features/Authentication/A
 settings = require 'settings-sharelatex'
 
 module.exports =
-	apply: (webRouter, apiRouter, privateApiRouter) ->
+	apply: (webRouter, privateApiRouter, publicApiRouter) ->
 
 		if !settings?.apis?.v1?.url?
 			logger.log {},
