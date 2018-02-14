@@ -141,7 +141,10 @@ module.exports = TemplatesController =
 					fs.unlink dumpPath, ->
 					delete req.session.templateData
 					conditions = {_id:project._id}
-					update = {templateId:options.templateId, templateVersionId:options.templateVersionId}
+					update = {
+						fromV1TemplateId:options.templateId,
+						fromV1TemplateVersionId:options.templateVersionId
+					}
 					Project.update conditions, update, {}, (err)->
 						res.redirect "/project/#{project._id}"
 
