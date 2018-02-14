@@ -13,7 +13,7 @@ describe "ProjectImporter", ->
 	beforeEach ->
 		@ProjectImporter = SandboxedModule.require modulePath, requires:
 			"../../../../../app/js/Features/Project/ProjectCreationHandler": @ProjectCreationHandler = {}
-			"../../../../../app/js/Features/Project/ProjectEntityHandler": @ProjectEntityHandler = {}
+			"../../../../../app/js/Features/Project/ProjectEntityUpdateHandler": @ProjectEntityUpdateHandler = {}
 			"../../../../../app/js/Features/Project/ProjectDeleter": @ProjectDeleter = {}
 			"../../../../../app/js/models/ProjectInvite": ProjectInvite: @ProjectInvite = {}
 			"../OAuth/OAuthRequest": @oAuthRequest = sinon.stub()
@@ -363,10 +363,10 @@ describe "ProjectImporter", ->
 			@project_id = "mock-project-id"
 			@user_id = "mock-user-id"
 			@doc = { _id: @doc_id = "mock-doc-id" }
-			@ProjectEntityHandler.mkdirp = sinon.stub().yields(null, [], { _id: @folder_id = "mock-folder-id" })
-			@ProjectEntityHandler.addDocWithoutUpdatingHistory = sinon.stub().yields(null, @doc)
-			@ProjectEntityHandler.addFileWithoutUpdatingHistory = sinon.stub().yields()
-			@ProjectEntityHandler.setRootDoc = sinon.stub().yields()
+			@ProjectEntityUpdateHandler.mkdirp = sinon.stub().yields(null, [], { _id: @folder_id = "mock-folder-id" })
+			@ProjectEntityUpdateHandler.addDocWithoutUpdatingHistory = sinon.stub().yields(null, @doc)
+			@ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory = sinon.stub().yields()
+			@ProjectEntityUpdateHandler.setRootDoc = sinon.stub().yields()
 
 		describe "with a src file", ->
 			beforeEach (done) ->
@@ -378,19 +378,19 @@ describe "ProjectImporter", ->
 				@ProjectImporter._importFile @project_id, @user_id, @file, done
 
 			it "should create the file's folder", ->
-				@ProjectEntityHandler.mkdirp
+				@ProjectEntityUpdateHandler.mkdirp
 					.calledWith(@project_id, "/folder")
 					.should.equal true
 
 			it "should add the doc to the project", ->
-				@ProjectEntityHandler.addDocWithoutUpdatingHistory
+				@ProjectEntityUpdateHandler.addDocWithoutUpdatingHistory
 					.calledWith(
 						@project_id, @folder_id, "chapter1.tex", ["chapter 1 content"], @user_id
 					)
 					.should.equal true
 
 			it "should not make the doc the root doc", ->
-				@ProjectEntityHandler.setRootDoc
+				@ProjectEntityUpdateHandler.setRootDoc
 					.called.should.equal false
 
 		describe "with the main src file", ->
@@ -404,12 +404,12 @@ describe "ProjectImporter", ->
 				@ProjectImporter._importFile @project_id, @user_id, @file, done
 
 			it "should create the file's folder", ->
-				@ProjectEntityHandler.mkdirp
+				@ProjectEntityUpdateHandler.mkdirp
 					.calledWith(@project_id, "/")
 					.should.equal true
 
 			it "should make the doc the root doc", ->
-				@ProjectEntityHandler.setRootDoc
+				@ProjectEntityUpdateHandler.setRootDoc
 					.calledWith(@project_id, @doc_id)
 					.should.equal true
 
@@ -424,7 +424,7 @@ describe "ProjectImporter", ->
 				@ProjectImporter._importFile @project_id, @user_id, @file, done
 
 			it "should create the file's folder", ->
-				@ProjectEntityHandler.mkdirp
+				@ProjectEntityUpdateHandler.mkdirp
 					.calledWith(@project_id, "/images")
 					.should.equal true
 
@@ -434,7 +434,7 @@ describe "ProjectImporter", ->
 					.should.equal true
 
 			it "should add the file to the project", ->
-				@ProjectEntityHandler.addFileWithoutUpdatingHistory
+				@ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory
 					.calledWith(
 						@project_id, @folder_id, "image.jpeg", "path/on/disk", @user_id
 					)
