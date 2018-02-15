@@ -37,8 +37,8 @@ getProject = (response, callback) ->
 
 	ProjectGetter.getProject project_id, (error, project) ->
 		throw error if error?
-		throw new Error('could not find imported project') if !(project? && project[0]?)
-		callback(null, project[0])
+		throw new Error('could not find imported project') if !project?
+		callback null, project
 
 describe "ProjectImportTests", ->
 	before (done) ->
