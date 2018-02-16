@@ -1,3 +1,4 @@
+Project = require("../../../../../app/js/models/Project").Project
 ProjectGetter = require '../../../../../app/js/Features/Project/ProjectGetter'
 
 module.exports = TrackChangesManager =
