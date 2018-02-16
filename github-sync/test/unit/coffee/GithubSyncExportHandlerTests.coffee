@@ -10,7 +10,7 @@ describe "GithubSyncExportHandler", ->
 		@GithubSyncExportHandler = SandboxedModule.require modulePath, requires:
 			"../../../../app/js/Features/Project/ProjectEntityHandler": @ProjectEntityHandler = {}
 			"../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler": @DocumentUpdaterHandler = {}
-			"../../../../app/js/models/Project": Project: @Project = {}
+			"../../../../app/js/Features/Project/ProjectGetter": @ProjectGetter = {}
 			"./GithubSyncApiHandler": @GithubSyncApiHandler = {}
 			"settings-sharelatex": @settings =
 				apis:
@@ -27,14 +27,14 @@ describe "GithubSyncExportHandler", ->
 			@owner_id = "owner-id-123"
 			@name = "mock-name"
 			@description = "Repository description"
-			@Project.findById = sinon.stub().callsArgWith(2, null, @project = { owner_ref: @owner_id })
+			@ProjectGetter.getProject = sinon.stub().callsArgWith(2, null, @project = { owner_ref: @owner_id })
 			@GithubSyncApiHandler.exportProject = sinon.stub().callsArg(4)
 			@GithubSyncExportHandler._buildFileList = sinon.stub().callsArgWith(1, null, @files = ["mock-files"])
 			@DocumentUpdaterHandler.flushProjectToMongo = sinon.stub().callsArg(1)
 			@GithubSyncExportHandler.exportProject @project_id, { name: @name, description: @description }, @callback
 			
 		it "should look up the project owner", ->
-			@Project.findById
+			@ProjectGetter.getProject
 				.calledWith(@project_id, {owner_ref: 1})
 				.should.equal true
 				
