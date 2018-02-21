@@ -1,4 +1,5 @@
 path = require('path')
+Project = require('../../../../app/js/models/Project').Project
 ProjectUploadManager = require('../../../../app/js/Features/Uploads/ProjectUploadManager')
 ProjectOptionsHandler = require("../../../../app/js/Features/Project/ProjectOptionsHandler")
 ProjectDetailsHandler = require('../../../../app/js/Features/Project/ProjectDetailsHandler')
@@ -88,19 +89,21 @@ module.exports = TemplatesController =
 				res.json details
 
 	getV1Template: (req, res)->
-		templateId = req.params.Template_id
-		if !/^[0-9]+$/.test(templateId)
-			logger.err templateId:templateId, "invalid template id"
+		templateVersionId = req.params.Template_version_id
+		templateId = req.query.id
+		if !/^[0-9]+$/.test(templateVersionId) || !/^[0-9]+$/.test(templateId)
+			logger.err templateVersionId:templateVersionId, templateId: templateId, "invalid template id or version"
 			return res.sendStatus 400
 		data = {}
-		data.id = templateId
+		data.templateVersionId = templateVersionId
+		data.templateId = templateId
 		data.name = req.query.templateName
 		data.compiler = req.query.latexEngine
 		res.render path.resolve(__dirname, "../views/new_from_template"), data
 
 	createProjectFromV1Template: (req, res)->
 		currentUserId = AuthenticationController.getLoggedInUserId(req)
-		zipUrl =	"#{settings.apis.v1.url}/api/v1/sharelatex/templates/#{req.body.templateId}"
+		zipUrl =	"#{settings.apis.v1.url}/api/v1/sharelatex/templates/#{req.body.templateVersionId}"
 		zipReq = request(zipUrl, {
 			'auth': {
 				'user': settings.apis.v1.user,
@@ -114,6 +117,9 @@ module.exports = TemplatesController =
 				templateName: req.body.templateName,
 				currentUserId: currentUserId,
 				compiler: req.body.compiler
+				docId: req.body.docId
+				templateId: req.body.templateId
+				templateVersionId: req.body.templateVersionId
 			},
 			req,
 			res
@@ -134,7 +140,13 @@ module.exports = TemplatesController =
 				setCompiler project._id, options.compiler, ->
 					fs.unlink dumpPath, ->
 					delete req.session.templateData
-					res.redirect "/project/#{project._id}"
+					conditions = {_id:project._id}
+					update = {
+						fromV1TemplateId:options.templateId,
+						fromV1TemplateVersionId:options.templateVersionId
+					}
+					Project.update conditions, update, {}, (err)->
+						res.redirect "/project/#{project._id}"
 
 setCompiler = (project_id, compiler, callback)->
 	if compiler?

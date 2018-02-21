@@ -105,8 +105,8 @@ describe 'TemplatesController', ->
 	describe 'v1Templates', ->
 
 		it "should fetch zip from v1 based on template id", (done)->
-			@templateId = 15
-			@req.body = {templateId: @templateId}
+			@templateVersionId = 15
+			@req.body = {templateVersionId: @templateId}
 
 			redirect = =>
 				@request.calledWith("#{@v1Url}/api/v1/sharelatex/templates/#{@templateId}").should.equal true
