@@ -106,7 +106,6 @@ define [
 		$scope.setup = () ->
 			if $scope.settings.autoComplete == false
 				return
-			$scope.searchEnabled = ide?.$scope?.project?.features?.references == true
 			if $scope._inited
 				return
 			# try to get the 'main' editor and it's `startAutocomplete` (Ctrl-Space)
@@ -141,6 +140,7 @@ define [
 
 						sixpack.convert 'bib-search-highlight' if $scope.shouldABTestBibSearch
 
+						$scope.searchEnabled = ide?.$scope?.project?.features?.references == true
 						$scope.openReferencesSearchModal()
 					else
 						startAutocomplete.exec(ed)
