@@ -16,5 +16,11 @@ module.exports =
 		privateApiRouter.get(
 			'/user/:user_id/v1/metrics_segmentation',
 			AuthenticationController.httpAuth,
-			MetricsController.metricsSegmentation
+			MetricsController.userMetricsSegmentation
+		)
+
+		privateApiRouter.get(
+			'/project/:project_id/v1/metrics_segmentation',
+			AuthenticationController.httpAuth,
+			MetricsController.projectMetricsSegmentation
 		)
