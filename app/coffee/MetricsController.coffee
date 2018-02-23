@@ -1,11 +1,12 @@
 settings = require 'settings-sharelatex'
 request = require 'request'
 UserGetter = require '../../../../app/js/Features/User/UserGetter'
+ProjectGetter = require '../../../../app/js/Features/Project/ProjectGetter'
 logger = require 'logger-sharelatex'
 
 module.exports = MetricsController =
 
-	metricsSegmentation: (req, res, next) ->
+	userMetricsSegmentation: (req, res, next) ->
 		userId = req.params.user_id
 		if !userId?
 			return next(new Error('[V1Segmentation] user_id required'))
@@ -36,3 +37,21 @@ module.exports = MetricsController =
 					logger.err {err, userId}, err.message
 					next(err)
 
+	projectMetricsSegmentation: (req, res, next) ->
+		projectId = req.params.project_id
+		if !projectId?
+			return next(new Error('[V1Segmentation] project_id required'))
+		ProjectGetter.getProject projectId, {
+			fromV1TemplateId: 1,
+			fromV1TemplateVersionId: 1,
+		}, (err, project) ->
+			if err?
+				return next(err)
+			if !project?
+				return res.sendStatus(404)
+			result = {
+				projectId: projectId,
+				v1TemplateId: project.fromV1TemplateId || null
+				v1TemplateVersionId: project.fromV1TemplateVersionId || null,
+			}
+			res.json(result)

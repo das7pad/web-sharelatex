@@ -18,8 +18,13 @@ describe "MetricsController", ->
 			'request': @request = sinon.stub()
 			'../../../../app/js/Features/User/UserGetter': @UserGetter =
 				getUser: sinon.stub()
+			'../../../../app/js/Features/Project/ProjectGetter': @ProjectGetter =
+				getProject: sinon.stub()
+			'logger-sharelatex':
+				err: sinon.stub()
+				log: sinon.stub()
 
-	describe 'metricsSegmentation', ->
+	describe 'userMetricsSegmentation', ->
 		beforeEach ->
 			@req =
 				params:
@@ -37,7 +42,7 @@ describe "MetricsController", ->
 				json: sinon.stub()
 			@next = sinon.stub()
 			@call = () =>
-				@MetricsController.metricsSegmentation(@req, @res, @next)
+				@MetricsController.userMetricsSegmentation(@req, @res, @next)
 
 		it 'should use the request', (done) ->
 			@call()
@@ -49,3 +54,44 @@ describe "MetricsController", ->
 			@res.json.calledWith(@body).should.equal true
 			done()
 
+	describe 'projectMetricsSegmentation', ->
+		beforeEach ->
+			@req =
+				params:
+					project_id: @user_id = '1234'
+			@res =
+				json: sinon.stub()
+			@next = sinon.stub()
+			@fakeProject =
+				_id: '1234'
+				fromV1TemplateId: 45
+				fromV1TemplateVersionId: 34
+			@call = (callback) =>
+				@MetricsController.projectMetricsSegmentation(@req, @res, @next)
+				callback()
+
+		describe 'when all goes well', ->
+			beforeEach ->
+				@ProjectGetter.getProject = sinon.stub()
+					.callsArgWith(2, null, @fakeProject)
+
+			it 'should produce the right data', (done) ->
+				@call () =>
+					expect(@next.callCount).to.equal 0
+					expect(@res.json.calledWith({
+						projectId: '1234',
+						v1TemplateId: 45,
+						v1TemplateVersionId: 34
+					})).to.equal true
+					done()
+
+		describe 'when getting the project produces an error', ->
+			beforeEach ->
+				@ProjectGetter.getProject = sinon.stub()
+					.callsArgWith(2, new Error('woops'))
+
+			it 'should produce an error', (done) ->
+				@call () =>
+					expect(@next.callCount).to.equal 1
+					expect(@next.lastCall.args[0]).to.be.instanceof Error
+					done()
