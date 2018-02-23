@@ -2,7 +2,7 @@ module.exports =
 	overleaf:
 		host: "http://localhost:5000"
 		s3:
-			host: "https://writelatex-dev.s3.amazonaws.com"
+			host: "http://localhost:5001" # MockS3Api
 		oauth:
 			clientID: "mock-oauth-client-id"
 			clientSecret: "mock-oauth-client-secret"

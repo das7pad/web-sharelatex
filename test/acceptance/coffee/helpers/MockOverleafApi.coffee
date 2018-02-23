@@ -4,13 +4,8 @@ app = express()
 module.exports = MockOverleafApi =
 	docs: { }
 
-	files: { }
-
 	setDoc: (doc) ->
 		@docs[doc.id] = doc
-
-	setFile: (file) ->
-		@files[file.id] = file.path
 
 	run: () ->
 		app.post "/api/v1/sharelatex/docs/:ol_doc_id/export/start", (req, res, next) =>
@@ -25,13 +20,6 @@ module.exports = MockOverleafApi =
 
 		app.post "/api/v1/sharelatex/docs/:ol_doc_id/export/cancel", (req, res, next) =>
       res.sendStatus 204
-
-		app.get "/file/:file_id", (req, res, next) =>
-			file = @files[req.params.file_id]
-			if file
-				file.stream.pipe(res)
-			else
-				res.sendStatus 404
 
 		app.listen 5000, (error) ->
 			throw error if error?

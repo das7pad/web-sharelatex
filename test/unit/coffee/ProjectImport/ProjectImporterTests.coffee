@@ -22,7 +22,7 @@ describe "ProjectImporter", ->
 			"../../../../../app/js/Features/Authorization/PrivilegeLevels": PrivilegeLevels
 			"request": @request = {}
 			"logger-sharelatex": { log: sinon.stub(), warn: sinon.stub() }
-			"settings-sharelatex":
+			"settings-sharelatex": @settings =
 				overleaf:
 					host: "http://overleaf.example.com"
 					s3:
@@ -420,7 +420,7 @@ describe "ProjectImporter", ->
 					file_path: "s3/image.jpeg"
 					type: "att"
 				}
-				@ProjectImporter._writeUrlToDisk = sinon.stub().yields(null, "path/on/disk")
+				@ProjectImporter._writeS3ObjectToDisk = sinon.stub().yields(null, "path/on/disk")
 				@ProjectImporter._importFile @project_id, @user_id, @file, done
 
 			it "should create the file's folder", ->
@@ -428,9 +428,9 @@ describe "ProjectImporter", ->
 					.calledWith(@project_id, "/images")
 					.should.equal true
 
-			it "should download the url to disk", ->
-				@ProjectImporter._writeUrlToDisk
-					.calledWith("http://s3.example.com/s3/image.jpeg")
+			it "should download the url to disk from s3", ->
+				@ProjectImporter._writeS3ObjectToDisk
+					.calledWith("s3/image.jpeg")
 					.should.equal true
 
 			it "should add the file to the project", ->
@@ -535,3 +535,32 @@ describe "ProjectImporter", ->
 
 		it "should return the callback", ->
 			@callback.called.should.equal true
+
+	describe "_writeS3ObjectToDisk", ->
+		beforeEach ->
+			@ProjectImporter._writeUrlToDisk = sinon.stub().yields()
+
+		it "should call _writeUrlToDisk with the s3 url", (done) ->
+			delete @settings.overleaf.s3.key
+			delete @settings.overleaf.s3.secret
+			@ProjectImporter._writeS3ObjectToDisk "foo/bar", (error) =>
+				@ProjectImporter._writeUrlToDisk
+					.calledWith({
+						url: "http://s3.example.com/foo/bar"
+					})
+					.should.equal true
+				done()
+
+		it "should call _writeUrlToDisk with the s3 credentials if present", (done) ->
+			@settings.overleaf.s3.key = "mock-key"
+			@settings.overleaf.s3.secret = "mock-secret"
+			@ProjectImporter._writeS3ObjectToDisk "foo/bar", (error) =>
+				@ProjectImporter._writeUrlToDisk
+					.calledWith({
+						url: "http://s3.example.com/foo/bar"
+						aws:
+							key: "mock-key"
+							secret: "mock-secret"
+					})
+					.should.equal true
+				done()
