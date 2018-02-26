@@ -10,7 +10,7 @@ SubscriptionUpdater = require("../../../../../app/js/Features/Subscription/Subsc
 
 module.exports = OverleafAuthenticationController =
 	welcomeScreen: (req, res, next) ->
-		res.render Path.resolve(__dirname, "../../views/welcome")
+		res.render Path.resolve(__dirname, "../../views/welcome"), req.query
 
 	setupUser: (req, res, next) ->
 		# This will call OverleafAuthenticationManager.setupUser
