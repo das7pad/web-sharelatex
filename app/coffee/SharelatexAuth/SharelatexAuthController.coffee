@@ -28,7 +28,8 @@ module.exports = SharelatexAuthController =
 				return next(error) if error?
 				AuthenticationController.afterLoginSessionSetup req, user, (error) ->
 					return next(error) if error?
-					res.redirect "/"
+					redir = AuthenticationController._getRedirectFromSession(req) || "/project"
+					res.redirect(redir)
 
 	_badToken: (res, error) ->
 		logger.err err: error, "bad token in logging in from sharelatex"

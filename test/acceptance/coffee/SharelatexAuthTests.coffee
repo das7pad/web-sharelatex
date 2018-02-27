@@ -30,9 +30,9 @@ describe "SharelatexAuth", ->
 				expect(loggedIn).to.equal true
 				done()
 
-		it 'should redirect to /', ->
+		it 'should redirect to /project', ->
 			expect(@response.statusCode).to.equal 302
-			expect(@response.headers.location).to.equal '/'
+			expect(@response.headers.location).to.equal '/project'
 
 	describe 'with an invalid jwt', ->
 		before (done) ->

@@ -6,17 +6,22 @@ block content
 			.row
 				.col-md-10.col-md-offset-1
 					.card
-						.page-header
-							h1 Welcome to Overleaf v2!
-						p
-							| Overleaf and ShareLaTeX have
-							|
-							a(href="https://www.overleaf.com/blog/518-exciting-news-sharelatex-is-joining-overleaf") joined forces
-							| . We’re currently beta-testing a new platform called Overleaf v2, which will combine the best features from Overleaf and ShareLaTeX.
+						if project_name
+							.page-header
+								h1 #{user_first_name} would like you to join <em>#{project_name}</em>
+							p You need to be logged in to Overleaf v2 in order to accept the invite and join the project.
+						else
+							.page-header
+								h1 Welcome to Overleaf v2!
+							p
+								| Overleaf and ShareLaTeX have
+								|
+								a(href="https://www.overleaf.com/blog/518-exciting-news-sharelatex-is-joining-overleaf", target="_blank") joined forces
+								| . We’re currently beta-testing a new platform called Overleaf v2, which will combine the best features from Overleaf and ShareLaTeX.
 						P
 							| You can log-in with either your Overleaf or ShareLaTeX account.
 							|
-							a(href="https://www.overleaf.com/help/342-overleaf-v2-faq") Read more.
+							a(href="https://www.overleaf.com/help/342-overleaf-v2-faq", target="_blank") Read more.
 						p.text-center.row-spaced
 							a(href="/overleaf/login").btn.btn-lg.btn-success Log in with Overleaf
 							| &nbsp;

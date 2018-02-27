@@ -6,6 +6,7 @@ SharelatexAuthController = require "./SharelatexAuth/SharelatexAuthController"
 RateLimiterMiddlewear = require('../../../../app/js/Features/Security/RateLimiterMiddlewear')
 passport = require "passport"
 logger = require "logger-sharelatex"
+qs = require 'querystring'
 
 module.exports = 
 	apply: (webRouter, privateApiRouter, publicApiRouter) ->
@@ -13,6 +14,7 @@ module.exports =
 		webRouter.get '/login', OverleafAuthenticationController.welcomeScreen
 
 		webRouter.get '/overleaf/login', passport.authenticate("overleaf")
+		webRouter.get '/register', (req, res, next) -> res.redirect("/login?#{qs.stringify(req.query)}")
 		
 		webRouter.get(
 			'/overleaf/callback',

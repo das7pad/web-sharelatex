@@ -41,6 +41,8 @@ describe "SharelatexAuthController", ->
 			@UserGetter.getUser.withArgs(@user_id).yields(null, @user)
 			@AuthenticationController.afterLoginSessionSetup =
 				sinon.stub().yields()
+			@AuthenticationController._getRedirectFromSession =
+				sinon.stub().returns('/redir/path')
 			@jwt.verify = sinon.stub()
 			@jwt.verify.withArgs(@token, @settings.accountMerge.secret).yields(null, @data)
 			@req.query = token: @token
@@ -64,9 +66,9 @@ describe "SharelatexAuthController", ->
 					.calledWith(@req, @user)
 					.should.equal true
 
-			it "should redirect to /", ->
+			it "should redirect to '/redir/path'", ->
 				@res.redirect
-					.calledWith('/')
+					.calledWith('/redir/path')
 					.should.equal true
 
 		describe "with no token", ->
