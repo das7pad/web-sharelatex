@@ -11,6 +11,7 @@ MockDocstoreApi = require "#{WEB_PATH}/test/acceptance/js/helpers/MockDocstoreAp
 MockDocUpdaterApi = require "#{WEB_PATH}/test/acceptance/js/helpers/MockDocUpdaterApi"
 MockFilestoreApi = require "./helpers/MockFilestoreApi"
 MockOverleafApi = require "./helpers/MockOverleafApi"
+MockS3Api = require "./helpers/MockS3Api"
 ProjectGetter = require "#{WEB_PATH}/app/js/Features/Project/ProjectGetter"
 ProjectEntityHandler = require "#{WEB_PATH}/app/js/Features/Project/ProjectEntityHandler"
 User = require "#{WEB_PATH}/test/acceptance/js/helpers/User"
@@ -102,7 +103,7 @@ describe "ProjectImportTests", ->
 				id: new ObjectId()
 				stream: fs.createReadStream(Path.resolve(__dirname + '/../files/1pixel.png'))
 			}
-			MockOverleafApi.setFile file
+			MockS3Api.setFile file
 			files = [
 				type: 'att'
 				file: '1pixel.png'

@@ -163,20 +163,29 @@ module.exports = ProjectImporter =
 			else if file.type == "att"
 				if !file.file_path?
 					return callback(new Error("expected file.file_path"))
-				url = "#{settings.overleaf.s3.host}/#{file.file_path}"
-				ProjectImporter._writeUrlToDisk url, (error, pathOnDisk) ->
+				ProjectImporter._writeS3ObjectToDisk file.file_path, (error, pathOnDisk) ->
 					return callback(error) if error?
 					ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory project_id, folder_id, name, pathOnDisk, user_id, callback
 			else
 				logger.warn {type: file.type, path: file.file, project_id}, "unknown file type"
 				callback(new UnsupportedFileTypeError("unknown file type: #{file.type}"))
 
-	_writeUrlToDisk: (url, callback = (error, pathOnDisk) ->) ->
+	_writeS3ObjectToDisk: (path, callback = (error, pathOnDisk) ->) ->
+		options = {
+			url: "#{settings.overleaf.s3.host}/#{path}"
+		}
+		if settings.overleaf.s3.key? and settings.overleaf.s3.secret?
+			options.aws =
+				key: settings.overleaf.s3.key
+				secret: settings.overleaf.s3.secret
+		ProjectImporter._writeUrlToDisk options, callback
+
+	_writeUrlToDisk: (options, callback = (error, pathOnDisk) ->) ->
 			callback = _.once(callback)
 
 			pathOnDisk = "#{settings.path.dumpFolder}/#{uuid.v4()}"
 
-			readStream = request.get url
+			readStream = request.get options
 			writeStream = fs.createWriteStream(pathOnDisk)
 
 			onError = (error) ->
@@ -189,7 +198,13 @@ module.exports = ProjectImporter =
 			writeStream.on "finish", ->
 				callback null, pathOnDisk
 
-			readStream.pipe(writeStream)
+			readStream.on 'response', (response) ->
+				if 200 <= response.statusCode < 300
+					readStream.pipe(writeStream)
+				else
+					error = new Error("Overleaf s3 returned non-success code: #{response.statusCode}")
+					logger.error {err: error, options}, "overleaf s3 error"
+					return callback(error)
 
 	_confirmExport: (v1_project_id, v2_project_id, user_id, callback = (error) ->) ->
 		oAuthRequest user_id, {
