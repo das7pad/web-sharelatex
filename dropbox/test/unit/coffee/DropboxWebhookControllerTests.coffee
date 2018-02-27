@@ -9,6 +9,7 @@ describe 'DropboxWebhookController', ->
 		@req =
 			session:
 				destroy: ->
+		@res = {}
 
 		@DropboxWebhookController = SandboxedModule.require modulePath, requires:
 			"./DropboxWebhookHandler": @DropboxWebhookHandler = {}
