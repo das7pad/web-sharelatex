@@ -165,7 +165,7 @@ module.exports = ProjectImporter =
 					return callback(new Error("expected file.file_path"))
 				ProjectImporter._writeS3ObjectToDisk file.file_path, (error, pathOnDisk) ->
 					return callback(error) if error?
-					ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory project_id, folder_id, name, pathOnDisk, user_id, callback
+					ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory project_id, folder_id, name, pathOnDisk, null, user_id, callback
 			else
 				logger.warn {type: file.type, path: file.file, project_id}, "unknown file type"
 				callback(new UnsupportedFileTypeError("unknown file type: #{file.type}"))
