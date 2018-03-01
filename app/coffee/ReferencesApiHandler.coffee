@@ -152,7 +152,7 @@ module.exports = ReferencesApiHandler =
 					return next(err)
 			requestStream.on 'end', (err) ->
 				filePath = "/#{ref_provider}.bib"
-				EditorController.upsertFileWithPath project_id, filePath, tempFilePath, "references-import", user_id, (err) ->
+				EditorController.upsertFileWithPath project_id, filePath, tempFilePath, null, "references-import", user_id, (err) ->
 					_cleanup () ->
 						if err?
 							logger.err {err, user_id, ref_provider, project_id, tempFilePath}, "could not add bibtex file"
