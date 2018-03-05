@@ -146,6 +146,7 @@ describe 'ReferencesApiHandler', ->
 					@project_id,
 					"/refProvider.bib",
 					@writeStream.path,
+					null,
 					"references-import",
 					@user_id
 				).should.equal true
@@ -232,7 +233,7 @@ describe 'ReferencesApiHandler', ->
 			beforeEach ->
 				@err = new Error('woops')
 				@fs.unlink = sinon.stub().callsArgWith(1, null)
-				@EditorController.upsertFileWithPath .yields(@err)
+				@EditorController.upsertFileWithPath.yields(@err)
 				@ReferencesApiHandler.importBibtex @req, @res, @next
 				@readStream.emit('data', 'hi')
 				@readStream.emit('end')
