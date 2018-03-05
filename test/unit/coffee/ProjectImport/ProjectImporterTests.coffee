@@ -436,7 +436,7 @@ describe "ProjectImporter", ->
 			it "should add the file to the project", ->
 				@ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory
 					.calledWith(
-						@project_id, @folder_id, "image.jpeg", "path/on/disk", @user_id
+						@project_id, @folder_id, "image.jpeg", "path/on/disk", null, @user_id
 					)
 					.should.equal true
 
