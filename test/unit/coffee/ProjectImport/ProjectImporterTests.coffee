@@ -95,6 +95,8 @@ describe "ProjectImporter", ->
 				token: "token"
 				read_token: "read_token"
 				general_access: "read_write"
+				template_id: '10'
+				template_ver_id: '2'
 			}
 			@ProjectCreationHandler.createBlankProject = sinon.stub().yields(null, @project)
 
@@ -113,6 +115,8 @@ describe "ProjectImporter", ->
 				@project.overleaf.history.display.should.equal true
 				@project.tokens.readAndWrite.should.equal @doc.token
 				@project.tokens.readOnly.should.equal @doc.read_token
+				@project.fromV1TemplateId.should.equal @doc.template_id
+				@project.fromV1TemplateVersionId.should.equal @doc.template_ver_id
 
 			it "should set the appropriate project compiler from the latex_engine", ->
 				@project.compiler.should.equal "latex"

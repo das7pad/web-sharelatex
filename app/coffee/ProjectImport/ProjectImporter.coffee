@@ -76,6 +76,10 @@ module.exports = ProjectImporter =
 			project.overleaf.id = doc.id
 			project.overleaf.imported_at_ver_id = doc.latest_ver_id
 			project.overleaf.history.display = true
+			if doc.template_id?
+				project.fromV1TemplateId = doc.template_id
+				project.fromV1TemplateVersionId = doc.template_ver_id
+
 			project.tokens = {
 				readOnly: doc.read_token,
 				readAndWrite: doc.token
