@@ -10,7 +10,7 @@ each item in ['mendeley']
 		.alert.alert-info
 			p #{translate(item+"_is_premium")}
 			p
-				a.btn.btn-info(href='/user/subscription/plans') #{translate("upgrade")}
+				a.btn.btn-info(href='/user/subscription/plans' ng-click='upgradeIntegration("'+item+'")') #{translate("upgrade")}
 	- else if(user.refProviders && user.refProviders[item])
 		p #{translate("account_is_linked")}.
 		p
