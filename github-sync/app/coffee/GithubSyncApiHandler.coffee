@@ -100,6 +100,8 @@ module.exports = GithubSyncApiHandler =
 		}, callback
 
 	apiRequest: (options, callback = (error, body) ->) ->
+		if settings.apis.githubSync?.app?
+			options.qs = {app: settings.apis.githubSync.app}
 		request options, (error, response, body) ->
 			return callback(error) if error?
 			if 200 <= response.statusCode < 300
