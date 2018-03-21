@@ -6,7 +6,7 @@ module.exports = MockTPRApi =
 		app.post "/user/:user_id/:ref_provider/bibtex", (req, res, next) =>
 			res.send '{testReference: 1}'
 
-		app.listen 3023, (error) ->
+		app.listen 3046, (error) ->
 			throw error if error?
 		.on "error", (error) ->
 			console.error "error starting MockTPRApi:", error.message

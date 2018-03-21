@@ -75,20 +75,15 @@ module.exports = ReferencesApiHandler =
 		request opts, callback
 
 	unlink: (req, res, next) ->
-		ref_provider = ReferencesApiHandler._getRefProviderDbKey(req)
+		ref_provider = ReferencesApiHandler._getRefProviderBackendKey(req)
 		user_id = AuthenticationController.getLoggedInUserId(req)
 
-		ref = {}
-		ref[ref_provider] = true
-		update =
-			$unset:
-				refProviders:
-					ref
-
-		logger.log {user_id, update:update}, "reference unlink"
-		UserUpdater.updateUser user_id, update, (err)->
-			if err?
-				logger.err err:err, result:result, "error unlinking reference info on user " + ref_provider
+		opts =
+				method: "delete"
+				url: "/user/#{user_id}/#{ref_provider}"
+		ReferencesApiHandler.make3rdRequest opts, (err, response, body)->
+			return next(err) if error?
+			logger.log {user_id, ref_provider}, "unlink complete"
 			res.redirect "/user/settings"
 
 	bibtex: (req, res, next) ->

@@ -87,15 +87,16 @@ describe 'ReferencesApiHandler', ->
 
 	describe "unlink", ->
 		beforeEach ->
-			@update =
-				$unset:
-					refProviders:
-						refProvider: true
+			@ReferencesApiHandler.make3rdRequest = sinon.stub().callsArgWith(1, null, {}, {} )
+			@ReferencesApiHandler.unlink @req, @res
 
-			@ReferencesApiHandler.unlink @req, @res, @next
-
-		it "should unset user reference info", ->
-			@UserUpdater.updateUser.calledWith(@user_id, @update).should.equal true
+		it "should make a request to unlink the user", ->
+			@ReferencesApiHandler.make3rdRequest
+				.calledWith({
+					method: 'delete',
+					url: "/user/#{@user_id}/refProvider"
+				})
+				.should.equal true
 
 		it "should redirect to user settings page", ->
 			@res.redirect.calledWith("/user/settings").should.equal true
