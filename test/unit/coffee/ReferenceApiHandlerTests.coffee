@@ -85,15 +85,6 @@ describe 'ReferencesApiHandler', ->
 		it "should redirect to user settings page", ->
 			@res.redirect.calledWith("/user/settings").should.equal true
 
-	describe "makeRefRequest", ->
-
-		it "should call request with right params", ->
-			@opts =
-				url: "/someUrl"
-			@ReferencesApiHandler.makeRefRequest @opts
-			@opts.url = "#{@settings.apis.references.url}#{@opts.url}"
-			@request.calledWith(@opts).should.equal true
-
 	describe "unlink", ->
 		beforeEach ->
 			@update =

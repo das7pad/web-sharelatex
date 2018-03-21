@@ -6,8 +6,7 @@ request = require "request"
 settings = require "settings-sharelatex"
 temp = require 'temp'
 
-thirdpartyUrl = settings.apis.thirdpartyreferences?.url || "http://localhost:3023"
-referencesUrl = settings.apis.references?.url || "http://localhost:3040"
+thirdpartyUrl = settings.apis.thirdpartyreferences?.url || "http://localhost:3046"
 db = mongojs(settings.mongo.url, ["users"])
 ObjectId = mongojs.ObjectId
 
@@ -17,6 +16,14 @@ UserGetter = require('../../../../app/js/Features/User/UserGetter')
 UserUpdater = require("../../../../app/js/Features/User/UserUpdater")
 
 module.exports = ReferencesApiHandler =
+	_getRefProviderBackendKey: (req) ->
+		ref_provider = req.params.ref_provider
+		if settings.apis.thirdpartyreferences?.providers?[ref_provider]?
+			ref_provider = settings.apis.thirdpartyreferences.providers[ref_provider]
+		return ref_provider
+
+	_getRefProviderDbKey: (req) ->
+		req.params.ref_provider
 
 	userCanMakeRequest: (userId, ref_provider, callback=(err, canMakeRequest)->) ->
 		UserGetter.getUser userId, (err, user) ->
@@ -24,7 +31,7 @@ module.exports = ReferencesApiHandler =
 
 	startAuth: (req, res, next)->
 		user_id = AuthenticationController.getLoggedInUserId(req)
-		ref_provider = req.params.ref_provider
+		ref_provider = ReferencesApiHandler._getRefProviderBackendKey(req)
 		logger.log {user_id, ref_provider}, "starting references auth process"
 		ReferencesApiHandler.userCanMakeRequest user_id, ref_provider, (err, canMakeRequest) ->
 			if err
@@ -45,7 +52,7 @@ module.exports = ReferencesApiHandler =
 
 	completeAuth: (req, res, next)->
 		user_id = AuthenticationController.getLoggedInUserId(req)
-		ref_provider = req.params.ref_provider
+		ref_provider = ReferencesApiHandler._getRefProviderBackendKey(req)
 		ReferencesApiHandler.userCanMakeRequest user_id, ref_provider, (err, canMakeRequest) ->
 			if err
 				return next(err)
@@ -67,13 +74,8 @@ module.exports = ReferencesApiHandler =
 		logger.log {url: opts.url}, 'making request to third-party-references api'
 		request opts, callback
 
-	makeRefRequest: (opts, callback)->
-		opts.url = "#{referencesUrl}#{opts.url}"
-		logger.log {url: opts.url}, 'making request to third-party-references api'
-		request opts, callback
-
 	unlink: (req, res, next) ->
-		ref_provider = req.params.ref_provider
+		ref_provider = ReferencesApiHandler._getRefProviderDbKey(req)
 		user_id = AuthenticationController.getLoggedInUserId(req)
 
 		ref = {}
@@ -91,7 +93,7 @@ module.exports = ReferencesApiHandler =
 
 	bibtex: (req, res, next) ->
 		user_id = AuthenticationController.getLoggedInUserId(req)
-		ref_provider = req.params.ref_provider
+		ref_provider = ReferencesApiHandler._getRefProviderBackendKey(req)
 		ReferencesApiHandler.userCanMakeRequest user_id, ref_provider, (err, canMakeRequest) ->
 			if err
 				return next(err)
@@ -120,7 +122,7 @@ module.exports = ReferencesApiHandler =
 
 	importBibtex: (req, res, next) ->
 		user_id = AuthenticationController.getLoggedInUserId(req)
-		ref_provider = req.params.ref_provider
+		ref_provider = ReferencesApiHandler._getRefProviderBackendKey(req)
 		project_id = req.params.Project_id
 		ReferencesApiHandler.userCanMakeRequest user_id, ref_provider, (err, canMakeRequest) ->
 			if err
