@@ -19,6 +19,7 @@ define [
         scope.$watch "sharejsDoc", switchAttachment
 
         switchAttachment = (sharejsDoc, oldSharejsDoc) ->
+          return if sharejsDoc == oldSharejsDoc
           if oldSharejsDoc?
             detachFromCM(oldSharejsDoc)
           if sharejsDoc?
