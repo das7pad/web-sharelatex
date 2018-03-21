@@ -22,9 +22,6 @@ module.exports = ReferencesApiHandler =
 			ref_provider = settings.apis.thirdpartyreferences.providers[ref_provider]
 		return ref_provider
 
-	_getRefProviderDbKey: (req) ->
-		req.params.ref_provider
-
 	userCanMakeRequest: (userId, ref_provider, callback=(err, canMakeRequest)->) ->
 		UserGetter.getUser userId, (err, user) ->
 			callback(err, user?.features?.references == true)
