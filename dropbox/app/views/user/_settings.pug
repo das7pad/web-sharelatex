@@ -7,7 +7,7 @@ h3 #{translate("dropbox_integration")}
 	.alert.alert-info
 		p #{translate("dropbox_is_premium")}
 		p
-			a.btn.btn-info(href='/user/subscription/plans') #{translate("upgrade")}
+			a.btn.btn-info(href='/user/subscription/plans' ng-click='upgradeIntegration("dropbox")') #{translate("upgrade")}
 - else if (dropbox.error)
 	.alert.alert-danger #{translate("dropbox_sync_error")}
 - else if(dropbox.registered)
