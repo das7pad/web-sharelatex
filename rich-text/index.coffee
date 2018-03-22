@@ -1,5 +1,5 @@
 module.exports =
   viewIncludes:
-    "richTextScript": "script"
-    "richTextToolbar": "toolbar"
-    "richTextDirective": "directive"
+    "editor:script": "script"
+    "editor:toolbar": "toolbar"
+    "editor:body": "body"
