@@ -25,6 +25,7 @@ describe "ImportBibtex", ->
 
 	it 'can import a reference', (done) ->
 		@owner.request.post "/project/#{@project_id}/test_provider/bibtex/import", (error, response, body) =>
+			expect(response.statusCode).to.equal 201
 			ProjectEntityHandler.getAllFiles @project_id, (error, files) ->
 				throw error if error?
 				expect(files).to.have.key '/test_provider.bib'
