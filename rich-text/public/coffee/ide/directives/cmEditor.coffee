@@ -11,10 +11,11 @@ define [
         cm = null
         richText = null
 
-        requirejs ['rich-text'], (rt) ->
-          richText = rt
-          cm = richText.init(element.find('.cm-editor-wrapper')[0])
-          switchAttachment(scope.sharejsDoc)
+        init = () ->
+          requirejs ['rich-text'], (rt) ->
+            richText = rt
+            cm = richText.init(element.find('.cm-editor-wrapper')[0])
+            switchAttachment(scope.sharejsDoc)
 
         scope.$watch "sharejsDoc", switchAttachment
 
@@ -36,6 +37,8 @@ define [
 
         scope.$on 'destroy', () ->
           detachFromCM(scope.sharejsDoc)
+
+        init()
 
       template: """
         <div class="cm-editor-wrapper"></div>

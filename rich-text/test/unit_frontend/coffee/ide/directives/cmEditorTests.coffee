@@ -2,52 +2,55 @@ define ['ide/rich-text/directives/cmEditor'], () ->
   describe 'cmEditor', () ->
     beforeEach(module('SharelatexApp'))
 
+    origRequireJsFn = null
     beforeEach () ->
-      @richTextInit = sinon.stub()
-      @richTextOpenDoc = sinon.stub()
-      window.Frontend = {
-        'rich-text': {
-          init: @richTextInit,
-          openDoc: @richTextOpenDoc
-        }
-      }
+      origRequireJsFn = window.requirejs
+      window.requirejs = @requirejs = sinon.stub()
 
-    afterEach () -> window.Frontend = null
+    afterEach () ->
+      window.Frontend = null
+      window.requirejs = origRequireJsFn
 
     it 'inits Rich Text', () ->
-      inject ($compile, $rootScope) =>
+      @requirejs.callsArgWith(1, {
+        init: richTextInit = sinon.stub()
+      })
+      inject ($compile, $rootScope) ->
         $compile('<div cm-editor></div>')($rootScope)
-        expect(@richTextInit).to.have.been.called
+        expect(richTextInit).to.have.been.called
 
     it 'attaches to CM', () ->
-      inject ($compile, $rootScope, $browser) =>
+      init = sinon.stub().returns({}) # Stub initing CM and returning instance
+      openDoc = sinon.stub()
+      @requirejs.callsArgWith(1, {
+        init: init
+        openDoc: openDoc
+      })
+      inject ($compile, $rootScope, $browser) ->
         getSnapshot = sinon.stub()
-        detachFromCM = sinon.stub()
         attachToCM = sinon.stub()
         $rootScope.sharejsDoc = {
           getSnapshot: getSnapshot
-          detachFromCM: detachFromCM
           attachToCM: attachToCM
         }
 
         $compile('<div cm-editor sharejs-doc="sharejsDoc"></div>')($rootScope)
         $rootScope.$digest()
-        # Trigger $applyAsync to evaluate the expression, normally done in the
-        # next tick
-        $browser.defer.flush()
 
-        expect(detachFromCM).to.have.been.called
         expect(getSnapshot).to.have.been.called
-        expect(@richTextOpenDoc).to.have.been.called
+        expect(openDoc).to.have.been.called
         expect(attachToCM).to.have.been.called
 
     it 'detaches from CM when destroyed', () ->
-      inject ($compile, $rootScope) =>
-        @richTextInit.returns({ setValue: sinon.stub() })
+      @requirejs.callsArgWith(1, {
+        init: sinon.stub().returns({})
+        openDoc: sinon.stub()
+      })
+      inject ($compile, $rootScope) ->
         detachFromCM = sinon.stub()
         $rootScope.sharejsDoc = {
-          getSnapshot: sinon.stub()
           detachFromCM: detachFromCM
+          getSnapshot: sinon.stub()
           attachToCM: sinon.stub()
         }
 
