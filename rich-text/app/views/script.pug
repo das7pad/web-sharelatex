@@ -1,4 +1,2 @@
-script(
-  src=buildWebpackPath('es/rich-text.js', {hashedPath:settings.useMinifiedJs})
-  type="text/javascript"
-)
+.
+  "rich-text": "#{buildWebpackPath('es/rich-text.js', {hashedPath:settings.useMinifiedJs, removeExtension:true})}"
