@@ -1,6 +1,11 @@
-# Ignore all modules except for a whitelist
-*
-!dropbox
-!github-sync
-!public-registration
-!.gitignore
+admin-panel
+groovehq
+launchpad
+learn
+metrics
+overleaf-account-merge
+overleaf-integration
+references-search
+templates
+tpr-webmodule
+track-changes
