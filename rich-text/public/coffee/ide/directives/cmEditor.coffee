@@ -8,17 +8,27 @@ define [
       }
 
       link: (scope, element, attrs) ->
-        cm = Frontend['rich-text'].init(element.find('.cm-editor-wrapper')[0])
+        cm = null
+        richText = null
 
-        scope.$watch "sharejsDoc", (sharejsDoc, oldSharejsDoc) ->
+        requirejs ['rich-text'], (rt) ->
+          richText = rt
+          cm = richText.init(element.find('.cm-editor-wrapper')[0])
+          switchAttachment(scope.sharejsDoc)
+
+        scope.$watch "sharejsDoc", switchAttachment
+
+        switchAttachment = (sharejsDoc, oldSharejsDoc) ->
+          return if sharejsDoc == oldSharejsDoc
           if oldSharejsDoc?
             detachFromCM(oldSharejsDoc)
           if sharejsDoc?
             attachToCM(sharejsDoc)
 
         attachToCM = (sharejsDoc) ->
+          return if !cm
           scope.$applyAsync () ->
-            Frontend['rich-text'].openDoc(cm, sharejsDoc.getSnapshot())
+            richText.openDoc(cm, sharejsDoc.getSnapshot())
             sharejsDoc.attachToCM(cm)
 
         detachFromCM = (sharejsDoc) ->
