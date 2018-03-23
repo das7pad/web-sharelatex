@@ -1,4 +1,4 @@
-define ['ide/editor/directives/cmEditor'], () ->
+define ['ide/rich-text/directives/cmEditor'], () ->
   describe 'cmEditor', () ->
     beforeEach(module('SharelatexApp'))
 
