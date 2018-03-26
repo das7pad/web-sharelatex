@@ -16,23 +16,23 @@ block content
 							p
 								| Overleaf and ShareLaTeX have
 								|
-								a(href="https://www.overleaf.com/blog/518-exciting-news-sharelatex-is-joining-overleaf", target="_blank") joined forces
+								a(href="https://www.overleaf.com/blog/518-exciting-news-sharelatex-is-joining-overleaf", target="_blank", event-tracking="click_v2_join_forces", event-tracking-trigger="click", event-tracking-ga="v2_onboard", event-tracking-label="welcome") joined forces
 								| . We’re currently beta-testing a new platform called Overleaf v2, which will combine the best features from Overleaf and ShareLaTeX.
 						P
 							| You can log-in with either your Overleaf or ShareLaTeX account.
 							|
-							a(href="https://www.overleaf.com/help/342-overleaf-v2-faq", target="_blank") Read more.
+							a(href="https://www.overleaf.com/help/342-overleaf-v2-faq", target="_blank", rel="nofollow", event-tracking="click_v2_read_more", event-tracking-trigger="click", event-tracking-ga="v2_onboard", event-tracking-label="welcome") Read more.
 						p.text-center.row-spaced
-							a(href="/overleaf/login").btn.btn-lg.btn-success Log in with Overleaf
+							a(href="/overleaf/login", event-tracking="login_v2_via_overleaf", event-tracking-trigger="click", event-tracking-ga="v2_onboard", event-tracking-label="welcome").btn.btn-lg.btn-success Log in with Overleaf
 							| &nbsp;
-							a(href=settings.accountMerge.sharelatexHost + "/user/login_to_ol_v2").btn.btn-lg.btn-danger Log in with ShareLaTeX
+							a(href=settings.accountMerge.sharelatexHost + "/user/login_to_ol_v2", event-tracking="login_v2_via_sharelatex", event-tracking-trigger="click", event-tracking-ga="v2_onboard", event-tracking-label="welcome").btn.btn-lg.btn-danger Log in with ShareLaTeX
 						hr
 						.small.text-center
 							| Not looking for Overleaf v2? Go back to
 							|
-							a(href="https://www.overleaf.com") Overleaf
+							a(href="https://www.overleaf.com", event-tracking="drop_v2_to_overleaf", event-tracking-trigger="click", event-tracking-ga="v2_onboard", event-tracking-label="welcome") Overleaf
 							|
 							| or
 							|
-							a(href="https://www.sharelatex.com") ShareLaTeX
+							a(href="https://www.sharelatex.com", event-tracking="drop_v2_to_sharelatex", event-tracking-trigger="click", event-tracking-ga="v2_onboard", event-tracking-label="welcome") ShareLaTeX
 							| .
