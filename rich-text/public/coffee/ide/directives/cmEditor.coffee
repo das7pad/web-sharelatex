@@ -31,6 +31,7 @@ define [
           scope.$applyAsync () ->
             richText.openDoc(cm, sharejsDoc.getSnapshot())
             sharejsDoc.attachToCM(cm)
+            richText.enableRichText()
 
         detachFromCM = (sharejsDoc) ->
           sharejsDoc.detachFromCM()
