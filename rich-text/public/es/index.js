@@ -5,7 +5,7 @@ import RichText from './rich-text/RichText'
 
 let rt
 
-export function init (rootEl) {
+export function init (rootEl, rtAdapter) {
   CodeMirror.defineMode('latex', () => new LatexMode())
   CodeMirror.defineMIME('application/x-tex', 'latex')
   CodeMirror.defineMIME('application/x-latex', 'latex')
@@ -16,7 +16,7 @@ export function init (rootEl) {
   })
 
   if (rt) rt.disable()
-  rt = new RichText(cm)
+  rt = new RichText(cm, rtAdapter)
 
   return cm
 }
