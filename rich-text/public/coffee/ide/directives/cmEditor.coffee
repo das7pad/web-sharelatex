@@ -41,6 +41,6 @@ define [
         init()
 
       template: """
-        <div class="cm-editor-wrapper"></div>
+        <div class="cm-editor-wrapper rich-text"></div>
       """
     }
