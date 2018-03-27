@@ -140,7 +140,7 @@ define [
 
 						sixpack.convert 'bib-search-highlight' if $scope.shouldABTestBibSearch
 
-						$scope.searchEnabled = ide?.$scope?.project?.features?.references == true
+						$scope.searchEnabled = ide?.$scope?.project?.features?.referencesSearch == true
 						$scope.openReferencesSearchModal()
 					else
 						startAutocomplete.exec(ed)
