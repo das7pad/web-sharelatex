@@ -33,6 +33,8 @@ module.exports = DropboxHandler =
 		opts =
 			url: "#{settings.apis.thirdPartyDataStore.url}/user/#{user_id}/dropbox/register"
 			timeout: 5000
+		if settings.apis.thirdPartyDataStore.dropboxApp?
+			opts.qs = {app: settings.apis.thirdPartyDataStore.dropboxApp}
 		request.get opts, (err, response, body)->
 			safelyGetResponse err, response, body, (err, body)->
 				if err?
