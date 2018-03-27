@@ -15,7 +15,7 @@ describe "ImportBibtex", ->
 		@owner.login (error) =>
 			throw error if error?
 			conditions = { _id: new ObjectId(@owner.id) }
-			update = { $set: { 'features.references': true} }
+			update = { $set: { 'features.mendeley': true} }
 			db.users.update conditions, update, (error) =>
 				throw error if error?
 				@owner.createProject 'tpr-test-project', (error, project_id) =>

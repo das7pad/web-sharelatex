@@ -3,7 +3,7 @@ define [
 ], (App) ->
 	App.controller "ReferencesController", ($scope, $modal, ide, $http) ->
 		user = ide.$scope.user
-		$scope.thirdPartyReferencesEnabled = user?.features?.references
+		$scope.thirdPartyReferencesEnabled = user?.features?.mendeley
 		$scope.openReferencesModal = (providerStr) ->
 			$modal.open {
 				templateUrl: "referencesModalTemplate"

@@ -6,7 +6,7 @@ define [
 		event_tracking.send("references-#{provider}", "modal", "open")
 
 		$scope.provider = provider
-		$scope.userHasProviderFeature = ide.$scope.user?.features?.references
+		$scope.userHasProviderFeature = ide.$scope.user?.features?.mendeley
 		$scope.userHasProviderLink = ide.$scope.user?.refProviders?[provider]
 
 		$scope.bibtexData = null
