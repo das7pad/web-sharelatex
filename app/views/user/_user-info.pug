@@ -66,9 +66,9 @@ p
 							| &nbsp;(Change to:&nbsp;
 							a(href, ng-click="user.features = {collaborators: 1, versioning: false, dropbox: false, github: false, compileTimeout: 60, compileGroup: 'standard', templates: false, trackChanges: false, references: false}") Free
 							| &nbsp;&middot;&nbsp;
-							a(href, ng-click="user.features = {collaborators: 10, versioning: true, dropbox: true, github: true, compileTimeout: 180, compileGroup: 'priority', templates: true, trackChanges: true, references: true}") Collab.
+							a(href, ng-click="user.features = {collaborators: 10, versioning: true, dropbox: true, github: true, compileTimeout: 180, compileGroup: 'priority', templates: true, trackChanges: true, references: false, referencesSearch: true, thirdPartyReferences: true}") Collab.
 							| &nbsp;&middot;&nbsp;
-							a(href, ng-click="user.features = {collaborators: -1, versioning: true, dropbox: true, github: true, compileTimeout: 180, compileGroup: 'priority', templates: true, trackChanges: true, references: true}") Pro.
+							a(href, ng-click="user.features = {collaborators: -1, versioning: true, dropbox: true, github: true, compileTimeout: 180, compileGroup: 'priority', templates: true, trackChanges: true, references: false, referencesSearch: true, thirdPartyReferences: true}") Pro.
 							| )
 
 			tr
@@ -150,12 +150,22 @@ p
 
 			tr
 				td
-					label(for="references") References
+					label(for="referencesSearch") References Search
 				td
-					input#references(
+					input#referencesSearch(
 						type="checkbox"
-						name="features.references"
-						ng-model="user.features.references"
+						name="features.referencesSearch"
+						ng-model="user.features.referencesSearch"
+					)
+
+			tr
+				td
+					label(for="mendeley") Mendeley
+				td
+					input#mendeley(
+						type="checkbox"
+						name="features.mendeley"
+						ng-model="user.features.mendeley"
 					)
 
 			tr

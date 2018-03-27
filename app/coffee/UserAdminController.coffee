@@ -89,7 +89,8 @@ module.exports = UserAdminController =
 		'features.compileGroup',
 		'features.templates',
 		'features.trackChanges',
-		'features.references',
+		'features.referencesSearch',
+		'features.mendeley',
 		'awareOfV2'
 	]
 	SUPER_ADMIN_ALLOWED_ATTRIBUTES: [
@@ -102,7 +103,8 @@ module.exports = UserAdminController =
 		'features.github',
 		'features.templates',
 		'features.trackChanges',
-		'features.references',
+		'features.referencesSearch',
+		'features.mendeley',
 		'awareOfV2',
 		'isAdmin'
 	]

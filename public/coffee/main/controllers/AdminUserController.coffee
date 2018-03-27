@@ -5,6 +5,10 @@ define [
 
 	App.controller "AdminUserController", ($scope, $timeout, $modal, queuedHttp) ->
 		$scope.user = window.data.user
+
+		$scope.user.features.mendeley ?= $scope.user.features.references
+		$scope.user.features.referencesSearch ?= $scope.user.features.references
+
 		$scope.projects = window.data.projects
 		$scope.searchText =
 			value: ""
