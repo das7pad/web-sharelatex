@@ -1,4 +1,4 @@
-define ['ide/editor/RichTextAdapter'], (RichTextAdapter) ->
+define ['ide/rich-text/RichTextAdapter'], (RichTextAdapter) ->
   describe 'RichTextAdapter', () ->
     beforeEach () ->
       @fileTreeManager = {

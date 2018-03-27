@@ -3,9 +3,9 @@
 import CodeMirror from 'codemirror'
 
 import fixture from '../support/fixture'
-import { stubMathJax, teardownMathJax } from '../../support/stub-mathjax'
-import LatexMode from 'Src/ide/editor/codemirror/LatexMode'
-import RichText from 'Src/ide/editor/RichText'
+import { stubMathJax, teardownMathJax } from '../support/stub-mathjax'
+import LatexMode from '../../../../public/es/latex-mode/LatexMode'
+import RichText from '../../../../public/es/rich-text/RichText'
 
 const TEXTAREA_HTML = '<textarea></textarea>'
 
