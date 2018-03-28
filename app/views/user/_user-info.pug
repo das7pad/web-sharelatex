@@ -150,6 +150,16 @@ p
 
 			tr
 				td
+					label(for="references") References (deprecated)
+				td
+					input#references(
+						type="checkbox"
+						name="features.references"
+						ng-model="user.features.references"
+					)
+
+			tr
+				td
 					label(for="referencesSearch") References Search
 				td
 					input#referencesSearch(

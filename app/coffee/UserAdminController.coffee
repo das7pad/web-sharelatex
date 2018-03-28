@@ -89,6 +89,7 @@ module.exports = UserAdminController =
 		'features.compileGroup',
 		'features.templates',
 		'features.trackChanges',
+		'features.references',
 		'features.referencesSearch',
 		'features.mendeley',
 		'awareOfV2'
@@ -103,6 +104,7 @@ module.exports = UserAdminController =
 		'features.github',
 		'features.templates',
 		'features.trackChanges',
+		'features.references',
 		'features.referencesSearch',
 		'features.mendeley',
 		'awareOfV2',
