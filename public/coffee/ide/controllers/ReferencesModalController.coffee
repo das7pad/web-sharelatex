@@ -7,10 +7,7 @@ define [
 
 		$scope.provider = provider
 		features = ide.$scope.user?.features
-		if features?.mendeley?
-			$scope.userHasProviderFeature = features?.mendeley
-		else
-			$scope.userHasProviderFeature = features?.references
+		$scope.userHasProviderFeature = features?.mendeley or features?.references
 		$scope.userHasProviderLink = ide.$scope.user?.refProviders?[provider]
 
 		$scope.bibtexData = null
