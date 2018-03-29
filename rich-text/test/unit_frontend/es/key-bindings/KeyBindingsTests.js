@@ -335,23 +335,29 @@ describe('Key bindings', function () {
     expect(() => fakeNamedKey(this.cm, 'Delete')).not.to.throw()
   })
 
-  it('doesn\'t error if pressing delete on last character with vim keymap', function () {
-    this.cm.setValue(
-      'foo\n' +
-      'bar'
-    )
-    this.cm.setCursor({ line: 1, ch: 3 })
+  // it('doesn\'t error if pressing delete on last character with vim keymap',
+  // function () {
+  //   _keymap = new WL.Keymap(new Test.MockUI(), _cm, 'vim', true, true, true,
+  // _rt);
+  //   this.cm.setValue(
+  //     'foo\n' +
+  //     'bar'
+  //   )
+  //   this.cm.setCursor({ line: 1, ch: 3 })
 
-    expect(() => fakeNamedKey(this.cm, 'Delete')).not.to.throw()
-  })
+  //   expect(() => fakeNamedKey(this.cm, 'Delete')).not.to.throw()
+  // })
 
-  it('doesn\'t error if pressing delete on last character with emacs keymap', function () {
-    this.cm.setValue(
-      'foo\n' +
-      'bar'
-    )
-    this.cm.setCursor({ line: 1, ch: 3 })
+  // it('doesn\'t error if pressing delete on last character with emacs keymap',
+  // function () {
+  //   _keymap = new WL.Keymap(new Test.MockUI(), _cm, 'emacs', true, true,
+  // true, _rt);
+  //   this.cm.setValue(
+  //     'foo\n' +
+  //     'bar'
+  //   )
+  //   this.cm.setCursor({ line: 1, ch: 3 })
 
-    expect(() => fakeNamedKey(this.cm, 'Delete')).not.to.throw()
-  })
+  //   expect(() => fakeNamedKey(this.cm, 'Delete')).not.to.throw()
+  // })
 })
