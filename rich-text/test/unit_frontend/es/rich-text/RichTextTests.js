@@ -305,29 +305,6 @@ describe('RichText', function () {
     )
   })
 
-  // it('should go up a line when inside an empty list', function (done) {
-  //   this.cm.setValue(
-  //     '\n' +
-  //     '\\begin{itemize}\n' +
-  //     '\\item a\n' +
-  //     '\\item b\n' +
-  //     '\\item c\n' +
-  //     '\\end{itemize}'
-  //   )
-  //   this.cm.setCursor({ line: 4, ch: 7 })
-
-  //   setTimeout(() => {
-  //     this.cm.refresh()
-  //     fakeNamedKey(this.cm, 'Up')
-  //     expectCursorAt(this.cm, 3, 7)
-  //     fakeNamedKey(this.cm, 'Up')
-  //     expectCursorAt(this.cm, 2, 7)
-  //     fakeNamedKey(this.cm, 'Up')
-  //     expectCursorAt(this.cm, 0, 0)
-  //     done()
-  //   }, 1000)
-  // })
-
   it('should handle section tag becoming empty', function () {
     // regression: caused error due to mark clearing order
     this.cm.setValue('\\section{a}')

@@ -90,15 +90,11 @@ describe('Key bindings', function () {
   //   _cm.setValue('')
   // }
 
-  // function expectCursorAt (line, ch) {
-  //   var cursor = _cm.getCursor()
-  //   if (cursor instanceof CodeMirror.Pos) {
-  //     expect(_cm.getCursor()).toEqual(new CodeMirror.Pos(line, ch))
-  //   } else {
-  //     // we sometimes don't get a Pos object
-  //     expect(_cm.getCursor()).toEqual({ line: line, ch: ch })
-  //   }
-  // }
+  function expectCursorAt (cm, line, ch) {
+    var cursor = cm.getCursor()
+    expect(cursor.line).to.equal(line)
+    expect(cursor.ch).to.equal(ch)
+  }
 
   // describe("Matching brackets", function () {
   //   afterEach(function () {
@@ -360,4 +356,23 @@ describe('Key bindings', function () {
 
   //   expect(() => fakeNamedKey(this.cm, 'Delete')).not.to.throw()
   // })
+
+  it('should go up a line when inside an empty list', function () {
+    this.cm.setValue(
+      '\n' +
+      '\\begin{itemize}\n' +
+      '\\item a\n' +
+      '\\item b\n' +
+      '\\item c\n' +
+      '\\end{itemize}'
+    )
+    this.cm.setCursor({ line: 4, ch: 7 }) // Cursor after "\item c"
+
+    fakeNamedKey(this.cm, 'Up')
+    expectCursorAt(this.cm, 3, 7)
+    fakeNamedKey(this.cm, 'Up')
+    expectCursorAt(this.cm, 2, 7)
+    fakeNamedKey(this.cm, 'Up')
+    expectCursorAt(this.cm, 0, 0)
+  })
 })
