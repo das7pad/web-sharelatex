@@ -40,7 +40,7 @@ describe('Key bindings', function () {
    *
    * Based on CodeMirror's test/emacs_test.js
    */
-  function _fakeNamedKey (cm, keyName) {
+  function fakeNamedKey (cm, keyName) {
     var ctrl, shift, alt
     var key = keyName.replace(/\w+-/g, function (type) {
       if (type === 'Ctrl-') ctrl = true
@@ -332,7 +332,7 @@ describe('Key bindings', function () {
     )
     this.cm.setCursor({ line: 1, ch: 3 })
 
-    expect(() => _fakeNamedKey(this.cm, 'Delete')).not.to.throw()
+    expect(() => fakeNamedKey(this.cm, 'Delete')).not.to.throw()
   })
 
   it('doesn\'t error if pressing delete on last character with vim keymap', function () {
@@ -342,7 +342,7 @@ describe('Key bindings', function () {
     )
     this.cm.setCursor({ line: 1, ch: 3 })
 
-    expect(() => _fakeNamedKey(this.cm, 'Delete')).not.to.throw()
+    expect(() => fakeNamedKey(this.cm, 'Delete')).not.to.throw()
   })
 
   it('doesn\'t error if pressing delete on last character with emacs keymap', function () {
@@ -352,6 +352,6 @@ describe('Key bindings', function () {
     )
     this.cm.setCursor({ line: 1, ch: 3 })
 
-    expect(() => _fakeNamedKey(this.cm, 'Delete')).not.to.throw()
+    expect(() => fakeNamedKey(this.cm, 'Delete')).not.to.throw()
   })
 })
