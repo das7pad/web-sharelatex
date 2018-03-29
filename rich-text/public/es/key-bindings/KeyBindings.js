@@ -22,39 +22,35 @@ var _COMMANDS_ON_SINGLE_LINE = {
 }
 
 function _handleBackspace (cm) {
-  // TODO: figure this out
-  if (_rt.isEnabled()) {
-    var selection = cm.listSelections()[0]
-    var isSelectionCursor = _.isEqual(selection.from(), selection.to())
-    if (isSelectionCursor) {
-      // Attempt to run special handling behaviour
-      if (
-        _handleBackspaceListEnvs(cm) ||
-        _handleBackspaceAbstract(cm) ||
-        _handleBackspaceCommandsSingleLine(cm)
-      ) {
-        // Functionality was handled, don't run default behaviour
-        return null
-      }
-    }
-  }
-  deleteClosingCharForSelection(cm)
-  return CodeMirror.Pass // Run default behaviour
-}
-
-function _handleDelete (cm) {
-  // TODO: figure this out
-  if (_rt.isEnabled()) {
+  var selection = cm.listSelections()[0]
+  var isSelectionCursor = _.isEqual(selection.from(), selection.to())
+  if (isSelectionCursor) {
     // Attempt to run special handling behaviour
     if (
-      _handleDeleteListEnvs(cm) ||
-      _handleDeleteCommandsSingleLine(cm) ||
-      _handleDeleteAbstract(cm)
+      _handleBackspaceListEnvs(cm) ||
+      _handleBackspaceAbstract(cm) ||
+      _handleBackspaceCommandsSingleLine(cm)
     ) {
       // Functionality was handled, don't run default behaviour
       return null
     }
   }
+
+  deleteClosingCharForSelection(cm)
+  return CodeMirror.Pass // Run default behaviour
+}
+
+function _handleDelete (cm) {
+  // Attempt to run special handling behaviour
+  if (
+    _handleDeleteListEnvs(cm) ||
+    _handleDeleteCommandsSingleLine(cm) ||
+    _handleDeleteAbstract(cm)
+  ) {
+    // Functionality was handled, don't run default behaviour
+    return null
+  }
+
   // Special handling wasn't run, do default behaviour
   return CodeMirror.Pass
 }
