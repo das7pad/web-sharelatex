@@ -3,9 +3,9 @@
 import CodeMirror from 'codemirror'
 
 export default {
-  'Backspace': function (cm) { return _handleBackspace(cm) },
-  'Delete': function (cm) { return _handleDelete(cm) },
-  'Up': function (cm) { return _handleUp(cm) },
+  'Backspace': function (cm) { return handleBackspace(cm) },
+  'Delete': function (cm) { return handleDelete(cm) },
+  'Up': function (cm) { return handleUp(cm) },
   'Home': 'goLineLeftSmart',
   'End': 'goLineRight',
   'Cmd-Left': 'goLineLeftSmart'
@@ -14,7 +14,7 @@ export default {
 // Defines the commands that should be on a single line,
 // the enter, delete and backspace behaviors will be overridden in the
 // respective handlers
-var _COMMANDS_ON_SINGLE_LINE = {
+var COMMANDS_ON_SINGLE_LINE = {
   'chapter': true,
   'chapter\\*': true,
   'section': true,
@@ -25,15 +25,15 @@ var _COMMANDS_ON_SINGLE_LINE = {
   'subsubsection\\*': true
 }
 
-function _handleBackspace (cm) {
+function handleBackspace (cm) {
   var selection = cm.listSelections()[0]
   var isSelectionCursor = _.isEqual(selection.from(), selection.to())
   if (isSelectionCursor) {
     // Attempt to run special handling behaviour
     if (
-      _handleBackspaceListEnvs(cm) ||
-      _handleBackspaceAbstract(cm) ||
-      _handleBackspaceCommandsSingleLine(cm)
+      handleBackspaceListEnvs(cm) ||
+      handleBackspaceAbstract(cm) ||
+      handleBackspaceCommandsSingleLine(cm)
     ) {
       // Functionality was handled, don't run default behaviour
       return null
@@ -44,12 +44,12 @@ function _handleBackspace (cm) {
   return CodeMirror.Pass // Run default behaviour
 }
 
-function _handleDelete (cm) {
+function handleDelete (cm) {
   // Attempt to run special handling behaviour
   if (
-    _handleDeleteListEnvs(cm) ||
-    _handleDeleteCommandsSingleLine(cm) ||
-    _handleDeleteAbstract(cm)
+    handleDeleteListEnvs(cm) ||
+    handleDeleteCommandsSingleLine(cm) ||
+    handleDeleteAbstract(cm)
   ) {
     // Functionality was handled, don't run default behaviour
     return null
@@ -59,7 +59,7 @@ function _handleDelete (cm) {
   return CodeMirror.Pass
 }
 
-function _handleUp (cm) {
+function handleUp (cm) {
   var cursor = cm.getCursor()
   var state = cm.getTokenAt(cursor, true).state
   var lastMark = _.last(state.marks)
@@ -90,7 +90,7 @@ function _handleUp (cm) {
 }
 
 // Helper function to handle the backspace command in list environments
-function _handleBackspaceListEnvs (cm) {
+function handleBackspaceListEnvs (cm) {
   // Given a closedMark, it will check that the content inside
   // does not contain any spaces or item commands
   function _isListEnvEmpty (closedMark) {
@@ -372,7 +372,7 @@ function _handleBackspaceListEnvs (cm) {
   }
 }
 
-function _handleDeleteListEnvs (cm) {
+function handleDeleteListEnvs (cm) {
   var currentPos = cm.doc.getCursor()
   var token = cm.getTokenAt(currentPos, true)
   var lastOpenMark = _.last(token.state.openMarks)
@@ -414,7 +414,7 @@ function _handleDeleteListEnvs (cm) {
   }
 }
 
-function _handleBackspaceAbstract (cm) {
+function handleBackspaceAbstract (cm) {
   var currentPos = cm.doc.getCursor()
   var token = cm.getTokenAt(currentPos, true)
   var lastOpenMark = _.last(token.state.openMarks)
@@ -490,7 +490,7 @@ function _handleBackspaceAbstract (cm) {
   }
 }
 
-function _handleDeleteAbstract (cm) {
+function handleDeleteAbstract (cm) {
   var currentPos = cm.doc.getCursor()
   var token = cm.getTokenAt(currentPos, true)
   var lastOpenMark = _.last(token.state.openMarks)
@@ -575,7 +575,7 @@ function _handleDeleteAbstract (cm) {
    * TODO: Rename this to just "section". The overly generic name isn't really
    * helping imo
    */
-function _handleBackspaceCommandsSingleLine (cm) {
+function handleBackspaceCommandsSingleLine (cm) {
   var currentPos = cm.doc.getCursor()
   var token = cm.getTokenAt(currentPos, true)
   var lastOpenMark = _.last(token.state.openMarks)
@@ -586,7 +586,7 @@ function _handleBackspaceCommandsSingleLine (cm) {
   // the current line
   if (
     lastOpenMark &&
-    _COMMANDS_ON_SINGLE_LINE[lastOpenMark.kind]
+    COMMANDS_ON_SINGLE_LINE[lastOpenMark.kind]
   ) {
     // Check if current line has an empty section mark (i.e. there's no title
     // between the curly braces)
@@ -650,7 +650,7 @@ function _handleBackspaceCommandsSingleLine (cm) {
     // If the last closed mark above the current line is a section
   } else if (
     lastClosedMark &&
-    _COMMANDS_ON_SINGLE_LINE[lastClosedMark.kind]
+    COMMANDS_ON_SINGLE_LINE[lastClosedMark.kind]
   ) {
     if (
       (
@@ -682,7 +682,7 @@ function _handleBackspaceCommandsSingleLine (cm) {
 
 // TODO: Rename this to just "section". The overly generic name isn't
 // really helping imo
-function _handleDeleteCommandsSingleLine (cm) {
+function handleDeleteCommandsSingleLine (cm) {
   var currentPos = cm.doc.getCursor()
   var token = cm.getTokenAt(currentPos, true)
   var lastOpenMark = _.last(token.state.openMarks)
@@ -706,13 +706,13 @@ function _handleDeleteCommandsSingleLine (cm) {
   var cmdSingleLineAfter = _.find(
     _.union(marksAfter, marksEol),
     function (m) {
-      return _COMMANDS_ON_SINGLE_LINE[m.kind]
+      return COMMANDS_ON_SINGLE_LINE[m.kind]
     }
   )
 
   // If we are inside a section command, and the section is at the start of
   // the current line
-  if (lastOpenMark && _COMMANDS_ON_SINGLE_LINE[lastOpenMark.kind]) {
+  if (lastOpenMark && COMMANDS_ON_SINGLE_LINE[lastOpenMark.kind]) {
     // Check if current line has an empty section mark (i.e. there's no title
     // between the curly braces)
     var emptyMatch = line.match(
