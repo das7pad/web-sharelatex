@@ -1,0 +1,12 @@
+- var publishedModalOpened = false
+
+a.btn.btn-full-height#publishButton(
+	href,
+	ng-if="permissions.admin",
+	ng-click="openPublishProjectModal(); loadPublishMenu()",
+	ng-controller="PublishController",
+	)
+	i.fa.fa-fw.fa-group
+		p.toolbar-label publish
+
+!= moduleIncludes('publish:modal', locals)
