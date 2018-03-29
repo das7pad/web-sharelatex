@@ -5,7 +5,10 @@ import CodeMirror from 'codemirror'
 export default {
   'Backspace': function (cm) { return _handleBackspace(cm) },
   'Delete': function (cm) { return _handleDelete(cm) },
-  'Up': function (cm) { return _handleUp(cm) }
+  'Up': function (cm) { return _handleUp(cm) },
+  'Home': 'goLineLeftSmart',
+  'End': 'goLineRight',
+  'Cmd-Left': 'goLineLeftSmart'
 }
 
 // Defines the commands that should be on a single line,
