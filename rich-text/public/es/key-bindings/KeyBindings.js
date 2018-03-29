@@ -4,7 +4,8 @@ import CodeMirror from 'codemirror'
 
 export default {
   'Backspace': function (cm) { return _handleBackspace(cm) },
-  'Delete': function (cm) { return _handleDelete(cm) }
+  'Delete': function (cm) { return _handleDelete(cm) },
+  'Up': function (cm) { return _handleUp(cm) }
 }
 
 // Defines the commands that should be on a single line,
@@ -52,6 +53,36 @@ function _handleDelete (cm) {
   }
 
   // Special handling wasn't run, do default behaviour
+  return CodeMirror.Pass
+}
+
+function _handleUp (cm) {
+  var cursor = cm.getCursor()
+  var state = cm.getTokenAt(cursor, true).state
+  var lastMark = _.last(state.marks)
+
+  // The last mark the cursor is on a line with an \item or \enumerate-item
+  if (
+    lastMark &&
+    (
+      lastMark.kind === 'item' ||
+      lastMark.kind === 'enumerate-item'
+    )
+  ) {
+    // And the cursor is at the end of the line
+    if (cursor.ch === lastMark.to.ch) {
+      // Jump to the beginning of the line and prevent the default behaviour
+      // (moving the cursor up). In RT mode this moves the cursor to the
+      // beginning of the line above
+      // The "exception" is if the line above is an \item, because then the
+      // cursor will be at the beginning of the \item for the current line,
+      // and RT will render this cursor at the end of the line above
+      // TODO: does this behaviour make sense?
+      cm.execCommand('goLineLeft')
+      return null
+    }
+  }
+
   return CodeMirror.Pass
 }
 
