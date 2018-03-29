@@ -2,7 +2,7 @@
 
 import CodeMirror from 'codemirror'
 
-import fixture from '../support/fixture'
+import fixture from '../../../../../../test/unit_frontend/es/support/fixture'
 import { stubMathJax, teardownMathJax } from '../support/stub-mathjax'
 import LatexMode from '../../../../public/es/latex-mode/LatexMode'
 import RichText from '../../../../public/es/rich-text/RichText'
