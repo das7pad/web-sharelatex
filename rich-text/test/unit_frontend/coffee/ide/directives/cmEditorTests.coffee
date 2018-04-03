@@ -1,6 +1,12 @@
-define ['ide/rich-text/directives/cmEditor'], () ->
+define [
+  'ide/rich-text/directives/cmEditor'
+  'ide/rich-text/RichTextAdapter'
+], (cmEditor, RichTextAdapter) ->
   describe 'cmEditor', () ->
-    beforeEach(module('SharelatexApp'))
+    beforeEach module 'SharelatexApp', ($provide) ->
+      $provide.factory 'ide', () ->
+        { fileTreeManager: sinon.stub() }
+      return
 
     origRequireJsFn = null
     beforeEach () ->
@@ -18,13 +24,18 @@ define ['ide/rich-text/directives/cmEditor'], () ->
       inject ($compile, $rootScope) ->
         $compile('<div cm-editor></div>')($rootScope)
         expect(richTextInit).to.have.been.called
+        expect(richTextInit.firstCall.args[1]).to.be.an.instanceof(
+          RichTextAdapter
+        )
 
     it 'attaches to CM', () ->
       init = sinon.stub().returns({}) # Stub initing CM and returning instance
       openDoc = sinon.stub()
+      enableRichText = sinon.stub()
       @requirejs.callsArgWith(1, {
         init: init
-        openDoc: openDoc
+        openDoc: openDoc,
+        enableRichText: enableRichText
       })
       inject ($compile, $rootScope, $browser) ->
         getSnapshot = sinon.stub()
@@ -40,11 +51,13 @@ define ['ide/rich-text/directives/cmEditor'], () ->
         expect(getSnapshot).to.have.been.called
         expect(openDoc).to.have.been.called
         expect(attachToCM).to.have.been.called
+        expect(enableRichText).to.have.been.called
 
     it 'detaches from CM when destroyed', () ->
       @requirejs.callsArgWith(1, {
         init: sinon.stub().returns({})
-        openDoc: sinon.stub()
+        openDoc: sinon.stub(),
+        enableRichText: sinon.stub()
       })
       inject ($compile, $rootScope) ->
         detachFromCM = sinon.stub()

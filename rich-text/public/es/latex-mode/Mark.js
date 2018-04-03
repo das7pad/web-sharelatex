@@ -60,4 +60,48 @@ export default class Mark {
       this.openParent
     )
   }
+
+  getOuter (cm) {
+    return cm.getRange(this.from, this.to)
+  }
+
+  getContent (cm) {
+    return cm.getRange(this.contentFrom, this.contentTo)
+  }
+
+  hasContent (cm) {
+    return this.getContent(cm).trim().length
+  }
+
+  containsCursor (cm, region) {
+    var cursor = cm.getCursor('head')
+    if (region === 'inner') {
+      return _positionInRange(cm, cursor, this.contentFrom, this.contentTo)
+    } else if (region === 'outer') {
+      return _positionInRange(cm, cursor, this.from, this.to)
+    } else {
+      throw new Error(`bad region ${region}`)
+    }
+  }
+
+  rangeForRegion (region) {
+    if (region === 'pre') {
+      return { from: this.from, to: this.contentFrom }
+    } else if (region === 'inner') {
+      return { from: this.contentFrom, to: this.contentTo }
+    } else if (region === 'post') {
+      return { from: this.contentTo, to: this.to }
+    } else if (region === 'outer') {
+      return this
+    } else {
+      throw new Error('bad region ' + region)
+    }
+  }
+}
+
+function _positionInRange (cm, position, from, to) {
+  var positionIndex = cm.indexFromPos(position)
+  var rangeFromIndex = cm.indexFromPos(from)
+  var rangeToIndex = cm.indexFromPos(to)
+  return rangeFromIndex <= positionIndex && positionIndex <= rangeToIndex
 }

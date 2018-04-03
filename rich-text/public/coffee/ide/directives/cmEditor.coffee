@@ -1,7 +1,8 @@
 define [
   "base"
-], (App) ->
-  App.directive "cmEditor", () ->
+  "ide/rich-text/RichTextAdapter"
+], (App, RichTextAdapter) ->
+  App.directive "cmEditor", (ide) ->
     return {
       scope: {
         sharejsDoc: "="
@@ -10,11 +11,12 @@ define [
       link: (scope, element, attrs) ->
         cm = null
         richText = null
+        adapter = new RichTextAdapter(ide.fileTreeManager)
 
         init = () ->
           requirejs ['rich-text'], (rt) ->
             richText = rt
-            cm = richText.init(element.find('.cm-editor-wrapper')[0])
+            cm = richText.init(element.find('.cm-editor-wrapper')[0], adapter)
             switchAttachment(scope.sharejsDoc)
 
         scope.$watch "sharejsDoc", switchAttachment
@@ -31,6 +33,7 @@ define [
           scope.$applyAsync () ->
             richText.openDoc(cm, sharejsDoc.getSnapshot())
             sharejsDoc.attachToCM(cm)
+            richText.enableRichText()
 
         detachFromCM = (sharejsDoc) ->
           sharejsDoc.detachFromCM()
@@ -41,6 +44,6 @@ define [
         init()
 
       template: """
-        <div class="cm-editor-wrapper"></div>
+        <div class="cm-editor-wrapper rich-text"></div>
       """
     }
