@@ -533,42 +533,6 @@ describe('RichText', function () {
   })
 })
 
-function expectCursorAt (cm, line, ch) {
-  // In CodeMirror 5.11, getCursor sometimes returns an object with an xRel
-  // property, which we ignore for the purpose of this comparison.
-  // In CodeMirror 5.27.4, getCursor is inconsistent in whether it returns a
-  // Pos typed object or a plain Object. Therefore we just compare the line
-  // and ch values
-  var cursor = cm.getCursor()
-  expect(cursor.line).to.equal(line)
-  expect(cursor.ch).to.equal(ch)
-}
-
-function fakeNamedKey (cm, keyName) {
-  var ctrl, shift, alt
-  var key = keyName.replace(/\w+-/g, function (type) {
-    if (type === 'Ctrl-') ctrl = true
-    else if (type === 'Alt-') alt = true
-    else if (type === 'Shift-') shift = true
-    return ''
-  })
-  var code = null
-  for (var c in CodeMirror.keyNames) {
-    if (CodeMirror.keyNames[c] === key) { code = c; break }
-  }
-  if (code === null) throw new Error('Unknown key: ' + key)
-
-  cm.triggerOnKeyDown({
-    type: 'keydown',
-    keyCode: code,
-    ctrlKey: ctrl,
-    shiftKey: shift,
-    altKey: alt,
-    preventDefault: function () {},
-    stopPropagation: function () {}
-  })
-}
-
 function type (cm, string) {
   cm.replaceRange(string, cm.getCursor(), cm.getCursor())
 }

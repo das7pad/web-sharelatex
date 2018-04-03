@@ -91,6 +91,11 @@ describe('Key bindings', function () {
   // }
 
   function expectCursorAt (cm, line, ch) {
+    // In CodeMirror 5.11, getCursor sometimes returns an object with an xRel
+    // property, which we ignore for the purpose of this comparison.
+    // In CodeMirror 5.27.4, getCursor is inconsistent in whether it returns a
+    // Pos typed object or a plain Object. Therefore we just compare the line
+    // and ch values
     var cursor = cm.getCursor()
     expect(cursor.line).to.equal(line)
     expect(cursor.ch).to.equal(ch)
@@ -1046,7 +1051,8 @@ describe('Key bindings', function () {
         'tex\\subsubsection{subsubsection}abc\n' +
         'b\n'
       )
-      // Place cursor at end of subsubsection argument, after "subsubsection" text
+      // Place cursor at end of subsubsection argument, after "subsubsection"
+      // text
       // tex\subsubsection{subsubsection|}abc
       this.cm.setCursor({ line: 1, ch: 31 })
 
