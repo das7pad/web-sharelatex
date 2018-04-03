@@ -12,7 +12,7 @@ module.exports = ReferencesSearchController =
 				logger.err {err, projectId}, "error fetching project"
 				return callback(err)
 			UserGetter.getUser project.owner_ref, (err, owner) ->
-				callback(err, owner?.features?.references == true)
+				callback(err, owner?.features?.referencesSearch or owner?.features?.references)
 
 	search: (req, res) ->
 		projectId = req.params.Project_id

@@ -49,7 +49,7 @@ describe 'ReferencesSearchController', ->
 			@fakeUser =
 				_id: @fakeProject.owner_ref
 				features:
-					references: true
+					referencesSearch: true
 			@fakeSearchData =
 				hits: []
 			@ProjectGetter.getProject.callsArgWith(2, null, @fakeProject)
@@ -84,7 +84,7 @@ describe 'ReferencesSearchController', ->
 		describe 'when the user is not allowed to search', ->
 
 			beforeEach ->
-				@fakeUser.features.references = false
+				@fakeUser.features.referencesSearch = false
 				@UserGetter.getUser.callsArgWith(1, null, @fakeUser)
 
 			it 'should send a 500 response', (done) ->
@@ -139,7 +139,7 @@ describe 'ReferencesSearchController', ->
 		describe 'when search produces an error', ->
 
 			beforeEach ->
-				@fakeUser.features.references = true
+				@fakeUser.features.referencesSearch = true
 				@ProjectGetter.getProject.callsArgWith(2, null, @fakeProject)
 				@UserGetter.getUser.callsArgWith(1, null, @fakeUser)
 				@handler.search.callsArgWith(2, new Error('woops'))
