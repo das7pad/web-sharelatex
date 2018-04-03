@@ -24,7 +24,9 @@ module.exports = ReferencesApiHandler =
 
 	userCanMakeRequest: (userId, ref_provider, callback=(err, canMakeRequest)->) ->
 		UserGetter.getUser userId, (err, user) ->
-			callback(err, user?.features?.references == true)
+			return callback(err) if err?
+			features = user?.features
+			callback(null, features?.mendeley or features?.references)
 
 	startAuth: (req, res, next)->
 		user_id = AuthenticationController.getLoggedInUserId(req)

@@ -13,13 +13,13 @@ describe 'ReferencesApiHandler', ->
 		@user =
 			_id: @user_id
 			features:
-				references: true
+				mendeley: true
 		@allFiles =
 			'/main.tex':  {_id: 'aaa', name: 'main.tex'}
 			'/other.tex': {_id: 'bbb', name: 'other.tex'}
 		@db = {
 			users: {
-				findOne : sinon.stub().callsArgWith(2, null, { features: {references:true}, refProvider:true})
+				findOne : sinon.stub().callsArgWith(2, null, { features: {mendeley:true}, refProvider:true})
 			}
 		}
 		@mongojs = () =>
