@@ -1,6 +1,4 @@
-/* global MathJax */
-
-import _ from 'underscore'
+/* global MathJax, _ */
 
 import { ignoreErrors, lastRenderedLine, getMarks } from './utils'
 import MathMarker from './markers/MathMarker'

@@ -1,4 +1,4 @@
-import _ from 'underscore'
+/* global _ */
 
 import { rangesEqual } from './utils'
 
