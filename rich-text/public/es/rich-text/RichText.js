@@ -57,20 +57,21 @@ export default function RichText (_cm, rtAdapter) {
 
     // Prepare "editor" marks - TextMarkers used in the DOM that must be matched
     // up with parser marks
-    _.chain(_cm.getAllMarks())
-      // Reset any existing editor marks
-      .filter((editorMark) => typeof editorMark.wlClearMatch === 'function')
-      .forEach((editorMark) => editorMark.wlClearMatch())
-      // Attempt to match up parser marks with existing editor marks
-      .forEach((editorMark) => editorMark.wlMatch(_cm, sourceMarks))
-      // Remove editor marks that don't match any source marks
-      .forEach((editorMark) => {
-        if (editorMark.wlIsMatched()) return
-        const { to } = editorMark.find()
-        if (to && to.line < lastRenderedLine(_cm)) {
-          editorMark.clear()
-        }
-      })
+    const editorMarks = _cm.getAllMarks().filter((editorMark) => {
+      return typeof editorMark.wlClearMatch === 'function'
+    })
+    // Reset any existing editor marks
+    editorMarks.forEach((editorMark) => editorMark.wlClearMatch())
+    // Attempt to match up parser marks with existing editor marks
+    editorMarks.forEach((editorMark) => editorMark.wlMatch(_cm, sourceMarks))
+    // Remove editor marks that don't match any source marks
+    editorMarks.forEach((editorMark) => {
+      if (editorMark.wlIsMatched()) return
+      const { to } = editorMark.find()
+      if (to && to.line < lastRenderedLine(_cm)) {
+        editorMark.clear()
+      }
+    })
 
     const newMathMarks = []
     let titleMark, authorMark, maketitleMark
