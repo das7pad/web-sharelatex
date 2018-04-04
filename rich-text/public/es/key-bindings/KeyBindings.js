@@ -15,7 +15,8 @@ export default {
   'End': 'goLineRight',
   'Cmd-Left': 'goLineLeftSmart',
   [`${modifierKey}-B`]: function (cm) { return wrapBold(cm) },
-  [`${modifierKey}-I`]: function (cm) { return wrapItalic(cm) }
+  [`${modifierKey}-I`]: function (cm) { return wrapItalic(cm) },
+  [`${modifierKey}-/`]: 'toggleComment'
 }
 
 // Defines the commands that should be on a single line,
