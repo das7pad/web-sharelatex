@@ -8,14 +8,14 @@ import { wrapBold, wrapItalic } from './TextWrapping'
 const modifierKey = mac ? 'Cmd' : 'Ctrl'
 
 export default {
-  'Backspace': function (cm) { return handleBackspace(cm) },
-  'Delete': function (cm) { return handleDelete(cm) },
-  'Up': function (cm) { return handleUp(cm) },
+  'Backspace': handleBackspace,
+  'Delete': handleDelete,
+  'Up': handleUp,
   'Home': 'goLineLeftSmart',
   'End': 'goLineRight',
   'Cmd-Left': 'goLineLeftSmart',
-  [`${modifierKey}-B`]: function (cm) { return wrapBold(cm) },
-  [`${modifierKey}-I`]: function (cm) { return wrapItalic(cm) },
+  [`${modifierKey}-B`]: wrapBold,
+  [`${modifierKey}-I`]: wrapItalic,
   [`${modifierKey}-/`]: 'toggleComment'
 }
 
