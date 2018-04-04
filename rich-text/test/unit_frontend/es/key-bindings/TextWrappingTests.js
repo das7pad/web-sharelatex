@@ -1,6 +1,7 @@
 import CodeMirror from 'codemirror'
 
 import fixture from '../../../../../../test/unit_frontend/es/support/fixture'
+import LatexMode from '../../../../public/es/latex-mode/LatexMode'
 import * as TextWrapping from '../../../../public/es/key-bindings/TextWrapping'
 
 const TEXTAREA_HTML = '<textarea></textarea>'
@@ -8,7 +9,11 @@ const TEXTAREA_HTML = '<textarea></textarea>'
 describe('Text wrapping', function () {
   beforeEach(function () {
     this.textarea = fixture.load(TEXTAREA_HTML)
-    this.cm = CodeMirror.fromTextArea(this.textarea)
+
+    CodeMirror.defineMode('latex', () => new LatexMode())
+    this.cm = CodeMirror.fromTextArea(this.textarea, {
+      mode: 'latex'
+    })
   })
 
   afterEach(function () {
@@ -69,52 +74,43 @@ describe('Text wrapping', function () {
   //   expect(_cm.getValue()).toEqual('\\[foo\\]')
   // })
 
-  // it('wraps with custom snippet', function () {
-  //   _cm.setValue('foo')
-  //   _cm.setSelection({ line: 0, ch: 0 }, { line: 0, ch: 3 })
+  it('inserts empty mark if nothing selected', function () {
+    TextWrapping.wrapBold(this.cm)
 
-  //   TextWrapping.wrapSnippet('$', '£') // Not LaTeX but you get the idea
+    expect(this.cm.getValue()).to.equal('\\textbf{}')
+  })
 
-  //   expect(_cm.getValue()).toEqual('$foo£')
-  // })
+  it('inserts if selection head before anchor', function () {
+    this.cm.setValue('foo')
+    this.cm.setSelection({ line: 0, ch: 3 }, { line: 0, ch: 0 })
 
-  // it('inserts empty mark if nothing selected', function () {
-  //   TextWrapping.wrapBold()
+    TextWrapping.wrapBold(this.cm)
 
-  //   expect(_cm.getValue()).toEqual('\\textbf{}')
-  // })
+    expect(this.cm.getValue()).to.equal('\\textbf{foo}')
+  })
 
-  // it('inserts if selection head before anchor', function () {
-  //   _cm.setValue('foo')
-  //   _cm.setSelection({ line: 0, ch: 3 }, { line: 0, ch: 0 })
+  it('maintains selection after wrapping', function () {
+    this.cm.setValue('foo')
+    this.cm.setSelection({ line: 0, ch: 0 }, { line: 0, ch: 3 })
 
-  //   TextWrapping.wrapBold()
+    TextWrapping.wrapBold(this.cm)
 
-  //   expect(_cm.getValue()).toEqual('\\textbf{foo}')
-  // })
+    var selections = this.cm.listSelections()
+    var selection = selections[0]
+    expect(selections.length).to.equal(1)
+    // Selection is still the same, even though we have inserted text on either
+    // side of it
+    expect(this.cm.getRange(selection.from(), selection.to())).to.equal('foo')
+  })
 
-  // it('maintains selection after wrapping', function () {
-  //   _cm.setValue('foo')
-  //   _cm.setSelection({ line: 0, ch: 0 }, { line: 0, ch: 3 })
+  it('removes unnecessary marks of the same kind within the wrap', function () {
+    this.cm.setValue('\\textbf{foo} \\textbf{bar} baz')
+    this.cm.setSelection({ line: 0, ch: 0 }, { line: 0, ch: 46 }) // Select all
 
-  //   TextWrapping.wrapBold()
+    TextWrapping.wrapBold(this.cm)
 
-  //   var selections = _cm.listSelections()
-  //   var selection = selections[0]
-  //   expect(selections.length).toEqual(1)
-  //   // Selection is still the same, even though we have inserted text on either
-  //   // side of it
-  //   expect(_cm.getRange(selection.from(), selection.to())).toEqual('foo')
-  // })
-
-  // it('removes unnecessary marks of the same kind within the wrap', function () {
-  //   _cm.setValue('\\textbf{foo} \\textbf{bar} baz')
-  //   _cm.setSelection({ line: 0, ch: 0 }, { line: 0, ch: 46 }) // Select all
-
-  //   TextWrapping.wrapBold()
-
-  //   expect(_cm.getValue()).toEqual('\\textbf{foo bar baz}')
-  // })
+    expect(this.cm.getValue()).to.equal('\\textbf{foo bar baz}')
+  })
 
   // it('does not wrap if nested within an header', function () {
   //   _cm.setValue('\\section*{foo}')
@@ -125,73 +121,73 @@ describe('Text wrapping', function () {
   //   expect(_cm.getValue()).toEqual('\\section*{foo}')
   // })
 
-  // it('does not wrap if already nested within outer bold or italic mark', function () {
-  //   _cm.setValue('\\textbf{\\textit{foo}}')
-  //   _cm.setSelection({ line: 0, ch: 16 }, { line: 0, ch: 19 })
+  it('does not wrap if already nested within outer bold or italic mark', function () {
+    this.cm.setValue('\\textbf{\\textit{foo}}')
+    this.cm.setSelection({ line: 0, ch: 16 }, { line: 0, ch: 19 })
 
-  //   TextWrapping.wrapBold()
+    TextWrapping.wrapBold(this.cm)
 
-  //   expect(_cm.getValue()).toEqual('\\textbf{\\textit{foo}}')
+    expect(this.cm.getValue()).to.equal('\\textbf{\\textit{foo}}')
 
-  //   // This is possibly feasable to implement at some point - we could remove
-  //   // the outer \textbf in this example. However, there is a more complex
-  //   // example: \textbf{foo \textit{bar}} where bar is selected and attempting
-  //   // to wrap in \textbf/
-  // })
+    // This is possibly feasable to implement at some point - we could remove
+    // the outer \textbf in this example. However, there is a more complex
+    // example: \textbf{foo \textit{bar}} where bar is selected and attempting
+    // to wrap in \textbf/
+  })
 
-  // it('removes existing bold or italic mark if entire content is selected', function () {
-  //   _cm.setValue('\\textbf{foo}')
-  //   // Select all content - "foo"
-  //   _cm.setSelection({ line: 0, ch: 8 }, { line: 0, ch: 11 })
+  it('removes existing bold or italic mark if entire content is selected', function () {
+    this.cm.setValue('\\textbf{foo}')
+    // Select all content - "foo"
+    this.cm.setSelection({ line: 0, ch: 8 }, { line: 0, ch: 11 })
 
-  //   TextWrapping.wrapBold()
+    TextWrapping.wrapBold(this.cm)
 
-  //   expect(_cm.getValue()).toEqual('foo')
-  // })
+    expect(this.cm.getValue()).to.equal('foo')
+  })
 
-  // it('moves selection before bold or italic mark if selection starts at beginning of content', function () {
-  //   _cm.setValue('\\textbf{foo bar}')
-  //   // Select from beginning of content - "foo", but not " bar"
-  //   _cm.setSelection({ line: 0, ch: 8 }, { line: 0, ch: 11 })
+  it('moves selection before bold or italic mark if selection starts at beginning of content', function () {
+    this.cm.setValue('\\textbf{foo bar}')
+    // Select from beginning of content - "foo", but not " bar"
+    this.cm.setSelection({ line: 0, ch: 8 }, { line: 0, ch: 11 })
 
-  //   TextWrapping.wrapBold()
+    TextWrapping.wrapBold(this.cm)
 
-  //   // Note that whitespace is moved out of the mark
-  //   expect(_cm.getValue()).toEqual('foo \\textbf{bar}')
-  // })
+    // Note that whitespace is moved out of the mark
+    expect(this.cm.getValue()).to.equal('foo \\textbf{bar}')
+  })
 
-  // it('moves selection after bold or italic mark if selection ends at end of content', function () {
-  //   _cm.setValue('\\textbf{foo bar}')
-  //   // Select from end of content - "bar", but not "foo"
-  //   _cm.setSelection({ line: 0, ch: 12 }, { line: 0, ch: 15 })
+  it('moves selection after bold or italic mark if selection ends at end of content', function () {
+    this.cm.setValue('\\textbf{foo bar}')
+    // Select from end of content - "bar", but not "foo"
+    this.cm.setSelection({ line: 0, ch: 12 }, { line: 0, ch: 15 })
 
-  //   TextWrapping.wrapBold()
+    TextWrapping.wrapBold(this.cm)
 
-  //   // Note that whitespace is moved out of the mark
-  //   expect(_cm.getValue()).toEqual('\\textbf{foo} bar')
-  // })
+    // Note that whitespace is moved out of the mark
+    expect(this.cm.getValue()).to.equal('\\textbf{foo} bar')
+  })
 
-  // it('extracts the selection out of a bold or italic mark when attempting wrap an existing mark', function () {
-  //   _cm.setValue('\\textbf{foo bar baz}')
-  //   // Select within the content - "bar", but not "foo " or " baz"
-  //   _cm.setSelection({ line: 0, ch: 12 }, { line: 0, ch: 15 })
+  it('extracts the selection out of a bold or italic mark when attempting wrap an existing mark', function () {
+    this.cm.setValue('\\textbf{foo bar baz}')
+    // Select within the content - "bar", but not "foo " or " baz"
+    this.cm.setSelection({ line: 0, ch: 12 }, { line: 0, ch: 15 })
 
-  //   TextWrapping.wrapBold()
+    TextWrapping.wrapBold(this.cm)
 
-  //   // Note that whitespace is moved out of the marks
-  //   expect(_cm.getValue()).toEqual('\\textbf{foo} bar \\textbf{baz}')
-  // })
+    // Note that whitespace is moved out of the marks
+    expect(this.cm.getValue()).to.equal('\\textbf{foo} bar \\textbf{baz}')
+  })
 
-  // it('handles newlines when extracting selection out of a bold or italic mark when attempting to wrap an existing mark', function () {
-  //   _cm.setValue('\\textbf{foo bar \nbaz}')
-  //   // Select multiple lines - "bar\n"
-  //   _cm.setSelection({ line: 0, ch: 12 }, { line: 1, ch: 0 })
+  it('handles newlines when extracting selection out of a bold or italic mark when attempting to wrap an existing mark', function () {
+    this.cm.setValue('\\textbf{foo bar \nbaz}')
+    // Select multiple lines - "bar\n"
+    this.cm.setSelection({ line: 0, ch: 12 }, { line: 1, ch: 0 })
 
-  //   TextWrapping.wrapBold()
+    TextWrapping.wrapBold(this.cm)
 
-  //   // Note that whitespace is moved out of the marks
-  //   expect(_cm.getValue()).toEqual('\\textbf{foo} bar \n\\textbf{baz}')
-  // })
+    // Note that whitespace is moved out of the marks
+    expect(this.cm.getValue()).to.equal('\\textbf{foo} bar \n\\textbf{baz}')
+  })
 
   // it('selects current line if attempting to wrap whole line', function () {
   //   _cm.setValue('foo\nbar')
@@ -207,7 +203,8 @@ describe('Text wrapping', function () {
   //   expect(selections[0].to()).toEqual(CodeMirror.Pos(0, 12))
   // })
 
-  // it('moves selection to newline if attempting to wrap whole line and line is not selected', function () {
+  // it('moves selection to newline if attempting to wrap whole line and line
+  // is not selected', function () {
   //   _cm.setValue('foo bar baz')
   //   // Select only part of the line - "bar" but not "foo " or " baz"
   //   _cm.setSelection({ line: 0, ch: 4 }, { line: 0, ch: 7 })
@@ -217,13 +214,15 @@ describe('Text wrapping', function () {
   //   expect(_cm.getValue()).toEqual('foo \n\\section{bar}\n baz')
   // })
 
-  // it('does not add extra newline if attempting to wrap whole line and selection ends at EOL', function () {
+  // it('does not add extra newline if attempting to wrap whole line and
+  // selection ends at EOL', function () {
   //   _cm.setValue(
   //     'foo\n' +
   //     'bar\n' +
   //     ''
   //   )
-  //   // Select end of the second line - "ar". Note that the selection ends at the
+  //   // Select end of the second line - "ar". Note that the selection ends at
+  // the
   //   // end of the line
   //   _cm.setSelection({ line: 1, ch: 1 }, { line: 1, ch: 3 })
 
@@ -237,13 +236,15 @@ describe('Text wrapping', function () {
   //   ])
   // })
 
-  // it('does not add extra newline if attempting to wrap whole line and selection starts at SOL', function () {
+  // it('does not add extra newline if attempting to wrap whole line and
+  // selection starts at SOL', function () {
   //   _cm.setValue(
   //     '\n' +
   //     'foo\n' +
   //     'bar'
   //   )
-  //   // Select start of second line - "fo". Note that the selection starts at the
+  //   // Select start of second line - "fo". Note that the selection starts at
+  // the
   //   // start of the line
   //   _cm.setSelection({ line: 1, ch: 0 }, { line: 1, ch: 2 })
 
@@ -271,7 +272,8 @@ describe('Text wrapping', function () {
   //     )
   //   })
 
-  //   // NOTE: Bullet lists have the same behaviour as numbered lists - apart from
+  //   // NOTE: Bullet lists have the same behaviour as numbered lists - apart
+  // from
   //   // "enumerate"/"itemize" - so bullet list's behaviour is not fully tested
   //   it('inserts a bullet list', function () {
   //     _cm.setValue('')
@@ -285,7 +287,8 @@ describe('Text wrapping', function () {
   //     )
   //   })
 
-  //   it('adds whitespace around numbered list if cursor is in middle of line', function () {
+  //   it('adds whitespace around numbered list if cursor is in middle of line',
+  // function () {
   //     _cm.setValue('foobar')
   //     // Place cursor in middle of line
   //     _cm.setCursor({ line: 0, ch: 3 })
@@ -301,7 +304,8 @@ describe('Text wrapping', function () {
   //     )
   //   })
 
-  //   it('adds whitespace before numbered list if cursor is at end of line', function () {
+  //   it('adds whitespace before numbered list if cursor is at end of line',
+  // function () {
   //     _cm.setValue('foo')
   //     // Place cursor at end of first line
   //     _cm.setSelection({ line: 0, ch: 3 })
@@ -332,7 +336,8 @@ describe('Text wrapping', function () {
   //     )
   //   })
 
-  //   it('adds whitespace around numbered list if selection in middle of line', function () {
+  //   it('adds whitespace around numbered list if selection in middle of line',
+  // function () {
   //     _cm.setValue('foo bar baz')
   //     // Select "bar"
   //     _cm.setSelection({ line: 0, ch: 4 }, { line: 0, ch: 7 })
@@ -348,7 +353,8 @@ describe('Text wrapping', function () {
   //     )
   //   })
 
-  //   it('adds whitespace before numbered list if selection ends at end of line', function () {
+  //   it('adds whitespace before numbered list if selection ends at end of
+  // line', function () {
   //     _cm.setValue('foo bar')
   //     _cm.setSelection({ line: 0, ch: 4 }, { line: 0, ch: 7 })
 
@@ -385,7 +391,8 @@ describe('Text wrapping', function () {
   //     expect(_cm.getCursor()).toEqual(CodeMirror.Pos(3, 6))
   //   })
 
-  //   it('inserts a numbered list within a numbered list if cursor is before \\end{}', function () {
+  //   it('inserts a numbered list within a numbered list if cursor is before
+  // \\end{}', function () {
   //     _cm.setValue(
   //       '\\begin{enumerate}\n' +
   //       '\\item a\n' +
