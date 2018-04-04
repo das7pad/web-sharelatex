@@ -355,52 +355,52 @@ function wrap (cm, pre, post, wrapWholeLine = false) {
   focus(cm)
 }
 
-/**
- * Prepend selected lines with \item command
- *
- * @param {CodeMirror} cm
- */
-function prependLinesWithItem (cm) {
-  const selectedLines = cm.getSelection().split('\n')
-  const prependedLines = _.map(selectedLines, (line) => `\\item ${line}`)
+// /**
+//  * Prepend selected lines with \item command
+//  *
+//  * @param {CodeMirror} cm
+//  */
+// function prependLinesWithItem (cm) {
+//   const selectedLines = cm.getSelection().split('\n')
+//   const prependedLines = _.map(selectedLines, (line) => `\\item ${line}`)
 
-  // +wrap argument used by CM to merge any following replaceRange with
-  // same +wrap argument into one history change. Note: The next history
-  // change must be done within the set historyEventDelay
-  cm.replaceSelection(prependedLines.join('\n'), null, '+wrap')
-}
+//   // +wrap argument used by CM to merge any following replaceRange with
+//   // same +wrap argument into one history change. Note: The next history
+//   // change must be done within the set historyEventDelay
+//   cm.replaceSelection(prependedLines.join('\n'), null, '+wrap')
+// }
 
-/**
- * Insert list environment, surrounding with newlines where applicable
- *
- * @param {CodeMirror} cm
- * @param {string} listType
- */
-function wrapListOnNewline (cm, listType) {
-  const cursor = cm.getCursor()
-  const token = cm.getTokenAt(cursor, true)
-  const lineText = cm.getLine(cursor.line)
+// /**
+//  * Insert list environment, surrounding with newlines where applicable
+//  *
+//  * @param {CodeMirror} cm
+//  * @param {string} listType
+//  */
+// function wrapListOnNewline (cm, listType) {
+//   const cursor = cm.getCursor()
+//   const token = cm.getTokenAt(cursor, true)
+//   const lineText = cm.getLine(cursor.line)
 
-  if (cursor.ch === 0 || (!lineText && !token.type)) {
-    // Cursor ends at beginning of line or the line is empty and not within
-    // a mark
+//   if (cursor.ch === 0 || (!lineText && !token.type)) {
+//     // Cursor ends at beginning of line or the line is empty and not within
+//     // a mark
 
-    // Open list on same line as cursor and close with a newline below
-    wrap(cm, `\\begin{${listType}}\n`, `\n\\end{${listType}}\n`, false)
-  } else if (cursor.ch > 0 && cursor.ch < lineText.length) {
-    // Cursor ends within the line - not at the beginning or the end
+//     // Open list on same line as cursor and close with a newline below
+//     wrap(cm, `\\begin{${listType}}\n`, `\n\\end{${listType}}\n`, false)
+//   } else if (cursor.ch > 0 && cursor.ch < lineText.length) {
+//     // Cursor ends within the line - not at the beginning or the end
 
-    // Open list on a newline and close with a newline below
-    wrap(cm, `\n\\begin{${listType}}\n`, `\n\\end{${listType}}\n`, false)
-  } else {
-    // Cursor ends at the end of the line
+//     // Open list on a newline and close with a newline below
+//     wrap(cm, `\n\\begin{${listType}}\n`, `\n\\end{${listType}}\n`, false)
+//   } else {
+//     // Cursor ends at the end of the line
 
-    // Open list on a newline and close without newline below
-    wrap(cm, `\n\\begin{${listType}}\n`, `\n\\end{${listType}}`, false)
-  }
+//     // Open list on a newline and close without newline below
+//     wrap(cm, `\n\\begin{${listType}}\n`, `\n\\end{${listType}}`, false)
+//   }
 
-  prependLinesWithItem(cm)
-}
+//   prependLinesWithItem(cm)
+// }
 
 export function wrapBold (cm) {
   wrap(cm, '\\textbf{', '}')
@@ -410,26 +410,26 @@ export function wrapItalic (cm) {
   wrap(cm, '\\textit{', '}')
 }
 
-export function wrapSection (cm) {
-  wrap(cm, '\\section{', '}', true)
-}
+// export function wrapSection (cm) {
+//   wrap(cm, '\\section{', '}', true)
+// }
 
-export function wrapSubsection (cm) {
-  wrap(cm, '\\subsection{', '}', true)
-}
+// export function wrapSubsection (cm) {
+//   wrap(cm, '\\subsection{', '}', true)
+// }
 
-export function wrapInlineMath (cm) {
-  wrap(cm, '\\(', '\\)', false)
-}
+// export function wrapInlineMath (cm) {
+//   wrap(cm, '\\(', '\\)', false)
+// }
 
-export function wrapDisplayMath (cm) {
-  wrap(cm, '\\[', '\\]', true)
-}
+// export function wrapDisplayMath (cm) {
+//   wrap(cm, '\\[', '\\]', true)
+// }
 
-export function wrapNumberedList (cm) {
-  wrapListOnNewline(cm, 'enumerate')
-}
+// export function wrapNumberedList (cm) {
+//   wrapListOnNewline(cm, 'enumerate')
+// }
 
-export function wrapBulletList (cm) {
-  wrapListOnNewline(cm, 'itemize')
-}
+// export function wrapBulletList (cm) {
+//   wrapListOnNewline(cm, 'itemize')
+// }
