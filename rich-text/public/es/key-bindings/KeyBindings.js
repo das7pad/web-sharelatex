@@ -2,13 +2,20 @@
 
 import CodeMirror from 'codemirror'
 
+import { mac } from '../utils/browser'
+import { wrapBold, wrapItalic } from './TextWrapping'
+
+const modifierKey = mac ? 'Cmd' : 'Ctrl'
+
 export default {
   'Backspace': function (cm) { return handleBackspace(cm) },
   'Delete': function (cm) { return handleDelete(cm) },
   'Up': function (cm) { return handleUp(cm) },
   'Home': 'goLineLeftSmart',
   'End': 'goLineRight',
-  'Cmd-Left': 'goLineLeftSmart'
+  'Cmd-Left': 'goLineLeftSmart',
+  [`${modifierKey}-B`]: function (cm) { return wrapBold(cm) },
+  [`${modifierKey}-I`]: function (cm) { return wrapItalic(cm) }
 }
 
 // Defines the commands that should be on a single line,
