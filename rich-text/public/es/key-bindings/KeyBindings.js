@@ -11,6 +11,7 @@ export default {
   'Backspace': handleBackspace,
   'Delete': handleDelete,
   'Up': handleUp,
+  'Enter': handleEnter,
   'Home': 'goLineLeftSmart',
   'End': 'goLineRight',
   'Cmd-Left': 'goLineLeftSmart',
@@ -94,6 +95,233 @@ function handleUp (cm) {
     }
   }
 
+  return CodeMirror.Pass
+}
+
+function handleEnter (cm) {
+  var cursor = cm.getCursor()
+  var token = cm.getTokenAt(cursor, true)
+  var currentState = token.state
+  var lastOpenMark = _.last(currentState.openMarks)
+  var lastClosedMark = _.last(currentState.marks)
+
+  // If cursor is within an environment
+  if (lastOpenMark) {
+    // Get the parse state at the end of the line. Note this is different to
+    // the state at the cursor (because the cursor may not be at the end of the
+    // line)
+    var stateLineAfter = cm.getStateAfter(cursor.line, true)
+    var lastClosedMarkAfter = _.last(stateLineAfter.marks)
+    var lastOpenMarkAfter = _.last(stateLineAfter.openMarks)
+
+    // Handle enter command for itemize and enumerate
+    // If within an itemize or enumerate environment and after a \item and
+    // the cursor is on the same line as or after the \begin{...}
+    if (
+      (
+        lastOpenMark.kind === 'itemize' ||
+        lastOpenMark.kind === 'enumerate'
+      ) &&
+      lastClosedMark &&
+      cursor.line >= lastClosedMark.to.line
+    ) {
+      // If the cursor is within the \begin{...} argument
+      if (
+        cursor.line === lastOpenMark.from.line &&
+        cursor.ch < lastOpenMark.contentFrom.ch
+      ) {
+        // Run the default Enter key handler
+        return CodeMirror.Pass
+      }
+
+      // If the cursor is at the start of line
+      if (cursor.ch === 0) {
+        // If the line the cursor is on contains a \item
+        if (cm.getLine(cursor.line).indexOf('\\item') === 0) {
+          // Run the default Enter key handler
+          return CodeMirror.Pass
+        }
+      }
+
+      // If the cursor is on the same line of \end{...} and inside the mark
+      if (
+        lastClosedMarkAfter &&
+        lastClosedMarkAfter.kind === lastOpenMark.kind &&
+        cursor.line === lastClosedMarkAfter.to.line &&
+        _.isEqual(lastOpenMark.from, lastClosedMarkAfter.from) &&
+        cursor.ch < lastClosedMarkAfter.to.ch
+      ) {
+        // Run the default Enter key handler
+        return CodeMirror.Pass
+      }
+
+      // If the cursor is still on the same line of \begin{...}
+      if (
+        cursor.line === lastOpenMark.from.line ||
+        cursor.line === lastOpenMarkAfter.from.line
+      ) {
+        // If the cursor is before the end of the \begin{...} argument
+        // TODO: is this handled above? (line 129)
+        if (cursor.ch < lastOpenMark.contentFrom.ch) {
+          // Run the default Enter key handler
+          return CodeMirror.Pass
+        }
+
+        // Get the state at the end of the line below the cursor
+        var stateAfter = cm.getStateAfter(cursor.line + 1, true)
+        // Determine if the line below the cursor is an \item or \end{...}
+        var check = _.find(stateAfter.marks, function (m) {
+          return (
+            m.from.line >= cursor.line &&
+            (
+              m.kind === 'enumerate-item' ||
+              m.kind === 'item' ||
+              m.kind === lastOpenMark.kind
+            )
+          )
+        })
+
+        // If there is no \item or \end{...} on the line below the cursor, we
+        // should not autocomplete
+        if (!check) {
+          // Run the default Enter key handler
+          return CodeMirror.Pass
+        } else {
+          // If there is an \item or \end{...}, insert a newline and \item on
+          // the cursor
+          cm.replaceRange('\n\\item ', {
+            line: cursor.line,
+            ch: cursor.ch
+          })
+          // Move the cursor to end of the line on which we just inserted the
+          // \item
+          cm.doc.setCursor({
+            line: cursor.line + 1,
+            ch: lastOpenMark.contentFrom.ch
+          })
+        }
+      } else {
+        // If we are not on the same line as the \begin{...}
+
+        // Handle enter command for list environments
+        // the enter command will clear the list if you
+        // press enter in the last blank item
+
+        // Find if the current open environment is nested within another (list)
+        // environment
+        var isNestedList = _.find(currentState.openMarks, function (m) {
+          return (
+            m !== lastOpenMark &&
+            (
+              m.kind === 'enumerate' ||
+              m.kind === 'itemize'
+            )
+          )
+        })
+        // Attempt to find the closing mark (the \end{...})
+        var envClosed = findClosedMark(cm, lastOpenMark)
+        var line = cm.getLine(cursor.line)
+
+        // If the environment is closed, there are no more items within the
+        // environment and the line the cursor is on is blank (after removing
+        // whitespace and \item)
+        // The most likely case here is that the cursor is on the last \item and
+        // it is blank
+        if (
+          envClosed &&
+          !checkItemsAfter(cm, lastClosedMark, envClosed.to) &&
+          cm.getRange(
+            { line: cursor.line, ch: 0 },
+            { line: cursor.line, ch: line.length }
+          ).replace(/\s*/g, '').replace('\\item', '') === ''
+        ) {
+          if (!isNestedList) {
+            // If not within a nested list
+            cm.operation(function () {
+              // Hack used to set the cursor after the refresh
+              // it seems that this is the only way to get it working
+              // at the moment
+              _.delay(function () {
+                cm.setCursor({ line: envClosed.to.line, ch: 0 })
+              }, 20)
+              // Delete the blank line that the cursor is on
+              cm.execCommand('deleteLine')
+              // Insert a line after the \end{...}
+              cm.replaceRange('\n', { line: envClosed.to.line, ch: 0 })
+              cm.refresh()
+            })
+          } else {
+            // If within a nested list
+            // "Move" the current (blank) line out of the nested list. This
+            // makes it appear as if a blank \item is being un-indented
+            cm.operation(function () {
+              // Hack used to set the cursor after the refresh
+              // it seems that this is the only way to get it working
+              // at the moment
+              _.delay(function () {
+                cm.setCursor({ line: envClosed.to.line, ch: 0 })
+              }, 20)
+              // Remove the blank line that the cursor is on
+              cm.execCommand('deleteLine')
+              // Insert a \item and a newline after the nested \end{...}
+              cm.replaceRange('\\item \n', { line: envClosed.to.line, ch: 0 })
+              cm.refresh()
+            })
+          }
+        } else {
+          // If the environment is not closed or there are more \item commands
+          // after the cursor or the current line is not blank
+          // Insert a new blank \item on the line below the cursor
+          cm.replaceRange('\n\\item ', {
+            line: cursor.line,
+            ch: cursor.ch
+          })
+          // If the line the cursor is on is an \item
+          if (
+            lastClosedMarkAfter.kind === 'item' ||
+            lastClosedMarkAfter.kind === 'enumerate-item'
+          ) {
+            // Move the cursor to the start of the \item on the line below
+            cm.doc.setCursor({
+              line: cursor.line + 1,
+              ch: lastClosedMarkAfter.contentFrom.ch
+            })
+          }
+        }
+      }
+      // Functionality was handled, don't run default behaviour
+      return null
+    } else if (COMMANDS_ON_SINGLE_LINE[lastOpenMark.kind]) {
+      // If the cursor is inside a section argument
+
+      // If the cursor is at the start of the section argument
+      if (
+        lastOpenMark.contentFrom.line === cursor.line &&
+        lastOpenMark.contentFrom.ch === cursor.ch
+      ) {
+        // Insert a newline above the \section{...}
+        cm.replaceRange('\n', lastOpenMark.from)
+        // Functionality was handled, don't run default behaviour
+        return null
+      }
+      // If the cursor is not at the start of the section argument
+      cm.operation(function () {
+        // Hack used to set the cursor after the refresh
+        // it seems that this is the only way to get it working
+        // at the moment
+        _.delay(function () {
+          cm.setCursor({ line: cursor.line + 1, ch: 0 })
+        }, 20)
+        // Insert a newline below the \section{...}
+        cm.replaceRange('\n', { line: cursor.line + 1, ch: 0 })
+        cm.refresh()
+      })
+      // Functionality was handled, don't run default behaviour
+      return null
+    }
+  }
+
+  // If not within an environment, run the default behaviour
   return CodeMirror.Pass
 }
 
@@ -831,6 +1059,42 @@ function filterMarksInRange (cm, from, to) {
       m.from.ch >= from.ch &&
       m.to.line <= to.line &&
       m.to.ch <= to.ch
+    )
+  })
+}
+
+/**
+ * Try to find where a given mark ends using the state at the end of the
+ * document
+ */
+function findClosedMark (cm, openMark) {
+  var lastLine = { line: cm.doc.lineCount(), ch: 0 }
+  var stateAfter = cm.getTokenAt(lastLine, true).state
+
+  return _.find(stateAfter.marks, function (i) {
+    return (
+      i.kind === openMark.kind &&
+      _.isEqual(i.contentFrom, openMark.contentFrom) &&
+      _.isEqual(i.from, openMark.from)
+    )
+  })
+}
+
+/**
+ * Helper function used to check if there are any more \item commands after a
+ * given mark and a range
+ */
+function checkItemsAfter (cm, mark, to) {
+  var state = cm.getTokenAt(to, true).state
+
+  return _.find(state.marks, function (m) {
+    return (
+      (
+        m.kind === 'item' ||
+        m.kind === 'enumerate-item'
+      ) &&
+      m.from.line > mark.from.line &&
+      m.to.line <= to.line
     )
   })
 }
