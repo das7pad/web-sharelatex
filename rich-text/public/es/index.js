@@ -3,6 +3,7 @@ import 'codemirror/addon/edit/closebrackets'
 
 import LatexMode from './latex-mode/LatexMode'
 import RichText from './rich-text/RichText'
+import keyBindings from './key-bindings/KeyBindings'
 
 let rt
 
@@ -14,7 +15,8 @@ export function init (rootEl, rtAdapter) {
   const cm = CodeMirror(rootEl, {
     mode: 'latex',
     lineWrapping: true,
-    autoCloseBrackets: "{}[]`'"
+    autoCloseBrackets: "{}[]`'",
+    extraKeys: keyBindings
   })
 
   if (rt) rt.disable()
