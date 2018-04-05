@@ -221,19 +221,23 @@ function handleEnter (cm) {
         // Attempt to find the closing mark (the \end{...})
         var envClosed = findClosedMark(cm, lastOpenMark)
         var line = cm.getLine(cursor.line)
+        // Strip the line the cursor is on of any whitespace and the \item
+        // command
+        var strippedLine = cm.getRange(
+          { line: cursor.line, ch: 0 },
+          { line: cursor.line, ch: line.length }
+        )
+          .replace(/\s*/g, '')
+          .replace('\\item', '')
 
         // If the environment is closed, there are no more items within the
-        // environment and the line the cursor is on is blank (after removing
-        // whitespace and \item)
+        // environment and the stripped line is on is blank
         // The most likely case here is that the cursor is on the last \item and
         // it is blank
         if (
           envClosed &&
           !checkItemsAfter(cm, lastClosedMark, envClosed.to) &&
-          cm.getRange(
-            { line: cursor.line, ch: 0 },
-            { line: cursor.line, ch: line.length }
-          ).replace(/\s*/g, '').replace('\\item', '') === ''
+          strippedLine === ''
         ) {
           if (!isNestedList) {
             // If not within a nested list
