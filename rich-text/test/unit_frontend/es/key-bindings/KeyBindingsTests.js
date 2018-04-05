@@ -1,3 +1,5 @@
+/* global _ */
+
 import CodeMirror from 'codemirror'
 
 import fixture from '../../../../../../test/unit_frontend/es/support/fixture'
@@ -253,30 +255,36 @@ describe('Key bindings', function () {
   // })
 
   describe('Enter key', function () {
-    // it('should add a new item on a list', function () {
-    //   this.cm.setValue(
-    //     '\\begin{enumerate}\n' +
-    //     '\\item FIRST\n' +
-    //     '\\item SECOND\n' +
-    //     '\\begin{enumerate}\n' +
-    //     '\\item FIRST\n' +
-    //     '\\end{enumerate}\n' +
-    //     '\\item THIRD\n' +
-    //     '\\end{enumerate}'
-    //   )
-    //   this.cm.setCursor({ line: 4, ch: 11 })
-    //   fakeNamedKey(this.cm, 'Enter')
+    it('should add a new item on a list', function () {
+      this.cm.setValue(
+        '\\begin{enumerate}\n' +
+        '\\item FIRST\n' +
+        '\\item SECOND\n' +
+        '\\begin{enumerate}\n' +
+        '\\item FIRST\n' +
+        '\\end{enumerate}\n' +
+        '\\item THIRD\n' +
+        '\\end{enumerate}'
+      )
+      // Place cursor after nested enumerate env
+      // \item FIRST|
+      this.cm.setCursor({ line: 4, ch: 11 })
 
-    //   var newCursor = this.cm.getCursor()
-    //   expect(newCursor.line).to.equal(5)
-    //   expect(newCursor.ch).to.equal(6)
-    //   this.cm.replaceRange('SECOND', newCursor, newCursor)
-    //   var token = this.cm.getTokenAt(this.cm.getCursor(), true)
-    //   var lastClosedMark = token.state.marks[token.state.marks.length - 1]
-    //   expect(token.string).to.equal('SECOND')
-    //   expect(token.state.openMarks.length).to.equal(2)
-    //   expect(lastClosedMark.checkedProperties.number).to.equal(2)
-    // })
+      fakeNamedKey(this.cm, 'Enter')
+
+      var newCursor = this.cm.getCursor()
+      expect(newCursor.line).to.equal(5)
+      expect(newCursor.ch).to.equal(6)
+
+      // Insert SECOND text on newly created \item
+      this.cm.replaceRange('SECOND', newCursor, newCursor)
+
+      var token = this.cm.getTokenAt(this.cm.getCursor(), true)
+      var lastClosedMark = _.last(token.state.marks)
+      expect(token.string).to.equal('SECOND')
+      expect(token.state.openMarks.length).to.equal(2)
+      expect(lastClosedMark.checkedProperties.number).to.equal(2)
+    })
 
     it('should move a list to a new line when the cursor is before begin{...}', function () {
       this.cm.setValue(
@@ -298,55 +306,60 @@ describe('Key bindings', function () {
       expect(newCursor.ch).to.equal(0)
     })
 
-    // it('should remove the last empty item pressing enter two times',
-    // function () {
-    //   this.cm.setValue(
-    //     '\\begin{enumerate}\n' +
-    //     '\\item FIRST\n' +
-    //     '\\item SECOND\n' +
-    //     '\\begin{enumerate}\n' +
-    //     '\\item h\n' +
-    //     '\\end{enumerate}\n' +
-    //     '\\item THIRD\n' +
-    //     '\\end{enumerate}'
-    //   )
-    //   this.cm.setCursor({ line: 6, ch: 14 })
+    it('should remove the last empty item pressing enter two times', function () {
+      this.cm.setValue(
+        '\\begin{enumerate}\n' +
+        '\\item FIRST\n' +
+        '\\item SECOND\n' +
+        '\\begin{enumerate}\n' +
+        '\\item h\n' +
+        '\\end{enumerate}\n' +
+        '\\item THIRD\n' +
+        '\\end{enumerate}'
+      )
+      // Place cursor after nested enumerate env
+      // \end{enumerate}|
+      this.cm.setCursor({ line: 6, ch: 14 })
 
-    //   fakeNamedKey(this.cm, 'Enter')
+      fakeNamedKey(this.cm, 'Enter')
 
-    //   var newCursor = this.cm.getCursor()
-    //   expect(newCursor.line).to.equal(7)
-    //   expect(newCursor.ch).to.equal(6)
-    //   expect(this.cm.getLine(7)).to.equal('\\item ')
-    //   fakeNamedKey(this.cm, 'Enter')
-    //   expect(this.cm.getLine(7)).to.equal('\\end{enumerate}')
-    //   expect(this.cm.getLine(8)).to.equal('')
-    // })
+      var newCursor = this.cm.getCursor()
+      expect(newCursor.line).to.equal(7)
+      expect(newCursor.ch).to.equal(6)
+      expect(this.cm.getLine(7)).to.equal('\\item ')
 
-    // it('should place the last empty of nested list as item of the outer
-    // list', function () {
-    //   this.cm.setValue(
-    //     '\\begin{enumerate}\n' +
-    //     '\\item FIRST\n' +
-    //     '\\item SECOND\n' +
-    //     '\\begin{enumerate}\n' +
-    //     '\\item h\n' +
-    //     '\\end{enumerate}\n' +
-    //     '\\item THIRD\n' +
-    //     '\\end{enumerate}'
-    //   )
-    //   this.cm.setCursor({ line: 4, ch: 8 })
+      fakeNamedKey(this.cm, 'Enter')
 
-    //   fakeNamedKey(this.cm, 'Enter')
+      expect(this.cm.getLine(7)).to.equal('\\end{enumerate}')
+      expect(this.cm.getLine(8)).to.equal('')
+    })
 
-    //   var newCursor = this.cm.getCursor()
-    //   expect(newCursor.line).to.equal(5)
-    //   expect(newCursor.ch).to.equal(6)
-    //   expect(this.cm.getLine(5)).to.equal('\\item ')
-    //   fakeNamedKey(this.cm, 'Enter')
-    //   expect(this.cm.getLine(5)).to.equal('\\end{enumerate}')
-    //   expect(this.cm.getLine(6)).to.equal('\\item ')
-    // })
+    it('should place the last empty of nested list as item of the outer list', function () {
+      this.cm.setValue(
+        '\\begin{enumerate}\n' +
+        '\\item FIRST\n' +
+        '\\item SECOND\n' +
+        '\\begin{enumerate}\n' +
+        '\\item h\n' +
+        '\\end{enumerate}\n' +
+        '\\item THIRD\n' +
+        '\\end{enumerate}'
+      )
+      // Place cursor in nested enumerate env
+      // \item h|
+      this.cm.setCursor({ line: 4, ch: 8 })
+
+      fakeNamedKey(this.cm, 'Enter')
+
+      var newCursor = this.cm.getCursor()
+      expect(newCursor.line).to.equal(5)
+      expect(newCursor.ch).to.equal(6)
+      expect(this.cm.getLine(5)).to.equal('\\item ')
+
+      fakeNamedKey(this.cm, 'Enter')
+      expect(this.cm.getLine(5)).to.equal('\\end{enumerate}')
+      expect(this.cm.getLine(6)).to.equal('\\item ')
+    })
 
     it('should not insert an item when inside an open mark', function () {
       this.cm.setValue(
