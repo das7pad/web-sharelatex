@@ -2,7 +2,7 @@
 
 import CodeMirror from 'codemirror'
 
-import { mac } from '../utils/browser'
+import { mac } from '../utils/Browser'
 import { wrapBold, wrapItalic } from './TextWrapping'
 
 const modifierKey = mac ? 'Cmd' : 'Ctrl'
