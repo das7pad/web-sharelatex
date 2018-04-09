@@ -1,30 +1,23 @@
 /* global sinon */
 
-import CodeMirror from 'codemirror'
-
 import fixture from '../../../../../../test/unit_frontend/es/support/fixture'
 import { stubMathJax, teardownMathJax } from '../support/stub-mathjax'
-import LatexMode from '../../../../public/es/latex-mode/LatexMode'
-import RichText from '../../../../public/es/rich-text/RichText'
+import {
+  init,
+  enableRichText,
+  updateRichText
+} from '../../../../public/es/index'
 
-const TEXTAREA_HTML = '<textarea></textarea>'
+const FIXTURE_HTML = '<div></div>'
 
 describe('RichText', function () {
   before(stubMathJax)
   after(teardownMathJax)
 
   beforeEach(function () {
-    this.textarea = fixture.load(TEXTAREA_HTML)
-
-    CodeMirror.defineMode('latex', () => new LatexMode())
-    this.cm = CodeMirror.fromTextArea(this.textarea, {
-      mode: 'latex'
-    })
-
     this.rtAdapter = {}
-
-    this.rt = new RichText(this.cm, this.rtAdapter)
-    this.rt.enable()
+    this.cm = init(fixture.load(FIXTURE_HTML), this.rtAdapter)
+    enableRichText()
   })
 
   afterEach(function () {
