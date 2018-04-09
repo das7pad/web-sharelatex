@@ -35,3 +35,7 @@ export function openDoc (cm, content) {
 export function enableRichText () {
   rt.enable()
 }
+
+export function updateRichText () {
+  rt.update()
+}

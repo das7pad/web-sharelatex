@@ -89,7 +89,7 @@ describe('RichText', function () {
     expect(this.cm.getAllMarks()[0].wlValue).to.equal('$a$')
 
     this.cm.replaceRange('b', { line: 0, ch: 1 }, { line: 0, ch: 2 })
-    this.rt.update()
+    updateRichText()
 
     expect(this.cm.getAllMarks().length).to.equal(1)
     expect(this.cm.getValue()).to.equal('$b$\n')
@@ -135,7 +135,7 @@ describe('RichText', function () {
     type(this.cm, '\\textbf{}')
     expect(this.cm.getAllMarks().length).to.equal(3)
 
-    this.rt.update()
+    updateRichText()
     expect(this.cm.getAllMarks().length).to.equal(3)
   })
 
@@ -304,7 +304,7 @@ describe('RichText', function () {
 
     expect(this.cm.getAllMarks().length).to.equal(3)
 
-    this.rt.update()
+    updateRichText()
     this.cm.replaceRange('', { line: 0, ch: 9 }, { line: 0, ch: 10 })
 
     expect(this.cm.getAllMarks().length).to.equal(0)
