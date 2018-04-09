@@ -1,3 +1,5 @@
+/* global _ */
+
 /**
  * A mark identifies a range of source code that may be replaced with a
  * CodeMirror TextMarker.
@@ -104,4 +106,45 @@ function _positionInRange (cm, position, from, to) {
   var rangeFromIndex = cm.indexFromPos(from)
   var rangeToIndex = cm.indexFromPos(to)
   return rangeFromIndex <= positionIndex && positionIndex <= rangeToIndex
+}
+
+/**
+ * Utility to update a mark with it's closing position. If a mark is found using
+ * a selection range that ends before the mark is closed, then it's closing
+ * position will be undefined.
+ *
+ * To get the closing position we must search all marks within the document for
+ * one that matches the input mark
+ *
+ * @param {CodeMirror} cm
+ * @param {Mark} mark
+ */
+export function updateMarkWithClosingPosition (cm, mark) {
+  // Find all of the marks within the document
+  const { state } = cm.getTokenAt({
+    line: cm.lastLine() + 1,
+    ch: 0
+  }, true)
+
+  // Search through the marks to find the one that matches exactly
+  return _.find(state.marks, (m) => {
+    return m.kind === mark.kind &&
+      _.isEqual(m.contentFrom, mark.contentFrom) &&
+      _.isEqual(m.from, mark.from)
+  })
+}
+
+/**
+ * Remove a mark
+ *
+ * @param {CodeMirror} cm
+ * @param {Mark} mark
+ */
+export function removeMark (cm, mark) {
+  cm.operation(() => {
+    // replace contentTo -> to
+    cm.replaceRange('', mark.contentTo, mark.to)
+    // replace from -> contentFrom
+    cm.replaceRange('', mark.from, mark.contentFrom)
+  })
 }
