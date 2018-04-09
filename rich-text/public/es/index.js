@@ -36,6 +36,10 @@ export function enableRichText () {
   rt.enable()
 }
 
+export function disableRichText () {
+  rt.disable()
+}
+
 export function updateRichText () {
   rt.update()
 }

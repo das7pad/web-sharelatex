@@ -5,6 +5,7 @@ import { stubMathJax, teardownMathJax } from '../support/stub-mathjax'
 import {
   init,
   enableRichText,
+  disableRichText,
   updateRichText
 } from '../../../../public/es/index'
 
@@ -22,7 +23,7 @@ describe('RichText', function () {
 
   afterEach(function () {
     fixture.cleanUp()
-    this.rt.disable()
+    disableRichText()
   })
 
   it('formats a typed section heading', function () {
@@ -98,11 +99,11 @@ describe('RichText', function () {
 
   it('should ignore updates when disabled', function () {
     // regression: was not checking enabled/disabled on external update call
-    this.rt.disable()
+    disableRichText()
     type(this.cm, '\\section{test}\n')
     expect(this.cm.getAllMarks().length).to.equal(0)
 
-    this.rt.update()
+    updateRichText()
     expect(this.cm.getAllMarks().length).to.equal(0)
   })
 
