@@ -80,7 +80,7 @@ describe('Key bindings', function () {
    * it may not have the full effect on the document; you can however check
    * whether it does pass by checking whether this returns CodeMirror.Pass.
    */
-  function _fakeExtraKey (cm, key) {
+  function fakeExtraKey (cm, key) {
     if (key.length === 1) {
       return cm.getOption('extraKeys')["'" + key + "'"](cm)
     } else {
@@ -102,7 +102,7 @@ describe('Key bindings', function () {
   describe('Auto close braces and quotes', function () {
     it('works', function () {
       // match braces
-      expect(_fakeExtraKey(this.cm, '{')).to.be.undefined
+      expect(fakeExtraKey(this.cm, '{')).to.be.undefined
       expect(this.cm.getValue()).to.equal('{}')
       expectCursorAt(this.cm, 0, 1)
 
@@ -112,7 +112,7 @@ describe('Key bindings', function () {
       expectCursorAt(this.cm, 0, 0)
 
       // match brackets
-      expect(_fakeExtraKey(this.cm, '[')).to.be.undefined
+      expect(fakeExtraKey(this.cm, '[')).to.be.undefined
       expect(this.cm.getValue()).to.equal('[]')
       expectCursorAt(this.cm, 0, 1)
 
@@ -122,7 +122,7 @@ describe('Key bindings', function () {
       expectCursorAt(this.cm, 0, 0)
 
       // match single quotes
-      expect(_fakeExtraKey(this.cm, '`')).to.be.undefined
+      expect(fakeExtraKey(this.cm, '`')).to.be.undefined
       expect(this.cm.getValue()).to.equal("`'")
       expectCursorAt(this.cm, 0, 1)
 
@@ -132,10 +132,10 @@ describe('Key bindings', function () {
       expectCursorAt(this.cm, 0, 0)
 
       // match double quotes
-      expect(_fakeExtraKey(this.cm, '`')).to.be.undefined
+      expect(fakeExtraKey(this.cm, '`')).to.be.undefined
       expect(this.cm.getValue()).to.equal("`'")
       expectCursorAt(this.cm, 0, 1)
-      expect(_fakeExtraKey(this.cm, '`')).to.be.undefined
+      expect(fakeExtraKey(this.cm, '`')).to.be.undefined
       expect(this.cm.getValue()).to.equal("``''")
       expectCursorAt(this.cm, 0, 2)
 
@@ -154,11 +154,11 @@ describe('Key bindings', function () {
       // don't insert matching bracket when oppening bracket is just before a
       // string
       this.cm.setValue('xy')
-      _fakeExtraKey(this.cm, '{')
+      fakeExtraKey(this.cm, '{')
       expect(this.cm.getValue()).to.equal('{xy')
-      _fakeExtraKey(this.cm, '[')
+      fakeExtraKey(this.cm, '[')
       expect(this.cm.getValue()).to.equal('{[xy')
-      _fakeExtraKey(this.cm, '`')
+      fakeExtraKey(this.cm, '`')
       expect(this.cm.getValue()).to.equal('{[`xy')
 
       // don't try to be smart when something is selected
@@ -166,12 +166,12 @@ describe('Key bindings', function () {
       this.cm.setSelection({ line: 0, ch: 0 }, { line: 0, ch: 2 })
       // all _fakeExtraKey this.cm, should fail writing anything because it
       // should return a CodeMirror.Pass as something is selected
-      _fakeExtraKey(this.cm, '{')
-      _fakeExtraKey(this.cm, '}')
-      _fakeExtraKey(this.cm, '[')
-      _fakeExtraKey(this.cm, ']')
-      _fakeExtraKey(this.cm, '`')
-      _fakeExtraKey(this.cm, '\'')
+      fakeExtraKey(this.cm, '{')
+      fakeExtraKey(this.cm, '}')
+      fakeExtraKey(this.cm, '[')
+      fakeExtraKey(this.cm, ']')
+      fakeExtraKey(this.cm, '`')
+      fakeExtraKey(this.cm, '\'')
       expect(this.cm.getValue()).to.equal('xy')
     })
 
@@ -195,7 +195,7 @@ describe('Key bindings', function () {
         ])
 
         // Press opening char key
-        _fakeExtraKey(this.cm, openingChar)
+        fakeExtraKey(this.cm, openingChar)
 
         // Opening & closing chars to be inserted
         expect(this.cm.getValue()).to.equal(
@@ -209,7 +209,7 @@ describe('Key bindings', function () {
         ])
 
         // Press closing char key
-        _fakeExtraKey(this.cm, closingChar)
+        fakeExtraKey(this.cm, closingChar)
 
         // Cursor should be after the opening & closing chars
         expectRangesMatch(this.cm.listSelections(), [
