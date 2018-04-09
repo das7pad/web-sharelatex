@@ -17,15 +17,12 @@ export function init (rootEl, rtAdapter) {
     extraKeys: keyBindings
   })
 
-  if (rt) rt.disable()
   rt = new RichText(cm, rtAdapter)
 
   return cm
 }
 
 export function openDoc (cm, content) {
-  if (rt) rt.disable()
-
   const newDoc = Doc(content, 'latex')
   cm.swapDoc(newDoc)
 

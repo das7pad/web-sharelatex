@@ -54,10 +54,12 @@ define [
         expect(enableRichText).to.have.been.called
 
     it 'detaches from CM when destroyed', () ->
+      disableRichText = sinon.stub()
       @requirejs.callsArgWith(1, {
         init: sinon.stub().returns({})
-        openDoc: sinon.stub(),
+        openDoc: sinon.stub()
         enableRichText: sinon.stub()
+        disableRichText: disableRichText
       })
       inject ($compile, $rootScope) ->
         detachFromCM = sinon.stub()
@@ -72,3 +74,4 @@ define [
         $rootScope.$broadcast('destroy')
 
         expect(detachFromCM).to.have.been.called
+        expect(disableRichText).to.have.been.called

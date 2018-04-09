@@ -40,6 +40,7 @@ define [
 
         scope.$on 'destroy', () ->
           detachFromCM(scope.sharejsDoc)
+          richText.disableRichText()
 
         init()
 
