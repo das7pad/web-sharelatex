@@ -72,21 +72,21 @@ describe('Key bindings', function () {
     })
   }
 
-  // /**
-  //  * Call directly into the extraKeys map that we set.
-  //  *
-  //  * NB this does NOT actually pass the events further up the handler chain,
-  // so
-  //  * it may not have the full effect on the document; you can however check
-  //  * whether it does pass by checking whether this returns CodeMirror.Pass.
-  //  */
-  // function _fakeExtraKey (key) {
-  //   if (key.length == 1) {
-  //     return _cm.getOption('extraKeys')["'" + key + "'"](_cm)
-  //   } else {
-  //     return _cm.getOption('extraKeys')[key](_cm)
-  //   }
-  // }
+  /**
+   * Call directly into the extraKeys map that we set.
+   *
+   * NB this does NOT actually pass the events further up the handler chain,
+  so
+   * it may not have the full effect on the document; you can however check
+   * whether it does pass by checking whether this returns CodeMirror.Pass.
+   */
+  function _fakeExtraKey (cm, key) {
+    if (key.length === 1) {
+      return cm.getOption('extraKeys')["'" + key + "'"](cm)
+    } else {
+      return cm.getOption('extraKeys')[key](cm)
+    }
+  }
 
   // function _clear () {
   //   _cm.setValue('')
@@ -103,85 +103,85 @@ describe('Key bindings', function () {
     expect(cursor.ch).to.equal(ch)
   }
 
-  // describe("Matching brackets", function () {
+  describe('Auto close braces and quotes', function () {
   //   afterEach(function () {
   //     _clear()
   //   })
 
-  // it("auto-inserts matching braces, brackets and quotes", function () {
-  //   // match braces
-  //   expect(_fakeExtraKey('{')).toBeUndefined()
-  //   expect(_cm.getValue()).toEqual('{}')
-  //   expectCursorAt(0, 1)
+    it('works', function () {
+      // match braces
+      expect(_fakeExtraKey(this.cm, '{')).to.be.undefined
+      expect(this.cm.getValue()).to.equal('{}')
+      expectCursorAt(this.cm, 0, 1)
 
-  //   // backspace should clear both characters
-  //   _fakeNamedKey('Backspace')
-  //   expect(_cm.getValue()).toEqual('')
-  //   expectCursorAt(0, 0)
+      // backspace should clear both characters
+      fakeNamedKey(this.cm, 'Backspace')
+      expect(this.cm.getValue()).to.equal('')
+      expectCursorAt(this.cm, 0, 0)
 
-  //   // match brackets
-  //   expect(_fakeExtraKey('[')).toBeUndefined()
-  //   expect(_cm.getValue()).toEqual('[]')
-  //   expectCursorAt(0, 1)
+      // match brackets
+      expect(_fakeExtraKey(this.cm, '[')).to.be.undefined
+      expect(this.cm.getValue()).to.equal('[]')
+      expectCursorAt(this.cm, 0, 1)
 
-  //   // backspace should clear both characters
-  //   _fakeNamedKey('Backspace')
-  //   expect(_cm.getValue()).toEqual('')
-  //   expectCursorAt(0, 0)
+      // backspace should clear both characters
+      fakeNamedKey(this.cm, 'Backspace')
+      expect(this.cm.getValue()).to.equal('')
+      expectCursorAt(this.cm, 0, 0)
 
-  //   // match single quotes
-  //   expect(_fakeExtraKey('`')).toBeUndefined()
-  //   expect(_cm.getValue()).toEqual("`'")
-  //   expectCursorAt(0, 1)
+      // match single quotes
+      expect(_fakeExtraKey(this.cm, '`')).to.be.undefined
+      expect(this.cm.getValue()).to.equal("`'")
+      expectCursorAt(this.cm, 0, 1)
 
-  //   // backspace should clear both characters
-  //   _fakeNamedKey('Backspace')
-  //   expect(_cm.getValue()).toEqual('')
-  //   expectCursorAt(0, 0)
+      // backspace should clear both characters
+      fakeNamedKey(this.cm, 'Backspace')
+      expect(this.cm.getValue()).to.equal('')
+      expectCursorAt(this.cm, 0, 0)
 
-  //   // match double quotes
-  //   expect(_fakeExtraKey('`')).toBeUndefined()
-  //   expect(_cm.getValue()).toEqual("`'")
-  //   expectCursorAt(0, 1)
-  //   expect(_fakeExtraKey('`')).toBeUndefined()
-  //   expect(_cm.getValue()).toEqual("``''")
-  //   expectCursorAt(0, 2)
+      // match double quotes
+      expect(_fakeExtraKey(this.cm, '`')).to.be.undefined
+      expect(this.cm.getValue()).to.equal("`'")
+      expectCursorAt(this.cm, 0, 1)
+      expect(_fakeExtraKey(this.cm, '`')).to.be.undefined
+      expect(this.cm.getValue()).to.equal("``''")
+      expectCursorAt(this.cm, 0, 2)
 
-  //   // backspace should clear inner quotes, then outer quotes
-  //   _fakeNamedKey('Backspace')
-  //   expect(_cm.getValue()).toEqual("`'")
-  //   expectCursorAt(0, 1)
-  //   _fakeNamedKey('Backspace')
-  //   expect(_cm.getValue()).toEqual("")
-  //   expectCursorAt(0, 0)
+      // backspace should clear inner quotes, then outer quotes
+      fakeNamedKey(this.cm, 'Backspace')
+      expect(this.cm.getValue()).to.equal("`'")
+      expectCursorAt(this.cm, 0, 1)
+      fakeNamedKey(this.cm, 'Backspace')
+      expect(this.cm.getValue()).to.equal('')
+      expectCursorAt(this.cm, 0, 0)
 
-  //   // don't bother matching parentheses any more
-  //   expect(_cm.getOption('extraKeys')['(']).toBeUndefined()
-  //   expect(_cm.getOption('extraKeys')[')']).toBeUndefined()
+      // don't bother matching parentheses any more
+      expect(this.cm.getOption('extraKeys')['(']).to.be.undefined
+      expect(this.cm.getOption('extraKeys')[')']).to.be.undefined
 
-  //   // don't insert matching bracket when oppening bracket is just before a
-  //   // string
-  //   _cm.setValue('xy')
-  //   _fakeExtraKey('{')
-  //   expect(_cm.getValue()).toEqual('{xy')
-  //   _fakeExtraKey('[')
-  //   expect(_cm.getValue()).toEqual('{[xy')
-  //   _fakeExtraKey('`')
-  //   expect(_cm.getValue()).toEqual('{[`xy')
+      // don't insert matching bracket when oppening bracket is just before a
+      // string
+      this.cm.setValue('xy')
+      _fakeExtraKey(this.cm, '{')
+      expect(this.cm.getValue()).to.equal('{xy')
+      _fakeExtraKey(this.cm, '[')
+      expect(this.cm.getValue()).to.equal('{[xy')
+      _fakeExtraKey(this.cm, '`')
+      expect(this.cm.getValue()).to.equal('{[`xy')
 
-  //   // don't try to be smart when something is selected
-  //   _cm.setValue('xy')
-  //   _cm.setSelection({ line: 0, ch: 0 }, { line: 0, ch: 2 })
-  //   // all _fakeExtraKey should fail writting anything because it should
-  //   // return a CodeMirror.Pass as something is selected
-  //   _fakeExtraKey('{')
-  //   _fakeExtraKey('}')
-  //   _fakeExtraKey('[')
-  //   _fakeExtraKey(']')
-  //   _fakeExtraKey('`')
-  //   _fakeExtraKey('\'')
-  //   expect(_cm.getValue()).toEqual('xy')
-  // })
+      // don't try to be smart when something is selected
+      this.cm.setValue('xy')
+      this.cm.setSelection({ line: 0, ch: 0 }, { line: 0, ch: 2 })
+      // all _fakeExtraKey this.cm, should fail writing anything because it
+      // should return a CodeMirror.Pass as something is selected
+      _fakeExtraKey(this.cm, '{')
+      _fakeExtraKey(this.cm, '}')
+      _fakeExtraKey(this.cm, '[')
+      _fakeExtraKey(this.cm, ']')
+      _fakeExtraKey(this.cm, '`')
+      _fakeExtraKey(this.cm, '\'')
+      expect(this.cm.getValue()).to.equal('xy')
+    })
 
   //   it('auto-inserts matching braces, brackets and quotes with multiple
   // cursors', function () {
@@ -252,7 +252,7 @@ describe('Key bindings', function () {
   //     testAutoInsertionWithMultipleCursors('[', ']')
   //     testAutoInsertionWithMultipleCursors('`', '\'')
   //   })
-  // })
+  })
 
   describe('Enter key', function () {
     it('should add a new item on a list', function () {
