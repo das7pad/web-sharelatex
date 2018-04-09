@@ -17,12 +17,12 @@ export default {
   'Cmd-Left': 'goLineLeftSmart',
   [`${modifierKey}-B`]: wrapBold,
   [`${modifierKey}-I`]: wrapItalic,
-  "'{'": function (cm) { return insertClosingCharForSelection(cm, '{', '}', '{') },
-  "'['": function (cm) { return insertClosingCharForSelection(cm, '[', ']', '[') },
-  "'}'": function (cm) { return insertClosingCharForSelection(cm, '{', '}', '}') },
-  "']'": function (cm) { return insertClosingCharForSelection(cm, '[', ']', ']') },
-  "'`'": function (cm) { return insertClosingCharForSelection(cm, '`', "'", '`') },
-  "'''": function (cm) { return insertClosingCharForSelection(cm, '`', "'", "'") },
+  "'{'": function (cm) { return autoCloseChar(cm, '{', '}', '{') },
+  "'['": function (cm) { return autoCloseChar(cm, '[', ']', '[') },
+  "'}'": function (cm) { return autoCloseChar(cm, '{', '}', '}') },
+  "']'": function (cm) { return autoCloseChar(cm, '[', ']', ']') },
+  "'`'": function (cm) { return autoCloseChar(cm, '`', "'", '`') },
+  "'''": function (cm) { return autoCloseChar(cm, '`', "'", "'") },
   [`${modifierKey}-/`]: 'toggleComment'
 }
 
@@ -338,7 +338,7 @@ function handleEnter (cm) {
 /**
  * make some special characters auto-closing (type "{" and you get "{}")
  */
-function insertClosingCharForSelection (cm, openChar, closeChar, typedChar) {
+function autoCloseChar (cm, openChar, closeChar, typedChar) {
   function insertClosingChar (pos, idx) {
     // Get the chars after the current position
     var nextPos = CodeMirror.Pos(pos.line, pos.ch + 1)
