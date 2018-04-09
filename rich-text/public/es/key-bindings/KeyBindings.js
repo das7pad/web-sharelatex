@@ -17,6 +17,12 @@ export default {
   'Cmd-Left': 'goLineLeftSmart',
   [`${modifierKey}-B`]: wrapBold,
   [`${modifierKey}-I`]: wrapItalic,
+  "'{'": function (cm) { return insertClosingCharForSelection(cm, '{', '}', '{') },
+  "'['": function (cm) { return insertClosingCharForSelection(cm, '[', ']', '[') },
+  "'}'": function (cm) { return insertClosingCharForSelection(cm, '{', '}', '}') },
+  "']'": function (cm) { return insertClosingCharForSelection(cm, '[', ']', ']') },
+  "'`'": function (cm) { return insertClosingCharForSelection(cm, '`', "'", '`') },
+  "'''": function (cm) { return insertClosingCharForSelection(cm, '`', "'", "'") },
   [`${modifierKey}-/`]: 'toggleComment'
 }
 
@@ -327,6 +333,59 @@ function handleEnter (cm) {
 
   // If not within an environment, run the default behaviour
   return CodeMirror.Pass
+}
+
+/**
+ * make some special characters auto-closing (type "{" and you get "{}")
+ */
+function insertClosingCharForSelection (cm, openChar, closeChar, typedChar) {
+  function insertClosingChar (pos, idx) {
+    // Get the chars after the current position
+    var nextPos = CodeMirror.Pos(pos.line, pos.ch + 1)
+    var nextChar = cm.getRange(pos, nextPos)
+
+    if (typedChar === openChar) {
+      // If typing the opening char
+      if (openChar !== closeChar || nextChar !== closeChar) {
+        // If the next char is not the closing char
+        if (nextChar === '' || nextChar.match(/^[`'[\]{} ]+$/)) {
+          // If there is no next char, OR
+          // if the next char is specially handled,
+          // insert the opening and closing char at the current cursor position
+          cm.replaceRange(openChar + closeChar, pos)
+        } else {
+          // Otherwise, just insert the opening char
+          cm.replaceRange(openChar, pos)
+        }
+      }
+    } else if (nextChar !== closeChar) {
+      // If the typed char is not the closing char, insert the closing char
+      // This effectively means that it is a no-op if typing the closing char,
+      // as we don't want to insert it again
+      cm.replaceRange(closeChar, pos)
+    }
+
+    // Move the cursor forward by 1
+    if (idx === 0) {
+      // For the first cursor, just set the position
+      cm.setCursor(nextPos)
+    } else {
+      // For additional cursors, add them instead
+      cm.addSelection(nextPos)
+    }
+  }
+
+  if (cm.somethingSelected()) {
+    return CodeMirror.Pass
+  }
+
+  // For each cursor, insert the closing char
+  _.forEach(cm.listSelections(), function (selection, idx) {
+    // Because we pass if something is selected (i.e. multiple chars are
+    // selected from a single cursor), we know that from() & to() are the same
+    var pos = selection.from()
+    insertClosingChar(pos, idx)
+  })
 }
 
 // Helper function to handle the backspace command in list environments
