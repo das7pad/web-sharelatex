@@ -88,10 +88,6 @@ describe('Key bindings', function () {
     }
   }
 
-  // function _clear () {
-  //   _cm.setValue('')
-  // }
-
   function expectCursorAt (cm, line, ch) {
     // In CodeMirror 5.11, getCursor sometimes returns an object with an xRel
     // property, which we ignore for the purpose of this comparison.
@@ -104,10 +100,6 @@ describe('Key bindings', function () {
   }
 
   describe('Auto close braces and quotes', function () {
-  //   afterEach(function () {
-  //     _clear()
-  //   })
-
     it('works', function () {
       // match braces
       expect(_fakeExtraKey(this.cm, '{')).to.be.undefined
