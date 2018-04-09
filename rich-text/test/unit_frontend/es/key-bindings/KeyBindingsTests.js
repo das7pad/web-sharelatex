@@ -175,75 +175,73 @@ describe('Key bindings', function () {
       expect(this.cm.getValue()).to.equal('xy')
     })
 
-  //   it('auto-inserts matching braces, brackets and quotes with multiple
-  // cursors', function () {
-  //     function expectRangesMatch (expectedRange, actualRange) {
-  //       expect(expectedRange[0].anchor).toEqual(actualRange[0].anchor)
-  //       expect(expectedRange[0].head).toEqual(actualRange[0].head)
-  //       expect(expectedRange[1].anchor).toEqual(actualRange[1].anchor)
-  //       expect(expectedRange[1].head).toEqual(actualRange[1].head)
-  //     }
+    it('works with multiple cursors', function () {
+      function expectRangesMatch (expectedRange, actualRange) {
+        expect(expectedRange[0].anchor).to.deep.equal(actualRange[0].anchor)
+        expect(expectedRange[0].head).to.deep.equal(actualRange[0].head)
+        expect(expectedRange[1].anchor).to.deep.equal(actualRange[1].anchor)
+        expect(expectedRange[1].head).to.deep.equal(actualRange[1].head)
+      }
 
-  //     function testAutoInsertionWithMultipleCursors (openingChar, closingChar
-  // ) {
-  //       // Initialise with 2 empty lines & set cursor on both lines
-  //       _cm.setValue(
-  //         '\n' +
-  //         ''
-  //       )
-  //       _cm.setSelections([
-  //         { anchor: CodeMirror.Pos(0, 0), head: CodeMirror.Pos(0, 0) },
-  //         { anchor: CodeMirror.Pos(1, 0), head: CodeMirror.Pos(1, 0) }
-  //       ])
+      const testAutoCloseWithMultipleCursors = (openingChar, closingChar) => {
+        // Initialise with 2 empty lines & set cursor on both lines
+        this.cm.setValue(
+          '\n' +
+          ''
+        )
+        this.cm.setSelections([
+          { anchor: CodeMirror.Pos(0, 0), head: CodeMirror.Pos(0, 0) },
+          { anchor: CodeMirror.Pos(1, 0), head: CodeMirror.Pos(1, 0) }
+        ])
 
-  //       // Press opening char key
-  //       _fakeExtraKey(openingChar)
+        // Press opening char key
+        _fakeExtraKey(this.cm, openingChar)
 
-  //       // Opening & closing chars to be inserted
-  //       expect(_cm.getValue()).toBe(
-  //         openingChar + closingChar + '\n' +
-  //         openingChar + closingChar
-  //       )
-  //       // Cursor should be inbetween the opening & closing chars
-  //       expectRangesMatch(_cm.listSelections(), [
-  //         { anchor: CodeMirror.Pos(0, 1), head: CodeMirror.Pos(0, 1) },
-  //         { anchor: CodeMirror.Pos(1, 1), head: CodeMirror.Pos(1, 1) },
-  //       ])
+        // Opening & closing chars to be inserted
+        expect(this.cm.getValue()).to.equal(
+          openingChar + closingChar + '\n' +
+          openingChar + closingChar
+        )
+        // Cursor should be inbetween the opening & closing chars
+        expectRangesMatch(this.cm.listSelections(), [
+          { anchor: CodeMirror.Pos(0, 1), head: CodeMirror.Pos(0, 1) },
+          { anchor: CodeMirror.Pos(1, 1), head: CodeMirror.Pos(1, 1) }
+        ])
 
-  //       // Press closing char key
-  //       _fakeExtraKey(closingChar)
+        // Press closing char key
+        _fakeExtraKey(this.cm, closingChar)
 
-  //       // Cursor should be after the opening & closing chars
-  //       expectRangesMatch(_cm.listSelections(), [
-  //         { anchor: CodeMirror.Pos(0, 2), head: CodeMirror.Pos(0, 2) },
-  //         { anchor: CodeMirror.Pos(1, 2), head: CodeMirror.Pos(1, 2) },
-  //       ])
+        // Cursor should be after the opening & closing chars
+        expectRangesMatch(this.cm.listSelections(), [
+          { anchor: CodeMirror.Pos(0, 2), head: CodeMirror.Pos(0, 2) },
+          { anchor: CodeMirror.Pos(1, 2), head: CodeMirror.Pos(1, 2) }
+        ])
 
-  //       // Reset the cursors back inbetween the opening & closing chars
-  //       _cm.setSelections([
-  //         { anchor: CodeMirror.Pos(0, 1), head: CodeMirror.Pos(0, 1) },
-  //         { anchor: CodeMirror.Pos(1, 1), head: CodeMirror.Pos(1, 1) },
-  //       ])
+        // Reset the cursors back inbetween the opening & closing chars
+        this.cm.setSelections([
+          { anchor: CodeMirror.Pos(0, 1), head: CodeMirror.Pos(0, 1) },
+          { anchor: CodeMirror.Pos(1, 1), head: CodeMirror.Pos(1, 1) }
+        ])
 
-  //       // Press the Backspace key
-  //       _fakeNamedKey('Backspace')
+        // Press the Backspace key
+        fakeNamedKey(this.cm, 'Backspace')
 
-  //       // Lines should be empty (closing char is also removed)
-  //       expect(_cm.getValue()).toBe(
-  //         '\n' +
-  //         ''
-  //       )
-  //       // Cursor should be at the SOL
-  //       expect(_cm.listSelections(), [
-  //         { anchor: CodeMirror.Pos(0, 0), head: CodeMirror.Pos(0, 0) },
-  //         { anchor: CodeMirror.Pos(1, 0), head: CodeMirror.Pos(1, 0) }
-  //       ])
-  //     }
+        // Lines should be empty (closing char is also removed)
+        expect(this.cm.getValue()).to.equal(
+          '\n' +
+          ''
+        )
+        // Cursor should be at the SOL
+        expectRangesMatch(this.cm.listSelections(), [
+          { anchor: CodeMirror.Pos(0, 0), head: CodeMirror.Pos(0, 0) },
+          { anchor: CodeMirror.Pos(1, 0), head: CodeMirror.Pos(1, 0) }
+        ])
+      }
 
-  //     testAutoInsertionWithMultipleCursors('{', '}')
-  //     testAutoInsertionWithMultipleCursors('[', ']')
-  //     testAutoInsertionWithMultipleCursors('`', '\'')
-  //   })
+      testAutoCloseWithMultipleCursors('{', '}')
+      testAutoCloseWithMultipleCursors('[', ']')
+      testAutoCloseWithMultipleCursors('`', '\'')
+    })
   })
 
   describe('Enter key', function () {
