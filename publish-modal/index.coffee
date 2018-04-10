@@ -4,7 +4,6 @@ PublishModalModule =
   viewIncludes:
     "publish:script": "script"
     "publish:button": "button"
-    "publish:modal": "modal"
 
 if Features.hasFeature('publish-modal')
   module.exports = PublishModalModule

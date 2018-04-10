@@ -3,7 +3,6 @@ define [
 ], (App) ->
 	App.controller "PublishController",
 		($scope, $modal) ->
-			firstOpen = false
 			publishModal = null
 
 			$scope.openPublishProjectModal = () ->
@@ -12,9 +11,7 @@ define [
 					scope: $scope
 				)
 
-				if !firstOpen
-					firstOpen = true
-					requirejs ['publish-modal'], (pm) ->
-						publishModal = pm
-						modalBody = document.getElementsByClassName("modal-body-publish")[0]
-						pm.init(modalBody)
+				requirejs ['publish-modal'], (pm) ->
+					publishModal = pm
+					modalBody = document.getElementsByClassName("modal-body-publish")[0]
+					pm.init(modalBody)

@@ -7,8 +7,7 @@
   PublishModalModule = {
     viewIncludes: {
       "publish:script": "script",
-      "publish:button": "button",
-      "publish:modal": "modal"
+      "publish:button": "button"
     }
   };
 
