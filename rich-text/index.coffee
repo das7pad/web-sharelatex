@@ -1,12 +1,7 @@
 Features = require('../../app/js/infrastructure/Features')
 
-RichTextModule =
+module.exports =
   viewIncludes:
     "editor:script": "script"
     "editor:toolbar": "toolbar"
     "editor:body": "body"
-
-if Features.hasFeature('rich-text')
-  module.exports = RichTextModule
-else
-  module.exports = {}
