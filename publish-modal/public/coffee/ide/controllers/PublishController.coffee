@@ -3,8 +3,6 @@ define [
 ], (App) ->
 	App.controller "PublishController",
 		($scope, $modal) ->
-			publishModal = null
-
 			$scope.openPublishProjectModal = () ->
 				$modal.open(
 					templateUrl: "publishProjectModalTemplate"
@@ -12,6 +10,5 @@ define [
 				)
 
 				requirejs ['publish-modal'], (pm) ->
-					publishModal = pm
 					modalBody = document.getElementsByClassName("modal-body-publish")[0]
 					pm.init(modalBody)
