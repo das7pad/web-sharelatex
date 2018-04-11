@@ -18,8 +18,8 @@ const FIXTURE_HTML = `<div class="rich-text">
 describe('Key bindings', function () {
   beforeEach(function () {
     const html = fixture.load(FIXTURE_HTML)
-    this.cm = init(html.querySelector('#cm'), {})
-    enableRichText()
+    this.cm = init(html.querySelector('#cm'))
+    enableRichText(this.cm, {})
   })
 
   afterEach(function () {

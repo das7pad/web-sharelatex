@@ -17,8 +17,8 @@ describe('RichText', function () {
 
   beforeEach(function () {
     this.rtAdapter = {}
-    this.cm = init(fixture.load(FIXTURE_HTML), this.rtAdapter)
-    enableRichText()
+    this.cm = init(fixture.load(FIXTURE_HTML))
+    enableRichText(this.cm, this.rtAdapter)
   })
 
   afterEach(function () {

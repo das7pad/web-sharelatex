@@ -24,12 +24,9 @@ define [
       inject ($compile, $rootScope) ->
         $compile('<div cm-editor></div>')($rootScope)
         expect(richTextInit).to.have.been.called
-        expect(richTextInit.firstCall.args[1]).to.be.an.instanceof(
-          RichTextAdapter
-        )
 
     it 'attaches to CM', () ->
-      init = sinon.stub().returns({}) # Stub initing CM and returning instance
+      init = sinon.stub().returns(cm = {}) # Stub initing CM and returning instance
       openDoc = sinon.stub()
       enableRichText = sinon.stub()
       @requirejs.callsArgWith(1, {
@@ -52,6 +49,10 @@ define [
         expect(openDoc).to.have.been.called
         expect(attachToCM).to.have.been.called
         expect(enableRichText).to.have.been.called
+        expect(enableRichText.firstCall.args[0]).to.equal(cm)
+        expect(enableRichText.firstCall.args[1]).to.be.an.instanceof(
+          RichTextAdapter
+        )
 
     it 'detaches from CM when destroyed', () ->
       disableRichText = sinon.stub()

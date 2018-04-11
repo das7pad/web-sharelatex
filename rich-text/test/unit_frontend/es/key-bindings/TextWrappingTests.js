@@ -6,7 +6,7 @@ const TEXTAREA_HTML = '<textarea></textarea>'
 
 describe('Text wrapping', function () {
   beforeEach(function () {
-    this.cm = init(fixture.load(TEXTAREA_HTML), {})
+    this.cm = init(fixture.load(TEXTAREA_HTML))
   })
 
   afterEach(function () {

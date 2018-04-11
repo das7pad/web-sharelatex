@@ -6,20 +6,16 @@ import keyBindings from './key-bindings/KeyBindings'
 
 let richText
 
-export function init (rootEl, rtAdapter) {
+export function init (rootEl) {
   CodeMirror.defineMode('latex', () => new LatexMode())
   CodeMirror.defineMIME('application/x-tex', 'latex')
   CodeMirror.defineMIME('application/x-latex', 'latex')
 
-  const codeMirror = CodeMirror(rootEl, {
+  return CodeMirror(rootEl, {
     mode: 'latex',
     lineWrapping: true,
     extraKeys: keyBindings
   })
-
-  richText = new RichText(codeMirror, rtAdapter)
-
-  return codeMirror
 }
 
 export function openDoc (codeMirror, content) {
@@ -29,7 +25,8 @@ export function openDoc (codeMirror, content) {
   return newDoc
 }
 
-export function enableRichText () {
+export function enableRichText (codeMirror, rtAdapter) {
+  richText = new RichText(codeMirror, rtAdapter)
   richText.enable()
 }
 
