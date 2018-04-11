@@ -4,39 +4,39 @@ import LatexMode from './latex-mode/LatexMode'
 import RichText from './rich-text/RichText'
 import keyBindings from './key-bindings/KeyBindings'
 
-let rt
+let richText
 
 export function init (rootEl, rtAdapter) {
   CodeMirror.defineMode('latex', () => new LatexMode())
   CodeMirror.defineMIME('application/x-tex', 'latex')
   CodeMirror.defineMIME('application/x-latex', 'latex')
 
-  const cm = CodeMirror(rootEl, {
+  const codeMirror = CodeMirror(rootEl, {
     mode: 'latex',
     lineWrapping: true,
     extraKeys: keyBindings
   })
 
-  rt = new RichText(cm, rtAdapter)
+  richText = new RichText(codeMirror, rtAdapter)
 
-  return cm
+  return codeMirror
 }
 
-export function openDoc (cm, content) {
+export function openDoc (codeMirror, content) {
   const newDoc = Doc(content, 'latex')
-  cm.swapDoc(newDoc)
+  codeMirror.swapDoc(newDoc)
 
   return newDoc
 }
 
 export function enableRichText () {
-  rt.enable()
+  richText.enable()
 }
 
 export function disableRichText () {
-  rt.disable()
+  richText.disable()
 }
 
 export function updateRichText () {
-  rt.update()
+  richText.update()
 }
