@@ -1,5 +1,4 @@
 import CodeMirror, { Doc } from 'codemirror'
-import 'codemirror/addon/edit/closebrackets'
 
 import LatexMode from './latex-mode/LatexMode'
 import RichText from './rich-text/RichText'
@@ -15,7 +14,6 @@ export function init (rootEl, rtAdapter) {
   const cm = CodeMirror(rootEl, {
     mode: 'latex',
     lineWrapping: true,
-    autoCloseBrackets: "{}[]`'",
     extraKeys: keyBindings
   })
 
