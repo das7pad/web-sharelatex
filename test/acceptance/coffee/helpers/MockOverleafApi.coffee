@@ -21,6 +21,9 @@ module.exports = MockOverleafApi =
 		app.post "/api/v1/sharelatex/docs/:ol_doc_id/export/cancel", (req, res, next) =>
       res.sendStatus 204
 
+		app.get "/api/v1/sharelatex/docs/:ol_doc_id/export/history", (req, res, next) =>
+			res.json exported: true
+
 		app.listen 5000, (error) ->
 			throw error if error?
 		.on "error", (error) ->

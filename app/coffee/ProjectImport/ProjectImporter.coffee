@@ -29,6 +29,10 @@ ENGINE_TO_COMPILER_MAP = {
 	lualatex:     "lualatex"
 }
 
+V1_HISTORY_SYNC_RETRY_INTERVALS = [
+	500, 1000, 2500, 5000, 10000, 10000, 10000, 10000
+]
+
 module.exports = ProjectImporter =
 	importProject: (v1_project_id, user_id, callback = (error, project_id) ->) ->
 		logger.log {v1_project_id, user_id}, "importing project from overleaf"
@@ -42,6 +46,8 @@ module.exports = ProjectImporter =
 						ProjectImporter._importInvites project_id, doc.invites, cb
 					(cb) ->
 						ProjectImporter._importFiles project_id, user_id, doc.files, cb
+					(cb) ->
+						ProjectImporter._waitForV1HistoryExport v1_project_id, user_id, cb
 					(cb) ->
 						ProjectImporter._confirmExport v1_project_id, project_id, user_id, cb
 				], (importError) ->
@@ -209,6 +215,30 @@ module.exports = ProjectImporter =
 					error = new Error("Overleaf s3 returned non-success code: #{response.statusCode}")
 					logger.error {err: error, options}, "overleaf s3 error"
 					return callback(error)
+
+	V1_HISTORY_SYNC_RETRY_OPTIONS: {
+		# The first request is not a retry
+		# There can be intervals + 1 retries
+		# Hence there can be intervals + 2 requests
+		times: V1_HISTORY_SYNC_RETRY_INTERVALS.length + 2
+		interval: (retryCount) ->
+			V1_HISTORY_SYNC_RETRY_INTERVALS[retryCount - 2]
+	}
+
+	_waitForV1HistoryExport: (v1_project_id, user_id, callback = (error) ->) ->
+		checkProject = (cb) ->
+			oAuthRequest user_id, {
+				url: "#{settings.overleaf.host}/api/v1/sharelatex/docs/#{v1_project_id}/export/history"
+				method: "GET"
+				json: true
+			}, (error, status) ->
+				if error?
+					cb error
+				else if status?.exported
+					cb()
+				else
+					cb new Error('v1 history not synced')
+		async.retry ProjectImporter.V1_HISTORY_SYNC_RETRY_OPTIONS, checkProject, callback
 
 	_confirmExport: (v1_project_id, v2_project_id, user_id, callback = (error) ->) ->
 		oAuthRequest user_id, {
