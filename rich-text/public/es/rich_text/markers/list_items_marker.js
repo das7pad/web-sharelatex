@@ -1,6 +1,6 @@
 /* global $ */
 
-import { makeSingleMark } from '../SingleMark'
+import { makeSingleMark } from '../single_mark'
 
 const ListItemsMarker = {
   matcher (cm, sourceMark) {

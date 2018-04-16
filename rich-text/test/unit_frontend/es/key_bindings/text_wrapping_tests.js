@@ -1,6 +1,6 @@
 import fixture from '../../../../../../test/unit_frontend/es/support/fixture'
 import { init } from '../../../../public/es/index'
-import * as TextWrapping from '../../../../public/es/key-bindings/TextWrapping'
+import * as TextWrapping from '../../../../public/es/key_bindings/text_wrapping'
 
 const TEXTAREA_HTML = '<textarea></textarea>'
 

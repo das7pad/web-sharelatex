@@ -1,16 +1,16 @@
 /* global MathJax, _ */
 
 import { ignoreErrors, lastRenderedLine, getMarks } from './utils'
-import MathMarker from './markers/MathMarker'
-import SectionMarker from './markers/SectionMarker'
-import FormattingMarker from './markers/FormattingMarker'
-import AbstractMarker from './markers/AbstractMarker'
-import ListEnvsMarker from './markers/ListEnvsMarker'
-import ListItemsMarker from './markers/ListItemsMarker'
-import FigureMarker from './markers/FigureMarker'
-import IconCommandMarker from './markers/IconCommandMarker'
-import InputMarker from './markers/InputMarker'
-import PreambleMarker from './markers/PreambleMarker'
+import MathMarker from './markers/math_marker'
+import SectionMarker from './markers/section_marker'
+import FormattingMarker from './markers/formatting_marker'
+import AbstractMarker from './markers/abstract_marker'
+import ListEnvsMarker from './markers/list_envs_marker'
+import ListItemsMarker from './markers/list_items_marker'
+import FigureMarker from './markers/figure_marker'
+import IconCommandMarker from './markers/icon_command_marker'
+import InputMarker from './markers/input_marker'
+import PreambleMarker from './markers/preamble_marker'
 
 export default function RichText (_cm, rtAdapter) {
   var _updating = false

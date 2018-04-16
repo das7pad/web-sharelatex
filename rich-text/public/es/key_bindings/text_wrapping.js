@@ -1,12 +1,12 @@
 /* global _ */
 
-import { focus } from '../utils/Focus'
+import { focus } from '../utils/focus'
 import {
   markEntirelyWithinSelection,
   selectionStartsAtMarkContentStart,
   selectionEndsAtMarkContentEnd
-} from '../utils/Selection'
-import { updateMarkWithClosingPosition, removeMark } from '../latex-mode/Mark'
+} from '../utils/selection'
+import { updateMarkWithClosingPosition, removeMark } from '../latex_mode/mark'
 
 const MARKS_DISALLOWED_WITHIN_HEADERS = [
   'chapter',

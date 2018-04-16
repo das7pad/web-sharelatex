@@ -1,8 +1,8 @@
 import CodeMirror, { Doc } from 'codemirror'
 
-import LatexMode from './latex-mode/LatexMode'
-import RichText from './rich-text/RichText'
-import keyBindings from './key-bindings/KeyBindings'
+import LatexMode from './latex_mode/latex_mode'
+import RichText from './rich_text/rich_text'
+import keyBindings from './key_bindings/key_bindings'
 
 let richText
 

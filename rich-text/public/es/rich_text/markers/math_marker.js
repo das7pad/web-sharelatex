@@ -1,6 +1,6 @@
 /* global $ */
 
-import { makeSingleMark } from '../SingleMark'
+import { makeSingleMark } from '../single_mark'
 import { clearOnMouseDown } from '../utils'
 
 const MathMarker = {
