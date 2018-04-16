@@ -1,19 +1,12 @@
-import CodeMirror from 'codemirror'
-
 import fixture from '../../../../../../test/unit_frontend/es/support/fixture'
-import LatexMode from '../../../../public/es/latex-mode/LatexMode'
+import { init } from '../../../../public/es/index'
 import * as TextWrapping from '../../../../public/es/key-bindings/TextWrapping'
 
 const TEXTAREA_HTML = '<textarea></textarea>'
 
 describe('Text wrapping', function () {
   beforeEach(function () {
-    this.textarea = fixture.load(TEXTAREA_HTML)
-
-    CodeMirror.defineMode('latex', () => new LatexMode())
-    this.cm = CodeMirror.fromTextArea(this.textarea, {
-      mode: 'latex'
-    })
+    this.cm = init(fixture.load(TEXTAREA_HTML))
   })
 
   afterEach(function () {

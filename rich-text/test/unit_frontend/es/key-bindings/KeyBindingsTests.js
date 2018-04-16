@@ -3,33 +3,28 @@
 import CodeMirror from 'codemirror'
 
 import fixture from '../../../../../../test/unit_frontend/es/support/fixture'
-import LatexMode from '../../../../public/es/latex-mode/LatexMode'
-import RichText from '../../../../public/es/rich-text/RichText'
-import keyBindings from '../../../../public/es/key-bindings/KeyBindings'
+import {
+  init,
+  enableRichText,
+  disableRichText
+} from '../../../../public/es/index'
 
 const FIXTURE_HTML = `<div class="rich-text">
 <link rel="stylesheet" href="base/public/stylesheets/style.css">
-<textarea id="cm"></textarea>
+<div id="cm"></div>
 </div>
 `
 
 describe('Key bindings', function () {
   beforeEach(function () {
     const html = fixture.load(FIXTURE_HTML)
-    this.textarea = html.querySelector('#cm')
-
-    CodeMirror.defineMode('latex', () => new LatexMode())
-    this.cm = CodeMirror.fromTextArea(this.textarea, {
-      mode: 'latex',
-      extraKeys: keyBindings
-    })
-
-    this.rt = new RichText(this.cm, {})
-    this.rt.enable()
+    this.cm = init(html.querySelector('#cm'))
+    enableRichText(this.cm, {})
   })
 
   afterEach(function () {
     fixture.cleanUp()
+    disableRichText()
   })
 
   /**

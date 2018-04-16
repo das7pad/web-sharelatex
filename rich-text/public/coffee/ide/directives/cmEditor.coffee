@@ -16,7 +16,7 @@ define [
         init = () ->
           requirejs ['rich-text'], (rt) ->
             richText = rt
-            cm = richText.init(element.find('.cm-editor-wrapper')[0], adapter)
+            cm = richText.init(element.find('.cm-editor-wrapper')[0])
             switchAttachment(scope.sharejsDoc)
 
         scope.$watch "sharejsDoc", switchAttachment
@@ -33,13 +33,14 @@ define [
           scope.$applyAsync () ->
             richText.openDoc(cm, sharejsDoc.getSnapshot())
             sharejsDoc.attachToCM(cm)
-            richText.enableRichText()
+            richText.enableRichText(cm, adapter)
 
         detachFromCM = (sharejsDoc) ->
           sharejsDoc.detachFromCM()
 
         scope.$on 'destroy', () ->
           detachFromCM(scope.sharejsDoc)
+          richText.disableRichText()
 
         init()
 

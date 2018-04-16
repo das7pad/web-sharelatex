@@ -1,35 +1,29 @@
 /* global sinon */
 
-import CodeMirror from 'codemirror'
-
 import fixture from '../../../../../../test/unit_frontend/es/support/fixture'
 import { stubMathJax, teardownMathJax } from '../support/stub-mathjax'
-import LatexMode from '../../../../public/es/latex-mode/LatexMode'
-import RichText from '../../../../public/es/rich-text/RichText'
+import {
+  init,
+  enableRichText,
+  disableRichText,
+  updateRichText
+} from '../../../../public/es/index'
 
-const TEXTAREA_HTML = '<textarea></textarea>'
+const FIXTURE_HTML = '<div></div>'
 
 describe('RichText', function () {
   before(stubMathJax)
   after(teardownMathJax)
 
   beforeEach(function () {
-    this.textarea = fixture.load(TEXTAREA_HTML)
-
-    CodeMirror.defineMode('latex', () => new LatexMode())
-    this.cm = CodeMirror.fromTextArea(this.textarea, {
-      mode: 'latex'
-    })
-
     this.rtAdapter = {}
-
-    this.rt = new RichText(this.cm, this.rtAdapter)
-    this.rt.enable()
+    this.cm = init(fixture.load(FIXTURE_HTML))
+    enableRichText(this.cm, this.rtAdapter)
   })
 
   afterEach(function () {
     fixture.cleanUp()
-    this.rt.disable()
+    disableRichText()
   })
 
   it('formats a typed section heading', function () {
@@ -96,7 +90,7 @@ describe('RichText', function () {
     expect(this.cm.getAllMarks()[0].wlValue).to.equal('$a$')
 
     this.cm.replaceRange('b', { line: 0, ch: 1 }, { line: 0, ch: 2 })
-    this.rt.update()
+    updateRichText()
 
     expect(this.cm.getAllMarks().length).to.equal(1)
     expect(this.cm.getValue()).to.equal('$b$\n')
@@ -105,11 +99,11 @@ describe('RichText', function () {
 
   it('should ignore updates when disabled', function () {
     // regression: was not checking enabled/disabled on external update call
-    this.rt.disable()
+    disableRichText()
     type(this.cm, '\\section{test}\n')
     expect(this.cm.getAllMarks().length).to.equal(0)
 
-    this.rt.update()
+    updateRichText()
     expect(this.cm.getAllMarks().length).to.equal(0)
   })
 
@@ -142,7 +136,7 @@ describe('RichText', function () {
     type(this.cm, '\\textbf{}')
     expect(this.cm.getAllMarks().length).to.equal(3)
 
-    this.rt.update()
+    updateRichText()
     expect(this.cm.getAllMarks().length).to.equal(3)
   })
 
@@ -311,7 +305,7 @@ describe('RichText', function () {
 
     expect(this.cm.getAllMarks().length).to.equal(3)
 
-    this.rt.update()
+    updateRichText()
     this.cm.replaceRange('', { line: 0, ch: 9 }, { line: 0, ch: 10 })
 
     expect(this.cm.getAllMarks().length).to.equal(0)
