@@ -219,7 +219,7 @@ module.exports = ProjectImporter =
 	V1_HISTORY_SYNC_RETRY_OPTIONS: {
 		times: V1_HISTORY_SYNC_REQUEST_TIMES.length
 		interval: (retryCount) ->
-			V1_HISTORY_SYNC_REQUEST_TIMES[retryCount] - V1_HISTORY_SYNC_REQUEST_TIMES[retryCount - 1]
+			(V1_HISTORY_SYNC_REQUEST_TIMES[retryCount] - V1_HISTORY_SYNC_REQUEST_TIMES[retryCount - 1]) * 1000
 	}
 
 	_waitForV1HistoryExport: (v1_project_id, user_id, callback = (error) ->) ->
