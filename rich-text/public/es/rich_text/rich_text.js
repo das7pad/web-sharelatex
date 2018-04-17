@@ -67,8 +67,8 @@ export default function RichText (_cm, rtAdapter) {
     // Remove editor marks that don't match any source marks
     editorMarks.forEach((editorMark) => {
       if (editorMark.wlIsMatched()) return
-      const { to } = editorMark.find()
-      if (to && to.line < lastRenderedLine(_cm)) {
+      const pos = editorMark.find()
+      if (pos && pos.to.line < lastRenderedLine(_cm)) {
         editorMark.clear()
       }
     })
