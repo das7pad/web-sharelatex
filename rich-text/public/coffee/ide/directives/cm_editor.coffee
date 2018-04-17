@@ -37,10 +37,10 @@ define [
 
         detachFromCM = (sharejsDoc) ->
           sharejsDoc.detachFromCM()
-
-        scope.$on 'destroy', () ->
-          detachFromCM(scope.sharejsDoc)
           richText.disableRichText()
+
+        scope.$on '$destroy', () ->
+          detachFromCM(scope.sharejsDoc)
 
         init()
 

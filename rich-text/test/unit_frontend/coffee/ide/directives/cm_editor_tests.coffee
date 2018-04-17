@@ -14,33 +14,29 @@ define [
       window.requirejs = @requirejs = sinon.stub()
 
     afterEach () ->
-      window.Frontend = null
       window.requirejs = origRequireJsFn
 
     it 'inits Rich Text', () ->
-      @requirejs.callsArgWith(1, {
+      @requirejs.callsArgWith(1, stubRichText({
         init: richTextInit = sinon.stub()
-      })
+      }))
       inject ($compile, $rootScope) ->
-        $compile('<div cm-editor></div>')($rootScope)
+        $rootScope.sharejsDoc = stubSharejsDoc()
+        $compile('<div cm-editor sharejs-doc="sharejsDoc"></div>')($rootScope)
         expect(richTextInit).to.have.been.called
 
     it 'attaches to CM', () ->
       init = sinon.stub().returns(cm = {}) # Stub initing CM and returning instance
-      openDoc = sinon.stub()
-      enableRichText = sinon.stub()
-      @requirejs.callsArgWith(1, {
+      @requirejs.callsArgWith(1, stubRichText({
         init: init
-        openDoc: openDoc,
-        enableRichText: enableRichText
-      })
+        openDoc: openDoc = sinon.stub()
+        enableRichText: enableRichText = sinon.stub()
+      }))
       inject ($compile, $rootScope, $browser) ->
-        getSnapshot = sinon.stub()
-        attachToCM = sinon.stub()
-        $rootScope.sharejsDoc = {
-          getSnapshot: getSnapshot
-          attachToCM: attachToCM
-        }
+        $rootScope.sharejsDoc = stubSharejsDoc({
+          getSnapshot: getSnapshot = sinon.stub()
+          attachToCM: attachToCM = sinon.stub()
+        })
 
         $compile('<div cm-editor sharejs-doc="sharejsDoc"></div>')($rootScope)
         $rootScope.$digest()
@@ -55,24 +51,34 @@ define [
         )
 
     it 'detaches from CM when destroyed', () ->
-      disableRichText = sinon.stub()
-      @requirejs.callsArgWith(1, {
+      @requirejs.callsArgWith(1, stubRichText({
         init: sinon.stub().returns({})
-        openDoc: sinon.stub()
-        enableRichText: sinon.stub()
-        disableRichText: disableRichText
-      })
+        disableRichText: disableRichText = sinon.stub()
+      }))
       inject ($compile, $rootScope) ->
-        detachFromCM = sinon.stub()
-        $rootScope.sharejsDoc = {
-          detachFromCM: detachFromCM
-          getSnapshot: sinon.stub()
-          attachToCM: sinon.stub()
-        }
+        $rootScope.sharejsDoc = stubSharejsDoc({
+          detachFromCM: detachFromCM = sinon.stub()
+        })
 
         $compile('<div cm-editor sharejs-doc="sharejsDoc"></div>')($rootScope)
         $rootScope.$digest()
-        $rootScope.$broadcast('destroy')
+        $rootScope.$broadcast('$destroy')
 
         expect(detachFromCM).to.have.been.called
         expect(disableRichText).to.have.been.called
+
+  stubRichText = (overrides = {}) ->
+    _.defaults(overrides, {
+      init: sinon.stub()
+      openDoc: sinon.stub()
+      enableRichText: sinon.stub()
+      disableRichText: sinon.stub()
+      updateRichText: sinon.stub()
+    })
+
+  stubSharejsDoc = (overrides = {}) ->
+    _.defaults(overrides, {
+      attachToCM: sinon.stub()
+      getSnapshot: sinon.stub()
+      detachFromCM: sinon.stub()
+    })
