@@ -29,8 +29,8 @@ ENGINE_TO_COMPILER_MAP = {
 	lualatex:     "lualatex"
 }
 
-V1_HISTORY_SYNC_RETRY_INTERVALS = [
-	500, 1000, 2500, 5000, 10000, 10000, 10000, 10000
+V1_HISTORY_SYNC_REQUEST_TIMES = [
+	0, 0.5, 1, 2, 5, 10, 30, 60, 120, 240, 360
 ]
 
 module.exports = ProjectImporter =
@@ -217,12 +217,9 @@ module.exports = ProjectImporter =
 					return callback(error)
 
 	V1_HISTORY_SYNC_RETRY_OPTIONS: {
-		# The first request is not a retry
-		# There can be intervals + 1 retries
-		# Hence there can be intervals + 2 requests
-		times: V1_HISTORY_SYNC_RETRY_INTERVALS.length + 2
+		times: V1_HISTORY_SYNC_REQUEST_TIMES.length
 		interval: (retryCount) ->
-			V1_HISTORY_SYNC_RETRY_INTERVALS[retryCount - 2]
+			V1_HISTORY_SYNC_REQUEST_TIMES[retryCount] - V1_HISTORY_SYNC_REQUEST_TIMES[retryCount - 1]
 	}
 
 	_waitForV1HistoryExport: (v1_project_id, user_id, callback = (error) ->) ->
