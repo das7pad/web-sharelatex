@@ -1,7 +1,8 @@
 define [
   'ide/rich-text/directives/cm_editor'
   'ide/rich-text/rich_text_adapter'
-], (cmEditor, RichTextAdapter) ->
+  'utils/EventEmitter'
+], (cmEditor, RichTextAdapter, EventEmitter) ->
   describe 'cmEditor', () ->
     beforeEach module 'SharelatexApp', ($provide) ->
       $provide.factory 'ide', () ->
@@ -50,6 +51,20 @@ define [
           RichTextAdapter
         )
 
+    it 'calls updateRichText when remoteop event is trigger', () ->
+      @requirejs.callsArgWith(1, stubRichText({
+        init: sinon.stub().returns({})
+        updateRichText: updateRichText = sinon.stub()
+      }))
+      inject ($compile, $rootScope) ->
+        $rootScope.sharejsDoc = stubSharejsDoc()
+        $compile('<div cm-editor sharejs-doc="sharejsDoc"></div>')($rootScope)
+        $rootScope.$digest()
+
+        $rootScope.sharejsDoc.trigger('remoteop')
+        expect(updateRichText).to.have.been.called
+
+
     it 'detaches from CM when destroyed', () ->
       @requirejs.callsArgWith(1, stubRichText({
         init: sinon.stub().returns({})
@@ -77,8 +92,8 @@ define [
     })
 
   stubSharejsDoc = (overrides = {}) ->
-    _.defaults(overrides, {
+    _.extend({
       attachToCM: sinon.stub()
       getSnapshot: sinon.stub()
       detachFromCM: sinon.stub()
-    })
+    }, overrides, EventEmitter.prototype)
