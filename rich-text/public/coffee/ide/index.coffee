@@ -1,4 +1,4 @@
 define [
-  "ide/rich-text/directives/cmEditor"
-  "ide/rich-text/controllers/EditorToolbarController"
+  "ide/rich-text/directives/cm_editor"
+  "ide/rich-text/controllers/editor_toolbar_controller"
 ], () ->

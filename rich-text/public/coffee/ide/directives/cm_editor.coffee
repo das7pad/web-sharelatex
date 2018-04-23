@@ -1,6 +1,6 @@
 define [
   "base"
-  "ide/rich-text/RichTextAdapter"
+  "ide/rich-text/rich_text_adapter"
 ], (App, RichTextAdapter) ->
   App.directive "cmEditor", (ide) ->
     return {

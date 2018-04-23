@@ -1,7 +1,7 @@
 /* global $ */
 
 import { deTex, splitAuthors, clearOnMouseDown } from '../utils'
-import { makePreambleMark } from '../PreambleMark'
+import { makePreambleMark } from '../preamble_mark'
 
 const PreambleMarker = {
   marker (cm, titleMark, authorMark, maketitleMark) {

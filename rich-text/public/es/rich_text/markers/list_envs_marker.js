@@ -1,4 +1,4 @@
-import { makeSingleMark } from '../SingleMark'
+import { makeSingleMark } from '../single_mark'
 import { markCoversWholeLines, makeGroup } from '../utils'
 
 const ListEnvsMarker = {

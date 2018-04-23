@@ -1,6 +1,6 @@
 define [
-  'ide/rich-text/directives/cmEditor'
-  'ide/rich-text/RichTextAdapter'
+  'ide/rich-text/directives/cm_editor'
+  'ide/rich-text/rich_text_adapter'
 ], (cmEditor, RichTextAdapter) ->
   describe 'cmEditor', () ->
     beforeEach module 'SharelatexApp', ($provide) ->

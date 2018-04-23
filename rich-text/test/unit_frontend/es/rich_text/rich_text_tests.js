@@ -1,7 +1,7 @@
 /* global sinon */
 
 import fixture from '../../../../../../test/unit_frontend/es/support/fixture'
-import { stubMathJax, teardownMathJax } from '../support/stub-mathjax'
+import { stubMathJax, teardownMathJax } from '../support/stub_mathjax'
 import {
   init,
   enableRichText,
