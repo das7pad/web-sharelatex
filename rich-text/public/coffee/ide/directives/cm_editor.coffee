@@ -34,11 +34,11 @@ define [
             richText.openDoc(cm, sharejsDoc.getSnapshot())
             sharejsDoc.attachToCM(cm)
             richText.enableRichText(cm, adapter)
-            sharejsDoc.on "remoteop", richText.updateRichText
+            sharejsDoc.on "remoteop.richtext", richText.updateRichText
 
         detachFromCM = (sharejsDoc) ->
           sharejsDoc.detachFromCM()
-          sharejsDoc.off "remoteop", richText.updateRichText
+          sharejsDoc.off "remoteop.richtext"
           richText.disableRichText()
 
         scope.$on '$destroy', () ->
