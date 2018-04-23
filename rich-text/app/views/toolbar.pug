@@ -1,3 +1,9 @@
 if showRichText
   .toolbar.toolbar-editor(ng-controller="EditorToolbarController")
-    button(ng-click="toggleRichText()") Rich Text
+    .toggle-wrapper
+      toggle-switch(
+        description="Editor mode."
+        label-false="Source"
+        label-true="Rich Text"
+        ng-model="editor.richText"
+      )
