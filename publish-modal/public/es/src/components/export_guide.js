@@ -4,17 +4,17 @@ import SidebarWithReturnButton from './sidebar_with_return_button'
 export default class ExportGuide extends Component {
   componentDidMount () {
     // Hack to fix links in DB that contain target="_blank" security hole
-    WL.fixOpenerLinks()
+    //WL.fixOpenerLinks()
   }
 
   render () {
-    const {entry, onReturn, docKey, returnText} = this.props
+    const {entry, onReturn, projectId, returnText} = this.props
     var link
     var multiJournalPartners = ['scholar_one', 'aries', 'ejp']
     if (multiJournalPartners.indexOf(entry.partner) >= 0) {
-      link = `/docs/${docKey}/exports/journal/${entry.id}`
+      link = `/docs/${projectId}/exports/journal/${entry.id}`
     } else {
-      link = `/docs/${docKey}/exports/${entry.partner}`
+      link = `/docs/${projectId}/exports/${entry.partner}`
     }
     return (
       <div
@@ -72,5 +72,5 @@ ExportGuide.propTypes = {
   entry: PropTypes.object.isRequired,
   returnText: PropTypes.string,
   onReturn: PropTypes.func,
-  docKey: PropTypes.string.isRequired
+  projectId: PropTypes.string.isRequired
 }

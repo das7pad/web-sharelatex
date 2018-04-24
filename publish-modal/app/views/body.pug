@@ -6,4 +6,6 @@ script(type='text/ng-template', id='publishProjectModalTemplate')
 			ng-click="cancel()"
 		) &times;
 		h3 Publish
-	.modal-body.modal-body-publish loading...
+	.modal-body.modal-body-publish
+		i.fa.fa-refresh.fa-spin.fa-fw
+		span &nbsp; loading...

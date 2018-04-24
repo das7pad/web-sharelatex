@@ -29,7 +29,7 @@ export default class PublishModal extends Component {
   }
 
   render () {
-    const { entries, docKey } = this.props
+    const { entries, projectId, pdfUrl } = this.props
 
     if (this.state.shown === 'basic') {
       return (<BasicPublishModal
@@ -42,9 +42,10 @@ export default class PublishModal extends Component {
         onSwitch={this.handleSwitch}
         entries={entries}
         guideId={this.state.guideId}
-        docKey={docKey}
+        projectId={projectId}
         shown={this.state.shown}
         initialEntry={this.state.initialEntry}
+        pdfUrl={pdfUrl}
       />)
     } else if (this.state.shown === 'branded') {
       return (<BrandedPublishModal
@@ -58,7 +59,8 @@ export default class PublishModal extends Component {
 
 PublishModal.propTypes = {
   entries: PropTypes.object.isRequired,
-  docKey: PropTypes.string.isRequired,
+  projectId: PropTypes.string.isRequired,
   initialShown: PropTypes.string.isRequired,
-  brandVariationId: PropTypes.number
+  brandVariationId: PropTypes.number,
+  pdfUrl: PropTypes.string
 }

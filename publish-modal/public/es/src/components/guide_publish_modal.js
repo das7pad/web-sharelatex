@@ -11,7 +11,8 @@ export default class GuidePublishModal extends Component {
       entries,
       onSwitch,
       shown,
-      docKey
+      projectId,
+      pdfUrl
     } = this.props
 
     var entry, onReturn, returnText
@@ -32,14 +33,16 @@ export default class GuidePublishModal extends Component {
         onReturn={onReturn}
         entry={entry}
         returnText={returnText}
-        />)
+        projectId={projectId}
+        pdfUrl={pdfUrl}
+      />)
     } else {
       return (<ExportGuide
         onReturn={onReturn}
         entry={entry}
         returnText={returnText}
-        docKey={docKey}
-        />)
+        projectId={projectId}
+      />)
     }
   }
 }
@@ -48,7 +51,8 @@ GuidePublishModal.propTypes = {
   entries: PropTypes.object.isRequired,
   initialEntry: PropTypes.object,
   guideId: PropTypes.number.isRequired,
-  docKey: PropTypes.string.isRequired,
+  projectId: PropTypes.string.isRequired,
   shown: PropTypes.string.isRequired,
-  onSwitch: PropTypes.func.isRequired
+  onSwitch: PropTypes.func.isRequired,
+  pdfUrl: PropTypes.string
 }
