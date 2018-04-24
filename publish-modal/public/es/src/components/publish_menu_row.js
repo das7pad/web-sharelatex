@@ -23,10 +23,8 @@ function generateEntry (entry, onSwitch, displayCategory) {
 
   if (entry.partner) {
     switchTo = 'export'
-    linkClass = 'tracked doc-event'
   } else {
     switchTo = 'guide'
-    linkClass = 'publish-guide-link tracked doc-event'
   }
   return _.assign({}, entry, {
     switchTo: switchTo,
