@@ -7,6 +7,7 @@ define [
 				$modal.open(
 					templateUrl: "publishProjectModalTemplate"
 					scope: $scope
+					size: "lg"
 				)
 
 				requirejs ['publish-modal'], (pm) ->
