@@ -1,4 +1,5 @@
 import React, { PropTypes, Component } from 'react'
+import _ from 'lodash'
 
 export default class PublishModal extends Component {
   constructor (props) {
@@ -16,8 +17,21 @@ export default class PublishModal extends Component {
   }
 
   render () {
+    const { entries } = this.props
     return (
-      <span> [publish modal content] </span>
+      <div>
+        {_.map(entries, (category, key) =>
+          <div key={'category-' + key}>
+            <span
+              className='affix-target affix-content-title'
+              data-affix-target={key}>
+              {category.title }
+            </span>
+            <div className='affix-subcontent'>
+            </div>
+          </div>
+       )}
+      </div>
     )
   }
 }
