@@ -2,11 +2,6 @@ import React, { PropTypes, Component } from 'react'
 import SidebarWithReturnButton from './sidebar_with_return_button'
 
 export default class ExportGuide extends Component {
-  componentDidMount () {
-    // Hack to fix links in DB that contain target="_blank" security hole
-    //WL.fixOpenerLinks()
-  }
-
   render () {
     const {entry, onReturn, projectId, returnText} = this.props
     var link

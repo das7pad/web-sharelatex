@@ -2,11 +2,6 @@ import React, { PropTypes, Component } from 'react'
 import SidebarWithReturnButton from './sidebar_with_return_button'
 
 export default class PublishGuide extends Component {
-  componentDidMount () {
-    // Hack to fix links in DB that contain target="_blank" security hole
-    // WL.fixOpenerLinks()
-  }
-
   render () {
     const { entry, returnText, onReturn, projectId, pdfUrl } = this.props
     return (
@@ -56,6 +51,7 @@ function DownloadAndSubmit ({ entry, projectId, pdfUrl }) {
         <a
           href={entry.publish_link_destination}
           target='_blank'
+          rel='noopener'
           className='link-as-button'
           data-event='link_submit'
           data-category='Publish'

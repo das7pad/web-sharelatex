@@ -7,9 +7,6 @@ import PublishSections from './publish_sections'
 export default class BrandedPublishModal extends Component {
   componentDidMount () {
     //$('#publish-modal').trigger('activate-affix-modal')
-
-    // Hack to fix links in DB that contain target="_blank" security hole
-    // WL.fixOpenerLinks()
   }
 
   render () {

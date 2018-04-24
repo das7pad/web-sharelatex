@@ -1,11 +1,6 @@
 import React, { PropTypes, Component } from 'react'
 
 export default class PublishMenuEntry extends Component {
-  componentDidMount () {
-    // Hack to fix links in DB that contain target="_blank" security hole
-    //WL.fixOpenerLinks()
-  }
-
   render () {
     const {name,
            id,
