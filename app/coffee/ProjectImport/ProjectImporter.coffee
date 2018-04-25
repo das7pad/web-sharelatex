@@ -1,5 +1,6 @@
 logger = require "logger-sharelatex"
 settings = require "settings-sharelatex"
+metrics = require "metrics-sharelatex"
 Path = require "path"
 uuid = require "uuid"
 _ = require "underscore"
@@ -50,6 +51,7 @@ module.exports = ProjectImporter =
 					cb(null, project_id)
 		], (importError, project_id) ->
 			if importError?
+				metrics.inc "project-import.errors.#{importError.name}"
 				ProjectImporter._cancelExport v1_project_id, project_id, user_id, (cleanUpError) ->
 					logger.err {err: cleanUpError, project_id: project_id}, "failed to clean up project" if cleanUpError?
 					callback importError

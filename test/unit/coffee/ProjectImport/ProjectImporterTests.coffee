@@ -22,6 +22,7 @@ describe "ProjectImporter", ->
 			"../../../../../app/js/Features/Authorization/PrivilegeLevels": PrivilegeLevels
 			"request": @request = {}
 			"logger-sharelatex": { log: sinon.stub(), warn: sinon.stub() }
+			"metrics-sharelatex": { inc: sinon.stub() }
 			"settings-sharelatex": @settings =
 				overleaf:
 					host: "http://overleaf.example.com"
