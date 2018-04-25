@@ -1,6 +1,5 @@
 import React, { PropTypes, Component } from 'react'
 import _ from 'lodash'
-import PublishAffix from './publish_affix'
 import PublishSections from './publish_sections'
 
 export default class BrandedPublishModal extends Component {

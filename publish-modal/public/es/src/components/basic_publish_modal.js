@@ -1,5 +1,4 @@
 import React, { PropTypes, Component } from 'react'
-import PublishAffix from './publish_affix'
 import PublishSections from './publish_sections'
 
 export default class BasicPublishModal extends Component {
