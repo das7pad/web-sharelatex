@@ -1,11 +1,14 @@
 define [
   "base"
   "ide/rich-text/rich_text_adapter"
-], (App, RichTextAdapter) ->
-  App.directive "cmEditor", (ide) ->
+  "ide/editor/directives/aceEditor/spell-check/SpellCheckManager"
+], (App, RichTextAdapter, SpellCheckManager) ->
+  App.directive "cmEditor", (ide, $cacheFactory, $http, $q) ->
     return {
       scope: {
         sharejsDoc: "="
+        spellCheck: "="
+        spellCheckLanguage: "="
       }
 
       link: (scope, element, attrs) ->
@@ -35,6 +38,20 @@ define [
             sharejsDoc.attachToCM(cm)
             richText.enableRichText(cm, adapter)
             sharejsDoc.on "remoteop.richtext", richText.updateRichText
+            spellCheckCache = (
+              $cacheFactory.get("spellCheck-#{scope.name}") ||
+              $cacheFactory("spellCheck-#{scope.name}", { capacity: 1000 })
+            )
+            spellCheckManager = new SpellCheckManager(
+              scope,
+              cm,
+              element,
+              spellCheckCache,
+              $http,
+              $q,
+              new richText.WordManager(),
+            )
+            spellCheckManager.enable()
 
         detachFromCM = (sharejsDoc) ->
           sharejsDoc.detachFromCM()
