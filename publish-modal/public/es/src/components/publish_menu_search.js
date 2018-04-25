@@ -22,7 +22,11 @@ export default class PublishMenuSearch extends Component {
     }).filter((t) => t)
 
     this.categoryListing =
-      _.union(_.initial(categoryNames), ', ') + ' or ' + _.last(categoryNames)
+      _.map(_.initial(categoryNames), name => {
+        return ' ' + name
+      }) +
+      ' or ' +
+      _.last(categoryNames)
 
     this.state = {results: []}
 
