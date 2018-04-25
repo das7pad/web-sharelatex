@@ -33,6 +33,7 @@ ENGINE_TO_COMPILER_MAP = {
 module.exports = ProjectImporter =
 	importProject: (v1_project_id, user_id, callback = (error, project_id) ->) ->
 		logger.log {v1_project_id, user_id}, "importing project from overleaf"
+		metrics.inc "project-import.attempt"
 		async.waterfall [
 			(cb) ->
 				ProjectImporter._startExport v1_project_id, user_id, cb
@@ -51,11 +52,13 @@ module.exports = ProjectImporter =
 					cb(null, project_id)
 		], (importError, project_id) ->
 			if importError?
-				metrics.inc "project-import.errors.#{importError.name}"
+				metrics.inc "project-import.error.total"
+				metrics.inc "project-import.error.#{importError.name}"
 				ProjectImporter._cancelExport v1_project_id, project_id, user_id, (cleanUpError) ->
 					logger.err {err: cleanUpError, project_id: project_id}, "failed to clean up project" if cleanUpError?
 					callback importError
 			else
+				metrics.inc "project-import.success"
 				callback null, project_id
 
 	_startExport: (v1_project_id, user_id, callback = (error, doc) ->) ->
