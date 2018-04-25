@@ -4,6 +4,8 @@ import LatexMode from './latex_mode/latex_mode'
 import RichText from './rich_text/rich_text'
 import keyBindings from './key_bindings/key_bindings'
 
+export { default as WordManager } from './spell_check/word_manager'
+
 let richText
 
 export function init (rootEl) {
@@ -37,3 +39,5 @@ export function disableRichText () {
 export function updateRichText () {
   richText.update()
 }
+
+export const wordManager = SpellCheck
