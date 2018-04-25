@@ -1,5 +1,4 @@
 import React, { PropTypes, Component } from 'react'
-import _ from 'lodash'
 import Fuse from 'fuse.js'
 import PublishMenuGrid from './publish_menu_grid'
 
@@ -23,7 +22,7 @@ export default class PublishMenuSearch extends Component {
     }).filter((t) => t)
 
     this.categoryListing =
-      _.join(_.dropRight(categoryNames), ', ') + ' or ' + _.last(categoryNames)
+      _.union(_.initial(categoryNames), ', ') + ' or ' + _.last(categoryNames)
 
     this.state = {results: []}
 

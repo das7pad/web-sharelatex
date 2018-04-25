@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react'
-import _ from 'lodash'
 import PublishMenuSearch from './publish_menu_search'
 import PublishMenuGrid from './publish_menu_grid'
 

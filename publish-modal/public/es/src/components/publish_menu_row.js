@@ -1,6 +1,4 @@
 import React, { PropTypes, Component } from 'react'
-import _ from 'lodash'
-
 import PublishMenuEntry from './publish_menu_entry'
 
 export default class PublishMenuRow extends Component {
@@ -26,7 +24,7 @@ function generateEntry (entry, onSwitch, displayCategory) {
   } else {
     switchTo = 'guide'
   }
-  return _.assign({}, entry, {
+  return _.extend({}, entry, {
     switchTo: switchTo,
     linkClass: linkClass,
     onSwitch: onSwitch,

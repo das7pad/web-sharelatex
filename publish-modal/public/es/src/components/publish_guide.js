@@ -42,9 +42,9 @@ function DownloadAndSubmit ({ entry, projectId, pdfUrl }) {
                   >
           Download PDF file of your article
         </a>}
-        {!pdfUrl && <div class="link-disabled">
+        {!pdfUrl && <span className="link-disabled">
           Download PDF file of your article ( please compile your project before downloading PDF )
-        </div>}
+        </span>}
       </p>
       <p><strong>Step 2: Submit your manuscript</strong></p>
       <p>
