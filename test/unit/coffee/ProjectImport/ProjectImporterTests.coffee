@@ -32,14 +32,16 @@ describe "ProjectImporter", ->
 	describe "importProject", ->
 		beforeEach ->
 			@ProjectImporter._startExport = sinon.stub().yields(null, @doc = { files: ["mock-files"] })
-			@ProjectImporter._initSharelatexProject = sinon.stub().yields(null, @project = { _id: "mock-project-id" })
+			@ProjectImporter._initSharelatexProject = sinon.stub().yields(null, @doc, @project_id = "mock-project-id")
 			@ProjectImporter._importFiles = sinon.stub().yields()
 			@ProjectImporter._confirmExport = sinon.stub().yields()
 			@ProjectImporter._cancelExport = sinon.stub().yields()
 
 		describe "successfully", ->
-			beforeEach ->
-				@ProjectImporter.importProject(@v1_project_id = "mock-ol-doc-id", @user_id = "mock-user-id", @callback)
+			beforeEach (done) ->
+				@ProjectImporter.importProject @v1_project_id = "mock-ol-doc-id", @user_id = "mock-user-id", (error, project_id) =>
+					@callback(error, project_id)
+					done(error, project_id)
 
 			it "should get the doc from OL", ->
 				@ProjectImporter._startExport
@@ -53,16 +55,16 @@ describe "ProjectImporter", ->
 
 			it "should import the files", ->
 				@ProjectImporter._importFiles
-					.calledWith(@project._id, @user_id, @doc.files)
+					.calledWith(@project_id, @user_id, @doc.files)
 					.should.equal true
 
 			it "should tell overleaf the project is now in the beta", ->
 				@ProjectImporter._confirmExport
-					.calledWith(@v1_project_id, @project._id, @user_id)
+					.calledWith(@v1_project_id, @project_id, @user_id)
 					.should.equal true
 
 			it "should return the new project id", ->
-				@callback.calledWith(null, @project._id).should.equal true
+				@callback.calledWith(null, @project_id).should.equal true
 
 		describe 'unsuccessfully', ->
 			beforeEach ->
@@ -127,8 +129,8 @@ describe "ProjectImporter", ->
 			it "should save the project", ->
 				@project.save.called.should.equal true
 
-			it "should return the project", ->
-				@callback.calledWith(null, @project).should.equal true
+			it "should return the doc and project id", ->
+				@callback.calledWith(null, @doc, @project._id).should.equal true
 
 		describe "null checks", ->
 			it "should require doc.title", (done) ->

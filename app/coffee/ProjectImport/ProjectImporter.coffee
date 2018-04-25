@@ -32,11 +32,12 @@ ENGINE_TO_COMPILER_MAP = {
 module.exports = ProjectImporter =
 	importProject: (v1_project_id, user_id, callback = (error, project_id) ->) ->
 		logger.log {v1_project_id, user_id}, "importing project from overleaf"
-		ProjectImporter._startExport v1_project_id, user_id, (error, doc) ->
-			return callback(error) if error?
-			ProjectImporter._initSharelatexProject user_id, doc, (error, project) ->
-				return callback(error) if error?
-				project_id = project._id
+		async.waterfall [
+			(cb) ->
+				ProjectImporter._startExport v1_project_id, user_id, cb
+			(doc, cb) ->
+				ProjectImporter._initSharelatexProject user_id, doc, cb
+			(doc, project_id, cb) ->
 				async.series [
 					(cb) ->
 						ProjectImporter._importInvites project_id, doc.invites, cb
@@ -44,13 +45,16 @@ module.exports = ProjectImporter =
 						ProjectImporter._importFiles project_id, user_id, doc.files, cb
 					(cb) ->
 						ProjectImporter._confirmExport v1_project_id, project_id, user_id, cb
-				], (importError) ->
-					if importError?
-						ProjectImporter._cancelExport v1_project_id, project_id, user_id, (cleanUpError) ->
-							logger.err {err: cleanUpError, project_id: project_id}, "failed to clean up project" if cleanUpError?
-							callback importError
-					else
-						callback null, project_id
+				], (error) ->
+					return cb(error) if error?
+					cb(null, project_id)
+		], (importError, project_id) ->
+			if importError?
+				ProjectImporter._cancelExport v1_project_id, project_id, user_id, (cleanUpError) ->
+					logger.err {err: cleanUpError, project_id: project_id}, "failed to clean up project" if cleanUpError?
+					callback importError
+			else
+				callback null, project_id
 
 	_startExport: (v1_project_id, user_id, callback = (error, doc) ->) ->
 		oAuthRequest user_id, {
@@ -95,7 +99,7 @@ module.exports = ProjectImporter =
 				project.imageName = settings.importedImageName
 			project.save (error) ->
 				return callback(error) if error?
-				return callback(null, project)
+				return callback(null, doc, project._id)
 
 	_importInvites: (project_id, invites = [], callback = (error) ->) ->
 		async.mapSeries(invites, (invite, cb) ->
