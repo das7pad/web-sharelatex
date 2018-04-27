@@ -3,6 +3,7 @@ Settings = require 'settings-sharelatex'
 logger = require 'logger-sharelatex'
 AuthenticationController = require "../../../../app/js/Features/Authentication/AuthenticationController"
 AnalyticsManager = require "../../../../app/js/Features/Analytics/AnalyticsManager"
+V1UserFinder = require "./V1UserFinder"
 
 module.exports = LogInToV2Controller =
 	signAndRedirectToLogInToV2: (req, res, next) ->
