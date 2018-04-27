@@ -1,10 +1,34 @@
 settings = require 'settings-sharelatex'
+logger = require 'logger-sharelatex'
 querystring = require('querystring')
 request = require 'request'
 
-module.exports =
-	findV1UserIdbyEmail: (email, callback) ->
-		qs = querystring.stringify({email: email})
+UserGetter = require "../../../../app/js/Features/User/UserGetter"
+
+V1UserFinder =
+	# Check wether the user has a v1 account but it hasn't linked it yet. This can happen,
+	# for instance, if they have accounts in sl and v1 but they only use SL to log in.
+	hasV1AccountNotLinkedYet: (userId, callback) ->
+		UserGetter.getUser userId, { 'overleaf.id': 1, email: 1 }, (err, user) ->
+			if err?
+				logger.err {userId}, "error getting user email"
+				return callback(err)
+
+			email = user.email
+
+			if !user?.overleaf?.id
+				V1UserFinder._findV1UserIdbyEmail email, (err, v1Id) ->
+					if err?
+						logger.err {userId, email}, "error getting v1 id"
+						return callback(err)
+
+					if v1Id
+						return callback(null, email, true)
+
+			return callback(null, email, false)
+
+	_findV1UserIdbyEmail: (email, callback) ->
+		qs = querystring.stringify({ email: email })
 
 		request {
 			method: 'GET',
@@ -25,3 +49,5 @@ module.exports =
 				error = new Error("overleaf returned non-success code: #{response.statusCode}")
 				error.statusCode = response.statusCode
 				return callback error
+
+module.exports = V1UserFinder

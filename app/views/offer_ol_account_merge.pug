@@ -1,0 +1,25 @@
+extends ../../../../app/views/layout
+
+block content
+	.content.content-alt
+		.container
+			.row
+				.col-md-4.col-md-offset-4
+					.card
+						.page-header
+							h2 Grant Overleaf access
+						p.text-center
+							img(
+								src="/img/ol_plus_sl.png"
+								style="width: 50%"
+							)
+						p
+							| You have an Overleaf V1 account. You can link that account in order to see your v1 projects in Overleaf v2.(<a href="https://www.overleaf.com/help/342-overleaf-v2-faq#ol-and-sl-account">read more here</a>).
+						hr
+							p.text-center
+								a(href="/login?redir=" + encodeURIComponent("/overleaf/auth_from_sl?token=" + token) + "&email=" + encodeURIComponent(email))
+									| Link my V1 account
+
+							p.text-center
+								a(href="/user/login_to_ol_v2?dont_link=true")
+									| Or continue with your ShareLaTeX account instead
