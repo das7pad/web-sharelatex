@@ -35,6 +35,7 @@ describe "ProjectImporter", ->
 			@ProjectImporter._startExport = sinon.stub().yields(null, @doc = { files: ["mock-files"] })
 			@ProjectImporter._initSharelatexProject = sinon.stub().yields(null, @doc, @project_id = "mock-project-id")
 			@ProjectImporter._importFiles = sinon.stub().yields()
+			@ProjectImporter._waitForV1HistoryExport = sinon.stub().yields()
 			@ProjectImporter._confirmExport = sinon.stub().yields()
 			@ProjectImporter._cancelExport = sinon.stub().yields()
 
