@@ -1,3 +1,4 @@
+/* global _ */
 import React, { PropTypes, Component } from 'react'
 import Fuse from 'fuse.js'
 import PublishMenuGrid from './publish_menu_grid'
@@ -22,11 +23,7 @@ export default class PublishMenuSearch extends Component {
     }).filter((t) => t)
 
     this.categoryListing =
-      _.map(_.initial(categoryNames), name => {
-        return ' ' + name
-      }) +
-      ' or ' +
-      _.last(categoryNames)
+      _.initial(categoryNames).join(', ') + ' or ' + _.last(categoryNames)
 
     this.state = {results: []}
 
@@ -38,7 +35,7 @@ export default class PublishMenuSearch extends Component {
         'publish_menu_html',
         'publish_guide_html'
       ],
-        threshold: 0.4
+      threshold: 0.4
       }
     )
     this.handleInput = this.handleInput.bind(this)

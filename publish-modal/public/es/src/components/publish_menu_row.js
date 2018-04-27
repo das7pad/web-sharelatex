@@ -1,3 +1,4 @@
+/* global _ */
 import React, { PropTypes, Component } from 'react'
 import PublishMenuEntry from './publish_menu_entry'
 

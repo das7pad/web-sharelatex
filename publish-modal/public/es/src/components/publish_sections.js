@@ -1,3 +1,4 @@
+/* global _ */
 import React, { PropTypes } from 'react'
 import PublishMenuSearch from './publish_menu_search'
 import PublishMenuGrid from './publish_menu_grid'

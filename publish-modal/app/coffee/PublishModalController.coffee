@@ -5,6 +5,6 @@ module.exports = PublishModalController =
 
 	list: (req, res)->
 		url = "#{settings.apis.v1.url}/journals/v2"
-		data = request.get(url, (err, response, body)->
+		request.get(url, (err, response, body)->
 			res.send(body)
 		)

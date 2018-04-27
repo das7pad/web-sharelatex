@@ -1,5 +1,4 @@
 import React, { PropTypes, Component } from 'react'
-
 import PublishMenuRow from './publish_menu_row'
 
 export default class PublishMenuGrid extends Component {
