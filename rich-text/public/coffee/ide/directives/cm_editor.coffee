@@ -17,9 +17,11 @@ define [
         adapter = new RichTextAdapter(ide.fileTreeManager)
 
         init = () ->
-          requirejs ['rich-text'], (rt) ->
-            richText = rt
-            cm = richText.init(element.find('.cm-editor-wrapper')[0])
+          requirejs ['rich-text'], ({ Editor }) ->
+            richText = new Editor(
+              element.find('.cm-editor-wrapper')[0],
+              adapter
+            )
             switchAttachment(scope.sharejsDoc)
 
         scope.$watch "sharejsDoc", switchAttachment
@@ -32,27 +34,26 @@ define [
             attachToCM(sharejsDoc)
 
         attachToCM = (sharejsDoc) ->
-          return if !cm
+          return if !richText.getCodeMirror()
           scope.$applyAsync () ->
-            richText.openDoc(cm, sharejsDoc.getSnapshot())
-            sharejsDoc.attachToCM(cm)
-            richText.enableRichText(cm, adapter)
-            sharejsDoc.on "remoteop.richtext", richText.updateRichText
-            spellCheckCache = (
-              $cacheFactory.get("spellCheck-#{scope.name}") ||
-              $cacheFactory("spellCheck-#{scope.name}", { capacity: 1000 })
-            )
-            spellCheckManager = new SpellCheckManager(
-              scope,
-              cm,
-              element,
-              spellCheckCache,
-              $http,
-              $q,
-              new richText.WordManager(),
-              richText.updateSpellCheck
-            )
-            spellCheckManager.enable()
+            richText.openDoc(sharejsDoc.getSnapshot())
+            sharejsDoc.attachToCM(richText.getCodeMirror())
+            sharejsDoc.on "remoteop.richtext", richText.update
+
+            richText.enable (wordManager, updateSpellCheck) ->
+              spellCheckCache = $cacheFactory.get("spellCheck-#{scope.name}") ||
+                $cacheFactory("spellCheck-#{scope.name}", { capacity: 1000 })
+              spellCheckManager = new SpellCheckManager(
+                scope,
+                richText.getCodeMirror(),
+                element,
+                spellCheckCache,
+                $http,
+                $q,
+                wordManager,
+                updateSpellCheck
+              )
+              spellCheckManager.enable()
 
         detachFromCM = (sharejsDoc) ->
           sharejsDoc.detachFromCM()
@@ -61,6 +62,7 @@ define [
 
         scope.$on '$destroy', () ->
           detachFromCM(scope.sharejsDoc)
+          richText.disable()
 
         init()
 

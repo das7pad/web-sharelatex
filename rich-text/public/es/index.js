@@ -1,64 +1,57 @@
+/* global _ */
+
 import CodeMirror, { Doc } from 'codemirror'
 
 import LatexMode from './latex_mode/latex_mode'
 import RichText from './rich_text/rich_text'
 import keyBindings from './key_bindings/key_bindings'
+import WordManager from './spell_check/word_manager'
+import makeSpellOverlay from './spell_check/spell_overlay'
 
-export { default as WordManager } from './spell_check/word_manager'
+export class Editor {
+  constructor (rootEl, adapter) {
+    CodeMirror.defineMode('latex', () => new LatexMode())
+    CodeMirror.defineMIME('application/x-tex', 'latex')
+    CodeMirror.defineMIME('application/x-latex', 'latex')
 
-let richText
+    this.codeMirror = CodeMirror(rootEl, {
+      mode: 'latex',
+      lineWrapping: true,
+      extraKeys: keyBindings
+    })
+    this.adapter = adapter
+    this.wordManager = new WordManager(this.codeMirror)
+    this.spellOverlay = makeSpellOverlay(this.wordManager)
 
-export function init (rootEl) {
-  CodeMirror.defineMode('latex', () => new LatexMode())
-  CodeMirror.defineMIME('application/x-tex', 'latex')
-  CodeMirror.defineMIME('application/x-latex', 'latex')
+    this.updateSpellOverlay = this.updateSpellOverlay.bind(this)
+  }
 
-  return CodeMirror(rootEl, {
-    mode: 'latex',
-    lineWrapping: true,
-    extraKeys: keyBindings
-  })
-}
+  getCodeMirror () {
+    return this.codeMirror
+  }
 
-export function openDoc (codeMirror, content) {
-  const newDoc = Doc(content, 'latex')
-  codeMirror.swapDoc(newDoc)
+  openDoc (content) {
+    const newDoc = Doc(content, 'latex')
+    this.codeMirror.swapDoc(newDoc)
 
-  return newDoc
-}
+    return newDoc
+  }
 
-export function enableRichText (codeMirror, rtAdapter) {
-  richText = new RichText(codeMirror, rtAdapter)
-  richText.enable()
-}
+  enable () {
+    this.richText = new RichText(this.codeMirror, this.adapter)
+    this.richText.enable()
+  }
 
-export function disableRichText () {
-  richText.disable()
-}
+  disable () {
+    this.richText.disable()
+  }
 
-export function updateRichText () {
-  richText.update()
-}
+  update () {
+    this.richText.update()
+  }
 
-export function updateSpellCheck (codeMirror, wordManager) {
-  codeMirror.addOverlay({
-    token (stream) {
-      const { line: currentLine } = stream.lineOracle
-      const highlightsForLine = wordManager.getHighlights()[currentLine]
-
-      if (highlightsForLine && highlightsForLine.length) {
-        for (let highlight of highlightsForLine) {
-          if (stream.match(highlight.word)) {
-            return 'spell-error'
-          } else {
-            stream.next()
-            return null
-          }
-        }
-      }
-
-      stream.next()
-      return null
-    }
-  })
+  updateSpellOverlay () {
+    this.codeMirror.removeOverlay(this.spellOverlay)
+    this.codeMirror.addOverlay(this.spellOverlay)
+  }
 }
