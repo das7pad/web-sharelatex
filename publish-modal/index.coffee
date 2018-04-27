@@ -1,10 +1,13 @@
-Features = require('../../app/js/infrastructure/Features')
+Features = require("../../app/js/infrastructure/Features")
+PublishModalRouter = require("./app/js/PublishModalRouter")
 
 PublishModalModule =
-  viewIncludes:
-    "publish:script": "script"
-    "publish:button": "button"
-    "publish:body": "body"
+	router: PublishModalRouter
+
+	viewIncludes:
+		"publish:script": "script"
+		"publish:button": "button"
+		"publish:body": "body"
 
 if Features.hasFeature('publish-modal')
   module.exports = PublishModalModule
