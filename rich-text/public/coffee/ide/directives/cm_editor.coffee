@@ -50,6 +50,7 @@ define [
               $http,
               $q,
               new richText.WordManager(),
+              richText.updateSpellCheck
             )
             spellCheckManager.enable()
 
