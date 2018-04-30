@@ -21,7 +21,7 @@ describe "ProjectImporter", ->
 			"../../../../../app/js/Features/Collaborators/CollaboratorsHandler": @CollaboratorsHandler = {}
 			"../../../../../app/js/Features/Authorization/PrivilegeLevels": PrivilegeLevels
 			"request": @request = {}
-			"logger-sharelatex": { log: sinon.stub(), warn: sinon.stub() }
+			"logger-sharelatex": { log: sinon.stub(), warn: sinon.stub(), err: sinon.stub() }
 			"metrics-sharelatex": { inc: sinon.stub() }
 			"settings-sharelatex": @settings =
 				overleaf:
@@ -69,14 +69,22 @@ describe "ProjectImporter", ->
 				@callback.calledWith(null, @project_id).should.equal true
 
 		describe 'unsuccessfully', ->
-			beforeEach ->
+			beforeEach (done) ->
 				# Mock import file error
 				@error = new UnsupportedFileTypeError("unknown file type: ext")
 				@ProjectImporter._importFiles = sinon.stub().yields(@error)
-				@ProjectImporter.importProject(@v1_project_id = "mock-ol-doc-id", @user_id = "mock-user-id", @callback)
+				@ProjectDeleter.deleteProject = sinon.stub().yields()
+				@ProjectImporter.importProject @v1_project_id = "mock-ol-doc-id", @user_id = "mock-user-id", (error) =>
+					@callback(error)
+					done()
+
+			it 'should delete the newly created project', ->
+				@ProjectDeleter.deleteProject.calledWith(@project_id)
+					.should.equal true
 
 			it 'should cancel the import', ->
-				@ProjectImporter._cancelExport.calledWith(@project_id)
+				@ProjectImporter._cancelExport.calledWith(@v1_project_id)
+					.should.equal true
 
 			it 'should callback with the error', ->
 				@callback.calledWith(@error)
@@ -527,8 +535,7 @@ describe "ProjectImporter", ->
 			@v1_project_id = "mock-ol-doc-id"
 			@v2_project_id = "mock-project-id"
 			@user_id = "mock-user-id"
-			@ProjectDeleter.deleteProject = sinon.stub().yields()
-			@ProjectImporter._cancelExport @v1_project_id, @v2_project_id, @user_id, @callback
+			@ProjectImporter._cancelExport @v1_project_id, @user_id, @callback
 
 		it "should make an oauth request for the doc", ->
 			@oAuthRequest
@@ -537,9 +544,6 @@ describe "ProjectImporter", ->
 					method: "POST"
 				})
 				.should.equal true
-
-		it 'should delete the newly created project', ->
-			@ProjectDeleter.deleteProject.calledWith(@v2_project_id)
 
 		it "should return the callback", ->
 			@callback.called.should.equal true
