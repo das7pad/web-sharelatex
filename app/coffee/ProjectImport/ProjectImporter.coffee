@@ -35,7 +35,7 @@ V1_HISTORY_SYNC_REQUEST_TIMES = [
 ]
 
 module.exports = ProjectImporter =
-	importProject: (v1_project_id, user_id, callback = (error, project_id) ->) ->
+	importProject: (v1_project_id, user_id, callback = (error, v2_project_id) ->) ->
 		logger.log {v1_project_id, user_id}, "importing project from overleaf"
 		metrics.inc "project-import.attempt"
 		async.waterfall [
@@ -43,35 +43,36 @@ module.exports = ProjectImporter =
 				ProjectImporter._startExport v1_project_id, user_id, cb
 			(doc, cb) ->
 				ProjectImporter._initSharelatexProject user_id, doc, cb
-			(doc, project_id, cb) ->
+			(doc, v2_project_id, cb) ->
 				async.series [
 					(cb) ->
-						ProjectImporter._importInvites project_id, doc.invites, cb
+						ProjectImporter._importInvites v2_project_id, doc.invites, cb
 					(cb) ->
-						ProjectImporter._importFiles project_id, user_id, doc.files, cb
+						ProjectImporter._importFiles v2_project_id, user_id, doc.files, cb
 					(cb) ->
 						ProjectImporter._waitForV1HistoryExport v1_project_id, user_id, cb
 					(cb) ->
-						ProjectImporter._confirmExport v1_project_id, project_id, user_id, cb
+						ProjectImporter._confirmExport v1_project_id, v2_project_id, user_id, cb
 				], (error) ->
 					if error?
-						ProjectDeleter.deleteProject project_id, (deleteError) ->
+						ProjectDeleter.deleteProject v2_project_id, (deleteError) ->
 							if deleteError?
-								logger.err {err: deleteError, project_id: project_id}, "failed to delete imported project"
+								logger.err {deleteError, v1_project_id, v2_project_id}, "failed to delete imported project"
 							cb(error)
 					else
-						cb(null, project_id)
-		], (importError, project_id) ->
+						cb(null, v2_project_id)
+		], (importError, v2_project_id) ->
 			if importError?
+				logger.err {importError, v1_project_id, v1_project_id}, "failed to import project"
 				metrics.inc "project-import.error.total"
 				metrics.inc "project-import.error.#{importError.name}"
 				ProjectImporter._cancelExport v1_project_id, user_id, (cancelErrror) ->
 					if cancelErrror?
-						logger.err {err: cancelErrror, project_id: project_id}, "failed to cancel export"
+						logger.err {cleanUpError, v1_project_id, v2_project_id}, "failed to cancel project import"
 					callback importError
 			else
 				metrics.inc "project-import.success"
-				callback null, project_id
+				callback null, v2_project_id
 
 	_startExport: (v1_project_id, user_id, callback = (error, doc) ->) ->
 		oAuthRequest user_id, {
@@ -260,7 +261,7 @@ module.exports = ProjectImporter =
 				doc: { v2_project_id }
 		}, callback
 
-	_cancelExport: (v1_project_id, v2_project_id, user_id, callback = (error) ->) ->
+	_cancelExport: (v1_project_id, user_id, callback = (error) ->) ->
 		oAuthRequest user_id, {
 			url: "#{settings.overleaf.host}/api/v1/sharelatex/docs/#{v1_project_id}/export/cancel"
 			method: "POST"
