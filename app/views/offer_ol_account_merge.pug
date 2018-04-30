@@ -6,20 +6,21 @@ block content
 			.row
 				.col-md-4.col-md-offset-4
 					.card
-						.page-header
-							h2 Grant Overleaf access
+						.page-header.text-center
+							h2 You also have an Overleaf V1 account
 						p.text-center
 							img(
 								src="/img/ol_plus_sl.png"
 								style="width: 50%"
 							)
-						p
-							| You have an Overleaf V1 account. You can link that account in order to see your v1 projects in Overleaf v2.(<a href="https://www.overleaf.com/help/342-overleaf-v2-faq#ol-and-sl-account">read more here</a>).
+						p.text-center
+							| You must link that account in order to see your v1 projects in Overleaf v2.
 						hr
-							p.text-center
-								a(href="/login?redir=" + encodeURIComponent("/overleaf/auth_from_sl?token=" + token) + "&email=" + encodeURIComponent(email))
-									| Link my V1 account
+						p.text-center
+							a(href=v1LoginUrl, event-tracking="login_v2_via_overleaf", event-tracking-trigger="click", event-tracking-ga="v2_onboard", event-tracking-label="welcome").btn.btn-lg.btn-success Link my V1 account
 
-							p.text-center
-								a(href="/user/login_to_ol_v2?dont_link=true")
-									| Or continue with your ShareLaTeX account instead
+						p.text-center Or
+
+						p.text-center
+							a(href="/user/login_to_ol_v2?dont_link=true")
+								|  Continue with your ShareLaTeX account instead

@@ -24,10 +24,15 @@ V1UserFinder =
 
 					if v1Id
 						return callback(null, email, true)
+					else
+						return callback(null, email, false)
 
-			return callback(null, email, false)
+			else
+				return callback(null, email, false)
 
 	_findV1UserIdbyEmail: (email, callback) ->
+		logger.log email: email, "searching user by email in v1"
+
 		qs = querystring.stringify({ email: email })
 
 		request {
@@ -42,8 +47,10 @@ V1UserFinder =
 			return callback(error) if error?
 
 			if 200 <= response.statusCode < 300
+				logger.log user_id: body.user_id, "found user id"
 				return callback null, body.user_id
 			else if response.statusCode == 404
+				logger.log "No user found"
 				return callback null, null
 			else
 				error = new Error("overleaf returned non-success code: #{response.statusCode}")
