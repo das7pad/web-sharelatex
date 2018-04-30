@@ -55,6 +55,8 @@ module.exports = ProjectImporter =
 						ProjectImporter._confirmExport v1_project_id, v2_project_id, user_id, cb
 				], (error) ->
 					if error?
+						# Since _initSharelatexProject created a v2 project we want to
+						# clean it up if any of these steps which happened afterwards fail.
 						ProjectDeleter.deleteProject v2_project_id, (deleteError) ->
 							if deleteError?
 								logger.err {deleteError, v1_project_id, v2_project_id}, "failed to delete imported project"
