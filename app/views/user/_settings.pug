@@ -5,7 +5,7 @@ each item in ['mendeley']
 	h3
 		| #{translate(item+"_integration")}
 
-	- if (!(user.features.mendeley || user.features.references) )
+	- if (!(user.features[item] || user.features.references) )
 		p.small #{translate(item+"_sync_description")}
 		.alert.alert-info
 			p #{translate(item+"_is_premium")}
