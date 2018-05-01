@@ -14,6 +14,7 @@ describe 'ReferencesApiHandler', ->
 			_id: @user_id
 			features:
 				mendeley: true
+				refProvider: true
 		@allFiles =
 			'/main.tex':  {_id: 'aaa', name: 'main.tex'}
 			'/other.tex': {_id: 'bbb', name: 'other.tex'}
