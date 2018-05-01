@@ -88,5 +88,3 @@ define [
         end: { row: e.to.line },
         action: if e.removed? then 'remove' else 'insert'
       }
-    afterUpdate: () ->
-      @editor.updateSpellOverlay()

@@ -1,12 +1,9 @@
-/* global _ */
-
 import CodeMirror, { Doc } from 'codemirror'
 
 import LatexMode from './latex_mode/latex_mode'
 import RichText from './rich_text/rich_text'
 import keyBindings from './key_bindings/key_bindings'
 import WordManager from './spell_check/word_manager'
-import makeSpellOverlay from './spell_check/spell_overlay'
 
 export class Editor {
   constructor (rootEl, adapter) {
@@ -21,9 +18,6 @@ export class Editor {
     })
     this.adapter = adapter
     this.wordManager = new WordManager(this.codeMirror)
-    this.spellOverlay = makeSpellOverlay(this.wordManager)
-
-    this.updateSpellOverlay = this.updateSpellOverlay.bind(this)
   }
 
   getCodeMirror () {
@@ -48,10 +42,5 @@ export class Editor {
 
   update () {
     this.richText.update()
-  }
-
-  updateSpellOverlay () {
-    this.codeMirror.removeOverlay(this.spellOverlay)
-    this.codeMirror.addOverlay(this.spellOverlay)
   }
 }

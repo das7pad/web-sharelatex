@@ -8,17 +8,28 @@ export default class WordManager {
     this.highlights = []
   }
 
-  getHighlights () {
-    return this.highlights
-  }
+  clearRow (lineNo) {
+    this.highlights = this.highlights.filter(({ marker }) => {
+      const pos = marker.find()
+      if (!pos) return false
 
-  clearRows (from = 0, to = this.highlights.length - 1) {
-    this.highlights.splice(from, to - from + 1)
+      return pos.from.line !== lineNo
+    })
   }
 
   addHighlight (highlight) {
-    const lineNo = highlight.row
-    const line = this.highlights[lineNo] || []
-    this.highlights[lineNo] = line.concat(highlight)
+    const { row: line, column: ch, word, suggestions } = highlight
+
+    const from = { line, ch }
+    const to = { line, ch: ch + word.length }
+    const marker = this.editor.markText(from, to, {
+      className: 'spelling-error'
+    })
+
+    this.highlights.push({
+      word,
+      suggestions,
+      marker
+    })
   }
 }
