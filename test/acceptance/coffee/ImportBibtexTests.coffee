@@ -15,7 +15,7 @@ describe "ImportBibtex", ->
 		@owner.login (error) =>
 			throw error if error?
 			conditions = { _id: new ObjectId(@owner.id) }
-			update = { $set: { 'features.references': true} }
+			update = { $set: { 'features.mendeley': true} }
 			db.users.update conditions, update, (error) =>
 				throw error if error?
 				@owner.createProject 'tpr-test-project', (error, project_id) =>
@@ -25,6 +25,7 @@ describe "ImportBibtex", ->
 
 	it 'can import a reference', (done) ->
 		@owner.request.post "/project/#{@project_id}/test_provider/bibtex/import", (error, response, body) =>
+			expect(response.statusCode).to.equal 201
 			ProjectEntityHandler.getAllFiles @project_id, (error, files) ->
 				throw error if error?
 				expect(files).to.have.key '/test_provider.bib'
