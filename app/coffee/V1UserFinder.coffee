@@ -22,7 +22,7 @@ V1UserFinder =
 						logger.err {userId, email}, "error getting v1 id"
 						return callback(err)
 
-					if v1Id
+					if v1Id?
 						return callback(null, email, true)
 					else
 						return callback(null, email, false)
