@@ -5,16 +5,18 @@ export default class WordManager {
   }
 
   reset () {
+    if (this.highlights) this.highlights.forEach(({ marker }) => marker.clear())
     this.highlights = []
   }
 
   clearRow (lineNo) {
-    this.highlights = this.highlights.filter(({ marker }) => {
-      const pos = marker.find()
-      if (!pos) return false
-
-      return pos.from.line !== lineNo
-    })
+    this.highlights
+      .filter(({ marker }) => {
+        const pos = marker.find()
+        if (!pos) return false
+        return pos.from.line === lineNo
+      })
+      .forEach((highlight) => this.removeHighlight(highlight))
   }
 
   addHighlight (highlight) {
