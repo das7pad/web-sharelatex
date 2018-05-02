@@ -69,9 +69,9 @@ module.exports = ProjectImporter =
 				logger.err {importError, v1_project_id, v1_project_id}, "failed to import project"
 				metrics.inc "project-import.error.total"
 				metrics.inc "project-import.error.#{importError.name}"
-				ProjectImporter._cancelExport v1_project_id, user_id, (cancelErrror) ->
-					if cancelErrror?
-						logger.err {cleanUpError, v1_project_id, v2_project_id}, "failed to cancel project import"
+				ProjectImporter._cancelExport v1_project_id, user_id, (cancelError) ->
+					if cancelError?
+						logger.err {cancelError, v1_project_id, v2_project_id}, "failed to cancel project import"
 					callback importError
 			else
 				metrics.inc "project-import.success"
