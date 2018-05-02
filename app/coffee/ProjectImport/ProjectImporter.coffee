@@ -18,9 +18,10 @@ ProjectDeleter = require "../../../../../app/js/Features/Project/ProjectDeleter"
 CollaboratorsHandler = require "../../../../../app/js/Features/Collaborators/CollaboratorsHandler"
 PrivilegeLevels = require "../../../../../app/js/Features/Authorization/PrivilegeLevels"
 {
-	UnsupportedFileTypeError,
-	UnsupportedBrandError,
+	UnsupportedFileTypeError
+	UnsupportedBrandError
 	UnsupportedExportRecordsError
+	V1HistoryNotSyncedError
 } = require "../../../../../app/js/Features/Errors/Errors"
 
 ENGINE_TO_COMPILER_MAP = {
@@ -31,7 +32,7 @@ ENGINE_TO_COMPILER_MAP = {
 }
 
 V1_HISTORY_SYNC_REQUEST_TIMES = [
-	0, 0.5, 1, 2, 5, 10, 30, 60, 120, 240, 360
+	0, 0.5, 1, 2, 5, 10, 30, 45
 ]
 
 module.exports = ProjectImporter =
@@ -234,26 +235,31 @@ module.exports = ProjectImporter =
 					logger.error {err: error, options}, "overleaf s3 error"
 					return callback(error)
 
-	V1_HISTORY_SYNC_RETRY_OPTIONS: {
-		times: V1_HISTORY_SYNC_REQUEST_TIMES.length
-		interval: (retryCount) ->
-			(V1_HISTORY_SYNC_REQUEST_TIMES[retryCount] - V1_HISTORY_SYNC_REQUEST_TIMES[retryCount - 1]) * 1000
-	}
-
 	_waitForV1HistoryExport: (v1_project_id, user_id, callback = (error) ->) ->
-		checkProject = (cb) ->
-			oAuthRequest user_id, {
-				url: "#{settings.overleaf.host}/api/v1/sharelatex/docs/#{v1_project_id}/export/history"
-				method: "GET"
-				json: true
-			}, (error, status) ->
-				if error?
-					cb error
-				else if status?.exported
-					cb()
+		ProjectImporter._checkV1HistoryExportStatus v1_project_id, user_id, 0, callback
+
+	_checkV1HistoryExportStatus: (v1_project_id, user_id, requestCount, callback = (error) ->) ->
+		oAuthRequest user_id, {
+			url: "#{settings.overleaf.host}/api/v1/sharelatex/docs/#{v1_project_id}/export/history"
+			method: "GET"
+			json: true
+		}, (error, status) ->
+			if !status?.exported
+				error ||= new V1HistoryNotSyncedError('v1 history not synced')
+
+			if error?
+				logger.log {v1_project_id, user_id, requestCount, error}, "error checking v1 history sync"
+				if requestCount >= V1_HISTORY_SYNC_REQUEST_TIMES.length
+					return callback(error)
 				else
-					cb new Error('v1 history not synced')
-		async.retry ProjectImporter.V1_HISTORY_SYNC_RETRY_OPTIONS, checkProject, callback
+					interval = (V1_HISTORY_SYNC_REQUEST_TIMES[requestCount + 1] - V1_HISTORY_SYNC_REQUEST_TIMES[requestCount]) * 1000
+					setTimeout(
+						() -> ProjectImporter._checkV1HistoryExportStatus v1_project_id, user_id, requestCount + 1, callback
+						interval
+					)
+			else
+				callback(null)
+
 
 	_confirmExport: (v1_project_id, v2_project_id, user_id, callback = (error) ->) ->
 		oAuthRequest user_id, {
