@@ -11,12 +11,17 @@ describe "LogInToV2Controller", ->
 		@LogInToV2Controller = SandboxedModule.require modulePath, requires:
 			"../../../../app/js/Features/Authentication/AuthenticationController":
 				@AuthenticationController = {}
+			"./V1UserFinder": @V1UserFinder =
+				hasV1AccountNotLinkedYet: (userId, callback)->
+					callback(null, "test@example.com", false)
+
 			"logger-sharelatex": { log: sinon.stub(), err: sinon.stub() }
 			"settings-sharelatex": @settings =
 				accountMerge:
 					betaHost: "http://beta.example.com"
 					secret: "banana"
 			"jsonwebtoken": @jwt = {}
+
 		@req = {}
 		@res =
 			redirect: sinon.stub()
