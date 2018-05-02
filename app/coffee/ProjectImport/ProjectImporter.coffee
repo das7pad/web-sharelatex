@@ -18,9 +18,10 @@ ProjectDeleter = require "../../../../../app/js/Features/Project/ProjectDeleter"
 CollaboratorsHandler = require "../../../../../app/js/Features/Collaborators/CollaboratorsHandler"
 PrivilegeLevels = require "../../../../../app/js/Features/Authorization/PrivilegeLevels"
 {
-	UnsupportedFileTypeError,
-	UnsupportedBrandError,
+	UnsupportedFileTypeError
+	UnsupportedBrandError
 	UnsupportedExportRecordsError
+	V1HistoryNotSyncedError
 } = require "../../../../../app/js/Features/Errors/Errors"
 
 ENGINE_TO_COMPILER_MAP = {
@@ -244,10 +245,11 @@ module.exports = ProjectImporter =
 			json: true
 		}, (error, status) ->
 			if !status?.exported
-				error ||= new Error('v1 history not synced')
+				error ||= new V1HistoryNotSyncedError('v1 history not synced')
 
 			if error?
-				if requestCount == V1_HISTORY_SYNC_REQUEST_TIMES.length
+				logger.log {v1_project_id, user_id, requestCount, error}, "error checking v1 history sync"
+				if requestCount >= V1_HISTORY_SYNC_REQUEST_TIMES.length
 					return callback(error)
 				else
 					interval = (V1_HISTORY_SYNC_REQUEST_TIMES[requestCount + 1] - V1_HISTORY_SYNC_REQUEST_TIMES[requestCount]) * 1000
