@@ -34,4 +34,17 @@ export default class WordManager {
       marker
     })
   }
+
+  findHighlightAtPosition (position) {
+    return this.highlights.find(({ marker }) => {
+      const markerPos = marker.find()
+      return (
+        markerPos &&
+        markerPos.from.line === position.line &&
+        markerPos.to.line === position.line &&
+        markerPos.from.ch <= position.ch &&
+        markerPos.to.ch >= position.ch
+      )
+    })
+  }
 }

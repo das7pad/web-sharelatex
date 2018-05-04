@@ -18,7 +18,7 @@ define [
         init = () ->
           requirejs ['rich-text'], ({ Editor }) ->
             richText = new Editor(
-              element.find('.cm-editor-wrapper')[0],
+              element.find('.cm-editor-body')[0],
               adapter
             )
             switchAttachment(scope.sharejsDoc)
@@ -50,6 +50,9 @@ define [
         handleChangeForSpellCheck = (_, event) ->
           @spellCheckManager.onChange(event)
 
+        handleContextMenu = (_, event) ->
+          @spellCheckManager.onContextMenu(event)
+
         attachToSpellCheck = () ->
           spellCheckCache = $cacheFactory.get("spellCheck-#{scope.name}") ||
             $cacheFactory("spellCheck-#{scope.name}", { capacity: 1000 })
@@ -61,10 +64,16 @@ define [
             new SpellCheckAdapter(richText)
           )
           @spellCheckManager.init()
-          richText.getCodeMirror().on 'change', handleChangeForSpellCheck
+          codeMirror = richText.getCodeMirror()
+          codeMirror.on 'change', handleChangeForSpellCheck
+          codeMirror.on 'contextmenu', handleContextMenu
+          codeMirror.on 'scroll', spellCheckManager.onScroll
 
         detachFromSpellCheck = () ->
-          richText.getCodeMirror().off 'change', handleChangeForSpellCheck
+          codeMirror = richText.getCodeMirror()
+          codeMirror.off 'change', handleChangeForSpellCheck
+          codeMirror.off 'contextmenu', handleContextMenu
+          codeMirror.off 'scroll', spellCheckManager.onScroll
 
         scope.$on 'destroy', () ->
           detachFromSpellCheck()
@@ -74,7 +83,15 @@ define [
         init()
 
       template: """
-        <div class="cm-editor-wrapper rich-text"></div>
+        <div class="cm-editor-wrapper rich-text">
+          <div class="cm-editor-body">
+          <spell-menu
+            open="spellMenu.open"
+            top="spellMenu.top"
+            left="spellMenu.left"
+            suggestions="spellMenu.suggestions"
+          ></spell-menu>
+        </div>
       """
     }
 
@@ -88,3 +105,21 @@ define [
         end: { row: e.to.line },
         action: if e.removed? then 'remove' else 'insert'
       }
+    getCoordsFromContextMenuEvent: (e) ->
+      e.stopPropagation()
+      return {
+        x: e.pageX
+        y: e.pageY
+      }
+    preventContextMenuEventDefault: (e) ->
+      e.preventDefault()
+    getHighlightFromCoords: (coords) ->
+      position = @editor.getCodeMirror().coordsChar({
+        left: coords.x,
+        top: coords.y
+      })
+      @wordManager.findHighlightAtPosition(position)
+    selectHighlightedWord: (highlight) ->
+      position = highlight.marker.find()
+      # TODO: handle removed markers?
+      @editor.getCodeMirror().setSelection(position.from, position.to)
