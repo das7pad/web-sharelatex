@@ -35,6 +35,11 @@ export default class WordManager {
     })
   }
 
+  removeHighlight (highlight) {
+    highlight.marker.clear()
+    this.highlights = this.highlights.filter((hl) => hl !== highlight)
+  }
+
   findHighlightAtPosition (position) {
     return this.highlights.find(({ marker }) => {
       const markerPos = marker.find()

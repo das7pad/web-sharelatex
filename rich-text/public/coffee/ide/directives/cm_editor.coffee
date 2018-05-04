@@ -89,7 +89,9 @@ define [
             open="spellMenu.open"
             top="spellMenu.top"
             left="spellMenu.left"
-            suggestions="spellMenu.suggestions"
+            highlight="spellMenu.highlight"
+            replace-word="replaceWord(highlight, suggestion)"
+            learn-word="learnWord(highlight)"
           ></spell-menu>
         </div>
       """
@@ -123,3 +125,7 @@ define [
       position = highlight.marker.find()
       # TODO: handle removed markers?
       @editor.getCodeMirror().setSelection(position.from, position.to)
+    replaceWord: (highlight, newWord) =>
+      codeMirror = @editor.getCodeMirror()
+      codeMirror.replaceSelection(newWord)
+      codeMirror.focus()
