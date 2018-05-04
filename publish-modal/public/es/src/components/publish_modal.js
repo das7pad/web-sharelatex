@@ -37,7 +37,9 @@ export default class PublishModal extends Component {
         onSwitch={this.handleSwitch}
       />)
     }
-    if (this.state.shown === 'guide' || this.state.shown === 'export') {
+    if (this.state.shown === 'guide' ||
+        this.state.shown === 'exportGuide' ||
+        this.state.shown === 'export') {
       return (<GuidePublishModal
         onSwitch={this.handleSwitch}
         entries={entries}

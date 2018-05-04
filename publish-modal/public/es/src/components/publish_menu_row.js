@@ -21,7 +21,7 @@ function generateEntry (entry, onSwitch, displayCategory) {
   var switchTo, linkClass
 
   if (entry.partner) {
-    switchTo = 'export'
+    switchTo = 'exportGuide'
   } else {
     switchTo = 'guide'
   }
