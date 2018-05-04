@@ -20,6 +20,7 @@ describe "MetricsController", ->
 				getUser: sinon.stub()
 			'../../../../app/js/Features/Project/ProjectGetter': @ProjectGetter =
 				getProject: sinon.stub()
+			'../../../../app/js/Features/Subscription/SubscriptionLocator': @SubscriptionLocator = {}
 			'logger-sharelatex':
 				err: sinon.stub()
 				log: sinon.stub()
@@ -33,11 +34,20 @@ describe "MetricsController", ->
 				_id: @user_id
 				overleaf:
 					id: 45
+			@memberSubscriptions = [
+			  { _id: '5ad60490c34621025f26006a' },
+			  { _id: '5ae8366062616006e8eb07d0' }
+			]
 			@UserGetter.getUser = sinon.stub().callsArgWith(2, null, @user)
+			@SubscriptionLocator.getMemberSubscriptions = sinon.stub().callsArgWith(1, null, @memberSubscriptions)
 			@response = {statusCode: 201}
-			@body = {one: 1}
+			@v1Segmentation = {
+				id : 1,
+				teamIds: [3, 4],
+				affiliationIds: [5, 7]
+			}
 			@request.reset()
-			@request.callsArgWith(1, null, @response, @body)
+			@request.callsArgWith(1, null, @response, @v1Segmentation)
 			@res =
 				json: sinon.stub()
 			@next = sinon.stub()
@@ -51,7 +61,17 @@ describe "MetricsController", ->
 
 		it 'should send a json response with the body', (done) ->
 			@call()
-			@res.json.calledWith(@body).should.equal true
+
+			@res.json.callCount.should.equal 1
+			response = @res.json.lastCall.args[0]
+
+			expect(response).to.deep.equal({
+				id : 1,
+				teamIds: [3, 4],
+				affiliationIds: [5, 7],
+				v2TeamIds: ['5ad60490c34621025f26006a', '5ae8366062616006e8eb07d0']
+			})
+
 			done()
 
 	describe 'projectMetricsSegmentation', ->
