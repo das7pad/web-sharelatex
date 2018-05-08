@@ -12,4 +12,4 @@ define [
 
 				requirejs ['publish-modal'], (pm) ->
 					modalBody = document.getElementsByClassName("modal-body-publish")[0]
-					pm.init(modalBody, $scope.project_id, $scope.pdf.downloadUrl)
+					pm.init(modalBody, $scope.project_id)
