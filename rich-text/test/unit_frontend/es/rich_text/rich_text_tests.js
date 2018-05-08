@@ -2,12 +2,7 @@
 
 import fixture from '../../../../../../test/unit_frontend/es/support/fixture'
 import { stubMathJax, teardownMathJax } from '../support/stub_mathjax'
-import {
-  init,
-  enableRichText,
-  disableRichText,
-  updateRichText
-} from '../../../../public/es/index'
+import { Editor } from '../../../../public/es/index'
 
 const FIXTURE_HTML = '<div></div>'
 
@@ -17,13 +12,14 @@ describe('RichText', function () {
 
   beforeEach(function () {
     this.rtAdapter = {}
-    this.cm = init(fixture.load(FIXTURE_HTML))
-    enableRichText(this.cm, this.rtAdapter)
+    this.editor = new Editor(fixture.load(FIXTURE_HTML), this.rtAdapter)
+    this.cm = this.editor.getCodeMirror()
+    this.editor.enable()
   })
 
   afterEach(function () {
     fixture.cleanUp()
-    disableRichText()
+    this.editor.disable()
   })
 
   it('formats a typed section heading', function () {
@@ -90,7 +86,7 @@ describe('RichText', function () {
     expect(this.cm.getAllMarks()[0].wlValue).to.equal('$a$')
 
     this.cm.replaceRange('b', { line: 0, ch: 1 }, { line: 0, ch: 2 })
-    updateRichText()
+    this.editor.update()
 
     expect(this.cm.getAllMarks().length).to.equal(1)
     expect(this.cm.getValue()).to.equal('$b$\n')
@@ -99,11 +95,11 @@ describe('RichText', function () {
 
   it('should ignore updates when disabled', function () {
     // regression: was not checking enabled/disabled on external update call
-    disableRichText()
+    this.editor.disable()
     type(this.cm, '\\section{test}\n')
     expect(this.cm.getAllMarks().length).to.equal(0)
 
-    updateRichText()
+    this.editor.update()
     expect(this.cm.getAllMarks().length).to.equal(0)
   })
 
@@ -136,7 +132,7 @@ describe('RichText', function () {
     type(this.cm, '\\textbf{}')
     expect(this.cm.getAllMarks().length).to.equal(3)
 
-    updateRichText()
+    this.editor.update()
     expect(this.cm.getAllMarks().length).to.equal(3)
   })
 
@@ -305,7 +301,7 @@ describe('RichText', function () {
 
     expect(this.cm.getAllMarks().length).to.equal(3)
 
-    updateRichText()
+    this.editor.update()
     this.cm.replaceRange('', { line: 0, ch: 9 }, { line: 0, ch: 10 })
 
     expect(this.cm.getAllMarks().length).to.equal(0)

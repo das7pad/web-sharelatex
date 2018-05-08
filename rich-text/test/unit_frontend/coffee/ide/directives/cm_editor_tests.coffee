@@ -16,60 +16,58 @@ define [
 
     afterEach () ->
       window.requirejs = origRequireJsFn
+      Editor.prototype.getCodeMirror.reset()
+      Editor.prototype.openDoc.reset()
+      Editor.prototype.enable.reset()
+      Editor.prototype.disable.reset()
+      Editor.prototype.update.reset()
 
     it 'inits Rich Text', () ->
-      @requirejs.callsArgWith(1, stubRichText({
-        init: richTextInit = sinon.stub()
-      }))
+      editorStub = sinon.stub().returns({
+        getCodeMirror: sinon.stub().returns({ off: sinon.stub() }),
+        disable: sinon.stub()
+      })
+      @requirejs.callsArgWith(1, Editor: editorStub)
       inject ($compile, $rootScope) ->
         $rootScope.sharejsDoc = stubSharejsDoc()
         $compile('<div cm-editor sharejs-doc="sharejsDoc"></div>')($rootScope)
-        expect(richTextInit).to.have.been.called
+        expect(editorStub).to.have.been.called
 
     it 'attaches to CM', () ->
-      init = sinon.stub().returns(cm = {}) # Stub initing CM and returning instance
-      @requirejs.callsArgWith(1, stubRichText({
-        init: init
-        openDoc: openDoc = sinon.stub()
-        enableRichText: enableRichText = sinon.stub()
-      }))
+      getCodeMirror = Editor.prototype.getCodeMirror
+      openDoc = Editor.prototype.openDoc
+      enable = Editor.prototype.enable
+      @requirejs.callsArgWith(1, Editor: Editor)
       inject ($compile, $rootScope, $browser) ->
         $rootScope.sharejsDoc = stubSharejsDoc({
-          getSnapshot: getSnapshot = sinon.stub()
+          getSnapshot: getSnapshot = sinon.stub().returns(snapshot = {})
           attachToCM: attachToCM = sinon.stub()
         })
 
         $compile('<div cm-editor sharejs-doc="sharejsDoc"></div>')($rootScope)
         $rootScope.$digest()
 
+        expect(getCodeMirror).to.have.been.called
         expect(getSnapshot).to.have.been.called
         expect(openDoc).to.have.been.called
+        expect(openDoc.firstCall.args[0]).to.equal(snapshot)
         expect(attachToCM).to.have.been.called
-        expect(enableRichText).to.have.been.called
-        expect(enableRichText.firstCall.args[0]).to.equal(cm)
-        expect(enableRichText.firstCall.args[1]).to.be.an.instanceof(
-          RichTextAdapter
-        )
+        expect(enable).to.have.been.called
 
     it 'calls updateRichText when remoteop event is trigger', () ->
-      @requirejs.callsArgWith(1, stubRichText({
-        init: sinon.stub().returns({})
-        updateRichText: updateRichText = sinon.stub()
-      }))
+      update = Editor.prototype.update
+      @requirejs.callsArgWith(1, Editor: Editor)
       inject ($compile, $rootScope) ->
         $rootScope.sharejsDoc = stubSharejsDoc()
         $compile('<div cm-editor sharejs-doc="sharejsDoc"></div>')($rootScope)
         $rootScope.$digest()
 
         $rootScope.sharejsDoc.trigger('remoteop')
-        expect(updateRichText).to.have.been.called
-
-
+        expect(update).to.have.been.called
+  
     it 'detaches from CM when destroyed', () ->
-      @requirejs.callsArgWith(1, stubRichText({
-        init: sinon.stub().returns({})
-        disableRichText: disableRichText = sinon.stub()
-      }))
+      disable = Editor.prototype.disable
+      @requirejs.callsArgWith(1, Editor: Editor)
       inject ($compile, $rootScope) ->
         $rootScope.sharejsDoc = stubSharejsDoc({
           detachFromCM: detachFromCM = sinon.stub()
@@ -80,16 +78,19 @@ define [
         $rootScope.$broadcast('$destroy')
 
         expect(detachFromCM).to.have.been.called
-        expect(disableRichText).to.have.been.called
+        expect(disable).to.have.been.called
 
-  stubRichText = (overrides = {}) ->
-    _.defaults(overrides, {
-      init: sinon.stub()
-      openDoc: sinon.stub()
-      enableRichText: sinon.stub()
-      disableRichText: sinon.stub()
-      updateRichText: sinon.stub()
-    })
+  stubCodeMirror = (overrides = {}) ->
+    _.extend({
+      getValue: sinon.stub().returns('some text')
+    }, overrides, EventEmitter.prototype)
+
+  class Editor
+    getCodeMirror: sinon.stub().returns(stubCodeMirror())
+    openDoc: sinon.stub()
+    enable: sinon.stub()
+    disable: sinon.stub()
+    update: sinon.stub()
 
   stubSharejsDoc = (overrides = {}) ->
     _.extend({

@@ -1,12 +1,13 @@
 import fixture from '../../../../../../test/unit_frontend/es/support/fixture'
-import { init } from '../../../../public/es/index'
+import { Editor } from '../../../../public/es/index'
 import * as TextWrapping from '../../../../public/es/key_bindings/text_wrapping'
 
 const TEXTAREA_HTML = '<textarea></textarea>'
 
 describe('Text wrapping', function () {
   beforeEach(function () {
-    this.cm = init(fixture.load(TEXTAREA_HTML))
+    this.editor = new Editor(fixture.load(TEXTAREA_HTML), {})
+    this.cm = this.editor.getCodeMirror()
   })
 
   afterEach(function () {

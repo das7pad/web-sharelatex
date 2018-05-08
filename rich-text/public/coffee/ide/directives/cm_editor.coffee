@@ -45,7 +45,6 @@ define [
         detachFromCM = (sharejsDoc) ->
           sharejsDoc.detachFromCM()
           sharejsDoc.off "remoteop.richtext"
-          richText.disableRichText()
 
         handleChangeForSpellCheck = (_, event) ->
           @spellCheckManager.onChange(event)
@@ -67,15 +66,15 @@ define [
           codeMirror = richText.getCodeMirror()
           codeMirror.on 'change', handleChangeForSpellCheck
           codeMirror.on 'contextmenu', handleContextMenu
-          codeMirror.on 'scroll', spellCheckManager.onScroll
+          codeMirror.on 'scroll', @spellCheckManager?.onScroll
 
         detachFromSpellCheck = () ->
           codeMirror = richText.getCodeMirror()
           codeMirror.off 'change', handleChangeForSpellCheck
           codeMirror.off 'contextmenu', handleContextMenu
-          codeMirror.off 'scroll', spellCheckManager.onScroll
+          codeMirror.off 'scroll', @spellCheckManager?.onScroll
 
-        scope.$on 'destroy', () ->
+        scope.$on '$destroy', () ->
           detachFromSpellCheck()
           detachFromCM(scope.sharejsDoc)
           richText.disable()
