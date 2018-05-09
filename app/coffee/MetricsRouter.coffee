@@ -13,6 +13,12 @@ module.exports =
 
 		logger.log {}, "Init metrics router"
 
+		webRouter.get(
+			'/metrics/teams/:teamId/',
+			AuthenticationController.requireLogin(),
+			MetricsController.metricsApp
+		)
+
 		privateApiRouter.get(
 			'/user/:user_id/v1/metrics_segmentation',
 			AuthenticationController.httpAuth,

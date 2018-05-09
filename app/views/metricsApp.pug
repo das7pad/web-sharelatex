@@ -1,0 +1,22 @@
+extends ../../../../app/views/layout
+
+block content
+	.content.content-alt
+		.container
+			button#metrics-dates
+			div#metrics-container
+
+block requirejs
+	script(type="text/javascript").
+		var METRICS_ENDPOINT = 'http://www.sharelatex.test:3050/graphs';
+		var METRICS_RESOURCE_ID = '5';
+		var METRICS_RESOURCE_TYPE = 'team';
+
+	script(
+			src=buildWebpackPath('es/metrics.js', {hashedPath:settings.useMinifiedJs})
+			type="text/javascript"
+		)
+
+	script(type="text/javascript").
+		debugger
+		Frontend.metrics.metricsApp.init()

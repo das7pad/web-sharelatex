@@ -10,4 +10,4 @@
 //= require ./views/metric
 //= require ./views/lags
 
-//= require ./helpers/lags
+//= require ./helpers/lag

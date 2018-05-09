@@ -1,10 +1,15 @@
 settings = require 'settings-sharelatex'
 request = require 'request'
+Path = require("path")
+async = require 'async'
 UserGetter = require '../../../../app/js/Features/User/UserGetter'
 ProjectGetter = require '../../../../app/js/Features/Project/ProjectGetter'
 logger = require 'logger-sharelatex'
 
 module.exports = MetricsController =
+
+	metricsApp: (req, res, next) ->
+		res.render Path.resolve(__dirname, "../views/metricsApp"), req.query
 
 	userMetricsSegmentation: (req, res, next) ->
 		userId = req.params.user_id
