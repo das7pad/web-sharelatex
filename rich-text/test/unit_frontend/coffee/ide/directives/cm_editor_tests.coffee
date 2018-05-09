@@ -54,7 +54,7 @@ define [
         expect(attachToCM).to.have.been.called
         expect(enable).to.have.been.called
 
-    it 'calls updateRichText when remoteop event is trigger', () ->
+    it 'calls Editor.update when remoteop event is trigger', () ->
       update = Editor.prototype.update
       @requirejs.callsArgWith(1, Editor: Editor)
       inject ($compile, $rootScope) ->
@@ -64,7 +64,7 @@ define [
 
         $rootScope.sharejsDoc.trigger('remoteop')
         expect(update).to.have.been.called
-  
+
     it 'detaches from CM when destroyed', () ->
       disable = Editor.prototype.disable
       @requirejs.callsArgWith(1, Editor: Editor)
