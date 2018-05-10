@@ -19,6 +19,12 @@ module.exports =
 			MetricsController.metricsApp
 		)
 
+		webRouter.get(
+			'/metrics/teams/:teamId/:startDate/:endDate/',
+			AuthenticationController.requireLogin(),
+			MetricsController.metricsApp
+		)
+
 		privateApiRouter.get(
 			'/user/:user_id/v1/metrics_segmentation',
 			AuthenticationController.httpAuth,
