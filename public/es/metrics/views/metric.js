@@ -1,6 +1,9 @@
 import template from '../templates/metrics.metric.handlebars';
 import footerTemplate from '../templates/metrics.metric-footer.handlebars';
 import lag from '../helpers/lag';
+import merge from 'underscore';
+
+import chartApp from '../../charts/chart_app';
 
 export const MetricView = Backbone.View.extend({
   tagName: 'div',
@@ -75,7 +78,7 @@ export const MetricView = Backbone.View.extend({
   renderChart: function(data) {
     var $svgElt = this.$('svg');
     var chartArguments = [this.model.get('key')];
-    chartArguments = _.merge(chartArguments, this.model.get('options'));
+    chartArguments = merge(chartArguments, this.model.get('options'));
     chartArguments.push("lag-" + lag.selected);
     var chartOptions = chartApp.getChartOptions.apply(this, chartArguments);
     if(this.chart) {

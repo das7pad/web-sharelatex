@@ -1,5 +1,5 @@
 import { map, keys } from 'underscore';
-import metricsApp from '../metricsApp';
+import metricsApp from '../metrics_app';
 
 const lag = {};
 

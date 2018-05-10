@@ -1,5 +1,5 @@
 import lag from '../helpers/lag';
-import metricsApp from '../metricsApp';
+import metricsApp from '../metrics_app';
 import { bind } from 'underscore';
 
 export const Metric = Backbone.Model.extend({

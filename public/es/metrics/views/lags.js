@@ -1,5 +1,6 @@
 import lag from '../helpers/lag'
 import template from '../templates/metrics.lags.handlebars'
+import includes from 'underscore'
 
 export const LagsView = Backbone.View.extend({
   el: '#lags-container',
@@ -27,7 +28,7 @@ export const LagsView = Backbone.View.extend({
    */
   lagClick: function(ev) {
     var lag = $(ev.currentTarget).data('lag');
-    if(_.includes(lag.keys, lag)) {
+    if(includes(lag.keys, lag)) {
       this.switchLag(lag);
     }
     return false;

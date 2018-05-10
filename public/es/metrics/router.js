@@ -1,7 +1,7 @@
 import Backbone from 'backbone';
 import moment from 'moment/src/moment';
 import dateRangePicker from './lib/date_range_picker';
-import metricsApp from './metricsApp';
+import metricsApp from './metrics_app';
 import lag from './helpers/lag';
 
 var Router = Backbone.Router.extend({
@@ -77,7 +77,6 @@ var Router = Backbone.Router.extend({
     }
 
     if(wantedLag !== lag.selected) {
-      debugger
       lag.selected = wantedLag;
       Backbone.trigger('lag:refresh')
     }

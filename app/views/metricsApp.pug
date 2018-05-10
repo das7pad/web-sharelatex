@@ -2,9 +2,9 @@ extends ../../../../app/views/layout
 
 block content
 	.content.content-alt
-		.container
+		#metrics.container
 			button#metrics-dates
-			div#metrics-container
+			div#metrics-container.row
 
 block requirejs
 	script(type="text/javascript").
@@ -18,5 +18,7 @@ block requirejs
 		)
 
 	script(type="text/javascript").
-		debugger
-		Frontend.metrics.metricsApp.init()
+		$(function() {
+			Frontend.metrics.chartApp.init();
+			Frontend.metrics.metricsApp.init();
+		})
