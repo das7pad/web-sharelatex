@@ -81,7 +81,6 @@ var createChart = function($svgElt, options) {
   // fix header formatting so the date always use the yAxis format
   if(chart.interactiveLayer) {
     chart.interactiveLayer.tooltip.headerFormatter(function (data) {
-      console.log("Options 2", options)
       return options.xAxisFormat(data);
     });
   }
@@ -90,33 +89,6 @@ var createChart = function($svgElt, options) {
 
   chartApp.charts.push(chart);
   return chart;
-};
-
-/**
- * Add custom colours to each dataset in a graph. Colours are shades of blue
- * for the first 5 datasets, then shades of grey. Useful when all dataset for
- * a graph are related.
- */
-var formatShadedColor = function(data) {
-  var choosenColour, colourR, colourG, colourB;
-
-  // loop over all datasets
-  each(data, function(lineData, i) {
-    if(i < 5 ) {
-      // first 5 colours are shades of blue (from dark to light)
-      colourR = 71 + (255 - 71) / 5 * i;
-      colourG = 107 + (255 - 107) / 5 * i;
-      colourB = 190 + (255 - 190) / 5 * i;
-    } else {
-      // remaining colours are shades of grey (from light to dark)
-      colourR = colourG = colourB = 255 - 255 / data.length * i;
-    }
-    lineData.color = "#" +
-      parseInt(colourR).toString(16) +
-      parseInt(colourG).toString(16) +
-      parseInt(colourB).toString(16);
-  });
-  return data;
 };
 
 export { createChart };

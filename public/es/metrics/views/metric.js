@@ -1,7 +1,7 @@
 import template from '../templates/metrics.metric.handlebars';
 import footerTemplate from '../templates/metrics.metric-footer.handlebars';
 import lag from '../helpers/lag';
-import merge from 'underscore';
+import merge from 'lodash/merge';
 
 import chartApp from '../../charts/chart_app';
 
