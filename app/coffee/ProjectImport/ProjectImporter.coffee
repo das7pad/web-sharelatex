@@ -96,31 +96,35 @@ module.exports = ProjectImporter =
 			return callback(new UnsupportedExportRecordsError("project has export records"))
 		if doc.title == ""
 			doc.title = "Untitled"
-		ProjectCreationHandler.createBlankProject user_id, doc.title, doc.id, (error, project) ->
-			return callback(error) if error?
-			project.overleaf.id = doc.id
-			project.overleaf.imported_at_ver_id = doc.latest_ver_id
-			project.overleaf.history.display = true
-			if doc.template_id?
-				project.fromV1TemplateId = doc.template_id
-				project.fromV1TemplateVersionId = doc.template_ver_id
 
-			project.tokens = {
-				readOnly: doc.read_token,
+		attributes =
+			overleaf:
+				id: doc.id
+				imported_at_ver_id: doc.latest_ver_id
+				history:
+					display: true
+					id: doc.id
+			tokens:
+				readOnly: doc.read_token
 				readAndWrite: doc.token
-			}
-			if doc.general_access == 'none'
-				project.publicAccesLevel = 'private'
-			else if doc.general_access == 'read_write'
-				project.publicAccesLevel = 'tokenBased'
-			if ENGINE_TO_COMPILER_MAP[doc.latex_engine]?
-				project.compiler = ENGINE_TO_COMPILER_MAP[doc.latex_engine]
-			# allow imported projects to use a separate image
-			if settings.importedImageName?
-				project.imageName = settings.importedImageName
-			project.save (error) ->
-				return callback(error) if error?
-				return callback(null, doc, project._id)
+
+		if doc.template_id?
+			attributes.fromV1TemplateId = doc.template_id
+			attributes.fromV1TemplateVersionId = doc.template_ver_id
+
+		if doc.general_access == 'none'
+			attributes.publicAccesLevel = 'private'
+		else if doc.general_access == 'read_write'
+			attributes.publicAccesLevel = 'tokenBased'
+		if ENGINE_TO_COMPILER_MAP[doc.latex_engine]?
+			attributes.compiler = ENGINE_TO_COMPILER_MAP[doc.latex_engine]
+		# allow imported projects to use a separate image
+		if settings.importedImageName?
+			attributes.imageName = settings.importedImageName
+
+		ProjectCreationHandler.createBlankProject user_id, doc.title, attributes, (error, project) ->
+			return callback(error) if error?
+			return callback(null, doc, project._id)
 
 	_importInvites: (project_id, invites = [], callback = (error) ->) ->
 		async.mapSeries(invites, (invite, cb) ->

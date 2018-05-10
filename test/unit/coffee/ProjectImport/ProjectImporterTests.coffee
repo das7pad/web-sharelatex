@@ -117,27 +117,26 @@ describe "ProjectImporter", ->
 				@ProjectImporter._initSharelatexProject @user_id, @doc, @callback
 
 			it "should create the project", ->
+				attributes =
+					overleaf:
+						id: @doc.id
+						imported_at_ver_id: @doc.latest_ver_id
+						history:
+							id: @doc.id
+							display: true
+					tokens:
+						readOnly: @doc.read_token
+						readAndWrite: @doc.token
+					fromV1TemplateId: @doc.template_id
+					fromV1TemplateVersionId: @doc.template_ver_id
+					publicAccesLevel: 'tokenBased'
+					compiler: "latex"
+
+				console.log 'expected', [@user_id, @doc.title, attributes]
+				console.log 'actual', @ProjectCreationHandler.createBlankProject.args[0].slice(0,-1)
 				@ProjectCreationHandler.createBlankProject
-					.calledWith(@user_id, @doc.title, @doc.id)
+					.calledWith(@user_id, @doc.title, attributes)
 					.should.equal true
-
-			it "should set overleaf metadata on the project", ->
-				@project.overleaf.id.should.equal @doc.id
-				@project.overleaf.imported_at_ver_id.should.equal @doc.latest_ver_id
-				@project.overleaf.history.display.should.equal true
-				@project.tokens.readAndWrite.should.equal @doc.token
-				@project.tokens.readOnly.should.equal @doc.read_token
-				@project.fromV1TemplateId.should.equal @doc.template_id
-				@project.fromV1TemplateVersionId.should.equal @doc.template_ver_id
-
-			it "should set the appropriate project compiler from the latex_engine", ->
-				@project.compiler.should.equal "latex"
-
-			it 'should set the project to tokenBased', ->
-				@project.publicAccesLevel.should.equal 'tokenBased'
-
-			it "should save the project", ->
-				@project.save.called.should.equal true
 
 			it "should return the doc and project id", ->
 				@callback.calledWith(null, @doc, @project._id).should.equal true
@@ -200,9 +199,8 @@ describe "ProjectImporter", ->
 
 			it "should set the title to 'Untitled'", ->
 				@ProjectCreationHandler.createBlankProject
-					.calledWith(@user_id, 'Untitled', @doc.id)
+					.calledWith(@user_id, 'Untitled')
 					.should.equal true
-
 
 	describe "_startExport", ->
 		beforeEach ->
