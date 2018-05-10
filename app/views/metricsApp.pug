@@ -2,9 +2,27 @@ extends ../../../../app/views/layout
 
 block content
 	.content.content-alt
-		#metrics.container
-			button#metrics-dates
-			div#metrics-container.row
+		.container
+			#metrics-header.row
+			.col-lg-9
+				.section_header
+					h3 Team Metrics
+			#filters-container.col-lg-3
+				#dates-container
+					button(name="button" type="submit" id="metrics-dates" class="button-as-link" data-min-date="1498760463")
+						span April 10, 2018 to May 9, 2018
+						b(class="caret print-hidden")
+				br
+				span.by by
+				span#lags-container
+					span.dropdown
+						a.dropdown-toggle(data-toggle="dropdown")
+							Day
+							b.class="caret print-hidden"
+							
+			#metrics.container
+				button#metrics-dates
+				div#metrics-container.row
 
 block requirejs
 	script(type="text/javascript").
