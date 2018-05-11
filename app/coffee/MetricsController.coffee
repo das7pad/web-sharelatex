@@ -21,8 +21,10 @@ module.exports = MetricsController =
 		(err, results) ->
 			return next(err) if err?
 
-			segmentation = results[0] || {}
-			segmentation['v2TeamIds'] = results[1].map (s) -> s._id
+			segmentation  = results[0] || {}
+			subscriptions = results[1] || []
+
+			segmentation['v2TeamIds'] = subscriptions.map (s) -> s._id
 
 			res.json segmentation
 		)

@@ -74,6 +74,24 @@ describe "MetricsController", ->
 
 			done()
 
+		it 'works if the user is not member of any team', (done) ->
+			@SubscriptionLocator.getMemberSubscriptions = sinon.stub()
+				.callsArgWith(1, null, null)
+
+			@call()
+
+			@res.json.callCount.should.equal 1
+			response = @res.json.lastCall.args[0]
+
+			expect(response).to.deep.equal({
+				id : 1,
+				teamIds: [3, 4],
+				affiliationIds: [5, 7]
+				v2TeamIds: [],
+			})
+
+			done()
+
 	describe 'projectMetricsSegmentation', ->
 		beforeEach ->
 			@req =
