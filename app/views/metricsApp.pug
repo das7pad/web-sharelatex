@@ -20,9 +20,9 @@ block content
 
 block requirejs
 	script(type="text/javascript").
-		var METRICS_ENDPOINT = 'http://www.sharelatex.test:3050/graphs';
-		var METRICS_RESOURCE_ID = '5';
-		var METRICS_RESOURCE_TYPE = 'team';
+		var METRICS_ENDPOINT = '#{metricsEndpoint}';
+		var METRICS_RESOURCE_ID = '#{resourceId}';
+		var METRICS_RESOURCE_TYPE = '#{resourceType}';
 
 	script(
 			src=buildWebpackPath('es/metrics.js', {hashedPath:settings.useMinifiedJs})

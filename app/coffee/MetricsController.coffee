@@ -8,8 +8,20 @@ logger = require 'logger-sharelatex'
 
 module.exports = MetricsController =
 
-	metricsApp: (req, res, next) ->
-		res.render Path.resolve(__dirname, "../views/metricsApp"), req.query
+	teamMetrics: (req, res, next) ->
+		res.render Path.resolve(__dirname, '../views/metricsApp'), {
+			metricsEndpoint: "/graphs",
+			resourceId: req.params.teamId,
+			resourceType: 'team',
+		}
+
+	analyticsProxy: (req, res, next) ->
+		analyticsUrl = settings.apis.analytics.url + req.originalUrl
+		logger.log req.query, "requesting from analytics #{analyticsUrl}"
+		request
+			.get(analyticsUrl)
+			.on('error', (err) => next(err))
+			.pipe(res)
 
 	userMetricsSegmentation: (req, res, next) ->
 		userId = req.params.user_id
