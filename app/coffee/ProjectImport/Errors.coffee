@@ -35,5 +35,10 @@ IMPORT_ERRORS = {
 }
 
 module.exports = Errors =
+	V2ExportCompleted: V2ExportCompleted
+	V2ExportInProgress: V2ExportInProgress
+	V2ExportNotInProgress: V2ExportNotInProgress
+	V1ExportInProgress: V1ExportInProgress
+
 	fromErrorCode: (error_code, message, error_data) ->
 		new IMPORT_ERRORS[error_code](message, error_data)
