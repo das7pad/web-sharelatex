@@ -53,7 +53,9 @@ module.exports = UserMapper =
 					accessToken: accessToken
 					refreshToken: refreshToken
 				},
-				email: email
+				email: email,
+				ace:
+					theme: 'overleaf'
 			}
 			if user_stub?
 				new_user._id = user_stub._id
