@@ -97,6 +97,8 @@ describe "UserMapper", ->
 							accessToken: @accessToken
 							refreshToken: @refreshToken
 						}
+						ace:
+							theme: 'overleaf'
 					})
 					.should.equal true
 			
@@ -122,6 +124,8 @@ describe "UserMapper", ->
 							accessToken: @accessToken
 							refreshToken: @refreshToken
 						}
+						ace:
+							theme: 'overleaf'
 					})
 					.should.equal true
 			
