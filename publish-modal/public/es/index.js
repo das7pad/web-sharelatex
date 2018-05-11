@@ -2,7 +2,7 @@ import PublishModal from './src/components/publish_modal'
 import ReactDOM from 'react-dom'
 import React from 'react'
 
-export function init (rootEl, projectId) {
+export function init (rootEl, projectId, pdfUrl) {
   $.ajax({
     url: '/journals',
     type: 'GET',
@@ -10,7 +10,8 @@ export function init (rootEl, projectId) {
       var entries = JSON.parse(jsonResponse)
       var props = {entries: entries,
         projectId: projectId,
-        initialShown: 'basic'
+        initialShown: 'basic',
+        pdfUrl: pdfUrl
       }
       ReactDOM.render(
         React.createElement(PublishModal, props),

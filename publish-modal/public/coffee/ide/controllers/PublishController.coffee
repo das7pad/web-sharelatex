@@ -11,5 +11,8 @@ define [
 				)
 
 				requirejs ['publish-modal'], (pm) ->
+					if ($scope.pdf)
+						downloadLink = $scope.pdf.downloadUrl
+
 					modalBody = document.getElementsByClassName("modal-body-publish")[0]
-					pm.init(modalBody, $scope.project_id)
+					pm.init(modalBody, $scope.project_id, downloadLink)
