@@ -32,7 +32,6 @@ define [], () ->
 
     selectHighlightedWord: (highlight) ->
       position = highlight.marker.find()
-      # TODO: handle removed markers?
       @editor.getCodeMirror().setSelection(position.from, position.to)
 
     replaceWord: (highlight, newWord) =>

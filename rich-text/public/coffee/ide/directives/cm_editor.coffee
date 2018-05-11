@@ -50,9 +50,6 @@ define [
         handleChangeForSpellCheck = (_, event) ->
           @spellCheckManager.onChange(event)
 
-        handleContextMenu = (_, event) ->
-          @spellCheckManager.onContextMenu(event)
-
         initSpellCheck = () ->
           spellCheckCache = $cacheFactory.get("spellCheck-#{scope.name}") ||
             $cacheFactory("spellCheck-#{scope.name}", { capacity: 1000 })
@@ -66,13 +63,19 @@ define [
           @spellCheckManager.init()
           codeMirror = richText.getCodeMirror()
           codeMirror.on 'change', handleChangeForSpellCheck
-          codeMirror.on 'contextmenu', handleContextMenu
+          $(codeMirror.getWrapperElement()).on(
+            'contextmenu',
+            @spellCheckManager.onContextMenu
+          )
           codeMirror.on 'scroll', @spellCheckManager?.onScroll
 
         tearDownSpellCheck = () ->
           codeMirror = richText.getCodeMirror()
           codeMirror.off 'change', handleChangeForSpellCheck
-          codeMirror.off 'contextmenu', handleContextMenu
+          $(codeMirror.getWrapperElement()).off(
+            'contextmenu',
+            @spellCheckManager.onContextMenu
+          )
           codeMirror.off 'scroll', @spellCheckManager?.onScroll
 
         scope.$on '$destroy', () ->
