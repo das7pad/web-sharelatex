@@ -41,4 +41,5 @@ module.exports = Errors =
 	V1ExportInProgress: V1ExportInProgress
 
 	fromErrorCode: (error_code, message, error_data) ->
-		new IMPORT_ERRORS[error_code](message, error_data)
+		errorClass = IMPORT_ERRORS[error_code] || Error
+		new errorClass(message, error_data)
