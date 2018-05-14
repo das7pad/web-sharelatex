@@ -1,3 +1,5 @@
+/* global $ */
+
 import lag from '../helpers/lag';
 import metricsApp from '../metrics_app';
 import { bind } from 'underscore';

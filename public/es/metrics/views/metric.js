@@ -1,3 +1,5 @@
+/* global $ */
+
 import template from '../templates/metrics.metric.handlebars';
 import footerTemplate from '../templates/metrics.metric-footer.handlebars';
 import lag from '../helpers/lag';

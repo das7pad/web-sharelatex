@@ -1,3 +1,5 @@
+/* global $ */
+
 import chartApp from './chart_app';
 import { filter, map, each } from 'underscore';
 import * as nv from 'nvd3';

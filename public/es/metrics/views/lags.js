@@ -1,3 +1,5 @@
+/* global $ */
+
 import lag from '../helpers/lag'
 import template from '../templates/metrics.lags.handlebars'
 import includes from 'underscore'

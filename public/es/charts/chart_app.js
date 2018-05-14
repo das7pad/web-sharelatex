@@ -1,3 +1,5 @@
+/* global $ */
+
 import * as d3 from 'd3';
 import { each, isArray, isObject, debounce, clone, reduce } from 'underscore';
 import merge from 'lodash/merge';

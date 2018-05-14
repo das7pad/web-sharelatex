@@ -1,3 +1,5 @@
+/* global $ */
+
 import Backbone from 'backbone';
 import moment from 'moment/src/moment';
 import dateRangePicker from './lib/date_range_picker';

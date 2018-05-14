@@ -1,3 +1,5 @@
+/* global $ */
+
 import { Metrics } from '../collections/metrics';
 import { LagsView } from './lags';
 import { MetricView } from './metric';
