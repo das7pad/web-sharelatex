@@ -1,7 +1,7 @@
 import * as moment from 'moment';
 import $ from 'jquery';
 import { bind } from 'underscore';
-require('daterangepicker');
+import 'daterangepicker';
 
 var WLDateRangePicker = function() {
   var dateFormat = 'MMMM D, YYYY';
