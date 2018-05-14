@@ -26,11 +26,16 @@ p
 								span(ng-show="adminUserEmailForm.inflight") Saving...
 							| &nbsp;
 							a.btn.btn-default(href, ng-click="editingEmail = false") Cancel
+			if user.overleaf
+				tr
+					td
+						label Overleaf v1 ID
+					td
+						a(href=settings.apis.v1.url + "/admin/user/" + user.overleaf.id)= user.overleaf.id
 
 		form-messages(for="adminUserEmailForm")
 			.alert.alert-success(ng-show="adminUserEmailForm.response.success && !adminUserEmailForm.inflight")
 				| Email was changed
-
 	
 	form(async-form="adminUser", name="adminUserForm", method="POST", action="/admin/user/" + user._id, novalidate)
 		input(type="hidden", name="_csrf", value=csrfToken)
