@@ -67,7 +67,7 @@ define [
             'contextmenu',
             @spellCheckManager.onContextMenu
           )
-          codeMirror.on 'scroll', @spellCheckManager?.onScroll
+          codeMirror.on 'scroll', @spellCheckManager.onScroll
 
         tearDownSpellCheck = () ->
           codeMirror = richText.getCodeMirror()
@@ -76,7 +76,7 @@ define [
             'contextmenu',
             @spellCheckManager.onContextMenu
           )
-          codeMirror.off 'scroll', @spellCheckManager?.onScroll
+          codeMirror.off 'scroll', @spellCheckManager.onScroll
 
         scope.$on '$destroy', () ->
           tearDownSpellCheck()

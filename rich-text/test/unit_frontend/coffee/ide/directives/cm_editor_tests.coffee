@@ -16,24 +16,31 @@ define [
 
     afterEach () ->
       window.requirejs = origRequireJsFn
-      Editor.prototype.getCodeMirror.reset()
-      Editor.prototype.openDoc.reset()
-      Editor.prototype.enable.reset()
-      Editor.prototype.disable.reset()
-      Editor.prototype.update.reset()
 
     it 'inits Rich Text', () ->
       editorStub = sinon.stub().returns({
-        getCodeMirror: sinon.stub().returns({ off: sinon.stub() }),
+        openDoc: sinon.stub(),
+        enable: sinon.stub(),
+        getCodeMirror: sinon.stub().returns({
+          getValue: sinon.stub().returns('some text'),
+          on: sinon.stub(),
+          off: sinon.stub(),
+          getWrapperElement: sinon.stub().returns({ off: sinon.stub() })
+        }),
         disable: sinon.stub()
       })
       @requirejs.callsArgWith(1, Editor: editorStub)
       inject ($compile, $rootScope) ->
         $rootScope.sharejsDoc = stubSharejsDoc()
+
         $compile('<div cm-editor sharejs-doc="sharejsDoc"></div>')($rootScope)
+        $rootScope.$digest()
+
         expect(editorStub).to.have.been.called
 
     it 'attaches to CM', () ->
+      Editor = stubEditor()
+
       getCodeMirror = Editor.prototype.getCodeMirror
       openDoc = Editor.prototype.openDoc
       enable = Editor.prototype.enable
@@ -55,6 +62,7 @@ define [
         expect(enable).to.have.been.called
 
     it 'calls Editor.update when remoteop event is trigger', () ->
+      Editor = stubEditor()
       update = Editor.prototype.update
       @requirejs.callsArgWith(1, Editor: Editor)
       inject ($compile, $rootScope) ->
@@ -66,6 +74,7 @@ define [
         expect(update).to.have.been.called
 
     it 'detaches from CM when destroyed', () ->
+      Editor = stubEditor()
       disable = Editor.prototype.disable
       @requirejs.callsArgWith(1, Editor: Editor)
       inject ($compile, $rootScope) ->
@@ -82,15 +91,17 @@ define [
 
   stubCodeMirror = (overrides = {}) ->
     _.extend({
-      getValue: sinon.stub().returns('some text')
+      getValue: sinon.stub().returns('some text'),
+      getWrapperElement: sinon.stub().returns({ off: sinon.stub() })
     }, overrides, EventEmitter.prototype)
 
-  class Editor
-    getCodeMirror: sinon.stub().returns(stubCodeMirror())
-    openDoc: sinon.stub()
-    enable: sinon.stub()
-    disable: sinon.stub()
-    update: sinon.stub()
+  stubEditor = () ->
+    class Editor
+      getCodeMirror: sinon.stub().returns(stubCodeMirror())
+      openDoc: sinon.stub()
+      enable: sinon.stub()
+      disable: sinon.stub()
+      update: sinon.stub()
 
   stubSharejsDoc = (overrides = {}) ->
     _.extend({
