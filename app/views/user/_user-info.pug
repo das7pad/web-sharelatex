@@ -58,10 +58,10 @@ p
 						ng-model="user.last_name"
 					)
 
-			tr
-				th(colspan=2).text-center
-					| Features
-					if settings.enableSubscriptions
+			if settings.enableSubscriptions
+				tr
+					th(colspan=2).text-center
+						| Features
 						span.small
 							| &nbsp;(Change to:&nbsp;
 							a(href, ng-click="user.features = {collaborators: 1, versioning: false, dropbox: false, github: false, compileTimeout: 60, compileGroup: 'standard', templates: false, trackChanges: false, referencesSearch: false, mendeley: false}") Free
@@ -71,135 +71,135 @@ p
 							a(href, ng-click="user.features = {collaborators: -1, versioning: true, dropbox: true, github: true, compileTimeout: 180, compileGroup: 'priority', templates: true, trackChanges: true, references: false, referencesSearch: true, mendeley: true}") Pro.
 							| )
 
-			tr
-				td
-					label(for="collaborators") Collaborators
-				td
-					input#collaborators.form-control(
-						name="features.collaborators"
-						ng-model="user.features.collaborators"
-					)
+				tr
+					td
+						label(for="collaborators") Collaborators
+					td
+						input#collaborators.form-control(
+							name="features.collaborators"
+							ng-model="user.features.collaborators"
+						)
 
-			tr
-				td
-					label(for="versioning") Versioning
-				td
-					input#versioning(
-						type="checkbox"
-						name="features.versioning"
-						ng-model="user.features.versioning"
-					)
+				tr
+					td
+						label(for="versioning") Versioning
+					td
+						input#versioning(
+							type="checkbox"
+							name="features.versioning"
+							ng-model="user.features.versioning"
+						)
 
-			tr
-				td
-					label(for="dropbox") Dropbox
-				td
-					input#dropbox(
-						type="checkbox"
-						name="features.dropbox"
-						ng-model="user.features.dropbox"
-					)
+				tr
+					td
+						label(for="dropbox") Dropbox
+					td
+						input#dropbox(
+							type="checkbox"
+							name="features.dropbox"
+							ng-model="user.features.dropbox"
+						)
 
-			tr
-				td
-					label(for="github") GitHub
-				td
-					input#github(
-						type="checkbox"
-						name="features.github"
-						ng-model="user.features.github"
-					)
+				tr
+					td
+						label(for="github") GitHub
+					td
+						input#github(
+							type="checkbox"
+							name="features.github"
+							ng-model="user.features.github"
+						)
 
-			tr
-				td
-					label(for="compileTimeout") Compile Timeout
-				td
-					input#compileTimeout.form-control(
-						name="features.compileTimeout"
-						ng-model="user.features.compileTimeout"
-					)
+				tr
+					td
+						label(for="compileTimeout") Compile Timeout
+					td
+						input#compileTimeout.form-control(
+							name="features.compileTimeout"
+							ng-model="user.features.compileTimeout"
+						)
 
-			tr
-				td
-					label(for="compileGroup") Compile Group
-				td
-					input#compileGroup.form-control(
-						name="features.compileGroup"
-						ng-model="user.features.compileGroup"
-					)
+				tr
+					td
+						label(for="compileGroup") Compile Group
+					td
+						input#compileGroup.form-control(
+							name="features.compileGroup"
+							ng-model="user.features.compileGroup"
+						)
 
-			tr
-				td
-					label(for="templates") Templates
-				td
-					input#templates(
-						type="checkbox"
-						name="features.templates"
-						ng-model="user.features.templates"
-					)
+				tr
+					td
+						label(for="templates") Templates
+					td
+						input#templates(
+							type="checkbox"
+							name="features.templates"
+							ng-model="user.features.templates"
+						)
 
-			tr
-				td
-					label(for="trackChanges") Track Changes
-				td
-					input#trackChanges(
-						type="checkbox"
-						name="features.trackChanges"
-						ng-model="user.features.trackChanges"
-					)
+				tr
+					td
+						label(for="trackChanges") Track Changes
+					td
+						input#trackChanges(
+							type="checkbox"
+							name="features.trackChanges"
+							ng-model="user.features.trackChanges"
+						)
 
-			tr
-				td
-					label(for="references") References (deprecated)
-				td
-					input#references(
-						type="checkbox"
-						name="features.references"
-						ng-model="user.features.references"
-					)
+				tr
+					td
+						label(for="references") References (deprecated)
+					td
+						input#references(
+							type="checkbox"
+							name="features.references"
+							ng-model="user.features.references"
+						)
 
-			tr
-				td
-					label(for="referencesSearch") References Search
-				td
-					input#referencesSearch(
-						type="checkbox"
-						name="features.referencesSearch"
-						ng-model="user.features.referencesSearch"
-					)
+				tr
+					td
+						label(for="referencesSearch") References Search
+					td
+						input#referencesSearch(
+							type="checkbox"
+							name="features.referencesSearch"
+							ng-model="user.features.referencesSearch"
+						)
 
-			tr
-				td
-					label(for="mendeley") Mendeley
-				td
-					input#mendeley(
-						type="checkbox"
-						name="features.mendeley"
-						ng-model="user.features.mendeley"
-					)
+				tr
+					td
+						label(for="mendeley") Mendeley
+					td
+						input#mendeley(
+							type="checkbox"
+							name="features.mendeley"
+							ng-model="user.features.mendeley"
+						)
 
-			tr
-				th(colspan=2).text-center Misc.
+			//- tr
+			//- 	th(colspan=2).text-center Misc.
 			
-			tr
-				td
-					label(for="betaProgram") Beta Program
-				td
-					input#betaProgram(
-						type="checkbox"
-						name="betaProgram"
-						ng-model="user.betaProgram"
-					)
+			//- tr
+			//- 	td
+			//- 		label(for="betaProgram") Beta Program
+			//- 	td
+			//- 		input#betaProgram(
+			//- 			type="checkbox"
+			//- 			name="betaProgram"
+			//- 			ng-model="user.betaProgram"
+			//- 		)
 
-			tr
-				td
-					label(for="awareOfV2") Aware of v2?
-				td
-					input#betaProgram(
-						type="checkbox"
-						name="awareOfV2"
-						ng-model="user.awareOfV2"
-					)
+			//- tr
+			//- 	td
+			//- 		label(for="awareOfV2") Aware of v2?
+			//- 	td
+			//- 		input#betaProgram(
+			//- 			type="checkbox"
+			//- 			name="awareOfV2"
+			//- 			ng-model="user.awareOfV2"
+			//- 		)
 
 
 			if isSuperAdmin
