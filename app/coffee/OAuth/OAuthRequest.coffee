@@ -2,6 +2,7 @@ refresh = require('passport-oauth2-refresh')
 request = require 'request'
 logger = require "logger-sharelatex"
 {User} = require "../../../../../app/js/models/User"
+Errors = require "../ProjectImport/Errors"
 
 NoOverleafTokenError = (message) ->
 	error = new Error(message)
@@ -22,12 +23,16 @@ OAuthRequest =
 		request optsWithAuth, (error, response, body) ->
 			return callback(error) if error?
 			if 200 <= response.statusCode < 300
-				return callback null, body
+				callback null, body
+			else if body?.error_code?
+				{ error_code, error_message, error_data } = body
+				error = Errors.fromErrorCode(error_code, error_message, error_data)
+				callback error
 			else
 				error = new Error("overleaf returned non-success code: #{response.statusCode}")
 				error.statusCode = response.statusCode
-				return callback error
-	
+				callback error
+
 	_refreshAccessToken: (user, callback = (error) ->) ->
 		logger.log {user_id: user._id, overleaf: user.overleaf}, "refreshing user token"
 		refresh.requestNewAccessToken 'overleaf', user.overleaf.refreshToken, (error, accessToken, refreshToken) ->
