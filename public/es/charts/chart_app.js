@@ -194,14 +194,14 @@ const chartApp = {
   init: () => {
     allOptions = merge(classOptions, chartOptions);
 
-    /**
-		 * resize all charts on window resize
-		 */
-		$(window).resize(debounce(function() {
-		  each(this.charts, function(chart){
-		    chart.update();
-		  });
-		}, 200));
+  /**
+   * resize all charts on window resize
+   */
+  $(window).resize(debounce(function() {
+    each(this.charts, function(chart){
+      chart.update();
+    });
+  }, 200));
   },
 
   charts: [],
