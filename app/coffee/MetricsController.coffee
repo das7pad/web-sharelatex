@@ -61,7 +61,7 @@ module.exports = MetricsController =
 			v1_userId = user?.overleaf?.id
 
 			if !v1_userId?
-				return null
+				return callback(null, null)
 
 			request {
 				method: 'GET',
@@ -83,4 +83,4 @@ module.exports = MetricsController =
 						"[V1Segmentation] got non-200 response from v1: #{statusCode}"
 					)
 					logger.err {err, userId}, err.message
-					callback(err)
+					return callback(err)
