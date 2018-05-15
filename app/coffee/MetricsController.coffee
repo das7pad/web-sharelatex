@@ -1,5 +1,6 @@
 settings = require 'settings-sharelatex'
 request = require 'request'
+mongoose = require('mongoose')
 async = require 'async'
 UserGetter = require '../../../../app/js/Features/User/UserGetter'
 ProjectGetter = require '../../../../app/js/Features/Project/ProjectGetter'
@@ -13,6 +14,11 @@ module.exports = MetricsController =
 
 		if !userId?
 			return next(new Error('[V1Segmentation] user_id required'))
+
+		if !mongoose.Types.ObjectId.isValid(userId)
+			# Not a valid user id. This can happen because we use the userId field to
+			# also store session ids.
+			return res.sendStatus(404)
 
 		async.parallel([
 			(callback) -> MetricsController._getV1Segmentation(userId, callback)

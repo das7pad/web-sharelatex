@@ -24,6 +24,9 @@ describe "MetricsController", ->
 			'logger-sharelatex':
 				err: sinon.stub()
 				log: sinon.stub()
+			'mongoose':
+				Types:
+					ObjectId: @ObjectId = sinon.stub()
 
 	describe 'userMetricsSegmentation', ->
 		beforeEach ->
@@ -46,10 +49,12 @@ describe "MetricsController", ->
 				teamIds: [3, 4],
 				affiliationIds: [5, 7]
 			}
+			@ObjectId.isValid = () -> true
 			@request.reset()
 			@request.callsArgWith(1, null, @response, @v1Segmentation)
 			@res =
 				json: sinon.stub()
+				sendStatus: sinon.stub()
 			@next = sinon.stub()
 			@call = () =>
 				@MetricsController.userMetricsSegmentation(@req, @res, @next)
@@ -89,6 +94,16 @@ describe "MetricsController", ->
 				affiliationIds: [5, 7]
 				v2TeamIds: [],
 			})
+
+			done()
+
+		it 'handles session ids in the user_id field', (done) ->
+			@ObjectId.isValid = () -> false
+
+			@call()
+
+			@res.sendStatus.callCount.should.equal 1
+			@res.sendStatus.lastCall.args[0].should.equal 404
 
 			done()
 
