@@ -1,7 +1,7 @@
 /* global $ */
 
 import Backbone from 'backbone';
-import moment from 'moment/src/moment';
+import moment from 'moment';
 import dateRangePicker from './lib/date_range_picker';
 import metricsApp from './metrics_app';
 import lag from './helpers/lag';
