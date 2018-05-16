@@ -60,18 +60,18 @@ module.exports = ProjectImporter =
 						# clean it up if any of these steps which happened afterwards fail.
 						ProjectDeleter.deleteProject v2_project_id, (deleteError) ->
 							if deleteError?
-								logger.err {deleteError, v1_project_id, v2_project_id}, "failed to delete imported project"
+								logger.err {deleteError, errorMessage: deleteError.message, v1_project_id, v2_project_id}, "failed to delete imported project"
 							cb(error)
 					else
 						cb(null, v2_project_id)
 		], (importError, v2_project_id) ->
 			if importError?
-				logger.err {importError, v1_project_id, v1_project_id}, "failed to import project"
+				logger.err {importError, errorMessage: importError.message, v1_project_id, v1_project_id}, "failed to import project"
 				metrics.inc "project-import.error.total"
 				metrics.inc "project-import.error.#{importError.name}"
 				ProjectImporter._cancelExport v1_project_id, user_id, (cancelError) ->
 					if cancelError?
-						logger.err {cancelError, v1_project_id, v2_project_id}, "failed to cancel project import"
+						logger.err {cancelError, errorMessage: cancelError.message, v1_project_id, v2_project_id}, "failed to cancel project import"
 					callback importError
 			else
 				metrics.inc "project-import.success"
