@@ -52,4 +52,33 @@ export default class WordManager {
       )
     })
   }
+
+  clearHighlightTouchingRange (e) {
+    const highlight = this.highlights.find((hl) => {
+      return this.isHighlightTouchingSelection(hl, e.from, e.to)
+    })
+
+    if (highlight) {
+      this.removeHighlight(highlight)
+    }
+  }
+
+  isHighlightTouchingSelection (highlight, selectionFrom, selectionTo) {
+    const { from: highlightFrom, to: highlightTo } = highlight.marker.find()
+
+    const onSameLine = highlightFrom.line === selectionFrom.line
+    const selectionFromIsWithinHighlight = (
+      highlightFrom.ch <= selectionFrom.ch &&
+      highlightTo.ch >= selectionFrom.ch
+    )
+    const selectionToIsWithinHighlight = (
+      highlightFrom.ch <= selectionTo.ch &&
+      highlightTo.ch >= selectionTo.ch
+    )
+
+    return (
+      onSameLine &&
+      (selectionFromIsWithinHighlight || selectionToIsWithinHighlight)
+    )
+  }
 }

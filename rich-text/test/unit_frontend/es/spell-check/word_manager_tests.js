@@ -105,4 +105,29 @@ describe('WordManager', function () {
 
     expect(found.word).to.equal('foo')
   })
+
+  it('clearHighlightTouchingRange removes highlight where selection range intersects', function () {
+    const clear = sinon.stub()
+    this.editor.markText.returns({
+      clear,
+      find: sinon.stub().returns({
+        from: { line: 0, ch: 0 },
+        to: { line: 0, ch: 3 }
+      })
+    })
+    this.wordManager.addHighlight({
+      row: 0,
+      column: 0,
+      word: 'foo',
+      suggestions: ['bar', 'baz']
+    })
+
+    this.wordManager.clearHighlightTouchingRange({
+      // Cursor is at the end of 'foo'
+      from: { line: 0, ch: 3 },
+      to: { line: 0, ch: 3 }
+    })
+
+    expect(clear).to.have.been.called
+  })
 })
