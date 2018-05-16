@@ -21,13 +21,7 @@ module.exports =
 		)
 
 		webRouter.get(
-			'/graphs/',
-			AuthorizationMiddlewear.ensureUserIsSiteAdmin,
-			MetricsController.analyticsProxy
-		)
-
-		webRouter.get(
-			'/graphs/:graph',
+			'/graphs/(:graph)?',
 			AuthorizationMiddlewear.ensureUserIsSiteAdmin,
 			MetricsController.analyticsProxy
 		)
