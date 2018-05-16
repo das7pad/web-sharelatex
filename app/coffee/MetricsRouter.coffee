@@ -15,13 +15,7 @@ module.exports =
 		logger.log {}, "Init metrics router"
 
 		webRouter.get(
-			'/metrics/teams/:teamId/',
-			AuthorizationMiddlewear.ensureUserIsSiteAdmin,
-			MetricsController.teamMetrics
-		)
-
-		webRouter.get(
-			'/metrics/teams/:teamId/:startDate/:endDate/',
+			'/metrics/teams/:teamId/?(:startDate/:endDate)?',
 			AuthorizationMiddlewear.ensureUserIsSiteAdmin,
 			MetricsController.teamMetrics
 		)
