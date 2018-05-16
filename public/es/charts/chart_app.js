@@ -111,60 +111,6 @@ var classOptions = {
     'xAxisDefault',
     'yAxisDefault',
   ],
-  'metric.team.licences': [
-  ],
-  'metric.edits': [
-    'multiBarChart',
-  ],
-  'metric.team.edits': [
-    'multiBarChart',
-  ],
-  'metric.new_users': [
-    'multiBarChart',
-  ],
-  'metric.active_users': [
-    'multiBarChart',
-  ],
-  'metric.total_users': [
-    'lineChart',
-  ],
-  'metric.active_docs': [
-    'multiBarChart',
-  ],
-  'metric.total_docs': [
-    'lineChart',
-  ],
-  'metric.collaborators': [
-    'multiBarChart',
-    'yAxisFloat',
-  ],
-  'metric.published_vers': [
-    'multiBarChart',
-  ],
-  'metric.total_published_vers': [
-    'lineChart',
-  ],
-  'metric.team.collaboration': [
-    'expandedChart',
-  ],
-  'metric.team.internal_collaboration': [
-    'expandedChart',
-  ],
-  'metric.created': [
-    'multiBarChart',
-  ],
-  'metric.edited': [
-    'multiBarChart',
-  ],
-  'metric.views': [
-    'lineChart',
-  ],
-  'metric.conversion_docs_created': [
-    'multiBarChart',
-  ],
-  'metric.submission_link_usage': [
-    'multiBarChart',
-  ],
   'lag-daily': [
     'formatXAsDay',
   ],
