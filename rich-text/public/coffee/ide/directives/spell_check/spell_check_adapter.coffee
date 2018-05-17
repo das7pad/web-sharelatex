@@ -1,7 +1,7 @@
 define [], () ->
   class SpellCheckAdapter
     constructor: (@editor) ->
-      @wordManager = @editor.wordManager
+      @highlightedWordManager = @editor.highlightedWordManager
 
     getLines: () ->
       @editor.getCodeMirror().getValue().split('\n')
@@ -28,7 +28,7 @@ define [], () ->
         left: coords.x,
         top: coords.y
       })
-      @wordManager.findHighlightAtPosition(position)
+      @highlightedWordManager.findHighlightAtPosition(position)
 
     selectHighlightedWord: (highlight) ->
       position = highlight.marker.find()

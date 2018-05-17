@@ -1,26 +1,27 @@
 /* global sinon */
 
-import WordManager from '../../../../public/es/spell_check/word_manager'
+import HighlightedWordManager
+  from '../../../../public/es/spell_check/highlighted_word_manager'
 
-describe('WordManager', function () {
+describe('HighlightedWordManager', function () {
   beforeEach(function () {
     this.editor = {
       markText: sinon.stub().returns({ clear: sinon.stub() })
     }
-    this.wordManager = new WordManager(this.editor)
+    this.highlightedWordManager = new HighlightedWordManager(this.editor)
   })
 
   it('has no highlights after resetting', function () {
-    this.wordManager.addHighlight({
+    this.highlightedWordManager.addHighlight({
       row: 0,
       column: 0,
       word: 'foo',
       suggestions: ['bar', 'baz']
     })
 
-    this.wordManager.reset()
+    this.highlightedWordManager.reset()
 
-    expect(this.wordManager.highlights).to.be.empty
+    expect(this.highlightedWordManager.highlights).to.be.empty
   })
 
   it('clearRow removes highlights on the given row', function () {
@@ -28,7 +29,7 @@ describe('WordManager', function () {
       clear: sinon.stub(),
       find: sinon.stub().returns({ from: { line: 0 } })
     })
-    this.wordManager.addHighlight({
+    this.highlightedWordManager.addHighlight({
       row: 0,
       column: 0,
       word: 'row0',
@@ -39,48 +40,48 @@ describe('WordManager', function () {
       clear: sinon.stub(),
       find: sinon.stub().returns({ from: { line: 1 } })
     })
-    this.wordManager.addHighlight({
+    this.highlightedWordManager.addHighlight({
       row: 1,
       column: 0,
       word: 'row1',
       suggestions: ['bar']
     })
 
-    this.wordManager.clearRow(0)
+    this.highlightedWordManager.clearRow(0)
 
-    expect(this.wordManager.highlights).to.have.lengthOf(1)
-    expect(this.wordManager.highlights[0].word).to.equal('row1')
+    expect(this.highlightedWordManager.highlights).to.have.lengthOf(1)
+    expect(this.highlightedWordManager.highlights[0].word).to.equal('row1')
   })
 
   it('addHighlight adds highlight', function () {
     const markerStub = { clear: sinon.stub() }
     this.editor.markText.returns(markerStub)
 
-    this.wordManager.addHighlight({
+    this.highlightedWordManager.addHighlight({
       row: 0,
       column: 0,
       word: 'foo',
       suggestions: ['bar', 'baz']
     })
 
-    const highlight = this.wordManager.highlights[0]
+    const highlight = this.highlightedWordManager.highlights[0]
     expect(highlight.marker).to.equal(markerStub)
     expect(highlight.word).to.equal('foo')
     expect(highlight.suggestions).to.deep.equal(['bar', 'baz'])
   })
 
   it('removeHighlight removes a given highlight', function () {
-    this.wordManager.addHighlight({
+    this.highlightedWordManager.addHighlight({
       row: 0,
       column: 0,
       word: 'foo',
       suggestions: ['bar', 'baz']
     })
 
-    const highlight = this.wordManager.highlights[0]
-    this.wordManager.removeHighlight(highlight)
+    const highlight = this.highlightedWordManager.highlights[0]
+    this.highlightedWordManager.removeHighlight(highlight)
 
-    expect(this.wordManager.highlights).to.be.empty
+    expect(this.highlightedWordManager.highlights).to.be.empty
   })
 
   it('findHighlightAtPosition finds a highlight from a given position', function () {
@@ -91,14 +92,14 @@ describe('WordManager', function () {
         to: { line: 0, ch: 3 }
       })
     })
-    this.wordManager.addHighlight({
+    this.highlightedWordManager.addHighlight({
       row: 0,
       column: 0,
       word: 'foo',
       suggestions: ['bar', 'baz']
     })
 
-    const found = this.wordManager.findHighlightAtPosition({
+    const found = this.highlightedWordManager.findHighlightAtPosition({
       line: 0,
       ch: 1
     })
@@ -115,14 +116,14 @@ describe('WordManager', function () {
         to: { line: 0, ch: 3 }
       })
     })
-    this.wordManager.addHighlight({
+    this.highlightedWordManager.addHighlight({
       row: 0,
       column: 0,
       word: 'foo',
       suggestions: ['bar', 'baz']
     })
 
-    this.wordManager.clearHighlightTouchingRange({
+    this.highlightedWordManager.clearHighlightTouchingRange({
       // Cursor is at the end of 'foo'
       from: { line: 0, ch: 3 },
       to: { line: 0, ch: 3 }

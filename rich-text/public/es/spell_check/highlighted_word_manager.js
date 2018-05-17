@@ -1,4 +1,4 @@
-export default class WordManager {
+export default class HighlightedWordManager {
   constructor (editor) {
     this.editor = editor
     this.reset()

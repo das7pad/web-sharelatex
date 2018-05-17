@@ -3,7 +3,7 @@ import CodeMirror, { Doc } from 'codemirror'
 import LatexMode from './latex_mode/latex_mode'
 import RichText from './rich_text/rich_text'
 import keyBindings from './key_bindings/key_bindings'
-import WordManager from './spell_check/word_manager'
+import HighlightedWordManager from './spell_check/highlighted_word_manager'
 
 export class Editor {
   constructor (rootEl, adapter) {
@@ -17,7 +17,7 @@ export class Editor {
       extraKeys: keyBindings
     })
     this.adapter = adapter
-    this.wordManager = new WordManager(this.codeMirror)
+    this.highlightedWordManager = new HighlightedWordManager(this.codeMirror)
   }
 
   getCodeMirror () {
