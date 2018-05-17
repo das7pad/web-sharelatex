@@ -162,7 +162,7 @@ block content
 								.col-md-9.col-md-pull-3.col-xs-10
 									h2.h1 #{translate("ease_of_use")}
 									p #{translate("no_complicated_latex_install")}
-									p !{translate("all_packages_and_templates", {templatesLink:"<a href='templates'>__templates__</a>", templates: translate("templates") })} 
+									p !{translate("all_packages_and_templates", {templatesLink:"<a href='templates'>" + translate("templates") + "</a>"})}
 
 				.row
 					.col-md-6
@@ -204,15 +204,15 @@ block content
 					.col-md-12
 						.col-md-4.pull-right
 							.alert.alert-info 
-								p !{translate("over_x_templates_easy_getting_started", {numberoftemplates:"<strong>__over__ 500 __templates__</strong>", over:translate("over"), templates:translate("templates")})}
+								p !{translate("over_x_templates_easy_getting_started", {templates: translate("templates"), over: translate("over")})}
 
 								p.text-center
 									a(href="/templates").btn.btn-info #{translate("view_templates")}
 							p &nbsp;
-						p !{translate("nothing_to_install_ready_to_go", {start_now:"<strong>__start_now_text__</strong>", start_now_text:translate("start_using_latex_now")})}
+						p !{translate("nothing_to_install_ready_to_go", {start_now:"<strong>" + translate("start_using_latex_now") + "</strong>"})}
 
 						p #{translate("get_same_latex_setup")}
-						p !{translate("support_lots_of_features", {help_guides_link:"<a href='/learn'>__latex_guides__</a>", latex_guides:translate("latex_guides")})}.
+						p !{translate("support_lots_of_features", {help_guides_link:"<a href='/learn'>" + translate("latex_guides") + "</a>"})}.
 					.col-md-6
 					
 			.card.row-spaced
