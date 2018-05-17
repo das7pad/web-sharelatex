@@ -127,12 +127,6 @@ var classOptions = {
   ],
   'percent': [
     'percentValue',
-  ],
-  'metric.total_conversions': [
-    'lineChart',
-  ],
-  'metric.conversions_errors': [
-    'expandedChart',
   ]
 };
 
