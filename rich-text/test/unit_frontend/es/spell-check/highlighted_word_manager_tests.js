@@ -84,6 +84,19 @@ describe('HighlightedWordManager', function () {
     expect(this.highlightedWordManager.highlights).to.be.empty
   })
 
+  it('removeWord removes highlights for a given word', function () {
+    this.highlightedWordManager.addHighlight({
+      row: 0,
+      column: 0,
+      word: 'foo',
+      suggestions: ['bar', 'baz']
+    })
+
+    this.highlightedWordManager.removeWord('foo')
+
+    expect(this.highlightedWordManager.highlights).to.be.empty
+  })
+
   it('findHighlightAtPosition finds a highlight from a given position', function () {
     this.editor.markText.returns({
       clear: sinon.stub(),

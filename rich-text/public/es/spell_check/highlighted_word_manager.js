@@ -42,6 +42,12 @@ export default class HighlightedWordManager {
     this.highlights = this.highlights.filter((hl) => hl !== highlight)
   }
 
+  removeWord (word) {
+    this.highlights
+      .filter((highlight) => highlight.word === word)
+      .forEach((highlight) => this.removeHighlight(highlight))
+  }
+
   findHighlightAtPosition (position) {
     return _.find(this.highlights, ({ marker }) => {
       const markerPos = marker.find()
