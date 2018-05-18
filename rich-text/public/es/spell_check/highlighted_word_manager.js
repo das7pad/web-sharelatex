@@ -1,3 +1,5 @@
+/* global _ */
+
 export default class HighlightedWordManager {
   constructor (editor) {
     this.editor = editor
@@ -41,7 +43,7 @@ export default class HighlightedWordManager {
   }
 
   findHighlightAtPosition (position) {
-    return this.highlights.find(({ marker }) => {
+    return _.find(this.highlights, ({ marker }) => {
       const markerPos = marker.find()
       return (
         markerPos &&
@@ -54,7 +56,7 @@ export default class HighlightedWordManager {
   }
 
   clearHighlightTouchingRange (e) {
-    const highlight = this.highlights.find((hl) => {
+    const highlight = _.find(this.highlights, (hl) => {
       return this.isHighlightTouchingSelection(hl, e.from, e.to)
     })
 
