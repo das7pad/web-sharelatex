@@ -72,7 +72,10 @@ export default class HighlightedWordManager {
   }
 
   isHighlightTouchingSelection (highlight, selectionFrom, selectionTo) {
-    const { from: highlightFrom, to: highlightTo } = highlight.marker.find()
+    const position = highlight.marker.find()
+    if (!position) return
+
+    const { from: highlightFrom, to: highlightTo } = position
 
     const onSameLine = highlightFrom.line === selectionFrom.line
     const selectionFromIsWithinHighlight = (
