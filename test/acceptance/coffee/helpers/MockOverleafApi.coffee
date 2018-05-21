@@ -1,13 +1,45 @@
 express = require("express")
 app = express()
+bodyParser = require('body-parser')
+
+app.use(bodyParser.json())
+
+DEFAULT_TEAM = {
+	id: 5,
+	name: "Test team",
+	owner: {
+		id: 1,
+		email: "user1@example.com"
+	},
+	users: [
+		{
+			id: 1,
+			email: "user1@example.com"
+		}
+		{
+			id: 2,
+			email: "user2@example.com"
+		}
+	]
+}
 
 module.exports = MockOverleafApi =
 	docs: { }
+	teamExports: { }
 
 	setDoc: (doc) ->
 		@docs[doc.id] = doc
 
+	setTeams: (team) ->
+		@teamExports[team.id] = team
+
+	reset: () ->
+		@docs = {}
+		@teamExports = {}
+
 	run: () ->
+
+		# Project import routes
 		app.post "/api/v1/sharelatex/docs/:ol_doc_id/export/start", (req, res, next) =>
 			doc = @docs[req.params.ol_doc_id]
 			if doc
@@ -23,6 +55,34 @@ module.exports = MockOverleafApi =
 
 		app.get "/api/v1/sharelatex/docs/:ol_doc_id/export/history", (req, res, next) =>
 			res.json exported: true
+
+
+		# Team import routes
+		app.post "/api/v1/sharelatex/team_exports/:team_id/", (req, res, next) =>
+			teamId = req.params.team_id
+			teamExport =  Object.assign({}, DEFAULT_TEAM,
+				{ id: teamId, started_at: new Date() })
+
+			@teamExports[teamExport.id] = teamExport
+
+			res.json teamExport
+
+		app.patch "/api/v1/sharelatex/team_exports/:team_id/", (req, res, next) =>
+			teamId = parseInt(req.params.team_id)
+
+			if teamId != 8
+				teamExport = @teamExports[teamId]
+				teamExport.v2_id = req.body.v2_id
+				res.json teamExport
+			else
+				# Simulate a failure for an specific export
+				res.sendStatus 500
+
+		app.delete "/api/v1/sharelatex/team_exports/:team_id/", (req, res, next) =>
+			teamId = req.params.team_id
+			delete @teamExports.teamId
+
+			res.sendStatus 204
 
 		app.listen 5000, (error) ->
 			throw error if error?

@@ -1,21 +1,23 @@
 OverleafAuthenticationController = require "./Authentication/OverleafAuthenticationController"
 ProjectImportController = require "./ProjectImport/ProjectImportController"
+TeamImportController = require "./TeamImport/TeamImportController"
 AuthenticationController = require "../../../../app/js/Features/Authentication/AuthenticationController"
 AccountSyncController = require "./AccountSync/AccountSyncController"
 SharelatexAuthController = require "./SharelatexAuth/SharelatexAuthController"
+AuthorizationMiddlewear = require('../../../../app/js/Features/Authorization/AuthorizationMiddlewear')
 RateLimiterMiddlewear = require('../../../../app/js/Features/Security/RateLimiterMiddlewear')
 passport = require "passport"
 logger = require "logger-sharelatex"
 qs = require 'querystring'
 
-module.exports = 
+module.exports =
 	apply: (webRouter, privateApiRouter, publicApiRouter) ->
 		removeRoute(webRouter, 'get', '/login')
 		webRouter.get '/login', OverleafAuthenticationController.welcomeScreen
 
 		webRouter.get '/overleaf/login', passport.authenticate("overleaf")
 		webRouter.get '/register', (req, res, next) -> res.redirect("/login?#{qs.stringify(req.query)}")
-		
+
 		webRouter.get(
 			'/overleaf/callback',
 			OverleafAuthenticationController.setupUser,
@@ -37,6 +39,12 @@ module.exports =
 		webRouter.get(
 			'/overleaf/auth_from_sl',
 			SharelatexAuthController.authFromSharelatex
+		)
+
+		webRouter.post(
+			'/overleaf/import_team/:teamId',
+			AuthorizationMiddlewear.ensureUserIsSiteAdmin,
+			TeamImportController.create
 		)
 
 		publicApiRouter.post(
