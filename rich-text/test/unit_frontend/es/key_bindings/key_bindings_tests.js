@@ -3,11 +3,7 @@
 import CodeMirror from 'codemirror'
 
 import fixture from '../../../../../../test/unit_frontend/es/support/fixture'
-import {
-  init,
-  enableRichText,
-  disableRichText
-} from '../../../../public/es/index'
+import { Editor } from '../../../../public/es/index'
 
 const FIXTURE_HTML = `<div class="rich-text">
 <link rel="stylesheet" href="base/public/stylesheets/style.css">
@@ -18,13 +14,14 @@ const FIXTURE_HTML = `<div class="rich-text">
 describe('Key bindings', function () {
   beforeEach(function () {
     const html = fixture.load(FIXTURE_HTML)
-    this.cm = init(html.querySelector('#cm'))
-    enableRichText(this.cm, {})
+    this.editor = new Editor(html.querySelector('#cm'), {})
+    this.editor.enable()
+    this.cm = this.editor.getCodeMirror()
   })
 
   afterEach(function () {
     fixture.cleanUp()
-    disableRichText()
+    this.editor.disable()
   })
 
   /**
