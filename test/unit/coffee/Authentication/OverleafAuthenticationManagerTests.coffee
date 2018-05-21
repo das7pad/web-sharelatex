@@ -17,8 +17,8 @@ describe "OverleafAuthenticationManager", ->
 				overleaf:
 					host: @host = "http://overleaf.example.com"
 			"request": @request = {}
-			"../../../../../app/js/Features/Subscription/SubscriptionUpdater":
-				@SubscriptionUpdater = {refreshFeatures: sinon.stub()}
+			"../../../../../app/js/Features/Subscription/FeaturesUpdater":
+				@FeaturesUpdater = {refreshFeatures: sinon.stub()}
 
 		@accessToken = "mock-access-token"
 		@refreshToken = "mock-refresh-token"

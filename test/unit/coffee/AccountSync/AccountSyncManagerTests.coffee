@@ -12,8 +12,8 @@ describe 'AccountSyncManager', ->
 	beforeEach ->
 		@AccountSyncManager = SandboxedModule.require modulePath, requires:
 			"../../../../../app/js/Features/User/UserGetter": @UserGetter = {}
-			"../../../../../app/js/Features/Subscription/SubscriptionUpdater":
-				@SubscriptionUpdater = {}
+			"../../../../../app/js/Features/Subscription/FeaturesUpdater":
+				@FeaturesUpdater = {}
 			"logger-sharelatex":
 				log: sinon.stub()
 				err: sinon.stub()
@@ -36,7 +36,7 @@ describe 'AccountSyncManager', ->
 		beforeEach ->
 			@UserGetter.getUser = sinon.stub()
 				.callsArgWith(2, null, @user)
-			@SubscriptionUpdater.refreshFeatures = sinon.stub()
+			@FeaturesUpdater.refreshFeatures = sinon.stub()
 				.callsArgWith(1, null)
 			@call = (cb) =>
 				@AccountSyncManager.doSync(@v1UserId, cb)
@@ -56,10 +56,10 @@ describe 'AccountSyncManager', ->
 			it 'should call refreshFeatures', (done) ->
 				@call (err) =>
 					expect(
-						@SubscriptionUpdater.refreshFeatures.callCount
+						@FeaturesUpdater.refreshFeatures.callCount
 					).to.equal 1
 					expect(
-						@SubscriptionUpdater.refreshFeatures.calledWith(@userId)
+						@FeaturesUpdater.refreshFeatures.calledWith(@userId)
 					).to.equal true
 					done()
 
@@ -76,7 +76,7 @@ describe 'AccountSyncManager', ->
 			it 'should not call refreshFeatures', (done) ->
 				@call (err) =>
 					expect(
-						@SubscriptionUpdater.refreshFeatures.callCount
+						@FeaturesUpdater.refreshFeatures.callCount
 					).to.equal 0
 					done()
 
@@ -93,7 +93,7 @@ describe 'AccountSyncManager', ->
 			it 'should not call refreshFeatures', (done) ->
 				@call (err) =>
 					expect(
-						@SubscriptionUpdater.refreshFeatures.callCount
+						@FeaturesUpdater.refreshFeatures.callCount
 					).to.equal 0
 					done()
 

@@ -1,5 +1,5 @@
 UserGetter = require('../../../../../app/js/Features/User/UserGetter')
-SubscriptionUpdater = require('../../../../../app/js/Features/Subscription/SubscriptionUpdater')
+FeaturesUpdater = require('../../../../../app/js/Features/Subscription/FeaturesUpdater')
 logger = require('logger-sharelatex')
 
 
@@ -16,5 +16,5 @@ module.exports = AccountSyncManager =
 				return callback(null)
 			logger.log {v1UserId, userId: user._id},
 				"[AccountSync] updating user subscription and features"
-			SubscriptionUpdater.refreshFeatures user._id, callback
+			FeaturesUpdater.refreshFeatures user._id, callback
 
