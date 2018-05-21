@@ -24,14 +24,14 @@ define [
             )
             switchAttachment(scope.sharejsDoc)
 
-        scope.$watch "sharejsDoc", switchAttachment
-
         switchAttachment = (sharejsDoc, oldSharejsDoc) ->
           return if sharejsDoc == oldSharejsDoc
           if oldSharejsDoc?
             detachFromCM(oldSharejsDoc)
           if sharejsDoc?
             attachToCM(sharejsDoc)
+
+        scope.$watch "sharejsDoc", switchAttachment
 
         attachToCM = (sharejsDoc) ->
           codeMirror = richText.getCodeMirror()
