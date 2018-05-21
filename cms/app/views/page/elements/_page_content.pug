@@ -1,0 +1,44 @@
+include ./_mixins
+
+mixin actual_content(content)
+	//- @param {object}		content		A content block
+	//- content block= From the CMS, which includes the content and UI settings
+	if content.fields.quote
+		+quote(content.fields)
+	else
+		div(class=content.fields.halfWidth ? "col-sm-6" : "col-sm-12")
+			div(class={"card" : content.fields.card, "text-center" : content.fields.centerText})
+				| !{content.fields.content}
+				if content.fields.contactButtonText
+					+contact_btn(content)
+				if content.fields.youTube
+					if content.fields.youTubeTitle
+						p #{content.fields.youTubeTitle}
+					iframe(src=content.fields.youTube title=content.fields.youTubeTitle || "YouTube Video")
+				if content.fields.contactForm
+					include ../../../../../support/app/views/contact_form/form_general
+
+mixin page_content(content, prev, prevPrev, prevPrevPrev, next)
+	//- Handles the grid layout for CMS generated pages
+	//- @param {object}		content, prev, prevPrev, prevPrevPrev, next		A content block
+	//- content block= From the CMS, which includes the content and UI settings
+	if content
+		if !content.fields.halfWidth
+			.row.row-spaced
+				+actual_content(content)
+		else
+			if !prev
+				.row.row-spaced
+					+actual_content(content)
+					if next && next.fields.halfWidth
+						+actual_content(next)
+			else if !prev.fields.halfWidth
+				.row.row-spaced
+					+actual_content(content)
+					if next && next.fields.halfWidth
+						+actual_content(next)
+			else if prev.fields.halfWidth && prevPrev && prevPrev.fields.halfWidth && prevPrevPrev && !prevPrevPrev.fields.halfWidth
+				.row.row-spaced
+					+actual_content(content)
+					if next && next.fields.halfWidth
+						+actual_content(next)

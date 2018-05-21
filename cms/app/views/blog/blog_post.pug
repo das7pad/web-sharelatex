@@ -1,0 +1,21 @@
+extends ../layout
+
+//- Page for a single blog post
+
+block content_cms
+	.page-header
+		h1
+			a(href="/blog") Blog
+	.blog(ng-cloak)
+		ul.blog-list
+			for post in items
+				li.card
+					.card-header
+						h2 #{post.fields.title}
+					if (post.fields.authorDisplay || post.fields.publishDateDay)
+						small Posted
+							if (post.fields.authorDisplay)
+								|  by #{post.fields.authorDisplay}
+							if (post.fields.publishDateDay)
+								|  on #{post.fields.publishDateDay} #{post.fields.publishDateMonth} #{post.fields.publishDateYear}
+					| !{post.fields.content}
