@@ -87,7 +87,7 @@ define [
 
       template: """
         <div class="cm-editor-wrapper rich-text">
-          <div class="cm-editor-body">
+          <div class="cm-editor-body"></div>
           <spell-menu
             open="spellMenu.open"
             top="spellMenu.top"
