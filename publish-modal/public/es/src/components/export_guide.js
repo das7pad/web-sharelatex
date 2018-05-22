@@ -3,18 +3,10 @@ import SidebarWithReturnButton from './sidebar_with_return_button'
 
 export default class ExportGuide extends Component {
   render () {
-    const {entry, onReturn, projectId, returnText} = this.props
-    var link
-    var multiJournalPartners = ['scholar_one', 'aries', 'ejp']
-    if (multiJournalPartners.indexOf(entry.partner) >= 0) {
-      link = `/docs/${projectId}/exports/journal/${entry.id}`
-    } else {
-      link = `/docs/${projectId}/exports/${entry.partner}`
-    }
+    const {entry, onReturn, returnText} = this.props
     return (
       <div
         className='publish-guide modal-body-content row content-as-table'
-        style={{paddingTop: '20px'}}
         key={entry.id}
       >
         <SidebarWithReturnButton onReturn={onReturn} returnText={returnText} />
@@ -41,15 +33,11 @@ export default class ExportGuide extends Component {
                 button below
               </p>
               <p>
-                <a className='link-as-button doc-event'
+                <button className="btn"
                   style={{display: 'inline-block'}}
-                  href={link}
-                  data-event='direct_submit'
-                  data-category='Publish'
-                  data-action='submit'
-                  data-label={entry.id}>
-                    Submit Now
-                </a>
+                  onClick={() => this.props.onSwitch('export', entry.id)}>
+                  Continue
+                </button>
               </p>
               <p>
                 Please note that you'll have chance to confirm your
@@ -67,5 +55,6 @@ ExportGuide.propTypes = {
   entry: PropTypes.object.isRequired,
   returnText: PropTypes.string,
   onReturn: PropTypes.func,
-  projectId: PropTypes.string.isRequired
+  projectId: PropTypes.string.isRequired,
+  onSwitch: PropTypes.func.isRequired
 }

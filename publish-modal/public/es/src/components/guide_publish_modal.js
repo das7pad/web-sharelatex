@@ -1,6 +1,7 @@
 import React, { PropTypes, Component } from 'react'
 import PublishGuide from './publish_guide'
 import ExportGuide from './export_guide'
+import GenericExport from './generic_export'
 import { findEntryInCategories } from '../utils.js'
 
 export default class GuidePublishModal extends Component {
@@ -19,7 +20,8 @@ export default class GuidePublishModal extends Component {
     if (initialEntry &&
         guideId === initialEntry.id) {
       entry = initialEntry
-      if (entries.journal && entries.journal.entries.length > 1 && entries.brand_data.active) {
+      if (entries.journal && entries.journal.entries.length > 1 &&
+          entries.brand_data.active) {
         returnText = 'More ' + entries.brand_data.name + ' Journals'
         onReturn = onSwitch
       }
@@ -36,13 +38,24 @@ export default class GuidePublishModal extends Component {
         projectId={projectId}
         pdfUrl={pdfUrl}
       />)
-    } else {
+    } else if (shown === 'export') {
+      return (<GenericExport
+        onReturn={onReturn}
+        entry={entry}
+        returnText={returnText}
+        projectId={projectId}
+        onSwitch={onSwitch}
+      />)
+    } else if (shown === 'exportGuide') {
       return (<ExportGuide
         onReturn={onReturn}
         entry={entry}
         returnText={returnText}
         projectId={projectId}
+        onSwitch={onSwitch}
       />)
+    } else {
+      return null
     }
   }
 }
