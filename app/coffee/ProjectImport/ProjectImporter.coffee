@@ -48,42 +48,47 @@ module.exports = ProjectImporter =
 				metrics.inc "project-import.error.total"
 				metrics.inc "project-import.error.#{error.name}"
 				return callback(error)
+			ProjectImporter._createV2ProjectFromV1Doc v1_project_id, user_id, doc, callback
 
-			async.waterfall [
-				(cb) ->
-					ProjectImporter._initSharelatexProject user_id, doc, cb
-				(doc, v2_project_id, cb) ->
-					async.series [
-						(cb) ->
-							ProjectImporter._importInvites v2_project_id, doc.invites, cb
-						(cb) ->
-							ProjectImporter._importFiles v2_project_id, user_id, doc.files, cb
-						(cb) ->
-							ProjectImporter._waitForV1HistoryExport v1_project_id, user_id, cb
-						(cb) ->
-							ProjectImporter._confirmExport v1_project_id, v2_project_id, user_id, cb
-					], (error) ->
-						if error?
-							# Since _initSharelatexProject created a v2 project we want to
-							# clean it up if any of these steps which happened afterwards fail.
-							ProjectDeleter.deleteProject v2_project_id, (deleteError) ->
-								if deleteError?
-									logger.err {deleteError, errorMessage: deleteError.message, v1_project_id, v2_project_id}, "failed to delete imported project"
-								cb(error)
-						else
-							cb(null, v2_project_id)
-			], (importError, v2_project_id) ->
-				if importError?
-					logger.err {importError, errorMessage: importError.message, v1_project_id, v1_project_id}, "failed to import project"
-					metrics.inc "project-import.error.total"
-					metrics.inc "project-import.error.#{importError.name}"
-					ProjectImporter._cancelExport v1_project_id, user_id, (cancelError) ->
-						if cancelError?
-							logger.err {cancelError, errorMessage: cancelError.message, v1_project_id, v2_project_id}, "failed to cancel project import"
-						callback importError
-				else
-					metrics.inc "project-import.success"
-					callback null, v2_project_id
+	_createV2ProjectFromV1Doc: (v1_project_id, user_id, doc, callback = (error, v2_project_id) ->) ->
+		async.waterfall [
+			(cb) ->
+				ProjectImporter._initSharelatexProject user_id, doc, cb
+			(v2_project_id, cb) ->
+				ProjectImporter._importV1ProjectDataIntoV2Project v1_project_id, v2_project_id, user_id, doc, cb
+		], (importError, v2_project_id) ->
+			if importError?
+				logger.err {importError, errorMessage: importError.message, v1_project_id, v1_project_id}, "failed to import project"
+				metrics.inc "project-import.error.total"
+				metrics.inc "project-import.error.#{importError.name}"
+				ProjectImporter._cancelExport v1_project_id, user_id, (cancelError) ->
+					if cancelError?
+						logger.err {cancelError, errorMessage: cancelError.message, v1_project_id, v2_project_id}, "failed to cancel project import"
+					callback(importError)
+			else
+				metrics.inc "project-import.success"
+				callback null, v2_project_id
+
+	_importV1ProjectDataIntoV2Project: (v1_project_id, v2_project_id, user_id, doc, callback = (error, v2_project_id) ->) ->
+		async.series [
+			(cb) ->
+				ProjectImporter._importInvites v2_project_id, doc.invites, cb
+			(cb) ->
+				ProjectImporter._importFiles v2_project_id, user_id, doc.files, cb
+			(cb) ->
+				ProjectImporter._waitForV1HistoryExport v1_project_id, user_id, cb
+			(cb) ->
+				ProjectImporter._confirmExport v1_project_id, v2_project_id, user_id, cb
+		], (error) ->
+			if error?
+				# Since _initSharelatexProject created a v2 project we want to
+				# clean it up if any of these steps which happened afterwards fail.
+				ProjectDeleter.deleteProject v2_project_id, (deleteError) ->
+					if deleteError?
+						logger.err {deleteError, errorMessage: deleteError.message, v1_project_id, v2_project_id}, "failed to delete imported project"
+					callback(error)
+			else
+				callback(null, v2_project_id)
 
 	_startExport: (v1_project_id, user_id, callback = (error, doc) ->) ->
 		oAuthRequest user_id, {
@@ -132,7 +137,7 @@ module.exports = ProjectImporter =
 
 		ProjectCreationHandler.createBlankProject user_id, doc.title, attributes, (error, project) ->
 			return callback(error) if error?
-			return callback(null, doc, project._id)
+			return callback(null, project._id)
 
 	_importInvites: (project_id, invites = [], callback = (error) ->) ->
 		async.mapSeries(invites, (invite, cb) ->
