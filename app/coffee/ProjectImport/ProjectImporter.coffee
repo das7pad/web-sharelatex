@@ -35,6 +35,8 @@ V1_HISTORY_SYNC_REQUEST_TIMES = [
 	0, 0.5, 1, 2, 5, 10, 30, 45
 ]
 
+OVERLEAF_BRAND_VARIATION_ID = 52
+
 module.exports = ProjectImporter =
 	importProject: (v1_project_id, user_id, callback = (error, v2_project_id) ->) ->
 		logger.log {v1_project_id, user_id}, "importing project from overleaf"
@@ -90,7 +92,7 @@ module.exports = ProjectImporter =
 	_initSharelatexProject: (user_id, doc = {}, callback = (err, project) ->) ->
 		if !doc.title? or !doc.id? or !doc.latest_ver_id? or !doc.latex_engine? or !doc.token? or !doc.read_token?
 			return callback(new Error("expected doc title, id, latest_ver_id, latex_engine, token and read_token"))
-		if doc.brand_variation_id?
+		if doc.brand_variation_id? && doc.brand_variation_id != OVERLEAF_BRAND_VARIATION_ID
 			return callback(new UnsupportedBrandError("project has brand variation: #{doc.brand_variation_id}"))
 		if doc.has_export_records? and doc.has_export_records
 			return callback(new UnsupportedExportRecordsError("project has export records"))
