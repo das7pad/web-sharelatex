@@ -33,7 +33,7 @@ describe "ProjectImporter", ->
 	describe "importProject", ->
 		beforeEach ->
 			@ProjectImporter._startExport = sinon.stub().yields(null, @doc = { files: ["mock-files"] })
-			@ProjectImporter._initSharelatexProject = sinon.stub().yields(null, @doc, @project_id = "mock-project-id")
+			@ProjectImporter._initSharelatexProject = sinon.stub().yields(null, @project_id = "mock-project-id")
 			@ProjectImporter._importFiles = sinon.stub().yields()
 			@ProjectImporter._waitForV1HistoryExport = sinon.stub().yields()
 			@ProjectImporter._confirmExport = sinon.stub().yields()
@@ -137,9 +137,6 @@ describe "ProjectImporter", ->
 				@ProjectCreationHandler.createBlankProject
 					.calledWith(@user_id, @doc.title, attributes)
 					.should.equal true
-
-			it "should return the doc and project id", ->
-				@callback.calledWith(null, @doc, @project._id).should.equal true
 
 		describe "null checks", ->
 			it "should require doc.title", (done) ->
