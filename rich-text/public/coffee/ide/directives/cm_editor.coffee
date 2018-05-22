@@ -83,6 +83,11 @@ define [
           detachFromCM(scope.sharejsDoc)
           richText.disable()
 
+        if attrs.resizeOn?
+          for event in attrs.resizeOn.split(',')
+            scope.$on event, () ->
+              richText?.getCodeMirror()?.refresh()
+
         init()
 
       template: """
