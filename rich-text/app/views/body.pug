@@ -1,9 +1,9 @@
 if showRichText
   #editor-rich-text(
     cm-editor,
-    ng-if="editor.richText"
-    ng-show="!!editor.sharejs_doc && !editor.opening"
-    sharejs-doc="editor.sharejs_doc"
+    ng-if="editor.richText",
+    ng-show="!!editor.sharejs_doc && !editor.opening",
+    sharejs-doc="editor.sharejs_doc",
     spell-check="!anonymous",
     spell-check-language="project.spellCheckLanguage"
   )
