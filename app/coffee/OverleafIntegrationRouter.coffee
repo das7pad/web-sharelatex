@@ -51,6 +51,8 @@ module.exports =
 			AccountSyncController.syncHook
 		)
 
+		webRouter.get '/user/trial', AccountSyncController.startTrial
+
 
 removeRoute = (router, method, path)->
 	index = null
