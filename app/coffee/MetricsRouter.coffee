@@ -1,6 +1,7 @@
 logger = require 'logger-sharelatex'
 MetricsController = require './MetricsController'
 AuthenticationController = require("../../../../app/js/Features/Authentication/AuthenticationController")
+AuthorizationMiddlewear = require('../../../../app/js/Features/Authorization/AuthorizationMiddlewear')
 settings = require 'settings-sharelatex'
 
 module.exports =
@@ -12,6 +13,18 @@ module.exports =
 			return
 
 		logger.log {}, "Init metrics router"
+
+		webRouter.get(
+			'/metrics/teams/:teamId/?(:startDate/:endDate)?',
+			AuthorizationMiddlewear.ensureUserIsSiteAdmin,
+			MetricsController.teamMetrics
+		)
+
+		webRouter.get(
+			'/graphs/(:graph)?',
+			AuthorizationMiddlewear.ensureUserIsSiteAdmin,
+			MetricsController.analyticsProxy
+		)
 
 		privateApiRouter.get(
 			'/user/:user_id/v1/metrics_segmentation',

@@ -11,6 +11,8 @@ describe "MetricsController", ->
 		@MetricsController = SandboxedModule.require modulePath, requires:
 			'settings-sharelatex': @Settings =
 				apis:
+					analytics:
+						url: 'http://analytics:123456'
 					v1:
 						url: 'some.host'
 						user: 'one'
@@ -27,6 +29,41 @@ describe "MetricsController", ->
 			'mongoose':
 				Types:
 					ObjectId: @ObjectId = sinon.stub()
+
+
+	describe 'teamMetrics', ->
+		it 'renders the metricsApp template', (done) ->
+			@req = params: { teamId: 5 }
+			@res = { render: sinon.stub() }
+
+			@MetricsController.teamMetrics(@req, @res)
+
+			@res.render.calledWith(
+				sinon.match('views/metricsApp'), {
+					metricsEndpoint: '/graphs',
+					resourceId: 5,
+					resourceType: 'team',
+				}
+			).should.equal true
+
+			done()
+
+	describe 'analyticsProxy', ->
+		it 'proxies requests to the analytics service', (done) ->
+			@request.get  = sinon.stub().returns(@request)
+			@request.on   = sinon.stub().returns(@request)
+			@request.pipe = sinon.stub().returns(@request)
+
+			@req = { originalUrl: '/graphs?resource_type=team&resource_id=6' }
+
+			@MetricsController.analyticsProxy(@req, @res)
+
+			@request.get.calledWith(
+				'http://analytics:123456/graphs?resource_type=team&resource_id=6'
+			).should.equal true
+
+			done()
+
 
 	describe 'userMetricsSegmentation', ->
 		beforeEach ->
