@@ -4,14 +4,25 @@ define [
 	"services/algolia-search"
 ], (App, platform) ->
 	App.controller 'ContactModal', ($scope, $modal) ->
+		# the button to open the modal
 		$scope.contactUsModal = () ->
 			modalInstance = $modal.open(
-				templateUrl: "supportModalTemplate"
-				controller: "SupportModalController"
+				templateUrl: 'contactModalTemplate'
+				controller: 'ContactModalController'
+				scope: $scope
 			)
 
-	App.controller 'SupportModalController', ($scope, $modalInstance, algoliaSearch, event_tracking,  $http) ->
-		$scope.form = {}
+	App.controller 'ContactModalController', ($scope, $modalInstance) ->
+		# the modal, which contains a form
+
+		$scope.close = () ->
+			$modalInstance.close()
+
+	App.controller 'ContactFormController', ($scope, algoliaSearch, event_tracking, $http)->
+		# the form
+		$scope.form = {
+			email: ''
+		}
 		$scope.sent = false
 		$scope.sending = false
 		$scope.suggestions = [];
@@ -20,13 +31,13 @@ define [
 			suggestions = for hit in results.hits
 				page_underscored = hit?.pageName?.replace(/\s/g,'_')
 
-				suggestion = 
+				suggestion =
 					url :"/learn/kb/#{page_underscored}"
 					name : hit._highlightResult.pageName.value
 
 			event_tracking.sendMB "contact-form-suggestions-shown" if results.hits.length
 
-			$scope.$applyAsync () -> 
+			$scope.$applyAsync () ->
 				$scope.suggestions = suggestions
 
 		$scope.contactUs = ->
@@ -37,7 +48,7 @@ define [
 			ticketNumber = Math.floor((1 + Math.random()) * 0x10000).toString(32)
 			message = $scope.form.message
 			if $scope.form.project_url?
-				message	= "#{message}\n\n project_url = #{$scope.form.project_url}" 
+				message	= "#{message}\n\n project_url = #{$scope.form.project_url}"
 			data =
 				_csrf : window.csrfToken
 				email: $scope.form.email
@@ -56,7 +67,7 @@ define [
 
 		$scope.$watch "form.subject", (newVal, oldVal) ->
 			if newVal and newVal != oldVal and newVal.length > 3
-				algoliaSearch.searchKB newVal, _handleSearchResults, { 
+				algoliaSearch.searchKB newVal, _handleSearchResults, {
 					hitsPerPage: 3
 					typoTolerance: 'strict'
 				}
@@ -65,9 +76,3 @@ define [
 
 		$scope.clickSuggestionLink = (url) ->
 			event_tracking.sendMB "contact-form-suggestions-clicked", { url }
-
-		$scope.close = () ->
-			$modalInstance.close()
-
-
-
