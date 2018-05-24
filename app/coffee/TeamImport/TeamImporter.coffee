@@ -73,7 +73,6 @@ rollback = (v1TeamId, originalError, callback) ->
 		method: "DELETE"
 	}, (error, team) ->
 		return callback(error) if error?
-		callback(originalError)
 
 		Subscription.deleteOne { "overleaf.id": v1TeamId }, (error) ->
 			return callback(error) if error?
