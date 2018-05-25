@@ -2,6 +2,7 @@
 {UserStub} = require "../../../../../app/js/models/UserStub"
 UserCreator = require "../../../../../app/js/Features/User/UserCreator"
 CollaboratorsHandler = require "../../../../../app/js/Features/Collaborators/CollaboratorsHandler"
+SubscriptionGroupHandler = require "../../../../../app/js/Features/Subscription/SubscriptionGroupHandler"
 Subscription = require("../../../../../app/js/models/Subscription").Subscription
 
 # When we import a project, it may refer to collaborators which
@@ -88,27 +89,9 @@ module.exports = UserMapper =
 						return callback null, user
 
 	_updateUserStubReferences: (olUser, userStubId, slUserId, callback = (error) ->) ->
-		UserMapper._updateUserStubCollaboratorReferences olUser, userStubId, slUserId, (error) ->
+		CollaboratorsHandler.transferProjects userStubId, slUserId, (error) ->
 			return callback(error) if error?
-			UserMapper._updateUserStubSubscriptionReferences olUser, userStubId, slUserId, (error) ->
+			SubscriptionGroupHandler.replaceUserReferencesInGroups userStubId, slUserId, (error) ->
 				return callback(error) if error?
 				UserMapper.removeOlUserStub olUser.id, (error) ->
 					return callback(error)
-
-	_updateUserStubCollaboratorReferences: (olUser, userStubId, slUserId, callback = (error) ->) ->
-		CollaboratorsHandler.transferProjects userStubId, slUserId, (error) ->
-			return callback(error)
-
-	_updateUserStubSubscriptionReferences: (olUser, userStubId, slUserId, callback = (error) ->) ->
-		Subscription.update {admin_id: userStubId}, {admin_id: slUserId}, (error) ->
-			callback(error) if error?
-
-			query = {member_ids: userStubId}
-			addNewUserUpdate = $addToSet: {member_ids: slUserId}
-			removeOldUserUpdate = $pull: {member_ids: userStubId}
-
-			# Mongo won't let us pull and addToSet in the same query, so do it in
-			# two. Note we need to add first, since the query is based on the old user.
-			Subscription.update query, addNewUserUpdate, { multi: true }, (error) ->
-				return callback(error) if error?
-				Subscription.update query, removeOldUserUpdate, { multi: true }, callback
