@@ -6,3 +6,6 @@
       label-true="Rich Text"
       ng-model="editor.showRichText"
     )
+
+  .formatting-btns(ng-if="editor.showRichText && richText.editor")
+    button(ng-click="logEditor()") Log editor
