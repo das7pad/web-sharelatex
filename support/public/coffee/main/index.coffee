@@ -4,7 +4,7 @@ define [
 	"services/algolia-search"
 ], (App, platform) ->
 	App.controller 'ContactModal', ($scope, $modal) ->
-		# the button to open the modal
+		# the button to open the support modal / form with affected URL input
 		$scope.contactUsModal = () ->
 			modalInstance = $modal.open(
 				templateUrl: 'contactModalTemplate'
@@ -12,7 +12,21 @@ define [
 				scope: $scope
 			)
 
+	App.controller 'ContactGeneralModal', ($scope, $modal) ->
+		# the button to open the general modal / form WITHOUT affected URL input
+		$scope.openModal = () ->
+			modalInstance = $modal.open(
+				templateUrl: 'contactGeneralModalTemplate'
+				controller: 'ContactGeneralModalController'
+			)
+
 	App.controller 'ContactModalController', ($scope, $modalInstance) ->
+		# the modal, which contains a form
+
+		$scope.close = () ->
+			$modalInstance.close()
+
+	App.controller 'ContactGeneralModalController', ($scope, $modalInstance) ->
 		# the modal, which contains a form
 
 		$scope.close = () ->

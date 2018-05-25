@@ -8,5 +8,6 @@ module.exports  =
 	router: SupportRouter
 	viewIncludes:
 		"contactModal": "contact_form/contact_modal"
+		"contactModalGeneral": "contact_form/contact_general_modal"
 		"contactFormGeneral": "contact_form/form_general"
 		"contactFormSupport": "contact_form/form_with_url"
