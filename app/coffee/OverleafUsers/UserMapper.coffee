@@ -88,9 +88,6 @@ module.exports = UserMapper =
 						return callback null, user
 
 	_updateUserStubReferences: (olUser, userStubId, slUserId, callback = (error) ->) ->
-		# At the moment, UserStub only tracks collaborations and subscriptions. If this changes in
-		# future, this method will need updating to migrate any additional references
-		# to the SL user.
 		UserMapper._updateUserStubCollaboratorReferences olUser, userStubId, slUserId, (error) ->
 			return callback(error) if error?
 			UserMapper._updateUserStubSubscriptionReferences olUser, userStubId, slUserId, (error) ->
