@@ -216,9 +216,10 @@ module.exports = ProjectImporter =
 				logger.warn {type: file.type, path: file.file, project_id}, "unknown file type"
 				callback(new UnsupportedFileTypeError("unknown file type: #{file.type}"))
 
-	_writeS3ObjectToDisk: (path, callback = (error, pathOnDisk) ->) ->
+	_writeS3ObjectToDisk: (filePath, callback = (error, pathOnDisk) ->) ->
+		encodedFilePath = filePath.split('/').map(encodeURIComponent).join('/')
 		options = {
-			url: "#{settings.overleaf.s3.host}/#{path}"
+			url: "#{settings.overleaf.s3.host}/#{encodedFilePath}"
 		}
 		if settings.overleaf.s3.key? and settings.overleaf.s3.secret?
 			options.aws =
