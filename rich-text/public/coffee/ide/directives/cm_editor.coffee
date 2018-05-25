@@ -37,8 +37,24 @@ define [
         scope.$watch "sharejsDoc", switchAttachment
 
         setUpFormattingEventListeners = () ->
+          scope.formattingEvents.on 'section', () -> editor.wrapSection()
+          scope.formattingEvents.on 'subsection', () -> editor.wrapSubsection()
+          scope.formattingEvents.on 'bold', () -> editor.wrapBold()
+          scope.formattingEvents.on 'italic', () -> editor.wrapItalic()
+          scope.formattingEvents.on 'inlineMath', () -> editor.wrapInlineMath()
+          scope.formattingEvents.on 'displayMath', () -> editor.wrapDisplayMath()
+          scope.formattingEvents.on 'numberedList', () -> editor.wrapNumberedList()
+          scope.formattingEvents.on 'bulletList', () -> editor.wrapBulletList()
 
         tearDownFormattingEventListeners = () ->
+          scope.formattingEvents.off 'section'
+          scope.formattingEvents.off 'subsection'
+          scope.formattingEvents.off 'bold'
+          scope.formattingEvents.off 'italic'
+          scope.formattingEvents.off 'inlineMath'
+          scope.formattingEvents.off 'displayMath'
+          scope.formattingEvents.off 'numberedList'
+          scope.formattingEvents.off 'bulletList'
 
         attachToCM = (sharejsDoc) ->
           scope.$applyAsync () ->
