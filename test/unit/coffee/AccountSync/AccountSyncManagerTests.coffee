@@ -14,6 +14,8 @@ describe 'AccountSyncManager', ->
 			"../../../../../app/js/Features/User/UserGetter": @UserGetter = {}
 			"../../../../../app/js/Features/Subscription/FeaturesUpdater":
 				@FeaturesUpdater = {}
+			'../../../../../app/js/Features/Subscription/SubscriptionLocator':
+				@SubscriptionLocator = {}
 			"logger-sharelatex":
 				log: sinon.stub()
 				err: sinon.stub()
@@ -22,6 +24,7 @@ describe 'AccountSyncManager', ->
 				overleaf:
 					host: @host = "http://overleaf.example.com"
 			"../OAuth/OAuthRequest": @oAuthRequest = {}
+
 		@AccountSyncManager._v1PlanRequest = sinon.stub()
 		@userId = 'abcd'
 		@v1UserId = 42
@@ -37,7 +40,7 @@ describe 'AccountSyncManager', ->
 			@UserGetter.getUser = sinon.stub()
 				.callsArgWith(2, null, @user)
 			@FeaturesUpdater.refreshFeatures = sinon.stub()
-				.callsArgWith(1, null)
+				.yields(null)
 			@call = (cb) =>
 				@AccountSyncManager.doSync(@v1UserId, cb)
 
@@ -59,7 +62,7 @@ describe 'AccountSyncManager', ->
 						@FeaturesUpdater.refreshFeatures.callCount
 					).to.equal 1
 					expect(
-						@FeaturesUpdater.refreshFeatures.calledWith(@userId)
+						@FeaturesUpdater.refreshFeatures.calledWith(@userId, false)
 					).to.equal true
 					done()
 
@@ -102,3 +105,50 @@ describe 'AccountSyncManager', ->
 					expect(err).to.not.exist
 					done()
 
+	describe "_canonicalPlanCode", ->
+		it "should map all the used plan codes to a canonical one", ->
+			expect(
+				@AccountSyncManager._canonicalPlanCode('student')
+			).to.equal 'student'
+			expect(
+				@AccountSyncManager._canonicalPlanCode('student-annual')
+			).to.equal 'student'
+			expect(
+				@AccountSyncManager._canonicalPlanCode('stud-ann_free_trial')
+			).to.equal 'student'
+			expect(
+				@AccountSyncManager._canonicalPlanCode('collaborator')
+			).to.equal 'collaborator'
+			expect(
+				@AccountSyncManager._canonicalPlanCode('collaborator-annual')
+			).to.equal 'collaborator'
+			expect(
+				@AccountSyncManager._canonicalPlanCode('collaborator-annual_free_trial')
+			).to.equal 'collaborator'
+			expect(
+				@AccountSyncManager._canonicalPlanCode('professional')
+			).to.equal 'professional'
+			expect(
+				@AccountSyncManager._canonicalPlanCode('professional-annual')
+			).to.equal 'professional'
+			expect(
+				@AccountSyncManager._canonicalPlanCode('prof-ann_free_trial')
+			).to.equal 'professional'
+			expect(
+				@AccountSyncManager._canonicalPlanCode('group_5_members')
+			).to.equal 'professional'
+			expect(
+				@AccountSyncManager._canonicalPlanCode('personal')
+			).to.equal 'personal'
+			expect(
+				@AccountSyncManager._canonicalPlanCode('unknown')
+			).to.equal 'personal'
+
+	describe '_sortPlanCodes', ->
+		it 'should sort in descending order of features', ->
+			planCodes = ['student', 'personal', 'collaborator', 'professional']
+			expect(
+				@AccountSyncManager._sortPlanCodes(planCodes)
+			).to.deep.equal [
+				'professional', 'collaborator', 'student', 'personal'
+			]

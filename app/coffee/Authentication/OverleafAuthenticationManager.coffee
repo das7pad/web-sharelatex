@@ -43,7 +43,7 @@ module.exports = OverleafAuthenticationManager =
 					else
 						UserMapper.createSlUser profile, accessToken, refreshToken, (err, sl_user) ->
 							return callback(err) if err?
-							FeaturesUpdater.refreshFeatures(sl_user._id)
+							FeaturesUpdater.refreshFeatures(sl_user._id, false)
 							callback(null, sl_user)
 
 	_updateUserTokens: (user, accessToken, refreshToken, callback = (error, user) ->) ->
