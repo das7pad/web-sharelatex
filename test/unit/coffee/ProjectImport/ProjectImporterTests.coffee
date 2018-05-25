@@ -554,12 +554,19 @@ describe "ProjectImporter", ->
 		beforeEach ->
 			@ProjectImporter._writeUrlToDisk = sinon.stub().yields()
 
+		it "should URI encode the file path", (done) ->
+			@ProjectImporter._writeS3ObjectToDisk "foo/b a r", (error) =>
+				@ProjectImporter._writeUrlToDisk
+					.calledWithMatch({
+						url: "http://s3.example.com/foo/b%20a%20r"
+					})
+					.should.equal true
+				done()
+
 		it "should call _writeUrlToDisk with the s3 url", (done) ->
-			delete @settings.overleaf.s3.key
-			delete @settings.overleaf.s3.secret
 			@ProjectImporter._writeS3ObjectToDisk "foo/bar", (error) =>
 				@ProjectImporter._writeUrlToDisk
-					.calledWith({
+					.calledWithMatch({
 						url: "http://s3.example.com/foo/bar"
 					})
 					.should.equal true
