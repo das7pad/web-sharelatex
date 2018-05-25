@@ -3,7 +3,6 @@
 UserCreator = require "../../../../../app/js/Features/User/UserCreator"
 CollaboratorsHandler = require "../../../../../app/js/Features/Collaborators/CollaboratorsHandler"
 SubscriptionGroupHandler = require "../../../../../app/js/Features/Subscription/SubscriptionGroupHandler"
-Subscription = require("../../../../../app/js/models/Subscription").Subscription
 
 # When we import a project, it may refer to collaborators which
 # have not yet linked their account the beta system. In that case,

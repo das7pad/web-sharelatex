@@ -12,7 +12,7 @@ describe "UserMapper", ->
 			"../../../../../app/js/Features/User/UserCreator": @UserCreator = {}
 			"../../../../../app/js/models/User": User: @User = {}
 			"../../../../../app/js/models/UserStub": UserStub: @UserStub = {}
-			"../../../../../app/js/models/Subscription": Subscription: @Subscription = {}
+			"../../../../../app/js/Features/Subscription/SubscriptionGroupHandler": @SubscriptionGroupHandler = {}
 			"../../../../../app/js/Features/Collaborators/CollaboratorsHandler": @CollaboratorsHandler = {}
 		@callback = sinon.stub()
 
@@ -188,7 +188,7 @@ describe "UserMapper", ->
 		describe "successfully - with an existing UserStub", ->
 			beforeEach ->
 				@UserMapper.getOlUserStub = sinon.stub().yields(null, @user_stub = { _id: "user-stub-id" })
-				@Subscription.update = sinon.stub().yields(null)
+				@SubscriptionGroupHandler.replaceUserReferencesInGroups = sinon.stub().yields(null)
 				@UserMapper.mergeWithSlUser(
 					@user_id, @ol_user, @accessToken, @refreshToken, @callback
 				)
@@ -200,6 +200,11 @@ describe "UserMapper", ->
 
 			it "should transfer projects from the user stub to the user", ->
 				@CollaboratorsHandler.transferProjects
+					.calledWith(@user_stub._id, @user_id)
+					.should.equal true
+
+			it "should transfer group memmberships from the user stub to the user", ->
+				@SubscriptionGroupHandler.replaceUserReferencesInGroups
 					.calledWith(@user_stub._id, @user_id)
 					.should.equal true
 
