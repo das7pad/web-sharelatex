@@ -1,4 +1,7 @@
 module.exports =
+	apis:
+		v1:
+			host: "http://localhost:5000"
 	overleaf:
 		host: "http://localhost:5000"
 		s3:

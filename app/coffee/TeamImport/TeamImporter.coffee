@@ -31,7 +31,7 @@ importTeam = (v1TeamId, callback = (error, v2TeamId) ->) ->
 
 startImportInV1 = (v1TeamId, callback = (error, v1Team) ->) ->
 	v1Request {
-		url: "#{settings.overleaf.host}/api/v1/sharelatex/team_exports/#{v1TeamId}/"
+		url: "#{settings.apis.v1.host}/api/v1/sharelatex/team_exports/#{v1TeamId}/"
 		method: "POST"
 	}, callback
 
@@ -60,7 +60,7 @@ importTeamMembers = (v1Team, v2Team, callback = (error, memberIds) ->) ->
 
 confirmImportInV1 = (v1TeamId, v2TeamId, callback = (error) ->) ->
 	v1Request {
-		url: "#{settings.overleaf.host}/api/v1/sharelatex/team_exports/#{v1TeamId}/"
+		url: "#{settings.apis.v1.host}/api/v1/sharelatex/team_exports/#{v1TeamId}/"
 		method: "PATCH",
 		json: true,
 		body: { v2_id: v2TeamId }
@@ -69,7 +69,7 @@ confirmImportInV1 = (v1TeamId, v2TeamId, callback = (error) ->) ->
 
 rollback = (v1TeamId, originalError, callback) ->
 	v1Request {
-		url: "#{settings.overleaf.host}/api/v1/sharelatex/team_exports/#{v1TeamId}/"
+		url: "#{settings.apis.v1.host}/api/v1/sharelatex/team_exports/#{v1TeamId}/"
 		method: "DELETE"
 	}, (error, team) ->
 		return callback(error) if error?
