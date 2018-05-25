@@ -52,7 +52,7 @@ describe "Team imports", ->
 				team = JSON.parse(body)
 
 				expect(team.overleaf.id).to.eq(4)
-				expect(team._id).to.eq(@subscription._id.toString())
+				expect(team.id).to.eq(@subscription.id)
 
 				done()
 

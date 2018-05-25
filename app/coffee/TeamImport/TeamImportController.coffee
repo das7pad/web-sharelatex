@@ -6,4 +6,11 @@ module.exports = TeamImportController =
 		TeamImporter.getOrImportTeam req.params.teamId, (error, v2Team) ->
 			return next(error) if error?
 
-			res.json v2Team
+			v2TeamView = {
+				id: v2Team.id,
+				overleaf:
+					id: v2Team.overleaf.id
+				member_ids: v2Team.member_ids
+			}
+
+			res.json v2TeamView
