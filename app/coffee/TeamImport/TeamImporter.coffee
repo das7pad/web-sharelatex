@@ -46,10 +46,7 @@ createV2Team = (v1Team, callback = (error, v2Team) ->) ->
 			return callback(null, v1Team, subscription)
 
 importTeamMembers = (v1Team, v2Team, callback = (error, memberIds) ->) ->
-	jobs = v1Team.users.map (u) ->
-		(cb) -> UserMapper.getSlIdFromOlUser(u, cb)
-
-	async.series jobs, (error, memberIds) ->
+	async.map v1Team.users, UserMapper.getSlIdFromOlUser, (error, memberIds) ->
 		return callback(error) if error?
 		Subscription.update { _id: v2Team.id }, { member_ids: memberIds }, (error, updated) ->
 			callback(error) if error?
