@@ -9,15 +9,9 @@ define [
         { fileTreeManager: sinon.stub() }
       return
 
-    origRequireJsFn = null
-    beforeEach () ->
-      origRequireJsFn = window.requirejs
-      window.requirejs = @requirejs = sinon.stub()
-
-    afterEach () ->
-      window.requirejs = origRequireJsFn
-
     it 'inits Rich Text', () ->
+      # Sinon doesn't really seem to like spying on a class, so we have to make
+      # a custom one
       editorStub = sinon.stub().returns({
         openDoc: sinon.stub(),
         enable: sinon.stub(),
@@ -29,29 +23,30 @@ define [
         }),
         disable: sinon.stub()
       })
-      @requirejs.callsArgWith(1, Editor: editorStub)
       inject ($compile, $rootScope) ->
         $rootScope.sharejsDoc = stubSharejsDoc()
+        $rootScope.bundle = { Editor: editorStub }
+        $rootScope.formattingEvents = new EventEmitter()
 
-        $compile('<div cm-editor sharejs-doc="sharejsDoc"></div>')($rootScope)
+        $compile('<div cm-editor sharejs-doc="sharejsDoc" bundle="bundle" formatting-events="formattingEvents"></div>')($rootScope)
         $rootScope.$digest()
 
         expect(editorStub).to.have.been.called
 
     it 'attaches to CM', () ->
       Editor = stubEditor()
-
       getCodeMirror = Editor.prototype.getCodeMirror
       openDoc = Editor.prototype.openDoc
       enable = Editor.prototype.enable
-      @requirejs.callsArgWith(1, Editor: Editor)
       inject ($compile, $rootScope, $browser) ->
         $rootScope.sharejsDoc = stubSharejsDoc({
           getSnapshot: getSnapshot = sinon.stub().returns(snapshot = {})
           attachToCM: attachToCM = sinon.stub()
         })
+        $rootScope.bundle = { Editor: Editor }
+        $rootScope.formattingEvents = new EventEmitter()
 
-        $compile('<div cm-editor sharejs-doc="sharejsDoc"></div>')($rootScope)
+        $compile('<div cm-editor sharejs-doc="sharejsDoc" bundle="bundle" formatting-events="formattingEvents"></div>')($rootScope)
         $rootScope.$digest()
 
         expect(getCodeMirror).to.have.been.called
@@ -64,10 +59,12 @@ define [
     it 'calls Editor.update when remoteop event is trigger', () ->
       Editor = stubEditor()
       update = Editor.prototype.update
-      @requirejs.callsArgWith(1, Editor: Editor)
       inject ($compile, $rootScope) ->
         $rootScope.sharejsDoc = stubSharejsDoc()
-        $compile('<div cm-editor sharejs-doc="sharejsDoc"></div>')($rootScope)
+        $rootScope.bundle = { Editor: Editor }
+        $rootScope.formattingEvents = new EventEmitter()
+
+        $compile('<div cm-editor sharejs-doc="sharejsDoc" bundle="bundle" formatting-events="formattingEvents"></div>')($rootScope)
         $rootScope.$digest()
 
         $rootScope.sharejsDoc.trigger('remoteop')
@@ -76,13 +73,14 @@ define [
     it 'detaches from CM when destroyed', () ->
       Editor = stubEditor()
       disable = Editor.prototype.disable
-      @requirejs.callsArgWith(1, Editor: Editor)
       inject ($compile, $rootScope) ->
         $rootScope.sharejsDoc = stubSharejsDoc({
           detachFromCM: detachFromCM = sinon.stub()
         })
+        $rootScope.bundle = { Editor: Editor }
+        $rootScope.formattingEvents = new EventEmitter()
 
-        $compile('<div cm-editor sharejs-doc="sharejsDoc"></div>')($rootScope)
+        $compile('<div cm-editor sharejs-doc="sharejsDoc" bundle="bundle" formatting-events="formattingEvents"></div>')($rootScope)
         $rootScope.$digest()
         $rootScope.$broadcast('$destroy')
 
@@ -90,11 +88,15 @@ define [
         expect(disable).to.have.been.called
 
   stubCodeMirror = (overrides = {}) ->
+    # Should note that we're extending our EventEmitter implementation that
+    # is different from CodeMirror's built-in implementation. However the top-
+    # level api is the same
     _.extend({
       getValue: sinon.stub().returns('some text'),
       getWrapperElement: sinon.stub().returns({ off: sinon.stub() })
     }, overrides, EventEmitter.prototype)
 
+  # Stub the Editor class that is returned as the root of the rich text bundle
   stubEditor = () ->
     class Editor
       getCodeMirror: sinon.stub().returns(stubCodeMirror())
@@ -103,6 +105,7 @@ define [
       disable: sinon.stub()
       update: sinon.stub()
 
+  # Stub the ShareJS Doc that is created by editor internals
   stubSharejsDoc = (overrides = {}) ->
     _.extend({
       attachToCM: sinon.stub()
