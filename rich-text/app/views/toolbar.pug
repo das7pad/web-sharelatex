@@ -7,4 +7,8 @@
       ng-model="editor.showRichText"
     )
 
-  button-measurer(buttons="buttons")
+  button-measurer(
+    buttons="buttons"
+    opening="editor.opening"
+    resize-on="layout:main:resize,layout:pdf:resize,layout:review:resize,review-panel:toggle",
+  )
