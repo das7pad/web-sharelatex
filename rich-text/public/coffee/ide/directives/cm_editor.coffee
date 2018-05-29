@@ -37,10 +37,8 @@ define [
         scope.$watch "sharejsDoc", switchAttachment
 
         setUpFormattingEventListeners = () ->
-          scope.formattingEvents.on "logEditor", () -> console.log(editor)
 
         tearDownFormattingEventListeners = () ->
-          scope.formattingEvents.off "logEditor"
 
         attachToCM = (sharejsDoc) ->
           scope.$applyAsync () ->
