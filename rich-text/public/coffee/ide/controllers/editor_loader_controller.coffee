@@ -2,7 +2,7 @@ define [
   "base"
   "utils/EventEmitter"
 ], (App, EventEmitter) ->
-  App.controller "EditorLoaderController", ($scope, ide) ->
+  App.controller "EditorLoaderController", ($scope) ->
     $scope.richText = {
       bundle: null
       formattingEvents: new EventEmitter()
