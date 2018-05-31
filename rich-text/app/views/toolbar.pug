@@ -7,8 +7,39 @@
       ng-model="editor.showRichText"
     )
 
-  formatting-buttons(
+  div(
+    formatting-buttons
+    ng-cloak
+    ng-if="editor.showRichText"
     buttons="buttons"
     opening="editor.opening"
-    resize-on="layout:main:resize,layout:pdf:resize,layout:review:resize,review-panel:toggle",
+    resize-on="layout:main:resize,layout:pdf:resize,layout:review:resize,review-panel:toggle"
+    class="formatting-buttons"
   )
+
+  script(type="text/ng-template", id="formattingButtonsTpl")
+    .formatting-buttons-wrapper
+      | &nbsp;
+      button.btn.btn-default.formatting-btn.formatting-btn--icon(
+        ng-repeat="button in shownButtons"
+        ng-click="button.handleClick()"
+        title="{{button.title}}"
+      )
+        i(class="{{button.iconClass}}") {{button.iconText}}
+
+      .dropdown.formatting-more(
+        ng-if="showMore"
+        dropdown
+        dropdown-append-to-body
+      )
+        button.btn.btn-default.formatting-btn.formatting-btn--more.dropdown-toggle(
+          dropdown-toggle
+        ) #{translate('more')}
+
+        ul.dropdown-menu.formatting-menu(role="menu")
+          li.formatting-menu-item(ng-repeat="button in overflowedButtons")
+            button.btn.btn-default.formatting-btn.formatting-btn--icon(
+              ng-click="button.handleClick()"
+              title="{{button.title}}"
+            )
+              i(class="{{button.iconClass}}") {{button.iconText}}

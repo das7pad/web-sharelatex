@@ -2,7 +2,7 @@ define ['base'], (App) ->
   BUTTON_WIDTH = 33
   OVERFLOWED_BUTTON_WIDTH = 55
 
-  App.directive "formattingButtons", ($timeout) ->
+  App.directive "formattingButtons", () ->
     return {
       scope: {
         buttons: "="
@@ -56,44 +56,5 @@ define ['base'], (App) ->
         scope.$watch '$destroy', () ->
           tearDownResizeListeners()
 
-      template: """
-        &nbsp;
-        <button
-          ng-repeat="button in shownButtons"
-          ng-click="button.handleClick()"
-          title="{{button.title}}"
-          class="btn btn-default formatting-btn formatting-btn--icon"
-        >
-          <i class="{{button.iconClass}}">{{button.iconText}}</i>
-        </button>
-
-        <div
-          ng-if="showMore"
-          dropdown
-          dropdown-append-to-body
-          class="dropdown formatting-more"
-        >
-          <button
-            dropdown-toggle
-            class="btn btn-default formatting-btn formatting-btn--more dropdown-toggle"
-          >
-            More
-          </button>
-
-          <ul class="dropdown-menu formatting-menu" role="menu">
-            <li
-              class="formatting-menu-item"
-              ng-repeat="button in overflowedButtons"
-            >
-              <button
-                ng-click="button.handleClick()"
-                title="{{button.title}}"
-                class="btn btn-default formatting-btn formatting-btn--icon"
-              >
-                <i class="{{button.iconClass}}">{{button.iconText}}</i>
-              </button>
-            </li>
-          </ul>
-        </div>
-      """
+      templateUrl: 'formattingButtonsTpl'
     }
