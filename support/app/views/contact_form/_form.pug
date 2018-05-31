@@ -23,18 +23,18 @@ mixin contact-form(showAffectedProjectUrl)
 								span(ng-bind-html="suggestion.name")
 								i.fa.fa-angle-right
 
-				if getUserEmail().length < 1
-					label.desc
-						| #{translate("email")}
-					.form-group
-						input.field.text.medium.span8.form-control(
-							name="email",
-							required
-							ng-model="form.email",
-							type='email', spellcheck='false',
-							value='',
-							maxlength='255',
-							tabindex='2')
+				label.desc(ng-show="'"+getUserEmail()+"'.length < 1")
+					| #{translate("email")}
+				.form-group(ng-show="'"+getUserEmail()+"'.length < 1")
+					input.field.text.medium.span8.form-control(
+						name="email",
+						required,
+						ng-model="form.email",
+						ng-init="form.email = '"+getUserEmail()+"'",
+						type='email', spellcheck='false',
+						value='',
+						maxlength='255',
+						tabindex='2')
 
 				if showAffectedProjectUrl
 					label#title12.desc
