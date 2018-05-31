@@ -29,7 +29,3 @@ module.exports =
 		app.get '/project/new/template', TemplatesMiddlewear.saveTemplateDataInSession, AuthenticationController.requireLogin(), TemplatesController.createProjectFromZipTemplate
 
 		app.get  "/project/:Project_id/template", AuthorizationMiddlewear.ensureUserCanReadProject, TemplatesController.getTemplateDetails
-
-		app.get '/project/new/template/:Template_version_id', TemplatesMiddlewear.saveTemplateDataInSession, AuthenticationController.requireLogin(), TemplatesController.getV1Template
-
-		app.post '/project/new/template', AuthenticationController.requireLogin(), TemplatesController.createProjectFromV1Template
