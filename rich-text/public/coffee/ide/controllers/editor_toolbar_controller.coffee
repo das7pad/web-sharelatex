@@ -1,5 +1,4 @@
 define [
-	"base"
-	"ide/editor/Document"
-], (App, Document) ->
+  "base"
+], (App) ->
   App.controller "EditorToolbarController", ($scope, ide) ->
