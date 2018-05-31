@@ -2,7 +2,7 @@ define ['base'], (App) ->
   BUTTON_WIDTH = 33
   OVERFLOWED_BUTTON_WIDTH = 55
 
-  App.directive "buttonMeasurer", ($timeout) ->
+  App.directive "formattingButtons", ($timeout) ->
     return {
       scope: {
         buttons: "="
