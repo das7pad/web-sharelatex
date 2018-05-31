@@ -62,10 +62,38 @@ define ['base'], (App) ->
           ng-repeat="button in shownButtons"
           ng-click="button.handleClick()"
           title="{{button.title}}"
-          class="btn btn-default formatting-btn formatting-btn-with-icon"
+          class="btn btn-default formatting-btn formatting-btn--icon"
         >
           <i class="{{button.iconClass}}">{{button.iconText}}</i>
         </button>
-        <button class="btn btn-default formatting-btn formatting-btn-overflowed" ng-if="overflowed">More</button>
+
+        <div
+          ng-if="overflowed"
+          dropdown
+          dropdown-append-to-body
+          class="dropdown formatting-more"
+        >
+          <button
+            dropdown-toggle
+            class="btn btn-default formatting-btn formatting-btn--more dropdown-toggle"
+          >
+            More
+          </button>
+
+          <ul class="dropdown-menu formatting-menu" role="menu">
+            <li
+              class="formatting-menu-item"
+              ng-repeat="button in overflowedButtons"
+            >
+              <button
+                ng-click="button.handleClick()"
+                title="{{button.title}}"
+                class="btn btn-default formatting-btn formatting-btn--icon"
+              >
+                <i class="{{button.iconClass}}">{{button.iconText}}</i>
+              </button>
+            </li>
+          </ul>
+        </div>
       """
     }
