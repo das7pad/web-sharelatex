@@ -67,9 +67,9 @@ module.exports = ProjectEntityMongoUpdateHandler = self =
 					update =
 						"$inc": inc
 						"$set": set
-					Project.update conditions, update, {}, (err) ->
+					Project.findOneAndUpdate conditions, update, {new:true}, (err, newProject) ->
 						return callback(err) if err?
-						callback null, fileRef, project, path
+						callback null, fileRef, project, path, newProject
 
 	mkdirp: wrapWithLock (project_id, path, options, callback) ->
 		# defaults to case insensitive paths, use options {exactCaseMatch:true}
@@ -128,7 +128,7 @@ module.exports = ProjectEntityMongoUpdateHandler = self =
 									return callback(err) if err?
 									startPath = entityPath.fileSystem
 									endPath = result.path.fileSystem
-									changes = {oldDocs, newDocs, oldFiles, newFiles}
+									changes = {oldDocs, newDocs, oldFiles, newFiles, newProject}
 									callback null, project, startPath, endPath, entity.rev, changes, callback
 
 	deleteEntity: wrapWithLock (project_id, entity_id, entityType, callback) ->
@@ -136,9 +136,9 @@ module.exports = ProjectEntityMongoUpdateHandler = self =
 			return callback(error) if error?
 			ProjectLocator.findElement {project: project, element_id: entity_id, type: entityType}, (error, entity, path) ->
 				return callback(error) if error?
-				self._removeElementFromMongoArray Project, project_id, path.mongo, (error) ->
+				self._removeElementFromMongoArray Project, project_id, path.mongo, (error, newProject) ->
 					return callback(error) if error?
-					callback null, entity, path, project
+					callback null, entity, path, project, newProject
 
 	renameEntity: wrapWithLock (project_id, entity_id, entityType, newName, callback) ->
 		ProjectGetter.getProjectWithoutLock project_id, {rootFolder:true, name:true, overleaf:true}, (error, project)=>
@@ -162,7 +162,7 @@ module.exports = ProjectEntityMongoUpdateHandler = self =
 							ProjectEntityHandler.getAllEntitiesFromProject newProject, (error, newDocs, newFiles) =>
 								return callback(error) if error?
 								startPath = entPath.fileSystem
-								changes = {oldDocs, newDocs, oldFiles, newFiles}
+								changes = {oldDocs, newDocs, oldFiles, newFiles, newProject}
 								callback null, project, startPath, endPath, entity.rev, changes, callback
 
 	addFolder: wrapWithLock (project_id, parentFolder_id, folderName, callback) ->
