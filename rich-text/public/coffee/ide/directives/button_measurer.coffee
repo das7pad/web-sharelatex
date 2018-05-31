@@ -10,7 +10,7 @@ define ['base'], (App) ->
       }
 
       link: (scope, element, attrs) ->
-        scope.overflowed = false
+        scope.showMore = false
         scope.shownButtons = []
         scope.overflowedButtons = []
 
@@ -27,14 +27,14 @@ define ['base'], (App) ->
           noOfShowableButtons = Math.floor(availableSpace / BUTTON_WIDTH)
 
           if noOfShowableButtons < scope.buttons.length
-            scope.overflowed = true
+            scope.showMore = true
 
             availableSpace = availableSpace - OVERFLOWED_BUTTON_WIDTH
             noOfShowableButtons = Math.floor(availableSpace / BUTTON_WIDTH)
 
             split(noOfShowableButtons)
           else
-            scope.overflowed = false
+            scope.showMore = false
             split(noOfShowableButtons)
 
         split = (splitIndex) ->
@@ -68,7 +68,7 @@ define ['base'], (App) ->
         </button>
 
         <div
-          ng-if="overflowed"
+          ng-if="showMore"
           dropdown
           dropdown-append-to-body
           class="dropdown formatting-more"
