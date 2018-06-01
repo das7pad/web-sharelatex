@@ -147,5 +147,5 @@ describe "ProjectImportTests", ->
 		it 'should return an error message', (done) ->
 			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
 				expect(response.statusCode).to.equal(501)
-				expect(JSON.parse(body).message).to.equal("Sorry! Projects with linked or external files aren't supported yet.")
+				expect(JSON.parse(body).message).to.equal("Sorry! Projects with linked or external files aren't fully supported yet.")
 				done()

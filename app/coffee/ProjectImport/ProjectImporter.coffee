@@ -37,6 +37,8 @@ V1_HISTORY_SYNC_REQUEST_TIMES = [
 
 OVERLEAF_BRAND_VARIATION_ID = 52
 
+SUPPORTED_V1_EXT_AGENTS = ['wlfile', 'url']
+
 module.exports = ProjectImporter =
 	importProject: (v1_project_id, user_id, callback = (error, v2_project_id) ->) ->
 		logger.log {v1_project_id, user_id}, "importing project from overleaf"
@@ -211,10 +213,54 @@ module.exports = ProjectImporter =
 					return callback(new Error("expected file.file_path"))
 				ProjectImporter._writeS3ObjectToDisk file.file_path, (error, pathOnDisk) ->
 					return callback(error) if error?
-					ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory project_id, folder_id, name, pathOnDisk, null, user_id, callback
+					ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory project_id,
+						folder_id, name, pathOnDisk, null, user_id, callback
+			else if file.type == "ext"
+				if file.agent not in SUPPORTED_V1_EXT_AGENTS
+					return callback(
+						new UnsupportedFileTypeError("expected file.agent to be valid, instead got '#{file.agent}'")
+					)
+				if !file.file_path?
+					return callback(new Error("expected file.file_path"))
+				if !file.agent_data?
+					return callback(new Error("expected file.agent_data"))
+
+				ProjectImporter._buildLinkedFileDataForExtFile file, (err, linkedFileData) ->
+					return callback(err) if err?
+					if !linkedFileData?
+						return callback(new Error('Could not build linkedFileData for agent #{file.agent}'))
+					ProjectImporter._writeS3ObjectToDisk file.file_path, (error, pathOnDisk) ->
+						return callback(error) if error?
+						ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory project_id,
+							folder_id, name, pathOnDisk, linkedFileData, user_id, callback
 			else
 				logger.warn {type: file.type, path: file.file, project_id}, "unknown file type"
 				callback(new UnsupportedFileTypeError("unknown file type: #{file.type}"))
+
+	_buildLinkedFileDataForExtFile: (file, callback=(err, linkedFileData)->) ->
+		if file.agent == 'url'
+			callback(null, {
+				provider: 'url',
+				url: file.agent_data.url
+			})
+		else if file.agent == 'wlfile'
+			ProjectImporter._getDocIdFromWriteToken file.agent_data.doc, (err, doc_id) ->
+				return callback(err) if err?
+				callback(null, {
+					provider: 'project_file',
+					v1_source_doc_id: doc_id,
+					source_entity_path: "/#{file.agent_data.file}",
+					source_project_display_name: file.agent_data.source_doc_display_name
+				})
+		else
+			callback(null, null)
+
+	_getDocIdFromWriteToken: (token, callback) ->
+		try
+			doc_id = parseInt(token.match(/^(\d+).*$/)[0], 10)
+			return callback(null, doc_id)
+		catch err
+			return callback(err)
 
 	_writeS3ObjectToDisk: (filePath, callback = (error, pathOnDisk) ->) ->
 		encodedFilePath = filePath.split('/').map(encodeURIComponent).join('/')
