@@ -34,7 +34,10 @@
       )
         button.btn.btn-default.formatting-btn.formatting-btn--more.dropdown-toggle(
           dropdown-toggle
-        ) #{translate('more')}
+        )
+          | #{translate('more')}
+          | &nbsp;
+          span.caret
 
         ul.dropdown-menu.formatting-menu(role="menu")
           li.formatting-menu-item(ng-repeat="button in overflowedButtons")

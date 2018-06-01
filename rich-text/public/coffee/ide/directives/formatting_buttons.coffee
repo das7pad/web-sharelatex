@@ -1,6 +1,6 @@
 define ['base'], (App) ->
   BUTTON_WIDTH = 33
-  OVERFLOWED_BUTTON_WIDTH = 55
+  OVERFLOWED_BUTTON_WIDTH = 70
 
   App.directive "formattingButtons", () ->
     return {
