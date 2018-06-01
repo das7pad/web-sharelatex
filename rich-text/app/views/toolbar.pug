@@ -20,7 +20,7 @@
   script(type="text/ng-template", id="formattingButtonsTpl")
     .formatting-buttons-wrapper
       | &nbsp;
-      button.btn.btn-default.formatting-btn.formatting-btn--icon(
+      button.btn.formatting-btn.formatting-btn--icon(
         ng-repeat="button in shownButtons"
         ng-click="button.handleClick()"
         title="{{button.title}}"
@@ -32,7 +32,7 @@
         dropdown
         dropdown-append-to-body
       )
-        button.btn.btn-default.formatting-btn.formatting-btn--more.dropdown-toggle(
+        button.btn.formatting-btn.formatting-btn--more.dropdown-toggle(
           dropdown-toggle
         )
           | #{translate('more')}
@@ -41,7 +41,7 @@
 
         ul.dropdown-menu.formatting-menu(role="menu")
           li.formatting-menu-item(ng-repeat="button in overflowedButtons")
-            button.btn.btn-default.formatting-btn.formatting-btn--icon(
+            button.btn.formatting-btn.formatting-btn--icon(
               ng-click="button.handleClick()"
               title="{{button.title}}"
             )
