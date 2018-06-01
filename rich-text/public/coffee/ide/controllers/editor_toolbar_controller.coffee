@@ -10,7 +10,7 @@ define [
         $scope.richText.formattingEvents.trigger('section')
     }, {
       iconText: '§'
-      iconClass: 'formatting-icon'
+      iconClass: 'formatting-icon formatting-icon--small'
       title: 'Insert Subsection Heading'
       handleClick: () ->
         $scope.richText.formattingEvents.trigger('subsection')
@@ -26,13 +26,13 @@ define [
         $scope.richText.formattingEvents.trigger('italic')
     }, {
       iconText: 'π'
-      iconClass: 'formatting-icon'
+      iconClass: 'formatting-icon formatting-icon--serif'
       title: 'Insert Inline Math'
       handleClick: () ->
         $scope.richText.formattingEvents.trigger('inlineMath')
     }, {
-      iconText: 'Π'
-      iconClass: 'formatting-icon'
+      iconText: 'Σ'
+      iconClass: 'formatting-icon formatting-icon--serif'
       title: 'Insert Math on its own line'
       handleClick: () ->
         $scope.richText.formattingEvents.trigger('displayMath')
