@@ -65,6 +65,7 @@ module.exports  =
 
 		SupportDetailsManager._getDetails userEmail, (err, details)->
 			if err?
+				logger.err err:err, "error getting support details for user"
 				return res.send 500
 			else if !details?._id?
 				res.send("<h4>User not registered</h4>")
