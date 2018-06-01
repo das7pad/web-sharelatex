@@ -88,43 +88,6 @@ module.exports = TemplatesController =
 				details.description = results.description
 				res.json details
 
-	getV1Template: (req, res)->
-		templateVersionId = req.params.Template_version_id
-		templateId = req.query.id
-		if !/^[0-9]+$/.test(templateVersionId) || !/^[0-9]+$/.test(templateId)
-			logger.err templateVersionId:templateVersionId, templateId: templateId, "invalid template id or version"
-			return res.sendStatus 400
-		data = {}
-		data.templateVersionId = templateVersionId
-		data.templateId = templateId
-		data.name = req.query.templateName
-		data.compiler = req.query.latexEngine
-		res.render path.resolve(__dirname, "../views/new_from_template"), data
-
-	createProjectFromV1Template: (req, res)->
-		currentUserId = AuthenticationController.getLoggedInUserId(req)
-		zipUrl =	"#{settings.apis.v1.url}/api/v1/sharelatex/templates/#{req.body.templateVersionId}"
-		zipReq = request(zipUrl, {
-			'auth': {
-				'user': settings.apis.v1.user,
-				'pass': settings.apis.v1.pass
-			}
-		})
-
-		TemplatesController.createFromZip(
-			zipReq,
-			{
-				templateName: req.body.templateName,
-				currentUserId: currentUserId,
-				compiler: req.body.compiler
-				docId: req.body.docId
-				templateId: req.body.templateId
-				templateVersionId: req.body.templateVersionId
-			},
-			req,
-			res
-		)
-
 	createFromZip: (zipReq, options, req, res)->
 		dumpPath = "#{settings.path.dumpFolder}/#{uuid.v4()}"
 		writeStream = fs.createWriteStream(dumpPath)

@@ -52,12 +52,6 @@ describe 'TemplatesController', ->
 						url: @templateApiUrl="http://templates.sharelatex.env"
 					web:
 						url: @webApiUrl="http://web-api.sharelatex.env"
-					v1:
-						url: @v1Url="http://overleaf.com"
-						user: "sharelatex"
-						pass: "password"
-				overleaf:
-					host: @v1Url
 			"uuid":v4:=>@uuid
 			"request": @request
 			"fs":@fs
@@ -101,18 +95,6 @@ describe 'TemplatesController', ->
 				done()
 			res = redirect:redirect
 			@controller.createProjectFromZipTemplate @req, res
-
-	describe 'v1Templates', ->
-
-		it "should fetch zip from v1 based on template id", (done)->
-			@templateVersionId = 15
-			@req.body = {templateVersionId: @templateId}
-
-			redirect = =>
-				@request.calledWith("#{@v1Url}/api/v1/sharelatex/templates/#{@templateId}").should.equal true
-				done()
-			res = redirect:redirect
-			@controller.createProjectFromV1Template @req, res
 
 	describe 'publishProject', ->
 		beforeEach ->
