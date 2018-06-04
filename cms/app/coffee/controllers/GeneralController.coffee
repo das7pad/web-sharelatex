@@ -2,6 +2,7 @@ logger = require 'logger-sharelatex'
 marked = require 'marked'
 path = require 'path'
 ContentfulClient = require '../ContentfulClient'
+ErrorController = require '../../../../../app/js/Features/Errors/ErrorController'
 
 page = path.resolve(__dirname, '../../views/page/page')
 
@@ -24,7 +25,7 @@ module.exports = PageController =
 	getPage: (req, res, next)->
 		if !req.query.cms
 			# Leave `!req.query.cms` until content migration is finished
-			ErrorController.notFound res, req
+			ErrorController.notFound req, res
 		else
 			# clientType determines which API to use.
 			# client is for published data
@@ -46,7 +47,7 @@ module.exports = PageController =
 				.then (collection) ->
 					if collection.items.length == 0
 						# to do - better 404?
-						ErrorController.notFound res, req
+						ErrorController.notFound req, res
 					else
 						[data] = collection.items
 						if data.fields.content

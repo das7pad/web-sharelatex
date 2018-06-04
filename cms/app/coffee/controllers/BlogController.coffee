@@ -2,6 +2,7 @@ logger = require 'logger-sharelatex'
 marked = require 'marked'
 path = require 'path'
 ContentfulClient = require '../ContentfulClient'
+ErrorController = require '../../../../../app/js/Features/Errors/ErrorController'
 
 pageBlog = path.resolve(__dirname, '../../views/blog/blog')
 pageBlogPost = path.resolve(__dirname, '../../views/blog/blog_post')
@@ -62,7 +63,7 @@ getAndRenderBlog = (req, res, blogQuery, page, tag) ->
 	ContentfulClient[clientType].getEntries(blogQuery)
 		.then (blogCollection) ->
 			if blogCollection.items.length == 0
-				ErrorController.notFound res, req
+				ErrorController.notFound req, res
 			else
 				blogCollection.items.map (post) -> parseBlogPost(post)
 				pageData.items = blogCollection.items
@@ -75,7 +76,7 @@ module.exports =
 	getBlog: (req, res, next)->
 		if !req.query.cms
 			# Leave `!req.query.cms` until content migration is finished
-			ErrorController.notFound res, req
+			ErrorController.notFound req, res
 		else
 			# Select operator limits fields returned. It has some restrictions,
 			# such as it can only select properties to a depth of 2.
@@ -96,7 +97,7 @@ module.exports =
 							getAndRenderBlog(req, res, blogQuery, pageBlog, req.query.tag)
 						else
 							# to do - better 404 - specific for blog tag
-							ErrorController.notFound res, req
+							ErrorController.notFound req, res
 					.catch (tagErr) ->
 						next(tagErr)
 			else
