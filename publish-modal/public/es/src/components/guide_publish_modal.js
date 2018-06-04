@@ -1,7 +1,7 @@
 import React, { PropTypes, Component } from 'react'
 import PublishGuide from './publish_guide'
 import ExportGuide from './export_guide'
-import GenericExport from './generic_export'
+import EmisExport from './emis_export'
 import { findEntryInCategories } from '../utils.js'
 
 export default class GuidePublishModal extends Component {
@@ -13,7 +13,8 @@ export default class GuidePublishModal extends Component {
       onSwitch,
       shown,
       projectId,
-      pdfUrl
+      pdfUrl,
+      hasFolders
     } = this.props
 
     var entry, onReturn, returnText
@@ -39,12 +40,13 @@ export default class GuidePublishModal extends Component {
         pdfUrl={pdfUrl}
       />)
     } else if (shown === 'export') {
-      return (<GenericExport
+      return (<EmisExport
         onReturn={onReturn}
         entry={entry}
         returnText={returnText}
         projectId={projectId}
         onSwitch={onSwitch}
+        hasFolders={hasFolders}
       />)
     } else if (shown === 'exportGuide') {
       return (<ExportGuide
@@ -67,5 +69,6 @@ GuidePublishModal.propTypes = {
   projectId: PropTypes.string.isRequired,
   shown: PropTypes.string.isRequired,
   onSwitch: PropTypes.func.isRequired,
-  pdfUrl: PropTypes.string
+  pdfUrl: PropTypes.string,
+  hasFolders: PropTypes.bool
 }

@@ -14,5 +14,6 @@ define [
 					if ($scope.pdf)
 						downloadLink = $scope.pdf.downloadUrl
 
+					hasFolders = window._ide.fileTreeManager.projectContainsFolder()
 					modalBody = document.getElementsByClassName("modal-body-publish")[0]
-					pm.init(modalBody, $scope.project_id, downloadLink)
+					pm.init(modalBody, $scope.project_id, downloadLink, hasFolders)
