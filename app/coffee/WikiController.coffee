@@ -20,6 +20,7 @@ module.exports = WikiController =
 		metrics.inc("wiki.getPage")
 		page = Url.parse(req.url).pathname
 		page = page.replace(/^\/learn/, "").replace(/^\//, "")
+		preview = req.query.preview?
 		if page == ""
 			page = "Main_Page"
 
@@ -58,11 +59,11 @@ module.exports = WikiController =
 				# See https://github.com/i18next/i18next-node/issues/78
 				pageData.title = pageData.title.replace(/\./g, "")
 					
-				WikiController._renderPage(pageData, contents, res)
+				WikiController._renderPage(pageData, contents, preview, res)
 			else
 				WikiController._getPageContent page, (error, pageData) ->
 					return next(error) if error?
-					WikiController._renderPage(pageData, contents, res)
+					WikiController._renderPage(pageData, contents, preview, res)
 
 
 	# only used for docker image
@@ -79,6 +80,7 @@ module.exports = WikiController =
 		urlStream.pipe(res)
 
 	_getPageContent: (page, callback = (error, data = { content: "", title: "" }) ->) ->
+		# @param {string} page
 		request {
 			url: "#{baseWikiUrl}/learn-scripts/api.php"
 			qs: {
@@ -93,7 +95,9 @@ module.exports = WikiController =
 				data = JSON.parse(data)
 			catch err
 				logger.err err:err, data:data, "error parsing data from wiki"
+
 			result = 
+				categories: data?.parse?.categories.map (category) -> category['*']
 				content: data?.parse?.text?['*']
 				title: data?.parse?.title
 				revid: data?.parse?.revid
@@ -101,7 +105,9 @@ module.exports = WikiController =
 			callback null, result
 
 
-	_renderPage: (page, contents, res)->
+	_renderPage: (page, contents, preview, res)->
+		if 'Draft' in page.categories and !preview
+			return ErrorController.notFound(null, res)
 		if page.redirects?.length > 0
 			return res.redirect "/learn/#{encodeURIComponent(page.redirects[0].to)}"
 		if page.revid == 0
