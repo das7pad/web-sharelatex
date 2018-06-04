@@ -7,22 +7,19 @@ export default class EmisExport extends Component {
     super(props)
     this.state = {
       exportState: 'unintiated',
-      firstName: this.props.firstName,
-      lastName: this.props.lastName,
       submissionValid: true
     }
-    this.handleChange = this.handleChange.bind(this)
   }
 
   initiateExport (entry, projectId) {
     var link = `/project/${projectId}/export/${entry.id}`
 
-    if (this.state.firstName && this.state.lastName) {
+    if (this.firstName.value && this.lastName.value) {
       this.setState({ exportState: 'initiated' })
       $.ajax({
         url: link,
         type: 'POST',
-        data: {firstName: this.state.firstName, lastName: this.state.lastName},
+        data: {firstName: this.firstName.value, lastName: this.lastName.value},
         headers: {'X-CSRF-Token': window.csrfToken},
         success: (resp) => {
           this.setState({ exportState: 'complete' })
@@ -36,12 +33,8 @@ export default class EmisExport extends Component {
     }
   }
 
-  handleChange (event) {
-    this.setState({ [event.target.name]: event.target.value })
-  }
-
   render () {
-    const {entry, onReturn, projectId, returnText, hasFolders} = this.props
+    const {entry, onReturn, projectId, returnText, hasFolders, firstName, lastName} = this.props
     if (hasFolders) {
       return (
         <div
@@ -99,20 +92,20 @@ export default class EmisExport extends Component {
                   <p>
                     <input type="text"
                       className="form-control"
-                      name="firstName"
+                      defaultValue={firstName}
                       style={{ width: '30%', display: 'inline-block' }}
-                      value={this.state.firstName}
                       maxLength="255"
                       placeholder="First Name"
-                      onChange={this.handleChange} />
+                      ref={ (input) => (this.firstName = input)}
+                    />
                     <input type="text"
                       className="form-control"
-                      name="lastName"
+                      defaultValue={lastName}
                       style={{ width: '30%', display: 'inline-block' }}
-                      value={this.state.lastName}
                       maxLength="255"
                       placeholder="Last Name"
-                      onChange={this.handleChange} />
+                      ref={ (input) => (this.lastName = input)}
+                    />
                   </p>
                   <br/>
                   <button
