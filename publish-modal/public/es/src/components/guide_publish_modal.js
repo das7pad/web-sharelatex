@@ -12,9 +12,7 @@ export default class GuidePublishModal extends Component {
       entries,
       onSwitch,
       shown,
-      projectId,
-      pdfUrl,
-      hasFolders
+      initParams
     } = this.props
 
     var entry, onReturn, returnText
@@ -36,24 +34,26 @@ export default class GuidePublishModal extends Component {
         onReturn={onReturn}
         entry={entry}
         returnText={returnText}
-        projectId={projectId}
-        pdfUrl={pdfUrl}
+        projectId={initParams.projectId}
+        pdfUrl={initParams.pdfUrl}
       />)
     } else if (shown === 'export') {
       return (<EmisExport
         onReturn={onReturn}
         entry={entry}
         returnText={returnText}
-        projectId={projectId}
+        projectId={initParams.projectId}
+        firstName={initParams.firstName}
+        lastName={initParams.lastName}
         onSwitch={onSwitch}
-        hasFolders={hasFolders}
+        hasFolders={initParams.hasFolders}
       />)
     } else if (shown === 'exportGuide') {
       return (<ExportGuide
         onReturn={onReturn}
         entry={entry}
         returnText={returnText}
-        projectId={projectId}
+        projectId={initParams.projectId}
         onSwitch={onSwitch}
       />)
     } else {
@@ -66,9 +66,7 @@ GuidePublishModal.propTypes = {
   entries: PropTypes.object.isRequired,
   initialEntry: PropTypes.object,
   guideId: PropTypes.number.isRequired,
-  projectId: PropTypes.string.isRequired,
   shown: PropTypes.string.isRequired,
   onSwitch: PropTypes.func.isRequired,
-  pdfUrl: PropTypes.string,
-  hasFolders: PropTypes.bool
+  initParams: PropTypes.object.isRequired
 }

@@ -5,7 +5,11 @@ import SidebarWithReturnButton from './sidebar_with_return_button'
 export default class EmisExport extends Component {
   constructor (props) {
     super(props)
-    this.state = { exportState: 'unintiated' }
+    this.state = {
+      exportState: 'unintiated',
+      firstName: this.props.firstName,
+      lastName: this.props.lastName
+    }
   }
 
   initiateExport (entry, projectId) {
@@ -15,6 +19,7 @@ export default class EmisExport extends Component {
     $.ajax({
       url: link,
       type: 'POST',
+      data: {firstName: this.state.firstName, lastName: this.state.lastName},
       headers: {'X-CSRF-Token': window.csrfToken},
       success: (resp) => {
         this.setState({ exportState: 'complete' })
@@ -23,6 +28,10 @@ export default class EmisExport extends Component {
         this.setState({ exportState: 'error' })
       }
     })
+  }
+
+  handleChange (event) {
+    this.setState({ [event.target.name]: event.target.value })
   }
 
   render () {
@@ -77,6 +86,25 @@ export default class EmisExport extends Component {
                     The journal's editorial team will then send you a follow-up
                     email with instructions for how to complete your submission.
                   </p>
+                  <p>
+                    To send your article,
+                    please confirm your first and last name:
+                  </p>
+                  <p>
+                    <input type="text"
+                      className="form-control"
+                      style={{ width: '30%', display: 'inline-block' }}
+                      value={this.state.firstName}
+                      placeholder="First Name"
+                      onChange={this.handleChange} />
+                    <input type="text"
+                      className="form-control"
+                      style={{ width: '30%', display: 'inline-block' }}
+                      value={this.state.lastName}
+                      placeholder="Last Name"
+                      onChange={this.handleChange} />
+                  </p>
+                  <br/>
                   <button
                     className='btn'
                     onClick={() => this.initiateExport(entry, projectId)}
@@ -132,5 +160,7 @@ EmisExport.propTypes = {
   onReturn: PropTypes.func,
   projectId: PropTypes.string.isRequired,
   onSwitch: PropTypes.func.isRequired,
-  hasFolders: PropTypes.bool
+  hasFolders: PropTypes.bool,
+  firstName: PropTypes.string,
+  lastName: PropTypes.string
 }
