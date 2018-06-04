@@ -8,26 +8,32 @@ export default class EmisExport extends Component {
     this.state = {
       exportState: 'unintiated',
       firstName: this.props.firstName,
-      lastName: this.props.lastName
+      lastName: this.props.lastName,
+      submissionValid: true
     }
+    this.handleChange = this.handleChange.bind(this)
   }
 
   initiateExport (entry, projectId) {
     var link = `/project/${projectId}/export/${entry.id}`
 
-    this.setState({ exportState: 'initiated' })
-    $.ajax({
-      url: link,
-      type: 'POST',
-      data: {firstName: this.state.firstName, lastName: this.state.lastName},
-      headers: {'X-CSRF-Token': window.csrfToken},
-      success: (resp) => {
-        this.setState({ exportState: 'complete' })
-      },
-      error: (resp) => {
-        this.setState({ exportState: 'error' })
-      }
-    })
+    if (this.state.firstName && this.state.lastName) {
+      this.setState({ exportState: 'initiated' })
+      $.ajax({
+        url: link,
+        type: 'POST',
+        data: {firstName: this.state.firstName, lastName: this.state.lastName},
+        headers: {'X-CSRF-Token': window.csrfToken},
+        success: (resp) => {
+          this.setState({ exportState: 'complete' })
+        },
+        error: (resp) => {
+          this.setState({ exportState: 'error' })
+        }
+      })
+    } else {
+      this.setState({ submissionValid: false })
+    }
   }
 
   handleChange (event) {
@@ -93,14 +99,18 @@ export default class EmisExport extends Component {
                   <p>
                     <input type="text"
                       className="form-control"
+                      name="firstName"
                       style={{ width: '30%', display: 'inline-block' }}
                       value={this.state.firstName}
+                      maxLength="255"
                       placeholder="First Name"
                       onChange={this.handleChange} />
                     <input type="text"
                       className="form-control"
+                      name="lastName"
                       style={{ width: '30%', display: 'inline-block' }}
                       value={this.state.lastName}
+                      maxLength="255"
                       placeholder="Last Name"
                       onChange={this.handleChange} />
                   </p>
@@ -111,6 +121,11 @@ export default class EmisExport extends Component {
                   >
                     Submit to {entry.name}
                   </button>
+                  { !this.state.submissionValid &&
+                    <p style={{color: 'red'}}>
+                      Please add valid first and last names before continuing
+                    </p>
+                  }
                 </span>
               }
               { this.state.exportState === 'initiated' &&
