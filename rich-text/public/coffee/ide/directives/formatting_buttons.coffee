@@ -7,6 +7,7 @@ define ['base'], (App) ->
       scope: {
         buttons: "="
         opening: "="
+        isFullscreenEditor: "="
       }
 
       link: (scope, element, attrs) ->
@@ -55,6 +56,10 @@ define ['base'], (App) ->
 
         scope.$watch '$destroy', () ->
           tearDownResizeListeners()
+
+        scope.$watch 'isFullscreenEditor', (oldVal, newVal) ->
+          return if oldVal == newVal
+          debouncedMeasure()
 
       templateUrl: 'formattingButtonsTpl'
     }
