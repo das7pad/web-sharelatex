@@ -18,26 +18,39 @@ module.exports = AccountSyncManager =
 				"[AccountSync] updating user subscription and features"
 			FeaturesUpdater.refreshFeatures user._id, false, callback
 
-	getV2PlanCode: (v1_user_id, callback = (error, planCode) ->) ->
+	getV2Subscriptions: (v1_user_id, callback = (error, individualSubscription, groupSubscriptions) ->) ->
 		UserGetter.getUser {'overleaf.id': v1_user_id}, {_id: 1}, (error, user) ->
 			return callback(error) if error?
 			if !user?
-				return callback null, null
+				return callback null, null, null
 			user_id = user._id
 			logger.log {v1_user_id, user_id}, "[AccountSync] found v2 user for v1 id"
 			SubscriptionLocator.getUsersSubscription user_id, (error, individualSubscription) ->
 				return callback(error) if error?
 				SubscriptionLocator.getGroupSubscriptionsMemberOf user_id, (error, groupSubscriptions = []) ->
 					return callback(error) if error?
-					subscriptions = []
-					if individualSubscription?
-						subscriptions.push individualSubscription
-					subscriptions = subscriptions.concat groupSubscriptions
-					planCodes = subscriptions.map (s) -> AccountSyncManager._canonicalPlanCode(s.planCode)
-					planCodes = AccountSyncManager._sortPlanCodes(planCodes)
-					bestPlanCode = planCodes[0] or 'personal'
-					logger.log {v1_user_id, user_id, planCodes, bestPlanCode, individualSubscription, groupSubscriptions, subscriptions}, "[AccountSync] found plans for user"
-					callback null, bestPlanCode
+					callback(null, individualSubscription, groupSubscriptions)
+
+	getV2PlanCode: (v1_user_id, callback = (error, planCode) ->) ->
+		AccountSyncManager.getV2Subscriptions v1_user_id, (error, individualSubscription, groupSubscriptions) ->
+			return callback(error) if error?
+			subscriptions = []
+			if individualSubscription?
+				subscriptions.push individualSubscription
+			subscriptions = subscriptions.concat groupSubscriptions
+			planCodes = subscriptions.map (s) -> AccountSyncManager._canonicalPlanCode(s.planCode)
+			planCodes = AccountSyncManager._sortPlanCodes(planCodes)
+			bestPlanCode = planCodes[0] or 'personal'
+			logger.log {v1_user_id, user_id, planCodes, bestPlanCode, individualSubscription, groupSubscriptions, subscriptions}, "[AccountSync] found plans for user"
+			callback null, bestPlanCode
+
+	getV2SubscriptionStatus: (v1_user_id, callback = (error, planCode) ->) ->
+		AccountSyncManager.getV2Subscriptions v1_user_id, (error, individualSubscription, groupSubscriptions = []) ->
+			return callback(error) if error?
+			callback null, {
+				has_subscription: individualSubscription?
+				in_team: groupSubscriptions.length > 0
+			}
 
 	_canonicalPlanCode: (planCode) ->
 		# Takes a plan_code like 'collaborator_7_day_trial' and returns

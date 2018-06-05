@@ -33,11 +33,20 @@ module.exports = AccountSyncController =
 		{v1_user_id} = req.params
 		v1_user_id = parseInt(v1_user_id, 10)
 		logger.log {v1_user_id}, "[AccountSync] getting v1 user plan_code in v2"
-		AccountSyncManager.getV2PlanCode v1_user_id, (error, plan_code) ->
+		AccountSyncManager.getV2PlanCode v1_user_id, (error, plan_code, has_subscription_or_team) ->
 			return next(error) if error?
 			if !plan_code?
 				logger.log {v1_user_id}, "[AccountSync] user not found in v2"
 				res.sendStatus 404
 			else
 				logger.log {v1_user_id, plan_code}, "[AccountSync] returning v2 plan_code"
-				res.json {plan_code}
+				res.json {plan_code, has_subscription_or_team}
+
+	getV2SubscriptionStatus: (req, res, next) ->
+		{v1_user_id} = req.params
+		v1_user_id = parseInt(v1_user_id, 10)
+		logger.log {v1_user_id}, "[AccountSync] getting v1 user subscription status in v2"
+		AccountSyncManager.getV2SubscriptionStatus v1_user_id, (error, status) ->
+			return next(error) if error?
+			logger.log {v1_user_id, status}, "[AccountSync] returning v2 subscription status"
+			res.json status
