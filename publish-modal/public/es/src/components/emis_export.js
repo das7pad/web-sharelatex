@@ -5,28 +5,36 @@ import SidebarWithReturnButton from './sidebar_with_return_button'
 export default class EmisExport extends Component {
   constructor (props) {
     super(props)
-    this.state = { exportState: 'unintiated' }
+    this.state = {
+      exportState: 'unintiated',
+      submissionValid: true
+    }
   }
 
   initiateExport (entry, projectId) {
     var link = `/project/${projectId}/export/${entry.id}`
 
-    this.setState({ exportState: 'initiated' })
-    $.ajax({
-      url: link,
-      type: 'POST',
-      headers: {'X-CSRF-Token': window.csrfToken},
-      success: (resp) => {
-        this.setState({ exportState: 'complete' })
-      },
-      error: (resp) => {
-        this.setState({ exportState: 'error' })
-      }
-    })
+    if (this.firstName.value && this.lastName.value) {
+      this.setState({ exportState: 'initiated' })
+      $.ajax({
+        url: link,
+        type: 'POST',
+        data: {firstName: this.firstName.value, lastName: this.lastName.value},
+        headers: {'X-CSRF-Token': window.csrfToken},
+        success: (resp) => {
+          this.setState({ exportState: 'complete' })
+        },
+        error: (resp) => {
+          this.setState({ exportState: 'error' })
+        }
+      })
+    } else {
+      this.setState({ submissionValid: false })
+    }
   }
 
   render () {
-    const {entry, onReturn, projectId, returnText, hasFolders} = this.props
+    const {entry, onReturn, projectId, returnText, hasFolders, firstName, lastName} = this.props
     if (hasFolders) {
       return (
         <div
@@ -77,12 +85,40 @@ export default class EmisExport extends Component {
                     The journal's editorial team will then send you a follow-up
                     email with instructions for how to complete your submission.
                   </p>
+                  <p>
+                    To send your article,
+                    please confirm your first and last name:
+                  </p>
+                  <p>
+                    <input type="text"
+                      className="form-control"
+                      defaultValue={firstName}
+                      style={{ width: '30%', display: 'inline-block' }}
+                      maxLength="255"
+                      placeholder="First Name"
+                      ref={ (input) => (this.firstName = input)}
+                    />
+                    <input type="text"
+                      className="form-control"
+                      defaultValue={lastName}
+                      style={{ width: '30%', display: 'inline-block' }}
+                      maxLength="255"
+                      placeholder="Last Name"
+                      ref={ (input) => (this.lastName = input)}
+                    />
+                  </p>
+                  <br/>
                   <button
                     className='btn'
                     onClick={() => this.initiateExport(entry, projectId)}
                   >
                     Submit to {entry.name}
                   </button>
+                  { !this.state.submissionValid &&
+                    <p style={{color: 'red'}}>
+                      Please add valid first and last names before continuing
+                    </p>
+                  }
                 </span>
               }
               { this.state.exportState === 'initiated' &&
@@ -132,5 +168,7 @@ EmisExport.propTypes = {
   onReturn: PropTypes.func,
   projectId: PropTypes.string.isRequired,
   onSwitch: PropTypes.func.isRequired,
-  hasFolders: PropTypes.bool
+  hasFolders: PropTypes.bool,
+  firstName: PropTypes.string,
+  lastName: PropTypes.string
 }
