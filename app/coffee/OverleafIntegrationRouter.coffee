@@ -51,8 +51,13 @@ module.exports =
 			AccountSyncController.syncHook
 		)
 
-		webRouter.get '/user/trial', AccountSyncController.startTrial
+		publicApiRouter.get(
+			'/overleaf/user/:v1_user_id/plan_code',
+			AuthenticationController.httpAuth,
+			AccountSyncController.getV2PlanCode
+		)
 
+		webRouter.get '/user/trial', AccountSyncController.startTrial
 
 removeRoute = (router, method, path)->
 	index = null

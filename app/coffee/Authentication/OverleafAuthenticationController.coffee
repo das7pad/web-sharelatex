@@ -70,7 +70,7 @@ module.exports = OverleafAuthenticationController =
 			)
 			UserMapper.mergeWithSlUser user_id, profile, accessToken, refreshToken,	(error, user) ->
 				return next(error) if error?
-				FeaturesUpdater.refreshFeatures(user_id)
+				FeaturesUpdater.refreshFeatures(user_id) # Notifies v1 about SL-granted features too
 				logger.log {user: user}, "merged with SL account, logging in"
 				return req.logIn(user, next)
 

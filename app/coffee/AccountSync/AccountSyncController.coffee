@@ -28,3 +28,16 @@ module.exports = AccountSyncController =
 				res.redirect "#{settings.overleaf.host}/users/trial?trial=2017-pro-plus-trial"
 			else
 				res.redirect "#{settings.accountMerge.sharelatexHost}/user/subscription/new?planCode=collaborator_free_trial_7_days&ssp=true"
+
+	getV2PlanCode: (req, res, next) ->
+		{v1_user_id} = req.params
+		v1_user_id = parseInt(v1_user_id, 10)
+		logger.log {v1_user_id}, "[AccountSync] getting v1 user plan_code in v2"
+		AccountSyncManager.getV2PlanCode v1_user_id, (error, plan_code) ->
+			return next(error) if error?
+			if !plan_code?
+				logger.log {v1_user_id}, "[AccountSync] user not found in v2"
+				res.sendStatus 404
+			else
+				logger.log {v1_user_id, plan_code}, "[AccountSync] returning v2 plan_code"
+				res.json {plan_code}
