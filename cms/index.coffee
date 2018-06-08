@@ -1,11 +1,10 @@
-CmsRouter = require "./app/js/CmsRouter"
 logger = require "logger-sharelatex"
 settings = require('settings-sharelatex')
 
-cms  =
-	router: CmsRouter
 
-if !settings.overleaf?
+if !settings.overleaf? || !settings.contentful?
 	module.exports = {}
 else
-	module.exports = cms
+	module.exports = {
+		router: require "./app/js/CmsRouter"
+	}
