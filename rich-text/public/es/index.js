@@ -4,6 +4,7 @@ import LatexMode from './latex_mode/latex_mode'
 import RichText from './rich_text/rich_text'
 import keyBindings from './key_bindings/key_bindings'
 import HighlightedWordManager from './spell_check/highlighted_word_manager'
+import * as textWrapping from './key_bindings/text_wrapping'
 
 export class Editor {
   constructor (rootEl, adapter) {
@@ -42,5 +43,37 @@ export class Editor {
 
   update () {
     this.richText.update()
+  }
+
+  wrapBold () {
+    textWrapping.wrapBold(this.codeMirror)
+  }
+
+  wrapItalic () {
+    textWrapping.wrapItalic(this.codeMirror)
+  }
+
+  wrapSection () {
+    textWrapping.wrapSection(this.codeMirror)
+  }
+
+  wrapSubsection () {
+    textWrapping.wrapSubsection(this.codeMirror)
+  }
+
+  wrapInlineMath () {
+    textWrapping.wrapInlineMath(this.codeMirror)
+  }
+
+  wrapDisplayMath () {
+    textWrapping.wrapDisplayMath(this.codeMirror)
+  }
+
+  wrapNumberedList () {
+    textWrapping.wrapNumberedList(this.codeMirror)
+  }
+
+  wrapBulletList () {
+    textWrapping.wrapBulletList(this.codeMirror)
   }
 }
