@@ -2,6 +2,7 @@ UserGetter = require('../../../../../app/js/Features/User/UserGetter')
 FeaturesUpdater = require('../../../../../app/js/Features/Subscription/FeaturesUpdater')
 SubscriptionLocator = require('../../../../../app/js/Features/Subscription/SubscriptionLocator')
 logger = require('logger-sharelatex')
+Errors = require "../../../../../app/js/Features/Errors/Errors"
 
 module.exports = AccountSyncManager =
 
@@ -22,7 +23,7 @@ module.exports = AccountSyncManager =
 		UserGetter.getUser {'overleaf.id': v1_user_id}, {_id: 1}, (error, user) ->
 			return callback(error) if error?
 			if !user?
-				return callback null, null, null
+				return callback new Errors.NotFoundError('no v1 user found')
 			user_id = user._id
 			logger.log {v1_user_id, user_id}, "[AccountSync] found v2 user for v1 id"
 			SubscriptionLocator.getUsersSubscription user_id, (error, individualSubscription) ->
@@ -32,7 +33,7 @@ module.exports = AccountSyncManager =
 					callback(null, individualSubscription, groupSubscriptions)
 
 	getV2PlanCode: (v1_user_id, callback = (error, planCode) ->) ->
-		AccountSyncManager.getV2Subscriptions v1_user_id, (error, individualSubscription, groupSubscriptions) ->
+		AccountSyncManager.getV2Subscriptions v1_user_id, (error, individualSubscription, groupSubscriptions = []) ->
 			return callback(error) if error?
 			subscriptions = []
 			if individualSubscription?
@@ -41,7 +42,7 @@ module.exports = AccountSyncManager =
 			planCodes = subscriptions.map (s) -> AccountSyncManager._canonicalPlanCode(s.planCode)
 			planCodes = AccountSyncManager._sortPlanCodes(planCodes)
 			bestPlanCode = planCodes[0] or 'personal'
-			logger.log {v1_user_id, user_id, planCodes, bestPlanCode, individualSubscription, groupSubscriptions, subscriptions}, "[AccountSync] found plans for user"
+			logger.log {v1_user_id, planCodes, bestPlanCode, individualSubscription, groupSubscriptions, subscriptions}, "[AccountSync] found plans for user"
 			callback null, bestPlanCode
 
 	getV2SubscriptionStatus: (v1_user_id, callback = (error, planCode) ->) ->
