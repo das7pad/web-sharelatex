@@ -2,6 +2,7 @@
 {UserStub} = require "../../../../../app/js/models/UserStub"
 UserCreator = require "../../../../../app/js/Features/User/UserCreator"
 CollaboratorsHandler = require "../../../../../app/js/Features/Collaborators/CollaboratorsHandler"
+SubscriptionGroupHandler = require "../../../../../app/js/Features/Subscription/SubscriptionGroupHandler"
 
 # When we import a project, it may refer to collaborators which
 # have not yet linked their account the beta system. In that case,
@@ -34,10 +35,10 @@ module.exports = UserMapper =
 				UserStub.findOne { "overleaf.id": ol_user.id }, { _id: 1 }, (error, user_stub) ->
 					return callback(error) if error?
 					return callback(null, user_stub._id)
-	
+
 	getOlUserStub: (ol_user_id, callback = (error, user_stub) ->) ->
 		UserStub.findOne { "overleaf.id": ol_user_id }, callback
-	
+
 	removeOlUserStub: (ol_user_id, callback = (error) ->) ->
 		UserStub.remove { "overleaf.id": ol_user_id }, callback
 
@@ -80,13 +81,16 @@ module.exports = UserMapper =
 				user.save (error) ->
 					return callback(error) if error?
 					if user_stub?
-						# At the moment, UserStub's only track collaborations. If this changes in 
-						# future, this method will need updating to migrate any additional references
-						# to the SL user.
-						CollaboratorsHandler.transferProjects user_stub._id, sl_user_id, (error) ->
+						UserMapper._updateUserStubReferences ol_user, user_stub._id, sl_user_id, (error) ->
 							return callback(error) if error?
-							UserMapper.removeOlUserStub ol_user.id, (error) ->
-								return callback(error) if error?
-								return callback null, user
+							return callback(null, user)
 					else
 						return callback null, user
+
+	_updateUserStubReferences: (olUser, userStubId, slUserId, callback = (error) ->) ->
+		CollaboratorsHandler.transferProjects userStubId, slUserId, (error) ->
+			return callback(error) if error?
+			SubscriptionGroupHandler.replaceUserReferencesInGroups userStubId, slUserId, (error) ->
+				return callback(error) if error?
+				UserMapper.removeOlUserStub olUser.id, (error) ->
+					return callback(error)
