@@ -19,7 +19,7 @@ module.exports = WikiController =
 	getPage: (req, res, next) ->
 		metrics.inc("wiki.getPage")
 		page = Url.parse(req.url).pathname
-		page = page.replace(/^\/learn/, "").replace(/^\//, "")
+		page = page.replace(/^\/learn/, "").replace(/^\//, "").replace(/\/$/, "")
 		preview = req.query.preview?
 		if page == ""
 			page = "Main_Page"
