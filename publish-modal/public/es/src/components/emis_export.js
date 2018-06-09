@@ -7,7 +7,8 @@ export default class EmisExport extends Component {
     super(props)
     this.state = {
       exportState: 'unintiated',
-      submissionValid: true
+      submissionValid: true,
+      errorDetails: null
     }
   }
 
@@ -22,7 +23,11 @@ export default class EmisExport extends Component {
         data: {firstName: this.firstName.value, lastName: this.lastName.value},
         headers: {'X-CSRF-Token': window.csrfToken},
         success: (resp) => {
-          this.setState({ exportState: 'complete' })
+          this.pollExportStatus(
+            resp.export_v1_id,
+            projectId,
+            this.pollExportStatus
+          )
         },
         error: (resp) => {
           this.setState({ exportState: 'error' })
@@ -31,6 +36,33 @@ export default class EmisExport extends Component {
     } else {
       this.setState({ submissionValid: false })
     }
+  }
+
+  pollExportStatus (exportId, projectId, recursion) {
+    var link = `/project/${projectId}/export/${exportId}`
+
+    $.ajax({
+      url: link,
+      type: 'GET',
+      success: (resp) => {
+        const status = resp.export_json
+        if (status.status_summary === 'failed') {
+          this.setState({
+            exportState: 'error',
+            errorDetails: status.status_detail
+          })
+        } else if (status.status_summary === 'succeeded') {
+          this.setState({ exportState: 'complete' })
+        } else {
+          setTimeout(function () {
+            recursion(exportId, projectId, recursion)
+          }, 10000)
+        }
+      },
+      error: (resp) => {
+        this.setState({ exportState: 'error' })
+      }
+    })
   }
 
   render () {
@@ -51,10 +83,16 @@ export default class EmisExport extends Component {
                 <strong> Files must be at top folder level </strong>
               </p>
               <p>
-                This project has one or more files in subfolders, rather than at the top folder level. Although Overleaf allows you to create and nest folders within your project, {entry.name} requires all files to be at the top level of your project.
+                This project has one or more files in subfolders,
+                rather than at the top folder level. Although Overleaf
+                allows you to create and nest folders within your project,
+                {entry.name} requires all files to be at the top level
+                of your project.
               </p>
               <p>
-                Please move each of the above files to the top level of the project, check that your project renders properly, and then retry the submission. We apologize for the inconvenience.
+                Please move each of the above files to the top level of the
+                project, check that your project renders properly, and then
+                retry the submission. We apologize for the inconvenience.
               </p>
             </div>
           </div>
@@ -151,6 +189,9 @@ export default class EmisExport extends Component {
                 <span>
                   <p>
                     Export Failed
+                  </p>
+                  <p>
+                    Error message: {this.state.errorDetails}
                   </p>
                 </span>
               }
