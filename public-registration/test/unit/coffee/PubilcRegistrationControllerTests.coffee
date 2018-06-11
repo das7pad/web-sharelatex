@@ -28,7 +28,7 @@ describe "PublicRegistrationController", ->
 		@EmailHandler =
 			sendEmail:sinon.stub().callsArgWith(2)
 		@UserHandler =
-			populateGroupLicenceInvite: sinon.stub().callsArgWith(1)
+			populateTeamInvites: sinon.stub().callsArgWith(1)
 		@AuthenticationController =
 			passportLogin: sinon.stub()
 			_getRedirectFromSession: sinon.stub().returns("/somewhere")
@@ -130,10 +130,10 @@ describe "PublicRegistrationController", ->
 				done()
 			@PublicRegistrationController.register @req, @res
 
-		it "should call populateGroupLicenceInvite", (done)->
+		it "should call populateTeamInvites", (done)->
 			@UserRegistrationHandler.registerNewUser.callsArgWith(1, null, @user)
 			@res.json = (opts)=>
-				@UserHandler.populateGroupLicenceInvite.calledWith(@user).should.equal true
+				@UserHandler.populateTeamInvites.calledWith(@user).should.equal true
 				done()
 			@PublicRegistrationController.register @req, @res
 
