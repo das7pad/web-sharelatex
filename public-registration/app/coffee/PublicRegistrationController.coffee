@@ -83,7 +83,7 @@ module.exports = PublicRegistrationController =
 					to: user.email
 				}, () ->
 
-				UserHandler.populateGroupLicenceInvite(user, ->)
+				UserHandler.populateTeamInvites(user, ->)
 
 				req.login user, (err) ->
 					return callback(error) if error?
