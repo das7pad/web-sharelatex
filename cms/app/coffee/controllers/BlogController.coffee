@@ -104,8 +104,12 @@ module.exports =
 				getAndRenderBlog(req, res, blogQuery, pageBlog)
 
 	getBlogPost: (req, res, next)->
-		blogQuery = {
-			content_type: 'blogPost'
-			'fields.slug': req.params.slug
-		}
-		getAndRenderBlog(req, res, blogQuery, pageBlogPost)
+		if !req.query.cms
+			# Leave `!req.query.cms` until content migration is finished
+			ErrorController.notFound req, res
+		else
+			blogQuery = {
+				content_type: 'blogPost'
+				'fields.slug': req.params.slug
+			}
+			getAndRenderBlog(req, res, blogQuery, pageBlogPost)
