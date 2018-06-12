@@ -3,7 +3,8 @@ define [
   "ide/rich-text/rich_text_adapter"
   "ide/editor/directives/aceEditor/spell-check/SpellCheckManager"
   "ide/rich-text/directives/spell_check/spell_check_adapter"
-], (App, RichTextAdapter, SpellCheckManager, SpellCheckAdapter) ->
+  "ide/rich-text/autocomplete_adapter"
+], (App, RichTextAdapter, SpellCheckManager, SpellCheckAdapter, AutocompleteAdapter) ->
   App.directive "cmEditor", (ide, $cacheFactory, $http, $q) ->
     return {
       scope: {
@@ -26,6 +27,7 @@ define [
           editor = new scope.bundle.Editor(
             bodyEl[0],
             new RichTextAdapter(ide.fileTreeManager),
+            new AutocompleteAdapter(),
             getSetting
           )
           switchAttachment(scope.sharejsDoc)

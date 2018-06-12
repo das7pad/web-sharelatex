@@ -7,10 +7,11 @@ import 'codemirror/addon/search/search'
 
 import { mac } from '../utils/browser'
 import { wrapBold, wrapItalic } from './text_wrapping'
+import autocomplete from '../autocomplete/autocomplete'
 
 const modifierKey = mac ? 'Cmd' : 'Ctrl'
 
-export default function makeKeyBindings (getSetting) {
+export default function makeKeyBindings (autocompleteAdapter, getSetting) {
   return Object.assign({}, {
     'Backspace': handleBackspace,
     'Delete': handleDelete,
@@ -24,7 +25,8 @@ export default function makeKeyBindings (getSetting) {
     [`${modifierKey}-/`]: 'toggleComment',
     [`${modifierKey}-F`]: 'findPersistent',
     [`${modifierKey}-G`]: 'findPersistentNext',
-    [`Shift-${modifierKey}-G`]: 'findPersistentPrev'
+    [`Shift-${modifierKey}-G`]: 'findPersistentPrev',
+    "'\\'": function (cm) { return insertBackslash(cm, autocompleteAdapter) }
   }, makeAutoCloseCharHandlers(getSetting))
 }
 
@@ -1186,4 +1188,13 @@ function checkItemsAfter (cm, mark, to) {
       m.to.line <= to.line
     )
   })
+}
+
+function insertBackslash (codeMirror, autocompleteAdapter) {
+  codeMirror.showHint({
+    hint: autocomplete,
+    autocompleteAdapter
+  })
+
+  return CodeMirror.Pass
 }
