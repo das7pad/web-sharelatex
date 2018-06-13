@@ -65,6 +65,12 @@ module.exports =
 			AccountSyncController.getV2PlanCode
 		)
 
+		publicApiRouter.get(
+			'/overleaf/user/:v1_user_id/subscription',
+			AuthenticationController.httpAuth,
+			AccountSyncController.getV2SubscriptionStatus
+		)
+
 		webRouter.get '/user/trial', AccountSyncController.startTrial
 
 removeRoute = (router, method, path)->
