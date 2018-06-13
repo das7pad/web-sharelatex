@@ -26,7 +26,8 @@ export default class EmisExport extends Component {
           this.pollExportStatus(
             resp.export_v1_id,
             projectId,
-            this.pollExportStatus
+            this.pollExportStatus,
+            1000
           )
         },
         error: (resp) => {
@@ -38,9 +39,8 @@ export default class EmisExport extends Component {
     }
   }
 
-  pollExportStatus (exportId, projectId, recursion) {
+  pollExportStatus (exportId, projectId, recursion, timeout) {
     var link = `/project/${projectId}/export/${exportId}`
-
     $.ajax({
       url: link,
       type: 'GET',
@@ -55,8 +55,11 @@ export default class EmisExport extends Component {
           this.setState({ exportState: 'complete' })
         } else {
           setTimeout(function () {
-            recursion(exportId, projectId, recursion)
-          }, 10000)
+            if (timeout < 10000) {
+              timeout = timeout + 1000
+            }
+            recursion(exportId, projectId, recursion, timeout)
+          }, timeout)
         }
       },
       error: (resp) => {
