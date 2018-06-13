@@ -20,7 +20,7 @@ module.exports = ProjectImportController =
 		unsupportedError = (msg) -> res.status(501).json(message: msg)
 		ProjectImporter.importProject ol_doc_id, user_id, (error, sl_project_id) ->
 			if error instanceof UnsupportedFileTypeError
-				unsupportedError("Sorry! Projects with linked or external files aren't supported yet.")
+				unsupportedError("Sorry! Projects with linked or external files aren't fully supported yet.")
 			else if error instanceof UnsupportedBrandError
 				unsupportedError("Sorry! Projects with associated journals aren't supported yet.")
 			else if error instanceof UnsupportedExportRecordsError
