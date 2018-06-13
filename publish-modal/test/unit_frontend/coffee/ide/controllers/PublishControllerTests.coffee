@@ -7,6 +7,9 @@ define ['ide/publish-modal/controllers/PublishController'], () ->
 		beforeEach () ->
 			origRequireJsFn = window.requirejs
 			window.requirejs = @requirejs = sinon.stub()
+			window._ide = sinon.stub()
+			window._ide.fileTreeManager = sinon.stub()
+			window._ide.fileTreeManager.projectContainsFolder = sinon.stub()
 
 		afterEach () ->
 			window.Frontend = null
@@ -17,6 +20,7 @@ define ['ide/publish-modal/controllers/PublishController'], () ->
 				init: publishModalInit = sinon.stub()
 			})
 			inject ($rootScope, $controller) ->
+				$rootScope.user = {first_name: 'first name', last_name: 'last name'}
 				$controller('PublishController', {$scope: $rootScope})
 
 				$rootScope.openPublishProjectModal()
