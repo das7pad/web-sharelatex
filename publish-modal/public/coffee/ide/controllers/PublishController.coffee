@@ -11,7 +11,7 @@ define [
 				)
 
 				requirejs ['publish-modal'], (pm) ->
-					if ($scope.pdf)
+					if ($scope.pdf.url)
 						downloadLink = $scope.pdf.downloadUrl
 
 					initParams = {

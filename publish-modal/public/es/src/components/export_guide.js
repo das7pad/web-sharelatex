@@ -29,10 +29,6 @@ export default class ExportGuide extends Component {
                 dangerouslySetInnerHTML={{__html: entry.publish_menu_html}}
               />
               <Continue initParams={initParams} entry={entry} />
-              <p>
-                Please note that you'll have chance to confirm your
-                submission on the next page before your files are sent
-              </p>
             </div>
           </div>
         </div>
@@ -55,6 +51,10 @@ function Continue ({ initParams, entry }) {
             onClick={() => this.props.onSwitch('export', entry.id)}>
             Continue
           </button>
+        </p>
+        <p>
+          Please note that you'll have chance to confirm your
+          submission on the next page before your files are sent
         </p>
       </div>
     )
