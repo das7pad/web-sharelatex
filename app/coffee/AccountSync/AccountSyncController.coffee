@@ -24,10 +24,12 @@ module.exports = AccountSyncController =
 		user_id = AuthenticationController.getLoggedInUserId req
 		UserGetter.getUser user_id, { overleaf: true }, (error, user) ->
 			return next(error) if error?
+			url = "/user/subscription/new?planCode=collaborator_free_trial_7_days&ssp=true"
 			if user?.overleaf?.id?
-				res.redirect "#{settings.overleaf.host}/users/trial?trial=2017-pro-plus-trial"
+				res.redirect url
 			else
-				res.redirect "#{settings.accountMerge.sharelatexHost}/user/subscription/new?planCode=collaborator_free_trial_7_days&ssp=true"
+				# Send non-v1 users to SL
+				res.redirect "#{settings.accountMerge.sharelatexHost}#{url}"
 
 	getV2PlanCode: (req, res, next) ->
 		{v1_user_id} = req.params
