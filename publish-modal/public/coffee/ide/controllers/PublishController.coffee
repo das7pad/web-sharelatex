@@ -16,7 +16,7 @@ define [
 
 					initParams = {
 						projectId: $scope.project_id,
-						downloadLink: downloadLink,
+						pdfUrl: downloadLink,
 						hasFolders: window._ide.fileTreeManager.projectContainsFolder(),
 						firstName: $scope.user.first_name,
 						lastName: $scope.user.last_name

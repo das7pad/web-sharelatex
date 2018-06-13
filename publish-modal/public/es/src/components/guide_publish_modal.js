@@ -55,6 +55,7 @@ export default class GuidePublishModal extends Component {
         returnText={returnText}
         projectId={initParams.projectId}
         onSwitch={onSwitch}
+        initParams={initParams}
       />)
     } else {
       return null
