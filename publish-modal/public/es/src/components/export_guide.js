@@ -56,6 +56,20 @@ function Continue ({ initParams, entry }) {
           Please note that you'll have chance to confirm your
           submission on the next page before your files are sent
         </p>
+        { initParams.logs.errors.length > 0 &&
+          <p>
+            <strong> Warning: </strong> LaTeX errors on this
+            project may affect submissions. Please check the logs
+            before continuing
+          </p>
+        }
+        { initParams.logs.warnings.length > 0 &&
+          <p>
+            <strong> Warning: </strong> LaTeX warnings on this
+            project may affect submissions. Please check the logs
+            before continuing
+          </p>
+        }
       </div>
     )
   } else {
