@@ -5,7 +5,7 @@ define [
   "ide/rich-text/directives/spell_check/spell_check_adapter"
   "ide/rich-text/autocomplete_adapter"
 ], (App, RichTextAdapter, SpellCheckManager, SpellCheckAdapter, AutocompleteAdapter) ->
-  App.directive "cmEditor", (ide, $cacheFactory, $http, $q) ->
+  App.directive "cmEditor", (ide, metadata, $cacheFactory, $http, $q) ->
     return {
       scope: {
         bundle: "="
@@ -27,7 +27,7 @@ define [
           editor = new scope.bundle.Editor(
             bodyEl[0],
             new RichTextAdapter(ide.fileTreeManager),
-            new AutocompleteAdapter(),
+            new AutocompleteAdapter(metadata),
             getSetting
           )
           switchAttachment(scope.sharejsDoc)
