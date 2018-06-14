@@ -1,11 +1,30 @@
 import { Pos } from 'codemirror'
+import Fuse from 'fuse.js'
 
 export default function autocomplete (cm, { autocompleteAdapter }) {
   const cursor = cm.getCursor()
   const token = cm.getTokenAt(cursor)
 
+  // Ignore comments or strings
+  if (/\b(?:string|comment)\b/.test(token.type)) return
+  // Ignore if user removed characters
+  if (!token.string.length) return
+
+  const list = autocompleteAdapter.getCompletions(handleCompletionPicked)
+
+  const fuse = new Fuse(list, {
+    caseSensitive: false,
+    includeScore: false,
+    shouldSort: true,
+    threshold: 0.3,
+    location: 0,
+    distance: 100,
+    maxPatternLength: 32,
+    keys: ['displayText']
+  })
+
   return {
-    list: autocompleteAdapter.getCompletions(handleCompletionPicked),
+    list: fuse.search(token.string),
     from: Pos(cursor.line, token.start),
     to: Pos(cursor.line, token.end)
   }
