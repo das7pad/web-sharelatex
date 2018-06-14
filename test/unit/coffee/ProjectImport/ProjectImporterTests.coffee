@@ -497,6 +497,43 @@ describe "ProjectImporter", ->
 					)
 					.should.equal true
 
+		describe "with an ext file, from wloutput agent", ->
+			beforeEach (done) ->
+				@file = {
+					file: "images/image.jpeg"
+					file_path: "abc/def"
+					type: "ext"
+					agent: "wloutput"
+					agent_data:
+						doc:  '234arst'
+						source_doc_display_name: 'Test Output Project'
+				}
+				@ProjectImporter._writeS3ObjectToDisk = sinon.stub().yields(null, "path/on/disk")
+				@ProjectImporter._importFile @project_id, @user_id, @file, done
+
+			it "should create the file's folder", ->
+				@ProjectEntityUpdateHandler.mkdirp
+					.calledWith(@project_id, "/images")
+					.should.equal true
+
+			it "should download the url to disk from s3", ->
+				@ProjectImporter._writeS3ObjectToDisk
+					.calledWith("abc/def")
+					.should.equal true
+
+			it "should add the file to the project", ->
+				linkedFileData = {
+					provider: 'project_output_file',
+					v1_source_doc_id: 234
+					source_output_file_path: 'output.pdf',
+					source_project_display_name: 'Test Output Project'
+				}
+				@ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory
+					.calledWith(
+						@project_id, @folder_id, "image.jpeg", "path/on/disk", linkedFileData, @user_id
+					)
+					.should.equal true
+
 		describe "with an ext file, from url agent", ->
 			beforeEach (done) ->
 				@file = {
