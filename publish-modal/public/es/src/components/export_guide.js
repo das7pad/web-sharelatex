@@ -99,5 +99,5 @@ ExportGuide.propTypes = {
 Continue.propTypes = {
   entry: PropTypes.object.isRequired,
   logs: PropTypes.object.isRequired,
-  pdfUrl: PropTypes.string.isRequired
+  pdfUrl: PropTypes.string
 }
