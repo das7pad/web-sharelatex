@@ -3,7 +3,7 @@ import SidebarWithReturnButton from './sidebar_with_return_button'
 
 export default class ExportGuide extends Component {
   render () {
-    const {entry, onReturn, returnText, initParams} = this.props
+    const {entry, onReturn, returnText, initParams, onSwitch} = this.props
     return (
       <div
         className='publish-guide modal-body-content row content-as-table'
@@ -28,7 +28,10 @@ export default class ExportGuide extends Component {
               <p
                 dangerouslySetInnerHTML={{__html: entry.publish_menu_html}}
               />
-              <Continue initParams={initParams} entry={entry} />
+              <Continue
+                {...initParams}
+                entry={entry}
+                onSwitch={onSwitch} />
             </div>
           </div>
         </div>
@@ -37,8 +40,8 @@ export default class ExportGuide extends Component {
   }
 }
 
-function Continue ({ initParams, entry }) {
-  if (initParams.pdfUrl) {
+function Continue ({ entry, onSwitch, pdfUrl, logs }) {
+  if (pdfUrl) {
     return (
       <div>
         <p>
@@ -48,7 +51,7 @@ function Continue ({ initParams, entry }) {
         <p>
           <button className="btn"
             style={{display: 'inline-block'}}
-            onClick={() => this.props.onSwitch('export', entry.id)}>
+            onClick={() => onSwitch('export', entry.id)}>
             Continue
           </button>
         </p>
@@ -56,14 +59,14 @@ function Continue ({ initParams, entry }) {
           Please note that you'll have chance to confirm your
           submission on the next page before your files are sent
         </p>
-        { initParams.logs.errors.length > 0 &&
+        { logs.errors.length > 0 &&
           <p>
             <strong> Warning: </strong> LaTeX errors on this
             project may affect submissions. Please check the logs
             before continuing
           </p>
         }
-        { initParams.logs.warnings.length > 0 &&
+        { logs.warnings.length > 0 &&
           <p>
             <strong> Warning: </strong> LaTeX warnings on this
             project may affect submissions. Please check the logs
@@ -95,5 +98,6 @@ ExportGuide.propTypes = {
 
 Continue.propTypes = {
   entry: PropTypes.object.isRequired,
-  initParams: PropTypes.object.isRequired
+  logs: PropTypes.object.isRequired,
+  pdfUrl: PropTypes.string.isRequired
 }
