@@ -3,7 +3,7 @@ import SidebarWithReturnButton from './sidebar_with_return_button'
 
 export default class ExportGuide extends Component {
   render () {
-    const {entry, onReturn, returnText} = this.props
+    const {entry, onReturn, returnText, initParams, onSwitch} = this.props
     return (
       <div
         className='publish-guide modal-body-content row content-as-table'
@@ -28,25 +28,61 @@ export default class ExportGuide extends Component {
               <p
                 dangerouslySetInnerHTML={{__html: entry.publish_menu_html}}
               />
-              <p>
-                To begin a direct export from Overleaf please click the
-                button below
-              </p>
-              <p>
-                <button className="btn"
-                  style={{display: 'inline-block'}}
-                  onClick={() => this.props.onSwitch('export', entry.id)}>
-                  Continue
-                </button>
-              </p>
-              <p>
-                Please note that you'll have chance to confirm your
-                submission on the next page before your files are sent
-              </p>
+              <Continue
+                {...initParams}
+                entry={entry}
+                onSwitch={onSwitch} />
             </div>
           </div>
         </div>
       </div>
+    )
+  }
+}
+
+function Continue ({ entry, onSwitch, pdfUrl, logs }) {
+  if (pdfUrl) {
+    return (
+      <div>
+        <p>
+          To begin a direct export from Overleaf please click the
+          button below
+        </p>
+        <p>
+          <button className="btn"
+            style={{display: 'inline-block'}}
+            onClick={() => onSwitch('export', entry.id)}>
+            Continue
+          </button>
+        </p>
+        <p>
+          Please note that you'll have chance to confirm your
+          submission on the next page before your files are sent
+        </p>
+        { logs.errors.length > 0 &&
+          <p>
+            <strong> Warning: </strong> LaTeX errors on this
+            project may affect submissions. Please check the logs
+            before continuing
+          </p>
+        }
+        { logs.warnings.length > 0 &&
+          <p>
+            <strong> Warning: </strong> LaTeX warnings on this
+            project may affect submissions. Please check the logs
+            before continuing
+          </p>
+        }
+      </div>
+    )
+  } else {
+    return (
+      <p>
+        <strong>
+          No current PDF. Please make sure your project
+          compiles before exporting
+        </strong>
+      </p>
     )
   }
 }
@@ -56,5 +92,12 @@ ExportGuide.propTypes = {
   returnText: PropTypes.string,
   onReturn: PropTypes.func,
   projectId: PropTypes.string.isRequired,
-  onSwitch: PropTypes.func.isRequired
+  onSwitch: PropTypes.func.isRequired,
+  initParams: PropTypes.object.isRequired
+}
+
+Continue.propTypes = {
+  entry: PropTypes.object.isRequired,
+  logs: PropTypes.object.isRequired,
+  pdfUrl: PropTypes.string.isRequired
 }
