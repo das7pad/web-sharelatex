@@ -11,12 +11,13 @@ define [
 				)
 
 				requirejs ['publish-modal'], (pm) ->
-					if ($scope.pdf)
+					if ($scope.pdf.url)
 						downloadLink = $scope.pdf.downloadUrl
 
 					initParams = {
 						projectId: $scope.project_id,
-						downloadLink: downloadLink,
+						pdfUrl: downloadLink,
+						logs: $scope.pdf.logEntries,
 						hasFolders: window._ide.fileTreeManager.projectContainsFolder(),
 						firstName: $scope.user.first_name,
 						lastName: $scope.user.last_name
