@@ -4,6 +4,7 @@ import SidebarWithReturnButton from './sidebar_with_return_button'
 export default class PublishGuide extends Component {
   render () {
     const { entry, returnText, onReturn, projectId, pdfUrl } = this.props
+
     return (
       <div
         className='publish-guide modal-body-content row content-as-table'
@@ -12,16 +13,40 @@ export default class PublishGuide extends Component {
       >
         <SidebarWithReturnButton onReturn={onReturn} returnText={returnText} />
         <div className='col-sm-8'>
-          <div dangerouslySetInnerHTML={{ __html: entry.publish_guide_html }} />
+          <GuideHtml entry={entry} projectId={projectId} pdfUrl={pdfUrl} />
           {entry.publish_link_destination &&
-          <DownloadAndSubmit entry={entry} projectId={projectId} pdfUrl={pdfUrl} />}
+           <div>
+             <Download entry={entry} projectId={projectId} pdfUrl={pdfUrl} />
+             <Submit entry={entry} />
+           </div>}
         </div>
       </div>
     )
   }
 }
 
-function DownloadAndSubmit ({ entry, projectId, pdfUrl }) {
+export function GuideHtml ({ entry, projectId, pdfUrl }) {
+  const html = entry.publish_guide_html
+  if (html.includes('DOWNLOAD')) {
+    const htmlParts = html.split('DOWNLOAD')
+    return (
+      <div>
+        <div dangerouslySetInnerHTML={{ __html: htmlParts[0] }} />
+        <Download entry={entry} projectId={projectId} pdfUrl={pdfUrl} />
+        <div
+          style={{ marginLeft: '140px', paddingLeft: '15px' }}
+          dangerouslySetInnerHTML={{ __html: htmlParts[1] }}
+        />
+      </div>
+    )
+  } else {
+    return (
+      <div dangerouslySetInnerHTML={{ __html: entry.publish_guide_html }} />
+    )
+  }
+}
+
+function Download ({ entry, projectId, pdfUrl }) {
   return (
     <div style={{ marginLeft: '140px', paddingLeft: '15px' }}>
       { /* Most publish guides have an image column
@@ -36,16 +61,24 @@ function DownloadAndSubmit ({ entry, projectId, pdfUrl }) {
         </a>
       </p>
       <p>
-        {pdfUrl && <a
-          href={pdfUrl}
-          target="_blank"
-                  >
-          Download PDF file of your article
-        </a>}
+        {pdfUrl &&
+         <a
+           href={pdfUrl}
+           target="_blank">
+           Download PDF file of your article
+         </a>}
         {!pdfUrl && <span className="link-disabled">
-          Download PDF file of your article ( please compile your project before downloading PDF )
+          Download PDF file of your article
+          ( please compile your project before downloading PDF )
         </span>}
       </p>
+    </div>
+  )
+}
+
+function Submit ({ entry }) {
+  return (
+    <div style={{ marginLeft: '140px', paddingLeft: '15px' }}>
       <p><strong>Step 2: Submit your manuscript</strong></p>
       <p>
         <a
@@ -65,7 +98,6 @@ function DownloadAndSubmit ({ entry, projectId, pdfUrl }) {
   )
 }
 
-
 PublishGuide.propTypes = {
   entry: PropTypes.object.isRequired,
   returnText: PropTypes.string,
@@ -74,8 +106,18 @@ PublishGuide.propTypes = {
   pdfUrl: PropTypes.string
 }
 
-DownloadAndSubmit.propTypes = {
+GuideHtml.propTypes = {
   entry: PropTypes.object.isRequired,
   projectId: PropTypes.string.isRequired,
   pdfUrl: PropTypes.string
+}
+
+Download.propTypes = {
+  entry: PropTypes.object.isRequired,
+  projectId: PropTypes.string.isRequired,
+  pdfUrl: PropTypes.string
+}
+
+Submit.propTypes = {
+  entry: PropTypes.object.isRequired
 }
