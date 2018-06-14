@@ -27,7 +27,7 @@ export default class PublishGuide extends Component {
 
 export function GuideHtml ({ entry, projectId, pdfUrl }) {
   const html = entry.publish_guide_html
-  if (html.includes('DOWNLOAD')) {
+  if (html.indexOf('DOWNLOAD') !== -1) {
     const htmlParts = html.split('DOWNLOAD')
     return (
       <div>
