@@ -17,17 +17,19 @@ define [
         autoCloseBrackets: "="
         fontSize: "="
         lineHeight: "="
+        docId: "="
       }
 
       link: (scope, element, attrs) ->
         bodyEl = element.find('.cm-editor-body')
         editor = null
+        autocompleteAdapter = new AutocompleteAdapter(scope, metadata)
 
         init = () ->
           editor = new scope.bundle.Editor(
             bodyEl[0],
             new RichTextAdapter(ide.fileTreeManager),
-            new AutocompleteAdapter(metadata),
+            autocompleteAdapter,
             getSetting
           )
           switchAttachment(scope.sharejsDoc)
@@ -70,6 +72,7 @@ define [
             editor.enable()
             sharejsDoc.on "remoteop.richtext", editor.update
             initSpellCheck()
+            setUpMetadataEventListener()
 
         detachFromCM = (sharejsDoc) ->
           sharejsDoc.detachFromCM()
@@ -106,12 +109,19 @@ define [
           )
           codeMirror.off 'scroll', @spellCheckManager.onScroll
 
+        setUpMetadataEventListener = () ->
+          editor.getCodeMirror().on 'change', autocompleteAdapter.onChange
+
+        tearDownMetadataEventListener = () ->
+          editor.getCodeMirror().off 'change', autocompleteAdapter.onChange
+
         getSetting = (key) ->
           scope[key]
 
         scope.$on '$destroy', () ->
           tearDownSpellCheck()
           tearDownFormattingEventListeners()
+          tearDownMetadataEventListener()
           detachFromCM(scope.sharejsDoc)
           editor.disable()
 
