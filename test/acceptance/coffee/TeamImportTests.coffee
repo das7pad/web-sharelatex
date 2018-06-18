@@ -64,7 +64,17 @@ describe "Team imports", ->
 				Subscription.findOne("overleaf.id": 5).exec (error, subscription) ->
 					return done(error) if error?
 					expect(subscription.overleaf.id).to.eq(5)
+					expect(subscription.membersLimit).to.eq(32)
 					expect(subscription.member_ids.length).to.eq(2)
+
+					expect(subscription.teamInvites.length).to.eq(1)
+
+					teamInvite = subscription.teamInvites[0]
+
+					expect(teamInvite.email).to.eq "invited@example.com"
+					expect(teamInvite.token).to.eq "secret"
+					expect(teamInvite.inviterName).to.eq "Test team"
+					expect(teamInvite.sentAt).to.be.an.instanceof(Date)
 
 					getUser = (id, cb) -> UserStub.findOne(_id: id, cb)
 
