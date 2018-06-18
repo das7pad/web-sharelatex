@@ -9,7 +9,7 @@ define [
       [].concat(TopHundredSnippets, @getCompletionsFromMetadata())
         .map (snippet) ->
           {
-            text: snippet.snippet
+            text: snippet.caption
             displayText: snippet.caption
             hint: handleCompletionPicked
           }

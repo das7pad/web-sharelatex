@@ -1,3 +1,5 @@
+/* global _ */
+
 import { Pos } from 'codemirror'
 import Fuse from 'fuse.js'
 
@@ -12,21 +14,34 @@ export default function autocomplete (cm, { autocompleteAdapter }) {
 
   const list = autocompleteAdapter.getCompletions(handleCompletionPicked)
 
-  const fuse = new Fuse(list, {
-    caseSensitive: false,
-    includeScore: false,
-    shouldSort: true,
-    threshold: 0.3,
-    location: 0,
-    distance: 100,
-    maxPatternLength: 32,
-    keys: ['displayText']
-  })
+  // Fuse seems to have a weird bug where if every item in the list matches
+  // equally it picks an item further down the unsorted list, rather than the
+  // first of the unsorted list.This appears like the completions are in a weird
+  // order when the autocomplete is first opened
+  // To work around this, check if the token is a single backslash and show only
+  // the unsorted list
+  if (token.string === '\\') {
+    return {
+      list,
+      from: Pos(cursor.line, token.start),
+      to: Pos(cursor.line, token.end)
+    }
+  } else {
+    try {
+      const fuzzySearch = makeFuzzySearch(list)
 
-  return {
-    list: fuse.search(token.string),
-    from: Pos(cursor.line, token.start),
-    to: Pos(cursor.line, token.end)
+      return {
+        list: fuzzySearch.search(token.string),
+        from: Pos(cursor.line, token.start),
+        to: Pos(cursor.line, token.end)
+      }
+    } catch (e) {
+      if (e === 'Error: Pattern length is too long') {
+        // do nothing
+      } else {
+        throw e
+      }
+    }
   }
 }
 
@@ -55,3 +70,13 @@ function handleCompletionPicked (cm, autocomplete, completion) {
     cm.setSelection(startPos, endPos)
   }
 }
+
+/*
+ * Memoize building up Fuse fuzzy search as it is somewhat expensive
+ */
+const makeFuzzySearch = _.memoize((list) => {
+  return new Fuse(list, {
+    threshold: 0.3,
+    keys: ['text']
+  })
+})
