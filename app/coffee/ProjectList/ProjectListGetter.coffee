@@ -1,6 +1,7 @@
 settings = require 'settings-sharelatex'
 logger = require 'logger-sharelatex'
 oAuthRequest = require '../OAuth/OAuthRequest'
+{ V1ConnectionError } = require "../../../../../app/js/Features/Errors/Errors"
 
 # Restrict number of projects to 1000, working around potential perf problems
 NO_PROJECTS_LIMIT = 1000
@@ -20,7 +21,7 @@ module.exports = ProjectListGetter =
 					return callback()
 				else
 					# Specially handle no connection err, so warning can be shown
-					error = new Error('No V1 connection') if error.code == 'ECONNREFUSED'
+					error = new V1ConnectionError('No V1 connection') if error.code == 'ECONNREFUSED'
 					return callback(error)
 			logger.log {userId, docs}, "got projects from V1"
 			callback(null, {
