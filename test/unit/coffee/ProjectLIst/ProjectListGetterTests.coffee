@@ -2,6 +2,7 @@ should = require('chai').should()
 SandboxedModule = require('sandboxed-module')
 path = require('path')
 sinon = require('sinon')
+Errors = require('../../../../../../app/js/Features/Errors/Errors')
 
 modulePath = path.join __dirname, '../../../../app/js/ProjectList/ProjectListGetter'
 
@@ -13,6 +14,7 @@ describe "ProjectListGetter", ->
 			'settings-sharelatex':
 				overleaf:
 					host: 'http://overleaf.example.com'
+			'../../../../../app/js/Features/Errors/Errors': Errors
 		@userId = 'mock-user-id'
 		@callback = sinon.stub()
 
