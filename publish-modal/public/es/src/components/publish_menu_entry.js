@@ -18,7 +18,15 @@ export default class PublishMenuEntry extends Component {
           {name}
         </div>
         <div className='table-content-icon'>
-          <img src={this.props.publish_menu_icon} alt={name} />
+          <button
+            data-event='publish_entry_select'
+            data-category='Publish'
+            data-action='choose'
+            data-label={this.props.id}
+            style={{ border: 0, padding: 0, backgroundColor: 'transparent' }}
+            onClick={() => this.props.onSwitch(switchTo, id)}>
+            <img src={this.props.publish_menu_icon} alt={name} />
+          </button>
         </div>
         <div className='table-content-text'>
           <div className='table-content-slogan'
