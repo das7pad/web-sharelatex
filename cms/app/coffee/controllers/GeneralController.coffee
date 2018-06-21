@@ -5,6 +5,7 @@ ErrorController = require '../../../../../app/js/Features/Errors/ErrorController
 CmsHandler = require '../CmsHandler'
 
 parseContent = (content) ->
+	content.type = content.sys?.contentType?.sys?.id
 	if content.fields.content
 		content.fields.content = marked(content.fields.content)
 	else if content.fields.tabs
