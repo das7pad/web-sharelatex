@@ -3,43 +3,47 @@
 import { Pos } from 'codemirror'
 import Fuse from 'fuse.js'
 
-export default function autocomplete (cm, { autocompleteAdapter }) {
-  const cursor = cm.getCursor()
-  const token = cm.getTokenAt(cursor)
+export default function makeAutocomplete (adapter) {
+  return function autocomplete (cm) {
+    const cursor = cm.getCursor()
+    const token = cm.getTokenAt(cursor)
 
-  // Ignore comments or strings
-  if (/\b(?:string|comment)\b/.test(token.type)) return
-  // Ignore if user removed characters
-  if (!token.string.length) return
+    // Ignore comments or strings
+    if (/\b(?:string|comment)\b/.test(token.type)) return
+    // Ignore if user removed characters
+    if (!token.string.length) return
 
-  const list = autocompleteAdapter.getCompletions(handleCompletionPicked)
+    // If there is a previous command on the line, show argument completions.
+    // Otherwise show command completions
+    const list = adapter.getCompletions(handleCompletionPicked)
 
-  // Fuse seems to have a weird bug where if every item in the list matches
-  // equally it picks an item further down the unsorted list, rather than the
-  // first of the unsorted list.This appears like the completions are in a weird
-  // order when the autocomplete is first opened
-  // To work around this, check if the token is a single backslash and show only
-  // the unsorted list
-  if (token.string === '\\') {
-    return {
-      list,
-      from: Pos(cursor.line, token.start),
-      to: Pos(cursor.line, token.end)
-    }
-  } else {
-    try {
-      const fuzzySearch = makeFuzzySearch(list)
-
+    // Fuse seems to have a weird bug where if every item in the list matches
+    // equally it picks an item further down the unsorted list, rather than the
+    // first of the unsorted list.This appears like the completions are in a
+    // weird order when the autocomplete is first opened
+    // To work around this, check if the token is a single backslash and show
+    // only the unsorted list
+    if (token.string === '\\') {
       return {
-        list: fuzzySearch.search(token.string),
+        list,
         from: Pos(cursor.line, token.start),
         to: Pos(cursor.line, token.end)
       }
-    } catch (e) {
-      if (e === 'Error: Pattern length is too long') {
-        // do nothing
-      } else {
-        throw e
+    } else {
+      try {
+        const fuzzySearch = makeFuzzySearch(list)
+
+        return {
+          list: fuzzySearch.search(token.string),
+          from: Pos(cursor.line, token.start),
+          to: Pos(cursor.line, token.end)
+        }
+      } catch (e) {
+        if (e === 'Error: Pattern length is too long') {
+          // do nothing
+        } else {
+          throw e
+        }
       }
     }
   }

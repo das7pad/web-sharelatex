@@ -4,6 +4,7 @@ import 'codemirror/addon/hint/show-hint'
 import LatexMode from './latex_mode/latex_mode'
 import RichText from './rich_text/rich_text'
 import makeKeyBindings from './key_bindings/key_bindings'
+import makeAutocomplete from './autocomplete/autocomplete'
 import HighlightedWordManager from './spell_check/highlighted_word_manager'
 import * as textWrapping from './key_bindings/text_wrapping'
 
@@ -17,7 +18,11 @@ export class Editor {
       mode: 'latex',
       lineNumbers: true,
       lineWrapping: true,
-      extraKeys: makeKeyBindings(autocompleteAdapter, getSetting)
+      extraKeys: makeKeyBindings(getSetting),
+      hintOptions: {
+        hint: makeAutocomplete(autocompleteAdapter),
+        completeSingle: false
+      }
     })
     this.adapter = richTextAdapter
     this.highlightedWordManager = new HighlightedWordManager(this.codeMirror)
