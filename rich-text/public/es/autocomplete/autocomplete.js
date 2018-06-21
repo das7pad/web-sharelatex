@@ -96,7 +96,8 @@ function getArgumentCompletions (command) {
   return argumentsForCommand.map((arg) => {
     return {
       text: arg,
-      displayText: arg
+      displayText: arg,
+      hint: handleArgumentCompletionPicked
     }
   })
 }
@@ -134,6 +135,53 @@ function handleCompletionPicked (cm, selection, completion) {
     cm.setSelection(startPos, endPos)
 
     cm.showHint()
+  }
+}
+
+function handleArgumentCompletionPicked (cm, selection, completion) {
+  cm.replaceRange(
+    completion.text,
+    selection.from,
+    selection.to,
+    'complete' // Group completion events in undo history
+  )
+
+  const { line: lineNo } = selection.from
+  const token = cm.getTokenAt(selection.from)
+  const prevCommand = getPrevCommandOnLine(cm, lineNo, token)
+
+  if (isBeginCommand(prevCommand.string)) {
+    const oneLineBelow = cm.getLine(lineNo + 1) || ''
+    const twoLinesBelow = cm.getLine(lineNo + 2) || ''
+
+    // If the line 2 below the cursor contains \end{}, handle completing
+    // environment
+    const endIndex = twoLinesBelow.indexOf('\\end{}')
+    if (endIndex !== -1) {
+      // If completion is \begin{itemize} or \begin{enumerate} and the
+      // environment is empty, insert \item into the environment
+      if (
+        (completion.text === 'itemize' || completion.text === 'enumerate') &&
+        (/^\s+$/.test(oneLineBelow) || !oneLineBelow)
+      ) {
+        const whitespace = oneLineBelow.match(/^\s*/)
+        cm.replaceRange(`${whitespace}\\item `, {
+          line: lineNo + 1,
+          ch: 0
+        })
+      }
+
+      // Insert completion into \end{}
+      cm.replaceRange(completion.text, {
+        line: lineNo + 2,
+        ch: endIndex + 5 // Argument is 5 chars from the beginning of \end{}
+      })
+    }
+
+    // Move cursor into environment
+    cm.setCursor({ line: lineNo + 1 })
+  } else {
+    cm.setCursor({ line: lineNo })
   }
 }
 
