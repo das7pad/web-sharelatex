@@ -250,7 +250,6 @@ module.exports = ProjectImporter =
 					provider: 'project_file',
 					v1_source_doc_id: doc_id,
 					source_entity_path: "/#{file.agent_data.file}",
-					source_project_display_name: file.agent_data.source_doc_display_name
 				})
 		else if file.agent == 'wloutput'
 			ProjectImporter._getDocIdFromWriteToken file.agent_data.doc, (err, doc_id) ->
@@ -259,7 +258,6 @@ module.exports = ProjectImporter =
 					provider: 'project_output_file',
 					v1_source_doc_id: doc_id,
 					source_output_file_path: "output.pdf",
-					source_project_display_name: file.agent_data.source_doc_display_name
 				})
 		else
 			callback(null, null)

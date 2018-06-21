@@ -489,7 +489,6 @@ describe "ProjectImporter", ->
 					provider: 'project_file',
 					v1_source_doc_id: 234
 					source_entity_path: '/a',
-					source_project_display_name: 'Test Project'
 				}
 				@ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory
 					.calledWith(
@@ -526,7 +525,6 @@ describe "ProjectImporter", ->
 					provider: 'project_output_file',
 					v1_source_doc_id: 234
 					source_output_file_path: 'output.pdf',
-					source_project_display_name: 'Test Output Project'
 				}
 				@ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory
 					.calledWith(
