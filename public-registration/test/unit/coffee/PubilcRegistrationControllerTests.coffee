@@ -25,8 +25,8 @@ describe "PublicRegistrationController", ->
 			getDomainLicencePage:sinon.stub()
 		@UserUpdater =
 			changeEmailAddress:sinon.stub()
-		@EmailHandler =
-			sendEmail:sinon.stub().callsArgWith(2)
+		@UserEmailsConfirmationHandler =
+			sendConfirmationEmail: sinon.stub().yields()
 		@UserHandler =
 			populateTeamInvites: sinon.stub().callsArgWith(1)
 		@AuthenticationController =
@@ -41,15 +41,17 @@ describe "PublicRegistrationController", ->
 			"../../../../app/js/Features/User/UserRegistrationHandler":@UserRegistrationHandler
 			"../../../../app/js/Features/Referal/ReferalAllocator":@ReferalAllocator
 			"../../../../app/js/Features/Subscription/SubscriptionDomainHandler":@SubscriptionDomainHandler
-			"../../../../app/js/Features/Email/EmailHandler": @EmailHandler
 			"../../../../app/js/Features/Email/Layouts/PersonalEmailLayout":{}
-			"../../../../app/js/Features/Email/EmailBuilder": templates:{welcome:{}}
+			"../../../../app/js/Features/Email/EmailBuilder": templates:{welcome:{}}, CTAEmailTemplate: sinon.stub()
+			"../../../../app/js/Features/Email/EmailHandler": {}
 			"../../../../app/js/Features/User/UserHandler": @UserHandler
+			"../../../../app/js/Features/User/UserEmailsConfirmationHandler": @UserEmailsConfirmationHandler
 			"../../../../app/js/Features/Authentication/AuthenticationController": @AuthenticationController
 			"../../../../app/js/Features/User/UserSessionsManager":@UserSessionsManager
 			"../../../../app/coffee/Features/Analytics/AnalyticsManager": @AnalyticsManager
 			"logger-sharelatex": {log:->}
 			"metrics-sharelatex": { inc: () ->}
+			"settings-sharelatex": {}
 
 		@req =
 			session:
@@ -151,6 +153,6 @@ describe "PublicRegistrationController", ->
 		it "should send a welcome email", (done)->
 			@UserRegistrationHandler.registerNewUser.callsArgWith(1, null, @user)
 			@res.json = (opts)=>
-				@EmailHandler.sendEmail.calledWith("welcome").should.equal true
+				@UserEmailsConfirmationHandler.sendConfirmationEmail.calledWith(@user._id, @user.email, 'welcome').should.equal true
 				done()
 			@PublicRegistrationController.register @req, @res

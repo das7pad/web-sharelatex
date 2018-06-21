@@ -5,43 +5,30 @@ metrics = require "metrics-sharelatex"
 ReferalAllocator = require "../../../../app/js/Features/Referal/ReferalAllocator"
 UserRegistrationHandler = require("../../../../app/js/Features/User/UserRegistrationHandler")
 SubscriptionDomainHandler = require("../../../../app/js/Features/Subscription/SubscriptionDomainHandler")
-EmailHandler = require("../../../../app/js/Features/Email/EmailHandler")
+UserEmailsConfirmationHandler = require("../../../../app/js/Features/User/UserEmailsConfirmationHandler")
 EmailBuilder = require("../../../../app/js/Features/Email/EmailBuilder")
-PersonalEmailLayout = require("../../../../app/js/Features/Email/Layouts/PersonalEmailLayout")
 _ = require "underscore"
 UserHandler = require("../../../../app/js/Features/User/UserHandler")
 UserSessionsManager = require("../../../../app/js/Features/User/UserSessionsManager")
 AuthenticationController = require("../../../../app/js/Features/Authentication/AuthenticationController")
 AnalyticsManager = require("../../../../app/coffee/Features/Analytics/AnalyticsManager")
+settings = require "settings-sharelatex"
 
-EmailBuilder.templates.welcome =
-	subject:  _.template "Welcome to ShareLaTeX"
-	layout: PersonalEmailLayout
-	type:"lifecycle"
-	plainTextTemplate: _.template """
-Hi <%= first_name %>,
+EmailBuilder.templates.welcome = EmailBuilder.CTAEmailTemplate({
+	subject: () -> "Welcome to #{settings.appName}"
+	title: () -> "Welcome to #{settings.appName}"
+	greeting: () -> "Hi,"
+	message: (opts) -> """
+Thanks for signing up to #{settings.appName}! If you ever get lost, you can [log in again](#{settings.siteUrl}/login) with the email address '#{opts.to}'.
 
-Thanks for signing up to ShareLaTeX! If you ever get lost, you can log in again (<%= siteUrl %>/login) with the email address "<%= to %>".
-If you're new to LaTeX, take a look at our Help Guides (<%= siteUrl %>/learn) and Templates (<%= siteUrl %>/templates).
+If you're new to LaTeX, take a look at our [Help Guides](#{settings.siteUrl}/learn) and [Templates](#{settings.siteUrl}/templates).
 
-Regards
-
-Henry
-ShareLaTeX Co-founder
-
-PS. We love talking to our users about ShareLaTeX. Reply to this email to get in touch with us directly, whatever the reason. Questions, comments, problems, suggestions, all welcome!
-"""
-	compiledTemplate: _.template """
-<p>Hi <%= first_name %>,</p>
-<p>Thanks for signing up to ShareLaTeX! If you ever get lost, you can log in again <a href="<%= siteUrl %>/login">here</a> with the email address "<%= to %>".</p>
-<p>If you're new to LaTeX, take a look at our <a href="<%= siteUrl %>/learn">Help Guides</a> and <a href="<%= siteUrl %>/templates">Templates</a>.</p>
-<p>
-Regards, <br>
-Henry <br>
-ShareLaTeX Co-founder
-</p>
-<p>PS. We love talking to our users about ShareLaTeX. Reply to this email to get in touch with us directly, whatever the reason. Questions, comments, problems, suggestions, all welcome!<p>
-"""
+Please also take a moment to confirm your email address for #{settings.appName}:
+	"""
+	secondaryMessage: () -> "PS. We love talking to our users about ShareLaTeX. Reply to this email to get in touch with us directly, whatever the reason. Questions, comments, problems, suggestions, all welcome!"
+	ctaText: () -> "Confirm Email"
+	ctaURL: (opts) -> opts.confirmEmailUrl
+})
 
 module.exports = PublicRegistrationController =
 	showRegisterPage : (req, res, next) ->
@@ -78,10 +65,7 @@ module.exports = PublicRegistrationController =
 				metrics.inc "user.register.success"
 				ReferalAllocator.allocate req.session.referal_id, user._id, req.session.referal_source, req.session.referal_medium
 
-				EmailHandler.sendEmail "welcome", {
-					first_name:user.first_name
-					to: user.email
-				}, () ->
+				UserEmailsConfirmationHandler.sendConfirmationEmail user._id, user.email, 'welcome', () ->
 
 				UserHandler.populateTeamInvites(user, ->)
 
