@@ -10,8 +10,6 @@ export default function makeAutocomplete (adapter) {
 
     // Ignore comments or strings
     if (/\b(?:string|comment)\b/.test(token.type)) return
-    // Ignore if user removed characters
-    if (!token.string.length) return
 
     const range = cm.getRange(
       Pos(cursor.line, cursor.ch - 1),
@@ -32,7 +30,20 @@ export default function makeAutocomplete (adapter) {
 
     // If there is a previous command on the line, show argument completions.
     // Otherwise show command completions
-    const list = adapter.getCompletions(handleCompletionPicked)
+    const prevCommand = getPrevCommandOnLine(cm, cursor.line, token)
+
+    let list
+    if (prevCommand) {
+      list = getArgumentCompletions()
+      // Cursor is inside an empty argument, so we adjust the token position
+      // inside the argument and set to an empty string
+      if (token.string === '{' || token.string === '[') {
+        token.start = token.end
+        token.string = ''
+      }
+    } else {
+      list = adapter.getCompletions(handleCompletionPicked)
+    }
 
     // Fuse seems to have a weird bug where if every item in the list matches
     // equally it picks an item further down the unsorted list, rather than the
@@ -40,7 +51,7 @@ export default function makeAutocomplete (adapter) {
     // weird order when the autocomplete is first opened
     // To work around this, check if the token is a single backslash and show
     // only the unsorted list
-    if (token.string === '\\') {
+    if (token.string === '\\' || token.string === '') {
       return {
         list,
         from: Pos(cursor.line, token.start),
@@ -66,7 +77,41 @@ export default function makeAutocomplete (adapter) {
   }
 }
 
-function handleCompletionPicked (cm, autocomplete, completion) {
+function getPrevCommandOnLine (cm, line, token) {
+  // While the token is not a command (marked as tags by parser), get the
+  // previous token on the line
+  let searchingToken = token
+  while (searchingToken.type !== 'tag' && searchingToken.start > 0) {
+    searchingToken = cm.getTokenAt(Pos(line, searchingToken.start))
+  }
+
+  // Return found token if it is a command and it is not the original token
+  const isCommand = searchingToken.type === 'tag'
+  const isDifferentToken = searchingToken !== token
+  return isCommand && isDifferentToken ? searchingToken : null
+}
+
+function getArgumentCompletions () {
+  // text: snippet.caption
+  // displayText: snippet.caption
+  // hint: handleCompletionPicked
+  return [{
+    text: 'foo',
+    displayText: 'foo',
+    hint: handleCompletionPicked
+  }, {
+    text: 'bar',
+    displayText: 'bar',
+    hint: handleCompletionPicked
+  }, {
+    text: 'baz',
+    displayText: 'baz',
+    hint: handleCompletionPicked
+  }
+  ]
+}
+
+function handleCompletionPicked (cm, selection, completion) {
   // Strip tabstops
   let completionText = completion.text.replace(/\$[0-9]/g, '')
 
@@ -80,23 +125,25 @@ function handleCompletionPicked (cm, autocomplete, completion) {
 
   cm.replaceRange(
     completionText,
-    autocomplete.from,
-    autocomplete.to,
+    selection.from,
+    selection.to,
     'complete' // Group completion events in undo history
   )
 
   const firstArg = completionText.match(/[{[]([\w \-_]*)[}\]]/)
   if (firstArg !== null) {
-    const lineNo = autocomplete.from.line
+    const lineNo = selection.from.line
     const startPos = {
       line: lineNo,
-      ch: autocomplete.from.ch + firstArg.index + 1
+      ch: selection.from.ch + firstArg.index + 1
     }
     const endPos = {
       line: lineNo,
       ch: startPos.ch + firstArg[1].length
     }
     cm.setSelection(startPos, endPos)
+
+    cm.showHint()
   }
 }
 
