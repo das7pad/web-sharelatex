@@ -22,27 +22,14 @@ mixin actual_content(content)
 				else if content.type == 'buttonOtherPage'
 					+btn_other_page(content)
 
-mixin page_content(content, prev, prevPrev, prevPrevPrev, next)
+mixin page_content(content, nextContent)
 	//- Handles the grid layout for CMS generated pages
-	//- @param {object}		content, prev, prevPrev, prevPrevPrev, next		A content block
+	//- @param {object}	content, nextContent	A content block
 	//- content block= From the CMS, which includes the content and UI settings
+
 	if content
-		if !content.fields.halfWidth
+		if content.newRow
 			.row.row-spaced
 				+actual_content(content)
-		else
-			if !prev
-				.row.row-spaced
-					+actual_content(content)
-					if next && next.fields.halfWidth
-						+actual_content(next)
-			else if !prev.fields.halfWidth
-				.row.row-spaced
-					+actual_content(content)
-					if next && next.fields.halfWidth
-						+actual_content(next)
-			else if prev.fields.halfWidth && prevPrev && prevPrev.fields.halfWidth && prevPrevPrev && !prevPrevPrev.fields.halfWidth
-				.row.row-spaced
-					+actual_content(content)
-					if next && next.fields.halfWidth
-						+actual_content(next)
+				if nextContent && !nextContent.newRow
+					+actual_content(nextContent)

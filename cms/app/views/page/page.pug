@@ -23,7 +23,7 @@ block content_cms
 					for tab, tabIndex in c.fields.tabs
 						tab(heading=tab.fields.tabTitle)
 							for tabContent in tab.fields.tabContent
-								+page_content(tabContent, c.fields.tabs[tabIndex-1], c.fields.tabs[tabIndex-2], c.fields.tabs[tabIndex-3], c.fields.tabs[tabIndex+2])
+								+page_content(tabContent, c.fields.tabs[tabIndex+1])
 
 			else
-				+page_content(c, content[cIndex-1], content[cIndex-2], content[cIndex-3], content[cIndex+1])
+				+page_content(c, content[cIndex+1])
