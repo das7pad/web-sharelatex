@@ -47,7 +47,15 @@ export default function autocomplete (cm, { autocompleteAdapter }) {
 
 function handleCompletionPicked (cm, autocomplete, completion) {
   // Strip tabstops
-  const completionText = completion.text.replace(/\$[123]/g, '')
+  let completionText = completion.text.replace(/\$[0-9]/g, '')
+
+  // If completing \begin also insert \end
+  if (isBeginCommand(completionText)) {
+    const { line } = cm.getCursor()
+    const [whitespace] = cm.getLine(line).match(/^\s*/)
+
+    completionText = `${completionText}\n${whitespace}\n${whitespace}\\end{}`
+  }
 
   cm.replaceRange(
     completionText,
@@ -69,6 +77,10 @@ function handleCompletionPicked (cm, autocomplete, completion) {
     }
     cm.setSelection(startPos, endPos)
   }
+}
+
+function isBeginCommand (completion) {
+  return /^\\begin/.test(completion)
 }
 
 /*
