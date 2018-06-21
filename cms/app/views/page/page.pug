@@ -9,12 +9,13 @@ block content_cms
 	.row
 		.col-xs-12
 			.page-header
-				h1 #{data.title}
+				h1 #{title}
 
-	if data.content
-		for c, cIndex in data.content
+	if content
+		for c, cIndex in content
 			//- tabGroupTitle is a required field on CMS but can be opted out of display on site
-			if c.fields.tabGroupTitle
+			//- must check c.fields, because an entry could have been created without adding any fields
+			if c.fields && c.fields.tabGroupTitle
 				if c.fields.displayTabGroupTitle
 					h2 #{c.fields.tabGroupTitle}
 
@@ -25,4 +26,4 @@ block content_cms
 								+page_content(tabContent, c.fields.tabs[tabIndex-1], c.fields.tabs[tabIndex-2], c.fields.tabs[tabIndex-3], c.fields.tabs[tabIndex+2])
 
 			else
-				+page_content(c, data.content[cIndex-1], data.content[cIndex-2], data.content[cIndex-3], data.content[cIndex+1])
+				+page_content(c, content[cIndex-1], content[cIndex-2], content[cIndex-3], content[cIndex+1])

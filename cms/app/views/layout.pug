@@ -4,6 +4,9 @@ include _mixins
 //- Layout for all CMS generated pages
 //- This might get removed once v2 styling decisions progress
 
+block vars
+	- metadata = metadata || {}
+
 block content
 	.content.content-alt.cms-page
 		main.container(ng-cloak, role="main")

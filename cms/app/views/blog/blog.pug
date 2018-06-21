@@ -17,25 +17,21 @@ block content_cms
 
 	.blog(ng-cloak)
 		ul.blog-list
-			//- looping here, but there will only be one item
-			//- using the same function as /blog, getAndRenderBlog()
-			//- which returns items, but the query for a blog post is based on slug,
-			//- so there will only be 1 item
 			for post in items
 				li.card
 					.card-header
 						h2
-							a(href='/blog/' + post.fields.slug)
-								| #{post.fields.title}
-					if (post.fields.authorDisplay || post.fields.publishDateDay)
+							a(href='/blog/' + post.slug)
+								| #{post.title}
+					if (post.authorDisplay || post.publishDateDay)
 						small Posted
-							if (post.fields.authorDisplay)
-								|  by #{post.fields.authorDisplay}
-							if (post.fields.publishDateDay)
-								|  on #{post.fields.publishDateDay} #{post.fields.publishDateMonth} #{post.fields.publishDateYear}
-					| !{post.fields.contentPreview}
+							if (post.authorDisplay)
+								|  by #{post.authorDisplay}
+							if (post.publishDateDay)
+								|  on #{post.publishDateDay} #{post.publishDateMonth} #{post.publishDateYear}
+					| !{post.contentPreview}
 
-					a.btn.btn-success(href='/blog/' + post.fields.slug) Read More
+					a.btn.btn-success(href='/blog/' + post.slug) Read More
 
-					if post.fields.tag
+					if post.tag
 						include _blog_tags

@@ -8,14 +8,13 @@ block content_cms
 			a(href="/blog") Blog
 	.blog(ng-cloak)
 		ul.blog-list
-			for post in items
-				li.card
-					.card-header
-						h2 #{post.fields.title}
-					if (post.fields.authorDisplay || post.fields.publishDateDay)
-						small Posted
-							if (post.fields.authorDisplay)
-								|  by #{post.fields.authorDisplay}
-							if (post.fields.publishDateDay)
-								|  on #{post.fields.publishDateDay} #{post.fields.publishDateMonth} #{post.fields.publishDateYear}
-					| !{post.fields.content}
+			li.card
+				.card-header
+					h2 #{title}
+				if (authorDisplay || publishDateDay)
+					small Posted
+						if (authorDisplay)
+							|  by #{authorDisplay}
+						if (publishDateDay)
+							|  on #{publishDateDay} #{publishDateMonth} #{publishDateYear}
+				| !{content}
