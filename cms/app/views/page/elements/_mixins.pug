@@ -1,6 +1,6 @@
-mixin contact_btn(content)
+mixin btn_contact(content)
 	if content.fields.description
-		span.contact-btn-description #{content.fields.description}
+		span.btn-description #{content.fields.description}
 	a.btn.btn-default(
 		href="/contact"
 		event-tracking-ga=content.fields.gaCategory || null
@@ -10,7 +10,35 @@ mixin contact_btn(content)
 		event-segmentation=content.fields.mbData || null
 	)
 		| #{content.fields.contactButtonText}
-		//- to do - safe values for attributes. for ex, do not want " in the value
+
+mixin btn_other_page(content)
+	//- linkTo is required for this content type
+	- var href = null;
+
+	if content.fields.linkTo.sys.contentType.sys.id == 'pageAbout'
+		//- slug will be undefined for the about page, 
+		//- because we don't add this as an input the CMS
+		- href = '/about'
+	else if content.fields.linkTo.sys.contentType.sys.id == 'blogPost'
+		//- to do? Should we add the blog path to a setting,
+		//- so that this path isn't hard coded here and above for 'about'
+		- href = '/blog/' + content.fields.linkTo.fields.slug 
+	else if content.fields.linkTo.sys.contentType.sys.id == 'page'
+		- href = '/' + content.fields.linkTo.fields.path + '/' + content.fields.linkTo.fields.slug 
+
+	if href
+		if content.fields.description
+			span.btn-description #{content.fields.description}
+
+		a.btn.btn-default(
+			href=href
+			event-tracking-ga=content.fields.gaCategory || null
+			event-tracking-action=content.fields.gaAction || 'Clicked Other Page Button'
+			event-tracking-label=content.fields.gaLabel || content.fields.buttonText
+			event-tracking-mb=content.fields.mbCategory || null
+			event-segmentation=content.fields.mbData || null
+		)
+			| #{content.fields.buttonText}
 	
 mixin quote(fields)
 	if fields.halfWidth
