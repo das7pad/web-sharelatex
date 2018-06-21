@@ -34,7 +34,7 @@ export default function makeAutocomplete (adapter) {
 
     let list
     if (prevCommand) {
-      list = getArgumentCompletions()
+      list = getArgumentCompletions(prevCommand)
       // Cursor is inside an empty argument, so we adjust the token position
       // inside the argument and set to an empty string
       if (token.string === '{' || token.string === '[') {
@@ -91,24 +91,14 @@ function getPrevCommandOnLine (cm, line, token) {
   return isCommand && isDifferentToken ? searchingToken : null
 }
 
-function getArgumentCompletions () {
-  // text: snippet.caption
-  // displayText: snippet.caption
-  // hint: handleCompletionPicked
-  return [{
-    text: 'foo',
-    displayText: 'foo',
-    hint: handleCompletionPicked
-  }, {
-    text: 'bar',
-    displayText: 'bar',
-    hint: handleCompletionPicked
-  }, {
-    text: 'baz',
-    displayText: 'baz',
-    hint: handleCompletionPicked
-  }
-  ]
+function getArgumentCompletions (command) {
+  const argumentsForCommand = ARGUMENTS[command.string] || []
+  return argumentsForCommand.map((arg) => {
+    return {
+      text: arg,
+      displayText: arg
+    }
+  })
 }
 
 function handleCompletionPicked (cm, selection, completion) {
@@ -160,3 +150,59 @@ const makeFuzzySearch = _.memoize((list) => {
     keys: ['text']
   })
 })
+
+const ARGUMENTS = {
+  '\\begin': [
+    'abstract',
+    'align',
+    'align*',
+    'alignat',
+    'alignat*',
+    'aligned',
+    'alignedat',
+    'array',
+    'block',
+    'bmatrix',
+    'center',
+    'description',
+    'displaymath',
+    'document',
+    'enumerate',
+    'eqnarray',
+    'equation',
+    'equation*',
+    'figure',
+    'flushleft',
+    'flushright',
+    'footnotesize',
+    'frame',
+    'huge',
+    'Huge',
+    'itemize',
+    'large',
+    'Large',
+    'LARGE',
+    'list',
+    'matrix',
+    'minipage',
+    'minipage',
+    'normalsize',
+    'pmatrix',
+    'proof',
+    'quotation',
+    'quote',
+    'scriptsize',
+    'small',
+    'split',
+    'tabbing',
+    'table',
+    'tabular',
+    'theorem',
+    'tiny',
+    'titlepage',
+    'verbatim',
+    'verse',
+    'vmatrix',
+    'Vmatrix'
+  ]
+}
