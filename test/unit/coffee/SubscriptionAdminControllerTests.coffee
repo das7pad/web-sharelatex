@@ -19,12 +19,14 @@ describe "SubscriptionAdminController", ->
 			"../../../../app/js/Features/User/UserGetter": @UserGetter = {}
 			"../../../../app/js/Features/Subscription/SubscriptionLocator": @SubscriptionLocator = {}
 			"../../../../app/js/Features/Subscription/SubscriptionUpdater": @SubscriptionUpdater = {}
+			"../../../../app/js/Features/Subscription/FeaturesUpdater":
+				@FeaturesUpdater = {refreshFeatures: sinon.stub().yields()}
 			"../../../../app/js/models/Subscription": Subscription: @Subscription =
 				class Subscription
 					constructor: sinon.stub()
 					save: sinon.stub().yields()
 					@remove: sinon.stub().yields()
-					@update: sinon.stub().yields()
+					@findAndModify: sinon.stub().yields()
 			"../../../../app/js/Features/Errors/ErrorController": @ErrorController = {}
 			"metrics-sharelatex":
 				gauge:->
@@ -92,6 +94,12 @@ describe "SubscriptionAdminController", ->
 		
 		describe "successfully", ->
 			beforeEach ->
+				@subscription = {
+					"mock": "subscription"
+					"admin_id": "admin-id"
+					"member_ids": ["member-id-1", "member-id-2"]
+				}
+				@Subscription.findAndModify.yields null, @subscription
 				@UserAdminController._reqToMongoUpdate = sinon.stub().returns(@update = {"mock": "update"})
 				@SubscriptionAdminController.update @req, @res
 			
@@ -101,10 +109,28 @@ describe "SubscriptionAdminController", ->
 					.should.equal true
 			
 			it "should update the subscription", ->
-				@Subscription.update
+				@Subscription.findAndModify
 					.calledWith({_id: @subscription_id}, { $set: @update })
 					.should.equal true
-			
+
+			it "should refresh features", ->
+				@FeaturesUpdater.refreshFeatures
+					.callCount
+					.should.equal 3
+
+			it "should refresh features for admin", ->
+				@FeaturesUpdater.refreshFeatures
+					.calledWith('admin-id')
+					.should.equal true
+
+			it "should refresh features for members", ->
+				@FeaturesUpdater.refreshFeatures
+					.calledWith('member-id-1')
+					.should.equal true
+				@FeaturesUpdater.refreshFeatures
+					.calledWith('member-id-2')
+					.should.equal true
+
 			it "should return 204", ->
 				@res.sendStatus
 					.calledWith(204)

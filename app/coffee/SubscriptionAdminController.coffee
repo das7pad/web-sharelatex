@@ -6,6 +6,7 @@ UserGetter = require "../../../../app/js/Features/User/UserGetter"
 UserAdminController = require("./UserAdminController")
 SubscriptionLocator = require("../../../../app/js/Features/Subscription/SubscriptionLocator")
 SubscriptionUpdater = require("../../../../app/js/Features/Subscription/SubscriptionUpdater")
+FeaturesUpdater = require("../../../../app/js/Features/Subscription/FeaturesUpdater")
 Subscription = require("../../../../app/js/models/Subscription").Subscription
 ErrorController = require("../../../../app/js/Features/Errors/ErrorController")
 async = require "async"
@@ -41,9 +42,16 @@ module.exports = SubscriptionAdminController =
 			SubscriptionAdminController.BOOLEAN_ATTRIBUTES
 		)
 		logger.log {subscription_id, update}, "updating subscription via admin panel"
-		Subscription.update {_id: subscription_id}, { $set: update }, (error) ->
+		Subscription.findAndModify {_id: subscription_id}, { $set: update }, (error, subscription) ->
 			return next(error) if error?
-			res.sendStatus 204
+			async.eachSeries(
+				[subscription.admin_id].concat(subscription.member_ids)
+				, (user_id, callback) ->
+					FeaturesUpdater.refreshFeatures user_id, true, callback
+				, (error) ->
+					return next(error) if error?
+					res.sendStatus 204
+			)
 
 	new: (req, res, next) ->
 		res.render Path.resolve(__dirname, "../views/subscription/new"), {admin_id: req.params.user_id}
