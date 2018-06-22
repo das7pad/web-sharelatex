@@ -7,6 +7,7 @@ app.use(bodyParser.json())
 DEFAULT_TEAM = {
 	id: 5,
 	name: "Test team",
+	n_licences: 32,
 	owner: {
 		id: 1,
 		email: "user1@example.com"
@@ -19,6 +20,15 @@ DEFAULT_TEAM = {
 		{
 			id: 2,
 			email: "user2@example.com"
+		}
+	],
+	pending_invites: [
+		{
+			email: "invited@example.com",
+			name: "Test user",
+			code: "secret",
+			plan_name: 'pro_plan',
+			updated_at: new Date(),
 		}
 	]
 }

@@ -3,6 +3,7 @@ settings = require "settings-sharelatex"
 _ = require("underscore")
 UserMapper = require "../OverleafUsers/UserMapper"
 SubscriptionUpdater = require "../../../../../app/js/Features/Subscription/SubscriptionUpdater"
+TeamInvitesHandler = require "../../../../../app/js/Features/Subscription/TeamInvitesHandler"
 Subscription = require("../../../../../app/js/models/Subscription").Subscription
 async = require "async"
 request = require "request"
@@ -16,6 +17,7 @@ importTeam = (v1TeamId, callback = (error, v2TeamId) ->) ->
 		startImportInV1WithId,
 		createV2Team,
 		importTeamMembers,
+		importPendingInvites,
 		confirmImportInV1,
 	], (error, v1Team, v2Team) ->
 	  return rollback(v1TeamId, error, callback) if error?
@@ -38,6 +40,8 @@ createV2Team = (v1Team, callback = (error, v2Team) ->) ->
 			overleaf:
 				id: v1Team.id
 			admin_id: teamAdmin._id
+			groupPlan: true
+			membersLimit: v1Team.n_licences
 		)
 
 		subscription.save (error) ->
@@ -45,13 +49,22 @@ createV2Team = (v1Team, callback = (error, v2Team) ->) ->
 			logger.log {subscription}, "[TeamImporter] Created v2 team"
 			return callback(null, v1Team, subscription)
 
-importTeamMembers = (v1Team, v2Team, callback = (error, memberIds) ->) ->
+importTeamMembers = (v1Team, v2Team, callback = (error, v1Team, v2Team) ->) ->
 	async.map v1Team.users, UserMapper.getSlIdFromOlUser, (error, memberIds) ->
 		return callback(error) if error?
 		Subscription.update { _id: v2Team.id }, { member_ids: memberIds }, (error, updated) ->
 			callback(error) if error?
 			logger.log {memberIds}, "[TeamImporter] Members added to the team #{v2Team.id}"
 			callback(null, v1Team, v2Team)
+
+importPendingInvites = (v1Team, v2Team, callback = (error, v1Team, v2Team) ->) ->
+	importInvite = (pendingInvite, cb) ->
+		logger.log "[TeamImporter] Importing invite", pendingInvite
+		TeamInvitesHandler.importInvite(v2Team, v1Team.name, pendingInvite.email,
+			pendingInvite.code, pendingInvite.updated_at, cb)
+
+	async.map v1Team.pending_invites, importInvite, (error, invites) ->
+		callback(error, v1Team, v2Team)
 
 confirmImportInV1 = (v1Team, v2Team, callback = (error) ->) ->
 	v1Request {
