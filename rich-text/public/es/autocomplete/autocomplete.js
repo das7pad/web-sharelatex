@@ -4,7 +4,10 @@ import { Pos } from 'codemirror'
 import Fuse from 'fuse.js'
 
 export default function makeAutocomplete (adapter) {
-  return function autocomplete (cm) {
+  /**
+   * Show autocomplete menu
+   */
+  function autocomplete (cm) {
     const cursor = cm.getCursor()
     const token = cm.getTokenAt(cursor)
 
@@ -34,7 +37,7 @@ export default function makeAutocomplete (adapter) {
 
     let list
     if (prevCommand) {
-      list = getArgumentCompletions(prevCommand, adapter)
+      list = getArgumentCompletions(prevCommand)
       // Cursor is inside an empty argument, so we adjust the token position
       // inside the argument and set to an empty string
       if (token.string === '{' || token.string === '[') {
@@ -75,145 +78,147 @@ export default function makeAutocomplete (adapter) {
       }
     }
   }
-}
 
-function getPrevCommandOnLine (cm, line, token) {
-  // While the token is not a command (marked as tags by parser), get the
-  // previous token on the line
-  let searchingToken = token
-  while (searchingToken.type !== 'tag' && searchingToken.start > 0) {
-    searchingToken = cm.getTokenAt(Pos(line, searchingToken.start))
+  function getArgumentCompletions (command) {
+    return BIBTEX_COMMANDS.indexOf(command.string) === -1
+      ? getCommandArgumentCompletions(command)
+      : getBibtexArgumentCompletions()
   }
 
-  // Return found token if it is a command and it is not the original token
-  const isCommand = searchingToken.type === 'tag'
-  const isDifferentToken = searchingToken !== token
-  return isCommand && isDifferentToken ? searchingToken : null
-}
-
-function getArgumentCompletions (command, adapter) {
-  return BIBTEX_COMMANDS.indexOf(command.string) === -1
-    ? getCommandArgumentCompletions(command)
-    : getBibtexArgumentCompletions(adapter)
-}
-
-function getBibtexArgumentCompletions (adapter) {
-  const { keys: references } = adapter.getReferences()
-  return references.map((ref) => {
-    return {
-      text: ref,
-      displayText: ref
-    }
-  })
-}
-
-function getCommandArgumentCompletions (command) {
-  const argumentsForCommand = ARGUMENTS[command.string] || []
-  return argumentsForCommand.map((arg) => {
-    return {
-      text: arg,
-      displayText: arg,
-      hint: handleArgumentCompletionPicked
-    }
-  })
-}
-
-function handleCompletionPicked (cm, selection, completion) {
-  // Strip tabstops
-  let completionText = completion.text.replace(/\$[0-9]/g, '')
-
-  // If completing \begin also insert \end
-  if (isBeginCommand(completionText)) {
-    const { line } = cm.getCursor()
-    const [whitespace] = cm.getLine(line).match(/^\s*/)
-
-    completionText = `${completionText}\n${whitespace}\n${whitespace}\\end{}`
+  function getBibtexArgumentCompletions () {
+    const { keys: references } = adapter.getReferences()
+    return references.map((ref) => {
+      return {
+        text: ref,
+        displayText: ref
+      }
+    })
   }
 
-  cm.replaceRange(
-    completionText,
-    selection.from,
-    selection.to,
-    'complete' // Group completion events in undo history
-  )
-
-  const firstArg = completionText.match(/[{[]([\w \-_]*)[}\]]/)
-  if (firstArg !== null) {
-    const lineNo = selection.from.line
-    const startPos = {
-      line: lineNo,
-      ch: selection.from.ch + firstArg.index + 1
-    }
-    const endPos = {
-      line: lineNo,
-      ch: startPos.ch + firstArg[1].length
-    }
-    cm.setSelection(startPos, endPos)
-
-    cm.showHint()
+  function getCommandArgumentCompletions (command) {
+    const argumentsForCommand = ARGUMENTS[command.string] || []
+    return argumentsForCommand.map((arg) => {
+      return {
+        text: arg,
+        displayText: arg,
+        hint: handleArgumentCompletionPicked
+      }
+    })
   }
-}
 
-function handleArgumentCompletionPicked (cm, selection, completion) {
-  cm.replaceRange(
-    completion.text,
-    selection.from,
-    selection.to,
-    'complete' // Group completion events in undo history
-  )
+  function handleCompletionPicked (cm, selection, completion) {
+    // Strip tabstops
+    let completionText = completion.text.replace(/\$[0-9]/g, '')
 
-  const { line: lineNo } = selection.from
-  const token = cm.getTokenAt(selection.from)
-  const prevCommand = getPrevCommandOnLine(cm, lineNo, token)
+    // If completing \begin also insert \end
+    if (isBeginCommand(completionText)) {
+      const { line } = cm.getCursor()
+      const [whitespace] = cm.getLine(line).match(/^\s*/)
 
-  if (isBeginCommand(prevCommand.string)) {
-    const oneLineBelow = cm.getLine(lineNo + 1) || ''
-    const twoLinesBelow = cm.getLine(lineNo + 2) || ''
+      completionText = `${completionText}\n${whitespace}\n${whitespace}\\end{}`
+    }
 
-    // If the line 2 below the cursor contains \end{}, handle completing
-    // environment
-    const endIndex = twoLinesBelow.indexOf('\\end{}')
-    if (endIndex !== -1) {
-      // If completion is \begin{itemize} or \begin{enumerate} and the
-      // environment is empty, insert \item into the environment
-      if (
-        (completion.text === 'itemize' || completion.text === 'enumerate') &&
-        (/^\s+$/.test(oneLineBelow) || !oneLineBelow)
-      ) {
-        const whitespace = oneLineBelow.match(/^\s*/)
-        cm.replaceRange(`${whitespace}\\item `, {
-          line: lineNo + 1,
-          ch: 0
+    cm.replaceRange(
+      completionText,
+      selection.from,
+      selection.to,
+      'complete' // Group completion events in undo history
+    )
+
+    const firstArg = completionText.match(/[{[]([\w \-_]*)[}\]]/)
+    if (firstArg !== null) {
+      const lineNo = selection.from.line
+      const startPos = {
+        line: lineNo,
+        ch: selection.from.ch + firstArg.index + 1
+      }
+      const endPos = {
+        line: lineNo,
+        ch: startPos.ch + firstArg[1].length
+      }
+      cm.setSelection(startPos, endPos)
+
+      cm.showHint()
+    }
+  }
+
+  function handleArgumentCompletionPicked (cm, selection, completion) {
+    cm.replaceRange(
+      completion.text,
+      selection.from,
+      selection.to,
+      'complete' // Group completion events in undo history
+    )
+
+    const { line: lineNo } = selection.from
+    const token = cm.getTokenAt(selection.from)
+    const prevCommand = getPrevCommandOnLine(cm, lineNo, token)
+
+    if (isBeginCommand(prevCommand.string)) {
+      const oneLineBelow = cm.getLine(lineNo + 1) || ''
+      const twoLinesBelow = cm.getLine(lineNo + 2) || ''
+
+      // If the line 2 below the cursor contains \end{}, handle completing
+      // environment
+      const endIndex = twoLinesBelow.indexOf('\\end{}')
+      if (endIndex !== -1) {
+        // If completion is \begin{itemize} or \begin{enumerate} and the
+        // environment is empty, insert \item into the environment
+        if (
+          (completion.text === 'itemize' || completion.text === 'enumerate') &&
+          (/^\s+$/.test(oneLineBelow) || !oneLineBelow)
+        ) {
+          const whitespace = oneLineBelow.match(/^\s*/)
+          cm.replaceRange(`${whitespace}\\item `, {
+            line: lineNo + 1,
+            ch: 0
+          })
+        }
+
+        // Insert completion into \end{}
+        cm.replaceRange(completion.text, {
+          line: lineNo + 2,
+          ch: endIndex + 5 // Argument is 5 chars from the beginning of \end{}
         })
       }
 
-      // Insert completion into \end{}
-      cm.replaceRange(completion.text, {
-        line: lineNo + 2,
-        ch: endIndex + 5 // Argument is 5 chars from the beginning of \end{}
-      })
+      // Move cursor into environment
+      cm.setCursor({ line: lineNo + 1 })
+    } else {
+      cm.setCursor({ line: lineNo })
+    }
+  }
+
+  function getPrevCommandOnLine (cm, line, token) {
+    // While the token is not a command (marked as tags by parser), get the
+    // previous token on the line
+    let searchingToken = token
+    while (searchingToken.type !== 'tag' && searchingToken.start > 0) {
+      searchingToken = cm.getTokenAt(Pos(line, searchingToken.start))
     }
 
-    // Move cursor into environment
-    cm.setCursor({ line: lineNo + 1 })
-  } else {
-    cm.setCursor({ line: lineNo })
+    // Return found token if it is a command and it is not the original token
+    const isCommand = searchingToken.type === 'tag'
+    const isDifferentToken = searchingToken !== token
+    return isCommand && isDifferentToken ? searchingToken : null
   }
-}
 
-function isBeginCommand (completion) {
-  return /^\\begin/.test(completion)
-}
+  function isBeginCommand (completion) {
+    return /^\\begin/.test(completion)
+  }
 
-/*
- * Memoize building up Fuse fuzzy search as it is somewhat expensive
- */
-const makeFuzzySearch = _.memoize((list) => {
-  return new Fuse(list, {
-    threshold: 0.3,
-    keys: ['text']
+  /*
+   * Memoize building up Fuse fuzzy search as it is somewhat expensive
+   */
+  const makeFuzzySearch = _.memoize((list) => {
+    return new Fuse(list, {
+      threshold: 0.3,
+      keys: ['text']
+    })
   })
-})
+
+  return autocomplete
+}
 
 const BIBTEX_COMMANDS = [
   '\\cite',
