@@ -41,9 +41,9 @@ module.exports =
 			SharelatexAuthController.authFromSharelatex
 		)
 
-		webRouter.post(
-			'/overleaf/import_team/:teamId',
-			AuthorizationMiddlewear.ensureUserIsSiteAdmin,
+		publicApiRouter.post(
+			'/overleaf/import_team/',
+			AuthenticationController.httpAuth,
 			TeamImportController.create
 		)
 

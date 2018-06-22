@@ -67,33 +67,6 @@ module.exports = MockOverleafApi =
 			res.json exported: true
 
 
-		# Team import routes
-		app.post "/api/v1/sharelatex/team_exports/:team_id/", (req, res, next) =>
-			teamId = req.params.team_id
-			teamExport =  Object.assign({}, DEFAULT_TEAM,
-				{ id: teamId, started_at: new Date() })
-
-			@teamExports[teamExport.id] = teamExport
-
-			res.json teamExport
-
-		app.patch "/api/v1/sharelatex/team_exports/:team_id/", (req, res, next) =>
-			teamId = parseInt(req.params.team_id)
-
-			if teamId != 8
-				teamExport = @teamExports[teamId]
-				teamExport.v2_id = req.body.v2_id
-				res.json teamExport
-			else
-				# Simulate a failure for an specific export
-				res.sendStatus 500
-
-		app.delete "/api/v1/sharelatex/team_exports/:team_id/", (req, res, next) =>
-			teamId = req.params.team_id
-			delete @teamExports.teamId
-
-			res.sendStatus 204
-
 		app.listen 5000, (error) ->
 			throw error if error?
 		.on "error", (error) ->

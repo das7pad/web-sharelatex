@@ -3,7 +3,7 @@ TeamImporter = require "./TeamImporter"
 
 module.exports = TeamImportController =
 	create: (req, res, next) ->
-		TeamImporter.getOrImportTeam req.params.teamId, (error, v2Team) ->
+		TeamImporter.getOrImportTeam req.body.team, (error, v2Team) ->
 			return next(error) if error?
 
 			v2TeamView = {
