@@ -1,12 +1,12 @@
 define [
   "ide/editor/directives/aceEditor/auto-complete/top_hundred_snippets"
-], (TopHundredSnippets) ->
+], (TopHundredCommands) ->
   class AutocompleteAdapter
-    constructor: (@$scope, @metadata, @references) ->
+    constructor: (@$scope, @metadata, @bibtexReferences) ->
       @debouncer = {}
 
-    getCompletions: (handleCompletionPicked) ->
-      [].concat(TopHundredSnippets, @getCompletionsFromMetadata())
+    getCommandCompletions: (handleCompletionPicked) ->
+      [].concat(TopHundredCommands, @getCommandCompletionsFromMetadata())
         .map (snippet) ->
           {
             text: snippet.caption
@@ -14,11 +14,11 @@ define [
             hint: handleCompletionPicked
           }
 
-    getCompletionsFromMetadata: () ->
+    getCommandCompletionsFromMetadata: () ->
       _.flatten(@metadata.getAllPackages())
 
-    getReferences: () ->
-      @references
+    getBibtexArguments: () ->
+      @bibtexReferences
 
     onChange: (cm) =>
       { line } = cm.getCursor()

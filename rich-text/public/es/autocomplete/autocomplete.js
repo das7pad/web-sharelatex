@@ -45,7 +45,7 @@ export default function makeAutocomplete (adapter) {
         token.string = ''
       }
     } else {
-      list = adapter.getCompletions(handleCompletionPicked)
+      list = adapter.getCommandCompletions(handleCommandCompletionPicked)
     }
 
     // Fuse seems to have a weird bug where if every item in the list matches
@@ -80,13 +80,15 @@ export default function makeAutocomplete (adapter) {
   }
 
   function getArgumentCompletions (command) {
-    return BIBTEX_COMMANDS.indexOf(command.string) === -1
-      ? getCommandArgumentCompletions(command)
-      : getBibtexArgumentCompletions()
+    if (isBibtexCommand(command.string)) {
+      return getBibtexArgumentCompletions()
+    } else {
+      return getCommandArgumentCompletions(command)
+    }
   }
 
   function getBibtexArgumentCompletions () {
-    const { keys: references } = adapter.getReferences()
+    const { keys: references } = adapter.getBibtexArguments()
     return references.map((ref) => {
       return {
         text: ref,
@@ -106,7 +108,7 @@ export default function makeAutocomplete (adapter) {
     })
   }
 
-  function handleCompletionPicked (cm, selection, completion) {
+  function handleCommandCompletionPicked (cm, selection, completion) {
     // Strip tabstops
     let completionText = completion.text.replace(/\$[0-9]/g, '')
 
@@ -203,8 +205,12 @@ export default function makeAutocomplete (adapter) {
     return isCommand && isDifferentToken ? searchingToken : null
   }
 
-  function isBeginCommand (completion) {
-    return /^\\begin/.test(completion)
+  function isBeginCommand (command) {
+    return /^\\begin/.test(command)
+  }
+
+  function isBibtexCommand (command) {
+    return BIBTEX_COMMANDS.indexOf(command) !== -1
   }
 
   /*
