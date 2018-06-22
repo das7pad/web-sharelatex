@@ -34,7 +34,7 @@ export default function makeAutocomplete (adapter) {
 
     let list
     if (prevCommand) {
-      list = getArgumentCompletions(prevCommand)
+      list = getArgumentCompletions(prevCommand, adapter)
       // Cursor is inside an empty argument, so we adjust the token position
       // inside the argument and set to an empty string
       if (token.string === '{' || token.string === '[') {
@@ -91,7 +91,23 @@ function getPrevCommandOnLine (cm, line, token) {
   return isCommand && isDifferentToken ? searchingToken : null
 }
 
-function getArgumentCompletions (command) {
+function getArgumentCompletions (command, adapter) {
+  return BIBTEX_COMMANDS.indexOf(command.string) === -1
+    ? getCommandArgumentCompletions(command)
+    : getBibtexArgumentCompletions(adapter)
+}
+
+function getBibtexArgumentCompletions (adapter) {
+  const { keys: references } = adapter.getReferences()
+  return references.map((ref) => {
+    return {
+      text: ref,
+      displayText: ref
+    }
+  })
+}
+
+function getCommandArgumentCompletions (command) {
   const argumentsForCommand = ARGUMENTS[command.string] || []
   return argumentsForCommand.map((arg) => {
     return {
@@ -198,6 +214,23 @@ const makeFuzzySearch = _.memoize((list) => {
     keys: ['text']
   })
 })
+
+const BIBTEX_COMMANDS = [
+  '\\cite',
+  '\\citep',
+  '\\citet',
+  '\\footcite',
+  '\\nocite',
+  '\\autocite',
+  '\\autocites',
+  '\\citeauthor',
+  '\\citeyear',
+  '\\parencite',
+  '\\citealt',
+  '\\textcite',
+  '\\cref',
+  '\\Cref'
+]
 
 const ARGUMENTS = {
   '\\begin': [

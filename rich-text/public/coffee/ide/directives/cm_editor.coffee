@@ -23,7 +23,11 @@ define [
       link: (scope, element, attrs) ->
         bodyEl = element.find('.cm-editor-body')
         editor = null
-        autocompleteAdapter = new AutocompleteAdapter(scope, metadata)
+        autocompleteAdapter = new AutocompleteAdapter(
+          scope,
+          metadata,
+          scope.$root._references
+        )
 
         init = () ->
           editor = new scope.bundle.Editor(

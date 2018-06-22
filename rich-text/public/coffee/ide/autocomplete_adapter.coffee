@@ -2,7 +2,7 @@ define [
   "ide/editor/directives/aceEditor/auto-complete/top_hundred_snippets"
 ], (TopHundredSnippets) ->
   class AutocompleteAdapter
-    constructor: (@$scope, @metadata) ->
+    constructor: (@$scope, @metadata, @references) ->
       @debouncer = {}
 
     getCompletions: (handleCompletionPicked) ->
@@ -16,6 +16,9 @@ define [
 
     getCompletionsFromMetadata: () ->
       _.flatten(@metadata.getAllPackages())
+
+    getReferences: () ->
+      @references
 
     onChange: (cm) =>
       { line } = cm.getCursor()
