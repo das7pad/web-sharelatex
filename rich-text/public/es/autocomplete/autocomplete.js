@@ -82,6 +82,8 @@ export default function makeAutocomplete (adapter) {
   function getArgumentCompletions (command) {
     if (isBibtexCommand(command.string)) {
       return getBibtexArgumentCompletions()
+    } else if (isReferenceCommand(command.string)) {
+      return getReferenceArgumentCompletions()
     } else {
       return getCommandArgumentCompletions(command)
     }
@@ -90,6 +92,15 @@ export default function makeAutocomplete (adapter) {
   function getBibtexArgumentCompletions () {
     const { keys: references } = adapter.getBibtexArguments()
     return references.map((ref) => {
+      return {
+        text: ref,
+        displayText: ref
+      }
+    })
+  }
+
+  function getReferenceArgumentCompletions () {
+    return adapter.getReferenceArguments().map((ref) => {
       return {
         text: ref,
         displayText: ref
@@ -211,6 +222,10 @@ export default function makeAutocomplete (adapter) {
 
   function isBibtexCommand (command) {
     return BIBTEX_COMMANDS.indexOf(command) !== -1
+  }
+
+  function isReferenceCommand (command) {
+    return (/^\\(eq|page|c|C)?ref/).test(command)
   }
 
   /*

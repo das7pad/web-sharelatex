@@ -20,6 +20,9 @@ define [
     getBibtexArguments: () ->
       @bibtexReferences
 
+    getReferenceArguments: () ->
+      @metadata.getAllLabels()
+
     onChange: (cm) =>
       { line } = cm.getCursor()
       lineText = cm.getLine(line)
