@@ -48,19 +48,21 @@ module.exports = PageController =
 						if cmsData.content
 							cmsData.content.map (content, index) ->
 								newRow = false # for the grid layout
-								content = parseContent(content)
-								# Grid layout
-								# new row when: 
-								# no index-1
-								# index-1 is full width
-								# index-1 and index-2 are half width
-								if (!content.fields.halfWidth) || 
-								(index == 0) || 
-								(cmsData.content[index-1] and !cmsData.content[index-1].fields.halfWidth) || 
-								(cmsData.content[index-1] and cmsData.content[index-2] and cmsData.content[index-1].fields.halfWidth and cmsData.content[index-2].fields.halfWidth)
-									newRow = true
-								content.newRow = newRow
-								content
+								if content && content.fields
+									# Must check for fields, because an entry could have been added, but with no fields added
+									content = parseContent(content)
+									# Grid layout
+									# new row when: 
+									# no index-1
+									# index-1 is full width
+									# index-1 and index-2 are half width
+									if (!content.fields.halfWidth) || 
+									(index == 0) || 
+									(cmsData.content[index-1] and !cmsData.content[index-1].fields.halfWidth) || 
+									(cmsData.content[index-1] and cmsData.content[index-2] and cmsData.content[index-1].fields.halfWidth and cmsData.content[index-2].fields.halfWidth)
+										newRow = true
+									content.newRow = newRow
+									content
 
 						CmsHandler.render(res, 'page/page', cmsData, req.query)
 				.catch (err) ->
