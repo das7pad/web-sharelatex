@@ -27,8 +27,8 @@ block content_cms
 						small Posted
 							if (post.authorDisplay)
 								|  by #{post.authorDisplay}
-							if (post.publishDateDay)
-								|  on #{post.publishDateDay} #{post.publishDateMonth} #{post.publishDateYear}
+							if (post.publishDatePretty)
+								|  on #{post.publishDatePretty}
 					| !{post.contentPreview}
 
 					a.btn.btn-success(href='/blog/' + post.slug) Read More

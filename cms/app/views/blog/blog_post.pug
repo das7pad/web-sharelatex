@@ -15,6 +15,6 @@ block content_cms
 					small Posted
 						if (authorDisplay)
 							|  by #{authorDisplay}
-						if (publishDateDay)
-							|  on #{publishDateDay} #{publishDateMonth} #{publishDateYear}
+						if (publishDatePretty)
+							|  on #{publishDatePretty}
 				| !{content}

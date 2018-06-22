@@ -1,5 +1,6 @@
 logger = require 'logger-sharelatex'
 marked = require 'marked'
+moment = require 'moment'
 ContentfulClient = require '../ContentfulClient'
 ErrorController = require '../../../../../app/js/Features/Errors/ErrorController'
 CmsHandler = require '../CmsHandler'
@@ -21,14 +22,13 @@ blogPostAuthors = (authorArr) ->
 
 parseBlogPost = (post) ->
 	authorsList = []
-	post.content = if post.content then marked(post.content) else null
-	post.contentPreview = if post.contentPreview then marked(post.contentPreview) else null
+	if post.content
+		post.content = marked(post.content)
+	if post.contentPreview
+		post.contentPreview = marked(post.contentPreview)
 
 	if post.publishDate
-		pubDate = new Date(post.publishDate)
-		post.publishDateDay = pubDate.getDate()
-		post.publishDateMonth = months[pubDate.getMonth()]
-		post.publishDateYear = pubDate.getFullYear()
+		post.publishDatePretty = moment(post.publishDate).format('LL')
 
 	if post.author
 		post.author.forEach (author) ->
