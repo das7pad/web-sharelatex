@@ -238,6 +238,10 @@ export default function makeAutocomplete (adapter) {
     })
   })
 
+  const ARGUMENTS = {
+    '\\begin': adapter.getBeginCommandArguments()
+  }
+
   return autocomplete
 }
 
@@ -257,59 +261,3 @@ const BIBTEX_COMMANDS = [
   '\\cref',
   '\\Cref'
 ]
-
-const ARGUMENTS = {
-  '\\begin': [
-    'abstract',
-    'align',
-    'align*',
-    'alignat',
-    'alignat*',
-    'aligned',
-    'alignedat',
-    'array',
-    'block',
-    'bmatrix',
-    'center',
-    'description',
-    'displaymath',
-    'document',
-    'enumerate',
-    'eqnarray',
-    'equation',
-    'equation*',
-    'figure',
-    'flushleft',
-    'flushright',
-    'footnotesize',
-    'frame',
-    'huge',
-    'Huge',
-    'itemize',
-    'large',
-    'Large',
-    'LARGE',
-    'list',
-    'matrix',
-    'minipage',
-    'minipage',
-    'normalsize',
-    'pmatrix',
-    'proof',
-    'quotation',
-    'quote',
-    'scriptsize',
-    'small',
-    'split',
-    'tabbing',
-    'table',
-    'tabular',
-    'theorem',
-    'tiny',
-    'titlepage',
-    'verbatim',
-    'verse',
-    'vmatrix',
-    'Vmatrix'
-  ]
-}

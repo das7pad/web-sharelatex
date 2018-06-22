@@ -1,6 +1,7 @@
 define [
-  "ide/editor/directives/aceEditor/auto-complete/top_hundred_snippets"
-], (TopHundredCommands) ->
+  "ide/editor/directives/aceEditor/auto-complete/snippets/TopHundredSnippets",
+  "ide/editor/directives/aceEditor/auto-complete/snippets/Environments"
+], (TopHundredCommands, Environments) ->
   class AutocompleteAdapter
     constructor: (@$scope, @metadata, @bibtexReferences) ->
       @debouncer = {}
@@ -16,6 +17,9 @@ define [
 
     getCommandCompletionsFromMetadata: () ->
       _.flatten(@metadata.getAllPackages())
+
+    getBeginCommandArguments: () ->
+      Environments.all
 
     getBibtexArguments: () ->
       @bibtexReferences
