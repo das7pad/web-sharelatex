@@ -16,6 +16,21 @@ export default function makeAutocomplete (adapter) {
     // Ignore comments or strings
     if (/\b(?:string|comment)\b/.test(token.type)) return
 
+    // Adjust token to handle commas in \cite
+    const distanceFromCursor = cursor.ch - token.start
+    const prevComma = token.string.lastIndexOf(',', distanceFromCursor - 1) + 1
+    const nextComma = token.string.indexOf(',', distanceFromCursor) + 1
+    // If there is a comma after the cursor, adjust token end up to this comma
+    if (nextComma) token.end = token.start + nextComma - 1
+    // Adjust the token start to the comma before the cursor (no-op if there
+    // isn't a cursor)
+    token.start += prevComma
+    // Slice the string so that only contains text between the cursors
+    token.string = token.string.slice(
+      prevComma,
+      nextComma ? nextComma - 1 : undefined
+    ).trim()
+
     const range = cm.getRange(
       Pos(cursor.line, cursor.ch - 1),
       Pos(cursor.line, cursor.ch + 1)
@@ -47,6 +62,7 @@ export default function makeAutocomplete (adapter) {
         token.string = ''
       }
     } else {
+      if (token.string === '') return
       list = adapter.getCommandCompletions(handleCommandCompletionPicked)
     }
 
