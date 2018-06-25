@@ -3,6 +3,8 @@
 import { Pos } from 'codemirror'
 import Fuse from 'fuse.js'
 
+import BIBTEX_COMMANDS from './bibtex_commands'
+
 export default function makeAutocomplete (adapter) {
   /**
    * Show autocomplete menu
@@ -244,20 +246,3 @@ export default function makeAutocomplete (adapter) {
 
   return autocomplete
 }
-
-const BIBTEX_COMMANDS = [
-  '\\cite',
-  '\\citep',
-  '\\citet',
-  '\\footcite',
-  '\\nocite',
-  '\\autocite',
-  '\\autocites',
-  '\\citeauthor',
-  '\\citeyear',
-  '\\parencite',
-  '\\citealt',
-  '\\textcite',
-  '\\cref',
-  '\\Cref'
-]
