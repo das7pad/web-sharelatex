@@ -13,6 +13,23 @@ export default function makeAutocomplete (adapter) {
     // Ignore if user removed characters
     if (!token.string.length) return
 
+    const range = cm.getRange(
+      Pos(cursor.line, cursor.ch - 1),
+      Pos(cursor.line, cursor.ch + 1)
+    )
+    if (range === ' ' || range === '  ') {
+      // If there is a space before or after the cursor then we need to prevent
+      // looking back on the line for the previous command
+
+      // Firstly we do this by marking the token as a command
+      token.type = 'tag'
+      // We also need to remove a backslash from the token string if typing a
+      // backslash followed by a space
+      token.string = ''
+    } else if (token.string === '\\') {
+      token.type = 'tag'
+    }
+
     // If there is a previous command on the line, show argument completions.
     // Otherwise show command completions
     const list = adapter.getCompletions(handleCompletionPicked)
