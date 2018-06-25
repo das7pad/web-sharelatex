@@ -37,7 +37,7 @@ V1_HISTORY_SYNC_REQUEST_TIMES = [
 
 OVERLEAF_BRAND_VARIATION_ID = 52
 
-SUPPORTED_V1_EXT_AGENTS = ['wlfile', 'url']
+SUPPORTED_V1_EXT_AGENTS = ['wlfile', 'url', 'wloutput']
 
 module.exports = ProjectImporter =
 	importProject: (v1_project_id, user_id, callback = (error, v2_project_id) ->) ->
@@ -250,7 +250,14 @@ module.exports = ProjectImporter =
 					provider: 'project_file',
 					v1_source_doc_id: doc_id,
 					source_entity_path: "/#{file.agent_data.file}",
-					source_project_display_name: file.agent_data.source_doc_display_name
+				})
+		else if file.agent == 'wloutput'
+			ProjectImporter._getDocIdFromWriteToken file.agent_data.doc, (err, doc_id) ->
+				return callback(err) if err?
+				callback(null, {
+					provider: 'project_output_file',
+					v1_source_doc_id: doc_id,
+					source_output_file_path: "output.pdf",
 				})
 		else
 			callback(null, null)
