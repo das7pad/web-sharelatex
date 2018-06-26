@@ -1,11 +1,10 @@
 logger = require 'logger-sharelatex'
 marked = require 'marked'
-path = require 'path'
+moment = require 'moment'
 ContentfulClient = require '../ContentfulClient'
 ErrorController = require '../../../../../app/js/Features/Errors/ErrorController'
+CmsHandler = require '../CmsHandler'
 
-pageBlog = path.resolve(__dirname, '../../views/blog/blog')
-pageBlogPost = path.resolve(__dirname, '../../views/blog/blog_post')
 months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 blogPostAuthors = (authorArr) ->
@@ -23,22 +22,21 @@ blogPostAuthors = (authorArr) ->
 
 parseBlogPost = (post) ->
 	authorsList = []
-	post.fields.content = if post.fields.content then marked(post.fields.content) else null
-	post.fields.contentPreview = if post.fields.contentPreview then marked(post.fields.contentPreview) else null
+	if post.content
+		post.content = marked(post.content)
+	if post.contentPreview
+		post.contentPreview = marked(post.contentPreview)
 
-	if post.fields.publishDate
-		pubDate = new Date(post.fields.publishDate)
-		post.fields.publishDateDay = pubDate.getDate()
-		post.fields.publishDateMonth = months[pubDate.getMonth()]
-		post.fields.publishDateYear = pubDate.getFullYear()
+	if post.publishDate
+		post.publishDatePretty = moment(post.publishDate).format('LL')
 
-	if post.fields.author
-		post.fields.author.forEach (author) ->
+	if post.author
+		post.author.forEach (author) ->
 			# firstName is required
 			if author.fields && author.fields.firstName
 				authorsList.push(author.fields.firstName)
 
-	post.fields.authorDisplay = blogPostAuthors(authorsList)
+	post.authorDisplay = blogPostAuthors(authorsList)
 
 	post
 
@@ -49,25 +47,25 @@ getTagId = (tag) ->
 	}
 	ContentfulClient.client.getEntries(query)
 
-getAndRenderBlog = (req, res, blogQuery, page, tag) ->
+getAndRenderBlog = (req, res, next, blogQuery, page) ->
 	# clientType determines which API to use.
 	# client is for published data
 	# clientPreview is for unpublished data
 	clientType = if req.query.preview == '' then 'clientPreview' else 'client'
-	# pageData.clientType is used to display a "Preview" element in the UI
-	pageData = {
-		clientType: clientType
-		tag: tag
-	}
 
 	ContentfulClient[clientType].getEntries(blogQuery)
-		.then (blogCollection) ->
-			if blogCollection.items.length == 0
+		.then (collection) ->
+			if collection.items.length == 0
 				ErrorController.notFound req, res
+			else if page == 'blog/blog_post'
+				cmsData = parseBlogPost(collection.items[0].fields)
+				CmsHandler.render(res, page, cmsData, req.query)
 			else
-				blogCollection.items.map (post) -> parseBlogPost(post)
-				pageData.items = blogCollection.items
-				res.render page, pageData
+				# a list of blog posts (either all or filtered by tag)
+				cmsData = { 
+					items:collection.items.map (post) -> parseBlogPost(post.fields)
+				}
+				CmsHandler.render(res, page, cmsData, req.query)
 		.catch (err) ->
 			next(err)
 
@@ -94,14 +92,14 @@ module.exports =
 					.then (tagData) ->
 						if tagData && tagData.items[0] && tagData.items[0].sys && tagData.items[0].sys.id
 							blogQuery['fields.tag.sys.id[in]'] = tagData.items[0].sys.id
-							getAndRenderBlog(req, res, blogQuery, pageBlog, req.query.tag)
+							getAndRenderBlog(req, res, next, blogQuery, 'blog/blog')
 						else
 							# to do - better 404 - specific for blog tag
 							ErrorController.notFound req, res
 					.catch (tagErr) ->
 						next(tagErr)
 			else
-				getAndRenderBlog(req, res, blogQuery, pageBlog)
+				getAndRenderBlog(req, res, next, blogQuery, 'blog/blog')
 
 	getBlogPost: (req, res, next)->
 		if !req.query.cms
@@ -112,4 +110,4 @@ module.exports =
 				content_type: 'blogPost'
 				'fields.slug': req.params.slug
 			}
-			getAndRenderBlog(req, res, blogQuery, pageBlogPost)
+			getAndRenderBlog(req, res, next, blogQuery, 'blog/blog_post')

@@ -1,10 +1,8 @@
 logger = require 'logger-sharelatex'
 marked = require 'marked'
-path = require 'path'
 ContentfulClient = require '../ContentfulClient'
 ErrorController = require '../../../../../app/js/Features/Errors/ErrorController'
-
-pageAbout = path.resolve(__dirname, '../../views/about/page')
+CmsHandler = require '../CmsHandler'
 
 module.exports =
 
@@ -17,10 +15,6 @@ module.exports =
 			# client is for published data
 			# clientPreview is for unpublished data
 			clientType = if req.query.preview == '' then 'clientPreview' else 'client'
-			# pageData.clientType is used to display a "Preview" element in the UI
-			pageData = {
-				clientType: clientType
-			}
 
 			# include is for the depth of the query, for linked data
 			cmsQuery = {
@@ -33,11 +27,9 @@ module.exports =
 					if collection.items.length == 0
 						next(new Error('About page not found on CMS'))
 					else
-						[data] = collection.items
-						if data.fields.about
-							data.fields.about = marked(data.fields.about)
-						pageData.data = data.fields
-						res.render pageAbout, pageData
+						cmsData = collection.items?[0]?.fields
+						if cmsData.about
+							cmsData.about = marked(cmsData.about)
+						CmsHandler.render(res, 'about/page', cmsData, req.query)
 				.catch (err) ->
 					next(err)
-

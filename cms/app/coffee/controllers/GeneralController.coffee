@@ -1,12 +1,11 @@
 logger = require 'logger-sharelatex'
 marked = require 'marked'
-path = require 'path'
 ContentfulClient = require '../ContentfulClient'
 ErrorController = require '../../../../../app/js/Features/Errors/ErrorController'
-
-page = path.resolve(__dirname, '../../views/page/page')
+CmsHandler = require '../CmsHandler'
 
 parseContent = (content) ->
+	content.type = content.sys?.contentType?.sys?.id
 	if content.fields.content
 		content.fields.content = marked(content.fields.content)
 	else if content.fields.tabs
@@ -31,10 +30,6 @@ module.exports = PageController =
 			# client is for published data
 			# clientPreview is for unpublished data
 			clientType = if req.query.preview == '' then 'clientPreview' else 'client'
-			# pageData.clientType is used to display a "Preview" element in the UI
-			pageData = {
-				clientType: clientType
-			}
 
 			# include is for the depth of the query, for linked data
 			cmsQuery = {
@@ -49,11 +44,27 @@ module.exports = PageController =
 						# to do - better 404?
 						ErrorController.notFound req, res
 					else
-						[data] = collection.items
-						if data.fields.content
-							data.fields.content.map (content) -> parseContent(content)
-						pageData.data = data.fields
-						pageData.meta = pageData.metaDescription
-						res.render page, pageData
+						cmsData = collection.items?[0]?.fields
+						if cmsData.content
+							cmsData.content.map (content, index) ->
+								newRow = false # for the grid layout
+								if content && content.fields
+									# Must check for fields, because an entry could have been added, but with no fields added
+									content = parseContent(content)
+									# Grid layout
+									# new row when: 
+									# no index-1
+									# index-1 is full width
+									# index-1 and index-2 are half width
+									if (!content.fields.halfWidth) || 
+									(index == 0) || 
+									(cmsData.content[index-1] and !cmsData.content[index-1].fields.halfWidth) || 
+									(cmsData.content[index-1] and cmsData.content[index-2] and cmsData.content[index-1].fields.halfWidth and cmsData.content[index-2].fields.halfWidth)
+										newRow = true
+									content.newRow = newRow
+									content
+
+						CmsHandler.render(res, 'page/page', cmsData, req.query)
 				.catch (err) ->
 					next(err)
+
