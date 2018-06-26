@@ -8,7 +8,6 @@ async = require "async"
 fs = require "fs"
 request = require "request"
 
-oAuthRequest = require "../OAuth/OAuthRequest"
 UserMapper = require "../OverleafUsers/UserMapper"
 
 ProjectCreationHandler = require "../../../../../app/js/Features/Project/ProjectCreationHandler"
@@ -23,6 +22,7 @@ PrivilegeLevels = require "../../../../../app/js/Features/Authorization/Privileg
 	UnsupportedExportRecordsError
 	V1HistoryNotSyncedError
 } = require "../../../../../app/js/Features/Errors/Errors"
+UserGetter = require "../../../../../app/js/Features/User/UserGetter"
 
 ENGINE_TO_COMPILER_MAP = {
 	latex_dvipdf: "latex"
@@ -40,30 +40,38 @@ OVERLEAF_BRAND_VARIATION_ID = 52
 SUPPORTED_V1_EXT_AGENTS = ['wlfile', 'url', 'wloutput', 'mendeley']
 
 module.exports = ProjectImporter =
-	importProject: (v1_project_id, user_id, callback = (error, v2_project_id) ->) ->
-		logger.log {v1_project_id, user_id}, "importing project from overleaf"
+	importProject: (v1_project_id, v2_user_id, callback = (error, v2_project_id) ->) ->
+		logger.log {v1_project_id, v2_user_id}, "importing project from overleaf"
 		metrics.inc "project-import.attempt"
 
-		ProjectImporter._startExport v1_project_id, user_id, (error, doc) ->
-			if error?
-				logger.err {error}, "failed to start project import"
-				metrics.inc "project-import.error.total"
-				metrics.inc "project-import.error.#{error.name}"
-				return callback(error)
-			ProjectImporter._createV2ProjectFromV1Doc v1_project_id, user_id, doc, callback
+		UserGetter.getUser v2_user_id, (error, user) ->
+			return callback(error) if error?
 
-	_createV2ProjectFromV1Doc: (v1_project_id, user_id, doc, callback = (error, v2_project_id) ->) ->
+			v1_user_id = user?.overleaf?.id
+			if !v1_user_id
+				logger.err {error}, "failed to import because user is not a V1 user"
+				return callback(new Error("failed to import because user is not a V1 user"))
+
+			ProjectImporter._startExport v1_project_id, v1_user_id, (error, doc) ->
+				if error?
+					logger.err {error}, "failed to start project import"
+					metrics.inc "project-import.error.total"
+					metrics.inc "project-import.error.#{error.name}"
+					return callback(error)
+				ProjectImporter._createV2ProjectFromV1Doc v1_project_id, v1_user_id, v2_user_id, doc, callback
+
+	_createV2ProjectFromV1Doc: (v1_project_id, v1_user_id, v2_user_id, doc, callback = (error, v2_project_id) ->) ->
 		async.waterfall [
 			(cb) ->
-				ProjectImporter._initSharelatexProject user_id, doc, cb
+				ProjectImporter._initSharelatexProject v2_user_id, doc, cb
 			(v2_project_id, cb) ->
-				ProjectImporter._importV1ProjectDataIntoV2Project v1_project_id, v2_project_id, user_id, doc, cb
+				ProjectImporter._importV1ProjectDataIntoV2Project v1_project_id, v2_project_id, v1_user_id, v2_user_id, doc, cb
 		], (importError, v2_project_id) ->
 			if importError?
 				logger.err {importError, errorMessage: importError.message, v1_project_id, v1_project_id}, "failed to import project"
 				metrics.inc "project-import.error.total"
 				metrics.inc "project-import.error.#{importError.name}"
-				ProjectImporter._cancelExport v1_project_id, user_id, (cancelError) ->
+				ProjectImporter._cancelExport v1_project_id, v1_user_id, (cancelError) ->
 					if cancelError?
 						logger.err {cancelError, errorMessage: cancelError.message, v1_project_id, v2_project_id}, "failed to cancel project import"
 					callback(importError)
@@ -71,16 +79,16 @@ module.exports = ProjectImporter =
 				metrics.inc "project-import.success"
 				callback null, v2_project_id
 
-	_importV1ProjectDataIntoV2Project: (v1_project_id, v2_project_id, user_id, doc, callback = (error, v2_project_id) ->) ->
+	_importV1ProjectDataIntoV2Project: (v1_project_id, v2_project_id, v1_user_id, v2_user_id, doc, callback = (error, v2_project_id) ->) ->
 		async.series [
 			(cb) ->
 				ProjectImporter._importInvites v2_project_id, doc.invites, cb
 			(cb) ->
-				ProjectImporter._importFiles v2_project_id, user_id, doc.files, cb
+				ProjectImporter._importFiles v2_project_id, v2_user_id, doc.files, cb
 			(cb) ->
-				ProjectImporter._waitForV1HistoryExport v1_project_id, user_id, cb
+				ProjectImporter._waitForV1HistoryExport v1_project_id, v1_user_id, cb
 			(cb) ->
-				ProjectImporter._confirmExport v1_project_id, v2_project_id, user_id, cb
+				ProjectImporter._confirmExport v1_project_id, v2_project_id, v1_user_id, cb
 		], (error) ->
 			if error?
 				# Since _initSharelatexProject created a v2 project we want to
@@ -92,17 +100,16 @@ module.exports = ProjectImporter =
 			else
 				callback(null, v2_project_id)
 
-	_startExport: (v1_project_id, user_id, callback = (error, doc) ->) ->
-		oAuthRequest user_id, {
-			url: "#{settings.overleaf.host}/api/v1/sharelatex/docs/#{v1_project_id}/export/start"
-			method: "POST"
+	_startExport: (v1_project_id, v1_user_id, callback = (error, doc) ->) ->
+		request.post {
+			url: "#{settings.overleaf.host}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/start"
 			json: true
-		}, (error, doc) ->
+		}, (error, res, doc) ->
 			return callback(error) if error?
-			logger.log {v1_project_id, user_id, doc}, "got doc for project from overleaf"
+			logger.log {v1_project_id, v1_user_id, doc}, "got doc for project from overleaf"
 			return callback(null, doc)
 
-	_initSharelatexProject: (user_id, doc = {}, callback = (err, project) ->) ->
+	_initSharelatexProject: (v2_user_id, doc = {}, callback = (err, project) ->) ->
 		if !doc.title? or !doc.id? or !doc.latest_ver_id? or !doc.latex_engine? or !doc.token? or !doc.read_token?
 			return callback(new Error("expected doc title, id, latest_ver_id, latex_engine, token and read_token"))
 		if doc.brand_variation_id? && doc.brand_variation_id != OVERLEAF_BRAND_VARIATION_ID
@@ -137,7 +144,7 @@ module.exports = ProjectImporter =
 		if settings.importedImageName?
 			attributes.imageName = settings.importedImageName
 
-		ProjectCreationHandler.createBlankProject user_id, doc.title, attributes, (error, project) ->
+		ProjectCreationHandler.createBlankProject v2_user_id, doc.title, attributes, (error, project) ->
 			return callback(error) if error?
 			return callback(null, project._id)
 
@@ -166,7 +173,7 @@ module.exports = ProjectImporter =
 			UserMapper.getSlIdFromOlUser invite.invitee, (error, invitee_user_id) ->
 				return callback(error) if error?
 				CollaboratorsHandler.addUserIdToProject project_id, inviter_user_id, invitee_user_id, privilegeLevel, callback
-		
+
 	_importPendingInvite: (project_id, invite, callback = (error) ->) ->
 		if !invite.inviter? or !invite.code? or !invite.email? or !invite.access_level?
 			return callback(new Error("expected invite inviter, code, email and access_level"))
@@ -182,12 +189,12 @@ module.exports = ProjectImporter =
 				privileges: privilegeLevel
 			}, callback
 
-	_importFiles: (project_id, user_id, files = [], callback = (error) ->) ->
+	_importFiles: (project_id, v2_user_id, files = [], callback = (error) ->) ->
 		async.mapSeries(files, (file, cb) ->
-			ProjectImporter._importFile project_id, user_id, file, cb
+			ProjectImporter._importFile project_id, v2_user_id, file, cb
 		, callback)
 
-	_importFile: (project_id, user_id, file, callback = (error) ->) ->
+	_importFile: (project_id, v2_user_id, file, callback = (error) ->) ->
 		if !file.type? or !file.file?
 			return callback(new Error("expected file.file and type"))
 		path = "/" + file.file
@@ -202,7 +209,7 @@ module.exports = ProjectImporter =
 					return callback(new Error("expected file.latest_content"))
 				# We already have history entries, we just want to get the SL content in the same state,
 				# so don't send add requests to the history service for these new docs
-				ProjectEntityUpdateHandler.addDocWithoutUpdatingHistory project_id, folder_id, name, file.latest_content.split("\n"), user_id, (error, doc) ->
+				ProjectEntityUpdateHandler.addDocWithoutUpdatingHistory project_id, folder_id, name, file.latest_content.split("\n"), v2_user_id, (error, doc) ->
 					return callback(error) if error?
 					if file.main
 						ProjectEntityUpdateHandler.setRootDoc project_id, doc._id, callback
@@ -214,7 +221,7 @@ module.exports = ProjectImporter =
 				ProjectImporter._writeS3ObjectToDisk file.file_path, (error, pathOnDisk) ->
 					return callback(error) if error?
 					ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory project_id,
-						folder_id, name, pathOnDisk, null, user_id, callback
+						folder_id, name, pathOnDisk, null, v2_user_id, callback
 			else if file.type == "ext"
 				if file.agent not in SUPPORTED_V1_EXT_AGENTS
 					return callback(
@@ -232,7 +239,7 @@ module.exports = ProjectImporter =
 					ProjectImporter._writeS3ObjectToDisk file.file_path, (error, pathOnDisk) ->
 						return callback(error) if error?
 						ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory project_id,
-							folder_id, name, pathOnDisk, linkedFileData, user_id, callback
+							folder_id, name, pathOnDisk, linkedFileData, v2_user_id, callback
 			else
 				logger.warn {type: file.type, path: file.file, project_id}, "unknown file type"
 				callback(new UnsupportedFileTypeError("unknown file type: #{file.type}"))
@@ -312,42 +319,39 @@ module.exports = ProjectImporter =
 					logger.error {err: error, options}, "overleaf s3 error"
 					return callback(error)
 
-	_waitForV1HistoryExport: (v1_project_id, user_id, callback = (error) ->) ->
-		ProjectImporter._checkV1HistoryExportStatus v1_project_id, user_id, 0, callback
+	_waitForV1HistoryExport: (v1_project_id, v1_user_id, callback = (error) ->) ->
+		ProjectImporter._checkV1HistoryExportStatus v1_project_id, v1_user_id, 0, callback
 
-	_checkV1HistoryExportStatus: (v1_project_id, user_id, requestCount, callback = (error) ->) ->
-		oAuthRequest user_id, {
-			url: "#{settings.overleaf.host}/api/v1/sharelatex/docs/#{v1_project_id}/export/history"
-			method: "GET"
+	_checkV1HistoryExportStatus: (v1_project_id, v1_user_id, requestCount, callback = (error) ->) ->
+		request.get {
+			url: "#{settings.overleaf.host}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/history"
 			json: true
-		}, (error, status) ->
+		}, (error, res, status) ->
 			if !status?.exported
 				error ||= new V1HistoryNotSyncedError('v1 history not synced')
 
 			if error?
-				logger.log {v1_project_id, user_id, requestCount, error}, "error checking v1 history sync"
+				logger.log {v1_project_id, v1_user_id, requestCount, error}, "error checking v1 history sync"
 				if requestCount >= V1_HISTORY_SYNC_REQUEST_TIMES.length
 					return callback(error)
 				else
 					interval = (V1_HISTORY_SYNC_REQUEST_TIMES[requestCount + 1] - V1_HISTORY_SYNC_REQUEST_TIMES[requestCount]) * 1000
 					setTimeout(
-						() -> ProjectImporter._checkV1HistoryExportStatus v1_project_id, user_id, requestCount + 1, callback
+						() -> ProjectImporter._checkV1HistoryExportStatus v1_project_id, v1_user_id, requestCount + 1, callback
 						interval
 					)
 			else
 				callback(null)
 
 
-	_confirmExport: (v1_project_id, v2_project_id, user_id, callback = (error) ->) ->
-		oAuthRequest user_id, {
-			url: "#{settings.overleaf.host}/api/v1/sharelatex/docs/#{v1_project_id}/export/confirm"
-			method: "POST"
+	_confirmExport: (v1_project_id, v2_project_id, v1_user_id, callback = (error) ->) ->
+		request.post {
+			url: "#{settings.overleaf.host}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/confirm"
 			json:
 				doc: { v2_project_id }
 		}, callback
 
-	_cancelExport: (v1_project_id, user_id, callback = (error) ->) ->
-		oAuthRequest user_id, {
-			url: "#{settings.overleaf.host}/api/v1/sharelatex/docs/#{v1_project_id}/export/cancel"
-			method: "POST"
+	_cancelExport: (v1_project_id, v1_user_id, callback = (error) ->) ->
+		request.post {
+			url: "#{settings.overleaf.host}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/cancel"
 		}, callback
