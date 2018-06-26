@@ -108,6 +108,30 @@ module.exports = ReferencesApiHandler =
 					logger.log {user_id, ref_provider, statusCode:response.statusCode}, "error code from remote api"
 					res.send response.statusCode
 
+	groups: (req, res, next) ->
+		user_id = AuthenticationController.getLoggedInUserId(req)
+		ref_provider = ReferencesApiHandler._getRefProviderBackendKey(req)
+		ReferencesApiHandler.userCanMakeRequest user_id, ref_provider, (err, canMakeRequest) ->
+			if err
+				return next(err)
+			if !canMakeRequest
+				return res.send 403
+			opts =
+				method:"get"
+				url: "/user/#{user_id}/#{ref_provider}/groups"
+				json: true
+			logger.log {user_id, ref_provider}, "getting groups from third-party-references"
+			ReferencesApiHandler.make3rdRequest opts, (err, response, body)->
+				if err
+					logger.err {user_id, ref_provider}, "error getting groups from third-party-references"
+					return next(err)
+				if 200 <= response.statusCode < 300
+					logger.log {user_id, ref_provider}, "got groups from third-party-references, returning to client"
+					res.json body
+				else
+					logger.log {user_id, ref_provider, statusCode:response.statusCode}, "error code from remote api"
+					res.send response.statusCode
+
 	make3rdRequestStream: (opts)->
 		opts.url = "#{thirdpartyUrl}#{opts.url}"
 		logger.log {url: opts.url}, 'making request to third-party-references api'
