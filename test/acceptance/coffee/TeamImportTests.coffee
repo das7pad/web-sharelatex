@@ -13,6 +13,7 @@ WEB_PATH = '../../../../..'
 User = require "#{WEB_PATH}/test/acceptance/js/helpers/User"
 Subscription = require("#{WEB_PATH}/app/js/models/Subscription").Subscription
 UserStub = require("#{WEB_PATH}/app/js/models/UserStub").UserStub
+UserMapper = require("../../../app/js/OverleafUsers/UserMapper")
 
 describe "Team imports", ->
 
@@ -21,11 +22,6 @@ describe "Team imports", ->
 		mongoose.Promise = global.Promise
 
 	beforeEach (done) ->
-		@teamAdmin = new User()
-		@admin = new User(isAdmin: true)
-		@admin.login =>
-			@admin.ensure_admin done
-
 		@v1Team = {
 			"id": 5,
 			"name": "Test Team",
@@ -62,6 +58,12 @@ describe "Team imports", ->
 				}
 			]
 		}
+
+		UserMapper.createSlUser @v1Team.owner, "accessToken", "refreshToken", (error, sl_user) =>
+			@teamAdmin = sl_user
+			done()
+
+		null # Don't return a promise
 
 	afterEach ->
 		Subscription.remove("overleaf.id": { $exists: true })
