@@ -11,11 +11,21 @@ const FIXTURE_HTML = `<div class="rich-text">
 </div>
 `
 
+const autocompleteAdapterStub = {
+  getBeginCommandArguments: () => ['environmentName']
+}
+
 describe('Key bindings', function () {
   beforeEach(function () {
     const html = fixture.load(FIXTURE_HTML)
+
     this.getSetting = sinon.stub()
-    this.editor = new Editor(html.querySelector('#cm'), {}, this.getSetting)
+    this.editor = new Editor(
+      html.querySelector('#cm'),
+      {},
+      autocompleteAdapterStub,
+      this.getSetting
+    )
     this.editor.enable()
     this.cm = this.editor.getCodeMirror()
   })

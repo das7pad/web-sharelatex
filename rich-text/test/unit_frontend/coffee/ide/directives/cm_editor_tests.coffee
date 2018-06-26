@@ -7,6 +7,7 @@ define [
     beforeEach module 'SharelatexApp', ($provide) ->
       $provide.factory 'ide', () ->
         { fileTreeManager: sinon.stub() }
+      $provide.factory 'metadata', () -> {}
       return
 
     it 'inits Rich Text', () ->

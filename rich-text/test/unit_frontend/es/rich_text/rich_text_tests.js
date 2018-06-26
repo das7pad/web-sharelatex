@@ -6,13 +6,21 @@ import { Editor } from '../../../../public/es/index'
 
 const FIXTURE_HTML = '<div></div>'
 
+const autocompleteAdapterStub = {
+  getBeginCommandArguments: () => ['environmentName']
+}
+
 describe('RichText', function () {
   before(stubMathJax)
   after(teardownMathJax)
 
   beforeEach(function () {
     this.rtAdapter = {}
-    this.editor = new Editor(fixture.load(FIXTURE_HTML), this.rtAdapter)
+    this.editor = new Editor(
+      fixture.load(FIXTURE_HTML),
+      this.rtAdapter,
+      autocompleteAdapterStub
+    )
     this.cm = this.editor.getCodeMirror()
     this.editor.enable()
   })
