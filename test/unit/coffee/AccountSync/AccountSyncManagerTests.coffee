@@ -23,7 +23,6 @@ describe 'AccountSyncManager', ->
 			"settings-sharelatex":
 				overleaf:
 					host: @host = "http://overleaf.example.com"
-			"../OAuth/OAuthRequest": @oAuthRequest = {}
 
 		@AccountSyncManager._v1PlanRequest = sinon.stub()
 		@userId = 'abcd'
