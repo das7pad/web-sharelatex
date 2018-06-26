@@ -20,7 +20,7 @@ importTeam = (origV1Team, callback = (error, v2TeamId) ->) ->
 		callback(null, v2Team)
 
 createV2Team = (v1Team, callback = (error, v2Team) ->) ->
-	UserGetter.getUser {'overleaf.id': v1Team.owner.id}, (err, teamAdmin) ->
+	UserGetter.getUser {'overleaf.id': v1Team.owner.id}, (error, teamAdmin) ->
 		return callback(error) if error?
 
 		unless teamAdmin?
