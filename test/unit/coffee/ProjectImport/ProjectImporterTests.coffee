@@ -20,7 +20,7 @@ describe "ProjectImporter", ->
 			"../../../../../app/js/Features/Collaborators/CollaboratorsHandler": @CollaboratorsHandler = {}
 			"../../../../../app/js/Features/Authorization/PrivilegeLevels": PrivilegeLevels
 			"../../../../../app/js/Features/User/UserGetter": @UserGetter = {}
-			"request": @request = {}
+			"../request": @request = {}
 			"logger-sharelatex": { log: sinon.stub(), warn: sinon.stub(), err: sinon.stub() }
 			"metrics-sharelatex": { inc: sinon.stub() }
 			"settings-sharelatex": @settings =
@@ -674,7 +674,7 @@ describe "ProjectImporter", ->
 
 	describe "_confirmExport", ->
 		beforeEach ->
-			@request.post = sinon.stub().yields()
+			@request.post = sinon.stub().yields(null, statusCode: 200)
 			@ProjectImporter._confirmExport @v1_project_id, @v2_project_id, @v1_user_id, @callback
 
 		it "should make an request for the doc", ->
@@ -692,7 +692,7 @@ describe "ProjectImporter", ->
 
 	describe "_cancelExport", ->
 		beforeEach ->
-			@request.post = sinon.stub().yields()
+			@request.post = sinon.stub().yields(null, statusCode: 200)
 			@ProjectImporter._cancelExport @v1_project_id, @v1_user_id, @callback
 
 		it "should make an request for the doc", ->

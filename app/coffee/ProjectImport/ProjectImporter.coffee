@@ -6,7 +6,7 @@ uuid = require "uuid"
 _ = require "underscore"
 async = require "async"
 fs = require "fs"
-request = require "request"
+request = require "../request"
 
 UserMapper = require "../OverleafUsers/UserMapper"
 
@@ -106,6 +106,10 @@ module.exports = ProjectImporter =
 			json: true
 		}, (error, res, doc) ->
 			return callback(error) if error?
+			if res.statusCode < 200 || res.statusCode >= 300
+				err = new Error("non-success code from overleaf: #{res.statusCode}")
+				err.statusCode = res.statusCode
+				return callback(err)
 			logger.log {v1_project_id, v1_user_id, doc}, "got doc for project from overleaf"
 			return callback(null, doc)
 
@@ -327,7 +331,10 @@ module.exports = ProjectImporter =
 			url: "#{settings.overleaf.host}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/history"
 			json: true
 		}, (error, res, status) ->
-			if !status?.exported
+			if res.statusCode < 200 || res.statusCode >= 300
+				error ||= new Error("non-success code from overleaf: #{res.statusCode}")
+				error.statusCode = res.statusCode
+			else if !status?.exported
 				error ||= new V1HistoryNotSyncedError('v1 history not synced')
 
 			if error?
@@ -349,9 +356,25 @@ module.exports = ProjectImporter =
 			url: "#{settings.overleaf.host}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/confirm"
 			json:
 				doc: { v2_project_id }
-		}, callback
+		}, (error, res) ->
+			if error?
+				callback(error)
+			else if res.statusCode < 200 || res.statusCode >= 300
+				err = new Error("non-success code from overleaf: #{res.statusCode}")
+				err.statusCode = res.statusCode
+				callback(err)
+			else
+				callback()
 
 	_cancelExport: (v1_project_id, v1_user_id, callback = (error) ->) ->
 		request.post {
 			url: "#{settings.overleaf.host}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/cancel"
-		}, callback
+		}, (error, res) ->
+			if error?
+				callback(error)
+			else if res.statusCode < 200 || res.statusCode >= 300
+				err = new Error("non-success code from overleaf: #{res.statusCode}")
+				err.statusCode = res.statusCode
+				callback(err)
+			else
+				callback()

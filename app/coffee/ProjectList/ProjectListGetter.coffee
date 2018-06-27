@@ -1,6 +1,6 @@
 settings = require 'settings-sharelatex'
 logger = require 'logger-sharelatex'
-request = require 'request'
+request = require '../request'
 UserGetter = require "../../../../../app/js/Features/User/UserGetter"
 { V1ConnectionError } = require "../../../../../app/js/Features/Errors/Errors"
 
@@ -23,10 +23,15 @@ module.exports = ProjectListGetter =
 				qs:
 					per: NO_PROJECTS_LIMIT
 					exclude_v2_projects: true
-			}, (error, docs) ->
+			}, (error, res, docs) ->
 				if error?
 					error = new V1ConnectionError('No V1 connection') if error.code == 'ECONNREFUSED'
 					return callback(error)
+
+				if res.statusCode < 200 || res.statusCode >= 300
+					error = new V1ConnectionError('Bad response from V1')
+					return callback(error)
+
 				logger.log {v2_user_id, v1_user_id, docs}, "got projects from V1"
 				callback(null, {
 					projects: docs.projects

@@ -13,7 +13,7 @@ describe "ProjectListGetter", ->
 				overleaf:
 					host: 'http://overleaf.example.com'
 			'logger-sharelatex': { log: sinon.stub() }
-			"request": @request = {}
+			"../request": @request = {}
 			'../../../../../app/js/Features/Errors/Errors': Errors
 			"../../../../../app/js/Features/User/UserGetter": @UserGetter = {}
 		@v1_user_id = 'mock-v1-id'
@@ -23,7 +23,7 @@ describe "ProjectListGetter", ->
 	describe 'findAllUsersProjects', ->
 		beforeEach ->
 			@UserGetter.getUser = sinon.stub().yields(null, overleaf: id: @v1_user_id)
-			@request.get = sinon.stub().yields(null, @list = {
+			@request.get = sinon.stub().yields(null, {statusCode: 200}, @list = {
 				"projects": [{
 					id: '123MockOLId'
 					title: 'Mock OL title'
@@ -63,7 +63,7 @@ describe "ProjectListGetter", ->
 
 		describe 'with large number of V1 projects', ->
 			beforeEach ->
-				@request.get = sinon.stub().yields(null, @list = {
+				@request.get = sinon.stub().yields(null, {statusCode: 200}, @list = {
 					"projects": [{
 						id: '123MockOLId'
 						title: 'Mock OL title'
