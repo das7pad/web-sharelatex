@@ -106,6 +106,15 @@ describe 'AccountSyncManager', ->
 					done()
 
 	describe "_canonicalPlanCode", ->
+
+		it "should default to 'personal'", ->
+			expect(
+				@AccountSyncManager._canonicalPlanCode(undefined)
+			).to.equal 'personal'
+			expect(
+				@AccountSyncManager._canonicalPlanCode(null)
+			).to.equal 'personal'
+
 		it "should map all the used plan codes to a canonical one", ->
 			expect(
 				@AccountSyncManager._canonicalPlanCode('student')
