@@ -63,6 +63,7 @@ module.exports = AccountSyncManager =
 			prof: 'professional'
 			group: 'professional'
 		}
+		return MATCHES.personal if !planCode?
 		for match, canonicalPlanCode of MATCHES
 			if planCode.match(match)
 				return canonicalPlanCode
