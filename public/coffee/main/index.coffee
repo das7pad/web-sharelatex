@@ -1,4 +1,4 @@
 define [
-	'ide/chat/directives/mathjax'
+	'ide/chat/directives/mathJax'
 ], (App) ->
 	App.controller "LearnController", () ->
