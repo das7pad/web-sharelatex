@@ -47,7 +47,9 @@ importTeamMembers = (v1Team, v2Team, callback = (error, v1Team, v2Team) ->) ->
 	async.map v1Team.users, UserMapper.getSlIdFromOlUser, (error, memberIds) ->
 		return callback(error) if error?
 
-		SubscriptionUpdater.addUsersToGroup v2Team.id, memberIds, (error, updated) ->
+		memberIds = memberIds.map (mId) -> mId.toString()
+
+		SubscriptionUpdater.addUsersToGroup v2Team.admin_id, memberIds, (error, updated) ->
 			callback(error) if error?
 			logger.log {memberIds}, "[TeamImporter] Members added to the team #{v2Team.id}"
 			callback(null, v1Team, v2Team)

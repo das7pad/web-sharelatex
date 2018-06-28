@@ -5,14 +5,16 @@ Path = require "path"
 Settings = require "settings-sharelatex"
 mongoose = require "mongoose"
 async = require "async"
-request = require "../../../../../test/acceptance/js/helpers/request"
 
 WEB_PATH = '../../../../..'
+
+request = require "#{WEB_PATH}/test/acceptance/js/helpers/request"
+MockOverleafApi = require "./helpers/MockOverleafApi"
 
 {db, ObjectId} = require "#{WEB_PATH}/app/js/infrastructure/mongojs"
 User = require "#{WEB_PATH}/test/acceptance/js/helpers/User"
 Subscription = require("#{WEB_PATH}/app/js/models/Subscription").Subscription
-UserStub = require("#{WEB_PATH}/app/js/models/UserStub").UserStub
+UserGetter = require("#{WEB_PATH}/app/js/Features/User/UserGetter")
 UserMapper = require("../../../app/js/OverleafUsers/UserMapper")
 
 describe "Team imports", ->
@@ -29,7 +31,7 @@ describe "Team imports", ->
 			"v2_id": null,
 			"n_licences": 32,
 			"owner": {
-				"id": 31,
+				"id": 1,
 				"name": "Daenerys Targaryen",
 				"email": "daenerys@mothersofdragons.com"
 			},
@@ -111,12 +113,12 @@ describe "Team imports", ->
 					expect(teamInvite.inviterName).to.eq "Test Team"
 					expect(teamInvite.sentAt).to.be.an.instanceof(Date)
 
-					getUser = (id, cb) -> UserStub.findOne(_id: id, cb)
+					getUser = (id, cb) -> UserGetter.getUserOrUserStubById(id,
+						{ 'overleaf.id': 1, email: 1}, cb)
 
 					async.map subscription.member_ids, getUser, (error, members) ->
 						imported = members.map (m) -> { id: m.overleaf.id, email: m.email }
 
-						# these come from the default data in the mock api
 						expect(imported).to.include(id: 1, email: "daenerys@mothersofdragons.com")
 						expect(imported).to.include(id: 2, email: "test@example.com")
 

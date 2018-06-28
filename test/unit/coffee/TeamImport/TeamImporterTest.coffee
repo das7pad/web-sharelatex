@@ -68,8 +68,8 @@ describe "TeamImporter", ->
 
 		@UserGetter.getUser.withArgs(sinon.match.has("overleaf.id", 31)).yields(null, @teamAdmin)
 
-		@UserMapper.getSlIdFromOlUser.withArgs(sinon.match.has("id", 31)).yields(null, @teamAdmin)
-		@UserMapper.getSlIdFromOlUser.withArgs(sinon.match.has("id", 32)).yields(null, @member)
+		@UserMapper.getSlIdFromOlUser.withArgs(sinon.match.has("id", 31)).yields(null, @teamAdmin.id)
+		@UserMapper.getSlIdFromOlUser.withArgs(sinon.match.has("id", 32)).yields(null, @member.id)
 
 		@SubscriptionUpdater = {
 			addUsersToGroup: sinon.stub().yields(null, true)
@@ -83,6 +83,7 @@ describe "TeamImporter", ->
 		@Subscription = (data) ->
 			data.save = (callback) ->
 				data.id = 'v2 id'
+				data.admin_id = 'v2 team admin id'
 				callback(null, data, data)
 
 			data
@@ -124,11 +125,12 @@ describe "TeamImporter", ->
 				@UserGetter.getUser.calledWith(
 					sinon.match.has("overleaf.id", @v1Team.owner.id)
 				).should.equal true
-				
+
 				@SubscriptionLocator.getGroupWithV1Id.calledWith(@v1Team.id).should.equal true
 				@SubscriptionLocator.getUsersSubscription.calledWith(@teamAdmin.id).should.equal true
-				@SubscriptionUpdater.addUsersToGroup.calledWith('v2 id',
-					[{ id: 'v2 team admin id'}, {id: 'v2 team member id'}]).should.equal true
+
+				@SubscriptionUpdater.addUsersToGroup.calledWith(@teamAdmin.id,
+					['v2 team admin id', 'v2 team member id']).should.equal true
 
 				@TeamInvitesHandler.importInvite.calledOnce.should.equal true
 
