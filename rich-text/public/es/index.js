@@ -2,12 +2,12 @@ import CodeMirror, { Doc } from 'codemirror'
 
 import LatexMode from './latex_mode/latex_mode'
 import RichText from './rich_text/rich_text'
-import keyBindings from './key_bindings/key_bindings'
+import makeKeyBindings from './key_bindings/key_bindings'
 import HighlightedWordManager from './spell_check/highlighted_word_manager'
 import * as textWrapping from './key_bindings/text_wrapping'
 
 export class Editor {
-  constructor (rootEl, adapter) {
+  constructor (rootEl, adapter, getSetting) {
     CodeMirror.defineMode('latex', () => new LatexMode())
     CodeMirror.defineMIME('application/x-tex', 'latex')
     CodeMirror.defineMIME('application/x-latex', 'latex')
@@ -15,7 +15,7 @@ export class Editor {
     this.codeMirror = CodeMirror(rootEl, {
       mode: 'latex',
       lineWrapping: true,
-      extraKeys: keyBindings
+      extraKeys: makeKeyBindings(getSetting)
     })
     this.adapter = adapter
     this.highlightedWordManager = new HighlightedWordManager(this.codeMirror)
