@@ -14,14 +14,17 @@ define [
         spellCheck: "="
         spellCheckLanguage: "="
         autoCloseBrackets: "="
+        fontSize: "="
+        lineHeight: "="
       }
 
       link: (scope, element, attrs) ->
+        bodyEl = element.find('.cm-editor-body')
         editor = null
 
         init = () ->
           editor = new scope.bundle.Editor(
-            element.find('.cm-editor-body')[0],
+            bodyEl[0],
             new RichTextAdapter(ide.fileTreeManager),
             getSetting
           )
@@ -116,6 +119,24 @@ define [
           for event in attrs.resizeOn.split(',')
             scope.$on event, () ->
               editor?.getCodeMirror()?.refresh()
+
+        scope.$watch 'fontSize', (value) ->
+          bodyEl.css({ 'font-size': "#{value}px" })
+          editor?.getCodeMirror()?.refresh()
+
+        scope.$watch "lineHeight", (value) ->
+          return if !value
+          switch value
+            when 'compact'
+              lineHeight = 1.33
+            when 'normal'
+              lineHeight = 1.6
+            when 'wide'
+              lineHeight = 2
+            else
+              lineHeight = 1.6
+          bodyEl.css({ 'line-height': lineHeight })
+          editor?.getCodeMirror()?.refresh()
 
       template: """
         <div class="cm-editor-wrapper rich-text">
