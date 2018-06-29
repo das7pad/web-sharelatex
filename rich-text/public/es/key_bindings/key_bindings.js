@@ -390,6 +390,11 @@ function autoCloseChar (cm, getSetting, openChar, closeChar, typedChar) {
     }
   }
 
+  // Ignore if setting is disabled
+  if (!getSetting('autoCloseBrackets')) {
+    return CodeMirror.Pass
+  }
+
   if (cm.somethingSelected()) {
     return CodeMirror.Pass
   }

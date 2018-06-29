@@ -1,4 +1,4 @@
-/* global _ */
+/* global sinon, _ */
 
 import CodeMirror from 'codemirror'
 
@@ -14,7 +14,8 @@ const FIXTURE_HTML = `<div class="rich-text">
 describe('Key bindings', function () {
   beforeEach(function () {
     const html = fixture.load(FIXTURE_HTML)
-    this.editor = new Editor(html.querySelector('#cm'), {})
+    this.getSetting = sinon.stub()
+    this.editor = new Editor(html.querySelector('#cm'), {}, this.getSetting)
     this.editor.enable()
     this.cm = this.editor.getCodeMirror()
   })
@@ -92,6 +93,10 @@ describe('Key bindings', function () {
   }
 
   describe('Auto close braces and quotes', function () {
+    beforeEach(function () {
+      this.getSetting.withArgs('autoCloseBrackets').returns(true)
+    })
+
     it('works', function () {
       // match braces
       expect(fakeExtraKey(this.cm, '{')).to.be.undefined
