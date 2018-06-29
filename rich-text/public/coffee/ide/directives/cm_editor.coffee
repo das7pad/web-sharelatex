@@ -14,6 +14,7 @@ define [
         sharejsDoc: "="
         spellCheck: "="
         spellCheckLanguage: "="
+        autoComplete: "="
         autoCloseBrackets: "="
         fontSize: "="
         lineHeight: "="

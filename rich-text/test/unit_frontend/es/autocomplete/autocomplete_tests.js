@@ -174,6 +174,16 @@ describe('Autocomplete', function () {
     )
   })
 
+  it('doesn\'t show if autocomplete setting is disabled', function () {
+    const getSetting = sinon.stub().withArgs('autoComplete').returns(false)
+    this.editor = makeEditor(this.adapter, getSetting)
+    this.cm = this.editor.getCodeMirror()
+    type(this.cm, '\\')
+
+    // Won't show autocomplete
+    expect(getShownAutocomplete(this.cm)).to.be.undefined
+  })
+
   describe('when command picked', function () {
     it('inserts command', function () {
       // Return completion with handler function that is provided by
@@ -324,8 +334,12 @@ describe('Autocomplete', function () {
  * Make a new instance of the Editor and configure with a given autocomplete
  * adapter
  */
-function makeEditor (adapter) {
-  const editor = new Editor(fixture.load(FIXTURE_HTML), {}, adapter)
+function makeEditor (adapter, getSetting) {
+  if (!getSetting) {
+    getSetting = sinon.stub().withArgs('autoComplete').returns(true)
+  }
+
+  const editor = new Editor(fixture.load(FIXTURE_HTML), {}, adapter, getSetting)
   editor.enable()
 
   return editor

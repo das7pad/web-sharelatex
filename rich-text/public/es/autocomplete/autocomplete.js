@@ -5,11 +5,13 @@ import Fuse from 'fuse.js'
 
 import BIBTEX_COMMANDS from './bibtex_commands'
 
-export default function makeAutocomplete (adapter) {
+export default function makeAutocomplete (adapter, getSetting) {
   /**
    * Show autocomplete menu
    */
   function autocomplete (cm) {
+    if (!getSetting('autoComplete')) return
+
     const cursor = cm.getCursor()
     const token = cm.getTokenAt(cursor)
 

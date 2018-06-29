@@ -24,12 +24,13 @@ export class Editor {
       lineWrapping: true,
       extraKeys: makeKeyBindings(getSetting),
       hintOptions: {
-        hint: makeAutocomplete(autocompleteAdapter),
+        hint: makeAutocomplete(autocompleteAdapter, getSetting),
         completeSingle: false
       }
     })
 
     this.adapter = richTextAdapter
+    this.autocompleteAdapter = autocompleteAdapter
     this.highlightedWordManager = new HighlightedWordManager(this.codeMirror)
     makeKeyUpHandler(this.codeMirror)
   }
