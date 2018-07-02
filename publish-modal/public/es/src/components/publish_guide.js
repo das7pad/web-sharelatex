@@ -1,5 +1,5 @@
 import React, { PropTypes, Component } from 'react'
-import SidebarWithReturnButton from './sidebar_with_return_button'
+import ReturnButton from './return_button'
 
 export default class PublishGuide extends Component {
   render () {
@@ -11,8 +11,8 @@ export default class PublishGuide extends Component {
         id={'publish-guide-' + entry.id}
         key={entry.id}
       >
-        <SidebarWithReturnButton onReturn={onReturn} returnText={returnText} />
-        <div className='col-sm-8'>
+        <div className='col-sm-12'>
+          <ReturnButton onReturn={onReturn} returnText={returnText} />
           <GuideHtml entry={entry} projectId={projectId} pdfUrl={pdfUrl} />
           {entry.publish_link_destination &&
            <div>

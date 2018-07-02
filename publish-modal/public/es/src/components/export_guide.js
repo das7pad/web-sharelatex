@@ -1,5 +1,5 @@
 import React, { PropTypes, Component } from 'react'
-import SidebarWithReturnButton from './sidebar_with_return_button'
+import ReturnButton from './return_button'
 
 export default class ExportGuide extends Component {
   render () {
@@ -9,31 +9,29 @@ export default class ExportGuide extends Component {
         className='publish-guide modal-body-content row content-as-table'
         key={entry.id}
       >
-        <SidebarWithReturnButton onReturn={onReturn} returnText={returnText} />
-        <div className='col-sm-8'>
-          <div className='row'>
-            <div
-              className='col-sm-2'
-              style={{verticalAlign: 'top'}}
-            >
-              {entry.publish_menu_icon &&
-                <img
-                  src={entry.publish_menu_icon}
-                  alt={entry.name}
-                  style={{width: '106px', float: 'right'}}
-                />
-              }
-            </div>
-            <div className='col-sm-10' style={{paddingLeft: '15px'}}>
-              <p
-                dangerouslySetInnerHTML={{__html: entry.publish_menu_html}}
-              />
-              <Continue
-                {...initParams}
-                entry={entry}
-                onSwitch={onSwitch} />
-            </div>
-          </div>
+        <div className='col-sm-12'>
+          <ReturnButton onReturn={onReturn} returnText={returnText} />
+        </div>
+        <div
+          className='col-sm-2'
+          style={{verticalAlign: 'top'}}
+        >
+          {entry.publish_menu_icon &&
+           <img
+             src={entry.publish_menu_icon}
+             alt={entry.name}
+             style={{width: '106px', float: 'right'}}
+           />
+          }
+        </div>
+        <div className='col-sm-10' style={{paddingLeft: '15px'}}>
+          <p
+            dangerouslySetInnerHTML={{__html: entry.publish_menu_html}}
+          />
+          <Continue
+            {...initParams}
+            entry={entry}
+            onSwitch={onSwitch} />
         </div>
       </div>
     )
@@ -98,6 +96,6 @@ ExportGuide.propTypes = {
 
 Continue.propTypes = {
   entry: PropTypes.object.isRequired,
-  logs: PropTypes.object.isRequired,
+  logs: PropTypes.object,
   pdfUrl: PropTypes.string
 }
