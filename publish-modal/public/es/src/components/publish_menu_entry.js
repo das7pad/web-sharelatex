@@ -33,7 +33,7 @@ export default class PublishMenuEntry extends Component {
             dangerouslySetInnerHTML={{__html: this.props.publish_menu_html}} />
         </div>
         <div className='table-content-link'>
-          <button className={`${this.props.linkClass} button-as-link`}
+          <button className={`${this.props.linkClass} btn btn-primary`}
             data-event='publish_entry_select'
             data-category='Publish'
             data-action='choose'

@@ -54,6 +54,7 @@ function Download ({ entry, projectId, pdfUrl }) {
       <p><strong>Step 1: Download files</strong></p>
       <p>
         <a
+          className="btn btn-primary"
           href={'/project/' + projectId + '/download/zip'}
           target="_blank"
         >
@@ -63,14 +64,15 @@ function Download ({ entry, projectId, pdfUrl }) {
       <p>
         {pdfUrl &&
          <a
+           className="btn btn-primary"
            href={pdfUrl}
            target="_blank">
            Download PDF file of your article
          </a>}
-        {!pdfUrl && <span className="link-disabled">
+        {!pdfUrl && <a className="btn btn-primary disabled" aria-disabled="true">
           Download PDF file of your article
           ( please compile your project before downloading PDF )
-        </span>}
+        </a>}
       </p>
     </div>
   )
@@ -85,7 +87,7 @@ function Submit ({ entry }) {
           href={entry.publish_link_destination}
           target='_blank'
           rel='noopener'
-          className='link-as-button'
+          className='btn btn-primary'
           data-event='link_submit'
           data-category='Publish'
           data-action='submit'
