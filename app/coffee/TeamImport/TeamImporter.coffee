@@ -20,11 +20,16 @@ importTeam = (origV1Team, callback = (error, v2TeamId) ->) ->
 		callback(null, v2Team)
 
 createV2Team = (v1Team, callback = (error, v2Team) ->) ->
-	UserGetter.getUser {'overleaf.id': v1Team.owner.id}, (error, teamAdmin) ->
+	UserMapper.getSlIdFromOlUser v1Team.owner, (error, teamAdminId) ->
 		return callback(error) if error?
 
-		unless teamAdmin?
-			return callback(new Error("Team manager needs to have a user in v2 to import a team."))
+		subscription = new Subscription(
+			overleaf:
+				id: v1Team.id
+			admin_id: teamAdminId
+			groupPlan: true
+			membersLimit: v1Team.n_licences
+		)
 
 		SubscriptionLocator.getUsersSubscription teamAdmin.id, (error, existingSubscription) ->
 			return callback(error) if error?
