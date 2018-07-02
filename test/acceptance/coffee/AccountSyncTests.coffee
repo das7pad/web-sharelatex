@@ -61,6 +61,7 @@ describe "AccountSync", ->
 				beforeEach ->
 					Subscription.create {
 						admin_id: @user._id
+						admin_ids: [@user._id]
 						planCode: 'collaborator_annual'
 						customAccount: true
 					} # returns a promise
@@ -73,8 +74,10 @@ describe "AccountSync", ->
 
 			describe "when the user is in a group subscription", ->
 				beforeEach ->
+					adminId = ObjectId()
 					Subscription.create {
-						admin_id: ObjectId()
+						admin_id: adminId
+						admin_ids: [adminId]
 						member_ids: [@user._id]
 						groupAccount: true
 						planCode: 'professional_annual'
@@ -91,12 +94,15 @@ describe "AccountSync", ->
 				beforeEach (done) ->
 					Subscription.create {
 						admin_id: @user._id
+						admin_ids: [@user._id]
 						planCode: 'professional_annual'
 						customAccount: true
 					}, (error) =>
 						throw error if error?
+						adminId = ObjectId()
 						Subscription.create {
-							admin_id: ObjectId()
+							admin_id: adminId
+							admin_ids: [adminId]
 							member_ids: [@user._id]
 							groupAccount: true
 							planCode: 'collaborator'
@@ -132,6 +138,7 @@ describe "AccountSync", ->
 				beforeEach ->
 					Subscription.create {
 						admin_id: @user._id
+						admin_ids: [@user._id]
 						planCode: 'collaborator_annual'
 						customAccount: true
 					} # returns a promise
@@ -147,8 +154,10 @@ describe "AccountSync", ->
 
 			describe "when the user is in a group subscription", ->
 				beforeEach ->
+					adminId = ObjectId()
 					Subscription.create {
-						admin_id: ObjectId()
+						admin_id: adminId
+						admin_ids: [adminId]
 						member_ids: [@user._id]
 						groupAccount: true
 						planCode: 'professional_annual'
@@ -168,12 +177,15 @@ describe "AccountSync", ->
 				beforeEach (done) ->
 					Subscription.create {
 						admin_id: @user._id
+						admin_ids: [@user._id]
 						planCode: 'professional_annual'
 						customAccount: true
 					}, (error) =>
 						throw error if error?
+						adminId = ObjectId()
 						Subscription.create {
-							admin_id: ObjectId()
+							admin_id: adminId
+							admin_ids: [adminId]
 							member_ids: [@user._id]
 							groupAccount: true
 							planCode: 'collaborator'
