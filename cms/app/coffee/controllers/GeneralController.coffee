@@ -5,7 +5,22 @@ ErrorController = require '../../../../../app/js/Features/Errors/ErrorController
 CmsHandler = require '../CmsHandler'
 
 parseContent = (content) ->
+	# Data easier to use in pug template
 	content.type = content.sys?.contentType?.sys?.id
+	
+	if content.type == 'buttonOtherPage'
+		if content.fields?.linkTo?.sys?.contentType?.sys?.id == 'pageAbout'
+			# slug will be undefined for the about page, 
+			# because we don't add this as an input the CMS
+			content.href = '/about'
+		else if content.fields?.linkTo?.sys?.contentType?.sys?.id == 'blogPost'
+			# to do? Should we add the blog path to a setting,
+			# so that this path isn't hard coded here and above for 'about'
+			content.href = '/blog/' + content.fields.linkTo.fields.slug 
+		else if content.fields?.linkTo?.sys?.contentType?.sys?.id == 'page'
+			content.href = '/' + content.fields.linkTo.fields.path + '/' + content.fields.linkTo.fields.slug 
+
+	# Parse markdown and stringify JSON
 	if content.fields.content
 		content.fields.content = marked(content.fields.content)
 	else if content.fields.tabs
@@ -17,6 +32,7 @@ parseContent = (content) ->
 		content.fields.quote = marked(content.fields.quote)
 	else if content.fields.mbData
 		content.fields.mbData = JSON.stringify(content.fields.mbData)
+
 	content
 
 module.exports = PageController =
