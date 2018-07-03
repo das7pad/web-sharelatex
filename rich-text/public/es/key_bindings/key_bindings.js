@@ -1,6 +1,9 @@
 /* global _ */
 
 import CodeMirror from 'codemirror'
+import 'codemirror/addon/dialog/dialog'
+import 'codemirror/addon/search/searchcursor'
+import 'codemirror/addon/search/search'
 
 import { mac } from '../utils/browser'
 import { wrapBold, wrapItalic } from './text_wrapping'
@@ -18,7 +21,10 @@ export default function makeKeyBindings (getSetting) {
     'Cmd-Left': 'goLineLeftSmart',
     [`${modifierKey}-B`]: wrapBold,
     [`${modifierKey}-I`]: wrapItalic,
-    [`${modifierKey}-/`]: 'toggleComment'
+    [`${modifierKey}-/`]: 'toggleComment',
+    [`${modifierKey}-F`]: 'findPersistent',
+    [`${modifierKey}-G`]: 'findPersistentNext',
+    [`Shift-${modifierKey}-G`]: 'findPersistentPrev'
   }, makeAutoCloseCharHandlers(getSetting))
 }
 
