@@ -13,6 +13,7 @@ define [
         sharejsDoc: "="
         spellCheck: "="
         spellCheckLanguage: "="
+        autoCloseBrackets: "="
       }
 
       link: (scope, element, attrs) ->
@@ -21,7 +22,8 @@ define [
         init = () ->
           editor = new scope.bundle.Editor(
             element.find('.cm-editor-body')[0],
-            new RichTextAdapter(ide.fileTreeManager)
+            new RichTextAdapter(ide.fileTreeManager),
+            getSetting
           )
           switchAttachment(scope.sharejsDoc)
           setUpFormattingEventListeners()
@@ -98,6 +100,9 @@ define [
             @spellCheckManager.onContextMenu
           )
           codeMirror.off 'scroll', @spellCheckManager.onScroll
+
+        getSetting = (key) ->
+          scope[key]
 
         scope.$on '$destroy', () ->
           tearDownSpellCheck()

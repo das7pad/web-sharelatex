@@ -7,23 +7,38 @@ import { wrapBold, wrapItalic } from './text_wrapping'
 
 const modifierKey = mac ? 'Cmd' : 'Ctrl'
 
-export default {
-  'Backspace': handleBackspace,
-  'Delete': handleDelete,
-  'Up': handleUp,
-  'Enter': handleEnter,
-  'Home': 'goLineLeftSmart',
-  'End': 'goLineRight',
-  'Cmd-Left': 'goLineLeftSmart',
-  [`${modifierKey}-B`]: wrapBold,
-  [`${modifierKey}-I`]: wrapItalic,
-  "'{'": function (cm) { return autoCloseChar(cm, '{', '}', '{') },
-  "'['": function (cm) { return autoCloseChar(cm, '[', ']', '[') },
-  "'}'": function (cm) { return autoCloseChar(cm, '{', '}', '}') },
-  "']'": function (cm) { return autoCloseChar(cm, '[', ']', ']') },
-  "'`'": function (cm) { return autoCloseChar(cm, '`', "'", '`') },
-  "'''": function (cm) { return autoCloseChar(cm, '`', "'", "'") },
-  [`${modifierKey}-/`]: 'toggleComment'
+export default function makeKeyBindings (getSetting) {
+  return Object.assign({}, {
+    'Backspace': handleBackspace,
+    'Delete': handleDelete,
+    'Up': handleUp,
+    'Enter': handleEnter,
+    'Home': 'goLineLeftSmart',
+    'End': 'goLineRight',
+    'Cmd-Left': 'goLineLeftSmart',
+    [`${modifierKey}-B`]: wrapBold,
+    [`${modifierKey}-I`]: wrapItalic,
+    [`${modifierKey}-/`]: 'toggleComment'
+  }, makeAutoCloseCharHandlers(getSetting))
+}
+
+function makeAutoCloseCharHandlers (getSetting) {
+  const autoCloseChars = {
+    "'{'": { openChar: '{', closeChar: '}', typedChar: '{' },
+    "'['": { openChar: '[', closeChar: ']', typedChar: '[' },
+    "'}'": { openChar: '{', closeChar: '}', typedChar: '}' },
+    "']'": { openChar: '[', closeChar: ']', typedChar: ']' },
+    "'`'": { openChar: '`', closeChar: "'", typedChar: '`' },
+    "'''": { openChar: '`', closeChar: "'", typedChar: "'" }
+  }
+
+  return Object.keys(autoCloseChars).reduce((acc, key) => {
+    const { openChar, closeChar, typedChar } = autoCloseChars[key]
+    acc[key] = function (cm) {
+      return autoCloseChar(cm, getSetting, openChar, closeChar, typedChar)
+    }
+    return acc
+  }, {})
 }
 
 // Defines the commands that should be on a single line,
@@ -338,7 +353,7 @@ function handleEnter (cm) {
 /**
  * make some special characters auto-closing (type "{" and you get "{}")
  */
-function autoCloseChar (cm, openChar, closeChar, typedChar) {
+function autoCloseChar (cm, getSetting, openChar, closeChar, typedChar) {
   function insertClosingChar (pos, idx) {
     // Get the chars after the current position
     var nextPos = CodeMirror.Pos(pos.line, pos.ch + 1)
@@ -373,6 +388,11 @@ function autoCloseChar (cm, openChar, closeChar, typedChar) {
       // For additional cursors, add them instead
       cm.addSelection(nextPos)
     }
+  }
+
+  // Ignore if setting is disabled
+  if (!getSetting('autoCloseBrackets')) {
+    return CodeMirror.Pass
   }
 
   if (cm.somethingSelected()) {
