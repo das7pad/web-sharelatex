@@ -3,24 +3,25 @@ include ./_mixins
 mixin actual_content(content)
 	//- @param {object}		content		A content block
 	//- content block= From the CMS, which includes the content and UI settings
-	if content.fields.quote
-		//- quotes are the only element that will handle col independently due to special layouts
-		+quote(content.fields)
-	else
-		div(class=content.fields.halfWidth ? "col-sm-6" : "col-sm-12")
-			div(class={"card" : content.fields.card, "text-center" : content.fields.centerText})
-				if content.type == 'content'
-					| !{content.fields.content}
-					if content.fields.youTubeTitle
-						p #{content.fields.youTubeTitle}
-						iframe(src=content.fields.youTube title=content.fields.youTubeTitle || "YouTube Video")
-					if content.fields.contactForm
-						//- to do - move this to a separate content type
-						include ../../../../../support/app/views/contact_form/form_general
-				else if content.type == 'buttonContact'
-					+btn_contact(content)
-				else if content.type == 'buttonOtherPage'
-					+btn_other_page(content)
+	if content.fields
+		if content.fields.quote
+			//- quotes are the only element that will handle col independently due to special layouts
+			+quote(content.fields)
+		else
+			div(class=content.fields.halfWidth ? "col-sm-6" : "col-sm-12")
+				div(class={"card" : content.fields.card, "text-center" : content.fields.centerText})
+					if content.type == 'content'
+						| !{content.fields.content}
+						if content.fields.youTubeTitle
+							p #{content.fields.youTubeTitle}
+							iframe(src=content.fields.youTube title=content.fields.youTubeTitle || "YouTube Video")
+						if content.fields.contactForm
+							//- to do - move this to a separate content type
+							include ../../../../../support/app/views/contact_form/form_general
+					else if content.type == 'buttonContact'
+						+btn_contact(content)
+					else if content.type == 'buttonOtherPage'
+						+btn_other_page(content)
 
 mixin page_content(content, nextContent)
 	//- Handles the grid layout for CMS generated pages
