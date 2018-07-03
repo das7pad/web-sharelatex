@@ -14,6 +14,7 @@ export class Editor {
 
     this.codeMirror = CodeMirror(rootEl, {
       mode: 'latex',
+      lineNumbers: true,
       lineWrapping: true,
       extraKeys: makeKeyBindings(getSetting)
     })
