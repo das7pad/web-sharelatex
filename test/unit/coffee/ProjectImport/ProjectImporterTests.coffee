@@ -566,6 +566,37 @@ describe "ProjectImporter", ->
 					)
 					.should.equal true
 
+		describe "with an ext file, from mendeley agent", ->
+			beforeEach (done) ->
+				@file = {
+					file: "images/references.bib"
+					file_path: "abc/def"
+					type: "ext"
+					agent: "mendeley"
+					agent_data:
+						uid: 'xyz',
+						importer_id: 4321,
+						group_id: 'abcbetatutts'
+				}
+				@ProjectImporter._writeS3ObjectToDisk = sinon.stub().yields(null, "path/on/disk")
+				@ProjectImporter._importFile @project_id, @user_id, @file, done
+
+			it "should download the url to disk from s3", ->
+				@ProjectImporter._writeS3ObjectToDisk
+					.calledWith("abc/def")
+					.should.equal true
+
+			it "should add the file to the project, and upgrade to the 'mendeley' provider", ->
+				linkedFileData = {
+					provider: 'mendeley',
+					v1_importer_id: 4321,
+					group_id: 'abcbetatutts'
+				}
+				@ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory
+					.calledWith(
+						@project_id, @folder_id, "references.bib", "path/on/disk", linkedFileData, @user_id
+					)
+					.should.equal true
 
 		describe "with an ext file, from an unknown agent", ->
 			beforeEach ->
