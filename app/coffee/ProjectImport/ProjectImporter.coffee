@@ -263,7 +263,7 @@ module.exports = ProjectImporter =
 			callback(null, {
 				provider: 'mendeley',
 				v1_importer_id: file.agent_data.importer_id,
-				group_id: file.agent_data.group_id
+				group_id: file.agent_data.group
 			})
 		else
 			callback(null, null)

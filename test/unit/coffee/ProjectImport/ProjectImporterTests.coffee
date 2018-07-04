@@ -576,7 +576,7 @@ describe "ProjectImporter", ->
 					agent_data:
 						uid: 'xyz',
 						importer_id: 4321,
-						group_id: 'abcbetatutts'
+						group: 'abcbetatutts'
 				}
 				@ProjectImporter._writeS3ObjectToDisk = sinon.stub().yields(null, "path/on/disk")
 				@ProjectImporter._importFile @project_id, @user_id, @file, done
