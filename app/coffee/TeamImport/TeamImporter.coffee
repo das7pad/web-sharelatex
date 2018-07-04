@@ -23,22 +23,15 @@ createV2Team = (v1Team, callback = (error, v2Team) ->) ->
 	UserMapper.getSlIdFromOlUser v1Team.owner, (error, teamAdminId) ->
 		return callback(error) if error?
 
-		subscription = new Subscription(
-			overleaf:
-				id: v1Team.id
-			admin_id: teamAdminId
-			groupPlan: true
-			membersLimit: v1Team.n_licences
-		)
-
-		SubscriptionLocator.getUsersSubscription teamAdmin.id, (error, existingSubscription) ->
+		SubscriptionLocator.getUsersSubscription teamAdminId, (error, existingSubscription) ->
 			return callback(error) if error?
-			return callback(new Error("User #{teamAdmin.id} already manages one team")) if existingSubscription?
+			return callback(new Error("User #{teamAdminId} already manages one team")) if existingSubscription?
 
 			subscription = new Subscription(
 				overleaf:
 					id: v1Team.id
-				admin_id: teamAdmin._id
+				admin_id: teamAdminId
+				manager_ids: [teamAdminId]
 				groupPlan: true
 				membersLimit: v1Team.n_licences
 			)
