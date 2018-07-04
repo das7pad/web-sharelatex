@@ -32,6 +32,10 @@ define [
           scope.$root._references
         )
 
+        # Name the scope to be editor. This means that events prefixed with
+        # `editor:` will listened for by the rich text editor
+        scope.name = 'editor'
+
         init = () ->
           editor = new scope.bundle.Editor(
             bodyEl[0],
