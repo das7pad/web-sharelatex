@@ -4,8 +4,10 @@ define [
   "ide/editor/directives/aceEditor/spell-check/SpellCheckManager"
   "ide/rich-text/directives/spell_check/spell_check_adapter"
   "ide/rich-text/autocomplete_adapter"
-], (App, RichTextAdapter, SpellCheckManager, SpellCheckAdapter, AutocompleteAdapter) ->
-  App.directive "cmEditor", (ide, metadata, $cacheFactory, $http, $q) ->
+  "ide/editor/directives/aceEditor/cursor-position/CursorPositionManager"
+  "ide/rich-text/directives/cursor_position/cursor_position_adapter"
+], (App, RichTextAdapter, SpellCheckManager, SpellCheckAdapter, AutocompleteAdapter, CursorPositionManager, CursorPositionAdapter) ->
+  App.directive "cmEditor", (ide, metadata, localStorage, $cacheFactory, $http, $q) ->
     return {
       scope: {
         bundle: "="
@@ -39,6 +41,7 @@ define [
           )
           switchAttachment(scope.sharejsDoc)
           setUpFormattingEventListeners()
+          initCursorPosition()
 
         switchAttachment = (sharejsDoc, oldSharejsDoc) ->
           return if sharejsDoc == oldSharejsDoc
@@ -122,11 +125,29 @@ define [
         tearDownMetadataEventListener = () ->
           editor.getCodeMirror().off 'change', autocompleteAdapter.onChange
 
+        onDocSwapForCursorPosition = (codeMirror, oldDoc) ->
+          return if !oldDoc
+          cursorPositionManager.onSessionChange({ oldSession: oldDoc })
+
+        initCursorPosition = () ->
+          codeMirror = editor.getCodeMirror()
+          @cursorPositionManager = new CursorPositionManager(
+            scope,
+            new CursorPositionAdapter(editor),
+            localStorage
+          )
+          @cursorPositionManager.init()
+          codeMirror.on 'swapDoc', onDocSwapForCursorPosition
+
+        tearDownCursorPosition = () ->
+          editor.getCodeMirror().off 'swapDoc', onDocSwapForCursorPosition
+
         getSetting = (key) ->
           scope[key]
 
         scope.$on '$destroy', () ->
           tearDownSpellCheck()
+          tearDownCursorPosition()
           tearDownFormattingEventListeners()
           tearDownMetadataEventListener()
           detachFromCM(scope.sharejsDoc)
