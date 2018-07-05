@@ -11,7 +11,8 @@ LinkedFilesHandler = require '../../../../../app/js/Features/LinkedFiles/LinkedF
 	BadDataError,
 	NotOriginalImporterError,
 	FeatureNotAvailableError,
-	RemoteServiceError
+	RemoteServiceError,
+	FileCannotRefreshError
 } = require '../../../../../app/js/Features/LinkedFiles/LinkedFilesErrors'
 ReferencesApiHandler = require '../ReferencesApiHandler'
 logger = require 'logger-sharelatex'
@@ -35,6 +36,8 @@ module.exports = MendeleyAgent = {
 	refreshLinkedFile: (project_id, linkedFileData, name, parent_folder_id, user_id, callback) ->
 		callback = _.once(callback)
 		url = MendeleyAgent._buildUrl(user_id, linkedFileData)
+		if MendeleyAgent._isOrphanedImport(linkedFileData)
+			return callback(new FileCannotRefreshError())
 		MendeleyAgent._userIsImporter user_id, linkedFileData, (err, isImporter) ->
 			return callback(err) if err?
 			return callback(new NotOriginalImporterError()) if !isImporter
@@ -70,6 +73,9 @@ module.exports = MendeleyAgent = {
 						"[MendeleyAgent] error code from tpr api"
 					return callback(new RemoteServiceError())
 
+	_isOrphanedImport: (data) ->
+		!data.v1_importer_id? && !data.importer_id?
+
 	_userIsImporter: (current_user_id, linkedFileData, callback=(err, isImporter)->) ->
 		callback = _.once(callback)
 		if linkedFileData.v1_importer_id?
@@ -78,5 +84,4 @@ module.exports = MendeleyAgent = {
 				callback(null, user? && user.overleaf? && (user.overleaf.id == linkedFileData.v1_importer_id))
 		else
 			callback(null, current_user_id.toString() == linkedFileData.importer_id.toString())
-
 }
