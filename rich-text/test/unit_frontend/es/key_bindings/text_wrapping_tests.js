@@ -4,9 +4,17 @@ import * as TextWrapping from '../../../../public/es/key_bindings/text_wrapping'
 
 const TEXTAREA_HTML = '<textarea></textarea>'
 
+const autocompleteAdapterStub = {
+  getBeginCommandArguments: () => ['environmentName']
+}
+
 describe('Text wrapping', function () {
   beforeEach(function () {
-    this.editor = new Editor(fixture.load(TEXTAREA_HTML), {})
+    this.editor = new Editor(
+      fixture.load(TEXTAREA_HTML),
+      {},
+      autocompleteAdapterStub
+    )
     this.cm = this.editor.getCodeMirror()
   })
 

@@ -3,8 +3,9 @@ define [
   "ide/rich-text/rich_text_adapter"
   "ide/editor/directives/aceEditor/spell-check/SpellCheckManager"
   "ide/rich-text/directives/spell_check/spell_check_adapter"
-], (App, RichTextAdapter, SpellCheckManager, SpellCheckAdapter) ->
-  App.directive "cmEditor", (ide, $cacheFactory, $http, $q) ->
+  "ide/rich-text/autocomplete_adapter"
+], (App, RichTextAdapter, SpellCheckManager, SpellCheckAdapter, AutocompleteAdapter) ->
+  App.directive "cmEditor", (ide, metadata, $cacheFactory, $http, $q) ->
     return {
       scope: {
         bundle: "="
@@ -13,19 +14,27 @@ define [
         sharejsDoc: "="
         spellCheck: "="
         spellCheckLanguage: "="
+        autoComplete: "="
         autoCloseBrackets: "="
         fontSize: "="
         lineHeight: "="
+        docId: "="
       }
 
       link: (scope, element, attrs) ->
         bodyEl = element.find('.cm-editor-body')
         editor = null
+        autocompleteAdapter = new AutocompleteAdapter(
+          scope,
+          metadata,
+          scope.$root._references
+        )
 
         init = () ->
           editor = new scope.bundle.Editor(
             bodyEl[0],
             new RichTextAdapter(ide.fileTreeManager),
+            autocompleteAdapter,
             getSetting
           )
           switchAttachment(scope.sharejsDoc)
@@ -68,6 +77,7 @@ define [
             editor.enable()
             sharejsDoc.on "remoteop.richtext", editor.update
             initSpellCheck()
+            setUpMetadataEventListener()
 
         detachFromCM = (sharejsDoc) ->
           sharejsDoc.detachFromCM()
@@ -104,12 +114,19 @@ define [
           )
           codeMirror.off 'scroll', @spellCheckManager.onScroll
 
+        setUpMetadataEventListener = () ->
+          editor.getCodeMirror().on 'change', autocompleteAdapter.onChange
+
+        tearDownMetadataEventListener = () ->
+          editor.getCodeMirror().off 'change', autocompleteAdapter.onChange
+
         getSetting = (key) ->
           scope[key]
 
         scope.$on '$destroy', () ->
           tearDownSpellCheck()
           tearDownFormattingEventListeners()
+          tearDownMetadataEventListener()
           detachFromCM(scope.sharejsDoc)
           editor.disable()
 

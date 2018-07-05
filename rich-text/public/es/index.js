@@ -1,13 +1,19 @@
 import CodeMirror, { Doc } from 'codemirror'
+import 'codemirror/addon/hint/show-hint'
 
 import LatexMode from './latex_mode/latex_mode'
 import RichText from './rich_text/rich_text'
-import makeKeyBindings from './key_bindings/key_bindings'
+import {
+  makeKeyBindings,
+  makeKeyUpHandler,
+  tearDownKeyUpHandler
+} from './key_bindings/key_bindings'
+import makeAutocomplete from './autocomplete/autocomplete'
 import HighlightedWordManager from './spell_check/highlighted_word_manager'
 import * as textWrapping from './key_bindings/text_wrapping'
 
 export class Editor {
-  constructor (rootEl, adapter, getSetting) {
+  constructor (rootEl, richTextAdapter, autocompleteAdapter, getSetting) {
     CodeMirror.defineMode('latex', () => new LatexMode())
     CodeMirror.defineMIME('application/x-tex', 'latex')
     CodeMirror.defineMIME('application/x-latex', 'latex')
@@ -16,10 +22,17 @@ export class Editor {
       mode: 'latex',
       lineNumbers: true,
       lineWrapping: true,
-      extraKeys: makeKeyBindings(getSetting)
+      extraKeys: makeKeyBindings(getSetting),
+      hintOptions: {
+        hint: makeAutocomplete(autocompleteAdapter, getSetting),
+        completeSingle: false
+      }
     })
-    this.adapter = adapter
+
+    this.adapter = richTextAdapter
+    this.autocompleteAdapter = autocompleteAdapter
     this.highlightedWordManager = new HighlightedWordManager(this.codeMirror)
+    makeKeyUpHandler(this.codeMirror)
   }
 
   getCodeMirror () {
@@ -40,6 +53,7 @@ export class Editor {
 
   disable () {
     this.richText.disable()
+    tearDownKeyUpHandler(this.codeMirror)
   }
 
   update () {

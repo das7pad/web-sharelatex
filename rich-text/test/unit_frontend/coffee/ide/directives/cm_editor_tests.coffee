@@ -7,6 +7,7 @@ define [
     beforeEach module 'SharelatexApp', ($provide) ->
       $provide.factory 'ide', () ->
         { fileTreeManager: sinon.stub() }
+      $provide.factory 'metadata', () -> {}
       return
 
     it 'inits Rich Text', () ->
@@ -23,6 +24,7 @@ define [
           refresh: sinon.stub()
         }),
         disable: sinon.stub()
+        disableAutocomplete: sinon.stub()
       })
       inject ($compile, $rootScope) ->
         $rootScope.sharejsDoc = stubSharejsDoc()
@@ -106,6 +108,7 @@ define [
       enable: sinon.stub()
       disable: sinon.stub()
       update: sinon.stub()
+      disableAutocomplete: sinon.stub()
 
   # Stub the ShareJS Doc that is created by editor internals
   stubSharejsDoc = (overrides = {}) ->

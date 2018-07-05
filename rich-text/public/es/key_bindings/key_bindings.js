@@ -7,10 +7,16 @@ import 'codemirror/addon/search/search'
 
 import { mac } from '../utils/browser'
 import { wrapBold, wrapItalic } from './text_wrapping'
+import BIBTEX_COMMANDS from '../autocomplete/bibtex_commands'
 
 const modifierKey = mac ? 'Cmd' : 'Ctrl'
 
-export default function makeKeyBindings (getSetting) {
+const BACKSLASH_KEY = 220
+const BACKSPACE_KEY = 8
+const SPACE_KEY = 32
+const COMMA_KEY = 188
+
+export function makeKeyBindings (getSetting) {
   return Object.assign({}, {
     'Backspace': handleBackspace,
     'Delete': handleDelete,
@@ -24,7 +30,8 @@ export default function makeKeyBindings (getSetting) {
     [`${modifierKey}-/`]: 'toggleComment',
     [`${modifierKey}-F`]: 'findPersistent',
     [`${modifierKey}-G`]: 'findPersistentNext',
-    [`Shift-${modifierKey}-G`]: 'findPersistentPrev'
+    [`Shift-${modifierKey}-G`]: 'findPersistentPrev',
+    'Ctrl-Space': 'autocomplete'
   }, makeAutoCloseCharHandlers(getSetting))
 }
 
@@ -45,6 +52,14 @@ function makeAutoCloseCharHandlers (getSetting) {
     }
     return acc
   }, {})
+}
+
+export function makeKeyUpHandler (cm) {
+  cm.on('keyup', handleKeyUp)
+}
+
+export function tearDownKeyUpHandler (cm) {
+  cm.off('keyup', handleKeyUp)
 }
 
 // Defines the commands that should be on a single line,
@@ -1186,4 +1201,45 @@ function checkItemsAfter (cm, mark, to) {
       m.to.line <= to.line
     )
   })
+}
+
+function handleKeyUp (cm, e) {
+  if (e.which === BACKSLASH_KEY) {
+    // Always show autocomplete after backslash
+    cm.showHint()
+  } else if (
+    e.which === BACKSPACE_KEY ||
+    e.which === COMMA_KEY ||
+    e.which === SPACE_KEY ||
+    /^[a-zA-Z0-9]+$/.test(String.fromCharCode(e.which))
+  ) {
+    // Show autocomplete after backspace, comma, space or after letter
+    const cursor = cm.getCursor()
+    const token = cm.getTokenAt(cursor)
+    const tokenBeforeCursor = cm.getTokenAt({
+      line: cursor.line,
+      ch: token.start - 1
+    })
+
+    // If the token string starts with a backslash (i.e. it is a command)
+    // Or the type of the token is an argument and the token before the cursor
+    // is a \begin command
+    // Then show the autocomplete
+    if (
+      token.string.match(/^\\/) ||
+      (token.type === 'keyword' && tokenBeforeCursor.string === '\\begin')
+    ) {
+      cm.showHint()
+    } else {
+      // If the cursor is within an argument, attempt to find the command for
+      // the argument
+      const commandMark = _.last(token.state.openMarks)
+      if (!commandMark) return // Not within a command, ignore
+
+      // If the command is a bibtex command, show autocomplete
+      if (BIBTEX_COMMANDS.indexOf(`\\${commandMark.kind}`) !== -1) {
+        cm.showHint()
+      }
+    }
+  }
 }
