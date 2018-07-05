@@ -1,5 +1,5 @@
 import React, { PropTypes, Component } from 'react'
-import SidebarWithReturnButton from './sidebar_with_return_button'
+import ReturnButton from './return_button'
 
 export default class PublishGuide extends Component {
   render () {
@@ -11,8 +11,8 @@ export default class PublishGuide extends Component {
         id={'publish-guide-' + entry.id}
         key={entry.id}
       >
-        <SidebarWithReturnButton onReturn={onReturn} returnText={returnText} />
-        <div className='col-sm-8'>
+        <div className='col-sm-12'>
+          <ReturnButton onReturn={onReturn} returnText={returnText} />
           <GuideHtml entry={entry} projectId={projectId} pdfUrl={pdfUrl} />
           {entry.publish_link_destination &&
            <div>
@@ -54,6 +54,7 @@ function Download ({ entry, projectId, pdfUrl }) {
       <p><strong>Step 1: Download files</strong></p>
       <p>
         <a
+          className="btn btn-primary"
           href={'/project/' + projectId + '/download/zip'}
           target="_blank"
         >
@@ -63,14 +64,15 @@ function Download ({ entry, projectId, pdfUrl }) {
       <p>
         {pdfUrl &&
          <a
+           className="btn btn-primary"
            href={pdfUrl}
            target="_blank">
            Download PDF file of your article
          </a>}
-        {!pdfUrl && <span className="link-disabled">
+        {!pdfUrl && <a className="btn btn-primary disabled" disabled>
           Download PDF file of your article
           ( please compile your project before downloading PDF )
-        </span>}
+        </a>}
       </p>
     </div>
   )
@@ -85,7 +87,7 @@ function Submit ({ entry }) {
           href={entry.publish_link_destination}
           target='_blank'
           rel='noopener'
-          className='link-as-button'
+          className='btn btn-primary'
           data-event='link_submit'
           data-category='Publish'
           data-action='submit'
