@@ -17,6 +17,13 @@ module.exports = MetricsController =
 			resourceType: 'team',
 		}
 
+	affiliationMetrics: (req, res, next) ->
+		res.render Path.resolve(__dirname, '../views/metricsApp'), {
+			metricsEndpoint: "/graphs",
+			resourceId: req.params.affiliationId,
+			resourceType: 'affiliation',
+		}
+
 	analyticsProxy: (req, res, next) ->
 		analyticsUrl = settings.apis.analytics.url + req.originalUrl
 		logger.log req.query, "requesting from analytics #{analyticsUrl}"
