@@ -18,7 +18,7 @@ const ReturnButton = ({returnText, onReturn}) => {
       </button>
     )
   } else {
-    return (<div />)
+    return (null)
   }
 }
 

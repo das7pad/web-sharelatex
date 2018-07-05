@@ -69,7 +69,7 @@ function Download ({ entry, projectId, pdfUrl }) {
            target="_blank">
            Download PDF file of your article
          </a>}
-        {!pdfUrl && <a className="btn btn-primary disabled" aria-disabled="true">
+        {!pdfUrl && <a className="btn btn-primary disabled" disabled>
           Download PDF file of your article
           ( please compile your project before downloading PDF )
         </a>}

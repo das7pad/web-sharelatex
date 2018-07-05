@@ -47,7 +47,7 @@ function Continue ({ entry, onSwitch, pdfUrl, logs }) {
           button below
         </p>
         <p>
-          <button className="btn"
+          <button className="btn btn-primary"
             style={{display: 'inline-block'}}
             onClick={() => onSwitch('export', entry.id)}>
             Continue

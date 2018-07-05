@@ -129,26 +129,26 @@ export default class EmisExport extends Component {
                   please confirm your first and last name:
                 </p>
                 <p>
-                <input type="text"
-                  className="form-control"
-                  defaultValue={firstName}
-                  style={{ width: '30%', display: 'inline-block' }}
-                  maxLength="255"
-                  placeholder="First Name"
-                  ref={ (input) => (this.firstName = input)}
-                />
-                <input type="text"
-                  className="form-control"
-                  defaultValue={lastName}
-                  style={{ width: '30%', display: 'inline-block' }}
-                  maxLength="255"
-                  placeholder="Last Name"
-                  ref={ (input) => (this.lastName = input)}
-                />
+                  <input type="text"
+                    className="form-control"
+                    defaultValue={firstName}
+                    style={{ width: '30%', display: 'inline-block' }}
+                    maxLength="255"
+                    placeholder="First Name"
+                    ref={ (input) => (this.firstName = input)}
+                  />
+                  <input type="text"
+                    className="form-control"
+                    defaultValue={lastName}
+                    style={{ width: '30%', display: 'inline-block' }}
+                    maxLength="255"
+                    placeholder="Last Name"
+                    ref={ (input) => (this.lastName = input)}
+                  />
                 </p>
                 <br/>
                 <button
-                  className='btn'
+                  className='btn btn-primary'
                   onClick={() => this.initiateExport(entry, projectId)}
                 >
                   Submit to {entry.name}
