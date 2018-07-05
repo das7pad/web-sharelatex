@@ -17,7 +17,7 @@ module.exports =
 				}
 			}
 
-		if data.metadata
+		if data.metadata && data.metadata.fields
 			data.metadata = data.metadata.fields
 			# keywords
 			if data.metadata.keywords
