@@ -8,18 +8,24 @@ define [], () ->
         column: ch
       }
 
+    convertFromAcePos: ({ row, column }) ->
+      return {
+        line: row,
+        ch: column
+      }
+
     getCursor: () =>
       @convertToAcePos(@editor.getCodeMirror().getCursor())
 
     getCursorForSession: (doc) ->
-      doc.getCursor()
+      @convertToAcePos(doc.getCursor())
 
     getScrollTopForSession: (doc) ->
       doc.scrollTop
 
     setCursor: (pos) ->
-      pos = pos.CursorPositionAdapter or { line: 0, ch: 0 }
-      @editor.getCodeMirror().setCursor(pos)
+      pos = pos.cursorPosition or { line: 0, ch: 0 }
+      @editor.getCodeMirror().setCursor(@convertFromAcePos(pos))
 
     setScrollTop: (pos) ->
       pos = pos.scrollTop or 0
