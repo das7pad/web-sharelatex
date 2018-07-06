@@ -17,11 +17,11 @@ module.exports = MetricsController =
 			resourceType: 'team',
 		}
 
-	affiliationMetrics: (req, res, next) ->
+	institutionMetrics: (req, res, next) ->
 		res.render Path.resolve(__dirname, '../views/metricsApp'), {
 			metricsEndpoint: "/graphs",
-			resourceId: req.params.affiliationId,
-			resourceType: 'affiliation',
+			resourceId: req.params.institutionId,
+			resourceType: 'institution',
 		}
 
 	analyticsProxy: (req, res, next) ->

@@ -21,9 +21,9 @@ module.exports =
 		)
 
 		webRouter.get(
-			'/metrics/affiliations/:affiliationId/?(:startDate/:endDate)?',
+			'/metrics/institutions/:institutionId/?(:startDate/:endDate)?',
 			AuthorizationMiddlewear.ensureUserIsSiteAdmin,
-			MetricsController.affiliationMetrics
+			MetricsController.institutionMetrics
 		)
 
 		webRouter.get(
