@@ -286,3 +286,37 @@ describe "MendeleyLinkedFiles", ->
 					new_file_id = body.new_file_id
 					expect(new_file_id).to.exist
 					done()
+
+	describe "Refreshing an orphaned mendeley file from v1", ->
+		before (done) ->
+			@owner.createProject 'mendeley-test-four', {template: 'blank'}, (err, project_id) =>
+				@project_four_id = project_id
+				@owner.getProject project_id, (err, project) =>
+					return done(err) if err?
+					@project_four = project
+					@project_four_root_folder_id = project.rootFolder[0]._id.toString()
+					@project_four.rootFolder[0].fileRefs.push {
+						linkedFileData: {
+							provider: "mendeley"  # Note, no importer id
+						},
+						_id: "5b3b5b631ac80a000162562d",
+						rev: 0,
+						created: new Date(),
+						name: "mendeley.bib"
+					}
+					@owner.saveProject @project_four, (err) =>
+						return done(err) if err?
+						@owner.addUserToProject @project_four._id, @other_user_one, 'readAndWrite', (err) =>
+							return done(err) if err?
+							@owner.mongoUpdate {$set: {overleaf: {id: 99299}}}, done
+
+		describe "when the user tries to refresh the file", ->
+
+			it "should not refresh the file", (done) ->
+				@owner.request.post {
+					url: "/project/#{@project_four_id}/linked_file/5b3b5b631ac80a000162562d/refresh",
+					json: true
+				}, (error, response, body) =>
+					expect(response.statusCode).to.equal 400
+					expect(body).to.equal "This file cannot be refreshed"
+					done()
