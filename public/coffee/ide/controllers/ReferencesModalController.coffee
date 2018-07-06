@@ -71,7 +71,7 @@ define [
 			$scope.status.errorType = 'default'
 			event_tracking.send("references-#{provider}", "modal", "load-bibtex")
 
-			$http.get("/#{provider}/bibtex")
+			$http.get("/#{provider}/bibtex", {disableAutoLoginRedirect: true})
 				.then (response) ->
 					data = response.data
 					limit = 1 * 1024 * 1024
@@ -100,7 +100,8 @@ define [
 			$scope.status.importing = true
 			$http.post(
 				"/project/#{ide.project_id}/#{provider}/bibtex/import",
-				{_csrf: window.csrfToken}
+				{_csrf: window.csrfToken},
+				{disableAutoLoginRedirect: true}
 			)
 				.then () ->
 					$scope.status.error = false
