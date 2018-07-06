@@ -332,10 +332,10 @@ module.exports = ProjectImporter =
 			json: true
 		}, (error, res, status) ->
 			if res.statusCode < 200 || res.statusCode >= 300
-				error ||= new Error("non-success code from overleaf: #{res.statusCode}")
+				error = new Error("non-success code from overleaf: #{res.statusCode}")
 				error.statusCode = res.statusCode
 			else if !status?.exported
-				error ||= new V1HistoryNotSyncedError('v1 history not synced')
+				error = new V1HistoryNotSyncedError('v1 history not synced')
 
 			if error?
 				logger.log {v1_project_id, v1_user_id, requestCount, error}, "error checking v1 history sync"
