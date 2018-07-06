@@ -80,6 +80,8 @@ define [
             setUpMetadataEventListener()
 
         detachFromCM = (sharejsDoc) ->
+          tearDownSpellCheck()
+          tearDownMetadataEventListener()
           sharejsDoc.detachFromCM()
           sharejsDoc.off "remoteop.richtext"
 
