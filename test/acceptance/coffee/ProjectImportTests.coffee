@@ -47,7 +47,8 @@ describe "ProjectImportTests", ->
 		@owner.login (error) =>
 			throw error if error?
 			conditions = { _id: new ObjectId(@owner.id) }
-			update = { $set: { 'overleaf.accessToken': new ObjectId() } }
+			@owner_v1_id = 123
+			update = { $set: { 'overleaf.id': @owner_v1_id } }
 			db.users.update conditions, update, (error) ->
 				throw error if error?
 				mkdirp Settings.path.dumpFolder, done
