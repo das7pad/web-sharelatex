@@ -13,9 +13,7 @@ module.exports = ProjectListGetter =
 			return callback(error) if error?
 
 			v1_user_id = user?.overleaf?.id
-			if !v1_user_id
-				logger.err {error}, "failed to import because user is not a V1 user"
-				return callback(new Error("failed to import because user is not a V1 user"))
+			return callback() if !v1_user_id # Just an SL-only user
 
 			request.get {
 				url: "#{settings.overleaf.host}/api/v1/sharelatex/users/#{v1_user_id}/docs"
