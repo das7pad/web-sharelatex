@@ -43,16 +43,23 @@ define [
             autocompleteAdapter,
             getSetting
           )
+          cursorPositionManager = new CursorPositionManager(
+            scope,
+            new CursorPositionAdapter(editor),
+            localStorage
+          )
           switchAttachment(scope.sharejsDoc)
           setUpFormattingEventListeners()
-          initCursorPosition()
 
         switchAttachment = (sharejsDoc, oldSharejsDoc) ->
           return if sharejsDoc == oldSharejsDoc
           if oldSharejsDoc?
+            scope.$broadcast('beforeChangeDocument')
             detachFromCM(oldSharejsDoc)
           if sharejsDoc?
             attachToCM(sharejsDoc)
+          if sharejsDoc? and oldSharejsDoc?
+            scope.$broadcast('afterChangeDocument')
 
         # If doc is changed, switch the CodeMirror/ShareJS attachment
         scope.$watch "sharejsDoc", switchAttachment
@@ -77,12 +84,19 @@ define [
           scope.formattingEvents.off 'numberedList'
           scope.formattingEvents.off 'bulletList'
 
+        # Trigger the event once *only* - this is called after CM is connected
+        # to the ShareJs instance but this event should only be triggered the
+        # first time the editor is opened. Not every time the docs opened
+        triggerEditorInitEvent = _.once () ->
+          scope.$broadcast('editorInit')
+
         attachToCM = (sharejsDoc) ->
           scope.$applyAsync () ->
             editor.openDoc(sharejsDoc.getSnapshot())
             sharejsDoc.attachToCM(editor.getCodeMirror())
             editor.enable()
             sharejsDoc.on "remoteop.richtext", editor.update
+            triggerEditorInitEvent()
             initSpellCheck()
             setUpMetadataEventListener()
 
@@ -129,29 +143,11 @@ define [
         tearDownMetadataEventListener = () ->
           editor.getCodeMirror().off 'change', autocompleteAdapter.onChange
 
-        onDocSwapForCursorPosition = (codeMirror, oldDoc) ->
-          return if !oldDoc
-          cursorPositionManager.onSessionChange({ oldSession: oldDoc })
-
-        initCursorPosition = () ->
-          codeMirror = editor.getCodeMirror()
-          @cursorPositionManager = new CursorPositionManager(
-            scope,
-            new CursorPositionAdapter(editor),
-            localStorage
-          )
-          @cursorPositionManager.init()
-          codeMirror.on 'swapDoc', onDocSwapForCursorPosition
-
-        tearDownCursorPosition = () ->
-          editor.getCodeMirror().off 'swapDoc', onDocSwapForCursorPosition
-
         getSetting = (key) ->
           scope[key]
 
         scope.$on '$destroy', () ->
           tearDownSpellCheck()
-          tearDownCursorPosition()
           tearDownFormattingEventListeners()
           tearDownMetadataEventListener()
           detachFromCM(scope.sharejsDoc)
