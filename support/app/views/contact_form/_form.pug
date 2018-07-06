@@ -16,7 +16,7 @@ mixin contact-form(showAffectedProjectUrl)
 						tabindex='1',
 						onkeyup='')
 				.contact-suggestions(ng-show="suggestions.length")
-					p.contact-suggestion-label !{translate("kb_suggestions_enquiry", { kbLink: "<a href='learn/kb' target='_blank'>" + translate("knowledge_base") + "</a>" })}
+					p.contact-suggestion-label !{translate("kb_suggestions_enquiry", { kbLink: "<a href='/learn/kb' target='_blank'>" + translate("knowledge_base") + "</a>" })}
 					ul.contact-suggestion-list
 						li(ng-repeat="suggestion in suggestions")
 							a.contact-suggestion-list-item(ng-href="{{ suggestion.url }}", ng-click="clickSuggestionLink(suggestion.url);" target="_blank")
