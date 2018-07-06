@@ -55,7 +55,7 @@ define [
 				return unless $scope.canLoadBibtex()
 				_reset()
 				$scope.state.fetchingGroups = true
-				ide.$http.get("/mendeley/groups")
+				ide.$http.get("/mendeley/groups", {disableAutoLoginRedirect: true})
 					.then (resp) ->
 						{ data } = resp
 						$scope.data.groups = data.groups
