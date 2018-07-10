@@ -140,9 +140,17 @@ define [
             new CursorPositionAdapter(editor),
             localStorage
           )
+          editor.getCodeMirror().on(
+            'cursorActivity',
+            cursorPositionManager.onCursorChange
+          )
           $(window).on 'unload', cursorPositionManager.onUnload
 
         tearDownCursorPosition = () ->
+          editor.getCodeMirror().off(
+            'cursorActivity',
+            cursorPositionManager.onCursorChange
+          )
           $(window).off 'unload', cursorPositionManager.onUnload
 
         setUpMetadataEventListener = () ->
