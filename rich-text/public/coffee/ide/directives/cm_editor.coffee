@@ -26,6 +26,7 @@ define [
       link: (scope, element, attrs) ->
         bodyEl = element.find('.cm-editor-body')
         editor = null
+        cursorPositionManager = null
         autocompleteAdapter = new AutocompleteAdapter(
           scope,
           metadata,
@@ -43,11 +44,7 @@ define [
             autocompleteAdapter,
             getSetting
           )
-          cursorPositionManager = new CursorPositionManager(
-            scope,
-            new CursorPositionAdapter(editor),
-            localStorage
-          )
+          initCursorPosition()
           switchAttachment(scope.sharejsDoc)
           setUpFormattingEventListeners()
 
@@ -137,6 +134,17 @@ define [
           )
           codeMirror.off 'scroll', @spellCheckManager.onScroll
 
+        initCursorPosition = () ->
+          cursorPositionManager = new CursorPositionManager(
+            scope,
+            new CursorPositionAdapter(editor),
+            localStorage
+          )
+          $(window).on 'unload', cursorPositionManager.onUnload
+
+        tearDownCursorPosition = () ->
+          $(window).off 'unload', cursorPositionManager.onUnload
+
         setUpMetadataEventListener = () ->
           editor.getCodeMirror().on 'change', autocompleteAdapter.onChange
 
@@ -148,6 +156,7 @@ define [
 
         scope.$on '$destroy', () ->
           tearDownSpellCheck()
+          tearDownCursorPosition()
           tearDownFormattingEventListeners()
           tearDownMetadataEventListener()
           detachFromCM(scope.sharejsDoc)
