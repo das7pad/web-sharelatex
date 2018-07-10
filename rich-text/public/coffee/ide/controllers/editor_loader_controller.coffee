@@ -2,13 +2,15 @@ define [
   "base"
   "utils/EventEmitter"
 ], (App, EventEmitter) ->
-  App.controller "EditorLoaderController", ($scope) ->
+  App.controller "EditorLoaderController", ($scope, localStorage) ->
     $scope.richText = {
       bundle: null
       formattingEvents: new EventEmitter()
     }
 
     $scope.$watch "editor.showRichText", (val) ->
+      localStorage("editor.mode.#{$scope.project_id}", val)
+
       if val and !$scope.richText.bundle
         requirejs ['rich-text'], (bundle) ->
           $scope.$applyAsync () ->
