@@ -23,7 +23,6 @@ describe 'AccountSyncManager', ->
 			"settings-sharelatex":
 				overleaf:
 					host: @host = "http://overleaf.example.com"
-			"../OAuth/OAuthRequest": @oAuthRequest = {}
 
 		@AccountSyncManager._v1PlanRequest = sinon.stub()
 		@userId = 'abcd'
@@ -106,6 +105,15 @@ describe 'AccountSyncManager', ->
 					done()
 
 	describe "_canonicalPlanCode", ->
+
+		it "should default to 'personal'", ->
+			expect(
+				@AccountSyncManager._canonicalPlanCode(undefined)
+			).to.equal 'personal'
+			expect(
+				@AccountSyncManager._canonicalPlanCode(null)
+			).to.equal 'personal'
+
 		it "should map all the used plan codes to a canonical one", ->
 			expect(
 				@AccountSyncManager._canonicalPlanCode('student')
