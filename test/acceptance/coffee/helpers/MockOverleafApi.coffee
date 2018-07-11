@@ -34,7 +34,6 @@ module.exports = MockOverleafApi =
 			res.json exported: true
 
 		app.get "/api/v1/sharelatex/users/:v1_user_id/plan_code", (req, res, next) =>
-			console.log("PLAN REQUESTED!", req.params.v1_user_id)
 			res.json { plan_code: 'pro' }
 
 		app.post "/api/v1/sharelatex/users/:v1_user_id/sync", (req, res, next) =>
