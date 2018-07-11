@@ -9,7 +9,10 @@ define [
     }
 
     $scope.$watch "editor.showRichText", (val) ->
-      localStorage("editor.mode.#{$scope.project_id}", val)
+      localStorage(
+        "editor.mode.#{$scope.project_id}",
+        if val == true then 'rich-text' else 'source'
+      )
 
       if val and !$scope.richText.bundle
         requirejs ['rich-text'], (bundle) ->
