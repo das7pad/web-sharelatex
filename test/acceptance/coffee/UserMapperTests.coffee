@@ -36,15 +36,21 @@ describe "UserMapper", ->
 			UserStub.remove("overleaf.id": { $exists: true }).then ->
 				Subscription.remove("overleaf.id": { $exists: true })
 
-		it "updates the admin_id references to UserStubs", ->
-			UserMapper.createSlUser({id: 9, email: "alice@example.com"}, "accessToken", "refreshToken").then (slUser) =>
+		it "updates the admin_id references to UserStubs", (done) ->
+			UserMapper.createSlUser {id: 9, email: "alice@example.com"}, "accessToken", "refreshToken", (error, slUser) =>
+				return done(error) if error?
 				expect(slUser.overleaf.id).to.eq 9
 				Subscription.findOne(_id: @subscriptionId).then (subscription) =>
 					expect(subscription.admin_id.toString()).to.equals(slUser._id.toString())
+					done()
+			return
 
-		it "updates member_ids references to UserStubs", ->
-			UserMapper.createSlUser({id: 10, email: "alice@example.com"}, "accessToken", "refreshToken").then (slUser) =>
+		it "updates member_ids references to UserStubs", (done) ->
+			UserMapper.createSlUser {id: 10, email: "alice@example.com"}, "accessToken", "refreshToken", (error, slUser) =>
+				return done(error) if error?
 				expect(slUser.overleaf.id).to.eq 10
 				Subscription.findOne(_id: @subscriptionId).then (subscription) =>
 					expect(subscription.member_ids.length).to.eq(1)
 					expect(subscription.member_ids[0].toString()).to.equals(slUser._id.toString())
+					done()
+			return
