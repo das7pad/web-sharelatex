@@ -63,7 +63,7 @@ describe "ProjectListGetter", ->
 
 		describe 'with large number of V1 projects', ->
 			beforeEach ->
-			@V1SharelatexApi.request = sinon.stub().yields(null, {statusCode: 200}, @list = {
+				@V1SharelatexApi.request = sinon.stub().yields(null, {statusCode: 200}, @list = {
 					"projects": [{
 						id: '123MockOLId'
 						title: 'Mock OL title'
