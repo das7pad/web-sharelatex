@@ -39,6 +39,7 @@ export default class PublishMenuEntry extends Component {
             data-action='choose'
             data-label={this.props.id}
             onClick={() => this.props.onSwitch(switchTo, id)}
+            style={{whiteSpace: 'normal'}}
             dangerouslySetInnerHTML={{__html: this.props.publish_menu_link_html}} />
         </div>
       </div>
