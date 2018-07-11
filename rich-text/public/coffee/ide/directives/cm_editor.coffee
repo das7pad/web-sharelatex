@@ -4,8 +4,10 @@ define [
   "ide/editor/directives/aceEditor/spell-check/SpellCheckManager"
   "ide/rich-text/directives/spell_check/spell_check_adapter"
   "ide/rich-text/autocomplete_adapter"
-], (App, RichTextAdapter, SpellCheckManager, SpellCheckAdapter, AutocompleteAdapter) ->
-  App.directive "cmEditor", (ide, metadata, $cacheFactory, $http, $q) ->
+  "ide/editor/directives/aceEditor/cursor-position/CursorPositionManager"
+  "ide/rich-text/directives/cursor_position/cursor_position_adapter"
+], (App, RichTextAdapter, SpellCheckManager, SpellCheckAdapter, AutocompleteAdapter, CursorPositionManager, CursorPositionAdapter) ->
+  App.directive "cmEditor", (ide, metadata, localStorage, $cacheFactory, $http, $q) ->
     return {
       scope: {
         bundle: "="
@@ -24,11 +26,16 @@ define [
       link: (scope, element, attrs) ->
         bodyEl = element.find('.cm-editor-body')
         editor = null
+        cursorPositionManager = null
         autocompleteAdapter = new AutocompleteAdapter(
           scope,
           metadata,
           scope.$root._references
         )
+
+        # Name the scope to be editor. This means that events prefixed with
+        # `editor:` will listened for by the rich text editor
+        scope.name = 'editor'
 
         init = () ->
           editor = new scope.bundle.Editor(
@@ -37,15 +44,19 @@ define [
             autocompleteAdapter,
             getSetting
           )
+          initCursorPosition()
           switchAttachment(scope.sharejsDoc)
           setUpFormattingEventListeners()
 
         switchAttachment = (sharejsDoc, oldSharejsDoc) ->
           return if sharejsDoc == oldSharejsDoc
           if oldSharejsDoc?
+            scope.$broadcast('beforeChangeDocument')
             detachFromCM(oldSharejsDoc)
           if sharejsDoc?
             attachToCM(sharejsDoc)
+          if sharejsDoc? and oldSharejsDoc?
+            scope.$broadcast('afterChangeDocument')
 
         # If doc is changed, switch the CodeMirror/ShareJS attachment
         scope.$watch "sharejsDoc", switchAttachment
@@ -70,12 +81,19 @@ define [
           scope.formattingEvents.off 'numberedList'
           scope.formattingEvents.off 'bulletList'
 
+        # Trigger the event once *only* - this is called after CM is connected
+        # to the ShareJs instance but this event should only be triggered the
+        # first time the editor is opened. Not every time the docs opened
+        triggerEditorInitEvent = _.once () ->
+          scope.$broadcast('editorInit')
+
         attachToCM = (sharejsDoc) ->
           scope.$applyAsync () ->
             editor.openDoc(sharejsDoc.getSnapshot())
             sharejsDoc.attachToCM(editor.getCodeMirror())
             editor.enable()
             sharejsDoc.on "remoteop.richtext", editor.update
+            triggerEditorInitEvent()
             initSpellCheck()
             setUpMetadataEventListener()
 
@@ -116,6 +134,25 @@ define [
           )
           codeMirror.off 'scroll', @spellCheckManager.onScroll
 
+        initCursorPosition = () ->
+          cursorPositionManager = new CursorPositionManager(
+            scope,
+            new CursorPositionAdapter(editor),
+            localStorage
+          )
+          editor.getCodeMirror().on(
+            'cursorActivity',
+            cursorPositionManager.onCursorChange
+          )
+          $(window).on 'unload', cursorPositionManager.onUnload
+
+        tearDownCursorPosition = () ->
+          editor.getCodeMirror().off(
+            'cursorActivity',
+            cursorPositionManager.onCursorChange
+          )
+          $(window).off 'unload', cursorPositionManager.onUnload
+
         setUpMetadataEventListener = () ->
           editor.getCodeMirror().on 'change', autocompleteAdapter.onChange
 
@@ -127,6 +164,7 @@ define [
 
         scope.$on '$destroy', () ->
           tearDownSpellCheck()
+          tearDownCursorPosition()
           tearDownFormattingEventListeners()
           tearDownMetadataEventListener()
           detachFromCM(scope.sharejsDoc)
