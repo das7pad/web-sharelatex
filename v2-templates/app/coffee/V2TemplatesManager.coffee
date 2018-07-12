@@ -137,18 +137,11 @@ module.exports = V2TemplatesManager =
 				href: page_path
 				text: "« First"
 			)
-			if pages.current_page > 2
-				pagination.push(
-					href: page_path
-					rel: "prev"
-					text: "‹ Prev"
-				)
-			else
-				pagination.push(
-					href: page_path
-					rel: "prev"
-					text: "‹ Prev"
-				)
+			pagination.push(
+				href: page_path
+				rel: "prev"
+				text: "‹ Prev"
+			)
 			page_num = Math.max(pages.current_page - pagination_max_pages, 1)
 			if pages.current_page - pagination_max_pages > 1
 				pagination.push(
