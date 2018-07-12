@@ -25,7 +25,8 @@ module.exports = V1LoginHandler =
 				err = new Error("Unexpected status from v1 login api: #{response.statusCode}")
 				callback(err)
 
-	handleAuthSuccess: (email, v1Profile, callback=(err, loginUser)->) ->
+	# nextAction = 'login' || null
+	handleAuthSuccess: (email, v1Profile, callback=(err, nextAction, user)->) ->
 		v1UserId = v1Profile.id
 		@findUserWithEmail email, (err, emailUser) =>
 			return callback(err) if err?
@@ -36,7 +37,7 @@ module.exports = V1LoginHandler =
 					if emailUser._id.toString() == v1User._id.toString()
 						logger.log {email, v1UserId}, "same user record for email and v1 id"
 						# Proceed, log this user in
-						callback(null, emailUser)
+						callback(null, 'login', emailUser)
 					else
 						logger.log {email, v1UserId}, "different user record for email and v1 id"
 						# Refuse?
@@ -54,8 +55,7 @@ module.exports = V1LoginHandler =
 					# Create new User, log in
 					@createUser email, v1Profile, (err, newUser) =>
 						return callback(err) if err?
-						callback(null, newUser)
-						# ???
+						callback(null, 'login', newUser)
 
 	findUserWithEmail: (email, callback=(err, user)->) ->
 		User.findOne {email: email}, {}, callback
