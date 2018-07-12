@@ -16,6 +16,7 @@ module.exports =
 		removeRoute(webRouter, 'get', '/login')
 		webRouter.get '/login', OverleafAuthenticationController.welcomeScreen
 		webRouter.get '/login/v1', V1LoginController.loginPage
+		webRouter.post '/login/v1', V1LoginController.doLogin
 
 		webRouter.get '/overleaf/login', passport.authenticate("overleaf")
 		webRouter.get '/register', (req, res, next) -> res.redirect("/login?#{qs.stringify(req.query)}")

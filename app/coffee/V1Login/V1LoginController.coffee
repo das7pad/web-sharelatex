@@ -1,4 +1,6 @@
 Path = require 'path'
+V1LoginHandler = require './V1LoginHandler'
+logger = require 'logger-sharelatex'
 
 
 module.exports = V1Login =
@@ -14,4 +16,13 @@ module.exports = V1Login =
 			email: req.query.email
 
 	doLogin: (req, res, next) ->
-		return res.status(403).send()
+		email = req.body.email
+		pass = req.body.password
+		V1LoginHandler.authWithV1 email, pass, (err, isValid, profile) ->
+			return next(err) if err?
+			if !isValid
+				logger.log email: email,  "failed login via v1"
+				return res.json message: {type: 'error', text: req.i18n.translate('email_or_password_wrong_try_again')}
+			else
+				logger.log email: email, v1UserId: profile.id, "successful login via v1"
+				return res.json message: {type: 'error', text: req.i18n.translate('ok')}
