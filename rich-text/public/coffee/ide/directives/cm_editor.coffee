@@ -42,7 +42,8 @@ define [
             bodyEl[0],
             new RichTextAdapter(ide.fileTreeManager),
             autocompleteAdapter,
-            getSetting
+            getSetting,
+            triggerSyncToPdf
           )
           initCursorPosition()
           switchAttachment(scope.sharejsDoc)
@@ -152,6 +153,9 @@ define [
             cursorPositionManager.onCursorChange
           )
           $(window).off 'unload', cursorPositionManager.onUnload
+
+        triggerSyncToPdf = () ->
+          cursorPositionManager.onSyncToPdf()
 
         setUpMetadataEventListener = () ->
           editor.getCodeMirror().on 'change', autocompleteAdapter.onChange

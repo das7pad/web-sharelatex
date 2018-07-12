@@ -17,7 +17,13 @@ import HighlightedWordManager from './spell_check/highlighted_word_manager'
 import * as textWrapping from './key_bindings/text_wrapping'
 
 export class Editor {
-  constructor (rootEl, richTextAdapter, autocompleteAdapter, getSetting) {
+  constructor (
+    rootEl,
+    richTextAdapter,
+    autocompleteAdapter,
+    getSetting,
+    triggerSyncToPdf
+  ) {
     CodeMirror.defineMode('latex', () => new LatexMode())
     CodeMirror.defineMIME('application/x-tex', 'latex')
     CodeMirror.defineMIME('application/x-latex', 'latex')
@@ -26,7 +32,7 @@ export class Editor {
       mode: 'latex',
       lineNumbers: true,
       lineWrapping: true,
-      extraKeys: makeKeyBindings(getSetting),
+      extraKeys: makeKeyBindings(getSetting, triggerSyncToPdf),
       hintOptions: {
         hint: makeAutocomplete(autocompleteAdapter, getSetting),
         completeSingle: false
