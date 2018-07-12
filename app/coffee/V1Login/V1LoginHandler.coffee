@@ -33,10 +33,10 @@ module.exports = V1LoginHandler =
 				return callback(err) if err?
 				if emailUser? && v1User?
 					logger.log {email, v1UserId}, "found user records for both email and v1 id"
-					if emailUser._id.toString == v1User._id.toString()
+					if emailUser._id.toString() == v1User._id.toString()
 						logger.log {email, v1UserId}, "same user record for email and v1 id"
 						# Proceed, log this user in
-						return callback(new Error('no'))
+						callback(null, emailUser)
 					else
 						logger.log {email, v1UserId}, "different user record for email and v1 id"
 						# Refuse?
@@ -58,10 +58,10 @@ module.exports = V1LoginHandler =
 						# ???
 
 	findUserWithEmail: (email, callback=(err, user)->) ->
-		User.findOne {email: email}, {_id: 1, email: 1, overleaf: 1}, callback
+		User.findOne {email: email}, {}, callback
 
 	findUserWithV1UserId: (v1UserId, callback=(err, user)->) ->
-		User.findOne {'overleaf.id': v1UserId}, {_id: 1, email: 1, overleaf: 1}, callback
+		User.findOne {'overleaf.id': v1UserId}, {}, callback
 
 	createUser: (email, v1Profile, callback=(err, newUser)->) ->
 		newUserSpec = {
