@@ -1,9 +1,6 @@
 /* global _ */
 
 import CodeMirror from 'codemirror'
-import 'codemirror/addon/dialog/dialog'
-import 'codemirror/addon/search/searchcursor'
-import 'codemirror/addon/search/search'
 
 import { mac } from '../utils/browser'
 import { wrapBold, wrapItalic } from './text_wrapping'
