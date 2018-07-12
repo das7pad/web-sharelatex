@@ -45,7 +45,7 @@ module.exports = PageController =
 			# clientType determines which API to use.
 			# client is for published data
 			# clientPreview is for unpublished data
-			clientType = if req.query.preview == '' then 'clientPreview' else 'client'
+			clientType = if req.query.preview || req.query.preview == '' then 'clientPreview' else 'client'
 
 			# include is for the depth of the query, for linked data
 			cmsQuery = {

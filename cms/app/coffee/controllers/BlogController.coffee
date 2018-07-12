@@ -51,7 +51,7 @@ getAndRenderBlog = (req, res, next, blogQuery, page) ->
 	# clientType determines which API to use.
 	# client is for published data
 	# clientPreview is for unpublished data
-	clientType = if req.query.preview == '' then 'clientPreview' else 'client'
+	clientType = if req.query.preview || req.query.preview == '' then 'clientPreview' else 'client'
 
 	ContentfulClient[clientType].getEntries(blogQuery)
 		.then (collection) ->
