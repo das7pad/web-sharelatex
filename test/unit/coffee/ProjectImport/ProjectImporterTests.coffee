@@ -16,13 +16,14 @@ describe "ProjectImporter", ->
 			"../../../../../app/js/Features/Project/ProjectEntityUpdateHandler": @ProjectEntityUpdateHandler = {}
 			"../../../../../app/js/Features/Project/ProjectDeleter": @ProjectDeleter = {}
 			"../../../../../app/js/models/ProjectInvite": ProjectInvite: @ProjectInvite = {}
-			"../OverleafUsers/UserMapper": @UserMapper = {}
 			"../../../../../app/js/Features/Collaborators/CollaboratorsHandler": @CollaboratorsHandler = {}
 			"../../../../../app/js/Features/Authorization/PrivilegeLevels": PrivilegeLevels
 			"../../../../../app/js/Features/User/UserGetter": @UserGetter = {}
-			"../request": @request = {}
+			"../V1SharelatexApi": @V1SharelatexApi = {}
+			"../OverleafUsers/UserMapper": @UserMapper = {}
 			"logger-sharelatex": { log: sinon.stub(), warn: sinon.stub(), err: sinon.stub() }
 			"metrics-sharelatex": { inc: sinon.stub() }
+			"request": @request = {}
 			"settings-sharelatex": @settings =
 				overleaf:
 					host: "http://overleaf.example.com"
@@ -142,8 +143,6 @@ describe "ProjectImporter", ->
 					publicAccesLevel: 'tokenBased'
 					compiler: "latex"
 
-				console.log 'expected', [@user_id, @doc.title, attributes]
-				console.log 'actual', @ProjectCreationHandler.createBlankProject.args[0].slice(0,-1)
 				@ProjectCreationHandler.createBlankProject
 					.calledWith(@user_id, @doc.title, attributes)
 					.should.equal true
@@ -218,14 +217,14 @@ describe "ProjectImporter", ->
 
 	describe "_startExport", ->
 		beforeEach ->
-			@request.post = sinon.stub().yields(null, {}, @doc = { "mock": "doc" })
+			@V1SharelatexApi.request = sinon.stub().yields(null, {}, @doc = { "mock": "doc" })
 			@ProjectImporter._startExport @v1_project_id, @v1_user_id, @callback
 
-		it "should make an request for the doc", ->
-			@request.post
+		it "should make a request for the doc", ->
+			@V1SharelatexApi.request
 				.calledWith({
+					method: "POST"
 					url: "http://overleaf.example.com/api/v1/sharelatex/users/#{@v1_user_id}/docs/#{@v1_project_id}/export/start"
-					json: true
 				})
 				.should.equal true
 
@@ -674,12 +673,13 @@ describe "ProjectImporter", ->
 
 	describe "_confirmExport", ->
 		beforeEach ->
-			@request.post = sinon.stub().yields(null, statusCode: 200)
+			@V1SharelatexApi.request = sinon.stub().yields()
 			@ProjectImporter._confirmExport @v1_project_id, @v2_project_id, @v1_user_id, @callback
 
-		it "should make an request for the doc", ->
-			@request.post
+		it "should make a request for the doc", ->
+			@V1SharelatexApi.request
 				.calledWith({
+					method: "POST"
 					url: "http://overleaf.example.com/api/v1/sharelatex/users/#{@v1_user_id}/docs/#{@v1_project_id}/export/confirm"
 					json: {
 						doc: { @v2_project_id }
@@ -692,12 +692,13 @@ describe "ProjectImporter", ->
 
 	describe "_cancelExport", ->
 		beforeEach ->
-			@request.post = sinon.stub().yields(null, statusCode: 200)
+			@V1SharelatexApi.request = sinon.stub().yields()
 			@ProjectImporter._cancelExport @v1_project_id, @v1_user_id, @callback
 
-		it "should make an request for the doc", ->
-			@request.post
+		it "should make a request for the doc", ->
+			@V1SharelatexApi.request
 				.calledWith({
+					method: "POST"
 					url: "http://overleaf.example.com/api/v1/sharelatex/users/#{@v1_user_id}/docs/#{@v1_project_id}/export/cancel"
 				})
 				.should.equal true

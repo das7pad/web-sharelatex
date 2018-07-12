@@ -13,9 +13,9 @@ describe "ProjectListGetter", ->
 				overleaf:
 					host: 'http://overleaf.example.com'
 			'logger-sharelatex': { log: sinon.stub() }
-			"../request": @request = {}
 			'../../../../../app/js/Features/Errors/Errors': Errors
 			"../../../../../app/js/Features/User/UserGetter": @UserGetter = {}
+			"../V1SharelatexApi": @V1SharelatexApi = {}
 		@v1_user_id = 'mock-v1-id'
 		@v2_user_id = 'mock-v2-id'
 		@callback = sinon.stub()
@@ -23,7 +23,7 @@ describe "ProjectListGetter", ->
 	describe 'findAllUsersProjects', ->
 		beforeEach ->
 			@UserGetter.getUser = sinon.stub().yields(null, overleaf: id: @v1_user_id)
-			@request.get = sinon.stub().yields(null, {statusCode: 200}, @list = {
+			@V1SharelatexApi.request = sinon.stub().yields(null, {statusCode: 200}, @list = {
 				"projects": [{
 					id: '123MockOLId'
 					title: 'Mock OL title'
@@ -43,11 +43,11 @@ describe "ProjectListGetter", ->
 				.calledWith(@v2_user_id)
 				.should.equal true
 
-		it 'should make an request for the project list', ->
-			@request.get
+		it 'should make a request for the project list', ->
+			@V1SharelatexApi.request
 				.calledWith({
+					method: "GET"
 					url: "http://overleaf.example.com/api/v1/sharelatex/users/#{@v1_user_id}/docs"
-					json: true
 					qs:
 						per: 1000
 						exclude_v2_projects: true
@@ -63,7 +63,7 @@ describe "ProjectListGetter", ->
 
 		describe 'with large number of V1 projects', ->
 			beforeEach ->
-				@request.get = sinon.stub().yields(null, {statusCode: 200}, @list = {
+				@V1SharelatexApi.request = sinon.stub().yields(null, {statusCode: 200}, @list = {
 					"projects": [{
 						id: '123MockOLId'
 						title: 'Mock OL title'

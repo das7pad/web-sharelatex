@@ -3,6 +3,7 @@ SandboxedModule = require('sandboxed-module')
 assert = require('assert')
 path = require('path')
 modulePath = path.join __dirname, '../../../../app/js/TeamImport/TeamImporter'
+{ObjectId} = require("../../../../../../app/js/infrastructure/mongojs")
 sinon = require("sinon")
 expect = require("chai").expect
 
@@ -78,9 +79,12 @@ describe "TeamImporter", ->
 			importInvite: sinon.stub().yields(null)
 		}
 
-		@Subscription = (data) ->
-			data.save = (callback) ->
-				data.id = 'v2 id'
+		@subscriptionId = new ObjectId('507f191e810c19729de860ea')
+
+		@Subscription = (data) =>
+			data.save = (callback) =>
+				data.id  = @subscriptionId.toString()
+				data._id = @subscriptionId
 				data.admin_id = 'v2 team admin id'
 				callback(null, data, data)
 
@@ -118,7 +122,7 @@ describe "TeamImporter", ->
 		it "creates a new team", (done) ->
 			@TeamImporter.getOrImportTeam @v1Team, (err, v2Team) =>
 				expect(err).to.not.exist
-				expect(v2Team.id).to.eq 'v2 id'
+				expect(v2Team._id).to.eq @subscriptionId
 
 				@UserMapper.getSlIdFromOlUser.calledWith(
 					sinon.match.has("id", @v1Team.owner.id)
@@ -127,7 +131,7 @@ describe "TeamImporter", ->
 				@SubscriptionLocator.getGroupWithV1Id.calledWith(@v1Team.id).should.equal true
 				@SubscriptionLocator.getUsersSubscription.calledWith(@teamAdmin.id).should.equal true
 
-				@SubscriptionUpdater.addUsersToGroup.calledWith(@teamAdmin.id,
+				@SubscriptionUpdater.addUsersToGroup.calledWith(@subscriptionId,
 					['v2 team admin id', 'v2 team member id']).should.equal true
 
 				@TeamInvitesHandler.importInvite.calledOnce.should.equal true

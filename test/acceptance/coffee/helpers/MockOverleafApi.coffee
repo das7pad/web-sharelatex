@@ -39,6 +39,9 @@ module.exports = MockOverleafApi =
 		app.post "/api/v1/sharelatex/users/:v1_user_id/sync", (req, res, next) =>
 			res.sendStatus 200
 
+		app.get "/api/v2/users/:userId/affiliations", (req, res, next) =>
+			res.json []
+
 		app.listen 5000, (error) ->
 			throw error if error?
 		.on "error", (error) ->

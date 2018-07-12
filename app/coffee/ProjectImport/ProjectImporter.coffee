@@ -6,9 +6,10 @@ uuid = require "uuid"
 _ = require "underscore"
 async = require "async"
 fs = require "fs"
-request = require "../request"
+request = require "request"
 
 UserMapper = require "../OverleafUsers/UserMapper"
+V1SharelatexApi = require "../V1SharelatexApi"
 
 ProjectCreationHandler = require "../../../../../app/js/Features/Project/ProjectCreationHandler"
 ProjectEntityUpdateHandler = require "../../../../../app/js/Features/Project/ProjectEntityUpdateHandler"
@@ -101,15 +102,11 @@ module.exports = ProjectImporter =
 				callback(null, v2_project_id)
 
 	_startExport: (v1_project_id, v1_user_id, callback = (error, doc) ->) ->
-		request.post {
+		V1SharelatexApi.request {
+			method: 'POST'
 			url: "#{settings.overleaf.host}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/start"
-			json: true
 		}, (error, res, doc) ->
 			return callback(error) if error?
-			if res.statusCode < 200 || res.statusCode >= 300
-				err = new Error("non-success code from overleaf: #{res.statusCode}")
-				err.statusCode = res.statusCode
-				return callback(err)
 			logger.log {v1_project_id, v1_user_id, doc}, "got doc for project from overleaf"
 			return callback(null, doc)
 
@@ -327,15 +324,14 @@ module.exports = ProjectImporter =
 		ProjectImporter._checkV1HistoryExportStatus v1_project_id, v1_user_id, 0, callback
 
 	_checkV1HistoryExportStatus: (v1_project_id, v1_user_id, requestCount, callback = (error) ->) ->
-		request.get {
+		V1SharelatexApi.request {
+			method: 'GET'
 			url: "#{settings.overleaf.host}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/history"
-			json: true
 		}, (error, res, status) ->
-			if res.statusCode < 200 || res.statusCode >= 300
-				error = new Error("non-success code from overleaf: #{res.statusCode}")
-				error.statusCode = res.statusCode
-			else if !status?.exported
-				error = new V1HistoryNotSyncedError('v1 history not synced')
+			return callback(error) if error?
+
+			if !status?.exported
+				error ?= new V1HistoryNotSyncedError('v1 history not synced')
 
 			if error?
 				logger.log {v1_project_id, v1_user_id, requestCount, error}, "error checking v1 history sync"
@@ -350,31 +346,24 @@ module.exports = ProjectImporter =
 			else
 				callback(null)
 
-
 	_confirmExport: (v1_project_id, v2_project_id, v1_user_id, callback = (error) ->) ->
-		request.post {
+		V1SharelatexApi.request {
+			method: 'POST'
 			url: "#{settings.overleaf.host}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/confirm"
 			json:
 				doc: { v2_project_id }
 		}, (error, res) ->
 			if error?
 				callback(error)
-			else if res.statusCode < 200 || res.statusCode >= 300
-				err = new Error("non-success code from overleaf: #{res.statusCode}")
-				err.statusCode = res.statusCode
-				callback(err)
 			else
 				callback()
 
 	_cancelExport: (v1_project_id, v1_user_id, callback = (error) ->) ->
-		request.post {
+		V1SharelatexApi.request {
+			method: 'POST'
 			url: "#{settings.overleaf.host}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/cancel"
 		}, (error, res) ->
 			if error?
 				callback(error)
-			else if res.statusCode < 200 || res.statusCode >= 300
-				err = new Error("non-success code from overleaf: #{res.statusCode}")
-				err.statusCode = res.statusCode
-				callback(err)
 			else
 				callback()
