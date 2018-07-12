@@ -1,6 +1,7 @@
 Path = require 'path'
 V1LoginHandler = require './V1LoginHandler'
 logger = require 'logger-sharelatex'
+AuthenticationController = require "../../../../../app/js/Features/Authentication/AuthenticationController"
 
 
 module.exports = V1Login =
@@ -22,7 +23,21 @@ module.exports = V1Login =
 			return next(err) if err?
 			if !isValid
 				logger.log email: email,  "failed login via v1"
+				AuthenticationController._recordFailedLogin()
 				return res.json message: {type: 'error', text: req.i18n.translate('email_or_password_wrong_try_again')}
 			else
 				logger.log email: email, v1UserId: profile.id, "successful login via v1"
-				return res.json message: {type: 'error', text: req.i18n.translate('ok')}
+				V1LoginHandler.handleAuthSuccess email, profile, (err, loginUser) ->
+					return next(err) if err?
+					if !loginUser
+						logger.err email: email, v1UserId: profile.id, "Cannot proceed with v1 login"
+						AuthenticationController._recordFailedLogin()
+						return res.json message: {type: 'error', text: req.i18n.translate('login_failed')}
+					AuthenticationController._loginAsyncHandlers(req, email, loginUser)
+					redir = AuthenticationController._getRedirectFromSession(req) || "/project"
+					AuthenticationController.afterLoginSessionSetup req, loginUser, (err) ->
+						if err?
+							return next(err)
+						AuthenticationController._clearRedirectFromSession(req)
+						res.json {redir: redir}
+
