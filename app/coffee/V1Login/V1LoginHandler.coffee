@@ -32,6 +32,8 @@ module.exports = V1LoginHandler =
 			return callback(err) if err?
 			@findUserWithV1UserId v1Profile.id, (err, v1User) =>
 				return callback(err) if err?
+
+				# Have records matching both email and v1Id in the database
 				if emailUser? && v1User?
 					logger.log {email, v1UserId}, "found user records for both email and v1 id"
 					if emailUser._id.toString() == v1User._id.toString()
@@ -40,16 +42,25 @@ module.exports = V1LoginHandler =
 						callback(null, 'login', emailUser)
 					else
 						logger.log {email, v1UserId}, "different user record for email and v1 id"
-						# Refuse?
 						return callback(new Error('no'))
+
+				# Match for only email
 				else if emailUser?
-					logger.log {email, v1UserId}, "found user record email"
+					logger.log {email, v1UserId}, "found user record for email"
+					if emailUser?.overleaf?.id?
+						# Matches an email address which is linked to another v1 user account
+						logger.log {email, v1UserId, otherV1UserId: emailUser.overleaf.id},
+							"email is in use on account linked to another v1 user"
 					# Refuse?
 					return callback(new Error('no'))
+
+				# Match for only v1Id
 				else if v1User?
 					logger.log {email, v1UserId}, "found user record for v1 id"
 					# Refuse?
 					return callback(new Error('no'))
+
+				# No matches in database
 				else
 					logger.log {email, v1UserId}, "did not find existing user record"
 					# Create new User, log in
