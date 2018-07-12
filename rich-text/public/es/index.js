@@ -1,5 +1,6 @@
 import CodeMirror, { Doc } from 'codemirror'
 import 'codemirror/addon/hint/show-hint'
+import 'codemirror/addon/comment/comment'
 
 import LatexMode from './latex_mode/latex_mode'
 import RichText from './rich_text/rich_text'
