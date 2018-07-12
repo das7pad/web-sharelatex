@@ -26,7 +26,7 @@ export default class EmisExport extends Component {
           this.pollExportStatus(
             resp.export_v1_id,
             projectId,
-            this.pollExportStatus,
+            this,
             1000
           )
         },
@@ -39,7 +39,7 @@ export default class EmisExport extends Component {
     }
   }
 
-  pollExportStatus (exportId, projectId, recursion, timeout) {
+  pollExportStatus (exportId, projectId, _this, timeout) {
     var link = `/project/${projectId}/export/${exportId}`
     $.ajax({
       url: link,
@@ -47,23 +47,23 @@ export default class EmisExport extends Component {
       success: (resp) => {
         const status = resp.export_json
         if (status.status_summary === 'failed') {
-          this.setState({
+          _this.setState({
             exportState: 'error',
             errorDetails: status.status_detail
           })
         } else if (status.status_summary === 'succeeded') {
-          this.setState({ exportState: 'complete' })
+          _this.setState({ exportState: 'complete' })
         } else {
           setTimeout(function () {
             if (timeout < 10000) {
               timeout = timeout + 1000
             }
-            recursion(exportId, projectId, recursion, timeout)
+            _this.pollExportStatus(exportId, projectId, _this, timeout)
           }, timeout)
         }
       },
       error: (resp) => {
-        this.setState({ exportState: 'error' })
+        _this.setState({ exportState: 'error' })
       }
     })
   }
