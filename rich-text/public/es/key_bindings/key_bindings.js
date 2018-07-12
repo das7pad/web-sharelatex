@@ -17,6 +17,10 @@ const SPACE_KEY = 32
 const COMMA_KEY = 188
 
 export function makeKeyBindings (getSetting) {
+  // Override CM save command to be a no-op. No sense in bringing up the
+  // browser's save dialog
+  CodeMirror.commands.save = function () {}
+
   return Object.assign({}, {
     'Backspace': handleBackspace,
     'Delete': handleDelete,
