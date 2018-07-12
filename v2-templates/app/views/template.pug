@@ -6,24 +6,26 @@ block content
 		.container
 			.row
 				.col-md-6
-					h1!= pub.title
+					h1 #{pub.title}
 					.row
 						.col-md-3 Author
+						//- sanitized by api
 						.col-md-9!= pub.author
 					if pub.read_only_views
 						.row
 							.col-md-3 View Count
-							.col-md-9!= pub.read_only_views
+							.col-md-9 #{pub.read_only_views}
 					.row
 						.col-md-3 License
 						.col-md-9 #{pub.license}
 					.row
 						.col-md-6
 							if open_in_v2_links
-								a(href!=open_in_v2_links.main.v2) Open as Template
+								a(href=open_in_v2_links.main.v2) Open as Template
 						.col-md-6
 					.row
 						.col-md-3 Abstract
+						//- sanitized by api
 						.col-md-9!= pub.description
 					if pub_tags.length
 						.row
@@ -44,15 +46,17 @@ block content
 			each old_version in old_versions
 				.row
 					.col-md-6
-						h3!= old_version.title
+						h3 #{old_version.title}
 						.row
 							.col-md-3 Author
+							//- sanitized by api
 							.col-md-9!= old_version.author
 						.row
 							.col-md-3 License
 							.col-md-9 #{old_version.license}
 						.row
 							.col-md-3 Abstract
+							//- sanitized by api
 							.col-md-9!= old_version.description
 					.col-md-6
 						if old_version.open_link

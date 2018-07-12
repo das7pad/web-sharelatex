@@ -3,8 +3,6 @@ _ = require "lodash"
 request = require "request"
 settings = require "settings-sharelatex"
 
-overleafHost = settings.apis.v1.url
-
 content_types =
 	article:
 		item_name: "Article"
@@ -35,44 +33,79 @@ content_types =
 		tagged_title: "Templates"
 		title: "Templates - Journals, CVs, Presentations, Reports and More"
 
+pagination_max_pages = 4
+
 module.exports = V2TemplatesManager =
 
-	formatDocPath: (doc) ->
+	getPage: (content_type_name, callback) ->
+		content_type = content_types[content_type_name]
+		return callback new Error "invalid content_type_name" if !content_type?
+		V2TemplatesManager._get content_type.path, (err, page) ->
+			return callback err if err
+			V2TemplatesManager._formatIndexData page, content_type.path, content_type.path
+			Object.assign page, content_type
+			callback null, page
+
+	getPagePaginated: (content_type_name, segment, page_num, callback) ->
+		content_type = content_types[content_type_name]
+		return callback new Error "invalid content_type_name" if !content_type?
+		V2TemplatesManager._get "#{content_type.path}/#{segment}/page/#{page_num}", (err, page) ->
+			return callback err if err
+			V2TemplatesManager._formatIndexData page, content_type.path, content_type.path
+			Object.assign page, content_type
+			page.hide_segment_title = true
+			page.page_title = "#{content_type.tagged_title} — #{_.capitalize segment}"
+			callback null, page
+
+	getPageTagged: (content_type_name, tag_name, page_num, callback) ->
+		content_type = content_types[content_type_name]
+		return callback new Error "invalid content_type_name" if !content_type?
+		page_path = "#{content_type.path}/tagged/#{tag_name}"
+		V2TemplatesManager._get "#{page_path}/page/#{page_num}", (err, page) ->
+			return callback err if err
+			V2TemplatesManager._formatIndexData page, content_type.path, page_path
+			Object.assign page, content_type
+			page.tag = page.tags[0]
+			page.page_title = "#{page.tagged_title} — #{page.tag.title}"
+			page.summary = page.tag.top_html
+			callback null, page
+
+	getTemplate: (slug, read_token, callback) ->
+		V2TemplatesManager._get "/latex/templates/#{slug}/#{read_token}", (err, page) ->
+			return callback err if err
+			content_type = content_types[page.pub.kind]
+			return callback new Error "invalid page.kind" if !content_type
+			V2TemplatesManager._formatTemplateData page, content_type
+			callback null, page
+
+	_formatDocPath: (doc) ->
 		if doc.kind == "article"
 			doc.path = "/articles/#{doc.slug}/#{doc.read_token}"
 		else
 			doc.path = "/latex/#{doc.kind}s/#{doc.slug}/#{doc.read_token}"
 
-	formatIndexData: (page, base_path, page_path) ->
-		if page.popular_docs
-			for idx, doc of page.popular_docs
-				doc.path = V2TemplatesManager.formatDocPath doc
-			if page.popular_docs_pages?.total_pages > 1
-				page.popular_docs_pagination = V2TemplatesManager.paginate page.popular_docs_pages, "#{page_path}/popular"
-		if page.recent_docs
-			for idx, doc of page.recent_docs
-				doc.path = V2TemplatesManager.formatDocPath doc
-			if page.recent_docs_pages?.total_pages > 1
-				page.recent_docs_pagination = V2TemplatesManager.paginate page.recent_docs_pages, "#{page_path}/recent"
-		if page.tagged_docs
-			for idx, doc of page.tagged_docs
-				doc.path = V2TemplatesManager.formatDocPath doc
-			if page.tagged_docs_pages?.total_pages > 1
-				page.tagged_docs_pagination = V2TemplatesManager.paginate page.tagged_docs_pages, "#{page_path}"
-		if page.tags
-			for idx, tag of page.tags
-				tag.path = "#{base_path}/tagged/#{tag.name}"
-		if page.related_tags
-			for idx, tag of page.related_tags
-				tag.path = "#{base_path}/tagged/#{tag.name}"
+	_formatDocsData: (page, docs_property, page_path) ->
+		return unless page["#{docs_property}_docs"]
+		for doc in page["#{docs_property}_docs"]
+			doc.path = V2TemplatesManager._formatDocPath doc
+		if page["#{docs_property}_docs_pages"]?.total_pages > 1
+			if docs_property == "popular" or docs_property == "recent"
+				page_path = "#{page_path}/#{docs_property}"
+			page["#{docs_property}_docs_pagination"] = V2TemplatesManager._paginate page["#{docs_property}_docs_pages"], page_path
 
-	formatTemplateData: (page, content_type) ->
-		page.pub.author_text = page.pub.author.replace(/<[^>]+>/g, '')
-		page.pub.description_text = page.pub.description.replace(/<[^>]+>/g, '')
-		page.meta = _.truncate(page.pub.description_text,
-			length: 160
-			omission: '...'
-		)
+	_formatIndexData: (page, base_path, page_path) ->
+		for docs_property in ["popular", "recent", "tagged"]
+			V2TemplatesManager._formatDocsData(page, docs_property, page_path)
+		for tags_property in ["tags", "related_tags"]
+			V2TemplatesManager._formatTagsData(page, tags_property, base_path)
+
+	_formatTagsData: (page, tags_property, base_path) ->
+		return unless page[tags_property]
+		for tag in page[tags_property]
+			tag.path = "#{base_path}/tagged/#{tag.name}"
+
+	_formatTemplateData: (page, content_type) ->
+		page.meta = page.pub.meta_description
 		page.title = page.pub.title
 		page.find_more =
 			href: content_type.path
@@ -84,12 +117,12 @@ module.exports = V2TemplatesManager =
 			for idx, old_version of page.old_versions
 				old_version.open_link = page.open_in_v2_links?[old_version.id]?.v2
 
-	get: (url, callback) ->
+	_get: (url, callback) ->
 		httpRequest =
 			headers:
 				Accept: "application/json"
 			json: true
-			uri: overleafHost+url
+			uri: settings.apis.v1.url+url
 
 		request httpRequest, (err, httpResponse) ->
 			if err?
@@ -97,48 +130,7 @@ module.exports = V2TemplatesManager =
 			else
 				callback null, httpResponse.body
 
-	getPage: (content_type_name, callback) ->
-		content_type = content_types[content_type_name]
-		return callback new Error "invalid content_type_name" if !content_type
-		V2TemplatesManager.get content_type.path, (err, page) ->
-			return callback err if err
-			V2TemplatesManager.formatIndexData page, content_type.path, content_type.path
-			Object.assign page, content_type
-			callback null, page
-
-	getPagePaginated: (content_type_name, segment, page_num, callback) ->
-		content_type = content_types[content_type_name]
-		return callback new Error "invalid content_type_name" if !content_type
-		V2TemplatesManager.get "#{content_type.path}/#{segment}/page/#{page_num}", (err, page) ->
-			return callback err if err
-			V2TemplatesManager.formatIndexData page, content_type.path, content_type.path
-			Object.assign page, content_type
-			page.hide_segment_title = true
-			page.page_title = "#{content_type.tagged_title} — #{_.capitalize segment}"
-			callback null, page
-
-	getPageTagged: (content_type_name, tag_name, page_num, callback) ->
-		content_type = content_types[content_type_name]
-		return callback new Error "invalid content_type_name" if !content_type
-		page_path = "#{content_type.path}/tagged/#{tag_name}"
-		V2TemplatesManager.get "#{page_path}/page/#{page_num}", (err, page) ->
-			return callback err if err
-			V2TemplatesManager.formatIndexData page, content_type.path, page_path
-			Object.assign page, content_type
-			page.tag = page.tags[0]
-			page.page_title = "#{page.tagged_title} — #{page.tag.title}"
-			page.summary = page.tag.top_html
-			callback null, page
-
-	getTemplate: (slug, read_token, callback) ->
-		V2TemplatesManager.get "/latex/templates/"+slug+"/"+read_token, (err, page) ->
-			return callback err if err
-			content_type = content_types[page.pub.kind]
-			return callback new Error "invalid page.kind" if !content_type
-			V2TemplatesManager.formatTemplateData page, content_type
-			callback null, page
-
-	paginate: (pages, page_path) ->
+	_paginate: (pages, page_path) ->
 		pagination = []
 		if pages.current_page > 1
 			pagination.push(
@@ -157,8 +149,8 @@ module.exports = V2TemplatesManager =
 					rel: "prev"
 					text: "‹ Prev"
 				)
-			page_num = Math.max(pages.current_page - 4, 1)
-			if pages.current_page - 4 > 1
+			page_num = Math.max(pages.current_page - pagination_max_pages, 1)
+			if pages.current_page - pagination_max_pages > 1
 				pagination.push(
 					text: "…"
 				)
@@ -176,7 +168,7 @@ module.exports = V2TemplatesManager =
 
 		if pages.current_page < pages.total_pages
 			page_num = 1
-			while page_num < 5 and pages.current_page + page_num <= pages.total_pages
+			while page_num <= pagination_max_pages and pages.current_page + page_num <= pages.total_pages
 				pagination.push(
 					href: "#{page_path}/page/#{pages.current_page + page_num}"
 					text: "#{pages.current_page + page_num}"
