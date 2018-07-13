@@ -21,6 +21,7 @@ define [
         fontSize: "="
         lineHeight: "="
         docId: "="
+        onSave: "="
       }
 
       link: (scope, element, attrs) ->
@@ -32,6 +33,10 @@ define [
           metadata,
           scope.$root._references
         )
+        keyBindingsAdapter = {
+          triggerRecompile: scope.onSave
+          triggerSyncToPdf: triggerSyncToPdf
+        }
 
         # Name the scope to be editor. This means that events prefixed with
         # `editor:` will listened for by the rich text editor
@@ -42,8 +47,8 @@ define [
             bodyEl[0],
             new RichTextAdapter(ide.fileTreeManager),
             autocompleteAdapter,
-            getSetting,
-            triggerSyncToPdf
+            keyBindingsAdapter,
+            getSetting
           )
           initCursorPosition()
           switchAttachment(scope.sharejsDoc)

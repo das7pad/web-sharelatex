@@ -21,8 +21,8 @@ export class Editor {
     rootEl,
     richTextAdapter,
     autocompleteAdapter,
-    getSetting,
-    triggerSyncToPdf
+    keyBindingsAdapter,
+    getSetting
   ) {
     CodeMirror.defineMode('latex', () => new LatexMode())
     CodeMirror.defineMIME('application/x-tex', 'latex')
@@ -32,7 +32,7 @@ export class Editor {
       mode: 'latex',
       lineNumbers: true,
       lineWrapping: true,
-      extraKeys: makeKeyBindings(getSetting, triggerSyncToPdf),
+      extraKeys: makeKeyBindings(getSetting, keyBindingsAdapter),
       hintOptions: {
         hint: makeAutocomplete(autocompleteAdapter, getSetting),
         completeSingle: false
