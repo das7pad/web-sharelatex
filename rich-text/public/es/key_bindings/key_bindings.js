@@ -33,7 +33,9 @@ export function makeKeyBindings (getSetting, keyBindingsAdapter) {
     [`${modifierKey}-G`]: 'findPersistentNext',
     [`Shift-${modifierKey}-G`]: 'findPersistentPrev',
     'Ctrl-Space': 'autocomplete',
-    'Ctrl-,': keyBindingsAdapter.triggerSyncToPdf
+    'Ctrl-,': keyBindingsAdapter.triggerSyncToPdf,
+    'Ctrl-.': keyBindingsAdapter.triggerRecompile,
+    [`${modifierKey}-Enter`]: keyBindingsAdapter.triggerRecompile
   }, makeAutoCloseCharHandlers(getSetting))
 }
 
