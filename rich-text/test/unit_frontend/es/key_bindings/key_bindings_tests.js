@@ -24,6 +24,7 @@ describe('Key bindings', function () {
       html.querySelector('#cm'),
       {},
       autocompleteAdapterStub,
+      {},
       this.getSetting
     )
     this.editor.enable()
