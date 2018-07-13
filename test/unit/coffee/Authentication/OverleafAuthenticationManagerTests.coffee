@@ -53,7 +53,7 @@ describe "OverleafAuthenticationManager", ->
 				error = @callback.args[0][0]
 				error.message.should.equal "non-success code from overleaf: 404"
 
-	describe "setupUser", ->
+	describe "setupOAuthUser", ->
 		beforeEach ->
 			@User.findOne = sinon.stub()
 			@user =
@@ -69,34 +69,29 @@ describe "OverleafAuthenticationManager", ->
 		describe "with no OL or SL user in the system", ->
 			beforeEach ->
 				@User.findOne.yields(null, null)
-				@OverleafAuthenticationManager.setupUser(@accessToken, @refreshToken, @profile, @callback)
+				@OverleafAuthenticationManager.setupOAuthUser(@accessToken, @refreshToken, @profile, @callback)
 
 			it "should create a user", ->
 				@UserMapper.createSlUser
-					.calledWith(@profile, @accessToken, @refreshToken)
+					.calledWith(@profile, undefined, undefined)
 					.should.equal true
 
 			it "should return the user", ->
 				@callback.calledWith(null, @user).should.equal true
-			
+
 		describe "with an existing user for this OL account", ->
 			beforeEach ->
 				@User.findOne.withArgs("overleaf.id": @profile.id).yields(null, @user)
-				@OverleafAuthenticationManager.setupUser(@accessToken, @refreshToken, @profile, @callback)
+				@OverleafAuthenticationManager.setupOAuthUser(@accessToken, @refreshToken, @profile, @callback)
 
-			it "should refresh the tokens on the user", ->
-				@user.overleaf.refreshToken.should.equal @refreshToken
-				@user.overleaf.accessToken.should.equal @accessToken
-				@user.save.called.should.equal true
-			
 			it "should return the user", ->
 				@callback.calledWith(null, @user).should.equal true
-		
+
 		describe "with a conflicting email in SL", ->
 			beforeEach ->
 				@User.findOne.withArgs("overleaf.id": @profile.id).yields(null, null)
 				@User.findOne.withArgs("email": "joe@example.com").yields(null, @user)
-				@OverleafAuthenticationManager.setupUser(@accessToken, @refreshToken, @profile, @callback)
+				@OverleafAuthenticationManager.setupOAuthUser(@accessToken, @refreshToken, @profile, @callback)
 
 			it "should not create a new user", ->
 				@UserMapper.createSlUser.called.should.equal false
@@ -105,7 +100,7 @@ describe "OverleafAuthenticationManager", ->
 				@callback
 					.calledWith(null, null, {
 						email_exists_in_sl: true
-						@profile, @accessToken, @refreshToken,
+						@profile,
 						user_id: @user._id
 					})
 					.should.equal true
