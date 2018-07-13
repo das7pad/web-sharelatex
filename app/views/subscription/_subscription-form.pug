@@ -2,11 +2,7 @@ tr
 	td
 		label(for="admin_id") Admin User ID
 	td
-		input#admin_id.form-control(
-			name='admin_id',
-			ng-model="subscription.admin_id"
-		)
-		a(ng-href="/admin/user/{{ subscription.admin_id }}", target="_blank") Goto user
+		a(href="/admin/user/" + subscription.admin_id)= subscription.admin_id
 
 tr
 	td
