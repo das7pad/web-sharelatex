@@ -1,5 +1,9 @@
 import CodeMirror, { Doc } from 'codemirror'
 import 'codemirror/addon/hint/show-hint'
+import 'codemirror/addon/comment/comment'
+import 'codemirror/addon/dialog/dialog'
+import 'codemirror/addon/search/searchcursor'
+import 'codemirror/addon/search/search'
 
 import LatexMode from './latex_mode/latex_mode'
 import RichText from './rich_text/rich_text'
@@ -13,7 +17,13 @@ import HighlightedWordManager from './spell_check/highlighted_word_manager'
 import * as textWrapping from './key_bindings/text_wrapping'
 
 export class Editor {
-  constructor (rootEl, richTextAdapter, autocompleteAdapter, getSetting) {
+  constructor (
+    rootEl,
+    richTextAdapter,
+    autocompleteAdapter,
+    getSetting,
+    triggerSyncToPdf
+  ) {
     CodeMirror.defineMode('latex', () => new LatexMode())
     CodeMirror.defineMIME('application/x-tex', 'latex')
     CodeMirror.defineMIME('application/x-latex', 'latex')
@@ -22,7 +32,7 @@ export class Editor {
       mode: 'latex',
       lineNumbers: true,
       lineWrapping: true,
-      extraKeys: makeKeyBindings(getSetting),
+      extraKeys: makeKeyBindings(getSetting, triggerSyncToPdf),
       hintOptions: {
         hint: makeAutocomplete(autocompleteAdapter, getSetting),
         completeSingle: false

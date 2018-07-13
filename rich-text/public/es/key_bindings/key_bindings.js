@@ -1,9 +1,6 @@
 /* global _ */
 
 import CodeMirror from 'codemirror'
-import 'codemirror/addon/dialog/dialog'
-import 'codemirror/addon/search/searchcursor'
-import 'codemirror/addon/search/search'
 
 import { mac } from '../utils/browser'
 import { wrapBold, wrapItalic } from './text_wrapping'
@@ -16,7 +13,11 @@ const BACKSPACE_KEY = 8
 const SPACE_KEY = 32
 const COMMA_KEY = 188
 
-export function makeKeyBindings (getSetting) {
+export function makeKeyBindings (getSetting, triggerSyncToPdf) {
+  // Override CM save command to be a no-op. No sense in bringing up the
+  // browser's save dialog
+  CodeMirror.commands.save = function () {}
+
   return Object.assign({}, {
     'Backspace': handleBackspace,
     'Delete': handleDelete,
@@ -31,7 +32,8 @@ export function makeKeyBindings (getSetting) {
     [`${modifierKey}-F`]: 'findPersistent',
     [`${modifierKey}-G`]: 'findPersistentNext',
     [`Shift-${modifierKey}-G`]: 'findPersistentPrev',
-    'Ctrl-Space': 'autocomplete'
+    'Ctrl-Space': 'autocomplete',
+    'Ctrl-,': triggerSyncToPdf
   }, makeAutoCloseCharHandlers(getSetting))
 }
 
