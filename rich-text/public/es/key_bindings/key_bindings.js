@@ -13,7 +13,7 @@ const BACKSPACE_KEY = 8
 const SPACE_KEY = 32
 const COMMA_KEY = 188
 
-export function makeKeyBindings (getSetting, triggerSyncToPdf) {
+export function makeKeyBindings (getSetting, keyBindingsAdapter) {
   // Override CM save command to be a no-op. No sense in bringing up the
   // browser's save dialog
   CodeMirror.commands.save = function () {}
@@ -33,7 +33,9 @@ export function makeKeyBindings (getSetting, triggerSyncToPdf) {
     [`${modifierKey}-G`]: 'findPersistentNext',
     [`Shift-${modifierKey}-G`]: 'findPersistentPrev',
     'Ctrl-Space': 'autocomplete',
-    'Ctrl-,': triggerSyncToPdf
+    'Ctrl-,': keyBindingsAdapter.triggerSyncToPdf,
+    'Ctrl-.': keyBindingsAdapter.triggerRecompile,
+    [`${modifierKey}-Enter`]: keyBindingsAdapter.triggerRecompile
   }, makeAutoCloseCharHandlers(getSetting))
 }
 

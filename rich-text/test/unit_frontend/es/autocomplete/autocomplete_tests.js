@@ -1,11 +1,7 @@
 /* global sinon */
 
-import CodeMirror from 'codemirror'
-import 'codemirror/addon/hint/show-hint'
-
 import fixture from '../../../../../../test/unit_frontend/es/support/fixture'
 import { Editor } from '../../../../public/es/index'
-import LatexMode from '../../../../public/es/latex_mode/latex_mode'
 
 const FIXTURE_HTML = '<div></div>'
 
@@ -339,7 +335,13 @@ function makeEditor (adapter, getSetting) {
     getSetting = sinon.stub().withArgs('autoComplete').returns(true)
   }
 
-  const editor = new Editor(fixture.load(FIXTURE_HTML), {}, adapter, getSetting)
+  const editor = new Editor(
+    fixture.load(FIXTURE_HTML),
+    {},
+    adapter,
+    {},
+    getSetting
+  )
   editor.enable()
 
   return editor

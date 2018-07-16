@@ -19,7 +19,8 @@ describe('RichText', function () {
     this.editor = new Editor(
       fixture.load(FIXTURE_HTML),
       this.rtAdapter,
-      autocompleteAdapterStub
+      autocompleteAdapterStub,
+      {}
     )
     this.cm = this.editor.getCodeMirror()
     this.editor.enable()

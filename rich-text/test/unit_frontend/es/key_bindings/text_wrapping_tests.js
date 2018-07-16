@@ -13,7 +13,8 @@ describe('Text wrapping', function () {
     this.editor = new Editor(
       fixture.load(TEXTAREA_HTML),
       {},
-      autocompleteAdapterStub
+      autocompleteAdapterStub,
+      {}
     )
     this.cm = this.editor.getCodeMirror()
   })
