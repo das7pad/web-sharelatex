@@ -1,8 +1,8 @@
 extends ../layout
+include ../../../../../app/views/mixins/_pagination
 
 //- Page for the list of all blog posts, 
 //- or page for a list of blog posts returned from a tag query
-//- TODO: Add pagination
 
 block content_cms
 	.row
@@ -35,5 +35,8 @@ block content_cms
 
 					if post.tag
 						include _blog_tags
+
+		if pages && pages.total_pages > 1
+			+paginate(pages, '/blog')
 
 	script(src=mathJaxPath)

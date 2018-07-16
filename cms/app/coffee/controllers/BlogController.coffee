@@ -5,6 +5,8 @@ ContentfulClient = require '../ContentfulClient'
 ErrorController = require '../../../../../app/js/Features/Errors/ErrorController'
 CmsHandler = require '../CmsHandler'
 
+resultsPerPage = 5;
+
 blogPostAuthors = (authorArr) ->
 	authors = ''
 
@@ -60,16 +62,19 @@ getAndRenderBlog = (req, res, next, blogQuery, page) ->
 				CmsHandler.render(res, page, cmsData, req.query)
 			else
 				# a list of blog posts (either all or filtered by tag)
-				cmsData = { 
-					items:collection.items.map (post) -> parseBlogPost(post.fields)
+				cmsData = {
+					pages: {
+						current_page: if req.params.page && !isNaN(req.params.page) then req.params.page else 1,
+						total: collection.total,
+						total_pages: Math.floor(collection.total/resultsPerPage)
+					}
+					items: collection.items.map (post) -> parseBlogPost(post.fields)
 				}
 				CmsHandler.render(res, page, cmsData, req.query)
 		.catch (err) ->
 			next(err)
 
-module.exports =
-
-	getBlog: (req, res, next)->
+_getBlog = (req, res, next) ->
 		if !req.query.cms
 			# Leave `!req.query.cms` until content migration is finished
 			ErrorController.notFound req, res
@@ -80,8 +85,15 @@ module.exports =
 			blogQuery = {
 				content_type: 'blogPost'
 				order: '-fields.publishDate'
-				select: 'fields.author,fields.content,fields.contentPreview,fields.publishDate,fields.slug,fields.tag,fields.title'
+				select: 'fields.author,fields.content,fields.contentPreview,fields.publishDate,fields.slug,fields.tag,fields.title',
+				limit: resultsPerPage
 			}
+
+			# Pagination
+			if req.params.page && !isNaN(req.params.page)
+				blogQuery.skip = (req.params.page * resultsPerPage)
+
+			# Filter by tag
 			if req.query.tag
 				# get the ID of the tag via the tag in the URL
 				# to do - stricter query?
@@ -99,10 +111,18 @@ module.exports =
 			else
 				getAndRenderBlog(req, res, next, blogQuery, 'blog/blog')
 
+module.exports =
+
+	getBlog: (req, res, next)->
+		_getBlog(req, res, next)
+
 	getBlogPost: (req, res, next)->
 		if !req.query.cms
 			# Leave `!req.query.cms` until content migration is finished
 			ErrorController.notFound req, res
+		else if req.params.slug == 'page'
+			# for if someone went to /blog/page/ without a page number
+			_getBlog(req, res, next)
 		else
 			blogQuery = {
 				content_type: 'blogPost'
