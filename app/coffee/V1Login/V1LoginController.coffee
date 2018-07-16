@@ -11,6 +11,23 @@ Settings = require 'settings-sharelatex'
 
 module.exports = V1Login =
 
+	registrationPage: (req, res, next) ->
+		sharedProjectData =
+			project_name:req.query.project_name
+			user_first_name:req.query.user_first_name
+
+		newTemplateData = {}
+		if req.session.templateData?
+			newTemplateData.templateName = req.session.templateData.templateName
+
+		res.render Path.resolve(__dirname, "../../views/v1_register"),
+			title: 'register'
+			sharedProjectData: sharedProjectData
+			newTemplateData: newTemplateData
+			new_email:req.query.new_email || ""
+			title: 'Register',
+			email: req.query.new_email || ""
+
 	loginPage: (req, res, next) ->
 		# if user is being sent to /login with explicit redirect (redir=/foo),
 		# such as being sent from the editor to /login, then set the redirect explicitly
