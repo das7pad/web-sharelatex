@@ -28,7 +28,7 @@ define [], () ->
       viewport.from + VIEWPORT_MARGIN
 
     setCursor: (pos) ->
-      pos = pos.cursorPosition or { line: 0, ch: 0 }
+      pos = pos.cursorPosition or { row: 0, column: 0 }
       @editor.getCodeMirror().setCursor(@convertFromAcePos(pos))
 
     setEditorScrollPosition: (pos) ->
