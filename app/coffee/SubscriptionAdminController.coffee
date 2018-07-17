@@ -23,10 +23,13 @@ module.exports = SubscriptionAdminController =
 				return ErrorController.notFound req, res
 			UserGetter.getUsers subscription.member_ids, { email: 1 }, (err, members) ->
 				return next(err) if err?
-				res.render Path.resolve(__dirname, "../views/subscription/show"), {subscription, user_id, members}
+				managerIds = subscription.manager_ids || []
+				UserGetter.getUsers managerIds, { email: 1 }, (err, managers) ->
+					return next(err) if err?
+					res.render Path.resolve(__dirname, "../views/subscription/show"),
+						{subscription, user_id, members, managers}
 
 	ALLOWED_ATTRIBUTES: [
-		'admin_id',
 		'recurlySubscription_id',
 		'planCode',
 		'membersLimit',
