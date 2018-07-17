@@ -745,8 +745,6 @@ export default function LatexMode () {
                   var closedMark = _closeMark(stream, state, markClosePos)
                   closedMark.checkedProperties.openMarksCount =
                     state.openMarks.length
-                  closedMark.checkedProperties.fromLine = closedMark.from.line
-                  closedMark.checkedProperties.toLine = closedMark.to.line
                 }
               })
           } else {
