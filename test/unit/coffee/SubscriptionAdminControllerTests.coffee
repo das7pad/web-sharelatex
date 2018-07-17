@@ -97,6 +97,7 @@ describe "SubscriptionAdminController", ->
 			beforeEach ->
 				@subscription = {
 					"mock": "subscription"
+					"admin_id": "admin-id"
 					"member_ids": ["member-id-1", "member-id-2"]
 				}
 				@Subscription.findAndModify.yields null, @subscription
