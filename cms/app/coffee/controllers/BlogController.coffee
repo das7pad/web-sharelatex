@@ -5,8 +5,6 @@ ContentfulClient = require '../ContentfulClient'
 ErrorController = require '../../../../../app/js/Features/Errors/ErrorController'
 CmsHandler = require '../CmsHandler'
 
-months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
 blogPostAuthors = (authorArr) ->
 	authors = ''
 
@@ -51,7 +49,7 @@ getAndRenderBlog = (req, res, next, blogQuery, page) ->
 	# clientType determines which API to use.
 	# client is for published data
 	# clientPreview is for unpublished data
-	clientType = if req.query.preview == '' then 'clientPreview' else 'client'
+	clientType = if req.query.preview || req.query.preview == '' then 'clientPreview' else 'client'
 
 	ContentfulClient[clientType].getEntries(blogQuery)
 		.then (collection) ->
