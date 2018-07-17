@@ -22,32 +22,29 @@ module.exports = OverleafAuthenticationController =
 					return next(err) 
 			if info?.email_exists_in_sl
 				logger.log {info}, "redirecting to sharelatex to merge accounts"
-				{profile, accessToken, refreshToken, user_id} = info
-				req.session.accountMerge = {profile, accessToken, refreshToken, user_id}
-				token = jwt.sign(
-					{ user_id, overleaf_email: profile.email, confirm_merge: true },
-					Settings.accountMerge.secret,
-					{ expiresIn: '1h' }
-				)
-				url = Settings.accountMerge.sharelatexHost + Url.format({
-					pathname: "/user/confirm_account_merge",
-					query: {token}
-				})
+				url = OverleafAuthenticationController.prepareAccountMerge(info, req)
 				return res.render Path.resolve(__dirname, "../../views/confirm_merge"), {
-					email: profile.email
+					email: info.profile.email
 					redirect_url: url
 					suppressNavbar: true
 				}
 			else
-				return req.logIn(user, next)
+				return AuthenticationController.finishLogin(user, req, res, next)
 		)(req, res, next)
 
-	doLogin: (req, res, next) ->
-		logger.log {user: req.user, info: req.info}, "successful log in from overleaf"
-		AuthenticationController.afterLoginSessionSetup req, req.user, (err) ->
-			return next(err) if err?
-			redir = AuthenticationController._getRedirectFromSession(req) || "/project"
-			res.redirect(redir)
+	prepareAccountMerge: (info, req) ->
+		{profile, user_id} = info
+		req.session.accountMerge = info
+		token = jwt.sign(
+			{ user_id, overleaf_email: profile.email, confirm_merge: true },
+			Settings.accountMerge.secret,
+			{ expiresIn: '1h' }
+		)
+		url = Settings.accountMerge.sharelatexHost + Url.format({
+			pathname: "/user/confirm_account_merge",
+			query: {token}
+		})
+		return url
 
 	confirmedAccountMerge: (req, res, next) ->
 		{token} = req.query
@@ -72,7 +69,7 @@ module.exports = OverleafAuthenticationController =
 				return next(error) if error?
 				FeaturesUpdater.refreshFeatures(user_id) # Notifies v1 about SL-granted features too
 				logger.log {user: user}, "merged with SL account, logging in"
-				return req.logIn(user, next)
+				return AuthenticationController.finishLogin(user, req, res, next)
 
 	_badToken: (res, error) ->
 		logger.err err: error, "bad token in confirming account"

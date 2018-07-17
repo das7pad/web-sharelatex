@@ -23,14 +23,12 @@ module.exports =
 
 		webRouter.get(
 			'/overleaf/callback',
-			OverleafAuthenticationController.setupUser,
-			OverleafAuthenticationController.doLogin
+			OverleafAuthenticationController.setupUser
 		)
 
 		webRouter.get(
 			'/overleaf/confirmed_account_merge',
-			OverleafAuthenticationController.confirmedAccountMerge,
-			OverleafAuthenticationController.doLogin
+			OverleafAuthenticationController.confirmedAccountMerge
 		)
 
 		webRouter.post(

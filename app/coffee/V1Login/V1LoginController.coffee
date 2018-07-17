@@ -3,6 +3,7 @@ V1LoginHandler = require './V1LoginHandler'
 logger = require 'logger-sharelatex'
 AuthenticationController = require "../../../../../app/js/Features/Authentication/AuthenticationController"
 OverleafAuthenticationManager = require "../Authentication/OverleafAuthenticationManager"
+OverleafAuthenticationController = require "../Authentication/OverleafAuthenticationController"
 Url = require 'url'
 jwt = require('jsonwebtoken')
 Settings = require 'settings-sharelatex'
@@ -34,28 +35,11 @@ module.exports = V1Login =
 				OverleafAuthenticationManager.setupUser profile, (err, user, info) ->
 					return callback(err) if err?
 					if info?.email_exists_in_sl
-						# Partially copied from OlAuthCon.setupUser
 						logger.log {email, info}, "account exists in SL, redirecting to sharelatex to merge accounts"
-						{profile, user_id} = info
-						req.session.accountMerge = {profile, user_id}
-						token = jwt.sign(
-							{ user_id, overleaf_email: profile.email, confirm_merge: true },
-							Settings.accountMerge.secret,
-							{ expiresIn: '1h' }
-						)
-						url = Settings.accountMerge.sharelatexHost + Url.format({
-							pathname: "/user/confirm_account_merge",
-							query: {token}
-						})
+						url = OverleafAuthenticationController.prepareAccountMerge(info, req)
 						res.json {redir: url}
 					else
 						# All good, login and proceed
 						logger.log {email}, "successful login with v1, proceeding with session setup"
-						AuthenticationController._loginAsyncHandlers(req, email, user)
-						redir = AuthenticationController._getRedirectFromSession(req) || "/project"
-						AuthenticationController.afterLoginSessionSetup req, user, (err) ->
-							if err?
-								return next(err)
-							AuthenticationController._clearRedirectFromSession(req)
-							res.json {redir: redir}
+						AuthenticationController.finishLogin(user, req, res, next)
 
