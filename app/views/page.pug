@@ -30,10 +30,10 @@ block content
 										span(ng-bind-html='hit.name')
 										div.search-result-content(ng-show="hit.content != ''", ng-bind-html='hit.content')
 
-					.card.row-spaced(ng-non-bindable)
+					.card.row-spaced(ng-controller="LearnController")
 						.page-header
-							h1 #{title}
-							
-						| !{page.content}
+							h1(ng-non-bindable) #{title}
 
+						mathjax !{page.content}
 
+	script(src=mathJaxPath)
