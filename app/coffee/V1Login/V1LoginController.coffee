@@ -2,6 +2,7 @@ Path = require 'path'
 V1LoginHandler = require './V1LoginHandler'
 logger = require 'logger-sharelatex'
 AuthenticationController = require "../../../../../app/js/Features/Authentication/AuthenticationController"
+UserRegistrationHandler = require "../../../../../app/js/Features/User/UserRegistrationHandler"
 OverleafAuthenticationManager = require "../Authentication/OverleafAuthenticationManager"
 OverleafAuthenticationController = require "../Authentication/OverleafAuthenticationController"
 Url = require 'url'
@@ -27,6 +28,51 @@ module.exports = V1Login =
 			new_email:req.query.new_email || ""
 			title: 'Register',
 			email: req.query.new_email || ""
+
+	doRegistration: (req, res, next) ->
+		requestIsValid = UserRegistrationHandler._registrationRequestIsValid(req.body)
+		if !requestIsValid
+			return next(new Error('registration request is not valid'))
+		{email, password} = req.body
+		logger.log {email}, "trying to create account via v1"
+		V1LoginHandler.registerWithV1 email, password, (err, created, profile) ->
+			if err?
+				logger.err {err, email}, "error while creating account in v1"
+				return next(err)
+			if !created
+				logger.log {email}, "could not create account in v1"
+				return res.json message: {type: 'error', text: req.i18n.translate('email_already_registered')}
+			else
+				# pass to the rest of the workflow
+				# NOTE: dupe of code below, refactor out
+				logger.log email: email, v1UserId: profile.id, "v1 account created"
+				OverleafAuthenticationManager.setupUser profile, (err, user, info) ->
+					return callback(err) if err?
+					if info?.email_exists_in_sl
+						# Partially copied from OlAuthCon.setupUser
+						logger.log {email, info}, "account exists in SL, redirecting to sharelatex to merge accounts"
+						{profile, user_id} = info
+						req.session.accountMerge = {profile, user_id}
+						token = jwt.sign(
+							{ user_id, overleaf_email: profile.email, confirm_merge: true },
+							Settings.accountMerge.secret,
+							{ expiresIn: '1h' }
+						)
+						url = Settings.accountMerge.sharelatexHost + Url.format({
+							pathname: "/user/confirm_account_merge",
+							query: {token}
+						})
+						res.json {redir: url}
+					else
+						# All good, login and proceed
+						logger.log {email}, "successful login with v1, proceeding with session setup"
+						AuthenticationController._loginAsyncHandlers(req, email, user)
+						redir = AuthenticationController._getRedirectFromSession(req) || "/project"
+						AuthenticationController._clearRedirectFromSession(req)
+						AuthenticationController.afterLoginSessionSetup req, user, (err) ->
+							if err?
+								return next(err)
+							res.json {redir: redir}
 
 	loginPage: (req, res, next) ->
 		# if user is being sent to /login with explicit redirect (redir=/foo),
