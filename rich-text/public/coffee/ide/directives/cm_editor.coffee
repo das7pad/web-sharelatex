@@ -99,6 +99,8 @@ define [
             sharejsDoc.attachToCM(editor.getCodeMirror())
             editor.enable()
             sharejsDoc.on "remoteop.richtext", editor.update
+            # Clear undo history so that attaching to ShareJS isn't included
+            editor.getCodeMirror().clearHistory()
             triggerEditorInitEvent()
             initSpellCheck()
             setUpMetadataEventListener()
