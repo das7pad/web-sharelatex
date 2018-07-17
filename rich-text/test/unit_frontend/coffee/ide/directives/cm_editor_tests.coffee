@@ -21,7 +21,8 @@ define [
           on: sinon.stub(),
           off: sinon.stub(),
           getWrapperElement: sinon.stub().returns({ off: sinon.stub() }),
-          refresh: sinon.stub()
+          refresh: sinon.stub(),
+          clearHistory: sinon.stub()
         }),
         disable: sinon.stub()
         disableAutocomplete: sinon.stub()
@@ -97,7 +98,8 @@ define [
     _.extend({
       getValue: sinon.stub().returns('some text'),
       getWrapperElement: sinon.stub().returns({ off: sinon.stub() }),
-      refresh: sinon.stub()
+      refresh: sinon.stub(),
+      clearHistory: sinon.stub()
     }, overrides, EventEmitter.prototype)
 
   # Stub the Editor class that is returned as the root of the rich text bundle
