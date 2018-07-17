@@ -59,15 +59,13 @@ describe "TeamImporter", ->
 			getUsersSubscription: sinon.stub().yields(null)
 		}
 
-		@UserGetter = {
-			getUser: sinon.stub().yields(null)
+		@UserMapper = {
+			getSlIdFromOlUser: sinon.stub().yields(null)
 		}
 
 		@UserMapper = {
 			getSlIdFromOlUser: sinon.stub()
 		}
-
-		@UserGetter.getUser.withArgs(sinon.match.has("overleaf.id", 31)).yields(null, @teamAdmin)
 
 		@UserMapper.getSlIdFromOlUser.withArgs(sinon.match.has("id", 31)).yields(null, @teamAdmin.id)
 		@UserMapper.getSlIdFromOlUser.withArgs(sinon.match.has("id", 32)).yields(null, @member.id)
@@ -126,8 +124,8 @@ describe "TeamImporter", ->
 				expect(err).to.not.exist
 				expect(v2Team._id).to.eq @subscriptionId
 
-				@UserGetter.getUser.calledWith(
-					sinon.match.has("overleaf.id", @v1Team.owner.id)
+				@UserMapper.getSlIdFromOlUser.calledWith(
+					sinon.match.has("id", @v1Team.owner.id)
 				).should.equal true
 
 				@SubscriptionLocator.getGroupWithV1Id.calledWith(@v1Team.id).should.equal true
