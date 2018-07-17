@@ -120,6 +120,9 @@ module.exports = WikiController =
 		viewPath = path.join(__dirname, "../views/page")
 		if settings.cdn?.wiki?.host?
 			page.content = page?.content?.replace(/src="(\/[^"]+)"/g, "src='#{settings.cdn?.web?.host}$1'");
+		# width and alt below are Linked_images, but we are not using this and causes a JS error
+		page.content = page?.content?.replace(/width='{{{width}}}'/g, ''); 
+		page.content = page?.content?.replace(/alt='{{{alt}}}'/g, ''); 
 		res.render viewPath, {
 			page: page
 			contents: contents
