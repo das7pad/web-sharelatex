@@ -27,6 +27,9 @@ module.exports = V1LoginHandler =
 				err = new Error("Unexpected status from v1 login api: #{response.statusCode}")
 				callback(err)
 
+	getUserByEmail: (email, callback) ->
+		User.findOne {email: email}, {_id: 1, email: 1, overleaf: 1}, callback
+
 	registerWithV1: (email, pass, callback=(err, created, v1Profile)->) ->
 		logger.log {email}, "sending registration request to v1 login api"
 		name = email.match(/^[^@]*/)[0]

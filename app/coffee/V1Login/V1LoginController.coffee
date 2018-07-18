@@ -35,44 +35,35 @@ module.exports = V1Login =
 			return next(new Error('registration request is not valid'))
 		{email, password} = req.body
 		logger.log {email}, "trying to create account via v1"
-		V1LoginHandler.registerWithV1 email, password, (err, created, profile) ->
-			if err?
-				logger.err {err, email}, "error while creating account in v1"
-				return next(err)
-			if !created
-				logger.log {email}, "could not create account in v1"
-				return res.json message: {type: 'error', text: req.i18n.translate('email_already_registered')}
-			else
-				# pass to the rest of the workflow
-				# NOTE: dupe of code below, refactor out
-				logger.log email: email, v1UserId: profile.id, "v1 account created"
-				OverleafAuthenticationManager.setupUser profile, (err, user, info) ->
-					return callback(err) if err?
-					if info?.email_exists_in_sl
-						# Partially copied from OlAuthCon.setupUser
-						logger.log {email, info}, "account exists in SL, redirecting to sharelatex to merge accounts"
-						{profile, user_id} = info
-						req.session.accountMerge = {profile, user_id}
-						token = jwt.sign(
-							{ user_id, overleaf_email: profile.email, confirm_merge: true },
-							Settings.accountMerge.secret,
-							{ expiresIn: '1h' }
-						)
-						url = Settings.accountMerge.sharelatexHost + Url.format({
-							pathname: "/user/confirm_account_merge",
-							query: {token}
-						})
-						res.json {redir: url}
-					else
-						# All good, login and proceed
-						logger.log {email}, "successful login with v1, proceeding with session setup"
-						AuthenticationController._loginAsyncHandlers(req, email, user)
-						redir = AuthenticationController._getRedirectFromSession(req) || "/project"
-						AuthenticationController._clearRedirectFromSession(req)
-						AuthenticationController.afterLoginSessionSetup req, user, (err) ->
-							if err?
-								return next(err)
-							res.json {redir: redir}
+		V1LoginHandler.getUserByEmail email, (err, existingUser) ->
+			return next(err) if err?
+			if existingUser? and !existingUser?.overleaf?.id?
+				logger.log {email}, "email conflicts with existing SL user, refusing to register"
+				return res.json {
+					message: {
+						type: 'error',
+						text: 'This email is in use by a Sharelatex account. Log in to Sharelatex to proceed'
+					}
+				}
+			V1LoginHandler.registerWithV1 email, password, (err, created, profile) ->
+				if err?
+					logger.err {err, email}, "error while creating account in v1"
+					return next(err)
+				if !created
+					logger.log {email}, "could not create account in v1"
+					return res.json message: {type: 'error', text: req.i18n.translate('email_already_registered')}
+				else
+					logger.log email: email, v1UserId: profile.id, "v1 account created"
+					OverleafAuthenticationManager.setupUser profile, (err, user, info) ->
+						return callback(err) if err?
+						if info?.email_exists_in_sl
+							logger.log {email, info}, "account exists in SL, redirecting to sharelatex to merge accounts"
+							url = OverleafAuthenticationController.prepareAccountMerge(info, req)
+							res.json {redir: url}
+						else
+							# All good, login and proceed
+							logger.log {email}, "successful registration with v1, proceeding with session setup"
+							AuthenticationController.finishLogin(user, req, res, next)
 
 	loginPage: (req, res, next) ->
 		# if user is being sent to /login with explicit redirect (redir=/foo),
