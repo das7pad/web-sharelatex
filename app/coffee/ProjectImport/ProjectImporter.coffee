@@ -85,6 +85,8 @@ module.exports = ProjectImporter =
 			(cb) ->
 				ProjectImporter._importInvites v2_project_id, doc.invites, cb
 			(cb) ->
+				ProjectImporter._importLabels v2_project_id, doc.labels, cb
+			(cb) ->
 				ProjectImporter._importFiles v2_project_id, v2_user_id, doc.files, cb
 			(cb) ->
 				ProjectImporter._waitForV1HistoryExport v1_project_id, v1_user_id, cb
@@ -189,6 +191,29 @@ module.exports = ProjectImporter =
 				projectId: project_id
 				privileges: privilegeLevel
 			}, callback
+
+	_importLabels: (v2_project_id, labels = [], callback = (error) ->) ->
+		async.eachSeries(
+			labels,
+			(label, cb) -> ProjectImporter._importLabel v2_project_id, label, cb
+			callback
+		)
+
+	_importLabel: (v2_project_id, label, callback = (error) ->) ->
+		UserMapper.getSlIdFromOlUser {id: label.user_id}, (error, user_id) ->
+			return callback(error) if error?
+			request.post {
+				url: "#{settings.apis.project_history.url}/project/#{v2_project_id}/user/#{user_id}/labels"
+				json: { version: label.history_version, comment: label.comment, created_at: label.created_at }
+			}, (error, response) ->
+				return callback(error) if error?
+
+				if 200 <= response.statusCode < 300
+					callback()
+				else
+					error = new Error("overleaf returned non-success code: #{response.statusCode}")
+					error.statusCode = response.statusCode
+					callback error
 
 	_importFiles: (project_id, v2_user_id, files = [], callback = (error) ->) ->
 		async.mapSeries(files, (file, cb) ->

@@ -11,10 +11,12 @@ MockDocstoreApi = require "#{WEB_PATH}/test/acceptance/js/helpers/MockDocstoreAp
 MockDocUpdaterApi = require "#{WEB_PATH}/test/acceptance/js/helpers/MockDocUpdaterApi"
 MockFilestoreApi = require "./helpers/MockFilestoreApi"
 MockOverleafApi = require "./helpers/MockOverleafApi"
+MockProjectHistoryApi = require "./helpers/MockProjectHistoryApi"
 MockS3Api = require "./helpers/MockS3Api"
 ProjectGetter = require "#{WEB_PATH}/app/js/Features/Project/ProjectGetter"
 ProjectEntityHandler = require "#{WEB_PATH}/app/js/Features/Project/ProjectEntityHandler"
 User = require "#{WEB_PATH}/test/acceptance/js/helpers/User"
+{UserStub} = require "#{WEB_PATH}/app/js/models/UserStub"
 
 BLANK_PROJECT = {
 	title: "Test Project"
@@ -24,6 +26,7 @@ BLANK_PROJECT = {
 	read_token: "read_token"
 	invites: []
 	files: []
+	labels: []
 }
 
 getProject = (response, callback) ->
@@ -150,3 +153,33 @@ describe "ProjectImportTests", ->
 				expect(response.statusCode).to.equal(501)
 				expect(JSON.parse(body).message).to.equal("Sorry! Projects with linked or external files aren't fully supported yet.")
 				done()
+
+	describe 'a project with labels', ->
+		before (done) ->
+			@ol_project_id = 1
+			@collaborator_v1_id = 234
+			@date = new Date()
+			labels = [
+				{ user_id: @owner_v1_id, history_version: 1, comment: 'hello', created_at: @date }
+				{ user_id: @collaborator_v1_id, history_version: 2, comment: 'goodbye', created_at: @date }
+			]
+			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, labels })
+
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+			MockProjectHistoryApi.reset()
+
+			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+				throw error if error?
+				getProject response, (error, project) =>
+					@project = project
+					done()
+
+		it 'creates the labels in project history with user stubs for unimported collaborators', (done) ->
+			UserStub.findOne { "overleaf.id": @collaborator_v1_id }, { _id: 1 }, (error, user_stub) =>
+				throw error if error?
+				expect(MockProjectHistoryApi.getLabels(@project._id)).to.deep.equal [
+					{ user_id: @owner._id.toString(), version: 1, comment: 'hello', created_at: @date.toISOString() }
+					{ user_id: user_stub._id.toString(), version: 2, comment: 'goodbye', created_at: @date.toISOString() }
+				]
+				done()
+			return
