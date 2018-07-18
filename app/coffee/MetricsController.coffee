@@ -3,6 +3,7 @@ request = require 'request'
 mongoose = require('mongoose')
 Path = require("path")
 async = require 'async'
+_ = require 'lodash'
 UserGetter = require '../../../../app/js/Features/User/UserGetter'
 ProjectGetter = require '../../../../app/js/Features/Project/ProjectGetter'
 SubscriptionLocator = require '../../../../app/js/Features/Subscription/SubscriptionLocator'
@@ -46,7 +47,7 @@ module.exports = MetricsController =
 			segmentation  = results[0] || {}
 			subscriptions = results[1] || []
 
-			segmentation['v2TeamIds'] = subscriptions.map (s) -> s._id
+			segmentation['teams'] = mergeTeams(segmentation.teamIds, subscriptions)
 
 			res.json segmentation
 		)
@@ -100,3 +101,18 @@ module.exports = MetricsController =
 					)
 					logger.err {err, userId}, err.message
 					return callback(err)
+
+
+mergeTeams = (v1TeamIds, v2Teams) ->
+	v2Teams = v2Teams.map (t) ->
+		v2Team = { v2Id: t.id }
+		v2Team.v1Id = t.overleaf?.id if t.overleaf?.id?
+		v2Team
+
+	v1Teams = v1TeamIds.map (id) -> { v1Id: id }
+
+	teams = v2Teams.concat(v1Teams)
+
+	# remove v1 teams that have already been imported to v2.
+	# uniqBy takes the first occurrence, if there's more than one
+	_.uniqBy teams, (t) -> t.v1Id || t.v2Id
