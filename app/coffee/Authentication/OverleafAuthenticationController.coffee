@@ -33,8 +33,8 @@ module.exports = OverleafAuthenticationController =
 		)(req, res, next)
 
 	prepareAccountMerge: (info, req) ->
-		{profile, user_id} = info
-		req.session.accountMerge = info
+		{profile, accessToken, refreshToken, user_id} = info
+		req.session.accountMerge = {profile, accessToken, refreshToken, user_id}
 		token = jwt.sign(
 			{ user_id, overleaf_email: profile.email, confirm_merge: true },
 			Settings.accountMerge.secret,
