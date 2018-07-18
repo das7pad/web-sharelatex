@@ -21,7 +21,8 @@ define [
           on: sinon.stub(),
           off: sinon.stub(),
           getWrapperElement: sinon.stub().returns({ off: sinon.stub() }),
-          refresh: sinon.stub()
+          refresh: sinon.stub(),
+          clearHistory: sinon.stub()
         }),
         disable: sinon.stub()
         disableAutocomplete: sinon.stub()
@@ -73,6 +74,20 @@ define [
         $rootScope.sharejsDoc.trigger('remoteop')
         expect(update).to.have.been.called
 
+    it 'calls clearHistory when attaching to CM', () ->
+      Editor = stubEditor(
+        stubCodeMirror({ clearHistory: clearHistory = sinon.stub() })
+      )
+      inject ($compile, $rootScope) ->
+        $rootScope.sharejsDoc = stubSharejsDoc()
+        $rootScope.bundle = { Editor: Editor }
+        $rootScope.formattingEvents = new EventEmitter()
+
+        $compile('<div cm-editor sharejs-doc="sharejsDoc" bundle="bundle" formatting-events="formattingEvents"></div>')($rootScope)
+        $rootScope.$digest()
+
+        expect(clearHistory).to.have.been.called
+
     it 'detaches from CM when destroyed', () ->
       Editor = stubEditor()
       disable = Editor.prototype.disable
@@ -97,13 +112,14 @@ define [
     _.extend({
       getValue: sinon.stub().returns('some text'),
       getWrapperElement: sinon.stub().returns({ off: sinon.stub() }),
-      refresh: sinon.stub()
+      refresh: sinon.stub(),
+      clearHistory: sinon.stub()
     }, overrides, EventEmitter.prototype)
 
   # Stub the Editor class that is returned as the root of the rich text bundle
-  stubEditor = () ->
+  stubEditor = (codeMirror = stubCodeMirror()) ->
     class Editor
-      getCodeMirror: sinon.stub().returns(stubCodeMirror())
+      getCodeMirror: sinon.stub().returns(codeMirror)
       openDoc: sinon.stub()
       enable: sinon.stub()
       disable: sinon.stub()
