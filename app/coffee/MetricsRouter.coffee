@@ -21,6 +21,12 @@ module.exports =
 		)
 
 		webRouter.get(
+			'/metrics/institutions/:institutionId/?(:startDate/:endDate)?',
+			AuthorizationMiddlewear.ensureUserIsSiteAdmin,
+			MetricsController.institutionMetrics
+		)
+
+		webRouter.get(
 			'/graphs/(:graph)?',
 			AuthorizationMiddlewear.ensureUserIsSiteAdmin,
 			MetricsController.analyticsProxy
