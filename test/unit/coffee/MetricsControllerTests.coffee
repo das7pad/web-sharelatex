@@ -75,8 +75,8 @@ describe "MetricsController", ->
 				overleaf:
 					id: 45
 			@memberSubscriptions = [
-			  { id: '5ad60490c34621025f26006a', overleaf: { id: 3 } },
-			  { id: '5ae8366062616006e8eb07d0' }
+			  { _id: '5ad60490c34621025f26006a' },
+			  { _id: '5ae8366062616006e8eb07d0' }
 			]
 			@UserGetter.getUser = sinon.stub().callsArgWith(2, null, @user)
 			@SubscriptionLocator.getMemberSubscriptions = sinon.stub().callsArgWith(1, null, @memberSubscriptions)
@@ -111,16 +111,12 @@ describe "MetricsController", ->
 				id : 1,
 				teamIds: [3, 4],
 				affiliationIds: [5, 7],
-				teams: [
-					{ v1Id: 3, v2Id: '5ad60490c34621025f26006a'},
-					{ v2Id: '5ae8366062616006e8eb07d0'},
-					{ v1Id: 4 }
-				]
+				v2TeamIds: ['5ad60490c34621025f26006a', '5ae8366062616006e8eb07d0']
 			})
 
 			done()
 
-		it 'works if the user is not member of any v2 team', (done) ->
+		it 'works if the user is not member of any team', (done) ->
 			@SubscriptionLocator.getMemberSubscriptions = sinon.stub()
 				.callsArgWith(1, null, null)
 
@@ -133,10 +129,7 @@ describe "MetricsController", ->
 				id : 1,
 				teamIds: [3, 4],
 				affiliationIds: [5, 7]
-				teams: [
-					{ v1Id: 3 }
-					{ v1Id: 4 }
-				],
+				v2TeamIds: [],
 			})
 
 			done()
