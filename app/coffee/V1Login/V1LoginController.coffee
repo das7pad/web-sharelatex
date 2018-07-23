@@ -42,7 +42,7 @@ module.exports = V1Login =
 				return res.json {
 					message: {
 						type: 'error',
-						text: 'This email is in use by a Sharelatex account. Log in to Sharelatex to proceed'
+						text: 'This email is in use by a Sharelatex account. Log in to ShareLaTeX to proceed'
 					}
 				}
 			V1LoginHandler.registerWithV1 email, password, (err, created, profile) ->
