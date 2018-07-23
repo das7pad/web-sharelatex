@@ -1,3 +1,5 @@
+/* global sinon */
+
 import fixture from '../../../../../../test/unit_frontend/es/support/fixture'
 import { Editor } from '../../../../public/es/index'
 import * as TextWrapping from '../../../../public/es/key_bindings/text_wrapping'
@@ -14,7 +16,8 @@ describe('Text wrapping', function () {
       fixture.load(TEXTAREA_HTML),
       {},
       autocompleteAdapterStub,
-      {}
+      {},
+      sinon.stub()
     )
     this.cm = this.editor.getCodeMirror()
   })
