@@ -55,7 +55,6 @@ module.exports = MetricsController =
 			subscriptions = results[1] || []
 
 			v1Ids = segmentation.teamIds || []
-			subscriptionIds = subscriptions.map (s) -> s.id
 
 			segmentation['teamIds'] = uniqTeamIds(v1Ids, subscriptions)
 
@@ -114,11 +113,7 @@ module.exports = MetricsController =
 
 
 uniqTeamIds = (v1TeamIds, v2Teams) ->
-	v2Teams = v2Teams.map (t) ->
-		v2Team = { v2Id: t.id }
-		v2Team.v1Id = t.overleaf?.id if t.overleaf?.id?
-		v2Team
-
+	v2Teams = v2Teams.map (t) -> { v2Id: t.id, v1Id: t.overleaf?.id }
 	v1Teams = v1TeamIds.map (id) -> { v1Id: id }
 
 	teams = v2Teams.concat(v1Teams)
