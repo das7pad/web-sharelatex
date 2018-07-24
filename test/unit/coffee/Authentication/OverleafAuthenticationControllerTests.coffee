@@ -38,6 +38,7 @@ describe "OverleafAuthenticationController", ->
 				# 	passport.authenticate("oauth2", (err, user, info) ->
 				# 		method we want to test...
 				# 	)(req, res, next)
+				@AuthenticationController.finishLogin = sinon.stub()
 				@passport.authenticate = (provider, method) =>
 					return (req, res, next) =>
 						method(null, null, {
@@ -65,7 +66,7 @@ describe "OverleafAuthenticationController", ->
 				expect(@req.session.accountMerge).to.deep.equal {
 					@profile, @user_id, @accessToken, @refreshToken
 				}
-	
+
 			it "should render the confirmation page", ->
 				@res.render
 					.calledWith(
@@ -77,37 +78,19 @@ describe "OverleafAuthenticationController", ->
 						}
 					)
 					.should.equal true
-			
+
 		describe "with a successful user set up", ->
 			beforeEach ->
+				@AuthenticationController.finishLogin = sinon.stub()
 				@passport.authenticate = (provider, method) =>
 					return (req, res, next) =>
 						method(null, @user = {"mock": "user"}, null)
 				@OverleafAuthenticationController.setupUser @req, @res, @next
 
 			it "should log the user in", ->
-				@req.logIn
-					.calledWith(@user, @next)
+				@AuthenticationController.finishLogin
+					.calledWith(@user, @req, @res, @next)
 					.should.equal true
-
-	describe "doLogin", ->
-		beforeEach ->
-			@user = {"mock": "user"}
-			@req.user = @user
-			@AuthenticationController.afterLoginSessionSetup = sinon.stub().yields()
-			@AuthenticationController._getRedirectFromSession = sinon.stub()
-			@AuthenticationController._getRedirectFromSession.withArgs(@req).returns @redir = "/redir/path"
-			@OverleafAuthenticationController.doLogin @req, @res, @next
-
-		it "should call AuthenticationController.afterLoginSessionSetup", ->
-			@AuthenticationController.afterLoginSessionSetup
-				.calledWith(@req, @user)
-				.should.equal true
-
-		it "should redirect to the stored rediret", ->
-			@res.redirect
-				.calledWith(@redir)
-				.should.equal true
 
 	describe "confirmedAccountMerge", ->
 		beforeEach ->
@@ -117,6 +100,7 @@ describe "OverleafAuthenticationController", ->
 				merge_confirmed: true
 				user_id: @user_id
 			}
+			@AuthenticationController.finishLogin = sinon.stub()
 			@UserMapper.mergeWithSlUser = sinon.stub().yields(null, @user = {"mock": "user"})
 			@jwt.verify = sinon.stub()
 			@jwt.verify.withArgs(@token, @settings.accountMerge.secret).yields(null, @data)
@@ -150,8 +134,8 @@ describe "OverleafAuthenticationController", ->
 					.should.equal true
 
 			it "should log the user in", ->
-				@req.logIn
-					.calledWith(@user)
+				@AuthenticationController.finishLogin
+					.calledWith(@user, @req, @res, @next)
 					.should.equal true
 
 		describe "with no token", ->
@@ -181,4 +165,25 @@ describe "OverleafAuthenticationController", ->
 			it "should return a 400 invalid token error", ->
 				@res.status.calledWith(400).should.equal true
 
+	describe "prepareAccountMerge", ->
+		beforeEach ->
+			@jwt.sign = sinon.stub().returns('some-token')
 
+		it 'should prepare the session, and produce a url with a token', () ->
+			info = {
+				profile: {email: 1},
+				accessToken: 2,
+				refreshToken: 3,
+				user_id: 4
+			}
+			req = {session: {}}
+			url = @OverleafAuthenticationController.prepareAccountMerge(info, req)
+			expect(req.session.accountMerge).to.deep.equal {
+				profile: {email: 1},
+				accessToken: 2,
+				refreshToken: 3,
+				user_id: 4
+			}
+			expect(@jwt.sign.callCount).to.equal 1
+			expect(@jwt.sign.calledWith({user_id: 4, overleaf_email: 1, confirm_merge: true})).to.equal true
+			expect(url.match(/^.*\/user\/confirm_account_merge\?token=some-token$/)?).to.equal true
