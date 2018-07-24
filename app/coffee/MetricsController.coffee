@@ -3,7 +3,6 @@ request = require 'request'
 mongoose = require('mongoose')
 Path = require("path")
 async = require 'async'
-_ = require 'lodash'
 UserGetter = require '../../../../app/js/Features/User/UserGetter'
 ProjectGetter = require '../../../../app/js/Features/Project/ProjectGetter'
 SubscriptionLocator = require '../../../../app/js/Features/Subscription/SubscriptionLocator'
