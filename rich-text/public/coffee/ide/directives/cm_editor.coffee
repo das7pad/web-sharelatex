@@ -14,6 +14,7 @@ define [
         formattingEvents: "="
         initCodeMirror: "="
         sharejsDoc: "="
+        readOnly: "="
         spellCheck: "="
         spellCheckLanguage: "="
         autoComplete: "="
@@ -66,6 +67,10 @@ define [
 
         # If doc is changed, switch the CodeMirror/ShareJS attachment
         scope.$watch "sharejsDoc", switchAttachment
+
+        scope.$watch "readOnly", (value) ->
+          if value?
+            editor.setReadOnly(value)
 
         setUpFormattingEventListeners = () ->
           scope.formattingEvents.on 'section', () -> editor.wrapSection()

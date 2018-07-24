@@ -20,7 +20,8 @@ describe('RichText', function () {
       fixture.load(FIXTURE_HTML),
       this.rtAdapter,
       autocompleteAdapterStub,
-      {}
+      {},
+      sinon.stub()
     )
     this.cm = this.editor.getCodeMirror()
     this.editor.enable()

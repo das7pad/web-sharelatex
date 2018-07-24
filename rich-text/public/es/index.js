@@ -36,7 +36,8 @@ export class Editor {
       hintOptions: {
         hint: makeAutocomplete(autocompleteAdapter, getSetting),
         completeSingle: false
-      }
+      },
+      readOnly: getSetting('readOnly')
     })
 
     this.adapter = richTextAdapter
@@ -68,6 +69,10 @@ export class Editor {
 
   update () {
     this.richText.update()
+  }
+
+  setReadOnly (readOnly) {
+    this.codeMirror.setOption('readOnly', readOnly)
   }
 
   wrapBold () {
