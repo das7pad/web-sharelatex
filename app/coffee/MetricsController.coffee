@@ -118,7 +118,9 @@ uniqTeamIds = (v1TeamIds, v2Teams) ->
 
 	teams = v2Teams.concat(v1Teams)
 
-	# remove v1 teams that have already been imported to v2.
-	# uniqBy takes the first occurrence, if there's more than one
+	# Teams that have been imported to v2 will appear in the v2Teams and v1Teams
+	# arrays. To avoid duplicates, if we have several teams with the same v1Id we
+	# only take the first occurrence (lodash uniqBy takes the first occurrence
+	# if there's more than one)
 	teams = _.uniqBy teams, (t) -> t.v1Id || t.v2Id
 	teams.map (t) -> t.v2Id || t.v1Id
