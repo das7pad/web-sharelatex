@@ -92,10 +92,10 @@ block content
 							table.table.table-striped.table-bordered
 								tr
 									th(colspan) Invited Members
-								for email in subscription.invited_emails || []
+								for teamInvite in subscription.teamInvites || []
 									tr
-										td= email
-								if !subscription.invited_emails || subscription.invited_emails.length == 0
+										td= teamInvite.email
+								if !subscription.teamInvites || subscription.teamInvites.length == 0
 									tr
 										td
 											i None
