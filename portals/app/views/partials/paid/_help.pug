@@ -1,0 +1,16 @@
+if portal.public_help_html
+	.content-item
+		.row
+			.col-sm-12
+				h2 FAQ &amp; Help
+				p !{portal.public_help_html}
+
+	.row
+		.col-sm-12
+			h4 Search our FAQ for more help
+			//- To Do: search input below
+			input(type="text" placeholder="Search")
+
+	.row
+		.col-sm-12
+			+portal_content('university-more', 'More', portal.public_bottom_html, false)
