@@ -15,7 +15,7 @@ module.exports = PortalsController =
 	# getIndexEdu: (req, res, next) ->
 	# 	res.render(Path.resolve(__dirname, '../views/index'))
 
-	# to do: decide to show
+	# to do: decide to add
 	# /org not on v1
 	# getIndexOrg: (req, res, next) ->
 	# 	res.render(Path.resolve(__dirname, '../views/index'))
@@ -27,7 +27,9 @@ module.exports = PortalsController =
 		PortalsController._getPortal(req, res, next, 'org')
 
 	_getPortal: (req, res, next, portalType) ->
-		if req.params.slug && req.params.slug != 'undefined'
+		if !req.query.prtl
+			ErrorController.notFound req, res
+		else if req.params.slug && req.params.slug != 'undefined'
 			v1PortalPath = "/#{portalType}/#{req.params.slug}"
 			portalLayout = path.resolve(__dirname, '../views/portal')
 			
@@ -35,7 +37,7 @@ module.exports = PortalsController =
 				return next(err) if err
 				if data.portal?
 					if data.portal.redirect_url
-						#  when slug was incorrect when portal created
+						# when slug was incorrect when portal created
 						res.redirect 301, data.portal.redirect_url
 
 					# redirect to correct portal type, if needed
