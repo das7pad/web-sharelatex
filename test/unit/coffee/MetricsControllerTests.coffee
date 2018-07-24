@@ -109,13 +109,8 @@ describe "MetricsController", ->
 
 			expect(response).to.deep.equal({
 				id : 1,
-				teamIds: [3, 4],
-				affiliationIds: [5, 7],
-				teams: [
-					{ v1Id: 3, v2Id: '5ad60490c34621025f26006a'},
-					{ v2Id: '5ae8366062616006e8eb07d0'},
-					{ v1Id: 4 }
-				]
+				teamIds: ['5ad60490c34621025f26006a', '5ae8366062616006e8eb07d0', 4],
+				affiliationIds: [5, 7]
 			})
 
 			done()
@@ -133,10 +128,6 @@ describe "MetricsController", ->
 				id : 1,
 				teamIds: [3, 4],
 				affiliationIds: [5, 7]
-				teams: [
-					{ v1Id: 3 }
-					{ v1Id: 4 }
-				],
 			})
 
 			done()

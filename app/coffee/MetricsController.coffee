@@ -54,7 +54,10 @@ module.exports = MetricsController =
 			segmentation  = results[0] || {}
 			subscriptions = results[1] || []
 
-			segmentation['teams'] = mergeTeams(segmentation.teamIds, subscriptions)
+			v1Ids = segmentation.teamIds || []
+			subscriptionIds = subscriptions.map (s) -> s.id
+
+			segmentation['teamIds'] = uniqTeamIds(v1Ids, subscriptions)
 
 			res.json segmentation
 		)
@@ -110,7 +113,7 @@ module.exports = MetricsController =
 					return callback(err)
 
 
-mergeTeams = (v1TeamIds, v2Teams) ->
+uniqTeamIds = (v1TeamIds, v2Teams) ->
 	v2Teams = v2Teams.map (t) ->
 		v2Team = { v2Id: t.id }
 		v2Team.v1Id = t.overleaf?.id if t.overleaf?.id?
@@ -122,4 +125,5 @@ mergeTeams = (v1TeamIds, v2Teams) ->
 
 	# remove v1 teams that have already been imported to v2.
 	# uniqBy takes the first occurrence, if there's more than one
-	_.uniqBy teams, (t) -> t.v1Id || t.v2Id
+	teams = _.uniqBy teams, (t) -> t.v1Id || t.v2Id
+	teams.map (t) -> t.v2Id || t.v1Id
