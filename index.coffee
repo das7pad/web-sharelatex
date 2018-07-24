@@ -19,7 +19,7 @@ OverleafIntegration =
 					tokenURL: "#{host}/oauth/token",
 					callbackURL: "#{settings.siteUrl}/overleaf/callback"
 					clientID, clientSecret
-			}, OverleafAuthenticationManager.setupOAuthUser)
+			}, OverleafAuthenticationManager.setupUser)
 
 			overleafOAuth2Strategy.userProfile = OverleafAuthenticationManager.getUserProfile
 
