@@ -6,6 +6,7 @@ app.use(bodyParser.json())
 
 module.exports = MockOverleafApi =
 	docs: { }
+	users: []
 
 	setDoc: (doc) ->
 		@docs[doc.id] = doc
@@ -41,6 +42,19 @@ module.exports = MockOverleafApi =
 
 		app.get "/api/v2/users/:userId/affiliations", (req, res, next) =>
 			res.json []
+
+		app.post "/api/v1/sharelatex/login", (req, res, next) =>
+			for user in @users
+				if user.email == req.body.email && user.pass == req.body.pass
+					return res.json {
+						email: user.email,
+						valid: true,
+						user_profile: user.profile
+					}
+			return res.status(403).json {
+				email: user.email,
+				valid: false
+			}
 
 		app.listen 5000, (error) ->
 			throw error if error?

@@ -1,4 +1,4 @@
-request = require '../request'
+{request} = require '../V1SharelatexApi'
 Settings = require 'settings-sharelatex'
 logger = require 'logger-sharelatex'
 {User} = require "../../../../../app/js/models/User"
@@ -9,9 +9,11 @@ module.exports = V1LoginHandler =
 
 	authWithV1: (email, pass, callback=(err, isValid, v1Profile)->) ->
 		logger.log {email}, "sending auth request to v1 login api"
-		request.post {
+		request {
+			method: 'POST'
 			url: "#{Settings.overleaf.host}/api/v1/sharelatex/login",
 			json: {email, pass}
+			expectedStatusCodes: [403]
 		}, (err, response, body) ->
 			if err?
 				logger.err {email, err}, "error while talking to v1 login api"
