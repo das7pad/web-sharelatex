@@ -109,7 +109,7 @@ describe "MetricsController", ->
 
 			expect(response).to.deep.equal({
 				id : 1,
-				teamIds: ['5ad60490c34621025f26006a', '5ae8366062616006e8eb07d0', 4],
+				teamIds: ['5ad60490c34621025f26006a', '5ae8366062616006e8eb07d0', 3, 4],
 				affiliationIds: [5, 7]
 			})
 

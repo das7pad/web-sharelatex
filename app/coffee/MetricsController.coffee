@@ -55,8 +55,9 @@ module.exports = MetricsController =
 			subscriptions = results[1] || []
 
 			v1Ids = segmentation.teamIds || []
+			v2Ids = subscriptions.map (s) -> s.id
 
-			segmentation['teamIds'] = uniqTeamIds(v1Ids, subscriptions)
+			segmentation['teamIds'] = v2Ids.concat(v1Ids)
 
 			res.json segmentation
 		)
@@ -110,17 +111,3 @@ module.exports = MetricsController =
 					)
 					logger.err {err, userId}, err.message
 					return callback(err)
-
-
-uniqTeamIds = (v1TeamIds, v2Teams) ->
-	v2Teams = v2Teams.map (t) -> { v2Id: t.id, v1Id: t.overleaf?.id }
-	v1Teams = v1TeamIds.map (id) -> { v1Id: id }
-
-	teams = v2Teams.concat(v1Teams)
-
-	# Teams that have been imported to v2 will appear in the v2Teams and v1Teams
-	# arrays. To avoid duplicates, if we have several teams with the same v1Id we
-	# only take the first occurrence (lodash uniqBy takes the first occurrence
-	# if there's more than one)
-	teams = _.uniqBy teams, (t) -> t.v1Id || t.v2Id
-	teams.map (t) -> t.v2Id || t.v1Id
