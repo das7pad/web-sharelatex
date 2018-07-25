@@ -56,6 +56,28 @@ module.exports = MockOverleafApi =
 				valid: false
 			}
 
+		v1Id = 89024583
+		app.post "/api/v1/sharelatex/register", (req, res, next) =>
+			for user in @users
+				if user.email == req.body.email && user.pass == req.body.pass
+					return res.status(409).json {
+						email: user.email,
+						created: false
+					}
+			@users.push user = {
+				email: req.body.email,
+				pass: req.body.pass
+				profile: {
+					id: v1Id++,
+					email: req.body.email
+				}
+			}
+			return res.json {
+				email: user.email,
+				created: true,
+				user_profile: user.profile
+			}
+
 		app.listen 5000, (error) ->
 			throw error if error?
 		.on "error", (error) ->

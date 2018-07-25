@@ -33,9 +33,11 @@ module.exports = V1LoginHandler =
 	registerWithV1: (email, pass, callback=(err, created, v1Profile)->) ->
 		logger.log {email}, "sending registration request to v1 login api"
 		name = email.match(/^[^@]*/)[0]
-		request.post {
+		request {
+			method: 'POST'
 			url: "#{Settings.overleaf.host}/api/v1/sharelatex/register",
 			json: {email, pass, name}
+			expectedStatusCodes: [409]
 		}, (err, response, body) ->
 			if err?
 				logger.err {email, err}, "error while talking to v1 registration api"
