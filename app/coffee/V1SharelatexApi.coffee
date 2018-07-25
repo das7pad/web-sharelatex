@@ -17,7 +17,7 @@ module.exports = V1SharelatexApi =
 		return request(options) if !callback?
 		request options, (error, response, body) ->
 			return callback(error, response, body) if error?
-			if 200 <= response.statusCode < 300
+			if 200 <= response.statusCode < 300 or response.statusCode in (options.expectedStatusCodes or [])
 				callback null, response, body
 			else if body?.error_code?
 				{ error_code, error_message, error_data } = body
