@@ -20,6 +20,13 @@ addV1User = (user) ->
 	user.v1Id = v1Id
 	v1Id++
 
+count = 0
+newUser = () ->
+	user = new User()
+	# Make sure we get emails that don't conflict with other
+	# users so we can test clean/non-existing users.
+	user.email = "overleaf-auth-test-#{count++}@example.com"
+	return user
 
 describe "OverleafAuthentication", ->
 	describe 'initiating login', ->
@@ -32,7 +39,7 @@ describe "OverleafAuthentication", ->
 
 	describe 'email and password login', (done) ->
 		beforeEach (done) ->
-			@user = new User()
+			@user = newUser()
 			addV1User(@user)
 			@user.getCsrfToken done
 
