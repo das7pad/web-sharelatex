@@ -98,7 +98,7 @@ describe "OverleafAuthentication", ->
 
 	describe 'email and password registration', (done) ->
 		beforeEach (done) ->
-			@user = new User()
+			@user = newUser()
 			@user.getCsrfToken done
 
 		describe "with an email which doesn't exist in v1", ->
