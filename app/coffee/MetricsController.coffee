@@ -53,7 +53,10 @@ module.exports = MetricsController =
 			segmentation  = results[0] || {}
 			subscriptions = results[1] || []
 
-			segmentation['v2TeamIds'] = subscriptions.map (s) -> s._id
+			v1Ids = segmentation.teamIds || []
+			v2Ids = subscriptions.map (s) -> s.id
+
+			segmentation['teamIds'] = v2Ids.concat(v1Ids)
 
 			res.json segmentation
 		)
