@@ -95,3 +95,59 @@ describe "OverleafAuthentication", ->
 						return done(error) if error?
 						expect(user).to.not.exist
 						done()
+
+	describe 'email and password registration', (done) ->
+		beforeEach (done) ->
+			@user = newUser()
+			@user.getCsrfToken done
+
+		describe "with an email which doesn't exist in v1", ->
+			it 'should register the user', (done) ->
+				@user.request.post {
+					url: '/register/v1',
+					json:
+						email: @user.email
+						password: 'banana'
+				}, (error, response, body) =>
+					return done(error) if error?
+					expect(response.statusCode).to.equal 200
+					db.users.findOne { 'email': @user.email }, (error, user) =>
+						return done(error) if error?
+						expect(user.email).to.equal @user.email
+						expect(user.overleaf.id).to.exist
+						expect(user.signUpDate).to.be.above(new Date(Date.now() - 2000))
+						done()
+
+		describe 'with an email that exists in SL', ->
+			beforeEach ->
+				@user.ensureUserExists done
+
+			it 'should return an error message', (done) ->
+				@user.request.post {
+					url: '/register/v1',
+					json:
+						email: @user.email
+						password: 'banana'
+				}, (error, response, body) =>
+					return done(error) if error?
+					expect(response.statusCode).to.equal 200
+					expect(body.message.type).to.equal 'error'
+					expect(body.message.text).to.equal 'This email is in use by a Sharelatex account. Log in to ShareLaTeX to proceed'
+					done()
+
+		describe 'with an email that exists in v1', ->
+			beforeEach ->
+				addV1User(@user)
+
+			it 'should return an error message', (done) ->
+				@user.request.post {
+					url: '/register/v1',
+					json:
+						email: @user.email
+						password: 'banana'
+				}, (error, response, body) =>
+					return done(error) if error?
+					expect(response.statusCode).to.equal 200
+					expect(body.message.type).to.equal 'error'
+					expect(body.message.text).to.equal 'This email is already registered'
+					done()

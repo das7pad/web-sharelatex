@@ -2,6 +2,7 @@ Path = require 'path'
 V1LoginHandler = require './V1LoginHandler'
 logger = require 'logger-sharelatex'
 AuthenticationController = require "../../../../../app/js/Features/Authentication/AuthenticationController"
+UserRegistrationHandler = require "../../../../../app/js/Features/User/UserRegistrationHandler"
 OverleafAuthenticationManager = require "../Authentication/OverleafAuthenticationManager"
 OverleafAuthenticationController = require "../Authentication/OverleafAuthenticationController"
 Url = require 'url'
@@ -10,6 +11,59 @@ Settings = require 'settings-sharelatex'
 
 
 module.exports = V1Login =
+
+	registrationPage: (req, res, next) ->
+		sharedProjectData =
+			project_name:req.query.project_name
+			user_first_name:req.query.user_first_name
+
+		newTemplateData = {}
+		if req.session.templateData?
+			newTemplateData.templateName = req.session.templateData.templateName
+
+		res.render Path.resolve(__dirname, "../../views/v1_register"),
+			title: 'register'
+			sharedProjectData: sharedProjectData
+			newTemplateData: newTemplateData
+			new_email:req.query.new_email || ""
+			title: 'Register',
+			email: req.query.new_email || ""
+
+	doRegistration: (req, res, next) ->
+		requestIsValid = UserRegistrationHandler._registrationRequestIsValid(req.body)
+		if !requestIsValid
+			return next(new Error('registration request is not valid'))
+		{email, password} = req.body
+		logger.log {email}, "trying to create account via v1"
+		V1LoginHandler.getUserByEmail email, (err, existingUser) ->
+			return next(err) if err?
+			if existingUser? and !existingUser?.overleaf?.id?
+				logger.log {email}, "email conflicts with existing SL user, refusing to register"
+				return res.json {
+					message: {
+						type: 'error',
+						text: 'This email is in use by a Sharelatex account. Log in to ShareLaTeX to proceed'
+					}
+				}
+			V1LoginHandler.registerWithV1 email, password, (err, created, profile) ->
+				if err?
+					logger.err {err, email}, "error while creating account in v1"
+					return next(err)
+				if !created
+					logger.log {email}, "could not create account in v1"
+					return res.json message: {type: 'error', text: req.i18n.translate('email_already_registered')}
+				else
+					logger.log email: email, v1UserId: profile.id, "v1 account created"
+					OverleafAuthenticationManager.setupUser profile, (err, user, info) ->
+						return callback(err) if err?
+						if info?.email_exists_in_sl
+							logger.log {email, info}, "account exists in SL, redirecting to sharelatex to merge accounts"
+							url = OverleafAuthenticationController.prepareAccountMerge(info, req)
+							res.json {redir: url}
+						else
+							# All good, login and proceed
+							logger.log {email}, "successful registration with v1, proceeding with session setup"
+							AuthenticationController.finishLogin(user, req, res, next)
 
 	loginPage: (req, res, next) ->
 		# if user is being sent to /login with explicit redirect (redir=/foo),
