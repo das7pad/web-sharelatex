@@ -7,12 +7,12 @@ UserCreator = require "../../../../../app/js/Features/User/UserCreator"
 
 module.exports = V1LoginHandler =
 
-	authWithV1: (email, pass, callback=(err, isValid, v1Profile)->) ->
+	authWithV1: (email, password, callback=(err, isValid, v1Profile)->) ->
 		logger.log {email}, "sending auth request to v1 login api"
 		request {
 			method: 'POST'
 			url: "#{Settings.overleaf.host}/api/v1/sharelatex/login",
-			json: {email, pass}
+			json: {email, password}
 			expectedStatusCodes: [403]
 		}, (err, response, body) ->
 			if err?
@@ -30,13 +30,13 @@ module.exports = V1LoginHandler =
 	getUserByEmail: (email, callback) ->
 		User.findOne {email: email}, {_id: 1, email: 1, overleaf: 1}, callback
 
-	registerWithV1: (email, pass, callback=(err, created, v1Profile)->) ->
+	registerWithV1: (email, password, callback=(err, created, v1Profile)->) ->
 		logger.log {email}, "sending registration request to v1 login api"
 		name = email.match(/^[^@]*/)[0]
 		request {
 			method: 'POST'
 			url: "#{Settings.overleaf.host}/api/v1/sharelatex/register",
-			json: {email, pass, name}
+			json: {email, password, name}
 			expectedStatusCodes: [409]
 		}, (err, response, body) ->
 			if err?

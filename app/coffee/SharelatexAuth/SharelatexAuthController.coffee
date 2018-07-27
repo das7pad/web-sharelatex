@@ -1,10 +1,17 @@
 logger = require("logger-sharelatex")
 AuthenticationController = require "../../../../../app/js/Features/Authentication/AuthenticationController"
 UserGetter = require "../../../../../app/js/Features/User/UserGetter"
+UserUpdater = require "../../../../../app/js/Features/User/UserUpdater"
 Settings = require "settings-sharelatex"
 jwt = require('jsonwebtoken')
+Path = require('path')
+SharelatexAuthHandler = require "./SharelatexAuthHandler"
 
 module.exports = SharelatexAuthController =
+
+	finishPage: (req, res, next) ->
+		return res.render Path.resolve(__dirname, "../../views/logged_in_with_sl")
+
 	authFromSharelatex: (req, res, next) ->
 		{token} = req.query
 		if !token?
@@ -26,10 +33,31 @@ module.exports = SharelatexAuthController =
 			)
 			UserGetter.getUser user_id, (error, user) ->
 				return next(error) if error?
-				AuthenticationController.afterLoginSessionSetup req, user, (error) ->
-					return next(error) if error?
-					redir = AuthenticationController._getRedirectFromSession(req) || "/project"
-					res.redirect(redir)
+				SharelatexAuthController._createBackingAccountIfNeeded user, req, (err) ->
+					return next(err) if err?
+					AuthenticationController.finishLogin(user, req, res, next)
+
+	_createBackingAccountIfNeeded: (user, req, callback=(err)->) ->
+		if !Settings.createV1AccountOnLogin
+			return callback(null)
+		user_id = user._id
+		email = user.email
+		logger.log {user_id, email}, "Creating backing account in v1 for user"
+		SharelatexAuthHandler.createBackingAccount user, (err, created, profile) ->
+			if err?
+				logger.err {err, user_id, email}, "error while creating backing account in v1"
+				return callback(err)
+			if !created
+				logger.log {user_id, email}, "could not create backing account in v1"
+				return callback(new Error('backing account not created'))
+			else
+				logger.log {email, v1UserId: profile.id}, "v1 backing account created, adding overleaf-id to account"
+				UserUpdater.updateUser user_id, {$set: {'overleaf.id': profile.id}}, (err) ->
+					return callback(err) if err?
+					# All good, login and proceed
+					logger.log {email}, "successful registration with v1, proceeding with session setup"
+					AuthenticationController._setRedirectInSession(req, '/login/sharelatex/finish')
+					callback(null)
 
 	_badToken: (res, error) ->
 		logger.err err: error, "bad token in logging in from sharelatex"

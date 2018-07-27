@@ -13,11 +13,14 @@ describe "SharelatexAuthController", ->
 				@AuthenticationController = {}
 			"../../../../../app/js/Features/User/UserGetter":
 				@UserGetter = {}
+			"../../../../../app/js/Features/User/UserUpdater":
+				@UserUpdater = {}
 			"logger-sharelatex": { log: sinon.stub(), err: sinon.stub() }
 			"settings-sharelatex": @settings =
 				accountMerge:
 					secret: "banana"
 			"jsonwebtoken": @jwt = {}
+			"./SharelatexAuthHandler": @SharelatexAuthHandler = {}
 		@req = {}
 		@res =
 			status: sinon.stub()
@@ -39,12 +42,13 @@ describe "SharelatexAuthController", ->
 			}
 			@UserGetter.getUser = sinon.stub()
 			@UserGetter.getUser.withArgs(@user_id).yields(null, @user)
+			@AuthenticationController.finishLogin = sinon.stub()
+			@AuthenticationController._setRedirectInSession = sinon.stub()
 			@AuthenticationController.afterLoginSessionSetup =
 				sinon.stub().yields()
-			@AuthenticationController._getRedirectFromSession =
-				sinon.stub().returns('/redir/path')
 			@jwt.verify = sinon.stub()
 			@jwt.verify.withArgs(@token, @settings.accountMerge.secret).yields(null, @data)
+			@SharelatexAuthController._createBackingAccountIfNeeded = sinon.stub().callsArgWith(2, null)
 			@req.query = token: @token
 
 		describe "successfully", ->
@@ -62,13 +66,8 @@ describe "SharelatexAuthController", ->
 					.should.equal true
 
 			it "should log the user in", ->
-				@AuthenticationController.afterLoginSessionSetup
-					.calledWith(@req, @user)
-					.should.equal true
-
-			it "should redirect to '/redir/path'", ->
-				@res.redirect
-					.calledWith('/redir/path')
+				@AuthenticationController.finishLogin
+					.calledWith(@user, @req, @res, @next)
 					.should.equal true
 
 		describe "with no token", ->
@@ -94,3 +93,81 @@ describe "SharelatexAuthController", ->
 
 			it "should return a 400 invalid token error", ->
 				@res.status.calledWith(400).should.equal true
+
+	describe "_createBackingAccountIfNeeded", ->
+		beforeEach ->
+			@user_id = "1234"
+			@email = "user@example.com"
+			@user = {_id: @user_id, email: @email}
+			@v1Profile = {id: 123, email: @email}
+			@SharelatexAuthHandler.createBackingAccount = sinon.stub().callsArgWith(1, null, true , @v1Profile)
+			@UserUpdater.updateUser = sinon.stub().callsArgWith(2, null)
+			@AuthenticationController._setRedirectInSession = sinon.stub()
+
+		describe "when we're creating v1 accounts on login", ->
+			beforeEach (done) ->
+				@settings.createV1AccountOnLogin = true
+				@SharelatexAuthController._createBackingAccountIfNeeded @user, @req, (err) =>
+					@err = err
+					done()
+
+			it "should not produce an error", ->
+				expect(@err).to.not.exist
+
+			it "should create a backing account", ->
+				expect(@SharelatexAuthHandler.createBackingAccount.callCount).to.equal 1
+				expect(@SharelatexAuthHandler.createBackingAccount.calledWith(@user)).to.equal true
+
+			it "should update the user record", ->
+				expect(@UserUpdater.updateUser.callCount).to.equal 1
+				expect(@UserUpdater.updateUser.calledWith(@user_id)).to.equal true
+
+			it "should set up a redirect in the session", ->
+				expect(@AuthenticationController._setRedirectInSession.callCount).to.equal 1
+				expect(@AuthenticationController._setRedirectInSession.calledWith(
+					@req, '/login/sharelatex/finish'
+				)).to.equal true
+
+		describe "when we're creating v1 accounts on login, but it produces an error", ->
+			beforeEach (done) ->
+				@settings.createV1AccountOnLogin = true
+				@SharelatexAuthHandler.createBackingAccount = sinon.stub().callsArgWith(1, new Error('woops'))
+				@SharelatexAuthController._createBackingAccountIfNeeded @user, @req, (err) =>
+					@err = err
+					done()
+
+			it "should produce an error", ->
+				expect(@err).to.exist
+
+			it "should not update the user record", ->
+				expect(@UserUpdater.updateUser.callCount).to.equal 0
+				expect(@UserUpdater.updateUser.calledWith(@user_id)).to.equal false
+
+		describe "when we're creating v1 accounts on login, the account is not created", ->
+			beforeEach (done) ->
+				@settings.createV1AccountOnLogin = true
+				@SharelatexAuthHandler.createBackingAccount = sinon.stub().callsArgWith(1, null, false, null)
+				@SharelatexAuthController._createBackingAccountIfNeeded @user, @req, (err) =>
+					@err = err
+					done()
+
+			it "should produce an error", ->
+				expect(@err).to.exist
+
+			it "should not update the user record", ->
+				expect(@UserUpdater.updateUser.callCount).to.equal 0
+				expect(@UserUpdater.updateUser.calledWith(@user_id)).to.equal false
+
+		describe "when we're not creating v1 accounts on login", ->
+			beforeEach (done) ->
+				@settings.createV1AccountOnLogin = false
+				@SharelatexAuthController._createBackingAccountIfNeeded @user, @req, (err) =>
+					@err = err
+					done()
+
+			it "should not produce an error", ->
+				expect(@err).to.not.exist
+
+			it "should return the callback immediately and not create a backing account", ->
+				expect(@SharelatexAuthHandler.createBackingAccount.callCount).to.equal 0
+				expect(@SharelatexAuthHandler.createBackingAccount.calledWith(@user)).to.equal false

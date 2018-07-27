@@ -45,7 +45,7 @@ module.exports = MockOverleafApi =
 
 		app.post "/api/v1/sharelatex/login", (req, res, next) =>
 			for user in @users
-				if user.email == req.body.email && user.pass == req.body.pass
+				if user.email == req.body.email && user.password == req.body.password
 					return res.json {
 						email: user.email,
 						valid: true,
@@ -59,14 +59,14 @@ module.exports = MockOverleafApi =
 		v1Id = 89024583
 		app.post "/api/v1/sharelatex/register", (req, res, next) =>
 			for user in @users
-				if user.email == req.body.email && user.pass == req.body.pass
+				if user.email == req.body.email && user.password == req.body.password
 					return res.status(409).json {
 						email: user.email,
 						created: false
 					}
 			@users.push user = {
 				email: req.body.email,
-				pass: req.body.pass
+				password: req.body.password
 				profile: {
 					id: v1Id++,
 					email: req.body.email
