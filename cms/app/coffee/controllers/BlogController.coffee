@@ -54,10 +54,13 @@ getAndRenderBlog = (req, res, next, blogQuery, page) ->
 	clientType = if req.query.preview || req.query.preview == '' then 'clientPreview' else 'client'
 	url_path = "/blog#{if req.params.tag then "/tagged/#{req.params.tag}" else ''}"
 
-	ContentfulClient[clientType].getEntries(blogQuery)
+	_queryApi(clientType, blogQuery)
 		.then (collection) ->
 			if collection.items.length == 0
-				ErrorController.notFound req, res
+				# check if they have a v1 ID but with the wrong slug
+				slugPieces = req.params.slug.split('-')
+				if slugPieces && slugPieces[0] && !isNaN(slugPieces[0])
+					_v1IdQuery(slugPieces[0], req, res)
 			else if page == 'blog/blog_post'
 				cmsData = parseBlogPost(collection.items[0].fields)
 				CmsHandler.render(res, page, cmsData, req.query)
@@ -114,6 +117,28 @@ _getBlog = (req, res, next) ->
 			else
 				getAndRenderBlog(req, res, next, blogQuery, 'blog/blog')
 
+
+_queryApi = (clientType, blogQuery) ->
+	ContentfulClient[clientType].getEntries(blogQuery)
+
+_v1IdQuery = (id, req, res) ->
+	# separating ID out of req, because of another use for this:
+	# for if the slug contains an ID with the wrong slug
+
+	blogQuery = {
+		content_type: 'blogPost'
+		'fields.v1Id': parseInt(id, 10)
+	}
+
+	_queryApi('client', blogQuery)
+		.then (collection) ->
+			if collection.items?[0]?.fields?.slug?
+				res.redirect 301, "/blog/#{collection.items[0].fields.slug}"
+			else
+				ErrorController.notFound req, res
+		.catch (err) ->
+			next(err)
+
 module.exports =
 
 	getBlog: (req, res, next)->
@@ -127,6 +152,9 @@ module.exports =
 			# for if someone went to /blog/page/ or /blog/tagged/
 			# without a page number or tag param
 			_getBlog(req, res, next)
+		else if !isNaN(req.params.slug)
+			# v1 would sometimes link to blog ID
+			_v1IdQuery(req.params.slug, req, res)
 		else
 			blogQuery = {
 				content_type: 'blogPost'
