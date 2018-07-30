@@ -6,7 +6,8 @@ export default class PublishGuide extends Component {
   constructor (props) {
     super(props)
     this.state = {
-      exportState: 'uninitiated'
+      exportState: 'uninitiated',
+      exportId: null
     }
   }
 
@@ -55,8 +56,8 @@ export function GuideHtml ({ entry, projectId, pdfUrl, _this }) {
 }
 
 function Download ({ entry, projectId, pdfUrl, _this }) {
-  console.log(_this.state.exportState)
-  console.log(_this.state.exportState === 'uninitiated')
+  var zipLink = `/project/${projectId}/export/${_this.state.exportId}/zip`
+
   return (
     <div style={{ marginLeft: '140px', paddingLeft: '15px' }}>
       { /* Most publish guides have an image column
@@ -68,7 +69,7 @@ function Download ({ entry, projectId, pdfUrl, _this }) {
             className="btn btn-primary"
             onClick={() => initiateExport(entry, projectId, _this)}
           >
-            Download ZIP file with submission files
+            Build project ZIP with submission files (.bll)
           </a>
         }
         { _this.state.exportState === 'initiated' &&
@@ -78,16 +79,19 @@ function Download ({ entry, projectId, pdfUrl, _this }) {
           </span>
         }
         { _this.state.exportState === 'complete' &&
-          <span> ZIP built </span>
+          <a
+            className="btn btn-primary"
+            href={zipLink}
+            target="_blank"
+          >
+            Download project ZIP with submission files (.bll)
+          </a>
         }
         { _this.state.exportState === 'error' &&
           <span>
-            <p>
-              Zip with submission files failed to build
-            </p>
-            <p>
-              Error message: {_this.state.errorDetails}
-            </p>
+            Zip with submission files failed to build
+            <br/>
+            Error message: {_this.state.errorDetails}
           </span>
         }
       </p>

@@ -29,6 +29,7 @@ export function initiateExport (entry, projectId, _this) {
     data: data,
     headers: {'X-CSRF-Token': window.csrfToken},
     success: (resp) => {
+      _this.setState({ exportId: resp.export_v1_id })
       pollExportStatus(
         resp.export_v1_id,
         projectId,
