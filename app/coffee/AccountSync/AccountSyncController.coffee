@@ -48,3 +48,16 @@ module.exports = AccountSyncController =
 			return next(error) if error?
 			logger.log {v1_user_id, status}, "[AccountSync] returning v2 subscription status"
 			res.json status
+
+	getV2User: (req, res, next) ->
+		{v1_user_id} = req.params
+		v1_user_id = parseInt(v1_user_id, 10)
+		logger.log {v1_user_id}, "[AccountSync] getting v1 user in v2"
+		UserGetter.getUser {'overleaf.id': v1_user_id}, { _id: 1 }, (error, user) ->
+			return next(error) if error?
+			exists = user?
+			logger.log {v1_user_id, exists}, "[AccountSync] returning v2 user"
+			if exists
+				res.sendStatus(200)
+			else
+				res.sendStatus(404)
