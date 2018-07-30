@@ -46,8 +46,6 @@ describe "OverleafAuthenticationController", ->
 							profile: @profile = {
 								email: "test@example.com"
 							}
-							accessToken: @accessToken = "access-token"
-							refreshToken: @refreshToken = "refresh-token"
 							user_id: @user_id = "mock-sl-user-id"
 						})
 				@jwt.sign = sinon.stub().returns @token = "mock-token"
@@ -64,7 +62,7 @@ describe "OverleafAuthenticationController", ->
 
 			it 'should save the OAuth and user data in the session', ->
 				expect(@req.session.accountMerge).to.deep.equal {
-					@profile, @user_id, @accessToken, @refreshToken
+					@profile, @user_id
 				}
 
 			it "should render the confirmation page", ->
@@ -105,8 +103,6 @@ describe "OverleafAuthenticationController", ->
 			@jwt.verify = sinon.stub()
 			@jwt.verify.withArgs(@token, @settings.accountMerge.secret).yields(null, @data)
 			@req.session.accountMerge = {
-				accessToken: 'mock-access-token'
-				refreshToken: 'mock-refresh-token'
 				user_id: @user_id
 				profile: {
 					email: "jim@example.com"
@@ -127,9 +123,7 @@ describe "OverleafAuthenticationController", ->
 				@UserMapper.mergeWithSlUser
 					.calledWith(
 						@user_id,
-						@req.session.accountMerge.profile,
-						@req.session.accountMerge.accessToken,
-						@req.session.accountMerge.refreshToken
+						@req.session.accountMerge.profile
 					)
 					.should.equal true
 
@@ -171,17 +165,13 @@ describe "OverleafAuthenticationController", ->
 
 		it 'should prepare the session, and produce a url with a token', () ->
 			info = {
-				profile: {email: 1},
-				accessToken: 2,
-				refreshToken: 3,
+				profile: {email: 1}
 				user_id: 4
 			}
 			req = {session: {}}
 			url = @OverleafAuthenticationController.prepareAccountMerge(info, req)
 			expect(req.session.accountMerge).to.deep.equal {
-				profile: {email: 1},
-				accessToken: 2,
-				refreshToken: 3,
+				profile: {email: 1}
 				user_id: 4
 			}
 			expect(@jwt.sign.callCount).to.equal 1

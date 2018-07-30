@@ -76,8 +76,11 @@ describe "UserMapper", ->
 				id: 42
 				email: "jane@example.com"
 			}
-			@accessToken = "mock-access-token"
-			@refreshToken = "mock-refresh-token"
+			@newSlUser =
+				id: 'new-user-id'
+				email: 'jane@example.com'
+				emails: [ { email: 'jane@example.com' } ]
+
 			@UserMapper.getOlUserStub = sinon.stub()
 			@UserMapper.removeOlUserStub = sinon.stub().yields()
 			@UserCreator.createNewUser = sinon.stub().yields(null, @user = {"mock": "user"})
@@ -85,7 +88,7 @@ describe "UserMapper", ->
 		describe "when a UserStub exists", ->
 			beforeEach ->
 				@UserMapper.getOlUserStub.yields(null, @user_stub = { _id: "user-stub-id" })
-				@UserMapper.createSlUser @ol_user, @accessToken, @refreshToken, @callback
+				@UserMapper.createSlUser @ol_user, @callback
 
 			it "should look up the user stub", ->
 				@UserMapper.getOlUserStub
@@ -99,8 +102,6 @@ describe "UserMapper", ->
 						email: @ol_user.email
 						overleaf: {
 							id: @ol_user.id
-							accessToken: @accessToken
-							refreshToken: @refreshToken
 						}
 						ace:
 							theme: 'overleaf'
@@ -118,7 +119,7 @@ describe "UserMapper", ->
 		describe "when no UserStub exists", ->
 			beforeEach ->
 				@UserMapper.getOlUserStub.yields()
-				@UserMapper.createSlUser @ol_user, @accessToken, @refreshToken, @callback
+				@UserMapper.createSlUser @ol_user, @callback
 
 			it "should create a new user without specifying an id", ->
 				@UserCreator.createNewUser
@@ -126,8 +127,6 @@ describe "UserMapper", ->
 						email: @ol_user.email
 						overleaf: {
 							id: @ol_user.id
-							accessToken: @accessToken
-							refreshToken: @refreshToken
 						}
 						ace:
 							theme: 'overleaf'
@@ -147,8 +146,6 @@ describe "UserMapper", ->
 				id: 42
 				email: "Jane@Example.com" # Only needs to match up to case
 			}
-			@accessToken = "mock-access-token"
-			@refreshToken = "mock-refresh-token"
 			@UserMapper.getOlUserStub = sinon.stub().yields()
 			@UserMapper.removeOlUserStub = sinon.stub().yields()
 			@request.post = sinon.stub().yields(null, statusCode: 204)
@@ -158,7 +155,7 @@ describe "UserMapper", ->
 		describe "successfully - without an existing UserStub", ->
 			beforeEach ->
 				@UserMapper.mergeWithSlUser(
-					@user_id, @ol_user, @accessToken, @refreshToken, @callback
+					@user_id, @ol_user, @callback
 				)
 
 			it "should look up whether there is a UserStub", ->
@@ -174,8 +171,6 @@ describe "UserMapper", ->
 			it "should add the overleaf properties to the user", ->
 				expect(@sl_user.overleaf).to.deep.equal {
 					id: @ol_user.id
-					accessToken: @accessToken
-					refreshToken: @refreshToken
 				}
 
 			it "should save the user", ->
@@ -198,7 +193,7 @@ describe "UserMapper", ->
 				@UserMapper.getOlUserStub = sinon.stub().yields(null, @user_stub = { _id: "user-stub-id" })
 				@SubscriptionGroupHandler.replaceUserReferencesInGroups = sinon.stub().yields(null)
 				@UserMapper.mergeWithSlUser(
-					@user_id, @ol_user, @accessToken, @refreshToken, @callback
+					@user_id, @ol_user, @callback
 				)
 
 			it "should remove the user stub", ->
@@ -229,7 +224,7 @@ describe "UserMapper", ->
 			beforeEach ->
 				@ol_user.email = "different@example.com"
 				@UserMapper.mergeWithSlUser(
-					@user_id, @ol_user, @accessToken, @refreshToken, @callback
+					@user_id, @ol_user, @callback
 				)
 
 			it "should not save the user", ->

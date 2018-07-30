@@ -61,7 +61,7 @@ describe "Team imports", ->
 			]
 		}
 
-		UserMapper.createSlUser @v1Team.owner, "accessToken", "refreshToken", (error, sl_user) =>
+		UserMapper.createSlUser @v1Team.owner, (error, sl_user) =>
 			@teamAdmin = sl_user
 			done()
 

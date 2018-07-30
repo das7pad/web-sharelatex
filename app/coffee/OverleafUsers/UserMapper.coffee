@@ -46,15 +46,13 @@ module.exports = UserMapper =
 
 	# Create an SL User object for the OL user, with the same ID as was
 	# used for the UserStub if it exists.
-	createSlUser: (ol_user, accessToken, refreshToken, callback = (error, sl_user) ->) ->
+	createSlUser: (ol_user, callback = (error, sl_user) ->) ->
 		email = UserMapper.getCanonicalEmail(ol_user.email)
 		UserMapper.getOlUserStub ol_user.id, (error, user_stub) ->
 			return callback(error) if error?
 			new_user = {
 				overleaf: {
 					id: ol_user.id
-					accessToken: accessToken
-					refreshToken: refreshToken
 				},
 				email: email,
 				ace:
@@ -68,7 +66,7 @@ module.exports = UserMapper =
 					return callback(error) if error?
 					return callback(null, user)
 
-	mergeWithSlUser: (sl_user_id, ol_user, accessToken, refreshToken, callback = (error, sl_user) ->) ->
+	mergeWithSlUser: (sl_user_id, ol_user, callback = (error, sl_user) ->) ->
 		UserMapper.getOlUserStub ol_user.id, (error, user_stub) ->
 			return callback(error) if error?
 			User.findOne {_id: sl_user_id}, (error, user) ->
@@ -77,8 +75,6 @@ module.exports = UserMapper =
 					return callback(new Error('expected OL and SL account emails to match'))
 				user.overleaf = {
 					id: ol_user.id
-					accessToken: accessToken
-					refreshToken: refreshToken
 				}
 				user.save (error) ->
 					return callback(error) if error?

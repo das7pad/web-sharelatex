@@ -33,8 +33,8 @@ module.exports = OverleafAuthenticationController =
 		)(req, res, next)
 
 	prepareAccountMerge: (info, req) ->
-		{profile, accessToken, refreshToken, user_id} = info
-		req.session.accountMerge = {profile, accessToken, refreshToken, user_id}
+		{profile, user_id} = info
+		req.session.accountMerge = {profile, user_id}
 		token = jwt.sign(
 			{ user_id, overleaf_email: profile.email, confirm_merge: true },
 			Settings.accountMerge.secret,
@@ -56,16 +56,16 @@ module.exports = OverleafAuthenticationController =
 				return OverleafAuthenticationController._badToken(
 					res, new Error('expected token.confirm_merge == true')
 				)
-			{profile, accessToken, refreshToken, user_id} = req.session.accountMerge
+			{profile, user_id} = req.session.accountMerge
 			if data.user_id != user_id
 				return OverleafAuthenticationController._badToken(
 					res, new Error('expected token.user_id == session.accountMerge.user_id')
 				)
 			logger.log(
-				{profile, accessToken, refreshToken, user_id},
+				{profile, user_id},
 				"merging OL user with existing SL account"
 			)
-			UserMapper.mergeWithSlUser user_id, profile, accessToken, refreshToken,	(error, user) ->
+			UserMapper.mergeWithSlUser user_id, profile, (error, user) ->
 				return next(error) if error?
 				FeaturesUpdater.refreshFeatures(user_id) # Notifies v1 about SL-granted features too
 				logger.log {user: user}, "merged with SL account, logging in"

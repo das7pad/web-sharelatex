@@ -47,7 +47,7 @@ module.exports = OverleafAuthenticationManager =
 						})
 					else
 						# No user for either v1UserId nor Email, create and sign in
-						UserMapper.createSlUser profile, undefined, undefined, (err, sl_user) ->
+						UserMapper.createSlUser profile, (err, sl_user) ->
 							return callback(err) if err?
 							FeaturesUpdater.refreshFeatures(sl_user._id, false)
 							callback(null, sl_user)
