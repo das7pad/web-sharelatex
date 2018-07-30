@@ -7,8 +7,6 @@ module.exports =
 
 		# Query param data
 		data.preview = reqQuery?.preview?
-		data.tag = reqQuery?.tag # just used to filter blog 
-
 		# Metadata
 		if page == 'blog/blog'
 			data.metadata = {
