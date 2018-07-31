@@ -24,6 +24,9 @@ describe "OverleafAuthenticationController", ->
 				@FeaturesUpdater = {refreshFeatures: sinon.stub()}
 			"../../../../../app/js/models/User": { User: @User = {} }
 			"../../../../../app/js/Features/User/UserController": @UserController = {}
+			"../Collabratec/CollabratecController": {
+				_completeOauthLink: sinon.stub().callsArgWith(2, null, false)
+			}
 		@req =
 			logIn: sinon.stub()
 			session: {}
