@@ -2,7 +2,13 @@ tr
 	td
 		label(for="admin_id") Admin User ID
 	td
-		a(href="/admin/user/" + subscription.admin_id)= subscription.admin_id
+		input(
+			type="hidden"
+			name="admin_id"
+			ng-value="subscription.admin_id"
+		)
+		a(ng-href="/admin/user/{{ subscription.admin_id }}", targ
+et="_blank") {{ subscription.admin_id }}
 
 tr
 	td
