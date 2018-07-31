@@ -8,7 +8,9 @@ expect = require("chai").expect
 
 describe "LogInToV2Controller", ->
 	beforeEach ->
+		@User = {}
 		@LogInToV2Controller = SandboxedModule.require modulePath, requires:
+			"../../../../app/js/models/User": {User: @User}
 			"../../../../app/js/Features/Authentication/AuthenticationController":
 				@AuthenticationController = {}
 			"./V1UserFinder": @V1UserFinder =
@@ -50,3 +52,53 @@ describe "LogInToV2Controller", ->
 					"http://beta.example.com/overleaf/auth_from_sl?token=#{@token}"
 				)
 				.should.equal true
+
+	describe "doPassportLoginHook", ->
+		beforeEach ->
+			@email = "user@example.com"
+			@call = (cb) =>
+				@LogInToV2Controller.doPassportLoginHook @email, cb
+
+		describe "when we're not creating v1 accounts on login", ->
+			beforeEach ->
+				@settings.createV1AccountOnLogin = false
+				@user = {_id: '1234', email: @email, overleaf: {id: 21}}
+				@User.findOne = sinon.stub().callsArgWith(2, null, @user)
+
+				it "should return callback immediately and not check for User", (done) ->
+					@call (err, info) =>
+						expect(err).to.not.exist
+						expect(info).to.not.exist
+						expect(@User.findOne.callCount).to.equal 0
+						expect(@User.findOne.calledWith({email: @email})).to.equal false
+						done()
+
+		describe "when we are creating v1 accounts on login", ->
+			beforeEach ->
+				@settings.createV1AccountOnLogin = true
+
+			describe "when the user is already linked to an overleaf v1 account", ->
+				beforeEach ->
+					@user = {_id: '1234', email: @email, overleaf: {id: 21}}
+					@User.findOne = sinon.stub().callsArgWith(2, null, @user)
+
+				it "should get the user, then return a redirect instruction", (done) ->
+					@call (err, info) =>
+						expect(err).to.not.exist
+						expect(info).to.deep.equal({redir: '/migrated-to-overleaf'})
+						expect(@User.findOne.callCount).to.equal 1
+						expect(@User.findOne.calledWith({email: @email})).to.equal true
+						done()
+
+			describe "when the user is not linked to an overleaf v1 account", ->
+				beforeEach ->
+					@user = {_id: '1234', email: @email}
+					@User.findOne = sinon.stub().callsArgWith(2, null, @user)
+
+				it "should get the user, then return nothing", (done) ->
+					@call (err, info) =>
+						expect(err).to.not.exist
+						expect(info).to.not.exist
+						expect(@User.findOne.callCount).to.equal 1
+						expect(@User.findOne.calledWith({email: @email})).to.equal true
+						done()
