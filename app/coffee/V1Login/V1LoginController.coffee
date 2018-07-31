@@ -5,6 +5,7 @@ AuthenticationController = require "../../../../../app/js/Features/Authenticatio
 UserRegistrationHandler = require "../../../../../app/js/Features/User/UserRegistrationHandler"
 OverleafAuthenticationManager = require "../Authentication/OverleafAuthenticationManager"
 OverleafAuthenticationController = require "../Authentication/OverleafAuthenticationController"
+CollabratecManager = require "../Collabratec/CollabratecManager"
 Url = require 'url'
 jwt = require('jsonwebtoken')
 Settings = require 'settings-sharelatex'
@@ -45,7 +46,7 @@ module.exports = V1Login =
 						text: 'This email is in use by a Sharelatex account. Log in to ShareLaTeX to proceed'
 					}
 				}
-			V1LoginHandler.registerWithV1 email, password, (err, created, profile) ->
+			V1LoginHandler.registerWithV1 { email, password }, (err, created, profile) ->
 				if err?
 					logger.err {err, email}, "error while creating account in v1"
 					return next(err)
@@ -78,6 +79,7 @@ module.exports = V1Login =
 	doLogin: (req, res, next) ->
 		email = req.body.email
 		pass = req.body.password
+
 		V1LoginHandler.authWithV1 email, pass, (err, isValid, profile) ->
 			return next(err) if err?
 			if !isValid
@@ -95,5 +97,13 @@ module.exports = V1Login =
 					else
 						# All good, login and proceed
 						logger.log {email}, "successful login with v1, proceeding with session setup"
-						AuthenticationController.finishLogin(user, req, res, next)
-
+						oauth_params = req.session.collabratec_oauth_params
+						collabratec_user = req.session.collabratec_saml_user
+						if oauth_params
+							CollabratecManager.setV1UserCollabratecId user.overleaf.id, collabratec_user.MemberNumber, (err, profile, cookies) ->
+								return callback(err) if err?
+								res.set('Set-Cookie', cookies)
+								req.session.postLoginRedirect = CollabratecManager.oauthRedirectUrl oauth_params
+								AuthenticationController.finishLogin(user, req, res, next)
+						else
+							AuthenticationController.finishLogin(user, req, res, next)
