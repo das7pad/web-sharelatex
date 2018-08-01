@@ -151,7 +151,7 @@ describe "SubscriptionAdminController", ->
 
 			it "should convert the body params to an update", ->
 				@UserAdminController._reqToMongoUpdate
-					.calledWith(@req.body, @SubscriptionAdminController.ALLOWED_ATTRIBUTES)
+					.calledWith(@req.body, @SubscriptionAdminController.ALLOWED_ATTRIBUTES.concat(@SubscriptionAdminController.ALLOWED_CREATE_ATTRIBUTES))
 					.should.equal true
 
 			it "should create the subscription", ->

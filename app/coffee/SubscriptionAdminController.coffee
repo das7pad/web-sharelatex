@@ -36,6 +36,9 @@ module.exports = SubscriptionAdminController =
 		'groupPlan',
 		'customAccount'
 	]
+	ALLOWED_CREATE_ATTRIBUTES: [
+		'admin_id'
+	]
 	BOOLEAN_ATTRIBUTES: ['groupPlan', 'customAccount']
 	update: (req, res, next) ->
 		{subscription_id, user_id} = req.params
@@ -57,10 +60,16 @@ module.exports = SubscriptionAdminController =
 			)
 
 	new: (req, res, next) ->
-		res.render Path.resolve(__dirname, "../views/subscription/new"), {admin_id: req.params.user_id}
+		res.render Path.resolve(__dirname, "../views/subscription/new"), {
+			admin_id: req.params.user_id
+		}
 
 	create: (req, res, next) ->
-		update = UserAdminController._reqToMongoUpdate(req.body, SubscriptionAdminController.ALLOWED_ATTRIBUTES, SubscriptionAdminController.BOOLEAN_ATTRIBUTES)
+		update = UserAdminController._reqToMongoUpdate(
+			req.body,
+			SubscriptionAdminController.ALLOWED_ATTRIBUTES.concat(SubscriptionAdminController.ALLOWED_CREATE_ATTRIBUTES),
+			SubscriptionAdminController.BOOLEAN_ATTRIBUTES
+		)
 		logger.log {update}, "creating subscription via admin panel"
 		new Subscription(update).save (error, subscription) ->
 			return next(error) if error?
