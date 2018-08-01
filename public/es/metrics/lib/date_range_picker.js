@@ -74,8 +74,9 @@ var WLDateRangePicker = function() {
     $('.daterangepicker').addClass('dropdown-menu-bare');
     var $applyButtons = $('.daterangepicker .range_inputs');
     $applyButtons.hide();
-    $applyButtons.find('button').removeClass('btn btn-sm btn-success');
-    $applyButtons.find('.cancelBtn').addClass('button-as-link');
+    $applyButtons.find('button').removeClass('btn-sm btn-success');
+    $applyButtons.find('.cancelBtn').addClass('btn');
+    $applyButtons.find('.applyBtn').addClass('btn btn-primary');
     this.$elt.on('showCalendar.daterangepicker', function() {
       $applyButtons.show();
     });
