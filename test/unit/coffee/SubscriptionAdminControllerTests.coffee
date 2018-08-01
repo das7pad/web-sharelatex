@@ -141,22 +141,27 @@ describe "SubscriptionAdminController", ->
 		beforeEach ->
 			@req.body = {
 				"mock": "data for subscription"
+				admin_id: @admin_id = 'mock-admin-id'
 			}
 			@Subscription::save.yields(null, @new_subscription = {"new": "subscription"})
 
 		describe "successfully", ->
 			beforeEach ->
-				@UserAdminController._reqToMongoUpdate = sinon.stub().returns({valid: true, update: @update = {"mock": "update"}})
+				@UserAdminController._reqToMongoUpdate = sinon.stub().returns(@update = {"mock": "update"})
 				@SubscriptionAdminController.create @req, @res
 
 			it "should convert the body params to an update", ->
 				@UserAdminController._reqToMongoUpdate
-					.calledWith(@req.body, @SubscriptionAdminController.ALLOWED_ATTRIBUTES.concat(@SubscriptionAdminController.ALLOWED_CREATE_ATTRIBUTES))
+					.calledWith(@req.body, @SubscriptionAdminController.ALLOWED_ATTRIBUTES)
 					.should.equal true
 
 			it "should create the subscription", ->
 				# @Subscription::constructor.calledWith(@update).should.equal true
 				@Subscription::save.called.should.equal true
+
+			it "should add the admin_id and manager_ids to the update", ->
+				expect(@update.admin_id).to.equal @admin_id
+				expect(@update.manager_ids).to.deep.equal [@admin_id]
 
 			it "should return the subscription as json", ->
 				@res.json
