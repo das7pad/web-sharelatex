@@ -1,6 +1,6 @@
-/* global $ */
 import React, { PropTypes, Component } from 'react'
 import ReturnButton from './return_button'
+import { initiateExport } from '../utils'
 
 export default class EmisExport extends Component {
   constructor (props) {
@@ -12,60 +12,12 @@ export default class EmisExport extends Component {
     }
   }
 
-  initiateExport (entry, projectId) {
-    var link = `/project/${projectId}/export/${entry.id}`
-
+  runExport (entry, projectId) {
     if (this.firstName.value && this.lastName.value) {
-      this.setState({ exportState: 'initiated' })
-      $.ajax({
-        url: link,
-        type: 'POST',
-        data: {firstName: this.firstName.value, lastName: this.lastName.value},
-        headers: {'X-CSRF-Token': window.csrfToken},
-        success: (resp) => {
-          this.pollExportStatus(
-            resp.export_v1_id,
-            projectId,
-            this,
-            1000
-          )
-        },
-        error: (resp) => {
-          this.setState({ exportState: 'error' })
-        }
-      })
+      initiateExport(entry, projectId, this)
     } else {
       this.setState({ submissionValid: false })
     }
-  }
-
-  pollExportStatus (exportId, projectId, _this, timeout) {
-    var link = `/project/${projectId}/export/${exportId}`
-    $.ajax({
-      url: link,
-      type: 'GET',
-      success: (resp) => {
-        const status = resp.export_json
-        if (status.status_summary === 'failed') {
-          _this.setState({
-            exportState: 'error',
-            errorDetails: status.status_detail
-          })
-        } else if (status.status_summary === 'succeeded') {
-          _this.setState({ exportState: 'complete' })
-        } else {
-          setTimeout(function () {
-            if (timeout < 10000) {
-              timeout = timeout + 1000
-            }
-            _this.pollExportStatus(exportId, projectId, _this, timeout)
-          }, timeout)
-        }
-      },
-      error: (resp) => {
-        _this.setState({ exportState: 'error' })
-      }
-    })
   }
 
   render () {
@@ -149,7 +101,7 @@ export default class EmisExport extends Component {
                 <br/>
                 <button
                   className='btn btn-primary'
-                  onClick={() => this.initiateExport(entry, projectId)}
+                    onClick={() => this.runExport(entry, projectId)}
                 >
                   Submit to {entry.name}
                 </button>

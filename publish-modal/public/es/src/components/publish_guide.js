@@ -1,7 +1,16 @@
 import React, { PropTypes, Component } from 'react'
 import ReturnButton from './return_button'
+import { initiateExport } from '../utils'
 
 export default class PublishGuide extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      exportState: 'uninitiated',
+      exportId: null
+    }
+  }
+
   render () {
     const { entry, returnText, onReturn, projectId, pdfUrl } = this.props
 
@@ -13,10 +22,10 @@ export default class PublishGuide extends Component {
       >
         <div className='col-sm-12'>
           <ReturnButton onReturn={onReturn} returnText={returnText} />
-          <GuideHtml entry={entry} projectId={projectId} pdfUrl={pdfUrl} />
+          <GuideHtml entry={entry} projectId={projectId} pdfUrl={pdfUrl} _this={this} />
           {entry.publish_link_destination &&
            <div>
-             <Download entry={entry} projectId={projectId} pdfUrl={pdfUrl} />
+             <Download entry={entry} projectId={projectId} pdfUrl={pdfUrl} _this={this} />
              <Submit entry={entry} />
            </div>}
         </div>
@@ -25,14 +34,14 @@ export default class PublishGuide extends Component {
   }
 }
 
-export function GuideHtml ({ entry, projectId, pdfUrl }) {
+export function GuideHtml ({ entry, projectId, pdfUrl, _this }) {
   const html = entry.publish_guide_html
   if (html.indexOf('DOWNLOAD') !== -1) {
     const htmlParts = html.split('DOWNLOAD')
     return (
       <div>
         <div dangerouslySetInnerHTML={{ __html: htmlParts[0] }} />
-        <Download entry={entry} projectId={projectId} pdfUrl={pdfUrl} />
+        <Download entry={entry} projectId={projectId} pdfUrl={pdfUrl} _this={_this} />
         <div
           style={{ marginLeft: '140px', paddingLeft: '15px' }}
           dangerouslySetInnerHTML={{ __html: htmlParts[1] }}
@@ -46,21 +55,47 @@ export function GuideHtml ({ entry, projectId, pdfUrl }) {
   }
 }
 
-function Download ({ entry, projectId, pdfUrl }) {
+function Download ({ entry, projectId, pdfUrl, _this }) {
+  var zipLink = `/project/${projectId}/export/${_this.state.exportId}/zip`
+
   return (
     <div style={{ marginLeft: '140px', paddingLeft: '15px' }}>
       { /* Most publish guides have an image column
            with 140px as the set width */ }
       <p><strong>Step 1: Download files</strong></p>
       <p>
-        <a
-          className="btn btn-primary"
-          href={'/project/' + projectId + '/download/zip'}
-          target="_blank"
-        >
-          Download ZIP file with all the source files
-        </a>
+        { _this.state.exportState === 'uninitiated' &&
+          <a
+            className="btn btn-primary"
+            onClick={() => initiateExport(entry, projectId, _this)}
+          >
+            Build project ZIP with submission files (.bll)
+          </a>
+        }
+        { _this.state.exportState === 'initiated' &&
+          <span style={{ fontSize: 20, margin: '20px 0px 20px' }}>
+            <i className='fa fa-refresh fa-spin fa-fw'></i>
+            <span> &nbsp; Zipping files, please wait...</span>
+          </span>
+        }
+        { _this.state.exportState === 'complete' &&
+          <a
+            className="btn btn-primary"
+            href={zipLink}
+            target="_blank"
+          >
+            Download project ZIP with submission files (.bll)
+          </a>
+        }
+        { _this.state.exportState === 'error' &&
+          <span>
+            Zip with submission files failed to build
+            <br/>
+            Error message: {_this.state.errorDetails}
+          </span>
+        }
       </p>
+
       <p>
         {pdfUrl &&
          <a
