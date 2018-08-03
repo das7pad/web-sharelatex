@@ -108,6 +108,6 @@ module.exports = UserMapper =
 			if 200 <= response.statusCode < 300
 				callback()
 			else
-				error = new Error("overleaf returned non-success code: #{response.statusCode}")
+				error = new Error("project-history returned non-success code: #{response.statusCode}")
 				error.statusCode = response.statusCode
 				callback error
