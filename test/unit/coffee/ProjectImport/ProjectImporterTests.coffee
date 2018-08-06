@@ -38,7 +38,7 @@ describe "ProjectImporter", ->
 	describe "importProject", ->
 		beforeEach ->
 			@UserGetter.getUser = sinon.stub().yields(null, @user = overleaf: id: @v1_user_id)
-			@ProjectImporter._startExport = sinon.stub().yields(null, @doc = { files: ["mock-files"] })
+			@ProjectImporter._startExport = sinon.stub().yields(null, @doc = { id: @v1_project_id, files: ["mock-files"] })
 			@ProjectImporter._initSharelatexProject = sinon.stub().yields(null, @v2_project_id)
 			@ProjectImporter._importFiles = sinon.stub().yields()
 			@ProjectImporter._importLabels = sinon.stub().yields()
@@ -74,7 +74,7 @@ describe "ProjectImporter", ->
 
 			it "should import the labels", ->
 				@ProjectImporter._importLabels
-					.calledWith(@v1_project_id, @v2_project_id, @v1_user_id)
+					.calledWith(@v1_project_id, @v2_project_id)
 					.should.equal true
 
 			it "should tell overleaf the project is now in the beta", ->
