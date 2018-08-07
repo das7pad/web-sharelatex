@@ -162,6 +162,7 @@ describe "ProjectImportTests", ->
 			labels = [
 				{ user_id: @owner_v1_id, history_version: 1, comment: 'hello', created_at: @date }
 				{ user_id: @collaborator_v1_id, history_version: 2, comment: 'goodbye', created_at: @date }
+				{ history_version: 3, comment: 'foobar', created_at: @date }
 			]
 			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, labels })
 
@@ -177,9 +178,13 @@ describe "ProjectImportTests", ->
 		it 'creates the labels in project history with user stubs for unimported collaborators', (done) ->
 			UserStub.findOne { "overleaf.id": @collaborator_v1_id }, { _id: 1 }, (error, user_stub) =>
 				throw error if error?
-				expect(MockProjectHistoryApi.getLabels(@project._id)).to.deep.equal [
-					{ user_id: @owner._id.toString(), version: 1, comment: 'hello', created_at: @date.toISOString() }
-					{ user_id: user_stub._id.toString(), version: 2, comment: 'goodbye', created_at: @date.toISOString() }
-				]
+				expect(MockProjectHistoryApi.getLabels(@project._id)[1]).to.deep.equal {
+					user_id: user_stub._id.toString(), version: 2, comment: 'goodbye', created_at: @date.toISOString()
+				}
 				done()
 			return
+
+		it 'sets a blank label user_id to the project owner user_id', ->
+			expect(MockProjectHistoryApi.getLabels(@project._id)[2]).to.deep.equal {
+				user_id: @owner._id, version: 3, comment: 'foobar', created_at: @date.toISOString()
+			}

@@ -74,7 +74,7 @@ describe "ProjectImporter", ->
 
 			it "should import the labels", ->
 				@ProjectImporter._importLabels
-					.calledWith(@v1_project_id, @v2_project_id)
+					.calledWith(@v1_project_id, @v2_project_id, @v1_user_id)
 					.should.equal true
 
 			it "should tell overleaf the project is now in the beta", ->

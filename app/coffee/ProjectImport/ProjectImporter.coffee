@@ -89,7 +89,7 @@ module.exports = ProjectImporter =
 			(cb) ->
 				ProjectImporter._waitForV1HistoryExport v1_project_id, v1_user_id, cb
 			(cb) ->
-				ProjectImporter._importLabels doc.id, v2_project_id, cb
+				ProjectImporter._importLabels doc.id, v2_project_id, v1_user_id, cb
 			(cb) ->
 				ProjectImporter._confirmExport v1_project_id, v2_project_id, v1_user_id, cb
 		], (error) ->
@@ -192,17 +192,22 @@ module.exports = ProjectImporter =
 				privileges: privilegeLevel
 			}, callback
 
-	_importLabels: (v1_project_id, v2_project_id, callback = (error) ->) ->
+	_importLabels: (v1_project_id, v2_project_id, v1_user_id, callback = (error) ->) ->
 		ProjectImporter._getLabels v1_project_id, (error, labels) ->
 			return callback(error) if error?
 			async.eachSeries(
 				labels,
-				(label, cb) -> ProjectImporter._importLabel v2_project_id, label, cb
+				(label, cb) -> ProjectImporter._importLabel v2_project_id, label, v1_user_id, cb
 				callback
 			)
 
-	_importLabel: (v2_project_id, label, callback = (error) ->) ->
+	_importLabel: (v2_project_id, label, v1_user_id, callback = (error) ->) ->
 		logger.log {v2_project_id, label}, 'importing label'
+		if !label.history_version?
+			return callback(new Error('cannot import label with no history_version'))
+		if !label.user_id?
+			logger.log {v2_project_id, label, v1_user_id}, 'no user id on label, defaulting to project owner'
+			label.user_id = v1_user_id
 		UserMapper.getSlIdFromOlUser {id: label.user_id}, (error, user_id) ->
 			return callback(error) if error?
 			request.post {
