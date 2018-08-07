@@ -53,14 +53,16 @@ block content
 								)
 									span(ng-show="!registerForm.inflight") #{translate("register")}
 									span(ng-show="registerForm.inflight") #{translate("registering")}...
+									
 							.form-group
-								.checkbox
+								label.checkbox-inline
 									input(type='checkbox', 
 										id="newslettercheckbox",
 										name="subscribeToNewsletter",
 										ng-model="subscribeToNewsletter",
 										value="true")
-									label(for="newslettercheckbox") I’d like emails about product offers and company news and events.
+									| I’d like emails about product offers and company news and events.
+
 	.universities.hidden-xs.hidden-sm
 		.container
 			.row.row-spaced-small
