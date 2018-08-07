@@ -34,6 +34,13 @@ module.exports = MockOverleafApi =
 		app.get "/api/v1/sharelatex/users/:ol_user_id/docs/:ol_doc_id/export/history", (req, res, next) =>
 			res.json exported: true
 
+		app.get "/api/v1/sharelatex/docs/:ol_doc_id/labels", (req, res, next) =>
+			doc = @docs[req.params.ol_doc_id]
+			if doc
+				res.json labels: doc.labels
+			else
+				res.sendStatus 404
+
 		app.get "/api/v1/sharelatex/users/:v1_user_id/plan_code", (req, res, next) =>
 			res.json { plan_code: 'pro' }
 

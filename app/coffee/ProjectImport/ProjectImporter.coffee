@@ -89,6 +89,8 @@ module.exports = ProjectImporter =
 			(cb) ->
 				ProjectImporter._waitForV1HistoryExport v1_project_id, v1_user_id, cb
 			(cb) ->
+				ProjectImporter._importLabels doc.id, v2_project_id, cb
+			(cb) ->
 				ProjectImporter._confirmExport v1_project_id, v2_project_id, v1_user_id, cb
 		], (error) ->
 			if error?
@@ -189,6 +191,32 @@ module.exports = ProjectImporter =
 				projectId: project_id
 				privileges: privilegeLevel
 			}, callback
+
+	_importLabels: (v1_project_id, v2_project_id, callback = (error) ->) ->
+		ProjectImporter._getLabels v1_project_id, (error, labels) ->
+			return callback(error) if error?
+			async.eachSeries(
+				labels,
+				(label, cb) -> ProjectImporter._importLabel v2_project_id, label, cb
+				callback
+			)
+
+	_importLabel: (v2_project_id, label, callback = (error) ->) ->
+		logger.log {v2_project_id, label}, 'importing label'
+		UserMapper.getSlIdFromOlUser {id: label.user_id}, (error, user_id) ->
+			return callback(error) if error?
+			request.post {
+				url: "#{settings.apis.project_history.url}/project/#{v2_project_id}/user/#{user_id}/labels"
+				json: { version: label.history_version, comment: label.comment, created_at: label.created_at }
+			}, (error, response) ->
+				return callback(error) if error?
+
+				if 200 <= response.statusCode < 300
+					callback()
+				else
+					error = new Error("project-history returned non-success code: #{response.statusCode}")
+					error.statusCode = response.statusCode
+					callback error
 
 	_importFiles: (project_id, v2_user_id, files = [], callback = (error) ->) ->
 		async.mapSeries(files, (file, cb) ->
@@ -345,6 +373,19 @@ module.exports = ProjectImporter =
 					)
 			else
 				callback(null)
+
+	_getLabels: (v1_project_id, callback = (error, labels) ->) ->
+		V1SharelatexApi.request {
+			method: 'GET'
+			url: "#{settings.overleaf.host}/api/v1/sharelatex/docs/#{v1_project_id}/labels"
+			json: true
+		}, (error, res, data) ->
+			if error?
+				callback(error)
+			else if !data?.labels?
+				callback(new Error('expected labels'))
+			else
+				callback(null, data.labels)
 
 	_confirmExport: (v1_project_id, v2_project_id, v1_user_id, callback = (error) ->) ->
 		V1SharelatexApi.request {

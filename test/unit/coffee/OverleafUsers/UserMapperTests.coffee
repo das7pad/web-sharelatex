@@ -9,6 +9,10 @@ expect = require("chai").expect
 describe "UserMapper", ->
 	beforeEach ->
 		@UserMapper = SandboxedModule.require modulePath, requires:
+			"settings-sharelatex": @settings = {
+				apis: { project_history: { url: 'project-history' } }
+			}
+			"request": @request = {}
 			"../../../../../app/js/Features/User/UserCreator": @UserCreator = {}
 			"../../../../../app/js/models/User": User: @User = {}
 			"../../../../../app/js/models/UserStub": UserStub: @UserStub = {}
@@ -147,6 +151,7 @@ describe "UserMapper", ->
 			@refreshToken = "mock-refresh-token"
 			@UserMapper.getOlUserStub = sinon.stub().yields()
 			@UserMapper.removeOlUserStub = sinon.stub().yields()
+			@request.post = sinon.stub().yields(null, statusCode: 204)
 			@CollaboratorsHandler.transferProjects = sinon.stub().yields()
 			@User.findOne = sinon.stub().yields(null, @sl_user)
 
@@ -182,6 +187,9 @@ describe "UserMapper", ->
 			it "should not try to transfer any projects", ->
 				@CollaboratorsHandler.transferProjects.called.should.equal false
 
+			it "should not try to transfer any labels", ->
+				@request.post.called.should.equal false
+
 			it "should return the user", ->
 				@callback.calledWith(null, @sl_user).should.equal true
 
@@ -207,6 +215,12 @@ describe "UserMapper", ->
 				@SubscriptionGroupHandler.replaceUserReferencesInGroups
 					.calledWith(@user_stub._id, @user_id)
 					.should.equal true
+
+			it "should transfer any labels from the user stub to the user", ->
+				@request.post.
+					calledWith(
+						url: "project-history/user/#{@user_stub._id}/labels/transfer/#{@user_id}"
+					).should.equal true
 
 			it "should return the user", ->
 				@callback.calledWith(null, @sl_user).should.equal true

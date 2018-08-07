@@ -1,3 +1,5 @@
+request = require "request"
+settings = require "settings-sharelatex"
 {User} = require "../../../../../app/js/models/User"
 {UserStub} = require "../../../../../app/js/models/UserStub"
 UserCreator = require "../../../../../app/js/Features/User/UserCreator"
@@ -92,5 +94,20 @@ module.exports = UserMapper =
 			return callback(error) if error?
 			SubscriptionGroupHandler.replaceUserReferencesInGroups userStubId, slUserId, (error) ->
 				return callback(error) if error?
-				UserMapper.removeOlUserStub olUser.id, (error) ->
-					return callback(error)
+				UserMapper._transferLabels userStubId, slUserId, (error) ->
+					return callback(error) if error?
+					UserMapper.removeOlUserStub olUser.id, (error) ->
+						return callback(error)
+
+	_transferLabels: (fromUserId, toUserId, callback = (error) ->) ->
+		request.post {
+			url: "#{settings.apis.project_history.url}/user/#{fromUserId}/labels/transfer/#{toUserId}"
+		}, (error, response) ->
+			return callback(error) if error?
+
+			if 200 <= response.statusCode < 300
+				callback()
+			else
+				error = new Error("project-history returned non-success code: #{response.statusCode}")
+				error.statusCode = response.statusCode
+				callback error
