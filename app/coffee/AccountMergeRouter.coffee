@@ -1,11 +1,14 @@
+RedirectSLToV2Middleware = require "./RedirectSLToV2Middleware"
 AccountMergeController = require "./AccountMergeController"
 LogInToV2Controller = require "./LogInToV2Controller"
 AuthenticationController = require "../../../../app/js/Features/Authentication/AuthenticationController"
 Settings = require 'settings-sharelatex'
 Path = require 'path'
 
-
 module.exports = 
+	applyNonCsrfRouter: (webRouter) ->
+		webRouter.use RedirectSLToV2Middleware
+
 	apply: (webRouter) ->
 		webRouter.get '/user/confirm_account_merge', AccountMergeController.showConfirmAccountMerge
 		webRouter.post '/user/confirm_account_merge', AccountMergeController.confirmAccountMerge
