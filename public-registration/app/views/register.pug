@@ -52,6 +52,15 @@ block content
 									complex-password
 								)
 								span.small.text-primary(ng-show="registerForm.password.$error.complexPassword", ng-bind-html="complexPasswordErrorMessage")
+
+							.form-group
+								.checkbox
+									input(type='checkbox', 
+										id="newslettercheckbox",
+										name="subscribeToNewsletter",
+										ng-model="subscribeToNewsletter",
+										value="true")
+									label(for="newslettercheckbox") I’d like emails about product offers and company news and events.
 							.actions
 								button.btn-primary.btn(
 									type='submit'
