@@ -23,7 +23,7 @@ module.exports = UserMapper =
 	# If no User or UserStub exists, create a UserStub. This guarantees to
 	# return a SL id that will be used for this OL user forever going forwards.
 	getSlIdFromOlUser: (ol_user, callback = (error, sl_user_id) ->) ->
-		if !ol_user?
+		if !ol_user?.id?
 			return callback(new Error('no ol user id provided'))
 		User.findOne { "overleaf.id": ol_user.id }, { _id: 1 }, (error, user) ->
 			return callback(error) if error?
