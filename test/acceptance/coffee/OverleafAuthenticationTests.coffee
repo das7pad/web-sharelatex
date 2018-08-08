@@ -12,7 +12,7 @@ v1Id = 10000
 addV1User = (user) ->
 	MockOverleafApi.users.push {
 		email: user.email,
-		pass: 'banana',
+		password: 'banana',
 		profile:
 			id: v1Id,
 			email: user.email
