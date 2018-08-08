@@ -1,9 +1,16 @@
 AccountMergeController = require "./AccountMergeController"
 LogInToV2Controller = require "./LogInToV2Controller"
 AuthenticationController = require "../../../../app/js/Features/Authentication/AuthenticationController"
+Settings = require 'settings-sharelatex'
+Path = require 'path'
+
 
 module.exports = 
 	apply: (webRouter) ->
 		webRouter.get '/user/confirm_account_merge', AccountMergeController.showConfirmAccountMerge
 		webRouter.post '/user/confirm_account_merge', AccountMergeController.confirmAccountMerge
 		webRouter.get '/user/login_to_ol_v2', AuthenticationController.requireLogin(), LogInToV2Controller.signAndRedirectToLogInToV2
+
+		if Settings.createV1AccountOnLogin
+			webRouter.get '/migrated-to-overleaf', (req, res, next) ->
+				res.render Path.resolve(__dirname, '../views/migrated_to_overleaf')

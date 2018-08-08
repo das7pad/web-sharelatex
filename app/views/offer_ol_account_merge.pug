@@ -20,8 +20,9 @@ block content
 						p.text-center
 							a(href=v1LoginUrl, event-tracking="login_v2_via_overleaf", event-tracking-trigger="click", event-tracking-ga="v2_onboard", event-tracking-label="welcome").btn.btn-lg.btn-success Log in with my Overleaf account
 
-						p.text-center Or
 
-						p.text-center
-							a(href="/user/login_to_ol_v2?dont_link=true")
-								|  Continue with just my ShareLaTeX account
+						if !settings.createV1AccountOnLogin
+							p.text-center Or
+							p.text-center
+								a(href="/user/login_to_ol_v2?dont_link=true")
+									|  Continue with just my ShareLaTeX account
