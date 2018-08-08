@@ -212,7 +212,12 @@ module.exports = ProjectImporter =
 			return callback(error) if error?
 			request.post {
 				url: "#{settings.apis.project_history.url}/project/#{v2_project_id}/user/#{user_id}/labels"
-				json: { version: label.history_version, comment: label.comment, created_at: label.created_at }
+				json: {
+					version: label.history_version,
+					comment: label.comment,
+					created_at: label.created_at,
+					validate_exists: false # We can trust v1
+				}
 			}, (error, response) ->
 				return callback(error) if error?
 

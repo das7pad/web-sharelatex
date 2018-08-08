@@ -6,39 +6,53 @@ const async = require('async')
 const request = require('request')
 const minimist = require('minimist')
 const settings = require('settings-sharelatex')
-const logger = require('logger-sharelatex')
-// logger.logger.level('error')
 
 const backfillLabels = function (project, callback) {
   const project_id = project._id.toString()
   const v1_id = project.overleaf.id
-  console.log('CHECKING FOR EXISTING LABELS', project_id, v1_id)
-  request({
-    method: 'GET',
-    url: `${settings.apis.project_history.url}/project/${project_id}/labels`,
-    json: true
-  }, function (error, response, labels) {
+  db.users.findOne({
+    _id: project.owner_ref
+  }, {
+    overleaf: 1
+  }, function (error, user) {
     if (error) {
       return callback(error)
     }
-    if (response.statusCode != 200) {
-      return callback(new Error(`bad status code: ${response.statusCode}`))
+    if (!user || !user.overleaf || !user.overleaf.id) {
+      return callback(new Error('no owner'))
     }
-    if (!labels) {
-      return callback(new Error('no labels'))
-    }
-    if (labels.length > 0) {
-      console.log('ALREADY IMPORTED', project_id, labels)
-      return callback()
-    } else {
-      console.log('IMPORTING', project_id)
-    }
-    ProjectImporter._importLabels(v1_id, project_id, function(error) {
+    const v1_owner_id = user.overleaf.id
+    console.log('CHECKING FOR EXISTING LABELS', project_id, v1_id)
+    request({
+      method: 'GET',
+      url: `${settings.apis.project_history.url}/project/${project_id}/labels`,
+      json: true
+    }, function (error, response, labels) {
       if (error) {
         return callback(error)
       }
-      console.log('IMPORTED', project_id)
-      callback()
+      if (response.statusCode !== 200) {
+        return callback(new Error(`bad status code: ${response.statusCode}`))
+      }
+      if (!labels) {
+        return callback(new Error('no labels'))
+      }
+      if (labels.length > 0) {
+        console.log('ALREADY IMPORTED', project_id, labels.length)
+        return callback()
+      } else {
+        console.log('IMPORTING', project_id, v1_id, v1_owner_id)
+      }
+      ProjectImporter._importLabels(
+        v1_id, project_id, v1_owner_id,
+        function (error) {
+          if (error) {
+            return callback(error)
+          }
+          console.log('IMPORTED', project_id)
+          callback()
+        }
+      )
     })
   })
 }
@@ -51,8 +65,9 @@ const backfillProjects = function (from_project_id, callback) {
     query._id = { $gte: ObjectId(from_project_id) }
   }
   db.projects.find(query, {
-    overleaf: 1
-  }).sort({ _id: 1}, function (error, projects) {
+    overleaf: 1,
+    owner_ref: 1
+  }).sort({ _id: 1 }, function (error, projects) {
     if (error) {
       return callback(error)
     }
@@ -64,7 +79,7 @@ const backfillProjects = function (from_project_id, callback) {
         }
         cb()
       })
-    } , function (error) {
+    }, function (error) {
       console.log('FINISHED!')
       callback()
     })
