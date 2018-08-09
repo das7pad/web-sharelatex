@@ -37,7 +37,7 @@ describe "UserMapper", ->
 				Subscription.remove("overleaf.id": { $exists: true })
 
 		it "updates the admin_id references to UserStubs", (done) ->
-			UserMapper.createSlUser {id: 9, email: "alice@example.com"}, "accessToken", "refreshToken", (error, slUser) =>
+			UserMapper.createSlUser {id: 9, email: "alice@example.com"}, (error, slUser) =>
 				return done(error) if error?
 				expect(slUser.overleaf.id).to.eq 9
 				Subscription.findOne(_id: @subscriptionId).then (subscription) =>
@@ -46,7 +46,7 @@ describe "UserMapper", ->
 			return
 
 		it "updates member_ids references to UserStubs", (done) ->
-			UserMapper.createSlUser {id: 10, email: "alice@example.com"}, "accessToken", "refreshToken", (error, slUser) =>
+			UserMapper.createSlUser {id: 10, email: "alice@example.com"}, (error, slUser) =>
 				return done(error) if error?
 				expect(slUser.overleaf.id).to.eq 10
 				Subscription.findOne(_id: @subscriptionId).then (subscription) =>
