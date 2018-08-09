@@ -73,7 +73,7 @@ describe "OverleafAuthenticationManager", ->
 
 			it "should create a user", ->
 				@UserMapper.createSlUser
-					.calledWith(@profile, undefined, undefined)
+					.calledWith(@profile)
 					.should.equal true
 
 			it "should return the user", ->
