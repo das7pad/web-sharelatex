@@ -1,4 +1,4 @@
-if showPublishModal
+if settings.overleaf
 	script(type='text/ng-template', id='publishProjectModalTemplate')
 		.modal-header
 			button.close(
@@ -10,3 +10,4 @@ if showPublishModal
 		.modal-body.modal-body-publish
 			i.fa.fa-refresh.fa-spin.fa-fw
 			span &nbsp; loading...
+
