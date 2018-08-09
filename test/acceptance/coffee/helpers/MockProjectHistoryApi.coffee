@@ -25,6 +25,9 @@ module.exports = MockProjectHistoryApi =
 			@setLabel(project_id, label)
 			res.json label
 
+		app.post "/user/:from_user_id/labels/transfer/:to_user_id", (req, res, next) =>
+			res.sendStatus 200
+
 		app.listen 3054, (error) ->
 			throw error if error?
 		.on "error", (error) ->
