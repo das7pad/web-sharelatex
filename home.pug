@@ -6,23 +6,43 @@ block _headLinks
 
 
 block content
-	.masthead
-		.container
-			.row
-				.col-md-12
-					h1 LaTeX, 
-						span #{translate("evolved")}
-					p #{translate("the_easy_online_collab_latex_editor")}
-			.row
-				.col-md-12
-					.screenshot
-						.img
-
-		.register-banner
+	if settings.showDeprecatedSLHomepage
+		.deprecated-sl-masthead
 			.container
 				.row
 					.col-md-12
-						h2 #{translate("get_started_now")}
+						h1 ShareLaTeX is now part of Overleaf
+				.row
+					.col-md-12
+						.screenshot
+							.img
+
+		.deprecated-sl-login-buttons
+			.container
+				.row
+					.col-md-12.text-center
+						a.btn.btn-primary(href="/login") Login to Overleaf v2 with ShareLateX
+				.row
+					.col-md-12.text-center
+						a.btn.btn-link(href="https://www.overleaf.com") Register for Overleaf v2
+	else
+		.masthead
+			.container
+				.row
+					.col-md-12
+						h1 LaTeX, 
+							span #{translate("evolved")}
+						p #{translate("the_easy_online_collab_latex_editor")}
+				.row
+					.col-md-12
+						.screenshot
+							.img
+
+			.register-banner
+				.container
+					.row
+						.col-md-12
+							h2 #{translate("get_started_now")}
 						form.form-inline(async-form="register", name="registerForm", action="/register", ng-cloak, captcha)
 							input(name='_csrf', type='hidden', value=csrfToken)
 							input(name='redir', type='hidden', value=redir)
@@ -63,38 +83,29 @@ block content
 										value="true")
 									| I’d like emails about product offers and company news and events.
 
-	.universities.hidden-xs.hidden-sm
-		.container
-			.row.row-spaced-small
-				div.small !{translate("sl_used_over_x_people_at", {numberOfUsers:"<strong>1,000,000</strong>"})}
-				#slides.container-fluid
-					.row.row-spaced
-						.col-xs-3
-							img(src=buildImgPath("crests/harvard.gif"), alt="harvard university logo")
-						.col-xs-3
-							img(src=buildImgPath("crests/mit.gif"), alt="mit university logo")
-						.col-xs-3
-							img(src=buildImgPath("crests/oxford.gif"), alt="oxford university logo")
-						.col-xs-3
-							img(src=buildImgPath("crests/tokyo.png"), alt="tokyo university logo")
-					.row.row-spaced(style="display: none;")
-						.col-xs-3
-							img(src=buildImgPath("crests/cambridge.png"), alt="cambridge university logo")
-						.col-xs-3
-							img(src=buildImgPath("crests/liverpool.jpg"), alt="liverpool university logo")
-						.col-xs-3
-							img(src=buildImgPath("crests/icl.png"), alt="icl university logo")
-						.col-xs-3
-							img(src=buildImgPath("crests/yale.png"), alt="yale university logo")
-					.row.row-spaced(style="display: none;")
-						.col-xs-3
-							img(src=buildImgPath("crests/durham.png"), alt="durham university logo")
-						.col-xs-3
-							img(src=buildImgPath("crests/nasa.png"), alt="nasa university logo")
-						.col-xs-3
-							img(src=buildImgPath("crests/toronto.gif"), alt="toronto university logo")
-						.col-xs-3
-							img(src=buildImgPath("crests/stanford.png"), alt="stanford university logo")
+	if settings.showDeprecatedSLHomepage
+		.deprecated-sl-long-cta.content-alt
+			.container
+				.row
+					.col-md-6
+						.card
+							h3 If you're an existing ShareLaTeX user
+							p
+								| Please log in to ShareLaTeX, and your account will be transferred
+								| to Overleaf, where your data and projects can be accessed.
+							p
+								| If you’ve already linked your ShareLaTeX account to Overleaf,
+								| please log in with Overleaf from now on.
+					.col-md-6
+						.card
+							h3 If you're a new user
+							p
+								| Please sign up to Overleaf. If you’ve been invited to a ShareLaTeX
+								| project, then you can still do this seamlessly through Overleaf.
+							p
+								| If you’re looking for an online LaTeX editor, then Overleaf will
+								| be what you need. It’s based on the ShareLaTeX editor, but with
+								| some extra features!
 
 	.pattern-container
 		.container
@@ -197,13 +208,15 @@ block content
 									h2.h1 #{translate("work_from_anywhere")}
 									p #{translate("acces_work_from_anywhere")}
 									p #{translate("work_offline_and_sync_with_dropbox")}
-									
-			.row.row-spaced
-				.col-md-12
-					p.text-center
-						a(href="/user/subscription/plans").btn.btn-primary.btn-lg #{translate("sign_up_now")}!
-						
-			.row-spaced
+
+			if !settings.showDeprecatedSLHomepage
+				.row.row-spaced
+					.col-md-12
+						p.text-center
+							a(href="/user/subscription/plans").btn.btn-primary.btn-lg #{translate("sign_up_now")}!
+
+				.row-spaced
+
 	.content.content-alt
 		.container
 			.card
@@ -283,13 +296,12 @@ block content
 					.col-md-8
 						p #{translate("sl_included_history_of_changes_blurb")}
 						p #{translate("can_revert_back_blurb")}
-						
-							
-			.row.row-spaced.text-center
-				a(href="/user/subscription/plans").btn.btn-primary.btn-lg #{translate("start_using_sl_now")}
-				
-			.row-spaced
-				
+
+			if !settings.showDeprecatedSLHomepage
+				.row.row-spaced.text-center
+					a(href="/user/subscription/plans").btn.btn-primary.btn-lg #{translate("start_using_sl_now")}
+
+				.row-spaced
 
 	script(src=buildJsPath("libs/jquery.slides.min.js", {fingerprint:false}))
 	script(type="text/javascript").
