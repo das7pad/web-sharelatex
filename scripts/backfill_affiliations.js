@@ -1,0 +1,39 @@
+const WEB_PATH = '../../..'
+
+const {db} = require(`${WEB_PATH}/app/js/infrastructure/mongojs`)
+const {request} = require('../app/js/V1SharelatexApi')
+const UserMapper = require('../app/js/OverleafUsers/UserMapper')
+const async = require('async')
+const settings = require('settings-sharelatex')
+const logger = require('logger-sharelatex')
+logger.logger.level('error')
+
+backfillUser = function (user, callback) {
+  console.log('BACKFILLING IN v2', user._id, user.overleaf.id)
+  if (user.emails.length > 1) {
+    console.log('ALREADY IMPORTED', user._id)
+    return callback()
+  }
+  request({
+    url: `${settings.apis.v1.url}/api/v1/sharelatex/users/${user.overleaf.id}/profile`,
+  }, function (error, response, profile) {
+    if (error) return callback(error)
+    console.log('GOT PROFILE', JSON.stringify(profile, null, 2))
+    UserMapper._addEmails(user, profile, callback)
+  })
+}
+
+db.users.find({
+  'overleaf.id': { $exists: true }
+}, {
+  overleaf: 1,
+  emails: 1
+}, function (error, users) {
+  if (error) throw error
+  console.log('USER COUNT', users.length)
+  async.mapSeries(users, backfillUser, function (error) {
+    if (error) throw error
+    console.log('FINISHED!')
+    process.exit()
+  })
+})
