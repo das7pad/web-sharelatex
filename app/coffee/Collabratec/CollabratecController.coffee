@@ -10,7 +10,7 @@ settings = require "settings-sharelatex"
 
 module.exports = CollabratecController =
 	oauthLink: (req, res, next) ->
-		logger.log req.query, "oauthLink"
+		logger.log req.query, "CollabratecController oauthLink"
 		CollabratecManager.validateOauthParams req.query, (err, params) ->
 			return CollabratecController._oauth_error req, res, err if err?
 			req.session.collabratec_oauth_params = params
@@ -143,3 +143,12 @@ module.exports = CollabratecController =
 			redirect_url = CollabratecManager.oauthRedirectUrl oauth_params
 			AuthenticationController._setRedirectInSession req, redirect_url
 		CollabratecManager.clearSession req.session
+
+	_completeOauthLink: (req, user, callback) ->
+		oauth_params = req.session.collabratec_oauth_params
+		return callback null, false unless oauth_params
+		collabratec_user = req.session.collabratec_saml_user
+		CollabratecManager.setV1UserCollabratecId user.overleaf.id, collabratec_user.MemberNumber, (err, profile, cookies) ->
+			return callback err if err?
+			CollabratecController._finishLogin req, cookies
+			callback null, true

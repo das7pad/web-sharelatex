@@ -98,14 +98,14 @@ module.exports = MockOverleafApi =
 				res.json
 					collabratec_id: '1111'
 					email: 'mock-user@exists.com'
-					id: 1
+					id: 88881111
 			else
 				res.status(404).json {}
 
 		app.get "/api/v1/sharelatex/user_emails", (req, res, next) =>
 			if req.query.email == 'mock-user@exists.com'
 				res.json
-					user_id: 1
+					user_id: 88881111
 			else
 				res.status(404).json {}
 

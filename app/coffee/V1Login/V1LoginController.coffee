@@ -5,7 +5,7 @@ AuthenticationController = require "../../../../../app/js/Features/Authenticatio
 UserRegistrationHandler = require "../../../../../app/js/Features/User/UserRegistrationHandler"
 OverleafAuthenticationManager = require "../Authentication/OverleafAuthenticationManager"
 OverleafAuthenticationController = require "../Authentication/OverleafAuthenticationController"
-CollabratecManager = require "../Collabratec/CollabratecManager"
+CollabratecController = require "../Collabratec/CollabratecController"
 Url = require 'url'
 jwt = require('jsonwebtoken')
 Settings = require 'settings-sharelatex'
@@ -97,13 +97,6 @@ module.exports = V1Login =
 					else
 						# All good, login and proceed
 						logger.log {email}, "successful login with v1, proceeding with session setup"
-						oauth_params = req.session.collabratec_oauth_params
-						collabratec_user = req.session.collabratec_saml_user
-						if oauth_params
-							CollabratecManager.setV1UserCollabratecId user.overleaf.id, collabratec_user.MemberNumber, (err, profile, cookies) ->
-								return callback(err) if err?
-								res.set('Set-Cookie', cookies)
-								req.session.postLoginRedirect = CollabratecManager.oauthRedirectUrl oauth_params
-								AuthenticationController.finishLogin(user, req, res, next)
-						else
-							AuthenticationController.finishLogin(user, req, res, next)
+						CollabratecController._completeOauthLink req, user, (err) ->
+							return callback err if err?
+							AuthenticationController.finishLogin user, req, res, next
