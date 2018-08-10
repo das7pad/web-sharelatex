@@ -11,6 +11,7 @@ expect = chai.expect
 
 login_collabratec_id_exists_saml = createMockSamlResponse('User', 'Exists', 'mock-user@exists.com', '1111')
 login_collabratec_id_does_not_exist_saml = createMockSamlResponse('User', 'DoesNotExist', 'mock-user@does-not-exist.com', '2222')
+login_collabratec_email_exists = createMockSamlResponse('User', 'EmailExist', 'mock-user@email-exists.com', '3333')
 
 describe "Collabratec", ->
 
@@ -121,6 +122,21 @@ describe "Collabratec", ->
 							expect(body).not.to.match /It looks like you've already signed up to Overleaf/
 							done()
 
+		describe "when logged in", ->
+			beforeEach (done) ->
+				@user.login done
+
+			it "should show link logged in account page", (done) ->
+				oauthLink login_collabratec_id_does_not_exist_saml, @user, (err) =>
+					return done(err) if err?
+					options =
+						url: '/org/ieee/collabratec/auth/link_after_saml_response'
+					@user.request options, (error, response, body) ->
+						expect(response.statusCode).to.equal 200
+						expect(body).to.match /Link Overleaf to IEEE Collabratec/
+						expect(body).to.match /Please confirm that you would like to link your Overleaf account/
+						done()
+
 	describe "oauthConfirmLink", ->
 
 		describe "when logged out", ->
@@ -135,3 +151,23 @@ describe "Collabratec", ->
 						url = URL.parse(response.headers.location)
 						expect(url.path).to.equal '/oauth/authorize?client_id=mock-collabratec-oauth-client-id'
 						done()
+
+		describe "when logged in", ->
+			beforeEach (done) ->
+				@user.login done
+
+			describe "when collabratec id does not exist", ->
+				beforeEach (done) ->
+					@user.setOverleafId "88883333", done
+
+				it "should link account", (done) ->
+					oauthLink login_collabratec_email_exists, @user, (err) =>
+						return done(err) if err?
+						options =
+							method: 'post'
+							url: '/org/ieee/collabratec/auth/confirm_link'
+						@user.request options, (error, response, body) ->
+							expect(response.statusCode).to.equal 302
+							url = URL.parse(response.headers.location)
+							expect(url.path).to.equal '/oauth/authorize?client_id=mock-collabratec-oauth-client-id'
+							done()
