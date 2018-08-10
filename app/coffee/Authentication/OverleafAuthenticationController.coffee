@@ -9,7 +9,6 @@ jwt = require('jsonwebtoken')
 FeaturesUpdater = require("../../../../../app/js/Features/Subscription/FeaturesUpdater")
 Settings = require('settings-sharelatex')
 CollabratecController = require "../Collabratec/CollabratecController"
-CollabratecManager = require "../Collabratec/CollabratecManager"
 
 module.exports = OverleafAuthenticationController =
 	saveRedir: (req, res, next) ->
