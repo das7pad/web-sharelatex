@@ -6,6 +6,7 @@ const UserMapper = require('../app/js/OverleafUsers/UserMapper')
 const async = require('async')
 const settings = require('settings-sharelatex')
 const logger = require('logger-sharelatex')
+const minimist = require('minimist')
 logger.logger.level('error')
 
 backfillUser = function (user, callback) {
@@ -23,12 +24,16 @@ backfillUser = function (user, callback) {
   })
 }
 
+const argv = minimist(process.argv.slice(2))
+const startId = argv.start || 0
 db.users.find({
-  'overleaf.id': { $exists: true }
+	'overleaf.id': { $exists: true },
+	'overleaf.id': { $gt: startId },
 }, {
   overleaf: 1,
   emails: 1
-}, function (error, users) {
+}
+).sort({ 'overleaf.id': 1 }, function (error, users) {
   if (error) throw error
   console.log('USER COUNT', users.length)
   async.mapSeries(users, backfillUser, function (error) {
