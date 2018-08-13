@@ -11,6 +11,11 @@ Settings = require('settings-sharelatex')
 
 
 module.exports = OverleafAuthenticationController =
+	saveRedir: (req, res, next) ->
+		if req.query.redir?
+			AuthenticationController._setRedirectInSession(req, req.query.redir)
+		next()
+
 	welcomeScreen: (req, res, next) ->
 		res.render Path.resolve(__dirname, "../../views/welcome"), req.query
 

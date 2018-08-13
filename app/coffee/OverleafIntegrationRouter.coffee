@@ -21,7 +21,7 @@ module.exports =
 		webRouter.get '/register/v1', V1LoginController.registrationPage
 		webRouter.post '/register/v1', V1LoginController.doRegistration
 
-		webRouter.get '/overleaf/login', passport.authenticate("overleaf")
+		webRouter.get '/overleaf/login', OverleafAuthenticationController.saveRedir, passport.authenticate("overleaf")
 		webRouter.get '/register', (req, res, next) -> res.redirect("/login?#{qs.stringify(req.query)}")
 
 		webRouter.get '/login/sharelatex/finish', SharelatexAuthController.finishPage
@@ -75,6 +75,12 @@ module.exports =
 			'/overleaf/user/:v1_user_id/subscription',
 			AuthenticationController.httpAuth,
 			AccountSyncController.getV2SubscriptionStatus
+		)
+
+		publicApiRouter.get(
+			'/overleaf/user/:v1_user_id',
+			AuthenticationController.httpAuth,
+			AccountSyncController.getV2User
 		)
 
 		webRouter.get '/user/trial', AccountSyncController.startTrial
