@@ -10,14 +10,13 @@ const minimist = require('minimist')
 logger.logger.level('error')
 
 backfillUserWithRetries = function (user, callback, tries = 0) {
-  try {
-    backfillUser(user, callback);
-  } catch (error) {
-    if (tries >= 3) throw error;
+  backfillUser(user, (error) => {
+    if (!error) return callback()
+    if (tries >= 3) return callback(error)
     tries++;
     console.log(`CAUTH "${error.message}". RETRYING (${tries} tries)`)
     setTimeout(() => { backfillUserWithRetries(user, callback, tries); }, 5000);
-  }
+  });
 }
 
 backfillUser = function (user, callback) {
