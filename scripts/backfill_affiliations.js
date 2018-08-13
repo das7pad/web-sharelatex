@@ -9,6 +9,17 @@ const logger = require('logger-sharelatex')
 const minimist = require('minimist')
 logger.logger.level('error')
 
+backfillUserWithRetries = function (user, callback, tries = 0) {
+  try {
+    backfillUser(user, callback);
+  } catch (error) {
+    if (tries >= 3) throw error;
+    tries++;
+    console.log(`CAUTH "${error.message}". RETRYING (${tries} tries)`)
+    setTimeout(() => { backfillUserWithRetries(user, callback, tries); }, 5000);
+  }
+}
+
 backfillUser = function (user, callback) {
   console.log('BACKFILLING IN v2', user._id, user.overleaf.id)
   if (user.emails.length > 1) {
@@ -36,7 +47,7 @@ db.users.find({
 ).sort({ 'overleaf.id': 1 }, function (error, users) {
   if (error) throw error
   console.log('USER COUNT', users.length)
-  async.mapSeries(users, backfillUser, function (error) {
+  async.mapSeries(users, backfillUserWithRetries, function (error) {
     if (error) throw error
     console.log('FINISHED!')
     process.exit()
