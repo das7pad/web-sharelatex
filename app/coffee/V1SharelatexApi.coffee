@@ -7,7 +7,7 @@ DEFAULT_V1_PARAMS = {
 		user: settings.apis.v1.user
 		pass: settings.apis.v1.pass
 	json: true,
-	timeout: 5 * 1000
+	timeout: 30 * 1000
 }
 
 request = request.defaults(DEFAULT_V1_PARAMS)
