@@ -18,6 +18,14 @@ describe "UserMapper", ->
 			"../../../../../app/js/models/UserStub": UserStub: @UserStub = {}
 			"../../../../../app/js/Features/Subscription/SubscriptionGroupHandler": @SubscriptionGroupHandler = {}
 			"../../../../../app/js/Features/Collaborators/CollaboratorsHandler": @CollaboratorsHandler = {}
+			"../../../../../app/js/Features/User/UserGetter": @UserGetter =
+				getUserByAnyEmail: sinon.stub().yields()
+			"../../../../../app/js/Features/User/UserUpdater": @UserUpdater =
+				addEmailAddress: sinon.stub().yields()
+				removeEmailAddress: sinon.stub().yields()
+				confirmEmail: sinon.stub().yields()
+			"../../../../../app/js/Features/Institutions/InstitutionsAPI": @InstitutionsApi =
+				addAffiliation: sinon.stub().yields()
 		@callback = sinon.stub()
 
 	describe "getSlIdFromOlUser", ->
@@ -75,15 +83,16 @@ describe "UserMapper", ->
 			@ol_user = {
 				id: 42
 				email: "jane@example.com"
+				confirmed_at: Date.now()
 			}
 			@newSlUser =
-				id: 'new-user-id'
+				_id: 'new-user-id'
 				email: 'jane@example.com'
 				emails: [ { email: 'jane@example.com' } ]
 
 			@UserMapper.getOlUserStub = sinon.stub()
 			@UserMapper.removeOlUserStub = sinon.stub().yields()
-			@UserCreator.createNewUser = sinon.stub().yields(null, @user = {"mock": "user"})
+			@UserCreator.createNewUser = sinon.stub().yields(null, @newSlUser)
 
 		describe "when a UserStub exists", ->
 			beforeEach ->
@@ -114,7 +123,15 @@ describe "UserMapper", ->
 					.should.equal true
 
 			it "should return the user", ->
-				@callback.calledWith(null, @user).should.equal true
+				@callback.calledWith(null, @newSlUser).should.equal true
+
+			it "should confirm main email", ->
+				sinon.assert.calledOnce(@UserUpdater.confirmEmail)
+				sinon.assert.calledWith(
+					@UserUpdater.confirmEmail,
+					@newSlUser._id,
+					'jane@example.com'
+				)
 
 		describe "when no UserStub exists", ->
 			beforeEach ->
@@ -134,17 +151,37 @@ describe "UserMapper", ->
 					.should.equal true
 
 			it "should return the user", ->
-				@callback.calledWith(null, @user).should.equal true
+				@callback.calledWith(null, @newSlUser).should.equal true
+
+		describe "with duplicate secondary emails", ->
+			beforeEach ->
+				@duplicateUser = { _id: 'duplicate-user-id' }
+				@UserMapper.getOlUserStub.yields()
+				@UserGetter.getUserByAnyEmail.yields(null, @duplicateUser)
+				@UserMapper.createSlUser @ol_user, @callback
+
+			it 'removes duplicate secondary emails', ->
+				sinon.assert.calledWith(
+					@UserUpdater.removeEmailAddress,
+					@duplicateUser._id,
+					@ol_user.email
+				)
 
 	describe 'mergeWithSlUser', ->
 		beforeEach ->
 			@user_id = "mock-user-id"
 			@sl_user =
+				_id: @user_id
 				email: "jane@example.com"
+				emails: [{ email: "jane@example.com" }]
 				save: sinon.stub().yields()
 			@ol_user = {
 				id: 42
 				email: "Jane@Example.com" # Only needs to match up to case
+				affiliations: [
+					{ email: 'foo@bar.edu', university: 1, department: 'dept', role: 'role' }
+					{ email: 'jane@example.com', university: 2, department: null, role: null, confirmed_at: Date.now() }
+				]
 			}
 			@UserMapper.getOlUserStub = sinon.stub().yields()
 			@UserMapper.removeOlUserStub = sinon.stub().yields()
@@ -188,6 +225,30 @@ describe "UserMapper", ->
 			it "should return the user", ->
 				@callback.calledWith(null, @sl_user).should.equal true
 
+			it "should add affiliations", ->
+				sinon.assert.calledOnce(@UserUpdater.addEmailAddress)
+				sinon.assert.calledWith(
+					@UserUpdater.addEmailAddress,
+					@sl_user._id,
+					'foo@bar.edu'
+					{ university: 1, department: 'dept', role: 'role' }
+				)
+
+				sinon.assert.calledOnce(@InstitutionsApi.addAffiliation)
+				sinon.assert.calledWith(
+					@InstitutionsApi.addAffiliation,
+					@sl_user._id,
+					'jane@example.com'
+					{ university: 2 }
+				)
+
+				sinon.assert.calledOnce(@UserUpdater.confirmEmail)
+				sinon.assert.calledWith(
+					@UserUpdater.confirmEmail,
+					@sl_user._id,
+					'jane@example.com'
+				)
+
 		describe "successfully - with an existing UserStub", ->
 			beforeEach ->
 				@UserMapper.getOlUserStub = sinon.stub().yields(null, @user_stub = { _id: "user-stub-id" })
@@ -218,7 +279,7 @@ describe "UserMapper", ->
 					).should.equal true
 
 			it "should return the user", ->
-				@callback.calledWith(null, @sl_user).should.equal true
+				sinon.assert.calledWith(@callback, null, @sl_user)
 
 		describe "when emails don't match", ->
 			beforeEach ->

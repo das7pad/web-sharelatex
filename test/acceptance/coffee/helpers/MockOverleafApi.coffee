@@ -1,12 +1,15 @@
 express = require("express")
 app = express()
 bodyParser = require('body-parser')
+sinon = require 'sinon'
 
 app.use(bodyParser.json())
 
 module.exports = MockOverleafApi =
 	docs: { }
 	users: []
+
+	addAffiliation: sinon.stub()
 
 	setDoc: (doc) ->
 		@docs[doc.id] = doc
@@ -49,6 +52,10 @@ module.exports = MockOverleafApi =
 
 		app.get "/api/v2/users/:userId/affiliations", (req, res, next) =>
 			res.json []
+
+		app.post "/api/v2/users/:userId/affiliations", (req, res, next) =>
+			@addAffiliation(req.params.userId, req.body)
+			res.sendStatus 201
 
 		app.post "/api/v1/sharelatex/login", (req, res, next) =>
 			for user in @users
