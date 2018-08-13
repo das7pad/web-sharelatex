@@ -38,8 +38,8 @@ backfillUser = function (user, callback) {
 const argv = minimist(process.argv.slice(2))
 const startId = argv.start || 0
 db.users.find({
-	'overleaf.id': { $exists: true },
-	'overleaf.id': { $gt: startId },
+  'overleaf.id': { $exists: true },
+  'overleaf.id': { $gt: startId },
 }, {
   overleaf: 1,
   emails: 1
