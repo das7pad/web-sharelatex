@@ -3,7 +3,7 @@
 		.content-item
 		h3 Benefits for #{portal.title}
 		p If you'd like to provide your librarian, IT department or department head with more information about Overleaf, you can&nbsp;
-			+linkPrintNewTab('save the following one-pager as a PDF', null, url, false, true) 
+			+linkPrintNewTab('save the following one-pager as a PDF', null, false, {category: 'Portal', action: 'pdf', label: 'link', trigger: 'click'}, false, true) 
 			//- TO DO: env var for email?
 			| &nbsp;and send it on to them. (Please CC sales@overleaf.com!)
 
@@ -64,4 +64,4 @@
 
 .row.row-spaced.hidden-print.text-center
 	.col-sm-12
-		+linkPrintNewTab('Print Benefits', 'btn btn-primary btn-lg', true, url)
+		+linkPrintNewTab('Print Benefits', 'btn btn-primary btn-lg', true, {category: 'Portal', action: 'pdf', label: 'button', trigger: 'click'})
