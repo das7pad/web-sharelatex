@@ -43,13 +43,10 @@ module.exports = SharelatexAuthController =
 		user_id = user._id
 		email = user.email
 		logger.log {user_id, email}, "Creating backing account in v1 for user"
-		SharelatexAuthHandler.createBackingAccount user, (err, created, profile) ->
+		SharelatexAuthHandler.createBackingAccount user, (err, profile) ->
 			if err?
 				logger.err {err, user_id, email}, "error while creating backing account in v1"
 				return callback(err)
-			if !created
-				logger.log {user_id, email}, "could not create backing account in v1"
-				return callback(new Error('backing account not created'))
 			else
 				logger.log {email, v1UserId: profile.id}, "v1 backing account created, adding overleaf-id to account"
 				UserUpdater.updateUser user_id, {$set: {'overleaf.id': profile.id}}, (err) ->

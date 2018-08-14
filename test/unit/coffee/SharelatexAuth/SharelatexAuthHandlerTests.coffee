@@ -33,5 +33,4 @@ describe "SharelatexAuthHandler", ->
 				last_name: 'Last'
 			}
 			@SharelatexAuthHandler.createBackingAccount(user, @callback)
-			console.log(@callback.firstCall.args)
-			@callback.calledWith(null, false, { id: 1 }).should.equal true
+			@callback.calledWith(null, { id: 1 }).should.equal true

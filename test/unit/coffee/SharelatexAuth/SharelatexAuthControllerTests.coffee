@@ -143,21 +143,6 @@ describe "SharelatexAuthController", ->
 				expect(@UserUpdater.updateUser.callCount).to.equal 0
 				expect(@UserUpdater.updateUser.calledWith(@user_id)).to.equal false
 
-		describe "when we're creating v1 accounts on login, the account is not created", ->
-			beforeEach (done) ->
-				@settings.createV1AccountOnLogin = true
-				@SharelatexAuthHandler.createBackingAccount = sinon.stub().callsArgWith(1, null, false, null)
-				@SharelatexAuthController._createBackingAccountIfNeeded @user, @req, (err) =>
-					@err = err
-					done()
-
-			it "should produce an error", ->
-				expect(@err).to.exist
-
-			it "should not update the user record", ->
-				expect(@UserUpdater.updateUser.callCount).to.equal 0
-				expect(@UserUpdater.updateUser.calledWith(@user_id)).to.equal false
-
 		describe "when we're not creating v1 accounts on login", ->
 			beforeEach (done) ->
 				@settings.createV1AccountOnLogin = false
