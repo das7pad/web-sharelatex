@@ -36,6 +36,7 @@ backfillUser = function (user, callback) {
 
 const argv = minimist(process.argv.slice(2))
 const startId = argv.start || 0
+const asyncLimit = argv.async || 1
 db.users.find({
   'overleaf.id': { $exists: true },
   'overleaf.id': { $gt: startId },
@@ -46,7 +47,7 @@ db.users.find({
 ).sort({ 'overleaf.id': 1 }, function (error, users) {
   if (error) throw error
   console.log('USER COUNT', users.length)
-  async.mapSeries(users, backfillUserWithRetries, function (error) {
+  async.mapLimit(users, asyncLimit, backfillUserWithRetries, function (error) {
     if (error) throw error
     console.log('FINISHED!')
     process.exit()
