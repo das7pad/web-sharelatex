@@ -45,6 +45,7 @@ block content
 									required,
 									ng-model="password"
 								)
+
 							.form-group
 								button.btn-primary.btn.btn-lg.btn-hero(
 									type='submit'
@@ -52,6 +53,15 @@ block content
 								)
 									span(ng-show="!registerForm.inflight") #{translate("register")}
 									span(ng-show="registerForm.inflight") #{translate("registering")}...
+									
+							.form-group
+								label.checkbox-inline
+									input(type='checkbox', 
+										id="newslettercheckbox",
+										name="subscribeToNewsletter",
+										ng-model="subscribeToNewsletter",
+										value="true")
+									| I’d like emails about product offers and company news and events.
 
 	.universities.hidden-xs.hidden-sm
 		.container
