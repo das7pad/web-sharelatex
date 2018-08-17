@@ -45,25 +45,28 @@ module.exports = PortalsController =
 						correctPortalType = 'edu'
 					else
 						correctPortalType = 'org'
+
 					if portalType != correctPortalType
 						res.redirect 301, "/#{correctPortalType}/#{req.params.slug}"
+					else
+						# sanitize html and replace v1 classes with v2
+						for key of data.portal
+							if key.indexOf('html') != -1 && data.portal[key]
+								data.portal[key] = sanitizeHtml(data.portal[key].replace(/link-as-button/g, 'btn btn-success'), sanitizeOpts)
+								
 
-					# sanitize html and replace v1 classes with v2
-					for key of data.portal
-						if key.indexOf('html') != -1 && data.portal[key]
-							data.portal[key] = sanitizeHtml(data.portal[key].replace(/link-as-button/g, 'btn btn-success'), sanitizeOpts)
-							
+						# for print view
+						if req.query.media && req.query.media == 'print'
+							data.print = true
 
-					# for print view
-					if req.query.media && req.query.media == 'print'
-						data.print = true
+						# metadata
+						if data.portal?.title
+							data.metadata = {
+								title: data.portal.title
+							}
 
-					# metadata
-					if data.portal?.title
-						data.metadata = {
-							title: data.portal.title
-						}
-
-				res.render(portalLayout, data) 
+						res.render(portalLayout, data) 
+				else
+					ErrorController.notFound req, res
 		else
 			ErrorController.notFound req, res
