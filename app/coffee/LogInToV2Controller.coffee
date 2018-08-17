@@ -48,7 +48,7 @@ module.exports = LogInToV2Controller =
 		AnalyticsManager.recordEvent(current_user_id, 'logs_into_v2', {v2_onboard: true})
 		res.redirect Settings.accountMerge.betaHost + "/overleaf/auth_from_sl?token=#{ol_token}"
 
-	doPassportLoginHook: (email, callback=(err, info)->) ->
+	doPassportLoginHook: (req, email, callback=(err, info)->) ->
 		if !Settings.createV1AccountOnLogin
 			return callback(null, null)
 		User.findOne {email: email}, {overleaf: 1}, (err, user) ->
@@ -60,4 +60,5 @@ module.exports = LogInToV2Controller =
 					{redir: '/migrated-to-overleaf'}
 				)
 			else
-				callback(null, null)
+				AuthenticationController._setRedirectInSession(req, '/user/login_to_ol_v2')
+				return callback(null, null)
