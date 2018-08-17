@@ -117,6 +117,11 @@ describe "UserMapper", ->
 					})
 					.should.equal true
 
+			it "should skip affiliation on create", ->
+				args = @UserCreator.createNewUser.firstCall.args
+				args.length.should.equal 3
+				expect(args[1]).to.deep.equal skip_affiliation: true
+
 			it "should remove the user stub", ->
 				@UserMapper.removeOlUserStub
 					.calledWith(@ol_user.id)

@@ -159,7 +159,7 @@ module.exports = UserMapper =
 	_removeDuplicateEmailsAndCreateNewUser: (new_user, callback = (error, user) ->) ->
 		UserMapper._removeDuplicateEmails new_user.email, (error) ->
 			return callback(error) if error?
-			UserCreator.createNewUser new_user, callback
+			UserCreator.createNewUser new_user, skip_affiliation: true, callback
 
 	_removeDuplicateEmails: (email, callback = (error) ->) ->
 		UserGetter.getUserByAnyEmail email, {}, (error, user) ->
