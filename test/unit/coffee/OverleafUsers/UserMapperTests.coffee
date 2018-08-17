@@ -12,6 +12,7 @@ describe "UserMapper", ->
 			"settings-sharelatex": @settings = {
 				apis: { project_history: { url: 'project-history' } }
 			}
+			"logger-sharelatex": { log: sinon.stub(), err: sinon.stub() }
 			"request": @request = {}
 			"../../../../../app/js/Features/User/UserCreator": @UserCreator = {}
 			"../../../../../app/js/models/User": User: @User = {}

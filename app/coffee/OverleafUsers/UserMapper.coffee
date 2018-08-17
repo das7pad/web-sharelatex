@@ -1,5 +1,6 @@
 request = require "request"
 settings = require "settings-sharelatex"
+logger = require "logger-sharelatex"
 {User} = require "../../../../../app/js/models/User"
 {UserStub} = require "../../../../../app/js/models/UserStub"
 UserCreator = require "../../../../../app/js/Features/User/UserCreator"
@@ -141,6 +142,7 @@ module.exports = UserMapper =
 				if error instanceof Errors.EmailExistsError
 					return callback()
 				else
+					logger.err user: user, email: email, "Couldn't add email on merge"
 					return callback(error)
 			return callback(null) unless affiliation.confirmed_at
 			UserUpdater.confirmEmail user._id, email, new Date(affiliation.confirmed_at), callback
