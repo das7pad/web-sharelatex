@@ -77,7 +77,7 @@ module.exports = OverleafAuthenticationController =
 				FeaturesUpdater.refreshFeatures(user_id) # Notifies v1 about SL-granted features too
 				logger.log {user: user}, "merged with SL account, logging in"
 				if Settings.createV1AccountOnLogin
-					AuthenticationController._setRedirectInSession(req, '/login/sharelatex/finish')
+					AuthenticationController._setRedirectInSession(req, '/login/sharelatex/finish?had_v1_account')
 				return AuthenticationController.finishLogin(user, req, res, next)
 
 	_badToken: (res, error) ->
