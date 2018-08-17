@@ -12,6 +12,7 @@ describe "UserMapper", ->
 			"settings-sharelatex": @settings = {
 				apis: { project_history: { url: 'project-history' } }
 			}
+			"logger-sharelatex": { log: sinon.stub(), err: sinon.stub() }
 			"request": @request = {}
 			"../../../../../app/js/Features/User/UserCreator": @UserCreator = {}
 			"../../../../../app/js/models/User": User: @User = {}
@@ -116,6 +117,11 @@ describe "UserMapper", ->
 							theme: 'overleaf'
 					})
 					.should.equal true
+
+			it "should skip affiliation on create", ->
+				args = @UserCreator.createNewUser.firstCall.args
+				args.length.should.equal 3
+				expect(args[1]).to.deep.equal skip_affiliation: true
 
 			it "should remove the user stub", ->
 				@UserMapper.removeOlUserStub
