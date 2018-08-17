@@ -18,14 +18,14 @@
 		.card
 			i(class="fa fa-twitter icon-lg icon-accent")
 			br
-			+linkTweet('Tweet', btnClasses, tweetText)
+			+linkTweet('Tweet', btnClasses, tweetText, {category: 'Portal', action: 'tweet', trigger: 'click'})
 	.col-sm-4
 		.card
 			i(class="fa fa-users icon-lg icon-accent")
 			br
-			+linkInvite('Invite your friends', btnClasses, true)
+			+linkInvite('Invite your friends', btnClasses, {category: 'Portal', action: 'opened invites modal', trigger: 'click'})
 	.col-sm-4
 		.card
 			i(class="fa fa-lightbulb-o icon-lg icon-accent")
 			br
-			+linkAdvisors('Become an Advisor', btnClasses, true)
+			+linkAdvisors('Become an Advisor', btnClasses, {category: 'Portal', action: 'click become an advisor', trigger: 'click'})
