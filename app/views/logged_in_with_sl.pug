@@ -9,11 +9,17 @@ block content
 						.page-header
 							h1 Logged in with ShareLaTeX
 
-						div
-							p
-								| Your ShareLaTeX account is been migrated to an Overleaf account.
-							p
-								| From now on, you should #[a(href="/login/v1") log in through Overleaf],
-								| instead of ShareLaTeX.
-							p.text-center
-								a(href="/project").btn.btn-lg.btn-primary Go to your projects
+						if had_v1_account
+							div
+								p
+									| We've now merged your ShareLaTeX and Overleaf accounts.
+						else
+							div
+								p
+									| Your ShareLaTeX account is been migrated to an Overleaf account.
+
+						p
+							| From now on, you should #[a(href="/login/v1") log in through Overleaf],
+							| instead of ShareLaTeX.
+						p.text-center
+							a(href="/project").btn.btn-lg.btn-primary Go to your projects

@@ -10,7 +10,8 @@ SharelatexAuthHandler = require "./SharelatexAuthHandler"
 module.exports = SharelatexAuthController =
 
 	finishPage: (req, res, next) ->
-		return res.render Path.resolve(__dirname, "../../views/logged_in_with_sl")
+		return res.render Path.resolve(__dirname, "../../views/logged_in_with_sl"),
+			had_v1_account: req.query?.had_v1_account?
 
 	authFromSharelatex: (req, res, next) ->
 		{token} = req.query
