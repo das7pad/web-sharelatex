@@ -19,7 +19,7 @@ importTeam = (origV1Team, callback = (error, v2TeamId) ->) ->
 		return rollback(origV1Team, error, callback) if error?
 		callback(null, v2Team)
 
-createV2Team = (v1Team, callback = (error, v2Team) ->) ->
+createV2Team = (v1Team, callback = (error, v1Team, v2Team) ->) ->
 	UserMapper.getSlIdFromOlUser v1Team.owner, (error, teamAdminId) ->
 		return callback(error) if error?
 
@@ -33,6 +33,7 @@ createV2Team = (v1Team, callback = (error, v2Team) ->) ->
 				admin_id: teamAdminId
 				manager_ids: [teamAdminId]
 				groupPlan: true
+				planCode: "v1_#{v1Team.plan_name}"
 				membersLimit: v1Team.n_licences
 			)
 
