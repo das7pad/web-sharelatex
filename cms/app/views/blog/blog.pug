@@ -6,7 +6,7 @@ include ../../../../../app/views/mixins/_pagination
 
 block content_cms
 	.row
-		.col-xs-12
+		.col-sm-8.col-sm-offset-2.col-xs-12
 			.page-header
 				if tag
 					h1
@@ -15,28 +15,37 @@ block content_cms
 				else
 					h1 Blog
 
-	.blog(ng-cloak ng-controller="CmsController")
-		ul.blog-list
-			for post in items
-				li.card
-					.card-header
-						h2
-							a(href='/blog/' + post.slug)
-								| #{post.title}
-					if (post.authorDisplay || post.publishDateDay)
-						small Posted
-							if (post.authorDisplay)
-								|  by #{post.authorDisplay}
-							if (post.publishDatePretty)
-								|  on #{post.publishDatePretty}
-					mathjax(delimiter="no-single-dollar") !{post.contentPreview}
+			.blog(ng-cloak ng-controller="CmsController")
+				ul.blog-list
+					for post in items
+						li.card.blog-post
+							.card-header
+								h2
+									a(href='/blog/' + post.slug)
+										| #{post.title}
+							if (post.authorDisplay || post.publishDateDay)
+								.row
+									.col-sm-12
+										small Posted
+											if (post.authorDisplay)
+												|  by #{post.authorDisplay}
+											if (post.publishDatePretty)
+												|  on #{post.publishDatePretty}
 
-					a.btn.btn-success(href='/blog/' + post.slug) Read More
+							.row
+								.col-sm-12
+									mathjax(delimiter="no-single-dollar") !{post.contentPreview}
 
-					if post.tag
-						include _blog_tags
+							.row.row-spaced
+								.col-sm-12
+									a.btn.btn-success(href='/blog/' + post.slug) Read More
 
-		if pages && pages.total_pages > 1
-			+paginate(pages, url_path)
+							if post.tag
+								.row
+									.col-sm-12
+										include _blog_tags
+
+				if pages && pages.total_pages > 1
+					+paginate(pages, url_path)
 
 	script(src=mathJaxPath)
