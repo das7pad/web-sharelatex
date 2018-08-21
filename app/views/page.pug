@@ -1,4 +1,5 @@
 extends ../../../../app/views/layout
+include ../../../../app/views/_mixins/faq_search
 
 block content
 	.content.content-alt(ng-cloak)
@@ -11,25 +12,7 @@ block content
 					| !{contents.content}
 
 				.col-xs-9.page
-					- if(typeof(settings.algolia) != "undefined" && typeof(settings.algolia.indexes) != "undefined" && typeof(settings.algolia.indexes.wiki) != "undefined")
-						div(ng-controller="SearchWikiController")
-							form.project-search.form-horizontal(role="form")
-								.form-group.has-feedback.has-feedback-left
-									.col-sm-12
-										input.form-control(type='text', ng-model='searchQueryText', ng-keyup='search()', placeholder="Search help library....")
-										i.fa.fa-search.form-control-feedback-left
-										i.fa.fa-times.form-control-feedback(
-											ng-click="clearSearchText()",
-											style="cursor: pointer;",
-											ng-show="searchQueryText.length > 0"
-										)
-
-							.row
-								.col-md-12(ng-cloak)
-									a(ng-href='{{hit.url}}',ng-repeat='hit in hits').search-result.card.card-thin
-										span(ng-bind-html='hit.name')
-										div.search-result-content(ng-show="hit.content != ''", ng-bind-html='hit.content')
-
+					+faq_search()
 					.card.row-spaced(ng-controller="LearnController")
 						.page-header
 							h1(ng-non-bindable) #{title}
