@@ -14,7 +14,7 @@ _canChooseToNotMerge = () ->
 
 module.exports = LogInToV2Controller =
 
-	signAndRedirectToLogInToV2: (req, res, next) ->
+	showLogInToV2Interstitial: (req, res, next) ->
 		current_user_id = AuthenticationController.getLoggedInUserId(req)
 
 		V1UserFinder.hasV1AccountNotLinkedYet current_user_id, (err, email, hasNotLinkedV1account) ->
@@ -30,13 +30,17 @@ module.exports = LogInToV2Controller =
 				LogInToV2Controller._renderMergePage(req, res, next)
 			else
 				# No email match in v1
-				LogInToV2Controller._logInToV2(current_user_id, req, res, next)
+				LogInToV2Controller._renderCheckAccountsPage(req, res, next)
 
 	_renderMergePage: (req, res, next) ->
 		res.render Path.resolve(__dirname, "../views/offer_ol_account_merge"),
 			v1LoginUrl: "#{Settings.accountMerge.betaHost}/overleaf/login"
 
-	_logInToV2: (current_user_id, req, res, next) ->
+	_renderCheckAccountsPage: (req, res, next) ->
+		res.render Path.resolve(__dirname, "../views/check_accounts")
+
+	signAndRedirectToLogInToV2: (req, res, next) ->
+		current_user_id = AuthenticationController.getLoggedInUserId(req)
 		logger.log {current_user_id}, "logging user in to v2"
 
 		ol_token = jwt.sign(

@@ -12,7 +12,8 @@ module.exports =
 	apply: (webRouter) ->
 		webRouter.get '/user/confirm_account_merge', AccountMergeController.showConfirmAccountMerge
 		webRouter.post '/user/confirm_account_merge', AccountMergeController.confirmAccountMerge
-		webRouter.get '/user/login_to_ol_v2', AuthenticationController.requireLogin(), LogInToV2Controller.signAndRedirectToLogInToV2
+		webRouter.get '/user/login_to_ol_v2', AuthenticationController.requireLogin(), LogInToV2Controller.showLogInToV2Interstitial
+		webRouter.get '/user/auth_with_ol_v2', AuthenticationController.requireLogin(), LogInToV2Controller.signAndRedirectToLogInToV2
 
 		if Settings.createV1AccountOnLogin
 			webRouter.get '/migrated-to-overleaf', (req, res, next) ->

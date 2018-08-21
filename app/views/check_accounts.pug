@@ -1,0 +1,26 @@
+extends ../../../../app/views/layout
+
+block content
+	.content.content-alt
+		.container
+			.row
+				.col-md-5.col-md-offset-3
+					.card
+						.page-header.text-center
+							h2 Migrating To Overleaf
+						p.text-center
+							img(
+								src="/img/ol_plus_sl.png"
+								style="width: 50%"
+							)
+						p.text-center
+							| Your ShareLaTeX account will be migrated to an Overleaf
+							| account.
+
+						p.text-center
+							| If you have an Overleaf v1 account
+							| #[strong please ensure that your email address is the same on Overleaf and ShareLaTeX].
+							| If the email addresses match, your accounts will be automatically merged.
+						hr
+						p.text-center
+							a.btn.btn-lg.btn-primary(href="/user/auth_with_ol_v2") Continue with account migration
