@@ -57,7 +57,7 @@ describe "LogInToV2Controller", ->
 		beforeEach ->
 			@email = "user@example.com"
 			@call = (cb) =>
-				@LogInToV2Controller.doPassportLoginHook @email, cb
+				@LogInToV2Controller.doPassportLoginHook @req, @email, cb
 
 		describe "when we're not creating v1 accounts on login", ->
 			beforeEach ->
@@ -92,6 +92,7 @@ describe "LogInToV2Controller", ->
 
 			describe "when the user is not linked to an overleaf v1 account", ->
 				beforeEach ->
+					@AuthenticationController._setRedirectInSession = sinon.stub()
 					@user = {_id: '1234', email: @email}
 					@User.findOne = sinon.stub().callsArgWith(2, null, @user)
 
@@ -101,4 +102,5 @@ describe "LogInToV2Controller", ->
 						expect(info).to.not.exist
 						expect(@User.findOne.callCount).to.equal 1
 						expect(@User.findOne.calledWith({email: @email})).to.equal true
+						expect(@AuthenticationController._setRedirectInSession.callCount).to.equal 1
 						done()
