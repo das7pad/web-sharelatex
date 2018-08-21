@@ -4,7 +4,8 @@ hr
 		if portal.invite_only
 			h4 Join #{team.name} on #{settings.appName}
 		else
-			h4 Join a community of over __ authors at #{portal.title}
+			h4 Join&nbsp;
+				+community_count(team.current_count, portal.title)
 
 		if portal.public_team_html
 			p !{portal.public_team_html}

@@ -1,8 +1,8 @@
 .row.hidden-print
 	.col-sm-12
 		.content-item.text-center
-			//- to do: community count
-			h3 You've joined a community of over ___ authors at #{portal.title}
+			h3 You've joined
+				+community_count(team.current_count, portal.title)
 
 			p  Welcome to the #{portal.title} portal on #{settings.appName}! This is a temporary portal to provide more information about institutional accounts on #{settings.appName}.
 

@@ -9,3 +9,9 @@ mixin portal_content(id, title, content, card, contentClass, childClass)
 				h3 #{title}
 
 			div(class=childClass) !{content}
+
+mixin community_count(count, title)
+	| a community of
+	if count && count > 1
+		| &nbsp;over #{count}
+	| &nbsp;authors at #{title}
