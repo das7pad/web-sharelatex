@@ -6,6 +6,7 @@ SubscriptionLocator = require("../../../../../app/js/Features/Subscription/Subsc
 UserGetter = require('../../../../../app/js/Features/User/UserGetter')
 Subscription = require("../../../../../app/js/models/Subscription").Subscription
 async = require "async"
+Errors = require './Errors'
 
 importTeam = (origV1Team, callback = (error, v2TeamId) ->) ->
 	createV2TeamFromV1Team = (cb) -> createV2Team origV1Team, cb
@@ -19,14 +20,14 @@ importTeam = (origV1Team, callback = (error, v2TeamId) ->) ->
 		callback(null, v2Team)
 
 createV2Team = (v1Team, callback = (error, v1Team, v2Team) ->) ->
-	UserGetter.getUser { 'overleaf.id': v1Team.owner }, { _id: 1 }, (error, teamAdmin) ->
+	UserGetter.getUser { 'overleaf.id': v1Team.owner.id }, { _id: 1 }, (error, teamAdmin) ->
 		return callback(error) if error?
 		teamAdminId = teamAdmin?._id
-		return callback(new Error('Team admin does not exist in v2')) unless teamAdminId?
+		return callback(new Errors.UserNotFoundError('Team admin does not exist in v2')) unless teamAdminId?
 
 		SubscriptionLocator.getUsersSubscription teamAdminId, (error, existingSubscription) ->
 			return callback(error) if error?
-			return callback(new Error("User #{teamAdminId} already manages one team")) if existingSubscription?
+			return callback(new Errors.MultipleSubscriptionsError("Team admin already has a subscription in v2")) if existingSubscription?
 
 			subscription = new Subscription(
 				overleaf:

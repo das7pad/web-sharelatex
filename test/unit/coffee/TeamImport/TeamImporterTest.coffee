@@ -151,6 +151,7 @@ describe "TeamImporter", ->
 
 			@TeamImporter.getOrImportTeam @v1Team, (err, v2Team) =>
 				expect(err).to.be.instanceof(Error)
+				expect(err.constructor.name).to.equal('MultipleSubscriptionsError')
 				@SubscriptionUpdater.deleteWithV1Id.calledWith(@v1Team.id).should.equal true
 				done()
 
@@ -159,5 +160,6 @@ describe "TeamImporter", ->
 
 			@TeamImporter.getOrImportTeam @v1Team, (err, v2Team) =>
 				expect(err).to.be.instanceof(Error)
+				expect(err.constructor.name).to.equal('UserNotFoundError')
 				@SubscriptionUpdater.deleteWithV1Id.calledWith(@v1Team.id).should.equal true
 				done()
