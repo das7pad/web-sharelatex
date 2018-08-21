@@ -30,7 +30,10 @@ module.exports = LogInToV2Controller =
 				LogInToV2Controller._renderMergePage(req, res, next)
 			else
 				# No email match in v1
-				LogInToV2Controller._renderCheckAccountsPage(req, res, next)
+				if Settings.createV1AccountOnLogin
+					LogInToV2Controller._renderCheckAccountsPage(req, res, next)
+				else
+					LogInToV2Controller.signAndRedirectToLogInToV2(req, res, next)
 
 	_renderMergePage: (req, res, next) ->
 		res.render Path.resolve(__dirname, "../views/offer_ol_account_merge"),
