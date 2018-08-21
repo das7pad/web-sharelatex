@@ -2,68 +2,79 @@ extends ../../../../app/views/layout
 
 block content
 
-	.content
+	.content(ng-controller="TemplatePageController")
 		.container
 			.row
+				.col-md-12
+					h1.template-title #{pub.title}
+			.row
 				.col-md-6
-					h1 #{pub.title}
 					.row
-						.col-md-3 Author
+						.col-md-3.field-title Author
 						//- sanitized by api
 						.col-md-9!= pub.author
 					if pub.read_only_views
 						.row
-							.col-md-3 View Count
+							.col-md-3.field-title View Count
 							.col-md-9 #{pub.read_only_views}
 					.row
-						.col-md-3 License
+						.col-md-3.field-title License
 						.col-md-9 #{pub.license}
+				.col-md-6
+					.row.cta-links
+						a(href, ng-click="openViewSourceModal()" class="btn btn-success cta-link") View Source
+						if open_in_v2_links
+							a(href=open_in_v2_links.main.v2 class="cta-link") Open as Template
+			.row.section-preview
+				.col-md-6
 					.row
-						.col-md-6
-							if open_in_v2_links
-								a(href=open_in_v2_links.main.v2) Open as Template
-						.col-md-6
-					.row
-						.col-md-3 Abstract
+						.col-md-3.field-title Abstract
 						//- sanitized by api
-						.col-md-9!= pub.description
+						.col-md-9.abstract!= pub.description
 					if pub_tags.length
-						.row
-							.col-md-3 Tags
+						.row.section-tags
+							.col-md-3.field-title Tags
 							.col-md-9
 								each tag in pub_tags
-									a(href=tag.path) #{tag.title}
-					a(href=find_more.href) #{find_more.text}
+									a(href=tag.path class="btn btn-info btn-sm tag-link") #{tag.title}
 				.col-md-6
 					.entry
 						.row
 							.col-md-12.template-large-pdf-preview
 								img(src=pub.image_url)
+			.row.section-find-more
+				a(href=find_more.href) #{find_more.text}
 
-	if old_versions && old_versions.length
-		.container
-			h2 Previous Versions
-			each old_version in old_versions
+			if old_versions && old_versions.length
 				.row
-					.col-md-6
-						h3 #{old_version.title}
-						.row
-							.col-md-3 Author
-							//- sanitized by api
-							.col-md-9!= old_version.author
-						.row
-							.col-md-3 License
-							.col-md-9 #{old_version.license}
-						.row
-							.col-md-3 Abstract
-							//- sanitized by api
-							.col-md-9!= old_version.description
-					.col-md-6
-						if old_version.open_link
+					h2 Previous Versions
+				.row.section-previous-versions
+					each old_version in old_versions
+						.col-md-6
+							h3 #{old_version.title}
+							.row
+								.col-md-3.field-title Author
+								//- sanitized by api
+								.col-md-9!= old_version.author
+							.row
+								.col-md-3.field-title License
+								.col-md-9 #{old_version.license}
+							.row
+								.col-md-3.field-title Abstract
+								//- sanitized by api
+								.col-md-9!= old_version.description
 							a(href=old_version.open_link) Open as Template
 
-	if source
-		.container
-			h2 Source Code
-				pre
-					code #{source}
+	script(type='text/ng-template', id='viewSourceModalTemplate')
+		.modal-header
+			button.close(
+				type="button"
+				data-dismiss="modal"
+				ng-click="cancel()"
+			) &times;
+			h3 Source
+		.modal-body
+			pre
+				code #{source}
+		.modal-footer
+			button.btn.btn-default(ng-click="cancel()") Close

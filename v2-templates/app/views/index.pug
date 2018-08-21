@@ -10,14 +10,15 @@ block content
 				.col-md-6
 					h1 #{page_title}
 				.col-md-6
-					span Filters: 
-					a(href="/gallery") All 
-					span / 
-					a(href="/latex/templates") Templates 
-					span / 
-					a(href="/latex/examples") Examples 
-					span / 
-					a(href="/articles") Articles
+					.row.filters
+						span Filters: 
+						a(href="/gallery") All 
+						span / 
+						a(href="/latex/templates") Templates 
+						span / 
+						a(href="/latex/examples") Examples 
+						span / 
+						a(href="/articles") Articles
 
 			p #{summary}
 
@@ -27,9 +28,10 @@ block content
 				.row
 					each tag in tags
 						.col-md-4.template-thumbnail
-							a(href=tag.path).thumbnail
+							a(href=tag.path).thumbnail.thumbnail-tag
 								img(src=tag.logo_url)
-								div #{tag.title}
+							.caption
+								a(href=tag.path) #{tag.title}
 
 		if recent_docs && recent_docs.length
 			.container
