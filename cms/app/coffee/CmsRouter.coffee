@@ -20,5 +20,7 @@ module.exports =
 		webRouter.get '/about', AboutController.getPage
 		webRouter.get '/blog', BlogController.getBlog
 		webRouter.get '/blog/page/:page', BlogController.getBlog
+		webRouter.get '/blog/tagged/:tag', BlogController.getBlog
+		webRouter.get '/blog/tagged/:tag/page/:page', BlogController.getBlog
 		webRouter.get '/blog/:slug', BlogController.getBlogPost
 		webRouter.get '/for/:slug', GeneralController.getPage

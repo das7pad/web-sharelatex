@@ -52,6 +52,7 @@ getAndRenderBlog = (req, res, next, blogQuery, page) ->
 	# client is for published data
 	# clientPreview is for unpublished data
 	clientType = if req.query.preview || req.query.preview == '' then 'clientPreview' else 'client'
+	url_path = "/blog#{if req.params.tag then "/tagged/#{req.params.tag}" else ''}"
 
 	ContentfulClient[clientType].getEntries(blogQuery)
 		.then (collection) ->
@@ -63,12 +64,14 @@ getAndRenderBlog = (req, res, next, blogQuery, page) ->
 			else
 				# a list of blog posts (either all or filtered by tag)
 				cmsData = {
+					items: (collection.items.map (post) -> parseBlogPost(post.fields)),
 					pages: {
 						current_page: if req.params.page && !isNaN(req.params.page) then req.params.page else 1,
 						total: collection.total,
 						total_pages: Math.floor(collection.total/resultsPerPage)
-					}
-					items: collection.items.map (post) -> parseBlogPost(post.fields)
+					},
+					tag: req.params.tag,
+					url_path: url_path
 				}
 				CmsHandler.render(res, page, cmsData, req.query)
 		.catch (err) ->
@@ -94,11 +97,11 @@ _getBlog = (req, res, next) ->
 				blogQuery.skip = (req.params.page * resultsPerPage)
 
 			# Filter by tag
-			if req.query.tag
+			if req.params.tag
 				# get the ID of the tag via the tag in the URL
 				# to do - stricter query?
 				# API will return posts tagged with "Auto-compile" if the query is " Auto-compil"
-				getTagId(req.query.tag)
+				getTagId(req.params.tag)
 					.then (tagData) ->
 						if tagData && tagData.items[0] && tagData.items[0].sys && tagData.items[0].sys.id
 							blogQuery['fields.tag.sys.id[in]'] = tagData.items[0].sys.id
@@ -120,8 +123,9 @@ module.exports =
 		if !req.query.cms
 			# Leave `!req.query.cms` until content migration is finished
 			ErrorController.notFound req, res
-		else if req.params.slug == 'page'
-			# for if someone went to /blog/page/ without a page number
+		else if req.params.slug == 'page' || req.params.slug == 'tagged'
+			# for if someone went to /blog/page/ or /blog/tagged/
+			# without a page number or tag param
 			_getBlog(req, res, next)
 		else
 			blogQuery = {
