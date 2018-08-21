@@ -1,5 +1,4 @@
 logger = require "logger-sharelatex"
-settings = require "settings-sharelatex"
 UserMapper = require "../OverleafUsers/UserMapper"
 SubscriptionUpdater = require "../../../../../app/js/Features/Subscription/SubscriptionUpdater"
 TeamInvitesHandler = require "../../../../../app/js/Features/Subscription/TeamInvitesHandler"
@@ -20,8 +19,10 @@ importTeam = (origV1Team, callback = (error, v2TeamId) ->) ->
 		callback(null, v2Team)
 
 createV2Team = (v1Team, callback = (error, v1Team, v2Team) ->) ->
-	UserMapper.getSlIdFromOlUser v1Team.owner, (error, teamAdminId) ->
+	UserGetter.getUser { 'overleaf.id': v1Team.owner }, { _id: 1 }, (error, teamAdmin) ->
 		return callback(error) if error?
+		teamAdminId = teamAdmin?._id
+		return callback(new Error('Team admin does not exist in v2')) unless teamAdminId?
 
 		SubscriptionLocator.getUsersSubscription teamAdminId, (error, existingSubscription) ->
 			return callback(error) if error?

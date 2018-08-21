@@ -93,20 +93,13 @@ describe "TeamImporter", ->
 
 		@TeamImporter = SandboxedModule.require modulePath, requires:
 			"../OverleafUsers/UserMapper": @UserMapper
-			"../OverleafUsers/UserMapper": @UserMapper
 			"../../../../../app/js/Features/Subscription/TeamInvitesHandler": @TeamInvitesHandler
 			"../../../../../app/js/Features/Subscription/SubscriptionLocator": @SubscriptionLocator
 			"../../../../../app/js/Features/Subscription/SubscriptionUpdater": @SubscriptionUpdater
-			"../../../../../app/js/Features/User/UserGetter": @UserGetter
+			"../../../../../app/js/Features/User/UserGetter": @UserGetter =
+				getUser: sinon.stub().yields(null, @user = { _id: @teamAdmin.id })
 			"../../../../../app/js/models/Subscription": { Subscription: @Subscription }
-			"request": @request = {}
 			"logger-sharelatex": { log: sinon.stub(), warn: sinon.stub(), err: sinon.stub() }
-			"metrics-sharelatex": { inc: sinon.stub() }
-			"settings-sharelatex": @settings =
-				overleaf:
-					host: "http://overleaf.example.com"
-					s3:
-						host: "http://s3.example.com"
 		@callback = sinon.stub()
 
 	describe "getOrImportTeam", ->
@@ -152,7 +145,7 @@ describe "TeamImporter", ->
 				@SubscriptionUpdater.deleteWithV1Id.calledWith(@v1Team.id).should.equal true
 				done()
 
-		it "fails if the team manager already has a team", ->
+		it "fails if the team manager already has a team", (done) ->
 			managerPreviousTeam = { id: 'a2137adfe8912' }
 			@SubscriptionLocator.getUsersSubscription.yields(null, managerPreviousTeam)
 
@@ -161,9 +154,8 @@ describe "TeamImporter", ->
 				@SubscriptionUpdater.deleteWithV1Id.calledWith(@v1Team.id).should.equal true
 				done()
 
-		it "fails if the team manager is not already in v2", ->
-			managerPreviousTeam = { id: 'a2137adfe8912' }
-			@SubscriptionLocator.getUsersSubscription.yields(null, managerPreviousTeam)
+		it "fails if the team manager is not already in v2", (done) ->
+			@UserGetter.getUser.yields(null, null)
 
 			@TeamImporter.getOrImportTeam @v1Team, (err, v2Team) =>
 				expect(err).to.be.instanceof(Error)
