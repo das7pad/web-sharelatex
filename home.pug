@@ -22,9 +22,14 @@ block content
 				.row
 					.col-md-12.text-center
 						a.btn.btn-primary(href="/login") Login to Overleaf v2 with ShareLateX
+
 				.row
 					.col-md-12.text-center
-						a.btn.btn-link(href="https://www.overleaf.com") Register for Overleaf v2
+						p.deprecated-sl-msg
+							| Good news! Overleaf and ShareLaTeX have joined forces to bring you
+							| Overleaf v2, which combines the best of both services. Coming from
+							| ShareLaTeX, Overleaf v2 will be very familiar, because it's built
+							| around the ShareLaTeX editor.
 	else
 		.masthead
 			.container
@@ -89,23 +94,34 @@ block content
 				.row
 					.col-md-6
 						.card
-							h3 If you're an existing ShareLaTeX user
+							h3 For Current ShareLaTeX Users
 							p
-								| Please log in to ShareLaTeX, and your account will be transferred
-								| to Overleaf, where your data and projects can be accessed.
+								| #[strong If you already have an Overleaf account], please make
+								| sure the email addresses you use to sign in are the same on
+								| both services. We'll then automatically merge your accounts so
+								| you can access all your Overleaf and ShareLaTeX projects
+								| through Overleaf v2.
 							p
-								| If you’ve already linked your ShareLaTeX account to Overleaf,
-								| please log in with Overleaf from now on.
+								| #[strong If you don't already have an Overleaf account], we'll
+								| automatically transfer all your projects from ShareLaTeX to
+								| Overleaf v2. The transfer will only take a few seconds. The
+								| Overleaf v2 LaTeX compiler is the same, so your projects will
+								| all work exactly as they did before.
+							p
+								| #[strong If you have a paid subscription, group license or institutional site license],
+								| it will continue to work in Overleaf v2 automatically.
 					.col-md-6
 						.card
-							h3 If you're a new user
+							h3 For New Users
 							p
-								| Please sign up to Overleaf. If you’ve been invited to a ShareLaTeX
-								| project, then you can still do this seamlessly through Overleaf.
+								| #[strong If you are looking for a great open source online LaTeX editor],
+								| head over to #[a(href="https://www.overleaf.com") Overleaf].
+								| Overleaf is now based on the ShareLaTeX editor, and it
+								| supports all the same features and more.
 							p
-								| If you’re looking for an online LaTeX editor, then Overleaf will
-								| be what you need. It’s based on the ShareLaTeX editor, but with
-								| some extra features!
+								| #[strong If you have an invitation to collaborate on a ShareLaTeX project],
+								| please #[a(href="https://www.overleaf.com/signup") sign up for Overleaf first].
+								| Your invitation will work in Overleaf, too.
 
 	.pattern-container
 		.container
