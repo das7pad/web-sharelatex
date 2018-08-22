@@ -3,9 +3,11 @@ request = require 'request'
 mongoose = require('mongoose')
 Path = require("path")
 async = require 'async'
+_ = require "underscore"
 UserGetter = require '../../../../app/js/Features/User/UserGetter'
 ProjectGetter = require '../../../../app/js/Features/Project/ProjectGetter'
 SubscriptionLocator = require '../../../../app/js/Features/Subscription/SubscriptionLocator'
+InstitutionsGetter = require '../../../../app/js/Features/Institutions/InstitutionsGetter'
 logger = require 'logger-sharelatex'
 
 module.exports = MetricsController =
@@ -46,17 +48,23 @@ module.exports = MetricsController =
 		async.parallel([
 			(callback) -> MetricsController._getV1Segmentation(userId, callback)
 			(callback) -> SubscriptionLocator.getMemberSubscriptions(userId, callback)
+			(callback) -> InstitutionsGetter.getConfirmedInstitutions(userId, callback)
 		],
 		(err, results) ->
 			return next(err) if err?
 
 			segmentation  = results[0] || {}
 			subscriptions = results[1] || []
+			institutions  = results[2] || []
 
-			v1Ids = segmentation.teamIds || []
-			v2Ids = subscriptions.map (s) -> s.id
+			v1TeamIds = segmentation.teamIds || []
+			v2TeamIds = subscriptions.map (s) -> s.id
+			segmentation['teamIds'] = v2TeamIds.concat(v1TeamIds)
 
-			segmentation['teamIds'] = v2Ids.concat(v1Ids)
+			v1InstitutionIds = segmentation.affiliationIds || []
+			v2InstitutionIds = institutions.map (i) -> i.id
+			institutionIds = v2InstitutionIds.concat(v1InstitutionIds)
+			segmentation['affiliationIds'] = _.uniq(institutionIds)
 
 			res.json segmentation
 		)
