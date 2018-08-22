@@ -86,8 +86,8 @@ describe "MetricsController", ->
 			@response = {statusCode: 201}
 			@v1Segmentation = {
 				id : 1,
-				teamIds: [3, 4],
-				affiliationIds: [5, 7]
+				team_ids: [3, 4],
+				affiliation_ids: [5, 7]
 			}
 			@ObjectId.isValid = () -> true
 			@request.reset()
