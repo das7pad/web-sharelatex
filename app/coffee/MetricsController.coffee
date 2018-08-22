@@ -53,20 +53,24 @@ module.exports = MetricsController =
 		(err, results) ->
 			return next(err) if err?
 
-			segmentation  = results[0] || {}
+			v1Segmentation  = results[0] || {}
 			subscriptions = results[1] || []
 			institutions  = results[2] || []
 
-			v1TeamIds = segmentation.teamIds || []
+			v1UserId = v1Segmentation.id
+
+			v1TeamIds = v1Segmentation.team_ids || []
 			v2TeamIds = subscriptions.map (s) -> s.id
-			segmentation['teamIds'] = v2TeamIds.concat(v1TeamIds)
+			teamIds = v2TeamIds.concat(v1TeamIds)
 
-			v1InstitutionIds = segmentation.affiliationIds || []
+			v1InstitutionIds = v1Segmentation.affiliation_ids || []
 			v2InstitutionIds = institutions.map (i) -> i.id
-			institutionIds = v2InstitutionIds.concat(v1InstitutionIds)
-			segmentation['affiliationIds'] = _.uniq(institutionIds)
+			institutionIds = _.uniq(v2InstitutionIds.concat(v1InstitutionIds))
 
-			res.json segmentation
+			res.json
+				id: v1UserId
+				teamIds: teamIds
+				affiliationIds: institutionIds
 		)
 
 	projectMetricsSegmentation: (req, res, next) ->
