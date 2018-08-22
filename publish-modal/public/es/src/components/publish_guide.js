@@ -69,7 +69,7 @@ function Download ({ entry, projectId, pdfUrl, _this }) {
             className="btn btn-primary"
             onClick={() => initiateExport(entry, projectId, _this)}
           >
-            Build project ZIP with submission files (.bll)
+            Build project ZIP with submission files (e.g. .bbl)
           </a>
         }
         { _this.state.exportState === 'initiated' &&
@@ -84,7 +84,7 @@ function Download ({ entry, projectId, pdfUrl, _this }) {
             href={zipLink}
             target="_blank"
           >
-            Download project ZIP with submission files (.bll)
+            Download project ZIP with submission files (e.g. .bbl)
           </a>
         }
         { _this.state.exportState === 'error' &&
