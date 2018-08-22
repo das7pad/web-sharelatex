@@ -8,7 +8,6 @@ LimitationsManager = require "../../../../app/js/Features/Subscription/Limitatio
 V1UserFinder = require "./V1UserFinder"
 User = require("../../../../app/js/models/User").User
 
-
 _canChooseToNotMerge = () ->
 	return !Settings.createV1AccountOnLogin
 
