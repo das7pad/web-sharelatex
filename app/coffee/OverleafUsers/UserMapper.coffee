@@ -6,6 +6,7 @@ logger = require "logger-sharelatex"
 UserCreator = require "../../../../../app/js/Features/User/UserCreator"
 CollaboratorsHandler = require "../../../../../app/js/Features/Collaborators/CollaboratorsHandler"
 SubscriptionGroupHandler = require "../../../../../app/js/Features/Subscription/SubscriptionGroupHandler"
+TagsHandler = require "../../../../../app/js/Features/Tags/TagsHandler"
 UserGetter = require "../../../../../app/js/Features/User/UserGetter"
 UserUpdater = require "../../../../../app/js/Features/User/UserUpdater"
 InstitutionsAPI = require "../../../../../app/js/Features/Institutions/InstitutionsAPI"
@@ -102,7 +103,9 @@ module.exports = UserMapper =
 				return callback(error) if error?
 				UserMapper._transferLabels userStubId, slUserId, (error) ->
 					return callback(error) if error?
-					UserMapper.removeOlUserStub olUser.id, callback
+					TagsHandler.updateTagUserIds userStubId, slUserId, (error) ->
+						return callback(error) if error?
+						UserMapper.removeOlUserStub olUser.id, callback
 
 	_transferLabels: (fromUserId, toUserId, callback = (error) ->) ->
 		request.post {

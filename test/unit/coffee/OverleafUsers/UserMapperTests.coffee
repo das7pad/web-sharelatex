@@ -19,6 +19,8 @@ describe "UserMapper", ->
 			"../../../../../app/js/models/UserStub": UserStub: @UserStub = {}
 			"../../../../../app/js/Features/Subscription/SubscriptionGroupHandler": @SubscriptionGroupHandler = {}
 			"../../../../../app/js/Features/Collaborators/CollaboratorsHandler": @CollaboratorsHandler = {}
+			"../../../../../app/js/Features/Tags/TagsHandler": @TagsHandler =
+				updateTagUserIds: sinon.stub().yields()
 			"../../../../../app/js/Features/User/UserGetter": @UserGetter =
 				getUserByAnyEmail: sinon.stub().yields()
 			"../../../../../app/js/Features/User/UserUpdater": @UserUpdater =
@@ -283,6 +285,11 @@ describe "UserMapper", ->
 					calledWith(
 						url: "project-history/user/#{@user_stub._id}/labels/transfer/#{@user_id}"
 					).should.equal true
+
+			it "should update user id for any tags", ->
+				@TagsHandler.updateTagUserIds
+					.calledWith(@user_stub._id, @user_id)
+					.should.equal true
 
 			it "should return the user", ->
 				sinon.assert.calledWith(@callback, null, @sl_user)

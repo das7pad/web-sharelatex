@@ -16,6 +16,7 @@ ProjectEntityUpdateHandler = require "../../../../../app/js/Features/Project/Pro
 ProjectDeleter = require "../../../../../app/js/Features/Project/ProjectDeleter"
 {ProjectInvite} = require "../../../../../app/js/models/ProjectInvite"
 CollaboratorsHandler = require "../../../../../app/js/Features/Collaborators/CollaboratorsHandler"
+TagsHandler = require "../../../../../app/js/Features/Tags/TagsHandler"
 PrivilegeLevels = require "../../../../../app/js/Features/Authorization/PrivilegeLevels"
 {
 	UnsupportedFileTypeError
@@ -83,13 +84,15 @@ module.exports = ProjectImporter =
 	_importV1ProjectDataIntoV2Project: (v1_project_id, v2_project_id, v1_user_id, v2_user_id, doc, callback = (error, v2_project_id) ->) ->
 		async.series [
 			(cb) ->
-				ProjectImporter._importInvites v2_project_id, doc.invites, cb
+				ProjectImporter._importInvites v1_project_id, v2_project_id, doc.invites, cb
 			(cb) ->
 				ProjectImporter._importFiles v2_project_id, v2_user_id, doc.files, cb
 			(cb) ->
 				ProjectImporter._waitForV1HistoryExport v1_project_id, v1_user_id, cb
 			(cb) ->
 				ProjectImporter._importLabels doc.id, v2_project_id, v1_user_id, cb
+			(cb) ->
+				ProjectImporter._importTags v2_project_id, v2_user_id, doc.tags, cb
 			(cb) ->
 				ProjectImporter._confirmExport v1_project_id, v2_project_id, v1_user_id, cb
 		], (error) ->
@@ -151,31 +154,33 @@ module.exports = ProjectImporter =
 			return callback(error) if error?
 			return callback(null, project._id)
 
-	_importInvites: (project_id, invites = [], callback = (error) ->) ->
+	_importInvites: (v1_project_id, v2_project_id, invites = [], callback = (error) ->) ->
 		async.mapSeries(invites, (invite, cb) ->
-			ProjectImporter._importInvite project_id, invite, cb
+			ProjectImporter._importInvite v1_project_id, v2_project_id, invite, cb
 		, callback)
 
-	_importInvite: (project_id, invite, callback = (error) ->) ->
+	_importInvite: (v1_project_id, v2_project_id, invite, callback = (error) ->) ->
 		if invite.invitee?
-			ProjectImporter._importAcceptedInvite(project_id, invite, callback)
+			ProjectImporter._importAcceptedInvite(v1_project_id, v2_project_id, invite, callback)
 		else
-			ProjectImporter._importPendingInvite(project_id, invite, callback)
+			ProjectImporter._importPendingInvite(v2_project_id, invite, callback)
 
 	ACCESS_LEVEL_MAP: {
 		"read_write": PrivilegeLevels.READ_AND_WRITE
 		"read_only": PrivilegeLevels.READ_ONLY
 	}
-	_importAcceptedInvite: (project_id, invite, callback = (error) ->) ->
+	_importAcceptedInvite: (v1_project_id, v2_project_id, invite, callback = (error) ->) ->
 		if !invite.inviter? or !invite.invitee? or !invite.access_level?
 			return callback(new Error("expected invite inviter, invitee and access_level"))
-		logger.log {project_id, invite}, "importing accepted invite from overleaf"
+		logger.log {v2_project_id, invite}, "importing accepted invite from overleaf"
 		privilegeLevel = ProjectImporter.ACCESS_LEVEL_MAP[invite.access_level]
 		UserMapper.getSlIdFromOlUser invite.inviter, (error, inviter_user_id) ->
 			return callback(error) if error?
 			UserMapper.getSlIdFromOlUser invite.invitee, (error, invitee_user_id) ->
 				return callback(error) if error?
-				CollaboratorsHandler.addUserIdToProject project_id, inviter_user_id, invitee_user_id, privilegeLevel, callback
+				CollaboratorsHandler.addUserIdToProject v2_project_id, inviter_user_id, invitee_user_id, privilegeLevel, (error) ->
+					return callback(error) if error?
+					ProjectImporter._importInviteTags(v1_project_id, v2_project_id, invite.invitee.id, invitee_user_id, callback)
 
 	_importPendingInvite: (project_id, invite, callback = (error) ->) ->
 		if !invite.inviter? or !invite.code? or !invite.email? or !invite.access_level?
@@ -227,6 +232,20 @@ module.exports = ProjectImporter =
 					error = new Error("project-history returned non-success code: #{response.statusCode}")
 					error.statusCode = response.statusCode
 					callback error
+
+	_importInviteTags: (v1_project_id, v2_project_id, v1_user_id, v2_user_id, callback = (error) ->) ->
+		V1SharelatexApi.request {
+			method: 'GET'
+			url: "#{settings.overleaf.host}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/tags"
+		}, (error, res, body) ->
+			return callback(error) if error?
+			logger.log {v1_project_id, v1_user_id, body}, "got tags for project from overleaf"
+			ProjectImporter._importTags v2_project_id, v2_user_id, body.tags, callback
+
+	_importTags: (project_id, v2_user_id, tags = [], callback = (error) ->) ->
+		async.mapSeries(tags, (tag, cb) ->
+			TagsHandler.addProjectToTagName v2_user_id, tag, project_id, cb
+		, callback)
 
 	_importFiles: (project_id, v2_user_id, files = [], callback = (error) ->) ->
 		async.mapSeries(files, (file, cb) ->
