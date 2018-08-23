@@ -21,17 +21,14 @@ module.exports = AccountMergeController =
 			logger.log {data: data}, "confirming account merge"
 			{ user_id, overleaf_email } = data
 
-			user = AuthenticationController.getSessionUser(req)
-			LimitationsManager.userHasSubscriptionOrIsGroupMember user, (err, hasSubscription) ->
-				res.render Path.resolve(__dirname, "../views/confirm_account_merge"), {
-					# Note that logged_in_user_id is allowed to be different from user_id here,
-					# we can't guarantee who we are logged in as yet (or if we're logged in at all).
-					logged_in_user_id: AuthenticationController.getLoggedInUserId(req)
-					merge_user_id: user_id
-					overleaf_email: overleaf_email
-					token: token
-					hasSubscription: hasSubscription
-				}
+			res.render Path.resolve(__dirname, "../views/confirm_account_merge"), {
+				# Note that logged_in_user_id is allowed to be different from user_id here,
+				# we can't guarantee who we are logged in as yet (or if we're logged in at all).
+				logged_in_user_id: AuthenticationController.getLoggedInUserId(req)
+				merge_user_id: user_id
+				overleaf_email: overleaf_email
+				token: token
+			}
 	
 	confirmAccountMerge: (req, res, next) ->
 		{token} = req.body
