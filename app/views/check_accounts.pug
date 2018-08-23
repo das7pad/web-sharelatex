@@ -39,8 +39,7 @@ block content
 											id="yes-ol-account"
 											name="account-checker"
 											ng-model="hasOlAccount"
-											ng-value="true"
-											checked
+											value="has-ol-account"
 										)
 										label(for="yes-ol-account") Yes, I also have an Overleaf account
 									.radio
@@ -49,11 +48,11 @@ block content
 											id="no-ol-account"
 											name="account-checker"
 											ng-model="hasOlAccount"
-											ng-value="false"
+											value="has-no-ol-account"
 										)
 										label(for="no-ol-account") No, I only have a ShareLaTeX account
 
-									.row(ng-if="hasOlAccount" ng-cloak style="margin-top: 25px;")
+									.row(ng-if="hasOlAccount == 'has-ol-account'" ng-cloak style="margin-top: 25px;")
 										.col-md-12
 											p
 												| We didn't find an Overleaf account for #[strong #{email}].
@@ -62,7 +61,7 @@ block content
 												| and then come back to sharelatex.com to merge your
 												| accounts.
 
-									.row(ng-if="!hasOlAccount" ng-cloak style="margin-top: 25px;")
+									.row(ng-if="hasOlAccount == 'has-no-ol-account'" ng-cloak style="margin-top: 25px;")
 										.col-md-12
 											p
 												| OK, let's move your ShareLaTeX account to Overleaf
