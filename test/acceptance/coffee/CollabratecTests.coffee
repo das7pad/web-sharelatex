@@ -41,10 +41,10 @@ describe "Collabratec", ->
 	describe "init", ->
 		it "should redirect to Collabratec SAML init endpoint", (done) ->
 			request.get "/org/ieee/saml/init", (error, response, body) ->
-					expect(response.statusCode).to.equal 302
-					url = URL.parse(response.headers.location)
-					expect(url.host).to.equal "mock-entry-point.com"
-					done()
+				expect(response.statusCode).to.equal 302
+				url = URL.parse(response.headers.location)
+				expect(url.host).to.equal "mock-entry-point.com"
+				done()
 
 	describe "consume", ->
 

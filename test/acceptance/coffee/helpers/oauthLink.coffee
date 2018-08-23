@@ -2,7 +2,6 @@ Request = require "request"
 request = require "../../../../../../test/acceptance/js/helpers/request"
 
 module.exports = (saml_response, user, callback) ->
-	jar = Request.jar()
 	options =
 		qs:
 			client_id: "mock-collabratec-oauth-client-id"

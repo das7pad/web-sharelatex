@@ -27,13 +27,15 @@ OverleafIntegration =
 			passport.use("overleaf", overleafOAuth2Strategy)
 			refresh.use("overleaf", overleafOAuth2Strategy)
 
-			saml_config = settings.collabratec.saml
-			passport.use new SamlStrategy {
-				identifierFormat: saml_config.identifier_format
-				callbackUrl: "#{saml_config.callback_host}#{saml_config.callback_path}"
-				entryPoint: saml_config.entry_point
-				issuer: saml_config.issuer
-			}, CollabratecManager.validateSamlData
+			if settings.collabratec?
+				saml_config = settings.collabratec.saml
+				passport.use new SamlStrategy {
+					identifierFormat: saml_config.identifier_format
+					callbackUrl: "#{saml_config.callback_host}#{saml_config.callback_path}"
+					cert: saml_config.cert,
+					entryPoint: saml_config.entry_point
+					issuer: saml_config.issuer
+				}, CollabratecManager.validateSamlData
 
 		findAllV1Projects: ProjectListGetter.findAllUsersProjects
 		getV1PlanCode: (args...) ->
