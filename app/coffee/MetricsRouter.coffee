@@ -1,5 +1,6 @@
 logger = require 'logger-sharelatex'
 MetricsController = require './MetricsController'
+AnalyticsController = require("../../../../app/js/Features/Analytics/AnalyticsController")
 AuthenticationController = require("../../../../app/js/Features/Authentication/AuthenticationController")
 AuthorizationMiddlewear = require('../../../../app/js/Features/Authorization/AuthorizationMiddlewear')
 settings = require 'settings-sharelatex'
@@ -24,6 +25,12 @@ module.exports =
 			'/metrics/institutions/:institutionId/?(:startDate/:endDate)?',
 			AuthorizationMiddlewear.ensureUserIsSiteAdmin,
 			MetricsController.institutionMetrics
+		)
+
+		webRouter.get(
+			'/graphs/licences',
+			AuthorizationMiddlewear.ensureUserIsSiteAdmin,
+			AnalyticsController.licences
 		)
 
 		webRouter.get(
