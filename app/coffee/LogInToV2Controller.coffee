@@ -23,7 +23,7 @@ module.exports = LogInToV2Controller =
 				return next(err)
 
 			if req.query?.dont_link && _canChooseToNotMerge()
-				return LogInToV2Controller._logInToV2(current_user_id, req, res, next)
+				return LogInToV2Controller.signAndRedirectToLogInToV2(req, res, next)
 
 			if hasNotLinkedV1account
 				# Email matched in v1
