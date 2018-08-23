@@ -16,18 +16,41 @@ describe "LogInToV2Controller", ->
 			"./V1UserFinder": @V1UserFinder =
 				hasV1AccountNotLinkedYet: (userId, callback)->
 					callback(null, "test@example.com", false)
-
 			"logger-sharelatex": { log: sinon.stub(), err: sinon.stub() }
 			"settings-sharelatex": @settings =
 				accountMerge:
 					betaHost: "http://beta.example.com"
 					secret: "banana"
 			"jsonwebtoken": @jwt = {}
+			"../../../../app/js/Features/Analytics/AnalyticsManager": {
+				recordEvent: sinon.stub()
+			}
 
 		@req = {}
 		@res =
 			redirect: sinon.stub()
 		@next = sinon.stub()
+
+	describe "showLogInToV2Interstitial", ->
+		beforeEach ->
+			@user_id = "mock-user-id"
+			@AuthenticationController.getLoggedInUserId =
+				sinon.stub().withArgs(@req).returns(@user_id)
+
+		describe "when choosing to not merge", ->
+			beforeEach ->
+				@req.query = {
+					dont_link: 'true'
+				}
+				@LogInToV2Controller.signAndRedirectToLogInToV2 = sinon.stub()
+				@LogInToV2Controller.showLogInToV2Interstitial(@req, @res, @next)
+
+			it "should sign and redirect to log in to v2", ->
+				@LogInToV2Controller.signAndRedirectToLogInToV2.calledWith(
+					@req,
+					@res,
+					@next
+				).should.equal true
 
 	describe "signAndRedirectToLogInToV2", ->
 		beforeEach ->
