@@ -45,7 +45,13 @@ module.exports = LogInToV2Controller =
 				hasSubscription: hasSubscription
 
 	_renderCheckAccountsPage: (req, res, next) ->
-		res.render Path.resolve(__dirname, "../views/check_accounts")
+		user = AuthenticationController.getSessionUser(req)
+		LimitationsManager.userHasSubscriptionOrIsGroupMember user, (err, hasSubscription) ->
+			return next(err) if err?
+
+			res.render Path.resolve(__dirname, "../views/check_accounts"),
+				email: user.email,
+				hasSubscription: hasSubscription
 
 	signAndRedirectToLogInToV2: (req, res, next) ->
 		current_user_id = AuthenticationController.getLoggedInUserId(req)
