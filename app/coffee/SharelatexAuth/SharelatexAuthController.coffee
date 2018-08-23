@@ -2,6 +2,7 @@ logger = require("logger-sharelatex")
 AuthenticationController = require "../../../../../app/js/Features/Authentication/AuthenticationController"
 UserGetter = require "../../../../../app/js/Features/User/UserGetter"
 UserUpdater = require "../../../../../app/js/Features/User/UserUpdater"
+LimitationsManager = require "../../../../../app/js/Features/Subscription/LimitationsManager"
 Settings = require "settings-sharelatex"
 jwt = require('jsonwebtoken')
 Path = require('path')
@@ -10,8 +11,13 @@ SharelatexAuthHandler = require "./SharelatexAuthHandler"
 module.exports = SharelatexAuthController =
 
 	finishPage: (req, res, next) ->
-		return res.render Path.resolve(__dirname, "../../views/logged_in_with_sl"),
-			had_v1_account: req.query?.had_v1_account?
+		user = AuthenticationController.getSessionUser(req)
+		LimitationsManager.userHasSubscriptionOrIsGroupMember user, (err, hasSubscription) ->
+			return next(err) if err?
+
+			return res.render Path.resolve(__dirname, "../../views/logged_in_with_sl"),
+				had_v1_account: req.query?.had_v1_account?
+				hasSubscription: hasSubscription
 
 	authFromSharelatex: (req, res, next) ->
 		{token} = req.query
