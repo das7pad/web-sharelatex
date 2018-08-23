@@ -1,7 +1,6 @@
 ErrorController = require "../../../../app/js/Features/Errors/ErrorController"
 AuthenticationManager = require "../../../../app/js/Features/Authentication/AuthenticationManager"
 AuthenticationController = require "../../../../app/js/Features/Authentication/AuthenticationController"
-LimitationsManager = require "../../../../app/js/Features/Subscription/LimitationsManager"
 Path = require 'path'
 jwt = require 'jsonwebtoken'
 Settings = require 'settings-sharelatex'
@@ -20,7 +19,6 @@ module.exports = AccountMergeController =
 				return AccountMergeController._badToken(res, new Error('expected user_id and overleaf_email attributes'))
 			logger.log {data: data}, "confirming account merge"
 			{ user_id, overleaf_email } = data
-
 			res.render Path.resolve(__dirname, "../views/confirm_account_merge"), {
 				# Note that logged_in_user_id is allowed to be different from user_id here,
 				# we can't guarantee who we are logged in as yet (or if we're logged in at all).
