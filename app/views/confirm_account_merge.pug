@@ -16,9 +16,8 @@ block content
 						p
 							| Please confirm that you'd like us to merge your Overleaf and
 							| ShareLaTeX accounts. You'll be able to access all your projects
-							| through Overleaf v2. If you have a Student / Collaborator /
-							| Professional subscription it will be transferred automatically
-							| to Overleaf v2.
+							| through Overleaf v2. If you have a subscription it will be
+							| transferred automatically to Overleaf v2.
 						hr
 						if (logged_in_user_id && logged_in_user_id == merge_user_id)
 							form(async-form="confirm", name="confirmForm", action='/user/confirm_account_merge', method="POST", ng-cloak)
