@@ -14,6 +14,7 @@ describe "TeamImporter", ->
 			"name": "Test Team",
 			"exporting_to_v2_at": "2018-06-22T10:53:30.924Z",
 			"v2_id": null,
+			"plan_name": 'pro',
 			"n_licences": 32,
 			"owner": {
 				"id": 31,
@@ -85,7 +86,7 @@ describe "TeamImporter", ->
 			data.save = (callback) =>
 				data.id  = @subscriptionId.toString()
 				data._id = @subscriptionId
-				data.admin_id = 'v2 team admin id'
+				data.admin_id = @teamAdmin.id
 				callback(null, data, data)
 
 			data
@@ -123,6 +124,11 @@ describe "TeamImporter", ->
 			@TeamImporter.getOrImportTeam @v1Team, (err, v2Team) =>
 				expect(err).to.not.exist
 				expect(v2Team._id).to.eq @subscriptionId
+				expect(v2Team.groupPlan).to.eq true
+				expect(v2Team.planCode).to.eq 'v1_pro'
+				expect(v2Team.membersLimit).to.eq 32
+				expect(v2Team.admin_id).to.eq @teamAdmin.id
+				expect(v2Team.manager_ids).to.deep.eq [@teamAdmin.id]
 
 				@UserMapper.getSlIdFromOlUser.calledWith(
 					sinon.match.has("id", @v1Team.owner.id)
