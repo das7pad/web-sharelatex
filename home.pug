@@ -122,6 +122,39 @@ block content
 								| #[strong If you have an invitation to collaborate on a ShareLaTeX project],
 								| please #[a(href="https://www.overleaf.com/signup") sign up for Overleaf first].
 								| Your invitation will work in Overleaf, too.
+	else
+		.universities.hidden-xs.hidden-sm
+			.container
+				.row.row-spaced-small
+					div.small !{translate("sl_used_over_x_people_at", {numberOfUsers:"<strong>1,000,000</strong>"})}
+					#slides.container-fluid
+						.row.row-spaced
+							.col-xs-3
+								img(src=buildImgPath("crests/harvard.gif"), alt="harvard university logo")
+							.col-xs-3
+								img(src=buildImgPath("crests/mit.gif"), alt="mit university logo")
+							.col-xs-3
+								img(src=buildImgPath("crests/oxford.gif"), alt="oxford university logo")
+							.col-xs-3
+								img(src=buildImgPath("crests/tokyo.png"), alt="tokyo university logo")
+						.row.row-spaced(style="display: none;")
+							.col-xs-3
+								img(src=buildImgPath("crests/cambridge.png"), alt="cambridge university logo")
+							.col-xs-3
+								img(src=buildImgPath("crests/liverpool.jpg"), alt="liverpool university logo")
+							.col-xs-3
+								img(src=buildImgPath("crests/icl.png"), alt="icl university logo")
+							.col-xs-3
+								img(src=buildImgPath("crests/yale.png"), alt="yale university logo")
+						.row.row-spaced(style="display: none;")
+							.col-xs-3
+								img(src=buildImgPath("crests/durham.png"), alt="durham university logo")
+							.col-xs-3
+								img(src=buildImgPath("crests/nasa.png"), alt="nasa university logo")
+							.col-xs-3
+								img(src=buildImgPath("crests/toronto.gif"), alt="toronto university logo")
+							.col-xs-3
+								img(src=buildImgPath("crests/stanford.png"), alt="stanford university logo")
 
 	.pattern-container
 		.container
