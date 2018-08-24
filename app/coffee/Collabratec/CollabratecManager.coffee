@@ -44,11 +44,11 @@ module.exports = CollabratecManager =
 			pathname: "/oauth/authorize"
 			query: oauth_params
 
-	validateOauthParams: (params, callback) ->
-		callback new Error "invalid client_id" unless params.client_id == settings.collabratec.oauth.client_id
+	validateOauthParams: (params={}, callback) ->
+		return callback new Error "invalid client_id" unless params.client_id == settings.collabratec.oauth.client_id
 		callback null, params
 
-	validateSamlData: (data, callback) ->
+	validateSamlData: (data={}, callback) ->
 		for param, name of samlParams
 			return callback new Error "identity provider did not provide #{name}" unless data[param]?
 		callback null, _.pick(data, _.keys samlParams)
