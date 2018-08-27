@@ -35,6 +35,7 @@ define [
 			$scope.$apply()
 
 		sendSearch = ->
+			$scope.isLoading = true
 			data._csrf = window.csrfToken
 			data.query = $scope.searchText
 			data.page = $scope.pageSelected
@@ -44,8 +45,10 @@ define [
 				$scope.users = data.users
 				$scope.pages = data.pages
 				$scope.updateVisibleUsers()
+				$scope.isLoading = false
 			request.catch ()->
 				console.log "the request failed"
+				$scope.isLoading = false
 
 		$scope.clearSearchText = () ->
 			$scope.searchText = ""
