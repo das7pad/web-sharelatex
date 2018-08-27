@@ -29,6 +29,13 @@ block content
 									style="cursor: pointer;",
 									ng-show="searchText.length > 0"
 								)
+								div.form-check
+									label.form-check-label
+										input.form-check-input(
+											type="checkbox"
+											ng-model="searchRegExp",
+										)
+										| &nbsp;RegExp
 						.user-tools(ng-cloak)
 							.btn-toolbar
 								.btn-group(ng-hide="selectedUsers.length < 1")

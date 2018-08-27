@@ -8,6 +8,8 @@ define [
 		$scope.projects = window.data.projects
 		$scope.searchText =
 			value: ""
+		$scope.searchRegExp =
+			value: false
 		$scope.selectedProjects = []
 		$scope.predicate = "lastUpdated"
 		$scope.reverse = true
