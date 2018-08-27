@@ -26,6 +26,14 @@ p
 								span(ng-show="adminUserEmailForm.inflight") Saving...
 							| &nbsp;
 							a.btn.btn-default(href, ng-click="editingEmail = false") Cancel
+
+			tr(ng-if="user.emails.length > 1")
+				td
+					label #{translate("emails")}
+				td
+					ul(ng-repeat="emailData in user.emails")
+						li {{ emailData.email }}
+
 			if user.overleaf
 				tr
 					td
