@@ -31,10 +31,8 @@ module.exports = UserAdminController =
 	_userFind: (params, page, cb = () ->) ->
 		query = params?.query
 		if query? and query != ""
-			if params?.regexp
-				q = {email: new RegExp(query)}
-			else
-				q = {email: query}
+			query = new RegExp(query) if params?.regexp
+			q = { $or: [{ email: query }, { 'emails.email': query }] }
 		else
 			q = {}
 		skip = (page - 1) * UserAdminController.PER_PAGE
