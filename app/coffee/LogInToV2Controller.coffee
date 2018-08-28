@@ -4,9 +4,9 @@ logger = require 'logger-sharelatex'
 Path = require('path')
 AuthenticationController = require "../../../../app/js/Features/Authentication/AuthenticationController"
 AnalyticsManager = require "../../../../app/js/Features/Analytics/AnalyticsManager"
+LimitationsManager = require "../../../../app/js/Features/Subscription/LimitationsManager"
 V1UserFinder = require "./V1UserFinder"
 User = require("../../../../app/js/models/User").User
-
 
 _canChooseToNotMerge = () ->
 	return !Settings.createV1AccountOnLogin
@@ -36,11 +36,22 @@ module.exports = LogInToV2Controller =
 					LogInToV2Controller.signAndRedirectToLogInToV2(req, res, next)
 
 	_renderMergePage: (req, res, next) ->
-		res.render Path.resolve(__dirname, "../views/offer_ol_account_merge"),
-			v1LoginUrl: "#{Settings.accountMerge.betaHost}/overleaf/login"
+		user = AuthenticationController.getSessionUser(req)
+		LimitationsManager.userHasSubscriptionOrIsGroupMember user, (err, hasSubscription) ->
+			return next(err) if err?
+
+			res.render Path.resolve(__dirname, "../views/offer_ol_account_merge"),
+				v1LoginUrl: "#{Settings.accountMerge.betaHost}/overleaf/login",
+				hasSubscription: hasSubscription
 
 	_renderCheckAccountsPage: (req, res, next) ->
-		res.render Path.resolve(__dirname, "../views/check_accounts")
+		user = AuthenticationController.getSessionUser(req)
+		LimitationsManager.userHasSubscriptionOrIsGroupMember user, (err, hasSubscription) ->
+			return next(err) if err?
+
+			res.render Path.resolve(__dirname, "../views/check_accounts"),
+				email: user.email,
+				hasSubscription: hasSubscription
 
 	signAndRedirectToLogInToV2: (req, res, next) ->
 		current_user_id = AuthenticationController.getLoggedInUserId(req)

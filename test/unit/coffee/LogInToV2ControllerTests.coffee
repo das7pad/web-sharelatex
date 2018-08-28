@@ -25,6 +25,9 @@ describe "LogInToV2Controller", ->
 			"../../../../app/js/Features/Analytics/AnalyticsManager": {
 				recordEvent: sinon.stub()
 			}
+			"../../../../app/js/Features/Subscription/LimitationsManager": {
+				userHasSubscriptionOrIsGroupMember: sinon.stub()
+			}
 
 		@req = {}
 		@res =
