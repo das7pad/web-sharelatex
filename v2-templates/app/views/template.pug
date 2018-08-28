@@ -22,7 +22,8 @@ block content
 						.col-md-9 #{pub.license}
 				.col-md-6
 					.row.cta-links
-						a(href, ng-click="openViewSourceModal()" class="btn btn-success cta-link") View Source
+						if source
+							a(href, ng-click="openViewSourceModal()" class="btn btn-success cta-link") View Source
 						if open_in_v2_links
 							a(href=open_in_v2_links.main.v2 class="cta-link") Open as Template
 			.row.section-preview
@@ -37,33 +38,36 @@ block content
 							.col-md-9
 								each tag in pub_tags
 									a(href=tag.path class="btn btn-info btn-sm tag-link") #{tag.title}
+						.row
+							.col-sm-12
+								a(href=find_more.href) #{find_more.text}
 				.col-md-6
 					.entry
 						.row
 							.col-md-12.template-large-pdf-preview
 								img(src=pub.image_url)
-			.row.section-find-more
-				a(href=find_more.href) #{find_more.text}
-
 			if old_versions && old_versions.length
 				.row
-					h2 Previous Versions
-				.row.section-previous-versions
-					each old_version in old_versions
-						.col-md-6
-							h3 #{old_version.title}
-							.row
-								.col-md-3.field-title Author
-								//- sanitized by api
-								.col-md-9!= old_version.author
-							.row
-								.col-md-3.field-title License
-								.col-md-9 #{old_version.license}
-							.row
-								.col-md-3.field-title Abstract
-								//- sanitized by api
-								.col-md-9!= old_version.description
-							a(href=old_version.open_link) Open as Template
+					.col-sm-12
+						h2 Previous Versions
+					.col-sm-12
+						.row
+							each old_version in old_versions
+								.col-md-6
+									h3 #{old_version.title}
+									.row
+										.col-md-3.field-title Author
+										//- sanitized by api
+										.col-md-9!= old_version.author
+									.row
+										.col-md-3.field-title License
+										.col-md-9 #{old_version.license}
+									.row
+										.col-md-3.field-title Abstract
+										//- sanitized by api
+										.col-md-9!= old_version.description
+									if old_version.open_link
+										a(href=old_version.open_link) Open as Template
 
 	script(type='text/ng-template', id='viewSourceModalTemplate')
 		.modal-header
