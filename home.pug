@@ -6,23 +6,48 @@ block _headLinks
 
 
 block content
-	.masthead
-		.container
-			.row
-				.col-md-12
-					h1 LaTeX, 
-						span #{translate("evolved")}
-					p #{translate("the_easy_online_collab_latex_editor")}
-			.row
-				.col-md-12
-					.screenshot
-						.img
-
-		.register-banner
+	if settings.showDeprecatedSLHomepage
+		.deprecated-sl-masthead
 			.container
 				.row
 					.col-md-12
-						h2 #{translate("get_started_now")}
+						h1 ShareLaTeX is now part of Overleaf
+				.row
+					.col-md-12
+						.screenshot
+							.img
+
+		.deprecated-sl-login-buttons
+			.container
+				.row
+					.col-md-12.text-center
+						a.btn.btn-primary(href="/login") Login to Overleaf v2 with ShareLateX
+
+				.row
+					.col-md-12.text-center
+						p.deprecated-sl-msg
+							| Good news! Overleaf and ShareLaTeX have joined forces to bring you
+							| Overleaf v2, which combines the best of both services. Coming from
+							| ShareLaTeX, Overleaf v2 will be very familiar, because it's built
+							| around the ShareLaTeX editor.
+	else
+		.masthead
+			.container
+				.row
+					.col-md-12
+						h1 LaTeX, 
+							span #{translate("evolved")}
+						p #{translate("the_easy_online_collab_latex_editor")}
+				.row
+					.col-md-12
+						.screenshot
+							.img
+
+			.register-banner
+				.container
+					.row
+						.col-md-12
+							h2 #{translate("get_started_now")}
 						form.form-inline(async-form="register", name="registerForm", action="/register", ng-cloak, captcha)
 							input(name='_csrf', type='hidden', value=csrfToken)
 							input(name='redir', type='hidden', value=redir)
@@ -63,38 +88,73 @@ block content
 										value="true")
 									| I’d like emails about product offers and company news and events.
 
-	.universities.hidden-xs.hidden-sm
-		.container
-			.row.row-spaced-small
-				div.small !{translate("sl_used_over_x_people_at", {numberOfUsers:"<strong>1,000,000</strong>"})}
-				#slides.container-fluid
-					.row.row-spaced
-						.col-xs-3
-							img(src=buildImgPath("crests/harvard.gif"), alt="harvard university logo")
-						.col-xs-3
-							img(src=buildImgPath("crests/mit.gif"), alt="mit university logo")
-						.col-xs-3
-							img(src=buildImgPath("crests/oxford.gif"), alt="oxford university logo")
-						.col-xs-3
-							img(src=buildImgPath("crests/tokyo.png"), alt="tokyo university logo")
-					.row.row-spaced(style="display: none;")
-						.col-xs-3
-							img(src=buildImgPath("crests/cambridge.png"), alt="cambridge university logo")
-						.col-xs-3
-							img(src=buildImgPath("crests/liverpool.jpg"), alt="liverpool university logo")
-						.col-xs-3
-							img(src=buildImgPath("crests/icl.png"), alt="icl university logo")
-						.col-xs-3
-							img(src=buildImgPath("crests/yale.png"), alt="yale university logo")
-					.row.row-spaced(style="display: none;")
-						.col-xs-3
-							img(src=buildImgPath("crests/durham.png"), alt="durham university logo")
-						.col-xs-3
-							img(src=buildImgPath("crests/nasa.png"), alt="nasa university logo")
-						.col-xs-3
-							img(src=buildImgPath("crests/toronto.gif"), alt="toronto university logo")
-						.col-xs-3
-							img(src=buildImgPath("crests/stanford.png"), alt="stanford university logo")
+	if settings.showDeprecatedSLHomepage
+		.deprecated-sl-long-cta.content-alt
+			.container
+				.row
+					.col-md-6
+						.card
+							h3 For Current ShareLaTeX Users
+							p
+								| #[strong If you already have an Overleaf account], please make
+								| sure the email addresses you use to sign in are the same on
+								| both services. We'll then automatically merge your accounts so
+								| you can access all your Overleaf and ShareLaTeX projects
+								| through Overleaf v2.
+							p
+								| #[strong If you don't already have an Overleaf account], we'll
+								| automatically transfer all your projects from ShareLaTeX to
+								| Overleaf v2. The transfer will only take a few seconds. The
+								| Overleaf v2 LaTeX compiler is the same, so your projects will
+								| all work exactly as they did before.
+							p
+								| #[strong If you have a paid subscription, group license or institutional site license],
+								| it will continue to work in Overleaf v2 automatically.
+					.col-md-6
+						.card
+							h3 For New Users
+							p
+								| #[strong If you are looking for a great open source online LaTeX editor],
+								| head over to #[a(href="https://www.overleaf.com") Overleaf].
+								| Overleaf is now based on the ShareLaTeX editor, and it
+								| supports all the same features and more.
+							p
+								| #[strong If you have an invitation to collaborate on a ShareLaTeX project],
+								| please #[a(href="https://www.overleaf.com/signup") sign up for Overleaf first].
+								| Your invitation will work in Overleaf, too.
+	else
+		.universities.hidden-xs.hidden-sm
+			.container
+				.row.row-spaced-small
+					div.small !{translate("sl_used_over_x_people_at", {numberOfUsers:"<strong>1,000,000</strong>"})}
+					#slides.container-fluid
+						.row.row-spaced
+							.col-xs-3
+								img(src=buildImgPath("crests/harvard.gif"), alt="harvard university logo")
+							.col-xs-3
+								img(src=buildImgPath("crests/mit.gif"), alt="mit university logo")
+							.col-xs-3
+								img(src=buildImgPath("crests/oxford.gif"), alt="oxford university logo")
+							.col-xs-3
+								img(src=buildImgPath("crests/tokyo.png"), alt="tokyo university logo")
+						.row.row-spaced(style="display: none;")
+							.col-xs-3
+								img(src=buildImgPath("crests/cambridge.png"), alt="cambridge university logo")
+							.col-xs-3
+								img(src=buildImgPath("crests/liverpool.jpg"), alt="liverpool university logo")
+							.col-xs-3
+								img(src=buildImgPath("crests/icl.png"), alt="icl university logo")
+							.col-xs-3
+								img(src=buildImgPath("crests/yale.png"), alt="yale university logo")
+						.row.row-spaced(style="display: none;")
+							.col-xs-3
+								img(src=buildImgPath("crests/durham.png"), alt="durham university logo")
+							.col-xs-3
+								img(src=buildImgPath("crests/nasa.png"), alt="nasa university logo")
+							.col-xs-3
+								img(src=buildImgPath("crests/toronto.gif"), alt="toronto university logo")
+							.col-xs-3
+								img(src=buildImgPath("crests/stanford.png"), alt="stanford university logo")
 
 	.pattern-container
 		.container
@@ -197,13 +257,15 @@ block content
 									h2.h1 #{translate("work_from_anywhere")}
 									p #{translate("acces_work_from_anywhere")}
 									p #{translate("work_offline_and_sync_with_dropbox")}
-									
-			.row.row-spaced
-				.col-md-12
-					p.text-center
-						a(href="/user/subscription/plans").btn.btn-primary.btn-lg #{translate("sign_up_now")}!
-						
-			.row-spaced
+
+			if !settings.showDeprecatedSLHomepage
+				.row.row-spaced
+					.col-md-12
+						p.text-center
+							a(href="/user/subscription/plans").btn.btn-primary.btn-lg #{translate("sign_up_now")}!
+
+				.row-spaced
+
 	.content.content-alt
 		.container
 			.card
@@ -283,13 +345,12 @@ block content
 					.col-md-8
 						p #{translate("sl_included_history_of_changes_blurb")}
 						p #{translate("can_revert_back_blurb")}
-						
-							
-			.row.row-spaced.text-center
-				a(href="/user/subscription/plans").btn.btn-primary.btn-lg #{translate("start_using_sl_now")}
-				
-			.row-spaced
-				
+
+			if !settings.showDeprecatedSLHomepage
+				.row.row-spaced.text-center
+					a(href="/user/subscription/plans").btn.btn-primary.btn-lg #{translate("start_using_sl_now")}
+
+				.row-spaced
 
 	script(src=buildJsPath("libs/jquery.slides.min.js", {fingerprint:false}))
 	script(type="text/javascript").
