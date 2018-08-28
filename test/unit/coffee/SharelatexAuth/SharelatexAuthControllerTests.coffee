@@ -21,6 +21,8 @@ describe "SharelatexAuthController", ->
 					secret: "banana"
 			"jsonwebtoken": @jwt = {}
 			"./SharelatexAuthHandler": @SharelatexAuthHandler = {}
+			"../../../../../app/js/Features/Subscription/LimitationsManager":
+				userHasSubscriptionOrIsGroupMember: sinon.stub()
 		@req = {}
 		@res =
 			status: sinon.stub()

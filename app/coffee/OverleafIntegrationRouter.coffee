@@ -24,7 +24,11 @@ module.exports =
 		webRouter.get '/overleaf/login', OverleafAuthenticationController.saveRedir, passport.authenticate("overleaf")
 		webRouter.get '/register', (req, res, next) -> res.redirect("/login?#{qs.stringify(req.query)}")
 
-		webRouter.get '/login/sharelatex/finish', SharelatexAuthController.finishPage
+		webRouter.get(
+			'/login/sharelatex/finish',
+			AuthenticationController.requireLogin(),
+			SharelatexAuthController.finishPage
+		)
 
 		webRouter.get(
 			'/overleaf/callback',
