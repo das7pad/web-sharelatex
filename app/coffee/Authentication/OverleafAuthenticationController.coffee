@@ -19,6 +19,9 @@ module.exports = OverleafAuthenticationController =
 	welcomeScreen: (req, res, next) ->
 		res.render Path.resolve(__dirname, "../../views/welcome"), req.query
 
+	showCheckAccountsInterstitial: (req, res, next) ->
+		res.render Path.resolve(__dirname, "../../views/check_accounts")
+
 	setupUser: (req, res, next) ->
 		# This will call OverleafAuthenticationManager.setupUser
 		passport.authenticate("overleaf", (err, user, info) ->

@@ -21,7 +21,12 @@ module.exports =
 		webRouter.get '/register/v1', V1LoginController.registrationPage
 		webRouter.post '/register/v1', V1LoginController.doRegistration
 
-		webRouter.get '/overleaf/login', OverleafAuthenticationController.saveRedir, passport.authenticate("overleaf")
+		webRouter.get(
+			'/overleaf/login',
+			OverleafAuthenticationController.saveRedir,
+			OverleafAuthenticationController.showCheckAccountsInterstitial
+		)
+		webRouter.get '/overleaf/auth_from_v1', passport.authenticate("overleaf")
 		webRouter.get '/register', (req, res, next) -> res.redirect("/login?#{qs.stringify(req.query)}")
 
 		webRouter.get(
