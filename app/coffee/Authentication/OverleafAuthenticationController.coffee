@@ -8,7 +8,7 @@ Settings = require "settings-sharelatex"
 jwt = require('jsonwebtoken')
 FeaturesUpdater = require("../../../../../app/js/Features/Subscription/FeaturesUpdater")
 Settings = require('settings-sharelatex')
-
+CollabratecController = require "../Collabratec/CollabratecController"
 
 module.exports = OverleafAuthenticationController =
 	saveRedir: (req, res, next) ->
@@ -76,9 +76,11 @@ module.exports = OverleafAuthenticationController =
 				return next(error) if error?
 				FeaturesUpdater.refreshFeatures(user_id) # Notifies v1 about SL-granted features too
 				logger.log {user: user}, "merged with SL account, logging in"
-				if Settings.createV1AccountOnLogin
-					AuthenticationController._setRedirectInSession(req, '/login/sharelatex/finish?had_v1_account')
-				return AuthenticationController.finishLogin(user, req, res, next)
+				CollabratecController._completeOauthLink req, user, (err, linked) ->
+					return callback err if err?
+					if Settings.createV1AccountOnLogin and !linked
+						AuthenticationController._setRedirectInSession(req, '/login/sharelatex/finish?had_v1_account')
+					AuthenticationController.finishLogin(user, req, res, next)
 
 	_badToken: (res, error) ->
 		logger.err err: error, "bad token in confirming account"

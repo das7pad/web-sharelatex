@@ -4,6 +4,7 @@ bodyParser = require('body-parser')
 sinon = require 'sinon'
 
 app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
 
 module.exports = MockOverleafApi =
 	docs: { }
@@ -91,6 +92,35 @@ module.exports = MockOverleafApi =
 				created: true,
 				user_profile: user.profile
 			}
+
+		# collabratec
+		app.get "/api/v1/sharelatex/user_collabratec_id", (req, res, next) =>
+			if req.query.collabratec_id == "1111"
+				res.json
+					collabratec_id: "1111"
+					email: "mock-user@exists.com"
+					id: "88881111"
+			else
+				res.status(404).json {}
+
+		app.post "/api/v1/sharelatex/user_collabratec_id", (req, res, next) =>
+			if req.body.user_id == "88883333"
+				res.json
+					collabratec_id: req.body.collabratec_id
+					email: "mock-user@email-exists.com'"
+					id: "88883333"
+			else
+				res.status(404).json {}
+
+		app.get "/api/v1/sharelatex/user_emails", (req, res, next) =>
+			if req.query.email == "mock-user@exists.com"
+				res.json
+					user_id: "88881111"
+			else if req.query.email == "mock-user@email-exists.com"
+				res.json
+					user_id: "88883333"
+			else
+				res.status(404).json {}
 
 		app.listen 5000, (error) ->
 			throw error if error?

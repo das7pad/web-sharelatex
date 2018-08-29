@@ -30,23 +30,36 @@ module.exports = V1LoginHandler =
 	getUserByEmail: (email, callback) ->
 		User.findOne {email: email}, {_id: 1, email: 1, overleaf: 1}, callback
 
-	registerWithV1: (email, password, callback=(err, created, v1Profile)->) ->
-		logger.log {email}, "sending registration request to v1 login api"
-		name = email.match(/^[^@]*/)[0]
+	getV1UserIdByEmail: (email, callback) ->
+		logger.log {email}, "V1LoginHandler getV1UserIdByEmail"
+		request {
+			url: "#{Settings.overleaf.host}/api/v1/sharelatex/user_emails"
+			qs: {email}
+		}, (err, response, body) ->
+			logger.log { err, body }, "V1LoginHandler getV1UserIdByEmail Response"
+			if err?
+				if err.statusCode == 404
+					callback null, null
+				else
+					callback err
+			else
+				callback(null, body.user_id)
+
+	registerWithV1: (options, callback=(err, created, v1Profile, cookies)->) ->
+		logger.log options, "sending registration request to v1 login api"
+		if options.email? && !options.name?
+			options.name = options.email.match(/^[^@]*/)[0]
 		request {
 			method: 'POST'
-			url: "#{Settings.overleaf.host}/api/v1/sharelatex/register",
-			json: {email, password, name}
+			url: "#{Settings.overleaf.host}/api/v1/sharelatex/register"
+			json: options
 			expectedStatusCodes: [409]
 		}, (err, response, body) ->
 			if err?
-				logger.err {email, err}, "error while talking to v1 registration api"
+				logger.err {email: options.email, err}, "error while talking to v1 registration api"
 				return callback(err)
-			if response.statusCode in [200, 409]
-				created = body.created
-				userProfile = body.user_profile
-				logger.log {email, created, v1UserId: body?.user_profile?.id}, "got response from v1 registration api"
-				callback(null, created, userProfile)
-			else
-				err = new Error("Unexpected status from v1 registration api: #{response.statusCode}")
-				callback(err)
+			created = body.created
+			userProfile = body.user_profile
+			cookies = response.headers["set-cookie"]
+			logger.log {email: options.email, created, v1UserId: body?.user_profile?.id}, "got response from v1 registration api"
+			callback(null, created, userProfile, cookies)
