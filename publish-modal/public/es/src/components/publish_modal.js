@@ -7,7 +7,11 @@ import { findEntryInCategories } from '../utils.js'
 export default class PublishModal extends Component {
   constructor (props) {
     super(props)
-    this.state = { shown: props.initialShown, baseReturn: props.initialShown }
+    this.state = {
+      shown: props.initialShown,
+      partner: null,
+      baseReturn: props.initialShown
+    }
     this.handleSwitch = this.handleSwitch.bind(this)
 
     // if we want to start at a guide or export we need to find it and
@@ -20,11 +24,15 @@ export default class PublishModal extends Component {
     }
   }
 
-  handleSwitch (switchTo, guideId) {
+  handleSwitch (switchTo, partner, guideId) {
     if (switchTo) {
-      this.setState({ shown: switchTo, guideId: guideId })
+      this.setState({ shown: switchTo, partner: partner, guideId: guideId })
     } else {
-      this.setState({ shown: this.state.baseReturn, guideId: null })
+      this.setState({
+        shown: this.state.baseReturn,
+        partner: null,
+        guideId: null
+      })
     }
   }
 
@@ -45,6 +53,7 @@ export default class PublishModal extends Component {
         entries={entries}
         guideId={this.state.guideId}
         initParams={initParams}
+        partner={this.state.partner}
         shown={this.state.shown}
         initialEntry={this.state.initialEntry}
       />)

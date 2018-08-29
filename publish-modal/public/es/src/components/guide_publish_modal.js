@@ -2,6 +2,7 @@ import React, { PropTypes, Component } from 'react'
 import PublishGuide from './publish_guide'
 import ExportGuide from './export_guide'
 import EmisExport from './emis_export'
+import GalleryExport from './gallery_export'
 import { findEntryInCategories } from '../utils.js'
 
 export default class GuidePublishModal extends Component {
@@ -12,6 +13,7 @@ export default class GuidePublishModal extends Component {
       entries,
       onSwitch,
       shown,
+      partner,
       initParams
     } = this.props
 
@@ -38,16 +40,34 @@ export default class GuidePublishModal extends Component {
         pdfUrl={initParams.pdfUrl}
       />)
     } else if (shown === 'export') {
-      return (<EmisExport
-        onReturn={onReturn}
-        entry={entry}
-        returnText={returnText}
-        projectId={initParams.projectId}
-        firstName={initParams.firstName}
-        lastName={initParams.lastName}
-        onSwitch={onSwitch}
-        hasFolders={initParams.hasFolders}
-      />)
+      if (partner === 'gallery') {
+        return (<GalleryExport
+          onReturn={onReturn}
+          entry={entry}
+          returnText={returnText}
+          projectId={initParams.projectId}
+          firstName={initParams.firstName}
+          lastName={initParams.lastName}
+          title={initParams.title}
+          description={initParams.description}
+          license={initParams.license}
+          showSource={initParams.showSource}
+          onSwitch={onSwitch}
+          hasFolders={initParams.hasFolders}
+        />)
+      }
+      else {
+        return (<EmisExport
+          onReturn={onReturn}
+          entry={entry}
+          returnText={returnText}
+          projectId={initParams.projectId}
+          firstName={initParams.firstName}
+          lastName={initParams.lastName}
+          onSwitch={onSwitch}
+          hasFolders={initParams.hasFolders}
+        />)
+      }
     } else if (shown === 'exportGuide') {
       return (<ExportGuide
         onReturn={onReturn}

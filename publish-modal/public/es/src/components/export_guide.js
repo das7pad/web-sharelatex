@@ -3,7 +3,9 @@ import ReturnButton from './return_button'
 
 export default class ExportGuide extends Component {
   render () {
-    const {entry, onReturn, returnText, initParams, onSwitch} = this.props
+    const {
+      entry, onReturn, returnText, initParams, onSwitch
+    } = this.props
     return (
       <div
         className='publish-guide modal-body-content row content-as-table'
@@ -31,6 +33,7 @@ export default class ExportGuide extends Component {
           <Continue
             {...initParams}
             entry={entry}
+            partner={entry.partner}
             onSwitch={onSwitch} />
         </div>
       </div>
@@ -38,7 +41,7 @@ export default class ExportGuide extends Component {
   }
 }
 
-function Continue ({ entry, onSwitch, pdfUrl, logs }) {
+function Continue ({ entry, partner, onSwitch, pdfUrl, logs }) {
   if (pdfUrl) {
     return (
       <div>
@@ -49,7 +52,7 @@ function Continue ({ entry, onSwitch, pdfUrl, logs }) {
         <p>
           <button className="btn btn-primary"
             style={{display: 'inline-block'}}
-            onClick={() => onSwitch('export', entry.id)}>
+            onClick={() => onSwitch('export', partner, entry.id)}>
             Continue
           </button>
         </p>
