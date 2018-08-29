@@ -72,20 +72,30 @@ export default class GalleryExport extends Component {
                   placeholder="Description"
                   ref={ (input) => (this.description = input)}
                 />
-                <input type="text"
-                  className="form-control"
-                  defaultValue={license}
-                  maxLength="2048"
-                  placeholder="License"
-                  ref={ (input) => (this.license = input)}
-                />
-                <input type="text"
-                  className="form-control"
-                  defaultValue={showSource}
-                  maxLength="4"
-                  placeholder="Show source"
-                  ref={ (input) => (this.showSource = input)}
-                />
+                <div className="form-control-box">
+                  <select id="gallery-export-license"
+                    ref={ (input) => (this.license = input)}>
+                    <option value='cc_by_4.0'>
+                      Creative Commons CC BY 4.0
+                    </option>
+                    <option value='lppl_1.3c'>
+                      LaTeX Project Public License 1.3c
+                    </option>
+                    <option value='other'>
+                      Other (as stated in the work)
+                    </option>
+                  </select>
+                  <label for="gallery-export-license">License</label>
+                </div>
+                <div className="form-control-box">
+                  <input type="checkbox"
+                    id="gallery-export-show-source"
+                    defaultValue={showSource}
+                    placeholder="Show source"
+                    ref={ (input) => (this.showSource = input)}
+                  />
+                  <label for="gallery-export-show-source">Show source</label>
+                </div>
               </p>
               <br/>
               <button
