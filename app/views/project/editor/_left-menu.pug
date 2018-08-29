@@ -15,8 +15,11 @@ script(type="text/ng-template", id="publishProjectAsTemplateModalTemplate")
 		if !hasFeature('view-templates')
 			.alert.alert-warning
 				| This template publishing system is deprecated in Overleaf v2 and will
-				| soon be replaced by a moderated submission process to our public gallery
-				| and read-only link-sharing for private distribution.
+				| soon be replaced by a moderated submission process to our public
+				| gallery. In the meantime, please contact support if you would like to
+				| publish a template to our public gallery. To share templates
+				| privately, please enable link sharing in the Share menu and share the
+				| read only link.
 		span(ng-hide="problemTalkingToTemplateApi")
 			form()
 				label(for='Description') #{translate("template_description")}
