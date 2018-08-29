@@ -39,18 +39,9 @@ export default class GalleryExport extends Component {
           { this.state.exportState === 'unintiated' &&
             <span>
               <p>
-                Thanks for using Overleaf to submit your article.
-              </p>
-              <p>
-                When you submit using the button below, your manuscript and
-                supporting files will be sent to the journal automatically,
-                and you will receive a confirmation email from Overleaf.
-                The journal's editorial team will then send you a follow-up
-                email with instructions for how to complete your submission.
-              </p>
-              <p>
-                To send your article,
-                please confirm your first and last name:
+              The Overleaf Gallery is the easiest way to publish your work
+              from Overleaf and make it searchable and shareable. Just fill
+              out the details below.
               </p>
               <p>
                 <input type="text"
@@ -103,11 +94,6 @@ export default class GalleryExport extends Component {
               >
                 Submit to {entry.name}
               </button>
-              { !this.state.submissionValid &&
-                <p style={{color: 'red'}}>
-                  Please add valid first and last names before continuing
-                </p>
-              }
             </span>
           }
           { this.state.exportState === 'initiated' &&
