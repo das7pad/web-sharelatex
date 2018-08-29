@@ -20,7 +20,8 @@ define [
 						logs: $scope.pdf.logEntries,
 						hasFolders: window._ide.fileTreeManager.projectContainsFolder(),
 						firstName: $scope.user.first_name,
-						lastName: $scope.user.last_name
+						lastName: $scope.user.last_name,
+						title: $scope.project.name
 					}
 					modalBody = document.getElementsByClassName("modal-body-publish")[0]
 					pm.init(modalBody, initParams)
