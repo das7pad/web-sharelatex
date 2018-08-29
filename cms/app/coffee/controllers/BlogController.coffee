@@ -1,11 +1,14 @@
 logger = require 'logger-sharelatex'
 marked = require 'marked'
 moment = require 'moment'
+sanitizeHtml = require 'sanitize-html'
 ContentfulClient = require '../ContentfulClient'
 ErrorController = require '../../../../../app/js/Features/Errors/ErrorController'
 CmsHandler = require '../CmsHandler'
+Settings = require 'settings-sharelatex'
 
 resultsPerPage = 5;
+sanitizeOptions = if Settings?.modules?.sanitize?.options? then Settings.modules.sanitize.options else sanitizeHtml.defaults
 
 blogPostAuthors = (authorArr) ->
 	authors = ''
@@ -22,10 +25,14 @@ blogPostAuthors = (authorArr) ->
 
 parseBlogPost = (post) ->
 	authorsList = []
+
 	if post.content
 		post.content = marked(post.content)
+		post.content = sanitizeHtml(post.content, sanitizeOptions)
+
 	if post.contentPreview
 		post.contentPreview = marked(post.contentPreview)
+		post.contentPreview = sanitizeHtml(post.contentPreview, sanitizeOptions)
 
 	if post.publishDate
 		post.publishDatePretty = moment(post.publishDate).format('LL')
@@ -62,6 +69,7 @@ getAndRenderBlog = (req, res, next, blogQuery, page) ->
 				if slugPieces && slugPieces[0] && !isNaN(slugPieces[0])
 					_v1IdQuery(slugPieces[0], req, res)
 			else if page == 'blog/blog_post'
+				# a single blog post
 				cmsData = parseBlogPost(collection.items[0].fields)
 				CmsHandler.render(res, page, cmsData, req.query)
 			else
