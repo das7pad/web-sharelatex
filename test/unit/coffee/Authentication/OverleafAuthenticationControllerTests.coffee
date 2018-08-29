@@ -20,9 +20,6 @@ describe "OverleafAuthenticationController", ->
 			"../OverleafUsers/UserMapper": @UserMapper = {}
 			"../../../../../app/js/Features/Subscription/FeaturesUpdater":
 				@FeaturesUpdater = {refreshFeatures: sinon.stub()}
-			"../Collabratec/CollabratecController": {
-				_completeOauthLink: sinon.stub().callsArgWith(2, null, false)
-			}
 		@req =
 			logIn: sinon.stub()
 			session: {}

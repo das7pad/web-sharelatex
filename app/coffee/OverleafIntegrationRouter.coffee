@@ -1,5 +1,3 @@
-CollabratecController = require "./Collabratec/CollabratecController"
-CollabratecManager = require "./Collabratec/CollabratecManager"
 OverleafAuthenticationController = require "./Authentication/OverleafAuthenticationController"
 ProjectImportController = require "./ProjectImport/ProjectImportController"
 TeamImportController = require "./TeamImport/TeamImportController"
@@ -12,7 +10,6 @@ RateLimiterMiddlewear = require('../../../../app/js/Features/Security/RateLimite
 passport = require "passport"
 logger = require "logger-sharelatex"
 qs = require 'querystring'
-settings = require "settings-sharelatex"
 
 module.exports =
 	apply: (webRouter, privateApiRouter, publicApiRouter) ->
@@ -91,18 +88,6 @@ module.exports =
 		)
 
 		webRouter.get '/user/trial', AccountSyncController.startTrial
-
-		if settings.collabratec?
-			webRouter.get '/collabratec/auth/link', CollabratecController.oauthLink
-			webRouter.get settings.collabratec.saml.init_path, (req, res, next) ->
-				(passport.authenticate('saml'))(req, res, next)
-			webRouter.get '/org/ieee/collabratec/auth/link_after_saml_response', CollabratecController.oauthLinkAfterSaml
-			webRouter.post '/org/ieee/collabratec/auth/confirm_link', CollabratecController.oauthConfirmLink
-			webRouter.post '/org/ieee/collabratec/auth/sign_in_to_link', CollabratecController.oauthSignin
-
-	applyNonCsrfRouter: (webRouter, privateApiRouter, publicApiRouter) ->
-		if settings.collabratec?
-			webRouter.post settings.collabratec.saml.callback_path, passport.authenticate('saml'), CollabratecController.samlConsume
 
 removeRoute = (router, method, path)->
 	index = null
