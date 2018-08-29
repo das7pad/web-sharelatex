@@ -89,7 +89,7 @@ module.exports = OverleafAuthenticationController =
 			return OverleafAuthenticationController._badToken(res, error) if error?
 			if !data.merge_confirmed
 				return OverleafAuthenticationController._badToken(
-					res, new Error('expected token.confirm_merge == true')
+					res, new Error('expected token.merge_confirmed == true')
 				)
 			{profile, user_id} = req.session.accountMerge
 			if data.user_id != user_id

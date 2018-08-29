@@ -7,6 +7,7 @@ request = require "#{WEB_PATH}/test/acceptance/js/helpers/request"
 User = require "#{WEB_PATH}/test/acceptance/js/helpers/User"
 MockOverleafApi = require "./helpers/MockOverleafApi"
 {db, ObjectId} = require "#{WEB_PATH}/app/js/infrastructure/mongojs"
+jwt = require('jsonwebtoken')
 
 v1Id = 10000
 addV1User = (user) ->
@@ -61,7 +62,7 @@ describe "OverleafAuthentication", ->
 						done()
 
 		describe 'with an email that exists in SL', ->
-			beforeEach ->
+			beforeEach (done) ->
 				@user.ensureUserExists done
 
 			it 'should redirect to SL', (done) ->
@@ -78,6 +79,30 @@ describe "OverleafAuthentication", ->
 					expect(redir.host).to.equal 'www.sharelatex.dev:3000'
 					expect(redir.query.token).to.exist
 					done()
+
+			it 'complete merge', (done) ->
+				@user.request.post {
+					url: '/login/v1',
+					json:
+						email: @user.email
+						password: 'banana'
+				}, (error, response, body) =>
+					return done(error) if error?
+					expect(response.statusCode).to.equal 200
+					token = jwt.sign(
+						{ user_id: @user.id, overleaf_email: @user.email, merge_confirmed: true },
+						settings.accountMerge.secret,
+						{ expiresIn: '1h' }
+					)
+					@user.request.get {
+						url: '/overleaf/confirmed_account_merge'
+						qs:
+							token: token
+					}, (error, response, body) =>
+						return done(error) if error?
+						expect(response.statusCode).to.equal 302
+						expect(response.headers.location).to.equal '/project'
+						done()
 
 		describe 'with an incorrect email and password', ->
 			it 'should log the user in', (done) ->
@@ -119,7 +144,7 @@ describe "OverleafAuthentication", ->
 						done()
 
 		describe 'with an email that exists in SL', ->
-			beforeEach ->
+			beforeEach (done) ->
 				@user.ensureUserExists done
 
 			it 'should return an error message', (done) ->

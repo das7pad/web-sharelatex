@@ -1,6 +1,5 @@
 AuthenticationController = require "../../../../../app/js/Features/Authentication/AuthenticationController"
 CollabratecManager = require "./CollabratecManager"
-OverleafAuthenticationController = require "../Authentication/OverleafAuthenticationController"
 OverleafAuthenticationManager = require "../Authentication/OverleafAuthenticationManager"
 Path = require "path"
 UserGetter = require "../../../../../app/js/Features/User/UserGetter"
@@ -128,6 +127,7 @@ module.exports = CollabratecController =
 		OverleafAuthenticationManager.setupUser profile, (err, user, info) ->
 			return next err if err?
 			if info?.email_exists_in_sl
+				OverleafAuthenticationController = require "../Authentication/OverleafAuthenticationController"
 				url = OverleafAuthenticationController.prepareAccountMerge info, req
 				res.redirect url
 			else
