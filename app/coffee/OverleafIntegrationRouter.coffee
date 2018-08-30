@@ -92,6 +92,7 @@ module.exports =
 		webRouter.get '/user/trial', AccountSyncController.startTrial
 
 		if settings.createV1AccountOnLogin
+			logger.log {}, "[OverleafIntegrationRouter] replacing '/user/delete' route"
 			removeRoute webRouter, 'post', '/user/delete'
 			webRouter.post '/user/delete',
 				AuthenticationController.requireLogin(),
