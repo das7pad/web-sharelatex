@@ -24,13 +24,15 @@ module.exports = UserAdminController =
 
 	search: (req, res, next)->
 		logger.log body: req.body, "getting admin request for search users"
-		UserAdminController._userFind req.body.query, req.body.page, (err, users, pages) ->
+		UserAdminController._userFind req.body, req.body.page, (err, users, pages) ->
 			return next(err) if err?
 			res.send 200, {users:users, pages:pages}
 
-	_userFind: (query, page, cb = () ->) ->
+	_userFind: (params, page, cb = () ->) ->
+		query = params?.query
 		if query? and query != ""
-			q = {email: new RegExp(query)}
+			query = new RegExp(query) if params?.regexp
+			q = { $or: [{ email: query }, { 'emails.email': query }] }
 		else
 			q = {}
 		skip = (page - 1) * UserAdminController.PER_PAGE
@@ -52,7 +54,7 @@ module.exports = UserAdminController =
 		async.parallel {
 			user: (cb) ->
 				UserGetter.getUser user_id, {
-					_id:1, first_name:1, last_name:1, email:1, betaProgram:1, features: 1, isAdmin: 1, awareOfV2: 1, overleaf: 1
+					_id:1, first_name:1, last_name:1, email:1, betaProgram:1, features: 1, isAdmin: 1, awareOfV2: 1, overleaf: 1, emails: 1
 				}, cb
 			projects: (cb) ->
 				ProjectGetter.findAllUsersProjects user_id, {

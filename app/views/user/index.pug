@@ -29,6 +29,13 @@ block content
 									style="cursor: pointer;",
 									ng-show="searchText.length > 0"
 								)
+								div.form-check
+									label.form-check-label
+										input.form-check-input(
+											type="checkbox"
+											ng-model="searchRegExp",
+										)
+										| &nbsp;RegExp
 						.user-tools(ng-cloak)
 							.btn-toolbar
 								.btn-group(ng-hide="selectedUsers.length < 1")
@@ -49,7 +56,11 @@ block content
 
 				.row
 					.col-xs-12
-						.user-list-card
+						span(ng-if='isLoading')
+							loading
+									i.fa.fa-fw.fa-spin.fa-refresh
+									| &nbsp;#{translate("loading")}...
+						.user-list-card(ng-if='!isLoading')
 							ul.list-unstyled.user-list.structured-list(
 								select-all-list,
 								max-height="userListHeight - 25",
