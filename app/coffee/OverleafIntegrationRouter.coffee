@@ -1,4 +1,5 @@
 OverleafAuthenticationController = require "./Authentication/OverleafAuthenticationController"
+AccountDeleteController = require "./AccountDelete/AccountDeleteController"
 ProjectImportController = require "./ProjectImport/ProjectImportController"
 TeamImportController = require "./TeamImport/TeamImportController"
 AuthenticationController = require "../../../../app/js/Features/Authentication/AuthenticationController"
@@ -88,6 +89,16 @@ module.exports =
 		)
 
 		webRouter.get '/user/trial', AccountSyncController.startTrial
+
+		if settings.createV1AccountOnLogin
+			removeRoute webRouter, 'post', '/user/delete'
+			webRouter.post '/user/delete',
+				AuthenticationController.requireLogin(),
+				AccountDeleteController.tryDeleteUser
+
+	applyNonCsrfRouter: (webRouter, privateApiRouter, publicApiRouter) ->
+		if settings.collabratec?
+			webRouter.post settings.collabratec.saml.callback_path, passport.authenticate('saml'), CollabratecController.samlConsume
 
 removeRoute = (router, method, path)->
 	index = null
