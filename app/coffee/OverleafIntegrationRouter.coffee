@@ -97,10 +97,6 @@ module.exports =
 				AuthenticationController.requireLogin(),
 				AccountDeleteController.tryDeleteUser
 
-	applyNonCsrfRouter: (webRouter, privateApiRouter, publicApiRouter) ->
-		if settings.collabratec?
-			webRouter.post settings.collabratec.saml.callback_path, passport.authenticate('saml'), CollabratecController.samlConsume
-
 removeRoute = (router, method, path)->
 	index = null
 	for route, i in router.stack
