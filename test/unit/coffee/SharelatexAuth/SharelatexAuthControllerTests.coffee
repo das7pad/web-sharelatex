@@ -102,7 +102,7 @@ describe "SharelatexAuthController", ->
 			@email = "user@example.com"
 			@user = {_id: @user_id, email: @email}
 			@v1Profile = {id: 123, email: @email}
-			@SharelatexAuthHandler.createBackingAccount = sinon.stub().callsArgWith(1, null, true , @v1Profile)
+			@SharelatexAuthHandler.createBackingAccount = sinon.stub().callsArgWith(1, null, @v1Profile)
 			@UserUpdater.updateUser = sinon.stub().callsArgWith(2, null)
 			@AuthenticationController._setRedirectInSession = sinon.stub()
 
@@ -123,6 +123,9 @@ describe "SharelatexAuthController", ->
 			it "should update the user record", ->
 				expect(@UserUpdater.updateUser.callCount).to.equal 1
 				expect(@UserUpdater.updateUser.calledWith(@user_id)).to.equal true
+				expect(@UserUpdater.updateUser.lastCall.args[1]).to.deep.equal {
+					$set: {'overleaf.id': @v1Profile.id, 'ace.overallTheme': 'light-'}
+				}
 
 			it "should set up a redirect in the session", ->
 				expect(@AuthenticationController._setRedirectInSession.callCount).to.equal 1

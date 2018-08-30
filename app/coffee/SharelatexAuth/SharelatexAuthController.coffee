@@ -56,7 +56,12 @@ module.exports = SharelatexAuthController =
 				return callback(err)
 			else
 				logger.log {email, v1UserId: profile.id}, "v1 backing account created, adding overleaf-id to account"
-				UserUpdater.updateUser user_id, {$set: {'overleaf.id': profile.id}}, (err) ->
+				UserUpdater.updateUser user_id, {
+					$set: {
+						'overleaf.id': profile.id,
+						'ace.overallTheme': 'light-'
+					}
+				}, (err) ->
 					return callback(err) if err?
 					# All good, login and proceed
 					logger.log {email}, "successful registration with v1, proceeding with session setup"
