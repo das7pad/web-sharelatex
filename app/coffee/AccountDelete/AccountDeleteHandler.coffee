@@ -17,7 +17,7 @@ module.exports = AccountDeleteHandler =
 				return callback(err)
 			if response.statusCode in [200]
 				logger.log {v1Id, email}, "[AccountDeleteHandler] got response from v1 login api"
-				callback(null, isValid, userProfile)
+				callback(null)
 			else
 				err = new Error("Unexpected status from v1 login api: #{response.statusCode}")
 				callback(err)

@@ -11,6 +11,7 @@ RateLimiterMiddlewear = require('../../../../app/js/Features/Security/RateLimite
 passport = require "passport"
 logger = require "logger-sharelatex"
 qs = require 'querystring'
+settings = require 'settings-sharelatex'
 
 module.exports =
 	apply: (webRouter, privateApiRouter, publicApiRouter) ->
