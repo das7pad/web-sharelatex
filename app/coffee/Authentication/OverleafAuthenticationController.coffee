@@ -8,7 +8,7 @@ Settings = require "settings-sharelatex"
 jwt = require('jsonwebtoken')
 FeaturesUpdater = require("../../../../../app/js/Features/Subscription/FeaturesUpdater")
 Settings = require('settings-sharelatex')
-
+{User} = require "../../../../../app/js/models/User"
 
 module.exports = OverleafAuthenticationController =
 	saveRedir: (req, res, next) ->
@@ -19,8 +19,18 @@ module.exports = OverleafAuthenticationController =
 	welcomeScreen: (req, res, next) ->
 		res.render Path.resolve(__dirname, "../../views/welcome"), req.query
 
-	showCheckAccountsInterstitial: (req, res, next) ->
-		res.render Path.resolve(__dirname, "../../views/check_accounts")
+	showCheckAccountsPage: (req, res, next) ->
+		if !req.query.email
+			return res.redirect('/overleaf/login')
+
+		User.findOne {email: req.query.email}, {_id: 1}, (err, user) ->
+			return callback(err) if err?
+			if user?
+				return res.redirect('/overleaf/login')
+			else
+				res.render Path.resolve(__dirname, "../../views/check_accounts"), {
+					email: req.query.email
+				}
 
 	setupUser: (req, res, next) ->
 		# This will call OverleafAuthenticationManager.setupUser
