@@ -20,17 +20,20 @@ module.exports = OverleafAuthenticationController =
 		res.render Path.resolve(__dirname, "../../views/welcome"), req.query
 
 	showCheckAccountsPage: (req, res, next) ->
-		if !req.query.email
+		{token} = req.query
+		if !token?
 			return res.redirect('/overleaf/login')
 
-		User.findOne {email: req.query.email}, {_id: 1}, (err, user) ->
-			return callback(err) if err?
-			if user?
-				return res.redirect('/overleaf/login')
-			else
-				res.render Path.resolve(__dirname, "../../views/check_accounts"), {
-					email: req.query.email
-				}
+		jwt.verify token, Settings.accountMerge.secret, (error, data) ->
+			{email} = data
+			User.findOne {email}, {_id: 1}, (err, user) ->
+				return callback(err) if err?
+				if user?
+					return res.redirect('/overleaf/login')
+				else
+					res.render Path.resolve(__dirname, "../../views/check_accounts"), {
+						email
+					}
 
 	setupUser: (req, res, next) ->
 		# This will call OverleafAuthenticationManager.setupUser
