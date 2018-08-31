@@ -25,6 +25,10 @@ module.exports = OverleafAuthenticationController =
 			return res.redirect('/overleaf/login')
 
 		jwt.verify token, Settings.accountMerge.secret, (error, data) ->
+			if error?
+				logger.err err: error, "bad token in checking accounts"
+				return res.status(400).send("invalid token")
+
 			{email} = data
 			User.findOne {email}, {_id: 1}, (err, user) ->
 				return callback(err) if err?
