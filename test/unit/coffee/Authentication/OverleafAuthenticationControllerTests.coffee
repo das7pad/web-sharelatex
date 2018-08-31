@@ -20,6 +20,7 @@ describe "OverleafAuthenticationController", ->
 			"../OverleafUsers/UserMapper": @UserMapper = {}
 			"../../../../../app/js/Features/Subscription/FeaturesUpdater":
 				@FeaturesUpdater = {refreshFeatures: sinon.stub()}
+			"../../../../../app/js/models/User": { User: @User = {} }
 		@req =
 			logIn: sinon.stub()
 			session: {}
@@ -158,6 +159,58 @@ describe "OverleafAuthenticationController", ->
 
 			it "should return a 400 invalid token error", ->
 				@res.status.calledWith(400).should.equal true
+
+	describe "showCheckAccountsPage", ->
+		describe "with no token", () ->
+			it "should redirect to /overleaf/login", () ->
+				@req.query = {}
+				@OverleafAuthenticationController.showCheckAccountsPage(@req, @res, @next)
+				@res.redirect.calledWith('/overleaf/login').should.equal true
+
+		describe "for email found in database", () ->
+			beforeEach ->
+				@token = "mock-token"
+				@email = "found@example.com"
+				@data = {
+					email: @email
+				}
+				@jwt.verify = sinon.stub()
+				@jwt.verify.withArgs(@token, @settings.accountMerge.secret).yields(null, @data)
+				@User.findOne = sinon.stub().yields(null, { email: @email })
+				@req.query = token: @token
+				@OverleafAuthenticationController.showCheckAccountsPage(@req, @res, @next)
+
+			it "should verify the token", () ->
+				@jwt.verify
+					.calledWith(@token, @settings.accountMerge.secret)
+					.should.equal true
+
+			it "should redirect to /overleaf/login", () ->
+				@res.redirect.calledWith('/overleaf/login').should.equal true
+
+		describe "for email not found in database", () ->
+			beforeEach ->
+				@token = "mock-token"
+				@email = "not_found@example.com"
+				@data = {
+					email: @email
+				}
+				@jwt.verify = sinon.stub()
+				@jwt.verify.withArgs(@token, @settings.accountMerge.secret).yields(null, @data)
+				@User.findOne = sinon.stub().yields(null, null)
+				@req.query = token: @token
+				@OverleafAuthenticationController.showCheckAccountsPage(@req, @res, @next)
+
+			it "should verify the token", () ->
+				@jwt.verify
+					.calledWith(@token, @settings.accountMerge.secret)
+					.should.equal true
+
+			it "should render the check accounts page", () ->
+				@res.render.calledWith(
+					Path.resolve(modulePath, "../../../views/check_accounts"),
+					{ email: @email }
+				).should.equal true
 
 	describe "prepareAccountMerge", ->
 		beforeEach ->
