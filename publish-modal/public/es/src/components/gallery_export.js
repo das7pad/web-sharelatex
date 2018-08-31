@@ -33,38 +33,56 @@ export default class GalleryExport extends Component {
         out the details below.
         </p>
         <p>
-          <input type="text"
-            className="form-control"
-            defaultValue={firstName}
-            maxLength="255"
-            placeholder="First Name"
-            ref={ (input) => (this.firstName = input)}
-          />
-          <input type="text"
-            className="form-control"
-            defaultValue={lastName}
-            maxLength="255"
-            placeholder="Last Name"
-            ref={ (input) => (this.lastName = input)}
-          />
-          <input type="text"
-            className="form-control"
-            defaultValue={title}
-            maxLength="255"
-            placeholder="Title"
-            ref={ (input) => (this.title = input)}
-          />
-          <label htmlFor="gallery-export-description">Description</label>
-          <input
-            id="gallery-export-description"
-            type="text-area"
-            className="form-control"
-            defaultValue={description}
-            maxLength="2048"
-            placeholder="Description"
-            ref={ (input) => (this.description = input)}
-          />
           <div className="form-control-box">
+            <label htmlFor="gallery-export-first-name">First name</label>
+            <input
+              id="gallery-export-first-name"
+              type="text"
+              className="form-control"
+              defaultValue={firstName}
+              maxLength="255"
+              placeholder="First Name"
+              ref={ (input) => (this.firstName = input)}
+            />
+          </div>
+          <div className="form-control-box">
+            <label htmlFor="gallery-export-last-name">Last name</label>
+            <input
+              id="gallery-export-last-name"
+              type="text"
+              className="form-control"
+              defaultValue={lastName}
+              maxLength="255"
+              placeholder="Last Name"
+              ref={ (input) => (this.lastName = input)}
+            />
+          </div>
+          <div className="form-control-box">
+            <label htmlFor="gallery-export-title">Title</label>
+            <input
+              id="gallery-export-title"
+              type="text"
+              className="form-control"
+              defaultValue={title}
+              maxLength="255"
+              placeholder="Title"
+              ref={ (input) => (this.title = input)}
+            />
+          </div>
+          <div className="form-control-box">
+            <label htmlFor="gallery-export-description">Description</label>
+            <input
+              id="gallery-export-description"
+              type="text-area"
+              className="form-control"
+              defaultValue={description}
+              maxLength="2048"
+              placeholder="Description"
+              ref={ (input) => (this.description = input)}
+            />
+          </div>
+          <div className="form-control-box">
+            <label htmlFor="gallery-export-license">License</label>
             <select id="gallery-export-license"
               ref={ (input) => (this.license = input)}>
               <option value='cc_by_4.0'>
@@ -77,7 +95,6 @@ export default class GalleryExport extends Component {
                 Other (as stated in the work)
               </option>
             </select>
-            <label htmlFor="gallery-export-license">License</label>
           </div>
           <div className="form-control-box">
             <input type="checkbox"
