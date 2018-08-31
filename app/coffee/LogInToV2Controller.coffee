@@ -7,6 +7,7 @@ AnalyticsManager = require "../../../../app/js/Features/Analytics/AnalyticsManag
 LimitationsManager = require "../../../../app/js/Features/Subscription/LimitationsManager"
 V1UserFinder = require "./V1UserFinder"
 User = require("../../../../app/js/models/User").User
+UserGetter = require('../../../../app/js/Features/User/UserGetter')
 
 _canChooseToNotMerge = () ->
 	return !Settings.createV1AccountOnLogin
@@ -17,23 +18,30 @@ module.exports = LogInToV2Controller =
 	showLogInToV2Interstitial: (req, res, next) ->
 		current_user_id = AuthenticationController.getLoggedInUserId(req)
 
-		V1UserFinder.hasV1AccountNotLinkedYet current_user_id, (err, email, hasNotLinkedV1account) ->
-			if err?
-				logger.err {current_user_id, email}, "error getting user from v1"
-				return next(err)
-
-			if req.query?.dont_link && _canChooseToNotMerge()
+		UserGetter.getUser current_user_id, {overleaf: 1}, (err, user) ->
+			return next(err) if err?
+			if user?.overleaf?.id?
+				logger.log {user_id: current_user_id},
+					"user already linked to overleaf account, sending to v2 login"
 				return LogInToV2Controller.signAndRedirectToLogInToV2(req, res, next)
 
-			if hasNotLinkedV1account
-				# Email matched in v1
-				LogInToV2Controller._renderMergePage(req, res, next)
-			else
-				# No email match in v1
-				if Settings.createV1AccountOnLogin
-					LogInToV2Controller._renderCheckAccountsPage(req, res, next)
+			V1UserFinder.hasV1AccountNotLinkedYet current_user_id, (err, email, hasNotLinkedV1account) ->
+				if err?
+					logger.err {current_user_id, email}, "error getting user from v1"
+					return next(err)
+
+				if req.query?.dont_link && _canChooseToNotMerge()
+					return LogInToV2Controller.signAndRedirectToLogInToV2(req, res, next)
+
+				if hasNotLinkedV1account
+					# Email matched in v1
+					LogInToV2Controller._renderMergePage(req, res, next)
 				else
-					LogInToV2Controller.signAndRedirectToLogInToV2(req, res, next)
+					# No email match in v1
+					if Settings.createV1AccountOnLogin
+						LogInToV2Controller._renderCheckAccountsPage(req, res, next)
+					else
+						LogInToV2Controller.signAndRedirectToLogInToV2(req, res, next)
 
 	_renderMergePage: (req, res, next) ->
 		user = AuthenticationController.getSessionUser(req)
