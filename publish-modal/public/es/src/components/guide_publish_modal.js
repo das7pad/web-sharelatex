@@ -13,7 +13,6 @@ export default class GuidePublishModal extends Component {
       entries,
       onSwitch,
       shown,
-      partner,
       initParams
     } = this.props
 
@@ -40,7 +39,7 @@ export default class GuidePublishModal extends Component {
         pdfUrl={initParams.pdfUrl}
       />)
     } else if (shown === 'export') {
-      if (partner === 'gallery') {
+      if (entry.partner === 'gallery') {
         return (<GalleryExport
           onReturn={onReturn}
           entry={entry}

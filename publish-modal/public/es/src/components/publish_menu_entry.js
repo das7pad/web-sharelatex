@@ -6,7 +6,6 @@ export default class PublishMenuEntry extends Component {
            id,
            category,
            displayCategory,
-           partner,
            switchTo
     } = this.props
 
@@ -25,7 +24,7 @@ export default class PublishMenuEntry extends Component {
             data-action='choose'
             data-label={this.props.id}
             style={{ border: 0, padding: 0, backgroundColor: 'transparent' }}
-            onClick={() => this.props.onSwitch(switchTo, partner, id)}>
+            onClick={() => this.props.onSwitch(switchTo, id)}>
             <img src={this.props.publish_menu_icon} alt={name} />
           </button>
         </div>
@@ -39,7 +38,7 @@ export default class PublishMenuEntry extends Component {
             data-category='Publish'
             data-action='choose'
             data-label={this.props.id}
-            onClick={() => this.props.onSwitch(switchTo, partner, id)}
+            onClick={() => this.props.onSwitch(switchTo, id)}
             dangerouslySetInnerHTML={{__html: this.props.publish_menu_link_html}} />
         </div>
       </div>

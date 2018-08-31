@@ -9,7 +9,6 @@ export default class PublishModal extends Component {
     super(props)
     this.state = {
       shown: props.initialShown,
-      partner: null,
       baseReturn: props.initialShown
     }
     this.handleSwitch = this.handleSwitch.bind(this)
@@ -24,13 +23,12 @@ export default class PublishModal extends Component {
     }
   }
 
-  handleSwitch (switchTo, partner, guideId) {
+  handleSwitch (switchTo, guideId) {
     if (switchTo) {
-      this.setState({ shown: switchTo, partner: partner, guideId: guideId })
+      this.setState({ shown: switchTo, guideId: guideId })
     } else {
       this.setState({
         shown: this.state.baseReturn,
-        partner: null,
         guideId: null
       })
     }
@@ -53,7 +51,6 @@ export default class PublishModal extends Component {
         entries={entries}
         guideId={this.state.guideId}
         initParams={initParams}
-        partner={this.state.partner}
         shown={this.state.shown}
         initialEntry={this.state.initialEntry}
       />)
