@@ -11,6 +11,7 @@ describe "LogInToV2Controller", ->
 		@User = {}
 		@LogInToV2Controller = SandboxedModule.require modulePath, requires:
 			"../../../../app/js/models/User": {User: @User}
+			"../../../../app/js/Features/User/UserGetter": @UserGetter = {}
 			"../../../../app/js/Features/Authentication/AuthenticationController":
 				@AuthenticationController = {}
 			"./V1UserFinder": @V1UserFinder =
@@ -34,6 +35,7 @@ describe "LogInToV2Controller", ->
 	describe "showLogInToV2Interstitial", ->
 		beforeEach ->
 			@user_id = "mock-user-id"
+			@UserGetter.getUser = sinon.stub().callsArgWith(2, null, {_id: @user_id})
 			@AuthenticationController.getLoggedInUserId =
 				sinon.stub().withArgs(@req).returns(@user_id)
 
@@ -51,6 +53,21 @@ describe "LogInToV2Controller", ->
 					@res,
 					@next
 				).should.equal true
+
+		describe "when the user is already linked", ->
+			beforeEach ->
+				@UserGetter.getUser = sinon.stub().callsArgWith(2, null, {_id: @user_id, overleaf: {id: 123}})
+				@LogInToV2Controller.signAndRedirectToLogInToV2 = sinon.stub()
+				@V1UserFinder.hasV1AccountNotLinkedYet = sinon.stub()
+				@LogInToV2Controller.showLogInToV2Interstitial(@req, @res, @next)
+
+			it "should just send the user to v2", ->
+				@LogInToV2Controller.signAndRedirectToLogInToV2.calledWith(
+					@req,
+					@res,
+					@next
+				).should.equal true
+				@V1UserFinder.hasV1AccountNotLinkedYet.callCount.should.equal 0
 
 	describe "signAndRedirectToLogInToV2", ->
 		beforeEach ->
