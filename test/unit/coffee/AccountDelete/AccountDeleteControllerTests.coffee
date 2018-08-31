@@ -93,7 +93,7 @@ describe "AccountDeleteController", ->
 				@UserGetter.getUser = sinon.stub().callsArgWith(2, null, @user)
 				@v1Profile = {id: @overleaf_id}
 				@V1LoginHandler.authWithV1 = sinon.stub().callsArgWith(2, null, true, @v1Profile)
-				@AccountDeleteHandler.deleteV1Account = sinon.stub().callsArgWith(3, null)
+				@AccountDeleteHandler.deleteV1Account = sinon.stub().callsArgWith(1, null)
 				@UserDeleter.deleteUser = sinon.stub().callsArgWith(1, null)
 				@req.logout = sinon.stub()
 				@req.session.destroy = sinon.stub().callsArgWith(0, null)

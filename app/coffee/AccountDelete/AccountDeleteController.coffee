@@ -44,7 +44,7 @@ module.exports = AccountDeleteController =
 						"[AccountDeleteController] #{err.message}"
 					return next(err)
 
-				AccountDeleteHandler.deleteV1Account v1Profile.id, email, password, (err)->
+				AccountDeleteHandler.deleteV1Account v1Profile.id, (err)->
 					return next(err) if err?
 					logger.log {user_id, email, v1Id: v1Profile.id},
 						"[AccountDeleteController] deleted v1 account, now deleting mongo account"
