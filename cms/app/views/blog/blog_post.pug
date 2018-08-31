@@ -3,20 +3,23 @@ extends ../layout
 //- Page for a single blog post
 
 block content_cms
-	.page-header
-		h1
-			a(href="/blog") Blog
-	.blog(ng-cloak ng-controller="CmsController")
-		ul.blog-list
-			li.card
-				.card-header
-					h2 #{title}
-				if (authorDisplay || publishDateDay)
-					small Posted
-						if (authorDisplay)
-							|  by #{authorDisplay}
-						if (publishDatePretty)
-							|  on #{publishDatePretty}
-				mathjax(delimiter="no-single-dollar") !{content}
+	.row
+		.col-sm-8.col-sm-offset-2.col-xs-12
+			.page-header
+				h1
+					a(href="/blog") Blog
+
+			.blog(ng-cloak ng-controller="CmsController")
+				ul.blog-list
+					li.card
+						.card-header
+							h2 #{title}
+						if (authorDisplay || publishDateDay)
+							small Posted
+								if (authorDisplay)
+									|  by #{authorDisplay}
+								if (publishDatePretty)
+									|  on #{publishDatePretty}
+						mathjax(delimiter="no-single-dollar") !{content}
 
 	script(src=mathJaxPath) 

@@ -1,8 +1,12 @@
 logger = require 'logger-sharelatex'
 marked = require 'marked'
+sanitizeHtml = require 'sanitize-html'
 ContentfulClient = require '../ContentfulClient'
 ErrorController = require '../../../../../app/js/Features/Errors/ErrorController'
 CmsHandler = require '../CmsHandler'
+Settings = require 'settings-sharelatex'
+
+sanitizeOptions = if Settings?.modules?.sanitize?.options? then Settings.modules.sanitize.options else sanitizeHtml.defaults
 
 module.exports =
 
@@ -30,6 +34,7 @@ module.exports =
 						cmsData = collection.items?[0]?.fields
 						if cmsData.about
 							cmsData.about = marked(cmsData.about)
+							cmsData.about = sanitizeHtml(cmsData.about, sanitizeOptions)
 						CmsHandler.render(res, 'about/page', cmsData, req.query)
 				.catch (err) ->
 					next(err)

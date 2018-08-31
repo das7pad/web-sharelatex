@@ -1,8 +1,12 @@
 logger = require 'logger-sharelatex'
 marked = require 'marked'
+sanitizeHtml = require 'sanitize-html'
 ContentfulClient = require '../ContentfulClient'
 ErrorController = require '../../../../../app/js/Features/Errors/ErrorController'
 CmsHandler = require '../CmsHandler'
+Settings = require 'settings-sharelatex'
+
+sanitizeOptions = if Settings?.modules?.sanitize?.options? then Settings.modules.sanitize.options else sanitizeHtml.defaults
 
 parseContent = (content) ->
 	# Data easier to use in pug template
@@ -21,17 +25,20 @@ parseContent = (content) ->
 			content.href = '/' + content.fields.linkTo.fields.path + '/' + content.fields.linkTo.fields.slug 
 
 	# Parse markdown and stringify JSON
-	if content.fields.content
-		content.fields.content = marked(content.fields.content)
-	else if content.fields.tabs
-		content.fields.tabs.map (c) -> parseContent(c)
-	else if content.fields.tabContent
-		content.fields.tabContent.map (c) -> parseContent(c)
-	else if content.fields.quote
-		# input is a textarea but still need to parse for line breaks
-		content.fields.quote = marked(content.fields.quote)
-	else if content.fields.mbData
-		content.fields.mbData = JSON.stringify(content.fields.mbData)
+	if content.fields
+		if content.fields.content
+			content.fields.content = marked(content.fields.content)
+			content.fields.content = sanitizeHtml(content.fields.content, sanitizeOptions)
+		else if content.fields.tabs
+			content.fields.tabs.map (c) -> parseContent(c)
+		else if content.fields.tabContent
+			content.fields.tabContent.map (c) -> parseContent(c)
+		else if content.fields.quote
+			# input is a textarea but still need to parse for line breaks
+			content.fields.quote = marked(content.fields.quote)
+			content.fields.quote = sanitizeHtml(content.fields.quote, sanitizeOptions)
+		else if content.fields.mbData
+			content.fields.mbData = JSON.stringify(content.fields.mbData)
 
 	content
 
