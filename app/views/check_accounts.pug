@@ -1,0 +1,68 @@
+extends ../../../../app/views/layout
+
+block content
+	.content.content-alt
+		.container
+			.row
+				.col-md-8.col-md-offset-2
+					.card
+						.page-header
+							h1 Moving to Overleaf v2
+						p.text-center
+							img(
+								src="/img/ol_plus_sl.png"
+								style="width: 50%"
+							)
+
+						div
+							p
+								| Good news! Overleaf and ShareLaTeX have joined forces to bring
+								| you Overleaf v2, which combines the best of both services.
+							p
+								| You can access all your projects through Overleaf v2. If you
+								| have a ShareLaTeX account, you can also access your ShareLaTeX
+								| projects through Overleaf v2.
+						hr
+
+						.row
+							.col-md-12.form-group(ng-controller="AccountMergeCheckerController")
+								h4(style="margin-top: 0;") Do you already have an ShareLaTeX account?
+
+								.radio
+									input(
+										type="radio"
+										id="yes-sl-account"
+										name="account-checker"
+										ng-model="hasSlAccount"
+										value="has-sl-account"
+									)
+									label(for="yes-sl-account") Yes, I also have an ShareLaTeX account
+								.radio
+									input(
+										type="radio"
+										id="no-sl-account"
+										name="account-checker"
+										ng-model="hasSlAccount"
+										value="has-no-sl-account"
+									)
+									label(for="no-sl-account") No, I only have a Overleaf account
+
+								.row(ng-if="hasSlAccount == 'has-sl-account'" ng-cloak style="margin-top: 25px;")
+									.col-md-12
+										p
+											| We didn't find an ShareLaTeX account for #[strong #{email}].
+											| If you have an ShareLaTeX account under a different
+											| email address, please #[a(href="https://www.overleaf.com/users/edit#details") change your email address on Overleaf to match your ShareLaTeX email address]
+											| and then try again.
+										p
+											| If your Overleaf email is your preferred email address,
+											| you can change both back after you have merged.
+
+								.row(ng-if="hasSlAccount == 'has-no-sl-account'" ng-cloak style="margin-top: 25px;")
+									.col-md-12
+										p
+											| OK, let's move your Overleaf account to v2 now. It will
+											| only take a few seconds.
+
+										p.text-center
+											a.btn.btn-lg.btn-primary(href="/overleaf/auth_from_v1") Get Started with Overleaf v2
