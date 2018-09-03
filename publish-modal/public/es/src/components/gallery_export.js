@@ -12,12 +12,15 @@ export default class GalleryExport extends Component {
     }
   }
 
-  runExport (entry, projectId) {
-    if (this.firstName.value && this.lastName.value && this.title.value) {
+  runExport (ev, entry, projectId) {
+    valid = this.firstName.value && this.lastName.value && this.title.value;
+    if (valid) {
       initiateExport(entry, projectId, this)
     } else {
-      this.setState({ submissionValid: false })
+      ev.preventDefault()
     }
+    this.setState({ submissionValid: valid })
+    return(valid)
   }
 
   renderUninitiated() {
@@ -26,90 +29,86 @@ export default class GalleryExport extends Component {
       firstName, lastName, title, description, license, showSource
     } = this.props
     return (
-      <form onSubmit={() => this.runExport(entry, projectId)}>
+      <form onSubmit={(ev) => this.runExport(ev, entry, projectId)}>
         <p>
         The Overleaf Gallery is the easiest way to publish your work
         from Overleaf and make it searchable and shareable. Just fill
         out the details below.
         </p>
-        <p>
-          <div className="form-control-box">
-            <label htmlFor="gallery-export-first-name">First name</label>
-            <input
-              id="gallery-export-first-name"
-              type="text"
-              className="form-control"
-              defaultValue={firstName}
-              maxLength="255"
-              placeholder="First Name"
-              ref={ (input) => (this.firstName = input)}
-            />
-          </div>
-          <div className="form-control-box">
-            <label htmlFor="gallery-export-last-name">Last name</label>
-            <input
-              id="gallery-export-last-name"
-              type="text"
-              className="form-control"
-              defaultValue={lastName}
-              maxLength="255"
-              placeholder="Last Name"
-              ref={ (input) => (this.lastName = input)}
-            />
-          </div>
-          <div className="form-control-box">
-            <label htmlFor="gallery-export-title">Title</label>
-            <input
-              id="gallery-export-title"
-              type="text"
-              className="form-control"
-              defaultValue={title}
-              maxLength="255"
-              placeholder="Title"
-              ref={ (input) => (this.title = input)}
-            />
-          </div>
-          <div className="form-control-box">
-            <label htmlFor="gallery-export-description">Description</label>
-            <input
-              id="gallery-export-description"
-              type="text-area"
-              className="form-control"
-              defaultValue={description}
-              maxLength="2048"
-              placeholder="Description"
-              ref={ (input) => (this.description = input)}
-            />
-          </div>
-          <div className="form-control-box">
-            <label htmlFor="gallery-export-license">License</label>
-            <select id="gallery-export-license"
-              ref={ (input) => (this.license = input)}>
-              <option value='cc_by_4.0'>
-                Creative Commons CC BY 4.0
-              </option>
-              <option value='lppl_1.3c'>
-                LaTeX Project Public License 1.3c
-              </option>
-              <option value='other'>
-                Other (as stated in the work)
-              </option>
-            </select>
-          </div>
-          <div className="form-control-box">
-            <input type="checkbox"
-              id="gallery-export-show-source"
-              defaultValue={showSource}
-              placeholder="Show source"
-              ref={ (input) => (this.showSource = input)}
-            />
-            <label htmlFor="gallery-export-show-source">Show source</label>
-          </div>
-        </p>
-        <br/>
-        <submit className='btn btn-primary' >
-          Submit to {entry.name}
-        </submit>
+        <div className="form-control-box">
+          <label htmlFor="gallery-export-first-name">First name</label>
+          <input
+            id="gallery-export-first-name"
+            type="text"
+            className="form-control"
+            defaultValue={firstName}
+            maxLength="255"
+            placeholder="First Name"
+            ref={ (input) => (this.firstName = input)}
+          />
+        </div>
+        <div className="form-control-box">
+          <label htmlFor="gallery-export-last-name">Last name</label>
+          <input
+            id="gallery-export-last-name"
+            type="text"
+            className="form-control"
+            defaultValue={lastName}
+            maxLength="255"
+            placeholder="Last Name"
+            ref={ (input) => (this.lastName = input)}
+          />
+        </div>
+        <div className="form-control-box">
+          <label htmlFor="gallery-export-title">Title</label>
+          <input
+            id="gallery-export-title"
+            type="text"
+            className="form-control"
+            defaultValue={title}
+            maxLength="255"
+            placeholder="Title"
+            ref={ (input) => (this.title = input)}
+          />
+        </div>
+        <div className="form-control-box">
+          <label htmlFor="gallery-export-description">Description</label>
+          <input
+            id="gallery-export-description"
+            type="text-area"
+            className="form-control"
+            defaultValue={description}
+            maxLength="2048"
+            placeholder="Description"
+            ref={ (input) => (this.description = input)}
+          />
+        </div>
+        <div className="form-control-box">
+          <label htmlFor="gallery-export-license">License</label>
+          <select id="gallery-export-license"
+            ref={ (input) => (this.license = input)}>
+            <option value='cc_by_4.0'>
+              Creative Commons CC BY 4.0
+            </option>
+            <option value='lppl_1.3c'>
+              LaTeX Project Public License 1.3c
+            </option>
+            <option value='other'>
+              Other (as stated in the work)
+            </option>
+          </select>
+        </div>
+        <div className="form-control-box">
+          <input type="checkbox"
+            id="gallery-export-show-source"
+            defaultValue={showSource}
+            placeholder="Show source"
+            ref={ (input) => (this.showSource = input)}
+          />
+          <label htmlFor="gallery-export-show-source">Show source</label>
+        </div>
+        <input type="submit" className='btn btn-primary'
+          value={"Submit to " + entry.name}/>
         { !this.state.submissionValid &&
           <p style={{color: 'red'}}>
             Please provide first name, last name, and title before continuing
