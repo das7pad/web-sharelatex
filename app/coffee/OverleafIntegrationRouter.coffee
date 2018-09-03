@@ -1,4 +1,5 @@
 OverleafAuthenticationController = require "./Authentication/OverleafAuthenticationController"
+AccountDeleteController = require "./AccountDelete/AccountDeleteController"
 ProjectImportController = require "./ProjectImport/ProjectImportController"
 TeamImportController = require "./TeamImport/TeamImportController"
 AuthenticationController = require "../../../../app/js/Features/Authentication/AuthenticationController"
@@ -10,6 +11,7 @@ RateLimiterMiddlewear = require('../../../../app/js/Features/Security/RateLimite
 passport = require "passport"
 logger = require "logger-sharelatex"
 qs = require 'querystring'
+settings = require 'settings-sharelatex'
 
 module.exports =
 	apply: (webRouter, privateApiRouter, publicApiRouter) ->
@@ -88,6 +90,13 @@ module.exports =
 		)
 
 		webRouter.get '/user/trial', AccountSyncController.startTrial
+
+		if settings.createV1AccountOnLogin
+			logger.log {}, "[OverleafIntegrationRouter] replacing '/user/delete' route"
+			removeRoute webRouter, 'post', '/user/delete'
+			webRouter.post '/user/delete',
+				AuthenticationController.requireLogin(),
+				AccountDeleteController.tryDeleteUser
 
 removeRoute = (router, method, path)->
 	index = null
