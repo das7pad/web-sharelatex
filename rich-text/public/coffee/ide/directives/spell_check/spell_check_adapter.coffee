@@ -20,6 +20,12 @@ define [], () ->
         y: e.pageY
       }
 
+    isContextMenuEventOnBottomHalf: (e) -> 
+      clientY = e.clientY
+      editorBoundingRect = e.currentTarget.getBoundingClientRect()
+      relativeYPos = (clientY - editorBoundingRect.top) / editorBoundingRect.height
+      return relativeYPos > 0.5
+      
     preventContextMenuEventDefault: (e) ->
       e.preventDefault()
 
