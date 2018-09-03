@@ -16,11 +16,14 @@ describe "OverleafAuthenticationController", ->
 				accountMerge:
 					sharelatexHost: "http://sl.example.com"
 					secret: "banana"
+				overleaf:
+					host: 'http://v1.example.com'
 			"jsonwebtoken": @jwt = {}
 			"../OverleafUsers/UserMapper": @UserMapper = {}
 			"../../../../../app/js/Features/Subscription/FeaturesUpdater":
 				@FeaturesUpdater = {refreshFeatures: sinon.stub()}
 			"../../../../../app/js/models/User": { User: @User = {} }
+			"../../../../../app/js/Features/User/UserController": @UserController = {}
 		@req =
 			logIn: sinon.stub()
 			session: {}
@@ -30,6 +33,16 @@ describe "OverleafAuthenticationController", ->
 			send: sinon.stub()
 			render: sinon.stub()
 		@res.status.returns(@res)
+
+	describe "logout", ->
+		beforeEach ->
+			@UserController._doLogout = sinon.stub().callsArgWith(1, null)
+			@OverleafAuthenticationController.logout @req, @res, @next
+
+		it "redirects to v1", () ->
+			@res.redirect.calledWith(
+				'http://v1.example.com/users/ensure_signed_out'
+			).should.equal true
 
 	describe "setupUser", ->
 		describe "with a conflicting email", ->

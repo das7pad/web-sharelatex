@@ -9,6 +9,7 @@ jwt = require('jsonwebtoken')
 FeaturesUpdater = require("../../../../../app/js/Features/Subscription/FeaturesUpdater")
 Settings = require('settings-sharelatex')
 {User} = require "../../../../../app/js/models/User"
+UserController = require("../../../../../app/js/Features/User/UserController")
 
 module.exports = OverleafAuthenticationController =
 	saveRedir: (req, res, next) ->
@@ -38,6 +39,12 @@ module.exports = OverleafAuthenticationController =
 					res.render Path.resolve(__dirname, "../../views/check_accounts"), {
 						email
 					}
+
+	logout: (req, res, next) ->
+		UserController._doLogout req, (err) ->
+			return next(err) if err?
+			# Redirect to v1 page which signs user out of v1 as well
+			res.redirect Settings.overleaf.host + '/users/ensure_signed_out'
 
 	setupUser: (req, res, next) ->
 		# This will call OverleafAuthenticationManager.setupUser
