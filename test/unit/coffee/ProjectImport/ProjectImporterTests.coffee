@@ -19,6 +19,8 @@ describe "ProjectImporter", ->
 			"../../../../../app/js/Features/Collaborators/CollaboratorsHandler": @CollaboratorsHandler = {}
 			"../../../../../app/js/Features/Authorization/PrivilegeLevels": PrivilegeLevels
 			"../../../../../app/js/Features/User/UserGetter": @UserGetter = {}
+			"../../../../../app/js/Features/Tags/TagsHandler": @TagsHandler =
+				addProjectToTagName: sinon.stub().yields()
 			"../V1SharelatexApi": @V1SharelatexApi = {}
 			"../OverleafUsers/UserMapper": @UserMapper = {}
 			"logger-sharelatex": { log: sinon.stub(), warn: sinon.stub(), err: sinon.stub() }
@@ -38,13 +40,14 @@ describe "ProjectImporter", ->
 	describe "importProject", ->
 		beforeEach ->
 			@UserGetter.getUser = sinon.stub().yields(null, @user = overleaf: id: @v1_user_id)
-			@ProjectImporter._startExport = sinon.stub().yields(null, @doc = { id: @v1_project_id, files: ["mock-files"] })
+			@ProjectImporter._startExport = sinon.stub().yields(null, @doc = { id: @v1_project_id, files: ["mock-files"], tags: ["foo", "bar"] })
 			@ProjectImporter._initSharelatexProject = sinon.stub().yields(null, @v2_project_id)
 			@ProjectImporter._importFiles = sinon.stub().yields()
 			@ProjectImporter._importLabels = sinon.stub().yields()
 			@ProjectImporter._waitForV1HistoryExport = sinon.stub().yields()
 			@ProjectImporter._confirmExport = sinon.stub().yields()
 			@ProjectImporter._cancelExport = sinon.stub().yields()
+			@ProjectImporter._importTags = sinon.stub().yields()
 
 		describe "successfully", ->
 			beforeEach (done) ->
@@ -75,6 +78,11 @@ describe "ProjectImporter", ->
 			it "should import the labels", ->
 				@ProjectImporter._importLabels
 					.calledWith(@v1_project_id, @v2_project_id, @v1_user_id)
+					.should.equal true
+
+			it "should import the tags", ->
+				@ProjectImporter._importTags
+					.calledWith(@v2_project_id, @v2_user_id, ["foo", "bar"])
 					.should.equal true
 
 			it "should tell overleaf the project is now in the beta", ->
@@ -239,7 +247,8 @@ describe "ProjectImporter", ->
 
 	describe "_importAcceptedInvite", ->
 		beforeEach ->
-			@project_id = "mock-project-id"
+			@v1_project_id = "mock-v1-project-id"
+			@v2_project_id = "mock-v2-project-id"
 			@ol_invitee = {
 				id: 42
 				email: "joe@example.com"
@@ -260,11 +269,12 @@ describe "ProjectImporter", ->
 				email: "joe@example.com"
 				token: "mock-token"
 			}
+			@V1SharelatexApi.request = sinon.stub().yields(null, {}, {tags: ['foo', 'bar']})
 
 		describe "with a read-only invite", ->
 			beforeEach (done) ->
 				@invite.access_level = "read_only"
-				@ProjectImporter._importAcceptedInvite @project_id, @invite, done
+				@ProjectImporter._importAcceptedInvite @v1_project_id, @v2_project_id, @invite, done
 
 			it "should look up the inviter in SL", ->
 				@UserMapper.getSlIdFromOlUser
@@ -278,35 +288,53 @@ describe "ProjectImporter", ->
 
 			it "should add the SL invitee to project, with readOnly privilege level", ->
 				@CollaboratorsHandler.addUserIdToProject
-					.calledWith(@project_id, @sl_inviter_id, @sl_invitee_id, PrivilegeLevels.READ_ONLY)
+					.calledWith(@v2_project_id, @sl_inviter_id, @sl_invitee_id, PrivilegeLevels.READ_ONLY)
 					.should.equal true
 
 		describe "with a read-write invite", ->
 			beforeEach (done) ->
 				@invite.access_level = "read_write"
-				@ProjectImporter._importAcceptedInvite @project_id, @invite, done
+				@ProjectImporter._importAcceptedInvite @v1_project_id, @v2_project_id, @invite, done
 
 			it "should add the SL invitee to project, with readAndWrite privilege level", ->
 				@CollaboratorsHandler.addUserIdToProject
-					.calledWith(@project_id, @sl_inviter_id, @sl_invitee_id, PrivilegeLevels.READ_AND_WRITE)
+					.calledWith(@v2_project_id, @sl_inviter_id, @sl_invitee_id, PrivilegeLevels.READ_AND_WRITE)
 					.should.equal true
+
+		describe "tags", ->
+			beforeEach (done) ->
+				@invite.access_level = "read_write"
+				@ProjectImporter._importAcceptedInvite @v1_project_id, @v2_project_id, @invite, done
+
+			it "should request tags for invited user", ->
+				@V1SharelatexApi.request.calledWithMatch(
+					{ url: "#{@settings.overleaf.host}/api/v1/sharelatex/users/#{@invite.invitee.id}/docs/#{@v1_project_id}/export/tags"}
+				).should.equal true
+
+			it "should add tags for user", ->
+				@TagsHandler.addProjectToTagName.calledWithMatch(
+					@sl_invitee_id, "foo", @v2_project_id
+				).should.equal true
+				@TagsHandler.addProjectToTagName.calledWithMatch(
+					@sl_invitee_id, "bar", @v2_project_id
+				).should.equal true
 
 		describe "null checks", ->
 			it "should require invite.inviter", (done) ->
 				delete @invite.inviter
-				@ProjectImporter._importAcceptedInvite @project_id, @invite, (error) ->
+				@ProjectImporter._importAcceptedInvite @v1_project_id, @v2_project_id, @invite, (error) ->
 					error.message.should.equal("expected invite inviter, invitee and access_level")
 					done()
 
 			it "should require invite.invitee", (done) ->
 				delete @invite.invitee
-				@ProjectImporter._importAcceptedInvite @project_id, @invite, (error) ->
+				@ProjectImporter._importAcceptedInvite @v1_project_id, @v2_project_id, @invite, (error) ->
 					error.message.should.equal("expected invite inviter, invitee and access_level")
 					done()
 
 			it "should require invite.access_level", (done) ->
 				delete @invite.access_level
-				@ProjectImporter._importAcceptedInvite @project_id, @invite, (error) ->
+				@ProjectImporter._importAcceptedInvite @v1_project_id, @v2_project_id, @invite, (error) ->
 					error.message.should.equal("expected invite inviter, invitee and access_level")
 					done()
 
@@ -747,3 +775,14 @@ describe "ProjectImporter", ->
 					})
 					.should.equal true
 				done()
+
+	describe "_importTags", ->
+		beforeEach (done) ->
+			@ProjectImporter._importTags(@v2_project_id, @v2_user_id, ["foo", "bar"], done)
+		it "should add tags to project", ->
+			@TagsHandler.addProjectToTagName.calledWith(
+				@v2_user_id, "foo", @v2_project_id
+			).should.equal. true
+			@TagsHandler.addProjectToTagName.calledWith(
+				@v2_user_id, "bar", @v2_project_id
+			).should.equal. true
