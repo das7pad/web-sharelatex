@@ -73,9 +73,9 @@ export default class GalleryExport extends Component {
         </div>
         <div className="form-control-box">
           <label htmlFor="gallery-export-description">Description</label>
-          <input
+          <textarea
             id="gallery-export-description"
-            type="text-area"
+            rows="2"
             className="form-control"
             defaultValue={description}
             maxLength="2048"
