@@ -17,6 +17,7 @@ module.exports =
 		adminRouter.get    "/user/:user_id", UserAdminController.show
 		adminRouter.post   "/user/:user_id", UserAdminController.update
 		adminRouter.delete "/user/:user_id", UserAdminController.delete
+		adminRouter.delete "/user/:user_id/overleaf", UserAdminController.deleteOverleafV1Link
 		adminRouter.post   "/user/:user_id/email", UserAdminController.updateEmail
 		
 		adminRouter.get    "/user/:user_id/subscription/new",              SubscriptionAdminController.new

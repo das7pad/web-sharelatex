@@ -19,3 +19,26 @@ script(type='text/ng-template', id='deleteUsersModalTemplate')
 		button.btn.btn-danger(
 			ng-click="delete()"
 		) #{translate("delete")}
+
+
+script(type='text/ng-template', id='unlinkOlModalTemplate')
+	.modal-header
+		button.close(
+			type="button"
+			data-dismiss="modal"
+			ng-click="cancel()"
+		) &times;
+		h3 Unlink Overleaf ID
+	.modal-body
+		div
+			p You are about to unlink these accounts to their Overleaf v1 linked account
+			ul
+				li(ng-repeat="user in users | orderBy:'first_name'")
+					strong {{user.first_name}}
+	.modal-footer
+		button.btn.btn-default(
+			ng-click="cancel()"
+		) #{translate("cancel")}
+		button.btn.btn-danger(
+			ng-click="unlink()"
+		) #{translate("Unlink")}

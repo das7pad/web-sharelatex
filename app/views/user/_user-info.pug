@@ -40,6 +40,14 @@ p
 						label Overleaf v1 ID
 					td
 						a(href=settings.apis.v1.url + "/admin/users/" + user.overleaf.id)= user.overleaf.id
+						a.pull-right.btn(
+							href='#',
+							tooltip-placement="bottom",
+							tooltip-append-to-body="true",
+							ng-click="openUnlinkOlModal()"
+						)
+							i.fa.fa-trash-o
+							| &nbsp; Unlink
 
 		form-messages(for="adminUserEmailForm")
 			.alert.alert-success(ng-show="adminUserEmailForm.response.success && !adminUserEmailForm.inflight")
