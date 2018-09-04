@@ -79,6 +79,15 @@ module.exports = UserAdminController =
 			return next(err) if err?
 			res.sendStatus 200
 
+	deleteOverleafV1Link: (req, res, next)->
+		user_id = req.params.user_id
+		logger.log user_id: user_id, "received admin request to unlink account from v1 Overleaf"
+		update =
+			$unset:{overleaf: ""}
+		UserUpdater.updateUser user_id, update, (err)->
+			return next(err) if err?
+			res.sendStatus 200
+
 	ALLOWED_ATTRIBUTES: [
 		'betaProgram',
 		'first_name',

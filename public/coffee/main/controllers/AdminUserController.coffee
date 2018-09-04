@@ -71,6 +71,29 @@ define [
 
 
 		# delete user
+		$scope.openUnlinkOlModal = () ->
+			modalInstance = $modal.open(
+				templateUrl: "unlinkOlModalTemplate"
+				controller: "UnlinkOlModalController"
+				resolve:
+					users: () -> [$scope.user]
+			)
+			modalInstance.result.then () ->
+				queuedHttp({
+					method: "DELETE"
+					url: "/admin/user/#{$scope.user._id}/overleaf"
+					headers:
+						"X-CSRF-Token": window.csrfToken
+				}).then(() ->
+					setTimeout(
+						() ->
+							window.location.href = "/admin/user/#{$scope.user._id}"
+						, 100
+					)
+				)
+
+
+		# delete user
 		$scope.openDeleteUserModal = () ->
 			modalInstance = $modal.open(
 				templateUrl: "deleteUsersModalTemplate"
@@ -125,6 +148,15 @@ define [
 		$scope.action = "Delete"
 
 		$scope.delete = () ->
+			$modalInstance.close()
+
+		$scope.cancel = () ->
+			$modalInstance.dismiss('cancel')
+
+	App.controller 'UnlinkOlModalController', ($scope, $modalInstance, $timeout, users) ->
+		$scope.users = users
+
+		$scope.unlink = () ->
 			$modalInstance.close()
 
 		$scope.cancel = () ->
