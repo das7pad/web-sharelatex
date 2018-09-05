@@ -11,7 +11,7 @@ p
 					label #{translate("email")}
 				td
 					div(ng-show="!editingEmail")
-						| {{ user.email }} &nbsp;
+						a(href="mailto:{{user.email}}") {{ user.email }} &nbsp;
 						a.small(href, ng-click="editingEmail = true") Edit
 					div(ng-show="editingEmail")
 						input#email.form-control(
