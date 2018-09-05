@@ -32,7 +32,7 @@ p
 				td
 					ul(ng-repeat="emailData in user.emails")
 						li {{ emailData.email }} 
-							a.btn(
+							a.btn.btn-danger.btn-xs(
 								href='#',
 								tooltip-placement="bottom",
 								tooltip-append-to-body="true",
@@ -265,7 +265,7 @@ p
 					span(ng-show="!adminUserForm.inflight") Save
 					span(ng-show="adminUserForm.inflight") Saving...
 			.col-md-3.text-right
-				a.btn(
+				a.btn.btn-danger(
 					href='#',
 					tooltip-placement="bottom",
 					tooltip-append-to-body="true",
