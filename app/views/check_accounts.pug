@@ -26,7 +26,7 @@ block content
 
 						.row
 							.col-md-12.form-group(ng-controller="AccountMergeCheckerController")
-								h4(style="margin-top: 0;") Do you already have an ShareLaTeX account?
+								h4(style="margin-top: 0;") Do you already have a ShareLaTeX account?
 
 								.radio
 									input(
@@ -36,7 +36,7 @@ block content
 										ng-model="hasSlAccount"
 										value="has-sl-account"
 									)
-									label(for="yes-sl-account") Yes, I also have an ShareLaTeX account
+									label(for="yes-sl-account") Yes, I also have a ShareLaTeX account
 								.radio
 									input(
 										type="radio"
@@ -50,8 +50,8 @@ block content
 								.row(ng-if="hasSlAccount == 'has-sl-account'" ng-cloak style="margin-top: 25px;")
 									.col-md-12
 										p
-											| We didn't find an ShareLaTeX account for #[strong #{email}].
-											| If you have an ShareLaTeX account under a different
+											| We didn't find a ShareLaTeX account for #[strong #{email}].
+											| If you have a ShareLaTeX account under a different
 											| email address, please #[a(href="https://www.overleaf.com/users/edit#details") change your email address on Overleaf to match your ShareLaTeX email address]
 											| and then try again.
 										p
