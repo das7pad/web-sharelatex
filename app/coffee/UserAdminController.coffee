@@ -93,9 +93,7 @@ module.exports = UserAdminController =
 		user_id = req.params.user_id
 		emailToRemove = req.body.emailToRemove
 		logger.log user_id:user_id, emailToRemove:emailToRemove,  "received request to delete secondary email"
-		update =
-			$pull:{emails:{email:emailToRemove}}
-		UserUpdater.updateUser user_id, update, (err)->
+		UserUpdater.removeEmailAddress user_id, emailToRemove, (err)->
 			return next(err) if err?
 			res.sendStatus 200
 
