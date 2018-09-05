@@ -8,11 +8,6 @@ p
 				td {{ user._id }}
 			tr
 				td
-					label Sign up date
-				td {{ user.signUpDate }}
-
-			tr
-				td
 					label #{translate("email")}
 				td
 					div(ng-show="!editingEmail")
@@ -59,7 +54,15 @@ p
 						)
 							i.fa.fa-trash-o
 							| &nbsp; Unlink
-
+			tr
+				td
+					label Sign up date
+				td {{ user.signUpDate }}
+			tr
+				td
+					label Login count
+				td {{ user.loginCount }}
+				
 		form-messages(for="adminUserEmailForm")
 			.alert.alert-success(ng-show="adminUserEmailForm.response.success && !adminUserEmailForm.inflight")
 				| Email was changed
