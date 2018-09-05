@@ -27,7 +27,10 @@
 						ng-click="openArchiveProjectsModal()"
 					)
 						i.fa.fa-trash-o
-	.col-md-3.text-right
+	.col-md-1.text-right
+		div.text-right count: 
+			strong {{visibleProjects.length}}
+	.col-md-2.text-right
 		a.btn.btn-default.btn-sm(href="/admin/user/graph/{{user._id}}?level=1") View Project Graph
 
 
