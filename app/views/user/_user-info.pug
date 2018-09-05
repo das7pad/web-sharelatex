@@ -32,7 +32,14 @@ p
 					label #{translate("emails")}
 				td
 					ul(ng-repeat="emailData in user.emails")
-						li {{ emailData.email }}
+						li {{ emailData.email }} 
+							a.btn(
+								href='#',
+								tooltip-placement="bottom",
+								tooltip-append-to-body="true",
+								ng-click="openDeleteSecondaryEmailModal(emailData.email)"
+							)
+								i.fa.fa-trash-o
 
 			if user.overleaf
 				tr
