@@ -6,13 +6,12 @@ p
 				td
 					label ID
 				td {{ user._id }}
-
 			tr
 				td
 					label #{translate("email")}
 				td
 					div(ng-show="!editingEmail")
-						| {{ user.email }} &nbsp;
+						a(href="mailto:{{user.email}}") {{ user.email }} &nbsp;
 						a.small(href, ng-click="editingEmail = true") Edit
 					div(ng-show="editingEmail")
 						input#email.form-control(
@@ -32,14 +31,21 @@ p
 					label #{translate("emails")}
 				td
 					ul(ng-repeat="emailData in user.emails")
-						li {{ emailData.email }}
+						li {{ emailData.email }} 
+							a.btn.btn-danger.btn-xs(
+								href='#',
+								tooltip-placement="bottom",
+								tooltip-append-to-body="true",
+								ng-click="openDeleteSecondaryEmailModal(emailData.email)"
+							)
+								i.fa.fa-trash-o
 
 			if user.overleaf
 				tr
 					td
 						label Overleaf v1 ID
 					td
-						a(href=settings.apis.v1.url + "/admin/users/" + user.overleaf.id)= user.overleaf.id
+						a(href="https://electric-leaf-4093.herokuapp.com/admin/users/" + user.overleaf.id)= user.overleaf.id
 						a.pull-right.btn(
 							href='#',
 							tooltip-placement="bottom",
@@ -48,7 +54,15 @@ p
 						)
 							i.fa.fa-trash-o
 							| &nbsp; Unlink
-
+			tr
+				td
+					label Sign up date
+				td {{ user.signUpDate }}
+			tr
+				td
+					label Login count
+				td {{ user.loginCount }}
+				
 		form-messages(for="adminUserEmailForm")
 			.alert.alert-success(ng-show="adminUserEmailForm.response.success && !adminUserEmailForm.inflight")
 				| Email was changed
@@ -251,7 +265,7 @@ p
 					span(ng-show="!adminUserForm.inflight") Save
 					span(ng-show="adminUserForm.inflight") Saving...
 			.col-md-3.text-right
-				a.btn(
+				a.btn.btn-danger(
 					href='#',
 					tooltip-placement="bottom",
 					tooltip-append-to-body="true",

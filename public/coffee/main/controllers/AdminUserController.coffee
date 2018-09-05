@@ -70,7 +70,33 @@ define [
 				return ""
 
 
-		# delete user
+		$scope.openDeleteSecondaryEmailModal = (emailToRemove) ->
+			modalInstance = $modal.open(
+				templateUrl: "deleteSecondaryEmailModalTemplate"
+				controller: "DeleteSecondaryEmailModalController"
+				resolve:
+					users: () -> [{email:emailToRemove}]
+			)
+			modalInstance.result.then () ->
+				console.log 
+				queuedHttp({
+					method: "DELETE"
+					url: "/admin/user/#{$scope.user._id}/secondaryemail"
+					data:
+						emailToRemove:emailToRemove
+					headers:
+						 #required for angular 1 to send data on delete which is valid
+						'Content-type': 'application/json;charset=utf-8'
+						"X-CSRF-Token": window.csrfToken
+				}).then(() ->
+					setTimeout(
+						() ->
+							window.location.href = "/admin/user/#{$scope.user._id}"
+						, 100
+					)
+				)
+
+
 		$scope.openUnlinkOlModal = () ->
 			modalInstance = $modal.open(
 				templateUrl: "unlinkOlModalTemplate"
@@ -157,6 +183,15 @@ define [
 		$scope.users = users
 
 		$scope.unlink = () ->
+			$modalInstance.close()
+
+		$scope.cancel = () ->
+			$modalInstance.dismiss('cancel')
+
+	App.controller 'DeleteSecondaryEmailModalController', ($scope, $modalInstance, $timeout, users) ->
+		$scope.users = users
+
+		$scope.delete = () ->
 			$modalInstance.close()
 
 		$scope.cancel = () ->

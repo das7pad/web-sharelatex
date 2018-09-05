@@ -54,7 +54,7 @@ module.exports = UserAdminController =
 		async.parallel {
 			user: (cb) ->
 				UserGetter.getUser user_id, {
-					_id:1, first_name:1, last_name:1, email:1, betaProgram:1, features: 1, isAdmin: 1, awareOfV2: 1, overleaf: 1, emails: 1
+					_id:1, first_name:1, last_name:1, email:1, betaProgram:1, features: 1, isAdmin: 1, awareOfV2: 1, overleaf: 1, emails: 1, signUpDate:1, loginCount:1
 				}, cb
 			projects: (cb) ->
 				ProjectGetter.findAllUsersProjects user_id, {
@@ -85,6 +85,15 @@ module.exports = UserAdminController =
 		update =
 			$unset:{overleaf: ""}
 		UserUpdater.updateUser user_id, update, (err)->
+			return next(err) if err?
+			res.sendStatus 200
+
+
+	deleteSecondaryEmail: (req, res, next)->
+		user_id = req.params.user_id
+		emailToRemove = req.body.emailToRemove
+		logger.log user_id:user_id, emailToRemove:emailToRemove,  "received request to delete secondary email"
+		UserUpdater.removeEmailAddress user_id, emailToRemove, (err)->
 			return next(err) if err?
 			res.sendStatus 200
 
