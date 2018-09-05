@@ -22,6 +22,7 @@ db.projects.find({
 	'overleaf.id': 1,
 	'owner_ref': 1,
 	'collaberator_refs': 1,
+	'tokenAccessReadAndWrite_refs': 1,
 }).sort({ 'overleaf.id': 1 }, function (error, projects) {
 	if (error) throw error
 	console.log('PROJECT COUNT', projects.length)
@@ -36,6 +37,9 @@ function backfillTags (project, callback) {
 	let user_ids = [ project.owner_ref ]
 	if (project.collaberator_refs) {
 		user_ids = user_ids.concat(project.collaberator_refs)
+	}
+	if (project.tokenAccessReadAndWrite_refs) {
+		user_ids = user_ids.concat(project.tokenAccessReadAndWrite_refs)
 	}
 	console.log(`BACKFILLING TAGS FOR PROJECT ${project.overleaf.id} ${project._id}`)
 	async.mapSeries(user_ids, function (user_id, cb) {
