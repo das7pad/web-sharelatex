@@ -21,9 +21,9 @@ module.exports =
 			app.get "/templates/:template_id/v/:version/:file_type", TemplatesWebController.proxyToTemplatesApi
 			app.get "/templates/:template_id/v/:version/:file_type/:preview_type", TemplatesWebController.proxyToTemplatesApi
 
-			# Make sure the /project/new/template route comes before the /project/:project_id/template route
-			# This is a get request so that it can be linked to.
-			app.get '/project/new/template', TemplatesMiddlewear.saveTemplateDataInSession, AuthenticationController.requireLogin(), TemplatesController.createProjectFromZipTemplate
+		# Make sure the /project/new/template route comes before the /project/:project_id/template route
+		# This is a get request so that it can be linked to.
+		app.get '/project/new/template', TemplatesMiddlewear.saveTemplateDataInSession, AuthenticationController.requireLogin(), TemplatesController.createProjectFromZipTemplate
 
 		if Features.hasFeature('publish-templates')
 			app.get  "/project/:Project_id/template", AuthorizationMiddlewear.ensureUserCanReadProject, TemplatesController.getTemplateDetails
