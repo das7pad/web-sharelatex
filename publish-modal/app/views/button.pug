@@ -1,7 +1,7 @@
 if settings.overleaf
 	a.btn.btn-full-height#publishButton(
 		href,
-		ng-if="permissions.admin",
+		ng-if="permissions.write",
 		ng-click="openPublishProjectModal()",
 		ng-controller="PublishController",
 		)
