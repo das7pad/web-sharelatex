@@ -4,6 +4,8 @@ mixin doc_rows(docs)
 			.col-md-4.template-thumbnail
 				a(href=doc.path).thumbnail
 					img(src=doc.image_url)
-					div #{doc.title}
+				div.caption
+					a(href=doc.path) #{doc.title}
+					div.description=doc.description
 					//- sanitized by api
 					div!= doc.author
