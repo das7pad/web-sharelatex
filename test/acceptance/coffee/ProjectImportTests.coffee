@@ -204,3 +204,19 @@ describe "ProjectImportTests", ->
 		it 'should import a project', ->
 			expect(@project).to.be.an('object')
 			expect(@project.name).to.equal('foo-bar-baz')
+
+	describe 'a project with a long name', ->
+		before (done) ->
+			@ol_project_id = 1
+			MockOverleafApi.setDoc Object.assign({ id: @ol_project_id }, BLANK_PROJECT, { title: "x".repeat(160) })
+
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+				getProject response, (error, project) =>
+					@project = project
+					done()
+
+		it 'should import a project', ->
+			expect(@project).to.be.an('object')
+			expect(@project.name).to.equal('x'.repeat(150))
