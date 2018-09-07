@@ -43,7 +43,7 @@ module.exports = V1LoginHandler =
 				logger.err {email, err}, "error while talking to v1 registration api"
 				return callback(err)
 			if response.statusCode in [200, 409]
-				created = body.created
+				created = response.statusCode == 200
 				userProfile = body.user_profile
 				logger.log {email, created, v1UserId: body?.user_profile?.id}, "got response from v1 registration api"
 				callback(null, created, userProfile)
