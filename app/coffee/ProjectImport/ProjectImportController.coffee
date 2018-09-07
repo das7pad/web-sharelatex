@@ -5,6 +5,7 @@ AuthenticationController = require "../../../../../app/js/Features/Authenticatio
 	UnsupportedFileTypeError,
 	UnsupportedBrandError,
 	UnsupportedExportRecordsError
+	InvalidNameError
 } = require "../../../../../app/js/Features/Errors/Errors"
 {
 	V2ExportCompleted,
@@ -31,6 +32,8 @@ module.exports = ProjectImportController =
 				unsupportedError("Sorry! This export timed out")
 			else if error instanceof V2ExportCompleted
 				res.json({ redir: "/project/#{error.v2_project_id}" })
+			else if error instanceof InvalidNameError
+				unsupportedError("Sorry! #{error.message}, please rename your project and try again")
 			else if error?
 				unsupportedError("Sorry! There was a problem with your import, please try again")
 			else
