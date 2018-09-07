@@ -22,6 +22,7 @@ define ['ide/publish-modal/controllers/PublishController'], () ->
 			inject ($rootScope, $controller) ->
 				$rootScope.user = {first_name: 'first name', last_name: 'last name'}
 				$rootScope.pdf = {logEntries: {}}
+				$rootScope.project = {name: 'Test project name'}
 				$controller('PublishController', {$scope: $rootScope})
 
 				$rootScope.openPublishProjectModal()
