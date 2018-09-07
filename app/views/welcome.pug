@@ -41,13 +41,15 @@ block content
 							.row
 								.col-md-6
 									h3 For Overleaf Users
+									p.text-center.row-spaced
+										a(href="/overleaf/login", event-tracking="login_v2_via_overleaf", event-tracking-trigger="click", event-tracking-ga="v2_onboard", event-tracking-label="welcome").btn.btn-lg.btn-success Log in with Overleaf
 									p
 										| You can log in to #[a(href="/overleaf/login", event-tracking="login_v2_via_overleaf", event-tracking-trigger="click", event-tracking-ga="v2_onboard", event-tracking-label="welcome") Overleaf v2 via www.overleaf.com]
 										| as normal.
-									p.text-center.row-spaced
-										a(href="/overleaf/login", event-tracking="login_v2_via_overleaf", event-tracking-trigger="click", event-tracking-ga="v2_onboard", event-tracking-label="welcome").btn.btn-lg.btn-success Log in with Overleaf
 								.col-md-6
 									h3 For ShareLaTeX Users
+									p.text-center.row-spaced
+										a(href=settings.accountMerge.sharelatexHost + "/logout", event-tracking="login_v2_via_sharelatex", event-tracking-trigger="click", event-tracking-ga="v2_onboard", event-tracking-label="welcome").btn.btn-lg.btn-danger Log in with ShareLaTeX
 									p
 										| #[strong If you already have an Overleaf account], please
 										| make sure the email addresses you use to sign in are the
@@ -69,8 +71,6 @@ block content
 										| Overleaf. It will only take a few seconds. If you have a
 										| ShareLaTeX subscription, it will automatically be
 										| transferred to Overleaf.
-									p.text-center.row-spaced
-										a(href=settings.accountMerge.sharelatexHost + "/logout", event-tracking="login_v2_via_sharelatex", event-tracking-trigger="click", event-tracking-ga="v2_onboard", event-tracking-label="welcome").btn.btn-lg.btn-danger Log in with ShareLaTeX
 						else
 							p
 								| You can log-in with either your Overleaf or ShareLaTeX account.
