@@ -160,7 +160,6 @@ EmisExport.propTypes = {
   returnText: PropTypes.string,
   onReturn: PropTypes.func,
   projectId: PropTypes.string.isRequired,
-  onSwitch: PropTypes.func.isRequired,
   hasFolders: PropTypes.bool,
   firstName: PropTypes.string,
   lastName: PropTypes.string

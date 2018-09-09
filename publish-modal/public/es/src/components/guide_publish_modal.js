@@ -52,7 +52,6 @@ export default class GuidePublishModal extends Component {
           description={initParams.description}
           license={initParams.license}
           showSource={initParams.showSource}
-          onSwitch={onSwitch}
           hasFolders={initParams.hasFolders}
         />)
       } else if (entry.partner === 'scholar_one') {
@@ -61,9 +60,6 @@ export default class GuidePublishModal extends Component {
           entry={entry}
           returnText={returnText}
           projectId={initParams.projectId}
-          firstName={initParams.firstName}
-          lastName={initParams.lastName}
-          onSwitch={onSwitch}
         />)
       } else {
         return (<EmisExport
@@ -73,7 +69,6 @@ export default class GuidePublishModal extends Component {
           projectId={initParams.projectId}
           firstName={initParams.firstName}
           lastName={initParams.lastName}
-          onSwitch={onSwitch}
           hasFolders={initParams.hasFolders}
         />)
       }

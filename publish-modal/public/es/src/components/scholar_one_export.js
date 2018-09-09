@@ -19,9 +19,7 @@ export default class ScholarOneExport extends Component {
   }
 
   componentDidUpdate () {
-    console.log(this.state.exportState)
     if (this.state.exportState === 'complete') {
-      console.log($('#export_form'))
       $('#export_form').submit()
     }
   }
@@ -40,7 +38,8 @@ export default class ScholarOneExport extends Component {
             Submit to: <br/>
             <strong> {entry.name} </strong>
           </h3>
-          { this.state.exportState === 'unintiated' &&
+          {
+            this.state.exportState === 'unintiated' &&
             <span>
               <p>
                 Thanks for using Overleaf to submit your article.
@@ -75,7 +74,8 @@ export default class ScholarOneExport extends Component {
               </button>
             </span>
           }
-          { this.state.exportState === 'initiated' &&
+          {
+            this.state.exportState === 'initiated' &&
             <span>
               <div style={{ fontSize: 20, margin: '20px 0px 20px' }}>
                 <i className='fa fa-refresh fa-spin fa-fw'></i>
