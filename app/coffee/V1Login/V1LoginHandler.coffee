@@ -62,7 +62,7 @@ module.exports = V1LoginHandler =
 				created = response.statusCode == 200
 				userProfile = body.user_profile
 				cookies = response.headers["set-cookie"]
-				logger.log {email, created, v1UserId: body?.user_profile?.id}, "got response from v1 registration api"
+				logger.log {email: options.email, created, v1UserId: body?.user_profile?.id}, "got response from v1 registration api"
 				callback(null, created, userProfile, cookies)
 			else
 				err = new Error("Unexpected status from v1 registration api: #{response.statusCode}")
