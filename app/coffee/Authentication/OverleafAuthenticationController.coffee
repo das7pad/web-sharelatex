@@ -10,6 +10,7 @@ FeaturesUpdater = require("../../../../../app/js/Features/Subscription/FeaturesU
 Settings = require('settings-sharelatex')
 {User} = require "../../../../../app/js/models/User"
 UserController = require("../../../../../app/js/Features/User/UserController")
+CollabratecController = require "../Collabratec/CollabratecController"
 
 module.exports = OverleafAuthenticationController =
 	saveRedir: (req, res, next) ->
@@ -88,7 +89,7 @@ module.exports = OverleafAuthenticationController =
 			return OverleafAuthenticationController._badToken(res, error) if error?
 			if !data.merge_confirmed
 				return OverleafAuthenticationController._badToken(
-					res, new Error('expected token.confirm_merge == true')
+					res, new Error('expected token.merge_confirmed == true')
 				)
 			{profile, user_id} = req.session.accountMerge
 			if data.user_id != user_id
@@ -103,9 +104,11 @@ module.exports = OverleafAuthenticationController =
 				return next(error) if error?
 				FeaturesUpdater.refreshFeatures(user_id) # Notifies v1 about SL-granted features too
 				logger.log {user: user}, "merged with SL account, logging in"
-				if Settings.createV1AccountOnLogin
-					AuthenticationController._setRedirectInSession(req, '/login/sharelatex/finish?had_v1_account')
-				return AuthenticationController.finishLogin(user, req, res, next)
+				CollabratecController._completeOauthLink req, user, (err, linked) ->
+					return callback err if err?
+					if Settings.createV1AccountOnLogin and !linked
+						AuthenticationController._setRedirectInSession(req, '/login/sharelatex/finish?had_v1_account')
+					AuthenticationController.finishLogin(user, req, res, next)
 
 	_badToken: (res, error) ->
 		logger.err err: error, "bad token in confirming account"
