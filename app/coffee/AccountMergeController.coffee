@@ -49,7 +49,7 @@ module.exports = AccountMergeController =
 						EmailHandler.sendEmail 'accountMergeToOverleafAddress', {
 							origin: 'sl',
 							to: overleafEmail,
-							tokenLinkUrl: "example.com/test?token=#{token}"
+							tokenLinkUrl: "#{Settings.accountMerge.betaHost}/account-merge/confirm?token=#{token}"
 						}, () ->
 
 						return res.sendStatus(201)
