@@ -1,12 +1,62 @@
 ErrorController = require "../../../../app/js/Features/Errors/ErrorController"
 AuthenticationManager = require "../../../../app/js/Features/Authentication/AuthenticationManager"
 AuthenticationController = require "../../../../app/js/Features/Authentication/AuthenticationController"
+OneTimeTokenHandler = require '../../../../app/js/Features/Security/OneTimeTokenHandler'
+EmailHandler = require '../../../../app/js/Features/Email/EmailHandler'
+User = require("../../../../app/js/models/User").User
+UserGetter = require('../../../../app/js/Features/User/UserGetter')
 Path = require 'path'
 jwt = require 'jsonwebtoken'
 Settings = require 'settings-sharelatex'
 logger = require 'logger-sharelatex'
 
 module.exports = AccountMergeController =
+
+	sendOverleafAccountMergeEmail: (req, res, next) ->
+		userId = AuthenticationController.getLoggedInUserId(req)
+		overleafEmail = req.body.overleafEmail
+		if !overleafEmail?
+			logger.log {userId}, "No Overleaf email supplied"
+			return res.sendStatus(400)
+		logger.log {userId, overleafEmail}, "Preparing to send account-merge link to overleaf-email"
+		User.findOne {email: overleafEmail}, {overleaf: 1}, (err, user) ->
+			return next(err) if err?
+			if user?
+				logger.log {userId, overleafEmail},
+					"email matches user account in mongo, cannot send account-merge email"
+				return res.status(400).json {errorCode: 'email_matches_v2_user'}
+			V1UserFinder = require "./V1UserFinder"
+			V1UserFinder._findV1UserIdbyEmail overleafEmail, (err, v1UserId) ->
+				return next(err) if err?
+				if !v1UserId?
+					logger.log {userId, overleafEmail},
+						"email does not match any account in v1, cannot send account-merge email"
+					return res.status(400).json {errorCode: 'email_not_in_v1'}
+				User.findOne {'overleaf.id': v1UserId}, {_id: 1}, (err, userWithV1Id) ->
+					return next(err) if err?
+					if userWithV1Id?
+						logger.log {userId, overleafEmail},
+							"email matches user already migrated to v2, cannot send account-merge email"
+						return res.status(400).json {errorCode: 'email_matches_v1_user_in_v2'}
+					# Send an email with the account-merge token link
+					mergeData = {
+						v1_id: v1UserId,
+						sl_id: userId,
+						origin: 'sl'
+					}
+					OneTimeTokenHandler.getNewToken 'account-merge-email-to-ol', mergeData, (err, token) ->
+						return next(err) if err?
+						EmailHandler.sendEmail 'accountMergeToOverleafAddress', {
+							origin: 'sl',
+							to: overleafEmail,
+							tokenLinkUrl: "example.com/test?token=#{token}"
+						}, () ->
+
+						return res.sendStatus(201)
+
+
+
+
 	showConfirmAccountMerge: (req, res, next) ->
 		{token} = req.query
 		if !token?
@@ -54,4 +104,3 @@ module.exports = AccountMergeController =
 	_badToken: (res, error) ->
 		logger.err err: error, "bad token in confirming account"
 		res.status(400).send("invalid token")
-		
