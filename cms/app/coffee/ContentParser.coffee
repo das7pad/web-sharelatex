@@ -27,9 +27,9 @@ module.exports = ContentParser =
 				content.fields.content = marked(content.fields.content)
 				content.fields.content = sanitizeHtml(content.fields.content, sanitizeOptions)
 			else if content.fields.tabs
-				content.fields.tabs.map (c) -> ContentParser.parse(c)
+				content.fields.tabs = ContentParser.parseArray(content.fields.tabs)
 			else if content.fields.tabContent
-				content.fields.tabContent.map (c) -> ContentParser.parse(c)
+				content.fields.tabContent = ContentParser.parseArray(content.fields.tabContent)
 			else if content.fields.quote
 				# input is a textarea but still need to parse for line breaks
 				content.fields.quote = marked(content.fields.quote)
