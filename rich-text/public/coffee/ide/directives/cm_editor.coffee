@@ -180,6 +180,7 @@ define [
           scope[key]
 
         scope.$on '$destroy', () ->
+          scope.$broadcast('changeEditor')
           tearDownSpellCheck()
           tearDownCursorPosition()
           tearDownFormattingEventListeners()
