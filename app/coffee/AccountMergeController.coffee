@@ -42,6 +42,7 @@ module.exports = AccountMergeController =
 					mergeData = {
 						v1_id: v1UserId,
 						sl_id: userId,
+						final_email: overleafEmail,
 						origin: 'sl'
 					}
 					OneTimeTokenHandler.getNewToken 'account-merge-email-to-ol', mergeData, (err, token) ->
@@ -49,7 +50,7 @@ module.exports = AccountMergeController =
 						EmailHandler.sendEmail 'accountMergeToOverleafAddress', {
 							origin: 'sl',
 							to: overleafEmail,
-							tokenLinkUrl: "#{Settings.accountMerge.betaHost}/account-merge/confirm?token=#{token}"
+							tokenLinkUrl: "#{Settings.accountMerge.betaHost}/account-merge/email/confirm?token=#{token}"
 						}, () ->
 
 						return res.sendStatus(201)
