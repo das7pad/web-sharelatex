@@ -57,52 +57,64 @@ block content
 											p
 												| We didn't find an Overleaf account for #[strong #{email}].
 												| If you have an Overleaf account under a different
-												| email address, please #[a(href="https://www.overleaf.com/users/edit#details") change your email address on Overleaf to #[strong #{email}]]
-												| and then come back to sharelatex.com to merge your
-												| accounts.
-												div.row
-													div.col-md-12
-														form(name="ol-email-merge")
-															.form-group
-																label Overleaf Account Email
-																input(
-																	type="email"
-																	required
-																	placeholder="email@example.com"
-																	ng-model-options="{ updateOn: 'blur' }"
-																	name="ol-email"
-																	id="ol-email"
-																	ng-model="olEmail"
-																).form-control
-															.form-group
-																button.btn.btn-info.pull-right(
-																	ng-click="submitEmail()"
-																) Send Confirmation Email
+												| email address, please enter the email address in the form below, and we will send
+												| an email to that address with a special link which will merge your two accounts together.
+											p
+												| #[strong After the accounts are merged, you will use your Overleaf v1 email and password] to
+												| log in to Overleaf v2, and the projects from both of your old accounts will be available on
+												| your dashboard.
 
-												// Success
-												div(ng-show="success == true").row
-													br
-													div.col-md-12
-														div.alert.alert-success
-															| Done!
+											p
+												| To proceed with the account merge, enter your Overleaf v1 email below:
 
-												// Errors
-												div(ng-show="errorCode != null").row
-													br
-													div.col-md-12
-														div.alert.alert-danger(ng-switch="errorCode")
+											div.row
+												div.col-md-12
+													form(name="ol-email-merge")
+														.form-group
+															label.hidden Overleaf Account Email
+															input(
+																type="email"
+																required
+																placeholder="email@example.com"
+																ng-model-options="{ updateOn: 'blur' }"
+																name="ol-email"
+																id="ol-email"
+																ng-model="olEmail"
+															).form-control
+														.form-group
+															button.btn.btn-info.pull-right(
+																ng-click="submitEmail()"
+															) Send Confirmation Email
 
-															div(ng-switch-when="email_matches_v2_user")
-																| Sorry, we can't merge that email address
+											// Success
+											div(ng-show="success == true").row
+												br
+												div.col-md-12
+													div.alert.alert-success
+														| Done!
 
-															div(ng-switch-when="email_not_in_v1")
-																| Sorry, that email address does not match any account in Overleaf v1
+											// Errors
+											div(ng-show="errorCode != null").row
+												br
+												div.col-md-12
+													div.alert.alert-danger(ng-switch="errorCode")
 
-															div(ng-switch-when="email_matches_v1_user_in_v2")
-																| Sorry, that account has already been migrated to Overleaf v2
+														div(ng-switch-when="email_matches_v2_user")
+															| Sorry, we can't merge that email address.
 
-															div(ng-switch-default)
-																| Sorry, something went wrong
+														div(ng-switch-when="email_not_in_v1")
+															| Sorry, that email address does not match any account in Overleaf v1.
+
+														div(ng-switch-when="email_matches_v1_user_in_v2")
+															| Sorry, that account has already been migrated to Overleaf v2.
+
+														div(ng-switch-default)
+															| Sorry, something went wrong.
+
+														// always shown
+														div
+															| If the problem persists, please contact us via the contact form
+															| on #[a(href=settings.accountMerge.betaHost+'/login', target="_blank", style="text-decoration: underline;") this page].
 
 									.row(ng-show="hasOlAccount == 'has-no-ol-account'" ng-cloak style="margin-top: 25px;")
 										.col-md-12
