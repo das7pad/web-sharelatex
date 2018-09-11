@@ -13,6 +13,7 @@ describe "ProjectImporter", ->
 	beforeEach ->
 		@ProjectImporter = SandboxedModule.require modulePath, requires:
 			"../../../../../app/js/Features/Project/ProjectCreationHandler": @ProjectCreationHandler = {}
+			"../../../../../app/js/Features/Project/ProjectDetailsHandler": @ProjectDetailsHandler = {}
 			"../../../../../app/js/Features/Project/ProjectEntityUpdateHandler": @ProjectEntityUpdateHandler = {}
 			"../../../../../app/js/Features/Project/ProjectDeleter": @ProjectDeleter = {}
 			"../../../../../app/js/models/ProjectInvite": ProjectInvite: @ProjectInvite = {}
@@ -227,6 +228,16 @@ describe "ProjectImporter", ->
 			it "should set the title to 'Untitled'", ->
 				@ProjectCreationHandler.createBlankProject
 					.calledWith(@user_id, 'Untitled')
+					.should.equal true
+
+		describe "with a title containing a '/''", ->
+			beforeEach ->
+				@doc.title = "foo/bar/baz"
+				@ProjectImporter._initSharelatexProject @user_id, @doc, @callback
+
+			it "should replace the '/'' with a '-''", ->
+				@ProjectCreationHandler.createBlankProject
+					.calledWith(@user_id, 'foo-bar')
 					.should.equal true
 
 	describe "_startExport", ->
