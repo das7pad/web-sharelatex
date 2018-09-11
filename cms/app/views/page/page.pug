@@ -22,8 +22,8 @@ block content_cms
 				tabset
 					for tab, tabIndex in c.fields.tabs
 						tab(heading=tab.fields.tabTitle)
-							for tabContent in tab.fields.tabContent
-								+page_content(tabContent, c.fields.tabs[tabIndex+1])
+							for tabContent, tabContentIndex in tab.fields.tabContent
+								+page_content(tabContent, tab.fields.tabContent[tabContentIndex+1])
 
 			else
 				+page_content(c, content[cIndex+1])
