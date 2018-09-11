@@ -55,9 +55,6 @@ module.exports = AccountMergeController =
 
 						return res.sendStatus(201)
 
-
-
-
 	showConfirmAccountMerge: (req, res, next) ->
 		{token} = req.query
 		if !token?
