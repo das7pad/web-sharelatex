@@ -108,6 +108,11 @@ module.exports =
 				AuthenticationController.requireLogin(),
 				AccountDeleteController.tryDeleteUser
 
+		privateApiRouter.get(
+			'/overleaf/import/failures',
+			ProjectImportController.getFailures
+		)
+
 		if settings.collabratec?
 			webRouter.get '/collabratec/auth/link', CollabratecController.oauthLink
 			webRouter.get settings.collabratec.saml.init_path, (req, res, next) ->
