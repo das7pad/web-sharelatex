@@ -23,7 +23,7 @@ module.exports =
 			webRouter.post '/account-merge/email/overleaf',
 				AuthenticationController.requireLogin(),
 				RateLimiterMiddlewear.rateLimit({
-					endpointName: "account-merge-email"
+					endpointName: "account-merge-email-overleaf"
 					maxRequests: 10
 					timeInterval: 60
 				}),
