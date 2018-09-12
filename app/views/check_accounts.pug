@@ -47,18 +47,79 @@ block content
 									)
 									label(for="no-sl-account") No, I only have a Overleaf account
 
-								.row(ng-if="hasSlAccount == 'has-sl-account'" ng-cloak style="margin-top: 25px;")
+								.row(ng-show="hasSlAccount == 'has-sl-account'" ng-cloak style="margin-top: 25px;")
 									.col-md-12
 										p
 											| We didn't find a ShareLaTeX account for #[strong #{email}].
-											| If you have a ShareLaTeX account under a different
-											| email address, please #[a(href="https://www.overleaf.com/users/edit#details") change your email address on Overleaf to match your ShareLaTeX email address]
-											| and then try again.
-										p
-											| If your Overleaf email is your preferred email address,
-											| you can change both back after you have merged.
 
-								.row(ng-if="hasSlAccount == 'has-no-sl-account'" ng-cloak style="margin-top: 25px;")
+
+											| If you have an ShareLaTeX account under a different
+											| email address, please enter the email address in the form below, and we will send
+											| an email to that address with a special link which will merge your two accounts together.
+										p
+											| #[strong After the accounts are merged, you will use your Overleaf v1 email and password] to
+											| log in to Overleaf v2, and the projects from both of your old accounts will be available on
+											| your dashboard.
+
+										p
+											| To proceed with the account merge, enter your ShareLaTeX email below:
+
+										div.row
+											div.col-md-12
+												form(name="ol-email-merge")
+													.form-group
+														label.hidden ShareLaTeX Account Email
+														input(
+															type="email"
+															required
+															placeholder="email@example.com"
+															ng-model-options="{ updateOn: 'blur' }"
+															name="sl-email"
+															id="sl-email"
+															ng-model="slEmail"
+														).form-control
+													.form-group
+														button.btn.btn-info.pull-right(
+															ng-click="submitEmail()"
+														) Send Confirmation Email
+
+										// Success
+										div(ng-show="success == true").row
+											br
+											div.col-md-12
+												div.alert.alert-success
+													| Done!
+
+										// Errors
+										div(ng-show="errorCode != null").row
+											br
+											div.col-md-12
+												div.alert.alert-danger(ng-switch="errorCode")
+
+													div(
+														ng-switch-when="email_matches_v2_user|email_matches_v1_user"
+														ng-switch-when-separator="|"
+													)
+														| Sorry, we can't merge that email address.
+
+													div(ng-switch-when="email_not_in_sl")
+														| Sorry, that email address does not match any account in ShareLaTeX.
+
+													div(ng-switch-when="email_matches_v1_user_in_v2")
+														| Sorry, that account has already been migrated to Overleaf v2.
+
+													div(ng-switch-default)
+														| Sorry, something went wrong.
+
+													// always shown
+													div
+														| If the problem persists, please contact us via the contact form
+														| on #[a(href=settings.accountMerge.betaHost+'/login', target="_blank", style="text-decoration: underline;") this page].
+
+
+
+
+								.row(ng-show="hasSlAccount == 'has-no-sl-account'" ng-cloak style="margin-top: 25px;")
 									.col-md-12
 										p
 											| OK, let's move your Overleaf account to v2 now. It will

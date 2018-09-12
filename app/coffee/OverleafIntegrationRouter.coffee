@@ -125,6 +125,14 @@ module.exports =
 			webRouter.get '/account-merge/email/finish',
 				AccountMergeEmailController.renderAccountMergeFromEmailFinishPage
 
+			webRouter.post '/account-merge/email/sharelatex',
+				RateLimiterMiddlewear.rateLimit({
+					endpointName: "account-merge-email-sharelatex"
+					maxRequests: 10
+					timeInterval: 60
+				}),
+				OverleafAuthenticationController.sendSharelatexAccountMergeEmail
+
 		privateApiRouter.get(
 			'/overleaf/import/failures',
 			ProjectImportController.getFailures
