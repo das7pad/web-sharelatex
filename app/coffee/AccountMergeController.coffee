@@ -9,6 +9,7 @@ Path = require 'path'
 jwt = require 'jsonwebtoken'
 Settings = require 'settings-sharelatex'
 logger = require 'logger-sharelatex'
+V1UserFinder = require "./V1UserFinder"
 
 module.exports = AccountMergeController =
 
@@ -25,7 +26,6 @@ module.exports = AccountMergeController =
 				logger.log {userId, overleafEmail},
 					"email matches user account in mongo, cannot send account-merge email"
 				return res.status(400).json {errorCode: 'email_matches_v2_user'}
-			V1UserFinder = require "./V1UserFinder"
 			V1UserFinder._findV1UserIdbyEmail overleafEmail, (err, v1UserId) ->
 				return next(err) if err?
 				if !v1UserId?
