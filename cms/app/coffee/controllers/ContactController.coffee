@@ -4,6 +4,7 @@ sanitizeHtml = require 'sanitize-html'
 ContentfulClient = require '../ContentfulClient'
 ErrorController = require '../../../../../app/js/Features/Errors/ErrorController'
 CmsHandler = require '../CmsHandler'
+ContentParser = require '../ContentParser'
 Settings = require 'settings-sharelatex'
 
 sanitizeOptions = if Settings?.modules?.sanitize?.options? then Settings.modules.sanitize.options else sanitizeHtml.defaults
@@ -29,12 +30,12 @@ module.exports =
 			ContentfulClient[clientType].getEntries(cmsQuery)
 				.then (collection) ->
 					if collection.items.length == 0
-						next(new Error('Contact page not found on CMS'))
+						ErrorController.notFound req, res
 					else
 						cmsData = collection.items?[0]?.fields
-						if cmsData.about
-							cmsData.about = marked(cmsData.about)
-							cmsData.about = sanitizeHtml(cmsData.about, sanitizeOptions)
+						if cmsData.content
+							ContentParser.parseArray(cmsData.content)
+
 						CmsHandler.render(res, 'page/page', cmsData, req.query)
 				.catch (err) ->
 					next(err)
