@@ -8,6 +8,7 @@ AuthenticationController = require "../../../../app/js/Features/Authentication/A
 AccountSyncController = require "./AccountSync/AccountSyncController"
 SharelatexAuthController = require "./SharelatexAuth/SharelatexAuthController"
 V1LoginController = require "./V1Login/V1LoginController"
+V1RedirectController = require "./V1Redirect/V1RedirectController"
 AuthorizationMiddlewear = require('../../../../app/js/Features/Authorization/AuthorizationMiddlewear')
 RateLimiterMiddlewear = require('../../../../app/js/Features/Security/RateLimiterMiddlewear')
 passport = require "passport"
@@ -121,9 +122,12 @@ module.exports =
 			webRouter.post '/org/ieee/collabratec/auth/confirm_link', CollabratecController.oauthConfirmLink
 			webRouter.post '/org/ieee/collabratec/auth/sign_in_to_link', CollabratecController.oauthSignin
 
+		webRouter.get '/sign_in_to_v1', V1RedirectController.sign_in_and_redirect
+
 	applyNonCsrfRouter: (webRouter, privateApiRouter, publicApiRouter) ->
 		if settings.collabratec?
 			webRouter.post settings.collabratec.saml.callback_path, passport.authenticate('saml'), CollabratecController.samlConsume
+
 
 removeRoute = (router, method, path)->
 	index = null
