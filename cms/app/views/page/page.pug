@@ -19,10 +19,10 @@ block content_cms
 				if c.fields.displayTabGroupTitle
 					h2 #{c.fields.tabGroupTitle}
 
-				tabset
+				tabset.ol-tabs
 					for tab, tabIndex in c.fields.tabs
 						tab(heading=tab.fields.tabTitle)
-							for tabContent, tabContentIndex in tab.fields.tabContent
+							for tabContent, tabContentIndex in tab.fields.tabContent || []
 								+page_content(tabContent, tab.fields.tabContent[tabContentIndex+1])
 
 			else
