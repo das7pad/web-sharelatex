@@ -69,7 +69,15 @@ function backfillTagsForUser (project, user_id, callback) {
 		request({
 			url: `${settings.overleaf.host}/api/v1/sharelatex/users/${user.overleaf.id}/docs/${project.overleaf.id}/export/tags`,
 		}, function (error, res, body) {
-			if (error) throw error
+			if (error) {
+				if (error.statusCode === 404) {
+					console.log(`PROJECT ${project.overleaf.id} USER ${user.overleaf.id} 404 ERROR`)
+					return callback()
+				}
+				else {
+					throw error
+				}
+			}
 			if (!body.tags.length) {
 				console.log(`NO TAGS FOR PROJECT ${project.overleaf.id} USER ${user.overleaf.id}`)
 				return callback()
