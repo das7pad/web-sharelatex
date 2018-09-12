@@ -237,7 +237,7 @@ describe "ProjectImporter", ->
 
 			it "should replace the '/'' with a '-''", ->
 				@ProjectCreationHandler.createBlankProject
-					.calledWith(@user_id, 'foo-bar')
+					.calledWith(@user_id, 'foo-bar-baz')
 					.should.equal true
 
 	describe "_startExport", ->
