@@ -27,6 +27,7 @@ describe "OverleafAuthenticationController", ->
 			"../Collabratec/CollabratecController": {
 				_completeOauthLink: sinon.stub().callsArgWith(2, null, false)
 			}
+			"../V1Login/V1LoginHandler": @V1LoginHandler = {}
 		@req =
 			logIn: sinon.stub()
 			session: {}
