@@ -6,6 +6,7 @@ ProjectImportController = require "./ProjectImport/ProjectImportController"
 TeamImportController = require "./TeamImport/TeamImportController"
 AuthenticationController = require "../../../../app/js/Features/Authentication/AuthenticationController"
 AccountSyncController = require "./AccountSync/AccountSyncController"
+AccountMergeEmailController = require "./AccountMerge/AccountMergeEmailController"
 SharelatexAuthController = require "./SharelatexAuth/SharelatexAuthController"
 V1LoginController = require "./V1Login/V1LoginController"
 V1RedirectController = require "./V1Redirect/V1RedirectController"
@@ -108,6 +109,15 @@ module.exports =
 			webRouter.post '/user/delete',
 				AuthenticationController.requireLogin(),
 				AccountDeleteController.tryDeleteUser
+
+			webRouter.get '/account-merge/email/confirm',
+				RateLimiterMiddlewear.rateLimit({
+					endpointName: "account-merge-email-confirm",
+					ipOnly: true,
+					maxRequests: 10
+					timeInterval: 60
+				}),
+				AccountMergeEmailController.confirmMergeFromEmail
 
 		privateApiRouter.get(
 			'/overleaf/import/failures',
