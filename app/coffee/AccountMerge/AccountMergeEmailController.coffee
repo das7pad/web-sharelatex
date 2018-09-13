@@ -39,10 +39,13 @@ module.exports = AccountMergeEmailController =
 						logger.err {err, v1_id, final_email, profile_email: v1_profile.email},
 							"[AccountMergeEmailController] error while preparing to merge accounts"
 						return next(err)
+					# Merge the user accounts, and deal with emails/affiliations
 					UserMapper.mergeWithSlUser sl_id, v1_profile, {emailMismatchOk: true}, (err, user) ->
 						return next(err) if err?
+						# Explicitely confirm the email just added above
 						UserUpdater.confirmEmail sl_id, final_email, new Date(), (err) ->
 							return next(err) if err?
+							# Set the new default/main email address on the account
 							UserUpdater.setDefaultEmailAddress sl_id, final_email, (err) ->
 								return next(err) if err?
 								res.render Path.resolve(__dirname, '../../views/account_merge_finish'), {
