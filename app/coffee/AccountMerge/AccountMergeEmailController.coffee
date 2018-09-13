@@ -5,6 +5,7 @@ OneTimeTokenHandler = require '../../../../../app/js/Features/Security/OneTimeTo
 logger = require 'logger-sharelatex'
 Settings = require 'settings-sharelatex'
 {request} = require '../V1SharelatexApi'
+Path = require 'path'
 
 
 module.exports = AccountMergeEmailController =
@@ -44,7 +45,7 @@ module.exports = AccountMergeEmailController =
 							return next(err) if err?
 							UserUpdater.setDefaultEmailAddress sl_id, final_email, (err) ->
 								return next(err) if err?
-								res.render 'account_merge/finish', {
+								res.render Path.resolve(__dirname, '../../views/account_merge_finish'), {
 									finalEmail: final_email
 								}
 
