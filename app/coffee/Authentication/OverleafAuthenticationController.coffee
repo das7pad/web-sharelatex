@@ -52,7 +52,6 @@ module.exports = OverleafAuthenticationController =
 					final_email: final_email,
 					origin: 'ol'
 				}
-				console.log ">>>>", mergeData
 				OneTimeTokenHandler.getNewToken 'account-merge-email', mergeData, (err, token) ->
 					return next(err) if err?
 					EmailHandler.sendEmail 'accountMergeToSharelatexAddress', {
