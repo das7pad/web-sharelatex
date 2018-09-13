@@ -28,6 +28,8 @@ describe "OverleafAuthenticationController", ->
 				_completeOauthLink: sinon.stub().callsArgWith(2, null, false)
 			}
 			"../V1Login/V1LoginHandler": @V1LoginHandler = {}
+			"../../../../../app/js/Features/Security/OneTimeTokenHandler": @OneTimeTokenHandler = {}
+			"../../../../../app/js/Features/Email/EmailHandler": @EmailHandler = {}
 		@req =
 			logIn: sinon.stub()
 			session: {}
