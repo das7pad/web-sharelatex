@@ -63,7 +63,7 @@ describe "AccountDeleteController", ->
 		describe 'when the login fails', ->
 			beforeEach ->
 				@UserGetter.getUser = sinon.stub().callsArgWith(2, null, @user)
-				@V1LoginHandler.authWithV1 = sinon.stub().callsArgWith(2, null, false, null)
+				@V1LoginHandler.authWithV1 = sinon.stub().callsArgWith(1, null, false, null)
 				@AccountDeleteHandler.deleteV1Account = sinon.stub()
 				@res.sendStatus = sinon.stub()
 
@@ -77,7 +77,7 @@ describe "AccountDeleteController", ->
 			beforeEach ->
 				@UserGetter.getUser = sinon.stub().callsArgWith(2, null, @user)
 				@v1Profile = {id: 9999}
-				@V1LoginHandler.authWithV1 = sinon.stub().callsArgWith(2, null, true, @v1Profile)
+				@V1LoginHandler.authWithV1 = sinon.stub().callsArgWith(1, null, true, @v1Profile)
 				@AccountDeleteHandler.deleteV1Account = sinon.stub()
 				@next = sinon.stub()
 
@@ -92,7 +92,7 @@ describe "AccountDeleteController", ->
 			beforeEach ->
 				@UserGetter.getUser = sinon.stub().callsArgWith(2, null, @user)
 				@v1Profile = {id: @overleaf_id}
-				@V1LoginHandler.authWithV1 = sinon.stub().callsArgWith(2, null, true, @v1Profile)
+				@V1LoginHandler.authWithV1 = sinon.stub().callsArgWith(1, null, true, @v1Profile)
 				@AccountDeleteHandler.deleteV1Account = sinon.stub().callsArgWith(1, null)
 				@UserDeleter.deleteUser = sinon.stub().callsArgWith(1, null)
 				@req.logout = sinon.stub()
