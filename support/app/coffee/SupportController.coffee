@@ -6,8 +6,8 @@ path = require("path")
 
 inboxes = {
 	"support":
-		id:"inb_4g9t"
-		email:"support@sharelatex.com"
+		id:"inb_3wb"
+		email:"support@overleaf.com"
 	"accounts":
 		id:"inb_4c3t"
 		email:"accounts@sharelatex.com"
