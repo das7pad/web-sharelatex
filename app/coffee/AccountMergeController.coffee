@@ -45,7 +45,7 @@ module.exports = AccountMergeController =
 						final_email: overleafEmail,
 						origin: 'sl'
 					}
-					OneTimeTokenHandler.getNewToken 'account-merge-email-to-ol', mergeData, (err, token) ->
+					OneTimeTokenHandler.getNewToken 'account-merge-email', mergeData, (err, token) ->
 						return next(err) if err?
 						EmailHandler.sendEmail 'accountMergeToOverleafAddress', {
 							origin: 'sl',
