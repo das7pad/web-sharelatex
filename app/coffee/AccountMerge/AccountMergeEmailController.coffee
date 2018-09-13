@@ -28,12 +28,12 @@ module.exports = AccountMergeEmailController =
 		token = req.body.token
 		if !token
 			return res.status(400).send()
-		OneTimeTokenHandler.getValueFromTokenAndExpire 'account-merge-email-to-ol', token, (err, data) ->
+		OneTimeTokenHandler.getValueFromTokenAndExpire 'account-merge-email', token, (err, data) ->
 			return next(err) if err?
 			if !data
 				return res.status(404).send()
-			if data.origin != 'sl'
-				logger.log {}, "Only sharelatex origin supported"
+			if data.origin not in ['sl', 'ol']
+				logger.log {}, "Only sharelatex/overleaf origin supported"
 				return res.status(501).send()
 			{ sl_id, v1_id, final_email } = data
 			UserGetter.getUser sl_id, {_id: 1, overleaf: 1}, (err, user) ->

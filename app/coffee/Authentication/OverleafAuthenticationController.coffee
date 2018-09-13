@@ -7,6 +7,8 @@ Path = require "path"
 Settings = require "settings-sharelatex"
 jwt = require('jsonwebtoken')
 FeaturesUpdater = require("../../../../../app/js/Features/Subscription/FeaturesUpdater")
+OneTimeTokenHandler = require("../../../../../app/js/Features/Security/OneTimeTokenHandler")
+EmailHandler = require("../../../../../app/js/Features/Email/EmailHandler")
 Settings = require('settings-sharelatex')
 {User} = require "../../../../../app/js/models/User"
 UserController = require("../../../../../app/js/Features/User/UserController")
@@ -18,16 +20,16 @@ V1LoginHandler = require '../V1Login/V1LoginHandler'
 module.exports = OverleafAuthenticationController =
 
 	sendSharelatexAccountMergeEmail: (req, res, next) ->
+		sharelatexEmail = req.body.sharelatexEmail
 		v1Id = req.session.__accountMergeV1Id
-		if !v1Id?
-			logger.log {}, "No v1Id in session, cannot send account-merge email to sharelatex address"
+		final_email = req.session.__accountMergeEmail
+		if !v1Id? or !final_email?
+			logger.log {}, "No v1Id/email in session, cannot send account-merge email to sharelatex address"
 			return res.status(400).send()
-		console.log ">>>> HERE, id =", v1Id
-		return res.status(501).send()
 		if !sharelatexEmail?
-			logger.log {userId}, "No Overleaf email supplied"
+			logger.log {v1Id}, "No Sharelatex email supplied"
 			return res.sendStatus(400)
-		logger.log {userId, sharelatexEmail}, "Preparing to send account-merge link to sharelatex-email"
+		logger.log {v1Id, sharelatexEmail}, "Preparing to send account-merge link to sharelatex-email"
 		User.findOne {email: sharelatexEmail}, {overleaf: 1}, (err, user) ->
 			return next(err) if err?
 			if user? and user?.overleaf?.id?
@@ -44,7 +46,22 @@ module.exports = OverleafAuthenticationController =
 					logger.log {v1Id, sharelatexEmail, otherV1Id},
 						"email matches another account in v1, cannot send account-merge email"
 					return res.status(400).json {errorCode: 'email_matches_v1_user'}
+				mergeData = {
+					v1_id: v1Id,
+					sl_id: user._id,
+					final_email: final_email,
+					origin: 'ol'
+				}
+				console.log ">>>>", mergeData
+				OneTimeTokenHandler.getNewToken 'account-merge-email', mergeData, (err, token) ->
+					return next(err) if err?
+					EmailHandler.sendEmail 'accountMergeToSharelatexAddress', {
+						origin: 'ol',
+						to: sharelatexEmail,
+						tokenLinkUrl: "#{Settings.accountMerge.betaHost}/account-merge/email/confirm?token=#{token}"
+					}, () ->
 
+					return res.sendStatus(201)
 
 	saveRedir: (req, res, next) ->
 		if req.query.redir?
@@ -72,6 +89,7 @@ module.exports = OverleafAuthenticationController =
 					return res.redirect('/overleaf/login')
 				else
 					req.session.__accountMergeV1Id = v1Id
+					req.session.__accountMergeEmail = email
 					res.render Path.resolve(__dirname, "../../views/check_accounts"), {
 						email
 					}
