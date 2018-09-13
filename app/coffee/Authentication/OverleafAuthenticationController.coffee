@@ -21,8 +21,8 @@ module.exports = OverleafAuthenticationController =
 
 	sendSharelatexAccountMergeEmail: (req, res, next) ->
 		sharelatexEmail = req.body.sharelatexEmail
-		v1Id = req.session.__accountMergeV1Id
-		final_email = req.session.__accountMergeEmail
+		v1Id = req.session?.__tmp?.accountMergeV1Id
+		final_email = req.session?.__tmp?.accountMergeEmail
 		if !v1Id? or !final_email?
 			logger.log {}, "No v1Id/email in session, cannot send account-merge email to sharelatex address"
 			return res.status(400).send()
@@ -87,8 +87,9 @@ module.exports = OverleafAuthenticationController =
 				if user?
 					return res.redirect('/overleaf/login')
 				else
-					req.session.__accountMergeV1Id = v1Id
-					req.session.__accountMergeEmail = email
+					req.session.__tmp ||= {}
+					req.session.__tmp.accountMergeV1Id = v1Id
+					req.session.__tmp.accountMergeEmail = email
 					res.render Path.resolve(__dirname, "../../views/check_accounts"), {
 						email
 					}
