@@ -7,6 +7,7 @@ if portal_templates && portal_templates.length > 0
 					img(src=template.image_url)
 				.caption.caption--portals
 					a(href='/latex/templates/' + template.slug + '/' + template.read_token) #{template.title}
+					.caption__description!=template.author
 else
 	.row
 		.col-sm-12
