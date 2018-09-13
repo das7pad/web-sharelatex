@@ -2,6 +2,7 @@ logger = require 'logger-sharelatex'
 AboutController = require './controllers/AboutController'
 BlogController = require './controllers/BlogController'
 ContactContoller = require './controllers/ContactController'
+LegalController = require './controllers/LegalController'
 GeneralController = require './controllers/GeneralController'
 
 removeRoute = (webRouter, method, path) ->
@@ -21,6 +22,7 @@ module.exports =
 		webRouter.get '/about', AboutController.getPage
 		webRouter.get '/blog', BlogController.getBlog
 		webRouter.get '/contact', ContactContoller.getContactPage
+		webRouter.get '/legal', LegalController.getLegal
 		webRouter.get '/blog/page/:page', BlogController.getBlog
 		webRouter.get '/blog/tagged/:tag', BlogController.getBlog
 		webRouter.get '/blog/tagged/:tag/page/:page', BlogController.getBlog
