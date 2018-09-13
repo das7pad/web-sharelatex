@@ -17,13 +17,50 @@ module.exports =
 				timeInterval: 60
 			}), WikiController.proxy
 
-			# Match either /learn on its own, or /learn/Page_name/...
-			webRouter.get /^\/learn(\/.*)?$/, RateLimiterMiddlewear.rateLimit({
+			# wiki root, `/learn`
+			webRouter.get /^\/learn\/?$/i, RateLimiterMiddlewear.rateLimit({
 				endpointName: "wiki"
 				params: []
 				maxRequests: 60
 				timeInterval: 60
 			}), WikiController.getPage
+
+			# redirect `/learn/latex` to wiki root, `/learn`
+			webRouter.get /^\/learn\/latex\/?$/i, (req, res) -> 
+				res.redirect '/learn'
+			
+			# redirect `/learn/Kb/Knowledge_Base` or `/learn/how-to/Knowledge_Base`
+			# to `/learn/how-to`
+			webRouter.get /^\/learn\/(Kb|how-to)\/Knowledge_Base\/?$/i,(req, res) -> 
+				res.redirect '/learn/how-to'
+
+			# Knowledge Base redirect
+			# redirect `/learn/kb` to `/learn/how-to`
+			# these are still under kb on the wiki,
+			# the controller is set up to query for correct page
+			webRouter.get /^\/learn\/kb(\/.*)?$/i, (req, res) ->
+				wikiPath = '/learn/how-to'
+				if req.params[0] && req.params[0] != '/Knowledge Base'
+					for index, param of req.params
+						wikiPath += param
+				res.redirect wikiPath
+
+			# Match either /learn/latex/:page or /learn/how-to/:page
+			webRouter.get /^\/learn\/(latex|how-to)(\/.*)?$/i, RateLimiterMiddlewear.rateLimit({
+				endpointName: "wiki"
+				params: []
+				maxRequests: 60
+				timeInterval: 60
+			}), WikiController.getPage
+
+			# redirect `/learn/:page` to `/learn/latex/:page`
+			webRouter.get /^\/learn(?!\/(latex))(\/.*)?$/i, (req, res) ->
+				wikiPath = '/learn/latex'
+				for index, param of req.params
+					# index = 0 will be undefined
+					if param
+						wikiPath += param
+				res.redirect wikiPath
 
 			# Check if a `/learn` link exists in header_extras, either under the `Help` menu
 			# or on it's own. If not, add it, either on it's own or in the `Help` menu,
