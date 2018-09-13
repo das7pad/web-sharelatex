@@ -25,6 +25,7 @@ describe "AccountMergeController", ->
 			"../../../../app/js/Features/User/UserGetter": @UserGetter = {}
 			"../../../../app/js/Features/Security/OneTimeTokenHandler": @OneTimeTokenHandler = {}
 			"../../../../app/js/Features/Email/EmailHandler": @EmailHandler = {}
+			"./V1UserFinder": @V1UserFinder = {}
 		@req = {}
 		@res =
 			redirect: sinon.stub()
