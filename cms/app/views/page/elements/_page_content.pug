@@ -12,9 +12,11 @@ mixin actual_content(content)
 				div(class={"card" : content.fields.card, "text-center" : content.fields.centerText})
 					if content.type == 'content'
 						| !{content.fields.content}
-						if content.fields.youTubeTitle
-							p #{content.fields.youTubeTitle}
-							iframe(src=content.fields.youTube title=content.fields.youTubeTitle || "YouTube Video")
+						if content.fields.youTube
+							if content.fields.youTubeTitle
+								p #{content.fields.youTubeTitle}
+							div.embed-responsive.embed-responsive-16by9
+								iframe(src=content.fields.youTube title=content.fields.youTubeTitle || "YouTube Video")
 						if content.fields.contactForm
 							//- to do - move this to a separate content type
 							include ../../../../../support/app/views/contact_form/form_general
