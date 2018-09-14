@@ -100,3 +100,16 @@ module.exports = V1Login =
 						CollabratecController._completeOauthLink req, user, (err) ->
 							return callback err if err?
 							AuthenticationController.finishLogin user, req, res, next
+
+	doPasswordChange: (req, res, next) ->
+		email = req.body.email
+		password = req.body.password
+
+		V1LoginHandler.doPasswordChange {email, password}, (err, isValid) ->
+			return next(err) if err?
+			if !isValid
+				logger.log {email},  "failed password change via v1"
+				return res.json message: {type: 'error', text: req.i18n.translate('password_change_failed_attempt')}
+			else
+				logger.log email: email, "v1 password updated"
+				return res.json message: {type: 'success', email}

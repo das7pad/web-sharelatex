@@ -53,6 +53,12 @@ module.exports =
 		)
 
 		webRouter.post(
+			'/change_password/v1',
+			AuthenticationController.requireLogin(),
+			V1LoginController.doPasswordChange
+		)
+
+		webRouter.post(
 			'/overleaf/project/:ol_doc_id/import',
 			AuthenticationController.requireLogin(),
 			ProjectImportController.importProject
