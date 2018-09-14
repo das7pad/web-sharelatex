@@ -11,10 +11,7 @@ sanitizeOptions = if Settings?.modules?.sanitize?.options? then Settings.modules
 module.exports =
 
 	getPage: (req, res, next)->
-		if !req.query.cms
-			# Leave `!req.query.cms` until content migration is finished
-			ErrorController.notFound req, res
-		else
+		if req.query.cms || process.env.CONTENT_PAGES
 			# clientType determines which API to use.
 			# client is for published data
 			# clientPreview is for unpublished data
@@ -38,3 +35,5 @@ module.exports =
 						CmsHandler.render(res, 'about/page', cmsData, req.query)
 				.catch (err) ->
 					next(err)
+		else
+			ErrorController.notFound req, res
