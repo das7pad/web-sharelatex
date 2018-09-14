@@ -23,10 +23,14 @@ module.exports = MetricsController =
 		id = req.params.institutionId
 		url = "#{settings.apis.v1.url}/universities/list/#{id}"
 		request.get(url, (err, response, body)->
+			if !err
+				resourceName = JSON.parse(body).name
+			else
+				resourceName = null
 			res.render Path.resolve(__dirname, '../views/metricsApp'), {
 				metricsEndpoint: "/graphs",
 				resourceId: id,
-				resourceName: JSON.parse(body).name
+				resourceName: resourceName,
 				resourceType: 'institution',
 			}
 		)
