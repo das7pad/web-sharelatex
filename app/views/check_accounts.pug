@@ -51,11 +51,8 @@ block content
 									.col-md-12
 										p
 											| We didn't find a ShareLaTeX account for #[strong #{email}].
-
-
-											| If you have an ShareLaTeX account under a different
-											| email address, please enter the email address in the form below, and we will send
-											| an email to that address with a special link which will merge your two accounts together.
+											| Do you use ShareLaTeX with a different email? Please enter it below, and
+											| we will send an email to that address with a link to merge your accounts together.
 										p
 											| #[strong After the accounts are merged, you will use your Overleaf v1 email and password] to
 											| log in to Overleaf v2, and the projects from both of your old accounts will be available on
@@ -79,7 +76,7 @@ block content
 															ng-model="slEmail"
 														).form-control
 													.form-group
-														button.btn.btn-info.pull-right(
+														button.btn.btn-primary.pull-right(
 															ng-click="submitEmail()"
 														) Send Confirmation Email
 

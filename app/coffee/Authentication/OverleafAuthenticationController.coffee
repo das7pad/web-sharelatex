@@ -10,7 +10,7 @@ FeaturesUpdater = require("../../../../../app/js/Features/Subscription/FeaturesU
 OneTimeTokenHandler = require("../../../../../app/js/Features/Security/OneTimeTokenHandler")
 EmailHandler = require("../../../../../app/js/Features/Email/EmailHandler")
 Settings = require('settings-sharelatex')
-{User} = require "../../../../../app/js/models/User"
+UserGetter = require "../../../../../app/js/Features/User/UserGetter"
 UserController = require("../../../../../app/js/Features/User/UserController")
 CollabratecController = require "../Collabratec/CollabratecController"
 logger = require 'logger-sharelatex'
@@ -30,7 +30,7 @@ module.exports = OverleafAuthenticationController =
 			logger.log {v1Id}, "No Sharelatex email supplied"
 			return res.sendStatus(400)
 		logger.log {v1Id, sharelatexEmail}, "Preparing to send account-merge link to sharelatex-email"
-		User.findOne {email: sharelatexEmail}, {overleaf: 1}, (err, user) ->
+		UserGetter.getUserByMainEmail sharelatexEmail, {overleaf: 1}, (err, user) ->
 			return next(err) if err?
 			if user? and user?.overleaf?.id?
 				logger.log {v1Id, sharelatexEmail},
@@ -82,7 +82,7 @@ module.exports = OverleafAuthenticationController =
 
 			email = data.email
 			v1Id = data.id
-			User.findOne {email}, {_id: 1}, (err, user) ->
+			UserGetter.getUserByMainEmail email, {_id: 1}, (err, user) ->
 				return callback(err) if err?
 				if user?
 					return res.redirect('/overleaf/login')

@@ -19,9 +19,10 @@ module.exports = AccountMergeEmailController =
 		}
 
 	renderAccountMergeFromEmailFinishPage: (req, res, next) ->
-		{ email } = req.query
+		{ email, origin } = req.query
 		res.render Path.resolve(__dirname, '../../views/account_merge_finish'), {
-			finalEmail: email
+			email,
+			origin
 		}
 
 	confirmMergeFromEmail: (req, res, next) ->
@@ -62,7 +63,7 @@ module.exports = AccountMergeEmailController =
 							# Set the new default/main email address on the account
 							UserUpdater.setDefaultEmailAddress sl_id, final_email, (err) ->
 								return next(err) if err?
-								res.json(redir: "/account-merge/email/finish?email=#{final_email}&from=#{data.origin}")
+								res.json(redir: "/account-merge/email/finish?email=#{final_email}&origin=#{data.origin}")
 
 	_getProfile: (v1Id, callback=(err, profile)->) ->
 		request {

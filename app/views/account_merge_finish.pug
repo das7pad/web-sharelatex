@@ -13,16 +13,18 @@ block content
 							.row
 								.col-md-12
 									p
-										| Your ShareLaTeX and Overleaf v1 accounts are now linked, and you are ready to
-										| get started with Overleaf v2.
-										| From now on, you will log in with your credentials from Overleaf v1 (#[em #{finalEmail}])
+										| Your ShareLaTeX and Overleaf v1 accounts are now merged, and you are ready to
+										| get started with Overleaf v2.&nbsp;
+									p
+										strong
+											| From now on, you will log in with your email and password from Overleaf v1 (#[em #{email}])
 
 									p
 										| Click the button below to resume the process of logging in to Overleaf v2
-										| with your merged account:
+										| with your merged account.
+										|
+										| On the following page, choose #[strong "Login&nbsp;with&nbsp;Overleaf" ].
 
 									p.text-center
-										a.btn.btn-lg.btn-success(href=settings.accountMerge.sharelatexHost+'/user/login_to_ol_v2')
-											| Continue Logging In
-										br
-										a.btn-small(href="/login") or go to the login page
+										a.btn.btn-lg.btn-success(href='/logout?redir=/login/v1')
+											| Log in to Overleaf v2

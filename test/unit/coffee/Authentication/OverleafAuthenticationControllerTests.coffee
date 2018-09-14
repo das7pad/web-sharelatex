@@ -22,7 +22,7 @@ describe "OverleafAuthenticationController", ->
 			"../OverleafUsers/UserMapper": @UserMapper = {}
 			"../../../../../app/js/Features/Subscription/FeaturesUpdater":
 				@FeaturesUpdater = {refreshFeatures: sinon.stub()}
-			"../../../../../app/js/models/User": { User: @User = {} }
+			"../../../../../app/js/Features/User/UserGetter": @UserGetter = {}
 			"../../../../../app/js/Features/User/UserController": @UserController = {}
 			"../Collabratec/CollabratecController": {
 				_completeOauthLink: sinon.stub().callsArgWith(2, null, false)
@@ -206,7 +206,7 @@ describe "OverleafAuthenticationController", ->
 				}
 				@jwt.verify = sinon.stub()
 				@jwt.verify.withArgs(@token, @settings.accountMerge.secret).yields(null, @data)
-				@User.findOne = sinon.stub().yields(null, { email: @email })
+				@UserGetter.getUserByMainEmail = sinon.stub().yields(null, { email: @email })
 				@req.query = token: @token
 				@OverleafAuthenticationController.showCheckAccountsPage(@req, @res, @next)
 
@@ -227,7 +227,7 @@ describe "OverleafAuthenticationController", ->
 				}
 				@jwt.verify = sinon.stub()
 				@jwt.verify.withArgs(@token, @settings.accountMerge.secret).yields(null, @data)
-				@User.findOne = sinon.stub().yields(null, null)
+				@UserGetter.getUserByMainEmail = sinon.stub().yields(null, null)
 				@req.query = token: @token
 				@OverleafAuthenticationController.showCheckAccountsPage(@req, @res, @next)
 
