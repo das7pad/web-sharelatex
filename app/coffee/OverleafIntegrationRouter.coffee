@@ -113,7 +113,7 @@ module.exports =
 			webRouter.get '/account-merge/email/confirm',
 				AccountMergeEmailController.renderConfirmMergeFromEmailPage
 
-			webRouter.post '/account-merge/email/confirm/go',
+			webRouter.post '/account-merge/email/confirm',
 				RateLimiterMiddlewear.rateLimit({
 					endpointName: "account-merge-email-confirm",
 					ipOnly: true,
