@@ -111,6 +111,9 @@ module.exports =
 				AccountDeleteController.tryDeleteUser
 
 			webRouter.get '/account-merge/email/confirm',
+				AccountMergeEmailController.renderConfirmMergeFromEmailPage
+
+			webRouter.post '/account-merge/email/confirm/go',
 				RateLimiterMiddlewear.rateLimit({
 					endpointName: "account-merge-email-confirm",
 					ipOnly: true,
@@ -118,6 +121,9 @@ module.exports =
 					timeInterval: 60
 				}),
 				AccountMergeEmailController.confirmMergeFromEmail
+
+			webRouter.get '/account-merge/email/finish',
+				AccountMergeEmailController.renderAccountMergeFromEmailFinishPage
 
 		privateApiRouter.get(
 			'/overleaf/import/failures',

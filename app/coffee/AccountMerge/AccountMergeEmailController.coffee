@@ -10,8 +10,22 @@ Path = require 'path'
 
 module.exports = AccountMergeEmailController =
 
-	confirmMergeFromEmail: (req, res, next) ->
+	renderConfirmMergeFromEmailPage: (req, res, next) ->
 		token = req.query.token
+		if !token
+			return res.status(400).send()
+		res.render Path.resolve(__dirname, '../../views/account_merge_page'), {
+			token
+		}
+
+	renderAccountMergeFromEmailFinishPage: (req, res, next) ->
+		{ email } = req.query
+		res.render Path.resolve(__dirname, '../../views/account_merge_finish'), {
+			finalEmail: email
+		}
+
+	confirmMergeFromEmail: (req, res, next) ->
+		token = req.body.token
 		if !token
 			return res.status(400).send()
 		OneTimeTokenHandler.getValueFromTokenAndExpire 'account-merge-email-to-ol', token, (err, data) ->
@@ -48,9 +62,7 @@ module.exports = AccountMergeEmailController =
 							# Set the new default/main email address on the account
 							UserUpdater.setDefaultEmailAddress sl_id, final_email, (err) ->
 								return next(err) if err?
-								res.render Path.resolve(__dirname, '../../views/account_merge_finish'), {
-									finalEmail: final_email
-								}
+								res.json(redir: "/account-merge/email/finish?email=#{final_email}&from=#{data.origin}")
 
 	_getProfile: (v1Id, callback=(err, profile)->) ->
 		request {
