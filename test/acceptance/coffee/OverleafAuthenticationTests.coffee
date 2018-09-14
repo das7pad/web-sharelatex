@@ -9,18 +9,6 @@ MockOverleafApi = require "./helpers/MockOverleafApi"
 {db, ObjectId} = require "#{WEB_PATH}/app/js/infrastructure/mongojs"
 jwt = require('jsonwebtoken')
 
-v1Id = 10000
-addV1User = (user) ->
-	MockOverleafApi.users.push {
-		email: user.email,
-		password: 'banana',
-		profile:
-			id: v1Id,
-			email: user.email
-	}
-	user.v1Id = v1Id
-	v1Id++
-
 count = 0
 newUser = () ->
 	user = new User()
@@ -41,7 +29,7 @@ describe "OverleafAuthentication", ->
 	describe 'email and password login', (done) ->
 		beforeEach (done) ->
 			@user = newUser()
-			addV1User(@user)
+			MockOverleafApi.addV1User(@user)
 			@user.getCsrfToken done
 
 		describe 'with a correct email and password', ->
@@ -162,7 +150,7 @@ describe "OverleafAuthentication", ->
 
 		describe 'with an email that exists in v1', ->
 			beforeEach ->
-				addV1User(@user)
+				MockOverleafApi.addV1User(@user)
 
 			it 'should return an error message', (done) ->
 				@user.request.post {
