@@ -28,8 +28,8 @@ block content
 				.row
 					each tag in tags
 						.col-md-4.template-thumbnail
-							a(href=tag.path).thumbnail.thumbnail-tag
-								img(src=tag.logo_url)
+							.thumbnail-tag.thumbnail(style=`background: url(${tag.logo_url}) no-repeat center center; background-size: cover;`)
+								a(href=tag.path)
 							.caption
 								a(href=tag.path) #{tag.title}
 
