@@ -20,9 +20,22 @@ module.exports = WikiController =
 		metrics.inc("wiki.getPage")
 		page = Url.parse(req.url).pathname
 		page = page.replace(/^\/learn/, "").replace(/^\//, "").replace(/\/$/, "")
+		pageParts = page.split('/');
 		preview = req.query.preview?
+
+		# query for correct page
+		# `/learn/kb` was changed to `/learn/how-to`
+		# `/learn` was changed to `/learn/latex`
 		if page == ""
 			page = "Main_Page"
+		else if page == "how-to"
+			page = "Kb/Knowledge Base"
+		else if pageParts[0].toLowerCase() == "how-to"
+			pageParts.shift()
+			page = "Kb/#{pageParts.join('/')}"
+		else if pageParts[0].toLowerCase() == "latex"
+			pageParts.shift()
+			page = pageParts.join('/')
 
 		isFile = page.toLowerCase().indexOf("file:") != -1
 
@@ -37,15 +50,18 @@ module.exports = WikiController =
 			return WikiController.proxy(req, res, next)
 
 		logger.log page: page, "getting page from wiki"
+
 		if _.include(other_lngs, req.lng)
 			lngPage = "#{page}_#{req.lng}"
 		else
 			lngPage = page
+
 		jobs =
 			contents: (cb)-> 
 				WikiController._getPageContent "Contents", cb
 			pageData: (cb)->
 				WikiController._getPageContent lngPage, cb
+
 		async.parallel jobs, (error, results)->
 			return next(error) if error?
 			{pageData, contents} = results
@@ -108,7 +124,7 @@ module.exports = WikiController =
 	_renderPage: (page, contents, preview, res)->
 		if 'Draft' in page.categories and !preview
 			return ErrorController.notFound(null, res)
-		if page.redirects?.length > 0
+		if page.redirects?.length > 0 && page.redirects[0].to != 'Kb/Knowledge Base'
 			return res.redirect "/learn/#{encodeURIComponent(page.redirects[0].to)}"
 		if page.revid == 0
 			return ErrorController.notFound(null, res)
