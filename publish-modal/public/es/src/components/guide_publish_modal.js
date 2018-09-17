@@ -3,6 +3,7 @@ import PublishGuide from './publish_guide'
 import ExportGuide from './export_guide'
 import EmisExport from './emis_export'
 import GalleryExport from './gallery_export'
+import ScholarOneExport from './scholar_one_export'
 import { findEntryInCategories } from '../utils.js'
 
 export default class GuidePublishModal extends Component {
@@ -51,11 +52,16 @@ export default class GuidePublishModal extends Component {
           description={initParams.description}
           license={initParams.license}
           showSource={initParams.showSource}
-          onSwitch={onSwitch}
           hasFolders={initParams.hasFolders}
         />)
-      }
-      else {
+      } else if (entry.partner === 'scholar_one') {
+        return (<ScholarOneExport
+          onReturn={onReturn}
+          entry={entry}
+          returnText={returnText}
+          projectId={initParams.projectId}
+        />)
+      } else {
         return (<EmisExport
           onReturn={onReturn}
           entry={entry}
@@ -63,7 +69,6 @@ export default class GuidePublishModal extends Component {
           projectId={initParams.projectId}
           firstName={initParams.firstName}
           lastName={initParams.lastName}
-          onSwitch={onSwitch}
           hasFolders={initParams.hasFolders}
         />)
       }
