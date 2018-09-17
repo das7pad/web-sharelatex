@@ -94,8 +94,12 @@ block content
 												div.alert.alert-danger(ng-switch="errorCode")
 
 													div(
-														ng-switch-when="email_matches_v2_user|email_matches_v1_user"
-														ng-switch-when-separator="|"
+														ng-switch-when="email_matches_v2_user"
+													)
+														|Sorry, that email address is already linked to an Overleaf v2 account and can’t be merged with this account.
+
+													div(
+														ng-switch-when="email_matches_v1_user"
 													)
 														| Sorry, we can't merge that email address.
 
