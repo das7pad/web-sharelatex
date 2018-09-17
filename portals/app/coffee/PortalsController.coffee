@@ -54,21 +54,22 @@ _portalLayoutData = (req, data) ->
 	data
 
 _getPortal = (req, res, next, portalType) ->
-	if !req.query.prtl
-		ErrorController.notFound req, res
-	else if req.params.slug && req.params.slug != 'undefined'
-		v1PortalPath = "/#{portalType}/#{req.params.slug}"
-		portalLayout = path.resolve(__dirname, '../views/portal')
-			
-		PortalsManager.get v1PortalPath, (err, data) ->
-			return next(err) if err
-			if data.portal?
-				redirected = _portalRedirect req, res, data, portalType
-				if !redirected
-					data = _portalLayoutData(req, data)
-					res.render(portalLayout, data) 
-			else
-				ErrorController.notFound req, res
+	if req.query.prtl || process.env.CONTENT_PAGES
+		if req.params.slug && req.params.slug != 'undefined'
+			v1PortalPath = "/#{portalType}/#{req.params.slug}"
+			portalLayout = path.resolve(__dirname, '../views/portal')
+				
+			PortalsManager.get v1PortalPath, (err, data) ->
+				return next(err) if err
+				if data.portal?
+					redirected = _portalRedirect req, res, data, portalType
+					if !redirected
+						data = _portalLayoutData(req, data)
+						res.render(portalLayout, data) 
+				else
+					ErrorController.notFound req, res
+		else
+			ErrorController.notFound req, res
 	else
 		ErrorController.notFound req, res
 

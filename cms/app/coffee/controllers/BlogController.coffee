@@ -89,10 +89,7 @@ getAndRenderBlog = (req, res, next, blogQuery, page) ->
 			next(err)
 
 _getBlog = (req, res, next) ->
-		if !req.query.cms
-			# Leave `!req.query.cms` until content migration is finished
-			ErrorController.notFound req, res
-		else
+		if req.query.cms || process.env.CONTENT_PAGES
 			# Select operator limits fields returned. It has some restrictions,
 			# such as it can only select properties to a depth of 2.
 			# Not a problem now, but if we link more then we'll need to remove operator
@@ -124,6 +121,8 @@ _getBlog = (req, res, next) ->
 						next(tagErr)
 			else
 				getAndRenderBlog(req, res, next, blogQuery, 'blog/blog')
+		else
+			ErrorController.notFound req, res
 
 
 _queryApi = (clientType, blogQuery) ->
@@ -153,19 +152,19 @@ module.exports =
 		_getBlog(req, res, next)
 
 	getBlogPost: (req, res, next)->
-		if !req.query.cms
-			# Leave `!req.query.cms` until content migration is finished
-			ErrorController.notFound req, res
-		else if req.params.slug == 'page' || req.params.slug == 'tagged'
-			# for if someone went to /blog/page/ or /blog/tagged/
-			# without a page number or tag param
-			_getBlog(req, res, next)
-		else if !isNaN(req.params.slug)
-			# v1 would sometimes link to blog ID
-			_v1IdQuery(req.params.slug, req, res)
+		if req.query.cms || process.env.CONTENT_PAGES
+			if req.params.slug == 'page' || req.params.slug == 'tagged'
+				# for if someone went to /blog/page/ or /blog/tagged/
+				# without a page number or tag param
+				_getBlog(req, res, next)
+			else if !isNaN(req.params.slug)
+				# v1 would sometimes link to blog ID
+				_v1IdQuery(req.params.slug, req, res)
+			else
+				blogQuery = {
+					content_type: 'blogPost'
+					'fields.slug': req.params.slug
+				}
+				getAndRenderBlog(req, res, next, blogQuery, 'blog/blog_post')
 		else
-			blogQuery = {
-				content_type: 'blogPost'
-				'fields.slug': req.params.slug
-			}
-			getAndRenderBlog(req, res, next, blogQuery, 'blog/blog_post')
+			ErrorController.notFound req, res
