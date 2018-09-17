@@ -28,6 +28,12 @@ module.exports =
 		webRouter.get '/register/v1', V1LoginController.registrationPage
 		webRouter.post '/register/v1', V1LoginController.doRegistration
 
+		webRouter.post(
+			'/user/password/update/v1',
+			AuthenticationController.requireLogin(),
+			V1LoginController.doPasswordChange
+		)
+
 		webRouter.get(
 			'/overleaf/auth_from_v1',
 			OverleafAuthenticationController.saveRedir,
@@ -50,12 +56,6 @@ module.exports =
 		webRouter.get(
 			'/overleaf/confirmed_account_merge',
 			OverleafAuthenticationController.confirmedAccountMerge
-		)
-
-		webRouter.post(
-			'/change_password/v1',
-			AuthenticationController.requireLogin(),
-			V1LoginController.doPasswordChange
 		)
 
 		webRouter.post(
