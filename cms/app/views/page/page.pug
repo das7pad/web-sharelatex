@@ -21,9 +21,10 @@ block content_cms
 
 				tabset.ol-tabs
 					for tab, tabIndex in c.fields.tabs
-						tab(heading=tab.fields.tabTitle)
-							for tabContent, tabContentIndex in tab.fields.tabContent || []
-								+page_content(tabContent, tab.fields.tabContent[tabContentIndex+1])
+						if tab.fields
+							tab(heading=tab.fields.tabTitle)
+								for tabContent, tabContentIndex in tab.fields.tabContent || []
+									+page_content(tabContent, tab.fields.tabContent[tabContentIndex+1])
 
 			else
 				+page_content(c, content[cIndex+1])
