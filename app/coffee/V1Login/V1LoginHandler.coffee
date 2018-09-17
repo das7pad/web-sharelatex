@@ -46,7 +46,8 @@ module.exports = V1LoginHandler =
 				callback(null, body.user_id)
 
 	registerWithV1: (options, callback=(err, created, v1Profile, cookies)->) ->
-		logger.log options.email, "sending registration request to v1 login api"
+		logger.log({email: options.email},
+			"sending registration request to v1 login api")
 		if options.email? && !options.name?
 			options.name = options.email.match(/^[^@]*/)[0]
 		request {
@@ -69,7 +70,8 @@ module.exports = V1LoginHandler =
 				callback(err)
 
 	doPasswordChange: (options, callback=(err, created)->) ->
-		logger.log options.email, "sending password change request to v1 login api"
+		logger.log({email: options.email},
+			"sending password change request to v1 login api")
 		request {
 			method: 'POST'
 			url: "#{Settings.overleaf.host}/api/v1/sharelatex/change_password"
