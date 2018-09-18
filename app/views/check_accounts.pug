@@ -94,31 +94,27 @@ block content
 												div.alert.alert-danger(ng-switch="errorCode")
 
 													div(
-														ng-switch-when="email_matches_v2_user"
-													)
-														| Sorry, that email address is already linked to an Overleaf v2 account and can’t be merged with this account.
-
-													div(
 														ng-switch-when="email_matches_v1_user"
 													)
-														| Sorry, we can't merge that email address.
-
-													div(ng-switch-when="email_not_in_sl")
-														| Sorry, that email address does not match any account in ShareLaTeX.
+														| Sorry, that email address is already linked to another account.
 
 													div(ng-switch-when="email_matches_v1_user_in_v2")
 														| Sorry, that account has already been migrated to Overleaf v2.
 
+													div(ng-switch-when="email_not_in_sl")
+														| Sorry, that email address does not match any account in ShareLaTeX.
+
 													div(ng-switch-default)
 														| Sorry, something went wrong.
-
-													// always shown
-													div
-														| If the problem persists, please contact us via the contact form
-														| on #[a(href=settings.accountMerge.betaHost+'/login', target="_blank", style="text-decoration: underline;") this page].
-
-
-
+														div
+															| If the problem persists, please &nbsp;
+															a(
+																ng-controller="ContactModal"
+																ng-click="contactUsModal()"
+																href=""
+																class="ng-scope"
+																style="text-decoration: underline;"
+															) contact us
 
 								.row(ng-show="hasSlAccount == 'has-no-sl-account'" ng-cloak style="margin-top: 25px;")
 									.col-md-12
