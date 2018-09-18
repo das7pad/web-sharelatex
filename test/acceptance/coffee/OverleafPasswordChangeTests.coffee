@@ -19,8 +19,7 @@ describe "OverleafPasswordChange", ->
 
 		it 'should redirect to Overleaf', (done) ->
 			@user.request.post {
-				#url: '/user/password/update/v1',
-				url: '/change_password/v1',
+				url: '/user/change_password/v1',
 				json:
 					email: @user.email
 					v1Id: @user.overleaf.id
@@ -33,8 +32,7 @@ describe "OverleafPasswordChange", ->
 
 		it 'should error on bad password', (done) ->
 			@user.request.post {
-				#url: '/user/password/update/v1',
-				url: '/change_password/v1',
+				url: '/user/change_password/v1',
 				json:
 					email: @user.email
 					v1Id: @user.overleaf.id

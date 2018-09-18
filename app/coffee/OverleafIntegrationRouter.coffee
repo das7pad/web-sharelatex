@@ -29,8 +29,7 @@ module.exports =
 		webRouter.post '/register/v1', V1LoginController.doRegistration
 
 		webRouter.post(
-			#'/user/password/update/v1',
-			'/change_password/v1',
+			'/user/change_password/v1',
 			AuthenticationController.requireLogin(),
 			V1LoginController.doPasswordChange
 		)
