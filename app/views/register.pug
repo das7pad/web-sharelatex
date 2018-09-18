@@ -1,79 +1,74 @@
 extends ../../../../app/views/layout
 
 block content
-	style.
-		.btn-google { background-color: #4885ed; } .btn-google:focus, .btn-google:hover { background-color: #3f76d4; } .btn-google:active { background-color: #3868ba; } 
-		.btn-orcid { background-color: #a6ce39; } .btn-orcid:focus, .btn-orcid:hover { background-color: #92b533; } .btn-orcid:active { background-color: #7e9c2c; } 
 	.content.content-alt
-		.container
-			.row
-				.registration_message
-					if sharedProjectData.user_first_name !== undefined
-						h1  #{translate("user_wants_you_to_see_project", {username:sharedProjectData.user_first_name, projectname:""})}
+		.login-register-container
+			.card.login-register-card(ng-cloak)
+				.login-register-header
+					h1.login-register-header-heading #{translate("register")}
+				if sharedProjectData.user_first_name !== undefined
+					.registration_message
+						h3.registration-message-heading #{translate("user_wants_you_to_see_project", {username:sharedProjectData.user_first_name, projectname:""})}
 							em #{sharedProjectData.project_name}
-						div
+						div.registration-message-details
 							| #{translate("join_sl_to_view_project")}.
-						div
+						div.registration-message-details
 							| #{translate("if_you_are_registered")},
 							a(href="/login")  #{translate("login_here")}
-					else if newTemplateData.templateName !== undefined
-						h1 #{translate("register_to_edit_template", {templateName:newTemplateData.templateName})}
-
-						div #{translate("already_have_sl_account")}
+				else if newTemplateData.templateName !== undefined
+					.registration_message
+						h3.registration-message-heading #{translate("register_to_edit_template", {templateName:newTemplateData.templateName})}
+						div.registration-message-details #{translate("already_have_sl_account")}
 							a(href="/login")  #{translate("login_here")}
-
-			.row
-				.col-md-6.col-md-offset-3
-					.card
-						.page-header
-							h1 #{translate("register")}
-						form(async-form="register", name="registerForm", action="/register/v1", method="POST", captcha, ng-cloak)
-							input(name='_csrf', type='hidden', value=csrfToken)
-							form-messages(for="registerForm")
-							.form-group
-								label(for='email') #{translate("email")}
-								input.form-control(
-									type='email',
-									name='email',
-									placeholder="email@example.com"
-									required,
-									ng-model="email",
-									ng-init="email = "+JSON.stringify(new_email),
-									ng-model-options="{ updateOn: 'blur' }",
-									focus="true"
-								)
-								span.small.text-primary(ng-show="registerForm.email.$invalid && registerForm.email.$dirty")
-									| #{translate("must_be_email_address")}
-							.form-group
-								label(for='password') #{translate("password")}
-								input.form-control#passwordField(
-									type='password',
-									name='password',
-									placeholder="********",
-									required,
-									ng-model="password",
-									complex-password
-								)
-								span.small.text-primary(ng-show="registerForm.password.$error.complexPassword", ng-bind-html="complexPasswordErrorMessage")
-							.actions
-								button.btn-primary.btn(
-									type='submit'
-									ng-disabled="registerForm.inflight || registerForm.password.$error.required|| registerForm.password.$error.complexPassword"
-								)
-									span(ng-show="!registerForm.inflight") #{translate("register")}
-									span(ng-show="registerForm.inflight") #{translate("registering")}...
-							hr
-							.page-header
-								h3 Sign-up using external services
-							.form-group.text-center
-								a.btn.btn-default.btn-google(
-									href="/auth/google?intent=sign_up"
-								) Sign-up using Google
-							.form-group.text-center
-								a.btn.btn-default.btn-orcid(
-									href="/auth/orcid?intent=sign_up"
-								) Sign-up using ORCID
-
+				form.login-register-form(async-form="register", name="registerForm", action="/register/v1", method="POST", captcha, ng-cloak)
+					input(name='_csrf', type='hidden', value=csrfToken)
+					form-messages(for="registerForm")
+					.form-group
+						label.sr-only(for='email') #{translate("email")}
+						input.form-control(
+							type='email'
+							name='email'
+							placeholder="Email"
+							required
+							ng-model="email"
+							ng-init="email = "+JSON.stringify(new_email)
+							ng-model-options="{ updateOn: 'blur' }"
+							focus="true"
+						)
+						span.small.text-danger(ng-show="registerForm.email.$invalid && registerForm.email.$dirty")
+							| #{translate("must_be_email_address")}
+					.form-group
+						label.sr-only(for='password') #{translate("password")}
+						input.form-control#passwordField(
+							type='password'
+							name='password'
+							placeholder="Password"
+							required
+							ng-model="password"
+							complex-password
+						)
+						span.small.text-danger(ng-show="registerForm.password.$error.complexPassword", ng-bind-html="complexPasswordErrorMessage")
+					.actions
+						button.btn-primary.btn.btn-block(
+							type='submit'
+							ng-disabled="registerForm.inflight || registerForm.password.$error.required|| registerForm.password.$error.complexPassword"
+						)
+							span(ng-show="!registerForm.inflight") Register using your email
+							span(ng-show="registerForm.inflight") #{translate("registering")}...
+					p.login-register-hr-text-container
+						span.login-register-hr-text or
+					.form-group.text-center
+						a.btn.btn-default.btn-block.login-btn-google(
+							href="/auth/google?intent=sign_up"
+						) 
+							i.login-btn-icon.login-btn-icon-google
+							| Register using Google
+					.form-group.text-center
+						a.btn.btn-default.btn-block.login-btn-orcid(
+							href="/auth/orcid?intent=sign_up"
+						) 
+							i.login-btn-icon.login-btn-icon-orcid
+							| Register using ORCID
 
 	script(type='text/javascript').
 		window.passwordStrengthOptions = !{JSON.stringify(settings.passwordStrengthOptions || {})}
