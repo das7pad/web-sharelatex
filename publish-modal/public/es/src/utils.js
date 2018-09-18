@@ -56,7 +56,11 @@ function pollExportStatus (exportId, projectId, _this, timeout) {
           errorDetails: status.status_detail
         })
       } else if (status.status_summary === 'succeeded') {
-        _this.setState({ exportState: 'complete' })
+        _this.setState({
+          exportState: 'complete',
+          partner_submission_id: status.partner_submission_id,
+          token: status.token
+        })
       } else {
         setTimeout(function () {
           if (timeout < 10000) {
