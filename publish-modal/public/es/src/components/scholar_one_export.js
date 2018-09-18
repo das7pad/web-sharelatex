@@ -10,7 +10,9 @@ export default class ScholarOneExport extends Component {
       exportState: 'unintiated',
       submissionValid: true,
       errorDetails: null,
-      exportId: null
+      exportId: null,
+      partner_submission_id: null,
+      token: null
     }
   }
 
@@ -80,11 +82,11 @@ export default class ScholarOneExport extends Component {
           <input
             id="export_id"
             type="hidden"
-            value={this.state.exportId} />
+            value={this.state.exportId + this.state.token} />
           <input
             id="submission_id"
             type="hidden"
-            value={entry.partner_submission_id} />
+            value={this.state.partner_submission_id} />
           <input
             id="EXT_ACTION"
             type="hidden"
