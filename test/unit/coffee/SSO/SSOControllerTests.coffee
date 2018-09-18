@@ -16,6 +16,7 @@ describe "SSOController", ->
 			"../V1Login/V1LoginHandler":
 				@V1LoginHandler = {}
 			"logger-sharelatex": { log: sinon.stub(), err: sinon.stub() }
+		@SSOController._renderError = sinon.stub()
 		@req = {
 			session: {}
 			user: {}
@@ -65,7 +66,7 @@ describe "SSOController", ->
 					@SSOController.authCallback @req, @res, @next
 
 				it "should redirect with error", ->
-					expect(@SSOController._errorRedirect).to.have.been.calledWith @res, "not_registered"
+					expect(@SSOController._renderError).to.have.been.calledWith @req, @res, "not_registered"
 
 			describe "with intent to sign_up", ->
 				beforeEach ->
@@ -99,8 +100,8 @@ describe "SSOController", ->
 			beforeEach ->
 				@SSOController.postRegisterSSOEmail @req, @res, @next
 
-			it "should return error", ->
-				expect(@res.json).to.have.been.calledWith { type: "error", text: "An error occurred. Please try again." }
+			it "should redirect to register", ->
+				expect(@res.json).to.have.been.calledWith { redir: "/register/v1?sso_error=try_again" }
 
 		describe "when user does not have email", ->
 			beforeEach ->
@@ -109,22 +110,21 @@ describe "SSOController", ->
 				@SSOController.postRegisterSSOEmail @req, @res, @next
 
 			it "should return error", ->
-				expect(@res.json).to.have.been.calledWith { type: "error", text: "Email Required" }
+				expect(@SSOController._renderError).to.have.been.calledWith @req, @res, "email_required"
 
 		describe "when user has email", ->
 			beforeEach ->
 				@req.session.sso_user = {}
 				@req.body = { email: "test@email.com" }
-				@SSOController._signUpForm = sinon.stub()
+				@SSOController._signUp = sinon.stub()
 				@SSOController.postRegisterSSOEmail @req, @res, @next
 
 			it "should attempt sign up", ->
-				expect(@SSOController._signUpForm).to.have.been.calledWith { email: "test@email.com" }, @req, @res, @next
+				expect(@SSOController._signUp).to.have.been.calledWith { email: "test@email.com" }, @req, @res, @next
 
 	describe "_signUp", ->
 		beforeEach ->
 			@V1LoginController._login = sinon.stub()
-			@SSOController._errorRedirect = sinon.stub()
 			@req.session.sso_user = "mock-user"
 			@profile = { profile: true }
 	
@@ -135,7 +135,7 @@ describe "SSOController", ->
 
 			it "should login", ->
 				expect(@V1LoginController._login).to.have.been.calledWith @profile, @req, @res, @next
-				expect(@SSOController._errorRedirect).not.to.have.been.called
+				expect(@SSOController._renderError).not.to.have.been.called
 
 			it "should clear sso_user from session", ->
 				expect(@req.session.sso_user).to.be.undefined
@@ -146,7 +146,7 @@ describe "SSOController", ->
 				@SSOController._signUp "mock-user", @req, @res, @next
 
 			it "should return error", ->
-				expect(@SSOController._errorRedirect).to.have.been.calledWith @res, "register"
+				expect(@SSOController._renderError).to.have.been.calledWith @req, @res, "registration_error"
 
 		describe "when email exists", ->
 			beforeEach ->
@@ -155,7 +155,7 @@ describe "SSOController", ->
 				@SSOController._signUp "mock-user", @req, @res, @next
 
 			it "should return error", ->
-				expect(@SSOController._errorRedirect).to.have.been.calledWith @res, "email_already_registered"
+				expect(@SSOController._renderError).to.have.been.calledWith @req, @res, "email_already_registered"
 
 		describe "when account not registered", ->
 			beforeEach ->
@@ -163,49 +163,4 @@ describe "SSOController", ->
 				@SSOController._signUp "mock-user", @req, @res, @next
 
 			it "should return error", ->
-				expect(@SSOController._errorRedirect).to.have.been.calledWith @res, "register"
-
-	describe "_signUpForm", ->
-		beforeEach ->
-			@V1LoginController._login = sinon.stub()
-			@req.session.sso_user = "mock-user"
-			@profile = { profile: true }
-	
-		describe "when account registered", ->
-			beforeEach ->	
-				@V1LoginHandler.registerWithV1 = sinon.stub().callsArgWith 1, null, true, @profile
-				@SSOController._signUpForm "mock-user", @req, @res, @next
-
-			it "should login", ->
-				expect(@V1LoginController._login).to.have.been.calledWith @profile, @req, @res, @next
-				expect(@res.json).not.to.have.been.called
-
-			it "should clear sso_user from session", ->
-				expect(@req.session.sso_user).to.be.undefined
-
-		describe "when error occurs", ->
-			beforeEach ->	
-				@V1LoginHandler.registerWithV1 = sinon.stub().callsArgWith 1, "error"
-				@SSOController._signUpForm "mock-user", @req, @res, @next
-
-			it "should return error", ->
-				expect(@res.json).to.have.been.calledWith message: { type: "error", text: "An error occurred" }
-
-		describe "when email exists", ->
-			beforeEach ->
-				@profile = { email: "test@email.com" }
-				@V1LoginHandler.registerWithV1 = sinon.stub().callsArgWith 1, null, false, @profile
-				@req.i18n = translate: sinon.stub().returns("mock-error")
-				@SSOController._signUpForm "mock-user", @req, @res, @next
-
-			it "should return error", ->
-				expect(@req.i18n.translate).to.have.been.calledWith "email_already_registered"
-				expect(@res.json).to.have.been.calledWith message: { type: "error", text: "mock-error" }
-
-		describe "when account not registered", ->
-			beforeEach ->
-				@V1LoginHandler.registerWithV1 = sinon.stub().callsArgWith 1, null, false, @profile
-				@SSOController._signUpForm "mock-user", @req, @res, @next
-
-			it "should return error", ->
-				expect(@res.json).to.have.been.calledWith message: { type: "error", text: "An error occurred" }
+				expect(@SSOController._renderError).to.have.been.calledWith @req, @res, "registration_error"

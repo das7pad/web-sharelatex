@@ -26,7 +26,7 @@ module.exports = SSOController =
 					return res.redirect "/register/sso_email"
 				SSOController._signUp(req.user, req, res, next)
 			else
-				SSOController._errorRedirect(res, "not_registered")
+				SSOController._renderError(req, res, "not_registered")
 
 	getRegisterSSOEmail: (req, res, next) ->
 		res.render Path.resolve(__dirname, "../../views/sso_email"),
@@ -34,36 +34,29 @@ module.exports = SSOController =
 
 	postRegisterSSOEmail: (req, res, next) ->
 		sso_user = _.cloneDeep(req.session.sso_user)
-		return res.json { type: "error", text: "An error occurred. Please try again." } unless sso_user?
-		return res.json { type: "error", text: "Email Required" } unless req.body.email?
+		return res.json { redir: "/register/v1?sso_error=try_again" } unless sso_user?
+		return SSOController._renderError req, res, "email_required" unless req.body.email?
 		sso_user.email = req.body.email
-		SSOController._signUpForm(sso_user, req, res, next)
+		SSOController._signUp(sso_user, req, res, next)
 
 	_signUp: (sso_user, req, res, next) ->
 		V1LoginHandler.registerWithV1 sso_user, (err, created, profile) ->
 			if err?
 				logger.log { sso_user, err }, "SSO ERROR"
-				return SSOController._errorRedirect(res, "register")
+				return SSOController._renderError(req, res, "registration_error")
 			if created
 				delete req.session.sso_user
 				V1LoginController._login(profile, req, res, next)
 			else if profile.email?
-				return SSOController._errorRedirect(res, "email_already_registered")
+				return SSOController._renderError(req, res, "email_already_registered")
 			else
-				return SSOController._errorRedirect(res, "register")
+				return SSOController._renderError(req, res, "registration_error")
 
-	_signUpForm: (sso_user, req, res, next) ->
-		V1LoginHandler.registerWithV1 sso_user, (err, created, profile) ->
-			if err?
-				logger.log { sso_user, err }, "SSO ERROR"
-				return res.json message: { type: "error", text: "An error occurred" }
-			if created
-				delete req.session.sso_user
-				V1LoginController._login(profile, req, res, next)
-			else if profile.email?
-				res.json message: { type: "error", text: req.i18n.translate("email_already_registered") }
-			else
-				res.json message: { type: "error", text: "An error occurred" }
-
-	_errorRedirect: (res, error) ->
-		res.redirect "/register/v1?error=#{error}"
+	_renderError: (req, res, error) ->
+		if req.headers?['accept']?.match(/^application\/json.*$/)
+			res.json message: {
+				type: "error",
+				text: req.i18n.translate(error),
+			}
+		else
+			res.redirect "/register/v1?sso_error=#{error}"
