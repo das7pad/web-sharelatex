@@ -56,16 +56,15 @@ block content
 										.col-md-12
 
 											p
-												| We didn't find a Overleaf account for #[strong #{email}].
-												| Do you use Overleaf with a different email? Please enter it below, and
-												| we will send an email to that address with a link to merge your accounts together.
+												| We didn't find a Overleaf account for #[em #{email}].
 											p
-												| #[strong After the accounts are merged, you will use your Overleaf v1 email and password] to
-												| log in to Overleaf v2, and the projects from both of your old accounts will be available on
-												| your dashboard.
-
+												strong Do you have an Overleaf account with a different email address?
+												|
+												| Please enter the main email address for your Overleaf account below,
+												| and we'll send an email to that address with a link that you can click to merge your accounts.
 											p
-												| To proceed with the account merge, enter your Overleaf email below:
+												| Note: Once you've merged your accounts, you will be able to access all your Overleaf and
+												| ShareLaTeX projects by logging in to your Overleaf account on #[a(href="https://www.overleaf.com", target="_blank") overleaf.com].
 
 											div.row
 												div.col-md-12
@@ -84,7 +83,7 @@ block content
 														.form-group
 															button.btn.btn-primary.pull-right(
 																ng-click="submitEmail()"
-															) Send Confirmation Email
+															) Send Confirmation Email to Merge my Accounts
 
 											// Success
 											div(ng-show="success == true").row
