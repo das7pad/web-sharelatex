@@ -23,6 +23,7 @@ module.exports =
 		removeRoute(webRouter, 'get', '/login')
 		webRouter.get '/login', V1LoginController.loginPage
 		webRouter.post '/login/v1', V1LoginController.doLogin
+		webRouter.get '/welcome/sl', OverleafAuthenticationController.welcomeScreen
 
 		webRouter.get '/login/finish', V1LoginController.loginProfile
 
