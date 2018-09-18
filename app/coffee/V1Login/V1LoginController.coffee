@@ -22,7 +22,7 @@ module.exports = V1LoginController =
 		if req.session.templateData?
 			newTemplateData.templateName = req.session.templateData.templateName
 
-		res.render Path.resolve(__dirname, "../../views/v1_register"),
+		res.render Path.resolve(__dirname, "../../views/register"),
 			title: 'register'
 			sharedProjectData: sharedProjectData
 			newTemplateData: newTemplateData
@@ -72,7 +72,7 @@ module.exports = V1LoginController =
 		if req.query.redir? and !AuthenticationController._getRedirectFromSession(req)?
 			logger.log {redir: req.query.redir}, "setting explicit redirect from login page"
 			AuthenticationController._setRedirectInSession(req, req.query.redir)
-		res.render Path.resolve(__dirname, "../../views/v1_login"),
+		res.render Path.resolve(__dirname, "../../views/login"),
 			title: 'Login with Overleaf v1',
 			email: req.query.email
 

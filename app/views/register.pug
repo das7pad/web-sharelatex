@@ -1,6 +1,9 @@
 extends ../../../../app/views/layout
 
 block content
+	style.
+		.btn-google { background-color: #4885ed; } .btn-google:focus, .btn-google:hover { background-color: #3f76d4; } .btn-google:active { background-color: #3868ba; } 
+		.btn-orcid { background-color: #a6ce39; } .btn-orcid:focus, .btn-orcid:hover { background-color: #92b533; } .btn-orcid:active { background-color: #7e9c2c; } 
 	.content.content-alt
 		.container
 			.row
@@ -59,5 +62,18 @@ block content
 								)
 									span(ng-show="!registerForm.inflight") #{translate("register")}
 									span(ng-show="registerForm.inflight") #{translate("registering")}...
+							hr
+							.page-header
+								h3 Sign-up using external services
+							.form-group.text-center
+								a.btn.btn-default.btn-google(
+									href="/auth/google?intent=sign_up"
+								) Sign-up using Google
+							.form-group.text-center
+								a.btn.btn-default.btn-orcid(
+									href="/auth/orcid?intent=sign_up"
+								) Sign-up using ORCID
+
+
 	script(type='text/javascript').
 		window.passwordStrengthOptions = !{JSON.stringify(settings.passwordStrengthOptions || {})}
