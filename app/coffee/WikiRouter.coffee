@@ -34,22 +34,13 @@ module.exports =
 			webRouter.get /^\/learn\/(Kb|how-to)\/Knowledge_Base\/?$/i,(req, res) -> 
 				res.redirect '/learn/how-to'
 
-			# Pages moved on MW:
-			# When page was moved on the MW, with a redirect on the MW
-			# the redirect will be `/learn/Kb%2F`, 
-			webRouter.get /^\/learn\/(Kb%2F.*)(\/.*)?$/i, (req, res) ->
-				res.redirect req.url.replace('/Kb%2F', '/how-to/')
-
 			# Knowledge Base redirect
+			# ------------------
 			# redirect `/learn/kb` to `/learn/how-to`
 			# these are still under kb on the wiki,
-			# the controller is set up to query for correct page
+			# the controller is set up to query for correct page.
 			webRouter.get /^\/learn\/kb(\/.*)?$/i, (req, res) ->
-				wikiPath = '/learn/how-to'
-				if req.params[0] && req.params[0] != '/Knowledge Base'
-					for index, param of req.params
-						wikiPath += param
-				res.redirect wikiPath
+				res.redirect req.path.replace(/learn\/kb/i, 'learn/how-to').replace(/%20/g, '_').replace(/\/Knowledge Base/i, '')
 
 			# Match either /learn/latex/:page or /learn/how-to/:page
 			webRouter.get /^\/learn\/(latex|how-to)(\/.*)?$/i, RateLimiterMiddlewear.rateLimit({
@@ -61,12 +52,7 @@ module.exports =
 
 			# redirect `/learn/:page` to `/learn/latex/:page`
 			webRouter.get /^\/learn(?!\/(latex))(\/.*)?$/i, (req, res) ->
-				wikiPath = '/learn/latex'
-				for index, param of req.params
-					# index = 0 will be undefined
-					if param
-						wikiPath += param
-				res.redirect wikiPath
+				res.redirect req.path.replace(/^\/learn/i, '/learn/latex')
 
 			# Check if a `/learn` link exists in header_extras, either under the `Help` menu
 			# or on it's own. If not, add it, either on it's own or in the `Help` menu,
