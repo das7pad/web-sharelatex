@@ -100,21 +100,22 @@ block content
 													div.alert.alert-danger(ng-switch="errorCode")
 
 														div(ng-switch-when="email_matches_v2_user")
-															| Sorry, we can't merge that email address.
+															| Sorry, that email address is already linked to an Overleaf v2 account.
 
 														div(ng-switch-when="email_not_in_v1")
 															| Sorry, that email address does not match any account in Overleaf v1.
 
-														div(ng-switch-when="email_matches_v1_user_in_v2")
-															| Sorry, that account has already been migrated to Overleaf v2.
-
 														div(ng-switch-default)
 															| Sorry, something went wrong.
-
-														// always shown
-														div
-															| If the problem persists, please contact us via the contact form
-															| on #[a(href=settings.accountMerge.betaHost+'/login', target="_blank", style="text-decoration: underline;") this page].
+															div
+																| If the problem persists, please &nbsp;
+																a(
+																	ng-controller="ContactModal"
+																	ng-click="contactUsModal()"
+																	href=""
+																	class="ng-scope"
+																	style="text-decoration: underline;"
+																) contact us
 
 									.row(ng-show="hasOlAccount == 'has-no-ol-account'" ng-cloak style="margin-top: 25px;")
 										.col-md-12

@@ -32,28 +32,22 @@ module.exports = AccountMergeController =
 					logger.log {userId, overleafEmail},
 						"email does not match any account in v1, cannot send account-merge email"
 					return res.status(400).json {errorCode: 'email_not_in_v1'}
-				User.findOne {'overleaf.id': v1UserId}, {_id: 1}, (err, userWithV1Id) ->
+				# Send an email with the account-merge token link
+				mergeData = {
+					v1_id: v1UserId,
+					sl_id: userId,
+					final_email: overleafEmail,
+					origin: 'sl'
+				}
+				OneTimeTokenHandler.getNewToken 'account-merge-email', mergeData, (err, token) ->
 					return next(err) if err?
-					if userWithV1Id?
-						logger.log {userId, overleafEmail},
-							"email matches user already migrated to v2, cannot send account-merge email"
-						return res.status(400).json {errorCode: 'email_matches_v1_user_in_v2'}
-					# Send an email with the account-merge token link
-					mergeData = {
-						v1_id: v1UserId,
-						sl_id: userId,
-						final_email: overleafEmail,
-						origin: 'sl'
-					}
-					OneTimeTokenHandler.getNewToken 'account-merge-email', mergeData, (err, token) ->
-						return next(err) if err?
-						EmailHandler.sendEmail 'accountMergeToOverleafAddress', {
-							origin: 'sl',
-							to: overleafEmail,
-							tokenLinkUrl: "#{Settings.accountMerge.betaHost}/account-merge/email/confirm?token=#{token}"
-						}, () ->
+					EmailHandler.sendEmail 'accountMergeToOverleafAddress', {
+						origin: 'sl',
+						to: overleafEmail,
+						tokenLinkUrl: "#{Settings.accountMerge.betaHost}/account-merge/email/confirm?token=#{token}"
+					}, () ->
 
-						return res.sendStatus(201)
+					return res.sendStatus(201)
 
 	showConfirmAccountMerge: (req, res, next) ->
 		{token} = req.query
