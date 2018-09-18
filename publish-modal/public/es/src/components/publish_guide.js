@@ -11,6 +11,14 @@ export default class PublishGuide extends Component {
     }
   }
 
+  componentDidUpdate () {
+    if (this.state.exportState === 'complete') {
+      var zipLink = `/project/${this.props.projectId}/export/${this.state.exportId}/zip`
+      window.location = zipLink
+      this.setState({exportState: 'uninitiated'})
+    }
+  }
+
   render () {
     const { entry, returnText, onReturn, projectId, pdfUrl } = this.props
 
@@ -56,8 +64,6 @@ export function GuideHtml ({ entry, projectId, pdfUrl, _this }) {
 }
 
 function Download ({ entry, projectId, pdfUrl, _this }) {
-  var zipLink = `/project/${projectId}/export/${_this.state.exportId}/zip`
-
   return (
     <div style={{ marginLeft: '140px', paddingLeft: '15px' }}>
       { /* Most publish guides have an image column
@@ -69,7 +75,7 @@ function Download ({ entry, projectId, pdfUrl, _this }) {
             className="btn btn-primary"
             onClick={() => initiateExport(entry, projectId, _this)}
           >
-            Build project ZIP with submission files (e.g. .bbl)
+            Download project ZIP with submission files (e.g. .bbl)
           </a>
         }
         { _this.state.exportState === 'initiated' &&
@@ -77,15 +83,6 @@ function Download ({ entry, projectId, pdfUrl, _this }) {
             <i className='fa fa-refresh fa-spin fa-fw'></i>
             <span> &nbsp; Zipping files, please wait...</span>
           </span>
-        }
-        { _this.state.exportState === 'complete' &&
-          <a
-            className="btn btn-primary"
-            href={zipLink}
-            target="_blank"
-          >
-            Download project ZIP with submission files (e.g. .bbl)
-          </a>
         }
         { _this.state.exportState === 'error' &&
           <span>
