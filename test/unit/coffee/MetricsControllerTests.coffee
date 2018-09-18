@@ -49,6 +49,25 @@ describe "MetricsController", ->
 
 			done()
 
+	describe 'institutionMetrics', ->
+		it 'renders the metricsApp template after calling v1 for the name', (done) ->
+			@request.get	= sinon.stub().callsArgWith(1, null, null, "{\"name\": \"Stanford\"}")
+			@req = params: { institutionId: 5 }
+			@res = { render: sinon.stub() }
+
+			@MetricsController.institutionMetrics(@req, @res)
+
+			@res.render.calledWith(
+				sinon.match('views/metricsApp'), {
+					metricsEndpoint: '/graphs',
+					resourceId: 5,
+					resourceName: 'Stanford',
+					resourceType: 'institution',
+				}
+			).should.equal true
+
+			done()
+
 	describe 'analyticsProxy', ->
 		it 'proxies requests to the analytics service', (done) ->
 			@request.get  = sinon.stub().returns(@request)

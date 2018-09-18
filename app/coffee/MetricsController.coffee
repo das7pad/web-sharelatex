@@ -20,11 +20,20 @@ module.exports = MetricsController =
 		}
 
 	institutionMetrics: (req, res, next) ->
-		res.render Path.resolve(__dirname, '../views/metricsApp'), {
-			metricsEndpoint: "/graphs",
-			resourceId: req.params.institutionId,
-			resourceType: 'institution',
-		}
+		id = req.params.institutionId
+		url = "#{settings.apis.v1.url}/universities/list/#{id}"
+		request.get(url, (err, response, body)->
+			if !err
+				resourceName = JSON.parse(body).name
+			else
+				resourceName = null
+			res.render Path.resolve(__dirname, '../views/metricsApp'), {
+				metricsEndpoint: "/graphs",
+				resourceId: id,
+				resourceName: resourceName,
+				resourceType: 'institution',
+			}
+		)
 
 	analyticsProxy: (req, res, next) ->
 		analyticsUrl = settings.apis.analytics.url + req.originalUrl
