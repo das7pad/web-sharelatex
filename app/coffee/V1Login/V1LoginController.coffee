@@ -103,13 +103,14 @@ module.exports = V1Login =
 
 	doPasswordChange: (req, res, next) ->
 		email = req.body.email
+		v1Id = req.body.v1Id
 		password = req.body.password
 
-		V1LoginHandler.doPasswordChange {email, password}, (err, isValid) ->
+		V1LoginHandler.doPasswordChange {email, v1Id, password}, (err, isValid) ->
 			return next(err) if err?
 			if !isValid
 				logger.log {email},  "failed password change via v1"
 				return res.json message: {type: 'error', text: req.i18n.translate('password_change_failed_attempt')}
 			else
-				logger.log email: email, "v1 password updated"
+				logger.log {email}, "v1 password updated"
 				return res.json message: {type: 'success', email}

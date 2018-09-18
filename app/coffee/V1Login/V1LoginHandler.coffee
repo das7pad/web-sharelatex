@@ -70,7 +70,7 @@ module.exports = V1LoginHandler =
 				callback(err)
 
 	doPasswordChange: (options, callback=(err, created)->) ->
-		logger.log({email: options.email},
+		logger.log({v1Id: options.v1Id, email: options.email},
 			"sending password change request to v1 login api")
 		request {
 			method: 'POST'

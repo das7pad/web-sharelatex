@@ -14,13 +14,16 @@ describe "OverleafPasswordChange", ->
 	describe 'changing password', ->
 		beforeEach (done) ->
 			@user = new User()
+			@user['overleaf'] = { id: 1 }
 			@user.login done
 
 		it 'should redirect to Overleaf', (done) ->
 			@user.request.post {
+				#url: '/user/password/update/v1',
 				url: '/change_password/v1',
 				json:
 					email: @user.email
+					v1Id: @user.overleaf.id
 					password: 'theNewPassw0rd'
 			}, (error, response, body) =>
 				expect(error).to.be.null
@@ -30,9 +33,11 @@ describe "OverleafPasswordChange", ->
 
 		it 'should error on bad password', (done) ->
 			@user.request.post {
+				#url: '/user/password/update/v1',
 				url: '/change_password/v1',
 				json:
 					email: @user.email
+					v1Id: @user.overleaf.id
 					password: 'short'
 			}, (error, response, body) =>
 				expect(error).to.be.null
