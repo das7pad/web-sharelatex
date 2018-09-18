@@ -1,8 +1,8 @@
 if portal_templates && portal_templates.length > 0
 	h2 #{translate("featured_latex_templates")}
-	.row
+	.templates-container
 		each template in portal_templates
-			.col-md-4.template-thumbnail
+			.template-thumbnail
 				a(href='/latex/templates/' + template.slug + '/' + template.read_token).thumbnail
 					img(src=template.image_url)
 				.caption.caption--portals
