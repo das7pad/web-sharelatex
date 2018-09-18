@@ -5,7 +5,7 @@ block content
 		.login-register-container
 			.card.login-register-card(ng-cloak)
 				.login-register-header
-					h1.login-register-header-heading Log in to Overleaf
+					h1.login-register-header-heading #{translate("login_to_overleaf")}
 				form.login-register-form(async-form="login", name="loginForm", action='/login/v1', method="POST", ng-cloak)
 					input(name='_csrf', type='hidden', value=csrfToken)
 					form-messages(for="loginForm")
@@ -39,51 +39,51 @@ block content
 							type='submit',
 							ng-disabled="loginForm.inflight"
 						)
-							span(ng-show="!loginForm.inflight") Log in with your email
+							span(ng-show="!loginForm.inflight") #{translate("login_with_email")}
 							span(ng-show="loginForm.inflight") #{translate("logging_in")}...
 					p.login-register-hr-text-container
-						span.login-register-hr-text or
+						span.login-register-hr-text #{translate("login_register_or")}
 					.form-group.text-center
 						a.btn.btn-default.btn-block.login-btn-ieee(
 							href="/org/ieee/saml/init"
 						) 
 							i.login-btn-icon.login-btn-icon-ieee
-							| Log in with IEEE
+							| #{translate("login_with_service", {service:"IEEE"})}
 					.form-group.text-center
 						a.btn.btn-default.btn-block.login-btn-google(
 							href="/auth/google?intent=sign_in"
 						) 
 							i.login-btn-icon.login-btn-icon-google
-							| Log in with Google
+							| #{translate("login_with_service", {service:"Google"})}
 					.form-group.text-center
 						a.btn.btn-default.btn-block.login-btn-twitter(
 							href="/auth/twitter?intent=sign_in"
 						) 
 							i.login-btn-icon.login-btn-icon-twitter
-							| Log in with Twitter
+							| #{translate("login_with_service", {service:"Twitter"})}
 					.form-group.text-center
 						a.btn.btn-default.btn-block.login-btn-orcid(
 							href="/auth/orcid?intent=sign_in"
 						) 
 							i.login-btn-icon.login-btn-icon-orcid
-							| Log in with ORCID
+							| #{translate("login_with_service", {service:"ORCID"})}
 				.login-register-sharelatex
 					p.login-register-text
-						| First time here as a ShareLaTeX user
+						| #{translate("first_time_sl_user")}
 						i.fa.fa-question-circle.login-register-sharelatex-tooltip(
-							tooltip="Please log in to ShareLaTeX to move your account to Overleaf. It will only take a few seconds. If you have a ShareLaTeX subscription, it will automatically be transferred to Overleaf."
+							tooltip=translate("sl_extra_info_tooltip")
 						)
 					.form-group.text-center
 						a.btn.btn-default.btn-block.login-btn-sharelatex(
 							href=settings.accountMerge.sharelatexHost + "/logout"
 						) 
 							i.login-btn-icon.login-btn-icon-sharelatex 
-							| Migrate from ShareLaTeX
+							| #{translate("migrate_from_sl")}
 				.login-register-other-links
 					p.login-register-text 
-						| Don't have an account?
+						| #{translate("dont_have_account")}
 						|
-						a(href="/register") Sign up
+						a(href="/register") #{translate("register")}
 					p.login-register-text 
-						a(href="/user/password/reset") Forgot your password?
+						a(href="/user/password/reset") #{translate("forgot_your_password")}?
 
