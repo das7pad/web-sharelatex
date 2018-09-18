@@ -3,6 +3,12 @@ _ = require "lodash"
 request = require "request"
 settings = require "settings-sharelatex"
 
+LICENSES = {
+    "cc_by_4.0" : "Creative Commons CC BY 4.0",
+    "lppl_1.3c" : "LaTeX Project Public License 1.3c",
+    "other" : "Other (as stated in the work)",
+  }
+
 content_types =
 	article:
 		item_name: "Article"
@@ -110,6 +116,7 @@ module.exports = V2TemplatesManager =
 		page.find_more =
 			href: content_type.path
 			text: "Find More #{content_type.page_title}"
+		page.pub.license = LICENSES[page.pub.license]
 		if page.pub_tags
 			for idx, tag of page.pub_tags
 				tag.path = "/gallery/tagged/#{tag.name}"
