@@ -18,15 +18,6 @@ block content_cms
 					//- tabGroupTitle is a required field on CMS but can be opted out of display on site
 					//- must check c.fields, because an entry could have been created without adding any fields
 					if c.fields && c.fields.tabGroupTitle
-						if c.fields.displayTabGroupTitle
-							h2 #{c.fields.tabGroupTitle}
-
-						tabset.ol-tabs
-							for tab, tabIndex in c.fields.tabs
-								if tab.fields
-									tab(heading=tab.fields.tabTitle)
-										for tabContent, tabContentIndex in tab.fields.tabContent || []
-											+page_content(tabContent, tab.fields.tabContent[tabContentIndex+1])
-
+						include ./elements/_tabs
 					else
 						+page_content(c, content[cIndex+1])
