@@ -44,8 +44,13 @@ block content
 					p.login-register-hr-text-container
 						span.login-register-hr-text #{translate("login_register_or")}
 					.form-group.text-center
+						//- TODO remove the hard-coded domain part for the IEEE link
+						//- The `href` attribute needs an hard-coded  domain until this codes lives on
+						//- www.overleaf.com, as IEEE will only accept a login flow started from the 
+						//- v1 domain. Once we have this code running on www.overleaf.com, we can 
+						//- remove the hard-coded domain.
 						a.btn.btn-default.btn-block.login-btn-ieee(
-							href="www.overleaf.com/org/ieee/saml/init"
+							href="//www.overleaf.com/org/ieee/saml/init"
 						) 
 							i.login-btn-icon.login-btn-icon-ieee
 							| #{translate("login_with_service", {service:"IEEE"})}
