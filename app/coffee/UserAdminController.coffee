@@ -36,8 +36,10 @@ module.exports = UserAdminController =
 		else
 			query = EmailHelper.parseEmail params?.query
 
-		if query?
+		if query? and params.secondaryEmailSearch
 			q = { $or: [{ email: query }, { 'emails.email': query }] }
+		else if query?
+			q = { email: query }
 		else
 			q = {}
 

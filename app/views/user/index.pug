@@ -36,6 +36,13 @@ block content
 											ng-model="searchRegExp",
 										)
 										| &nbsp;RegExp
+									span &nbsp;&nbsp;&nbsp;
+									label.form-check-label
+										input.form-check-input(
+											type="checkbox"
+											ng-model="secondaryEmailSearch",
+										)
+										| &nbsp;Search Seconday Emails
 						.user-tools(ng-cloak)
 							.btn-toolbar
 								.btn-group(ng-hide="selectedUsers.length < 1")
