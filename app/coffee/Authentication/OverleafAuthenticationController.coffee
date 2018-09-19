@@ -7,12 +7,61 @@ Path = require "path"
 Settings = require "settings-sharelatex"
 jwt = require('jsonwebtoken')
 FeaturesUpdater = require("../../../../../app/js/Features/Subscription/FeaturesUpdater")
+OneTimeTokenHandler = require("../../../../../app/js/Features/Security/OneTimeTokenHandler")
+EmailHandler = require("../../../../../app/js/Features/Email/EmailHandler")
 Settings = require('settings-sharelatex')
-{User} = require "../../../../../app/js/models/User"
+UserGetter = require "../../../../../app/js/Features/User/UserGetter"
 UserController = require("../../../../../app/js/Features/User/UserController")
 CollabratecController = require "../Collabratec/CollabratecController"
+logger = require 'logger-sharelatex'
+V1LoginHandler = require '../V1Login/V1LoginHandler'
+
 
 module.exports = OverleafAuthenticationController =
+
+	sendSharelatexAccountMergeEmail: (req, res, next) ->
+		sharelatexEmail = req.body.sharelatexEmail
+		v1Id = req.session?.__tmp?.accountMergeV1Id
+		final_email = req.session?.__tmp?.accountMergeEmail
+		if !v1Id? or !final_email?
+			logger.log {}, "No v1Id/email in session, cannot send account-merge email to sharelatex address"
+			return res.status(400).send()
+		if !sharelatexEmail?
+			logger.log {v1Id}, "No Sharelatex email supplied"
+			return res.sendStatus(400)
+		logger.log {v1Id, sharelatexEmail}, "Preparing to send account-merge link to sharelatex-email"
+		UserGetter.getUserByMainEmail sharelatexEmail, {overleaf: 1}, (err, user) ->
+			return next(err) if err?
+			if user? and user?.overleaf?.id?
+				logger.log {v1Id, sharelatexEmail},
+					"email matches account already linked to v2, cannot send account-merge email"
+				return res.status(400).json {errorCode: 'email_matches_v1_user_in_v2'}
+			else if !user?
+				logger.log {v1Id, sharelatexEmail},
+					"email does not match unlinked account in sharelatex(mongo), cannot send account-merge email"
+				return res.status(400).json {errorCode: 'email_not_in_sl'}
+			V1LoginHandler.getV1UserIdByEmail sharelatexEmail, (err, otherV1Id) ->
+				return next(err) if err?
+				if otherV1Id? and otherV1Id != v1Id
+					logger.log {v1Id, sharelatexEmail, otherV1Id},
+						"email matches another account in v1, cannot send account-merge email"
+					return res.status(400).json {errorCode: 'email_matches_v1_user'}
+				mergeData = {
+					v1_id: v1Id,
+					sl_id: user._id,
+					final_email: final_email,
+					origin: 'ol'
+				}
+				OneTimeTokenHandler.getNewToken 'account-merge-email', mergeData, (err, token) ->
+					return next(err) if err?
+					EmailHandler.sendEmail 'accountMergeToSharelatexAddress', {
+						origin: 'ol',
+						to: sharelatexEmail,
+						tokenLinkUrl: "#{Settings.accountMerge.betaHost}/account-merge/email/confirm?token=#{token}"
+					}, () ->
+
+					return res.sendStatus(201)
+
 	saveRedir: (req, res, next) ->
 		if req.query.redir?
 			AuthenticationController._setRedirectInSession(req, req.query.redir)
@@ -31,12 +80,16 @@ module.exports = OverleafAuthenticationController =
 				logger.err err: error, "bad token in checking accounts"
 				return res.status(400).send("invalid token")
 
-			{email} = data
-			User.findOne {email}, {_id: 1}, (err, user) ->
+			email = data.email
+			v1Id = data.id
+			UserGetter.getUserByMainEmail email, {_id: 1}, (err, user) ->
 				return callback(err) if err?
 				if user?
 					return res.redirect('/overleaf/login')
 				else
+					req.session.__tmp ||= {}
+					req.session.__tmp.accountMergeV1Id = v1Id
+					req.session.__tmp.accountMergeEmail = email
 					res.render Path.resolve(__dirname, "../../views/check_accounts"), {
 						email
 					}

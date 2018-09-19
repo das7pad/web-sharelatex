@@ -77,12 +77,15 @@ module.exports = UserMapper =
 						return callback(error) if error?
 						callback(null, user)
 
-	mergeWithSlUser: (sl_user_id, ol_user, callback = (error, sl_user) ->) ->
+	mergeWithSlUser: (sl_user_id, ol_user, options, callback = (error, sl_user) ->) ->
+		if typeof options == 'function'  # options are, optional
+			callback = options
+			options = {}
 		UserMapper.getOlUserStub ol_user.id, (error, user_stub) ->
 			return callback(error) if error?
 			User.findOne {_id: sl_user_id}, (error, user) ->
 				return callback(error) if error?
-				if user.email != UserMapper.getCanonicalEmail(ol_user.email)
+				if user.email != UserMapper.getCanonicalEmail(ol_user.email) and !options.emailMismatchOk
 					return callback(new Error('expected OL and SL account emails to match'))
 				user.overleaf = {
 					id: ol_user.id
@@ -94,6 +97,7 @@ module.exports = UserMapper =
 						UserMapper._addEmails user, ol_user, (error) ->
 							return callback(error) if error?
 							callback(null, user)
+
 
 	_updateUserStubReferences: (olUser, userStubId, slUserId, callback = (error) ->) ->
 		return callback() unless userStubId?
