@@ -70,7 +70,13 @@ module.exports = UserAdminController =
 				}, (err, projects) ->
 					{owned, readAndWrite, readOnly} = projects
 					return cb(err) if err?
-					return cb(null, owned.concat(readAndWrite).concat(readOnly))
+					allProjects = owned.concat(readAndWrite).concat(readOnly)
+					allProjects = _.map allProjects, (project)->
+						projectTimestamp = project._id.toString().substring(0,8)
+						project.createdAt = new Date( parseInt( projectTimestamp, 16 ) * 1000 )
+						return project
+					return cb(null, allProjects)
+
 			subscription: (cb) ->
 				SubscriptionLocator.getUsersSubscription user_id, cb
 			memberSubscriptions: (cb) ->
