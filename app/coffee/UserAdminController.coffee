@@ -13,6 +13,8 @@ SubscriptionLocator = require("../../../../app/js/Features/Subscription/Subscrip
 async = require "async"
 settings = require "settings-sharelatex"
 
+EmailHelper = require "../../../../app/js/Features/Helpers/EmailHelper"
+
 module.exports = UserAdminController =
 	PER_PAGE: 100
 
@@ -29,12 +31,16 @@ module.exports = UserAdminController =
 			res.send 200, {users:users, pages:pages}
 
 	_userFind: (params, page, cb = () ->) ->
-		query = params?.query
-		if query? and query != ""
-			query = new RegExp(query) if params?.regexp
+		if params?.regexp
+			query = new RegExp(params?.query)
+		else
+			query = EmailHelper.parseEmail params?.query
+
+		if query?
 			q = { $or: [{ email: query }, { 'emails.email': query }] }
 		else
 			q = {}
+
 		skip = (page - 1) * UserAdminController.PER_PAGE
 		opts = {limit: UserAdminController.PER_PAGE, skip : skip, sort: {email: 1} }
 		logger.log opts:opts, q:q, "user options and query"
