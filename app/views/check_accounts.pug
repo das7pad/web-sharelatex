@@ -4,7 +4,7 @@ block content
 	.content.content-alt
 		.container
 			.row
-				.col-md-5.col-md-offset-3
+				.col-md-8.col-md-offset-2
 					.card
 						.page-header
 							h1 Moving to Overleaf
@@ -30,7 +30,7 @@ block content
 							hr
 
 							.row
-								.col-md-12.form-group(ng-controller="AccountMergeCheckerController")
+								.col-md-12.form-group(ng-controller="SharelatexAccountMergeCheckerController")
 									h4(style="margin-top: 0;") Do you already have an Overleaf account?
 
 									.radio
@@ -52,16 +52,71 @@ block content
 										)
 										label(for="no-ol-account") No, I only have a ShareLaTeX account
 
-									.row(ng-if="hasOlAccount == 'has-ol-account'" ng-cloak style="margin-top: 25px;")
+									.row(ng-show="hasOlAccount == 'has-ol-account'" ng-cloak style="margin-top: 25px;")
 										.col-md-12
-											p
-												| We didn't find an Overleaf account for #[strong #{email}].
-												| If you have an Overleaf account under a different
-												| email address, please #[a(href="https://www.overleaf.com/users/edit#details") change your email address on Overleaf to #[strong #{email}]]
-												| and then come back to sharelatex.com to merge your
-												| accounts.
 
-									.row(ng-if="hasOlAccount == 'has-no-ol-account'" ng-cloak style="margin-top: 25px;")
+											p
+												| We didn't find a Overleaf account for #[em #{email}].
+											p
+												strong Do you have an Overleaf account with a different email address?
+												|
+												| Please enter the main email address for your Overleaf account below,
+												| and we'll send an email to that address with a link that you can click to merge your accounts.
+											p
+												| Note: Once you've merged your accounts, you will be able to access all your Overleaf and
+												| ShareLaTeX projects by logging in to your Overleaf account on #[a(href="https://www.overleaf.com", target="_blank") overleaf.com].
+
+											div.row
+												div.col-md-12
+													form(name="ol-email-merge")
+														.form-group
+															label.hidden Overleaf Account Email
+															input(
+																type="email"
+																required
+																placeholder="email@example.com"
+																ng-model-options="{ updateOn: 'blur' }"
+																name="ol-email"
+																id="ol-email"
+																ng-model="olEmail"
+															).form-control
+														.form-group
+															button.btn.btn-primary.pull-right(
+																ng-click="submitEmail()"
+															) Send Confirmation Email to Merge my Accounts
+
+											// Success
+											div(ng-show="success == true").row
+												br
+												div.col-md-12
+													div.alert.alert-success
+														| Email sent!
+
+											// Errors
+											div(ng-show="errorCode != null").row
+												br
+												div.col-md-12
+													div.alert.alert-danger(ng-switch="errorCode")
+
+														div(ng-switch-when="email_matches_v2_user")
+															| Sorry, that email address is already linked to an Overleaf v2 account.
+
+														div(ng-switch-when="email_not_in_v1")
+															| Sorry, that email address does not match any account in Overleaf v1.
+
+														div(ng-switch-default)
+															| Sorry, something went wrong.
+															div
+																| If the problem persists, please &nbsp;
+																a(
+																	ng-controller="ContactModal"
+																	ng-click="contactUsModal()"
+																	href=""
+																	class="ng-scope"
+																	style="text-decoration: underline;"
+																) contact us
+
+									.row(ng-show="hasOlAccount == 'has-no-ol-account'" ng-cloak style="margin-top: 25px;")
 										.col-md-12
 											p
 												| OK, let's move your ShareLaTeX account to Overleaf

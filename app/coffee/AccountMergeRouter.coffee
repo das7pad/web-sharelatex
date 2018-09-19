@@ -2,6 +2,7 @@ RedirectSLToV2Middleware = require "./RedirectSLToV2Middleware"
 AccountMergeController = require "./AccountMergeController"
 LogInToV2Controller = require "./LogInToV2Controller"
 AuthenticationController = require "../../../../app/js/Features/Authentication/AuthenticationController"
+RateLimiterMiddlewear = require('../../../../app/js/Features/Security/RateLimiterMiddlewear')
 Settings = require 'settings-sharelatex'
 Path = require 'path'
 
@@ -18,3 +19,12 @@ module.exports =
 		if Settings.createV1AccountOnLogin
 			webRouter.get '/migrated-to-overleaf', (req, res, next) ->
 				res.render Path.resolve(__dirname, '../views/migrated_to_overleaf')
+
+			webRouter.post '/account-merge/email/overleaf',
+				AuthenticationController.requireLogin(),
+				RateLimiterMiddlewear.rateLimit({
+					endpointName: "account-merge-email-overleaf"
+					maxRequests: 10
+					timeInterval: 60
+				}),
+				AccountMergeController.sendOverleafAccountMergeEmail

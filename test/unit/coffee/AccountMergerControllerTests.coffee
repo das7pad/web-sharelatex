@@ -21,6 +21,11 @@ describe "AccountMergeController", ->
 					betaHost: "http://beta.example.com"
 					secret: "banana"
 			"jsonwebtoken": @jwt = {}
+			"../../../../app/js/models/User": {User: @User = {}}
+			"../../../../app/js/Features/User/UserGetter": @UserGetter = {}
+			"../../../../app/js/Features/Security/OneTimeTokenHandler": @OneTimeTokenHandler = {}
+			"../../../../app/js/Features/Email/EmailHandler": @EmailHandler = {}
+			"./V1UserFinder": @V1UserFinder = {}
 		@req = {}
 		@res =
 			redirect: sinon.stub()
