@@ -9,6 +9,6 @@ block vars
 
 block content
 	.content.content-alt.cms-page.content-page
-		main.container(ng-cloak, role="main")
+		main.container(ng-cloak, ng-controller="CmsController", role="main")
 			block content_cms
 			+preview()
