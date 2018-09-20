@@ -39,6 +39,7 @@ define [
 			data._csrf = window.csrfToken
 			data.query = $scope.searchText
 			data.regexp = $scope.searchRegExp
+			data.secondaryEmailSearch = $scope.secondaryEmailSearch
 			data.page = $scope.pageSelected
 			request = $http.post "/admin/user/search", data
 			request.then (response)->

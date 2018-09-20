@@ -13,6 +13,8 @@ SubscriptionLocator = require("../../../../app/js/Features/Subscription/Subscrip
 async = require "async"
 settings = require "settings-sharelatex"
 
+EmailHelper = require "../../../../app/js/Features/Helpers/EmailHelper"
+
 module.exports = UserAdminController =
 	PER_PAGE: 100
 
@@ -29,12 +31,18 @@ module.exports = UserAdminController =
 			res.send 200, {users:users, pages:pages}
 
 	_userFind: (params, page, cb = () ->) ->
-		query = params?.query
-		if query? and query != ""
-			query = new RegExp(query) if params?.regexp
+		if params?.regexp
+			query = new RegExp(params?.query)
+		else
+			query = EmailHelper.parseEmail params?.query
+
+		if query? and params.secondaryEmailSearch
 			q = { $or: [{ email: query }, { 'emails.email': query }] }
+		else if query?
+			q = { email: query }
 		else
 			q = {}
+
 		skip = (page - 1) * UserAdminController.PER_PAGE
 		opts = {limit: UserAdminController.PER_PAGE, skip : skip, sort: {email: 1} }
 		logger.log opts:opts, q:q, "user options and query"
@@ -54,7 +62,7 @@ module.exports = UserAdminController =
 		async.parallel {
 			user: (cb) ->
 				UserGetter.getUser user_id, {
-					_id:1, first_name:1, last_name:1, email:1, betaProgram:1, features: 1, isAdmin: 1, awareOfV2: 1, overleaf: 1, emails: 1, signUpDate:1, loginCount:1
+					_id:1, first_name:1, last_name:1, email:1, betaProgram:1, features: 1, isAdmin: 1, awareOfV2: 1, overleaf: 1, emails: 1, signUpDate:1, loginCount:1, lastLoggedIn:1, lastLoginIp:1
 				}, cb
 			projects: (cb) ->
 				ProjectGetter.findAllUsersProjects user_id, {
@@ -62,7 +70,13 @@ module.exports = UserAdminController =
 				}, (err, projects) ->
 					{owned, readAndWrite, readOnly} = projects
 					return cb(err) if err?
-					return cb(null, owned.concat(readAndWrite).concat(readOnly))
+					allProjects = owned.concat(readAndWrite).concat(readOnly)
+					allProjects = _.map allProjects, (project)->
+						projectTimestamp = project._id.toString().substring(0,8)
+						project.createdAt = new Date( parseInt( projectTimestamp, 16 ) * 1000 )
+						return project
+					return cb(null, allProjects)
+
 			subscription: (cb) ->
 				SubscriptionLocator.getUsersSubscription user_id, cb
 			memberSubscriptions: (cb) ->

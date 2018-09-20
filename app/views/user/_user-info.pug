@@ -60,6 +60,14 @@ p
 				td {{ user.signUpDate }}
 			tr
 				td
+					label Last login
+				td {{ user.lastLoggedIn }}
+			tr
+				td
+					label Last login IP
+				td {{ user.lastLoginIp }}
+			tr
+				td
 					label Login count
 				td {{ user.loginCount }}
 				
@@ -101,9 +109,9 @@ p
 							| &nbsp;(Change to:&nbsp;
 							a(href, ng-click="user.features = {collaborators: 1, versioning: false, dropbox: false, github: false, compileTimeout: 60, compileGroup: 'standard', templates: false, trackChanges: false, referencesSearch: false, mendeley: false}") Free
 							| &nbsp;&middot;&nbsp;
-							a(href, ng-click="user.features = {collaborators: 10, versioning: true, dropbox: true, github: true, compileTimeout: 180, compileGroup: 'priority', templates: true, trackChanges: true, references: false, referencesSearch: true, mendeley: true}") Collab.
+							a(href, ng-click="user.features = {collaborators: 10, versioning: true, dropbox: true, github: true, compileTimeout: 240, compileGroup: 'priority', templates: true, trackChanges: true, references: false, referencesSearch: true, mendeley: true}") Collab.
 							| &nbsp;&middot;&nbsp;
-							a(href, ng-click="user.features = {collaborators: -1, versioning: true, dropbox: true, github: true, compileTimeout: 180, compileGroup: 'priority', templates: true, trackChanges: true, references: false, referencesSearch: true, mendeley: true}") Pro.
+							a(href, ng-click="user.features = {collaborators: -1, versioning: true, dropbox: true, github: true, compileTimeout: 240, compileGroup: 'priority', templates: true, trackChanges: true, references: false, referencesSearch: true, mendeley: true}") Pro.
 							| )
 
 				tr
