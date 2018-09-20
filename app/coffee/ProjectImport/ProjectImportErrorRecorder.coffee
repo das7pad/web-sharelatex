@@ -67,7 +67,37 @@ module.exports = ProjectImportErrorRecorder =
 
 			shortNames =
 				'InvalidNameError: Project name cannot not contain / characters': 'invalid-name-slash'
+				'InvalidNameError: Project name is too long': 'invalid-name-length'
+				"UnsupportedFileTypeError: expected file.agent to be valid, instead got 'plotly'": 'plotly'
+				"UnsupportedFileTypeError: expected file.agent to be valid, instead got 'zotero'": 'zotero'
+				"UnsupportedFileTypeError: expected file.agent to be valid, instead got 'citeulike'": 'citeulike'
+				"V2ExportNotInProgress: v2 export not in progress": 'v2-export-not-in-progress'
+				"V1HistoryNotSyncedError: v1 history not synced": 'v1-history-not-synced'
+				"UnsupportedExportRecordsError: project has export records": 'has-export-records'
+				'Error: non-ok response from filestore for upload: 500' : 'filestore-500'
+				'Error: socket hang up': 'connection-error'
+				'Error: ETIMEDOUT': 'timed-out'
+				'Error: read ECONNRESET': 'connection-error'
+				'Error: overleaf returned non-success code: 403': 'overleaf-403'
+				'Error: non-ok response from filestore for upload: 502': 'filestore-502'
+				'V2ExportInProgress: v2 export already in progress': 'v2-export-already-in-progress'
+				'InvalidNameError: invalid element name': 'invalid-element-name'
+				'Error: Overleaf s3 returned non-success code: 500': 'overleaf-s3-500'
+				'Error: overleaf returned non-success code: 500': 'overleaf-500'
+				'Error: ESOCKETTIMEDOUT': 'connection-error'
+				'NotFoundError: entity not found': 'entity-not-found'
+				'project-history returned non-success code: 409': 'project-history-409'
+				'Error: docstore api responded with non-success code: 500': 'docstore-500'
+				'Error: connect ETIMEDOUT 52.216.18.59:443': 'connection-error'
+				'Error: cannot import label with no history_version': 'label-without-version'
 				'*': 'other'
+
+			getShortName = (name) ->
+				if name?.match(/UnsupportedBrandError: project has brand variation/)
+					return 'unsupported-brand'
+				if name?.match(/duplicate key error/)
+					return 'duplicate-key'
+				return shortNames[name] || shortNames['*']
 
 			# set all the known errors to zero if not present (otherwise gauges stay on their last value)
 			summaryCounts = {}
@@ -79,7 +109,7 @@ module.exports = ProjectImportErrorRecorder =
 
 			# record a metric for each type of failure
 			for failureType, failureCount of failureCounts
-				label = shortNames[failureType] || shortNames['*']
+				label = getShortName(failureType)
 				summaryCounts[label] += failureCount
 				summaryAttempts[label] += failureAttempts[failureType]
 
