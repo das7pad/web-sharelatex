@@ -30,6 +30,7 @@ module.exports = V1LoginController =
 			new_email:req.query.new_email || ""
 			title: 'Register',
 			email: req.query.new_email || ""
+			ssoError: req.query.sso_error || null
 
 	doRegistration: (req, res, next) ->
 		requestIsValid = UserRegistrationHandler._registrationRequestIsValid(req.body)
