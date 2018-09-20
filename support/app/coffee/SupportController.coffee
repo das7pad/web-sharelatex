@@ -9,8 +9,8 @@ inboxes = {
 		id:"inb_3wb"
 		email:"support@overleaf.com"
 	"accounts":
-		id:"inb_4c3t"
-		email:"accounts@sharelatex.com"
+		id:"inb_bmf"
+		email:"sales@overleaf.com"
 }
 module.exports  =
 
