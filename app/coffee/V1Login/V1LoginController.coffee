@@ -11,7 +11,7 @@ jwt = require('jsonwebtoken')
 Settings = require 'settings-sharelatex'
 
 
-module.exports = V1Login =
+module.exports = V1LoginController =
 
 	registrationPage: (req, res, next) ->
 		sharedProjectData =
@@ -78,25 +78,31 @@ module.exports = V1Login =
 
 	doLogin: (req, res, next) ->
 		email = req.body.email
-		pass = req.body.password
+		password = req.body.password
 
-		V1LoginHandler.authWithV1 email, pass, (err, isValid, profile) ->
+		V1LoginHandler.authWithV1 {email, password}, (err, isValid, profile) ->
 			return next(err) if err?
 			if !isValid
 				logger.log {email},  "failed login via v1"
 				AuthenticationController._recordFailedLogin()
 				return res.json message: {type: 'error', text: req.i18n.translate('email_or_password_wrong_try_again')}
 			else
-				logger.log email: email, v1UserId: profile.id, "v1 credentials valid"
-				OverleafAuthenticationManager.setupUser profile, (err, user, info) ->
-					return callback(err) if err?
-					if info?.email_exists_in_sl
-						logger.log {email, info}, "account exists in SL, redirecting to sharelatex to merge accounts"
-						url = OverleafAuthenticationController.prepareAccountMerge(info, req)
-						res.json {redir: url}
-					else
-						# All good, login and proceed
-						logger.log {email}, "successful login with v1, proceeding with session setup"
-						CollabratecController._completeOauthLink req, user, (err) ->
-							return callback err if err?
-							AuthenticationController.finishLogin user, req, res, next
+				V1LoginController._login(profile, req, res, next)
+
+	_login: (profile, req, res, next) ->
+		logger.log { email: profile.email, v1UserId: profile.id }, "v1 credentials valid"
+		OverleafAuthenticationManager.setupUser profile, (err, user, info) ->
+			return callback(err) if err?
+			if info?.email_exists_in_sl
+				logger.log { email: profile.email, info }, "account exists in SL, redirecting to sharelatex to merge accounts"
+				redir = OverleafAuthenticationController.prepareAccountMerge(info, req)
+				if req.headers?['accept']?.match(/^application\/json.*$/)
+					res.json {redir}
+				else
+					res.redirect(redir)
+			else
+				# All good, login and proceed
+				logger.log { email: profile.email }, "successful login with v1, proceeding with session setup"
+				CollabratecController._completeOauthLink req, user, (err) ->
+					return callback err if err?
+					AuthenticationController.finishLogin user, req, res, next

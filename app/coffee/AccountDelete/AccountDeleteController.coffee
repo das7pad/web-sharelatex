@@ -28,7 +28,7 @@ module.exports = AccountDeleteController =
 				return next(err)
 
 			# Auth against v1 instead of mongo
-			V1LoginHandler.authWithV1 email, password, (err, isValid, v1Profile) ->
+			V1LoginHandler.authWithV1 {email, password}, (err, isValid, v1Profile) ->
 				if err?
 					logger.err {err, user_id, email},
 						'[AccountDeleteController] error authenticating during attempt to delete account'

@@ -1,3 +1,4 @@
+_ = require "lodash"
 {request} = require '../V1SharelatexApi'
 Settings = require 'settings-sharelatex'
 logger = require 'logger-sharelatex'
@@ -7,21 +8,23 @@ UserCreator = require "../../../../../app/js/Features/User/UserCreator"
 
 module.exports = V1LoginHandler =
 
-	authWithV1: (email, password, callback=(err, isValid, v1Profile)->) ->
-		logger.log {email}, "sending auth request to v1 login api"
+	authWithV1: (options, callback=(err, isValid, v1Profile)->) ->
+		log_options = _.cloneDeep(options)
+		delete log_options.password
+		logger.log {options: log_options}, "sending auth request to v1 login api"
 		request {
 			method: 'POST'
 			url: "#{Settings.overleaf.host}/api/v1/sharelatex/login",
-			json: {email, password}
+			json: options
 			expectedStatusCodes: [403]
 		}, (err, response, body) ->
 			if err?
-				logger.err {email, err}, "error while talking to v1 login api"
+				logger.err {options: log_options, err}, "error while talking to v1 login api"
 				return callback(err)
 			if response.statusCode in [200, 403]
 				isValid = body.valid
 				userProfile = body.user_profile
-				logger.log {email, isValid, v1UserId: body?.user_profile?.id}, "got response from v1 login api"
+				logger.log {options: log_options, isValid, v1UserId: body?.user_profile?.id}, "got response from v1 login api"
 				callback(null, isValid, userProfile)
 			else
 				err = new Error("Unexpected status from v1 login api: #{response.statusCode}")
@@ -45,8 +48,10 @@ module.exports = V1LoginHandler =
 			else
 				callback(null, body.user_id)
 
-	registerWithV1: (options, callback=(err, created, v1Profile, cookies)->) ->
-		logger.log options, "sending registration request to v1 login api"
+	registerWithV1: (options, callback=(err, created, v1Profile)->) ->
+		log_options = _.cloneDeep(options)
+		delete log_options.password
+		logger.log {options: log_options}, "sending registration request to v1 login api"
 		if options.email? && !options.name?
 			options.name = options.email.match(/^[^@]*/)[0]
 		request {
@@ -56,14 +61,13 @@ module.exports = V1LoginHandler =
 			expectedStatusCodes: [409]
 		}, (err, response, body) ->
 			if err?
-				logger.err {email: options.email, err}, "error while talking to v1 registration api"
+				logger.err {options: log_options, err}, "error while talking to v1 registration api"
 				return callback(err)
 			if response.statusCode in [200, 409]
 				created = response.statusCode == 200
 				userProfile = body.user_profile
-				cookies = response.headers["set-cookie"]
-				logger.log {email: options.email, created, v1UserId: body?.user_profile?.id}, "got response from v1 registration api"
-				callback(null, created, userProfile, cookies)
+				logger.log {options: log_options, created, v1UserId: body?.user_profile?.id}, "got response from v1 registration api"
+				callback(null, created, userProfile)
 			else
 				err = new Error("Unexpected status from v1 registration api: #{response.statusCode}")
 				callback(err)

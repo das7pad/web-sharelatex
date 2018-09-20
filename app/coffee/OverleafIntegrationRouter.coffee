@@ -8,6 +8,7 @@ AuthenticationController = require "../../../../app/js/Features/Authentication/A
 AccountSyncController = require "./AccountSync/AccountSyncController"
 AccountMergeEmailController = require "./AccountMerge/AccountMergeEmailController"
 SharelatexAuthController = require "./SharelatexAuth/SharelatexAuthController"
+SSOController = require "./SSO/SSOController"
 V1LoginController = require "./V1Login/V1LoginController"
 V1RedirectController = require "./V1Redirect/V1RedirectController"
 AuthorizationMiddlewear = require('../../../../app/js/Features/Authorization/AuthorizationMiddlewear')
@@ -16,6 +17,9 @@ passport = require "passport"
 logger = require "logger-sharelatex"
 qs = require 'querystring'
 settings = require 'settings-sharelatex'
+OrcidStrategy = require('passport-orcid').Strategy
+GoogleStrategy = require('passport-google-oauth20').Strategy
+TwitterStrategy = require('passport-twitter').Strategy
 
 module.exports =
 	apply: (webRouter, privateApiRouter, publicApiRouter) ->
@@ -147,6 +151,96 @@ module.exports =
 			webRouter.post '/org/ieee/collabratec/auth/sign_in_to_link', CollabratecController.oauthSignin
 
 		webRouter.get '/sign_in_to_v1', V1RedirectController.sign_in_and_redirect
+
+		if settings.sso?
+			webRouter.get '/register/sso_email', SSOController.getRegisterSSOEmail
+			webRouter.post '/register/sso_email', SSOController.postRegisterSSOEmail
+
+			orcid = settings.sso.orcid
+			if orcid?.client_id?
+				callback_url = settings.siteUrl + orcid.callback_path
+				passport.use(
+					new OrcidStrategy(
+						{
+							clientID: orcid.client_id,
+							clientSecret: orcid.client_secret,
+							callbackURL: callback_url
+						},
+						(accessToken, refreshToken, params, profile, callback) ->
+							callback(null, {
+								auth_provider: 'orcid'
+								auth_provider_uid: params.orcid
+								name: params.name
+							})
+					)
+				)
+				webRouter.get '/auth/orcid', SSOController.authInit, passport.authenticate('orcid')
+				webRouter.get(
+					orcid.callback_path,
+					passport.authenticate('orcid', { failureRedirect: '/' }),
+					SSOController.authCallback
+				)
+
+			google = settings.sso.google
+			if google?.client_id?
+				callback_url = settings.siteUrl + google.callback_path
+				passport.use(
+					new GoogleStrategy(
+						{
+							clientID: google.client_id,
+							clientSecret: google.client_secret,
+							callbackURL: callback_url
+						},
+						(accessToken, refreshToken, profile, callback) ->
+							if profile.name?.givenName? && profile.name?.familyName?
+								name = profile.name.givenName + ' ' + profile.name.familyName
+							callback(null, {
+								auth_provider: 'google'
+								auth_provider_uid: profile.id
+								email: profile.emails?[0]?.value
+								name: name
+							})
+					)
+				)
+				webRouter.get(
+					'/auth/google',
+					SSOController.authInit,
+					passport.authenticate('google', { scope: ['email', 'profile'] })
+				)
+				webRouter.get(
+					google.callback_path,
+					passport.authenticate('google', { failureRedirect: '/' }),
+					SSOController.authCallback
+				)
+
+			twitter = settings.sso.twitter
+			if twitter?.client_id?
+				callback_url = settings.siteUrl + twitter.callback_path
+				passport.use(
+					new TwitterStrategy(
+						{
+							consumerKey: twitter.client_id,
+							consumerSecret: twitter.client_secret,
+							callbackURL: callback_url
+						},
+						(token, tokenSecret, profile, callback) ->
+							callback(null, {
+								auth_provider: 'twitter'
+								auth_provider_uid: profile.id
+								name: profile.name
+							})
+					)
+				)
+				webRouter.get(
+					'/auth/twitter',
+					SSOController.authInit,
+					passport.authenticate('twitter')
+				)
+				webRouter.get(
+					twitter.callback_path,
+					passport.authenticate('twitter', { failureRedirect: '/' }),
+					SSOController.authCallback
+				)
 
 	applyNonCsrfRouter: (webRouter, privateApiRouter, publicApiRouter) ->
 		if settings.collabratec?
