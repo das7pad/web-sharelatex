@@ -37,16 +37,16 @@ form.form-inline(async-form="register", name="registerForm", action="/register",
 			.hp-register-external-separator
 				span.hp-register-external-separator-or #{translate("login_register_or")}
 			.form-group
-				a.btn.btn-default.login-btn-google-alt.hp-login-btn(
+				a.btn.btn-default.login-btn-google.hp-login-btn(
 					href="/auth/google?intent=sign_up"
 				) 
-					i.login-btn-icon.login-btn-icon-google-alt
+					i.login-btn-icon.login-btn-icon-google
 					| #{translate("register_using_service", {service:"Google"})}
 			.form-group
-				a.btn.btn-default.login-btn-orcid-alt.hp-login-btn(
+				a.btn.btn-default.login-btn-orcid.hp-login-btn(
 					href="/auth/orcid?intent=sign_up"
 				) 
-					i.login-btn-icon.login-btn-icon-orcid-alt
+					i.login-btn-icon.login-btn-icon-orcid
 					| #{translate("register_using_service", {service:"ORCID"})}
 
 		.col-xs-12.col-md-3(style="padding: 0;")
