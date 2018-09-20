@@ -37,7 +37,7 @@ module.exports = CollabratecManager =
 		}, (err, response, body) ->
 			logger.log { err, body },  "CollabratecManager setV1UserCollabratecId Response"
 			return callback err if err?
-			callback null, body, response.headers["set-cookie"]
+			callback null, body
 
 	oauthRedirectUrl: (oauth_params) ->
 		return url.format
