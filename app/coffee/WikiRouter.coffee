@@ -34,6 +34,12 @@ module.exports =
 			webRouter.get /^\/learn\/(Kb|how-to)\/Knowledge_Base\/?$/i,(req, res) -> 
 				res.redirect '/learn/how-to'
 
+			# Pages moved on MW:
+			# When page was moved on the MW, with a redirect on the MW
+			# the redirect will be `/learn/Kb%2F`, 
+			webRouter.get /^\/learn\/(Kb%2F.*)(\/.*)?$/i, (req, res) ->
+				res.redirect req.url.replace('/Kb%2F', '/how-to/')
+
 			# Knowledge Base redirect
 			# redirect `/learn/kb` to `/learn/how-to`
 			# these are still under kb on the wiki,
