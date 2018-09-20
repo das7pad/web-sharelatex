@@ -5,11 +5,12 @@ ContentfulClient = require '../ContentfulClient'
 ErrorController = require '../../../../../app/js/Features/Errors/ErrorController'
 CmsHandler = require '../CmsHandler'
 ContentParser = require '../ContentParser'
+Settings = require 'settings-sharelatex'
 
 module.exports =
 
 	getContactPage: (req, res, next)->
-		if req.query.cms || process.env.CONTENT_PAGES
+		if req.query.cms || Settings.showContentPages
 			# clientType determines which API to use.
 			# client is for published data
 			# clientPreview is for unpublished data
