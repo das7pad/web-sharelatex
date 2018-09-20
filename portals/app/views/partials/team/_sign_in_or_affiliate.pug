@@ -1,11 +1,12 @@
 if !user
 	include _not_signed_in
-//- to do: layouts below
-//- else if in_team
-//- 	include _already_joined
-//- else if @affiliation_status == :confirmed || @affiliation_status == :not_required
-//- 	include _join
-//- else if @affiliation_status == :pending
-//- 	include _pending_confirmation
-//- else
-//- 	include _not_affiliated
+else if affiliation == 'confirmed'
+	include _already_joined
+else if affiliation == 'pending'
+	include _pending_confirmation
+else if !university.id && !team.v2_id
+	p.text-centered Please contact the team owner at #{portal.title} to move the team to v2
+else if affiliation_error == true
+	p.text-centered There was a problem checking your affiliation. Please try again later.
+else
+	include _not_affiliated

@@ -1,6 +1,7 @@
 .row
 	.col-sm-12.text-center
-		h3 Join a community of over __ authors at #{portal.title}
+		h3 Join&nbsp;
+			+community_count(team.current_count, portal.title)
 
 include ../team/_sign_in_or_affiliate
 
@@ -16,5 +17,6 @@ include ./_pro_benefits
 .row
 	.col-sm-12
 		.content-item
-			//- to do: count below
-			p Add your #{portal.title} email to your free account today to join a community of over __ users at #{portal.title}.
+			p Add your #{portal.title} email to your free account today to join&nbsp;
+				+community_count(team.current_count, portal.title)
+				| .
