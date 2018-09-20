@@ -25,16 +25,29 @@ form.form-inline(async-form="register", name="registerForm", action="/register",
 					aria-label='password',
 					ng-model="password"
 				)
-
 			br
-			.form-group
-				label.checkbox-inline
+			.form-group.hp-register-newsletter-checkbox
+				label.checkbox-inline.checkbox-newsletter
 					input(type='checkbox', 
 						id="newslettercheckbox",
 						name="subscribeToNewsletter",
 						ng-model="subscribeToNewsletter",
 						value="true")
-					| I’d like emails about product offers and company news and events.
+					| #{translate("newsletter-accept")}
+			.hp-register-external-separator
+				span.hp-register-external-separator-or #{translate("login_register_or")}
+			.form-group
+				a.btn.btn-default.login-btn-google-alt.hp-login-btn(
+					href="/auth/google?intent=sign_up"
+				) 
+					i.login-btn-icon.login-btn-icon-google-alt
+					| #{translate("register_using_service", {service:"Google"})}
+			.form-group
+				a.btn.btn-default.login-btn-orcid-alt.hp-login-btn(
+					href="/auth/orcid?intent=sign_up"
+				) 
+					i.login-btn-icon.login-btn-icon-orcid-alt
+					| #{translate("register_using_service", {service:"ORCID"})}
 
 		.col-xs-12.col-md-3(style="padding: 0;")
 			button.btn-primary.btn.btn-lg.btn-hero(
