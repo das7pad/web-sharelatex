@@ -21,8 +21,9 @@ settings = require 'settings-sharelatex'
 module.exports =
 	apply: (webRouter, privateApiRouter, publicApiRouter) ->
 		removeRoute(webRouter, 'get', '/login')
+		removeRoute(webRouter, 'post', '/login')
 		webRouter.get '/login', V1LoginController.loginPage
-		webRouter.post '/login/v1', V1LoginController.doLogin
+		webRouter.post '/login', V1LoginController.doLogin
 		webRouter.get '/welcome/sl', OverleafAuthenticationController.welcomeScreen
 
 		webRouter.get '/login/finish', V1LoginController.loginProfile
@@ -31,7 +32,7 @@ module.exports =
 		webRouter.get '/logout', OverleafAuthenticationController.logout
 
 		webRouter.get '/register', V1LoginController.registrationPage
-		webRouter.post '/register/v1', V1LoginController.doRegistration
+		webRouter.post '/register', V1LoginController.doRegistration
 
 		webRouter.get(
 			'/overleaf/auth_from_v1',

@@ -6,7 +6,7 @@ block content
 			.card.login-register-card(ng-cloak)
 				.login-register-header
 					h1.login-register-header-heading #{translate("login_to_overleaf")}
-				form.login-register-form(async-form="login", name="loginForm", action='/login/v1', method="POST", ng-cloak)
+				form.login-register-form(async-form="login", name="loginForm", action='/login', method="POST", ng-cloak)
 					input(name='_csrf', type='hidden', value=csrfToken)
 					form-messages(for="loginForm")
 					.form-group

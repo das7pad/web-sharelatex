@@ -20,7 +20,7 @@ block content
 						h3.registration-message-heading #{translate("register_to_edit_template", {templateName:newTemplateData.templateName})}
 						div.registration-message-details #{translate("already_have_sl_account")}
 							a(href="/login")  #{translate("login_here")}
-				form.login-register-form(async-form="register", name="registerForm", action="/register/v1", method="POST", captcha, ng-cloak)
+				form.login-register-form(async-form="register", name="registerForm", action="/register", method="POST", captcha, ng-cloak)
 					input(name='_csrf', type='hidden', value=csrfToken)
 					form-messages(for="registerForm")
 					.form-group
@@ -69,6 +69,16 @@ block content
 						) 
 							i.login-btn-icon.login-btn-icon-orcid
 							| #{translate("register_using_service", {service:"ORCID"})}
+					.login-register-newsletter
+						.checkbox
+							input(
+								type="checkbox"
+								id="newslettercheckbox"
+								name="subscribeToNewsletter"
+								ng-model="subscribeToNewsletter"
+								value="true"
+							)
+							label(for="newslettercheckbox") #{translate("newsletter-accept")}
 
 	script(type='text/javascript').
 		window.passwordStrengthOptions = !{JSON.stringify(settings.passwordStrengthOptions || {})}
