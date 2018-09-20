@@ -39,6 +39,7 @@ describe "OverleafAuthenticationController", ->
 			send: sinon.stub()
 			render: sinon.stub()
 		@res.status.returns(@res)
+		@next = sinon.stub()
 
 	describe "logout", ->
 		beforeEach ->
@@ -190,12 +191,12 @@ describe "OverleafAuthenticationController", ->
 			beforeEach ->
 				@token = "invalid-token"
 				@jwt.verify = sinon.stub()
-				@jwt.verify.withArgs(@token, @settings.accountMerge.secret).yields({ error: 'invalid token' })
+				@jwt.verify.withArgs(@token, @settings.accountMerge.secret).yields('error')
 				@req.query = token: @token
 				@OverleafAuthenticationController.showCheckAccountsPage(@req, @res, @next)
 
-			it "should return a 400 invalid token error", ->
-				@res.status.calledWith(400).should.equal true
+			it "should call next with error", ->
+				@next.calledWith('error').should.equal true
 
 		describe "for email found in database", () ->
 			beforeEach ->
@@ -215,8 +216,8 @@ describe "OverleafAuthenticationController", ->
 					.calledWith(@token, @settings.accountMerge.secret)
 					.should.equal true
 
-			it "should redirect to /overleaf/login", () ->
-				@res.redirect.calledWith('/overleaf/login').should.equal true
+			it "should redirect to /login/profile", () ->
+				@res.redirect.calledWith('/login/profile').should.equal true
 
 		describe "for email not found in database", () ->
 			beforeEach ->

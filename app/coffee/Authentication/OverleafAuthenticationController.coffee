@@ -21,8 +21,8 @@ module.exports = OverleafAuthenticationController =
 
 	sendSharelatexAccountMergeEmail: (req, res, next) ->
 		sharelatexEmail = req.body.sharelatexEmail
-		v1Id = req.session?.__tmp?.accountMergeV1Id
-		final_email = req.session?.__tmp?.accountMergeEmail
+		v1Id = req.session?.login_profile?.id
+		final_email = req.session?.login_profile?.email
 		if !v1Id? or !final_email?
 			logger.log {}, "No v1Id/email in session, cannot send account-merge email to sharelatex address"
 			return res.status(400).send()
@@ -71,28 +71,30 @@ module.exports = OverleafAuthenticationController =
 		res.render Path.resolve(__dirname, "../../views/welcome"), req.query
 
 	showCheckAccountsPage: (req, res, next) ->
+		OverleafAuthenticationController._loadLoginProfile req, res, (err, profile) ->
+			return next(err) if err?
+			return res.redirect('/overleaf/login') unless profile
+			UserGetter.getUserByMainEmail profile.email, {_id: 1}, (err, user) ->
+				return next(err) if err?
+				return res.redirect('/login/profile') if user
+				res.render Path.resolve(__dirname, "../../views/check_accounts"), {
+					email: req.session.login_profile.email
+				}
+
+	_loadLoginProfile: (req, res, callback) ->
+		return callback(null, req.session.login_profile) if req.session.login_profile?
 		{token} = req.query
 		if !token?
-			return res.redirect('/overleaf/login')
-
-		jwt.verify token, Settings.accountMerge.secret, (error, data) ->
-			if error?
-				logger.err err: error, "bad token in checking accounts"
-				return res.status(400).send("invalid token")
-
-			email = data.email
-			v1Id = data.id
-			UserGetter.getUserByMainEmail email, {_id: 1}, (err, user) ->
-				return callback(err) if err?
-				if user?
-					return res.redirect('/overleaf/login')
-				else
-					req.session.__tmp ||= {}
-					req.session.__tmp.accountMergeV1Id = v1Id
-					req.session.__tmp.accountMergeEmail = email
-					res.render Path.resolve(__dirname, "../../views/check_accounts"), {
-						email
-					}
+			return callback()
+		jwt.verify token, Settings.accountMerge.secret, (err, data) ->
+			if err?
+				logger.err { err }, "bad token in checking accounts"
+				return callback(err)
+			req.session.login_profile = {
+				email: data.email
+				id: data.id
+			}
+			callback(null, req.session.login_profile)
 
 	logout: (req, res, next) ->
 		UserController._doLogout req, (err) ->

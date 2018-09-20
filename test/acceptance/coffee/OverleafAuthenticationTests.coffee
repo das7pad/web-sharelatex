@@ -54,18 +54,26 @@ describe "OverleafAuthentication", ->
 				}, (error, response, body) =>
 					return done(error) if error?
 					expect(response.statusCode).to.equal 200
-					db.users.findOne { 'overleaf.id': @user.v1Id }, (error, user) =>
+					expect(body).to.deep.equal { redir: '/overleaf/auth_from_v1' }
+
+					@user.request.get {
+						url: '/login/profile'
+					}, (error, response, body) =>
 						return done(error) if error?
-						expect(user.email).to.equal @user.email
-						expect(user.loginCount).to.equal 1
-						expect(user.lastLoggedIn).to.be.above(new Date(Date.now() - 2000))
-						done()
+						expect(response.statusCode).to.equal 302
+
+						db.users.findOne { 'overleaf.id': @user.v1Id }, (error, user) =>
+							return done(error) if error?
+							expect(user.email).to.equal @user.email
+							expect(user.loginCount).to.equal 1
+							expect(user.lastLoggedIn).to.be.above(new Date(Date.now() - 2000))
+							done()
 
 		describe 'with an email that exists in SL', ->
 			beforeEach (done) ->
 				@user.ensureUserExists done
 
-			it 'should redirect to SL', (done) ->
+			it 'should complete merge', (done) ->
 				@user.request.post {
 					url: '/login/v1',
 					json:
@@ -74,35 +82,27 @@ describe "OverleafAuthentication", ->
 				}, (error, response, body) =>
 					return done(error) if error?
 					expect(response.statusCode).to.equal 200
-					redir = Url.parse(body.redir, parseQueryString:true)
-					expect(redir.pathname).to.equal '/user/confirm_account_merge'
-					expect(redir.host).to.equal 'www.sharelatex.dev:3000'
-					expect(redir.query.token).to.exist
-					done()
 
-			it 'complete merge', (done) ->
-				@user.request.post {
-					url: '/login/v1',
-					json:
-						email: @user.email
-						password: 'banana'
-				}, (error, response, body) =>
-					return done(error) if error?
-					expect(response.statusCode).to.equal 200
-					token = jwt.sign(
-						{ user_id: @user.id, overleaf_email: @user.email, merge_confirmed: true },
-						settings.accountMerge.secret,
-						{ expiresIn: '1h' }
-					)
 					@user.request.get {
-						url: '/overleaf/confirmed_account_merge'
-						qs:
-							token: token
+						url: '/login/profile'
 					}, (error, response, body) =>
 						return done(error) if error?
 						expect(response.statusCode).to.equal 302
-						expect(response.headers.location).to.equal '/project'
-						done()
+
+						token = jwt.sign(
+							{ user_id: @user.id, overleaf_email: @user.email, merge_confirmed: true },
+							settings.accountMerge.secret,
+							{ expiresIn: '1h' }
+						)
+						@user.request.get {
+							url: '/overleaf/confirmed_account_merge'
+							qs:
+								token: token
+						}, (error, response, body) =>
+							return done(error) if error?
+							expect(response.statusCode).to.equal 302
+							expect(response.headers.location).to.equal '/project'
+							done()
 
 		describe 'with an incorrect email and password', ->
 			it 'should log the user in', (done) ->
