@@ -1,0 +1,250 @@
+extends ../../layout
+
+
+block _headLinks
+	link(rel='canonical', href='https://www.sharelatex.com')
+
+
+block content
+	.deprecated-sl-masthead
+		.container
+			.row
+				.col-md-12
+					h1 ShareLaTeX is now part of Overleaf
+			.row
+				.col-md-12
+					.screenshot
+						.img
+
+	.deprecated-sl-login-buttons
+		.container
+			.row
+				.col-md-12.text-center
+					a.btn.btn-primary(href="/login") Login to Overleaf v2 with ShareLaTeX
+
+			.row
+				.col-md-12.text-center
+					p.deprecated-sl-msg
+						| Good news! Overleaf and ShareLaTeX have joined forces to bring you
+						| Overleaf v2, which combines the best of both services. Coming from
+						| ShareLaTeX, Overleaf v2 will be very familiar, because it's built
+						| around the ShareLaTeX editor.
+
+	.deprecated-sl-long-cta.content-alt
+		.container
+			.row
+				.col-md-6
+					.card
+						h3 For Current ShareLaTeX Users
+						p
+							| #[strong If you already have an Overleaf account], please make
+							| sure the email addresses you use to sign in are the same on
+							| both services. We'll then automatically merge your accounts so
+							| you can access all your Overleaf and ShareLaTeX projects
+							| through Overleaf v2.
+						p
+							| #[strong If you don't already have an Overleaf account], we'll
+							| automatically transfer all your projects from ShareLaTeX to
+							| Overleaf v2. The transfer will only take a few seconds. The
+							| Overleaf v2 LaTeX compiler is the same, so your projects will
+							| all work exactly as they did before.
+						p
+							| #[strong If you have a paid subscription, group license or institutional site license],
+							| it will continue to work in Overleaf v2 automatically.
+				.col-md-6
+					.card
+						h3 For New Users
+						p
+							| #[strong If you are looking for a great open source online LaTeX editor],
+							| head over to #[a(href="https://www.overleaf.com") Overleaf].
+							| Overleaf is now based on the ShareLaTeX editor, and it
+							| supports all the same features and more.
+						p
+							| #[strong If you have an invitation to collaborate on a ShareLaTeX project],
+							| please #[a(href="https://www.overleaf.com/signup") sign up for Overleaf first].
+							| Your invitation will work in Overleaf, too.
+
+	.pattern-container
+		.container
+			.long-form-features
+				.row
+					script(type="text/javascript").
+						var frames = [{
+							before: "",
+							time: 1000
+						}, {
+							before: "i",
+							time: 100
+						}, {
+							before: "in",
+							time: 200
+						}, {
+							before: "in ",
+							time: 300
+						}, {
+							before: "in r",
+							time: 100
+						}, {
+							before: "in re",
+							time: 200
+						}, {
+							before: "in rea",
+							time: 100
+						}, {
+							before: "in real",
+							time: 200
+						}, {
+							before: "in real ",
+							time: 400
+						}, {
+							before: "in real t",
+							time: 200
+						}, {
+							before: "in real ti",
+							time: 100
+						}, {
+							before: "in real tim",
+							time: 200
+						}, {
+							before: "in real time",
+							time: 2000
+						}];
+						var index = 0;
+						function nextFrame() {
+							var frame = frames[index];
+							index = index + 1;
+							if (index >= frames.length) {
+								index = 0;
+							}
+							$(".real-time-example").html(frame.before + "<div class='cursor'>|</div>");
+							setTimeout(nextFrame, frame.time);
+						}
+						nextFrame();
+						
+					.col-md-6
+						.card.row-spaced
+							.row
+								.col-md-3.col-xs-2.text-center
+									i.fa.fa-group.fa-4x
+								.col-md-9.col-xs-10
+									h2.h1 #{translate("collaboration")}
+									p #{translate("work_on_single_version")} 
+									p #{translate("view_collab_edits")} 
+										span.real-time-example
+										
+					.col-md-6
+						.card.row-spaced
+							.row
+								.col-md-3.col-md-push-9.col-xs-2.text-center
+									i.fa.fa-thumbs-up.fa-4x
+								.col-md-9.col-md-pull-3.col-xs-10
+									h2.h1 #{translate("ease_of_use")}
+									p #{translate("no_complicated_latex_install")}
+									p !{translate("all_packages_and_templates", {templatesLink:"<a href='templates'>" + translate("templates") + "</a>"})}
+
+				.row
+					.col-md-6
+						.card.row-spaced
+							.row
+								.col-md-3.col-xs-2.text-center
+									i.fa.fa-history.fa-4x
+								.col-md-9.col-xs-10
+									h2.h1 #{translate("document_history")}
+									p.track-changes-example #{translate("see_what_has_been")}
+										span.added #{translate("added")}
+										|  #{translate("and")} 
+										span.removed #{translate("removed")}
+									p #{translate("restore_to_any_older_version")}
+
+					.col-md-6
+						.card.row-spaced
+							.row
+								.col-md-3.col-md-push-9.col-xs-2.text-center
+									i.fa.fa-globe.fa-4x
+								.col-md-9.col-md-pull-3.col-xs-10
+									h2.h1 #{translate("work_from_anywhere")}
+									p #{translate("acces_work_from_anywhere")}
+									p #{translate("work_offline_and_sync_with_dropbox")}
+
+				.row-spaced
+
+	.content.content-alt
+		.container
+			.card
+				.page-header
+					h2 #{translate("ease_of_use")}
+				
+				.row.row-spaced
+					.col-md-12
+						.col-md-4.pull-right
+							.alert.alert-info 
+								p !{translate("over_x_templates_easy_getting_started", {templates: translate("templates"), over: translate("over")})}
+
+								p.text-center
+									a(href="/templates").btn.btn-info #{translate("view_templates")}
+							p &nbsp;
+						p !{translate("nothing_to_install_ready_to_go", {start_now:"<strong>" + translate("start_using_latex_now") + "</strong>"})}
+
+						p #{translate("get_same_latex_setup")}
+						p !{translate("support_lots_of_features", {help_guides_link:"<a href='/learn'>" + translate("latex_guides") + "</a>"})}.
+					.col-md-6
+					
+			.card.row-spaced
+				.page-header
+					h2 #{translate("collaboration")}
+				
+				.row.row-spaced
+					.col-md-12
+						blockquote 
+							p Waiting for changes to be emailed back before carrying on wastes a huge amount of time. 
+								strong The ability to track changes and the real-time collaborative nature is what sets ShareLaTeX apart.
+							footer Professor Erdogmus, Northeastern University.
+							
+				.row
+					.col-md-8
+						p
+							| #{translate("single_version_easy_collab_blurb")}
+						p
+							| #{translate("can_see_collabs_type_blurb")}
+					.col-md-4
+						.real-time-example-code
+							span.highlight \begin
+							| {document}
+							br
+							br
+							| #{translate("work_directly_with_collabs")} 
+							span.real-time-example
+							br
+							br
+							span.highlight \end
+							| {document}
+							
+				h3 #{translate("work_with_word_users")}
+				.row
+					.col-md-12
+						p #{translate("work_with_word_users_blurb")}
+				
+			.card.row-spaced
+				.page-header
+					h2 #{translate("document_history")}
+				
+				.row.row-spaced
+					.col-md-4
+						.real-time-example-code.track-changes-example
+							span.highlight \begin
+							| {document}
+							br
+							br
+							| #{translate("view_which_changes")} 
+							span.added #{translate("added")}
+							|  #{translate("and")} 
+							span.removed #{translate("removed")}
+							| .
+							br
+							br
+							span.highlight \end
+							| {document}
+					.col-md-8
+						p #{translate("sl_included_history_of_changes_blurb")}
+						p #{translate("can_revert_back_blurb")}
+
