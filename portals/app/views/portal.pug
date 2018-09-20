@@ -11,7 +11,7 @@ block content
 	- var defaultPortalBannerImage = 'https://www.overleaf.com/assets/universities/campus-default-6ff0eb1eb94de6defcbabd3d4d0d67d5a576908df214727a7367a8b0c806d05c.jpg'
 	- var backgroundImage = portal.banner_image_url ? portal.banner_image_url : defaultPortalBannerImage
 
-	.content.content-alt.content-portal
+	.content.content-alt.content-portal.content-page
 		main(ng-cloak, id="university-content-container" class=print ? 'print' : '')
 			div.banner-image.hidden-print(style=`background-image:url(${backgroundImage})`)
 			if portal.logo_url

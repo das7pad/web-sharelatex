@@ -4,7 +4,7 @@ extends  ../layout
 
 block content_cms
 	.row
-		.col-xs-12
+		.col-xs-12.col-sm-8.col-sm-offset-2
 			.page-header
 				h1 #{title}
 				div !{about}
@@ -12,7 +12,7 @@ block content_cms
 	for list in teamLists
 		if list.fields
 			.row
-				.col-sm-12
+				.col-xs-12.col-sm-8.col-sm-offset-2
 					h2 #{list.fields.header}
 					ul.team
 						if list.fields.team
