@@ -87,12 +87,13 @@ module.exports = AccountMergeController =
 			ol_token = jwt.sign(
 				{ user_id: current_user_id, merge_confirmed: true },
 				Settings.accountMerge.secret,
-				{ expiresIn: '1h' }
+				{ expiresIn: '3h' }
 			)
 			return res.json {
 				redir: Settings.accountMerge.betaHost + "/overleaf/confirmed_account_merge?token=#{ol_token}"
 			}
 
 	_badToken: (res, error) ->
-		logger.err err: error, "bad token in confirming account"
+		logger.err { err: error, expiredAt: error.expiredAt, now: new Date().toISOString() },
+			"bad token in confirming account"
 		res.status(400).send("invalid token")

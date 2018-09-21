@@ -136,7 +136,7 @@ describe "AccountMergeController", ->
 					.calledWith(
 						{ merge_confirmed: true, user_id: @logged_in_user_id }
 						@settings.accountMerge.secret
-						{ expiresIn: "1h" }
+						{ expiresIn: "3h" }
 					)
 					.should.equal true
 
