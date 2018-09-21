@@ -131,7 +131,7 @@ module.exports = OverleafAuthenticationController =
 		token = jwt.sign(
 			{ user_id, overleaf_email: profile.email, confirm_merge: true },
 			Settings.accountMerge.secret,
-			{ expiresIn: '1h' }
+			{ expiresIn: '3h' }
 		)
 		url = Settings.accountMerge.sharelatexHost + Url.format({
 			pathname: "/user/confirm_account_merge",

@@ -47,7 +47,7 @@ describe "V1RedirectController", ->
 				signArgs = @jwt.sign.lastCall.args
 				signArgs.length.should.equal 3
 				signArgs[1].should.equal @settings.accountMerge.secret
-				signArgs[2].expiresIn.should.equal '1m'
+				signArgs[2].expiresIn.should.equal '15m'
 
 			it 'sign corrent payload', ->
 				signArgs = @jwt.sign.lastCall.args

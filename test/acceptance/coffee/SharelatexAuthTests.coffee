@@ -14,7 +14,7 @@ describe "SharelatexAuth", ->
 				@token = jwt.sign(
 					{ user_id: @user.id, login: true },
 					settings.accountMerge.secret,
-					{ expiresIn: '1m' }
+					{ expiresIn: '15m' }
 				)
 				@user.request.get "/overleaf/auth_from_sl", {
 					qs:
@@ -65,7 +65,7 @@ describe "SharelatexAuth", ->
 				@token = jwt.sign(
 					{ user_id: @user.id }, # missing login parameter
 					settings.accountMerge.secret,
-					{ expiresIn: '1m' }
+					{ expiresIn: '15m' }
 				)
 				@user.request.get "/overleaf/auth_from_sl", {
 					qs:
