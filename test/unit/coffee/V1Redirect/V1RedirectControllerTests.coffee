@@ -27,7 +27,7 @@ describe "V1RedirectController", ->
 		@next = sinon.stub()
 
 	describe "sign_in_and_redirect", ->
-		describe "successfully", ->
+		describe "with signed in v1 user", ->
 			beforeEach ->
 				@V1RedirectController.sign_in_and_redirect(@req, @res, @next)
 
@@ -57,16 +57,33 @@ describe "V1RedirectController", ->
 				payload.intent.should.equal 'sign_in_from_v2'
 				payload.unsafe_return_to.should.equal '/return/path?query=true'
 
-		describe "with error", ->
-			it 'require authentication', (done) ->
-				@AuthenticationController.getLoggedInUserId.returns(null)
-				@V1RedirectController.sign_in_and_redirect @req, @res, (error) =>
-					should.exist error
-					sinon.assert.notCalled(@res.redirect)
-					done()
+		describe "with signed in non-v1 user", ->
+			beforeEach ->
+				@UserGetter.getUser.yields(null, { _id: '456def' })
+				@V1RedirectController.sign_in_and_redirect(@req, @res, @next)
 
-			it 'require overleaf id', (done) ->
-				@UserGetter.getUser.yields(null, { _id: @user._id })
+			it 'redirect', ->
+				sinon.assert.calledOnce(@res.redirect)
+				@res.redirect.lastCall.args.length.should.equal 1
+				redirectUrl = @res.redirect.lastCall.args[0]
+				redirectUrl.should.be.a 'string'
+				redirectUrl.should.equal "#{@settings.overleaf.host}/return/path?query=true"
+
+		describe "without signed in user", ->
+			beforeEach ->
+				@AuthenticationController.getLoggedInUserId.returns(null)
+				@V1RedirectController.sign_in_and_redirect(@req, @res, @next)
+
+			it 'redirect', ->
+				sinon.assert.calledOnce(@res.redirect)
+				@res.redirect.lastCall.args.length.should.equal 1
+				redirectUrl = @res.redirect.lastCall.args[0]
+				redirectUrl.should.be.a 'string'
+				redirectUrl.should.equal "#{@settings.overleaf.host}/return/path?query=true"
+
+		describe "with error", ->
+			it 'handle UserGetter error', (done) ->
+				@UserGetter.getUser.yields(new Error('Oups'))
 				@V1RedirectController.sign_in_and_redirect @req, @res, (error) =>
 					should.exist error
 					sinon.assert.notCalled(@res.redirect)
