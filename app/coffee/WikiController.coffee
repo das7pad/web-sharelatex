@@ -122,14 +122,14 @@ module.exports = WikiController =
 
 
 	_renderPage: (page, contents, preview, res)->
-		if !settings.overleaf && 'Draft' in page.categories and !preview
+		if !settings.overleaf and page.categories?.length > 0 and 'Draft' in page.categories and !preview
 			# pages with category draft were imported from v1 and should not be shown on sl
 			# still allowing these pages to be previewed with ?preview in URL though
 			return ErrorController.notFound(null, res)
-		if 'Hide' in page.categories and !preview
+		if page.categories?.length > 0 and 'Hide' in page.categories and !preview
 			return ErrorController.notFound(null, res)
-		if page.redirects?.length > 0 && page.redirects[0].to != 'Kb/Knowledge Base'
-			return res.redirect "/learn/#{encodeURIComponent(page.redirects[0].to)}"
+		if page.redirects?.length > 0 and page.redirects[0].to != 'Kb/Knowledge Base'
+			return res.redirect "/learn/#{encodeURI(page.redirects[0].to)}"
 		if page.revid == 0
 			return ErrorController.notFound(null, res)
 		
