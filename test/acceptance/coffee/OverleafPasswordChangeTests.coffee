@@ -13,7 +13,7 @@ describe "OverleafPasswordChange", ->
 	describe 'changing password', ->
 		beforeEach (done) ->
 			@user = new User()
-			MockOverleafApi.addV1User(@user)
+			MockOverleafApi.addV1User(@user, @user.password)
 			@user.login (error) =>
 				done(error) if error?
 				@user.setOverleafId(@user.v1Id, done)

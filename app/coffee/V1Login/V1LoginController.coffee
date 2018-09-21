@@ -109,11 +109,13 @@ module.exports = V1Login =
 			return next(err) if err?
 			v1Id = user?.overleaf?.id
 			email = user?.email
-			currentPassword = req.body.currentPassword
+			current_password = req.body.currentPassword
 			password = req.body.newPassword1
 
 			if (v1Id? && email? && password?)
-				V1LoginHandler.doPasswordChange {email, v1Id, password}, (err, isValid) =>
+				V1LoginHandler.doPasswordChange {
+						email, v1Id, password, current_password,
+					}, (err, isValid) =>
 					return next(err) if err?
 					if !isValid
 						logger.log {v1Id, email},  "failed password change via v1"

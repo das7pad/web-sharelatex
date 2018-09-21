@@ -78,6 +78,7 @@ module.exports = V1LoginHandler =
 			json: {
 				user_id: options.v1Id,
 				email: options.email,
+				current_password: options.current_password,
 				password: options.password
 			}
 			expectedStatusCodes: [403]

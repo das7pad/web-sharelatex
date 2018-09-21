@@ -106,11 +106,16 @@ module.exports = MockOverleafApi =
 			}
 
 		app.post "/api/v1/sharelatex/change_password", (req, res, next) =>
+			invalid = {
+				user: req.body.user_id,
+				valid: false,
+			}
+			for user in @users
+				if user.profile.id == req.body.user_id &&
+						user.password != req.body.current_password
+					return res.status(403).json invalid
 			if req.body.password.length < 6
-				return res.status(403).json {
-					user: req.body.user_id,
-					valid: false,
-				}
+				return res.status(403).json invalid
 			return res.json {
 				valid: true,
 			}
