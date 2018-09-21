@@ -7,24 +7,26 @@ include ./elements/_page_content
 
 block content_cms
 	.row
-		.col-xs-12
+		.col-xs-12.col-sm-10.col-sm-offset-1
 			.page-header
 				h1 #{title}
 
 	if content
-		for c, cIndex in content
-			//- tabGroupTitle is a required field on CMS but can be opted out of display on site
-			//- must check c.fields, because an entry could have been created without adding any fields
-			if c.fields && c.fields.tabGroupTitle
-				if c.fields.displayTabGroupTitle
-					h2 #{c.fields.tabGroupTitle}
+		.row
+			.col-xs-12.col-sm-10.col-sm-offset-1.content-container
+				for c, cIndex in content
+					//- tabGroupTitle is a required field on CMS but can be opted out of display on site
+					//- must check c.fields, because an entry could have been created without adding any fields
+					if c.fields && c.fields.tabGroupTitle
+						if c.fields.displayTabGroupTitle
+							h2 #{c.fields.tabGroupTitle}
 
-				tabset.ol-tabs
-					for tab, tabIndex in c.fields.tabs
-						if tab.fields
-							tab(heading=tab.fields.tabTitle)
-								for tabContent, tabContentIndex in tab.fields.tabContent || []
-									+page_content(tabContent, tab.fields.tabContent[tabContentIndex+1])
+						tabset.ol-tabs
+							for tab, tabIndex in c.fields.tabs
+								if tab.fields
+									tab(heading=tab.fields.tabTitle)
+										for tabContent, tabContentIndex in tab.fields.tabContent || []
+											+page_content(tabContent, tab.fields.tabContent[tabContentIndex+1])
 
-			else
-				+page_content(c, content[cIndex+1])
+					else
+						+page_content(c, content[cIndex+1])

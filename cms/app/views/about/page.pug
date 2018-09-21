@@ -4,7 +4,7 @@ extends  ../layout
 
 block content_cms
 	.row
-		.col-xs-12
+		.col-xs-12.col-sm-8.col-sm-offset-2
 			.page-header
 				h1 #{title}
 				div !{about}
@@ -12,7 +12,7 @@ block content_cms
 	for list in teamLists
 		if list.fields
 			.row
-				.col-sm-12
+				.col-xs-12.col-sm-8.col-sm-offset-2
 					h2 #{list.fields.header}
 					ul.team
 						if list.fields.team
@@ -27,19 +27,21 @@ block content_cms
 												h4 #{member.fields.title}
 											if member.fields.about
 												span #{member.fields.about}
-											ul.team-connect
-												if (member.fields.twitterHandle)
-													li
-														a(href="https://twitter.com/"+member.fields.twitterHandle target="_BLANK" rel="nofollow" aria-label="Twitter")
-															i(class="fa fa-twitter" aria-hidden="true")
-															.sr-only Opens in new window
-												if (member.fields.linkedInUrl)
-													li
-														a(href=member.fields.linkedInUrl target="_BLANK" rel="nofollow" aria-label="LinkedIn")
-															i(class="fa fa-linkedin" aria-hidden="true")
-															.sr-only Opens in new window
-												if (member.fields.email)
-													li
-														a(href="mailto:"+member.fields.email aria-label="Email")
-															i(class="fa fa-envelope" aria-hidden="true")
-															.sr-only Email opens mail client
+											if typeof(member.fields.displayLinks) == "undefined" || member.fields.displayLinks == true
+												//- default is to show the links, but can opt out per person
+												ul.team-connect
+													if (member.fields.twitterHandle)
+														li
+															a(href="https://twitter.com/"+member.fields.twitterHandle target="_BLANK" rel="nofollow" aria-label="Twitter")
+																i(class="fa fa-twitter" aria-hidden="true")
+																.sr-only Opens in new window
+													if (member.fields.linkedInUrl)
+														li
+															a(href=member.fields.linkedInUrl target="_BLANK" rel="nofollow" aria-label="LinkedIn")
+																i(class="fa fa-linkedin" aria-hidden="true")
+																.sr-only Opens in new window
+													if (member.fields.email)
+														li
+															a(href="mailto:"+member.fields.email aria-label="Email")
+																i(class="fa fa-envelope" aria-hidden="true")
+																.sr-only Email opens mail client
