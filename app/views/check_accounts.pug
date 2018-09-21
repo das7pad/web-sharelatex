@@ -123,4 +123,7 @@ block content
 											| only take a few seconds.
 
 										p.text-center
-											a.btn.btn-lg.btn-primary(href="/overleaf/auth_from_v1") Get Started with Overleaf v2
+											if login_profile
+												a.btn.btn-lg.btn-primary(href="/login/finish") Get Started with Overleaf v2
+											else
+												a.btn.btn-lg.btn-primary(href="/overleaf/login") Get Started with Overleaf v2

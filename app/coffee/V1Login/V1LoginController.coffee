@@ -9,7 +9,7 @@ CollabratecController = require "../Collabratec/CollabratecController"
 Url = require 'url'
 jwt = require('jsonwebtoken')
 Settings = require 'settings-sharelatex'
-
+UserGetter = require('../../../../../app/js/Features/User/UserGetter')
 
 module.exports = V1LoginController =
 
@@ -89,10 +89,30 @@ module.exports = V1LoginController =
 			else
 				V1LoginController._login(profile, req, res, next)
 
+	loginProfile: (req, res, next) ->
+		profile = req.session.login_profile
+		return next(new Error "missing profile") unless profile
+		delete req.session.login_profile
+		V1LoginController._setupUser profile, req, res, next
+
 	_login: (profile, req, res, next) ->
 		logger.log { email: profile.email, v1UserId: profile.id }, "v1 credentials valid"
+		UserGetter.getUser {'overleaf.id': profile.id}, { _id: 1 }, (err, user) ->
+			return next(err) if err?
+			# if v1 user is already associated with v2 account login
+			if user
+				V1LoginController._setupUser profile, req, res, next
+			# otherwise redirect to merge flow
+			else
+				req.session.login_profile = profile
+				if req.headers?['accept']?.match(/^application\/json.*$/)
+					res.json { redir: "/overleaf/auth_from_v1" }
+				else
+					res.redirect "/overleaf/auth_from_v1"
+
+	_setupUser: (profile, req, res, next) ->
 		OverleafAuthenticationManager.setupUser profile, (err, user, info) ->
-			return callback(err) if err?
+			return next(err) if err?
 			if info?.email_exists_in_sl
 				logger.log { email: profile.email, info }, "account exists in SL, redirecting to sharelatex to merge accounts"
 				redir = OverleafAuthenticationController.prepareAccountMerge(info, req)
@@ -104,5 +124,5 @@ module.exports = V1LoginController =
 				# All good, login and proceed
 				logger.log { email: profile.email }, "successful login with v1, proceeding with session setup"
 				CollabratecController._completeOauthLink req, user, (err) ->
-					return callback err if err?
+					return next err if err?
 					AuthenticationController.finishLogin user, req, res, next

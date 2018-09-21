@@ -17,9 +17,6 @@ passport = require "passport"
 logger = require "logger-sharelatex"
 qs = require 'querystring'
 settings = require 'settings-sharelatex'
-OrcidStrategy = require('passport-orcid').Strategy
-GoogleStrategy = require('passport-google-oauth20').Strategy
-TwitterStrategy = require('passport-twitter').Strategy
 
 module.exports =
 	apply: (webRouter, privateApiRouter, publicApiRouter) ->
@@ -27,6 +24,8 @@ module.exports =
 		webRouter.get '/login', OverleafAuthenticationController.welcomeScreen
 		webRouter.get '/login/v1', V1LoginController.loginPage
 		webRouter.post '/login/v1', V1LoginController.doLogin
+
+		webRouter.get '/login/finish', V1LoginController.loginProfile
 
 		removeRoute(webRouter, 'get', '/logout')
 		webRouter.get '/logout', OverleafAuthenticationController.logout
@@ -158,22 +157,6 @@ module.exports =
 
 			orcid = settings.sso.orcid
 			if orcid?.client_id?
-				callback_url = settings.siteUrl + orcid.callback_path
-				passport.use(
-					new OrcidStrategy(
-						{
-							clientID: orcid.client_id,
-							clientSecret: orcid.client_secret,
-							callbackURL: callback_url
-						},
-						(accessToken, refreshToken, params, profile, callback) ->
-							callback(null, {
-								auth_provider: 'orcid'
-								auth_provider_uid: params.orcid
-								name: params.name
-							})
-					)
-				)
 				webRouter.get '/auth/orcid', SSOController.authInit, passport.authenticate('orcid')
 				webRouter.get(
 					orcid.callback_path,
@@ -183,25 +166,6 @@ module.exports =
 
 			google = settings.sso.google
 			if google?.client_id?
-				callback_url = settings.siteUrl + google.callback_path
-				passport.use(
-					new GoogleStrategy(
-						{
-							clientID: google.client_id,
-							clientSecret: google.client_secret,
-							callbackURL: callback_url
-						},
-						(accessToken, refreshToken, profile, callback) ->
-							if profile.name?.givenName? && profile.name?.familyName?
-								name = profile.name.givenName + ' ' + profile.name.familyName
-							callback(null, {
-								auth_provider: 'google'
-								auth_provider_uid: profile.id
-								email: profile.emails?[0]?.value
-								name: name
-							})
-					)
-				)
 				webRouter.get(
 					'/auth/google',
 					SSOController.authInit,
@@ -215,22 +179,6 @@ module.exports =
 
 			twitter = settings.sso.twitter
 			if twitter?.client_id?
-				callback_url = settings.siteUrl + twitter.callback_path
-				passport.use(
-					new TwitterStrategy(
-						{
-							consumerKey: twitter.client_id,
-							consumerSecret: twitter.client_secret,
-							callbackURL: callback_url
-						},
-						(token, tokenSecret, profile, callback) ->
-							callback(null, {
-								auth_provider: 'twitter'
-								auth_provider_uid: profile.id
-								name: profile.name
-							})
-					)
-				)
 				webRouter.get(
 					'/auth/twitter',
 					SSOController.authInit,

@@ -21,8 +21,8 @@ module.exports = OverleafAuthenticationController =
 
 	sendSharelatexAccountMergeEmail: (req, res, next) ->
 		sharelatexEmail = req.body.sharelatexEmail
-		v1Id = req.session?.__tmp?.accountMergeV1Id
-		final_email = req.session?.__tmp?.accountMergeEmail
+		v1Id = req.session?.merge_account?.id
+		final_email = req.session?.merge_account?.email
 		if !v1Id? or !final_email?
 			logger.log {}, "No v1Id/email in session, cannot send account-merge email to sharelatex address"
 			return res.status(400).send()
@@ -71,27 +71,32 @@ module.exports = OverleafAuthenticationController =
 		res.render Path.resolve(__dirname, "../../views/welcome"), req.query
 
 	showCheckAccountsPage: (req, res, next) ->
-		{token} = req.query
-		if !token?
-			return res.redirect('/overleaf/login')
+		if req.session.login_profile?
+			{ email, id } = req.session.login_profile
+			req.session.merge_account = { email, id }
+			res.render Path.resolve(__dirname, "../../views/check_accounts"), {
+				email: email
+				login_profile: true
+			}
+		else
+			{token} = req.query
+			if !token?
+				return res.redirect('/overleaf/login')
 
-		jwt.verify token, Settings.accountMerge.secret, (error, data) ->
-			if error?
-				logger.err err: error, "bad token in checking accounts"
-				return res.status(400).send("invalid token")
+			jwt.verify token, Settings.accountMerge.secret, (err, data) ->
+				if err?
+					logger.err { err }, "bad token in checking accounts"
+					return next(err)
 
-			email = data.email
-			v1Id = data.id
-			UserGetter.getUserByMainEmail email, {_id: 1}, (err, user) ->
-				return callback(err) if err?
-				if user?
-					return res.redirect('/overleaf/login')
-				else
-					req.session.__tmp ||= {}
-					req.session.__tmp.accountMergeV1Id = v1Id
-					req.session.__tmp.accountMergeEmail = email
+				UserGetter.getUserByMainEmail data.email, {_id: 1}, (err, user) ->
+					return next(err) if err?
+					return res.redirect('/overleaf/login') if user
+					req.session.merge_account = {
+						id: data.id
+						email: data.email
+					}
 					res.render Path.resolve(__dirname, "../../views/check_accounts"), {
-						email
+						email: data.email
 					}
 
 	logout: (req, res, next) ->
