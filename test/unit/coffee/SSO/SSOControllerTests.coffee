@@ -101,7 +101,7 @@ describe "SSOController", ->
 				@SSOController.postRegisterSSOEmail @req, @res, @next
 
 			it "should redirect to register", ->
-				expect(@res.json).to.have.been.calledWith { redir: "/register/v1?sso_error=try_again" }
+				expect(@res.json).to.have.been.calledWith { redir: "/register?sso_error=try_again" }
 
 		describe "when user does not have email", ->
 			beforeEach ->

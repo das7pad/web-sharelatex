@@ -34,7 +34,7 @@ module.exports = SSOController =
 
 	postRegisterSSOEmail: (req, res, next) ->
 		sso_user = _.cloneDeep(req.session.sso_user)
-		return res.json { redir: "/register/v1?sso_error=try_again" } unless sso_user?
+		return res.json { redir: "/register?sso_error=try_again" } unless sso_user?
 		return SSOController._renderError req, res, "email_required" unless req.body.email?
 		sso_user.email = req.body.email
 		SSOController._signUp(sso_user, req, res, next)
@@ -59,4 +59,4 @@ module.exports = SSOController =
 				text: req.i18n.translate(error),
 			}
 		else
-			res.redirect "/register/v1?sso_error=#{error}"
+			res.redirect "/register?sso_error=#{error}"
