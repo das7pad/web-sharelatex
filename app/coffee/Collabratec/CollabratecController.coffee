@@ -57,7 +57,7 @@ module.exports = CollabratecController =
 			v1_user_id = user.overleaf.id
 			CollabratecManager.setV1UserCollabratecId v1_user_id, saml_user.MemberNumber, (err, profile) ->
 				if err
-					if err.message == "collabratec_id already set"
+					if err.statusCode == 400
 						template_path = Path.resolve __dirname, "../../views/oauth_account_already_linked"
 						res.render template_path
 					else
