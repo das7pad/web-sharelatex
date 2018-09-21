@@ -75,7 +75,11 @@ module.exports = V1LoginHandler =
 		request {
 			method: 'POST'
 			url: "#{Settings.overleaf.host}/api/v1/sharelatex/change_password"
-			json: options
+			json: {
+				user_id: options.v1Id,
+				email: options.email,
+				password: options.password
+			}
 			expectedStatusCodes: [403]
 		}, (err, response, body) ->
 			if err?

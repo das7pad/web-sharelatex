@@ -2,28 +2,29 @@ expect = require("chai").expect
 Async = require("async")
 settings = require "settings-sharelatex"
 Url = require 'url'
-WEB_PATH = '../../../../..'
-request = require "#{WEB_PATH}/test/acceptance/js/helpers/request"
-User = require "#{WEB_PATH}/test/acceptance/js/helpers/User"
-MockOverleafApi = require "./helpers/MockOverleafApi"
-{db, ObjectId} = require "#{WEB_PATH}/app/js/infrastructure/mongojs"
 jwt = require('jsonwebtoken')
 logger = require('logger-sharelatex')
+MockOverleafApi = require "./helpers/MockOverleafApi"
+
+WEB_PATH = '../../../../..'
+User = require "#{WEB_PATH}/test/acceptance/js/helpers/User"
 
 describe "OverleafPasswordChange", ->
 	describe 'changing password', ->
 		beforeEach (done) ->
 			@user = new User()
-			@user['overleaf'] = { id: 1 }
-			@user.login done
+			MockOverleafApi.addV1User(@user)
+			@user.login (error) =>
+				done(error) if error?
+				@user.setOverleafId(@user.v1Id, done)
 
 		it 'should redirect to Overleaf', (done) ->
 			@user.request.post {
 				url: '/user/change_password/v1',
 				json:
-					email: @user.email
-					v1Id: @user.overleaf.id
-					password: 'theNewPassw0rd'
+					currentPassword: @user.password,
+					newPassword1: 'theNewPassw0rd',
+					newPassword2: 'theNewPassw0rd',
 			}, (error, response, body) =>
 				expect(error).to.be.null
 				expect(response.statusCode).to.equal 200
@@ -34,9 +35,9 @@ describe "OverleafPasswordChange", ->
 			@user.request.post {
 				url: '/user/change_password/v1',
 				json:
-					email: @user.email
-					v1Id: @user.overleaf.id
-					password: 'short'
+					currentPassword: @user.password,
+					newPassword1: 'short',
+					newPassword2: 'short',
 			}, (error, response, body) =>
 				expect(error).to.be.null
 				expect(response.statusCode).to.equal 200

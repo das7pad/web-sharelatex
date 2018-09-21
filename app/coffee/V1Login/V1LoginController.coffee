@@ -1,8 +1,10 @@
 Path = require 'path'
 V1LoginHandler = require './V1LoginHandler'
 logger = require 'logger-sharelatex'
-AuthenticationController = require "../../../../../app/js/Features/Authentication/AuthenticationController"
-UserRegistrationHandler = require "../../../../../app/js/Features/User/UserRegistrationHandler"
+WEB = "../../../../.."
+AuthenticationController = require "#{WEB}/app/js/Features/Authentication/AuthenticationController"
+UserGetter = require "#{WEB}/app/js/Features/User/UserGetter"
+UserRegistrationHandler = require "#{WEB}/app/js/Features/User/UserRegistrationHandler"
 OverleafAuthenticationManager = require "../Authentication/OverleafAuthenticationManager"
 OverleafAuthenticationController = require "../Authentication/OverleafAuthenticationController"
 CollabratecController = require "../Collabratec/CollabratecController"
@@ -102,15 +104,29 @@ module.exports = V1Login =
 							AuthenticationController.finishLogin user, req, res, next
 
 	doPasswordChange: (req, res, next) ->
-		email = req.body.email
-		v1Id = req.body.v1Id
-		password = req.body.password
-
-		V1LoginHandler.doPasswordChange {email, v1Id, password}, (err, isValid) ->
+		lightUser = AuthenticationController.getSessionUser(req)
+		UserGetter.getUser lightUser._id, (err, user) ->
 			return next(err) if err?
-			if !isValid
-				logger.log {email},  "failed password change via v1"
-				return res.json message: {type: 'error', text: req.i18n.translate('password_change_failed_attempt')}
+			v1Id = user?.overleaf?.id
+			email = user?.email
+			currentPassword = req.body.currentPassword
+			password = req.body.newPassword1
+
+			if (v1Id? && email? && password?)
+				V1LoginHandler.doPasswordChange {email, v1Id, password}, (err, isValid) =>
+					return next(err) if err?
+					if !isValid
+						logger.log {v1Id, email},  "failed password change via v1"
+						return res.json message: {
+							type: 'error',
+							text: req.i18n.translate('password_change_failed_attempt')
+						}
+					else
+						logger.log {v1Id, email}, "v1 password updated"
+						return res.json message: {
+							type: 'success',
+							email,
+							text: req.i18n.translate('password_change_successful')
+						}
 			else
-				logger.log {email}, "v1 password updated"
-				return res.json message: {type: 'success', email}
+				return res.json message: {type: 'error', text: req.i18n.translate('internal_error')}
