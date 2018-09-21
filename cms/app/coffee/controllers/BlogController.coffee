@@ -89,7 +89,7 @@ getAndRenderBlog = (req, res, next, blogQuery, page) ->
 			next(err)
 
 _getBlog = (req, res, next) ->
-		if req.query.cms || process.env.CONTENT_PAGES
+		if req.query.cms || Settings.showContentPages
 			# Select operator limits fields returned. It has some restrictions,
 			# such as it can only select properties to a depth of 2.
 			# Not a problem now, but if we link more then we'll need to remove operator
@@ -152,7 +152,7 @@ module.exports =
 		_getBlog(req, res, next)
 
 	getBlogPost: (req, res, next)->
-		if req.query.cms || process.env.CONTENT_PAGES
+		if req.query.cms || Settings.useContentPages
 			if req.params.slug == 'page' || req.params.slug == 'tagged'
 				# for if someone went to /blog/page/ or /blog/tagged/
 				# without a page number or tag param

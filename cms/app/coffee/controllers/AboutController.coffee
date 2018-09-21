@@ -11,7 +11,7 @@ sanitizeOptions = if Settings?.modules?.sanitize?.options? then Settings.modules
 module.exports =
 
 	getPage: (req, res, next)->
-		if req.query.cms || process.env.CONTENT_PAGES
+		if req.query.cms || Settings.showContentPages
 			# clientType determines which API to use.
 			# client is for published data
 			# clientPreview is for unpublished data

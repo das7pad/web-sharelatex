@@ -54,7 +54,7 @@ _portalLayoutData = (req, data) ->
 	data
 
 _getPortal = (req, res, next, portalType) ->
-	if req.query.prtl || process.env.CONTENT_PAGES
+	if req.query.prtl || Settings.showContentPages
 		if req.params.slug && req.params.slug != 'undefined'
 			v1PortalPath = "/#{portalType}/#{req.params.slug}"
 			portalLayout = path.resolve(__dirname, '../views/portal')
