@@ -1,20 +1,21 @@
 include ../../../../app/views/_scripts/active_tab
 
-tabset.ol-tabs
-	tab(heading='Overview' id="overview")
-		.row
-			.col-sm-10.col-sm-offset-1
-				include partials/paid/_overview
-	tab(heading='Quick Start' id="quick-start")
-		.row
-			.col-sm-10.col-sm-offset-1
-				include partials/paid/_quick_start
-	tab(heading='Templates' id="templates")
-		.row
-			.col-sm-10.col-sm-offset-1
-				//- to do: active if in team
-				include partials/paid/_templates
-	tab(heading='FAQ & Help' id="help")
-		.row
-			.col-sm-10.col-sm-offset-1
-				include partials/paid/_help
+div(ng-controller="CmsController")
+	tabset.ol-tabs
+		tab(heading='Overview' id="overview")
+			.row
+				.col-sm-10.col-sm-offset-1
+					include partials/paid/_overview
+		tab(heading='Quick Start' id="quick-start")
+			.row
+				.col-sm-10.col-sm-offset-1
+					include partials/paid/_quick_start
+		tab(heading='Templates' id="templates")
+			.row
+				.col-sm-10.col-sm-offset-1
+					//- to do: active if in team
+					include partials/paid/_templates
+		tab(heading='FAQ & Help' id="help")
+			.row
+				.col-sm-10.col-sm-offset-1
+					include partials/paid/_help
