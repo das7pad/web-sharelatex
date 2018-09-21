@@ -85,7 +85,7 @@ describe "LogInToV2Controller", ->
 				.calledWith(
 					{ user_id: @user_id, login: true },
 					@settings.accountMerge.secret,
-					{ expiresIn: '1m' }
+					{ expiresIn: '15m' }
 				)
 				.should.equal true
 

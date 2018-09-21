@@ -68,7 +68,7 @@ module.exports = LogInToV2Controller =
 		ol_token = jwt.sign(
 			{ user_id: current_user_id, login: true },
 			Settings.accountMerge.secret,
-			{ expiresIn: '1m' }
+			{ expiresIn: '15m' }
 		)
 
 		AnalyticsManager.recordEvent(current_user_id, 'logs_into_v2', {v2_onboard: true})

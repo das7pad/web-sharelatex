@@ -87,7 +87,7 @@ module.exports = AccountMergeController =
 			ol_token = jwt.sign(
 				{ user_id: current_user_id, merge_confirmed: true },
 				Settings.accountMerge.secret,
-				{ expiresIn: '1h' }
+				{ expiresIn: '3h' }
 			)
 			return res.json {
 				redir: Settings.accountMerge.betaHost + "/overleaf/confirmed_account_merge?token=#{ol_token}"
