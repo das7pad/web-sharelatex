@@ -94,5 +94,6 @@ module.exports = AccountMergeController =
 			}
 
 	_badToken: (res, error) ->
-		logger.err err: error, "bad token in confirming account"
+		logger.err { err: error, expiredAt: error.expiredAt, now: new Date().toISOString() },
+			"bad token in confirming account"
 		res.status(400).send("invalid token")
