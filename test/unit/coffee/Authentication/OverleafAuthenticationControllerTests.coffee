@@ -77,7 +77,7 @@ describe "OverleafAuthenticationController", ->
 					.calledWith(
 						{ @user_id, overleaf_email: @profile.email, confirm_merge: true },
 						@settings.accountMerge.secret,
-						{ expiresIn: '1h' }
+						{ expiresIn: '3h' }
 					)
 					.should.equal true
 

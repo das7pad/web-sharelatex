@@ -69,5 +69,6 @@ module.exports = SharelatexAuthController =
 					callback(null)
 
 	_badToken: (res, error) ->
-		logger.err err: error, "bad token in logging in from sharelatex"
+		logger.err { err: error, expiredAt: error.expiredAt, now: new Date().toISOString() },
+			"bad token in logging in from sharelatex"
 		res.status(400).send("invalid token")

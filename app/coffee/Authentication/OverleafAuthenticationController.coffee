@@ -131,7 +131,7 @@ module.exports = OverleafAuthenticationController =
 		token = jwt.sign(
 			{ user_id, overleaf_email: profile.email, confirm_merge: true },
 			Settings.accountMerge.secret,
-			{ expiresIn: '1h' }
+			{ expiresIn: '3h' }
 		)
 		url = Settings.accountMerge.sharelatexHost + Url.format({
 			pathname: "/user/confirm_account_merge",
@@ -169,5 +169,6 @@ module.exports = OverleafAuthenticationController =
 					AuthenticationController.finishLogin(user, req, res, next)
 
 	_badToken: (res, error) ->
-		logger.err err: error, "bad token in confirming account"
+		logger.err { err: error, expiredAt: error.expiredAt, now: new Date().toISOString() },
+			"bad token in confirming account"
 		res.status(400).send("invalid token")

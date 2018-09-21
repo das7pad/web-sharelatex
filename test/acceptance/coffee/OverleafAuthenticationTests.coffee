@@ -92,7 +92,7 @@ describe "OverleafAuthentication", ->
 						token = jwt.sign(
 							{ user_id: @user.id, overleaf_email: @user.email, merge_confirmed: true },
 							settings.accountMerge.secret,
-							{ expiresIn: '1h' }
+							{ expiresIn: '3h' }
 						)
 						@user.request.get {
 							url: '/overleaf/confirmed_account_merge'

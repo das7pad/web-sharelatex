@@ -21,7 +21,7 @@ _getRedirectUrl = (userId, returnTo, callback = (error, redirectUrl)->) ->
 		token = jwt.sign(
 			payload,
 			settings.accountMerge.secret,
-			{ expiresIn: '1m' }
+			{ expiresIn: '15m' }
 		)
 
 		redirectUrl = settings.overleaf.host
