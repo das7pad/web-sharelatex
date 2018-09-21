@@ -8,7 +8,7 @@ Settings = require 'settings-sharelatex'
 module.exports = PageController =
 
 	getPage: (req, res, next)->
-		if req.query.cms || Settings.showContactPages
+		if req.query.cms || Settings.showContentPages
 			# clientType determines which API to use.
 			# client is for published data
 			# clientPreview is for unpublished data
