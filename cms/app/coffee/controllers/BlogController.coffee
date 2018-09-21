@@ -152,7 +152,7 @@ module.exports =
 		_getBlog(req, res, next)
 
 	getBlogPost: (req, res, next)->
-		if req.query.cms || Settings.useContentPages
+		if req.query.cms || Settings.showContentPages
 			if req.params.slug == 'page' || req.params.slug == 'tagged'
 				# for if someone went to /blog/page/ or /blog/tagged/
 				# without a page number or tag param
