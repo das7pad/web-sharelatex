@@ -2,6 +2,15 @@ Path = require "path"
 _ = require "lodash"
 request = require "request"
 settings = require "settings-sharelatex"
+sanitizeHtml = require 'sanitize-html'
+# Strip all tags - used on templates index but not on detail page
+sanitizeOptions = { allowedTags: [], allowedAttributes: [] }
+
+LICENSES = {
+    "cc_by_4.0" : "Creative Commons CC BY 4.0",
+    "lppl_1.3c" : "LaTeX Project Public License 1.3c",
+    "other" : "Other (as stated in the work)",
+  }
 
 content_types =
 	article:
@@ -88,6 +97,7 @@ module.exports = V2TemplatesManager =
 		return unless page["#{docs_property}_docs"]
 		for doc in page["#{docs_property}_docs"]
 			doc.path = V2TemplatesManager._formatDocPath doc
+			doc.description = sanitizeHtml(doc.description, sanitizeOptions)
 		if page["#{docs_property}_docs_pages"]?.total_pages > 1
 			if docs_property == "popular" or docs_property == "recent"
 				page_path = "#{page_path}/#{docs_property}"
@@ -110,6 +120,7 @@ module.exports = V2TemplatesManager =
 		page.find_more =
 			href: content_type.path
 			text: "Find More #{content_type.page_title}"
+		page.pub.license = LICENSES[page.pub.license]
 		if page.pub_tags
 			for idx, tag of page.pub_tags
 				tag.path = "/gallery/tagged/#{tag.name}"

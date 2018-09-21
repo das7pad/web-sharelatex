@@ -2,7 +2,8 @@ mixin pagination(pages)
 	ul.pagination
 		each page in pages
 			if page.active
-				li.active #{page.text}
+				li
+					span.active #{page.text}
 			else
 				li
 					if page.rel
