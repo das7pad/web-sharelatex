@@ -25,7 +25,7 @@ module.exports =
 		webRouter.get '/login/v1', V1LoginController.loginPage
 		webRouter.post '/login/v1', V1LoginController.doLogin
 
-		webRouter.get '/login/profile', V1LoginController.loginProfile
+		webRouter.get '/login/finish', V1LoginController.loginProfile
 
 		removeRoute(webRouter, 'get', '/logout')
 		webRouter.get '/logout', OverleafAuthenticationController.logout

@@ -216,8 +216,8 @@ describe "OverleafAuthenticationController", ->
 					.calledWith(@token, @settings.accountMerge.secret)
 					.should.equal true
 
-			it "should redirect to /login/profile", () ->
-				@res.redirect.calledWith('/login/profile').should.equal true
+			it "should redirect to /overleaf/login", () ->
+				@res.redirect.calledWith('/overleaf/login').should.equal true
 
 		describe "for email not found in database", () ->
 			beforeEach ->

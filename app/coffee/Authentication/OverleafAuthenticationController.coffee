@@ -21,8 +21,8 @@ module.exports = OverleafAuthenticationController =
 
 	sendSharelatexAccountMergeEmail: (req, res, next) ->
 		sharelatexEmail = req.body.sharelatexEmail
-		v1Id = req.session?.login_profile?.id
-		final_email = req.session?.login_profile?.email
+		v1Id = req.session?.merge_account?.id
+		final_email = req.session?.merge_account?.email
 		if !v1Id? or !final_email?
 			logger.log {}, "No v1Id/email in session, cannot send account-merge email to sharelatex address"
 			return res.status(400).send()
@@ -71,30 +71,33 @@ module.exports = OverleafAuthenticationController =
 		res.render Path.resolve(__dirname, "../../views/welcome"), req.query
 
 	showCheckAccountsPage: (req, res, next) ->
-		OverleafAuthenticationController._loadLoginProfile req, res, (err, profile) ->
-			return next(err) if err?
-			return res.redirect('/overleaf/login') unless profile
-			UserGetter.getUserByMainEmail profile.email, {_id: 1}, (err, user) ->
-				return next(err) if err?
-				return res.redirect('/login/profile') if user
-				res.render Path.resolve(__dirname, "../../views/check_accounts"), {
-					email: req.session.login_profile.email
-				}
-
-	_loadLoginProfile: (req, res, callback) ->
-		return callback(null, req.session.login_profile) if req.session.login_profile?
-		{token} = req.query
-		if !token?
-			return callback()
-		jwt.verify token, Settings.accountMerge.secret, (err, data) ->
-			if err?
-				logger.err { err }, "bad token in checking accounts"
-				return callback(err)
-			req.session.login_profile = {
-				email: data.email
-				id: data.id
+		if req.session.login_profile?
+			{ email, id } = req.session.login_profile
+			req.session.merge_account = { email, id }
+			res.render Path.resolve(__dirname, "../../views/check_accounts"), {
+				email: email
+				login_profile: true
 			}
-			callback(null, req.session.login_profile)
+		else
+			{token} = req.query
+			if !token?
+				return res.redirect('/overleaf/login')
+
+			jwt.verify token, Settings.accountMerge.secret, (err, data) ->
+				if err?
+					logger.err { err }, "bad token in checking accounts"
+					return next(err)
+
+				UserGetter.getUserByMainEmail data.email, {_id: 1}, (err, user) ->
+					return next(err) if err?
+					return res.redirect('/overleaf/login') if user
+					req.session.merge_account = {
+						id: data.id
+						email: data.email
+					}
+					res.render Path.resolve(__dirname, "../../views/check_accounts"), {
+						email: data.email
+					}
 
 	logout: (req, res, next) ->
 		UserController._doLogout req, (err) ->

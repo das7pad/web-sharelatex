@@ -57,7 +57,7 @@ describe "OverleafAuthentication", ->
 					expect(body).to.deep.equal { redir: '/overleaf/auth_from_v1' }
 
 					@user.request.get {
-						url: '/login/profile'
+						url: '/login/finish'
 					}, (error, response, body) =>
 						return done(error) if error?
 						expect(response.statusCode).to.equal 302
@@ -84,7 +84,7 @@ describe "OverleafAuthentication", ->
 					expect(response.statusCode).to.equal 200
 
 					@user.request.get {
-						url: '/login/profile'
+						url: '/login/finish'
 					}, (error, response, body) =>
 						return done(error) if error?
 						expect(response.statusCode).to.equal 302
