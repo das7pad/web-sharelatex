@@ -47,7 +47,7 @@ describe "OverleafAuthentication", ->
 		describe 'with a correct email and password', ->
 			it 'should log the user in', (done) ->
 				@user.request.post {
-					url: '/login/v1',
+					url: '/login',
 					json:
 						email: @user.email
 						password: 'banana'
@@ -73,16 +73,20 @@ describe "OverleafAuthentication", ->
 			beforeEach (done) ->
 				@user.ensureUserExists done
 
-			it 'should complete merge', (done) ->
+			it 'complete merge', (done) ->
 				@user.request.post {
-					url: '/login/v1',
+					url: '/login',
 					json:
 						email: @user.email
 						password: 'banana'
 				}, (error, response, body) =>
 					return done(error) if error?
 					expect(response.statusCode).to.equal 200
-
+					token = jwt.sign(
+						{ user_id: @user.id, overleaf_email: @user.email, merge_confirmed: true },
+						settings.accountMerge.secret,
+						{ expiresIn: '1h' }
+					)
 					@user.request.get {
 						url: '/login/finish'
 					}, (error, response, body) =>
@@ -107,7 +111,7 @@ describe "OverleafAuthentication", ->
 		describe 'with an incorrect email and password', ->
 			it 'should log the user in', (done) ->
 				@user.request.post {
-					url: '/login/v1',
+					url: '/login',
 					json:
 						email: @user.email
 						password: 'not-the-right-password'
@@ -129,7 +133,7 @@ describe "OverleafAuthentication", ->
 		describe "with an email which doesn't exist in v1", ->
 			it 'should register the user', (done) ->
 				@user.request.post {
-					url: '/register/v1',
+					url: '/register',
 					json:
 						email: @user.email
 						password: 'banana'
@@ -149,7 +153,7 @@ describe "OverleafAuthentication", ->
 
 			it 'should return an error message', (done) ->
 				@user.request.post {
-					url: '/register/v1',
+					url: '/register',
 					json:
 						email: @user.email
 						password: 'banana'
@@ -166,7 +170,7 @@ describe "OverleafAuthentication", ->
 
 			it 'should return an error message', (done) ->
 				@user.request.post {
-					url: '/register/v1',
+					url: '/register',
 					json:
 						email: @user.email
 						password: 'banana'

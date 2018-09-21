@@ -28,6 +28,12 @@ module.exports =
 
 		webRouter.get '/login/finish', V1LoginController.loginProfile
 
+		if settings.enableLegacyLogin
+			UserPagesController = require '../../../../app/js/Features/User/UserPagesController'
+			webRouter.get  '/login/legacy', UserPagesController.loginPage
+			AuthenticationController.addEndpointToLoginWhitelist '/login/legacy'
+			webRouter.post '/login/legacy', AuthenticationController.passportLogin
+
 		removeRoute(webRouter, 'get', '/logout')
 		webRouter.get '/logout', OverleafAuthenticationController.logout
 

@@ -1,4 +1,6 @@
 module.exports =
+	enableLegacyRegistration: true
+	enableLegacyLogin: true
 	apis:
 		v1:
 			host: "http://localhost:5000"
