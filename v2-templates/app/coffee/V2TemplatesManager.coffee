@@ -121,6 +121,7 @@ module.exports = V2TemplatesManager =
 			href: content_type.path
 			text: "Find More #{content_type.page_title}"
 		page.pub.license = LICENSES[page.pub.license]
+		page.pub.pdf_url = settings.apis.v1.url + page.pdf_links.main.pdf
 		if page.pub_tags
 			for idx, tag of page.pub_tags
 				tag.path = "/gallery/tagged/#{tag.name}"

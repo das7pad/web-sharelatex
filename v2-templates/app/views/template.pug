@@ -11,10 +11,12 @@ block content
 							h1.template-title #{pub.title}
 					.row.cta-links
 						.col-md-12
-							if open_in_v2_links
+							if open_in_v2_links && source
 								a(href=open_in_v2_links.main.v2 class="btn btn-success cta-link") Open as Template
 							if source
 								a(href, ng-click="openViewSourceModal()" class="btn btn-success cta-link") View Source
+							if pub.pdf_url
+								a(href=pub.pdf_url class="btn btn-success cta-link") Download PDF
 					.row
 						.col-md-3.field-title Author
 						//- sanitized by api
