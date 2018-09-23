@@ -193,6 +193,9 @@ describe "V2TemplatesManager", ->
 				path: "path"
 				page_title: "page-title"
 			@page_mock =
+				pdf_links:
+					main:
+						pdf: "pdf_link"
 				pub:
 					author: "author"
 					description: "description"
