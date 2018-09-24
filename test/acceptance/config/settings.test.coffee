@@ -1,4 +1,6 @@
 module.exports =
+	enableLegacyRegistration: true
+	enableLegacyLogin: true
 	apis:
 		v1:
 			host: "http://localhost:5000"
@@ -26,5 +28,19 @@ module.exports =
 		secret: "banana"
 
 	siteUrl: 'http://beta.overleaf.dev:4000'
+
+	sso:
+		google:
+			client_id: 'google-client-id'
+			client_secret: 'google-client-secret'
+			callback_path: '/auth/google/callback'
+		orcid:
+			client_id: 'orcid-client-id'
+			client_secret: 'orcid-client-secret'
+			callback_path: '/auth/orcid/callback'
+		twitter:
+			client_id: 'twitter-client-id'
+			client_secret: 'twitter-client-secret'
+			callback_path: '/auth/twitter/callback'
 
 	allowPublicAccess: true

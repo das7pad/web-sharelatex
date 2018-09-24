@@ -12,6 +12,7 @@ UserMapper = require "../OverleafUsers/UserMapper"
 V1SharelatexApi = require "../V1SharelatexApi"
 
 ProjectCreationHandler = require "../../../../../app/js/Features/Project/ProjectCreationHandler"
+ProjectDetailsHandler = require "../../../../../app/js/Features/Project/ProjectDetailsHandler"
 ProjectEntityUpdateHandler = require "../../../../../app/js/Features/Project/ProjectEntityUpdateHandler"
 ProjectDeleter = require "../../../../../app/js/Features/Project/ProjectDeleter"
 {ProjectInvite} = require "../../../../../app/js/models/ProjectInvite"
@@ -124,6 +125,9 @@ module.exports = ProjectImporter =
 			return callback(new UnsupportedExportRecordsError("project has export records"))
 		if doc.title == ""
 			doc.title = "Untitled"
+		if doc.title.indexOf('/') > -1
+			# v2 does not allow / in a project name
+			doc.title = doc.title.replace(/\//g, '-')
 
 		attributes =
 			overleaf:

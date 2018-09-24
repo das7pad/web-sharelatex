@@ -55,15 +55,15 @@ module.exports = CollabratecController =
 			return next err if err?
 			return next new Error "missing overleaf.id" unless user?.overleaf?.id
 			v1_user_id = user.overleaf.id
-			CollabratecManager.setV1UserCollabratecId v1_user_id, saml_user.MemberNumber, (err, profile, cookies) ->
+			CollabratecManager.setV1UserCollabratecId v1_user_id, saml_user.MemberNumber, (err, profile) ->
 				if err
-					if err.message == "collabratec_id already set"
+					if err.statusCode == 400
 						template_path = Path.resolve __dirname, "../../views/oauth_account_already_linked"
 						res.render template_path
 					else
 						next err
 				else
-					CollabratecController._setupUser req, res, next, profile, cookies
+					CollabratecController._setupUser req, res, next, profile
 
 	_oauthConfirmLinkRegister: (req, res, next) ->
 		oauth_params = req.session.collabratec_oauth_params
@@ -72,7 +72,7 @@ module.exports = CollabratecController =
 			collabratec_id: saml_user.MemberNumber
 			email: saml_user.Email
 			name: "#{saml_user.FirstName} #{saml_user.LastName}"
-		V1LoginHandler.registerWithV1 register_options, (err, created, profile, cookies) ->
+		V1LoginHandler.registerWithV1 register_options, (err, created, profile) ->
 			return next err if err?
 			if !created
 				template_data =
@@ -83,7 +83,7 @@ module.exports = CollabratecController =
 				template_path = Path.resolve __dirname, "../../views/oauth_link_after_saml_logged_out"
 				res.render template_path, template_data
 			else
-				CollabratecController._setupUser req, res, next, profile, cookies
+				CollabratecController._setupUser req, res, next, profile
 
 	oauthSignin: (req, res, next) ->
 		CollabratecManager.validateSamlData req.session.collabratec_saml_user, (err) ->
@@ -123,7 +123,7 @@ module.exports = CollabratecController =
 		template_path = Path.resolve __dirname, "../../views/saml_error"
 		res.render template_path, template_data
 
-	_setupUser: (req, res, next, profile, cookies) ->
+	_setupUser: (req, res, next, profile) ->
 		OverleafAuthenticationManager.setupUser profile, (err, user, info) ->
 			return next err if err?
 			if info?.email_exists_in_sl
@@ -131,11 +131,10 @@ module.exports = CollabratecController =
 				url = OverleafAuthenticationController.prepareAccountMerge info, req
 				res.redirect url
 			else
-				CollabratecController._finishLogin req, cookies
+				CollabratecController._finishLogin req
 				AuthenticationController.finishLogin user, req, res, next
 
-	_finishLogin: (req, cookies) ->
-		res.set "Set-Cookie", cookies if cookies?
+	_finishLogin: (req) ->
 		oauth_params = req.session.collabratec_oauth_params
 		if oauth_params
 			redirect_url = CollabratecManager.oauthRedirectUrl oauth_params
@@ -146,7 +145,7 @@ module.exports = CollabratecController =
 		oauth_params = req.session.collabratec_oauth_params
 		return callback null, false unless oauth_params
 		collabratec_user = req.session.collabratec_saml_user
-		CollabratecManager.setV1UserCollabratecId user.overleaf.id, collabratec_user.MemberNumber, (err, profile, cookies) ->
+		CollabratecManager.setV1UserCollabratecId user.overleaf.id, collabratec_user.MemberNumber, (err, profile) ->
 			return callback err if err?
-			CollabratecController._finishLogin req, cookies
+			CollabratecController._finishLogin req
 			callback null, true

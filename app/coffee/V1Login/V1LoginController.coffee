@@ -5,6 +5,7 @@ WEB = "../../../../.."
 AuthenticationController = require "#{WEB}/app/js/Features/Authentication/AuthenticationController"
 UserGetter = require "#{WEB}/app/js/Features/User/UserGetter"
 UserRegistrationHandler = require "#{WEB}/app/js/Features/User/UserRegistrationHandler"
+NewsLetterManager = require("#{WEB}/app/js/Features/Newsletter/NewsletterManager")
 OverleafAuthenticationManager = require "../Authentication/OverleafAuthenticationManager"
 OverleafAuthenticationController = require "../Authentication/OverleafAuthenticationController"
 CollabratecController = require "../Collabratec/CollabratecController"
@@ -12,8 +13,7 @@ Url = require 'url'
 jwt = require('jsonwebtoken')
 Settings = require 'settings-sharelatex'
 
-
-module.exports = V1Login =
+module.exports = V1LoginController =
 
 	registrationPage: (req, res, next) ->
 		sharedProjectData =
@@ -24,13 +24,14 @@ module.exports = V1Login =
 		if req.session.templateData?
 			newTemplateData.templateName = req.session.templateData.templateName
 
-		res.render Path.resolve(__dirname, "../../views/v1_register"),
+		res.render Path.resolve(__dirname, "../../views/register"),
 			title: 'register'
 			sharedProjectData: sharedProjectData
 			newTemplateData: newTemplateData
 			new_email:req.query.new_email || ""
 			title: 'Register',
 			email: req.query.new_email || ""
+			ssoError: req.query.sso_error || null
 
 	doRegistration: (req, res, next) ->
 		requestIsValid = UserRegistrationHandler._registrationRequestIsValid(req.body)
@@ -38,6 +39,7 @@ module.exports = V1Login =
 			return next(new Error('registration request is not valid'))
 		{email, password} = req.body
 		logger.log {email}, "trying to create account via v1"
+		subscribeToNewsletter = req.body.subscribeToNewsletter == 'true'
 		V1LoginHandler.getUserByEmail email, (err, existingUser) ->
 			return next(err) if err?
 			if existingUser? and !existingUser?.overleaf?.id?
@@ -66,6 +68,8 @@ module.exports = V1Login =
 						else
 							# All good, login and proceed
 							logger.log {email}, "successful registration with v1, proceeding with session setup"
+							if subscribeToNewsletter
+								NewsLetterManager.subscribe user, ->
 							AuthenticationController.finishLogin(user, req, res, next)
 
 	loginPage: (req, res, next) ->
@@ -74,34 +78,22 @@ module.exports = V1Login =
 		if req.query.redir? and !AuthenticationController._getRedirectFromSession(req)?
 			logger.log {redir: req.query.redir}, "setting explicit redirect from login page"
 			AuthenticationController._setRedirectInSession(req, req.query.redir)
-		res.render Path.resolve(__dirname, "../../views/v1_login"),
-			title: 'Login with Overleaf v1',
+		res.render Path.resolve(__dirname, "../../views/login"),
+			title: 'Log in to Overleaf',
 			email: req.query.email
 
 	doLogin: (req, res, next) ->
 		email = req.body.email
-		pass = req.body.password
+		password = req.body.password
 
-		V1LoginHandler.authWithV1 email, pass, (err, isValid, profile) ->
+		V1LoginHandler.authWithV1 {email, password}, (err, isValid, profile) ->
 			return next(err) if err?
 			if !isValid
 				logger.log {email},  "failed login via v1"
 				AuthenticationController._recordFailedLogin()
 				return res.json message: {type: 'error', text: req.i18n.translate('email_or_password_wrong_try_again')}
 			else
-				logger.log email: email, v1UserId: profile.id, "v1 credentials valid"
-				OverleafAuthenticationManager.setupUser profile, (err, user, info) ->
-					return callback(err) if err?
-					if info?.email_exists_in_sl
-						logger.log {email, info}, "account exists in SL, redirecting to sharelatex to merge accounts"
-						url = OverleafAuthenticationController.prepareAccountMerge(info, req)
-						res.json {redir: url}
-					else
-						# All good, login and proceed
-						logger.log {email}, "successful login with v1, proceeding with session setup"
-						CollabratecController._completeOauthLink req, user, (err) ->
-							return callback err if err?
-							AuthenticationController.finishLogin user, req, res, next
+				V1LoginController._login(profile, req, res, next)
 
 	doPasswordChange: (req, res, next) ->
 		lightUser = AuthenticationController.getSessionUser(req)
@@ -132,3 +124,41 @@ module.exports = V1Login =
 						}
 			else
 				return res.json message: {type: 'error', text: req.i18n.translate('internal_error')}
+
+	loginProfile: (req, res, next) ->
+		profile = req.session.login_profile
+		return next(new Error "missing profile") unless profile
+		delete req.session.login_profile
+		V1LoginController._setupUser profile, req, res, next
+
+	_login: (profile, req, res, next) ->
+		logger.log { email: profile.email, v1UserId: profile.id }, "v1 credentials valid"
+		UserGetter.getUser {'overleaf.id': profile.id}, { _id: 1 }, (err, user) ->
+			return next(err) if err?
+			# if v1 user is already associated with v2 account login
+			if user
+				V1LoginController._setupUser profile, req, res, next
+			# otherwise redirect to merge flow
+			else
+				req.session.login_profile = profile
+				if req.headers?['accept']?.match(/^application\/json.*$/)
+					res.json { redir: "/overleaf/auth_from_v1" }
+				else
+					res.redirect "/overleaf/auth_from_v1"
+
+	_setupUser: (profile, req, res, next) ->
+		OverleafAuthenticationManager.setupUser profile, (err, user, info) ->
+			return next(err) if err?
+			if info?.email_exists_in_sl
+				logger.log { email: profile.email, info }, "account exists in SL, redirecting to sharelatex to merge accounts"
+				redir = OverleafAuthenticationController.prepareAccountMerge(info, req)
+				if req.headers?['accept']?.match(/^application\/json.*$/)
+					res.json {redir}
+				else
+					res.redirect(redir)
+			else
+				# All good, login and proceed
+				logger.log { email: profile.email }, "successful login with v1, proceeding with session setup"
+				CollabratecController._completeOauthLink req, user, (err) ->
+					return next err if err?
+					AuthenticationController.finishLogin user, req, res, next

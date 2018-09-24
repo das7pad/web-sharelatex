@@ -188,3 +188,19 @@ describe "ProjectImportTests", ->
 			expect(MockProjectHistoryApi.getLabels(@project._id)[2]).to.deep.equal {
 				user_id: @owner._id, version: 3, comment: 'foobar', created_at: @date.toISOString()
 			}
+
+	describe 'a project with name containing a /', ->
+		before (done) ->
+			@ol_project_id = 1
+			MockOverleafApi.setDoc Object.assign({ id: @ol_project_id }, BLANK_PROJECT, { title: "foo/bar/baz" })
+
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+				getProject response, (error, project) =>
+					@project = project
+					done()
+
+		it 'should import a project', ->
+			expect(@project).to.be.an('object')
+			expect(@project.name).to.equal('foo-bar-baz')
