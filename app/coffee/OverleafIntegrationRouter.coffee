@@ -21,17 +21,24 @@ settings = require 'settings-sharelatex'
 module.exports =
 	apply: (webRouter, privateApiRouter, publicApiRouter) ->
 		removeRoute(webRouter, 'get', '/login')
-		webRouter.get '/login', OverleafAuthenticationController.welcomeScreen
-		webRouter.get '/login/v1', V1LoginController.loginPage
-		webRouter.post '/login/v1', V1LoginController.doLogin
+		removeRoute(webRouter, 'post', '/login')
+		webRouter.get '/login', V1LoginController.loginPage
+		webRouter.post '/login', V1LoginController.doLogin
+		webRouter.get '/welcome/sl', OverleafAuthenticationController.welcomeScreen
 
 		webRouter.get '/login/finish', V1LoginController.loginProfile
+
+		if settings.enableLegacyLogin
+			UserPagesController = require '../../../../app/js/Features/User/UserPagesController'
+			webRouter.get  '/login/legacy', UserPagesController.loginPage
+			AuthenticationController.addEndpointToLoginWhitelist '/login/legacy'
+			webRouter.post '/login/legacy', AuthenticationController.passportLogin
 
 		removeRoute(webRouter, 'get', '/logout')
 		webRouter.get '/logout', OverleafAuthenticationController.logout
 
-		webRouter.get '/register/v1', V1LoginController.registrationPage
-		webRouter.post '/register/v1', V1LoginController.doRegistration
+		webRouter.get '/register', V1LoginController.registrationPage
+		webRouter.post '/register', V1LoginController.doRegistration
 
 		webRouter.get(
 			'/overleaf/auth_from_v1',

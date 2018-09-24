@@ -3,6 +3,7 @@ V1LoginHandler = require './V1LoginHandler'
 logger = require 'logger-sharelatex'
 AuthenticationController = require "../../../../../app/js/Features/Authentication/AuthenticationController"
 UserRegistrationHandler = require "../../../../../app/js/Features/User/UserRegistrationHandler"
+NewsLetterManager = require("../../../../../app/js/Features/Newsletter/NewsletterManager")
 OverleafAuthenticationManager = require "../Authentication/OverleafAuthenticationManager"
 OverleafAuthenticationController = require "../Authentication/OverleafAuthenticationController"
 CollabratecController = require "../Collabratec/CollabratecController"
@@ -22,13 +23,14 @@ module.exports = V1LoginController =
 		if req.session.templateData?
 			newTemplateData.templateName = req.session.templateData.templateName
 
-		res.render Path.resolve(__dirname, "../../views/v1_register"),
+		res.render Path.resolve(__dirname, "../../views/register"),
 			title: 'register'
 			sharedProjectData: sharedProjectData
 			newTemplateData: newTemplateData
 			new_email:req.query.new_email || ""
 			title: 'Register',
 			email: req.query.new_email || ""
+			ssoError: req.query.sso_error || null
 
 	doRegistration: (req, res, next) ->
 		requestIsValid = UserRegistrationHandler._registrationRequestIsValid(req.body)
@@ -36,6 +38,7 @@ module.exports = V1LoginController =
 			return next(new Error('registration request is not valid'))
 		{email, password} = req.body
 		logger.log {email}, "trying to create account via v1"
+		subscribeToNewsletter = req.body.subscribeToNewsletter == 'true'
 		V1LoginHandler.getUserByEmail email, (err, existingUser) ->
 			return next(err) if err?
 			if existingUser? and !existingUser?.overleaf?.id?
@@ -64,6 +67,8 @@ module.exports = V1LoginController =
 						else
 							# All good, login and proceed
 							logger.log {email}, "successful registration with v1, proceeding with session setup"
+							if subscribeToNewsletter
+								NewsLetterManager.subscribe user, ->
 							AuthenticationController.finishLogin(user, req, res, next)
 
 	loginPage: (req, res, next) ->
@@ -72,7 +77,7 @@ module.exports = V1LoginController =
 		if req.query.redir? and !AuthenticationController._getRedirectFromSession(req)?
 			logger.log {redir: req.query.redir}, "setting explicit redirect from login page"
 			AuthenticationController._setRedirectInSession(req, req.query.redir)
-		res.render Path.resolve(__dirname, "../../views/v1_login"),
+		res.render Path.resolve(__dirname, "../../views/login"),
 			title: 'Login with Overleaf v1',
 			email: req.query.email
 
