@@ -78,7 +78,7 @@ module.exports = V1LoginController =
 			logger.log {redir: req.query.redir}, "setting explicit redirect from login page"
 			AuthenticationController._setRedirectInSession(req, req.query.redir)
 		res.render Path.resolve(__dirname, "../../views/login"),
-			title: 'Login with Overleaf v1',
+			title: 'Log in to Overleaf',
 			email: req.query.email
 
 	doLogin: (req, res, next) ->
