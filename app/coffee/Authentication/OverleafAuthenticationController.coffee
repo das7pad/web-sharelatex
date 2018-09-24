@@ -103,7 +103,7 @@ module.exports = OverleafAuthenticationController =
 		UserController._doLogout req, (err) ->
 			return next(err) if err?
 			# Redirect to v1 page which signs user out of v1 as well
-			res.redirect Settings.overleaf.host + '/users/ensure_signed_out'
+			res.redirect Settings.v1Api.host + '/users/ensure_signed_out'
 
 	setupUser: (req, res, next) ->
 		# This will call OverleafAuthenticationManager.setupUser
