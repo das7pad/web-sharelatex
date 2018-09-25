@@ -1,5 +1,5 @@
 module.exports =
-	enableLegacyRegistration: true
+	enableLegacyRegistration: false
 	enableLegacyLogin: true
 	apis:
 		v1:
