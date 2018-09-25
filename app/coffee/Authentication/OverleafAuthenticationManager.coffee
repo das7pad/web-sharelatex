@@ -8,7 +8,7 @@ FeaturesUpdater = require("../../../../../app/js/Features/Subscription/FeaturesU
 module.exports = OverleafAuthenticationManager =
 	getUserProfile: (accessToken, callback) ->
 		request.get {
-			url: "#{settings.v1Api.host}/api/v1/sharelatex/users/current_user/profile"
+			url: "#{settings.overleaf.host}/api/v1/sharelatex/users/current_user/profile"
 			json: true
 			headers:
 				Authorization: "Bearer #{accessToken}"
