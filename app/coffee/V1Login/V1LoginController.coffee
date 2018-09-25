@@ -15,6 +15,8 @@ UserGetter = require('../../../../../app/js/Features/User/UserGetter')
 module.exports = V1LoginController =
 
 	registrationPage: (req, res, next) ->
+		if AuthenticationController.isUserLoggedIn(req)
+			return res.redirect('/project')
 		sharedProjectData =
 			project_name:req.query.project_name
 			user_first_name:req.query.user_first_name
@@ -72,6 +74,8 @@ module.exports = V1LoginController =
 							AuthenticationController.finishLogin(user, req, res, next)
 
 	loginPage: (req, res, next) ->
+		if AuthenticationController.isUserLoggedIn(req)
+			return res.redirect('/project')
 		# if user is being sent to /login with explicit redirect (redir=/foo),
 		# such as being sent from the editor to /login, then set the redirect explicitly
 		if req.query.redir? and !AuthenticationController._getRedirectFromSession(req)?
