@@ -11,7 +11,7 @@ module.exports = SharelatexAuthHandler =
 		name = [first_name, last_name].filter((n) -> n?).join(" ")
 		request {
 			method: "POST",
-			url: "#{Settings.overleaf.host}/api/v1/sharelatex/register",
+			url: "#{Settings.v1Api.host}/api/v1/sharelatex/register",
 			json: {email, encrypted_password: hashedPassword, name},
 			expectedStatusCodes: [409]
 		}, (err, response, body) ->
