@@ -16,6 +16,9 @@ describe "OverleafAuthenticationManager", ->
 			"settings-sharelatex":
 				overleaf:
 					host: @host = "http://overleaf.example.com"
+				apis:
+					v1:
+						url: "http://overleaf.example.com"
 			"request": @request = {}
 			"../../../../../app/js/Features/Subscription/FeaturesUpdater":
 				@FeaturesUpdater = {refreshFeatures: sinon.stub()}

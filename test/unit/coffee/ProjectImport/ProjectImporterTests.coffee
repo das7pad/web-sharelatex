@@ -32,6 +32,9 @@ describe "ProjectImporter", ->
 					host: "http://overleaf.example.com"
 					s3:
 						host: "http://s3.example.com"
+				apis:
+					v1:
+						url: "http://overleaf.example.com"
 		@v1_user_id = 'mock-v1-id'
 		@v2_user_id = 'mock-v2-id'
 		@v1_project_id = "mock-v1-doc-id"

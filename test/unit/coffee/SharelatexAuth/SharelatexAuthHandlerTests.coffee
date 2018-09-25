@@ -14,6 +14,9 @@ describe "SharelatexAuthHandler", ->
 			"settings-sharelatex":
 				overleaf:
 					host: "http://overleaf.test:5000"
+				apis:
+					v1:
+						url: "http://overleaf.test:5000"
 		@callback = sinon.stub()
 
 	describe "createBackingAccount", ->

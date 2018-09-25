@@ -12,6 +12,9 @@ describe "ProjectListGetter", ->
 			'settings-sharelatex':
 				overleaf:
 					host: 'http://overleaf.example.com'
+				apis:
+					v1:
+						url: 'http://overleaf.example.com'
 			'logger-sharelatex': { log: sinon.stub() }
 			'../../../../../app/js/Features/Errors/Errors': Errors
 			"../../../../../app/js/Features/User/UserGetter": @UserGetter = {}
