@@ -17,7 +17,7 @@ module.exports = ProjectListGetter =
 
 			V1SharelatexApi.request {
 				method: 'GET'
-				url: "#{settings.overleaf.host}/api/v1/sharelatex/users/#{v1_user_id}/docs"
+				url: "#{settings.v1Api.host}/api/v1/sharelatex/users/#{v1_user_id}/docs"
 				qs:
 					per: NO_PROJECTS_LIMIT
 					exclude_v2_projects: true
