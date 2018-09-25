@@ -102,12 +102,18 @@ module.exports = V1LoginController =
 
 	_login: (profile, req, res, next) ->
 		logger.log { email: profile.email, v1UserId: profile.id }, "v1 credentials valid"
-		UserGetter.getUser {'overleaf.id': profile.id}, { _id: 1 }, (err, user) ->
+		# check if there is any existing account matching either email
+		# or overleaf id - if not redirect to check for existing account
+		query = $or: [
+			{ 'overleaf.id': profile.id },
+			{ email: profile.email }
+		]
+		UserGetter.getUser query, { _id: 1 }, (err, user) ->
 			return next(err) if err?
 			# if v1 user is already associated with v2 account login
 			if user
 				V1LoginController._setupUser profile, req, res, next
-			# otherwise redirect to merge flow
+			# otherwise redirect to check for existing account
 			else
 				req.session.login_profile = profile
 				if req.headers?['accept']?.match(/^application\/json.*$/)

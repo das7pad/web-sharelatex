@@ -82,31 +82,23 @@ describe "OverleafAuthentication", ->
 				}, (error, response, body) =>
 					return done(error) if error?
 					expect(response.statusCode).to.equal 200
+					url = Url.parse(body.redir)
+					expect(url.pathname).to.equal '/user/confirm_account_merge'
+
 					token = jwt.sign(
 						{ user_id: @user.id, overleaf_email: @user.email, merge_confirmed: true },
 						settings.accountMerge.secret,
-						{ expiresIn: '1h' }
+						{ expiresIn: '3h' }
 					)
 					@user.request.get {
-						url: '/login/finish'
+						url: '/overleaf/confirmed_account_merge'
+						qs:
+							token: token
 					}, (error, response, body) =>
 						return done(error) if error?
 						expect(response.statusCode).to.equal 302
-
-						token = jwt.sign(
-							{ user_id: @user.id, overleaf_email: @user.email, merge_confirmed: true },
-							settings.accountMerge.secret,
-							{ expiresIn: '3h' }
-						)
-						@user.request.get {
-							url: '/overleaf/confirmed_account_merge'
-							qs:
-								token: token
-						}, (error, response, body) =>
-							return done(error) if error?
-							expect(response.statusCode).to.equal 302
-							expect(response.headers.location).to.equal '/project'
-							done()
+						expect(response.headers.location).to.equal '/project'
+						done()
 
 		describe 'with an incorrect email and password', ->
 			it 'should log the user in', (done) ->
