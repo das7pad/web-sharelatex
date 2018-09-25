@@ -67,7 +67,16 @@ describe "OverleafAuthentication", ->
 							expect(user.email).to.equal @user.email
 							expect(user.loginCount).to.equal 1
 							expect(user.lastLoggedIn).to.be.above(new Date(Date.now() - 2000))
-							done()
+
+							# should redirect subsequent requests to the register and login pages
+							@user.request.get '/login', (error, response, body) =>
+								expect(response.statusCode).to.equal 302
+								expect(response.headers['location']).to.equal '/project'
+								@user.request.get '/register', (error, response, body) =>
+									expect(response.statusCode).to.equal 302
+									expect(response.headers['location']).to.equal '/project'
+									done()
+
 
 		describe 'with an email that exists in SL', ->
 			beforeEach (done) ->
