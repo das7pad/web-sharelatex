@@ -48,6 +48,6 @@ mixin quote(fields)
 			if fields.picture
 				img(src=fields.picture.fields.file.url class="img-circle pull-left")
 			if fields.person
-				h5 #{fields.person}
+				h5.quote-by #{fields.person}
 			if fields.position
-				.small #{fields.position}
+				.small.quote-by #{fields.position}
