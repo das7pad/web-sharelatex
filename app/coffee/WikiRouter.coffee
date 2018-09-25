@@ -52,7 +52,7 @@ module.exports =
 
 			# redirect `/learn/:page` to `/learn/latex/:page`
 			webRouter.get /^\/learn(?!\/(latex))(\/.*)?$/i, (req, res) ->
-				res.redirect req.path.replace(/^\/learn/i, '/learn/latex')
+				res.redirect req.url.replace(/^\/learn/i, '/learn/latex').replace(/\?$/, '%3F')
 
 			# Check if a `/learn` link exists in header_extras, either under the `Help` menu
 			# or on it's own. If not, add it, either on it's own or in the `Help` menu,
