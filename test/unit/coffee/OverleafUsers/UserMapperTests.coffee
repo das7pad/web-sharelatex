@@ -29,6 +29,8 @@ describe "UserMapper", ->
 				confirmEmail: sinon.stub().yields()
 			"../../../../../app/js/Features/Institutions/InstitutionsAPI": @InstitutionsApi =
 				addAffiliation: sinon.stub().yields()
+			"../../../../../app/js/Features/User/UserEmailsConfirmationHandler": @UserEmailsConfirmationHandler =
+				sendConfirmationEmail: sinon.stub().callsArgWith(2, null)
 		@callback = sinon.stub()
 
 	describe "getSlIdFromOlUser", ->
@@ -100,6 +102,7 @@ describe "UserMapper", ->
 		describe "when a UserStub exists", ->
 			beforeEach ->
 				@UserMapper.getOlUserStub.yields(null, @user_stub = { _id: "user-stub-id" })
+				@UserEmailsConfirmationHandler.sendConfirmationEmail = sinon.stub().callsArgWith(2, null)
 				@UserMapper.createSlUser @ol_user, @callback
 
 			it "should look up the user stub", ->
@@ -133,10 +136,10 @@ describe "UserMapper", ->
 			it "should return the user", ->
 				@callback.calledWith(null, @newSlUser).should.equal true
 
-			it "should confirm main email", ->
-				sinon.assert.calledOnce(@UserUpdater.confirmEmail)
+			it "should send a confirmation email for main email", ->
+				sinon.assert.calledOnce(@UserEmailsConfirmationHandler.sendConfirmationEmail)
 				sinon.assert.calledWith(
-					@UserUpdater.confirmEmail,
+					@UserEmailsConfirmationHandler.sendConfirmationEmail,
 					@newSlUser._id,
 					'jane@example.com'
 				)

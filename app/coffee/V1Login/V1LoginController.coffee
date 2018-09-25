@@ -71,7 +71,6 @@ module.exports = V1LoginController =
 						else
 							# All good, login and proceed
 							logger.log {email}, "successful registration with v1, proceeding with session setup"
-							UserEmailsConfirmationHandler.sendConfirmationEmail user._id, email, 'welcome', () ->
 							if subscribeToNewsletter
 								NewsLetterManager.subscribe user, ->
 							AuthenticationController.finishLogin(user, req, res, next)
