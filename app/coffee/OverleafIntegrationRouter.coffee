@@ -37,6 +37,8 @@ module.exports =
 		removeRoute(webRouter, 'get', '/logout')
 		webRouter.get '/logout', OverleafAuthenticationController.logout
 
+		removeRoute(webRouter, 'get', '/register')
+		removeRoute(webRouter, 'post', '/register')
 		webRouter.get '/register', V1LoginController.registrationPage
 		webRouter.post '/register', V1LoginController.doRegistration
 
@@ -46,7 +48,6 @@ module.exports =
 			OverleafAuthenticationController.showCheckAccountsPage
 		)
 		webRouter.get '/overleaf/login', OverleafAuthenticationController.saveRedir, passport.authenticate("overleaf")
-		webRouter.get '/register', (req, res, next) -> res.redirect("/login?#{qs.stringify(req.query)}")
 
 		webRouter.get(
 			'/login/sharelatex/finish',
