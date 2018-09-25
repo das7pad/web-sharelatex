@@ -25,6 +25,8 @@ describe "V1LoginController", ->
 				@OverleafAuthenticationController = {}
 			"../Collabratec/CollabratecController":
 				@CollabratecController = {} 
+			"../../../../../app/js/Features/User/UserEmailsConfirmationHandler":
+				@UserEmailsConfirmationHandler = {sendConfirmationEmail: sinon.stub()}
 			"logger-sharelatex": { log: sinon.stub(), err: sinon.stub() }
 		@req = {
 			session: @session = {}
