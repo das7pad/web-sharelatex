@@ -9,7 +9,7 @@ module.exports = AccountDeleteHandler =
 		logger.log {v1Id}, "[AccountDeleteHandler] sending request to v1 account-delete api"
 		request {
 			method: 'POST'
-			url: "#{Settings.overleaf.host}/api/v1/sharelatex/user_delete",
+			url: "#{Settings.apis.v1.url}/api/v1/sharelatex/user_delete",
 			json: {user_id: v1Id}
 		}, (err, response, body) ->
 			if err?

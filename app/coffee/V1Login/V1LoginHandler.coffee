@@ -36,7 +36,7 @@ module.exports = V1LoginHandler =
 	getV1UserIdByEmail: (email, callback) ->
 		logger.log {email}, "V1LoginHandler getV1UserIdByEmail"
 		request {
-			url: "#{Settings.overleaf.host}/api/v1/sharelatex/user_emails"
+			url: "#{Settings.apis.v1.url}/api/v1/sharelatex/user_emails"
 			qs: {email}
 		}, (err, response, body) ->
 			logger.log { err, body }, "V1LoginHandler getV1UserIdByEmail Response"
@@ -56,7 +56,7 @@ module.exports = V1LoginHandler =
 			options.name = options.email.match(/^[^@]*/)[0]
 		request {
 			method: 'POST'
-			url: "#{Settings.overleaf.host}/api/v1/sharelatex/register"
+			url: "#{Settings.apis.v1.url}/api/v1/sharelatex/register"
 			json: options
 			expectedStatusCodes: [409]
 		}, (err, response, body) ->

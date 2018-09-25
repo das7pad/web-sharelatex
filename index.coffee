@@ -20,7 +20,7 @@ OverleafIntegration =
 			{clientID, clientSecret} = settings.overleaf.oauth
 			overleafOAuth2Strategy = new OAuth2Strategy({
 					authorizationURL: "#{settings.overleaf.host}/oauth/authorize",
-					tokenURL: "#{settings.overleaf.host}/oauth/token",
+					tokenURL: "#{settings.apis.v1.url}/oauth/token",
 					callbackURL: "#{settings.siteUrl}/overleaf/callback"
 					clientID, clientSecret
 			}, OverleafAuthenticationManager.setupOAuthUser)

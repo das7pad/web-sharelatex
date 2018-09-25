@@ -21,7 +21,7 @@ module.exports = CollabratecManager =
 		request {
 			expectedStatusCodes: [404]
 			qs: { collabratec_id }
-			url: "#{settings.overleaf.host}/api/v1/sharelatex/user_collabratec_id"
+			url: "#{settings.apis.v1.url}/api/v1/sharelatex/user_collabratec_id"
 		}, (err, response, body) ->
 			logger.log { err, body }, "CollabratecManager getV1UserByCollabratecId Response"
 			return callback err if err?
@@ -33,7 +33,7 @@ module.exports = CollabratecManager =
 		request {
 			form: { collabratec_id, user_id }
 			method: "POST"
-			url: "#{settings.overleaf.host}/api/v1/sharelatex/user_collabratec_id"
+			url: "#{settings.apis.v1.url}/api/v1/sharelatex/user_collabratec_id"
 		}, (err, response, body) ->
 			logger.log { err, body },  "CollabratecManager setV1UserCollabratecId Response"
 			return callback err if err?

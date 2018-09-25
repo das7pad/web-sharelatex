@@ -110,7 +110,7 @@ module.exports = ProjectImporter =
 	_startExport: (v1_project_id, v1_user_id, callback = (error, doc) ->) ->
 		V1SharelatexApi.request {
 			method: 'POST'
-			url: "#{settings.overleaf.host}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/start"
+			url: "#{settings.apis.v1.url}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/start"
 		}, (error, res, doc) ->
 			return callback(error) if error?
 			logger.log {v1_project_id, v1_user_id, doc}, "got doc for project from overleaf"
@@ -240,7 +240,7 @@ module.exports = ProjectImporter =
 	_importInviteTags: (v1_project_id, v2_project_id, v1_user_id, v2_user_id, callback = (error) ->) ->
 		V1SharelatexApi.request {
 			method: 'GET'
-			url: "#{settings.overleaf.host}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/tags"
+			url: "#{settings.apis.v1.url}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/tags"
 		}, (error, res, body) ->
 			return callback(error) if error?
 			logger.log {v1_project_id, v1_user_id, body}, "got tags for project from overleaf"
@@ -387,7 +387,7 @@ module.exports = ProjectImporter =
 	_checkV1HistoryExportStatus: (v1_project_id, v1_user_id, requestCount, callback = (error) ->) ->
 		V1SharelatexApi.request {
 			method: 'GET'
-			url: "#{settings.overleaf.host}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/history"
+			url: "#{settings.apis.v1.url}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/history"
 		}, (error, res, status) ->
 			return callback(error) if error?
 
@@ -410,7 +410,7 @@ module.exports = ProjectImporter =
 	_getLabels: (v1_project_id, callback = (error, labels) ->) ->
 		V1SharelatexApi.request {
 			method: 'GET'
-			url: "#{settings.overleaf.host}/api/v1/sharelatex/docs/#{v1_project_id}/labels"
+			url: "#{settings.apis.v1.url}/api/v1/sharelatex/docs/#{v1_project_id}/labels"
 			json: true
 		}, (error, res, data) ->
 			if error?
@@ -423,7 +423,7 @@ module.exports = ProjectImporter =
 	_confirmExport: (v1_project_id, v2_project_id, v1_user_id, callback = (error) ->) ->
 		V1SharelatexApi.request {
 			method: 'POST'
-			url: "#{settings.overleaf.host}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/confirm"
+			url: "#{settings.apis.v1.url}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/confirm"
 			json:
 				doc: { v2_project_id }
 		}, (error, res) ->
@@ -435,7 +435,7 @@ module.exports = ProjectImporter =
 	_cancelExport: (v1_project_id, v1_user_id, callback = (error) ->) ->
 		V1SharelatexApi.request {
 			method: 'POST'
-			url: "#{settings.overleaf.host}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/cancel"
+			url: "#{settings.apis.v1.url}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/cancel"
 		}, (error, res) ->
 			if error?
 				callback(error)
