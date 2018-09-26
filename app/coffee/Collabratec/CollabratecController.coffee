@@ -93,6 +93,7 @@ module.exports = CollabratecController =
 	samlConsume: (req, res, next) ->
 		oauth_params = req.session.collabratec_oauth_params
 		saml_user = req.user
+		# user gets set automatically by passport but we are not logged in yet
 		delete req.session?.passport?.user
 		logger.log { oauth_params, saml_user }, "CollabratecController samlConsume"
 		if oauth_params
