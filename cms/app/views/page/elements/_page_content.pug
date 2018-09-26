@@ -26,9 +26,11 @@ mixin actual_content(content)
 					else if content.type == 'buttonOtherPage'
 						+btn_other_page(content)
 					else if content.type == 'contactForm'
+						| !{content.fields.content}
 						-var affectedProject = content.fields && content.fields.formInputs && content.fields.formInputs.indexOf('Affected Project URL') > -1 ? true : false
 						-var wikiSuggestions = content.fields && content.fields.formInputs && content.fields.formInputs.indexOf('Subject Suggestions from Learn Wiki') > -1 ? true : false
 						+contact-form(affectedProject, wikiSuggestions)
+						| !{content.fields.footer}
 
 mixin page_content(content, nextContent)
 	//- Handles the grid layout for CMS generated pages
