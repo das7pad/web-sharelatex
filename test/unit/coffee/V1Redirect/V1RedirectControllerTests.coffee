@@ -1,4 +1,5 @@
 should = require('chai').should()
+expect = require('chai').expect
 SandboxedModule = require('sandboxed-module')
 Path = require('path')
 modulePath = Path.join __dirname, '../../../../app/js/V1Redirect/V1RedirectController'
@@ -67,7 +68,13 @@ describe "V1RedirectController", ->
 				@res.redirect.lastCall.args.length.should.equal 1
 				redirectUrl = @res.redirect.lastCall.args[0]
 				redirectUrl.should.be.a 'string'
-				redirectUrl.should.equal "#{@settings.overleaf.host}/return/path?query=true"
+
+			it 'sign corrent payload', ->
+				signArgs = @jwt.sign.lastCall.args
+				payload = signArgs[0]
+				Object.keys(payload).length.should.equal 3
+				expect(payload.user_id).to.equal null
+				payload.unsafe_return_to.should.equal '/return/path?query=true'
 
 		describe "without signed in user", ->
 			beforeEach ->
@@ -79,7 +86,13 @@ describe "V1RedirectController", ->
 				@res.redirect.lastCall.args.length.should.equal 1
 				redirectUrl = @res.redirect.lastCall.args[0]
 				redirectUrl.should.be.a 'string'
-				redirectUrl.should.equal "#{@settings.overleaf.host}/return/path?query=true"
+
+			it 'sign corrent payload', ->
+				signArgs = @jwt.sign.lastCall.args
+				payload = signArgs[0]
+				Object.keys(payload).length.should.equal 3
+				expect(payload.user_id).to.equal null
+				payload.unsafe_return_to.should.equal '/return/path?query=true'
 
 		describe "with error", ->
 			it 'handle UserGetter error', (done) ->
