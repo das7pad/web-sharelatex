@@ -47,7 +47,7 @@ module.exports = SSOController =
 			if created
 				delete req.session.sso_user
 				V1LoginController._login(profile, req, res, next)
-			else if profile.email?
+			else if profile?.email?
 				return SSOController._renderError(req, res, "email_already_registered")
 			else
 				return SSOController._renderError(req, res, "registration_error")
