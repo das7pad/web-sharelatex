@@ -79,14 +79,21 @@ define [
 				$scope.error = true
 				console.log "the request failed"
 
-		$scope.$watch "form.subject", (newVal, oldVal) ->
-			if newVal and newVal != oldVal and newVal.length > 3
-				algoliaSearch.searchKB newVal, _handleSearchResults, {
-					hitsPerPage: 3
-					typoTolerance: 'strict'
-				}
-			else
-				$scope.suggestions = [];
+		_deregisterShowSuggestionsWatcher = $scope.$watch "showContactFormSuggestions", (showContactFormSuggestions) ->
+			if showContactFormSuggestions? 
+				if showContactFormSuggestions == true
+					_setupSuggestionsWatcher()
+				_deregisterShowSuggestionsWatcher()
+	
+		_setupSuggestionsWatcher = () ->
+			$scope.$watch "form.subject", (newVal, oldVal) ->
+				if newVal and newVal != oldVal and newVal.length > 3
+					algoliaSearch.searchKB newVal, _handleSearchResults, {
+						hitsPerPage: 3
+						typoTolerance: 'strict'
+					}
+				else
+					$scope.suggestions = [];
 
 		$scope.clickSuggestionLink = (url) ->
 			event_tracking.sendMB "contact-form-suggestions-clicked", { url }
