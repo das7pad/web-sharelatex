@@ -1,4 +1,5 @@
 include ./_mixins
+include ../../../../../support/app/views/contact_form/_form
 
 mixin actual_content(content)
 	//- @param {object}		content		A content block
@@ -24,6 +25,10 @@ mixin actual_content(content)
 						+btn_contact(content)
 					else if content.type == 'buttonOtherPage'
 						+btn_other_page(content)
+					else if content.type == 'contactForm'
+						-var affectedProject = content.fields && content.fields.formInputs && content.fields.formInputs.indexOf('Affected Project URL') > -1 ? true : false
+						-var wikiSuggestions = content.fields && content.fields.formInputs && content.fields.formInputs.indexOf('Subject Suggestions from Learn Wiki') > -1 ? true : false
+						+contact-form(affectedProject, wikiSuggestions)
 
 mixin page_content(content, nextContent)
 	//- Handles the grid layout for CMS generated pages
