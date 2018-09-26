@@ -14,7 +14,7 @@ block content_cms
 					li.card
 						.card-header
 							h2 #{title}
-						if (authorDisplay || publishDateDay)
+						if (authorDisplay || publishDatePretty)
 							small Posted
 								if (authorDisplay)
 									|  by #{authorDisplay}
