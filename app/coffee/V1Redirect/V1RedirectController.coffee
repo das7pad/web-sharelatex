@@ -4,30 +4,28 @@ UserGetter = require "../../../../../app/js/Features/User/UserGetter"
 jwt = require 'jsonwebtoken'
 settings = require 'settings-sharelatex'
 
-_directRedirectUrl = (returnTo) ->
-	"#{settings.overleaf.host}#{returnTo}"
+_getRedirectUrlWithToken = (userId, returnTo) ->
+	payload =
+		user_id: userId, # This key/value pair is dropped if the userId is null
+		intent: 'sign_in_from_v2',
+		unsafe_return_to: returnTo
+	token = jwt.sign(
+		payload,
+		settings.accountMerge.secret,
+		{ expiresIn: '15m' }
+	)
+
+	redirectUrl = settings.overleaf.host
+	redirectUrl += '/users/sign_in_from_v2'
+	redirectUrl += "?token=#{token}"
 
 _getRedirectUrl = (userId, returnTo, callback = (error, redirectUrl)->) ->
-	return callback(null, _directRedirectUrl(returnTo)) unless userId
+	return callback(null, _getRedirectUrlWithToken(null, returnTo)) unless userId
 
 	UserGetter.getUser userId, { overleaf: 1 }, (error, user) ->
 		return callback(error) if error
-		return callback(null, _directRedirectUrl(returnTo)) unless user?.overleaf?.id
-
-		payload =
-			user_id: user.overleaf.id,
-			intent: 'sign_in_from_v2',
-			unsafe_return_to: returnTo
-		token = jwt.sign(
-			payload,
-			settings.accountMerge.secret,
-			{ expiresIn: '15m' }
-		)
-
-		redirectUrl = settings.overleaf.host
-		redirectUrl += '/users/sign_in_from_v2'
-		redirectUrl += "?token=#{token}"
-		callback(null, redirectUrl)
+		return callback(null, _getRedirectUrlWithToken(null, returnTo)) unless user?.overleaf?.id
+		callback(null, _getRedirectUrlWithToken(user.overleaf.id, returnTo))
 
 module.exports = V1Redirect =
 
