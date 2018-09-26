@@ -1,5 +1,9 @@
-mixin contact-form(showAffectedProjectUrl)
-	div(ng-cloak ng-controller="ContactFormController")
+mixin contact-form(showAffectedProjectUrl, showContactFormSuggestions = true)
+	div(
+		ng-cloak
+		ng-controller="ContactFormController"
+		ng-init="showContactFormSuggestions = " + showContactFormSuggestions
+	)
 		form(name="contactForm")
 			span(ng-show="sent == false")
 				.alert.alert-danger(ng-show="error") Something went wrong sending your request :(
@@ -16,6 +20,7 @@ mixin contact-form(showAffectedProjectUrl)
 						maxlength='255'
 						tabindex='1'
 						onkeyup='')
+			
 				.contact-suggestions(ng-show="suggestions.length")
 					p.contact-suggestion-label !{translate("kb_suggestions_enquiry", { kbLink: "<a href='/learn/kb' target='_blank'>" + translate("knowledge_base") + "</a>" })}
 					ul.contact-suggestion-list
