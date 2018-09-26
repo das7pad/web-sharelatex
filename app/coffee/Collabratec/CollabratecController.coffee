@@ -88,7 +88,7 @@ module.exports = CollabratecController =
 	oauthSignin: (req, res, next) ->
 		CollabratecManager.validateSamlData req.session.collabratec_saml_user, (err) ->
 			return CollabratecController._render_oauth_error req, res, err if err?
-			res.redirect "/login/v1"
+			res.redirect "/login"
 
 	samlConsume: (req, res, next) ->
 		oauth_params = req.session.collabratec_oauth_params
@@ -104,7 +104,7 @@ module.exports = CollabratecController =
 					CollabratecController._setupUser req, res, next, profile
 				else
 					CollabratecManager.clearSession req.session
-					res.redirect "/login/v1"
+					res.redirect "/login"
 
 	_render_oauth_error: (req, res, err) ->
 		logger.log { err }, "CollabratecController OAUTH Error"
