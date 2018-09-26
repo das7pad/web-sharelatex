@@ -91,7 +91,7 @@ describe "Collabratec", ->
 					@user.request options, (error, response, body) ->
 						expect(response.statusCode).to.equal 302
 						url = URL.parse(response.headers.location)
-						expect(url.path).to.equal '/login/v1'
+						expect(url.path).to.equal '/login'
 						done()
 
 	describe "oauthLinkAfterSaml", ->
