@@ -91,7 +91,7 @@ describe "Collabratec", ->
 					@user.request options, (error, response, body) ->
 						expect(response.statusCode).to.equal 302
 						url = URL.parse(response.headers.location)
-						expect(url.path).to.equal '/login'
+						expect(url.path).to.equal '/login?sso_error=collabratec_account_not_registered'
 						done()
 
 	describe "oauthLinkAfterSaml", ->

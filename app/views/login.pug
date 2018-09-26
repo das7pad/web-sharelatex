@@ -3,6 +3,10 @@ extends ../../../../app/views/layout
 block content
 	.content.content-alt
 		.login-register-container
+			if ssoError
+				.alert.alert-danger
+					| Login Error: #{translate(ssoError )}
+
 			.card.login-register-card(ng-cloak)
 				.login-register-header
 					h1.login-register-header-heading #{translate("login_to_overleaf")}

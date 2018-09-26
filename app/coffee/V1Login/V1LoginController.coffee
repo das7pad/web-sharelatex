@@ -84,6 +84,7 @@ module.exports = V1LoginController =
 		res.render Path.resolve(__dirname, "../../views/login"),
 			title: 'Log in to Overleaf',
 			email: req.query.email
+			ssoError: req.query.sso_error || null
 
 	doLogin: (req, res, next) ->
 		email = req.body.email

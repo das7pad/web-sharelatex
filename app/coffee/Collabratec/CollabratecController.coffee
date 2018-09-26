@@ -106,7 +106,7 @@ module.exports = CollabratecController =
 					CollabratecController._setupUser req, res, next, profile
 				else
 					CollabratecManager.clearSession req.session
-					res.redirect "/login"
+					res.redirect "/login?sso_error=collabratec_account_not_registered"
 
 	_render_oauth_error: (req, res, err) ->
 		logger.log { err }, "CollabratecController OAUTH Error"
