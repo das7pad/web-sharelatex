@@ -112,7 +112,7 @@ module.exports = CollabratecController =
 		logger.log { err }, "CollabratecController OAUTH Error"
 		CollabratecManager.clearSession req.session
 		template_data =
-			cl_home_url: settings.collabratec.home_url
+			ct_home_url: settings.collabratec.home_url
 			title: "Error"
 		template_path = Path.resolve __dirname, "../../views/oauth_error"
 		res.render template_path, template_data
