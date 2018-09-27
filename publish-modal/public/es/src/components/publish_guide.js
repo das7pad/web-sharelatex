@@ -31,7 +31,7 @@ export default class PublishGuide extends Component {
   }
 
   render () {
-    const { entry, returnText, onReturn, projectId, pdfUrl } = this.props
+    const { entry, returnText, onReturn, projectId } = this.props
 
     return (
       <div
@@ -41,10 +41,10 @@ export default class PublishGuide extends Component {
       >
         <div className='col-sm-12'>
           <ReturnButton onReturn={onReturn} returnText={returnText} />
-          <GuideHtml entry={entry} projectId={projectId} pdfUrl={pdfUrl} _this={this} />
+          <GuideHtml entry={entry} projectId={projectId} _this={this} />
           {entry.publish_link_destination &&
            <div>
-             <Download entry={entry} projectId={projectId} pdfUrl={pdfUrl} _this={this} />
+             <Download entry={entry} projectId={projectId} _this={this} />
              <Submit entry={entry} />
            </div>}
         </div>
@@ -53,14 +53,14 @@ export default class PublishGuide extends Component {
   }
 }
 
-export function GuideHtml ({ entry, projectId, pdfUrl, _this }) {
+export function GuideHtml ({ entry, projectId, _this }) {
   const html = entry.publish_guide_html
   if (html.indexOf('DOWNLOAD') !== -1) {
     const htmlParts = html.split('DOWNLOAD')
     return (
       <div>
         <div dangerouslySetInnerHTML={{ __html: htmlParts[0] }} />
-        <Download entry={entry} projectId={projectId} pdfUrl={pdfUrl} _this={_this} />
+        <Download entry={entry} projectId={projectId} _this={_this} />
         <div
           style={{ marginLeft: '140px', paddingLeft: '15px' }}
           dangerouslySetInnerHTML={{ __html: htmlParts[1] }}
@@ -74,7 +74,7 @@ export function GuideHtml ({ entry, projectId, pdfUrl, _this }) {
   }
 }
 
-function Download ({ entry, projectId, pdfUrl, _this }) {
+function Download ({ entry, projectId, _this }) {
   return (
     <div style={{ marginLeft: '140px', paddingLeft: '15px' }}>
       { /* Most publish guides have an image column
@@ -143,20 +143,17 @@ PublishGuide.propTypes = {
   entry: PropTypes.object.isRequired,
   returnText: PropTypes.string,
   onReturn: PropTypes.func,
-  projectId: PropTypes.string.isRequired,
-  pdfUrl: PropTypes.string
+  projectId: PropTypes.string.isRequired
 }
 
 GuideHtml.propTypes = {
   entry: PropTypes.object.isRequired,
-  projectId: PropTypes.string.isRequired,
-  pdfUrl: PropTypes.string
+  projectId: PropTypes.string.isRequired
 }
 
 Download.propTypes = {
   entry: PropTypes.object.isRequired,
-  projectId: PropTypes.string.isRequired,
-  pdfUrl: PropTypes.string
+  projectId: PropTypes.string.isRequired
 }
 
 Submit.propTypes = {
