@@ -39,6 +39,12 @@ module.exports = V2TemplatesController =
 	getGalleryTagged: (req, res, next) ->
 		V2TemplatesController._getPageTagged req, res, next, 'gallery'
 
+	cloneTemplate: (req, res, next) ->
+		V2TemplatesManager.getTemplate '-', req.params.read_token, (err, page) ->
+			return next err if err
+			return res.sendStatus(404) unless page?.open_in_v2_links?.main?.v2
+			res.redirect page.open_in_v2_links.main.v2
+
 	getTemplate: (req, res, next) ->
 		V2TemplatesManager.getTemplate req.params.slug, req.params.read_token, (err, page) ->
 			return next err if err
