@@ -131,7 +131,7 @@ module.exports = UserMapper =
 		mainEmailIsAffiliation = affiliations.some (emailData) ->
 			emailData.email == ol_user_email
 		unless mainEmailIsAffiliation
-			affiliations.push { email: ol_user_email }
+			affiliations.push { email: ol_user_email, confirmed_at: ol_user.confirmed_at }
 		async.each(
 			affiliations,
 			((affiliation, cb) -> UserMapper._addEmail user, affiliation, cb),

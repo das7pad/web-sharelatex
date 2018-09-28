@@ -136,10 +136,10 @@ describe "UserMapper", ->
 			it "should return the user", ->
 				@callback.calledWith(null, @newSlUser).should.equal true
 
-			it "should send a confirmation email for main email", ->
-				sinon.assert.calledOnce(@UserEmailsConfirmationHandler.sendConfirmationEmail)
+			it "should confirm email", ->
+				sinon.assert.calledOnce(@UserUpdater.confirmEmail)
 				sinon.assert.calledWith(
-					@UserEmailsConfirmationHandler.sendConfirmationEmail,
+					@UserUpdater.confirmEmail,
 					@newSlUser._id,
 					'jane@example.com'
 				)
@@ -176,6 +176,21 @@ describe "UserMapper", ->
 					@UserUpdater.removeEmailAddress,
 					@duplicateUser._id,
 					@ol_user.email
+				)
+
+		describe "with no confirmed_at field", ->
+			beforeEach ->
+				delete @ol_user.confirmed_at
+				@UserMapper.getOlUserStub.yields(null, @user_stub = { _id: "user-stub-id" })
+				@UserEmailsConfirmationHandler.sendConfirmationEmail = sinon.stub().callsArgWith(2, null)
+				@UserMapper.createSlUser @ol_user, @callback
+
+			it "should send a confirmation email", ->
+				sinon.assert.calledOnce(@UserEmailsConfirmationHandler.sendConfirmationEmail)
+				sinon.assert.calledWith(
+					@UserEmailsConfirmationHandler.sendConfirmationEmail,
+					@newSlUser._id,
+					'jane@example.com'
 				)
 
 	describe 'mergeWithSlUser', ->
