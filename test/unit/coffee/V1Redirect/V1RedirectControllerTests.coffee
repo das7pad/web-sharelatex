@@ -104,3 +104,12 @@ describe "V1RedirectController", ->
 					should.exist error
 					sinon.assert.notCalled(@res.redirect)
 					done()
+
+		describe 'POST', ->
+			beforeEach ->
+				@req.method = 'POST'
+				@V1RedirectController.sign_in_and_redirect(@req, @res, @next)
+
+			it 'redirects with 307 code', () ->
+				@res.redirect.lastCall.args.length.should.equal 2
+				@res.redirect.lastCall.args[0].should.equal 307
