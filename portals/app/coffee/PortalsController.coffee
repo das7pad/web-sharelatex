@@ -46,10 +46,10 @@ _portalLayoutData = (req, data) ->
 		data.print = true
 
 	# metadata
+	data.metadata = {}
 	if data.portal?.title
-		data.metadata = {
-			title: data.portal.title
-		}
+		data.metadata.title = data.portal.title
+	data.metadata.viewport = true
 
 	data
 

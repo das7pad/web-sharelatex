@@ -7,14 +7,11 @@ module.exports =
 
 		# Query param data
 		data.preview = reqQuery?.preview?
-		# Metadata
-		if page == 'blog/blog'
-			data.metadata = {
-				fields: {
-					title: 'Blog'
-				}
-			}
 
+		# Metadata
+		# --------
+		data.metadata = data.metadata || {}
+		# metadata - from CMS
 		if data.metadata && data.metadata.fields
 			data.metadata = data.metadata.fields
 			# keywords
@@ -33,4 +30,10 @@ module.exports =
 					data.metadata.twitterDescription = data.metadata.description
 				if !data.metadata.openGraphDescription
 					data.metadata.openGraphDescription = data.metadata.description
+		# metadata - for blog list page. CMS not set up for metadata for list page
+		if page == 'blog/blog'
+			data.title = 'Blog'
+		# metadata- viewport
+		data.metadata.viewport = true
+
 		res.render pagePath, data
