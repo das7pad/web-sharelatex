@@ -1,4 +1,5 @@
 Path = require "path"
+URL = require "url"
 _ = require "lodash"
 request = require "request"
 settings = require "settings-sharelatex"
@@ -131,6 +132,7 @@ module.exports = V2TemplatesManager =
 
 	_get: (url, callback) ->
 		httpRequest =
+			followRedirect: false
 			headers:
 				Accept: "application/json"
 			json: true
@@ -139,6 +141,12 @@ module.exports = V2TemplatesManager =
 		request httpRequest, (err, httpResponse) ->
 			if err?
 				callback err
+			else if httpResponse.statusCode in [301, 302]
+				url = URL.parse httpResponse.headers.location
+				error = new Error "redirect"
+				error.statusCode = httpResponse.statusCode
+				error.location = url.path
+				callback error
 			else
 				callback null, httpResponse.body
 

@@ -41,7 +41,8 @@ module.exports = V2TemplatesController =
 
 	getTemplate: (req, res, next) ->
 		V2TemplatesManager.getTemplate req.params.slug, req.params.read_token, (err, page) ->
-			return next err if err
+			return res.redirect err.statusCode, err.location if err?.message == "redirect"
+			return next err if err?
 			res.render Path.resolve(__dirname, "../views/template"), page
 
 	getTemplates: (req, res, next) ->
@@ -63,17 +64,20 @@ module.exports = V2TemplatesController =
 
 	_getPage: (req, res, next, content_type_name) ->
 		V2TemplatesManager.getPage content_type_name, (err, page) ->
-			return next(err) if err
+			return res.redirect err.statusCode, err.location if err?.message == "redirect"
+			return next err if err?
 			res.render(Path.resolve(__dirname, "../views/index"), page)
 
 	_getPagePaginated: (req, res, next, content_type_name, segment) ->
 		page_num = V2TemplatesController._getPageNum(req)
 		V2TemplatesManager.getPagePaginated content_type_name, segment, page_num, (err, page) ->
-			return next(err) if err
+			return res.redirect err.statusCode, err.location if err?.message == "redirect"
+			return next err if err?
 			res.render(Path.resolve(__dirname, "../views/index"), page)
 
 	_getPageTagged: (req, res, next, content_type_name) ->
 		page_num = V2TemplatesController._getPageNum(req)
 		V2TemplatesManager.getPageTagged content_type_name, req.params.tag_name, page_num, (err, page) ->
-			return next err if err
+			return res.redirect err.statusCode, err.location if err?.message == "redirect"
+			return next err if err?
 			res.render Path.resolve(__dirname, "../views/index_tagged"), page
