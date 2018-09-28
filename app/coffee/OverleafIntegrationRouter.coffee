@@ -42,6 +42,12 @@ module.exports =
 		webRouter.get '/register', V1LoginController.registrationPage
 		webRouter.post '/register', V1LoginController.doRegistration
 
+		webRouter.post(
+			'/user/change_password/v1',
+			AuthenticationController.requireLogin(),
+			V1LoginController.doPasswordChange
+		)
+
 		webRouter.get(
 			'/overleaf/auth_from_v1',
 			OverleafAuthenticationController.saveRedir,

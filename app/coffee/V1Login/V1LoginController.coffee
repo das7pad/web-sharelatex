@@ -1,16 +1,17 @@
 Path = require 'path'
 V1LoginHandler = require './V1LoginHandler'
 logger = require 'logger-sharelatex'
-AuthenticationController = require "../../../../../app/js/Features/Authentication/AuthenticationController"
-UserRegistrationHandler = require "../../../../../app/js/Features/User/UserRegistrationHandler"
-NewsLetterManager = require("../../../../../app/js/Features/Newsletter/NewsletterManager")
+WEB = "../../../../.."
+AuthenticationController = require "#{WEB}/app/js/Features/Authentication/AuthenticationController"
+UserGetter = require "#{WEB}/app/js/Features/User/UserGetter"
+UserRegistrationHandler = require "#{WEB}/app/js/Features/User/UserRegistrationHandler"
+NewsLetterManager = require("#{WEB}/app/js/Features/Newsletter/NewsletterManager")
 OverleafAuthenticationManager = require "../Authentication/OverleafAuthenticationManager"
 OverleafAuthenticationController = require "../Authentication/OverleafAuthenticationController"
 CollabratecController = require "../Collabratec/CollabratecController"
 Url = require 'url'
 jwt = require('jsonwebtoken')
 Settings = require 'settings-sharelatex'
-UserGetter = require('../../../../../app/js/Features/User/UserGetter')
 
 module.exports = V1LoginController =
 
@@ -98,6 +99,36 @@ module.exports = V1LoginController =
 				return res.json message: {type: 'error', text: req.i18n.translate('email_or_password_wrong_try_again')}
 			else
 				V1LoginController._login(profile, req, res, next)
+
+	doPasswordChange: (req, res, next) ->
+		lightUser = AuthenticationController.getSessionUser(req)
+		UserGetter.getUser lightUser._id, (err, user) ->
+			return next(err) if err?
+			v1Id = user?.overleaf?.id
+			email = user?.email
+			current_password = req.body.currentPassword
+			password = req.body.newPassword1
+
+			if (v1Id? && email? && password?)
+				V1LoginHandler.doPasswordChange {
+						email, v1Id, password, current_password,
+					}, (err, isValid) =>
+					return next(err) if err?
+					if !isValid
+						logger.log {v1Id, email},  "failed password change via v1"
+						return res.json message: {
+							type: 'error',
+							text: req.i18n.translate('password_change_failed_attempt')
+						}
+					else
+						logger.log {v1Id, email}, "v1 password updated"
+						return res.json message: {
+							type: 'success',
+							email,
+							text: req.i18n.translate('password_change_successful')
+						}
+			else
+				return res.json message: {type: 'error', text: req.i18n.translate('internal_error')}
 
 	loginProfile: (req, res, next) ->
 		profile = req.session.login_profile

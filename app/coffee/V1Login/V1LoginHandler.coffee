@@ -71,3 +71,28 @@ module.exports = V1LoginHandler =
 			else
 				err = new Error("Unexpected status from v1 registration api: #{response.statusCode}")
 				callback(err)
+
+	doPasswordChange: (options, callback=(err, created)->) ->
+		logger.log({v1Id: options.v1Id, email: options.email},
+			"sending password change request to v1 login api")
+		request {
+			method: 'POST'
+			url: "#{Settings.overleaf.host}/api/v1/sharelatex/change_password"
+			json: {
+				user_id: options.v1Id,
+				email: options.email,
+				current_password: options.current_password,
+				password: options.password
+			}
+			expectedStatusCodes: [403]
+		}, (err, response, body) ->
+			if err?
+				logger.err {email: options.email, err}, "error while talking to v1 password change api"
+				return callback(err, false)
+			if response.statusCode in [200, 403]
+				changed = response.statusCode == 200
+				logger.log {email: options.email, changed}, "got response from v1 password change api"
+				callback(null, changed)
+			else
+				err = new Error("Unexpected status from v1 password change api: #{response.statusCode}")
+				callback(err, false)

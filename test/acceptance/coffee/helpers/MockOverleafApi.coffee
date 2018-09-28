@@ -7,6 +7,18 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 
 module.exports = MockOverleafApi =
+	v1Id: 10000
+	addV1User: (user, password='banana') ->
+		@users.push {
+			email: user.email,
+			password: password,
+			profile:
+				id: @v1Id,
+				email: user.email
+		}
+		user.v1Id = @v1Id
+		@v1Id++
+
 	docs: { }
 	users: []
 
@@ -91,6 +103,21 @@ module.exports = MockOverleafApi =
 				email: user.email,
 				created: true,
 				user_profile: user.profile
+			}
+
+		app.post "/api/v1/sharelatex/change_password", (req, res, next) =>
+			invalid = {
+				user: req.body.user_id,
+				valid: false,
+			}
+			for user in @users
+				if user.profile.id == req.body.user_id &&
+						user.password != req.body.current_password
+					return res.status(403).json invalid
+			if req.body.password.length < 6
+				return res.status(403).json invalid
+			return res.json {
+				valid: true,
 			}
 
 		# collabratec
