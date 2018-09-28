@@ -2,3 +2,4 @@ Makefile
 index.js
 app/js
 test/unit/js
+test/acceptance/js
