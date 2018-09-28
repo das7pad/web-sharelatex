@@ -34,11 +34,12 @@ describe "V1RedirectController", ->
 
 			it 'redirect', ->
 				sinon.assert.calledOnce(@res.redirect)
-				@res.redirect.lastCall.args.length.should.equal 1
-				@res.redirect.lastCall.args[0].should.be.a 'string'
+				@res.redirect.lastCall.args.length.should.equal 2
+				@res.redirect.lastCall.args[0].should.be.a 'number'
+				@res.redirect.lastCall.args[1].should.be.a 'string'
 
 			it 'send token param', ->
-				redirectUrl = @res.redirect.lastCall.args[0]
+				redirectUrl = @res.redirect.lastCall.args[1]
 				match = redirectUrl.match(/\?token=(.*)$/)
 				token = match[1]
 				token.should.equal 'mock-token'
@@ -65,8 +66,9 @@ describe "V1RedirectController", ->
 
 			it 'redirect', ->
 				sinon.assert.calledOnce(@res.redirect)
-				@res.redirect.lastCall.args.length.should.equal 1
-				redirectUrl = @res.redirect.lastCall.args[0]
+				@res.redirect.lastCall.args.length.should.equal 2
+				@res.redirect.lastCall.args[0].should.be.a 'number'
+				redirectUrl = @res.redirect.lastCall.args[1]
 				redirectUrl.should.be.a 'string'
 
 			it 'sign corrent payload', ->
@@ -83,8 +85,9 @@ describe "V1RedirectController", ->
 
 			it 'redirect', ->
 				sinon.assert.calledOnce(@res.redirect)
-				@res.redirect.lastCall.args.length.should.equal 1
-				redirectUrl = @res.redirect.lastCall.args[0]
+				@res.redirect.lastCall.args.length.should.equal 2
+				@res.redirect.lastCall.args[0].should.be.a 'number'
+				redirectUrl = @res.redirect.lastCall.args[1]
 				redirectUrl.should.be.a 'string'
 
 			it 'sign corrent payload', ->
