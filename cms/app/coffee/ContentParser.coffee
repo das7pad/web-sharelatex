@@ -26,6 +26,9 @@ module.exports = ContentParser =
 			if content.fields.content
 				content.fields.content = marked(content.fields.content)
 				content.fields.content = sanitizeHtml(content.fields.content, sanitizeOptions)
+			else if content.fields.footer
+				content.fields.footer = marked(content.fields.footer)
+				content.fields.footer = sanitizeHtml(content.fields.footer, sanitizeOptions)
 			else if content.fields.tabs
 				content.fields.tabs = ContentParser.parseArray(content.fields.tabs)
 			else if content.fields.tabContent
