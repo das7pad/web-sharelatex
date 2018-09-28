@@ -128,6 +128,8 @@ module.exports = ProjectImporter =
 		if doc.title.indexOf('/') > -1
 			# v2 does not allow / in a project name
 			doc.title = doc.title.replace(/\//g, '-')
+		if doc.title.length > ProjectDetailsHandler.MAX_PROJECT_NAME_LENGTH
+			doc.title = doc.title.substr(0, ProjectDetailsHandler.MAX_PROJECT_NAME_LENGTH)
 
 		attributes =
 			overleaf:
@@ -154,9 +156,16 @@ module.exports = ProjectImporter =
 		if settings.importedImageName?
 			attributes.imageName = settings.importedImageName
 
-		ProjectCreationHandler.createBlankProject v2_user_id, doc.title, attributes, (error, project) ->
+		# make the project name unique on import
+		# use the numerical part of the overleaf id as an optional suffix
+		# fall back to a timestamp if needed (format YYYY-MM-DD hhmmss)
+		numericId = doc.token.replace(/a-z/g,'')
+		timestamp = new Date().toISOString().replace(/T(\d+):(\d+):(\d+)\..*/,' $1$2$3') # strip out unwanted characters
+		ProjectDetailsHandler.ensureProjectNameIsUnique v2_user_id, doc.title, [" (#{numericId})", " (#{timestamp})"], (error, v2_project_name) ->
 			return callback(error) if error?
-			return callback(null, project._id)
+			ProjectCreationHandler.createBlankProject v2_user_id, v2_project_name, attributes, (error, project) ->
+				return callback(error) if error?
+				return callback(null, project._id)
 
 	_importInvites: (v1_project_id, v2_project_id, invites = [], callback = (error) ->) ->
 		async.mapSeries(invites, (invite, cb) ->

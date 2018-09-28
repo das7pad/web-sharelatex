@@ -139,6 +139,7 @@ describe "ProjectImporter", ->
 				template_id: '10'
 				template_ver_id: '2'
 			}
+			@ProjectDetailsHandler.ensureProjectNameIsUnique = (user_id, name, suffixes, callback) -> callback(null, name)
 			@ProjectCreationHandler.createBlankProject = sinon.stub().yields(null, @project)
 
 		describe "successfully", ->
@@ -241,6 +242,17 @@ describe "ProjectImporter", ->
 			it "should replace the '/'' with a '-''", ->
 				@ProjectCreationHandler.createBlankProject
 					.calledWith(@user_id, 'foo-bar-baz')
+					.should.equal true
+
+		describe "with a title exceeding the length limit'", ->
+			beforeEach ->
+				@doc.title = "x".repeat(160)
+				@ProjectDetailsHandler.MAX_PROJECT_NAME_LENGTH = 150
+				@ProjectImporter._initSharelatexProject @user_id, @doc, @callback
+
+			it "should truncate the title and insert the numeric part of the project token", ->
+				@ProjectCreationHandler.createBlankProject
+					.calledWith(@user_id, "x".repeat(150))
 					.should.equal true
 
 	describe "_startExport", ->
