@@ -275,7 +275,7 @@ describe "V2TemplatesManager", ->
 
 			it "should return error with redirect", ->
 				@V2TemplatesManager._get "/test-url", (err) =>
-					expect(err.message).to.equal "redirect"
+					expect(err instanceof @V2TemplatesManager.RedirectError).to.be.true
 					expect(err.statusCode).to.equal 301
 					expect(err.location).to.equal "/foo/bar"
 
@@ -288,7 +288,7 @@ describe "V2TemplatesManager", ->
 
 			it "should return error with redirect", ->
 				@V2TemplatesManager._get "/test-url", (err) =>
-					expect(err.message).to.equal "redirect"
+					expect(err instanceof @V2TemplatesManager.RedirectError).to.be.true
 					expect(err.statusCode).to.equal 302
 					expect(err.location).to.equal "/foo/bar"
 

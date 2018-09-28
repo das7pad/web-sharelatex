@@ -47,6 +47,15 @@ pagination_max_pages = 4
 
 module.exports = V2TemplatesManager =
 
+	RedirectError: (statusCode, location) ->
+		error = new Error "redirect"
+		error.name = "RedirectError"
+		error.__proto__ = V2TemplatesManager.RedirectError.prototype
+		error.statusCode = statusCode
+		url = URL.parse location
+		error.location = url.path
+		return error
+
 	getPage: (content_type_name, callback) ->
 		content_type = content_types[content_type_name]
 		return callback new Error "invalid content_type_name" if !content_type?
@@ -142,11 +151,7 @@ module.exports = V2TemplatesManager =
 			if err?
 				callback err
 			else if httpResponse.statusCode in [301, 302]
-				url = URL.parse httpResponse.headers.location
-				error = new Error "redirect"
-				error.statusCode = httpResponse.statusCode
-				error.location = url.path
-				callback error
+				callback new V2TemplatesManager.RedirectError httpResponse.statusCode, httpResponse.headers.location
 			else
 				callback null, httpResponse.body
 
@@ -202,3 +207,5 @@ module.exports = V2TemplatesManager =
 			)
 
 		return pagination
+
+V2TemplatesManager.RedirectError.prototype.__proto__ = Error.prototype
