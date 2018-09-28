@@ -103,6 +103,7 @@ describe "UserMapper", ->
 			beforeEach ->
 				@UserMapper.getOlUserStub.yields(null, @user_stub = { _id: "user-stub-id" })
 				@UserEmailsConfirmationHandler.sendConfirmationEmail = sinon.stub().callsArgWith(2, null)
+				@UserUpdater.updateUser = sinon.stub().callsArgWith(3, null)
 				@UserMapper.createSlUser @ol_user, @callback
 
 			it "should look up the user stub", ->
@@ -143,6 +144,7 @@ describe "UserMapper", ->
 					@newSlUser._id,
 					'jane@example.com'
 				)
+				sinon.assert.notCalled(@UserEmailsConfirmationHandler.sendConfirmationEmail)
 
 		describe "when no UserStub exists", ->
 			beforeEach ->
@@ -183,6 +185,7 @@ describe "UserMapper", ->
 				delete @ol_user.confirmed_at
 				@UserMapper.getOlUserStub.yields(null, @user_stub = { _id: "user-stub-id" })
 				@UserEmailsConfirmationHandler.sendConfirmationEmail = sinon.stub().callsArgWith(2, null)
+				@UserUpdater.updateUser = sinon.stub().callsArgWith(3, null)
 				@UserMapper.createSlUser @ol_user, @callback
 
 			it "should send a confirmation email", ->
@@ -192,6 +195,7 @@ describe "UserMapper", ->
 					@newSlUser._id,
 					'jane@example.com'
 				)
+				sinon.assert.notCalled(@UserUpdater.updateUser)
 
 	describe 'mergeWithSlUser', ->
 		beforeEach ->
