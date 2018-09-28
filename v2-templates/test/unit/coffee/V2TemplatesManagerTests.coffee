@@ -245,7 +245,7 @@ describe "V2TemplatesManager", ->
 				expect(@page_mock.old_versions[0].open_link).to.equal "v2-link-1"
 				expect(@page_mock.old_versions[1].open_link).to.equal "v2-link-2"
 
-	describe "get", ->
+	describe "_get", ->
 		describe "when request succeeds", ->
 			beforeEach ->
 				@response_mock =
@@ -255,6 +255,7 @@ describe "V2TemplatesManager", ->
 			it "should set default params for request", ->
 				@V2TemplatesManager._get "/test-url", () =>
 					expect(@request.firstCall.args[0]).to.deep.equal
+						followRedirect: false
 						headers:
 							Accept: "application/json"
 						json: true
@@ -264,6 +265,32 @@ describe "V2TemplatesManager", ->
 				@V2TemplatesManager._get "/test-url", (err, response) =>
 					expect(err).to.equal null
 					expect(response).to.equal "response"
+
+		describe "when response is 301", ->
+			beforeEach ->
+				@request.callsArgWith(1, null, {
+					statusCode: 301
+					headers: location: "http://www.foo.bar/foo/bar"
+				})
+
+			it "should return error with redirect", ->
+				@V2TemplatesManager._get "/test-url", (err) =>
+					expect(err instanceof @V2TemplatesManager.RedirectError).to.be.true
+					expect(err.statusCode).to.equal 301
+					expect(err.location).to.equal "/foo/bar"
+
+		describe "when response is 302", ->
+			beforeEach ->
+				@request.callsArgWith(1, null, {
+					statusCode: 302
+					headers: location: "http://www.foo.bar/foo/bar"
+				})
+
+			it "should return error with redirect", ->
+				@V2TemplatesManager._get "/test-url", (err) =>
+					expect(err instanceof @V2TemplatesManager.RedirectError).to.be.true
+					expect(err.statusCode).to.equal 302
+					expect(err.location).to.equal "/foo/bar"
 
 		describe "when request has an error", ->
 			beforeEach ->
@@ -532,4 +559,3 @@ describe "V2TemplatesManager", ->
 			it "should set ellipsis", ->
 				expect(@pagination[2].text).to.equal "…"
 				expect(@pagination[12].text).to.equal "…"
-

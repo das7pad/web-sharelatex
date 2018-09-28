@@ -1,4 +1,5 @@
 Path = require "path"
+URL = require "url"
 _ = require "lodash"
 request = require "request"
 settings = require "settings-sharelatex"
@@ -45,6 +46,15 @@ content_types =
 pagination_max_pages = 4
 
 module.exports = V2TemplatesManager =
+
+	RedirectError: (statusCode, location) ->
+		error = new Error "redirect"
+		error.name = "RedirectError"
+		error.__proto__ = V2TemplatesManager.RedirectError.prototype
+		error.statusCode = statusCode
+		url = URL.parse location
+		error.location = url.path
+		return error
 
 	getPage: (content_type_name, callback) ->
 		content_type = content_types[content_type_name]
@@ -133,6 +143,7 @@ module.exports = V2TemplatesManager =
 
 	_get: (url, callback) ->
 		httpRequest =
+			followRedirect: false
 			headers:
 				Accept: "application/json"
 			json: true
@@ -141,6 +152,8 @@ module.exports = V2TemplatesManager =
 		request httpRequest, (err, httpResponse) ->
 			if err?
 				callback err
+			else if httpResponse.statusCode in [301, 302]
+				callback new V2TemplatesManager.RedirectError httpResponse.statusCode, httpResponse.headers.location
 			else
 				callback null, httpResponse.body
 
@@ -196,3 +209,5 @@ module.exports = V2TemplatesManager =
 			)
 
 		return pagination
+
+V2TemplatesManager.RedirectError.prototype.__proto__ = Error.prototype
