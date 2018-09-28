@@ -72,6 +72,7 @@ module.exports = V2TemplatesManager =
 		page_path = "#{content_type.path}/tagged/#{tag_name}"
 		V2TemplatesManager._get "#{page_path}/page/#{page_num}", (err, page) ->
 			return callback err if err
+			return callback new Error "invalid response" unless page?.tags?
 			V2TemplatesManager._formatIndexData page, content_type.path, page_path
 			Object.assign page, content_type
 			page.tag = page.tags[0]
@@ -82,6 +83,7 @@ module.exports = V2TemplatesManager =
 	getTemplate: (slug, read_token, callback) ->
 		V2TemplatesManager._get "/latex/templates/#{slug}/#{read_token}", (err, page) ->
 			return callback err if err
+			return callback new Error "invalid response" unless page?.pub?
 			content_type = content_types[page.pub.kind]
 			return callback new Error "invalid page.kind" if !content_type
 			V2TemplatesManager._formatTemplateData page, content_type

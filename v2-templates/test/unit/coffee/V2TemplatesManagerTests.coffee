@@ -385,6 +385,16 @@ describe "V2TemplatesManager", ->
 					expect(page.page_title).to.equal "Articles — tag-title"
 					expect(page.summary).to.equal "top-html"
 
+		describe "with bad data", ->
+			beforeEach ->
+				@V2TemplatesManager._formatIndexData = sinon.stub()
+				@V2TemplatesManager._get = sinon.stub().callsArgWith 1, null, {}
+
+			it "should callback with error", ->
+				@V2TemplatesManager.getPageTagged "article", "tag_name", "1", (err) =>
+					expect(err).to.deep.equal new Error "invalid response"
+					expect(@V2TemplatesManager._formatIndexData).not.to.have.been.called
+
 		describe "when get has error", ->
 			beforeEach ->
 				@V2TemplatesManager._get = sinon.stub().callsArgWith 1, "error"
@@ -423,6 +433,16 @@ describe "V2TemplatesManager", ->
 				it "should callback with error", ->
 					@V2TemplatesManager.getTemplate "slug", "read_token", (err) =>
 						expect(err).to.deep.equal new Error "invalid page.kind"
+
+		describe "with bad data", ->
+			beforeEach ->
+				@V2TemplatesManager._formatTemplateData = sinon.stub()
+				@V2TemplatesManager._get = sinon.stub().callsArgWith 1, null, {}
+
+			it "should callback with error", ->
+					@V2TemplatesManager.getTemplate "slug", "read_token", (err) =>
+						expect(err).to.deep.equal new Error "invalid response"
+						expect(@V2TemplatesManager._formatTemplateData).not.to.have.been.called
 
 		describe "when get has error", ->
 			beforeEach ->
