@@ -36,5 +36,6 @@ module.exports = V1Redirect =
 		_getRedirectUrl userId, returnTo, (error, redirectUrl) ->
 			return next(error) if error
 
-			logger.log { userId, returnTo, redirectUrl }, 'redirect to v1'
-			res.redirect(redirectUrl)
+			code = if req.method == 'GET' then 302 else 307
+			logger.log { userId, returnTo, code, redirectUrl }, 'redirect to v1'
+			res.redirect(code, redirectUrl)
