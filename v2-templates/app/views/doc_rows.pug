@@ -3,7 +3,7 @@ mixin doc_rows(docs)
 		each doc in docs
 			.template-thumbnail.template-thumbnail__container
 				a(href=doc.path).thumbnail
-					img(src=doc.image_url)
+					img(src=doc.image_url alt=doc.title)
 				div.caption
 					a.caption__title(href=doc.path) #{doc.title}
 					div.caption__description=doc.description

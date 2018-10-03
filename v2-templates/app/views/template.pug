@@ -5,7 +5,7 @@ block vars
 
 block content
 
-	.content(ng-controller="TemplatePageController")
+	main.content(ng-controller="TemplatePageController")
 		.container
 			.row
 				.col-md-6
@@ -48,7 +48,7 @@ block content
 					.entry
 						.row
 							.col-md-12.template-large-pdf-preview
-								img(src=pub.image_url)
+								img(src=pub.image_url alt=pub.title)
 
 			// TODO: Fully-featured Previous Versions section
 			//- if old_versions && old_versions.length
