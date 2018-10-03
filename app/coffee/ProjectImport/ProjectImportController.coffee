@@ -20,12 +20,17 @@ module.exports = ProjectImportController =
 		user_id = AuthenticationController.getLoggedInUserId req
 		logger.log {user_id, ol_doc_id}, "importing project from overleaf"
 		ProjectImporter.importProject ol_doc_id, user_id, (error, sl_project_id) ->
+			recordFailure = (failure) ->
+				ProjectImportErrorRecorder.record ol_doc_id, user_id, failure, (err, result) -> # record the error in the background
+					# send metrics to graphite if a new project failed, or an existing failed project succeeded
+					if result?.n > 0
+						ProjectImportErrorRecorder.getFailures ->
 			unsupportedError = (msg) ->
 				res.status(501).json(message: msg)
-				ProjectImportErrorRecorder.record ol_doc_id, user_id, error, -> # record the error in the background
+				recordFailure(error)
 			importCompleted = (result) ->
 				res.json(result)
-				ProjectImportErrorRecorder.record ol_doc_id, user_id, null, ->
+				recordFailure(null)
 			if error instanceof UnsupportedFileTypeError
 				unsupportedError("Sorry! Projects with linked or external files aren't fully supported yet.")
 			else if error instanceof UnsupportedBrandError

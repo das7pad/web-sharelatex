@@ -7,10 +7,10 @@ db = mongojs(settings.mongo.url, ["projectImportFailures"])
 
 module.exports = ProjectImportErrorRecorder =
 	record: (v1_project_id, v2_user_id, error, callback = (error) ->) ->
-		_callback = (mongoError) ->
+		_callback = (mongoError, result...) ->
 			if mongoError?
 				logger.error {v1_project_id, mongoError}, "failed to change project status in mongo"
-			callback(error || null)
+			callback(error || null, result...)
 
 		if error?
 			errorRecord =
@@ -18,7 +18,7 @@ module.exports = ProjectImportErrorRecorder =
 				error: error.toString()
 				stack: error.stack
 				ts: new Date()
-			logger.log {v1_project_id, errorRecord}, "recording failed attempt to process updates"
+			logger.log {v1_project_id, errorRecord}, "recording failed attempt to import project"
 			db.projectImportFailures.update {
 				v1_project_id: v1_project_id
 			}, {
@@ -45,7 +45,7 @@ module.exports = ProjectImportErrorRecorder =
 			callback(null, results)
 
 	getFailuresByType: (callback = (error, failureCounts, failureAttempts) ->) ->
-		db.projectImportFailures.find {}, {}, (error, results) ->
+		db.projectImportFailures.find {}, {error:1, attempts:1}, (error, results) ->
 			return callback(error) if error?
 			failureCounts = {}
 			failureAttempts = {}
