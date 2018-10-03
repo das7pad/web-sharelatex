@@ -9,6 +9,7 @@ NewsLetterManager = require("#{WEB}/app/js/Features/Newsletter/NewsletterManager
 OverleafAuthenticationManager = require "../Authentication/OverleafAuthenticationManager"
 OverleafAuthenticationController = require "../Authentication/OverleafAuthenticationController"
 CollabratecController = require "../Collabratec/CollabratecController"
+EmailHelper = require "#{WEB}/app/js/Features/Helpers/EmailHelper"
 Url = require 'url'
 jwt = require('jsonwebtoken')
 Settings = require 'settings-sharelatex'
@@ -88,7 +89,7 @@ module.exports = V1LoginController =
 			ssoError: req.query.sso_error || null
 
 	doLogin: (req, res, next) ->
-		email = req.body.email
+		email = EmailHelper.parseEmail(req.body.email)
 		password = req.body.password
 
 		V1LoginHandler.authWithV1 {email, password}, (err, isValid, profile) ->
