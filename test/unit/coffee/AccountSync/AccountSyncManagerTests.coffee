@@ -16,6 +16,8 @@ describe 'AccountSyncManager', ->
 				@FeaturesUpdater = {}
 			'../../../../../app/js/Features/Subscription/SubscriptionLocator':
 				@SubscriptionLocator = {}
+			'../../../../../app/js/Features/Institutions/InstitutionsFeatures':
+				@InstitutionsFeatures = {}
 			"logger-sharelatex":
 				log: sinon.stub()
 				err: sinon.stub()
@@ -160,3 +162,57 @@ describe 'AccountSyncManager', ->
 			).to.deep.equal [
 				'professional', 'collaborator', 'student', 'personal'
 			]
+
+	describe 'subscriptions getter', ->
+		beforeEach ->
+			@individualSubscription = { planCode: 'collaborator' }
+			@groupSubscription = { planCode: 'collaborator' }
+			@UserGetter.getUser = sinon.stub().yields(null, @user)
+			@SubscriptionLocator.getUsersSubscription = sinon.stub().yields(null, @individualSubscription)
+			@SubscriptionLocator.getGroupSubscriptionsMemberOf = sinon.stub().yields(null, [@groupSubscription])
+			@InstitutionsFeatures.getInstitutionsPlan = sinon.stub().yields(null, 'collaborator')
+
+		describe '_getV2Subscriptions', ->
+			it 'return both subscriptions', (done) ->
+				@AccountSyncManager._getV2Subscriptions @v1UserId, (error, individualSubscription, groupSubscriptions) =>
+					expect(error).to.not.exist
+					expect(individualSubscription).to.equal @individualSubscription
+					expect(groupSubscriptions.length).to.equal 1
+					expect(groupSubscriptions[0]).to.equal @groupSubscription
+					done()
+
+		describe '_getV2SubscriptionsPlans', ->
+			it 'return both plans', (done) ->
+				@AccountSyncManager._getV2SubscriptionsPlans @v1UserId, (error, planCodes) =>
+					expect(error).to.not.exist
+					expect(planCodes).to.deep.equal ['collaborator', 'collaborator']
+					done()
+
+		describe '_getInstitutionsPlan', ->
+			it 'return both plans', (done) ->
+				@AccountSyncManager._getInstitutionsPlan @v1UserId, (error, planCode) =>
+					expect(error).to.not.exist
+					expect(planCode).to.equal 'collaborator'
+					done()
+
+		describe 'getV2PlanCode', ->
+			it 'return plan code without affiliation', (done) ->
+				@AccountSyncManager.getV2PlanCode @v1UserId, (error, planCode) =>
+					expect(error).to.not.exist
+					expect(planCode).to.equal 'collaborator'
+					done()
+
+			it 'return plan code with affiliation', (done) ->
+				@InstitutionsFeatures.getInstitutionsPlan.yields(null, 'professional')
+				@AccountSyncManager.getV2PlanCode @v1UserId, (error, planCode) =>
+					expect(error).to.not.exist
+					expect(planCode).to.equal 'professional'
+					done()
+
+		describe 'getV2SubscriptionStatus', ->
+			it 'return status', (done) ->
+				@AccountSyncManager.getV2SubscriptionStatus @v1UserId, (error, status) =>
+					expect(error).to.not.exist
+					expect(status.has_subscription).to.equal true
+					expect(status.in_team).to.equal true
+					done()
