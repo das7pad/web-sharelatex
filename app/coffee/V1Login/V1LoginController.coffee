@@ -90,6 +90,8 @@ module.exports = V1LoginController =
 
 	doLogin: (req, res, next) ->
 		email = EmailHelper.parseEmail(req.body.email)
+		if !email
+			return res.json message: {type: 'error', text: req.i18n.translate('email_or_password_wrong_try_again')}
 		password = req.body.password
 
 		V1LoginHandler.authWithV1 {email, password}, (err, isValid, profile) ->
