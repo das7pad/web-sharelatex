@@ -20,7 +20,7 @@ block content
 								a(href, ng-click="openViewSourceModal()" class="btn btn-success cta-link") View Source
 							if pub.pdf_url
 								a(href=pub.pdf_url class="btn btn-success cta-link") Download PDF
-					.row
+					.row.row-spaced
 						.col-md-3.field-title Author
 						//- sanitized by api
 						.col-md-9!= pub.author
@@ -47,8 +47,9 @@ block content
 				.col-md-6
 					.entry
 						.row
-							.col-md-12.template-large-pdf-preview
-								img(src=pub.image_url alt=pub.title)
+							.col-md-12
+								.template-large-pdf-preview
+									img(src=pub.image_url alt=pub.title)
 
 			// TODO: Fully-featured Previous Versions section
 			//- if old_versions && old_versions.length
