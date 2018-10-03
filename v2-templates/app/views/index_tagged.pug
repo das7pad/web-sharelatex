@@ -2,6 +2,9 @@ extends ../../../../app/views/layout
 include doc_rows
 include pagination
 
+block vars
+	- metadata = { viewport: true }
+
 block content
 
 	.content
