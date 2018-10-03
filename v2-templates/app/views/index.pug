@@ -28,13 +28,13 @@ block content
 		if tags && tags.length
 			.container
 				h2 Popular Tags
-				.row
+				.row.row-spaced.popular-tags
 					each tag in tags
-						.col-md-4.template-thumbnail
-							.thumbnail-tag.thumbnail(style=`background: url(${tag.logo_url}) no-repeat center center; background-size: cover;`)
+						.col-md-4
+							.template-thumbnail
 								a(href=tag.path)
-							.caption
-								a(href=tag.path) #{tag.title}
+									.thumbnail-tag.thumbnail(style=`background: url(${tag.logo_url}) no-repeat center center; background-size: cover;`)
+									.caption__title #{tag.title}
 
 		if recent_docs && recent_docs.length
 			.container

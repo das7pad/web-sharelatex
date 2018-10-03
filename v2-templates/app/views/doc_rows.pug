@@ -2,10 +2,10 @@ mixin doc_rows(docs)
 	.templates-container
 		each doc in docs
 			.template-thumbnail.template-thumbnail__container
-				a(href=doc.path).thumbnail
-					img(src=doc.image_url alt=doc.title)
+				a(href=doc.path)
+					img.thumbnail(src=doc.image_url alt=doc.title)
+					.caption__title #{doc.title}
 				div.caption
-					a.caption__title(href=doc.path) #{doc.title}
 					div.caption__description=doc.description
 					//- sanitized by api
 					div!= doc.author
