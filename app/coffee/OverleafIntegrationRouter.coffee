@@ -164,7 +164,6 @@ module.exports =
 			webRouter.post '/org/ieee/collabratec/auth/sign_in_to_link', CollabratecController.oauthSignin
 
 		webRouter.get '/sign_in_to_v1', V1RedirectController.sign_in_and_redirect
-		publicApiRouter.post '/sign_in_to_v1', V1RedirectController.sign_in_and_redirect
 
 		if settings.sso?
 			webRouter.get '/register/sso_email', SSOController.getRegisterSSOEmail
@@ -209,6 +208,8 @@ module.exports =
 			res.redirect "/sign_in_to_v1?return_to=#{encodeURIComponent req.url}"
 
 	applyNonCsrfRouter: (webRouter, privateApiRouter, publicApiRouter) ->
+		webRouter.post '/sign_in_to_v1', V1RedirectController.sign_in_and_redirect
+
 		if settings.collabratec?
 			webRouter.post settings.collabratec.saml.callback_path, passport.authenticate('saml'), CollabratecController.samlConsume
 
