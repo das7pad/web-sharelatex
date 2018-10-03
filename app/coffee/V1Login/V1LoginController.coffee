@@ -41,6 +41,10 @@ module.exports = V1LoginController =
 		if !requestIsValid
 			return next(new Error('registration request is not valid'))
 		{email, password} = req.body
+		email = EmailHelper.parseEmail(email)
+		if !email
+			logger.err {email}, "registration email invalid"
+			return res.json message: {type: 'error', text: req.i18n.translate('invalid_email')}
 		logger.log {email}, "trying to create account via v1"
 		subscribeToNewsletter = req.body.subscribeToNewsletter == 'true'
 		V1LoginHandler.getUserByEmail email, (err, existingUser) ->
