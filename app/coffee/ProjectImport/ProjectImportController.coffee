@@ -12,6 +12,8 @@ AuthenticationController = require "../../../../../app/js/Features/Authenticatio
 	V2ExportCompleted,
 	V2ExportInProgress,
 	V2ExportNotInProgress,
+	V1ExportInProgress,
+	V1ProjectHasAssignments
 } = require "./Errors"
 
 module.exports = ProjectImportController =
@@ -36,6 +38,8 @@ module.exports = ProjectImportController =
 				unsupportedError("Sorry! This Project is already being exported")
 			else if error instanceof V2ExportNotInProgress
 				unsupportedError("Sorry! This export timed out")
+			else if error instanceof V1ProjectHasAssignments
+				unsupportedError("Sorry! This project is being used as an assignment, and assignments are not supported in Overleaf v2. Please see https://www.overleaf.com/learn/how-to/Teaching_in_Overleaf_v2 for more information about teaching tools in Overleaf v2.")
 			else if error instanceof InvalidNameError
 				unsupportedError("Sorry! #{error.message}, please rename your project and try again")
 			else if error instanceof V2ExportCompleted

@@ -27,11 +27,19 @@ V1ExportInProgress = (message) ->
 	return error
 V1ExportInProgress.prototype.__proto__ = Error.prototype
 
+V1ProjectHasAssignments = (message) ->
+	error = new Error(message)
+	error.name = "V1ProjectHasAssignments"
+	error.__proto__ = V1ProjectHasAssignments.prototype
+	return error
+V1ProjectHasAssignments.prototype.__proto__ = Error.prototype
+
 IMPORT_ERRORS = {
 	1: V2ExportCompleted,
 	2: V2ExportInProgress,
 	3: V2ExportNotInProgress,
 	4: V1ExportInProgress,
+	5: V1ProjectHasAssignments
 }
 
 module.exports = Errors =
@@ -39,6 +47,7 @@ module.exports = Errors =
 	V2ExportInProgress: V2ExportInProgress
 	V2ExportNotInProgress: V2ExportNotInProgress
 	V1ExportInProgress: V1ExportInProgress
+	V1ProjectHasAssignments: V1ProjectHasAssignments
 
 	fromErrorCode: (error_code, message, error_data) ->
 		errorClass = IMPORT_ERRORS[error_code] || Error
