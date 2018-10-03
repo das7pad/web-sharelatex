@@ -122,6 +122,16 @@ describe "SSOController", ->
 			it "should attempt sign up", ->
 				expect(@SSOController._signUp).to.have.been.calledWith { email: "test@email.com" }, @req, @res, @next
 
+		describe "when user has a mixed-case email", ->
+			beforeEach ->
+				@req.session.sso_user = {}
+				@req.body = { email: "TeSt.One@email.com" }
+				@SSOController._signUp = sinon.stub()
+				@SSOController.postRegisterSSOEmail @req, @res, @next
+
+			it "should attempt sign up, with a lower-cased email", ->
+				expect(@SSOController._signUp).to.have.been.calledWith { email: "test.one@email.com" }, @req, @res, @next
+
 	describe "_signUp", ->
 		beforeEach ->
 			@V1LoginController._login = sinon.stub()
