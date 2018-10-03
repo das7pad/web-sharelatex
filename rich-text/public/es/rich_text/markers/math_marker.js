@@ -15,11 +15,10 @@ const MathMarker = {
     let replacement
     if (sourceMark.kind === 'inline-math') {
       replacement = makeInlineMath(sourceMark.getContent(cm))
-    } else if (
-      sourceMark.kind === 'display-math' ||
-      sourceMark.kind === 'outer-display-math'
-    ) {
+    } else if (sourceMark.kind === 'display-math') {
       replacement = makeDisplayMath(sourceMark.getContent(cm))
+    } else if (sourceMark.kind === 'outer-display-math') {
+      replacement = makeDisplayMath(sourceMark.getOuter(cm))
     } else {
       throw new Error(`bad math mark ${sourceMark.kind}`)
     }
