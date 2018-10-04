@@ -35,10 +35,10 @@ form.form-inline(async-form="register", name="registerForm", action="/register",
 					span(ng-show="!registerForm.inflight") #{translate("register")}
 					span(ng-show="registerForm.inflight") #{translate("registering")}...
 
-		div
-			.form-group.hp-register-password-error
-				span.register-banner__password-error.small.alert.alert-danger(ng-show="registerForm.password.$error.complexPassword", ng-bind-html="complexPasswordErrorMessage")
+		.hp-register-password-error(ng-show="registerForm.password.$error.complexPassword")
+			span.register-banner__password-error.small.alert.alert-danger(ng-bind-html="complexPasswordErrorMessage")
 
+		div
 			.form-group.hp-register-newsletter-checkbox
 				label.checkbox-inline.checkbox-newsletter
 					input(type='checkbox', 
