@@ -154,6 +154,9 @@ module.exports = V2TemplatesManager =
 				callback err
 			else if httpResponse.statusCode in [301, 302]
 				callback new V2TemplatesManager.RedirectError httpResponse.statusCode, httpResponse.headers.location
+			else if httpResponse.statusCode >= 300
+				# Handle HTTP errors. E.g. staging v1 has basic auth
+				callback new Error('Error fetching from v1')
 			else
 				callback null, httpResponse.body
 
