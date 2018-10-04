@@ -1,4 +1,7 @@
 form.form-inline(async-form="register", name="registerForm", action="/register", ng-cloak, captcha)
+	.hp-register-password-error(ng-show="registerForm.password.$error.complexPassword")
+		span.register-banner__password-error.small.alert.alert-danger(ng-bind-html="complexPasswordErrorMessage")
+
 	input(name='_csrf', type='hidden', value=csrfToken)
 	input(name='redir', type='hidden', value=redir)
 	form-messages(for="registerForm")
@@ -34,9 +37,6 @@ form.form-inline(async-form="register", name="registerForm", action="/register",
 				)
 					span(ng-show="!registerForm.inflight") #{translate("register")}
 					span(ng-show="registerForm.inflight") #{translate("registering")}...
-
-		.hp-register-password-error(ng-show="registerForm.password.$error.complexPassword")
-			span.register-banner__password-error.small.alert.alert-danger(ng-bind-html="complexPasswordErrorMessage")
 
 		div
 			.form-group.hp-register-newsletter-checkbox
