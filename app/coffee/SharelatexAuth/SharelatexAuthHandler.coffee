@@ -10,7 +10,7 @@ module.exports = SharelatexAuthHandler =
 		{email, hashedPassword, first_name, last_name} = user
 		logger.log {email}, "sending registration request to v1 login api"
 		name = [first_name, last_name].filter((n) -> n?).join(" ")
-		confirmedAt = @_getConfirmationTimestamp(user)
+		confirmedAt = @_getConfirmationDate(user)
 		request {
 			method: "POST",
 			url: "#{Settings.apis.v1.url}/api/v1/sharelatex/register",
@@ -33,6 +33,6 @@ module.exports = SharelatexAuthHandler =
 				err = new Error("Unexpected status from v1 registration api: #{response.statusCode}")
 				callback(err)
 
-	_getConfirmationTimestamp: (user) ->
+	_getConfirmationDate: (user) ->
 		return _.find(user.emails, (e) -> e.email == user.email)?.confirmedAt || null
 
