@@ -3,6 +3,7 @@ Path = require "path"
 logger = require "logger-sharelatex"
 V1LoginController = require "../V1Login/V1LoginController"
 V1LoginHandler = require "../V1Login/V1LoginHandler"
+EmailHelper = require "../../../../../app/js/Features/Helpers/EmailHelper"
 
 module.exports = SSOController =
 	authInit: (req, res, next) ->
@@ -36,7 +37,9 @@ module.exports = SSOController =
 		sso_user = _.cloneDeep(req.session.sso_user)
 		return res.json { redir: "/register?sso_error=try_again" } unless sso_user?
 		return SSOController._renderError req, res, "email_required" unless req.body.email?
-		sso_user.email = req.body.email
+		sso_user.email = EmailHelper.parseEmail(req.body.email)
+		if !sso_user.email
+			return next(new Error('sso email invalid'))
 		SSOController._signUp(sso_user, req, res, next)
 
 	_signUp: (sso_user, req, res, next) ->

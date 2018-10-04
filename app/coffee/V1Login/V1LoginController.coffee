@@ -9,6 +9,7 @@ NewsLetterManager = require("#{WEB}/app/js/Features/Newsletter/NewsletterManager
 OverleafAuthenticationManager = require "../Authentication/OverleafAuthenticationManager"
 OverleafAuthenticationController = require "../Authentication/OverleafAuthenticationController"
 CollabratecController = require "../Collabratec/CollabratecController"
+EmailHelper = require "#{WEB}/app/js/Features/Helpers/EmailHelper"
 Url = require 'url'
 jwt = require('jsonwebtoken')
 Settings = require 'settings-sharelatex'
@@ -40,6 +41,10 @@ module.exports = V1LoginController =
 		if !requestIsValid
 			return next(new Error('registration request is not valid'))
 		{email, password} = req.body
+		email = EmailHelper.parseEmail(email)
+		if !email
+			logger.err {email}, "registration email invalid"
+			return res.json message: {type: 'error', text: req.i18n.translate('invalid_email')}
 		logger.log {email}, "trying to create account via v1"
 		subscribeToNewsletter = req.body.subscribeToNewsletter == 'true'
 		V1LoginHandler.getUserByEmail email, (err, existingUser) ->
@@ -88,7 +93,9 @@ module.exports = V1LoginController =
 			ssoError: req.query.sso_error || null
 
 	doLogin: (req, res, next) ->
-		email = req.body.email
+		email = EmailHelper.parseEmail(req.body.email)
+		if !email
+			return res.json message: {type: 'error', text: req.i18n.translate('invalid_email')}
 		password = req.body.password
 
 		V1LoginHandler.authWithV1 {email, password}, (err, isValid, profile) ->
