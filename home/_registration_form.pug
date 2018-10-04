@@ -24,7 +24,8 @@ form.form-inline(async-form="register", name="registerForm", action="/register",
 					required,
 					minlength="6",
 					aria-label='password',
-					ng-model="password"
+					ng-model="password",
+					complex-password
 				)
 			.form-group.hp-register-form-email-pwd-btn-container
 				button.btn-primary.btn.btn-lg.btn-hero(
@@ -57,3 +58,6 @@ form.form-inline(async-form="register", name="registerForm", action="/register",
 				) 
 					i.login-btn-icon.login-btn-icon-orcid
 					| #{translate("register_using_service", {service:"ORCID"})}
+
+script(type='text/javascript').
+	window.passwordStrengthOptions = !{JSON.stringify(settings.passwordStrengthOptions || {})}
