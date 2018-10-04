@@ -6,7 +6,6 @@ AuthenticationController = require "#{WEB}/app/js/Features/Authentication/Authen
 UserGetter = require "#{WEB}/app/js/Features/User/UserGetter"
 UserRegistrationHandler = require "#{WEB}/app/js/Features/User/UserRegistrationHandler"
 NewsLetterManager = require("#{WEB}/app/js/Features/Newsletter/NewsletterManager")
-UserEmailsConfirmationHandler = require "#{WEB}/app/js/Features/User/UserEmailsConfirmationHandler"
 OverleafAuthenticationManager = require "../Authentication/OverleafAuthenticationManager"
 OverleafAuthenticationController = require "../Authentication/OverleafAuthenticationController"
 CollabratecController = require "../Collabratec/CollabratecController"
