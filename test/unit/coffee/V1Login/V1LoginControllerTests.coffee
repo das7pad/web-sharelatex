@@ -19,6 +19,8 @@ describe "V1LoginController", ->
 				@AuthenticationController = {}
 			"../../../../../app/js/Features/User/UserRegistrationHandler":
 				@UserRegistrationHandler = {}
+			"../../../../../app/js/Features/Newsletter/NewsletterManager":
+				@NewsletterManager = sinon.mock()
 			"../Authentication/OverleafAuthenticationManager":
 				@OverleafAuthenticationManager = {}
 			"../Authentication/OverleafAuthenticationController":
