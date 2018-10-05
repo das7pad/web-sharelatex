@@ -17,6 +17,28 @@
     is-fullscreen-editor="ui.view == 'editor' && ui.pdfLayout == 'flat'"
     class="formatting-buttons"
   )
+  .toolbar-right
+      a(
+        href,
+        ng-click="switchToFlatLayout()"
+        ng-show="ui.pdfLayout == 'sideBySide'"
+        tooltip=translate('full_screen')
+        tooltip-placement="bottom"
+        tooltip-append-to-body="true"
+      )
+        i.fa.fa-expand
+        i.full-screen
+      a(
+        href,
+        ng-click="switchToSideBySideLayout()"
+        ng-show="ui.pdfLayout == 'flat'"
+        tooltip=translate('split_screen')
+        tooltip-placement="bottom"
+        tooltip-append-to-body="true"
+      )
+        i.fa.fa-compress
+        i.split-screen
+        i.split-screen
 
   script(type="text/ng-template", id="formattingButtonsTpl")
     .formatting-buttons-wrapper

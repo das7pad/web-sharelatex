@@ -1,7 +1,7 @@
 define [
   "base"
 ], (App) ->
-  App.controller "EditorToolbarController", ($scope, ide) ->
+  App.controller "EditorToolbarController", ($scope, ide, localStorage) ->
     $scope.buttons = [{
       iconText: '§'
       iconClass: 'formatting-icon'
@@ -47,3 +47,17 @@ define [
       handleClick: () ->
         $scope.richText.formattingEvents.trigger('bulletList')
     }]
+    $scope.switchToFlatLayout = () ->
+      $scope.ui.pdfLayout = 'flat'
+      $scope.ui.view = 'editor'
+      ide.localStorage "pdf.layout", "flat"
+    $scope.switchToSideBySideLayout = () ->
+      $scope.ui.pdfLayout = 'sideBySide'
+      $scope.ui.view = 'editor'
+      localStorage "pdf.layout", "split"
+
+    if pdfLayout = localStorage("pdf.layout")
+      $scope.switchToSideBySideLayout() if pdfLayout == "split"
+      $scope.switchToFlatLayout() if pdfLayout == "flat"
+    else
+      $scope.switchToSideBySideLayout()
