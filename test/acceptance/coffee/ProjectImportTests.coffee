@@ -71,6 +71,9 @@ describe "ProjectImportTests", ->
 		it 'should import a project', ->
 			expect(@project).to.be.an('object')
 
+		it 'should use the default pdflatex compiler', ->
+			expect(@project.compiler).to.eq('pdflatex')
+
 	describe 'a project with docs', ->
 		before (done) ->
 			files = [
@@ -220,3 +223,19 @@ describe "ProjectImportTests", ->
 		it 'should import a project', ->
 			expect(@project).to.be.an('object')
 			expect(@project.name).to.equal('x'.repeat(150))
+
+	describe 'a project that uses the "latex_dvipdf" engine', ->
+		before (done) ->
+			@ol_project_id = 1
+			MockOverleafApi.setDoc Object.assign({ id: @ol_project_id }, BLANK_PROJECT, { latex_engine: 'latex_dvipdf' })
+
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+				getProject response, (error, project) =>
+					@project = project
+					done()
+
+		it 'should import using the "latex" compiler', ->
+			expect(@project).to.be.an('object')
+			expect(@project.compiler).to.equal('latex')
