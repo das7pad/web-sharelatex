@@ -111,6 +111,10 @@ module.exports = CollabratecController =
 					CollabratecManager.clearSession req.session
 					res.redirect "/login?sso_error=collabratec_account_not_registered"
 
+	showProject: (req, res, next) ->
+		req.session.show_project_id = req.params.project_id
+		res.redirect settings.collabratec.saml.init_path
+
 	_render_oauth_error: (req, res, err) ->
 		logger.log { err }, "CollabratecController OAUTH Error"
 		CollabratecManager.clearSession req.session
@@ -141,8 +145,12 @@ module.exports = CollabratecController =
 
 	_finishLogin: (req) ->
 		oauth_params = req.session.collabratec_oauth_params
-		if oauth_params
+		project_id = req.session.show_project_id
+		if oauth_params?
 			redirect_url = CollabratecManager.oauthRedirectUrl oauth_params
+			AuthenticationController._setRedirectInSession req, redirect_url
+		else if project_id?
+			redirect_url = "/sign_in_to_v1?return_to="+encodeURIComponent("/"+project_id)
 			AuthenticationController._setRedirectInSession req, redirect_url
 		CollabratecManager.clearSession req.session
 

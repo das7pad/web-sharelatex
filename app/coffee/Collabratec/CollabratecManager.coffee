@@ -15,6 +15,7 @@ module.exports = CollabratecManager =
 	clearSession: (session) ->
 		delete session.collabratec_oauth_params
 		delete session.collabratec_saml_user
+		delete session.show_project_id
 
 	getV1UserByCollabratecId: (collabratec_id, callback) ->
 		logger.log { collabratec_id }, "CollabratecManager getV1UserByCollabratecId"
