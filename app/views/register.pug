@@ -51,7 +51,8 @@ block content
 							name='password'
 							placeholder="Password"
 							required
-							minlength="6"
+							minlength=settings.passwordStrengthOptions.length.min
+							maxlength=settings.passwordStrengthOptions.length.max
 							ng-model="password"
 							complex-password
 						)
