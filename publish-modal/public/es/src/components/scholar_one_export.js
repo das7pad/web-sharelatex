@@ -81,14 +81,17 @@ export default class ScholarOneExport extends Component {
         <form action={entry.export_url} method="post" id="export_form">
           <input
             id="export_id"
+            name="export_id"
             type="hidden"
             value={this.state.exportId + this.state.token} />
           <input
             id="submission_id"
+            name="submission_id"
             type="hidden"
             value={this.state.partner_submission_id} />
           <input
             id="EXT_ACTION"
+            name="EXT_ACTION"
             type="hidden"
             value="OVERLEAF_SUBMISSION" />
         </form>
