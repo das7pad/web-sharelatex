@@ -10,6 +10,7 @@ OverleafAuthenticationManager = require "../Authentication/OverleafAuthenticatio
 OverleafAuthenticationController = require "../Authentication/OverleafAuthenticationController"
 CollabratecController = require "../Collabratec/CollabratecController"
 EmailHelper = require "#{WEB}/app/js/Features/Helpers/EmailHelper"
+Errors = require "#{WEB}/app/js/Features/Errors/Errors"
 Url = require 'url'
 jwt = require('jsonwebtoken')
 Settings = require 'settings-sharelatex'
@@ -39,7 +40,7 @@ module.exports = V1LoginController =
 	doRegistration: (req, res, next) ->
 		requestIsValid = UserRegistrationHandler._registrationRequestIsValid(req.body)
 		if !requestIsValid
-			return next(new Error('registration request is not valid'))
+			return next(new Errors.InvalidError('registration request is not valid'))
 		{email, password} = req.body
 		email = EmailHelper.parseEmail(email)
 		if !email
