@@ -20,7 +20,7 @@
   .toolbar-right
       a(
         href,
-        ng-click="switchToFlatLayout()"
+        ng-click="switchToFlatLayout('editor')"
         ng-show="ui.pdfLayout == 'sideBySide'"
         tooltip=translate('full_screen')
         tooltip-placement="bottom"
@@ -30,7 +30,7 @@
         i.full-screen
       a(
         href,
-        ng-click="switchToSideBySideLayout()"
+        ng-click="switchToSideBySideLayout('editor')"
         ng-show="ui.pdfLayout == 'flat'"
         tooltip=translate('split_screen')
         tooltip-placement="bottom"
