@@ -97,6 +97,12 @@ module.exports = V2TemplatesManager =
 			content_type = content_types[page.pub.kind]
 			return callback new Error "invalid page.kind" if !content_type
 			V2TemplatesManager._formatTemplateData page, content_type
+			# metadata
+			page.metadata = {
+				description: page.pub?.meta_description
+				image_src: page.pub?.public_image_url
+				viewport: true
+			}
 			callback null, page
 
 	_formatDocPath: (doc) ->
