@@ -44,9 +44,9 @@ define [
 		_handleSearchResults = (success, results) ->
 			suggestions = for hit in results.hits
 				page_underscored = hit?.pageName?.replace(/\s/g,'_')
-
+				page_slug = encodeURIComponent(page_underscored)
 				suggestion =
-					url :"/learn/kb/#{page_underscored}"
+					url : "/learn/how-to/#{page_slug}"
 					name : hit._highlightResult.pageName.value
 
 			event_tracking.sendMB "contact-form-suggestions-shown" if results.hits.length
