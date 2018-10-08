@@ -6,15 +6,13 @@ define [
 		features = user?.features
 		$scope.thirdPartyReferencesEnabled = features?.mendeley or features?.references
 
-		$scope.openReferencesModal = (providerStr) ->
-			$modal.open {
-				templateUrl: "referencesModalTemplate"
-				controller: "ReferencesModalController"
-				scope: $scope
-				resolve:
-					provider: () -> providerStr
-			}
-
-		ide.referencesManager = {
-			openReferencesModal: (providerStr) -> $scope.openReferencesModal(providerStr)
-		}
+		$scope.openNewDocModal = () ->
+			$modal.open(
+				templateUrl: "newFileModalTemplate"
+				controller:  "NewFileModalController"
+				size: 'lg'
+				resolve: {
+					parent_folder: () -> $scope.entity
+					type: () -> 'mendeley'
+				}
+			)
