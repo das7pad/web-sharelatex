@@ -7,20 +7,31 @@ export default class PublishGuide extends Component {
     super(props)
     this.state = {
       exportState: 'uninitiated',
-      exportId: null
+      exportId: null,
+      downloadRequested: null
     }
   }
 
   componentDidUpdate () {
     if (this.state.exportState === 'complete') {
-      var zipLink = `/project/${this.props.projectId}/export/${this.state.exportId}/zip`
-      window.location = zipLink
+      var link = `/project/${this.props.projectId}/export/${this.state.exportId}/`
+      if (this.state.downloadRequested === 'zip') {
+        link = link + 'zip'
+      } else {
+        link = link + 'pdf'
+      }
+      window.location = link
       this.setState({exportState: 'uninitiated'})
     }
   }
 
+  initiateGuideExport (entry, projectId, _this, type) {
+    this.setState({downloadRequested: type})
+    initiateExport(entry, projectId, _this)
+  }
+
   render () {
-    const { entry, returnText, onReturn, projectId, pdfUrl } = this.props
+    const { entry, returnText, onReturn, projectId } = this.props
 
     return (
       <div
@@ -30,10 +41,10 @@ export default class PublishGuide extends Component {
       >
         <div className='col-sm-12'>
           <ReturnButton onReturn={onReturn} returnText={returnText} />
-          <GuideHtml entry={entry} projectId={projectId} pdfUrl={pdfUrl} _this={this} />
+          <GuideHtml entry={entry} projectId={projectId} _this={this} />
           {entry.publish_link_destination &&
            <div>
-             <Download entry={entry} projectId={projectId} pdfUrl={pdfUrl} _this={this} />
+             <Download entry={entry} projectId={projectId} _this={this} />
              <Submit entry={entry} />
            </div>}
         </div>
@@ -42,14 +53,14 @@ export default class PublishGuide extends Component {
   }
 }
 
-export function GuideHtml ({ entry, projectId, pdfUrl, _this }) {
+export function GuideHtml ({ entry, projectId, _this }) {
   const html = entry.publish_guide_html
   if (html.indexOf('DOWNLOAD') !== -1) {
     const htmlParts = html.split('DOWNLOAD')
     return (
       <div>
         <div dangerouslySetInnerHTML={{ __html: htmlParts[0] }} />
-        <Download entry={entry} projectId={projectId} pdfUrl={pdfUrl} _this={_this} />
+        <Download entry={entry} projectId={projectId} _this={_this} />
         <div
           style={{ marginLeft: '140px', paddingLeft: '15px' }}
           dangerouslySetInnerHTML={{ __html: htmlParts[1] }}
@@ -63,49 +74,45 @@ export function GuideHtml ({ entry, projectId, pdfUrl, _this }) {
   }
 }
 
-function Download ({ entry, projectId, pdfUrl, _this }) {
+function Download ({ entry, projectId, _this }) {
   return (
     <div style={{ marginLeft: '140px', paddingLeft: '15px' }}>
       { /* Most publish guides have an image column
            with 140px as the set width */ }
       <p><strong>Step 1: Download files</strong></p>
-      <p>
-        { _this.state.exportState === 'uninitiated' &&
-          <a
-            className="btn btn-primary"
-            onClick={() => initiateExport(entry, projectId, _this)}
-          >
-            Download project ZIP with submission files (e.g. .bbl)
-          </a>
-        }
-        { _this.state.exportState === 'initiated' &&
-          <span style={{ fontSize: 20, margin: '20px 0px 20px' }}>
-            <i className='fa fa-refresh fa-spin fa-fw'></i>
-            <span> &nbsp; Zipping files, please wait...</span>
-          </span>
-        }
-        { _this.state.exportState === 'error' &&
-          <span>
-            Zip with submission files failed to build
-            <br/>
-            Error message: {_this.state.errorDetails}
-          </span>
-        }
-      </p>
-
-      <p>
-        {pdfUrl &&
-         <a
-           className="btn btn-primary"
-           href={pdfUrl}
-           target="_blank">
-           Download PDF file of your article
-         </a>}
-        {!pdfUrl && <a className="btn btn-primary disabled" disabled>
-          Download PDF file of your article
-          ( please compile your project before downloading PDF )
-        </a>}
-      </p>
+      { _this.state.exportState === 'uninitiated' &&
+        <span>
+          <p>
+            <a
+              className="btn btn-primary"
+              onClick={() =>
+                _this.initiateGuideExport(entry, projectId, _this, 'zip')}>
+              Download project ZIP with submission files (e.g. .bbl)
+            </a>
+          </p>
+          <p>
+            <a
+              className="btn btn-primary"
+              onClick={() =>
+                _this.initiateGuideExport(entry, projectId, _this, 'pdf')}>
+              Download PDF file of your article
+            </a>
+          </p>
+        </span>
+      }
+      { _this.state.exportState === 'initiated' &&
+        <p style={{ fontSize: 20, margin: '20px 0px 20px' }}>
+          <i className='fa fa-refresh fa-spin fa-fw'></i>
+          <span> &nbsp; Compiling project, please wait...</span>
+        </p>
+      }
+      { _this.state.exportState === 'error' &&
+        <p>
+          Project failed to compile
+          <br/>
+          Error message: {_this.state.errorDetails}
+        </p>
+      }
     </div>
   )
 }
@@ -136,20 +143,17 @@ PublishGuide.propTypes = {
   entry: PropTypes.object.isRequired,
   returnText: PropTypes.string,
   onReturn: PropTypes.func,
-  projectId: PropTypes.string.isRequired,
-  pdfUrl: PropTypes.string
+  projectId: PropTypes.string.isRequired
 }
 
 GuideHtml.propTypes = {
   entry: PropTypes.object.isRequired,
-  projectId: PropTypes.string.isRequired,
-  pdfUrl: PropTypes.string
+  projectId: PropTypes.string.isRequired
 }
 
 Download.propTypes = {
   entry: PropTypes.object.isRequired,
-  projectId: PropTypes.string.isRequired,
-  pdfUrl: PropTypes.string
+  projectId: PropTypes.string.isRequired
 }
 
 Submit.propTypes = {

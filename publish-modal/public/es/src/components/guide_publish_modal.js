@@ -37,7 +37,6 @@ export default class GuidePublishModal extends Component {
         entry={entry}
         returnText={returnText}
         projectId={initParams.projectId}
-        pdfUrl={initParams.pdfUrl}
       />)
     } else if (shown === 'export') {
       if (entry.partner === 'gallery') {
