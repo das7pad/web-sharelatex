@@ -4,6 +4,7 @@ BlogController = require './controllers/BlogController'
 ContactContoller = require './controllers/ContactController'
 LegalController = require './controllers/LegalController'
 GeneralController = require './controllers/GeneralController'
+ErrorController = require '../../../../app/js/Features/Errors/ErrorController'
 
 removeRoute = (webRouter, method, path) ->
 	index = null
@@ -13,6 +14,9 @@ removeRoute = (webRouter, method, path) ->
 	if index?
 		logger.log method:method, path:path, index:index, 'removing route from express router'
 		webRouter.stack.splice(index,1)
+
+send404 = (req, res) ->
+	ErrorController.notFound req, res
 
 module.exports =
 	apply: (webRouter) ->
@@ -26,5 +30,6 @@ module.exports =
 		webRouter.get '/blog/page/:page', BlogController.getBlog
 		webRouter.get '/blog/tagged/:tag', BlogController.getBlog
 		webRouter.get '/blog/tagged/:tag/page/:page', BlogController.getBlog
+		webRouter.get '/blog/feed*', send404 # RSS isn't implemented yet
 		webRouter.get '/blog/:slug', BlogController.getBlogPost
 		webRouter.get '/for/:slug', GeneralController.getPage
