@@ -51,7 +51,7 @@ module.exports =
 			}), WikiController.getPage
 
 			# redirect `/learn/:page` to `/learn/latex/:page`
-			webRouter.get /^\/learn(?!\/(latex))(\/.*)?$/i, (req, res) ->
+			webRouter.get /^\/learn(?!\/(latex\/))(.*)?$/i, (req, res) ->
 				res.redirect req.url.replace(/^\/learn/i, '/learn/latex').replace(/\?$/, '%3F')
 
 			# Check if a `/learn` link exists in header_extras, either under the `Help` menu
