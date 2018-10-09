@@ -4,6 +4,7 @@ request = require "request"
 settings = require "settings-sharelatex"
 UserMapper = require "../OverleafUsers/UserMapper"
 FeaturesUpdater = require("../../../../../app/js/Features/Subscription/FeaturesUpdater")
+Errors = require "../../../../../app/js/Features/Errors/Errors"
 
 module.exports = OverleafAuthenticationManager =
 	getUserProfile: (accessToken, callback) ->
@@ -35,8 +36,14 @@ module.exports = OverleafAuthenticationManager =
 			else
 				# User not present in database for this v1UserId, check against email too
 				email = UserMapper.getCanonicalEmail(profile.email)
-				User.findOne {email}, {_id: 1}, (err, user) ->
+				User.findOne {email}, {_id: 1, overleaf: 1}, (err, user) ->
 					return callback(err) if err?
+					# if the email has an overleaf id then it does not match the profile.id
+					# which was already queried for
+					if user?.overleaf?.id?
+						error = new Errors.AccountMergeError "email does not match oveleaf id"
+						error.info = profile
+						return callback(error) 
 					if user?
 						# Found a user for this email,
 						# bail out to the merge-sl-account flow
