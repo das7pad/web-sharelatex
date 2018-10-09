@@ -12,7 +12,7 @@ define [
 				controller:  "NewFileModalController"
 				size: 'lg'
 				resolve: {
-					parent_folder: () -> $scope.entity
+					parent_folder: () -> null
 					type: () -> 'mendeley'
 				}
 			)
