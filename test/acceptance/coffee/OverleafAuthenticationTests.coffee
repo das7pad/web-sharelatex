@@ -97,6 +97,23 @@ describe "OverleafAuthentication", ->
 						expect(response.headers.location).to.equal '/project'
 						done()
 
+		describe 'with an email that exists in SL with different overleaf id', ->
+			beforeEach (done) ->
+				@user.ensureUserExists (err) =>
+					return done err if err?
+					@user.setOverleafId 99999, done
+
+			it 'should return error', (done) ->
+				@user.request.post {
+					url: '/login',
+					json:
+						email: @user.email
+						password: 'banana'
+				}, (error, response, body) =>
+					return done(error) if error?
+					expect(response.statusCode).to.equal 500
+					done()
+
 		describe 'with an incorrect email and password', ->
 			it 'should log the user in', (done) ->
 				@user.request.post {
