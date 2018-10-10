@@ -1,6 +1,7 @@
 {request} = require '../V1SharelatexApi'
 logger = require 'logger-sharelatex'
 Settings = require 'settings-sharelatex'
+_ = require 'lodash'
 
 
 module.exports = SharelatexAuthHandler =
@@ -9,10 +10,16 @@ module.exports = SharelatexAuthHandler =
 		{email, hashedPassword, first_name, last_name} = user
 		logger.log {email}, "sending registration request to v1 login api"
 		name = [first_name, last_name].filter((n) -> n?).join(" ")
+		confirmedAt = @_getConfirmationDate(user)
 		request {
 			method: "POST",
 			url: "#{Settings.apis.v1.url}/api/v1/sharelatex/register",
-			json: {email, encrypted_password: hashedPassword, name},
+			json: {
+				email: email,
+				encrypted_password: hashedPassword,
+				name: name,
+				confirmed_at: confirmedAt  # Pass along the confirmation time on this account
+			},
 			expectedStatusCodes: [409]
 		}, (err, response, body) ->
 			if err?
@@ -25,3 +32,7 @@ module.exports = SharelatexAuthHandler =
 			else
 				err = new Error("Unexpected status from v1 registration api: #{response.statusCode}")
 				callback(err)
+
+	_getConfirmationDate: (user) ->
+		return _.find(user.emails, (e) -> e.email == user.email)?.confirmedAt || null
+

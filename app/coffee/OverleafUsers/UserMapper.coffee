@@ -10,6 +10,7 @@ TagsHandler = require "../../../../../app/js/Features/Tags/TagsHandler"
 UserGetter = require "../../../../../app/js/Features/User/UserGetter"
 UserUpdater = require "../../../../../app/js/Features/User/UserUpdater"
 InstitutionsAPI = require "../../../../../app/js/Features/Institutions/InstitutionsAPI"
+UserEmailsConfirmationHandler = require "../../../../../app/js/Features/User/UserEmailsConfirmationHandler"
 async = require 'async'
 Errors = require "../../../../../app/js/Features/Errors/Errors"
 
@@ -151,8 +152,10 @@ module.exports = UserMapper =
 				else
 					logger.err user: user, email: email, "Couldn't add email on merge"
 					return callback(error)
-			return callback(null) unless affiliation.confirmed_at
-			UserUpdater.confirmEmail user._id, email, new Date(affiliation.confirmed_at), callback
+			if affiliation.confirmed_at
+				UserUpdater.confirmEmail user._id, email, new Date(affiliation.confirmed_at), callback
+			else
+				UserEmailsConfirmationHandler.sendConfirmationEmail user._id, email, callback
 
 	_addEmailOrAffiliation: (user, email, options, callback) ->
 		emailExists = user.emails.some (emailData) -> emailData.email == email

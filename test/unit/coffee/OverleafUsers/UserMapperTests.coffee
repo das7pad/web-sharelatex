@@ -29,6 +29,8 @@ describe "UserMapper", ->
 				confirmEmail: sinon.stub().yields()
 			"../../../../../app/js/Features/Institutions/InstitutionsAPI": @InstitutionsApi =
 				addAffiliation: sinon.stub().yields()
+			"../../../../../app/js/Features/User/UserEmailsConfirmationHandler": @UserEmailsConfirmationHandler =
+				sendConfirmationEmail: sinon.stub().callsArgWith(2, null)
 		@callback = sinon.stub()
 
 	describe "getSlIdFromOlUser", ->
@@ -100,6 +102,8 @@ describe "UserMapper", ->
 		describe "when a UserStub exists", ->
 			beforeEach ->
 				@UserMapper.getOlUserStub.yields(null, @user_stub = { _id: "user-stub-id" })
+				@UserEmailsConfirmationHandler.sendConfirmationEmail = sinon.stub().callsArgWith(2, null)
+				@UserUpdater.updateUser = sinon.stub().callsArgWith(3, null)
 				@UserMapper.createSlUser @ol_user, @callback
 
 			it "should look up the user stub", ->
@@ -133,13 +137,14 @@ describe "UserMapper", ->
 			it "should return the user", ->
 				@callback.calledWith(null, @newSlUser).should.equal true
 
-			it "should confirm main email", ->
+			it "should confirm email", ->
 				sinon.assert.calledOnce(@UserUpdater.confirmEmail)
 				sinon.assert.calledWith(
 					@UserUpdater.confirmEmail,
 					@newSlUser._id,
 					'jane@example.com'
 				)
+				sinon.assert.notCalled(@UserEmailsConfirmationHandler.sendConfirmationEmail)
 
 		describe "when no UserStub exists", ->
 			beforeEach ->
@@ -174,6 +179,23 @@ describe "UserMapper", ->
 					@duplicateUser._id,
 					@ol_user.email
 				)
+
+		describe "with no confirmed_at field", ->
+			beforeEach ->
+				delete @ol_user.confirmed_at
+				@UserMapper.getOlUserStub.yields(null, @user_stub = { _id: "user-stub-id" })
+				@UserEmailsConfirmationHandler.sendConfirmationEmail = sinon.stub().callsArgWith(2, null)
+				@UserUpdater.updateUser = sinon.stub().callsArgWith(3, null)
+				@UserMapper.createSlUser @ol_user, @callback
+
+			it "should send a confirmation email", ->
+				sinon.assert.calledOnce(@UserEmailsConfirmationHandler.sendConfirmationEmail)
+				sinon.assert.calledWith(
+					@UserEmailsConfirmationHandler.sendConfirmationEmail,
+					@newSlUser._id,
+					'jane@example.com'
+				)
+				sinon.assert.notCalled(@UserUpdater.updateUser)
 
 	describe 'mergeWithSlUser', ->
 		beforeEach ->
