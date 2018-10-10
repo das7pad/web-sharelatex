@@ -1,7 +1,7 @@
 define [
   "base"
 ], (App) ->
-  App.controller "EditorToolbarController", ($scope, ide, localStorage) ->
+  App.controller "EditorToolbarController", ($scope, ide) ->
     $scope.buttons = [{
       iconText: '§'
       iconClass: 'formatting-icon'
