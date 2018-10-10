@@ -1,19 +1,20 @@
+include ./_mixins
 doctype html
 html(itemscope, itemtype='http://schema.org/Product')
 	head
 		meta(charset="utf-8")
-		meta(name="viewport", content="width=device-width,initial-scale=1.0")
-		title Track changes and commenting in LaTeX
-		link(rel="icon", href="/favicon.ico")
+		- var metadata = { title: 'Track changes and commenting in LaTeX' }
+		include ../_metadata
+		link(rel="icon", href="/ol-favicon.ico")
 		if buildCssPath
-			link(rel='stylesheet', href=buildCssPath('/style.css'))
+			link(rel='stylesheet', href=buildCssPath('/ol-style.css'))
 	body
 		main.rfp-main#main
 			header.rfp-header
 				.rfp-header-wrapper
 					a.rfp-header-logo-container(href="/")
-						img.rfp-header-logo(src="/img/brand/logo-horizontal-white.svg", alt="ShareLaTeX")
-					a.rfp-cta.rfp-cta-header(href="/project") Get Started
+						img.rfp-header-logo(src=buildImgPath('ol-brand/overleaf-white.svg'), alt="Overleaf")
+					a.btn.btn-primary(href="/project") Get Started
 
 			section.rfp-section.rfp-section-masthead#intro
 				.rfp-section-wrapper
@@ -34,7 +35,7 @@ html(itemscope, itemtype='http://schema.org/Product')
 			section.rfp-section.rfp-section-blockquote
 				.rfp-section-wrapper
 					blockquote.rfp-quote-main 
-						p.rfp-quoted-text I can't tell you what a game-changer this new feature is for me and my collaborators. This feature puts ShareLaTeX miles above the competition, as no one else has anything close to it.
+						p.rfp-quoted-text I can't tell you what a game-changer this new feature is for me and my collaborators. This feature puts ShareLaTeX (now #{settings.appName}) miles above the competition, as no one else has anything close to it.
 						figure.rfp-quoted-person
 							img.rfp-quoted-person-photo(src="/img/feature-page/pamela-marcum.jpg")
 							figcaption
@@ -45,7 +46,7 @@ html(itemscope, itemtype='http://schema.org/Product')
 					.rfp-feature-description-container
 						h2.rfp-h2 
 							span.rfp-highlight Discuss 
-							| Within ShareLaTeX
+							| Within #{settings.appName}
 						p.rfp-p With real-time commenting, you can discuss your work without having to switch to email, printed versions or any other tool.
 						p.rfp-p Leave comments, give quick feedback and resolve issues much more effectively with everything happening inside a single tool.
 					.rfp-feature-video-container
@@ -61,7 +62,7 @@ html(itemscope, itemtype='http://schema.org/Product')
 							| Track All 
 							span.rfp-highlight Changes
 						p.rfp-p Keep track of every change made to the document, along with the person making the change.
-						p.rfp-p ShareLaTeX is the only LaTeX editor with real time tracked changes. Now there's nothing holding you back from being able to collaborate using LaTeX.
+						p.rfp-p #{settings.appName} is the only LaTeX editor with real time tracked changes. Now there's nothing holding you back from being able to collaborate using LaTeX.
 					.rfp-feature-video-container
 						video.rfp-video.rfp-video-anim.rfp-video-anim-alt#video-2(
 							loop
@@ -99,45 +100,17 @@ html(itemscope, itemtype='http://schema.org/Product')
 							poster="/img/feature-page/feat-accept-poster.jpg"
 						)
 							source(src="/img/feature-page/feat-accept.mp4", type="video/mp4")
-			section.rfp-section.rfp-section-testimonials
+			section.rfp-section.rfp-section-feature-white
 				.rfp-section-wrapper
-					h2.rfp-h2 ShareLaTeX has revolutionized LaTeX collaboration. Again.
-					p.rfp-lead We kept hearing how frustrating it could be to figure out what changes had been made by other collaborators.
-					p.rfp-lead So we put our coding hats on and did something about it.
-					p.rfp-lead Here's what some of our users said when we showed them the new comments and track changes features.
-					.rfp-quote-section
-						blockquote.rfp-quote 
-							p.rfp-quoted-text The new collaboration features make my writing process a lot smoother.  I can add notes, questions, or suggested changes for my co-authors without having to add a package, scroll through the code, or email a hand-annotated scan of the document. Between the "track changes" pane and the chat feature, I have all the discussion related to my document happening in most useful place: where I write!
-							figure.rfp-quoted-person
-								img.rfp-quoted-person-photo(src="/img/feature-page/courtney-gibbons.jpg")
-								figcaption
-									p.rfp-quoted-person-name Prof. Courtney Gibbons
-									p.rfp-quoted-person-affil Assistant Professor of Mathematics · Hamilton College
-						blockquote.rfp-quote 
-							p.rfp-quoted-text The new review panel really streamlines collaborative work.  There is no commenting clutter in the source code to clean up afterwards, comments are very easy to see (or hide!) in the review panel, and the new features are very intuitive to use.  Although I use ShareLaTeX primarily for professional collaboration,  is also a very fast and effective way to ramp up students new to TeX, especially with the new review panel that lets me comment directly on students' work.
-							figure.rfp-quoted-person
-								img.rfp-quoted-person-photo(src="/img/feature-page/joanna-ellis-monaghan.jpg")
-								figcaption
-									p.rfp-quoted-person-name Prof. Joanna Ellis-Monaghan
-									p.rfp-quoted-person-affil Mathematics Department Chair · Saint Michael's College
+					h3.rfp-h3 #{settings.appName} is used by over 2 million authors at institutions worldwide, including:
+					.universities
+						+universities()
 			section.rfp-section.rfp-section-final
-				.rfp-section-wrapper
-					h2.rfp-h2 ShareLaTeX has more than a million users around the world, including:
-					div.rfp-users
-						figure.rfp-user-container
-							img.rfp-user-logo(src="/img/feature-page/user-nasa-jpl.png", alt="NASA JPL")
-						figure.rfp-user-container
-							img.rfp-user-logo(src="/img/feature-page/user-caltech.png", alt="Caltech")
-						figure.rfp-user-container
-							img.rfp-user-logo(src="/img/feature-page/user-deepmind.png", alt="Deepmind")
-						figure.rfp-user-container
-							img.rfp-user-logo(src="/img/feature-page/user-chalmers.png", alt="Chalmers")
 					.rfp-cta-container
-						h3.rfp-h3.rfp-h3-cta Start using ShareLaTeX today to see these features in action.
-						p.rfp-lead.rfp-lead-cta Join more than a million other people using ShareLaTeX.
-						a.rfp-cta(href="/project") 
-							span.rfp-cta-main Start using ShareLaTeX
-							span.rfp-cta-extra Get 7 days free
+						h3.rfp-h3.rfp-h3-cta Start using #{settings.appName} today to see these features in action.
+						p.rfp-lead.rfp-lead-cta Join more than two million other people using #{settings.appName}.
+						a.btn.btn-primary.btn-xl(href="/project") Start using #{settings.appName}
+			include ../layout/footer
 		script(type="text/javascript").
 			(function(){
 				// Underscore utils.
@@ -330,5 +303,5 @@ html(itemscope, itemtype='http://schema.org/Product')
 				(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
 				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 				})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-				ga('create', '#{gaToken}', 'sharelatex.com');
+				ga('create', '#{gaToken}', '#{settings.appName}.com');
 				ga('send', 'pageview');
