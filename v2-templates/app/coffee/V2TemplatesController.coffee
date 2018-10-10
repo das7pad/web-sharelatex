@@ -1,5 +1,6 @@
 Path = require "path"
 V2TemplatesManager = require "./V2TemplatesManager"
+Settings = require 'settings-sharelatex'
 
 module.exports = V2TemplatesController =
 
@@ -46,6 +47,10 @@ module.exports = V2TemplatesController =
 			res.redirect page.open_in_v2_links.main.v2
 
 	getTemplate: (req, res, next) ->
+		# Redirect to v1 if requesting pdf url (ends with .pdf)
+		if /\.pdf$/.test(req.params.read_token)
+			return res.redirect Settings.apis.v1.url + req.url
+
 		V2TemplatesManager.getTemplate req.params.slug, req.params.read_token, (err, page) ->
 			return res.redirect err.statusCode, err.location if err instanceof V2TemplatesManager.RedirectError
 			return next err if err?
