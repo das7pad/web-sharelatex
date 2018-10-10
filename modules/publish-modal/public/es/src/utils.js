@@ -15,11 +15,23 @@ export function initiateExport (entry, projectId, _this) {
   var link = `/project/${projectId}/export/${entry.id}`
 
   var data = {}
-  if (_this.firstName && _this.lastName) {
-    data = {
-      firstName: _this.firstName.value,
-      lastName: _this.lastName.value
-    }
+  if (_this.firstName) {
+    data['firstName'] = _this.firstName.value
+  }
+  if (_this.lastName) {
+    data['lastName'] = _this.lastName.value
+  }
+  if (_this.description) {
+    data['description'] = _this.description.value
+  }
+  if (_this.title) {
+    data['title'] = _this.title.value
+  }
+  if (_this.license) {
+    data['license'] = _this.license.value
+  }
+  if (_this.showSource) {
+    data['showSource'] = _this.showSource.checked
   }
 
   _this.setState({ exportState: 'initiated' })

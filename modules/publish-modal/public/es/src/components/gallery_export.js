@@ -12,12 +12,15 @@ export default class GalleryExport extends Component {
     }
   }
 
-  runExport (ev, entry, projectId) {
-    valid = this.firstName.value && this.lastName.value && this.title.value;
+  runExport (ev) {
+    ev.preventDefault()
+    let valid = this.firstName.value &&
+      this.lastName.value &&
+      this.description.value &&
+      this.title.value;
     if (valid) {
+      const { entry, projectId } = this.props
       initiateExport(entry, projectId, this)
-    } else {
-      ev.preventDefault()
     }
     this.setState({ submissionValid: valid })
     return(valid)
@@ -29,7 +32,7 @@ export default class GalleryExport extends Component {
       firstName, lastName, title, description, license, showSource
     } = this.props
     return (
-      <form onSubmit={(ev) => this.runExport(ev, entry, projectId)}>
+      <form onSubmit={ (ev) => this.runExport(ev) }>
         <p>
         The Overleaf Gallery is the easiest way to publish your work
         from Overleaf and make it searchable and shareable. Just fill
@@ -111,7 +114,8 @@ export default class GalleryExport extends Component {
           value={"Submit to " + entry.name}/>
         { !this.state.submissionValid &&
           <p style={{color: 'red'}}>
-            Please provide first name, last name, and title before continuing
+            Please provide all of first name, last name, title,
+            and description before continuing
           </p>
         }
       </form>
