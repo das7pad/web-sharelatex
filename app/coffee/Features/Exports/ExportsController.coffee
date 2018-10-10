@@ -21,7 +21,7 @@ module.exports =
 			export_params.description = req.body.description.trim() if req.body.description
 			export_params.author = req.body.author.trim() if req.body.author
 			export_params.license = req.body.license.trim() if req.body.license
-			export_params.show_source = req.body.show_source if req.body.show_source
+			export_params.show_source = req.body.showSource
 
 		ExportsHandler.exportProject export_params, (err, export_data) ->
 			return err if err?
