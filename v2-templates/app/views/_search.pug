@@ -1,11 +1,11 @@
-.search__container--addsearch
+form.search__container--addsearch(addsearch)
   .search__input-bar
     label.sr-only(for="search") Search
     input#search.addsearch.form-control.search__input(
       type="text",
       placeholder!="Search&hellip;"
     )
-    button.btn.btn-primary Search
+    button.btn.btn-primary(type="submit") Search
   #addsearch-results
 
 block scripts
