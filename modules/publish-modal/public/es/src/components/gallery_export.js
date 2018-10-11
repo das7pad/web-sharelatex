@@ -104,7 +104,7 @@ export default class GalleryExport extends Component {
         <div className="form-control-box">
           <input type="checkbox"
             id="gallery-export-show-source"
-            defaultValue={showSource}
+            defaultChecked={showSource}
             placeholder="Show source"
             ref={ (input) => (this.showSource = input)}
           />
@@ -134,6 +134,7 @@ export default class GalleryExport extends Component {
   }
 
   renderComplete() {
+    const entry = this.props.entry
     return (
       <span>
         <p>
