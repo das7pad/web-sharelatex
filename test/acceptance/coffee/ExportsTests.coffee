@@ -36,7 +36,7 @@ describe 'Exports', ->
 					description: 'description'
 					author: 'author'
 					license: 'other'
-					show_source: true
+					showSource: true
 			}, (error, response, body) =>
 				throw error if error?
 				expect(response.statusCode).to.equal 200
