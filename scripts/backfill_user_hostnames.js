@@ -13,13 +13,16 @@ const asyncLimit = argv.async || 1
 backfillUserEmailHostnames = function (user, callback) {
   processedUsers++
   async.mapSeries(user.emails, function (userEmail, innerCallback) {
-    if (userEmail.hostname) innerCallback()
-    const hostname = userEmail.email.split('@')[1].split('').reverse().join('')
+    if (userEmail.reversedHostname) innerCallback()
+    const reversedHostname =
+      userEmail.email.split('@')[1].split('').reverse().join('')
     const query = {_id: user._id, 'emails.email': userEmail.email}
-    const update = {$set: {'emails.$.hostname': hostname}}
+    const update = {$set: {'emails.$.reversedHostname': reversedHostname}}
 
     UserUpdater.updateUser(query, update, function (error, res) {
-      console.log('ADDING HOSTNAME FOR', user._id, userEmail.email, hostname)
+      console.log(
+        'ADDING HOSTNAME FOR', user._id, userEmail.email, reversedHostname
+      )
       if (error) return innerCallback(error)
       innerCallback()
     })
@@ -30,7 +33,7 @@ backfillUserEmailHostnames = function (user, callback) {
 }
 
 db.users.find({
-  'emails.hostname': {$exists: false}
+  'emails.reversedHostname': {$exists: false}
 }, {
   emails: 1
 }, function (error, users) {
