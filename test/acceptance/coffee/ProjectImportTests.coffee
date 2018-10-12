@@ -59,7 +59,7 @@ describe "ProjectImportTests", ->
 	describe 'an empty project', ->
 		before (done) ->
 			@ol_project_id = 1
-			MockOverleafApi.setDoc Object.assign({ id: @ol_project_id }, BLANK_PROJECT)
+			MockOverleafApi.setDoc Object.assign({ id: @ol_project_id }, BLANK_PROJECT, {title: "empty project"})
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 
@@ -83,7 +83,7 @@ describe "ProjectImportTests", ->
 				main: true
 			]
 			@ol_project_id = 2
-			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, files })
+			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, files, title: "docs project" })
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 
@@ -117,7 +117,7 @@ describe "ProjectImportTests", ->
 				file_path: "file/#{file.id}"
 			]
 			@ol_project_id = 3
-			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, files })
+			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, files, title: "files project" })
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 
@@ -146,7 +146,7 @@ describe "ProjectImportTests", ->
 				file_path: "file/linked_file.pdf"
 			]
 			@ol_project_id = 4
-			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, files })
+			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, files, title: "New name" })
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 			done()
@@ -167,7 +167,7 @@ describe "ProjectImportTests", ->
 				{ user_id: @collaborator_v1_id, history_version: 2, comment: 'goodbye', created_at: @date }
 				{ history_version: 3, comment: 'foobar', created_at: @date }
 			]
-			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, labels })
+			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, labels, title: "Project with labels" })
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 			MockProjectHistoryApi.reset()
@@ -227,7 +227,7 @@ describe "ProjectImportTests", ->
 	describe 'a project that uses the "latex_dvipdf" engine', ->
 		before (done) ->
 			@ol_project_id = 1
-			MockOverleafApi.setDoc Object.assign({ id: @ol_project_id }, BLANK_PROJECT, { latex_engine: 'latex_dvipdf' })
+			MockOverleafApi.setDoc Object.assign({ id: @ol_project_id }, BLANK_PROJECT, { latex_engine: 'latex_dvipdf', title: "dvipdf project" })
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 
