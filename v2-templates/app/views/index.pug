@@ -41,7 +41,7 @@ block content
 			.container
 				if !hide_segment_title
 					h2 Recent
-					+doc_rows(recent_docs)
+				+doc_rows(recent_docs)
 				if recent_docs_pagination
 					+pagination(recent_docs_pagination)
 
