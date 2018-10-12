@@ -4,6 +4,6 @@ if c.fields.displayTabGroupTitle
 tabset.ol-tabs(bookmarkable-tabset)
 	for tab, tabIndex in c.fields.tabs
 		if tab.fields
-			tab(bookmarkable-tab=tab.fields.tabId, heading=tab.fields.tabTitle, id=tab.fields.tabId)
+			tab(bookmarkable-tab=tab.fields.tabId, heading=tab.fields.tabTitle)
 				for tabContent, tabContentIndex in tab.fields.tabContent || []
 					+page_content(tabContent, tab.fields.tabContent[tabContentIndex+1])
