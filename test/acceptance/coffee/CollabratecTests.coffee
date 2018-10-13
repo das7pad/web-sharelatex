@@ -171,3 +171,17 @@ describe "Collabratec", ->
 							url = URL.parse(response.headers.location)
 							expect(url.path).to.equal '/oauth/authorize?client_id=mock-collabratec-oauth-client-id'
 							done()
+
+				it "should set pro features", (done) ->
+					oauthLink login_collabratec_email_exists, @user, (err) =>
+						return done(err) if err?
+						options =
+							method: 'post'
+							url: '/org/ieee/collabratec/auth/confirm_link'
+						@user.request options, (error, response, body) =>
+							expect(response.statusCode).to.equal 302
+							@user.get (err, user) ->
+								return done(err) if err?
+								expect(user.features.collaborators).to.equal -1
+								expect(user.features.dropbox).to.equal true
+								done()
