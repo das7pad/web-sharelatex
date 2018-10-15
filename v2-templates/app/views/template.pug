@@ -18,7 +18,7 @@ block content
 								if brand_variation_id
 									a(ng-click="openViewInV1Modal()" class="btn btn-success cta-link") Open as Template
 								else
-									a(href=brand_variation_id ? settings.overleaf.host + open_in_v2_links.main.v1 : open_in_v2_links.main.v2 class="btn btn-success cta-link") Open as Template
+									a(href=open_in_v2_links.main.v2 class="btn btn-success cta-link") Open as Template
 							if source
 								a(href, ng-click="openViewSourceModal()" class="btn btn-success cta-link") View Source
 							if pub.pdf_url
@@ -99,8 +99,11 @@ block content
 				data-dismiss="modal"
 				ng-click="cancel()"
 			) &times;
-			h3 Source
+			h3 Open Template
 		.modal-body
-			p Just popping this here
+			p Projects created from this template have extra features that are specific to the template, which are currently only in Overleaf v1. We are working to bring these features to Overleaf v2. You can open the template in Overleaf v1 or Overleaf v2.
+				.row.text-center.cta-links
+						a(href=settings.overleaf.host + open_in_v2_links.main.v1 class="btn btn-success cta-link") Open in v1
+						a(href=open_in_v2_links.main.v2 class="btn btn-info cta-link") Try it in v2
 		.modal-footer
 			button.btn.btn-default(ng-click="cancel()") Close

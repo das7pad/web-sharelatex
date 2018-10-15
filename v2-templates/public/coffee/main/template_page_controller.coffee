@@ -13,6 +13,6 @@ define [
 			console.log('do we go here')
 			modalInstance = $modal.open(
 				templateUrl: "viewInV1ModalTemplate"
-				controller: "viewInV1ModalController"
+				controller: "ViewInV1ModalController"
 				scope: $scope
 			)
