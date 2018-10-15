@@ -54,7 +54,7 @@ module.exports = PublicRegistrationController =
 			if err? and err?.message == "EmailAlreadyRegistered"
 				if user?.overleaf?.id?
 					res.json {
-						message: 
+						message:
 							text: "You are already registered in ShareLaTeX through the Overleaf Beta. Please log in via Overleaf."
 					}
 				else
@@ -63,24 +63,28 @@ module.exports = PublicRegistrationController =
 				next(err)
 			else
 				metrics.inc "user.register.success"
-				ReferalAllocator.allocate req.session.referal_id, user._id, req.session.referal_source, req.session.referal_medium
 
-				UserEmailsConfirmationHandler.sendConfirmationEmail user._id, user.email, 'welcome', () ->
-
-				UserHandler.populateTeamInvites(user, ->)
+				# send mail in the background
+				UserEmailsConfirmationHandler.sendConfirmationEmail(user._id, user.email, 'welcome', () ->)
 
 				req.login user, (err) ->
-					return callback(error) if error?
+					return callback(err) if err?
 					req.session.justRegistered = true
 					AnalyticsManager.identifyUser(user._id, req.sessionID)
 					# copy to the old `session.user` location, for backward-comptability
 					req.session.user = req.session.passport.user
 					AuthenticationController._clearRedirectFromSession(req)
-					UserSessionsManager.trackSession(user, req.sessionID, () ->)
-					res.json
-						redir: redir
-						id: user._id.toString()
-						first_name: user.first_name
-						last_name: user.last_name
-						email: user.email
-						created: Date.now()
+
+					# ignoring errors on these methods. We expect them to log errors, but we want to
+					# continue if the fail as the user has already successfully registered and we dont
+					# want to show them an error page beyond this point.
+					UserSessionsManager.trackSession user, req.sessionID, () ->
+						UserHandler.populateTeamInvites user, () ->
+							ReferalAllocator.allocate req.session.referal_id, user._id, req.session.referal_source, req.session.referal_medium, () ->
+								res.json
+									redir: redir
+									id: user._id.toString()
+									first_name: user.first_name
+									last_name: user.last_name
+									email: user.email
+									created: Date.now()
