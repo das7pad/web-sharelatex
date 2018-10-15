@@ -10,7 +10,6 @@ define [
 			)
 
 		$scope.openViewInV1Modal = () ->
-			console.log('do we go here')
 			modalInstance = $modal.open(
 				templateUrl: "viewInV1ModalTemplate"
 				controller: "ViewInV1ModalController"
