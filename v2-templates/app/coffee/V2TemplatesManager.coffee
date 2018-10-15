@@ -4,6 +4,8 @@ _ = require "lodash"
 request = require "request"
 settings = require "settings-sharelatex"
 sanitizeHtml = require 'sanitize-html'
+Errors = require "../../../../app/js/Features/Errors/Errors"
+
 # Strip all tags - used on templates index but not on detail page
 sanitizeOptions = { allowedTags: [], allowedAttributes: [] }
 
@@ -160,6 +162,8 @@ module.exports = V2TemplatesManager =
 				callback err
 			else if httpResponse.statusCode in [301, 302]
 				callback new V2TemplatesManager.RedirectError httpResponse.statusCode, httpResponse.headers.location
+			else if httpResponse.statusCode == 404
+				callback new Errors.NotFoundError('Template not found')
 			else if httpResponse.statusCode >= 300
 				# Handle HTTP errors. E.g. staging v1 has basic auth
 				callback new Error('Error fetching from v1')
