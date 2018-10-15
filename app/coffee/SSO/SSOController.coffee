@@ -56,8 +56,6 @@ module.exports = SSOController =
 				return SSOController._renderError(req, res, "registration_error")
 
 	_renderError: (req, res, error) ->
-		# user gets set automatically by passport so delete on error
-		delete req.session?.passport?.user
 		if req.headers?['accept']?.match(/^application\/json.*$/)
 			res.json message: {
 				type: "error",
