@@ -20,7 +20,7 @@ describe "PublicRegistrationController", ->
 		@UserRegistrationHandler =
 			registerNewUser: sinon.stub()
 		@ReferalAllocator =
-			allocate:sinon.stub()
+			allocate:sinon.stub().yields()
 		@SubscriptionDomainHandler =
 			getDomainLicencePage:sinon.stub()
 		@UserUpdater =
@@ -28,13 +28,13 @@ describe "PublicRegistrationController", ->
 		@UserEmailsConfirmationHandler =
 			sendConfirmationEmail: sinon.stub().yields()
 		@UserHandler =
-			populateTeamInvites: sinon.stub().callsArgWith(1)
+			populateTeamInvites: sinon.stub().callsArgWith(1).yields()
 		@AuthenticationController =
 			passportLogin: sinon.stub()
 			_getRedirectFromSession: sinon.stub().returns("/somewhere")
 			_clearRedirectFromSession: sinon.stub()
 		@UserSessionsManager =
-			trackSession:sinon.stub()
+			trackSession:sinon.stub().yields()
 		@AnalyticsManager =
 			identifyUser:sinon.stub()
 		@PublicRegistrationController = SandboxedModule.require modulePath, requires:
