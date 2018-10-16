@@ -6,14 +6,18 @@ PROJECT_NAME = web
 MODULE_DIRS := $(shell find modules -mindepth 1 -maxdepth 1 -type d -not -name '.git' )
 MODULE_MAKEFILES := $(MODULE_DIRS:=/Makefile)
 COFFEE := node_modules/.bin/coffee $(COFFEE_OPTIONS)
+BABEL := node_modules/.bin/babel
 GRUNT := node_modules/.bin/grunt
+
 APP_COFFEE_FILES := $(shell find app/coffee -name '*.coffee')
-FRONT_END_COFFEE_FILES := $(shell find public/coffee -name '*.coffee')
+FRONT_END_SRC_FILES := $(shell find public/src -name '*.js')
 TEST_COFFEE_FILES := $(shell find test/*/coffee -name '*.coffee')
-MODULE_MAIN_COFFEE_FILES := $(shell find modules -type f -wholename '*main/index.coffee')
-MODULE_IDE_COFFEE_FILES := $(shell find modules -type f -wholename '*ide/index.coffee')
+MODULE_MAIN_SRC_FILES := $(shell find modules -type f -wholename '*main/index.js')
+MODULE_IDE_SRC_FILES := $(shell find modules -type f -wholename '*ide/index.js')
 COFFEE_FILES := app.coffee $(APP_COFFEE_FILES) $(FRONT_END_COFFEE_FILES) $(TEST_COFFEE_FILES)
+SRC_FILES := $(FRONT_END_SRC_FILES)
 JS_FILES := $(subst coffee,js,$(COFFEE_FILES))
+OUTPUT_SRC_FILES := $(subst src,js,$(SRC_FILES))
 SHAREJS_COFFEE_FILES := \
 	public/coffee/ide/editor/sharejs/header.coffee \
 	public/coffee/ide/editor/sharejs/vendor/types/helpers.coffee \
@@ -34,9 +38,9 @@ app/js/%.js: app/coffee/%.coffee
 	@mkdir -p $(@D)
 	$(COFFEE) --compile -o $(@D) $<
 
-public/js/%.js: public/coffee/%.coffee
+public/js/%.js: public/src/%.js
 	@mkdir -p $(@D)
-	$(COFFEE) --output $(@D) --map --compile $<
+	$(BABEL) $< --out-file $@
 
 test/unit/js/%.js: test/unit/coffee/%.coffee
 	@mkdir -p $(@D)
@@ -61,34 +65,34 @@ public/js/libs/sharejs.js: $(SHAREJS_COFFEE_FILES)
 	@echo "" >> public/js/libs/sharejs.js
 	@echo "return window.sharejs; });" >> public/js/libs/sharejs.js
 
-public/js/ide.js: public/coffee/ide.coffee $(MODULE_IDE_COFFEE_FILES)
+public/js/ide.js: public/src/ide.js $(MODULE_IDE_SRC_FILES)
 	@echo Compiling and injecting module includes into public/js/ide.js
 	@INCLUDES=""; \
 	for dir in modules/*; \
 	do \
 		MODULE=`echo $$dir | cut -d/ -f2`; \
-		if [ -e $$dir/public/coffee/ide/index.coffee ]; then \
+		if [ -e $$dir/public/src/ide/index.js ]; then \
 			INCLUDES="\"ide/$$MODULE/index\",$$INCLUDES"; \
 		fi \
 	done; \
 	INCLUDES=$${INCLUDES%?}; \
-	$(COFFEE) --compile --print $< | \
-		sed -e s=\"__IDE_CLIENTSIDE_INCLUDES__\"=$$INCLUDES= \
+	$(BABEL) $< | \
+		sed -e s=\'__IDE_CLIENTSIDE_INCLUDES__\'=$$INCLUDES= \
 		> $@
 
-public/js/main.js: public/coffee/main.coffee $(MODULE_MAIN_COFFEE_FILES)
+public/js/main.js: public/src/main.js $(MODULE_MAIN_SRC_FILES)
 	@echo Compiling and injecting module includes into public/js/main.js
 	@INCLUDES=""; \
 	for dir in modules/*; \
 	do \
 		MODULE=`echo $$dir | cut -d/ -f2`; \
-		if [ -e $$dir/public/coffee/main/index.coffee ]; then \
+		if [ -e $$dir/public/src/main/index.js ]; then \
 			INCLUDES="\"main/$$MODULE/index\",$$INCLUDES"; \
 		fi \
 	done; \
 	INCLUDES=$${INCLUDES%?}; \
-	$(COFFEE) --compile --print $< | \
-		sed -e s=\"__MAIN_CLIENTSIDE_INCLUDES__\"=$$INCLUDES= \
+	$(BABEL) $< | \
+		sed -e s=\'__MAIN_CLIENTSIDE_INCLUDES__\'=$$INCLUDES= \
 		> $@
 
 $(CSS_FILES): $(LESS_FILES)
@@ -103,7 +107,7 @@ minify_es:
 
 css: $(CSS_FILES)
 
-compile: $(JS_FILES) css public/js/libs/sharejs.js public/js/main.js public/js/ide.js
+compile: $(JS_FILES) $(OUTPUT_SRC_FILES) css public/js/main.js public/js/ide.js
 	@$(MAKE) compile_modules
 
 compile_full:
