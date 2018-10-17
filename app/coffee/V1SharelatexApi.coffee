@@ -24,6 +24,6 @@ module.exports = V1SharelatexApi =
 				error = Errors.fromErrorCode(error_code, error_message, error_data)
 				callback error
 			else
-				error = new Error("overleaf returned non-success code: #{response.statusCode}")
+				error = new Error("overleaf returned non-success code: #{response.statusCode} for #{options.method} #{options.url}")
 				error.statusCode = response.statusCode
 				callback error

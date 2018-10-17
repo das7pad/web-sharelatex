@@ -1,4 +1,5 @@
 AuthenticationController = require "../../../../../app/js/Features/Authentication/AuthenticationController"
+FeaturesUpdater = require "../../../../../app/js/Features/Subscription/FeaturesUpdater"
 CollabratecManager = require "./CollabratecManager"
 OverleafAuthenticationManager = require "../Authentication/OverleafAuthenticationManager"
 Path = require "path"
@@ -63,7 +64,9 @@ module.exports = CollabratecController =
 					else
 						next err
 				else
-					CollabratecController._setupUser req, res, next, profile
+					FeaturesUpdater.refreshFeatures user._id, false, (err) ->
+						return next err if err?
+						CollabratecController._setupUser req, res, next, profile
 
 	_oauthConfirmLinkRegister: (req, res, next) ->
 		oauth_params = req.session.collabratec_oauth_params
