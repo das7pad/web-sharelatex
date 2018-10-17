@@ -12,6 +12,7 @@ expect = chai.expect
 login_collabratec_id_exists_saml = createMockSamlResponse('User', 'Exists', 'mock-user@exists.com', '1111')
 login_collabratec_id_does_not_exist_saml = createMockSamlResponse('User', 'DoesNotExist', 'mock-user@does-not-exist.com', '2222')
 login_collabratec_email_exists = createMockSamlResponse('User', 'EmailExist', 'mock-user@email-exists.com', '3333')
+login_collabratec_already_connected = createMockSamlResponse('User', 'AlreadyConnected', 'mock-user@already-connected.com', '4444')
 
 describe "Collabratec", ->
 
@@ -185,3 +186,35 @@ describe "Collabratec", ->
 								expect(user.features.collaborators).to.equal -1
 								expect(user.features.dropbox).to.equal true
 								done()
+
+	describe "showProject", ->
+
+		it "should redirect to saml sign in flow", (done) ->
+			options =
+				method: 'get'
+				url: '/org/ieee/collabratec/projects/mock-project-id'
+			@user.request options, (error, response, body) ->
+				expect(response.statusCode).to.equal 302
+				url = URL.parse(response.headers.location)
+				expect(url.path).to.equal '/org/ieee/saml/init'
+				done()
+
+		it "should redirect to v1 after sign-in", (done) ->
+			options =
+				method: 'get'
+				url: '/org/ieee/collabratec/projects/mock-project-id'
+			@user.request options, (error, response, body) =>
+				expect(response.statusCode).to.equal 302
+				url = URL.parse(response.headers.location)
+				expect(url.path).to.equal '/org/ieee/saml/init'
+
+				options =
+					form:
+						SAMLResponse: login_collabratec_id_exists_saml
+					method: 'post'
+					url: '/org/ieee/saml/consume'
+				@user.request options, (error, response, body) =>
+					expect(response.statusCode).to.equal 302
+					url = URL.parse(response.headers.location)
+					expect(url.path).to.equal '/sign_in_to_v1?return_to=%2Fmock-project-id'
+					done()
