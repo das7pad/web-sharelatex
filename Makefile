@@ -19,15 +19,6 @@ COFFEE_FILES := app.coffee $(APP_COFFEE_FILES) $(FRONT_END_COFFEE_FILES) $(TEST_
 SRC_FILES := $(FRONT_END_SRC_FILES) $(TEST_SRC_FILES)
 JS_FILES := $(subst coffee,js,$(COFFEE_FILES))
 OUTPUT_SRC_FILES := $(subst src,js,$(SRC_FILES))
-SHAREJS_COFFEE_FILES := \
-	public/coffee/ide/editor/sharejs/header.coffee \
-	public/coffee/ide/editor/sharejs/vendor/types/helpers.coffee \
-	public/coffee/ide/editor/sharejs/vendor/types/text.coffee \
-	public/coffee/ide/editor/sharejs/vendor/types/text-api.coffee \
-	public/coffee/ide/editor/sharejs/vendor/client/microevent.coffee \
-	public/coffee/ide/editor/sharejs/vendor/client/doc.coffee \
-	public/coffee/ide/editor/sharejs/vendor/client/ace.coffee \
-	public/coffee/ide/editor/sharejs/vendor/client/cm.coffee
 LESS_FILES := $(shell find public/stylesheets -name '*.less')
 CSS_FILES := public/stylesheets/style.css public/stylesheets/ol-style.css public/stylesheets/ol-light-style.css
 
@@ -59,12 +50,6 @@ test/smoke/js/%.js: test/smoke/coffee/%.coffee
 	@mkdir -p $(@D)
 	$(COFFEE) --compile -o $(@D) $<
 
-public/js/libs/sharejs.js: $(SHAREJS_COFFEE_FILES)
-	@echo "Compiling public/js/libs/sharejs.js"
-	@echo 'define(["ace/ace"], function() {' > public/js/libs/sharejs.js
-	@cat $(SHAREJS_COFFEE_FILES) | $(COFFEE) --stdio --print >> public/js/libs/sharejs.js
-	@echo "" >> public/js/libs/sharejs.js
-	@echo "return window.sharejs; });" >> public/js/libs/sharejs.js
 
 public/js/ide.js: public/src/ide.js $(MODULE_IDE_SRC_FILES)
 	@echo Compiling and injecting module includes into public/js/ide.js
@@ -96,6 +81,10 @@ public/js/main.js: public/src/main.js $(MODULE_MAIN_SRC_FILES)
 		sed -e s=\'__MAIN_CLIENTSIDE_INCLUDES__\'=$$INCLUDES= \
 		> $@
 
+public/js/libs/sharejs.js: public/src/ide/editor/sharejs/sharejs.js
+	@mkdir -p $(@D)
+	$(BABEL) $< --out-file $@
+
 $(CSS_FILES): $(LESS_FILES)
 	$(GRUNT) compile:css
 
@@ -108,7 +97,7 @@ minify_es:
 
 css: $(CSS_FILES)
 
-compile: $(JS_FILES) $(OUTPUT_SRC_FILES) css public/js/main.js public/js/ide.js
+compile: $(JS_FILES) $(OUTPUT_SRC_FILES) css public/js/libs/sharejs.js public/js/main.js public/js/ide.js
 	@$(MAKE) compile_modules
 
 compile_full:
