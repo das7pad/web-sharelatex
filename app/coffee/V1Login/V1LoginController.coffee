@@ -5,6 +5,7 @@ WEB = "../../../../.."
 AuthenticationController = require "#{WEB}/app/js/Features/Authentication/AuthenticationController"
 UserGetter = require "#{WEB}/app/js/Features/User/UserGetter"
 UserRegistrationHandler = require "#{WEB}/app/js/Features/User/UserRegistrationHandler"
+ReferalAllocator = require("#{WEB}/app/js/Features/Referal/ReferalAllocator")
 NewsLetterManager = require("#{WEB}/app/js/Features/Newsletter/NewsletterManager")
 OverleafAuthenticationManager = require "../Authentication/OverleafAuthenticationManager"
 OverleafAuthenticationController = require "../Authentication/OverleafAuthenticationController"
@@ -67,8 +68,10 @@ module.exports = V1LoginController =
 					return res.json message: {type: 'error', text: req.i18n.translate('email_already_registered')}
 				else
 					logger.log email: email, v1UserId: profile.id, "v1 account created"
+
 					OverleafAuthenticationManager.setupUser profile, (err, user, info) ->
 						return callback(err) if err?
+
 						if info?.email_exists_in_sl
 							logger.log {email, info}, "account exists in SL, redirecting to sharelatex to merge accounts"
 							url = OverleafAuthenticationController.prepareAccountMerge(info, req)
@@ -78,7 +81,11 @@ module.exports = V1LoginController =
 							logger.log {email}, "successful registration with v1, proceeding with session setup"
 							if subscribeToNewsletter
 								NewsLetterManager.subscribe user, ->
-							AuthenticationController.finishLogin(user, req, res, next)
+
+							# We don't want to do anything with the result of this as the user has already signed up successfully.
+							# ReferalAllocator.allocate will log if something goes wrong.
+							ReferalAllocator.allocate req.session.referal_id, user._id, req.session.referal_source, req.session.referal_medium, () ->
+								AuthenticationController.finishLogin(user, req, res, next)
 
 	loginPage: (req, res, next) ->
 		if AuthenticationController.isUserLoggedIn(req)

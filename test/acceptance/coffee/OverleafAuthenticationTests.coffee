@@ -153,6 +153,36 @@ describe "OverleafAuthentication", ->
 						expect(user.signUpDate).to.be.above(new Date(Date.now() - 2000))
 						done()
 
+		describe 'with a v2 referal id', ->
+			beforeEach (done) ->
+				@user2 = newUser()
+				@user2.ensureUserExists done
+
+			it 'should not fail with an invalid referal id', (done) ->
+				@user.request.post {
+					url: '/register?r=abcd1234&rm=d&rs=b',
+					json:
+						email: @user.email
+						password: 'banana'
+				}, (error, response, body) =>
+					return done(error) if error?
+					expect(response.statusCode).to.equal 200
+					done()
+
+			it 'should record a referal with a valid referal id', (done) ->
+				@user.request.post {
+					url: '/register?r=' + @user2.referal_id + '&rm=d&rs=b',
+					json:
+						email: @user.email
+						password: 'banana'
+				}, (error, response, body) =>
+					return done(error) if error?
+					expect(response.statusCode).to.equal 200
+					@user2.get (error, user) ->
+						return done(error) if error?
+						expect(user.refered_user_count).to.equal 1
+						done()
+
 		describe 'with an email that exists in SL', ->
 			beforeEach (done) ->
 				@user.ensureUserExists done
