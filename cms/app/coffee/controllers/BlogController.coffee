@@ -50,7 +50,7 @@ parseBlogPost = (post) ->
 getTagId = (tag) ->
 	query = {
 		content_type: 'blogTag'
-		'fields.tag[match]': tag
+		'fields.tag': tag
 	}
 	ContentfulClient.client.getEntries(query)
 
@@ -107,8 +107,6 @@ _getBlog = (req, res, next) ->
 			# Filter by tag
 			if req.params.tag
 				# get the ID of the tag via the tag in the URL
-				# to do - stricter query?
-				# API will return posts tagged with "Auto-compile" if the query is " Auto-compil"
 				getTagId(req.params.tag)
 					.then (tagData) ->
 						if tagData && tagData.items[0] && tagData.items[0].sys && tagData.items[0].sys.id
