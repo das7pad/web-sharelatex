@@ -79,7 +79,7 @@ getAndRenderBlog = (req, res, next, blogQuery, page) ->
 					pages: {
 						current_page: if req.params.page && !isNaN(req.params.page) then req.params.page else 1,
 						total: collection.total,
-						total_pages: Math.floor(collection.total/resultsPerPage)
+						total_pages: Math.ceil(collection.total/resultsPerPage)
 					},
 					tag: req.params.tag,
 					url_path: url_path
