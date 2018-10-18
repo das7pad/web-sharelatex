@@ -1,10 +1,10 @@
-AuthenticationController = require('../Authentication/AuthenticationController')
+UserMembershipAuthorization = require './UserMembershipAuthorization'
 UserMembershipController = require './UserMembershipController'
 
 module.exports =
 	apply: (webRouter) ->
 		webRouter.get '/manage/groups/:id/members',
-			AuthenticationController.requireLogin(),
+			UserMembershipAuthorization.requireEntityAccess('group'),
 			(req, res, next) -> UserMembershipController.index('group', req, res, next)
 
 
@@ -14,13 +14,13 @@ module.exports =
 		for pathName, entityName of regularEntitites
 			do (pathName, entityName) ->
 				webRouter.get "/manage/#{pathName}/:id/managers",
-					AuthenticationController.requireLogin(),
+					UserMembershipAuthorization.requireEntityAccess(entityName),
 					(req, res, next) -> UserMembershipController.index(entityName, req, res, next)
 
 				webRouter.post "/manage/#{pathName}/:id/managers",
-					AuthenticationController.requireLogin(),
+					UserMembershipAuthorization.requireEntityAccess(entityName),
 					(req, res, next) -> UserMembershipController.add(entityName, req, res, next)
 
 				webRouter.delete "/manage/#{pathName}/:id/managers/:userId",
-					AuthenticationController.requireLogin(),
+					UserMembershipAuthorization.requireEntityAccess(entityName),
 					(req, res, next) -> UserMembershipController.remove(entityName, req, res, next)
