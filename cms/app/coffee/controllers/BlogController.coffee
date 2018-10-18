@@ -102,7 +102,7 @@ _getBlog = (req, res, next) ->
 
 			# Pagination
 			if req.params.page && !isNaN(req.params.page)
-				blogQuery.skip = (req.params.page * resultsPerPage)
+				blogQuery.skip = (parseInt(req.params.page - 1, 10) * resultsPerPage)
 
 			# Filter by tag
 			if req.params.tag
