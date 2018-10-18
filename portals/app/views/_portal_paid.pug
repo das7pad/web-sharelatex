@@ -1,18 +1,32 @@
-tabset.ol-tabs
-	tab(heading='Overview')
+tabset.ol-tabs(
+	bookmarkable-tabset
+)
+	tab(
+		heading='Overview'
+		bookmarkable-tab="overview"
+	)
 		.row
 			.col-sm-10.col-sm-offset-1
 				include partials/paid/_overview
-	tab(heading='Quick Start')
+	tab(
+		heading='Quick Start'
+		bookmarkable-tab="quick-start"
+	)
 		.row
 			.col-sm-10.col-sm-offset-1
 				include partials/paid/_quick_start
-	tab(heading='Templates')
+	tab(
+		heading='Templates'
+		bookmarkable-tab="templates"
+	)
 		.row
 			.col-sm-10.col-sm-offset-1
 				//- to do: active if in team
 				include partials/paid/_templates
-	tab(heading='FAQ & Help')
+	tab(
+		heading='FAQ & Help'
+		bookmarkable-tab="help"
+	)
 		.row
 			.col-sm-10.col-sm-offset-1
 				include partials/paid/_help

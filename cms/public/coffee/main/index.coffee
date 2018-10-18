@@ -1,4 +1,4 @@
 define [
-	'directives/mathjax'
+	'base'
 ], (App) ->
 	App.controller "CmsController", () ->
