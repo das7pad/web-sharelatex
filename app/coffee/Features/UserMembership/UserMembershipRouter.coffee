@@ -5,7 +5,7 @@ module.exports =
 	apply: (webRouter) ->
 		webRouter.get '/manage/groups/:id/members',
 			UserMembershipAuthorization.requireEntityAccess('group'),
-			(req, res, next) -> UserMembershipController.index('group', req, res, next)
+			UserMembershipController.index
 
 
 		regularEntitites =
@@ -15,12 +15,12 @@ module.exports =
 			do (pathName, entityName) ->
 				webRouter.get "/manage/#{pathName}/:id/managers",
 					UserMembershipAuthorization.requireEntityAccess(entityName),
-					(req, res, next) -> UserMembershipController.index(entityName, req, res, next)
+					UserMembershipController.index
 
 				webRouter.post "/manage/#{pathName}/:id/managers",
 					UserMembershipAuthorization.requireEntityAccess(entityName),
-					(req, res, next) -> UserMembershipController.add(entityName, req, res, next)
+					UserMembershipController.add
 
 				webRouter.delete "/manage/#{pathName}/:id/managers/:userId",
 					UserMembershipAuthorization.requireEntityAccess(entityName),
-					(req, res, next) -> UserMembershipController.remove(entityName, req, res, next)
+					UserMembershipController.remove
