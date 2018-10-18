@@ -88,7 +88,7 @@ public/js/libs/sharejs.js: public/src/ide/editor/sharejs/sharejs.js
 $(CSS_FILES): $(LESS_FILES)
 	$(GRUNT) compile:css
 
-minify: $(CSS_FILES) $(JS_FILES)
+minify: $(CSS_FILES) $(JS_FILES) $(OUTPUT_SRC_FILES)
 	$(GRUNT) compile:minify
 	$(MAKE) minify_es
 
