@@ -12,10 +12,11 @@ GRUNT := node_modules/.bin/grunt
 APP_COFFEE_FILES := $(shell find app/coffee -name '*.coffee')
 FRONT_END_SRC_FILES := $(shell find public/src -name '*.js')
 TEST_COFFEE_FILES := $(shell find test/*/coffee -name '*.coffee')
+TEST_SRC_FILES := $(shell find test/*/src -name '*.js')
 MODULE_MAIN_SRC_FILES := $(shell find modules -type f -wholename '*main/index.js')
 MODULE_IDE_SRC_FILES := $(shell find modules -type f -wholename '*ide/index.js')
 COFFEE_FILES := app.coffee $(APP_COFFEE_FILES) $(FRONT_END_COFFEE_FILES) $(TEST_COFFEE_FILES)
-SRC_FILES := $(FRONT_END_SRC_FILES)
+SRC_FILES := $(FRONT_END_SRC_FILES) $(TEST_SRC_FILES)
 JS_FILES := $(subst coffee,js,$(COFFEE_FILES))
 OUTPUT_SRC_FILES := $(subst src,js,$(SRC_FILES))
 SHAREJS_COFFEE_FILES := \
@@ -50,9 +51,9 @@ test/acceptance/js/%.js: test/acceptance/coffee/%.coffee
 	@mkdir -p $(@D)
 	$(COFFEE) --compile -o $(@D) $<
 
-test/unit_frontend/js/%.js: test/unit_frontend/coffee/%.coffee
+test/unit_frontend/js/%.js: test/unit_frontend/src/%.js
 	@mkdir -p $(@D)
-	$(COFFEE) --compile -o $(@D) $< 
+	$(BABEL) $< --out-file $@
 
 test/smoke/js/%.js: test/smoke/coffee/%.coffee
 	@mkdir -p $(@D)
