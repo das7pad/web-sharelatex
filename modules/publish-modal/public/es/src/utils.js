@@ -21,6 +21,9 @@ export function initiateExport (entry, projectId, _this) {
   if (_this.lastName) {
     data['lastName'] = _this.lastName.value
   }
+  if (_this.author) {
+    data['author'] = _this.author.value
+  }
   if (_this.description) {
     data['description'] = _this.description.value
   }

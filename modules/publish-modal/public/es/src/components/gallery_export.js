@@ -14,10 +14,10 @@ export default class GalleryExport extends Component {
 
   runExport (ev) {
     ev.preventDefault()
-    let valid = this.firstName.value &&
-      this.lastName.value &&
-      this.description.value &&
-      this.title.value;
+    let valid =
+      this.title.value &&
+      this.author.value &&
+      this.description.value
     if (valid) {
       const { entry, projectId } = this.props
       initiateExport(entry, projectId, this)
@@ -29,7 +29,7 @@ export default class GalleryExport extends Component {
   renderUninitiated() {
     const {
       entry, projectId,
-      firstName, lastName, title, description, license, showSource
+      author, title, description, license, showSource
     } = this.props
     return (
       <form onSubmit={ (ev) => this.runExport(ev) }>
@@ -38,30 +38,6 @@ export default class GalleryExport extends Component {
         from Overleaf and make it searchable and shareable. Just fill
         out the details below.
         </p>
-        <div className="form-control-box">
-          <label htmlFor="gallery-export-first-name">First name</label>
-          <input
-            id="gallery-export-first-name"
-            type="text"
-            className="form-control"
-            defaultValue={firstName}
-            maxLength="255"
-            placeholder="First Name"
-            ref={ (input) => (this.firstName = input)}
-          />
-        </div>
-        <div className="form-control-box">
-          <label htmlFor="gallery-export-last-name">Last name</label>
-          <input
-            id="gallery-export-last-name"
-            type="text"
-            className="form-control"
-            defaultValue={lastName}
-            maxLength="255"
-            placeholder="Last Name"
-            ref={ (input) => (this.lastName = input)}
-          />
-        </div>
         <div className="form-control-box">
           <label htmlFor="gallery-export-title">Title</label>
           <input
@@ -72,6 +48,18 @@ export default class GalleryExport extends Component {
             maxLength="255"
             placeholder="Title"
             ref={ (input) => (this.title = input)}
+          />
+        </div>
+        <div className="form-control-box">
+          <label htmlFor="gallery-export-author">Author(s)</label>
+          <input
+            id="gallery-export-first-name"
+            type="text"
+            className="form-control"
+            defaultValue={author}
+            maxLength="255"
+            placeholder="Author(s)"
+            ref={ (input) => (this.author = input)}
           />
         </div>
         <div className="form-control-box">
@@ -114,7 +102,7 @@ export default class GalleryExport extends Component {
           value={"Submit to " + entry.name}/>
         { !this.state.submissionValid &&
           <p style={{color: 'red'}}>
-            Please provide all of first name, last name, title,
+            Please provide all of title, author(s)
             and description before continuing
           </p>
         }
@@ -204,8 +192,6 @@ GalleryExport.propTypes = {
   onReturn: PropTypes.func,
   projectId: PropTypes.string.isRequired,
   hasFolders: PropTypes.bool,
-  firstName: PropTypes.string,
-  lastName: PropTypes.string,
   title: PropTypes.string,
   description: PropTypes.string,
   license: PropTypes.string,
