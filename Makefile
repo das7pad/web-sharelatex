@@ -103,11 +103,11 @@ compile: $(JS_FILES) $(OUTPUT_SRC_FILES) css public/js/libs/sharejs.js public/js
 compile_full:
 	$(COFFEE) -c -p app.coffee > app.js
 	$(COFFEE) -o app/js -c app/coffee
-	$(COFFEE) -o public/js -c public/coffee
+	$(BABEL) public/src --out-dir public/js
 	$(COFFEE) -o test/acceptance/js -c test/acceptance/coffee
 	$(COFFEE) -o test/smoke/js -c test/smoke/coffee
 	$(COFFEE) -o test/unit/js -c test/unit/coffee
-	$(COFFEE) -o test/unit_frontend/js -c test/unit_frontend/coffee
+	$(BABEL) test/unit_frontend/src --out-dir test/unit_frontend/js
 	rm -f public/js/ide.js public/js/main.js # We need to generate ide.js, main.js manually later
 	$(MAKE) $(CSS_FILES)
 	$(MAKE) compile_modules_full
