@@ -8,7 +8,7 @@ block vars
 
 block content
 	//- to do? image as env var
-	- var defaultPortalBannerImage = 'https://www.overleaf.com/assets/universities/campus-default-6ff0eb1eb94de6defcbabd3d4d0d67d5a576908df214727a7367a8b0c806d05c.jpg'
+	- var defaultPortalBannerImage = buildImgPath('portal-default.jpg')
 	- var backgroundImage = portal.banner_image_url ? portal.banner_image_url : defaultPortalBannerImage
 
 	.content.content-alt.content-portal.content-page
