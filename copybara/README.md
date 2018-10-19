@@ -41,10 +41,10 @@ in a bad state, you can provide with an explicit reference to a commit in the
 source repo to start replaying commits from. Add the following to the
 `docker-compose.yml` config:
 ```yaml
-	copybara:
-		...
-		environment:
-			...
+  copybara:
+    ...
+    environment:
+      ...
       COPYBARA_OPTIONS: "--last-rev=COMMIT_SHA_FROM_SOURCE_REPO"
 ```
 
