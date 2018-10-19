@@ -148,7 +148,7 @@ pipeline {
 
     stage('Sync OSS') {
       when {
-        branch 'ja-copybara'
+        branch 'master'
       }
       agent {
         docker {

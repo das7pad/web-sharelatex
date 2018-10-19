@@ -2,10 +2,10 @@ core.workflow(
     name = "default",
     origin = git.origin(
       url = "git@github.com:sharelatex/web-sharelatex-internal.git",
-      ref = "ja-copybara"
+      ref = "master"
     ),
     destination = git.destination(
-      url = "git@github.com:sharelatex/ja-copybara-dest.git",
+      url = "git@github.com:sharelatex/web-sharelatex.git",
       fetch = "master",
       push = "master"
     ),
