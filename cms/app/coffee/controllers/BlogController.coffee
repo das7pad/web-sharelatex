@@ -65,9 +65,13 @@ getAndRenderBlog = (req, res, next, blogQuery, page) ->
 		.then (collection) ->
 			if collection.items.length == 0
 				# check if they have a v1 ID but with the wrong slug
-				slugPieces = req.params.slug.split('-')
+				if req.params.slug
+					slugPieces = req.params.slug.split('-')
 				if slugPieces && slugPieces[0] && !isNaN(slugPieces[0])
 					_v1IdQuery(slugPieces[0], req, res)
+				else
+					ErrorController.notFound req, res
+
 			else if page == 'blog/blog_post'
 				# a single blog post
 				cmsData = parseBlogPost(collection.items[0].fields)
