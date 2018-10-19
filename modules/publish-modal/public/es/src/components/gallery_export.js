@@ -54,7 +54,7 @@ export default class GalleryExport extends Component {
         <div className="form-control-box">
           <label htmlFor="gallery-export-author">Author(s)</label>
           <input
-            id="gallery-export-first-name"
+            id="gallery-export-author"
             type="text"
             className="form-control"
             defaultValue={author}
