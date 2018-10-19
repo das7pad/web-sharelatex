@@ -17,7 +17,8 @@ export default class GalleryExport extends Component {
     let valid =
       this.title.value &&
       this.author.value &&
-      this.description.value
+      this.description.value &&
+      this.license.value
     if (valid) {
       const { entry, projectId } = this.props
       initiateExport(entry, projectId, this)
