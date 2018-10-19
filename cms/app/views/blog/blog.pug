@@ -23,7 +23,7 @@ block content_cms
 								h2
 									a(href='/blog/' + post.slug)
 										| #{post.title}
-							if (post.authorDisplay || post.publishDateDay)
+							if (post.authorDisplay || post.publishDatePretty)
 								.row
 									.col-sm-12
 										small Posted

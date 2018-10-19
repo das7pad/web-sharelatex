@@ -50,7 +50,7 @@ parseBlogPost = (post) ->
 getTagId = (tag) ->
 	query = {
 		content_type: 'blogTag'
-		'fields.tag[match]': tag
+		'fields.tag': tag
 	}
 	ContentfulClient.client.getEntries(query)
 
@@ -65,9 +65,13 @@ getAndRenderBlog = (req, res, next, blogQuery, page) ->
 		.then (collection) ->
 			if collection.items.length == 0
 				# check if they have a v1 ID but with the wrong slug
-				slugPieces = req.params.slug.split('-')
+				if req.params.slug
+					slugPieces = req.params.slug.split('-')
 				if slugPieces && slugPieces[0] && !isNaN(slugPieces[0])
 					_v1IdQuery(slugPieces[0], req, res)
+				else
+					ErrorController.notFound req, res
+
 			else if page == 'blog/blog_post'
 				# a single blog post
 				cmsData = parseBlogPost(collection.items[0].fields)
@@ -79,7 +83,7 @@ getAndRenderBlog = (req, res, next, blogQuery, page) ->
 					pages: {
 						current_page: if req.params.page && !isNaN(req.params.page) then req.params.page else 1,
 						total: collection.total,
-						total_pages: Math.floor(collection.total/resultsPerPage)
+						total_pages: Math.ceil(collection.total/resultsPerPage)
 					},
 					tag: req.params.tag,
 					url_path: url_path
@@ -102,13 +106,11 @@ _getBlog = (req, res, next) ->
 
 			# Pagination
 			if req.params.page && !isNaN(req.params.page)
-				blogQuery.skip = (req.params.page * resultsPerPage)
+				blogQuery.skip = (parseInt(req.params.page - 1, 10) * resultsPerPage)
 
 			# Filter by tag
 			if req.params.tag
 				# get the ID of the tag via the tag in the URL
-				# to do - stricter query?
-				# API will return posts tagged with "Auto-compile" if the query is " Auto-compil"
 				getTagId(req.params.tag)
 					.then (tagData) ->
 						if tagData && tagData.items[0] && tagData.items[0].sys && tagData.items[0].sys.id
