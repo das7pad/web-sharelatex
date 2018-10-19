@@ -9,11 +9,12 @@ module.exports =
 		{ entity, entityConfig } = req
 		UserMembershipHandler.getUsers entity, entityConfig, (error, users)->
 			return next(error) if error?
+			entityPrimaryKey = entity[entityConfig.fields.primaryKey].toString()
 			res.render "user_membership/index",
 				users: users
 				groupSize: entity.membersLimit if entityConfig.hasMembersLimit
 				translations: entityConfig.translations
-				paths: entityConfig.pathsFor(entity._id.toString())
+				paths: entityConfig.pathsFor(entityPrimaryKey)
 
 	add: (req, res, next)->
 		{ entity, entityConfig } = req

@@ -19,6 +19,7 @@ describe "UserMembershipController", ->
 		@user = _id: 'mock-user-id'
 		@newUser = _id: 'mock-new-user-id', email: 'new-user-email@foo.bar'
 		@subscription = { _id: 'mock-subscription-id'}
+		@institution = _id: 'mock-institution-id', v1Id: 123
 		@users = [{ _id: 'mock-member-id-1' }, { _id: 'mock-member-id-2' }]
 
 		@AuthenticationController =
@@ -69,6 +70,7 @@ describe "UserMembershipController", ->
 				done()
 
 		it 'render institution view', (done) ->
+			@req.entity = @institution
 			@req.entityConfig = EntityConfigs.institution
 			@UserMembershipController.index @req, render: (viewPath, viewParams) =>
 				expect(viewPath).to.equal 'user_membership/index'
