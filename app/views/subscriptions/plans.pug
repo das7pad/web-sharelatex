@@ -78,11 +78,12 @@ block content
 											+card_student_monthly
 
 				.row.row-spaced-large.text-centered
-					i.fa.fa-cc-mastercard.fa-2x &nbsp;
-					i.fa.fa-cc-visa.fa-2x &nbsp;
-					i.fa.fa-cc-amex.fa-2x &nbsp;
-					i.fa.fa-cc-paypal.fa-2x &nbsp;
-					div.text-centered #{translate('change_plans_any_time')}<br/> #{translate('billed_after_x_days', {len:'{{trial_len}}'})}
+					.col-xs-12
+						i.fa.fa-cc-mastercard.fa-2x &nbsp;
+						i.fa.fa-cc-visa.fa-2x &nbsp;
+						i.fa.fa-cc-amex.fa-2x &nbsp;
+						i.fa.fa-cc-paypal.fa-2x &nbsp;
+						div.text-centered #{translate('change_plans_any_time')}<br/> #{translate('billed_after_x_days', {len:'{{trial_len}}'})}
 
 				.row.row-spaced-large
 					.col-md-8.col-md-offset-2
