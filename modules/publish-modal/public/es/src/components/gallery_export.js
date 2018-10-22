@@ -8,7 +8,7 @@ export default class GalleryExport extends Component {
     this.state = {
       exportState: 'unintiated',
       submissionValid: true,
-      errorDetails: null
+      errorDetails: null,
     }
   }
 
@@ -29,9 +29,12 @@ export default class GalleryExport extends Component {
 
   renderUninitiated() {
     const {
-      entry, projectId,
-      author, title, description, license, showSource
+      entry, projectId, author, title, description, license
     } = this.props
+    var showSource = this.props.showSource
+    if (showSource === undefined || showSource == null) {
+      showSource = this.showSource = true
+    }
     return (
       <form onSubmit={ (ev) => this.runExport(ev) }>
         <p>
@@ -89,24 +92,30 @@ export default class GalleryExport extends Component {
               Other (as stated in the work)
             </option>
           </select>
+          <a
+            href="/learn/how-to/How_are_the_contents_of_the_Overleaf_gallery_licensed%3F"
+          >(?)</a>
         </div>
         <div className="form-control-box">
+          <label htmlFor="gallery-export-show-source"></label>
           <input type="checkbox"
             id="gallery-export-show-source"
             defaultChecked={showSource}
-            placeholder="Show source"
             ref={ (input) => (this.showSource = input)}
           />
-          <label htmlFor="gallery-export-show-source">Show source</label>
+          Let people use this project as a template.
         </div>
-        <input type="submit" className='btn btn-primary'
-          value={"Submit to " + entry.name}/>
-        { !this.state.submissionValid &&
-          <p style={{color: 'red'}}>
-            Please provide all of title, author(s)
-            and description before continuing
-          </p>
-        }
+        <div className="form-control-box">
+          <label htmlFor="gallery-export-submit"></label>
+          <input type="submit" className='btn btn-primary'
+            value={"Submit to " + entry.name}/>
+          { !this.state.submissionValid &&
+            <p style={{color: 'red'}}>
+              Please provide all of title, author(s)
+              and description before continuing
+            </p>
+          }
+        </div>
       </form>
     )
   }
@@ -177,7 +186,7 @@ export default class GalleryExport extends Component {
         <div className='col-sm-12'>
           <ReturnButton onReturn={onReturn} returnText={returnText}/>
           <h3 style={{marginTop: '5px'}}>
-            Submit to: <br/>
+            Submit to:
             <strong> {entry.name} </strong>
           </h3>
           {body}
