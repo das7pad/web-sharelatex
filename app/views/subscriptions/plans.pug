@@ -3,13 +3,16 @@ extends ../layout
 include _plans_page_mixins
 include _plans_page_tables
 
+block vars
+	- metadata = { viewport: true }
+
 block scripts
 	script(type='text/javascript').
 		window.recomendedCurrency = '#{recomendedCurrency}'
 		window.abCurrencyFlag = '#{abCurrencyFlag}'
 
 block content
-	.content.content-alt
+	.content.content-alt.content-page
 		.plans(ng-controller="PlansController")
 			.container(ng-cloak)
 				.row
