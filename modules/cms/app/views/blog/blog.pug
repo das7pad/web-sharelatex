@@ -22,7 +22,7 @@ block content_cms
 							.card-header
 								h2
 									a(href='/blog/' + post.slug)
-										| #{post.title}
+										| !{post.title}
 							if (post.authorDisplay || post.publishDatePretty)
 								.row
 									.col-sm-12
