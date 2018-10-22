@@ -101,11 +101,6 @@
 	.tagline {
 		margin-bottom: 20px;
 	}
-	.top-switch {
-		.currency-dropdown {
-			margin-right: -15px;
-		}
-	}
 	ul.nav-pills {
 		text-align: center;
 		margin-bottom: @line-height-computed;
@@ -161,9 +156,15 @@
 /* Media Queries */
 @media (max-width: @screen-sm-max) {
 	.plans {
-		.card-highlighted {
+		.card-group {
 			/*override style in cards.less */
-			margin-top: @line-height-computed!important;
+			.card {
+				margin-left: 0;
+				margin-right: 0;
+			}
+			.card-highlighted {
+				margin-top: @line-height-computed!important;
+			}
 		}
 		.circle-img {
 			float: left;
@@ -181,6 +182,11 @@
 				h3 {
 					margin-top: 0;
 				}
+			}
+		}
+		.top-switch {
+			.currency-dropdown {
+				margin-right: -15px;
 			}
 		}
 	}
