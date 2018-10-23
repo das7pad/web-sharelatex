@@ -15,6 +15,7 @@ describe "UserMapper", ->
 			"logger-sharelatex": { log: sinon.stub(), err: sinon.stub() }
 			"request": @request = {}
 			"../../../../../app/js/Features/User/UserCreator": @UserCreator = {}
+			"../../../../../app/js/Features/Subscription/FeaturesUpdater": @FeaturesUpdater = {}
 			"../../../../../app/js/models/User": User: @User = {}
 			"../../../../../app/js/models/UserStub": UserStub: @UserStub = {}
 			"../../../../../app/js/Features/Subscription/SubscriptionGroupHandler": @SubscriptionGroupHandler = {}
@@ -105,6 +106,7 @@ describe "UserMapper", ->
 				@UserEmailsConfirmationHandler.sendConfirmationEmail = sinon.stub().callsArgWith(2, null)
 				@UserUpdater.updateUser = sinon.stub().callsArgWith(3, null)
 				@UserMapper.createSlUser @ol_user, @callback
+				@User.findOneAndUpdate = sinon.stub().yields()
 
 			it "should look up the user stub", ->
 				@UserMapper.getOlUserStub
@@ -146,6 +148,9 @@ describe "UserMapper", ->
 				)
 				sinon.assert.notCalled(@UserEmailsConfirmationHandler.sendConfirmationEmail)
 
+			it "should not record any additional referrals from v1", ->
+				sinon.assert.notCalled(@User.findOneAndUpdate)
+
 		describe "when no UserStub exists", ->
 			beforeEach ->
 				@UserMapper.getOlUserStub.yields()
@@ -162,6 +167,37 @@ describe "UserMapper", ->
 							theme: 'overleaf'
 					})
 					.should.equal true
+
+			it "should return the user", ->
+				@callback.calledWith(null, @newSlUser).should.equal true
+
+		describe "when there are v1 referrals", ->
+			beforeEach ->
+				@ol_user.referred_user_count = 5
+				@UserMapper.getOlUserStub.yields(null, @user_stub = { _id: "user-stub-id" })
+				@UserEmailsConfirmationHandler.sendConfirmationEmail = sinon.stub().callsArgWith(2, null)
+				@UserUpdater.updateUser = sinon.stub().callsArgWith(3, null)
+				@User.findOneAndUpdate = sinon.stub().yields()
+				@FeaturesUpdater.refreshFeatures = sinon.stub().yields()
+				@UserMapper.createSlUser @ol_user, @callback
+
+			it "should record additional referrals from v1", ->
+				sinon.assert.calledWith(
+					@User.findOneAndUpdate,
+					{
+						_id: @newSlUser._id,
+					}, {
+						$inc: {
+							refered_user_count: 5
+						}
+					})
+
+			it "should refresh the user's features", ->
+				sinon.assert.calledWith(
+					@FeaturesUpdater.refreshFeatures,
+					@newSlUser._id,
+					false
+				)
 
 			it "should return the user", ->
 				@callback.calledWith(null, @newSlUser).should.equal true
@@ -196,6 +232,7 @@ describe "UserMapper", ->
 					'jane@example.com'
 				)
 				sinon.assert.notCalled(@UserUpdater.updateUser)
+
 
 	describe 'mergeWithSlUser', ->
 		beforeEach ->

@@ -6,6 +6,7 @@ logger = require "logger-sharelatex"
 UserCreator = require "../../../../../app/js/Features/User/UserCreator"
 CollaboratorsHandler = require "../../../../../app/js/Features/Collaborators/CollaboratorsHandler"
 SubscriptionGroupHandler = require "../../../../../app/js/Features/Subscription/SubscriptionGroupHandler"
+FeaturesUpdater = require "../../../../../app/js/Features/Subscription/FeaturesUpdater"
 TagsHandler = require "../../../../../app/js/Features/Tags/TagsHandler"
 UserGetter = require "../../../../../app/js/Features/User/UserGetter"
 UserUpdater = require "../../../../../app/js/Features/User/UserUpdater"
@@ -76,7 +77,9 @@ module.exports = UserMapper =
 					return callback(error) if error?
 					UserMapper._addEmails user, ol_user, (error) ->
 						return callback(error) if error?
-						callback(null, user)
+						UserMapper._addReferedUserCount user, ol_user, (error) ->
+							return callback(error) if error?
+							callback(null, user)
 
 	mergeWithSlUser: (sl_user_id, ol_user, options, callback = (error, sl_user) ->) ->
 		if typeof options == 'function'  # options are, optional
@@ -97,7 +100,9 @@ module.exports = UserMapper =
 						return callback(error) if error?
 						UserMapper._addEmails user, ol_user, (error) ->
 							return callback(error) if error?
-							callback(null, user)
+							UserMapper._addReferedUserCount user, ol_user, (error) ->
+								return callback(error) if error?
+								callback(null, user)
 
 
 	_updateUserStubReferences: (olUser, userStubId, slUserId, callback = (error) ->) ->
@@ -137,6 +142,14 @@ module.exports = UserMapper =
 			((affiliation, cb) -> UserMapper._addEmail user, affiliation, cb),
 			callback
 		)
+
+	_addReferedUserCount: (user, ol_user, callback = (error) ->) ->
+		if ol_user.referred_user_count
+			User.findOneAndUpdate { _id: user._id }, { $inc: { refered_user_count: ol_user.referred_user_count } }, (error) ->
+				return callback(error) if error?
+				FeaturesUpdater.refreshFeatures user._id, false, callback
+		else
+			callback()
 
 	_addEmail: (user, affiliation, callback) ->
 		{ email, university, department, role, inferred } = affiliation

@@ -25,8 +25,10 @@ describe "V1LoginController", ->
 				@OverleafAuthenticationManager = {}
 			"../Authentication/OverleafAuthenticationController":
 				@OverleafAuthenticationController = {}
+			"../../../../../app/js/Features/Referal/ReferalAllocator":
+				@ReferalAllocator = {}
 			"../Collabratec/CollabratecController":
-				@CollabratecController = {} 
+				@CollabratecController = {}
 			"logger-sharelatex": { log: sinon.stub(), err: sinon.stub() }
 		@req = {
 			session: @session = {}

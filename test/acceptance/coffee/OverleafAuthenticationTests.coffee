@@ -65,6 +65,30 @@ describe "OverleafAuthentication", ->
 									expect(response.headers['location']).to.equal '/project'
 									done()
 
+		describe 'with a v1 account that has referrals', ->
+			beforeEach (done) ->
+				@userWithReferrals = newUser()
+				MockOverleafApi.addV1User(@userWithReferrals)
+				MockOverleafApi.users[MockOverleafApi.users.length - 1].profile.referred_user_count = 5
+				@user.request.post {
+					url: '/login',
+					json:
+						email: @userWithReferrals.email
+						password: 'banana'
+				}, (error) =>
+					return done(error) if error?
+					@user.request.get {
+						url: '/login/finish'
+					}, done
+
+			it 'should record the referrals in v2', (done) ->
+				db.users.findOne { 'email': @userWithReferrals.email }, (error, user) =>
+					return done(error) if error?
+					expect(user).to.exist
+					expect(user.email).to.equal @userWithReferrals.email
+					expect(user.overleaf.id).to.exist
+					expect(user.refered_user_count).to.equal 5
+					done()
 
 		describe 'with an email that exists in SL', ->
 			beforeEach (done) ->
@@ -151,6 +175,36 @@ describe "OverleafAuthentication", ->
 						expect(user.email).to.equal @user.email
 						expect(user.overleaf.id).to.exist
 						expect(user.signUpDate).to.be.above(new Date(Date.now() - 2000))
+						done()
+
+		describe 'with a v2 referal id', ->
+			beforeEach (done) ->
+				@user2 = newUser()
+				@user2.ensureUserExists done
+
+			it 'should not fail with an invalid referal id', (done) ->
+				@user.request.post {
+					url: '/register?r=abcd1234&rm=d&rs=b',
+					json:
+						email: @user.email
+						password: 'banana'
+				}, (error, response, body) =>
+					return done(error) if error?
+					expect(response.statusCode).to.equal 200
+					done()
+
+			it 'should record a referal with a valid referal id', (done) ->
+				@user.request.post {
+					url: '/register?r=' + @user2.referal_id + '&rm=d&rs=b',
+					json:
+						email: @user.email
+						password: 'banana'
+				}, (error, response, body) =>
+					return done(error) if error?
+					expect(response.statusCode).to.equal 200
+					@user2.get (error, user) ->
+						return done(error) if error?
+						expect(user.refered_user_count).to.equal 1
 						done()
 
 		describe 'with an email that exists in SL', ->
