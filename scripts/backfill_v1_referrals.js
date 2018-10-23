@@ -39,9 +39,14 @@ function backfillReferrals (user, callback) {
     request({
       url: `${settings.overleaf.host}/api/v1/sharelatex/users/${user.overleaf.id}/profile`
     }, function(error, res, body) {
-      if (error) throw error
       processedUsers += 1
-      UserMapper._addReferedUserCount(user, body, callback)
+      if (error && error.statusCode == 404) {
+        console.log(`*** WARN: v1 user not found for ${user._id} -> ${user.overleaf.id}`)
+        callback()
+      } else {
+        if (error) throw error
+        UserMapper._addReferedUserCount(user, body, callback)
+      }
     })
   } else {
     processedUsers += 1
