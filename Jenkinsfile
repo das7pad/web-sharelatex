@@ -32,10 +32,10 @@ pipeline {
       }
     }
 
-    stage('Install modules') {
+    stage('Copy external pages') {
       steps {
         sshagent (credentials: ['GIT_DEPLOY_KEY']) {
-          sh 'bin/install_modules'
+          sh 'bin/copy_external_pages'
         }
       }
     }
