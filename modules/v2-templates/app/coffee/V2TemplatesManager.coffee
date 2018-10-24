@@ -3,11 +3,8 @@ URL = require "url"
 _ = require "lodash"
 request = require "request"
 settings = require "settings-sharelatex"
-sanitizeHtml = require 'sanitize-html'
 Errors = require "../../../../app/js/Features/Errors/Errors"
-
-# Strip all tags - used on templates index but not on detail page
-sanitizeOptions = { allowedTags: [], allowedAttributes: [] }
+TemplatesUtilities = require "../../../v2-templates/app/js/TemplatesUtilities"
 
 LICENSES = {
     "cc_by_4.0" : "Creative Commons CC BY 4.0",
@@ -107,17 +104,11 @@ module.exports = V2TemplatesManager =
 			}
 			callback null, page
 
-	_formatDocPath: (doc) ->
-		if doc.kind == "article"
-			doc.path = "/articles/#{doc.slug}/#{doc.read_token}"
-		else
-			doc.path = "/latex/#{doc.kind}s/#{doc.slug}/#{doc.read_token}"
 
 	_formatDocsData: (page, docs_property, page_path) ->
 		return unless page["#{docs_property}_docs"]
 		for doc in page["#{docs_property}_docs"]
-			doc.path = V2TemplatesManager._formatDocPath doc
-			doc.description = sanitizeHtml(doc.description, sanitizeOptions)
+			doc = TemplatesUtilities.format_template(doc)
 		if page["#{docs_property}_docs_pages"]?.total_pages > 1
 			if docs_property == "popular" or docs_property == "recent"
 				page_path = "#{page_path}/#{docs_property}"

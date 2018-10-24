@@ -1,3 +1,5 @@
+include ../../../v2-templates/app/views/_template_mixins
+
 mixin portal_content(id, title, content, card, contentClass, childClass)
 	- var contentClasses = `${contentClass ? contentClass : ''} ${card ? 'card' : ''}`
 
@@ -15,3 +17,18 @@ mixin community_count(count, title)
 	if count && count > 1
 		| &nbsp;over #{count}
 	| &nbsp;authors at #{title}
+
+mixin portal_templates(templates)
+	if templates
+		h2 #{translate("featured_latex_templates")}
+		+templates_list(templates)
+	else
+		.row
+			.col-sm-12
+				p #{translate("no_featured_templates", {title:"{{portal.title}}"})}
+
+		//- To Do: search input below
+		//- .row
+		//- 	.col-sm-12
+		//- 		h4 Discover more Templates, Articles and Examples
+		//- 		input(type="text" placeholder="Search")
