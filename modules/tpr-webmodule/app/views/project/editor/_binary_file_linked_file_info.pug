@@ -1,0 +1,5 @@
+div(ng-if="openFile.linkedFileData.provider == 'mendeley'")
+	p
+		i.fa.fa-fw.fa-external-link-square.fa-rotate-180.linked-file-icon
+		| Imported from Mendeley
+		| at {{ openFile.created | formatDate:'h:mm a' }} {{ openFile.created | relativeDate }}

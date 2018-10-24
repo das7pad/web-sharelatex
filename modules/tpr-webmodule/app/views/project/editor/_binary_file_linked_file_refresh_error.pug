@@ -1,0 +1,7 @@
+div(ng-if="openFile.linkedFileData.provider == 'mendeley'")
+	br
+	div
+		| If this error persists, try re-linking your Mendeley account here:&nbsp;
+	div.text-center
+		a(href="/user/settings", target="_blank", style="font-weight: bold")
+			| #{translate("account_settings")}

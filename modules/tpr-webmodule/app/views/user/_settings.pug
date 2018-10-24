@@ -1,0 +1,53 @@
+//each item in ['mendeley','zotero']
+each item in ['mendeley']
+	hr
+
+	h3
+		| #{translate(item+"_integration")}
+
+	- if (!(user.features[item] || user.features.references) )
+		p.small #{translate(item+"_sync_description")}
+		.alert.alert-info
+			p #{translate(item+"_is_premium")}
+			p
+				a.btn.btn-info(href='/user/subscription/plans' ng-click='upgradeIntegration("'+item+'")') #{translate("upgrade")}
+	- else if(user.refProviders && user.refProviders[item])
+		p #{translate("account_is_linked")}.
+		p
+			a(
+				id=item+"-unlink",
+				href, 
+				ng-click="unlinkAccount('"+item+"')",
+				ng-controller="ReferenceUnlinkController"
+			)  #{translate("unlink_to_"+item)}
+	- else
+		p.small #{translate(item+"_sync_description")}
+		//p.small #{translate("link_to_"+item+"_description")}
+		p
+			a(id=item+"-link", href='/'+item+'/oauth').btn.btn-info #{translate("link_to_"+item)}
+
+// Unlink modal
+script(type="text/ng-template", id="referenceUnlinkModalTemplate")
+
+	.modal-header
+		button.close(
+			type="button"
+			data-dismiss="modal"
+			ng-click="$dismiss()"
+		) &times;
+		h3
+			| #{translate("unlink_reference")} {{provider}}
+	.modal-body
+		p #{translate("unlink_warning_reference")}
+
+	.modal-footer()
+		button.btn.btn-default(
+			ng-click="$dismiss()",
+		)
+			span #{translate("cancel")}
+		| 
+		form(id="{{provider}}-unlink", action="{{providerUnlink}}", method="POST", style="display: inline;")
+			input(type="hidden", name="_csrf", value=csrfToken)
+			button.btn.btn-info(
+				type="submit"
+			) #{translate("unlink")}
