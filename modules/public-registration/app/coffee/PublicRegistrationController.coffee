@@ -4,7 +4,6 @@ logger = require "logger-sharelatex"
 metrics = require "metrics-sharelatex"
 ReferalAllocator = require "../../../../app/js/Features/Referal/ReferalAllocator"
 UserRegistrationHandler = require("../../../../app/js/Features/User/UserRegistrationHandler")
-SubscriptionDomainHandler = require("../../../../app/js/Features/Subscription/SubscriptionDomainHandler")
 UserEmailsConfirmationHandler = require("../../../../app/js/Features/User/UserEmailsConfirmationHandler")
 EmailBuilder = require("../../../../app/js/Features/Email/EmailBuilder")
 _ = require "underscore"
@@ -49,8 +48,7 @@ module.exports = PublicRegistrationController =
 	register: (req, res, next) ->
 		logger.log email: req.body.email, "attempted register"
 		UserRegistrationHandler.registerNewUser req.body, (err, user)->
-			verifyLink = SubscriptionDomainHandler.getDomainLicencePage(user)
-			redir = verifyLink or AuthenticationController._getRedirectFromSession(req) or "/project"
+			redir = AuthenticationController._getRedirectFromSession(req) or "/project"
 			if err? and err?.message == "EmailAlreadyRegistered"
 				if user?.overleaf?.id?
 					res.json {
