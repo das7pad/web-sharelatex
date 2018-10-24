@@ -103,6 +103,7 @@ describe "Team imports", ->
 					expect(subscription.overleaf.id).to.eq(5)
 					expect(subscription.membersLimit).to.eq(32)
 					expect(subscription.admin_id).to.be.an.instanceof(ObjectId)
+					expect(subscription.teamName).to.eq("Test Team")
 					expect(subscription.member_ids.length).to.eq(2)
 
 					expect(subscription.teamInvites.length).to.eq(1)
