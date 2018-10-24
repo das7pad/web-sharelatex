@@ -1,0 +1,58 @@
+extends ../../../../app/views/layout
+
+block content
+	.content.content-alt
+		#metrics.container
+			#metrics-header.row
+				.col-lg-9
+					.section_header
+						h3(style="text-transform: capitalize") #{resourceName || resourceType} Metrics
+				#filters-container.col-lg-3
+					#dates-container
+						// Min date 1514764800 is 2018-01-01
+						button(name="button" type="submit" id="metrics-dates" class="btn-link" data-min-date="1514764800")
+							span
+							b(class="caret print-hidden")
+					br
+					span.by by
+					span#lags-container
+
+			#metrics-container.row
+
+block requirejs
+	script(type="text/javascript").
+		var METRICS_ENDPOINT = '#{metricsEndpoint}';
+		var METRICS_RESOURCE_ID = '#{resourceId}';
+		var METRICS_RESOURCE_TYPE = '#{resourceType}';
+
+	script(
+			src=buildWebpackPath('es/metrics.js', {hashedPath:settings.useMinifiedJs})
+			type="text/javascript"
+		)
+
+	script(type="text/javascript").
+		$(function() {
+			Frontend.metrics.chartApp.init();
+			Frontend.metrics.metricsApp.init();
+		})
+
+	script(type='text/javascript').
+		// minimal requirejs configuration (can be extended/overridden)
+		window.requirejs = {
+			"paths" : {
+				"moment": "libs/#{lib('moment')}",
+				"fineuploader": "libs/#{lib('fineuploader')}",
+				"main": "#{buildJsPath('main.js', {hashedPath:settings.useMinifiedJs, removeExtension:true})}",
+				"libraries": "#{buildJsPath('libraries.js', {hashedPath:settings.useMinifiedJs, removeExtension:true})}",
+			},
+			"config":{
+				"moment":{
+					"noGlobal": true
+				}
+			}
+		};
+	script(
+		data-main=buildJsPath('main.js', {hashedPath:false}),
+		baseurl=fullJsPath,
+		src=buildJsPath('libs/require.js', {hashedPath:true})
+	)

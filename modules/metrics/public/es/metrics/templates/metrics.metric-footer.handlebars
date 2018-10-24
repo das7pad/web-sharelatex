@@ -1,0 +1,9 @@
+{{#if ([../helpers/eq] selectedLag 'monthly')}}
+  <i>Month commencing</i>
+{{^}}
+  {{#if ([../helpers/eq] selectedLag 'weekly')}}
+    <i>Week commencing</i>
+  {{^}}
+    <i>&nbsp;</i>
+  {{/if}}
+{{/if}}
