@@ -1,0 +1,96 @@
+.row
+	.col-md-9
+		form.project-search.form-horizontal(role="form")
+			.form-group.has-feedback.has-feedback-left.col-md-8.col-xs-12
+				input.form-control.col-md-8.col-xs-12(
+					placeholder=translate('search_projects')+"…",
+					autofocus='autofocus',
+					ng-model="searchText.value",
+					focus-on='search:clear',
+					ng-keyup="searchProjects()"
+				)
+				i.fa.fa-search.form-control-feedback-left
+				i.fa.fa-times.form-control-feedback(
+					ng-click="clearSearchText()",
+					style="cursor: pointer;",
+					ng-show="searchText.value.length > 0"
+				)
+
+		.project-tools(ng-cloak)
+			.btn-toolbar(ng-show="selectedProjects.length > 0")
+				.btn-group
+					a.btn.btn-default(
+						href='#',
+						tooltip=translate('delete'),
+						tooltip-placement="bottom",
+						tooltip-append-to-body="true",
+						ng-click="openArchiveProjectsModal()"
+					)
+						i.fa.fa-trash-o
+	.col-md-1.text-right
+		div.text-right count: 
+			strong {{visibleProjects.length}}
+	.col-md-2.text-right
+		a.btn.btn-default.btn-sm(href="/admin/user/graph/{{user._id}}?level=1") View Project Graph
+
+
+.row.row-spaced
+	.col-xs-12
+		.project-list-card
+			ul.list-unstyled.project-list.structured-list(
+				select-all-list,
+				max-height="projectListHeight - 25",
+				ng-cloak
+			)
+				li.container-fluid
+					.row
+						.col-xs-6
+							input.select-all(
+								select-all,
+								type="checkbox"
+							)
+							span.header.clickable(ng-click="changePredicate('name')") #{translate("title")}
+								i.tablesort.fa(ng-class="getSortIconClass('name')")
+						.col-xs-2
+							span.header.clickable(ng-click="changePredicate('archived')") Archived
+								i.tablesort.fa(ng-class="getSortIconClass('archived')")
+						.col-xs-2
+							span.header.clickable(ng-click="changePredicate('lastUpdated')") #{translate("last_modified")}
+								i.tablesort.fa(ng-class="getSortIconClass('lastUpdated')")
+						.col-xs-2
+							span.header.clickable(ng-click="changePredicate('createdAt')") #{translate("created_at")}
+								i.tablesort.fa(ng-class="getSortIconClass('createdAt')")
+				li.project_entry.container-fluid(
+					ng-repeat="project in visibleProjects | orderBy:predicate:reverse",
+					ng-controller="AdminProjectListItemController"
+				)
+					.row
+						.col-xs-6
+							input.select-item(
+								select-individual,
+								type="checkbox",
+								ng-model="project.selected"
+							)
+							span
+								a.projectName(href="/project/{{project._id}}",target="_blank") {{project.name}}
+								span(
+									ng-controller="TagListController"
+								)
+									a.label.label-default.tag-label(
+										href,
+										ng-repeat='tag in project.tags',
+										ng-click="selectTag(tag)"
+									) {{tag.name}}
+						.col-xs-2
+							i.fa.fa-check(ng-if="project.archived")
+						.col-xs-2
+							span.last-modified {{project.lastUpdated | formatDate}}
+						.col-xs-2
+							span.last-modified {{project.createdAt | formatDate}}
+				li(
+					ng-if="visibleProjects.length == 0",
+					ng-cloak
+				)
+					.row
+						.col-xs-12.text-centered
+							small #{translate("no_projects")}

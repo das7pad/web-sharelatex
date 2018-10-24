@@ -1,0 +1,27 @@
+extends ../../../../../app/views/layout
+
+block content
+	script#data(type="application/json").
+		!{JSON.stringify({user: user, projects: projects}).replace(/\//g, '\\/')}
+
+	script(type="text/javascript").
+		window.data = JSON.parse($("#data").text());
+
+	.content.content-alt(ng-controller="AdminUserController")
+		.container(ng-cloak)
+			p
+				strong
+					a(href="/admin/user") Users
+				| &nbsp;&gt;&nbsp;
+				strong {{ user.email }}
+			tabset
+				tab(heading="User Info")
+					include ./_user-info
+				tab(heading="Projects")
+					include ./_project-list
+				if settings.enableSubscriptions
+					tab(heading="Subscriptions")
+						include ./_subscription-list
+
+		include ../../../../../app/views/project/list/modals
+		include ./_modals

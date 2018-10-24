@@ -1,0 +1,12 @@
+script(type='text/ng-template', id='graphModalTemplate')
+	.modal-header
+		button.close(
+			type="button"
+			data-dismiss="modal"
+			ng-click="close()"
+		) &times;
+		h3 {{element.type}} Information
+	.modal-body
+		div
+			span Name: {{element.name}}
+		a(href="{{element.link}}") View {{element.type}}
