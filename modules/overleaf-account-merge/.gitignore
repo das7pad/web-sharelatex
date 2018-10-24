@@ -1,0 +1,4 @@
+app/js/
+test/unit/js/
+index.js
+Makefile
