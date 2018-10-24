@@ -63,6 +63,9 @@ block content
 							table.table.table-striped.table-bordered
 								tr
 									th(colspan=2) Group managers
+										| &nbsp;&#40;
+										a(href="/manage/groups/" + subscription._id + '/managers')= 'Manage'
+										| &#41;
 								for manager in managers
 									tr
 										td
@@ -78,6 +81,9 @@ block content
 							table.table.table-striped.table-bordered
 								tr
 									th(colspan=2) Group Members
+										| &nbsp;&#40;
+										a(href="/manage/groups/" + subscription._id + '/members')= 'Manage'
+										| &#41;
 								for member in members
 									tr
 										td
@@ -92,6 +98,10 @@ block content
 							table.table.table-striped.table-bordered
 								tr
 									th(colspan) Invited Members
+										| &nbsp;&#40;
+										a(href="/manage/groups/" + subscription._id + '/members')= 'Manage'
+										| &#41;
+
 								for teamInvite in subscription.teamInvites || []
 									tr
 										td= teamInvite.email
