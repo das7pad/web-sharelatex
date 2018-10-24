@@ -8,16 +8,14 @@ async = require("async")
 module.exports =
 
 	removeUserFromGroup: (req, res, next)->
-		adminUserId = AuthenticationController.getLoggedInUserId(req)
+		subscription = req.entity
 		userToRemove_id = req.params.user_id
-		getManagedSubscription adminUserId, (error, subscription) ->
-			return next(error) if error?
-			logger.log adminUserId:adminUserId, userToRemove_id:userToRemove_id, "removing user from group subscription"
-			SubscriptionGroupHandler.removeUserFromGroup subscription._id, userToRemove_id, (err)->
-				if err?
-					logger.err err:err, adminUserId:adminUserId, userToRemove_id:userToRemove_id, "error removing user from group"
-					return res.sendStatus 500
-				res.send()
+		logger.log subscriptionId: subscription._id, userToRemove_id:userToRemove_id, "removing user from group subscription"
+		SubscriptionGroupHandler.removeUserFromGroup subscription._id, userToRemove_id, (err)->
+			if err?
+				logger.err err:err, adminUserId:adminUserId, userToRemove_id:userToRemove_id, "error removing user from group"
+				return res.sendStatus 500
+			res.send()
 
 	removeSelfFromGroup: (req, res, next)->
 		adminUserId = req.query.admin_user_id

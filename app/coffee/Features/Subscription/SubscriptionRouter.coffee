@@ -21,7 +21,6 @@ module.exports =
 
 
 		webRouter.get '/subscription/group', AuthenticationController.requireLogin(), SubscriptionGroupController.redirectToSubscriptionGroupAdminPage
-		webRouter.delete '/subscription/group/user/:user_id', AuthenticationController.requireLogin(), SubscriptionGroupController.removeUserFromGroup
 		webRouter.delete '/subscription/group/user', AuthenticationController.requireLogin(), SubscriptionGroupController.removeSelfFromGroup
 
 		# Team invites

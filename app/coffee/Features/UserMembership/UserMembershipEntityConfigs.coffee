@@ -15,7 +15,7 @@ module.exports =
 			remove: 'remove_from_group'
 		pathsFor: (id) ->
 			addMember: '/subscription/invites'
-			removeMember: '/subscription/group/user'
+			removeMember: "/manage/groups/#{id}/user"
 			removeInvite: '/subscription/invites'
 			exportMembers: "/manage/groups/#{id}/members/export"
 

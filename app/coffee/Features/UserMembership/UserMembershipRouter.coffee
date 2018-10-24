@@ -8,6 +8,9 @@ module.exports =
 		webRouter.get '/manage/groups/:id/members',
 			UserMembershipAuthorization.requireEntityAccess('group'),
 			UserMembershipController.index
+		webRouter.delete '/manage/groups/:id/user/:user_id',
+			UserMembershipAuthorization.requireEntityAccess('group'),
+			SubscriptionGroupController.removeUserFromGroup
 		webRouter.get '/manage/groups/:id/members/export',
 			UserMembershipAuthorization.requireEntityAccess('group'),
 			UserMembershipController.exportCsv
