@@ -1,8 +1,6 @@
 SubscriptionGroupHandler = require("./SubscriptionGroupHandler")
 logger = require("logger-sharelatex")
 SubscriptionLocator = require("./SubscriptionLocator")
-ErrorsController = require("../Errors/ErrorController")
-SubscriptionDomainHandler = require("./SubscriptionDomainHandler")
 AuthenticationController = require('../Authentication/AuthenticationController')
 _ = require("underscore")
 async = require("async")
@@ -32,24 +30,6 @@ module.exports =
 					logger.err err:err, userToRemove_id:userToRemove_id, adminUserId:adminUserId, "error removing self from group"
 					return res.sendStatus 500
 				res.send()
-
-	exportGroupCsv: (req, res, next)->
-		user_id = AuthenticationController.getLoggedInUserId(req)
-		logger.log user_id: user_id, "exporting group csv"
-		getManagedSubscription user_id, (err, subscription)->
-			return next(error) if error?
-			if !subscription.groupPlan
-				return res.redirect("/")
-			SubscriptionGroupHandler.getPopulatedListOfMembers subscription._id, (err, users)->
-				groupCsv = ""
-				for user in users
-					groupCsv += user.email + "\n"
-				res.header(
-					"Content-Disposition",
-					"attachment; filename=Group.csv"
-				)
-				res.contentType('text/csv')
-				res.send(groupCsv)
 
 	# legacy route
 	redirectToSubscriptionGroupAdminPage: (req, res, next) ->

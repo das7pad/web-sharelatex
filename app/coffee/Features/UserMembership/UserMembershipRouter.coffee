@@ -1,11 +1,16 @@
 UserMembershipAuthorization = require './UserMembershipAuthorization'
 UserMembershipController = require './UserMembershipController'
+SubscriptionGroupController = require '../Subscription/SubscriptionGroupController'
+TeamInvitesController = require '../Subscription/TeamInvitesController'
 
 module.exports =
 	apply: (webRouter) ->
 		webRouter.get '/manage/groups/:id/members',
 			UserMembershipAuthorization.requireEntityAccess('group'),
 			UserMembershipController.index
+		webRouter.get '/manage/groups/:id/members/export',
+			UserMembershipAuthorization.requireEntityAccess('group'),
+			UserMembershipController.exportCsv
 
 
 		regularEntitites =

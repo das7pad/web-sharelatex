@@ -13,11 +13,11 @@ module.exports =
 		translations:
 			title: 'group_account'
 			remove: 'remove_from_group'
-		pathsFor: () ->
+		pathsFor: (id) ->
 			addMember: '/subscription/invites'
 			removeMember: '/subscription/group/user'
 			removeInvite: '/subscription/invites'
-			exportMembers: '/subscription/group/export'
+			exportMembers: "/manage/groups/#{id}/members/export"
 
 	team: # for metrics only
 		modelName: 'Subscription'
