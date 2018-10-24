@@ -1,0 +1,51 @@
+extends ../layout
+include ../../../../../app/views/mixins/_pagination
+
+//- Page for the list of all blog posts, 
+//- or page for a list of blog posts returned from a tag query
+
+block content_cms
+	.row
+		.col-sm-8.col-sm-offset-2.col-xs-12
+			.page-header
+				if tag
+					h1
+						a(href="/blog") Blog
+					small Posts tagged #{tag}
+				else
+					h1 Blog
+
+			.blog(ng-cloak ng-controller="BlogController")
+				ul.blog-list
+					for post in items
+						li.card.blog-post
+							.card-header
+								h2
+									a(href='/blog/' + post.slug)
+										| #{post.title}
+							if (post.authorDisplay || post.publishDatePretty)
+								.row
+									.col-sm-12
+										small Posted
+											if (post.authorDisplay)
+												|  by #{post.authorDisplay}
+											if (post.publishDatePretty)
+												|  on #{post.publishDatePretty}
+
+							.row
+								.col-sm-12
+									mathjax(delimiter="no-single-dollar") !{post.contentPreview}
+
+							.row.row-spaced
+								.col-sm-12
+									a.btn.btn-success(href='/blog/' + post.slug) Read More
+
+							if post.tag
+								.row
+									.col-sm-12
+										include _blog_tags
+
+				if pages && pages.total_pages > 1
+					+paginate(pages, url_path)
+
+	script(src=mathJaxPath)

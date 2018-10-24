@@ -1,0 +1,54 @@
+extends ../../../../app/views/layout
+include _template_mixins
+
+block vars
+	- metadata = { description: translate('hundreds_templates_info'), viewport: true }
+
+block content
+
+	main.content
+		.container
+			.row
+				.col-md-6
+					h1 #{page_title}
+				.col-md-6
+					.filters
+						span Filters: 
+						a(href="/gallery") All 
+						span / 
+						a(href="/latex/templates") Templates 
+						span / 
+						a(href="/latex/examples") Examples 
+						span / 
+						a(href="/articles") Articles
+
+			p #{summary}
+
+			include _search
+
+		if tags && tags.length
+			.container
+				h2 Popular Tags
+				.row.row-spaced.popular-tags
+					each tag in tags
+						.col-md-4
+							.template-thumbnail
+								a(href=tag.path)
+									.thumbnail-tag.thumbnail(style=`background: url(${tag.logo_url}) no-repeat center center; background-size: cover;`)
+									.caption__title #{tag.title}
+
+		if recent_docs && recent_docs.length
+			.container
+				if !hide_segment_title
+					h2 Recent
+				+doc_rows(recent_docs)
+				if recent_docs_pagination
+					+pagination(recent_docs_pagination)
+
+		if popular_docs && popular_docs.length
+			.container
+				if !hide_segment_title
+					h2 Popular
+				+doc_rows(popular_docs)
+				if popular_docs_pagination
+					+pagination(popular_docs_pagination)

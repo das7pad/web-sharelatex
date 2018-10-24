@@ -1,0 +1,13 @@
+if settings.overleaf
+	script(type='text/ng-template', id='publishProjectModalTemplate')
+		.modal-header
+			button.close(
+				type="button"
+				data-dismiss="modal"
+				ng-click="$close()"
+			) &times;
+			h3 Submit
+		.modal-body.modal-body-publish
+			i.fa.fa-refresh.fa-spin.fa-fw
+			span &nbsp; loading...
+

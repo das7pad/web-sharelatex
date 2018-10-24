@@ -1,0 +1,53 @@
+mixin btn_contact(content)
+	if content.fields.description
+		span.btn-description #{content.fields.description}
+	a.btn.btn-default(
+		href="/contact"
+		event-tracking-ga=content.fields.gaCategory || null
+		event-tracking-action=content.fields.gaAction || 'Clicked Contact Button'
+		event-tracking-label=content.fields.gaLabel || content.fields.contactButtonText
+		event-tracking-mb=content.fields.mbCategory || null
+		event-segmentation=content.fields.mbData || null
+	)
+		| #{content.fields.contactButtonText}
+
+mixin btn_other_page(content)
+	if content.href
+		if content.fields.description
+			span.btn-description #{content.fields.description}
+
+		a.btn.btn-default(
+			href=content.href
+			event-tracking-ga=content.fields.gaCategory || null
+			event-tracking-action=content.fields.gaAction || 'Clicked Other Page Button'
+			event-tracking-label=content.fields.gaLabel || content.fields.buttonText
+			event-tracking-mb=content.fields.mbCategory || null
+			event-segmentation=content.fields.mbData || null
+		) #{content.fields.buttonText}
+	
+mixin quote(fields)
+	if fields.halfWidth
+		.col-sm-6
+			.row
+				if fields.picture
+					.col-sm-3
+						img(src=fields.picture.fields.file.url class="img-circle pull-right" alt="fields.picture.fields.title")
+				div(class=fields.picture ? "col-sm-9" : "col-sm-12")
+					blockquote !{fields.quote}
+						if fields.person || fields.position
+							footer
+								| #{fields.person}
+								if fields.person && fields.position
+									| , #{fields.position}
+								else
+									| #{fields.position}
+	else
+		.col-sm-9.quote-full-width
+			blockquote !{fields.quote}
+		.col-sm-3.quote-full-width
+			if fields.picture
+				img(src=fields.picture.fields.file.url class="img-circle pull-left")
+			if fields.person
+				h5.quote-by #{fields.person}
+			if fields.position
+				.small.quote-by #{fields.position}

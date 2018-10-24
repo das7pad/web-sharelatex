@@ -1,0 +1,14 @@
+extends ../../../../app/views/layout
+include _mixins
+
+//- Layout for all CMS generated pages
+//- This might get removed once v2 styling decisions progress
+
+block vars
+	- metadata = metadata || {}
+
+block content
+	.content.content-alt.cms-page.content-page
+		main.container(ng-cloak, ng-controller="CmsController", role="main")
+			block content_cms
+			+preview()

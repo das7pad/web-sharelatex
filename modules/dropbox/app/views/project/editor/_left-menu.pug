@@ -1,0 +1,77 @@
+span(ng-controller="DropboxController")
+	ul.list-unstyled.nav()
+		li
+			a(ng-click="openDropboxModal()")
+				i.fa.fa-dropbox.fa-fw
+				| &nbsp;&nbsp; Dropbox
+
+script(type="text/ng-template", id="dropboxModalTemplate")
+	.modal-header
+		button.close(
+			type="button"
+			data-dismiss="modal"
+			ng-click="cancel()"
+		) &times;
+		h3 #{translate("dropbox_sync")}
+	.modal-body.modal-body-share
+
+		div(ng-show="dbState.gotLinkStatus")
+			div(ng-hide="dbState.userIsLinkedToDropbox || !dbState.hasDropboxFeature")
+
+				span(ng-hide="dbState.startedLinkProcess") #{translate("account_not_linked_to_dropbox")}
+					| &nbsp; &nbsp;
+					a(ng-click="linkToDropbox()").btn.btn-info #{translate("update_dropbox_settings")}
+
+				p.small.text-center(ng-show="dbState.startedLinkProcess")
+					| #{translate("refresh_page_after_starting_free_trial")}
+
+
+			div(ng-show="dbState.hasDropboxFeature && dbState.userIsLinkedToDropbox")
+				p.small
+					| #{translate("this_project_will_appear_in_your_dropbox_folder_at")}
+					strong apps/sharelatex/{{ project.name }}
+					
+			div(ng-hide="dbState.hasDropboxFeature")
+				h4.teaser-title Easily manage your project files, everywhere
+				img.teaser-img(
+					src="/img/teasers/dropbox/teaser-dropbox-editor.png"
+					alt="Dropbox"
+				)
+				p.small(ng-show="startedFreeTrial")
+					| #{translate("refresh_page_after_starting_free_trial")}
+
+				.row
+					.col-md-8.col-md-offset-2
+						ul.list-unstyled
+							li 
+								i.fa.fa-check &nbsp;
+								| Manage files from your Dropbox folder
+							
+							li
+								i.fa.fa-check &nbsp;
+								| Have an extra backup
+							
+							li 
+								i.fa.fa-check &nbsp;
+								| Work with non ShareLaTeX users
+							
+							li 
+								i.fa.fa-check &nbsp;
+								| Work offline
+
+				.row.text-center(ng-controller="FreeTrialModalController")
+					a.btn.btn-success(
+						href
+						ng-class="buttonClass"
+						ng-click="startFreeTrial('dropbox')"
+					) Try it for free
+
+		div(ng-hide="dbState.gotLinkStatus")
+			i.fa.fa-refresh.fa-spin 
+			span.small &nbsp; #{translate("checking_dropbox_status")}
+
+	.modal-footer()
+		button.btn.btn-default(
+			ng-click="cancel()",
+		)
+			span #{translate("dismiss")}
