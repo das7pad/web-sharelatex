@@ -14,9 +14,9 @@ module.exports =
 			title: 'group_account'
 			remove: 'remove_from_group'
 		pathsFor: (id) ->
-			addMember: '/subscription/invites'
+			addMember: "/manage/groups/#{id}/invites"
 			removeMember: "/manage/groups/#{id}/user"
-			removeInvite: '/subscription/invites'
+			removeInvite: "/manage/groups/#{id}/invites"
 			exportMembers: "/manage/groups/#{id}/members/export"
 
 	team: # for metrics only
