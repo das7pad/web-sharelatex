@@ -34,9 +34,7 @@ pipeline {
 
     stage('Copy external pages') {
       steps {
-        sshagent (credentials: ['GIT_DEPLOY_KEY']) {
-          sh 'bin/copy_external_pages'
-        }
+        sh 'bin/copy_external_pages'
       }
     }
 
