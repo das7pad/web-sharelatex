@@ -20,7 +20,8 @@ module.exports = ExportsHandler = self =
 				callback null, export_data
 
 	_buildExport: (export_params, callback=(err, export_data) ->) ->
-		{project_id, user_id, brand_variation_id, title, description, author, license, show_source} = export_params
+		{project_id, user_id, brand_variation_id, title, description, author,
+			license, show_source} = export_params
 		jobs =
 			project: (cb) ->
 				ProjectGetter.getProject project_id, cb
@@ -62,7 +63,7 @@ module.exports = ExportsHandler = self =
 						description: description
 						author: author
 						license: license
-						show_source: show_source
+						showSource: show_source
 				user:
 					id: user_id
 					firstName: user.first_name
