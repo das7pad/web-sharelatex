@@ -1,0 +1,87 @@
+extends ../layout
+
+block content
+	.content
+		.container
+			.row
+				.col-md-8.col-md-offset-2
+					.page-header
+						h1 #{translate("about_us")}
+					h2 #{translate("meet_team_behind_latex_editor")}
+
+					p.team-profile
+						span.img-container.img-circle
+							img(src=buildImgPath('about/henry_oswald.jpg'))
+						strong Henry Oswald&nbsp;
+						| #{translate("about_henry_oswald")}
+						br
+						a(href='https://twitter.com/henryoswald')
+							i.fa.fa-twitter-square
+							|  #{translate("follow_me_on_twitter")}.
+
+					p.team-profile
+						span.img-container.img-circle
+							img(src=buildImgPath('about/james_allen.jpg'))
+						strong James Allen&nbsp;
+						| #{translate("about_james_allen")}
+						br
+						a(href='https://twitter.com/thejpallen')
+							i.fa.fa-twitter-square
+							|  #{translate("follow_me_on_twitter")}.
+
+					p.team-profile
+						span.img-container.img-circle
+							img(src=buildImgPath("about/shane_kilkelly.jpg"))
+						strong Shane Kilkelly&nbsp;
+						| #{translate("about_shane_kilkelly")}
+						br
+						a(href='https://twitter.com/shanekilkelly')
+							i.fa.fa-twitter-square
+							|  #{translate("follow_me_on_twitter")}.
+
+					p.team-profile
+						span.img-container.img-circle
+							img(src=buildImgPath("about/brian_gough.jpg"))
+						strong Brian Gough&nbsp;
+						| #{translate("about_brian_gough")}
+
+					p.team-profile
+						span.img-container.img-circle
+							img(src=buildImgPath("about/paulo_reis.jpg"))
+						strong Paulo Reis&nbsp;
+						| #{translate("about_paulo_reis")}
+
+
+					p.team-profile
+						span.img-container.img-circle
+							img(src=buildImgPath("about/chris.jpg"))
+						strong Chris Walker&nbsp;
+						| takes care of our marketing. With a technical background as a former systems engineer, he has a data-driven approach and is always looking to test new ideas before diving in.
+
+					p.team-profile
+						span.img-container.img-circle
+							img(src=buildImgPath("about/michael.jpg"))
+						strong Michael Cribbin&nbsp;
+						| is our resident LaTeX expert, he is responsible for all our great tutorials and guides as well as solving some tricky LaTeX problems.
+
+					p.team-profile
+						span.img-container.img-circle
+							img(src=buildImgPath("about/kiri_channon.jpg"))
+						strong Kiri Channon&nbsp;
+						| is our account manager who works with all the large groups using ShareLaTeX. Previously she worked at the BBC and before that she helped run the torch relay for London 2012 Olympics.
+
+					p(style="clear: both")
+					h3 #{translate("motivation")}
+					p #{translate("two_strong_principles_behind_sl")}
+					ul
+						li
+							strong #{translate("want_to_improve_workflow_of_as_many_people_as_possible")}
+							|  #{translate("detail_on_improve_peoples_workflow")}
+
+						li
+							strong #{translate("want_to_create_sustainable_lasting_legacy")}
+							|  #{translate("details_on_legacy")}
+
+					h3 #{translate("get_in_touch")}
+					p #{translate("want_to_hear_from_you_email_us_at")}
+						a(href="mailto:support@sharelatex.com") support@sharelatex.com
