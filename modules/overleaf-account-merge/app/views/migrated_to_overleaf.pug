@@ -1,0 +1,27 @@
+extends ../../../../app/views/layout
+
+block content
+	.content.content-alt
+		.container
+			.row
+				.col-md-6.col-md-offset-3
+					.card
+						.page-header
+							h1 Moving to Overleaf
+						p.text-center
+							img(
+								src="/img/ol_plus_sl.png"
+								style="width: 50%"
+							)
+
+						p
+							| It looks like you’ve already moved this ShareLaTeX account to
+							| Overleaf. Please log in with the same email and password on
+							| Overleaf from now on.
+						p
+							| You can access all your ShareLaTeX projects through Overleaf
+							| v2. If you have a  subscription it will be transferred
+							| automatically to Overleaf v2.
+
+						p.text-center
+							a.btn.btn-lg.btn-primary(href=settings.accountMerge.betaHost+"/login") Login to Overleaf

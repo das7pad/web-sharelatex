@@ -1,0 +1,64 @@
+tr
+	td
+		label(for="admin_id") Admin User ID
+	td
+		input(
+			type="hidden"
+			name="admin_id"
+			ng-value="subscription.admin_id"
+		)
+		a(ng-href="/admin/user/{{ subscription.admin_id }}", targ
+et="_blank") {{ subscription.admin_id }}
+
+tr
+	td
+		label(for="customAccount") Custom Account
+	td
+		input#customAccount(
+			type="checkbox"
+			name="customAccount"
+			ng-model="subscription.customAccount"
+		)
+
+tr
+	td
+		label(for="recurlySubscription_id") Recurly Subscription ID
+	td
+		input#recurlySubscription_id.form-control(
+			name='recurlySubscription_id',
+			ng-model="subscription.recurlySubscription_id",
+			ng-disabled="subscription.customAccount"
+		)
+
+tr
+	td
+		label(for="planCode") Plan Code
+	td
+		select#planCode.form-control(
+			name='planCode',
+			placeholder="collaborator"
+			ng-model="subscription.planCode"
+		)
+			for plan in settings.plans
+				option(value=plan.planCode)= plan.planCode
+
+tr
+	td
+		label(for="groupPlan") Group Plan
+	td
+		input#groupPlan(
+			type="checkbox"
+			name="groupPlan"
+			ng-model="subscription.groupPlan"
+		)
+
+tr
+	td
+		label(for="membersLimit") Member Limit
+	td
+		input#planCode.form-control(
+			name='membersLimit',
+			placeholder="10"
+			ng-model="subscription.membersLimit",
+			ng-disabled="!subscription.groupPlan"
+		)

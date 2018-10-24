@@ -1,0 +1,9 @@
+version: "2"
+
+services:
+  test_acceptance:
+    environment:
+      REDIS_HOST: redis
+      MONGO_URL: 'mongodb://mongo/sharelatex'
+      SHARELATEX_CONFIG: 'true'
+      PROJECT_HISTORY_ENABLED: 'false'

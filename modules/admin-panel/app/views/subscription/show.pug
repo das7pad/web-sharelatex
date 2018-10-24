@@ -1,0 +1,101 @@
+extends ../../../../../app/views/layout
+
+block content
+	script#data(type="application/json").
+		!{JSON.stringify({subscription: subscription, user_id: user_id}).replace(/\//g, '\\/')}
+
+	script(type="text/javascript").
+		window.data = JSON.parse($("#data").text());
+
+	.content.content-alt(ng-controller="AdminSubscriptionController")
+		.container(ng-cloak)
+			p
+				strong
+					a(href="/admin/user") Users
+				| &nbsp;&gt;&nbsp;
+				strong 
+					a(href="/admin/user/" + user_id)= user_id
+				| &nbsp;&gt;&nbsp;
+				strong Subscriptions
+				| &nbsp;&gt;&nbsp;
+				strong= subscription._id
+
+			.card.card-thin
+				p
+					form(async-form="adminSubscription", name="adminSubscriptionForm", method="POST", action="/admin/subscription/" + subscription._id, novalidate)
+						input(type="hidden", name="_csrf", value=csrfToken)
+						table.table.table-striped.table-bordered(style="margin-bottom: 12px;")
+							tr
+								td
+									label ID
+								td {{ subscription._id }}
+
+							include ./_subscription-form
+
+						form-messages(for="adminSubscriptionForm")
+							.alert.alert-success(ng-show="adminSubscriptionForm.response.success && !adminSubscriptionForm.inflight")
+								| Subscription was successfully updated
+
+						.row
+							.col-md-9
+								button.btn.btn-primary(type='submit', ng-disabled="adminSubscriptionForm.inflight")
+									span(ng-show="!adminSubscriptionForm.inflight") Save
+									span(ng-show="adminSubscriptionForm.inflight") Saving...
+							.col-md-3.text-right
+								a.btn(
+									href='#',
+									tooltip-placement="bottom",
+									tooltip-append-to-body="true",
+									ng-click="deleting = true",
+									ng-show="!deleting"
+								)
+									i.fa.fa-trash-o
+									| &nbsp; #{translate('delete')} #{translate('subscription')}
+								div(ng-show="deleting")
+									| Are you sure?&nbsp;
+									a(href, ng-click="deleteSubscription()") Yes
+									| &nbsp;&middot;&nbsp;
+									a(href, ng-click="deleting = false") No
+								.text-danger(ng-show="deleteError") Something when wrong :(
+					if subscription.groupPlan
+						hr
+						p
+							table.table.table-striped.table-bordered
+								tr
+									th(colspan=2) Group managers
+								for manager in managers
+									tr
+										td
+											a(href="/admin/user/" + manager._id)= manager.email
+										td
+											a(href="/admin/user/" + manager._id)= manager._id
+								if managers.length == 0
+									tr
+										td(colspan=2)
+											i None
+						hr
+						p
+							table.table.table-striped.table-bordered
+								tr
+									th(colspan=2) Group Members
+								for member in members
+									tr
+										td
+											a(href="/admin/user/" + member._id)= member.email
+										td
+											a(href="/admin/user/" + member._id)= member._id
+								if members.length == 0
+									tr
+										td(colspan=2)
+											i None
+						p
+							table.table.table-striped.table-bordered
+								tr
+									th(colspan) Invited Members
+								for teamInvite in subscription.teamInvites || []
+									tr
+										td= teamInvite.email
+								if !subscription.teamInvites || subscription.teamInvites.length == 0
+									tr
+										td
+											i None

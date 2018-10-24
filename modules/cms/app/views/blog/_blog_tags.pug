@@ -1,0 +1,7 @@
+div.tags
+	small Tags:
+	ul.tags-list
+		for t in post.tag
+			if t.fields && t.fields.tag
+				li
+					a.tag.btn.btn-default(href= '/blog/tagged/' + t.fields.tag) #{t.fields.tag}

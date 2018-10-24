@@ -1,0 +1,47 @@
+hr
+
+h3
+	| #{translate("github_integration")}
+
+- if (!user.features.github)
+	p.small #{translate("github_sync_description")}
+	.alert.alert-info
+		p #{translate("github_is_premium")}
+		p
+			a.btn.btn-info(href='/user/subscription/plans') #{translate("upgrade")}
+- else if (github.error)
+	.alert.alert-danger #{translate("github_sync_error")}
+- else if (github.enabled)
+	.alert.alert-success
+		| #{translate("github_account_is_linked")}
+		|  
+		a(href, ng-click="unlinkAccount()", ng-controller="GithubSyncUnlinkController") #{translate("unlink_github")}
+- else
+	p.small #{translate("github_sync_description")}
+	p.small #{translate("link_to_github_description")}
+	p
+		a(href='/github-sync/beginAuth').btn.btn-info #{translate("link_to_github")}
+		
+script(type="text/ng-template", id="githubSyncUnlinkModalTemplate")
+
+	.modal-header
+		button.close(
+			type="button"
+			data-dismiss="modal"
+			ng-click="$dismiss()"
+		) &times;
+		h3 #{translate("unlink_github")}
+	.modal-body
+		p #{translate("unlink_github_warning")}
+	
+	.modal-footer()
+		button.btn.btn-default(
+			ng-click="$dismiss()",
+		)
+			span #{translate("cancel")}
+		| 
+		form(action="/github-sync/unlink", method="POST", style="display: inline;")
+			input(type="hidden", name="_csrf", value=csrfToken)
+			button.btn.btn-info(
+				type="submit"
+			) #{translate("unlink")}

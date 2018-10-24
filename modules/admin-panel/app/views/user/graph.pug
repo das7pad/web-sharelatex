@@ -1,0 +1,45 @@
+extends ../../../../../app/views/layout
+
+block scripts
+	//sigma does not play well with requirejs, just hard linking it #HO
+	script(src=jsPath+"libs/sigma-master/sigma.min.js")
+	script(src=jsPath+"libs/sigma-master/plugins/sigma.layout.forceAtlas2.min.js")
+	script(src=jsPath+"libs/sigma-master/plugins/sigma.renderers.edgeLabels.min.js")
+	script(src=jsPath+"libs/sigma-master/plugins/sigma.renderers.parallelEdges.min.js")
+
+block content
+
+	script(type="text/javascript").
+		window.data = {
+			user: !{JSON.stringify(user).replace(/\//g, '\\/')},
+			graph: !{JSON.stringify(graph).replace(/\//g, '\\/')}
+		};
+
+	.content.content-alt(ng-controller="AdminGraphController")
+		.container(ng-cloak)
+			.card.card-thin
+				.container-fluid
+					.row
+						.col-md-8
+							h2(style="margin-top: 0")
+								a(href="/admin/user/{{user._id}}") {{user.email}}
+								| &nbsp;&gt;
+								| Graph
+								| &nbsp;
+						.col-md-4.text-right
+							span.dropdown(dropdown)
+								button.btn.btn-default.dropdown-toggle(dropdown-toggle) Graph Level
+									span 
+										b.caret
+								ul.dropdown-menu(role="menu")
+									li(
+										ng-repeat="n in [1,2,3,4,5,6,7,8]",
+										ng-class="{active: n==level}"
+									)
+										a(
+											href="/admin/user/graph/{{user._id}}?level={{n}}", 
+										) Level {{n}}
+					hr(style="margin: 12px 0")
+					#graph(style="max-width: 100%; height: 450px;")
+
+		include ./_graphModal

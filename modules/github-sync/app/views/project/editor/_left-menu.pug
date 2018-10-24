@@ -1,0 +1,255 @@
+span(ng-controller="GithubSyncController", ng-show="permissions.write")
+	ul.list-unstyled.nav()
+		li
+			a(ng-click="openGithubSyncModal()")
+				i.fa.fa-github.fa-fw
+				| &nbsp;&nbsp; GitHub
+				
+script(type="text/ng-template", id="githubSyncModalTemplate")
+
+	.modal-header
+		button.close(
+			type="button"
+			data-dismiss="modal"
+			ng-click="cancel()"
+		) &times;
+		h3 #{translate("github_sync")}
+	.modal-body
+		.alert.alert-danger(ng-show="status.error")
+			div(ng-show="status.error.statusCode == 401")
+				p #{translate("github_credentials_expired")}
+				a(href="/github-sync/beginAuth").btn.btn-primary #{translate("reauthorize_github_account")}
+			span(ng-show="status.error.statusCode != 401") #{translate("github_sync_error")}
+	
+		.loading(ng-show="!status.error && status.loading")
+			i.fa.fa-refresh.fa-spin.fa-fw
+			span  #{translate("checking_project_github_status")}
+	
+		div(ng-if="!status.error && !status.loading")
+			div(ng-if="!status.project.enabled")
+				div(ng-if="!status.user.enabled")
+					div(ng-if="$parent.permissions.admin")
+						div(ng-if="!status.user.available")
+							h4.teaser-title Push to GitHub, pull to ShareLaTeX
+							
+							p.text-center.small(ng-show="startedFreeTrial")
+								| #{translate("refresh_page_after_starting_free_trial")}
+
+							.row
+								.col-md-8.col-md-offset-2
+									ul.list-unstyled
+										li
+											i.fa.fa-check &nbsp;
+											| Work offline, then pull to ShareLaTeX
+										
+										li
+											i.fa.fa-check &nbsp;
+											| Import existing projects from GitHub
+
+										li
+											i.fa.fa-check &nbsp;
+											| Have an extra backup
+										
+										li
+											i.fa.fa-check &nbsp;
+											| Work with other GitHub users
+
+							.row.text-center(ng-controller="FreeTrialModalController")
+								a.btn.btn-success(
+									href
+									ng-class="buttonClass"
+									ng-click="startFreeTrial('github')"
+								) Try it for free
+
+						div(ng-if="status.user.available")
+							p #{translate("link_to_github_description")}
+							p
+								a(href,ng-click="linkAccount()").btn.btn-info #{translate("link_to_github")}
+								
+					div(ng-if="!$parent.permissions.admin")
+						p #{translate("please_ask_the_project_owner_to_link_to_github")}
+
+				div(ng-if="status.user.enabled")
+					p #{translate("project_not_linked_to_github")}
+					p
+						button(ng-click="openExportToGithubModal()").btn.btn-primary #{translate("create_project_in_github")}
+
+			div(ng-if="status.project.enabled")
+				div(ng-if="status.project.merge_status == 'success'")
+					p.text-center #{translate("project_synced_with_git_repo_at")} 
+						a(ng-href="https://github.com/{{status.project.repo}}", target="_blank") {{status.project.repo}}
+					
+					hr
+					
+					div(ng-show="!status.error && status.commits.loading").text-center
+						i.fa.fa-refresh.fa-spin.fa-fw
+						span  #{translate("loading_recent_github_commits")}
+						
+					div(ng-show="!status.commits.loading && status.commits.commits.length > 0")
+						h3 #{translate("recent_commits_in_github")}
+						div(style="max-height: 200px; overflow: auto")
+							div(ng-repeat="commit in status.commits.commits")
+								span.small.pull-right
+									a(
+										ng-href="https://github.com/{{status.project.repo}}/commit/{{commit.sha}}"
+										target="_blank"
+									) {{commit.sha.slice(0,6)}}
+								a(
+									ng-href="https://github.com/{{status.project.repo}}/commit/{{commit.sha}}"
+									target="_blank"
+								) {{commit.message}}
+								div.small by {{commit.author.name}} <{{commit.author.email}}>
+						
+						p.text-center.row-spaced
+							button(ng-click="openMergeModal(true)").btn.btn-info
+								i.fa.fa-fw.fa-file
+								i.fa.fa-fw.fa-long-arrow-left
+								i.fa.fa-fw.fa-github
+								| &nbsp; #{translate("pull_github_changes_into_sharelatex")}
+					
+					div(ng-show="!status.commits.loading && status.commits.commits.length == 0").text-center
+						p.small #{translate("no_new_commits_in_github")}
+					
+					hr
+					
+					p.text-center
+						button(ng-click="openMergeModal()").btn.btn-info
+							i.fa.fa-fw.fa-file
+							i.fa.fa-fw.fa-long-arrow-right
+							i.fa.fa-fw.fa-github
+							| &nbsp; #{translate("push_sharelatex_changes_to_github")}
+	
+				div(ng-if="status.project.merge_status == 'failure'")
+					.alert.alert-danger !{translate("github_merge_failed", {sharelatex_branch:"<strong>{{ status.project.unmerged_branch }}</strong>", master_branch:"<strong>master</strong>"})}
+					p.text-center
+						button(ng-click="openMergeModal()").btn.btn-primary= translate("continue_github_merge")
+	
+	.modal-footer()
+		button.btn.btn-default(
+			ng-click="cancel()",
+		)
+			span #{translate("close")}
+			
+script(type="text/ng-template", id="githubSyncExportModalTemplate")
+
+	.modal-header
+		button.close(
+			type="button"
+			data-dismiss="modal"
+			ng-click="cancel()"
+		) &times;
+		h3 #{translate("export_project_to_github")}
+	.modal-body
+		.alert.alert-danger(ng-show="status.error") 
+			div(ng-show="status.error.statusCode == 401")
+				p #{translate("github_credentials_expired")}
+				a(href="/github-sync/beginAuth").btn.btn-primary #{translate("reauthorize_github_account")}
+			span(ng-show="status.error.statusCode != 401") #{translate("github_sync_error")}
+
+		.loading(ng-show="!status.error && status.loading")
+			i.fa.fa-refresh.fa-spin.fa-fw
+			span  #{translate("loading")}
+
+		div(ng-show="!status.error && !status.loading")
+			.alert.alert-danger(ng-show="form.error")
+				| {{ form.error }}
+				div.small= translate("github_validation_check")
+			
+			form.form(ng-submit="create()")
+				.row
+					.col-xs-4
+						.form-group
+							label= translate("owner")
+							select.form-control(ng-model="form.org")
+								option(ng-value="status.user.login", selected) {{status.user.login}}
+								option(ng-repeat="org in status.orgs", ng-value="org.login") {{ org.login }}
+					.col-xs-8
+						.form-group
+							label= translate("repository_name")
+							input.form-control(type="text", ng-model="form.name")
+							
+				.row
+					.col-xs-12
+						.form-group
+							label #{translate("description")} (#{translate("optional")})
+							input.form-control(type="text", ng-model="form.description")
+				
+				hr
+				
+				.row
+					.col-xs-12
+						label
+							input(type="radio", name="private", value="false", ng-model="form.private")
+							|  #{translate("public")}.
+						small  #{translate("github_public_description")}
+				.row
+					.col-xs-12
+						label
+							input(type="radio", name="private", value="true", ng-model="form.private")
+							|  #{translate("private")}. 
+						small  #{translate("github_private_description")}
+						
+				input(type="submit", style="display: none;")
+
+	.modal-footer()
+		button.btn.btn-default(
+			ng-disabled="status.inflight"
+			ng-click="cancel()"
+		)
+			span #{translate("cancel")}
+		button.btn.btn-primary(
+			ng-disabled="status.inflight"
+			ng-click="create()"
+		)
+			span(ng-hide="status.inflight") #{translate("create")}
+			span(ng-show="status.inflight") #{translate("creating")}...
+			
+script(type="text/ng-template", id="githubSyncPushToGithubModalTemplate")
+
+	.modal-header
+		button.close(
+			type="button"
+			data-dismiss="modal"
+			ng-click="cancel()"
+		) &times;
+		h3 #{translate("push_sharelatex_changes_to_github")}
+	.modal-body
+		.alert.alert-danger(ng-show="form.error")
+			| {{ form.error }}
+		
+		form.form(ng-show="!status.inflight")
+			p= translate("sync_project_to_github_explanation")
+		
+			.row
+				.col-xs-12
+					textarea(
+						placeholder=translate('github_commit_message_placeholder'),
+						ng-model="form.message"
+					).form-control
+					
+		.loading(ng-show="status.inflight")
+			i.fa.fa-refresh.fa-spin.fa-fw
+			span  #{translate("merging")}
+
+	.modal-footer()
+		button.btn.btn-default(
+			ng-disabled="status.inflight"
+			ng-click="cancel()"
+		)
+			span #{translate("cancel")}
+		button.btn.btn-primary(
+			ng-disabled="status.inflight"
+			ng-click="merge()"
+		)
+			span(ng-hide="status.inflight") #{translate("commit")}
+			span(ng-show="status.inflight") #{translate("commiting")}...
+			
+script(type="text/ng-template", id="githubSyncPullFromGithubModalTemplate")
+
+	.modal-header
+		h3 #{translate("pull_github_changes_into_sharelatex")}
+	.modal-body
+		.loading(ng-show="status.inflight")
+			i.fa.fa-refresh.fa-spin.fa-fw
+			span  #{translate("importing_and_merging_changes_in_github")}
+

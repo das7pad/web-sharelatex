@@ -1,0 +1,12 @@
+include ./_form
+
+script(type='text/ng-template', id='contactModalTemplate')
+	.modal-header
+		button.close(
+			type="button"
+			data-dismiss="modal"
+			ng-click="close()"
+		) &times;
+		h3 #{translate("contact_us")}
+	.modal-body.contact-us-modal
+		+contact-form(true)

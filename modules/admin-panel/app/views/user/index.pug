@@ -1,0 +1,130 @@
+extends ../../../../../app/views/layout
+
+block content
+	script#data(type="application/json").
+		!{JSON.stringify({users: users, pages: pages}).replace(/\//g, '\\/')}
+
+	script(type="text/javascript").
+		window.data = JSON.parse($("#data").text());
+
+	.content.content-alt(ng-controller="AdminUserListController")
+		.container(ng-cloak)
+			p
+				strong Users
+			.card.card-thin
+				.row
+					.col-md-9
+						form.user-search.form-horizontal(role="form")
+							.form-group.has-feedback.has-feedback-left.col-md-7.col-xs-12
+								input.form-control.col-md-7.col-xs-12(
+									placeholder="Search users...",
+									autofocus='autofocus',
+									ng-model="searchText",
+									focus-on='search:clear',
+									on-enter="searchUsers()"
+								)
+								i.fa.fa-search.form-control-feedback-left
+								i.fa.fa-times.form-control-feedback(
+									ng-click="clearSearchText()",
+									style="cursor: pointer;",
+									ng-show="searchText.length > 0"
+								)
+								div.form-check
+									label.form-check-label
+										input.form-check-input(
+											type="checkbox"
+											ng-model="searchRegExp",
+										)
+										| &nbsp;RegExp
+									span &nbsp;&nbsp;&nbsp;
+									label.form-check-label
+										input.form-check-input(
+											type="checkbox"
+											ng-model="secondaryEmailSearch",
+										)
+										| &nbsp;Search Seconday Emails
+						.user-tools(ng-cloak)
+							.btn-toolbar
+								.btn-group(ng-hide="selectedUsers.length < 1")
+									a.btn.btn-default(
+										href='#',
+										tooltip=translate('delete'),
+										tooltip-placement="bottom",
+										tooltip-append-to-body="true",
+										ng-click="openDeleteUsersModal()"
+									)
+										i.fa.fa-trash-o
+					.col-md-3.text-right
+						if !externalAuthenticationSystemUsed()
+							a.btn.btn-primary(
+								href="/admin/register"
+							)
+								| New User
+
+				.row
+					.col-xs-12
+						span(ng-if='isLoading')
+							loading
+									i.fa.fa-fw.fa-spin.fa-refresh
+									| &nbsp;#{translate("loading")}...
+						.user-list-card(ng-if='!isLoading')
+							ul.list-unstyled.user-list.structured-list(
+								select-all-list,
+								max-height="userListHeight - 25",
+								ng-cloak
+							)
+								li.container-fluid
+									.row
+										.col-xs-4
+											input.select-all(
+												select-all,
+												type="checkbox"
+											)
+											span.header.clickable(ng-click="changePredicate('email')") Email
+										.col-xs-3
+											span.header.clickable(ng-click="changePredicate('first_name')") Name
+										.col-xs-3
+											span.header.clickable(ng-click="changePredicate('lastLoggedIn')") Last logged in
+										.col-xs-2
+											span.header.clickable(ng-click="changePredicate('loginCount')") Login Count
+								li.user_entry.container-fluid(
+									ng-repeat="user in visibleUsers",
+									ng-controller="UserListItemController"
+								)
+									.row
+										.col-xs-4
+											input.select-item(
+												select-individual,
+												type="checkbox",
+												ng-model="user.selected"
+											)
+											span.owner 
+												a.userName(href="/admin/user/{{user._id}}") {{user.email}}
+										.col-xs-3
+											span
+												a.userName(href="/admin/user/{{user._id}}") {{user.first_name}}
+										.col-xs-3
+											span.last-loggedin {{user.lastLoggedIn | formatDate}}
+										.col-xs-2
+											span.owner {{user.loginCount}}
+											
+								li(
+									ng-if="visibleUsers.length == 0",
+									ng-cloak
+								)
+									.row
+										.col-xs-12.text-centered
+											small No Users
+				div(ng-if="pages > 1")
+					ul.pager(
+						
+					)
+						li Pages:&nbsp;
+						li(
+							ng-repeat="page in pagesList",
+							ng-class="{active: (page == pageSelected)}"
+						)
+							a(href, ng-click="changePage(page)") {{page}}
+
+
+		include ./_modals

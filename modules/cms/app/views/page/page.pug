@@ -1,0 +1,23 @@
+extends ../layout
+include ./elements/_page_content
+
+//- A page from the CMS
+//- This is the model "Page" on the CMS
+//- These are for the path /for/_SLUG_ (other paths might be added)
+
+block content_cms
+	.row
+		.col-xs-12.col-sm-10.col-sm-offset-1
+			.page-header
+				h1 #{title}
+
+	if content
+		.row
+			.col-xs-12.col-sm-10.col-sm-offset-1.content-container
+				for c, cIndex in content
+					//- tabGroupTitle is a required field on CMS but can be opted out of display on site
+					//- must check c.fields, because an entry could have been created without adding any fields
+					if c.fields && c.fields.tabGroupTitle
+						include ./elements/_tabs
+					else
+						+page_content(c, content[cIndex+1])

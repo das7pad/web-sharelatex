@@ -1,0 +1,21 @@
+hr
+
+h3 #{translate("dropbox_integration")} 
+
+- if(!user.features.dropbox)
+	p.small #{translate("dropbox_sync_description")}
+	.alert.alert-info
+		p #{translate("dropbox_is_premium")}
+		p
+			a.btn.btn-info(href='/user/subscription/plans' ng-click='upgradeIntegration("dropbox")') #{translate("upgrade")}
+- else if (dropbox.error)
+	.alert.alert-danger #{translate("dropbox_sync_error")}
+- else if(dropbox.registered)
+	.alert.alert-success
+		| #{translate("account_is_linked")}.
+		| 
+		a(href='/dropbox/unlink') #{translate("unlink_dropbox")}
+- else
+	p.small #{translate("dropbox_sync_description")}
+	p
+		a.btn.btn-info(href='/dropbox/beginAuth') #{translate("link_to_dropbox")}

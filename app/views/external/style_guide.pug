@@ -1,0 +1,379 @@
+extends ../layout
+
+block content
+	.content.content-alt
+		.container
+			.row
+				.col-md-8.col-md-offset-2
+					h2 Logo in HTML
+					
+					style.
+						.logo {
+							font-family: 'Baskerville';
+							font-weight: 600;
+							font-size: 22px;
+							color: #333;
+						}
+						.logo span {
+							position: relative;
+						}
+						.logo .small {
+							color: inherit;
+							font-size: 18px;
+						}
+						.logo .LATEX {
+							//- left: 1px;
+						}
+						.logo .A {
+							//- top: -8px;
+							//- left: -7px;
+						}
+						.logo .TEX {
+							left: -1px;
+						}
+						//- .logo .TEX .E {
+						//- 	left: 1px;
+						//- }
+						//- .logo .TEX .X {
+						//- 	left: 1px;
+						//- }
+					p.logo
+						span S
+						span.small HARE
+						span.LATEX
+							span L
+							span.small.E A
+							span.TEX
+								span.T T
+								span.small.E E
+								span.X X
+								
+					h1 ShareLaTeX CSS Style Guide
+
+					h2 Headings
+
+					p Here are our heading styles:
+
+					h1 Heading level 1
+					p Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum
+
+					h2 Heading level 2
+					p Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum
+
+					h3 Heading level 3
+					p Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum
+
+					h4 Heading level 4
+					p Lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum
+
+					h2 Buttons
+
+					p Our primary button is red:
+					p
+						a.btn.btn-primary(href="#") Primary Button
+					p Our secondary button is blue:
+					p
+						a.btn.btn-info(href="#") Secondary Button
+					p All button styles
+					p
+						.btn-toolbar
+							a.btn.btn-primary(href="#") Primary
+							a.btn.btn-info(href="#") Info (secondary)
+							a.btn.btn-default(href="#") Default
+							a.btn.btn-success(href="#") Success
+							a.btn.btn-warning(href="#") Warning
+							a.btn.btn-danger(href="#") Danger
+
+					h2 Hyperlinks
+
+					p Hyperlinks are highlighted 
+						a(href="#") as shown
+						|.
+
+					h2 Alerts
+
+					.alert.alert-danger An <code>.alert-danger</code> alert
+					.alert.alert-success An <code>.alert-success</code> alert
+					.alert.alert-info An <code>.alert-info</code> alert
+					.alert.alert-warning An <code>.alert-warning</code> alert
+					
+					h2 Progress bars
+
+					.progress
+						.progress-bar.progress-bar-danger(style="width: 20%")
+					.progress
+						.progress-bar.progress-bar-success(style="width: 40%")
+					.progress
+						.progress-bar.progress-bar-info(style="width: 60%")
+					.progress
+						.progress-bar.progress-bar-warning(style="width: 80%")
+
+					h2 Favicon in HTML
+					style.
+						.favicon {
+							border-radius: 4px;
+							width: 32px;
+							height: 32px;
+							color: white;
+							font-family: 'Baskerville';
+							font-weight: 600;
+							font-size: 32px;
+							text-align: center;
+							line-height: 1;
+							background: linear-gradient(to bottom, #a93529 0%,#521914 100%);;
+						}
+					p
+						.favicon S
+
+		.container
+			.row
+				.col-md-8.col-md-offset-2
+					.card
+						p Cards look best on a <code>.content.content-alt</code> background
+
+		.container
+			.row.row-spaced
+				.col-md-8.col-md-offset-2
+					.card
+						h2 Form elements—basic example
+						form
+							.form-group
+								label(for='exampleInputEmail1') Email address
+								input#exampleInputEmail1.form-control(type='email', placeholder='Email')
+							.form-group
+								label(for='exampleInputPassword1') Password
+								input#exampleInputPassword1.form-control(type='password', placeholder='Password')
+							.form-group
+								label(for='exampleInputFile') File input
+								input#exampleInputFile(type='file')
+								p.help-block Example block-level help text here.
+							.checkbox
+								label
+									input(type='checkbox')
+									|  Check me out
+								button.btn.btn-default(type='submit') Submit
+		.container
+			.row.row-spaced
+				.col-md-8.col-md-offset-2
+					.card
+						h2 Inline form
+						form.form-inline
+							.form-group
+								label(for='exampleInputName2') Name
+								input#exampleInputName2.form-control(type='text', placeholder='Jane Doe')
+							.form-group
+								label(for='exampleInputEmail2') Email
+								input#exampleInputEmail2.form-control(type='email', placeholder='jane.doe@example.com')
+							button.btn.btn-default(type='submit') Send invitation
+		.container
+			.row.row-spaced
+				.col-md-8.col-md-offset-2
+					.card
+						form.form-inline
+							.form-group
+								label.sr-only(for='exampleInputEmail3') Email address
+								input#exampleInputEmail3.form-control(type='email', placeholder='Email')
+							.form-group
+								label.sr-only(for='exampleInputPassword3') Password
+								input#exampleInputPassword3.form-control(type='password', placeholder='Password')
+							.checkbox
+								label
+									input(type='checkbox')
+									|  Remember me
+							button.btn.btn-default(type='submit') Sign in
+		.container
+			.row.row-spaced
+				.col-md-8.col-md-offset-2
+					.card
+						form.form-inline
+							.form-group
+								label.sr-only(for='exampleInputAmount') Amount (in dollars)
+								.input-group
+									.input-group-addon $
+									input#exampleInputAmount.form-control(type='text', placeholder='Amount')
+									.input-group-addon .00
+							button.btn.btn-primary(type='submit') Transfer cash
+		.container
+			.row.row-spaced
+				.col-md-8.col-md-offset-2
+					.card
+						h2 Horizontal form
+						form.form-horizontal
+							.form-group
+								label.col-sm-2.control-label(for='inputEmail3') Email
+								.col-sm-10
+									input#inputEmail3.form-control(type='email', placeholder='Email')
+							.form-group
+								label.col-sm-2.control-label(for='inputPassword3') Password
+								.col-sm-10
+									input#inputPassword3.form-control(type='password', placeholder='Password')
+							.form-group
+								.col-sm-offset-2.col-sm-10
+									.checkbox
+										label
+											input(type='checkbox')
+											|  Remember me
+							.form-group
+								.col-sm-offset-2.col-sm-10
+									button.btn.btn-default(type='submit') Sign in
+		.container
+			.row.row-spaced
+				.col-md-8.col-md-offset-2
+					.card
+						h2 Supported controls
+						form
+							input.form-control(type='text', placeholder='Text input')
+			.row
+				.col-md-8.col-md-offset-2
+					.card
+						form
+							textarea.form-control(rows='3', placeholder='Textarea')
+			.row
+				.col-md-8.col-md-offset-2
+					.card
+						form
+							.checkbox
+								label
+									input(type='checkbox', value='')
+									| Option one is this and that—be sure to include why it's great
+							.checkbox.disabled
+								label
+									input(type='checkbox', value='', disabled='')
+									| Option two is disabled
+			.row
+				.col-md-8.col-md-offset-2
+					.card
+						form
+							.radio
+								label
+									input#optionsRadios1(type='radio', name='optionsRadios', value='option1', checked='')
+									| Option one is this and that—be sure to include why it's great
+							.radio
+								label
+									input#optionsRadios2(type='radio', name='optionsRadios', value='option2')
+									| Option two can be something else and selecting it will deselect option one
+							.radio.disabled
+								label
+									input#optionsRadios3(type='radio', name='optionsRadios', value='option3', disabled='')
+									| Option three is disabled
+			.row
+				.col-md-8.col-md-offset-2
+					.card
+						form
+							label.checkbox-inline
+								input#inlineCheckbox1(type='checkbox', value='option1')
+								| 1
+							label.checkbox-inline
+								input#inlineCheckbox2(type='checkbox', value='option2')
+								| 2
+							label.checkbox-inline
+								input#inlineCheckbox3(type='checkbox', value='option3')
+								| 3
+			.row
+				.col-md-8.col-md-offset-2
+					.card
+						form
+							label.radio-inline
+								input#inlineRadio1(type='radio', name='inlineRadioOptions', value='option1')
+								| 1
+							label.radio-inline
+								input#inlineRadio2(type='radio', name='inlineRadioOptions', value='option2')
+								| 2
+							label.radio-inline
+								input#inlineRadio3(type='radio', name='inlineRadioOptions', value='option3')
+								| 3
+			.row
+				.col-md-8.col-md-offset-2
+					.card
+						form
+							select.form-control
+								option 1
+								option 2
+								option 3
+								option 4
+								option 5
+			.row
+				.col-md-8.col-md-offset-2
+					.card
+						form
+							select.form-control(multiple='')
+								option 1
+								option 2
+								option 3
+								option 4
+								option 5
+		.container
+			.row.row-spaced
+				.col-md-8.col-md-offset-2
+					.card
+						h2 Form states
+						form.form-inline
+							.form-group
+								label.sr-only Emails
+								p.form-control-static email@example.com
+							.form-group
+								label.sr-only(for='inputPassword2') Password
+								input#inputPassword2.form-control(type='password', placeholder='Password')
+							button.btn.btn-default(type='submit') Confirm identity
+			.row
+				.col-md-8.col-md-offset-2
+					.card
+						form
+							input#focusedInput.form-control(type='text', value='Demonstrative focus state')
+			.row
+				.col-md-8.col-md-offset-2
+					.card
+						form
+							input#disabledInput.form-control(type='text', placeholder='Disabled input here…', disabled='')
+			.row
+				.col-md-8.col-md-offset-2
+					.card
+						form
+							input.form-control(type='text', placeholder='Readonly input here…', readonly='')
+			.row
+				.col-md-8.col-md-offset-2
+					.card
+						form
+							.form-group
+								label(for='inputHelpBlock') Input with help text
+								input#inputHelpBlock.form-control(type='text', aria-describedby='helpBlock')
+							span#helpBlock.help-block A block of help text that breaks onto a new line and may extend beyond one line.
+		.container
+			.row.row-spaced
+				.col-md-8.col-md-offset-2
+					.card
+						h2 Validation states
+						form
+							.form-group.has-success
+								label.control-label(for='inputSuccess1') Input with success
+								input#inputSuccess1.form-control(type='text', aria-describedby='helpBlock2')
+								span#helpBlock2.help-block A block of help text that breaks onto a new line and may extend beyond one line.
+							.form-group.has-warning
+								label.control-label(for='inputWarning1') Input with warning
+								input#inputWarning1.form-control(type='text')
+							.form-group.has-error
+								label.control-label(for='inputError1') Input with error
+								input#inputError1.form-control(type='text')
+							.has-success
+								.checkbox
+									label
+										input#checkboxSuccess(type='checkbox', value='option1')
+										| Checkbox with success
+							.has-warning
+								.checkbox
+									label
+										input#checkboxWarning(type='checkbox', value='option1')
+										| Checkbox with warning
+							.has-error
+								.checkbox
+									label
+										input#checkboxError(type='checkbox', value='option1')
+										| Checkbox with error
+
+
+
+
+
+
+
+

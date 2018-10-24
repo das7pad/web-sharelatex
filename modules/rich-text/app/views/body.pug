@@ -1,0 +1,19 @@
+#editor-rich-text(
+  cm-editor,
+  ng-if="editor.showRichText && richText.bundle",
+  ng-show="!!editor.sharejs_doc && !editor.opening",
+  bundle="richText.bundle",
+  formatting-events="richText.formattingEvents",
+  init-code-mirror="initCodeMirror",
+  sharejs-doc="editor.sharejs_doc",
+  read-only="!permissions.write",
+  resize-on="layout:main:resize,layout:pdf:resize,layout:review:resize,review-panel:toggle",
+  spell-check="!anonymous",
+  spell-check-language="project.spellCheckLanguage",
+  auto-complete="settings.autoComplete",
+  auto-close-brackets="settings.autoPairDelimiters",
+  font-size="settings.fontSize",
+  line-height="settings.lineHeight || ui.defaultLineHeight"
+  doc-id="editor.open_doc_id",
+  on-save="recompileViaKey"
+)

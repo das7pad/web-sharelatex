@@ -1,0 +1,35 @@
+extends ../../../../app/views/layout
+
+block content
+	.content.content-alt
+		.container
+			.row
+				.col-md-6.col-md-offset-3
+					.card
+						.page-header
+							h1 Welcome to Overleaf v2!
+
+						if had_v1_account
+							div
+								p
+									| We've now merged your ShareLaTeX and Overleaf accounts.
+								p
+									| From now on, please go to www.overleaf.com to log in to your
+									| account.
+								if hasSubscription
+									p
+										| Your subscription has been transferred to Overleaf v2.
+						else
+							div
+								p
+									| We've now moved your ShareLaTeX account to Overleaf v2.
+								p
+									| From now on, please go to www.overleaf.com to log in to your
+									| account. You can use the same email address and password
+									| that you used on ShareLaTeX to log into Overleaf.
+								if hasSubscription
+									p
+										| Your subscription has been transferred to Overleaf v2.
+
+						p.text-center
+							a(href="/project").btn.btn-lg.btn-primary Go to your projects

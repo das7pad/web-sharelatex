@@ -1,0 +1,29 @@
+extends ../../../../app/views/layout
+include ../../../../app/views/_mixins/links
+include ../../../../app/views/_mixins/faq_search
+include _mixins
+
+block vars
+	- metadata = metadata || {}
+
+block content
+	//- to do? image as env var
+	- var defaultPortalBannerImage = buildImgPath('portal-default.jpg')
+	- var backgroundImage = portal.banner_image_url ? portal.banner_image_url : defaultPortalBannerImage
+
+	.content.content-alt.content-portal.content-page
+		main(ng-cloak, id="university-content-container" class=print ? 'print' : '')
+			div.banner-image.hidden-print(style=`background-image:url(${backgroundImage})`)
+			if portal.logo_url
+				div.institution-logo
+					div
+						span.image-fill
+						img(src=portal.logo_url alt=portal.title)
+
+			.portal-name.container
+				h1.text-center #{portal.title} on #{settings.appName}
+
+			if portal.paid
+				include _portal_paid
+			else
+				include _portal_unpaid

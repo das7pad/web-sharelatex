@@ -1,0 +1,31 @@
+.row.hidden-print
+	.col-sm-12(id="basic-metrics")
+		.content-item
+			h3 Spread the Word
+			p Like using #{settings.appName}? Invite others from #{portal.title} to Overleaf or Tweet at your institution to spread the word. You may also be interested in joining our&nbsp;
+				+linkAdvisors()
+				| .
+
+.row.hidden-print.text-center.portal-actions
+	- var btnClasses = 'btn btn-primary btn-block'
+	- var teamCount =  team && team.current_count && team.current_count !== 0 ? team.current_count + ' ' : '' 
+	- var tweetText = 'I\'ve joined ' + teamCount + 'users from ' + portal.title + ' on @overleaf to write and collaborate online'
+	if university && university.twitter_handle && university.twitter_handle != ''
+		- tweetText = '@' + university.twitter_handle + ' ' + tweetText
+
+	.col-sm-4
+		//- TODO: track click
+		.card
+			i(class="fa fa-twitter icon-lg icon-accent")
+			br
+			+linkTweet('Tweet', btnClasses, tweetText, {category: 'Portal', action: 'tweet', trigger: 'click'})
+	.col-sm-4
+		.card
+			i(class="fa fa-users icon-lg icon-accent")
+			br
+			+linkInvite('Invite your friends', btnClasses, {category: 'Portal', action: 'opened invites modal', trigger: 'click'})
+	.col-sm-4
+		.card
+			i(class="fa fa-lightbulb-o icon-lg icon-accent")
+			br
+			+linkAdvisors('Become an Advisor', btnClasses, {category: 'Portal', action: 'click become an advisor', trigger: 'click'})

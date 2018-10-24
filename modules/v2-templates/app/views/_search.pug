@@ -1,0 +1,16 @@
+.search__container--addsearch(addsearch)
+  .search__input-bar
+    label.sr-only(for="search") Search
+    input#search.addsearch.form-control.search__input(
+      type="text",
+      placeholder!="Search&hellip;"
+    )
+    button.btn.btn-primary Search
+  #addsearch-results
+
+block scripts
+  script(
+    type="text/javascript",
+    defer,
+    src=settings.addsearch.host+"/js/?key="+settings.addsearch.key+"&type=resultpage"
+  )

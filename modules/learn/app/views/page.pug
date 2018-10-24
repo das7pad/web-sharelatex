@@ -1,0 +1,22 @@
+extends ../../../../app/views/layout
+include ../../../../app/views/_mixins/faq_search
+
+block content
+	.content.content-alt(ng-cloak)
+		.container.wiki
+			.row.template-page-header
+				.col-md-8(ng-cloak)
+
+			.row
+				.col-xs-3.contents(ng-non-bindable)
+					| !{contents.content}
+
+				.col-xs-9.page
+					+faq_search()
+					.card.row-spaced(ng-controller="LearnController")
+						.page-header
+							h1(ng-non-bindable) #{title}
+
+						mathjax !{page.content}
+
+	script(src=mathJaxPath)

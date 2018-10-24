@@ -1,0 +1,14 @@
+hr
+.row
+	.col-sm-12.text-center
+		if portal.invite_only
+			h4 Join #{portal.title} on #{settings.appName}
+		else
+			h4 Join&nbsp;
+				+community_count(team.current_count, portal.title)
+
+		if portal.public_team_html
+			p !{portal.public_team_html}
+
+if !portal.invite_only
+	include _sign_in_or_affiliate

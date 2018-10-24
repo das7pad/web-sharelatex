@@ -1,0 +1,17 @@
+mixin portal_content(id, title, content, card, contentClass, childClass)
+	- var contentClasses = `${contentClass ? contentClass : ''} ${card ? 'card' : ''}`
+
+	if content
+		.content-item(id=id class=contentClasses)
+			if card
+				h4.card-header #{title}
+			else
+				h3 #{title}
+
+			div(class=childClass) !{content}
+
+mixin community_count(count, title)
+	| a community of
+	if count && count > 1
+		| &nbsp;over #{count}
+	| &nbsp;authors at #{title}

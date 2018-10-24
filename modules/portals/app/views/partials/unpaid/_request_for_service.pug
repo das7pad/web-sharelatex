@@ -1,0 +1,67 @@
+.row.hidden-print
+	.col-sm-12
+		.content-item
+		h3 Benefits for #{portal.title}
+		p If you'd like to provide your librarian, IT department or department head with more information about Overleaf, you can&nbsp;
+			+linkPrintNewTab('save the following one-pager as a PDF', null, false, {category: 'Portal', action: 'pdf', label: 'link', trigger: 'click'}, false, true) 
+			//- TO DO: env var for email?
+			| &nbsp;and send it on to them. (Please CC sales@overleaf.com!)
+
+.row(id="request-for-service")
+	.col-sm-12
+		.card
+			strong By investing in Overleaf for institutions, #{portal.title} can:
+
+			ul
+				li Allow students, faculty and staff to benefit from their online, collaborative scientific writing and publishing platform with real‐time preview
+
+				li
+					+linkBenefits('Provide Students')
+					| &nbsp;with an easy to use platform where they can share and collaborate on assignments, research, and documents and quickly see LaTeX errors as they occur, helping the learning process.
+
+				li
+					+linkEducation('Provide faculty')
+					| &nbsp;with a LaTeX solution that they can use for interactive demonstrations during class and templated assignments for their students, which can be opened and edited securely online. Faculty admin tools allow for easy assignment distribution, commenting and collection.
+
+				li Use #{settings.appName} as a&nbsp;
+					+linkUniversities('thesis writing submission and review platform')
+					| – tailored to our requirements to help improve standardization and compliance related to our dissertation and theses templates and repository submissions.
+
+				li Provide librarians and administrators access to an&nbsp;
+					strong administrative dashboard with metrics and analytics data
+					| &nbsp;to track platform use, number of users, collaboration, projects and submissions.
+
+				li Provide students, faculty and staff with a custom&nbsp;
+					strong institutional portal&nbsp;
+					| on #{settings.appName} that includes helpful templates, resources and links – examples of customized #{settings.appName} institutional portals can be seen here:
+
+			hr
+			.text-center
+				h4 #{portal.title} members already using #{settings.appName}
+				//- TO DO: metrics <%= render partial: 'portals/show/unpaid/basic_metrics' %>
+
+			div
+				h5 Departments
+				span(id="departments-label") Number of users from #{portal.title} by department
+
+				.custom-donut-container.chart-container
+					//- TO DO: SVG //- <svg id='university-departments-chart' data-url='<%= departments_data_portal_path(@portal.slug) %>'></svg>
+
+			hr
+
+			p Institutions including Stanford and Purdue have already adopted #{settings.appName}, and you can read more about their use of #{settings.appName} across campus on the&nbsp;
+				a(href="http://library.stanford.edu/blogs/stanford-libraries-blog/2016/02/free-overleaf-pro-account-all-stanford-students-faculty-staff" target="_BLANK") Stanford Libraries blog 
+				| and in this&nbsp;
+				+linkBlog('Purdue University Case Study', null, '447')
+
+			p
+				strong To receive more information from #{settings.appName} about an institutional account at #{portal.title}, please email&nbsp;
+				+linkEmail('sales@overleaf.com', null, 'sales')
+				//- to do: check if modal or /contact
+				| &nbsp;or send us a message via our&nbsp;
+				+linkContact('contact form')
+				| .
+
+.row.row-spaced.hidden-print.text-center
+	.col-sm-12
+		+linkPrintNewTab('Print Benefits', 'btn btn-primary btn-lg', true, {category: 'Portal', action: 'pdf', label: 'button', trigger: 'click'})

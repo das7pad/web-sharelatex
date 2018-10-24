@@ -1,0 +1,14 @@
+if portal.public_help_html
+	.content-item
+		.row
+			.col-sm-12
+				h2 FAQ &amp; Help
+				p !{portal.public_help_html}
+
+	.row
+		.col-sm-12
+			+faq_search('Search our FAQ for more help', 'h4')
+
+	.row
+		.col-sm-12
+			+portal_content('university-more', 'More', portal.public_bottom_html, false)

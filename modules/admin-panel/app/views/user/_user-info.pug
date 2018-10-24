@@ -1,0 +1,283 @@
+p
+	form(async-form="adminUserEmail", name="adminUserEmailForm", method="POST", action="/admin/user/" + user._id + "/email", novalidate)
+		input(type="hidden", name="_csrf", value=csrfToken)
+		table.table.table-striped.table-bordered(style="margin-bottom: 12px;")
+			tr
+				td
+					label ID
+				td {{ user._id }}
+			tr
+				td
+					label #{translate("email")}
+				td
+					div(ng-show="!editingEmail")
+						a(href="mailto:{{user.email}}") {{ user.email }} &nbsp;
+						a.small(href, ng-click="editingEmail = true") Edit
+					div(ng-show="editingEmail")
+						input#email.form-control(
+							name='email',
+							placeholder="jane@example.com"
+							ng-model="user.email"
+						)
+						.row-spaced-small
+							button.btn.btn-primary(type='submit', ng-disabled="adminUserEmailForm.inflight")
+								span(ng-show="!adminUserEmailForm.inflight") Save
+								span(ng-show="adminUserEmailForm.inflight") Saving...
+							| &nbsp;
+							a.btn.btn-default(href, ng-click="editingEmail = false") Cancel
+
+			tr(ng-if="user.emails.length > 1")
+				td
+					label #{translate("emails")}
+				td
+					ul(ng-repeat="emailData in user.emails")
+						li {{ emailData.email }} 
+							a.btn.btn-danger.btn-xs(
+								href='#',
+								tooltip-placement="bottom",
+								tooltip-append-to-body="true",
+								ng-click="openDeleteSecondaryEmailModal(emailData.email)"
+							)
+								i.fa.fa-trash-o
+
+			if user.overleaf
+				tr
+					td
+						label Overleaf v1 ID
+					td
+						a(href="https://electric-leaf-4093.herokuapp.com/admin/users/" + user.overleaf.id)= user.overleaf.id
+						a.pull-right.btn(
+							href='#',
+							tooltip-placement="bottom",
+							tooltip-append-to-body="true",
+							ng-click="openUnlinkOlModal()"
+						)
+							i.fa.fa-trash-o
+							| &nbsp; Unlink
+			tr
+				td
+					label Sign up date
+				td {{ user.signUpDate }}
+			tr
+				td
+					label Last login
+				td {{ user.lastLoggedIn }}
+			tr
+				td
+					label Last login IP
+				td {{ user.lastLoginIp }}
+			tr
+				td
+					label Login count
+				td {{ user.loginCount }}
+				
+		form-messages(for="adminUserEmailForm")
+			.alert.alert-success(ng-show="adminUserEmailForm.response.success && !adminUserEmailForm.inflight")
+				| Email was changed
+	
+	form(async-form="adminUser", name="adminUserForm", method="POST", action="/admin/user/" + user._id, novalidate)
+		input(type="hidden", name="_csrf", value=csrfToken)
+		table.table.table-striped.table-bordered(style="margin-bottom: 12px;")
+			tr
+				th(colspan=2).text-center Profile
+
+			tr
+				td
+					label(for="first_name") #{translate("first_name")}
+				td
+					input#first_name.form-control(
+						name='first_name',
+						placeholder="Jane"
+						ng-model="user.first_name"
+					)
+
+			tr
+				td
+					label(for="last_name") #{translate("last_name")}
+				td
+					input#last_name.form-control(
+						name='last_name',
+						placeholder="Smith"
+						ng-model="user.last_name"
+					)
+
+			if settings.enableSubscriptions
+				tr
+					th(colspan=2).text-center
+						| Features
+						span.small
+							| &nbsp;(Change to:&nbsp;
+							a(href, ng-click="user.features = {collaborators: 1, versioning: false, dropbox: false, github: false, compileTimeout: 60, compileGroup: 'standard', templates: false, trackChanges: false, referencesSearch: false, mendeley: false}") Free
+							| &nbsp;&middot;&nbsp;
+							a(href, ng-click="user.features = {collaborators: 10, versioning: true, dropbox: true, github: true, compileTimeout: 240, compileGroup: 'priority', templates: true, trackChanges: true, references: false, referencesSearch: true, mendeley: true}") Collab.
+							| &nbsp;&middot;&nbsp;
+							a(href, ng-click="user.features = {collaborators: -1, versioning: true, dropbox: true, github: true, compileTimeout: 240, compileGroup: 'priority', templates: true, trackChanges: true, references: false, referencesSearch: true, mendeley: true}") Pro.
+							| )
+
+				tr
+					td
+						label(for="collaborators") Collaborators
+					td
+						input#collaborators.form-control(
+							name="features.collaborators"
+							ng-model="user.features.collaborators"
+						)
+
+				tr
+					td
+						label(for="versioning") Versioning
+					td
+						input#versioning(
+							type="checkbox"
+							name="features.versioning"
+							ng-model="user.features.versioning"
+						)
+
+				tr
+					td
+						label(for="dropbox") Dropbox
+					td
+						input#dropbox(
+							type="checkbox"
+							name="features.dropbox"
+							ng-model="user.features.dropbox"
+						)
+
+				tr
+					td
+						label(for="github") GitHub
+					td
+						input#github(
+							type="checkbox"
+							name="features.github"
+							ng-model="user.features.github"
+						)
+
+				tr
+					td
+						label(for="compileTimeout") Compile Timeout
+					td
+						input#compileTimeout.form-control(
+							name="features.compileTimeout"
+							ng-model="user.features.compileTimeout"
+						)
+
+				tr
+					td
+						label(for="compileGroup") Compile Group
+					td
+						input#compileGroup.form-control(
+							name="features.compileGroup"
+							ng-model="user.features.compileGroup"
+						)
+
+				tr
+					td
+						label(for="templates") Templates
+					td
+						input#templates(
+							type="checkbox"
+							name="features.templates"
+							ng-model="user.features.templates"
+						)
+
+				tr
+					td
+						label(for="trackChanges") Track Changes
+					td
+						input#trackChanges(
+							type="checkbox"
+							name="features.trackChanges"
+							ng-model="user.features.trackChanges"
+						)
+
+				tr
+					td
+						label(for="references") References (deprecated)
+					td
+						input#references(
+							type="checkbox"
+							name="features.references"
+							ng-model="user.features.references"
+						)
+
+				tr
+					td
+						label(for="referencesSearch") References Search
+					td
+						input#referencesSearch(
+							type="checkbox"
+							name="features.referencesSearch"
+							ng-model="user.features.referencesSearch"
+						)
+
+				tr
+					td
+						label(for="mendeley") Mendeley
+					td
+						input#mendeley(
+							type="checkbox"
+							name="features.mendeley"
+							ng-model="user.features.mendeley"
+						)
+
+			//- tr
+			//- 	th(colspan=2).text-center Misc.
+			
+			//- tr
+			//- 	td
+			//- 		label(for="betaProgram") Beta Program
+			//- 	td
+			//- 		input#betaProgram(
+			//- 			type="checkbox"
+			//- 			name="betaProgram"
+			//- 			ng-model="user.betaProgram"
+			//- 		)
+
+			//- tr
+			//- 	td
+			//- 		label(for="awareOfV2") Aware of v2?
+			//- 	td
+			//- 		input#betaProgram(
+			//- 			type="checkbox"
+			//- 			name="awareOfV2"
+			//- 			ng-model="user.awareOfV2"
+			//- 		)
+
+
+			if isSuperAdmin
+				tr
+					th(colspan=2).text-center Site Admin.
+
+				tr(ng-show="!showIsAdmin")
+					td(colspan=2)
+						a(href,ng-click="showIsAdmin = true", ng-show="!showIsAdmin") Show
+
+				tr(ng-show="showIsAdmin")
+					td
+						label(for="isAdmin").text-danger Is Site Admin? <br/> (Grants full access to all users and projects!)
+					td
+						input#betaProgram(
+							type="checkbox"
+							name="isAdmin"
+							ng-model="user.isAdmin"
+						)
+
+		form-messages(for="adminUserForm")
+			.alert.alert-success(ng-show="adminUserForm.response.success && !adminUserForm.inflight")
+				| User was successfully updated
+
+		.row
+			.col-md-9
+				button.btn.btn-primary(type='submit', ng-disabled="adminUserForm.inflight")
+					span(ng-show="!adminUserForm.inflight") Save
+					span(ng-show="adminUserForm.inflight") Saving...
+			.col-md-3.text-right
+				a.btn.btn-danger(
+					href='#',
+					tooltip-placement="bottom",
+					tooltip-append-to-body="true",
+					ng-click="openDeleteUserModal()"
+				)
+					i.fa.fa-trash-o
+					| &nbsp; #{translate('delete')} #{translate('user')}

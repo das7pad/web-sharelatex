@@ -1,0 +1,36 @@
+div
+	Strong Profile
+	table
+		tbody
+			tr 
+				td user_id: 
+					a(href=admin_url, target="_blank") #{_id}
+			tr 
+				td  First Name: #{first_name}
+			tr 
+				td  Last Name: #{last_name}
+			tr 
+				td  Login count: #{loginCount}
+			tr 
+				td  Sign up date: #{signUpDate}
+			tr 
+				td  Institution: #{institution}
+			tr 
+				td  Role: #{role}
+
+	table
+		thead
+			tr 
+				strong Features
+		tbody
+			each has_feature, key in features
+				tr 
+					td &nbsp; #{key}:
+					td #{has_feature}
+
+	strong Account
+	-if (typeof(recurly_url) != "undefined")
+		div
+			a(href=recurly_url, target="_blank") Recurly Profile
+
+		div PlanCode : #{planCode}

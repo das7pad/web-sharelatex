@@ -1,0 +1,15 @@
+extends ../../../../../app/views/layout
+
+block content
+	.content.content-alt
+		.container
+			.row
+				.col-md-10.col-md-offset-1.col-lg-8.col-lg-offset-2
+					.card
+						.page-header
+							h1  #{translate("github_account_successfully_linked")}
+							
+						p #{translate("github_successfully_linked_description")}
+						
+						p
+							a(href="/project").btn.btn-primary &lt; #{translate("back_to_your_projects")}
