@@ -7,12 +7,14 @@ UserGetter = require('../../../../../app/js/Features/User/UserGetter')
 Subscription = require("../../../../../app/js/models/Subscription").Subscription
 async = require "async"
 Errors = require './Errors'
+_ = require "underscore"
 
 importTeam = (origV1Team, callback = (error, v2TeamId) ->) ->
 	createV2TeamFromV1Team = (cb) -> createV2Team origV1Team, cb
 
 	async.waterfall [
 		createV2TeamFromV1Team,
+		importTeamManagers,
 		importTeamMembers,
 		importPendingInvites,
 	], (error, v1Team, v2Team) ->
@@ -34,7 +36,6 @@ createV2Team = (v1Team, callback = (error, v1Team, v2Team) ->) ->
 					id: v1Team.id
 				teamName: v1Team.name
 				admin_id: teamAdminId
-				manager_ids: [teamAdminId]
 				groupPlan: true
 				planCode: "v1_#{v1Team.plan_name}"
 				membersLimit: v1Team.n_licences
@@ -65,6 +66,27 @@ importPendingInvites = (v1Team, v2Team, callback = (error, v1Team, v2Team) ->) -
 	async.map v1Team.pending_invites, importInvite, (error, invites) ->
 		callback(error, v1Team, v2Team)
 
+importTeamManagers = (v1Team, v2Team, callback = (error, v1Team, v2Team) ->) ->
+	async.map v1Team.managers, getManagerSlId, (error, managerIds) ->
+		return callback(error) if error?
+
+		managerIds.push(v2Team.admin_id)
+		managerIds = _.compact(managerIds).map (id) -> id.toString()
+		v2Team.manager_ids = _.uniq(managerIds)
+
+		v2Team.save (error) ->
+			return callback(error) if error?
+			logger.log {managerIds: v2Team.manager_ids}, "[TeamImporter] Managers added to the team #{v2Team.id}"
+			callback(null, v1Team, v2Team)
+
+getManagerSlId = (v1User, callback = (error, v2ManagerId) ->) ->
+	UserMapper.getSlIdFromOlUser v1User, (error, v2ManagerId) ->
+		return callback(error) if error?
+
+		SubscriptionLocator.findManagedSubscription v2ManagerId, (error, existingSubscription) ->
+			return callback(error) if error?
+			return callback(null, null) if existingSubscription?
+			return callback(null, v2ManagerId)
 
 rollback = (v1Team, originalError, callback) ->
 	SubscriptionUpdater.deleteWithV1Id v1Team.id, (error) ->
