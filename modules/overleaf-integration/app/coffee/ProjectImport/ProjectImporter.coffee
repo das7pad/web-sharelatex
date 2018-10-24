@@ -158,10 +158,8 @@ module.exports = ProjectImporter =
 
 		# make the project name unique on import
 		# use the numerical part of the overleaf id as an optional suffix
-		# fall back to a timestamp if needed (format YYYY-MM-DD hhmmss)
 		numericId = doc.token.replace(/a-z/g,'')
-		timestamp = new Date().toISOString().replace(/T(\d+):(\d+):(\d+)\..*/,' $1$2$3') # strip out unwanted characters
-		ProjectDetailsHandler.ensureProjectNameIsUnique v2_user_id, doc.title, [" (#{numericId})", " (#{timestamp})"], (error, v2_project_name) ->
+		ProjectDetailsHandler.generateUniqueName v2_user_id, doc.title, [" (#{numericId})"], (error, v2_project_name) ->
 			return callback(error) if error?
 			ProjectCreationHandler.createBlankProject v2_user_id, v2_project_name, attributes, (error, project) ->
 				return callback(error) if error?
