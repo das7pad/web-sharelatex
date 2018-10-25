@@ -29,6 +29,10 @@ module.exports =
 				return res.status(400).json error:
 					code: 'user_already_added'
 					message: req.i18n.translate('user_already_added')
+			if error?.userNotFound
+				return res.status(404).json error:
+					code: 'user_not_found'
+					message: req.i18n.translate('user_not_found')
 			return next(error) if error?
 			res.json(user: user)
 

@@ -26,7 +26,7 @@ module.exports =
 		UserGetter.getUserByAnyEmail email, (error, user) ->
 			return callback(error) if error?
 			unless user
-				return callback(new Errors.NotFoundError("No user found with email #{email}"))
+				return callback(userNotFound: true)
 			if entity[attribute].some((managerId) -> managerId.equals(user._id))
 				return callback(alreadyAdded: true)
 

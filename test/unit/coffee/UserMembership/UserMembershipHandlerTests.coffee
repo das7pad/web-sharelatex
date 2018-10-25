@@ -133,7 +133,7 @@ describe 'UserMembershipHandler', ->
 				@UserGetter.getUserByAnyEmail.yields(null, null)
 				@UserMembershipHandler.addUser @institution, EntityConfigs.institution, @email, (error) =>
 					expect(error).to.exist
-					expect(error).to.be.an.instanceof(Errors.NotFoundError)
+					expect(error.userNotFound).to.equal true
 					done()
 
 			it 'handle user already added', (done) ->

@@ -116,6 +116,12 @@ describe "UserMembershipController", ->
 				expect(payload.error.code).to.equal 'user_already_added'
 				done()
 
+		it 'handle user not found', (done) ->
+			@UserMembershipHandler.addUser.yields(userNotFound: true)
+			@UserMembershipController.add @req, status: () => json: (payload) =>
+				expect(payload.error.code).to.equal 'user_not_found'
+				done()
+
 	describe 'remove', ->
 		beforeEach ->
 			@req.params.userId = @newUser._id
