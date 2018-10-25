@@ -81,10 +81,6 @@ public/js/main.js: public/src/main.js $(MODULE_MAIN_SRC_FILES)
 		sed -e s=\'__MAIN_CLIENTSIDE_INCLUDES__\'=$$INCLUDES= \
 		> $@
 
-public/js/libs/sharejs.js: public/src/ide/editor/sharejs/sharejs.js
-	@mkdir -p $(@D)
-	$(BABEL) $< --out-file $@
-
 $(CSS_FILES): $(LESS_FILES)
 	$(GRUNT) compile:css
 
@@ -97,7 +93,7 @@ minify_es:
 
 css: $(CSS_FILES)
 
-compile: $(JS_FILES) $(OUTPUT_SRC_FILES) css public/js/libs/sharejs.js public/js/main.js public/js/ide.js
+compile: $(JS_FILES) $(OUTPUT_SRC_FILES) css public/js/main.js public/js/ide.js
 	@$(MAKE) compile_modules
 
 compile_full:
@@ -154,7 +150,6 @@ clean_app:
 clean_frontend:
 	rm -rf public/js/{analytics,directives,es,filters,ide,main,modules,services,utils}
 	rm -f public/js/*.{js,map}
-	rm -f public/js/libs/sharejs.{js,map}
 
 clean_tests:
 	rm -rf test/unit/js
