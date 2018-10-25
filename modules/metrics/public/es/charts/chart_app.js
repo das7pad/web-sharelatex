@@ -13,12 +13,12 @@ var allOptions, additionalOptions
  * options keys. The given keys can be any keys from chartOptions or
  * classOptions objects.
  */
-function buildChartOptions (filteredOptions) {
+function buildChartOptions(filteredOptions) {
   if (isArray(filteredOptions) && filteredOptions.length > 0) {
     var returnOptions = {}
-    each(filteredOptions, function (optionName) {
+    each(filteredOptions, function(optionName) {
       additionalOptions = buildChartOptions(allOptions[optionName])
-      each(additionalOptions, function (val, key) {
+      each(additionalOptions, function(val, key) {
         returnOptions[key] = val
       })
     })
@@ -30,7 +30,7 @@ function buildChartOptions (filteredOptions) {
 
 var chartOptions = {
   chartDefault: {
-    margin: {top: 0, right: 40, bottom: 30, left: 70},
+    margin: { top: 0, right: 40, bottom: 30, left: 70 },
     useInteractiveGuideline: true,
     transitionDuration: 350,
     showLegend: true,
@@ -49,17 +49,17 @@ var chartOptions = {
     yAxisFormat: d3.format(',d')
   },
   xAxisAsDate: {
-    x: function (d) {
+    x: function(d) {
       return new Date(d.x)
     }
   },
   formatXAsDay: {
-    xAxisFormat: function (d) {
+    xAxisFormat: function(d) {
       return d3.time.format.utc('%d %b %Y')(new Date(d))
     }
   },
   formatXAsMonth: {
-    xAxisFormat: function (d) {
+    xAxisFormat: function(d) {
       return d3.time.format.utc('%B %Y')(new Date(d))
     }
   },
@@ -79,7 +79,9 @@ var chartOptions = {
   },
   expand: {
     style: 'expand',
-    customTooltipValue: function (serie) { return serie.point.y }
+    customTooltipValue: function(serie) {
+      return serie.point.y
+    }
   },
   shadedColour: {
     shadedColour: true
@@ -90,8 +92,12 @@ var chartOptions = {
   donutChart: {
     chartType: 'donutChart',
     valueFormat: d3.format('d'),
-    x: function (d) { return d.key },
-    y: function (d) { return d.val },
+    x: function(d) {
+      return d.key
+    },
+    y: function(d) {
+      return d.val
+    },
     legendPosition: 'right',
     showLabels: false,
     padAngle: 0.05,
@@ -103,32 +109,13 @@ var chartOptions = {
 }
 
 var classOptions = {
-  basics: [
-    'chartDefault',
-    'basicsAxis',
-    'xAxisAsDate'
-  ],
-  basicsAxis: [
-    'xAxisDefault',
-    'yAxisDefault'
-  ],
-  'lag-daily': [
-    'formatXAsDay'
-  ],
-  'lag-weekly': [
-    'formatXAsDay'
-  ],
-  'lag-monthly': [
-    'formatXAsMonth'
-  ],
-  expandedChart: [
-    'hideLegend',
-    'expand',
-    'shadedColour'
-  ],
-  'percent': [
-    'percentValue'
-  ]
+  basics: ['chartDefault', 'basicsAxis', 'xAxisAsDate'],
+  basicsAxis: ['xAxisDefault', 'yAxisDefault'],
+  'lag-daily': ['formatXAsDay'],
+  'lag-weekly': ['formatXAsDay'],
+  'lag-monthly': ['formatXAsMonth'],
+  expandedChart: ['hideLegend', 'expand', 'shadedColour'],
+  percent: ['percentValue']
 }
 
 const chartApp = {
@@ -136,13 +123,15 @@ const chartApp = {
     allOptions = merge(classOptions, chartOptions)
 
     /**
-   * resize all charts on window resize
-   */
-    $(window).resize(debounce(function () {
-      each(this.charts, function (chart) {
-        chart.update()
-      })
-    }, 200))
+     * resize all charts on window resize
+     */
+    $(window).resize(
+      debounce(function() {
+        each(this.charts, function(chart) {
+          chart.update()
+        })
+      }, 200)
+    )
   },
 
   charts: [],
@@ -150,12 +139,12 @@ const chartApp = {
   /**
    * add a chart to the given svg element
    */
-  addChart: function ($svgElt, chartData, options) {
+  addChart: function($svgElt, chartData, options) {
     var chart = createChart($svgElt, options)
 
     chartData = formatData(chartData, options)
 
-    nv.addGraph(function () {
+    nv.addGraph(function() {
       d3.select($svgElt[0])
         .datum(chartData)
         .call(chart)
@@ -178,7 +167,7 @@ const chartApp = {
   /**
    * Update a chart
    */
-  updateChart: function ($svgElt, chartData, options, chart) {
+  updateChart: function($svgElt, chartData, options, chart) {
     chart = createChart($svgElt, options)
 
     if (options.emptyBeforeUpdate || chartData.length === 0) {
@@ -206,9 +195,9 @@ const chartApp = {
    * duplicate chart options, the values will be overriden by the lates option
    * added
    */
-  getChartOptions: function () {
+  getChartOptions: function() {
     var filteredOptions = ['basics']
-    each(arguments, function (optionKey) {
+    each(arguments, function(optionKey) {
       var opts = allOptions[optionKey]
       if (isArray(opts)) {
         filteredOptions = filteredOptions.concat(opts)
@@ -223,7 +212,7 @@ const chartApp = {
 /**
  * Do some formatting on the data before passing it to nvd3
  */
-var formatData = function (data, options) {
+var formatData = function(data, options) {
   if (!options.avoidHumanizeKeys) {
     data = humanizeKeys(data)
   }
@@ -239,11 +228,13 @@ var formatData = function (data, options) {
  * transform snake_case keys into humanized names (capitalized words with
  * spaces). Not full-proof; but works OK.
  */
-var humanizeKeys = function (data) {
-  each(data, function (lineData, i) {
-    data[i].key = data[i].key.replace(/(\b|_)./g, function (letters) {
-      return letters.replace('_', ' ').toUpperCase()
-    }).replace('Doc', 'Project')
+var humanizeKeys = function(data) {
+  each(data, function(lineData, i) {
+    data[i].key = data[i].key
+      .replace(/(\b|_)./g, function(letters) {
+        return letters.replace('_', ' ').toUpperCase()
+      })
+      .replace('Doc', 'Project')
       .replace('Avg', 'Average')
       .replace(/Projects (10+)$/, 'Projects $1+ edits')
   })
@@ -260,19 +251,32 @@ var humanizeKeys = function (data) {
  * the colour is always the same for a given dataset (less confusing for the
  * end-user) and 4) not depend on the charts order
  */
-var formatColor = function (data) {
+var formatColor = function(data) {
   // define our custom colours
-  var chartColours = ['#FF6666', '#6699FF', '#669966', '#FF9966', '#CCCC99',
-    '#9966CC', '#CC6666', '#99CCFF']
+  var chartColours = [
+    '#FF6666',
+    '#6699FF',
+    '#669966',
+    '#FF9966',
+    '#CCCC99',
+    '#9966CC',
+    '#CC6666',
+    '#99CCFF'
+  ]
   var availableChartColours = clone(chartColours)
   var colourIndex
 
   // loop over all datasets
-  each(data, function (lineData, i) {
+  each(data, function(lineData, i) {
     // hash the key of the dataset and get the modulo to choose a colour
-    colourIndex = reduce(lineData.key, function (sum, char) {
-      return sum + char.charCodeAt(0)
-    }, 0) % availableChartColours.length
+    colourIndex =
+      reduce(
+        lineData.key,
+        function(sum, char) {
+          return sum + char.charCodeAt(0)
+        },
+        0
+      ) % availableChartColours.length
 
     // set the colour
     lineData.color = availableChartColours[colourIndex]
@@ -295,21 +299,22 @@ var formatColor = function (data) {
  * for the first 5 datasets, then shades of grey. Useful when all dataset for
  * a graph are related.
  */
-var formatShadedColor = function (data) {
+var formatShadedColor = function(data) {
   var colourR, colourG, colourB
 
   // loop over all datasets
-  each(data, function (lineData, i) {
+  each(data, function(lineData, i) {
     if (i < 5) {
       // first 5 colours are shades of blue (from dark to light)
-      colourR = 71 + (255 - 71) / 5 * i
-      colourG = 107 + (255 - 107) / 5 * i
-      colourB = 190 + (255 - 190) / 5 * i
+      colourR = 71 + ((255 - 71) / 5) * i
+      colourG = 107 + ((255 - 107) / 5) * i
+      colourB = 190 + ((255 - 190) / 5) * i
     } else {
       // remaining colours are shades of grey (from light to dark)
-      colourR = colourG = colourB = 255 - 255 / data.length * i
+      colourR = colourG = colourB = 255 - (255 / data.length) * i
     }
-    lineData.color = '#' +
+    lineData.color =
+      '#' +
       parseInt(colourR).toString(16) +
       parseInt(colourG).toString(16) +
       parseInt(colourB).toString(16)

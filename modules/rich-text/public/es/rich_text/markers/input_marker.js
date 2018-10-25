@@ -4,11 +4,11 @@ import { makeSingleMark } from '../single_mark'
 import { makeGroup } from '../utils'
 
 const InputMarker = {
-  matcher (cm, sourceMark) {
+  matcher(cm, sourceMark) {
     return sourceMark.kind === 'input' || sourceMark.kind === 'include'
   },
 
-  marker (cm, sourceMark, rtAdapter) {
+  marker(cm, sourceMark, rtAdapter) {
     let path = cm.getRange(sourceMark.contentFrom, sourceMark.contentTo)
     if (!path.match(/\.tex$/)) {
       path = path + '.tex'
@@ -30,7 +30,7 @@ const InputMarker = {
   }
 }
 
-function makeOpeningSpan (isFileFound) {
+function makeOpeningSpan(isFileFound) {
   // TODO: Make this clickable so that it opens the linked file
   const icon = $('<i>')
     .addClass('fa fa-fw fa-link')
@@ -48,7 +48,7 @@ function makeOpeningSpan (isFileFound) {
   return span[0]
 }
 
-function makeClosingSpan () {
+function makeClosingSpan() {
   const span = $('<span>')
     .text('}')
     .addClass('wl-label-bracket')

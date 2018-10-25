@@ -2,11 +2,11 @@ import { makeSingleMark } from '../single_mark'
 import { markCoversWholeLines, makeGroup } from '../utils'
 
 const ListEnvsMarker = {
-  matcher (cm, sourceMark) {
+  matcher(cm, sourceMark) {
     return sourceMark.kind === 'itemize' || sourceMark.kind === 'enumerate'
   },
 
-  marker (cm, sourceMark) {
+  marker(cm, sourceMark) {
     if (!markCoversWholeLines(cm, sourceMark)) return
 
     var innerMark = makeSingleMark(cm, sourceMark, 'inner', false, {
@@ -20,7 +20,7 @@ const ListEnvsMarker = {
   }
 }
 
-function collapsePrePostMark (cm, sourceMark) {
+function collapsePrePostMark(cm, sourceMark) {
   const preMark = makeSingleMark(cm, sourceMark, 'pre', true, {
     inclusiveLeft: true,
     inclusiveRight: true,

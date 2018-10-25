@@ -6,7 +6,7 @@ import { MetricView } from './metric'
 export const MetricsView = Backbone.View.extend({
   el: '#metrics-container',
 
-  initialize: function () {
+  initialize: function() {
     this.metrics = new Metrics()
     this.metrics.fetch()
 
@@ -15,7 +15,7 @@ export const MetricsView = Backbone.View.extend({
     new LagsView() // eslint-disable-line no-new
   },
 
-  render: function (metric) {
+  render: function(metric) {
     metric.view = new MetricView({
       model: metric
     })

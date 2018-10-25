@@ -3,7 +3,7 @@
  *
  * @param {CodeMirror} cm
  */
-export function focus (cm) {
+export function focus(cm) {
   // Can get errors due to popup blockers
   try {
     cm.focus()

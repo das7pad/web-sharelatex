@@ -64,25 +64,25 @@ import Mark from './mark'
 // 4. marks: a list of all Marks that have been closed by the current position,
 //           in the order in which they were closed
 //
-export default function LatexMode () {
+export default function LatexMode() {
   //
   // Stack: we maintain the parse state as a stack of tokenize functions.
   //
-  function _push (state, tokenizer) {
+  function _push(state, tokenizer) {
     state.stack.push(tokenizer)
   }
 
-  function _pop (state) {
+  function _pop(state) {
     state.stack.pop()
   }
 
-  function _popAndResume (stream, state) {
+  function _popAndResume(stream, state) {
     _pop(state)
     return state.stack[state.stack.length - 1](stream, state)
   }
 
-  function _defer (state, tokenizer) {
-    _push(state, function (stream, state) {
+  function _defer(state, tokenizer) {
+    _push(state, function(stream, state) {
       _pop(state)
       return tokenizer(stream, state)
     })
@@ -105,9 +105,9 @@ export default function LatexMode () {
    * just after we have processed the last token in the sequence; it should
    * set up the stack for the next call
    */
-  function _matchSequence (stream, state, patterns, tokens, callback) {
+  function _matchSequence(stream, state, patterns, tokens, callback) {
     var i = 0
-    function _matchNext (stream, state) {
+    function _matchNext(stream, state) {
       if (stream.match(patterns[i])) {
         var token = tokens[i]
         ++i
@@ -127,21 +127,27 @@ export default function LatexMode () {
    * tokens, this actually pushes several methods onto the stack;
    * {@see_matchSequence}.
    */
-  function _matchBeginEnvironmentSequence (stream, state, callback) {
-    return _matchSequence(stream, state,
+  function _matchBeginEnvironmentSequence(stream, state, callback) {
+    return _matchSequence(
+      stream,
+      state,
       [/^\\begin\s*/, '{', /[^{}]+/, '}'],
       ['tag', 'bracket', 'keyword', 'bracket'],
-      callback)
+      callback
+    )
   }
 
   /**
    * Match a \end{env} tag; {@see _matchSequence}.
    */
-  function _matchEndEnvironmentSequence (stream, state, callback) {
-    return _matchSequence(stream, state,
+  function _matchEndEnvironmentSequence(stream, state, callback) {
+    return _matchSequence(
+      stream,
+      state,
       [/^\\end\s*/, '{', /[^{}]+/, '}'],
       ['tag', 'bracket', 'keyword', 'bracket'],
-      callback)
+      callback
+    )
   }
 
   //
@@ -149,40 +155,55 @@ export default function LatexMode () {
   // CodeMirror TextMarker, and manage the mark stack and list.
   //
 
-  function _startPos (stream, state) {
+  function _startPos(stream, state) {
     return CodeMirror.Pos(state.line, stream.start)
   }
 
-  function _currentPos (stream, state) {
-    return CodeMirror.Pos(state.line,
-      stream.start + stream.current().length)
+  function _currentPos(stream, state) {
+    return CodeMirror.Pos(state.line, stream.start + stream.current().length)
   }
 
-  function _openMark (stream, state, kind, openPos) {
+  function _openMark(stream, state, kind, openPos) {
     var newMark = new Mark(kind, openPos, _currentPos(stream, state))
     state.openMarks.push(newMark)
     return newMark
   }
 
-  function _abandonMark (stream, state) {
+  function _abandonMark(stream, state) {
     state.openMarks.pop()
   }
 
-  function _closeMark (stream, state, closePos) {
+  function _closeMark(stream, state, closePos) {
     var mark = state.openMarks.pop()
     var openParent =
       mark.openParent || state.openMarks[state.openMarks.length - 1]
-    var newMark = new Mark(mark.kind, mark.from, mark.contentFrom, closePos,
-      _currentPos(stream, state), openParent)
+    var newMark = new Mark(
+      mark.kind,
+      mark.from,
+      mark.contentFrom,
+      closePos,
+      _currentPos(stream, state),
+      openParent
+    )
     state.marks.push(newMark)
     return newMark
   }
 
-  function _matchAndMark (stream, state, kind, openPos,
-    open, openStyle, close, closeStyle, abandon, innerMode) {
+  function _matchAndMark(
+    stream,
+    state,
+    kind,
+    openPos,
+    open,
+    openStyle,
+    close,
+    closeStyle,
+    abandon,
+    innerMode
+  ) {
     if (stream.match(open)) {
       _openMark(stream, state, kind, openPos)
-      _push(state, function (stream, state) {
+      _push(state, function(stream, state) {
         if (_matchBlankLine(stream)) {
           _abandonMark(stream, state)
           return _popAndResume(stream, state)
@@ -209,20 +230,46 @@ export default function LatexMode () {
     }
   }
 
-  function _matchAndMarkOptionalArgument (stream, state,
-    kind, openPos, innerMode) {
-    return _matchAndMark(stream, state, kind, openPos,
-      '[', 'bracket',
-      ']', 'bracket',
-      [], innerMode)
+  function _matchAndMarkOptionalArgument(
+    stream,
+    state,
+    kind,
+    openPos,
+    innerMode
+  ) {
+    return _matchAndMark(
+      stream,
+      state,
+      kind,
+      openPos,
+      '[',
+      'bracket',
+      ']',
+      'bracket',
+      [],
+      innerMode
+    )
   }
 
-  function _matchAndMarkRequiredArgument (stream, state,
-    kind, openPos, innerMode) {
-    return _matchAndMark(stream, state, kind, openPos,
-      '{', 'bracket',
-      '}', 'bracket',
-      [], innerMode)
+  function _matchAndMarkRequiredArgument(
+    stream,
+    state,
+    kind,
+    openPos,
+    innerMode
+  ) {
+    return _matchAndMark(
+      stream,
+      state,
+      kind,
+      openPos,
+      '{',
+      'bracket',
+      '}',
+      'bracket',
+      [],
+      innerMode
+    )
   }
 
   //
@@ -237,7 +284,7 @@ export default function LatexMode () {
   //  - however, a blank line does not terminate a verbatim / comment
   //    environment; tikzpicture also permits blank lines
   //
-  function _matchBlankLine (stream) {
+  function _matchBlankLine(stream) {
     return stream.sol() && (stream.eol() || stream.match(/^[\s\u00a0]+$/))
   }
 
@@ -247,10 +294,17 @@ export default function LatexMode () {
   /**
    * Note: an argument is not allowed to contain a blank line
    */
-  function _matchArgument (stream, state,
-    open, openStyle, close, closeStyle, innerMode) {
+  function _matchArgument(
+    stream,
+    state,
+    open,
+    openStyle,
+    close,
+    closeStyle,
+    innerMode
+  ) {
     if (stream.match(open)) {
-      _push(state, function (stream, state) {
+      _push(state, function(stream, state) {
         if (_matchBlankLine(stream)) {
           _pop(state)
         } else if (stream.match(close)) {
@@ -264,19 +318,24 @@ export default function LatexMode () {
     }
   }
 
-  function _matchOptionalArgument (stream, state, innerMode) {
-    return _matchArgument(stream, state,
-      '[', 'bracket',
-      ']', 'bracket',
-      innerMode)
+  function _matchOptionalArgument(stream, state, innerMode) {
+    return _matchArgument(
+      stream,
+      state,
+      '[',
+      'bracket',
+      ']',
+      'bracket',
+      innerMode
+    )
   }
 
   /**
    * Note: a group is allowed to contain a blank line
    */
-  function _matchGroup (stream, state, innerMode) {
+  function _matchGroup(stream, state, innerMode) {
     if (stream.eat('{')) {
-      _push(state, function (stream, state) {
+      _push(state, function(stream, state) {
         if (stream.eat('}')) {
           _pop(state)
           return 'bracket'
@@ -291,7 +350,7 @@ export default function LatexMode () {
   /**
    * Called before trying to match any mode-specific rules, to match comments.
    */
-  function _matchLineComment (stream, state) {
+  function _matchLineComment(stream, state) {
     if (stream.match(/^\s*%/)) {
       stream.skipToEnd()
       return 'comment'
@@ -301,8 +360,8 @@ export default function LatexMode () {
   /**
    * Note: guaranteed to match input if there is any
    */
-  function _matchMath (stream, state) {
-    function _matchOtherMath (stream, state) {
+  function _matchMath(stream, state) {
+    function _matchOtherMath(stream, state) {
       if (stream.match(/^\\(?:[a-zA-Z]+|.|\n)/)) {
         return 'tag' // command in math mode
       } else if (stream.match(/^[\^_&~]/)) {
@@ -314,23 +373,30 @@ export default function LatexMode () {
       }
     }
 
-    return _matchVerbCommand(stream, state) ||
+    return (
+      _matchVerbCommand(stream, state) ||
       _matchOtherEnvironmentBeginOrEnd(stream, state) ||
       _matchOtherCommand(stream, state) ||
       _matchOtherMath(stream, state)
+    )
   }
 
-  function _matchTitleCommand (stream, state) {
+  function _matchTitleCommand(stream, state) {
     if (stream.match(/^\\title[[{]/, false)) {
       stream.match(/^\\title/)
       // want to capture the full title
       var openPos = _startPos(stream, state)
-      _defer(state, function (stream, state) {
-        return _matchAndMarkRequiredArgument(stream, state,
-          'title', openPos, _matchText)
+      _defer(state, function(stream, state) {
+        return _matchAndMarkRequiredArgument(
+          stream,
+          state,
+          'title',
+          openPos,
+          _matchText
+        )
       })
       // may have a short title as an optional argument, which we ignore
-      _defer(state, function (stream, state) {
+      _defer(state, function(stream, state) {
         return _matchOptionalArgument(stream, state, _matchText)
       })
       return 'tag'
@@ -392,23 +458,28 @@ export default function LatexMode () {
     _bibCommands
   )
 
-  function _matchCommandWithArgument (stream, state, command) {
+  function _matchCommandWithArgument(stream, state, command) {
     var commandInfo = _MATCH_COMMAND_WITH_ARGUMENT_LOOKAHEADS[command]
     if (stream.match(commandInfo.lookaheadPattern, false)) {
       stream.match(commandInfo.matchPattern)
       var openPos = _startPos(stream, state)
-      _defer(state, function (stream, state) {
-        return _matchAndMarkRequiredArgument(stream, state,
-          command, openPos, _matchText)
+      _defer(state, function(stream, state) {
+        return _matchAndMarkRequiredArgument(
+          stream,
+          state,
+          command,
+          openPos,
+          _matchText
+        )
       })
       return 'tag'
     }
   }
 
-  function _matchBibCommand (stream, state) {
+  function _matchBibCommand(stream, state) {
     var currentVal
     var returnVal = null
-    _.keys(_bibCommands).forEach(function (command) {
+    _.keys(_bibCommands).forEach(function(command) {
       currentVal = _matchCommandWithArgument(stream, state, command)
       if (currentVal) {
         returnVal = currentVal
@@ -418,7 +489,7 @@ export default function LatexMode () {
     return returnVal
   }
 
-  function _matchItemCommand (stream, state) {
+  function _matchItemCommand(stream, state) {
     var kind = 'item'
     if (stream.sol() && stream.match(/^\\item(?: |$)/)) {
       var lastOpenmark = state.openMarks[state.openMarks.length - 1]
@@ -454,11 +525,11 @@ export default function LatexMode () {
    * Match a \verb command. This is based on
    * http://www.tex.ac.uk/cgi-bin/texfaq2html?label=verbwithin
    */
-  function _matchVerbCommand (stream, state) {
+  function _matchVerbCommand(stream, state) {
     var verbMatch = stream.match(/^\\verb\*?([^a-zA-Z])/)
     if (verbMatch) {
       var verbEnd = verbMatch[1]
-      _push(state, function (stream, state) {
+      _push(state, function(stream, state) {
         if (stream.match(verbEnd)) {
           _pop(state)
           return 'tag'
@@ -473,44 +544,58 @@ export default function LatexMode () {
     }
   }
 
-  function _matchVerbatimEnvironment (stream, state) {
+  function _matchVerbatimEnvironment(stream, state) {
     if (!stream.match(/^[^\\]+/)) {
       stream.next() // Skip over backslashes so that they don't get parsed
     }
     return 'string'
   }
 
-  function _matchCommentEnvironment (stream, state) {
+  function _matchCommentEnvironment(stream, state) {
     if (!stream.match(/^[^\\]+/)) {
       stream.next() // Skip over backslashes so that they don't get parsed
     }
     return 'comment'
   }
 
-  function _matchTikZ (stream, state) {
-    return _matchEnvironments(stream, state, _TIKZ_ENVIRONMENTS) ||
+  function _matchTikZ(stream, state) {
+    return (
+      _matchEnvironments(stream, state, _TIKZ_ENVIRONMENTS) ||
       _matchOtherCommand(stream, state) ||
       _matchOther(stream, state)
+    )
   }
 
-  function _matchFigureContent (stream, state) {
-    return _matchCommandWithArgument(stream, state, 'caption') ||
+  function _matchFigureContent(stream, state) {
+    return (
+      _matchCommandWithArgument(stream, state, 'caption') ||
       _matchIncludeGraphics(stream, state) ||
       _matchText(stream, state)
+    )
   }
 
-  function _matchIncludeGraphics (stream, state) {
+  function _matchIncludeGraphics(stream, state) {
     var commandInfo = _MATCH_COMMAND_WITH_ARGUMENT_LOOKAHEADS.includegraphics
     if (stream.match(commandInfo.lookaheadPattern, false)) {
       stream.match(commandInfo.matchPattern)
       var openPos = _startPos(stream, state)
-      _defer(state, function (stream, state) {
-        return _matchAndMarkRequiredArgument(stream, state,
-          'includegraphics', openPos, _matchText)
+      _defer(state, function(stream, state) {
+        return _matchAndMarkRequiredArgument(
+          stream,
+          state,
+          'includegraphics',
+          openPos,
+          _matchText
+        )
       })
-      _defer(state, function (stream, state) {
-        return _matchAndMarkOptionalArgument(stream, state,
-          'includegraphics-optional', openPos, _matchText)
+      _defer(state, function(stream, state) {
+        return _matchAndMarkOptionalArgument(
+          stream,
+          state,
+          'includegraphics-optional',
+          openPos,
+          _matchText
+        )
       })
       return 'tag'
     }
@@ -536,12 +621,13 @@ export default function LatexMode () {
   // beginPattern, endPattern: regular expressions used to match the beginning
   // and end of the environment, respectively
   //
-  function _buildEnvironmentBeginAndEndPatterns (environments) {
+  function _buildEnvironmentBeginAndEndPatterns(environments) {
     for (var env in environments) {
       if (environments.hasOwnProperty(env)) {
         var end = environments[env].matchOnSingleLine ? '$' : ''
-        environments[env].beginPattern =
-          new RegExp('^\\\\begin\\s*{' + env + '}' + end)
+        environments[env].beginPattern = new RegExp(
+          '^\\\\begin\\s*{' + env + '}' + end
+        )
         environments[env].endPattern = new RegExp('^\\\\end\\s*{' + env + '}')
       }
     }
@@ -549,41 +635,41 @@ export default function LatexMode () {
   }
 
   var _IGNORED_ENVIRONMENTS = _buildEnvironmentBeginAndEndPatterns({
-    'verbatim': {
+    verbatim: {
       tokenizer: _matchVerbatimEnvironment,
       allowBlankLines: true
     },
-    'Verbatim': {
+    Verbatim: {
       tokenizer: _matchVerbatimEnvironment,
       allowBlankLines: true
     },
-    'lstlisting': {
+    lstlisting: {
       tokenizer: _matchVerbatimEnvironment,
       allowBlankLines: true
     },
-    'minted': {
+    minted: {
       tokenizer: _matchVerbatimEnvironment,
       allowBlankLines: true
     },
-    'comment': {
+    comment: {
       tokenizer: _matchCommentEnvironment,
       allowBlankLines: true
     }
   })
 
   var _MATH_ENVIRONMENTS = _buildEnvironmentBeginAndEndPatterns({
-    'math': {
+    math: {
       tokenizer: _matchMath,
       kind: 'inline-math',
       allowBlankLines: false
     },
-    'displaymath': {
+    displaymath: {
       tokenizer: _matchMath,
       kind: 'display-math',
       allowBlankLines: false
     },
     // Standard LaTeX
-    'equation': {
+    equation: {
       tokenizer: _matchMath,
       kind: 'outer-display-math',
       allowBlankLines: false
@@ -593,7 +679,7 @@ export default function LatexMode () {
       kind: 'outer-display-math',
       allowBlankLines: false
     },
-    'eqnarray': {
+    eqnarray: {
       tokenizer: _matchMath,
       kind: 'outer-display-math',
       allowBlankLines: false
@@ -604,7 +690,7 @@ export default function LatexMode () {
       allowBlankLines: false
     },
     // AMS-LaTeX
-    'align': {
+    align: {
       tokenizer: _matchMath,
       kind: 'outer-display-math',
       allowBlankLines: false
@@ -614,7 +700,7 @@ export default function LatexMode () {
       kind: 'outer-display-math',
       allowBlankLines: false
     },
-    'gather': {
+    gather: {
       tokenizer: _matchMath,
       kind: 'outer-display-math',
       allowBlankLines: false
@@ -624,7 +710,7 @@ export default function LatexMode () {
       kind: 'outer-display-math',
       allowBlankLines: false
     },
-    'multline': {
+    multline: {
       tokenizer: _matchMath,
       kind: 'outer-display-math',
       allowBlankLines: false
@@ -634,7 +720,7 @@ export default function LatexMode () {
       kind: 'outer-display-math',
       allowBlankLines: false
     },
-    'alignat': {
+    alignat: {
       tokenizer: _matchMath,
       kind: 'outer-display-math',
       allowBlankLines: false
@@ -644,7 +730,7 @@ export default function LatexMode () {
       kind: 'outer-display-math',
       allowBlankLines: false
     },
-    'xalignat': {
+    xalignat: {
       tokenizer: _matchMath,
       kind: 'outer-display-math',
       allowBlankLines: false
@@ -657,7 +743,7 @@ export default function LatexMode () {
   })
 
   var _TOP_LEVEL_ENVIRONMENTS = _buildEnvironmentBeginAndEndPatterns({
-    'abstract': {
+    abstract: {
       tokenizer: _matchText,
       kind: 'abstract',
       allowBlankLines: true
@@ -665,13 +751,13 @@ export default function LatexMode () {
   })
 
   var _LIST_ENVIROMENTS = _buildEnvironmentBeginAndEndPatterns({
-    'itemize': {
+    itemize: {
       tokenizer: _matchListContent,
       kind: 'itemize',
       allowBlankLines: true,
       matchOnSingleLine: true
     },
-    'enumerate': {
+    enumerate: {
       tokenizer: _matchListContent,
       kind: 'enumerate',
       allowBlankLines: true,
@@ -680,7 +766,7 @@ export default function LatexMode () {
   })
 
   var _FIGURE_ENVIRONMENTS = _buildEnvironmentBeginAndEndPatterns({
-    'figure': {
+    figure: {
       tokenizer: _matchFigureContent,
       kind: 'figure',
       allowBlankLines: true
@@ -688,14 +774,18 @@ export default function LatexMode () {
   })
 
   var _TIKZ_ENVIRONMENTS = _buildEnvironmentBeginAndEndPatterns({
-    'tikzpicture': {
+    tikzpicture: {
       tokenizer: _matchTikZ,
       allowBlankLines: true
     }
   })
 
-  function _lookaheadForBeginEnvironments (
-    stream, state, environments, matcher) {
+  function _lookaheadForBeginEnvironments(
+    stream,
+    state,
+    environments,
+    matcher
+  ) {
     for (var env in environments) {
       if (environments.hasOwnProperty(env)) {
         var envConfig = environments[env]
@@ -706,55 +796,59 @@ export default function LatexMode () {
     }
   }
 
-  function _matchEnvironments (stream, state, environments) {
-    return _lookaheadForBeginEnvironments(
-      stream, state, environments,
-      function (stream, state, envConfig) {
-        var mark, markOpenPos, markClosePos
+  function _matchEnvironments(stream, state, environments) {
+    return _lookaheadForBeginEnvironments(stream, state, environments, function(
+      stream,
+      state,
+      envConfig
+    ) {
+      var mark, markOpenPos, markClosePos
 
-        mark = envConfig.hasOwnProperty('kind')
+      mark = envConfig.hasOwnProperty('kind')
+      if (mark) {
+        markOpenPos = _startPos(stream, state)
+      }
+
+      return _matchBeginEnvironmentSequence(stream, state, function(
+        stream,
+        state
+      ) {
         if (mark) {
-          markOpenPos = _startPos(stream, state)
+          var openMark = _openMark(stream, state, envConfig.kind, markOpenPos)
+          openMark.checkedProperties.openMarksCount = state.openMarks.length - 1
         }
-
-        return _matchBeginEnvironmentSequence(
-          stream, state, function (stream, state) {
-            if (mark) {
-              var openMark =
-                _openMark(stream, state, envConfig.kind, markOpenPos)
-              openMark.checkedProperties.openMarksCount =
-                state.openMarks.length - 1
-            }
-            _push(state, _matchEnvironment)
-          })
-
-        function _matchEnvironment (stream, state) {
-          if (!envConfig.allowBlankLines && _matchBlankLine(stream)) {
-            if (mark) {
-              _abandonMark(stream, state)
-            }
-            return _popAndResume(stream, state)
-          } else if (stream.match(envConfig.endPattern, false)) {
-            if (mark) {
-              markClosePos = _startPos(stream, state)
-            }
-            _pop(state)
-            return _matchEndEnvironmentSequence(
-              stream, state, function (stream, state) {
-                if (mark) {
-                  var closedMark = _closeMark(stream, state, markClosePos)
-                  closedMark.checkedProperties.openMarksCount =
-                    state.openMarks.length
-                }
-              })
-          } else {
-            return envConfig.tokenizer(stream, state)
-          }
-        }
+        _push(state, _matchEnvironment)
       })
+
+      function _matchEnvironment(stream, state) {
+        if (!envConfig.allowBlankLines && _matchBlankLine(stream)) {
+          if (mark) {
+            _abandonMark(stream, state)
+          }
+          return _popAndResume(stream, state)
+        } else if (stream.match(envConfig.endPattern, false)) {
+          if (mark) {
+            markClosePos = _startPos(stream, state)
+          }
+          _pop(state)
+          return _matchEndEnvironmentSequence(stream, state, function(
+            stream,
+            state
+          ) {
+            if (mark) {
+              var closedMark = _closeMark(stream, state, markClosePos)
+              closedMark.checkedProperties.openMarksCount =
+                state.openMarks.length
+            }
+          })
+        } else {
+          return envConfig.tokenizer(stream, state)
+        }
+      }
+    })
   }
 
-  function _matchCommand (stream, state, command, markKind) {
+  function _matchCommand(stream, state, command, markKind) {
     if (stream.match(command)) {
       var openPos = _startPos(stream, state)
       _openMark(stream, state, markKind, openPos)
@@ -763,22 +857,23 @@ export default function LatexMode () {
     }
   }
 
-  function _matchOtherEnvironmentBeginOrEnd (stream, state) {
+  function _matchOtherEnvironmentBeginOrEnd(stream, state) {
     if (stream.match(/^\\begin\s*{[^}]+}/, false)) {
-      return _matchBeginEnvironmentSequence(stream, state, function () { })
+      return _matchBeginEnvironmentSequence(stream, state, function() {})
     } else if (stream.match(/^\\end\s*{[^}]+}/, false)) {
-      return _matchEndEnvironmentSequence(stream, state, function () { })
+      return _matchEndEnvironmentSequence(stream, state, function() {})
     }
   }
 
-  function _matchOtherCommand (stream, state) {
+  function _matchOtherCommand(stream, state) {
     if (stream.match(/^\\(?:[a-zA-Z]+|.|\n)/)) {
       return 'tag'
     }
   }
 
-  function _matchSectioningCommand (stream, state) {
-    return _matchCommandWithArgument(stream, state, 'chapter') ||
+  function _matchSectioningCommand(stream, state) {
+    return (
+      _matchCommandWithArgument(stream, state, 'chapter') ||
       _matchCommandWithArgument(stream, state, 'chapter\\*') ||
       _matchCommandWithArgument(stream, state, 'section') ||
       _matchCommandWithArgument(stream, state, 'section\\*') ||
@@ -786,67 +881,94 @@ export default function LatexMode () {
       _matchCommandWithArgument(stream, state, 'subsection\\*') ||
       _matchCommandWithArgument(stream, state, 'subsubsection') ||
       _matchCommandWithArgument(stream, state, 'subsubsection\\*')
+    )
   }
 
-  function _matchListContent (stream, state) {
+  function _matchListContent(stream, state) {
     return _matchItemCommand(stream, state) || _matchText(stream, state)
   }
 
-  function _matchDollarDollarMath (stream, state) {
-    return _matchAndMark(stream, state, 'display-math',
+  function _matchDollarDollarMath(stream, state) {
+    return _matchAndMark(
+      stream,
+      state,
+      'display-math',
       _startPos(stream, state),
-      '$$', 'keyword', // open
-      '$$', 'keyword', // close
+      '$$',
+      'keyword', // open
+      '$$',
+      'keyword', // close
       [], // abandon
-      _matchMath)
+      _matchMath
+    )
   }
 
-  function _matchDollarMath (stream, state) {
-    return _matchAndMark(stream, state, 'inline-math',
+  function _matchDollarMath(stream, state) {
+    return _matchAndMark(
+      stream,
+      state,
+      'inline-math',
       _startPos(stream, state),
-      '$', 'keyword', // open
-      '$', 'keyword', // close
+      '$',
+      'keyword', // open
+      '$',
+      'keyword', // close
       ['$$'], // abandon
-      _matchMath)
+      _matchMath
+    )
   }
 
-  function _matchBracketMath (stream, state) {
-    return _matchAndMark(stream, state, 'display-math',
+  function _matchBracketMath(stream, state) {
+    return _matchAndMark(
+      stream,
+      state,
+      'display-math',
       _startPos(stream, state),
-      '\\[', 'keyword', // open
-      '\\]', 'keyword', // close
+      '\\[',
+      'keyword', // open
+      '\\]',
+      'keyword', // close
       [], // abandon
-      _matchMath)
+      _matchMath
+    )
   }
 
-  function _matchParenMath (stream, state) {
-    return _matchAndMark(stream, state, 'inline-math',
+  function _matchParenMath(stream, state) {
+    return _matchAndMark(
+      stream,
+      state,
+      'inline-math',
       _startPos(stream, state),
-      '\\(', 'keyword', // open
-      '\\)', 'keyword', // close
+      '\\(',
+      'keyword', // open
+      '\\)',
+      'keyword', // close
       [], // abandon
-      _matchMath)
+      _matchMath
+    )
   }
 
   /**
    * Everything after an \end{document} tag is treated as a comment.
    */
-  function _matchEndDocument (stream, state) {
+  function _matchEndDocument(stream, state) {
     if (stream.match(/^\\end\s*{document}/, false)) {
-      return _matchEndEnvironmentSequence(stream, state,
-        function (stream, state) {
-          _push(state, function (stream, state) {
-            stream.skipToEnd()
-            return 'comment'
-          })
+      return _matchEndEnvironmentSequence(stream, state, function(
+        stream,
+        state
+      ) {
+        _push(state, function(stream, state) {
+          stream.skipToEnd()
+          return 'comment'
         })
+      })
     }
   }
 
   /**
    *
    */
-  function _matchOther (stream) {
+  function _matchOther(stream) {
     if (stream.match(/^[{}[\]]/)) {
       return 'bracket'
     } else if (stream.match(/^[&~]+/)) {
@@ -861,8 +983,9 @@ export default function LatexMode () {
   /**
    * Text mode.
    */
-  function _matchText (stream, state) {
-    return _matchCommandWithArgument(stream, state, 'textbf') ||
+  function _matchText(stream, state) {
+    return (
+      _matchCommandWithArgument(stream, state, 'textbf') ||
       _matchCommandWithArgument(stream, state, 'textit') ||
       _matchBracketMath(stream, state) ||
       _matchParenMath(stream, state) ||
@@ -883,26 +1006,29 @@ export default function LatexMode () {
       _matchDollarDollarMath(stream, state) ||
       _matchDollarMath(stream, state) ||
       _matchOther(stream)
+    )
   }
 
   /**
    * Document top-level.
    */
-  function _topLevel (stream, state) {
-    return _matchTitleCommand(stream, state) ||
+  function _topLevel(stream, state) {
+    return (
+      _matchTitleCommand(stream, state) ||
       _matchCommandWithArgument(stream, state, 'author') ||
       _matchCommand(stream, state, /^\\maketitle$/, 'maketitle') ||
       _matchSectioningCommand(stream, state) ||
       _matchEnvironments(stream, state, _TOP_LEVEL_ENVIRONMENTS) ||
       _matchEndDocument(stream, state) ||
       _matchText(stream, state)
+    )
   }
 
-  function _startNewLine (state) {
+  function _startNewLine(state) {
     state.line += 1
   }
 
-  function _token (stream, state) {
+  function _token(stream, state) {
     if (stream.sol()) {
       _startNewLine(state)
     }
@@ -928,7 +1054,7 @@ export default function LatexMode () {
     return result
   }
 
-  this.startState = function () {
+  this.startState = function() {
     // console.clear();
     return {
       stack: [_topLevel],
@@ -937,9 +1063,9 @@ export default function LatexMode () {
       marks: []
     }
   }
-  this.blankLine = function (state) {
+  this.blankLine = function(state) {
     _token(new CodeMirror.StringStream(''), state)
   }
   this.token = _token
   this.lineComment = '%'
-};
+}

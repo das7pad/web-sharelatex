@@ -2,25 +2,24 @@
 
 import { rangesEqual } from './utils'
 
-const INDENTED_ENVIROMENTS = [
-  'itemize',
-  'enumerate'
-]
+const INDENTED_ENVIROMENTS = ['itemize', 'enumerate']
 
-function _clearMatch () {
+function _clearMatch() {
   this.wlMatched = false
 }
 
-function _isMatched () {
+function _isMatched() {
   return this.wlMatched
 }
 
-function _valueIsCurrent (cm, editorMark, range) {
-  return (typeof editorMark.wlValue === 'undefined') ||
+function _valueIsCurrent(cm, editorMark, range) {
+  return (
+    typeof editorMark.wlValue === 'undefined' ||
     cm.getRange(range.from, range.to) === editorMark.wlValue
+  )
 }
 
-function _propertiesCheck (sourceMark, editorMark) {
+function _propertiesCheck(sourceMark, editorMark) {
   for (var property in editorMark.wlProperties) {
     if (editorMark.wlProperties.hasOwnProperty(property)) {
       if (
@@ -42,19 +41,21 @@ function _propertiesCheck (sourceMark, editorMark) {
  *
  * @param {WL.LatexMode.Mark[]} sourceMarks the matched mark is deleted
  */
-function _match (cm, sourceMarks) {
+function _match(cm, sourceMarks) {
   // we compare child marks of a group starting from the parent (the first)
   if (this.wlChild) {
     return
   }
 
-  function matchGroup (sourceMark, editorMark) {
+  function matchGroup(sourceMark, editorMark) {
     var sourceMarkRange = sourceMark.rangeForRegion(editorMark.wlRegion)
     var editorMarkRange = editorMark.find()
-    if (editorMarkRange &&
+    if (
+      editorMarkRange &&
       rangesEqual(sourceMarkRange, editorMarkRange) &&
       _valueIsCurrent(cm, editorMark, editorMarkRange) &&
-      _propertiesCheck(sourceMark, editorMark)) {
+      _propertiesCheck(sourceMark, editorMark)
+    ) {
       if (editorMark.wlNextMark) {
         return matchGroup(sourceMark, editorMark.wlNextMark)
       } else {
@@ -65,7 +66,7 @@ function _match (cm, sourceMarks) {
     }
   }
 
-  function setGroupMatched (editorMark) {
+  function setGroupMatched(editorMark) {
     editorMark.wlMatched = true
     if (editorMark.wlNextMark) {
       setGroupMatched(editorMark.wlNextMark)
@@ -90,25 +91,25 @@ function _match (cm, sourceMarks) {
  * a binary search on the 'to' or 'contentTo' positions for the source marks
  * (which are guaranteed to be in order), but for now it's just linear.
  */
-export function makeSingleMark (cm, sourceMark, region, staticMark, options) {
+export function makeSingleMark(cm, sourceMark, region, staticMark, options) {
   const { from, to } = sourceMark.rangeForRegion(region)
 
   const mark = cm.markText(from, to, options)
 
   if (INDENTED_ENVIROMENTS.includes(sourceMark.kind)) {
-    _.range(from.line, to.line + 1)
-      .forEach((i) => {
-        const openMarksCount = sourceMark.checkedProperties.openMarksCount > 4
+    _.range(from.line, to.line + 1).forEach(i => {
+      const openMarksCount =
+        sourceMark.checkedProperties.openMarksCount > 4
           ? 4
           : sourceMark.checkedProperties.openMarksCount
 
-        if (i === from.line || i === to.line) {
-          cm.doc.removeLineClass(i, 'text')
-          cm.doc.addLineClass(i, 'text', `wl-indent-env-${openMarksCount}`)
-        } else {
-          cm.doc.addLineClass(i, 'text', `wl-indent-${openMarksCount}`)
-        }
-      })
+      if (i === from.line || i === to.line) {
+        cm.doc.removeLineClass(i, 'text')
+        cm.doc.addLineClass(i, 'text', `wl-indent-env-${openMarksCount}`)
+      } else {
+        cm.doc.addLineClass(i, 'text', `wl-indent-${openMarksCount}`)
+      }
+    })
   } else if (
     sourceMark.openParent &&
     INDENTED_ENVIROMENTS.includes(sourceMark.openParent.kind)

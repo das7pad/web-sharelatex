@@ -5,14 +5,16 @@
  * @param {Range} selection
  * @returns {boolean}
  */
-export function markEntirelyWithinSelection (mark, selection) {
+export function markEntirelyWithinSelection(mark, selection) {
   const rangeStart = selection.from()
   const rangeEnd = selection.to()
 
-  return mark.from.line >= rangeStart.line &&
+  return (
+    mark.from.line >= rangeStart.line &&
     mark.from.ch >= rangeStart.ch &&
     mark.to.line <= rangeEnd.line &&
     mark.to.ch <= rangeEnd.ch
+  )
 }
 
 /**
@@ -22,11 +24,13 @@ export function markEntirelyWithinSelection (mark, selection) {
  * @param {Mark} mark
  * @returns {boolean}
  */
-export function selectionStartsAtMarkContentStart (selection, mark) {
+export function selectionStartsAtMarkContentStart(selection, mark) {
   const selectionStart = selection.from()
 
-  return mark.contentFrom.line === selectionStart.line &&
+  return (
+    mark.contentFrom.line === selectionStart.line &&
     mark.contentFrom.ch === selectionStart.ch
+  )
 }
 
 /**
@@ -36,9 +40,11 @@ export function selectionStartsAtMarkContentStart (selection, mark) {
  * @param {Mark} mark
  * @returns {boolean}
  */
-export function selectionEndsAtMarkContentEnd (selection, mark) {
+export function selectionEndsAtMarkContentEnd(selection, mark) {
   const selectionEnd = selection.to()
 
-  return mark.contentTo.line === selectionEnd.line &&
+  return (
+    mark.contentTo.line === selectionEnd.line &&
     mark.contentTo.ch === selectionEnd.ch
+  )
 }
