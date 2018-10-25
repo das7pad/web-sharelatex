@@ -14,7 +14,7 @@ module.exports =
 		SubscriptionGroupHandler.removeUserFromGroup subscription._id, userToRemove_id, (err)->
 			if err?
 				logger.err err:err, adminUserId:adminUserId, userToRemove_id:userToRemove_id, "error removing user from group"
-				return res.sendStatus 500
+				return next(err)
 			res.send()
 
 	removeSelfFromGroup: (req, res, next)->
