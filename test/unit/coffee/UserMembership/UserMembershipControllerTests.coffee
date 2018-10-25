@@ -122,6 +122,12 @@ describe "UserMembershipController", ->
 				expect(payload.error.code).to.equal 'user_not_found'
 				done()
 
+		it 'handle invalid email', (done) ->
+			@req.body.email = 'not_valid_email'
+			@UserMembershipController.add @req, status: () => json: (payload) =>
+				expect(payload.error.code).to.equal 'invalid_email'
+				done()
+
 	describe 'remove', ->
 		beforeEach ->
 			@req.params.userId = @newUser._id

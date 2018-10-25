@@ -2,6 +2,7 @@ AuthenticationController = require('../Authentication/AuthenticationController')
 UserMembershipHandler = require('./UserMembershipHandler')
 EntityConfigs = require('./UserMembershipEntityConfigs')
 Errors = require('../Errors/Errors')
+EmailHelper = require("../Helpers/EmailHelper")
 logger = require("logger-sharelatex")
 
 module.exports =
@@ -18,8 +19,12 @@ module.exports =
 
 	add: (req, res, next)->
 		{ entity, entityConfig } = req
-		email = req.body.email
-		return res.sendStatus 422 unless email
+		email = EmailHelper.parseEmail(req.body.email)
+		if !email?
+			return res.status(400).json error:
+				code: 'invalid_email'
+				message: req.i18n.translate('invalid_email')
+
 
 		if entityConfig.readOnly
 			return next(new Errors.NotFoundError("Cannot add users to entity"))
