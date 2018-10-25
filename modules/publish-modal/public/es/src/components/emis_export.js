@@ -101,7 +101,7 @@ export default class EmisExport extends Component {
                 <br/>
                 <button
                   className='btn btn-primary'
-                    onClick={() => this.runExport(entry, projectId)}
+                  onClick={() => this.runExport(entry, projectId)}
                 >
                   Submit to {entry.name}
                 </button>

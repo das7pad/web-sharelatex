@@ -1,25 +1,25 @@
 /* global $ */
 
-import { Metrics } from '../collections/metrics';
-import { LagsView } from './lags';
-import { MetricView } from './metric';
+import { Metrics } from '../collections/metrics'
+import { LagsView } from './lags'
+import { MetricView } from './metric'
 
 export const MetricsView = Backbone.View.extend({
-  el: "#metrics-container",
+  el: '#metrics-container',
 
-  initialize: function() {
-    this.metrics = new Metrics();
-    this.metrics.fetch();
+  initialize: function () {
+    this.metrics = new Metrics()
+    this.metrics.fetch()
 
-    this.listenTo(this.metrics, 'add', this.render);
+    this.listenTo(this.metrics, 'add', this.render)
 
-    new LagsView();
+    new LagsView()
   },
 
-  render: function(metric) {
+  render: function (metric) {
     metric.view = new MetricView({
       model: metric
-    });
-    this.$el.append(metric.view.render().el);
-  },
-});
+    })
+    this.$el.append(metric.view.render().el)
+  }
+})

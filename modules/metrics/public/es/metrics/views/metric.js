@@ -1,11 +1,11 @@
 /* global $ */
 
-import template from '../templates/metrics.metric.handlebars';
-import footerTemplate from '../templates/metrics.metric-footer.handlebars';
-import lag from '../helpers/lag';
-import merge from 'lodash/merge';
+import template from '../templates/metrics.metric.handlebars'
+import footerTemplate from '../templates/metrics.metric-footer.handlebars'
+import lag from '../helpers/lag'
+import merge from 'lodash/merge'
 
-import chartApp from '../../charts/chart_app';
+import chartApp from '../../charts/chart_app'
 
 export const MetricView = Backbone.View.extend({
   tagName: 'div',
@@ -16,11 +16,11 @@ export const MetricView = Backbone.View.extend({
   chart: null,
 
   events: {
-    'click a.metric-refresh': 'refresh',
+    'click a.metric-refresh': 'refresh'
   },
 
-  initialize: function() {
-    this.listenTo(Backbone, 'metrics:refresh', this.render);
+  initialize: function () {
+    this.listenTo(Backbone, 'metrics:refresh', this.render)
   },
 
   /**
@@ -28,18 +28,18 @@ export const MetricView = Backbone.View.extend({
    * displaying the loading view. The render will be called again from the
    * model; once the data has been fetched
    */
-  render: function() {
-    this.displayLoadingOverlay();
-    this.model.fetchData();
-    this.renderTemplate();
-    this.csvUpdate();
-    return this;
+  render: function () {
+    this.displayLoadingOverlay()
+    this.model.fetchData()
+    this.renderTemplate()
+    this.csvUpdate()
+    return this
   },
 
-  renderWithData: function(data) {
-    this.renderTemplate(data);
-    this.removeOverlay();
-    return this;
+  renderWithData: function (data) {
+    this.renderTemplate(data)
+    this.removeOverlay()
+    return this
   },
 
   /**
@@ -47,71 +47,71 @@ export const MetricView = Backbone.View.extend({
    * replacing the whole html for of the chart container would prevent a nice
    * chart update animation
    */
-  renderTemplate: function(chartData) {
-    if(this.$el.html().length === 0) {
+  renderTemplate: function (chartData) {
+    if (this.$el.html().length === 0) {
       // render the main template only once
       this.$el.html(this.template({
         title: this.model.get('title'),
-        tooltip: this.model.get('tooltip'),
-      }));
+        tooltip: this.model.get('tooltip')
+      }))
     }
 
     // the header & footer are always re-rendered
-    this.renderFooterTemplate();
+    this.renderFooterTemplate()
 
-    if(chartData) {
+    if (chartData) {
       // create or update the chart
-      this.renderChart(chartData);
+      this.renderChart(chartData)
     }
   },
 
   /**
    * render the metric header data (title & lags)
    */
-  renderFooterTemplate: function() {
-    this.$(".metric-footer-container").html(this.footerTemplate({
+  renderFooterTemplate: function () {
+    this.$('.metric-footer-container').html(this.footerTemplate({
       selectedLag: lag.selected
-    }));
+    }))
   },
 
   /**
    * render the chart. Either create or update if it exist already
    */
-  renderChart: function(data) {
-    var $svgElt = this.$('svg');
-    var chartArguments = [this.model.get('key')];
-    chartArguments = merge(chartArguments, this.model.get('options'));
-    chartArguments.push("lag-" + lag.selected);
-    var chartOptions = chartApp.getChartOptions.apply(this, chartArguments);
-    if(this.chart) {
+  renderChart: function (data) {
+    var $svgElt = this.$('svg')
+    var chartArguments = [this.model.get('key')]
+    chartArguments = merge(chartArguments, this.model.get('options'))
+    chartArguments.push('lag-' + lag.selected)
+    var chartOptions = chartApp.getChartOptions.apply(this, chartArguments)
+    if (this.chart) {
       this.chart = chartApp.updateChart($svgElt, data, chartOptions,
-        this.chart);
+        this.chart)
     } else {
-      this.chart = chartApp.addChart($svgElt, data, chartOptions);
+      this.chart = chartApp.addChart($svgElt, data, chartOptions)
     }
   },
 
-  displayLoadingOverlay: function() {
-    this.$(".metric-overlay-error").hide();
-    this.$(".metric-overlay-loading").show();
-    this.$(".metric-overlay-backdrop").show();
+  displayLoadingOverlay: function () {
+    this.$('.metric-overlay-error').hide()
+    this.$('.metric-overlay-loading').show()
+    this.$('.metric-overlay-backdrop').show()
   },
 
-  displayErrorOverlay: function() {
-    this.$(".metric-overlay-loading").hide();
-    this.$(".metric-overlay-error").show();
-    this.$(".metric-overlay-backdrop").show();
+  displayErrorOverlay: function () {
+    this.$('.metric-overlay-loading').hide()
+    this.$('.metric-overlay-error').show()
+    this.$('.metric-overlay-backdrop').show()
   },
 
-  removeOverlay: function() {
-    this.$(".metric-overlay-loading").fadeOut('fast');
-    this.$(".metric-overlay-error").fadeOut('fast');
-    this.$(".metric-overlay-backdrop").fadeOut('fast');
+  removeOverlay: function () {
+    this.$('.metric-overlay-loading').fadeOut('fast')
+    this.$('.metric-overlay-error').fadeOut('fast')
+    this.$('.metric-overlay-backdrop').fadeOut('fast')
   },
 
-  csvUpdate: function() {
-    var $csvElt = $('#csv');
-    if($csvElt.length === 0) return;
+  csvUpdate: function () {
+    var $csvElt = $('#csv')
+    if ($csvElt.length === 0) return
 
     var router = metricsApp.router
     var csv_date_format = 'YYYY-MM-DD'
@@ -119,12 +119,12 @@ export const MetricView = Backbone.View.extend({
       '&resource_type=' + METRICS_RESOURCE_TYPE +
       '&start_date=' + router.startDate.unix() +
       '&end_date=' + router.endDate.unix() +
-      '&lag=' + lag.selected;
-    $csvElt[0].search = path;
+      '&lag=' + lag.selected
+    $csvElt[0].search = path
   },
 
-  refresh: function() {
-    this.render();
-    return false;
-  },
-});
+  refresh: function () {
+    this.render()
+    return false
+  }
+})

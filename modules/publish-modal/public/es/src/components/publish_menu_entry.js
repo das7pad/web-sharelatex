@@ -3,10 +3,10 @@ import React, { PropTypes, Component } from 'react'
 export default class PublishMenuEntry extends Component {
   render () {
     const {name,
-           id,
-           category,
-           displayCategory,
-           switchTo
+      id,
+      category,
+      displayCategory,
+      switchTo
     } = this.props
 
     return (

@@ -24,10 +24,10 @@ export default class GalleryExport extends Component {
       initiateExport(entry, projectId, this)
     }
     this.setState({ submissionValid: valid })
-    return(valid)
+    return (valid)
   }
 
-  renderUninitiated() {
+  renderUninitiated () {
     const {
       entry, projectId, author, title, description, license
     } = this.props
@@ -112,11 +112,18 @@ export default class GalleryExport extends Component {
             </p>
           }
         </div>
+        <input type="submit" className='btn btn-primary'
+          value={'Submit to ' + entry.name}/>
+        { !this.state.submissionValid &&
+          <p style={{color: 'red'}}>
+            Please provide first name, last name, and title before continuing
+          </p>
+        }
       </form>
     )
   }
 
-  renderInitiated() {
+  renderInitiated () {
     return (
       <span>
         <div style={{ fontSize: 20, margin: '20px 0px 20px' }}>
@@ -147,7 +154,7 @@ export default class GalleryExport extends Component {
     )
   }
 
-  renderError() {
+  renderError () {
     return (
       <span>
         <p>
@@ -160,7 +167,7 @@ export default class GalleryExport extends Component {
     )
   }
 
-  render() {
+  render () {
     const { entry, onReturn, projectId, returnText } = this.props
 
     let body

@@ -1,4 +1,4 @@
-import { Metric } from '../models/metric';
+import { Metric } from '../models/metric'
 
 export const Metrics = Backbone.Collection.extend({
   model: Metric,
@@ -11,6 +11,6 @@ export const Metrics = Backbone.Collection.extend({
       queryString += 'resource_type=' + METRICS_RESOURCE_TYPE;
       queryString += '&resource_id=' + METRICS_RESOURCE_ID;
     }
-    this.url += queryString;
-  },
-});
+    this.url += queryString
+  }
+})
