@@ -2,7 +2,6 @@ define [
 	"base"
 ], (App) ->
 	App.controller "GitBridgeController", ($scope, $modal, ide) ->
-		console.log ">>>> controller"
 
 		$scope.openGitBridgeModal = () ->
 			$modal.open {
