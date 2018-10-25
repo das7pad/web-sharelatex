@@ -9,8 +9,14 @@ core.workflow(
       fetch = "master",
       push = "master"
     ),
-    # Exclude the modules directory
-    origin_files = glob(["**"], exclude = ["modules/**", "app/views/external/**", "public/brand/**"]),
+    # Exclude proprietary code and non-local build scripts
+    origin_files = glob(["**"], exclude = [
+      "modules/**",
+      "app/views/external/**",
+      "public/brand/**",
+      "copybara/**",
+      "Jenkinsfile"
+    ]),
     mode="ITERATIVE",
     migrate_noop_changes=True,
     authoring = authoring.pass_thru("Copybot <copybot@overleaf.com>")

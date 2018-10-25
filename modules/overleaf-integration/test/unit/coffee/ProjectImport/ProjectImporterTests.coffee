@@ -139,7 +139,7 @@ describe "ProjectImporter", ->
 				template_id: '10'
 				template_ver_id: '2'
 			}
-			@ProjectDetailsHandler.ensureProjectNameIsUnique = (user_id, name, suffixes, callback) -> callback(null, name)
+			@ProjectDetailsHandler.generateUniqueName = (user_id, name, suffixes, callback) -> callback(null, name)
 			@ProjectCreationHandler.createBlankProject = sinon.stub().yields(null, @project)
 
 		describe "successfully", ->
