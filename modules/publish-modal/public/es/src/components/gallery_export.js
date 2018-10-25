@@ -31,12 +31,9 @@ export default class GalleryExport extends Component {
     const {
       entry, projectId, author, title, description, license
     } = this.props
-    var showSource = this.props.showSource
-    if (showSource === undefined || showSource == null) {
-      showSource = this.showSource = true
-    }
+    var showSource = (this.props.showSource !== false)
     return (
-      <form onSubmit={ (ev) => this.runExport(ev) }>
+      <form onSubmit={(ev) => this.runExport(ev)}>
         <p>
         The Overleaf Gallery is the easiest way to publish your work
         from Overleaf and make it searchable and shareable. Just fill
