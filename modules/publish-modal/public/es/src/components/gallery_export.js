@@ -89,7 +89,7 @@ export default class GalleryExport extends Component {
               Other (as stated in the work)
             </option>
           </select>
-          <a
+          <a className='help'
             href="/learn/how-to/How_are_the_contents_of_the_Overleaf_gallery_licensed%3F"
           >(?)</a>
         </div>
