@@ -27,6 +27,7 @@ describe "UserMembershipController", ->
 
 		@AuthenticationController =
 			getSessionUser: sinon.stub().returns(@user)
+			getLoggedInUserId: sinon.stub().returns(@user._id)
 		@UserMembershipHandler =
 			getEntity: sinon.stub().yields(null, @subscription)
 			getUsers: sinon.stub().yields(null, @users)
@@ -149,6 +150,12 @@ describe "UserMembershipController", ->
 			@UserMembershipController.remove @req, null, (error) =>
 				expect(error).to.extist
 				expect(error).to.be.an.instanceof(Errors.NotFoundError)
+				done()
+
+		it 'prevent self removal', (done) ->
+			@req.params.userId = @user._id
+			@UserMembershipController.remove @req, status: () => json: (payload) =>
+				expect(payload.error.code).to.equal 'managers_cannot_remove_self'
 				done()
 
 	describe "exportCsv", ->

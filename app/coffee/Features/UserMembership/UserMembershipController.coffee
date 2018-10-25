@@ -48,6 +48,12 @@ module.exports =
 		if entityConfig.readOnly
 			return next(new Errors.NotFoundError("Cannot remove users from entity"))
 
+		loggedInUserId = AuthenticationController.getLoggedInUserId(req)
+		if loggedInUserId == userId
+			return res.status(400).json error:
+				code: 'managers_cannot_remove_self'
+				message: req.i18n.translate('managers_cannot_remove_self')
+
 		UserMembershipHandler.removeUser entity, entityConfig, userId, (error, user)->
 			return next(error) if error?
 			res.send()
