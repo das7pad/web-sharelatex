@@ -93,17 +93,16 @@ export default class GalleryExport extends Component {
             href="/learn/how-to/How_are_the_contents_of_the_Overleaf_gallery_licensed%3F"
           >(?)</a>
         </div>
-        <div className="form-control-box">
-          <label htmlFor="gallery-export-show-source"></label>
+        <div className="form-control-box no-label">
           <input type="checkbox"
             id="gallery-export-show-source"
             defaultChecked={showSource}
             ref={ (input) => (this.showSource = input)}
           />
-          Let people use this project as a template.
+          <label className='checkbox-label'>Let people use this project
+            as a template.</label>
         </div>
-        <div className="form-control-box">
-          <label htmlFor="gallery-export-submit"></label>
+        <div className="form-control-box no-label">
           <input type="submit" className='btn btn-primary'
             value={"Submit to " + entry.name}/>
           { !this.state.submissionValid &&
