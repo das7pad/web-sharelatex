@@ -369,6 +369,8 @@ module.exports = ProjectController =
 					showTestControls: req.query?.tc == 'true' || user.isAdmin
 					brandVariation: brandVariation
 					allowedImageNames: Settings.allowedImageNames || []
+					gitBridgeBaseUrl: Settings.gitBridgeBaseUrl
+					showGitBridge: req.query?.gitbridge == 'true' || user.isAdmin
 				timer.done()
 
 	_buildProjectList: (allProjects, v1Projects = [])->
