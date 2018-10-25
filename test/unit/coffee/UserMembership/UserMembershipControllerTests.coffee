@@ -158,6 +158,12 @@ describe "UserMembershipController", ->
 				expect(payload.error.code).to.equal 'managers_cannot_remove_self'
 				done()
 
+		it 'prevent admin removal', (done) ->
+			@UserMembershipHandler.removeUser.yields(isAdmin: true)
+			@UserMembershipController.remove @req, status: () => json: (payload) =>
+				expect(payload.error.code).to.equal 'managers_cannot_remove_admin'
+				done()
+
 	describe "exportCsv", ->
 
 		beforeEach ->

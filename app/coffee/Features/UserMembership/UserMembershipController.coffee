@@ -55,6 +55,10 @@ module.exports =
 				message: req.i18n.translate('managers_cannot_remove_self')
 
 		UserMembershipHandler.removeUser entity, entityConfig, userId, (error, user)->
+			if error?.isAdmin
+				return res.status(400).json error:
+					code: 'managers_cannot_remove_admin'
+					message: req.i18n.translate('managers_cannot_remove_admin')
 			return next(error) if error?
 			res.send()
 

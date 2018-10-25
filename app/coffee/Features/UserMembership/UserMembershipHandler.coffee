@@ -35,6 +35,8 @@ module.exports =
 
 	removeUser: (entity, entityConfig, userId, callback = (error) ->) ->
 		attribute = entityConfig.fields.write
+		if entity.admin_id?.equals(userId)
+			return callback(isAdmin: true)
 		removeUserFromEntity entity, attribute, userId, callback
 
 getPopulatedListOfMembers = (entity, attributes, callback = (error, users)->)->

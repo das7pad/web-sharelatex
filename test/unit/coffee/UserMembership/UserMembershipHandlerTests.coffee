@@ -160,3 +160,10 @@ describe 'UserMembershipHandler', ->
 					lastCall = @institution.update.lastCall
 					assertCalledWith(@institution.update, { $pull: managerIds: @newUser._id })
 					done()
+
+			it 'handle admin', (done) ->
+				@subscription.admin_id = @newUser._id
+				@UserMembershipHandler.removeUser @subscription, EntityConfigs.groupManagers, @newUser._id, (error, user) =>
+					expect(error).to.exist
+					expect(error.isAdmin).to.equal true
+					done()
