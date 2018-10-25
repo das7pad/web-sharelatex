@@ -9,6 +9,7 @@ export const Metrics = Backbone.Collection.extend({
     if(METRICS_RESOURCE_TYPE && METRICS_RESOURCE_TYPE.length > 0) {
       queryString += (queryString.length === 0) ? '?' : '&';
       queryString += 'resource_type=' + METRICS_RESOURCE_TYPE;
+      queryString += '&resource_id=' + METRICS_RESOURCE_ID;
     }
     this.url += queryString;
   },
