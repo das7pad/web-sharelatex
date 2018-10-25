@@ -22,7 +22,7 @@ module.exports = ProjectHistoryHandler =
 			return callback(new Error("history exists")) if project.overleaf?.history?.id?
 			callback(null, project?.overleaf?.history?.id)
 
-	startHistoryForExistingProject: (project_id, callback = (err) ->) ->
+	ensureHistoryExistsForProject: (project_id, callback = (err) ->) ->
 		# We can only set a history id for a project that doesn't have one. The
 		# history id is cached in the project history service, and changing an
 		# existing value corrupts the history, leaving it in an irrecoverable
@@ -30,7 +30,7 @@ module.exports = ProjectHistoryHandler =
 		# because undefined history ids aren't cached.
 		ProjectHistoryHandler.getHistoryId project_id, (err, history_id) ->
 			return callback(err) if err?
-			return callback(new Error("history exists")) if history_id?
+			return callback() if history_id? # history already exists, success
 			HistoryManager.initializeProject (err, history) ->
 				return callback(err) if err?
 				return callback(new Error("failed to initialize history id")) if !history?.overleaf_id

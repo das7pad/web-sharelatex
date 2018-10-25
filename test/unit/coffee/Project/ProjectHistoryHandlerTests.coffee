@@ -41,7 +41,7 @@ describe 'ProjectHistoryHandler', ->
 			beforeEach ->
 				@ProjectDetailsHandler.getDetails = sinon.stub().withArgs(project_id).callsArgWith(1, null, @project)
 				@ProjectModel.update = sinon.stub().callsArgWith(2,null,{n:1})
-				@ProjectHistoryHandler.startHistoryForExistingProject project_id, @callback
+				@ProjectHistoryHandler.ensureHistoryExistsForProject project_id, @callback
 
 			it "should get any existing history id for the project", ->
 				@ProjectDetailsHandler.getDetails
@@ -75,7 +75,7 @@ describe 'ProjectHistoryHandler', ->
 				@project.overleaf = {history: {id: 1234}}
 				@ProjectDetailsHandler.getDetails = sinon.stub().withArgs(project_id).callsArgWith(1, null, @project)
 				@ProjectModel.update = sinon.stub()
-				@ProjectHistoryHandler.startHistoryForExistingProject project_id, @callback
+				@ProjectHistoryHandler.ensureHistoryExistsForProject project_id, @callback
 
 			it "should get any existing history id for the project", ->
 				@ProjectDetailsHandler.getDetails
@@ -101,5 +101,5 @@ describe 'ProjectHistoryHandler', ->
 					.called
 					.should.equal false
 			
-			it "should call the callback with an error", ->
-				@callback.calledWith(new Error()).should.equal true
+			it "should call the callback", ->
+				@callback.calledWith().should.equal true
