@@ -34,6 +34,9 @@ parseBlogPost = (post) ->
 		post.contentPreview = marked(post.contentPreview)
 		post.contentPreview = sanitizeHtml(post.contentPreview, sanitizeOptions)
 
+	if post.title
+		post.title = sanitizeHtml(post.title, sanitizeOptions)
+
 	if post.publishDate
 		post.publishDatePretty = moment(post.publishDate).format('LL')
 
