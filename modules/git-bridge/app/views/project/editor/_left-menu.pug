@@ -1,0 +1,29 @@
+if showGitBridge
+	span(ng-controller="GitBridgeController", ng-show="permissions.write")
+		ul.list-unstyled.nav()
+			li
+				a(ng-click="openGitBridgeModal()")
+					i.fa.fa-code-fork.fa-fw
+					| &nbsp;&nbsp; Git
+
+
+script(type="text/ng-template", id="gitBridgeModalTemplate")
+
+	.modal-header
+		button.close(
+			type="button"
+			data-dismiss="modal"
+			ng-click="cancel()"
+		) &times;
+		h3 Clone with Git
+	.modal-body
+		p
+			| You can #[code git clone] your project using the link displayed below.
+		pre.text-center
+			| {{ gitUrl }}
+
+	.modal-footer()
+		button.btn.btn-default(
+			ng-click="cancel()",
+		)
+			span #{translate("close")}
