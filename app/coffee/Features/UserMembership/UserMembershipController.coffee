@@ -25,6 +25,10 @@ module.exports =
 			return next(new Errors.NotFoundError("Cannot add users to entity"))
 
 		UserMembershipHandler.addUser entity, entityConfig, email, (error, user)->
+			if error?.alreadyAdded
+				return res.status(400).json error:
+					code: 'user_already_added'
+					message: req.i18n.translate('user_already_added')
 			return next(error) if error?
 			res.json(user: user)
 

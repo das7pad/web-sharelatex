@@ -12,8 +12,8 @@ EntityConfigs = require("../../../../app/js/Features/UserMembership/UserMembersh
 
 describe 'UserMembershipHandler', ->
 	beforeEach ->
-		@user = _id: 'mock-user-id'
-		@newUser = _id: 'mock-new-user-id', email: 'new-user-email@foo.bar'
+		@user = _id: ObjectId()
+		@newUser = _id: ObjectId(), email: 'new-user-email@foo.bar'
 		@fakeEntityId = ObjectId()
 		@subscription =
 			_id: 'mock-subscription-id'
@@ -134,6 +134,13 @@ describe 'UserMembershipHandler', ->
 				@UserMembershipHandler.addUser @institution, EntityConfigs.institution, @email, (error) =>
 					expect(error).to.exist
 					expect(error).to.be.an.instanceof(Errors.NotFoundError)
+					done()
+
+			it 'handle user already added', (done) ->
+				@institution.managerIds.push(@newUser._id)
+				@UserMembershipHandler.addUser @institution, EntityConfigs.institution, @email, (error, users) =>
+					expect(error).to.exist
+					expect(error.alreadyAdded).to.equal true
 					done()
 
 			it 'add user to institution', (done) ->

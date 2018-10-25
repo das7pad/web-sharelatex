@@ -110,6 +110,12 @@ describe "UserMembershipController", ->
 				expect(error).to.be.an.instanceof(Errors.NotFoundError)
 				done()
 
+		it 'handle user already added', (done) ->
+			@UserMembershipHandler.addUser.yields(alreadyAdded: true)
+			@UserMembershipController.add @req, status: () => json: (payload) =>
+				expect(payload.error.code).to.equal 'user_already_added'
+				done()
+
 	describe 'remove', ->
 		beforeEach ->
 			@req.params.userId = @newUser._id
