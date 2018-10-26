@@ -35,7 +35,7 @@ module.exports = GitBridgeHandler =
 					err = new Error("Non-success status from project-history api: #{response.statusCode}")
 					logger.err {err}, "Error while communicating with project-history api"
 					return callback(err)
-				if !body.version
+				if !body.version?
 					err = new Error("No version received from project-history api")
 					logger.err {err}, "Error while communicating with project-history api"
 					return callback(err)
