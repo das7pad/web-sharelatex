@@ -53,7 +53,7 @@ export default class ScholarOneExport extends Component {
             </li>
           </ul>
         </p>
-        <br/>
+        <br />
         <button
           className='btn btn-primary'
           onClick={() => this.runExport(entry, projectId)}
@@ -68,7 +68,7 @@ export default class ScholarOneExport extends Component {
     return (
       <span>
         <div style={{ fontSize: 20, margin: '20px 0px 20px' }}>
-          <i className='fa fa-refresh fa-spin fa-fw'></i>
+          <i className='fa fa-refresh fa-spin fa-fw' />
           <span> &nbsp; Exporting files, please wait...</span>
         </div>
       </span>
@@ -78,22 +78,22 @@ export default class ScholarOneExport extends Component {
   renderComplete (entry) {
     return (
       <span>
-        <form action={entry.export_url} method="post" id="export_form">
+        <form action={entry.export_url} method='post' id='export_form'>
           <input
-            id="export_id"
-            name="export_id"
-            type="hidden"
+            id='export_id'
+            name='export_id'
+            type='hidden'
             value={this.state.exportId + this.state.token} />
           <input
-            id="submission_id"
-            name="submission_id"
-            type="hidden"
+            id='submission_id'
+            name='submission_id'
+            type='hidden'
             value={this.state.partner_submission_id} />
           <input
-            id="EXT_ACTION"
-            name="EXT_ACTION"
-            type="hidden"
-            value="OVERLEAF_SUBMISSION" />
+            id='EXT_ACTION'
+            name='EXT_ACTION'
+            type='hidden'
+            value='OVERLEAF_SUBMISSION' />
         </form>
       </span>
     )
@@ -131,9 +131,9 @@ export default class ScholarOneExport extends Component {
         key={entry.id}
       >
         <div className='col-sm-12'>
-          <ReturnButton onReturn={onReturn} returnText={returnText}/>
+          <ReturnButton onReturn={onReturn} returnText={returnText} />
           <h3 style={{marginTop: '5px'}}>
-            Submit to: <br/>
+            Submit to: <br />
             <strong> {entry.name} </strong>
           </h3>
           {body}
