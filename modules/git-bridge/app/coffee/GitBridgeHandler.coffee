@@ -23,7 +23,7 @@ module.exports = GitBridgeHandler =
 				return callback(err)
 			callback(null, project)
 
-	showDoc: (userId, projectId, callback=(err, data)->) ->
+	getLatestProjectVersion: (userId, projectId, callback=(err, data)->) ->
 		@_checkCanUseHistoryApi projectId, (err, project) =>
 			return callback(err) if err?
 			request.get {

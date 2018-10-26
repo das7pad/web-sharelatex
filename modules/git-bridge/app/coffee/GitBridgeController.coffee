@@ -10,10 +10,10 @@ TEST_USER_ID = '5bc8680afc8b910129394d9b'
 
 module.exports = GitBridgeController =
 
-	showDoc: (req, res, next) ->
+	getLatestProjectVersion: (req, res, next) ->
 		projectId = req.params['project_id']
 		logger.log {projectId}, "[GitBridgeController] getting doc/project"
-		GitBridgeHandler.showDoc TEST_USER_ID, projectId, (err, data) ->
+		GitBridgeHandler.getLatestProjectVersion TEST_USER_ID, projectId, (err, data) ->
 			return GitBridgeController._handleError(err, req, res, next) if err?
 			res.json(data)
 
