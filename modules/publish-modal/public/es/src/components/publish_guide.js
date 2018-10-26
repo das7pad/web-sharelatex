@@ -22,6 +22,7 @@ export default class PublishGuide extends Component {
         link = link + 'pdf'
       }
       window.location = link
+      // eslint-disable-next-line react/no-did-update-set-state
       this.setState({exportState: 'uninitiated'})
     }
   }
