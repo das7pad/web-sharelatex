@@ -1,3 +1,5 @@
+/* global _ */
+
 import React, { PropTypes, Component } from 'react'
 import PublishSections from './publish_sections'
 

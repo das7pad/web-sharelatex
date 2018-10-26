@@ -24,7 +24,7 @@ export default class GalleryExport extends Component {
       initiateExport(entry, projectId, this)
     }
     this.setState({ submissionValid: valid })
-    return (valid)
+    return valid
   }
 
   renderUninitiated () {
@@ -142,7 +142,7 @@ export default class GalleryExport extends Component {
           Export Successful!
         </p>
         <p>
-          Thanks for submitting to {entry.name}. Your manuscript and
+          Thanks for submitting to {this.props.entry.name}. Your manuscript and
           supporting files have been sent directly to the journal's
           editorial team, and they will send a follow-up email with
           instructions for how to complete your submission.
