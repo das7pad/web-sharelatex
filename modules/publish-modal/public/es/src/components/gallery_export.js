@@ -201,9 +201,8 @@ GalleryExport.propTypes = {
   returnText: PropTypes.string,
   onReturn: PropTypes.func,
   projectId: PropTypes.string.isRequired,
-  hasFolders: PropTypes.bool,
+  author: PropTypes.string.isRequired,
   title: PropTypes.string,
   description: PropTypes.string,
-  license: PropTypes.string,
   showSource: PropTypes.bool
 }
