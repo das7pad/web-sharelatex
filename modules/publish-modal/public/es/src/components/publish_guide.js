@@ -150,12 +150,14 @@ PublishGuide.propTypes = {
 
 GuideHtml.propTypes = {
   entry: PropTypes.object.isRequired,
-  projectId: PropTypes.string.isRequired
+  projectId: PropTypes.string.isRequired,
+  _this: PropTypes.object.isRequired
 }
 
 Download.propTypes = {
   entry: PropTypes.object.isRequired,
-  projectId: PropTypes.string.isRequired
+  projectId: PropTypes.string.isRequired,
+  _this: PropTypes.object.isRequired
 }
 
 Submit.propTypes = {
