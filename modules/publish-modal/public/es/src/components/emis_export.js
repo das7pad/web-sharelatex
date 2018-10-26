@@ -21,7 +21,15 @@ export default class EmisExport extends Component {
   }
 
   render () {
-    const {entry, onReturn, projectId, returnText, hasFolders, firstName, lastName} = this.props
+    const {
+      entry,
+      onReturn,
+      projectId,
+      returnText,
+      hasFolders,
+      firstName,
+      lastName
+    } = this.props
     if (hasFolders) {
       return (
         <div

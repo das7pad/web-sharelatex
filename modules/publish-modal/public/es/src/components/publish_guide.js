@@ -14,7 +14,8 @@ export default class PublishGuide extends Component {
 
   componentDidUpdate () {
     if (this.state.exportState === 'complete') {
-      var link = `/project/${this.props.projectId}/export/${this.state.exportId}/`
+      var link =
+        `/project/${this.props.projectId}/export/${this.state.exportId}/`
       if (this.state.downloadRequested === 'zip') {
         link = link + 'zip'
       } else {

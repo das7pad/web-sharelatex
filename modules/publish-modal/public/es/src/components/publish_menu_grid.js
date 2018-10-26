@@ -43,7 +43,12 @@ export default class PublishMenuGrid extends Component {
         }
         { this.state.shownCount < this.props.entries.length &&
           <span><br />
-            <button className='button-as-link' onClick={() => this.showMore()}>Show more</button>
+            <button
+              className='button-as-link'
+              onClick={() => this.showMore()}
+            >
+              Show more
+            </button>
           </span>
         }
       </div>
