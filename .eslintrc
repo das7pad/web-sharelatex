@@ -1,6 +1,11 @@
 {
-  "extends": ["standard", "standard-react"],
+  "extends": [
+    "standard",
+    "standard-react",
+    "plugin:jsx-a11y/recommended"
+  ],
   "plugins": [
+    "jsx-a11y",
     "mocha",
     "chai-expect",
     "chai-friendly"
@@ -23,6 +28,20 @@
       "ignoreUrls": true,
       "ignorePattern": "^\\s*(it|describe)\\s*\\(['\"]"
     }],
+
+    // Override weird behaviour of jsx-a11y label-has-for (says labels must be
+    // nested *and* have for/id attributes)
+    "jsx-a11y/label-has-for": [
+      "error",
+      {
+        "required": {
+          "some": [
+            "nesting",
+            "id"
+          ]
+        }
+      }
+    ],
 
     // Add some mocha specific rules
     "mocha/handle-done-callback": "error",
