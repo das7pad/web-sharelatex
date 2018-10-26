@@ -3023,6 +3023,12 @@
         }
       }
     },
+    "eslint-plugin-mocha": {
+      "version": "5.2.0",
+      "from": "eslint-plugin-mocha@latest",
+      "resolved": "https://registry.npmjs.org/eslint-plugin-mocha/-/eslint-plugin-mocha-5.2.0.tgz",
+      "dev": true
+    },
     "eslint-plugin-node": {
       "version": "6.0.1",
       "from": "eslint-plugin-node@>=6.0.0 <7.0.0",
@@ -9032,6 +9038,12 @@
       "version": "0.0.4",
       "from": "querystringify@>=0.0.0 <0.1.0",
       "resolved": "https://registry.npmjs.org/querystringify/-/querystringify-0.0.4.tgz",
+      "dev": true
+    },
+    "ramda": {
+      "version": "0.25.0",
+      "from": "ramda@>=0.25.0 <0.26.0",
+      "resolved": "https://registry.npmjs.org/ramda/-/ramda-0.25.0.tgz",
       "dev": true
     },
     "random-bytes": {
