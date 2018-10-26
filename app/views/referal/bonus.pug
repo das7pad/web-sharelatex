@@ -24,22 +24,34 @@ block content
 							.row
 								.col-md-8.col-md-offset-2.bonus-banner
 									.title
-										a(href='https://twitter.com/share?text='+encodeURIComponent(translate("bonus_twitter_share_text"))+'&url='+encodeURIComponent(buildReferalUrl("t"))+'&counturl=https://www.overleaf.com', target="_blank").twitter Tweet
+										a(href='https://twitter.com/share?text='+encodeURIComponent(translate("bonus_twitter_share_text"))+'&url='+encodeURIComponent(buildReferalUrl("t"))+'&counturl=https://www.overleaf.com', target="_blank").twitter
+											i.fa.fa-fw.fa-2x.fa-twitter
+											|
+											| Tweet
 									
 							.row
 								.col-md-8.col-md-offset-2.bonus-banner
 									.title
-										a(href='#', onclick='postToFeed(); return false;').facebook #{translate("post_on_facebook")}
+										a(href='#', onclick='postToFeed(); return false;').facebook
+											i.fa.fa-fw.fa-2x.fa-facebook-square
+											|
+											| #{translate("post_on_facebook")}
 
 							.row
 								.col-md-8.col-md-offset-2.bonus-banner
 									.title
-										a(href='mailto:?subject='+encodeURIComponent(translate("bonus_email_share_header"))+'&body='+encodeURIComponent(translate("bonus_email_share_body")+' ')+encodeURIComponent(buildReferalUrl("e")), title='Share by Email').email #{translate("email_us_to_your_friends")}
+										a(href='mailto:?subject='+encodeURIComponent(translate("bonus_email_share_header"))+'&body='+encodeURIComponent(translate("bonus_email_share_body")+' ')+encodeURIComponent(buildReferalUrl("e")), title='Share by Email').email
+											i.fa.fa-fw.fa-2x.fa-envelope-open-o
+											|
+											| #{translate("email_us_to_your_friends")}
 
 							.row
 								.col-md-8.col-md-offset-2.bonus-banner
 									.title
-										a(href='#link-modal', data-toggle="modal", ng-click="openLinkToUsModal()").link #{translate("link_to_us")}
+										a(href='#link-modal', data-toggle="modal", ng-click="openLinkToUsModal()").link
+											i.fa.fa-fw.fa-2x.fa-globe
+											|
+											| #{translate("link_to_us")}
 
 							.row
 								.col-md-10.col-md-offset-1.bonus-banner
