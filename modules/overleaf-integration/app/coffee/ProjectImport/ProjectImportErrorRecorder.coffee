@@ -97,6 +97,8 @@ module.exports = ProjectImportErrorRecorder =
 					return 'unsupported-brand'
 				if name?.match(/duplicate key error/)
 					return 'duplicate-key'
+				if name?.match(/InvalidNameError: Project name cannot not contain/)
+					return 'invalid-name-other'
 				return shortNames[name] || shortNames['*']
 
 			# set all the known errors to zero if not present (otherwise gauges stay on their last value)

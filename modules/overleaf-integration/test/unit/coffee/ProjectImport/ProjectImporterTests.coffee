@@ -139,6 +139,7 @@ describe "ProjectImporter", ->
 				template_id: '10'
 				template_ver_id: '2'
 			}
+			@ProjectDetailsHandler.fixProjectName = sinon.stub().returns('fixed-project-name')
 			@ProjectDetailsHandler.generateUniqueName = (user_id, name, suffixes, callback) -> callback(null, name)
 			@ProjectCreationHandler.createBlankProject = sinon.stub().yields(null, @project)
 
@@ -224,35 +225,13 @@ describe "ProjectImporter", ->
 					error.message.should.equal("project has export records")
 					done()
 
-		describe "with blank title", ->
+		describe "with any title", ->
 			beforeEach ->
-				@doc.title = ""
 				@ProjectImporter._initSharelatexProject @user_id, @doc, @callback
 
-			it "should set the title to 'Untitled'", ->
+			it "should fix any invalid characters in the project name", ->
 				@ProjectCreationHandler.createBlankProject
-					.calledWith(@user_id, 'Untitled')
-					.should.equal true
-
-		describe "with a title containing a '/''", ->
-			beforeEach ->
-				@doc.title = "foo/bar/baz"
-				@ProjectImporter._initSharelatexProject @user_id, @doc, @callback
-
-			it "should replace the '/'' with a '-''", ->
-				@ProjectCreationHandler.createBlankProject
-					.calledWith(@user_id, 'foo-bar-baz')
-					.should.equal true
-
-		describe "with a title exceeding the length limit'", ->
-			beforeEach ->
-				@doc.title = "x".repeat(160)
-				@ProjectDetailsHandler.MAX_PROJECT_NAME_LENGTH = 150
-				@ProjectImporter._initSharelatexProject @user_id, @doc, @callback
-
-			it "should truncate the title and insert the numeric part of the project token", ->
-				@ProjectCreationHandler.createBlankProject
-					.calledWith(@user_id, "x".repeat(150))
+					.calledWith(@user_id, 'fixed-project-name')
 					.should.equal true
 
 	describe "_startExport", ->
