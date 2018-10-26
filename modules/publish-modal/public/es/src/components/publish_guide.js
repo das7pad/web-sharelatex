@@ -85,20 +85,20 @@ function Download ({ entry, projectId, _this }) {
       { _this.state.exportState === 'uninitiated' &&
         <span>
           <p>
-            <a
+            <button
               className='btn btn-primary'
               onClick={() =>
                 _this.initiateGuideExport(entry, projectId, _this, 'zip')}>
               Download project ZIP with submission files (e.g. .bbl)
-            </a>
+            </button>
           </p>
           <p>
-            <a
+            <button
               className='btn btn-primary'
               onClick={() =>
                 _this.initiateGuideExport(entry, projectId, _this, 'pdf')}>
               Download PDF file of your article
-            </a>
+            </button>
           </p>
         </span>
       }
