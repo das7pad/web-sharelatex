@@ -228,6 +228,9 @@ ci:
 	MOCHA_ARGS="--reporter tap" \
 	$(MAKE) test
 
+format:
+	npm -q run format
+
 lint:
 	npm -q run lint
 
