@@ -1,21 +1,12 @@
-util = require 'util'
+errorType = require 'overleaf-error-type'
 
 
 Errors = {}
 
 
-defineError = (name) ->
-	errorFn = (message) ->
-		Error.captureStackTrace(this, errorFn)
-		@name = name
-		@message = message
-	util.inherits errorFn, Error
-	Errors[name] = errorFn
-
-
-defineError('ProjectNotCompatibleError')
-defineError('OutOfDateError')
-defineError('InvalidFileError')
+Errors.ProjectNotCompatibleError = errorType.define('ProjectNotCompatibleError')
+Errors.OutOfDateError = errorType.define('OutOfDateError')
+Errors.InvalidFileError = errorType.define('InvalidFileError')
 
 
 module.exports = Errors
