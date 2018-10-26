@@ -63,9 +63,9 @@ module.exports = ProjectDetailsHandler =
 		else if name.length > @MAX_PROJECT_NAME_LENGTH
 			return callback(new Errors.InvalidNameError("Project name is too long"))
 		else if name.indexOf("/") > -1
-			return callback(new Errors.InvalidNameError("Project name cannot not contain / characters"))
+			return callback(new Errors.InvalidNameError("Project name cannot contain / characters"))
 		else if name.indexOf("\\") > -1
-			return callback(new Errors.InvalidNameError("Project name cannot not contain \\ characters"))
+			return callback(new Errors.InvalidNameError("Project name cannot contain \\ characters"))
 		else
 			return callback()
 
