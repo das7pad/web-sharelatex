@@ -28,9 +28,7 @@ export default class GalleryExport extends Component {
   }
 
   renderUninitiated () {
-    const {
-      entry, projectId, author, title, description, license
-    } = this.props
+    const { entry, title, description, showSource } = this.props
     var showSource = (this.props.showSource !== false)
     return (
       <form onSubmit={(ev) => this.runExport(ev)}>
@@ -168,7 +166,7 @@ export default class GalleryExport extends Component {
   }
 
   render () {
-    const { entry, onReturn, projectId, returnText } = this.props
+    const { entry, onReturn, returnText } = this.props
 
     let body
     if (this.state.exportState === 'unintiated') {
