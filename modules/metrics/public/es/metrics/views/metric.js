@@ -1,5 +1,6 @@
 /* global $, METRICS_RESOURCE_ID, METRICS_RESOURCE_TYPE */
 
+import Backbone from 'backbone'
 import template from '../templates/metrics.metric.handlebars'
 import footerTemplate from '../templates/metrics.metric-footer.handlebars'
 import lag from '../helpers/lag'

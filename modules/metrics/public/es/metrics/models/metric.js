@@ -1,5 +1,6 @@
 /* global $, METRICS_ENDPOINT, METRICS_RESOURCE_ID, METRICS_RESOURCE_TYPE */
 
+import Backbone from 'backbone'
 import lag from '../helpers/lag'
 import metricsApp from '../metrics_app'
 import { bind } from 'underscore'

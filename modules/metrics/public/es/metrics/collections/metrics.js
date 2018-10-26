@@ -1,5 +1,6 @@
 /* global METRICS_ENDPOINT, METRICS_RESOURCE_TYPE, METRICS_RESOURCE_ID */
 
+import Backbone from 'backbone'
 import { Metric } from '../models/metric'
 
 export const Metrics = Backbone.Collection.extend({
