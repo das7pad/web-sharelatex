@@ -13,7 +13,7 @@ export const MetricsView = Backbone.View.extend({
 
     this.listenTo(this.metrics, 'add', this.render)
 
-    new LagsView()
+    new LagsView() // eslint-disable-line no-new
   },
 
   render: function (metric) {

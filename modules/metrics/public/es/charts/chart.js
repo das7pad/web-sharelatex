@@ -4,6 +4,7 @@
 import chartApp from './chart_app'
 import { filter, map, each } from 'underscore'
 import * as nv from 'nvd3'
+import * as d3 from 'd3'
 
 /**
  * create the NVD3 chart with the given options

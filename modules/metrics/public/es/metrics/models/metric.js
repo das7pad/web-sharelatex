@@ -1,4 +1,4 @@
-/* global $ */
+/* global $, METRICS_ENDPOINT, METRICS_RESOURCE_ID, METRICS_RESOURCE_TYPE */
 
 import lag from '../helpers/lag'
 import metricsApp from '../metrics_app'

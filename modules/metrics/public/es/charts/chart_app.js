@@ -1,6 +1,7 @@
 /* global $ */
 
 import * as d3 from 'd3'
+import * as nv from 'nvd3'
 import { each, isArray, isObject, debounce, clone, reduce } from 'underscore'
 import merge from 'lodash/merge'
 import { createChart } from './chart'
@@ -295,7 +296,7 @@ var formatColor = function (data) {
  * a graph are related.
  */
 var formatShadedColor = function (data) {
-  var choosenColour, colourR, colourG, colourB
+  var colourR, colourG, colourB
 
   // loop over all datasets
   each(data, function (lineData, i) {

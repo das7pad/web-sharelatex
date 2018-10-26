@@ -1,9 +1,10 @@
-/* global $ */
+/* global $, METRICS_RESOURCE_ID, METRICS_RESOURCE_TYPE */
 
 import template from '../templates/metrics.metric.handlebars'
 import footerTemplate from '../templates/metrics.metric-footer.handlebars'
 import lag from '../helpers/lag'
 import merge from 'lodash/merge'
+import metricsApp from '../metrics_app'
 
 import chartApp from '../../charts/chart_app'
 
@@ -114,7 +115,6 @@ export const MetricView = Backbone.View.extend({
     if ($csvElt.length === 0) return
 
     var router = metricsApp.router
-    var csv_date_format = 'YYYY-MM-DD'
     var path = 'resource_id=' + METRICS_RESOURCE_ID +
       '&resource_type=' + METRICS_RESOURCE_TYPE +
       '&start_date=' + router.startDate.unix() +

@@ -56,7 +56,9 @@ var WLDateRangePicker = function () {
         ranges: customRanges,
         parentEl: this.$elt.parent(),
         minDate: moment.unix(parseInt(this.$elt.data('min-date')) || 0),
-        maxDate: this.$elt.data('max-date') ? moment.unix(this.$elt.data('max-date')) : yesterday,
+        maxDate: this.$elt.data('max-date')
+          ? moment.unix(this.$elt.data('max-date'))
+          : yesterday,
         startDate: startDate,
         endDate: endDate
       },

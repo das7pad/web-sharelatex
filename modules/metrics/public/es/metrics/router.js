@@ -3,7 +3,6 @@
 import Backbone from 'backbone'
 import moment from 'moment'
 import dateRangePicker from './lib/date_range_picker'
-import metricsApp from './metrics_app'
 import lag from './helpers/lag'
 
 var Router = Backbone.Router.extend({
@@ -117,7 +116,7 @@ var Router = Backbone.Router.extend({
       path += '/' + endDate.format(this.urlDateFormat)
     }
 
-    if (window.location.pathname.slice(-1) == '/') {
+    if (window.location.pathname.slice(-1) === '/') {
       // only add a trailing slash if there's already one
       path += '/'
     }
