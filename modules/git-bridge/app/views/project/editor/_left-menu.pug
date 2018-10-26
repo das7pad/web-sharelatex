@@ -15,10 +15,10 @@ script(type="text/ng-template", id="gitBridgeModalTemplate")
 			data-dismiss="modal"
 			ng-click="cancel()"
 		) &times;
-		h3 Clone with Git
+		h3 #{translate('clone_with_git')}
 	.modal-body
 		p
-			| You can #[code git clone] your project using the link displayed below.
+			| !{translate('git_bridge_modal_description')}
 		pre.text-center
 			| {{ gitUrl }}
 
