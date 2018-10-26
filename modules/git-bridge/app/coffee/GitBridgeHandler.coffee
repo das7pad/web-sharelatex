@@ -67,6 +67,9 @@ module.exports = GitBridgeHandler =
 			err = new Error("Can't process snapshot-data, no files")
 			logger.err {err, snapshotData}, "[GitBridgeHandler] #{err.message}"
 			return callback(err)
+		# Note: In v1, mutable documents were "srcs" (sources), and blob files were "atts" (attachments)
+		# In v2, srcs are "docs" and atts are "files". The git-bridge service expects this format though,
+		# so we're sticking to the old naming in this one case
 		srcs = []
 		atts = []
 		for path, file of snapshotData.files
