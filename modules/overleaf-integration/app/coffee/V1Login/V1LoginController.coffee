@@ -70,7 +70,7 @@ module.exports = V1LoginController =
 					logger.log email: email, v1UserId: profile.id, "v1 account created"
 
 					OverleafAuthenticationManager.setupUser profile, (err, user, info) ->
-						return callback(err) if err?
+						return next(err) if err?
 
 						if info?.email_exists_in_sl
 							logger.log {email, info}, "account exists in SL, redirecting to sharelatex to merge accounts"
