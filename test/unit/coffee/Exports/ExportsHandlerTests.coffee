@@ -119,7 +119,7 @@ describe 'ExportsHandler', ->
 							description: @description
 							author: @author
 							license: @license
-							show_source: @show_source
+							showSource: @show_source
 					user:
 						id: @user_id
 						firstName: @user.first_name
@@ -159,7 +159,7 @@ describe 'ExportsHandler', ->
 							description: @description
 							author: @author
 							license: @license
-							show_source: @show_source
+							showSource: @show_source
 					user:
 						id: @user_id
 						firstName: @custom_first_name
