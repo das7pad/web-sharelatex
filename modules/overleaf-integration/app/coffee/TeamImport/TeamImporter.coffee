@@ -32,6 +32,7 @@ createV2Team = (v1Team, callback = (error, v1Team, v2Team) ->) ->
 			subscription = new Subscription(
 				overleaf:
 					id: v1Team.id
+				teamName: v1Team.name
 				admin_id: teamAdminId
 				manager_ids: [teamAdminId]
 				groupPlan: true
