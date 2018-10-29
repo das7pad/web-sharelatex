@@ -8,16 +8,20 @@ export default class GalleryExport extends Component {
     this.state = {
       exportState: 'unintiated',
       submissionValid: true,
-      errorDetails: null
+      errorDetails: null,
     }
   }
 
-  runExport (ev, entry, projectId) {
-    valid = this.firstName.value && this.lastName.value && this.title.value;
+  runExport (ev) {
+    ev.preventDefault()
+    let valid =
+      this.title.value &&
+      this.author.value &&
+      this.description.value &&
+      this.license.value
     if (valid) {
+      const { entry, projectId } = this.props
       initiateExport(entry, projectId, this)
-    } else {
-      ev.preventDefault()
     }
     this.setState({ submissionValid: valid })
     return(valid)
@@ -25,40 +29,16 @@ export default class GalleryExport extends Component {
 
   renderUninitiated() {
     const {
-      entry, projectId,
-      firstName, lastName, title, description, license, showSource
+      entry, projectId, author, title, description, license
     } = this.props
+    var showSource = (this.props.showSource !== false)
     return (
-      <form onSubmit={(ev) => this.runExport(ev, entry, projectId)}>
+      <form onSubmit={(ev) => this.runExport(ev)}>
         <p>
         The Overleaf Gallery is the easiest way to publish your work
         from Overleaf and make it searchable and shareable. Just fill
         out the details below.
         </p>
-        <div className="form-control-box">
-          <label htmlFor="gallery-export-first-name">First name</label>
-          <input
-            id="gallery-export-first-name"
-            type="text"
-            className="form-control"
-            defaultValue={firstName}
-            maxLength="255"
-            placeholder="First Name"
-            ref={ (input) => (this.firstName = input)}
-          />
-        </div>
-        <div className="form-control-box">
-          <label htmlFor="gallery-export-last-name">Last name</label>
-          <input
-            id="gallery-export-last-name"
-            type="text"
-            className="form-control"
-            defaultValue={lastName}
-            maxLength="255"
-            placeholder="Last Name"
-            ref={ (input) => (this.lastName = input)}
-          />
-        </div>
         <div className="form-control-box">
           <label htmlFor="gallery-export-title">Title</label>
           <input
@@ -72,10 +52,22 @@ export default class GalleryExport extends Component {
           />
         </div>
         <div className="form-control-box">
+          <label htmlFor="gallery-export-author">Author(s)</label>
+          <input
+            id="gallery-export-author"
+            type="text"
+            className="form-control"
+            defaultValue={author}
+            maxLength="255"
+            placeholder="Author(s)"
+            ref={ (input) => (this.author = input)}
+          />
+        </div>
+        <div className="form-control-box">
           <label htmlFor="gallery-export-description">Description</label>
           <textarea
             id="gallery-export-description"
-            rows="2"
+            rows="4"
             className="form-control"
             defaultValue={description}
             maxLength="2048"
@@ -97,23 +89,29 @@ export default class GalleryExport extends Component {
               Other (as stated in the work)
             </option>
           </select>
+          <a className='help'
+            href="/learn/how-to/How_are_the_contents_of_the_Overleaf_gallery_licensed%3F"
+          >(?)</a>
         </div>
-        <div className="form-control-box">
+        <div className="form-control-box no-label">
           <input type="checkbox"
             id="gallery-export-show-source"
-            defaultValue={showSource}
-            placeholder="Show source"
+            defaultChecked={showSource}
             ref={ (input) => (this.showSource = input)}
           />
-          <label htmlFor="gallery-export-show-source">Show source</label>
+          <label className='checkbox-label'>Let people use this project
+            as a template.</label>
         </div>
-        <input type="submit" className='btn btn-primary'
-          value={"Submit to " + entry.name}/>
-        { !this.state.submissionValid &&
-          <p style={{color: 'red'}}>
-            Please provide first name, last name, and title before continuing
-          </p>
-        }
+        <div className="form-control-box no-label">
+          <input type="submit" className='btn btn-primary'
+            value={"Submit to " + entry.name}/>
+          { !this.state.submissionValid &&
+            <p style={{color: 'red'}}>
+              Please provide all of title, author(s)
+              and description before continuing
+            </p>
+          }
+        </div>
       </form>
     )
   }
@@ -130,6 +128,7 @@ export default class GalleryExport extends Component {
   }
 
   renderComplete() {
+    const entry = this.props.entry
     return (
       <span>
         <p>
@@ -183,7 +182,7 @@ export default class GalleryExport extends Component {
         <div className='col-sm-12'>
           <ReturnButton onReturn={onReturn} returnText={returnText}/>
           <h3 style={{marginTop: '5px'}}>
-            Submit to: <br/>
+            Submit to:
             <strong> {entry.name} </strong>
           </h3>
           {body}
@@ -199,8 +198,6 @@ GalleryExport.propTypes = {
   onReturn: PropTypes.func,
   projectId: PropTypes.string.isRequired,
   hasFolders: PropTypes.bool,
-  firstName: PropTypes.string,
-  lastName: PropTypes.string,
   title: PropTypes.string,
   description: PropTypes.string,
   license: PropTypes.string,
