@@ -1,4 +1,3 @@
-/* eslint-disable chai-friendly/no-unused-expressions */
 /* global $ */
 
 import chartApp from './chart_app'
@@ -32,9 +31,9 @@ var createChart = function ($svgElt, options) {
   // x axis options
   var xAxis = chart.xAxis
   if (xAxis) {
-    options.xAxisTickPadding && xAxis.tickPadding(options.xAxisTickPadding)
-    options.xAxisFormat && xAxis.tickFormat(options.xAxisFormat)
-    options.xAxisTimeScale && chart.xScale && chart.xScale(d3.time.scale())
+    if (options.xAxisTickPadding) xAxis.tickPadding(options.xAxisTickPadding)
+    if (options.xAxisFormat) xAxis.tickFormat(options.xAxisFormat)
+    if (options.xAxisTimeScale && chart.xScale) chart.xScale(d3.time.scale())
     xAxis.showMaxMin(false)
 
     if (options.customDiscreteDateValuesFix) {
@@ -63,8 +62,8 @@ var createChart = function ($svgElt, options) {
   // y axis options
   var yAxis = chart.yAxis
   if (yAxis) {
-    options.yAxisTickPadding && yAxis.tickPadding(options.yAxisTickPadding)
-    options.yAxisFormat && yAxis.tickFormat(options.yAxisFormat)
+    if (options.yAxisTickPadding) yAxis.tickPadding(options.yAxisTickPadding)
+    if (options.yAxisFormat) yAxis.tickFormat(options.yAxisFormat)
   }
 
   if (options.customTooltipValue) {
