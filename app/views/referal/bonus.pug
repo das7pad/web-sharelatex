@@ -132,16 +132,16 @@ block content
 	script(type='text/javascript', src='//platform.twitter.com/widgets.js')
 	script(src='https://connect.facebook.net/en_US/all.js')
 	script(type='text/javascript').
-		FB.init({appId: #{settings.social.facebook.appId}, status: true, cookie: true});
+		FB.init({appId: '#{settings.social.facebook.appId}', status: true, cookie: true});
 
 		function postToFeed() {
 
 			// calling the API ...
 			var obj = {
 				method: 'feed',
-				redirect_uri: #{settings.social.facebook.redirectUri},
+				redirect_uri: '#{settings.social.facebook.redirectUri}',
 				link: '!{buildReferalUrl("fb")}',
-				picture: #{settings.social.facebook.picture},
+				picture: '#{settings.social.facebook.picture}',
 				name: '#{translate("bonus_facebook_name").replace(/'/g, "\\x27")}',
 				caption: '#{translate("bonus_facebook_caption").replace(/'/g, "\\x27")}',
 				description: '#{translate("bonus_facebook_description").replace(/'/g, "\\x27")}'
