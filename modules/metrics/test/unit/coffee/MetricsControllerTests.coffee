@@ -34,7 +34,7 @@ describe "MetricsController", ->
 
 	describe 'teamMetrics', ->
 		it 'renders the metricsApp template', (done) ->
-			@req = params: { teamId: 5 }
+			@req = entity: overleaf: id: 5
 			@res = { render: sinon.stub() }
 
 			@MetricsController.teamMetrics(@req, @res)
@@ -52,7 +52,7 @@ describe "MetricsController", ->
 	describe 'institutionMetrics', ->
 		it 'renders the metricsApp template after calling v1 for the name', (done) ->
 			@request.get	= sinon.stub().callsArgWith(1, null, null, "{\"name\": \"Stanford\"}")
-			@req = params: { institutionId: 5 }
+			@req = entity: v1Id: 5
 			@res = { render: sinon.stub() }
 
 			@MetricsController.institutionMetrics(@req, @res)

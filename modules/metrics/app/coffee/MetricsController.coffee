@@ -15,12 +15,12 @@ module.exports = MetricsController =
 	teamMetrics: (req, res, next) ->
 		res.render Path.resolve(__dirname, '../views/metricsApp'), {
 			metricsEndpoint: "/graphs",
-			resourceId: req.params.teamId,
+			resourceId: req.entity.overleaf.id,
 			resourceType: 'team',
 		}
 
 	institutionMetrics: (req, res, next) ->
-		id = req.params.institutionId
+		id = req.entity.v1Id
 		url = "#{settings.apis.v1.url}/universities/list/#{id}"
 		request.get(url, (err, response, body)->
 			if !err

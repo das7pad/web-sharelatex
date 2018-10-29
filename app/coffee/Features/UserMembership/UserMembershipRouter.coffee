@@ -1,11 +1,25 @@
-AuthenticationController = require('../Authentication/AuthenticationController')
+UserMembershipAuthorization = require './UserMembershipAuthorization'
 UserMembershipController = require './UserMembershipController'
+SubscriptionGroupController = require '../Subscription/SubscriptionGroupController'
+TeamInvitesController = require '../Subscription/TeamInvitesController'
 
 module.exports =
 	apply: (webRouter) ->
 		webRouter.get '/manage/groups/:id/members',
-			AuthenticationController.requireLogin(),
-			(req, res, next) -> UserMembershipController.index('group', req, res, next)
+			UserMembershipAuthorization.requireEntityAccess('group'),
+			UserMembershipController.index
+		webRouter.post '/manage/groups/:id/invites',
+			UserMembershipAuthorization.requireEntityAccess('group'),
+			TeamInvitesController.createInvite
+		webRouter.delete '/manage/groups/:id/user/:user_id',
+			UserMembershipAuthorization.requireEntityAccess('group'),
+			SubscriptionGroupController.removeUserFromGroup
+		webRouter.delete '/manage/groups/:id/invites/:email',
+			UserMembershipAuthorization.requireEntityAccess('group'),
+			TeamInvitesController.revokeInvite
+		webRouter.get '/manage/groups/:id/members/export',
+			UserMembershipAuthorization.requireEntityAccess('group'),
+			UserMembershipController.exportCsv
 
 
 		regularEntitites =
@@ -14,13 +28,13 @@ module.exports =
 		for pathName, entityName of regularEntitites
 			do (pathName, entityName) ->
 				webRouter.get "/manage/#{pathName}/:id/managers",
-					AuthenticationController.requireLogin(),
-					(req, res, next) -> UserMembershipController.index(entityName, req, res, next)
+					UserMembershipAuthorization.requireEntityAccess(entityName),
+					UserMembershipController.index
 
 				webRouter.post "/manage/#{pathName}/:id/managers",
-					AuthenticationController.requireLogin(),
-					(req, res, next) -> UserMembershipController.add(entityName, req, res, next)
+					UserMembershipAuthorization.requireEntityAccess(entityName),
+					UserMembershipController.add
 
 				webRouter.delete "/manage/#{pathName}/:id/managers/:userId",
-					AuthenticationController.requireLogin(),
-					(req, res, next) -> UserMembershipController.remove(entityName, req, res, next)
+					UserMembershipAuthorization.requireEntityAccess(entityName),
+					UserMembershipController.remove
