@@ -104,11 +104,13 @@ module.exports = V2TemplatesManager =
 			}
 			callback null, page
 
+	_formatTemplate: (template) ->
+		TemplatesUtilities.format_template(template)
 
 	_formatDocsData: (page, docs_property, page_path) ->
 		return unless page["#{docs_property}_docs"]
 		for doc in page["#{docs_property}_docs"]
-			doc = TemplatesUtilities.format_template(doc)
+			doc = V2TemplatesManager._formatTemplate(doc)
 		if page["#{docs_property}_docs_pages"]?.total_pages > 1
 			if docs_property == "popular" or docs_property == "recent"
 				page_path = "#{page_path}/#{docs_property}"
