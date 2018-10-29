@@ -88,7 +88,10 @@ export default class GalleryExport extends Component {
             </option>
           </select>
           <a className='help'
-            href='/learn/how-to/How_are_the_contents_of_the_Overleaf_gallery_licensed%3F'
+            href={
+              // eslint-disable-next-line max-len
+              '/learn/how-to/How_are_the_contents_of_the_Overleaf_gallery_licensed%3F'
+            }
           >(?)</a>
         </div>
         <div className='form-control-box no-label'>
@@ -97,8 +100,12 @@ export default class GalleryExport extends Component {
             defaultChecked={showSource}
             ref={(input) => (this.showSource = input)}
           />
-          <label className='checkbox-label'>Let people use this project
-            as a template.</label>
+          <label
+            htmlFor='gallery-export-show-source'
+            className='checkbox-label'
+          >
+            Let people use this project as a template.
+          </label>
         </div>
         <div className='form-control-box no-label'>
           <input type='submit' className='btn btn-primary'
