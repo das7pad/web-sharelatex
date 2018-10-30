@@ -1,5 +1,6 @@
 GitBridgeRouter = require "./app/js/GitBridgeRouter"
 logger = require "logger-sharelatex"
+Features = require "../../app/js/infrastructure/Features"
 
 
 GitBridgeModule =
