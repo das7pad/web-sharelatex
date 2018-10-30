@@ -1,3 +1,3 @@
-var metricsApp = {};
+var metricsApp = {}
 
 export default metricsApp

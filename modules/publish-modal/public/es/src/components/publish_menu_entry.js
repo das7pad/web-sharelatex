@@ -3,10 +3,10 @@ import React, { PropTypes, Component } from 'react'
 export default class PublishMenuEntry extends Component {
   render () {
     const {name,
-           id,
-           category,
-           displayCategory,
-           switchTo
+      id,
+      category,
+      displayCategory,
+      switchTo
     } = this.props
 
     return (
@@ -33,13 +33,17 @@ export default class PublishMenuEntry extends Component {
             dangerouslySetInnerHTML={{__html: this.props.publish_menu_html}} />
         </div>
         <div className='table-content-link'>
-          <button className={`${this.props.linkClass} btn btn-primary btn-wrapping`}
+          <button
+            className={`${this.props.linkClass} btn btn-primary btn-wrapping`}
             data-event='publish_entry_select'
             data-category='Publish'
             data-action='choose'
             data-label={this.props.id}
             onClick={() => this.props.onSwitch(switchTo, id)}
-            dangerouslySetInnerHTML={{__html: this.props.publish_menu_link_html}} />
+            dangerouslySetInnerHTML={{
+              __html: this.props.publish_menu_link_html
+            }}
+          />
         </div>
       </div>
     )

@@ -1,4 +1,5 @@
-/* global $ */
+/* global $, _ */
+
 export function findEntryInCategories (categories, id) {
   let entry
   _.forEach(categories, (category) => {

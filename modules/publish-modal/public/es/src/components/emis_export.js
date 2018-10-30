@@ -21,17 +21,25 @@ export default class EmisExport extends Component {
   }
 
   render () {
-    const {entry, onReturn, projectId, returnText, hasFolders, firstName, lastName} = this.props
+    const {
+      entry,
+      onReturn,
+      projectId,
+      returnText,
+      hasFolders,
+      firstName,
+      lastName
+    } = this.props
     if (hasFolders) {
       return (
         <div
           className='publish-guide modal-body-content row content-as-table'
           key={entry.id} >
           <div className='col-sm-12'>
-            <ReturnButton onReturn={onReturn} returnText={returnText}/>
+            <ReturnButton onReturn={onReturn} returnText={returnText} />
 
             <h3 style={{marginTop: '5px'}}>
-              Submit to: <br/>
+              Submit to: <br />
               <strong> {entry.name} </strong>
             </h3>
             <p>
@@ -59,9 +67,9 @@ export default class EmisExport extends Component {
           key={entry.id}
         >
           <div className='col-sm-12'>
-            <ReturnButton onReturn={onReturn} returnText={returnText}/>
+            <ReturnButton onReturn={onReturn} returnText={returnText} />
             <h3 style={{marginTop: '5px'}}>
-              Submit to: <br/>
+              Submit to: <br />
               <strong> {entry.name} </strong>
             </h3>
             { this.state.exportState === 'unintiated' &&
@@ -81,27 +89,27 @@ export default class EmisExport extends Component {
                   please confirm your first and last name:
                 </p>
                 <p>
-                  <input type="text"
-                    className="form-control"
+                  <input type='text'
+                    className='form-control'
                     defaultValue={firstName}
                     style={{ width: '30%', display: 'inline-block' }}
-                    maxLength="255"
-                    placeholder="First Name"
-                    ref={ (input) => (this.firstName = input)}
+                    maxLength='255'
+                    placeholder='First Name'
+                    ref={(input) => (this.firstName = input)}
                   />
-                  <input type="text"
-                    className="form-control"
+                  <input type='text'
+                    className='form-control'
                     defaultValue={lastName}
                     style={{ width: '30%', display: 'inline-block' }}
-                    maxLength="255"
-                    placeholder="Last Name"
-                    ref={ (input) => (this.lastName = input)}
+                    maxLength='255'
+                    placeholder='Last Name'
+                    ref={(input) => (this.lastName = input)}
                   />
                 </p>
-                <br/>
+                <br />
                 <button
                   className='btn btn-primary'
-                    onClick={() => this.runExport(entry, projectId)}
+                  onClick={() => this.runExport(entry, projectId)}
                 >
                   Submit to {entry.name}
                 </button>
@@ -115,7 +123,7 @@ export default class EmisExport extends Component {
             { this.state.exportState === 'initiated' &&
               <span>
                 <div style={{ fontSize: 20, margin: '20px 0px 20px' }}>
-                  <i className='fa fa-refresh fa-spin fa-fw'></i>
+                  <i className='fa fa-refresh fa-spin fa-fw' />
                   <span> &nbsp; Exporting files, please wait...</span>
                 </div>
               </span>

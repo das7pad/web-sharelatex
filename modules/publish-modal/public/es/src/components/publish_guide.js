@@ -14,13 +14,15 @@ export default class PublishGuide extends Component {
 
   componentDidUpdate () {
     if (this.state.exportState === 'complete') {
-      var link = `/project/${this.props.projectId}/export/${this.state.exportId}/`
+      var link =
+        `/project/${this.props.projectId}/export/${this.state.exportId}/`
       if (this.state.downloadRequested === 'zip') {
         link = link + 'zip'
       } else {
         link = link + 'pdf'
       }
       window.location = link
+      // eslint-disable-next-line react/no-did-update-set-state
       this.setState({exportState: 'uninitiated'})
     }
   }
@@ -43,10 +45,10 @@ export default class PublishGuide extends Component {
           <ReturnButton onReturn={onReturn} returnText={returnText} />
           <GuideHtml entry={entry} projectId={projectId} _this={this} />
           {entry.publish_link_destination &&
-           <div>
-             <Download entry={entry} projectId={projectId} _this={this} />
-             <Submit entry={entry} />
-           </div>}
+          <div>
+            <Download entry={entry} projectId={projectId} _this={this} />
+            <Submit entry={entry} />
+          </div>}
         </div>
       </div>
     )
@@ -83,33 +85,33 @@ function Download ({ entry, projectId, _this }) {
       { _this.state.exportState === 'uninitiated' &&
         <span>
           <p>
-            <a
-              className="btn btn-primary"
+            <button
+              className='btn btn-primary'
               onClick={() =>
                 _this.initiateGuideExport(entry, projectId, _this, 'zip')}>
               Download project ZIP with submission files (e.g. .bbl)
-            </a>
+            </button>
           </p>
           <p>
-            <a
-              className="btn btn-primary"
+            <button
+              className='btn btn-primary'
               onClick={() =>
                 _this.initiateGuideExport(entry, projectId, _this, 'pdf')}>
               Download PDF file of your article
-            </a>
+            </button>
           </p>
         </span>
       }
       { _this.state.exportState === 'initiated' &&
         <p style={{ fontSize: 20, margin: '20px 0px 20px' }}>
-          <i className='fa fa-refresh fa-spin fa-fw'></i>
+          <i className='fa fa-refresh fa-spin fa-fw' />
           <span> &nbsp; Compiling project, please wait...</span>
         </p>
       }
       { _this.state.exportState === 'error' &&
         <p>
           Project failed to compile
-          <br/>
+          <br />
           Error message: {_this.state.errorDetails}
         </p>
       }
@@ -148,12 +150,14 @@ PublishGuide.propTypes = {
 
 GuideHtml.propTypes = {
   entry: PropTypes.object.isRequired,
-  projectId: PropTypes.string.isRequired
+  projectId: PropTypes.string.isRequired,
+  _this: PropTypes.object.isRequired
 }
 
 Download.propTypes = {
   entry: PropTypes.object.isRequired,
-  projectId: PropTypes.string.isRequired
+  projectId: PropTypes.string.isRequired,
+  _this: PropTypes.object.isRequired
 }
 
 Submit.propTypes = {

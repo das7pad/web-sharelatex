@@ -1,3 +1,5 @@
+/* global _ */
+
 import React, { PropTypes, Component } from 'react'
 import PublishSections from './publish_sections'
 
@@ -26,6 +28,5 @@ export default class BrandedPublishModal extends Component {
 
 BrandedPublishModal.propTypes = {
   entries: PropTypes.object.isRequired,
-  initialEntry: PropTypes.object,
   onSwitch: PropTypes.func.isRequired
 }

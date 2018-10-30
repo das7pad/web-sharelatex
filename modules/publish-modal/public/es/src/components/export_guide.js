@@ -17,11 +17,11 @@ export default class ExportGuide extends Component {
           style={{verticalAlign: 'top'}}
         >
           {entry.publish_menu_icon &&
-           <img
-             src={entry.publish_menu_icon}
-             alt={entry.name}
-             style={{width: '106px', float: 'right'}}
-           />
+          <img
+            src={entry.publish_menu_icon}
+            alt={entry.name}
+            style={{width: '106px', float: 'right'}}
+          />
           }
         </div>
         <div className='col-sm-10' style={{paddingLeft: '15px'}}>
@@ -47,7 +47,7 @@ function Continue ({ entry, onSwitch, pdfUrl, logs }) {
           button below
         </p>
         <p>
-          <button className="btn btn-primary"
+          <button className='btn btn-primary'
             style={{display: 'inline-block'}}
             onClick={() => onSwitch('export', entry.id)}>
             Continue
