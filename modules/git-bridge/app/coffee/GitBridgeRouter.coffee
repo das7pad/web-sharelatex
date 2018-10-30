@@ -7,27 +7,27 @@ AuthorizationMiddlewear = require '../../../../app/js/Features/Authorization/Aut
 
 module.exports = GitBridgeRouter =
 
-	apply: (webRouter, apiRouter) ->
+	apply: (webRouter, privateApiRouter, publicApiRouter) ->
 		if !Settings.overleaf?
 			logger.log {}, "[GitBridgeRouter] Not running with overleaf settings, not setting up git-bridge"
 			return
 
-		apiRouter.get  '/api/git-bridge/docs/:project_id',
+		publicApiRouter.get  '/api/git-bridge/docs/:project_id',
 			AuthenticationController.requireOauth(),
 			AuthorizationMiddlewear.ensureUserCanReadProject,
 			GitBridgeController.getLatestProjectVersion
 
-		apiRouter.get  '/api/git-bridge/docs/:project_id/saved_vers',
+		publicApiRouter.get  '/api/git-bridge/docs/:project_id/saved_vers',
 			AuthenticationController.requireOauth(),
 			AuthorizationMiddlewear.ensureUserCanReadProject,
 			GitBridgeController.showSavedVers
 
-		apiRouter.get  '/api/git-bridge/docs/:project_id/snapshots/:version',
+		publicApiRouter.get  '/api/git-bridge/docs/:project_id/snapshots/:version',
 			AuthenticationController.requireOauth(),
 			AuthorizationMiddlewear.ensureUserCanReadProject,
 			GitBridgeController.showSnapshot
 
-		apiRouter.post '/api/git-bridge/docs/:project_id/snapshots',
+		publicApiRouter.post '/api/git-bridge/docs/:project_id/snapshots',
 			AuthenticationController.requireOauth(),
 			AuthorizationMiddlewear.ensureUserCanWriteProjectContent,
 			GitBridgeController.applySnapshot
