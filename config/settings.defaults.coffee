@@ -214,6 +214,8 @@ module.exports = settings =
 	defaultFeatures: defaultFeatures =
 		collaborators: -1
 		dropbox: true
+		github: true
+		gitBridge: true
 		versioning: true
 		compileTimeout: 180
 		compileGroup: "standard"
