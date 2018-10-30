@@ -35,9 +35,16 @@ describe "UserAdminController", ->
 
 		@AuthenticationController = {}
 	
+		@adminSubscription = _id: 'mock-subscription-id-1'
+		@memberSubscriptions = [
+			( _id: 'mock-subscription-id-2')
+			( _id: 'mock-subscription-id-3')
+		]
+		@managedSubscription = _id: 'mock-subscription-id-4'
 		@SubscriptionLocator =
-			getUsersSubscription: sinon.stub().yields(null, @user_subscription = {"mock": "subscription"})
-			getMemberSubscriptions: sinon.stub().yields(null, @member_subscriptions = [{"mock": "subscriptions"}])
+			getUsersSubscription: sinon.stub().yields(null, @adminSubscription)
+			getMemberSubscriptions: sinon.stub().yields(null, @memberSubscriptions)
+			findManagedSubscription: sinon.stub().yields(null, @managedSubscription)
 		
 		@ProjectGetter =
 			findAllUsersProjects: sinon.stub().yields(null, @projects)
@@ -144,13 +151,19 @@ describe "UserAdminController", ->
 		
 		it "should send the user's subscription", (done) ->
 			@res.render = (pageName, opts)=>
-				opts.subscription.should.deep.equal @user_subscription
+				opts.adminSubscription.should.deep.equal @adminSubscription
 				done()
 			@UserAdminController.show @req, @res
 		
-		it "should send the user's subscription", (done) ->
+		it "should send the user's member subscriptions", (done) ->
 			@res.render = (pageName, opts)=>
-				opts.memberSubscriptions.should.deep.equal @member_subscriptions
+				opts.memberSubscriptions.should.deep.equal @memberSubscriptions
+				done()
+			@UserAdminController.show @req, @res
+
+		it "should send the user's managed subscription", (done) ->
+			@res.render = (pageName, opts)=>
+				opts.managedSubscription.should.deep.equal @managedSubscription
 				done()
 			@UserAdminController.show @req, @res
 

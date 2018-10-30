@@ -1,18 +1,26 @@
 table.table.table-striped.table-bordered
 	tr
 		td
-			strong Personal Subscription
+			strong Admin of
 		td
-			if subscription
-				a(href="/admin/user/" + user._id + "/subscription/" + subscription._id) #{subscription._id}
+			if adminSubscription
+				a(href="/admin/user/" + user._id + "/subscription/" + adminSubscription._id) #{adminSubscription.teamName || adminSubscription._id}
 			else
 				a.btn.btn-primary(href="/admin/user/" + user._id + "/subscription/new") Create Subscription
 
-	if memberSubscriptions.length > 0
-		for sub in memberSubscriptions
-			tr
-				td
-					strong Group Subscription
-				td
-					a(href="/admin/user/" + user._id + "/subscription/" + sub._id) #{sub._id}
-		
+	tr
+		td
+			strong Manager of
+		td
+			if managedSubscription
+				a(href="/admin/user/" + user._id + "/subscription/" + managedSubscription._id) #{managedSubscription.teamName || managedSubscription._id}
+
+	tr
+		td
+			strong Member of
+		td
+			if memberSubscriptions.length > 0
+				ul
+					for sub in memberSubscriptions
+						li
+							a(href="/admin/user/" + user._id + "/subscription/" + sub._id) #{sub.teamName || sub._id}
