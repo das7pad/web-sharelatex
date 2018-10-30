@@ -2,9 +2,13 @@
   "extends": [
     "standard",
     "standard-react",
+    "prettier",
+    "prettier/react",
+    "prettier/standard",
     "plugin:jsx-a11y/recommended"
   ],
   "plugins": [
+    "prettier",
     "jsx-a11y",
     "mocha",
     "chai-expect",
