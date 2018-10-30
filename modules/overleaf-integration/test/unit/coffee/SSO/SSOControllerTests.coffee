@@ -59,6 +59,7 @@ describe "SSOController", ->
 		describe "when user does not exist", ->
 			beforeEach ->
 				@V1LoginHandler.authWithV1 = sinon.stub().callsArgWith 1, null, false
+				@V1LoginHandler.getV1UserIdByEmail = sinon.stub().callsArgWith 1, null, null
 
 			describe "with intent to sign_in", ->
 				beforeEach ->
