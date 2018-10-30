@@ -15,7 +15,7 @@ Async = require 'async'
 module.exports = GitBridgeHandler =
 
 	_checkCanUseHistoryApi: (projectId, callback=(err, project)->) ->
-		ProjectGetter.getProjectWithoutDocLines projectId, (err, project) ->
+		ProjectGetter.getProjectWithoutDocLines projectId, (err, project) =>
 			return callback(err) if err?
 			if !(project?.overleaf?.history?.id and project?.overleaf?.history?.display == true)
 				err = new Errors.ProjectNotCompatibleError('Project not compatible with history/git-bridge')
@@ -88,7 +88,7 @@ module.exports = GitBridgeHandler =
 			return callback(err) if err?
 			ProjectGetter.getProject projectId, (err, project) =>
 				return callback(err) if err?
-				@showDoc userId, projectId, (err, currentDocData) =>
+				@getLatestProjectVersion userId, projectId, (err, currentDocData) =>
 					return callback(err) if err?
 					{ latestVerId } = currentDocData
 					snapshotVerId = snapshot.latestVerId
@@ -97,27 +97,51 @@ module.exports = GitBridgeHandler =
 						err = new Errors.OutOfDateError("project out of date: #{projectId}")
 						logger.err {err, projectId, latestVerId, snapshotVerId},
 							"[GitBridgeHandler] project out of date, can't apply snapshot"
-						return callback(err)
 					logger.log {userId, projectId}, "[GitBridgeHandler] starting snapshot application"
+					process.nextTick(
+						@_asyncApplySnapshot,
+						userId,
+						project,
+						snapshot
+					)
 					callback()  # Do the actual import async, like the original rails implementation
-					Async.waterfall [
-						(cb) =>
-							@_prepareSnapshotFiles project, snapshot, cb
-						(snapshotFiles, cb) =>
-							@_prepareEntityOperations project, snapshotFiles, cb
-						(operations, cb) =>
-							@_fetchContentToDisk project, operations, cb
-						(operationsWithContentPaths, cb) =>
-							@_applyOperationsToProject userId, project, operationsWithContentPaths, cb
-						(cb) =>
-							@_finishSnapshotApplication userId, project, snapshot, cb
-					], (err) =>
-						if err?
-							logger.err {err, projectId, latestVerId: snapshot.latestVerId},
-								"[GitBridgeHandler] error while applying snapshot to project"
-						else
-							logger.log {projectId, latestVerId: snapshot.latestVerId},
-								"[GitBridgeHandler] finished applying snapshot to project"
+
+	_asyncApplySnapshot: (userId, project, snapshot, callback=()->) ->
+		projectId = project._id
+		Async.waterfall [
+			(cb) =>
+				@_prepareSnapshotFiles project, snapshot, cb
+			(snapshotFiles, cb) =>
+				@_prepareEntityOperations project, snapshotFiles, cb
+			(operations, cb) =>
+				@_fetchContentToDisk project, operations, cb
+			(operationsWithContentPaths, cb) =>
+				@_applyOperationsToProject userId, project, operationsWithContentPaths, cb
+		], (err) =>
+			if err?
+				logger.err {err, projectId, latestVerId: snapshot.latestVerId},
+					"[GitBridgeHandler] error while applying snapshot to project"
+				GitBridgeHandler._handleApplySnapshotError project, snapshot, err, callback
+			else
+				logger.log {projectId, latestVerId: snapshot.latestVerId},
+					"[GitBridgeHandler] applied snapshot to project, finishing up"
+					@_finishSnapshotApplication userId, project, snapshot, () =>
+
+	_handleApplySnapshotError: (project, snapshot, err, callback=(err)->) ->
+		errorPayload = if err instanceof Errors.OutOfDateError
+				{code: 'outOfDate', message: 'Out of Date'}
+			else if err instanceof Errors.InvalidFileError
+				{code: 'invalidFiles', message: 'Invalid Files'}
+			else
+				{code: 'error', message: 'Unexpected Error'}
+		logger.log {errorPayload, projectId: project._id},
+			"[GitBridgeHandler] posting error back to git-bridge"
+		@_postbackToGitBridge snapshot, errorPayload, callback
+
+	_postbackToGitBridge: (snapshot, payload, callback) ->
+		request.post snapshot.postbackUrl, {
+			json: payload
+		}, callback
 
 	_prepareSnapshotFiles: (project, snapshot, callback=(err, files)->) ->
 		files = []
@@ -192,14 +216,12 @@ module.exports = GitBridgeHandler =
 						callback()
 
 	_finishSnapshotApplication: (userId, project, snapshot, callback=(err)->) ->
-		@showDoc userId, project._id, (err, currentDocData) =>
+		@getLatestProjectVersion userId, project._id, (err, currentDocData) =>
 			return callback(err) if err?
 			{ latestVerId } = currentDocData
 			logger.log {userId, projectId: project._id, latestVerId},
 				"[GitBrigeHandler] postback to git-bridge"
-			request.post snapshot.postbackUrl, {
-				json: {code: 'upToDate', latestVerId: latestVerId}
-			}, (err, response, body) =>
+			@_postbackToGitBridge snapshot, {code: 'upToDate', latestVerId: latestVerId}, (err, response) =>
 				return callback(err) if err?
 				statusCode = response.statusCode
 				logger.log {projectId: project._id, statusCode},
