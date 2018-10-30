@@ -41,7 +41,7 @@ module.exports =
 
 		webRouter.get(
 			'/graphs/licences',
-			AuthorizationMiddlewear.ensureUserIsSiteAdmin,
+			UserMembershipAuthorization.requireGraphAccess,
 			AnalyticsController.licences
 		)
 
