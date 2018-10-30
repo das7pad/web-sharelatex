@@ -181,7 +181,6 @@ module.exports = settings =
 	# Where your instance of ShareLaTeX can be found publically. Used in emails
 	# that are sent out, generated links, etc.
 	siteUrl : siteUrl = process.env['PUBLIC_URL'] or 'http://localhost:3000'
-	gitBridgePublicBaseUrl: process.env['GITBRIDGE_URL'] or 'http://localhost:8000'
 
 	# cookie domain
 	# use full domain for cookies to only be accessible from that domain,
