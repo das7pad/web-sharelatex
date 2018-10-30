@@ -1,6 +1,7 @@
 Settings = require 'settings-sharelatex'
 logger = require 'logger-sharelatex'
 ProjectGetter = require '../../../../app/js/Features/Project/ProjectGetter'
+UserGetter = require '../../../../app/js/Features/User/UserGetter'
 ProjectEntityHandler = require '../../../../app/js/Features/Project/ProjectEntityHandler'
 EditorHttpController = require '../../../../app/js/Features/Editor/EditorHttpController'
 SafePath = require '../../../../app/js/Features/Project/SafePath'
@@ -14,17 +15,21 @@ Async = require 'async'
 
 module.exports = GitBridgeHandler =
 
-	_checkCanUseHistoryApi: (projectId, callback=(err, project)->) ->
+	_checkAccess: (projectId, callback=(err, project)->) ->
 		ProjectGetter.getProjectWithoutDocLines projectId, (err, project) ->
 			return callback(err) if err?
 			if !(project?.overleaf?.history?.id and project?.overleaf?.history?.display == true)
 				err = new Errors.ProjectNotCompatibleError('Project not compatible with history/git-bridge')
 				logger.err {err, projectId}, "[GitBridgeHandler] #{err.message}"
 				return callback(err)
-			callback(null, project)
+			UserGetter.getUser project.owner_ref, {features: 1}, (err, owner) ->
+				return callback(err) if err?
+				if !owner.features.gitBridge
+					return callback(new Error('Owner does not have gitBridge feature'))
+				callback(null, project)
 
 	getLatestProjectVersion: (userId, projectId, callback=(err, data)->) ->
-		GitBridgeHandler._checkCanUseHistoryApi projectId, (err, project) ->
+		GitBridgeHandler._checkAccess projectId, (err, project) ->
 			return callback(err) if err?
 			request.get {
 				url: GitBridgeHandler._projectHistoryUrl("/project/#{projectId}/version"),
@@ -47,7 +52,7 @@ module.exports = GitBridgeHandler =
 				callback(null, data)
 
 	showSnapshot: (userId, projectId, version, callback=(err, data)->) ->
-		GitBridgeHandler._checkCanUseHistoryApi projectId, (err, project) ->
+		GitBridgeHandler._checkAccess projectId, (err, project) ->
 			return callback(err) if err?
 			request.get {
 				url: GitBridgeHandler._projectHistoryUrl("/project/#{projectId}/version/#{version}"),
@@ -84,7 +89,7 @@ module.exports = GitBridgeHandler =
 		callback(null, {srcs, atts})
 
 	applySnapshotToProject: (userId, projectId, snapshot, callback=(err)->) ->
-		GitBridgeHandler._checkCanUseHistoryApi projectId, (err) ->
+		GitBridgeHandler._checkAccess projectId, (err) ->
 			return callback(err) if err?
 			ProjectGetter.getProject projectId, (err, project) ->
 				return callback(err) if err?

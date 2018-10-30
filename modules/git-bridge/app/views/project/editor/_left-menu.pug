@@ -1,6 +1,6 @@
 if showGitBridge
 	span(ng-controller="GitBridgeController", ng-show="permissions.write")
-		ul.list-unstyled.nav()
+		ul.list-unstyled.nav(ng-if="project.features.gitBridge == true")
 			li
 				a(ng-click="openGitBridgeModal()")
 					i.fa.fa-code-fork.fa-fw
