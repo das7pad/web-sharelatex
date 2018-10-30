@@ -33,6 +33,10 @@
       "ignorePattern": "^\\s*(it|describe)\\s*\\(['\"]"
     }],
 
+    // Fix conflict between prettier & standard by overriding to prefer
+    // double quotes
+    "jsx-quotes": ["error", "prefer-double"],
+
     // Override weird behaviour of jsx-a11y label-has-for (says labels must be
     // nested *and* have for/id attributes)
     "jsx-a11y/label-has-for": [
