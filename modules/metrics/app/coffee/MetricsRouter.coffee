@@ -19,13 +19,13 @@ module.exports =
 
 		webRouter.get(
 			'/metrics/teams/:id/?(:startDate/:endDate)?',
-			UserMembershipAuthorization.requireEntityAccess('team'),
+			UserMembershipAuthorization.requireTeamAccess,
 			MetricsController.teamMetrics
 		)
 
 		webRouter.get(
 			'/metrics/groups/:id/?(:startDate/:endDate)?',
-			UserMembershipAuthorization.requireEntityAccess('group'),
+			UserMembershipAuthorization.requireGroupAccess,
 			(req, res, next) ->
 				if req.entity.overleaf?.id?
 					MetricsController.teamMetrics(req, res, next)
@@ -35,7 +35,7 @@ module.exports =
 
 		webRouter.get(
 			'/metrics/institutions/:id/?(:startDate/:endDate)?',
-			UserMembershipAuthorization.requireEntityAccess('institution'),
+			UserMembershipAuthorization.requireInstitutionAccess,
 			MetricsController.institutionMetrics
 		)
 
@@ -47,35 +47,31 @@ module.exports =
 
 		webRouter.get(
 			'/graphs/(:graph)?',
-			(req, res, next) ->
-				UserMembershipAuthorization.requireEntityAccess(
-					req.query.resource_type,
-					req.query.resource_id
-				)(req, res, next)
+			UserMembershipAuthorization.requireGraphAccess,
 			MetricsController.analyticsProxy
 		)
 
 		webRouter.get(
 			'/institutions/:id/hub',
-			UserMembershipAuthorization.requireEntityAccess('institution'),
+			UserMembershipAuthorization.requireInstitutionAccess,
 			HubsController.institutionHub
 		)
 
 		webRouter.get(
 			'/institutions/:id/externalCollaboration',
-			UserMembershipAuthorization.requireEntityAccess('institution'),
+			UserMembershipAuthorization.requireInstitutionAccess,
 			HubsController.institutionExternalCollaboration
 		)
 
 		webRouter.get(
 			'/institutions/:id/departments',
-			UserMembershipAuthorization.requireEntityAccess('institution'),
+			UserMembershipAuthorization.requireInstitutionAccess,
 			HubsController.institutionDepartments
 		)
 
 		webRouter.get(
 			'/institutions/:id/roles',
-			UserMembershipAuthorization.requireEntityAccess('institution'),
+			UserMembershipAuthorization.requireInstitutionAccess,
 			HubsController.institutionRoles
 		)
 

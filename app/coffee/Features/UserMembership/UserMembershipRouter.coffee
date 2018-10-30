@@ -6,35 +6,35 @@ TeamInvitesController = require '../Subscription/TeamInvitesController'
 module.exports =
 	apply: (webRouter) ->
 		webRouter.get '/manage/groups/:id/members',
-			UserMembershipAuthorization.requireEntityAccess('group'),
+			UserMembershipAuthorization.requireGroupAccess,
 			UserMembershipController.index
 		webRouter.post '/manage/groups/:id/invites',
-			UserMembershipAuthorization.requireEntityAccess('group'),
+			UserMembershipAuthorization.requireGroupAccess,
 			TeamInvitesController.createInvite
 		webRouter.delete '/manage/groups/:id/user/:user_id',
-			UserMembershipAuthorization.requireEntityAccess('group'),
+			UserMembershipAuthorization.requireGroupAccess,
 			SubscriptionGroupController.removeUserFromGroup
 		webRouter.delete '/manage/groups/:id/invites/:email',
-			UserMembershipAuthorization.requireEntityAccess('group'),
+			UserMembershipAuthorization.requireGroupAccess,
 			TeamInvitesController.revokeInvite
 		webRouter.get '/manage/groups/:id/members/export',
-			UserMembershipAuthorization.requireEntityAccess('group'),
+			UserMembershipAuthorization.requireGroupAccess,
 			UserMembershipController.exportCsv
 
 
 		regularEntitites =
-			groups: 'groupManagers'
-			institutions: 'institution'
-		for pathName, entityName of regularEntitites
-			do (pathName, entityName) ->
+			groups: 'requireGroupManagersAccess'
+			institutions: 'requireInstitutionAccess'
+		for pathName, authorizationFunctionName of regularEntitites
+			do (pathName, authorizationFunctionName) ->
 				webRouter.get "/manage/#{pathName}/:id/managers",
-					UserMembershipAuthorization.requireEntityAccess(entityName),
+					UserMembershipAuthorization[authorizationFunctionName],
 					UserMembershipController.index
 
 				webRouter.post "/manage/#{pathName}/:id/managers",
-					UserMembershipAuthorization.requireEntityAccess(entityName),
+					UserMembershipAuthorization[authorizationFunctionName],
 					UserMembershipController.add
 
 				webRouter.delete "/manage/#{pathName}/:id/managers/:userId",
-					UserMembershipAuthorization.requireEntityAccess(entityName),
+					UserMembershipAuthorization[authorizationFunctionName],
 					UserMembershipController.remove
