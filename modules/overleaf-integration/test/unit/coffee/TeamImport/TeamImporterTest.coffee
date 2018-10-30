@@ -35,6 +35,19 @@ describe "TeamImporter", ->
 					"plan_name": "pro"
 				}
 			],
+			"managers": [
+				{
+					"id": 31,
+					"name": "Daenerys Targaryen",
+					"email": "daenerys@mothersofdragons.com",
+					"plan_name": "pro"
+				}
+				{
+					"id": 33,
+					"name": "I am manager already",
+					"email": "foo@bar.com",
+				}
+			],
 			"pending_invites": [
 				{
 					"email": "invited@example.com",
@@ -55,21 +68,24 @@ describe "TeamImporter", ->
 			id: 'v2 team member id'
 		}
 
+		@duplicateManager = {
+			id: 'duplicate manager id'
+		}
+
 		@SubscriptionLocator = {
 			getGroupWithV1Id: sinon.stub().yields(null)
 			getUsersSubscription: sinon.stub().yields(null)
+			findManagedSubscription: sinon.stub().yields(null)
 		}
 
 		@UserMapper = {
 			getSlIdFromOlUser: sinon.stub().yields(null)
 		}
 
-		@UserMapper = {
-			getSlIdFromOlUser: sinon.stub()
-		}
-
 		@UserMapper.getSlIdFromOlUser.withArgs(sinon.match.has("id", 31)).yields(null, @teamAdmin.id)
 		@UserMapper.getSlIdFromOlUser.withArgs(sinon.match.has("id", 32)).yields(null, @member.id)
+		@UserMapper.getSlIdFromOlUser.withArgs(sinon.match.has("id", 33)).yields(null, @duplicateManager.id)
+		@SubscriptionLocator.findManagedSubscription.withArgs(@duplicateManager.id).yields(null, { id: 'another-subscripiton-id'})
 
 		@SubscriptionUpdater = {
 			addUsersToGroup: sinon.stub().yields(null, true)
@@ -128,7 +144,7 @@ describe "TeamImporter", ->
 				).should.equal true
 
 				@SubscriptionLocator.getGroupWithV1Id.calledWith(@v1Team.id).should.equal true
-				@SubscriptionLocator.getUsersSubscription.calledWith(@teamAdmin.id).should.equal true
+				@SubscriptionLocator.findManagedSubscription.calledWith(@teamAdmin.id).should.equal true
 
 				@SubscriptionUpdater.addUsersToGroup.calledWith(@subscriptionId,
 					['v2 team admin id', 'v2 team member id']).should.equal true
@@ -138,14 +154,14 @@ describe "TeamImporter", ->
 				done()
 
 		it "rollbacks the process if there's a failure", (done) ->
-			@SubscriptionLocator.getUsersSubscription.yields(new Error("Here be dragons!"))
+			@SubscriptionLocator.findManagedSubscription.yields(new Error("Here be dragons!"))
 
 			@TeamImporter.getOrImportTeam @v1Team, (err, v2Team) =>
 				expect(err).to.be.instanceof(Error)
 				@SubscriptionUpdater.deleteWithV1Id.calledWith(@v1Team.id).should.equal true
 				done()
 
-		it "fails if the team manager already has a team", (done) ->
+		it "fails if the team admin already has a team", (done) ->
 			managerPreviousTeam = { id: 'a2137adfe8912' }
 			@SubscriptionLocator.getUsersSubscription.yields(null, managerPreviousTeam)
 
@@ -155,7 +171,7 @@ describe "TeamImporter", ->
 				@SubscriptionUpdater.deleteWithV1Id.calledWith(@v1Team.id).should.equal true
 				done()
 
-		it "fails if the team manager is not already in v2", (done) ->
+		it "fails if the team admin is not already in v2", (done) ->
 			@UserGetter.getUser.yields(null, null)
 
 			@TeamImporter.getOrImportTeam @v1Team, (err, v2Team) =>

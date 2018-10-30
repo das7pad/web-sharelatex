@@ -49,6 +49,14 @@ describe "Team imports", ->
 					"plan_name": "pro"
 				}
 			],
+			"managers": [
+				{
+					"id": 1,
+					"name": "Daenerys Targaryen",
+					"email": "daenerys@mothersofdragons.com",
+					"plan_name": "pro"
+				}
+			],
 			"pending_invites": [
 				{
 					"email": "invited@example.com",
@@ -100,11 +108,13 @@ describe "Team imports", ->
 
 				Subscription.findOne("overleaf.id": 5).exec (error, subscription) ->
 					return done(error) if error?
+
 					expect(subscription.overleaf.id).to.eq(5)
 					expect(subscription.membersLimit).to.eq(32)
 					expect(subscription.admin_id).to.be.an.instanceof(ObjectId)
 					expect(subscription.teamName).to.eq("Test Team")
 					expect(subscription.member_ids.length).to.eq(2)
+					expect(subscription.manager_ids.length).to.eq(1)
 
 					expect(subscription.teamInvites.length).to.eq(1)
 
@@ -124,7 +134,11 @@ describe "Team imports", ->
 						expect(imported).to.include(id: 1, email: "daenerys@mothersofdragons.com")
 						expect(imported).to.include(id: 2, email: "test@example.com")
 
-						done()
+						async.map subscription.manager_ids, getUser, (error, admins) ->
+							expect(admins[0].overleaf.id).to.equal(1)
+							expect(subscription.admin_id.toString()).to.equal admins[0]._id.toString()
+
+							done()
 
 
 		it "rolls back the change if there's a failure", (done) ->
