@@ -29,7 +29,7 @@ module.exports =
 			dropbox: false
 			versioning: false
 			github: false
-			gitBridge: true
+			gitBridge: false
 			templates: false
 			references: false
 			referencesSearch: false
