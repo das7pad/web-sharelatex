@@ -25,7 +25,7 @@ module.exports = GitBridgeHandler =
 			UserGetter.getUser project.owner_ref, {features: 1}, (err, owner) ->
 				return callback(err) if err?
 				if !owner.features.gitBridge
-					return callback(new Error('Owner does not have gitBridge feature'))
+					return callback(new Errors.FeatureNotAvailable('Project owner does not have gitBridge feature'))
 				callback(null, project)
 
 	getLatestProjectVersion: (userId, projectId, callback=(err, data)->) ->

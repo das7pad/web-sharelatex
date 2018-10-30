@@ -44,6 +44,8 @@ module.exports = GitBridgeController =
 	_handleError: (err, req, res, next) ->
 		if err instanceof GitBridgeErrors.OutOfDateError
 			return res.status(409).json {code: 'outOfDate', message: 'Out of Date'}
+		if err instanceof GitBridgeErrors.FeatureNotAvailable
+			return res.status(400).json {code: 'featureNotAvailable', message: 'Feature not available'}
 		if err instanceof GitBridgeErrors.ProjectNotCompatibleError
 			return res.status(501).send err.message
 		next(err)
