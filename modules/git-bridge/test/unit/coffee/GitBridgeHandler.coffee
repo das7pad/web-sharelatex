@@ -17,6 +17,7 @@ describe "GitBridgeHandler", ->
 			'settings-sharelatex': @Settings = {}
 			'logger-sharelatex': { log: sinon.stub(), err: sinon.stub() }
 			'../../../../app/js/Features/Project/ProjectGetter': @ProjectGetter = {}
+			'../../../../app/js/Features/User/UserGetter': @UserGetter = {}
 			'../../../../app/js/Features/Project/ProjectEntityHandler': @ProjectEntityHandler = {}
 			'../../../../app/js/Features/Editor/EditorHttpController': @EditorHttpController = {}
 			'../../../../app/js/infrastructure/FileWriter': @FileWriter = {}
