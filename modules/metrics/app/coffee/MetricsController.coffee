@@ -16,6 +16,7 @@ module.exports = MetricsController =
 		res.render Path.resolve(__dirname, '../views/metricsApp'), {
 			metricsEndpoint: "/graphs",
 			resourceId: req.entity.overleaf.id,
+			resourceName: req.entity.teamName,
 			resourceType: 'team',
 		}
 
