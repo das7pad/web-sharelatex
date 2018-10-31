@@ -36,8 +36,16 @@ module.exports = MockOverleafApi =
 			}
 
 		app.get "/api/v1/collabratec/users/current_user/projects", (req, res, next) =>
-			return res.json @projects[req.token] if @projects[req.token]?
+			return res.json { projects: @projects[req.token] } if @projects[req.token]?
 			res.status(401).send()
+
+		app.get "/api/v1/collabratec/users/current_user/projects/:project_id/metadata", (req, res, next) =>
+			return res.status(401).send() unless @projects[req.token]?
+			project = @projects[req.token].find((project) ->
+				return project.id == req.params.project_id
+			)
+			return res.status(404).send() unless project
+			res.json project
 
 		app.post "/api/v1/sharelatex/oauth_authorize", (req, res, next) =>
 			return res.json @tokens[req.body.token] if @tokens[req.body.token]?
