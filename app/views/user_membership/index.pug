@@ -84,12 +84,16 @@ block content
 											placeholder="jane@example.com, joe@example.com",
 											ng-model="inputs.addMembers.content",
 											on-enter="addMembers()"
+											aria-describedby="add-members-description"
 										)
 									.col-xs-4
 										button.btn.btn-primary(ng-click="addMembers()") #{translate("add")}
 									.col-xs-2(ng-if="paths.exportMembers", ng-cloak)
 										a(href=paths.exportMembers) Export CSV
-											
+								.row
+									.col-xs-8
+										span.help-block #{translate('add_comma_separated_emails_help')}
+
 						div(ng-if="groupSize && users.length >= groupSize && users.length > 0", ng-cloak)
 							.row
 								.col-xs-2.col-xs-offset-10(ng-if="paths.exportMembers", ng-cloak)
