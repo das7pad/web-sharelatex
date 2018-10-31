@@ -1,16 +1,7 @@
 mixin doc_rows(docs)
 	.row.row-spaced
 		.col-sm-12
-			.templates-container
-				each doc in docs
-					.template-thumbnail
-						a(href=doc.path)
-							img.thumbnail(src=doc.image_url alt=doc.title)
-							.caption__title #{doc.title}
-						div.caption
-							div.caption__description=doc.description
-							//- sanitized by api
-							div!= doc.author
+			+templates_list(docs)
 
 mixin pagination(pages)
 	ul.pagination
@@ -24,3 +15,15 @@ mixin pagination(pages)
 						a(href=page.href rel=page.rel) #{page.text}
 					else
 						a(href=page.href) #{page.text}
+
+mixin templates_list(templates)
+	.templates-container
+		each template in templates
+			.template-thumbnail
+				a(href=template.path)
+					img.thumbnail(src=template.image_url alt=template.title)
+					.caption__title #{template.title}
+				div.caption
+					div.caption__description=template.description_plain
+					//- sanitized by api
+					div!= template.author
