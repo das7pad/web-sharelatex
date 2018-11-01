@@ -3,6 +3,8 @@ logger = require 'logger-sharelatex'
 GitBridgeController = require './GitBridgeController'
 AuthenticationController = require '../../../../app/js/Features/Authentication/AuthenticationController'
 AuthorizationMiddlewear = require '../../../../app/js/Features/Authorization/AuthorizationMiddlewear'
+httpProxy = require 'express-http-proxy'
+URL = require 'url'
 
 
 module.exports = GitBridgeRouter =
@@ -36,3 +38,7 @@ module.exports = GitBridgeRouter =
 			AuthorizationMiddlewear.ensureUserIsSiteAdmin,  # Temporary
 			GitBridgeController.applySnapshot
 
+		# Proxy blob-content requests to project-history
+		publicApiRouter.use '/blob', httpProxy(
+			Settings.apis.project_history.url
+		)
