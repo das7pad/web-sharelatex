@@ -7,6 +7,7 @@ define [
 			$modal.open {
 				templateUrl: "gitBridgeModalTemplate"
 				controller: "GitBridgeModalController"
+				size: 'lg'
 				scope: $scope
 			}
 

@@ -21,7 +21,7 @@ script(type="text/ng-template", id="gitBridgeModalTemplate")
 			p
 				| !{translate('git_bridge_modal_description')}
 			pre.text-center
-				| {{ gitUrl }}
+				kbd git clone {{ gitUrl }}
 
 		div(ng-if="!hasGitBridgeFeature")
 			h4.teaser-title #{translate('access_your_projects_with_git')}
