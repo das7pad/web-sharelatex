@@ -1,6 +1,6 @@
 define [
 	"libraries"
-	"libs/polyfills/array-from"
+	"libs/polyfills/symbol"
 	"libs/polyfills/array-fill"
 	"libs/polyfills/array-includes"
 	"modules/recursionHelper"
