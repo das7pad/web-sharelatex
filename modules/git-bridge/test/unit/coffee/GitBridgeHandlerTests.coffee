@@ -19,10 +19,12 @@ describe "GitBridgeHandler", ->
 			'../../../../app/js/Features/Project/ProjectGetter': @ProjectGetter = {}
 			'../../../../app/js/Features/User/UserGetter': @UserGetter = {}
 			'../../../../app/js/Features/Project/ProjectEntityHandler': @ProjectEntityHandler = {}
+			'../../../../app/js/Features/Project/ProjectHistoryHandler': @ProjectHistoryHandler = {}
 			'../../../../app/js/Features/Editor/EditorHttpController': @EditorHttpController = {}
 			'../../../../app/js/infrastructure/FileWriter': @FileWriter = {}
 			'../../../../app/js/Features/ThirdPartyDataStore/UpdateMerger': @UpdateMerger = {}
 			'request': @Request = {}
+		@ProjectHistoryHandler.ensureHistoryExistsForProject = sinon.stub().yields(null)
 
 	describe "_formatGitBridgeSnapshot", ->
 		beforeEach ->
