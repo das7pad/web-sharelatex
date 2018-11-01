@@ -15,20 +15,24 @@ module.exports = GitBridgeRouter =
 		publicApiRouter.get  '/api/git-bridge/docs/:project_id',
 			AuthenticationController.requireOauth(),
 			AuthorizationMiddlewear.ensureUserCanReadProject,
+			AuthorizationMiddlewear.ensureUserIsSiteAdmin,  # Temporary
 			GitBridgeController.getLatestProjectVersion
 
 		publicApiRouter.get  '/api/git-bridge/docs/:project_id/saved_vers',
 			AuthenticationController.requireOauth(),
 			AuthorizationMiddlewear.ensureUserCanReadProject,
+			AuthorizationMiddlewear.ensureUserIsSiteAdmin,  # Temporary
 			GitBridgeController.showSavedVers
 
 		publicApiRouter.get  '/api/git-bridge/docs/:project_id/snapshots/:version',
 			AuthenticationController.requireOauth(),
 			AuthorizationMiddlewear.ensureUserCanReadProject,
+			AuthorizationMiddlewear.ensureUserIsSiteAdmin,  # Temporary
 			GitBridgeController.showSnapshot
 
 		publicApiRouter.post '/api/git-bridge/docs/:project_id/snapshots',
 			AuthenticationController.requireOauth(),
 			AuthorizationMiddlewear.ensureUserCanWriteProjectContent,
+			AuthorizationMiddlewear.ensureUserIsSiteAdmin,  # Temporary
 			GitBridgeController.applySnapshot
 
