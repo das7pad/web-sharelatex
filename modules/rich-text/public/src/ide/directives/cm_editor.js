@@ -27,6 +27,7 @@ define([
         readOnly: "=",
         spellCheck: "=",
         spellCheckLanguage: "=",
+        trackChangesEnabled: "=",
         autoComplete: "=",
         autoCloseBrackets: "=",
         fontSize: "=",

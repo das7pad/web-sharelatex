@@ -40,9 +40,10 @@ define([
 				this.$scope.$watch("sharejsDoc", (doc, oldDoc) => {
 					if ((doc == null)) { return; }
 					if (oldDoc != null) {
-						this.disconnectFromDoc(oldDoc);
+						this.adapter.disconnectFromDoc(oldDoc);
 					}
-					return this.connectToDoc(doc);
+					this.setTrackChanges(this.$scope.trackChanges);
+					return this.adapter.connectToDoc(doc);
 				});
 
 				this.$scope.$on("comment:add", (e, thread_id, offset, length) => {
@@ -94,14 +95,8 @@ define([
 					return this.recalculateReviewEntriesScreenPositions();
 				};
 
-				const onChangeSession = e => {
-					this.clearAnnotations();
-					this.redrawAnnotations();
-					return this.editor.session.on("changeScrollTop", onChangeScroll);
-				};
-
 				let _scrollTimeout = null;
-				var onChangeScroll = () => {
+				const onChangeScroll = () => {
 					if (_scrollTimeout != null) {
 						return;
 					} else {
@@ -118,39 +113,14 @@ define([
 				const onCut = () => this.onCut();
 				const onPaste = () => this.onPaste();
 
-				const bindToAce = () => {
-					this.editor.on("changeSelection", onChangeSelection);
-					this.editor.on("change", onChangeSelection); // Selection also moves with updates elsewhere in the document
-					this.editor.on("changeSession", onChangeSession);
-					this.editor.on("cut", onCut);
-					this.editor.on("paste", onPaste);
-					return this.editor.renderer.on("resize", onResize);
-				};
-
-				const unbindFromAce = () => {
-					this.editor.off("changeSelection", onChangeSelection);
-					this.editor.off("change", onChangeSelection);
-					this.editor.off("changeSession", onChangeSession);
-					this.editor.off("cut", onCut);
-					this.editor.off("paste", onPaste);
-					return this.editor.renderer.off("resize", onResize);
-				};
-
 				this.$scope.$watch("trackChangesEnabled", enabled => {
 					if ((enabled == null)) { return; }
 					if (enabled) {
-						return bindToAce();
+						return this.adapter.bindToEditor();
 					} else {
-						return unbindFromAce();
+						return this.adapter.unbindFromEditor();
 					}
 				});
-			}
-
-			disconnectFromDoc(doc) {
-				this.adapter.changeIdToMarkerIdMap = {};
-				doc.off("ranges:clear");
-				doc.off("ranges:redraw");
-				return doc.off("ranges:dirty");
 			}
 
 			setTrackChanges(value) {
@@ -159,49 +129,6 @@ define([
 				} else {
 					return (this.$scope.sharejsDoc != null ? this.$scope.sharejsDoc.track_changes_as = null : undefined);
 				}
-			}
-
-			connectToDoc(doc) {
-				this.rangesTracker = doc.ranges;
-				this.setTrackChanges(this.$scope.trackChanges);
-
-				doc.on("ranges:dirty", () => {
-					return this.updateAnnotations();
-				});
-				doc.on("ranges:clear", () => {
-					return this.clearAnnotations();
-				});
-				return doc.on("ranges:redraw", () => {
-					return this.redrawAnnotations();
-				});
-			}
-
-			clearAnnotations() {
-				const session = this.editor.getSession();
-				for (let change_id in this.adapter.changeIdToMarkerIdMap) {
-					const markers = this.adapter.changeIdToMarkerIdMap[change_id];
-					for (let marker_name in markers) {
-						const marker_id = markers[marker_name];
-						session.removeMarker(marker_id);
-					}
-				}
-				return this.adapter.changeIdToMarkerIdMap = {};
-			}
-
-			redrawAnnotations() {
-				for (let change of Array.from(this.rangesTracker.changes)) {
-					if (change.op.i != null) {
-						this.adapter.onInsertAdded(change);
-					} else if (change.op.d != null) {
-						this._onDeleteAdded(change);
-					}
-				}
-
-				for (let comment of Array.from(this.rangesTracker.comments)) {
-					this._onCommentAdded(comment);
-				}
-
-				return this.broadcastChange();
 			}
 			updateAnnotations() {
 				// Doc updates with multiple ops, like search/replace or block comments
@@ -587,20 +514,6 @@ define([
 				return entries;
 			}
 
-			_onDeleteAdded(change) {
-				const position = this.adapter.shareJsOffsetToAcePosition(change.op.p);
-				const session = this.editor.getSession();
-				const doc = session.getDocument();
-
-				const markerLayer = this.editor.renderer.$markerBack;
-				const klass = "track-changes-marker track-changes-deleted-marker";
-				const background_range = this.adapter.makeZeroWidthRange(position);
-				const background_marker_id = session.addMarker(background_range, klass, (html, range, left, top, config) => markerLayer.drawSingleLineMarker(html, range, `${klass} ace_start`, config, 0, ""));
-
-				const callout_marker_id = this.adapter.createCalloutMarker(position, "track-changes-deleted-marker-callout");
-				return this.adapter.changeIdToMarkerIdMap[change.id] = { background_marker_id, callout_marker_id };
-			}
-
 			_onInsertRemoved(change) {
 				const {background_marker_id, callout_marker_id} = this.adapter.changeIdToMarkerIdMap[change.id];
 				delete this.adapter.changeIdToMarkerIdMap[change.id];
@@ -615,24 +528,6 @@ define([
 				const session = this.editor.getSession();
 				session.removeMarker(background_marker_id);
 				return session.removeMarker(callout_marker_id);
-			}
-
-			_onCommentAdded(comment) {
-				if (this.rangesTracker.resolvedThreadIds[comment.op.t]) {
-					// Comment is resolved so shouldn't be displayed.
-					return;
-				}
-				if ((this.adapter.changeIdToMarkerIdMap[comment.id] == null)) {
-					// Only create new markers if they don't already exist
-					const start = this.adapter.shareJsOffsetToAcePosition(comment.op.p);
-					const end = this.adapter.shareJsOffsetToAcePosition(comment.op.p + comment.op.c.length);
-					const session = this.editor.getSession();
-					const doc = session.getDocument();
-					const background_range = new Range(start.row, start.column, end.row, end.column);
-					const background_marker_id = session.addMarker(background_range, "track-changes-marker track-changes-comment-marker", "text");
-					const callout_marker_id = this.adapter.createCalloutMarker(start, "track-changes-comment-marker-callout");
-					return this.adapter.changeIdToMarkerIdMap[comment.id] = { background_marker_id, callout_marker_id };
-				}
 			}
 
 			_onCommentRemoved(comment) {
