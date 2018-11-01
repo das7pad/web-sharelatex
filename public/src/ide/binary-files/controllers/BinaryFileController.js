@@ -116,7 +116,6 @@ define(['base', 'moment'], (App, moment) =>
         $scope.imgLoaded = true
         return $scope.$apply()
       }
-
       ;(loadTextFileFilePreview = function() {
         if (!$scope.isTextFile()) {
           return
