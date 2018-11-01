@@ -153,14 +153,14 @@ define([
       overrides = {}
     }
     return _.extend(
+      EventEmitter.prototype,
       {
         getValue: sinon.stub().returns('some text'),
         getWrapperElement: sinon.stub().returns({ off: sinon.stub() }),
         refresh: sinon.stub(),
         clearHistory: sinon.stub()
       },
-      overrides,
-      EventEmitter.prototype
+      overrides
     )
   }
 
@@ -192,13 +192,13 @@ define([
       overrides = {}
     }
     return _.extend(
+      EventEmitter.prototype,
       {
         attachToCM: sinon.stub(),
         getSnapshot: sinon.stub(),
         detachFromCM: sinon.stub()
       },
-      overrides,
-      EventEmitter.prototype
+      overrides
     )
   })
 })
