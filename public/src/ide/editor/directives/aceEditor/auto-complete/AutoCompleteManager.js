@@ -89,8 +89,9 @@ define([
               /^~?\\(includegraphics(?:\[.*])?){([^}]*, *)?(\w*)/
             )
             if (match) {
-              let _, commandName, currentArg
-              ;[_, commandName, _, currentArg] = Array.from(match)
+              let [_ignore1, commandName, _ignore2, currentArg] = Array.from(
+                match
+              )
               const graphicsPaths = Preamble.getGraphicsPaths()
               const result = []
               for (let graphic of Array.from(Graphics.getGraphicsFiles())) {
