@@ -13,7 +13,6 @@ module.exports = ProjectHistoryHandler =
 		# use $exists:false to prevent overwriting any existing history id, atomically
 		Project.update {_id: project_id, "overleaf.history.id": {$exists:false}}, {"overleaf.history.id":history_id}, (err, result)->
 			return callback(err) if err?
-			return callback(new Error("history exists")) if result?.n == 0
 			callback()
 
 	getHistoryId: (project_id, callback = (err, result) ->) ->
