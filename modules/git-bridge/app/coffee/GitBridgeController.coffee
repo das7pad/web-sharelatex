@@ -9,7 +9,6 @@ module.exports = GitBridgeController =
 	getLatestProjectVersion: (req, res, next) ->
 		projectId = req.params['project_id']
 		userId = req.oauth_user._id
-		console.log ">>>> user", userId
 		logger.log {projectId}, "[GitBridgeController] getting doc/project"
 		GitBridgeHandler.getLatestProjectVersion userId, projectId, (err, data) ->
 			return GitBridgeController._handleError(err, req, res, next) if err?
