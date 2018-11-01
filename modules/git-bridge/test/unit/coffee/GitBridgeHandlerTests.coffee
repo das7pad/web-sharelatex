@@ -28,7 +28,7 @@ describe "GitBridgeHandler", ->
 
 	describe "_formatGitBridgeSnapshot", ->
 		beforeEach ->
-			@Settings.apis = {project_history: {url: 'http://project_history'}}
+			@Settings.apis = {siteUrl: 'http://example.com'}
 			@rawData = {
 				projectId: @projectId,
 				files: {
@@ -55,7 +55,7 @@ describe "GitBridgeHandler", ->
 						["some content or whatever", "main.tex"]
 					],
 					atts: [
-						["http://project_history/blob/b2c3cc5be", "things/other.png"]
+						["http://example.com/blob/b2c3cc5be", "things/other.png"]
 					]
 				}
 				done()
