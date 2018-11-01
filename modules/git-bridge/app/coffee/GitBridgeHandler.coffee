@@ -102,13 +102,8 @@ module.exports = GitBridgeHandler =
 						logger.err {err, projectId, latestVerId, snapshotVerId},
 							"[GitBridgeHandler] project out of date, can't apply snapshot"
 					logger.log {userId, projectId}, "[GitBridgeHandler] starting snapshot application"
-					process.nextTick(
-						GitBridgeHandler._asyncApplySnapshot,
-						userId,
-						project,
-						snapshot
-					)
 					callback()  # Do the actual import async, like the original rails implementation
+					GitBridgeHandler._asyncApplySnapshot(userId, project, snapshot)
 
 	_asyncApplySnapshot: (userId, project, snapshot, callback=()->) ->
 		projectId = project._id
