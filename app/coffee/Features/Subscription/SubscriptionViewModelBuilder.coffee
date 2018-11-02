@@ -7,6 +7,7 @@ SubscriptionLocator = require("./SubscriptionLocator")
 V1SubscriptionManager = require("./V1SubscriptionManager")
 logger = require('logger-sharelatex')
 _ = require("underscore")
+async = require('async')
 
 
 buildBillingDetails = (recurlySubscription) ->
@@ -22,43 +23,54 @@ buildBillingDetails = (recurlySubscription) ->
 
 module.exports =
 	buildUsersSubscriptionViewModel: (user, callback = (error, subscription, memberSubscriptions, billingDetailsLink) ->) ->
-		SubscriptionLocator.getUsersSubscription user, (err, subscription) ->
+		async.auto {
+			personalSubscription: (cb) ->
+				SubscriptionLocator.getUsersSubscription user, cb
+			recurlySubscription: ['personalSubscription', (cb, {personalSubscription}) ->
+				if !personalSubscription?.recurlySubscription_id? or personalSubscription?.recurlySubscription_id == ''
+					return cb(null, null) 
+				RecurlyWrapper.getSubscription personalSubscription.recurlySubscription_id, includeAccount: true, cb
+			]
+			plan: ['personalSubscription', (cb, {personalSubscription}) ->
+				return cb() if !personalSubscription?
+				plan = PlansLocator.findLocalPlanInSettings(personalSubscription.planCode)
+				return cb(new Error("No plan found for planCode '#{personalSubscription.planCode}'")) if !plan?
+				personalSubscription.plan = plan
+				cb()
+			]
+			groupSubscriptions: (cb) ->
+				SubscriptionLocator.getMemberSubscriptions user, cb
+			v1Subscriptions: (cb) ->
+				V1SubscriptionManager.getSubscriptionsFromV1 user._id, (error, subscriptions) ->
+					return cb(error) if error?
+					cb(null, subscriptions)
+		}, (err, results) ->
 			return callback(err) if err?
+			{personalSubscription, groupSubscriptions, v1Subscriptions, recurlySubscription} = results
+			groupSubscriptions ?= []
+			v1Subscriptions ?= []
 
-			SubscriptionLocator.getMemberSubscriptions user, (err, memberSubscriptions = []) ->
-				return callback(err) if err?
+			if personalSubscription?.toObject?
+				# Downgrade from Mongoose object, so we can add a recurly attribute
+				personalSubscription = personalSubscription.toObject()
 
-				V1SubscriptionManager.getSubscriptionsFromV1 user._id, (err, v1Subscriptions) ->
-					return callback(err) if err?
+			console.log 'recurlySubscription', recurlySubscription
 
-					if subscription?
-						return callback(error) if error?
+			if personalSubscription? and recurlySubscription?
+				tax = recurlySubscription?.tax_in_cents || 0
+				personalSubscription.recurly = {
+					tax: tax
+					taxRate: taxRate:parseFloat(recurlySubscription?.tax_rate?._)
+					billingDetailsLink: buildBillingDetails(recurlySubscription)
+					price: SubscriptionFormatters.formatPrice (recurlySubscription?.unit_amount_in_cents + tax), recurlySubscription?.currency
+					nextPaymentDueAt: SubscriptionFormatters.formatDate(recurlySubscription?.current_period_ends_at)
+					currency: recurlySubscription.currency
+					state: recurlySubscription.state
+				}
 
-						plan = PlansLocator.findLocalPlanInSettings(subscription.planCode)
-
-						if !plan?
-							err = new Error("No plan found for planCode '#{subscription.planCode}'")
-							logger.error {user_id: user._id, err}, "error getting subscription plan for user"
-							return callback(err)
-
-						RecurlyWrapper.getSubscription subscription.recurlySubscription_id, includeAccount: true, (err, recurlySubscription)->
-							tax = recurlySubscription?.tax_in_cents || 0
-
-							callback null, {
-								admin_id:subscription.admin_id
-								name: plan.name
-								nextPaymentDueAt: SubscriptionFormatters.formatDate(recurlySubscription?.current_period_ends_at)
-								state: recurlySubscription?.state
-								price: SubscriptionFormatters.formatPrice (recurlySubscription?.unit_amount_in_cents + tax), recurlySubscription?.currency
-								planCode: subscription.planCode
-								currency:recurlySubscription?.currency
-								taxRate:parseFloat(recurlySubscription?.tax_rate?._)
-								groupPlan: subscription.groupPlan
-								trial_ends_at:recurlySubscription?.trial_ends_at
-							}, memberSubscriptions, buildBillingDetails(recurlySubscription), v1Subscriptions
-
-					else
-						callback null, null, memberSubscriptions, null, v1Subscriptions
+			callback null, {
+				personalSubscription, groupSubscriptions, v1Subscriptions
+			}
 
 	buildViewModel : ->
 		plans = Settings.plans

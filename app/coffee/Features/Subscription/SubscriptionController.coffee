@@ -89,35 +89,23 @@ module.exports = SubscriptionController =
 
 	userSubscriptionPage: (req, res, next) ->
 		user = AuthenticationController.getSessionUser(req)
-		LimitationsManager.hasPaidSubscription user, (err, hasPaidSubscription, subscription)->
-			return next(err) if err?
-			groupLicenceInviteUrl = SubscriptionDomainHandler.getDomainLicencePage(user)
-			if subscription?.customAccount
-				logger.log user: user, "redirecting to custom account page"
-				res.redirect "/user/subscription/custom_account"
-			else if groupLicenceInviteUrl? and !hasPaidSubscription
-				logger.log user:user, "redirecting to group subscription invite page"
-				res.redirect groupLicenceInviteUrl
-			else if !hasPaidSubscription
-				logger.log user: user, "redirecting to plans"
-				res.redirect "/user/subscription/plans"
+		SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel user, (error, results) ->
+			return next(error) if error?
+			{ personalSubscription, groupSubscriptions, v1Subscriptions } = results
+			logger.log {user, personalSubscription, groupSubscriptions, v1Subscriptions}, "showing subscription dashboard"
+			plans = SubscriptionViewModelBuilder.buildViewModel()
+			data = 
+				title: "your_subscription"
+				plans: plans
+				user: user
+				personalSubscription: personalSubscription
+				groupSubscriptions: groupSubscriptions
+				v1Subscriptions: v1Subscriptions
+			if req.headers.accept?.match 'application/json'
+				# Used for acceptance testing
+				res.json data
 			else
-				SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel user, (error, subscription, groupSubscriptions, billingDetailsLink, v1Subscriptions) ->
-					return next(error) if error?
-					logger.log {user, subscription, hasPaidSubscription, groupSubscriptions, billingDetailsLink, v1Subscriptions}, "showing subscription dashboard"
-					plans = SubscriptionViewModelBuilder.buildViewModel()
-					res.render "subscriptions/dashboard",
-						title: "your_subscription"
-						recomendedCurrency: subscription?.currency
-						taxRate:subscription?.taxRate
-						plans: plans
-						subscription: subscription || {}
-						groupSubscriptions: groupSubscriptions
-						subscriptionTabActive: true
-						user:user
-						saved_billing_details: req.query.saved_billing_details?
-						billingDetailsLink: billingDetailsLink
-						v1Subscriptions: v1Subscriptions
+				res.render "subscriptions/dashboard", data
 
 	userCustomSubscriptionPage: (req, res, next)->
 		user = AuthenticationController.getSessionUser(req)
