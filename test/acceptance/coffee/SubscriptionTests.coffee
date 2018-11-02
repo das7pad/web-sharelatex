@@ -5,7 +5,7 @@ User = require "./helpers/User"
 
 MockRecurlyApi = require "./helpers/MockRecurlyApi"
 
-describe.only 'Subscriptions', ->
+describe 'Subscriptions', ->
 	describe 'dashboard', ->
 		before (done) ->
 			@user = new User()
@@ -115,3 +115,47 @@ describe.only 'Subscriptions', ->
 			it 'should return no groupSubscriptions', ->
 				expect(@data.groupSubscriptions).to.deep.equal []
 
+		describe.only 'when the user is a member of a group subscription', ->
+			before (done) ->
+				@owner1 = new User()
+				@owner2 = new User()
+				async.series [
+					(cb) => @owner1.ensureUserExists cb
+					(cb) => @owner2.ensureUserExists cb
+					(cb) => Subscription.create {
+							admin_id: @owner1._id,
+							manager_ids: [@owner1._id],
+							planCode: 'collaborator',
+							groupPlan: true,
+							member_ids: [@user._id]
+						}, cb
+					(cb) => Subscription.create {
+							admin_id: @owner2._id,
+							manager_ids: [@owner2._id],
+							planCode: 'collaborator',
+							groupPlan: true,
+							member_ids: [@user._id]
+						}, cb
+				], (error) =>				
+					return done(error) if error?
+					@user.request {
+						url: '/user/subscription'
+						json: true
+					}, (error, response, @data) =>
+						return done(error) if error?
+						expect(response.statusCode).to.equal 200
+						done()
+				return
+
+			it 'should return no personalSubscription', ->
+				expect(@data.personalSubscription).to.equal null
+
+			it 'should return the two groupSubscriptions', ->
+				expect(@data.groupSubscriptions.length).to.equal 2
+				expect(
+					# Mongoose populates the admin_id with the user
+					@data.groupSubscriptions[0].admin_id._id
+				).to.equal @owner1._id
+				expect(
+					@data.groupSubscriptions[1].admin_id._id
+				).to.equal @owner2._id
