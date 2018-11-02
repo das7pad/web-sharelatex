@@ -5,7 +5,9 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define([], function() {
+define([
+  "ide/editor/AceShareJsCodec"
+], function(AceShareJsCodec) {
   let TrackChangesAdapter;
   return (TrackChangesAdapter = class TrackChangesAdapter {
     constructor(editor) {
@@ -15,6 +17,8 @@ define([], function() {
       this.clearAnnotations = this.clearAnnotations.bind(this);
       this.redrawAnnotations = this.redrawAnnotations.bind(this);
       this.onInsertAdded = this.onInsertAdded.bind(this);
+      this.shareJsOffsetToAcePosition = this.shareJsOffsetToAcePosition.bind(this);
+      this.getAllLines = this.getAllLines.bind(this);
       this.onDeleteAdded = this.onDeleteAdded.bind(this);
       this.onCommentAdded = this.onCommentAdded.bind(this);
       this.editor = editor;
@@ -84,19 +88,27 @@ define([], function() {
       // TODO you will need to put this back in but will think about it later
       // @broadcastChange()
 
-    onInsertAdded() {
-      // start = @shareJsOffsetToAcePosition(change.op.p)
-      // end = @shareJsOffsetToAcePosition(change.op.p + change.op.i.length)
-      // session = @editor.getSession()
-      // doc = session.getDocument()
-      // background_range = new Range(start.row, start.column, end.row, end.column)
-      // background_marker_id = session.addMarker background_range, "track-changes-marker track-changes-added-marker", "text"
+    onInsertAdded(change) {
+      let position;
+      return position = this.shareJsOffsetToAcePosition(change.op.p);
+    }
+      // cm.addWidget(pos: position, node: Element, scrollIntoView: boolean)
       // callout_marker_id = @createCalloutMarker(start, "track-changes-added-marker-callout")
       // @changeIdToMarkerIdMap[change.id] = { background_marker_id, callout_marker_id }
 
-      //TODO shareJS bits, not thinking about that right now
-      let background_range;
-      return background_range = new Range(start.row, start.column, end.row, end.column);
+    shareJsOffsetToAcePosition(offset) {
+      const lines = this.getAllLines();
+      return AceShareJsCodec.shareJsOffsetToAcePosition(offset, lines);
+    }
+
+    getAllLines() {
+      const lines = [];
+      for (let leaf of Array.from(this.cm.doc.children)) {
+        for (let line of Array.from(leaf.lines)) {
+          lines.push(line.text);
+        }
+      }
+      return lines;
     }
 
     onDeleteAdded() {}
