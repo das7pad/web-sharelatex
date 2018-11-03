@@ -1,5 +1,5 @@
 ReferencesRouter = require "./app/js/ReferencesRouter"
-ThirdPartyReferenceAgentBuilder = require('./app/js/LinkedFiles/ThirdPartyReferenceAgentBuilder')
+ThirdPartyReferencesAgentBuilder = require('./app/js/LinkedFiles/ThirdPartyReferencesAgentBuilder')
 
 module.exports = References =
 	router: ReferencesRouter
@@ -12,5 +12,5 @@ module.exports = References =
 		"binaryFile:linkedFileRefreshError" : "project/editor/_binary_file_linked_file_refresh_error"
 
 	linkedFileAgents:
-		"mendeley": ThirdPartyReferenceAgentBuilder('mendeley')
-		"zotero": ThirdPartyReferenceAgentBuilder('zotero')
+		"mendeley": () -> ThirdPartyReferencesAgentBuilder('mendeley')
+		"zotero": () -> ThirdPartyReferencesAgentBuilder('zotero')
