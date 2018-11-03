@@ -1,0 +1,12 @@
+div(ng-controller="UserSubscriptionController")
+	.page-header(x-current-plan=personalSubscription.planCode)
+		h1 #{translate("your_subscription")} 
+		
+	if (personalSubscription.recurly)
+		include ./_personal_subscription_recurly
+	else
+		include ./_personal_subscription_custom
+	
+	if(personalSubscription.groupPlan)
+		p
+			a(href="/subscription/group").btn.btn-success !{translate("manage_group")}

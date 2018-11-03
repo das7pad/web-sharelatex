@@ -1,0 +1,97 @@
+case personalSubscription.recurly.state
+	when "active"
+		p !{translate("currently_subscribed_to_plan", {planName:"<strong>" + personalSubscription.plan.name + "</strong>"})} 
+			span(ng-show="!isNextGenPlan")
+				a(href, ng-click="changePlan = true") !{translate("change_plan")}.
+		p !{translate("next_payment_of_x_collectected_on_y", {paymentAmmount:"<strong>" + personalSubscription.recurly.price + "</strong>", collectionDate:"<strong>" + personalSubscription.recurly.nextPaymentDueAt + "</strong>"})}
+		p.pull-right
+		p
+			a(href=personalSubscription.recurly.billingDetailsLink, target="_blank").btn.btn-info #{translate("update_your_billing_details")}
+			| &nbsp;
+			a(href, ng-click="switchToCancelationView()").btn.btn-primary !{translate("cancel_your_subscription")}
+	when "canceled"
+		p !{translate("currently_subscribed_to_plan", {planName:"<strong>" + personalSubscription.plan.name + "</strong>"})}
+		p !{translate("subscription_canceled_and_terminate_on_x", {terminateDate:"<strong>" + personalSubscription.recurly.nextPaymentDueAt + "</strong>"})}
+		p: form(action="/user/subscription/reactivate",method="post")
+			input(type="hidden", name="_csrf", value=csrfToken)
+			input(type="submit",value="Reactivate your subscription").btn.btn-success
+	when "expired"
+		p !{translate("your_subscription_has_expired")}	
+			a(href="/user/subscription/plans") !{translate("create_new_subscription")}
+	default
+		p !{translate("problem_with_subscription_contact_us")}
+
+include ./_change_plans_mixins
+div(ng-show="changePlan", ng-cloak)#changePlanSection
+	h2.col-md-7 !{translate("change_plan")}
+	span.dropdown.col-md-1.changePlanButton(ng-controller="CurrenyDropdownController", style="display:none", dropdown)
+		a.btn.btn-primary.dropdown-toggle(
+			href="#",
+			data-toggle="dropdown",
+			dropdown-toggle
+		)
+			| {{currencyCode}} ({{plans[currencyCode]['symbol']}})
+		ul.dropdown-menu(role="menu")
+			li(ng-repeat="(currency, value) in plans", dropdown-toggle)
+				a(
+					href,
+					ng-click="changeCurrency(currency)"
+				) {{currency}} ({{value['symbol']}})
+	p: table.table
+		tr
+			th !{translate("name")}
+			th !{translate("price")}
+			th
+		+printPlans(plans.studentAccounts)
+		+printPlans(plans.individualMonthlyPlans)
+		+printPlans(plans.individualAnnualPlans)
+
+
+.card(ng-if="view == 'cancelation'")
+	.page-header
+		h1 #{translate("Cancel Subscription")}
+
+	div(ng-show="showExtendFreeTrial", style="text-align: center")
+		p !{translate("have_more_days_to_try", {days:14})}
+		button(type="submit", ng-click="exendTrial()", ng-disabled='inflight').btn.btn-success #{translate("ill_take_it")}
+		p
+			| &nbsp;
+		p
+			a(href, ng-click="cancelSubscription()", ng-disabled='inflight') #{translate("no_thanks_cancel_now")}
+
+	div(ng-show="showDowngradeToStudent", style="text-align: center")
+		span(ng-controller="ChangePlanFormController")
+			p !{translate("interested_in_cheaper_plan",{price:'{{studentPrice}}'})}
+			button(type="submit", ng-click="downgradeToStudent()", ng-disabled='inflight').btn.btn-success #{translate("yes_please")}
+			p
+				| &nbsp;
+			p
+				a(href, ng-click="cancelSubscription()", ng-disabled='inflight')  #{translate("no_thanks_cancel_now")}
+
+	div(ng-show="showBasicCancel")
+		p #{translate("sure_you_want_to_cancel")}
+		a(href="/project").btn.btn-info #{translate("i_want_to_stay")}
+		| &nbsp;
+		a(ng-click="cancelSubscription()", ng-disabled='inflight').btn.btn-primary #{translate("cancel_my_account")}
+
+script(type="text/javascript").
+	$('#cancelSubscription').on("click", function() {
+		ga('send', 'event', 'subscription-funnel', 'cancelation')
+	})
+
+script(type='text/ng-template', id='confirmChangePlanModalTemplate')
+	.modal-header
+		h3 #{translate("change_plan")}
+	.modal-body
+		p !{translate("sure_you_want_to_change_plan", {planName:"<strong>{{plan.name}}</strong>"})}
+	.modal-footer
+		button.btn.btn-default(
+			ng-disabled="inflight"
+			ng-click="cancel()"
+		) #{translate("cancel")}
+		button.btn.btn-success(
+			ng-disabled="state.inflight"
+			ng-click="confirmChangePlan()"
+		)
+			span(ng-hide="inflight") #{translate("change_plan")}
+			span(ng-show="inflight") #{translate("processing")}...
