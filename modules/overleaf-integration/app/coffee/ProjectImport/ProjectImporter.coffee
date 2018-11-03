@@ -40,7 +40,7 @@ V1_HISTORY_SYNC_REQUEST_TIMES = [
 
 OVERLEAF_BRAND_VARIATION_ID = 52
 
-SUPPORTED_V1_EXT_AGENTS = ['wlfile', 'url', 'wloutput', 'mendeley']
+SUPPORTED_V1_EXT_AGENTS = ['wlfile', 'url', 'wloutput', 'mendeley', 'zotero']
 
 module.exports = ProjectImporter =
 	importProject: (v1_project_id, v2_user_id, callback = (error, v2_project_id) ->) ->
@@ -340,6 +340,11 @@ module.exports = ProjectImporter =
 				provider: 'mendeley',
 				v1_importer_id: file.agent_data.importer_id,
 				group_id: file.agent_data.group
+			})
+		else if file.agent == 'zotero'
+			callback(null, {
+				provider: 'zotero',
+				v1_importer_id: file.agent_data.importer_id
 			})
 		else
 			callback(null, null)
