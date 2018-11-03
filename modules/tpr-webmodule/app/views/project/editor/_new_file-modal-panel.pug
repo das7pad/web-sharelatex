@@ -19,7 +19,6 @@ mixin providerPanel(providerKey, controller, providerName)
 			// When the user has linked, the happy path
 			div(ng-if="userHasProviderLink")
 
-
 				// Forms, data and options
 				div
 					div(ng-if="state.fetchingGroups")
@@ -29,14 +28,11 @@ mixin providerPanel(providerKey, controller, providerName)
 								|&nbsp;Loading...
 
 					div(ng-if="!state.fetchingGroups")
-						// Has groups available
-						div(ng-if="hasGroups()")
-							div.text-center
-								h3 Import bibtex from your Mendeley Account or Group
+						div(ng-if="!hasGroups()")
+							p Import a bibtex file from your #{providerName} account
 
 							form(novalidate, name="newLinkedFileForm")
-								.form-controls
-
+								.row-spaced-small(ng-if="hasGroups()")
 									label(for="group-select") Select a Group (optional)
 									select.form-control(
 										name="group-select"
@@ -48,8 +44,7 @@ mixin providerPanel(providerKey, controller, providerName)
 											value="{{ group.id }}"
 										) {{ group.name }}
 
-									br
-
+								.row-spaced-small
 									label(for="name") File name in this project
 									input.form-control(
 										type="text",
@@ -57,28 +52,11 @@ mixin providerPanel(providerKey, controller, providerName)
 										required,
 										ng-model="data.name",
 										on-enter="create()",
-										name="name"
+										name="name",
+										focus-on="open"
 									)
-									.text-danger.row-spaced-small(ng-show="newDocForm.name.$error.validFile")
 
-						// No groups available, from account directly
-						div(ng-if="!hasGroups()")
-
-							div.text-center
-								h3 Import bibtex from your #{providerName} account
-
-							form(novalidate, name="newLinkedFileForm")
-								.row-spaced.small
-									label(for="name") File name in this project
-									input.form-control(
-										type="text",
-										placeholder="references.bib",
-										required,
-										ng-model="data.name",
-										on-enter="create()",
-										name="name"
-									)
-									.text-danger.row-spaced-small(ng-show="newDocForm.name.$error.validFile")
+								.text-danger.row-spaced-small(ng-show="newDocForm.name.$error.validFile")
 
 						div(ng-if="state.inflight")
 							h3.text-center

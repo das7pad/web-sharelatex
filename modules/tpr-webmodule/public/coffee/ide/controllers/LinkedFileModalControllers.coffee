@@ -3,20 +3,26 @@ define [
 	"base"
 ], (App) ->
 	controllerForProvider = (provider, supportsGroups) ->	[
-		"$scope", "ide", "$timeout", "$window", "$interval", "event_tracking", "sixpack"
+		"$scope", "ide", "$timeout", "$window", "$interval", "event_tracking", "sixpack",
 		($scope,   ide,   $timeout,   $window,   $interval,   event_tracking,   sixpack) ->
 			features = ide.$scope.user?.features
 			$scope.userHasProviderFeature = features?[provider] or features?.references
 			$scope.userHasProviderLink = ide.$scope.user?.refProviders?[provider]
 
+			$timeout () ->
+				$scope.$broadcast "open"
+			, 200
+
 			$scope.canLoadBibtex = () ->
 				$scope.userHasProviderFeature && $scope.userHasProviderLink
 
-			$scope.state =
-				fetchingGroups: false
-				inflight: false
-				error: false
-				errorType: 'default'  # || 'expired' || 'forbidden'
+			# Don't overwrite the state object, since we inherit the modal state
+			# object to communicate the 'valid' attribute back to it.
+			$scope.state.fetchingGroups = false
+			$scope.state.inflight = false
+			$scope.state.error = false
+			$scope.state.errorType = 'default' # || 'expired' || 'forbidden'
+
 			$scope.data =
 				isInitialized: false
 				groups: null
@@ -72,11 +78,12 @@ define [
 					$scope.state.valid = false
 				else
 					$scope.state.valid = true
+				console.log 'validating', {name, isInitialized, valid:$scope.state.valid}
 
 			$scope.$watch 'data.name', validate
+			validate()
 
 			$scope.$on 'create', () ->
-				console.log 'create', provider, $scope.data
 				return unless $scope.data.isInitialized
 				return unless (
 					$scope.data.isInitialized &&
