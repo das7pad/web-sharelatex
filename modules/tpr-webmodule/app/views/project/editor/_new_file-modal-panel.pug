@@ -1,235 +1,122 @@
-div(ng-if="type == 'mendeley'", ng-controller="MendeleyLinkedFileModalController")
-	// When the user doesn't have this feature
-	div(ng-if="!userHasProviderFeature")
-		p.small #{translate("mendeley_sync_description")}
-		.alert.alert-info
-			p #{translate("mendeley_is_premium")}
-			p
-				a.btn.btn-info(ng-click="startFreeTrial(provider)") #{translate("start_free_trial")}
+mixin providerPanel(providerKey, controller, providerName)
+	div(ng-if="type == '" + providerKey + "'", ng-controller=controller)
+		// When the user doesn't have this feature
+		div(ng-if="!userHasProviderFeature")
+			p.small #{translate(providerKey+"_sync_description")}
+			.alert.alert-info
+				p #{translate(providerKey+"_is_premium")}
+				p
+					a.btn.btn-info(ng-click="startFreeTrial(provider)") #{translate("start_free_trial")}
 
-	div(ng-if="userHasProviderFeature").referencesImportModal
+		div(ng-if="userHasProviderFeature").referencesImportModal
 
-		// When the user has not linked to the provider
-		div(ng-if="!userHasProviderLink")
-			p #{translate("mendeley_sync_description" )} 
-			p
-				a(href,ng-click="linkAccount()").btn.btn-info #{translate("link_to_mendeley")}
+			// When the user has not linked to the provider
+			div(ng-if="!userHasProviderLink")
+				p #{translate(providerKey+"_sync_description" )} 
+				p
+					a(href,ng-click="linkAccount()").btn.btn-info #{translate("link_to_"+providerKey)}
 
-		// When the user has linked, the happy path
-		div(ng-if="userHasProviderLink")
+			// When the user has linked, the happy path
+			div(ng-if="userHasProviderLink")
 
 
-			// Forms, data and options
-			div
-				div(ng-if="state.fetchingGroups")
-					h2.text-center
-						small
-							i.fa.fa-refresh.fa-spin.fa-fw
-							|&nbsp;Loading...
-
-				div(ng-if="!state.fetchingGroups")
-					// Has groups available
-					div(ng-if="hasGroups()")
-						div.text-center
-							h3 Import bibtex from your Mendeley Account or Group
-
-						form(novalidate, name="newLinkedFileForm")
-							.form-controls
-
-								label(for="group-select") Select a Group (optional)
-								select.form-control(
-									name="group-select"
-									ng-model="data.selectedGroupId"
-								)
-									option(value="" selected) - Select a Group (optional)
-									option(
-										ng-repeat="group in data.groups"
-										value="{{ group.id }}"
-									) {{ group.name }}
-
-								br
-
-								label(for="name") File name in this project
-								input.form-control(
-									type="text",
-									placeholder="references.bib",
-									required,
-									ng-model="data.name",
-									on-enter="create()",
-									name="name"
-								)
-								.text-danger.row-spaced-small(ng-show="newDocForm.name.$error.validFile")
-
-					// No groups available, from account directly
-					div(ng-if="!hasGroups()")
-
-						div.text-center
-							h3 Import bibtex from your Mendeley account
-
-						form(novalidate, name="newLinkedFileForm")
-							.row-spaced.small
-								label(for="name") File name in this project
-								input.form-control(
-									type="text",
-									placeholder="references.bib",
-									required,
-									ng-model="data.name",
-									on-enter="create()",
-									name="name"
-								)
-								.text-danger.row-spaced-small(ng-show="newDocForm.name.$error.validFile")
-
-					div(ng-if="state.inflight")
-						h3.text-center
+				// Forms, data and options
+				div
+					div(ng-if="state.fetchingGroups")
+						h2.text-center
 							small
 								i.fa.fa-refresh.fa-spin.fa-fw
-								|&nbsp;Importing...
+								|&nbsp;Loading...
 
-			// error message
-			div(ng-show="state.error").text-center
-				hr
-				.alert.alert-danger(ng-show="state.error")
-					div(ng-show="state.errorType == 'default'")
-						| #{translate("mendeley_reference_loading_error")}
+					div(ng-if="!state.fetchingGroups")
+						// Has groups available
+						div(ng-if="hasGroups()")
+							div.text-center
+								h3 Import bibtex from your Mendeley Account or Group
 
-					div(ng-show="state.errorType == 'expired'")
-						| #{translate("mendeley_reference_loading_error_expired")}
+							form(novalidate, name="newLinkedFileForm")
+								.form-controls
 
-					div(ng-show="state.errorType == 'forbidden'")
-						| #{translate("mendeley_reference_loading_error_forbidden")}
+									label(for="group-select") Select a Group (optional)
+									select.form-control(
+										name="group-select"
+										ng-model="data.selectedGroupId"
+									)
+										option(value="" selected) - Select a Group (optional)
+										option(
+											ng-repeat="group in data.groups"
+											value="{{ group.id }}"
+										) {{ group.name }}
 
-					div(ng-show="state.errorType == 'refresh-failed'")
-						| #{translate("mendeley_reference_loading_error_expired")}
+									br
 
-				// token refresh failed, prompt to relink account
-				div(ng-show="state.error && state.errorType == 'refresh-failed'")
-					div()
-						p #{translate("mendeley_sync_description" )} 
-						p
-							a(href,ng-click="linkAccount()").btn.btn-info #{translate("link_to_mendeley")}
+									label(for="name") File name in this project
+									input.form-control(
+										type="text",
+										placeholder="references.bib",
+										required,
+										ng-model="data.name",
+										on-enter="create()",
+										name="name"
+									)
+									.text-danger.row-spaced-small(ng-show="newDocForm.name.$error.validFile")
 
-				div(ng-show="state.error && state.errorType != 'refresh-failed' ")
-					div
+						// No groups available, from account directly
+						div(ng-if="!hasGroups()")
+
+							div.text-center
+								h3 Import bibtex from your #{providerName} account
+
+							form(novalidate, name="newLinkedFileForm")
+								.row-spaced.small
+									label(for="name") File name in this project
+									input.form-control(
+										type="text",
+										placeholder="references.bib",
+										required,
+										ng-model="data.name",
+										on-enter="create()",
+										name="name"
+									)
+									.text-danger.row-spaced-small(ng-show="newDocForm.name.$error.validFile")
+
+						div(ng-if="state.inflight")
+							h3.text-center
+								small
+									i.fa.fa-refresh.fa-spin.fa-fw
+									|&nbsp;Importing...
+
+				// error message
+				div(ng-show="state.error").text-center
+					hr
+					.alert.alert-danger(ng-show="state.error")
+						div(ng-show="state.errorType == 'default'")
+							| #{translate(providerKey+"_reference_loading_error")}
+
+						div(ng-show="state.errorType == 'expired'")
+							| #{translate(providerKey+"_reference_loading_error_expired")}
+
+						div(ng-show="state.errorType == 'forbidden'")
+							| #{translate(providerKey+"_reference_loading_error_forbidden")}
+
+						div(ng-show="state.errorType == 'refresh-failed'")
+							| #{translate(providerKey+"_reference_loading_error_expired")}
+
+					// token refresh failed, prompt to relink account
+					div(ng-show="state.error && state.errorType == 'refresh-failed'")
+						div()
+							p #{translate(providerKey+"_sync_description" )} 
+							p
+								a(href,ng-click="linkAccount()").btn.btn-info #{translate("link_to_" + providerKey)}
+
+					div(ng-show="state.error && state.errorType != 'refresh-failed' ")
 						div
-							| #{translate("reference_error_relink_hint")} &nbsp;
-						div
-							a(href="/user/settings", target="_blank", style="font-weight: bold")
-								| #{translate("account_settings")}
-			// end of error messages
+							div
+								| #{translate("reference_error_relink_hint")} &nbsp;
+							div
+								a(href="/user/settings", target="_blank", style="font-weight: bold")
+									| #{translate("account_settings")}
+				// end of error messages
 
-div(ng-if="type == 'zotero'", ng-controller="ZoteroLinkedFileModalController")
-	// When the user doesn't have this feature
-	div(ng-if="!userHasProviderFeature")
-		p.small #{translate("zotero_sync_description")}
-		.alert.alert-info
-			p #{translate("zotero_is_premium")}
-			p
-				a.btn.btn-info(ng-click="startFreeTrial(provider)") #{translate("start_free_trial")}
-
-	div(ng-if="userHasProviderFeature").referencesImportModal
-
-		// When the user has not linked to the provider
-		div(ng-if="!userHasProviderLink")
-			p #{translate("zotero_sync_description" )} 
-			p
-				a(href,ng-click="linkAccount()").btn.btn-info #{translate("link_to_zotero")}
-
-		// When the user has linked, the happy path
-		div(ng-if="userHasProviderLink")
-			// Forms, data and options
-			div
-				div(ng-if="state.fetchingGroups")
-					h2.text-center
-						small
-							i.fa.fa-refresh.fa-spin.fa-fw
-							|&nbsp;Loading...
-
-				div(ng-if="!state.fetchingGroups")
-					// Has groups available
-					div(ng-if="hasGroups()")
-						div.text-center
-							h3 Import bibtex from your Zotero Account or Group
-
-						form(novalidate, name="newLinkedFileForm")
-							.form-controls
-
-								label(for="group-select") Select a Group (optional)
-								select.form-control(
-									name="group-select"
-									ng-model="data.selectedGroupId"
-								)
-									option(value="" selected) - Select a Group (optional)
-									option(
-										ng-repeat="group in data.groups"
-										value="{{ group.id }}"
-									) {{ group.name }}
-
-								br
-
-								label(for="name") File name in this project
-								input.form-control(
-									type="text",
-									placeholder="references.bib",
-									required,
-									ng-model="data.name",
-									on-enter="create()",
-									name="name"
-								)
-								.text-danger.row-spaced-small(ng-show="newDocForm.name.$error.validFile")
-
-					// No groups available, from account directly
-					div(ng-if="!hasGroups()")
-
-						div.text-center
-							h3 Import bibtex from your Mendeley account
-
-						form(novalidate, name="newLinkedFileForm")
-							.row-spaced.small
-								label(for="name") File name in this project
-								input.form-control(
-									type="text",
-									placeholder="references.bib",
-									required,
-									ng-model="data.name",
-									on-enter="create()",
-									name="name"
-								)
-								.text-danger.row-spaced-small(ng-show="newDocForm.name.$error.validFile")
-
-					div(ng-if="state.inflight")
-						h3.text-center
-							small
-								i.fa.fa-refresh.fa-spin.fa-fw
-								|&nbsp;Importing...
-
-			// error message
-			div(ng-show="state.error").text-center
-				hr
-				.alert.alert-danger(ng-show="state.error")
-					div(ng-show="state.errorType == 'default'")
-						| #{translate("mendeley_reference_loading_error")}
-
-					div(ng-show="state.errorType == 'expired'")
-						| #{translate("mendeley_reference_loading_error_expired")}
-
-					div(ng-show="state.errorType == 'forbidden'")
-						| #{translate("mendeley_reference_loading_error_forbidden")}
-
-					div(ng-show="state.errorType == 'refresh-failed'")
-						| #{translate("mendeley_reference_loading_error_expired")}
-
-				// token refresh failed, prompt to relink account
-				div(ng-show="state.error && state.errorType == 'refresh-failed'")
-					div()
-						p #{translate("mendeley_sync_description" )} 
-						p
-							a(href,ng-click="linkAccount()").btn.btn-info #{translate("link_to_mendeley")}
-
-				div(ng-show="state.error && state.errorType != 'refresh-failed' ")
-					div
-						div
-							| #{translate("reference_error_relink_hint")} &nbsp;
-						div
-							a(href="/user/settings", target="_blank", style="font-weight: bold")
-								| #{translate("account_settings")}
-			// end of error messages
++providerPanel('mendeley', 'MendeleyLinkedFileModalController', 'Mendeley')
++providerPanel('zotero', 'ZoteroLinkedFileModalController', 'Zotero')
