@@ -1,4 +1,3 @@
 define [
-	"ide/tpr-webmodule/controllers/ReferencesController"
-	"ide/tpr-webmodule/controllers/MendeleyLinkedFileModalController"
+	"ide/tpr-webmodule/controllers/LinkedFileModalControllers"
 ], () ->

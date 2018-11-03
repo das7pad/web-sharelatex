@@ -2,14 +2,11 @@
 define [
 	"base"
 ], (App) ->
-
-	App.controller "MendeleyLinkedFileModalController", [
+	controllerForProvider = (provider, supportsGroups) ->	[
 		"$scope", "ide", "$timeout", "$window", "$interval", "event_tracking", "sixpack"
 		($scope,   ide,   $timeout,   $window,   $interval,   event_tracking,   sixpack) ->
-
-			provider = 'mendeley'
 			features = ide.$scope.user?.features
-			$scope.userHasProviderFeature = features?.mendeley or features?.references
+			$scope.userHasProviderFeature = features?[provider] or features?.references
 			$scope.userHasProviderLink = ide.$scope.user?.refProviders?[provider]
 
 			$scope.canLoadBibtex = () ->
@@ -51,11 +48,11 @@ define [
 			$scope.hasGroups = () ->
 				$scope.data.groups? && $scope.data.groups.length > 0
 
-			$scope.fetchGroups = () ->
+			$scope.supportsGroups = () ->
 				return unless $scope.canLoadBibtex()
 				_reset()
 				$scope.state.fetchingGroups = true
-				ide.$http.get("/mendeley/groups", {disableAutoLoginRedirect: true})
+				ide.$http.get("/#{provider}/groups", {disableAutoLoginRedirect: true})
 					.then (resp) ->
 						{ data } = resp
 						$scope.data.groups = data.groups
@@ -79,6 +76,7 @@ define [
 			$scope.$watch 'data.name', validate
 
 			$scope.$on 'create', () ->
+				console.log 'create', provider, $scope.data
 				return unless $scope.data.isInitialized
 				return unless (
 					$scope.data.isInitialized &&
@@ -95,10 +93,10 @@ define [
 				else
 					# Import from Account
 					payload = {}
-				event_tracking.send("references-mendeley", "modal", "import-bibtex")
+				event_tracking.send("references-#{provider}", "modal", "import-bibtex")
 				$scope.state.inflight = true
 				ide.fileTreeManager
-					.createLinkedFile($scope.data.name, $scope.parent_folder, 'mendeley', payload)
+					.createLinkedFile($scope.data.name, $scope.parent_folder, provider, payload)
 					.then () ->
 						$scope.$emit 'references:should-reindex', {}
 						$scope.$emit 'done'
@@ -108,12 +106,15 @@ define [
 
 			_init = () ->
 				return unless $scope.canLoadBibtex()
-				$scope.state.fetchingGroups = true
-				$timeout(
-					() ->
-						$scope.fetchGroups()
-					, 500
-				)
+				if supportsGroups
+					$scope.state.fetchingGroups = true
+					$timeout(
+						() ->
+							$scope.supportsGroups()
+						, 500
+					)
+				else
+					$scope.data.isInitialized = true
 			_init()
 
 			# Stuff for managing trials and linkages
@@ -148,7 +149,7 @@ define [
 						$scope.userHasProviderLink = true
 						ide.$scope.user.refProviders[provider] = true
 						$timeout(
-							$scope.fetchGroups()
+							$scope.supportsGroups()
 							, 500
 						)
 						$interval.cancel(poller)
@@ -158,3 +159,7 @@ define [
 
 			window._S = $scope
 	]
+
+	App.controller "MendeleyLinkedFileModalController", controllerForProvider('mendeley', true)
+	App.controller "ZoteroLinkedFileModalController", controllerForProvider('zotero', false)
+

@@ -126,6 +126,7 @@ module.exports = UserAdminController =
 		'features.references',
 		'features.referencesSearch',
 		'features.mendeley',
+		'features.zotero',
 		'awareOfV2'
 	]
 	SUPER_ADMIN_ALLOWED_ATTRIBUTES: [
@@ -141,6 +142,7 @@ module.exports = UserAdminController =
 		'features.references',
 		'features.referencesSearch',
 		'features.mendeley',
+		'features.zotero',
 		'awareOfV2',
 		'isAdmin'
 	]
