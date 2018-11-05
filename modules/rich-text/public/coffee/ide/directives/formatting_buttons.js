@@ -1,65 +1,82 @@
-define ['base'], (App) ->
-  BUTTON_WIDTH = 33
-  OVERFLOWED_BUTTON_WIDTH = 70
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define(['base'], function(App) {
+  const BUTTON_WIDTH = 33;
+  const OVERFLOWED_BUTTON_WIDTH = 70;
 
-  App.directive "formattingButtons", () ->
-    return {
+  return App.directive("formattingButtons", () =>
+    ({
       scope: {
-        buttons: "="
-        opening: "="
+        buttons: "=",
+        opening: "=",
         isFullscreenEditor: "="
-      }
+      },
 
-      link: (scope, element, attrs) ->
-        scope.showMore = false
-        scope.shownButtons = []
-        scope.overflowedButtons = []
+      link(scope, element, attrs) {
+        scope.showMore = false;
+        scope.shownButtons = [];
+        scope.overflowedButtons = [];
 
-        # Wait until the editor is not "opening" anymore (i.e. it's fully
-        # loaded). This means we can acurately measure the element width
-        unbindOpeningWatcher = scope.$watch 'opening', (isOpening) ->
-          if !isOpening
-            measure()
-            setUpWindowResizeListeners()
-            unbindOpeningWatcher()
+        // Wait until the editor is not "opening" anymore (i.e. it's fully
+        // loaded). This means we can acurately measure the element width
+        var unbindOpeningWatcher = scope.$watch('opening', function(isOpening) {
+          if (!isOpening) {
+            measure();
+            setUpWindowResizeListeners();
+            return unbindOpeningWatcher();
+          }
+        });
 
-        measure = () ->
-          availableSpace = element.width()
-          noOfShowableButtons = Math.floor(availableSpace / BUTTON_WIDTH)
+        var measure = function() {
+          let availableSpace = element.width();
+          let noOfShowableButtons = Math.floor(availableSpace / BUTTON_WIDTH);
 
-          if noOfShowableButtons < scope.buttons.length
-            scope.showMore = true
+          if (noOfShowableButtons < scope.buttons.length) {
+            scope.showMore = true;
 
-            availableSpace = availableSpace - OVERFLOWED_BUTTON_WIDTH
-            noOfShowableButtons = Math.floor(availableSpace / BUTTON_WIDTH)
+            availableSpace = availableSpace - OVERFLOWED_BUTTON_WIDTH;
+            noOfShowableButtons = Math.floor(availableSpace / BUTTON_WIDTH);
 
-            split(noOfShowableButtons)
-          else
-            scope.showMore = false
-            split(noOfShowableButtons)
+            return split(noOfShowableButtons);
+          } else {
+            scope.showMore = false;
+            return split(noOfShowableButtons);
+          }
+        };
 
-        split = (splitIndex) ->
-          scope.$applyAsync () ->
-            scope.shownButtons = scope.buttons.slice(0, splitIndex)
-            scope.overflowedButtons = scope.buttons.slice(splitIndex)
+        var split = splitIndex =>
+          scope.$applyAsync(function() {
+            scope.shownButtons = scope.buttons.slice(0, splitIndex);
+            return scope.overflowedButtons = scope.buttons.slice(splitIndex);
+          })
+        ;
 
-        debouncedMeasure = _.debounce(measure, 300)
+        const debouncedMeasure = _.debounce(measure, 300);
 
-        setUpWindowResizeListeners = () ->
-          $(window).on 'resize', debouncedMeasure
-          if attrs.resizeOn?
-            for event in attrs.resizeOn.split(',')
-              scope.$on event, debouncedMeasure
+        var setUpWindowResizeListeners = function() {
+          $(window).on('resize', debouncedMeasure);
+          if (attrs.resizeOn != null) {
+            return Array.from(attrs.resizeOn.split(',')).map((event) =>
+              scope.$on(event, debouncedMeasure));
+          }
+        };
 
-        tearDownResizeListeners = () ->
-          $(window).off 'resize', debouncedMeasure
+        const tearDownResizeListeners = () => $(window).off('resize', debouncedMeasure);
 
-        scope.$watch '$destroy', () ->
-          tearDownResizeListeners()
+        scope.$watch('$destroy', () => tearDownResizeListeners());
 
-        scope.$watch 'isFullscreenEditor', (oldVal, newVal) ->
-          return if oldVal == newVal
-          debouncedMeasure()
+        return scope.$watch('isFullscreenEditor', function(oldVal, newVal) {
+          if (oldVal === newVal) { return; }
+          return debouncedMeasure();
+        });
+      },
 
       templateUrl: 'formattingButtonsTpl'
-    }
+    })
+);
+});

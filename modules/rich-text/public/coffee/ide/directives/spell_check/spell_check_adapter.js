@@ -1,46 +1,66 @@
-define [], () ->
-  class SpellCheckAdapter
-    constructor: (@editor) ->
-      @highlightedWordManager = @editor.highlightedWordManager
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([], function() {
+  let SpellCheckAdapter;
+  return (SpellCheckAdapter = class SpellCheckAdapter {
+    constructor(editor) {
+      this.replaceWord = this.replaceWord.bind(this);
+      this.editor = editor;
+      this.highlightedWordManager = this.editor.highlightedWordManager;
+    }
 
-    getLines: () ->
-      @editor.getCodeMirror().getValue().split('\n')
+    getLines() {
+      return this.editor.getCodeMirror().getValue().split('\n');
+    }
 
-    normalizeChangeEvent: (e) ->
+    normalizeChangeEvent(e) {
       return {
         start: { row: e.from.line, },
         end: { row: e.to.line },
-        action: if e.removed? then 'remove' else 'insert'
-      }
+        action: (e.removed != null) ? 'remove' : 'insert'
+      };
+    }
 
-    getCoordsFromContextMenuEvent: (e) ->
-      e.stopPropagation()
+    getCoordsFromContextMenuEvent(e) {
+      e.stopPropagation();
       return {
-        x: e.pageX
+        x: e.pageX,
         y: e.pageY
-      }
+      };
+    }
 
-    isContextMenuEventOnBottomHalf: (e) -> 
-      clientY = e.clientY
-      editorBoundingRect = e.currentTarget.getBoundingClientRect()
-      relativeYPos = (clientY - editorBoundingRect.top) / editorBoundingRect.height
-      return relativeYPos > 0.5
+    isContextMenuEventOnBottomHalf(e) { 
+      const { clientY } = e;
+      const editorBoundingRect = e.currentTarget.getBoundingClientRect();
+      const relativeYPos = (clientY - editorBoundingRect.top) / editorBoundingRect.height;
+      return relativeYPos > 0.5;
+    }
       
-    preventContextMenuEventDefault: (e) ->
-      e.preventDefault()
+    preventContextMenuEventDefault(e) {
+      return e.preventDefault();
+    }
 
-    getHighlightFromCoords: (coords) ->
-      position = @editor.getCodeMirror().coordsChar({
+    getHighlightFromCoords(coords) {
+      const position = this.editor.getCodeMirror().coordsChar({
         left: coords.x,
         top: coords.y
-      })
-      @highlightedWordManager.findHighlightAtPosition(position)
+      });
+      return this.highlightedWordManager.findHighlightAtPosition(position);
+    }
 
-    selectHighlightedWord: (highlight) ->
-      position = highlight.marker.find()
-      @editor.getCodeMirror().setSelection(position.from, position.to)
+    selectHighlightedWord(highlight) {
+      const position = highlight.marker.find();
+      return this.editor.getCodeMirror().setSelection(position.from, position.to);
+    }
 
-    replaceWord: (highlight, newWord) =>
-      codeMirror = @editor.getCodeMirror()
-      codeMirror.replaceSelection(newWord)
-      codeMirror.focus()
+    replaceWord(highlight, newWord) {
+      const codeMirror = this.editor.getCodeMirror();
+      codeMirror.replaceSelection(newWord);
+      return codeMirror.focus();
+    }
+  });
+});

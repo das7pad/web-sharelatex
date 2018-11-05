@@ -1,20 +1,29 @@
-define [
-  "base"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
+  "base",
   "utils/EventEmitter"
-], (App, EventEmitter) ->
-  App.controller "EditorLoaderController", ($scope, localStorage) ->
+], (App, EventEmitter) =>
+  App.controller("EditorLoaderController", function($scope, localStorage) {
     $scope.richText = {
-      bundle: null
+      bundle: null,
       formattingEvents: new EventEmitter()
-    }
+    };
 
-    $scope.$watch "editor.showRichText", (val) ->
+    return $scope.$watch("editor.showRichText", function(val) {
       localStorage(
-        "editor.mode.#{$scope.project_id}",
-        if val == true then 'rich-text' else 'source'
-      )
+        `editor.mode.${$scope.project_id}`,
+        val === true ? 'rich-text' : 'source'
+      );
 
-      if val and !$scope.richText.bundle
-        requirejs ['rich-text'], (bundle) ->
-          $scope.$applyAsync () ->
-            $scope.richText.bundle = bundle
+      if (val && !$scope.richText.bundle) {
+        return requirejs(['rich-text'], bundle =>
+          $scope.$applyAsync(() => $scope.richText.bundle = bundle)
+        );
+      }
+    });
+  })
+);

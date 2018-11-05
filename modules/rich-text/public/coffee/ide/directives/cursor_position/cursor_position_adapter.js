@@ -1,51 +1,69 @@
-define [], () ->
-  # Number of lines rendered above/below visible lines
-  VIEWPORT_MARGIN = 10
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([], function() {
+  // Number of lines rendered above/below visible lines
+  let CursorPositionAdapter;
+  const VIEWPORT_MARGIN = 10;
 
-  class CursorPositionAdapter
-    constructor: (@editor) ->
+  return (CursorPositionAdapter = class CursorPositionAdapter {
+    constructor(editor) {
+      this.getCursor = this.getCursor.bind(this);
+      this.editor = editor;
+    }
 
-    convertToAcePos: ({ line, ch }) ->
+    convertToAcePos({ line, ch }) {
       return {
-        row: line
+        row: line,
         column: ch
-      }
+      };
+    }
 
-    convertFromAcePos: ({ row, column }) ->
+    convertFromAcePos({ row, column }) {
       return {
         line: row,
         ch: column
-      }
+      };
+    }
 
-    getCursor: () =>
-      @convertToAcePos(@editor.getCodeMirror().getCursor())
+    getCursor() {
+      return this.convertToAcePos(this.editor.getCodeMirror().getCursor());
+    }
 
-    getEditorScrollPosition: () ->
-      # CodeMirror renders some lines out of the viewport to improve scrolling
-      # performance. We therefore have to add some extra lines onto the
-      # calculation to account for this
-      viewport = @editor.getCodeMirror().getViewport()
-      viewport.from + VIEWPORT_MARGIN
+    getEditorScrollPosition() {
+      // CodeMirror renders some lines out of the viewport to improve scrolling
+      // performance. We therefore have to add some extra lines onto the
+      // calculation to account for this
+      const viewport = this.editor.getCodeMirror().getViewport();
+      return viewport.from + VIEWPORT_MARGIN;
+    }
 
-    setCursor: (pos) ->
-      pos = pos.cursorPosition or { row: 0, column: 0 }
-      @editor.getCodeMirror().setCursor(@convertFromAcePos(pos))
+    setCursor(pos) {
+      pos = pos.cursorPosition || { row: 0, column: 0 };
+      return this.editor.getCodeMirror().setCursor(this.convertFromAcePos(pos));
+    }
 
-    setEditorScrollPosition: (pos) ->
-      pos = pos.firstVisibleLine or 0
-      codeMirror = @editor.getCodeMirror()
-      height = codeMirror.heightAtLine(pos, 'local')
-      codeMirror.scrollTo(null, height)
+    setEditorScrollPosition(pos) {
+      pos = pos.firstVisibleLine || 0;
+      const codeMirror = this.editor.getCodeMirror();
+      const height = codeMirror.heightAtLine(pos, 'local');
+      return codeMirror.scrollTo(null, height);
+    }
 
-    clearSelection: () ->
-      # This method is only used by track changes, which rich text does not
-      # (yet) support. Therefore it is left as a no-op
+    clearSelection() {}
+      // This method is only used by track changes, which rich text does not
+      // (yet) support. Therefore it is left as a no-op
 
-    gotoLine: (line, ch) ->
-      codeMirror = @editor.getCodeMirror()
-      codeMirror.setCursor({ line: line, ch: ch })
-      codeMirror.focus()
+    gotoLine(line, ch) {
+      const codeMirror = this.editor.getCodeMirror();
+      codeMirror.setCursor({ line, ch });
+      return codeMirror.focus();
+    }
 
-    gotoOffset: () ->
-      # This method is only used by track changes, which rich text does not
-      # (yet) support. Therefore it is left as a no-op
+    gotoOffset() {}
+  });
+});
+      // This method is only used by track changes, which rich text does not
+      // (yet) support. Therefore it is left as a no-op
