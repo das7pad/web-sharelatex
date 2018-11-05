@@ -28,7 +28,8 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
     }
 
     $scope.currencyCode = MultiCurrencyPricing.currencyCode
-    $scope.plans = MultiCurrencyPricing.plans
+    $scope.allCurrencies = MultiCurrencyPricing.plans
+    $scope.availableCurrencies = {}
     $scope.planCode = window.plan_code
 
     $scope.switchToStudent = function() {
@@ -101,6 +102,13 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
           ? pricing.items.plan.trial.length
           : undefined
       $scope.monthlyBilling = pricing.items.plan.period.length === 1
+
+      $scope.availableCurrencies = {}
+      for (let currencyCode in pricing.items.plan.price) {
+        const data = pricing.items.plan.price[currencyCode]
+        $scope.availableCurrencies[currencyCode] =
+          MultiCurrencyPricing.plans[currencyCode]
+      }
 
       if (
         __guard__(

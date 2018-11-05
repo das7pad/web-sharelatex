@@ -197,14 +197,15 @@ define(['base', 'libs/recurly-4.8.5'], function(App, recurly) {
     }
   })
 
-  return App.controller('PlansController', function(
+  App.controller('PlansController', function(
     $scope,
     $modal,
     event_tracking,
     MultiCurrencyPricing,
     $http,
     $filter,
-    ipCookie
+    ipCookie,
+    $location
   ) {
     let switchEvent
     $scope.showPlans = true
@@ -266,14 +267,27 @@ define(['base', 'libs/recurly-4.8.5'], function(App, recurly) {
     }
 
     $scope.openGroupPlanModal = function() {
-      $modal.open({
-        templateUrl: 'groupPlanModalTemplate'
-      })
+      history.replaceState(
+        null,
+        document.title,
+        window.location.pathname + '#groups'
+      )
+      $modal
+        .open({
+          templateUrl: 'groupPlanModalPurchaseTemplate',
+          controller: 'GroupPlansModalPurchaseController'
+        })
+        .result.finally(() =>
+          history.replaceState(null, document.title, window.location.pathname)
+        )
       return event_tracking.send(
         'subscription-funnel',
         'plans-page',
         'group-inquiry-potential'
       )
+    }
+    if ($location.hash() === 'groups') {
+      $scope.openGroupPlanModal()
     }
 
     var eventLabel = (label, location) => label
@@ -282,6 +296,93 @@ define(['base', 'libs/recurly-4.8.5'], function(App, recurly) {
       e.preventDefault()
       const gaLabel = eventLabel(label, location)
       return event_tracking.send('subscription-funnel', 'plans-page', gaLabel)
+    })
+  })
+
+  return App.controller('GroupPlansModalPurchaseController', function(
+    $scope,
+    $modal
+  ) {
+    $scope.options = {
+      plan_codes: [
+        {
+          display: 'Collaborator',
+          code: 'collaborator'
+        },
+        {
+          display: 'Professional',
+          code: 'professional'
+        }
+      ],
+      currencies: [
+        {
+          display: 'USD ($)',
+          code: 'USD'
+        },
+        {
+          display: 'GBP (£)',
+          code: 'GBP'
+        },
+        {
+          display: 'EUR (€)',
+          code: 'EUR'
+        }
+      ],
+      currencySymbols: {
+        USD: '$',
+        EUR: '€',
+        GBP: '£'
+      },
+      sizes: [2, 3, 4, 5, 10, 20, 50],
+      usages: [
+        {
+          display: 'Enterprise',
+          code: 'enterprise'
+        },
+        {
+          display: 'Educational',
+          code: 'educational'
+        }
+      ]
+    }
+
+    $scope.prices = window.groupPlans
+
+    let currency = 'USD'
+    if (['USD', 'GBP', 'EUR'].includes(window.recomendedCurrency)) {
+      currency = window.recomendedCurrency
+    }
+
+    $scope.selected = {
+      plan_code: 'collaborator',
+      currency,
+      size: '10',
+      usage: 'educational'
+    }
+
+    $scope.recalculatePrice = function() {
+      let plan_code, size, usage
+      ;({ usage, plan_code, currency, size } = $scope.selected)
+      const price = $scope.prices[usage][plan_code][currency][size]
+      const currencySymbol = $scope.options.currencySymbols[currency]
+      return ($scope.displayPrice = `${currencySymbol}${price}`)
+    }
+
+    $scope.$watch('selected', $scope.recalculatePrice, true)
+    $scope.recalculatePrice()
+
+    $scope.purchase = function() {
+      let plan_code, size, usage
+      ;({ plan_code, size, usage, currency } = $scope.selected)
+      plan_code = `group_${plan_code}_${size}_${usage}`
+      return (window.location = `/user/subscription/new?planCode=${plan_code}&currency=${currency}&svf=true`)
+    }
+
+    return ($scope.payByInvoice = function() {
+      $modal.open({
+        templateUrl: 'groupPlanModalInquiryTemplate'
+      })
+      return $scope.$close()
     })
   })
 })
