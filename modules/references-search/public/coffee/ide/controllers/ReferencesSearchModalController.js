@@ -1,3 +1,12 @@
+/* eslint-disable
+    camelcase,
+    max-len,
+    no-return-assign,
+    no-undef,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -96,7 +105,7 @@ define([
 		$scope.moveSelectionBackward = function() {
 			if ($scope.state.selectedIndex === null) {
 				// do nothing
-				return;
+				
 			} else {
 				if ($scope.state.searchResults && ($scope.state.searchResults.length > 0)) {
 					$scope.state.selectedIndex--;
