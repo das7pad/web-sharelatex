@@ -1,44 +1,56 @@
-define [
-	"base"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
+	"base",
 	"ide/permissions/PermissionsManager"
-], (App, PermissionsManager) ->
+], function(App, PermissionsManager) {
 	
-	POLLING_INTERVAL = 15
-	ONE_MIN_MILI = 1000 * 60
+	const POLLING_INTERVAL = 15;
+	const ONE_MIN_MILI = 1000 * 60;
 
-	cachedState =
-		gotLinkStatus: false
-		startedLinkProcess: false
-		userIsLinkedToDropbox: false
+	let cachedState = {
+		gotLinkStatus: false,
+		startedLinkProcess: false,
+		userIsLinkedToDropbox: false,
 		hasDropboxFeature: false
+	};
 
 
-	App.controller "DropboxController", ($scope, $modal, ide) ->
-		$scope.openDropboxModal = () ->
+	App.controller("DropboxController", ($scope, $modal, ide) =>
+		$scope.openDropboxModal = () =>
 
-			$modal.open {
-				templateUrl: "dropboxModalTemplate"
-				controller: "DropboxModalController"
+			$modal.open({
+				templateUrl: "dropboxModalTemplate",
+				controller: "DropboxModalController",
 				scope:$scope
-			}
+			})
+		
+);
 
-	App.controller "DropboxModalController", ($scope, $modalInstance, ide, $timeout, $http) ->
-		user_id = ide.$scope.user.id
+	return App.controller("DropboxModalController", function($scope, $modalInstance, ide, $timeout, $http) {
+		const user_id = ide.$scope.user.id;
 
-		$scope.dbState = cachedState
-		$scope.dbState.hasDropboxFeature = $scope.project.features.dropbox
+		$scope.dbState = cachedState;
+		$scope.dbState.hasDropboxFeature = $scope.project.features.dropbox;
 
 		$http.get("/dropbox/status")
-			.then (response) ->
-				dropboxStatus = response.data
-				$scope.dbState.gotLinkStatus = true
-				if dropboxStatus.registered
-					$scope.dbState.userIsLinkedToDropbox = true
-					cachedState = $scope.dbState
+			.then(function(response) {
+				const dropboxStatus = response.data;
+				$scope.dbState.gotLinkStatus = true;
+				if (dropboxStatus.registered) {
+					$scope.dbState.userIsLinkedToDropbox = true;
+					return cachedState = $scope.dbState;
+				}
+		});
 		
-		$scope.linkToDropbox = ->
-			window.open("/user/settings#dropboxSettings")
-			$scope.startedLinkProcess = true
+		$scope.linkToDropbox = function() {
+			window.open("/user/settings#dropboxSettings");
+			return $scope.startedLinkProcess = true;
+		};
 
-		$scope.cancel = () ->
-			$modalInstance.dismiss()
+		return $scope.cancel = () => $modalInstance.dismiss();
+	});
+});
