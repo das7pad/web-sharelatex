@@ -1,3 +1,5 @@
+// TODO: This file was created by bulk-decaffeinate.
+// Sanity-check the conversion and remove this comment.
 define([
   "ide/rich-text/directives/cm_editor",
   "ide/rich-text/directives/formatting_buttons",
