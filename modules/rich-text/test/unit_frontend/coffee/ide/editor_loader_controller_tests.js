@@ -1,48 +1,61 @@
-define [
-  "ide/rich-text/controllers/editor_loader_controller"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
+  "ide/rich-text/controllers/editor_loader_controller",
   "utils/EventEmitter"
-], (EditorLoaderController, EventEmitter) ->
-  describe 'EditorLoaderController', () ->
-    beforeEach module 'SharelatexApp'
+], (EditorLoaderController, EventEmitter) =>
+  describe('EditorLoaderController', function() {
+    beforeEach(module('SharelatexApp'));
 
-    origRequireJsFn = null
-    beforeEach () ->
-      origRequireJsFn = window.requirejs
-      window.requirejs = @requirejs = sinon.stub()
+    let origRequireJsFn = null;
+    beforeEach(function() {
+      origRequireJsFn = window.requirejs;
+      return window.requirejs = (this.requirejs = sinon.stub());
+    });
 
-    afterEach () ->
-      window.requirejs = origRequireJsFn
+    afterEach(() => window.requirejs = origRequireJsFn);
 
-    it 'inits richText scope', () ->
-      inject ($rootScope, $controller) =>
-        $scope = $rootScope.$new()
-        $controller('EditorLoaderController', { $scope: $scope })
+    it('inits richText scope', () =>
+      inject(($rootScope, $controller) => {
+        const $scope = $rootScope.$new();
+        $controller('EditorLoaderController', { $scope });
 
-        expect($scope.richText.bundle).to.equal(null)
-        expect($scope.richText.formattingEvents).to.be.an.instanceof(EventEmitter)
+        expect($scope.richText.bundle).to.equal(null);
+        return expect($scope.richText.formattingEvents).to.be.an.instanceof(EventEmitter);
+      })
+    );
 
-    it 'watches showRichText and loads bundle if true', () ->
-      inject ($rootScope, $controller) =>
-        $scope = $rootScope.$new()
-        $scope.editor = { showRichText: false }
+    it('watches showRichText and loads bundle if true', function() {
+      return inject(($rootScope, $controller) => {
+        const $scope = $rootScope.$new();
+        $scope.editor = { showRichText: false };
 
-        expect(@requirejs).to.not.have.been.called
+        expect(this.requirejs).to.not.have.been.called;
 
-        $controller('EditorLoaderController', { $scope: $scope })
+        $controller('EditorLoaderController', { $scope });
 
-        $scope.editor.showRichText = true
-        $rootScope.$digest()
+        $scope.editor.showRichText = true;
+        $rootScope.$digest();
 
-        expect(@requirejs).to.have.been.called
+        return expect(this.requirejs).to.have.been.called;
+      });
+    });
 
-    it 'watches showRichText and does nothing if false', () ->
-      inject ($rootScope, $controller) =>
-        $scope = $rootScope.$new()
-        $scope.editor = { showRichText: true }
+    return it('watches showRichText and does nothing if false', function() {
+      return inject(($rootScope, $controller) => {
+        const $scope = $rootScope.$new();
+        $scope.editor = { showRichText: true };
 
-        $controller('EditorLoaderController', { $scope: $scope })
+        $controller('EditorLoaderController', { $scope });
 
-        $scope.editor.showRichText = false
-        $rootScope.$digest()
+        $scope.editor.showRichText = false;
+        $rootScope.$digest();
 
-        expect(@requirejs).to.not.have.been.called
+        return expect(this.requirejs).to.not.have.been.called;
+      });
+    });
+  })
+);
