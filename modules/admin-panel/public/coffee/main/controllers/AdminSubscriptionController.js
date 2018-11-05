@@ -1,36 +1,45 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base",
 	"libs/md5"
-], (App) ->
-	App.controller "AdminSubscriptionController", ($scope, $http) ->
-		$scope.subscription = window.data.subscription
-		$scope.user_id = window.data.user_id
+], function(App) {
+	App.controller("AdminSubscriptionController", function($scope, $http) {
+		$scope.subscription = window.data.subscription;
+		$scope.user_id = window.data.user_id;
 		
-		$scope.deleteSubscription = () ->
-			$scope.deleteError = false
-			$http({
-				url: "/admin/subscription/#{$scope.subscription._id}"
-				method: "DELETE"
-				headers:
+		return $scope.deleteSubscription = function() {
+			$scope.deleteError = false;
+			return $http({
+				url: `/admin/subscription/${$scope.subscription._id}`,
+				method: "DELETE",
+				headers: {
 					"X-CSRF-Token": window.csrfToken
+				}
 			})
-				.then () ->
-					window.location = "/admin/user/#{$scope.user_id}"
-				.catch () ->
-					$scope.deleteError = true
+				.then(() => window.location = `/admin/user/${$scope.user_id}`).catch(() => $scope.deleteError = true);
+		};
+	});
 		
 	
-	App.controller "AdminCreateSubscriptionController", ($scope) ->
-		$scope.subscription =
+	return App.controller("AdminCreateSubscriptionController", function($scope) {
+		$scope.subscription = {
 			customAccount: true,
 			groupPlan: true,
 			planCode: "professional",
 			membersLimit: 10,
 			admin_id: window.data.admin_id
+		};
 
-		$scope.onSuccess = (result) ->
-			subscription = result.data.subscription
-			location = "/admin/user/#{subscription.admin_id}/subscription/#{subscription._id}"
-			window.location = location
+		return $scope.onSuccess = function(result) {
+			const { subscription } = result.data;
+			const location = `/admin/user/${subscription.admin_id}/subscription/${subscription._id}`;
+			return window.location = location;
+		};
+	});
+});
 				
 
