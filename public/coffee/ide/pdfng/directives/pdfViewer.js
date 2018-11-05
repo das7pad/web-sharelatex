@@ -1,3 +1,14 @@
+/* eslint-disable
+    handle-callback-err,
+    max-len,
+    new-cap,
+    no-return-assign,
+    no-sequences,
+    no-undef,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -237,7 +248,7 @@ define([
 		this.computeOffset = function(page, position) {
 			// console.log 'computing offset for', page, position
 			const { element } = page;
-			//console.log 'element =', $(element), 'parent =', $(element).parent()
+			// console.log 'element =', $(element), 'parent =', $(element).parent()
 			const t1 = __guard__($(element).offset(), x => x.top);
 			const t2 = __guard__($(element).parent().offset(), x1 => x1.top);
 			if (!((t1 != null) && (t2 != null))) {
@@ -257,7 +268,7 @@ define([
 				// console.log 'addition offset =', pageOffset
 				// console.log 'total', pageTop + pageOffset[1]
 				return Math.round(pageTop + pageOffset[1] + currentScroll);
-			}); //# 10 is margin
+			}); // # 10 is margin
 		};
 
 		this.setPdfPosition = function(page, position) {
@@ -427,7 +438,7 @@ define([
 
 				queueLayout();
 
-				//scope.$on 'layout:pdf:view', (e, args) ->
+				// scope.$on 'layout:pdf:view', (e, args) ->
 				//	console.log 'pdf view change', element, e, args
 				//	queueLayout()
 
@@ -457,17 +468,17 @@ define([
 							scope.scale = angular.copy((scope.scale))).catch(error => scope.$emit('pdf:error:display'));
 					} else {
 						scope.$emit('pdf:error:display');
-						return;
+						
 					}
 				});
 
 				scope.$on('pdf:page:size-change', function(event, pageNum, delta) {
-					//console.log 'page size change event', pageNum, delta
+					// console.log 'page size change event', pageNum, delta
 					const origposition = angular.copy(scope.position);
-					//console.log 'orig position', JSON.stringify(origposition)
+					// console.log 'orig position', JSON.stringify(origposition)
 					if ((origposition != null) && ((pageNum - 1) < origposition.page) && (delta !== 0)) {
 						const currentScrollTop =  element.scrollTop();
-						//console.log 'adjusting scroll from', currentScrollTop, 'by', delta
+						// console.log 'adjusting scroll from', currentScrollTop, 'by', delta
 						scope.adjustingScroll = true;
 						return element.scrollTop(currentScrollTop + delta);
 					}
@@ -532,8 +543,8 @@ define([
 				};
 
 				element.on('scroll', function() {
-					//console.log 'scroll event', element.scrollTop(), 'adjusting?', scope.adjustingScroll
-					//scope.scrollPosition = element.scrollTop()
+					// console.log 'scroll event', element.scrollTop(), 'adjusting?', scope.adjustingScroll
+					// scope.scrollPosition = element.scrollTop()
 					if (scope.adjustingScroll) {
 						renderVisiblePages();
 						scope.adjustingScroll = false;
@@ -630,12 +641,12 @@ define([
 							// console.log 'page num is', pidx
 							const page = scope.pages[pidx];
 							return scope.document.getPdfViewport(page.pageNum).then(function(viewport) {
-								//console.log 'got viewport', viewport
+								// console.log 'got viewport', viewport
 								const coords = viewport.convertToViewportPoint(r[2], r[3]);
-								//console.log	'viewport position', coords
-								//console.log 'r is', r, 'r[1]', r[1], 'r[1].name', r[1].name
+								// console.log	'viewport position', coords
+								// console.log 'r is', r, 'r[1]', r[1], 'r[1].name', r[1].name
 								if (r[1].name === 'XYZ') {
-									//console.log 'XYZ:', r[2], r[3]
+									// console.log 'XYZ:', r[2], r[3]
 									const newPosition = {page: pidx, offset: {top: r[3], left: r[2]}};
 									return ctrl.setPdfPosition(scope.pages[pidx], newPosition);
 								}
@@ -647,7 +658,7 @@ define([
 				scope.$watch("highlights", function(areas) {
 					// console.log 'got HIGHLIGHTS in pdfViewer', areas
 					if ((areas == null)) { return; }
-					//console.log 'areas are', areas
+					// console.log 'areas are', areas
 					const highlights = Array.from(areas || []).map((area) => (
 						{
 							page: area.page - 1,
@@ -658,7 +669,7 @@ define([
 								width: area.width
 							}
 						}));
-					//console.log 'highlights', highlights
+					// console.log 'highlights', highlights
 
 					if (!highlights.length) { return; }
 

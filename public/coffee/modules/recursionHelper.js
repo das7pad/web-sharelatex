@@ -1,3 +1,9 @@
+/* eslint-disable
+    max-len,
+    no-undef,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -26,7 +32,7 @@ angular.module("RecursionHelper", []).factory("RecursionHelper", [
       
       // Break the recursion loop by removing the contents
       const contents = element.contents().remove();
-      let compiledContents = undefined;
+      let compiledContents;
       return {
         pre: ((link && link.pre) ? link.pre : null),
       

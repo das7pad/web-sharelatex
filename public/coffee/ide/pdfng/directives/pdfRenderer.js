@@ -1,3 +1,13 @@
+/* eslint-disable
+    handle-callback-err,
+    max-len,
+    new-cap,
+    no-return-assign,
+    no-undef,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -401,7 +411,7 @@ define([
 						, error => typeof self.errorCallback === 'function' ? self.errorCallback(error) : undefined);}).catch(function(error) {
 						// page render failed
 						if (error === 'cancelled') {
-							return; // do nothing when cancelled
+							 // do nothing when cancelled
 						} else {
 							return (typeof self.errorCallback === 'function' ? self.errorCallback(error) : undefined);
 						}

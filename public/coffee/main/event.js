@@ -1,3 +1,12 @@
+/* eslint-disable
+    camelcase,
+    max-len,
+    no-return-assign,
+    no-undef,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -120,7 +129,7 @@ define([
 });
 
 
-	//header
+	// header
 	return $('.navbar a').on("click", function(e){
 		const href = $(e.target).attr("href");
 		if (href != null) {

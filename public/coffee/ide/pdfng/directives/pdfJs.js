@@ -1,3 +1,11 @@
+/* eslint-disable
+    max-len,
+    no-cond-assign,
+    no-return-assign,
+    no-undef,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -121,7 +129,7 @@ define([
 						scope.$on(event, function(e) {});
 					}
 				}
-							//console.log 'got a resize event', event, e
+							// console.log 'got a resize event', event, e
 
 				scope.$on('progress', (event, progress) =>
 					scope.$apply(function() {

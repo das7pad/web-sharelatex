@@ -1,3 +1,14 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+    max-len,
+    no-dupe-class-members,
+    no-return-assign,
+    no-undef,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -157,7 +168,7 @@ define([
 					continue;
 				} else {
 					// Record prefixes a/b/c.tex -> 'a' and 'a/b'
-					for (let i = 1, end = parts.length - 1, asc = 1 <= end; asc ? i <= end : i >= end; asc ? i++ : i--) {
+					for (let i = 1, end = parts.length - 1, asc = end >= 1; asc ? i <= end : i >= end; asc ? i++ : i--) {
 						prefixes[parts.slice(0,i).join("/")] = true;
 					}
 				}

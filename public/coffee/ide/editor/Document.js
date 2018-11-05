@@ -1,3 +1,16 @@
+/* eslint-disable
+    camelcase,
+    constructor-super,
+    handle-callback-err,
+    max-len,
+    no-constant-condition,
+    no-eval,
+    no-return-assign,
+    no-this-before-super,
+    no-undef,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS001: Remove Babel/TypeScript constructor workaround

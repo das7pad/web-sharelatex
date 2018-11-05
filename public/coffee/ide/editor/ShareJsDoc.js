@@ -1,3 +1,16 @@
+/* eslint-disable
+    camelcase,
+    constructor-super,
+    max-len,
+    no-constant-condition,
+    no-eval,
+    no-return-assign,
+    no-this-before-super,
+    no-undef,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS001: Remove Babel/TypeScript constructor workaround
@@ -14,7 +27,7 @@ define([
 	"libs/sharejs"
 ], function(EventEmitter, ShareJs) {
 	let ShareJsDoc;
-	const SINGLE_USER_FLUSH_DELAY = 1000; //ms
+	const SINGLE_USER_FLUSH_DELAY = 1000; // ms
 
 	return ShareJsDoc = (function() {
 		ShareJsDoc = class ShareJsDoc extends EventEmitter {

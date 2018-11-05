@@ -1,3 +1,12 @@
+/* eslint-disable
+    camelcase,
+    max-len,
+    no-return-assign,
+    no-undef,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -15,7 +24,7 @@ define([
 ], function(_, EventEmitter, ColorManager, AceShareJsCodec) {
 	let TrackChangesManager;
 	return TrackChangesManager = (function() {
-		let Range = undefined;
+		let Range;
 		TrackChangesManager = class TrackChangesManager {
 			static initClass() {
 				({ Range } = ace.require("ace/range"));
@@ -102,7 +111,7 @@ define([
 				let _scrollTimeout = null;
 				var onChangeScroll = () => {
 					if (_scrollTimeout != null) {
-						return;
+						
 					} else {
 						return _scrollTimeout = setTimeout(() => {
 							this.recalculateVisibleEntries();

@@ -1,3 +1,11 @@
+/* eslint-disable
+    max-len,
+    no-return-assign,
+    no-undef,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -8,7 +16,7 @@
 define([
 	"base"
 ], App =>
-	//app = angular.module 'pdfHighlights', []
+	// app = angular.module 'pdfHighlights', []
 
 	App.factory('pdfHighlights', [ function() {
 		let pdfHighlights;

@@ -1,3 +1,13 @@
+/* eslint-disable
+    camelcase,
+    max-len,
+    no-cond-assign,
+    no-return-assign,
+    no-undef,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -245,7 +255,7 @@ define([
 			// if the previous run was a check, clear the error logs
 			if ($scope.check) { $scope.pdf.logEntries = []; }
 			// keep track of whether this is a compile or check
-			$scope.check = options.check ? true : false;
+			$scope.check = !!options.check;
 			if (options.check) { event_tracking.sendMB("syntax-check-request"); }
 			// send appropriate check type to clsi
 			let checkType = (() => { switch (false) {
@@ -272,7 +282,7 @@ define([
 		};
 
 		const buildPdfDownloadUrl = function(pdfDownloadDomain, path){
-			 //we only download builds from compiles server for security reasons
+			 // we only download builds from compiles server for security reasons
 			if ((pdfDownloadDomain != null) && (path != null) && (path.indexOf("build") !== -1)) {
 				return `${pdfDownloadDomain}${path}`;
 			} else {
@@ -418,7 +428,7 @@ define([
 						// Turn 'output.blg' into 'blg file'.
 						name: isOutputFile ? `${file.path.replace(/^output\./, "")} file` : file.path,
 						url: `/project/${project_id}/output/${file.path}` + createQueryString(qs),
-						main: isOutputFile ? true : false
+						main: !!isOutputFile
 					});
 				}
 			}

@@ -1,3 +1,12 @@
+/* eslint-disable
+    camelcase,
+    max-len,
+    no-return-assign,
+    no-undef,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -151,7 +160,7 @@ define([
 				
 				scope.$watch("reviewPanel.rendererData.lineHeight", () => layout());
 
-				//# Scroll lock with Ace
+				// # Scroll lock with Ace
 				const scroller = element;
 				const list = element.find(".rp-entry-list-inner");
 				

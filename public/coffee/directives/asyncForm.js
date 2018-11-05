@@ -1,3 +1,11 @@
+/* eslint-disable
+    max-len,
+    no-return-assign,
+    no-undef,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -176,7 +184,7 @@ define([
 
 				const opts = _.defaults(window.passwordStrengthOptions || {}, defaultPasswordOpts);
 				if (opts.length.min === 1) {
-					opts.acceptRate = 0; //this allows basically anything to be a valid password
+					opts.acceptRate = 0; // this allows basically anything to be a valid password
 				}
 				const passField = new PassField.Field("passwordField", opts);
 

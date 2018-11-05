@@ -1,3 +1,10 @@
+/* eslint-disable
+    max-len,
+    no-return-assign,
+    no-undef,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -249,7 +256,7 @@ Something went wrong connecting to your project. Please refresh if this continue
 					countdown = 3 + Math.floor(Math.random() * 7);
 				}
 
-				if (this.userIsLeavingPage) { //user will have pressed refresh or back etc
+				if (this.userIsLeavingPage) { // user will have pressed refresh or back etc
 					return;
 				}
 
