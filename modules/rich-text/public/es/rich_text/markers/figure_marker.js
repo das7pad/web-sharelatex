@@ -4,18 +4,20 @@ import { makeSingleMark } from '../single_mark'
 import { markCoversWholeLines, deTex, clearOnMouseDown } from '../utils'
 
 const FigureMarker = {
-  matcher (cm, sourceMark) {
-    return sourceMark.kind === 'figure' &&
+  matcher(cm, sourceMark) {
+    return (
+      sourceMark.kind === 'figure' &&
       sourceMark.hasContent(cm) &&
       !sourceMark.containsCursor(cm, 'outer')
+    )
   },
 
-  marker (cm, sourceMark, rtAdapter) {
+  marker(cm, sourceMark, rtAdapter) {
     if (!markCoversWholeLines(cm, sourceMark)) return
 
     const wrapperDiv = makeWrapperDiv()
 
-    getInnerMarks(cm, sourceMark).forEach((mark) => {
+    getInnerMarks(cm, sourceMark).forEach(mark => {
       const region = mark.rangeForRegion('inner')
 
       if (mark.kind === 'caption') {
@@ -25,9 +27,7 @@ const FigureMarker = {
         const previewUrl = rtAdapter.getPreviewUrlForPath(path)
 
         if (previewUrl) {
-          wrapperDiv
-            .append(makeImg(previewUrl))
-            .append(makeFileNameSpan(path))
+          wrapperDiv.append(makeImg(previewUrl)).append(makeFileNameSpan(path))
         } else {
           wrapperDiv.append(makeNotFoundSpan(path))
         }
@@ -48,23 +48,27 @@ const FigureMarker = {
  * Given a sourceMark, it will return an array containing
  * all the marks inside the sourceMark range
  */
-function getInnerMarks (cm, sourceMark) {
+function getInnerMarks(cm, sourceMark) {
   const marks = cm.getTokenAt(sourceMark.to, true).state.marks
 
-  return marks.filter((mark) => {
-    return mark.from.line >= sourceMark.from.line &&
+  return marks.filter(mark => {
+    return (
+      mark.from.line >= sourceMark.from.line &&
       mark.to.line <= sourceMark.to.line &&
-      !(mark.from.line === sourceMark.from.line &&
+      !(
+        mark.from.line === sourceMark.from.line &&
         mark.from.ch === sourceMark.from.ch &&
-        mark.kind === sourceMark.kind)
+        mark.kind === sourceMark.kind
+      )
+    )
   })
 }
 
-function makeWrapperDiv () {
+function makeWrapperDiv() {
   return $('<div>').addClass('wl-figure-wrap')
 }
 
-function makeCaptionDiv (cm, region) {
+function makeCaptionDiv(cm, region) {
   const { from, to } = region
   const caption = deTex(cm.getRange(from, to))
 
@@ -73,13 +77,13 @@ function makeCaptionDiv (cm, region) {
     .addClass('wl-figure-caption')
 }
 
-function makeImg (previewUrl) {
+function makeImg(previewUrl) {
   return $('<img>')
     .attr('src', previewUrl)
     .addClass('img-responsive wl-figure')
 }
 
-function makeNotFoundSpan (path) {
+function makeNotFoundSpan(path) {
   return $('<span>')
     .text(`[Not Found: ${path}]`)
     .css({
@@ -89,7 +93,7 @@ function makeNotFoundSpan (path) {
     .addClass('wl-figure-not-found')
 }
 
-function makeFileNameSpan (path) {
+function makeFileNameSpan(path) {
   return $('<span>')
     .text(`[${path}]`)
     .css('font-size', 'small')

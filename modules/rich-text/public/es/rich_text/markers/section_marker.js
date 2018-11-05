@@ -4,7 +4,7 @@ import { makeSingleMark } from '../single_mark'
 import { makeGroup } from '../utils'
 
 const SectionMarker = {
-  matcher (cm, sourceMark) {
+  matcher(cm, sourceMark) {
     const validKinds = [
       'chapter',
       'chapter\\*',
@@ -18,7 +18,7 @@ const SectionMarker = {
     return validKinds.includes(sourceMark.kind) && sourceMark.hasContent(cm)
   },
 
-  marker (cm, sourceMark) {
+  marker(cm, sourceMark) {
     let className
     if (/^chapter/.test(sourceMark.kind)) {
       className = 'chapter'
@@ -52,7 +52,7 @@ const SectionMarker = {
   }
 }
 
-function isSplitOverMultipleLines (cm, sourceMark) {
+function isSplitOverMultipleLines(cm, sourceMark) {
   const { from, to } = sourceMark
   const line = cm.getLine(from.line)
   if (
@@ -64,7 +64,7 @@ function isSplitOverMultipleLines (cm, sourceMark) {
   return false
 }
 
-function makeSpan (text, className) {
+function makeSpan(text, className) {
   const el = $('<span>')
     .text(text)
     .addClass('wl-' + className + '-open')

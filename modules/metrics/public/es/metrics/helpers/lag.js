@@ -11,8 +11,8 @@ lag.keys = keys(lag.names)
 lag.selected = lag.keys[0]
 
 // format the lags for the handlebar template
-lag.mapForTemplate = function () {
-  return map(lag.keys, function (lagKey, idx) {
+lag.mapForTemplate = function() {
+  return map(lag.keys, function(lagKey, idx) {
     return {
       key: lagKey,
       name: lag.names[lagKey],

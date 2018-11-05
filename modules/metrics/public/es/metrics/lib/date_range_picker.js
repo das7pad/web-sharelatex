@@ -3,39 +3,54 @@ import $ from 'jquery'
 import { bind } from 'underscore'
 import 'daterangepicker'
 
-var WLDateRangePicker = function () {
+var WLDateRangePicker = function() {
   var dateFormat = 'MMMM D, YYYY'
   var yesterday = moment().subtract(1, 'day')
 
   // build some custom ranges for easier date picking
   var customRanges = {}
-  customRanges['Last 7 days'] = [
-    moment().subtract(7, 'days'),
-    yesterday
-  ]
+  customRanges['Last 7 days'] = [moment().subtract(7, 'days'), yesterday]
   customRanges['Previous Week'] = [
-    moment().subtract(1, 'week').startOf('isoweek'),
-    moment().subtract(1, 'week').endOf('isoweek')
+    moment()
+      .subtract(1, 'week')
+      .startOf('isoweek'),
+    moment()
+      .subtract(1, 'week')
+      .endOf('isoweek')
   ]
-  customRanges['Last 30 days'] = [
-    moment().subtract(30, 'days'),
-    yesterday
-  ]
-  customRanges[moment().subtract(1, 'month').format('MMMM YYYY')] = [
-    moment().subtract(1, 'month').startOf('month'),
-    moment().subtract(1, 'month').endOf('month')
+  customRanges['Last 30 days'] = [moment().subtract(30, 'days'), yesterday]
+  customRanges[
+    moment()
+      .subtract(1, 'month')
+      .format('MMMM YYYY')
+  ] = [
+    moment()
+      .subtract(1, 'month')
+      .startOf('month'),
+    moment()
+      .subtract(1, 'month')
+      .endOf('month')
   ]
   customRanges['Year ' + moment().format('YYYY')] = [
     moment().startOf('year'),
     yesterday
   ]
-  customRanges['Year ' + moment().subtract(1, 'year').format('YYYY')] = [
-    moment().subtract(1, 'year').startOf('year'),
-    moment().subtract(1, 'year').endOf('year')
+  customRanges[
+    'Year ' +
+      moment()
+        .subtract(1, 'year')
+        .format('YYYY')
+  ] = [
+    moment()
+      .subtract(1, 'year')
+      .startOf('year'),
+    moment()
+      .subtract(1, 'year')
+      .endOf('year')
   ]
 
   // callback called on date change
-  this.customCallback = function (startDate, endDate, externalCallback) {
+  this.customCallback = function(startDate, endDate, externalCallback) {
     var displayRange = startDate.format(dateFormat)
     displayRange += ' to '
     displayRange += endDate.format(dateFormat)
@@ -44,7 +59,7 @@ var WLDateRangePicker = function () {
     if (externalCallback) externalCallback(startDate, endDate)
   }
 
-  this.init = function (elt, startDate, endDate, callback) {
+  this.init = function(elt, startDate, endDate, callback) {
     this.$elt = $(elt)
     this.$label = this.$elt.find('span')
 
@@ -62,7 +77,8 @@ var WLDateRangePicker = function () {
         startDate: startDate,
         endDate: endDate
       },
-      bind(function (startDate, endDate) { // daterangepicker callback
+      bind(function(startDate, endDate) {
+        // daterangepicker callback
         this.customCallback(startDate, endDate, callback)
       }, this)
     )
@@ -79,10 +95,10 @@ var WLDateRangePicker = function () {
     $applyButtons.find('button').removeClass('btn-sm btn-success')
     $applyButtons.find('.cancelBtn').addClass('btn')
     $applyButtons.find('.applyBtn').addClass('btn btn-primary')
-    this.$elt.on('showCalendar.daterangepicker', function () {
+    this.$elt.on('showCalendar.daterangepicker', function() {
       $applyButtons.show()
     })
-    this.$elt.on('hideCalendar.daterangepicker', function () {
+    this.$elt.on('hideCalendar.daterangepicker', function() {
       $applyButtons.hide()
     })
 

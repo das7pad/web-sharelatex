@@ -71,15 +71,31 @@ pipeline {
       }
     }
 
-    stage('Lint') {
-      agent {
-        docker {
-          image 'node:6.9.5'
-          reuseNode true
+    stage('Format and Lint') {
+      parallel {
+        stage('Format') {
+          agent {
+            docker {
+              image 'node:6.9.5'
+              reuseNode true
+            }
+          }
+          steps {
+            sh 'make --no-print-directory format'
+          }
         }
-      }
-      steps {
-        sh 'make --no-print-directory lint'
+
+        stage('Lint') {
+          agent {
+            docker {
+              image 'node:6.9.5'
+              reuseNode true
+            }
+          }
+          steps {
+            sh 'make --no-print-directory lint'
+          }
+        }
       }
     }
 

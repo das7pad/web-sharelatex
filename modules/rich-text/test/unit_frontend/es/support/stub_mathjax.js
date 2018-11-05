@@ -1,6 +1,6 @@
 /* global sinon */
 
-export function stubMathJax () {
+export function stubMathJax() {
   // fake MathJax so we don't have to load it into the test harness
   window.MathJax = {
     Hub: {
@@ -10,6 +10,6 @@ export function stubMathJax () {
   }
 }
 
-export function teardownMathJax () {
+export function teardownMathJax() {
   window.MathJax = null
 }

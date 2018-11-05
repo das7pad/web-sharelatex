@@ -77,8 +77,10 @@ module.exports = UserAdminController =
 						return project
 					return cb(null, allProjects)
 
-			subscription: (cb) ->
+			adminSubscription: (cb) ->
 				SubscriptionLocator.getUsersSubscription user_id, cb
+			managedSubscription: (cb) ->
+				SubscriptionLocator.findManagedSubscription user_id, cb
 			memberSubscriptions: (cb) ->
 				SubscriptionLocator.getMemberSubscriptions user_id, cb
 		}, (err, data) ->

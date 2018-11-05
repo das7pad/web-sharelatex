@@ -18,13 +18,13 @@ const MARKS_DISALLOWED_WITHIN_HEADERS = [
 ]
 
 const HEADER_MARKS = {
-  'chapter': MARKS_DISALLOWED_WITHIN_HEADERS,
+  chapter: MARKS_DISALLOWED_WITHIN_HEADERS,
   'chapter\\*': MARKS_DISALLOWED_WITHIN_HEADERS,
-  'section': MARKS_DISALLOWED_WITHIN_HEADERS,
+  section: MARKS_DISALLOWED_WITHIN_HEADERS,
   'section\\*': MARKS_DISALLOWED_WITHIN_HEADERS,
-  'subsection': MARKS_DISALLOWED_WITHIN_HEADERS,
+  subsection: MARKS_DISALLOWED_WITHIN_HEADERS,
   'subsection\\*': MARKS_DISALLOWED_WITHIN_HEADERS,
-  'subsubsection': MARKS_DISALLOWED_WITHIN_HEADERS,
+  subsubsection: MARKS_DISALLOWED_WITHIN_HEADERS,
   'subsubsection\\*': MARKS_DISALLOWED_WITHIN_HEADERS
 }
 
@@ -39,15 +39,13 @@ const MARKS_WITH_SPECIAL_HANDLING = BOLD_OR_ITALIC_MARKS.concat(
  *
  * @param {CodeMirror} cm
  */
-function selectLine (cm) {
+function selectLine(cm) {
   const cursor = cm.getCursor()
   const { state } = cm.getTokenAt(cursor, true)
   const lastOpenMark = _.last(state.openMarks)
 
-  const withinUnhandledMark = (
-    lastOpenMark &&
-    !_.contains(MARKS_WITH_SPECIAL_HANDLING, lastOpenMark.kind)
-  )
+  const withinUnhandledMark =
+    lastOpenMark && !_.contains(MARKS_WITH_SPECIAL_HANDLING, lastOpenMark.kind)
 
   // If outside of mark or within a mark which has no special handling, select
   // the whole line which the cursor is on
@@ -66,14 +64,14 @@ function selectLine (cm) {
  * @param {string} preText
  * @param {Range} selection
  */
-function removeInnerMarks (cm, preText, selection) {
+function removeInnerMarks(cm, preText, selection) {
   const selectionEnd = selection.to()
   // Get state precisely up to where the selection ends, resolving recent edits
   // before returning editor state
   const { state } = cm.getTokenAt(selectionEnd, true)
 
   // Find marks that are within the selection of the same kind and remove them
-  _.filter(state.marks, (mark) => {
+  _.filter(state.marks, mark => {
     const isRemovableMark = _.contains(MARKS_WITH_SPECIAL_HANDLING, mark.kind)
     const isMarkSameKindAsWrap = preText.match(mark.kind)
     const withinSelection = markEntirelyWithinSelection(mark, selection)
@@ -83,7 +81,7 @@ function removeInnerMarks (cm, preText, selection) {
     // Marks must be removed in reverse order so that character positions are
     // updated correctly for each removal
     .reverse()
-    .forEach((mark) => removeMark(cm, mark))
+    .forEach(mark => removeMark(cm, mark))
 }
 
 /**
@@ -94,17 +92,19 @@ function removeInnerMarks (cm, preText, selection) {
  * @param {string} preText
  * @returns {boolean}
  */
-function withinHeaderMark (openMarks, preText) {
-  return Boolean(_.find(openMarks, (mark) => {
-    // Determine if the open mark is a header & can have nested inner marks
-    const marksDisallowedInHeaders = HEADER_MARKS[mark.kind]
-    if (!marksDisallowedInHeaders) return false
+function withinHeaderMark(openMarks, preText) {
+  return Boolean(
+    _.find(openMarks, mark => {
+      // Determine if the open mark is a header & can have nested inner marks
+      const marksDisallowedInHeaders = HEADER_MARKS[mark.kind]
+      if (!marksDisallowedInHeaders) return false
 
-    // Determine if attempting to wrap in a mark which is un-nestable
-    return Boolean(
-      _.find(marksDisallowedInHeaders, (innerMark) => preText.match(innerMark))
-    )
-  }))
+      // Determine if attempting to wrap in a mark which is un-nestable
+      return Boolean(
+        _.find(marksDisallowedInHeaders, innerMark => preText.match(innerMark))
+      )
+    })
+  )
 }
 
 /**
@@ -116,19 +116,21 @@ function withinHeaderMark (openMarks, preText) {
  * @param {string} preText
  * @returns {boolean}
  */
-function withinNestedBoldOrItalicMark (openMarks, preText) {
+function withinNestedBoldOrItalicMark(openMarks, preText) {
   // Pop off the inner mark, it is unimportant here. If the selection is not
   // nested, then openMarksTo will be empty and thus isSelectionMarked is
   // falsy. This is fine because we are only interested in nested marks here
   openMarks.pop()
 
-  return Boolean(_.find(openMarks, (mark) => {
-    const isWithinBoldOrItalic = _.contains(BOLD_OR_ITALIC_MARKS, mark.kind)
-    if (!isWithinBoldOrItalic) return false
+  return Boolean(
+    _.find(openMarks, mark => {
+      const isWithinBoldOrItalic = _.contains(BOLD_OR_ITALIC_MARKS, mark.kind)
+      if (!isWithinBoldOrItalic) return false
 
-    // Determine if attempting to wrap in \textbf or \textit
-    return preText.match(mark.kind)
-  }))
+      // Determine if attempting to wrap in \textbf or \textit
+      return preText.match(mark.kind)
+    })
+  )
 }
 
 /**
@@ -140,15 +142,17 @@ function withinNestedBoldOrItalicMark (openMarks, preText) {
  * @param {Range} selection
  * @returns {boolean}
  */
-function cannotNestMarks (cm, preText, selection) {
+function cannotNestMarks(cm, preText, selection) {
   const selectionEnd = selection.to()
   // Get state precisely up to where the selection ends, resolving recent edits
   // before returning editor state
   const { state } = cm.getTokenAt(selectionEnd, true)
   const openMarks = _.clone(state.openMarks) || []
 
-  return withinHeaderMark(openMarks, preText) ||
+  return (
+    withinHeaderMark(openMarks, preText) ||
     withinNestedBoldOrItalicMark(openMarks, preText)
+  )
 }
 
 /**
@@ -164,7 +168,7 @@ function cannotNestMarks (cm, preText, selection) {
  * @param {Range} selection
  * @returns {boolean}
  */
-function withinBoldOrItalicMarkContent (cm, preText, postText, selection) {
+function withinBoldOrItalicMarkContent(cm, preText, postText, selection) {
   let selectionStart = _.clone(selection.from())
   let selectionEnd = _.clone(selection.to())
   let selectedText = cm.getRange(selectionStart, selectionEnd)
@@ -278,7 +282,7 @@ function withinBoldOrItalicMarkContent (cm, preText, postText, selection) {
  * @param {Range} selection
  * @returns {string}
  */
-function ensureNewlineBefore (preText, selection) {
+function ensureNewlineBefore(preText, selection) {
   const { ch } = selection.from()
   return ch === 0 ? preText : '\n' + preText
 }
@@ -291,7 +295,7 @@ function ensureNewlineBefore (preText, selection) {
  * @param {Range} selection
  * @returns {string}
  */
-function ensureNewlineAfter (cm, postText, selection) {
+function ensureNewlineAfter(cm, postText, selection) {
   const { line, ch } = selection.to()
   return ch === cm.getLine(line).length ? postText : postText + '\n'
 }
@@ -304,7 +308,7 @@ function ensureNewlineAfter (cm, postText, selection) {
  * @param {string} post
  * @param {boolean} wrapWholeLine
  */
-function wrap (cm, pre, post, wrapWholeLine = false) {
+function wrap(cm, pre, post, wrapWholeLine = false) {
   if (wrapWholeLine && !cm.somethingSelected()) {
     selectLine(cm)
   }
@@ -360,9 +364,9 @@ function wrap (cm, pre, post, wrapWholeLine = false) {
  *
  * @param {CodeMirror} cm
  */
-function prependLinesWithItem (cm) {
+function prependLinesWithItem(cm) {
   const selectedLines = cm.getSelection().split('\n')
-  const prependedLines = _.map(selectedLines, (line) => `\\item ${line}`)
+  const prependedLines = _.map(selectedLines, line => `\\item ${line}`)
 
   // +wrap argument used by CM to merge any following replaceRange with
   // same +wrap argument into one history change. Note: The next history
@@ -376,7 +380,7 @@ function prependLinesWithItem (cm) {
  * @param {CodeMirror} cm
  * @param {string} listType
  */
-function wrapListOnNewline (cm, listType) {
+function wrapListOnNewline(cm, listType) {
   const cursor = cm.getCursor()
   const token = cm.getTokenAt(cursor, true)
   const lineText = cm.getLine(cursor.line)
@@ -402,34 +406,34 @@ function wrapListOnNewline (cm, listType) {
   prependLinesWithItem(cm)
 }
 
-export function wrapBold (cm) {
+export function wrapBold(cm) {
   wrap(cm, '\\textbf{', '}')
 }
 
-export function wrapItalic (cm) {
+export function wrapItalic(cm) {
   wrap(cm, '\\textit{', '}')
 }
 
-export function wrapSection (cm) {
+export function wrapSection(cm) {
   wrap(cm, '\\section{', '}', true)
 }
 
-export function wrapSubsection (cm) {
+export function wrapSubsection(cm) {
   wrap(cm, '\\subsection{', '}', true)
 }
 
-export function wrapInlineMath (cm) {
+export function wrapInlineMath(cm) {
   wrap(cm, '\\(', '\\)', false)
 }
 
-export function wrapDisplayMath (cm) {
+export function wrapDisplayMath(cm) {
   wrap(cm, '\\[', '\\]', true)
 }
 
-export function wrapNumberedList (cm) {
+export function wrapNumberedList(cm) {
   wrapListOnNewline(cm, 'enumerate')
 }
 
-export function wrapBulletList (cm) {
+export function wrapBulletList(cm) {
   wrapListOnNewline(cm, 'itemize')
 }

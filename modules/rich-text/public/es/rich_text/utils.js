@@ -25,13 +25,11 @@ const VIEWPORT_MIN_LINE = 350
  * @param {CodeMirror} cm
  * @returns {number}
  */
-export function lastRenderedLine (cm) {
+export function lastRenderedLine(cm) {
   const { to } = cm.getViewport()
   const lastLine = to + VIEWPORT_PADDING_LINES
 
-  return lastLine < VIEWPORT_MIN_LINE
-    ? VIEWPORT_MIN_LINE
-    : lastLine
+  return lastLine < VIEWPORT_MIN_LINE ? VIEWPORT_MIN_LINE : lastLine
 }
 
 /**
@@ -40,7 +38,7 @@ export function lastRenderedLine (cm) {
  * @param {CodeMirror} cm
  * @returns {Array.<Mark>}
  */
-export function getMarks (cm) {
+export function getMarks(cm) {
   const marks = cm.getStateAfter(lastRenderedLine(cm), true).marks
   return marks || []
 }
@@ -52,7 +50,7 @@ export function getMarks (cm) {
  *
  * @param {CodeMirror.Pos} y
  */
-export function positionsEqual (x, y) {
+export function positionsEqual(x, y) {
   return x.line === y.line && x.ch === y.ch
 }
 
@@ -63,7 +61,7 @@ export function positionsEqual (x, y) {
  *
  * @param {CodeMirror.Range} y
  */
-export function rangesEqual (x, y) {
+export function rangesEqual(x, y) {
   return positionsEqual(x.from, y.from) && positionsEqual(x.to, y.to)
 }
 
@@ -76,13 +74,13 @@ export function rangesEqual (x, y) {
  * @param {Mark} sourceMark
  * @return {Boolean}
  */
-export function markCoversWholeLines (cm, sourceMark) {
+export function markCoversWholeLines(cm, sourceMark) {
   const { from, to } = sourceMark
 
   return from.ch === 0 && to.ch === cm.getLine(to.line).length
 }
 
-export function ignoreErrors (cb) {
+export function ignoreErrors(cb) {
   try {
     return cb()
   } catch (e) {
@@ -90,7 +88,7 @@ export function ignoreErrors (cb) {
   }
 }
 
-export function deTex (string) {
+export function deTex(string) {
   string = string.replace(/\\LaTeX/g, 'LaTeX')
   string = string.replace(/\\TeX/g, 'TeX')
   string = string.replace(/\\TikZ/g, 'TikZ')
@@ -103,9 +101,9 @@ export function deTex (string) {
   return string.trim()
 }
 
-export function splitAuthors (string) {
+export function splitAuthors(string) {
   string = string.replace(/\\and|\n/g, '\\\\')
-  return string.split('\\\\').map((s) => s.trim())
+  return string.split('\\\\').map(s => s.trim())
 }
 
 /**
@@ -121,8 +119,8 @@ export function splitAuthors (string) {
  * @param {Element} element
  * @param {CodeMirror.TextMarker} mark
  */
-export function clearOnMouseDown (cm, element, mark) {
-  $(element).on('mousedown', function () {
+export function clearOnMouseDown(cm, element, mark) {
+  $(element).on('mousedown', function() {
     var markPos = mark.find()
     if (markPos) {
       cm.setCursor(markPos.from)
@@ -132,7 +130,9 @@ export function clearOnMouseDown (cm, element, mark) {
     // clicking the mark seems to make the editor lose focus; I'm not sure
     // why we have to wait before refocusing, but I can't find any other way
     // of doing it
-    setTimeout(() => { cm.focus() }, 0)
+    setTimeout(() => {
+      cm.focus()
+    }, 0)
   })
 }
 
@@ -143,8 +143,8 @@ export function clearOnMouseDown (cm, element, mark) {
  * @param {CodeMirror.TextMarker[]} marks
  * @return {CodeMirror.TextMarker[]} marks with group data attached
  */
-export function makeGroup (marks) {
-  const clearAll = () => marks.forEach((mark) => mark.clear())
+export function makeGroup(marks) {
+  const clearAll = () => marks.forEach(mark => mark.clear())
 
   marks.forEach((mark, markIndex) => {
     mark.on('clear', clearAll)
