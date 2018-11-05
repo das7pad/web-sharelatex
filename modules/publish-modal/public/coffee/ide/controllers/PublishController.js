@@ -1,20 +1,27 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.controller "PublishController",
-		($scope, $modal) ->
-			$scope.openPublishProjectModal = () ->
-				$modal.open(
-					templateUrl: "publishProjectModalTemplate"
-					scope: $scope
+], App =>
+	App.controller("PublishController",
+		($scope, $modal) =>
+			$scope.openPublishProjectModal = function() {
+				$modal.open({
+					templateUrl: "publishProjectModalTemplate",
+					scope: $scope,
 					size: "lg"
-				)
+				});
 
-				requirejs ['publish-modal'], (pm) ->
-					if ($scope.pdf.url)
-						downloadLink = $scope.pdf.downloadUrl
+				return requirejs(['publish-modal'], function(pm) {
+					let downloadLink;
+					if ($scope.pdf.url) {
+						downloadLink = $scope.pdf.downloadUrl;
+					}
 
-					initParams = {
+					const initParams = {
 						projectId: $scope.project_id,
 						pdfUrl: downloadLink,
 						logs: $scope.pdf.logEntries,
@@ -22,6 +29,10 @@ define [
 						firstName: $scope.user.first_name,
 						lastName: $scope.user.last_name,
 						title: $scope.project.name
-					}
-					modalBody = document.getElementsByClassName("modal-body-publish")[0]
-					pm.init(modalBody, initParams)
+					};
+					const modalBody = document.getElementsByClassName("modal-body-publish")[0];
+					return pm.init(modalBody, initParams);
+				});
+			}
+	)
+);
