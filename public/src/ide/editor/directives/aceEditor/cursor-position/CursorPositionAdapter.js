@@ -10,47 +10,48 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define([
-	"ide/editor/AceShareJsCodec"
-], function(AceShareJsCodec) {
-	let CursorPositionAdapter;
-	return (CursorPositionAdapter = class CursorPositionAdapter {
-		constructor(editor) {
-			this.editor = editor;
-		}
+define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
+  let CursorPositionAdapter
+  return (CursorPositionAdapter = class CursorPositionAdapter {
+    constructor(editor) {
+      this.editor = editor
+    }
 
-		getCursor() {
-			return this.editor.getCursorPosition();
-		}
+    getCursor() {
+      return this.editor.getCursorPosition()
+    }
 
-		getEditorScrollPosition() {
-			return this.editor.getFirstVisibleRow();
-		}
+    getEditorScrollPosition() {
+      return this.editor.getFirstVisibleRow()
+    }
 
-		setCursor(pos) {
-			pos = pos.cursorPosition || { row: 0, column: 0 };
-			return this.editor.moveCursorToPosition(pos);
-		}
+    setCursor(pos) {
+      pos = pos.cursorPosition || { row: 0, column: 0 }
+      return this.editor.moveCursorToPosition(pos)
+    }
 
-		setEditorScrollPosition(pos) {
-			pos = pos.firstVisibleLine || 0;
-			return this.editor.scrollToLine(pos);
-		}
+    setEditorScrollPosition(pos) {
+      pos = pos.firstVisibleLine || 0
+      return this.editor.scrollToLine(pos)
+    }
 
-		clearSelection() {
-			return this.editor.selection.clearSelection();
-		}
+    clearSelection() {
+      return this.editor.selection.clearSelection()
+    }
 
-		gotoLine(line, column) {
-			this.editor.gotoLine(line, column);
-			this.editor.scrollToLine(line, true, true); // centre and animate
-			return this.editor.focus();
-		}
+    gotoLine(line, column) {
+      this.editor.gotoLine(line, column)
+      this.editor.scrollToLine(line, true, true) // centre and animate
+      return this.editor.focus()
+    }
 
-		gotoOffset(offset) {
-			const lines = this.editor.getSession().getDocument().getAllLines();
-			const position = AceShareJsCodec.shareJsOffsetToAcePosition(offset, lines);
-			return this.gotoLine(position.row + 1, position.column);
-		}
-	});
-});
+    gotoOffset(offset) {
+      const lines = this.editor
+        .getSession()
+        .getDocument()
+        .getAllLines()
+      const position = AceShareJsCodec.shareJsOffsetToAcePosition(offset, lines)
+      return this.gotoLine(position.row + 1, position.column)
+    }
+  })
+})

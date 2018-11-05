@@ -10,48 +10,44 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define([
-	"base"
-], App =>
-	App.directive("infiniteScroll", () =>
-		({
-			link(scope, element, attrs, ctrl) {
-				const innerElement = element.find(".infinite-scroll-inner");
-				element.css({'overflow-y': 'auto'});
+define(['base'], App =>
+  App.directive('infiniteScroll', () => ({
+    link(scope, element, attrs, ctrl) {
+      const innerElement = element.find('.infinite-scroll-inner')
+      element.css({ 'overflow-y': 'auto' })
 
-				const atEndOfListView = function() {
-					if (attrs.infiniteScrollUpwards != null) {
-						return atTopOfListView();
-					} else {
-						return atBottomOfListView();
-					}
-				};
-					
-				var atTopOfListView = () => element.scrollTop() < 30;
-					
-				var atBottomOfListView = () => (element.scrollTop() + element.height()) >= (innerElement.height() - 30);
+      const atEndOfListView = function() {
+        if (attrs.infiniteScrollUpwards != null) {
+          return atTopOfListView()
+        } else {
+          return atBottomOfListView()
+        }
+      }
 
-				const listShorterThanContainer = () => element.height() > innerElement.height();
+      var atTopOfListView = () => element.scrollTop() < 30
 
-				var loadUntilFull = function() {
-					if ((listShorterThanContainer() || atEndOfListView()) && !scope.$eval(attrs.infiniteScrollDisabled)) {
-						const promise = scope.$eval(attrs.infiniteScroll);
-						return promise.then(() =>
-							setTimeout(() => loadUntilFull()
-							, 0)
-						);
-					}
-				};
+      var atBottomOfListView = () =>
+        element.scrollTop() + element.height() >= innerElement.height() - 30
 
-				element.on("scroll", event => loadUntilFull());
+      const listShorterThanContainer = () =>
+        element.height() > innerElement.height()
 
-				return scope.$watch(attrs.infiniteScrollInitialize, function(value) {
-					if (value) {
-						return loadUntilFull();
-					}
-				});
-			}
+      var loadUntilFull = function() {
+        if (
+          (listShorterThanContainer() || atEndOfListView()) &&
+          !scope.$eval(attrs.infiniteScrollDisabled)
+        ) {
+          const promise = scope.$eval(attrs.infiniteScroll)
+          return promise.then(() => setTimeout(() => loadUntilFull(), 0))
+        }
+      }
 
-		})
-)
-);
+      element.on('scroll', event => loadUntilFull())
+
+      return scope.$watch(attrs.infiniteScrollInitialize, function(value) {
+        if (value) {
+          return loadUntilFull()
+        }
+      })
+    }
+  })))

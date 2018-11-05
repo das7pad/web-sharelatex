@@ -9,16 +9,16 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(["base"], App =>
-  App.component("spellMenu", {
+define(['base'], App =>
+  App.component('spellMenu', {
     bindings: {
-      open: "<",
-      top: "<",
-      left: "<",
-      layoutFromBottom: "<",
-      highlight: "<",
-      replaceWord: "&",
-      learnWord: "&"
+      open: '<',
+      top: '<',
+      left: '<',
+      layoutFromBottom: '<',
+      highlight: '<',
+      replaceWord: '&',
+      learnWord: '&'
     },
     template: `\
 <div
@@ -43,5 +43,4 @@ define(["base"], App =>
   </ul>
 </div>\
 `
-  })
-);
+  }))

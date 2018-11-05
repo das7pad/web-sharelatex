@@ -10,23 +10,28 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define([
-	"base"
-], function(App) {
-	App.controller("ReferenceUnlinkController", ($scope, $modal) =>
-		$scope.unlinkAccount = providerStr =>
-			$modal.open({
-				templateUrl: "referenceUnlinkModalTemplate",
-				controller: "ReferenceUnlinkModalController",
-				resolve: {
-					provider() { return providerStr; }
-				}
-			})
-		
-	);
+define(['base'], function(App) {
+  App.controller(
+    'ReferenceUnlinkController',
+    ($scope, $modal) =>
+      ($scope.unlinkAccount = providerStr =>
+        $modal.open({
+          templateUrl: 'referenceUnlinkModalTemplate',
+          controller: 'ReferenceUnlinkModalController',
+          resolve: {
+            provider() {
+              return providerStr
+            }
+          }
+        }))
+  )
 
-	return App.controller('ReferenceUnlinkModalController', function($scope, $modalInstance, provider) {
-		$scope.provider = provider;
-		return $scope.providerUnlink = `/${provider}/unlink`;
-	});
-});
+  return App.controller('ReferenceUnlinkModalController', function(
+    $scope,
+    $modalInstance,
+    provider
+  ) {
+    $scope.provider = provider
+    return ($scope.providerUnlink = `/${provider}/unlink`)
+  })
+})

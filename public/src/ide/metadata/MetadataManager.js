@@ -11,24 +11,21 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 define([], function() {
+  let MetadataManager
+  return (MetadataManager = class MetadataManager {
+    constructor(ide, $scope, metadata) {
+      this.ide = ide
+      this.$scope = $scope
+      this.metadata = metadata
+      this.ide.socket.on('broadcastDocMeta', data => {
+        return this.metadata.onBroadcastDocMeta(data)
+      })
+      this.$scope.$on('entity:deleted', this.metadata.onEntityDeleted)
+      this.$scope.$on('file:upload:complete', this.metadata.fileUploadComplete)
+    }
 
-	let MetadataManager;
-	return (MetadataManager = class MetadataManager {
-
-		constructor(ide, $scope, metadata) {
-
-			this.ide = ide;
-			this.$scope = $scope;
-			this.metadata = metadata;
-			this.ide.socket.on('broadcastDocMeta', data => {
-				return this.metadata.onBroadcastDocMeta(data);
-			});
-			this.$scope.$on('entity:deleted', this.metadata.onEntityDeleted);
-			this.$scope.$on('file:upload:complete', this.metadata.fileUploadComplete);
-		}
-
-		loadProjectMetaFromServer() {
-			return this.metadata.loadProjectMetaFromServer();
-		}
-	});
-});
+    loadProjectMetaFromServer() {
+      return this.metadata.loadProjectMetaFromServer()
+    }
+  })
+})

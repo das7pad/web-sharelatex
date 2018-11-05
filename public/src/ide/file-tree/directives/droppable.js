@@ -8,24 +8,19 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define([
-	"base"
-], App =>
-	App.directive("droppable", () =>
-		({
-			link(scope, element, attrs) {
-				return scope.$watch(attrs.droppable, function(droppable) {
-					if (droppable) {
-						return element.droppable({
-							greedy: true,
-							hoverClass: "droppable-hover",
-							tolerance: "pointer",
-							accept: attrs.accept,
-							drop: scope.$eval(attrs.onDropCallback)
-						});
-					}
-				});
-			}
-		})
-)
-);
+define(['base'], App =>
+  App.directive('droppable', () => ({
+    link(scope, element, attrs) {
+      return scope.$watch(attrs.droppable, function(droppable) {
+        if (droppable) {
+          return element.droppable({
+            greedy: true,
+            hoverClass: 'droppable-hover',
+            tolerance: 'pointer',
+            accept: attrs.accept,
+            drop: scope.$eval(attrs.onDropCallback)
+          })
+        }
+      })
+    }
+  })))

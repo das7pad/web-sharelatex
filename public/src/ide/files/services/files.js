@@ -11,34 +11,40 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define([
-	"base"
-], App =>
+define(['base'], App =>
+  App.factory('files', function(ide) {
+    const Files = {
+      getTeXFiles() {
+        const texFiles = []
+        ide.fileTreeManager.forEachEntity(function(entity, folder, path) {
+          if (
+            entity.type === 'doc' &&
+            __guardMethod__(
+              entity != null ? entity.name : undefined,
+              'match',
+              o => o.match(/.*\.(tex|txt|md)/)
+            )
+          ) {
+            const cloned = _.clone(entity)
+            cloned.path = path
+            return texFiles.push(cloned)
+          }
+        })
+        return texFiles
+      }
+    }
 
-	App.factory('files', function(ide) {
-
-		const Files = {
-			getTeXFiles() {
-				const texFiles = [];
-				ide.fileTreeManager.forEachEntity(function(entity, folder, path) {
-					if ((entity.type === 'doc') && __guardMethod__(entity != null ? entity.name : undefined, 'match', o => o.match(/.*\.(tex|txt|md)/))) {
-						const cloned = _.clone(entity);
-						cloned.path = path;
-						return texFiles.push(cloned);
-					}
-				});
-				return texFiles;
-			}
-		};
-
-		return Files;
-	})
-);
+    return Files
+  }))
 
 function __guardMethod__(obj, methodName, transform) {
-  if (typeof obj !== 'undefined' && obj !== null && typeof obj[methodName] === 'function') {
-    return transform(obj, methodName);
+  if (
+    typeof obj !== 'undefined' &&
+    obj !== null &&
+    typeof obj[methodName] === 'function'
+  ) {
+    return transform(obj, methodName)
   } else {
-    return undefined;
+    return undefined
   }
 }

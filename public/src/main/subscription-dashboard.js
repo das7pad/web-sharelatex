@@ -16,193 +16,268 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define([
-	"base"
-], function(App){
+define(['base'], function(App) {
+  App.controller('SuccessfulSubscriptionController', function(
+    $scope,
+    sixpack
+  ) {})
 
-	App.controller('SuccessfulSubscriptionController', function($scope, sixpack) {});
+  const SUBSCRIPTION_URL = '/user/subscription/update'
 
-	const SUBSCRIPTION_URL = "/user/subscription/update";
+  const setupReturly = _.once(
+    () =>
+      typeof recurly !== 'undefined' && recurly !== null
+        ? recurly.configure(window.recurlyApiKey)
+        : undefined
+  )
+  const PRICES = {}
 
-	const setupReturly = _.once(() => typeof recurly !== 'undefined' && recurly !== null ? recurly.configure(window.recurlyApiKey) : undefined);
-	const PRICES = {};
+  App.controller('CurrenyDropdownController', function(
+    $scope,
+    MultiCurrencyPricing,
+    $q
+  ) {
+    // $scope.plans = MultiCurrencyPricing.plans
+    $scope.currencyCode = MultiCurrencyPricing.currencyCode
 
+    return ($scope.changeCurrency = newCurrency =>
+      (MultiCurrencyPricing.currencyCode = newCurrency))
+  })
 
-	App.controller("CurrenyDropdownController", function($scope, MultiCurrencyPricing, $q){
+  App.controller('ChangePlanFormController', function(
+    $scope,
+    $modal,
+    MultiCurrencyPricing
+  ) {
+    setupReturly()
+    const { taxRate } = window
 
-		// $scope.plans = MultiCurrencyPricing.plans
-		$scope.currencyCode = MultiCurrencyPricing.currencyCode;
+    $scope.changePlan = () =>
+      $modal.open({
+        templateUrl: 'confirmChangePlanModalTemplate',
+        controller: 'ConfirmChangePlanController',
+        scope: $scope
+      })
 
-		return $scope.changeCurrency = newCurrency=> MultiCurrencyPricing.currencyCode = newCurrency;
-	});
+    $scope.$watch(
+      'pricing.currencyCode',
+      () => ($scope.currencyCode = MultiCurrencyPricing.currencyCode)
+    )
 
+    $scope.pricing = MultiCurrencyPricing
+    // $scope.plans = MultiCurrencyPricing.plans
+    $scope.currencySymbol =
+      MultiCurrencyPricing.plans[MultiCurrencyPricing.currencyCode] != null
+        ? MultiCurrencyPricing.plans[MultiCurrencyPricing.currencyCode].symbol
+        : undefined
 
-	App.controller("ChangePlanFormController", function($scope, $modal, MultiCurrencyPricing){
-		setupReturly();
-		const { taxRate } = window;
+    $scope.currencyCode = MultiCurrencyPricing.currencyCode
 
-		$scope.changePlan = () =>
-			$modal.open({
-				templateUrl: "confirmChangePlanModalTemplate",
-				controller:  "ConfirmChangePlanController",
-				scope: $scope
-			})
-		;
+    $scope.prices = PRICES
+    return ($scope.refreshPrice = function(planCode) {
+      let price
+      if ($scope.prices[planCode] != null) {
+        return
+      }
+      $scope.prices[planCode] = '...'
+      const pricing = recurly.Pricing()
+      pricing
+        .plan(planCode, { quantity: 1 })
+        .currency(MultiCurrencyPricing.currencyCode)
+        .done(function(price) {
+          const totalPriceExTax = parseFloat(price.next.total)
+          return $scope.$evalAsync(function() {
+            let taxAmmount = totalPriceExTax * taxRate
+            if (isNaN(taxAmmount)) {
+              taxAmmount = 0
+            }
+            return ($scope.prices[planCode] =
+              $scope.currencySymbol + (totalPriceExTax + taxAmmount))
+          })
+        })
 
-		$scope.$watch("pricing.currencyCode", () => $scope.currencyCode = MultiCurrencyPricing.currencyCode);
+      return (price = '')
+    })
+  })
 
-		$scope.pricing = MultiCurrencyPricing;
-		// $scope.plans = MultiCurrencyPricing.plans
-		$scope.currencySymbol = MultiCurrencyPricing.plans[MultiCurrencyPricing.currencyCode] != null ? MultiCurrencyPricing.plans[MultiCurrencyPricing.currencyCode].symbol : undefined;
+  App.controller('ConfirmChangePlanController', function(
+    $scope,
+    $modalInstance,
+    $http
+  ) {
+    $scope.confirmChangePlan = function() {
+      const body = {
+        plan_code: $scope.plan.planCode,
+        _csrf: window.csrfToken
+      }
 
-		$scope.currencyCode = MultiCurrencyPricing.currencyCode;
+      $scope.inflight = true
 
-		$scope.prices = PRICES;
-		return $scope.refreshPrice = function(planCode){
-			let price;
-			if ($scope.prices[planCode] != null) {
-				return;
-			}
-			$scope.prices[planCode] = "...";
-			const pricing = recurly.Pricing();
-			pricing.plan(planCode, { quantity: 1 }).currency(MultiCurrencyPricing.currencyCode).done(function(price){
-				const totalPriceExTax = parseFloat(price.next.total);
-				return $scope.$evalAsync(function() {
-					let taxAmmount = totalPriceExTax * taxRate;
-					if (isNaN(taxAmmount)) {
-						taxAmmount = 0;
-					}
-					return $scope.prices[planCode] = $scope.currencySymbol + (totalPriceExTax + taxAmmount);
-				});
-			});
+      return $http
+        .post(`${SUBSCRIPTION_URL}?origin=confirmChangePlan`, body)
+        .then(() => location.reload())
+        .catch(() => console.log('something went wrong changing plan'))
+    }
 
-			return price = "";
-		};
-	});
+    return ($scope.cancel = () => $modalInstance.dismiss('cancel'))
+  })
 
-	App.controller("ConfirmChangePlanController", function($scope, $modalInstance, $http){
+  App.controller('LeaveGroupModalController', function(
+    $scope,
+    $modalInstance,
+    $http
+  ) {
+    $scope.confirmLeaveGroup = function() {
+      $scope.inflight = true
+      return $http({
+        url: '/subscription/group/user',
+        method: 'DELETE',
+        params: { admin_user_id: $scope.admin_id, _csrf: window.csrfToken }
+      })
+        .then(() => location.reload())
+        .catch(() => console.log('something went wrong changing plan'))
+    }
 
-		$scope.confirmChangePlan = function() {
-			const body = {
-				plan_code: $scope.plan.planCode,
-				_csrf : window.csrfToken
-			};
+    return ($scope.cancel = () => $modalInstance.dismiss('cancel'))
+  })
 
-			$scope.inflight = true;
+  return App.controller('UserSubscriptionController', function(
+    $scope,
+    MultiCurrencyPricing,
+    $http,
+    sixpack,
+    $modal
+  ) {
+    $scope.plans = MultiCurrencyPricing.plans
 
-			return $http.post(`${SUBSCRIPTION_URL}?origin=confirmChangePlan`, body)
-				.then(() => location.reload()).catch(() => console.log("something went wrong changing plan"));
-		};
+    const freeTrialEndDate = new Date(
+      typeof subscription !== 'undefined' && subscription !== null
+        ? subscription.trial_ends_at
+        : undefined
+    )
 
-		return $scope.cancel = () => $modalInstance.dismiss('cancel');
-	});
+    const sevenDaysTime = new Date()
+    sevenDaysTime.setDate(sevenDaysTime.getDate() + 7)
 
-	App.controller("LeaveGroupModalController", function($scope, $modalInstance, $http){
-		$scope.confirmLeaveGroup = function() {
-			$scope.inflight = true;
-			return $http({
-				url: "/subscription/group/user",
-				method: "DELETE",
-				params: {admin_user_id: $scope.admin_id, _csrf: window.csrfToken}
-			}).then(() => location.reload()).catch(() => console.log("something went wrong changing plan"));
-		};
+    const freeTrialInFuture = freeTrialEndDate > new Date()
+    const freeTrialExpiresUnderSevenDays = freeTrialEndDate < sevenDaysTime
 
-		return $scope.cancel = () => $modalInstance.dismiss('cancel');
-	});
+    $scope.view = 'overview'
+    $scope.getSuffix = planCode =>
+      __guard__(
+        planCode != null ? planCode.match(/(.*?)_(.*)/) : undefined,
+        x => x[2]
+      ) || null
+    $scope.subscriptionSuffix = $scope.getSuffix(
+      __guard__(
+        typeof window !== 'undefined' && window !== null
+          ? window.subscription
+          : undefined,
+        x => x.planCode
+      )
+    )
+    if ($scope.subscriptionSuffix === 'free_trial_7_days') {
+      $scope.subscriptionSuffix = ''
+    }
+    $scope.isNextGenPlan = ['heron', 'ibis'].includes($scope.subscriptionSuffix)
 
+    $scope.shouldShowPlan = function(planCode) {
+      let needle
+      return (
+        (needle = $scope.getSuffix(planCode)),
+        !['heron', 'ibis'].includes(needle)
+      )
+    }
 
-	return App.controller("UserSubscriptionController", function($scope, MultiCurrencyPricing, $http, sixpack, $modal) {
-		$scope.plans = MultiCurrencyPricing.plans;
+    const isMonthlyCollab =
+      __guard__(
+        typeof subscription !== 'undefined' && subscription !== null
+          ? subscription.planCode
+          : undefined,
+        x1 => x1.indexOf('collaborator')
+      ) !== -1 &&
+      __guard__(
+        typeof subscription !== 'undefined' && subscription !== null
+          ? subscription.planCode
+          : undefined,
+        x2 => x2.indexOf('ann')
+      ) === -1
+    const stillInFreeTrial = freeTrialInFuture && freeTrialExpiresUnderSevenDays
 
-		const freeTrialEndDate = new Date(typeof subscription !== 'undefined' && subscription !== null ? subscription.trial_ends_at : undefined);
+    if (isMonthlyCollab && stillInFreeTrial) {
+      $scope.showExtendFreeTrial = true
+    } else if (isMonthlyCollab && !stillInFreeTrial) {
+      $scope.showDowngradeToStudent = true
+    } else {
+      $scope.showBasicCancel = true
+    }
 
-		const sevenDaysTime = new Date();
-		sevenDaysTime.setDate(sevenDaysTime.getDate() + 7);
+    setupReturly()
 
-		const freeTrialInFuture = freeTrialEndDate > new Date();
-		const freeTrialExpiresUnderSevenDays = freeTrialEndDate < sevenDaysTime;
+    recurly
+      .Pricing()
+      .plan('student', { quantity: 1 })
+      .currency(MultiCurrencyPricing.currencyCode)
+      .done(function(price) {
+        const totalPriceExTax = parseFloat(price.next.total)
+        return $scope.$evalAsync(function() {
+          let taxAmmount = totalPriceExTax * taxRate
+          if (isNaN(taxAmmount)) {
+            taxAmmount = 0
+          }
+          $scope.currencySymbol =
+            MultiCurrencyPricing.plans[MultiCurrencyPricing.currencyCode].symbol
+          return ($scope.studentPrice =
+            $scope.currencySymbol + (totalPriceExTax + taxAmmount))
+        })
+      })
 
-		$scope.view = 'overview';
-		$scope.getSuffix = planCode => __guard__(planCode != null ? planCode.match(/(.*?)_(.*)/) : undefined, x => x[2]) || null;
-		$scope.subscriptionSuffix = $scope.getSuffix(__guard__(typeof window !== 'undefined' && window !== null ? window.subscription : undefined, x => x.planCode));
-		if ($scope.subscriptionSuffix === 'free_trial_7_days') {
-			$scope.subscriptionSuffix = '';
-		}
-		$scope.isNextGenPlan = ['heron', 'ibis'].includes($scope.subscriptionSuffix);
+    $scope.downgradeToStudent = function() {
+      const body = {
+        plan_code: 'student',
+        _csrf: window.csrfToken
+      }
+      $scope.inflight = true
+      return $http
+        .post(`${SUBSCRIPTION_URL}?origin=downgradeToStudent`, body)
+        .then(() => location.reload())
+        .catch(() => console.log('something went wrong changing plan'))
+    }
 
-		$scope.shouldShowPlan = function(planCode) {
-			let needle;
-			return (needle = $scope.getSuffix(planCode), !['heron', 'ibis'].includes(needle));
-		};
+    $scope.cancelSubscription = function() {
+      const body = { _csrf: window.csrfToken }
 
-		const isMonthlyCollab = (__guard__(typeof subscription !== 'undefined' && subscription !== null ? subscription.planCode : undefined, x1 => x1.indexOf("collaborator")) !== -1) && (__guard__(typeof subscription !== 'undefined' && subscription !== null ? subscription.planCode : undefined, x2 => x2.indexOf("ann")) === -1);
-		const stillInFreeTrial = freeTrialInFuture && freeTrialExpiresUnderSevenDays;
+      $scope.inflight = true
+      return $http
+        .post('/user/subscription/cancel', body)
+        .then(() => location.reload())
+        .catch(() => console.log('something went wrong changing plan'))
+    }
 
-		if (isMonthlyCollab && stillInFreeTrial) {
-			$scope.showExtendFreeTrial = true;
-		} else if (isMonthlyCollab && !stillInFreeTrial) {
-			$scope.showDowngradeToStudent = true;
-		} else {
-			$scope.showBasicCancel = true;
-		}
+    $scope.removeSelfFromGroup = function(admin_id) {
+      $scope.admin_id = admin_id
+      return $modal.open({
+        templateUrl: 'LeaveGroupModalTemplate',
+        controller: 'LeaveGroupModalController',
+        scope: $scope
+      })
+    }
 
-		setupReturly();
+    $scope.switchToCancelationView = () => ($scope.view = 'cancelation')
 
-		recurly.Pricing().plan('student', { quantity: 1 }).currency(MultiCurrencyPricing.currencyCode).done(function(price){
-				const totalPriceExTax = parseFloat(price.next.total);
-				return $scope.$evalAsync(function() {
-					let taxAmmount = totalPriceExTax * taxRate;
-					if (isNaN(taxAmmount)) {
-						taxAmmount = 0;
-					}
-					$scope.currencySymbol = MultiCurrencyPricing.plans[MultiCurrencyPricing.currencyCode].symbol;
-					return $scope.studentPrice = $scope.currencySymbol + (totalPriceExTax + taxAmmount);
-				});
-		});
-
-		$scope.downgradeToStudent = function() {
-			const body = {
-				plan_code: 'student',
-				_csrf : window.csrfToken
-			};
-			$scope.inflight = true;
-			return $http.post(`${SUBSCRIPTION_URL}?origin=downgradeToStudent`, body)
-				.then(() => location.reload()).catch(() => console.log("something went wrong changing plan"));
-		};
-
-		$scope.cancelSubscription = function() {
-			const body =
-				{_csrf : window.csrfToken};
-
-			$scope.inflight = true;
-			return $http.post("/user/subscription/cancel", body)
-				.then(() => location.reload()).catch(() => console.log("something went wrong changing plan"));
-		};
-
-
-		$scope.removeSelfFromGroup = function(admin_id){
-			$scope.admin_id = admin_id;
-			return $modal.open({
-				templateUrl: "LeaveGroupModalTemplate",
-				controller:  "LeaveGroupModalController",
-				scope: $scope
-			});
-		};
-
-		$scope.switchToCancelationView = () => $scope.view = "cancelation";
-
-
-
-		return $scope.exendTrial = function() {
-			const body =
-				{_csrf : window.csrfToken};
-			$scope.inflight = true;
-			return $http.put("/user/subscription/extend", body)
-				.then(() => location.reload()).catch(() => console.log("something went wrong changing plan"));
-		};
-	});
-});
+    return ($scope.exendTrial = function() {
+      const body = { _csrf: window.csrfToken }
+      $scope.inflight = true
+      return $http
+        .put('/user/subscription/extend', body)
+        .then(() => location.reload())
+        .catch(() => console.log('something went wrong changing plan'))
+    })
+  })
+})
 
 function __guard__(value, transform) {
-  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+  return typeof value !== 'undefined' && value !== null
+    ? transform(value)
+    : undefined
 }
