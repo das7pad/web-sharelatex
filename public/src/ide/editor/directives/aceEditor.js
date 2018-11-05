@@ -763,7 +763,7 @@ define([
         }
 
         editor.renderer.on('changeCharacterSize', () => {
-          if (rendererData != null) {
+          if (scope.rendererData != null) {
             scope.$apply(
               () => (scope.rendererData.lineHeight = editor.renderer.lineHeight)
             )
