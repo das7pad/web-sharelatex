@@ -1,3 +1,12 @@
+/* eslint-disable
+    camelcase,
+    chai-friendly/no-unused-expressions,
+    max-len,
+    no-return-assign,
+    no-undef,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -102,7 +111,7 @@ define([
 						emailToRemove
 					},
 					headers: {
-						 //required for angular 1 to send data on delete which is valid
+						 // required for angular 1 to send data on delete which is valid
 						'Content-type': 'application/json;charset=utf-8',
 						"X-CSRF-Token": window.csrfToken
 					}
