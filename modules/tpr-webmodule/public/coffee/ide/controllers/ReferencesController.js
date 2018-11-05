@@ -1,18 +1,27 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.controller "ReferencesController", ($scope, $modal, ide, $http) ->
-		user = ide.$scope.user
-		features = user?.features
-		$scope.thirdPartyReferencesEnabled = features?.mendeley or features?.references
+], App =>
+	App.controller("ReferencesController", function($scope, $modal, ide, $http) {
+		const { user } = ide.$scope;
+		const features = user != null ? user.features : undefined;
+		$scope.thirdPartyReferencesEnabled = (features != null ? features.mendeley : undefined) || (features != null ? features.references : undefined);
 
-		$scope.openNewDocModal = () ->
-			$modal.open(
-				templateUrl: "newFileModalTemplate"
-				controller:  "NewFileModalController"
-				size: 'lg'
+		return $scope.openNewDocModal = () =>
+			$modal.open({
+				templateUrl: "newFileModalTemplate",
+				controller:  "NewFileModalController",
+				size: 'lg',
 				resolve: {
-					parent_folder: () -> null
-					type: () -> 'mendeley'
+					parent_folder() { return null; },
+					type() { return 'mendeley'; }
 				}
-			)
+			})
+		;
+	})
+);
