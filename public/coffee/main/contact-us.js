@@ -1,36 +1,49 @@
-define [
-	"base"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
+	"base",
 	"libs/platform"
-], (App, platform) ->
-	App.controller 'GroupPlanContactController', ($scope, $modal, $http) ->
+], (App, platform) =>
+	App.controller('GroupPlanContactController', function($scope, $modal, $http) {
 
-		$scope.form = {}
-		$scope.sent = false
-		$scope.sending = false
-		$scope.error = false
-		$scope.contactUs = ->
-			if !$scope.form.email?
-				console.log "email not set"
-				return
-			$scope.sending = true
-			ticketNumber = Math.floor((1 + Math.random()) * 0x10000).toString(32)
-			data =
-				_csrf : window.csrfToken
-				name: $scope.form.name || $scope.form.email
-				email: $scope.form.email
-				labels: "#{$scope.form.source} accounts"
-				message: "Please contact me with more details"
-				subject: "#{$scope.form.name} - Group Enquiry - #{$scope.form.position} - #{$scope.form.university}"
+		$scope.form = {};
+		$scope.sent = false;
+		$scope.sending = false;
+		$scope.error = false;
+		return $scope.contactUs = function() {
+			if (($scope.form.email == null)) {
+				console.log("email not set");
+				return;
+			}
+			$scope.sending = true;
+			const ticketNumber = Math.floor((1 + Math.random()) * 0x10000).toString(32);
+			const data = {
+				_csrf : window.csrfToken,
+				name: $scope.form.name || $scope.form.email,
+				email: $scope.form.email,
+				labels: `${$scope.form.source} accounts`,
+				message: "Please contact me with more details",
+				subject: `${$scope.form.name} - Group Enquiry - ${$scope.form.position} - ${$scope.form.university}`,
 				inbox: "accounts"
+			};
 
-			request = $http.post "/support", data
+			const request = $http.post("/support", data);
 			
-			request.catch ()->
-				$scope.error = true
-				$scope.$apply()
+			request.catch(function(){
+				$scope.error = true;
+				return $scope.$apply();
+			});
 
-			request.then (response)->
-				$scope.sent = true
-				event_tracking.send 'subscription-funnel', 'plans-page', 'group-inquiry-sent'
-				$scope.error = (response.status != 200)
-				$scope.$apply()
+			return request.then(function(response){
+				$scope.sent = true;
+				event_tracking.send('subscription-funnel', 'plans-page', 'group-inquiry-sent');
+				$scope.error = (response.status !== 200);
+				return $scope.$apply();
+			});
+		};
+	})
+);

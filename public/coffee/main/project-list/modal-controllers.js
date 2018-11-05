@@ -1,143 +1,162 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.controller 'RenameProjectModalController', ($scope, $modalInstance, $timeout, project, queuedHttp) ->
+], function(App) {
+	App.controller('RenameProjectModalController', function($scope, $modalInstance, $timeout, project, queuedHttp) {
 		$scope.inputs =
-			projectName: project.name
+			{projectName: project.name};
 
-		$scope.state =
-			inflight: false
+		$scope.state = {
+			inflight: false,
 			error: false
+		};
 
-		$modalInstance.opened.then () ->
-			$timeout () ->
-				$scope.$broadcast "open"
-			, 200
+		$modalInstance.opened.then(() =>
+			$timeout(() => $scope.$broadcast("open")
+			, 200)
+		);
 
-		$scope.rename = () ->
-			$scope.state.inflight = true
-			$scope.state.error = false
-			$scope
+		$scope.rename = function() {
+			$scope.state.inflight = true;
+			$scope.state.error = false;
+			return $scope
 				.renameProject(project, $scope.inputs.projectName)
-				.then () ->
-					$scope.state.inflight = false
-					$scope.state.error = false
-					$modalInstance.close()
-				.catch (response) ->
-					{ data, status } = response
-					$scope.state.inflight = false
-					if status == 400
-						$scope.state.error = { message: data }
-					else
-						$scope.state.error = true
+				.then(function() {
+					$scope.state.inflight = false;
+					$scope.state.error = false;
+					return $modalInstance.close();}).catch(function(response) {
+					const { data, status } = response;
+					$scope.state.inflight = false;
+					if (status === 400) {
+						return $scope.state.error = { message: data };
+					} else {
+						return $scope.state.error = true;
+					}
+			});
+		};
 
-		$scope.cancel = () ->
-			$modalInstance.dismiss('cancel')
+		return $scope.cancel = () => $modalInstance.dismiss('cancel');
+	});
 
-	App.controller 'CloneProjectModalController', ($scope, $modalInstance, $timeout, project) ->
+	App.controller('CloneProjectModalController', function($scope, $modalInstance, $timeout, project) {
 		$scope.inputs =
-			projectName: project.name + " (Copy)"
-		$scope.state =
-			inflight: false
+			{projectName: project.name + " (Copy)"};
+		$scope.state = {
+			inflight: false,
 			error: false
+		};
 
-		$modalInstance.opened.then () ->
-			$timeout () ->
-				$scope.$broadcast "open"
-			, 200
+		$modalInstance.opened.then(() =>
+			$timeout(() => $scope.$broadcast("open")
+			, 200)
+		);
 
-		$scope.clone = () ->
-			$scope.state.inflight = true
-			$scope
+		$scope.clone = function() {
+			$scope.state.inflight = true;
+			return $scope
 				.cloneProject(project, $scope.inputs.projectName)
-				.then () ->
-					$scope.state.inflight = false
-					$scope.state.error = false
-					$modalInstance.close()
-				.catch (response) ->
-					{ data, status } = response
-					$scope.state.inflight = false
-					if status == 400
-						$scope.state.error = { message: data }
-					else
-						$scope.state.error = true
+				.then(function() {
+					$scope.state.inflight = false;
+					$scope.state.error = false;
+					return $modalInstance.close();}).catch(function(response) {
+					const { data, status } = response;
+					$scope.state.inflight = false;
+					if (status === 400) {
+						return $scope.state.error = { message: data };
+					} else {
+						return $scope.state.error = true;
+					}
+			});
+		};
 
-		$scope.cancel = () ->
-			$modalInstance.dismiss('cancel')
+		return $scope.cancel = () => $modalInstance.dismiss('cancel');
+	});
 
-	App.controller 'NewProjectModalController', ($scope, $modalInstance, $timeout, template) ->
+	App.controller('NewProjectModalController', function($scope, $modalInstance, $timeout, template) {
 		$scope.inputs =
-			projectName: ""
-		$scope.state =
-			inflight: false
+			{projectName: ""};
+		$scope.state = {
+			inflight: false,
 			error: false
+		};
 
-		$modalInstance.opened.then () ->
-			$timeout () ->
-				$scope.$broadcast "open"
-			, 200
+		$modalInstance.opened.then(() =>
+			$timeout(() => $scope.$broadcast("open")
+			, 200)
+		);
 
-		$scope.create = () ->
-			$scope.state.inflight = true
-			$scope.state.error = false
-			$scope
+		$scope.create = function() {
+			$scope.state.inflight = true;
+			$scope.state.error = false;
+			return $scope
 				.createProject($scope.inputs.projectName, template)
-				.then (response) ->
-					{ data } = response
-					$scope.state.inflight = false
-					$scope.state.error = false
-					$modalInstance.close(data.project_id)
-				.catch (response) ->
-					{ data, status } = response
-					$scope.state.inflight = false
-					if status == 400
-						$scope.state.error = { message: data }
-					else
-						$scope.state.error = true
+				.then(function(response) {
+					const { data } = response;
+					$scope.state.inflight = false;
+					$scope.state.error = false;
+					return $modalInstance.close(data.project_id);}).catch(function(response) {
+					const { data, status } = response;
+					$scope.state.inflight = false;
+					if (status === 400) {
+						return $scope.state.error = { message: data };
+					} else {
+						return $scope.state.error = true;
+					}
+			});
+		};
 
-		$scope.cancel = () ->
-			$modalInstance.dismiss('cancel')
+		return $scope.cancel = () => $modalInstance.dismiss('cancel');
+	});
 
-	App.controller 'DeleteProjectsModalController', ($scope, $modalInstance, $timeout, projects) ->
-		$scope.projectsToDelete = projects.filter (project) -> project.accessLevel == "owner"
-		$scope.projectsToLeave = projects.filter (project) -> project.accessLevel != "owner"
-		$scope.projectsToArchive = projects.filter (project) ->
-			project.accessLevel == "owner" and !project.archived
+	App.controller('DeleteProjectsModalController', function($scope, $modalInstance, $timeout, projects) {
+		$scope.projectsToDelete = projects.filter(project => project.accessLevel === "owner");
+		$scope.projectsToLeave = projects.filter(project => project.accessLevel !== "owner");
+		$scope.projectsToArchive = projects.filter(project => (project.accessLevel === "owner") && !project.archived);
 
-		if $scope.projectsToLeave.length > 0 and $scope.projectsToDelete.length > 0
-			if $scope.projectsToArchive.length > 0 and window.ExposedSettings.isOverleaf
-				$scope.action = "archive-and-leave"
-			else
-				$scope.action = "delete-and-leave"
-		else if $scope.projectsToLeave.length == 0 and $scope.projectsToDelete.length > 0
-			if $scope.projectsToArchive.length > 0 and window.ExposedSettings.isOverleaf
-				$scope.action = "archive"
-			else
-				$scope.action = "delete"
-		else
-			$scope.action = "leave"
+		if (($scope.projectsToLeave.length > 0) && ($scope.projectsToDelete.length > 0)) {
+			if (($scope.projectsToArchive.length > 0) && window.ExposedSettings.isOverleaf) {
+				$scope.action = "archive-and-leave";
+			} else {
+				$scope.action = "delete-and-leave";
+			}
+		} else if (($scope.projectsToLeave.length === 0) && ($scope.projectsToDelete.length > 0)) {
+			if (($scope.projectsToArchive.length > 0) && window.ExposedSettings.isOverleaf) {
+				$scope.action = "archive";
+			} else {
+				$scope.action = "delete";
+			}
+		} else {
+			$scope.action = "leave";
+		}
 
-		$scope.delete = () ->
-			$modalInstance.close()
+		$scope.delete = () => $modalInstance.close();
 
-		$scope.cancel = () ->
-			$modalInstance.dismiss('cancel')
+		return $scope.cancel = () => $modalInstance.dismiss('cancel');
+	});
 
-	App.controller 'UploadProjectModalController', ($scope, $modalInstance, $timeout) ->
-		$scope.cancel = () ->
-			$modalInstance.dismiss('cancel')
+	App.controller('UploadProjectModalController', function($scope, $modalInstance, $timeout) {
+		$scope.cancel = () => $modalInstance.dismiss('cancel');
 
-		$scope.onComplete = (error, name, response) ->
-			if response.project_id?
-				window.location = '/project/' + response.project_id
+		return $scope.onComplete = function(error, name, response) {
+			if (response.project_id != null) {
+				return window.location = `/project/${response.project_id}`;
+			}
+		};
+	});
 
-	App.controller 'V1ImportModalController', ($scope, $modalInstance, project) ->
-		$scope.project = project
+	App.controller('V1ImportModalController', function($scope, $modalInstance, project) {
+		$scope.project = project;
 
-		$scope.dismiss = () ->
-			$modalInstance.dismiss('cancel')
+		return $scope.dismiss = () => $modalInstance.dismiss('cancel');
+	});
 
-	App.controller 'ShowErrorModalController', ($scope, $modalInstance, error) ->
-		$scope.error = error
-		$scope.cancel = () ->
-			$modalInstance.dismiss('cancel')
+	return App.controller('ShowErrorModalController', function($scope, $modalInstance, error) {
+		$scope.error = error;
+		return $scope.cancel = () => $modalInstance.dismiss('cancel');
+	});
+});

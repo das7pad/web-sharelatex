@@ -1,210 +1,263 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS103: Rewrite code to no longer use __guard__
+ * DS205: Consider reworking code to avoid use of IIFEs
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.controller "ShareProjectModalController", ($scope, $modalInstance, $timeout, projectMembers, projectInvites, $modal, $http, ide, validateCaptcha, settings, event_tracking) ->
+], App =>
+	App.controller("ShareProjectModalController", function($scope, $modalInstance, $timeout, projectMembers, projectInvites, $modal, $http, ide, validateCaptcha, settings, event_tracking) {
+		let loadAutocompleteUsers;
 		$scope.inputs = {
-			privileges: "readAndWrite"
+			privileges: "readAndWrite",
 			contacts: []
-		}
+		};
 		$scope.state = {
-			error: null
-			errorReason: null
-			inflight: false
-			startedFreeTrial: false
+			error: null,
+			errorReason: null,
+			inflight: false,
+			startedFreeTrial: false,
 			invites: []
-		}
+		};
 
-		$modalInstance.opened.then () ->
-			$timeout () ->
-				$scope.$broadcast "open"
-			, 200
+		$modalInstance.opened.then(() =>
+			$timeout(() => $scope.$broadcast("open")
+			, 200)
+		);
 
-		INFINITE_COLLABORATORS = -1
+		const INFINITE_COLLABORATORS = -1;
 
-		$scope.refreshCanAddCollaborators = () ->
-			allowedNoOfMembers = $scope.project.features.collaborators
-			$scope.canAddCollaborators = (
-				($scope.project.members.length + $scope.project.invites.length) < allowedNoOfMembers or allowedNoOfMembers == INFINITE_COLLABORATORS
-			)
-		$scope.refreshCanAddCollaborators()
+		$scope.refreshCanAddCollaborators = function() {
+			const allowedNoOfMembers = $scope.project.features.collaborators;
+			return $scope.canAddCollaborators = (
+				(($scope.project.members.length + $scope.project.invites.length) < allowedNoOfMembers) || (allowedNoOfMembers === INFINITE_COLLABORATORS)
+			);
+		};
+		$scope.refreshCanAddCollaborators();
 
-		$scope.$watch "(project.members.length + project.invites.length)", (_noOfMembers) ->
-			$scope.refreshCanAddCollaborators()
+		$scope.$watch("(project.members.length + project.invites.length)", _noOfMembers => $scope.refreshCanAddCollaborators());
 
-		$scope.autocompleteContacts = []
-		do loadAutocompleteUsers = () ->
-			$http.get "/user/contacts"
-				.then (response) ->
-					{ data } = response
-					$scope.autocompleteContacts = data.contacts or []
-					for contact in $scope.autocompleteContacts
-						if contact.type == "user"
-							if contact.first_name == contact.email.split("@")[0] and !contact.last_name
-								# User has not set their proper name so use email as canonical display property
-								contact.display = contact.email
-							else
-								contact.name = "#{contact.first_name} #{contact.last_name}"
-								contact.display = "#{contact.name} <#{contact.email}>"
-						else
-							# Must be a group
-							contact.display = contact.name
+		$scope.autocompleteContacts = [];
+		(loadAutocompleteUsers = () =>
+			$http.get("/user/contacts")
+				.then(function(response) {
+					const { data } = response;
+					$scope.autocompleteContacts = data.contacts || [];
+					return (() => {
+						const result = [];
+						for (let contact of Array.from($scope.autocompleteContacts)) {
+							if (contact.type === "user") {
+								if ((contact.first_name === contact.email.split("@")[0]) && !contact.last_name) {
+									// User has not set their proper name so use email as canonical display property
+									result.push(contact.display = contact.email);
+								} else {
+									contact.name = `${contact.first_name} ${contact.last_name}`;
+									result.push(contact.display = `${contact.name} <${contact.email}>`);
+								}
+							} else {
+								// Must be a group
+								result.push(contact.display = contact.name);
+							}
+						}
+						return result;
+					})();
+			})
+		)();
 
-		getCurrentMemberEmails = () ->
-			($scope.project.members || []).map (u) -> u.email
+		const getCurrentMemberEmails = () => ($scope.project.members || []).map(u => u.email);
 
-		getCurrentInviteEmails = () ->
-			($scope.project.invites || []).map (u) -> u.email
+		const getCurrentInviteEmails = () => ($scope.project.invites || []).map(u => u.email);
 
-		$scope.filterAutocompleteUsers = ($query) ->
-			currentMemberEmails = getCurrentMemberEmails()
-			return $scope.autocompleteContacts.filter (contact) ->
-				if contact.email? and contact.email in currentMemberEmails
-					return false
-				for text in [contact.name, contact.email]
-					if text?.toLowerCase().indexOf($query.toLowerCase()) > -1
-						return true
-				return false
+		$scope.filterAutocompleteUsers = function($query) {
+			const currentMemberEmails = getCurrentMemberEmails();
+			return $scope.autocompleteContacts.filter(function(contact) {
+				if ((contact.email != null) && Array.from(currentMemberEmails).includes(contact.email)) {
+					return false;
+				}
+				for (let text of [contact.name, contact.email]) {
+					if ((text != null ? text.toLowerCase().indexOf($query.toLowerCase()) : undefined) > -1) {
+						return true;
+					}
+				}
+				return false;
+			});
+		};
 
-		$scope.addMembers = () ->
-			addMembers = () ->
-				return if $scope.inputs.contacts.length == 0
+		$scope.addMembers = function() {
+			const addMembers = function() {
+				let addNextMember;
+				if ($scope.inputs.contacts.length === 0) { return; }
 
-				members = $scope.inputs.contacts
-				$scope.inputs.contacts = []
-				$scope.state.error = false
-				$scope.state.errorReason = null
-				$scope.state.inflight = true
+				const members = $scope.inputs.contacts;
+				$scope.inputs.contacts = [];
+				$scope.state.error = false;
+				$scope.state.errorReason = null;
+				$scope.state.inflight = true;
 
-				if !$scope.project.invites?
-					$scope.project.invites = []
+				if (($scope.project.invites == null)) {
+					$scope.project.invites = [];
+				}
 
-				currentMemberEmails = getCurrentMemberEmails()
-				currentInviteEmails = getCurrentInviteEmails()
-				do addNextMember = () ->
-					if members.length == 0 or !$scope.canAddCollaborators
-						$scope.state.inflight = false
-						$scope.$apply()
-						return
+				const currentMemberEmails = getCurrentMemberEmails();
+				const currentInviteEmails = getCurrentInviteEmails();
+				return (addNextMember = function() {
+					let email;
+					if ((members.length === 0) || !$scope.canAddCollaborators) {
+						$scope.state.inflight = false;
+						$scope.$apply();
+						return;
+					}
 
-					member = members.shift()
-					if member.type == "user"
-						email = member.email
-					else # Not an auto-complete object, so email == display
-						email = member.display
-					email = email.toLowerCase()
+					const member = members.shift();
+					if (member.type === "user") {
+						({ email } = member);
+					} else { // Not an auto-complete object, so email == display
+						email = member.display;
+					}
+					email = email.toLowerCase();
 
-					if email in currentMemberEmails
-						# Skip this existing member
-						return addNextMember()
-					validateCaptcha (response) ->
-						$scope.grecaptchaResponse = response	
-						if email in currentInviteEmails and inviteId = _.find(($scope.project.invites || []), (invite) -> invite.email == email)?._id
-							request = projectInvites.resendInvite(inviteId)
-						else
-							request = projectInvites.sendInvite(email, $scope.inputs.privileges, $scope.grecaptchaResponse)
+					if (Array.from(currentMemberEmails).includes(email)) {
+						// Skip this existing member
+						return addNextMember();
+					}
+					return validateCaptcha(function(response) {
+						let inviteId, request;
+						$scope.grecaptchaResponse = response;	
+						if (Array.from(currentInviteEmails).includes(email) && (inviteId = __guard__(_.find(($scope.project.invites || []), invite => invite.email === email), x => x._id))) {
+							request = projectInvites.resendInvite(inviteId);
+						} else {
+							request = projectInvites.sendInvite(email, $scope.inputs.privileges, $scope.grecaptchaResponse);
+						}
 
-						request
-							.then (response) ->
-								{ data } = response
-								if data.error
-									$scope.state.error = true
-									$scope.state.errorReason = "#{data.error}"
-									$scope.state.inflight = false
-								else
-									if data.invite
-										invite = data.invite
-										$scope.project.invites.push invite
-									else
-										if data.users?
-											users = data.users
-										else if data.user?
-											users = [data.user]
-										else
-											users = []
-										$scope.project.members.push users...
+						return request
+							.then(function(response) {
+								const { data } = response;
+								if (data.error) {
+									$scope.state.error = true;
+									$scope.state.errorReason = `${data.error}`;
+									$scope.state.inflight = false;
+								} else {
+									if (data.invite) {
+										const { invite } = data;
+										$scope.project.invites.push(invite);
+									} else {
+										let users;
+										if (data.users != null) {
+											({ users } = data);
+										} else if (data.user != null) {
+											users = [data.user];
+										} else {
+											users = [];
+										}
+										$scope.project.members.push(...Array.from(users || []));
+									}
+								}
 
-								setTimeout () ->
-									# Give $scope a chance to update $scope.canAddCollaborators
-									# with new collaborator information.
+								return setTimeout(() =>
+									// Give $scope a chance to update $scope.canAddCollaborators
+									// with new collaborator information.
 									addNextMember()
-								, 0
-							.catch (httpResponse) ->
-								{data, status, headers, config } = httpResponse
-								$scope.state.inflight = false
-								$scope.state.error = true
+								
+								, 0);}).catch(function(httpResponse) {
+								const {data, status, headers, config } = httpResponse;
+								$scope.state.inflight = false;
+								$scope.state.error = true;
 
-								if data?.errorReason?
-									$scope.state.errorReason = data?.errorReason
-								else
-									$scope.state.errorReason = null
+								if ((data != null ? data.errorReason : undefined) != null) {
+									return $scope.state.errorReason = data != null ? data.errorReason : undefined;
+								} else {
+									return $scope.state.errorReason = null;
+								}
+						});
+					});
+				})();
+			};
 
 
-			$timeout addMembers, 50 # Give email list a chance to update
+			return $timeout(addMembers, 50); // Give email list a chance to update
+		};
 
-		$scope.removeMember = (member) ->
-			$scope.state.error = null
-			$scope.state.inflight = true
-			projectMembers
+		$scope.removeMember = function(member) {
+			$scope.state.error = null;
+			$scope.state.inflight = true;
+			return projectMembers
 				.removeMember(member)
-				.then () ->
-					$scope.state.inflight = false
-					index = $scope.project.members.indexOf(member)
-					return if index == -1
-					$scope.project.members.splice(index, 1)
-				.catch () ->
-					$scope.state.inflight = false
-					$scope.state.error = "Sorry, something went wrong :("
+				.then(function() {
+					$scope.state.inflight = false;
+					const index = $scope.project.members.indexOf(member);
+					if (index === -1) { return; }
+					return $scope.project.members.splice(index, 1);}).catch(function() {
+					$scope.state.inflight = false;
+					return $scope.state.error = "Sorry, something went wrong :(";
+			});
+		};
 
-		$scope.revokeInvite = (invite) ->
-			$scope.state.error = null
-			$scope.state.inflight = true
-			projectInvites
+		$scope.revokeInvite = function(invite) {
+			$scope.state.error = null;
+			$scope.state.inflight = true;
+			return projectInvites
 				.revokeInvite(invite._id)
-				.then () ->
-					$scope.state.inflight = false
-					index = $scope.project.invites.indexOf(invite)
-					return if index == -1
-					$scope.project.invites.splice(index, 1)
-				.catch () ->
-					$scope.state.inflight = false
-					$scope.state.error = "Sorry, something went wrong :("
+				.then(function() {
+					$scope.state.inflight = false;
+					const index = $scope.project.invites.indexOf(invite);
+					if (index === -1) { return; }
+					return $scope.project.invites.splice(index, 1);}).catch(function() {
+					$scope.state.inflight = false;
+					return $scope.state.error = "Sorry, something went wrong :(";
+			});
+		};
 
-		$scope.resendInvite = (invite, event) ->
-			$scope.state.error = null
-			$scope.state.inflight = true
-			projectInvites
+		$scope.resendInvite = function(invite, event) {
+			$scope.state.error = null;
+			$scope.state.inflight = true;
+			return projectInvites
 				.resendInvite(invite._id)
-				.then () ->
-					$scope.state.inflight = false
-					event.target.blur()
-				.catch () ->
-					$scope.state.inflight = false
-					$scope.state.error = "Sorry, something went wrong resending the invite :("
-					event.target.blur()
+				.then(function() {
+					$scope.state.inflight = false;
+					return event.target.blur();}).catch(function() {
+					$scope.state.inflight = false;
+					$scope.state.error = "Sorry, something went wrong resending the invite :(";
+					return event.target.blur();
+			});
+		};
 
-		$scope.makeTokenBased = () ->
-			$scope.project.publicAccesLevel = "tokenBased"
-			settings.saveProjectAdminSettings({publicAccessLevel: "tokenBased"})
-			event_tracking.sendMB 'project-make-token-based'
+		$scope.makeTokenBased = function() {
+			$scope.project.publicAccesLevel = "tokenBased";
+			settings.saveProjectAdminSettings({publicAccessLevel: "tokenBased"});
+			return event_tracking.sendMB('project-make-token-based');
+		};
 
-		$scope.makePrivate = () ->
-			$scope.project.publicAccesLevel = "private"
-			settings.saveProjectAdminSettings({publicAccessLevel: "private"})
+		$scope.makePrivate = function() {
+			$scope.project.publicAccesLevel = "private";
+			return settings.saveProjectAdminSettings({publicAccessLevel: "private"});
+		};
 
-		$scope.$watch "project.tokens.readAndWrite", (token) ->
-			if token?
-				$scope.readAndWriteTokenLink = "#{location.origin}/#{token}"
-			else
-				$scope.readAndWriteTokenLink = null
+		$scope.$watch("project.tokens.readAndWrite", function(token) {
+			if (token != null) {
+				return $scope.readAndWriteTokenLink = `${location.origin}/${token}`;
+			} else {
+				return $scope.readAndWriteTokenLink = null;
+			}
+		});
 
-		$scope.$watch "project.tokens.readOnly", (token) ->
-			if token?
-				$scope.readOnlyTokenLink = "#{location.origin}/read/#{token}"
-			else
-				$scope.readOnlyTokenLink = null
+		$scope.$watch("project.tokens.readOnly", function(token) {
+			if (token != null) {
+				return $scope.readOnlyTokenLink = `${location.origin}/read/${token}`;
+			} else {
+				return $scope.readOnlyTokenLink = null;
+			}
+		});
 
-		$scope.done = () ->
-			$modalInstance.close()
+		$scope.done = () => $modalInstance.close();
 
-		$scope.cancel = () ->
-			$modalInstance.dismiss()
+		return $scope.cancel = () => $modalInstance.dismiss();
+	})
+);
+
+function __guard__(value, transform) {
+  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+}

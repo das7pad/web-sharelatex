@@ -1,20 +1,27 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.controller "ClearSessionsController", ["$scope", "$http", ($scope, $http) ->
+], App =>
+	App.controller("ClearSessionsController", ["$scope", "$http", function($scope, $http) {
 
-		$scope.state =
-			otherSessions: window.otherSessions
-			error: false
+		$scope.state = {
+			otherSessions: window.otherSessions,
+			error: false,
 			success: false
+		};
 
-		$scope.clearSessions = () ->
-			console.log ">> clearing all sessions"
-			$http({method: 'POST', url: "/user/sessions/clear", headers: {'X-CSRF-Token': window.csrfToken}})
-			.then () ->
-				$scope.state.otherSessions = []
-				$scope.state.error = false
-				$scope.state.success = true
-			.catch () ->
-				$scope.state.error = true
-	]
+		return $scope.clearSessions = function() {
+			console.log(">> clearing all sessions");
+			return $http({method: 'POST', url: "/user/sessions/clear", headers: {'X-CSRF-Token': window.csrfToken}})
+			.then(function() {
+				$scope.state.otherSessions = [];
+				$scope.state.error = false;
+				return $scope.state.success = true;}).catch(() => $scope.state.error = true);
+		};
+	}
+	])
+);

@@ -1,15 +1,25 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
+], App =>
 
-	App.directive "equals", [->
-		return {
-			require: "ngModel"
-			link: (scope, elem, attrs, ctrl) ->
-				firstField = "#" + attrs.equals
-				elem.add(firstField).on "keyup", ->
-					scope.$apply ->
-						equal = elem.val() == $(firstField).val()
-						ctrl.$setValidity "areEqual", equal
-		}
-	]
+	App.directive("equals", [() =>
+		({
+			require: "ngModel",
+			link(scope, elem, attrs, ctrl) {
+				const firstField = `#${attrs.equals}`;
+				return elem.add(firstField).on("keyup", () =>
+					scope.$apply(function() {
+						const equal = elem.val() === $(firstField).val();
+						return ctrl.$setValidity("areEqual", equal);
+					})
+				);
+			}
+		})
+	
+	])
+);

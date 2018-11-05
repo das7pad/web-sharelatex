@@ -1,35 +1,45 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.controller "DomainSubscriptionJoinController", ($scope, $http) ->
+], App =>
+	App.controller("DomainSubscriptionJoinController", function($scope, $http) {
 
-		$scope.inflight = false
+		$scope.inflight = false;
 
-		if has_personal_subscription
-			$scope.view = "personalSubscription"
-		else
-			$scope.view = "domainSubscriptionJoin"
+		if (has_personal_subscription) {
+			$scope.view = "personalSubscription";
+		} else {
+			$scope.view = "domainSubscriptionJoin";
+		}
 
-		$scope.keepPersonalSubscription = ->
-			$scope.view = "domainSubscriptionJoin"
+		$scope.keepPersonalSubscription = () => $scope.view = "domainSubscriptionJoin";
 
-		$scope.cancelSubscription = ->
-			$scope.inflight = true
-			request = $http.post "/user/subscription/cancel", {_csrf:window.csrfToken}
-			request.then ()->
-				$scope.inflight = false
-				$scope.view = "domainSubscriptionJoin"
-			request.catch ()->
-				console.log "the request failed"
+		$scope.cancelSubscription = function() {
+			$scope.inflight = true;
+			const request = $http.post("/user/subscription/cancel", {_csrf:window.csrfToken});
+			request.then(function(){
+				$scope.inflight = false;
+				return $scope.view = "domainSubscriptionJoin";
+			});
+			return request.catch(()=> console.log("the request failed"));
+		};
 
-		$scope.joinGroup = ->
-			$scope.view = "requestSent"
-			$scope.inflight = true
-			request = $http.post "/user/subscription/domain/join", {_csrf:window.csrfToken}
-			request.then (response)->
-				{ status } = response
-				$scope.inflight = false
-				if status != 200 # assume request worked
-					$scope.requestSent = false
-			request.catch ()->
-				console.log "the request failed"
+		return $scope.joinGroup = function() {
+			$scope.view = "requestSent";
+			$scope.inflight = true;
+			const request = $http.post("/user/subscription/domain/join", {_csrf:window.csrfToken});
+			request.then(function(response){
+				const { status } = response;
+				$scope.inflight = false;
+				if (status !== 200) { // assume request worked
+					return $scope.requestSent = false;
+				}
+			});
+			return request.catch(()=> console.log("the request failed"));
+		};
+	})
+);

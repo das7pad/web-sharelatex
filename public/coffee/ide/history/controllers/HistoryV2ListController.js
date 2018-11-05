@@ -1,33 +1,44 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base",
 	"ide/history/util/displayNameForUser"
-], (App, displayNameForUser) ->
+], (App, displayNameForUser) =>
 
-	App.controller "HistoryV2ListController", ["$scope", "$modal", "ide", ($scope, $modal, ide) ->
-		$scope.hoveringOverListSelectors = false
+	App.controller("HistoryV2ListController", ["$scope", "$modal", "ide", function($scope, $modal, ide) {
+		$scope.hoveringOverListSelectors = false;
 		$scope.listConfig =
-			showOnlyLabelled: false
+			{showOnlyLabelled: false};
 		
-		$scope.projectUsers = []
+		$scope.projectUsers = [];
 
-		$scope.$watch "project.members", (newVal) ->
-			if newVal?
-				$scope.projectUsers = newVal.concat $scope.project.owner
+		$scope.$watch("project.members", function(newVal) {
+			if (newVal != null) {
+				return $scope.projectUsers = newVal.concat($scope.project.owner);
+			}
+		});
 
-		$scope.loadMore = () =>
-			ide.historyManager.fetchNextBatchOfUpdates()
+		$scope.loadMore = () => {
+			return ide.historyManager.fetchNextBatchOfUpdates();
+		};
 
-		$scope.handleEntrySelect = (entry) ->
-			ide.historyManager.selectUpdate(entry)
+		$scope.handleEntrySelect = entry => ide.historyManager.selectUpdate(entry);
 
-		$scope.handleLabelSelect = (label) ->
-			ide.historyManager.selectLabel(label)
+		$scope.handleLabelSelect = label => ide.historyManager.selectLabel(label);
 			
-		$scope.handleLabelDelete = (labelDetails) ->
-			$modal.open(
-				templateUrl: "historyV2DeleteLabelModalTemplate"
-				controller: "HistoryV2DeleteLabelModalController"
-				resolve:
-					labelDetails: () -> labelDetails
-			)
-	]
+		return $scope.handleLabelDelete = labelDetails =>
+			$modal.open({
+				templateUrl: "historyV2DeleteLabelModalTemplate",
+				controller: "HistoryV2DeleteLabelModalController",
+				resolve: {
+					labelDetails() { return labelDetails; }
+				}
+			})
+		;
+	}
+	])
+);

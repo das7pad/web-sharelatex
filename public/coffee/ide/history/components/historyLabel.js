@@ -1,20 +1,27 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	historyLabelController = ($scope, $element, $attrs, $filter, _) ->
-		ctrl = @
-		ctrl.$onInit = () ->
-			ctrl.showTooltip ?= true
-		return
+], function(App) {
+	const historyLabelController = function($scope, $element, $attrs, $filter, _) {
+		const ctrl = this;
+		ctrl.$onInit = () => ctrl.showTooltip != null ? ctrl.showTooltip : (ctrl.showTooltip = true);
+	};
 
-	App.component "historyLabel", {
-		bindings:
-			labelText: "<"
-			labelOwnerName: "<?"
-			labelCreationDateTime: "<?"
-			isOwnedByCurrentUser: "<"
-			onLabelDelete: "&"
+	return App.component("historyLabel", {
+		bindings: {
+			labelText: "<",
+			labelOwnerName: "<?",
+			labelCreationDateTime: "<?",
+			isOwnedByCurrentUser: "<",
+			onLabelDelete: "&",
 			showTooltip: "<?"
-		controller: historyLabelController
+		},
+		controller: historyLabelController,
 		templateUrl: "historyLabelTpl"
-	}
+	});
+});

@@ -1,39 +1,48 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	historyEntriesListController = ($scope, $element, $attrs) ->
-		ctrl = @ 
-		ctrl.$entryListViewportEl = null
-		_isEntryElVisible = ($entryEl) ->
-			entryElTop = $entryEl.offset().top
-			entryElBottom = entryElTop + $entryEl.outerHeight()
-			entryListViewportElTop = ctrl.$entryListViewportEl.offset().top
-			entryListViewportElBottom = entryListViewportElTop + ctrl.$entryListViewportEl.height()
-			return entryElTop >= entryListViewportElTop and entryElBottom <= entryListViewportElBottom;
-		_getScrollTopPosForEntry = ($entryEl) ->
-			halfViewportElHeight = ctrl.$entryListViewportEl.height() / 2
-			return $entryEl.offset().top - halfViewportElHeight
-		ctrl.onEntryLinked = (entry, $entryEl) ->
-			if entry.selectedTo and entry.selectedFrom and !_isEntryElVisible $entryEl
-				$scope.$applyAsync () ->
-					ctrl.$entryListViewportEl.scrollTop _getScrollTopPosForEntry $entryEl
-		ctrl.$onInit = () ->
-			ctrl.$entryListViewportEl = $element.find "> .history-entries"
-		return
+], function(App) {
+	const historyEntriesListController = function($scope, $element, $attrs) {
+		const ctrl = this; 
+		ctrl.$entryListViewportEl = null;
+		const _isEntryElVisible = function($entryEl) {
+			const entryElTop = $entryEl.offset().top;
+			const entryElBottom = entryElTop + $entryEl.outerHeight();
+			const entryListViewportElTop = ctrl.$entryListViewportEl.offset().top;
+			const entryListViewportElBottom = entryListViewportElTop + ctrl.$entryListViewportEl.height();
+			return (entryElTop >= entryListViewportElTop) && (entryElBottom <= entryListViewportElBottom);
+		};
+		const _getScrollTopPosForEntry = function($entryEl) {
+			const halfViewportElHeight = ctrl.$entryListViewportEl.height() / 2;
+			return $entryEl.offset().top - halfViewportElHeight;
+		};
+		ctrl.onEntryLinked = function(entry, $entryEl) {
+			if (entry.selectedTo && entry.selectedFrom && !_isEntryElVisible($entryEl)) {
+				return $scope.$applyAsync(() => ctrl.$entryListViewportEl.scrollTop(_getScrollTopPosForEntry($entryEl)));
+			}
+		};
+		ctrl.$onInit = () => ctrl.$entryListViewportEl = $element.find("> .history-entries");
+	};
 
-	App.component "historyEntriesList", {
-		bindings:
-			entries: "<"
-			users: "<"
-			loadEntries: "&"
-			loadDisabled: "<"
-			loadInitialize: "<"
-			isLoading: "<"
-			currentUser: "<"
-			freeHistoryLimitHit: "<"
-			currentUserIsOwner: "<"
-			onEntrySelect: "&"
+	return App.component("historyEntriesList", {
+		bindings: {
+			entries: "<",
+			users: "<",
+			loadEntries: "&",
+			loadDisabled: "<",
+			loadInitialize: "<",
+			isLoading: "<",
+			currentUser: "<",
+			freeHistoryLimitHit: "<",
+			currentUserIsOwner: "<",
+			onEntrySelect: "&",
 			onLabelDelete: "&"
-		controller: historyEntriesListController
+		},
+		controller: historyEntriesListController,
 		templateUrl: "historyEntriesListTpl"
-	}
+	});
+});

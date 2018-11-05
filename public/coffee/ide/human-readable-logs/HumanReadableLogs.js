@@ -1,42 +1,69 @@
-define [
-	"libs/latex-log-parser"
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
+	"libs/latex-log-parser",
 	"ide/human-readable-logs/HumanReadableLogsRules"
-], (LogParser, ruleset) ->
-	parse : (rawLog, options) ->
-		if typeof rawLog is 'string'
-			parsedLogEntries = LogParser.parse(rawLog, options)
-		else
-			parsedLogEntries = rawLog
+], (LogParser, ruleset) =>
+	({
+		parse(rawLog, options) {
+			let parsedLogEntries;
+			if (typeof rawLog === 'string') {
+				parsedLogEntries = LogParser.parse(rawLog, options);
+			} else {
+				parsedLogEntries = rawLog;
+			}
 
-		_getRule = (logMessage) ->
-			return rule for rule in ruleset when rule.regexToMatch.test logMessage
+			const _getRule = function(logMessage) {
+				for (let rule of Array.from(ruleset)) { if (rule.regexToMatch.test(logMessage)) { return rule; } }
+			};
 
-		seenErrorTypes = {} # keep track of types of errors seen
+			const seenErrorTypes = {}; // keep track of types of errors seen
 
-		for entry in parsedLogEntries.all
-			ruleDetails = _getRule entry.message
+			for (let entry of Array.from(parsedLogEntries.all)) {
+				const ruleDetails = _getRule(entry.message);
 
-			if (ruleDetails?)
-				if ruleDetails.ruleId?
-					entry.ruleId = ruleDetails.ruleId
-				else if ruleDetails.regexToMatch?
-					entry.ruleId = 'hint_' + ruleDetails.regexToMatch.toString().replace(/\s/g, '_').slice(1, -1)
-				if ruleDetails.newMessage?
-					entry.message = entry.message.replace ruleDetails.regexToMatch, ruleDetails.newMessage
-				# suppress any entries that are known to cascade from previous error types
-				if ruleDetails.cascadesFrom?
-					for type in ruleDetails.cascadesFrom
-						entry.suppressed = true if seenErrorTypes[type]
-				# record the types of errors seen
-				if ruleDetails.types?
-					for type in ruleDetails.types
-						seenErrorTypes[type] = true
+				if (ruleDetails != null) {
+					var type;
+					if (ruleDetails.ruleId != null) {
+						entry.ruleId = ruleDetails.ruleId;
+					} else if (ruleDetails.regexToMatch != null) {
+						entry.ruleId = `hint_${ruleDetails.regexToMatch.toString().replace(/\s/g, '_').slice(1, -1)}`;
+					}
+					if (ruleDetails.newMessage != null) {
+						entry.message = entry.message.replace(ruleDetails.regexToMatch, ruleDetails.newMessage);
+					}
+					// suppress any entries that are known to cascade from previous error types
+					if (ruleDetails.cascadesFrom != null) {
+						for (type of Array.from(ruleDetails.cascadesFrom)) {
+							if (seenErrorTypes[type]) { entry.suppressed = true; }
+						}
+					}
+					// record the types of errors seen
+					if (ruleDetails.types != null) {
+						for (type of Array.from(ruleDetails.types)) {
+							seenErrorTypes[type] = true;
+						}
+					}
 				
-				entry.humanReadableHint = ruleDetails.humanReadableHint if ruleDetails.humanReadableHint?
-				entry.extraInfoURL = ruleDetails.extraInfoURL if ruleDetails.extraInfoURL?
+					if (ruleDetails.humanReadableHint != null) { entry.humanReadableHint = ruleDetails.humanReadableHint; }
+					if (ruleDetails.extraInfoURL != null) { entry.extraInfoURL = ruleDetails.extraInfoURL; }
+				}
+			}
 
-		# filter out the suppressed errors (from the array entries in parsedLogEntries)
-		for key, errors of parsedLogEntries when typeof errors is 'object' and errors.length > 0
-			parsedLogEntries[key] = (err for err in errors when not err.suppressed)
+			// filter out the suppressed errors (from the array entries in parsedLogEntries)
+			for (let key in parsedLogEntries) {
+				const errors = parsedLogEntries[key];
+				if ((typeof errors === 'object') && (errors.length > 0)) {
+					parsedLogEntries[key] = (Array.from(errors).filter((err) => !err.suppressed));
+				}
+			}
 
-		return parsedLogEntries
+			return parsedLogEntries;
+		}
+	})
+);

@@ -1,48 +1,61 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	inputSuggestionsController = ($scope, $element, $attrs, Keys) ->
-		ctrl = @ 
-		ctrl.showHint = false
-		ctrl.hasFocus = false
-		ctrl.handleFocus = () ->
-			ctrl.hasFocus = true
-			ctrl.suggestion = null
-		ctrl.handleBlur = () ->
-			ctrl.showHint = false
-			ctrl.hasFocus = false
-			ctrl.suggestion = null
-			ctrl.onBlur()
-		ctrl.handleKeyDown = ($event) ->
-			if ($event.which == Keys.TAB or $event.which == Keys.ENTER) and ctrl.suggestion? and ctrl.suggestion != ""
-				$event.preventDefault()
-				ctrl.localNgModel += ctrl.suggestion
-			ctrl.suggestion = null
-			ctrl.showHint = false
-		$scope.$watch "$ctrl.localNgModel", (newVal, oldVal) ->
-			if ctrl.hasFocus and newVal != oldVal
-				ctrl.suggestion = null
-				ctrl.showHint = false
-				ctrl.getSuggestion({ userInput: newVal })
-					.then (suggestion) -> 
-						if suggestion? and newVal == ctrl.localNgModel
-							ctrl.showHint = true
-							ctrl.suggestion = suggestion.replace newVal, ""
-					.catch () -> ctrl.suggestion = null
-		return
+], function(App) {
+	const inputSuggestionsController = function($scope, $element, $attrs, Keys) {
+		const ctrl = this; 
+		ctrl.showHint = false;
+		ctrl.hasFocus = false;
+		ctrl.handleFocus = function() {
+			ctrl.hasFocus = true;
+			return ctrl.suggestion = null;
+		};
+		ctrl.handleBlur = function() {
+			ctrl.showHint = false;
+			ctrl.hasFocus = false;
+			ctrl.suggestion = null;
+			return ctrl.onBlur();
+		};
+		ctrl.handleKeyDown = function($event) {
+			if ((($event.which === Keys.TAB) || ($event.which === Keys.ENTER)) && (ctrl.suggestion != null) && (ctrl.suggestion !== "")) {
+				$event.preventDefault();
+				ctrl.localNgModel += ctrl.suggestion;
+			}
+			ctrl.suggestion = null;
+			return ctrl.showHint = false;
+		};
+		$scope.$watch("$ctrl.localNgModel", function(newVal, oldVal) {
+			if (ctrl.hasFocus && (newVal !== oldVal)) {
+				ctrl.suggestion = null;
+				ctrl.showHint = false;
+				return ctrl.getSuggestion({ userInput: newVal })
+					.then(function(suggestion) { 
+						if ((suggestion != null) && (newVal === ctrl.localNgModel)) {
+							ctrl.showHint = true;
+							return ctrl.suggestion = suggestion.replace(newVal, "");
+						}}).catch(() => ctrl.suggestion = null);
+			}
+		});
+	};
 
-	App.component "inputSuggestions", {
-		bindings:
-			localNgModel: "=ngModel"
-			localNgModelOptions: "=?ngModelOptions"
-			getSuggestion: "&"
-			onBlur: "&?"
-			inputId: "@?"
-			inputName: "@?"
-			inputPlaceholder: "@?"
-			inputType: "@?"
+	return App.component("inputSuggestions", {
+		bindings: {
+			localNgModel: "=ngModel",
+			localNgModelOptions: "=?ngModelOptions",
+			getSuggestion: "&",
+			onBlur: "&?",
+			inputId: "@?",
+			inputName: "@?",
+			inputPlaceholder: "@?",
+			inputType: "@?",
 			inputRequired: "=?"
-		controller: inputSuggestionsController
+		},
+		controller: inputSuggestionsController,
 		template: [
 				'<div class="input-suggestions">',
 					'<div class="form-control input-suggestions-shadow">',
@@ -69,6 +82,7 @@ define [
 						' ng-attr-name="{{ ::$ctrl.inputName }}"',
 						' ng-required="::$ctrl.inputRequired">',
 				'</div>'
-				].join ""
+				].join("")
 				
-	}
+	});
+});

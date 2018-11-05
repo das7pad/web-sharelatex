@@ -1,168 +1,215 @@
-define [
-	"base"
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS103: Rewrite code to no longer use __guard__
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
+	"base",
 	"libs/passfield"
-], (App) ->
-	App.directive "asyncForm", ($http, validateCaptcha) ->
-		return {
-			controller: ['$scope', ($scope) ->
-				@getEmail = () ->
-					return $scope.email
-				return this
-			]
-			link: (scope, element, attrs) ->
-				formName = attrs.asyncForm
+], function(App) {
+	App.directive("asyncForm", ($http, validateCaptcha) =>
+		({
+			controller: ['$scope', function($scope) {
+				this.getEmail = () => $scope.email;
+				return this;
+			}
+			],
+			link(scope, element, attrs) {
+				let response;
+				const formName = attrs.asyncForm;
 
-				scope[attrs.name].response = response = {}
-				scope[attrs.name].inflight = false
+				scope[attrs.name].response = (response = {});
+				scope[attrs.name].inflight = false;
 
-				validateCaptchaIfEnabled = (callback = (response) ->) ->
-					if attrs.captcha?
-						validateCaptcha callback
-					else
-						callback()
+				const validateCaptchaIfEnabled = function(callback) {
+					if (callback == null) { callback = function(response) {}; }
+					if (attrs.captcha != null) {
+						return validateCaptcha(callback);
+					} else {
+						return callback();
+					}
+				};
 
-				submitRequest = (grecaptchaResponse) ->
-					formData = {}
-					for data in element.serializeArray()
-						formData[data.name] = data.value
+				const submitRequest = function(grecaptchaResponse) {
+					const formData = {};
+					for (var data of Array.from(element.serializeArray())) {
+						formData[data.name] = data.value;
+					}
 
-					if grecaptchaResponse?
-						formData['g-recaptcha-response'] = grecaptchaResponse
+					if (grecaptchaResponse != null) {
+						formData['g-recaptcha-response'] = grecaptchaResponse;
+					}
 
-					scope[attrs.name].inflight = true
+					scope[attrs.name].inflight = true;
 
-					# for asyncForm prevent automatic redirect to /login if
-					# authentication fails, we will handle it ourselves
-					$http
+					// for asyncForm prevent automatic redirect to /login if
+					// authentication fails, we will handle it ourselves
+					return $http
 						.post(element.attr('action'), formData, {disableAutoLoginRedirect: true})
-						.then (httpResponse) ->
-							{ data, status, headers, config } = httpResponse
-							scope[attrs.name].inflight = false
-							response.success = true
-							response.error = false
+						.then(function(httpResponse) {
+							let config, headers, status;
+							({ data, status, headers, config } = httpResponse);
+							scope[attrs.name].inflight = false;
+							response.success = true;
+							response.error = false;
 
-							onSuccessHandler = scope[attrs.onSuccess]
-							if onSuccessHandler
-								onSuccessHandler(httpResponse)
-								return
+							const onSuccessHandler = scope[attrs.onSuccess];
+							if (onSuccessHandler) {
+								onSuccessHandler(httpResponse);
+								return;
+							}
 							
-							if data.redir?
-								ga('send', 'event', formName, 'success')
-								window.location = data.redir
-							else if data.message?
-								response.message = data.message
+							if (data.redir != null) {
+								ga('send', 'event', formName, 'success');
+								return window.location = data.redir;
+							} else if (data.message != null) {
+								response.message = data.message;
 
-								if data.message.type == "error"
-									response.success = false
-									response.error = true
-									ga('send', 'event', formName, 'failure', data.message)
-								else
-									ga('send', 'event', formName, 'success')
+								if (data.message.type === "error") {
+									response.success = false;
+									response.error = true;
+									return ga('send', 'event', formName, 'failure', data.message);
+								} else {
+									return ga('send', 'event', formName, 'success');
+								}
+							}}).catch(function(httpResponse) {
+							let config, headers, status;
+							({ data, status, headers, config } = httpResponse);
+							scope[attrs.name].inflight = false;
+							response.success = false;
+							response.error = true;
 
-						.catch (httpResponse) ->
-							{ data, status, headers, config } = httpResponse
-							scope[attrs.name].inflight = false
-							response.success = false
-							response.error = true
+							const onErrorHandler = scope[attrs.onError];
+							if (onErrorHandler) {
+								onErrorHandler(httpResponse);
+								return;
+							}
 
-							onErrorHandler = scope[attrs.onError]
-							if onErrorHandler
-								onErrorHandler(httpResponse)
-								return
-
-							if status == 400 # Bad Request
-								response.message =
-									text: "Invalid Request. Please correct the data and try again."
+							if (status === 400) { // Bad Request
+								response.message = {
+									text: "Invalid Request. Please correct the data and try again.",
 									type: 'error'
-							else if status == 403 # Forbidden
-								response.message =
-									text: "Session error. Please check you have cookies enabled. If the problem persists, try clearing your cache and cookies."
+								};
+							} else if (status === 403) { // Forbidden
+								response.message = {
+									text: "Session error. Please check you have cookies enabled. If the problem persists, try clearing your cache and cookies.",
 									type: "error"
-							else
-								response.message =
-									text: data.message?.text or data.message or "Something went wrong talking to the server :(. Please try again."
+								};
+							} else {
+								response.message = {
+									text: (data.message != null ? data.message.text : undefined) || data.message || "Something went wrong talking to the server :(. Please try again.",
 									type: 'error'
-							ga('send', 'event', formName, 'failure', data.message)
+								};
+							}
+							return ga('send', 'event', formName, 'failure', data.message);
+					});
+				};
 
-				submit = () ->
-					validateCaptchaIfEnabled (response) ->
-						submitRequest response
+				const submit = () =>
+					validateCaptchaIfEnabled(response => submitRequest(response))
+				;
 
-				element.on "submit", (e) ->
-					e.preventDefault()
-					submit()
+				element.on("submit", function(e) {
+					e.preventDefault();
+					return submit();
+				});
 
-				if attrs.autoSubmit
-					submit()
-		}
+				if (attrs.autoSubmit) {
+					return submit();
+				}
+			}
+		})
+);
 
-	App.directive "formMessages", () ->
-		return {
-			restrict: "E"
-			template: """
-				<div class="alert" ng-class="{
-					'alert-danger': form.response.message.type == 'error',
-					'alert-success': form.response.message.type != 'error'
-				}" ng-show="!!form.response.message">
-					{{form.response.message.text}}
-				</div>
-				<div ng-transclude></div>
-			"""
-			transclude: true
+	App.directive("formMessages", () =>
+		({
+			restrict: "E",
+			template: `\
+<div class="alert" ng-class="{
+	'alert-danger': form.response.message.type == 'error',
+	'alert-success': form.response.message.type != 'error'
+}" ng-show="!!form.response.message">
+	{{form.response.message.text}}
+</div>
+<div ng-transclude></div>\
+`,
+			transclude: true,
 			scope: {
 				form: "=for"
 			}
 
-		}
+		})
+);
 
 
-	App.directive 'complexPassword', ->
-		require: ['^asyncForm', 'ngModel']
+	return App.directive('complexPassword', () =>
+		({
+			require: ['^asyncForm', 'ngModel'],
 
-		link: (scope, element, attrs, ctrl) ->
+			link(scope, element, attrs, ctrl) {
 
-			PassField.Config.blackList = []
-			defaultPasswordOpts =
-				pattern: ""
-				length:
-					min: 6
-					max: 128
-				allowEmpty: false
-				allowAnyChars: false
-				isMasked: true
-				showToggle: false
-				showGenerate: false
-				showTip:false
-				showWarn:false
-				checkMode : PassField.CheckModes.STRICT
-				chars:
-					digits: "1234567890"
-					letters: "abcdefghijklmnopqrstuvwxyz"
-					letters_up: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-					symbols: "@#$%^&*()-_=+[]{};:<>/?!£€.,"
+				PassField.Config.blackList = [];
+				const defaultPasswordOpts = {
+					pattern: "",
+					length: {
+						min: 6,
+						max: 128
+					},
+					allowEmpty: false,
+					allowAnyChars: false,
+					isMasked: true,
+					showToggle: false,
+					showGenerate: false,
+					showTip:false,
+					showWarn:false,
+					checkMode : PassField.CheckModes.STRICT,
+					chars: {
+						digits: "1234567890",
+						letters: "abcdefghijklmnopqrstuvwxyz",
+						letters_up: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+						symbols: "@#$%^&*()-_=+[]{};:<>/?!£€.,"
+					}
+				};
 
-			opts = _.defaults(window.passwordStrengthOptions || {}, defaultPasswordOpts)
-			if opts.length.min == 1
-				opts.acceptRate = 0 #this allows basically anything to be a valid password
-			passField = new PassField.Field("passwordField", opts);
+				const opts = _.defaults(window.passwordStrengthOptions || {}, defaultPasswordOpts);
+				if (opts.length.min === 1) {
+					opts.acceptRate = 0; //this allows basically anything to be a valid password
+				}
+				const passField = new PassField.Field("passwordField", opts);
 
-			[asyncFormCtrl, ngModelCtrl] = ctrl
+				const [asyncFormCtrl, ngModelCtrl] = Array.from(ctrl);
 
-			ngModelCtrl.$parsers.unshift (modelValue) ->
-				isValid = passField.validatePass()
-				email = asyncFormCtrl.getEmail() || window.usersEmail
-				if !isValid
-					scope.complexPasswordErrorMessage = passField.getPassValidationMessage()
-				else if (email? and email != "")
-					startOfEmail = email?.split("@")?[0]
-					if modelValue.indexOf(email) != -1 or modelValue.indexOf(startOfEmail) != -1
-						isValid = false
-						scope.complexPasswordErrorMessage = "Password can not contain email address"
-				if opts.length.max? and modelValue.length == opts.length.max
-					isValid = false
-					scope.complexPasswordErrorMessage = "Maximum password length #{opts.length.max} reached"
-				if opts.length.min? and modelValue.length < opts.length.min
-					isValid = false
-					scope.complexPasswordErrorMessage = "Password too short, minimum #{opts.length.min}"
-				ngModelCtrl.$setValidity('complexPassword', isValid)
-				return modelValue
+				return ngModelCtrl.$parsers.unshift(function(modelValue) {
+					let isValid = passField.validatePass();
+					const email = asyncFormCtrl.getEmail() || window.usersEmail;
+					if (!isValid) {
+						scope.complexPasswordErrorMessage = passField.getPassValidationMessage();
+					} else if ((email != null) && (email !== "")) {
+						const startOfEmail = __guard__(email != null ? email.split("@") : undefined, x => x[0]);
+						if ((modelValue.indexOf(email) !== -1) || (modelValue.indexOf(startOfEmail) !== -1)) {
+							isValid = false;
+							scope.complexPasswordErrorMessage = "Password can not contain email address";
+						}
+					}
+					if ((opts.length.max != null) && (modelValue.length === opts.length.max)) {
+						isValid = false;
+						scope.complexPasswordErrorMessage = `Maximum password length ${opts.length.max} reached`;
+					}
+					if ((opts.length.min != null) && (modelValue.length < opts.length.min)) {
+						isValid = false;
+						scope.complexPasswordErrorMessage = `Password too short, minimum ${opts.length.min}`;
+					}
+					ngModelCtrl.$setValidity('complexPassword', isValid);
+					return modelValue;
+				});
+			}
+		})
+	);
+});
+
+function __guard__(value, transform) {
+  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+}

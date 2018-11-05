@@ -1,76 +1,100 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
+], function(App) {
 
-	App.controller "NotificationsController", ($scope, $http) ->
-		for notification in $scope.notifications
-			notification.hide = false
+	App.controller("NotificationsController", function($scope, $http) {
+		for (let notification of Array.from($scope.notifications)) {
+			notification.hide = false;
+		}
 
-		$scope.dismiss = (notification) ->
+		return $scope.dismiss = notification =>
 			$http({
-				url: "/notifications/#{notification._id}"
-				method: "DELETE"
-				headers:
+				url: `/notifications/${notification._id}`,
+				method: "DELETE",
+				headers: {
 					"X-Csrf-Token": window.csrfToken
+				}
 			})
-				.then () ->
-					notification.hide = true
+				.then(() => notification.hide = true)
+		;
+	});
 					
-	App.controller "ProjectInviteNotificationController", ($scope, $http) ->
-		# Shortcuts for translation keys
-		$scope.projectName = $scope.notification.messageOpts.projectName
-		$scope.userName = $scope.notification.messageOpts.userName
+	App.controller("ProjectInviteNotificationController", function($scope, $http) {
+		// Shortcuts for translation keys
+		$scope.projectName = $scope.notification.messageOpts.projectName;
+		$scope.userName = $scope.notification.messageOpts.userName;
 
-		$scope.accept = () ->
-			$scope.notification.inflight = true
-			$http({
-				url: "/project/#{$scope.notification.messageOpts.projectId}/invite/token/#{$scope.notification.messageOpts.token}/accept"
-				method: "POST"
-				headers:
-					"X-Csrf-Token": window.csrfToken
+		return $scope.accept = function() {
+			$scope.notification.inflight = true;
+			return $http({
+				url: `/project/${$scope.notification.messageOpts.projectId}/invite/token/${$scope.notification.messageOpts.token}/accept`,
+				method: "POST",
+				headers: {
+					"X-Csrf-Token": window.csrfToken,
 					"X-Requested-With": "XMLHttpRequest"
+				}
 			})
-				.then () ->
-					$scope.notification.inflight = false
-					$scope.notification.accepted = true
-				.catch () ->
-					$scope.notification.inflight = false
-					$scope.notification.error = true
+				.then(function() {
+					$scope.notification.inflight = false;
+					return $scope.notification.accepted = true;}).catch(function() {
+					$scope.notification.inflight = false;
+					return $scope.notification.error = true;
+			});
+		};
+	});
 
-	App.controller "OverleafV2NotificationController", ($scope, localStorage) ->
-		$scope.visible = !localStorage('overleaf_v2_2_notification_hidden_at')
+	App.controller("OverleafV2NotificationController", function($scope, localStorage) {
+		$scope.visible = !localStorage('overleaf_v2_2_notification_hidden_at');
 
-		$scope.dismiss = () ->
-			$scope.visible = false
-			localStorage('overleaf_v2_2_notification_hidden_at', Date.now())
+		return $scope.dismiss = function() {
+			$scope.visible = false;
+			return localStorage('overleaf_v2_2_notification_hidden_at', Date.now());
+		};
+	});
 
-	App.controller "OverleafV1NotificationController", ($scope, localStorage) ->
-		$scope.visible = !localStorage('overleaf_v1_notification_hidden_at')
+	App.controller("OverleafV1NotificationController", function($scope, localStorage) {
+		$scope.visible = !localStorage('overleaf_v1_notification_hidden_at');
 
-		$scope.toggle = () ->
-			$scope.visible = !$scope.visible
-			if !$scope.visible
-				localStorage('overleaf_v1_notification_hidden_at', Date.now())
-			else
-				localStorage('overleaf_v1_notification_hidden_at', null)
+		return $scope.toggle = function() {
+			$scope.visible = !$scope.visible;
+			if (!$scope.visible) {
+				return localStorage('overleaf_v1_notification_hidden_at', Date.now());
+			} else {
+				return localStorage('overleaf_v1_notification_hidden_at', null);
+			}
+		};
+	});
 
-	App.controller "EmailNotificationController", ($scope, $http, UserAffiliationsDataService) ->
-		$scope.userEmails = []
-		for userEmail in $scope.userEmails
-			userEmail.hide = false
+	return App.controller("EmailNotificationController", function($scope, $http, UserAffiliationsDataService) {
+		$scope.userEmails = [];
+		for (let userEmail of Array.from($scope.userEmails)) {
+			userEmail.hide = false;
+		}
 
-		_getUserEmails = () ->
+		const _getUserEmails = () =>
 			UserAffiliationsDataService
-				.getUserEmails().then (emails) ->
-					$scope.userEmails = emails
-					$scope.$emit "project-list:notifications-received"
-		_getUserEmails()
+				.getUserEmails().then(function(emails) {
+					$scope.userEmails = emails;
+					return $scope.$emit("project-list:notifications-received");
+			})
+		;
+		_getUserEmails();
 
-		$scope.resendConfirmationEmail = (userEmail) ->
-			userEmail.confirmationInflight = true
-			UserAffiliationsDataService
-				.resendConfirmationEmail userEmail.email
-				.then () ->
-					userEmail.hide = true
-					userEmail.confirmationInflight = false
-					$scope.$emit "project-list:notifications-received"
+		return $scope.resendConfirmationEmail = function(userEmail) {
+			userEmail.confirmationInflight = true;
+			return UserAffiliationsDataService
+				.resendConfirmationEmail(userEmail.email)
+				.then(function() {
+					userEmail.hide = true;
+					userEmail.confirmationInflight = false;
+					return $scope.$emit("project-list:notifications-received");
+			});
+		};
+	});
+});

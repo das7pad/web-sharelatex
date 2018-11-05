@@ -1,66 +1,88 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"ace/ace"
-], () ->
-	Range = ace.require("ace/range").Range
+], function() {
+	let MetadataManager;
+	const { Range } = ace.require("ace/range");
 
-	getLastCommandFragment = (lineUpToCursor) ->
-		if m = lineUpToCursor.match(/(\\[^\\]+)$/)
-			return m[1]
-		else
-			return null
+	const getLastCommandFragment = function(lineUpToCursor) {
+		let m;
+		if (m = lineUpToCursor.match(/(\\[^\\]+)$/)) {
+			return m[1];
+		} else {
+			return null;
+		}
+	};
 
-	class MetadataManager
-		constructor: (@$scope, @editor, @element, @Metadata) ->
-			@debouncer = {}  # DocId => Timeout
+	return (MetadataManager = class MetadataManager {
+		constructor($scope, editor, element, Metadata) {
+			this.$scope = $scope;
+			this.editor = editor;
+			this.element = element;
+			this.Metadata = Metadata;
+			this.debouncer = {};  // DocId => Timeout
 
-			onChange = (change) =>
-				if change.remote
-					return
-				if change.action not in ['remove', 'insert']
-					return
-				cursorPosition = @editor.getCursorPosition()
-				end = change.end
-				range = new Range(end.row, 0, end.row, end.column)
-				lineUpToCursor = @editor.getSession().getTextRange range
-				if lineUpToCursor.trim() == '%' or lineUpToCursor.slice(0, 1) == '\\'
-					range = new Range(end.row, 0, end.row, end.column + 80)
-					lineUpToCursor = @editor.getSession().getTextRange range
-				commandFragment = getLastCommandFragment lineUpToCursor
+			const onChange = change => {
+				if (change.remote) {
+					return;
+				}
+				if (!['remove', 'insert'].includes(change.action)) {
+					return;
+				}
+				const cursorPosition = this.editor.getCursorPosition();
+				const { end } = change;
+				let range = new Range(end.row, 0, end.row, end.column);
+				let lineUpToCursor = this.editor.getSession().getTextRange(range);
+				if ((lineUpToCursor.trim() === '%') || (lineUpToCursor.slice(0, 1) === '\\')) {
+					range = new Range(end.row, 0, end.row, end.column + 80);
+					lineUpToCursor = this.editor.getSession().getTextRange(range);
+				}
+				const commandFragment = getLastCommandFragment(lineUpToCursor);
 
-				linesContainPackage = _.any(
+				const linesContainPackage = _.any(
 					change.lines,
-					(line) -> line.match(/^\\usepackage(?:\[.{0,80}?])?{(.{0,80}?)}/)
-				)
-				linesContainReqPackage = _.any(
+					line => line.match(/^\\usepackage(?:\[.{0,80}?])?{(.{0,80}?)}/));
+				const linesContainReqPackage = _.any(
 					change.lines,
-					(line) -> line.match(/^\\RequirePackage(?:\[.{0,80}?])?{(.{0,80}?)}/)
-				)
-				linesContainLabel = _.any(
+					line => line.match(/^\\RequirePackage(?:\[.{0,80}?])?{(.{0,80}?)}/));
+				const linesContainLabel = _.any(
 					change.lines,
-					(line) -> line.match(/\\label{(.{0,80}?)}/)
-				)
-				linesContainMeta =
-					linesContainPackage or
-					linesContainLabel or
-					linesContainReqPackage
+					line => line.match(/\\label{(.{0,80}?)}/));
+				const linesContainMeta =
+					linesContainPackage ||
+					linesContainLabel ||
+					linesContainReqPackage;
 
-				lastCommandFragmentIsLabel = commandFragment?.slice(0, 7) == '\\label{'
-				lastCommandFragmentIsPackage = commandFragment?.slice(0, 11) == '\\usepackage'
-				lastCommandFragmentIsReqPack = commandFragment?.slice(0, 15) == '\\RequirePackage'
-				lastCommandFragmentIsMeta =
-					lastCommandFragmentIsPackage or
-					lastCommandFragmentIsLabel or
-					lastCommandFragmentIsReqPack
+				const lastCommandFragmentIsLabel = (commandFragment != null ? commandFragment.slice(0, 7) : undefined) === '\\label{';
+				const lastCommandFragmentIsPackage = (commandFragment != null ? commandFragment.slice(0, 11) : undefined) === '\\usepackage';
+				const lastCommandFragmentIsReqPack = (commandFragment != null ? commandFragment.slice(0, 15) : undefined) === '\\RequirePackage';
+				const lastCommandFragmentIsMeta =
+					lastCommandFragmentIsPackage ||
+					lastCommandFragmentIsLabel ||
+					lastCommandFragmentIsReqPack;
 
-				if linesContainMeta or lastCommandFragmentIsMeta
-					@Metadata.scheduleLoadDocMetaFromServer @$scope.docId
+				if (linesContainMeta || lastCommandFragmentIsMeta) {
+					return this.Metadata.scheduleLoadDocMetaFromServer(this.$scope.docId);
+				}
+			};
 
-			@editor.on "changeSession", (e) =>
-				e.oldSession.off "change", onChange
-				e.session.on "change", onChange
+			this.editor.on("changeSession", e => {
+				e.oldSession.off("change", onChange);
+				return e.session.on("change", onChange);
+			});
+		}
 
-		getAllLabels: () ->
-			@Metadata.getAllLabels()
+		getAllLabels() {
+			return this.Metadata.getAllLabels();
+		}
 
-		getAllPackages: () ->
-			@Metadata.getAllPackages()
+		getAllPackages() {
+			return this.Metadata.getAllPackages();
+		}
+	});
+});

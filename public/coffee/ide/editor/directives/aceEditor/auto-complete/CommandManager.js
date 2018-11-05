@@ -1,167 +1,223 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS103: Rewrite code to no longer use __guard__
+ * DS206: Consider reworking classes to avoid initClass
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"./snippets/TopHundredSnippets"
-], (topHundred) ->
+], function(topHundred) {
 
-	class Parser
-		constructor: (@doc, @prefix) ->
+	let CommandManager;
+	class Parser {
+		static initClass() {
+	
+			// Ignore single letter commands since auto complete is moot then.
+			this.prototype.commandRegex = /\\([a-zA-Z]{2,})/;
+		}
+		constructor(doc, prefix) {
+			this.doc = doc;
+			this.prefix = prefix;
+		}
 
-		parse: () ->
-			# Safari regex is super slow, freezes browser for minutes on end,
-			# hacky solution: limit iterations
-			limit = null
-			if window?._ide?.browserIsSafari
-				limit = 5000
+		parse() {
+			// Safari regex is super slow, freezes browser for minutes on end,
+			// hacky solution: limit iterations
+			let command;
+			let limit = null;
+			if (__guard__(typeof window !== 'undefined' && window !== null ? window._ide : undefined, x => x.browserIsSafari)) {
+				limit = 5000;
+			}
 
-			# fully formed commands
-			realCommands = []
-			# commands which match the prefix exactly,
-			# and could be partially typed or malformed
-			incidentalCommands = []
-			seen = {}
-			iterations = 0
-			while command = @nextCommand()
-				iterations += 1
-				if limit && iterations > limit
-					return realCommands
+			// fully formed commands
+			const realCommands = [];
+			// commands which match the prefix exactly,
+			// and could be partially typed or malformed
+			const incidentalCommands = [];
+			const seen = {};
+			let iterations = 0;
+			while ((command = this.nextCommand())) {
+				iterations += 1;
+				if (limit && (iterations > limit)) {
+					return realCommands;
+				}
 
-				docState = @doc
+				const docState = this.doc;
 
-				optionalArgs = 0
-				while @consumeArgument("[", "]")
-					optionalArgs++
+				let optionalArgs = 0;
+				while (this.consumeArgument("[", "]")) {
+					optionalArgs++;
+				}
 
-				args = 0
-				while @consumeArgument("{", "}")
-					args++
+				let args = 0;
+				while (this.consumeArgument("{", "}")) {
+					args++;
+				}
 
-				commandHash = "#{command}\\#{optionalArgs}\\#{args}"
+				const commandHash = `${command}\\${optionalArgs}\\${args}`;
 
-				if @prefix? && "\\#{command}" == @prefix
-					incidentalCommands.push [command, optionalArgs, args]
-				else
-					if !seen[commandHash]?
-						seen[commandHash] = true
-						realCommands.push [command, optionalArgs, args]
-
-				# Reset to before argument to handle nested commands
-				@doc = docState
-
-			# check incidentals, see if we should pluck out a match
-			if incidentalCommands.length > 1
-				bestMatch = incidentalCommands.sort((a, b) =>  a[1]+a[2] < b[1]+b[2])[0]
-				realCommands.push bestMatch
-
-			return realCommands
-
-		# Ignore single letter commands since auto complete is moot then.
-		commandRegex: /\\([a-zA-Z]{2,})/
-
-		nextCommand: () ->
-			i = @doc.search @commandRegex
-			if i == -1
-				return false
-			else
-				match = @doc.match(@commandRegex)[1]
-				@doc = @doc.substr(i + match.length + 1)
-				return match
-
-		consumeWhitespace: () ->
-			match = @doc.match(/^[ \t\n]*/m)[0]
-			@doc = @doc.substr(match.length)
-
-		consumeArgument: (openingBracket, closingBracket) ->
-			@consumeWhitespace()
-
-			if @doc[0] == openingBracket
-				i = 1
-				bracketParity = 1
-				while bracketParity > 0 and i < @doc.length
-					if @doc[i] == openingBracket
-						bracketParity++
-					else if @doc[i] == closingBracket
-						bracketParity--
-					i++
-
-				if bracketParity == 0
-					@doc = @doc.substr(i)
-					return true
-				else
-					return false
-			else
-				return false
-
-	class CommandManager
-		constructor: (@metadataManager) ->
-
-		getCompletions: (editor, session, pos, prefix, callback) ->
-			commandNames = {}
-			for snippet in topHundred
-				commandNames[snippet.caption.match(/\w+/)[0]] = true
-
-			packages = @metadataManager.getAllPackages()
-			packageCommands = []
-			for pkg, snippets of packages
-				for snippet in snippets
-					packageCommands.push snippet
-					commandNames[snippet.caption.match(/\w+/)[0]] = true
-
-			doc = session.getValue()
-			parser = new Parser(doc, prefix)
-			commands = parser.parse()
-			completions = []
-			for command in commands
-				if not commandNames[command[0]]
-					caption = "\\#{command[0]}"
-					score = if caption == prefix then 99 else 50
-					snippet = caption
-					i = 1
-					_.times command[1], () ->
-						snippet += "[${#{i}}]"
-						caption += "[]"
-						i++
-					_.times command[2], () ->
-						snippet += "{${#{i}}}"
-						caption += "{}"
-						i++
-					completions.push {
-						caption: caption
-						snippet: snippet
-						meta: "cmd"
-						score: score
+				if ((this.prefix != null) && (`\\${command}` === this.prefix)) {
+					incidentalCommands.push([command, optionalArgs, args]);
+				} else {
+					if ((seen[commandHash] == null)) {
+						seen[commandHash] = true;
+						realCommands.push([command, optionalArgs, args]);
 					}
-			completions = completions.concat topHundred, packageCommands
+				}
 
-			callback null, completions
+				// Reset to before argument to handle nested commands
+				this.doc = docState;
+			}
 
-		loadCommandsFromDoc: (doc) ->
-			parser = new Parser(doc)
-			@commands = parser.parse()
+			// check incidentals, see if we should pluck out a match
+			if (incidentalCommands.length > 1) {
+				const bestMatch = incidentalCommands.sort((a, b) =>  (a[1]+a[2]) < (b[1]+b[2]))[0];
+				realCommands.push(bestMatch);
+			}
 
-		getSuggestions: (commandFragment) ->
-			matchingCommands = _.filter @commands, (command) ->
-				command[0].slice(0, commandFragment.length) == commandFragment
+			return realCommands;
+		}
 
-			return _.map matchingCommands, (command) ->
-				base = "\\" + commandFragment
+		nextCommand() {
+			const i = this.doc.search(this.commandRegex);
+			if (i === -1) {
+				return false;
+			} else {
+				const match = this.doc.match(this.commandRegex)[1];
+				this.doc = this.doc.substr(i + match.length + 1);
+				return match;
+			}
+		}
 
-				args = ""
-				_.times command[1], () -> args = args + "[]"
-				_.times command[2], () -> args = args + "{}"
-				completionBase = command[0].slice(commandFragment.length)
+		consumeWhitespace() {
+			const match = this.doc.match(/^[ \t\n]*/m)[0];
+			return this.doc = this.doc.substr(match.length);
+		}
 
-				squareArgsNo = command[1]
-				curlyArgsNo = command[2]
-				totalArgs = squareArgsNo + curlyArgsNo
-				if totalArgs == 0
-					completionBeforeCursor = completionBase
-					completionAfterCursor = ""
-				else
-					completionBeforeCursor = completionBase + args[0]
-					completionAfterCursor = args.slice(1)
+		consumeArgument(openingBracket, closingBracket) {
+			this.consumeWhitespace();
+
+			if (this.doc[0] === openingBracket) {
+				let i = 1;
+				let bracketParity = 1;
+				while ((bracketParity > 0) && (i < this.doc.length)) {
+					if (this.doc[i] === openingBracket) {
+						bracketParity++;
+					} else if (this.doc[i] === closingBracket) {
+						bracketParity--;
+					}
+					i++;
+				}
+
+				if (bracketParity === 0) {
+					this.doc = this.doc.substr(i);
+					return true;
+				} else {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		}
+	}
+	Parser.initClass();
+
+	return (CommandManager = class CommandManager {
+		constructor(metadataManager) {
+			this.metadataManager = metadataManager;
+		}
+
+		getCompletions(editor, session, pos, prefix, callback) {
+			const commandNames = {};
+			for (var snippet of Array.from(topHundred)) {
+				commandNames[snippet.caption.match(/\w+/)[0]] = true;
+			}
+
+			const packages = this.metadataManager.getAllPackages();
+			const packageCommands = [];
+			for (let pkg in packages) {
+				const snippets = packages[pkg];
+				for (snippet of Array.from(snippets)) {
+					packageCommands.push(snippet);
+					commandNames[snippet.caption.match(/\w+/)[0]] = true;
+				}
+			}
+
+			const doc = session.getValue();
+			const parser = new Parser(doc, prefix);
+			const commands = parser.parse();
+			let completions = [];
+			for (let command of Array.from(commands)) {
+				if (!commandNames[command[0]]) {
+					let caption = `\\${command[0]}`;
+					const score = caption === prefix ? 99 : 50;
+					snippet = caption;
+					var i = 1;
+					_.times(command[1], function() {
+						snippet += `[\${${i}}]`;
+						caption += "[]";
+						return i++;
+					});
+					_.times(command[2], function() {
+						snippet += `{\${${i}}}`;
+						caption += "{}";
+						return i++;
+					});
+					completions.push({
+						caption,
+						snippet,
+						meta: "cmd",
+						score
+					});
+				}
+			}
+			completions = completions.concat(topHundred, packageCommands);
+
+			return callback(null, completions);
+		}
+
+		loadCommandsFromDoc(doc) {
+			const parser = new Parser(doc);
+			return this.commands = parser.parse();
+		}
+
+		getSuggestions(commandFragment) {
+			const matchingCommands = _.filter(this.commands, command => command[0].slice(0, commandFragment.length) === commandFragment);
+
+			return _.map(matchingCommands, function(command) {
+				let completionAfterCursor, completionBeforeCursor;
+				const base = `\\${commandFragment}`;
+
+				let args = "";
+				_.times(command[1], () => args = args + "[]");
+				_.times(command[2], () => args = args + "{}");
+				const completionBase = command[0].slice(commandFragment.length);
+
+				const squareArgsNo = command[1];
+				const curlyArgsNo = command[2];
+				const totalArgs = squareArgsNo + curlyArgsNo;
+				if (totalArgs === 0) {
+					completionBeforeCursor = completionBase;
+					completionAfterCursor = "";
+				} else {
+					completionBeforeCursor = completionBase + args[0];
+					completionAfterCursor = args.slice(1);
+				}
 
 				return {
-					base: base
-					completion: completionBase + args
-					completionBeforeCursor: completionBeforeCursor
-					completionAfterCursor: completionAfterCursor
-				}
+					base,
+					completion: completionBase + args,
+					completionBeforeCursor,
+					completionAfterCursor
+				};
+		});
+		}
+	});
+});
+
+function __guard__(value, transform) {
+  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+}

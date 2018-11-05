@@ -1,56 +1,77 @@
-define [
-	"base"
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
+	"base",
 	"services/algolia-search"
-], (App) ->
+], App =>
 
-	App.controller "SearchWikiController", ($scope, algoliaSearch, _) ->
-		$scope.hits = []
+	App.controller("SearchWikiController", function($scope, algoliaSearch, _) {
+		$scope.hits = [];
 
-		$scope.clearSearchText = ->
-			$scope.searchQueryText = ""
-			updateHits []
+		$scope.clearSearchText = function() {
+			$scope.searchQueryText = "";
+			return updateHits([]);
+		};
 
-		$scope.safeApply = (fn)->
-			phase = $scope.$root.$$phase
-			if(phase == '$apply' || phase == '$digest')
-				$scope.$eval(fn)
-			else
-				$scope.$apply(fn)
+		$scope.safeApply = function(fn){
+			const phase = $scope.$root.$$phase;
+			if((phase === '$apply') || (phase === '$digest')) {
+				return $scope.$eval(fn);
+			} else {
+				return $scope.$apply(fn);
+			}
+		};
 
-		buildHitViewModel = (hit)->
-			page_underscored = hit.pageName.replace(/\s/g,'_')
-			section_underscored = hit.sectionName.replace(/\s/g,'_')
-			content = hit._highlightResult.content.value
-			# Replace many new lines
-			content = content.replace(/\n\n+/g, "\n\n")
-			lines = content.split("\n")
-			# Only show the lines that have a highlighted match
-			matching_lines = []
-			for line in lines
-				if !/^\[edit\]/.test(line)
-					content += line + "\n"
-					if /<em>/.test(line)
-						matching_lines.push line
-			content = matching_lines.join("\n...\n")
-			result =
-				name : hit._highlightResult.pageName.value + " - " + hit._highlightResult.sectionName.value
-				url :"/learn/#{page_underscored}##{section_underscored}"
-				content: content
-			return result
+		const buildHitViewModel = function(hit){
+			const page_underscored = hit.pageName.replace(/\s/g,'_');
+			const section_underscored = hit.sectionName.replace(/\s/g,'_');
+			let content = hit._highlightResult.content.value;
+			// Replace many new lines
+			content = content.replace(/\n\n+/g, "\n\n");
+			const lines = content.split("\n");
+			// Only show the lines that have a highlighted match
+			const matching_lines = [];
+			for (let line of Array.from(lines)) {
+				if (!/^\[edit\]/.test(line)) {
+					content += line + "\n";
+					if (/<em>/.test(line)) {
+						matching_lines.push(line);
+					}
+				}
+			}
+			content = matching_lines.join("\n...\n");
+			const result = {
+				name : hit._highlightResult.pageName.value + " - " + hit._highlightResult.sectionName.value,
+				url :`/learn/${page_underscored}#${section_underscored}`,
+				content
+			};
+			return result;
+		};
 
-		updateHits = (hits)->
-			$scope.safeApply ->
-				$scope.hits = hits
+		var updateHits = hits=>
+			$scope.safeApply(() => $scope.hits = hits)
+		;
 
-		$scope.search = ->
-			query = $scope.searchQueryText
-			if !query? or query.length == 0
-				updateHits []
-				return
+		return $scope.search = function() {
+			const query = $scope.searchQueryText;
+			if ((query == null) || (query.length === 0)) {
+				updateHits([]);
+				return;
+			}
 
-			algoliaSearch.searchWiki query, (err, response)->
-				if response.hits.length == 0
-					updateHits []
-				else
-					hits = _.map response.hits, buildHitViewModel
-					updateHits hits
+			return algoliaSearch.searchWiki(query, function(err, response){
+				if (response.hits.length === 0) {
+					return updateHits([]);
+				} else {
+					const hits = _.map(response.hits, buildHitViewModel);
+					return updateHits(hits);
+				}
+			});
+		};
+	})
+);

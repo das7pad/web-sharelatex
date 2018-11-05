@@ -1,18 +1,26 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.directive "stopPropagation", ($http) ->
-		return {
+], function(App) {
+	App.directive("stopPropagation", $http =>
+		({
 			restrict: "A",
-			link: (scope, element, attrs) ->
-				element.bind attrs.stopPropagation, (e) ->
-					e.stopPropagation()
-		}
+			link(scope, element, attrs) {
+				return element.bind(attrs.stopPropagation, e => e.stopPropagation());
+			}
+		})
+);
 
-	App.directive "preventDefault", ($http) ->
-		return {
+	return App.directive("preventDefault", $http =>
+		({
 			restrict: "A",
-			link: (scope, element, attrs) ->
-				element.bind attrs.preventDefault, (e) ->
-					e.preventDefault()
-		}
+			link(scope, element, attrs) {
+				return element.bind(attrs.preventDefault, e => e.preventDefault());
+			}
+		})
+);
+});

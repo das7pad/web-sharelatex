@@ -1,5 +1,5 @@
-define () ->
-	envs = [
+define(function() {
+	const envs = [
 		"abstract",
 		"align", "align*",
 		"equation", "equation*",
@@ -9,9 +9,9 @@ define () ->
 		"verbatim",
 		"quote",
 		"center"
-	]
+	];
 
-	envsWithSnippets = [
+	const envsWithSnippets = [
 		"array",
 		"figure",
 		"tabular",
@@ -21,9 +21,9 @@ define () ->
 		"itemize",
 		"frame",
 		"thebibliography"
-	]
+	];
 
 	return {
-		all: envs.concat(envsWithSnippets)
+		all: envs.concat(envsWithSnippets),
 		withoutSnippets: envs
-	}
+	};});

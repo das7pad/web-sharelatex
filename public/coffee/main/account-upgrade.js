@@ -1,26 +1,41 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.controller "FreeTrialModalController", ($scope, abTestManager, sixpack, event_tracking)->
+], App =>
+	App.controller("FreeTrialModalController", function($scope, abTestManager, sixpack, event_tracking){
 
-		$scope.buttonClass = "btn-primary"
+		$scope.buttonClass = "btn-primary";
 
-		$scope.startFreeTrial = (source, couponCode) ->
-			plan = 'collaborator_free_trial_7_days'
+		return $scope.startFreeTrial = function(source, couponCode) {
+			const plan = 'collaborator_free_trial_7_days';
 
-			w = window.open()
-			go = () ->
-				ga?('send', 'event', 'subscription-funnel', 'upgraded-free-trial', source)
-				if window.useV2TrialUrl
-					url = "/user/trial"
-				else
-					url = "/user/subscription/new?planCode=#{plan}&ssp=true"
-					if couponCode?
-						url = "#{url}&cc=#{couponCode}"
-				$scope.startedFreeTrial = true
+			const w = window.open();
+			const go = function() {
+				let url;
+				if (typeof ga === 'function') {
+					ga('send', 'event', 'subscription-funnel', 'upgraded-free-trial', source);
+				}
+				if (window.useV2TrialUrl) {
+					url = "/user/trial";
+				} else {
+					url = `/user/subscription/new?planCode=${plan}&ssp=true`;
+					if (couponCode != null) {
+						url = `${url}&cc=${couponCode}`;
+					}
+				}
+				$scope.startedFreeTrial = true;
 
-				event_tracking.sendMB "subscription-start-trial", { source, plan }
+				event_tracking.sendMB("subscription-start-trial", { source, plan });
 
-				w.location = url
+				return w.location = url;
+			};
 
-			go()
+			return go();
+		};
+	})
+);

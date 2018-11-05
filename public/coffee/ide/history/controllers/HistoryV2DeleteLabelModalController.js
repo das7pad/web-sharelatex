@@ -1,23 +1,33 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base",
-], (App) ->
-	App.controller "HistoryV2DeleteLabelModalController", ["$scope", "$modalInstance", "ide", "labelDetails", ($scope, $modalInstance, ide, labelDetails) ->
-		$scope.labelDetails = labelDetails
-		$scope.state =
-			inflight: false
+], App =>
+	App.controller("HistoryV2DeleteLabelModalController", ["$scope", "$modalInstance", "ide", "labelDetails", function($scope, $modalInstance, ide, labelDetails) {
+		$scope.labelDetails = labelDetails;
+		$scope.state = {
+			inflight: false,
 			error: false
+		};
 
-		$scope.deleteLabel = () ->
-			$scope.state.inflight = true
-			ide.historyManager.deleteLabel labelDetails
-				.then (response) ->
-					$scope.state.inflight = false
-					$modalInstance.close()
-				.catch (response) ->
-					{ data, status } = response
-					$scope.state.inflight = false
-					if status == 400
-						$scope.state.error = { message: data }
-					else
-						$scope.state.error = true
-	]
+		return $scope.deleteLabel = function() {
+			$scope.state.inflight = true;
+			return ide.historyManager.deleteLabel(labelDetails)
+				.then(function(response) {
+					$scope.state.inflight = false;
+					return $modalInstance.close();}).catch(function(response) {
+					const { data, status } = response;
+					$scope.state.inflight = false;
+					if (status === 400) {
+						return $scope.state.error = { message: data };
+					} else {
+						return $scope.state.error = true;
+					}
+			});
+		};
+	}
+	])
+);

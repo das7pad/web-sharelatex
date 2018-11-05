@@ -1,19 +1,38 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS205: Consider reworking code to avoid use of IIFEs
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
+], App =>
 
-	App.controller 'LeftHandMenuPromoController', ($scope, UserAffiliationsDataService) ->
+	App.controller('LeftHandMenuPromoController', function($scope, UserAffiliationsDataService) {
 
-		$scope.hasProjects = window.data.projects.length > 0
-		$scope.userHasNoSubscription = window.userHasNoSubscription
+		$scope.hasProjects = window.data.projects.length > 0;
+		$scope.userHasNoSubscription = window.userHasNoSubscription;
 
-		_userHasNoAffiliation = () ->
-			$scope.userEmails = []
-			$scope.userAffiliations = []
-			UserAffiliationsDataService.getUserEmails().then (emails) ->
-				$scope.userEmails = emails
-				for email in emails
-					if email.affiliation
-						$scope.userAffiliations.push email.affiliation
+		const _userHasNoAffiliation = function() {
+			$scope.userEmails = [];
+			$scope.userAffiliations = [];
+			return UserAffiliationsDataService.getUserEmails().then(function(emails) {
+				$scope.userEmails = emails;
+				return (() => {
+					const result = [];
+					for (let email of Array.from(emails)) {
+						if (email.affiliation) {
+							result.push($scope.userAffiliations.push(email.affiliation));
+						} else {
+							result.push(undefined);
+						}
+					}
+					return result;
+				})();
+			});
+		};
 
-		_userHasNoAffiliation()
+		return _userHasNoAffiliation();
+	})
+);

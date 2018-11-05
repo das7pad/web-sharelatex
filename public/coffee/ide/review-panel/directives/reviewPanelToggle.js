@@ -1,32 +1,48 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.directive "reviewPanelToggle", () ->
-		restrict: "E"
-		scope: 
-			onToggle: '&'
-			ngModel: '='
-			valWhenUndefined: '=?'
-			disabled: '=?'
-			onDisabledClick: '&?'
-		link: (scope) ->
-			if !scope.disabled?
-				scope.disabled = false
-			scope.onChange = (args...) ->
-				scope.onToggle({ isOn: scope.localModel })
-			scope.handleClick = () ->
-				if scope.disabled and scope.onDisabledClick?
-					scope.onDisabledClick()
-			scope.localModel = scope.ngModel
-			scope.$watch "ngModel", (value) ->
-				if scope.valWhenUndefined? and !value?
-					value = scope.valWhenUndefined
-				scope.localModel = value
+], App =>
+	App.directive("reviewPanelToggle", () =>
+		({
+			restrict: "E",
+			scope: { 
+				onToggle: '&',
+				ngModel: '=',
+				valWhenUndefined: '=?',
+				disabled: '=?',
+				onDisabledClick: '&?'
+			},
+			link(scope) {
+				if ((scope.disabled == null)) {
+					scope.disabled = false;
+				}
+				scope.onChange = (...args) => scope.onToggle({ isOn: scope.localModel });
+				scope.handleClick = function() {
+					if (scope.disabled && (scope.onDisabledClick != null)) {
+						return scope.onDisabledClick();
+					}
+				};
+				scope.localModel = scope.ngModel;
+				return scope.$watch("ngModel", function(value) {
+					if ((scope.valWhenUndefined != null) && (value == null)) {
+						value = scope.valWhenUndefined;
+					}
+					return scope.localModel = value;
+				});
+			},
 
-		template: """
+			template: `\
 <div class="rp-toggle" ng-click="handleClick();">
-	<input id="rp-toggle-{{$id}}" ng-disabled="disabled" type="checkbox" class="rp-toggle-hidden-input" ng-model="localModel" ng-change="onChange()" />
-	<label for="rp-toggle-{{$id}}" class="rp-toggle-btn"></label>
-</div>
-"""
+		<input id="rp-toggle-{{$id}}" ng-disabled="disabled" type="checkbox" class="rp-toggle-hidden-input" ng-model="localModel" ng-change="onChange()" />
+		<label for="rp-toggle-{{$id}}" class="rp-toggle-btn"></label>
+	</div>\
+`
+		})
+	)
+);
 	

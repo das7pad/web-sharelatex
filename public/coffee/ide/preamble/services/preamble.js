@@ -1,22 +1,39 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS103: Rewrite code to no longer use __guard__
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
+], App =>
 
-	App.factory 'preamble', (ide) ->
+	App.factory('preamble', function(ide) {
 
-		Preamble =
-			getPreambleText: () ->
-				text = ide.editorManager.getCurrentDocValue().slice(0, 5000)
-				preamble = text.match(/([^]*)^\\begin\{document\}/m)?[1] || ""
-				return preamble
+		var Preamble = {
+			getPreambleText() {
+				const text = ide.editorManager.getCurrentDocValue().slice(0, 5000);
+				const preamble = __guard__(text.match(/([^]*)^\\begin\{document\}/m), x => x[1]) || "";
+				return preamble;
+			},
 
-			getGraphicsPaths: () ->
-				preamble = Preamble.getPreambleText()
-				graphicsPathsArgs = preamble.match(/\\graphicspath\{(.*)\}/)?[1] || ""
-				paths = []
-				re = /\{([^}]*)\}/g
-				while match = re.exec(graphicsPathsArgs)
-					paths.push(match[1])
-				return paths
+			getGraphicsPaths() {
+				let match;
+				const preamble = Preamble.getPreambleText();
+				const graphicsPathsArgs = __guard__(preamble.match(/\\graphicspath\{(.*)\}/), x => x[1]) || "";
+				const paths = [];
+				const re = /\{([^}]*)\}/g;
+				while ((match = re.exec(graphicsPathsArgs))) {
+					paths.push(match[1]);
+				}
+				return paths;
+			}
+		};
 
-		return Preamble
+		return Preamble;
+	})
+);
+
+function __guard__(value, transform) {
+  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+}

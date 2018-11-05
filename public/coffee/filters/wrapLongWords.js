@@ -1,25 +1,34 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	DEF_MIN_LENGTH = 20
+], function(App) {
+	const DEF_MIN_LENGTH = 20;
 
-	_decodeHTMLEntities = (str) ->
-		str.replace /&#(\d+);/g, (match, dec) ->
-    		String.fromCharCode dec;
+	const _decodeHTMLEntities = str =>
+		str.replace(/&#(\d+);/g, (match, dec) => String.fromCharCode(dec))
+	;
 
-	_getWrappedWordsString = (baseStr, wrapperElName, minLength) ->
-		minLength = minLength || DEF_MIN_LENGTH
-		words = baseStr.split ' '
+	const _getWrappedWordsString = function(baseStr, wrapperElName, minLength) {
+		let outputStr;
+		minLength = minLength || DEF_MIN_LENGTH;
+		const words = baseStr.split(' ');
 
-		wordsWrapped = for word in words
-			if _decodeHTMLEntities(word).length >= minLength
-				"<#{wrapperElName} class=\"break-word\">#{word}</#{wrapperElName}>"
-			else
-				word
+		const wordsWrapped = Array.from(words).map((word) =>
+			_decodeHTMLEntities(word).length >= minLength ?
+				`<${wrapperElName} class=\"break-word\">${word}</${wrapperElName}>`
+			:
+				word);
 
-		outputStr = wordsWrapped.join ' '
+		return outputStr = wordsWrapped.join(' ');
+	};
 
 
-	App.filter "wrapLongWords", () ->
-		(input, minLength) ->
-			_getWrappedWordsString input, "span", minLength
+	return App.filter("wrapLongWords", () =>
+		(input, minLength) => _getWrappedWordsString(input, "span", minLength)
+	);
+});

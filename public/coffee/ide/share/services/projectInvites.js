@@ -1,36 +1,49 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.factory "projectInvites", ["ide", "$http", (ide, $http) ->
-		return {
+], App =>
+	App.factory("projectInvites", ["ide", "$http", (ide, $http) =>
+		({
 
-			sendInvite: (email, privileges, grecaptchaResponse) ->
-				$http.post("/project/#{ide.project_id}/invite", {
-					email: email
-					privileges: privileges
-					_csrf: window.csrfToken
+			sendInvite(email, privileges, grecaptchaResponse) {
+				return $http.post(`/project/${ide.project_id}/invite`, {
+					email,
+					privileges,
+					_csrf: window.csrfToken,
 					'g-recaptcha-response': grecaptchaResponse
-				})
+				});
+			},
 
-			revokeInvite: (inviteId) ->
-				$http({
-					url: "/project/#{ide.project_id}/invite/#{inviteId}"
-					method: "DELETE"
-					headers:
+			revokeInvite(inviteId) {
+				return $http({
+					url: `/project/${ide.project_id}/invite/${inviteId}`,
+					method: "DELETE",
+					headers: {
 						"X-Csrf-Token": window.csrfToken
-				})
+					}
+				});
+			},
 
-			resendInvite: (inviteId, privileges) ->
-				$http.post("/project/#{ide.project_id}/invite/#{inviteId}/resend", {
+			resendInvite(inviteId, privileges) {
+				return $http.post(`/project/${ide.project_id}/invite/${inviteId}/resend`, {
 					_csrf: window.csrfToken
-				})
+				});
+			},
 
-			getInvites: () ->
-				$http.get("/project/#{ide.project_id}/invites", {
-					json: true
-					headers:
+			getInvites() {
+				return $http.get(`/project/${ide.project_id}/invites`, {
+					json: true,
+					headers: {
 						"X-Csrf-Token": window.csrfToken
-				})
+					}
+				});
+			}
 
-		}
-	]
+		})
+	
+	])
+);

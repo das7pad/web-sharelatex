@@ -1,196 +1,262 @@
-define [
-	"ide/editor/Document"
-	"ide/editor/components/spellMenu"
-	"ide/editor/directives/aceEditor"
-	"ide/editor/directives/toggleSwitch"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS206: Consider reworking classes to avoid initClass
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
+	"ide/editor/Document",
+	"ide/editor/components/spellMenu",
+	"ide/editor/directives/aceEditor",
+	"ide/editor/directives/toggleSwitch",
 	"ide/editor/controllers/SavingNotificationController"
-], (Document) ->
-	class EditorManager
-		constructor: (@ide, @$scope, @localStorage) ->
-			@$scope.editor = {
-				sharejs_doc: null
-				open_doc_id: null
-				open_doc_name: null
-				opening: true
-				trackChanges: false
-				wantTrackChanges: false
-				showRichText: @showRichText()
+], function(Document) {
+	let EditorManager;
+	return EditorManager = (function() {
+		EditorManager = class EditorManager {
+			static initClass() {
+	
+				this.prototype._syncTimeout = null;
+			}
+			constructor(ide, $scope, localStorage) {
+				this.ide = ide;
+				this.$scope = $scope;
+				this.localStorage = localStorage;
+				this.$scope.editor = {
+					sharejs_doc: null,
+					open_doc_id: null,
+					open_doc_name: null,
+					opening: true,
+					trackChanges: false,
+					wantTrackChanges: false,
+					showRichText: this.showRichText()
+				};
+
+				this.$scope.$on("entity:selected", (event, entity) => {
+					if ((this.$scope.ui.view !== "history") && (entity.type === "doc")) {
+						return this.openDoc(entity);
+					}
+				});
+
+				this.$scope.$on("entity:deleted", (event, entity) => {
+					if (this.$scope.editor.open_doc_id === entity.id) {
+						if (!this.$scope.project.rootDoc_id) { return; }
+						const doc = this.ide.fileTreeManager.findEntityById(this.$scope.project.rootDoc_id);
+						if ((doc == null)) { return; }
+						return this.openDoc(doc);
+					}
+				});
+
+				let initialized = false;
+				this.$scope.$on("file-tree:initialized", () => {
+					if (!initialized) {
+						initialized = true;
+						return this.autoOpenDoc();
+					}
+				});
+
+				this.$scope.$on("flush-changes", () => {
+					return Document.flushAll();
+				});
+
+				this.$scope.$watch("editor.wantTrackChanges", value => {
+					if ((value == null)) { return; }
+					return this._syncTrackChangesState(this.$scope.editor.sharejs_doc);
+				});
 			}
 
-			@$scope.$on "entity:selected", (event, entity) =>
-				if (@$scope.ui.view != "history" and entity.type == "doc")
-					@openDoc(entity)
+			showRichText() {
+				if (!window.richTextEnabled) {
+					return false;
+				}
+				return this.localStorage(`editor.mode.${this.$scope.project_id}`) === 'rich-text';
+			}
 
-			@$scope.$on "entity:deleted", (event, entity) =>
-				if @$scope.editor.open_doc_id == entity.id
-					return if !@$scope.project.rootDoc_id
-					doc = @ide.fileTreeManager.findEntityById(@$scope.project.rootDoc_id)
-					return if !doc?
-					@openDoc(doc)
+			autoOpenDoc() {
+				const open_doc_id =
+					this.ide.localStorage(`doc.open_id.${this.$scope.project_id}`) ||
+					this.$scope.project.rootDoc_id;
+				if ((open_doc_id == null)) { return; }
+				const doc = this.ide.fileTreeManager.findEntityById(open_doc_id);
+				if ((doc == null)) { return; }
+				return this.openDoc(doc);
+			}
 
-			initialized = false
-			@$scope.$on "file-tree:initialized", () =>
-				if !initialized
-					initialized = true
-					@autoOpenDoc()
+			openDocId(doc_id, options) {
+				if (options == null) { options = {}; }
+				const doc = this.ide.fileTreeManager.findEntityById(doc_id);
+				if ((doc == null)) { return; }
+				return this.openDoc(doc, options);
+			}
 
-			@$scope.$on "flush-changes", () =>
-				Document.flushAll()
+			openDoc(doc, options) {
+				if (options == null) { options = {}; }
+				sl_console.log(`[openDoc] Opening ${doc.id}`);
+				this.$scope.ui.view = "editor";
 
-			@$scope.$watch "editor.wantTrackChanges", (value) =>
-				return if !value?
-				@_syncTrackChangesState(@$scope.editor.sharejs_doc)
-
-		showRichText: () ->
-			if !window.richTextEnabled
-				return false
-			@localStorage("editor.mode.#{@$scope.project_id}") == 'rich-text'
-
-		autoOpenDoc: () ->
-			open_doc_id =
-				@ide.localStorage("doc.open_id.#{@$scope.project_id}") or
-				@$scope.project.rootDoc_id
-			return if !open_doc_id?
-			doc = @ide.fileTreeManager.findEntityById(open_doc_id)
-			return if !doc?
-			@openDoc(doc)
-
-		openDocId: (doc_id, options = {}) ->
-			doc = @ide.fileTreeManager.findEntityById(doc_id)
-			return if !doc?
-			@openDoc(doc, options)
-
-		openDoc: (doc, options = {}) ->
-			sl_console.log "[openDoc] Opening #{doc.id}"
-			@$scope.ui.view = "editor"
-
-			done = () =>
-				if options.gotoLine?
-					# allow Ace to display document before moving, delay until next tick
-					# added delay to make this happen later that gotoStoredPosition in
-					# CursorPositionManager
-					setTimeout () =>
-						@$scope.$broadcast "editor:gotoLine", options.gotoLine, options.gotoColumn
-					, 0
-				else if options.gotoOffset?
-					setTimeout () =>
-						@$scope.$broadcast "editor:gotoOffset", options.gotoOffset
-					, 0
+				const done = () => {
+					if (options.gotoLine != null) {
+						// allow Ace to display document before moving, delay until next tick
+						// added delay to make this happen later that gotoStoredPosition in
+						// CursorPositionManager
+						return setTimeout(() => {
+							return this.$scope.$broadcast("editor:gotoLine", options.gotoLine, options.gotoColumn);
+						}
+						, 0);
+					} else if (options.gotoOffset != null) {
+						return setTimeout(() => {
+							return this.$scope.$broadcast("editor:gotoOffset", options.gotoOffset);
+						}
+						, 0);
+					}
+				};
 
 
-			if doc.id == @$scope.editor.open_doc_id and !options.forceReopen
-				@$scope.$apply () =>
-					done()
-				return
+				if ((doc.id === this.$scope.editor.open_doc_id) && !options.forceReopen) {
+					this.$scope.$apply(() => {
+						return done();
+					});
+					return;
+				}
 
-			@$scope.editor.open_doc_id = doc.id
-			@$scope.editor.open_doc_name = doc.name
+				this.$scope.editor.open_doc_id = doc.id;
+				this.$scope.editor.open_doc_name = doc.name;
 
-			@ide.localStorage "doc.open_id.#{@$scope.project_id}", doc.id
-			@ide.fileTreeManager.selectEntity(doc)
+				this.ide.localStorage(`doc.open_id.${this.$scope.project_id}`, doc.id);
+				this.ide.fileTreeManager.selectEntity(doc);
 
-			@$scope.editor.opening = true
-			@_openNewDocument doc, (error, sharejs_doc) =>
-				if error?
-					@ide.showGenericMessageModal(
-						"Error opening document"
-						"Sorry, something went wrong opening this document. Please try again."
-					)
-					return
+				this.$scope.editor.opening = true;
+				return this._openNewDocument(doc, (error, sharejs_doc) => {
+					if (error != null) {
+						this.ide.showGenericMessageModal(
+							"Error opening document",
+							"Sorry, something went wrong opening this document. Please try again."
+						);
+						return;
+					}
 
-				@_syncTrackChangesState(sharejs_doc)
+					this._syncTrackChangesState(sharejs_doc);
 
-				@$scope.$broadcast "doc:opened"
+					this.$scope.$broadcast("doc:opened");
 
-				@$scope.$apply () =>
-					@$scope.editor.opening = false
-					@$scope.editor.sharejs_doc = sharejs_doc
-					done()
+					return this.$scope.$apply(() => {
+						this.$scope.editor.opening = false;
+						this.$scope.editor.sharejs_doc = sharejs_doc;
+						return done();
+					});
+				});
+			}
 
-		_openNewDocument: (doc, callback = (error, sharejs_doc) ->) ->
-			sl_console.log "[_openNewDocument] Opening..."
-			current_sharejs_doc = @$scope.editor.sharejs_doc
-			if current_sharejs_doc?
-				sl_console.log "[_openNewDocument] Leaving existing open doc..."
-				current_sharejs_doc.leaveAndCleanUp()
-				@_unbindFromDocumentEvents(current_sharejs_doc)
+			_openNewDocument(doc, callback) {
+				if (callback == null) { callback = function(error, sharejs_doc) {}; }
+				sl_console.log("[_openNewDocument] Opening...");
+				const current_sharejs_doc = this.$scope.editor.sharejs_doc;
+				if (current_sharejs_doc != null) {
+					sl_console.log("[_openNewDocument] Leaving existing open doc...");
+					current_sharejs_doc.leaveAndCleanUp();
+					this._unbindFromDocumentEvents(current_sharejs_doc);
+				}
 
-			new_sharejs_doc = Document.getDocument @ide, doc.id
+				const new_sharejs_doc = Document.getDocument(this.ide, doc.id);
 
-			new_sharejs_doc.join (error) =>
-				return callback(error) if error?
-				@_bindToDocumentEvents(doc, new_sharejs_doc)
-				callback null, new_sharejs_doc
+				return new_sharejs_doc.join(error => {
+					if (error != null) { return callback(error); }
+					this._bindToDocumentEvents(doc, new_sharejs_doc);
+					return callback(null, new_sharejs_doc);
+				});
+			}
 
 
-		_bindToDocumentEvents: (doc, sharejs_doc) ->
-			sharejs_doc.on "error", (error, meta) =>
-				if error?.message?
-					message = error.message
-				else if typeof error == "string"
-					message = error
-				else
-					message = ""
-				if /maxDocLength/.test(message)
-					@ide.showGenericMessageModal(
-						"Document Too Long"
-						"Sorry, this file is too long to be edited manually. Please upload it directly."
-					)
-				else if /too many comments or tracked changes/.test(message)
-					@ide.showGenericMessageModal(
-						"Too many comments or tracked changes"
-						"Sorry, this file has too many comments or tracked changes. Please try accepting or rejecting some existing changes, or resolving and deleting some comments."
-					)
-				else
-					@ide.socket.disconnect()
-					@ide.reportError(error, meta)
-					@ide.showGenericMessageModal(
-						"Out of sync"
-						"Sorry, this file has gone out of sync and we need to do a full refresh. <br> <a href='/learn/Kb/Editor_out_of_sync_problems'>Please see this help guide for more information</a>"
-					)
-				@openDoc(doc, forceReopen: true)
+			_bindToDocumentEvents(doc, sharejs_doc) {
+				sharejs_doc.on("error", (error, meta) => {
+					let message;
+					if ((error != null ? error.message : undefined) != null) {
+						({ message } = error);
+					} else if (typeof error === "string") {
+						message = error;
+					} else {
+						message = "";
+					}
+					if (/maxDocLength/.test(message)) {
+						this.ide.showGenericMessageModal(
+							"Document Too Long",
+							"Sorry, this file is too long to be edited manually. Please upload it directly."
+						);
+					} else if (/too many comments or tracked changes/.test(message)) {
+						this.ide.showGenericMessageModal(
+							"Too many comments or tracked changes",
+							"Sorry, this file has too many comments or tracked changes. Please try accepting or rejecting some existing changes, or resolving and deleting some comments."
+						);
+					} else {
+						this.ide.socket.disconnect();
+						this.ide.reportError(error, meta);
+						this.ide.showGenericMessageModal(
+							"Out of sync",
+							"Sorry, this file has gone out of sync and we need to do a full refresh. <br> <a href='/learn/Kb/Editor_out_of_sync_problems'>Please see this help guide for more information</a>"
+						);
+					}
+					return this.openDoc(doc, {forceReopen: true});
+				});
 
-			sharejs_doc.on "externalUpdate", (update) =>
-				return if @_ignoreExternalUpdates
-				@ide.showGenericMessageModal(
-					"Document Updated Externally"
-					"This document was just updated externally. Any recent changes you have made may have been overwritten. To see previous versions please look in the history."
-				)
+				return sharejs_doc.on("externalUpdate", update => {
+					if (this._ignoreExternalUpdates) { return; }
+					return this.ide.showGenericMessageModal(
+						"Document Updated Externally",
+						"This document was just updated externally. Any recent changes you have made may have been overwritten. To see previous versions please look in the history."
+					);
+				});
+			}
 
-		_unbindFromDocumentEvents: (document) ->
-			document.off()
+			_unbindFromDocumentEvents(document) {
+				return document.off();
+			}
 
-		getCurrentDocValue: () ->
-			@$scope.editor.sharejs_doc?.getSnapshot()
+			getCurrentDocValue() {
+				return (this.$scope.editor.sharejs_doc != null ? this.$scope.editor.sharejs_doc.getSnapshot() : undefined);
+			}
 
-		getCurrentDocId: () ->
-			@$scope.editor.open_doc_id
+			getCurrentDocId() {
+				return this.$scope.editor.open_doc_id;
+			}
 
-		startIgnoringExternalUpdates: () ->
-			@_ignoreExternalUpdates = true
+			startIgnoringExternalUpdates() {
+				return this._ignoreExternalUpdates = true;
+			}
 
-		stopIgnoringExternalUpdates: () ->
-			@_ignoreExternalUpdates = false
+			stopIgnoringExternalUpdates() {
+				return this._ignoreExternalUpdates = false;
+			}
+			_syncTrackChangesState(doc) {
+				let tryToggle;
+				if ((doc == null)) { return; }
 
-		_syncTimeout: null
-		_syncTrackChangesState: (doc) ->
-			return if !doc?
+				if (this._syncTimeout != null) {
+					clearTimeout(this._syncTimeout);
+					this._syncTimeout = null;
+				}
 
-			if @_syncTimeout?
-				clearTimeout @_syncTimeout
-				@_syncTimeout = null
+				const want = this.$scope.editor.wantTrackChanges;
+				const have = doc.getTrackingChanges();
+				if (want === have) {
+					this.$scope.editor.trackChanges = want;
+					return;
+				}
 
-			want = @$scope.editor.wantTrackChanges
-			have = doc.getTrackingChanges()
-			if want == have
-				@$scope.editor.trackChanges = want
-				return
-
-			do tryToggle = () =>
-				saved = !doc.getInflightOp()? and !doc.getPendingOp()?
-				if saved
-					doc.setTrackingChanges(want)
-					@$scope.$apply () =>
-						@$scope.editor.trackChanges = want
-				else
-					@_syncTimeout = setTimeout tryToggle, 100
+				return (tryToggle = () => {
+					const saved = (doc.getInflightOp() == null) && (doc.getPendingOp() == null);
+					if (saved) {
+						doc.setTrackingChanges(want);
+						return this.$scope.$apply(() => {
+							return this.$scope.editor.trackChanges = want;
+						});
+					} else {
+						return this._syncTimeout = setTimeout(tryToggle, 100);
+					}
+				})();
+			}
+		};
+		EditorManager.initClass();
+		return EditorManager;
+	})();
+});

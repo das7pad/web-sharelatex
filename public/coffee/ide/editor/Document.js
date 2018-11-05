@@ -1,410 +1,593 @@
-define [
-	"utils/EventEmitter"
-	"ide/editor/ShareJsDoc"
+/*
+ * decaffeinate suggestions:
+ * DS001: Remove Babel/TypeScript constructor workaround
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS103: Rewrite code to no longer use __guard__
+ * DS205: Consider reworking code to avoid use of IIFEs
+ * DS206: Consider reworking classes to avoid initClass
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
+	"utils/EventEmitter",
+	"ide/editor/ShareJsDoc",
 	"ide/review-panel/RangesTracker"
-], (EventEmitter, ShareJsDoc, RangesTracker) ->
-	class Document extends EventEmitter
-		@getDocument: (ide, doc_id) ->
-			@openDocs ||= {}
-			if !@openDocs[doc_id]?
-				sl_console.log "[getDocument] Creating new document instance for #{doc_id}"
-				@openDocs[doc_id] = new Document(ide, doc_id)
-			else
-				sl_console.log "[getDocument] Returning existing document instance for #{doc_id}"
-			return @openDocs[doc_id]
+], function(EventEmitter, ShareJsDoc, RangesTracker) {
+	let Document;
+	return Document = (function() {
+		Document = class Document extends EventEmitter {
+			static initClass() {
+	
+				this.prototype.MAX_PENDING_OP_SIZE = 64;
+			}
+			static getDocument(ide, doc_id) {
+				if (!this.openDocs) { this.openDocs = {}; }
+				if ((this.openDocs[doc_id] == null)) {
+					sl_console.log(`[getDocument] Creating new document instance for ${doc_id}`);
+					this.openDocs[doc_id] = new Document(ide, doc_id);
+				} else {
+					sl_console.log(`[getDocument] Returning existing document instance for ${doc_id}`);
+				}
+				return this.openDocs[doc_id];
+			}
 
-		@hasUnsavedChanges: () ->
-			for doc_id, doc of (@openDocs or {})
-				return true if doc.hasBufferedOps()
-			return false
+			static hasUnsavedChanges() {
+				const object = this.openDocs || {};
+				for (let doc_id in object) {
+					const doc = object[doc_id];
+					if (doc.hasBufferedOps()) { return true; }
+				}
+				return false;
+			}
 
-		@flushAll: () ->
-			for doc_id, doc of @openDocs
-				doc.flush()
+			static flushAll() {
+				return (() => {
+					const result = [];
+					for (let doc_id in this.openDocs) {
+						const doc = this.openDocs[doc_id];
+						result.push(doc.flush());
+					}
+					return result;
+				})();
+			}
 
-		constructor: (@ide, @doc_id) ->
-			@connected = @ide.socket.socket.connected
-			@joined = false
-			@wantToBeJoined = false
-			@_checkAceConsistency = _.bind(@_checkConsistency, @, @ace)
-			@_checkCMConsistency = _.bind(@_checkConsistency, @, @cm)
-			@inconsistentCount = 0
-			@_bindToEditorEvents()
-			@_bindToSocketEvents()
+			constructor(ide, doc_id) {
+				{
+				  // Hack: trick Babel/TypeScript into allowing this before super.
+				  if (false) { super(); }
+				  let thisFn = (() => { return this; }).toString();
+				  let thisName = thisFn.slice(thisFn.indexOf('return') + 6 + 1, thisFn.indexOf(';')).trim();
+				  eval(`${thisName} = this;`);
+				}
+				this.ide = ide;
+				this.doc_id = doc_id;
+				this.connected = this.ide.socket.socket.connected;
+				this.joined = false;
+				this.wantToBeJoined = false;
+				this._checkAceConsistency = _.bind(this._checkConsistency, this, this.ace);
+				this._checkCMConsistency = _.bind(this._checkConsistency, this, this.cm);
+				this.inconsistentCount = 0;
+				this._bindToEditorEvents();
+				this._bindToSocketEvents();
+			}
 
-		attachToAce: (@ace) ->
-			@doc?.attachToAce(@ace)
-			editorDoc = @ace.getSession().getDocument()
-			editorDoc.on "change", @_checkAceConsistency
-			@ide.$scope.$emit 'document:opened', @doc
+			attachToAce(ace) {
+				this.ace = ace;
+				if (this.doc != null) {
+					this.doc.attachToAce(this.ace);
+				}
+				const editorDoc = this.ace.getSession().getDocument();
+				editorDoc.on("change", this._checkAceConsistency);
+				return this.ide.$scope.$emit('document:opened', this.doc);
+			}
 
-		detachFromAce: () ->
-			@doc?.detachFromAce()
-			editorDoc = @ace?.getSession().getDocument()
-			editorDoc?.off "change", @_checkAceConsistency
-			@ide.$scope.$emit 'document:closed', @doc
+			detachFromAce() {
+				if (this.doc != null) {
+					this.doc.detachFromAce();
+				}
+				const editorDoc = this.ace != null ? this.ace.getSession().getDocument() : undefined;
+				if (editorDoc != null) {
+					editorDoc.off("change", this._checkAceConsistency);
+				}
+				return this.ide.$scope.$emit('document:closed', this.doc);
+			}
 
-		attachToCM: (@cm) ->
-			@doc?.attachToCM(@cm)
-			@cm?.on "change", @_checkCMConsistency
-			@ide.$scope.$emit 'document:opened', @doc
+			attachToCM(cm) {
+				this.cm = cm;
+				if (this.doc != null) {
+					this.doc.attachToCM(this.cm);
+				}
+				if (this.cm != null) {
+					this.cm.on("change", this._checkCMConsistency);
+				}
+				return this.ide.$scope.$emit('document:opened', this.doc);
+			}
 
-		detachFromCM: () ->
-			@doc?.detachFromCM()
-			@cm?.off "change", @_checkCMConsistency
-			@ide.$scope.$emit 'document:closed', @doc
+			detachFromCM() {
+				if (this.doc != null) {
+					this.doc.detachFromCM();
+				}
+				if (this.cm != null) {
+					this.cm.off("change", this._checkCMConsistency);
+				}
+				return this.ide.$scope.$emit('document:closed', this.doc);
+			}
 
-		submitOp: (args...) -> @doc?.submitOp(args...)
+			submitOp(...args) { return (this.doc != null ? this.doc.submitOp(...Array.from(args || [])) : undefined); }
 
-		_checkConsistency: (editor) ->
-			return () =>
-				# We've been seeing a lot of errors when I think there shouldn't be
-				# any, which may be related to this check happening before the change is
-				# applied. If we use a timeout, hopefully we can reduce this.
-				setTimeout () =>
-					editorValue = editor?.getValue()
-					sharejsValue = @doc?.getSnapshot()
-					if editorValue != sharejsValue
-						@inconsistentCount++
-					else
-						@inconsistentCount = 0
+			_checkConsistency(editor) {
+				return () => {
+					// We've been seeing a lot of errors when I think there shouldn't be
+					// any, which may be related to this check happening before the change is
+					// applied. If we use a timeout, hopefully we can reduce this.
+					return setTimeout(() => {
+						const editorValue = editor != null ? editor.getValue() : undefined;
+						const sharejsValue = this.doc != null ? this.doc.getSnapshot() : undefined;
+						if (editorValue !== sharejsValue) {
+							this.inconsistentCount++;
+						} else {
+							this.inconsistentCount = 0;
+						}
 
-					if @inconsistentCount >= 3
-						@_onError new Error("Editor text does not match server text")
-				, 0
+						if (this.inconsistentCount >= 3) {
+							return this._onError(new Error("Editor text does not match server text"));
+						}
+					}
+					, 0);
+				};
+			}
 
-		getSnapshot: () ->
-			@doc?.getSnapshot()
+			getSnapshot() {
+				return (this.doc != null ? this.doc.getSnapshot() : undefined);
+			}
 
-		getType: () ->
-			@doc?.getType()
+			getType() {
+				return (this.doc != null ? this.doc.getType() : undefined);
+			}
 
-		getInflightOp: () ->
-			@doc?.getInflightOp()
+			getInflightOp() {
+				return (this.doc != null ? this.doc.getInflightOp() : undefined);
+			}
 
-		getPendingOp: () ->
-			@doc?.getPendingOp()
+			getPendingOp() {
+				return (this.doc != null ? this.doc.getPendingOp() : undefined);
+			}
 
-		getRecentAck: () ->
-			@doc?.getRecentAck()
+			getRecentAck() {
+				return (this.doc != null ? this.doc.getRecentAck() : undefined);
+			}
 
-		getOpSize: (op) ->
-			@doc?.getOpSize(op)
+			getOpSize(op) {
+				return (this.doc != null ? this.doc.getOpSize(op) : undefined);
+			}
 
-		hasBufferedOps: () ->
-			@doc?.hasBufferedOps()
+			hasBufferedOps() {
+				return (this.doc != null ? this.doc.hasBufferedOps() : undefined);
+			}
 		
-		setTrackingChanges: (track_changes) ->
-			@doc.track_changes = track_changes
+			setTrackingChanges(track_changes) {
+				return this.doc.track_changes = track_changes;
+			}
 		
-		getTrackingChanges: () ->
-			!!@doc.track_changes
+			getTrackingChanges() {
+				return !!this.doc.track_changes;
+			}
 		
-		setTrackChangesIdSeeds: (id_seeds) ->
-			@doc.track_changes_id_seeds = id_seeds
+			setTrackChangesIdSeeds(id_seeds) {
+				return this.doc.track_changes_id_seeds = id_seeds;
+			}
 
-		_bindToSocketEvents: () ->
-			@_onUpdateAppliedHandler = (update) => @_onUpdateApplied(update)
-			@ide.socket.on "otUpdateApplied", @_onUpdateAppliedHandler
-			@_onErrorHandler = (error, update) => @_onError(error, update)
-			@ide.socket.on "otUpdateError", @_onErrorHandler
-			@_onDisconnectHandler = (error) => @_onDisconnect(error)
-			@ide.socket.on "disconnect", @_onDisconnectHandler
+			_bindToSocketEvents() {
+				this._onUpdateAppliedHandler = update => this._onUpdateApplied(update);
+				this.ide.socket.on("otUpdateApplied", this._onUpdateAppliedHandler);
+				this._onErrorHandler = (error, update) => this._onError(error, update);
+				this.ide.socket.on("otUpdateError", this._onErrorHandler);
+				this._onDisconnectHandler = error => this._onDisconnect(error);
+				return this.ide.socket.on("disconnect", this._onDisconnectHandler);
+			}
 
-		_bindToEditorEvents: () ->
-			onReconnectHandler = (update) =>
-				@_onReconnect(update)
-			@_unsubscribeReconnectHandler = @ide.$scope.$on "project:joined", onReconnectHandler
+			_bindToEditorEvents() {
+				const onReconnectHandler = update => {
+					return this._onReconnect(update);
+				};
+				return this._unsubscribeReconnectHandler = this.ide.$scope.$on("project:joined", onReconnectHandler);
+			}
 
-		_unBindFromEditorEvents: () ->
-			@_unsubscribeReconnectHandler()
+			_unBindFromEditorEvents() {
+				return this._unsubscribeReconnectHandler();
+			}
 
-		_unBindFromSocketEvents: () ->
-			@ide.socket.removeListener "otUpdateApplied", @_onUpdateAppliedHandler
-			@ide.socket.removeListener "otUpdateError", @_onErrorHandler
-			@ide.socket.removeListener "disconnect", @_onDisconnectHandler
+			_unBindFromSocketEvents() {
+				this.ide.socket.removeListener("otUpdateApplied", this._onUpdateAppliedHandler);
+				this.ide.socket.removeListener("otUpdateError", this._onErrorHandler);
+				return this.ide.socket.removeListener("disconnect", this._onDisconnectHandler);
+			}
 
-		leaveAndCleanUp: () ->
-			@leave (error) =>
-				@_cleanUp()
+			leaveAndCleanUp() {
+				return this.leave(error => {
+					return this._cleanUp();
+				});
+			}
 
-		join: (callback = (error) ->) ->
-			@wantToBeJoined = true
-			@_cancelLeave()
-			if @connected
-				return @_joinDoc callback
-			else
-				@_joinCallbacks ||= []
-				@_joinCallbacks.push callback
+			join(callback) {
+				if (callback == null) { callback = function(error) {}; }
+				this.wantToBeJoined = true;
+				this._cancelLeave();
+				if (this.connected) {
+					return this._joinDoc(callback);
+				} else {
+					if (!this._joinCallbacks) { this._joinCallbacks = []; }
+					return this._joinCallbacks.push(callback);
+				}
+			}
 
-		leave: (callback = (error) ->) ->
-			@wantToBeJoined = false
-			@_cancelJoin()
-			if (@doc? and @doc.hasBufferedOps())
-				sl_console.log "[leave] Doc has buffered ops, pushing callback for later"
-				@_leaveCallbacks ||= []
-				@_leaveCallbacks.push callback
-			else if !@connected
-				sl_console.log "[leave] Not connected, returning now"
-				callback()
-			else
-				sl_console.log "[leave] Leaving now"
-				@_leaveDoc(callback)
+			leave(callback) {
+				if (callback == null) { callback = function(error) {}; }
+				this.wantToBeJoined = false;
+				this._cancelJoin();
+				if ((this.doc != null) && this.doc.hasBufferedOps()) {
+					sl_console.log("[leave] Doc has buffered ops, pushing callback for later");
+					if (!this._leaveCallbacks) { this._leaveCallbacks = []; }
+					return this._leaveCallbacks.push(callback);
+				} else if (!this.connected) {
+					sl_console.log("[leave] Not connected, returning now");
+					return callback();
+				} else {
+					sl_console.log("[leave] Leaving now");
+					return this._leaveDoc(callback);
+				}
+			}
 
-		flush: () ->
-			@doc?.flushPendingOps()
+			flush() {
+				return (this.doc != null ? this.doc.flushPendingOps() : undefined);
+			}
 
-		chaosMonkey: (line = 0, char = "a") ->
-			orig = char
-			copy = null
-			pos = 0
-			timer = () =>
-				unless copy? and copy.length
-					copy = orig.slice() + ' ' + new Date() + '\n'
-					line += if Math.random() > 0.1 then 1 else -2
-					line = 0 if line < 0
-					pos = 0
-				char = copy[0]
-				copy = copy.slice(1)
-				@ace.session.insert({row: line, column: pos}, char)
-				pos += 1
-				@_cm = setTimeout timer, 100 + if Math.random() < 0.1 then 1000 else 0
-			@_cm = timer()
+			chaosMonkey(line, char) {
+				if (line == null) { line = 0; }
+				if (char == null) { char = "a"; }
+				const orig = char;
+				let copy = null;
+				let pos = 0;
+				var timer = () => {
+					if ((copy == null) || !copy.length) {
+						copy = orig.slice() + ' ' + new Date() + '\n';
+						line += Math.random() > 0.1 ? 1 : -2;
+						if (line < 0) { line = 0; }
+						pos = 0;
+					}
+					char = copy[0];
+					copy = copy.slice(1);
+					this.ace.session.insert({row: line, column: pos}, char);
+					pos += 1;
+					return this._cm = setTimeout(timer, 100 + (Math.random() < 0.1 ? 1000 : 0));
+				};
+				return this._cm = timer();
+			}
 
-		clearChaosMonkey: () ->
-			clearTimeout @_cm
+			clearChaosMonkey() {
+				return clearTimeout(this._cm); // pending ops bigger than this are always considered unsaved
+			}
 
-		MAX_PENDING_OP_SIZE: 64 # pending ops bigger than this are always considered unsaved
+			pollSavedStatus() {
+				// returns false if doc has ops waiting to be acknowledged or
+				// sent that haven't changed since the last time we checked.
+				// Otherwise returns true.
+				let saved;
+				const inflightOp = this.getInflightOp();
+				const pendingOp = this.getPendingOp();
+				const recentAck = this.getRecentAck();
+				const pendingOpSize = (pendingOp != null) && this.getOpSize(pendingOp);
+				if ((inflightOp == null) && (pendingOp == null)) {
+					// there's nothing going on, this is ok.
+					saved = true;
+					sl_console.log("[pollSavedStatus] no inflight or pending ops");
+				} else if ((inflightOp != null) && (inflightOp === this.oldInflightOp)) {
+					// The same inflight op has been sitting unacked since we
+					// last checked, this is bad.
+					saved = false;
+					sl_console.log("[pollSavedStatus] inflight op is same as before");
+				} else if ((pendingOp != null) && recentAck && (pendingOpSize < this.MAX_PENDING_OP_SIZE)) {
+					// There is an op waiting to go to server but it is small and
+					// within the flushDelay, this is ok for now.
+					saved = true;
+					sl_console.log("[pollSavedStatus] pending op (small with recent ack) assume ok", pendingOp, pendingOpSize);
+				} else {
+					// In any other situation, assume the document is unsaved.
+					saved = false;
+					sl_console.log(`[pollSavedStatus] assuming not saved (inflightOp?: ${(inflightOp != null)}, pendingOp?: ${(pendingOp != null)})`);
+				}
 
-		pollSavedStatus: () ->
-			# returns false if doc has ops waiting to be acknowledged or
-			# sent that haven't changed since the last time we checked.
-			# Otherwise returns true.
-			inflightOp = @getInflightOp()
-			pendingOp = @getPendingOp()
-			recentAck = @getRecentAck()
-			pendingOpSize = pendingOp? && @getOpSize(pendingOp)
-			if !inflightOp? and !pendingOp?
-				# there's nothing going on, this is ok.
-				saved = true
-				sl_console.log "[pollSavedStatus] no inflight or pending ops"
-			else if inflightOp? and inflightOp == @oldInflightOp
-				# The same inflight op has been sitting unacked since we
-				# last checked, this is bad.
-				saved = false
-				sl_console.log "[pollSavedStatus] inflight op is same as before"
-			else if pendingOp? and recentAck && pendingOpSize < @MAX_PENDING_OP_SIZE
-				# There is an op waiting to go to server but it is small and
-				# within the flushDelay, this is ok for now.
-				saved = true
-				sl_console.log "[pollSavedStatus] pending op (small with recent ack) assume ok", pendingOp, pendingOpSize
-			else
-				# In any other situation, assume the document is unsaved.
-				saved = false
-				sl_console.log "[pollSavedStatus] assuming not saved (inflightOp?: #{inflightOp?}, pendingOp?: #{pendingOp?})"
+				this.oldInflightOp = inflightOp;
+				return saved;
+			}
 
-			@oldInflightOp = inflightOp
-			return saved
+			_cancelLeave() {
+				if (this._leaveCallbacks != null) {
+					return delete this._leaveCallbacks;
+				}
+			}
 
-		_cancelLeave: () ->
-			if @_leaveCallbacks?
-				delete @_leaveCallbacks
+			_cancelJoin() {
+				if (this._joinCallbacks != null) {
+					return delete this._joinCallbacks;
+				}
+			}
 
-		_cancelJoin: () ->
-			if @_joinCallbacks?
-				delete @_joinCallbacks
+			_onUpdateApplied(update) {
+				this.ide.pushEvent("received-update", {
+					doc_id: this.doc_id,
+					remote_doc_id: (update != null ? update.doc : undefined),
+					wantToBeJoined: this.wantToBeJoined,
+					update
+				}
+				);
 
-		_onUpdateApplied: (update) ->
-			@ide.pushEvent "received-update",
-				doc_id: @doc_id
-				remote_doc_id: update?.doc
-				wantToBeJoined: @wantToBeJoined
-				update: update
+				if ((window.disconnectOnAck != null) && (Math.random() < window.disconnectOnAck)) {
+					sl_console.log("Disconnecting on ack", update);
+					window._ide.socket.socket.disconnect();
+					// Pretend we never received the ack
+					return;
+				}
 
-			if window.disconnectOnAck? and Math.random() < window.disconnectOnAck
-				sl_console.log "Disconnecting on ack", update
-				window._ide.socket.socket.disconnect()
-				# Pretend we never received the ack
-				return
+				if ((window.dropAcks != null) && (Math.random() < window.dropAcks)) {
+					if ((update.op == null)) { // Only drop our own acks, not collaborator updates
+						sl_console.log("Simulating a lost ack", update);
+						return;
+					}
+				}
 
-			if window.dropAcks? and Math.random() < window.dropAcks
-				if !update.op? # Only drop our own acks, not collaborator updates
-					sl_console.log "Simulating a lost ack", update
-					return
+				if (((update != null ? update.doc : undefined) === this.doc_id) && (this.doc != null)) {
+					this.doc.processUpdateFromServer(update);
 
-			if update?.doc == @doc_id and @doc?
-				@doc.processUpdateFromServer update
+					if (!this.wantToBeJoined) {
+						return this.leave();
+					}
+				}
+			}
 
-				if !@wantToBeJoined
-					@leave()
+			_onDisconnect() {
+				sl_console.log('[onDisconnect] disconnecting');
+				this.connected = false;
+				this.joined = false;
+				return (this.doc != null ? this.doc.updateConnectionState("disconnected") : undefined);
+			}
 
-		_onDisconnect: () ->
-			sl_console.log '[onDisconnect] disconnecting'
-			@connected = false
-			@joined = false
-			@doc?.updateConnectionState "disconnected"
+			_onReconnect() {
+				sl_console.log("[onReconnect] reconnected (joined project)");
+				this.ide.pushEvent("reconnected:afterJoinProject");
 
-		_onReconnect: () ->
-			sl_console.log "[onReconnect] reconnected (joined project)"
-			@ide.pushEvent "reconnected:afterJoinProject"
+				this.connected = true;
+				if (this.wantToBeJoined || (this.doc != null ? this.doc.hasBufferedOps() : undefined)) {
+					sl_console.log(`[onReconnect] Rejoining (wantToBeJoined: ${this.wantToBeJoined} OR hasBufferedOps: ${(this.doc != null ? this.doc.hasBufferedOps() : undefined)})`);
+					return this._joinDoc(error => {
+						if (error != null) { return this._onError(error); }
+						this.doc.updateConnectionState("ok");
+						this.doc.flushPendingOps();
+						return this._callJoinCallbacks();
+					});
+				}
+			}
 
-			@connected = true
-			if @wantToBeJoined or @doc?.hasBufferedOps()
-				sl_console.log "[onReconnect] Rejoining (wantToBeJoined: #{@wantToBeJoined} OR hasBufferedOps: #{@doc?.hasBufferedOps()})"
-				@_joinDoc (error) =>
-					return @_onError(error) if error?
-					@doc.updateConnectionState "ok"
-					@doc.flushPendingOps()
-					@_callJoinCallbacks()
+			_callJoinCallbacks() {
+				for (let callback of Array.from(this._joinCallbacks || [])) {
+					callback();
+				}
+				return delete this._joinCallbacks;
+			}
 
-		_callJoinCallbacks: () ->
-			for callback in @_joinCallbacks or []
-				callback()
-			delete @_joinCallbacks
+			_joinDoc(callback) {
+				if (callback == null) { callback = function(error) {}; }
+				if (this.doc != null) {
+					return this.ide.socket.emit('joinDoc', this.doc_id, this.doc.getVersion(), { encodeRanges: true }, (error, docLines, version, updates, ranges) => {
+						if (error != null) { return callback(error); }
+						this.joined = true;
+						this.doc.catchUp( updates );
+						this._decodeRanges(ranges);
+						this._catchUpRanges(ranges != null ? ranges.changes : undefined, ranges != null ? ranges.comments : undefined);
+						return callback();
+					});
+				} else {
+					return this.ide.socket.emit('joinDoc', this.doc_id, { encodeRanges: true }, (error, docLines, version, updates, ranges) => {
+						if (error != null) { return callback(error); }
+						this.joined = true;
+						this.doc = new ShareJsDoc(this.doc_id, docLines, version, this.ide.socket);
+						this._decodeRanges(ranges);
+						this.ranges = new RangesTracker(ranges != null ? ranges.changes : undefined, ranges != null ? ranges.comments : undefined);
+						this._bindToShareJsDocEvents();
+						return callback();
+					});
+				}
+			}
 
-		_joinDoc: (callback = (error) ->) ->
-			if @doc?
-				@ide.socket.emit 'joinDoc', @doc_id, @doc.getVersion(), { encodeRanges: true }, (error, docLines, version, updates, ranges) =>
-					return callback(error) if error?
-					@joined = true
-					@doc.catchUp( updates )
-					@_decodeRanges(ranges)
-					@_catchUpRanges(ranges?.changes, ranges?.comments)
-					callback()
-			else
-				@ide.socket.emit 'joinDoc', @doc_id, { encodeRanges: true }, (error, docLines, version, updates, ranges) =>
-					return callback(error) if error?
-					@joined = true
-					@doc = new ShareJsDoc @doc_id, docLines, version, @ide.socket
-					@_decodeRanges(ranges)
-					@ranges = new RangesTracker(ranges?.changes, ranges?.comments)
-					@_bindToShareJsDocEvents()
-					callback()
+			_decodeRanges(ranges) {
+				const decodeFromWebsockets = text => decodeURIComponent(escape(text));
+				try {
+					for (let change of Array.from(ranges.changes || [])) {
+						if (change.op.i != null) { change.op.i = decodeFromWebsockets(change.op.i); }
+						if (change.op.d != null) { change.op.d = decodeFromWebsockets(change.op.d); }
+					}
+					return (() => {
+						const result = [];
+						for (let comment of Array.from(ranges.comments || [])) {
+							if (comment.op.c != null) { result.push(comment.op.c = decodeFromWebsockets(comment.op.c)); } else {
+								result.push(undefined);
+							}
+						}
+						return result;
+					})();
+				} catch (err) {
+					return console.log(err);
+				}
+			}
 
-		_decodeRanges: (ranges) ->
-			decodeFromWebsockets = (text) -> decodeURIComponent(escape(text))
-			try
-				for change in ranges.changes or []
-					change.op.i = decodeFromWebsockets(change.op.i) if change.op.i?
-					change.op.d = decodeFromWebsockets(change.op.d) if change.op.d?
-				for comment in ranges.comments or []
-					comment.op.c = decodeFromWebsockets(comment.op.c) if comment.op.c?
-			catch err
-				console.log(err)
+			_leaveDoc(callback) {
+				if (callback == null) { callback = function(error) {}; }
+				sl_console.log('[_leaveDoc] Sending leaveDoc request');
+				return this.ide.socket.emit('leaveDoc', this.doc_id, error => {
+					if (error != null) { return callback(error); }
+					this.joined = false;
+					for (callback of Array.from(this._leaveCallbacks || [])) {
+						sl_console.log('[_leaveDoc] Calling buffered callback', callback);
+						callback(error);
+					}
+					delete this._leaveCallbacks;
+					return callback(error);
+				});
+			}
 
-		_leaveDoc: (callback = (error) ->) ->
-			sl_console.log '[_leaveDoc] Sending leaveDoc request'
-			@ide.socket.emit 'leaveDoc', @doc_id, (error) =>
-				return callback(error) if error?
-				@joined = false
-				for callback in @_leaveCallbacks or []
-					sl_console.log '[_leaveDoc] Calling buffered callback', callback
-					callback(error)
-				delete @_leaveCallbacks
-				callback(error)
+			_cleanUp() {
+				if (Document.openDocs[this.doc_id] === this) {
+					sl_console.log(`[_cleanUp] Removing self (${this.doc_id}) from in openDocs`);
+					delete Document.openDocs[this.doc_id];
+				} else {
+					// It's possible that this instance has error, and the doc has been reloaded.
+					// This creates a new instance in Document.openDoc with the same id. We shouldn't
+					// clear it because it's not this instance.
+					sl_console.log(`[_cleanUp] New instance of (${this.doc_id}) created. Not removing`);
+				}
+				this._unBindFromEditorEvents();
+				return this._unBindFromSocketEvents();
+			}
 
-		_cleanUp: () ->
-			if Document.openDocs[@doc_id] == @
-				sl_console.log "[_cleanUp] Removing self (#{@doc_id}) from in openDocs"
-				delete Document.openDocs[@doc_id]
-			else
-				# It's possible that this instance has error, and the doc has been reloaded.
-				# This creates a new instance in Document.openDoc with the same id. We shouldn't
-				# clear it because it's not this instance.
-				sl_console.log "[_cleanUp] New instance of (#{@doc_id}) created. Not removing"
-			@_unBindFromEditorEvents()
-			@_unBindFromSocketEvents()
+			_bindToShareJsDocEvents() {
+				this.doc.on("error", (error, meta) => this._onError(error, meta));
+				this.doc.on("externalUpdate", update => { 
+					this.ide.pushEvent("externalUpdate",
+						{doc_id: this.doc_id});
+					return this.trigger("externalUpdate", update);
+				});
+				this.doc.on("remoteop", (...args) => { 
+					this.ide.pushEvent("remoteop",
+						{doc_id: this.doc_id});
+					return this.trigger("remoteop", ...Array.from(args));
+				});
+				this.doc.on("op:sent", op => {
+					this.ide.pushEvent("op:sent", {
+						doc_id: this.doc_id,
+						op
+					}
+					);
+					return this.trigger("op:sent");
+				});
+				this.doc.on("op:acknowledged", op => {
+					this.ide.pushEvent("op:acknowledged", {
+						doc_id: this.doc_id,
+						op
+					}
+					);
+					this.ide.$scope.$emit("ide:opAcknowledged", {
+						doc_id: this.doc_id,
+						op
+					}
+					);
+					return this.trigger("op:acknowledged");
+				});
+				this.doc.on("op:timeout", op => {
+					this.ide.pushEvent("op:timeout", {
+						doc_id: this.doc_id,
+						op
+					}
+					);
+					this.trigger("op:timeout");
+					return this._onError(new Error("op timed out"), {op});
+			});
+				this.doc.on("flush", (inflightOp, pendingOp, version) => {
+					return this.ide.pushEvent("flush", {
+						doc_id: this.doc_id,
+						inflightOp,
+						pendingOp,
+						v: version
+					}
+					);
+				});
+				this.doc.on("change", (ops, oldSnapshot, msg) => {
+					this._applyOpsToRanges(ops, oldSnapshot, msg);
+					return this.ide.$scope.$emit("doc:changed",
+						{doc_id: this.doc_id});
+				});
+				this.doc.on("flipped_pending_to_inflight", () => {
+					return this.trigger("flipped_pending_to_inflight");
+				});
+				return this.doc.on("saved", () => {
+					return this.ide.$scope.$emit("doc:saved",
+						{doc_id: this.doc_id});
+				});
+			}
 
-		_bindToShareJsDocEvents: () ->
-			@doc.on "error", (error, meta) => @_onError error, meta
-			@doc.on "externalUpdate", (update) => 
-				@ide.pushEvent "externalUpdate",
-					doc_id: @doc_id
-				@trigger "externalUpdate", update
-			@doc.on "remoteop", (args...) => 
-				@ide.pushEvent "remoteop",
-					doc_id: @doc_id
-				@trigger "remoteop", args...
-			@doc.on "op:sent", (op) =>
-				@ide.pushEvent "op:sent",
-					doc_id: @doc_id
-					op: op
-				@trigger "op:sent"
-			@doc.on "op:acknowledged", (op) =>
-				@ide.pushEvent "op:acknowledged",
-					doc_id: @doc_id
-					op: op
-				@ide.$scope.$emit "ide:opAcknowledged",
-					doc_id: @doc_id
-					op: op
-				@trigger "op:acknowledged"
-			@doc.on "op:timeout", (op) =>
-				@ide.pushEvent "op:timeout",
-					doc_id: @doc_id
-					op: op
-				@trigger "op:timeout"
-				@_onError new Error("op timed out"), {op: op}
-			@doc.on "flush", (inflightOp, pendingOp, version) =>
-				@ide.pushEvent "flush",
-					doc_id: @doc_id,
-					inflightOp: inflightOp,
-					pendingOp: pendingOp
-					v: version
-			@doc.on "change", (ops, oldSnapshot, msg) =>
-				@_applyOpsToRanges(ops, oldSnapshot, msg)
-				@ide.$scope.$emit "doc:changed",
-					doc_id: @doc_id
-			@doc.on "flipped_pending_to_inflight", () =>
-				@trigger "flipped_pending_to_inflight"
-			@doc.on "saved", () =>
-				@ide.$scope.$emit "doc:saved",
-					doc_id: @doc_id
+			_onError(error, meta) {
+				if (meta == null) { meta = {}; }
+				meta.doc_id = this.doc_id;
+				sl_console.log("ShareJS error", error, meta);
+				if (typeof ga === 'function') {
+					ga('send', 'event', 'error', "shareJsError", `${error.message} - ${this.ide.socket.socket.transport.name}` );
+				}
+				if (this.doc != null) {
+					this.doc.clearInflightAndPendingOps();
+				}
+				this.trigger("error", error, meta);
+				// The clean up should run after the error is triggered because the error triggers a
+				// disconnect. If we run the clean up first, we remove our event handlers and miss
+				// the disconnect event, which means we try to leaveDoc when the connection comes back.
+				// This could intefere with the new connection of a new instance of this document.
+				return this._cleanUp();
+			}
 
-		_onError: (error, meta = {}) ->
-			meta.doc_id = @doc_id
-			sl_console.log "ShareJS error", error, meta
-			ga?('send', 'event', 'error', "shareJsError", "#{error.message} - #{@ide.socket.socket.transport.name}" )
-			@doc?.clearInflightAndPendingOps()
-			@trigger "error", error, meta
-			# The clean up should run after the error is triggered because the error triggers a
-			# disconnect. If we run the clean up first, we remove our event handlers and miss
-			# the disconnect event, which means we try to leaveDoc when the connection comes back.
-			# This could intefere with the new connection of a new instance of this document.
-			@_cleanUp()
-
-		_applyOpsToRanges: (ops = [], oldSnapshot, msg) ->
-			track_changes_as = null
-			remote_op = msg?
-			if msg?.meta?.tc?
-				old_id_seed = @ranges.getIdSeed()
-				@ranges.setIdSeed(msg.meta.tc)
-			if remote_op and msg.meta?.tc
-				track_changes_as = msg.meta.user_id
-			else if !remote_op and @track_changes_as?
-				track_changes_as = @track_changes_as
-			@ranges.track_changes = track_changes_as?
-			for op in ops
-				@ranges.applyOp op, { user_id: track_changes_as }
-			if old_id_seed?
-				@ranges.setIdSeed(old_id_seed)
-			if remote_op
-				# With remote ops, Ace hasn't been updated when we receive this op,
-				# so defer updating track changes until it has
-				setTimeout () => @emit "ranges:dirty"
-			else
-				@emit "ranges:dirty"
+			_applyOpsToRanges(ops, oldSnapshot, msg) {
+				let old_id_seed;
+				if (ops == null) { ops = []; }
+				let track_changes_as = null;
+				const remote_op = (msg != null);
+				if (__guard__(msg != null ? msg.meta : undefined, x => x.tc) != null) {
+					old_id_seed = this.ranges.getIdSeed();
+					this.ranges.setIdSeed(msg.meta.tc);
+				}
+				if (remote_op && (msg.meta != null ? msg.meta.tc : undefined)) {
+					track_changes_as = msg.meta.user_id;
+				} else if (!remote_op && (this.track_changes_as != null)) {
+					({ track_changes_as } = this);
+				}
+				this.ranges.track_changes = (track_changes_as != null);
+				for (let op of Array.from(ops)) {
+					this.ranges.applyOp(op, { user_id: track_changes_as });
+				}
+				if (old_id_seed != null) {
+					this.ranges.setIdSeed(old_id_seed);
+				}
+				if (remote_op) {
+					// With remote ops, Ace hasn't been updated when we receive this op,
+					// so defer updating track changes until it has
+					return setTimeout(() => this.emit("ranges:dirty"));
+				} else {
+					return this.emit("ranges:dirty");
+				}
+			}
 		
-		_catchUpRanges: (changes = [], comments = []) ->
-			# We've just been given the current server's ranges, but need to apply any local ops we have.
-			# Reset to the server state then apply our local ops again.
-			@emit "ranges:clear"
-			@ranges.changes = changes
-			@ranges.comments = comments
-			@ranges.track_changes = @doc.track_changes
-			for op in @doc.getInflightOp() or []
-				@ranges.setIdSeed(@doc.track_changes_id_seeds.inflight)
-				@ranges.applyOp(op, { user_id: @track_changes_as })
-			for op in @doc.getPendingOp() or []
-				@ranges.setIdSeed(@doc.track_changes_id_seeds.pending)
-				@ranges.applyOp(op, { user_id: @track_changes_as })
-			@emit "ranges:redraw"
+			_catchUpRanges(changes, comments) {
+				// We've just been given the current server's ranges, but need to apply any local ops we have.
+				// Reset to the server state then apply our local ops again.
+				if (changes == null) { changes = []; }
+				if (comments == null) { comments = []; }
+				this.emit("ranges:clear");
+				this.ranges.changes = changes;
+				this.ranges.comments = comments;
+				this.ranges.track_changes = this.doc.track_changes;
+				for (var op of Array.from(this.doc.getInflightOp() || [])) {
+					this.ranges.setIdSeed(this.doc.track_changes_id_seeds.inflight);
+					this.ranges.applyOp(op, { user_id: this.track_changes_as });
+				}
+				for (op of Array.from(this.doc.getPendingOp() || [])) {
+					this.ranges.setIdSeed(this.doc.track_changes_id_seeds.pending);
+					this.ranges.applyOp(op, { user_id: this.track_changes_as });
+				}
+				return this.emit("ranges:redraw");
+			}
+		};
+		Document.initClass();
+		return Document;
+	})();
+});
+
+function __guard__(value, transform) {
+  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+}

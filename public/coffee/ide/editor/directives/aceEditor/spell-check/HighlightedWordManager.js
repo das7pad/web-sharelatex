@@ -1,96 +1,123 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"ace/ace"
-], () ->
-	Range = ace.require("ace/range").Range
+], function() {
+	let HighlightedWordManager;
+	const { Range } = ace.require("ace/range");
 
-	class Highlight
-		constructor: (@markerId, @range, options) ->
-			@word = options.word
-			@suggestions = options.suggestions
+	class Highlight {
+		constructor(markerId, range, options) {
+			this.markerId = markerId;
+			this.range = range;
+			this.word = options.word;
+			this.suggestions = options.suggestions;
+		}
+	}
 
-	class HighlightedWordManager
-		constructor: (@editor) ->
-			@reset()
+	return (HighlightedWordManager = class HighlightedWordManager {
+		constructor(editor) {
+			this.editor = editor;
+			this.reset();
+		}
 
-		reset: () ->
-			@highlights?.forEach (highlight) =>
-				@editor.getSession().removeMarker(highlight.markerId)
-			@highlights = []
+		reset() {
+			if (this.highlights != null) {
+				this.highlights.forEach(highlight => {
+				return this.editor.getSession().removeMarker(highlight.markerId);
+			});
+			}
+			return this.highlights = [];
+		}
 
-		addHighlight: (options) ->
-			session = @editor.getSession()
-			doc = session.getDocument()
-			# Set up Range that will automatically update it's positions when the
-			# document changes
-			range = new Range()
+		addHighlight(options) {
+			const session = this.editor.getSession();
+			const doc = session.getDocument();
+			// Set up Range that will automatically update it's positions when the
+			// document changes
+			const range = new Range();
 			range.start = doc.createAnchor({
 				row: options.row,
 				column: options.column
-			})
+			});
 			range.end = doc.createAnchor({
 				row: options.row,
 				column: options.column + options.word.length
-			})
-			# Prevent range from adding newly typed characters to the end of the word.
-			# This makes it appear as if the spelling error continues to the next word
-			# even after a space
-			range.end.$insertRight = true
+			});
+			// Prevent range from adding newly typed characters to the end of the word.
+			// This makes it appear as if the spelling error continues to the next word
+			// even after a space
+			range.end.$insertRight = true;
 
-			markerId = session.addMarker range, "spelling-highlight", 'text', false
+			const markerId = session.addMarker(range, "spelling-highlight", 'text', false);
 
-			@highlights.push new Highlight(markerId, range, options)
+			return this.highlights.push(new Highlight(markerId, range, options));
+		}
 
-		removeHighlight: (highlight) ->
-			@editor.getSession().removeMarker(highlight.markerId)
-			@highlights = @highlights.filter (hl) ->
-				hl != highlight
+		removeHighlight(highlight) {
+			this.editor.getSession().removeMarker(highlight.markerId);
+			return this.highlights = this.highlights.filter(hl => hl !== highlight);
+		}
 
-		removeWord: (word) ->
-			@highlights.filter (highlight) ->
-				highlight.word == word
-			.forEach (highlight) =>
-				@removeHighlight(highlight)
+		removeWord(word) {
+			return this.highlights.filter(highlight => highlight.word === word).forEach(highlight => {
+				return this.removeHighlight(highlight);
+			});
+		}
 
-		clearRow: (row) ->
-			@highlights.filter (highlight) ->
-				highlight.range.start.row == row
-			.forEach (highlight) =>
-				@removeHighlight(highlight)
+		clearRow(row) {
+			return this.highlights.filter(highlight => highlight.range.start.row === row).forEach(highlight => {
+				return this.removeHighlight(highlight);
+			});
+		}
 
-		findHighlightWithinRange: (range) ->
-			_.find @highlights, (highlight) =>
-				@_doesHighlightOverlapRange highlight, range.start, range.end
+		findHighlightWithinRange(range) {
+			return _.find(this.highlights, highlight => {
+				return this._doesHighlightOverlapRange(highlight, range.start, range.end);
+			});
+		}
 
-		_doesHighlightOverlapRange: (highlight, start, end) ->
-			highlightRow = highlight.range.start.row
-			highlightStartColumn = highlight.range.start.column
-			highlightEndColumn = highlight.range.end.column
+		_doesHighlightOverlapRange(highlight, start, end) {
+			const highlightRow = highlight.range.start.row;
+			const highlightStartColumn = highlight.range.start.column;
+			const highlightEndColumn = highlight.range.end.column;
 
-			highlightIsAllBeforeRange =
-				highlightRow < start.row or
-				(highlightRow == start.row and highlightEndColumn <= start.column)
-			highlightIsAllAfterRange =
-				highlightRow > end.row or
-				(highlightRow == end.row and highlightStartColumn >= end.column)
-			!(highlightIsAllBeforeRange or highlightIsAllAfterRange)
+			const highlightIsAllBeforeRange =
+				(highlightRow < start.row) ||
+				((highlightRow === start.row) && (highlightEndColumn <= start.column));
+			const highlightIsAllAfterRange =
+				(highlightRow > end.row) ||
+				((highlightRow === end.row) && (highlightStartColumn >= end.column));
+			return !(highlightIsAllBeforeRange || highlightIsAllAfterRange);
+		}
 
-		clearHighlightTouchingRange: (range) ->
-			highlight = _.find @highlights, (hl) =>
-				@_doesHighlightTouchRange hl, range.start, range.end
-			if highlight
-				@removeHighlight highlight
+		clearHighlightTouchingRange(range) {
+			const highlight = _.find(this.highlights, hl => {
+				return this._doesHighlightTouchRange(hl, range.start, range.end);
+			});
+			if (highlight) {
+				return this.removeHighlight(highlight);
+			}
+		}
 
-		_doesHighlightTouchRange: (highlight, start, end) ->
-			highlightRow = highlight.range.start.row
-			highlightStartColumn = highlight.range.start.column
-			highlightEndColumn = highlight.range.end.column
+		_doesHighlightTouchRange(highlight, start, end) {
+			const highlightRow = highlight.range.start.row;
+			const highlightStartColumn = highlight.range.start.column;
+			const highlightEndColumn = highlight.range.end.column;
 
-			rangeStartIsWithinHighlight =
-				highlightStartColumn <= start.column and
-				highlightEndColumn >= start.column
-			rangeEndIsWithinHighlight =
-				highlightStartColumn <= end.column and
-				highlightEndColumn >= end.column
+			const rangeStartIsWithinHighlight =
+				(highlightStartColumn <= start.column) &&
+				(highlightEndColumn >= start.column);
+			const rangeEndIsWithinHighlight =
+				(highlightStartColumn <= end.column) &&
+				(highlightEndColumn >= end.column);
 
-			highlightRow == start.row and
-				(rangeStartIsWithinHighlight or rangeEndIsWithinHighlight)
+			return (highlightRow === start.row) &&
+				(rangeStartIsWithinHighlight || rangeEndIsWithinHighlight);
+		}
+	});
+});

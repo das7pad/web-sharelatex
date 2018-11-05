@@ -1,13 +1,25 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.controller "OnlineUsersController", ($scope, ide) ->
-		$scope.gotoUser = (user) ->
-			if user.doc? and user.row?
-				ide.editorManager.openDoc(user.doc, gotoLine: user.row + 1)
+], App =>
+	App.controller("OnlineUsersController", function($scope, ide) {
+		$scope.gotoUser = function(user) {
+			if ((user.doc != null) && (user.row != null)) {
+				return ide.editorManager.openDoc(user.doc, {gotoLine: user.row + 1});
+			}
+		};
 
-		$scope.userInitial = (user) ->
-			if user.user_id == 'anonymous-user'
-				'?'
-			else
-				user.name.slice(0, 1)
+		return $scope.userInitial = function(user) {
+			if (user.user_id === 'anonymous-user') {
+				return '?';
+			} else {
+				return user.name.slice(0, 1);
+			}
+		};
+	})
+);

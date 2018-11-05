@@ -1,18 +1,24 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	historyFileTreeController = ($scope, $element, $attrs) ->
-		ctrl = @
-		ctrl.handleEntityClick = (file) ->
-			ctrl.onSelectedFileChange file: file
-		return
+], function(App) {
+	const historyFileTreeController = function($scope, $element, $attrs) {
+		const ctrl = this;
+		ctrl.handleEntityClick = file => ctrl.onSelectedFileChange({file});
+	};
 
-	App.component "historyFileTree", {
-		bindings:
-			fileTree: "<"
-			selectedPathname: "<"
-			onSelectedFileChange: "&"
+	return App.component("historyFileTree", {
+		bindings: {
+			fileTree: "<",
+			selectedPathname: "<",
+			onSelectedFileChange: "&",
 			isLoading: "<"
-		controller: historyFileTreeController
+		},
+		controller: historyFileTreeController,
 		templateUrl: "historyFileTreeTpl"
-	}
+	});
+});

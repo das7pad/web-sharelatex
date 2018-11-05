@@ -1,170 +1,201 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS103: Rewrite code to no longer use __guard__
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base",
-	"directives/creditCards"
+	"directives/creditCards",
 	"libs/recurly-4.8.5"
-], (App)->
+], App=>
 
-	App.controller "NewSubscriptionController", ($scope, MultiCurrencyPricing, $http, event_tracking, ccUtils)->
-		throw new Error("Recurly API Library Missing.")  if typeof recurly is "undefined"
+	App.controller("NewSubscriptionController", function($scope, MultiCurrencyPricing, $http, event_tracking, ccUtils){
+		let inputHasError, isFormValid, setPaymentMethod;
+		if (typeof recurly === "undefined") { throw new Error("Recurly API Library Missing."); }
 
-		$scope.currencyCode = MultiCurrencyPricing.currencyCode
-		$scope.plans = MultiCurrencyPricing.plans
-		$scope.planCode = window.plan_code
+		$scope.currencyCode = MultiCurrencyPricing.currencyCode;
+		$scope.plans = MultiCurrencyPricing.plans;
+		$scope.planCode = window.plan_code;
 
-		$scope.switchToStudent = ()->
-			currentPlanCode = window.plan_code
-			planCode = currentPlanCode.replace('collaborator', 'student')
-			event_tracking.sendMB 'subscription-form-switch-to-student', { plan: window.plan_code }
-			window.location = "/user/subscription/new?planCode=#{planCode}&currency=#{$scope.currencyCode}&cc=#{$scope.data.coupon}"
+		$scope.switchToStudent = function(){
+			const currentPlanCode = window.plan_code;
+			const planCode = currentPlanCode.replace('collaborator', 'student');
+			event_tracking.sendMB('subscription-form-switch-to-student', { plan: window.plan_code });
+			return window.location = `/user/subscription/new?planCode=${planCode}&currency=${$scope.currencyCode}&cc=${$scope.data.coupon}`;
+		};
 
-		event_tracking.sendMB "subscription-form", { plan : window.plan_code }
+		event_tracking.sendMB("subscription-form", { plan : window.plan_code });
 
 		$scope.paymentMethod =
-			value: "credit_card"
+			{value: "credit_card"};
 
-		$scope.data =
-			first_name: ""
-			last_name: ""
-			postal_code: ""
-			address1 : ""
-			address2 : ""
-			state:""
-			city:""
-			country:window.countryCode
+		$scope.data = {
+			first_name: "",
+			last_name: "",
+			postal_code: "",
+			address1 : "",
+			address2 : "",
+			state:"",
+			city:"",
+			country:window.countryCode,
 			coupon: window.couponCode
+		};
 			
-		$scope.validation = {}
+		$scope.validation = {};
 
-		$scope.processing = false
+		$scope.processing = false;
 
-		recurly.configure 
-			publicKey: window.recurlyApiKey
-			style: 
-				all: 
+		recurly.configure({ 
+			publicKey: window.recurlyApiKey,
+			style: { 
+				all: { 
 					fontFamily: '"Open Sans", sans-serif',
 					fontSize: '16px',
 					fontColor: '#7a7a7a'
-				month: 
+				},
+				month: { 
 					placeholder: 'MM'
-				year: 
+				},
+				year: { 
 					placeholder: 'YY'
-				cvv:
+				},
+				cvv: {
 					placeholder: 'CVV'
+				}
+			}
+		});
 
 
-		pricing = recurly.Pricing()
-		window.pricing = pricing
+		const pricing = recurly.Pricing();
+		window.pricing = pricing;
 
-		initialPricing = pricing
+		const initialPricing = pricing
 			.plan(window.plan_code, { quantity: 1 })
 			.address({country: $scope.data.country})
 			.tax({tax_code: 'digital', vat_number: ''})
 			.currency($scope.currencyCode)
 			.coupon($scope.data.coupon)
-			.done()
+			.done();
 
-		pricing.on "change", =>
-			$scope.planName = pricing.items.plan.name
-			$scope.price = pricing.price
-			$scope.trialLength = pricing.items.plan.trial?.length
-			$scope.monthlyBilling = pricing.items.plan.period.length == 1
+		pricing.on("change", () => {
+			$scope.planName = pricing.items.plan.name;
+			$scope.price = pricing.price;
+			$scope.trialLength = pricing.items.plan.trial != null ? pricing.items.plan.trial.length : undefined;
+			$scope.monthlyBilling = pricing.items.plan.period.length === 1;
 
-			if pricing.items?.coupon?.discount?.type == "percent"
-				basePrice = parseInt(pricing.price.base.plan.unit)
-				$scope.normalPrice = basePrice
-				if pricing.items.coupon.applies_for_months > 0 and pricing.items.coupon?.discount?.rate and pricing.items.coupon?.applies_for_months?
-					$scope.discountMonths =  pricing.items.coupon?.applies_for_months
-					$scope.discountRate =  pricing.items.coupon?.discount?.rate * 100
+			if (__guard__(__guard__(pricing.items != null ? pricing.items.coupon : undefined, x1 => x1.discount), x => x.type) === "percent") {
+				const basePrice = parseInt(pricing.price.base.plan.unit);
+				$scope.normalPrice = basePrice;
+				if ((pricing.items.coupon.applies_for_months > 0) && __guard__(pricing.items.coupon != null ? pricing.items.coupon.discount : undefined, x2 => x2.rate) && ((pricing.items.coupon != null ? pricing.items.coupon.applies_for_months : undefined) != null)) {
+					$scope.discountMonths =  pricing.items.coupon != null ? pricing.items.coupon.applies_for_months : undefined;
+					$scope.discountRate =  __guard__(pricing.items.coupon != null ? pricing.items.coupon.discount : undefined, x3 => x3.rate) * 100;
+				}
 
-				if pricing.price?.taxes[0]?.rate?
-					$scope.normalPrice += (basePrice * pricing.price.taxes[0].rate)
-			$scope.$apply()
-
-
-
-		$scope.applyCoupon = ->
-			pricing.coupon($scope.data.coupon).done()
-
-		$scope.applyVatNumber = ->
-			pricing.tax({tax_code: 'digital', vat_number: $scope.data.vat_number}).done()
-
-		$scope.changeCurrency = (newCurrency)->
-			$scope.currencyCode = newCurrency
-			pricing.currency(newCurrency).done()
+				if (__guard__(pricing.price != null ? pricing.price.taxes[0] : undefined, x4 => x4.rate) != null) {
+					$scope.normalPrice += (basePrice * pricing.price.taxes[0].rate);
+				}
+			}
+			return $scope.$apply();
+		});
 
 
-		$scope.inputHasError = inputHasError = (formItem) ->
-			if !formItem?
-				return false
 
-			return (formItem.$touched && formItem.$invalid)
+		$scope.applyCoupon = () => pricing.coupon($scope.data.coupon).done();
 
-		$scope.isFormValid = isFormValid = (form) ->
-			if $scope.paymentMethod.value == 'paypal' 
-				return $scope.data.country != ""
-			else 
-				return form.$valid
+		$scope.applyVatNumber = () => pricing.tax({tax_code: 'digital', vat_number: $scope.data.vat_number}).done();
 
-		$scope.updateCountry = ->
-			pricing.address({country:$scope.data.country}).done()
+		$scope.changeCurrency = function(newCurrency){
+			$scope.currencyCode = newCurrency;
+			return pricing.currency(newCurrency).done();
+		};
 
-		$scope.setPaymentMethod = setPaymentMethod = (method) ->
+
+		$scope.inputHasError = (inputHasError = function(formItem) {
+			if ((formItem == null)) {
+				return false;
+			}
+
+			return (formItem.$touched && formItem.$invalid);
+		});
+
+		$scope.isFormValid = (isFormValid = function(form) {
+			if ($scope.paymentMethod.value === 'paypal') { 
+				return $scope.data.country !== "";
+			} else { 
+				return form.$valid;
+			}
+		});
+
+		$scope.updateCountry = () => pricing.address({country:$scope.data.country}).done();
+
+		$scope.setPaymentMethod = (setPaymentMethod = function(method) {
 			$scope.paymentMethod.value = method;
-			$scope.validation.errorFields = {}
-			$scope.genericError = ""
+			$scope.validation.errorFields = {};
+			return $scope.genericError = "";
+		});
 
-		completeSubscription = (err, recurly_token_id) ->
-			$scope.validation.errorFields = {}
-			if err?
-				event_tracking.sendMB "subscription-error", err
-				# We may or may not be in a digest loop here depending on
-				# whether recurly could do validation locally, so do it async
-				$scope.$evalAsync () ->
-					$scope.processing = false
-					$scope.genericError = err.message
-					_.each err.fields, (field)-> $scope.validation.errorFields[field] = true
-			else
-				postData =
-					_csrf: window.csrfToken
-					recurly_token_id:recurly_token_id.id
-					subscriptionDetails:
-						currencyCode:pricing.items.currency
-						plan_code:pricing.items.plan.code
-						coupon_code:pricing.items?.coupon?.code || ""
-						isPaypal: $scope.paymentMethod.value == 'paypal'
-						address:
-							address1:    $scope.data.address1
-							address2:    $scope.data.address2
-							country:     $scope.data.country
-							state:       $scope.data.state
+		const completeSubscription = function(err, recurly_token_id) {
+			$scope.validation.errorFields = {};
+			if (err != null) {
+				event_tracking.sendMB("subscription-error", err);
+				// We may or may not be in a digest loop here depending on
+				// whether recurly could do validation locally, so do it async
+				return $scope.$evalAsync(function() {
+					$scope.processing = false;
+					$scope.genericError = err.message;
+					return _.each(err.fields, field=> $scope.validation.errorFields[field] = true);
+				});
+			} else {
+				const postData = {
+					_csrf: window.csrfToken,
+					recurly_token_id:recurly_token_id.id,
+					subscriptionDetails: {
+						currencyCode:pricing.items.currency,
+						plan_code:pricing.items.plan.code,
+						coupon_code:__guard__(pricing.items != null ? pricing.items.coupon : undefined, x => x.code) || "",
+						isPaypal: $scope.paymentMethod.value === 'paypal',
+						address: {
+							address1:    $scope.data.address1,
+							address2:    $scope.data.address2,
+							country:     $scope.data.country,
+							state:       $scope.data.state,
 							postal_code: $scope.data.postal_code
+						}
+					}
+				};
 				
-				event_tracking.sendMB "subscription-form-submitted", { 
+				event_tracking.sendMB("subscription-form-submitted", { 
 					currencyCode	: postData.subscriptionDetails.currencyCode,
 					plan_code		: postData.subscriptionDetails.plan_code,
 					coupon_code		: postData.subscriptionDetails.coupon_code,
 					isPaypal		: postData.subscriptionDetails.isPaypal
-				}
+				});
 
 
-				$http.post("/user/subscription/create", postData)
-					.then ()->
-						event_tracking.sendMB "subscription-submission-success"
-						window.location.href = "/user/subscription/thank-you"
-					.catch ()->
-						$scope.processing = false
-						$scope.genericError = "Something went wrong processing the request"
+				return $http.post("/user/subscription/create", postData)
+					.then(function(){
+						event_tracking.sendMB("subscription-submission-success");
+						return window.location.href = "/user/subscription/thank-you";}).catch(function(){
+						$scope.processing = false;
+						return $scope.genericError = "Something went wrong processing the request";
+				});
+			}
+		};
 
-		$scope.submit = ->
-			$scope.processing = true
-			if $scope.paymentMethod.value == 'paypal'
-				opts = { description: $scope.planName }
-				recurly.paypal opts, completeSubscription
-			else
-				recurly.token $scope.data, completeSubscription
+		$scope.submit = function() {
+			$scope.processing = true;
+			if ($scope.paymentMethod.value === 'paypal') {
+				const opts = { description: $scope.planName };
+				return recurly.paypal(opts, completeSubscription);
+			} else {
+				return recurly.token($scope.data, completeSubscription);
+			}
+		};
 
 
-		$scope.countries = [
+		return $scope.countries = [
 			{code:'AF',name:'Afghanistan'},{code:'AL',name:'Albania'},{code:'DZ',name:'Algeria'},{code:'AS',name:'American Samoa'},
 			{code:'AD',name:'Andorra'},{code:'AO',name:'Angola'},{code:'AI',name:'Anguilla'},{code:'AQ',name:'Antarctica'},
 			{code:'AG',name:'Antigua and Barbuda'},{code:'AR',name:'Argentina'},{code:'AM',name:'Armenia'},{code:'AW',name:'Aruba'},
@@ -234,4 +265,9 @@ define [
 			{code:'VU',name:'Vanuatu'},{code:'VA',name:'Vatican City'},{code:'VE',name:'Venezuela'},{code:'VN',name:'Vietnam'},
 			{code:'WK',name:'Wake Island'},{code:'WF',name:'Wallis and Futuna'},{code:'EH',name:'Western Sahara'},{code:'YE',name:'Yemen'},
 			{code:'ZM',name:'Zambia'},{code:'AX',name:'&angst;land Islandscode:'}
-		]
+		];
+})
+);
+function __guard__(value, transform) {
+  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+}

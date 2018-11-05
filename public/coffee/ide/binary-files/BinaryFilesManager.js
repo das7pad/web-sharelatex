@@ -1,21 +1,36 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"ide/binary-files/controllers/BinaryFileController"
-], () ->
-	class BinaryFilesManager
-		constructor: (@ide, @$scope) ->
-			@$scope.$on "entity:selected", (event, entity) =>
-				if (@$scope.ui.view != "track-changes" and entity.type == "file")
-					@openFile(entity)
+], function() {
+	let BinaryFilesManager;
+	return (BinaryFilesManager = class BinaryFilesManager {
+		constructor(ide, $scope) {
+			this.ide = ide;
+			this.$scope = $scope;
+			this.$scope.$on("entity:selected", (event, entity) => {
+				if ((this.$scope.ui.view !== "track-changes") && (entity.type === "file")) {
+					return this.openFile(entity);
+				}
+			});
+		}
 
-		openFile: (file) ->
-			@ide.fileTreeManager.selectEntity(file)
-			@$scope.ui.view = "file"
-			@$scope.openFile = null
-			@$scope.$apply()
-			window.setTimeout(
-				() =>
-					@$scope.openFile = file
-					@$scope.$apply()
+		openFile(file) {
+			this.ide.fileTreeManager.selectEntity(file);
+			this.$scope.ui.view = "file";
+			this.$scope.openFile = null;
+			this.$scope.$apply();
+			return window.setTimeout(
+				() => {
+					this.$scope.openFile = file;
+					return this.$scope.$apply();
+				}
 				, 0
 				, this
-			)
+			);
+		}
+	});
+});

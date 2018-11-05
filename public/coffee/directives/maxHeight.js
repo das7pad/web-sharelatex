@@ -1,11 +1,22 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.directive "maxHeight", () ->
-		return {
-			restrict: "A"
-			link: (scope, element, attrs) ->
-				scope.$watch attrs.maxHeight, (value) ->
-					if value?
-						element.css("max-height": value)
-		}
+], App =>
+	App.directive("maxHeight", () =>
+		({
+			restrict: "A",
+			link(scope, element, attrs) {
+				return scope.$watch(attrs.maxHeight, function(value) {
+					if (value != null) {
+						return element.css({"max-height": value});
+					}
+				});
+			}
+		})
+)
+);

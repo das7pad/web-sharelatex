@@ -1,40 +1,51 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.directive "infiniteScroll", () ->
-		return {
-			link: (scope, element, attrs, ctrl) ->
-				innerElement = element.find(".infinite-scroll-inner")
-				element.css 'overflow-y': 'auto'
+], App =>
+	App.directive("infiniteScroll", () =>
+		({
+			link(scope, element, attrs, ctrl) {
+				const innerElement = element.find(".infinite-scroll-inner");
+				element.css({'overflow-y': 'auto'});
 
-				atEndOfListView = () ->
-					if attrs.infiniteScrollUpwards?
-						atTopOfListView()
-					else
-						atBottomOfListView()
+				const atEndOfListView = function() {
+					if (attrs.infiniteScrollUpwards != null) {
+						return atTopOfListView();
+					} else {
+						return atBottomOfListView();
+					}
+				};
 					
-				atTopOfListView = () ->
-					element.scrollTop() < 30
+				var atTopOfListView = () => element.scrollTop() < 30;
 					
-				atBottomOfListView = () ->
-					element.scrollTop() + element.height() >= innerElement.height() - 30
+				var atBottomOfListView = () => (element.scrollTop() + element.height()) >= (innerElement.height() - 30);
 
-				listShorterThanContainer = () ->
-					element.height() > innerElement.height()
+				const listShorterThanContainer = () => element.height() > innerElement.height();
 
-				loadUntilFull = () ->
-					if (listShorterThanContainer() or atEndOfListView()) and not scope.$eval(attrs.infiniteScrollDisabled)
-						promise = scope.$eval(attrs.infiniteScroll)
-						promise.then () ->
-							setTimeout () ->
-								loadUntilFull()
-							, 0
+				var loadUntilFull = function() {
+					if ((listShorterThanContainer() || atEndOfListView()) && !scope.$eval(attrs.infiniteScrollDisabled)) {
+						const promise = scope.$eval(attrs.infiniteScroll);
+						return promise.then(() =>
+							setTimeout(() => loadUntilFull()
+							, 0)
+						);
+					}
+				};
 
-				element.on "scroll", (event) ->
-					loadUntilFull()
+				element.on("scroll", event => loadUntilFull());
 
-				scope.$watch attrs.infiniteScrollInitialize, (value) ->
-					if value
-						loadUntilFull()
+				return scope.$watch(attrs.infiniteScrollInitialize, function(value) {
+					if (value) {
+						return loadUntilFull();
+					}
+				});
+			}
 
-		}
+		})
+)
+);

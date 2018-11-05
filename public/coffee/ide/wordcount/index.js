@@ -1,4 +1,4 @@
-define [
-	"ide/wordcount/controllers/WordCountController"
+define([
+	"ide/wordcount/controllers/WordCountController",
 	"ide/wordcount/controllers/WordCountModalController"
-], () ->
+], function() {});

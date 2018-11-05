@@ -1,55 +1,69 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.factory "queuedHttp", ($http, $q) ->
-		pendingRequests = []
-		inflight = false
+], App =>
+	App.factory("queuedHttp", function($http, $q) {
+		const pendingRequests = [];
+		let inflight = false;
 
-		processPendingRequests = () ->
-			return if inflight
-			doRequest = pendingRequests.shift()
-			if doRequest?
-				inflight = true
-				doRequest()
-					.then () ->
-						inflight = false
-						processPendingRequests()
-					.catch () ->
-						inflight = false
-						processPendingRequests()
+		var processPendingRequests = function() {
+			if (inflight) { return; }
+			const doRequest = pendingRequests.shift();
+			if (doRequest != null) {
+				inflight = true;
+				return doRequest()
+					.then(function() {
+						inflight = false;
+						return processPendingRequests();}).catch(function() {
+						inflight = false;
+						return processPendingRequests();
+				});
+			}
+		};
 
-		queuedHttp = (args...) ->
-			# We can't use Angular's $q.defer promises, because it only passes
-			# a single argument on error, and $http passes multiple.
-			promise = {}
-			successCallbacks = []
-			errorCallbacks = []
+		const queuedHttp = function(...args) {
+			// We can't use Angular's $q.defer promises, because it only passes
+			// a single argument on error, and $http passes multiple.
+			const promise = {};
+			const successCallbacks = [];
+			const errorCallbacks = [];
 
-			# Adhere to the $http promise conventions
-			promise.then = (callback, errCallback) ->
-				successCallbacks.push callback
-				errorCallbacks.push errCallback if errCallback?
-				return promise
+			// Adhere to the $http promise conventions
+			promise.then = function(callback, errCallback) {
+				successCallbacks.push(callback);
+				if (errCallback != null) { errorCallbacks.push(errCallback); }
+				return promise;
+			};
 
-			promise.catch = (callback) ->
-				errorCallbacks.push callback
-				return promise
+			promise.catch = function(callback) {
+				errorCallbacks.push(callback);
+				return promise;
+			};
 
-			doRequest = () ->
-				$http(args...)
-					.then (args...) ->
-						for cb in successCallbacks
-							cb(args...)
-					.catch (args...) ->
-						for cb in errorCallbacks
-							cb(args...)
+			const doRequest = () =>
+				$http(...Array.from(args || []))
+					.then((...args) =>
+						Array.from(successCallbacks).map((cb) =>
+							cb(...Array.from(args || [])))).catch((...args) =>
+						Array.from(errorCallbacks).map((cb) =>
+							cb(...Array.from(args || [])))
+				)
+			;
 
-			pendingRequests.push doRequest
-			processPendingRequests()
+			pendingRequests.push(doRequest);
+			processPendingRequests();
 
-			return promise
+			return promise;
+		};
 
-		queuedHttp.post = (url, data) ->
-			queuedHttp({method: "POST", url: url, data: data})
+		queuedHttp.post = (url, data) => queuedHttp({method: "POST", url, data});
 
-		return queuedHttp
+		return queuedHttp;
+	})
+);

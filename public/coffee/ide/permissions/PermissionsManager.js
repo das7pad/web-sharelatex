@@ -1,26 +1,43 @@
-define [], () ->
-	class PermissionsManager
-		constructor: (@ide, @$scope) ->
-			@$scope.permissions =
-				read:  false
-				write: false
-				admin: false
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([], function() {
+	let PermissionsManager;
+	return (PermissionsManager = class PermissionsManager {
+		constructor(ide, $scope) {
+			this.ide = ide;
+			this.$scope = $scope;
+			this.$scope.permissions = {
+				read:  false,
+				write: false,
+				admin: false,
 				comment: false
-			@$scope.$watch "permissionsLevel", (permissionsLevel) =>
+			};
+			this.$scope.$watch("permissionsLevel", permissionsLevel => {
 
-				if permissionsLevel?
-					if permissionsLevel == "readOnly"
-						@$scope.permissions.read = true
-						@$scope.permissions.comment = true
-					else if permissionsLevel == "readAndWrite"
-						@$scope.permissions.read = true
-						@$scope.permissions.write = true
-						@$scope.permissions.comment = true
-					else if permissionsLevel == "owner"
-						@$scope.permissions.read = true
-						@$scope.permissions.write = true
-						@$scope.permissions.admin = true
-						@$scope.permissions.comment = true
+				if (permissionsLevel != null) {
+					if (permissionsLevel === "readOnly") {
+						this.$scope.permissions.read = true;
+						this.$scope.permissions.comment = true;
+					} else if (permissionsLevel === "readAndWrite") {
+						this.$scope.permissions.read = true;
+						this.$scope.permissions.write = true;
+						this.$scope.permissions.comment = true;
+					} else if (permissionsLevel === "owner") {
+						this.$scope.permissions.read = true;
+						this.$scope.permissions.write = true;
+						this.$scope.permissions.admin = true;
+						this.$scope.permissions.comment = true;
+					}
+				}
 
-				if @$scope.anonymous
-					@$scope.permissions.comment = false
+				if (this.$scope.anonymous) {
+					return this.$scope.permissions.comment = false;
+				}
+			});
+		}
+	});
+});

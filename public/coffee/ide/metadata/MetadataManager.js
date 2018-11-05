@@ -1,13 +1,27 @@
-define [], () ->
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([], function() {
 
-	class MetadataManager
+	let MetadataManager;
+	return (MetadataManager = class MetadataManager {
 
-		constructor: (@ide, @$scope, @metadata) ->
+		constructor(ide, $scope, metadata) {
 
-			@ide.socket.on 'broadcastDocMeta', (data) =>
-				@metadata.onBroadcastDocMeta data
-			@$scope.$on 'entity:deleted', @metadata.onEntityDeleted
-			@$scope.$on 'file:upload:complete', @metadata.fileUploadComplete
+			this.ide = ide;
+			this.$scope = $scope;
+			this.metadata = metadata;
+			this.ide.socket.on('broadcastDocMeta', data => {
+				return this.metadata.onBroadcastDocMeta(data);
+			});
+			this.$scope.$on('entity:deleted', this.metadata.onEntityDeleted);
+			this.$scope.$on('file:upload:complete', this.metadata.fileUploadComplete);
+		}
 
-		loadProjectMetaFromServer: () ->
-			@metadata.loadProjectMetaFromServer()
+		loadProjectMetaFromServer() {
+			return this.metadata.loadProjectMetaFromServer();
+		}
+	});
+});

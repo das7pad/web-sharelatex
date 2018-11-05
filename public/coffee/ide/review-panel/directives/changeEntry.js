@@ -1,30 +1,42 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.directive "changeEntry", ($timeout) ->
-		restrict: "E"
-		templateUrl: "changeEntryTemplate"
-		scope: 
-			entry: "="
-			user: "="
-			permissions: "="
-			onAccept: "&"
-			onReject: "&"
-			onIndicatorClick: "&"
-			onBodyClick: "&"
-		link: (scope, element, attrs) ->
-			scope.contentLimit = 40
-			scope.isCollapsed = true
-			scope.needsCollapsing = false
+], App =>
+	App.directive("changeEntry", $timeout =>
+		({
+			restrict: "E",
+			templateUrl: "changeEntryTemplate",
+			scope: { 
+				entry: "=",
+				user: "=",
+				permissions: "=",
+				onAccept: "&",
+				onReject: "&",
+				onIndicatorClick: "&",
+				onBodyClick: "&"
+			},
+			link(scope, element, attrs) {
+				scope.contentLimit = 40;
+				scope.isCollapsed = true;
+				scope.needsCollapsing = false;
 
-			element.on "click", (e) ->
-				if $(e.target).is('.rp-entry, .rp-entry-description, .rp-entry-body, .rp-entry-action-icon i')
-					scope.onBodyClick()
+				element.on("click", function(e) {
+					if ($(e.target).is('.rp-entry, .rp-entry-description, .rp-entry-body, .rp-entry-action-icon i')) {
+						return scope.onBodyClick();
+					}
+				});
 
-			scope.toggleCollapse = () ->
-				scope.isCollapsed = !scope.isCollapsed
-				$timeout () ->
-					scope.$emit "review-panel:layout"
+				scope.toggleCollapse = function() {
+					scope.isCollapsed = !scope.isCollapsed;
+					return $timeout(() => scope.$emit("review-panel:layout"));
+				};
 
-			scope.$watch "entry.content.length", (contentLength) ->
-				scope.needsCollapsing = contentLength > scope.contentLimit
+				return scope.$watch("entry.content.length", contentLength => scope.needsCollapsing = contentLength > scope.contentLimit);
+			}
+		})
+	)
+);

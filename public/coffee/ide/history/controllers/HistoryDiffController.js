@@ -1,47 +1,59 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.controller "HistoryDiffController", ($scope, $modal, ide, event_tracking) ->
-		$scope.restoreDeletedDoc = () ->
-			event_tracking.sendMB "history-restore-deleted"
-			$scope.history.diff.restoreInProgress = true
-			ide.historyManager
+], function(App) {
+	App.controller("HistoryDiffController", function($scope, $modal, ide, event_tracking) {
+		$scope.restoreDeletedDoc = function() {
+			event_tracking.sendMB("history-restore-deleted");
+			$scope.history.diff.restoreInProgress = true;
+			return ide.historyManager
 				.restoreDeletedDoc(
 					$scope.history.diff.doc
 				)
-				.then (response) ->
-					{ data } = response
-					$scope.history.diff.restoredDocNewId = data.doc_id
-					$scope.history.diff.restoreInProgress = false
-					$scope.history.diff.restoreDeletedSuccess = true
+				.then(function(response) {
+					const { data } = response;
+					$scope.history.diff.restoredDocNewId = data.doc_id;
+					$scope.history.diff.restoreInProgress = false;
+					return $scope.history.diff.restoreDeletedSuccess = true;
+			});
+		};
 
-		$scope.openRestoreDiffModal = () ->
-			event_tracking.sendMB "history-restore-modal"
-			$modal.open {
-				templateUrl: "historyRestoreDiffModalTemplate"
-				controller: "HistoryRestoreDiffModalController"
-				resolve:
-					diff: () -> $scope.history.diff
-			}
+		$scope.openRestoreDiffModal = function() {
+			event_tracking.sendMB("history-restore-modal");
+			return $modal.open({
+				templateUrl: "historyRestoreDiffModalTemplate",
+				controller: "HistoryRestoreDiffModalController",
+				resolve: {
+					diff() { return $scope.history.diff; }
+				}
+			});
+		};
 
-		$scope.backToEditorAfterRestore = () ->
-			ide.editorManager.openDoc({ id: $scope.history.diff.restoredDocNewId })
+		return $scope.backToEditorAfterRestore = () => ide.editorManager.openDoc({ id: $scope.history.diff.restoredDocNewId });
+	});
 
-	App.controller "HistoryRestoreDiffModalController", ($scope, $modalInstance, diff, ide, event_tracking) ->
+	return App.controller("HistoryRestoreDiffModalController", function($scope, $modalInstance, diff, ide, event_tracking) {
 		$scope.state =
-			inflight: false
+			{inflight: false};
 
-		$scope.diff = diff
+		$scope.diff = diff;
 
-		$scope.restore = () ->
-			event_tracking.sendMB "history-restored"
-			$scope.state.inflight = true
-			ide.historyManager
+		$scope.restore = function() {
+			event_tracking.sendMB("history-restored");
+			$scope.state.inflight = true;
+			return ide.historyManager
 				.restoreDiff(diff)
-				.then () ->
-					$scope.state.inflight = false
-					$modalInstance.close()
-					ide.editorManager.openDoc(diff.doc)
+				.then(function() {
+					$scope.state.inflight = false;
+					$modalInstance.close();
+					return ide.editorManager.openDoc(diff.doc);
+			});
+		};
 
-		$scope.cancel = () ->
-			$modalInstance.dismiss()
+		return $scope.cancel = () => $modalInstance.dismiss();
+	});
+});

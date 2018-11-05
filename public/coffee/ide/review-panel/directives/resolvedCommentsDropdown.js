@@ -1,59 +1,95 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS205: Consider reworking code to avoid use of IIFEs
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.directive "resolvedCommentsDropdown", (_) ->
-		restrict: "E"
-		templateUrl: "resolvedCommentsDropdownTemplate"
-		scope: 
-			entries 	: "="
-			threads 	: "="
-			resolvedIds	: "="
-			docs		: "="
-			permissions: "="
-			onOpen		: "&"
-			onUnresolve	: "&"
-			onDelete	: "&"
-			isLoading	: "="
+], App =>
+	App.directive("resolvedCommentsDropdown", _ =>
+		({
+			restrict: "E",
+			templateUrl: "resolvedCommentsDropdownTemplate",
+			scope: { 
+				entries 	: "=",
+				threads 	: "=",
+				resolvedIds	: "=",
+				docs		: "=",
+				permissions: "=",
+				onOpen		: "&",
+				onUnresolve	: "&",
+				onDelete	: "&",
+				isLoading	: "="
+			},
 
-		link: (scope, element, attrs) ->
-			scope.state = 
-				isOpen: false
+			link(scope, element, attrs) {
+				let filterResolvedComments;
+				scope.state = 
+					{isOpen: false};
 
-			scope.toggleOpenState = () ->
-				scope.state.isOpen = !scope.state.isOpen
-				if (scope.state.isOpen)
-					scope.onOpen()
-						.then () -> filterResolvedComments()
+				scope.toggleOpenState = function() {
+					scope.state.isOpen = !scope.state.isOpen;
+					if (scope.state.isOpen) {
+						return scope.onOpen()
+							.then(() => filterResolvedComments());
+					}
+				};
 
-			scope.resolvedComments = []
+				scope.resolvedComments = [];
 
-			scope.handleUnresolve = (threadId) ->
-				scope.onUnresolve({ threadId })
-				scope.resolvedComments = scope.resolvedComments.filter (c) -> c.threadId != threadId
+				scope.handleUnresolve = function(threadId) {
+					scope.onUnresolve({ threadId });
+					return scope.resolvedComments = scope.resolvedComments.filter(c => c.threadId !== threadId);
+				};
 
-			scope.handleDelete = (entryId, docId, threadId) ->
-				scope.onDelete({ entryId, docId, threadId })
-				scope.resolvedComments = scope.resolvedComments.filter (c) -> c.threadId != threadId
+				scope.handleDelete = function(entryId, docId, threadId) {
+					scope.onDelete({ entryId, docId, threadId });
+					return scope.resolvedComments = scope.resolvedComments.filter(c => c.threadId !== threadId);
+				};
 
-			getDocNameById = (docId) ->
-				doc = _.find(scope.docs, (doc) -> doc.doc.id == docId)
-				if doc?
-					return doc.path
-				else 
-					return null
+				const getDocNameById = function(docId) {
+					const doc = _.find(scope.docs, doc => doc.doc.id === docId);
+					if (doc != null) {
+						return doc.path;
+					} else { 
+						return null;
+					}
+				};
 
-			filterResolvedComments = () ->
-				scope.resolvedComments = []
+				return filterResolvedComments = function() {
+					scope.resolvedComments = [];
 
-				for docId, docEntries of scope.entries
-					for entryId, entry of docEntries
-						if entry.type == "comment" and scope.threads[entry.thread_id]?.resolved?
-							resolvedComment = angular.copy scope.threads[entry.thread_id]
+					return (() => {
+						const result = [];
+						for (var docId in scope.entries) {
+							var docEntries = scope.entries[docId];
+							result.push((() => {
+								const result1 = [];
+								for (let entryId in docEntries) {
+									const entry = docEntries[entryId];
+									if ((entry.type === "comment") && ((scope.threads[entry.thread_id] != null ? scope.threads[entry.thread_id].resolved : undefined) != null)) {
+										const resolvedComment = angular.copy(scope.threads[entry.thread_id]);
 
-							resolvedComment.content = entry.content
-							resolvedComment.threadId = entry.thread_id
-							resolvedComment.entryId = entryId
-							resolvedComment.docId = docId
-							resolvedComment.docName = getDocNameById(docId)
+										resolvedComment.content = entry.content;
+										resolvedComment.threadId = entry.thread_id;
+										resolvedComment.entryId = entryId;
+										resolvedComment.docId = docId;
+										resolvedComment.docName = getDocNameById(docId);
 
-							scope.resolvedComments.push(resolvedComment)
+										result1.push(scope.resolvedComments.push(resolvedComment));
+									} else {
+										result1.push(undefined);
+									}
+								}
+								return result1;
+							})());
+						}
+						return result;
+					})();
+				};
+			}
+		})
+	)
+);

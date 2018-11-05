@@ -1,57 +1,75 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
+], App =>
 
-	# uses the PDFJS text layer renderer to provide invisible overlayed
-	# text for searching
+	// uses the PDFJS text layer renderer to provide invisible overlayed
+	// text for searching
 
-	App.factory 'pdfTextLayer', [ () ->
+	App.factory('pdfTextLayer', [ function() {
 
-		class pdfTextLayer
+		let pdfTextLayer;
+		return (pdfTextLayer = class pdfTextLayer {
 
-			constructor: (options) ->
-				@textLayerDiv = options.textLayerDiv
-				@divContentDone = false
-				@viewport = options.viewport
-				@textDivs = []
-				@renderer = options.renderer
-				@renderingDone = false
+			constructor(options) {
+				this.textLayerDiv = options.textLayerDiv;
+				this.divContentDone = false;
+				this.viewport = options.viewport;
+				this.textDivs = [];
+				this.renderer = options.renderer;
+				this.renderingDone = false;
+			}
 
-			render: (timeout) ->
-				if @renderingDone or not @divContentDone
-					return
+			render(timeout) {
+				if (this.renderingDone || !this.divContentDone) {
+					return;
+				}
 
-				if @textLayerRenderTask?
-					@textLayerRenderTask.cancel()
-					@textLayerRenderTask = null
+				if (this.textLayerRenderTask != null) {
+					this.textLayerRenderTask.cancel();
+					this.textLayerRenderTask = null;
+				}
 
-				@textDivs = []
-				textLayerFrag = document.createDocumentFragment()
+				this.textDivs = [];
+				const textLayerFrag = document.createDocumentFragment();
 
-				@textLayerRenderTask = @renderer {
+				this.textLayerRenderTask = this.renderer({
 					textContent: this.textContent,
 					container: textLayerFrag,
 					viewport: this.viewport,
 					textDivs: this.textDivs,
-					timeout: timeout,
+					timeout,
 					enhanceTextSelection: this.enhanceTextSelection,
+				});
+
+				const textLayerSuccess = () => {
+					this.textLayerDiv.appendChild(textLayerFrag);
+					return this.renderingDone = true;
+				};
+
+				const textLayerFailure = function() {
+					 // canceled or failed to render text layer -- skipping errors
+				};
+
+				return this.textLayerRenderTask.promise.then(textLayerSuccess, textLayerFailure);
+			}
+
+			setTextContent(textContent) {
+				if (this.textLayerRenderTask) {
+					this.textLayerRenderTask.cancel();
+					this.textLayerRenderTask = null;
 				}
 
-				textLayerSuccess = () =>
-					@textLayerDiv.appendChild(textLayerFrag)
-					@renderingDone = true
+				this.textContent = textContent;
+				return this.divContentDone = true;
+			}
+		});
+	}
 
-				textLayerFailure = () ->
-					return # canceled or failed to render text layer -- skipping errors
-
-				@textLayerRenderTask.promise.then(textLayerSuccess, textLayerFailure)
-
-			setTextContent: (textContent) ->
-				if (@textLayerRenderTask)
-					@textLayerRenderTask.cancel();
-					@textLayerRenderTask = null;
-
-				@textContent = textContent;
-				@divContentDone = true;
-
-	]
+	])
+);

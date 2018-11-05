@@ -1,12 +1,21 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.directive "rightClick", () ->
-		return {
+], App =>
+	App.directive("rightClick", () =>
+		({
 			restrict: "A",
-			link: (scope, element, attrs) ->
-				element.bind "contextmenu", (e) ->
-					e.preventDefault()
-					e.stopPropagation()
-					scope.$eval(attrs.rightClick)
-		}
+			link(scope, element, attrs) {
+				return element.bind("contextmenu", function(e) {
+					e.preventDefault();
+					e.stopPropagation();
+					return scope.$eval(attrs.rightClick);
+				});
+			}
+		})
+)
+);

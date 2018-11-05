@@ -1,29 +1,39 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base",
-], (App) ->
-	App.controller "HistoryV2AddLabelModalController", ["$scope", "$modalInstance", "ide", "update", ($scope, $modalInstance, ide, update) ->
-		$scope.update = update
+], App =>
+	App.controller("HistoryV2AddLabelModalController", ["$scope", "$modalInstance", "ide", "update", function($scope, $modalInstance, ide, update) {
+		$scope.update = update;
 		$scope.inputs = 
-			labelName: null
-		$scope.state =
-			inflight: false
+			{labelName: null};
+		$scope.state = {
+			inflight: false,
 			error: false
+		};
 			
-		$modalInstance.opened.then () ->
-			$scope.$applyAsync () ->
-				$scope.$broadcast "open"
+		$modalInstance.opened.then(() =>
+			$scope.$applyAsync(() => $scope.$broadcast("open"))
+		);
 
-		$scope.addLabelModalFormSubmit = () ->
-			$scope.state.inflight = true
-			ide.historyManager.labelCurrentVersion $scope.inputs.labelName
-				.then (response) ->
-					$scope.state.inflight = false
-					$modalInstance.close()
-				.catch (response) ->
-					{ data, status } = response
-					$scope.state.inflight = false
-					if status == 400
-						$scope.state.error = { message: data }
-					else
-						$scope.state.error = true
-	]
+		return $scope.addLabelModalFormSubmit = function() {
+			$scope.state.inflight = true;
+			return ide.historyManager.labelCurrentVersion($scope.inputs.labelName)
+				.then(function(response) {
+					$scope.state.inflight = false;
+					return $modalInstance.close();}).catch(function(response) {
+					const { data, status } = response;
+					$scope.state.inflight = false;
+					if (status === 400) {
+						return $scope.state.error = { message: data };
+					} else {
+						return $scope.state.error = true;
+					}
+			});
+		};
+	}
+	])
+);

@@ -1,103 +1,130 @@
-define [
-	"moment"
-	"base"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
+	"moment",
+	"base",
 	"modules/localStorage"
 
-], (moment, App) ->
-	CACHE_KEY = "mbEvents"
+], function(moment, App) {
+	const CACHE_KEY = "mbEvents";
 
-	# keep track of how many heartbeats we've sent so we can calculate how
-	# long wait until the next one
-	heartbeatsSent = 0
-	nextHeartbeat = new Date()
+	// keep track of how many heartbeats we've sent so we can calculate how
+	// long wait until the next one
+	let heartbeatsSent = 0;
+	let nextHeartbeat = new Date();
 
-	send = (category, action, attributes = {})->
-		ga('send', 'event', category, action)
-		event_name = "#{action}-#{category}"
-		Intercom?("trackEvent", event_name, attributes)
+	const send = function(category, action, attributes){
+		if (attributes == null) { attributes = {}; }
+		ga('send', 'event', category, action);
+		const event_name = `${action}-${category}`;
+		return (typeof Intercom === 'function' ? Intercom("trackEvent", event_name, attributes) : undefined);
+	};
 
-	App.factory "event_tracking", ($http, localStorage) ->
-		_getEventCache = () ->
-			eventCache = localStorage CACHE_KEY
+	App.factory("event_tracking", function($http, localStorage) {
+		const _getEventCache = function() {
+			let eventCache = localStorage(CACHE_KEY);
 
-			# Initialize as an empy object if the event cache is still empty.
-			if !eventCache?
-				eventCache = {}
-				localStorage CACHE_KEY, eventCache
+			// Initialize as an empy object if the event cache is still empty.
+			if ((eventCache == null)) {
+				eventCache = {};
+				localStorage(CACHE_KEY, eventCache);
+			}
 
-			return eventCache
+			return eventCache;
+		};
 
-		_eventInCache = (key) ->
-			curCache = _getEventCache()
-			curCache[key] || false
+		const _eventInCache = function(key) {
+			const curCache = _getEventCache();
+			return curCache[key] || false;
+		};
 
-		_addEventToCache = (key) ->
-			curCache = _getEventCache()
-			curCache[key] = true
+		const _addEventToCache = function(key) {
+			const curCache = _getEventCache();
+			curCache[key] = true;
 
-			localStorage CACHE_KEY, curCache
+			return localStorage(CACHE_KEY, curCache);
+		};
 
-		_sendEditingSessionHeartbeat = () ->
+		const _sendEditingSessionHeartbeat = () =>
 			$http({
-				url: "/editingSession/#{window.project_id}",
+				url: `/editingSession/${window.project_id}`,
 				method: "PUT",
 				headers: {
 					"X-CSRF-Token": window.csrfToken
 				}
 			})
+		;
 
 		return {
-			send: (category, action, label, value)->
-				ga('send', 'event', category, action, label, value)
+			send(category, action, label, value){
+				return ga('send', 'event', category, action, label, value);
+			},
 
-			sendGAOnce: (category, action, label, value) ->
-				if ! _eventInCache(action)
-					_addEventToCache(action)
-					@send category, action, label, value
+			sendGAOnce(category, action, label, value) {
+				if (!_eventInCache(action)) {
+					_addEventToCache(action);
+					return this.send(category, action, label, value);
+				}
+			},
 
-			editingSessionHeartbeat: () ->
-				return unless nextHeartbeat <= new Date()
+			editingSessionHeartbeat() {
+				if (!(nextHeartbeat <= new Date())) { return; }
 
-				_sendEditingSessionHeartbeat()
+				_sendEditingSessionHeartbeat();
 
-				heartbeatsSent++
+				heartbeatsSent++;
 
-				# send two first heartbeats at 0 and 30s then increase the backoff time
-				# 1min per call until we reach 5 min
-				backoffSecs = if heartbeatsSent <= 2
+				// send two first heartbeats at 0 and 30s then increase the backoff time
+				// 1min per call until we reach 5 min
+				const backoffSecs = heartbeatsSent <= 2 ?
 					30
-				else if heartbeatsSent <= 6
+				: heartbeatsSent <= 6 ?
 					(heartbeatsSent - 2) * 60
-				else
-					300
+				:
+					300;
 
-				nextHeartbeat = moment().add(backoffSecs, 'seconds').toDate()
+				return nextHeartbeat = moment().add(backoffSecs, 'seconds').toDate();
+			},
 
-			sendMB: (key, segmentation = {}) ->
-				$http {
-					url: "/event/#{key}",
+			sendMB(key, segmentation) {
+				if (segmentation == null) { segmentation = {}; }
+				return $http({
+					url: `/event/${key}`,
 					method: "POST",
-					data: segmentation
+					data: segmentation,
 					headers: {
 						"X-CSRF-Token": window.csrfToken
 					}
+				});
+			},
+
+			sendMBSampled(key, segmentation) {
+				if (Math.random() < .01) { return this.sendMB(key, segmentation); }
+			},
+
+			sendMBOnce(key, segmentation) {
+				if (!_eventInCache(key)) {
+					_addEventToCache(key);
+					return this.sendMB(key, segmentation);
 				}
+			},
 
-			sendMBSampled: (key, segmentation) ->
-				@sendMB key, segmentation if Math.random() < .01
+			eventInCache(key) {
+				return _eventInCache(key);
+			}
+		};
+});
 
-			sendMBOnce: (key, segmentation) ->
-				if ! _eventInCache(key)
-					_addEventToCache(key)
-					@sendMB key, segmentation
 
-			eventInCache: (key) ->
-				_eventInCache(key)
+	//header
+	return $('.navbar a').on("click", function(e){
+		const href = $(e.target).attr("href");
+		if (href != null) {
+			return ga('send', 'event', 'navigation', 'top menu bar', href);
 		}
-
-
-	#header
-	$('.navbar a').on "click", (e)->
-		href = $(e.target).attr("href")
-		if href?
-			ga('send', 'event', 'navigation', 'top menu bar', href)
+	});
+});

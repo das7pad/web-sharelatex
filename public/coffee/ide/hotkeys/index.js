@@ -1,4 +1,4 @@
-define [
-	"ide/hotkeys/BackspaceHighjack"
+define([
+	"ide/hotkeys/BackspaceHighjack",
 	"ide/hotkeys/controllers/HotkeysController"
-], () ->
+], function() {});

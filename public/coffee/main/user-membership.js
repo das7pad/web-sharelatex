@@ -1,80 +1,100 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.controller "UserMembershipController", ($scope, queuedHttp) ->
-		$scope.users = window.users
-		$scope.groupSize = window.groupSize
-		$scope.paths = window.paths
-		$scope.selectedUsers = []
+], function(App) {
+	App.controller("UserMembershipController", function($scope, queuedHttp) {
+		$scope.users = window.users;
+		$scope.groupSize = window.groupSize;
+		$scope.paths = window.paths;
+		$scope.selectedUsers = [];
 
-		$scope.inputs =
-			addMembers:
-				content: ''
-				error: false
+		$scope.inputs = {
+			addMembers: {
+				content: '',
+				error: false,
 				errorMessage: null
-			removeMembers:
-				error: false
+			},
+			removeMembers: {
+				error: false,
 				errorMessage: null
+			}
+		};
 
-		parseEmails = (emailsString)->
-			regexBySpaceOrComma = /[\s,]+/
-			emails = emailsString.split(regexBySpaceOrComma)
-			emails = _.map emails, (email)->
-				email = email.trim()
-			emails = _.select emails, (email)->
-				email.indexOf("@") != -1
-			return emails
+		const parseEmails = function(emailsString){
+			const regexBySpaceOrComma = /[\s,]+/;
+			let emails = emailsString.split(regexBySpaceOrComma);
+			emails = _.map(emails, email=> email = email.trim());
+			emails = _.select(emails, email=> email.indexOf("@") !== -1);
+			return emails;
+		};
 
-		$scope.addMembers = () ->
-			$scope.inputs.addMembers.error = false
-			$scope.inputs.addMembers.errorMessage = null
-			emails = parseEmails($scope.inputs.addMembers.content)
-			for email in emails
+		$scope.addMembers = function() {
+			$scope.inputs.addMembers.error = false;
+			$scope.inputs.addMembers.errorMessage = null;
+			const emails = parseEmails($scope.inputs.addMembers.content);
+			return Array.from(emails).map((email) =>
 				queuedHttp
 					.post(paths.addMember, {
-						email: email,
+						email,
 						_csrf: window.csrfToken
 					})
-					.then (response) ->
-						{ data } = response
-						$scope.users.push data.user if data.user?
-						$scope.inputs.addMembers.content = ""
-					.catch (response) ->
-						{ data } = response
-						$scope.inputs.addMembers.error = true
-						$scope.inputs.addMembers.errorMessage = data.error?.message
+					.then(function(response) {
+						const { data } = response;
+						if (data.user != null) { $scope.users.push(data.user); }
+						return $scope.inputs.addMembers.content = "";}).catch(function(response) {
+						const { data } = response;
+						$scope.inputs.addMembers.error = true;
+						return $scope.inputs.addMembers.errorMessage = data.error != null ? data.error.message : undefined;
+				}));
+		};
 
-		$scope.removeMembers = () ->
-			$scope.inputs.removeMembers.error = false
-			$scope.inputs.removeMembers.errorMessage = null
-			for user in $scope.selectedUsers
-				do (user) ->
-					if paths.removeInvite and user.invite and !user._id?
-						url = "#{paths.removeInvite}/#{encodeURIComponent(user.email)}"
-					else if paths.removeMember and user._id?
-						url = "#{paths.removeMember}/#{user._id}"
-					else
-						return
-					queuedHttp({
+		$scope.removeMembers = function() {
+			$scope.inputs.removeMembers.error = false;
+			$scope.inputs.removeMembers.errorMessage = null;
+			for (let user of Array.from($scope.selectedUsers)) {
+				(function(user) {
+					let url;
+					if (paths.removeInvite && user.invite && (user._id == null)) {
+						url = `${paths.removeInvite}/${encodeURIComponent(user.email)}`;
+					} else if (paths.removeMember && (user._id != null)) {
+						url = `${paths.removeMember}/${user._id}`;
+					} else {
+						return;
+					}
+					return queuedHttp({
 						method: "DELETE",
-						url: url
-						headers:
+						url,
+						headers: {
 							"X-Csrf-Token": window.csrfToken
+						}
 					})
-						.then () ->
-							index = $scope.users.indexOf(user)
-							return if index == -1
-							$scope.users.splice(index, 1)
-						.catch (response) ->
-							{ data } = response
-							$scope.inputs.removeMembers.error = true
-							$scope.inputs.removeMembers.errorMessage = data.error?.message
-			$scope.updateSelectedUsers
+						.then(function() {
+							const index = $scope.users.indexOf(user);
+							if (index === -1) { return; }
+							return $scope.users.splice(index, 1);}).catch(function(response) {
+							const { data } = response;
+							$scope.inputs.removeMembers.error = true;
+							return $scope.inputs.removeMembers.errorMessage = data.error != null ? data.error.message : undefined;
+					});
+				})(user);
+			}
+			return $scope.updateSelectedUsers;
+		};
 
-		$scope.updateSelectedUsers = () ->
-			$scope.selectedUsers = $scope.users.filter (user) -> user.selected
+		return $scope.updateSelectedUsers = () => $scope.selectedUsers = $scope.users.filter(user => user.selected);
+	});
 
-	App.controller "UserMembershipListItemController", ($scope) ->
-		$scope.$watch "user.selected", (value) ->
-			if value?
-				$scope.updateSelectedUsers()
+	return App.controller("UserMembershipListItemController", $scope =>
+		$scope.$watch("user.selected", function(value) {
+			if (value != null) {
+				return $scope.updateSelectedUsers();
+			}
+		})
+	);
+});

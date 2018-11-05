@@ -1,28 +1,37 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.controller "AnnualUpgradeController",  ($scope, $http, $modal) ->
+], App =>
+	App.controller("AnnualUpgradeController",  function($scope, $http, $modal) {
 
-		MESSAGES_URL = "/user/subscription/upgrade-annual"
+		const MESSAGES_URL = "/user/subscription/upgrade-annual";
 
-		$scope.upgradeComplete = false
-		savings = 
-			student:"19.2"
+		$scope.upgradeComplete = false;
+		const savings = { 
+			student:"19.2",
 			collaborator:"36"
-		$scope.$watch $scope.planName, ->
-			$scope.yearlySaving = savings[$scope.planName]
-			if $scope.planName == "annual"
-				$scope.upgradeComplete = true
-		$scope.completeAnnualUpgrade = ->
-			body = 
-				planName: $scope.planName
+		};
+		$scope.$watch($scope.planName, function() {
+			$scope.yearlySaving = savings[$scope.planName];
+			if ($scope.planName === "annual") {
+				return $scope.upgradeComplete = true;
+			}
+		});
+		return $scope.completeAnnualUpgrade = function() {
+			const body = { 
+				planName: $scope.planName,
 				_csrf : window.csrfToken
+			};
 
-			$scope.inflight = true
+			$scope.inflight = true;
 
 
-			$http.post(MESSAGES_URL, body)
-				.then ->
-					$scope.upgradeComplete = true
-				.catch ->
-					console.log "something went wrong changing plan"
+			return $http.post(MESSAGES_URL, body)
+				.then(() => $scope.upgradeComplete = true).catch(() => console.log("something went wrong changing plan"));
+		};
+	})
+);

@@ -1,36 +1,48 @@
-define [
-	"base"
-	"ide/colors/ColorManager"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
+	"base",
+	"ide/colors/ColorManager",
 	"ide/history/util/displayNameForUser"
-], (App, ColorManager, displayNameForUser) ->
-	historyLabelsListController = ($scope, $element, $attrs) ->
-		ctrl = @ 
-		# This method (and maybe the one below) will be removed soon. User details data will be 
-		# injected into the history API responses, so we won't need to fetch user data from other
-		# local data structures.
-		ctrl.getUserById = (id) ->
-			_.find ctrl.users, (user) ->
-				curUserId = user?._id or user?.id
-				curUserId == id
-		ctrl.displayName = displayNameForUser
-		ctrl.getUserCSSStyle = (user, label) ->
-			curUserId = user?._id or user?.id
-			hue = ColorManager.getHueForUserId(curUserId) or 100
-			if label.id == ctrl.selectedLabel?.id
-				color : "#FFF" 
-			else 
-				color: "hsl(#{ hue }, 70%, 50%)"
-		return
+], function(App, ColorManager, displayNameForUser) {
+	const historyLabelsListController = function($scope, $element, $attrs) {
+		const ctrl = this; 
+		// This method (and maybe the one below) will be removed soon. User details data will be 
+		// injected into the history API responses, so we won't need to fetch user data from other
+		// local data structures.
+		ctrl.getUserById = id =>
+			_.find(ctrl.users, function(user) {
+				const curUserId = (user != null ? user._id : undefined) || (user != null ? user.id : undefined);
+				return curUserId === id;
+			})
+		;
+		ctrl.displayName = displayNameForUser;
+		ctrl.getUserCSSStyle = function(user, label) {
+			const curUserId = (user != null ? user._id : undefined) || (user != null ? user.id : undefined);
+			const hue = ColorManager.getHueForUserId(curUserId) || 100;
+			if (label.id === (ctrl.selectedLabel != null ? ctrl.selectedLabel.id : undefined)) {
+				return {color : "#FFF"}; 
+			} else { 
+				return {color: `hsl(${ hue }, 70%, 50%)`};
+			}
+		};
+	};
 
-	App.component "historyLabelsList", {
-		bindings:
-			labels: "<"
-			users: "<"
-			currentUser: "<"
-			isLoading: "<"
-			selectedLabel: "<"
-			onLabelSelect: "&"
+	return App.component("historyLabelsList", {
+		bindings: {
+			labels: "<",
+			users: "<",
+			currentUser: "<",
+			isLoading: "<",
+			selectedLabel: "<",
+			onLabelSelect: "&",
 			onLabelDelete: "&"
-		controller: historyLabelsListController
+		},
+		controller: historyLabelsListController,
 		templateUrl: "historyLabelsListTpl"
-	}
+	});
+});

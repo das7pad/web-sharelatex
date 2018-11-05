@@ -1,104 +1,149 @@
-define [
-	"ide/colors/ColorManager"
-	"libs/md5"
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS206: Consider reworking classes to avoid initClass
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
+	"ide/colors/ColorManager",
+	"libs/md5",
 	"ide/online-users/controllers/OnlineUsersController"
-], (ColorManager) ->
-	class OnlineUsersManager
+], function(ColorManager) {
+	let OnlineUsersManager;
+	return OnlineUsersManager = (function() {
+		OnlineUsersManager = class OnlineUsersManager {
+			static initClass() {
+	
+				this.prototype.cursorUpdateInterval =500;
+			}
 
-		cursorUpdateInterval:500
+			constructor(ide, $scope) {
+				this.ide = ide;
+				this.$scope = $scope;
+				this.$scope.onlineUsers = {};
+				this.$scope.onlineUserCursorHighlights = {};
+				this.$scope.onlineUsersArray = [];
 
-		constructor: (@ide, @$scope) ->
-			@$scope.onlineUsers = {}
-			@$scope.onlineUserCursorHighlights = {}
-			@$scope.onlineUsersArray = []
-
-			@$scope.$on "cursor:editor:update", (event, position) =>
-				@sendCursorPositionUpdate(position)
+				this.$scope.$on("cursor:editor:update", (event, position) => {
+					return this.sendCursorPositionUpdate(position);
+				});
 			
-			@$scope.$on "project:joined", () =>
-				@ide.socket.emit "clientTracking.getConnectedUsers", (error, connectedUsers) =>
-					@$scope.onlineUsers = {}
-					for user in connectedUsers or []
-						if user.client_id == @ide.socket.socket.sessionid
-							# Don't store myself
-							continue
-						# Store data in the same format returned by clientTracking.clientUpdated
+				this.$scope.$on("project:joined", () => {
+					return this.ide.socket.emit("clientTracking.getConnectedUsers", (error, connectedUsers) => {
+						this.$scope.onlineUsers = {};
+						for (let user of Array.from(connectedUsers || [])) {
+							if (user.client_id === this.ide.socket.socket.sessionid) {
+								// Don't store myself
+								continue;
+							}
+							// Store data in the same format returned by clientTracking.clientUpdated
 
-						@$scope.onlineUsers[user.client_id] = {
-							id:      user.client_id
-							user_id: user.user_id
-							email:   user.email
-							name:    "#{user.first_name} #{user.last_name}"
-							doc_id:  user.cursorData?.doc_id
-							row:     user.cursorData?.row
-							column:  user.cursorData?.column
+							this.$scope.onlineUsers[user.client_id] = {
+								id:      user.client_id,
+								user_id: user.user_id,
+								email:   user.email,
+								name:    `${user.first_name} ${user.last_name}`,
+								doc_id:  (user.cursorData != null ? user.cursorData.doc_id : undefined),
+								row:     (user.cursorData != null ? user.cursorData.row : undefined),
+								column:  (user.cursorData != null ? user.cursorData.column : undefined)
+							};
 						}
-					@refreshOnlineUsers()
+						return this.refreshOnlineUsers();
+					});
+				});
 
-			@ide.socket.on "clientTracking.clientUpdated", (client) =>
-				if client.id != @ide.socket.socket.sessionid # Check it's not me!
-					@$scope.$apply () =>
-						@$scope.onlineUsers[client.id] = client
-						@refreshOnlineUsers()
+				this.ide.socket.on("clientTracking.clientUpdated", client => {
+					if (client.id !== this.ide.socket.socket.sessionid) { // Check it's not me!
+						return this.$scope.$apply(() => {
+							this.$scope.onlineUsers[client.id] = client;
+							return this.refreshOnlineUsers();
+						});
+					}
+				});
 
-			@ide.socket.on "clientTracking.clientDisconnected", (client_id) =>
-				@$scope.$apply () =>
-					delete @$scope.onlineUsers[client_id]
-					@refreshOnlineUsers()
+				this.ide.socket.on("clientTracking.clientDisconnected", client_id => {
+					return this.$scope.$apply(() => {
+						delete this.$scope.onlineUsers[client_id];
+						return this.refreshOnlineUsers();
+					});
+				});
 					
-			@$scope.getHueForUserId = (user_id) =>
-				ColorManager.getHueForUserId(user_id)
+				this.$scope.getHueForUserId = user_id => {
+					return ColorManager.getHueForUserId(user_id);
+				};
+			}
 
-		refreshOnlineUsers: () ->
-			@$scope.onlineUsersArray = []
+			refreshOnlineUsers() {
+				this.$scope.onlineUsersArray = [];
 			
-			for client_id, user of @$scope.onlineUsers
-				if user.doc_id?
-					user.doc = @ide.fileTreeManager.findEntityById(user.doc_id)
-
-				if user.name?.trim().length == 0
-					user.name = user.email.trim()
-				
-				user.initial = user.name?[0]
-				if !user.initial or user.initial == " "
-					user.initial = "?"
-
-				@$scope.onlineUsersArray.push user
-
-			@$scope.onlineUserCursorHighlights = {}
-			for client_id, client of @$scope.onlineUsers
-				doc_id = client.doc_id
-				continue if !doc_id? or !client.row? or !client.column?
-				@$scope.onlineUserCursorHighlights[doc_id] ||= []
-				@$scope.onlineUserCursorHighlights[doc_id].push {
-					label: client.name
-					cursor:
-						row: client.row
-						column: client.column
-					hue: ColorManager.getHueForUserId(client.user_id)
-				}
-
-			if @$scope.onlineUsersArray.length > 0
-				delete @cursorUpdateTimeout
-				@cursorUpdateInterval = 500
-			else
-				delete @cursorUpdateTimeout
-				@cursorUpdateInterval = 60 * 1000 * 5
-
-
-		sendCursorPositionUpdate: (position) ->
-			if position?
-				@$scope.currentPosition = position  # keep track of the latest position
-			if !@cursorUpdateTimeout?
-				@cursorUpdateTimeout = setTimeout ()=>
-					doc_id   = @$scope.editor.open_doc_id
-					# always send the latest position to other clients
-					@ide.socket.emit "clientTracking.updatePosition", {
-						row: @$scope.currentPosition?.row
-						column: @$scope.currentPosition?.column
-						doc_id: doc_id
+				for (var client_id in this.$scope.onlineUsers) {
+					const user = this.$scope.onlineUsers[client_id];
+					if (user.doc_id != null) {
+						user.doc = this.ide.fileTreeManager.findEntityById(user.doc_id);
 					}
 
-					delete @cursorUpdateTimeout
-				, @cursorUpdateInterval
+					if ((user.name != null ? user.name.trim().length : undefined) === 0) {
+						user.name = user.email.trim();
+					}
+				
+					user.initial = user.name != null ? user.name[0] : undefined;
+					if (!user.initial || (user.initial === " ")) {
+						user.initial = "?";
+					}
+
+					this.$scope.onlineUsersArray.push(user);
+				}
+
+				this.$scope.onlineUserCursorHighlights = {};
+				for (client_id in this.$scope.onlineUsers) {
+					const client = this.$scope.onlineUsers[client_id];
+					const { doc_id } = client;
+					if ((doc_id == null) || (client.row == null) || (client.column == null)) { continue; }
+					if (!this.$scope.onlineUserCursorHighlights[doc_id]) { this.$scope.onlineUserCursorHighlights[doc_id] = []; }
+					this.$scope.onlineUserCursorHighlights[doc_id].push({
+						label: client.name,
+						cursor: {
+							row: client.row,
+							column: client.column
+						},
+						hue: ColorManager.getHueForUserId(client.user_id)
+					});
+				}
+
+				if (this.$scope.onlineUsersArray.length > 0) {
+					delete this.cursorUpdateTimeout;
+					return this.cursorUpdateInterval = 500;
+				} else {
+					delete this.cursorUpdateTimeout;
+					return this.cursorUpdateInterval = 60 * 1000 * 5;
+				}
+			}
+
+
+			sendCursorPositionUpdate(position) {
+				if (position != null) {
+					this.$scope.currentPosition = position;  // keep track of the latest position
+				}
+				if ((this.cursorUpdateTimeout == null)) {
+					return this.cursorUpdateTimeout = setTimeout(()=> {
+						const doc_id   = this.$scope.editor.open_doc_id;
+						// always send the latest position to other clients
+						this.ide.socket.emit("clientTracking.updatePosition", {
+							row: (this.$scope.currentPosition != null ? this.$scope.currentPosition.row : undefined),
+							column: (this.$scope.currentPosition != null ? this.$scope.currentPosition.column : undefined),
+							doc_id
+						});
+
+						return delete this.cursorUpdateTimeout;
+					}
+					, this.cursorUpdateInterval);
+				}
+			}
+		};
+		OnlineUsersManager.initClass();
+		return OnlineUsersManager;
+	})();
+});
 

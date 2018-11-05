@@ -1,13 +1,20 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.controller "SystemMessagesController", ($scope) ->
-		$scope.messages = window.systemMessages;
+], function(App) {
+	App.controller("SystemMessagesController", $scope => $scope.messages = window.systemMessages);
 		
-	App.controller "SystemMessageController", ($scope, $sce) ->
-		$scope.hidden = $.localStorage("systemMessage.hide.#{$scope.message._id}")
-		$scope.htmlContent = $scope.message.content
+	return App.controller("SystemMessageController", function($scope, $sce) {
+		$scope.hidden = $.localStorage(`systemMessage.hide.${$scope.message._id}`);
+		$scope.htmlContent = $scope.message.content;
 		
-		$scope.hide = () ->
-			$scope.hidden = true
-			$.localStorage("systemMessage.hide.#{$scope.message._id}", true)
+		return $scope.hide = function() {
+			$scope.hidden = true;
+			return $.localStorage(`systemMessage.hide.${$scope.message._id}`, true);
+		};
+	});
+});

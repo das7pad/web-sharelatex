@@ -1,17 +1,28 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.controller "PdfViewToggleController", ($scope) ->
-		$scope.togglePdfView = () ->
-			if $scope.ui.view == "pdf"
-				$scope.ui.view = "editor"
-			else
-				$scope.ui.view = "pdf"
+], App =>
+	App.controller("PdfViewToggleController", function($scope) {
+		$scope.togglePdfView = function() {
+			if ($scope.ui.view === "pdf") {
+				return $scope.ui.view = "editor";
+			} else {
+				return $scope.ui.view = "pdf";
+			}
+		};
 		
-		$scope.fileTreeClosed = false		
-		$scope.$on "layout:main:resize", (e, state) ->
-			if state.west.initClosed
-				$scope.fileTreeClosed = true
-			else
-				$scope.fileTreeClosed = false
-			$scope.$apply()
+		$scope.fileTreeClosed = false;		
+		return $scope.$on("layout:main:resize", function(e, state) {
+			if (state.west.initClosed) {
+				$scope.fileTreeClosed = true;
+			} else {
+				$scope.fileTreeClosed = false;
+			}
+			return $scope.$apply();
+		});
+	})
+);

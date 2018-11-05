@@ -1,65 +1,106 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS205: Consider reworking code to avoid use of IIFEs
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
+], App =>
 
-	App.factory 'metadata', ($http, ide) ->
-		debouncer = {}  # DocId => Timeout
+	App.factory('metadata', function($http, ide) {
+		const debouncer = {};  // DocId => Timeout
 
-		state = {documents: {}}
+		const state = {documents: {}};
 
-		metadata = {state: state}
+		const metadata = {state};
 
-		metadata.onBroadcastDocMeta = (data) ->
-			if data.docId? and data.meta?
-				state.documents[data.docId] = data.meta
+		metadata.onBroadcastDocMeta = function(data) {
+			if ((data.docId != null) && (data.meta != null)) {
+				return state.documents[data.docId] = data.meta;
+			}
+		};
 
-		metadata.onEntityDeleted = (e, entity) ->
-			if entity.type == 'doc'
-				delete state.documents[entity.id]
+		metadata.onEntityDeleted = function(e, entity) {
+			if (entity.type === 'doc') {
+				return delete state.documents[entity.id];
+			}
+		};
 
-		metadata.onFileUploadComplete = (e, upload) ->
-			if upload.entity_type == 'doc'
-				metadata.loadDocMetaFromServer upload.entity_id
+		metadata.onFileUploadComplete = function(e, upload) {
+			if (upload.entity_type === 'doc') {
+				return metadata.loadDocMetaFromServer(upload.entity_id);
+			}
+		};
 
-		metadata.getAllLabels = () ->
-			_.flatten(meta.labels for docId, meta of state.documents)
+		metadata.getAllLabels = () =>
+			_.flatten((() => {
+				const result = [];
+				for (let docId in state.documents) {
+					const meta = state.documents[docId];
+					result.push(meta.labels);
+				}
+				return result;
+			})())
+		;
 
-		metadata.getAllPackages = () ->
-			packageCommandMapping = {}
-			for _docId, meta of state.documents
-				for packageName, commandSnippets of meta.packages
-					packageCommandMapping[packageName] = commandSnippets
-			return packageCommandMapping
+		metadata.getAllPackages = function() {
+			const packageCommandMapping = {};
+			for (let _docId in state.documents) {
+				const meta = state.documents[_docId];
+				for (let packageName in meta.packages) {
+					const commandSnippets = meta.packages[packageName];
+					packageCommandMapping[packageName] = commandSnippets;
+				}
+			}
+			return packageCommandMapping;
+		};
 
-		metadata.loadProjectMetaFromServer = () ->
+		metadata.loadProjectMetaFromServer = () =>
 			$http
-				.get("/project/#{window.project_id}/metadata")
-				.then (response) ->
-					{ data } = response
-					if data.projectMeta
-						for docId, docMeta of data.projectMeta
-							state.documents[docId] = docMeta
+				.get(`/project/${window.project_id}/metadata`)
+				.then(function(response) {
+					const { data } = response;
+					if (data.projectMeta) {
+						return (() => {
+							const result = [];
+							for (let docId in data.projectMeta) {
+								const docMeta = data.projectMeta[docId];
+								result.push(state.documents[docId] = docMeta);
+							}
+							return result;
+						})();
+					}
+			})
+		;
 
-		metadata.loadDocMetaFromServer = (docId) ->
+		metadata.loadDocMetaFromServer = docId =>
 			$http
 				.post(
-					"/project/#{window.project_id}/doc/#{docId}/metadata",
+					`/project/${window.project_id}/doc/${docId}/metadata`,
 					{_csrf: window.csrfToken}
 				)
+		;
 
-		metadata.scheduleLoadDocMetaFromServer = (docId) ->
-			# De-bounce loading labels with a timeout
-			existingTimeout = debouncer[docId]
+		metadata.scheduleLoadDocMetaFromServer = function(docId) {
+			// De-bounce loading labels with a timeout
+			const existingTimeout = debouncer[docId];
 
-			if existingTimeout?
-				clearTimeout(existingTimeout)
-				delete debouncer[docId]
+			if (existingTimeout != null) {
+				clearTimeout(existingTimeout);
+				delete debouncer[docId];
+			}
 
-			debouncer[docId] = setTimeout(
-				() =>
-					metadata.loadDocMetaFromServer docId
-					delete debouncer[docId]
+			return debouncer[docId] = setTimeout(
+				() => {
+					metadata.loadDocMetaFromServer(docId);
+					return delete debouncer[docId];
+				}
 				, 1000
-			)
+			);
+		};
 
-		return metadata
+		return metadata;
+	})
+);

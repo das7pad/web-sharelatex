@@ -1,13 +1,25 @@
-define [], () ->
-	return iconTypeFromName = (name) ->
-		ext = name.split(".").pop()?.toLowerCase()
-		if ext in ["png", "pdf", "jpg", "jpeg", "gif"]
-			return "image"
-		else if ext in ["csv", "xls", "xlsx"]
-			return "table"
-		else if ext in ["py", "r"]
-			return "file-text"
-		else if ext in ['bib']
-			return 'book'
-		else
-			return "file"
+/*
+ * decaffeinate suggestions:
+ * DS103: Rewrite code to no longer use __guard__
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([], function() {
+	let iconTypeFromName;
+	return iconTypeFromName = function(name) {
+		const ext = __guard__(name.split(".").pop(), x => x.toLowerCase());
+		if (["png", "pdf", "jpg", "jpeg", "gif"].includes(ext)) {
+			return "image";
+		} else if (["csv", "xls", "xlsx"].includes(ext)) {
+			return "table";
+		} else if (["py", "r"].includes(ext)) {
+			return "file-text";
+		} else if (['bib'].includes(ext)) {
+			return 'book';
+		} else {
+			return "file";
+		}
+	};
+});
+function __guard__(value, transform) {
+  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+}

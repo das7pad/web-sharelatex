@@ -1,29 +1,45 @@
-define [], () ->
-	AceShareJsCodec =
-		aceRangeToShareJs: (range, lines) ->
-			offset = 0
-			for line, i in lines
-				offset += if i < range.row
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([], function() {
+	let AceShareJsCodec;
+	return AceShareJsCodec = {
+		aceRangeToShareJs(range, lines) {
+			let offset = 0;
+			for (let i = 0; i < lines.length; i++) {
+				const line = lines[i];
+				offset += i < range.row ?
 					line.length
-				else
-					range.column
-			offset += range.row # Include newlines
-			return offset
+				:
+					range.column;
+			}
+			offset += range.row; // Include newlines
+			return offset;
+		},
 		
-		aceChangeToShareJs: (delta, lines) ->
-			offset = AceShareJsCodec.aceRangeToShareJs(delta.start, lines)
+		aceChangeToShareJs(delta, lines) {
+			const offset = AceShareJsCodec.aceRangeToShareJs(delta.start, lines);
 
-			text = delta.lines.join('\n')
-			switch delta.action
-				when 'insert'
-					return { i: text, p: offset }
-				when 'remove'
-					return { d: text, p: offset }
-				else throw new Error "unknown action: #{delta.action}"
+			const text = delta.lines.join('\n');
+			switch (delta.action) {
+				case 'insert':
+					return { i: text, p: offset };
+				case 'remove':
+					return { d: text, p: offset };
+				default: throw new Error(`unknown action: ${delta.action}`);
+			}
+		},
 		
-		shareJsOffsetToAcePosition: (offset, lines) ->
-			row = 0
-			for line, row in lines
-				break if offset <= line.length
-				offset -= lines[row].length + 1 # + 1 for newline char
-			return {row:row, column:offset}
+		shareJsOffsetToAcePosition(offset, lines) {
+			let row = 0;
+			for (row = 0; row < lines.length; row++) {
+				const line = lines[row];
+				if (offset <= line.length) { break; }
+				offset -= lines[row].length + 1;
+			} // + 1 for newline char
+			return {row, column:offset};
+		}
+	};
+});

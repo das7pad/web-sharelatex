@@ -1,68 +1,93 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS103: Rewrite code to no longer use __guard__
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	# We create and provide this as service so that we can access the global ide
-	# from within other parts of the angular app.
-	App.factory "ide", ["$http", "queuedHttp", "$modal", "$q", "$filter", "$timeout", ($http, queuedHttp, $modal, $q, $filter, $timeout) ->
-		ide = {}
-		ide.$http = $http
-		ide.queuedHttp = queuedHttp
-		ide.$q = $q
-		ide.$filter = $filter
-		ide.$timeout = $timeout
+], function(App) {
+	// We create and provide this as service so that we can access the global ide
+	// from within other parts of the angular app.
+	App.factory("ide", ["$http", "queuedHttp", "$modal", "$q", "$filter", "$timeout", function($http, queuedHttp, $modal, $q, $filter, $timeout) {
+		const ide = {};
+		ide.$http = $http;
+		ide.queuedHttp = queuedHttp;
+		ide.$q = $q;
+		ide.$filter = $filter;
+		ide.$timeout = $timeout;
 
-		@recentEvents = []
-		ide.pushEvent = (type, meta = {}) =>
-			@recentEvents.push type: type, meta: meta, date: new Date()
-			if @recentEvents.length > 40
-				@recentEvents.shift()
+		this.recentEvents = [];
+		ide.pushEvent = (type, meta) => {
+			if (meta == null) { meta = {}; }
+			this.recentEvents.push({type, meta, date: new Date()});
+			if (this.recentEvents.length > 40) {
+				return this.recentEvents.shift();
+			}
+		};
 
-		ide.reportError = (error, meta = {}) =>
-			meta.client_id = @socket?.socket?.sessionid
-			meta.transport = @socket?.socket?.transport?.name
-			meta.client_now = new Date()
-			meta.recent_events = @recentEvents
-			errorObj = {}
-			if typeof error == "object"
-				for key in Object.getOwnPropertyNames(error)
-					errorObj[key] = error[key]
-			else if typeof error == "string"
-				errorObj.message = error
-			$http.post "/error/client", {
-				error: errorObj
-				meta: meta
+		ide.reportError = (error, meta) => {
+			if (meta == null) { meta = {}; }
+			meta.client_id = __guard__(this.socket != null ? this.socket.socket : undefined, x => x.sessionid);
+			meta.transport = __guard__(__guard__(this.socket != null ? this.socket.socket : undefined, x2 => x2.transport), x1 => x1.name);
+			meta.client_now = new Date();
+			meta.recent_events = this.recentEvents;
+			const errorObj = {};
+			if (typeof error === "object") {
+				for (let key of Array.from(Object.getOwnPropertyNames(error))) {
+					errorObj[key] = error[key];
+				}
+			} else if (typeof error === "string") {
+				errorObj.message = error;
+			}
+			return $http.post("/error/client", {
+				error: errorObj,
+				meta,
 				_csrf: window.csrfToken
-			}
+			});
+		};
 
-		ide.showGenericMessageModal = (title, message) ->
-			$modal.open {
-				templateUrl: "genericMessageModalTemplate"
-				controller:  "GenericMessageModalController"
-				resolve:
-					title:   -> title
-					message: -> message
-			}
+		ide.showGenericMessageModal = (title, message) =>
+			$modal.open({
+				templateUrl: "genericMessageModalTemplate",
+				controller:  "GenericMessageModalController",
+				resolve: {
+					title() { return title; },
+					message() { return message; }
+				}
+			})
+		;
 
-		ide.showLockEditorMessageModal = (title, message) ->
-			# modal to block the editor when connection is down
-			$modal.open {
-				templateUrl: "lockEditorModalTemplate"
-				controller:  "GenericMessageModalController"
-				backdrop:    "static" # prevent dismiss by click on background
-				keyboard:    false    # prevent dismiss via keyboard
-				resolve:
-					title:   -> title
-					message: -> message
+		ide.showLockEditorMessageModal = (title, message) =>
+			// modal to block the editor when connection is down
+			$modal.open({
+				templateUrl: "lockEditorModalTemplate",
+				controller:  "GenericMessageModalController",
+				backdrop:    "static", // prevent dismiss by click on background
+				keyboard:    false,    // prevent dismiss via keyboard
+				resolve: {
+					title() { return title; },
+					message() { return message; }
+				},
 				windowClass: "lock-editor-modal"
-			}
+			})
+		;
 
-		return ide
-	]
+		return ide;
+	}
+	]);
 
-	App.controller "GenericMessageModalController", ["$scope", "$modalInstance", "title", "message", ($scope, $modalInstance, title, message) ->
-		$scope.title = title
-		$scope.message = message
+	return App.controller("GenericMessageModalController", ["$scope", "$modalInstance", "title", "message", function($scope, $modalInstance, title, message) {
+		$scope.title = title;
+		$scope.message = message;
 
-		$scope.done = () ->
-			$modalInstance.close()
-	]
+		return $scope.done = () => $modalInstance.close();
+	}
+	]);
+});
+
+function __guard__(value, transform) {
+  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+}

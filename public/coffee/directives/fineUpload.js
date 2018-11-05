@@ -1,68 +1,85 @@
-define [
-	"base"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
+	"base",
 	"fineuploader"
-], (App, qq) ->
-	App.directive 'fineUpload', ($timeout) ->
-		return {
+], (App, qq) =>
+	App.directive('fineUpload', $timeout =>
+		({
 			scope: {
-				multiple: "="
-				endpoint: "@"
-				templateId: "@"
-				allowedExtensions: "="
-				onCompleteCallback: "="
-				onUploadCallback: "="
-				onValidateBatch: "="
-				onErrorCallback: "="
-				onSubmitCallback: "="
-				onCancelCallback: "="
-				autoUpload: "="
-				params: "="
+				multiple: "=",
+				endpoint: "@",
+				templateId: "@",
+				allowedExtensions: "=",
+				onCompleteCallback: "=",
+				onUploadCallback: "=",
+				onValidateBatch: "=",
+				onErrorCallback: "=",
+				onSubmitCallback: "=",
+				onCancelCallback: "=",
+				autoUpload: "=",
+				params: "=",
 				control: "="
-			}
-			link: (scope, element, attrs) ->
-				multiple = scope.multiple or false
-				endpoint = scope.endpoint
-				templateId = scope.templateId
-				if scope.allowedExtensions?
+			},
+			link(scope, element, attrs) {
+				let autoUpload, validation;
+				const multiple = scope.multiple || false;
+				const { endpoint } = scope;
+				const { templateId } = scope;
+				if (scope.allowedExtensions != null) {
 					validation =
-						allowedExtensions: scope.allowedExtensions
-				else
-					validation = {}
-				maxConnections = scope.maxConnections or 1
-				onComplete = scope.onCompleteCallback or () ->
-				onUpload   = scope.onUploadCallback or () ->
-				onError   = scope.onErrorCallback or () ->
-				onValidateBatch = scope.onValidateBatch or () ->
-				onSubmit = scope.onSubmitCallback or () ->
-				onCancel = scope.onCancelCallback or () ->
-				if !scope.autoUpload?
-					autoUpload = true
-				else
-					autoUpload = scope.autoUpload
-				params     = scope.params or {}
-				params._csrf = window.csrfToken
+						{allowedExtensions: scope.allowedExtensions};
+				} else {
+					validation = {};
+				}
+				const maxConnections = scope.maxConnections || 1;
+				const onComplete = scope.onCompleteCallback || function() {};
+				const onUpload   = scope.onUploadCallback || function() {};
+				const onError   = scope.onErrorCallback || function() {};
+				const onValidateBatch = scope.onValidateBatch || function() {};
+				const onSubmit = scope.onSubmitCallback || function() {};
+				const onCancel = scope.onCancelCallback || function() {};
+				if ((scope.autoUpload == null)) {
+					autoUpload = true;
+				} else {
+					({ autoUpload } = scope);
+				}
+				const params     = scope.params || {};
+				params._csrf = window.csrfToken;
 
-				q = new qq.FineUploader
-					element: element[0]
-					multiple: multiple
-					autoUpload: autoUpload
-					disabledCancelForFormUploads: true
-					validation: validation
-					maxConnections: maxConnections
-					request:
-						endpoint: endpoint
-						forceMultipart: true
-						params: params
+				const q = new qq.FineUploader({
+					element: element[0],
+					multiple,
+					autoUpload,
+					disabledCancelForFormUploads: true,
+					validation,
+					maxConnections,
+					request: {
+						endpoint,
+						forceMultipart: true,
+						params,
 						paramsInBody: false
-					callbacks:
-						onComplete: onComplete
-						onUpload:   onUpload
-						onValidateBatch: onValidateBatch
-						onError: onError
-						onSubmit: onSubmit
-						onCancel: onCancel
+					},
+					callbacks: {
+						onComplete,
+						onUpload,
+						onValidateBatch,
+						onError,
+						onSubmit,
+						onCancel
+					},
 					template: templateId
-				window.q = q
-				scope.control?.q = q
-				return q
-		}
+				});
+				window.q = q;
+				if (scope.control != null) {
+					scope.control.q = q;
+				}
+				return q;
+			}
+		})
+)
+);

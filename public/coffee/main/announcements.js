@@ -1,31 +1,40 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.controller "AnnouncementsController", ($scope, $http, event_tracking, $window, _) ->
-		$scope.announcements = []
-		$scope.ui =
-			isOpen: false
+], App =>
+	App.controller("AnnouncementsController", function($scope, $http, event_tracking, $window, _) {
+		$scope.announcements = [];
+		$scope.ui = {
+			isOpen: false,
 			newItems: 0
+		};
 		
-		refreshAnnouncements = ->
-			$http.get("/announcements").then (response) ->
-				$scope.announcements = response.data
-				$scope.ui.newItems = _.filter($scope.announcements, (announcement) -> !announcement.read).length
+		const refreshAnnouncements = () =>
+			$http.get("/announcements").then(function(response) {
+				$scope.announcements = response.data;
+				return $scope.ui.newItems = _.filter($scope.announcements, announcement => !announcement.read).length;
+			})
+		;
 				
-		markAnnouncementsAsRead = ->
-			event_tracking.sendMB "announcement-alert-dismissed", { blogPostId: $scope.announcements[0].id }
+		const markAnnouncementsAsRead = () => event_tracking.sendMB("announcement-alert-dismissed", { blogPostId: $scope.announcements[0].id });
 
-		$scope.logAnnouncementClick = ->
-			event_tracking.sendMB "announcement-read-more-clicked", { blogPostId: $scope.announcements[0].id }
+		$scope.logAnnouncementClick = () => event_tracking.sendMB("announcement-read-more-clicked", { blogPostId: $scope.announcements[0].id });
 
-		refreshAnnouncements()
+		refreshAnnouncements();
 
-		$scope.toggleAnnouncementsUI = ->
-			$scope.ui.isOpen = !$scope.ui.isOpen
+		$scope.toggleAnnouncementsUI = function() {
+			$scope.ui.isOpen = !$scope.ui.isOpen;
 
-			if !$scope.ui.isOpen and $scope.ui.newItems
-				$scope.ui.newItems = 0
-				markAnnouncementsAsRead()
+			if (!$scope.ui.isOpen && $scope.ui.newItems) {
+				$scope.ui.newItems = 0;
+				return markAnnouncementsAsRead();
+			}
+		};
 
-		$scope.showAll = -> 
-			$scope.ui.newItems = 0
+		return $scope.showAll = () => $scope.ui.newItems = 0;
+	})
+);

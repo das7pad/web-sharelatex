@@ -1,260 +1,339 @@
-define [
-	"moment"
-	"ide/colors/ColorManager"
-	"ide/history/util/displayNameForUser"
-	"ide/history/controllers/HistoryListController"
-	"ide/history/controllers/HistoryDiffController"
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS206: Consider reworking classes to avoid initClass
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
+	"moment",
+	"ide/colors/ColorManager",
+	"ide/history/util/displayNameForUser",
+	"ide/history/controllers/HistoryListController",
+	"ide/history/controllers/HistoryDiffController",
 	"ide/history/directives/infiniteScroll"
-], (moment, ColorManager, displayNameForUser) ->
-	class HistoryManager
-		constructor: (@ide, @$scope) ->
-			@reset()
+], function(moment, ColorManager, displayNameForUser) {
+	let HistoryManager;
+	return HistoryManager = (function() {
+		HistoryManager = class HistoryManager {
+			static initClass() {
+	
+				this.prototype.BATCH_SIZE = 10;
+			}
+			constructor(ide, $scope) {
+				this.ide = ide;
+				this.$scope = $scope;
+				this.reset();
 
-			@$scope.toggleHistory = () =>
-				if @$scope.ui.view == "history"
-					@hide()
-				else
-					@show()
+				this.$scope.toggleHistory = () => {
+					if (this.$scope.ui.view === "history") {
+						return this.hide();
+					} else {
+						return this.show();
+					}
+				};
 
-			@$scope.$watch "history.selection.updates", (updates) =>
-				if updates? and updates.length > 0
-					@_selectDocFromUpdates()
-					@reloadDiff()
+				this.$scope.$watch("history.selection.updates", updates => {
+					if ((updates != null) && (updates.length > 0)) {
+						this._selectDocFromUpdates();
+						return this.reloadDiff();
+					}
+				});
 
-			@$scope.$on "entity:selected", (event, entity) =>
-				if (@$scope.ui.view == "history") and (entity.type == "doc")
-					@$scope.history.selection.doc = entity
-					@reloadDiff()
+				this.$scope.$on("entity:selected", (event, entity) => {
+					if ((this.$scope.ui.view === "history") && (entity.type === "doc")) {
+						this.$scope.history.selection.doc = entity;
+						return this.reloadDiff();
+					}
+				});
+			}
 
-		show: () ->
-			@$scope.ui.view = "history"
-			@reset()
+			show() {
+				this.$scope.ui.view = "history";
+				return this.reset();
+			}
 
-		hide: () ->
-			@$scope.ui.view = "editor"
-			# Make sure we run the 'open' logic for whatever is currently selected
-			@$scope.$emit "entity:selected", @ide.fileTreeManager.findSelectedEntity()
+			hide() {
+				this.$scope.ui.view = "editor";
+				// Make sure we run the 'open' logic for whatever is currently selected
+				return this.$scope.$emit("entity:selected", this.ide.fileTreeManager.findSelectedEntity());
+			}
 
-		reset: () ->
-			@$scope.history = {
-				updates: []
-				nextBeforeTimestamp: null
-				atEnd: false
-				selection: {
-					updates: []
-					doc: null
-					range: {
-						fromV: null
-						toV: null
-						start_ts: null
-						end_ts: null
+			reset() {
+				return this.$scope.history = {
+					updates: [],
+					nextBeforeTimestamp: null,
+					atEnd: false,
+					selection: {
+						updates: [],
+						doc: null,
+						range: {
+							fromV: null,
+							toV: null,
+							start_ts: null,
+							end_ts: null
+						}
+					},
+					diff: null
+				};
+			}
+
+			autoSelectRecentUpdates() {
+				if (this.$scope.history.updates.length === 0) { return; }
+
+				this.$scope.history.updates[0].selectedTo = true;
+
+				let indexOfLastUpdateNotByMe = 0;
+				for (let i = 0; i < this.$scope.history.updates.length; i++) {
+					const update = this.$scope.history.updates[i];
+					if (this._updateContainsUserId(update, this.$scope.user.id)) {
+						break;
+					}
+					indexOfLastUpdateNotByMe = i;
+				}
+
+				return this.$scope.history.updates[indexOfLastUpdateNotByMe].selectedFrom = true;
+			}
+			fetchNextBatchOfUpdates() {
+				let url = `/project/${this.ide.project_id}/updates?min_count=${this.BATCH_SIZE}`;
+				if (this.$scope.history.nextBeforeTimestamp != null) {
+					url += `&before=${this.$scope.history.nextBeforeTimestamp}`;
+				}
+				this.$scope.history.loading = true;
+				return this.ide.$http
+					.get(url)
+					.then(response => {
+						const { data } = response;
+						this._loadUpdates(data.updates);
+						this.$scope.history.nextBeforeTimestamp = data.nextBeforeTimestamp;
+						if ((data.nextBeforeTimestamp == null)) {
+							this.$scope.history.atEnd = true;
+						}
+						return this.$scope.history.loading = false;
+				});
+			}
+
+			reloadDiff() {
+				let { diff } = this.$scope.history;
+				const {updates, doc} = this.$scope.history.selection;
+				const {fromV, toV, start_ts, end_ts}   = this._calculateRangeFromSelection();
+
+				if ((doc == null)) { return; }
+
+				if ((diff != null) &&
+					(diff.doc   === doc)   &&
+					(diff.fromV === fromV) &&
+					(diff.toV   === toV)) { return; }
+
+				this.$scope.history.diff = (diff = {
+					fromV,
+					toV,
+					start_ts,
+					end_ts,
+					doc,
+					error:    false,
+					pathname: doc.name
+				});
+
+				if (!doc.deleted) {
+					diff.loading = true;
+					let url = `/project/${this.$scope.project_id}/doc/${diff.doc.id}/diff`;
+					if ((diff.fromV != null) && (diff.toV != null)) {
+						url += `?from=${diff.fromV}&to=${diff.toV}`;
+					}
+
+					return this.ide.$http
+						.get(url)
+						.then(response => {
+							const { data } = response;
+							diff.loading = false;
+							const {text, highlights} = this._parseDiff(data);
+							diff.text = text;
+							return diff.highlights = highlights;
+					}).catch(function() {
+							diff.loading = false;
+							return diff.error = true;
+					});
+				} else {
+					diff.deleted = true;
+					diff.restoreInProgress = false;
+					diff.restoreDeletedSuccess = false;
+					return diff.restoredDocNewId = null;
+				}
+			}
+
+			restoreDeletedDoc(doc) {
+				const url = `/project/${this.$scope.project_id}/doc/${doc.id}/restore`;
+				return this.ide.$http.post(url, {name: doc.name, _csrf: window.csrfToken});
+			}
+
+			restoreDiff(diff) {
+				const url = `/project/${this.$scope.project_id}/doc/${diff.doc.id}/version/${diff.fromV}/restore`;
+				return this.ide.$http.post(url, {_csrf: window.csrfToken});
+			}
+
+			_parseDiff(diff) {
+				let row    = 0;
+				let column = 0;
+				const highlights = [];
+				let text   = "";
+				const iterable = diff.diff || [];
+				for (let i = 0; i < iterable.length; i++) {
+					var endColumn, endRow;
+					const entry = iterable[i];
+					let content = entry.u || entry.i || entry.d;
+					if (!content) { content = ""; }
+					text += content;
+					const lines   = content.split("\n");
+					const startRow    = row;
+					const startColumn = column;
+					if (lines.length > 1) {
+						endRow    = (startRow + lines.length) - 1;
+						endColumn = lines[lines.length - 1].length;
+					} else {
+						endRow    = startRow;
+						endColumn = startColumn + lines[0].length;
+					}
+					row    = endRow;
+					column = endColumn;
+
+					const range = {
+						start: {
+							row: startRow,
+							column: startColumn
+						},
+						end: {
+							row: endRow,
+							column: endColumn
+						}
+					};
+
+					if ((entry.i != null) || (entry.d != null)) {
+						const name = displayNameForUser(entry.meta.user);
+						const date = moment(entry.meta.end_ts).format("Do MMM YYYY, h:mm a");
+						if (entry.i != null) {
+							highlights.push({
+								label: `Added by ${name} on ${date}`,
+								highlight: range,
+								hue: ColorManager.getHueForUserId(entry.meta.user != null ? entry.meta.user.id : undefined)
+							});
+						} else if (entry.d != null) {
+							highlights.push({
+								label: `Deleted by ${name} on ${date}`,
+								strikeThrough: range,
+								hue: ColorManager.getHueForUserId(entry.meta.user != null ? entry.meta.user.id : undefined)
+							});
+						}
 					}
 				}
-				diff: null
+
+				return {text, highlights};
 			}
 
-		autoSelectRecentUpdates: () ->
-			return if @$scope.history.updates.length == 0
+			_loadUpdates(updates) {
+				if (updates == null) { updates = []; }
+				let previousUpdate = this.$scope.history.updates[this.$scope.history.updates.length - 1];
 
-			@$scope.history.updates[0].selectedTo = true
+				for (let update of Array.from(updates)) {
+					update.pathnames = []; // Used for display
+					const object = update.docs || {};
+					for (let doc_id in object) {
+						const doc = object[doc_id];
+						doc.entity = this.ide.fileTreeManager.findEntityById(doc_id, {includeDeleted: true});
+						update.pathnames.push(doc.entity.name);
+					}
 
-			indexOfLastUpdateNotByMe = 0
-			for update, i in @$scope.history.updates
-				if @_updateContainsUserId(update, @$scope.user.id)
-					break
-				indexOfLastUpdateNotByMe = i
+					for (let user of Array.from(update.meta.users || [])) {
+						if (user != null) {
+							user.hue = ColorManager.getHueForUserId(user.id);
+						}
+					}
 
-			@$scope.history.updates[indexOfLastUpdateNotByMe].selectedFrom = true
+					if ((previousUpdate == null) || !moment(previousUpdate.meta.end_ts).isSame(update.meta.end_ts, "day")) {
+						update.meta.first_in_day = true;
+					}
 
-		BATCH_SIZE: 10
-		fetchNextBatchOfUpdates: () ->
-			url = "/project/#{@ide.project_id}/updates?min_count=#{@BATCH_SIZE}"
-			if @$scope.history.nextBeforeTimestamp?
-				url += "&before=#{@$scope.history.nextBeforeTimestamp}"
-			@$scope.history.loading = true
-			@ide.$http
-				.get(url)
-				.then (response) =>
-					{ data } = response
-					@_loadUpdates(data.updates)
-					@$scope.history.nextBeforeTimestamp = data.nextBeforeTimestamp
-					if !data.nextBeforeTimestamp?
-						@$scope.history.atEnd = true
-					@$scope.history.loading = false
+					update.selectedFrom = false;
+					update.selectedTo = false;
+					update.inSelection = false;
 
-		reloadDiff: () ->
-			diff = @$scope.history.diff
-			{updates, doc} = @$scope.history.selection
-			{fromV, toV, start_ts, end_ts}   = @_calculateRangeFromSelection()
-
-			return if !doc?
-
-			return if diff? and
-				diff.doc   == doc   and
-				diff.fromV == fromV and
-				diff.toV   == toV
-
-			@$scope.history.diff = diff = {
-				fromV:    fromV
-				toV:      toV
-				start_ts: start_ts
-				end_ts:   end_ts
-				doc:      doc
-				error:    false
-				pathname: doc.name
-			}
-
-			if !doc.deleted
-				diff.loading = true
-				url = "/project/#{@$scope.project_id}/doc/#{diff.doc.id}/diff"
-				if diff.fromV? and diff.toV?
-					url += "?from=#{diff.fromV}&to=#{diff.toV}"
-
-				@ide.$http
-					.get(url)
-					.then (response) =>
-						{ data } = response
-						diff.loading = false
-						{text, highlights} = @_parseDiff(data)
-						diff.text = text
-						diff.highlights = highlights
-					.catch () ->
-						diff.loading = false
-						diff.error = true
-			else
-				diff.deleted = true
-				diff.restoreInProgress = false
-				diff.restoreDeletedSuccess = false
-				diff.restoredDocNewId = null
-
-		restoreDeletedDoc: (doc) ->
-			url = "/project/#{@$scope.project_id}/doc/#{doc.id}/restore"
-			@ide.$http.post(url, name: doc.name, _csrf: window.csrfToken)
-
-		restoreDiff: (diff) ->
-			url = "/project/#{@$scope.project_id}/doc/#{diff.doc.id}/version/#{diff.fromV}/restore"
-			@ide.$http.post(url, _csrf: window.csrfToken)
-
-		_parseDiff: (diff) ->
-			row    = 0
-			column = 0
-			highlights = []
-			text   = ""
-			for entry, i in diff.diff or []
-				content = entry.u or entry.i or entry.d
-				content ||= ""
-				text += content
-				lines   = content.split("\n")
-				startRow    = row
-				startColumn = column
-				if lines.length > 1
-					endRow    = startRow + lines.length - 1
-					endColumn = lines[lines.length - 1].length
-				else
-					endRow    = startRow
-					endColumn = startColumn + lines[0].length
-				row    = endRow
-				column = endColumn
-
-				range = {
-					start:
-						row: startRow
-						column: startColumn
-					end:
-						row: endRow
-						column: endColumn
+					previousUpdate = update;
 				}
 
-				if entry.i? or entry.d?
-					name = displayNameForUser(entry.meta.user)
-					date = moment(entry.meta.end_ts).format("Do MMM YYYY, h:mm a")
-					if entry.i?
-						highlights.push {
-							label: "Added by #{name} on #{date}"
-							highlight: range
-							hue: ColorManager.getHueForUserId(entry.meta.user?.id)
+				const firstLoad = this.$scope.history.updates.length === 0;
+
+				this.$scope.history.updates =
+					this.$scope.history.updates.concat(updates);
+
+				if (firstLoad) { return this.autoSelectRecentUpdates(); }
+			}
+
+			_calculateRangeFromSelection() {
+				let end_ts, start_ts, toV;
+				let fromV = (toV = (start_ts = (end_ts = null)));
+
+				const selected_doc_id = this.$scope.history.selection.doc != null ? this.$scope.history.selection.doc.id : undefined;
+
+				for (let update of Array.from(this.$scope.history.selection.updates || [])) {
+					for (let doc_id in update.docs) {
+						const doc = update.docs[doc_id];
+						if (doc_id === selected_doc_id) {
+							if ((fromV != null) && (toV != null)) {
+								fromV = Math.min(fromV, doc.fromV);
+								toV = Math.max(toV, doc.toV);
+								start_ts = Math.min(start_ts, update.meta.start_ts);
+								end_ts = Math.max(end_ts, update.meta.end_ts);
+							} else {
+								({ fromV } = doc);
+								({ toV } = doc);
+								({ start_ts } = update.meta);
+								({ end_ts } = update.meta);
+							}
+							break;
 						}
-					else if entry.d?
-						highlights.push {
-							label: "Deleted by #{name} on #{date}"
-							strikeThrough: range
-							hue: ColorManager.getHueForUserId(entry.meta.user?.id)
-						}
+					}
+				}
 
-			return {text, highlights}
+				return {fromV, toV, start_ts, end_ts};
+			}
 
-		_loadUpdates: (updates = []) ->
-			previousUpdate = @$scope.history.updates[@$scope.history.updates.length - 1]
+			// Set the track changes selected doc to one of the docs in the range
+			// of currently selected updates. If we already have a selected doc
+			// then prefer this one if present.
+			_selectDocFromUpdates() {
+				let doc, doc_id;
+				const affected_docs = {};
+				for (let update of Array.from(this.$scope.history.selection.updates)) {
+					for (doc_id in update.docs) {
+						doc = update.docs[doc_id];
+						affected_docs[doc_id] = doc.entity;
+					}
+				}
 
-			for update in updates
-				update.pathnames = [] # Used for display
-				for doc_id, doc of update.docs or {}
-					doc.entity = @ide.fileTreeManager.findEntityById(doc_id, includeDeleted: true)
-					update.pathnames.push doc.entity.name
+				let selected_doc = this.$scope.history.selection.doc;
+				if ((selected_doc != null) && (affected_docs[selected_doc.id] != null)) {
+					// Selected doc is already open
+				} else {
+					for (doc_id in affected_docs) {
+						doc = affected_docs[doc_id];
+						selected_doc = doc;
+						break;
+					}
+				}
 
-				for user in update.meta.users or []
-					if user?
-						user.hue = ColorManager.getHueForUserId(user.id)
+				this.$scope.history.selection.doc = selected_doc;
+				return this.ide.fileTreeManager.selectEntity(selected_doc);
+			}
 
-				if !previousUpdate? or !moment(previousUpdate.meta.end_ts).isSame(update.meta.end_ts, "day")
-					update.meta.first_in_day = true
-
-				update.selectedFrom = false
-				update.selectedTo = false
-				update.inSelection = false
-
-				previousUpdate = update
-
-			firstLoad = @$scope.history.updates.length == 0
-
-			@$scope.history.updates =
-				@$scope.history.updates.concat(updates)
-
-			@autoSelectRecentUpdates() if firstLoad
-
-		_calculateRangeFromSelection: () ->
-			fromV = toV = start_ts = end_ts = null
-
-			selected_doc_id = @$scope.history.selection.doc?.id
-
-			for update in @$scope.history.selection.updates or []
-				for doc_id, doc of update.docs
-					if doc_id == selected_doc_id
-						if fromV? and toV?
-							fromV = Math.min(fromV, doc.fromV)
-							toV = Math.max(toV, doc.toV)
-							start_ts = Math.min(start_ts, update.meta.start_ts)
-							end_ts = Math.max(end_ts, update.meta.end_ts)
-						else
-							fromV = doc.fromV
-							toV = doc.toV
-							start_ts = update.meta.start_ts
-							end_ts = update.meta.end_ts
-						break
-
-			return {fromV, toV, start_ts, end_ts}
-
-		# Set the track changes selected doc to one of the docs in the range
-		# of currently selected updates. If we already have a selected doc
-		# then prefer this one if present.
-		_selectDocFromUpdates: () ->
-			affected_docs = {}
-			for update in @$scope.history.selection.updates
-				for doc_id, doc of update.docs
-					affected_docs[doc_id] = doc.entity
-
-			selected_doc = @$scope.history.selection.doc
-			if selected_doc? and affected_docs[selected_doc.id]?
-				# Selected doc is already open
-			else
-				for doc_id, doc of affected_docs
-					selected_doc = doc
-					break
-
-			@$scope.history.selection.doc = selected_doc
-			@ide.fileTreeManager.selectEntity(selected_doc)
-
-		_updateContainsUserId: (update, user_id) ->
-			for user in update.meta.users
-				return true if user?.id == user_id
-			return false
+			_updateContainsUserId(update, user_id) {
+				for (let user of Array.from(update.meta.users)) {
+					if ((user != null ? user.id : undefined) === user_id) { return true; }
+				}
+				return false;
+			}
+		};
+		HistoryManager.initClass();
+		return HistoryManager;
+	})();
+});

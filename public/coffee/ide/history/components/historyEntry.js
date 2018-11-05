@@ -1,44 +1,56 @@
-define [
-	"base"
-	"ide/colors/ColorManager"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
+	"base",
+	"ide/colors/ColorManager",
 	"ide/history/util/displayNameForUser"
-], (App, ColorManager, displayNameForUser) ->
-	historyEntryController = ($scope, $element, $attrs, _) ->
-		ctrl = @
-		# This method (and maybe the one below) will be removed soon. User details data will be 
-		# injected into the history API responses, so we won't need to fetch user data from other
-		# local data structures.
-		_getUserById = (id) ->
-			_.find ctrl.users, (user) ->
-				curUserId = user?._id or user?.id
-				curUserId == id
-		ctrl.displayName = displayNameForUser
-		ctrl.displayNameById = (id) ->
-			displayNameForUser(_getUserById(id))
-		ctrl.getProjectOpDoc = (projectOp) ->
-			if projectOp.rename? then "#{ projectOp.rename.pathname} → #{ projectOp.rename.newPathname }"
-			else if projectOp.add? then "#{ projectOp.add.pathname}"
-			else if projectOp.remove? then "#{ projectOp.remove.pathname}"
-		ctrl.getUserCSSStyle = (user) ->
-			curUserId = user?._id or user?.id
-			hue = ColorManager.getHueForUserId(curUserId) or 100
-			if ctrl.entry.inSelection 
-				color : "#FFF" 
-			else 
-				color: "hsl(#{ hue }, 70%, 50%)"
-		ctrl.$onInit = () ->
-			ctrl.historyEntriesList.onEntryLinked ctrl.entry, $element.find "> .history-entry"
-		return
+], function(App, ColorManager, displayNameForUser) {
+	const historyEntryController = function($scope, $element, $attrs, _) {
+		const ctrl = this;
+		// This method (and maybe the one below) will be removed soon. User details data will be 
+		// injected into the history API responses, so we won't need to fetch user data from other
+		// local data structures.
+		const _getUserById = id =>
+			_.find(ctrl.users, function(user) {
+				const curUserId = (user != null ? user._id : undefined) || (user != null ? user.id : undefined);
+				return curUserId === id;
+			})
+		;
+		ctrl.displayName = displayNameForUser;
+		ctrl.displayNameById = id => displayNameForUser(_getUserById(id));
+		ctrl.getProjectOpDoc = function(projectOp) {
+			if (projectOp.rename != null) { return `${ projectOp.rename.pathname} → ${ projectOp.rename.newPathname }`;
+			} else if (projectOp.add != null) { return `${ projectOp.add.pathname}`;
+			} else if (projectOp.remove != null) { return `${ projectOp.remove.pathname}`; }
+		};
+		ctrl.getUserCSSStyle = function(user) {
+			const curUserId = (user != null ? user._id : undefined) || (user != null ? user.id : undefined);
+			const hue = ColorManager.getHueForUserId(curUserId) || 100;
+			if (ctrl.entry.inSelection) { 
+				return {color : "#FFF"}; 
+			} else { 
+				return {color: `hsl(${ hue }, 70%, 50%)`};
+			}
+		};
+		ctrl.$onInit = () => ctrl.historyEntriesList.onEntryLinked(ctrl.entry, $element.find("> .history-entry"));
+	};
 
-	App.component "historyEntry", {
-		bindings:
-			entry: "<"
-			currentUser: "<"
-			users: "<"
-			onSelect: "&"
+	return App.component("historyEntry", {
+		bindings: {
+			entry: "<",
+			currentUser: "<",
+			users: "<",
+			onSelect: "&",
 			onLabelDelete: "&"
-		require:
+		},
+		require: {
 			historyEntriesList: '^historyEntriesList'
-		controller: historyEntryController
+		},
+		controller: historyEntryController,
 		templateUrl: "historyEntryTpl"
-	}
+	});
+});

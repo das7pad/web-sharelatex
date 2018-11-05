@@ -1,302 +1,347 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS103: Rewrite code to no longer use __guard__
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
 	"base"
-], (App) ->
-	App.controller "FileTreeController", ["$scope", "$modal", "ide", "$rootScope", ($scope, $modal, ide, $rootScope) ->
-		$scope.openNewDocModal = () ->
-			$modal.open(
-				templateUrl: "newFileModalTemplate"
-				controller:  "NewFileModalController"
-				size: 'lg'
+], function(App) {
+	App.controller("FileTreeController", ["$scope", "$modal", "ide", "$rootScope", function($scope, $modal, ide, $rootScope) {
+		$scope.openNewDocModal = () =>
+			$modal.open({
+				templateUrl: "newFileModalTemplate",
+				controller:  "NewFileModalController",
+				size: 'lg',
 				resolve: {
-					parent_folder: () -> ide.fileTreeManager.getCurrentFolder()
-					type: () -> 'doc'
+					parent_folder() { return ide.fileTreeManager.getCurrentFolder(); },
+					type() { return 'doc'; }
 				}
-			)
+			})
+		;
 
-		$scope.openNewFolderModal = () ->
-			$modal.open(
-				templateUrl: "newFolderModalTemplate"
-				controller:  "NewFolderModalController"
+		$scope.openNewFolderModal = () =>
+			$modal.open({
+				templateUrl: "newFolderModalTemplate",
+				controller:  "NewFolderModalController",
 				resolve: {
-					parent_folder: () -> ide.fileTreeManager.getCurrentFolder()
+					parent_folder() { return ide.fileTreeManager.getCurrentFolder(); }
 				}
-			)
+			})
+		;
 
-		$scope.openUploadFileModal = () ->
-			$modal.open(
-				templateUrl: "newFileModalTemplate"
-				controller:  "NewFileModalController"
-				size: 'lg'
+		$scope.openUploadFileModal = () =>
+			$modal.open({
+				templateUrl: "newFileModalTemplate",
+				controller:  "NewFileModalController",
+				size: 'lg',
 				resolve: {
-					parent_folder: () -> ide.fileTreeManager.getCurrentFolder()
-					type: () -> 'upload'
+					parent_folder() { return ide.fileTreeManager.getCurrentFolder(); },
+					type() { return 'upload'; }
 				}
-			)
+			})
+		;
 
-		$scope.orderByFoldersFirst = (entity) ->
-			return '0' if entity?.type == "folder"
-			return '1'
+		$scope.orderByFoldersFirst = function(entity) {
+			if ((entity != null ? entity.type : undefined) === "folder") { return '0'; }
+			return '1';
+		};
 
-		$scope.startRenamingSelected = () ->
-			$scope.$broadcast "rename:selected"
+		$scope.startRenamingSelected = () => $scope.$broadcast("rename:selected");
 
-		$scope.openDeleteModalForSelected = () ->
-			$scope.$broadcast "delete:selected"
-	]
+		return $scope.openDeleteModalForSelected = () => $scope.$broadcast("delete:selected");
+	}
+	]);
 
-	App.controller "NewFolderModalController", [
+	App.controller("NewFolderModalController", [
 		"$scope", "ide", "$modalInstance", "$timeout", "parent_folder",
-		($scope,   ide,   $modalInstance,   $timeout,   parent_folder) ->
+		function($scope,   ide,   $modalInstance,   $timeout,   parent_folder) {
 			$scope.inputs =
-				name: "name"
+				{name: "name"};
 			$scope.state =
-				inflight: false
+				{inflight: false};
 
-			$modalInstance.opened.then () ->
-				$timeout () ->
-					$scope.$broadcast "open"
-				, 200
+			$modalInstance.opened.then(() =>
+				$timeout(() => $scope.$broadcast("open")
+				, 200)
+			);
 
-			$scope.create = () ->
-				name = $scope.inputs.name
-				if !name? or name.length == 0
-					return
-				$scope.state.inflight = true
-				ide.fileTreeManager
+			$scope.create = function() {
+				const { name } = $scope.inputs;
+				if ((name == null) || (name.length === 0)) {
+					return;
+				}
+				$scope.state.inflight = true;
+				return ide.fileTreeManager
 					.createFolder(name, $scope.parent_folder)
-					.then () ->
-						$scope.state.inflight = false
-						$modalInstance.dismiss('done')
-					.catch (response)->
-						{ data } = response
-						$scope.error = data
-						$scope.state.inflight = false
+					.then(function() {
+						$scope.state.inflight = false;
+						return $modalInstance.dismiss('done');}).catch(function(response){
+						const { data } = response;
+						$scope.error = data;
+						return $scope.state.inflight = false;
+				});
+			};
 
-			$scope.cancel = () ->
-				$modalInstance.dismiss('cancel')
-	]
+			return $scope.cancel = () => $modalInstance.dismiss('cancel');
+		}
+	]);
 
-	App.controller "NewFileModalController", [
-		"$scope", "type", "parent_folder", "$modalInstance"
-		($scope,   type,   parent_folder,   $modalInstance) ->
-			$scope.type = type
-			$scope.parent_folder = parent_folder
+	App.controller("NewFileModalController", [
+		"$scope", "type", "parent_folder", "$modalInstance",
+		function($scope,   type,   parent_folder,   $modalInstance) {
+			$scope.type = type;
+			$scope.parent_folder = parent_folder;
 			$scope.state = {
-				inflight: false
+				inflight: false,
 				valid: true
-			}
-			$scope.cancel = () ->
-				$modalInstance.dismiss('cancel')
-			$scope.create = () ->
-				$scope.$broadcast 'create'
-			$scope.$on 'done', () ->
-				$modalInstance.dismiss('done')
-	]
+			};
+			$scope.cancel = () => $modalInstance.dismiss('cancel');
+			$scope.create = () => $scope.$broadcast('create');
+			return $scope.$on('done', () => $modalInstance.dismiss('done'));
+		}
+	]);
 
-	App.controller "NewDocModalController", [
-		"$scope", "ide", "$timeout"
-		($scope,   ide,   $timeout) ->
-			$scope.inputs = 
-				name: "name.tex"
-
-			validate = () ->
-				name = $scope.inputs.name
-				$scope.state.valid = (name? and name.length > 0)
-			$scope.$watch 'inputs.name', validate
-
-			$timeout () ->
-				$scope.$broadcast "open"
-			, 200
-
-			$scope.$on 'create', () ->
-				name = $scope.inputs.name
-				if !name? or name.length == 0
-					return
-				$scope.state.inflight = true
-				ide.fileTreeManager
-					.createDoc(name, $scope.parent_folder)
-					.then () ->
-						$scope.state.inflight = false
-						$scope.$emit 'done'
-					.catch (response)->
-						{ data } = response
-						$scope.error = data
-						$scope.state.inflight = false
-
-	]
-
-	App.controller "UploadFileModalController", [
-		"$scope", "$rootScope", "ide", "$timeout", "$window"
-		($scope,   $rootScope,   ide,   $timeout,   $window) ->
-			$scope.parent_folder_id = $scope.parent_folder?.id
-			$scope.project_id = ide.project_id
-			$scope.tooManyFiles = false
-			$scope.rateLimitHit = false
-			$scope.secondsToRedirect = 10
-			$scope.notLoggedIn = false
-			$scope.conflicts = []
-			$scope.control = {}
-
-			needToLogBackIn = ->
-				$scope.notLoggedIn = true
-				decreseTimeout = ->
-					$timeout (() ->
-						if $scope.secondsToRedirect == 0
-							$window.location.href = "/login?redir=/project/#{ide.project_id}"
-						else
-							decreseTimeout()
-							$scope.secondsToRedirect = $scope.secondsToRedirect - 1
-					), 1000
-
-				decreseTimeout()
-
-			$scope.max_files = 40
-			$scope.onComplete = (error, name, response) ->
-				$timeout (() ->
-					uploadCount--
-					if response.success
-						$rootScope.$broadcast 'file:upload:complete', response
-					if uploadCount == 0 and response? and response.success
-						$scope.$emit 'done'
-				), 250
-
-			$scope.onValidateBatch = (files)->
-				if files.length > $scope.max_files
-					$timeout (() ->
-						$scope.tooManyFiles = true
-					), 1
-					return false
-				else
-					return true
-
-			$scope.onError = (id, name, reason)->
-				console.log(id, name, reason)
-				if reason.indexOf("429") != -1
-					$scope.rateLimitHit = true
-				else if reason.indexOf("403") != -1
-					needToLogBackIn()
-
-			_uploadTimer = null
-			uploadIfNoConflicts = () ->
-				if $scope.conflicts.length == 0
-					$scope.doUpload()
-
-			uploadCount = 0
-			$scope.onSubmit = (id, name) ->
-				uploadCount++
-				if ide.fileTreeManager.existsInFolder($scope.parent_folder_id, name)
-					$scope.conflicts.push name
-					$scope.$apply()
-				if !_uploadTimer?
-					_uploadTimer = setTimeout () ->
-						_uploadTimer = null
-						uploadIfNoConflicts()
-					, 0
-				return true
-			
-			$scope.onCancel = (id, name) ->
-				uploadCount--
-				index = $scope.conflicts.indexOf(name)
-				if index > -1
-					$scope.conflicts.splice(index, 1)
-				$scope.$apply()
-				uploadIfNoConflicts()
-
-			$scope.doUpload = () ->
-				$scope.control?.q?.uploadStoredFiles()
-
-	]
-
-	App.controller "ProjectLinkedFileModalController", [
+	App.controller("NewDocModalController", [
 		"$scope", "ide", "$timeout",
-		($scope,   ide,   $timeout) ->
+		function($scope,   ide,   $timeout) {
+			$scope.inputs = 
+				{name: "name.tex"};
 
-			$scope.data =
-				projects: null # or []
-				selectedProjectId: null
-				projectEntities: null # or []
-				projectOutputFiles: null # or []
-				selectedProjectEntity: null
-				selectedProjectOutputFile: null
-				buildId: null
+			const validate = function() {
+				const { name } = $scope.inputs;
+				return $scope.state.valid = ((name != null) && (name.length > 0));
+			};
+			$scope.$watch('inputs.name', validate);
+
+			$timeout(() => $scope.$broadcast("open")
+			, 200);
+
+			return $scope.$on('create', function() {
+				const { name } = $scope.inputs;
+				if ((name == null) || (name.length === 0)) {
+					return;
+				}
+				$scope.state.inflight = true;
+				return ide.fileTreeManager
+					.createDoc(name, $scope.parent_folder)
+					.then(function() {
+						$scope.state.inflight = false;
+						return $scope.$emit('done');}).catch(function(response){
+						const { data } = response;
+						$scope.error = data;
+						return $scope.state.inflight = false;
+				});
+			});
+		}
+
+	]);
+
+	App.controller("UploadFileModalController", [
+		"$scope", "$rootScope", "ide", "$timeout", "$window",
+		function($scope,   $rootScope,   ide,   $timeout,   $window) {
+			$scope.parent_folder_id = $scope.parent_folder != null ? $scope.parent_folder.id : undefined;
+			$scope.project_id = ide.project_id;
+			$scope.tooManyFiles = false;
+			$scope.rateLimitHit = false;
+			$scope.secondsToRedirect = 10;
+			$scope.notLoggedIn = false;
+			$scope.conflicts = [];
+			$scope.control = {};
+
+			const needToLogBackIn = function() {
+				$scope.notLoggedIn = true;
+				var decreseTimeout = () =>
+					$timeout((function() {
+						if ($scope.secondsToRedirect === 0) {
+							return $window.location.href = `/login?redir=/project/${ide.project_id}`;
+						} else {
+							decreseTimeout();
+							return $scope.secondsToRedirect = $scope.secondsToRedirect - 1;
+						}
+					}), 1000)
+				;
+
+				return decreseTimeout();
+			};
+
+			$scope.max_files = 40;
+			$scope.onComplete = (error, name, response) =>
+				$timeout((function() {
+					uploadCount--;
+					if (response.success) {
+						$rootScope.$broadcast('file:upload:complete', response);
+					}
+					if ((uploadCount === 0) && (response != null) && response.success) {
+						return $scope.$emit('done');
+					}
+				}), 250)
+			;
+
+			$scope.onValidateBatch = function(files){
+				if (files.length > $scope.max_files) {
+					$timeout((() => $scope.tooManyFiles = true), 1);
+					return false;
+				} else {
+					return true;
+				}
+			};
+
+			$scope.onError = function(id, name, reason){
+				console.log(id, name, reason);
+				if (reason.indexOf("429") !== -1) {
+					return $scope.rateLimitHit = true;
+				} else if (reason.indexOf("403") !== -1) {
+					return needToLogBackIn();
+				}
+			};
+
+			let _uploadTimer = null;
+			const uploadIfNoConflicts = function() {
+				if ($scope.conflicts.length === 0) {
+					return $scope.doUpload();
+				}
+			};
+
+			var uploadCount = 0;
+			$scope.onSubmit = function(id, name) {
+				uploadCount++;
+				if (ide.fileTreeManager.existsInFolder($scope.parent_folder_id, name)) {
+					$scope.conflicts.push(name);
+					$scope.$apply();
+				}
+				if ((_uploadTimer == null)) {
+					_uploadTimer = setTimeout(function() {
+						_uploadTimer = null;
+						return uploadIfNoConflicts();
+					}
+					, 0);
+				}
+				return true;
+			};
+			
+			$scope.onCancel = function(id, name) {
+				uploadCount--;
+				const index = $scope.conflicts.indexOf(name);
+				if (index > -1) {
+					$scope.conflicts.splice(index, 1);
+				}
+				$scope.$apply();
+				return uploadIfNoConflicts();
+			};
+
+			return $scope.doUpload = () => __guard__($scope.control != null ? $scope.control.q : undefined, x => x.uploadStoredFiles());
+		}
+
+	]);
+
+	App.controller("ProjectLinkedFileModalController", [
+		"$scope", "ide", "$timeout",
+		function($scope,   ide,   $timeout) {
+
+			$scope.data = {
+				projects: null, // or []
+				selectedProjectId: null,
+				projectEntities: null, // or []
+				projectOutputFiles: null, // or []
+				selectedProjectEntity: null,
+				selectedProjectOutputFile: null,
+				buildId: null,
 				name: null
-			$scope.state.inFlight =
-				projects: false
-				entities: false
+			};
+			$scope.state.inFlight = {
+				projects: false,
+				entities: false,
 				compile: false
-			$scope.state.isOutputFilesMode = false
-			$scope.state.error = false
+			};
+			$scope.state.isOutputFilesMode = false;
+			$scope.state.error = false;
 
-			$scope.$watch 'data.selectedProjectId', (newVal, oldVal) ->
-				return if !newVal
-				$scope.data.selectedProjectEntity = null
-				$scope.data.selectedProjectOutputFile = null
-				if $scope.state.isOutputFilesMode
-					$scope.compileProjectAndGetOutputFiles($scope.data.selectedProjectId)
-				else
-					$scope.getProjectEntities($scope.data.selectedProjectId)
+			$scope.$watch('data.selectedProjectId', function(newVal, oldVal) {
+				if (!newVal) { return; }
+				$scope.data.selectedProjectEntity = null;
+				$scope.data.selectedProjectOutputFile = null;
+				if ($scope.state.isOutputFilesMode) {
+					return $scope.compileProjectAndGetOutputFiles($scope.data.selectedProjectId);
+				} else {
+					return $scope.getProjectEntities($scope.data.selectedProjectId);
+				}
+			});
 
-			$scope.$watch 'state.isOutputFilesMode', (newVal, oldVal) ->
-				return if !newVal and !oldVal
-				$scope.data.selectedProjectOutputFile = null
-				if newVal == true
-					$scope.compileProjectAndGetOutputFiles($scope.data.selectedProjectId)
-				else
-					$scope.getProjectEntities($scope.data.selectedProjectId)
+			$scope.$watch('state.isOutputFilesMode', function(newVal, oldVal) {
+				if (!newVal && !oldVal) { return; }
+				$scope.data.selectedProjectOutputFile = null;
+				if (newVal === true) {
+					return $scope.compileProjectAndGetOutputFiles($scope.data.selectedProjectId);
+				} else {
+					return $scope.getProjectEntities($scope.data.selectedProjectId);
+				}
+			});
 
-			# auto-set filename based on selected file
-			$scope.$watch 'data.selectedProjectEntity', (newVal, oldVal) ->
-				return if !newVal
-				fileName = newVal.split('/').reverse()[0]
-				if fileName
-					$scope.data.name = fileName
+			// auto-set filename based on selected file
+			$scope.$watch('data.selectedProjectEntity', function(newVal, oldVal) {
+				if (!newVal) { return; }
+				const fileName = newVal.split('/').reverse()[0];
+				if (fileName) {
+					return $scope.data.name = fileName;
+				}
+			});
 
-			# auto-set filename based on selected file
-			$scope.$watch 'data.selectedProjectOutputFile', (newVal, oldVal) ->
-				return if !newVal
-				if newVal == 'output.pdf'
-					project = _.find($scope.data.projects, (p) -> p._id == $scope.data.selectedProjectId)
-					$scope.data.name = if project?.name? then "#{project.name}.pdf" else 'output.pdf'
-				else
-					fileName = newVal.split('/').reverse()[0]
-					if fileName
-						$scope.data.name = fileName
+			// auto-set filename based on selected file
+			$scope.$watch('data.selectedProjectOutputFile', function(newVal, oldVal) {
+				if (!newVal) { return; }
+				if (newVal === 'output.pdf') {
+					const project = _.find($scope.data.projects, p => p._id === $scope.data.selectedProjectId);
+					return $scope.data.name = ((project != null ? project.name : undefined) != null) ? `${project.name}.pdf` : 'output.pdf';
+				} else {
+					const fileName = newVal.split('/').reverse()[0];
+					if (fileName) {
+						return $scope.data.name = fileName;
+					}
+				}
+			});
 
-			_setInFlight = (type) ->
-				$scope.state.inFlight[type] = true
+			const _setInFlight = type => $scope.state.inFlight[type] = true;
 
-			_reset = (opts) ->
-				isError = opts.err == true
-				inFlight = $scope.state.inFlight
-				inFlight.projects = inFlight.entities = inFlight.compile = false
-				$scope.state.inflight = false
-				$scope.state.error = isError
+			const _reset = function(opts) {
+				const isError = opts.err === true;
+				const { inFlight } = $scope.state;
+				inFlight.projects = (inFlight.entities = (inFlight.compile = false));
+				$scope.state.inflight = false;
+				return $scope.state.error = isError;
+			};
 
-			$scope.toggleOutputFilesMode = () ->
-				return if !$scope.data.selectedProjectId
-				$scope.state.isOutputFilesMode = !$scope.state.isOutputFilesMode
+			$scope.toggleOutputFilesMode = function() {
+				if (!$scope.data.selectedProjectId) { return; }
+				return $scope.state.isOutputFilesMode = !$scope.state.isOutputFilesMode;
+			};
 
-			$scope.shouldEnableProjectSelect = () ->
-				{ state, data } = $scope
-				return !state.inFlight.projects && data.projects
+			$scope.shouldEnableProjectSelect = function() {
+				const { state, data } = $scope;
+				return !state.inFlight.projects && data.projects;
+			};
 
-			$scope.hasNoProjects = () ->
-				{ state, data } = $scope
-				return !state.inFlight.projects && (data.projects.length == 0 || !data.projects?)
+			$scope.hasNoProjects = function() {
+				const { state, data } = $scope;
+				return !state.inFlight.projects && ((data.projects.length === 0) || (data.projects == null));
+			};
 
-			$scope.shouldEnableProjectEntitySelect = () ->
-				{ state, data } = $scope
-				return !state.inFlight.projects && !state.inFlight.entities && data.projects && data.selectedProjectId
+			$scope.shouldEnableProjectEntitySelect = function() {
+				const { state, data } = $scope;
+				return !state.inFlight.projects && !state.inFlight.entities && data.projects && data.selectedProjectId;
+			};
 
-			$scope.shouldEnableProjectOutputFileSelect = () ->
-				{ state, data } = $scope
-				return !state.inFlight.projects && !state.inFlight.compile && data.projects && data.selectedProjectId
+			$scope.shouldEnableProjectOutputFileSelect = function() {
+				const { state, data } = $scope;
+				return !state.inFlight.projects && !state.inFlight.compile && data.projects && data.selectedProjectId;
+			};
 
 
-			validate = () ->
-				state = $scope.state
-				data = $scope.data
-				$scope.state.valid = !state.inFlight.projects &&
+			const validate = function() {
+				const { state } = $scope;
+				const { data } = $scope;
+				return $scope.state.valid = !state.inFlight.projects &&
 					!state.inFlight.entities &&
 					data.projects &&
 					data.selectedProjectId &&
@@ -312,136 +357,153 @@ define [
 							data.selectedProjectOutputFile
 						)
 					) &&
-					data.name
-			$scope.$watch 'state', validate, true
-			$scope.$watch 'data', validate, true
+					data.name;
+			};
+			$scope.$watch('state', validate, true);
+			$scope.$watch('data', validate, true);
 
-			$scope.getUserProjects = () ->
-				_setInFlight('projects')
-				ide.$http.get("/user/projects", {
+			$scope.getUserProjects = function() {
+				_setInFlight('projects');
+				return ide.$http.get("/user/projects", {
 					_csrf: window.csrfToken
 				})
-				.then (resp) ->
-					$scope.data.projectEntities = null
-					$scope.data.projects = resp.data.projects.filter (p) ->
-						p._id != ide.project_id
-					_reset(err: false)
-				.catch (err) ->
-					_reset(err: true)
+				.then(function(resp) {
+					$scope.data.projectEntities = null;
+					$scope.data.projects = resp.data.projects.filter(p => p._id !== ide.project_id);
+					return _reset({err: false});}).catch(err => _reset({err: true}));
+			};
 
-			$scope.getProjectEntities = (project_id) =>
-				_setInFlight('entities')
-				ide.$http.get("/project/#{project_id}/entities", {
+			$scope.getProjectEntities = project_id => {
+				_setInFlight('entities');
+				return ide.$http.get(`/project/${project_id}/entities`, {
 					_csrf: window.csrfToken
 				})
-				.then (resp) ->
-					if $scope.data.selectedProjectId == resp.data.project_id
-						$scope.data.projectEntities = resp.data.entities
-						_reset(err: false)
-				.catch (err) ->
-					_reset(err: true)
+				.then(function(resp) {
+					if ($scope.data.selectedProjectId === resp.data.project_id) {
+						$scope.data.projectEntities = resp.data.entities;
+						return _reset({err: false});
+					}}).catch(err => _reset({err: true}));
+			};
 
-			$scope.compileProjectAndGetOutputFiles = (project_id) =>
-				_setInFlight('compile')
-				ide.$http.post("/project/#{project_id}/compile", {
+			$scope.compileProjectAndGetOutputFiles = project_id => {
+				_setInFlight('compile');
+				return ide.$http.post(`/project/${project_id}/compile`, {
 					check: "silent",
 					draft: false,
-					incrementalCompilesEnabled: false
+					incrementalCompilesEnabled: false,
 					_csrf: window.csrfToken
 				})
-				.then (resp) ->
-					if resp.data.status == 'success'
-						filteredFiles = resp.data.outputFiles.filter (f) ->
-							f.path.match(/.*\.(pdf|png|jpeg|jpg|gif)/)
-						$scope.data.projectOutputFiles = filteredFiles
-						$scope.data.buildId = filteredFiles?[0]?.build
-						console.log ">> build_id", $scope.data.buildId
-						_reset(err: false)
-					else
-						$scope.data.projectOutputFiles = null
-						_reset(err: true)
-				.catch (err) ->
-					console.error(err)
-					_reset(err: true)
+				.then(function(resp) {
+					if (resp.data.status === 'success') {
+						const filteredFiles = resp.data.outputFiles.filter(f => f.path.match(/.*\.(pdf|png|jpeg|jpg|gif)/));
+						$scope.data.projectOutputFiles = filteredFiles;
+						$scope.data.buildId = __guard__(filteredFiles != null ? filteredFiles[0] : undefined, x => x.build);
+						console.log(">> build_id", $scope.data.buildId);
+						return _reset({err: false});
+					} else {
+						$scope.data.projectOutputFiles = null;
+						return _reset({err: true});
+					}}).catch(function(err) {
+					console.error(err);
+					return _reset({err: true});
+				});
+			};
 
-			$scope.init = () ->
-				$scope.getUserProjects()
-			$timeout($scope.init, 0)
+			$scope.init = () => $scope.getUserProjects();
+			$timeout($scope.init, 0);
 
-			$scope.$on 'create', () ->
-				projectId = $scope.data.selectedProjectId
-				name = $scope.data.name
-				if $scope.state.isOutputFilesMode
-					provider = 'project_output_file'
+			return $scope.$on('create', function() {
+				let payload, provider;
+				const projectId = $scope.data.selectedProjectId;
+				const { name } = $scope.data;
+				if ($scope.state.isOutputFilesMode) {
+					provider = 'project_output_file';
 					payload = {
 						source_project_id: projectId,
 						source_output_file_path: $scope.data.selectedProjectOutputFile,
 						build_id: $scope.data.buildId
-					}
-				else
-					provider = 'project_file'
+					};
+				} else {
+					provider = 'project_file';
 					payload = {
 						source_project_id: projectId,
 						source_entity_path: $scope.data.selectedProjectEntity
-					}
-				_setInFlight('create')
-				ide.fileTreeManager
+					};
+				}
+				_setInFlight('create');
+				return ide.fileTreeManager
 					.createLinkedFile(name, $scope.parent_folder, provider, payload)
-					.then () ->
-						_reset(err: false)
-						$scope.$emit 'done'
-					.catch (response)->
-						{ data } = response
-						_reset(err: true)
+					.then(function() {
+						_reset({err: false});
+						return $scope.$emit('done');}).catch(function(response){
+						const { data } = response;
+						return _reset({err: true});
+				});
+			});
+		}
 
 
-	]
+	]);
 
-	App.controller "UrlLinkedFileModalController", [
-		"$scope", "ide", "$timeout"
-		($scope,   ide,   $timeout) ->
-			$scope.inputs =
-				name: ""
+	return App.controller("UrlLinkedFileModalController", [
+		"$scope", "ide", "$timeout",
+		function($scope,   ide,   $timeout) {
+			$scope.inputs = {
+				name: "",
 				url: ""
-			$scope.nameChangedByUser = false
+			};
+			$scope.nameChangedByUser = false;
 
-			$timeout () ->
-				$scope.$broadcast "open"
-			, 200
+			$timeout(() => $scope.$broadcast("open")
+			, 200);
 
-			validate = () ->
-				{name, url} = $scope.inputs
-				if !name? or name.length == 0
-					$scope.state.valid = false
-				else if !url? or url.length == 0
-					$scope.state.valid = false
-				else
-					$scope.state.valid = true
-			$scope.$watch 'inputs.name', validate
-			$scope.$watch 'inputs.url', validate
+			const validate = function() {
+				const {name, url} = $scope.inputs;
+				if ((name == null) || (name.length === 0)) {
+					return $scope.state.valid = false;
+				} else if ((url == null) || (url.length === 0)) {
+					return $scope.state.valid = false;
+				} else {
+					return $scope.state.valid = true;
+				}
+			};
+			$scope.$watch('inputs.name', validate);
+			$scope.$watch('inputs.url', validate);
 
-			$scope.$watch "inputs.url", (url) ->
-				if url? and url != "" and !$scope.nameChangedByUser
-					url = url.replace("://", "") # Ignore http:// etc
-					parts = url.split("/").reverse()
-					if parts.length > 1 # Wait for at one /
-						$scope.inputs.name = parts[0]
+			$scope.$watch("inputs.url", function(url) {
+				if ((url != null) && (url !== "") && !$scope.nameChangedByUser) {
+					url = url.replace("://", ""); // Ignore http:// etc
+					const parts = url.split("/").reverse();
+					if (parts.length > 1) { // Wait for at one /
+						return $scope.inputs.name = parts[0];
+					}
+				}
+		});
 
-			$scope.$on 'create', () ->
-				{name, url} = $scope.inputs
-				if !name? or name.length == 0
-					return
-				if !url? or url.length == 0
-					return
-				$scope.state.inflight = true
-				ide.fileTreeManager
+			return $scope.$on('create', function() {
+				const {name, url} = $scope.inputs;
+				if ((name == null) || (name.length === 0)) {
+					return;
+				}
+				if ((url == null) || (url.length === 0)) {
+					return;
+				}
+				$scope.state.inflight = true;
+				return ide.fileTreeManager
 					.createLinkedFile(name, $scope.parent_folder, 'url', {url})
-					.then () ->
-						$scope.state.inflight = false
-						$scope.$emit 'done'
-					.catch (response)->
-						{ data } = response
-						$scope.error = data
-						$scope.state.inflight = false
+					.then(function() {
+						$scope.state.inflight = false;
+						return $scope.$emit('done');}).catch(function(response){
+						const { data } = response;
+						$scope.error = data;
+						return $scope.state.inflight = false;
+				});
+			});
+		}
 
-	]
+	]);
+});
+
+function __guard__(value, transform) {
+  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+}
