@@ -1,99 +1,136 @@
-define [
-	"base"
-	"libs/platform"
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS103: Rewrite code to no longer use __guard__
+ * DS205: Consider reworking code to avoid use of IIFEs
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
+	"base",
+	"libs/platform",
 	"services/algolia-search"
-], (App, platform) ->
-	App.controller 'ContactModal', ($scope, $modal) ->
-		# the button to open the support modal / form with affected URL input
-		$scope.contactUsModal = () ->
-			modalInstance = $modal.open(
-				templateUrl: 'contactModalTemplate'
-				controller: 'ContactModalController'
+], function(App, platform) {
+	App.controller('ContactModal', ($scope, $modal) =>
+		// the button to open the support modal / form with affected URL input
+		$scope.contactUsModal = function() {
+			let modalInstance;
+			return modalInstance = $modal.open({
+				templateUrl: 'contactModalTemplate',
+				controller: 'ContactModalController',
 				scope: $scope
-			)
+			});
+		}
+	);
 
-	App.controller 'ContactGeneralModal', ($scope, $modal) ->
-		# the button to open the general modal / form WITHOUT affected URL input
-		$scope.openModal = () ->
-			modalInstance = $modal.open(
-				templateUrl: 'contactGeneralModalTemplate'
+	App.controller('ContactGeneralModal', ($scope, $modal) =>
+		// the button to open the general modal / form WITHOUT affected URL input
+		$scope.openModal = function() {
+			let modalInstance;
+			return modalInstance = $modal.open({
+				templateUrl: 'contactGeneralModalTemplate',
 				controller: 'ContactGeneralModalController'
-			)
+			});
+		}
+	);
 
-	App.controller 'ContactModalController', ($scope, $modalInstance) ->
-		# the modal, which contains a form
+	App.controller('ContactModalController', ($scope, $modalInstance) =>
+		// the modal, which contains a form
 
-		$scope.close = () ->
-			$modalInstance.close()
+		$scope.close = () => $modalInstance.close()
+	);
 
-	App.controller 'ContactGeneralModalController', ($scope, $modalInstance) ->
-		# the modal, which contains a form
+	App.controller('ContactGeneralModalController', ($scope, $modalInstance) =>
+		// the modal, which contains a form
 
-		$scope.close = () ->
-			$modalInstance.close()
+		$scope.close = () => $modalInstance.close()
+	);
 
-	App.controller 'ContactFormController', ($scope, algoliaSearch, event_tracking, $http)->
-		# the form
+	return App.controller('ContactFormController', function($scope, algoliaSearch, event_tracking, $http){
+		// the form
 		$scope.form = {
 			email: ''
-		}
-		$scope.sent = false
-		$scope.sending = false
+		};
+		$scope.sent = false;
+		$scope.sending = false;
 		$scope.suggestions = [];
 
-		_handleSearchResults = (success, results) ->
-			suggestions = for hit in results.hits
-				page_underscored = hit?.pageName?.replace(/\s/g,'_')
-				page_slug = encodeURIComponent(page_underscored)
-				suggestion =
-					url : "/learn/how-to/#{page_slug}"
-					name : hit._highlightResult.pageName.value
+		const _handleSearchResults = function(success, results) {
+			const suggestions = (() => {
+				const result = [];
+				for (let hit of Array.from(results.hits)) {
+					var suggestion;
+					const page_underscored = __guard__(hit != null ? hit.pageName : undefined, x => x.replace(/\s/g,'_'));
+					const page_slug = encodeURIComponent(page_underscored);
+					result.push(suggestion = {
+						url : `/learn/how-to/${page_slug}`,
+						name : hit._highlightResult.pageName.value
+					});
+				}
+				return result;
+			})();
 
-			event_tracking.sendMB "contact-form-suggestions-shown" if results.hits.length
+			if (results.hits.length) { event_tracking.sendMB("contact-form-suggestions-shown"); }
 
-			$scope.$applyAsync () ->
-				$scope.suggestions = suggestions
+			return $scope.$applyAsync(() => $scope.suggestions = suggestions);
+		};
 
-		$scope.contactUs = ->
-			if !$scope.form.email? or $scope.form.email == ""
-				console.log "email not set"
-				return
-			$scope.sending = true
-			ticketNumber = Math.floor((1 + Math.random()) * 0x10000).toString(32)
-			message = $scope.form.message
-			if $scope.form.project_url?
-				message	= "#{message}\n\n project_url = #{$scope.form.project_url}"
-			data =
-				_csrf : window.csrfToken
-				email: $scope.form.email
-				message: message or ""
-				subject: $scope.form.subject + " - [#{ticketNumber}]"
-				labels: "support"
-				inbox: "support"
-				about: "<div>browser: #{platform?.name} #{platform?.version}</div>
-						<div>os: #{platform?.os?.family} #{platform?.os?.version}</div>"
-			request = $http.post "/support", data
-			request.then (response)->
-				$scope.sent = true
-			request.catch ()->
-				$scope.error = true
-				console.log "the request failed"
+		$scope.contactUs = function() {
+			if (($scope.form.email == null) || ($scope.form.email === "")) {
+				console.log("email not set");
+				return;
+			}
+			$scope.sending = true;
+			const ticketNumber = Math.floor((1 + Math.random()) * 0x10000).toString(32);
+			let { message } = $scope.form;
+			if ($scope.form.project_url != null) {
+				message	= `${message}\n\n project_url = ${$scope.form.project_url}`;
+			}
+			const data = {
+				_csrf : window.csrfToken,
+				email: $scope.form.email,
+				message: message || "",
+				subject: $scope.form.subject + ` - [${ticketNumber}]`,
+				labels: "support",
+				inbox: "support",
+				about: `<div>browser: ${(platform != null ? platform.name : undefined)} ${(platform != null ? platform.version : undefined)}</div> \
+<div>os: ${__guard__(platform != null ? platform.os : undefined, x => x.family)} ${__guard__(platform != null ? platform.os : undefined, x1 => x1.version)}</div>`
+			};
+			const request = $http.post("/support", data);
+			request.then(response=> $scope.sent = true);
+			return request.catch(function(){
+				$scope.error = true;
+				return console.log("the request failed");
+			});
+		};
 
-		_deregisterShowSuggestionsWatcher = $scope.$watch "showContactFormSuggestions", (showContactFormSuggestions) ->
-			if showContactFormSuggestions? 
-				if showContactFormSuggestions == true
-					_setupSuggestionsWatcher()
-				_deregisterShowSuggestionsWatcher()
+		var _deregisterShowSuggestionsWatcher = $scope.$watch("showContactFormSuggestions", function(showContactFormSuggestions) {
+			if (showContactFormSuggestions != null) { 
+				if (showContactFormSuggestions === true) {
+					_setupSuggestionsWatcher();
+				}
+				return _deregisterShowSuggestionsWatcher();
+			}
+		});
 	
-		_setupSuggestionsWatcher = () ->
-			$scope.$watch "form.subject", (newVal, oldVal) ->
-				if newVal and newVal != oldVal and newVal.length > 3
-					algoliaSearch.searchKB newVal, _handleSearchResults, {
-						hitsPerPage: 3
+		var _setupSuggestionsWatcher = () =>
+			$scope.$watch("form.subject", function(newVal, oldVal) {
+				if (newVal && (newVal !== oldVal) && (newVal.length > 3)) {
+					return algoliaSearch.searchKB(newVal, _handleSearchResults, {
+						hitsPerPage: 3,
 						typoTolerance: 'strict'
-					}
-				else
-					$scope.suggestions = [];
+					});
+				} else {
+					return $scope.suggestions = [];
+				}
+			})
+		;
 
-		$scope.clickSuggestionLink = (url) ->
-			event_tracking.sendMB "contact-form-suggestions-clicked", { url }
+		return $scope.clickSuggestionLink = url => event_tracking.sendMB("contact-form-suggestions-clicked", { url });
+});
+});
+
+function __guard__(value, transform) {
+  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+}
