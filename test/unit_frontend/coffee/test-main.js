@@ -1,3 +1,8 @@
+/* eslint-disable
+    no-undef,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 // Set up requirejs to load the tests
 // Uses heuristic that test filenames end with Tests.js (existing frontend code)
 // or _tests.js (newer frontend code)
