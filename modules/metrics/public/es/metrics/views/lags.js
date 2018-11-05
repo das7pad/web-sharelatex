@@ -15,26 +15,28 @@ export const LagsView = Backbone.View.extend({
     'click a.lag-option': 'lagClick'
   },
 
-  initialize: function () {
+  initialize: function() {
     this.listenTo(Backbone, 'lag:refresh', this.refresh)
     this.render()
   },
 
-  render: function () {
-    this.$el.html(this.lagsTemplate({
-      selectedLagName: lag.names[lag.selected],
-      lagsMap: lag.mapForTemplate()
-    }))
+  render: function() {
+    this.$el.html(
+      this.lagsTemplate({
+        selectedLagName: lag.names[lag.selected],
+        lagsMap: lag.mapForTemplate()
+      })
+    )
   },
 
-  toggleDropdown: function () {
+  toggleDropdown: function() {
     this.$el.find('.dropdown-menu').toggle()
   },
 
   /**
    * change the selected lag, render the view and trigger a notification
    */
-  lagClick: function (ev) {
+  lagClick: function(ev) {
     var selectedLag = $(ev.currentTarget).data('lag')
     if (includes(lag.keys, selectedLag)) {
       this.switchLag(selectedLag)
@@ -42,7 +44,7 @@ export const LagsView = Backbone.View.extend({
     return false
   },
 
-  switchLag: function (selectedLag) {
+  switchLag: function(selectedLag) {
     if (selectedLag !== lag.selected) {
       lag.selected = selectedLag
       Backbone.trigger('metrics:refresh')
@@ -50,7 +52,7 @@ export const LagsView = Backbone.View.extend({
     this.render()
   },
 
-  refresh: function () {
+  refresh: function() {
     this.render()
   }
 })

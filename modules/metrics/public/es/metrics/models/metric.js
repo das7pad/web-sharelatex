@@ -9,7 +9,7 @@ export const Metric = Backbone.Model.extend({
   /**
    * fetch the metric's data for a given lag
    */
-  fetchData: function () {
+  fetchData: function() {
     var location = this.get('location') || ''
     if (location.length === 0) {
       location = METRICS_ENDPOINT + this.get('path')
@@ -25,13 +25,12 @@ export const Metric = Backbone.Model.extend({
         end_date: metricsApp.router.endDate.unix()
       },
       type: 'GET',
-      success: bind(function (metricData) {
+      success: bind(function(metricData) {
         this.view.renderWithData(metricData.data)
       }, this),
-      error: bind(function () {
+      error: bind(function() {
         this.view.displayErrorOverlay()
       }, this)
     })
   }
-
 })

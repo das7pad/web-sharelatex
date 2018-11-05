@@ -7,7 +7,7 @@ import ScholarOneExport from './scholar_one_export'
 import { findEntryInCategories } from '../utils.js'
 
 export default class GuidePublishModal extends Component {
-  render () {
+  render() {
     const {
       guideId,
       initialEntry,
@@ -18,11 +18,13 @@ export default class GuidePublishModal extends Component {
     } = this.props
 
     var entry, onReturn, returnText
-    if (initialEntry &&
-        guideId === initialEntry.id) {
+    if (initialEntry && guideId === initialEntry.id) {
       entry = initialEntry
-      if (entries.journal && entries.journal.entries.length > 1 &&
-          entries.brand_data.active) {
+      if (
+        entries.journal &&
+        entries.journal.entries.length > 1 &&
+        entries.brand_data.active
+      ) {
         returnText = 'More ' + entries.brand_data.name + ' Journals'
         onReturn = onSwitch
       }
@@ -32,54 +34,64 @@ export default class GuidePublishModal extends Component {
       onReturn = onSwitch
     }
     if (shown === 'guide') {
-      return (<PublishGuide
-        onReturn={onReturn}
-        entry={entry}
-        returnText={returnText}
-        projectId={initParams.projectId}
-      />)
+      return (
+        <PublishGuide
+          onReturn={onReturn}
+          entry={entry}
+          returnText={returnText}
+          projectId={initParams.projectId}
+        />
+      )
     } else if (shown === 'export') {
       if (entry.partner === 'gallery') {
-        return (<GalleryExport
-          onReturn={onReturn}
-          entry={entry}
-          returnText={returnText}
-          projectId={initParams.projectId}
-          firstName={initParams.firstName}
-          lastName={initParams.lastName}
-          title={initParams.title}
-          description={initParams.description}
-          license={initParams.license}
-          showSource={initParams.showSource}
-          hasFolders={initParams.hasFolders}
-        />)
+        return (
+          <GalleryExport
+            onReturn={onReturn}
+            entry={entry}
+            returnText={returnText}
+            projectId={initParams.projectId}
+            firstName={initParams.firstName}
+            lastName={initParams.lastName}
+            title={initParams.title}
+            description={initParams.description}
+            license={initParams.license}
+            showSource={initParams.showSource}
+            hasFolders={initParams.hasFolders}
+          />
+        )
       } else if (entry.partner === 'scholar_one') {
-        return (<ScholarOneExport
-          onReturn={onReturn}
-          entry={entry}
-          returnText={returnText}
-          projectId={initParams.projectId}
-        />)
+        return (
+          <ScholarOneExport
+            onReturn={onReturn}
+            entry={entry}
+            returnText={returnText}
+            projectId={initParams.projectId}
+          />
+        )
       } else {
-        return (<EmisExport
-          onReturn={onReturn}
-          entry={entry}
-          returnText={returnText}
-          projectId={initParams.projectId}
-          firstName={initParams.firstName}
-          lastName={initParams.lastName}
-          hasFolders={initParams.hasFolders}
-        />)
+        return (
+          <EmisExport
+            onReturn={onReturn}
+            entry={entry}
+            returnText={returnText}
+            projectId={initParams.projectId}
+            firstName={initParams.firstName}
+            lastName={initParams.lastName}
+            hasFolders={initParams.hasFolders}
+          />
+        )
       }
     } else if (shown === 'exportGuide') {
-      return (<ExportGuide
-        onReturn={onReturn}
-        entry={entry}
-        returnText={returnText}
-        projectId={initParams.projectId}
-        onSwitch={onSwitch}
-        initParams={initParams}
-      />)
+      return (
+        <ExportGuide
+          onReturn={onReturn}
+          entry={entry}
+          returnText={returnText}
+          projectId={initParams.projectId}
+          onSwitch={onSwitch}
+          initParams={initParams}
+        />
+      )
     } else {
       return null
     }

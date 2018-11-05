@@ -34,7 +34,7 @@
  *
  */
 export default class Mark {
-  constructor (kind, from, contentFrom, contentTo, to, openParent) {
+  constructor(kind, from, contentFrom, contentTo, to, openParent) {
     this.kind = kind
     this.from = from
     this.to = to
@@ -52,7 +52,7 @@ export default class Mark {
    *
    * @return {Mark}
    */
-  copy () {
+  copy() {
     return new Mark(
       this.kind,
       this.from,
@@ -63,19 +63,19 @@ export default class Mark {
     )
   }
 
-  getOuter (cm) {
+  getOuter(cm) {
     return cm.getRange(this.from, this.to)
   }
 
-  getContent (cm) {
+  getContent(cm) {
     return cm.getRange(this.contentFrom, this.contentTo)
   }
 
-  hasContent (cm) {
+  hasContent(cm) {
     return this.getContent(cm).trim().length
   }
 
-  containsCursor (cm, region) {
+  containsCursor(cm, region) {
     var cursor = cm.getCursor('head')
     if (region === 'inner') {
       return _positionInRange(cm, cursor, this.contentFrom, this.contentTo)
@@ -86,7 +86,7 @@ export default class Mark {
     }
   }
 
-  rangeForRegion (region) {
+  rangeForRegion(region) {
     if (region === 'pre') {
       return { from: this.from, to: this.contentFrom }
     } else if (region === 'inner') {
@@ -101,7 +101,7 @@ export default class Mark {
   }
 }
 
-function _positionInRange (cm, position, from, to) {
+function _positionInRange(cm, position, from, to) {
   var positionIndex = cm.indexFromPos(position)
   var rangeFromIndex = cm.indexFromPos(from)
   var rangeToIndex = cm.indexFromPos(to)
@@ -119,18 +119,23 @@ function _positionInRange (cm, position, from, to) {
  * @param {CodeMirror} cm
  * @param {Mark} mark
  */
-export function updateMarkWithClosingPosition (cm, mark) {
+export function updateMarkWithClosingPosition(cm, mark) {
   // Find all of the marks within the document
-  const { state } = cm.getTokenAt({
-    line: cm.lastLine() + 1,
-    ch: 0
-  }, true)
+  const { state } = cm.getTokenAt(
+    {
+      line: cm.lastLine() + 1,
+      ch: 0
+    },
+    true
+  )
 
   // Search through the marks to find the one that matches exactly
-  return _.find(state.marks, (m) => {
-    return m.kind === mark.kind &&
+  return _.find(state.marks, m => {
+    return (
+      m.kind === mark.kind &&
       _.isEqual(m.contentFrom, mark.contentFrom) &&
       _.isEqual(m.from, mark.from)
+    )
   })
 }
 
@@ -140,7 +145,7 @@ export function updateMarkWithClosingPosition (cm, mark) {
  * @param {CodeMirror} cm
  * @param {Mark} mark
  */
-export function removeMark (cm, mark) {
+export function removeMark(cm, mark) {
   cm.operation(() => {
     // replace contentTo -> to
     cm.replaceRange('', mark.contentTo, mark.to)

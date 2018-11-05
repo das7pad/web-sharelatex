@@ -36,11 +36,11 @@ import { makeGroup } from '../utils'
  * markers, to make it more explicit.
  */
 const FormattingMarker = {
-  matcher (cm, sourceMark) {
+  matcher(cm, sourceMark) {
     return sourceMark.kind === 'textbf' || sourceMark.kind === 'textit'
   },
 
-  marker (cm, sourceMark) {
+  marker(cm, sourceMark) {
     const preMark = makeSingleMark(cm, sourceMark, 'pre', true, {
       replacedWith: makeSpan('{', sourceMark.kind)
     })
@@ -58,7 +58,7 @@ const FormattingMarker = {
   }
 }
 
-function makeSpan (text, kind) {
+function makeSpan(text, kind) {
   var el = $('<span>')
     .text(text)
     .addClass(`wl-${kind}-open`)

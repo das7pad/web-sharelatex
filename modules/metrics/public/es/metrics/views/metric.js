@@ -21,7 +21,7 @@ export const MetricView = Backbone.View.extend({
     'click a.metric-refresh': 'refresh'
   },
 
-  initialize: function () {
+  initialize: function() {
     this.listenTo(Backbone, 'metrics:refresh', this.render)
   },
 
@@ -30,7 +30,7 @@ export const MetricView = Backbone.View.extend({
    * displaying the loading view. The render will be called again from the
    * model; once the data has been fetched
    */
-  render: function () {
+  render: function() {
     this.displayLoadingOverlay()
     this.model.fetchData()
     this.renderTemplate()
@@ -38,7 +38,7 @@ export const MetricView = Backbone.View.extend({
     return this
   },
 
-  renderWithData: function (data) {
+  renderWithData: function(data) {
     this.renderTemplate(data)
     this.removeOverlay()
     return this
@@ -49,13 +49,15 @@ export const MetricView = Backbone.View.extend({
    * replacing the whole html for of the chart container would prevent a nice
    * chart update animation
    */
-  renderTemplate: function (chartData) {
+  renderTemplate: function(chartData) {
     if (this.$el.html().length === 0) {
       // render the main template only once
-      this.$el.html(this.template({
-        title: this.model.get('title'),
-        tooltip: this.model.get('tooltip')
-      }))
+      this.$el.html(
+        this.template({
+          title: this.model.get('title'),
+          tooltip: this.model.get('tooltip')
+        })
+      )
     }
 
     // the header & footer are always re-rendered
@@ -70,61 +72,68 @@ export const MetricView = Backbone.View.extend({
   /**
    * render the metric header data (title & lags)
    */
-  renderFooterTemplate: function () {
-    this.$('.metric-footer-container').html(this.footerTemplate({
-      selectedLag: lag.selected
-    }))
+  renderFooterTemplate: function() {
+    this.$('.metric-footer-container').html(
+      this.footerTemplate({
+        selectedLag: lag.selected
+      })
+    )
   },
 
   /**
    * render the chart. Either create or update if it exist already
    */
-  renderChart: function (data) {
+  renderChart: function(data) {
     var $svgElt = this.$('svg')
     var chartArguments = [this.model.get('key')]
     chartArguments = merge(chartArguments, this.model.get('options'))
     chartArguments.push('lag-' + lag.selected)
     var chartOptions = chartApp.getChartOptions.apply(this, chartArguments)
     if (this.chart) {
-      this.chart = chartApp.updateChart($svgElt, data, chartOptions,
-        this.chart)
+      this.chart = chartApp.updateChart($svgElt, data, chartOptions, this.chart)
     } else {
       this.chart = chartApp.addChart($svgElt, data, chartOptions)
     }
   },
 
-  displayLoadingOverlay: function () {
+  displayLoadingOverlay: function() {
     this.$('.metric-overlay-error').hide()
     this.$('.metric-overlay-loading').show()
     this.$('.metric-overlay-backdrop').show()
   },
 
-  displayErrorOverlay: function () {
+  displayErrorOverlay: function() {
     this.$('.metric-overlay-loading').hide()
     this.$('.metric-overlay-error').show()
     this.$('.metric-overlay-backdrop').show()
   },
 
-  removeOverlay: function () {
+  removeOverlay: function() {
     this.$('.metric-overlay-loading').fadeOut('fast')
     this.$('.metric-overlay-error').fadeOut('fast')
     this.$('.metric-overlay-backdrop').fadeOut('fast')
   },
 
-  csvUpdate: function () {
+  csvUpdate: function() {
     var $csvElt = $('#csv')
     if ($csvElt.length === 0) return
 
     var router = metricsApp.router
-    var path = 'resource_id=' + METRICS_RESOURCE_ID +
-      '&resource_type=' + METRICS_RESOURCE_TYPE +
-      '&start_date=' + router.startDate.unix() +
-      '&end_date=' + router.endDate.unix() +
-      '&lag=' + lag.selected
+    var path =
+      'resource_id=' +
+      METRICS_RESOURCE_ID +
+      '&resource_type=' +
+      METRICS_RESOURCE_TYPE +
+      '&start_date=' +
+      router.startDate.unix() +
+      '&end_date=' +
+      router.endDate.unix() +
+      '&lag=' +
+      lag.selected
     $csvElt[0].search = path
   },
 
-  refresh: function () {
+  refresh: function() {
     this.render()
     return false
   }

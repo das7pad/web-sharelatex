@@ -8,16 +8,16 @@ import * as d3 from 'd3'
 /**
  * create the NVD3 chart with the given options
  */
-var createChart = function ($svgElt, options) {
+var createChart = function($svgElt, options) {
   var chart
   switch (options.chartType) {
-    case 'multiBarChart' :
+    case 'multiBarChart':
       chart = nv.models.multiBarChart()
       break
-    case 'lineChart' :
+    case 'lineChart':
       chart = nv.models.lineChart()
       break
-    case 'donutChart' :
+    case 'donutChart':
       chart = nv.models.pieChart().donut(true)
       break
     default:
@@ -45,14 +45,14 @@ var createChart = function ($svgElt, options) {
       // filter the ticks. The filtering rules comes from NVD3's reduceXTicks
       // directive used for multiBarCharts. See
       // https://github.com/novus/nvd3/blob/05cfaafa872ec8f941f7349bcf83fc7d344db857/src/models/multiBarChart.js#L262
-      xAxis.tickValues(function (data) {
+      xAxis.tickValues(function(data) {
         var margin = options.margin.left + options.margin.right
         var availableWidth = $svgElt.width() - margin
         var allValues = data[0].values
-        var values = filter(allValues, function (v, i) {
-          return i % Math.ceil(allValues.length / availableWidth * 100) === 0
+        var values = filter(allValues, function(v, i) {
+          return i % Math.ceil((allValues.length / availableWidth) * 100) === 0
         })
-        return map(values, function (v) {
+        return map(values, function(v) {
           return new Date(v.x)
         })
       })
@@ -68,13 +68,16 @@ var createChart = function ($svgElt, options) {
 
   if (options.customTooltipValue) {
     var contentGenerator = chart.interactiveLayer.tooltip.contentGenerator()
-    chart.interactiveLayer.tooltip.contentGenerator(function (data) {
+    chart.interactiveLayer.tooltip.contentGenerator(function(data) {
       var generatedTooltipHtml = contentGenerator(data)
       var $html = $('<div />', { html: generatedTooltipHtml })
 
-      each(data.series, function (serie, idx) {
+      each(data.series, function(serie, idx) {
         var customValue = options.customTooltipValue(serie)
-        $html.find('.value').eq(idx).text(customValue)
+        $html
+          .find('.value')
+          .eq(idx)
+          .text(customValue)
       })
 
       return $html.html()
@@ -83,7 +86,7 @@ var createChart = function ($svgElt, options) {
 
   // fix header formatting so the date always use the yAxis format
   if (chart.interactiveLayer) {
-    chart.interactiveLayer.tooltip.headerFormatter(function (data) {
+    chart.interactiveLayer.tooltip.headerFormatter(function(data) {
       return options.xAxisFormat(data)
     })
   }
