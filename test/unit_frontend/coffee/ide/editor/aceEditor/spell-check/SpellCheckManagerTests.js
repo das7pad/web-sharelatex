@@ -1,46 +1,57 @@
-define [
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+define([
   'ide/editor/directives/aceEditor/spell-check/SpellCheckManager'
-], (SpellCheckManager) ->
-  describe 'SpellCheckManager', ->
-    beforeEach (done) ->
-      @timelord = sinon.useFakeTimers()
+], SpellCheckManager =>
+  describe('SpellCheckManager', function() {
+    beforeEach(function(done) {
+      this.timelord = sinon.useFakeTimers();
 
-      window.user = { id: 1 }
-      window.csrfToken = 'token'
-      @scope = {
-        $watch: sinon.stub()
-        spellCheck: true
+      window.user = { id: 1 };
+      window.csrfToken = 'token';
+      this.scope = {
+        $watch: sinon.stub(),
+        spellCheck: true,
         spellCheckLanguage: 'en'
-      }
-      @highlightedWordManager = {
-        reset: sinon.stub()
-        clearRow: sinon.stub()
+      };
+      this.highlightedWordManager = {
+        reset: sinon.stub(),
+        clearRow: sinon.stub(),
         addHighlight: sinon.stub()
-      }
-      @adapter = {
-        getLines: sinon.stub()
-        highlightedWordManager: @highlightedWordManager
-      }
-      inject ($q, $http, $httpBackend, $cacheFactory) =>
-        @$http = $http
-        @$q = $q
-        @$httpBackend = $httpBackend
-        cache = $cacheFactory('spellCheckTest', {capacity: 1000})
-        @spellCheckManager = new SpellCheckManager(@scope, cache, $http, $q, @adapter)
-        done()
+      };
+      this.adapter = {
+        getLines: sinon.stub(),
+        highlightedWordManager: this.highlightedWordManager
+      };
+      return inject(($q, $http, $httpBackend, $cacheFactory) => {
+        this.$http = $http;
+        this.$q = $q;
+        this.$httpBackend = $httpBackend;
+        const cache = $cacheFactory('spellCheckTest', {capacity: 1000});
+        this.spellCheckManager = new SpellCheckManager(this.scope, cache, $http, $q, this.adapter);
+        return done();
+      });
+    });
 
-    afterEach ->
-      @timelord.restore()
+    afterEach(function() {
+      return this.timelord.restore();
+    });
 
-    it 'runs a full check soon after init', () ->
-      @$httpBackend.when('POST', '/spelling/check').respond({
+    return it('runs a full check soon after init', function() {
+      this.$httpBackend.when('POST', '/spelling/check').respond({
         misspellings: [{
-          index: 0
+          index: 0,
           suggestions: ['opposition']
         }]
-      })
-      @adapter.getLines.returns(['oppozition'])
-      @spellCheckManager.init()
-      @timelord.tick(200)
-      @$httpBackend.flush()
-      expect(@highlightedWordManager.addHighlight).to.have.been.called
+      });
+      this.adapter.getLines.returns(['oppozition']);
+      this.spellCheckManager.init();
+      this.timelord.tick(200);
+      this.$httpBackend.flush();
+      return expect(this.highlightedWordManager.addHighlight).to.have.been.called;
+    });
+  })
+);

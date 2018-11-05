@@ -1,4 +1,4 @@
-# Stub out some globals
+// Stub out some globals
 window.sharelatex = {
   sixpackDomain: ''
-}
+};
