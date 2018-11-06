@@ -17,40 +17,21 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 define(['base'], function(App) {
-  App.controller('SuccessfulSubscriptionController', function(
-    $scope,
-    sixpack
-  ) {})
-
   const SUBSCRIPTION_URL = '/user/subscription/update'
 
-  const setupReturly = _.once(
-    () =>
-      typeof recurly !== 'undefined' && recurly !== null
-        ? recurly.configure(window.recurlyApiKey)
-        : undefined
-  )
-  const PRICES = {}
-
-  App.controller('CurrenyDropdownController', function(
-    $scope,
-    MultiCurrencyPricing,
-    $q
-  ) {
-    // $scope.plans = MultiCurrencyPricing.plans
-    $scope.currencyCode = MultiCurrencyPricing.currencyCode
-
-    return ($scope.changeCurrency = newCurrency =>
-      (MultiCurrencyPricing.currencyCode = newCurrency))
+  const setupRecurly = _.once(() => {
+    if (!recurly) return
+    recurly.configure(window.recurlyApiKey)
   })
+  const PRICES = {}
 
   App.controller('ChangePlanFormController', function(
     $scope,
     $modal,
     MultiCurrencyPricing
   ) {
-    setupReturly()
-    const { taxRate } = window
+    setupRecurly()
+    const { taxRate } = window.subscription.recurly
 
     $scope.changePlan = () =>
       $modal.open({
@@ -141,7 +122,7 @@ define(['base'], function(App) {
     return ($scope.cancel = () => $modalInstance.dismiss('cancel'))
   })
 
-  return App.controller('UserSubscriptionController', function(
+  App.controller('UserSubscriptionController', function(
     $scope,
     MultiCurrencyPricing,
     $http,
@@ -149,12 +130,15 @@ define(['base'], function(App) {
     $modal
   ) {
     $scope.plans = MultiCurrencyPricing.plans
+    const subscription = window.subscription
+    const taxRate = subscription.recurly.taxRate
+    if (!subscription) {
+      throw new Error(
+        'expected subscription object for UserSubscriptionController'
+      )
+    }
 
-    const freeTrialEndDate = new Date(
-      typeof subscription !== 'undefined' && subscription !== null
-        ? subscription.trial_ends_at
-        : undefined
-    )
+    const freeTrialEndDate = new Date(subscription.trial_ends_at)
 
     const sevenDaysTime = new Date()
     sevenDaysTime.setDate(sevenDaysTime.getDate() + 7)
@@ -163,19 +147,10 @@ define(['base'], function(App) {
     const freeTrialExpiresUnderSevenDays = freeTrialEndDate < sevenDaysTime
 
     $scope.view = 'overview'
-    $scope.getSuffix = planCode =>
-      __guard__(
-        planCode != null ? planCode.match(/(.*?)_(.*)/) : undefined,
-        x => x[2]
-      ) || null
-    $scope.subscriptionSuffix = $scope.getSuffix(
-      __guard__(
-        typeof window !== 'undefined' && window !== null
-          ? window.subscription
-          : undefined,
-        x => x.planCode
-      )
-    )
+    $scope.getSuffix = planCode => {
+      if ((m = planCode.match(/(.*?)_(.*)/))) return m[2]
+    }
+    $scope.subscriptionSuffix = $scope.getSuffix(subscription.plan.planCode)
     if ($scope.subscriptionSuffix === 'free_trial_7_days') {
       $scope.subscriptionSuffix = ''
     }
@@ -183,27 +158,12 @@ define(['base'], function(App) {
       ['heron', 'ibis'].includes($scope.subscriptionSuffix) ||
       subscription.groupPlan
 
-    $scope.shouldShowPlan = function(planCode) {
-      let needle
-      return (
-        (needle = $scope.getSuffix(planCode)),
-        !['heron', 'ibis'].includes(needle)
-      )
-    }
+    $scope.shouldShowPlan = planCode =>
+      !['heron', 'ibis'].includes($scope.getSuffix(planCode))
 
     const isMonthlyCollab =
-      __guard__(
-        typeof subscription !== 'undefined' && subscription !== null
-          ? subscription.planCode
-          : undefined,
-        x1 => x1.indexOf('collaborator')
-      ) !== -1 &&
-      __guard__(
-        typeof subscription !== 'undefined' && subscription !== null
-          ? subscription.planCode
-          : undefined,
-        x2 => x2.indexOf('ann')
-      ) === -1 &&
+      subscription.plan.planCode.indexOf('collaborator') === -1 &&
+      subscription.plan.planCode.indexOf('ann') === -1 &&
       !subscription.groupPlan
     const stillInFreeTrial = freeTrialInFuture && freeTrialExpiresUnderSevenDays
 
@@ -215,7 +175,7 @@ define(['base'], function(App) {
       $scope.showBasicCancel = true
     }
 
-    setupReturly()
+    setupRecurly()
 
     recurly
       .Pricing()

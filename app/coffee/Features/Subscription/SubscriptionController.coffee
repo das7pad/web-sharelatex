@@ -138,11 +138,13 @@ module.exports = SubscriptionController =
 
 	successful_subscription: (req, res, next)->
 		user = AuthenticationController.getSessionUser(req)
-		SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel user, (error, subscription) ->
+		SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel user, (error, {personalSubscription}) ->
 			return next(error) if error?
+			if !personalSubscription?
+				return res.redirect '/user/subscription/plans'
 			res.render "subscriptions/successful_subscription",
 				title: "thank_you"
-				subscription:subscription
+				subscription:personalSubscription
 
 	cancelSubscription: (req, res, next) ->
 		user = AuthenticationController.getSessionUser(req)

@@ -22,21 +22,8 @@ case personalSubscription.recurly.state
 		p !{translate("problem_with_subscription_contact_us")}
 
 include ./_change_plans_mixins
-div(ng-show="changePlan", ng-cloak)#changePlanSection
-	h2.col-md-7 !{translate("change_plan")}
-	span.dropdown.col-md-1.changePlanButton(ng-controller="CurrenyDropdownController", style="display:none", dropdown)
-		a.btn.btn-primary.dropdown-toggle(
-			href="#",
-			data-toggle="dropdown",
-			dropdown-toggle
-		)
-			| {{currencyCode}} ({{plans[currencyCode]['symbol']}})
-		ul.dropdown-menu(role="menu")
-			li(ng-repeat="(currency, value) in plans", dropdown-toggle)
-				a(
-					href,
-					ng-click="changeCurrency(currency)"
-				) {{currency}} ({{value['symbol']}})
+div(ng-show="changePlan", ng-cloak)
+	h2 !{translate("change_plan")}
 	p: table.table
 		tr
 			th !{translate("name")}
@@ -47,32 +34,31 @@ div(ng-show="changePlan", ng-cloak)#changePlanSection
 		+printPlans(plans.individualAnnualPlans)
 
 
-.card(ng-if="view == 'cancelation'")
+.div.alert.alert-info(ng-if="view == 'cancelation'")
 	.page-header
-		h1 #{translate("Cancel Subscription")}
+		strong #{translate("Cancel Subscription")}
 
 	div(ng-show="showExtendFreeTrial", style="text-align: center")
 		p !{translate("have_more_days_to_try", {days:14})}
-		button(type="submit", ng-click="exendTrial()", ng-disabled='inflight').btn.btn-success #{translate("ill_take_it")}
 		p
-			| &nbsp;
+			button(type="submit", ng-click="exendTrial()", ng-disabled='inflight').btn.btn-success #{translate("ill_take_it")}
 		p
 			a(href, ng-click="cancelSubscription()", ng-disabled='inflight') #{translate("no_thanks_cancel_now")}
 
 	div(ng-show="showDowngradeToStudent", style="text-align: center")
-		span(ng-controller="ChangePlanFormController")
+		div(ng-controller="ChangePlanFormController")
 			p !{translate("interested_in_cheaper_plan",{price:'{{studentPrice}}'})}
-			button(type="submit", ng-click="downgradeToStudent()", ng-disabled='inflight').btn.btn-success #{translate("yes_please")}
 			p
-				| &nbsp;
+				button(type="submit", ng-click="downgradeToStudent()", ng-disabled='inflight').btn.btn-info #{translate("yes_please")}
 			p
 				a(href, ng-click="cancelSubscription()", ng-disabled='inflight')  #{translate("no_thanks_cancel_now")}
 
 	div(ng-show="showBasicCancel")
 		p #{translate("sure_you_want_to_cancel")}
-		a(href="/project").btn.btn-info #{translate("i_want_to_stay")}
-		| &nbsp;
-		a(ng-click="cancelSubscription()", ng-disabled='inflight').btn.btn-primary #{translate("cancel_my_account")}
+		p
+			a(href="/project").btn.btn-info #{translate("i_want_to_stay")}
+		p
+			a(ng-click="cancelSubscription()", ng-disabled='inflight').btn.btn-primary #{translate("cancel_my_account")}
 
 script(type="text/javascript").
 	$('#cancelSubscription').on("click", function() {
@@ -95,3 +81,4 @@ script(type='text/ng-template', id='confirmChangePlanModalTemplate')
 		)
 			span(ng-hide="inflight") #{translate("change_plan")}
 			span(ng-show="inflight") #{translate("processing")}...
+

@@ -35,8 +35,7 @@ module.exports =
 				return cb() if !personalSubscription?
 				plan = PlansLocator.findLocalPlanInSettings(personalSubscription.planCode)
 				return cb(new Error("No plan found for planCode '#{personalSubscription.planCode}'")) if !plan?
-				personalSubscription.plan = plan
-				cb()
+				cb(null, plan)
 			]
 			groupSubscriptions: (cb) ->
 				SubscriptionLocator.getMemberSubscriptions user, cb
@@ -46,15 +45,16 @@ module.exports =
 					cb(null, subscriptions)
 		}, (err, results) ->
 			return callback(err) if err?
-			{personalSubscription, groupSubscriptions, v1Subscriptions, recurlySubscription} = results
+			{personalSubscription, groupSubscriptions, v1Subscriptions, recurlySubscription, plan} = results
 			groupSubscriptions ?= []
 			v1Subscriptions ?= []
 
 			if personalSubscription?.toObject?
-				# Downgrade from Mongoose object, so we can add a recurly attribute
+				# Downgrade from Mongoose object, so we can add a recurly and plan attribute
 				personalSubscription = personalSubscription.toObject()
 
-			console.log 'recurlySubscription', recurlySubscription
+			if plan?
+				personalSubscription.plan = plan
 
 			if personalSubscription? and recurlySubscription?
 				tax = recurlySubscription?.tax_in_cents || 0
