@@ -1,13 +1,13 @@
 mixin printPlan(plan)
 	-if (!plan.hideFromUsers)
-		tr(ng-controller="ChangePlanFormController", ng-init="plan="+JSON.stringify(plan), ng-show="shouldShowPlan(plan.planCode)")
+		tr(ng-controller="ChangePlanFormController", ng-init="plan="+JSON.stringify(plan))
 			td
 				strong #{plan.name}
-			td {{refreshPrice(plan.planCode)}}
+			td
 				-if (plan.annual)
-					| {{prices[plan.planCode]}} / #{translate("year")}
+					| {{price}} / #{translate("year")}
 				-else
-					| {{prices[plan.planCode]}} / #{translate("month")}
+					| {{price}} / #{translate("month")}
 			td
 				-if (typeof(personalSubscription.planCode) != "undefined" && plan.planCode == personalSubscription.planCode.split("_")[0])
 					button.btn.disabled #{translate("your_plan")}

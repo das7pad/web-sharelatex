@@ -19,19 +19,17 @@
 define(['base'], function(App) {
   const SUBSCRIPTION_URL = '/user/subscription/update'
 
-  const setupRecurly = _.once(() => {
+  const ensureRecurlyIsSetup = _.once(() => {
     if (!recurly) return
     recurly.configure(window.recurlyApiKey)
   })
-  const PRICES = {}
 
   App.controller('ChangePlanFormController', function(
     $scope,
     $modal,
     MultiCurrencyPricing
   ) {
-    setupRecurly()
-    const { taxRate } = window.subscription.recurly
+    ensureRecurlyIsSetup()
 
     $scope.changePlan = () =>
       $modal.open({
@@ -40,44 +38,28 @@ define(['base'], function(App) {
         scope: $scope
       })
 
-    $scope.$watch(
-      'pricing.currencyCode',
-      () => ($scope.currencyCode = MultiCurrencyPricing.currencyCode)
-    )
-
-    $scope.pricing = MultiCurrencyPricing
-    // $scope.plans = MultiCurrencyPricing.plans
-    $scope.currencySymbol =
-      MultiCurrencyPricing.plans[MultiCurrencyPricing.currencyCode] != null
-        ? MultiCurrencyPricing.plans[MultiCurrencyPricing.currencyCode].symbol
-        : undefined
-
-    $scope.currencyCode = MultiCurrencyPricing.currencyCode
-
-    $scope.prices = PRICES
-    return ($scope.refreshPrice = function(planCode) {
-      let price
-      if ($scope.prices[planCode] != null) {
-        return
-      }
-      $scope.prices[planCode] = '...'
+    $scope.$watch('plan', function(plan) {
+      if (!plan) return
+      // Work out how to display the price for this plan, taking into account
+      // the tax from Recurly
+      const planCode = plan.planCode
+      const { currency, taxRate } = window.subscription.recurly
+      const currencySymbol = MultiCurrencyPricing.plans[currency].symbol
+      $scope.price = '...' // Placeholder while we talk to recurly
       const pricing = recurly.Pricing()
       pricing
         .plan(planCode, { quantity: 1 })
         .currency(MultiCurrencyPricing.currencyCode)
         .done(function(price) {
           const totalPriceExTax = parseFloat(price.next.total)
-          return $scope.$evalAsync(function() {
+          $scope.$evalAsync(function() {
             let taxAmmount = totalPriceExTax * taxRate
             if (isNaN(taxAmmount)) {
               taxAmmount = 0
             }
-            return ($scope.prices[planCode] =
-              $scope.currencySymbol + (totalPriceExTax + taxAmmount))
+            $scope.price = `${currencySymbol}${totalPriceExTax + taxAmmount}`
           })
         })
-
-      return (price = '')
     })
   })
 
@@ -131,38 +113,24 @@ define(['base'], function(App) {
   ) {
     $scope.plans = MultiCurrencyPricing.plans
     const subscription = window.subscription
-    const taxRate = subscription.recurly.taxRate
     if (!subscription) {
       throw new Error(
         'expected subscription object for UserSubscriptionController'
       )
     }
 
-    const freeTrialEndDate = new Date(subscription.trial_ends_at)
+    const taxRate = subscription.recurly.taxRate
 
     const sevenDaysTime = new Date()
     sevenDaysTime.setDate(sevenDaysTime.getDate() + 7)
-
+    const freeTrialEndDate = new Date(subscription.recurly.trial_ends_at)
     const freeTrialInFuture = freeTrialEndDate > new Date()
     const freeTrialExpiresUnderSevenDays = freeTrialEndDate < sevenDaysTime
 
     $scope.view = 'overview'
-    $scope.getSuffix = planCode => {
-      if ((m = planCode.match(/(.*?)_(.*)/))) return m[2]
-    }
-    $scope.subscriptionSuffix = $scope.getSuffix(subscription.plan.planCode)
-    if ($scope.subscriptionSuffix === 'free_trial_7_days') {
-      $scope.subscriptionSuffix = ''
-    }
-    $scope.isNextGenPlan =
-      ['heron', 'ibis'].includes($scope.subscriptionSuffix) ||
-      subscription.groupPlan
-
-    $scope.shouldShowPlan = planCode =>
-      !['heron', 'ibis'].includes($scope.getSuffix(planCode))
 
     const isMonthlyCollab =
-      subscription.plan.planCode.indexOf('collaborator') === -1 &&
+      subscription.plan.planCode.indexOf('collaborator') !== -1 &&
       subscription.plan.planCode.indexOf('ann') === -1 &&
       !subscription.groupPlan
     const stillInFreeTrial = freeTrialInFuture && freeTrialExpiresUnderSevenDays
@@ -175,7 +143,7 @@ define(['base'], function(App) {
       $scope.showBasicCancel = true
     }
 
-    setupRecurly()
+    ensureRecurlyIsSetup()
 
     recurly
       .Pricing()
