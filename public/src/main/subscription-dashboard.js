@@ -10,7 +10,6 @@
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
- * DS103: Rewrite code to no longer use __guard__
  * DS104: Avoid inline assignments
  * DS204: Change includes calls to have a more natural evaluation order
  * DS207: Consider shorter variations of null checks
@@ -24,10 +23,33 @@ define(['base'], function(App) {
     recurly.configure(window.recurlyApiKey)
   })
 
+  App.factory('RecurlyPricing', function($q, MultiCurrencyPricing) {
+    return {
+      loadDisplayPriceWithTax: function(planCode, currency, taxRate) {
+        ensureRecurlyIsSetup()
+        const currencySymbol = MultiCurrencyPricing.plans[currency].symbol
+        const pricing = recurly.Pricing()
+        return $q(function(resolve, reject) {
+          pricing
+            .plan(planCode, { quantity: 1 })
+            .currency(currency)
+            .done(function(price) {
+              const totalPriceExTax = parseFloat(price.next.total)
+              let taxAmmount = totalPriceExTax * taxRate
+              if (isNaN(taxAmmount)) {
+                taxAmmount = 0
+              }
+              resolve(`${currencySymbol}${totalPriceExTax + taxAmmount}`)
+            })
+        })
+      }
+    }
+  })
+
   App.controller('ChangePlanFormController', function(
     $scope,
     $modal,
-    MultiCurrencyPricing
+    RecurlyPricing
   ) {
     ensureRecurlyIsSetup()
 
@@ -40,26 +62,14 @@ define(['base'], function(App) {
 
     $scope.$watch('plan', function(plan) {
       if (!plan) return
-      // Work out how to display the price for this plan, taking into account
-      // the tax from Recurly
       const planCode = plan.planCode
       const { currency, taxRate } = window.subscription.recurly
-      const currencySymbol = MultiCurrencyPricing.plans[currency].symbol
       $scope.price = '...' // Placeholder while we talk to recurly
-      const pricing = recurly.Pricing()
-      pricing
-        .plan(planCode, { quantity: 1 })
-        .currency(MultiCurrencyPricing.currencyCode)
-        .done(function(price) {
-          const totalPriceExTax = parseFloat(price.next.total)
-          $scope.$evalAsync(function() {
-            let taxAmmount = totalPriceExTax * taxRate
-            if (isNaN(taxAmmount)) {
-              taxAmmount = 0
-            }
-            $scope.price = `${currencySymbol}${totalPriceExTax + taxAmmount}`
-          })
-        })
+      RecurlyPricing.loadDisplayPriceWithTax(planCode, currency, taxRate).then(
+        price => {
+          $scope.price = price
+        }
+      )
     })
   })
 
@@ -104,30 +114,40 @@ define(['base'], function(App) {
     return ($scope.cancel = () => $modalInstance.dismiss('cancel'))
   })
 
-  App.controller('UserSubscriptionController', function(
-    $scope,
-    MultiCurrencyPricing,
-    $http,
-    sixpack,
-    $modal
-  ) {
-    $scope.plans = MultiCurrencyPricing.plans
-    const subscription = window.subscription
-    if (!subscription) {
-      throw new Error(
-        'expected subscription object for UserSubscriptionController'
-      )
+  App.controller('GroupMembershipController', function($scope, $modal) {
+    $scope.removeSelfFromGroup = function(admin_id) {
+      $scope.admin_id = admin_id
+      return $modal.open({
+        templateUrl: 'LeaveGroupModalTemplate',
+        controller: 'LeaveGroupModalController',
+        scope: $scope
+      })
+    }
+  })
+
+  App.controller('RecurlySubscriptionController', function($scope) {
+    $scope.switchToCancellationView = () => {
+      $scope.showCancellation = true
+      $scope.showChangePlan = false
     }
 
-    const taxRate = subscription.recurly.taxRate
+    $scope.switchToChangePlanView = () => {
+      $scope.showCancellation = false
+      $scope.showChangePlan = true
+    }
+  })
 
+  App.controller('RecurlyCancellationController', function(
+    $scope,
+    RecurlyPricing,
+    $http
+  ) {
+    const subscription = window.subscription
     const sevenDaysTime = new Date()
     sevenDaysTime.setDate(sevenDaysTime.getDate() + 7)
     const freeTrialEndDate = new Date(subscription.recurly.trial_ends_at)
     const freeTrialInFuture = freeTrialEndDate > new Date()
     const freeTrialExpiresUnderSevenDays = freeTrialEndDate < sevenDaysTime
-
-    $scope.view = 'overview'
 
     const isMonthlyCollab =
       subscription.plan.planCode.indexOf('collaborator') !== -1 &&
@@ -143,25 +163,13 @@ define(['base'], function(App) {
       $scope.showBasicCancel = true
     }
 
-    ensureRecurlyIsSetup()
-
-    recurly
-      .Pricing()
-      .plan('student', { quantity: 1 })
-      .currency(MultiCurrencyPricing.currencyCode)
-      .done(function(price) {
-        const totalPriceExTax = parseFloat(price.next.total)
-        return $scope.$evalAsync(function() {
-          let taxAmmount = totalPriceExTax * taxRate
-          if (isNaN(taxAmmount)) {
-            taxAmmount = 0
-          }
-          $scope.currencySymbol =
-            MultiCurrencyPricing.plans[MultiCurrencyPricing.currencyCode].symbol
-          return ($scope.studentPrice =
-            $scope.currencySymbol + (totalPriceExTax + taxAmmount))
-        })
-      })
+    const { currency, taxRate } = window.subscription.recurly
+    $scope.studentPrice = '...' // Placeholder while we talk to recurly
+    RecurlyPricing.loadDisplayPriceWithTax('student', currency, taxRate).then(
+      price => {
+        $scope.studentPrice = price
+      }
+    )
 
     $scope.downgradeToStudent = function() {
       const body = {
@@ -185,30 +193,13 @@ define(['base'], function(App) {
         .catch(() => console.log('something went wrong changing plan'))
     }
 
-    $scope.removeSelfFromGroup = function(admin_id) {
-      $scope.admin_id = admin_id
-      return $modal.open({
-        templateUrl: 'LeaveGroupModalTemplate',
-        controller: 'LeaveGroupModalController',
-        scope: $scope
-      })
-    }
-
-    $scope.switchToCancelationView = () => ($scope.view = 'cancelation')
-
-    return ($scope.exendTrial = function() {
+    $scope.extendTrial = function() {
       const body = { _csrf: window.csrfToken }
       $scope.inflight = true
       return $http
         .put('/user/subscription/extend', body)
         .then(() => location.reload())
         .catch(() => console.log('something went wrong changing plan'))
-    })
+    }
   })
 })
-
-function __guard__(value, transform) {
-  return typeof value !== 'undefined' && value !== null
-    ? transform(value)
-    : undefined
-}

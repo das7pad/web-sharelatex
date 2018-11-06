@@ -60,7 +60,7 @@ module.exports =
 				tax = recurlySubscription?.tax_in_cents || 0
 				personalSubscription.recurly = {
 					tax: tax
-					taxRate: taxRate:parseFloat(recurlySubscription?.tax_rate?._)
+					taxRate: parseFloat(recurlySubscription?.tax_rate?._)
 					billingDetailsLink: buildBillingDetails(recurlySubscription)
 					price: SubscriptionFormatters.formatPrice (recurlySubscription?.unit_amount_in_cents + tax), recurlySubscription?.currency
 					nextPaymentDueAt: SubscriptionFormatters.formatDate(recurlySubscription?.current_period_ends_at)
