@@ -19,13 +19,16 @@ module.exports = GitBridgeHandler =
 	_checkAccess: (projectId, callback=(err, project)->) ->
 		ProjectGetter.getProjectWithoutDocLines projectId, (err, project) ->
 			return callback(err) if err?
-			ProjectHistoryHandler.ensureHistoryExistsForProject projectId, (err) ->
+			UserGetter.getUser project.owner_ref, {features: 1}, (err, owner) ->
 				return callback(err) if err?
-				UserGetter.getUser project.owner_ref, {features: 1}, (err, owner) ->
-					return callback(err) if err?
-					if !owner.features.gitBridge
-						return callback(new Errors.FeatureNotAvailable('Project owner does not have gitBridge feature'))
-					callback(null, project)
+				if !owner.features.gitBridge
+					return callback(new Errors.FeatureNotAvailable('Project owner does not have gitBridge feature'))
+					if project.overleaf?.history?.id?
+						return callback(null, project)
+					else
+						ProjectHistoryHandler.ensureHistoryExistsForProject projectId, (err) ->
+							return callback(err) if err?
+							callback(null, project)
 
 	getLatestProjectVersion: (userId, projectId, callback=(err, data)->) ->
 		GitBridgeHandler._checkAccess projectId, (err, project) ->
