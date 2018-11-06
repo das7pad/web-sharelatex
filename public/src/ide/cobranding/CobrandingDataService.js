@@ -30,12 +30,32 @@ define(['base'], function(App) {
     const getBrandVariationHomeUrl = () =>
       _cobrandingData != null ? _cobrandingData.home_url : undefined
 
+    const getPublishGuideHtml = () =>
+      _cobrandingData != null ? _cobrandingData.publish_guide_html : undefined
+
+    const getPartner = () =>
+      _cobrandingData != null ? _cobrandingData.partner : undefined
+
+    const hasBrandedMenu = () =>
+      _cobrandingData != null ? _cobrandingData.branded_menu : undefined
+
+    const getBrandId = () =>
+      _cobrandingData != null ? _cobrandingData.brand_id : undefined
+
+    const getBrandVariationId = () =>
+      _cobrandingData != null ? _cobrandingData.id : undefined
+
     return {
       isProjectCobranded,
       getLogoImgUrl,
       getSubmitBtnHtml,
       getBrandVariationName,
-      getBrandVariationHomeUrl
+      getBrandVariationHomeUrl,
+      getPublishGuideHtml,
+      getPartner,
+      hasBrandedMenu,
+      getBrandId,
+      getBrandVariationId
     }
   })
 })

@@ -13,7 +13,7 @@
 define(['base'], App =>
   App.controller(
     'PublishController',
-    ($scope, $modal) =>
+    ($scope, $modal, CobrandingDataService) =>
       ($scope.openPublishProjectModal = function() {
         $modal.open({
           templateUrl: 'publishProjectModalTemplate',
@@ -36,10 +36,20 @@ define(['base'], App =>
             lastName: $scope.user.last_name,
             title: $scope.project.name
           }
+          const publishModalConfig = {
+            isBranded:
+              CobrandingDataService.isProjectCobranded() &&
+              (CobrandingDataService.getPublishGuideHtml() != null ||
+                CobrandingDataService.getPartner() != null),
+            brandedMenu: CobrandingDataService.hasBrandedMenu(),
+            brandId: CobrandingDataService.getBrandId(),
+            brandVariationId: CobrandingDataService.getBrandVariationId(),
+            partner: CobrandingDataService.getPartner()
+          }
           const modalBody = document.getElementsByClassName(
             'modal-body-publish'
           )[0]
-          return pm.init(modalBody, initParams)
+          return pm.init(modalBody, initParams, publishModalConfig)
         })
       })
   ))

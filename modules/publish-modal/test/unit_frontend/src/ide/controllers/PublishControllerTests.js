@@ -16,6 +16,27 @@ define(['ide/publish-modal/controllers/PublishController'], () =>
 
     let origRequireJsFn = null
 
+    const mockedCobrandingDataService = {
+      isProjectCobranded() {
+        return false
+      },
+      getPublishGuideHtml() {
+        return null
+      },
+      getPartner() {
+        return null
+      },
+      hasBrandedMenu() {
+        return null
+      },
+      getBrandId() {
+        return null
+      },
+      getBrandVariationId() {
+        return null
+      }
+    }
+
     beforeEach(function() {
       origRequireJsFn = window.requirejs
       window.requirejs = this.requirejs = sinon.stub()
@@ -35,10 +56,16 @@ define(['ide/publish-modal/controllers/PublishController'], () =>
         init: (publishModalInit = sinon.stub())
       })
       return inject(function($rootScope, $controller) {
-        $rootScope.user = { first_name: 'first name', last_name: 'last name' }
+        $rootScope.user = {
+          first_name: 'first name',
+          last_name: 'last name'
+        }
         $rootScope.pdf = { logEntries: {} }
         $rootScope.project = { name: 'Test project name' }
-        $controller('PublishController', { $scope: $rootScope })
+        $controller('PublishController', {
+          $scope: $rootScope,
+          CobrandingDataService: mockedCobrandingDataService
+        })
 
         $rootScope.openPublishProjectModal()
         return expect(publishModalInit).to.have.been.called
