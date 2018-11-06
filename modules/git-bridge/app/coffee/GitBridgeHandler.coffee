@@ -230,7 +230,7 @@ module.exports = GitBridgeHandler =
 				callback()
 
 	_fileBlobUrl: (hash) ->
-		"#{Settings.siteUrl}/blob/#{hash}"
+		"#{Settings.siteUrl}/history/blob/#{hash}"
 
 	_projectHistoryUrl: (path) ->
 		"#{Settings.apis.project_history.url}#{path}"
