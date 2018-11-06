@@ -123,13 +123,8 @@ module.exports = ProjectImporter =
 			return callback(new UnsupportedBrandError("project has brand variation: #{doc.brand_variation_id}"))
 		if doc.has_export_records? and doc.has_export_records
 			return callback(new UnsupportedExportRecordsError("project has export records"))
-		if doc.title == ""
-			doc.title = "Untitled"
-		if doc.title.indexOf('/') > -1
-			# v2 does not allow / in a project name
-			doc.title = doc.title.replace(/\//g, '-')
-		if doc.title.length > ProjectDetailsHandler.MAX_PROJECT_NAME_LENGTH
-			doc.title = doc.title.substr(0, ProjectDetailsHandler.MAX_PROJECT_NAME_LENGTH)
+		# clean up project name
+		doc.title = ProjectDetailsHandler.fixProjectName(doc.title)
 
 		attributes =
 			overleaf:

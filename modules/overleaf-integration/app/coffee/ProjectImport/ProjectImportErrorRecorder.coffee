@@ -67,6 +67,7 @@ module.exports = ProjectImportErrorRecorder =
 
 			shortNames =
 				'InvalidNameError: Project name cannot not contain / characters': 'invalid-name-slash'
+				'InvalidNameError: Project name cannot contain / characters': 'invalid-name-slash'
 				'InvalidNameError: Project name is too long': 'invalid-name-length'
 				"UnsupportedFileTypeError: expected file.agent to be valid, instead got 'plotly'": 'plotly'
 				"UnsupportedFileTypeError: expected file.agent to be valid, instead got 'zotero'": 'zotero'
@@ -97,6 +98,8 @@ module.exports = ProjectImportErrorRecorder =
 					return 'unsupported-brand'
 				if name?.match(/duplicate key error/)
 					return 'duplicate-key'
+				if name?.match(/InvalidNameError: Project name cannot( not)? contain/)
+					return 'invalid-name-other'
 				return shortNames[name] || shortNames['*']
 
 			# set all the known errors to zero if not present (otherwise gauges stay on their last value)
