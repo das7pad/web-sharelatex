@@ -62,7 +62,7 @@ module.exports = UserAdminController =
 		async.parallel {
 			user: (cb) ->
 				UserGetter.getUser user_id, {
-					_id:1, first_name:1, last_name:1, email:1, betaProgram:1, features: 1, isAdmin: 1, awareOfV2: 1, overleaf: 1, emails: 1, signUpDate:1, loginCount:1, lastLoggedIn:1, lastLoginIp:1
+					_id:1, first_name:1, last_name:1, email:1, betaProgram:1, features: 1, isAdmin: 1, awareOfV2: 1, overleaf: 1, emails: 1, signUpDate:1, loginCount:1, lastLoggedIn:1, lastLoginIp:1, useCollabratecV2: 1
 				}, cb
 			projects: (cb) ->
 				ProjectGetter.findAllUsersProjects user_id, {
@@ -128,7 +128,8 @@ module.exports = UserAdminController =
 		'features.references',
 		'features.referencesSearch',
 		'features.mendeley',
-		'awareOfV2'
+		'awareOfV2',
+		'useCollabratecV2'
 	]
 	SUPER_ADMIN_ALLOWED_ATTRIBUTES: [
 		'isAdmin'
@@ -144,7 +145,8 @@ module.exports = UserAdminController =
 		'features.referencesSearch',
 		'features.mendeley',
 		'awareOfV2',
-		'isAdmin'
+		'isAdmin',
+		'useCollabratecV2'
 	]
 	update: (req, res, next) ->
 		user_id = req.params.user_id

@@ -221,9 +221,19 @@ p
 							ng-model="user.features.mendeley"
 						)
 
-			//- tr
-			//- 	th(colspan=2).text-center Misc.
-			
+				tr
+					th(colspan=2).text-center Experimental Features
+
+				tr
+					td
+						label(for="useCollabratecV2") Use Collabratec V2
+					td
+						input#useCollabratecV2(
+							type="checkbox"
+							name="useCollabratecV2"
+							ng-model="user.useCollabratecV2"
+						)
+
 			//- tr
 			//- 	td
 			//- 		label(for="betaProgram") Beta Program
