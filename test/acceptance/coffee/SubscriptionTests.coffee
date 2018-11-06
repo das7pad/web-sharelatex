@@ -4,8 +4,9 @@ User = require "./helpers/User"
 {Subscription} = require "../../../app/js/models/Subscription"
 
 MockRecurlyApi = require "./helpers/MockRecurlyApi"
+MockV1Api = require "./helpers/MockV1Api"
 
-describe 'Subscriptions', ->
+describe.only 'Subscriptions', ->
 	describe 'dashboard', ->
 		before (done) ->
 			@user = new User()
@@ -106,6 +107,12 @@ describe 'Subscriptions', ->
 						done()
 				return
 
+			after (done) ->
+				Subscription.remove {
+					admin_id: @user._id
+				}, done
+				return
+
 			it 'should return a personalSubscription with no recurly data', ->
 				subscription = @data.personalSubscription
 				expect(subscription).to.exist
@@ -115,7 +122,7 @@ describe 'Subscriptions', ->
 			it 'should return no groupSubscriptions', ->
 				expect(@data.groupSubscriptions).to.deep.equal []
 
-		describe.only 'when the user is a member of a group subscription', ->
+		describe 'when the user is a member of a group subscription', ->
 			before (done) ->
 				@owner1 = new User()
 				@owner2 = new User()
@@ -147,6 +154,16 @@ describe 'Subscriptions', ->
 						done()
 				return
 
+			after (done) ->
+				Subscription.remove {
+					admin_id: @owner1._id
+				}, (error) =>
+					return done(error) if error?
+					Subscription.remove {
+						admin_id: @owner2._id
+					}, done
+				return
+
 			it 'should return no personalSubscription', ->
 				expect(@data.personalSubscription).to.equal null
 
@@ -159,3 +176,34 @@ describe 'Subscriptions', ->
 				expect(
 					@data.groupSubscriptions[1].admin_id._id
 				).to.equal @owner2._id
+
+		describe 'when the user has a v1 subscription', ->
+			before (done) ->
+				MockV1Api.setUser v1Id = MockV1Api.nextV1Id(), {
+					subscription: @subscription = {
+						trial: false,
+						has_plan: true,
+						teams: [{
+							id: 56,
+							name: 'Test team'
+						}]
+					}
+				}
+				@user.setV1Id v1Id, (error) =>
+					return done(error) if error?
+					@user.request {
+						url: '/user/subscription'
+						json: true
+					}, (error, response, @data) =>
+						return done(error) if error?
+						expect(response.statusCode).to.equal 200
+						done()
+
+			it 'should return no personalSubscription', ->
+				expect(@data.personalSubscription).to.equal null
+
+			it 'should return no groupSubscriptions', ->
+				expect(@data.groupSubscriptions).to.deep.equal []
+
+			it 'should return a v1Subscriptions', ->
+				expect(@data.v1Subscriptions).to.deep.equal @subscription
