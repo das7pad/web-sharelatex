@@ -1,6 +1,6 @@
 script(type="text/ng-template", id="groupPlanModalPurchaseTemplate")
 	.modal-header
-		h3 Save money with a group license
+		h3 Save 30% or more money with a group license
 	.modal-body.plans
 		.container-fluid
 			.row
@@ -40,11 +40,13 @@ script(type="text/ng-template", id="groupPlanModalPurchaseTemplate")
 								| Usage
 							select.form-control(ng-model="selected.usage")
 								option(ng-repeat="usage in options.usages", value="{{usage.code}}") {{ usage.display }}
+							p.small.text-center.row-spaced-small(ng-show="selected.usage == 'educational'")
+								| Save an additional 40% on groups of 10 or more with our educational discount
 	.modal-footer
 		.text-center
 			button.btn.btn-primary.btn-lg(ng-click="purchase()") Purchase Now
 			br
 			| or
 			br
-			a(href, ng-click="payByInvoice()") Pay by invoice
+			a(href, ng-click="payByInvoice()") Pay by invoice or VAT invoice
 

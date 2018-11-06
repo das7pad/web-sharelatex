@@ -375,7 +375,7 @@ define(['base', 'libs/recurly-4.8.5'], function(App, recurly) {
       let plan_code, size, usage
       ;({ plan_code, size, usage, currency } = $scope.selected)
       plan_code = `group_${plan_code}_${size}_${usage}`
-      return (window.location = `/user/subscription/new?planCode=${plan_code}&currency=${currency}&svf=true`)
+      return (window.location = `/user/subscription/new?planCode=${plan_code}&currency=${currency}`)
     }
 
     return ($scope.payByInvoice = function() {
