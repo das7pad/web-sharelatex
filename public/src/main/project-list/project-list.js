@@ -531,7 +531,7 @@ define(['base'], function(App) {
         $scope._removeProjectIdsFromTagArray(tag, projectIds)
       }
 
-      for (project of Array.from(projects)) {
+      for (let project of projects) {
         project.tags = []
         if (project.accessLevel === 'owner') {
           project.archived = true
