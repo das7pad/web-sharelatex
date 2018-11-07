@@ -96,8 +96,10 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
 
       $scope.availableCurrencies = {}
       for (let currencyCode in pricing.items.plan.price) {
-        $scope.availableCurrencies[currencyCode] =
-          MultiCurrencyPricing.plans[currencyCode]
+        if (MultiCurrencyPricing.plans[currencyCode]) {
+          $scope.availableCurrencies[currencyCode] =
+            MultiCurrencyPricing.plans[currencyCode]
+        }
       }
 
       if (
