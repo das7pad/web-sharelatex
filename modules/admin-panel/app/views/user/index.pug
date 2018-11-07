@@ -104,7 +104,8 @@ block content
 											span
 												a.userName(href="/admin/user/{{user._id}}") {{user.first_name}}
 										.col-xs-3
-											span.last-loggedin {{user.lastLoggedIn | formatDate}}
+											span.last-loggedin(ng-if="!user.lastLoggedIn") Not set
+											span.last-loggedin(ng-if="user.lastLoggedIn") {{user.lastLoggedIn | formatDate}}
 										.col-xs-2
 											span.owner {{user.loginCount}}
 											
