@@ -1,9 +1,15 @@
 if settings.overleaf
 	a.btn.btn-full-height#publishButton(
-		href,
-		ng-if="permissions.write",
-		ng-click="openPublishProjectModal()",
-		ng-controller="PublishController",
-		)
+		href
+		ng-if="permissions.write"
+		ng-click="openPublishProjectModal()"
+		ng-controller="PublishController"
+	)
 		i.fa.fa-fw.fa-globe
-		p.toolbar-label Submit
+		p.toolbar-label(
+			ng-if="::!(cobranding.isProjectCobranded && cobranding.submitBtnHtml)"
+		) Submit
+		p.toolbar-label.toolbar-label-multiline(
+			ng-if="::(cobranding.isProjectCobranded && cobranding.submitBtnHtml)"
+			ng-bind-html="::cobranding.submitBtnHtml"
+		)
