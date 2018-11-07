@@ -888,9 +888,12 @@ define([
 		<div class="btn-group">
 			<span action="toggleRegexpMode" class="btn btn-default btn-sm" tooltip-placement="bottom" tooltip-append-to-body="true" tooltip="RegExp Search">.*</span>
 			<span action="toggleCaseSensitive" class="btn btn-default btn-sm" tooltip-placement="bottom" tooltip-append-to-body="true" tooltip="CaseSensitive Search">Aa</span>
-			<span action="toggleWholeWords" class="btn btn-default btn-sm" tooltip-placement="bottom" tooltip-append-to-body="true" tooltip="Whole Word Search">"..."</span>
-		</div>
-	</div>
+      <span action="toggleWholeWords" class="btn btn-default btn-sm" tooltip-placement="bottom" tooltip-append-to-body="true" tooltip="Whole Word Search">"..."</span>
+      <span action="searchInSelection" class="btn btn-default btn-sm">S</span>
+    </div>
+    <span class="ace_search_counter"></span>
+  </div>
+  <div action="toggleReplace" class="hidden"></div>
 </div>\
 `
 
