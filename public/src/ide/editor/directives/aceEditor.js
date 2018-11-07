@@ -889,7 +889,7 @@ define([
 			<button action="toggleRegexpMode" class="btn btn-default btn-sm" tooltip-placement="bottom" tooltip-append-to-body="true" tooltip="RegExp Search">.*</button>
 			<button action="toggleCaseSensitive" class="btn btn-default btn-sm" tooltip-placement="bottom" tooltip-append-to-body="true" tooltip="CaseSensitive Search">Aa</button>
 			<button action="toggleWholeWords" class="btn btn-default btn-sm" tooltip-placement="bottom" tooltip-append-to-body="true" tooltip="Whole Word Search">"..."</button>
-			<button action="searchInSelection" class="btn btn-default btn-sm" tooltip-placement="bottom" tooltip-append-to-body="true" tooltip="Search Within Selection">S</button>
+			<button action="searchInSelection" class="btn btn-default btn-sm" tooltip-placement="bottom" tooltip-append-to-body="true" tooltip="Search Within Selection"><i class="fa fa-align-left"></i></button>
 		</div>
 		<span class="ace_search_counter"></span>
 	</div>
