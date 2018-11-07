@@ -886,14 +886,14 @@ define([
 	</div>
 	<div class="ace_search_options">
 		<div class="btn-group">
-			<span action="toggleRegexpMode" class="btn btn-default btn-sm" tooltip-placement="bottom" tooltip-append-to-body="true" tooltip="RegExp Search">.*</span>
-			<span action="toggleCaseSensitive" class="btn btn-default btn-sm" tooltip-placement="bottom" tooltip-append-to-body="true" tooltip="CaseSensitive Search">Aa</span>
-      <span action="toggleWholeWords" class="btn btn-default btn-sm" tooltip-placement="bottom" tooltip-append-to-body="true" tooltip="Whole Word Search">"..."</span>
-      <span action="searchInSelection" class="btn btn-default btn-sm">S</span>
-    </div>
-    <span class="ace_search_counter"></span>
-  </div>
-  <div action="toggleReplace" class="hidden"></div>
+			<button action="toggleRegexpMode" class="btn btn-default btn-sm" tooltip-placement="bottom" tooltip-append-to-body="true" tooltip="RegExp Search">.*</button>
+			<button action="toggleCaseSensitive" class="btn btn-default btn-sm" tooltip-placement="bottom" tooltip-append-to-body="true" tooltip="CaseSensitive Search">Aa</button>
+			<button action="toggleWholeWords" class="btn btn-default btn-sm" tooltip-placement="bottom" tooltip-append-to-body="true" tooltip="Whole Word Search">"..."</button>
+			<button action="searchInSelection" class="btn btn-default btn-sm" tooltip-placement="bottom" tooltip-append-to-body="true" tooltip="Search Within Selection">S</button>
+		</div>
+		<span class="ace_search_counter"></span>
+	</div>
+	<div action="toggleReplace" class="hidden"></div>
 </div>\
 `
 
