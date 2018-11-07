@@ -98,8 +98,6 @@ describe 'ProjectDeleter', ->
 
 	describe "archiveProject", ->
 		beforeEach ->
-			@CollaboratorsHandler.getMemberIds = sinon.stub()
-			@CollaboratorsHandler.getMemberIds.withArgs(@project_id).yields(null, ["member-id-1", "member-id-2"])
 			@Project.update.callsArgWith(2)
 
 		it "should flushProjectToMongoAndDelete in doc updater", (done)->
@@ -114,12 +112,6 @@ describe 'ProjectDeleter', ->
 				}, {
 					$set: { archived: true }
 				}).should.equal true
-				done()
-
-		it "should removeProjectFromAllTags", (done)->
-			@deleter.archiveProject @project_id, =>
-				@TagsHandler.removeProjectFromAllTags.calledWith("member-id-1", @project_id).should.equal true
-				@TagsHandler.removeProjectFromAllTags.calledWith("member-id-2", @project_id).should.equal true
 				done()
 
 	describe "restoreProject", ->
