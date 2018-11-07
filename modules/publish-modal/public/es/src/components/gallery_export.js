@@ -120,16 +120,6 @@ export default class GalleryExport extends Component {
             </p>
           )}
         </div>
-        <input
-          type="submit"
-          className="btn btn-primary"
-          value={'Submit to ' + entry.name}
-        />
-        {!this.state.submissionValid && (
-          <p style={{ color: 'red' }}>
-            Please provide first name, last name, and title before continuing
-          </p>
-        )}
       </form>
     )
   }
