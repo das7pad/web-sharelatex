@@ -1,0 +1,9 @@
+{
+  "globals": {
+    "define": true,
+    "$": true,
+    "angular": true,
+    // Injected in layout.pug
+    "user_id": true
+  }
+}
