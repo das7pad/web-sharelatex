@@ -525,14 +525,7 @@ define(['base'], function(App) {
       $scope.archiveOrLeaveProjects($scope.getSelectedProjects())
 
     $scope.archiveOrLeaveProjects = function(projects) {
-      const projectIds = projects.map(p => p.id)
-      // Remove project from any tags
-      for (tag of Array.from($scope.tags)) {
-        $scope._removeProjectIdsFromTagArray(tag, projectIds)
-      }
-
       for (let project of projects) {
-        project.tags = []
         if (project.accessLevel === 'owner') {
           project.archived = true
           queuedHttp({

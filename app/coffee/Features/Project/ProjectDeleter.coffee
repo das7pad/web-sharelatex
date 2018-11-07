@@ -41,11 +41,6 @@ module.exports = ProjectDeleter =
 			(cb)->
 				documentUpdaterHandler.flushProjectToMongoAndDelete project_id, cb
 			(cb)->
-				CollaboratorsHandler.getMemberIds project_id, (error, member_ids = []) ->
-					for member_id in member_ids
-						tagsHandler.removeProjectFromAllTags member_id, project_id, (err)->
-				cb() #doesn't matter if this fails or the order it happens in
-			(cb)->
 				Project.update {_id:project_id}, { $set: { archived: true }}, cb
 		], (err)->
 			if err?
