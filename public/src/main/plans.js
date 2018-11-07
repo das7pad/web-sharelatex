@@ -1,16 +1,8 @@
 /* eslint-disable
     camelcase,
-    max-len,
-    no-return-assign,
-    no-undef,
+    max-len
 */
-// TODO: This file was created by bulk-decaffeinate.
-// Fix any style issues and re-enable lint.
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
+/* global define,history */
 define(['base', 'libs/recurly-4.8.5'], function(App, recurly) {
   App.factory('MultiCurrencyPricing', function() {
     const currencyCode = window.recomendedCurrency
@@ -222,7 +214,7 @@ define(['base', 'libs/recurly-4.8.5'], function(App, recurly) {
 
     $scope.changeCurreny = function(e, newCurrency) {
       e.preventDefault()
-      return ($scope.currencyCode = newCurrency)
+      $scope.currencyCode = newCurrency
     }
 
     // because ternary logic in angular bindings is hard
@@ -241,29 +233,25 @@ define(['base', 'libs/recurly-4.8.5'], function(App, recurly) {
       }
       plan = eventLabel(plan, location)
       event_tracking.sendMB('plans-page-start-trial')
-      return event_tracking.send(
-        'subscription-funnel',
-        'sign_up_now_button',
-        plan
-      )
+      event_tracking.send('subscription-funnel', 'sign_up_now_button', plan)
     }
 
     $scope.switchToMonthly = function(e, location) {
       const uiView = 'monthly'
       switchEvent(e, uiView + '-prices', location)
-      return ($scope.ui.view = uiView)
+      $scope.ui.view = uiView
     }
 
     $scope.switchToStudent = function(e, location) {
       const uiView = 'student'
       switchEvent(e, uiView + '-prices', location)
-      return ($scope.ui.view = uiView)
+      $scope.ui.view = uiView
     }
 
     $scope.switchToAnnual = function(e, location) {
       const uiView = 'annual'
       switchEvent(e, uiView + '-prices', location)
-      return ($scope.ui.view = uiView)
+      $scope.ui.view = uiView
     }
 
     $scope.openGroupPlanModal = function() {
@@ -280,7 +268,7 @@ define(['base', 'libs/recurly-4.8.5'], function(App, recurly) {
         .result.finally(() =>
           history.replaceState(null, document.title, window.location.pathname)
         )
-      return event_tracking.send(
+      event_tracking.send(
         'subscription-funnel',
         'plans-page',
         'group-inquiry-potential'
@@ -292,17 +280,14 @@ define(['base', 'libs/recurly-4.8.5'], function(App, recurly) {
 
     var eventLabel = (label, location) => label
 
-    return (switchEvent = function(e, label, location) {
+    switchEvent = function(e, label, location) {
       e.preventDefault()
       const gaLabel = eventLabel(label, location)
-      return event_tracking.send('subscription-funnel', 'plans-page', gaLabel)
-    })
+      event_tracking.send('subscription-funnel', 'plans-page', gaLabel)
+    }
   })
 
-  return App.controller('GroupPlansModalPurchaseController', function(
-    $scope,
-    $modal
-  ) {
+  App.controller('GroupPlansModalPurchaseController', function($scope, $modal) {
     $scope.options = {
       plan_codes: [
         {
@@ -361,28 +346,26 @@ define(['base', 'libs/recurly-4.8.5'], function(App, recurly) {
     }
 
     $scope.recalculatePrice = function() {
-      let plan_code, size, usage
-      ;({ usage, plan_code, currency, size } = $scope.selected)
+      let { usage, plan_code, currency, size } = $scope.selected
       const price = $scope.prices[usage][plan_code][currency][size]
       const currencySymbol = $scope.options.currencySymbols[currency]
-      return ($scope.displayPrice = `${currencySymbol}${price}`)
+      $scope.displayPrice = `${currencySymbol}${price}`
     }
 
     $scope.$watch('selected', $scope.recalculatePrice, true)
     $scope.recalculatePrice()
 
     $scope.purchase = function() {
-      let plan_code, size, usage
-      ;({ plan_code, size, usage, currency } = $scope.selected)
+      let { plan_code, size, usage, currency } = $scope.selected
       plan_code = `group_${plan_code}_${size}_${usage}`
-      return (window.location = `/user/subscription/new?planCode=${plan_code}&currency=${currency}`)
+      window.location = `/user/subscription/new?planCode=${plan_code}&currency=${currency}`
     }
 
-    return ($scope.payByInvoice = function() {
+    $scope.payByInvoice = function() {
       $modal.open({
         templateUrl: 'groupPlanModalInquiryTemplate'
       })
-      return $scope.$close()
-    })
+      $scope.$close()
+    }
   })
 })
