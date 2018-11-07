@@ -4,8 +4,6 @@
     no-return-assign
 */
 /* global recurly,_,define */
-// TODO: This file was created by bulk-decaffeinate.
-// Fix any style issues and re-enable lint.
 define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
   App.controller('NewSubscriptionController', function(
     $scope,
