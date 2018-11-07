@@ -1,9 +1,5 @@
 /* eslint-disable
     camelcase,
-    max-len,
-    no-return-assign,
-    no-undef,
-    no-unused-vars,
 */
 // TODO: This file was created by bulk-decaffeinate.
 // Fix any style issues and re-enable lint.
@@ -146,9 +142,9 @@ define(['base'], function(App) {
       $scope.selectedProjects = $scope.projects.filter(
         project => project.selected
       )
-      return ($scope.isArchiveableProjectSelected = $scope.selectedProjects.some(
+      $scope.isArchiveableProjectSelected = $scope.selectedProjects.some(
         project => window.user_id === project.owner._id
-      ))
+      )
     }
 
     $scope.getSelectedProjects = () => $scope.selectedProjects
@@ -282,7 +278,6 @@ define(['base'], function(App) {
       )
 
       // Remove tag from project.tags
-      const remaining_tags = []
       for (project of Array.from(selected_projects)) {
         if (!project.tags) {
           project.tags = []
@@ -441,7 +436,6 @@ define(['base'], function(App) {
         .then(() => (project.name = newName))
 
     $scope.openRenameProjectModal = function() {
-      let modalInstance
       project = $scope.getFirstSelectedProject()
       if (project == null || project.accessLevel !== 'owner') {
         return
@@ -451,7 +445,7 @@ define(['base'], function(App) {
         'project action',
         'Rename'
       )
-      return (modalInstance = $modal.open({
+      $modal.open({
         templateUrl: 'renameProjectModalTemplate',
         controller: 'RenameProjectModalController',
         resolve: {
@@ -460,7 +454,7 @@ define(['base'], function(App) {
           }
         },
         scope: $scope
-      }))
+      })
     }
 
     $scope.cloneProject = function(project, cloneName) {
@@ -491,13 +485,12 @@ define(['base'], function(App) {
     }
 
     $scope.openCloneProjectModal = function() {
-      let modalInstance
       project = $scope.getFirstSelectedProject()
       if (project == null) {
         return
       }
 
-      return (modalInstance = $modal.open({
+      $modal.open({
         templateUrl: 'cloneProjectModalTemplate',
         controller: 'CloneProjectModalController',
         resolve: {
@@ -506,7 +499,7 @@ define(['base'], function(App) {
           }
         },
         scope: $scope
-      }))
+      })
     }
 
     $scope.openArchiveProjectsModal = function() {
@@ -630,11 +623,10 @@ define(['base'], function(App) {
     }
 
     $scope.openUploadProjectModal = function() {
-      let modalInstance
-      return (modalInstance = $modal.open({
+      $modal.open({
         templateUrl: 'uploadProjectModalTemplate',
         controller: 'UploadProjectModalController'
-      }))
+      })
     }
 
     $scope.downloadSelectedProjects = () =>
@@ -733,7 +725,7 @@ define(['base'], function(App) {
         .catch(function(response) {
           const { data, status } = response
           const error = status === 400 ? { message: data } : true
-          const modalInstance = $modal.open({
+          $modal.open({
             templateUrl: 'showErrorModalTemplate',
             controller: 'ShowErrorModalController',
             resolve: {
