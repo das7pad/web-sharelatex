@@ -86,10 +86,9 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
     pricing.on('change', () => {
       $scope.planName = pricing.items.plan.name
       $scope.price = pricing.price
-      $scope.trialLength =
-        pricing.items.plan.trial != null
-          ? pricing.items.plan.trial.length
-          : undefined
+      if (pricing.items.plan.trial) {
+        $scope.trialLength = pricing.items.plan.trial.length
+      }
       $scope.monthlyBilling = pricing.items.plan.period.length === 1
 
       $scope.availableCurrencies = {}
