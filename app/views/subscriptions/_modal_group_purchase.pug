@@ -23,22 +23,22 @@ script(type="text/ng-template", id="groupPlanModalPurchaseTemplate")
 						.form-group
 							label(for='plan_code')
 								| Plan
-							select.form-control(ng-model="selected.plan_code")
+							select.form-control(id="plan_code", ng-model="selected.plan_code")
 								option(ng-repeat="plan_code in options.plan_codes", value="{{plan_code.code}}") {{ plan_code.display }}
 						.form-group
 							label(for='size')
 								| Number of users
-							select.form-control(ng-model="selected.size")
+							select.form-control(id="size", ng-model="selected.size")
 								option(ng-repeat="size in options.sizes", value="{{size}}") {{ size }}
 						.form-group
 							label(for='currency')
 								| Currency
-							select.form-control(ng-model="selected.currency")
+							select.form-control(id="currency", ng-model="selected.currency")
 								option(ng-repeat="currency in options.currencies", value="{{currency.code}}") {{ currency.display }}
 						.form-group
 							label(for='usage')
 								| Usage
-							select.form-control(ng-model="selected.usage")
+							select.form-control(id="usage", ng-model="selected.usage")
 								option(ng-repeat="usage in options.usages", value="{{usage.code}}") {{ usage.display }}
 							p.small.text-center.row-spaced-small(ng-show="selected.usage == 'educational'")
 								| Save an additional 40% on groups of 10 or more with our educational discount
