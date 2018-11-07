@@ -1,6 +1,8 @@
-express = require "express"
 bearerToken = require "express-bearer-token"
 bodyParser = require "body-parser"
+express = require "express"
+fs = require "fs"
+logger = require "logger-sharelatex"
 sinon = require "sinon"
 
 app = express()
@@ -50,6 +52,21 @@ module.exports = MockOverleafApi =
 		app.post "/api/v1/sharelatex/oauth_authorize", (req, res, next) =>
 			return res.json @tokens[req.body.token] if @tokens[req.body.token]?
 			res.status(401).send()
+
+		app.get "/latex/templates/-/valid-template-id", (req, res) ->
+			res.json({
+				pub:
+					doc_id: 11,
+					published_ver_id: 11
+			})
+
+		app.get "/api/v1/sharelatex/templates/11", (req, res, next) ->
+			fs.readFile "#{__dirname}/../../files/test-template.zip", (err, data) ->
+				if err?
+					logger.error { err }, "error reading template file"
+					return res.sendStatus(500) 
+				res.set("Content-Type", "application/zip")
+				res.send(data)
 
 		app.listen 5000, (error) ->
 			throw error if error?

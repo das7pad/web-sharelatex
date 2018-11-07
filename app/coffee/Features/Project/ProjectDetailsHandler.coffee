@@ -1,6 +1,7 @@
 ProjectGetter = require("./ProjectGetter")
 UserGetter = require("../User/UserGetter")
 Project = require('../../models/Project').Project
+ObjectId = require("mongojs").ObjectId
 logger = require("logger-sharelatex")
 tpdsUpdateSender = require '../ThirdPartyDataStore/TpdsUpdateSender'
 _ = require("underscore")
@@ -109,7 +110,7 @@ module.exports = ProjectDetailsHandler =
 			return callback new Errors.InvalidNameError("Project name could not be made unique")
 	
 	fixProjectName: (name) ->
-		if name == ""
+		if name == "" || !name
 			name = "Untitled"
 		if name.indexOf('/') > -1
 			# v2 does not allow / in a project name
@@ -155,3 +156,7 @@ module.exports = ProjectDetailsHandler =
 				Project.update {_id: project_id}, {$set: {tokens: tokens}}, (err) ->
 					return callback(err) if err?
 					callback(null, tokens)
+
+	initializeCollabratecProject: (project_id, name, user_id, collabratec_document_id, collabratec_privategroup_id, callback=(err)->) ->
+		update = $set: { name, collabratecUsers: [ { user_id, collabratec_document_id, collabratec_privategroup_id } ] }
+		Project.update { _id: project_id }, update, callback
