@@ -84,11 +84,9 @@
 						.col-xs-2
 							i.fa.fa-check(ng-if="project.archived")
 						.col-xs-2
-							span.last-modified(ng-if="!project.lastUpdated") Not set
-							span.last-modified(ng-if="project.lastUpdated") {{project.lastUpdated | formatDate}}
+							span.last-modified {{project.lastUpdated | formatDate}}
 						.col-xs-2
-							span.last-modified(ng-if="!project.lastUpdated") Not set
-							span.last-modified(ng-if="project.lastUpdated") {{project.createdAt | formatDate}}
+							span.last-modified {{project.createdAt | formatDate}}
 				li(
 					ng-if="visibleProjects.length == 0",
 					ng-cloak
