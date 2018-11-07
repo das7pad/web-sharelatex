@@ -32,6 +32,7 @@ p
 				td
 					ul(ng-repeat="emailData in user.emails")
 						li {{ emailData.email }} 
+							i.fa.fa-check(ng-if="emailData.confirmedAt") 
 							a.btn.btn-danger.btn-xs(
 								href='#',
 								tooltip-placement="bottom",
