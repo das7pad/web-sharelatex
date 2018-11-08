@@ -17,8 +17,7 @@ mixin contact-form(showAffectedProjectUrl, showContactFormSuggestions = true)
 						autocomplete="off"
 						ng-model="form.subject"
 						ng-model-options="{ updateOn: 'default blur', debounce: {'default': 350, 'blur': 0} }"
-						maxlength='255'
-						onkeyup='')
+						maxlength='255')
 			
 				.contact-suggestions(ng-show="suggestions.length")
 					p.contact-suggestion-label !{translate("kb_suggestions_enquiry", { kbLink: "<a href='/learn/kb' target='_blank'>" + translate("knowledge_base") + "</a>" })}
@@ -44,7 +43,7 @@ mixin contact-form(showAffectedProjectUrl, showContactFormSuggestions = true)
 					label#title12.desc
 						| #{translate("project_url")} (#{translate("optional")})
 					.form-group
-						input.field.text.medium.span8.form-control(ng-model="form.project_url", onkeyup='')
+						input.field.text.medium.span8.form-control(ng-model="form.project_url")
 
 				label.desc
 					| #{translate("contact_message_label")}
@@ -54,8 +53,7 @@ mixin contact-form(showAffectedProjectUrl, showContactFormSuggestions = true)
 						required
 						ng-model="form.message",
 						type='text',
-						value='',
-						onkeyup=''
+						value=''
 					)
 				.form-group.text-center
 					input.btn-success.btn.btn-lg(
