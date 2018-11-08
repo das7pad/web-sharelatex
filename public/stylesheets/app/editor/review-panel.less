@@ -923,6 +923,17 @@
 	}
 }
 
+.cm-editor-wrapper {
+	.track-changes-marker {
+		border-radius: 0;
+		position: absolute;
+	}
+
+	.track-changes-added-marker {
+		background-color: @rp-green;
+	}
+}
+
 .review-icon when (@is-overleaf = false) {
 	display: inline-block;
 	background: url('/img/review-icon-sprite.png') top/30px no-repeat;

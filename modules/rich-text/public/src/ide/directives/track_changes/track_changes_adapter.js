@@ -90,12 +90,18 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
     // @broadcastChange()
 
     onInsertAdded(change) {
-      let position
-      return (position = this.shareJsOffsetToAcePosition(change.op.p))
+      let start, end
+      start = this.shareJsOffsetToAcePosition(change.op.p)
+      end = this.shareJsOffsetToAcePosition(change.op.p + change.op.i.length)
+      this.cm.doc.markText(
+        { line: start.row, ch: start.column },
+        { line: end.row, ch: end.column },
+        { className: 'track-changes-marker track-changes-added-marker' }
+      )
+
+      // callout_marker_id = @createCalloutMarker(start, "track-changes-added-marker-callout")
+      // @changeIdToMarkerIdMap[change.id] = { background_marker_id, callout_marker_id }
     }
-    // cm.addWidget(pos: position, node: Element, scrollIntoView: boolean)
-    // callout_marker_id = @createCalloutMarker(start, "track-changes-added-marker-callout")
-    // @changeIdToMarkerIdMap[change.id] = { background_marker_id, callout_marker_id }
 
     shareJsOffsetToAcePosition(offset) {
       const lines = this.getAllLines()
