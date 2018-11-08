@@ -28,7 +28,7 @@ describe "GitBridgeHandler", ->
 
 	describe "_formatGitBridgeSnapshot", ->
 		beforeEach ->
-			@Settings.siteUrl = 'http://example.com' 
+			@Settings.apis = {v1_history: {url: 'http://example.com'}}
 			@rawData = {
 				projectId: @projectId,
 				files: {
