@@ -4,6 +4,9 @@ else
 	include ./_personal_subscription_custom
 
 if(personalSubscription.groupPlan)
+	hr
+	p
+		| You are the manager of a group subscription
 	p
 		a(href="/subscription/group").btn.btn-success !{translate("manage_group")}
 

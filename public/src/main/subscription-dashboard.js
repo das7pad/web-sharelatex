@@ -126,6 +126,14 @@ define(['base'], function(App) {
   })
 
   App.controller('RecurlySubscriptionController', function($scope) {
+    $scope.showChangePlanButton = !subscription.groupPlan
+
+    $scope.switchToDefaultView = () => {
+      $scope.showCancellation = false
+      $scope.showChangePlan = false
+    }
+    $scope.switchToDefaultView()
+
     $scope.switchToCancellationView = () => {
       $scope.showCancellation = true
       $scope.showChangePlan = false

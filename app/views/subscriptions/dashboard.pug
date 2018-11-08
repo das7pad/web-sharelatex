@@ -22,6 +22,6 @@ block content
 							include ./dashboard/_v1_subscriptions
 
 						-if (!hasAnySubscription)
-							p You're on the Overleaf Free plan.
+							p You're on the #{settings.appName} Free plan.
 							|
-							a(href="/user/subscription/plans") Click here to upgrade.
+							a(href="/user/subscription/plans").btn.btn-primary Upgrade now
