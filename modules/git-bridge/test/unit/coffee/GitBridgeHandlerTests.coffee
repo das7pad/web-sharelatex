@@ -55,7 +55,7 @@ describe "GitBridgeHandler", ->
 						["some content or whatever", "main.tex"]
 					],
 					atts: [
-						["http://example.com/history/blob/b2c3cc5be", "things/other.png"]
+						["http://example.com/blobs/b2c3cc5be/content", "things/other.png"]
 					]
 				}
 				done()
