@@ -25,6 +25,7 @@ module.exports = MockRecurlyApi =
 					<current_period_ends_at type="datetime">#{subscription.current_period_ends_at}</current_period_ends_at>
 					<unit_amount_in_cents type="integer">#{subscription.unit_amount_in_cents}</unit_amount_in_cents>
 					<account href="accounts/#{subscription.account_id}" />
+					<trial_ends_at type="datetime">#{subscription.trial_ends_at}</trial_ends_at>
 				</subscription>
 				"""
 

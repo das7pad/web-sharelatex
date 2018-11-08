@@ -22,7 +22,7 @@ buildBillingDetails = (recurlySubscription) ->
 		].join("")
 
 module.exports =
-	buildUsersSubscriptionViewModel: (user, callback = (error, subscription, memberSubscriptions, billingDetailsLink) ->) ->
+	buildUsersSubscriptionViewModel: (user, callback = (error, data) ->) ->
 		async.auto {
 			personalSubscription: (cb) ->
 				SubscriptionLocator.getUsersSubscription user, cb

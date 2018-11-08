@@ -2,24 +2,21 @@ expect = require('chai').expect
 async = require("async")
 User = require "./helpers/User"
 {Subscription} = require "../../../app/js/models/Subscription"
+SubscriptionViewModelBuilder = require "../../../app/js/Features/Subscription/SubscriptionViewModelBuilder"
 
 MockRecurlyApi = require "./helpers/MockRecurlyApi"
 MockV1Api = require "./helpers/MockV1Api"
 
-describe.only 'Subscriptions', ->
+describe 'Subscriptions', ->
 	describe 'dashboard', ->
 		before (done) ->
 			@user = new User()
-			@user.login done
+			@user.ensureUserExists done
 
 		describe 'when the user has no subscription', ->
 			before (done) ->
-				@user.request {
-					url: '/user/subscription'
-					json: true
-				}, (error, response, @data) =>
+				SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel @user, (error, @data) =>
 					return done(error) if error?
-					expect(response.statusCode).to.equal 200
 					done()
 
 			it 'should return no personalSubscription', ->
@@ -44,7 +41,8 @@ describe.only 'Subscriptions', ->
 					currency: 'GBP',
 					current_period_ends_at: new Date(2018,4,5),
 					state: 'active',
-					account_id: 'mock-account-id'
+					account_id: 'mock-account-id',
+					trial_ends_at: new Date(2018, 6, 7)
 				}
 				Subscription.create {
 					admin_id: @user._id,
@@ -53,12 +51,8 @@ describe.only 'Subscriptions', ->
 					planCode: 'collaborator'
 				}, (error) =>
 					return done(error) if error?
-					@user.request {
-						url: '/user/subscription'
-						json: true
-					}, (error, response, @data) =>
+					SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel @user, (error, @data) =>
 						return done(error) if error?
-						expect(response.statusCode).to.equal 200
 						done()
 				return
 
@@ -82,9 +76,8 @@ describe.only 'Subscriptions', ->
 					"price": "£6.00"
 					"state": "active"
 					"tax": 100
-					"taxRate": {
-						"taxRate": 0.2
-					}
+					"taxRate": 0.2
+					"trial_ends_at": new Date(2018, 6, 7)
 				}
 
 			it 'should return no groupSubscriptions', ->
@@ -98,12 +91,8 @@ describe.only 'Subscriptions', ->
 					planCode: 'collaborator'
 				}, (error) =>
 					return done(error) if error?
-					@user.request {
-						url: '/user/subscription'
-						json: true
-					}, (error, response, @data) =>
+					SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel @user, (error, @data) =>
 						return done(error) if error?
-						expect(response.statusCode).to.equal 200
 						done()
 				return
 
@@ -145,12 +134,8 @@ describe.only 'Subscriptions', ->
 						}, cb
 				], (error) =>				
 					return done(error) if error?
-					@user.request {
-						url: '/user/subscription'
-						json: true
-					}, (error, response, @data) =>
+					SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel @user, (error, @data) =>
 						return done(error) if error?
-						expect(response.statusCode).to.equal 200
 						done()
 				return
 
@@ -171,10 +156,10 @@ describe.only 'Subscriptions', ->
 				expect(@data.groupSubscriptions.length).to.equal 2
 				expect(
 					# Mongoose populates the admin_id with the user
-					@data.groupSubscriptions[0].admin_id._id
+					@data.groupSubscriptions[0].admin_id._id.toString()
 				).to.equal @owner1._id
 				expect(
-					@data.groupSubscriptions[1].admin_id._id
+					@data.groupSubscriptions[1].admin_id._id.toString()
 				).to.equal @owner2._id
 
 		describe 'when the user has a v1 subscription', ->
@@ -191,12 +176,8 @@ describe.only 'Subscriptions', ->
 				}
 				@user.setV1Id v1Id, (error) =>
 					return done(error) if error?
-					@user.request {
-						url: '/user/subscription'
-						json: true
-					}, (error, response, @data) =>
+					SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel @user, (error, @data) =>
 						return done(error) if error?
-						expect(response.statusCode).to.equal 200
 						done()
 
 			it 'should return no personalSubscription', ->
