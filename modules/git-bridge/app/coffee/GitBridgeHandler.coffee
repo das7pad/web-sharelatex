@@ -170,8 +170,9 @@ module.exports = GitBridgeHandler =
 		changeEntities = []
 		ProjectEntityHandler.getAllEntitiesFromProject project, (err, docs, files) ->
 			return callback(err) if err?
+			snapshotPaths = new Set(snapshotFiles.map (sf) => "/#{sf.name}")
 			for entity in docs.concat(files)
-				if !_.find(snapshotFiles, (sf) -> "/#{sf.name}" == entity.path)
+				if !snapshotPaths.has(entity.path)
 					deleteEntities.push {path: entity.path}
 			for file in snapshotFiles
 				if file.url?
