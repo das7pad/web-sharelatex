@@ -101,23 +101,7 @@ module.exports = SubscriptionController =
 				personalSubscription: personalSubscription
 				groupSubscriptions: groupSubscriptions
 				v1Subscriptions: v1Subscriptions
-			if req.headers.accept?.match 'application/json'
-				# Used for acceptance testing
-				res.json data
-			else
-				res.render "subscriptions/dashboard", data
-
-	userCustomSubscriptionPage: (req, res, next)->
-		user = AuthenticationController.getSessionUser(req)
-		LimitationsManager.hasPaidSubscription user, (err, hasPaidSubscription, subscription)->
-			return next(err) if err?
-			if !subscription?
-				err = new Error("subscription null for custom account, user:#{user?._id}")
-				logger.warn err:err, "subscription is null for custom accounts page"
-				return next(err)
-			res.render "subscriptions/custom_account",
-				title: "your_subscription"
-				subscription: subscription
+			res.render "subscriptions/dashboard", data
 
 	createSubscription: (req, res, next)->
 		user = AuthenticationController.getSessionUser(req)
