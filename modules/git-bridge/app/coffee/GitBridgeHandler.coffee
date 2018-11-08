@@ -16,22 +16,24 @@ Async = require 'async'
 
 module.exports = GitBridgeHandler =
 
-	_checkAccess: (projectId, callback=(err, project)->) ->
+	_checkAccess: (userId, projectId, callback=(err, project)->) ->
 		ProjectGetter.getProjectWithoutDocLines projectId, (err, project) ->
 			return callback(err) if err?
 			UserGetter.getUser project.owner_ref, {features: 1}, (err, owner) ->
 				return callback(err) if err?
-				if !owner.features.gitBridge
-					return callback(new Errors.FeatureNotAvailable('Project owner does not have gitBridge feature'))
-				if project.overleaf?.history?.id?
-					return callback(null, project)
-				else
-					ProjectHistoryHandler.ensureHistoryExistsForProject projectId, (err) ->
-						return callback(err) if err?
-						callback(null, project)
+				UserGetter.getUser userId, {features: 1}, (err, user) ->
+					return callback(err) if err?
+					if !(owner.features.gitBridge || user.features.gitBridge)
+						return callback(new Errors.FeatureNotAvailable('Neither user nor has gitBridge feature'))
+					if project.overleaf?.history?.id?
+						return callback(null, project)
+					else
+						ProjectHistoryHandler.ensureHistoryExistsForProject projectId, (err) ->
+							return callback(err) if err?
+							callback(null, project)
 
 	getLatestProjectVersion: (userId, projectId, callback=(err, data)->) ->
-		GitBridgeHandler._checkAccess projectId, (err, project) ->
+		GitBridgeHandler._checkAccess userId, projectId, (err, project) ->
 			return callback(err) if err?
 			request.get {
 				url: GitBridgeHandler._projectHistoryUrl("/project/#{projectId}/version"),
@@ -54,7 +56,7 @@ module.exports = GitBridgeHandler =
 				callback(null, data)
 
 	showSnapshot: (userId, projectId, version, callback=(err, data)->) ->
-		GitBridgeHandler._checkAccess projectId, (err, project) ->
+		GitBridgeHandler._checkAccess userId, projectId, (err, project) ->
 			return callback(err) if err?
 			request.get {
 				url: GitBridgeHandler._projectHistoryUrl("/project/#{projectId}/version/#{version}"),
@@ -91,7 +93,7 @@ module.exports = GitBridgeHandler =
 		callback(null, {srcs, atts})
 
 	applySnapshotToProject: (userId, projectId, snapshot, callback=(err)->) ->
-		GitBridgeHandler._checkAccess projectId, (err) ->
+		GitBridgeHandler._checkAccess userId, projectId, (err) ->
 			return callback(err) if err?
 			ProjectGetter.getProject projectId, (err, project) ->
 				return callback(err) if err?
