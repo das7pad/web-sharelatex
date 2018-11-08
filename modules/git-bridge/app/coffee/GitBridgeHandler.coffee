@@ -19,11 +19,13 @@ module.exports = GitBridgeHandler =
 	_checkAccess: (userId, projectId, callback=(err, project)->) ->
 		ProjectGetter.getProjectWithoutDocLines projectId, (err, project) ->
 			return callback(err) if err?
-			UserGetter.getUser project.owner_ref, {features: 1}, (err, owner) ->
+			_userCanAccess = (u) ->
+				u?.features?.gitBridge && u.isAdmin
+			UserGetter.getUser project.owner_ref, {}, (err, owner) ->
 				return callback(err) if err?
-				UserGetter.getUser userId, {features: 1}, (err, user) ->
+				UserGetter.getUser userId, {}, (err, user) ->
 					return callback(err) if err?
-					if !(owner.features.gitBridge || user.features.gitBridge)
+					if !(_userCanAccess(owner) || _userCanAccess(user))
 						return callback(new Errors.FeatureNotAvailable('Neither user nor has gitBridge feature'))
 					if project.overleaf?.history?.id?
 						return callback(null, project)
