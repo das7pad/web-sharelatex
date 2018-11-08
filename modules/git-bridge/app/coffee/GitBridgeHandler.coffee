@@ -154,7 +154,7 @@ module.exports = GitBridgeHandler =
 		for file in (snapshot.files or [])
 			if !file.name?
 				return callback(new Errors.InvalidFileError("file object has no name"))
-			name = file.name.trim()
+			name = file.name
 			if !EditorHttpController._nameIsAcceptableLength(name)
 				err = new Errors.InvalidFileError("file name is not acceptible length: #{name}")
 				logger.err {err, projectId: project._id}, "[GitBridgeHandler] #{err.message}"

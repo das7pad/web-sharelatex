@@ -77,7 +77,7 @@ describe "GitBridgeHandler", ->
 			@snapshot = {
 				files: [
 					{
-						name: 'one.tex  ', # spaces are deliberate
+						name: 'one.tex', # spaces are deliberate
 						url: 'http://example.com/one'
 					},
 					{
