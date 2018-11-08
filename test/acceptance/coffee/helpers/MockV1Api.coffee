@@ -5,7 +5,7 @@ sinon = require 'sinon'
 
 app.use(bodyParser.json())
 
-v1Id = 1
+v1Id = 1000
 
 module.exports = MockV1Api =
 	nextV1Id: -> v1Id++
