@@ -6,7 +6,9 @@ script(type='text/ng-template', id='contactModalTemplate')
 			type="button"
 			data-dismiss="modal"
 			ng-click="close()"
-		) &times;
+			aria-label="Close"
+		)
+			span(aria-hidden) &times;
 		h3 #{translate("contact_us")}
 	.modal-body.contact-us-modal
 		+contact-form(true)
