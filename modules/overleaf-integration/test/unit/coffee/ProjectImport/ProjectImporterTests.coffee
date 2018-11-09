@@ -205,17 +205,19 @@ describe "ProjectImporter", ->
 					done()
 
 		describe "with brand variation", ->
-			it "should allow projects from the overleaf brand variation to be imported", (done) ->
-				@doc.brand_variation_id = 52
-				@ProjectImporter._initSharelatexProject @user_id, @doc, (error, project_id) ->
+			it "should set brandVariationId", (done) ->
+				@doc.brand_variation_id = 123
+				@ProjectImporter._initSharelatexProject @user_id, @doc, (error, project_id) =>
 					expect(error).to.equal(null)
 					expect(project_id).to.not.be.undefined
-					done()
-
-			it "should prevent import", (done) ->
-				@doc.brand_variation_id = 123
-				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
-					error.message.should.equal("project has brand variation: 123")
+					# Creates project with brandVariationId = 123
+					expect(
+						@ProjectCreationHandler
+							.createBlankProject
+							.firstCall
+							.args[2]
+							.brandVariationId
+					).to.equal 123
 					done()
 
 		describe "with export records", ->
