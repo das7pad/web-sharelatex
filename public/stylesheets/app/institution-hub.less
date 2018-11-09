@@ -1,0 +1,83 @@
+#institution-hub {
+  .section_header {
+    .dropdown {
+      margin-right: 10px;
+    }
+  }
+  .print-button {
+    margin-right: 10px;
+    font-size: 20px;
+  }
+
+  #usage {
+    .recent-activity {
+      .overbox {
+        font-size: 16px;
+      }
+      .hub-big-number, .hub-number-label, .worked-on {
+        display: block;
+        width: 50%;
+      }
+      .hub-big-number {
+        padding-right: 10px;
+        text-align: right;
+      }
+      .hub-number-label, .worked-on {
+        float: right;
+      }
+      .hub-number-label {
+        &:nth-child(odd) {
+          margin-top: 16px;
+        }
+      }
+      .worked-on {
+        color: @text-small-color;
+        font-style: italic;
+      }
+    }
+  }
+
+  #training, #marketing {
+    .admin-materials {
+      &:not(:first-child) {
+        margin-top: 10px;
+      }
+      .admin-materials-item {
+        text-align: center;
+        a {
+          display: inline-block;
+          .wl-icon {
+            display: block;
+            @include wl-icon-size(36px);
+            margin-bottom: 10px;
+          }
+          .item-label {
+            word-wrap: break-word;
+          }
+        }
+      }
+    }
+  }
+
+  #administration {
+    ul {
+      list-style: none;
+      display: block;
+      li {
+        padding-bottom: 10px;
+      }
+      .wl-icon {
+        margin-right: 10px;
+        vertical-align: top;
+      }
+    }
+  }
+}
+
+body.print-loading {
+  #team-hub {
+    .admin-item {
+      opacity: 0.5;
+    }
+  }
+}
