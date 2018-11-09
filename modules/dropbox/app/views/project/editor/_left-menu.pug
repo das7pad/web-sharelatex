@@ -26,10 +26,12 @@ script(type="text/ng-template", id="dropboxModalTemplate")
 					| #{translate("refresh_page_after_starting_free_trial")}
 
 
-			div(ng-show="dbState.hasDropboxFeature && dbState.userIsLinkedToDropbox")
-				p.small
+			div(ng-show="dbState.userIsLinkedToDropbox")
+				p.small(ng-if="isProjectMember()")
 					| #{translate("this_project_will_appear_in_your_dropbox_folder_at")}
-					strong apps/sharelatex/{{ project.name }}
+					strong Apps/Overleaf/{{ project.name }}
+				p.small(ng-if="!isProjectMember()")
+					| #{translate("dropbox_for_link_share_projs")}
 					
 			div(ng-hide="dbState.hasDropboxFeature")
 				h4.teaser-title Easily manage your project files, everywhere
