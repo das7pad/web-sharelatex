@@ -15,10 +15,7 @@ block content
 					.row.cta-links
 						.col-md-12
 							if link_to_template
-								if brand_variation_id
-									a(ng-click="openViewInV1Modal()" class="btn btn-success cta-link") Open as Template
-								else
-									a(href=open_in_v2_links.main.v2 class="btn btn-success cta-link") Open as Template
+								a(href=open_in_v2_links.main.v2 class="btn btn-success cta-link") Open as Template
 							if link_to_show_source
 								a(href, ng-click="openViewSourceModal()" class="btn btn-success cta-link") View Source
 							if pub.pdf_url
@@ -82,8 +79,5 @@ block content
 
 	if link_to_show_source
 		include _show_source_modal.pug
-
-	if link_to_template
-		include _link_to_template_modal.pug
 
 	script(src=mathJaxPath)
