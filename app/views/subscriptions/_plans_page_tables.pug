@@ -32,9 +32,11 @@ mixin table_premium
 						if feature.value == 'str'
 							| #{plan}
 						else if plan
-							i.fa.fa-check
+							i.fa.fa-check(aria-hidden)
+							span.sr-only Feature included
 						else
-							i.fa.fa-times
+							i.fa.fa-times(aria-hidden)
+							span.sr-only Feature not included
 
 		tr
 			td
