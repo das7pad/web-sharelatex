@@ -4,7 +4,6 @@ ProjectImportErrorRecorder = require "./ProjectImportErrorRecorder"
 AuthenticationController = require "../../../../../app/js/Features/Authentication/AuthenticationController"
 {
 	UnsupportedFileTypeError,
-	UnsupportedBrandError,
 	UnsupportedExportRecordsError
 	InvalidNameError
 } = require "../../../../../app/js/Features/Errors/Errors"
@@ -35,8 +34,6 @@ module.exports = ProjectImportController =
 				recordFailure(null)
 			if error instanceof UnsupportedFileTypeError
 				unsupportedError("Sorry! Projects with linked or external files aren't fully supported yet.")
-			else if error instanceof UnsupportedBrandError
-				unsupportedError("Sorry! Projects with associated journals aren't supported yet.")
 			else if error instanceof UnsupportedExportRecordsError
 				unsupportedError("Sorry! Projects with an ongoing export aren't supported yet.")
 			else if error instanceof V2ExportInProgress
