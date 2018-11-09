@@ -31,7 +31,7 @@ mixin quote(fields)
 			.row
 				if fields.picture
 					.col-sm-3
-						img(src=fields.picture.fields.file.url class="img-circle pull-right" alt="fields.picture.fields.title")
+						img(src=fields.picture.fields.file.url class="img-circle pull-right" alt=fields.picture.fields.title)
 				div(class=fields.picture ? "col-sm-9" : "col-sm-12")
 					blockquote !{fields.quote}
 						if fields.person || fields.position
@@ -46,7 +46,7 @@ mixin quote(fields)
 			blockquote !{fields.quote}
 		.col-sm-3.quote-full-width
 			if fields.picture
-				img(src=fields.picture.fields.file.url class="img-circle pull-left")
+				img(src=fields.picture.fields.file.url class="img-circle pull-left" alt=fields.picture.fields.title)
 			if fields.person
 				h5.quote-by #{fields.person}
 			if fields.position
