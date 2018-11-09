@@ -4,6 +4,7 @@ logger = require "logger-sharelatex"
 V1LoginController = require "../V1Login/V1LoginController"
 V1LoginHandler = require "../V1Login/V1LoginHandler"
 EmailHelper = require "../../../../../app/js/Features/Helpers/EmailHelper"
+ReferalAllocator = require "../../../../../app/js/Features/Referal/ReferalAllocator"
 
 module.exports = SSOController =
 	authInit: (req, res, next) ->
@@ -51,7 +52,10 @@ module.exports = SSOController =
 				return SSOController._renderError(req, res, "registration_error")
 			if created
 				delete req.session.sso_user
-				V1LoginController._login(profile, req, res, next)
+				# We don't want to do anything with the result of this as the user has already signed up successfully.
+				# ReferalAllocator.allocate will log if something goes wrong.
+				ReferalAllocator.allocate req.session.referal_id, sso_user._id, req.session.referal_source, req.session.referal_medium, () ->
+					V1LoginController._login(profile, req, res, next)
 			else if profile?.email?
 				return SSOController._renderError(req, res, "email_already_registered")
 			else
