@@ -5,10 +5,4 @@ define(['base'], App =>
         templateUrl: 'viewSourceModalTemplate'
       })
     }
-
-    $scope.openViewInV1Modal = function() {
-      $modal.open({
-        templateUrl: 'viewInV1ModalTemplate'
-      })
-    }
   }))
