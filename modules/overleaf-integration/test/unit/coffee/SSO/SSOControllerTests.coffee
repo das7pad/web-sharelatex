@@ -16,6 +16,9 @@ describe "SSOController", ->
 			"../V1Login/V1LoginHandler":
 				@V1LoginHandler = {}
 			"logger-sharelatex": { log: sinon.stub(), err: sinon.stub() }
+			"../../../../../app/js/Features/Referal/ReferalAllocator":
+				@ReferalAllocator =
+					allocate: sinon.stub().callsArg(4)
 		@SSOController._renderError = sinon.stub()
 		@req = {
 			session: {}
@@ -150,6 +153,9 @@ describe "SSOController", ->
 
 			it "should clear sso_user from session", ->
 				expect(@req.session.sso_user).to.be.undefined
+
+			it "should record a referral", ->
+				expect(@ReferalAllocator.allocate).to.have.been.called
 
 		describe "when error occurs", ->
 			beforeEach ->	
