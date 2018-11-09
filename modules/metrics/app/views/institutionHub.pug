@@ -1,0 +1,21 @@
+extends ../../../../app/views/layout
+
+block content
+	.content.content-alt
+		#hub.container
+			#hub-header.row
+				.col-lg-8
+					.section_header
+						h2(style="text-transform: capitalize") #{institutionName} Administrator Hub
+
+					span.dropdown(dropdown)
+						a.dropdown-toggle(href, dropdown-toggle)
+							i.fa.fa-chevron-down
+						ul.dropdown-menu
+							if portalSlug
+								li
+									a(href="/edu/" + portalSlug) Portal
+							li
+								a(href="/metrics/institutions/" + institutionId) Metrics
+
+

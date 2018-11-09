@@ -1,5 +1,6 @@
 logger = require 'logger-sharelatex'
 MetricsController = require './MetricsController'
+HubsController = require './HubsController'
 AnalyticsController = require("../../../../app/js/Features/Analytics/AnalyticsController")
 AuthenticationController = require("../../../../app/js/Features/Authentication/AuthenticationController")
 AuthorizationMiddlewear = require('../../../../app/js/Features/Authorization/AuthorizationMiddlewear')
@@ -42,6 +43,12 @@ module.exports =
 					req.query.resource_id
 				)(req, res, next)
 			MetricsController.analyticsProxy
+		)
+
+		webRouter.get(
+			'/institutions/:id/hub',
+			UserMembershipAuthorization.requireEntityAccess('institution'),
+			HubsController.institutionHub
 		)
 
 		privateApiRouter.get(
