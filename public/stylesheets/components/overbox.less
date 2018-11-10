@@ -1,0 +1,128 @@
+/* overbox: white box with shadow borders */
+.overbox {
+  margin: 0;
+  padding: 40px 20px;
+  background: @white;
+  border: 1px solid @gray-light;
+  .box {
+    padding-bottom: 30px;
+    overflow: hidden;
+    margin-bottom: 40px;
+    border-bottom: 1px solid rgb(216, 216, 216);
+
+    .header {
+      margin-bottom: 20px;
+
+      h4 {
+        font-size: 19px;
+        margin: 0;
+      }
+    }
+
+    .menu {
+      list-style-type: none;
+      margin-left: 0px;
+      padding: 0 0 0 15px;
+
+      ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+
+        li {
+          margin-bottom: 6px;
+
+          a {
+            color: @gray-dark;
+            font-size: 14px;
+            -webkit-transition: color .2s;
+            -moz-transition: color .2s;
+            -ms-transition: color .2s;
+            transition: color .2s;
+
+            &:hover {
+              color: @accent-color-secondary;
+            }
+          }
+        }
+      }
+    }
+
+    .start {
+      p {
+        &.medium {
+          padding-top: 20px;
+          font-size: 18px;
+        }
+        &.small {
+          padding-top: 10px;
+          font-size: 14px;
+        }
+      }
+    }
+
+    &.indent {
+      padding-left: 20px;
+    }
+  }
+
+  .no-border {
+    border: 0 none;
+    margin-bottom: 0;
+  }
+
+  .last {
+    border: 0 none;
+    padding: 0;
+    margin-bottom: 0;
+  }
+
+  &.overbox-small {
+    padding: 10px;
+  }
+  &.overbox-no-padding {
+    padding: 0;
+  }
+  &.overbox-wide {
+    float: right;
+    width: 100%;
+  }
+}
+
+@media (min-width: 992px) and (max-width: 1199px) {
+  .sidebar {
+    padding-left: 25px;
+    padding-right: 25px;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  .overbox {
+    .box {
+      .start {
+        p {
+          font-size: 21px;
+          &.small {
+            font-size: 12px;
+          }
+        }
+        a {
+          font-size: 14px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .sidebar {
+    display: none;
+  }
+
+  .helper {
+    a {
+      margin-top: 7px;
+      margin-bottom: 7px;
+    }
+  }
+}

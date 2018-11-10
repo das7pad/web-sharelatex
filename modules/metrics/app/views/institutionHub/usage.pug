@@ -7,11 +7,20 @@ p.hub-metric-link
 	h5 In the past month
 	.row
 		.col-xs-12
-			.overbox.hub-circle
+			.hub-circle
 				span.hub-circle-number #{usageData.count}
 				|signups
 
-if recent_activity
+if recentActivity
 	.admin-sub-item.recent-activity
 		h5 Recent activity
-			.row.overbox.overbox-small
+		.row.overbox.overbox-small
+			each activity in recentActivity
+				.col-xs-4
+					h6 #{activity.title}
+					span.hub-big-number #{activity.users}
+					span.number-label users
+					span.worked-on worked on
+					span.hub-big-number #{activity.docs}
+					span.hub-number-label projects
+
