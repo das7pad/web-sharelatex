@@ -31,7 +31,7 @@ module.exports = HubsController =
 					json: true
 				}, (err, response, body)->
 					if !err && response.statusCode == 200
-						recentActivity = HubsController._format_recent_activity(body)
+						recentActivity = HubsController._formatRecentActivity(body)
 					else
 						recentActivity = []
 					res.render Path.resolve(__dirname, '../views/institutionHub.pug'), {
@@ -47,16 +47,31 @@ module.exports = HubsController =
 		)
 
 	institutionExternalCollaboration: (req, res, next) ->
-		id = req.entity.v1Id
-		url = "#{settings.apis.v1.url}/api/v2/institutions/#{id}/external_collaboration_data"
-		request.get({
-			url: url,
-			auth: { user: settings.apis.v1.user, pass: settings.apis.v1.pass }
-    }, (err, response, body)->
+		HubsController._v1InstitutionsApi(req, 'external_collaboration_data', (err, response, body)->
 			res.send(body)
 		)
 
-	_format_recent_activity: (data) ->
+	institutionDepartments: (req, res, next) ->
+		HubsController._v1InstitutionsApi(req, 'departments', (err, response, body)->
+			res.send(body)
+		)
+
+	institutionRoles: (req, res, next) ->
+		HubsController._v1InstitutionsApi(req, 'roles', (err, response, body)->
+			res.send(body)
+		)
+
+	_v1InstitutionsApi: (req, endpoint, callback) ->
+		id = req.entity.v1Id
+		url = "#{settings.apis.v1.url}/api/v2/institutions/#{id}/#{endpoint}"
+		request.get({
+			url: url,
+			auth: { user: settings.apis.v1.user, pass: settings.apis.v1.pass }
+		}, (err, response, body)->
+			callback(err, response, body)
+		)
+
+	_formatRecentActivity: (data) ->
 		recentActivity = []
 		if data['month']['users'] + data['month']['projects'] == 0
 			return recentActivity
@@ -67,7 +82,6 @@ module.exports = HubsController =
 				users: data[lag]['users'],
 				docs: data[lag]['projects']
 			)
-		console.log(recentActivity)
 		return recentActivity
 
 	_signupData: (id, callback) ->

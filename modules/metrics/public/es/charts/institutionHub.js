@@ -4,8 +4,9 @@ import chartInitializer from './chartInitializer'
 
 const institutionHub = {
   getDataAndInitCharts: () => {
-    console.log("initting the charts!")
     chartInitializer.getDataAndInitChart($('#v2-external-collaboration-chart'));
+    chartInitializer.getDataAndInitChart($('#institutional-departments-chart'));
+    chartInitializer.getDataAndInitChart($('#institutional-roles-chart'));
   }
 }
 

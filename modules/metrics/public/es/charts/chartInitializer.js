@@ -7,8 +7,6 @@ var svgNS = 'http://www.w3.org/2000/svg';
 
 var chartInitializer = {
   getDataAndInitChart: function($chartElt) {
-    console.log($chartElt)
-    console.log($chartElt.data('url'))
     if($chartElt.length !== 1) {
       return
     }

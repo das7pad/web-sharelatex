@@ -4,7 +4,7 @@ block content
 	.content.content-alt
 		#institution-hub.container
 			.row
-				.col-lg-9
+				.col-lg-12
 					.hub-header
 						span.dropdown(dropdown)
 							a.dropdown-toggle(href, dropdown-toggle)
@@ -18,7 +18,7 @@ block content
 
 						h2(style="text-transform: capitalize") #{institutionName} &mdash; Administrator Hub
 			.row
-				.col-lg-9
+				.col-lg-12
 					.admin-item#usage
 						.section-title
 							h3 Usage
@@ -27,6 +27,10 @@ block content
 						.section-title
 							h3 Collaboration
 						include institutionHub/collaboration
+					.admin-item#distribution
+						.section-title
+							h3 Distribution
+						include institutionHub/distribution
 
 block requirejs
 	script(
@@ -36,8 +40,27 @@ block requirejs
 
 	script(type="text/javascript").
 		$(function() {
-			console.log("running the function")
 			Frontend.metrics.chartApp.init();
 			Frontend.metrics.institutionHub.getDataAndInitCharts();
 		})
 
+	script(type='text/javascript').
+		// minimal requirejs configuration (can be extended/overridden)
+		window.requirejs = {
+			"paths" : {
+				"moment": "libs/#{lib('moment')}",
+				"fineuploader": "libs/#{lib('fineuploader')}",
+				"main": "#{buildJsPath('main.js', {hashedPath:settings.useMinifiedJs, removeExtension:true})}",
+				"libraries": "#{buildJsPath('libraries.js', {hashedPath:settings.useMinifiedJs, removeExtension:true})}",
+			},
+			"config":{
+				"moment":{
+					"noGlobal": true
+				}
+			}
+		}
+	script(
+		data-main=buildJsPath('main.js', {hashedPath:false}),
+		baseurl=fullJsPath,
+		src=buildJsPath('libs/require.js', {hashedPath:true})
+	)
