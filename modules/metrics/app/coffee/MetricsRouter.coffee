@@ -51,6 +51,12 @@ module.exports =
 			HubsController.institutionHub
 		)
 
+		webRouter.get(
+			'/institutions/:id/externalCollaboration',
+			UserMembershipAuthorization.requireEntityAccess('institution'),
+			HubsController.institutionExternalCollaboration
+		)
+
 		privateApiRouter.get(
 			'/user/:user_id/v1/metrics_segmentation',
 			AuthenticationController.httpAuth,

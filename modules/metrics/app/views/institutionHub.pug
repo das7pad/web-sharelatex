@@ -23,7 +23,21 @@ block content
 						.section-title
 							h3 Usage
 						include institutionHub/usage
-					.admin-item
+					.admin-item#collaboration
 						.section-title
 							h3 Collaboration
 						include institutionHub/collaboration
+
+block requirejs
+	script(
+			src=buildWebpackPath('es/metrics.js', {hashedPath:settings.useMinifiedJs})
+			type="text/javascript"
+		)
+
+	script(type="text/javascript").
+		$(function() {
+			console.log("running the function")
+			Frontend.metrics.chartApp.init();
+			Frontend.metrics.institutionHub.getDataAndInitCharts();
+		})
+

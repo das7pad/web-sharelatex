@@ -46,6 +46,16 @@ module.exports = HubsController =
 			)
 		)
 
+	institutionExternalCollaboration: (req, res, next) ->
+		id = req.entity.v1Id
+		url = "#{settings.apis.v1.url}/api/v2/institutions/#{id}/external_collaboration_data"
+		request.get({
+			url: url,
+			auth: { user: settings.apis.v1.user, pass: settings.apis.v1.pass }
+    }, (err, response, body)->
+			res.send(body)
+		)
+
 	_format_recent_activity: (data) ->
 		recentActivity = []
 		if data['month']['users'] + data['month']['projects'] == 0
