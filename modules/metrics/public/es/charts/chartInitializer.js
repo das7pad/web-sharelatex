@@ -16,6 +16,7 @@ var chartInitializer = {
       type: 'GET',
       success: function(data){
         if(data) {
+          data = JSON.parse(data)
           initChart(data)
         } else {
           handleMissingDataError()
