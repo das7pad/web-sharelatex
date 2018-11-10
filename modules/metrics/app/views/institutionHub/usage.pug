@@ -1,0 +1,17 @@
+p.hub-metric-link
+	a(href="/metrics/institutions/" + institutionId) 
+		i.fa.fa-bar-chart
+		|All usage metrics
+
+.admin-sub-item
+	h5 In the past month
+	.row
+		.col-xs-12
+			.overbox.hub-circle
+				span.hub-circle-number #{usageData.count}
+				|signups
+
+if recent_activity
+	.admin-sub-item.recent-activity
+		h5 Recent activity
+			.row.overbox.overbox-small

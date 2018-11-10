@@ -4,7 +4,7 @@ block content
 	.content.content-alt
 		#institution-hub.container
 			.row
-				.col-lg-8
+				.col-lg-9
 					.hub-header
 						span.dropdown(dropdown)
 							a.dropdown-toggle(href, dropdown-toggle)
@@ -18,3 +18,12 @@ block content
 
 						h2(style="text-transform: capitalize") #{institutionName} &mdash; Administrator Hub
 			.row
+				.col-lg-9
+					.admin-item
+						.section-title
+							h3 Usage
+						include institutionHub/usage
+					.admin-item
+						.section-title
+							h3 Collaboration
+						include institutionHub/collaboration

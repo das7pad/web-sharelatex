@@ -1,3 +1,17 @@
+.circle(@size, @background_color) {
+  display: inline-block;
+  background-color: @background_color;
+  border-radius: 50%;
+  width: @size;
+  height: @size;
+  text-align: center;
+  padding-top: @size/6.4;
+  img {
+    height: @size - @size/3.2;
+  }
+}
+
+
 .hub-header {
     h2 {
         display: inline-block;
@@ -15,14 +29,17 @@
 .admin-item {
   position: relative;
   margin-bottom: 60px;
+  .section-title {
+      text-transform: capitalize;
+  }
 }
 .hidden-chart-section {
   display: none;
 }
 .hub-circle {
-  @include circle(160px, @accent-color-secondary);
+  .circle(160px, @accent-color-secondary);
   padding-top: 50px;
-  color: $white;
+  color: white;
 }
 .hub-circle-number {
   display: block;
@@ -52,6 +69,10 @@
   position: absolute;
   top: 9px;
   right: 0;
+
+  i {
+      margin-right: 5px;
+  }
 }
 .custom-donut-container {
   svg {
