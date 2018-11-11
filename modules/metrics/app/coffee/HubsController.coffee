@@ -18,22 +18,10 @@ module.exports = HubsController =
 			else
 				institutionName = null
 				portalSlug = null
-
-			HubsController._signupData(id, (err, response, body)->
-				if !err
-					usageData = body
-				else
-					usageData = null
+			# fetch signup data from v1
+			HubsController._usageData(id, (usageData)->
 				# fetch recent usage data from analytics
-				recent_usage_path = "/recentInstitutionActivity?institution_id=#{id}"
-				request.get({
-					url: settings.apis.analytics.url + recent_usage_path,
-					json: true
-				}, (err, response, body)->
-					if !err && response.statusCode == 200
-						recentActivity = HubsController._formatRecentActivity(body)
-					else
-						recentActivity = []
+				HubsController._recentActivity(id, (recentActivity) ->
 					res.render Path.resolve(__dirname, '../views/institutionHub.pug'), {
 						institutionId: id,
 						institutionName: institutionName,
@@ -71,6 +59,17 @@ module.exports = HubsController =
 			callback(err, response, body)
 		)
 
+	_recentActivity: (id, callback) ->
+		recent_usage_path = "/recentInstitutionActivity?institution_id=#{id}"
+		request.get {
+			url: settings.apis.analytics.url + recent_usage_path,
+			json: true
+		}, (err, response, body) ->
+			if !err && response.statusCode == 200
+				callback(HubsController._formatRecentActivity(body))
+			else
+				callback([])
+
 	_formatRecentActivity: (data) ->
 		recentActivity = []
 		if data['month']['users'] + data['month']['projects'] == 0
@@ -84,7 +83,7 @@ module.exports = HubsController =
 			)
 		return recentActivity
 
-	_signupData: (id, callback) ->
+	_usageData: (id, callback) ->
 		# fetch signup data from v1
 		date = new Date()
 		endDate = date.getTime()
@@ -96,4 +95,7 @@ module.exports = HubsController =
 			auth: { user: settings.apis.v1.user, pass: settings.apis.v1.pass }
 			json: true
 		}, (err, response, body) ->
-			callback(err, response, body)
+			if !err
+				callback(body)
+			else
+				callback(null)
