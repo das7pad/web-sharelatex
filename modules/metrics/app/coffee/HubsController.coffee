@@ -52,12 +52,12 @@ module.exports = HubsController =
 		)
 
 	institutionDepartments: (req, res, next) ->
-		HubsController._v1InstitutionsApi(req, 'departments', (err, response, body)->
+		HubsController._v1InstitutionsApi(req, 'departments_data', (err, response, body)->
 			res.send(body)
 		)
 
 	institutionRoles: (req, res, next) ->
-		HubsController._v1InstitutionsApi(req, 'roles', (err, response, body)->
+		HubsController._v1InstitutionsApi(req, 'roles_data', (err, response, body)->
 			res.send(body)
 		)
 
