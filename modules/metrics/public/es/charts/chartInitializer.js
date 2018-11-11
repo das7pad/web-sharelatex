@@ -3,19 +3,19 @@
 import chartApp from './chart_app'
 import { filter } from 'underscore'
 
-var svgNS = 'http://www.w3.org/2000/svg';
+var svgNS = 'http://www.w3.org/2000/svg'
 
 var chartInitializer = {
   getDataAndInitChart: function($chartElt) {
-    if($chartElt.length !== 1) {
+    if ($chartElt.length !== 1) {
       return
     }
 
     $.ajax({
       url: $chartElt.data('url'),
       type: 'GET',
-      success: function(data){
-        if(data) {
+      success: function(data) {
+        if (data) {
           data = JSON.parse(data)
           initChart(data)
         } else {
@@ -33,9 +33,9 @@ var chartInitializer = {
     function handleMissingDataError() {
       $chartElt.replaceWith(
         '<div class="overbox overbox-small alert-danger"><em>' +
-        'Unfortunately no data has been collected yet. ' +
-        'Please try again later' +
-        '</em></div>'
+          'Unfortunately no data has been collected yet. ' +
+          'Please try again later' +
+          '</em></div>'
       )
     }
 
@@ -45,9 +45,9 @@ var chartInitializer = {
     function handleHttpError() {
       $chartElt.replaceWith(
         '<div class="overbox overbox-small alert-danger"><em>' +
-        'Sorry, there was an error fetching your data.' +
-        'Please try again later' +
-        '</em> </div>'
+          'Sorry, there was an error fetching your data.' +
+          'Please try again later' +
+          '</em> </div>'
       )
     }
 
@@ -58,7 +58,7 @@ var chartInitializer = {
       // get the $chartElt classes starting with `chart-` and convert them as
       // options
       var chartOptions = null
-      if ($chartElt.attr('class')){
+      if ($chartElt.attr('class')) {
         var classArray = $chartElt.attr('class').split(' ')
         var classOptions = filter(classArray, function(klass) {
           return klass.startsWith('chart-')
@@ -105,7 +105,8 @@ var chartInitializer = {
        */
       function initObserver() {
         var observer = new window.MutationObserver(function(mutations) {
-          if(mutations.length !== 1) { // ignore event with multiple mutations
+          if (mutations.length !== 1) {
+            // ignore event with multiple mutations
             return
           }
           var mutation = mutations[0]
@@ -114,7 +115,7 @@ var chartInitializer = {
           var isNotClassMutation = mutation.attributeName !== 'class'
           var isNotTarget = $target.attr('id') !== $chartElt.attr('id')
           var isNotReady = !$target.attr('class').match(/nvd3-svg/)
-          if(isNotClassMutation || isNotTarget || isNotReady) {
+          if (isNotClassMutation || isNotTarget || isNotReady) {
             // ignore unstuitable events
             return
           }
@@ -138,15 +139,20 @@ var chartInitializer = {
       function fixLegend() {
         var posX = 0
 
-        $chartElt.find('.nv-series').each(function(_idx, elt){
+        $chartElt.find('.nv-series').each(function(_idx, elt) {
           // fix labels position
           $(elt).attr('transform', 'translate(0,' + posX + ')')
           posX += 25
 
           // use full university name in labels
-          var fullTitle = $(elt).find('title').first().text()
-          if(fullTitle) {
-            $(this).find('text').text(fullTitle)
+          var fullTitle = $(elt)
+            .find('title')
+            .first()
+            .text()
+          if (fullTitle) {
+            $(this)
+              .find('text')
+              .text(fullTitle)
           }
         })
       }
