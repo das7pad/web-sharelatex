@@ -1,5 +1,6 @@
 ReferencesRouter = require "./app/js/ReferencesRouter"
 MendeleyAgent = require('./app/js/LinkedFiles/MendeleyAgent')
+ZoteroAgent = require('./app/js/LinkedFiles/ZoteroAgent')
 
 module.exports = References =
 	router: ReferencesRouter
@@ -13,4 +14,4 @@ module.exports = References =
 
 	linkedFileAgents:
 		"mendeley": () -> MendeleyAgent
-		# "zotero": () -> ThirdPartyReferencesAgentBuilder('zotero')
+		"zotero": () -> ZoteroAgent

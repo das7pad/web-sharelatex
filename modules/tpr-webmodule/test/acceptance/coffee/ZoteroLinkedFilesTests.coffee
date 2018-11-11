@@ -10,9 +10,9 @@ request = require "#{basePath}/test/acceptance/js/helpers/request"
 User = require "#{basePath}/test/acceptance/js/helpers/User"
 
 MockTPRApi = require "./helpers/MockTPRApi"
+MockFilestoreApi = require "./helpers/MockFilestoreApi"
 
-
-describe "MendeleyLinkedFiles", ->
+describe "ZoteroLinkedFiles", ->
 	before (done) ->
 		async.series [
 			(cb) =>
@@ -33,7 +33,7 @@ describe "MendeleyLinkedFiles", ->
 
 			(cb) =>
 				# Create a project
-				@owner.createProject 'mendeley-test-one', {template: 'blank'}, (err, project_id) =>
+				@owner.createProject 'zotero-test-one', {template: 'blank'}, (err, project_id) =>
 					@project_one_id = project_id
 					@owner.getProject project_id, (err, project) =>
 						return cb(err) if err?
@@ -42,7 +42,7 @@ describe "MendeleyLinkedFiles", ->
 
 			(cb) =>
 				# Create another project
-				@owner.createProject 'mendeley-test-two', {template: 'blank'}, (err, project_id) =>
+				@owner.createProject 'zotero-test-two', {template: 'blank'}, (err, project_id) =>
 					@project_two_id = project_id
 					@owner.getProject project_id, (err, project) =>
 						return cb(err) if err?
@@ -60,33 +60,11 @@ describe "MendeleyLinkedFiles", ->
 	beforeEach (done) ->
 		done()
 
-	describe "Getting list of users groups from TPR (Third Party References)", ->
-		beforeEach ->
-			MockTPRApi.reset(mendeley: groups: [{id: 'abcd', name: 'Test Group'}])
-
-		it "should get a list of the users mendeley groups", (done) ->
-			@owner.request.get {uri: '/mendeley/groups', json: true}, (err, response, body) =>
-				expect(err).to.not.exist
-				expect(body).to.deep.equal {
-					user_id: @owner._id.toString(),
-					groups: [{id: 'abcd', name: 'Test Group'}]
-				}
-				done()
-
-		describe "when the user does not have the mendeley feature", ->
-
-			it "should not produce an list of groups", (done) ->
-				@other_user_one.request.get {uri: '/mendeley/groups', json: true}, (err, response, body) =>
-					expect(err).to.not.exist
-					expect(response.statusCode).to.equal 403
-					expect(body).to.equal "Forbidden"
-					done()
-
-	describe "Importing bibtex from mendeley account into a linked file", ->
+	describe "Importing bibtex from zotero account into a linked file", ->
 		beforeEach ->
 			MockTPRApi.reset()
 
-		describe "when the user doesn't have the mendeley feature", ->
+		describe "when the user doesn't have the zotero feature", ->
 			before ->
 
 			it "should produce an error", (done) ->
@@ -95,7 +73,7 @@ describe "MendeleyLinkedFiles", ->
 					json:
 						name: 'test.bib',
 						parent_folder_id: @project_one_root_folder_id,
-						provider: 'mendeley',
+						provider: 'zotero',
 						data: {}
 				}, (error, response, body) =>
 					expect(response.statusCode).to.equal 400
@@ -108,7 +86,7 @@ describe "MendeleyLinkedFiles", ->
 				json:
 					name: 'test.bib',
 					parent_folder_id: @project_one_root_folder_id,
-					provider: 'mendeley',
+					provider: 'zotero',
 					data: {}
 			}, (error, response, body) =>
 				new_file_id = body.new_file_id
@@ -119,10 +97,68 @@ describe "MendeleyLinkedFiles", ->
 					firstFile = project.rootFolder[0].fileRefs[0]
 					expect(firstFile._id.toString()).to.equal(new_file_id.toString())
 					expect(firstFile.linkedFileData).to.deep.equal {
-						provider: 'mendeley',
+						format: 'bibtex'
+						provider: 'zotero',
 						importer_id: @owner._id.toString()
 					}
 					expect(firstFile.name).to.equal('test.bib')
+					done()
+
+		it "should import the file when multiple requests are needed", (done) ->
+			MockTPRApi.reset(zotero: bibtex: ["page one\n", "page two", ''])
+			@owner.request.post {
+				url: "/project/#{@project_one_id}/linked_file",
+				json:
+					name: 'test.bib',
+					parent_folder_id: @project_one_root_folder_id,
+					provider: 'zotero',
+					data: {}
+			}, (error, response, body) =>
+				new_file_id = body.new_file_id
+				@existing_file_id = new_file_id
+				expect(new_file_id).to.exist
+				@owner.getProject @project_one_id, (error, project) =>
+					return done(error) if error?
+					firstFile = project.rootFolder[0].fileRefs[0]
+					expect(firstFile._id.toString()).to.equal(new_file_id.toString())
+					expect(firstFile.linkedFileData).to.deep.equal {
+						format: 'bibtex'
+						provider: 'zotero',
+						importer_id: @owner._id.toString()
+					}
+					expect(firstFile.name).to.equal('test.bib')
+					expect(MockFilestoreApi.getFile(@project_one_id, new_file_id)).to.equal(
+						"page one\npage two"
+					)
+					done()
+
+		it "should import the file with biblatex format", (done) ->
+			@owner.request.post {
+				url: "/project/#{@project_one_id}/linked_file",
+				json:
+					name: 'test.bib',
+					parent_folder_id: @project_one_root_folder_id,
+					provider: 'zotero',
+					data: {
+						format: 'biblatex'
+					}
+			}, (error, response, body) =>
+				new_file_id = body.new_file_id
+				@existing_file_id = new_file_id
+				expect(new_file_id).to.exist
+				@owner.getProject @project_one_id, (error, project) =>
+					return done(error) if error?
+					firstFile = project.rootFolder[0].fileRefs[0]
+					expect(firstFile._id.toString()).to.equal(new_file_id.toString())
+					expect(firstFile.linkedFileData).to.deep.equal {
+						format: 'biblatex'
+						provider: 'zotero',
+						importer_id: @owner._id.toString()
+					}
+					expect(firstFile.name).to.equal('test.bib')
+					expect(MockFilestoreApi.getFile(@project_one_id, new_file_id)).to.equal(
+						'{testBiblatex: 1}'
+					)
 					done()
 
 		it "should not refresh the file for another user", (done) ->
@@ -153,96 +189,26 @@ describe "MendeleyLinkedFiles", ->
 
 		describe "when tpr produces an error", ->
 			beforeEach ->
+				MockTPRApi.reset(shouldError: true)
+			afterEach ->
+				MockTPRApi.reset()
 
 			it "should not import the file", (done) ->
-				MockTPRApi.reset(shouldError: true)
 				@owner.request.post {
 					url: "/project/#{@project_one_id}/linked_file",
 					json:
 						name: 'test.bib',
 						parent_folder_id: @project_one_root_folder_id,
-						provider: 'mendeley',
+						provider: 'zotero',
 						data: {}
 				}, (error, response, body) =>
 					expect(response.statusCode).to.equal 502
 					expect(body).to.equal "The remote service produced an error"
 					done()
 
-
-	describe "Importing bibtex from mendeley group into a linked file", ->
-		before ->
-			MockTPRApi.reset(mendeley: groups: [{id: 'abcd', name: 'Test Group'}])
-
-		describe "when the user doesn't have the mendeley feature", ->
-			before ->
-
-			it "should produce an error", (done) ->
-				@other_user_one.request.post {
-					url: "/project/#{@project_two_id}/linked_file",
-					json:
-						name: 'test.bib',
-						parent_folder_id: @project_two_root_folder_id,
-						provider: 'mendeley',
-						data: {group_id: 'abcd'}
-				}, (error, response, body) =>
-					expect(response.statusCode).to.equal 400
-					expect(body).to.equal "This feature is not enabled on your account"
-					done()
-
-		it "should import the file", (done) ->
-			@owner.request.post {
-				url: "/project/#{@project_two_id}/linked_file",
-				json:
-					name: 'test.bib',
-					parent_folder_id: @project_two_root_folder_id,
-					provider: 'mendeley',
-					data: {group_id: 'abcd'}
-			}, (error, response, body) =>
-				new_file_id = body.new_file_id
-				@existing_file_id = new_file_id
-				expect(new_file_id).to.exist
-				@owner.getProject @project_two_id, (error, project) =>
-					return done(error) if error?
-					firstFile = project.rootFolder[0].fileRefs[0]
-					expect(firstFile._id.toString()).to.equal(new_file_id.toString())
-					expect(firstFile.linkedFileData).to.deep.equal {
-						provider: 'mendeley',
-						group_id: 'abcd',
-						importer_id: @owner._id.toString()
-					}
-					expect(firstFile.name).to.equal('test.bib')
-					done()
-
-		it "should not refresh the file for another user", (done) ->
-			@other_user_one.request.post {
-				url: "/project/#{@project_two_id}/linked_file/#{@existing_file_id}/refresh",
-				json: true
-			}, (error, response, body) =>
-				expect(error).to.not.exist
-				expect(response.statusCode).to.equal 400
-				expect(body).to.equal "You are not the user who originally imported this file"
-				done()
-
-		it "should refresh the file", (done) ->
-			@owner.request.post {
-				url: "/project/#{@project_two_id}/linked_file/#{@existing_file_id}/refresh",
-				json: true
-			}, (error, response, body) =>
-				new_file_id = body.new_file_id
-				expect(new_file_id).to.exist
-				expect(new_file_id).to.not.equal @existing_file_id
-				@refreshed_file_id = new_file_id
-				@owner.getProject @project_two_id, (error, project) =>
-					return done(error) if error?
-					firstFile = project.rootFolder[0].fileRefs[0]
-					expect(firstFile._id.toString()).to.equal(new_file_id.toString())
-					expect(firstFile.name).to.equal('test.bib')
-					done()
-
-
-	describe "Refreshing a mendeley file from v1", ->
+	describe "Refreshing a zotero file from v1", ->
 		before (done) ->
-			@owner.createProject 'mendeley-test-three', {template: 'blank'}, (err, project_id) =>
+			@owner.createProject 'zotero-test-three', {template: 'blank'}, (err, project_id) =>
 				@project_three_id = project_id
 				@owner.getProject project_id, (err, project) =>
 					return done(err) if err?
@@ -250,22 +216,21 @@ describe "MendeleyLinkedFiles", ->
 					@project_three_root_folder_id = project.rootFolder[0]._id.toString()
 					@project_three.rootFolder[0].fileRefs.push {
 						linkedFileData: {
-							provider: "mendeley",
-							v1_importer_id: 99299
+							provider: "zotero",
+							v1_importer_id: 99298
 						},
 						_id: "5b3b5b631ac80a000162562c",
 						rev: 0,
 						created: new Date(),
-						name: "mendeley.bib"
+						name: "zotero.bib"
 					}
 					@owner.saveProject @project_three, (err) =>
 						return done(err) if err?
 						@owner.addUserToProject @project_three._id, @other_user_one, 'readAndWrite', (err) =>
 							return done(err) if err?
-							@owner.mongoUpdate {$set: {overleaf: {id: 99299}}}, done
+							@owner.mongoUpdate {$set: {overleaf: {id: 99298}}}, done
 
 		describe "when the user is not the original v1 importer", ->
-
 			it "should not refresh the file", (done) ->
 				@other_user_one.request.post {
 					url: "/project/#{@project_three_id}/linked_file/5b3b5b631ac80a000162562c/refresh",
@@ -287,9 +252,9 @@ describe "MendeleyLinkedFiles", ->
 					expect(new_file_id).to.exist
 					done()
 
-	describe "Refreshing an orphaned mendeley file from v1", ->
+	describe "Refreshing an orphaned zotero file from v1", ->
 		before (done) ->
-			@owner.createProject 'mendeley-test-four', {template: 'blank'}, (err, project_id) =>
+			@owner.createProject 'zotero-test-four', {template: 'blank'}, (err, project_id) =>
 				@project_four_id = project_id
 				@owner.getProject project_id, (err, project) =>
 					return done(err) if err?
@@ -297,12 +262,12 @@ describe "MendeleyLinkedFiles", ->
 					@project_four_root_folder_id = project.rootFolder[0]._id.toString()
 					@project_four.rootFolder[0].fileRefs.push {
 						linkedFileData: {
-							provider: "mendeley"  # Note, no importer id
+							provider: "zotero"  # Note, no importer id
 						},
 						_id: "5b3b5b631ac80a000162562d",
 						rev: 0,
 						created: new Date(),
-						name: "mendeley.bib"
+						name: "zotero.bib"
 					}
 					@owner.saveProject @project_four, (err) =>
 						return done(err) if err?
@@ -311,7 +276,6 @@ describe "MendeleyLinkedFiles", ->
 							@owner.mongoUpdate {$set: {overleaf: {id: 99299}}}, done
 
 		describe "when the user tries to refresh the file", ->
-
 			it "should not refresh the file", (done) ->
 				@owner.request.post {
 					url: "/project/#{@project_four_id}/linked_file/5b3b5b631ac80a000162562d/refresh",

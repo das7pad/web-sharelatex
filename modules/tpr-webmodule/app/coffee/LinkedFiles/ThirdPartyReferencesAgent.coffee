@@ -11,7 +11,8 @@ LinkedFilesHandler = require '../../../../../app/js/Features/LinkedFiles/LinkedF
 	BadDataError,
 	NotOriginalImporterError,
 	FeatureNotAvailableError,
-	FileCannotRefreshError
+	FileCannotRefreshError,
+	RemoteServiceError
 } = require '../../../../../app/js/Features/LinkedFiles/LinkedFilesErrors'
 ReferencesApiHandler = require '../ReferencesApiHandler'
 logger = require 'logger-sharelatex'
@@ -66,3 +67,18 @@ module.exports = class ThirdPartyReferencesAgent
 				callback(null, user? && user.overleaf? && (user.overleaf.id == linkedFileData.v1_importer_id))
 		else
 			callback(null, current_user_id.toString() == linkedFileData.importer_id.toString())
+
+	_makeRequestToThirdPartyRefService: (url, callback = (error, body) ->) ->
+		logger.log {url}, "[ThirdPartyReferenceAgent] getting bibtex from third-party-references"
+		ReferencesApiHandler.make3rdRequest { method: 'GET', url }, (err, response, body)->
+			if err
+				logger.err {user_id}, "[ThirdPartyReferenceAgent] error getting bibtex from third-party-references"
+				return callback(err)
+			if 200 <= response.statusCode < 300
+				# Do import with bibtex content
+				logger.log {url}, "[ThirdPartyReferenceAgent] got bibtex from third-party-references, importing"
+				callback(null, body)
+			else
+				logger.log {url, statusCode:response.statusCode},
+					"[ThirdPartyReferenceAgent] error code from tpr api"
+				return callback(new RemoteServiceError())
