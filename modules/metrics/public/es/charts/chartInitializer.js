@@ -1,7 +1,7 @@
 /* global $ */
 
 import chartApp from './chart_app'
-import { filter, sumBy } from 'underscore'
+import { filter } from 'underscore'
 
 var svgNS = 'http://www.w3.org/2000/svg';
 
@@ -80,8 +80,11 @@ var chartInitializer = {
      * add the total number of users as a svg text element
      */
     function addChartTotalCount(data) {
+      var sum = data.reduce(function(total, entry) {
+        return total + entry.val
+      }, 0)
       $(document.createElementNS(svgNS, 'text'))
-        .text(sumBy(data, function(d) { return d.val }))
+        .text(sum)
         .attr('class', 'chart-center-text')
         .appendTo($chartElt)
     }
@@ -162,7 +165,7 @@ var chartInitializer = {
         var chartLength = 222 // the pie fit in a square box of 222x222
 
         var $pieWrap = $chartElt.find('.nv-pieWrap')
-        posX = svgWidth - chartLength / 2
+        posX = svgWidth - chartLength / 1.5
         posY = chartLength / 2 + paddingTop
         transformDirective = 'translate(' + posX + ',' + posY + ')'
         $pieWrap.attr('transform', transformDirective)
