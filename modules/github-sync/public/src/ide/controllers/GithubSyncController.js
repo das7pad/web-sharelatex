@@ -18,9 +18,9 @@ define(['base'], App =>
         scope: $scope
       })
 
-    return (ide.githubSyncManager = {
+    ide.githubSyncManager = {
       openGithubSyncModal() {
         return $scope.openGithubSyncModal()
       }
-    })
+    }
   }))
