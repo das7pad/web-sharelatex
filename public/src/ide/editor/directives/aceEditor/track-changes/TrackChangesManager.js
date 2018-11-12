@@ -46,10 +46,10 @@ define([
             return
           }
           if (oldDoc != null) {
-            this.adapter.disconnectFromDoc(oldDoc)
+            this.disconnectFromDoc(oldDoc)
           }
           this.setTrackChanges(this.$scope.trackChanges)
-          return this.adapter.connectToDoc(doc)
+          return this.connectToDoc(doc)
         })
 
         this.$scope.$on('comment:add', (e, thread_id, offset, length) => {
@@ -101,6 +101,12 @@ define([
           return this.recalculateReviewEntriesScreenPositions()
         }
 
+        const onChangeSession = e => {
+          this.clearAnnotations()
+          this.redrawAnnotations()
+          this.editor.session.on('changeScrollTop', onChangeScroll)
+        }
+
         let _scrollTimeout = null
         const onChangeScroll = () => {
           if (_scrollTimeout != null) {
@@ -117,16 +123,49 @@ define([
         const onCut = () => this.onCut()
         const onPaste = () => this.onPaste()
 
+        const bindToEditor = () => {
+          if (this.editor) {
+            this.editor.on('changeSelection', onChangeSelection)
+            this.editor.on('change', onChangeSelection) // Selection also moves with updates elsewhere in the document
+            this.editor.on('changeSession', onChangeSession)
+            this.editor.on('cut', onCut)
+            this.editor.on('paste', onPaste)
+            this.editor.renderer.on('resize', onResize)
+          } else {
+            this.adapter.bindToEditor()
+          }
+        }
+
+        const unbindFromEditor = () => {
+          if (this.editor) {
+            this.editor.off('changeSelection', onChangeSelection)
+            this.editor.off('change', onChangeSelection)
+            this.editor.off('changeSession', onChangeSession)
+            this.editor.off('cut', onCut)
+            this.editor.off('paste', onPaste)
+            this.editor.renderer.off('resize', onResize)
+          } else {
+            this.adapter.unbindFromEditor()
+          }
+        }
+
         this.$scope.$watch('trackChangesEnabled', enabled => {
           if (enabled == null) {
             return
           }
           if (enabled) {
-            return this.adapter.bindToEditor()
+            bindToEditor()
           } else {
-            return this.adapter.unbindFromEditor()
+            unbindFromEditor()
           }
         })
+      }
+
+      disconnectFromDoc(doc) {
+        this.adapter.changeIdToMarkerIdMap = {}
+        doc.off('ranges:clear')
+        doc.off('ranges:redraw')
+        doc.off('ranges:dirty')
       }
 
       setTrackChanges(value) {
@@ -141,6 +180,46 @@ define([
             : undefined
         }
       }
+
+      connectToDoc(doc) {
+        this.rangesTracker = doc.ranges
+        this.setTrackChanges(this.$scope.trackChanges)
+
+        doc.on('ranges:dirty', () => {})
+        // @updateAnnotations()
+        doc.on('ranges:clear', () => {
+          this.clearAnnotations()
+        })
+        doc.on('ranges:redraw', () => {
+          this.redrawAnnotations()
+        })
+      }
+
+      clearAnnotations() {
+        const session = this.editor.getSession()
+        for (let change_id in this.adapter.changeIdToMarkerIdMap) {
+          const markers = this.adapter.changeIdToMarkerIdMap[change_id]
+          for (let marker_name in markers) {
+            const marker_id = markers[marker_name]
+            session.removeMarker(marker_id)
+          }
+        }
+        this.adapter.changeIdToMarkerIdMap = {}
+      }
+
+      redrawAnnotations() {
+        for (let change of Array.from(this.rangesTracker.changes)) {
+          if (change.op.i != null) {
+            this.adapter.onInsertAdded(change)
+          } else if (change.op.d != null) {
+            this.adapter.onDeleteAdded(change)
+          }
+        }
+
+        Array.from(this.rangesTracker.comments).map(comment => comment)
+        this.broadcastChange()
+      }
+
       updateAnnotations() {
         // Doc updates with multiple ops, like search/replace or block comments
         // will call this with every individual op in a single event loop. So only
@@ -171,7 +250,7 @@ define([
           if (change.op.i != null) {
             this.adapter.onInsertAdded(change)
           } else if (change.op.d != null) {
-            this._onDeleteAdded(change)
+            this.adapter.onDeleteAdded(change)
           }
         }
         for (id in dirty.change.removed) {
@@ -190,7 +269,7 @@ define([
 
         for (id in dirty.comment.added) {
           comment = dirty.comment.added[id]
-          this._onCommentAdded(comment)
+          this.onCommentAdded(comment)
         }
         for (id in dirty.comment.removed) {
           comment = dirty.comment.removed[id]
@@ -359,7 +438,7 @@ define([
             : undefined) || []
         )) {
           if (comment.op.t === thread_id) {
-            this._onCommentAdded(comment)
+            this.onCommentAdded(comment)
           }
         }
         return this.broadcastChange()
@@ -629,6 +708,41 @@ define([
         const session = this.editor.getSession()
         session.removeMarker(background_marker_id)
         return session.removeMarker(callout_marker_id)
+      }
+
+      onCommentAdded(comment) {
+        if (this.rangesTracker.resolvedThreadIds[comment.op.t]) {
+          // Comment is resolved so shouldn't be displayed.
+          return
+        }
+        if (this.changeIdToMarkerIdMap[comment.id] == null) {
+          // Only create new markers if they don't already exist
+          const start = this.shareJsOffsetToAcePosition(comment.op.p)
+          const end = this.shareJsOffsetToAcePosition(
+            comment.op.p + comment.op.c.length
+          )
+          const session = this.editor.getSession()
+          const doc = session.getDocument()
+          const background_range = new Range(
+            start.row,
+            start.column,
+            end.row,
+            end.column
+          )
+          const background_marker_id = session.addMarker(
+            background_range,
+            'track-changes-marker track-changes-comment-marker',
+            'text'
+          )
+          const callout_marker_id = this.createCalloutMarker(
+            start,
+            'track-changes-comment-marker-callout'
+          )
+          return (this.changeIdToMarkerIdMap[comment.id] = {
+            background_marker_id,
+            callout_marker_id
+          })
+        }
       }
 
       _onCommentRemoved(comment) {

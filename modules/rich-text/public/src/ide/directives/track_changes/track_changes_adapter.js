@@ -12,8 +12,6 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
       this.bindToEditor = this.bindToEditor.bind(this)
       this.unbindFromEditor = this.unbindFromEditor.bind(this)
       this.loadAnnotations = this.loadAnnotations.bind(this)
-      this.clearAnnotations = this.clearAnnotations.bind(this)
-      this.redrawAnnotations = this.redrawAnnotations.bind(this)
       this.onInsertAdded = this.onInsertAdded.bind(this)
       this.shareJsOffsetToAcePosition = this.shareJsOffsetToAcePosition.bind(
         this
@@ -25,31 +23,10 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
       this.cm = this.editor.getCodeMirror()
     }
 
-    connectToDoc(doc) {
-      this.rangesTracker = doc.ranges
-
-      doc.on('ranges:dirty', () => {})
-      // TODO will put this back later
-      // @updateAnnotations()
-      doc.on('ranges:clear', () => {
-        return this.clearAnnotations()
-      })
-      return doc.on('ranges:redraw', () => {
-        return this.redrawAnnotations()
-      })
-    }
-
-    disconnectFromDoc(doc) {
-      this.changeIdToMarkerIdMap = {}
-      doc.off('ranges:clear')
-      doc.off('ranges:redraw')
-      return doc.off('ranges:dirty')
-    }
-
     bindToEditor() {
       // Couldn't find a suitable event for an onload sort of thing
       // So this isn't really binding anything but needed to load the annotations at this time
-      return this.loadAnnotations()
+      this.loadAnnotations()
     }
     // TODO fill these up
 
@@ -59,35 +36,8 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
     loadAnnotations() {
       // TODO
       // @clearAnnotations()
-      return this.redrawAnnotations()
+      this.redrawAnnotations()
     }
-    // @editor.session.on "changeScrollTop", onChangeScroll
-    // @clearAnnotations()
-
-    clearAnnotations() {}
-    // TODO
-    // session = @editor.getSession()
-    // for change_id, markers of @adapter.changeIdToMarkerIdMap
-    // 	for marker_name, marker_id of markers
-    // 		session.removeMarker marker_id
-    // @adapter.changeIdToMarkerIdMap = {}
-
-    redrawAnnotations() {
-      for (let change of Array.from(this.rangesTracker.changes)) {
-        if (change.op.i != null) {
-          this.onInsertAdded(change)
-        } else if (change.op.d != null) {
-          this.onDeleteAdded(change)
-        }
-      }
-
-      return Array.from(this.rangesTracker.comments).map(comment =>
-        this.onCommentAdded(comment)
-      )
-    }
-
-    // TODO you will need to put this back in but will think about it later
-    // @broadcastChange()
 
     onInsertAdded(change) {
       let start, end
