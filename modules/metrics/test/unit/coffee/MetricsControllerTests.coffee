@@ -34,7 +34,9 @@ describe "MetricsController", ->
 
 	describe 'teamMetrics', ->
 		it 'renders the metricsApp template', (done) ->
-			@req = entity: overleaf: id: 5
+			@req = entity:
+				overleaf: id: 5
+				teamName: 'Test Name'
 			@res = { render: sinon.stub() }
 
 			@MetricsController.teamMetrics(@req, @res)
@@ -43,6 +45,7 @@ describe "MetricsController", ->
 				sinon.match('views/metricsApp'), {
 					metricsEndpoint: '/graphs',
 					resourceId: 5,
+					resourceName: 'Test Name',
 					resourceType: 'team',
 				}
 			).should.equal true
