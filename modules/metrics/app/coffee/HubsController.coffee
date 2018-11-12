@@ -35,29 +35,28 @@ module.exports = HubsController =
 		)
 
 	institutionExternalCollaboration: (req, res, next) ->
-		HubsController._v1InstitutionsApi(req, 'external_collaboration_data', (err, response, body)->
+		HubsController._v1InstitutionsApi(req.entity.v1Id, 'external_collaboration_data', (err, response, body)->
 			res.send(body)
 		)
 
 	institutionDepartments: (req, res, next) ->
-		HubsController._v1InstitutionsApi(req, 'departments_data', (err, response, body)->
+		HubsController._v1InstitutionsApi(req.entity.v1Id, 'departments_data', (err, response, body)->
 			res.send(body)
 		)
 
 	institutionRoles: (req, res, next) ->
-		HubsController._v1InstitutionsApi(req, 'roles_data', (err, response, body)->
+		HubsController._v1InstitutionsApi(req.entity.v1Id, 'roles_data', (err, response, body)->
 			res.send(body)
 		)
 
-	_v1InstitutionsApi: (req, endpoint, callback) ->
-		id = req.entity.v1Id
+	_v1InstitutionsApi: (id, endpoint, callback) ->
 		url = "#{settings.apis.v1.url}/api/v2/institutions/#{id}/#{endpoint}"
-		request.get({
+		request.get {
 			url: url,
 			auth: { user: settings.apis.v1.user, pass: settings.apis.v1.pass }
-		}, (err, response, body)->
+			json: true
+		}, (err, response, body) ->
 			callback(err, response, body)
-		)
 
 	_recentActivity: (id, callback) ->
 		recent_usage_path = "/recentInstitutionActivity?institution_id=#{id}"
@@ -89,13 +88,10 @@ module.exports = HubsController =
 		endDate = date.getTime()
 		startDate = date.setMonth(date.getMonth() - 1)
 		query = "?start_date=#{startDate}&end_date=#{endDate}"
-		signupUrl = "#{settings.apis.v1.url}/api/v2/institutions/#{id}/usage_signup_data?#{query}"
-		request {
-			url: signupUrl
-			auth: { user: settings.apis.v1.user, pass: settings.apis.v1.pass }
-			json: true
-		}, (err, response, body) ->
+		endpoint = "usage_signup_data#{query}"
+		HubsController._v1InstitutionsApi(id, endpoint, (err, response, body) ->
 			if !err
 				callback(body)
 			else
 				callback(null)
+		)
