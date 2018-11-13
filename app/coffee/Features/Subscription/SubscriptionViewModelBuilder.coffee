@@ -67,6 +67,7 @@ module.exports =
 					nextPaymentDueAt: SubscriptionFormatters.formatDate(recurlySubscription?.current_period_ends_at)
 					currency: recurlySubscription.currency
 					state: recurlySubscription.state
+					trialEndsAtFormatted: SubscriptionFormatters.formatDate(recurlySubscription?.trial_ends_at)
 					trial_ends_at: recurlySubscription.trial_ends_at
 				}
 

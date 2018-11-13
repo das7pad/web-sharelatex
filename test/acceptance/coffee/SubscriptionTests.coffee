@@ -77,7 +77,8 @@ describe 'Subscriptions', ->
 					"state": "active"
 					"tax": 100
 					"taxRate": 0.2
-					"trial_ends_at": new Date(2018, 6, 7)
+					"trial_ends_at": new Date(2018, 6, 7),
+					"trialEndsAtFormatted": "7th June 2018"
 				}
 
 			it 'should return no groupSubscriptions', ->
