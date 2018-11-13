@@ -184,6 +184,20 @@ define(['base', 'libs/md5'], function(App) {
       )
     }
 
+    $scope.refreshFeatures = function() {
+      const { user } = $scope
+      $scope.refreshingFeatures = true
+      return queuedHttp({
+        method: 'POST',
+        url: `/admin/user/${user._id}/refresh_features`,
+        headers: {
+          'X-CSRF-Token': window.csrfToken
+        }
+      }).then(() =>
+        location.reload()
+      )
+    }
+
     $scope.updateVisibleProjects = function() {
       $scope.visibleProjects = []
 
