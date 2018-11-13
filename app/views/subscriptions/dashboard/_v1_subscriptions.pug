@@ -1,5 +1,5 @@
 - if (v1Subscriptions.has_subscription)
-	-var hasAnySubscription = true
+	-hasAnySubscription = true
 	p
 		| You are subscribed to Overleaf through Overleaf v1
 	p
@@ -7,7 +7,7 @@
 	hr
 
 - if (v1Subscriptions.teams && v1Subscriptions.teams.length > 0)
-	-var hasAnySubscription = true
+	-hasAnySubscription = true
 	for team in v1Subscriptions.teams
 		p
 			| You are a member of the Overleaf v1 team: <strong>#{team.name}</strong>

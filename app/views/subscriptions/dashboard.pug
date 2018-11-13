@@ -11,11 +11,11 @@ block content
 
 						-var hasAnySubscription = false
 						-if (personalSubscription)
-							-var hasAnySubscription = true
+							-hasAnySubscription = true
 							include ./dashboard/_personal_subscription
 
 						-if (groupSubscriptions && groupSubscriptions.length > 0)
-							-var hasAnySubscription = true
+							-hasAnySubscription = true
 							include ./dashboard/_group_memberships
 
 						-if (settings.overleaf && v1Subscriptions)
