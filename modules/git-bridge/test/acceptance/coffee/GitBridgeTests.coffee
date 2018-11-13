@@ -29,9 +29,3 @@ describe 'GitBridge', ->
 				@projectId = projectId
 				cb(err)
 		]
-
-	describe 'getting latest project version', ->
-		before ->
-
-		it 'should whatever', (done) ->
-			done()
