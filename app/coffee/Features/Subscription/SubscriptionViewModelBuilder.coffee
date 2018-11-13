@@ -48,7 +48,7 @@ module.exports =
 			return callback(err) if err?
 			{personalSubscription, groupSubscriptions, v1Subscriptions, recurlySubscription, plan} = results
 			groupSubscriptions ?= []
-			v1Subscriptions ?= []
+			v1Subscriptions ?= {}
 
 			if personalSubscription?.toObject?
 				# Downgrade from Mongoose object, so we can add a recurly and plan attribute
