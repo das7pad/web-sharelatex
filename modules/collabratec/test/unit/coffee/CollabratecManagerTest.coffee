@@ -20,6 +20,7 @@ describe "CollabratecManager", ->
 				NotFoundError: sinon.stub()
 			}
 			"../../../../app/js/Features/Project/ProjectCollabratecDetailsHandler": @ProjectCollabratecDetailsHandler = {}
+			"../../../../app/js/Features/Project/ProjectDeleter": @ProjectDeleter = {}
 			"../../../../app/js/Features/Project/ProjectDetailsHandler": @ProjectDetailsHandler = {}
 			"../../../../app/js/Features/Project/ProjectEntityHandler": @ProjectEntityHandler = {}
 			"../../../../app/js/Features/Project/ProjectEntityUpdateHandler": @ProjectEntityUpdateHandler = {}
