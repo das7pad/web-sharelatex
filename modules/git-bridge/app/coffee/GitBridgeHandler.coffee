@@ -20,10 +20,10 @@ module.exports = GitBridgeHandler =
 		ProjectGetter.getProjectWithoutDocLines projectId, (err, project) ->
 			return callback(err) if err?
 			_userCanAccess = (u) ->
-				u?.features?.gitBridge && u.isAdmin
-			UserGetter.getUser project.owner_ref, {}, (err, owner) ->
+				u?.features?.gitBridge && u.isAdmin # Restrict to admins for now
+			UserGetter.getUser project.owner_ref, {features: 1, isAdmin: 1}, (err, owner) ->
 				return callback(err) if err?
-				UserGetter.getUser userId, {}, (err, user) ->
+				UserGetter.getUser userId, {features: 1, isAdmin: 1}, (err, user) ->
 					return callback(err) if err?
 					if !(_userCanAccess(owner) || _userCanAccess(user))
 						return callback(new Errors.FeatureNotAvailable('Neither user nor has gitBridge feature'))
