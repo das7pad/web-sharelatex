@@ -41,17 +41,17 @@ div(ng-controller="RecurlySubscriptionController")
 			+printPlans(plans.individualAnnualPlans)
 
 
-	.div(ng-controller="RecurlyCancellationController", ng-show="showCancellation")
-		strong #{translate("Cancel Subscription")}
+	.div(ng-controller="RecurlyCancellationController", ng-show="showCancellation").text-center
+		strong #{translate("cancel_your_subscription")}
 
-		div(ng-show="showExtendFreeTrial", style="text-align: center")
+		div(ng-show="showExtendFreeTrial")
 			p !{translate("have_more_days_to_try", {days:14})}
 			p
 				button(type="submit", ng-click="extendTrial()", ng-disabled='inflight').btn.btn-success #{translate("ill_take_it")}
 			p
 				a(href, ng-click="cancelSubscription()", ng-disabled='inflight') #{translate("no_thanks_cancel_now")}
 
-		div(ng-show="showDowngradeToStudent", style="text-align: center")
+		div(ng-show="showDowngradeToStudent")
 			div(ng-controller="ChangePlanFormController")
 				p !{translate("interested_in_cheaper_plan",{price:'{{studentPrice}}'})}
 				p
