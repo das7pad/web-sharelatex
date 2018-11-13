@@ -33,14 +33,3 @@ module.exports = GitBridgeRouter =
 			AuthorizationMiddlewear.ensureUserCanWriteProjectContent,
 			AuthorizationMiddlewear.ensureUserIsSiteAdmin,  # Temporary
 			GitBridgeController.applySnapshot
-
-		# # Proxy blob-content requests to project-history
-		# publicApiRouter.use '/history/blob', httpProxy(
-		# 	Settings.apis.project_history.url,
-		# 	proxyReqPathResolver: (req) ->
-		# 		path = req.path
-		# 		blobHash = path.split('/').slice(-1)[0]
-		# 		newPath = "/blob/#{blobHash}"
-		# 		logger.log {blobHash, path, newPath}, "[GitBridgeRouter] Proxy request for history content blob"
-		# 		return newPath
-		# )
