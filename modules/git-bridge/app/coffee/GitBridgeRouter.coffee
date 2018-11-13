@@ -1,4 +1,3 @@
-Settings = require 'settings-sharelatex'
 logger = require 'logger-sharelatex'
 GitBridgeController = require './GitBridgeController'
 AuthenticationController = require '../../../../app/js/Features/Authentication/AuthenticationController'
@@ -10,9 +9,6 @@ URL = require 'url'
 module.exports = GitBridgeRouter =
 
 	apply: (webRouter, privateApiRouter, publicApiRouter) ->
-		if !Settings.overleaf?
-			logger.log {}, "[GitBridgeRouter] Not running with overleaf settings, not setting up git-bridge"
-			return
 
 		publicApiRouter.get  '/api/v0/docs/:project_id',
 			AuthenticationController.requireOauth(),
