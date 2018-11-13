@@ -40,8 +40,9 @@ module.exports =
 			groupSubscriptions: (cb) ->
 				SubscriptionLocator.getMemberSubscriptions user, cb
 			v1Subscriptions: (cb) ->
-				V1SubscriptionManager.getSubscriptionsFromV1 user._id, (error, subscriptions) ->
+				V1SubscriptionManager.getSubscriptionsFromV1 user._id, (error, subscriptions, v1Id) ->
 					return cb(error) if error?
+					# Only return one argument to async.auto, otherwise it returns an array
 					cb(null, subscriptions)
 		}, (err, results) ->
 			return callback(err) if err?
