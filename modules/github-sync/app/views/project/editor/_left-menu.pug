@@ -29,7 +29,7 @@ script(type="text/ng-template", id="githubSyncModalTemplate")
 			div(ng-if="!status.project.enabled")
 				div(ng-if="!status.user.enabled")
 					div(ng-if="!status.user.available")
-						h4.teaser-title Push to GitHub, pull to {{settings.appName}}
+						h4.teaser-title Push to GitHub, pull to #{settings.appName}
 						
 						p.text-center.small(ng-show="startedFreeTrial")
 							| #{translate("refresh_page_after_starting_free_trial")}
@@ -39,7 +39,7 @@ script(type="text/ng-template", id="githubSyncModalTemplate")
 								ul.list-unstyled
 									li
 										i.fa.fa-check &nbsp;
-										| Work offline, then pull to {{settings.appName}}
+										| Work offline, then pull to #{settings.appName}
 									
 									li
 										i.fa.fa-check &nbsp;
