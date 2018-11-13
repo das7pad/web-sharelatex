@@ -132,6 +132,14 @@ define([
             this.editor.on('paste', onPaste)
             this.editor.renderer.on('resize', onResize)
           } else {
+            /**
+              There was no changeSession event equivalent for CM where it would fire
+              at the beginning of the first "session", so here I'm just doing the
+              main thing I wanted onChangeSession to do for CM so it gets done the
+              first time (otherwise I'm doing it in swapDoc)
+              */
+
+            this.redrawAnnotations()
             this.adapter.bindToEditor()
           }
         }
@@ -186,7 +194,7 @@ define([
         this.setTrackChanges(this.$scope.trackChanges)
 
         doc.on('ranges:dirty', () => {})
-        // @updateAnnotations()
+        this.updateAnnotations()
         doc.on('ranges:clear', () => {
           this.clearAnnotations()
         })

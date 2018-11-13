@@ -197,7 +197,7 @@ define([
         var initTrackChanges = function() {
           return (this.trackChangesManager = new TrackChangesManager(
             scope,
-            {},
+            null,
             element,
             new TrackChangesAdapter(editor)
           ))

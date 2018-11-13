@@ -11,7 +11,6 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
     constructor(editor) {
       this.bindToEditor = this.bindToEditor.bind(this)
       this.unbindFromEditor = this.unbindFromEditor.bind(this)
-      this.loadAnnotations = this.loadAnnotations.bind(this)
       this.onInsertAdded = this.onInsertAdded.bind(this)
       this.shareJsOffsetToAcePosition = this.shareJsOffsetToAcePosition.bind(
         this
@@ -24,19 +23,11 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
     }
 
     bindToEditor() {
-      // Couldn't find a suitable event for an onload sort of thing
-      // So this isn't really binding anything but needed to load the annotations at this time
-      this.loadAnnotations()
+      // TODO fill these up with necessary equivalents
     }
-    // TODO fill these up
 
-    unbindFromEditor() {}
-    // TODO fill these up
-
-    loadAnnotations() {
-      // TODO
-      // @clearAnnotations()
-      this.redrawAnnotations()
+    unbindFromEditor() {
+      // TODO fill these up with necessary equivalents
     }
 
     onInsertAdded(change) {
