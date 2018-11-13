@@ -33,6 +33,8 @@ describe "V1LoginController", ->
 		@req = {
 			session: @session = {}
 			user: {}
+			i18n:
+				translate: sinon.stub().returnsArg(0)
 		}
 		@res =
 			json: sinon.stub()
@@ -67,6 +69,96 @@ describe "V1LoginController", ->
 
 			it "should not setup user", ->
 				expect(@V1LoginController._setupUser).not.to.have.been.called
+
+	describe "doPasswordChange", ->
+		beforeEach ->
+			@oldPassword = 'passw0rd'
+			@newPassword = 'w0mb4t5'
+			@badPassword = '1337h4x0r'
+			@userid = '1234'
+			@email = 'foo@example.org'
+			@v1Id = 5
+			@lightUser =
+				_id: @userid
+			@user =
+				_id: @userid
+				email: @email
+				overleaf:
+					id: @v1Id
+			@baduser =
+				_id: @userid
+				email: @email
+				overleaf:
+					id: -1
+			@req.body =
+				newPassword1: @newPassword
+			@AuthenticationController.getSessionUser = sinon.stub().returns(@lightUser)
+			@UserGetter.getUser = sinon.stub().withArgs(@userid).callsArgWith(1, null, @user)
+			@V1LoginHandler.doPasswordChange = sinon.stub()
+			@V1LoginHandler.doPasswordChange.withArgs({@email, @v1Id, password: @newPassword, current_password: @oldPassword}).callsArgWith(1, null, true)
+			@V1LoginHandler.doPasswordChange.withArgs({@email, @v1Id, password: @newPassword, current_password: @badPassword}).callsArgWith(1, null, false)
+			@V1LoginHandler.doPasswordChange.withArgs({@email, v1Id: -1, password: @newPassword, current_password: @oldPassword}).callsArgWith(1, new Error(), null)
+
+		describe "when the details are valid", ->
+			beforeEach ->
+				@req.body.currentPassword = @oldPassword
+				@V1LoginController.doPasswordChange(@req, @res, @next)
+
+			it "should not return an error", ->
+				expect(@next).not.to.have.been.called
+
+			it "should try to change the password", ->
+				expect(@V1LoginHandler.doPasswordChange).to.be.calledWith({@email, @v1Id, password: @newPassword, current_password: @oldPassword})
+
+			it "should return a json success response", ->
+				expect(@res.json).to.be.calledWith message: {
+					type: 'success',
+					@email,
+					text: 'password_change_successful'
+				}
+
+		describe "when the old password is bad", ->
+			beforeEach ->
+				@req.body.currentPassword = @badPassword
+				@V1LoginController.doPasswordChange(@req, @res, @next)
+
+			it "should not return an error", ->
+				expect(@next).not.to.have.been.called
+
+			it "should try to change the password", ->
+				expect(@V1LoginHandler.doPasswordChange).to.be.calledWith({@email, @v1Id, password: @newPassword, current_password: @badPassword})
+
+			it "should return a json error response", ->
+				expect(@res.json).to.be.calledWith message: {
+					type: 'error',
+					text: 'password_change_failed_attempt'
+				}
+
+		describe "when changing the password returns an error", ->
+			beforeEach ->
+				@req.body.currentPassword = @oldPassword
+				@UserGetter.getUser = sinon.stub().withArgs(@userid).callsArgWith(1, null, @baduser)
+				@V1LoginController.doPasswordChange(@req, @res, @next)
+
+			it "should try to change the password", ->
+				expect(@V1LoginHandler.doPasswordChange).to.be.calledWith({@email, v1Id: -1, password: @newPassword, current_password: @oldPassword})
+
+			it "should return an error", ->
+				expect(@next).to.be.called
+
+		describe "when there are missing fields", ->
+			beforeEach ->
+				@req.body = {}
+				@V1LoginController.doPasswordChange(@req, @res, @next)
+
+			it "should not try to change the password", ->
+				expect(@V1LoginHandler.doPasswordChange).not.to.be.called
+
+			it "should return a json error response", ->
+				expect(@res.json).to.be.calledWith message: {
+					type: 'error',
+					text: 'internal_error'
+				}
 
 	describe "_login", ->
 		beforeEach ->
