@@ -193,9 +193,7 @@ define(['base', 'libs/md5'], function(App) {
         headers: {
           'X-CSRF-Token': window.csrfToken
         }
-      }).then(() =>
-        location.reload()
-      )
+      }).then(() => location.reload())
     }
 
     $scope.updateVisibleProjects = function() {
