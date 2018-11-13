@@ -28,46 +28,45 @@ script(type="text/ng-template", id="githubSyncModalTemplate")
 		div(ng-if="!status.error && !status.loading")
 			div(ng-if="!status.project.enabled")
 				div(ng-if="!status.user.enabled")
-					div(ng-if="$parent.permissions.admin")
-						div(ng-if="!status.user.available")
-							h4.teaser-title Push to GitHub, pull to {{settings.appName}}
-							
-							p.text-center.small(ng-show="startedFreeTrial")
-								| #{translate("refresh_page_after_starting_free_trial")}
+					div(ng-if="!status.user.available")
+						h4.teaser-title Push to GitHub, pull to {{settings.appName}}
+						
+						p.text-center.small(ng-show="startedFreeTrial")
+							| #{translate("refresh_page_after_starting_free_trial")}
 
-							.row
-								.col-md-8.col-md-offset-2
-									ul.list-unstyled
-										li
-											i.fa.fa-check &nbsp;
-											| Work offline, then pull to {{settings.appName}}
-										
-										li
-											i.fa.fa-check &nbsp;
-											| Import existing projects from GitHub
+						.row
+							.col-md-8.col-md-offset-2
+								ul.list-unstyled
+									li
+										i.fa.fa-check &nbsp;
+										| Work offline, then pull to {{settings.appName}}
+									
+									li
+										i.fa.fa-check &nbsp;
+										| Import existing projects from GitHub
 
-										li
-											i.fa.fa-check &nbsp;
-											| Have an extra backup
-										
-										li
-											i.fa.fa-check &nbsp;
-											| Work with other GitHub users
+									li
+										i.fa.fa-check &nbsp;
+										| Have an extra backup
+									
+									li
+										i.fa.fa-check &nbsp;
+										| Work with other GitHub users
 
-							.row.text-center(ng-controller="FreeTrialModalController")
-								a.btn.btn-success(
-									href
-									ng-class="buttonClass"
-									ng-click="startFreeTrial('github')"
-								) Try it for free
+						.row.text-center(ng-controller="FreeTrialModalController")
+							a.btn.btn-success(
+								href
+								ng-class="buttonClass"
+								ng-click="startFreeTrial('github')"
+							) Try it for free
 
-						div(ng-if="status.user.available")
-							p #{translate("link_to_github_description")}
-							p
-								a(href,ng-click="linkAccount()").btn.btn-info #{translate("link_to_github")}
-								
-					div(ng-if="!$parent.permissions.admin")
-						p #{translate("please_ask_the_project_owner_to_link_to_github")}
+					div(ng-if="status.user.available && isProjectMember()")
+						p #{translate("link_to_github_description")}
+						p
+							a(href,ng-click="linkAccount()").btn.btn-info #{translate("link_to_github")}
+
+					div(ng-if="status.user.available && !isProjectMember()")
+						p #{translate("github_for_link_shared_projects")}
 
 				div(ng-if="status.user.enabled")
 					p #{translate("project_not_linked_to_github")}
