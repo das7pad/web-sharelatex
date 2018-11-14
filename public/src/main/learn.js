@@ -70,7 +70,7 @@ define(['base', 'directives/mathjax', 'services/algolia-search'], function(
 
     var updateHits = hits => $scope.safeApply(() => ($scope.hits = hits))
 
-    return ($scope.search = function() {
+    $scope.search = function() {
       const query = $scope.searchQueryText
       if (query == null || query.length === 0) {
         updateHits([])
@@ -85,7 +85,7 @@ define(['base', 'directives/mathjax', 'services/algolia-search'], function(
           return updateHits(hits)
         }
       })
-    })
+    }
   })
 
   return App.controller('LearnController', function() {})
