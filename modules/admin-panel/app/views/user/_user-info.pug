@@ -103,6 +103,16 @@ p
 
 			if settings.enableSubscriptions
 				tr
+					td
+						label(for="refered_user_count") Referred User Count
+					td
+						input#first_name.form-control(
+							name='refered_user_count',
+							placeholder="0"
+							ng-model="user.refered_user_count"
+						)
+
+				tr
 					th(colspan=2).text-center
 						| Features
 						span.small
@@ -255,6 +265,8 @@ p
 			//- 		)
 
 
+
+
 			if isSuperAdmin
 				tr
 					th(colspan=2).text-center Site Admin.
@@ -282,6 +294,10 @@ p
 				button.btn.btn-primary(type='submit', ng-disabled="adminUserForm.inflight")
 					span(ng-show="!adminUserForm.inflight") Save
 					span(ng-show="adminUserForm.inflight") Saving...
+				| &nbsp;
+				a.btn.btn-primary(href, ng-click="refreshFeatures()")
+					span(ng-if="!refreshingFeatures") Refresh Features
+					span(ng-if="refreshingFeatures") Refreshing...
 			.col-md-3.text-right
 				a.btn.btn-danger(
 					href='#',
