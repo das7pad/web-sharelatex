@@ -19,6 +19,7 @@ describe "CollabratecManager", ->
 			"../../../../app/js/Features/Errors/Errors": @Errors = {
 				NotFoundError: sinon.stub()
 			}
+			"../../../../app/js/Features/Project/ProjectCollabratecDetailsHandler": @ProjectCollabratecDetailsHandler = {}
 			"../../../../app/js/Features/Project/ProjectDetailsHandler": @ProjectDetailsHandler = {}
 			"../../../../app/js/Features/Project/ProjectEntityHandler": @ProjectEntityHandler = {}
 			"../../../../app/js/Features/Project/ProjectEntityUpdateHandler": @ProjectEntityUpdateHandler = {}
@@ -135,20 +136,20 @@ describe "CollabratecManager", ->
 					@CollabratecManager.createProject "user-id", "template-id", "title", "doc-abstract", ["keyword-1", "keyword-2"], "author", "collabratec-document-id", "collabratec-privategroup-id", @callback
 
 				it "should inject project metadata", ->
-					expect(@CollabratecManager._injectProjectMetadata).to.have.been.calledOnce.and.calledWithMatch @project, "title", "doc-abstract", ["keyword-1", "keyword-2"]
+					expect(@CollabratecManager._injectProjectMetadata).to.have.been.calledOnce.and.calledWithMatch "user-id", @project, "title", "doc-abstract", ["keyword-1", "keyword-2"]
 
 				describe "when inject project metadata succeeds", ->
 					beforeEach ->
 						@CollabratecManager._injectProjectMetadata = sinon.stub().yields()
-						@ProjectDetailsHandler.initializeCollabratecProject = sinon.stub()
+						@ProjectCollabratecDetailsHandler.initializeCollabratecProject = sinon.stub()
 						@CollabratecManager.createProject "user-id", "template-id", "title", "doc-abstract", ["keyword-1", "keyword-2"], "author", "collabratec-document-id", "collabratec-privategroup-id", @callback
 
 					it "should initialize project record", ->
-						expect(@ProjectDetailsHandler.initializeCollabratecProject).to.have.been.calledOnce.and.calledWithMatch "project-id", "title", "user", "collabratec-document-id", "collabratec-privategroup-id"
+						expect(@ProjectCollabratecDetailsHandler.initializeCollabratecProject).to.have.been.calledOnce.and.calledWithMatch "project-id", "title", "user", "collabratec-document-id", "collabratec-privategroup-id"
 
 					describe "when initialize project succeeds", ->
 						beforeEach ->
-							@ProjectDetailsHandler.initializeCollabratecProject.yields()
+							@ProjectCollabratecDetailsHandler.initializeCollabratecProject.yields()
 							@CollabratecManager.createProject "user-id", "template-id", "title", "doc-abstract", ["keyword-1", "keyword-2"], "author", "collabratec-document-id", "collabratec-privategroup-id", @callback
 
 						it "should callback with result", ->
@@ -159,7 +160,7 @@ describe "CollabratecManager", ->
 
 					describe "when initialize project returns error", ->
 						beforeEach ->
-							@ProjectDetailsHandler.initializeCollabratecProject.yields("error")
+							@ProjectCollabratecDetailsHandler.initializeCollabratecProject.yields("error")
 							@CollabratecManager.createProject "user-id", "template-id", "title", "doc-abstract", ["keyword-1", "keyword-2"], "author", "collabratec-document-id", "collabratec-privategroup-id", @callback
 
 						it "should callback with error", ->
@@ -168,14 +169,14 @@ describe "CollabratecManager", ->
 				describe "when inject project metadata returns error", ->
 					beforeEach ->
 						@CollabratecManager._injectProjectMetadata = sinon.stub().yields("error")
-						@ProjectDetailsHandler.initializeCollabratecProject = sinon.stub()
+						@ProjectCollabratecDetailsHandler.initializeCollabratecProject = sinon.stub()
 						@CollabratecManager.createProject "user-id", "template-id", "title", "doc-abstract", ["keyword-1", "keyword-2"], "author", "collabratec-document-id", "collabratec-privategroup-id", @callback
 
 					it "should callback with error", ->
 						expect(@callback).to.have.been.calledOnce.and.calledWith("error")
 
 					it "should not inject project metadata", ->
-						expect(@ProjectDetailsHandler.initializeCollabratecProject).not.to.have.been.called
+						expect(@ProjectCollabratecDetailsHandler.initializeCollabratecProject).not.to.have.been.called
 
 			describe "when create project returns error", ->
 				beforeEach ->
@@ -223,7 +224,7 @@ describe "CollabratecManager", ->
 					rootDoc_id: "root-doc-id"
 				@ProjectGetter.getProject = sinon.stub().yields null, @project
 				@ProjectEntityHandler.getDoc = sinon.stub()
-				@CollabratecManager._injectProjectMetadata { _id: "project-id" }, "title", "doc-abstract", ["keyword-1", "keyword-2"], @callback
+				@CollabratecManager._injectProjectMetadata "user-id", { _id: "project-id" }, "title", "doc-abstract", ["keyword-1", "keyword-2"], @callback
 
 			it "should get doc", ->
 				expect(@ProjectEntityHandler.getDoc).to.have.been.calledOnce.and.calledWithMatch "project-id", "root-doc-id"
@@ -244,29 +245,29 @@ describe "CollabratecManager", ->
 						"\\end{document}"
 					]
 					@ProjectEntityHandler.getDoc = sinon.stub().yields null, @lines, "revision"
-					@ProjectEntityUpdateHandler.updateDocLines = sinon.stub().yields()
-					@CollabratecManager._injectProjectMetadata { _id: "project-id" }, "title", "doc-abstract", ["keyword-1", "keyword-2"], @callback
+					@DocumentUpdaterHandler.setDocument = sinon.stub().yields()
+					@CollabratecManager._injectProjectMetadata "user-id", { _id: "project-id" }, "title", "doc-abstract", ["keyword-1", "keyword-2"], @callback
 
 				it "should update doc lines", ->
-					expect(@ProjectEntityUpdateHandler.updateDocLines).to.have.been.calledOnce.and.calledWith "project-id", "root-doc-id", @newLines, "revision", {}, @callback
+					expect(@DocumentUpdaterHandler.setDocument).to.have.been.calledOnce.and.calledWith "project-id", "root-doc-id", "user-id", @newLines, "collabratec", @callback
 
 			describe "when get doc returns error", ->
 				beforeEach ->
 					@ProjectEntityHandler.getDoc = sinon.stub().yields "error"
-					@ProjectEntityUpdateHandler.updateDocLines = sinon.stub()
-					@CollabratecManager._injectProjectMetadata { _id: "project-id" }, "title", "doc-abstract", ["keyword-1", "keyword-2"], @callback
+					@DocumentUpdaterHandler.setDocument = sinon.stub()
+					@CollabratecManager._injectProjectMetadata "user-id", { _id: "project-id" }, "title", "doc-abstract", ["keyword-1", "keyword-2"], @callback
 
 				it "should callback with error", ->
 					expect(@callback).to.have.been.calledOnce.and.calledWith("error")
 
 				it "should not update doc lines", ->
-					expect(@ProjectEntityUpdateHandler.updateDocLines).not.to.have.been.called
+					expect(@DocumentUpdaterHandler.setDocument).not.to.have.been.called
 
 		describe "when get project returns error", ->
 			beforeEach ->
 				@ProjectGetter.getProject = sinon.stub().yields "error"
 				@ProjectEntityHandler.getDoc = sinon.stub()
-				@CollabratecManager._injectProjectMetadata { _id: "project-id" }, "title", "doc-abstract", ["keyword-1", "keyword-2"], @callback
+				@CollabratecManager._injectProjectMetadata "user-id", { _id: "project-id" }, "title", "doc-abstract", ["keyword-1", "keyword-2"], @callback
 
 			it "should callback with error", ->
 				expect(@callback).to.have.been.calledOnce.and.calledWith("error")

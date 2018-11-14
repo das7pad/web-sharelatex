@@ -3,6 +3,7 @@ DocumentUpdaterHandler = require "../../../../app/js/Features/DocumentUpdater/Do
 Errors = require "../../../../app/js/Features/Errors/Errors"
 ObjectId = require("mongojs").ObjectId
 Path = require "path"
+ProjectCollabratecDetailsHandler = require "../../../../app/js/Features/Project/ProjectCollabratecDetailsHandler"
 ProjectDetailsHandler = require "../../../../app/js/Features/Project/ProjectDetailsHandler"
 ProjectEntityHandler = require "../../../../app/js/Features/Project/ProjectEntityHandler"
 ProjectEntityUpdateHandler = require "../../../../app/js/Features/Project/ProjectEntityUpdateHandler"
@@ -26,9 +27,9 @@ module.exports = CollabratecManager =
 			return callback err if err?
 			TemplatesManager.createProjectFromV1Template null, null, null, body.pub.doc_id, title, body.pub.published_ver_id, user_id, (err, project) ->
 				return callback err if err?
-				CollabratecManager._injectProjectMetadata project, title, doc_abstract, keywords, (err) ->
+				CollabratecManager._injectProjectMetadata user_id, project, title, doc_abstract, keywords, (err) ->
 					return callback err if err?
-					ProjectDetailsHandler.initializeCollabratecProject project._id, title, user_id, collabratec_document_id,collabratec_privategroup_id, (err) ->
+					ProjectCollabratecDetailsHandler.initializeCollabratecProject project._id, title, user_id, collabratec_document_id,collabratec_privategroup_id, (err) ->
 						return callback err if err?
 						callback null, {
 							id: project._id,
@@ -117,14 +118,14 @@ module.exports = CollabratecManager =
 				CollabratecManager._formatV2Project project, user
 			callback null, projects
 
-	_injectProjectMetadata: (project, title, doc_abstract, keywords, callback) ->
+	_injectProjectMetadata: (user_id, project, title, doc_abstract, keywords, callback) ->
 		ProjectGetter.getProject project._id, { _id: 1, rootDoc_id: 1 }, (err, project) ->
 			return callback err if err?
 			ProjectEntityHandler.getDoc project._id, project.rootDoc_id, (err, lines, rev) ->
 				return callback err if err?
 				new_lines = DocMetadata.injectMetadata lines, title, doc_abstract, keywords
 				return callback() unless new_lines?
-				ProjectEntityUpdateHandler.updateDocLines project._id, project.rootDoc_id, new_lines, rev, {}, callback
+				DocumentUpdaterHandler.setDocument project._id, project.rootDoc_id, user_id, new_lines, "collabratec", callback
 
 	_paginate: (projects=[], current_page, page_size) ->
 		total_items = projects.length
