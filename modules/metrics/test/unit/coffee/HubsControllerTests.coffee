@@ -22,16 +22,22 @@ describe "HubsController", ->
 			'logger-sharelatex':
 				err: sinon.stub()
 				log: sinon.stub()
-		@req = entity: v1Id: 5
+		institution =
+			_id: 'mock-institution-id'
+			v1Id: 5
+			fetchV1Data: (callback) =>
+				institution = Object.assign({}, @institution)
+				institution.name = 'Stanford'
+				institution.portalSlug = 'slug'
+				callback(null, institution)
+		@req = entity: institution
 		@res = { send: sinon.stub() }
 
 	describe "institutionHub rendering", ->
 		it 'renders the institution hub template', (done) ->
 			@res = { render: sinon.stub() }
-			metadata = "{\"name\": \"Stanford\", \"portal_slug\": \"slug\"}"
 			usageData = "{\"count\": 10}"
 			recentActivity = "[{\"title\": \"yesterday\"}]"
-			@request.get	= sinon.stub().callsArgWith(1, null, null, metadata)
 			@HubsController._usageData = sinon.stub().callsArgWith(1, usageData)
 			@HubsController._recentActivity = sinon.stub().callsArgWith(1, recentActivity)
 
@@ -41,7 +47,6 @@ describe "HubsController", ->
 					institutionId: 5,
 					institutionName: 'Stanford',
 					portalSlug: 'slug',
-					resourceType: 'institution',
 					usageData: usageData,
 					recentActivity: recentActivity
 				}
@@ -71,24 +76,24 @@ describe "HubsController", ->
 			@callback.calledWith(formatted).should.equal true
 			done()
 
-		it 'returns empty on errors and non-success status', (done) ->
+		it 'returns null on errors and non-success status', (done) ->
 			@request.get = sinon.stub().callsArgWith(1, null, {statusCode: 500}, {})
 			@HubsController._recentActivity(5, @callback)
-			@callback.calledWith([]).should.equal true
+			@callback.calledWith(null).should.equal true
 
 			@request.get = sinon.stub().callsArgWith(1, 'error', {statusCode: 200}, {})
 			@HubsController._recentActivity(5, @callback)
-			@callback.calledWith([]).should.equal true
+			@callback.calledWith(null).should.equal true
 			done()
 
-		it 'returns empty on errors and non-success status', (done) ->
+		it 'returns null on errors and non-success status', (done) ->
 			@request.get = sinon.stub().callsArgWith(1, null, {statusCode: 500}, {})
 			@HubsController._recentActivity(5, @callback)
-			@callback.calledWith([]).should.equal true
+			@callback.calledWith(null).should.equal true
 
 			@request.get = sinon.stub().callsArgWith(1, 'error', {statusCode: 200}, {})
 			@HubsController._recentActivity(5, @callback)
-			@callback.calledWith([]).should.equal true
+			@callback.calledWith(null).should.equal true
 			done()
 
 		it 'returns empty on zero activity', (done) ->

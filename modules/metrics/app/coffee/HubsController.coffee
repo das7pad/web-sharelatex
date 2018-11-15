@@ -7,14 +7,12 @@ logger = require 'logger-sharelatex'
 module.exports = HubsController =
 
 	institutionHub: (req, res, next) ->
-		id = req.entity.v1Id
-		# get general university metadata from v1
-		url = "#{settings.apis.v1.url}/universities/list/#{id}"
-		request.get(url, (err, response, body)->
-			if !err
-				data = JSON.parse(body)
-				institutionName = data.name
-				portalSlug = data.portal_slug
+		{entity} = req
+		id = entity.v1Id
+		entity.fetchV1Data (error, entity) ->
+			if !error
+				institutionName = entity.name
+				portalSlug = entity.portalSlug
 			else
 				institutionName = null
 				portalSlug = null
@@ -26,26 +24,27 @@ module.exports = HubsController =
 						institutionId: id,
 						institutionName: institutionName,
 						portalSlug: portalSlug,
-						resourceType: 'institution',
 						usageData: usageData,
 						recentActivity: recentActivity
 					}
 				)
 			)
-		)
 
 	institutionExternalCollaboration: (req, res, next) ->
 		HubsController._v1InstitutionsApi(req.entity.v1Id, 'external_collaboration_data', (err, response, body)->
+			return next(err) if err?
 			res.send(body)
 		)
 
 	institutionDepartments: (req, res, next) ->
 		HubsController._v1InstitutionsApi(req.entity.v1Id, 'departments_data', (err, response, body)->
+			return next(err) if err?
 			res.send(body)
 		)
 
 	institutionRoles: (req, res, next) ->
 		HubsController._v1InstitutionsApi(req.entity.v1Id, 'roles_data', (err, response, body)->
+			return next(err) if err?
 			res.send(body)
 		)
 
@@ -67,7 +66,7 @@ module.exports = HubsController =
 			if !err && response.statusCode == 200
 				callback(HubsController._formatRecentActivity(body))
 			else
-				callback([])
+				callback(null)
 
 	_formatRecentActivity: (data) ->
 		recentActivity = []
