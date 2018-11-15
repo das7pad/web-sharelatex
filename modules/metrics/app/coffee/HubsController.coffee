@@ -84,8 +84,8 @@ module.exports = HubsController =
 	_usageData: (id, callback) ->
 		# fetch signup data from v1
 		date = new Date()
-		endDate = date.getTime()
-		startDate = date.setMonth(date.getMonth() - 1)
+		endDate = date.getTime() / 1000
+		startDate = date.setMonth(date.getMonth() - 1) / 1000
 		query = "?start_date=#{startDate}&end_date=#{endDate}"
 		endpoint = "usage_signup_data#{query}"
 		HubsController._v1InstitutionsApi(id, endpoint, (err, response, body) ->
