@@ -71,7 +71,7 @@ module.exports = HubsController =
 	_formatRecentActivity: (data) ->
 		recentActivity = []
 		if data['month']['users'] + data['month']['projects'] == 0
-			return recentActivity
+			return null
 		lags = { day: 'Yesterday', week: 'Last Week', month: 'Last Month' }
 		for lag, title of lags
 			recentActivity.push(
