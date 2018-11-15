@@ -100,6 +100,7 @@ module.exports = ProjectImportErrorRecorder =
 				'Error: tried to release timed out lock': 'lock-error'
 				'Error: export of assignments is not supported': 'assignments-not-supported'
 				'V1ProjectHasAssignments: export of assignments is not supported': 'assignments-not-supported'
+				'[object Error]': 'generic-error-object'
 				'*': 'other'
 
 			getShortName = (name) ->
