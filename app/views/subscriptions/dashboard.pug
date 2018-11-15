@@ -14,7 +14,11 @@ block content
 							-hasAnySubscription = true
 							include ./dashboard/_personal_subscription
 
-						-if (groupSubscriptions && groupSubscriptions.length > 0)
+						-if (managedGroupSubscriptions && managedGroupSubscriptions.length > 0)
+							-hasAnySubscription = true
+							include ./dashboard/_managed_groups
+
+						-if (memberGroupSubscriptions && memberGroupSubscriptions.length > 0)
 							-hasAnySubscription = true
 							include ./dashboard/_group_memberships
 

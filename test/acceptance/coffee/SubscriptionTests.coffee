@@ -22,8 +22,8 @@ describe 'Subscriptions', ->
 			it 'should return no personalSubscription', ->
 				expect(@data.personalSubscription).to.equal null
 
-			it 'should return no groupSubscriptions', ->
-				expect(@data.groupSubscriptions).to.deep.equal []
+			it 'should return no memberGroupSubscriptions', ->
+				expect(@data.memberGroupSubscriptions).to.deep.equal []
 
 			it 'should return no v1Subscriptions', ->
 				expect(@data.v1Subscriptions).to.deep.equal {}
@@ -81,8 +81,8 @@ describe 'Subscriptions', ->
 					"trialEndsAtFormatted": "7th July 2018"
 				}
 
-			it 'should return no groupSubscriptions', ->
-				expect(@data.groupSubscriptions).to.deep.equal []
+			it 'should return no memberGroupSubscriptions', ->
+				expect(@data.memberGroupSubscriptions).to.deep.equal []
 
 		describe 'when the user has a subscription without recurly', ->
 			before (done) ->
@@ -109,8 +109,8 @@ describe 'Subscriptions', ->
 				expect(subscription.planCode).to.equal 'collaborator'
 				expect(subscription.recurly).to.not.exist
 
-			it 'should return no groupSubscriptions', ->
-				expect(@data.groupSubscriptions).to.deep.equal []
+			it 'should return no memberGroupSubscriptions', ->
+				expect(@data.memberGroupSubscriptions).to.deep.equal []
 
 		describe 'when the user is a member of a group subscription', ->
 			before (done) ->
@@ -153,15 +153,53 @@ describe 'Subscriptions', ->
 			it 'should return no personalSubscription', ->
 				expect(@data.personalSubscription).to.equal null
 
-			it 'should return the two groupSubscriptions', ->
-				expect(@data.groupSubscriptions.length).to.equal 2
+			it 'should return the two memberGroupSubscriptions', ->
+				expect(@data.memberGroupSubscriptions.length).to.equal 2
 				expect(
 					# Mongoose populates the admin_id with the user
-					@data.groupSubscriptions[0].admin_id._id.toString()
+					@data.memberGroupSubscriptions[0].admin_id._id.toString()
 				).to.equal @owner1._id
 				expect(
-					@data.groupSubscriptions[1].admin_id._id.toString()
+					@data.memberGroupSubscriptions[1].admin_id._id.toString()
 				).to.equal @owner2._id
+
+		describe 'when the user is a manager of a group subscription', ->
+			before (done) ->
+				@owner1 = new User()
+				@owner2 = new User()
+				async.series [
+					(cb) => @owner1.ensureUserExists cb
+					(cb) => @owner2.ensureUserExists cb
+					(cb) => Subscription.create {
+							admin_id: @owner1._id,
+							manager_ids: [@owner1._id, @user._id],
+							planCode: 'collaborator',
+							groupPlan: true
+						}, cb
+				], (error) =>				
+					return done(error) if error?
+					SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel @user, (error, @data) =>
+						return done(error) if error?
+						done()
+				return
+
+			after (done) ->
+				Subscription.remove {
+					admin_id: @owner1._id
+				}, done
+				return
+
+			it 'should return no personalSubscription', ->
+				expect(@data.personalSubscription).to.equal null
+
+			it 'should return the managedGroupSubscriptions', ->
+				expect(@data.managedGroupSubscriptions.length).to.equal 1
+				subscription = @data.managedGroupSubscriptions[0]
+				expect(
+					# Mongoose populates the admin_id with the user
+					subscription.admin_id._id.toString()
+				).to.equal @owner1._id
+				expect(subscription.groupPlan).to.equal true
 
 		describe 'when the user has a v1 subscription', ->
 			before (done) ->
@@ -184,8 +222,8 @@ describe 'Subscriptions', ->
 			it 'should return no personalSubscription', ->
 				expect(@data.personalSubscription).to.equal null
 
-			it 'should return no groupSubscriptions', ->
-				expect(@data.groupSubscriptions).to.deep.equal []
+			it 'should return no memberGroupSubscriptions', ->
+				expect(@data.memberGroupSubscriptions).to.deep.equal []
 
 			it 'should return a v1Subscriptions', ->
 				expect(@data.v1Subscriptions).to.deep.equal @subscription

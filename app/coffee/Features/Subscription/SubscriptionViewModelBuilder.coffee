@@ -37,8 +37,10 @@ module.exports =
 				return cb(new Error("No plan found for planCode '#{personalSubscription.planCode}'")) if !plan?
 				cb(null, plan)
 			]
-			groupSubscriptions: (cb) ->
+			memberGroupSubscriptions: (cb) ->
 				SubscriptionLocator.getMemberSubscriptions user, cb
+			managedGroupSubscriptions: (cb) ->
+				SubscriptionLocator.getManagedGroupSubscriptions user, cb
 			v1Subscriptions: (cb) ->
 				V1SubscriptionManager.getSubscriptionsFromV1 user._id, (error, subscriptions, v1Id) ->
 					return cb(error) if error?
@@ -46,8 +48,16 @@ module.exports =
 					cb(null, subscriptions)
 		}, (err, results) ->
 			return callback(err) if err?
-			{personalSubscription, groupSubscriptions, v1Subscriptions, recurlySubscription, plan} = results
-			groupSubscriptions ?= []
+			{
+				personalSubscription,
+				memberGroupSubscriptions,
+				managedGroupSubscriptions,
+				v1Subscriptions,
+				recurlySubscription,
+				plan
+			} = results
+			memberGroupSubscriptions ?= []
+			managedGroupSubscriptions ?= []
 			v1Subscriptions ?= {}
 
 			if personalSubscription?.toObject?
@@ -72,7 +82,10 @@ module.exports =
 				}
 
 			callback null, {
-				personalSubscription, groupSubscriptions, v1Subscriptions
+				personalSubscription,
+				managedGroupSubscriptions,
+				memberGroupSubscriptions,
+				v1Subscriptions
 			}
 
 	buildViewModel : ->
