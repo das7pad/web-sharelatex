@@ -1,0 +1,20 @@
+each managedGroupSubscription in managedGroupSubscriptions
+	p
+		| You are a manager of
+		|
+		- if (managedGroupSubscription.teamName && managedGroupSubscription.teamName != '')
+			strong= managedGroupSubscription.teamName
+		- else if (managedGroupSubscription.admin_id._id == user._id)
+			| a group account
+		- else
+			| the group account owned by
+			|
+			strong= managedGroupSubscription.admin_id.email
+	p
+		a.btn.btn-primary(href="/manage/groups/" + managedGroupSubscription._id + "/members")
+			| Add members
+		| &nbsp;
+		a.btn.btn-primary(href="/manage/groups/" + managedGroupSubscription._id + "/managers")
+			| Add other managers
+
+	hr
