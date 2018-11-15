@@ -201,6 +201,46 @@ describe 'Subscriptions', ->
 				).to.equal @owner1._id
 				expect(subscription.groupPlan).to.equal true
 
+		describe.only 'when the user is a member of an affiliation', ->
+			before (done) ->
+				v1Id = MockV1Api.nextV1Id()
+				MockV1Api.setUser v1Id, {
+					subscription: {}
+				}
+				MockV1Api.setAffiliations [{
+					email: 'confirmed-affiliation-email@stanford.example.edu'
+					institution: { name: 'Stanford', licence: 'pro_plus', confirmed: true }
+				}, {
+					email: 'unconfirmed-affiliation-email@harvard.example.edu'
+					institution: { name: 'Harvard', licence: 'pro_plus', confirmed: true }
+				}, {
+					email: 'confirmed-affiliation-email@mit.example.edu'
+					institution: { name: 'MIT', licence: 'pro_plus', confirmed: false }
+				}]
+				async.series [
+					(cb) =>
+						@user.setV1Id v1Id, cb
+					(cb) =>
+						@user.addEmail 'unconfirmed-affiliation-email@harvard.example.edu', cb
+					(cb) =>
+						@user.addEmail 'confirmed-affiliation-email@stanford.example.edu', cb
+					(cb) =>
+						@user.confirmEmail 'confirmed-affiliation-email@stanford.example.edu', cb
+					(cb) =>
+						@user.addEmail 'confirmed-affiliation-email@mit.example.edu', cb
+					(cb) =>
+						@user.confirmEmail 'confirmed-affiliation-email@mit.example.edu', cb
+				], (error) =>
+					return done(error) if error?
+					SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel @user, (error, @data) =>
+						return done(error) if error?
+						done()
+
+			it 'should return only the affilations with confirmed institutions, and confirmed emails', ->
+				expect(@data.confirmedMemberInstitutions).to.deep.equal [
+					{ name: 'Stanford', licence: 'pro_plus', confirmed: true }
+				]
+
 		describe 'when the user has a v1 subscription', ->
 			before (done) ->
 				MockV1Api.setUser v1Id = MockV1Api.nextV1Id(), {

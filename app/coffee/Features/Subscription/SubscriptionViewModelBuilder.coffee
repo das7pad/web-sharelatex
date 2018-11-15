@@ -5,6 +5,7 @@ SubscriptionFormatters = require("./SubscriptionFormatters")
 LimitationsManager = require("./LimitationsManager")
 SubscriptionLocator = require("./SubscriptionLocator")
 V1SubscriptionManager = require("./V1SubscriptionManager")
+InstitutionsGetter = require("../Institutions/InstitutionsGetter")
 logger = require('logger-sharelatex')
 _ = require("underscore")
 async = require('async')
@@ -41,6 +42,8 @@ module.exports =
 				SubscriptionLocator.getMemberSubscriptions user, cb
 			managedGroupSubscriptions: (cb) ->
 				SubscriptionLocator.getManagedGroupSubscriptions user, cb
+			confirmedMemberInstitutions: (cb) ->
+				InstitutionsGetter.getConfirmedInstitutions user._id, cb
 			v1Subscriptions: (cb) ->
 				V1SubscriptionManager.getSubscriptionsFromV1 user._id, (error, subscriptions, v1Id) ->
 					return cb(error) if error?
@@ -52,12 +55,14 @@ module.exports =
 				personalSubscription,
 				memberGroupSubscriptions,
 				managedGroupSubscriptions,
+				confirmedMemberInstitutions,
 				v1Subscriptions,
 				recurlySubscription,
 				plan
 			} = results
 			memberGroupSubscriptions ?= []
 			managedGroupSubscriptions ?= []
+			confirmedMemberInstitutions ?= []
 			v1Subscriptions ?= {}
 
 			if personalSubscription?.toObject?
@@ -85,6 +90,7 @@ module.exports =
 				personalSubscription,
 				managedGroupSubscriptions,
 				memberGroupSubscriptions,
+				confirmedMemberInstitutions,
 				v1Subscriptions
 			}
 
