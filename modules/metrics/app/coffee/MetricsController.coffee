@@ -31,6 +31,7 @@ module.exports = MetricsController =
 			}
 
 	analyticsProxy: (req, res, next) ->
+		res.setTimeout(5 * 60 * 1000)
 		analyticsUrl = settings.apis.analytics.url + req.originalUrl
 		logger.log req.query, "requesting from analytics #{analyticsUrl}"
 		request

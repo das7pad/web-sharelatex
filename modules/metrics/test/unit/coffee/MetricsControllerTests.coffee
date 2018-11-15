@@ -85,6 +85,7 @@ describe "MetricsController", ->
 
 			@req = { originalUrl: '/graphs?resource_type=team&resource_id=6' }
 
+			@res = { setTimeout: sinon.stub() }
 			@MetricsController.analyticsProxy(@req, @res)
 
 			@request.get.calledWith(
