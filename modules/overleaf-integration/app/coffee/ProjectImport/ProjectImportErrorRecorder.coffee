@@ -76,31 +76,48 @@ module.exports = ProjectImportErrorRecorder =
 				"V1HistoryNotSyncedError: v1 history not synced": 'v1-history-not-synced'
 				"UnsupportedExportRecordsError: project has export records": 'has-export-records'
 				'Error: non-ok response from filestore for upload: 500' : 'filestore-500'
+				'Error: non-ok response from filestore for upload: 502' : 'filestore-502'
+				'Error: non-ok response from filestore for upload: 413' : 'filestore-413'
 				'Error: socket hang up': 'connection-error'
 				'Error: ETIMEDOUT': 'timed-out'
 				'Error: read ECONNRESET': 'connection-error'
 				'Error: overleaf returned non-success code: 403': 'overleaf-403'
 				'Error: non-ok response from filestore for upload: 502': 'filestore-502'
 				'V2ExportInProgress: v2 export already in progress': 'v2-export-already-in-progress'
+				'InvalidNameError: file already exists': 'file-exists'
 				'InvalidNameError: invalid element name': 'invalid-element-name'
 				'Error: Overleaf s3 returned non-success code: 500': 'overleaf-s3-500'
 				'Error: overleaf returned non-success code: 500': 'overleaf-500'
 				'Error: ESOCKETTIMEDOUT': 'connection-error'
 				'NotFoundError: entity not found': 'entity-not-found'
-				'project-history returned non-success code: 409': 'project-history-409'
+				'Error: project-history returned non-success code: 409': 'project-history-409'
+				'Error: project-history returned non-success code: 502': 'project-history-502'
+				'Error: project-history returned non-success code: 503': 'project-history-503'
 				'Error: docstore api responded with non-success code: 500': 'docstore-500'
+				'Error: docstore api responded with non-success code: 504': 'docstore-504'
 				'Error: connect ETIMEDOUT 52.216.18.59:443': 'connection-error'
 				'Error: cannot import label with no history_version': 'label-without-version'
+				'Error: tried to release timed out lock': 'lock-error'
+				'Error: export of assignments is not supported': 'assignments-not-supported'
+				'V1ProjectHasAssignments: export of assignments is not supported': 'assignments-not-supported'
 				'*': 'other'
 
 			getShortName = (name) ->
+				if shortNames[name]
+					return shortNames[name] 
 				if name?.match(/UnsupportedBrandError: project has brand variation/)
 					return 'unsupported-brand'
 				if name?.match(/duplicate key error/)
 					return 'duplicate-key'
 				if name?.match(/InvalidNameError: Project name cannot( not)? contain/)
 					return 'invalid-name-other'
-				return shortNames[name] || shortNames['*']
+				if name?.match(/overleaf returned non-success code: 500/)
+					return 'overleaf-500'
+				if name?.match(/overleaf returned non-success code: 403/)
+					return 'overleaf-403'
+				if name?.match(/NotFoundError: no project found with id/)
+					return 'project-not-found'
+				return shortNames['*']
 
 			# set all the known errors to zero if not present (otherwise gauges stay on their last value)
 			summaryCounts = {}
