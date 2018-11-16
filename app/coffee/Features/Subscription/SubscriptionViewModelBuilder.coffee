@@ -44,6 +44,8 @@ module.exports =
 				SubscriptionLocator.getManagedGroupSubscriptions user, cb
 			confirmedMemberInstitutions: (cb) ->
 				InstitutionsGetter.getConfirmedInstitutions user._id, cb
+			managedInstitutions: (cb) ->
+				InstitutionsGetter.getManagedInstitutions user._id, cb
 			v1Subscriptions: (cb) ->
 				V1SubscriptionManager.getSubscriptionsFromV1 user._id, (error, subscriptions, v1Id) ->
 					return cb(error) if error?
@@ -56,6 +58,7 @@ module.exports =
 				memberGroupSubscriptions,
 				managedGroupSubscriptions,
 				confirmedMemberInstitutions,
+				managedInstitutions,
 				v1Subscriptions,
 				recurlySubscription,
 				plan
@@ -63,7 +66,9 @@ module.exports =
 			memberGroupSubscriptions ?= []
 			managedGroupSubscriptions ?= []
 			confirmedMemberInstitutions ?= []
+			managedInstitutions ?= []
 			v1Subscriptions ?= {}
+
 
 			if personalSubscription?.toObject?
 				# Downgrade from Mongoose object, so we can add a recurly and plan attribute
@@ -91,6 +96,7 @@ module.exports =
 				managedGroupSubscriptions,
 				memberGroupSubscriptions,
 				confirmedMemberInstitutions,
+				managedInstitutions,
 				v1Subscriptions
 			}
 
