@@ -9,6 +9,7 @@
 // Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
@@ -47,7 +48,7 @@ define(['base', 'ide/permissions/PermissionsManager'], function(
     const user_id = ide.$scope.user.id
 
     $scope.dbState = cachedState
-    $scope.dbState.hasDropboxFeature = $scope.project.features.dropbox
+    $scope.dbState.hasDropboxFeature = $scope.user.features.dropbox
 
     $http.get('/dropbox/status').then(function(response) {
       const dropboxStatus = response.data
@@ -63,6 +64,16 @@ define(['base', 'ide/permissions/PermissionsManager'], function(
       return ($scope.startedLinkProcess = true)
     }
 
-    return ($scope.cancel = () => $modalInstance.dismiss())
+    $scope.cancel = () => $modalInstance.dismiss()
+
+    $scope.isProjectMember = function() {
+      const projectMembers = ide.$scope.project.members.map(
+        member => member._id
+      )
+      return (
+        ide.$scope.project.owner._id === user_id ||
+        projectMembers.includes(user_id)
+      )
+    }
   })
 })
