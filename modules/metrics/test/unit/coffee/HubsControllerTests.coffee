@@ -143,12 +143,12 @@ describe "HubsController", ->
 
 		it 'calls correct endpoint with query for usageData', (done) ->
 			callback = sinon.stub()
-			@HubsController._usageData(5, callback)
 			endpoint = /5\/usage_signup_data\?start_date=\d{10}\.\d{3}&end_date=\d{10}\.\d{3}/
-			@request.get.calledWith({
-				url: sinon.match(endpoint)
-				auth: @v1Auth
-				json: true
-			}).should.equal true
-			callback.calledWith(@v1JsonResp).should.equal true
-			done()
+			@HubsController._usageData 5, (data) =>
+				@request.get.calledWith({
+					url: sinon.match(endpoint)
+					auth: @v1Auth
+					json: true
+				}).should.equal true
+				expect(data).to.deep.equal(@v1JsonResp)
+				done()
