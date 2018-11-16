@@ -11,15 +11,22 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
     constructor(editor) {
       this.bindToEditor = this.bindToEditor.bind(this)
       this.unbindFromEditor = this.unbindFromEditor.bind(this)
+      this.updateFocus = this.updateFocus.bind(this)
       this.onInsertAdded = this.onInsertAdded.bind(this)
+      this.onInsertRemoved = this.onInsertRemoved.bind(this)
       this.shareJsOffsetToAcePosition = this.shareJsOffsetToAcePosition.bind(
         this
       )
       this.getAllLines = this.getAllLines.bind(this)
       this.onDeleteAdded = this.onDeleteAdded.bind(this)
-      this.onCommentAdded = this.onCommentAdded.bind(this)
+      this.onDeleteRemoved = this.onDeleteRemoved.bind(this)
+      this.onChangeMoved = this.onChangeMoved.bind(this)
       this.editor = editor
       this.cm = this.editor.getCodeMirror()
+    }
+
+    updateFocus() {
+      // Actually it may have been completely fruitless me abstracting this out. Leave it for now
     }
 
     bindToEditor() {
@@ -31,17 +38,56 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
     }
 
     onInsertAdded(change) {
-      let start, end
+      let start, end, marker
       start = this.shareJsOffsetToAcePosition(change.op.p)
       end = this.shareJsOffsetToAcePosition(change.op.p + change.op.i.length)
-      this.cm.doc.markText(
+      marker = this.cm.doc.markText(
         { line: start.row, ch: start.column },
         { line: end.row, ch: end.column },
         { className: 'track-changes-marker track-changes-added-marker' }
       )
 
-      // callout_marker_id = @createCalloutMarker(start, "track-changes-added-marker-callout")
-      // @changeIdToMarkerIdMap[change.id] = { background_marker_id, callout_marker_id }
+      this.changeIdToMarkerIdMap[change.id] = marker.id
+    }
+
+    onDeleteAdded() {}
+
+    onInsertRemoved(change) {
+      /** For the moment I'm just going to do this bit
+       - I think I need to take some action to remove the
+       highlight itself but don't worry about it for a sec**/
+      delete this.changeIdToMarkerIdMap[change.id]
+    }
+
+    onDeleteRemoved() {}
+
+    onChangeMoved(change) {
+      let end
+      const start = this.shareJsOffsetToAcePosition(change.op.p)
+      if (change.op.i != null) {
+        end = this.shareJsOffsetToAcePosition(change.op.p + change.op.i.length)
+      } else {
+        end = start
+      }
+      return this.updateMarker(change.id, start, end)
+    }
+
+    updateMarker(change_id, start, end) {
+      const markers = this.cm.doc.getAllMarks()
+      const markerId = this.changeIdToMarkerIdMap[change_id]
+
+      for (let marker of markers) {
+        if (marker.id === markerId) {
+          marker.clear()
+          let updatedMarker = this.cm.doc.markText(
+            { line: start.row, ch: start.column },
+            { line: end.row, ch: end.column },
+            { className: 'track-changes-marker track-changes-added-marker' }
+          )
+
+          this.changeIdToMarkerIdMap[change_id] = updatedMarker.id
+        }
+      }
     }
 
     shareJsOffsetToAcePosition(offset) {
@@ -58,11 +104,6 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
       }
       return lines
     }
-
-    onDeleteAdded() {}
-    // TODO
-
-    onCommentAdded() {}
   })
 })
 // TODO

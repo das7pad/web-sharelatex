@@ -193,8 +193,9 @@ define([
         this.rangesTracker = doc.ranges
         this.setTrackChanges(this.$scope.trackChanges)
 
-        doc.on('ranges:dirty', () => {})
-        this.updateAnnotations()
+        doc.on('ranges:dirty', () => {
+          this.updateAnnotations()
+        })
         doc.on('ranges:clear', () => {
           this.clearAnnotations()
         })
@@ -264,15 +265,15 @@ define([
         for (id in dirty.change.removed) {
           change = dirty.change.removed[id]
           if (change.op.i != null) {
-            this._onInsertRemoved(change)
+            this.adapter.onInsertRemoved(change)
           } else if (change.op.d != null) {
-            this._onDeleteRemoved(change)
+            this.adapter.onDeleteRemoved(change)
           }
         }
         for (id in dirty.change.moved) {
           change = dirty.change.moved[id]
           updateMarkers = true
-          this._onChangeMoved(change)
+          this.adapter.onChangeMoved(change)
         }
 
         for (id in dirty.comment.added) {
@@ -287,6 +288,13 @@ define([
           comment = dirty.comment.moved[id]
           updateMarkers = true
           this._onCommentMoved(comment)
+        }
+
+        /**
+         * For now, if not using ACE don't worry about the markers
+         */
+        if (!this.editor) {
+          updateMarkers = false
         }
 
         this.rangesTracker.resetDirtyState()
@@ -463,8 +471,8 @@ define([
       onCut() {
         this._resetCutState()
         const selection = this.editor.getSelectionRange()
-        const selection_start = this._aceRangeToShareJs(selection.start)
-        const selection_end = this._aceRangeToShareJs(selection.end)
+        const selection_start = this.adapter._aceRangeToShareJs(selection.start)
+        const selection_end = this.adapter._aceRangeToShareJs(selection.end)
         this._cutState.text = this.editor.getSelectedText()
         this._cutState.docId = this.$scope.docId
         return (() => {
@@ -497,7 +505,7 @@ define([
             return
           }
           const pasted_text = change.lines.join('\n')
-          const paste_offset = this._aceRangeToShareJs(change.start)
+          const paste_offset = this.adapter._aceRangeToShareJs(change.start)
           // We have to wait until the change has been processed by the range tracker,
           // since if we move the ops into place beforehand, they will be moved again
           // when the changes are processed by the range tracker. This ranges:dirty
@@ -617,20 +625,6 @@ define([
         })()
       }
 
-      updateFocus() {
-        const selection = this.editor.getSelectionRange()
-        const selection_start = this._aceRangeToShareJs(selection.start)
-        const selection_end = this._aceRangeToShareJs(selection.end)
-        const entries = this._getCurrentDocEntries()
-        const is_selection = selection_start !== selection_end
-        return this.$scope.$emit(
-          'editor:focus:changed',
-          selection_start,
-          selection_end,
-          is_selection
-        )
-      }
-
       broadcastChange() {
         return this.$scope.$emit(
           'editor:track-changes:changed',
@@ -696,26 +690,20 @@ define([
         return entries
       }
 
-      _onInsertRemoved(change) {
-        const {
-          background_marker_id,
-          callout_marker_id
-        } = this.adapter.changeIdToMarkerIdMap[change.id]
-        delete this.adapter.changeIdToMarkerIdMap[change.id]
-        const session = this.editor.getSession()
-        session.removeMarker(background_marker_id)
-        return session.removeMarker(callout_marker_id)
-      }
+      updateFocus() {
+        // Don't worry about the review panel for now if we're not using ACE
+        if (this.editor) {
+          const selection = this.adapter.updateFocus()
 
-      _onDeleteRemoved(change) {
-        const {
-          background_marker_id,
-          callout_marker_id
-        } = this.adapter.changeIdToMarkerIdMap[change.id]
-        delete this.adapter.changeIdToMarkerIdMap[change.id]
-        const session = this.editor.getSession()
-        session.removeMarker(background_marker_id)
-        return session.removeMarker(callout_marker_id)
+          this.$scope.$emit(
+            'editor:focus:changed',
+            selection.start,
+            selection.end,
+            selection.isSelection
+          )
+        } else {
+          this.adapter.updateFocus()
+        }
       }
 
       onCommentAdded(comment) {
@@ -767,14 +755,6 @@ define([
         }
       }
 
-      _aceRangeToShareJs(range) {
-        const lines = this.editor
-          .getSession()
-          .getDocument()
-          .getLines(0, range.row)
-        return AceShareJsCodec.aceRangeToShareJs(range, lines)
-      }
-
       _aceChangeToShareJs(delta) {
         const lines = this.editor
           .getSession()
@@ -783,50 +763,12 @@ define([
         return AceShareJsCodec.aceChangeToShareJs(delta, lines)
       }
 
-      _onChangeMoved(change) {
-        let end
-        const start = this.adapter.shareJsOffsetToAcePosition(change.op.p)
-        if (change.op.i != null) {
-          end = this.adapter.shareJsOffsetToAcePosition(
-            change.op.p + change.op.i.length
-          )
-        } else {
-          end = start
-        }
-        return this._updateMarker(change.id, start, end)
-      }
-
       _onCommentMoved(comment) {
         const start = this.adapter.shareJsOffsetToAcePosition(comment.op.p)
         const end = this.adapter.shareJsOffsetToAcePosition(
           comment.op.p + comment.op.c.length
         )
-        return this._updateMarker(comment.id, start, end)
-      }
-
-      _updateMarker(change_id, start, end) {
-        if (this.adapter.changeIdToMarkerIdMap[change_id] == null) {
-          return
-        }
-        const session = this.editor.getSession()
-        const markers = session.getMarkers()
-        const {
-          background_marker_id,
-          callout_marker_id
-        } = this.adapter.changeIdToMarkerIdMap[change_id]
-        if (
-          background_marker_id != null &&
-          markers[background_marker_id] != null
-        ) {
-          const background_marker = markers[background_marker_id]
-          background_marker.range.start = start
-          background_marker.range.end = end
-        }
-        if (callout_marker_id != null && markers[callout_marker_id] != null) {
-          const callout_marker = markers[callout_marker_id]
-          callout_marker.range.start = start
-          return (callout_marker.range.end = start)
-        }
+        return this.adapter.updateMarker(comment.id, start, end)
       }
     }
     TrackChangesManager.initClass()
