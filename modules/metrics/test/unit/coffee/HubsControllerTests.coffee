@@ -96,12 +96,12 @@ describe "HubsController", ->
 			@callback.calledWith(null).should.equal true
 			done()
 
-		it 'returns empty on zero activity', (done) ->
+		it 'returns null on zero activity', (done) ->
 			@dataResponse.month.users = 0
 			@dataResponse.month.projects = 0
 			@request.get = sinon.stub().callsArgWith(1, null, {statusCode: 200}, @dataResponse)
 			@HubsController._recentActivity(5, @callback)
-			@callback.calledWith([]).should.equal true
+			@callback.calledWith(null).should.equal true
 			done()
 
 	describe "v1 api proxies", ->
