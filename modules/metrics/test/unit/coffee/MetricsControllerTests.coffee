@@ -8,6 +8,13 @@ expect = require("chai").expect
 
 describe "MetricsController", ->
 	beforeEach ->
+		@institution =
+			_id: 'mock-institution-id'
+			v1Id: 5
+			fetchV1Data: (callback) =>
+				institution = Object.assign({}, @institution)
+				institution.name = 'Stanford'
+				callback(null, institution)
 		@MetricsController = SandboxedModule.require modulePath, requires:
 			'settings-sharelatex': @Settings =
 				apis:
@@ -54,8 +61,7 @@ describe "MetricsController", ->
 
 	describe 'institutionMetrics', ->
 		it 'renders the metricsApp template after calling v1 for the name', (done) ->
-			@request.get	= sinon.stub().callsArgWith(1, null, null, "{\"name\": \"Stanford\"}")
-			@req = entity: v1Id: 5
+			@req = entity: @institution
 			@res = { render: sinon.stub() }
 
 			@MetricsController.institutionMetrics(@req, @res)
