@@ -5,7 +5,7 @@ if settings.overleaf
 		ng-click="openPublishProjectModal()"
 		ng-controller="PublishController"
 	)
-		i.fa.fa-fw.fa-globe
+		i.fa.fa-fw.fa-globe(aria-hidden)
 		p.toolbar-label(
 			ng-if="::!(cobranding.isProjectCobranded && cobranding.submitBtnHtml)"
 		) Submit

@@ -96,6 +96,8 @@ module.exports = settings =
 		documentupdater:
 			port: docUpdaterPort = 3003
 
+	gitBridgePublicBaseUrl: "http://#{process.env['GIT_BRIDGE_HOST'] || 'localhost'}:8000"
+
 	# Tell each service where to find the other services. If everything
 	# is running locally then this is easy, but they exist as separate config
 	# options incase you want to run some services on remote hosts.
@@ -167,6 +169,8 @@ module.exports = settings =
 			url: v1Api.url
 			user: v1Api.user
 			pass: v1Api.pass
+		v1_history:
+			url: "http://#{process.env['V1_HISTORY_HOST'] or "localhost"}:3100/api"
 
 	templates:
 		user_id: process.env.TEMPLATES_USER_ID or "5395eb7aad1f29a88756c7f2"
@@ -213,12 +217,17 @@ module.exports = settings =
 	defaultFeatures: defaultFeatures =
 		collaborators: -1
 		dropbox: true
+		github: true
+		gitBridge: true
 		versioning: true
 		compileTimeout: 180
 		compileGroup: "standard"
 		references: true
 		templates: true
 		trackChanges: true
+
+	features:
+		personal: defaultFeatures
 
 	plans: plans = [{
 		planCode: "personal"

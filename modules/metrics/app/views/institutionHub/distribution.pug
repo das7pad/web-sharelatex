@@ -1,0 +1,13 @@
+.admin-sub-item
+	h6 Departments
+	.row
+		.custom-donut-container.chart-container.col-xs-12
+			p Number of users in different #{institutionName} departments
+			svg#institutional-departments-chart(data-url="/institutions/" + institutionId + "/departments")
+
+.admin-sub-item
+	h6 Roles
+	.row
+		.custom-donut-container.chart-container.col-xs-12
+			p Number of users in different #{institutionName} roles
+			svg#institutional-roles-chart(data-url="/institutions/" + institutionId + "/roles")

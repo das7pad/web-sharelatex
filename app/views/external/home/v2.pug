@@ -47,63 +47,64 @@ block content
 			.long-form-features.row-spaced
 				.row
 					script(type="text/javascript").
-						var frames = [{
-							before: "",
-							time: 1000
-						}, {
-							before: "i",
-							time: 100
-						}, {
-							before: "in",
-							time: 200
-						}, {
-							before: "in ",
-							time: 300
-						}, {
-							before: "in r",
-							time: 100
-						}, {
-							before: "in re",
-							time: 200
-						}, {
-							before: "in rea",
-							time: 100
-						}, {
-							before: "in real",
-							time: 200
-						}, {
-							before: "in real ",
-							time: 400
-						}, {
-							before: "in real t",
-							time: 200
-						}, {
-							before: "in real ti",
-							time: 100
-						}, {
-							before: "in real tim",
-							time: 200
-						}, {
-							before: "in real time",
-							time: 2000
-						}];
-						var index = 0;
-						function nextFrame() {
-							var frame = frames[index];
-							index = index + 1;
-							if (index >= frames.length) {
-								index = 0;
+						(function () {
+							var frames = [{
+								before: "",
+								time: 1000
+							}, {
+								before: "i",
+								time: 100
+							}, {
+								before: "in",
+								time: 200
+							}, {
+								before: "in ",
+								time: 300
+							}, {
+								before: "in r",
+								time: 100
+							}, {
+								before: "in re",
+								time: 200
+							}, {
+								before: "in rea",
+								time: 100
+							}, {
+								before: "in real",
+								time: 200
+							}, {
+								before: "in real ",
+								time: 400
+							}, {
+								before: "in real t",
+								time: 200
+							}, {
+								before: "in real ti",
+								time: 100
+							}, {
+								before: "in real tim",
+								time: 200
+							}, {
+								before: "in real time",
+								time: 2000
+							}];
+							var index = 0;
+							function nextFrame() {
+								var frame = frames[index];
+								index = index + 1;
+								if (index >= frames.length) {
+									index = 0;
+								}
+								$(".real-time-example").html(frame.before + "<div class='cursor'>|</div>");
+								setTimeout(nextFrame, frame.time);
 							}
-							$(".real-time-example").html(frame.before + "<div class='cursor'>|</div>");
-							setTimeout(nextFrame, frame.time);
-						}
-						nextFrame();
-
+							nextFrame();
+						})(); 
 					.col-md-6
 						.card.row-spaced
 							.row
 								.col-xs-2.text-center
-									i.fa.fa-group.fa-4x.icon-accent
+									i.fa.fa-group.fa-4x.icon-accent(aria-hidden)
 								.col-xs-10
 									h2.h1 #{translate("collaboration")}
 									p #{translate("work_on_single_version")} 
@@ -114,7 +115,7 @@ block content
 						.card.row-spaced
 							.row
 								.col-md-2.col-md-push-10.col-xs-2.text-center
-									i.fa.fa-thumbs-up.fa-4x.icon-accent
+									i.fa.fa-thumbs-up.fa-4x.icon-accent(aria-hidden)
 								.col-md-10.col-md-pull-2.col-xs-10
 									h2.h1 #{translate("ease_of_use")}
 									p #{translate("no_complicated_latex_install")}
@@ -125,7 +126,7 @@ block content
 						.card.row-spaced
 							.row
 								.col-xs-2.text-center
-									i.fa.fa-history.fa-4x.icon-accent
+									i.fa.fa-history.fa-4x.icon-accent(aria-hidden)
 								.col-xs-10
 									h2.h1 #{translate("document_history")}
 									p.track-changes-example #{translate("see_what_has_been")}
@@ -138,7 +139,7 @@ block content
 						.card.row-spaced
 							.row
 								.col-md-2.col-md-push-10.col-xs-2.text-center
-									i.fa.fa-globe.fa-4x.icon-accent
+									i.fa.fa-globe.fa-4x.icon-accent(aria-hidden)
 								.col-md-10.col-md-pull-2.col-xs-10
 									h2.h1 #{translate("work_from_anywhere")}
 									p #{translate("acces_work_from_anywhere")}

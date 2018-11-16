@@ -1,0 +1,7 @@
+.admin-sub-item
+	h6 External collaboration
+	.row
+		.custom-donut-container.chart-container.col-xs-12
+			p Number of users at other institutions that have collaborated with 
+				| #{institutionName} the most, in Overleaf, in the past month
+			svg#v2-external-collaboration-chart(data-url="/institutions/" + institutionId + "/externalCollaboration")
