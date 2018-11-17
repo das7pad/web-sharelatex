@@ -27,6 +27,7 @@ define [
 				isInitialized: false
 				groups: null
 				selectedGroupId: null
+				format: 'bibtex'
 
 			_handleError = (err) ->
 				if err.status == 401
@@ -78,7 +79,6 @@ define [
 					$scope.state.valid = false
 				else
 					$scope.state.valid = true
-				console.log 'validating', {name, isInitialized, valid:$scope.state.valid}
 
 			$scope.$watch 'data.name', validate
 			validate()
@@ -89,17 +89,11 @@ define [
 					$scope.data.isInitialized &&
 					$scope.data.name
 				)
-				if $scope.hasGroups()
-					# Import from selected Group
-					if $scope.data.selectedGroupId
-						payload = {
-							group_id: $scope.data.selectedGroupId
-						}
-					else
-						payload = {}
-				else
-					# Import from Account
-					payload = {}
+				payload = {}
+				if provider == 'mendeley' && $scope.hasGroups() && $scope.data.selectedGroupId
+					payload.group_id = $scope.data.selectedGroupId
+				if provider == 'zotero'
+					payload.format = $scope.data.format
 				event_tracking.send("references-#{provider}", "modal", "import-bibtex")
 				$scope.state.inflight = true
 				ide.fileTreeManager

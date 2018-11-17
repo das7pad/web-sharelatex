@@ -56,6 +56,13 @@ mixin providerPanel(providerKey, controller, providerName)
 										focus-on="open"
 									)
 
+								if (providerKey == 'zotero')
+									.row-spaced-small
+										label(for="format") Format
+										select.form-control(ng-model="data.format")
+											option(value='bibtex') BibTeX
+											option(value='biblatex') BibLaTeX
+
 								.text-danger.row-spaced-small(ng-show="newDocForm.name.$error.validFile")
 
 						div(ng-if="state.inflight")
