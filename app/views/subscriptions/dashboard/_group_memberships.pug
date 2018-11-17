@@ -5,14 +5,7 @@ div(ng-controller="GroupMembershipController")
 				p
 					| You are a member of
 					|
-					- if (groupSubscription.teamName && groupSubscription.teamName != '')
-						strong= groupSubscription.teamName
-					- else if (groupSubscription.admin_id._id == user._id)
-						| a group account
-					- else
-						| the group account owned by
-						|
-						strong= groupSubscription.admin_id.email
+					+teamName(groupSubscription)
 				- if (groupSubscription.teamNotice && groupSubscription.teamNotice != '')
 					div.alert.alert-success= groupSubscription.teamNotice
 				span 
