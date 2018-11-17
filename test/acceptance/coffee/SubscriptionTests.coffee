@@ -26,7 +26,7 @@ describe 'Subscriptions', ->
 				expect(@data.groupSubscriptions).to.deep.equal []
 
 			it 'should return no v1Subscriptions', ->
-				expect(@data.v1Subscriptions).to.deep.equal []
+				expect(@data.v1Subscriptions).to.deep.equal {}
 
 		describe 'when the user has a subscription with recurly', ->
 			before (done) ->
@@ -78,7 +78,7 @@ describe 'Subscriptions', ->
 					"tax": 100
 					"taxRate": 0.2
 					"trial_ends_at": new Date(2018, 6, 7),
-					"trialEndsAtFormatted": "7th June 2018"
+					"trialEndsAtFormatted": "7th July 2018"
 				}
 
 			it 'should return no groupSubscriptions', ->
