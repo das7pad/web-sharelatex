@@ -9,6 +9,7 @@ describe 'InstitutionsGetter', ->
 		@UserGetter = getUserFullEmails: sinon.stub()
 		@InstitutionsGetter = SandboxedModule.require modulePath, requires:
 			'../User/UserGetter': @UserGetter
+			"../UserMembership/UserMembershipHandler": @UserMembershipHandler = {}
 			'logger-sharelatex':
 				log:-> console.log(arguments)
 				err:->
