@@ -2,6 +2,7 @@ expect = require('chai').expect
 async = require("async")
 User = require "./helpers/User"
 {Subscription} = require "../../../app/js/models/Subscription"
+{Institution} = require "../../../app/js/models/Institution"
 SubscriptionViewModelBuilder = require "../../../app/js/Features/Subscription/SubscriptionViewModelBuilder"
 
 MockRecurlyApi = require "./helpers/MockRecurlyApi"
@@ -201,7 +202,35 @@ describe 'Subscriptions', ->
 				).to.equal @owner1._id
 				expect(subscription.groupPlan).to.equal true
 
-		describe.only 'when the user is a member of an affiliation', ->
+		describe 'when the user is a manager of an institution', ->
+			before (done) ->
+				@v1Id = MockV1Api.nextV1Id()
+				async.series [
+					(cb) =>
+						Institution.create({
+							v1Id: @v1Id,
+							managerIds: [@user._id]
+						}, cb)
+				], (error) =>
+					return done(error) if error?
+					SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel @user, (error, @data) =>
+						return done(error) if error?
+						done()
+				return
+
+			after (done) ->
+				Institution.remove {
+					v1Id: @v1Id
+				}, done
+				return
+
+			it 'should return the managedInstitutions', ->
+				expect(@data.managedInstitutions.length).to.equal 1
+				institution = @data.managedInstitutions[0]
+				expect(institution.v1Id).to.equal @v1Id
+				expect(institution.name).to.equal "Institution #{@v1Id}"
+
+		describe 'when the user is a member of an affiliation', ->
 			before (done) ->
 				v1Id = MockV1Api.nextV1Id()
 				MockV1Api.setUser v1Id, {
