@@ -72,7 +72,7 @@ module.exports = class ThirdPartyReferencesAgent
 		logger.log {url}, "[ThirdPartyReferenceAgent] getting bibtex from third-party-references"
 		ReferencesApiHandler.make3rdRequest { method: 'GET', url }, (err, response, body)->
 			if err
-				logger.err {user_id}, "[ThirdPartyReferenceAgent] error getting bibtex from third-party-references"
+				logger.err {url}, "[ThirdPartyReferenceAgent] error getting bibtex from third-party-references"
 				return callback(err)
 			if 200 <= response.statusCode < 300
 				# Do import with bibtex content
