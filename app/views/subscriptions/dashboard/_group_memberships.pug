@@ -2,7 +2,17 @@ div(ng-controller="GroupMembershipController")
 	each groupSubscription in memberGroupSubscriptions
 		- if (user._id+'' != groupSubscription.admin_id._id+'')
 			div 
-				p !{translate("member_of_group_subscription", {admin_email: "<strong>" + groupSubscription.admin_id.email + "</strong>"})}
+				p
+					| You are a member of
+					|
+					- if (groupSubscription.teamName && groupSubscription.teamName != '')
+						strong= groupSubscription.teamName
+					- else if (groupSubscription.admin_id._id == user._id)
+						| a group account
+					- else
+						| the group account owned by
+						|
+						strong= groupSubscription.admin_id.email
 				- if (groupSubscription.teamNotice && groupSubscription.teamNotice != '')
 					div.alert.alert-success= groupSubscription.teamNotice
 				span 
