@@ -344,7 +344,8 @@ module.exports = ProjectImporter =
 		else if file.agent == 'zotero'
 			callback(null, {
 				provider: 'zotero',
-				v1_importer_id: file.agent_data.importer_id
+				v1_importer_id: file.agent_data.importer_id,
+				format: file.agent_data.format
 			})
 		else
 			callback(null, null)
