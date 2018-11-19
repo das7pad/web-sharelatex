@@ -69,6 +69,7 @@ module.exports = ProjectImportErrorRecorder =
 				'InvalidNameError: Project name cannot not contain / characters': 'invalid-name-slash'
 				'InvalidNameError: Project name cannot contain / characters': 'invalid-name-slash'
 				'InvalidNameError: Project name is too long': 'invalid-name-length'
+				'InvalidNameError: Project name cannot contain': 'invalid-name-other'  # placeholder (see below)
 				"UnsupportedFileTypeError: expected file.agent to be valid, instead got 'plotly'": 'plotly'
 				"UnsupportedFileTypeError: expected file.agent to be valid, instead got 'zotero'": 'zotero'
 				"UnsupportedFileTypeError: expected file.agent to be valid, instead got 'citeulike'": 'citeulike'
@@ -100,12 +101,18 @@ module.exports = ProjectImportErrorRecorder =
 				'Error: tried to release timed out lock': 'lock-error'
 				'Error: export of assignments is not supported': 'assignments-not-supported'
 				'V1ProjectHasAssignments: export of assignments is not supported': 'assignments-not-supported'
+				'NotFoundError: no project found with id': 'project-not-found' # placeholder
+				'UnsupportedBrandError: project has brand variation': 'unsupported-brand' # placeholder
+				'duplicate key error': 'duplicate-key' # placeholder
 				'[object Error]': 'generic-error-object'
 				'*': 'other'
 
 			getShortName = (name) ->
 				if shortNames[name]
 					return shortNames[name] 
+				# all of these regex matching cases must have a placeholder
+				# entry in the shortNames hash above so that we can send zero
+				# for the gauge value when the error is not present.
 				if name?.match(/UnsupportedBrandError: project has brand variation/)
 					return 'unsupported-brand'
 				if name?.match(/duplicate key error/)
