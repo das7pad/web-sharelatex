@@ -40,9 +40,7 @@ module.exports =
 			return callback(isAdmin: true)
 		removeUserFromEntity entity, attribute, userId, callback
 
-	getEntitiesByUser: (entityName, userId, callback = (error, entities) ->) ->
-		entityConfig = UserMembershipEntityConfigs[entityName]
-		return callback(new Error("no entity called: #{entityName}")) if !entityConfig?
+	getEntitiesByUser: (entityConfig, userId, callback = (error, entities) ->) ->
 		query = Object.assign({}, entityConfig.baseQuery)
 		query[entityConfig.fields.access] = userId
 		EntityModels[entityConfig.modelName].find query, (error, entities = []) ->

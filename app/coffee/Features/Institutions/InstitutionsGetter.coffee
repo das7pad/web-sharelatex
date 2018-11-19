@@ -1,5 +1,6 @@
 UserGetter = require '../User/UserGetter'
 UserMembershipHandler = require "../UserMembership/UserMembershipHandler"
+UserMembershipEntityConfigs = require "../UserMembership/UserMembershipEntityConfigs"
 logger = require 'logger-sharelatex'
 
 module.exports = InstitutionsGetter =
@@ -15,4 +16,4 @@ module.exports = InstitutionsGetter =
 			callback(null, confirmedInstitutions)
 
 	getManagedInstitutions: (user_id, callback = (error, managedInstitutions) ->) ->
-		UserMembershipHandler.getEntitiesByUser 'institution', user_id, callback
+		UserMembershipHandler.getEntitiesByUser UserMembershipEntityConfigs.institution, user_id, callback
