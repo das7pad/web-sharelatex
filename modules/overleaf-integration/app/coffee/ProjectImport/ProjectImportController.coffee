@@ -35,7 +35,7 @@ module.exports = ProjectImportController =
 			if error instanceof UnsupportedFileTypeError
 				unsupportedError("Sorry! Projects with linked or external files aren't fully supported yet.")
 			else if error instanceof UnsupportedExportRecordsError
-				unsupportedError("Sorry! Projects with an ongoing export aren't supported yet.")
+				unsupportedError("Sorry! Projects with some associated journals aren't supported yet.")
 			else if error instanceof V2ExportInProgress
 				unsupportedError("Sorry! This Project is already being exported")
 			else if error instanceof V2ExportNotInProgress
