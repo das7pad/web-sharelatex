@@ -5,9 +5,9 @@ each managedGroupSubscription in managedGroupSubscriptions
 		+teamName(managedGroupSubscription)
 	p
 		a.btn.btn-primary(href="/manage/groups/" + managedGroupSubscription._id + "/members")
-			| Add members
+			| Manage members
 		| &nbsp;
 		a.btn.btn-primary(href="/manage/groups/" + managedGroupSubscription._id + "/managers")
-			| Add other managers
+			| Manage group managers
 
 	hr
