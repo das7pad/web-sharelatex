@@ -39,6 +39,7 @@ define([
         spellCheck: '=',
         spellCheckLanguage: '=',
         trackChangesEnabled: '=',
+        trackChanges: '=',
         autoComplete: '=',
         autoCloseBrackets: '=',
         fontSize: '=',
