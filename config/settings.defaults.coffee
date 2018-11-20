@@ -502,7 +502,7 @@ module.exports = settings =
 			options: 
 				allowedTags: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol', 'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div', 'table', 'thead', 'caption', 'tbody', 'tr', 'th', 'td', 'pre', 'iframe', 'img', 'figure', 'figcaption', 'span', 'source', 'video' ]
 				allowedAttributes:
-					'a': [ 'href', 'name', 'target', 'class', 'event-tracking', 'event-tracking-ga', 'event-tracking-label' ]
+					'a': [ 'href', 'name', 'target', 'class', 'event-tracking', 'event-tracking-ga', 'event-tracking-label', 'event-tracking-trigger' ]
 					'div': [ 'class', 'id', 'style' ]
 					'h1': [ 'class', 'id' ]
 					'h2': [ 'class', 'id' ]
