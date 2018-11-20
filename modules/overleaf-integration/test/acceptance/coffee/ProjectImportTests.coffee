@@ -138,6 +138,29 @@ describe "ProjectImportTests", ->
 			updates = MockDocUpdaterApi.getProjectStructureUpdates(@project._id).fileUpdates
 			expect(updates.length).to.equal(0)
 
+	describe 'a project with a brand variation id', ->
+		before (done) ->
+			@ol_project_id = 1
+			stuff = Object.assign(
+				{ id: @ol_project_id },
+				BLANK_PROJECT,
+				{
+					title: "project with brand variation id"
+					brand_variation_id: 123
+				}
+			)
+			MockOverleafApi.setDoc stuff
+
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+				getProject response, (error, project) =>
+					@project = project
+					done()
+
+		it 'should import a project with the brand variation id', ->
+			expect(@project.brandVariationId).to.equal '123'
+
 	describe 'a project with unsupported file type', ->
 		before (done) ->
 			files = [
