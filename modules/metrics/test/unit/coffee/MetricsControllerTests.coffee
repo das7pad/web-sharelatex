@@ -59,6 +59,26 @@ describe "MetricsController", ->
 
 			done()
 
+	describe 'groupMetrics', ->
+		it 'renders the metricsApp template', (done) ->
+			@req = entity:
+				_id: '123abc'
+				teamName: 'Test Group Name'
+			@res = { render: sinon.stub() }
+
+			@MetricsController.groupMetrics(@req, @res)
+
+			@res.render.calledWith(
+				sinon.match('views/metricsApp'), {
+					metricsEndpoint: '/graphs',
+					resourceId: '123abc',
+					resourceName: 'Test Group Name',
+					resourceType: 'group',
+				}
+			).should.equal true
+
+			done()
+
 	describe 'institutionMetrics', ->
 		it 'renders the metricsApp template after calling v1 for the name', (done) ->
 			@req = entity: @institution

@@ -24,6 +24,12 @@ module.exports =
 		)
 
 		webRouter.get(
+			'/metrics/groups/:id/?(:startDate/:endDate)?',
+			UserMembershipAuthorization.requireEntityAccess('group'),
+			MetricsController.groupMetrics
+		)
+
+		webRouter.get(
 			'/metrics/institutions/:id/?(:startDate/:endDate)?',
 			UserMembershipAuthorization.requireEntityAccess('institution'),
 			MetricsController.institutionMetrics
