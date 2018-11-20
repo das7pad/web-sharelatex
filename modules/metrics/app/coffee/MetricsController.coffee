@@ -20,6 +20,14 @@ module.exports = MetricsController =
 			resourceType: 'team',
 		}
 
+	groupMetrics: (req, res, next) ->
+		res.render Path.resolve(__dirname, '../views/metricsApp'), {
+			metricsEndpoint: "/graphs",
+			resourceId: req.entity._id,
+			resourceName: req.entity.teamName,
+			resourceType: 'group',
+		}
+
 	institutionMetrics: (req, res, next) ->
 		{ entity } = req
 		entity.fetchV1Data (error, entity) ->

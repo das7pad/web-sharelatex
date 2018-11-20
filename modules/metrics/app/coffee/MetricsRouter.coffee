@@ -24,6 +24,16 @@ module.exports =
 		)
 
 		webRouter.get(
+			'/metrics/groups/:id/?(:startDate/:endDate)?',
+			UserMembershipAuthorization.requireEntityAccess('group'),
+			(req, res, next) ->
+				if req.entity.overleaf?.id?
+					MetricsController.teamMetrics(req, res, next)
+				else
+					MetricsController.groupMetrics(req, res, next)
+		)
+
+		webRouter.get(
 			'/metrics/institutions/:id/?(:startDate/:endDate)?',
 			UserMembershipAuthorization.requireEntityAccess('institution'),
 			MetricsController.institutionMetrics
