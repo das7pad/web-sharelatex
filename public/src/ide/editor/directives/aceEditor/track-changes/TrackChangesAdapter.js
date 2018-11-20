@@ -27,7 +27,6 @@ define(['ace/ace', 'ide/editor/AceShareJsCodec'], function(
 
       updateFocus() {
         const selection = this.editor.getSelectionRange()
-
         const selection_start = this._aceRangeToShareJs(selection.start)
         const selection_end = this._aceRangeToShareJs(selection.end)
         const is_selection = selection_start !== selection_end
@@ -52,8 +51,8 @@ define(['ace/ace', 'ide/editor/AceShareJsCodec'], function(
         const end = this.shareJsOffsetToAcePosition(
           change.op.p + change.op.i.length
         )
+
         const session = this.editor.getSession()
-        const doc = session.getDocument()
         const background_range = new Range(
           start.row,
           start.column,
@@ -79,7 +78,6 @@ define(['ace/ace', 'ide/editor/AceShareJsCodec'], function(
       onDeleteAdded(change) {
         const position = this.shareJsOffsetToAcePosition(change.op.p)
         const session = this.editor.getSession()
-        const doc = session.getDocument()
 
         const markerLayer = this.editor.renderer.$markerBack
         const klass = 'track-changes-marker track-changes-deleted-marker'
@@ -126,13 +124,13 @@ define(['ace/ace', 'ide/editor/AceShareJsCodec'], function(
           callout_marker_id
         } = this.adapter.changeIdToMarkerIdMap[change.id]
         delete this.adapter.changeIdToMarkerIdMap[change.id]
+
         const session = this.editor.getSession()
         session.removeMarker(background_marker_id)
         return session.removeMarker(callout_marker_id)
       }
 
       onChangeMoved(change) {
-        console.log('When does this get called', change)
         let end
         const start = this.shareJsOffsetToAcePosition(change.op.p)
         if (change.op.i != null) {

@@ -195,7 +195,7 @@ define([
           return codeMirror.off('scroll', this.spellCheckManager.onScroll)
         }
 
-        var initTrackChanges = function() {
+        const initTrackChanges = function() {
           return (this.trackChangesManager = new TrackChangesManager(
             scope,
             null,

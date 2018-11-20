@@ -17,7 +17,6 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
       this.shareJsOffsetToAcePosition = this.shareJsOffsetToAcePosition.bind(
         this
       )
-      this.getAllLines = this.getAllLines.bind(this)
       this.onDeleteAdded = this.onDeleteAdded.bind(this)
       this.onDeleteRemoved = this.onDeleteRemoved.bind(this)
       this.onChangeMoved = this.onChangeMoved.bind(this)
@@ -26,7 +25,8 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
     }
 
     updateFocus() {
-      // Actually it may have been completely fruitless me abstracting this out. Leave it for now
+      // This is for the review panel updates, which isn't necessary now
+      // But I didn't want Source erroring so thought I would move it early
     }
 
     bindToEditor() {
@@ -91,18 +91,8 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
     }
 
     shareJsOffsetToAcePosition(offset) {
-      const lines = this.getAllLines()
+      const lines = this.cm.doc.getValue().split('\n')
       return AceShareJsCodec.shareJsOffsetToAcePosition(offset, lines)
-    }
-
-    getAllLines() {
-      const lines = []
-      for (let leaf of Array.from(this.cm.doc.children)) {
-        for (let line of Array.from(leaf.lines)) {
-          lines.push(line.text)
-        }
-      }
-      return lines
     }
   })
 })
