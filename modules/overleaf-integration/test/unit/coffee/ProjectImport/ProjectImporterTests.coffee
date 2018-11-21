@@ -44,8 +44,18 @@ describe "ProjectImporter", ->
 	describe "importProject", ->
 		beforeEach ->
 			@UserGetter.getUser = sinon.stub().yields(null, @user = overleaf: id: @v1_user_id)
-			@ProjectImporter._startExport = sinon.stub().yields(null, @doc = { id: @v1_project_id, files: ["mock-files"], tags: ["foo", "bar"] })
+			@ProjectImporter._startExport = sinon.stub().yields(null, @doc = {
+				id: @v1_project_id,
+				files: ["mock-files"],
+				tags: ["foo", "bar"],
+				invites: [{
+					id: 1,
+					email: "invite1@example.com",
+					name: "invite 1"
+				}]
+			})
 			@ProjectImporter._initSharelatexProject = sinon.stub().yields(null, @v2_project_id)
+			@ProjectImporter._importInvites = sinon.stub().yields()
 			@ProjectImporter._importFiles = sinon.stub().yields()
 			@ProjectImporter._importLabels = sinon.stub().yields()
 			@ProjectImporter._waitForV1HistoryExport = sinon.stub().yields()
@@ -72,6 +82,11 @@ describe "ProjectImporter", ->
 			it "should create the SL project", ->
 				@ProjectImporter._initSharelatexProject
 					.calledWith(@v2_user_id, @doc)
+					.should.equal true
+
+			it "should import the invites", ->
+				@ProjectImporter._importInvites
+					.calledWith(@v1_project_id, @v2_project_id, @doc.invites)
 					.should.equal true
 
 			it "should import the files", ->
