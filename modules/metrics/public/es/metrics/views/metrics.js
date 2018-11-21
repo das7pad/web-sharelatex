@@ -11,6 +11,7 @@ export const MetricsView = Backbone.View.extend({
     this.metrics.fetch()
 
     this.listenTo(this.metrics, 'add', this.render)
+    this.listenTo(this.metrics, 'sync', this.showContact)
 
     new LagsView() // eslint-disable-line no-new
   },
@@ -20,5 +21,9 @@ export const MetricsView = Backbone.View.extend({
       model: metric
     })
     this.$el.append(metric.view.render().el)
+  },
+
+  showContact: function() {
+    $('.metrics-contact').removeClass('hide')
   }
 })
