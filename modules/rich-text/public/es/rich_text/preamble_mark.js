@@ -5,13 +5,17 @@ const ORIGIN_POS = {
   ch: 0
 }
 
-function _clearMatch () { this.wlMatched = false }
-function _isMatched () { return this.wlMatched }
+function _clearMatch() {
+  this.wlMatched = false
+}
+function _isMatched() {
+  return this.wlMatched
+}
 
 /**
  * @param {Mark[]} sourceMarks the matched marks are deleted
  */
-function _match (cm, sourceMarks) {
+function _match(cm, sourceMarks) {
   var titleIndex = -1
   var authorIndex = -1
   var maketitleIndex = -1
@@ -60,7 +64,7 @@ function _match (cm, sourceMarks) {
  * several source marks: title, author and the \maketitle command; it has to
  * be kept in sync with all of them.
  */
-export function makePreambleMark (cm, titleMark, authorMark, maketitleMark) {
+export function makePreambleMark(cm, titleMark, authorMark, maketitleMark) {
   var mark = cm.markText(ORIGIN_POS, maketitleMark.to, {
     clearOnEnter: true,
     collapsed: true,

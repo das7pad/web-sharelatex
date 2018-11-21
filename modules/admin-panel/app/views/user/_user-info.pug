@@ -32,6 +32,7 @@ p
 				td
 					ul(ng-repeat="emailData in user.emails")
 						li {{ emailData.email }} 
+							i.fa.fa-check(ng-if="emailData.confirmedAt") 
 							a.btn.btn-danger.btn-xs(
 								href='#',
 								tooltip-placement="bottom",
@@ -102,6 +103,16 @@ p
 					)
 
 			if settings.enableSubscriptions
+				tr
+					td
+						label(for="refered_user_count") Referred User Count
+					td
+						input#first_name.form-control(
+							name='refered_user_count',
+							placeholder="0"
+							ng-model="user.refered_user_count"
+						)
+
 				tr
 					th(colspan=2).text-center
 						| Features
@@ -231,9 +242,21 @@ p
 							ng-model="user.features.zotero"
 						)
 
+				tr
+					th(colspan=2).text-center Experimental Features
+
+				tr
+					td
+						label(for="useCollabratecV2") Use Collabratec V2
+					td
+						input#useCollabratecV2(
+							type="checkbox"
+							name="useCollabratecV2"
+							ng-model="user.useCollabratecV2"
+						)
+
 			//- tr
 			//- 	th(colspan=2).text-center Misc.
-			
 			//- tr
 			//- 	td
 			//- 		label(for="betaProgram") Beta Program
@@ -253,6 +276,8 @@ p
 			//- 			name="awareOfV2"
 			//- 			ng-model="user.awareOfV2"
 			//- 		)
+
+
 
 
 			if isSuperAdmin
@@ -282,6 +307,10 @@ p
 				button.btn.btn-primary(type='submit', ng-disabled="adminUserForm.inflight")
 					span(ng-show="!adminUserForm.inflight") Save
 					span(ng-show="adminUserForm.inflight") Saving...
+				| &nbsp;
+				a.btn.btn-primary(href, ng-click="refreshFeatures()")
+					span(ng-if="!refreshingFeatures") Refresh Features
+					span(ng-if="refreshingFeatures") Refreshing...
 			.col-md-3.text-right
 				a.btn.btn-danger(
 					href='#',

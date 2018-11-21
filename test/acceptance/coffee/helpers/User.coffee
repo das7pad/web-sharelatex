@@ -185,6 +185,10 @@ class User
 			return callback(error) if error?
 			callback(null)
 
+	deleteProjects: (callback=(error)) ->
+		db.projects.remove owner_ref:ObjectId(@id), {multi:true}, (err)->
+			callback(err)
+
 	openProject: (project_id, callback=(error)) ->
 		@request.get {
 			url: "/project/#{project_id}"
@@ -313,5 +317,13 @@ class User
 				return callback(null, false)
 			else
 				return callback(new Error("unexpected status code from /user/personal_info: #{response.statusCode}"))
+
+	setV1Id: (v1Id, callback) ->
+		UserModel.update {
+			_id: @_id
+		}, {
+			overleaf:
+				id: v1Id
+		}, callback
 
 module.exports = User

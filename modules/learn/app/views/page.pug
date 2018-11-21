@@ -1,22 +1,24 @@
 extends ../../../../app/views/layout
 include ../../../../app/views/_mixins/faq_search
 
+block vars
+	- metadata = { viewport: true }
+
 block content
-	.content.content-alt(ng-cloak)
-		.container.wiki
+	.content.content-page.content-alt
+		.container.wiki(ng-cloak)
 			.row.template-page-header
 				.col-md-8(ng-cloak)
 
 			.row
-				.col-xs-3.contents(ng-non-bindable)
-					| !{contents.content}
-
-				.col-xs-9.page
+				.col-xs-12.col-sm-9.col-sm-push-3.page
 					+faq_search()
 					.card.row-spaced(ng-controller="LearnController")
 						.page-header
 							h1(ng-non-bindable) #{title}
 
 						mathjax !{page.content}
+				.col-xs-12.col-sm-3.col-sm-pull-9.contents(ng-non-bindable)
+					| !{contents.content}
 
 	script(src=mathJaxPath)

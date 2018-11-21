@@ -1,15 +1,14 @@
-import { map, keys } from 'underscore';
-import metricsApp from '../metrics_app';
+import { map, keys } from 'underscore'
 
-const lag = {};
+const lag = {}
 
 lag.names = {
   daily: 'Day',
   weekly: 'Week',
-  monthly: 'Month',
-};
-lag.keys = keys(lag.names);
-lag.selected = lag.keys[0];
+  monthly: 'Month'
+}
+lag.keys = keys(lag.names)
+lag.selected = lag.keys[0]
 
 // format the lags for the handlebar template
 lag.mapForTemplate = function() {
@@ -17,9 +16,9 @@ lag.mapForTemplate = function() {
     return {
       key: lagKey,
       name: lag.names[lagKey],
-      isSelected: lagKey === lag.selected,
-    };
-  });
+      isSelected: lagKey === lag.selected
+    }
+  })
 }
 
-export default lag;
+export default lag

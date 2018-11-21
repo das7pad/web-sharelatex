@@ -18,8 +18,16 @@ describe "UserMembershipController", ->
 		@req.params.id = 'mock-entity-id'
 		@user = _id: 'mock-user-id'
 		@newUser = _id: 'mock-new-user-id', email: 'new-user-email@foo.bar'
-		@subscription = { _id: 'mock-subscription-id'}
-		@institution = _id: 'mock-institution-id', v1Id: 123
+		@subscription =
+			_id: 'mock-subscription-id'
+			fetchV1Data: (callback) => callback(null, @subscription)
+		@institution =
+			_id: 'mock-institution-id'
+			v1Id: 123
+			fetchV1Data: (callback) =>
+				institution = Object.assign({}, @institution)
+				institution.name = 'Test Institution Name'
+				callback(null, institution)
 		@users = [
 			{ _id: 'mock-member-id-1', email: 'mock-email-1@foo.com' }
 			{ _id: 'mock-member-id-2', email: 'mock-email-2@foo.com' }
@@ -27,6 +35,7 @@ describe "UserMembershipController", ->
 
 		@AuthenticationController =
 			getSessionUser: sinon.stub().returns(@user)
+			getLoggedInUserId: sinon.stub().returns(@user._id)
 		@UserMembershipHandler =
 			getEntity: sinon.stub().yields(null, @subscription)
 			getUsers: sinon.stub().yields(null, @users)
@@ -68,7 +77,8 @@ describe "UserMembershipController", ->
 			@UserMembershipController.index @req, render: (viewPath, viewParams) =>
 				expect(viewPath).to.equal 'user_membership/index'
 				expect(viewParams.groupSize).to.equal undefined
-				expect(viewParams.translations.title).to.equal 'group_managers'
+				expect(viewParams.translations.title).to.equal 'group_account'
+				expect(viewParams.translations.subtitle).to.equal 'managers_management'
 				expect(viewParams.paths.exportMembers).to.be.undefined
 				done()
 
@@ -77,8 +87,9 @@ describe "UserMembershipController", ->
 			@req.entityConfig = EntityConfigs.institution
 			@UserMembershipController.index @req, render: (viewPath, viewParams) =>
 				expect(viewPath).to.equal 'user_membership/index'
+				expect(viewParams.name).to.equal 'Test Institution Name'
 				expect(viewParams.groupSize).to.equal undefined
-				expect(viewParams.translations.title).to.equal 'institution_managers'
+				expect(viewParams.translations.title).to.equal 'institution_account'
 				expect(viewParams.paths.exportMembers).to.be.undefined
 				done()
 
@@ -110,6 +121,24 @@ describe "UserMembershipController", ->
 				expect(error).to.be.an.instanceof(Errors.NotFoundError)
 				done()
 
+		it 'handle user already added', (done) ->
+			@UserMembershipHandler.addUser.yields(alreadyAdded: true)
+			@UserMembershipController.add @req, status: () => json: (payload) =>
+				expect(payload.error.code).to.equal 'user_already_added'
+				done()
+
+		it 'handle user not found', (done) ->
+			@UserMembershipHandler.addUser.yields(userNotFound: true)
+			@UserMembershipController.add @req, status: () => json: (payload) =>
+				expect(payload.error.code).to.equal 'user_not_found'
+				done()
+
+		it 'handle invalid email', (done) ->
+			@req.body.email = 'not_valid_email'
+			@UserMembershipController.add @req, status: () => json: (payload) =>
+				expect(payload.error.code).to.equal 'invalid_email'
+				done()
+
 	describe 'remove', ->
 		beforeEach ->
 			@req.params.userId = @newUser._id
@@ -131,6 +160,18 @@ describe "UserMembershipController", ->
 			@UserMembershipController.remove @req, null, (error) =>
 				expect(error).to.extist
 				expect(error).to.be.an.instanceof(Errors.NotFoundError)
+				done()
+
+		it 'prevent self removal', (done) ->
+			@req.params.userId = @user._id
+			@UserMembershipController.remove @req, status: () => json: (payload) =>
+				expect(payload.error.code).to.equal 'managers_cannot_remove_self'
+				done()
+
+		it 'prevent admin removal', (done) ->
+			@UserMembershipHandler.removeUser.yields(isAdmin: true)
+			@UserMembershipController.remove @req, status: () => json: (payload) =>
+				expect(payload.error.code).to.equal 'managers_cannot_remove_admin'
 				done()
 
 	describe "exportCsv", ->

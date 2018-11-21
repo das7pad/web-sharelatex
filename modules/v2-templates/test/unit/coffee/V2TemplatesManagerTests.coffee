@@ -10,6 +10,7 @@ expect = chai.expect
 describe "V2TemplatesManager", ->
 
 	modulePath = Path.resolve __dirname, "../../../app/js/V2TemplatesManager"
+	utilitiesPath = Path.resolve __dirname, "../../../app/js/TemplatesUtilities"
 
 	beforeEach ->
 		@request = sinon.stub()
@@ -21,39 +22,9 @@ describe "V2TemplatesManager", ->
 			request: @request
 			"settings-sharelatex": @settings
 
-	describe "_formatDocPath", ->
-		beforeEach ->
-			@doc_mock =
-				read_token: "doc-read-token"
-				slug: "doc-slug"
-
-		describe "with article content", ->
-			beforeEach ->
-				@doc_mock.kind = "article"
-
-			it "should have articles path", ->
-				@V2TemplatesManager._formatDocPath @doc_mock
-				expect(@doc_mock.path).to.equal "/articles/doc-slug/doc-read-token"
-
-		describe "with example content", ->
-			beforeEach ->
-				@doc_mock.kind = "example"
-
-			it "should have latex/examples path", ->
-				@V2TemplatesManager._formatDocPath @doc_mock
-				expect(@doc_mock.path).to.equal "/latex/examples/doc-slug/doc-read-token"
-
-		describe "with template content", ->
-			beforeEach ->
-				@doc_mock.kind = "template"
-
-			it "should have latex/templates path", ->
-				@V2TemplatesManager._formatDocPath @doc_mock
-				expect(@doc_mock.path).to.equal "/latex/templates/doc-slug/doc-read-token"
-
 	describe "_formatIndexData", ->
 		beforeEach ->
-			@V2TemplatesManager._formatDocPath = sinon.stub()
+			@V2TemplatesManager._formatTemplate = sinon.stub()
 			@V2TemplatesManager._paginate = sinon.stub()
 
 		describe "when popular_docs", ->
@@ -66,7 +37,7 @@ describe "V2TemplatesManager", ->
 
 			it "should format path for each doc", ->
 				@V2TemplatesManager._formatIndexData @page_mock, "base-path", "page-path"
-				expect(@V2TemplatesManager._formatDocPath).to.have.been.calledTwice
+				expect(@V2TemplatesManager._formatTemplate).to.have.been.calledTwice
 					.and.to.have.been.calledWith "popular-doc-1"
 					.and.to.have.been.calledWith "popular-doc-2"
 
@@ -101,7 +72,7 @@ describe "V2TemplatesManager", ->
 
 			it "should format path for each doc", ->
 				@V2TemplatesManager._formatIndexData @page_mock, "base-path", "page-path"
-				expect(@V2TemplatesManager._formatDocPath).to.have.been.calledTwice
+				expect(@V2TemplatesManager._formatTemplate).to.have.been.calledTwice
 					.and.to.have.been.calledWith "recent-doc-1"
 					.and.to.have.been.calledWith "recent-doc-2"
 
@@ -136,7 +107,7 @@ describe "V2TemplatesManager", ->
 
 			it "should format path for each doc", ->
 				@V2TemplatesManager._formatIndexData @page_mock, "base-path", "page-path"
-				expect(@V2TemplatesManager._formatDocPath).to.have.been.calledTwice
+				expect(@V2TemplatesManager._formatTemplate).to.have.been.calledTwice
 					.and.to.have.been.calledWith "tagged-doc-1"
 					.and.to.have.been.calledWith "tagged-doc-2"
 

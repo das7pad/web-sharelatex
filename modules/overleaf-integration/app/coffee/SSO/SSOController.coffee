@@ -4,6 +4,7 @@ logger = require "logger-sharelatex"
 V1LoginController = require "../V1Login/V1LoginController"
 V1LoginHandler = require "../V1Login/V1LoginHandler"
 EmailHelper = require "../../../../../app/js/Features/Helpers/EmailHelper"
+ReferalAllocator = require "../../../../../app/js/Features/Referal/ReferalAllocator"
 
 module.exports = SSOController =
 	authInit: (req, res, next) ->
@@ -27,7 +28,9 @@ module.exports = SSOController =
 					return res.redirect "/register/sso_email"
 				SSOController._signUp(req.user, req, res, next)
 			else
-				SSOController._renderError(req, res, "not_registered")
+				V1LoginHandler.getV1UserIdByEmail req.user.email, (err, userId) -> 
+					return SSOController._renderError(req, res, "email_registered_try_alternative", "login") if userId?
+					SSOController._renderError(req, res, "not_registered")
 
 	getRegisterSSOEmail: (req, res, next) ->
 		res.render Path.resolve(__dirname, "../../views/sso_email"),
@@ -49,13 +52,16 @@ module.exports = SSOController =
 				return SSOController._renderError(req, res, "registration_error")
 			if created
 				delete req.session.sso_user
-				V1LoginController._login(profile, req, res, next)
+				# We don't want to do anything with the result of this as the user has already signed up successfully.
+				# ReferalAllocator.allocate will log if something goes wrong.
+				ReferalAllocator.allocate req.session.referal_id, sso_user._id, req.session.referal_source, req.session.referal_medium, () ->
+					V1LoginController._login(profile, req, res, next)
 			else if profile?.email?
 				return SSOController._renderError(req, res, "email_already_registered")
 			else
 				return SSOController._renderError(req, res, "registration_error")
 
-	_renderError: (req, res, error) ->
+	_renderError: (req, res, error, destination="register") ->
 		# user gets set automatically by passport so delete on error
 		delete req.session?.passport?.user
 		if req.headers?['accept']?.match(/^application\/json.*$/)
@@ -64,4 +70,4 @@ module.exports = SSOController =
 				text: req.i18n.translate(error),
 			}
 		else
-			res.redirect "/register?sso_error=#{error}"
+			res.redirect "/#{destination}?sso_error=#{error}"

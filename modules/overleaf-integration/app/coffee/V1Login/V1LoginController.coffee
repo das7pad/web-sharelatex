@@ -70,7 +70,7 @@ module.exports = V1LoginController =
 					logger.log email: email, v1UserId: profile.id, "v1 account created"
 
 					OverleafAuthenticationManager.setupUser profile, (err, user, info) ->
-						return callback(err) if err?
+						return next(err) if err?
 
 						if info?.email_exists_in_sl
 							logger.log {email, info}, "account exists in SL, redirecting to sharelatex to merge accounts"
@@ -128,20 +128,20 @@ module.exports = V1LoginController =
 				V1LoginHandler.doPasswordChange {
 						email, v1Id, password, current_password,
 					}, (err, isValid) =>
-					return next(err) if err?
-					if !isValid
-						logger.log {v1Id, email},  "failed password change via v1"
-						return res.json message: {
-							type: 'error',
-							text: req.i18n.translate('password_change_failed_attempt')
-						}
-					else
-						logger.log {v1Id, email}, "v1 password updated"
-						return res.json message: {
-							type: 'success',
-							email,
-							text: req.i18n.translate('password_change_successful')
-						}
+						return next(err) if err?
+						if !isValid
+							logger.log {v1Id, email},  "failed password change via v1"
+							return res.json message: {
+								type: 'error',
+								text: req.i18n.translate('password_change_failed_attempt')
+							}
+						else
+							logger.log {v1Id, email}, "v1 password updated"
+							return res.json message: {
+								type: 'success',
+								email,
+								text: req.i18n.translate('password_change_successful')
+							}
 			else
 				return res.json message: {type: 'error', text: req.i18n.translate('internal_error')}
 

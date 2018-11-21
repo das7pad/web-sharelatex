@@ -7,7 +7,8 @@ html(itemscope, itemtype='http://schema.org/Product')
 		include ../_metadata
 		link(rel="icon", href="/ol-favicon.ico")
 		if buildCssPath
-			link(rel='stylesheet', href=buildCssPath('/ol-style.css'))
+			link(rel='stylesheet', href=buildCssPath(buildCssFileNameForUser(userSettings), {hashedPath:true}), id="main-stylesheet")
+
 	body
 		main.rfp-main#main
 			header.rfp-header

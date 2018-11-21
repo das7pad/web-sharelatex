@@ -21,7 +21,6 @@ TagsHandler = require "../../../../../app/js/Features/Tags/TagsHandler"
 PrivilegeLevels = require "../../../../../app/js/Features/Authorization/PrivilegeLevels"
 {
 	UnsupportedFileTypeError
-	UnsupportedBrandError
 	UnsupportedExportRecordsError
 	V1HistoryNotSyncedError
 } = require "../../../../../app/js/Features/Errors/Errors"
@@ -37,8 +36,6 @@ ENGINE_TO_COMPILER_MAP = {
 V1_HISTORY_SYNC_REQUEST_TIMES = [
 	0, 0.5, 1, 2, 5, 10, 30, 45
 ]
-
-OVERLEAF_BRAND_VARIATION_ID = 52
 
 SUPPORTED_V1_EXT_AGENTS = ['wlfile', 'url', 'wloutput', 'mendeley', 'zotero']
 
@@ -119,17 +116,10 @@ module.exports = ProjectImporter =
 	_initSharelatexProject: (v2_user_id, doc = {}, callback = (err, project) ->) ->
 		if !doc.title? or !doc.id? or !doc.latest_ver_id? or !doc.latex_engine? or !doc.token? or !doc.read_token?
 			return callback(new Error("expected doc title, id, latest_ver_id, latex_engine, token and read_token"))
-		if doc.brand_variation_id? && doc.brand_variation_id != OVERLEAF_BRAND_VARIATION_ID
-			return callback(new UnsupportedBrandError("project has brand variation: #{doc.brand_variation_id}"))
 		if doc.has_export_records? and doc.has_export_records
 			return callback(new UnsupportedExportRecordsError("project has export records"))
-		if doc.title == ""
-			doc.title = "Untitled"
-		if doc.title.indexOf('/') > -1
-			# v2 does not allow / in a project name
-			doc.title = doc.title.replace(/\//g, '-')
-		if doc.title.length > ProjectDetailsHandler.MAX_PROJECT_NAME_LENGTH
-			doc.title = doc.title.substr(0, ProjectDetailsHandler.MAX_PROJECT_NAME_LENGTH)
+		# clean up project name
+		doc.title = ProjectDetailsHandler.fixProjectName(doc.title)
 
 		attributes =
 			overleaf:
@@ -145,6 +135,9 @@ module.exports = ProjectImporter =
 		if doc.template_id?
 			attributes.fromV1TemplateId = doc.template_id
 			attributes.fromV1TemplateVersionId = doc.template_ver_id
+
+		if doc.brand_variation_id?
+			attributes.brandVariationId = doc.brand_variation_id
 
 		if doc.general_access == 'none'
 			attributes.publicAccesLevel = 'private'

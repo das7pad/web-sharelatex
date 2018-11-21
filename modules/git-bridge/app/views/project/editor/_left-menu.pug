@@ -1,0 +1,52 @@
+if showGitBridge
+	span(ng-controller="GitBridgeController", ng-show="permissions.write")
+		ul.list-unstyled.nav(ng-if="project.features.gitBridge == true")
+			li
+				a(ng-click="openGitBridgeModal()")
+					i.fa.fa-code-fork.fa-fw
+					| &nbsp;&nbsp; #{translate('git')}
+
+
+script(type="text/ng-template", id="gitBridgeModalTemplate")
+
+	.modal-header
+		button.close(
+			type="button"
+			data-dismiss="modal"
+			ng-click="cancel()"
+		) &times;
+		h3 #{translate('clone_with_git')}
+	.modal-body
+		div(ng-if="hasGitBridgeFeature")
+			p
+				| !{translate('git_bridge_modal_description')}
+			pre.text-center
+				kbd git clone {{ gitUrl }}
+
+		div(ng-if="!hasGitBridgeFeature")
+			h4.teaser-title #{translate('access_your_projects_with_git')}
+			div(ng-if="userIsProjectOwner")
+				img.teaser-img(
+					src="/img/teasers/git-bridge/teaser-git-bridge-editor.png"
+					alt="git-bridge"
+				)
+				p.small(ng-show="startedFreeTrial")
+					| #{translate("refresh_page_after_starting_free_trial")}
+
+				.row.text-center(ng-controller="FreeTrialModalController")
+					a.btn.btn-success(
+						href
+						ng-class="buttonClass"
+						ng-click="startFreeTrial('gitBridge')"
+					) #{translate('try_it_for_free')}
+
+			div(ng-if="!userIsProjectOwner")
+				p.text-center
+					| #{translate('ask_proj_owner_to_upgrade_for_git_bridge')}
+
+
+	.modal-footer()
+		button.btn.btn-default(
+			ng-click="cancel()",
+		)
+			span #{translate("close")}

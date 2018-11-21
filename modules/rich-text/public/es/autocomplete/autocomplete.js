@@ -5,11 +5,11 @@ import Fuse from 'fuse.js'
 
 import BIBTEX_COMMANDS from './bibtex_commands'
 
-export default function makeAutocomplete (adapter, getSetting) {
+export default function makeAutocomplete(adapter, getSetting) {
   /**
    * Show autocomplete menu
    */
-  function autocomplete (cm) {
+  function autocomplete(cm) {
     if (!getSetting('autoComplete')) return
 
     const cursor = cm.getCursor()
@@ -28,10 +28,9 @@ export default function makeAutocomplete (adapter, getSetting) {
     // isn't a cursor)
     token.start += prevComma
     // Slice the string so that only contains text between the cursors
-    token.string = token.string.slice(
-      prevComma,
-      nextComma ? nextComma - 1 : undefined
-    ).trim()
+    token.string = token.string
+      .slice(prevComma, nextComma ? nextComma - 1 : undefined)
+      .trim()
 
     const range = cm.getRange(
       Pos(cursor.line, cursor.ch - 1),
@@ -99,7 +98,7 @@ export default function makeAutocomplete (adapter, getSetting) {
     }
   }
 
-  function getArgumentCompletions (command) {
+  function getArgumentCompletions(command) {
     if (isBibtexCommand(command.string)) {
       return getBibtexArgumentCompletions()
     } else if (isReferenceCommand(command.string)) {
@@ -109,9 +108,9 @@ export default function makeAutocomplete (adapter, getSetting) {
     }
   }
 
-  function getBibtexArgumentCompletions () {
+  function getBibtexArgumentCompletions() {
     const { keys: references } = adapter.getBibtexArguments()
-    return references.map((ref) => {
+    return references.map(ref => {
       return {
         text: ref,
         displayText: ref
@@ -119,8 +118,8 @@ export default function makeAutocomplete (adapter, getSetting) {
     })
   }
 
-  function getReferenceArgumentCompletions () {
-    return adapter.getReferenceArguments().map((ref) => {
+  function getReferenceArgumentCompletions() {
+    return adapter.getReferenceArguments().map(ref => {
       return {
         text: ref,
         displayText: ref
@@ -128,9 +127,9 @@ export default function makeAutocomplete (adapter, getSetting) {
     })
   }
 
-  function getCommandArgumentCompletions (command) {
+  function getCommandArgumentCompletions(command) {
     const argumentsForCommand = ARGUMENTS[command.string] || []
-    return argumentsForCommand.map((arg) => {
+    return argumentsForCommand.map(arg => {
       return {
         text: arg,
         displayText: arg,
@@ -139,7 +138,7 @@ export default function makeAutocomplete (adapter, getSetting) {
     })
   }
 
-  function handleCommandCompletionPicked (cm, selection, completion) {
+  function handleCommandCompletionPicked(cm, selection, completion) {
     // Strip tabstops
     let completionText = completion.text.replace(/\$[0-9]/g, '')
 
@@ -175,7 +174,7 @@ export default function makeAutocomplete (adapter, getSetting) {
     }
   }
 
-  function handleArgumentCompletionPicked (cm, selection, completion) {
+  function handleArgumentCompletionPicked(cm, selection, completion) {
     cm.replaceRange(
       completion.text,
       selection.from,
@@ -222,7 +221,7 @@ export default function makeAutocomplete (adapter, getSetting) {
     }
   }
 
-  function getPrevCommandOnLine (cm, line, token) {
+  function getPrevCommandOnLine(cm, line, token) {
     // While the token is not a command (marked as tags by parser), get the
     // previous token on the line
     let searchingToken = token
@@ -236,22 +235,22 @@ export default function makeAutocomplete (adapter, getSetting) {
     return isCommand && isDifferentToken ? searchingToken : null
   }
 
-  function isBeginCommand (command) {
+  function isBeginCommand(command) {
     return /^\\begin/.test(command)
   }
 
-  function isBibtexCommand (command) {
+  function isBibtexCommand(command) {
     return BIBTEX_COMMANDS.indexOf(command) !== -1
   }
 
-  function isReferenceCommand (command) {
-    return (/^\\(eq|page|c|C)?ref/).test(command)
+  function isReferenceCommand(command) {
+    return /^\\(eq|page|c|C)?ref/.test(command)
   }
 
   /*
    * Memoize building up Fuse fuzzy search as it is somewhat expensive
    */
-  const makeFuzzySearch = _.memoize((list) => {
+  const makeFuzzySearch = _.memoize(list => {
     return new Fuse(list, {
       threshold: 0.3,
       keys: ['text']

@@ -4,11 +4,11 @@ import { makeSingleMark } from '../single_mark'
 import { makeGroup } from '../utils'
 
 const AbstractMarker = {
-  matcher (cm, sourceMark) {
+  matcher(cm, sourceMark) {
     return sourceMark.kind === 'abstract'
   },
 
-  marker (cm, sourceMark) {
+  marker(cm, sourceMark) {
     // handle bad \begin and \end placement
     if (hasBadBeginOrEndCommand(sourceMark)) return
 
@@ -32,27 +32,31 @@ const AbstractMarker = {
   }
 }
 
-function makeDiv (text, className) {
-  const el = $('<div>').text(text).addClass(className)
+function makeDiv(text, className) {
+  const el = $('<div>')
+    .text(text)
+    .addClass(className)
   return el[0]
 }
 
-function hasBadBeginOrEndCommand (sourceMark) {
-  return spansMoreThanTwoLines(sourceMark) ||
+function hasBadBeginOrEndCommand(sourceMark) {
+  return (
+    spansMoreThanTwoLines(sourceMark) ||
     contentDoesNotStartAfterBeginCommand(sourceMark) ||
     contentDoesNotEndBeforeEndCommand(sourceMark)
+  )
 }
 
-function spansMoreThanTwoLines (sourceMark) {
+function spansMoreThanTwoLines(sourceMark) {
   const { contentTo, contentFrom } = sourceMark
-  return (contentTo.line - contentFrom.line) < 2
+  return contentTo.line - contentFrom.line < 2
 }
 
-function contentDoesNotStartAfterBeginCommand (sourceMark) {
+function contentDoesNotStartAfterBeginCommand(sourceMark) {
   return sourceMark.contentFrom.ch !== 16
 }
 
-function contentDoesNotEndBeforeEndCommand (sourceMark) {
+function contentDoesNotEndBeforeEndCommand(sourceMark) {
   return sourceMark.contentTo.ch !== 0
 }
 

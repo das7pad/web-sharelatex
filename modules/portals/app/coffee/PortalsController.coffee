@@ -7,6 +7,7 @@ ErrorController = require '../../../../app/js/Features/Errors/ErrorController'
 AuthenticationController = require '../../../../app/js/Features/Authentication/AuthenticationController'
 UserGetter = require '../../../../app/js/Features/User/UserGetter'
 SubscriptionGroupHandler = require '../../../../app/js/Features/Subscription/SubscriptionGroupHandler'
+TemplatesUtilities = require '../../../v2-templates/app/js/TemplatesUtilities'
 Settings = require 'settings-sharelatex'
 
 sanitizeOptions = if Settings?.modules?.sanitize?.options? then Settings.modules.sanitize.options else sanitizeHtml.defaults
@@ -16,7 +17,6 @@ _portalRedirect = (req, res, data, portalType) ->
 	# or if the portal contains a redirect URL
 
 	requestedUrl = "#{req.protocol}://#{req.hostname}#{req.path}"
-
 	if data.portal.redirect_url && data.portal.redirect_url != requestedUrl
 		# when slug was incorrect when portal created
 		res.redirect 301, data.portal.redirect_url
@@ -57,23 +57,21 @@ _getPortal = (req, res, next, portalType) ->
 	if req.query.prtl || Settings.showContentPages
 		if req.params.slug && req.params.slug != 'undefined'
 			v1PortalPath = "/#{portalType}/#{req.params.slug}"
-			portalLayout = path.resolve(__dirname, '../views/portal')
 				
 			PortalsManager.get v1PortalPath, (err, data) ->
 				return next(err) if err
 				if data.portal?
 					redirected = _portalRedirect req, res, data, portalType
 					if !redirected 
+						# check if user is affiliated with portal
 						_getUser req, next, (err, userId, userEmails) ->
 							if userEmails
 								_isAffiliated data, userId, userEmails, (err, affiliation) ->
 									if err then data.affiliation_error = true
 									data.affiliation = affiliation
-									data = _portalLayoutData(req, data)
-									res.render(portalLayout, data)
+									_formatAndRender(req, res, data)
 							else
-								data = _portalLayoutData(req, data)
-								res.render(portalLayout, data)
+								_formatAndRender(req, res, data)
 				else
 					ErrorController.notFound req, res
 		else
@@ -121,6 +119,18 @@ _isAffiliated = (portal, userId, userEmails, callback = (err, affiliation)->) ->
 			callback(null, null)
 	.catch (error) ->
 		callback(error, null)
+
+_formatAndRender = (req, res, data) ->
+	portalLayout = path.resolve(__dirname, '../views/portal')
+	data = _portalLayoutData(req, data)
+	if data.portal_templates
+		data.portal_templates = _formatTemplatesData(data.portal_templates)
+	res.render(portalLayout, data)
+
+_formatTemplatesData = (templates) ->
+	for template in templates
+		template = TemplatesUtilities.format_template(template)
+	templates
 
 module.exports = PortalsController =
 	# to do: decide if using v1 content

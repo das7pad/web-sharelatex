@@ -1,0 +1,21 @@
+extends ../../../../app/views/layout
+
+block vars
+	- var suppressNavContentLinks = true
+
+block content
+	script(type="text/javascript").
+		$(document).ready(function () {
+			$('#create_form').submit();
+		});
+
+	form(method="POST", id="create_form", action="/docs" novalidate)
+		input(type="hidden", name="_csrf", value=csrfToken)
+
+	.container
+		.row
+			.col-md-6.col-md-offset-3
+				.card
+					.page-header
+						h1 #{translate('loading_content')}
+						p #{translate('opening_your_content_please_wait')}

@@ -12,11 +12,11 @@ import IconCommandMarker from './markers/icon_command_marker'
 import InputMarker from './markers/input_marker'
 import PreambleMarker from './markers/preamble_marker'
 
-export default function RichText (_cm, rtAdapter) {
+export default function RichText(_cm, rtAdapter) {
   var _updating = false
   var _enabled = false
 
-  function attemptUpdate (isEnabling) {
+  function attemptUpdate(isEnabling) {
     // have to guard against re-entrance, because adding marks can move the
     // cursor due to the inclusiveLeft and inclusiveRight options to markText
     if (_updating) return
@@ -50,22 +50,22 @@ export default function RichText (_cm, rtAdapter) {
    * @param {Boolean} enabling when updating for the first time, we will move
    * the cursor out of the preamble, if it's there
    */
-  function _update (enabling) {
+  function _update(enabling) {
     // Get the "source" marks - metadata about commands produced during the
     // LateMode parse
     var sourceMarks = getMarks(_cm)
 
     // Prepare "editor" marks - TextMarkers used in the DOM that must be matched
     // up with parser marks
-    const editorMarks = _cm.getAllMarks().filter((editorMark) => {
+    const editorMarks = _cm.getAllMarks().filter(editorMark => {
       return typeof editorMark.wlClearMatch === 'function'
     })
     // Reset any existing editor marks
-    editorMarks.forEach((editorMark) => editorMark.wlClearMatch())
+    editorMarks.forEach(editorMark => editorMark.wlClearMatch())
     // Attempt to match up parser marks with existing editor marks
-    editorMarks.forEach((editorMark) => editorMark.wlMatch(_cm, sourceMarks))
+    editorMarks.forEach(editorMark => editorMark.wlMatch(_cm, sourceMarks))
     // Remove editor marks that don't match any source marks
-    editorMarks.forEach((editorMark) => {
+    editorMarks.forEach(editorMark => {
       if (editorMark.wlIsMatched()) return
       const pos = editorMark.find()
       if (pos && pos.to.line < lastRenderedLine(_cm)) {
@@ -120,21 +120,26 @@ export default function RichText (_cm, rtAdapter) {
     }
 
     if (newMathMarks.length > 0) {
-      const mathEls = newMathMarks.map((mark) => mark.replacedWith)
+      const mathEls = newMathMarks.map(mark => mark.replacedWith)
       // Note: see http://docs.mathjax.org/en/latest/advanced/typeset.html for
       // why we have to reset MathJax's equation numbers when re-rendering an
       // equation with a label.
       MathJax.Hub.Queue(
         ['resetEquationNumbers', MathJax.InputJax.TeX],
-        ['Process', MathJax.Hub, mathEls, function refreshAfterMathUpdate () {
-          // NB: In MathJax 2.7, if we don't pass a callback as an argument
-          // here, MathJax's `elementCallback` method ignores the element
-          // list. We need to refresh codemirror in any case, but it's very
-          // important that we do so by passing a callback function rather
-          // than passing a second callback spec to Queue. I want my afternoon
-          // back. JLM 20161222
-          newMathMarks.forEach((mark) => mark.changed())
-        }]
+        [
+          'Process',
+          MathJax.Hub,
+          mathEls,
+          function refreshAfterMathUpdate() {
+            // NB: In MathJax 2.7, if we don't pass a callback as an argument
+            // here, MathJax's `elementCallback` method ignores the element
+            // list. We need to refresh codemirror in any case, but it's very
+            // important that we do so by passing a callback function rather
+            // than passing a second callback spec to Queue. I want my afternoon
+            // back. JLM 20161222
+            newMathMarks.forEach(mark => mark.changed())
+          }
+        ]
       )
     }
   }
@@ -143,15 +148,15 @@ export default function RichText (_cm, rtAdapter) {
   // Buttons
   /// ////////////////////////////////////////////////////////////////////////
 
-  function _cursorActivity () {
+  function _cursorActivity() {
     attemptUpdate(false)
   }
 
-  function _viewportChange () {
+  function _viewportChange() {
     attemptUpdate(false)
   }
 
-  this.enable = function () {
+  this.enable = function() {
     if (!_enabled) {
       _cm.on('cursorActivity', _cursorActivity)
       _cm.on('viewportChange', _viewportChange)
@@ -161,13 +166,13 @@ export default function RichText (_cm, rtAdapter) {
       _enabled = true
       _cm.refresh()
       _cm.scrollIntoView(null, 100)
-      ignoreErrors(function () {
+      ignoreErrors(function() {
         _cm.focus() // can get errors due to popup blockers
       })
     }
   }
 
-  this.disable = function () {
+  this.disable = function() {
     if (_enabled) {
       _cm.off('cursorActivity', _cursorActivity)
       _cm.off('viewportChange', _viewportChange)
@@ -178,19 +183,19 @@ export default function RichText (_cm, rtAdapter) {
       }
 
       // Remove every line class when disabling richText
-      _.forEach(_.range(0, _cm.doc.lineCount()), function (x) {
+      _.forEach(_.range(0, _cm.doc.lineCount()), function(x) {
         _cm.doc.removeLineClass(x, 'text')
       })
 
       _enabled = false
       _cm.refresh()
-      ignoreErrors(function () {
+      ignoreErrors(function() {
         _cm.focus() // can get errors due to popup blockers
       })
     }
   }
 
-  function _updateIfEnabled () {
+  function _updateIfEnabled() {
     if (_enabled) {
       attemptUpdate(false)
     }
@@ -198,11 +203,11 @@ export default function RichText (_cm, rtAdapter) {
 
   this.update = _updateIfEnabled
 
-  this.cmRefresh = function () {
+  this.cmRefresh = function() {
     _cm.refresh()
   }
 
-  this.isEnabled = function () {
+  this.isEnabled = function() {
     return _enabled
   }
 }

@@ -3,13 +3,17 @@ extends ../layout
 include _plans_page_mixins
 include _plans_page_tables
 
+block vars
+	- metadata = { viewport: true }
+
 block scripts
 	script(type='text/javascript').
-		window.recomendedCurrency = '#{recomendedCurrency}'
-		window.abCurrencyFlag = '#{abCurrencyFlag}'
+		window.recomendedCurrency = '#{recomendedCurrency}';
+		window.abCurrencyFlag = '#{abCurrencyFlag}';
+		window.groupPlans = !{JSON.stringify(groupPlans)};
 
 block content
-	.content.content-alt
+	.content.content-alt.content-page
 		.plans(ng-controller="PlansController")
 			.container(ng-cloak)
 				.row
@@ -75,11 +79,16 @@ block content
 											+card_student_monthly
 
 				.row.row-spaced-large.text-centered
-					i.fa.fa-cc-mastercard.fa-2x &nbsp;
-					i.fa.fa-cc-visa.fa-2x &nbsp;
-					i.fa.fa-cc-amex.fa-2x &nbsp;
-					i.fa.fa-cc-paypal.fa-2x &nbsp;
-					div.text-centered #{translate('change_plans_any_time')}<br/> #{translate('billed_after_x_days', {len:'{{trial_len}}'})}
+					.col-xs-12
+						i.fa.fa-cc-mastercard.fa-2x(aria-hidden="true") &nbsp;
+						span.sr-only Mastercard accepted
+						i.fa.fa-cc-visa.fa-2x(aria-hidden="true") &nbsp;
+						span.sr-only Visa accepted
+						i.fa.fa-cc-amex.fa-2x(aria-hidden="true") &nbsp;
+						span.sr-only Amex accepted
+						i.fa.fa-cc-paypal.fa-2x(aria-hidden="true") &nbsp;
+						span.sr-only Paypal accepted
+						div.text-centered #{translate('change_plans_any_time')}<br/> #{translate('billed_after_x_days', {len:'{{trial_len}}'})}
 
 				.row.row-spaced-large
 					.col-md-8.col-md-offset-2
@@ -90,7 +99,7 @@ block content
 							br
 							br
 							a.btn.btn-default(
-								href
+								href="#groups"
 								ng-click="openGroupPlanModal()"
 							) #{translate('find_out_more')}
 
@@ -117,7 +126,7 @@ block content
 					.row.row-spaced-large
 						.col-md-12
 							.plans-header.plans-subheader.text-centered
-								h2 #{translate('still_have_questions')}
+								h2.header-with-btn #{translate('still_have_questions')}
 									button.btn.btn-default.btn-header.text-capitalize(
 										ng-controller="ContactGeneralModal"
 										ng-click="openModal()"
@@ -127,3 +136,4 @@ block content
 					.row.row-spaced
 
 	include _modal_group_inquiry
+	include _modal_group_purchase

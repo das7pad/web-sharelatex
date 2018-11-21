@@ -53,7 +53,6 @@ public/es/modules
 
 public/js/*.js
 public/js/*.map
-public/js/libs/sharejs.js
 public/js/analytics/
 public/js/directives/
 public/js/components/
@@ -65,16 +64,15 @@ public/js/modules/
 public/js/services/
 public/js/utils/
 
-public/stylesheets/style.css
-public/stylesheets/ol-style.css
-public/stylesheets/ol-light-style.css
+public/stylesheets/style*.css
+public/stylesheets/ol-style*.css
+public/stylesheets/ol-light-style*.css
+public/stylesheets/ol-ieee-style*.css
 public/stylesheets/*.map
 public/minjs/
 
 Gemfile.lock
 
-public/stylesheets/ol-style.*.css
-public/stylesheets/style.*.css
 public/js/libs/require*.js
 
 
@@ -86,3 +84,8 @@ docker-shared.yml
 config/*.coffee
 
 modules/**/Makefile
+
+modules/*/index.js
+modules/**/app/js/*
+modules/**/test/unit/js/*
+modules/**/test/acceptance/js/*

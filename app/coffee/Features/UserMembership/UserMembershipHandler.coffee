@@ -7,6 +7,7 @@ EntityModels =
 UserMembershipViewModel = require('./UserMembershipViewModel')
 UserGetter = require('../User/UserGetter')
 logger = require('logger-sharelatex')
+UserMembershipEntityConfigs = require "./UserMembershipEntityConfigs"
 
 module.exports =
 	getEntity: (entityId, entityConfig, loggedInUser, callback = (error, entity) ->) ->
@@ -24,14 +25,29 @@ module.exports =
 	addUser: (entity, entityConfig, email, callback = (error, user) ->) ->
 		attribute = entityConfig.fields.write
 		UserGetter.getUserByAnyEmail email, (error, user) ->
-			error ||= new Errors.NotFoundError("No user found with email #{email}") unless user
 			return callback(error) if error?
+			unless user
+				return callback(userNotFound: true)
+			if entity[attribute].some((managerId) -> managerId.equals(user._id))
+				return callback(alreadyAdded: true)
+
 			addUserToEntity entity, attribute, user, (error) ->
 				callback(error, UserMembershipViewModel.build(user))
 
 	removeUser: (entity, entityConfig, userId, callback = (error) ->) ->
 		attribute = entityConfig.fields.write
+		if entity.admin_id?.equals(userId)
+			return callback(isAdmin: true)
 		removeUserFromEntity entity, attribute, userId, callback
+
+	getEntitiesByUser: (entityConfig, userId, callback = (error, entities) ->) ->
+		query = Object.assign({}, entityConfig.baseQuery)
+		query[entityConfig.fields.access] = userId
+		EntityModels[entityConfig.modelName].find query, (error, entities = []) ->
+			return callback(error) if error?
+			async.mapSeries entities,
+				(entity, cb) -> entity.fetchV1Data(cb),
+				callback
 
 getPopulatedListOfMembers = (entity, attributes, callback = (error, users)->)->
 		userObjects = []

@@ -8,20 +8,18 @@ SandboxedModule = require('sandboxed-module')
 describe 'ExportsHandler', ->
 
 	beforeEach ->
-		@ProjectGetter = {}
-		@ProjectLocator = {}
-		@UserGetter = {}
-		@settings = {}
 		@stubRequest = {}
 		@request = defaults: => return @stubRequest
 		@ExportsHandler = SandboxedModule.require modulePath, requires:
 			'logger-sharelatex':
 				log: ->
 				err: ->
-			'../Project/ProjectGetter': @ProjectGetter
-			'../Project/ProjectLocator': @ProjectLocator
-			'../User/UserGetter': @UserGetter
-			'settings-sharelatex': @settings
+			'../Project/ProjectGetter': @ProjectGetter = {}
+			'../Project/ProjectHistoryHandler': @ProjectHistoryHandler = {}
+			'../Project/ProjectLocator': @ProjectLocator = {}
+			'../Project/ProjectRootDocManager': @ProjectRootDocManager = {}
+			'../User/UserGetter': @UserGetter = {}
+			'settings-sharelatex': @settings = {}
 			'request': @request
 		@project_id = "project-id-123"
 		@project_history_id = 987
@@ -45,34 +43,49 @@ describe 'ExportsHandler', ->
 		@callback = sinon.stub()
 
 	describe 'exportProject', ->
-		beforeEach (done) ->
+		beforeEach ->
 			@export_data = {iAmAnExport: true}
 			@response_body = {iAmAResponseBody: true}
 			@ExportsHandler._buildExport = sinon.stub().yields(null, @export_data)
 			@ExportsHandler._requestExport = sinon.stub().yields(null, @response_body)
-			@ExportsHandler.exportProject @export_params, (error, export_data) =>
-				@callback(error, export_data)
-				done()
 
-		it "should build the export", ->
-			@ExportsHandler._buildExport
-			.calledWith(@export_params)
-			.should.equal true
+		describe "when all goes well", ->
+			beforeEach (done) ->
+				@ExportsHandler.exportProject @export_params, (error, export_data) =>
+					@callback(error, export_data)
+					done()
 
-		it "should request the export", ->
-			@ExportsHandler._requestExport
-			.calledWith(@export_data)
-			.should.equal true
+			it "should build the export", ->
+				@ExportsHandler._buildExport
+				.calledWith(@export_params)
+				.should.equal true
 
-		it "should return the export", ->
-			@callback
-			.calledWith(null, @export_data)
-			.should.equal true
+			it "should request the export", ->
+				@ExportsHandler._requestExport
+				.calledWith(@export_data)
+				.should.equal true
+
+			it "should return the export", ->
+				@callback
+				.calledWith(null, @export_data)
+				.should.equal true
+
+		describe "when request can't be built", ->
+			beforeEach (done) ->
+				@ExportsHandler._buildExport = sinon.stub().yields(new Error("cannot export project without root doc"))
+				@ExportsHandler.exportProject @export_params, (error, export_data) =>
+					@callback(error, export_data)
+					done()
+
+			it "should return an error", ->
+				(@callback.args[0][0] instanceof Error)
+				.should.equal true
 
 	describe '_buildExport', ->
 		beforeEach (done) ->
 			@project =
 				id: @project_id
+				rootDoc_id: 'doc1_id'
 				compiler: 'pdflatex'
 				imageName: 'mock-image-name'
 				overleaf:
@@ -89,7 +102,9 @@ describe 'ExportsHandler', ->
 			@rootDocPath = 'main.tex'
 			@historyVersion = 777
 			@ProjectGetter.getProject = sinon.stub().yields(null, @project)
+			@ProjectHistoryHandler.ensureHistoryExistsForProject = sinon.stub().yields(null)
 			@ProjectLocator.findRootDoc = sinon.stub().yields(null, [null, {fileSystem: 'main.tex'}])
+			@ProjectRootDocManager.ensureRootDocumentIsValid = sinon.stub().callsArgWith(1, null)
 			@UserGetter.getUser = sinon.stub().yields(null, @user)
 			@ExportsHandler._requestVersion = sinon.stub().yields(null, @historyVersion)
 			done()
@@ -99,6 +114,10 @@ describe 'ExportsHandler', ->
 				@ExportsHandler._buildExport @export_params, (error, export_data) =>
 					@callback(error, export_data)
 					done()
+
+			it "should ensure the project has history", ->
+				@ProjectHistoryHandler.ensureHistoryExistsForProject.called
+				.should.equal true
 
 			it "should request the project history version", ->
 				@ExportsHandler._requestVersion.called
@@ -119,7 +138,7 @@ describe 'ExportsHandler', ->
 							description: @description
 							author: @author
 							license: @license
-							show_source: @show_source
+							showSource: @show_source
 					user:
 						id: @user_id
 						firstName: @user.first_name
@@ -159,7 +178,7 @@ describe 'ExportsHandler', ->
 							description: @description
 							author: @author
 							license: @license
-							show_source: @show_source
+							showSource: @show_source
 					user:
 						id: @user_id
 						firstName: @custom_first_name
@@ -186,15 +205,102 @@ describe 'ExportsHandler', ->
 				.should.equal true
 
 		describe "when project has no root doc", ->
-			beforeEach (done) ->
-				@ProjectLocator.findRootDoc = sinon.stub().yields(null, [null, null])
-				@ExportsHandler._buildExport @export_params, (error, export_data) =>
-					@callback(error, export_data)
-					done()
+			describe "when a root doc can be set automatically", ->
+				beforeEach (done) ->
+					@project.rootDoc_id = null
+					@ProjectLocator.findRootDoc = sinon.stub().yields(null, [null, {fileSystem: 'other.tex'}])
+					@ExportsHandler._buildExport @export_params, (error, export_data) =>
+						@callback(error, export_data)
+						done()
 
-			it "should return an error", ->
-				(@callback.args[0][0] instanceof Error)
-				.should.equal true
+				it "should set a root doc", ->
+					@ProjectRootDocManager.ensureRootDocumentIsValid.called
+					.should.equal true
+
+				it "should return export data", ->
+					expected_export_data =
+						project:
+							id: @project_id
+							rootDocPath: 'other.tex'
+							historyId: @project_history_id
+							historyVersion: @historyVersion
+							v1ProjectId: @project_history_id
+							metadata:
+								compiler: 'pdflatex'
+								imageName: 'mock-image-name'
+								title: @title
+								description: @description
+								author: @author
+								license: @license
+								showSource: @show_source
+						user:
+							id: @user_id
+							firstName: @user.first_name
+							lastName: @user.last_name
+							email: @user.email
+							orcidId: null
+							v1UserId: 876
+						destination:
+							brandVariationId: @brand_variation_id
+						options:
+							callbackUrl: null
+					@callback.calledWith(null, expected_export_data)
+					.should.equal true
+
+		describe "when project has an invalid root doc", ->
+			describe "when a new root doc can be set automatically", ->
+				beforeEach (done) ->
+					@fakeDoc_id = '1a2b3c4d5e6f'
+					@project.rootDoc_id = @fakeDoc_id
+					@ProjectLocator.findRootDoc = sinon.stub().yields(null, [null, {fileSystem: 'other.tex'}])
+					@ExportsHandler._buildExport @export_params, (error, export_data) =>
+						@callback(error, export_data)
+						done()
+
+				it "should set a valid root doc", ->
+					@ProjectRootDocManager.ensureRootDocumentIsValid.called
+					.should.equal true
+
+				it "should return export data", ->
+					expected_export_data =
+						project:
+							id: @project_id
+							rootDocPath: 'other.tex'
+							historyId: @project_history_id
+							historyVersion: @historyVersion
+							v1ProjectId: @project_history_id
+							metadata:
+								compiler: 'pdflatex'
+								imageName: 'mock-image-name'
+								title: @title
+								description: @description
+								author: @author
+								license: @license
+								showSource: @show_source
+						user:
+							id: @user_id
+							firstName: @user.first_name
+							lastName: @user.last_name
+							email: @user.email
+							orcidId: null
+							v1UserId: 876
+						destination:
+							brandVariationId: @brand_variation_id
+						options:
+							callbackUrl: null
+					@callback.calledWith(null, expected_export_data)
+					.should.equal true
+
+			describe "when no root doc can be identified", ->
+				beforeEach (done) ->
+					@ProjectLocator.findRootDoc = sinon.stub().yields(null, [null, null])
+					@ExportsHandler._buildExport @export_params, (error, export_data) =>
+						@callback(error, export_data)
+						done()
+
+				it "should return an error", ->
+					(@callback.args[0][0] instanceof Error)
+					.should.equal true
 
 		describe "when user is not found", ->
 			beforeEach (done) ->

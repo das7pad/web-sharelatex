@@ -1,5 +1,7 @@
 ProjectGetter = require('../Project/ProjectGetter')
+ProjectHistoryHandler = require('../Project/ProjectHistoryHandler')
 ProjectLocator = require('../Project/ProjectLocator')
+ProjectRootDocManager = require('../Project/ProjectRootDocManager')
 UserGetter = require('../User/UserGetter')
 logger = require('logger-sharelatex')
 settings = require 'settings-sharelatex'
@@ -20,18 +22,23 @@ module.exports = ExportsHandler = self =
 				callback null, export_data
 
 	_buildExport: (export_params, callback=(err, export_data) ->) ->
-		{project_id, user_id, brand_variation_id, title, description, author, license, show_source} = export_params
+		{project_id, user_id, brand_variation_id, title, description, author,
+			license, show_source} = export_params
 		jobs =
 			project: (cb) ->
 				ProjectGetter.getProject project_id, cb
 			# TODO: when we update async, signature will change from (cb, results) to (results, cb)
 			rootDoc: [ 'project', (cb, results) ->
-				ProjectLocator.findRootDoc {project: results.project, project_id: project_id}, cb
+				ProjectRootDocManager.ensureRootDocumentIsValid project_id, (error) ->
+					return callback(error) if error?
+					ProjectLocator.findRootDoc {project: results.project, project_id: project_id}, cb
 			]
 			user: (cb) ->
 				UserGetter.getUser user_id, {first_name: 1, last_name: 1, email: 1, overleaf: 1}, cb
 			historyVersion: (cb) ->
-				self._requestVersion project_id, cb
+				ProjectHistoryHandler.ensureHistoryExistsForProject project_id, (error) ->
+					return callback(error) if error?
+					self._requestVersion project_id, cb
 
 		async.auto jobs, (err, results) ->
 			if err?
@@ -62,7 +69,7 @@ module.exports = ExportsHandler = self =
 						description: description
 						author: author
 						license: license
-						show_source: show_source
+						showSource: show_source
 				user:
 					id: user_id
 					firstName: user.first_name

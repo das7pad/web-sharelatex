@@ -24,11 +24,11 @@ const ICON_COMMANDS = [
 ]
 
 const IconCommandMarker = {
-  matcher (cm, sourceMark) {
+  matcher(cm, sourceMark) {
     return ICON_COMMANDS.includes(sourceMark.kind)
   },
 
-  marker (cm, sourceMark) {
+  marker(cm, sourceMark) {
     const preMark = makeSingleMark(cm, sourceMark, 'pre', true, {
       replacedWith: makeOpenSpan(sourceMark)
     })
@@ -40,13 +40,10 @@ const IconCommandMarker = {
   }
 }
 
-function makeOpenSpan (sourceMark) {
-  const iconClass = sourceMark.kind.match(/cite/)
-    ? 'fa-book'
-    : 'fa-tag'
+function makeOpenSpan(sourceMark) {
+  const iconClass = sourceMark.kind.match(/cite/) ? 'fa-book' : 'fa-tag'
 
-  const icon = $('<span>')
-    .addClass(`fa fa-fw ${iconClass}`)
+  const icon = $('<span>').addClass(`fa fa-fw ${iconClass}`)
   const bracket = $('<span>')
     .text('{')
     .addClass('wl-label-bracket')
@@ -59,7 +56,7 @@ function makeOpenSpan (sourceMark) {
   return span[0]
 }
 
-function makeClosingSpan () {
+function makeClosingSpan() {
   const span = $('<span>')
     .text('}')
     .addClass('wl-label-bracket')

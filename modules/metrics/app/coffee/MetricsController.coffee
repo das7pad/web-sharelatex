@@ -16,26 +16,30 @@ module.exports = MetricsController =
 		res.render Path.resolve(__dirname, '../views/metricsApp'), {
 			metricsEndpoint: "/graphs",
 			resourceId: req.entity.overleaf.id,
+			resourceName: req.entity.teamName,
 			resourceType: 'team',
 		}
 
+	groupMetrics: (req, res, next) ->
+		res.render Path.resolve(__dirname, '../views/metricsApp'), {
+			metricsEndpoint: "/graphs",
+			resourceId: req.entity._id,
+			resourceName: req.entity.teamName,
+			resourceType: 'group',
+		}
+
 	institutionMetrics: (req, res, next) ->
-		id = req.entity.v1Id
-		url = "#{settings.apis.v1.url}/universities/list/#{id}"
-		request.get(url, (err, response, body)->
-			if !err
-				resourceName = JSON.parse(body).name
-			else
-				resourceName = null
+		{ entity } = req
+		entity.fetchV1Data (error, entity) ->
 			res.render Path.resolve(__dirname, '../views/metricsApp'), {
 				metricsEndpoint: "/graphs",
-				resourceId: id,
-				resourceName: resourceName,
+				resourceId: entity.v1Id,
+				resourceName: entity.name,
 				resourceType: 'institution',
 			}
-		)
 
 	analyticsProxy: (req, res, next) ->
+		res.setTimeout(5 * 60 * 1000)
 		analyticsUrl = settings.apis.analytics.url + req.originalUrl
 		logger.log req.query, "requesting from analytics #{analyticsUrl}"
 		request
