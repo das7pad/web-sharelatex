@@ -176,7 +176,9 @@ define([
           }
         }
 
-        Array.from(this.rangesTracker.comments).map(comment => comment)
+        Array.from(this.rangesTracker.comments).map(comment =>
+          this._onCommentAdded(comment)
+        )
         this.broadcastChange()
       }
 
@@ -661,8 +663,8 @@ define([
         }
         if (this.changeIdToMarkerIdMap[comment.id] == null) {
           // Only create new markers if they don't already exist
-          const start = this.shareJsOffsetToAcePosition(comment.op.p)
-          const end = this.shareJsOffsetToAcePosition(
+          const start = this.adapter.shareJsOffsetToAcePosition(comment.op.p)
+          const end = this.adapter.shareJsOffsetToAcePosition(
             comment.op.p + comment.op.c.length
           )
           const session = this.editor.getSession()
