@@ -325,7 +325,6 @@ module.exports = ProjectController =
 
 				showGitBridge =
 					user.betaProgram && !project.overleaf?.id? # don't support v1 projects yet
-				console.log('showGitBridge', showGitBridge)
 
 				logger.log project_id:project_id, "rendering editor page"
 				res.render 'project/editor',
