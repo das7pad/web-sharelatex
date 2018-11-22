@@ -165,13 +165,6 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 		_buildCssFileName = (themeModifier) ->
 			return "/" + Settings.brandPrefix + (if themeModifier then themeModifier else "") + "style.css"
 
-		_buildCssPath = (cssFileName, isHashed) -> 
-			path = Path.join("/stylesheets/", cssFileName)
-			if isHashed && hashedFiles[path]?
-				hashedPath = hashedFiles[path]
-				return Url.resolve(staticFilesBase, hashedPath)
-			return Url.resolve(staticFilesBase, path)
-
 		res.locals.getCssThemeModifier = (userSettings, brandVariation) ->
 			# Themes only exist in OL v2
 			if Settings.overleaf?
@@ -186,7 +179,7 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 		res.locals.buildCssPath = (themeModifier, buildOpts) ->
 			cssFileName = _buildCssFileName themeModifier
 			path = Path.join("/stylesheets/", cssFileName)
-			if buildOpts?.isHashed && hashedFiles[path]?
+			if buildOpts?.hashedPath && hashedFiles[path]?
 				hashedPath = hashedFiles[path]
 				return Url.resolve(staticFilesBase, hashedPath)
 			return Url.resolve(staticFilesBase, path)
