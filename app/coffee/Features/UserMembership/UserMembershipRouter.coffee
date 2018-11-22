@@ -5,6 +5,7 @@ TeamInvitesController = require '../Subscription/TeamInvitesController'
 
 module.exports =
 	apply: (webRouter) ->
+		# group members routes
 		webRouter.get '/manage/groups/:id/members',
 			UserMembershipAuthorization.requireGroupAccess,
 			UserMembershipController.index
@@ -21,20 +22,24 @@ module.exports =
 			UserMembershipAuthorization.requireGroupAccess,
 			UserMembershipController.exportCsv
 
+		# group managers routes
+		webRouter.get "/manage/groups/:id/managers",
+			UserMembershipAuthorization.requireGroupManagersAccess,
+			UserMembershipController.index
+		webRouter.post "/manage/groups/:id/managers",
+			UserMembershipAuthorization.requireGroupManagersAccess,
+			UserMembershipController.add
+		webRouter.delete "/manage/groups/:id/managers/:userId",
+			UserMembershipAuthorization.requireGroupManagersAccess,
+			UserMembershipController.remove
 
-		regularEntitites =
-			groups: 'requireGroupManagersAccess'
-			institutions: 'requireInstitutionAccess'
-		for pathName, authorizationFunctionName of regularEntitites
-			do (pathName, authorizationFunctionName) ->
-				webRouter.get "/manage/#{pathName}/:id/managers",
-					UserMembershipAuthorization[authorizationFunctionName],
-					UserMembershipController.index
-
-				webRouter.post "/manage/#{pathName}/:id/managers",
-					UserMembershipAuthorization[authorizationFunctionName],
-					UserMembershipController.add
-
-				webRouter.delete "/manage/#{pathName}/:id/managers/:userId",
-					UserMembershipAuthorization[authorizationFunctionName],
-					UserMembershipController.remove
+		# institution members routes
+		webRouter.get "/manage/institutions/:id/managers",
+			UserMembershipAuthorization.requireInstitutionAccess,
+			UserMembershipController.index
+		webRouter.post "/manage/institutions/:id/managers",
+			UserMembershipAuthorization.requireInstitutionAccess,
+			UserMembershipController.add
+		webRouter.delete "/manage/institutions/:id/managers/:userId",
+			UserMembershipAuthorization.requireInstitutionAccess,
+			UserMembershipController.remove
