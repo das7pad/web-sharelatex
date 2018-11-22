@@ -17,6 +17,7 @@ ProjectEntityUpdateHandler = require "../../../../../app/js/Features/Project/Pro
 ProjectDeleter = require "../../../../../app/js/Features/Project/ProjectDeleter"
 {ProjectInvite} = require "../../../../../app/js/models/ProjectInvite"
 CollaboratorsHandler = require "../../../../../app/js/Features/Collaborators/CollaboratorsHandler"
+TokenAccessHandler = require "../../../../../app/js/Features/TokenAccess/TokenAccessHandler"
 TagsHandler = require "../../../../../app/js/Features/Tags/TagsHandler"
 PrivilegeLevels = require "../../../../../app/js/Features/Authorization/PrivilegeLevels"
 {
@@ -83,6 +84,8 @@ module.exports = ProjectImporter =
 		async.series [
 			(cb) ->
 				ProjectImporter._importInvites v1_project_id, v2_project_id, doc.invites, cb
+			(cb) ->
+				ProjectImporter._importTokenAccessInvites v2_project_id, doc.token_access_invites, cb
 			(cb) ->
 				ProjectImporter._importFiles v2_project_id, v2_user_id, doc.files, cb
 			(cb) ->
@@ -169,6 +172,11 @@ module.exports = ProjectImporter =
 		else
 			ProjectImporter._importPendingInvite(v2_project_id, invite, callback)
 
+	_importTokenAccessInvites: (v2ProjectId, invites = [], callback = (error) ->) ->
+		async.mapSeries(invites, (invite, cb) ->
+			ProjectImporter._importTokenAccessInvite v2ProjectId, invite, cb
+		, callback)
+
 	ACCESS_LEVEL_MAP: {
 		"read_write": PrivilegeLevels.READ_AND_WRITE
 		"read_only": PrivilegeLevels.READ_ONLY
@@ -200,6 +208,12 @@ module.exports = ProjectImporter =
 				projectId: project_id
 				privileges: privilegeLevel
 			}, callback
+
+	_importTokenAccessInvite: (projectId, invite, callback = (error) ->) ->
+		# TODO: null checks, privilegeLevels, tags
+		UserMapper.getSlIdFromOlUser invite, (error, inviteeUserId) ->
+			return callback(error) if error?
+			TokenAccessHandler.addReadAndWriteUserToProject inviteeUserId, projectId, callback
 
 	_importLabels: (v1_project_id, v2_project_id, v1_user_id, callback = (error) ->) ->
 		ProjectImporter._getLabels v1_project_id, (error, labels) ->

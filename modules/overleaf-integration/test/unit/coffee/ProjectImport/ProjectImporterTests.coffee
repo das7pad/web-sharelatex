@@ -18,6 +18,7 @@ describe "ProjectImporter", ->
 			"../../../../../app/js/Features/Project/ProjectDeleter": @ProjectDeleter = {}
 			"../../../../../app/js/models/ProjectInvite": ProjectInvite: @ProjectInvite = {}
 			"../../../../../app/js/Features/Collaborators/CollaboratorsHandler": @CollaboratorsHandler = {}
+			"../../../../../app/js/Features/TokenAccess/TokenAccessHandler": @TokenAccessHandler = {}
 			"../../../../../app/js/Features/Authorization/PrivilegeLevels": PrivilegeLevels
 			"../../../../../app/js/Features/User/UserGetter": @UserGetter = {}
 			"../../../../../app/js/Features/Tags/TagsHandler": @TagsHandler =
@@ -52,10 +53,12 @@ describe "ProjectImporter", ->
 					id: 1,
 					email: "invite1@example.com",
 					name: "invite 1"
-				}]
+				}],
+				token_access_invites: []
 			})
 			@ProjectImporter._initSharelatexProject = sinon.stub().yields(null, @v2_project_id)
 			@ProjectImporter._importInvites = sinon.stub().yields()
+			@ProjectImporter._importTokenAccessInvites = sinon.stub().yields()
 			@ProjectImporter._importFiles = sinon.stub().yields()
 			@ProjectImporter._importLabels = sinon.stub().yields()
 			@ProjectImporter._waitForV1HistoryExport = sinon.stub().yields()
@@ -88,6 +91,10 @@ describe "ProjectImporter", ->
 				@ProjectImporter._importInvites
 					.calledWith(@v1_project_id, @v2_project_id, @doc.invites)
 					.should.equal true
+
+			it "should import the token-access invites", ->
+				@ProjectImporter._importTokenAccessInvites
+					.calledWith(@v2_project_id, @doc.token_access_invites)
 
 			it "should import the files", ->
 				@ProjectImporter._importFiles
@@ -439,6 +446,31 @@ describe "ProjectImporter", ->
 				@ProjectImporter._importPendingInvite @project_id, @invite, (error) ->
 					error.message.should.equal("expected invite inviter, code, email and access_level")
 					done()
+
+	describe "_importTokenAccessInvite", ->
+		beforeEach (done) ->
+			@project_id = "mock-project-id"
+			@invite = {
+				id: 54
+				email: "jane@example.com",
+				name: 'Jane'
+			}
+			@sl_invitee_id = "sl-invitee-id"
+			@UserMapper.getSlIdFromOlUser = sinon.stub()
+				.withArgs(@invite)
+				.yields(null, @sl_invitee_id)
+			@TokenAccessHandler.addReadAndWriteUserToProject = sinon.stub().yields()
+			@ProjectImporter._importTokenAccessInvite @project_id, @invite, done
+
+		it "should look up the invited user in SL", ->
+			@UserMapper.getSlIdFromOlUser
+				.calledWith(@invite)
+				.should.equal true
+
+		it "should add the SL invitee to project", ->
+			@TokenAccessHandler.addReadAndWriteUserToProject
+				.calledWith(@sl_invitee_id, @project_id)
+				.should.equal true
 
 	describe "_importFile", ->
 		beforeEach ->

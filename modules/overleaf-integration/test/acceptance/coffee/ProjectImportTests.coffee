@@ -339,3 +339,40 @@ describe "ProjectImportTests", ->
 				expect(projectInvite.privileges).to.equal('readOnly')
 				done()
 			return
+
+	describe 'a project with token-access invites', ->
+		before (done) ->
+			@ol_project_id = 1
+
+			@tokenAccessInvitee = newUser()
+			MockOverleafApi.addV1User(@tokenAccessInvitee)
+
+			MockOverleafApi.setDoc Object.assign({ id: @ol_project_id }, BLANK_PROJECT, {
+				general_access: 'read_write',
+				token_access_invites: [{
+					id: @tokenAccessInvitee.v1Id,
+					email: @tokenAccessInvitee.email,
+					name: 'Token based invitee'
+				}]
+			})
+
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+				getProject response, (error, project) =>
+					@project = project
+					done()
+
+		it 'should still grant access to the owner', (done) ->
+			CollaboratorsHandler.getMemberIdsWithPrivilegeLevels @project._id, (error, members) =>
+				expect(members[0].id).to.equal(@owner.id)
+				done()
+
+		it 'should import the invite', (done) ->
+			CollaboratorsHandler.getMemberIdsWithPrivilegeLevels @project._id, (error, members) =>
+				UserStub.findOne { "overleaf.id": @tokenAccessInvitee.v1Id }, { _id: 1 }, (error, tokenBasedInviteeUserStub) =>
+					throw error if error?
+					expect(members[1].id).to.equal(tokenBasedInviteeUserStub._id.toString())
+					expect(members[1].privilegeLevel).to.equal('readAndWrite')
+					done()
+				return
