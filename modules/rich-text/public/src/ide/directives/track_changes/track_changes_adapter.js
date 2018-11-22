@@ -9,8 +9,6 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
   let TrackChangesAdapter
   return (TrackChangesAdapter = class TrackChangesAdapter {
     constructor(editor) {
-      this.bindToEditor = this.bindToEditor.bind(this)
-      this.unbindFromEditor = this.unbindFromEditor.bind(this)
       this.updateFocus = this.updateFocus.bind(this)
       this.onInsertAdded = this.onInsertAdded.bind(this)
       this.onInsertRemoved = this.onInsertRemoved.bind(this)
@@ -29,12 +27,13 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
       // But I didn't want Source erroring so thought I would move it early
     }
 
-    bindToEditor() {
-      // TODO fill these up with necessary equivalents
-    }
+    clearAnnotations() {
+      const markers = this.cm.doc.getAllMarks()
 
-    unbindFromEditor() {
-      // TODO fill these up with necessary equivalents
+      for (let marker of markers) {
+        marker.clear()
+      }
+      this.changeIdToMarkerIdMap = {}
     }
 
     onInsertAdded(change) {
@@ -96,4 +95,3 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
     }
   })
 })
-// TODO

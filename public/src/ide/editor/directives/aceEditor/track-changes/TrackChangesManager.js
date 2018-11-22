@@ -25,11 +25,18 @@ define([
       }
 
       constructor($scope, editor, element, adapter) {
+        this.onChangeSession = this.onChangeSession.bind(this)
+        this.onChangeSelection = this.onChangeSelection.bind(this)
+        this.onCut = this.onCut.bind(this)
         this.onPaste = this.onPaste.bind(this)
+        this.onResize = this.onResize.bind(this)
+
         this.$scope = $scope
         this.editor = editor
         this.element = element
         this.adapter = adapter
+        this._scrollTimeout = null
+        this.changingSelection = false
         if (window.trackChangesManager == null) {
           window.trackChangesManager = this
         }
@@ -84,89 +91,46 @@ define([
           return this.recalculateReviewEntriesScreenPositions()
         })
 
-        let changingSelection = false
-        const onChangeSelection = () => {
-          // Deletes can send about 5 changeSelection events, so
-          // just act on the last one.
-          if (!changingSelection) {
-            changingSelection = true
-            return this.$scope.$evalAsync(() => {
-              changingSelection = false
-              return this.updateFocus()
-            })
-          }
-        }
-
-        const onResize = () => {
-          return this.recalculateReviewEntriesScreenPositions()
-        }
-
-        const onChangeSession = e => {
-          this.clearAnnotations()
-          this.redrawAnnotations()
-          this.editor.session.on('changeScrollTop', onChangeScroll)
-        }
-
-        let _scrollTimeout = null
-        const onChangeScroll = () => {
-          if (_scrollTimeout != null) {
-          } else {
-            return (_scrollTimeout = setTimeout(() => {
-              this.recalculateVisibleEntries()
-              this.$scope.$apply()
-              return (_scrollTimeout = null)
-            }, 200))
-          }
-        }
-
         this._resetCutState()
-        const onCut = () => this.onCut()
-        const onPaste = () => this.onPaste()
+      }
 
-        const bindToEditor = () => {
-          if (this.editor) {
-            this.editor.on('changeSelection', onChangeSelection)
-            this.editor.on('change', onChangeSelection) // Selection also moves with updates elsewhere in the document
-            this.editor.on('changeSession', onChangeSession)
-            this.editor.on('cut', onCut)
-            this.editor.on('paste', onPaste)
-            this.editor.renderer.on('resize', onResize)
-          } else {
-            /**
-              There was no changeSession event equivalent for CM where it would fire
-              at the beginning of the first "session", so here I'm just doing the
-              main thing I wanted onChangeSession to do for CM so it gets done the
-              first time (otherwise I'm doing it in swapDoc)
-              */
+      onChangeSession(e) {
+        this.adapter.clearAnnotations()
+        this.redrawAnnotations()
 
-            this.redrawAnnotations()
-            this.adapter.bindToEditor()
-          }
+        if (this.editor) {
+          this.editor.session.on(
+            'changeScrollTop',
+            this.onChangeScroll.bind(this)
+          )
         }
+      }
 
-        const unbindFromEditor = () => {
-          if (this.editor) {
-            this.editor.off('changeSelection', onChangeSelection)
-            this.editor.off('change', onChangeSelection)
-            this.editor.off('changeSession', onChangeSession)
-            this.editor.off('cut', onCut)
-            this.editor.off('paste', onPaste)
-            this.editor.renderer.off('resize', onResize)
-          } else {
-            this.adapter.unbindFromEditor()
-          }
+      onChangeScroll() {
+        if (this._scrollTimeout != null) {
+        } else {
+          return (this._scrollTimeout = setTimeout(() => {
+            this.recalculateVisibleEntries()
+            this.$scope.$apply()
+            return (this._scrollTimeout = null)
+          }, 200))
         }
+      }
 
-        this.$scope.$watch('trackChangesEnabled', enabled => {
-          if (enabled == null) {
-            return
-          }
-          if (enabled) {
-            bindToEditor()
-          } else {
-            unbindFromEditor()
-          }
-        })
+      onChangeSelection() {
+        // Deletes can send about 5 changeSelection events, so
+        // just act on the last one.
+        if (!this.changingSelection) {
+          this.changingSelection = true
+          return this.$scope.$evalAsync(() => {
+            this.changingSelection = false
+            return this.updateFocus()
+          })
+        }
+      }
+
+      onResize() {
+        return this.recalculateReviewEntriesScreenPositions()
       }
 
       disconnectFromDoc(doc) {
@@ -190,30 +154,17 @@ define([
       }
 
       connectToDoc(doc) {
-        this.rangesTracker = doc.ranges
         this.setTrackChanges(this.$scope.trackChanges)
 
         doc.on('ranges:dirty', () => {
           this.updateAnnotations()
         })
         doc.on('ranges:clear', () => {
-          this.clearAnnotations()
+          this.adapter.clearAnnotations()
         })
         doc.on('ranges:redraw', () => {
           this.redrawAnnotations()
         })
-      }
-
-      clearAnnotations() {
-        const session = this.editor.getSession()
-        for (let change_id in this.adapter.changeIdToMarkerIdMap) {
-          const markers = this.adapter.changeIdToMarkerIdMap[change_id]
-          for (let marker_name in markers) {
-            const marker_id = markers[marker_name]
-            session.removeMarker(marker_id)
-          }
-        }
-        this.adapter.changeIdToMarkerIdMap = {}
       }
 
       redrawAnnotations() {

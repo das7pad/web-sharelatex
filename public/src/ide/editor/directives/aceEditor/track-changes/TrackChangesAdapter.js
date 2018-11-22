@@ -46,6 +46,18 @@ define(['ace/ace', 'ide/editor/AceShareJsCodec'], function(
         return AceShareJsCodec.aceRangeToShareJs(range, lines)
       }
 
+      clearAnnotations() {
+        const session = this.editor.getSession()
+        for (let change_id in this.changeIdToMarkerIdMap) {
+          const markers = this.changeIdToMarkerIdMap[change_id]
+          for (let marker_name in markers) {
+            const marker_id = markers[marker_name]
+            session.removeMarker(marker_id)
+          }
+        }
+        this.changeIdToMarkerIdMap = {}
+      }
+
       onInsertAdded(change) {
         const start = this.shareJsOffsetToAcePosition(change.op.p)
         const end = this.shareJsOffsetToAcePosition(

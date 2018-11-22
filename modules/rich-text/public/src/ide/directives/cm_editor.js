@@ -155,6 +155,7 @@ define([
 
         var detachFromCM = function(sharejsDoc) {
           tearDownSpellCheck()
+          tearDownTrackChanges()
           tearDownMetadataEventListener()
           sharejsDoc.detachFromCM()
           return sharejsDoc.off('remoteop.richtext')
@@ -196,12 +197,26 @@ define([
         }
 
         const initTrackChanges = function() {
-          return (this.trackChangesManager = new TrackChangesManager(
+          const codeMirror = editor.getCodeMirror()
+
+          this.trackChangesManager = new TrackChangesManager(
             scope,
             null,
             element,
             new TrackChangesAdapter(editor)
-          ))
+          )
+
+          this.trackChangesManager.rangesTracker = scope.sharejsDoc.ranges
+
+          // Call this initially because swapDoc doesn't occur on load
+          this.trackChangesManager.onChangeSession()
+
+          codeMirror.on('swapDoc', this.trackChangesManager.onChangeSession)
+        }
+
+        const tearDownTrackChanges = function() {
+          const codeMirror = editor.getCodeMirror()
+          codeMirror.off('swapDoc', this.trackChangesManager.onChangeSession)
         }
 
         var initCursorPosition = function() {

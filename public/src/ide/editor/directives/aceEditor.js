@@ -605,6 +605,33 @@ define([
           )
         }
 
+        const initTrackChanges = function() {
+          trackChangesManager.rangesTracker = scope.sharejsDoc.ranges
+
+          // Force onChangeSession in order to set up highlights etc.
+          trackChangesManager.onChangeSession()
+
+          if (!trackChangesManager) return
+          editor.on('changeSelection', trackChangesManager.onChangeSelection)
+
+          editor.on('change', trackChangesManager.onChangeSelection) // Selection also moves with updates elsewhere in the document
+          editor.on('changeSession', trackChangesManager.onChangeSession)
+          editor.on('cut', trackChangesManager.onCut)
+          editor.on('paste', trackChangesManager.onPaste)
+          editor.renderer.on('resize', trackChangesManager.onResize)
+        }
+
+        const tearDownTrackChanges = function() {
+          if (!trackChangesManager) return
+          editor.off('changeSelection', trackChangesManager.onChangeSelection)
+
+          editor.off('change', trackChangesManager.onChangeSelection)
+          editor.off('changeSession', trackChangesManager.onChangeSession)
+          editor.off('cut', trackChangesManager.onCut)
+          editor.off('paste', trackChangesManager.onPaste)
+          editor.renderer.off('resize', trackChangesManager.onResize)
+        }
+
         const onSessionChangeForCursorPosition = function(e) {
           if (e.oldSession != null) {
             e.oldSession.selection.off(
@@ -698,6 +725,7 @@ define([
           editor.setReadOnly(scope.readOnly) // respect the readOnly setting, normally false
           triggerEditorInitEvent()
           initSpellCheck()
+          initTrackChanges()
 
           resetScrollMargins()
 
@@ -747,6 +775,7 @@ define([
 
         var detachFromAce = function(sharejs_doc) {
           tearDownSpellCheck()
+          tearDownTrackChanges()
           sharejs_doc.detachFromAce()
           sharejs_doc.off('remoteop.recordRemote')
 
