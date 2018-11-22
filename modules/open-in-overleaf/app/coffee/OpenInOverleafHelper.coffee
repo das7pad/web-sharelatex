@@ -17,7 +17,7 @@ module.exports = OpenInOverleafHelper =
 # see: https://github.com/overleaf/write_latex/blob/master/main/lib/text_normalization.rb
 		return content
 
-	getSnippetFromUri: (uri, cb = (error, result)->) ->
+	populateSnippetFromUri: (uri, source_snippet, cb = (error, result)->) ->
 		return cb(new Error('Invalid URI')) unless urlValidator.isWebUri(uri)
 		uri = UrlHelper.wrapUrlWithProxy(uri)
 
@@ -29,14 +29,17 @@ module.exports = OpenInOverleafHelper =
 			magic.detectFile fspath, (error, ctype) ->
 				return cb(error) if error?
 
+				snippet = JSON.parse(JSON.stringify(source_snippet))
+
 				if ctype == 'application/zip'
-					# TODO: Handle zip files
-					cb(new Error('I need to implement zip file support'))
+					snippet.projectFile = fspath
+					cb(null, snippet)
 				else if ctype.match(/^text\//)
 					# TODO: handle non-UTF8 properly
 					fs.readFile fspath, encoding: 'utf8', (error, data) ->
 						return cb(error) if error?
-						cb(null, data)
+						snippet.snip = data
+						cb(null, snippet)
 				else
 					logger.log uri:uri, ctype:ctype, "refusing to open unrecognised content type"
 					cb(new Error("Invalid content type: #{ctype}"))

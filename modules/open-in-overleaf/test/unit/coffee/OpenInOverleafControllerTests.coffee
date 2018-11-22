@@ -38,10 +38,13 @@ describe 'OpenInOverleafController', ->
 			redirect: sinon.stub()
 		@ProjectModel = {}
 		@ProjectModel.update = sinon.stub().callsArg(2)
+		@project = {_id:@project_id}
 		@ProjectCreationHandler =
-			createProjectFromSnippet: sinon.stub().callsArgWith(3, null, {_id:@project_id})
+			createProjectFromSnippet: sinon.stub().callsArgWith(3, null, @project)
 		@ProjectDetailsHandler =
 			generateUniqueName: sinon.stub().callsArgWith(2, null, "new_snippet_project")
+		@ProjectUploadManager =
+			createProjectFromZipArchive: sinon.stub().callsArgWith(3, null, @project)
 
 		@OpenInOverleafHelper =
 			getDocumentLinesFromSnippet: sinon.stub().returns((@comment + @snip).split("\n"))
@@ -61,6 +64,7 @@ describe 'OpenInOverleafController', ->
 			'../../../../app/js/Features/Project/ProjectDetailsHandler': @ProjectDetailsHandler
 			'../../../../app/js/models/Project': {Project: @ProjectModel}
 			'../../../../app/js/Features/Documents/DocumentHelper': @DocumentHelper
+			'../../../../app/js/Features/Uploads/ProjectUploadManager': @ProjectUploadManager
 			'./OpenInOverleafHelper': @OpenInOverleafHelper
 
 	describe "openInOverleaf", ->
@@ -135,6 +139,22 @@ describe 'OpenInOverleafController', ->
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
+		describe "when the snippet uri is a zip file", ->
+			beforeEach ->
+				@req.body.snip_uri = "#{@snip_uri}.zip"
+				@OpenInOverleafController._populateSnippetFromRequest = sinon.stub().callsArgWith(1, null, {
+						projectFile: '/foo/bar.zip'
+						defaultTitle: "new_snippet_project"
+				})
+
+			it "should create a project from the zip file and redirect to it", (done)->
+				@res.send = (content)=>
+					sinon.assert.calledWith(@ProjectUploadManager.createProjectFromZipArchive, @user._id, "new_snippet_project", "/foo/bar.zip")
+					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
+					content.should.equal JSON.stringify({redirect: '/project/' + @project_id})
+					done()
+				@OpenInOverleafController.openInOverleaf @req, @res
+
 		describe "when populating the snippet returns an error", ->
 			beforeEach ->
 				@req.body.snip_uri = @snip_uri
@@ -152,7 +172,7 @@ describe 'OpenInOverleafController', ->
 			@OpenInOverleafController._getMainFileCommentFromSnipRequest = sinon.stub().returns(@comment)
 
 		it "should return a snippet object with a comment, snippet and default title", (done) ->
-			@OpenInOverleafController._getSnippetContentsFromRequest = sinon.stub().callsArgWith(1, null, @snip)
+			@OpenInOverleafController._getSnippetContentsFromRequest = sinon.stub().callsArgWith(1, null, {snip: @snip})
 			@OpenInOverleafController._populateSnippetFromRequest @req, (error, snippet) =>
 				expect(error).not.to.exist
 				snippet.snip.should.equal @snip
@@ -161,17 +181,15 @@ describe 'OpenInOverleafController', ->
 				done()
 
 		it "should return an error if retrieving the snippet returns an error", (done) ->
-			@OpenInOverleafController._getSnippetContentsFromRequest = sinon.stub().callsArgWith(1, new Error(), null)
+			@OpenInOverleafController._getSnippetContentsFromRequest = sinon.stub().callsArgWith(1, new Error())
 			@OpenInOverleafController._populateSnippetFromRequest @req, (error, snippet) =>
 				expect(error).to.exist
-				expect(snippet).not.to.exist
 				done()
 
 		it "should return an error if there is no error, but no snippet", (done) ->
-			@OpenInOverleafController._getSnippetContentsFromRequest = sinon.stub().callsArgWith(1, null, null)
+			@OpenInOverleafController._getSnippetContentsFromRequest = sinon.stub().callsArgWith(1, null, {})
 			@OpenInOverleafController._populateSnippetFromRequest @req, (error, snippet) =>
 				expect(error).to.exist
-				expect(snippet).not.to.exist
 				done()
 
 	describe "_getMainFileCommentFromSnipRequest", ->
