@@ -166,6 +166,16 @@ p
 
 				tr
 					td
+						label(for="gitBridge") Git Bridge
+					td
+						input#gitBridge(
+							type="checkbox"
+							name="features.gitBridge"
+							ng-model="user.features.gitBridge"
+						)
+
+				tr
+					td
 						label(for="compileTimeout") Compile Timeout
 					td
 						input#compileTimeout.form-control(
@@ -245,28 +255,15 @@ p
 							ng-model="user.useCollabratecV2"
 						)
 
-			//- tr
-			//- 	td
-			//- 		label(for="betaProgram") Beta Program
-			//- 	td
-			//- 		input#betaProgram(
-			//- 			type="checkbox"
-			//- 			name="betaProgram"
-			//- 			ng-model="user.betaProgram"
-			//- 		)
-
-			//- tr
-			//- 	td
-			//- 		label(for="awareOfV2") Aware of v2?
-			//- 	td
-			//- 		input#betaProgram(
-			//- 			type="checkbox"
-			//- 			name="awareOfV2"
-			//- 			ng-model="user.awareOfV2"
-			//- 		)
-
-
-
+				tr
+					td
+						label(for="betaProgram") Beta Program (Git bridge)
+					td
+						input#betaProgram(
+							type="checkbox"
+							name="betaProgram"
+							ng-model="user.betaProgram"
+						)
 
 			if isSuperAdmin
 				tr
