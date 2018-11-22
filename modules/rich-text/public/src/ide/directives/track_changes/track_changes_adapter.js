@@ -9,7 +9,6 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
   let TrackChangesAdapter
   return (TrackChangesAdapter = class TrackChangesAdapter {
     constructor(editor) {
-      this.updateFocus = this.updateFocus.bind(this)
       this.onInsertAdded = this.onInsertAdded.bind(this)
       this.onInsertRemoved = this.onInsertRemoved.bind(this)
       this.shareJsOffsetToAcePosition = this.shareJsOffsetToAcePosition.bind(
@@ -20,11 +19,6 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
       this.onChangeMoved = this.onChangeMoved.bind(this)
       this.editor = editor
       this.cm = this.editor.getCodeMirror()
-    }
-
-    updateFocus() {
-      // This is for the review panel updates, which isn't necessary now
-      // But I didn't want Source erroring so thought I would move it early
     }
 
     clearAnnotations() {
@@ -92,11 +86,6 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
     shareJsOffsetToAcePosition(offset) {
       const lines = this.cm.doc.getValue().split('\n')
       return AceShareJsCodec.shareJsOffsetToAcePosition(offset, lines)
-    }
-
-    aceRangeToShareJs(range) {
-      const lines = this.cm.doc.getValue().split('\n')
-      return AceShareJsCodec.aceRangeToShareJs(range, lines)
     }
   })
 })

@@ -21,29 +21,6 @@ define(['ace/ace', 'ide/editor/AceShareJsCodec'], function(
       constructor(editor) {
         this.editor = editor
         this.changeIdToMarkerIdMap = {}
-
-        this.aceRangeToShareJs = this.aceRangeToShareJs.bind(this)
-      }
-
-      updateFocus() {
-        const selection = this.editor.getSelectionRange()
-        const selection_start = this.aceRangeToShareJs(selection.start)
-        const selection_end = this.aceRangeToShareJs(selection.end)
-        const is_selection = selection_start !== selection_end
-
-        return {
-          start: selection_start,
-          end: selection_end,
-          isSelection: is_selection
-        }
-      }
-
-      aceRangeToShareJs(range) {
-        const lines = this.editor
-          .getSession()
-          .getDocument()
-          .getLines(0, range.row)
-        return AceShareJsCodec.aceRangeToShareJs(range, lines)
       }
 
       clearAnnotations() {

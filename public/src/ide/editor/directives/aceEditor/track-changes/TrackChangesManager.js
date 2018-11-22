@@ -422,8 +422,8 @@ define([
       onCut() {
         this._resetCutState()
         const selection = this.editor.getSelectionRange()
-        const selection_start = this.adapter.aceRangeToShareJs(selection.start)
-        const selection_end = this.adapter.aceRangeToShareJs(selection.end)
+        const selection_start = this.adapter._aceRangeToShareJs(selection.start)
+        const selection_end = this.adapter._aceRangeToShareJs(selection.end)
         this._cutState.text = this.editor.getSelectedText()
         this._cutState.docId = this.$scope.docId
         return (() => {
@@ -456,7 +456,7 @@ define([
             return
           }
           const pasted_text = change.lines.join('\n')
-          const paste_offset = this.adapter.aceRangeToShareJs(change.start)
+          const paste_offset = this.adapter._aceRangeToShareJs(change.start)
           // We have to wait until the change has been processed by the range tracker,
           // since if we move the ops into place beforehand, they will be moved again
           // when the changes are processed by the range tracker. This ranges:dirty
@@ -642,19 +642,16 @@ define([
       }
 
       updateFocus() {
-        // Don't worry about the review panel for now if we're not using ACE
-        if (this.editor) {
-          const selection = this.adapter.updateFocus()
-
-          this.$scope.$emit(
-            'editor:focus:changed',
-            selection.start,
-            selection.end,
-            selection.isSelection
-          )
-        } else {
-          this.adapter.updateFocus()
-        }
+        const selection = this.editor.getSelectionRange()
+        const selection_start = this._aceRangeToShareJs(selection.start)
+        const selection_end = this._aceRangeToShareJs(selection.end)
+        const is_selection = selection_start !== selection_end
+        return this.$scope.$emit(
+          'editor:focus:changed',
+          selection_start,
+          selection_end,
+          is_selection
+        )
       }
 
       onCommentAdded(comment) {
@@ -704,6 +701,14 @@ define([
           session.removeMarker(background_marker_id)
           return session.removeMarker(callout_marker_id)
         }
+      }
+
+      _aceRangeToShareJs(range) {
+        const lines = this.editor
+          .getSession()
+          .getDocument()
+          .getLines(0, range.row)
+        return AceShareJsCodec.aceRangeToShareJs(range, lines)
       }
 
       _aceChangeToShareJs(delta) {
