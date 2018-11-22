@@ -3,9 +3,9 @@
     | You have a legacy group licence from Overleaf v1.
   - if (v1SubscriptionStatus['team']['will_end_at'])
     p
-      | Your current group licence ends
+      | Your current group licence ends on
       |
-      strong= v1SubscriptionStatus['team']['will_end_at']
+      strong= moment(v1SubscriptionStatus['team']['will_end_at']).format('Do MMM YY')
       |
       | and will
       |
@@ -33,7 +33,7 @@
   p
     | Your plan ends on
     |
-    strong= v1SubscriptionStatus['product']['will_end_at']
+    strong= moment(v1SubscriptionStatus['product']['will_end_at']).format('Do MMM YY')
     |
     | and will
     |
