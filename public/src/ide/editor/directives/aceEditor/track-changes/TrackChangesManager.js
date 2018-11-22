@@ -422,8 +422,8 @@ define([
       onCut() {
         this._resetCutState()
         const selection = this.editor.getSelectionRange()
-        const selection_start = this.adapter._aceRangeToShareJs(selection.start)
-        const selection_end = this.adapter._aceRangeToShareJs(selection.end)
+        const selection_start = this.adapter.aceRangeToShareJs(selection.start)
+        const selection_end = this.adapter.aceRangeToShareJs(selection.end)
         this._cutState.text = this.editor.getSelectedText()
         this._cutState.docId = this.$scope.docId
         return (() => {
@@ -456,7 +456,7 @@ define([
             return
           }
           const pasted_text = change.lines.join('\n')
-          const paste_offset = this.adapter._aceRangeToShareJs(change.start)
+          const paste_offset = this.adapter.aceRangeToShareJs(change.start)
           // We have to wait until the change has been processed by the range tracker,
           // since if we move the ops into place beforehand, they will be moved again
           // when the changes are processed by the range tracker. This ranges:dirty

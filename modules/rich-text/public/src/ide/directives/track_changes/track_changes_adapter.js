@@ -93,5 +93,10 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
       const lines = this.cm.doc.getValue().split('\n')
       return AceShareJsCodec.shareJsOffsetToAcePosition(offset, lines)
     }
+
+    aceRangeToShareJs(range) {
+      const lines = this.cm.doc.getValue().split('\n')
+      return AceShareJsCodec.aceRangeToShareJs(range, lines)
+    }
   })
 })
