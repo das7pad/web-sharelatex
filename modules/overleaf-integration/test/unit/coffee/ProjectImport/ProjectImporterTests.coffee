@@ -449,7 +449,8 @@ describe "ProjectImporter", ->
 
 	describe "_importTokenAccessInvite", ->
 		beforeEach ->
-			@project_id = "mock-project-id"
+			@v1_project_id = "mock-v1-project-id"
+			@v2_project_id = "mock-v2-project-id"
 			@invite = {
 				id: 54
 				email: "jane@example.com",
@@ -460,23 +461,24 @@ describe "ProjectImporter", ->
 				.withArgs(@invite)
 				.yields(null, @sl_invitee_id)
 			@TokenAccessHandler.addReadAndWriteUserToProject = sinon.stub().yields()
+			@V1SharelatexApi.request = sinon.stub().yields(null, {}, {tags: ['foo', 'bar']})
 
 		describe 'null checks', ->
 			it "should require invite.id", (done) ->
 				delete @invite.id
-				@ProjectImporter._importTokenAccessInvite @project_id, @invite, (error) ->
+				@ProjectImporter._importTokenAccessInvite @v1_project_id, @v2_project_id, @invite, (error) ->
 					error.message.should.equal("expected invite id and email")
 					done()
 
 			it "should require invite.email", (done) ->
 				delete @invite.email
-				@ProjectImporter._importTokenAccessInvite @project_id, @invite, (error) ->
+				@ProjectImporter._importTokenAccessInvite @v1_project_id, @v2_project_id, @invite, (error) ->
 					error.message.should.equal("expected invite id and email")
 					done()
 
 		describe 'imports successfully', ->
 			beforeEach (done) ->
-				@ProjectImporter._importTokenAccessInvite @project_id, @invite, done
+				@ProjectImporter._importTokenAccessInvite @v1_project_id, @v2_project_id, @invite, done
 
 			it "should look up the invited user in SL", ->
 				@UserMapper.getSlIdFromOlUser
@@ -485,8 +487,25 @@ describe "ProjectImporter", ->
 
 			it "should add the SL invitee to project", ->
 				@TokenAccessHandler.addReadAndWriteUserToProject
-					.calledWith(@sl_invitee_id, @project_id)
+					.calledWith(@sl_invitee_id, @v2_project_id)
 					.should.equal true
+
+		describe "tags", ->
+			beforeEach (done) ->
+				@ProjectImporter._importTokenAccessInvite @v1_project_id, @v2_project_id, @invite, done
+
+			it "should request tags for invited user", ->
+				@V1SharelatexApi.request.calledWithMatch(
+					{ url: "#{@settings.apis.v1.url}/api/v1/sharelatex/users/#{@invite.id}/docs/#{@v1_project_id}/export/tags"}
+				).should.equal true
+
+			it "should add tags for user", ->
+				@TagsHandler.addProjectToTagName.calledWithMatch(
+					@sl_invitee_id, "foo", @v2_project_id
+				).should.equal true
+				@TagsHandler.addProjectToTagName.calledWithMatch(
+					@sl_invitee_id, "bar", @v2_project_id
+				).should.equal true
 
 	describe "_importFile", ->
 		beforeEach ->
