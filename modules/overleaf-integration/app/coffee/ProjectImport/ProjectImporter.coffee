@@ -174,7 +174,7 @@ module.exports = ProjectImporter =
 
 	_importTokenAccessInvites: (v1_project_id, v2_project_id, invites = [], callback = (error) ->) ->
 		async.mapSeries(invites, (invite, cb) ->
-			ProjectImporter._importTokenAccessInvite v1_project_id, v2ProjectId, invite, cb
+			ProjectImporter._importTokenAccessInvite v1_project_id, v2_Project_id, invite, cb
 		, callback)
 
 	ACCESS_LEVEL_MAP: {
