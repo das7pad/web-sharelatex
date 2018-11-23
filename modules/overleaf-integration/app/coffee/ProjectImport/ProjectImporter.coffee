@@ -172,9 +172,9 @@ module.exports = ProjectImporter =
 		else
 			ProjectImporter._importPendingInvite(v2_project_id, invite, callback)
 
-	_importTokenAccessInvites: (v1ProjectId, v2ProjectId, invites = [], callback = (error) ->) ->
+	_importTokenAccessInvites: (v1_project_id, v2_project_id, invites = [], callback = (error) ->) ->
 		async.mapSeries(invites, (invite, cb) ->
-			ProjectImporter._importTokenAccessInvite v1ProjectId, v2ProjectId, invite, cb
+			ProjectImporter._importTokenAccessInvite v1_project_id, v2ProjectId, invite, cb
 		, callback)
 
 	ACCESS_LEVEL_MAP: {
@@ -209,7 +209,7 @@ module.exports = ProjectImporter =
 				privileges: privilegeLevel
 			}, callback
 
-	_importTokenAccessInvite: (v1ProjectId, v2ProjectId, invite, callback = (error) ->) ->
+	_importTokenAccessInvite: (v1_project_id, v2_project_id, invite, callback = (error) ->) ->
 		if !invite.id? or !invite.email?
 			return callback(new Error('expected invite id and email'))
 		UserMapper.getSlIdFromOlUser invite, (error, inviteeUserId) ->
@@ -217,9 +217,9 @@ module.exports = ProjectImporter =
 			# v1 token-access invites (called UserDocs in v1) are only recorded for
 			# read-write token-accesses, so always grant readAndWriteAccess to v2
 			# token-access
-			TokenAccessHandler.addReadAndWriteUserToProject inviteeUserId, v2ProjectId, (error) ->
+			TokenAccessHandler.addReadAndWriteUserToProject inviteeUserId, v2_project_id, (error) ->
 				return callback(error) if error?
-				ProjectImporter._importInviteTags(v1ProjectId, v2ProjectId, invite.id, inviteeUserId, callback)
+				ProjectImporter._importInviteTags(v1_project_id, v2_project_id, invite.id, inviteeUserId, callback)
 
 	_importLabels: (v1_project_id, v2_project_id, v1_user_id, callback = (error) ->) ->
 		ProjectImporter._getLabels v1_project_id, (error, labels) ->
