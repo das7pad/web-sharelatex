@@ -448,7 +448,7 @@ describe "ProjectImporter", ->
 					done()
 
 	describe "_importTokenAccessInvite", ->
-		beforeEach (done) ->
+		beforeEach ->
 			@project_id = "mock-project-id"
 			@invite = {
 				id: 54
@@ -460,17 +460,33 @@ describe "ProjectImporter", ->
 				.withArgs(@invite)
 				.yields(null, @sl_invitee_id)
 			@TokenAccessHandler.addReadAndWriteUserToProject = sinon.stub().yields()
-			@ProjectImporter._importTokenAccessInvite @project_id, @invite, done
 
-		it "should look up the invited user in SL", ->
-			@UserMapper.getSlIdFromOlUser
-				.calledWith(@invite)
-				.should.equal true
+		describe 'null checks', ->
+			it "should require invite.id", (done) ->
+				delete @invite.id
+				@ProjectImporter._importTokenAccessInvite @project_id, @invite, (error) ->
+					error.message.should.equal("expected invite id and email")
+					done()
 
-		it "should add the SL invitee to project", ->
-			@TokenAccessHandler.addReadAndWriteUserToProject
-				.calledWith(@sl_invitee_id, @project_id)
-				.should.equal true
+			it "should require invite.email", (done) ->
+				delete @invite.email
+				@ProjectImporter._importTokenAccessInvite @project_id, @invite, (error) ->
+					error.message.should.equal("expected invite id and email")
+					done()
+
+		describe 'imports successfully', ->
+			beforeEach (done) ->
+				@ProjectImporter._importTokenAccessInvite @project_id, @invite, done
+
+			it "should look up the invited user in SL", ->
+				@UserMapper.getSlIdFromOlUser
+					.calledWith(@invite)
+					.should.equal true
+
+			it "should add the SL invitee to project", ->
+				@TokenAccessHandler.addReadAndWriteUserToProject
+					.calledWith(@sl_invitee_id, @project_id)
+					.should.equal true
 
 	describe "_importFile", ->
 		beforeEach ->

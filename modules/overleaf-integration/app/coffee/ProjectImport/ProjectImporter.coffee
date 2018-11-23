@@ -210,9 +210,14 @@ module.exports = ProjectImporter =
 			}, callback
 
 	_importTokenAccessInvite: (projectId, invite, callback = (error) ->) ->
-		# TODO: null checks, privilegeLevels, tags
+		# TODO: tags
+		if !invite.id? or !invite.email?
+			return callback(new Error('expected invite id and email'))
 		UserMapper.getSlIdFromOlUser invite, (error, inviteeUserId) ->
 			return callback(error) if error?
+			# v1 token-access invites (called UserDocs in v1) are only recorded for
+			# read-write token-accesses, so always grant readAndWriteAccess to v2
+			# token-access
 			TokenAccessHandler.addReadAndWriteUserToProject inviteeUserId, projectId, callback
 
 	_importLabels: (v1_project_id, v2_project_id, v1_user_id, callback = (error) ->) ->
