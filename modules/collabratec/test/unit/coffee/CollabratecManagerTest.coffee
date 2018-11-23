@@ -70,7 +70,7 @@ describe "CollabratecManager", ->
 						@ProjectEntityHandler.getDoc = sinon.stub().yields null, @lines
 
 					it "should callback with project metadata", ->
-						@CollabratecManager.getProjectMetadata @user, "project-id", @callback
+						@CollabratecManager.getProjectMetadata "project-id", @callback
 						expect(@callback).to.have.been.calledWith null, {
 							title: "project-title",
 							doc_abstract: "Test abstract. It spans two lines.",
@@ -86,7 +86,7 @@ describe "CollabratecManager", ->
 						@ProjectEntityHandler.getDoc = sinon.stub().yields "error"
 
 					it "should callback with error", ->
-						@CollabratecManager.getProjectMetadata @user, "project-id", @callback
+						@CollabratecManager.getProjectMetadata "project-id", @callback
 						expect(@callback).to.have.been.calledWith "error"
 
 			describe "when project does not have rootDoc_id", ->
@@ -98,7 +98,7 @@ describe "CollabratecManager", ->
 					@ProjectGetter.getProject = sinon.stub().yields null, @project
 
 				it "should callback with limited metadata", ->
-					@CollabratecManager.getProjectMetadata @user, "project-id", @callback
+					@CollabratecManager.getProjectMetadata "project-id", @callback
 					expect(@callback).to.have.been.calledWith null, {
 						title: "project-title",
 						created_at: 1540993059000,
@@ -111,7 +111,7 @@ describe "CollabratecManager", ->
 				@ProjectGetter.getProject = sinon.stub().yields "error"
 
 			it "should callback with error", ->
-				@CollabratecManager.getProjectMetadata @user, "project-id", @callback
+				@CollabratecManager.getProjectMetadata "project-id", @callback
 				expect(@callback).to.have.been.calledWith "error"
 
 	describe "createProject", ->
@@ -146,7 +146,7 @@ describe "CollabratecManager", ->
 						@CollabratecManager.createProject "user-id", "template-id", "title", "doc-abstract", ["keyword-1", "keyword-2"], "author", "collabratec-document-id", "collabratec-privategroup-id", @callback
 
 					it "should initialize project record", ->
-						expect(@ProjectCollabratecDetailsHandler.initializeCollabratecProject).to.have.been.calledOnce.and.calledWithMatch "project-id", "title", "user", "collabratec-document-id", "collabratec-privategroup-id"
+						expect(@ProjectCollabratecDetailsHandler.initializeCollabratecProject).to.have.been.calledOnce.and.calledWithMatch "project-id", "user", "collabratec-document-id", "collabratec-privategroup-id"
 
 					describe "when initialize project succeeds", ->
 						beforeEach ->

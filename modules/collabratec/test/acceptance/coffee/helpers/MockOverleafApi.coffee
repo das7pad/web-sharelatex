@@ -74,6 +74,18 @@ module.exports = MockOverleafApi =
 		app.delete "/api/v1/collabratec/users/current_user/projects/bad-project-id", (req, res) ->
 			res.sendStatus 422
 
+		app.post "/api/v1/collabratec/users/current_user/projects/good-project-id/collabratec", (req, res) ->
+			res.status(201).json({project: "data"})
+
+		app.post "/api/v1/collabratec/users/current_user/projects/bad-project-id/collabratec", (req, res) ->
+			res.sendStatus 422
+
+		app.delete "/api/v1/collabratec/users/current_user/projects/good-project-id/collabratec", (req, res) ->
+			res.sendStatus 204
+
+		app.delete "/api/v1/collabratec/users/current_user/projects/bad-project-id/collabratec", (req, res) ->
+			res.sendStatus 403
+
 		app.listen 5000, (error) ->
 			throw error if error?
 		.on "error", (error) ->

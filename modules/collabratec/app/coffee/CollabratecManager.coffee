@@ -18,7 +18,6 @@ async = require "async"
 request = require "request"
 
 module.exports = CollabratecManager =
-
 	createProject: (user_id, template_id, title, doc_abstract, keywords, primary_author, collabratec_document_id, collabratec_privategroup_id, callback) ->
 		options =
 			headers: Accept: "application/json"
@@ -30,7 +29,7 @@ module.exports = CollabratecManager =
 				return callback err if err?
 				CollabratecManager._injectProjectMetadata user_id, project, title, doc_abstract, keywords, (err) ->
 					return callback err if err?
-					ProjectCollabratecDetailsHandler.initializeCollabratecProject project._id, title, user_id, collabratec_document_id,collabratec_privategroup_id, (err) ->
+					ProjectCollabratecDetailsHandler.initializeCollabratecProject project._id, user_id, collabratec_document_id,collabratec_privategroup_id, (err) ->
 						return callback err if err?
 						callback null, {
 							id: project._id,
@@ -56,7 +55,7 @@ module.exports = CollabratecManager =
 					project.title.toLowerCase().match(search)
 			callback null, CollabratecManager._paginate(projects, current_page, page_size)
 
-	getProjectMetadata: (user, project_id, callback) ->
+	getProjectMetadata: (project_id, callback) ->
 		projection =
 			_id: 1
 			lastUpdated: 1
@@ -73,6 +72,14 @@ module.exports = CollabratecManager =
 						return callback err if err?
 						content = DocMetadata.contentFromLines(lines)
 						callback null, CollabratecManager._formatProjectMetadata(project, content)
+
+	linkProject: (project_id, user_id, collabratec_document_id, callback) ->
+		ProjectCollabratecDetailsHandler.linkCollabratecUserProject project_id, user_id, collabratec_document_id, (err) ->
+			return callback err if err?
+			CollabratecManager.getProjectMetadata project_id, callback
+
+	unlinkProject: (project_id, user_id, callback) ->
+		ProjectCollabratecDetailsHandler.unlinkCollabratecUserProject project_id, user_id, callback
 
 	_formatProjectMetadata: (project, content) ->
 		metadata =
@@ -96,8 +103,8 @@ module.exports = CollabratecManager =
 		}
 
 		if (project.collabratecUsers?)
-			collabratecUser = project.collabratecUsers.find (collabratecUser) ->
-				return collabratecUser.user_id == user._id
+			collabratecUser = project.collabratecUsers.reverse().find (collabratecUser) ->
+				return collabratecUser.user_id.toString() == user._id.toString()
 			if (collabratecUser?)
 				collabratecProject.collabratec_document_id = collabratecUser.collabratec_document_id
 				collabratecProject.collabratec_privategroup_id = collabratecUser.collabratec_privategroup_id
@@ -116,8 +123,11 @@ module.exports = CollabratecManager =
 			callback null, body.projects
 
 	_getProjectsV2: (user, callback) ->
-		ProjectGetter.findAllUsersProjects user._id, 'name lastUpdated publicAccesLevel archived owner_ref tokens', (err, projects) ->
+		ProjectGetter.findAllUsersProjects user._id, 'name lastUpdated publicAccesLevel archived owner_ref tokens collabratecUsers', (err, projects) ->
 			projects = projects.owned.concat(projects.readAndWrite, projects.tokenReadAndWrite)
+			projects = projects.filter (project) ->
+				return false if project.archived
+				return true
 			projects = projects.map (project) ->
 				CollabratecManager._formatV2Project project, user
 			callback null, projects
