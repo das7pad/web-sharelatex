@@ -20,13 +20,18 @@ module.exports = GitBridgeHandler =
 		ProjectGetter.getProjectWithoutDocLines projectId, (err, project) ->
 			return callback(err) if err?
 			_userCanAccess = (u) ->
-				u?.features?.gitBridge && u.isAdmin # Restrict to admins for now
-			UserGetter.getUser project.owner_ref, {features: 1, isAdmin: 1}, (err, owner) ->
+				u?.features?.gitBridge
+			UserGetter.getUser project.owner_ref, {features: 1}, (err, owner) ->
 				return callback(err) if err?
-				UserGetter.getUser userId, {features: 1, isAdmin: 1}, (err, user) ->
+				UserGetter.getUser userId, {features: 1, betaProgram: 1}, (err, user) ->
 					return callback(err) if err?
 					if !(_userCanAccess(owner) || _userCanAccess(user))
-						return callback(new Errors.FeatureNotAvailable('Neither user nor has gitBridge feature'))
+						return callback(new Errors.FeatureNotAvailable('Neither user nor project owner has gitBridge feature'))
+					if !user.betaProgram
+						return callback(new Errors.FeatureNotAvailable('User is not in beta program'))
+					if project.overleaf?.id?
+						# TODO: This can return the project successfully once we have a migration strategy
+						return callback(new Errors.FeatureNotAvailable('Project was imported from v1'))
 					if project.overleaf?.history?.id?
 						return callback(null, project)
 					else
