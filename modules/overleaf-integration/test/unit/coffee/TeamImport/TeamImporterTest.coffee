@@ -88,7 +88,7 @@ describe "TeamImporter", ->
 		@SubscriptionLocator.findManagedSubscription.withArgs(@duplicateManager.id).yields(null, { id: 'another-subscripiton-id'})
 
 		@SubscriptionUpdater = {
-			addUsersToGroup: sinon.stub().yields(null, true)
+			addUsersToGroupWithoutFeaturesRefresh: sinon.stub().yields(null, true)
 			deleteWithV1Id: sinon.stub().yields(null)
 		}
 
@@ -146,7 +146,7 @@ describe "TeamImporter", ->
 				@SubscriptionLocator.getGroupWithV1Id.calledWith(@v1Team.id).should.equal true
 				@SubscriptionLocator.findManagedSubscription.calledWith(@teamAdmin.id).should.equal true
 
-				@SubscriptionUpdater.addUsersToGroup.calledWith(@subscriptionId,
+				@SubscriptionUpdater.addUsersToGroupWithoutFeaturesRefresh.calledWith(@subscriptionId,
 					['v2 team admin id', 'v2 team member id']).should.equal true
 
 				@TeamInvitesHandler.importInvite.calledOnce.should.equal true
