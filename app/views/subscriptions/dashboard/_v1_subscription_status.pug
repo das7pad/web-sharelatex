@@ -20,12 +20,16 @@
         button().btn.btn-danger Stop automatic renewal
   - else
     p
-      | Please contact support to make changes to your plan
+      | Please
+      |
+      a(href="/contact") contact support
+      |
+      | to make changes to your plan
   hr
 
 - if (v1SubscriptionStatus['product'])
   p  
-    | You're have a legacy Overleaf v1
+    | You have a legacy Overleaf v1
     |
     strong= v1SubscriptionStatus['product']['display_name']
     |
@@ -48,5 +52,9 @@
         button().btn.btn-danger Stop automatic renewal
   - else
     p
-      | Please contact support to make changes to your plan
+      | Please
+      |
+      a(href="/contact") contact support
+      |
+      | to make changes to your plan
   hr
