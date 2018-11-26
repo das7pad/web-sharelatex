@@ -18,44 +18,11 @@ define(['base', 'ide/history/util/displayNameForUser'], function(
   App,
   displayNameForUser
 ) {
-  App.controller('HistoryListController', [
+  App.controller('HistoryCompareListController', [
     '$scope',
-    '$modal',
     'ide',
-    function($scope, $modal, ide) {
+    function($scope, ide) {
       $scope.hoveringOverListSelectors = false
-
-      $scope.projectUsers = []
-
-      $scope.$watch('project.members', function(newVal) {
-        if (newVal != null) {
-          return ($scope.projectUsers = newVal.concat($scope.project.owner))
-        }
-      })
-
-      // This method (and maybe the one below) will be removed soon. User details data will be
-      // injected into the history API responses, so we won't need to fetch user data from other
-      // local data structures.
-      const _getUserById = id =>
-        _.find($scope.projectUsers, function(user) {
-          const curUserId =
-            (user != null ? user._id : undefined) ||
-            (user != null ? user.id : undefined)
-          return curUserId === id
-        })
-
-      $scope.getDisplayNameById = id => displayNameForUser(_getUserById(id))
-
-      $scope.deleteLabel = labelDetails =>
-        $modal.open({
-          templateUrl: 'historyV2DeleteLabelModalTemplate',
-          controller: 'HistoryV2DeleteLabelModalController',
-          resolve: {
-            labelDetails() {
-              return labelDetails
-            }
-          }
-        })
 
       $scope.loadMore = () => {
         return ide.historyManager.fetchNextBatchOfUpdates()
@@ -160,7 +127,7 @@ define(['base', 'ide/history/util/displayNameForUser'], function(
     }
   ])
 
-  return App.controller('HistoryListItemController', [
+  return App.controller('HistoryCompareListItemController', [
     '$scope',
     'event_tracking',
     function($scope, event_tracking) {
@@ -217,7 +184,7 @@ define(['base', 'ide/history/util/displayNameForUser'], function(
         return $scope.resetHoverState()
       }
 
-      return ($scope.displayName = displayNameForUser)
+      $scope.displayName = displayNameForUser
     }
   ])
 })

@@ -347,7 +347,8 @@ define([
             const updatesData = response.updates.data
             if (response.labels != null) {
               this.$scope.history.labels = this._sortLabelsByVersionAndDate(
-                response.labels.data
+                response.labels.data,
+                updatesData.updates[0].toV
               )
             }
             this._loadUpdates(updatesData.updates)
@@ -372,8 +373,22 @@ define([
           })
       }
 
-      _sortLabelsByVersionAndDate(labels) {
-        return this.ide.$filter('orderBy')(labels, ['-version', '-created_at'])
+      _sortLabelsByVersionAndDate(labels, lastUpdateToVersion) {
+        sortedLabels = this.ide.$filter('orderBy')(labels, [
+          '-version',
+          '-created_at'
+        ])
+        if (
+          sortedLabels.length > 0 &&
+          sortedLabels[0].version !== lastUpdateToVersion
+        ) {
+          sortedLabels.unshift({
+            isPseudoCurrentStateLabel: true,
+            version: lastUpdateToVersion,
+            created_at: new Date().toISOString()
+          })
+        }
+        return sortedLabels
       }
 
       loadFileAtPointInTime() {
@@ -600,7 +615,6 @@ define([
               user.hue = ColorManager.getHueForUserId(user.id)
             }
           }
-
           if (
             previousUpdate == null ||
             !moment(previousUpdate.meta.end_ts).isSame(
