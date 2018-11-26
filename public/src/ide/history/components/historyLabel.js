@@ -19,8 +19,12 @@ define(['base'], function(App) {
     _
   ) {
     const ctrl = this
-    ctrl.$onInit = () =>
+    ctrl.$onInit = () => {
       ctrl.showTooltip != null ? ctrl.showTooltip : (ctrl.showTooltip = true)
+      ctrl.isPseudoCurrentStateLabel != null
+        ? ctrl.isPseudoCurrentStateLabel
+        : (ctrl.isPseudoCurrentStateLabel = false)
+    }
   }
 
   return App.component('historyLabel', {
@@ -29,6 +33,7 @@ define(['base'], function(App) {
       labelOwnerName: '<?',
       labelCreationDateTime: '<?',
       isOwnedByCurrentUser: '<',
+      isPseudoCurrentStateLabel: '<',
       onLabelDelete: '&',
       showTooltip: '<?'
     },

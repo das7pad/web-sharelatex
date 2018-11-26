@@ -13,6 +13,19 @@
 	padding-left: (@line-height-computed / 2);
 }
 
+.history-compare-mode-toolbar {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	justify-content: center;
+	line-height: 1;
+	font-size: @font-size-small;
+	background-color: @history-toolbar-bg-color;
+	height: @editor-toolbar-height;
+	color: @history-toolbar-color;
+	padding: 0 10px;
+}
+
 .history-toolbar when (@is-overleaf = false) or (@is-overleaf-light) {
 	border-bottom: @toolbar-border-bottom;
 }
@@ -89,12 +102,22 @@
 		.history-entry-label-selected & {
 			color: @history-entry-selected-label-color;
 		}
+		&.history-label-pseudo-current-state {
+			.history-entry-selected &,
+			.history-entry-label-selected & {
+				color: @history-entry-selected-pseudo-label-color;
+			}
+		}
 	}
 		.history-label-comment,
 		.history-label-delete-btn {
 			padding: 0 @padding-xs-horizontal 1px @padding-xs-horizontal;
 			border: 0;
 			background-color: @history-entry-label-bg-color;
+			.history-label-pseudo-current-state & {
+				background-color: @history-entry-pseudo-label-bg-color;
+
+			}
 			.history-entry-selected &,
 			.history-entry-label-selected & {
 				background-color: @history-entry-selected-label-bg-color;

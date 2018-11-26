@@ -183,7 +183,10 @@ aside.change-list(
 						on-label-delete="deleteLabel(label)"
 					)
 					.history-entry-label-metadata
-						.history-entry-label-metadata-user(ng-init="labelOwner = getUserById(label.user_id)")
+						.history-entry-label-metadata-user(
+							ng-if="!label.isPseudoCurrentStateLabel"	
+							ng-init="labelOwner = getUserById(label.user_id)"
+						)
 							| Saved by 
 							span.name(
 								ng-if="labelOwner && labelOwner._id !== user.id"
@@ -350,7 +353,10 @@ script(type="text/ng-template", id="historyLabelsListTpl")
 				is-pseudo-current-state-label="label.isPseudoCurrentStateLabel"
 			)
 			.history-entry-label-metadata
-				.history-entry-label-metadata-user(ng-init="user = $ctrl.getUserById(label.user_id)")
+				.history-entry-label-metadata-user(
+					ng-if="!label.isPseudoCurrentStateLabel"
+					ng-init="user = $ctrl.getUserById(label.user_id)"
+				)
 					| Saved by 
 					span.name(
 						ng-if="user && user._id !== $ctrl.currentUser.id"
