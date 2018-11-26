@@ -39,11 +39,27 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
         { line: end.row, ch: end.column },
         { className: 'track-changes-marker track-changes-added-marker' }
       )
-
       this.changeIdToMarkerIdMap[change.id] = marker.id
     }
 
-    onDeleteAdded() {}
+    onDeleteAdded(change) {
+      let position, markerNode
+      position = this.shareJsOffsetToAcePosition(change.op.p)
+
+      markerNode = document.createElement('div')
+      markerNode.style.borderBottom = '1px dashed red'
+      markerNode.style.borderLeft = '1px dotted red'
+      markerNode.style.width = '100%'
+      markerNode.style.height = '20px'
+      markerNode.style.marginTop = '-40px'
+
+      this.cm.addWidget(
+        { line: position.row, ch: position.column },
+        markerNode,
+        true
+      )
+      // this.changeIdToMarkerIdMap[change.id] = marker.id
+    }
 
     onInsertRemoved(change) {
       /** For the moment I'm just going to do this bit
