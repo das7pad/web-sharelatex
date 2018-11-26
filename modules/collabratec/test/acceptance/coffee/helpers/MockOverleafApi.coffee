@@ -28,7 +28,7 @@ module.exports = MockOverleafApi =
 
 	run: () ->
 
-		app.post "/api/v1/sharelatex/login", (req, res, next) =>
+		app.post "/api/v1/sharelatex/login", (req, res) =>
 			return res.json {
 				email: req.body.email
 				valid: true
@@ -37,11 +37,11 @@ module.exports = MockOverleafApi =
 					email: req.body.email
 			}
 
-		app.get "/api/v1/collabratec/users/current_user/projects", (req, res, next) =>
+		app.get "/api/v1/collabratec/users/current_user/projects", (req, res) =>
 			return res.json { projects: @projects[req.token] } if @projects[req.token]?
 			res.status(401).send()
 
-		app.get "/api/v1/collabratec/users/current_user/projects/:project_id/metadata", (req, res, next) =>
+		app.get "/api/v1/collabratec/users/current_user/projects/:project_id/metadata", (req, res) =>
 			return res.status(401).send() unless @projects[req.token]?
 			project = @projects[req.token].find((project) ->
 				return project.id == req.params.project_id
@@ -49,7 +49,7 @@ module.exports = MockOverleafApi =
 			return res.status(404).send() unless project
 			res.json project
 
-		app.post "/api/v1/sharelatex/oauth_authorize", (req, res, next) =>
+		app.post "/api/v1/sharelatex/oauth_authorize", (req, res) =>
 			return res.json @tokens[req.body.token] if @tokens[req.body.token]?
 			res.status(401).send()
 
@@ -67,6 +67,12 @@ module.exports = MockOverleafApi =
 					return res.sendStatus(500) 
 				res.set("Content-Type", "application/zip")
 				res.send(data)
+
+		app.delete "/api/v1/collabratec/users/current_user/projects/good-project-id", (req, res) ->
+			res.sendStatus 204
+
+		app.delete "/api/v1/collabratec/users/current_user/projects/bad-project-id", (req, res) ->
+			res.sendStatus 422
 
 		app.listen 5000, (error) ->
 			throw error if error?

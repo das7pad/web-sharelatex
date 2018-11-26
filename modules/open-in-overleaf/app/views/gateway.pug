@@ -4,18 +4,16 @@ block vars
 	- var suppressNavContentLinks = true
 
 block content
-	script(type="text/javascript").
-		$(document).ready(function () {
-			$('#create_form').submit();
-		});
-
-	form(method="POST", id="create_form", action="/docs" novalidate)
-		input(type="hidden", name="_csrf", value=csrfToken)
-
 	.container
 		.row
 			.col-md-6.col-md-offset-3
 				.card
 					.page-header
 						h1 #{translate('loading_content')}
+					.message
 						p #{translate('opening_your_content_please_wait')}
+					.gateway(
+						ng-controller="OpenInOverleafGatewayController",
+						ng-init="handleGateway('"+Buffer.from(JSON.stringify({params: form_data, action: action, target: target, csrfToken: csrfToken})).toString('base64')+"')"
+					)
+						.alert.alert-danger(ng-show="error" ng-cloak) #{translate('sorry_something_went_wrong_opening_the_document_please_try_again')}

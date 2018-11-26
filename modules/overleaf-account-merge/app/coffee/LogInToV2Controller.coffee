@@ -86,5 +86,5 @@ module.exports = LogInToV2Controller =
 					{redir: '/migrated-to-overleaf'}
 				)
 			else
-				AuthenticationController._setRedirectInSession(req, '/user/login_to_ol_v2')
+				AuthenticationController.setRedirectInSession(req, '/user/login_to_ol_v2')
 				return callback(null, null)
