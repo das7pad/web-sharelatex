@@ -40,15 +40,40 @@ I have a fancy name
 		before ->
 			@uri_regex = /^\/project\/([0-9a-fA-F]{24})$/
 
-		describe "when GETing the gateway page", ->
-			it "should redirect to the root if there is no stashed request", (done) ->
-				@user.request.get "/docs", (err, res, body) =>
-					expect(err).not.to.exist
-					expect(res.headers.location).to.equal "/"
-					expect(res.statusCode).to.equal 302
+		describe "when POSTing a snippet with a valid csrf token via xhr", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						snip: "test"
+					headers:
+						'X-Requested-With': 'XMLHttpRequest'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
 					done()
 
-		describe "when POSTing a snippet with a valid csrf token", ->
+			it "should not produce an error", ->
+				expect(@err).not.to.exist
+
+			it "should redirect to a project", ->
+				expect(@res.statusCode).to.equal 200
+				expect(@res.headers["content-type"]).to.match /^application\/json/
+				expect(JSON.parse(@body).redirect).to.match @uri_regex
+
+			it "should create a project with the returned id", (done) ->
+				projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				ProjectGetter.getProject projectId, (error, project) ->
+					return done(error) if error?
+
+					expect(project).to.exist
+
+					done()
+
+		describe "when POSTing a snippet with a valid csrf token via a form", ->
 			beforeEach (done) ->
 				@user.request.post
 					url: "/docs"
@@ -66,10 +91,10 @@ I have a fancy name
 
 			it "should redirect to a project", ->
 				expect(@res.statusCode).to.equal 302
-				expect(@res.headers.location).to.match @uri_regex
+				expect(@res.headers["location"]).to.match @uri_regex
 
 			it "should create a project with the returned id", (done) ->
-				projectId = @res.headers.location.match(@uri_regex)[1]
+				projectId = @res.headers["location"].match(@uri_regex)[1]
 				expect(projectId).to.exist
 				ProjectGetter.getProject projectId, (error, project) ->
 					return done(error) if error?
@@ -86,6 +111,8 @@ I have a fancy name
 						_csrf: @user.csrfToken
 						snip: "test"
 						engine: "latex_dvipdf"
+					headers:
+						'X-Requested-With': 'XMLHttpRequest'
 				, (_err, _res, _body) =>
 					@err = _err
 					@res = _res
@@ -93,7 +120,7 @@ I have a fancy name
 					done()
 
 			it "should create a project with the requested compiler", (done) ->
-				projectId = @res.headers.location.match(@uri_regex)[1]
+				projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
 				expect(projectId).to.exist
 				ProjectGetter.getProject projectId, (error, project) ->
 					return done(error) if error?
@@ -116,24 +143,6 @@ I have a fancy name
 				expect(@err).not.to.exist
 				expect(@res.headers.location).not.to.exist
 				expect(@res.statusCode).to.equal 200
-
-			it "should allow rendering of the gateway page without redirecting", (done) ->
-				@user.request.get "/docs", (err, res, body) =>
-					expect(err).not.to.exist
-					expect(res.headers.location).not.to.exist
-					expect(res.statusCode).to.equal 200
-					done()
-
-			it "should put the snippet in the session, and allow creation with just a csrf token", (done) ->
-				@user.request.post
-					url: "/docs"
-					form:
-						_csrf: @user.csrfToken
-				, (err, res, body) =>
-					expect(err).not.to.exist
-					expect(res.statusCode).to.equal 302
-					expect(res.headers.location).to.match @uri_regex
-					done()
 
 		describe "when GETing with a csrf token", ->
 			beforeEach (done) ->
@@ -174,19 +183,8 @@ I have a fancy name
 					expect(res.statusCode).to.equal 200
 					done()
 
-			it "should put the snippet in the session, and allow creation with just a csrf token", (done) ->
-				@user.request.post
-					url: "/docs"
-					form:
-						_csrf: @user.csrfToken
-				, (err, res, body) =>
-					expect(err).not.to.exist
-					expect(res.statusCode).to.equal 302
-					expect(res.headers.location).to.match @uri_regex
-					done()
-
 		describe "when POSTing a snippet for a non-logged-in user", ->
-			it "should redirect to the login page", (done) ->
+			it "should render the gateway page", (done) ->
 				guest = new User()
 				guest.request.post
 					url: "/docs"
@@ -195,8 +193,7 @@ I have a fancy name
 						snip: "test"
 				, (err, res, body) =>
 					expect(err).not.to.exist
-					expect(res.statusCode).to.equal 302
-					expect(res.headers.location).to.match /login/
+					expect(res.statusCode).to.equal 200
 					done()
 
 		describe "when POSTing without a snippet", ->
@@ -218,6 +215,8 @@ I have a fancy name
 					form:
 						_csrf: @user.csrfToken
 						encoded_snip: "%22wombat%5C%7B%5C%26%5C%7D%22"
+					headers:
+						'X-Requested-With': 'XMLHttpRequest'
 				, (_err, _res, _body) =>
 					@err = _err
 					@res = _res
@@ -227,12 +226,13 @@ I have a fancy name
 			it "should not produce an error", ->
 				expect(@err).not.to.exist
 
-			it "should redirect to a project", ->
-				expect(@res.statusCode).to.equal 302
-				expect(@res.headers.location).to.match @uri_regex
+			it "should send a json response to redirect to a project", ->
+				expect(@res.statusCode).to.equal 200
+				expect(@res.headers["content-type"]).to.match /application\/json/
+				expect(JSON.parse(@body).redirect).to.match @uri_regex
 
 			it "should create a project containing the decoded snippet", (done) ->
-				projectId = @res.headers.location.match(@uri_regex)[1]
+				projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
 				expect(projectId).to.exist
 				ProjectGetter.getProject projectId, (error, project) ->
 					return done(error) if error?
@@ -252,6 +252,8 @@ I have a fancy name
 					form:
 						_csrf: @user.csrfToken
 						snip_uri: 'http://example.org/test.tex'
+					headers:
+						'X-Requested-With': 'XMLHttpRequest'
 				, (_err, _res, _body) =>
 					@err = _err
 					@res = _res
@@ -261,12 +263,13 @@ I have a fancy name
 			it "should not produce an error", ->
 				expect(@err).not.to.exist
 
-			it "should redirect to a project", ->
-				expect(@res.statusCode).to.equal 302
-				expect(@res.headers.location).to.match @uri_regex
+			it "should send a json response to redirect to a project", ->
+				expect(@res.statusCode).to.equal 200
+				expect(@res.headers["content-type"]).to.match /application\/json/
+				expect(JSON.parse(@body).redirect).to.match @uri_regex
 
 			it "should create a project containing the retrieved snippet", (done) ->
-				projectId = @res.headers.location.match(@uri_regex)[1]
+				projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
 				expect(projectId).to.exist
 				ProjectGetter.getProject projectId, (error, project) ->
 					return done(error) if error?
@@ -286,6 +289,8 @@ I have a fancy name
 					form:
 						_csrf: @user.csrfToken
 						snip_uri: 'http://example.org/test.texx'
+					headers:
+						'X-Requested-With': 'XMLHttpRequest'
 				, (_err, _res, _body) =>
 					@err = _err
 					@res = _res
@@ -302,6 +307,8 @@ I have a fancy name
 					form:
 						_csrf: @user.csrfToken
 						snip_uri: 'http://example.org/fancyname.tex'
+					headers:
+						'X-Requested-With': 'XMLHttpRequest'
 				, (_err, _res, _body) =>
 					@err = _err
 					@res = _res
@@ -309,7 +316,7 @@ I have a fancy name
 					done()
 
 			it "should create a project with the correct name", (done) ->
-				projectId = @res.headers.location.match(@uri_regex)[1]
+				projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
 				expect(projectId).to.exist
 				ProjectGetter.getProject projectId, (error, project) ->
 					return done(error) if error?
@@ -318,16 +325,18 @@ I have a fancy name
 					done()
 
 			it "should ensure that the project name is unique", (done) ->
-				projectId = @res.headers.location.match(@uri_regex)[1]
+				projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
 				expect(projectId).to.exist
 				@user.request.post
 					url: "/docs"
 					form:
 						_csrf: @user.csrfToken
 						snip_uri: 'http://example.org/fancyname.tex'
+					headers:
+						'X-Requested-With': 'XMLHttpRequest'
 				, (err, res, body) =>
 					expect(err).not.to.exist
-					newProjectId = res.headers.location.match(@uri_regex)[1]
+					newProjectId = JSON.parse(body).redirect.match(@uri_regex)[1]
 					expect(newProjectId).to.exist
 
 					ProjectGetter.getProject newProjectId, (error, project) ->

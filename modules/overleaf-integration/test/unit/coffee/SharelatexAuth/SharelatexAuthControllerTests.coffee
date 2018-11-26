@@ -45,7 +45,7 @@ describe "SharelatexAuthController", ->
 			@UserGetter.getUser = sinon.stub()
 			@UserGetter.getUser.withArgs(@user_id).yields(null, @user)
 			@AuthenticationController.finishLogin = sinon.stub()
-			@AuthenticationController._setRedirectInSession = sinon.stub()
+			@AuthenticationController.setRedirectInSession = sinon.stub()
 			@AuthenticationController.afterLoginSessionSetup =
 				sinon.stub().yields()
 			@jwt.verify = sinon.stub()
@@ -104,7 +104,7 @@ describe "SharelatexAuthController", ->
 			@v1Profile = {id: 123, email: @email}
 			@SharelatexAuthHandler.createBackingAccount = sinon.stub().callsArgWith(1, null, @v1Profile)
 			@UserUpdater.updateUser = sinon.stub().callsArgWith(2, null)
-			@AuthenticationController._setRedirectInSession = sinon.stub()
+			@AuthenticationController.setRedirectInSession = sinon.stub()
 
 		describe "when we're creating v1 accounts on login", ->
 			beforeEach (done) ->
@@ -128,8 +128,8 @@ describe "SharelatexAuthController", ->
 				}
 
 			it "should set up a redirect in the session", ->
-				expect(@AuthenticationController._setRedirectInSession.callCount).to.equal 1
-				expect(@AuthenticationController._setRedirectInSession.calledWith(
+				expect(@AuthenticationController.setRedirectInSession.callCount).to.equal 1
+				expect(@AuthenticationController.setRedirectInSession.calledWith(
 					@req, '/login/sharelatex/finish'
 				)).to.equal true
 

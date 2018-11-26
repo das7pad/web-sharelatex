@@ -36,9 +36,9 @@ module.exports = OpenInOverleafController =
 					if Object.keys(update).length
 						Project.update {_id: project.id}, update, (err) ->
 							return next(err) if err?
-							res.redirect '/project/' + project._id
+							OpenInOverleafController._sendResponse(req, res, project)
 					else
-						res.redirect '/project/' + project._id
+						OpenInOverleafController._sendResponse(req, res, project)
 
 	_populateSnippetFromRequest: (req, cb = (error, result)->) ->
 		comment = OpenInOverleafController._getMainFileCommentFromSnipRequest(req)
@@ -75,3 +75,12 @@ module.exports = OpenInOverleafController =
 			comment = comment.split("\n").map((line)-> "% #{line}").join("\n") + "\n"
 
 		return comment
+
+	_sendResponse: (req, res, project) ->
+		uri = "/project/#{project._id}"
+
+		if req.xhr || req.headers.accept?.indexOf('json') > -1
+			res.setHeader('Content-Type', 'application/json')
+			res.send(JSON.stringify({redirect: uri}))
+		else
+			res.redirect uri
