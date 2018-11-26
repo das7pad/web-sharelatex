@@ -179,3 +179,10 @@ describe "TeamImporter", ->
 				expect(err.constructor.name).to.equal('UserNotFoundError')
 				@SubscriptionUpdater.deleteWithV1Id.calledWith(@v1Team.id).should.equal true
 				done()
+
+		it "fails if if users can't be added to group", (done) ->
+			@SubscriptionUpdater.addUsersToGroupWithoutFeaturesRefresh.yields(new Error('Nope'))
+			@TeamImporter.getOrImportTeam @v1Team, (err, v2Team) =>
+				expect(err).to.be.instanceof(Error)
+				@TeamInvitesHandler.importInvite.called.should.equal false
+				done()
