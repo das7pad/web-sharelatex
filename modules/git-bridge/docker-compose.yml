@@ -1,0 +1,8 @@
+version: "2"
+
+services:
+  test_acceptance:
+    environment:
+      SHARELATEX_CONFIG: /app/$MODULE_DIR/test/acceptance/config/settings.test.coffee
+      REDIS_HOST: redis
+      MONGO_URL: 'mongodb://mongo/sharelatex'

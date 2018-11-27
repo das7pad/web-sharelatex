@@ -10,6 +10,7 @@ ProjectGetter = require "../../../../app/js/Features/Project/ProjectGetter"
 AuthenticationManager = require("../../../../app/js/Features/Authentication/AuthenticationManager")
 AuthenticationController = require("../../../../app/js/Features/Authentication/AuthenticationController")
 SubscriptionLocator = require("../../../../app/js/Features/Subscription/SubscriptionLocator")
+FeaturesUpdater = require("../../../../app/js/Features/Subscription/FeaturesUpdater")
 async = require "async"
 settings = require "settings-sharelatex"
 
@@ -62,7 +63,7 @@ module.exports = UserAdminController =
 		async.parallel {
 			user: (cb) ->
 				UserGetter.getUser user_id, {
-					_id:1, first_name:1, last_name:1, email:1, betaProgram:1, features: 1, isAdmin: 1, awareOfV2: 1, overleaf: 1, emails: 1, signUpDate:1, loginCount:1, lastLoggedIn:1, lastLoginIp:1, useCollabratecV2: 1
+					_id:1, first_name:1, last_name:1, email:1, betaProgram:1, features: 1, isAdmin: 1, awareOfV2: 1, overleaf: 1, emails: 1, signUpDate:1, loginCount:1, lastLoggedIn:1, lastLoginIp:1, useCollabratecV2: 1, refered_user_count: 1
 				}, cb
 			projects: (cb) ->
 				ProjectGetter.findAllUsersProjects user_id, {
@@ -121,6 +122,7 @@ module.exports = UserAdminController =
 		'features.versioning',
 		'features.dropbox',
 		'features.github',
+		'features.gitBridge',
 		'features.compileTimeout',
 		'features.compileGroup',
 		'features.templates',
@@ -129,7 +131,8 @@ module.exports = UserAdminController =
 		'features.referencesSearch',
 		'features.mendeley',
 		'awareOfV2',
-		'useCollabratecV2'
+		'useCollabratecV2',
+		'refered_user_count'
 	]
 	SUPER_ADMIN_ALLOWED_ATTRIBUTES: [
 		'isAdmin'
@@ -139,6 +142,7 @@ module.exports = UserAdminController =
 		'features.versioning',
 		'features.dropbox',
 		'features.github',
+		'features.gitBridge',
 		'features.templates',
 		'features.trackChanges',
 		'features.references',
@@ -174,6 +178,12 @@ module.exports = UserAdminController =
 					return next(err)
 			else
 				return res.sendStatus 204
+
+	refreshFeatures: (req, res, next) ->
+		user_id = req.params.user_id
+		FeaturesUpdater.refreshFeatures user_id, true, (err) ->
+			return next(err) if err?
+			return res.sendStatus 204
 
 	_reqToMongoUpdate: (body, attributes, booleans) ->
 		update = {}

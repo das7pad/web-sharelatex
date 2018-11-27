@@ -61,6 +61,7 @@ describe "UserAdminController", ->
 			"../../../../app/js/Features/Subscription/SubscriptionLocator": @SubscriptionLocator
 			"../../../../app/js/models/User": User: @User
 			"../../../../app/js/Features/Project/ProjectGetter": @ProjectGetter
+			"../../../../app/js/Features/Subscription/FeaturesUpdater": @FeaturesUpdater = {}
 			"metrics-sharelatex":
 				gauge:->
 			"settings-sharelatex": @settings = {}

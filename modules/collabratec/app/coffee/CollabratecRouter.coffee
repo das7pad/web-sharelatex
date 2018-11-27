@@ -8,6 +8,10 @@ module.exports =
 	apply: (webRouter, privateApiRouter, publicApiRouter) ->
 		return unless settings.overleaf
 
-		publicApiRouter.get "/api/v1/collabratec/users/current_user/projects", AuthenticationController.requireOauth(), CollabratecController.getProjects
+		publicApiRouter.get "/api/v1/collabratec/users/current_user/projects", AuthenticationController.requireOauth(), CollabratecMiddleware.v1Proxy, CollabratecController.getProjects
 
-		publicApiRouter.get "/api/v1/collabratec/users/current_user/projects/:project_id/metadata", AuthenticationController.requireOauth(), CollabratecMiddleware.v1ProjectProxy, AuthorizationMiddlewear.ensureUserCanReadProject, CollabratecController.getProjectMetadata
+		publicApiRouter.post "/api/v1/collabratec/users/current_user/projects", AuthenticationController.requireOauth(), CollabratecMiddleware.v1Proxy, CollabratecController.createProject
+
+		publicApiRouter.delete "/api/v1/collabratec/users/current_user/projects/:project_id", AuthenticationController.requireOauth(), CollabratecMiddleware.v1Proxy, CollabratecMiddleware.ensureUserCanDeleteProject, CollabratecController.deleteProject
+
+		publicApiRouter.get "/api/v1/collabratec/users/current_user/projects/:project_id/metadata", AuthenticationController.requireOauth(), CollabratecMiddleware.v1Proxy, AuthorizationMiddlewear.ensureUserCanReadProject, CollabratecController.getProjectMetadata

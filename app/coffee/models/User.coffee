@@ -43,6 +43,7 @@ UserSchema = new Schema
 		versioning:       { type:Boolean, default: Settings.defaultFeatures.versioning }
 		dropbox:          { type:Boolean, default: Settings.defaultFeatures.dropbox }
 		github:           { type:Boolean, default: Settings.defaultFeatures.github }
+		gitBridge:        { type:Boolean, default: Settings.defaultFeatures.gitBridge }
 		compileTimeout:   { type:Number, default: Settings.defaultFeatures.compileTimeout }
 		compileGroup:     { type:String,  default: Settings.defaultFeatures.compileGroup }
 		templates:        { type:Boolean, default: Settings.defaultFeatures.templates }
@@ -54,17 +55,6 @@ UserSchema = new Schema
 	referal_id : {type:String, default:() -> uuid.v4().split("-")[0]}
 	refered_users: [ type:ObjectId, ref:'User' ]
 	refered_user_count: { type:Number, default: 0 }
-	subscription:
-		recurlyToken : String
-		freeTrialExpiresAt: Date
-		freeTrialDowngraded: Boolean
-		freeTrialPlanCode: String
-		# This is poorly named. It does not directly correspond
-		# to whether the user has has a free trial, but rather
-		# whether they should be allowed one in the future.
-		# For example, a user signing up directly for a paid plan
-		# has this set to true, despite never having had a free trial
-		hadFreeTrial: {type: Boolean, default: false}
 	refProviders: {
 		mendeley: Boolean  # coerce the refProviders values to Booleans
 		zotero: Boolean

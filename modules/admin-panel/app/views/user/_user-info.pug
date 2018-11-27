@@ -32,6 +32,7 @@ p
 				td
 					ul(ng-repeat="emailData in user.emails")
 						li {{ emailData.email }} 
+							i.fa.fa-check(ng-if="emailData.confirmedAt") 
 							a.btn.btn-danger.btn-xs(
 								href='#',
 								tooltip-placement="bottom",
@@ -103,15 +104,25 @@ p
 
 			if settings.enableSubscriptions
 				tr
+					td
+						label(for="refered_user_count") Referred User Count
+					td
+						input#first_name.form-control(
+							name='refered_user_count',
+							placeholder="0"
+							ng-model="user.refered_user_count"
+						)
+
+				tr
 					th(colspan=2).text-center
 						| Features
 						span.small
 							| &nbsp;(Change to:&nbsp;
-							a(href, ng-click="user.features = {collaborators: 1, versioning: false, dropbox: false, github: false, compileTimeout: 60, compileGroup: 'standard', templates: false, trackChanges: false, referencesSearch: false, mendeley: false}") Free
+							a(href, ng-click="user.features = {collaborators: 1, versioning: false, dropbox: false, github: false, gitBridge: false, compileTimeout: 60, compileGroup: 'standard', templates: false, trackChanges: false, referencesSearch: false, mendeley: false}") Free
 							| &nbsp;&middot;&nbsp;
-							a(href, ng-click="user.features = {collaborators: 10, versioning: true, dropbox: true, github: true, compileTimeout: 240, compileGroup: 'priority', templates: true, trackChanges: true, references: false, referencesSearch: true, mendeley: true}") Collab.
+							a(href, ng-click="user.features = {collaborators: 10, versioning: true, dropbox: true, github: true, gitBridge: true, compileTimeout: 240, compileGroup: 'priority', templates: true, trackChanges: true, references: false, referencesSearch: true, mendeley: true}") Collab.
 							| &nbsp;&middot;&nbsp;
-							a(href, ng-click="user.features = {collaborators: -1, versioning: true, dropbox: true, github: true, compileTimeout: 240, compileGroup: 'priority', templates: true, trackChanges: true, references: false, referencesSearch: true, mendeley: true}") Pro.
+							a(href, ng-click="user.features = {collaborators: -1, versioning: true, dropbox: true, github: true, gitBridge: true, compileTimeout: 240, compileGroup: 'priority', templates: true, trackChanges: true, references: false, referencesSearch: true, mendeley: true}") Pro.
 							| )
 
 				tr
@@ -151,6 +162,16 @@ p
 							type="checkbox"
 							name="features.github"
 							ng-model="user.features.github"
+						)
+
+				tr
+					td
+						label(for="gitBridge") Git Bridge
+					td
+						input#gitBridge(
+							type="checkbox"
+							name="features.gitBridge"
+							ng-model="user.features.gitBridge"
 						)
 
 				tr
@@ -234,26 +255,15 @@ p
 							ng-model="user.useCollabratecV2"
 						)
 
-			//- tr
-			//- 	td
-			//- 		label(for="betaProgram") Beta Program
-			//- 	td
-			//- 		input#betaProgram(
-			//- 			type="checkbox"
-			//- 			name="betaProgram"
-			//- 			ng-model="user.betaProgram"
-			//- 		)
-
-			//- tr
-			//- 	td
-			//- 		label(for="awareOfV2") Aware of v2?
-			//- 	td
-			//- 		input#betaProgram(
-			//- 			type="checkbox"
-			//- 			name="awareOfV2"
-			//- 			ng-model="user.awareOfV2"
-			//- 		)
-
+				tr
+					td
+						label(for="betaProgram") Beta Program (Git bridge)
+					td
+						input#betaProgram(
+							type="checkbox"
+							name="betaProgram"
+							ng-model="user.betaProgram"
+						)
 
 			if isSuperAdmin
 				tr
@@ -282,6 +292,10 @@ p
 				button.btn.btn-primary(type='submit', ng-disabled="adminUserForm.inflight")
 					span(ng-show="!adminUserForm.inflight") Save
 					span(ng-show="adminUserForm.inflight") Saving...
+				| &nbsp;
+				a.btn.btn-primary(href, ng-click="refreshFeatures()")
+					span(ng-if="!refreshingFeatures") Refresh Features
+					span(ng-if="refreshingFeatures") Refreshing...
 			.col-md-3.text-right
 				a.btn.btn-danger(
 					href='#',

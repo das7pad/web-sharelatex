@@ -14,12 +14,14 @@ block content
 					form.project-search.form-horizontal(role="form")
 						.form-group.has-feedback.has-feedback-left.col-md-12
 							input.form-control.col-md-12(type='text', ng-model='searchQueryText', ng-keyup='search()', placeholder="Search template library....")
-							i.fa.fa-search.form-control-feedback-left
+							i.fa.fa-search.form-control-feedback-left(aria-hidden="true")
 							i.fa.fa-times.form-control-feedback(
 								ng-click="clearSearchText()",
 								style="cursor: pointer;",
 								ng-show="searchQueryText.length > 0"
+								aria-hidden="true"
 							)
+							span.sr-only(ng-show="searchQueryText.length > 0" ng-click="clearSearchText()") #{translate('clear_search')}
 				.col-md-2(ng-controller="MissingTemplateController", ng-show='showSearch')
 					a.btn.btn-primary(ng-click="showMissingTemplateModal()") #{translate("missing_template_question")}
 				.col-md-8(ng-cloak)

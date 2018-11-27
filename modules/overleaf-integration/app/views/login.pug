@@ -84,7 +84,9 @@ block content
 						| #{translate("first_time_sl_user")}
 						i.fa.fa-question-circle.login-register-sharelatex-tooltip(
 							tooltip=translate("sl_extra_info_tooltip")
+							aria-hidden="true"
 						)
+						span.sr-only #{translate("sl_extra_info_tooltip")}
 					.form-group.text-center
 						a.btn.btn-default.btn-block.login-btn-sharelatex(
 							href=settings.accountMerge.sharelatexHost + "/logout"

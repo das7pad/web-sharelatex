@@ -4,6 +4,12 @@ v1Api =
 module.exports =
 	enableSubscriptions: true
 
+	apis:
+		recurly:
+			# Set up our own mock recurly server
+			url: 'http://localhost:6034'
+			subdomain: 'test'
+
 	# for registration via SL, set enableLegacyRegistration to true
 	# for registration via Overleaf v1, set enableLegacyLogin to true
 
@@ -16,6 +22,7 @@ module.exports =
 			dropbox: false
 			versioning: false
 			github: true
+			gitBridge: true
 			templates: false
 			references: false
 			referencesSearch: false
@@ -28,6 +35,7 @@ module.exports =
 			dropbox: false
 			versioning: false
 			github: false
+			gitBridge: false
 			templates: false
 			references: false
 			referencesSearch: false
@@ -40,6 +48,7 @@ module.exports =
 			dropbox: true
 			versioning: true
 			github: true
+			gitBridge: true
 			templates: true
 			references: true
 			referencesSearch: true
@@ -52,6 +61,7 @@ module.exports =
 			dropbox: true
 			versioning: true
 			github: true
+			gitBridge: true
 			templates: true
 			references: true
 			referencesSearch: true
@@ -133,7 +143,7 @@ module.exports =
 			url: (params) -> "/destination/#{params.id}/params"
 		},
 		'/redirect/qs': '/destination/qs'
-		'/docs': {
+		'/docs_v1': {
 			authWithV1: true
 			url: '/docs'
 		}

@@ -31,6 +31,8 @@ module.exports = SubscriptionAdminController =
 
 	ALLOWED_ATTRIBUTES: [
 		'recurlySubscription_id',
+		'teamName',
+		'teamNotice',
 		'planCode',
 		'membersLimit',
 		'groupPlan',

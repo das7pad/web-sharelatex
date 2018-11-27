@@ -1,5 +1,6 @@
 logger = require 'logger-sharelatex'
 MetricsController = require './MetricsController'
+HubsController = require './HubsController'
 AnalyticsController = require("../../../../app/js/Features/Analytics/AnalyticsController")
 AuthenticationController = require("../../../../app/js/Features/Authentication/AuthenticationController")
 AuthorizationMiddlewear = require('../../../../app/js/Features/Authorization/AuthorizationMiddlewear')
@@ -18,30 +19,60 @@ module.exports =
 
 		webRouter.get(
 			'/metrics/teams/:id/?(:startDate/:endDate)?',
-			UserMembershipAuthorization.requireEntityAccess('team'),
+			UserMembershipAuthorization.requireTeamAccess,
 			MetricsController.teamMetrics
 		)
 
 		webRouter.get(
+			'/metrics/groups/:id/?(:startDate/:endDate)?',
+			UserMembershipAuthorization.requireGroupAccess,
+			(req, res, next) ->
+				if req.entity.overleaf?.id?
+					MetricsController.teamMetrics(req, res, next)
+				else
+					MetricsController.groupMetrics(req, res, next)
+		)
+
+		webRouter.get(
 			'/metrics/institutions/:id/?(:startDate/:endDate)?',
-			UserMembershipAuthorization.requireEntityAccess('institution'),
+			UserMembershipAuthorization.requireInstitutionAccess,
 			MetricsController.institutionMetrics
 		)
 
 		webRouter.get(
 			'/graphs/licences',
-			AuthorizationMiddlewear.ensureUserIsSiteAdmin,
+			UserMembershipAuthorization.requireGraphAccess,
 			AnalyticsController.licences
 		)
 
 		webRouter.get(
 			'/graphs/(:graph)?',
-			(req, res, next) ->
-				UserMembershipAuthorization.requireEntityAccess(
-					req.query.resource_type,
-					req.query.resource_id
-				)(req, res, next)
+			UserMembershipAuthorization.requireGraphAccess,
 			MetricsController.analyticsProxy
+		)
+
+		webRouter.get(
+			'/institutions/:id/hub',
+			UserMembershipAuthorization.requireInstitutionAccess,
+			HubsController.institutionHub
+		)
+
+		webRouter.get(
+			'/institutions/:id/externalCollaboration',
+			UserMembershipAuthorization.requireInstitutionAccess,
+			HubsController.institutionExternalCollaboration
+		)
+
+		webRouter.get(
+			'/institutions/:id/departments',
+			UserMembershipAuthorization.requireInstitutionAccess,
+			HubsController.institutionDepartments
+		)
+
+		webRouter.get(
+			'/institutions/:id/roles',
+			UserMembershipAuthorization.requireInstitutionAccess,
+			HubsController.institutionRoles
 		)
 
 		privateApiRouter.get(

@@ -94,7 +94,7 @@ module.exports = V1LoginController =
 		# such as being sent from the editor to /login, then set the redirect explicitly
 		if req.query.redir? and !AuthenticationController._getRedirectFromSession(req)?
 			logger.log {redir: req.query.redir}, "setting explicit redirect from login page"
-			AuthenticationController._setRedirectInSession(req, req.query.redir)
+			AuthenticationController.setRedirectInSession(req, req.query.redir)
 		res.render Path.resolve(__dirname, "../../views/login"),
 			title: 'Log in to Overleaf',
 			email: req.query.email
@@ -128,20 +128,20 @@ module.exports = V1LoginController =
 				V1LoginHandler.doPasswordChange {
 						email, v1Id, password, current_password,
 					}, (err, isValid) =>
-					return next(err) if err?
-					if !isValid
-						logger.log {v1Id, email},  "failed password change via v1"
-						return res.json message: {
-							type: 'error',
-							text: req.i18n.translate('password_change_failed_attempt')
-						}
-					else
-						logger.log {v1Id, email}, "v1 password updated"
-						return res.json message: {
-							type: 'success',
-							email,
-							text: req.i18n.translate('password_change_successful')
-						}
+						return next(err) if err?
+						if !isValid
+							logger.log {v1Id, email},  "failed password change via v1"
+							return res.json message: {
+								type: 'error',
+								text: req.i18n.translate('password_change_failed_attempt')
+							}
+						else
+							logger.log {v1Id, email}, "v1 password updated"
+							return res.json message: {
+								type: 'success',
+								email,
+								text: req.i18n.translate('password_change_successful')
+							}
 			else
 				return res.json message: {type: 'error', text: req.i18n.translate('internal_error')}
 

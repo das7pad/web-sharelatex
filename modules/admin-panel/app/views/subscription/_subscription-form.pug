@@ -32,6 +32,26 @@ tr
 
 tr
 	td
+		label(for="teamName") Team Name
+	td
+		input#teamName.form-control(
+			name='teamName',
+			ng-model="subscription.teamName",
+			ng-disabled="!subscription.groupPlan"
+		)
+
+tr
+	td
+		label(for="teamNotice") Team Notice
+	td
+		input#teamName.form-control(
+			name='teamNotice',
+			ng-model="subscription.teamNotice",
+			ng-disabled="!subscription.groupPlan"
+		)
+
+tr
+	td
 		label(for="planCode") Plan Code
 	td
 		select#planCode.form-control(
