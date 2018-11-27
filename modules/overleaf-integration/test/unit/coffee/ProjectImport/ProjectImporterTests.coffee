@@ -64,7 +64,7 @@ describe "ProjectImporter", ->
 			@ProjectImporter._waitForV1HistoryExport = sinon.stub().yields()
 			@ProjectImporter._confirmExport = sinon.stub().yields()
 			@ProjectImporter._cancelExport = sinon.stub().yields()
-			@ProjectImporter._importTags = sinon.stub().yields()
+			@ProjectImporter._importTagsForOwner = sinon.stub().yields()
 
 		describe "successfully", ->
 			beforeEach (done) ->
@@ -106,9 +106,9 @@ describe "ProjectImporter", ->
 					.calledWith(@v1_project_id, @v2_project_id, @v1_user_id)
 					.should.equal true
 
-			it "should import the tags", ->
-				@ProjectImporter._importTags
-					.calledWith(@v2_project_id, @v2_user_id, ["foo", "bar"])
+			it "should import the owner's tags", ->
+				@ProjectImporter._importTagsForOwner
+					.calledWith(@v1_project_id, @v2_project_id, @v1_user_id, @v2_user_id)
 					.should.equal true
 
 			it "should tell overleaf the project is now in the beta", ->

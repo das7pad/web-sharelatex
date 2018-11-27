@@ -93,7 +93,7 @@ module.exports = ProjectImporter =
 			(cb) ->
 				ProjectImporter._importLabels doc.id, v2_project_id, v1_user_id, cb
 			(cb) ->
-				ProjectImporter._importTags v2_project_id, v2_user_id, doc.tags, cb
+				ProjectImporter._importTagsForOwner v1_project_id, v2_project_id, v1_user_id, v2_user_id, cb
 			(cb) ->
 				ProjectImporter._confirmExport v1_project_id, v2_project_id, v1_user_id, cb
 		], (error) ->
@@ -219,7 +219,7 @@ module.exports = ProjectImporter =
 			# token-access
 			TokenAccessHandler.addReadAndWriteUserToProject inviteeUserId, v2_project_id, (error) ->
 				return callback(error) if error?
-				ProjectImporter._importInviteTags(v1_project_id, v2_project_id, invite.invitee.id, inviteeUserId, callback)
+				ProjectImporter._importTags(v1_project_id, v2_project_id, invite.invitee.id, inviteeUserId, callback)
 
 	_importLabels: (v1_project_id, v2_project_id, v1_user_id, callback = (error) ->) ->
 		ProjectImporter._getLabels v1_project_id, (error, labels) ->
@@ -256,6 +256,9 @@ module.exports = ProjectImporter =
 					error = new Error("project-history returned non-success code: #{response.statusCode}")
 					error.statusCode = response.statusCode
 					callback error
+
+	_importTagsForOwner: (v1_project_id, v2_project_id, v1_user_id, v2_user_id, callback = (error) ->) ->
+		ProjectImporter._importInviteTags(v1_project_id, v2_project_id, v1_user_id, v2_user_id, callback)
 
 	_importInviteTags: (v1_project_id, v2_project_id, v1_user_id, v2_user_id, callback = (error) ->) ->
 		V1SharelatexApi.request {
