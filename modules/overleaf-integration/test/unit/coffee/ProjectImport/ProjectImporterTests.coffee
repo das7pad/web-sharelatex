@@ -864,7 +864,7 @@ describe "ProjectImporter", ->
 	describe "_importTags", ->
 		beforeEach (done) ->
 			@V1SharelatexApi.request = sinon.stub().yields(null, {}, {tags: ['foo', 'bar']})
-			@ProjectImporter._importInviteTags(@v1_project_id, @v2_project_id, @v1_user_id, @v2_user_id, done)
+			@ProjectImporter._importTags(@v1_project_id, @v2_project_id, @v1_user_id, @v2_user_id, done)
 
 		it "should request tags from v1", ->
 			@V1SharelatexApi.request

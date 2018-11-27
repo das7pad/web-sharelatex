@@ -192,7 +192,7 @@ module.exports = ProjectImporter =
 				return callback(error) if error?
 				CollaboratorsHandler.addUserIdToProject v2_project_id, inviter_user_id, invitee_user_id, privilegeLevel, (error) ->
 					return callback(error) if error?
-					ProjectImporter._importInviteTags(v1_project_id, v2_project_id, invite.invitee.id, invitee_user_id, callback)
+					ProjectImporter._importTags(v1_project_id, v2_project_id, invite.invitee.id, invitee_user_id, callback)
 
 	_importPendingInvite: (project_id, invite, callback = (error) ->) ->
 		if !invite.inviter? or !invite.code? or !invite.email? or !invite.access_level?
@@ -258,9 +258,9 @@ module.exports = ProjectImporter =
 					callback error
 
 	_importTagsForOwner: (v1_project_id, v2_project_id, v1_user_id, v2_user_id, callback = (error) ->) ->
-		ProjectImporter._importInviteTags(v1_project_id, v2_project_id, v1_user_id, v2_user_id, callback)
+		ProjectImporter._importTags(v1_project_id, v2_project_id, v1_user_id, v2_user_id, callback)
 
-	_importInviteTags: (v1_project_id, v2_project_id, v1_user_id, v2_user_id, callback = (error) ->) ->
+	_importTags: (v1_project_id, v2_project_id, v1_user_id, v2_user_id, callback = (error) ->) ->
 		V1SharelatexApi.request {
 			method: 'GET'
 			url: "#{settings.apis.v1.url}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/tags"
