@@ -65,7 +65,7 @@ module.exports = SharelatexAuthController =
 					return callback(err) if err?
 					# All good, login and proceed
 					logger.log {email}, "successful registration with v1, proceeding with session setup"
-					AuthenticationController._setRedirectInSession(req, '/login/sharelatex/finish')
+					AuthenticationController.setRedirectInSession(req, '/login/sharelatex/finish')
 					callback(null)
 
 	_badToken: (res, error) ->

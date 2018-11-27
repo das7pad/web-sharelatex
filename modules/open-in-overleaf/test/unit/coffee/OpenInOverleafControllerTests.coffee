@@ -28,9 +28,14 @@ describe 'OpenInOverleafController', ->
 				user: @user
 			body: {}
 			header: sinon.stub().withArgs('Referer').returns('https://example.org/1/2/3')
+			headers:
+				accept: ['json']
 			i18n:
 				translate: sinon.stub().returnsArg(0)
-		@res = {}
+		@res =
+			setHeader: sinon.stub()
+			send: sinon.stub()
+			redirect: sinon.stub()
 		@ProjectModel = {}
 		@ProjectModel.update = sinon.stub().callsArg(2)
 		@ProjectCreationHandler =
@@ -67,30 +72,32 @@ describe 'OpenInOverleafController', ->
 				@req.body.snip = @snip
 
 			it "should process the snippet, create a project and redirect to it", (done)->
-				@res.redirect = (url)=>
+				@res.send = (content)=>
 					sinon.assert.calledWith(@OpenInOverleafHelper.getDocumentLinesFromSnippet, @snippet)
 					sinon.assert.calledWith(@ProjectCreationHandler.createProjectFromSnippet, @user._id, "new_snippet_project", @documentLines)
-					url.should.equal '/project/' + @project_id
+					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
+					content.should.equal JSON.stringify({redirect: '/project/' + @project_id})
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
 			it "should update the project with the requested engine, if supplied", (done)->
 				@req.body.engine = 'latex_dvipdf'
-				@res.redirect = (url)=>
+				@res.send = (content)=>
 					sinon.assert.calledWith(@ProjectModel.update, sinon.match.any, {compiler: 'latex'})
-					url.should.equal '/project/' + @project_id
+					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
+					content.should.equal JSON.stringify({redirect: '/project/' + @project_id})
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
 			it "should get the document title from the snippet", (done) ->
-				@res.redirect = (url)=>
+				@res.send = (content)=>
 					sinon.assert.calledWith(@DocumentHelper.getTitleFromTexContent, @documentLines)
 					sinon.assert.calledWith(@ProjectDetailsHandler.generateUniqueName, @user._id, "new_snippet_project")
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
 			it "should use the default title if the document has no title", (done) ->
-				@res.redirect = (url)=>
+				@res.send = (content)=>
 					sinon.assert.calledWith(@DocumentHelper.getTitleFromTexContent, @documentLines)
 					sinon.assert.calledWith(@ProjectDetailsHandler.generateUniqueName, @user._id, "default_title")
 					done()
@@ -101,7 +108,7 @@ describe 'OpenInOverleafController', ->
 			it "should redirect to the root", (done)->
 				@res.redirect = (url)=>
 					sinon.assert.notCalled(@OpenInOverleafController._populateSnippetFromRequest)
-					url.should.equal '/'
+					url.should.equal("/")
 					done()
 				delete @req.body.snip
 				@OpenInOverleafController.openInOverleaf @req, @res
@@ -110,9 +117,10 @@ describe 'OpenInOverleafController', ->
 			beforeEach ->
 				@req.body.encoded_snip = encodeURIComponent(@snip)
 
-			it "should create a project and redirect to it", (done)->
-				@res.redirect = (url)=>
-					url.should.equal '/project/' + @project_id
+			it "should create a project and send a redirect to it", (done)->
+				@res.send = (content)=>
+					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
+					content.should.equal JSON.stringify({redirect: '/project/' + @project_id})
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
@@ -121,8 +129,9 @@ describe 'OpenInOverleafController', ->
 				@req.body.snip_uri = @snip_uri
 
 			it "should create a project and redirect to it", (done)->
-				@res.redirect = (url)=>
-					url.should.equal '/project/' + @project_id
+				@res.send = (content)=>
+					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
+					content.should.equal JSON.stringify({redirect: '/project/' + @project_id})
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
@@ -176,3 +185,21 @@ describe 'OpenInOverleafController', ->
 		it "should return the texample comment if the referrer is texample", ->
 			@req.header = sinon.stub().withArgs('Referer').returns('https://asdf.texample.net/1/2/3')
 			@OpenInOverleafController._getMainFileCommentFromSnipRequest(@req).should.equal "% texample_snippet_comment\n"
+
+	describe "_sendResponse", ->
+		it "should send a json response for xhr requests", ->
+			project =
+				_id: @project_id
+			@OpenInOverleafController._sendResponse(@req, @res, project)
+			sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
+			sinon.assert.calledWith(@res.send, JSON.stringify({redirect: "/project/#{@project_id}"}))
+			sinon.assert.notCalled(@res.redirect)
+
+		it "should send a redirect for standard requests", ->
+			project =
+				_id: @project_id
+			delete @req.headers.accept
+			@OpenInOverleafController._sendResponse(@req, @res, project)
+			sinon.assert.notCalled(@res.setHeader)
+			sinon.assert.notCalled(@res.send)
+			sinon.assert.calledWith(@res.redirect, "/project/#{@project_id}")

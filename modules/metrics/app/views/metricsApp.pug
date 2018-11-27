@@ -1,4 +1,5 @@
 extends ../../../../app/views/layout
+include ../../../../app/views/_mixins/links
 
 block content
 	.content.content-alt
@@ -18,6 +19,13 @@ block content
 					span#lags-container
 
 			#metrics-container.row
+
+			.row.metrics-contact.hide
+				.col-lg-12
+					hr
+					p.text-centered Please&nbsp;
+						+linkContact('contact us')
+						| &nbsp;if you need to access the v1 metrics for your #{resourceType}.
 
 block requirejs
 	script(type="text/javascript").

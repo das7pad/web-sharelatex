@@ -5,7 +5,9 @@ should = chai.should()
 expect = chai.expect
 modulePath = "../../../app/js/OpenInOverleafHelper.js"
 SandboxedModule = require('sandboxed-module')
-mmmagic = require("mmmagic")
+
+mmmagic =
+	Magic: sinon.stub()
 
 mmmagic.Magic::detectFile = sinon.stub().withArgs(@tmpFile).callsArgWith(1, null, 'text/x-tex')
 

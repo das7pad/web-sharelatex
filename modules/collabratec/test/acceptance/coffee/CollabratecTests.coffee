@@ -2,6 +2,7 @@ MockDocstoreApi = require "../../../../../test/acceptance/js/helpers/MockDocstor
 MockDocUpdaterApi = require "../../../../../test/acceptance/js/helpers/MockDocUpdaterApi"
 MockOverleafApi = require "./helpers/MockOverleafApi"
 MockProjectHistoryApi = require "../../../../../test/acceptance/js/helpers/MockProjectHistoryApi"
+ProjectModel = require("../../../../../app/js/models/Project").Project
 URL = require "url"
 User = require "../../../../../test/acceptance/js/helpers/User"
 chai = require "chai"
@@ -327,3 +328,90 @@ describe "Collabratec", ->
 					expect(body.id).to.be.defined
 					expect(body.url).to.be.defined
 					done()
+
+	describe "deleteProject", ->
+		before ->
+			@token =
+				access_token:
+					resource_owner_id: 1
+				user_profile:
+					id: 1
+					email: "test@user.com"
+			MockOverleafApi.addToken "good-token", @token
+
+		describe "with v1 project id", ->
+			describe "when delete succeeds", ->
+				it "should proxy to v1", (done) ->
+					options =
+						auth: bearer: "good-token"
+						method: "DELETE"
+						url: "/api/v1/collabratec/users/current_user/projects/good-project-id"
+					request options, (error, response, body) =>
+						expect(response.statusCode).to.equal 204
+						done()
+
+			describe "when delete has error", ->
+				it "should proxy to v1", (done) ->	
+					options =
+						auth: bearer: "good-token"
+						method: "DELETE"
+						url: "/api/v1/collabratec/users/current_user/projects/bad-project-id"
+					request options, (error, response, body) =>
+						expect(response.statusCode).to.equal 422
+						done()
+
+		describe "with v2 project id", ->
+			describe "when user owns project", ->
+				describe "when project is linked to collabratec", ->
+					before (done) ->
+						update = $set: {
+							collabratecUsers: [ {
+								collabratec_document_id: "9999"
+								user_id: @user.id
+							} ]
+						}
+						ProjectModel.update {_id: @project_id}, update, done
+
+					it "should archive project and return 204", (done) ->
+						options =
+							auth: bearer: "good-token"
+							method: "DELETE"
+							url: "/api/v1/collabratec/users/current_user/projects/#{@project_id}"
+						request options, (error, response, body) =>
+							expect(response.statusCode).to.equal 204
+							ProjectModel.find {_id: @project_id }, (err, project) ->
+								return done err if err?
+								done()
+
+				describe "when project is not linked to collabratec", ->
+					before (done) ->
+						update = $unset: { collabratecUsers: 1 }
+						ProjectModel.update {_id: @project_id}, update, done
+					it "should return 422 error", (done) ->
+						options =
+							auth: bearer: "good-token"
+							method: "DELETE"
+							url: "/api/v1/collabratec/users/current_user/projects/#{@project_id}"
+						request options, (error, response, body) =>
+							expect(response.statusCode).to.equal 422
+							done()
+
+			describe "when user does not own project", ->
+				before (done) ->
+					update = $set: {
+						owner_ref: "5bea9338831a0a0a9dfdff44"
+						collabratecUsers: [ {
+							collabratec_document_id: "9999"
+							user_id: @user.id
+						} ]
+					}
+					ProjectModel.update {_id: @project_id}, update, done
+
+				it "should return 422 error", (done) ->
+					options =
+						auth: bearer: "good-token"
+						method: "DELETE"
+						url: "/api/v1/collabratec/users/current_user/projects/#{@project_id}"
+					request options, (error, response, body) =>
+						expect(response.statusCode).to.equal 422
+						done()

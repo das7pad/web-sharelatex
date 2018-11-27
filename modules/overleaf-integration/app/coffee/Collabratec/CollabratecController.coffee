@@ -148,10 +148,10 @@ module.exports = CollabratecController =
 		project_id = req.session.show_project_id
 		if oauth_params?
 			redirect_url = CollabratecManager.oauthRedirectUrl oauth_params
-			AuthenticationController._setRedirectInSession req, redirect_url
+			AuthenticationController.setRedirectInSession req, redirect_url
 		else if project_id?
 			redirect_url = "/sign_in_to_v1?return_to="+encodeURIComponent("/"+project_id)
-			AuthenticationController._setRedirectInSession req, redirect_url
+			AuthenticationController.setRedirectInSession req, redirect_url
 		CollabratecManager.clearSession req.session
 
 	_completeOauthLink: (req, user, callback) ->

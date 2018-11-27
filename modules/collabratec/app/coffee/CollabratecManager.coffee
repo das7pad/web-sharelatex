@@ -4,6 +4,7 @@ Errors = require "../../../../app/js/Features/Errors/Errors"
 ObjectId = require("mongojs").ObjectId
 Path = require "path"
 ProjectCollabratecDetailsHandler = require "../../../../app/js/Features/Project/ProjectCollabratecDetailsHandler"
+ProjectDeleter = require "../../../../app/js/Features/Project/ProjectDeleter"
 ProjectDetailsHandler = require "../../../../app/js/Features/Project/ProjectDetailsHandler"
 ProjectEntityHandler = require "../../../../app/js/Features/Project/ProjectEntityHandler"
 ProjectEntityUpdateHandler = require "../../../../app/js/Features/Project/ProjectEntityUpdateHandler"
@@ -35,6 +36,9 @@ module.exports = CollabratecManager =
 							id: project._id,
 							url: "#{Settings.siteUrl}/project/#{project._id}"
 						}
+
+	deleteProject: (project_id, callback) ->
+		ProjectDeleter.archiveProject project_id, callback
 
 	getProjects: (user, token, current_page, page_size, search, callback) ->
 		async.parallel {

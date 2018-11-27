@@ -142,8 +142,7 @@ describe "HubsController", ->
 			done()
 
 		it 'calls correct endpoint with query for usageData', (done) ->
-			callback = sinon.stub()
-			endpoint = /5\/usage_signup_data\?start_date=\d{10}\.\d{3}&end_date=\d{10}\.\d{3}/
+			endpoint = /5\/usage_signup_data\?start_date=\d+&end_date=\d+/
 			@HubsController._usageData 5, (data) =>
 				@request.get.calledWith({
 					url: sinon.match(endpoint)
