@@ -93,7 +93,7 @@ module.exports = ProjectImporter =
 			(cb) ->
 				ProjectImporter._importLabels doc.id, v2_project_id, v1_user_id, cb
 			(cb) ->
-				ProjectImporter._importTagsForOwner v1_project_id, v2_project_id, v1_user_id, v2_user_id, cb
+				ProjectImporter._importTags v1_project_id, v2_project_id, v1_user_id, v2_user_id, cb
 			(cb) ->
 				ProjectImporter._confirmExport v1_project_id, v2_project_id, v1_user_id, cb
 		], (error) ->
@@ -256,9 +256,6 @@ module.exports = ProjectImporter =
 					error = new Error("project-history returned non-success code: #{response.statusCode}")
 					error.statusCode = response.statusCode
 					callback error
-
-	_importTagsForOwner: (v1_project_id, v2_project_id, v1_user_id, v2_user_id, callback = (error) ->) ->
-		ProjectImporter._importTags(v1_project_id, v2_project_id, v1_user_id, v2_user_id, callback)
 
 	_importTags: (v1_project_id, v2_project_id, v1_user_id, v2_user_id, callback = (error) ->) ->
 		V1SharelatexApi.request {

@@ -64,7 +64,7 @@ describe "ProjectImporter", ->
 			@ProjectImporter._waitForV1HistoryExport = sinon.stub().yields()
 			@ProjectImporter._confirmExport = sinon.stub().yields()
 			@ProjectImporter._cancelExport = sinon.stub().yields()
-			@ProjectImporter._importTagsForOwner = sinon.stub().yields()
+			@ProjectImporter._importTags = sinon.stub().yields()
 
 		describe "successfully", ->
 			beforeEach (done) ->
@@ -107,7 +107,7 @@ describe "ProjectImporter", ->
 					.should.equal true
 
 			it "should import the owner's tags", ->
-				@ProjectImporter._importTagsForOwner
+				@ProjectImporter._importTags
 					.calledWith(@v1_project_id, @v2_project_id, @v1_user_id, @v2_user_id)
 					.should.equal true
 
