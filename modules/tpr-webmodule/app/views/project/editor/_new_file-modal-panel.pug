@@ -28,42 +28,41 @@ mixin providerPanel(providerKey, controller, providerName)
 								|&nbsp;Loading...
 
 					div(ng-if="!state.fetchingGroups")
-						div(ng-if="!hasGroups()")
-							p Import a bibtex file from your #{providerName} account
+						p Import a bibtex file from your #{providerName} account
 
-							form(novalidate, name="newLinkedFileForm")
-								.row-spaced-small(ng-if="hasGroups()")
-									label(for="group-select") Select a Group (optional)
-									select.form-control(
-										name="group-select"
-										ng-model="data.selectedGroupId"
-									)
-										option(value="" selected) - Select a Group (optional)
-										option(
-											ng-repeat="group in data.groups"
-											value="{{ group.id }}"
-										) {{ group.name }}
+						form(novalidate, name="newLinkedFileForm")
+							.row-spaced-small(ng-if="hasGroups()")
+								label(for="group-select") Select a Group (optional)
+								select.form-control(
+									name="group-select"
+									ng-model="data.selectedGroupId"
+								)
+									option(value="" selected) - Select a Group (optional)
+									option(
+										ng-repeat="group in data.groups"
+										value="{{ group.id }}"
+									) {{ group.name }}
 
+							.row-spaced-small
+								label(for="name") File name in this project
+								input.form-control(
+									type="text",
+									placeholder="references.bib",
+									required,
+									ng-model="data.name",
+									on-enter="create()",
+									name="name",
+									focus-on="open"
+								)
+
+							if (providerKey == 'zotero')
 								.row-spaced-small
-									label(for="name") File name in this project
-									input.form-control(
-										type="text",
-										placeholder="references.bib",
-										required,
-										ng-model="data.name",
-										on-enter="create()",
-										name="name",
-										focus-on="open"
-									)
+									label(for="format") Format
+									select.form-control(ng-model="data.format")
+										option(value='bibtex') BibTeX
+										option(value='biblatex') BibLaTeX
 
-								if (providerKey == 'zotero')
-									.row-spaced-small
-										label(for="format") Format
-										select.form-control(ng-model="data.format")
-											option(value='bibtex') BibTeX
-											option(value='biblatex') BibLaTeX
-
-								.text-danger.row-spaced-small(ng-show="newDocForm.name.$error.validFile")
+							.text-danger.row-spaced-small(ng-show="newDocForm.name.$error.validFile")
 
 						div(ng-if="state.inflight")
 							h3.text-center
