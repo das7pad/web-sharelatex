@@ -86,20 +86,21 @@ mixin providerPanel(providerKey, controller, providerName)
 						div(ng-show="state.errorType == 'refresh-failed'")
 							| #{translate(providerKey+"_reference_loading_error_expired")}
 
-					// token refresh failed, prompt to relink account
-					div(ng-show="state.error && state.errorType == 'refresh-failed'")
-						div()
-							p #{translate(providerKey+"_sync_description" )} 
-							p
-								a(href,ng-click="linkAccount()").btn.btn-info #{translate("link_to_" + providerKey)}
+						div(ng-show="state.errorType == 'name-exists'")
+							| #{translate("file_already_exists")}
 
-					div(ng-show="state.error && state.errorType != 'refresh-failed' ")
+					div(ng-show="state.errorType == 'refresh-failed'")
+						// token refresh failed, prompt to relink account
+						p #{translate(providerKey+"_sync_description" )} 
+						p
+							a(href,ng-click="linkAccount()").btn.btn-info #{translate("link_to_" + providerKey)}
+
+					div(ng-show="state.errorType == 'default' || state.errorType == 'expired' || state.errorType == 'forbidden'")
 						div
-							div
-								| #{translate("reference_error_relink_hint")} &nbsp;
-							div
-								a(href="/user/settings", target="_blank", style="font-weight: bold")
-									| #{translate("account_settings")}
+							| #{translate("reference_error_relink_hint")} &nbsp;
+						div
+							a(href="/user/settings", target="_blank", style="font-weight: bold")
+								| #{translate("account_settings")}
 				// end of error messages
 
 +providerPanel('mendeley', 'MendeleyLinkedFileModalController', 'Mendeley')

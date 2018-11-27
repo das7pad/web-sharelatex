@@ -54,7 +54,9 @@ define(['base'], function(App) {
 			}
 
 			const _handleError = function(err) {
-				if (err.status === 401) {
+				if (err.data == 'already exists') {
+					return _reset({ error: 'name-exists' })
+				} else if (err.status === 401) {
 					return _reset({ error: 'expired' })
 				} else if (err.status === 403) {
 					return _reset({ error: 'forbidden' })
