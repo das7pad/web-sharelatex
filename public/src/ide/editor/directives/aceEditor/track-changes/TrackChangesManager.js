@@ -133,8 +133,22 @@ define([
         return this.recalculateReviewEntriesScreenPositions()
       }
 
+      connectToDoc(doc) {
+        this.setTrackChanges(this.$scope.trackChanges)
+
+        doc.on('ranges:dirty', () => {
+          this.updateAnnotations()
+        })
+        doc.on('ranges:clear', () => {
+          this.adapter.clearAnnotations()
+        })
+        doc.on('ranges:redraw', () => {
+          this.redrawAnnotations()
+        })
+      }
+
       disconnectFromDoc(doc) {
-        this.adapter.changeIdToMarkerIdMap = {}
+        //this.adapter.changeIdToMarkerIdMap = {}
         doc.off('ranges:clear')
         doc.off('ranges:redraw')
         doc.off('ranges:dirty')
@@ -151,20 +165,6 @@ define([
             ? (this.$scope.sharejsDoc.track_changes_as = null)
             : undefined
         }
-      }
-
-      connectToDoc(doc) {
-        this.setTrackChanges(this.$scope.trackChanges)
-
-        doc.on('ranges:dirty', () => {
-          this.updateAnnotations()
-        })
-        doc.on('ranges:clear', () => {
-          this.adapter.clearAnnotations()
-        })
-        doc.on('ranges:redraw', () => {
-          this.redrawAnnotations()
-        })
       }
 
       redrawAnnotations() {

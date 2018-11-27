@@ -51,14 +51,14 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
       markerNode.style.borderLeft = '1px dotted red'
       markerNode.style.width = '100%'
       markerNode.style.height = '20px'
-      markerNode.style.marginTop = '-40px'
+      markerNode.style.marginTop = '-20px'
 
       this.cm.addWidget(
         { line: position.row, ch: position.column },
         markerNode,
-        true
+        false
       )
-      // this.changeIdToMarkerIdMap[change.id] = marker.id
+      this.changeIdToMarkerIdMap[change.id] = markerNode
     }
 
     onInsertRemoved(change) {
@@ -85,17 +85,26 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
       const markers = this.cm.doc.getAllMarks()
       const markerId = this.changeIdToMarkerIdMap[change_id]
 
-      for (let marker of markers) {
-        if (marker.id === markerId) {
-          marker.clear()
-          let updatedMarker = this.cm.doc.markText(
-            { line: start.row, ch: start.column },
-            { line: end.row, ch: end.column },
-            { className: 'track-changes-marker track-changes-added-marker' }
-          )
+      // If it's not a delete
+      if (start !== end)
+        for (let marker of markers) {
+          if (marker.id === markerId) {
+            marker.clear()
+            let updatedMarker = this.cm.doc.markText(
+              { line: start.row, ch: start.column },
+              { line: end.row, ch: end.column },
+              { className: 'track-changes-marker track-changes-added-marker' }
+            )
 
-          this.changeIdToMarkerIdMap[change_id] = updatedMarker.id
+            this.changeIdToMarkerIdMap[change_id] = updatedMarker.id
+          }
         }
+      else {
+        this.cm.addWidget(
+          { line: start.row, ch: start.column },
+          markerId,
+          false
+        )
       }
     }
 
