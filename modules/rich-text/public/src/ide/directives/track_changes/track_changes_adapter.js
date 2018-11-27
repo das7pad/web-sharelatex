@@ -98,7 +98,7 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
           false
         )
 
-        this.clearOverlappingDeleteMarkers()
+        this.clearOverlappingDeleteMarkers(markerNode)
       }
     }
 
