@@ -10,12 +10,10 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
   return (TrackChangesAdapter = class TrackChangesAdapter {
     constructor(editor) {
       this.onInsertAdded = this.onInsertAdded.bind(this)
-      this.onInsertRemoved = this.onInsertRemoved.bind(this)
       this.shareJsOffsetToAcePosition = this.shareJsOffsetToAcePosition.bind(
         this
       )
       this.onDeleteAdded = this.onDeleteAdded.bind(this)
-      this.onDeleteRemoved = this.onDeleteRemoved.bind(this)
       this.onChangeMoved = this.onChangeMoved.bind(this)
       this.editor = editor
       this.cm = this.editor.getCodeMirror()
@@ -47,8 +45,8 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
       position = this.shareJsOffsetToAcePosition(change.op.p)
 
       markerNode = document.createElement('div')
-      markerNode.style.borderBottom = '1px dashed red'
-      markerNode.style.borderLeft = '1px dotted red'
+      markerNode.style.borderBottom = '1px dashed #c5060b'
+      markerNode.style.borderLeft = '1px dotted #c5060b'
       markerNode.style.width = '100%'
       markerNode.style.height = '20px'
       markerNode.style.marginTop = '-20px'
@@ -59,16 +57,9 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
         false
       )
       this.changeIdToMarkerIdMap[change.id] = markerNode
-    }
 
-    onInsertRemoved(change) {
-      /** For the moment I'm just going to do this bit
-       - I think I need to take some action to remove the
-       highlight itself but don't worry about it for a sec**/
-      delete this.changeIdToMarkerIdMap[change.id]
+      this.clearOverlappingDeleteMarkers(markerNode)
     }
-
-    onDeleteRemoved() {}
 
     onChangeMoved(change) {
       let end
@@ -82,11 +73,10 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
     }
 
     updateMarker(change_id, start, end) {
-      const markers = this.cm.doc.getAllMarks()
-      const markerId = this.changeIdToMarkerIdMap[change_id]
-
       // If it's not a delete
-      if (start !== end)
+      if (start !== end) {
+        const markers = this.cm.doc.getAllMarks()
+        const markerId = this.changeIdToMarkerIdMap[change_id]
         for (let marker of markers) {
           if (marker.id === markerId) {
             marker.clear()
@@ -99,12 +89,41 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
             this.changeIdToMarkerIdMap[change_id] = updatedMarker.id
           }
         }
-      else {
+      } else {
+        const markerNode = this.changeIdToMarkerIdMap[change_id]
+
         this.cm.addWidget(
           { line: start.row, ch: start.column },
-          markerId,
+          markerNode,
           false
         )
+
+        this.clearOverlappingDeleteMarkers()
+      }
+    }
+
+    clearOverlappingDeleteMarkers(markerNode) {
+      const markers = Object.values(this.changeIdToMarkerIdMap).filter(
+        marker => typeof marker === 'object'
+      )
+
+      // Find overlapping markers (markers on the same line)
+      const markerTopValue = markerNode.style.top
+      const markersMatchingTop = markers.filter(
+        marker => marker.style.top === markerTopValue
+      )
+
+      // Find the marker on the most left of that line, which we don't want to affect
+      const markersMatchingTopLefts = markersMatchingTop.map(marker =>
+        parseInt(marker.style.left)
+      )
+      const mostLeftMarkerValue = Math.min(...markersMatchingTopLefts)
+
+      // Reduce the width of all non-far-left markers on that line
+      for (let marker of markersMatchingTop) {
+        if (parseInt(marker.style.left) > mostLeftMarkerValue) {
+          marker.style.width = 0
+        }
       }
     }
 

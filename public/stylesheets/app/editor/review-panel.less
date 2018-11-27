@@ -919,7 +919,7 @@
 		}
 		.track-changes-added-marker {
 			background-color: @rp-green-on-dark;
-		}	
+		}
 	}
 }
 
@@ -929,7 +929,9 @@
 	}
 
 	.track-changes-added-marker {
-		background-color: @rp-green;
+		// Uses rgba so not to affect the opacity of the text - doesn't layer like ace
+		background-color: rgba(44, 142, 48, 0.3);
+		color: black;
 	}
 }
 
