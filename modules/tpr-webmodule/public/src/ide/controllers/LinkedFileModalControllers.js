@@ -1,3 +1,9 @@
+/* eslint-disable
+    camelcase,
+    max-len,
+    no-return-assign,
+    no-undef,
+*/
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -54,7 +60,7 @@ define(['base'], function(App) {
 			}
 
 			const _handleError = function(err) {
-				if (err.data == 'already exists') {
+				if (err.data === 'already exists') {
 					return _reset({ error: 'name-exists' })
 				} else if (err.status === 401) {
 					return _reset({ error: 'expired' })
