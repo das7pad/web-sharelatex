@@ -267,12 +267,9 @@ module.exports = ProjectImporter =
 		}, (error, res, body) ->
 			return callback(error) if error?
 			logger.log {v1_project_id, v1_user_id, body}, "got tags for project from overleaf"
-			ProjectImporter._importTags v2_project_id, v2_user_id, body.tags, callback
-
-	_importTags: (project_id, v2_user_id, tags = [], callback = (error) ->) ->
-		async.mapSeries(tags, (tag, cb) ->
-			TagsHandler.addProjectToTagName v2_user_id, tag, project_id, cb
-		, callback)
+			async.mapSeries(body.tags, (tag, cb) ->
+				TagsHandler.addProjectToTagName v2_user_id, tag, v2_project_id, cb
+			, callback)
 
 	_importFiles: (project_id, v2_user_id, files = [], callback = (error) ->) ->
 		async.mapSeries(files, (file, cb) ->

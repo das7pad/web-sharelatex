@@ -863,7 +863,17 @@ describe "ProjectImporter", ->
 
 	describe "_importTags", ->
 		beforeEach (done) ->
-			@ProjectImporter._importTags(@v2_project_id, @v2_user_id, ["foo", "bar"], done)
+			@V1SharelatexApi.request = sinon.stub().yields(null, {}, {tags: ['foo', 'bar']})
+			@ProjectImporter._importInviteTags(@v1_project_id, @v2_project_id, @v1_user_id, @v2_user_id, done)
+
+		it "should request tags from v1", ->
+			@V1SharelatexApi.request
+				.calledWith({
+					method: 'GET'
+					url: "http://overleaf.example.com/api/v1/sharelatex/users/#{@v1_user_id}/docs/#{@v1_project_id}/export/tags"
+				})
+				.should.equal true
+
 		it "should add tags to project", ->
 			@TagsHandler.addProjectToTagName.calledWith(
 				@v2_user_id, "foo", @v2_project_id
