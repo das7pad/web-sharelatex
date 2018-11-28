@@ -36,6 +36,7 @@ createV2Team = (v1Team, callback = (error, v1Team, v2Team) ->) ->
 					id: v1Team.id
 				teamName: v1Team.name
 				admin_id: teamAdminId
+				manager_ids: [teamAdminId]
 				groupPlan: true
 				planCode: "v1_#{v1Team.plan_name}"
 				membersLimit: v1Team.n_licences
