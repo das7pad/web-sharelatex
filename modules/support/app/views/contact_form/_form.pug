@@ -6,13 +6,13 @@ mixin contact-form(showAffectedProjectUrl, showContactFormSuggestions = true)
 	)
 		form(name="contactForm" role="form" aria-label=translate("contact_us"))
 			span(ng-show="sent == false")
-				.alert.alert-danger(aria-live="polite" ng-show="error") Something went wrong sending your request :(
+				.alert.alert-danger(aria-live="polite" ng-show="error") #{translate('generic_something_went_wrong')}
 
 				label
 					| #{translate("subject")}
 				.form-group
 					input.field.text.medium.span8.form-control(
-						aria-label="subject"
+						aria-label=translate("subject")
 						name="subject"
 						required
 						autocomplete="off"
@@ -22,7 +22,7 @@ mixin contact-form(showAffectedProjectUrl, showContactFormSuggestions = true)
 			
 				.contact-suggestions(ng-show="suggestions.length > 0" )
 					p.contact-suggestion-label(aria-live="polite") !{translate("kb_suggestions_enquiry", { kbLink: "<a href='/learn/kb' target='_blank'>" + translate("knowledge_base") + "</a>" })}
-					ul.contact-suggestion-list(aria-role="region" aria-label="Help articles matching your subject")
+					ul.contact-suggestion-list(aria-role="region" aria-label=translate('help_articles_matching'))
 						li(ng-repeat="suggestion in suggestions")
 							a.contact-suggestion-list-item(ng-href="{{ suggestion.url }}", ng-click="clickSuggestionLink(suggestion.url);" target="_blank")
 								span(ng-bind-html="suggestion.name")
@@ -60,7 +60,7 @@ mixin contact-form(showAffectedProjectUrl, showContactFormSuggestions = true)
 					)
 				.form-group.text-center
 					input.btn-success.btn.btn-lg(
-						aria-label="Submit"
+						aria-label=translate('contact_us')
 						type='submit',
 						ng-disabled="contactForm.$invalid || sending",
 						ng-click="contactUs()"
