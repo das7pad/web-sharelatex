@@ -6,7 +6,6 @@
 */
 /*
  * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
  * DS103: Rewrite code to no longer use __guard__
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
@@ -61,15 +60,15 @@ define(['base'], function(App) {
 
 			const _handleError = function(err) {
 				if (err.data === 'already exists') {
-					return _reset({ error: 'name-exists' })
+					_reset({ error: 'name-exists' })
 				} else if (err.status === 401) {
-					return _reset({ error: 'expired' })
+					_reset({ error: 'expired' })
 				} else if (err.status === 403) {
-					return _reset({ error: 'forbidden' })
+					_reset({ error: 'forbidden' })
 				} else if (err.status === 400) {
-					return _reset({ error: 'default' })
+					_reset({ error: 'default' })
 				} else {
-					return _reset({ error: true })
+					_reset({ error: true })
 				}
 			}
 
@@ -83,12 +82,12 @@ define(['base'], function(App) {
 				if (opts.error != null) {
 					$scope.state.error = true
 					if (opts.error === true) {
-						return ($scope.state.errorType = 'default')
+						$scope.state.errorType = 'default'
 					} else {
-						return ($scope.state.errorType = opts.error)
+						$scope.state.errorType = opts.error
 					}
 				} else {
-					return ($scope.state.error = false)
+					$scope.state.error = false
 				}
 			}
 
@@ -106,7 +105,6 @@ define(['base'], function(App) {
 					.then(function(resp) {
 						const { data } = resp
 						$scope.data.groups = data.groups
-						// $scope.data.groups = [] # DEBUG
 						$scope.data.selectedGroup = null
 						$scope.data.isInitialized = true
 						return _reset()
@@ -120,11 +118,11 @@ define(['base'], function(App) {
 			const validate = function() {
 				const { name, isInitialized } = $scope.data
 				if (name == null || name.length === 0) {
-					return ($scope.state.valid = false)
+					$scope.state.valid = false
 				} else if (isInitialized == null) {
-					return ($scope.state.valid = false)
+					$scope.state.valid = false
 				} else {
-					return ($scope.state.valid = true)
+					$scope.state.valid = true
 				}
 			}
 
@@ -172,9 +170,9 @@ define(['base'], function(App) {
 				}
 				if (supportsGroups) {
 					$scope.state.fetchingGroups = true
-					return $timeout(() => $scope.supportsGroups(), 500)
+					$timeout(() => $scope.supportsGroups(), 500)
 				} else {
-					return ($scope.data.isInitialized = true)
+					$scope.data.isInitialized = true
 				}
 			}
 			_init()
@@ -194,10 +192,10 @@ define(['base'], function(App) {
 				const w = window.open()
 				const go = function() {
 					$scope.startedFreeTrial = true
-					return (w.location = `/user/subscription/new?planCode=${plan}&ssp=true`)
+					w.location = `/user/subscription/new?planCode=${plan}&ssp=true`
 				}
 				if ($scope.shouldABTestPlans) {
-					return sixpack.participate(
+					sixpack.participate(
 						'plans-1610',
 						['default', 'heron', 'ibis'],
 						function(chosenVariation, rawResponse) {
@@ -208,7 +206,7 @@ define(['base'], function(App) {
 						}
 					)
 				} else {
-					return go()
+					go()
 				}
 			}
 
@@ -245,13 +243,13 @@ define(['base'], function(App) {
 						$scope.userHasProviderLink = true
 						ide.$scope.user.refProviders[provider] = true
 						$timeout($scope.supportsGroups(), 500)
-						return $interval.cancel(poller)
+						$interval.cancel(poller)
 					}
 				}, 1000)
 				return true // See https://github.com/angular/angular.js/issues/4853#issuecomment-28491586
 			}
 
-			return (window._S = $scope)
+			window._S = $scope
 		}
 	]
 
@@ -259,7 +257,7 @@ define(['base'], function(App) {
 		'MendeleyLinkedFileModalController',
 		controllerForProvider('mendeley', true)
 	)
-	return App.controller(
+	App.controller(
 		'ZoteroLinkedFileModalController',
 		controllerForProvider('zotero', false)
 	)
