@@ -53,8 +53,8 @@ importTeamMembers = (v1Team, v2Team, callback = (error, v1Team, v2Team) ->) ->
 
 		memberIds = memberIds.map (mId) -> mId.toString()
 
-		SubscriptionUpdater.addUsersToGroup v2Team._id, memberIds, (error, updated) ->
-			callback(error) if error?
+		SubscriptionUpdater.addUsersToGroupWithoutFeaturesRefresh v2Team._id, memberIds, (error) ->
+			return callback(error) if error?
 			logger.log {memberIds}, "[TeamImporter] Members added to the team #{v2Team.id}"
 			callback(null, v1Team, v2Team)
 
