@@ -1,13 +1,5 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
-  let TrackChangesAdapter
-  return (TrackChangesAdapter = class TrackChangesAdapter {
+  class TrackChangesAdapter {
     constructor(editor) {
       this.onInsertAdded = this.onInsertAdded.bind(this)
       this.shareJsOffsetToAcePosition = this.shareJsOffsetToAcePosition.bind(
@@ -69,7 +61,7 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
       } else {
         end = start
       }
-      return this.updateMarker(change.id, start, end)
+      this.updateMarker(change.id, start, end)
     }
 
     updateMarker(change_id, start, end) {
@@ -131,5 +123,6 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
       const lines = this.cm.doc.getValue().split('\n')
       return AceShareJsCodec.shareJsOffsetToAcePosition(offset, lines)
     }
-  })
+  }
+  return TrackChangesAdapter
 })

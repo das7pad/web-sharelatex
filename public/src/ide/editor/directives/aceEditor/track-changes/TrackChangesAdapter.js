@@ -1,11 +1,3 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS206: Consider reworking classes to avoid initClass
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 define(['ace/ace', 'ide/editor/AceShareJsCodec'], function(
   _ignore,
   AceShareJsCodec
@@ -84,10 +76,10 @@ define(['ace/ace', 'ide/editor/AceShareJsCodec'], function(
         'track-changes-deleted-marker-callout'
       )
 
-      return (this.changeIdToMarkerIdMap[change.id] = {
+      this.changeIdToMarkerIdMap[change.id] = {
         background_marker_id,
         callout_marker_id
-      })
+      }
     }
 
     onInsertRemoved(change) {
@@ -110,7 +102,7 @@ define(['ace/ace', 'ide/editor/AceShareJsCodec'], function(
 
       const session = this.editor.getSession()
       session.removeMarker(background_marker_id)
-      return session.removeMarker(callout_marker_id)
+      session.removeMarker(callout_marker_id)
     }
 
     onChangeMoved(change) {
@@ -121,7 +113,7 @@ define(['ace/ace', 'ide/editor/AceShareJsCodec'], function(
       } else {
         end = start
       }
-      return this.updateMarker(change.id, start, end)
+      this.updateMarker(change.id, start, end)
     }
 
     updateMarker(change_id, start, end) {
@@ -145,7 +137,7 @@ define(['ace/ace', 'ide/editor/AceShareJsCodec'], function(
       if (callout_marker_id != null && markers[callout_marker_id] != null) {
         const callout_marker = markers[callout_marker_id]
         callout_marker.range.start = start
-        return (callout_marker.range.end = start)
+        callout_marker.range.end = start
       }
     }
 
