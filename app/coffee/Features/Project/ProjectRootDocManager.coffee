@@ -71,7 +71,6 @@ module.exports = ProjectRootDocManager =
 	ensureRootDocumentIsValid: (project_id, callback = (error) ->) ->
 		ProjectGetter.getProject project_id, rootDoc_id: 1, (error, project) ->
 			return callback(error) if error?
-			console.log "GGGGGGGGG", error, project_id, project
 			if !project?
 				return callback new Error("project not found")
 
