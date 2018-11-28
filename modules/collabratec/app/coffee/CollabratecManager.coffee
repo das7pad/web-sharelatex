@@ -6,18 +6,34 @@ Path = require "path"
 ProjectCollabratecDetailsHandler = require "../../../../app/js/Features/Project/ProjectCollabratecDetailsHandler"
 ProjectDeleter = require "../../../../app/js/Features/Project/ProjectDeleter"
 ProjectDetailsHandler = require "../../../../app/js/Features/Project/ProjectDetailsHandler"
+ProjectDuplicator = require "../../../../app/js/Features/Project/ProjectDuplicator"
 ProjectEntityHandler = require "../../../../app/js/Features/Project/ProjectEntityHandler"
 ProjectEntityUpdateHandler = require "../../../../app/js/Features/Project/ProjectEntityUpdateHandler"
 ProjectGetter = require "../../../../app/js/Features/Project/ProjectGetter"
 ProjectRootDocManager = require "../../../../app/js/Features/Project/ProjectRootDocManager"
 Settings = require "settings-sharelatex"
 TemplatesManager = require "../../../../app/js/Features/Templates/TemplatesManager"
+UserGetter = require "../../../../app/js/Features/User/UserGetter"
 V1Api = require "../../../../app/js/Features/V1/V1Api"
 _ = require "lodash"
 async = require "async"
-request = require "request"
+logger = require "logger-sharelatex"
 
 module.exports = CollabratecManager =
+	cloneProject: (user, project_id, protect, new_collabratec_document_id, new_owner_collabratec_customer_id, collabratec_privategroup_id, callback) ->
+		ProjectGetter.getProject project_id, {name: 1}, (err, project) ->
+			return callback err if err?
+			ProjectDetailsHandler.generateUniqueName user._id, project.name, (err, project_name) ->
+				return callback err if err?
+				ProjectDuplicator.duplicate user, project_id, project_name, (err, project) ->
+					return callback err if err?
+					ProjectCollabratecDetailsHandler.initializeCollabratecProject project._id, user._id, new_collabratec_document_id,collabratec_privategroup_id, (err) ->
+						return callback err if err?
+						callback null, {
+							id: project._id,
+							url: "#{Settings.siteUrl}/project/#{project._id}"
+						}
+
 	createProject: (user_id, template_id, title, doc_abstract, keywords, primary_author, collabratec_document_id, collabratec_privategroup_id, callback) ->
 		options =
 			headers: Accept: "application/json"
@@ -72,6 +88,18 @@ module.exports = CollabratecManager =
 						return callback err if err?
 						content = DocMetadata.contentFromLines(lines)
 						callback null, CollabratecManager._formatProjectMetadata(project, content)
+
+	getUserByCollabratecId: (collabratec_id, callback) ->
+		V1Api.request {
+			expectedStatusCodes: [404]
+			qs: { collabratec_id }
+			uri: "/api/v1/sharelatex/user_collabratec_id"
+		}, (err, response, body) ->
+			return callback err if err?
+			return callback null, null unless body?.id?
+			UserGetter.getUser {"overleaf.id": parseInt(body.id)}, (err, user) ->
+				callback err if err?
+				return callback null, user
 
 	linkProject: (project_id, user_id, collabratec_document_id, callback) ->
 		ProjectCollabratecDetailsHandler.linkCollabratecUserProject project_id, user_id, collabratec_document_id, (err) ->

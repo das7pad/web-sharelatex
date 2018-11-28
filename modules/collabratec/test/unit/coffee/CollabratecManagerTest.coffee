@@ -22,12 +22,14 @@ describe "CollabratecManager", ->
 			"../../../../app/js/Features/Project/ProjectCollabratecDetailsHandler": @ProjectCollabratecDetailsHandler = {}
 			"../../../../app/js/Features/Project/ProjectDeleter": @ProjectDeleter = {}
 			"../../../../app/js/Features/Project/ProjectDetailsHandler": @ProjectDetailsHandler = {}
+			"../../../../app/js/Features/Project/ProjectDuplicator": @ProjectDuplicator = {}
 			"../../../../app/js/Features/Project/ProjectEntityHandler": @ProjectEntityHandler = {}
 			"../../../../app/js/Features/Project/ProjectEntityUpdateHandler": @ProjectEntityUpdateHandler = {}
 			"../../../../app/js/Features/Project/ProjectGetter": @ProjectGetter = {}
 			"../../../../app/js/Features/Project/ProjectRootDocManager":
 				@ProjectRootDocManager = {}
 			"../../../../app/js/Features/Templates/TemplatesManager": @TemplatesManager = {}
+			"../../../../app/js/Features/User/UserGetter": @UserGetter = {}
 			"../../../../app/js/Features/V1/V1Api": @V1Api = {}
 			"logger-sharelatex": { log: sinon.stub(), err: sinon.stub() }
 			"settings-sharelatex": { siteUrl: "site-url" }
