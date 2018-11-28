@@ -3,3 +3,9 @@ li(ng-class="type == 'mendeley' ? 'active' : null")
 		i.fa.fa-fw.fa-book
 		|
 		| From Mendeley
+
+li(ng-class="type == 'zotero' ? 'active' : null")
+	a(href, ng-click="type = 'zotero'")
+		i.fa.fa-fw.fa-book
+		|
+		| From Zotero

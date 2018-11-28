@@ -4,18 +4,15 @@
     no-return-assign,
     no-undef,
 */
-// TODO: This file was created by bulk-decaffeinate.
-// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
  * DS103: Rewrite code to no longer use __guard__
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 
-define(['base'], App =>
-  App.controller('MendeleyLinkedFileModalController', [
+define(['base'], function(App) {
+  const controllerForProvider = (provider, supportsGroups) => [
     '$scope',
     'ide',
     '$timeout',
@@ -32,41 +29,46 @@ define(['base'], App =>
       event_tracking,
       sixpack
     ) {
-      const provider = 'mendeley'
       const features =
         ide.$scope.user != null ? ide.$scope.user.features : undefined
       $scope.userHasProviderFeature =
-        (features != null ? features.mendeley : undefined) ||
+        (features != null ? features[provider] : undefined) ||
         (features != null ? features.references : undefined)
       $scope.userHasProviderLink = __guard__(
         ide.$scope.user != null ? ide.$scope.user.refProviders : undefined,
         x => x[provider]
       )
 
+      $timeout(() => $scope.$broadcast('open'), 200)
+
       $scope.canLoadBibtex = () =>
         $scope.userHasProviderFeature && $scope.userHasProviderLink
 
-      $scope.state = {
-        fetchingGroups: false,
-        inflight: false,
-        error: false,
-        errorType: 'default' // || 'expired' || 'forbidden'
-      }
+      // Don't overwrite the state object, since we inherit the modal state
+      // object to communicate the 'valid' attribute back to it.
+      $scope.state.fetchingGroups = false
+      $scope.state.inflight = false
+      $scope.state.error = false
+      $scope.state.errorType = 'default' // || 'expired' || 'forbidden'
+
       $scope.data = {
         isInitialized: false,
         groups: null,
-        selectedGroupId: null
+        selectedGroupId: null,
+        format: 'bibtex'
       }
 
       const _handleError = function(err) {
-        if (err.status === 401) {
-          return _reset({ error: 'expired' })
+        if (err.data === 'already exists') {
+          _reset({ error: 'name-exists' })
+        } else if (err.status === 401) {
+          _reset({ error: 'expired' })
         } else if (err.status === 403) {
-          return _reset({ error: 'forbidden' })
+          _reset({ error: 'forbidden' })
         } else if (err.status === 400) {
-          return _reset({ error: 'default' })
+          _reset({ error: 'default' })
         } else {
-          return _reset({ error: true })
+          _reset({ error: true })
         }
       }
 
@@ -80,30 +82,29 @@ define(['base'], App =>
         if (opts.error != null) {
           $scope.state.error = true
           if (opts.error === true) {
-            return ($scope.state.errorType = 'default')
+            $scope.state.errorType = 'default'
           } else {
-            return ($scope.state.errorType = opts.error)
+            $scope.state.errorType = opts.error
           }
         } else {
-          return ($scope.state.error = false)
+          $scope.state.error = false
         }
       }
 
       $scope.hasGroups = () =>
         $scope.data.groups != null && $scope.data.groups.length > 0
 
-      $scope.fetchGroups = function() {
+      $scope.supportsGroups = function() {
         if (!$scope.canLoadBibtex()) {
           return
         }
         _reset()
         $scope.state.fetchingGroups = true
         return ide.$http
-          .get('/mendeley/groups', { disableAutoLoginRedirect: true })
+          .get(`/${provider}/groups`, { disableAutoLoginRedirect: true })
           .then(function(resp) {
             const { data } = resp
             $scope.data.groups = data.groups
-            // $scope.data.groups = [] # DEBUG
             $scope.data.selectedGroup = null
             $scope.data.isInitialized = true
             return _reset()
@@ -117,44 +118,42 @@ define(['base'], App =>
       const validate = function() {
         const { name, isInitialized } = $scope.data
         if (name == null || name.length === 0) {
-          return ($scope.state.valid = false)
+          $scope.state.valid = false
         } else if (isInitialized == null) {
-          return ($scope.state.valid = false)
+          $scope.state.valid = false
         } else {
-          return ($scope.state.valid = true)
+          $scope.state.valid = true
         }
       }
 
       $scope.$watch('data.name', validate)
+      validate()
 
       $scope.$on('create', function() {
-        let payload
         if (!$scope.data.isInitialized) {
           return
         }
         if (!$scope.data.isInitialized || !$scope.data.name) {
           return
         }
-        if ($scope.hasGroups()) {
-          // Import from selected Group
-          if ($scope.data.selectedGroupId) {
-            payload = {
-              group_id: $scope.data.selectedGroupId
-            }
-          } else {
-            payload = {}
-          }
-        } else {
-          // Import from Account
-          payload = {}
+        const payload = {}
+        if (
+          provider === 'mendeley' &&
+          $scope.hasGroups() &&
+          $scope.data.selectedGroupId
+        ) {
+          payload.group_id = $scope.data.selectedGroupId
         }
-        event_tracking.send('references-mendeley', 'modal', 'import-bibtex')
+        if (provider === 'zotero') {
+          payload.format = $scope.data.format
+        }
+        event_tracking.send(`references-${provider}`, 'modal', 'import-bibtex')
         $scope.state.inflight = true
         return ide.fileTreeManager
           .createLinkedFile(
             $scope.data.name,
             $scope.parent_folder,
-            'mendeley',
+            provider,
             payload
           )
           .then(function() {
@@ -169,8 +168,12 @@ define(['base'], App =>
         if (!$scope.canLoadBibtex()) {
           return
         }
-        $scope.state.fetchingGroups = true
-        return $timeout(() => $scope.fetchGroups(), 500)
+        if (supportsGroups) {
+          $scope.state.fetchingGroups = true
+          $timeout(() => $scope.supportsGroups(), 500)
+        } else {
+          $scope.data.isInitialized = true
+        }
       }
       _init()
 
@@ -189,10 +192,10 @@ define(['base'], App =>
         const w = window.open()
         const go = function() {
           $scope.startedFreeTrial = true
-          return (w.location = `/user/subscription/new?planCode=${plan}&ssp=true`)
+          w.location = `/user/subscription/new?planCode=${plan}&ssp=true`
         }
         if ($scope.shouldABTestPlans) {
-          return sixpack.participate(
+          sixpack.participate(
             'plans-1610',
             ['default', 'heron', 'ibis'],
             function(chosenVariation, rawResponse) {
@@ -203,7 +206,7 @@ define(['base'], App =>
             }
           )
         } else {
-          return go()
+          go()
         }
       }
 
@@ -239,16 +242,26 @@ define(['base'], App =>
             )
             $scope.userHasProviderLink = true
             ide.$scope.user.refProviders[provider] = true
-            $timeout($scope.fetchGroups(), 500)
-            return $interval.cancel(poller)
+            $timeout($scope.supportsGroups(), 500)
+            $interval.cancel(poller)
           }
         }, 1000)
         return true // See https://github.com/angular/angular.js/issues/4853#issuecomment-28491586
       }
 
-      return (window._S = $scope)
+      window._S = $scope
     }
-  ]))
+  ]
+
+  App.controller(
+    'MendeleyLinkedFileModalController',
+    controllerForProvider('mendeley', true)
+  )
+  App.controller(
+    'ZoteroLinkedFileModalController',
+    controllerForProvider('zotero', false)
+  )
+})
 
 function __guard__(value, transform) {
   return typeof value !== 'undefined' && value !== null
