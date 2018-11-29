@@ -164,9 +164,13 @@ define([
         }
       }
 
-      Array.from(this.rangesTracker.comments).map(comment =>
-        this._onCommentAdded(comment)
-      )
+      // Ignore comments for rich text for now
+      if (this.editor) {
+        Array.from(this.rangesTracker.comments).map(comment =>
+          this.onCommentAdded(comment)
+        )
+      }
+
       this.broadcastChange()
     }
 
@@ -642,7 +646,7 @@ define([
         // Comment is resolved so shouldn't be displayed.
         return
       }
-      if (this.changeIdToMarkerIdMap[comment.id] == null) {
+      if (this.adapter.changeIdToMarkerIdMap[comment.id] == null) {
         // Only create new markers if they don't already exist
         const start = this.adapter.shareJsOffsetToAcePosition(comment.op.p)
         const end = this.adapter.shareJsOffsetToAcePosition(
@@ -661,11 +665,11 @@ define([
           'track-changes-marker track-changes-comment-marker',
           'text'
         )
-        const callout_marker_id = this.createCalloutMarker(
+        const callout_marker_id = this.adapter.createCalloutMarker(
           start,
           'track-changes-comment-marker-callout'
         )
-        this.changeIdToMarkerIdMap[comment.id] = {
+        this.adapter.changeIdToMarkerIdMap[comment.id] = {
           background_marker_id,
           callout_marker_id
         }
