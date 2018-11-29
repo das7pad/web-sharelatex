@@ -1,3 +1,6 @@
+/* eslint-disable
+    camelcase
+ */
 define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
   class TrackChangesAdapter {
     constructor(editor) {

@@ -1,3 +1,6 @@
+/* eslint-disable
+    camelcase
+ */
 define([
   'ace/ace',
   'utils/EventEmitter',
@@ -134,7 +137,6 @@ define([
     }
 
     disconnectFromDoc(doc) {
-      //this.adapter.changeIdToMarkerIdMap = {}
       doc.off('ranges:clear')
       doc.off('ranges:redraw')
       doc.off('ranges:dirty')

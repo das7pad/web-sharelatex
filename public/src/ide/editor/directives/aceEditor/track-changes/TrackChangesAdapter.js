@@ -1,3 +1,6 @@
+/* eslint-disable
+    camelcase
+ */
 define(['ace/ace', 'ide/editor/AceShareJsCodec'], function(
   _ignore,
   AceShareJsCodec
@@ -150,11 +153,10 @@ define(['ace/ace', 'ide/editor/AceShareJsCodec'], function(
     }
 
     createCalloutMarker(position, klass) {
-      let callout_marker_id
       const session = this.editor.getSession()
       const callout_range = this.makeZeroWidthRange(position)
       const markerLayer = this.editor.renderer.$markerBack
-      return (callout_marker_id = session.addMarker(
+      return session.addMarker(
         callout_range,
         klass,
         (html, range, left, top, config) =>
@@ -166,7 +168,7 @@ define(['ace/ace', 'ide/editor/AceShareJsCodec'], function(
             0,
             'width: auto; right: 0;'
           )
-      ))
+      )
     }
 
     makeZeroWidthRange(position) {
