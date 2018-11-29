@@ -41,10 +41,10 @@ aside.change-list(
 		ng-if="!history.showOnlyLabels && !history.error"
 		ng-controller="HistoryCompareListController"
 	)
-		div(
+		aside.change-list(
 			infinite-scroll="loadMore()"
 			infinite-scroll-disabled="history.loading || history.atEnd"
-			infinite-scroll-initialize="ui.view == 'history'"
+			infinite-scroll-initialize="ui.view == 'history' && history.viewMode === HistoryViewModes.COMPARE"
 		)
 			.infinite-scroll-inner
 				ul.list-unstyled(
@@ -53,7 +53,7 @@ aside.change-list(
 					}"
 				)
 					li.change(
-						ng-repeat="update in history.updates"
+						ng-repeat="update in history.updates | filter:{ 'hidden': false }"
 						ng-class="{\
 							'first-in-day': update.meta.first_in_day,\
 							'selected': update.inSelection,\
@@ -201,7 +201,6 @@ aside.change-list(
 								ng-style="{'color': 'hsl(100, 70%, 50%)'}"
 							) #{translate("anonymous")}
 						time.history-entry-label-metadata-time {{ ::label.created_at | formatDate }}
-
 
 		.loading(ng-show="history.loading")
 			i.fa.fa-spin.fa-refresh

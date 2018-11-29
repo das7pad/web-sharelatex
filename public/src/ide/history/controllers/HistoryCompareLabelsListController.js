@@ -25,7 +25,6 @@ define([
     'ide',
     function($scope, $modal, ide) {
       $scope.hoveringOverListSelectors = false
-
       $scope.recalculateSelectedLabels = function() {
         let beforeSelection = true
         let afterSelection = false
@@ -45,6 +44,7 @@ define([
             afterSelection = true
           }
         }
+        ide.historyManager.selectUpdatesFromLabelSelection()
       }
 
       $scope.recalculateHoveredLabels = function() {
