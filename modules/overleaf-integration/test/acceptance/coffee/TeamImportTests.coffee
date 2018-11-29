@@ -65,6 +65,22 @@ describe "Team imports", ->
 					"plan_name": "pro",
 					"created_at": "2018-06-22T10:48:46.650Z",
 					"updated_at": "2018-06-22T10:48:46.650Z"
+				},
+				{
+					"email": "invited2@example.com",
+					"name": null,
+					"code": "secret",
+					"plan_name": "pro",
+					"created_at": "2018-06-22T10:48:46.650Z",
+					"updated_at": "2018-06-22T10:48:46.650Z"
+				},
+				{
+					"email": "invited3@example.com",
+					"name": null,
+					"code": "secret",
+					"plan_name": "pro",
+					"created_at": "2018-06-22T10:48:46.650Z",
+					"updated_at": "2018-06-22T10:48:46.650Z"
 				}
 			]
 		}
@@ -116,7 +132,7 @@ describe "Team imports", ->
 					expect(subscription.member_ids.length).to.eq(2)
 					expect(subscription.manager_ids.length).to.eq(1)
 
-					expect(subscription.teamInvites.length).to.eq(1)
+					expect(subscription.teamInvites.length).to.eq(3)
 
 					teamInvite = subscription.teamInvites[0]
 
