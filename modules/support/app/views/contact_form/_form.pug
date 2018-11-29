@@ -4,14 +4,15 @@ mixin contact-form(showAffectedProjectUrl, showContactFormSuggestions = true)
 		ng-controller="ContactFormController"
 		ng-init="showContactFormSuggestions = " + showContactFormSuggestions
 	)
-		form(name="contactForm")
+		form(name="contactForm" role="form" aria-label=translate("contact_us"))
 			span(ng-show="sent == false")
-				.alert.alert-danger(ng-show="error") Something went wrong sending your request :(
+				.alert.alert-danger(aria-live="polite" ng-show="error") #{translate('generic_something_went_wrong')}
 
 				label
 					| #{translate("subject")}
 				.form-group
 					input.field.text.medium.span8.form-control(
+						aria-label=translate("subject")
 						name="subject"
 						required
 						autocomplete="off"
@@ -19,9 +20,9 @@ mixin contact-form(showAffectedProjectUrl, showContactFormSuggestions = true)
 						ng-model-options="{ updateOn: 'default blur', debounce: {'default': 350, 'blur': 0} }"
 						maxlength='255')
 			
-				.contact-suggestions(ng-show="suggestions.length")
-					p.contact-suggestion-label !{translate("kb_suggestions_enquiry", { kbLink: "<a href='/learn/kb' target='_blank'>" + translate("knowledge_base") + "</a>" })}
-					ul.contact-suggestion-list
+				.contact-suggestions(ng-show="suggestions.length > 0" )
+					p.contact-suggestion-label(aria-live="polite") !{translate("kb_suggestions_enquiry", { kbLink: "<a href='/learn/kb' target='_blank'>" + translate("knowledge_base") + "</a>" })}
+					ul.contact-suggestion-list(aria-role="region" aria-label=translate('help_articles_matching'))
 						li(ng-repeat="suggestion in suggestions")
 							a.contact-suggestion-list-item(ng-href="{{ suggestion.url }}", ng-click="clickSuggestionLink(suggestion.url);" target="_blank")
 								span(ng-bind-html="suggestion.name")
@@ -31,6 +32,7 @@ mixin contact-form(showAffectedProjectUrl, showContactFormSuggestions = true)
 					| #{translate("email")}
 				.form-group(ng-show="'"+getUserEmail()+"'.length < 1")
 					input.field.text.medium.span8.form-control(
+						aria-label=translate("email")
 						name="email",
 						required,
 						ng-model="form.email",
@@ -43,12 +45,13 @@ mixin contact-form(showAffectedProjectUrl, showContactFormSuggestions = true)
 					label#title12.desc
 						| #{translate("project_url")} (#{translate("optional")})
 					.form-group
-						input.field.text.medium.span8.form-control(ng-model="form.project_url")
+						input.field.text.medium.span8.form-control(aria-label=translate("project_url") + ' ' + translate("optional"), ng-model="form.project_url")
 
 				label.desc
 					| #{translate("contact_message_label")}
 				.form-group
 					textarea.field.text.medium.span8.form-control(
+						aria-label=translate("contact_message_label")
 						name="body",
 						required
 						ng-model="form.message",
@@ -57,6 +60,7 @@ mixin contact-form(showAffectedProjectUrl, showContactFormSuggestions = true)
 					)
 				.form-group.text-center
 					input.btn-success.btn.btn-lg(
+						aria-label=translate('contact_us')
 						type='submit',
 						ng-disabled="contactForm.$invalid || sending",
 						ng-click="contactUs()"
