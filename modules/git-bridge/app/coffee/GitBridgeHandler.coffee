@@ -142,7 +142,7 @@ module.exports = GitBridgeHandler =
 		errorPayload = if err instanceof Errors.OutOfDateError
 				{code: 'outOfDate', message: 'Out of Date'}
 			else if err instanceof Errors.InvalidFileError
-				{code: 'invalidFiles', message: 'Invalid Files'}
+				{code: 'invalidFiles', message: 'Invalid Files', errors: err.errors}
 			else
 				{code: 'error', message: 'Unexpected Error'}
 		logger.log {errorPayload, projectId: project._id},
@@ -156,23 +156,36 @@ module.exports = GitBridgeHandler =
 
 	_prepareSnapshotFiles: (project, snapshot, callback=(err, files)->) ->
 		files = []
+		fileErrors = []
 		for file in (snapshot.files or [])
 			if !file.name?
 				return callback(new Errors.InvalidFileError("file object has no name"))
 			name = file.name
 			if !EditorHttpController._nameIsAcceptableLength(name)
-				err = new Errors.InvalidFileError("file name is not acceptible length: #{name}")
-				logger.err {err, projectId: project._id}, "[GitBridgeHandler] #{err.message}"
-				return callback(err)
+				logger.log {projectId: project._id, file}, '[GitBridgeHandler] invalid file length'
+				fileErrors.push({
+					file: file.name,
+					state: 'error'
+				})
+				continue
 			if !SafePath.isCleanPath(name)
-				err = new Errors.InvalidFileError("file name invalid: #{name}")
-				logger.err {err, projectId: project._id}, "[GitBridgeHandler] #{err.message}"
-				return callback(err)
+				logger.log {projectId: project._id, file}, '[GitBridgeHandler] invalid file name'
+				fileErrors.push({
+					file: file.name,
+					state: 'error'
+				})
+				continue
 			newFile = {name: name}
 			if file.url?
 				newFile.url = url.parse(file.url).format()
 			files.push(newFile)
-		callback(null, files)
+		if fileErrors.length > 0
+			err = new Errors.InvalidFileError()
+			err.errors = fileErrors
+			logger.err {err, errors: err.errors, projectId: project._id}, "[GitBridgeHandler] invalid files"
+			return callback(err)
+		else
+			callback(null, files)
 
 	_prepareEntityOperations: (project, snapshotFiles, callback=(err, operations)->) ->
 		deleteEntities = []
