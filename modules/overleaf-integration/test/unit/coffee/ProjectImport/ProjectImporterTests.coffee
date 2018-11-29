@@ -452,9 +452,11 @@ describe "ProjectImporter", ->
 			@v1_project_id = "mock-v1-project-id"
 			@v2_project_id = "mock-v2-project-id"
 			@invite = {
-				id: 54
-				email: "jane@example.com",
-				name: 'Jane'
+				invitee: {
+					id: 54
+					email: "jane@example.com",
+					name: 'Jane'
+				}
 			}
 			@sl_invitee_id = "sl-invitee-id"
 			@UserMapper.getSlIdFromOlUser = sinon.stub()
@@ -464,16 +466,10 @@ describe "ProjectImporter", ->
 			@V1SharelatexApi.request = sinon.stub().yields(null, {}, {tags: ['foo', 'bar']})
 
 		describe 'null checks', ->
-			it "should require invite.id", (done) ->
-				delete @invite.id
+			it "should require invitee", (done) ->
+				delete @invite.invitee
 				@ProjectImporter._importTokenAccessInvite @v1_project_id, @v2_project_id, @invite, (error) ->
-					error.message.should.equal("expected invite id and email")
-					done()
-
-			it "should require invite.email", (done) ->
-				delete @invite.email
-				@ProjectImporter._importTokenAccessInvite @v1_project_id, @v2_project_id, @invite, (error) ->
-					error.message.should.equal("expected invite id and email")
+					error.message.should.equal("expected invitee")
 					done()
 
 		describe 'imports successfully', ->
@@ -482,7 +478,7 @@ describe "ProjectImporter", ->
 
 			it "should look up the invited user in SL", ->
 				@UserMapper.getSlIdFromOlUser
-					.calledWith(@invite)
+					.calledWith(@invite.invitee)
 					.should.equal true
 
 			it "should add the SL invitee to project", ->

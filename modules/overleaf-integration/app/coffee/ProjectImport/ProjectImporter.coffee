@@ -210,9 +210,9 @@ module.exports = ProjectImporter =
 			}, callback
 
 	_importTokenAccessInvite: (v1_project_id, v2_project_id, invite, callback = (error) ->) ->
-		if !invite.id? or !invite.email?
-			return callback(new Error('expected invite id and email'))
-		UserMapper.getSlIdFromOlUser invite, (error, inviteeUserId) ->
+		if !invite.invitee?
+			return callback(new Error('expected invitee'))
+		UserMapper.getSlIdFromOlUser invite.invitee, (error, inviteeUserId) ->
 			return callback(error) if error?
 			# v1 token-access invites (called UserDocs in v1) are only recorded for
 			# read-write token-accesses, so always grant readAndWriteAccess to v2
