@@ -34,7 +34,7 @@ module.exports = PageController =
 							# subpages should not be loaded without parent slug
 							# for example: /for/_correct_subpage_slug_
 							ErrorController.notFound req, res
-						else if pageData.parentPage.fields?.slug && req.params.parent_slug != pageData.parentPage.fields?.slug
+						else if pageData.parentPage && pageData.parentPage.fields?.slug && req.params.parent_slug != pageData.parentPage.fields?.slug
 							# subpages should not be loaded with the wrong parent slug
 							# for example: /_wrong_path_/_correct_parent_slug/_correct_subpage_slug_
 							ErrorController.notFound req, res
@@ -42,7 +42,7 @@ module.exports = PageController =
 							if pageData.content
 								ContentParser.parseArray(pageData.content)
 
-						CmsHandler.render(res, 'page/page', pageData, req.query)
+							CmsHandler.render(res, 'page/page', pageData, req.query)
 				.catch (err) ->
 					next(err)
 		else
