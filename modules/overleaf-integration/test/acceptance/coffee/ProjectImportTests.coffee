@@ -350,9 +350,11 @@ describe "ProjectImportTests", ->
 			MockOverleafApi.setDoc Object.assign({ id: @ol_project_id }, BLANK_PROJECT, {
 				general_access: 'read_write',
 				token_access_invites: [{
-					id: @tokenAccessInvitee.v1Id,
-					email: @tokenAccessInvitee.email,
-					name: 'Token based invitee'
+					invitee: {
+						id: @tokenAccessInvitee.v1Id,
+						email: @tokenAccessInvitee.email,
+						name: 'Token based invitee'
+					}
 				}]
 			})
 
