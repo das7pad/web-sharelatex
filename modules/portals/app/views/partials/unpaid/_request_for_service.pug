@@ -21,7 +21,7 @@
 
 				li
 					+linkEducation('Provide faculty')
-					| &nbsp;with a LaTeX solution that they can use for interactive demonstrations during class and templated assignments for their students, which can be opened and edited securely online. Faculty admin tools allow for easy assignment distribution, commenting and collection.
+					| &nbsp;with a LaTeX solution that they can use for interactive demonstrations during class and templated assignments for their students, which can be opened and edited securely online.
 
 				li Use #{settings.appName} as a&nbsp;
 					+linkUniversities('thesis writing submission and review platform')
@@ -35,16 +35,16 @@
 					strong institutional portal&nbsp;
 					| on #{settings.appName} that includes helpful templates, resources and links – examples of customized #{settings.appName} institutional portals can be seen here:
 
-			hr
-			.text-center
+			//- hr
+			//- .text-center
 				h4 #{portal.title} members already using #{settings.appName}
 				//- TO DO: metrics <%= render partial: 'portals/show/unpaid/basic_metrics' %>
 
-			div
-				h5 Departments
-				span(id="departments-label") Number of users from #{portal.title} by department
+			//-div
+			//-	h5 Departments
+			//-	span(id="departments-label") Number of users from #{portal.title} by department
 
-				.custom-donut-container.chart-container
+			//-	.custom-donut-container.chart-container
 					//- TO DO: SVG //- <svg id='university-departments-chart' data-url='<%= departments_data_portal_path(@portal.slug) %>'></svg>
 
 			hr
