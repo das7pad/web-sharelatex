@@ -179,3 +179,43 @@ describe "GitBridgeHandler", ->
 					@stream
 				)).to.equal true
 				done()
+
+	describe "_getMigratedFromId", ->
+		beforeEach ->
+
+		describe "with a project not imported from v1", ->
+			beforeEach ->
+				@project = {}
+
+			it "should produce a null id", (done) ->
+				@GitBridgeHandler._getMigratedFromId @project, (err, migratedFromId) =>
+					expect(err).to.not.exist
+					expect(migratedFromId).to.not.exist
+					done()
+
+		describe "with a imported from v1, but with a non-matching token", ->
+			beforeEach ->
+				@project = {
+					overleaf: {id: 1234},
+					tokens: {readAndWrite: "5678abcd"}
+				}
+
+			it "should produce a null id", (done) ->
+				@GitBridgeHandler._getMigratedFromId @project, (err, migratedFromId) =>
+					expect(err).to.not.exist
+					expect(migratedFromId).to.not.exist
+					done()
+
+		describe "with a imported from v1", ->
+			beforeEach ->
+				@project = {
+					overleaf: {id: 1234},
+					tokens: {readAndWrite: "1234aaaabbbbccccdddd"}
+				}
+
+			it "should produce the read-write token as the id", (done) ->
+				@GitBridgeHandler._getMigratedFromId @project, (err, migratedFromId) =>
+					expect(err).to.not.exist
+					expect(migratedFromId).to.exist
+					expect(migratedFromId).to.equal @project.tokens.readAndWrite
+					done()

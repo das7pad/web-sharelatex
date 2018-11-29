@@ -29,9 +29,6 @@ module.exports = GitBridgeHandler =
 						return callback(new Errors.FeatureNotAvailable('Neither user nor project owner has gitBridge feature'))
 					if !user.betaProgram
 						return callback(new Errors.FeatureNotAvailable('User is not in beta program'))
-					if project.overleaf?.id?
-						# TODO: This can return the project successfully once we have a migration strategy
-						return callback(new Errors.FeatureNotAvailable('Project was imported from v1'))
 					if project.overleaf?.history?.id?
 						return callback(null, project)
 					else
@@ -58,9 +55,21 @@ module.exports = GitBridgeHandler =
 				data = {
 					latestVerId: body.version
 					latestVerAt: body.timestamp
-					latestVerBy: (body.v2Authors or [])[0]
+					latestVerBy: (body.v2Authors or [])[0] or "<unknown>"
 				}
-				callback(null, data)
+				GitBridgeHandler._getMigratedFromId project, (err, migratedFromId) ->
+					return callback(err) if err?
+					if migratedFromId?
+						logger.log {projectId, userId, migratedFromId}, "Adding migratedFromId to response"
+						data.migratedFromId = migratedFromId
+					callback(null, data)
+
+	_getMigratedFromId: (project, callback=(err, migratedFromId)->) ->
+		if !project.overleaf?.id? || !project.tokens?.readAndWrite?
+			return callback(null, null)
+		if !project.tokens.readAndWrite.startsWith("#{project.overleaf.id}")
+			return callback(null, null)
+		callback(null, project.tokens.readAndWrite)
 
 	showSnapshot: (userId, projectId, version, callback=(err, data)->) ->
 		GitBridgeHandler._checkAccess userId, projectId, (err, project) ->
