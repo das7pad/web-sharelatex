@@ -40,11 +40,7 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
       position = this.shareJsOffsetToAcePosition(change.op.p)
 
       markerNode = document.createElement('div')
-      markerNode.style.borderBottom = '1px dashed #c5060b'
-      markerNode.style.borderLeft = '1px dotted #c5060b'
-      markerNode.style.width = '100%'
-      markerNode.style.height = '20px'
-      markerNode.style.marginTop = '-20px'
+      markerNode.className = 'track-changes-deleted-marker-callout'
 
       this.cm.addWidget(
         { line: position.row, ch: position.column },
