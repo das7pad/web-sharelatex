@@ -62,23 +62,35 @@ module.exports = ProjectImporter =
 				ProjectImporter._createV2ProjectFromV1Doc v1_project_id, v1_user_id, v2_user_id, doc, callback
 
 	_createV2ProjectFromV1Doc: (v1_project_id, v1_user_id, v2_user_id, doc, callback = (error, v2_project_id) ->) ->
-		async.waterfall [
-			(cb) ->
-				ProjectImporter._initSharelatexProject v2_user_id, doc, cb
-			(v2_project_id, cb) ->
-				ProjectImporter._importV1ProjectDataIntoV2Project v1_project_id, v2_project_id, v1_user_id, v2_user_id, doc, cb
-		], (importError, v2_project_id) ->
-			if importError?
-				logger.err {importError, errorMessage: importError.message, v1_project_id, v1_project_id}, "failed to import project"
-				metrics.inc "project-import.error.total"
-				metrics.inc "project-import.error.#{importError.name}"
-				ProjectImporter._cancelExport v1_project_id, v1_user_id, (cancelError) ->
-					if cancelError?
-						logger.err {cancelError, errorMessage: cancelError.message, v1_project_id, v2_project_id}, "failed to cancel project import"
-					callback(importError)
+		ProjectImporter._checkOwnerIsMigrated doc, (error, v2_owner_id) ->
+			return callback(error) if error?
+
+			async.waterfall [
+				(cb) ->
+					ProjectImporter._initSharelatexProject v2_user_id, v2_owner_id, doc, cb
+				(v2_project_id, cb) ->
+					ProjectImporter._importV1ProjectDataIntoV2Project v1_project_id, v2_project_id, v1_user_id, v2_user_id, doc, cb
+			], (importError, v2_project_id) ->
+				if importError?
+					logger.err {importError, errorMessage: importError.message, v1_project_id, v1_project_id}, "failed to import project"
+					metrics.inc "project-import.error.total"
+					metrics.inc "project-import.error.#{importError.name}"
+					ProjectImporter._cancelExport v1_project_id, v1_user_id, (cancelError) ->
+						if cancelError?
+							logger.err {cancelError, errorMessage: cancelError.message, v1_project_id, v2_project_id}, "failed to cancel project import"
+						callback(importError)
+				else
+					metrics.inc "project-import.success"
+					callback null, v2_project_id
+
+	_checkOwnerIsMigrated: (doc, callback = (error, v2_owner_id) ->) ->
+		UserGetter.getUser { "overleaf.id": doc.owner_id }, { _id: 1 }, (error, v2_owner) ->
+			if error?
+				callback(error)
+			else if !v2_owner?
+				callback(new Error("failed to import because owner is not migrated to v2"))
 			else
-				metrics.inc "project-import.success"
-				callback null, v2_project_id
+				callback(null, v2_owner._id)
 
 	_importV1ProjectDataIntoV2Project: (v1_project_id, v2_project_id, v1_user_id, v2_user_id, doc, callback = (error, v2_project_id) ->) ->
 		async.series [
@@ -116,7 +128,7 @@ module.exports = ProjectImporter =
 			logger.log {v1_project_id, v1_user_id, doc}, "got doc for project from overleaf"
 			return callback(null, doc)
 
-	_initSharelatexProject: (v2_user_id, doc = {}, callback = (err, project) ->) ->
+	_initSharelatexProject: (v2_user_id, v2_owner_id, doc = {}, callback = (err, project) ->) ->
 		if !doc.title? or !doc.id? or !doc.latest_ver_id? or !doc.latex_engine? or !doc.token? or !doc.read_token?
 			return callback(new Error("expected doc title, id, latest_ver_id, latex_engine, token and read_token"))
 		if doc.has_export_records? and doc.has_export_records
@@ -157,7 +169,7 @@ module.exports = ProjectImporter =
 		numericId = doc.token.replace(/a-z/g,'')
 		ProjectDetailsHandler.generateUniqueName v2_user_id, doc.title, [" (#{numericId})"], (error, v2_project_name) ->
 			return callback(error) if error?
-			ProjectCreationHandler.createBlankProject v2_user_id, v2_project_name, attributes, (error, project) ->
+			ProjectCreationHandler.createBlankProject v2_owner_id, v2_project_name, attributes, (error, project) ->
 				return callback(error) if error?
 				return callback(null, project._id)
 

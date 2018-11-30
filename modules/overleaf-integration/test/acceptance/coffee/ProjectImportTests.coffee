@@ -20,8 +20,11 @@ User = require "#{WEB_PATH}/test/acceptance/js/helpers/User"
 {ProjectInvite} = require "#{WEB_PATH}/app/js/models/ProjectInvite"
 {UserStub} = require "#{WEB_PATH}/app/js/models/UserStub"
 
+OWNER_V1_ID = 123
+
 BLANK_PROJECT = {
 	title: "Test Project"
+	owner_id: OWNER_V1_ID
 	latest_ver_id: 1
 	latex_engine: "pdflatex"
 	token: "write_token"
@@ -60,8 +63,7 @@ describe "ProjectImportTests", ->
 		@owner.login (error) =>
 			throw error if error?
 			conditions = { _id: new ObjectId(@owner.id) }
-			@owner_v1_id = 123
-			update = { $set: { 'overleaf.id': @owner_v1_id } }
+			update = { $set: { 'overleaf.id': OWNER_V1_ID } }
 			db.users.update conditions, update, (error) ->
 				throw error if error?
 				mkdirp Settings.path.dumpFolder, done
@@ -148,10 +150,58 @@ describe "ProjectImportTests", ->
 			updates = MockDocUpdaterApi.getProjectStructureUpdates(@project._id).fileUpdates
 			expect(updates.length).to.equal(0)
 
+	describe 'a project with an un-migrated owner', ->
+		before (done) ->
+			# Another user owns the project that we are importing, but is not migrated
+			# to v2
+			@unmigrated_v1_owner_id = 9876
+			@ol_project_id = 1200000
+			MockOverleafApi.setDoc Object.assign(
+				{ id: @ol_project_id },
+				BLANK_PROJECT,
+				{ owner_id: @unmigrated_v1_owner_id }
+			)
+
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+				@response = response
+				done()
+
+		it 'throws an error', ->
+			expect(@response.statusCode).to.equal 501
+
+	describe 'a project with a migrated owner', ->
+		before (done) ->
+			@other_owner_v1_id = 6543
+			@ol_project_id = 1000000
+
+			MockOverleafApi.setDoc Object.assign(
+				{ id: @ol_project_id },
+				BLANK_PROJECT,
+				{ owner_id: @other_owner_v1_id }
+			)
+
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			@other_owner = new User()
+			@other_owner.ensureUserExists (error) =>
+				throw error if error?
+				@other_owner.setV1Id @other_owner_v1_id, (error) =>
+					throw error if error?
+
+					@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+						getProject response, (error, project) =>
+							@project = project
+							done()
+
+		it 'should import a project with the correct owner', ->
+			expect(@project.owner_ref.toString()).to.equal @other_owner._id
+
 	describe 'a project with a brand variation id', ->
 		before (done) ->
 			@ol_project_id = 1
-			stuff = Object.assign(
+			MockOverleafApi.setDoc Object.assign(
 				{ id: @ol_project_id },
 				BLANK_PROJECT,
 				{
@@ -159,7 +209,6 @@ describe "ProjectImportTests", ->
 					brand_variation_id: 123
 				}
 			)
-			MockOverleafApi.setDoc stuff
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 
@@ -196,7 +245,7 @@ describe "ProjectImportTests", ->
 			@collaborator_v1_id = 234
 			@date = new Date()
 			labels = [
-				{ user_id: @owner_v1_id, history_version: 1, comment: 'hello', created_at: @date }
+				{ user_id: OWNER_V1_ID, history_version: 1, comment: 'hello', created_at: @date }
 				{ user_id: @collaborator_v1_id, history_version: 2, comment: 'goodbye', created_at: @date }
 				{ history_version: 3, comment: 'foobar', created_at: @date }
 			]
