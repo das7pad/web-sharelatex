@@ -97,6 +97,26 @@ describe "MetricsController", ->
 
 			done()
 
+	describe 'TemplateMetrics', ->
+		it 'renders the metricsApp template', (done) ->
+			@req = template:
+				id: 123
+				title: 'Template Title'
+			@res = { render: sinon.stub() }
+
+			@MetricsController.templateMetrics(@req, @res)
+
+			@res.render.calledWith(
+				sinon.match('views/metricsApp'), {
+					metricsEndpoint: '/graphs',
+					resourceId: 123,
+					resourceName: 'Template Title',
+					resourceType: 'template',
+				}
+			).should.equal true
+
+			done()
+
 	describe 'analyticsProxy', ->
 		it 'proxies requests to the analytics service', (done) ->
 			@request.get  = sinon.stub().returns(@request)

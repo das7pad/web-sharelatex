@@ -40,6 +40,12 @@ module.exports =
 		)
 
 		webRouter.get(
+			'/metrics/templates/:id/?(:startDate/:endDate)?',
+			UserMembershipAuthorization.requireTemplateAccess,
+			MetricsController.templateMetrics
+		)
+
+		webRouter.get(
 			'/graphs/licences',
 			UserMembershipAuthorization.requireGraphAccess,
 			AnalyticsController.licences
