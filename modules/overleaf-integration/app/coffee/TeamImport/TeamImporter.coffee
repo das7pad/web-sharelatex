@@ -64,7 +64,7 @@ importPendingInvites = (v1Team, v2Team, callback = (error, v1Team, v2Team) ->) -
 		TeamInvitesHandler.importInvite(v2Team, v1Team.name, pendingInvite.email,
 			pendingInvite.code, pendingInvite.updated_at, cb)
 
-	async.map v1Team.pending_invites, importInvite, (error, invites) ->
+	async.mapSeries v1Team.pending_invites, importInvite, (error, invites) ->
 		callback(error, v1Team, v2Team)
 
 importTeamManagers = (v1Team, v2Team, callback = (error, v1Team, v2Team) ->) ->
