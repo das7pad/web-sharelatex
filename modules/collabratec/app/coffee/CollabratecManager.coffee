@@ -103,6 +103,8 @@ module.exports = CollabratecManager =
 		}
 
 		if (project.collabratecUsers?)
+			# if is possible (though unlikely) to have multiple entries with different collabratec
+			# document ids for the same user so use reverse to find the most recently added entry
 			collabratecUser = project.collabratecUsers.reverse().find (collabratecUser) ->
 				return collabratecUser.user_id.toString() == user._id.toString()
 			if (collabratecUser?)

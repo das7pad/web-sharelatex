@@ -105,7 +105,7 @@ module.exports = AuthorizationManager =
 			else
 				return callback null, false
 	
-	canUserAdminProject: (user_id, project_id, token, callback = (error, canAdmin) ->) ->
+	canUserAdminProject: (user_id, project_id, token, callback = (error, canAdmin, becauseSiteAdmin) ->) ->
 		AuthorizationManager.getPrivilegeLevelForProject user_id, project_id, token, (error, privilegeLevel, becausePublic, becauseSiteAdmin) ->
 			return callback(error) if error?
 			return callback null, (privilegeLevel == PrivilegeLevels.OWNER), becauseSiteAdmin
