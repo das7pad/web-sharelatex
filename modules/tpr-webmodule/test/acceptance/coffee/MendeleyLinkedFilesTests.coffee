@@ -62,7 +62,7 @@ describe "MendeleyLinkedFiles", ->
 
 	describe "Getting list of users groups from TPR (Third Party References)", ->
 		beforeEach ->
-			MockTPRApi.reset(groups: [{id: 'abcd', name: 'Test Group'}])
+			MockTPRApi.reset(mendeley: groups: [{id: 'abcd', name: 'Test Group'}])
 
 		it "should get a list of the users mendeley groups", (done) ->
 			@owner.request.get {uri: '/mendeley/groups', json: true}, (err, response, body) =>
@@ -171,7 +171,7 @@ describe "MendeleyLinkedFiles", ->
 
 	describe "Importing bibtex from mendeley group into a linked file", ->
 		before ->
-			MockTPRApi.reset(groups: [{id: 'abcd', name: 'Test Group'}])
+			MockTPRApi.reset(mendeley: groups: [{id: 'abcd', name: 'Test Group'}])
 
 		describe "when the user doesn't have the mendeley feature", ->
 			before ->

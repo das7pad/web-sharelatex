@@ -20,13 +20,18 @@ module.exports = GitBridgeHandler =
 		ProjectGetter.getProjectWithoutDocLines projectId, (err, project) ->
 			return callback(err) if err?
 			_userCanAccess = (u) ->
-				u?.features?.gitBridge && u.isAdmin # Restrict to admins for now
-			UserGetter.getUser project.owner_ref, {features: 1, isAdmin: 1}, (err, owner) ->
+				u?.features?.gitBridge
+			UserGetter.getUser project.owner_ref, {features: 1}, (err, owner) ->
 				return callback(err) if err?
-				UserGetter.getUser userId, {features: 1, isAdmin: 1}, (err, user) ->
+				UserGetter.getUser userId, {features: 1, betaProgram: 1}, (err, user) ->
 					return callback(err) if err?
 					if !(_userCanAccess(owner) || _userCanAccess(user))
-						return callback(new Errors.FeatureNotAvailable('Neither user nor has gitBridge feature'))
+						return callback(new Errors.FeatureNotAvailable('Neither user nor project owner has gitBridge feature'))
+					if !user.betaProgram
+						return callback(new Errors.FeatureNotAvailable('User is not in beta program'))
+					if project.overleaf?.id?
+						# TODO: This can return the project successfully once we have a migration strategy
+						return callback(new Errors.FeatureNotAvailable('Project was imported from v1'))
 					if project.overleaf?.history?.id?
 						return callback(null, project)
 					else
@@ -137,7 +142,7 @@ module.exports = GitBridgeHandler =
 		errorPayload = if err instanceof Errors.OutOfDateError
 				{code: 'outOfDate', message: 'Out of Date'}
 			else if err instanceof Errors.InvalidFileError
-				{code: 'invalidFiles', message: 'Invalid Files'}
+				{code: 'invalidFiles', message: 'Invalid Files', errors: err.errors}
 			else
 				{code: 'error', message: 'Unexpected Error'}
 		logger.log {errorPayload, projectId: project._id},
@@ -151,23 +156,36 @@ module.exports = GitBridgeHandler =
 
 	_prepareSnapshotFiles: (project, snapshot, callback=(err, files)->) ->
 		files = []
+		fileErrors = []
 		for file in (snapshot.files or [])
 			if !file.name?
 				return callback(new Errors.InvalidFileError("file object has no name"))
 			name = file.name
 			if !EditorHttpController._nameIsAcceptableLength(name)
-				err = new Errors.InvalidFileError("file name is not acceptible length: #{name}")
-				logger.err {err, projectId: project._id}, "[GitBridgeHandler] #{err.message}"
-				return callback(err)
+				logger.log {projectId: project._id, file}, '[GitBridgeHandler] invalid file length'
+				fileErrors.push({
+					file: file.name,
+					state: 'error'
+				})
+				continue
 			if !SafePath.isCleanPath(name)
-				err = new Errors.InvalidFileError("file name invalid: #{name}")
-				logger.err {err, projectId: project._id}, "[GitBridgeHandler] #{err.message}"
-				return callback(err)
+				logger.log {projectId: project._id, file}, '[GitBridgeHandler] invalid file name'
+				fileErrors.push({
+					file: file.name,
+					state: 'error'
+				})
+				continue
 			newFile = {name: name}
 			if file.url?
 				newFile.url = url.parse(file.url).format()
 			files.push(newFile)
-		callback(null, files)
+		if fileErrors.length > 0
+			err = new Errors.InvalidFileError()
+			err.errors = fileErrors
+			logger.err {err, errors: err.errors, projectId: project._id}, "[GitBridgeHandler] invalid files"
+			return callback(err)
+		else
+			callback(null, files)
 
 	_prepareEntityOperations: (project, snapshotFiles, callback=(err, operations)->) ->
 		deleteEntities = []

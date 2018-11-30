@@ -64,7 +64,7 @@ module.exports = OverleafAuthenticationController =
 
 	saveRedir: (req, res, next) ->
 		if req.query.redir?
-			AuthenticationController._setRedirectInSession(req, req.query.redir)
+			AuthenticationController.setRedirectInSession(req, req.query.redir)
 		next()
 
 	welcomeScreen: (req, res, next) ->
@@ -165,7 +165,7 @@ module.exports = OverleafAuthenticationController =
 				CollabratecController._completeOauthLink req, user, (err, linked) ->
 					return callback err if err?
 					if Settings.createV1AccountOnLogin and !linked
-						AuthenticationController._setRedirectInSession(req, '/login/sharelatex/finish?had_v1_account')
+						AuthenticationController.setRedirectInSession(req, '/login/sharelatex/finish?had_v1_account')
 					AuthenticationController.finishLogin(user, req, res, next)
 
 	_badToken: (res, error) ->

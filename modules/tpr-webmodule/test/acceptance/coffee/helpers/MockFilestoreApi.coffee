@@ -14,13 +14,18 @@ module.exports = MockFileStoreApi =
 	run: () ->
 		app.post "/project/:project_id/file/:file_id", (req, res, next) =>
 			{project_id, file_id} = req.params
-			@addFile project_id, file_id, req
-			res.send 200
+			data = ""
+			req.resume()
+			req.on 'data', (chunk) ->
+				data += chunk.toString()
+			req.on 'end', () =>
+				@addFile project_id, file_id, data
+				res.send 200
 
 		app.get "/project/:project_id/file/:file_id", (req, res, next) =>
 			{project_id, file_id} = req.params
-			file = @getFile project_id, file_id
-			file.pipe(res)
+			data = @getFile project_id, file_id
+			res.send data
 
 		app.listen 3009, (error) ->
 			throw error if error?

@@ -9,6 +9,11 @@ module.exports = CollabratecController =
 			return next err if err?
 			res.status(201).json(result)
 
+	deleteProject: (req, res, next) ->
+		CollabratecManager.deleteProject req.params.project_id, (err) ->
+			return next err if err?
+			res.sendStatus(204)
+
 	getProjects: (req, res, next) ->
 		page = parseInt(req.query.page) || 1
 		page_size = parseInt(req.query.page_size) || 30

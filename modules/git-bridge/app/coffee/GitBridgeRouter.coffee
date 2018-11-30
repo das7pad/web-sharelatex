@@ -1,7 +1,7 @@
 logger = require 'logger-sharelatex'
 GitBridgeController = require './GitBridgeController'
 AuthenticationController = require '../../../../app/js/Features/Authentication/AuthenticationController'
-AuthorizationMiddlewear = require '../../../../app/js/Features/Authorization/AuthorizationMiddlewear'
+GitBridgeAuthorizationMiddleware = require './GitBridgeAuthorizationMiddleware'
 httpProxy = require 'express-http-proxy'
 URL = require 'url'
 
@@ -12,24 +12,20 @@ module.exports = GitBridgeRouter =
 
 		publicApiRouter.get  '/api/v0/docs/:project_id',
 			AuthenticationController.requireOauth(),
-			AuthorizationMiddlewear.ensureUserCanReadProject,
-			AuthorizationMiddlewear.ensureUserIsSiteAdmin,  # Temporary
+			GitBridgeAuthorizationMiddleware.ensureUserCanReadProject,
 			GitBridgeController.getLatestProjectVersion
 
 		publicApiRouter.get  '/api/v0/docs/:project_id/saved_vers',
 			AuthenticationController.requireOauth(),
-			AuthorizationMiddlewear.ensureUserCanReadProject,
-			AuthorizationMiddlewear.ensureUserIsSiteAdmin,  # Temporary
+			GitBridgeAuthorizationMiddleware.ensureUserCanReadProject,
 			GitBridgeController.showSavedVers
 
 		publicApiRouter.get  '/api/v0/docs/:project_id/snapshots/:version',
 			AuthenticationController.requireOauth(),
-			AuthorizationMiddlewear.ensureUserCanReadProject,
-			AuthorizationMiddlewear.ensureUserIsSiteAdmin,  # Temporary
+			GitBridgeAuthorizationMiddleware.ensureUserCanReadProject,
 			GitBridgeController.showSnapshot
 
 		publicApiRouter.post '/api/v0/docs/:project_id/snapshots',
 			AuthenticationController.requireOauth(),
-			AuthorizationMiddlewear.ensureUserCanWriteProjectContent,
-			AuthorizationMiddlewear.ensureUserIsSiteAdmin,  # Temporary
+			GitBridgeAuthorizationMiddleware.ensureUserCanWriteProjectContent,
 			GitBridgeController.applySnapshot
