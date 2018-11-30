@@ -42,7 +42,7 @@ script(type="text/ng-template", id="historyLabelTpl")
 			tooltip-enable="$ctrl.showTooltip"
 		)
 			i.fa.fa-tag
-			| &nbsp;{{ $ctrl.isPseudoCurrentStateLabel ? '#{translate("history_label_project_current_state")}' : $ctrl.labelText }}
+			| &nbsp;{{ ::$ctrl.isPseudoCurrentStateLabel ? '#{translate("history_label_project_current_state")}' : $ctrl.labelText }}
 		button.history-label-delete-btn(
 			ng-if="$ctrl.isOwnedByCurrentUser && !$ctrl.isPseudoCurrentStateLabel"
 			stop-propagation="click"

@@ -19,6 +19,10 @@ aside.file-tree.file-tree-history.full-size(
 
 	.file-tree-inner
 		ul.list-unstyled.file-tree-list
+			li(ng-if="history.loading")
+				.loading
+					i.fa.fa-spin.fa-refresh
+					| &nbsp;&nbsp; #{translate("loading")}...
 			li(
 				ng-repeat="(pathname, doc) in history.selection.docs"
 				ng-class="{ 'selected': history.selection.pathname == pathname }"

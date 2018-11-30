@@ -31,6 +31,14 @@ define(['base', 'ide/history/util/displayNameForUser'], function(
         }
       })
 
+      $scope.loadMore = () => ide.historyManager.fetchNextBatchOfUpdates()
+
+      $scope.setHoverFrom = fromV => ide.historyManager.setHoverFrom(fromV)
+
+      $scope.setHoverTo = toV => ide.historyManager.setHoverTo(toV)
+
+      $scope.resetHover = () => ide.historyManager.resetHover()
+
       // This method (and maybe the one below) will be removed soon. User details data will be
       // injected into the history API responses, so we won't need to fetch user data from other
       // local data structures.
