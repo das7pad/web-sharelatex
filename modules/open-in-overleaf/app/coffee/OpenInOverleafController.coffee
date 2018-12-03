@@ -1,10 +1,12 @@
 logger = require('logger-sharelatex')
+path = require('path')
 URL = require('url-parse')
 AuthenticationController = require('../../../../app/js/Features/Authentication/AuthenticationController')
 ProjectCreationHandler = require('../../../../app/js/Features/Project/ProjectCreationHandler')
 ProjectHelper = require('../../../../app/js/Features/Project/ProjectHelper')
 ProjectDetailsHandler = require('../../../../app/js/Features/Project/ProjectDetailsHandler')
 DocumentHelper = require('../../../../app/js/Features/Documents/DocumentHelper')
+ProjectUploadManager = require('../../../../app/js/Features/Uploads/ProjectUploadManager')
 Project = require('../../../../app/js/models/Project').Project
 OpenInOverleafHelper = require('./OpenInOverleafHelper')
 
@@ -19,48 +21,56 @@ module.exports = OpenInOverleafController =
 		OpenInOverleafController._populateSnippetFromRequest req, (err, snippet) ->
 			return next(err) if err?
 
-			content = OpenInOverleafHelper.getDocumentLinesFromSnippet(snippet)
+			if snippet.snip?
+				content = OpenInOverleafHelper.getDocumentLinesFromSnippet(snippet)
 
-			projectName = DocumentHelper.getTitleFromTexContent(content) || snippet.defaultTitle
-			ProjectDetailsHandler.generateUniqueName user_id, projectName, (err, projectName) ->
-				return next(err) if err?
-
-				ProjectCreationHandler.createProjectFromSnippet user_id, projectName, content, (err, project) ->
+				projectName = DocumentHelper.getTitleFromTexContent(content) || snippet.defaultTitle
+				ProjectDetailsHandler.generateUniqueName user_id, projectName, (err, projectName) ->
 					return next(err) if err?
 
-					update = {}
+					ProjectCreationHandler.createProjectFromSnippet user_id, projectName, content, (err, project) ->
+						return next(err) if err?
 
-					compiler = ProjectHelper.compilerFromV1Engine(req.body.engine)
-					update.compiler = compiler if compiler?
+						update = {}
 
-					if Object.keys(update).length
-						Project.update {_id: project.id}, update, (err) ->
-							return next(err) if err?
+						compiler = ProjectHelper.compilerFromV1Engine(req.body.engine)
+						update.compiler = compiler if compiler?
+
+						if Object.keys(update).length
+							Project.update {_id: project.id}, update, (err) ->
+								return next(err) if err?
+								OpenInOverleafController._sendResponse(req, res, project)
+						else
 							OpenInOverleafController._sendResponse(req, res, project)
-					else
-						OpenInOverleafController._sendResponse(req, res, project)
+			else if snippet.projectFile?
+				ProjectUploadManager.createProjectFromZipArchive user_id, snippet.defaultTitle, snippet.projectFile, (error, project) ->
+					return next(error) if error
+					OpenInOverleafController._sendResponse(req, res, project)
+			else
+				res.redirect('/')
 
 	_populateSnippetFromRequest: (req, cb = (error, result)->) ->
 		comment = OpenInOverleafController._getMainFileCommentFromSnipRequest(req)
 		OpenInOverleafController._getSnippetContentsFromRequest req, (error, snippet) ->
 			return cb(error) if error?
-			return cb(new Error("Couldn't extract snippet")) unless snippet?
+			return cb(new Error("Couldn't extract snippet")) unless snippet.snip? || snippet.projectFile?
 
-			cb(null, {
-				comment: comment
-				snip: snippet
-				defaultTitle: req.i18n.translate('new_snippet_project')
-			})
+			snippet.comment = comment
+			snippet.defaultTitle = OpenInOverleafController._getDefaultTitleFromSnipRequest(req)
+			cb(null, snippet)
 
-	_getSnippetContentsFromRequest: (req, cb = (error, result)->) ->
+	_getSnippetContentsFromRequest: (req, cb = (error, snippet)->) ->
+		snippet = {}
 		if req.body.snip?
-			return cb(null, req.body.snip)
+			snippet.snip = req.body.snip
+			return cb(null, snippet)
 		else if req.body.encoded_snip?
-			return cb(null, decodeURIComponent(req.body.encoded_snip))
+			snippet.snip = decodeURIComponent(req.body.encoded_snip)
+			return cb(null, snippet)
 		else if req.body.snip_uri?
-			return OpenInOverleafHelper.getSnippetFromUri req.body.snip_uri, cb
-
-		cb(new Error('No snippet in request'))
+			OpenInOverleafHelper.populateSnippetFromUri req.body.snip_uri, snippet, cb
+		else
+			cb(new Error('No snippet in request'))
 
 	_getMainFileCommentFromSnipRequest: (req) ->
 		comment = ''
@@ -84,3 +94,10 @@ module.exports = OpenInOverleafController =
 			res.send(JSON.stringify({redirect: uri}))
 		else
 			res.redirect uri
+
+	_getDefaultTitleFromSnipRequest: (req) ->
+		FILE_EXTENSION_REGEX = /\.[^.]+$/
+		if req.body.snip_uri?
+			return path.basename(req.body.snip_uri).replace(FILE_EXTENSION_REGEX, '')
+
+		return req.i18n.translate('new_snippet_project')

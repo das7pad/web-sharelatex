@@ -65,13 +65,14 @@ snap snap
 		it 'returns the input', ->
 			expect(@OpenInOverleafHelper.normalizeLatexContent(@snippet.snip)).to.equal @snippet.snip
 
-	describe "getSnippetFromUri", ->
+	describe "populateSnippetFromUri", ->
 		beforeEach ->
 			@cb = sinon.stub()
+			@snippet = {}
 
 		describe "when downloading a .tex file", ->
 			beforeEach ->
-				@OpenInOverleafHelper.getSnippetFromUri(@snip_uri, @cb)
+				@OpenInOverleafHelper.populateSnippetFromUri(@snip_uri, @snippet, @cb)
 
 			it "wraps the snippet with the proxy", ->
 				sinon.assert.calledWith(@UrlHelper.wrapUrlWithProxy, @snip_uri)
@@ -85,25 +86,30 @@ snap snap
 			it "reads the file contents", ->
 				sinon.assert.calledWith(@fs.readFile, @tmpfile, {encoding: 'utf8'})
 
-			it "calls the callback with the .tex file contents", ->
-				sinon.assert.calledWith(@cb, null, @snip)
+			it "adds the .tex file contents to the snippet", ->
+				expect(@snippet.snip).to.equal @snip
+
+			it "calls the callback without an error", ->
+				sinon.assert.calledWith(@cb, null)
 
 		describe "when downloading a zip file", ->
 			beforeEach ->
 				mmmagic.Magic::detectFile = sinon.stub().withArgs(@tmpFile).callsArgWith(1, null, 'application/zip')
-				@OpenInOverleafHelper.getSnippetFromUri(@snip_uri, @cb)
+				@OpenInOverleafHelper.populateSnippetFromUri(@snip_uri, @snippet, @cb)
 
 			it "detects the file type", ->
 				sinon.assert.calledWith(mmmagic.Magic::detectFile, @tmpfile)
 
-			it "errors, because we haven't implemented zip files yet", ->
-				# TODO: Add zip file support
-				sinon.assert.calledWith(@cb, new Error())
+			it "adds the filesystem path to the snippet", ->
+				expect(@snippet.projectFile).to.equal @tmpfile
+
+			it "calls the callback without error", ->
+				sinon.assert.calledWith(@cb, null)
 
 		describe "when downloading an incorrect file type", ->
 			beforeEach ->
 				mmmagic.Magic::detectFile = sinon.stub().withArgs(@tmpFile).callsArgWith(1, null, 'image/png')
-				@OpenInOverleafHelper.getSnippetFromUri(@snip_uri, @cb)
+				@OpenInOverleafHelper.populateSnippetFromUri(@snip_uri, {}, @cb)
 
 			it "detects the file type", ->
 				sinon.assert.calledWith(mmmagic.Magic::detectFile, @tmpfile)
