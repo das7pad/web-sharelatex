@@ -492,7 +492,7 @@ describe "ProjectImporter", ->
 
 			it "should request tags for invited user", ->
 				@V1SharelatexApi.request.calledWithMatch(
-					{ url: "#{@settings.apis.v1.url}/api/v1/sharelatex/users/#{@invite.id}/docs/#{@v1_project_id}/export/tags"}
+					{ url: "#{@settings.apis.v1.url}/api/v1/sharelatex/users/#{@invite.invitee.id}/docs/#{@v1_project_id}/export/tags"}
 				).should.equal true
 
 			it "should add tags for user", ->

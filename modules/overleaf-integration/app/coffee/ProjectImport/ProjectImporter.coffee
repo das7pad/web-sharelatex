@@ -219,7 +219,7 @@ module.exports = ProjectImporter =
 			# token-access
 			TokenAccessHandler.addReadAndWriteUserToProject inviteeUserId, v2_project_id, (error) ->
 				return callback(error) if error?
-				ProjectImporter._importInviteTags(v1_project_id, v2_project_id, invite.id, inviteeUserId, callback)
+				ProjectImporter._importInviteTags(v1_project_id, v2_project_id, invite.invitee.id, inviteeUserId, callback)
 
 	_importLabels: (v1_project_id, v2_project_id, v1_user_id, callback = (error) ->) ->
 		ProjectImporter._getLabels v1_project_id, (error, labels) ->
