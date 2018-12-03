@@ -1,9 +1,9 @@
 /* eslint-disable
     camelcase
  */
-define(['ace/ace', 'ide/editor/AceShareJsCodec'], function(
+define(['ace/ace', 'ide/editor/EditorShareJsCodec'], function(
   _ignore,
-  AceShareJsCodec
+  EditorShareJsCodec
 ) {
   const { Range } = ace.require('ace/range')
   class TrackChangesAdapter {
@@ -25,8 +25,8 @@ define(['ace/ace', 'ide/editor/AceShareJsCodec'], function(
     }
 
     onInsertAdded(change) {
-      const start = this.shareJsOffsetToAcePosition(change.op.p)
-      const end = this.shareJsOffsetToAcePosition(
+      const start = this.shareJsOffsetToRowColumn(change.op.p)
+      const end = this.shareJsOffsetToRowColumn(
         change.op.p + change.op.i.length
       )
 
@@ -54,7 +54,7 @@ define(['ace/ace', 'ide/editor/AceShareJsCodec'], function(
     }
 
     onDeleteAdded(change) {
-      const position = this.shareJsOffsetToAcePosition(change.op.p)
+      const position = this.shareJsOffsetToRowColumn(change.op.p)
       const session = this.editor.getSession()
 
       const markerLayer = this.editor.renderer.$markerBack
@@ -110,9 +110,9 @@ define(['ace/ace', 'ide/editor/AceShareJsCodec'], function(
 
     onChangeMoved(change) {
       let end
-      const start = this.shareJsOffsetToAcePosition(change.op.p)
+      const start = this.shareJsOffsetToRowColumn(change.op.p)
       if (change.op.i != null) {
-        end = this.shareJsOffsetToAcePosition(change.op.p + change.op.i.length)
+        end = this.shareJsOffsetToRowColumn(change.op.p + change.op.i.length)
       } else {
         end = start
       }
@@ -122,8 +122,8 @@ define(['ace/ace', 'ide/editor/AceShareJsCodec'], function(
     onCommentAdded(comment) {
       if (this.changeIdToMarkerIdMap[comment.id] == null) {
         // Only create new markers if they don't already exist
-        const start = this.shareJsOffsetToAcePosition(comment.op.p)
-        const end = this.shareJsOffsetToAcePosition(
+        const start = this.shareJsOffsetToRowColumn(comment.op.p)
+        const end = this.shareJsOffsetToRowColumn(
           comment.op.p + comment.op.c.length
         )
         const session = this.editor.getSession()
@@ -150,8 +150,8 @@ define(['ace/ace', 'ide/editor/AceShareJsCodec'], function(
     }
 
     onCommentMoved(comment) {
-      const start = this.shareJsOffsetToAcePosition(comment.op.p)
-      const end = this.shareJsOffsetToAcePosition(
+      const start = this.shareJsOffsetToRowColumn(comment.op.p)
+      const end = this.shareJsOffsetToRowColumn(
         comment.op.p + comment.op.c.length
       )
       this.updateMarker(comment.id, start, end)
@@ -196,12 +196,12 @@ define(['ace/ace', 'ide/editor/AceShareJsCodec'], function(
       }
     }
 
-    shareJsOffsetToAcePosition(offset) {
+    shareJsOffsetToRowColumn(offset) {
       const lines = this.editor
         .getSession()
         .getDocument()
         .getAllLines()
-      return AceShareJsCodec.shareJsOffsetToAcePosition(offset, lines)
+      return EditorShareJsCodec.shareJsOffsetToRowColumn(offset, lines)
     }
 
     createCalloutMarker(position, klass) {

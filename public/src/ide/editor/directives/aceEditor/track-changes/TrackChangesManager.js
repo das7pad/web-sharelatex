@@ -5,8 +5,8 @@ define([
   'ace/ace',
   'utils/EventEmitter',
   'ide/colors/ColorManager',
-  'ide/editor/AceShareJsCodec'
-], function(_ignore, EventEmitter, ColorManager, AceShareJsCodec) {
+  'ide/editor/EditorShareJsCodec'
+], function(_ignore, EventEmitter, ColorManager, EditorShareJsCodec) {
   const { Range } = ace.require('ace/range')
   class TrackChangesManager {
     constructor($scope, editor, element, adapter) {
@@ -267,8 +267,8 @@ define([
     }
 
     addCommentToSelection(thread_id, offset, length) {
-      const start = this.adapter.shareJsOffsetToAcePosition(offset)
-      const end = this.adapter.shareJsOffsetToAcePosition(offset + length)
+      const start = this.adapter.shareJsOffsetToRowColumn(offset)
+      const end = this.adapter.shareJsOffsetToRowColumn(offset + length)
       const range = new Range(start.row, start.column, end.row, end.column)
       const content = this.editor.session.getTextRange(range)
       this.addComment(offset, content, thread_id)
@@ -354,13 +354,13 @@ define([
       for (let change of Array.from(changes)) {
         if (change.op.d != null) {
           const content = change.op.d
-          const position = this.adapter.shareJsOffsetToAcePosition(change.op.p)
+          const position = this.adapter.shareJsOffsetToRowColumn(change.op.p)
           session.$fromReject = true // Tell track changes to cancel out delete
           session.insert(position, content)
           session.$fromReject = false
         } else if (change.op.i != null) {
-          const start = this.adapter.shareJsOffsetToAcePosition(change.op.p)
-          const end = this.adapter.shareJsOffsetToAcePosition(
+          const start = this.adapter.shareJsOffsetToRowColumn(change.op.p)
+          const end = this.adapter.shareJsOffsetToRowColumn(
             change.op.p + change.op.i.length
           )
           const editor_text = session.getDocument().getTextRange({ start, end })
@@ -429,8 +429,8 @@ define([
     onCut() {
       this._resetCutState()
       const selection = this.editor.getSelectionRange()
-      const selection_start = this._aceRangeToShareJs(selection.start)
-      const selection_end = this._aceRangeToShareJs(selection.end)
+      const selection_start = this._rangeToShareJs(selection.start)
+      const selection_end = this._rangeToShareJs(selection.end)
       this._cutState.text = this.editor.getSelectedText()
       this._cutState.docId = this.$scope.docId
       return (() => {
@@ -463,7 +463,7 @@ define([
           return
         }
         const pasted_text = change.lines.join('\n')
-        const paste_offset = this._aceRangeToShareJs(change.start)
+        const paste_offset = this._rangeToShareJs(change.start)
         // We have to wait until the change has been processed by the range tracker,
         // since if we move the ops into place beforehand, they will be moved again
         // when the changes are processed by the range tracker. This ranges:dirty
@@ -509,9 +509,9 @@ define([
             background_marker_id,
             callout_marker_id
           } = this.adapter.changeIdToMarkerIdMap[change.id])
-          start = this.adapter.shareJsOffsetToAcePosition(op.p)
+          start = this.adapter.shareJsOffsetToRowColumn(op.p)
           if (op.i != null) {
-            end = this.adapter.shareJsOffsetToAcePosition(op.p + op.i.length)
+            end = this.adapter.shareJsOffsetToRowColumn(op.p + op.i.length)
           } else if (op.d != null) {
             end = start
           }
@@ -534,8 +534,8 @@ define([
             background_marker_id,
             callout_marker_id
           } = this.adapter.changeIdToMarkerIdMap[comment.id])
-          start = this.adapter.shareJsOffsetToAcePosition(comment.op.p)
-          end = this.adapter.shareJsOffsetToAcePosition(
+          start = this.adapter.shareJsOffsetToRowColumn(comment.op.p)
+          end = this.adapter.shareJsOffsetToRowColumn(
             comment.op.p + comment.op.c.length
           )
           expected_markers.push({
@@ -595,9 +595,7 @@ define([
       const object = entries || {}
       for (let entry_id in object) {
         const entry = object[entry_id]
-        const doc_position = this.adapter.shareJsOffsetToAcePosition(
-          entry.offset
-        )
+        const doc_position = this.adapter.shareJsOffsetToRowColumn(entry.offset)
         const screen_position = session.documentToScreenPosition(
           doc_position.row,
           doc_position.column
@@ -647,8 +645,8 @@ define([
 
     updateFocus() {
       const selection = this.editor.getSelectionRange()
-      const selection_start = this._aceRangeToShareJs(selection.start)
-      const selection_end = this._aceRangeToShareJs(selection.end)
+      const selection_start = this._rangeToShareJs(selection.start)
+      const selection_end = this._rangeToShareJs(selection.end)
       const is_selection = selection_start !== selection_end
       this.$scope.$emit(
         'editor:focus:changed',
@@ -658,20 +656,20 @@ define([
       )
     }
 
-    _aceRangeToShareJs(range) {
+    _rangeToShareJs(range) {
       const lines = this.editor
         .getSession()
         .getDocument()
         .getLines(0, range.row)
-      return AceShareJsCodec.aceRangeToShareJs(range, lines)
+      return EditorShareJsCodec.rangeToShareJs(range, lines)
     }
 
-    _aceChangeToShareJs(delta) {
+    _changeToShareJs(delta) {
       const lines = this.editor
         .getSession()
         .getDocument()
         .getLines(0, delta.start.row)
-      return AceShareJsCodec.aceChangeToShareJs(delta, lines)
+      return EditorShareJsCodec.changeToShareJs(delta, lines)
     }
   }
   return TrackChangesManager

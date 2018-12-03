@@ -1,13 +1,11 @@
 /* eslint-disable
     camelcase
  */
-define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
+define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
   class TrackChangesAdapter {
     constructor(editor) {
       this.onInsertAdded = this.onInsertAdded.bind(this)
-      this.shareJsOffsetToAcePosition = this.shareJsOffsetToAcePosition.bind(
-        this
-      )
+      this.shareJsOffsetToRowColumn = this.shareJsOffsetToRowColumn.bind(this)
       this.onDeleteAdded = this.onDeleteAdded.bind(this)
       this.onChangeMoved = this.onChangeMoved.bind(this)
       this.editor = editor
@@ -25,8 +23,8 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
 
     onInsertAdded(change) {
       let start, end, marker
-      start = this.shareJsOffsetToAcePosition(change.op.p)
-      end = this.shareJsOffsetToAcePosition(change.op.p + change.op.i.length)
+      start = this.shareJsOffsetToRowColumn(change.op.p)
+      end = this.shareJsOffsetToRowColumn(change.op.p + change.op.i.length)
       marker = this.cm.doc.markText(
         { line: start.row, ch: start.column },
         { line: end.row, ch: end.column },
@@ -37,7 +35,7 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
 
     onDeleteAdded(change) {
       let position, markerNode
-      position = this.shareJsOffsetToAcePosition(change.op.p)
+      position = this.shareJsOffsetToRowColumn(change.op.p)
 
       markerNode = document.createElement('div')
       markerNode.className = 'track-changes-deleted-marker-callout'
@@ -54,9 +52,9 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
 
     onChangeMoved(change) {
       let end
-      const start = this.shareJsOffsetToAcePosition(change.op.p)
+      const start = this.shareJsOffsetToRowColumn(change.op.p)
       if (change.op.i != null) {
-        end = this.shareJsOffsetToAcePosition(change.op.p + change.op.i.length)
+        end = this.shareJsOffsetToRowColumn(change.op.p + change.op.i.length)
       } else {
         end = start
       }
@@ -118,9 +116,9 @@ define(['ide/editor/AceShareJsCodec'], function(AceShareJsCodec) {
       }
     }
 
-    shareJsOffsetToAcePosition(offset) {
+    shareJsOffsetToRowColumn(offset) {
       const lines = this.cm.doc.getValue().split('\n')
-      return AceShareJsCodec.shareJsOffsetToAcePosition(offset, lines)
+      return EditorShareJsCodec.shareJsOffsetToRowColumn(offset, lines)
     }
   }
   return TrackChangesAdapter
