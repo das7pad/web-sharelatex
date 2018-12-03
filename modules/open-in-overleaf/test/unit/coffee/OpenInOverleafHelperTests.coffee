@@ -27,6 +27,10 @@ describe 'OpenInOverleafHelper', ->
 			'../../../../app/js/Features/Helpers/UrlHelper': @UrlHelper
 			'settings-sharelatex': @settings
 			'fs': @fs
+			'logger-sharelatex':
+				log:->
+				err:->
+
 		@snippet =
 			snip: "snippety snip\nsnap snap"
 			comment: "% commenty comment\n"
