@@ -34,20 +34,20 @@ module.exports = MockOverleafApi =
 	run: () ->
 
 		# Project import routes
-		app.post "/api/v1/sharelatex/docs/:ol_doc_id/export/start", (req, res, next) =>
+		app.post "/api/v1/sharelatex/users/:ol_user_id/docs/:ol_doc_id/export/start", (req, res, next) =>
 			doc = @docs[req.params.ol_doc_id]
 			if doc
 				res.json doc
 			else
 				res.sendStatus 404
 
-		app.post "/api/v1/sharelatex/docs/:ol_doc_id/export/confirm", (req, res, next) =>
+		app.post "/api/v1/sharelatex/users/:ol_user_id/docs/:ol_doc_id/export/confirm", (req, res, next) =>
       res.sendStatus 204
 
-		app.post "/api/v1/sharelatex/docs/:ol_doc_id/export/cancel", (req, res, next) =>
+		app.post "/api/v1/sharelatex/users/:ol_user_id/docs/:ol_doc_id/export/cancel", (req, res, next) =>
       res.sendStatus 204
 
-		app.get "/api/v1/sharelatex/docs/:ol_doc_id/export/history", (req, res, next) =>
+		app.get "/api/v1/sharelatex/users/:ol_user_id/docs/:ol_doc_id/export/history", (req, res, next) =>
 			res.json exported: true
 
 		app.get "/api/v1/sharelatex/users/:ol_user_id/docs/:ol_doc_id/export/tags", (req, res, next) =>

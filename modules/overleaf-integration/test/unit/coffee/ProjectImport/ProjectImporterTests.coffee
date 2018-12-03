@@ -318,7 +318,7 @@ describe "ProjectImporter", ->
 			@V1SharelatexApi.request
 				.calledWith({
 					method: "POST"
-					url: "http://overleaf.example.com/api/v1/sharelatex/docs/#{@v1_project_id}/export/start"
+					url: "http://overleaf.example.com/api/v1/sharelatex/users/#{@v1_user_id}/docs/#{@v1_project_id}/export/start"
 				})
 				.should.equal true
 
@@ -850,7 +850,7 @@ describe "ProjectImporter", ->
 			@V1SharelatexApi.request
 				.calledWith({
 					method: "POST"
-					url: "http://overleaf.example.com/api/v1/sharelatex/docs/#{@v1_project_id}/export/confirm"
+					url: "http://overleaf.example.com/api/v1/sharelatex/users/#{@v1_user_id}/docs/#{@v1_project_id}/export/confirm"
 					json: {
 						doc: { @v2_project_id }
 					}
@@ -869,7 +869,7 @@ describe "ProjectImporter", ->
 			@V1SharelatexApi.request
 				.calledWith({
 					method: "POST"
-					url: "http://overleaf.example.com/api/v1/sharelatex/docs/#{@v1_project_id}/export/cancel"
+					url: "http://overleaf.example.com/api/v1/sharelatex/users/#{@v1_user_id}/docs/#{@v1_project_id}/export/cancel"
 				})
 				.should.equal true
 
