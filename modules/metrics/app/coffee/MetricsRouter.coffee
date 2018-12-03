@@ -1,6 +1,7 @@
 logger = require 'logger-sharelatex'
 MetricsController = require './MetricsController'
 InstitutionHubsController = require './InstitutionHubsController'
+PublisherHubsController = require './PublisherHubsController'
 AnalyticsController = require("../../../../app/js/Features/Analytics/AnalyticsController")
 AuthenticationController = require("../../../../app/js/Features/Authentication/AuthenticationController")
 AuthorizationMiddlewear = require('../../../../app/js/Features/Authorization/AuthorizationMiddlewear')
@@ -79,6 +80,12 @@ module.exports =
 			'/institutions/:id/roles',
 			UserMembershipAuthorization.requireInstitutionAccess,
 			InstitutionHubsController.institutionRoles
+		)
+
+		webRouter.get(
+			'/publishers/:id/hub',
+			UserMembershipAuthorization.requirePublisherAccess,
+			PublisherHubsController.publisherHub
 		)
 
 		privateApiRouter.get(
