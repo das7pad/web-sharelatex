@@ -146,6 +146,7 @@ module.exports = HistoryController =
 
 	downloadZipOfVersion: (req, res, next) ->
 		{project_id, version} = req.params
+		logger.log {project_id, version}, "got request for zip file at version"
 		ProjectDetailsHandler.getDetails project_id, (err, project) ->
 			return next(err) if err?
 			v1_id = project.overleaf?.history?.id
@@ -153,9 +154,10 @@ module.exports = HistoryController =
 				logger.err {project_id, version}, 'got request for zip version of non-v1 history project'
 				return res.sendStatus(402)
 
-			logger.log {project_id, v1_id, version}, "proxying to history api"
+			url = "#{settings.apis.v1_history.url}/projects/#{v1_id}/version/#{version}/zip"
+			logger.log {project_id, v1_id, version, url}, "proxying to history api"
 			getReq = request(
-				url: "#{settings.apis.v1_history.url}/projects/#{v1_id}/version/#{version}/zip"
+				url: url
 				auth:
 					user: settings.apis.v1_history.user
 					pass: settings.apis.v1_history.pass
@@ -167,7 +169,7 @@ module.exports = HistoryController =
 				delete response.headers['content-type']
 				res.status response.statusCode
 				res.setContentDisposition(
-					'inline',
+					'attachment',
 					{filename: "#{project.name} (Version #{version}).zip"}
 				)
 				res.contentType('application/zip')
