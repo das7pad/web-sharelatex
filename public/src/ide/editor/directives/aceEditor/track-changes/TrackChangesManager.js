@@ -84,7 +84,7 @@ define([
     }
 
     onChangeSession(e) {
-      this.adapter.clearAnnotations()
+      this.clearAnnotations()
       this.redrawAnnotations()
 
       if (this.editor) {
@@ -129,7 +129,7 @@ define([
         this.updateAnnotations()
       })
       doc.on('ranges:clear', () => {
-        this.adapter.clearAnnotations()
+        this.clearAnnotations()
       })
       doc.on('ranges:redraw', () => {
         this.redrawAnnotations()
@@ -144,15 +144,19 @@ define([
 
     setTrackChanges(value) {
       if (value) {
-        return this.$scope.sharejsDoc != null
-          ? (this.$scope.sharejsDoc.track_changes_as =
-              window.user.id || 'anonymous')
-          : undefined
+        if (this.$scope.sharejsDoc != null) {
+          this.$scope.sharejsDoc.track_changes_as =
+            window.user.id || 'anonymous'
+        }
       } else {
-        return this.$scope.sharejsDoc != null
-          ? (this.$scope.sharejsDoc.track_changes_as = null)
-          : undefined
+        if (this.$scope.sharejsDoc != null) {
+          this.$scope.sharejsDoc.track_changes_as = null
+        }
       }
+    }
+
+    clearAnnotations() {
+      this.adapter.clearAnnotations()
     }
 
     redrawAnnotations() {
