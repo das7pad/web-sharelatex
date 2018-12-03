@@ -138,6 +138,7 @@ describe "TeamImporter", ->
 				expect(v2Team.membersLimit).to.eq 32
 				expect(v2Team.admin_id).to.eq @teamAdmin.id
 				expect(v2Team.manager_ids).to.deep.eq [@teamAdmin.id]
+				expect(v2Team.customAccount).to.eq true
 
 				@UserMapper.getSlIdFromOlUser.calledWith(
 					sinon.match.has("id", @v1Team.owner.id)
