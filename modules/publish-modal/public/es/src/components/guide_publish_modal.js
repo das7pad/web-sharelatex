@@ -4,6 +4,7 @@ import ExportGuide from './export_guide'
 import EmisExport from './emis_export'
 import GalleryExport from './gallery_export'
 import ScholarOneExport from './scholar_one_export'
+import F1000Export from './f1000_export'
 import { findEntryInCategories } from '../utils.js'
 
 export default class GuidePublishModal extends Component {
@@ -64,6 +65,17 @@ export default class GuidePublishModal extends Component {
           <ScholarOneExport
             onReturn={onReturn}
             entry={entry}
+            returnText={returnText}
+            projectId={initParams.projectId}
+          />
+        )
+      }
+      if (entry.partner === 'f1000' || entry.partner === 'wellcome_trust') {
+        return (
+          <F1000Export
+            onReturn={onReturn}
+            partnerName={entry.name}
+            partnerContactURL={entry.home_url + '/contact'} // works; not ideal
             returnText={returnText}
             projectId={initParams.projectId}
           />

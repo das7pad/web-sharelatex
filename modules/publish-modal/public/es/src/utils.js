@@ -69,7 +69,19 @@ function pollExportStatus(exportId, projectId, _this, timeout) {
       } else if (status.status_summary === 'succeeded') {
         _this.setState({
           exportState: 'complete',
+          // for ScholarOne
           partner_submission_id: status.partner_submission_id,
+          // for F1000/Wellcome
+          authorEmail: status.v2_user_email,
+          authorName: [
+            status.v2_user_first_name,
+            status.v2_user_last_name
+          ].join(' '),
+          title: status.title,
+          articleZipURL: link + '/zip',
+          pdfURL: link + '/pdf',
+          revisionURL: '', // TODO: agree on this with F1000
+          // general-purpose
           token: status.token
         })
       } else {
