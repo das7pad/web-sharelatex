@@ -168,11 +168,12 @@ define([
         }
       }
 
-      // Ignore comments for rich text for now
-      if (this.editor) {
-        Array.from(this.rangesTracker.comments).map(comment =>
-          this.onCommentAdded(comment)
-        )
+      if (this.adapter.onCommentAdded) {
+        Array.from(this.rangesTracker.comments).map(comment => {
+          if (!this.isCommentResolved(comment)) {
+            this.adapter.onCommentAdded(comment)
+          }
+        })
       }
 
       this.broadcastChange()
@@ -227,16 +228,22 @@ define([
 
       for (id in dirty.comment.added) {
         comment = dirty.comment.added[id]
-        this.onCommentAdded(comment)
+        if (this.adapter.onCommentAdded && !this.isCommentResolved(comment)) {
+          this.adapter.onCommentAdded(comment)
+        }
       }
       for (id in dirty.comment.removed) {
         comment = dirty.comment.removed[id]
-        this._onCommentRemoved(comment)
+        if (this.adapter.onCommentRemoved && !this.isCommentResolved(comment)) {
+          this.adapter.onCommentRemoved(comment)
+        }
       }
       for (id in dirty.comment.moved) {
         comment = dirty.comment.moved[id]
-        updateMarkers = true
-        this._onCommentMoved(comment)
+        if (this.adapter.onCommentMoved && !this.isCommentResolved(comment)) {
+          updateMarkers = true
+          this.adapter.onCommentMoved(comment)
+        }
       }
 
       /**
@@ -265,6 +272,10 @@ define([
       const range = new Range(start.row, start.column, end.row, end.column)
       const content = this.editor.session.getTextRange(range)
       this.addComment(offset, content, thread_id)
+    }
+
+    isCommentResolved(comment) {
+      return this.rangesTracker.resolvedThreadIds[comment.op.t]
     }
 
     selectLineIfNoSelection() {
@@ -386,7 +397,7 @@ define([
           : undefined) || []
       )) {
         if (resolve_ids[comment.op.t]) {
-          this._onCommentRemoved(comment)
+          this.adapter.onCommentRemoved(comment)
         }
       }
       return this.broadcastChange()
@@ -398,8 +409,10 @@ define([
           ? this.rangesTracker.comments
           : undefined) || []
       )) {
-        if (comment.op.t === thread_id) {
-          this.onCommentAdded(comment)
+        if (comment.op.t === thread_id && !this.isCommentResolved(comment)) {
+          if (this.adapter.onCommentAdded) {
+            this.adapter.onCommentAdded(comment)
+          }
         }
       }
       return this.broadcastChange()
@@ -645,55 +658,6 @@ define([
       )
     }
 
-    onCommentAdded(comment) {
-      if (this.rangesTracker.resolvedThreadIds[comment.op.t]) {
-        // Comment is resolved so shouldn't be displayed.
-        return
-      }
-      if (this.adapter.changeIdToMarkerIdMap[comment.id] == null) {
-        // Only create new markers if they don't already exist
-        const start = this.adapter.shareJsOffsetToAcePosition(comment.op.p)
-        const end = this.adapter.shareJsOffsetToAcePosition(
-          comment.op.p + comment.op.c.length
-        )
-        const session = this.editor.getSession()
-        const doc = session.getDocument()
-        const background_range = new Range(
-          start.row,
-          start.column,
-          end.row,
-          end.column
-        )
-        const background_marker_id = session.addMarker(
-          background_range,
-          'track-changes-marker track-changes-comment-marker',
-          'text'
-        )
-        const callout_marker_id = this.adapter.createCalloutMarker(
-          start,
-          'track-changes-comment-marker-callout'
-        )
-        this.adapter.changeIdToMarkerIdMap[comment.id] = {
-          background_marker_id,
-          callout_marker_id
-        }
-      }
-    }
-
-    _onCommentRemoved(comment) {
-      if (this.adapter.changeIdToMarkerIdMap[comment.id] != null) {
-        // Resolved comments may not have marker ids
-        const {
-          background_marker_id,
-          callout_marker_id
-        } = this.adapter.changeIdToMarkerIdMap[comment.id]
-        delete this.adapter.changeIdToMarkerIdMap[comment.id]
-        const session = this.editor.getSession()
-        session.removeMarker(background_marker_id)
-        session.removeMarker(callout_marker_id)
-      }
-    }
-
     _aceRangeToShareJs(range) {
       const lines = this.editor
         .getSession()
@@ -708,14 +672,6 @@ define([
         .getDocument()
         .getLines(0, delta.start.row)
       return AceShareJsCodec.aceChangeToShareJs(delta, lines)
-    }
-
-    _onCommentMoved(comment) {
-      const start = this.adapter.shareJsOffsetToAcePosition(comment.op.p)
-      const end = this.adapter.shareJsOffsetToAcePosition(
-        comment.op.p + comment.op.c.length
-      )
-      this.adapter.updateMarker(comment.id, start, end)
     }
   }
   return TrackChangesManager

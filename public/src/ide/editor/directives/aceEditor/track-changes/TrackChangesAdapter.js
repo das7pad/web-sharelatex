@@ -119,6 +119,58 @@ define(['ace/ace', 'ide/editor/AceShareJsCodec'], function(
       this.updateMarker(change.id, start, end)
     }
 
+    onCommentAdded(comment) {
+      if (this.changeIdToMarkerIdMap[comment.id] == null) {
+        // Only create new markers if they don't already exist
+        const start = this.shareJsOffsetToAcePosition(comment.op.p)
+        const end = this.shareJsOffsetToAcePosition(
+          comment.op.p + comment.op.c.length
+        )
+        const session = this.editor.getSession()
+        const background_range = new Range(
+          start.row,
+          start.column,
+          end.row,
+          end.column
+        )
+        const background_marker_id = session.addMarker(
+          background_range,
+          'track-changes-marker track-changes-comment-marker',
+          'text'
+        )
+        const callout_marker_id = this.createCalloutMarker(
+          start,
+          'track-changes-comment-marker-callout'
+        )
+        this.changeIdToMarkerIdMap[comment.id] = {
+          background_marker_id,
+          callout_marker_id
+        }
+      }
+    }
+
+    onCommentMoved(comment) {
+      const start = this.shareJsOffsetToAcePosition(comment.op.p)
+      const end = this.shareJsOffsetToAcePosition(
+        comment.op.p + comment.op.c.length
+      )
+      this.updateMarker(comment.id, start, end)
+    }
+
+    onCommentRemoved(comment) {
+      if (this.changeIdToMarkerIdMap[comment.id] != null) {
+        // Resolved comments may not have marker ids
+        const {
+          background_marker_id,
+          callout_marker_id
+        } = this.changeIdToMarkerIdMap[comment.id]
+        delete this.changeIdToMarkerIdMap[comment.id]
+        const session = this.editor.getSession()
+        session.removeMarker(background_marker_id)
+        session.removeMarker(callout_marker_id)
+      }
+    }
+
     updateMarker(change_id, start, end) {
       if (this.changeIdToMarkerIdMap[change_id] == null) {
         return
