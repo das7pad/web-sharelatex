@@ -11,6 +11,19 @@ PrivilegeLevels = require "../../../../../../app/js/Features/Authorization/Privi
 
 describe "ProjectImporter", ->
 	beforeEach ->
+		@DocModel = class Doc
+			constructor:(options)->
+				{@name, @lines} = options
+				@_id = "mock-doc-id"
+				@rev = 0
+		@FileModel = class File
+			constructor:(options)->
+				{@name} = options
+				@_id = "mock-file-id"
+				@rev = 0
+				if options.linkedFileData?
+					@linkedFileData = options.linkedFileData
+
 		@ProjectImporter = SandboxedModule.require modulePath, requires:
 			"../../../../../app/js/Features/Project/ProjectCreationHandler": @ProjectCreationHandler = {}
 			"../../../../../app/js/Features/Project/ProjectDetailsHandler": @ProjectDetailsHandler = {}
@@ -21,8 +34,11 @@ describe "ProjectImporter", ->
 			"../../../../../app/js/Features/TokenAccess/TokenAccessHandler": @TokenAccessHandler = {}
 			"../../../../../app/js/Features/Authorization/PrivilegeLevels": PrivilegeLevels
 			"../../../../../app/js/Features/User/UserGetter": @UserGetter = {}
-			"../../../../../app/js/Features/Tags/TagsHandler": @TagsHandler =
-				addProjectToTagName: sinon.stub().yields()
+			"../../../../../app/js/Features/Tags/TagsHandler": @TagsHandler = {addProjectToTagName: sinon.stub().yields()}
+			'../../../../../app/js/models/Doc': Doc:@DocModel
+			'../../../../../app/js/Features/Docstore/DocstoreManager': @DocstoreManager = {}
+			'../../../../../app/js/models/File': File:@FileModel
+			'../../../../../app/js/Features/FileStore/FileStoreHandler': @FileStoreHandler = {}
 			"../V1SharelatexApi": @V1SharelatexApi = {}
 			"../OverleafUsers/UserMapper": @UserMapper = {}
 			"logger-sharelatex": { log: sinon.stub(), warn: sinon.stub(), err: sinon.stub() }
@@ -571,14 +587,16 @@ describe "ProjectImporter", ->
 					@sl_invitee_id, "bar", @v2_project_id
 				).should.equal true
 
-	describe "_importFile", ->
+	describe "_importFiles", ->
 		beforeEach ->
 			@project_id = "mock-project-id"
 			@user_id = "mock-user-id"
 			@doc = { _id: @doc_id = "mock-doc-id" }
+			@DocstoreManager.updateDoc = sinon.stub().yields(null)
+			@FileStoreHandler.uploadFileFromDisk = sinon.stub().yields(null, "filestore-url")
 			@ProjectEntityUpdateHandler.mkdirp = sinon.stub().yields(null, [], { _id: @folder_id = "mock-folder-id" })
-			@ProjectEntityUpdateHandler.addDocWithoutUpdatingHistory = sinon.stub().yields(null, @doc)
-			@ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory = sinon.stub().yields()
+			@ProjectEntityUpdateHandler._addDocAndSendToTpds = sinon.stub().yields()
+			@ProjectEntityUpdateHandler._addFileAndSendToTpds = sinon.stub().yields()
 			@ProjectEntityUpdateHandler.setRootDoc = sinon.stub().yields()
 
 		describe "with a src file", ->
@@ -588,17 +606,24 @@ describe "ProjectImporter", ->
 					latest_content: "chapter 1 content"
 					type: "src"
 				}
-				@ProjectImporter._importFile @project_id, @user_id, @file, done
+				@ProjectImporter._importFiles @project_id, @user_id, [@file], done
 
 			it "should create the file's folder", ->
 				@ProjectEntityUpdateHandler.mkdirp
 					.calledWith(@project_id, "/folder")
 					.should.equal true
 
-			it "should add the doc to the project", ->
-				@ProjectEntityUpdateHandler.addDocWithoutUpdatingHistory
+			it "should store the doc in the docstore", ->
+				@DocstoreManager.updateDoc
 					.calledWith(
-						@project_id, @folder_id, "chapter1.tex", ["chapter 1 content"], @user_id
+						@project_id, 'mock-doc-id', ['chapter 1 content']
+					)
+					.should.equal true
+
+			it "should add the doc to the project", ->
+				@ProjectEntityUpdateHandler._addDocAndSendToTpds
+					.calledWith(
+						@project_id, @folder_id, sinon.match({name: "chapter1.tex"})
 					)
 					.should.equal true
 
@@ -614,7 +639,7 @@ describe "ProjectImporter", ->
 					type: "src"
 					main: true
 				}
-				@ProjectImporter._importFile @project_id, @user_id, @file, done
+				@ProjectImporter._importFiles @project_id, @user_id, [@file], done
 
 			it "should create the file's folder", ->
 				@ProjectEntityUpdateHandler.mkdirp
@@ -634,7 +659,7 @@ describe "ProjectImporter", ->
 					type: "att"
 				}
 				@ProjectImporter._writeS3ObjectToDisk = sinon.stub().yields(null, "path/on/disk")
-				@ProjectImporter._importFile @project_id, @user_id, @file, done
+				@ProjectImporter._importFiles @project_id, @user_id, [@file], done
 
 			it "should create the file's folder", ->
 				@ProjectEntityUpdateHandler.mkdirp
@@ -646,10 +671,15 @@ describe "ProjectImporter", ->
 					.calledWith("s3/image.jpeg")
 					.should.equal true
 
+			it "should store the file in the filestore", ->
+				@FileStoreHandler.uploadFileFromDisk
+					.calledWith(@project_id, "mock-file-id", "path/on/disk")
+					.should.equal true
+
 			it "should add the file to the project", ->
-				@ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory
+				@ProjectEntityUpdateHandler._addFileAndSendToTpds
 					.calledWith(
-						@project_id, @folder_id, "image.jpeg", "path/on/disk", null, @user_id
+						@project_id, @folder_id, sinon.match({name: "image.jpeg"})
 					)
 					.should.equal true
 
@@ -667,7 +697,7 @@ describe "ProjectImporter", ->
 						source_doc_display_name: 'Test Project'
 				}
 				@ProjectImporter._writeS3ObjectToDisk = sinon.stub().yields(null, "path/on/disk")
-				@ProjectImporter._importFile @project_id, @user_id, @file, done
+				@ProjectImporter._importFiles @project_id, @user_id, [@file], done
 
 			it "should create the file's folder", ->
 				@ProjectEntityUpdateHandler.mkdirp
@@ -685,9 +715,9 @@ describe "ProjectImporter", ->
 					v1_source_doc_id: 234
 					source_entity_path: '/a',
 				}
-				@ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory
+				@ProjectEntityUpdateHandler._addFileAndSendToTpds
 					.calledWith(
-						@project_id, @folder_id, "image.jpeg", "path/on/disk", linkedFileData, @user_id
+						@project_id, @folder_id, sinon.match.has("name", "image.jpeg").and(sinon.match.has("linkedFileData", sinon.match(linkedFileData)))
 					)
 					.should.equal true
 
@@ -703,7 +733,7 @@ describe "ProjectImporter", ->
 						source_doc_display_name: 'Test Output Project'
 				}
 				@ProjectImporter._writeS3ObjectToDisk = sinon.stub().yields(null, "path/on/disk")
-				@ProjectImporter._importFile @project_id, @user_id, @file, done
+				@ProjectImporter._importFiles @project_id, @user_id, [@file], done
 
 			it "should create the file's folder", ->
 				@ProjectEntityUpdateHandler.mkdirp
@@ -721,9 +751,9 @@ describe "ProjectImporter", ->
 					v1_source_doc_id: 234
 					source_output_file_path: 'output.pdf',
 				}
-				@ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory
+				@ProjectEntityUpdateHandler._addFileAndSendToTpds
 					.calledWith(
-						@project_id, @folder_id, "image.jpeg", "path/on/disk", linkedFileData, @user_id
+						@project_id, @folder_id, sinon.match({name: "image.jpeg", linkedFileData: sinon.match(linkedFileData)})
 					)
 					.should.equal true
 
@@ -738,7 +768,7 @@ describe "ProjectImporter", ->
 						url: 'http://example.com/image.jpeg'
 				}
 				@ProjectImporter._writeS3ObjectToDisk = sinon.stub().yields(null, "path/on/disk")
-				@ProjectImporter._importFile @project_id, @user_id, @file, done
+				@ProjectImporter._importFiles @project_id, @user_id, [@file], done
 
 			it "should create the file's folder", ->
 				@ProjectEntityUpdateHandler.mkdirp
@@ -755,9 +785,9 @@ describe "ProjectImporter", ->
 					provider: 'url',
 					url: 'http://example.com/image.jpeg'
 				}
-				@ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory
+				@ProjectEntityUpdateHandler._addFileAndSendToTpds
 					.calledWith(
-						@project_id, @folder_id, "image.jpeg", "path/on/disk", linkedFileData, @user_id
+						@project_id, @folder_id, sinon.match({name: "image.jpeg", linkedFileData: sinon.match(linkedFileData)})
 					)
 					.should.equal true
 
@@ -774,7 +804,7 @@ describe "ProjectImporter", ->
 						group: 'abcbetatutts'
 				}
 				@ProjectImporter._writeS3ObjectToDisk = sinon.stub().yields(null, "path/on/disk")
-				@ProjectImporter._importFile @project_id, @user_id, @file, done
+				@ProjectImporter._importFiles @project_id, @user_id, [@file], done
 
 			it "should download the url to disk from s3", ->
 				@ProjectImporter._writeS3ObjectToDisk
@@ -787,9 +817,9 @@ describe "ProjectImporter", ->
 					v1_importer_id: 4321,
 					group_id: 'abcbetatutts'
 				}
-				@ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory
+				@ProjectEntityUpdateHandler._addFileAndSendToTpds
 					.calledWith(
-						@project_id, @folder_id, "references.bib", "path/on/disk", linkedFileData, @user_id
+						@project_id, @folder_id, sinon.match({name: "references.bib", linkedFileData: sinon.match(linkedFileData)})
 					)
 					.should.equal true
 
@@ -801,7 +831,7 @@ describe "ProjectImporter", ->
 					type: "ext"
 					agent: "unknown"
 				}
-				@ProjectImporter._importFile @project_id, @user_id, @file, @callback
+				@ProjectImporter._importFiles @project_id, @user_id, [@file], @callback
 
 			it 'should throw an error', ->
 				err = @callback.lastCall.args[0]
@@ -814,7 +844,7 @@ describe "ProjectImporter", ->
 					file_path: 's3/linked_file.pdf'
 					type: 'definitely_unknown'
 				}
-				@ProjectImporter._importFile @project_id, @user_id, @file, @callback
+				@ProjectImporter._importFiles @project_id, @user_id, [@file], @callback
 
 			it 'should throw an error', ->
 				@callback
@@ -836,27 +866,28 @@ describe "ProjectImporter", ->
 
 			it "should require file.file", (done) ->
 				delete @src_file.file
-				@ProjectImporter._importFile @project_id, @user_id, @src_file, (error) ->
+				@ProjectImporter._importFiles @project_id, @user_id, [@src_file], (error) ->
 					error.message.should.equal("expected file.file and type")
 					done()
 
 			it "should require file.type", (done) ->
 				delete @src_file.type
-				@ProjectImporter._importFile @project_id, @user_id, @src_file, (error) ->
+				@ProjectImporter._importFiles @project_id, @user_id, [@src_file], (error) ->
 					error.message.should.equal("expected file.file and type")
 					done()
 
 			it "should require file.latest_content", (done) ->
 				delete @src_file.latest_content
-				@ProjectImporter._importFile @project_id, @user_id, @src_file, (error) ->
+				@ProjectImporter._importFiles @project_id, @user_id, [@src_file], (error) ->
 					error.message.should.equal("expected file.latest_content")
 					done()
 
 			it "should require file.file_path", (done) ->
 				delete @att_file.file_path
-				@ProjectImporter._importFile @project_id, @user_id, @att_file, (error) ->
+				@ProjectImporter._importFiles @project_id, @user_id, [@att_file], (error) ->
 					error.message.should.equal("expected file.file_path")
 					done()
+
 
 	describe "_confirmExport", ->
 		beforeEach ->

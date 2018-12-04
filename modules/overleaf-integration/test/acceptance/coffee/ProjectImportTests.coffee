@@ -214,6 +214,51 @@ describe "ProjectImportTests", ->
 		it 'should import a project with the correct owner', ->
 			expect(@project.owner_ref.toString()).to.equal @other_owner._id
 
+	describe 'a project with docs, files and external files', ->
+		before (done) ->
+			@ol_project_id = 100
+			file = {
+				id: new ObjectId()
+				stream: fs.createReadStream(Path.resolve(__dirname + '/../files/1pixel.png'))
+			}
+			MockS3Api.setFile file
+			ext = {
+				id: new ObjectId()
+				stream: fs.createReadStream(Path.resolve(__dirname + '/../files/foo.bib'))
+			}
+			MockS3Api.setFile ext
+			files = [
+				{type: 'src', file: 'main.tex', latest_content: 'Test Content', main: true}
+				{type: 'att', file: '1pixel.png', file_path: "file/#{file.id}"}
+				{type: 'ext', file: 'foo.bib', file_path: "file/#{ext.id}", agent: "mendeley", agent_data: {importer_id:123, group:456}}
+			]
+			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, files, title: "docs and files project" })
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+				getProject response, (error, project) =>
+					@project = project
+					done()
+
+		it 'should import the docs, files and external files', (done) ->
+			ProjectEntityHandler.getAllEntitiesFromProject @project, (error, docs, files) ->
+				throw error if error?
+				expect(files).to.have.lengthOf(2)
+				expect(docs).to.have.lengthOf(1)
+				expect(docs[0].path).to.equal('/main.tex')
+				expect(files[0].path).to.equal('/1pixel.png')
+				expect(files[1].path).to.equal('/foo.bib')
+				done()
+
+		it 'should not version importing the doc', ->
+			updates = MockDocUpdaterApi.getProjectStructureUpdates(@project._id).docUpdates
+			expect(updates.length).to.equal(0)
+
+		it 'should not version importing the file', ->
+			updates = MockDocUpdaterApi.getProjectStructureUpdates(@project._id).fileUpdates
+			expect(updates.length).to.equal(0)
+
+
 	describe 'a project with a brand variation id', ->
 		before (done) ->
 			@ol_project_id = 1
