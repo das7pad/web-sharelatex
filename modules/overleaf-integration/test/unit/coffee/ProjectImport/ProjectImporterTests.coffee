@@ -52,7 +52,11 @@ describe "ProjectImporter", ->
 			})
 			@ProjectImporter._startExport = sinon.stub().yields(null, @doc = {
 				id: @v1_project_id,
-				owner_id: @v1_user_id,
+				owner: {
+					id: @v1_user_id
+					email: 'owner@example.com'
+					name: 'Owner'
+				},
 				files: ["mock-files"],
 				tags: ["foo", "bar"],
 				invites: [{
@@ -149,8 +153,14 @@ describe "ProjectImporter", ->
 	describe "_checkOwnerIsMigrated", ->
 		describe "successfully", ->
 			beforeEach ->
-				@owner_id = 'mock-v1-id'
-				@doc = { owner_id: @owner_id }
+				@owner_id = 'mock-v1-owner-id'
+				@doc = {
+					owner: {
+						id: @owner_id
+						email: 'owner-email@example.com'
+						name: 'Owner name'
+					}
+				}
 				@UserGetter.getUser = sinon.stub().yields(null, @user = {
 					_id: @v2_user_id,
 					overleaf: {
@@ -166,15 +176,22 @@ describe "ProjectImporter", ->
 			beforeEach ->
 				@error = new Error('something went wrong')
 				@UserGetter.getUser = sinon.stub().yields(@error)
-				@ProjectImporter._checkOwnerIsMigrated {}, @callback
+				doc = { owner: {} }
+				@ProjectImporter._checkOwnerIsMigrated doc, @callback
 
 			it "should callback with the error", ->
 				@callback.calledWith(@error).should.equal true
 
 		describe "with no matching v2 user", ->
 			beforeEach ->
-				@owner_id = 'mock-v1-id'
-				@doc = { owner_id: @owner_id }
+				@owner_id = 'unmigrated-mock-v1-owner-id'
+				@doc = {
+					owner: {
+						id: @owner_id
+						email: 'unmigrated-owner@example.com'
+						name: 'Unmigrated owner'
+					}
+				}
 				@UserGetter.getUser = sinon.stub().yields(null, null)
 
 			it "should callback with an error", (done) ->

@@ -84,7 +84,7 @@ module.exports = ProjectImporter =
 					callback null, v2_project_id
 
 	_checkOwnerIsMigrated: (doc, callback = (error, v2_owner_id) ->) ->
-		UserGetter.getUser { "overleaf.id": doc.owner_id }, { _id: 1 }, (error, v2_owner) ->
+		UserGetter.getUser { "overleaf.id": doc.owner.id }, { _id: 1 }, (error, v2_owner) ->
 			if error?
 				callback(error)
 			else if !v2_owner?

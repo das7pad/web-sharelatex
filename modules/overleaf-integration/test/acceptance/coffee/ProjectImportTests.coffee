@@ -24,7 +24,11 @@ OWNER_V1_ID = 123
 
 BLANK_PROJECT = {
 	title: "Test Project"
-	owner_id: OWNER_V1_ID
+	owner: {
+		id: OWNER_V1_ID
+		email: 'owner@example.com'
+		name: 'Owner'
+	}
 	latest_ver_id: 1
 	latex_engine: "pdflatex"
 	token: "write_token"
@@ -159,7 +163,13 @@ describe "ProjectImportTests", ->
 			MockOverleafApi.setDoc Object.assign(
 				{ id: @ol_project_id },
 				BLANK_PROJECT,
-				{ owner_id: @unmigrated_v1_owner_id }
+				{
+					owner: {
+						id: @unmigrated_v1_owner_id
+						email: 'unmigrated-owner@example.com'
+						name: 'Unmigrated Owner'
+					}
+				}
 			)
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
@@ -179,7 +189,13 @@ describe "ProjectImportTests", ->
 			MockOverleafApi.setDoc Object.assign(
 				{ id: @ol_project_id },
 				BLANK_PROJECT,
-				{ owner_id: @other_owner_v1_id }
+				{
+					owner: {
+						id: @other_owner_v1_id
+						email: 'migrated@example.com'
+						name: 'Migrated Owner'
+					}
+				}
 			)
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
