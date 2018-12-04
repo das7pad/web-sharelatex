@@ -52,17 +52,20 @@ module.exports = GitBridgeHandler =
 					err = new Error("No version received from project-history api")
 					logger.err {err}, "Error while communicating with project-history api"
 					return callback(err)
-				data = {
-					latestVerId: body.version
-					latestVerAt: body.timestamp
-					latestVerBy: (body.v2Authors or [])[0] or "<unknown>"
-				}
-				GitBridgeHandler._getMigratedFromId project, (err, migratedFromId) ->
+				authorId = (body.v2Authors or [])[0] or null
+				GitBridgeHandler._getAuthorInfo authorId, (err, authorInfo) ->
 					return callback(err) if err?
-					if migratedFromId?
-						logger.log {projectId, userId, migratedFromId}, "Adding migratedFromId to response"
-						data.migratedFromId = migratedFromId
-					callback(null, data)
+					data = {
+						latestVerId: body.version
+						latestVerAt: body.timestamp
+						latestVerBy: authorInfo
+					}
+					GitBridgeHandler._getMigratedFromId project, (err, migratedFromId) ->
+						return callback(err) if err?
+						if migratedFromId?
+							logger.log {projectId, userId, migratedFromId}, "Adding migratedFromId to response"
+							data.migratedFromId = migratedFromId
+						callback(null, data)
 
 	_getMigratedFromId: (project, callback=(err, migratedFromId)->) ->
 		if !project?.overleaf?.id?
@@ -270,3 +273,13 @@ module.exports = GitBridgeHandler =
 
 	_projectHistoryUrl: (path) ->
 		"#{Settings.apis.project_history.url}#{path}"
+
+	_getAuthorInfo: (userId, callback=(err, info)->) ->
+		if !userId?
+			return callback(null, null)
+		UserGetter.getUser userId, {first_name: 1, last_name: 1, email: 1}, (err, user) ->
+			return callback(err) if err?
+			if !user?
+				return callback(null, null)
+			callback(null, {email: user.email, name: "#{user.first_name} #{user.last_name}"})
+
