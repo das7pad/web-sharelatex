@@ -58,8 +58,25 @@ describe "V2TemplatesSources", ->
 				expect(response.body).to.include(@open_template_link_text)
 				done()
 
+		it "shows when show_source and no source", (done) ->
+			@V1TemplateResponse.source = null
+			request.get @template_view_url, (err, response, body) =>
+				return done(err) if err?
+				expect(response.statusCode).to.equal 200
+				expect(response.body).to.include(@open_template_link_text)
+				done()
+
 		it "does not show when show_source is false", (done) ->
 			@V1TemplateResponse.pub.show_source = false
+			request.get @template_view_url, (err, response, body) =>
+				return done(err) if err?
+				expect(response.statusCode).to.equal 200
+				expect(response.body).to.not.include(@open_template_link_text)
+				done()
+
+		it "does not show when show_source is null", (done) ->
+			@V1TemplateResponse.pub.show_source = null
+			@V1TemplateResponse.source = null
 			request.get @template_view_url, (err, response, body) =>
 				return done(err) if err?
 				expect(response.statusCode).to.equal 200
