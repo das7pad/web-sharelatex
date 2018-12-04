@@ -58,5 +58,5 @@ module.exports = CollabratecController =
 		# process upload
 		CollabratecManager.uploadProject req.oauth_user._id, req.files?.zipfile, req.body.collabratec_document_id, req.body.collabratec_privategroup_id, (err, project, project_metadata) ->
 			logger.error { err: err, user_id: req.oauth_user._id }, "collabratec upload project error" if err?
-			CollabratecManager.uploadProjectCallback req.oauth.user_profile.collabratec_customer_id, req.body.collabratec_document_id, project?._id, project_metadata, (err) ->
+			CollabratecManager.uploadProjectCallback req.oauth.collabratec_customer_id, req.body.collabratec_document_id, project?._id, project_metadata, (err) ->
 				logger.error { err: err, user_id: req.oauth_user._id }, "collabratec upload project callback error" if err?

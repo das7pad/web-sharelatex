@@ -1,11 +1,14 @@
+MockCollabratecApi = require "./helpers/MockCollabratecApi"
 MockDocstoreApi = require "../../../../../test/acceptance/js/helpers/MockDocstoreApi"
 MockDocUpdaterApi = require "../../../../../test/acceptance/js/helpers/MockDocUpdaterApi"
 MockOverleafApi = require "./helpers/MockOverleafApi"
 MockProjectHistoryApi = require "../../../../../test/acceptance/js/helpers/MockProjectHistoryApi"
+Path = require "path"
 ProjectModel = require("../../../../../app/js/models/Project").Project
 URL = require "url"
 User = require "../../../../../test/acceptance/js/helpers/User"
 chai = require "chai"
+fs = require "fs"
 mkdirp = require "mkdirp"
 request = require "../../../../../test/acceptance/js/helpers/request"
 settings = require "settings-sharelatex"
@@ -533,7 +536,7 @@ describe "Collabratec", ->
 						expect(response.statusCode).to.equal 403
 						done()
 
-	describe.only "cloneProject", ->
+	describe "cloneProject", ->
 		before ->
 			@token =
 				access_token:
@@ -678,10 +681,10 @@ describe "Collabratec", ->
 			@token =
 				access_token:
 					resource_owner_id: 1
+				collabratec_customer_id: "collabratec-customer-id"
 				user_profile:
 					id: 1
 					email: "test@user.com"
-					collabratec_customer_id: "collabratec-customer-id"
 
 			MockOverleafApi.addToken "good-token", @token
 
@@ -707,7 +710,7 @@ describe "Collabratec", ->
 						expect(MockCollabratecApi.requests[0].body.uploadStatus).to.equal "success"
 						expect(MockCollabratecApi.requests[0].headers["x-ppct-signature"]).to.be.defined
 						expect(MockCollabratecApi.requests[0].headers["x-ppct-date"]).to.be.defined
-						expect(MockCollabratecApi.requests[0].headers["x-extnet-access"]).to.be.defined
+						expect(MockCollabratecApi.requests[0].headers["x-extnet-access"]).to.equal "Y29sbGFicmF0ZWMtY3VzdG9tZXItaWQ="
 						project_id = MockCollabratecApi.requests[0].body.storageProviderId
 						ProjectModel.findOne {_id: project_id }, (err, project) =>
 							return done err if err?
