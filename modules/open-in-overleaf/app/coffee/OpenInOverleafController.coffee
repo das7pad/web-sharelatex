@@ -25,7 +25,7 @@ module.exports = OpenInOverleafController =
 				content = OpenInOverleafHelper.getDocumentLinesFromSnippet(snippet)
 
 				projectName = DocumentHelper.getTitleFromTexContent(content) || snippet.defaultTitle
-				ProjectDetailsHandler.generateUniqueName user_id, projectName, (err, projectName) ->
+				ProjectDetailsHandler.generateUniqueName user_id, ProjectDetailsHandler.fixProjectName(projectName), (err, projectName) ->
 					return next(err) if err?
 
 					ProjectCreationHandler.createProjectFromSnippet user_id, projectName, content, (err, project) ->
