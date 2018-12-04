@@ -200,9 +200,10 @@ describe "GitBridgeHandler", ->
 					tokens: {readAndWrite: "5678abcd"}
 				}
 
-			it "should produce a null id", (done) ->
+			it "should produce an error", (done) ->
 				@GitBridgeHandler._getMigratedFromId @project, (err, migratedFromId) =>
-					expect(err).to.not.exist
+					expect(err).to.exist
+					expect(err.message).to.equal('Inconsistent readAndWrite token')
 					expect(migratedFromId).to.not.exist
 					done()
 

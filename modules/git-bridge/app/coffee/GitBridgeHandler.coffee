@@ -65,10 +65,11 @@ module.exports = GitBridgeHandler =
 					callback(null, data)
 
 	_getMigratedFromId: (project, callback=(err, migratedFromId)->) ->
-		if !project.overleaf?.id? || !project.tokens?.readAndWrite?
+		if !project?.overleaf?.id?
 			return callback(null, null)
-		if !project.tokens.readAndWrite.startsWith("#{project.overleaf.id}")
-			return callback(null, null)
+		if !project.tokens?.readAndWrite? || !project.tokens?.readAndWrite?.startsWith("#{project.overleaf.id}")
+			logger.err {projectId: project._id}, '[GitBridgeHandler] Inconsistent readAndWriteToken'
+			return callback(new Error('Inconsistent readAndWrite token'))
 		callback(null, project.tokens.readAndWrite)
 
 	showSnapshot: (userId, projectId, version, callback=(err, data)->) ->
