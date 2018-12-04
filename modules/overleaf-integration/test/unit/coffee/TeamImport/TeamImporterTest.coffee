@@ -107,8 +107,12 @@ describe "TeamImporter", ->
 
 			data
 
+		@OverleafAuthenticationManager =
+			setupUser: sinon.stub().yields(null, @user = { _id: @teamAdmin.id })
+
 		@TeamImporter = SandboxedModule.require modulePath, requires:
 			"../OverleafUsers/UserMapper": @UserMapper
+			"../Authentication/OverleafAuthenticationManager": @OverleafAuthenticationManager
 			"../../../../../app/js/Features/Subscription/TeamInvitesHandler": @TeamInvitesHandler
 			"../../../../../app/js/Features/Subscription/SubscriptionLocator": @SubscriptionLocator
 			"../../../../../app/js/Features/Subscription/SubscriptionUpdater": @SubscriptionUpdater
@@ -172,8 +176,8 @@ describe "TeamImporter", ->
 				@SubscriptionUpdater.deleteWithV1Id.calledWith(@v1Team.id).should.equal true
 				done()
 
-		it "fails if the team admin is not already in v2", (done) ->
-			@UserGetter.getUser.yields(null, null)
+		it "fails if the team admin cannot be found nor created in v2", (done) ->
+			@OverleafAuthenticationManager.setupUser.yields(null, null)
 
 			@TeamImporter.getOrImportTeam @v1Team, (err, v2Team) =>
 				expect(err).to.be.instanceof(Error)
