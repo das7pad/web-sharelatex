@@ -100,15 +100,9 @@ define([
                 newTo !== prevTo &&
                 newFrom !== prevFrom
               ) {
-                this.$scope.history.loading = true
-                this._waitUntilUpdatesAreAvailable(newTo, newFrom)
-                  .then(() => {
-                    this._selectDocFromUpdates()
-                    this.reloadDiff().then(
-                      () => (this.$scope.history.loading = false)
-                    )
-                  })
-                  .catch(reason => console.log(reason))
+                this.loadFileTreeDiff(newTo, newFrom).then(response =>
+                  console.log(response)
+                )
               }
             }
           }
@@ -141,12 +135,18 @@ define([
         this.$scope.ui.view = 'history'
         this.reset()
         this.$scope.history.viewMode = HistoryViewModes.POINT_IN_TIME
-        // TODO Remove, only for debugging
-        // this.$scope.history.viewMode = HistoryViewModes.COMPARE
       }
 
       hide() {
         this.$scope.ui.view = 'editor'
+      }
+
+      showAllUpdates() {
+        this.$scope.history.showOnlyLabels = false
+      }
+
+      showOnlyLabels() {
+        this.$scope.history.showOnlyLabels = true
       }
 
       reset() {
@@ -169,6 +169,7 @@ define([
           selection: {
             label: null,
             docs: {},
+            files: [],
             pathname: null,
             range: {
               fromV: null,
@@ -182,7 +183,6 @@ define([
           error: null,
           showOnlyLabels: false,
           labels: null,
-          files: [],
           diff: null, // When history.viewMode == HistoryViewModes.COMPARE
           selectedFile: null // When history.viewMode == HistoryViewModes.POINT_IN_TIME
         }
@@ -192,8 +192,8 @@ define([
         ;(this.$scope.history.viewMode = null),
           (this.$scope.history.selection = {
             label: null,
-            updates: [],
             docs: {},
+            files: [],
             pathname: null,
             range: {
               fromV: null,
@@ -206,7 +206,6 @@ define([
           })
         this.$scope.history.error = null
         this.$scope.history.showOnlyLabels = false
-        this.$scope.history.files = []
         this.$scope.history.diff = null // When history.viewMode == HistoryViewModes.COMPARE
         this.$scope.history.selectedFile = null // When history.viewMode == HistoryViewModes.POINT_IN_TIME
       }
@@ -260,14 +259,22 @@ define([
       }
 
       loadFileTreeForVersion(version) {
+        return this._loadFileTree(version, version)
+      }
+
+      loadFileTreeDiff(toV, fromV) {
+        return this._loadFileTree(toV, fromV)
+      }
+
+      _loadFileTree(toV, fromV) {
         let url = `/project/${this.$scope.project_id}/filetree/diff`
-        const query = [`from=${version}`, `to=${version}`]
+        const query = [`from=${fromV}`, `to=${toV}`]
         url += `?${query.join('&')}`
         this.$scope.history.loadingFileTree = true
         this.$scope.history.selectedFile = null
         this.$scope.history.selection.pathname = null
         return this.ide.$http.get(url).then(response => {
-          this.$scope.history.files = response.data.diff
+          this.$scope.history.selection.files = response.data.diff
           this.$scope.history.loadingFileTree = false
         })
       }
@@ -394,76 +401,61 @@ define([
         }
       }
 
-      // selectUpdatesFromLabelSelection() {
-      //   let { toV, fromV } = this._getLabelSelectionVersionBoundaries()
-      //   this.$scope.history.selection.updates = []
-      //   if (toV && fromV && toV !== fromV) {
-      //     this._waitUntilUpdatesAreAvailable(toV, fromV).then(updates => {
-      //       this.$scope.history.selection.updates = updates
-      //       if (updates != null && updates.length > 0) {
-      //         this._selectDocFromUpdates()
-      //         this.reloadDiff()
+      // _waitUntilUpdatesAreAvailable(toV, fromV) {
+      //   let deferred = this.ide.$q.defer()
+      //   let updates = []
+      //   let gotToVUpdate = false
+      //   let gotFromVUpdate = false
+      //   let curUpdatesArrayIndex = 0
+      //   let checkUpdates = () => {
+      //     this._checkAvailableUpdatesForVersions(
+      //       toV,
+      //       fromV,
+      //       curUpdatesArrayIndex
+      //     ).then(function(result) {
+      //       gotToVUpdate = result.gotToVUpdate
+      //       gotFromVUpdate = result.gotFromVUpdate
+      //       curUpdatesArrayIndex = result.lastIndex + 1
+      //       if (gotToVUpdate && gotFromVUpdate) {
+      //         deferred.resolve(true)
+      //       } else {
+      //         checkUpdates()
       //       }
       //     })
       //   }
+      //   checkUpdates()
+      //   return deferred.promise
       // }
 
-      _waitUntilUpdatesAreAvailable(toV, fromV) {
-        let deferred = this.ide.$q.defer()
-        let updates = []
-        let gotToVUpdate = false
-        let gotFromVUpdate = false
-        let curUpdatesArrayIndex = 0
-        let checkUpdates = () => {
-          this._checkAvailableUpdatesForVersions(
-            toV,
-            fromV,
-            curUpdatesArrayIndex
-          ).then(function(result) {
-            gotToVUpdate = result.gotToVUpdate
-            gotFromVUpdate = result.gotFromVUpdate
-            curUpdatesArrayIndex = result.lastIndex + 1
-            if (gotToVUpdate && gotFromVUpdate) {
-              deferred.resolve(true)
-            } else {
-              checkUpdates()
-            }
-          })
-        }
-        checkUpdates()
-        return deferred.promise
-      }
-
-      _checkAvailableUpdatesForVersions(toV, fromV, startIndex) {
-        let deferred = this.ide.$q.defer()
-        let result = {
-          gotToVUpdate: false,
-          gotFromVUpdate: false,
-          lastIndex: null
-        }
-        let fetchNextBatchOfUpdatesIfNeeded =
-          startIndex >= this.$scope.history.updates.length
-            ? this.fetchNextBatchOfUpdates()
-            : null
-        this.ide.$q.when(fetchNextBatchOfUpdatesIfNeeded).then(() => {
-          const nUpdates = this.$scope.history.updates.length
-          for (var i = startIndex; i < nUpdates; i++) {
-            let update = this.$scope.history.updates[i]
-            result.lastIndex = i
-            if (update.toV <= toV && update.fromV >= fromV) {
-              result.gotToVUpdate = true
-            } else if (update.fromV < fromV) {
-              result.gotFromVUpdate = true
-              break
-            }
-          }
-          deferred.resolve(result)
-        })
-        return deferred.promise
-      }
+      // _checkAvailableUpdatesForVersions(toV, fromV, startIndex) {
+      //   let deferred = this.ide.$q.defer()
+      //   let result = {
+      //     gotToVUpdate: false,
+      //     gotFromVUpdate: false,
+      //     lastIndex: null
+      //   }
+      //   let fetchNextBatchOfUpdatesIfNeeded =
+      //     startIndex >= this.$scope.history.updates.length
+      //       ? this.fetchNextBatchOfUpdates()
+      //       : null
+      //   this.ide.$q.when(fetchNextBatchOfUpdatesIfNeeded).then(() => {
+      //     const nUpdates = this.$scope.history.updates.length
+      //     for (var i = startIndex; i < nUpdates; i++) {
+      //       let update = this.$scope.history.updates[i]
+      //       result.lastIndex = i
+      //       if (update.toV <= toV && update.fromV >= fromV) {
+      //         result.gotToVUpdate = true
+      //       } else if (update.fromV < fromV) {
+      //         result.gotFromVUpdate = true
+      //         break
+      //       }
+      //     }
+      //     deferred.resolve(result)
+      //   })
+      //   return deferred.promise
+      // }
 
       fetchNextBatchOfUpdates() {
-        console.log('new request')
         let updatesURL = `/project/${this.ide.project_id}/updates?min_count=${
           this.BATCH_SIZE
         }`
@@ -494,14 +486,16 @@ define([
             this._loadUpdates(updatesData.updates)
             this.$scope.history.nextBeforeTimestamp =
               updatesData.nextBeforeTimestamp
-            if (updatesData.nextBeforeTimestamp == null) {
+            if (
+              updatesData.nextBeforeTimestamp == null ||
+              this.$scope.history.freeHistoryLimitHit
+            ) {
               this.$scope.history.atEnd = true
             }
             // this.$scope.history.loading = false
             if (this.$scope.history.updates.length === 0) {
               // this.$scope.history.loadingFileTree = false
             }
-            console.log('finished handling new request')
           })
           .catch(error => {
             const { status, statusText } = error
@@ -511,19 +505,19 @@ define([
           })
       }
 
-      _loadLabels(labels, lastUpdateToVersion) {
+      _loadLabels(labels, lastUpdateToV) {
         sortedLabels = this.ide.$filter('orderBy')(labels, [
           '-version',
           '-created_at'
         ])
         if (
           sortedLabels.length > 0 &&
-          sortedLabels[0].version !== lastUpdateToVersion
+          sortedLabels[0].version !== lastUpdateToV
         ) {
           sortedLabels.unshift({
             id: '1',
             isPseudoCurrentStateLabel: true,
-            version: lastUpdateToVersion,
+            version: lastUpdateToV,
             created_at: new Date().toISOString()
           })
         }
@@ -558,8 +552,11 @@ define([
 
       reloadDiff() {
         let { diff } = this.$scope.history
-        const { updates } = this.$scope.history.selection
-        const { fromV, toV, pathname } = this._calculateDiffDataFromSelection()
+        // const { updates } = this.$scope.history.selection
+        // const { fromV, toV, pathname } = this._calculateDiffDataFromSelection()
+        const { range, pathname } = this.$scope.history.selection
+        const { fromV, toV } = range
+
         if (pathname == null) {
           this.$scope.history.diff = null
           return
@@ -733,6 +730,7 @@ define([
         const timestamp24hoursAgo = dateTimeNow.setDate(
           dateTimeNow.getDate() - 1
         )
+        let cutOffIndex = null
 
         const iterable = updates || []
         for (let i = 0; i < iterable.length; i++) {
@@ -752,20 +750,22 @@ define([
             update.meta.first_in_day = true
           }
 
-          update.hidden = false
-
           previousUpdate = update
 
           if (
             !this.$scope.history.userHasFullFeature &&
             update.meta.end_ts < timestamp24hoursAgo
           ) {
+            cutOffIndex = i || 1 // Make sure that we show at least one entry (to allow labelling).
             this.$scope.history.freeHistoryLimitHit = true
-            update.hidden = true
           }
         }
 
         const firstLoad = this.$scope.history.updates.length === 0
+
+        if (!this.$scope.history.userHasFullFeature && cutOffIndex != null) {
+          updates = updates.slice(0, cutOffIndex)
+        }
 
         this.$scope.history.updates = this.$scope.history.updates.concat(
           updates
@@ -773,12 +773,6 @@ define([
 
         if (firstLoad) {
           // Make sure that at least the first update is visible
-          if (
-            this.$scope.history.updates.length > 0 &&
-            this.$scope.history.updates[0].hidden === true
-          ) {
-            this.$scope.history.updates[0].hidden = false
-          }
           this._handleHistoryUIStateChange()
         }
       }

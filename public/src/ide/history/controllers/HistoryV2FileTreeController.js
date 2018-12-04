@@ -24,6 +24,7 @@ define(['base'], App =>
       const _pathnameExistsInFiles = (pathname, files) =>
         _.any(files, file => file.pathname === pathname)
 
+      // TODO Move to history manager
       const _getSelectedDefaultPathname = function(files) {
         let selectedPathname = null
         if (
@@ -48,9 +49,10 @@ define(['base'], App =>
         ($scope.history.selection.pathname = _previouslySelectedPathname =
           file.pathname)
 
-      $scope.$watch('history.files', function(files) {
+      $scope.$watch('history.selection.files', function(files) {
         if (files != null && files.length > 0) {
           $scope.currentFileTree = _.reduce(files, _reducePathsToTree, [])
+          console.log(files, $scope.currentFileTree)
           return ($scope.history.selection.pathname = _getSelectedDefaultPathname(
             files
           ))

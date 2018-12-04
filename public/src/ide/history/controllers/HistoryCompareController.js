@@ -22,12 +22,29 @@ define(['base', 'ide/history/util/displayNameForUser'], function(
     '$scope',
     '$modal',
     'ide',
-    function($scope, $modal, ide) {
+    '_',
+    function($scope, $modal, ide, _) {
       $scope.projectUsers = []
+      $scope.versionsWithLabels = []
 
       $scope.$watch('project.members', function(newVal) {
         if (newVal != null) {
           return ($scope.projectUsers = newVal.concat($scope.project.owner))
+        }
+      })
+
+      $scope.$watchCollection('history.labels', function(labels) {
+        if (labels != null && labels.length > 0) {
+          const groupedLabelsHash = _.groupBy(labels, 'version')
+          $scope.versionsWithLabels = _.map(
+            groupedLabelsHash,
+            (labels, version) => {
+              return {
+                version: parseInt(version, 10),
+                labels
+              }
+            }
+          )
         }
       })
 

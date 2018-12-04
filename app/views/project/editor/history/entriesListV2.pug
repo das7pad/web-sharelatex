@@ -31,13 +31,6 @@ aside.change-list(
 	ng-if="history.isV2 && history.viewMode === HistoryViewModes.COMPARE"
 	ng-controller="HistoryCompareController"
 )
-	.history-compare-mode-toolbar
-		toggle-switch(
-			ng-model="history.showOnlyLabels"
-			label-true=translate("history_view_labels")
-			label-false=translate("history_view_all")
-			description=translate("history_view_a11y_description")
-		)
 	div(
 		ng-show="!history.showOnlyLabels && !history.error"
 	)
@@ -53,7 +46,7 @@ aside.change-list(
 					}"
 				)
 					li.change(
-						ng-repeat="update in history.updates | filter:{ 'hidden': false } track by update.fromV"
+						ng-repeat="update in history.updates track by update.fromV"
 						ng-class="{\
 							'first-in-day': update.meta.first_in_day,\
 							'selected': update.toV <= history.selection.range.toV && update.fromV >= history.selection.range.fromV,\
@@ -137,14 +130,14 @@ aside.change-list(
 			}"
 		)
 			li.change(
-				ng-repeat="label in history.labels track by label.id"
+				ng-repeat="versionWithLabel in versionsWithLabels  | orderBy:'-version' track by versionWithLabel.version"
 				ng-class="{\
-					'selected': label.version <= history.selection.range.toV && label.version >= history.selection.range.fromV,\
-					'selected-to': label.version === history.selection.range.toV,\
-					'selected-from': label.version === history.selection.range.fromV,\
-					'hover-selected': label.version <= history.selection.hoveredRange.toV && label.version >= history.selection.hoveredRange.fromV,\
-					'hover-selected-to': label.version === history.selection.hoveredRange.toV,\
-					'hover-selected-from': label.version === history.selection.hoveredRange.fromV,\
+					'selected': versionWithLabel.version <= history.selection.range.toV && versionWithLabel.version >= history.selection.range.fromV,\
+					'selected-to': versionWithLabel.version === history.selection.range.toV,\
+					'selected-from': versionWithLabel.version === history.selection.range.fromV,\
+					'hover-selected': versionWithLabel.version <= history.selection.hoveredRange.toV && versionWithLabel.version >= history.selection.hoveredRange.fromV,\
+					'hover-selected-to': versionWithLabel.version === history.selection.hoveredRange.toV,\
+					'hover-selected-from': versionWithLabel.version === history.selection.hoveredRange.fromV,\
 				}"
 			)
 				div.selectors
@@ -152,53 +145,55 @@ aside.change-list(
 					form
 						input.selector-from(
 							type="radio"
-							name="fromVersion"
+							name="fromversionWithLabel.version"
 							ng-model="history.selection.range.fromV"
-							ng-value="label.version"
-							ng-mouseover="setHoverFrom(label.version)"
+							ng-value="versionWithLabel.version"
+							ng-mouseover="setHoverFrom(versionWithLabel.version)"
 							ng-mouseout="resetHover()"
-							ng-show="label.version < history.selection.range.fromV || label.version <= history.selection.range.toV && label.version >= history.selection.range.fromV"
+							ng-show="versionWithLabel.version < history.selection.range.fromV || versionWithLabel.version <= history.selection.range.toV && versionWithLabel.version >= history.selection.range.fromV"
 						)
 					form
 						input.selector-to(
 							type="radio"
-							name="toVersion"
+							name="toversionWithLabel.version"
 							ng-model="history.selection.range.toV"
-							ng-value="label.version"
-							ng-mouseover="setHoverTo(label.version)"
+							ng-value="versionWithLabel.version"
+							ng-mouseover="setHoverTo(versionWithLabel.version)"
 							ng-mouseout="resetHover()"
-							ng-show="label.version > history.selection.range.toV || label.version <= history.selection.range.toV && label.version >= history.selection.range.fromV"
+							ng-show="versionWithLabel.version > history.selection.range.toV || versionWithLabel.version <= history.selection.range.toV && versionWithLabel.version >= history.selection.range.fromV"
 						)
 
 
-
-				div.description(ng-click="select()")
-					history-label(
-						show-tooltip="false"
-						label-text="label.comment"
-						is-owned-by-current-user="label.user_id === user.id"
-						is-pseudo-current-state-label="label.isPseudoCurrentStateLabel"
-						on-label-delete="deleteLabel(label)"
+				.description(ng-click="select()")
+					div(
+						ng-repeat="label in versionWithLabel.labels track by label.id"
 					)
-					.history-entry-label-metadata
-						.history-entry-label-metadata-user(
-							ng-if="!label.isPseudoCurrentStateLabel"	
-							ng-init="labelOwner = getUserById(label.user_id)"
+						history-label(
+							show-tooltip="false"
+							label-text="label.comment"
+							is-owned-by-current-user="label.user_id === user.id"
+							is-pseudo-current-state-label="label.isPseudoCurrentStateLabel"
+							on-label-delete="deleteLabel(label)"
 						)
-							| Saved by 
-							span.name(
-								ng-if="::labelOwner && labelOwner._id !== user.id"
-								ng-style="::{'color': 'hsl({{ hueForUser(label.user_id) }}, 70%, 50%)'}"
-							) {{ ::getDisplayNameById(label.user_id) }} 
-							span.name(
-								ng-if="labelOwner && labelOwner._id == user.id"
-								ng-style="::{'color': 'hsl({{ hueForUser(label.user_id) }}, 70%, 50%)'}"
-							) You
-							span.name(
-								ng-if="::labelOwner == null"
-								ng-style="::{'color': 'hsl(100, 70%, 50%)'}"
-							) #{translate("anonymous")}
-						time.history-entry-label-metadata-time {{ ::label.created_at | formatDate }}
+						.history-entry-label-metadata
+							.history-entry-label-metadata-user(
+								ng-if="!label.isPseudoCurrentStateLabel"	
+								ng-init="labelOwner = getUserById(label.user_id)"
+							)
+								| Saved by 
+								span.name(
+									ng-if="::labelOwner && labelOwner._id !== user.id"
+									ng-style="::{'color': 'hsl({{ hueForUser(label.user_id) }}, 70%, 50%)'}"
+								) {{ ::getDisplayNameById(label.user_id) }} 
+								span.name(
+									ng-if="labelOwner && labelOwner._id == user.id"
+									ng-style="::{'color': 'hsl({{ hueForUser(label.user_id) }}, 70%, 50%)'}"
+								) You
+								span.name(
+									ng-if="::labelOwner == null"
+									ng-style="::{'color': 'hsl(100, 70%, 50%)'}"
+								) #{translate("anonymous")}
+							time.history-entry-label-metadata-time {{ ::label.created_at | formatDate }}
 
 		.loading(ng-show="history.loading")
 			i.fa.fa-spin.fa-refresh
