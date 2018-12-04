@@ -181,10 +181,10 @@ module.exports = ProjectEntityUpdateHandler = self =
 				return callback(err)
 			callback(null, fileRef, fileStoreUrl)
 
-	_addFileAndSendToTpds: (project_id, folder_id, fileName, fileRef, callback = (error) ->)->
+	_addFileAndSendToTpds: (project_id, folder_id, fileRef, callback = (error) ->)->
 		ProjectEntityMongoUpdateHandler.addFile project_id, folder_id, fileRef, (err, result, project) ->
 			if err?
-				logger.err err:err, project_id: project_id, folder_id: folder_id, file_name: fileName, fileRef:fileRef, "error adding file with project"
+				logger.err err:err, project_id: project_id, folder_id: folder_id, file_name: fileRef.name, fileRef:fileRef, "error adding file with project"
 				return callback(err)
 			TpdsUpdateSender.addFile {project_id:project_id, file_id:fileRef._id, path:result?.path?.fileSystem, project_name:project.name, rev:fileRef.rev}, (err) ->
 				return callback(err) if err?
@@ -199,7 +199,7 @@ module.exports = ProjectEntityUpdateHandler = self =
 					return callback(error) if error?
 					next(project_id, folder_id, fileName, fsPath, linkedFileData, userId, fileRef, fileStoreUrl, callback)
 		withLock: (project_id, folder_id, fileName, fsPath, linkedFileData, userId, fileRef, fileStoreUrl, callback = (error, fileRef, folder_id) ->)->
-			ProjectEntityUpdateHandler._addFileAndSendToTpds project_id, folder_id, fileName, fileRef, (err, result, project) ->
+			ProjectEntityUpdateHandler._addFileAndSendToTpds project_id, folder_id, fileRef, (err, result, project) ->
 				return callback(err) if err?
 				projectHistoryId = project.overleaf?.history?.id
 				newFiles = [
@@ -270,7 +270,7 @@ module.exports = ProjectEntityUpdateHandler = self =
 					return callback(error) if error?
 					next(project_id, folder_id, fileName, fsPath, linkedFileData, userId, fileRef, fileStoreUrl, callback)
 		withLock: (project_id, folder_id, fileName, fsPath, linkedFileData, userId, fileRef, fileStoreUrl, callback = (error, fileRef, folder_id, path, fileStoreUrl) ->)->
-			ProjectEntityUpdateHandler._addFileAndSendToTpds project_id, folder_id, fileName, fileRef, (err, result, project) ->
+			ProjectEntityUpdateHandler._addFileAndSendToTpds project_id, folder_id, fileRef, (err, result, project) ->
 				return callback(err) if err?
 				callback(null, fileRef, folder_id, result?.path?.fileSystem, fileStoreUrl)
 
