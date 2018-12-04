@@ -1,4 +1,3 @@
-AuthorizationMiddlewear = require "../../../../app/js/Features/Authorization/AuthorizationMiddlewear"
 V2TemplatesController = require "./V2TemplatesController"
 settings = require "settings-sharelatex"
 
