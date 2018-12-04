@@ -532,3 +532,143 @@ describe "Collabratec", ->
 					request options, (error, response, body) =>
 						expect(response.statusCode).to.equal 403
 						done()
+
+	describe.only "cloneProject", ->
+		before ->
+			@token =
+				access_token:
+					resource_owner_id: 1
+				user_profile:
+					id: 1
+					email: "test@user.com"
+			MockOverleafApi.addToken "good-token", @token
+
+		describe "with v1 project id", ->
+			describe "when clone succeeds", ->
+				it "should proxy to v1", (done) ->
+					options =
+						auth: bearer: "good-token"
+						json: true
+						method: "POST"
+						url: "/api/v1/collabratec/users/current_user/projects/good-project-id/clone"
+					request options, (error, response, body) =>
+						expect(response.statusCode).to.equal 201
+						expect(body).to.deep.equal project: "data"
+						done()
+
+			describe "when clone has error", ->
+				it "should proxy to v1", (done) ->
+					options =
+						auth: bearer: "good-token"
+						method: "POST"
+						url: "/api/v1/collabratec/users/current_user/projects/bad-project-id/clone"
+					request options, (error, response, body) =>
+						expect(response.statusCode).to.equal 422
+						done()
+
+		describe "with v2 project id", ->
+			before ->
+				MockOverleafApi.addCollabratecUser "collabratec-user-id-1", 1
+				MockOverleafApi.addCollabratecUser "collabratec-user-id-2", 2
+
+			describe "when user owns project", ->
+				describe "with valid args", ->
+					it "should clone project and return 201", (done) ->
+						options =
+							auth: bearer: "good-token"
+							json:
+								protect: "true"
+								new_collabratec_document_id: "collabratec-document-id"
+								new_owner_collabratec_customer_id: "collabratec-user-id-1"
+							method: "POST"
+							url: "/api/v1/collabratec/users/current_user/projects/#{@project_id}/clone"
+						request options, (error, response, body) =>
+							expect(response.statusCode).to.equal 201
+							expect(body.id).to.be.defined
+							expect(body.url).to.be.defined
+							ProjectModel.findOne { _id: body.id }, (err, project) =>
+								return done err if err?
+								expect(project.name).to.equal "v2 project (1)"
+								expect(project.collabratecUsers[0].user_id.toString()).to.equal @user.id
+								done()
+
+				describe "with different collabratec user id", ->
+					it "should clone project for different user", (done) ->
+						options =
+							auth: bearer: "good-token"
+							json:
+								protect: "true"
+								new_collabratec_document_id: "collabratec-document-id"
+								new_owner_collabratec_customer_id: "collabratec-user-id-2"
+							method: "POST"
+							url: "/api/v1/collabratec/users/current_user/projects/#{@project_id}/clone"
+						request options, (error, response, body) =>
+							expect(response.statusCode).to.equal 201
+							ProjectModel.findOne { _id: body.id }, (err, project) =>
+								return done err if err?
+								expect(project.collabratecUsers[0].user_id.toString()).to.equal @user2.id
+								done()
+
+				describe "without protect", ->
+					it "should return 422", (done) ->
+						options =
+							auth: bearer: "good-token"
+							json:
+								new_collabratec_document_id: "collabratec-document-id"
+								new_owner_collabratec_customer_id: "collabratec-user-id-1"
+							method: "POST"
+							url: "/api/v1/collabratec/users/current_user/projects/#{@project_id}/clone"
+						request options, (error, response, body) =>
+							expect(response.statusCode).to.equal 422
+							done()
+
+				describe "without new_collabratec_document_id", ->
+					it "should return 422", (done) ->
+						options =
+							auth: bearer: "good-token"
+							json:
+								protect: "true"
+								new_owner_collabratec_customer_id: "collabratec-user-id-1"
+							method: "POST"
+							url: "/api/v1/collabratec/users/current_user/projects/#{@project_id}/clone"
+						request options, (error, response, body) =>
+							expect(response.statusCode).to.equal 422
+							done()
+
+				describe "without new_owner_collabratec_customer_id", ->
+					it "should return 422", (done) ->
+						options =
+							auth: bearer: "good-token"
+							json:
+								protect: "true"
+								new_collabratec_document_id: "collabratec-document-id"
+								new_owner_collabratec_customer_id: "invalid-collabratec-user-id"
+							method: "POST"
+							url: "/api/v1/collabratec/users/current_user/projects/#{@project_id}/clone"
+						request options, (error, response, body) =>
+							expect(response.statusCode).to.equal 422
+							done()
+
+				describe "without invalid new_owner_collabratec_customer_id", ->
+					it "should return 422", (done) ->
+						options =
+							auth: bearer: "good-token"
+							json:
+								protect: "true"
+								new_collabratec_document_id: "collabratec-document-id"
+							method: "POST"
+							url: "/api/v1/collabratec/users/current_user/projects/#{@project_id}/clone"
+						request options, (error, response, body) =>
+							expect(response.statusCode).to.equal 422
+							done()
+
+			describe "when user does not own project", ->
+				it "should return 403 error", (done) ->
+					options =
+						auth: bearer: "good-token2"
+						json: collabratec_document_id: "collabratec-document-id"
+						method: "POST"
+						url: "/api/v1/collabratec/users/current_user/projects/#{@project_id}/clone"
+					request options, (error, response, body) =>
+						expect(response.statusCode).to.equal 403
+						done()

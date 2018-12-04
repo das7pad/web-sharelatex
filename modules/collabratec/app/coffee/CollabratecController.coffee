@@ -1,6 +1,17 @@
 CollabratecManager = require "./CollabratecManager"
 
 module.exports = CollabratecController =
+	cloneProject: (req, res, next) ->
+		return res.sendStatus(422) unless req.body.protect?
+		return res.sendStatus(422) unless req.body.new_collabratec_document_id?
+		return res.sendStatus(422) unless req.body.new_owner_collabratec_customer_id?
+		CollabratecManager.getUserByCollabratecId req.body.new_owner_collabratec_customer_id, (err, user) ->
+			return next err if err?
+			return res.sendStatus(422) unless user?
+			CollabratecManager.cloneProject user, req.params.project_id, req.body.protect, req.body.new_collabratec_document_id, req.body.new_owner_collabratec_customer_id, req.body.collabratec_privategroup_id, (err, result) ->
+				return next err if err?
+				res.status(201).json(result)
+
 	createProject: (req, res, next) ->
 		return res.sendStatus(422) unless req.body.template_id?
 		return res.sendStatus(422) unless req.body.title?
