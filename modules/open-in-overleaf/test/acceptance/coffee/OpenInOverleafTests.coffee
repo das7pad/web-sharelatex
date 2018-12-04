@@ -26,6 +26,14 @@ describe "Open In Overleaf", ->
 I have a fancy name
 \\end{document}
 """)
+			else if req.query.url == 'http://example.org/boringname.tex'
+				res.send("""
+\\documentclass[12pt]{article}
+\\begin{document}
+\\title{boring name}
+I have a boring name
+\\end{document}
+""")
 			else if req.query.url == 'http://example.org/badname.tex'
 				res.send("""
 \\documentclass[12pt]{article}
@@ -422,27 +430,3 @@ I have a bad name
 
 						expect(project.name).to.match /fancy name.+/
 						done()
-
-		describe "when the document has a title containing an invalid character", ->
-			beforeEach (done) ->
-				@user.request.post
-					url: "/docs"
-					form:
-						_csrf: @user.csrfToken
-						snip_uri: 'http://example.org/badname.tex'
-					headers:
-						'X-Requested-With': 'XMLHttpRequest'
-				, (_err, _res, _body) =>
-					@err = _err
-					@res = _res
-					@body = _body
-					done()
-
-			it "should create a project without any bad characters in its name", (done) ->
-				projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
-				expect(projectId).to.exist
-				ProjectGetter.getProject projectId, (error, project) ->
-					return done(error) if error?
-
-					expect(project.name).to.match /^bad[^\\]+name/
-					done()
