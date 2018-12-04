@@ -149,7 +149,9 @@ define([
             editor.getCodeMirror().clearHistory()
             triggerEditorInitEvent()
             initSpellCheck()
-            initTrackChanges()
+            if (window.richTextTrackChangesEnabled) {
+              initTrackChanges()
+            }
             return setUpMetadataEventListener()
           })
 

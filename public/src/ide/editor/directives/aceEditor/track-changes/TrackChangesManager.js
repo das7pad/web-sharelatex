@@ -397,7 +397,9 @@ define([
           : undefined) || []
       )) {
         if (resolve_ids[comment.op.t]) {
-          this.adapter.onCommentRemoved(comment)
+          if (this.adapter.onCommentRemoved) {
+            this.adapter.onCommentRemoved(comment)
+          }
         }
       }
       return this.broadcastChange()
