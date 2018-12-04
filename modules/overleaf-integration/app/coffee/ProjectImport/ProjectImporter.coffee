@@ -70,7 +70,7 @@ module.exports = ProjectImporter =
 				ProjectImporter._createV2ProjectFromV1Doc v1_project_id, v1_user_id, v2_user_id, doc, callback
 
 	_createV2ProjectFromV1Doc: (v1_project_id, v1_user_id, v2_user_id, doc, callback = (error, v2_project_id) ->) ->
-		ProjectImporter._checkOwnerIsMigrated doc, (error, v2_owner_id) ->
+		UserMapper.getSlIdFromOlUser doc.owner, (error, v2_owner_id) ->
 			return callback(error) if error?
 
 			async.waterfall [
@@ -90,15 +90,6 @@ module.exports = ProjectImporter =
 				else
 					metrics.inc "project-import.success"
 					callback null, v2_project_id
-
-	_checkOwnerIsMigrated: (doc, callback = (error, v2_owner_id) ->) ->
-		UserGetter.getUser { "overleaf.id": doc.owner.id }, { _id: 1 }, (error, v2_owner) ->
-			if error?
-				callback(error)
-			else if !v2_owner?
-				callback(new Error("failed to import because owner is not migrated to v2"))
-			else
-				callback(null, v2_owner._id)
 
 	_importV1ProjectDataIntoV2Project: (v1_project_id, v2_project_id, v1_user_id, v2_user_id, doc, callback = (error, v2_project_id) ->) ->
 		async.series [

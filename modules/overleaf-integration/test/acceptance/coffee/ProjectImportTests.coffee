@@ -154,7 +154,7 @@ describe "ProjectImportTests", ->
 			updates = MockDocUpdaterApi.getProjectStructureUpdates(@project._id).fileUpdates
 			expect(updates.length).to.equal(0)
 
-	describe 'a project with an un-migrated owner', ->
+	describe.only 'a project with an un-migrated owner', ->
 		before (done) ->
 			# Another user owns the project that we are importing, but is not migrated
 			# to v2
@@ -176,10 +176,17 @@ describe "ProjectImportTests", ->
 
 			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
 				@response = response
-				done()
+				getProject response, (error, project) =>
+					@project = project
+					done()
 
-		it 'throws an error', ->
-			expect(@response.statusCode).to.equal 501
+		it 'should import a project with a user stub for the owner id', (done) ->
+			user_stub_id = @project.owner_ref.toString()
+			UserStub.findOne { _id: user_stub_id }, (error, user_stub) =>
+				throw error if error?
+				expect(user_stub.overleaf.id).to.equal @unmigrated_v1_owner_id
+				done()
+			return
 
 	describe 'a project with a migrated owner', ->
 		before (done) ->
