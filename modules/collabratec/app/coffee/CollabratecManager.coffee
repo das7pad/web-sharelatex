@@ -6,18 +6,33 @@ Path = require "path"
 ProjectCollabratecDetailsHandler = require "../../../../app/js/Features/Project/ProjectCollabratecDetailsHandler"
 ProjectDeleter = require "../../../../app/js/Features/Project/ProjectDeleter"
 ProjectDetailsHandler = require "../../../../app/js/Features/Project/ProjectDetailsHandler"
+ProjectDuplicator = require "../../../../app/js/Features/Project/ProjectDuplicator"
 ProjectEntityHandler = require "../../../../app/js/Features/Project/ProjectEntityHandler"
 ProjectEntityUpdateHandler = require "../../../../app/js/Features/Project/ProjectEntityUpdateHandler"
 ProjectGetter = require "../../../../app/js/Features/Project/ProjectGetter"
 ProjectRootDocManager = require "../../../../app/js/Features/Project/ProjectRootDocManager"
 Settings = require "settings-sharelatex"
 TemplatesManager = require "../../../../app/js/Features/Templates/TemplatesManager"
+UserGetter = require "../../../../app/js/Features/User/UserGetter"
 V1Api = require "../../../../app/js/Features/V1/V1Api"
 _ = require "lodash"
 async = require "async"
-request = require "request"
+logger = require "logger-sharelatex"
 
 module.exports = CollabratecManager =
+	cloneProject: (user, project_id, protect, new_collabratec_document_id, new_owner_collabratec_customer_id, collabratec_privategroup_id, callback) ->
+		ProjectGetter.getProject project_id, {name: 1}, (err, project) ->
+			return callback err if err?
+			ProjectDetailsHandler.generateUniqueName user._id, project.name, (err, project_name) ->
+				return callback err if err?
+				ProjectDuplicator.duplicate user, project_id, project_name, (err, project) ->
+					return callback err if err?
+					ProjectCollabratecDetailsHandler.initializeCollabratecProject project._id, user._id, new_collabratec_document_id,collabratec_privategroup_id, (err) ->
+						return callback err if err?
+						callback null, {
+							id: project._id,
+							url: "#{Settings.siteUrl}/project/#{project._id}"
+						}
 
 	createProject: (user_id, template_id, title, doc_abstract, keywords, primary_author, collabratec_document_id, collabratec_privategroup_id, callback) ->
 		options =
@@ -30,7 +45,7 @@ module.exports = CollabratecManager =
 				return callback err if err?
 				CollabratecManager._injectProjectMetadata user_id, project, title, doc_abstract, keywords, (err) ->
 					return callback err if err?
-					ProjectCollabratecDetailsHandler.initializeCollabratecProject project._id, title, user_id, collabratec_document_id,collabratec_privategroup_id, (err) ->
+					ProjectCollabratecDetailsHandler.initializeCollabratecProject project._id, user_id, collabratec_document_id,collabratec_privategroup_id, (err) ->
 						return callback err if err?
 						callback null, {
 							id: project._id,
@@ -56,7 +71,7 @@ module.exports = CollabratecManager =
 					project.title.toLowerCase().match(search)
 			callback null, CollabratecManager._paginate(projects, current_page, page_size)
 
-	getProjectMetadata: (user, project_id, callback) ->
+	getProjectMetadata: (project_id, callback) ->
 		projection =
 			_id: 1
 			lastUpdated: 1
@@ -73,6 +88,26 @@ module.exports = CollabratecManager =
 						return callback err if err?
 						content = DocMetadata.contentFromLines(lines)
 						callback null, CollabratecManager._formatProjectMetadata(project, content)
+
+	getUserByCollabratecId: (collabratec_id, callback) ->
+		V1Api.request {
+			expectedStatusCodes: [404]
+			qs: { collabratec_id }
+			uri: "/api/v1/sharelatex/user_collabratec_id"
+		}, (err, response, body) ->
+			return callback err if err?
+			return callback null, null unless body?.id?
+			UserGetter.getUser {"overleaf.id": parseInt(body.id)}, (err, user) ->
+				callback err if err?
+				return callback null, user
+
+	linkProject: (project_id, user_id, collabratec_document_id, callback) ->
+		ProjectCollabratecDetailsHandler.linkCollabratecUserProject project_id, user_id, collabratec_document_id, (err) ->
+			return callback err if err?
+			CollabratecManager.getProjectMetadata project_id, callback
+
+	unlinkProject: (project_id, user_id, callback) ->
+		ProjectCollabratecDetailsHandler.unlinkCollabratecUserProject project_id, user_id, callback
 
 	_formatProjectMetadata: (project, content) ->
 		metadata =
@@ -96,8 +131,10 @@ module.exports = CollabratecManager =
 		}
 
 		if (project.collabratecUsers?)
-			collabratecUser = project.collabratecUsers.find (collabratecUser) ->
-				return collabratecUser.user_id == user._id
+			# if is possible (though unlikely) to have multiple entries with different collabratec
+			# document ids for the same user so use reverse to find the most recently added entry
+			collabratecUser = project.collabratecUsers.reverse().find (collabratecUser) ->
+				return collabratecUser.user_id.toString() == user._id.toString()
 			if (collabratecUser?)
 				collabratecProject.collabratec_document_id = collabratecUser.collabratec_document_id
 				collabratecProject.collabratec_privategroup_id = collabratecUser.collabratec_privategroup_id
@@ -116,8 +153,11 @@ module.exports = CollabratecManager =
 			callback null, body.projects
 
 	_getProjectsV2: (user, callback) ->
-		ProjectGetter.findAllUsersProjects user._id, 'name lastUpdated publicAccesLevel archived owner_ref tokens', (err, projects) ->
+		ProjectGetter.findAllUsersProjects user._id, 'name lastUpdated publicAccesLevel archived owner_ref tokens collabratecUsers', (err, projects) ->
 			projects = projects.owned.concat(projects.readAndWrite, projects.tokenReadAndWrite)
+			projects = projects.filter (project) ->
+				return false if project.archived
+				return true
 			projects = projects.map (project) ->
 				CollabratecManager._formatV2Project project, user
 			callback null, projects
