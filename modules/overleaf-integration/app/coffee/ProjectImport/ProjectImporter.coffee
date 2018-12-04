@@ -472,10 +472,12 @@ module.exports = ProjectImporter =
 			pathOnDisk = "#{settings.path.dumpFolder}/#{uuid.v4()}"
 
 			readStream = request.get options
+			readStream.pause()
 			writeStream = fs.createWriteStream(pathOnDisk)
 
 			onError = (error) ->
 				logger.err {err: error}, "error writing URL to disk"
+				readStream.resume()
 				callback(error)
 
 			readStream.on 'error', onError
@@ -487,9 +489,11 @@ module.exports = ProjectImporter =
 			readStream.on 'response', (response) ->
 				if 200 <= response.statusCode < 300
 					readStream.pipe(writeStream)
+					readStream.resume()
 				else
 					error = new Error("Overleaf s3 returned non-success code: #{response.statusCode}")
 					logger.error {err: error, options}, "overleaf s3 error"
+					readStream.resume()
 					return callback(error)
 
 	_waitForV1HistoryExport: (v1_project_id, v1_user_id, callback = (error) ->) ->
