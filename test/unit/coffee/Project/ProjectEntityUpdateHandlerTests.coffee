@@ -293,14 +293,15 @@ describe 'ProjectEntityUpdateHandler', ->
 			beforeEach ->
 				@path = "/path/to/doc"
 
-				@newDoc = _id: doc_id
-				@ProjectEntityUpdateHandler.addDocWithoutUpdatingHistory =
-					withoutLock: sinon.stub().yields(null, @newDoc, folder_id, @path, @project)
-				@ProjectEntityUpdateHandler.addDoc project_id, folder_id, @docName, @docLines, userId, @callback
+				@newDoc = name:@docName, lines:undefined, _id: doc_id, rev: 0
+				@DocstoreManager.updateDoc = sinon.stub().yields(null, false, @rev = 5)
+				@TpdsUpdateSender.addDoc = sinon.stub().yields()
+				@ProjectEntityMongoUpdateHandler.addDoc = sinon.stub().yields(null, {path: fileSystem: @path}, @project)
+				@ProjectEntityUpdateHandler.addDoc project_id, doc_id, @docName, @docLines, userId, @callback
 
 			it "creates the doc without history", () ->
-				@ProjectEntityUpdateHandler.addDocWithoutUpdatingHistory.withoutLock
-					.calledWith(project_id, folder_id, @docName, @docLines, userId)
+				@DocstoreManager.updateDoc
+					.calledWith(project_id, doc_id, @docLines, 0, {})
 					.should.equal true
 
 			it "sends the change in project structure to the doc updater", () ->
