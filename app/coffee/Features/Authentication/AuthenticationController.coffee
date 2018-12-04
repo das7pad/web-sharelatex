@@ -185,7 +185,7 @@ module.exports = AuthenticationController =
 				User.findOne { "overleaf.id": body.user_profile.id }, (error, user) ->
 					return next(error) if error?
 					return res.status(401).send({error: "invalid_token"}) unless user?
-					req.oauth = access_token: body.access_token
+					req.oauth = body
 					req.oauth_user = user
 					next()
 

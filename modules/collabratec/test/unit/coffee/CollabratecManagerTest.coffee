@@ -14,6 +14,7 @@ modulePath = Path.join __dirname, "../../../app/js/CollabratecManager"
 describe "CollabratecManager", ->
 	beforeEach ->
 		@CollabratecManager = SandboxedModule.require modulePath, requires:
+			"./CollabratecApi": @CollabratecApi = {}
 			"../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler":
 				@DocumentUpdaterHandler = {}
 			"../../../../app/js/Features/Errors/Errors": @Errors = {
@@ -28,6 +29,7 @@ describe "CollabratecManager", ->
 			"../../../../app/js/Features/Project/ProjectGetter": @ProjectGetter = {}
 			"../../../../app/js/Features/Project/ProjectRootDocManager":
 				@ProjectRootDocManager = {}
+			"../../../../app/js/Features/Uploads/ProjectUploadManager": @ProjectUploadManager = {}
 			"../../../../app/js/Features/Templates/TemplatesManager": @TemplatesManager = {}
 			"../../../../app/js/Features/User/UserGetter": @UserGetter = {}
 			"../../../../app/js/Features/V1/V1Api": @V1Api = {}

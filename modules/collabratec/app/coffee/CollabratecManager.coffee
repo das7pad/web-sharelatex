@@ -1,3 +1,4 @@
+CollabratecApi = require "./CollabratecApi"
 DocMetadata = require "./DocMetadata"
 DocumentUpdaterHandler = require "../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler"
 Errors = require "../../../../app/js/Features/Errors/Errors"
@@ -11,12 +12,14 @@ ProjectEntityHandler = require "../../../../app/js/Features/Project/ProjectEntit
 ProjectEntityUpdateHandler = require "../../../../app/js/Features/Project/ProjectEntityUpdateHandler"
 ProjectGetter = require "../../../../app/js/Features/Project/ProjectGetter"
 ProjectRootDocManager = require "../../../../app/js/Features/Project/ProjectRootDocManager"
+ProjectUploadManager = require "../../../../app/js/Features/Uploads/ProjectUploadManager"
 Settings = require "settings-sharelatex"
 TemplatesManager = require "../../../../app/js/Features/Templates/TemplatesManager"
 UserGetter = require "../../../../app/js/Features/User/UserGetter"
 V1Api = require "../../../../app/js/Features/V1/V1Api"
 _ = require "lodash"
 async = require "async"
+fs = require "fs"
 logger = require "logger-sharelatex"
 
 module.exports = CollabratecManager =
@@ -108,6 +111,36 @@ module.exports = CollabratecManager =
 
 	unlinkProject: (project_id, user_id, callback) ->
 		ProjectCollabratecDetailsHandler.unlinkCollabratecUserProject project_id, user_id, callback
+
+	uploadProject: (user_id, file, collabratec_document_id, collabratec_privategroup_id, callback) ->
+		name = Path.basename(file.originalname, ".zip")
+		ProjectUploadManager.createProjectFromZipArchive user_id, name, file.path, (err, project) ->
+			# always delete upload but continue on errors
+			fs.unlink file.path, (err) ->
+				logger.error { err }, "error deleting collabratec zip upload"
+			return callback err if err?
+			ProjectCollabratecDetailsHandler.initializeCollabratecProject project._id, user_id, collabratec_document_id, collabratec_privategroup_id, (err) ->
+				return callback err if err?
+				CollabratecManager.getProjectMetadata project._id, (err, project_metadata) ->
+					return callback err if err?
+					callback null, project, project_metadata
+
+	uploadProjectCallback: (collabratec_customer_id, collabratec_document_id, project_id, project_metadata, callback) ->
+		upload_status = if project_metadata? then "success" else "failure"
+		options =
+			json:
+				storageProviderId: project_id
+				viewerLink: project_metadata?.url
+				collabratecDocumentID: collabratec_document_id
+				documentTitle: project_metadata?.title
+				docAbstract: project_metadata?.doc_abstract
+				primaryAuthor: project_metadata?.primary_author
+				keyWords: project_metadata?.keywords
+				uploadStatus: upload_status
+				uploadMessages: []
+			method: "post"
+			uri: "/ext/v1/document/callback/overleaf/project"
+		CollabratecApi.request collabratec_customer_id, options, callback
 
 	_formatProjectMetadata: (project, content) ->
 		metadata =

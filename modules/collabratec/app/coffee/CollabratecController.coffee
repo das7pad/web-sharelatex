@@ -1,4 +1,5 @@
 CollabratecManager = require "./CollabratecManager"
+logger = require "logger-sharelatex"
 
 module.exports = CollabratecController =
 	cloneProject: (req, res, next) ->
@@ -48,3 +49,14 @@ module.exports = CollabratecController =
 		CollabratecManager.unlinkProject req.params.project_id, req.oauth_user._id, (err) ->
 			return next err if err?
 			res.sendStatus(204)
+
+	uploadProject: (req, res, next) ->
+		return res.sendStatus(422) unless req.body.collabratec_document_id?
+		return res.sendStatus(422) unless req.files?.zipfile?
+		# return success now and callback with result after processing
+		res.sendStatus(204)
+		# process upload
+		CollabratecManager.uploadProject req.oauth_user._id, req.files?.zipfile, req.body.collabratec_document_id, req.body.collabratec_privategroup_id, (err, project, project_metadata) ->
+			logger.error { err: err, user_id: req.oauth_user._id }, "collabratec upload project error" if err?
+			CollabratecManager.uploadProjectCallback req.oauth.user_profile.collabratec_customer_id, req.body.collabratec_document_id, project?._id, project_metadata, (err) ->
+				logger.error { err: err, user_id: req.oauth_user._id }, "collabratec upload project callback error" if err?

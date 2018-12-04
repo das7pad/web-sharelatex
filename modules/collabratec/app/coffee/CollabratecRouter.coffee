@@ -9,7 +9,9 @@ module.exports =
 
 		publicApiRouter.get "/api/v1/collabratec/users/current_user/projects", AuthenticationController.requireOauth(), CollabratecMiddleware.v1Proxy, CollabratecController.getProjects
 
-		publicApiRouter.post "/api/v1/collabratec/users/current_user/projects", AuthenticationController.requireOauth(), CollabratecMiddleware.v1Proxy, CollabratecController.createProject
+		publicApiRouter.post "/api/v1/collabratec/users/current_user/projects", AuthenticationController.requireOauth(), CollabratecController.createProject
+
+		publicApiRouter.post "/api/v1/collabratec/users/current_user/projects/upload", AuthenticationController.requireOauth(), CollabratecController.uploadProject
 
 		publicApiRouter.delete "/api/v1/collabratec/users/current_user/projects/:project_id", AuthenticationController.requireOauth(), CollabratecMiddleware.v1Proxy, CollabratecMiddleware.ensureUserCanDeleteProject, CollabratecController.deleteProject
 
