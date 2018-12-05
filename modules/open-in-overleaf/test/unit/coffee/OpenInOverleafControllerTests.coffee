@@ -43,6 +43,7 @@ describe 'OpenInOverleafController', ->
 			createProjectFromSnippet: sinon.stub().callsArgWith(3, null, @project)
 		@ProjectDetailsHandler =
 			generateUniqueName: sinon.stub().callsArgWith(2, null, "new_snippet_project")
+			fixProjectName: sinon.stub().returnsArg(0)
 		@ProjectUploadManager =
 			createProjectFromZipArchive: sinon.stub().callsArgWith(3, null, @project)
 
@@ -97,6 +98,7 @@ describe 'OpenInOverleafController', ->
 				@res.send = (content)=>
 					sinon.assert.calledWith(@DocumentHelper.getTitleFromTexContent, @documentLines)
 					sinon.assert.calledWith(@ProjectDetailsHandler.generateUniqueName, @user._id, "new_snippet_project")
+					sinon.assert.called(@ProjectDetailsHandler.fixProjectName)
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 

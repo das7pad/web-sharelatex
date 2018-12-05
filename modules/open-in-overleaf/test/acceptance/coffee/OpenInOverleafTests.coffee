@@ -26,8 +26,18 @@ describe "Open In Overleaf", ->
 I have a fancy name
 \\end{document}
 """)
+			else if req.query.url == 'http://example.org/badname.tex'
+				res.send("""
+\\documentclass[12pt]{article}
+\\begin{document}
+\\title{bad \\\\ name}
+I have a bad name
+\\end{document}
+""")
 			else if req.query.url == 'http://example.org/project.zip'
 				res.sendFile path.join(__dirname, '../fixtures', 'project.zip')
+			else if req.query.url == 'http://example.org/badname.zip'
+				res.sendFile path.join(__dirname, '../fixtures', 'badname.zip')
 			else
 				res.sendStatus(404)
 
@@ -317,16 +327,38 @@ I have a fancy name
 
 						done()
 
-			# TODO: requires https://github.com/sharelatex/web-sharelatex-internal/pull/1184
-			#it "should read the name from the zip's main.tex file", ->
-			#	projectId = @res.headers.location.match(@uri_regex)[1]
-			#	expect(projectId).to.exist
-			#	ProjectGetter.getProject projectId, (error, project) ->
-			#		return done(error) if error?
-			#
-			#		expect(project).to.exist
-			#		expect(project.name).to.match /^wombat/
-			#		done()
+			it "should read the name from the zip's main.tex file", (done) ->
+				projectId = @res.headers.location.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				ProjectGetter.getProject projectId, (error, project) ->
+					return done(error) if error?
+
+					expect(project).to.exist
+					expect(project.name).to.match /^wombat/
+					done()
+
+		describe "when POSTing a snip_uri for a zip file with an invalid name in the tex contents", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						snip_uri: 'http://example.org/badname.zip'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should not create a project with an invalid name", (done) ->
+				projectId = @res.headers.location.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				ProjectGetter.getProject projectId, (error, project) ->
+					return done(error) if error?
+
+					expect(project).to.exist
+					expect(project.name).to.match /^bad[^\\]+name/
+					done()
 
 		describe "when POSTing a snip_uri that does not exist", ->
 			beforeEach (done) ->
@@ -390,3 +422,27 @@ I have a fancy name
 
 						expect(project.name).to.match /fancy name.+/
 						done()
+
+		describe "when the document has a title containing an invalid character", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						snip_uri: 'http://example.org/badname.tex'
+					headers:
+						'X-Requested-With': 'XMLHttpRequest'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should create a project without any bad characters in its name", (done) ->
+				projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				ProjectGetter.getProject projectId, (error, project) ->
+					return done(error) if error?
+
+					expect(project.name).to.match /^bad[^\\]+name/
+					done()
