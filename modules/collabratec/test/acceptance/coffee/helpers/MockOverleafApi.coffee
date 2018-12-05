@@ -50,11 +50,11 @@ module.exports = MockOverleafApi =
 			res.sendStatus 401
 
 		app.get "/api/v1/collabratec/users/current_user/projects/:project_id/metadata", (req, res) =>
-			return res.sendStatus 401 unless @projects[req.token]?
+			return res.sendStatus 404 unless @projects[req.token]?
 			project = @projects[req.token].find((project) ->
 				return project.id == req.params.project_id
 			)
-			return res.sendStatus 401 unless project
+			return res.sendStatus 404 unless project
 			res.json project
 
 		app.post "/api/v1/sharelatex/oauth_authorize", (req, res) =>
