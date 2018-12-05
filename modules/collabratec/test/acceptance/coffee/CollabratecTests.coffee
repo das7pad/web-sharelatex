@@ -7,6 +7,7 @@ Path = require "path"
 ProjectModel = require("../../../../../app/js/models/Project").Project
 URL = require "url"
 User = require "../../../../../test/acceptance/js/helpers/User"
+async = require "async"
 chai = require "chai"
 fs = require "fs"
 mkdirp = require "mkdirp"
@@ -704,21 +705,32 @@ describe "Collabratec", ->
 				request options, (error, response, body) =>
 					expect(response.statusCode).to.equal 204
 					# api calls back immediately so must wait for upload to complete
-					setTimeout(() =>
-						expect(MockCollabratecApi.requests.length).to.equal 1
-						expect(MockCollabratecApi.requests[0].body.storageProviderId).to.be.defined
-						expect(MockCollabratecApi.requests[0].body.uploadStatus).to.equal "success"
-						expect(MockCollabratecApi.requests[0].headers["x-ppct-signature"]).to.be.defined
-						expect(MockCollabratecApi.requests[0].headers["x-ppct-date"]).to.be.defined
-						expect(MockCollabratecApi.requests[0].headers["x-extnet-access"]).to.equal "Y29sbGFicmF0ZWMtY3VzdG9tZXItaWQ="
-						project_id = MockCollabratecApi.requests[0].body.storageProviderId
-						ProjectModel.findOne {_id: project_id }, (err, project) =>
-							return done err if err?
-							expect(project.collabratecUsers[0].collabratec_document_id).to.equal "collabratec-document-id"
-							expect(project.collabratecUsers[0].collabratec_privategroup_id).to.equal "collabratec-privategroup-id"
-							expect(project.collabratecUsers[0].user_id.toString()).to.equal @user.id
+					# retry this 100 times waiting 100ms between tries (10s max)
+					async.retry(
+						100
+						(callback) =>
+							setTimeout(
+								() =>
+									return callback(new Error("project upload did not complete")) if MockCollabratecApi.requests.length == 0
+									expect(MockCollabratecApi.requests.length).to.equal 1
+									expect(MockCollabratecApi.requests[0].body.storageProviderId).to.be.defined
+									expect(MockCollabratecApi.requests[0].body.uploadStatus).to.equal "success"
+									expect(MockCollabratecApi.requests[0].headers["x-ppct-signature"]).to.be.defined
+									expect(MockCollabratecApi.requests[0].headers["x-ppct-date"]).to.be.defined
+									expect(MockCollabratecApi.requests[0].headers["x-extnet-access"]).to.equal "Y29sbGFicmF0ZWMtY3VzdG9tZXItaWQ="
+									project_id = MockCollabratecApi.requests[0].body.storageProviderId
+									ProjectModel.findOne {_id: project_id }, (err, project) =>
+										return done err if err?
+										expect(project.collabratecUsers[0].collabratec_document_id).to.equal "collabratec-document-id"
+										expect(project.collabratecUsers[0].collabratec_privategroup_id).to.equal "collabratec-privategroup-id"
+										expect(project.collabratecUsers[0].user_id.toString()).to.equal @user.id
+									callback()
+								100
+							)
+						(err) =>
+							expect(err).to.be.undefined
 							done()
-					, 500)
+					)
 
 		describe "without collabratec_document_id", ->
 			it "should return 422", (done) ->
