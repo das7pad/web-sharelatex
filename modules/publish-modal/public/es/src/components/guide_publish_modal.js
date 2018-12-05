@@ -74,6 +74,7 @@ export default class GuidePublishModal extends Component {
         return (
           <F1000Export
             onReturn={onReturn}
+            entry={entry}
             partnerName={entry.name}
             partnerContactURL={entry.home_url + '/contact'} // works; not ideal
             returnText={returnText}

@@ -39,15 +39,14 @@ export default class F1000Export extends Component {
         <p>Thanks for using Overleaf to write your article.</p>
         <p>
           When you are ready to submit, then click
-          <strong>Send to {this.state.partnerName}</strong> below. (Your files
-          will be sent to {this.state.partnerName} by {this.state.appName}
-          .)
+          <strong> Send to {entry.name}</strong> below. (Your files will be sent
+          to {entry.name} by Overleaf)
         </p>
         <button
           className="btn btn-primary"
           onClick={() => this.runExport(entry, projectId)}
         >
-          Submit to {this.state.partnerName}
+          Submit to {entry.name}
         </button>
       </span>
     )
