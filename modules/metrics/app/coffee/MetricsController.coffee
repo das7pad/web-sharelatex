@@ -38,9 +38,19 @@ module.exports = MetricsController =
 				resourceType: 'institution',
 			}
 
+	templateMetrics: (req, res, next) ->
+		template = req.template
+		res.render Path.resolve(__dirname, '../views/metricsApp'), {
+			metricsEndpoint: "/graphs",
+			resourceId: template.id
+			resourceName: template.title
+			resourceType: 'template',
+		}
+
 	analyticsProxy: (req, res, next) ->
 		res.setTimeout(5 * 60 * 1000)
 		analyticsUrl = settings.apis.analytics.url + req.originalUrl
+		analyticsUrl = analyticsUrl.replace('template', 'v1_template')
 		logger.log req.query, "requesting from analytics #{analyticsUrl}"
 		request
 			.get(analyticsUrl)
