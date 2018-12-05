@@ -154,7 +154,7 @@ describe "ProjectImportTests", ->
 			updates = MockDocUpdaterApi.getProjectStructureUpdates(@project._id).fileUpdates
 			expect(updates.length).to.equal(0)
 
-	describe.only 'a project with an un-migrated owner', ->
+	describe 'a project with an un-migrated owner', ->
 		before (done) ->
 			# Another user owns the project that we are importing, but is not migrated
 			# to v2

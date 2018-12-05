@@ -49,41 +49,42 @@ SUPPORTED_V1_EXT_AGENTS = ['wlfile', 'url', 'wloutput', 'mendeley', 'zotero']
 MAX_UPLOADS = 4 # maximum number of parallel uploads
 
 module.exports = ProjectImporter =
-	importProject: (v1_project_id, v2_user_id, callback = (error, v2_project_id) ->) ->
-		logger.log {v1_project_id, v2_user_id}, "importing project from overleaf"
+	importProject: (v1_project_id, v2_importer_id, callback = (error, v2_project_id) ->) ->
+		logger.log {v1_project_id, v2_importer_id}, "importing project from overleaf"
 		metrics.inc "project-import.attempt"
 
-		UserGetter.getUser v2_user_id, (error, user) ->
+		UserGetter.getUser v2_importer_id, (error, user) ->
 			return callback(error) if error?
 
-			v1_user_id = user?.overleaf?.id
-			if !v1_user_id
+			v1_importer_id = user?.overleaf?.id
+			if !v1_importer_id
 				logger.err {error}, "failed to import because user is not a V1 user"
 				return callback(new Error("failed to import because user is not a V1 user"))
 
-			ProjectImporter._startExport v1_project_id, v1_user_id, (error, doc) ->
+			ProjectImporter._startExport v1_project_id, v1_importer_id, (error, doc) ->
 				if error?
 					logger.err {error}, "failed to start project import"
 					metrics.inc "project-import.error.total"
 					metrics.inc "project-import.error.#{error.name}"
 					return callback(error)
-				ProjectImporter._createV2ProjectFromV1Doc v1_project_id, v1_user_id, v2_user_id, doc, callback
+				ProjectImporter._createV2ProjectFromV1Doc v1_project_id, v1_importer_id, doc, callback
 
-	_createV2ProjectFromV1Doc: (v1_project_id, v1_user_id, v2_user_id, doc, callback = (error, v2_project_id) ->) ->
+	_createV2ProjectFromV1Doc: (v1_project_id, v1_importer_id, doc, callback = (error, v2_project_id) ->) ->
+		v1_owner_id = doc.owner.id
 		UserMapper.getSlIdFromOlUser doc.owner, (error, v2_owner_id) ->
 			return callback(error) if error?
 
 			async.waterfall [
 				(cb) ->
-					ProjectImporter._initSharelatexProject v2_user_id, v2_owner_id, doc, cb
+					ProjectImporter._initSharelatexProject v2_owner_id, doc, cb
 				(v2_project_id, cb) ->
-					ProjectImporter._importV1ProjectDataIntoV2Project v1_project_id, v2_project_id, v1_user_id, v2_user_id, doc, cb
+					ProjectImporter._importV1ProjectDataIntoV2Project v1_project_id, v2_project_id, v1_owner_id, v2_owner_id, v1_importer_id, doc, cb
 			], (importError, v2_project_id) ->
 				if importError?
 					logger.err {importError, errorMessage: importError.message, v1_project_id, v1_project_id}, "failed to import project"
 					metrics.inc "project-import.error.total"
 					metrics.inc "project-import.error.#{importError.name}"
-					ProjectImporter._cancelExport v1_project_id, v1_user_id, (cancelError) ->
+					ProjectImporter._cancelExport v1_project_id, v1_importer_id, (cancelError) ->
 						if cancelError?
 							logger.err {cancelError, errorMessage: cancelError.message, v1_project_id, v2_project_id}, "failed to cancel project import"
 						callback(importError)
@@ -91,22 +92,22 @@ module.exports = ProjectImporter =
 					metrics.inc "project-import.success"
 					callback null, v2_project_id
 
-	_importV1ProjectDataIntoV2Project: (v1_project_id, v2_project_id, v1_user_id, v2_user_id, doc, callback = (error, v2_project_id) ->) ->
+	_importV1ProjectDataIntoV2Project: (v1_project_id, v2_project_id, v1_owner_id, v2_owner_id, v1_importer_id, doc, callback = (error, v2_project_id) ->) ->
 		async.series [
 			(cb) ->
 				ProjectImporter._importInvites v1_project_id, v2_project_id, doc.invites, cb
 			(cb) ->
 				ProjectImporter._importTokenAccessInvites v1_project_id, v2_project_id, doc.token_access_invites, cb
 			(cb) ->
-				ProjectImporter._importFiles v2_project_id, v2_user_id, doc.files, cb
+				ProjectImporter._importFiles v2_project_id, doc.files, cb
 			(cb) ->
-				ProjectImporter._waitForV1HistoryExport v1_project_id, v1_user_id, cb
+				ProjectImporter._waitForV1HistoryExport v1_project_id, v1_importer_id, cb
 			(cb) ->
-				ProjectImporter._importLabels doc.id, v2_project_id, v1_user_id, cb
+				ProjectImporter._importLabels doc.id, v2_project_id, v1_owner_id, cb
 			(cb) ->
-				ProjectImporter._importTags v1_project_id, v2_project_id, v1_user_id, v2_user_id, cb
+				ProjectImporter._importTags v1_project_id, v2_project_id, v1_owner_id, v2_owner_id, cb
 			(cb) ->
-				ProjectImporter._confirmExport v1_project_id, v2_project_id, v1_user_id, cb
+				ProjectImporter._confirmExport v1_project_id, v2_project_id, v1_importer_id, cb
 		], (error) ->
 			if error?
 				# Since _initSharelatexProject created a v2 project we want to
@@ -118,16 +119,16 @@ module.exports = ProjectImporter =
 			else
 				callback(null, v2_project_id)
 
-	_startExport: (v1_project_id, v1_user_id, callback = (error, doc) ->) ->
+	_startExport: (v1_project_id, v1_importer_id, callback = (error, doc) ->) ->
 		V1SharelatexApi.request {
 			method: 'POST'
-			url: "#{settings.apis.v1.url}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/start"
+			url: @_exportUrl(v1_project_id, v1_importer_id, "start")
 		}, (error, res, doc) ->
 			return callback(error) if error?
-			logger.log {v1_project_id, v1_user_id, doc}, "got doc for project from overleaf"
+			logger.log {v1_project_id, v1_importer_id, doc}, "got doc for project from overleaf"
 			return callback(null, doc)
 
-	_initSharelatexProject: (v2_user_id, v2_owner_id, doc = {}, callback = (err, project) ->) ->
+	_initSharelatexProject: (v2_owner_id, doc = {}, callback = (err, project) ->) ->
 		if !doc.title? or !doc.id? or !doc.latest_ver_id? or !doc.latex_engine? or !doc.token? or !doc.read_token?
 			return callback(new Error("expected doc title, id, latest_ver_id, latex_engine, token and read_token"))
 		if doc.has_export_records? and doc.has_export_records
@@ -166,7 +167,7 @@ module.exports = ProjectImporter =
 		# make the project name unique on import
 		# use the numerical part of the overleaf id as an optional suffix
 		numericId = doc.token.replace(/a-z/g,'')
-		ProjectDetailsHandler.generateUniqueName v2_user_id, doc.title, [" (#{numericId})"], (error, v2_project_name) ->
+		ProjectDetailsHandler.generateUniqueName v2_owner_id, doc.title, [" (#{numericId})"], (error, v2_project_name) ->
 			return callback(error) if error?
 			ProjectCreationHandler.createBlankProject v2_owner_id, v2_project_name, attributes, (error, project) ->
 				return callback(error) if error?
@@ -232,22 +233,22 @@ module.exports = ProjectImporter =
 				return callback(error) if error?
 				ProjectImporter._importTags(v1_project_id, v2_project_id, invite.invitee.id, inviteeUserId, callback)
 
-	_importLabels: (v1_project_id, v2_project_id, v1_user_id, callback = (error) ->) ->
+	_importLabels: (v1_project_id, v2_project_id, v1_owner_id, callback = (error) ->) ->
 		ProjectImporter._getLabels v1_project_id, (error, labels) ->
 			return callback(error) if error?
 			async.eachSeries(
 				labels,
-				(label, cb) -> ProjectImporter._importLabel v2_project_id, label, v1_user_id, cb
+				(label, cb) -> ProjectImporter._importLabel v2_project_id, label, v1_owner_id, cb
 				callback
 			)
 
-	_importLabel: (v2_project_id, label, v1_user_id, callback = (error) ->) ->
+	_importLabel: (v2_project_id, label, v1_owner_id, callback = (error) ->) ->
 		logger.log {v2_project_id, label}, 'importing label'
 		if !label.history_version?
 			return callback(new Error('cannot import label with no history_version'))
 		if !label.user_id?
-			logger.log {v2_project_id, label, v1_user_id}, 'no user id on label, defaulting to project owner'
-			label.user_id = v1_user_id
+			logger.log {v2_project_id, label, v1_owner_id}, 'no user id on label, defaulting to project owner'
+			label.user_id = v1_owner_id
 		UserMapper.getSlIdFromOlUser {id: label.user_id}, (error, user_id) ->
 			return callback(error) if error?
 			request.post {
@@ -312,11 +313,11 @@ module.exports = ProjectImporter =
 
 		return null
 
-	_importFiles: (project_id, v2_user_id, files = [], callback = (error) ->) ->
+	_importFiles: (project_id, files = [], callback = (error) ->) ->
 		# check files are in expected format
 		checkErr = ProjectImporter._checkFiles (files)
 		if checkErr?
-			logger.warn {project_id, v2_user_id, files:files, checkErr:checkErr}, "invalid files in import"
+			logger.warn {project_id, files:files, checkErr:checkErr}, "invalid files in import"
 			return callback(checkErr)
 
 		getPath = (file) ->
@@ -487,13 +488,13 @@ module.exports = ProjectImporter =
 					readStream.resume()
 					return callback(error)
 
-	_waitForV1HistoryExport: (v1_project_id, v1_user_id, callback = (error) ->) ->
-		ProjectImporter._checkV1HistoryExportStatus v1_project_id, v1_user_id, 0, callback
+	_waitForV1HistoryExport: (v1_project_id, v1_importer_id, callback = (error) ->) ->
+		ProjectImporter._checkV1HistoryExportStatus v1_project_id, v1_importer_id, 0, callback
 
-	_checkV1HistoryExportStatus: (v1_project_id, v1_user_id, requestCount, callback = (error) ->) ->
+	_checkV1HistoryExportStatus: (v1_project_id, v1_importer_id, requestCount, callback = (error) ->) ->
 		V1SharelatexApi.request {
 			method: 'GET'
-			url: "#{settings.apis.v1.url}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/history"
+			url: @_exportUrl(v1_project_id, v1_importer_id, "history")
 		}, (error, res, status) ->
 			return callback(error) if error?
 
@@ -501,13 +502,13 @@ module.exports = ProjectImporter =
 				error ?= new V1HistoryNotSyncedError('v1 history not synced')
 
 			if error?
-				logger.log {v1_project_id, v1_user_id, requestCount, error}, "error checking v1 history sync"
+				logger.log {v1_project_id, v1_importer_id, requestCount, error}, "error checking v1 history sync"
 				if requestCount >= V1_HISTORY_SYNC_REQUEST_TIMES.length
 					return callback(error)
 				else
 					interval = (V1_HISTORY_SYNC_REQUEST_TIMES[requestCount + 1] - V1_HISTORY_SYNC_REQUEST_TIMES[requestCount]) * 1000
 					setTimeout(
-						() -> ProjectImporter._checkV1HistoryExportStatus v1_project_id, v1_user_id, requestCount + 1, callback
+						() -> ProjectImporter._checkV1HistoryExportStatus v1_project_id, v1_importer_id, requestCount + 1, callback
 						interval
 					)
 			else
@@ -526,10 +527,10 @@ module.exports = ProjectImporter =
 			else
 				callback(null, data.labels)
 
-	_confirmExport: (v1_project_id, v2_project_id, v1_user_id, callback = (error) ->) ->
+	_confirmExport: (v1_project_id, v2_project_id, v1_importer_id, callback = (error) ->) ->
 		V1SharelatexApi.request {
 			method: 'POST'
-			url: "#{settings.apis.v1.url}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/confirm"
+			url: @_exportUrl(v1_project_id, v1_importer_id, "confirm")
 			json:
 				doc: { v2_project_id }
 		}, (error, res) ->
@@ -538,12 +539,18 @@ module.exports = ProjectImporter =
 			else
 				callback()
 
-	_cancelExport: (v1_project_id, v1_user_id, callback = (error) ->) ->
+	_cancelExport: (v1_project_id, v1_importer_id, callback = (error) ->) ->
 		V1SharelatexApi.request {
 			method: 'POST'
-			url: "#{settings.apis.v1.url}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/cancel"
+			url: @_exportUrl(v1_project_id, v1_importer_id, "cancel")
 		}, (error, res) ->
 			if error?
 				callback(error)
 			else
 				callback()
+
+	_exportUrl: (v1_project_id, v1_importer_id, action) ->
+		if settings.allowUnauthorizedDocExport
+			"#{settings.apis.v1.url}/api/v1/sharelatex/docs/#{v1_project_id}/export/#{action}"
+		else
+			"#{settings.apis.v1.url}/api/v1/sharelatex/users/#{v1_importer_id}/docs/#{v1_project_id}/export/#{action}"

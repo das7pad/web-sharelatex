@@ -68,7 +68,7 @@ describe "ProjectImporter", ->
 			})
 			@ProjectImporter._startExport = sinon.stub().yields(null, @doc = {
 				id: @v1_project_id,
-				owner: {
+				owner: @owner = {
 					id: @v1_user_id
 					email: 'owner@example.com'
 					name: 'Owner'
@@ -82,6 +82,8 @@ describe "ProjectImporter", ->
 				}],
 				token_access_invites: []
 			})
+			@UserMapper.getSlIdFromOlUser = sinon.stub()
+			@UserMapper.getSlIdFromOlUser.withArgs(@owner).yields(null, @v2_user_id)
 			@ProjectImporter._initSharelatexProject = sinon.stub().yields(null, @v2_project_id)
 			@ProjectImporter._importInvites = sinon.stub().yields()
 			@ProjectImporter._importTokenAccessInvites = sinon.stub().yields()
@@ -110,7 +112,7 @@ describe "ProjectImporter", ->
 
 			it "should create the SL project", ->
 				@ProjectImporter._initSharelatexProject
-					.calledWith(@v2_user_id, @v2_user_id, @doc)
+					.calledWith(@v2_user_id, @doc)
 					.should.equal true
 
 			it "should import the invites", ->
@@ -124,7 +126,7 @@ describe "ProjectImporter", ->
 
 			it "should import the files", ->
 				@ProjectImporter._importFiles
-					.calledWith(@v2_project_id, @v2_user_id, @doc.files)
+					.calledWith(@v2_project_id, @doc.files)
 					.should.equal true
 
 			it "should import the labels", ->
@@ -166,55 +168,6 @@ describe "ProjectImporter", ->
 			it 'should callback with the error', ->
 				@callback.calledWith(@error)
 
-	describe "_checkOwnerIsMigrated", ->
-		describe "successfully", ->
-			beforeEach ->
-				@owner_id = 'mock-v1-owner-id'
-				@doc = {
-					owner: {
-						id: @owner_id
-						email: 'owner-email@example.com'
-						name: 'Owner name'
-					}
-				}
-				@UserGetter.getUser = sinon.stub().yields(null, @user = {
-					_id: @v2_user_id,
-					overleaf: {
-						id: @owner_id
-					}
-				})
-				@ProjectImporter._checkOwnerIsMigrated @doc, @callback
-
-			it "should callback with the v2 user id", ->
-				@callback.calledWith(null, @v2_user_id).should.equal true
-
-		describe "unsuccessfully", ->
-			beforeEach ->
-				@error = new Error('something went wrong')
-				@UserGetter.getUser = sinon.stub().yields(@error)
-				doc = { owner: {} }
-				@ProjectImporter._checkOwnerIsMigrated doc, @callback
-
-			it "should callback with the error", ->
-				@callback.calledWith(@error).should.equal true
-
-		describe "with no matching v2 user", ->
-			beforeEach ->
-				@owner_id = 'unmigrated-mock-v1-owner-id'
-				@doc = {
-					owner: {
-						id: @owner_id
-						email: 'unmigrated-owner@example.com'
-						name: 'Unmigrated owner'
-					}
-				}
-				@UserGetter.getUser = sinon.stub().yields(null, null)
-
-			it "should callback with an error", (done) ->
-				@ProjectImporter._checkOwnerIsMigrated @doc, (error) =>
-					expect(error.message).to.equal("failed to import because owner is not migrated to v2")
-					done()
-
 	describe "_initSharelatexProject", ->
 		beforeEach ->
 			@project = {
@@ -242,7 +195,7 @@ describe "ProjectImporter", ->
 
 		describe "successfully", ->
 			beforeEach ->
-				@ProjectImporter._initSharelatexProject @user_id, @user_id, @doc, @callback
+				@ProjectImporter._initSharelatexProject @user_id, @doc, @callback
 
 			it "should create the project", ->
 				attributes =
@@ -267,44 +220,44 @@ describe "ProjectImporter", ->
 		describe "null checks", ->
 			it "should require doc.title", (done) ->
 				delete @doc.title
-				@ProjectImporter._initSharelatexProject @user_id, @user_id, @doc, (error) ->
+				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
 					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
 					done()
 
 			it "should require doc.latest_ver_id", (done) ->
 				delete @doc.latest_ver_id
-				@ProjectImporter._initSharelatexProject @user_id, @user_id, @doc, (error) ->
+				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
 					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
 					done()
 
 			it "should require doc.id", (done) ->
 				delete @doc.id
-				@ProjectImporter._initSharelatexProject @user_id, @user_id, @doc, (error) ->
+				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
 					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
 					done()
 
 			it "should require doc.latex_engine", (done) ->
 				delete @doc.latex_engine
-				@ProjectImporter._initSharelatexProject @user_id, @user_id, @doc, (error) ->
+				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
 					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
 					done()
 
 			it "should require doc.token", (done) ->
 				delete @doc.token
-				@ProjectImporter._initSharelatexProject @user_id, @user_id, @doc, (error) ->
+				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
 					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
 					done()
 
 			it "should require doc.read_token", (done) ->
 				delete @doc.read_token
-				@ProjectImporter._initSharelatexProject @user_id, @user_id, @doc, (error) ->
+				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
 					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
 					done()
 
 		describe "with brand variation", ->
 			it "should set brandVariationId", (done) ->
 				@doc.brand_variation_id = 123
-				@ProjectImporter._initSharelatexProject @user_id, @user_id, @doc, (error, project_id) =>
+				@ProjectImporter._initSharelatexProject @user_id, @doc, (error, project_id) =>
 					expect(error).to.equal(null)
 					expect(project_id).to.not.be.undefined
 					# Creates project with brandVariationId = 123
@@ -320,27 +273,18 @@ describe "ProjectImporter", ->
 		describe "with export records", ->
 			it "should prevent import", (done) ->
 				@doc.has_export_records = true
-				@ProjectImporter._initSharelatexProject @user_id, @user_id, @doc, (error) ->
+				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
 					error.message.should.equal("project has export records")
 					done()
 
 		describe "with any title", ->
 			beforeEach ->
-				@ProjectImporter._initSharelatexProject @user_id, @user_id, @doc, @callback
+				@ProjectImporter._initSharelatexProject @user_id, @doc, @callback
 
 			it "should fix any invalid characters in the project name", ->
 				@ProjectCreationHandler.createBlankProject
 					.calledWith(@user_id, 'fixed-project-name')
 					.should.equal true
-
-		describe "with a owner_id different to exporting user", ->
-			beforeEach ->
-				@owner_id = 'mock-owner-id'
-				@ProjectImporter._initSharelatexProject @user_id, @owner_id, @doc, @callback
-
-			it "should create the project with the correct owner", ->
-				expect(@ProjectCreationHandler.createBlankProject.firstCall.args[0])
-					.to.equal @owner_id
 
 	describe "_startExport", ->
 		beforeEach ->
@@ -606,7 +550,8 @@ describe "ProjectImporter", ->
 					latest_content: "chapter 1 content"
 					type: "src"
 				}
-				@ProjectImporter._importFiles @project_id, @user_id, [@file], done
+				@ProjectImporter._importFiles @project_id, [@file], done
+
 
 			it "should create the file's folder", ->
 				@ProjectEntityUpdateHandler.mkdirp
@@ -639,7 +584,7 @@ describe "ProjectImporter", ->
 					type: "src"
 					main: true
 				}
-				@ProjectImporter._importFiles @project_id, @user_id, [@file], done
+				@ProjectImporter._importFiles @project_id, [@file], done
 
 			it "should create the file's folder", ->
 				@ProjectEntityUpdateHandler.mkdirp
@@ -659,7 +604,7 @@ describe "ProjectImporter", ->
 					type: "att"
 				}
 				@ProjectImporter._writeS3ObjectToDisk = sinon.stub().yields(null, "path/on/disk")
-				@ProjectImporter._importFiles @project_id, @user_id, [@file], done
+				@ProjectImporter._importFiles @project_id, [@file], done
 
 			it "should create the file's folder", ->
 				@ProjectEntityUpdateHandler.mkdirp
@@ -697,7 +642,7 @@ describe "ProjectImporter", ->
 						source_doc_display_name: 'Test Project'
 				}
 				@ProjectImporter._writeS3ObjectToDisk = sinon.stub().yields(null, "path/on/disk")
-				@ProjectImporter._importFiles @project_id, @user_id, [@file], done
+				@ProjectImporter._importFiles @project_id, [@file], done
 
 			it "should create the file's folder", ->
 				@ProjectEntityUpdateHandler.mkdirp
@@ -733,7 +678,7 @@ describe "ProjectImporter", ->
 						source_doc_display_name: 'Test Output Project'
 				}
 				@ProjectImporter._writeS3ObjectToDisk = sinon.stub().yields(null, "path/on/disk")
-				@ProjectImporter._importFiles @project_id, @user_id, [@file], done
+				@ProjectImporter._importFiles @project_id, [@file], done
 
 			it "should create the file's folder", ->
 				@ProjectEntityUpdateHandler.mkdirp
@@ -768,7 +713,7 @@ describe "ProjectImporter", ->
 						url: 'http://example.com/image.jpeg'
 				}
 				@ProjectImporter._writeS3ObjectToDisk = sinon.stub().yields(null, "path/on/disk")
-				@ProjectImporter._importFiles @project_id, @user_id, [@file], done
+				@ProjectImporter._importFiles @project_id, [@file], done
 
 			it "should create the file's folder", ->
 				@ProjectEntityUpdateHandler.mkdirp
@@ -804,7 +749,7 @@ describe "ProjectImporter", ->
 						group: 'abcbetatutts'
 				}
 				@ProjectImporter._writeS3ObjectToDisk = sinon.stub().yields(null, "path/on/disk")
-				@ProjectImporter._importFiles @project_id, @user_id, [@file], done
+				@ProjectImporter._importFiles @project_id, [@file], done
 
 			it "should download the url to disk from s3", ->
 				@ProjectImporter._writeS3ObjectToDisk
@@ -831,7 +776,7 @@ describe "ProjectImporter", ->
 					type: "ext"
 					agent: "unknown"
 				}
-				@ProjectImporter._importFiles @project_id, @user_id, [@file], @callback
+				@ProjectImporter._importFiles @project_id, [@file], @callback
 
 			it 'should throw an error', ->
 				err = @callback.lastCall.args[0]
@@ -844,7 +789,7 @@ describe "ProjectImporter", ->
 					file_path: 's3/linked_file.pdf'
 					type: 'definitely_unknown'
 				}
-				@ProjectImporter._importFiles @project_id, @user_id, [@file], @callback
+				@ProjectImporter._importFiles @project_id, [@file], @callback
 
 			it 'should throw an error', ->
 				@callback
@@ -866,25 +811,25 @@ describe "ProjectImporter", ->
 
 			it "should require file.file", (done) ->
 				delete @src_file.file
-				@ProjectImporter._importFiles @project_id, @user_id, [@src_file], (error) ->
+				@ProjectImporter._importFiles @project_id, [@src_file], (error) ->
 					error.message.should.equal("expected file.file and type")
 					done()
 
 			it "should require file.type", (done) ->
 				delete @src_file.type
-				@ProjectImporter._importFiles @project_id, @user_id, [@src_file], (error) ->
+				@ProjectImporter._importFiles @project_id, [@src_file], (error) ->
 					error.message.should.equal("expected file.file and type")
 					done()
 
 			it "should require file.latest_content", (done) ->
 				delete @src_file.latest_content
-				@ProjectImporter._importFiles @project_id, @user_id, [@src_file], (error) ->
+				@ProjectImporter._importFiles @project_id, [@src_file], (error) ->
 					error.message.should.equal("expected file.latest_content")
 					done()
 
 			it "should require file.file_path", (done) ->
 				delete @att_file.file_path
-				@ProjectImporter._importFiles @project_id, @user_id, [@att_file], (error) ->
+				@ProjectImporter._importFiles @project_id, [@att_file], (error) ->
 					error.message.should.equal("expected file.file_path")
 					done()
 
