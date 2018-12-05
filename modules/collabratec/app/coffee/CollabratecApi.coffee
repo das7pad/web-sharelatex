@@ -27,7 +27,11 @@ module.exports = CollabratecApi =
 		hmac = crypto.createHmac("sha256", settings.collabratec.api.hmac_key)
 		hmac.update(token_text)
 		signature = hmac.digest("base64")
-		# set auth headers
+		# set auth headers - this authenication scheme is something custom that ieee
+		# came up with and not well documented. the original implementation in
+		# overleaf/write_latex/main/lib/orgs/ieee/api_request.rb which was developed
+		# in collaboration with ieee is the only authoritative specification that
+		# i am aware of.
 		options.headers =
 			"X-ppct-signature": "#{settings.collabratec.api.secret}:#{signature}"
 			"X-ppct-date": current_time
