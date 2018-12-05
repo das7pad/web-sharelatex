@@ -1,17 +1,16 @@
 expect = require("chai").expect
 async = require("async")
 express = require("express")
+path = require("path")
 {db, ObjectId} = require("../../../../../app/js/infrastructure/mongojs")
 User = require("../../../../../test/acceptance/js/helpers/User")
 ProjectGetter = require("../../../../../app/js/Features/Project/ProjectGetter")
-ProjectEntityHandler = require "../../../../../app/js/Features/Project/ProjectEntityHandler"
+ProjectEntityHandler = require("../../../../../app/js/Features/Project/ProjectEntityHandler")
 
 MockProjectHistoryApi = require('../../../../../test/acceptance/js/helpers/MockProjectHistoryApi')
 MockDocUpdaterApi = require('../../../../../test/acceptance/js/helpers/MockDocUpdaterApi')
 MockFileStoreApi = require ('../../../../../test/acceptance/js/helpers/MockFileStoreApi')
 MockDocstoreApi = require('../../../../../test/acceptance/js/helpers/MockDocstoreApi')
-
-
 
 describe "Open In Overleaf", ->
 	before (done) ->
@@ -27,6 +26,18 @@ describe "Open In Overleaf", ->
 I have a fancy name
 \\end{document}
 """)
+			else if req.query.url == 'http://example.org/badname.tex'
+				res.send("""
+\\documentclass[12pt]{article}
+\\begin{document}
+\\title{bad \\\\ name}
+I have a bad name
+\\end{document}
+""")
+			else if req.query.url == 'http://example.org/project.zip'
+				res.sendFile path.join(__dirname, '../fixtures', 'project.zip')
+			else if req.query.url == 'http://example.org/badname.zip'
+				res.sendFile path.join(__dirname, '../fixtures', 'badname.zip')
 			else
 				res.sendStatus(404)
 
@@ -282,6 +293,73 @@ I have a fancy name
 
 						done()
 
+		describe "when POSTing a snip_uri for a zip file", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						snip_uri: 'http://example.org/project.zip'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should not produce an error", ->
+				expect(@err).not.to.exist
+
+			it "should redirect to a project", ->
+				expect(@res.statusCode).to.equal 302
+				expect(@res.headers.location).to.match @uri_regex
+
+			it "should create a project containing the retrieved snippet", (done) ->
+				projectId = @res.headers.location.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				ProjectGetter.getProject projectId, (error, project) ->
+					return done(error) if error?
+
+					expect(project).to.exist
+					ProjectEntityHandler.getDoc project._id, project.rootDoc_id, (error, lines) ->
+						return done(error) if error?
+
+						expect(lines).to.include 'Wombat? Wombat.'
+
+						done()
+
+			it "should read the name from the zip's main.tex file", (done) ->
+				projectId = @res.headers.location.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				ProjectGetter.getProject projectId, (error, project) ->
+					return done(error) if error?
+
+					expect(project).to.exist
+					expect(project.name).to.match /^wombat/
+					done()
+
+		describe "when POSTing a snip_uri for a zip file with an invalid name in the tex contents", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						snip_uri: 'http://example.org/badname.zip'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should not create a project with an invalid name", (done) ->
+				projectId = @res.headers.location.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				ProjectGetter.getProject projectId, (error, project) ->
+					return done(error) if error?
+
+					expect(project).to.exist
+					expect(project.name).to.match /^bad[^\\]+name/
+					done()
+
 		describe "when POSTing a snip_uri that does not exist", ->
 			beforeEach (done) ->
 				@user.request.post
@@ -344,3 +422,27 @@ I have a fancy name
 
 						expect(project.name).to.match /fancy name.+/
 						done()
+
+		describe "when the document has a title containing an invalid character", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						snip_uri: 'http://example.org/badname.tex'
+					headers:
+						'X-Requested-With': 'XMLHttpRequest'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should create a project without any bad characters in its name", (done) ->
+				projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				ProjectGetter.getProject projectId, (error, project) ->
+					return done(error) if error?
+
+					expect(project.name).to.match /^bad[^\\]+name/
+					done()

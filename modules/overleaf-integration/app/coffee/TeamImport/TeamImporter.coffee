@@ -40,6 +40,7 @@ createV2Team = (v1Team, callback = (error, v1Team, v2Team) ->) ->
 				groupPlan: true
 				planCode: "v1_#{v1Team.plan_name}"
 				membersLimit: v1Team.n_licences
+				customAccount: true
 			)
 
 			subscription.save (error) ->

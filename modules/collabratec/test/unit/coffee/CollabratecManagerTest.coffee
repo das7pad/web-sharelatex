@@ -14,6 +14,7 @@ modulePath = Path.join __dirname, "../../../app/js/CollabratecManager"
 describe "CollabratecManager", ->
 	beforeEach ->
 		@CollabratecManager = SandboxedModule.require modulePath, requires:
+			"./CollabratecApi": @CollabratecApi = {}
 			"../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler":
 				@DocumentUpdaterHandler = {}
 			"../../../../app/js/Features/Errors/Errors": @Errors = {
@@ -22,12 +23,15 @@ describe "CollabratecManager", ->
 			"../../../../app/js/Features/Project/ProjectCollabratecDetailsHandler": @ProjectCollabratecDetailsHandler = {}
 			"../../../../app/js/Features/Project/ProjectDeleter": @ProjectDeleter = {}
 			"../../../../app/js/Features/Project/ProjectDetailsHandler": @ProjectDetailsHandler = {}
+			"../../../../app/js/Features/Project/ProjectDuplicator": @ProjectDuplicator = {}
 			"../../../../app/js/Features/Project/ProjectEntityHandler": @ProjectEntityHandler = {}
 			"../../../../app/js/Features/Project/ProjectEntityUpdateHandler": @ProjectEntityUpdateHandler = {}
 			"../../../../app/js/Features/Project/ProjectGetter": @ProjectGetter = {}
 			"../../../../app/js/Features/Project/ProjectRootDocManager":
 				@ProjectRootDocManager = {}
+			"../../../../app/js/Features/Uploads/ProjectUploadManager": @ProjectUploadManager = {}
 			"../../../../app/js/Features/Templates/TemplatesManager": @TemplatesManager = {}
+			"../../../../app/js/Features/User/UserGetter": @UserGetter = {}
 			"../../../../app/js/Features/V1/V1Api": @V1Api = {}
 			"logger-sharelatex": { log: sinon.stub(), err: sinon.stub() }
 			"settings-sharelatex": { siteUrl: "site-url" }
@@ -70,7 +74,7 @@ describe "CollabratecManager", ->
 						@ProjectEntityHandler.getDoc = sinon.stub().yields null, @lines
 
 					it "should callback with project metadata", ->
-						@CollabratecManager.getProjectMetadata @user, "project-id", @callback
+						@CollabratecManager.getProjectMetadata "project-id", @callback
 						expect(@callback).to.have.been.calledWith null, {
 							title: "project-title",
 							doc_abstract: "Test abstract. It spans two lines.",
@@ -86,7 +90,7 @@ describe "CollabratecManager", ->
 						@ProjectEntityHandler.getDoc = sinon.stub().yields "error"
 
 					it "should callback with error", ->
-						@CollabratecManager.getProjectMetadata @user, "project-id", @callback
+						@CollabratecManager.getProjectMetadata "project-id", @callback
 						expect(@callback).to.have.been.calledWith "error"
 
 			describe "when project does not have rootDoc_id", ->
@@ -98,7 +102,7 @@ describe "CollabratecManager", ->
 					@ProjectGetter.getProject = sinon.stub().yields null, @project
 
 				it "should callback with limited metadata", ->
-					@CollabratecManager.getProjectMetadata @user, "project-id", @callback
+					@CollabratecManager.getProjectMetadata "project-id", @callback
 					expect(@callback).to.have.been.calledWith null, {
 						title: "project-title",
 						created_at: 1540993059000,
@@ -111,7 +115,7 @@ describe "CollabratecManager", ->
 				@ProjectGetter.getProject = sinon.stub().yields "error"
 
 			it "should callback with error", ->
-				@CollabratecManager.getProjectMetadata @user, "project-id", @callback
+				@CollabratecManager.getProjectMetadata "project-id", @callback
 				expect(@callback).to.have.been.calledWith "error"
 
 	describe "createProject", ->
@@ -146,7 +150,7 @@ describe "CollabratecManager", ->
 						@CollabratecManager.createProject "user-id", "template-id", "title", "doc-abstract", ["keyword-1", "keyword-2"], "author", "collabratec-document-id", "collabratec-privategroup-id", @callback
 
 					it "should initialize project record", ->
-						expect(@ProjectCollabratecDetailsHandler.initializeCollabratecProject).to.have.been.calledOnce.and.calledWithMatch "project-id", "title", "user", "collabratec-document-id", "collabratec-privategroup-id"
+						expect(@ProjectCollabratecDetailsHandler.initializeCollabratecProject).to.have.been.calledOnce.and.calledWithMatch "project-id", "user", "collabratec-document-id", "collabratec-privategroup-id"
 
 					describe "when initialize project succeeds", ->
 						beforeEach ->
