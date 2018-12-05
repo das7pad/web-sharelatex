@@ -718,7 +718,7 @@ describe "Collabratec", ->
 							expect(project.collabratecUsers[0].collabratec_privategroup_id).to.equal "collabratec-privategroup-id"
 							expect(project.collabratecUsers[0].user_id.toString()).to.equal @user.id
 							done()
-					, 100)
+					, 500)
 
 		describe "without collabratec_document_id", ->
 			it "should return 422", (done) ->
