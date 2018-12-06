@@ -1,0 +1,10 @@
+table.overbox#templates-container
+	each template in templates
+		tr
+			td.title-cell
+				p.title-text #{template.title}
+				span.created-on created #{moment(template.original_created_date).format('Do MMM YY')}
+					if template.original_created_date != template.updated_date
+						|, last updated #{moment(template.updated_date).format('Do MMM YY')}
+			td
+				a.btn.btn-primary(href="/metrics/templates/" + template.doc_id) Metrics

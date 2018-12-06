@@ -9,7 +9,19 @@ module.exports = PublisherHubsController =
 		{entity} = req
 		entity.fetchV1Data (error, publisher) ->
 			return next(error) if error?
-			console.log(publisher.name)
-			res.render Path.resolve(__dirname, '../views/publisherHub.pug'), {
-				name: publisher.name
-			}
+			PublisherHubsController._fetchTemplates(publisher, (error ,templates) ->
+				return next(error) if error?
+				res.render Path.resolve(__dirname, '../views/publisherHub.pug'), {
+					name: publisher.name,
+					templates: templates
+				}
+			)
+
+	_fetchTemplates: (publisher, callback) ->
+		url = "#{settings.apis.v1.url}/api/v2/brands/#{publisher.slug}/templates"
+		request.get {
+			url: url,
+			auth: { user: settings.apis.v1.user, pass: settings.apis.v1.pass }
+			json: true
+		}, (err, response, body) ->
+			callback(err, body)
