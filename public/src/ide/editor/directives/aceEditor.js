@@ -112,7 +112,6 @@ define([
         reviewPanel: '=',
         eventsBridge: '=',
         trackChanges: '=',
-        trackChangesEnabled: '=',
         docId: '=',
         rendererData: '=',
         lineHeight: '=',
