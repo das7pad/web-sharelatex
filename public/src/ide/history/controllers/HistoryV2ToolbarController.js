@@ -22,7 +22,7 @@ define(['base'], App =>
           controller: 'HistoryV2AddLabelModalController',
           resolve: {
             update() {
-              return $scope.history.selection.updates[0]
+              return $scope.history.selection.update
             }
           }
         }))

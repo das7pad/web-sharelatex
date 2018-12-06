@@ -83,7 +83,7 @@ aside.change-list(
 									ng-show="update.toV > history.selection.range.toV || update.toV <= history.selection.range.toV && update.fromV >= history.selection.range.fromV"
 								)
 
-						div.description(ng-click="select()")
+						div.description(ng-click="select(update.toV, update.fromV)")
 							history-label(
 								ng-repeat="label in update.labels track by label.id"
 								label-text="label.comment"
@@ -145,7 +145,7 @@ aside.change-list(
 					form
 						input.selector-from(
 							type="radio"
-							name="fromversionWithLabel.version"
+							name="fromversionForLabel"
 							ng-model="history.selection.range.fromV"
 							ng-value="versionWithLabel.version"
 							ng-mouseover="setHoverFrom(versionWithLabel.version)"
@@ -155,7 +155,7 @@ aside.change-list(
 					form
 						input.selector-to(
 							type="radio"
-							name="toversionWithLabel.version"
+							name="toVersionForLabel"
 							ng-model="history.selection.range.toV"
 							ng-value="versionWithLabel.version"
 							ng-mouseover="setHoverTo(versionWithLabel.version)"
@@ -164,7 +164,7 @@ aside.change-list(
 						)
 
 
-				.description(ng-click="select()")
+				.description(ng-click="addLabelVersionToSelection(versionWithLabel.version)")
 					div(
 						ng-repeat="label in versionWithLabel.labels track by label.id"
 					)

@@ -141,14 +141,6 @@ define([
         this.$scope.ui.view = 'editor'
       }
 
-      showAllUpdates() {
-        this.$scope.history.showOnlyLabels = false
-      }
-
-      showOnlyLabels() {
-        this.$scope.history.showOnlyLabels = true
-      }
-
       reset() {
         if (this.$scope.history) {
           this._softReset()
@@ -167,9 +159,7 @@ define([
           userHasFullFeature: undefined,
           freeHistoryLimitHit: false,
           selection: {
-            label: null,
             docs: {},
-            files: [],
             pathname: null,
             range: {
               fromV: null,
@@ -178,22 +168,23 @@ define([
             hoveredRange: {
               fromV: null,
               toV: null
-            }
+            },
+            diff: null, // When history.viewMode == HistoryViewModes.COMPARE
+            files: [], // When history.viewMode == HistoryViewModes.COMPARE
+            update: null, // When history.viewMode == HistoryViewModes.POINT_IN_TIME
+            label: null, // When history.viewMode == HistoryViewModes.POINT_IN_TIME
+            file: null // When history.viewMode == HistoryViewModes.POINT_IN_TIME
           },
           error: null,
           showOnlyLabels: false,
-          labels: null,
-          diff: null, // When history.viewMode == HistoryViewModes.COMPARE
-          selectedFile: null // When history.viewMode == HistoryViewModes.POINT_IN_TIME
+          labels: null
         }
       }
 
       _softReset() {
         ;(this.$scope.history.viewMode = null),
           (this.$scope.history.selection = {
-            label: null,
             docs: {},
-            files: [],
             pathname: null,
             range: {
               fromV: null,
@@ -202,12 +193,15 @@ define([
             hoveredRange: {
               fromV: null,
               toV: null
-            }
+            },
+            diff: null, // When history.viewMode == HistoryViewModes.COMPARE
+            files: [], // When history.viewMode == HistoryViewModes.COMPARE
+            update: null, // When history.viewMode == HistoryViewModes.POINT_IN_TIME
+            label: null, // When history.viewMode == HistoryViewModes.POINT_IN_TIME
+            file: null // When history.viewMode == HistoryViewModes.POINT_IN_TIME
           })
         this.$scope.history.error = null
         this.$scope.history.showOnlyLabels = false
-        this.$scope.history.diff = null // When history.viewMode == HistoryViewModes.COMPARE
-        this.$scope.history.selectedFile = null // When history.viewMode == HistoryViewModes.POINT_IN_TIME
       }
 
       _handleHistoryUIStateChange() {
@@ -268,15 +262,26 @@ define([
 
       _loadFileTree(toV, fromV) {
         let url = `/project/${this.$scope.project_id}/filetree/diff`
+        let selection = this.$scope.history.selection
         const query = [`from=${fromV}`, `to=${toV}`]
         url += `?${query.join('&')}`
         this.$scope.history.loadingFileTree = true
-        this.$scope.history.selectedFile = null
-        this.$scope.history.selection.pathname = null
-        return this.ide.$http.get(url).then(response => {
-          this.$scope.history.selection.files = response.data.diff
-          this.$scope.history.loadingFileTree = false
-        })
+        selection.file = null
+        selection.pathname = null
+        if (selection.diff) {
+          selection.diff.loading = true
+        }
+        return this.ide.$http
+          .get(url)
+          .then(response => {
+            this.$scope.history.selection.files = response.data.diff
+          })
+          .finally(() => {
+            this.$scope.history.loadingFileTree = false
+            if (selection.diff) {
+              selection.diff.loading = true
+            }
+          })
       }
 
       autoSelectRecentUpdates() {
@@ -320,10 +325,24 @@ define([
         return this.selectLabelForPointInTime(this.$scope.history.labels[0])
       }
 
+      expandSelectionToVersion(version) {
+        console.log(
+          version,
+          this.$scope.history.selection.range.toV,
+          this.$scope.history.selection.range.fromV
+        )
+        if (version > this.$scope.history.selection.range.toV) {
+          this.$scope.history.selection.range.toV = version
+        } else if (version < this.$scope.history.selection.range.fromV) {
+          this.$scope.history.selection.range.fromV = version
+        }
+      }
+
       selectVersionForPointInTime(version) {
-        let selectionRange = this.$scope.history.selection.range
-        selectionRange.toV = version
-        selectionRange.fromV = version
+        let selection = this.$scope.history.selection
+        selection.range.toV = version
+        selection.range.fromV = version
+        selection.update = this._getUpdateForVersion(version)
         this.loadFileTreeForVersion(version)
       }
 
@@ -339,7 +358,7 @@ define([
           // If the update has one label, select it
         } else if (nSelectedLabels === 1) {
           this.selectLabelForPointInTime(
-            this.$scope.history.selection.updates[0].labels[0]
+            this.$scope.history.selection.update.labels[0]
           )
           // If there are multiple labels for the update, select the latest
         } else if (nSelectedLabels > 1) {
@@ -464,9 +483,6 @@ define([
         }
         const labelsURL = `/project/${this.ide.project_id}/labels`
 
-        // this.$scope.history.loading = true
-        // this.$scope.history.loadingFileTree = true
-
         const requests = { updates: this.ide.$http.get(updatesURL) }
 
         if (this.$scope.history.labels == null) {
@@ -492,24 +508,19 @@ define([
             ) {
               this.$scope.history.atEnd = true
             }
-            // this.$scope.history.loading = false
-            if (this.$scope.history.updates.length === 0) {
-              // this.$scope.history.loadingFileTree = false
-            }
+            // // this.$scope.history.loading = false
+            // if (this.$scope.history.updates.length === 0) {
+            //   this.$scope.history.loadingFileTree = false
+            // }
           })
           .catch(error => {
             const { status, statusText } = error
             this.$scope.history.error = { status, statusText }
-            // this.$scope.history.loading = false
-            //this.$scope.history.loadingFileTree = false
           })
       }
 
       _loadLabels(labels, lastUpdateToV) {
-        sortedLabels = this.ide.$filter('orderBy')(labels, [
-          '-version',
-          '-created_at'
-        ])
+        sortedLabels = this._sortLabelsByVersionAndDate(labels)
         if (
           sortedLabels.length > 0 &&
           sortedLabels[0].version !== lastUpdateToV
@@ -525,6 +536,10 @@ define([
         return sortedLabels
       }
 
+      _sortLabelsByVersionAndDate(labels) {
+        return this.ide.$filter('orderBy')(labels, ['-version', '-created_at'])
+      }
+
       loadFileAtPointInTime() {
         const toV = this.$scope.history.selection.range.toV
         const { pathname } = this.$scope.history.selection
@@ -538,27 +553,27 @@ define([
           `to=${toV}`
         ]
         url += `?${query.join('&')}`
-        this.$scope.history.selectedFile = { loading: true }
+        this.$scope.history.selection.file = { loading: true }
         return this.ide.$http
           .get(url)
           .then(response => {
             const { text, binary } = this._parseDiff(response.data.diff)
-            this.$scope.history.selectedFile.binary = binary
-            this.$scope.history.selectedFile.text = text
-            this.$scope.history.selectedFile.loading = false
+            this.$scope.history.selection.file.binary = binary
+            this.$scope.history.selection.file.text = text
+            this.$scope.history.selection.file.loading = false
           })
           .catch(function() {})
       }
 
       reloadDiff() {
-        let { diff } = this.$scope.history
+        let { diff } = this.$scope.history.selection
         // const { updates } = this.$scope.history.selection
         // const { fromV, toV, pathname } = this._calculateDiffDataFromSelection()
         const { range, pathname } = this.$scope.history.selection
         const { fromV, toV } = range
 
         if (pathname == null) {
-          this.$scope.history.diff = null
+          this.$scope.history.selection.diff = null
           return
         }
 
@@ -571,7 +586,7 @@ define([
           return this.ide.$q.when(true)
         }
 
-        this.$scope.history.diff = diff = {
+        this.$scope.history.selection.diff = diff = {
           fromV,
           toV,
           pathname,
@@ -593,11 +608,11 @@ define([
             const { text, highlights, binary } = this._parseDiff(data.diff)
             diff.binary = binary
             diff.text = text
-            return (diff.highlights = highlights)
+            diff.highlights = highlights
           })
           .catch(function() {
             diff.loading = false
-            return (diff.error = true)
+            diff.error = true
           })
       }
 
@@ -805,127 +820,127 @@ define([
         ))
       }
 
-      _perDocSummaryOfUpdates(updates) {
-        // Track current_pathname -> original_pathname
-        // create bare object for use as Map
-        // http://ryanmorr.com/true-hash-maps-in-javascript/
-        const original_pathnames = Object.create(null)
+      // _perDocSummaryOfUpdates(updates) {
+      //   // Track current_pathname -> original_pathname
+      //   // create bare object for use as Map
+      //   // http://ryanmorr.com/true-hash-maps-in-javascript/
+      //   const original_pathnames = Object.create(null)
 
-        // Map of original pathname -> doc summary
-        const docs_summary = Object.create(null)
+      //   // Map of original pathname -> doc summary
+      //   const docs_summary = Object.create(null)
 
-        const updatePathnameWithUpdateVersions = function(
-          pathname,
-          update,
-          deletedAtV
-        ) {
-          // docs_summary is indexed by the original pathname the doc
-          // had at the start, so we have to look this up from the current
-          // pathname via original_pathname first
-          if (original_pathnames[pathname] == null) {
-            original_pathnames[pathname] = pathname
-          }
-          const original_pathname = original_pathnames[pathname]
-          const doc_summary =
-            docs_summary[original_pathname] != null
-              ? docs_summary[original_pathname]
-              : (docs_summary[original_pathname] = {
-                  fromV: update.fromV,
-                  toV: update.toV
-                })
-          doc_summary.fromV = Math.min(doc_summary.fromV, update.fromV)
-          doc_summary.toV = Math.max(doc_summary.toV, update.toV)
-          if (deletedAtV != null) {
-            return (doc_summary.deletedAtV = deletedAtV)
-          }
-        }
+      //   const updatePathnameWithUpdateVersions = function(
+      //     pathname,
+      //     update,
+      //     deletedAtV
+      //   ) {
+      //     // docs_summary is indexed by the original pathname the doc
+      //     // had at the start, so we have to look this up from the current
+      //     // pathname via original_pathname first
+      //     if (original_pathnames[pathname] == null) {
+      //       original_pathnames[pathname] = pathname
+      //     }
+      //     const original_pathname = original_pathnames[pathname]
+      //     const doc_summary =
+      //       docs_summary[original_pathname] != null
+      //         ? docs_summary[original_pathname]
+      //         : (docs_summary[original_pathname] = {
+      //             fromV: update.fromV,
+      //             toV: update.toV
+      //           })
+      //     doc_summary.fromV = Math.min(doc_summary.fromV, update.fromV)
+      //     doc_summary.toV = Math.max(doc_summary.toV, update.toV)
+      //     if (deletedAtV != null) {
+      //       return (doc_summary.deletedAtV = deletedAtV)
+      //     }
+      //   }
 
-        // Put updates in ascending chronological order
-        updates = this._getSelectedUpdates()
-        for (let update of Array.from(updates)) {
-          for (let pathname of Array.from(update.pathnames || [])) {
-            updatePathnameWithUpdateVersions(pathname, update)
-          }
-          for (let project_op of Array.from(update.project_ops || [])) {
-            if (project_op.rename != null) {
-              const { rename } = project_op
-              updatePathnameWithUpdateVersions(rename.pathname, update)
-              original_pathnames[rename.newPathname] =
-                original_pathnames[rename.pathname]
-              delete original_pathnames[rename.pathname]
-            }
-            if (project_op.add != null) {
-              const { add } = project_op
-              updatePathnameWithUpdateVersions(add.pathname, update)
-            }
-            if (project_op.remove != null) {
-              const { remove } = project_op
-              updatePathnameWithUpdateVersions(
-                remove.pathname,
-                update,
-                project_op.atV
-              )
-            }
-          }
-        }
+      //   // Put updates in ascending chronological order
+      //   updates = this._getSelectedUpdates()
+      //   for (let update of Array.from(updates)) {
+      //     for (let pathname of Array.from(update.pathnames || [])) {
+      //       updatePathnameWithUpdateVersions(pathname, update)
+      //     }
+      //     for (let project_op of Array.from(update.project_ops || [])) {
+      //       if (project_op.rename != null) {
+      //         const { rename } = project_op
+      //         updatePathnameWithUpdateVersions(rename.pathname, update)
+      //         original_pathnames[rename.newPathname] =
+      //           original_pathnames[rename.pathname]
+      //         delete original_pathnames[rename.pathname]
+      //       }
+      //       if (project_op.add != null) {
+      //         const { add } = project_op
+      //         updatePathnameWithUpdateVersions(add.pathname, update)
+      //       }
+      //       if (project_op.remove != null) {
+      //         const { remove } = project_op
+      //         updatePathnameWithUpdateVersions(
+      //           remove.pathname,
+      //           update,
+      //           project_op.atV
+      //         )
+      //       }
+      //     }
+      //   }
 
-        return docs_summary
-      }
+      //   return docs_summary
+      // }
 
-      _getSelectedUpdates() {
-        let { toV, fromV } = this.$scope.history.selection.range
-        let selectedUpdates = []
-        for (let update of this.$scope.history.updates) {
-          if (update.toV <= toV && update.fromV >= fromV) {
-            selectedUpdates.push(update)
-          }
-          if (update.fromV <= fromV) {
-            break
-          }
-        }
-        return selectedUpdates.reverse()
-      }
+      // _getSelectedUpdates() {
+      //   let { toV, fromV } = this.$scope.history.selection.range
+      //   let selectedUpdates = []
+      //   for (let update of this.$scope.history.updates) {
+      //     if (update.toV <= toV && update.fromV >= fromV) {
+      //       selectedUpdates.push(update)
+      //     }
+      //     if (update.fromV <= fromV) {
+      //       break
+      //     }
+      //   }
+      //   return selectedUpdates.reverse()
+      // }
 
-      _calculateDiffDataFromSelection() {
-        let pathname, toV
-        let fromV = (toV = pathname = null)
+      // _calculateDiffDataFromSelection() {
+      //   let pathname, toV
+      //   let fromV = (toV = pathname = null)
 
-        const selected_pathname = this.$scope.history.selection.pathname
+      //   const selected_pathname = this.$scope.history.selection.pathname
 
-        const object = this._perDocSummaryOfUpdates()
-        for (pathname in object) {
-          const doc = object[pathname]
-          if (pathname === selected_pathname) {
-            ;({ fromV, toV } = doc)
-            return { fromV, toV, pathname }
-          }
-        }
+      //   const object = this._perDocSummaryOfUpdates()
+      //   for (pathname in object) {
+      //     const doc = object[pathname]
+      //     if (pathname === selected_pathname) {
+      //       ;({ fromV, toV } = doc)
+      //       return { fromV, toV, pathname }
+      //     }
+      //   }
 
-        return {}
-      }
+      //   return {}
+      // }
 
       // Set the track changes selected doc to one of the docs in the range
       // of currently selected updates. If we already have a selected doc
       // then prefer this one if present.
-      _selectDocFromUpdates() {
-        let pathname
-        const affected_docs = this._perDocSummaryOfUpdates()
-        this.$scope.history.selection.docs = affected_docs
+      // _selectDocFromUpdates() {
+      //   let pathname
+      //   const affected_docs = this._perDocSummaryOfUpdates()
+      //   this.$scope.history.selection.docs = affected_docs
 
-        let selected_pathname = this.$scope.history.selection.pathname
-        if (selected_pathname != null && affected_docs[selected_pathname]) {
-          // Selected doc is already open
-        } else {
-          // Set to first possible candidate
-          for (pathname in affected_docs) {
-            const doc = affected_docs[pathname]
-            selected_pathname = pathname
-            break
-          }
-        }
+      //   let selected_pathname = this.$scope.history.selection.pathname
+      //   if (selected_pathname != null && affected_docs[selected_pathname]) {
+      //     // Selected doc is already open
+      //   } else {
+      //     // Set to first possible candidate
+      //     for (pathname in affected_docs) {
+      //       const doc = affected_docs[pathname]
+      //       selected_pathname = pathname
+      //       break
+      //     }
+      //   }
 
-        this.$scope.history.selection.pathname = selected_pathname
-      }
+      //   this.$scope.history.selection.pathname = selected_pathname
+      // }
 
       _updateContainsUserId(update, user_id) {
         for (let user of Array.from(update.meta.users)) {

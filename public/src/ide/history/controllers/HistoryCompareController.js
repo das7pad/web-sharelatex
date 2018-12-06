@@ -56,6 +56,15 @@ define(['base', 'ide/history/util/displayNameForUser'], function(
 
       $scope.resetHover = () => ide.historyManager.resetHover()
 
+      $scope.select = (toV, fromV) => {
+        $scope.history.selection.range.toV = toV
+        $scope.history.selection.range.fromV = fromV
+      }
+
+      $scope.addLabelVersionToSelection = version => {
+        ide.historyManager.expandSelectionToVersion(version)
+      }
+
       // This method (and maybe the one below) will be removed soon. User details data will be
       // injected into the history API responses, so we won't need to fetch user data from other
       // local data structures.

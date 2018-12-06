@@ -60,7 +60,9 @@ define(['base'], App =>
       })
 
       return (_reducePathsToTree = function(currentFileTree, fileObject) {
-        const filePathParts = fileObject.pathname.split('/')
+        const filePathParts = fileObject.newPathname
+          ? fileObject.newPathname.split('/')
+          : fileObject.pathname.split('/')
         let currentFileTreeLocation = currentFileTree
         for (let index = 0; index < filePathParts.length; index++) {
           var fileTreeEntity
@@ -71,7 +73,11 @@ define(['base'], App =>
               name: pathPart,
               pathname: fileObject.pathname,
               type: 'file',
-              operation: fileObject.operation || 'edited'
+              operation: fileObject.operation
+            }
+            if (fileObject.operation === 'renamed') {
+              fileTreeEntity.pathname = fileObject.newPathname
+              fileTreeEntity.oldPathname = fileObject.pathname
             }
             currentFileTreeLocation.push(fileTreeEntity)
           } else {

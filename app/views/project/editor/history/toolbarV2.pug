@@ -2,38 +2,37 @@
 	ng-controller="HistoryV2ToolbarController"
 	ng-if="ui.view == 'history' && history.isV2"
 )
-	//- FOR POINT IN TIME
-	span.history-toolbar-selected-version(ng-show="history.loadingFileTree")
+	span.history-toolbar-selected-version(ng-show="history.loadingFileTree || history.selection.diff.loading")
 		i.fa.fa-spin.fa-refresh
 		| &nbsp;&nbsp; #{translate("loading")}...
-	//- TODO FIX history.selection.updates.
+
+	//- FOR POINT IN TIME
 	span.history-toolbar-selected-version(
-		ng-show="!history.loadingFileTree && !history.showOnlyLabels && history.selection.updates.length && !history.error"
+		ng-show="!history.loadingFileTree && !history.showOnlyLabels && history.selection.update && !history.error"
 	) #{translate("browsing_project_as_of")}&nbsp;
-		//- TODO FIX history.selection.updates.
-		time.history-toolbar-time {{ history.selection.updates[0].meta.end_ts | formatDate:'Do MMM YYYY, h:mm a' }}
+		time.history-toolbar-time {{ history.selection.update.meta.end_ts | formatDate:'Do MMM YYYY, h:mm a' }}
 	span.history-toolbar-selected-version(
 		ng-show="!history.loadingFileTree && history.showOnlyLabels && history.selection.label && !history.error"
-	) #{translate("browsing_project_labelled")}&nbsp;
-		span.history-toolbar-selected-label "{{ history.selection.label.comment }}"
+	) 
+		span(ng-if="history.selection.label.comment && !history.selection.label.isPseudoCurrentStateLabel") 
+			| #{translate("browsing_project_labelled")}&nbsp;
+			span.history-toolbar-selected-label "{{ history.selection.label.comment }}"
+		span.history-toolbar-selected-label(ng-if="history.selection.label.isPseudoCurrentStateLabel") 
+			| #{translate("browsing_project_latest_for_pseudo_label")}
 
 
 
 	//- FOR COMPARE
-	span.name(ng-show="history.viewMode === HistoryViewModes.COMPARE && history.diff.binary && !history.loadingFileTree")
-		strong {{history.diff.pathname}}
-	span.name(ng-show="history.viewMode === HistoryViewModes.COMPARE && !history.diff.binary && !history.loadingFileTree")
-		| <strong>{{history.diff.highlights.length}} </strong>
+	span.history-toolbar-selected-version(ng-show="history.viewMode === HistoryViewModes.COMPARE && !history.selection.diff.binary && !history.selection.diff.loading && !history.selection.diff.error && !history.loadingFileTree")
+		| <strong>{{history.selection.diff.highlights.length}} </strong>
 		ng-pluralize(
-			count="history.diff.highlights.length",
+			count="history.selection.diff.highlights.length",
 			when="{\
 				'one': 'change',\
 				'other': 'changes'\
 			}"
 		)
-		|  in <strong>{{history.diff.pathname}}</strong>
-
-
+		|  in <strong>{{history.selection.diff.pathname}}</strong>
 
 	//- FOR POINT IN TIME
 	div.history-toolbar-actions(
@@ -67,11 +66,12 @@
 	div.history-toolbar-actions(
 		ng-if="history.viewMode === HistoryViewModes.COMPARE && !history.error"
 	)
-		.history-toolbar-btn(
+		button.history-toolbar-btn(
 			ng-click="toggleHistoryViewMode();"
 		) 
 			i.fa
 			| #{translate("view_single_version")}
+		// TODO Fix deletedAtV (no longer exists)
 		.toolbar-right(ng-if="history.selection.docs[history.selection.pathname].deletedAtV")
 			button.btn.btn-danger.btn-xs(
 				ng-click="restoreDeletedFile()"
