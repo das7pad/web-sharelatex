@@ -135,7 +135,7 @@ module.exports = ProjectEntityUpdateHandler = self =
 				return callback(err)
 			TpdsUpdateSender.addDoc {
 				project_id:   project_id,
-				doc_id:		    doc?._id
+				doc_id:       doc?._id,
 				path:         result?.path?.fileSystem,
 				project_name: project.name,
 				rev:          0
