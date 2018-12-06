@@ -62,23 +62,35 @@ module.exports = ProjectImporter =
 				ProjectImporter._createV2ProjectFromV1Doc v1_project_id, v1_user_id, v2_user_id, doc, callback
 
 	_createV2ProjectFromV1Doc: (v1_project_id, v1_user_id, v2_user_id, doc, callback = (error, v2_project_id) ->) ->
-		async.waterfall [
-			(cb) ->
-				ProjectImporter._initSharelatexProject v2_user_id, doc, cb
-			(v2_project_id, cb) ->
-				ProjectImporter._importV1ProjectDataIntoV2Project v1_project_id, v2_project_id, v1_user_id, v2_user_id, doc, cb
-		], (importError, v2_project_id) ->
-			if importError?
-				logger.err {importError, errorMessage: importError.message, v1_project_id, v1_project_id}, "failed to import project"
-				metrics.inc "project-import.error.total"
-				metrics.inc "project-import.error.#{importError.name}"
-				ProjectImporter._cancelExport v1_project_id, v1_user_id, (cancelError) ->
-					if cancelError?
-						logger.err {cancelError, errorMessage: cancelError.message, v1_project_id, v2_project_id}, "failed to cancel project import"
-					callback(importError)
+		ProjectImporter._checkOwnerIsMigrated doc, (error, v2_owner_id) ->
+			return callback(error) if error?
+
+			async.waterfall [
+				(cb) ->
+					ProjectImporter._initSharelatexProject v2_user_id, v2_owner_id, doc, cb
+				(v2_project_id, cb) ->
+					ProjectImporter._importV1ProjectDataIntoV2Project v1_project_id, v2_project_id, v1_user_id, v2_user_id, doc, cb
+			], (importError, v2_project_id) ->
+				if importError?
+					logger.err {importError, errorMessage: importError.message, v1_project_id, v1_project_id}, "failed to import project"
+					metrics.inc "project-import.error.total"
+					metrics.inc "project-import.error.#{importError.name}"
+					ProjectImporter._cancelExport v1_project_id, v1_user_id, (cancelError) ->
+						if cancelError?
+							logger.err {cancelError, errorMessage: cancelError.message, v1_project_id, v2_project_id}, "failed to cancel project import"
+						callback(importError)
+				else
+					metrics.inc "project-import.success"
+					callback null, v2_project_id
+
+	_checkOwnerIsMigrated: (doc, callback = (error, v2_owner_id) ->) ->
+		UserGetter.getUser { "overleaf.id": doc.owner.id }, { _id: 1 }, (error, v2_owner) ->
+			if error?
+				callback(error)
+			else if !v2_owner?
+				callback(new Error("failed to import because owner is not migrated to v2"))
 			else
-				metrics.inc "project-import.success"
-				callback null, v2_project_id
+				callback(null, v2_owner._id)
 
 	_importV1ProjectDataIntoV2Project: (v1_project_id, v2_project_id, v1_user_id, v2_user_id, doc, callback = (error, v2_project_id) ->) ->
 		async.series [
@@ -93,7 +105,7 @@ module.exports = ProjectImporter =
 			(cb) ->
 				ProjectImporter._importLabels doc.id, v2_project_id, v1_user_id, cb
 			(cb) ->
-				ProjectImporter._importTags v2_project_id, v2_user_id, doc.tags, cb
+				ProjectImporter._importTags v1_project_id, v2_project_id, v1_user_id, v2_user_id, cb
 			(cb) ->
 				ProjectImporter._confirmExport v1_project_id, v2_project_id, v1_user_id, cb
 		], (error) ->
@@ -116,7 +128,7 @@ module.exports = ProjectImporter =
 			logger.log {v1_project_id, v1_user_id, doc}, "got doc for project from overleaf"
 			return callback(null, doc)
 
-	_initSharelatexProject: (v2_user_id, doc = {}, callback = (err, project) ->) ->
+	_initSharelatexProject: (v2_user_id, v2_owner_id, doc = {}, callback = (err, project) ->) ->
 		if !doc.title? or !doc.id? or !doc.latest_ver_id? or !doc.latex_engine? or !doc.token? or !doc.read_token?
 			return callback(new Error("expected doc title, id, latest_ver_id, latex_engine, token and read_token"))
 		if doc.has_export_records? and doc.has_export_records
@@ -157,7 +169,7 @@ module.exports = ProjectImporter =
 		numericId = doc.token.replace(/a-z/g,'')
 		ProjectDetailsHandler.generateUniqueName v2_user_id, doc.title, [" (#{numericId})"], (error, v2_project_name) ->
 			return callback(error) if error?
-			ProjectCreationHandler.createBlankProject v2_user_id, v2_project_name, attributes, (error, project) ->
+			ProjectCreationHandler.createBlankProject v2_owner_id, v2_project_name, attributes, (error, project) ->
 				return callback(error) if error?
 				return callback(null, project._id)
 
@@ -192,7 +204,7 @@ module.exports = ProjectImporter =
 				return callback(error) if error?
 				CollaboratorsHandler.addUserIdToProject v2_project_id, inviter_user_id, invitee_user_id, privilegeLevel, (error) ->
 					return callback(error) if error?
-					ProjectImporter._importInviteTags(v1_project_id, v2_project_id, invite.invitee.id, invitee_user_id, callback)
+					ProjectImporter._importTags(v1_project_id, v2_project_id, invite.invitee.id, invitee_user_id, callback)
 
 	_importPendingInvite: (project_id, invite, callback = (error) ->) ->
 		if !invite.inviter? or !invite.code? or !invite.email? or !invite.access_level?
@@ -219,7 +231,7 @@ module.exports = ProjectImporter =
 			# token-access
 			TokenAccessHandler.addReadAndWriteUserToProject inviteeUserId, v2_project_id, (error) ->
 				return callback(error) if error?
-				ProjectImporter._importInviteTags(v1_project_id, v2_project_id, invite.invitee.id, inviteeUserId, callback)
+				ProjectImporter._importTags(v1_project_id, v2_project_id, invite.invitee.id, inviteeUserId, callback)
 
 	_importLabels: (v1_project_id, v2_project_id, v1_user_id, callback = (error) ->) ->
 		ProjectImporter._getLabels v1_project_id, (error, labels) ->
@@ -257,19 +269,16 @@ module.exports = ProjectImporter =
 					error.statusCode = response.statusCode
 					callback error
 
-	_importInviteTags: (v1_project_id, v2_project_id, v1_user_id, v2_user_id, callback = (error) ->) ->
+	_importTags: (v1_project_id, v2_project_id, v1_user_id, v2_user_id, callback = (error) ->) ->
 		V1SharelatexApi.request {
 			method: 'GET'
 			url: "#{settings.apis.v1.url}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{v1_project_id}/export/tags"
 		}, (error, res, body) ->
 			return callback(error) if error?
 			logger.log {v1_project_id, v1_user_id, body}, "got tags for project from overleaf"
-			ProjectImporter._importTags v2_project_id, v2_user_id, body.tags, callback
-
-	_importTags: (project_id, v2_user_id, tags = [], callback = (error) ->) ->
-		async.mapSeries(tags, (tag, cb) ->
-			TagsHandler.addProjectToTagName v2_user_id, tag, project_id, cb
-		, callback)
+			async.mapSeries(body.tags, (tag, cb) ->
+				TagsHandler.addProjectToTagName v2_user_id, tag, v2_project_id, cb
+			, callback)
 
 	_importFiles: (project_id, v2_user_id, files = [], callback = (error) ->) ->
 		async.mapSeries(files, (file, cb) ->

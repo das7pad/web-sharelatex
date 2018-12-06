@@ -44,9 +44,19 @@ describe "ProjectImporter", ->
 
 	describe "importProject", ->
 		beforeEach ->
-			@UserGetter.getUser = sinon.stub().yields(null, @user = overleaf: id: @v1_user_id)
+			@UserGetter.getUser = sinon.stub().yields(null, @user = {
+				_id: @v2_user_id,
+				overleaf: {
+					id: @v1_user_id
+				}
+			})
 			@ProjectImporter._startExport = sinon.stub().yields(null, @doc = {
 				id: @v1_project_id,
+				owner: {
+					id: @v1_user_id
+					email: 'owner@example.com'
+					name: 'Owner'
+				},
 				files: ["mock-files"],
 				tags: ["foo", "bar"],
 				invites: [{
@@ -84,7 +94,7 @@ describe "ProjectImporter", ->
 
 			it "should create the SL project", ->
 				@ProjectImporter._initSharelatexProject
-					.calledWith(@v2_user_id, @doc)
+					.calledWith(@v2_user_id, @v2_user_id, @doc)
 					.should.equal true
 
 			it "should import the invites", ->
@@ -106,9 +116,9 @@ describe "ProjectImporter", ->
 					.calledWith(@v1_project_id, @v2_project_id, @v1_user_id)
 					.should.equal true
 
-			it "should import the tags", ->
+			it "should import the owner's tags", ->
 				@ProjectImporter._importTags
-					.calledWith(@v2_project_id, @v2_user_id, ["foo", "bar"])
+					.calledWith(@v1_project_id, @v2_project_id, @v1_user_id, @v2_user_id)
 					.should.equal true
 
 			it "should tell overleaf the project is now in the beta", ->
@@ -140,6 +150,55 @@ describe "ProjectImporter", ->
 			it 'should callback with the error', ->
 				@callback.calledWith(@error)
 
+	describe "_checkOwnerIsMigrated", ->
+		describe "successfully", ->
+			beforeEach ->
+				@owner_id = 'mock-v1-owner-id'
+				@doc = {
+					owner: {
+						id: @owner_id
+						email: 'owner-email@example.com'
+						name: 'Owner name'
+					}
+				}
+				@UserGetter.getUser = sinon.stub().yields(null, @user = {
+					_id: @v2_user_id,
+					overleaf: {
+						id: @owner_id
+					}
+				})
+				@ProjectImporter._checkOwnerIsMigrated @doc, @callback
+
+			it "should callback with the v2 user id", ->
+				@callback.calledWith(null, @v2_user_id).should.equal true
+
+		describe "unsuccessfully", ->
+			beforeEach ->
+				@error = new Error('something went wrong')
+				@UserGetter.getUser = sinon.stub().yields(@error)
+				doc = { owner: {} }
+				@ProjectImporter._checkOwnerIsMigrated doc, @callback
+
+			it "should callback with the error", ->
+				@callback.calledWith(@error).should.equal true
+
+		describe "with no matching v2 user", ->
+			beforeEach ->
+				@owner_id = 'unmigrated-mock-v1-owner-id'
+				@doc = {
+					owner: {
+						id: @owner_id
+						email: 'unmigrated-owner@example.com'
+						name: 'Unmigrated owner'
+					}
+				}
+				@UserGetter.getUser = sinon.stub().yields(null, null)
+
+			it "should callback with an error", (done) ->
+				@ProjectImporter._checkOwnerIsMigrated @doc, (error) =>
+					expect(error.message).to.equal("failed to import because owner is not migrated to v2")
+					done()
+
 	describe "_initSharelatexProject", ->
 		beforeEach ->
 			@project = {
@@ -167,7 +226,7 @@ describe "ProjectImporter", ->
 
 		describe "successfully", ->
 			beforeEach ->
-				@ProjectImporter._initSharelatexProject @user_id, @doc, @callback
+				@ProjectImporter._initSharelatexProject @user_id, @user_id, @doc, @callback
 
 			it "should create the project", ->
 				attributes =
@@ -192,44 +251,44 @@ describe "ProjectImporter", ->
 		describe "null checks", ->
 			it "should require doc.title", (done) ->
 				delete @doc.title
-				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
+				@ProjectImporter._initSharelatexProject @user_id, @user_id, @doc, (error) ->
 					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
 					done()
 
 			it "should require doc.latest_ver_id", (done) ->
 				delete @doc.latest_ver_id
-				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
+				@ProjectImporter._initSharelatexProject @user_id, @user_id, @doc, (error) ->
 					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
 					done()
 
 			it "should require doc.id", (done) ->
 				delete @doc.id
-				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
+				@ProjectImporter._initSharelatexProject @user_id, @user_id, @doc, (error) ->
 					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
 					done()
 
 			it "should require doc.latex_engine", (done) ->
 				delete @doc.latex_engine
-				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
+				@ProjectImporter._initSharelatexProject @user_id, @user_id, @doc, (error) ->
 					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
 					done()
 
 			it "should require doc.token", (done) ->
 				delete @doc.token
-				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
+				@ProjectImporter._initSharelatexProject @user_id, @user_id, @doc, (error) ->
 					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
 					done()
 
 			it "should require doc.read_token", (done) ->
 				delete @doc.read_token
-				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
+				@ProjectImporter._initSharelatexProject @user_id, @user_id, @doc, (error) ->
 					error.message.should.equal("expected doc title, id, latest_ver_id, latex_engine, token and read_token")
 					done()
 
 		describe "with brand variation", ->
 			it "should set brandVariationId", (done) ->
 				@doc.brand_variation_id = 123
-				@ProjectImporter._initSharelatexProject @user_id, @doc, (error, project_id) =>
+				@ProjectImporter._initSharelatexProject @user_id, @user_id, @doc, (error, project_id) =>
 					expect(error).to.equal(null)
 					expect(project_id).to.not.be.undefined
 					# Creates project with brandVariationId = 123
@@ -245,18 +304,27 @@ describe "ProjectImporter", ->
 		describe "with export records", ->
 			it "should prevent import", (done) ->
 				@doc.has_export_records = true
-				@ProjectImporter._initSharelatexProject @user_id, @doc, (error) ->
+				@ProjectImporter._initSharelatexProject @user_id, @user_id, @doc, (error) ->
 					error.message.should.equal("project has export records")
 					done()
 
 		describe "with any title", ->
 			beforeEach ->
-				@ProjectImporter._initSharelatexProject @user_id, @doc, @callback
+				@ProjectImporter._initSharelatexProject @user_id, @user_id, @doc, @callback
 
 			it "should fix any invalid characters in the project name", ->
 				@ProjectCreationHandler.createBlankProject
 					.calledWith(@user_id, 'fixed-project-name')
 					.should.equal true
+
+		describe "with a owner_id different to exporting user", ->
+			beforeEach ->
+				@owner_id = 'mock-owner-id'
+				@ProjectImporter._initSharelatexProject @user_id, @owner_id, @doc, @callback
+
+			it "should create the project with the correct owner", ->
+				expect(@ProjectCreationHandler.createBlankProject.firstCall.args[0])
+					.to.equal @owner_id
 
 	describe "_startExport", ->
 		beforeEach ->
@@ -863,7 +931,17 @@ describe "ProjectImporter", ->
 
 	describe "_importTags", ->
 		beforeEach (done) ->
-			@ProjectImporter._importTags(@v2_project_id, @v2_user_id, ["foo", "bar"], done)
+			@V1SharelatexApi.request = sinon.stub().yields(null, {}, {tags: ['foo', 'bar']})
+			@ProjectImporter._importTags(@v1_project_id, @v2_project_id, @v1_user_id, @v2_user_id, done)
+
+		it "should request tags from v1", ->
+			@V1SharelatexApi.request
+				.calledWith({
+					method: 'GET'
+					url: "http://overleaf.example.com/api/v1/sharelatex/users/#{@v1_user_id}/docs/#{@v1_project_id}/export/tags"
+				})
+				.should.equal true
+
 		it "should add tags to project", ->
 			@TagsHandler.addProjectToTagName.calledWith(
 				@v2_user_id, "foo", @v2_project_id
