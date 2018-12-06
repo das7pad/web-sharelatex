@@ -27,7 +27,8 @@ module.exports = OpenInOverleafController =
 			if snippet.snip?
 				OpenInOverleafController._createProjectFromPostedSnippet user_id, snippet, sendResponse
 			else if snippet.projectFile?
-				ProjectUploadManager.createProjectFromZipArchive user_id, snippet.defaultTitle, snippet.projectFile, sendResponse
+				projectName = if typeof snippet.snip_name is 'string' then snippet.snip_name else snippet.defaultTitle
+				ProjectUploadManager.createProjectFromZipArchive user_id, projectName, snippet.projectFile, sendResponse
 			else if snippet.files?
 				OpenInOverleafController._createProjectFromFileList user_id, snippet, sendResponse
 			else
@@ -38,7 +39,8 @@ module.exports = OpenInOverleafController =
 		async.waterfall(
 			[
 				(cb) ->
-					ProjectDetailsHandler.generateUniqueName user_id, ProjectDetailsHandler.fixProjectName(DocumentHelper.getTitleFromTexContent(content) || snippet.defaultTitle), (err, name) ->
+					projectName = if typeof snippet.snip_name is 'string' then snippet.snip_name else DocumentHelper.getTitleFromTexContent(content) || snippet.defaultTitle
+					ProjectDetailsHandler.generateUniqueName user_id, ProjectDetailsHandler.fixProjectName(projectName), (err, name) ->
 						cb(err, name)
 				(projectName, cb) ->
 					ProjectCreationHandler.createProjectFromSnippet user_id, projectName, content, (err, project) ->
@@ -79,6 +81,9 @@ module.exports = OpenInOverleafController =
 
 	_getSnippetContentsFromRequest: (req, cb = (error, snippet)->) ->
 		snippet = {}
+		snippet.snip_name = req.body.snip_name if req.body.snip_name?
+		snippet.snip_name = snippet.snip_name[0] if Array.isArray(snippet.snip_name) && snippet.snip_name.length == 1
+
 		if req.body.snip?
 			snippet.snip = req.body.snip
 			return cb(null, snippet)

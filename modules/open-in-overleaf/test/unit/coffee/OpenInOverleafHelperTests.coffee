@@ -215,6 +215,15 @@ snap snap
 				expect(snippet.title).to.equal 'wombat'
 				done()
 
+		it 'uses filenames from snip_name if supplied', (done) ->
+			@source.snip_name = ['1.tex', '2.tex', '3.tex']
+			@OpenInOverleafHelper.populateSnippetFromUriArray @uris, @source, (error, snippet) =>
+				filenames = _.map(snippet.files, (file) -> file.name)
+				expect(filenames[0]).to.equal('1.tex')
+				expect(filenames[1]).to.equal('2.tex')
+				expect(filenames[2]).to.equal('3.tex')
+				done()
+
 	describe "populateProjectFromFileList", ->
 		beforeEach (done) ->
 			@project = {
