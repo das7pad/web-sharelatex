@@ -1,13 +1,13 @@
 logger = require('logger-sharelatex')
 path = require('path')
 URL = require('url-parse')
+async = require('async')
 AuthenticationController = require('../../../../app/js/Features/Authentication/AuthenticationController')
 ProjectCreationHandler = require('../../../../app/js/Features/Project/ProjectCreationHandler')
 ProjectHelper = require('../../../../app/js/Features/Project/ProjectHelper')
 ProjectDetailsHandler = require('../../../../app/js/Features/Project/ProjectDetailsHandler')
 DocumentHelper = require('../../../../app/js/Features/Documents/DocumentHelper')
 ProjectUploadManager = require('../../../../app/js/Features/Uploads/ProjectUploadManager')
-Project = require('../../../../app/js/models/Project').Project
 OpenInOverleafHelper = require('./OpenInOverleafHelper')
 
 module.exports = OpenInOverleafController =
@@ -18,44 +18,62 @@ module.exports = OpenInOverleafController =
 		logger.log user: user_id, "creating project from snippet"
 		user_id = AuthenticationController.getLoggedInUserId(req)
 
+		sendResponse = (error, project) ->
+			next(error) if error?
+			OpenInOverleafController._sendResponse(req, res, project)
+
 		OpenInOverleafController._populateSnippetFromRequest req, (err, snippet) ->
 			return next(err) if err?
-
 			if snippet.snip?
-				content = OpenInOverleafHelper.getDocumentLinesFromSnippet(snippet)
-
-				projectName = DocumentHelper.getTitleFromTexContent(content) || snippet.defaultTitle
-				ProjectDetailsHandler.generateUniqueName user_id, ProjectDetailsHandler.fixProjectName(projectName), (err, projectName) ->
-					return next(err) if err?
-
-					ProjectCreationHandler.createProjectFromSnippet user_id, projectName, content, (err, project) ->
-						return next(err) if err?
-
-						update = {}
-
-						compiler = ProjectHelper.compilerFromV1Engine(req.body.engine)
-						update.compiler = compiler if compiler?
-
-						if Object.keys(update).length
-							Project.update {_id: project.id}, update, (err) ->
-								return next(err) if err?
-								OpenInOverleafController._sendResponse(req, res, project)
-						else
-							OpenInOverleafController._sendResponse(req, res, project)
+				OpenInOverleafController._createProjectFromPostedSnippet user_id, snippet, sendResponse
 			else if snippet.projectFile?
-				ProjectUploadManager.createProjectFromZipArchive user_id, snippet.defaultTitle, snippet.projectFile, (error, project) ->
-					return next(error) if error
-					OpenInOverleafController._sendResponse(req, res, project)
+				ProjectUploadManager.createProjectFromZipArchive user_id, snippet.defaultTitle, snippet.projectFile, sendResponse
+			else if snippet.files?
+				OpenInOverleafController._createProjectFromFileList user_id, snippet, sendResponse
 			else
 				res.redirect('/')
+
+	_createProjectFromPostedSnippet: (user_id, snippet, callback = (error, project)->) ->
+		content = OpenInOverleafHelper.getDocumentLinesFromSnippet(snippet)
+		async.waterfall(
+			[
+				(cb) ->
+					ProjectDetailsHandler.generateUniqueName user_id, ProjectDetailsHandler.fixProjectName(DocumentHelper.getTitleFromTexContent(content) || snippet.defaultTitle), (err, name) ->
+						cb(err, name)
+				(projectName, cb) ->
+					ProjectCreationHandler.createProjectFromSnippet user_id, projectName, content, (err, project) ->
+						cb(err, project)
+				(project, cb) ->
+					OpenInOverleafHelper.setCompilerForProject project, snippet.engine, (err) ->
+						cb(err, project)
+			]
+			callback
+		)
+
+	_createProjectFromFileList: (user_id, snippet, callback = (error, project)->) ->
+		async.waterfall(
+			[
+				(cb) ->
+					ProjectDetailsHandler.generateUniqueName user_id, ProjectDetailsHandler.fixProjectName(snippet.title || snippet.defaultTitle), (err, name) ->
+						cb(err, name)
+				(projectName, cb) ->
+					ProjectCreationHandler.createBlankProject user_id, projectName, (err, project) ->
+						cb(err, project)
+				(project, cb) ->
+					OpenInOverleafHelper.populateProjectFromFileList project, snippet, (err) ->
+						cb(err, project)
+			]
+			callback
+		)
 
 	_populateSnippetFromRequest: (req, cb = (error, result)->) ->
 		comment = OpenInOverleafController._getMainFileCommentFromSnipRequest(req)
 		OpenInOverleafController._getSnippetContentsFromRequest req, (error, snippet) ->
 			return cb(error) if error?
-			return cb(new Error("Couldn't extract snippet")) unless snippet.snip? || snippet.projectFile?
+			return cb(new Error("Couldn't extract snippet")) unless snippet.snip? || snippet.projectFile? || snippet.files?
 
 			snippet.comment = comment
+			snippet.engine = req.body.engine if req.body.engine?
 			snippet.defaultTitle = OpenInOverleafController._getDefaultTitleFromSnipRequest(req)
 			cb(null, snippet)
 
@@ -67,6 +85,11 @@ module.exports = OpenInOverleafController =
 		else if req.body.encoded_snip?
 			snippet.snip = decodeURIComponent(req.body.encoded_snip)
 			return cb(null, snippet)
+		else if Array.isArray(req.body.snip_uri)
+			if req.body.snip_uri.length == 1
+				OpenInOverleafHelper.populateSnippetFromUri req.body.snip_uri[0], snippet, cb
+			else
+				OpenInOverleafHelper.populateSnippetFromUriArray req.body.snip_uri, snippet, cb
 		else if req.body.snip_uri?
 			OpenInOverleafHelper.populateSnippetFromUri req.body.snip_uri, snippet, cb
 		else
@@ -97,7 +120,7 @@ module.exports = OpenInOverleafController =
 
 	_getDefaultTitleFromSnipRequest: (req) ->
 		FILE_EXTENSION_REGEX = /\.[^.]+$/
-		if req.body.snip_uri?
+		if typeof req.body.snip_uri is 'string'
 			return path.basename(req.body.snip_uri).replace(FILE_EXTENSION_REGEX, '')
 
 		return req.i18n.translate('new_snippet_project')

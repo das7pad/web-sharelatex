@@ -1,6 +1,7 @@
 assert = require("chai").assert
 sinon = require('sinon')
 chai = require('chai')
+_ = require('underscore')
 should = chai.should()
 expect = chai.expect
 modulePath = "../../../app/js/OpenInOverleafHelper.js"
@@ -20,11 +21,21 @@ describe 'OpenInOverleafHelper', ->
 		@fs =
 			readFile: sinon.stub().withArgs(@tmpfile, encoding: 'utf8').callsArgWith(2, null, @snip)
 		@settings = {}
+		@ProjectEntityUpdateHandler =
+			addDoc: sinon.stub().callsArg(5)
+			addFile: sinon.stub().callsArg(6)
+		@ProjectRootDocManager =
+			setRootDocFromName: sinon.stub().callsArg(2)
+		@ProjectModel = {}
+		@ProjectModel.update = sinon.stub().callsArg(2)
 
 		@OpenInOverleafHelper = SandboxedModule.require modulePath, requires:
 			'mmmagic': mmmagic
 			'../../../../app/js/infrastructure/FileWriter': @FileWriter
 			'../../../../app/js/Features/Helpers/UrlHelper': @UrlHelper
+			'../../../../app/js/Features/Project/ProjectRootDocManager': @ProjectRootDocManager
+			'../../../../app/js/Features/Project/ProjectEntityUpdateHandler': @ProjectEntityUpdateHandler
+			'../../../../app/js/models/Project': {Project: @ProjectModel}
 			'settings-sharelatex': @settings
 			'fs': @fs
 			'logger-sharelatex':
@@ -120,6 +131,125 @@ snap snap
 
 			it "raises an error", ->
 				sinon.assert.calledWith(@cb, new Error())
+
+	describe 'populateSnippetFromUriArray', ->
+		beforeEach ->
+			@uris = [
+				"http://a.aa/main.tex",
+				"http://b.bb/main.tex",
+				"http://c.cc/file.zip",
+				"http://d.dd/a.tex",
+				"http://e.ee/picard.gif"
+				"http://f.ff/file"
+			]
+			@FileWriter.writeUrlToDisk = sinon.stub().callsArgWith(2, new Error("URL not found"))
+			@FileWriter.writeUrlToDisk.withArgs(sinon.match.any, "http://a.aa/main.tex").callsArgWith(2, null, "/tmp/main.tex_1")
+			@FileWriter.writeUrlToDisk.withArgs(sinon.match.any, "http://b.bb/main.tex").callsArgWith(2, null, "/tmp/main.tex_2")
+			@FileWriter.writeUrlToDisk.withArgs(sinon.match.any, "http://c.cc/file.zip").callsArgWith(2, null, "/tmp/file.zip_1")
+			@FileWriter.writeUrlToDisk.withArgs(sinon.match.any, "http://d.dd/a.tex").callsArgWith(2, null, "/tmp/a.tex_1")
+			@FileWriter.writeUrlToDisk.withArgs(sinon.match.any, "http://e.ee/picard.gif").callsArgWith(2, null, "/tmp/picard.gif_1")
+			@FileWriter.writeUrlToDisk.withArgs(sinon.match.any, "http://f.ff/file").callsArgWith(2, null, "/tmp/file_1")
+			mmmagic.Magic::detectFile = sinon.stub().callsArgWith(1, new Error("File not found"))
+			mmmagic.Magic::detectFile.withArgs("/tmp/main.tex_1").callsArgWith(1, null, 'text/x-tex')
+			mmmagic.Magic::detectFile.withArgs("/tmp/main.tex_2").callsArgWith(1, null, 'text/x-tex')
+			mmmagic.Magic::detectFile.withArgs("/tmp/file.zip_1").callsArgWith(1, null, 'application/zip')
+			mmmagic.Magic::detectFile.withArgs("/tmp/a.tex_1").callsArgWith(1, null, 'text/x-tex')
+			mmmagic.Magic::detectFile.withArgs("/tmp/picard.gif_1").callsArgWith(1, null, 'image/gif')
+			mmmagic.Magic::detectFile.withArgs("/tmp/file_1").callsArgWith(1, null, 'text/plain')
+			@fs.readFile = sinon.stub().callsArgWith(2, null, "Hello world")
+			@fs.readFile.withArgs("/tmp/a.tex_1").callsArgWith(2, null, "\\title{wombat}")
+			@source = {wombat: 'potato'}
+
+		it 'succeeds', (done) ->
+			@OpenInOverleafHelper.populateSnippetFromUriArray @uris, @source, (error) ->
+				expect(error).not.to.exist
+				done()
+
+		it 'downloads all of the URIs', (done) ->
+			@OpenInOverleafHelper.populateSnippetFromUriArray @uris, @source, =>
+				for u in @uris
+					sinon.assert.calledWith(@FileWriter.writeUrlToDisk, sinon.match.any, u)
+				done()
+
+		it 'checks the filetypes of all the files', (done) ->
+			@OpenInOverleafHelper.populateSnippetFromUriArray @uris, @source, =>
+				sinon.assert.calledWith(mmmagic.Magic::detectFile, "/tmp/main.tex_1")
+				sinon.assert.calledWith(mmmagic.Magic::detectFile, "/tmp/main.tex_2")
+				sinon.assert.calledWith(mmmagic.Magic::detectFile, "/tmp/file.zip_1")
+				sinon.assert.calledWith(mmmagic.Magic::detectFile, "/tmp/a.tex_1")
+				sinon.assert.calledWith(mmmagic.Magic::detectFile, "/tmp/picard.gif_1")
+				sinon.assert.calledWith(mmmagic.Magic::detectFile, "/tmp/file_1")
+				done()
+
+		it 'reads the tex and text file contents, but not the binaries', (done) ->
+			@OpenInOverleafHelper.populateSnippetFromUriArray @uris, @source, =>
+				sinon.assert.calledWith(@fs.readFile, "/tmp/main.tex_1")
+				sinon.assert.calledWith(@fs.readFile, "/tmp/main.tex_2")
+				sinon.assert.calledWith(@fs.readFile, "/tmp/a.tex_1")
+				sinon.assert.calledWith(@fs.readFile, "/tmp/file_1")
+				sinon.assert.neverCalledWith(@fs.readFile, "/tmp/file.zip_1")
+				sinon.assert.neverCalledWith(@fs.readFile, "/tmp/picard.gif_1")
+				done()
+
+		it 'adds the file list to the snippet', (done) ->
+			@OpenInOverleafHelper.populateSnippetFromUriArray @uris, @source, (error, snippet) =>
+				expect(snippet.files).to.be.a 'Array'
+				expect(snippet.files.length).to.equal @uris.length
+				done()
+
+		it "keeps the snippet's original fields", (done) ->
+			@OpenInOverleafHelper.populateSnippetFromUriArray @uris, @source, (error, snippet) =>
+				expect(snippet.wombat).to.equal 'potato'
+				done()
+
+		it 'extracts the filename from the URL', (done) ->
+			@OpenInOverleafHelper.populateSnippetFromUriArray @uris, @source, (error, snippet) =>
+				filenames = _.map(snippet.files, (file) -> file.name)
+				expect(filenames).to.include('main.tex')
+				done()
+
+		it 'ensures the filenames are unique', (done) ->
+			@OpenInOverleafHelper.populateSnippetFromUriArray @uris, @source, (error, snippet) =>
+				filenames = _.map(snippet.files, (file) -> file.name)
+				expect(filenames).to.include('main (1).tex')
+				done()
+
+		it 'reads the project title from the tex content', (done) ->
+			@OpenInOverleafHelper.populateSnippetFromUriArray @uris, @source, (error, snippet) =>
+				expect(snippet.title).to.equal 'wombat'
+				done()
+
+	describe "populateProjectFromFileList", ->
+		beforeEach (done) ->
+			@project = {
+				_id: "1234"
+				rootFolder: [{_id: 'asdf'}]
+			}
+			@snippet =
+				rootDoc: 'foo.tex'
+				files: [
+					{content: "snippety snip\nsnap snap", name: 'foo.tex'},
+					{content: "blippety blip\nblop blop", name: 'bar.tex'},
+					{fspath: '/foo/baz.zip', name: 'baz.zip'},
+					{fspath: '/foo/qux.zip', name: 'qux.zip'}
+				]
+				comment: "% commenty comment\n"
+			@error = null
+			@OpenInOverleafHelper.populateProjectFromFileList @project, @snippet, (error) =>
+				@error = error
+				done()
+
+		it "succeeds", ->
+			expect(@error).not.to.exist
+
+		it "adds the tex files as documents", ->
+			sinon.assert.calledTwice(@ProjectEntityUpdateHandler.addDoc)
+
+		it "adds the zip files as files", ->
+			sinon.assert.calledTwice(@ProjectEntityUpdateHandler.addFile)
+
+		it "sets the root document", ->
+			sinon.assert.calledWith(@ProjectRootDocManager.setRootDocFromName, sinon.match.any, 'foo.tex')
 
 	describe '_normalizeMainSrcContent', ->
 		beforeEach ->

@@ -1,6 +1,7 @@
 assert = require("chai").assert
 sinon = require('sinon')
 chai = require('chai')
+_ = require('underscore')
 should = chai.should()
 expect = chai.expect
 modulePath = "../../../app/js/OpenInOverleafController.js"
@@ -36,11 +37,10 @@ describe 'OpenInOverleafController', ->
 			setHeader: sinon.stub()
 			send: sinon.stub()
 			redirect: sinon.stub()
-		@ProjectModel = {}
-		@ProjectModel.update = sinon.stub().callsArg(2)
 		@project = {_id:@project_id}
 		@ProjectCreationHandler =
 			createProjectFromSnippet: sinon.stub().callsArgWith(3, null, @project)
+			createBlankProject: sinon.stub().callsArgWith(2, null, @project)
 		@ProjectDetailsHandler =
 			generateUniqueName: sinon.stub().callsArgWith(2, null, "new_snippet_project")
 			fixProjectName: sinon.stub().returnsArg(0)
@@ -49,12 +49,18 @@ describe 'OpenInOverleafController', ->
 
 		@OpenInOverleafHelper =
 			getDocumentLinesFromSnippet: sinon.stub().returns((@comment + @snip).split("\n"))
+			setCompilerForProject: sinon.stub().callsArg(2)
+			populateSnippetFromUri: sinon.stub().callsArgWith(2, null, @snippet)
+			populateSnippetFromUriArray: sinon.stub().callsArgWith(
+				2
+				null
+				_.extend({files: [{ctype: 'text/x-tex', content: @snip}, {ctype: 'application/zip', fspath: '/foo/bar.zip'}]}, @snippet, {snip: undefined})
+			)
+			populateProjectFromFileList: sinon.stub().callsArg(2)
 		@Csrf =
 			validateRequest: sinon.stub().callsArgWith(1, true)
 		@AuthenticationController =
 			getLoggedInUserId: sinon.stub().returns(@user._id)
-		@DocumentHelper =
-			getTitleFromTexContent: sinon.stub().returns("new_snippet_project")
 
 		@OpenInOverleafController = SandboxedModule.require modulePath, requires:
 			"logger-sharelatex":
@@ -63,22 +69,17 @@ describe 'OpenInOverleafController', ->
 			'../../../../app/js/Features/Authentication/AuthenticationController': @AuthenticationController
 			'../../../../app/js/Features/Project/ProjectCreationHandler': @ProjectCreationHandler
 			'../../../../app/js/Features/Project/ProjectDetailsHandler': @ProjectDetailsHandler
-			'../../../../app/js/models/Project': {Project: @ProjectModel}
-			'../../../../app/js/Features/Documents/DocumentHelper': @DocumentHelper
 			'../../../../app/js/Features/Uploads/ProjectUploadManager': @ProjectUploadManager
 			'./OpenInOverleafHelper': @OpenInOverleafHelper
 
 	describe "openInOverleaf", ->
-		beforeEach ->
-			@OpenInOverleafController._populateSnippetFromRequest = sinon.stub().callsArgWith(1, null, @snippet)
-
 		describe "when there is a raw snippet", ->
 			beforeEach ->
 				@req.body.snip = @snip
 
 			it "should process the snippet, create a project and redirect to it", (done)->
 				@res.send = (content)=>
-					sinon.assert.calledWith(@OpenInOverleafHelper.getDocumentLinesFromSnippet, @snippet)
+					sinon.assert.calledWith(@OpenInOverleafHelper.getDocumentLinesFromSnippet, sinon.match.has("snip", @snip))
 					sinon.assert.calledWith(@ProjectCreationHandler.createProjectFromSnippet, @user._id, "new_snippet_project", @documentLines)
 					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
 					content.should.equal JSON.stringify({redirect: '/project/' + @project_id})
@@ -87,31 +88,30 @@ describe 'OpenInOverleafController', ->
 
 			it "should update the project with the requested engine, if supplied", (done)->
 				@req.body.engine = 'latex_dvipdf'
-				@res.send = (content)=>
-					sinon.assert.calledWith(@ProjectModel.update, sinon.match.any, {compiler: 'latex'})
-					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
-					content.should.equal JSON.stringify({redirect: '/project/' + @project_id})
+				@res.send = =>
+					sinon.assert.calledWith(@OpenInOverleafHelper.setCompilerForProject, sinon.match.any, 'latex_dvipdf')
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
-			it "should get the document title from the snippet", (done) ->
-				@res.send = (content)=>
-					sinon.assert.calledWith(@DocumentHelper.getTitleFromTexContent, @documentLines)
+			it "should use the default title if the document has no title", (done) ->
+				@res.send = =>
 					sinon.assert.calledWith(@ProjectDetailsHandler.generateUniqueName, @user._id, "new_snippet_project")
 					sinon.assert.called(@ProjectDetailsHandler.fixProjectName)
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
-			it "should use the default title if the document has no title", (done) ->
-				@res.send = (content)=>
-					sinon.assert.calledWith(@DocumentHelper.getTitleFromTexContent, @documentLines)
-					sinon.assert.calledWith(@ProjectDetailsHandler.generateUniqueName, @user._id, "default_title")
+			it "should use the document title from the snippet, if present", (done) ->
+				@snip = "\\title{wombat}"
+				@req.body.snip = @snip
+				@OpenInOverleafHelper.getDocumentLinesFromSnippet = sinon.stub().returns((@comment + @snip).split("\n"))
+				@res.send = =>
+					sinon.assert.calledWith(@ProjectDetailsHandler.generateUniqueName, @user._id, "wombat")
 					done()
-				@DocumentHelper.getTitleFromTexContent = sinon.stub().returns(null)
 				@OpenInOverleafController.openInOverleaf @req, @res
 
 		describe "when there is no snippet", ->
 			it "should redirect to the root", (done)->
+				@OpenInOverleafController._populateSnippetFromRequest = sinon.stub()
 				@res.redirect = (url)=>
 					sinon.assert.notCalled(@OpenInOverleafController._populateSnippetFromRequest)
 					url.should.equal("/")
@@ -138,6 +138,26 @@ describe 'OpenInOverleafController', ->
 				@res.send = (content)=>
 					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
 					content.should.equal JSON.stringify({redirect: '/project/' + @project_id})
+					done()
+				@OpenInOverleafController.openInOverleaf @req, @res
+
+		describe "when there is an array of uris", ->
+			beforeEach ->
+				@req.body.snip_uri = [@snip_uri, 'http://foo.net/foo.tex']
+
+			it "should create a project and redirect to it", (done)->
+				@res.send = (content)=>
+					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
+					content.should.equal JSON.stringify({redirect: '/project/' + @project_id})
+					done()
+				@OpenInOverleafController.openInOverleaf @req, @res
+
+			it "should cate a blank project and populate it with a list of files", (done)->
+				@res.send = =>
+					sinon.assert.called(@ProjectDetailsHandler.generateUniqueName)
+					sinon.assert.called(@ProjectDetailsHandler.fixProjectName)
+					sinon.assert.called(@ProjectCreationHandler.createBlankProject)
+					sinon.assert.called(@OpenInOverleafHelper.populateProjectFromFileList)
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
@@ -180,6 +200,15 @@ describe 'OpenInOverleafController', ->
 				snippet.snip.should.equal @snip
 				snippet.comment.should.equal @comment
 				snippet.defaultTitle.should.equal "new_snippet_project"
+				done()
+
+		it "should add the engine to the snippet, if present", (done) ->
+			@req.body.engine = 'latex_dvipdf'
+			@OpenInOverleafController._getSnippetContentsFromRequest = sinon.stub().callsArgWith(1, null, {snip: @snip})
+			@OpenInOverleafController._populateSnippetFromRequest @req, (error, snippet) =>
+				expect(error).not.to.exist
+				expect(snippet.engine).to.exist
+				snippet.engine.should.equal 'latex_dvipdf'
 				done()
 
 		it "should return an error if retrieving the snippet returns an error", (done) ->

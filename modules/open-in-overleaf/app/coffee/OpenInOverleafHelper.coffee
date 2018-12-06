@@ -2,20 +2,75 @@ logger = require('logger-sharelatex')
 settings = require('settings-sharelatex')
 mmm = require('mmmagic')
 fs = require('fs')
+path = require('path')
+async = require('async')
+_ = require('underscore')
 urlValidator = require('valid-url')
 FileWriter = require("../../../../app/js/infrastructure/FileWriter")
 UrlHelper = require('../../../../app/js/Features/Helpers/UrlHelper')
+ProjectHelper = require('../../../../app/js/Features/Project/ProjectHelper')
+ProjectRootDocManager = require('../../../../app/js/Features/Project/ProjectRootDocManager')
+ProjectEntityUpdateHandler = require('../../../../app/js/Features/Project/ProjectEntityUpdateHandler')
+DocumentHelper = require('../../../../app/js/Features/Documents/DocumentHelper')
+Project = require('../../../../app/js/models/Project').Project
 
 module.exports = OpenInOverleafHelper =
-	getDocumentLinesFromSnippet: (snippet) ->
+	getDocumentLinesFromSnippet: (snippet, content = null) ->
 		return (
-			snippet.comment + OpenInOverleafHelper._normalizeMainSrcContent(snippet)
+			snippet.comment + OpenInOverleafHelper._normalizeMainSrcContent(snippet, content)
 		).trim().split('\n')
 
 	normalizeLatexContent: (content) ->
-# TODO: handle non-UTF8 content and make best effort to convert.
-# see: https://github.com/overleaf/write_latex/blob/master/main/lib/text_normalization.rb
+		# TODO: handle non-UTF8 content and make best effort to convert.
+		# see: https://github.com/overleaf/write_latex/blob/master/main/lib/text_normalization.rb
 		return content
+
+	populateSnippetFromUriArray: (uris, source_snippet, callback = (error, results)->) ->
+		async.mapLimit(
+			uris
+			5
+			(uri, mapcb)->
+				async.waterfall(
+					[
+						(cb)->
+							FileWriter.writeUrlToDisk 'open_in_overleaf_snippet', UrlHelper.wrapUrlWithProxy(uri), (error, fspath) ->
+								return cb(error) if error?
+								cb(null, {uri: uri, fspath: fspath})
+						(file, cb)->
+							magic = new mmm.Magic(mmm.MAGIC_MIME_TYPE)
+							magic.detectFile file.fspath, (error, ctype) ->
+								return cb(error) if error?
+								file.ctype = ctype
+								cb(null, file)
+						(file, cb)->
+							if file.ctype.match(/^text\//)
+								fs.readFile file.fspath, encoding: 'utf8', (error, content) ->
+									return cb(error) if error?
+									file.content = content
+									cb(null, file)
+							else
+								cb(null, file)
+						(file, cb) ->
+							file.name = path.basename(file.uri)
+							cb(null, file)
+					]
+					mapcb
+				)
+			(error, files)->
+				return callback(error) if error?
+
+				# sort files based on the order supplied so that the user can control project name if more than one .tex document has a documentclass
+				groups = _.groupBy(files, (file)-> file.uri)
+				files = _.map(uris, (uri)-> groups[uri].shift())
+
+				OpenInOverleafHelper._ensureFilesHaveUniqueNames files, (err) ->
+					return callback(err) if err?
+
+					snippet = JSON.parse(JSON.stringify(source_snippet))
+					snippet.files = files
+					OpenInOverleafHelper._setSnippetRootDocAndTitleFromFileArray(snippet)
+					callback(null, snippet)
+		)
 
 	populateSnippetFromUri: (uri, source_snippet, cb = (error, result)->) ->
 		return cb(new Error('Invalid URI')) unless urlValidator.isWebUri(uri)
@@ -44,8 +99,48 @@ module.exports = OpenInOverleafHelper =
 					logger.log uri:uri, ctype:ctype, "refusing to open unrecognised content type"
 					cb(new Error("Invalid content type: #{ctype}"))
 
-	_normalizeMainSrcContent: (snippet) ->
-		r = OpenInOverleafHelper._wrapSnippetIfNoDocumentClass(OpenInOverleafHelper.normalizeLatexContent(snippet.snip), snippet.defaultTitle)
+	populateProjectFromFileList: (project, snippet, callback = (error)->) ->
+		async.eachLimit(
+			snippet.files
+			5
+			(file, cb) ->
+				if file.content?
+					ProjectEntityUpdateHandler.addDoc(
+						project._id
+						project.rootFolder[0]._id
+						file.name
+						OpenInOverleafHelper.getDocumentLinesFromSnippet(snippet, file.content)
+						project.owner_ref
+						cb
+					)
+				else
+					ProjectEntityUpdateHandler.addFile(
+						project._id
+						project.rootFolder[0]._id
+						file.name
+						file.fspath
+						null
+						project.owner_ref
+						cb
+					)
+			(error) ->
+				return callback(error) if error?
+				if snippet.rootDoc?
+					ProjectRootDocManager.setRootDocFromName project._id, snippet.rootDoc, callback
+				else
+					callback()
+		)
+
+	setCompilerForProject: (project, engine, callback = (error)->) ->
+		compiler = ProjectHelper.compilerFromV1Engine(engine)
+
+		if compiler?
+			Project.update {_id: project.id}, {compiler: compiler}, callback
+		else
+			callback()
+
+	_normalizeMainSrcContent: (snippet, content = null) ->
+		r = OpenInOverleafHelper._wrapSnippetIfNoDocumentClass(OpenInOverleafHelper.normalizeLatexContent(content || snippet.snip), snippet.defaultTitle)
 		return r
 
 	_wrapSnippetIfNoDocumentClass: (content, title) ->
@@ -62,3 +157,28 @@ module.exports = OpenInOverleafHelper =
 \\end{document}
 """
 		return content
+
+
+	_ensureFilesHaveUniqueNames: (files, callback) ->
+		# ensure all files have unique names:
+		# keep track of unique filenames for each file extension, so when generating a unique filename we can put the
+		# suffix before the extension if one is necessary. e.g. "main (2).tex" instead of "main.tex (2)"
+		filenamesByExtension = {}
+		for file in files
+			ext = path.extname(file.name)
+			filenamesByExtension[ext] = [] unless filenamesByExtension[ext]?
+			base = file.name.substring(0, file.name.length - ext.length)
+			ProjectHelper.ensureNameIsUnique filenamesByExtension[ext], base, [], 100, (error, name) ->
+				return callback(error) if error?
+				file.name = "#{name}#{ext}"
+				filenamesByExtension[ext].push(name)
+		callback()
+
+	_setSnippetRootDocAndTitleFromFileArray: (snippet) ->
+		for file in snippet.files
+			if file.content?
+				snippet.rootDoc = file.name if !snippet.rootDoc? && DocumentHelper.contentHasDocumentclass(file.content)
+				title = DocumentHelper.getTitleFromTexContent(file.content)
+				if title?
+					snippet.title = title
+					break if file.name == snippet.rootDoc
