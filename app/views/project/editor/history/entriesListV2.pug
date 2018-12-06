@@ -273,7 +273,7 @@ script(type="text/ng-template", id="historyEntryTpl")
 
 		.history-entry-details(ng-click="$ctrl.onSelect({ selectedEntry: $ctrl.entry })")
 			history-label(
-				ng-repeat="label in ::$ctrl.entry.labels | orderBy : '-created_at'"
+				ng-repeat="label in $ctrl.entry.labels | orderBy : '-created_at'"
 				label-text="label.comment"
 				label-owner-name="$ctrl.displayNameById(label.user_id)"
 				label-creation-date-time="label.created_at"

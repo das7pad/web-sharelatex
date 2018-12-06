@@ -23,7 +23,7 @@
 
 
 	//- FOR COMPARE
-	span.history-toolbar-selected-version(ng-show="history.viewMode === HistoryViewModes.COMPARE && !history.selection.diff.binary && !history.selection.diff.loading && !history.selection.diff.error && !history.loadingFileTree")
+	span.history-toolbar-selected-version(ng-show="history.viewMode === HistoryViewModes.COMPARE && history.selection.diff && !history.selection.diff.binary && !history.selection.diff.loading && !history.selection.diff.error && !history.loadingFileTree")
 		| <strong>{{history.selection.diff.highlights.length}} </strong>
 		ng-pluralize(
 			count="history.selection.diff.highlights.length",

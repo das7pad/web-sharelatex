@@ -47,7 +47,7 @@ define([
       constructor(ide, $scope) {
         this.labelCurrentVersion = this.labelCurrentVersion.bind(this)
         this.deleteLabel = this.deleteLabel.bind(this)
-        this._addLabelToLocalUpdate = this._addLabelToLocalUpdate.bind(this)
+        this._addLabelLocally = this._addLabelLocally.bind(this)
         this.ide = ide
         this.$scope = $scope
         this.hardReset()
@@ -175,24 +175,24 @@ define([
       }
 
       softReset() {
-        ;(this.$scope.history.viewMode = null),
-          (this.$scope.history.selection = {
-            docs: {},
-            pathname: null,
-            range: {
-              fromV: null,
-              toV: null
-            },
-            hoveredRange: {
-              fromV: null,
-              toV: null
-            },
-            diff: null, // When history.viewMode == HistoryViewModes.COMPARE
-            files: [], // When history.viewMode == HistoryViewModes.COMPARE
-            update: null, // When history.viewMode == HistoryViewModes.POINT_IN_TIME
-            label: null, // When history.viewMode == HistoryViewModes.POINT_IN_TIME
-            file: null // When history.viewMode == HistoryViewModes.POINT_IN_TIME
-          })
+        this.$scope.history.viewMode = null
+        this.$scope.history.selection = {
+          docs: {},
+          pathname: null,
+          range: {
+            fromV: null,
+            toV: null
+          },
+          hoveredRange: {
+            fromV: null,
+            toV: null
+          },
+          diff: null, // When history.viewMode == HistoryViewModes.COMPARE
+          files: [], // When history.viewMode == HistoryViewModes.COMPARE
+          update: null, // When history.viewMode == HistoryViewModes.POINT_IN_TIME
+          label: null, // When history.viewMode == HistoryViewModes.POINT_IN_TIME
+          file: null // When history.viewMode == HistoryViewModes.POINT_IN_TIME
+        }
         this.$scope.history.error = null
         this.$scope.history.showOnlyLabels = false
         this.$scope.history.loadingFileTree = true
@@ -513,24 +513,36 @@ define([
       }
 
       _loadLabels(labels, lastUpdateToV) {
-        sortedLabels = this._sortLabelsByVersionAndDate(labels)
-        if (
-          sortedLabels.length > 0 &&
-          sortedLabels[0].version !== lastUpdateToV
-        ) {
-          sortedLabels.unshift({
-            id: '1',
-            isPseudoCurrentStateLabel: true,
-            version: lastUpdateToV,
-            created_at: new Date().toISOString()
-          })
+        let sortedLabels = this._sortLabelsByVersionAndDate(labels)
+        let hasPseudoCurrentStateLabel = false
+        let needsPseudoCurrentStateLabel = false
+        if (sortedLabels.length > 0 && lastUpdateToV) {
+          hasPseudoCurrentStateLabel = sortedLabels[0].isPseudoCurrentStateLabel
+          needsPseudoCurrentStateLabel =
+            sortedLabels[0].version !== lastUpdateToV
+          if (needsPseudoCurrentStateLabel && !hasPseudoCurrentStateLabel) {
+            sortedLabels.unshift({
+              id: '1',
+              isPseudoCurrentStateLabel: true,
+              version: lastUpdateToV,
+              created_at: new Date().toISOString()
+            })
+          } else if (
+            !needsPseudoCurrentStateLabel &&
+            hasPseudoCurrentStateLabel
+          ) {
+            sortedLabels.shift()
+          }
         }
-
         return sortedLabels
       }
 
       _sortLabelsByVersionAndDate(labels) {
-        return this.ide.$filter('orderBy')(labels, ['-version', '-created_at'])
+        return this.ide.$filter('orderBy')(labels, [
+          'isPseudoCurrentStateLabel',
+          '-version',
+          '-created_at'
+        ])
       }
 
       loadFileAtPointInTime() {
@@ -632,15 +644,6 @@ define([
           })
       }
 
-      _isLabelSelected(label) {
-        return (
-          label.id ===
-          (this.$scope.history.selection.label != null
-            ? this.$scope.history.selection.label.id
-            : undefined)
-        )
-      }
-
       _deleteLabelLocally(labelToDelete) {
         for (let i = 0; i < this.$scope.history.updates.length; i++) {
           const update = this.$scope.history.updates[i]
@@ -652,10 +655,22 @@ define([
             break
           }
         }
-        return (this.$scope.history.labels = _.filter(
-          this.$scope.history.labels,
-          label => label.id !== labelToDelete.id
-        ))
+        this.$scope.history.labels = this._loadLabels(
+          _.filter(
+            this.$scope.history.labels,
+            label => label.id !== labelToDelete.id
+          ),
+          this.$scope.history.updates[0].toV
+        )
+      }
+
+      _isLabelSelected(label) {
+        return (
+          label.id ===
+          (this.$scope.history.selection.label != null
+            ? this.$scope.history.selection.label.id
+            : undefined)
+        )
       }
 
       _parseDiff(diff) {
@@ -794,23 +809,22 @@ define([
             _csrf: window.csrfToken
           })
           .then(response => {
-            return this._addLabelToLocalUpdate(response.data)
+            return this._addLabelLocally(response.data)
           })
       }
 
-      _addLabelToLocalUpdate(label) {
+      _addLabelLocally(label) {
         const localUpdate = _.find(
           this.$scope.history.updates,
           update => update.toV === label.version
         )
         if (localUpdate != null) {
-          localUpdate.labels = this._sortLabelsByVersionAndDate(
-            localUpdate.labels.concat(label)
-          )
+          localUpdate.labels = localUpdate.labels.concat(label)
         }
-        return (this.$scope.history.labels = this._sortLabelsByVersionAndDate(
-          this.$scope.history.labels.concat(label)
-        ))
+        this.$scope.history.labels = this._loadLabels(
+          this.$scope.history.labels.concat(label),
+          this.$scope.history.updates[0].toV
+        )
       }
 
       // _perDocSummaryOfUpdates(updates) {
