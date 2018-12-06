@@ -239,41 +239,6 @@ module.exports = ProjectEntityUpdateHandler = self =
 					return callback(err) if err?
 					DocumentUpdaterHandler.updateProjectStructure project_id, projectHistoryId, userId, {oldFiles, newFiles}, callback
 
-	addDocWithoutUpdatingHistory: wrapWithLock
-		# This method should never be called directly, except when importing a project
-		# from Overleaf. It skips sending updates to the project history, which will break
-		# the history unless you are making sure it is updated in some other way.
-		beforeLock: (next) ->
-			# Put doc in docstore first, so that if it errors, we don't have a doc_id in the project
-			# which hasn't been created in docstore.
-			(project_id, folder_id, docName, docLines, userId, callback) ->
-				if not SafePath.isCleanFilename docName
-					return callback new Errors.InvalidNameError("invalid element name")
-				doc = new Doc name: docName
-				DocstoreManager.updateDoc project_id.toString(), doc._id.toString(), docLines, 0, {}, (err, modified, rev) ->
-					return callback(err) if err?
-					next(project_id, folder_id, doc, userId, callback)
-		withLock: (project_id, folder_id, doc, userId, callback = (error, doc, folder_id) ->) ->
-			ProjectEntityUpdateHandler._addDocAndSendToTpds project_id, folder_id, doc, (err, result, project) ->
-				return callback(err) if err?
-				callback(null, doc, folder_id, result?.path?.fileSystem, project)
-
-	addFileWithoutUpdatingHistory: wrapWithLock
-		# This method should never be called directly, except when importing a project
-		# from Overleaf. It skips sending updates to the project history, which will break
-		# the history unless you are making sure it is updated in some other way.
-		beforeLock: (next) ->
-			(project_id, folder_id, fileName, fsPath, linkedFileData, userId, callback) ->
-				if not SafePath.isCleanFilename fileName
-					return callback(new Errors.InvalidNameError("invalid element name"))
-				ProjectEntityUpdateHandler._uploadFile project_id, folder_id, fileName, fsPath, linkedFileData, userId, (error, fileRef, fileStoreUrl) ->
-					return callback(error) if error?
-					next(project_id, folder_id, fileName, fsPath, linkedFileData, userId, fileRef, fileStoreUrl, callback)
-		withLock: (project_id, folder_id, fileName, fsPath, linkedFileData, userId, fileRef, fileStoreUrl, callback = (error, fileRef, folder_id, path, fileStoreUrl) ->)->
-			ProjectEntityUpdateHandler._addFileAndSendToTpds project_id, folder_id, fileRef, (err, result, project) ->
-				return callback(err) if err?
-				callback(null, fileRef, folder_id, result?.path?.fileSystem, fileStoreUrl)
-
 	upsertDoc: wrapWithLock (project_id, folder_id, docName, docLines, source, userId, callback = (err, doc, folder_id, isNewDoc)->)->
 		if not SafePath.isCleanFilename docName
 			return callback new Errors.InvalidNameError("invalid element name")
