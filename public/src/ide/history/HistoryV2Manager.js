@@ -50,7 +50,7 @@ define([
         this._addLabelToLocalUpdate = this._addLabelToLocalUpdate.bind(this)
         this.ide = ide
         this.$scope = $scope
-        this.reset()
+        this.hardReset()
         this.$scope.HistoryViewModes = HistoryViewModes
 
         this.$scope.toggleHistory = () => {
@@ -67,10 +67,10 @@ define([
 
         this.$scope.toggleHistoryViewMode = () => {
           if (this.$scope.history.viewMode === HistoryViewModes.COMPARE) {
-            this.reset()
+            this.softReset()
             this.$scope.history.viewMode = HistoryViewModes.POINT_IN_TIME
           } else {
-            this.reset()
+            this.softReset()
             this.$scope.history.viewMode = HistoryViewModes.COMPARE
           }
           this._handleHistoryUIStateChange()
@@ -133,7 +133,7 @@ define([
 
       show() {
         this.$scope.ui.view = 'history'
-        this.reset()
+        this.hardReset()
         this.$scope.history.viewMode = HistoryViewModes.POINT_IN_TIME
       }
 
@@ -141,15 +141,7 @@ define([
         this.$scope.ui.view = 'editor'
       }
 
-      reset() {
-        if (this.$scope.history) {
-          this._softReset()
-        } else {
-          this._fullReset()
-        }
-      }
-
-      _fullReset() {
+      hardReset() {
         this.$scope.history = {
           isV2: true,
           updates: [],
@@ -177,11 +169,12 @@ define([
           },
           error: null,
           showOnlyLabels: false,
-          labels: null
+          labels: null,
+          loadingFileTree: true
         }
       }
 
-      _softReset() {
+      softReset() {
         ;(this.$scope.history.viewMode = null),
           (this.$scope.history.selection = {
             docs: {},
@@ -202,6 +195,7 @@ define([
           })
         this.$scope.history.error = null
         this.$scope.history.showOnlyLabels = false
+        this.$scope.history.loadingFileTree = true
       }
 
       _handleHistoryUIStateChange() {
@@ -508,10 +502,9 @@ define([
             ) {
               this.$scope.history.atEnd = true
             }
-            // // this.$scope.history.loading = false
-            // if (this.$scope.history.updates.length === 0) {
-            //   this.$scope.history.loadingFileTree = false
-            // }
+            if (this.$scope.history.updates.length === 0) {
+              this.$scope.history.loadingFileTree = false
+            }
           })
           .catch(error => {
             const { status, statusText } = error
