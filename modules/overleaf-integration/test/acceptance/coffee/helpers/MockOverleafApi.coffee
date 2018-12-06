@@ -156,6 +156,14 @@ module.exports = MockOverleafApi =
 			else
 				res.status(404).json {}
 
+		app.post "/api/v1/sharelatex/oauth_authorize", (req, res, next) =>
+			# Send back the token parameter as the user-id
+			# example header:   {'Authorization': 'Bearer 42'}
+			id = parseInt(req.body.token, 10)
+			return res.json({
+				user_profile: {id: id}
+			})
+
 		app.listen 5000, (error) ->
 			throw error if error?
 		.on "error", (error) ->
