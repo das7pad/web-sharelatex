@@ -335,6 +335,40 @@ I have a bad name
 
 						done()
 
+		describe "when POSTing a zip_uri for a zip file", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						zip_uri: 'http://example.org/project.zip'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should not produce an error", ->
+				expect(@err).not.to.exist
+
+			it "should redirect to a project", ->
+				expect(@res.statusCode).to.equal 302
+				expect(@res.headers.location).to.match @uri_regex
+
+			it "should create a project containing the retrieved snippet", (done) ->
+				projectId = @res.headers.location.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				ProjectGetter.getProject projectId, (error, project) ->
+					return done(error) if error?
+
+					expect(project).to.exist
+					ProjectEntityHandler.getDoc project._id, project.rootDoc_id, (error, lines) ->
+						return done(error) if error?
+
+						expect(lines).to.include 'Wombat? Wombat.'
+
+						done()
+
 			it "should read the name from the zip's main.tex file", (done) ->
 				projectId = @res.headers.location.match(@uri_regex)[1]
 				expect(projectId).to.exist

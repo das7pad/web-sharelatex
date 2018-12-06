@@ -13,7 +13,7 @@ OpenInOverleafHelper = require('./OpenInOverleafHelper')
 module.exports = OpenInOverleafController =
 	# 'open in overleaf' /docs API
 	openInOverleaf: (req, res, next)->
-		return res.redirect '/' unless req.body.snip? || req.body.encoded_snip? || req.body.snip_uri?
+		return res.redirect '/' unless req.body.snip? || req.body.encoded_snip? || req.body.snip_uri? || req.body.zip_uri?
 
 		logger.log user: user_id, "creating project from snippet"
 		user_id = AuthenticationController.getLoggedInUserId(req)
@@ -76,6 +76,7 @@ module.exports = OpenInOverleafController =
 
 			snippet.comment = comment
 			snippet.engine = req.body.engine if req.body.engine?
+			snippet.publisher_slug = req.body.publisher_slug if req.body.publisher_slug?
 			snippet.defaultTitle = OpenInOverleafController._getDefaultTitleFromSnipRequest(req)
 			cb(null, snippet)
 
@@ -95,8 +96,8 @@ module.exports = OpenInOverleafController =
 				OpenInOverleafHelper.populateSnippetFromUri req.body.snip_uri[0], snippet, cb
 			else
 				OpenInOverleafHelper.populateSnippetFromUriArray req.body.snip_uri, snippet, cb
-		else if req.body.snip_uri?
-			OpenInOverleafHelper.populateSnippetFromUri req.body.snip_uri, snippet, cb
+		else if req.body.snip_uri? || req.body.zip_uri?
+			OpenInOverleafHelper.populateSnippetFromUri req.body.snip_uri || req.body.zip_uri, snippet, cb
 		else
 			cb(new Error('No snippet in request'))
 
@@ -125,7 +126,8 @@ module.exports = OpenInOverleafController =
 
 	_getDefaultTitleFromSnipRequest: (req) ->
 		FILE_EXTENSION_REGEX = /\.[^.]+$/
-		if typeof req.body.snip_uri is 'string'
-			return path.basename(req.body.snip_uri).replace(FILE_EXTENSION_REGEX, '')
+		uri = (req.body.zip_uri || req.body.snip_uri)
+		if typeof uri is 'string'
+			return path.basename(uri).replace(FILE_EXTENSION_REGEX, '')
 
 		return req.i18n.translate('new_snippet_project')

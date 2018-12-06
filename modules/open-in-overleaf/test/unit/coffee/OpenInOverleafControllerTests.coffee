@@ -150,6 +150,17 @@ describe 'OpenInOverleafController', ->
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
+		describe "when there is a snippet uri passed as zip_uri", ->
+			beforeEach ->
+				@req.body.zip_uri = @snip_uri
+
+			it "should create a project and redirect to it", (done)->
+				@res.send = (content)=>
+					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
+					content.should.equal JSON.stringify({redirect: '/project/' + @project_id})
+					done()
+				@OpenInOverleafController.openInOverleaf @req, @res
+
 		describe "when there is an array of uris", ->
 			beforeEach ->
 				@req.body.snip_uri = [@snip_uri, 'http://foo.net/foo.tex']
