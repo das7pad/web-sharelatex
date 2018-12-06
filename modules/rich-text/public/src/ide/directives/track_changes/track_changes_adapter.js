@@ -63,7 +63,7 @@ define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
 
     updateMarker(change_id, start, end) {
       // If it's not a delete
-      if (start !== end) {
+      if (typeof this.changeIdToMarkerIdMap[change_id] === 'number') {
         const markers = this.cm.doc.getAllMarks()
         const markerId = this.changeIdToMarkerIdMap[change_id]
         for (let marker of markers) {
@@ -78,7 +78,7 @@ define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
             this.changeIdToMarkerIdMap[change_id] = updatedMarker.id
           }
         }
-      } else {
+      } else if (typeof this.changeIdToMarkerIdMap[change_id] === 'object') {
         const markerNode = this.changeIdToMarkerIdMap[change_id]
 
         this.cm.addWidget(
