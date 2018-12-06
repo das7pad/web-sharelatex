@@ -29,9 +29,6 @@ module.exports = GitBridgeHandler =
 						return callback(new Errors.FeatureNotAvailable('Neither user nor project owner has gitBridge feature'))
 					if !user.betaProgram
 						return callback(new Errors.FeatureNotAvailable('User is not in beta program'))
-					if project.overleaf?.id?
-						# TODO: This can return the project successfully once we have a migration strategy
-						return callback(new Errors.FeatureNotAvailable('Project was imported from v1'))
 					if project.overleaf?.history?.id?
 						return callback(null, project)
 					else
@@ -55,12 +52,28 @@ module.exports = GitBridgeHandler =
 					err = new Error("No version received from project-history api")
 					logger.err {err}, "Error while communicating with project-history api"
 					return callback(err)
-				data = {
-					latestVerId: body.version
-					latestVerAt: body.timestamp
-					latestVerBy: (body.v2Authors or [])[0]
-				}
-				callback(null, data)
+				authorId = (body.v2Authors or [])[0] or null
+				GitBridgeHandler._getAuthorInfo authorId, (err, authorInfo) ->
+					return callback(err) if err?
+					data = {
+						latestVerId: body.version
+						latestVerAt: body.timestamp
+						latestVerBy: authorInfo
+					}
+					GitBridgeHandler._getMigratedFromId project, (err, migratedFromId) ->
+						return callback(err) if err?
+						if migratedFromId?
+							logger.log {projectId, userId, migratedFromId}, "Adding migratedFromId to response"
+							data.migratedFromId = migratedFromId
+						callback(null, data)
+
+	_getMigratedFromId: (project, callback=(err, migratedFromId)->) ->
+		if !project?.overleaf?.id?
+			return callback(null, null)
+		if !project.tokens?.readAndWrite? || !project.tokens?.readAndWrite?.startsWith("#{project.overleaf.id}")
+			logger.err {projectId: project._id}, '[GitBridgeHandler] Inconsistent readAndWriteToken'
+			return callback(new Error('Inconsistent readAndWrite token'))
+		callback(null, project.tokens.readAndWrite)
 
 	showSnapshot: (userId, projectId, version, callback=(err, data)->) ->
 		GitBridgeHandler._checkAccess userId, projectId, (err, project) ->
@@ -260,3 +273,13 @@ module.exports = GitBridgeHandler =
 
 	_projectHistoryUrl: (path) ->
 		"#{Settings.apis.project_history.url}#{path}"
+
+	_getAuthorInfo: (userId, callback=(err, info)->) ->
+		if !userId?
+			return callback(null, null)
+		UserGetter.getUser userId, {first_name: 1, last_name: 1, email: 1}, (err, user) ->
+			return callback(err) if err?
+			if !user?
+				return callback(null, null)
+			callback(null, {email: user.email, name: "#{user.first_name} #{user.last_name}"})
+
