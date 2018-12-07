@@ -158,9 +158,7 @@ module.exports =
 			webRouter.post '/org/ieee/collabratec/auth/confirm_link', CollabratecController.oauthConfirmLink
 			webRouter.post '/org/ieee/collabratec/auth/sign_in_to_link', CollabratecController.oauthSignin
 			webRouter.get '/org/ieee/collabratec/dash', CollabratecController.showDash
-			webRouter.get '/collabratec/dash', CollabratecController.showDash
 			webRouter.get '/org/ieee/collabratec/projects/:project_id', CollabratecController.showProject
-			webRouter.get '/collabratec/projects/:project_id', CollabratecController.showProject
 
 		webRouter.get '/sign_in_to_v1', V1RedirectController.sign_in_and_redirect
 

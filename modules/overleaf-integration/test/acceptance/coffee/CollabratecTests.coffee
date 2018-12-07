@@ -199,16 +199,6 @@ describe "Collabratec", ->
 				expect(url.path).to.equal '/org/ieee/saml/init'
 				done()
 
-		it "should redirect to saml sign in flow from /collabratec/projects/:project_id", (done) ->
-			options =
-				method: 'get'
-				url: '/collabratec/projects/mock-project-id'
-			@user.request options, (error, response, body) ->
-				expect(response.statusCode).to.equal 302
-				url = URL.parse(response.headers.location)
-				expect(url.path).to.equal '/org/ieee/saml/init'
-				done()
-
 		it "should redirect to v1 project after sign-in", (done) ->
 			options =
 				method: 'get'
@@ -235,16 +225,6 @@ describe "Collabratec", ->
 			options =
 				method: 'get'
 				url: '/org/ieee/collabratec/dash'
-			@user.request options, (error, response, body) ->
-				expect(response.statusCode).to.equal 302
-				url = URL.parse(response.headers.location)
-				expect(url.path).to.equal '/org/ieee/saml/init'
-				done()
-
-		it "should redirect to saml sign in flow from /collabratec/dash", (done) ->
-			options =
-				method: 'get'
-				url: '/collabratec/dash'
 			@user.request options, (error, response, body) ->
 				expect(response.statusCode).to.equal 302
 				url = URL.parse(response.headers.location)
