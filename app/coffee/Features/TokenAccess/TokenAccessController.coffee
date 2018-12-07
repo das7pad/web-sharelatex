@@ -40,7 +40,7 @@ module.exports = TokenAccessController =
 				TokenAccessHandler.getV1DocInfo token, (err, doc_info) ->
 					return next err if err?
 					return next(new Errors.NotFoundError()) if doc_info.exported
-					return res.redirect(302, "/sign_in_to_v1?return_to=/#{token}")
+					return res.render('project/import')
 			else if !project?
 				logger.log {token, userId},
 					"[TokenAccess] no token-based project found for readAndWrite token"
