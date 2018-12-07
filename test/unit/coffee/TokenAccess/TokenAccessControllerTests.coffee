@@ -257,8 +257,11 @@ describe "TokenAccessController", ->
 
 					describe 'when project was not exported from v1', ->
 						beforeEach ->
-							@TokenAccessHandler.checkV1ProjectExported = sinon.stub()
-								.callsArgWith(1, null, false)
+							@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+									allow: true
+									exists: true
+									exported: false
+								})
 							@TokenAccessController.readAndWriteToken @req, @res, @next
 
 						it 'should redirect to v1', (done) ->
@@ -271,12 +274,15 @@ describe "TokenAccessController", ->
 
 					describe 'when project was exported from v1', ->
 						beforeEach ->
-							@TokenAccessHandler.checkV1ProjectExported = sinon.stub()
-								.callsArgWith(1, null, false)
+							@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+									allow: true
+									exists: true
+									exported: true
+								})
 							@TokenAccessController.readAndWriteToken @req, @res, @next
 
 						it 'should call next with a not-found error', (done) ->
-							expect(@next.callCount).to.equal 0
+							expect(@next.callCount).to.equal 1
 							done()
 
 				describe 'when token access is off, but user has higher access anyway', ->
