@@ -289,7 +289,7 @@ describe "TokenAccessController", ->
 						it 'should render v2-import page', (done) ->
 							expect(@res.render.calledWith(
 								'project/v2-import',
-								{ project_id: '123abc' }
+								{ projectId: '123abc' }
 							)).to.equal true
 							done()
 
