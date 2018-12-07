@@ -13,7 +13,7 @@ aside.file-tree.full-size(
 script(type="text/ng-template", id="historyFileTreeTpl")
 	.history-file-tree
 		history-file-entity(
-			ng-repeat="fileEntity in $ctrl.fileTree"
+			ng-repeat="fileEntity in $ctrl.fileTree | orderBy : [ '-type', 'operation', 'name' ]"
 			file-entity="fileEntity"
 			ng-show="!$ctrl.isLoading"
 		)
