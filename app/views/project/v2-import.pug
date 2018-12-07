@@ -2,13 +2,22 @@ extends ../layout
 
 block content
 	main.content
-		v2-importer(project-id=project_id)
+		.v2-import
+			h1.v2-import__heading Import project to Overleaf v2
+			p.v2-import__description
+				| Some text about importing. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris a laoreet massa. Phasellus pellentesque faucibus porta. Nunc faucibus tincidunt tortor ut ullamcorper. Vestibulum lobortis at nisl eget pharetra. Praesent ex mauris, laoreet eu tempor et, lobortis eget justo. Nulla volutpat leo faucibus ante suscipit, eu malesuada ipsum gravida. Mauris at leo turpis. Aenean porta odio a lectus convallis egestas. Sed aliquet libero nunc, a faucibus ante accumsan ut. Phasellus nec finibus ex. Duis eget nisl sem. Morbi eget sollicitudin nisi. Vestibulum mattis eu enim non viverra. Morbi facilisis fermentum sollicitudin. Donec facilisis porta blandit. Vestibulum aliquam ex dolor.
 
-		script(type="text/ng-template", id="v2ImporterTemplate")
-			.v2-import
-				h1.v2-import__heading Import project to Overleaf v2
-				p.v2-import__description
-					| Some text about importing. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris a laoreet massa. Phasellus pellentesque faucibus porta. Nunc faucibus tincidunt tortor ut ullamcorper. Vestibulum lobortis at nisl eget pharetra. Praesent ex mauris, laoreet eu tempor et, lobortis eget justo. Nulla volutpat leo faucibus ante suscipit, eu malesuada ipsum gravida. Mauris at leo turpis. Aenean porta odio a lectus convallis egestas. Sed aliquet libero nunc, a faucibus ante accumsan ut. Phasellus nec finibus ex. Duis eget nisl sem. Morbi eget sollicitudin nisi. Vestibulum mattis eu enim non viverra. Morbi facilisis fermentum sollicitudin. Donec facilisis porta blandit. Vestibulum aliquam ex dolor.
-				button.btn.btn-primary.v2-import__confirm(
-					ng-click="$ctrl.doImport()"
-				) Import project to Overleaf v2
+			form.v2-import__form(
+				async-form="v2Import"
+				name="v2ImportForm"
+				action="{{'/overleaf/project/'+ project_id + '/import'}}"
+				method="POST"
+				ng-cloak
+			)
+				input(name='_csrf', type='hidden', value=csrfToken)
+				form-messages(for="v2ImportForm")
+				input.btn.btn-primary.v2-import__confirm(
+					type="submit"
+					value="Import project to Overleaf v2"
+					ng-disabled="v2ImportForm.inflight || v2ImportForm.response.success"
+				)
