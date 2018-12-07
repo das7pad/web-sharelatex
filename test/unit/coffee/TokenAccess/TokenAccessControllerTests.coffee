@@ -35,6 +35,9 @@ describe "TokenAccessController", ->
 					exported: false
 				})
 			}
+			'../../infrastructure/Features': @Features = {
+				hasFeature: sinon.stub().returns(false)
+			}
 			'logger-sharelatex': {log: sinon.stub(), err: sinon.stub()}
 			'settings-sharelatex': {
 				overleaf:
@@ -250,6 +253,7 @@ describe "TokenAccessController", ->
 						@req.url = '/123abc'
 						@res = new MockResponse()
 						@res.redirect = sinon.stub()
+						@res.render = sinon.stub()
 						@next = sinon.stub()
 						@req.params['read_and_write_token'] = '123abc'
 						@TokenAccessHandler.findProjectWithReadAndWriteToken = sinon.stub()
@@ -269,6 +273,23 @@ describe "TokenAccessController", ->
 							expect(@res.redirect.calledWith(
 								302,
 								'/sign_in_to_v1?return_to=/123abc'
+							)).to.equal true
+							done()
+
+					describe 'when project was not exported from v1 but forcing import to v2', ->
+						beforeEach ->
+							@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+									allow: true
+									exists: true
+									exported: false
+								})
+							@Features.hasFeature.returns(true)
+							@TokenAccessController.readAndWriteToken @req, @res, @next
+
+						it 'should render v2-import page', (done) ->
+							expect(@res.render.calledWith(
+								'project/v2-import',
+								{ project_id: '123abc' }
 							)).to.equal true
 							done()
 
