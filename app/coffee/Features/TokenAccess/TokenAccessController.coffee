@@ -42,7 +42,10 @@ module.exports = TokenAccessController =
 					return next err if err?
 					return next(new Errors.NotFoundError()) if doc_info.exported
 					if Features.hasFeature('force-import-to-v2')
-						return res.render('project/v2-import', { projectId: token })
+						return res.render('project/v2-import', {
+							projectId: token,
+							hasOwner: doc_info.has_owner
+						})
 					else
 						return res.redirect(302, "/sign_in_to_v1?return_to=/#{token}")
 			else if !project?

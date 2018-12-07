@@ -278,20 +278,47 @@ describe "TokenAccessController", ->
 
 					describe 'when project was not exported from v1 but forcing import to v2', ->
 						beforeEach ->
-							@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+							@Features.hasFeature.returns(true)
+
+						describe 'with project owner', ->
+							beforeEach ->
+								@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
 									allow: true
 									exists: true
 									exported: false
+									has_owner: true
 								})
-							@Features.hasFeature.returns(true)
-							@TokenAccessController.readAndWriteToken @req, @res, @next
+								@TokenAccessController.readAndWriteToken @req, @res, @next
 
-						it 'should render v2-import page', (done) ->
-							expect(@res.render.calledWith(
-								'project/v2-import',
-								{ projectId: '123abc' }
-							)).to.equal true
-							done()
+							it 'should render v2-import page', (done) ->
+								expect(@res.render.calledWith(
+									'project/v2-import',
+									{
+										projectId: '123abc',
+										hasOwner: true
+									}
+								)).to.equal true
+								done()
+
+						describe 'without project owner', ->
+							beforeEach ->
+								@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+									allow: true
+									exists: true
+									exported: false
+									has_owner: false
+								})
+								@TokenAccessController.readAndWriteToken @req, @res, @next
+
+							it 'should render v2-import page', (done) ->
+								expect(@res.render.calledWith(
+									'project/v2-import',
+									{
+										projectId: '123abc',
+										hasOwner: false
+									}
+								)).to.equal true
+								done()
 
 					describe 'when project was exported from v1', ->
 						beforeEach ->
