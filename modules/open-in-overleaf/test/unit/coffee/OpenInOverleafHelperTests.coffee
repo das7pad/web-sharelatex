@@ -26,8 +26,9 @@ describe 'OpenInOverleafHelper', ->
 			addFile: sinon.stub().callsArg(6)
 		@ProjectRootDocManager =
 			setRootDocFromName: sinon.stub().callsArg(2)
-		@ProjectModel = {}
-		@ProjectModel.update = sinon.stub().callsArg(2)
+		@ProjectOptionsHandler =
+			setCompiler: sinon.stub().callsArg(2)
+			setBrandVariationId: sinon.stub().callsArg(2)
 		@V1Api =
 			request: sinon.stub().callsArgWith(1, null, {statusCode: 404}, {})
 		@V1Api.request.withArgs({ uri: "/api/v2/brands/OSF" }).callsArgWith(
@@ -40,8 +41,8 @@ describe 'OpenInOverleafHelper', ->
 			'../../../../app/js/Features/Helpers/UrlHelper': @UrlHelper
 			'../../../../app/js/Features/Project/ProjectRootDocManager': @ProjectRootDocManager
 			'../../../../app/js/Features/Project/ProjectEntityUpdateHandler': @ProjectEntityUpdateHandler
+			'../../../../app/js/Features/Project/ProjectOptionsHandler': @ProjectOptionsHandler
 			'../../../../app/js/Features/V1/V1Api': @V1Api
-			'../../../../app/js/models/Project': {Project: @ProjectModel}
 			'settings-sharelatex': @settings
 			'fs': @fs
 			'logger-sharelatex':
@@ -285,7 +286,7 @@ snap snap
 				expect(@err).to.be.falsey
 
 			it "sets the brand variation for the project", ->
-				sinon.assert.calledWith(@ProjectModel.update, sinon.match.any, {brandVariationId: 1234})
+				sinon.assert.calledWith(@ProjectOptionsHandler.setBrandVariationId, @project._id, 1234)
 
 		describe "when the slug doesn't exist in v1", ->
 			beforeEach ->
@@ -301,7 +302,7 @@ snap snap
 				expect(@err).to.be.truthy
 
 			it "does not try to set the brand variation", ->
-				sinon.assert.notCalled(@ProjectModel.update)
+				sinon.assert.notCalled(@ProjectOptionsHandler.setBrandVariationId)
 
 	describe '_normalizeMainSrcContent', ->
 		beforeEach ->

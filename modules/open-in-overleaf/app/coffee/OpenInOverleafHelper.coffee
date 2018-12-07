@@ -10,11 +10,11 @@ FileWriter = require("../../../../app/js/infrastructure/FileWriter")
 UrlHelper = require('../../../../app/js/Features/Helpers/UrlHelper')
 ProjectHelper = require('../../../../app/js/Features/Project/ProjectHelper')
 ProjectRootDocManager = require('../../../../app/js/Features/Project/ProjectRootDocManager')
+ProjectOptionsHandler = require('../../../../app/js/Features/Project/ProjectOptionsHandler')
 ProjectEntityUpdateHandler = require('../../../../app/js/Features/Project/ProjectEntityUpdateHandler')
 SafePath = require('../../../../app/js/Features/Project/SafePath')
 DocumentHelper = require('../../../../app/js/Features/Documents/DocumentHelper')
 V1Api = require('../../../../app/js/Features/V1/V1Api')
-Project = require('../../../../app/js/models/Project').Project
 
 module.exports = OpenInOverleafHelper =
 	getDocumentLinesFromSnippet: (snippet, content = null) ->
@@ -143,7 +143,7 @@ module.exports = OpenInOverleafHelper =
 		compiler = ProjectHelper.compilerFromV1Engine(engine)
 
 		if compiler?
-			Project.update {_id: project.id}, {compiler: compiler}, callback
+			ProjectOptionsHandler.setCompiler project._id, compiler, callback
 		else
 			callback()
 
@@ -154,11 +154,10 @@ module.exports = OpenInOverleafHelper =
 					V1Api.request { uri: "/api/v2/brands/#{encodeURIComponent(publisherSlug)}" }, (err, response, body) ->
 						return cb(err) if err?
 						return cb(new Error(Error.NotFoundError)) if response.statusCode == 404 || !body?.default_variation_id?
-						return cb(new Error("Unhandled status from response: #{response.statusCode}")) unless response.statusCode >= 200 && response.statusCode < 300
 
 						cb(null, body.default_variation_id)
 				(brandVariationId, cb) ->
-					Project.update {_id: project.id}, {brandVariationId: brandVariationId}, (err) ->
+					ProjectOptionsHandler.setBrandVariationId project._id, brandVariationId, (err) ->
 						cb(err)
 			]
 			callback
