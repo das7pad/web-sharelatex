@@ -13,6 +13,7 @@ ProjectRootDocManager = require('../../../../app/js/Features/Project/ProjectRoot
 ProjectEntityUpdateHandler = require('../../../../app/js/Features/Project/ProjectEntityUpdateHandler')
 SafePath = require('../../../../app/js/Features/Project/SafePath')
 DocumentHelper = require('../../../../app/js/Features/Documents/DocumentHelper')
+V1Api = require('../../../../app/js/Features/V1/V1Api')
 Project = require('../../../../app/js/models/Project').Project
 
 module.exports = OpenInOverleafHelper =
@@ -145,6 +146,23 @@ module.exports = OpenInOverleafHelper =
 			Project.update {_id: project.id}, {compiler: compiler}, callback
 		else
 			callback()
+
+	setProjectBrandVariationFromSlug: (project, publisherSlug, callback = (error)->) ->
+		async.waterfall(
+			[
+				(cb) ->
+					V1Api.request { uri: "/api/v2/brands/#{encodeURIComponent(publisherSlug)}" }, (err, response, body) ->
+						return cb(err) if err?
+						return cb(new Error(Error.NotFoundError)) if response.statusCode == 404 || !body?.default_variation_id?
+						return cb(new Error("Unhandled status from response: #{response.statusCode}")) unless response.statusCode >= 200 && response.statusCode < 300
+
+						cb(null, body.default_variation_id)
+				(brandVariationId, cb) ->
+					Project.update {_id: project.id}, {brandVariationId: brandVariationId}, (err) ->
+						cb(err)
+			]
+			callback
+		)
 
 	_normalizeMainSrcContent: (snippet, content = null) ->
 		r = OpenInOverleafHelper._wrapSnippetIfNoDocumentClass(OpenInOverleafHelper.normalizeLatexContent(content || snippet.snip), snippet.defaultTitle)

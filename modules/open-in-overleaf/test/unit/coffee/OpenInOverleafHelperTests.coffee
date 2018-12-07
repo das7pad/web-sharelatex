@@ -28,6 +28,11 @@ describe 'OpenInOverleafHelper', ->
 			setRootDocFromName: sinon.stub().callsArg(2)
 		@ProjectModel = {}
 		@ProjectModel.update = sinon.stub().callsArg(2)
+		@V1Api =
+			request: sinon.stub().callsArgWith(1, null, {statusCode: 404}, {})
+		@V1Api.request.withArgs({ uri: "/api/v2/brands/OSF" }).callsArgWith(
+			1, null, {statusCode: 200}, { default_variation_id: 1234 }
+		)
 
 		@OpenInOverleafHelper = SandboxedModule.require modulePath, requires:
 			'mmmagic': mmmagic
@@ -35,6 +40,7 @@ describe 'OpenInOverleafHelper', ->
 			'../../../../app/js/Features/Helpers/UrlHelper': @UrlHelper
 			'../../../../app/js/Features/Project/ProjectRootDocManager': @ProjectRootDocManager
 			'../../../../app/js/Features/Project/ProjectEntityUpdateHandler': @ProjectEntityUpdateHandler
+			'../../../../app/js/Features/V1/V1Api': @V1Api
 			'../../../../app/js/models/Project': {Project: @ProjectModel}
 			'settings-sharelatex': @settings
 			'fs': @fs
@@ -259,6 +265,43 @@ snap snap
 
 		it "sets the root document", ->
 			sinon.assert.calledWith(@ProjectRootDocManager.setRootDocFromName, sinon.match.any, 'foo.tex')
+
+	describe 'setProjectBrandVariationFromSlug', ->
+		beforeEach ->
+			@project = {
+				_id: "1234"
+			}
+
+		describe 'when the slug exists in v1', ->
+			beforeEach (done) ->
+				@OpenInOverleafHelper.setProjectBrandVariationFromSlug @project, "OSF", (err) =>
+					@err = err
+					done()
+
+			it "calls the V1 API with the slug", ->
+				sinon.assert.calledWith(@V1Api.request, { uri: "/api/v2/brands/OSF" })
+
+			it "calls the callback without error", ->
+				expect(@err).to.be.falsey
+
+			it "sets the brand variation for the project", ->
+				sinon.assert.calledWith(@ProjectModel.update, sinon.match.any, {brandVariationId: 1234})
+
+		describe "when the slug doesn't exist in v1", ->
+			beforeEach ->
+			beforeEach (done) ->
+				@OpenInOverleafHelper.setProjectBrandVariationFromSlug @project, "wombat", (err) =>
+					@err = err
+					done()
+
+			it "calls the V1 API with the slug", ->
+				sinon.assert.calledWith(@V1Api.request, { uri: "/api/v2/brands/wombat" })
+
+			it "calls the callback with an error", ->
+				expect(@err).to.be.truthy
+
+			it "does not try to set the brand variation", ->
+				sinon.assert.notCalled(@ProjectModel.update)
 
 	describe '_normalizeMainSrcContent', ->
 		beforeEach ->

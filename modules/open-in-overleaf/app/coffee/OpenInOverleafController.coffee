@@ -19,7 +19,7 @@ module.exports = OpenInOverleafController =
 		user_id = AuthenticationController.getLoggedInUserId(req)
 
 		sendResponse = (error, project) ->
-			next(error) if error?
+			return next(error) if error?
 			OpenInOverleafController._sendResponse(req, res, project)
 
 		OpenInOverleafController._populateSnippetFromRequest req, (err, snippet) ->
@@ -27,8 +27,7 @@ module.exports = OpenInOverleafController =
 			if snippet.snip?
 				OpenInOverleafController._createProjectFromPostedSnippet user_id, snippet, sendResponse
 			else if snippet.projectFile?
-				projectName = if typeof snippet.snip_name is 'string' then snippet.snip_name else snippet.defaultTitle
-				ProjectUploadManager.createProjectFromZipArchive user_id, projectName, snippet.projectFile, sendResponse
+				OpenInOverleafController._createProjectFromZipArchive user_id, snippet, sendResponse
 			else if snippet.files?
 				OpenInOverleafController._createProjectFromFileList user_id, snippet, sendResponse
 			else
@@ -68,6 +67,24 @@ module.exports = OpenInOverleafController =
 			callback
 		)
 
+	_createProjectFromZipArchive: (user_id, snippet, callback = (error, project)->) ->
+		async.waterfall(
+			[
+				(cb) ->
+					projectName = if typeof snippet.snip_name is 'string' then snippet.snip_name else snippet.defaultTitle
+					ProjectUploadManager.createProjectFromZipArchive user_id, projectName, snippet.projectFile, (err, project) ->
+						cb(err, project)
+				(project, cb) ->
+					if snippet.publisherSlug
+						OpenInOverleafHelper.setProjectBrandVariationFromSlug project, snippet.publisherSlug, (err) ->
+							return cb(err) if err?
+							cb(null, project)
+					else
+						cb(null, project)
+			]
+			callback
+		)
+
 	_populateSnippetFromRequest: (req, cb = (error, result)->) ->
 		comment = OpenInOverleafController._getMainFileCommentFromSnipRequest(req)
 		OpenInOverleafController._getSnippetContentsFromRequest req, (error, snippet) ->
@@ -76,7 +93,7 @@ module.exports = OpenInOverleafController =
 
 			snippet.comment = comment
 			snippet.engine = req.body.engine if req.body.engine?
-			snippet.publisher_slug = req.body.publisher_slug if req.body.publisher_slug?
+			snippet.publisherSlug = req.body.publisher_slug if req.body.publisher_slug?
 			snippet.defaultTitle = OpenInOverleafController._getDefaultTitleFromSnipRequest(req)
 			cb(null, snippet)
 
