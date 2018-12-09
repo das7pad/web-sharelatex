@@ -6,5 +6,13 @@ table.overbox#templates-container
 				span.created-on created #{moment(template.original_created_date).format('Do MMM YY')}
 					if template.original_created_date != template.updated_date
 						|, last updated #{moment(template.updated_date).format('Do MMM YY')}
+			if templatesAnalytics
+				- metric = templatesAnalytics[template.doc_id]
+				td
+					span.hub-big-number(class=metric.new_projects > 100000? 'hub-long-big-number': '') #{metric.new_projects}
+					span.hub-number-label new projects
+				td
+					span.hub-big-number(class=metric.active_projects > 100000? 'hub-long-big-number': '') #{metric.active_projects}
+					span.hub-number-label active projects
 			td
 				a.btn.btn-primary(href="/metrics/templates/" + template.doc_id) Metrics
