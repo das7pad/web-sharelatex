@@ -24,8 +24,7 @@ define(['base'], App =>
       const _pathnameExistsInFiles = (pathname, files) =>
         _.any(files, file => file.pathname === pathname)
 
-      // TODO Move to history manager
-      const _getSelectedDefaultPathname = function(files) {
+      const _getSelectedDefaultFile = function(files) {
         let selectedPathname = null
         if (
           _previouslySelectedPathname != null &&
@@ -42,20 +41,18 @@ define(['base'], App =>
             selectedPathname = _previouslySelectedPathname = files[0].pathname
           }
         }
-        return selectedPathname
+        return _.find(files, { pathname: selectedPathname })
       }
 
-      $scope.handleFileSelection = file =>
-        ($scope.history.selection.pathname = _previouslySelectedPathname =
-          file.pathname)
+      $scope.handleFileSelection = file => {
+        _previouslySelectedPathname = file.pathname
+        ide.historyManager.selectFile(file)
+      }
 
       $scope.$watch('history.selection.files', function(files) {
         if (files != null && files.length > 0) {
           $scope.currentFileTree = _.reduce(files, _reducePathsToTree, [])
-          console.log(files, $scope.currentFileTree)
-          return ($scope.history.selection.pathname = _getSelectedDefaultPathname(
-            files
-          ))
+          ide.historyManager.selectFile(_getSelectedDefaultFile(files))
         }
       })
 
@@ -78,6 +75,9 @@ define(['base'], App =>
             if (fileObject.operation === 'renamed') {
               fileTreeEntity.pathname = fileObject.newPathname
               fileTreeEntity.oldPathname = fileObject.pathname
+            }
+            if (fileObject.operation === 'removed' && fileObject.deletedAtV) {
+              fileTreeEntity.deletedAtV = fileObject.deletedAtV
             }
             currentFileTreeLocation.push(fileTreeEntity)
           } else {

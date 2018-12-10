@@ -38,10 +38,10 @@ script(type="text/ng-template", id="historyFileEntityTpl")
 				span.history-file-entity-name(
 					ng-class="::$ctrl.entityOpTextClass"
 				) {{ ::$ctrl.fileEntity.name }}
-				span.history-file-entity-operation-tooltip(
+				span.history-file-entity-operation-badge(
 					ng-if="::$ctrl.hasOperation && $ctrl.fileEntity.operation !== 'renamed' && $ctrl.fileEntity.operation !== 'removed'"
 				) {{ ::$ctrl.getFileOperationName('#{ translate('file_action_edited') }', '#{ translate('file_action_renamed') }', '#{ translate('file_action_created') }', '#{ translate('file_action_deleted') }') }}
-				span.history-file-entity-operation-tooltip(
+				span.history-file-entity-operation-badge(
 					ng-if="::$ctrl.hasOperation && $ctrl.fileEntity.operation === 'renamed'"
 					tooltip-append-to-body="true"
 					tooltip-placement="right"

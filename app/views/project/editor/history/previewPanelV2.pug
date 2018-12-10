@@ -1,6 +1,5 @@
 .diff-panel.full-size(
 	ng-if="history.isV2 && history.viewMode === HistoryViewModes.COMPARE"
-	ng-controller="HistoryV2DiffController"
 )
 	.diff(
 		ng-if="!!history.selection.diff && !history.selection.diff.loading && !history.selection.diff.error",

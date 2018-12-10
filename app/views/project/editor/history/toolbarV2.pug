@@ -6,7 +6,7 @@
 		i.fa.fa-spin.fa-refresh
 		| &nbsp;&nbsp; #{translate("loading")}...
 
-	//- FOR POINT IN TIME
+	//- point-in-time mode info
 	span.history-toolbar-selected-version(
 		ng-show="!history.loadingFileTree && !history.showOnlyLabels && history.selection.update && !history.error"
 	) #{translate("browsing_project_as_of")}&nbsp;
@@ -22,7 +22,7 @@
 
 
 
-	//- FOR COMPARE
+	//- compare mode info
 	span.history-toolbar-selected-version(ng-show="history.viewMode === HistoryViewModes.COMPARE && history.selection.diff && !history.selection.diff.binary && !history.selection.diff.loading && !history.selection.diff.error && !history.loadingFileTree")
 		| <strong>{{history.selection.diff.highlights.length}} </strong>
 		ng-pluralize(
@@ -34,7 +34,7 @@
 		)
 		|  in <strong>{{history.selection.diff.pathname}}</strong>
 
-	//- FOR POINT IN TIME
+	//- point-in-time mode actions
 	div.history-toolbar-actions(
 		ng-if="history.viewMode === HistoryViewModes.POINT_IN_TIME && !history.error"
 	)
@@ -62,7 +62,7 @@
 
 
 
-	//- FOR COMPARE
+	//- compare mode actions
 	div.history-toolbar-actions(
 		ng-if="history.viewMode === HistoryViewModes.COMPARE && !history.error"
 	)
@@ -71,26 +71,25 @@
 		) 
 			i.fa
 			| #{translate("view_single_version")}
-		// TODO Fix deletedAtV (no longer exists)
-		.toolbar-right(ng-if="history.selection.docs[history.selection.pathname].deletedAtV")
-			button.btn.btn-danger.btn-xs(
-				ng-click="restoreDeletedFile()"
-				ng-show="!restoreState.error"
-				ng-disabled="restoreState.inflight"
-			)
-				i.fa.fa-fw.fa-step-backward
-				span(ng-show="!restoreState.inflight")
-					| Restore this deleted file
-				span(ng-show="restoreState.inflight")
-					| Restoring...
-			span.text-danger(ng-show="restoreState.error")
-				| Error restoring, sorry
+		button.history-toolbar-btn-danger.pull-right(
+			ng-if="history.selection.file.deletedAtV"
+			ng-click="restoreDeletedFile()"
+			ng-show="!restoreState.error"
+			ng-disabled="restoreState.inflight"
+		)
+			i.fa.fa-fw.fa-step-backward
+			span(ng-show="!restoreState.inflight")
+				| Restore this deleted file
+			span(ng-show="restoreState.inflight")
+				| Restoring...
+		span.text-danger(ng-show="restoreState.error")
+			| Error restoring, sorry
 
 	.history-toolbar-entries-list(
 		ng-if="!history.error"
 	)
 		toggle-switch(
-			ng-model="history.showOnlyLabels"
+			ng-model="toolbarUIConfig.showOnlyLabels"
 			label-true=translate("history_view_labels")
 			label-false=translate("history_view_all")
 			description=translate("history_view_a11y_description")

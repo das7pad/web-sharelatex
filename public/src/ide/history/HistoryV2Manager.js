@@ -79,15 +79,6 @@ define([
           }, 0)
         }
 
-        this.$scope.$watch(
-          'history.showOnlyLabels',
-          (showOnlyLabels, prevVal) => {
-            if (showOnlyLabels != null && showOnlyLabels !== prevVal) {
-              this._handleHistoryUIStateChange()
-            }
-          }
-        )
-
         this.$scope.$watchGroup(
           ['history.selection.range.toV', 'history.selection.range.fromV'],
           (newRange, prevRange) => {
@@ -100,25 +91,11 @@ define([
                 newTo !== prevTo &&
                 newFrom !== prevFrom
               ) {
-                this.loadFileTreeDiff(newTo, newFrom).then(response =>
-                  console.log(response)
-                )
+                this.loadFileTreeDiff(newTo, newFrom)
               }
             }
           }
         )
-
-        this.$scope.$watch('history.selection.pathname', pathname => {
-          if (pathname != null) {
-            if (
-              this.$scope.history.viewMode === HistoryViewModes.POINT_IN_TIME
-            ) {
-              this.loadFileAtPointInTime()
-            } else {
-              this.reloadDiff()
-            }
-          }
-        })
 
         let _deregisterFeatureWatcher = this.$scope.$watch(
           'project.features.versioning',
@@ -165,7 +142,7 @@ define([
             files: [], // When history.viewMode == HistoryViewModes.COMPARE
             update: null, // When history.viewMode == HistoryViewModes.POINT_IN_TIME
             label: null, // When history.viewMode == HistoryViewModes.POINT_IN_TIME
-            file: null // When history.viewMode == HistoryViewModes.POINT_IN_TIME
+            file: null
           },
           error: null,
           showOnlyLabels: false,
@@ -191,7 +168,7 @@ define([
           files: [], // When history.viewMode == HistoryViewModes.COMPARE
           update: null, // When history.viewMode == HistoryViewModes.POINT_IN_TIME
           label: null, // When history.viewMode == HistoryViewModes.POINT_IN_TIME
-          file: null // When history.viewMode == HistoryViewModes.POINT_IN_TIME
+          file: null
         }
         this.$scope.history.error = null
         this.$scope.history.showOnlyLabels = false
@@ -236,6 +213,20 @@ define([
         this.$scope.history.hoveringOverListSelectors = false
       }
 
+      showAllUpdates() {
+        if (this.$scope.history.showOnlyLabels) {
+          this.$scope.history.showOnlyLabels = false
+          this._handleHistoryUIStateChange()
+        }
+      }
+
+      showOnlyLabels() {
+        if (!this.$scope.history.showOnlyLabels) {
+          this.$scope.history.showOnlyLabels = true
+          this._handleHistoryUIStateChange()
+        }
+      }
+
       restoreFile(version, pathname) {
         const url = `/project/${this.$scope.project_id}/restore_file`
 
@@ -276,6 +267,18 @@ define([
               selection.diff.loading = true
             }
           })
+      }
+
+      selectFile(file) {
+        if (file != null && file.pathname != null) {
+          this.$scope.history.selection.pathname = file.pathname
+          this.$scope.history.selection.file = file
+          if (this.$scope.history.viewMode === HistoryViewModes.POINT_IN_TIME) {
+            this.loadFileAtPointInTime()
+          } else {
+            this.reloadDiff()
+          }
+        }
       }
 
       autoSelectRecentUpdates() {
@@ -320,11 +323,6 @@ define([
       }
 
       expandSelectionToVersion(version) {
-        console.log(
-          version,
-          this.$scope.history.selection.range.toV,
-          this.$scope.history.selection.range.fromV
-        )
         if (version > this.$scope.history.selection.range.toV) {
           this.$scope.history.selection.range.toV = version
         } else if (version < this.$scope.history.selection.range.fromV) {
@@ -413,60 +411,6 @@ define([
           selection.range.fromV = labels[1].version
         }
       }
-
-      // _waitUntilUpdatesAreAvailable(toV, fromV) {
-      //   let deferred = this.ide.$q.defer()
-      //   let updates = []
-      //   let gotToVUpdate = false
-      //   let gotFromVUpdate = false
-      //   let curUpdatesArrayIndex = 0
-      //   let checkUpdates = () => {
-      //     this._checkAvailableUpdatesForVersions(
-      //       toV,
-      //       fromV,
-      //       curUpdatesArrayIndex
-      //     ).then(function(result) {
-      //       gotToVUpdate = result.gotToVUpdate
-      //       gotFromVUpdate = result.gotFromVUpdate
-      //       curUpdatesArrayIndex = result.lastIndex + 1
-      //       if (gotToVUpdate && gotFromVUpdate) {
-      //         deferred.resolve(true)
-      //       } else {
-      //         checkUpdates()
-      //       }
-      //     })
-      //   }
-      //   checkUpdates()
-      //   return deferred.promise
-      // }
-
-      // _checkAvailableUpdatesForVersions(toV, fromV, startIndex) {
-      //   let deferred = this.ide.$q.defer()
-      //   let result = {
-      //     gotToVUpdate: false,
-      //     gotFromVUpdate: false,
-      //     lastIndex: null
-      //   }
-      //   let fetchNextBatchOfUpdatesIfNeeded =
-      //     startIndex >= this.$scope.history.updates.length
-      //       ? this.fetchNextBatchOfUpdates()
-      //       : null
-      //   this.ide.$q.when(fetchNextBatchOfUpdatesIfNeeded).then(() => {
-      //     const nUpdates = this.$scope.history.updates.length
-      //     for (var i = startIndex; i < nUpdates; i++) {
-      //       let update = this.$scope.history.updates[i]
-      //       result.lastIndex = i
-      //       if (update.toV <= toV && update.fromV >= fromV) {
-      //         result.gotToVUpdate = true
-      //       } else if (update.fromV < fromV) {
-      //         result.gotFromVUpdate = true
-      //         break
-      //       }
-      //     }
-      //     deferred.resolve(result)
-      //   })
-      //   return deferred.promise
-      // }
 
       fetchNextBatchOfUpdates() {
         let updatesURL = `/project/${this.ide.project_id}/updates?min_count=${
@@ -558,7 +502,7 @@ define([
           `to=${toV}`
         ]
         url += `?${query.join('&')}`
-        this.$scope.history.selection.file = { loading: true }
+        this.$scope.history.selection.file.loading = true
         return this.ide.$http
           .get(url)
           .then(response => {
@@ -826,128 +770,6 @@ define([
           this.$scope.history.updates[0].toV
         )
       }
-
-      // _perDocSummaryOfUpdates(updates) {
-      //   // Track current_pathname -> original_pathname
-      //   // create bare object for use as Map
-      //   // http://ryanmorr.com/true-hash-maps-in-javascript/
-      //   const original_pathnames = Object.create(null)
-
-      //   // Map of original pathname -> doc summary
-      //   const docs_summary = Object.create(null)
-
-      //   const updatePathnameWithUpdateVersions = function(
-      //     pathname,
-      //     update,
-      //     deletedAtV
-      //   ) {
-      //     // docs_summary is indexed by the original pathname the doc
-      //     // had at the start, so we have to look this up from the current
-      //     // pathname via original_pathname first
-      //     if (original_pathnames[pathname] == null) {
-      //       original_pathnames[pathname] = pathname
-      //     }
-      //     const original_pathname = original_pathnames[pathname]
-      //     const doc_summary =
-      //       docs_summary[original_pathname] != null
-      //         ? docs_summary[original_pathname]
-      //         : (docs_summary[original_pathname] = {
-      //             fromV: update.fromV,
-      //             toV: update.toV
-      //           })
-      //     doc_summary.fromV = Math.min(doc_summary.fromV, update.fromV)
-      //     doc_summary.toV = Math.max(doc_summary.toV, update.toV)
-      //     if (deletedAtV != null) {
-      //       return (doc_summary.deletedAtV = deletedAtV)
-      //     }
-      //   }
-
-      //   // Put updates in ascending chronological order
-      //   updates = this._getSelectedUpdates()
-      //   for (let update of Array.from(updates)) {
-      //     for (let pathname of Array.from(update.pathnames || [])) {
-      //       updatePathnameWithUpdateVersions(pathname, update)
-      //     }
-      //     for (let project_op of Array.from(update.project_ops || [])) {
-      //       if (project_op.rename != null) {
-      //         const { rename } = project_op
-      //         updatePathnameWithUpdateVersions(rename.pathname, update)
-      //         original_pathnames[rename.newPathname] =
-      //           original_pathnames[rename.pathname]
-      //         delete original_pathnames[rename.pathname]
-      //       }
-      //       if (project_op.add != null) {
-      //         const { add } = project_op
-      //         updatePathnameWithUpdateVersions(add.pathname, update)
-      //       }
-      //       if (project_op.remove != null) {
-      //         const { remove } = project_op
-      //         updatePathnameWithUpdateVersions(
-      //           remove.pathname,
-      //           update,
-      //           project_op.atV
-      //         )
-      //       }
-      //     }
-      //   }
-
-      //   return docs_summary
-      // }
-
-      // _getSelectedUpdates() {
-      //   let { toV, fromV } = this.$scope.history.selection.range
-      //   let selectedUpdates = []
-      //   for (let update of this.$scope.history.updates) {
-      //     if (update.toV <= toV && update.fromV >= fromV) {
-      //       selectedUpdates.push(update)
-      //     }
-      //     if (update.fromV <= fromV) {
-      //       break
-      //     }
-      //   }
-      //   return selectedUpdates.reverse()
-      // }
-
-      // _calculateDiffDataFromSelection() {
-      //   let pathname, toV
-      //   let fromV = (toV = pathname = null)
-
-      //   const selected_pathname = this.$scope.history.selection.pathname
-
-      //   const object = this._perDocSummaryOfUpdates()
-      //   for (pathname in object) {
-      //     const doc = object[pathname]
-      //     if (pathname === selected_pathname) {
-      //       ;({ fromV, toV } = doc)
-      //       return { fromV, toV, pathname }
-      //     }
-      //   }
-
-      //   return {}
-      // }
-
-      // Set the track changes selected doc to one of the docs in the range
-      // of currently selected updates. If we already have a selected doc
-      // then prefer this one if present.
-      // _selectDocFromUpdates() {
-      //   let pathname
-      //   const affected_docs = this._perDocSummaryOfUpdates()
-      //   this.$scope.history.selection.docs = affected_docs
-
-      //   let selected_pathname = this.$scope.history.selection.pathname
-      //   if (selected_pathname != null && affected_docs[selected_pathname]) {
-      //     // Selected doc is already open
-      //   } else {
-      //     // Set to first possible candidate
-      //     for (pathname in affected_docs) {
-      //       const doc = affected_docs[pathname]
-      //       selected_pathname = pathname
-      //       break
-      //     }
-      //   }
-
-      //   this.$scope.history.selection.pathname = selected_pathname
-      // }
 
       _updateContainsUserId(update, user_id) {
         for (let user of Array.from(update.meta.users)) {
