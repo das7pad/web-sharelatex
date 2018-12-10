@@ -269,7 +269,7 @@
 				text-decoration: none;
 			}
 			&:focus {
-				color: @file-tree-item-color;
+				color: @file-tree-item-focus-color;
 				outline: none;
 				text-decoration: none;
 			}
@@ -286,6 +286,9 @@
 			&:hover {
 				background-color: @file-tree-item-hover-bg;
 			}
+			&:focus {
+				color: @file-tree-item-focus-selected-color;
+			}
 		}
 			.history-file-entity-name-container {
 				display: flex;
@@ -297,12 +300,13 @@
 					overflow: hidden;
 					text-overflow: ellipsis;
 				}
-				.history-file-entity-operation-tooltip {
+				.history-file-entity-operation-badge {
 					flex: 0 0 auto;
 					text-transform: lowercase;
 					margin-left: .5em;
 					font-size: .7em;
-					background: rgba(255,255,255,.25);
+					background: @history-file-badge-bg;
+					color: @history-file-badge-color;
 					border-radius: 8px;
 					line-height: 1;
 					padding: 2px 4px 3px;
