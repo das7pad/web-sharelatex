@@ -11,9 +11,15 @@ request = require "request"
 UserMapper = require "../OverleafUsers/UserMapper"
 V1SharelatexApi = require "../V1SharelatexApi"
 
+Doc = require('../../../../../app/js/models/Doc').Doc
+DocstoreManager = require('../../../../../app/js/Features/Docstore/DocstoreManager')
+File = require('../../../../../app/js/models/File').File
+FileStoreHandler = require('../../../../../app/js/Features/FileStore/FileStoreHandler')
+
 ProjectCreationHandler = require "../../../../../app/js/Features/Project/ProjectCreationHandler"
 ProjectDetailsHandler = require "../../../../../app/js/Features/Project/ProjectDetailsHandler"
 ProjectEntityUpdateHandler = require "../../../../../app/js/Features/Project/ProjectEntityUpdateHandler"
+SafePath = require '../../../../../app/js/Features/Project/SafePath'
 ProjectDeleter = require "../../../../../app/js/Features/Project/ProjectDeleter"
 {ProjectInvite} = require "../../../../../app/js/models/ProjectInvite"
 CollaboratorsHandler = require "../../../../../app/js/Features/Collaborators/CollaboratorsHandler"
@@ -39,6 +45,8 @@ V1_HISTORY_SYNC_REQUEST_TIMES = [
 ]
 
 SUPPORTED_V1_EXT_AGENTS = ['wlfile', 'url', 'wloutput', 'mendeley', 'zotero']
+
+MAX_UPLOADS = 4 # maximum number of parallel uploads
 
 module.exports = ProjectImporter =
 	importProject: (v1_project_id, v2_user_id, callback = (error, v2_project_id) ->) ->
@@ -280,60 +288,128 @@ module.exports = ProjectImporter =
 				TagsHandler.addProjectToTagName v2_user_id, tag, v2_project_id, cb
 			, callback)
 
-	_importFiles: (project_id, v2_user_id, files = [], callback = (error) ->) ->
-		async.mapSeries(files, (file, cb) ->
-			ProjectImporter._importFile project_id, v2_user_id, file, cb
-		, callback)
-
-	_importFile: (project_id, v2_user_id, file, callback = (error) ->) ->
-		if !file.type? or !file.file?
-			return callback(new Error("expected file.file and type"))
-		path = "/" + file.file
-		dirname = Path.dirname(path)
-		name = Path.basename(path)
-		logger.log {path: file.file, project_id, dirname, name, type: file.type}, "importing file"
-		ProjectEntityUpdateHandler.mkdirp project_id, dirname, (error, folders, lastFolder) ->
-			return callback(error) if error?
-			folder_id = lastFolder._id
+	_checkFiles: (files) ->
+		for file in files
+			if !file.type? or !file.file?
+				return new Error("expected file.file and type")
 			if file.type == "src"
 				if !file.latest_content?
-					return callback(new Error("expected file.latest_content"))
-				# We already have history entries, we just want to get the SL content in the same state,
-				# so don't send add requests to the history service for these new docs
-				ProjectEntityUpdateHandler.addDocWithoutUpdatingHistory project_id, folder_id, name, file.latest_content.split("\n"), v2_user_id, (error, doc) ->
-					return callback(error) if error?
-					if file.main
-						ProjectEntityUpdateHandler.setRootDoc project_id, doc._id, callback
-					else
-						callback()
+					return new Error("expected file.latest_content")
 			else if file.type == "att"
 				if !file.file_path?
-					return callback(new Error("expected file.file_path"))
-				ProjectImporter._writeS3ObjectToDisk file.file_path, (error, pathOnDisk) ->
-					return callback(error) if error?
-					ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory project_id,
-						folder_id, name, pathOnDisk, null, v2_user_id, callback
+					return new Error("expected file.file_path")
 			else if file.type == "ext"
 				if file.agent not in SUPPORTED_V1_EXT_AGENTS
-					return callback(
-						new UnsupportedFileTypeError("expected file.agent to be valid, instead got '#{file.agent}'")
-					)
+					return  new UnsupportedFileTypeError("expected file.agent to be valid, instead got '#{file.agent}'")
 				if !file.file_path?
-					return callback(new Error("expected file.file_path"))
+					return new Error("expected file.file_path")
 				if !file.agent_data?
-					return callback(new Error("expected file.agent_data"))
-
-				ProjectImporter._buildLinkedFileDataForExtFile file, (err, linkedFileData) ->
-					return callback(err) if err?
-					if !linkedFileData?
-						return callback(new Error('Could not build linkedFileData for agent #{file.agent}'))
-					ProjectImporter._writeS3ObjectToDisk file.file_path, (error, pathOnDisk) ->
-						return callback(error) if error?
-						ProjectEntityUpdateHandler.addFileWithoutUpdatingHistory project_id,
-							folder_id, name, pathOnDisk, linkedFileData, v2_user_id, callback
+					return new Error("expected file.agent_data")
 			else
-				logger.warn {type: file.type, path: file.file, project_id}, "unknown file type"
-				callback(new UnsupportedFileTypeError("unknown file type: #{file.type}"))
+				return new UnsupportedFileTypeError("unknown file type: #{file.type}")
+
+		# check files have valid names
+		for file in files
+			path = "/" + file.file
+			dirname = Path.dirname(path)
+			name = Path.basename(path)
+			for folder in dirname.split('/')
+				if folder.length > 0 and not SafePath.isCleanFilename folder
+					return new Errors.InvalidNameError("invalid element name")
+			if not SafePath.isCleanFilename name
+				return new Errors.InvalidNameError("invalid element name")
+
+		return null
+
+	_importFiles: (project_id, v2_user_id, files = [], callback = (error) ->) ->
+		# check files are in expected format
+		checkErr = ProjectImporter._checkFiles (files)
+		if checkErr?
+			logger.warn {project_id, v2_user_id, files:files, checkErr:checkErr}, "invalid files in import"
+			return callback(checkErr)
+
+		getPath = (file) ->
+			path = "/" + file.file
+			return {path: path, dirname: Path.dirname(path), name: Path.basename(path)}
+
+		# now upload all the docs in parallel
+		uploadDoc = (file, cb) ->
+			{path, dirname, name} = getPath(file)
+			docLines = file.latest_content.split("\n")
+			doc = new Doc name: name
+			DocstoreManager.updateDoc project_id.toString(), doc._id.toString(), docLines, 0, {}, (err, modified, rev) ->
+				return cb(err) if err?
+				cb(null, {file:file, dirname:dirname, name:name, doc:doc})
+
+		# now upload all the files in parallel
+		uploadFile = (file, cb) ->
+			{path, dirname, name} = getPath(file)
+			ProjectImporter._writeS3ObjectToDisk file.file_path, (err, fsPath) ->
+				return cb(err) if err?
+				fileRef = new File name: name, linkedFileData: file.linkedFileData # optional
+				FileStoreHandler.uploadFileFromDisk project_id, fileRef._id, fsPath, (err, fileStoreUrl)->
+					return cb(err) if err?
+					cb(null, {file:file, dirname:dirname, name:name, fileRef:fileRef, fileStoreUrl:fileStoreUrl})
+
+		# store the uploaded docs and files
+		storeDoc = (uploadResult, cb) ->
+			{file, dirname, doc} = uploadResult
+			ProjectEntityUpdateHandler.mkdirp project_id, dirname, (err, folders, lastFolder) ->
+				return cb(err) if err?
+				folder_id = lastFolder._id
+				ProjectEntityUpdateHandler._addDocAndSendToTpds project_id, folder_id, doc, cb
+
+		storeFile = (uploadResult, cb) ->
+			{file, dirname, fileRef} = uploadResult
+			ProjectEntityUpdateHandler.mkdirp project_id, dirname, (err, folders, lastFolder) ->
+				return cb(err) if err?
+				folder_id = lastFolder._id
+				ProjectEntityUpdateHandler._addFileAndSendToTpds project_id, folder_id, fileRef, cb
+
+		# store v2 linkedFileData as property on the ext files
+		buildLinkedFileData = (file, _cb) ->
+			cb = (err) ->
+				setImmediate _cb, err  # make the callback asynchronous
+			if file.type is "ext"
+				ProjectImporter._buildLinkedFileDataForExtFile file, (err, linkedFileData) ->
+					return cb(err) if err?
+					return new Error('Could not build linkedFileData for agent #{file.agent}') if !linkedFileData?
+					file.linkedFileData = linkedFileData
+					cb()
+			else
+				cb()
+
+		# select each of the different file types
+		srcs = _.filter files, (f) -> f.type is "src"
+		attsAndExts = _.filter files, (f) -> f.type in ["att", "ext"]
+
+		async.series [
+			(cb) ->
+				async.eachSeries files, buildLinkedFileData, cb
+			(cb) ->
+				async.mapLimit srcs, MAX_UPLOADS, uploadDoc, cb
+			(cb) ->
+				async.mapLimit attsAndExts, MAX_UPLOADS, uploadFile, cb
+		], (err, results) ->
+			return callback(err) if err?
+			[linkResult, uploadedDocs, uploadedFiles] = results
+			# now put the references in mongo. In future we could do this in a
+			# single operation, computing and storing the entire folder tree in
+			# a single mongo operation.  Since uploading is the bottleneck I have
+			# parallelised only that part for now.
+			async.series [
+				(cb) ->
+					async.eachSeries uploadedDocs, storeDoc, cb
+				(cb) ->
+					async.eachSeries uploadedFiles, storeFile, cb
+			], (err) ->
+				return callback(err) if err?
+				# set the main file if present
+				mainFile = _.find uploadedDocs, (uploadResult) -> uploadResult.file.main
+				if mainFile
+					ProjectEntityUpdateHandler.setRootDoc project_id, mainFile.doc._id, callback
+				else
+					callback()
 
 	_buildLinkedFileDataForExtFile: (file, callback=(err, linkedFileData)->) ->
 		if file.agent == 'url'
@@ -396,10 +472,12 @@ module.exports = ProjectImporter =
 			pathOnDisk = "#{settings.path.dumpFolder}/#{uuid.v4()}"
 
 			readStream = request.get options
+			readStream.pause()
 			writeStream = fs.createWriteStream(pathOnDisk)
 
 			onError = (error) ->
 				logger.err {err: error}, "error writing URL to disk"
+				readStream.resume()
 				callback(error)
 
 			readStream.on 'error', onError
@@ -411,9 +489,11 @@ module.exports = ProjectImporter =
 			readStream.on 'response', (response) ->
 				if 200 <= response.statusCode < 300
 					readStream.pipe(writeStream)
+					readStream.resume()
 				else
 					error = new Error("Overleaf s3 returned non-success code: #{response.statusCode}")
 					logger.error {err: error, options}, "overleaf s3 error"
+					readStream.resume()
 					return callback(error)
 
 	_waitForV1HistoryExport: (v1_project_id, v1_user_id, callback = (error) ->) ->
