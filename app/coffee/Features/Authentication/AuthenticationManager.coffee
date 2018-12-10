@@ -17,26 +17,6 @@ _checkWriteResult = (result, callback = (error, updated) ->) ->
 	else
 		callback(null, false)
 
-_setUserPasswordInV2 = (user_id, password, callback) ->
-	bcrypt.genSalt BCRYPT_ROUNDS, (error, salt) ->
-		return callback(error) if error?
-		bcrypt.hash password, salt, (error, hash) ->
-			return callback(error) if error?
-			db.users.update({
-				_id: ObjectId(user_id.toString())
-			}, {
-				$set: hashedPassword: hash
-				$unset: password: true
-			}, (updateError, result)->
-				return callback(updateError) if updateError?
-				_checkWriteResult(result, callback)
-			)
-
-_setUserPasswordInV1 = (user, callback) ->
-	V1LoginHandler.doPasswordReset user, (error, reset)->
-		return callback(error) if error?
-		return callback(error, reset)
-
 module.exports = AuthenticationManager =
 	authenticate: (query, password, callback = (error, user) ->) ->
 		# Using Mongoose for legacy reasons here. The returned User instance
@@ -85,7 +65,7 @@ module.exports = AuthenticationManager =
 			overleafId = user.overleaf?.id?
 			if overleafId and Settings.overleaf? # v2 user in v2
 				# v2 user in v2, change password in v1
-				_setUserPasswordInV1({
+				AuthenticationManager._setUserPasswordInV1({
 					v1Id: user.overleaf.id,
 					email: user.email,
 					password: password
@@ -95,7 +75,7 @@ module.exports = AuthenticationManager =
 				return callback(new Errors.NotInV2Error("Password Reset Attempt"))
 			else if !overleafId and !Settings.overleaf?
 				# SL user in SL, change password in SL
-				_setUserPasswordInV2(user_id, password, callback)
+				AuthenticationManager._setUserPasswordInV2(user_id, password, callback)
 			else if !overleafId and Settings.overleaf?
 				# SL user in v2, should not happen
 				return callback(new Errors.SLInV2Error("Password Reset Attempt"))
