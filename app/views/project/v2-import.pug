@@ -23,7 +23,7 @@ block content
 				)
 					input(name='_csrf', type='hidden', value=csrfToken)
 					form-messages(for="v2ImportForm")
-					input.btn.btn-primary.v2-import__confirm(
+					input.btn.btn-primary.v2-import__cta(
 						type="submit"
 						value="Import project to Overleaf v2"
 						ng-disabled="v2ImportForm.inflight || v2ImportForm.response.success"
@@ -33,3 +33,5 @@ block content
 					| Overleaf has moved to v2. This project was created anonymously and
 					| therefore cannot be automatically imported. Please download a zip
 					| file of the project and upload that to continue editing it.
+
+				button.btn.btn-primary.v2-import__cta Download project zip file
