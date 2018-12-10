@@ -111,6 +111,10 @@ module.exports = CollabratecController =
 					CollabratecManager.clearSession req.session
 					res.redirect "/login?sso_error=collabratec_account_not_registered"
 
+	showDash: (req, res, next) ->
+		AuthenticationController.setRedirectInSession req, "/project"
+		res.redirect settings.collabratec.saml.init_path
+
 	showProject: (req, res, next) ->
 		req.session.show_project_id = req.params.project_id
 		res.redirect settings.collabratec.saml.init_path
