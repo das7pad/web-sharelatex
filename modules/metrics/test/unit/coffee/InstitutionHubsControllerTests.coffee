@@ -2,13 +2,13 @@ should = require('chai').should()
 SandboxedModule = require('sandboxed-module')
 assert = require('assert')
 Path = require('path')
-modulePath = Path.join __dirname, '../../../app/js/HubsController'
+modulePath = Path.join __dirname, '../../../app/js/InstitutionHubsController'
 sinon = require("sinon")
 expect = require("chai").expect
 
-describe "HubsController", ->
+describe "InstitutionHubsController", ->
 	beforeEach ->
-		@HubsController = SandboxedModule.require modulePath, requires:
+		@InstitutionHubsController = SandboxedModule.require modulePath, requires:
 			'settings-sharelatex': @Settings =
 				apis:
 					analytics:
@@ -38,10 +38,10 @@ describe "HubsController", ->
 			@res = { render: sinon.stub() }
 			usageData = "{\"count\": 10}"
 			recentActivity = "[{\"title\": \"yesterday\"}]"
-			@HubsController._usageData = sinon.stub().callsArgWith(1, usageData)
-			@HubsController._recentActivity = sinon.stub().callsArgWith(1, recentActivity)
+			@InstitutionHubsController._usageData = sinon.stub().callsArgWith(1, usageData)
+			@InstitutionHubsController._recentActivity = sinon.stub().callsArgWith(1, recentActivity)
 
-			@HubsController.institutionHub(@req, @res)
+			@InstitutionHubsController.institutionHub(@req, @res)
 			@res.render.calledWith(
 				sinon.match('views/institutionHub'), {
 					institutionId: 5,
@@ -66,7 +66,7 @@ describe "HubsController", ->
 
 		it 'fetches and formats recent activity', (done) ->
 			@request.get = sinon.stub().callsArgWith(1, null, {statusCode: 200}, @dataResponse)
-			@HubsController._recentActivity(5, @callback)
+			@InstitutionHubsController._recentActivity(5, @callback)
 
 			formatted = [
 				{ title: 'Yesterday', users: 76, docs: 143 },
@@ -78,21 +78,21 @@ describe "HubsController", ->
 
 		it 'returns null on errors and non-success status', (done) ->
 			@request.get = sinon.stub().callsArgWith(1, null, {statusCode: 500}, {})
-			@HubsController._recentActivity(5, @callback)
+			@InstitutionHubsController._recentActivity(5, @callback)
 			@callback.calledWith(null).should.equal true
 
 			@request.get = sinon.stub().callsArgWith(1, 'error', {statusCode: 200}, {})
-			@HubsController._recentActivity(5, @callback)
+			@InstitutionHubsController._recentActivity(5, @callback)
 			@callback.calledWith(null).should.equal true
 			done()
 
 		it 'returns null on errors and non-success status', (done) ->
 			@request.get = sinon.stub().callsArgWith(1, null, {statusCode: 500}, {})
-			@HubsController._recentActivity(5, @callback)
+			@InstitutionHubsController._recentActivity(5, @callback)
 			@callback.calledWith(null).should.equal true
 
 			@request.get = sinon.stub().callsArgWith(1, 'error', {statusCode: 200}, {})
-			@HubsController._recentActivity(5, @callback)
+			@InstitutionHubsController._recentActivity(5, @callback)
 			@callback.calledWith(null).should.equal true
 			done()
 
@@ -100,7 +100,7 @@ describe "HubsController", ->
 			@dataResponse.month.users = 0
 			@dataResponse.month.projects = 0
 			@request.get = sinon.stub().callsArgWith(1, null, {statusCode: 200}, @dataResponse)
-			@HubsController._recentActivity(5, @callback)
+			@InstitutionHubsController._recentActivity(5, @callback)
 			@callback.calledWith(null).should.equal true
 			done()
 
@@ -112,7 +112,7 @@ describe "HubsController", ->
 			@v1Auth = {user: @Settings.apis.v1.user, pass: @Settings.apis.v1.pass}
 
 		it 'calls correct endpoint for external collaboration', (done) ->
-			@HubsController.institutionExternalCollaboration(@req, @res)
+			@InstitutionHubsController.institutionExternalCollaboration(@req, @res)
 			@request.get.calledWith({
 				url: @Settings.apis.v1.url + @institutionsApi + '5/external_collaboration_data'
 				auth: @v1Auth
@@ -122,7 +122,7 @@ describe "HubsController", ->
 			done()
 
 		it 'calls correct endpoint for departments', (done) ->
-			@HubsController.institutionDepartments(@req, @res)
+			@InstitutionHubsController.institutionDepartments(@req, @res)
 			@request.get.calledWith({
 				url: @Settings.apis.v1.url + @institutionsApi + '5/departments_data'
 				auth: @v1Auth
@@ -132,7 +132,7 @@ describe "HubsController", ->
 			done()
 
 		it 'calls correct endpoint for roles', (done) ->
-			@HubsController.institutionRoles(@req, @res)
+			@InstitutionHubsController.institutionRoles(@req, @res)
 			@request.get.calledWith({
 				url: @Settings.apis.v1.url + @institutionsApi + '5/roles_data'
 				auth: @v1Auth
@@ -143,7 +143,7 @@ describe "HubsController", ->
 
 		it 'calls correct endpoint with query for usageData', (done) ->
 			endpoint = /5\/usage_signup_data\?start_date=\d+&end_date=\d+/
-			@HubsController._usageData 5, (data) =>
+			@InstitutionHubsController._usageData 5, (data) =>
 				@request.get.calledWith({
 					url: sinon.match(endpoint)
 					auth: @v1Auth

@@ -1,0 +1,15 @@
+extends ../../../../app/views/layout
+
+block content
+	.content.content-alt
+		#publisher-hub.container
+			.row
+				.col-lg-12
+					.hub-header
+						h2(style="text-transform: capitalize") #{name} &mdash; Administrator Hub
+			.row
+				.col-lg-12
+					.admin-item#templates
+						.section-title
+							h3 Templates
+						include publisherHub/templates
