@@ -46,7 +46,8 @@ V1_HISTORY_SYNC_REQUEST_TIMES = [
 
 SUPPORTED_V1_EXT_AGENTS = ['wlfile', 'url', 'wloutput', 'mendeley', 'zotero']
 
-MAX_UPLOADS = 4 # maximum number of parallel uploads
+MAX_DOC_UPLOADS = 4 # maximum numbers of parallel uploads
+MAX_FILE_UPLOADS = 8 # allow more file uploads because they are slower
 
 module.exports = ProjectImporter =
 	importProject: (v1_project_id, v2_user_id, callback = (error, v2_project_id) ->) ->
@@ -387,9 +388,9 @@ module.exports = ProjectImporter =
 			(cb) ->
 				async.eachSeries files, buildLinkedFileData, cb
 			(cb) ->
-				async.mapLimit srcs, MAX_UPLOADS, uploadDoc, cb
+				async.mapLimit srcs, MAX_DOC_UPLOADS, uploadDoc, cb
 			(cb) ->
-				async.mapLimit attsAndExts, MAX_UPLOADS, uploadFile, cb
+				async.mapLimit attsAndExts, MAX_FILE_UPLOADS, uploadFile, cb
 		], (err, results) ->
 			return callback(err) if err?
 			[linkResult, uploadedDocs, uploadedFiles] = results
