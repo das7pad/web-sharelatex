@@ -18,6 +18,7 @@ define([
       this.onCut = this.onCut.bind(this)
       this.onPaste = this.onPaste.bind(this)
       this.onResize = this.onResize.bind(this)
+      this.tearDown = this.tearDown.bind(this)
 
       this.$scope = $scope
       this.editor = editor
@@ -123,6 +124,7 @@ define([
     }
 
     connectToDoc(doc) {
+      this.rangesTracker = doc.ranges
       this.setTrackChanges(this.$scope.trackChanges)
 
       doc.on('ranges:dirty', () => {
@@ -137,9 +139,24 @@ define([
     }
 
     disconnectFromDoc(doc) {
+      this.rangesTracker = {}
+
       doc.off('ranges:clear')
       doc.off('ranges:redraw')
       doc.off('ranges:dirty')
+    }
+
+    tearDown() {
+      // Clear html-node based markers
+      const markers = Object.values(this.adapter.changeIdToMarkerIdMap).filter(
+        marker => marker.parentNode
+      )
+
+      for (let marker of markers) {
+        marker.parentNode.removeChild(marker)
+      }
+
+      this.adapter.changeIdToMarkerIdMap = {}
     }
 
     setTrackChanges(value) {
@@ -388,14 +405,12 @@ define([
 
     hideCommentsByThreadIds(thread_ids) {
       const resolve_ids = {}
+      let comments = this.rangesTracker.comments || []
       for (let id of Array.from(thread_ids)) {
         resolve_ids[id] = true
       }
-      for (let comment of Array.from(
-        (this.rangesTracker != null
-          ? this.rangesTracker.comments
-          : undefined) || []
-      )) {
+
+      for (let comment of comments) {
         if (resolve_ids[comment.op.t]) {
           if (this.adapter.onCommentRemoved) {
             this.adapter.onCommentRemoved(comment)
@@ -406,11 +421,8 @@ define([
     }
 
     showCommentByThreadId(thread_id) {
-      for (let comment of Array.from(
-        (this.rangesTracker != null
-          ? this.rangesTracker.comments
-          : undefined) || []
-      )) {
+      let comments = this.rangesTracker.comments || []
+      for (let comment of comments) {
         if (comment.op.t === thread_id && !this.isCommentResolved(comment)) {
           if (this.adapter.onCommentAdded) {
             this.adapter.onCommentAdded(comment)
@@ -638,10 +650,7 @@ define([
 
     _getCurrentDocEntries() {
       const doc_id = this.$scope.docId
-      const entries =
-        this.$scope.reviewPanel.entries[doc_id] != null
-          ? this.$scope.reviewPanel.entries[doc_id]
-          : (this.$scope.reviewPanel.entries[doc_id] = {})
+      const entries = this.$scope.reviewPanel.entries[doc_id] || {}
       return entries
     }
 

@@ -622,6 +622,7 @@ define([
 
         const tearDownTrackChanges = function() {
           if (!trackChangesManager) return
+          this.trackChangesManager.tearDown()
           editor.off('changeSelection', trackChangesManager.onChangeSelection)
 
           editor.off('change', trackChangesManager.onChangeSelection)

@@ -217,6 +217,8 @@ define([
 
         const tearDownTrackChanges = function() {
           const codeMirror = editor.getCodeMirror()
+
+          this.trackChangesManager.tearDown()
           codeMirror.off('swapDoc', this.trackChangesManager.onChangeSession)
         }
 
