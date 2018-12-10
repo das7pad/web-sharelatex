@@ -1,5 +1,5 @@
 logger = require('logger-sharelatex')
-path = require('path')
+Path = require('path')
 URL = require('url-parse')
 async = require('async')
 AuthenticationController = require('../../../../app/js/Features/Authentication/AuthenticationController')
@@ -8,12 +8,15 @@ ProjectHelper = require('../../../../app/js/Features/Project/ProjectHelper')
 ProjectDetailsHandler = require('../../../../app/js/Features/Project/ProjectDetailsHandler')
 DocumentHelper = require('../../../../app/js/Features/Documents/DocumentHelper')
 ProjectUploadManager = require('../../../../app/js/Features/Uploads/ProjectUploadManager')
+Errors = require('../../../../app/js/Features/Errors/Errors')
 OpenInOverleafHelper = require('./OpenInOverleafHelper')
+OpenInOverleafErrors = require('./OpenInOverleafErrors')
 
 module.exports = OpenInOverleafController =
 	# 'open in overleaf' /docs API
 	openInOverleaf: (req, res, next)->
-		return res.redirect '/' unless req.body.snip? || req.body.encoded_snip? || req.body.snip_uri? || req.body.zip_uri?
+		unless req.body.snip? || req.body.encoded_snip? || req.body.snip_uri? || req.body.zip_uri?
+			return next(new OpenInOverleafErrors.MissingParametersError)
 
 		logger.log user: user_id, "creating project from snippet"
 		user_id = AuthenticationController.getLoggedInUserId(req)
@@ -23,7 +26,7 @@ module.exports = OpenInOverleafController =
 			OpenInOverleafController._sendResponse(req, res, project)
 
 		OpenInOverleafController._populateSnippetFromRequest req, (err, snippet) ->
-			return next(err) if err?
+			return sendResponse(err) if err?
 			if snippet.snip?
 				OpenInOverleafController._createProjectFromPostedSnippet user_id, snippet, sendResponse
 			else if snippet.projectFile?
@@ -31,7 +34,7 @@ module.exports = OpenInOverleafController =
 			else if snippet.files?
 				OpenInOverleafController._createProjectFromFileList user_id, snippet, sendResponse
 			else
-				res.redirect('/')
+				next(new OpenInOverleafErrors.MissingParametersError)
 
 	_createProjectFromPostedSnippet: (user_id, snippet, callback = (error, project)->) ->
 		content = OpenInOverleafHelper.getDocumentLinesFromSnippet(snippet)
@@ -73,7 +76,8 @@ module.exports = OpenInOverleafController =
 				(cb) ->
 					projectName = if typeof snippet.snip_name is 'string' then snippet.snip_name else snippet.defaultTitle
 					ProjectUploadManager.createProjectFromZipArchive user_id, projectName, snippet.projectFile, (err, project) ->
-						cb(err, project)
+						return cb(new OpenInOverleafErrors.ZipExtractError) if err?
+						cb(null, project)
 				(project, cb) ->
 					if snippet.publisherSlug
 						OpenInOverleafHelper.setProjectBrandVariationFromSlug project, snippet.publisherSlug, (err) ->
@@ -89,7 +93,7 @@ module.exports = OpenInOverleafController =
 		comment = OpenInOverleafController._getMainFileCommentFromSnipRequest(req)
 		OpenInOverleafController._getSnippetContentsFromRequest req, (error, snippet) ->
 			return cb(error) if error?
-			return cb(new Error("Couldn't extract snippet")) unless snippet.snip? || snippet.projectFile? || snippet.files?
+			return cb(new Errors.InvalidError) unless snippet.snip? || snippet.projectFile? || snippet.files?
 
 			snippet.comment = comment
 			snippet.engine = req.body.engine if req.body.engine?
@@ -116,7 +120,7 @@ module.exports = OpenInOverleafController =
 		else if req.body.snip_uri? || req.body.zip_uri?
 			OpenInOverleafHelper.populateSnippetFromUri req.body.snip_uri || req.body.zip_uri, snippet, cb
 		else
-			cb(new Error('No snippet in request'))
+			cb(new OpenInOverleafErrors.MissingParametersError)
 
 	_getMainFileCommentFromSnipRequest: (req) ->
 		comment = ''
@@ -145,6 +149,6 @@ module.exports = OpenInOverleafController =
 		FILE_EXTENSION_REGEX = /\.[^.]+$/
 		uri = (req.body.zip_uri || req.body.snip_uri)
 		if typeof uri is 'string'
-			return path.basename(uri).replace(FILE_EXTENSION_REGEX, '')
+			return Path.basename(uri).replace(FILE_EXTENSION_REGEX, '')
 
 		return req.i18n.translate('new_snippet_project')

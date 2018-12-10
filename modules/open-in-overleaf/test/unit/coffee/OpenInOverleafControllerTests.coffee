@@ -7,6 +7,8 @@ expect = chai.expect
 modulePath = "../../../app/js/OpenInOverleafController.js"
 SandboxedModule = require('sandboxed-module')
 ObjectId = require("mongojs").ObjectId
+Errors = require("../../../../../app/js/Features/Errors/Errors")
+OpenInOverleafErrors = require("../../../app/js/OpenInOverleafErrors")
 
 describe 'OpenInOverleafController', ->
 	beforeEach ->
@@ -120,14 +122,14 @@ describe 'OpenInOverleafController', ->
 
 
 		describe "when there is no snippet", ->
-			it "should redirect to the root", (done)->
+			it "should send a missing parameters error", (done)->
 				@OpenInOverleafController._populateSnippetFromRequest = sinon.stub()
-				@res.redirect = (url)=>
-					sinon.assert.notCalled(@OpenInOverleafController._populateSnippetFromRequest)
-					url.should.equal("/")
-					done()
 				delete @req.body.snip
-				@OpenInOverleafController.openInOverleaf @req, @res
+				@OpenInOverleafController.openInOverleaf @req, @res, (error) =>
+					console.log(JSON.stringify(error))
+					expect(error.name).to.equal "MissingParametersError"
+					sinon.assert.notCalled(@OpenInOverleafController._populateSnippetFromRequest)
+					done()
 
 		describe "when there is an encoded snippet", ->
 			beforeEach ->

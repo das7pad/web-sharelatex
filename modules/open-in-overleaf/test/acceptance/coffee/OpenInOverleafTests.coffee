@@ -224,15 +224,14 @@ I have a bad name
 					done()
 
 		describe "when POSTing without a snippet", ->
-			it "should redirect to the root", (done) ->
+			it "should render an error page", (done) ->
 				@user.request.post
 					url: "/docs"
 					form:
 						_csrf: @user.csrfToken
 				, (err, res, body) =>
 					expect(err).not.to.exist
-					expect(res.statusCode).to.equal 302
-					expect(res.headers.location).to.equal "/"
+					expect(res.statusCode).to.equal 400
 					done()
 
 		describe "when POSTing an encoded snippet with valid csrf", ->
@@ -435,8 +434,8 @@ I have a bad name
 			it "should not produce an error", ->
 				expect(@err).not.to.exist
 
-			it "should return 404", ->
-				expect(@res.statusCode).to.equal 500 # TODO: better error handling
+			it "should return a 'not found' error", ->
+				expect(@res.statusCode).to.equal 404
 
 		describe "when POSTing a snip_uri for a zip file with an invalid name in the tex contents", ->
 			beforeEach (done) ->
@@ -476,8 +475,9 @@ I have a bad name
 					@body = _body
 					done()
 
-			it "should return an error", ->
-				expect(@res.statusCode).to.equal 500
+			it "should return a 'not found' error", ->
+				expect(@res.statusCode).to.equal 404
+				expect(JSON.parse(@body).error).to.equal 'not_found_error_from_the_supplied_url'
 
 		describe "when the document has a title", ->
 			beforeEach (done) ->
