@@ -430,3 +430,136 @@ I have a bad name
 
 						expect(project.name).to.match /fancy name.+/
 						done()
+
+		describe "when snip_name is supplied", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						snip_uri: 'http://example.org/fancyname.tex'
+						snip_name: 'penguin'
+					headers:
+						'X-Requested-With': 'XMLHttpRequest'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should create a project with the correct name", (done) ->
+				projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				ProjectGetter.getProject projectId, (error, project) ->
+					return done(error) if error?
+
+					expect(project.name).to.equal "penguin"
+					done()
+
+			it "should ensure that the project name is unique", (done) ->
+				projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						snip_uri: 'http://example.org/fancyname.tex'
+						snip_name: 'penguin'
+					headers:
+						'X-Requested-With': 'XMLHttpRequest'
+				, (err, res, body) =>
+					expect(err).not.to.exist
+					newProjectId = JSON.parse(body).redirect.match(@uri_regex)[1]
+					expect(newProjectId).to.exist
+
+					ProjectGetter.getProject newProjectId, (error, project) ->
+						return done(error) if error?
+
+						expect(project.name).to.match /penguin.+/
+						done()
+
+		describe "when opening an array of files", ->
+			describe "with a basic .tex and a .zip", ->
+				beforeEach (done) ->
+					@user.request.post
+						url: "/docs"
+						form:
+							_csrf: @user.csrfToken
+							snip_uri: [
+								'http://example.org/test.tex'
+								'http://example.org/project.zip'
+							]
+						headers:
+							'X-Requested-With': 'XMLHttpRequest'
+					, (_err, _res, _body) =>
+						@err = _err
+						@res = _res
+						@body = _body
+						done()
+
+				it "should create a project with the deault project name", (done) ->
+					projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
+					expect(projectId).to.exist
+
+					ProjectGetter.getProject projectId, (error, project) ->
+						return done(error) if error?
+
+						expect(project.name).to.equal "new_snippet_project"
+						done()
+
+				it "should add the .tex file as a document", (done) ->
+					projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
+					expect(projectId).to.exist
+
+					ProjectGetter.getProject projectId, (error, project) ->
+						return done(error) if error?
+
+						expect(project.rootFolder[0].docs.length).to.equal 1
+						expect(project.rootFolder[0].docs[0].name).to.equal 'test.tex'
+						done()
+
+				it "should add the .zip file as a file", (done) ->
+					projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
+					expect(projectId).to.exist
+
+					ProjectGetter.getProject projectId, (error, project) ->
+						return done(error) if error?
+
+						expect(project.rootFolder[0].fileRefs.length).to.equal 1
+						expect(project.rootFolder[0].fileRefs[0].name).to.equal 'project.zip'
+						done()
+
+			describe "when names are supplied for the files", ->
+				beforeEach (done) ->
+					@user.request.post
+						url: "/docs"
+						form:
+							_csrf: @user.csrfToken
+							snip_uri: [
+								'http://example.org/test.tex'
+								'http://example.org/project.zip'
+							]
+							snip_name: [
+								'wombat.tex',
+								'potato.zip'
+							]
+						headers:
+							'X-Requested-With': 'XMLHttpRequest'
+					, (_err, _res, _body) =>
+						@err = _err
+						@res = _res
+						@body = _body
+						done()
+
+				it "should use the supplied filenames", (done) ->
+					projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
+					expect(projectId).to.exist
+
+					ProjectGetter.getProject projectId, (error, project) ->
+						return done(error) if error?
+
+						expect(project.rootFolder[0].docs.length).to.equal 1
+						expect(project.rootFolder[0].docs[0].name).to.equal 'wombat.tex'
+						expect(project.rootFolder[0].fileRefs.length).to.equal 1
+						expect(project.rootFolder[0].fileRefs[0].name).to.equal 'potato.zip'
+						done()

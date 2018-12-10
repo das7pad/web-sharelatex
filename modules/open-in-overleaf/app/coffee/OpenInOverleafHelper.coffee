@@ -11,6 +11,7 @@ UrlHelper = require('../../../../app/js/Features/Helpers/UrlHelper')
 ProjectHelper = require('../../../../app/js/Features/Project/ProjectHelper')
 ProjectRootDocManager = require('../../../../app/js/Features/Project/ProjectRootDocManager')
 ProjectEntityUpdateHandler = require('../../../../app/js/Features/Project/ProjectEntityUpdateHandler')
+SafePath = require('../../../../app/js/Features/Project/SafePath')
 DocumentHelper = require('../../../../app/js/Features/Documents/DocumentHelper')
 Project = require('../../../../app/js/models/Project').Project
 
@@ -26,16 +27,22 @@ module.exports = OpenInOverleafHelper =
 		return content
 
 	populateSnippetFromUriArray: (uris, source_snippet, callback = (error, results)->) ->
+		# add names to uris, if present
+		names = source_snippet.snip_name || []
+		names = [names] if typeof names is 'string'
+		urisWithName = _.map uris, (uri, index) ->
+			{uri: uri, name: names[index]}
+
 		async.mapLimit(
-			uris
+			urisWithName
 			5
 			(uri, mapcb)->
 				async.waterfall(
 					[
 						(cb)->
-							FileWriter.writeUrlToDisk 'open_in_overleaf_snippet', UrlHelper.wrapUrlWithProxy(uri), (error, fspath) ->
+							FileWriter.writeUrlToDisk 'open_in_overleaf_snippet', UrlHelper.wrapUrlWithProxy(uri.uri), (error, fspath) ->
 								return cb(error) if error?
-								cb(null, {uri: uri, fspath: fspath})
+								cb(null, {uri: uri.uri, fspath: fspath})
 						(file, cb)->
 							magic = new mmm.Magic(mmm.MAGIC_MIME_TYPE)
 							magic.detectFile file.fspath, (error, ctype) ->
@@ -51,7 +58,7 @@ module.exports = OpenInOverleafHelper =
 							else
 								cb(null, file)
 						(file, cb) ->
-							file.name = path.basename(file.uri)
+							file.name = SafePath.clean(uri.name || path.basename(uri.uri))
 							cb(null, file)
 					]
 					mapcb

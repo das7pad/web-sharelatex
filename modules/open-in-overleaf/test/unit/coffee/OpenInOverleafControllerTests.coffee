@@ -109,6 +109,15 @@ describe 'OpenInOverleafController', ->
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
+			it "should create a project with the snip name, if supplied", (done) ->
+				@req.body.snip_name = 'potato'
+				@OpenInOverleafHelper.getDocumentLinesFromSnippet = sinon.stub().returns((@comment + @snip).split("\n"))
+				@res.send = =>
+					sinon.assert.calledWith(@ProjectDetailsHandler.generateUniqueName, @user._id, "potato")
+					done()
+				@OpenInOverleafController.openInOverleaf @req, @res
+
+
 		describe "when there is no snippet", ->
 			it "should redirect to the root", (done)->
 				@OpenInOverleafController._populateSnippetFromRequest = sinon.stub()
@@ -163,16 +172,28 @@ describe 'OpenInOverleafController', ->
 
 		describe "when the snippet uri is a zip file", ->
 			beforeEach ->
-				@req.body.snip_uri = "#{@snip_uri}.zip"
-				@OpenInOverleafController._populateSnippetFromRequest = sinon.stub().callsArgWith(1, null, {
+				@req.body.snip_uri = "http://foo.net/foo.zip"
+				@OpenInOverleafHelper.populateSnippetFromUri = sinon.stub().callsArgWith(2, null, {
 						projectFile: '/foo/bar.zip'
 						defaultTitle: "new_snippet_project"
 				})
 
 			it "should create a project from the zip file and redirect to it", (done)->
 				@res.send = (content)=>
-					sinon.assert.calledWith(@ProjectUploadManager.createProjectFromZipArchive, @user._id, "new_snippet_project", "/foo/bar.zip")
+					sinon.assert.calledWith(@ProjectUploadManager.createProjectFromZipArchive, @user._id, "foo", "/foo/bar.zip")
 					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
+					content.should.equal JSON.stringify({redirect: '/project/' + @project_id})
+					done()
+				@OpenInOverleafController.openInOverleaf @req, @res
+
+			it "should use the snip_name if supplied", (done) ->
+				@OpenInOverleafHelper.populateSnippetFromUri = sinon.stub().callsArgWith(2, null, {
+					projectFile: '/foo/bar.zip'
+					defaultTitle: "new_snippet_project"
+					snip_name: 'potato'
+				})
+				@res.send = (content)=>
+					sinon.assert.calledWith(@ProjectUploadManager.createProjectFromZipArchive, @user._id, "potato", "/foo/bar.zip")
 					content.should.equal JSON.stringify({redirect: '/project/' + @project_id})
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
