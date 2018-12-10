@@ -280,6 +280,28 @@ describe "TokenAccessController", ->
 						beforeEach ->
 							@Features.hasFeature.returns(true)
 
+						describe 'with project name', ->
+							beforeEach ->
+								@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+									allow: true
+									exists: true
+									exported: false
+									has_owner: true
+									name: 'A title'
+								})
+								@TokenAccessController.readAndWriteToken @req, @res, @next
+
+							it 'should render v2-import page with name', (done) ->
+								expect(@res.render.calledWith(
+									'project/v2-import',
+									{
+										projectId: '123abc'
+										name: 'A title'
+										hasOwner: true
+									}
+								)).to.equal true
+								done()
+
 						describe 'with project owner', ->
 							beforeEach ->
 								@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
@@ -287,6 +309,7 @@ describe "TokenAccessController", ->
 									exists: true
 									exported: false
 									has_owner: true
+									name: 'A title'
 								})
 								@TokenAccessController.readAndWriteToken @req, @res, @next
 
@@ -296,6 +319,7 @@ describe "TokenAccessController", ->
 									{
 										projectId: '123abc',
 										hasOwner: true
+										name: 'A title'
 									}
 								)).to.equal true
 								done()
@@ -307,6 +331,7 @@ describe "TokenAccessController", ->
 									exists: true
 									exported: false
 									has_owner: false
+									name: 'A title'
 								})
 								@TokenAccessController.readAndWriteToken @req, @res, @next
 
@@ -316,6 +341,7 @@ describe "TokenAccessController", ->
 									{
 										projectId: '123abc',
 										hasOwner: false
+										name: 'A title'
 									}
 								)).to.equal true
 								done()
