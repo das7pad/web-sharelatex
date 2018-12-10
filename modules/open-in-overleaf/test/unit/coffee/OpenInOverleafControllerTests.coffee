@@ -57,6 +57,7 @@ describe 'OpenInOverleafController', ->
 				_.extend({files: [{ctype: 'text/x-tex', content: @snip}, {ctype: 'application/zip', fspath: '/foo/bar.zip'}]}, @snippet, {snip: undefined})
 			)
 			populateProjectFromFileList: sinon.stub().callsArg(2)
+			setProjectBrandVariationFromSlug: sinon.stub().callsArg(2)
 		@Csrf =
 			validateRequest: sinon.stub().callsArgWith(1, true)
 		@AuthenticationController =
@@ -150,6 +151,17 @@ describe 'OpenInOverleafController', ->
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
+		describe "when there is a snippet uri passed as zip_uri", ->
+			beforeEach ->
+				@req.body.zip_uri = @snip_uri
+
+			it "should create a project and redirect to it", (done)->
+				@res.send = (content)=>
+					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
+					content.should.equal JSON.stringify({redirect: '/project/' + @project_id})
+					done()
+				@OpenInOverleafController.openInOverleaf @req, @res
+
 		describe "when there is an array of uris", ->
 			beforeEach ->
 				@req.body.snip_uri = [@snip_uri, 'http://foo.net/foo.tex']
@@ -195,6 +207,21 @@ describe 'OpenInOverleafController', ->
 				@res.send = (content)=>
 					sinon.assert.calledWith(@ProjectUploadManager.createProjectFromZipArchive, @user._id, "potato", "/foo/bar.zip")
 					content.should.equal JSON.stringify({redirect: '/project/' + @project_id})
+					done()
+				@OpenInOverleafController.openInOverleaf @req, @res
+
+		describe "when there is a publisher slug", ->
+			beforeEach ->
+				@req.body.snip_uri = "#{@snip_uri}.zip"
+				@OpenInOverleafController._populateSnippetFromRequest = sinon.stub().callsArgWith(1, null, {
+					projectFile: '/foo/bar.zip'
+					defaultTitle: "new_snippet_project"
+					publisherSlug: 'OSF'
+				})
+
+			it "should set the brand variation on the project", (done)->
+				@res.send = (content)=>
+					sinon.assert.calledWith(@OpenInOverleafHelper.setProjectBrandVariationFromSlug, sinon.match.any, "OSF")
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
