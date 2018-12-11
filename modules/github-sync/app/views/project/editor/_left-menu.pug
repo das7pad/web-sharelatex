@@ -68,10 +68,13 @@ script(type="text/ng-template", id="githubSyncModalTemplate")
 					div(ng-if="status.user.available && !isProjectMember()")
 						p #{translate("github_for_link_shared_projects")}
 
-				div(ng-if="status.user.enabled")
+				div(ng-if="status.user.enabled && isProjectMember()")
 					p #{translate("project_not_linked_to_github")}
 					p
 						button(ng-click="openExportToGithubModal()").btn.btn-primary #{translate("create_project_in_github")}
+
+				div(ng-if="status.user.enabled && !isProjectMember()")
+					p #{translate("github_for_link_shared_projects")}
 
 			div(ng-if="status.project.enabled")
 				div(ng-if="status.project.merge_status == 'success'")
