@@ -2,7 +2,7 @@ ThirdPartyReferencesAgent = require './ThirdPartyReferencesAgent'
 logger = require 'logger-sharelatex'
 
 PER_PAGE_LIMIT = 100
-MAX_ITERATIONS = 20
+MAX_ITERATIONS = 100
 
 class ZoteroAgent extends ThirdPartyReferencesAgent
 	_sanitizeLinkedFileData: (linkedFileData) ->
