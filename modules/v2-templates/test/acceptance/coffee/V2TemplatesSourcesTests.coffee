@@ -49,6 +49,9 @@ describe "V2TemplatesSources", ->
 		@template_view_url = "articles/slug/read_token"
 		@open_template_link_text = '>Open as Template</a>'
 		@view_source_link_text = '>View Source</a>'
+		@no_show_source = () ->
+			@V1TemplateResponse.pub.show_source = false
+			@V1TemplateResponse.source = null
 
 	describe "Open as Template button", ->
 		it "shows with show_source and source", (done) ->
@@ -67,7 +70,7 @@ describe "V2TemplatesSources", ->
 				done()
 
 		it "does not show when show_source is false", (done) ->
-			@V1TemplateResponse.pub.show_source = false
+			@no_show_source()
 			request.get @template_view_url, (err, response, body) =>
 				return done(err) if err?
 				expect(response.statusCode).to.equal 200
@@ -75,16 +78,17 @@ describe "V2TemplatesSources", ->
 				done()
 
 		it "does not show when show_source is null", (done) ->
+			@no_show_source()
 			@V1TemplateResponse.pub.show_source = null
-			@V1TemplateResponse.source = null
 			request.get @template_view_url, (err, response, body) =>
 				return done(err) if err?
 				expect(response.statusCode).to.equal 200
 				expect(response.body).to.not.include(@open_template_link_text)
 				done()
 
-		it "shows when show_source and zip", (done) ->
-			@V1TemplateResponse.pub.source = null
+		it "shows when show_source and zip but no source", (done) ->
+			@V1TemplateResponse.pub.show_source = true
+			@V1TemplateResponse.source = null
 			request.get @template_view_url, (err, response, body) =>
 				return done(err) if err?
 				expect(response.statusCode).to.equal 200
@@ -100,7 +104,7 @@ describe "V2TemplatesSources", ->
 				done()
 
 		it "does not show when show_source is false", (done) ->
-			@V1TemplateResponse.pub.show_source = false
+			@no_show_source()
 			request.get @template_view_url, (err, response, body) =>
 				return done(err) if err?
 				expect(response.statusCode).to.equal 200
