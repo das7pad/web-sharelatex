@@ -2,6 +2,7 @@
     max-len,
     no-return-assign,
     no-undef,
+    camelcase,
 */
 // TODO: This file was created by bulk-decaffeinate.
 // Fix any style issues and re-enable lint.
@@ -38,6 +39,11 @@ define(['base'], App =>
           }
         }
       })
+
+      $scope.toggleHistoryViewMode = () => {
+        $scope.toolbarUIConfig.showOnlyLabels = false
+        ide.historyManager.toggleHistoryViewMode()
+      }
 
       $scope.restoreDeletedFile = function() {
         const { pathname, deletedAtV } = $scope.history.selection.file
@@ -78,11 +84,15 @@ define(['base'], App =>
         return waitFor(() => ide.fileTreeManager.findEntityById(id), 3000)
           .then(function(entity) {
             if (type === 'doc') {
-              return ide.editorManager.openDoc(entity)
-              $scope.$broadcast('history:toggle')
+              ide.editorManager.openDoc(entity)
+              this.ide.$timeout(() => {
+                this.$scope.$broadcast('history:toggle')
+              }, 0)
             } else if (type === 'file') {
-              return ide.binaryFilesManager.openFile(entity)
-              $scope.$broadcast('history:toggle')
+              ide.binaryFilesManager.openFile(entity)
+              this.ide.$timeout(() => {
+                this.$scope.$broadcast('history:toggle')
+              }, 0)
             }
           })
           .catch(err => console.warn(err))

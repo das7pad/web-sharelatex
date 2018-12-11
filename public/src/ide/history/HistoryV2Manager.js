@@ -23,7 +23,6 @@ define([
   'ide/history/util/displayNameForUser',
   'ide/history/util/HistoryViewModes',
   'ide/history/controllers/HistoryV2ListController',
-  'ide/history/controllers/HistoryV2DiffController',
   'ide/history/controllers/HistoryV2FileTreeController',
   'ide/history/controllers/HistoryV2ToolbarController',
   'ide/history/controllers/HistoryV2AddLabelModalController',
@@ -65,20 +64,6 @@ define([
           }, 0)
         }
 
-        this.$scope.toggleHistoryViewMode = () => {
-          if (this.$scope.history.viewMode === HistoryViewModes.COMPARE) {
-            this.softReset()
-            this.$scope.history.viewMode = HistoryViewModes.POINT_IN_TIME
-          } else {
-            this.softReset()
-            this.$scope.history.viewMode = HistoryViewModes.COMPARE
-          }
-          this._handleHistoryUIStateChange()
-          this.ide.$timeout(() => {
-            this.$scope.$broadcast('history:toggle')
-          }, 0)
-        }
-
         this.$scope.$watchGroup(
           ['history.selection.range.toV', 'history.selection.range.fromV'],
           (newRange, prevRange) => {
@@ -100,7 +85,7 @@ define([
         let _deregisterFeatureWatcher = this.$scope.$watch(
           'project.features.versioning',
           hasVersioning => {
-            if (hasVersioning != undefined) {
+            if (hasVersioning != null) {
               this.$scope.history.userHasFullFeature = hasVersioning
               _deregisterFeatureWatcher()
             }
@@ -173,6 +158,20 @@ define([
         this.$scope.history.error = null
         this.$scope.history.showOnlyLabels = false
         this.$scope.history.loadingFileTree = true
+      }
+
+      toggleHistoryViewMode() {
+        if (this.$scope.history.viewMode === HistoryViewModes.COMPARE) {
+          this.softReset()
+          this.$scope.history.viewMode = HistoryViewModes.POINT_IN_TIME
+        } else {
+          this.softReset()
+          this.$scope.history.viewMode = HistoryViewModes.COMPARE
+        }
+        this._handleHistoryUIStateChange()
+        this.ide.$timeout(() => {
+          this.$scope.$broadcast('history:toggle')
+        }, 0)
       }
 
       _handleHistoryUIStateChange() {
@@ -382,6 +381,10 @@ define([
         if (updateToSelect != null) {
           this.selectVersionForPointInTime(updateToSelect.toV)
         } else {
+          let selection = this.$scope.history.selection
+          selection.range.toV = labelToSelect.version
+          selection.range.fromV = labelToSelect.version
+          selection.update = null
           this.loadFileTreeForVersion(labelToSelect.version)
         }
       }
@@ -401,9 +404,7 @@ define([
         if (Array.isArray(labels)) {
           nLabels = labels.length
         }
-        if (nLabels === 0) {
-          return
-        } else if (nLabels === 1) {
+        if (nLabels === 1) {
           selection.range.toV = labels[0].version
           selection.range.fromV = labels[0].version
         } else {
@@ -606,6 +607,7 @@ define([
           ),
           this.$scope.history.updates[0].toV
         )
+        this._handleHistoryUIStateChange()
       }
 
       _isLabelSelected(label) {
@@ -725,6 +727,7 @@ define([
           ) {
             cutOffIndex = i || 1 // Make sure that we show at least one entry (to allow labelling).
             this.$scope.history.freeHistoryLimitHit = true
+            break
           }
         }
 
@@ -769,6 +772,7 @@ define([
           this.$scope.history.labels.concat(label),
           this.$scope.history.updates[0].toV
         )
+        this._handleHistoryUIStateChange()
       }
 
       _updateContainsUserId(update, user_id) {

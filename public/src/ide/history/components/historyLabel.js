@@ -20,10 +20,12 @@ define(['base'], function(App) {
   ) {
     const ctrl = this
     ctrl.$onInit = () => {
-      ctrl.showTooltip != null ? ctrl.showTooltip : (ctrl.showTooltip = true)
-      ctrl.isPseudoCurrentStateLabel != null
-        ? ctrl.isPseudoCurrentStateLabel
-        : (ctrl.isPseudoCurrentStateLabel = false)
+      if (ctrl.showTooltip == null) {
+        ctrl.showTooltip = true
+      }
+      if (ctrl.isPseudoCurrentStateLabel == null) {
+        ctrl.isPseudoCurrentStateLabel = false
+      }
     }
   }
 

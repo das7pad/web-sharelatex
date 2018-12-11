@@ -53,8 +53,8 @@
 			| &nbsp;#{translate("compare_to_another_version")}
 
 		a.history-toolbar-btn-danger.pull-right(
-			ng-hide="history.loadingFileTree || history.selection.updates.length == 0"
-			ng-href="/project/{{ project_id }}/version/{{ history.selection.updates[0].toV }}/zip"
+			ng-hide="history.loadingFileTree || history.selection.range.toV == null"
+			ng-href="/project/{{ project_id }}/version/{{ history.selection.range.toV }}/zip"
 			target="_blank"
 		) 
 			i.fa.fa-download

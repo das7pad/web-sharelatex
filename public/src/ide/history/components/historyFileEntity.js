@@ -75,9 +75,6 @@ define(['base', 'ide/file-tree/util/iconTypeFromName'], function(
         return 'fa-folder'
       }
     }
-    var _getOperationIcon = function() {
-      return _operationIconMap[ctrl.fileEntity.operation]
-    }
     ctrl.$onInit = function() {
       if (ctrl.fileEntity.type === 'folder') {
         ctrl.isOpen = true
