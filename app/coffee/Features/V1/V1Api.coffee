@@ -1,6 +1,6 @@
 request = require 'request'
 settings = require 'settings-sharelatex'
-Error = require '../Errors/Errors'
+Errors = require '../Errors/Errors'
 
 # TODO: check what happens when these settings aren't defined
 DEFAULT_V1_PARAMS = {
