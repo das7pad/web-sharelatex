@@ -5,6 +5,13 @@ NotFoundError = (message) ->
 	return error
 NotFoundError.prototype.__proto__ = Error.prototype
 
+ForbiddenError = (message) ->
+	error = new Error(message)
+	error.name = "ForbiddenError"
+	error.__proto__ = ForbiddenError.prototype
+	return error
+ForbiddenError.prototype.__proto__ = Error.prototype
+
 ServiceNotConfiguredError = (message) ->
 	error = new Error(message)
 	error.name = "ServiceNotConfiguredError"
@@ -91,6 +98,7 @@ AccountMergeError.prototype.__proto__ = Error.prototype
 
 module.exports = Errors =
 	NotFoundError: NotFoundError
+	ForbiddenError: ForbiddenError
 	ServiceNotConfiguredError: ServiceNotConfiguredError
 	TooManyRequestsError: TooManyRequestsError
 	InvalidNameError: InvalidNameError
