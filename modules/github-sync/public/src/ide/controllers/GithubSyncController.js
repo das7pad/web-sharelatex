@@ -24,7 +24,7 @@ define(['base'], App =>
       }
     }
 
-    $scope.isProjectMember = function () {
+    $scope.isProjectMember = function() {
       const projectMembers = ide.$scope.project.members.map(
         member => member._id
       )
