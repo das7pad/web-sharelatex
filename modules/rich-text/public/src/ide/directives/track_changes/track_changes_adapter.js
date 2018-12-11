@@ -21,6 +21,19 @@ define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
       this.changeIdToMarkerIdMap = {}
     }
 
+    tearDown() {
+      // Clear html-node based markers
+      const markers = Object.values(this.changeIdToMarkerIdMap).filter(
+        marker => marker.parentNode
+      )
+
+      for (let marker of markers) {
+        marker.parentNode.removeChild(marker)
+      }
+
+      this.changeIdToMarkerIdMap = {}
+    }
+
     onInsertAdded(change) {
       let start, end, marker
       start = this.shareJsOffsetToRowColumn(change.op.p)

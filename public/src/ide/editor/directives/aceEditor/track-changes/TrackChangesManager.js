@@ -139,24 +139,13 @@ define([
     }
 
     disconnectFromDoc(doc) {
-      this.rangesTracker = {}
-
       doc.off('ranges:clear')
       doc.off('ranges:redraw')
       doc.off('ranges:dirty')
     }
 
     tearDown() {
-      // Clear html-node based markers
-      const markers = Object.values(this.adapter.changeIdToMarkerIdMap).filter(
-        marker => marker.parentNode
-      )
-
-      for (let marker of markers) {
-        marker.parentNode.removeChild(marker)
-      }
-
-      this.adapter.changeIdToMarkerIdMap = {}
+      this.adapter.tearDown()
     }
 
     setTrackChanges(value) {

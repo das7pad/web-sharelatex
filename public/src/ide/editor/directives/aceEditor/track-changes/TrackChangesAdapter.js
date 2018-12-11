@@ -12,6 +12,10 @@ define(['ace/ace', 'ide/editor/EditorShareJsCodec'], function(
       this.changeIdToMarkerIdMap = {}
     }
 
+    tearDown() {
+      this.changeIdToMarkerIdMap = {}
+    }
+
     clearAnnotations() {
       const session = this.editor.getSession()
       for (let change_id in this.changeIdToMarkerIdMap) {
