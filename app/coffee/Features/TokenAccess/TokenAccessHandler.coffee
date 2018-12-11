@@ -119,7 +119,7 @@ module.exports = TokenAccessHandler =
 			exported: false
 		}) unless Settings.apis?.v1?
 
-		UserGetter.getUser v2UserId, (err, user) ->
+		UserGetter.getUser v2UserId, { overleaf: 1 }, (err, user) ->
 			return callback(err) if err?
 			v1UserId = user.overleaf?.id
 			V1Api.request { url: "/api/v1/sharelatex/users/#{v1UserId}/docs/#{token}/info" }, (err, response, body) ->
