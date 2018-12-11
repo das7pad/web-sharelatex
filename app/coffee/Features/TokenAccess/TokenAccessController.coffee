@@ -38,7 +38,7 @@ module.exports = TokenAccessController =
 			if !projectExists and settings.overleaf
 				logger.log {token, userId},
 					"[TokenAccess] no project found for this token"
-				TokenAccessHandler.getV1DocInfo token, (err, doc_info) ->
+				TokenAccessHandler.getV1DocInfo token, userId, (err, doc_info) ->
 					return next err if err?
 					return next(new Errors.NotFoundError()) if doc_info.exported
 					if Features.hasFeature('force-import-to-v2')
