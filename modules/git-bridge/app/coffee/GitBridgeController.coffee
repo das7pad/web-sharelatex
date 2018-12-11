@@ -3,7 +3,6 @@ logger = require 'logger-sharelatex'
 GitBridgeHandler = require './GitBridgeHandler'
 GitBridgeErrors = require './GitBridgeErrors'
 
-
 module.exports = GitBridgeController =
 
 	getLatestProjectVersion: (req, res, next) ->

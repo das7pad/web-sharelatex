@@ -15,11 +15,20 @@ MockProjectHistoryApi = require "./helpers/MockProjectHistoryApi"
 MockS3Api = require "./helpers/MockS3Api"
 ProjectGetter = require "#{WEB_PATH}/app/js/Features/Project/ProjectGetter"
 ProjectEntityHandler = require "#{WEB_PATH}/app/js/Features/Project/ProjectEntityHandler"
+CollaboratorsHandler = require "#{WEB_PATH}/app/js/Features/Collaborators/CollaboratorsHandler"
 User = require "#{WEB_PATH}/test/acceptance/js/helpers/User"
+{ProjectInvite} = require "#{WEB_PATH}/app/js/models/ProjectInvite"
 {UserStub} = require "#{WEB_PATH}/app/js/models/UserStub"
+
+OWNER_V1_ID = 123
 
 BLANK_PROJECT = {
 	title: "Test Project"
+	owner: {
+		id: OWNER_V1_ID
+		email: 'owner@example.com'
+		name: 'Owner'
+	}
 	latest_ver_id: 1
 	latex_engine: "pdflatex"
 	token: "write_token"
@@ -44,14 +53,21 @@ getProject = (response, callback) ->
 		throw new Error('could not find imported project') if !project?
 		callback null, project
 
+count = 0
+newUser = () ->
+	user = new User()
+	# Make sure we get emails that don't conflict with other
+	# users so we can test clean/non-existing users.
+	user.email = "overleaf-auth-test-#{count++}@example.com"
+	return user
+
 describe "ProjectImportTests", ->
 	before (done) ->
 		@owner = new User()
 		@owner.login (error) =>
 			throw error if error?
 			conditions = { _id: new ObjectId(@owner.id) }
-			@owner_v1_id = 123
-			update = { $set: { 'overleaf.id': @owner_v1_id } }
+			update = { $set: { 'overleaf.id': OWNER_V1_ID } }
 			db.users.update conditions, update, (error) ->
 				throw error if error?
 				mkdirp Settings.path.dumpFolder, done
@@ -138,10 +154,115 @@ describe "ProjectImportTests", ->
 			updates = MockDocUpdaterApi.getProjectStructureUpdates(@project._id).fileUpdates
 			expect(updates.length).to.equal(0)
 
+	describe 'a project with an un-migrated owner', ->
+		before (done) ->
+			# Another user owns the project that we are importing, but is not migrated
+			# to v2
+			@unmigrated_v1_owner_id = 9876
+			@ol_project_id = 1200000
+			MockOverleafApi.setDoc Object.assign(
+				{ id: @ol_project_id },
+				BLANK_PROJECT,
+				{
+					owner: {
+						id: @unmigrated_v1_owner_id
+						email: 'unmigrated-owner@example.com'
+						name: 'Unmigrated Owner'
+					}
+				}
+			)
+
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+				@response = response
+				done()
+
+		it 'throws an error', ->
+			expect(@response.statusCode).to.equal 501
+
+	describe 'a project with a migrated owner', ->
+		before (done) ->
+			@other_owner_v1_id = 6543
+			@ol_project_id = 1000000
+
+			MockOverleafApi.setDoc Object.assign(
+				{ id: @ol_project_id },
+				BLANK_PROJECT,
+				{
+					owner: {
+						id: @other_owner_v1_id
+						email: 'migrated@example.com'
+						name: 'Migrated Owner'
+					}
+				}
+			)
+
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			@other_owner = new User()
+			@other_owner.ensureUserExists (error) =>
+				throw error if error?
+				@other_owner.setV1Id @other_owner_v1_id, (error) =>
+					throw error if error?
+
+					@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+						getProject response, (error, project) =>
+							@project = project
+							done()
+
+		it 'should import a project with the correct owner', ->
+			expect(@project.owner_ref.toString()).to.equal @other_owner._id
+
+	describe 'a project with docs, files and external files', ->
+		before (done) ->
+			@ol_project_id = 100
+			file = {
+				id: new ObjectId()
+				stream: fs.createReadStream(Path.resolve(__dirname + '/../files/1pixel.png'))
+			}
+			MockS3Api.setFile file
+			ext = {
+				id: new ObjectId()
+				stream: fs.createReadStream(Path.resolve(__dirname + '/../files/foo.bib'))
+			}
+			MockS3Api.setFile ext
+			files = [
+				{type: 'src', file: 'main.tex', latest_content: 'Test Content', main: true}
+				{type: 'att', file: '1pixel.png', file_path: "file/#{file.id}"}
+				{type: 'ext', file: 'foo.bib', file_path: "file/#{ext.id}", agent: "mendeley", agent_data: {importer_id:123, group:456}}
+			]
+			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, files, title: "docs and files project" })
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+				getProject response, (error, project) =>
+					@project = project
+					done()
+
+		it 'should import the docs, files and external files', (done) ->
+			ProjectEntityHandler.getAllEntitiesFromProject @project, (error, docs, files) ->
+				throw error if error?
+				expect(files).to.have.lengthOf(2)
+				expect(docs).to.have.lengthOf(1)
+				expect(docs[0].path).to.equal('/main.tex')
+				expect(files[0].path).to.equal('/1pixel.png')
+				expect(files[1].path).to.equal('/foo.bib')
+				done()
+
+		it 'should not version importing the doc', ->
+			updates = MockDocUpdaterApi.getProjectStructureUpdates(@project._id).docUpdates
+			expect(updates.length).to.equal(0)
+
+		it 'should not version importing the file', ->
+			updates = MockDocUpdaterApi.getProjectStructureUpdates(@project._id).fileUpdates
+			expect(updates.length).to.equal(0)
+
+
 	describe 'a project with a brand variation id', ->
 		before (done) ->
 			@ol_project_id = 1
-			stuff = Object.assign(
+			MockOverleafApi.setDoc Object.assign(
 				{ id: @ol_project_id },
 				BLANK_PROJECT,
 				{
@@ -149,7 +270,6 @@ describe "ProjectImportTests", ->
 					brand_variation_id: 123
 				}
 			)
-			MockOverleafApi.setDoc stuff
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 
@@ -186,7 +306,7 @@ describe "ProjectImportTests", ->
 			@collaborator_v1_id = 234
 			@date = new Date()
 			labels = [
-				{ user_id: @owner_v1_id, history_version: 1, comment: 'hello', created_at: @date }
+				{ user_id: OWNER_V1_ID, history_version: 1, comment: 'hello', created_at: @date }
 				{ user_id: @collaborator_v1_id, history_version: 2, comment: 'goodbye', created_at: @date }
 				{ history_version: 3, comment: 'foobar', created_at: @date }
 			]
@@ -262,3 +382,109 @@ describe "ProjectImportTests", ->
 		it 'should import using the "latex" compiler', ->
 			expect(@project).to.be.an('object')
 			expect(@project.compiler).to.equal('latex')
+
+	describe 'a project with invites', ->
+		before (done) ->
+			@ol_project_id = 1
+			@pendingInviteCode = 'pending-invite-code'
+
+			@acceptedInvitee = newUser()
+			MockOverleafApi.addV1User(@acceptedInvitee)
+			@pendingInvitee = newUser()
+			MockOverleafApi.addV1User(@pendingInvitee)
+			@inviter = newUser()
+			MockOverleafApi.addV1User(@inviter)
+
+			MockOverleafApi.setDoc Object.assign({ id: @ol_project_id }, BLANK_PROJECT, {
+				invites: [{
+					access_level: 'read_write',
+					invitee: {
+						id: @acceptedInvitee.v1Id,
+						email: @acceptedInvitee.email,
+						name: 'acceptedInvitee'
+					},
+					inviter: {
+						id: @inviter.v1Id,
+						email: @inviter.email,
+						name: 'Inviter'
+					}
+				}, {
+					email: @pendingInvitee.email,
+					access_level: 'read_only',
+					code: @pendingInviteCode,
+					inviter: {
+						id: @inviter.v1Id,
+						email: @inviter.email,
+						name: 'Inviter'
+					}
+				}]
+			})
+
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+				getProject response, (error, project) =>
+					@project = project
+					done()
+
+		it 'should still grant access to the owner', (done) ->
+			CollaboratorsHandler.getMemberIdsWithPrivilegeLevels @project._id, (error, members) =>
+				expect(members[0].id).to.equal(@owner.id)
+				done()
+
+		it 'should import the accepted invite', (done) ->
+			CollaboratorsHandler.getMemberIdsWithPrivilegeLevels @project._id, (error, members) =>
+				UserStub.findOne { "overleaf.id": @acceptedInvitee.v1Id }, { _id: 1 }, (error, acceptedInviteeUserStub) =>
+					throw error if error?
+					expect(members[1].id).to.equal(acceptedInviteeUserStub._id.toString())
+					expect(members[1].privilegeLevel).to.equal('readAndWrite')
+					done()
+				return
+
+		it 'should import the pending invite', (done) ->
+			ProjectInvite.findOne { "token": @pendingInviteCode }, { email: 1, token: 1, privileges: 1 }, (error, projectInvite) =>
+				throw error if error?
+				expect(projectInvite.email).to.equal(@pendingInvitee.email)
+				expect(projectInvite.token).to.equal(@pendingInviteCode)
+				expect(projectInvite.privileges).to.equal('readOnly')
+				done()
+			return
+
+	describe 'a project with token-access invites', ->
+		before (done) ->
+			@ol_project_id = 1
+
+			@tokenAccessInvitee = newUser()
+			MockOverleafApi.addV1User(@tokenAccessInvitee)
+
+			MockOverleafApi.setDoc Object.assign({ id: @ol_project_id }, BLANK_PROJECT, {
+				general_access: 'read_write',
+				token_access_invites: [{
+					invitee: {
+						id: @tokenAccessInvitee.v1Id,
+						email: @tokenAccessInvitee.email,
+						name: 'Token based invitee'
+					}
+				}]
+			})
+
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+				getProject response, (error, project) =>
+					@project = project
+					done()
+
+		it 'should still grant access to the owner', (done) ->
+			CollaboratorsHandler.getMemberIdsWithPrivilegeLevels @project._id, (error, members) =>
+				expect(members[0].id).to.equal(@owner.id)
+				done()
+
+		it 'should import the invite', (done) ->
+			CollaboratorsHandler.getMemberIdsWithPrivilegeLevels @project._id, (error, members) =>
+				UserStub.findOne { "overleaf.id": @tokenAccessInvitee.v1Id }, { _id: 1 }, (error, tokenBasedInviteeUserStub) =>
+					throw error if error?
+					expect(members[1].id).to.equal(tokenBasedInviteeUserStub._id.toString())
+					expect(members[1].privilegeLevel).to.equal('readAndWrite')
+					done()
+				return

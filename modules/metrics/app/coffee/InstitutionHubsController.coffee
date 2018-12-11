@@ -4,7 +4,7 @@ Path = require("path")
 InstitutionsGetter = require '../../../../app/js/Features/Institutions/InstitutionsGetter'
 logger = require 'logger-sharelatex'
 
-module.exports = HubsController =
+module.exports = InstitutionHubsController =
 
 	institutionHub: (req, res, next) ->
 		{entity} = req
@@ -17,9 +17,9 @@ module.exports = HubsController =
 				institutionName = null
 				portalSlug = null
 			# fetch signup data from v1
-			HubsController._usageData(id, (usageData)->
+			InstitutionHubsController._usageData(id, (usageData)->
 				# fetch recent usage data from analytics
-				HubsController._recentActivity(id, (recentActivity) ->
+				InstitutionHubsController._recentActivity(id, (recentActivity) ->
 					res.render Path.resolve(__dirname, '../views/institutionHub.pug'), {
 						institutionId: id,
 						institutionName: institutionName,
@@ -31,19 +31,19 @@ module.exports = HubsController =
 			)
 
 	institutionExternalCollaboration: (req, res, next) ->
-		HubsController._v1InstitutionsApi(req.entity.v1Id, 'external_collaboration_data', (err, response, body)->
+		InstitutionHubsController._v1InstitutionsApi(req.entity.v1Id, 'external_collaboration_data', (err, response, body)->
 			return next(err) if err?
 			res.send(body)
 		)
 
 	institutionDepartments: (req, res, next) ->
-		HubsController._v1InstitutionsApi(req.entity.v1Id, 'departments_data', (err, response, body)->
+		InstitutionHubsController._v1InstitutionsApi(req.entity.v1Id, 'departments_data', (err, response, body)->
 			return next(err) if err?
 			res.send(body)
 		)
 
 	institutionRoles: (req, res, next) ->
-		HubsController._v1InstitutionsApi(req.entity.v1Id, 'roles_data', (err, response, body)->
+		InstitutionHubsController._v1InstitutionsApi(req.entity.v1Id, 'roles_data', (err, response, body)->
 			return next(err) if err?
 			res.send(body)
 		)
@@ -64,7 +64,7 @@ module.exports = HubsController =
 			json: true
 		}, (err, response, body) ->
 			if !err && response.statusCode == 200
-				callback(HubsController._formatRecentActivity(body))
+				callback(InstitutionHubsController._formatRecentActivity(body))
 			else
 				callback(null)
 
@@ -88,7 +88,7 @@ module.exports = HubsController =
 		startDate = Math.round(date.setMonth(date.getMonth() - 1) / 1000)
 		query = "?start_date=#{startDate}&end_date=#{endDate}"
 		endpoint = "usage_signup_data#{query}"
-		HubsController._v1InstitutionsApi(id, endpoint, (err, response, body) ->
+		InstitutionHubsController._v1InstitutionsApi(id, endpoint, (err, response, body) ->
 			if !err
 				callback(body)
 			else

@@ -155,9 +155,10 @@ module.exports =
 			webRouter.get settings.collabratec.saml.init_path, (req, res, next) ->
 				(passport.authenticate('saml'))(req, res, next)
 			webRouter.get '/org/ieee/collabratec/auth/link_after_saml_response', CollabratecController.oauthLinkAfterSaml
-			webRouter.get '/org/ieee/collabratec/projects/:project_id', CollabratecController.showProject
 			webRouter.post '/org/ieee/collabratec/auth/confirm_link', CollabratecController.oauthConfirmLink
 			webRouter.post '/org/ieee/collabratec/auth/sign_in_to_link', CollabratecController.oauthSignin
+			webRouter.get '/org/ieee/collabratec/dash', CollabratecController.showDash
+			webRouter.get '/org/ieee/collabratec/projects/:project_id', CollabratecController.showProject
 
 		webRouter.get '/sign_in_to_v1', V1RedirectController.sign_in_and_redirect
 

@@ -130,6 +130,7 @@ module.exports = UserAdminController =
 		'features.references',
 		'features.referencesSearch',
 		'features.mendeley',
+		'features.zotero',
 		'awareOfV2',
 		'useCollabratecV2',
 		'refered_user_count'
@@ -148,6 +149,7 @@ module.exports = UserAdminController =
 		'features.references',
 		'features.referencesSearch',
 		'features.mendeley',
+		'features.zotero',
 		'awareOfV2',
 		'isAdmin',
 		'useCollabratecV2'

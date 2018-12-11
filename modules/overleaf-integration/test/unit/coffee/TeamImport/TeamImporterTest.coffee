@@ -88,7 +88,7 @@ describe "TeamImporter", ->
 		@SubscriptionLocator.findManagedSubscription.withArgs(@duplicateManager.id).yields(null, { id: 'another-subscripiton-id'})
 
 		@SubscriptionUpdater = {
-			addUsersToGroup: sinon.stub().yields(null, true)
+			addUsersToGroupWithoutFeaturesRefresh: sinon.stub().yields(null, true)
 			deleteWithV1Id: sinon.stub().yields(null)
 		}
 
@@ -107,8 +107,12 @@ describe "TeamImporter", ->
 
 			data
 
+		@OverleafAuthenticationManager =
+			setupUser: sinon.stub().yields(null, @user = { _id: @teamAdmin.id })
+
 		@TeamImporter = SandboxedModule.require modulePath, requires:
 			"../OverleafUsers/UserMapper": @UserMapper
+			"../Authentication/OverleafAuthenticationManager": @OverleafAuthenticationManager
 			"../../../../../app/js/Features/Subscription/TeamInvitesHandler": @TeamInvitesHandler
 			"../../../../../app/js/Features/Subscription/SubscriptionLocator": @SubscriptionLocator
 			"../../../../../app/js/Features/Subscription/SubscriptionUpdater": @SubscriptionUpdater
@@ -138,6 +142,7 @@ describe "TeamImporter", ->
 				expect(v2Team.membersLimit).to.eq 32
 				expect(v2Team.admin_id).to.eq @teamAdmin.id
 				expect(v2Team.manager_ids).to.deep.eq [@teamAdmin.id]
+				expect(v2Team.customAccount).to.eq true
 
 				@UserMapper.getSlIdFromOlUser.calledWith(
 					sinon.match.has("id", @v1Team.owner.id)
@@ -146,7 +151,7 @@ describe "TeamImporter", ->
 				@SubscriptionLocator.getGroupWithV1Id.calledWith(@v1Team.id).should.equal true
 				@SubscriptionLocator.findManagedSubscription.calledWith(@teamAdmin.id).should.equal true
 
-				@SubscriptionUpdater.addUsersToGroup.calledWith(@subscriptionId,
+				@SubscriptionUpdater.addUsersToGroupWithoutFeaturesRefresh.calledWith(@subscriptionId,
 					['v2 team admin id', 'v2 team member id']).should.equal true
 
 				@TeamInvitesHandler.importInvite.calledOnce.should.equal true
@@ -171,11 +176,18 @@ describe "TeamImporter", ->
 				@SubscriptionUpdater.deleteWithV1Id.calledWith(@v1Team.id).should.equal true
 				done()
 
-		it "fails if the team admin is not already in v2", (done) ->
-			@UserGetter.getUser.yields(null, null)
+		it "fails if the team admin cannot be found nor created in v2", (done) ->
+			@OverleafAuthenticationManager.setupUser.yields(null, null)
 
 			@TeamImporter.getOrImportTeam @v1Team, (err, v2Team) =>
 				expect(err).to.be.instanceof(Error)
 				expect(err.constructor.name).to.equal('UserNotFoundError')
 				@SubscriptionUpdater.deleteWithV1Id.calledWith(@v1Team.id).should.equal true
+				done()
+
+		it "fails if if users can't be added to group", (done) ->
+			@SubscriptionUpdater.addUsersToGroupWithoutFeaturesRefresh.yields(new Error('Nope'))
+			@TeamImporter.getOrImportTeam @v1Team, (err, v2Team) =>
+				expect(err).to.be.instanceof(Error)
+				@TeamInvitesHandler.importInvite.called.should.equal false
 				done()

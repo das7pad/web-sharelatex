@@ -12,9 +12,12 @@ app.use bodyParser.urlencoded({ extended: true })
 app.use bearerToken()
 
 module.exports = MockOverleafApi =
-
+	collabratec_users: {}
 	projects: {}
 	tokens: {}
+
+	addCollabratecUser: (collabretec_id, user_id) ->
+		@collabratec_users[collabretec_id] = user_id
 
 	addToken: (token, auth) ->
 		@tokens[token] = auth
@@ -23,6 +26,7 @@ module.exports = MockOverleafApi =
 		@projects[token] = projects
 
 	reset: () ->
+		@collabratec_users = {}
 		@tokens = {}
 		@projects = {}
 
@@ -37,21 +41,25 @@ module.exports = MockOverleafApi =
 					email: req.body.email
 			}
 
+		app.get "/api/v1/sharelatex/user_collabratec_id", (req, res) =>
+			return res.json { id: @collabratec_users[req.query.collabratec_id] } if @collabratec_users[req.query.collabratec_id]?
+			res.sendStatus 404
+
 		app.get "/api/v1/collabratec/users/current_user/projects", (req, res) =>
 			return res.json { projects: @projects[req.token] } if @projects[req.token]?
-			res.status(401).send()
+			res.sendStatus 401
 
 		app.get "/api/v1/collabratec/users/current_user/projects/:project_id/metadata", (req, res) =>
-			return res.status(401).send() unless @projects[req.token]?
+			return res.sendStatus 404 unless @projects[req.token]?
 			project = @projects[req.token].find((project) ->
 				return project.id == req.params.project_id
 			)
-			return res.status(404).send() unless project
+			return res.sendStatus 404 unless project
 			res.json project
 
 		app.post "/api/v1/sharelatex/oauth_authorize", (req, res) =>
 			return res.json @tokens[req.body.token] if @tokens[req.body.token]?
-			res.status(401).send()
+			res.sendStatus 401
 
 		app.get "/latex/templates/-/valid-template-id", (req, res) ->
 			res.json({
@@ -64,7 +72,7 @@ module.exports = MockOverleafApi =
 			fs.readFile "#{__dirname}/../../files/test-template.zip", (err, data) ->
 				if err?
 					logger.error { err }, "error reading template file"
-					return res.sendStatus(500) 
+					return res.sendStatus 500
 				res.set("Content-Type", "application/zip")
 				res.send(data)
 
@@ -72,6 +80,24 @@ module.exports = MockOverleafApi =
 			res.sendStatus 204
 
 		app.delete "/api/v1/collabratec/users/current_user/projects/bad-project-id", (req, res) ->
+			res.sendStatus 422
+
+		app.post "/api/v1/collabratec/users/current_user/projects/good-project-id/collabratec", (req, res) ->
+			res.status(201).json({project: "data"})
+
+		app.post "/api/v1/collabratec/users/current_user/projects/bad-project-id/collabratec", (req, res) ->
+			res.sendStatus 422
+
+		app.delete "/api/v1/collabratec/users/current_user/projects/good-project-id/collabratec", (req, res) ->
+			res.sendStatus 204
+
+		app.delete "/api/v1/collabratec/users/current_user/projects/bad-project-id/collabratec", (req, res) ->
+			res.sendStatus 403
+
+		app.post "/api/v1/collabratec/users/current_user/projects/good-project-id/clone", (req, res) ->
+			res.status(201).json({project: "data"})
+
+		app.post "/api/v1/collabratec/users/current_user/projects/bad-project-id/clone", (req, res) ->
 			res.sendStatus 422
 
 		app.listen 5000, (error) ->

@@ -1,5 +1,9 @@
 include ../../../v2-templates/app/views/_template_mixins
 
+mixin branded(branded_portal)
+	if branded_portal.brand_id == 15
+		include branded/ieee
+
 mixin portal_content(id, title, content, card, contentClass, childClass)
 	- var contentClasses = `${contentClass ? contentClass : ''} ${card ? 'card' : ''}`
 
@@ -20,8 +24,15 @@ mixin community_count(count, title)
 
 mixin portal_templates(templates)
 	if templates
-		h2 #{translate("featured_latex_templates")}
-		+templates_list(templates)
+		each templatesData in templates
+			if templatesData.list
+				.row
+					.col-sm-12
+						if templatesData.header
+							h2(class=templatesData.header_class ? templatesData.header_class : "") #{templatesData.header}
+						else
+							h2 #{translate("featured_latex_templates")}
+						+templates_list(templatesData.list)
 	else
 		.row
 			.col-sm-12

@@ -36,6 +36,8 @@ module.exports = MockV1Api =
 
 	existingEmails: []
 
+	brands: {}
+
 	setAffiliations: (affiliations) -> @affiliations = affiliations
 
 	run: () ->
@@ -53,6 +55,20 @@ module.exports = MockV1Api =
 			else
 				res.sendStatus 404
 
+		app.get "/api/v1/sharelatex/users/:v1_user_id/subscription_status", (req, res, next) =>
+			user = @users[req.params.v1_user_id]
+			if user?.subscription_status?
+				res.json user.subscription_status
+			else
+				res.sendStatus 404
+
+		app.delete "/api/v1/sharelatex/users/:v1_user_id/subscription", (req, res, next) =>
+			user = @users[req.params.v1_user_id]
+			if user?
+				user.canceled = true
+				res.sendStatus 200
+			else
+				res.sendStatus 404
 
 		app.post "/api/v1/sharelatex/users/:v1_user_id/sync", (req, res, next) =>
 			@syncUserFeatures(req.params.v1_user_id)
@@ -70,6 +86,12 @@ module.exports = MockV1Api =
 
 		app.delete "/api/v2/users/:userId/affiliations/:email", (req, res, next) =>
 			res.sendStatus 204
+
+		app.get "/api/v2/brands/:slug", (req, res, next) =>
+			if brand = @brands[req.params.slug]
+				res.json brand
+			else
+				res.sendStatus 404
 
 		app.get '/universities/list', (req, res, next) ->
 			res.json []

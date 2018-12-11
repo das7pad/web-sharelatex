@@ -10,20 +10,22 @@ block content
 	//- to do? image as env var
 	- var defaultPortalBannerImage = buildImgPath('portal-default.jpg')
 	- var backgroundImage = portal.banner_image_url ? portal.banner_image_url : defaultPortalBannerImage
+	if brandVariation
+		+branded(brandVariation)
+	else
+		.content.content-alt.content-portal.content-page
+			main(ng-cloak, id="university-content-container" class=print ? 'print' : '')
+				div.banner-image.hidden-print(style=`background-image:url(${backgroundImage})`)
+				if portal.logo_url
+					div.institution-logo
+						div
+							span.image-fill
+							img(src=portal.logo_url alt=portal.title)
 
-	.content.content-alt.content-portal.content-page
-		main(ng-cloak, id="university-content-container" class=print ? 'print' : '')
-			div.banner-image.hidden-print(style=`background-image:url(${backgroundImage})`)
-			if portal.logo_url
-				div.institution-logo
-					div
-						span.image-fill
-						img(src=portal.logo_url alt=portal.title)
+				.portal-name.container
+					h1.text-center #{portal.title} on #{settings.appName}
 
-			.portal-name.container
-				h1.text-center #{portal.title} on #{settings.appName}
-
-			if portal.paid
-				include _portal_paid
-			else
-				include _portal_unpaid
+				if portal.paid
+					include _portal_paid
+				else
+					include _portal_unpaid

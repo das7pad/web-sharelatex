@@ -18,14 +18,17 @@ describe "UserMembershipAuthorization", ->
 			getSessionUser: sinon.stub().returns(@user)
 		@UserMembershipHandler =
 			getEntity: sinon.stub().yields(null, @subscription)
+			getEntityWithoutAuthorizationCheck: sinon.stub().yields(null, @subscription)
 		@AuthorizationMiddlewear =
 			redirectToRestricted: sinon.stub().yields()
+			ensureUserIsSiteAdmin: sinon.stub().yields()
 		@UserMembershipAuthorization = SandboxedModule.require modulePath, requires:
 			'../Authentication/AuthenticationController': @AuthenticationController
 			'../Authorization/AuthorizationMiddlewear': @AuthorizationMiddlewear
 			'./UserMembershipHandler': @UserMembershipHandler
 			'./EntityConfigs': EntityConfigs
 			'../Errors/Errors': Errors
+			'request': @request = sinon.stub().yields(null, null, {})
 			"logger-sharelatex":
 				log: ->
 				err: ->
@@ -44,13 +47,40 @@ describe "UserMembershipAuthorization", ->
 				expect(@req.entityConfig).to.exist
 				done()
 
-		it 'handle entity not found', (done) ->
+		it 'handle entity not found as non-admin', (done) ->
 			@UserMembershipHandler.getEntity.yields(null, null)
+			@UserMembershipHandler.getEntityWithoutAuthorizationCheck.yields(null, null)
 			@UserMembershipAuthorization.requireGroupAccess @req, null, (error) =>
 				expect(error).to.extist
-				sinon.assert.called(@AuthorizationMiddlewear.redirectToRestricted)
+				expect(error).to.be.instanceof(Error)
+				expect(error.constructor.name).to.equal('NotFoundError')
 				sinon.assert.called(@UserMembershipHandler.getEntity)
 				expect(@req.entity).to.not.exist
+				done()
+
+		it 'handle entity not found an admin can create', (done) ->
+			@user.isAdmin = true
+			@UserMembershipHandler.getEntity.yields(null, null)
+			@UserMembershipHandler.getEntityWithoutAuthorizationCheck.yields(null, null)
+			@UserMembershipAuthorization.requirePublisherAccess @req, redirect: (path) =>
+				expect(path).to.extist
+				expect(path).to.match /create/
+				done()
+
+		it 'handle entity not found an admin cannot create', (done) ->
+			@user.isAdmin = true
+			@UserMembershipHandler.getEntity.yields(null, null)
+			@UserMembershipHandler.getEntityWithoutAuthorizationCheck.yields(null, null)
+			@UserMembershipAuthorization.requireGroupAccess @req, null, (error) =>
+				expect(error).to.extist
+				expect(error).to.be.instanceof(Error)
+				expect(error.constructor.name).to.equal('NotFoundError')
+				done()
+
+		it 'handle entity no access', (done) ->
+			@UserMembershipHandler.getEntity.yields(null, null)
+			@UserMembershipAuthorization.requireGroupAccess @req, null, (error) =>
+				sinon.assert.called(@AuthorizationMiddlewear.redirectToRestricted)
 				done()
 
 		it 'handle anonymous user', (done) ->
@@ -101,6 +131,33 @@ describe "UserMembershipAuthorization", ->
 					@req.params.id,
 					modelName: 'Institution',
 				)
+				done()
+
+		it 'handle template with brand access', (done) ->
+			templateData =
+				id: 123
+				title: 'Template Title'
+				brand: { slug: 'brand-slug' }
+			@request.yields(null, { statusCode: 200 }, JSON.stringify(templateData))
+			@UserMembershipAuthorization.requireTemplateAccess @req, null, (error) =>
+				expect(error).to.not.extist
+				sinon.assert.calledWithMatch(
+					@UserMembershipHandler.getEntity,
+					'brand-slug',
+					modelName: 'Publisher',
+				)
+				done()
+
+		it 'handle template without brand access', (done) ->
+			templateData =
+				id: 123
+				title: 'Template Title'
+				brand: null
+			@request.yields(null, { statusCode: 200 }, JSON.stringify(templateData))
+			@UserMembershipAuthorization.requireTemplateAccess @req, null, (error) =>
+				expect(error).to.not.extist
+				sinon.assert.notCalled(@UserMembershipHandler.getEntity)
+				sinon.assert.calledOnce(@AuthorizationMiddlewear.ensureUserIsSiteAdmin)
 				done()
 
 		it 'handle graph access', (done) ->

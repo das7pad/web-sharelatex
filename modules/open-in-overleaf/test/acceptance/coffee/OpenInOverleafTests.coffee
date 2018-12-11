@@ -1,17 +1,17 @@
 expect = require("chai").expect
 async = require("async")
 express = require("express")
+path = require("path")
 {db, ObjectId} = require("../../../../../app/js/infrastructure/mongojs")
 User = require("../../../../../test/acceptance/js/helpers/User")
 ProjectGetter = require("../../../../../app/js/Features/Project/ProjectGetter")
-ProjectEntityHandler = require "../../../../../app/js/Features/Project/ProjectEntityHandler"
+ProjectEntityHandler = require("../../../../../app/js/Features/Project/ProjectEntityHandler")
 
 MockProjectHistoryApi = require('../../../../../test/acceptance/js/helpers/MockProjectHistoryApi')
 MockDocUpdaterApi = require('../../../../../test/acceptance/js/helpers/MockDocUpdaterApi')
 MockFileStoreApi = require ('../../../../../test/acceptance/js/helpers/MockFileStoreApi')
 MockDocstoreApi = require('../../../../../test/acceptance/js/helpers/MockDocstoreApi')
-
-
+MockV1Api = require('../../../../../test/acceptance/js/helpers/MockV1Api')
 
 describe "Open In Overleaf", ->
 	before (done) ->
@@ -27,10 +27,37 @@ describe "Open In Overleaf", ->
 I have a fancy name
 \\end{document}
 """)
+			else if req.query.url == 'http://example.org/boringname.tex'
+				res.send("""
+\\documentclass[12pt]{article}
+\\begin{document}
+\\title{boring name}
+I have a boring name
+\\end{document}
+""")
+			else if req.query.url == 'http://example.org/badname.tex'
+				res.send("""
+\\documentclass[12pt]{article}
+\\begin{document}
+\\title{bad \\\\ name}
+I have a bad name
+\\end{document}
+""")
+			else if req.query.url == 'http://example.org/project.zip'
+				res.sendFile path.join(__dirname, '../fixtures', 'project.zip')
+			else if req.query.url == 'http://example.org/badname.zip'
+				res.sendFile path.join(__dirname, '../fixtures', 'badname.zip')
 			else
 				res.sendStatus(404)
 
 		LinkedUrlProxy.listen 6543, done
+
+		MockV1Api.brands["OSF"] =
+			id: 176
+			name: "Open Science Framework"
+			partner: null
+			slug: "OSF"
+			default_variation_id: 1234
 
 	beforeEach (done) ->
 		@user = new User()
@@ -282,6 +309,158 @@ I have a fancy name
 
 						done()
 
+		describe "when POSTing a snip_uri for a zip file", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						snip_uri: 'http://example.org/project.zip'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should not produce an error", ->
+				expect(@err).not.to.exist
+
+			it "should redirect to a project", ->
+				expect(@res.statusCode).to.equal 302
+				expect(@res.headers.location).to.match @uri_regex
+
+			it "should create a project containing the retrieved snippet", (done) ->
+				projectId = @res.headers.location.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				ProjectGetter.getProject projectId, (error, project) ->
+					return done(error) if error?
+
+					expect(project).to.exist
+					ProjectEntityHandler.getDoc project._id, project.rootDoc_id, (error, lines) ->
+						return done(error) if error?
+
+						expect(lines).to.include 'Wombat? Wombat.'
+
+						done()
+
+		describe "when POSTing a zip_uri for a zip file", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						zip_uri: 'http://example.org/project.zip'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should not produce an error", ->
+				expect(@err).not.to.exist
+
+			it "should redirect to a project", ->
+				expect(@res.statusCode).to.equal 302
+				expect(@res.headers.location).to.match @uri_regex
+
+			it "should create a project containing the retrieved snippet", (done) ->
+				projectId = @res.headers.location.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				ProjectGetter.getProject projectId, (error, project) ->
+					return done(error) if error?
+
+					expect(project).to.exist
+					ProjectEntityHandler.getDoc project._id, project.rootDoc_id, (error, lines) ->
+						return done(error) if error?
+
+						expect(lines).to.include 'Wombat? Wombat.'
+
+						done()
+
+			it "should read the name from the zip's main.tex file", (done) ->
+				projectId = @res.headers.location.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				ProjectGetter.getProject projectId, (error, project) ->
+					return done(error) if error?
+
+					expect(project).to.exist
+					expect(project.name).to.match /^wombat/
+					done()
+
+		describe "when POSTing a zip_uri that contains a publisher_slug", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						zip_uri: 'http://example.org/project.zip'
+						publisher_slug: 'OSF'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should not produce an error", ->
+				expect(@err).not.to.exist
+
+			it "should redirect to a project", ->
+				expect(@res.statusCode).to.equal 302
+				expect(@res.headers.location).to.match @uri_regex
+
+			it "should create a project with the correct brand variation id", (done) ->
+				projectId = @res.headers.location.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				ProjectGetter.getProject projectId, (error, project) ->
+					return done(error) if error?
+
+					expect(project).to.exist
+					expect(project.brandVariationId).to.equal "1234"
+					done()
+
+		describe "when POSTing a zip_uri that contains an invalid publisher_slug", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						zip_uri: 'http://example.org/project.zip'
+						publisher_slug: 'wombat'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should not produce an error", ->
+				expect(@err).not.to.exist
+
+			it "should return 404", ->
+				expect(@res.statusCode).to.equal 500 # TODO: better error handling
+
+		describe "when POSTing a snip_uri for a zip file with an invalid name in the tex contents", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						snip_uri: 'http://example.org/badname.zip'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should not create a project with an invalid name", (done) ->
+				projectId = @res.headers.location.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				ProjectGetter.getProject projectId, (error, project) ->
+					return done(error) if error?
+
+					expect(project).to.exist
+					expect(project.name).to.match /^bad[^\\]+name/
+					done()
+
 		describe "when POSTing a snip_uri that does not exist", ->
 			beforeEach (done) ->
 				@user.request.post
@@ -343,4 +522,137 @@ I have a fancy name
 						return done(error) if error?
 
 						expect(project.name).to.match /fancy name.+/
+						done()
+
+		describe "when snip_name is supplied", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						snip_uri: 'http://example.org/fancyname.tex'
+						snip_name: 'penguin'
+					headers:
+						'X-Requested-With': 'XMLHttpRequest'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should create a project with the correct name", (done) ->
+				projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				ProjectGetter.getProject projectId, (error, project) ->
+					return done(error) if error?
+
+					expect(project.name).to.equal "penguin"
+					done()
+
+			it "should ensure that the project name is unique", (done) ->
+				projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						snip_uri: 'http://example.org/fancyname.tex'
+						snip_name: 'penguin'
+					headers:
+						'X-Requested-With': 'XMLHttpRequest'
+				, (err, res, body) =>
+					expect(err).not.to.exist
+					newProjectId = JSON.parse(body).redirect.match(@uri_regex)[1]
+					expect(newProjectId).to.exist
+
+					ProjectGetter.getProject newProjectId, (error, project) ->
+						return done(error) if error?
+
+						expect(project.name).to.match /penguin.+/
+						done()
+
+		describe "when opening an array of files", ->
+			describe "with a basic .tex and a .zip", ->
+				beforeEach (done) ->
+					@user.request.post
+						url: "/docs"
+						form:
+							_csrf: @user.csrfToken
+							snip_uri: [
+								'http://example.org/test.tex'
+								'http://example.org/project.zip'
+							]
+						headers:
+							'X-Requested-With': 'XMLHttpRequest'
+					, (_err, _res, _body) =>
+						@err = _err
+						@res = _res
+						@body = _body
+						done()
+
+				it "should create a project with the deault project name", (done) ->
+					projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
+					expect(projectId).to.exist
+
+					ProjectGetter.getProject projectId, (error, project) ->
+						return done(error) if error?
+
+						expect(project.name).to.equal "new_snippet_project"
+						done()
+
+				it "should add the .tex file as a document", (done) ->
+					projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
+					expect(projectId).to.exist
+
+					ProjectGetter.getProject projectId, (error, project) ->
+						return done(error) if error?
+
+						expect(project.rootFolder[0].docs.length).to.equal 1
+						expect(project.rootFolder[0].docs[0].name).to.equal 'test.tex'
+						done()
+
+				it "should add the .zip file as a file", (done) ->
+					projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
+					expect(projectId).to.exist
+
+					ProjectGetter.getProject projectId, (error, project) ->
+						return done(error) if error?
+
+						expect(project.rootFolder[0].fileRefs.length).to.equal 1
+						expect(project.rootFolder[0].fileRefs[0].name).to.equal 'project.zip'
+						done()
+
+			describe "when names are supplied for the files", ->
+				beforeEach (done) ->
+					@user.request.post
+						url: "/docs"
+						form:
+							_csrf: @user.csrfToken
+							snip_uri: [
+								'http://example.org/test.tex'
+								'http://example.org/project.zip'
+							]
+							snip_name: [
+								'wombat.tex',
+								'potato.zip'
+							]
+						headers:
+							'X-Requested-With': 'XMLHttpRequest'
+					, (_err, _res, _body) =>
+						@err = _err
+						@res = _res
+						@body = _body
+						done()
+
+				it "should use the supplied filenames", (done) ->
+					projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
+					expect(projectId).to.exist
+
+					ProjectGetter.getProject projectId, (error, project) ->
+						return done(error) if error?
+
+						expect(project.rootFolder[0].docs.length).to.equal 1
+						expect(project.rootFolder[0].docs[0].name).to.equal 'wombat.tex'
+						expect(project.rootFolder[0].fileRefs.length).to.equal 1
+						expect(project.rootFolder[0].fileRefs[0].name).to.equal 'potato.zip'
 						done()
