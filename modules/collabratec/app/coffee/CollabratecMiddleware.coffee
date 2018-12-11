@@ -1,6 +1,7 @@
 AuthorizationManager = require "../../../../app/js/Features/Authorization/AuthorizationManager"
 ProjectCollabratecDetailsHandler = require "../../../../app/js/Features/Project/ProjectCollabratecDetailsHandler"
 V1Api = require "../../../../app/js/Features/V1/V1Api"
+fs = require "fs"
 logger = require "logger-sharelatex"
 mongojs = require "mongojs"
 
@@ -41,10 +42,22 @@ module.exports = CollabratecMiddlewear =
 
 	_v1Proxy: (req, res, next) ->
 		options =
-			json: req.body
 			method: req.method
 			uri: req.originalUrl
+		if req.file?
+			options.formData =
+				zipfile:
+					options:
+						filename: req.file.originalname
+						contentType: req.file.mimetype
+					value: fs.createReadStream req.file.path
+		else if req.body?
+			options.json = req.body
 		V1Api.oauthRequest options, req.token, (err, response, body) ->
+			if req.file?
+				# always delete upload but continue on errors
+				fs.unlink req.file.path, (err) ->
+					logger.error { err }, "error deleting collabratec zip upload"
 			return res.sendStatus err.statusCode if err? && 400 <= err.statusCode < 500
 			return next err if err?
 			res.status response.statusCode

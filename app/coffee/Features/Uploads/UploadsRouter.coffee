@@ -2,11 +2,16 @@ AuthorizationMiddlewear = require('../Authorization/AuthorizationMiddlewear')
 AuthenticationController = require('../Authentication/AuthenticationController')
 ProjectUploadController = require "./ProjectUploadController"
 RateLimiterMiddlewear = require('../Security/RateLimiterMiddlewear')
+Settings = require('settings-sharelatex')
+multer = require('multer')
+
+upload = multer(dest: Settings.path.uploadFolder)
 
 module.exports =
 	apply: (webRouter, apiRouter) ->
 		webRouter.post '/project/new/upload',
 			AuthenticationController.requireLogin(),
+			upload.single('qqfile'),
 			ProjectUploadController.uploadProject
 
 		webRouter.post '/Project/:Project_id/upload',
@@ -18,5 +23,5 @@ module.exports =
 			}),
 			AuthenticationController.requireLogin(),
 			AuthorizationMiddlewear.ensureUserCanWriteProjectContent,
+			upload.single('qqfile'),
 			ProjectUploadController.uploadFile
-
