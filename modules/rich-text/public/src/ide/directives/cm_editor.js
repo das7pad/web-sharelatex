@@ -213,6 +213,9 @@ define([
           this.trackChangesManager.onChangeSession()
 
           codeMirror.on('swapDoc', this.trackChangesManager.onChangeSession)
+          codeMirror.on('viewportChange', () => {
+            console.log('hello')
+          })
         }
 
         const tearDownTrackChanges = function() {

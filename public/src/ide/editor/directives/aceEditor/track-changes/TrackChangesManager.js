@@ -19,6 +19,7 @@ define([
       this.onPaste = this.onPaste.bind(this)
       this.onResize = this.onResize.bind(this)
       this.tearDown = this.tearDown.bind(this)
+      this.onViewportChange = this.onViewportChange.bind(this)
 
       this.$scope = $scope
       this.editor = editor
@@ -427,6 +428,11 @@ define([
         comments: [],
         docId: null
       })
+    }
+
+    onViewportChange() {
+      console.log('here')
+      this.adapter.changeMarkerPositions()
     }
 
     onCut() {

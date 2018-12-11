@@ -8,6 +8,7 @@ define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
       this.shareJsOffsetToRowColumn = this.shareJsOffsetToRowColumn.bind(this)
       this.onDeleteAdded = this.onDeleteAdded.bind(this)
       this.onChangeMoved = this.onChangeMoved.bind(this)
+      this.changeMarkerPositions = this.changeMarkerPositions.bind(this)
       this.editor = editor
       this.cm = this.editor.getCodeMirror()
     }
@@ -58,7 +59,10 @@ define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
         markerNode,
         false
       )
-      this.changeIdToMarkerIdMap[change.id] = markerNode
+      this.changeIdToMarkerIdMap[change.id] = {
+        position: position,
+        marker: markerNode
+      }
 
       this.clearOverlappingDeleteMarkers(markerNode)
     }
@@ -92,7 +96,7 @@ define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
           }
         }
       } else if (typeof this.changeIdToMarkerIdMap[change_id] === 'object') {
-        const markerNode = this.changeIdToMarkerIdMap[change_id]
+        const markerNode = this.changeIdToMarkerIdMap[change_id].marker
 
         this.cm.addWidget(
           { line: start.row, ch: start.column },
@@ -109,9 +113,11 @@ define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
         marker => typeof marker === 'object'
       )
 
+      const markerNodes = markers.map(marker => marker.marker)
+
       // Find overlapping markers (markers on the same line)
       const markerTopValue = markerNode.style.top
-      const markersMatchingTop = markers.filter(
+      const markersMatchingTop = markerNodes.filter(
         marker => marker.style.top === markerTopValue
       )
 
@@ -126,6 +132,24 @@ define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
         if (parseInt(marker.style.left) > mostLeftMarkerValue) {
           marker.style.width = 0
         }
+      }
+    }
+
+    changeMarkerPositions() {
+      const markers = Object.values(this.changeIdToMarkerIdMap).filter(
+        marker => typeof marker === 'object'
+      )
+
+      for (let marker of markers) {
+        const newCoords = this.cm.charCoords({
+          line: marker.position.row,
+          ch: marker.position.column
+        })
+
+        marker.marker.style.top = newCoords.top
+        marker.marker.style.right = newCoords.right
+        marker.marker.style.bottom = newCoords.bottom
+        marker.marker.style.left = newCoords.left
       }
     }
 
