@@ -49,6 +49,16 @@ describe 'GitBridge', ->
 	describe 'get latest version info', ->
 		before ->
 
+		describe 'missing project', ->
+			before ->
+
+			it 'should produce a 404 json response', (done) ->
+				_latestVersionRequest @owner, "#{mongoose.Types.ObjectId()}", (err, response, body) =>
+					expect(err).to.not.exist
+					expect(response.statusCode).to.equal 404
+					expect(body.message).to.equal 'Project not found'
+					done()
+
 		describe 'native v2 project', ->
 			before (done) ->
 				@projectId = null
