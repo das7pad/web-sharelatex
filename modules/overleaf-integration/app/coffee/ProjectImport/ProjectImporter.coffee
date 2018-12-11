@@ -550,7 +550,4 @@ module.exports = ProjectImporter =
 				callback()
 
 	_exportUrl: (v1_project_id, v1_importer_id, action) ->
-		if settings.allowUnauthorizedDocExport
-			"#{settings.apis.v1.url}/api/v1/sharelatex/docs/#{v1_project_id}/export/#{action}"
-		else
-			"#{settings.apis.v1.url}/api/v1/sharelatex/users/#{v1_importer_id}/docs/#{v1_project_id}/export/#{action}"
+		"#{settings.apis.v1.url}/api/v1/sharelatex/users/#{v1_importer_id}/docs/#{v1_project_id}/export/#{action}"
