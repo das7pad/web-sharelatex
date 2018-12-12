@@ -9,22 +9,25 @@ define([
             $scope.handleGateway = function(base64EncodedInput) {
                 let input = JSON.parse(atob(base64EncodedInput));
 
-                if (!_validateInput(input.params, input.action, input.target)) {
+                if (!_validateInput(input)) {
                     $scope.error = true;
-                    return;
-                }
-                if (input.action === 'store') {
+                } else if (input.error) {
+                    $scope.serverError = input.error;
+                } else if (input.action === 'store') {
                     _storeParamsAndRedirect(input.params, input.target);
                 } else if (input.action === 'submit') {
                     _submitParamsAndOpen(_retrieveParamsIfMissing(input.params), input.csrfToken);
                 }
             };
 
-            function _validateInput(params, action, target) {
-                if (action === 'store' && target !== "" && params) {
+            function _validateInput(input) {
+                if (input.error) {
                     return true;
                 }
-                return action === 'submit' && params;
+                if (input.action === 'store' && input.target !== "" && input.params) {
+                    return true;
+                }
+                return input.action === 'submit' && input.params;
             };
 
             function _storeParamsAndRedirect(params, target) {
@@ -34,7 +37,7 @@ define([
 
             function _retrieveParamsIfMissing(params) {
                 if (Object.keys(params).length === 0) {
-                    return JSON.parse(window.sessionStorage.getItem('openInOverleaf'));
+                    return JSON.parse(window.sessionStorage.getItem('openInOverleaf')) || {};
                 }
                 return params;
             };
@@ -46,13 +49,19 @@ define([
                     url: window.location.pathname,
                     data: params
                 }).then(function successCallback(response) {
-                    if (response.data && response.data.redirect) {
+                    if (response.error) {
+                        $scope.serverError = response.error;
+                    } else if (response.data && response.data.redirect) {
                         window.location.replace(response.data.redirect);
                     } else {
                         $scope.error = true;
                     }
                 }, function errorCallback(response) {
-                    $scope.error = true;
+                    if (response.data && response.data.error) {
+                        $scope.serverError = response.data.error;
+                    } else {
+                        $scope.error = true;
+                    }
                 });
             };
         })

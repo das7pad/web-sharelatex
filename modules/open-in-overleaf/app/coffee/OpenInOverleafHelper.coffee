@@ -12,6 +12,8 @@ ProjectHelper = require('../../../../app/js/Features/Project/ProjectHelper')
 ProjectRootDocManager = require('../../../../app/js/Features/Project/ProjectRootDocManager')
 ProjectOptionsHandler = require('../../../../app/js/Features/Project/ProjectOptionsHandler')
 ProjectEntityUpdateHandler = require('../../../../app/js/Features/Project/ProjectEntityUpdateHandler')
+OpenInOverleafErrors = require('./OpenInOverleafErrors')
+Errors = require('../../../../app/js/Features/Errors/Errors')
 SafePath = require('../../../../app/js/Features/Project/SafePath')
 DocumentHelper = require('../../../../app/js/Features/Documents/DocumentHelper')
 V1Api = require('../../../../app/js/Features/V1/V1Api')
@@ -42,7 +44,7 @@ module.exports = OpenInOverleafHelper =
 					[
 						(cb)->
 							FileWriter.writeUrlToDisk 'open_in_overleaf_snippet', UrlHelper.wrapUrlWithProxy(uri.uri), (error, fspath) ->
-								return cb(error) if error?
+								return cb(new Errors.NotFoundError) if error?
 								cb(null, {uri: uri.uri, fspath: fspath})
 						(file, cb)->
 							magic = new mmm.Magic(mmm.MAGIC_MIME_TYPE)
@@ -86,7 +88,7 @@ module.exports = OpenInOverleafHelper =
 
 		# TODO: Implement a file size limit here to prevent shenanigans
 		FileWriter.writeUrlToDisk 'open_in_overleaf_snippet', uri, (error, fspath) ->
-			return cb(error) if error?
+			return cb(new Errors.NotFoundError) if error? || !fspath?
 
 			magic = new mmm.Magic(mmm.MAGIC_MIME_TYPE)
 			magic.detectFile fspath, (error, ctype) ->
@@ -105,7 +107,7 @@ module.exports = OpenInOverleafHelper =
 						cb(null, snippet)
 				else
 					logger.log uri:uri, ctype:ctype, "refusing to open unrecognised content type"
-					cb(new Error("Invalid content type: #{ctype}"))
+					cb(new OpenInOverleafErrors.InvalidFileTypeError)
 
 	populateProjectFromFileList: (project, snippet, callback = (error)->) ->
 		async.eachLimit(
@@ -152,8 +154,8 @@ module.exports = OpenInOverleafHelper =
 			[
 				(cb) ->
 					V1Api.request { uri: "/api/v2/brands/#{encodeURIComponent(publisherSlug)}" }, (err, response, body) ->
+						return cb(new OpenInOverleafErrors.PublisherNotFoundError) if err?.statusCode == 404 || response?.statusCode == 404 || !body?.default_variation_id?
 						return cb(err) if err?
-						return cb(new Error(Error.NotFoundError)) if response.statusCode == 404 || !body?.default_variation_id?
 
 						cb(null, body.default_variation_id)
 				(brandVariationId, cb) ->

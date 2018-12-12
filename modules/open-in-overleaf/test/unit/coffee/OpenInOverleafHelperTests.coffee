@@ -6,14 +6,16 @@ should = chai.should()
 expect = chai.expect
 modulePath = "../../../app/js/OpenInOverleafHelper.js"
 SandboxedModule = require('sandboxed-module')
+OpenInOverleafErrors = require('../../../app/js/OpenInOverleafErrors')
 
 mmmagic =
 	Magic: sinon.stub()
 
-mmmagic.Magic::detectFile = sinon.stub().withArgs(@tmpFile).callsArgWith(1, null, 'text/x-tex')
-
 describe 'OpenInOverleafHelper', ->
 	beforeEach ->
+		@snip = "snippety snip\nsnap snap"
+		@tmpfile = '/tmp/wombat.foo'
+		mmmagic.Magic::detectFile = sinon.stub().withArgs(@tmpfile).callsArgWith(1, null, 'text/x-tex')
 		@FileWriter =
 			writeUrlToDisk: sinon.stub().withArgs('open_in_overleaf_snippet', @snip_uri).callsArgWith(2, null, @tmpfile)
 		@UrlHelper =
@@ -50,7 +52,7 @@ describe 'OpenInOverleafHelper', ->
 				err:->
 
 		@snippet =
-			snip: "snippety snip\nsnap snap"
+			snip: @snip
 			comment: "% commenty comment\n"
 			defaultTitle: "new_snippet_project"
 		@snip_uri = 'http://snip.io/foo.tex'
@@ -93,8 +95,11 @@ snap snap
 			@snippet = {}
 
 		describe "when downloading a .tex file", ->
-			beforeEach ->
-				@OpenInOverleafHelper.populateSnippetFromUri(@snip_uri, @snippet, @cb)
+			beforeEach (done) ->
+				@OpenInOverleafHelper.populateSnippetFromUri @snip_uri, @snippet, (err, result) =>
+					@err = err
+					@snippet = result
+					done()
 
 			it "wraps the snippet with the proxy", ->
 				sinon.assert.calledWith(@UrlHelper.wrapUrlWithProxy, @snip_uri)
@@ -112,12 +117,15 @@ snap snap
 				expect(@snippet.snip).to.equal @snip
 
 			it "calls the callback without an error", ->
-				sinon.assert.calledWith(@cb, null)
+				expect(@err).not.to.exist
 
 		describe "when downloading a zip file", ->
-			beforeEach ->
+			beforeEach (done) ->
 				mmmagic.Magic::detectFile = sinon.stub().withArgs(@tmpFile).callsArgWith(1, null, 'application/zip')
-				@OpenInOverleafHelper.populateSnippetFromUri(@snip_uri, @snippet, @cb)
+				@OpenInOverleafHelper.populateSnippetFromUri @snip_uri, @snippet, (err, result) =>
+					@err = err
+					@snippet = result
+					done()
 
 			it "detects the file type", ->
 				sinon.assert.calledWith(mmmagic.Magic::detectFile, @tmpfile)
@@ -126,18 +134,18 @@ snap snap
 				expect(@snippet.projectFile).to.equal @tmpfile
 
 			it "calls the callback without error", ->
-				sinon.assert.calledWith(@cb, null)
+				expect(@err).not.to.exist
 
 		describe "when downloading an incorrect file type", ->
 			beforeEach ->
-				mmmagic.Magic::detectFile = sinon.stub().withArgs(@tmpFile).callsArgWith(1, null, 'image/png')
+				mmmagic.Magic::detectFile = sinon.stub().withArgs(@tmpfile).callsArgWith(1, null, 'image/png')
 				@OpenInOverleafHelper.populateSnippetFromUri(@snip_uri, {}, @cb)
 
 			it "detects the file type", ->
 				sinon.assert.calledWith(mmmagic.Magic::detectFile, @tmpfile)
 
 			it "raises an error", ->
-				sinon.assert.calledWith(@cb, new Error())
+				sinon.assert.calledWith(@cb, new OpenInOverleafErrors.InvalidFileTypeError)
 
 	describe 'populateSnippetFromUriArray', ->
 		beforeEach ->
