@@ -22,8 +22,7 @@ module.exports = FileStoreHandler =
 			if !stat.isFile()
 				logger.log project_id:project_id, file_id:file_id, fsPath:fsPath, "tried to upload symlink, not contining"
 				return callback(new Error("can not upload symlink"))
-			Async.retry FileStoreHandler.RETRY_ATTEMPTS
-			, (cb) ->
+			Async.retry FileStoreHandler.RETRY_ATTEMPTS, (cb) ->
 				FileStoreHandler._doUploadFileFromDisk project_id, file_id, fsPath, cb
 			, (err, url) ->
 				if err?
