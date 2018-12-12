@@ -1,0 +1,536 @@
+{
+  "latextemplates-cover_letter_1": {
+    "id": 3,
+    "doc_id": 18806,
+    "description": "Plain Cover Letter (latextemplates.com)",
+    "brand_variation_id": null
+  },
+  "latextemplates-article_1": {
+    "id": 4,
+    "doc_id": 18817,
+    "description": "Large Colored Title Article (latextemplates.com)",
+    "brand_variation_id": null
+  },
+  "latextemplates-article_2": {
+    "id": 5,
+    "doc_id": 18815,
+    "description": "Journal Article (latextemplates.com)",
+    "brand_variation_id": null
+  },
+  "arxiv-1": {
+    "id": 6,
+    "doc_id": 19075,
+    "description": "Paper Template for arXiv.org",
+    "brand_variation_id": null
+  },
+  "texample-hand-drawn-lines": {
+    "id": 7,
+    "doc_id": 22740,
+    "description": "Hand-drawn Lines (texample.net)",
+    "brand_variation_id": null
+  },
+  "texample-butterfly-lemma": {
+    "id": 8,
+    "doc_id": 22747,
+    "description": "Butterfly Lemma (texample.net)",
+    "brand_variation_id": null
+  },
+  "conference-demo-20121227": {
+    "id": 10,
+    "doc_id": 29277,
+    "description": "Conference Presentation",
+    "brand_variation_id": null
+  },
+  "UCSD_CSE101_HWK0": {
+    "id": 13,
+    "doc_id": 34191,
+    "description": "UCSD CSE101 course template for homework 0",
+    "brand_variation_id": null
+  },
+  "purdue-thesis": {
+    "id": 116,
+    "doc_id": 755759,
+    "description": "Purdue University Thesis Template",
+    "brand_variation_id": null
+  },
+  "howtotex-colour_article": {
+    "id": 18,
+    "doc_id": 34194,
+    "description": "Colour Article",
+    "brand_variation_id": null
+  },
+  "chem-example": {
+    "id": 11,
+    "doc_id": 29242,
+    "description": "Molecular Chemistry Slides",
+    "brand_variation_id": null
+  },
+  "paper-2": {
+    "id": 12,
+    "doc_id": 29288,
+    "description": "Academic Paper",
+    "brand_variation_id": null
+  },
+  "blank": {
+    "id": 23,
+    "doc_id": 38644,
+    "description": "Blank document",
+    "brand_variation_id": null
+  },
+  "data-descriptor": {
+    "id": 120,
+    "doc_id": 1310737,
+    "description": "Data Descriptor LaTeX template",
+    "brand_variation_id": null
+  },
+  "texample-dartboard": {
+    "id": 16,
+    "doc_id": 31986,
+    "description": "Dartboard",
+    "brand_variation_id": null
+  },
+  "presentation": {
+    "id": 2,
+    "doc_id": 16925,
+    "description": "Beamer Presentation",
+    "brand_variation_id": null
+  },
+  "paper": {
+    "id": 1,
+    "doc_id": 281120,
+    "description": "Paper",
+    "brand_variation_id": null
+  },
+  "overleaf": {
+    "id": 113,
+    "doc_id": 653660,
+    "description": "Overleaf Document Template",
+    "brand_variation_id": 52
+  },
+  "osa-opex-guide": {
+    "id": 114,
+    "doc_id": 689823,
+    "description": "OSA Journal Template",
+    "brand_variation_id": 67
+  },
+  "peerj": {
+    "id": 115,
+    "doc_id": 675263,
+    "description": "PeerJ Journal Template",
+    "brand_variation_id": 69
+  },
+  "osa-opex-simple": {
+    "id": 117,
+    "doc_id": 689908,
+    "description": "Simple template for authors submitting to OSA Optics Express",
+    "brand_variation_id": 67
+  },
+  "osa-optica": {
+    "id": 118,
+    "doc_id": 826823,
+    "description": "Optica Journal LaTeX Template",
+    "brand_variation_id": 94
+  },
+  "ieee-general": {
+    "id": 119,
+    "doc_id": 1131310,
+    "description": "IEEE General Template",
+    "brand_variation_id": 64
+  },
+  "overleaf-ieee": {
+    "id": 121,
+    "doc_id": 2423760,
+    "description": "Overleaf IEEE Branding Demo Template",
+    "brand_variation_id": 64
+  },
+  "template-invoice": {
+    "id": 24,
+    "doc_id": 40523,
+    "description": "Invoice Template",
+    "brand_variation_id": null
+  },
+  "danaernst-weekly_homework_x": {
+    "id": 21,
+    "doc_id": 38019,
+    "description": "Weekly Homework X",
+    "brand_variation_id": null
+  },
+  "texample-interaction_diagram": {
+    "id": 19,
+    "doc_id": 31964,
+    "description": "Interaction Diagram",
+    "brand_variation_id": null
+  },
+  "protected-paper": {
+    "id": 28,
+    "doc_id": 119766,
+    "description": "Protected Doc Template",
+    "brand_variation_id": null
+  },
+  "texample-sunset": {
+    "id": 26,
+    "doc_id": 72753,
+    "description": "Sunset",
+    "brand_variation_id": null
+  },
+  "dan-drake-la-assignment-2": {
+    "id": 27,
+    "doc_id": 95641,
+    "description": "Linear Algebra Assignment 2",
+    "brand_variation_id": null
+  },
+  "klassen-research-diary": {
+    "id": 29,
+    "doc_id": 142494,
+    "description": "Research Diary Template",
+    "brand_variation_id": null
+  },
+  "ieee-bare_adv": {
+    "id": 30,
+    "doc_id": 143589,
+    "description": "IEEE Bare Advanced Demo Template",
+    "brand_variation_id": null
+  },
+  "ieee-bare_conf": {
+    "id": 31,
+    "doc_id": 143591,
+    "description": "IEEE Bare Demo for Conferences",
+    "brand_variation_id": null
+  },
+  "ieee-bare_jrnl": {
+    "id": 32,
+    "doc_id": 143593,
+    "description": "IEEE Bare Demo for Journals",
+    "brand_variation_id": null
+  },
+  "ieee-bare_jrnl_transmag": {
+    "id": 34,
+    "doc_id": 143595,
+    "description": "IEEE Bare Demo for Transactions on Magnetics",
+    "brand_variation_id": null
+  },
+  "ieee-bare_jrnl_compsoc": {
+    "id": 33,
+    "doc_id": 143594,
+    "description": "IEEE Demo Template for Computer Science Journals",
+    "brand_variation_id": null
+  },
+  "MCHE-Report-Template": {
+    "id": 37,
+    "doc_id": 165378,
+    "description": "MCHE Report Template",
+    "brand_variation_id": null
+  },
+  "howtotex-newsletter": {
+    "id": 35,
+    "doc_id": 154003,
+    "description": "Newsletter Template",
+    "brand_variation_id": null
+  },
+  "howtotex-project_report": {
+    "id": 17,
+    "doc_id": 34233,
+    "description": "Project Report",
+    "brand_variation_id": null
+  },
+  "journal-qic": {
+    "id": 38,
+    "doc_id": 167600,
+    "description": "Journal of Quantum Information and Computation",
+    "brand_variation_id": null
+  },
+  "elsevier-article": {
+    "id": 40,
+    "doc_id": 175157,
+    "description": "Elsevier Journal Article",
+    "brand_variation_id": 101
+  },
+  "arrow-shaped-table": {
+    "id": 39,
+    "doc_id": 173476,
+    "description": "Arrow shaped table (The Porter Value Chain)",
+    "brand_variation_id": null
+  },
+  "modern-cv-and-cover-letter": {
+    "id": 56,
+    "doc_id": 187658,
+    "description": "Modern CV and Cover Letter",
+    "brand_variation_id": null
+  },
+  "texample-mindmap": {
+    "id": 25,
+    "doc_id": 45918,
+    "description": "Example Mindmap",
+    "brand_variation_id": null
+  },
+  "texample-beamer-arrows": {
+    "id": 15,
+    "doc_id": 36270,
+    "description": "Beamer Arrows",
+    "brand_variation_id": null
+  },
+  "bmc-article": {
+    "id": 110,
+    "doc_id": 352518,
+    "description": "BioMed Central Article Template",
+    "brand_variation_id": null
+  },
+  "tikz-family-tree": {
+    "id": 67,
+    "doc_id": 256268,
+    "description": "Simple template for creating a Family Tree",
+    "brand_variation_id": null
+  },
+  "howtotex-project_titlepage": {
+    "id": 22,
+    "doc_id": 38374,
+    "description": "Project Titlepage",
+    "brand_variation_id": null
+  },
+  "howtotex-plain-cv": {
+    "id": 9,
+    "doc_id": 29451,
+    "description": "Your new CV",
+    "brand_variation_id": null
+  },
+  "tufte-sample-book": {
+    "id": 42,
+    "doc_id": 180814,
+    "description": "Book design inspired by Ed­ward Tufte",
+    "brand_variation_id": null
+  },
+  "iopart-example": {
+    "id": 111,
+    "doc_id": 333203,
+    "description": "Author guidelines for publishing to IOP journals in LaTeX",
+    "brand_variation_id": null
+  },
+  "tufte-sample-handout": {
+    "id": 43,
+    "doc_id": 180859,
+    "description": "Handout design inspired by Ed­ward Tufte",
+    "brand_variation_id": null
+  },
+  "quick-guide-divisbyzero": {
+    "id": 14,
+    "doc_id": 28864,
+    "description": "A quick guide to LaTeX",
+    "brand_variation_id": null
+  },
+  "beamer-poster": {
+    "id": 44,
+    "doc_id": 186426,
+    "description": "Beamer Conference Poster",
+    "brand_variation_id": null
+  },
+  "sbc-conference-paper-template": {
+    "id": 45,
+    "doc_id": 186669,
+    "description": "SBC Conferences Template",
+    "brand_variation_id": null
+  },
+  "conference-event-timetable": {
+    "id": 46,
+    "doc_id": 187572,
+    "description": "Conference Event Timetable",
+    "brand_variation_id": null
+  },
+  "two-column-cv": {
+    "id": 47,
+    "doc_id": 187579,
+    "description": "Two Column CV",
+    "brand_variation_id": null
+  },
+  "weekly-timetable": {
+    "id": 48,
+    "doc_id": 187585,
+    "description": "Weekly Timetable",
+    "brand_variation_id": null
+  },
+  "monthly-calendar": {
+    "id": 49,
+    "doc_id": 187587,
+    "description": "Monthly Calendar",
+    "brand_variation_id": null
+  },
+  "invoice-latex-templates": {
+    "id": 50,
+    "doc_id": 187595,
+    "description": "Alternative Invoice Template",
+    "brand_variation_id": null
+  },
+  "medium-length-cv": {
+    "id": 51,
+    "doc_id": 187593,
+    "description": "Medium Length Graduate CV",
+    "brand_variation_id": null
+  },
+  "code-snippet": {
+    "id": 52,
+    "doc_id": 187610,
+    "description": "Code Snippet",
+    "brand_variation_id": null
+  },
+  "rsc-paper": {
+    "id": 53,
+    "doc_id": 187641,
+    "description": "Royal Society of Chemistry Paper",
+    "brand_variation_id": null
+  },
+  "rsc-communication": {
+    "id": 54,
+    "doc_id": 187646,
+    "description": "Royal Society of Chemistry Communication",
+    "brand_variation_id": null
+  },
+  "rsc-faraday": {
+    "id": 55,
+    "doc_id": 187648,
+    "description": "Royal Society of Chemistry Faraday Discussion",
+    "brand_variation_id": null
+  },
+  "howtotex-designer_cv": {
+    "id": 20,
+    "doc_id": 31179,
+    "description": "A Designer CV",
+    "brand_variation_id": null
+  },
+  "pdf_tex1": {
+    "id": 57,
+    "doc_id": 177377,
+    "description": "Example of pdf_tex",
+    "brand_variation_id": null
+  },
+  "tikz-inkscape": {
+    "id": 58,
+    "doc_id": 195681,
+    "description": "Example of TikZ export from Inkscape",
+    "brand_variation_id": null
+  },
+  "tikz-inkscape2": {
+    "id": 59,
+    "doc_id": 195696,
+    "description": "Refined example of TikZ export from Inkscape",
+    "brand_variation_id": null
+  },
+  "dia-pgf": {
+    "id": 60,
+    "doc_id": 195680,
+    "description": "A Cube (3D) drawn in Dia and exported as tex with PGF",
+    "brand_variation_id": null
+  },
+  "calculus-1-flashcards": {
+    "id": 61,
+    "doc_id": 213920,
+    "description": "Calculus 1 Flashcards",
+    "brand_variation_id": null
+  },
+  "heart": {
+    "id": 62,
+    "doc_id": 224011,
+    "description": "Heart shaped paragraph",
+    "brand_variation_id": null
+  },
+  "moebius-strip": {
+    "id": 63,
+    "doc_id": 227061,
+    "description": "Moebius Strip",
+    "brand_variation_id": null
+  },
+  "trb": {
+    "id": 64,
+    "doc_id": 225814,
+    "description": "Transportation Research Board Template",
+    "brand_variation_id": null
+  },
+  "modern-cv-banking-special": {
+    "id": 65,
+    "doc_id": 237943,
+    "description": "Modern CV with bespoke style adjustment",
+    "brand_variation_id": null
+  },
+  "masters-doctoral-thesis": {
+    "id": 66,
+    "doc_id": 241711,
+    "description": "Template for a Masters / Doctoral Thesis",
+    "brand_variation_id": null
+  },
+  "todonotes-comments": {
+    "id": 100,
+    "doc_id": 281065,
+    "description": "Inline and margin comments in the pdf",
+    "brand_variation_id": null
+  },
+  "transactions": {
+    "id": 101,
+    "doc_id": 38041,
+    "description": "Transactions Template",
+    "brand_variation_id": null
+  },
+  "memo": {
+    "id": 106,
+    "doc_id": 323989,
+    "description": "Memo Template",
+    "brand_variation_id": null
+  },
+  "llncs": {
+    "id": 102,
+    "doc_id": 302536,
+    "description": "Springer Lecture Notes in Computer Science",
+    "brand_variation_id": null
+  },
+  "f1000research": {
+    "id": 41,
+    "doc_id": 178247,
+    "description": "F1000Research Journal Article Template",
+    "brand_variation_id": 61
+  },
+  "homework-demo": {
+    "id": 104,
+    "doc_id": 307155,
+    "description": "Homework Demo",
+    "brand_variation_id": null
+  },
+  "flowfram-brochure": {
+    "id": 105,
+    "doc_id": 307160,
+    "description": "Landscape Brochure",
+    "brand_variation_id": null
+  },
+  "umemoria": {
+    "id": 107,
+    "doc_id": 329671,
+    "description": "U-Memoria Thesis Template",
+    "brand_variation_id": null
+  },
+  "sw-homework": {
+    "id": 108,
+    "doc_id": 265452,
+    "description": "Sarah Wright Homework Template",
+    "brand_variation_id": null
+  },
+  "sw-portfolio": {
+    "id": 109,
+    "doc_id": 322106,
+    "description": "Sarah Wright Portfolio Template",
+    "brand_variation_id": null
+  },
+  "flooved-demo": {
+    "id": 103,
+    "doc_id": 281120,
+    "description": "Flooved Demo",
+    "brand_variation_id": 105
+  },
+  "hepthesis": {
+    "id": 112,
+    "doc_id": 356379,
+    "description": "hepthesis - A template for academic reports and PhD theses",
+    "brand_variation_id": null
+  },
+  "plos-journal": {
+    "id": 36,
+    "doc_id": 160700,
+    "description": "Public Library of Science PLOS Article",
+    "brand_variation_id": null
+  }
+}
