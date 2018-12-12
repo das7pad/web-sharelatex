@@ -6,6 +6,7 @@ AuthenticationController = require('../../../../app/js/Features/Authentication/A
 ProjectCreationHandler = require('../../../../app/js/Features/Project/ProjectCreationHandler')
 ProjectHelper = require('../../../../app/js/Features/Project/ProjectHelper')
 ProjectDetailsHandler = require('../../../../app/js/Features/Project/ProjectDetailsHandler')
+ProjectOptionsHandler = require('../../../../app/js/Features/Project/ProjectOptionsHandler')
 DocumentHelper = require('../../../../app/js/Features/Documents/DocumentHelper')
 ProjectUploadManager = require('../../../../app/js/Features/Uploads/ProjectUploadManager')
 Errors = require('../../../../app/js/Features/Errors/Errors')
@@ -15,8 +16,9 @@ OpenInOverleafErrors = require('./OpenInOverleafErrors')
 module.exports = OpenInOverleafController =
 	# 'open in overleaf' /docs API
 	openInOverleaf: (req, res, next)->
-		unless req.body.snip? || req.body.encoded_snip? || req.body.snip_uri? || req.body.zip_uri?
-			return next(new OpenInOverleafErrors.MissingParametersError)
+		paramCount = req.body.snip? + req.body.encoded_snip? + req.body.snip_uri? + req.body.zip_uri? + req.body.template?
+		return next(new OpenInOverleafErrors.MissingParametersError) if paramCount == 0
+		return next(new OpenInOverleafErrors.AmbiguousParametersError) if paramCount > 1
 
 		logger.log user: user_id, "creating project from snippet"
 		user_id = AuthenticationController.getLoggedInUserId(req)
@@ -79,8 +81,12 @@ module.exports = OpenInOverleafController =
 						return cb(new OpenInOverleafErrors.ZipExtractError) if err?
 						cb(null, project)
 				(project, cb) ->
-					if snippet.publisherSlug
+					if snippet.publisherSlug?
 						OpenInOverleafHelper.setProjectBrandVariationFromSlug project, snippet.publisherSlug, (err) ->
+							return cb(err) if err?
+							cb(null, project)
+					else if snippet.brandVariationId?
+						ProjectOptionsHandler.setBrandVariationId project._id, snippet.brandVariationId, (err) ->
 							return cb(err) if err?
 							cb(null, project)
 					else
@@ -119,6 +125,8 @@ module.exports = OpenInOverleafController =
 				OpenInOverleafHelper.populateSnippetFromUriArray req.body.snip_uri, snippet, cb
 		else if req.body.snip_uri? || req.body.zip_uri?
 			OpenInOverleafHelper.populateSnippetFromUri req.body.snip_uri || req.body.zip_uri, snippet, cb
+		else if req.body.template?
+			OpenInOverleafHelper.populateSnippetFromTemplate req.body.template, snippet, cb
 		else
 			cb(new OpenInOverleafErrors.MissingParametersError)
 

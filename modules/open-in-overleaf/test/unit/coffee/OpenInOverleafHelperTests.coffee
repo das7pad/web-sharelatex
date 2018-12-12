@@ -15,6 +15,7 @@ describe 'OpenInOverleafHelper', ->
 	beforeEach ->
 		@snip = "snippety snip\nsnap snap"
 		@tmpfile = '/tmp/wombat.foo'
+		@templateUriPrefix = 'http://example.org/'
 		mmmagic.Magic::detectFile = sinon.stub().withArgs(@tmpfile).callsArgWith(1, null, 'text/x-tex')
 		@FileWriter =
 			writeUrlToDisk: sinon.stub().withArgs('open_in_overleaf_snippet', @snip_uri).callsArgWith(2, null, @tmpfile)
@@ -22,7 +23,9 @@ describe 'OpenInOverleafHelper', ->
 			wrapUrlWithProxy: sinon.stub().returnsArg(0)
 		@fs =
 			readFile: sinon.stub().withArgs(@tmpfile, encoding: 'utf8').callsArgWith(2, null, @snip)
-		@settings = {}
+		@settings =
+			openInOverleaf:
+				templateUriPrefix: @templateUriPrefix
 		@ProjectEntityUpdateHandler =
 			addDoc: sinon.stub().callsArg(5)
 			addFile: sinon.stub().callsArg(6)
@@ -68,6 +71,11 @@ snippety snip
 snap snap
 \\end{document}
 """
+		@OpenInOverleafHelper.TEMPLATE_DATA =
+			wombat:
+				brand_variation_id: null
+			potato:
+				brand_variation_id: 1234
 
 	describe 'getDocumentLinesFromSnippet', ->
 		beforeEach ->
@@ -146,6 +154,72 @@ snap snap
 
 			it "raises an error", ->
 				sinon.assert.calledWith(@cb, new OpenInOverleafErrors.InvalidFileTypeError)
+
+		describe "when trying to download an invalid uri", ->
+			it "raises an invalid URI error", (done)->
+				@OpenInOverleafHelper.populateSnippetFromUri "htt::/a", {}, (err) ->
+					expect(err.name).to.equal "InvalidUriError"
+					done()
+
+	describe "populateSnippetFromTemplate", ->
+		beforeEach ->
+			@cb = sinon.stub()
+			@snippet = {}
+			@fs.readFile.callsArgWith(2, null, @templatesJson)
+			@FileWriter.writeUrlToDisk.withArgs(sinon.match.any, "http://example.org/wombat.zip").callsArgWith(2, null, "/tmp/wombat.zip")
+			@FileWriter.writeUrlToDisk.withArgs(sinon.match.any, "http://example.org/potato.zip").callsArgWith(2, null, "/tmp/potato.zip")
+			mmmagic.Magic::detectFile.callsArgWith(1, null, 'application/zip')
+
+		describe "when requesting a template that exists", ->
+			beforeEach (done) ->
+				@OpenInOverleafHelper.populateSnippetFromTemplate 'wombat', @snippet, (err, result) =>
+					@err = err
+					@snippet = result
+					done()
+
+			it "should not raise an error", ->
+				expect(@err).not.to.exist
+
+			it "should download the zip file", ->
+				sinon.assert.calledWith(@UrlHelper.wrapUrlWithProxy, "#{@templateUriPrefix}wombat.zip")
+
+			it "adds thefilesystem path to the snippet", ->
+				expect(@snippet.projectFile).to.equal @tmpfile
+
+			it "does not add a brand variation", ->
+				expect(@snippet.brandVariationId).not.to.exist
+
+		describe "when requesting a template that has a brand variation", ->
+			beforeEach (done) ->
+				@OpenInOverleafHelper.populateSnippetFromTemplate 'potato', @snippet, (err, result) =>
+					@err = err
+					@snippet = result
+					done()
+
+			it "should not raise an error", ->
+				expect(@err).not.to.exist
+
+			it "should download the zip file", ->
+				sinon.assert.calledWith(@UrlHelper.wrapUrlWithProxy, "#{@templateUriPrefix}potato.zip")
+
+			it "adds thefilesystem path to the snippet", ->
+				expect(@snippet.projectFile).to.equal @tmpfile
+
+			it "does not add a brand variation", ->
+				expect(@snippet.brandVariationId).to.equal 1234
+
+		describe "when requesting a template that does not exist", ->
+			beforeEach (done) ->
+				@OpenInOverleafHelper.populateSnippetFromTemplate 'banana', @snippet, (err, result) =>
+					@err = err
+					@snippet = result
+					done()
+
+			it "should raise a template not found error", ->
+				expect(@err.name).to.equal "TemplateNotFoundError"
+
+			it "should not try and download anything", ->
+				sinon.assert.notCalled(@UrlHelper.wrapUrlWithProxy)
 
 	describe 'populateSnippetFromUriArray', ->
 		beforeEach ->

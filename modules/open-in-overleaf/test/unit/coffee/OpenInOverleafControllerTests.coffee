@@ -48,6 +48,8 @@ describe 'OpenInOverleafController', ->
 			fixProjectName: sinon.stub().returnsArg(0)
 		@ProjectUploadManager =
 			createProjectFromZipArchive: sinon.stub().callsArgWith(3, null, @project)
+		@ProjectOptionsHandler =
+			setBrandVariationId: sinon.stub().callsArg(2)
 
 		@OpenInOverleafHelper =
 			getDocumentLinesFromSnippet: sinon.stub().returns((@comment + @snip).split("\n"))
@@ -72,6 +74,7 @@ describe 'OpenInOverleafController', ->
 			'../../../../app/js/Features/Authentication/AuthenticationController': @AuthenticationController
 			'../../../../app/js/Features/Project/ProjectCreationHandler': @ProjectCreationHandler
 			'../../../../app/js/Features/Project/ProjectDetailsHandler': @ProjectDetailsHandler
+			'../../../../app/js/Features/Project/ProjectOptionsHandler': @ProjectOptionsHandler
 			'../../../../app/js/Features/Uploads/ProjectUploadManager': @ProjectUploadManager
 			'./OpenInOverleafHelper': @OpenInOverleafHelper
 
@@ -119,7 +122,6 @@ describe 'OpenInOverleafController', ->
 					sinon.assert.calledWith(@ProjectDetailsHandler.generateUniqueName, @user._id, "potato")
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
-
 
 		describe "when there is no snippet", ->
 			it "should send a missing parameters error", (done)->
@@ -227,6 +229,47 @@ describe 'OpenInOverleafController', ->
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
+		describe "when there is a template parameter", ->
+			beforeEach ->
+				@req.body.template = 'wombat'
+				@OpenInOverleafHelper.populateSnippetFromTemplate = sinon.stub().callsArgWith(2, null, {
+					projectFile: '/foo/bar.zip',
+					defaultTitle: 'new_snippet_project'
+				})
+
+			it "should not raise an error", (done) ->
+				next = sinon.stub()
+				@res.send = =>
+					sinon.assert.notCalled(next)
+					done()
+				@OpenInOverleafController.openInOverleaf @req, @res, next
+
+			it "should populate the snippet from the template", (done) ->
+				@res.send = =>
+					sinon.assert.calledWith(@OpenInOverleafHelper.populateSnippetFromTemplate, 'wombat')
+					done()
+				@OpenInOverleafController.openInOverleaf @req, @res
+
+			it "should create a project from the associated zip", (done) ->
+				@res.send = =>
+					sinon.assert.called(@ProjectUploadManager.createProjectFromZipArchive)
+					done()
+				@OpenInOverleafController.openInOverleaf @req, @res
+
+			describe "when the template has a brand variation", ->
+				beforeEach ->
+					@OpenInOverleafHelper.populateSnippetFromTemplate = sinon.stub().callsArgWith(2, null, {
+						projectFile: '/foo/bar.zip',
+						defaultTitle: 'new_snippet_project',
+						brandVariationId: 1234
+					})
+
+				it "should set the brand variation id on the project", (done) ->
+					@res.send = =>
+						sinon.assert.calledWith(@ProjectOptionsHandler.setBrandVariationId, sinon.match.any, 1234)
+						done()
+					@OpenInOverleafController.openInOverleaf @req, @res
+
 		describe "when populating the snippet returns an error", ->
 			beforeEach ->
 				@req.body.snip_uri = @snip_uri
@@ -238,6 +281,14 @@ describe 'OpenInOverleafController', ->
 				@OpenInOverleafController.openInOverleaf @req, @res, @next
 				sinon.assert.calledWith(@next, @error)
 				sinon.assert.notCalled(@OpenInOverleafHelper.getDocumentLinesFromSnippet)
+
+		describe "when there are multiple types of snippet requested", ->
+			it "should return an 'ambiguous parameters' error", ->
+				@req.body.snip_uri = @snip_uri
+				@req.body.snip = "foo"
+				next = sinon.stub()
+				@OpenInOverleafController.openInOverleaf @req, @res, next
+				sinon.assert.calledWith(next, new OpenInOverleafErrors.AmbiguousParametersError)
 
 	describe "_populateSnippetFromRequest", ->
 		beforeEach ->
