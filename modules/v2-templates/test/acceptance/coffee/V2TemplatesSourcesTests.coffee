@@ -52,6 +52,7 @@ describe "V2TemplatesSources", ->
 		@no_show_source = () ->
 			@V1TemplateResponse.pub.show_source = false
 			@V1TemplateResponse.source = null
+			@V1TemplateResponse.open_in_v2_links = null
 
 	describe "Open as Template button", ->
 		it "shows with show_source and source", (done) ->
