@@ -156,7 +156,9 @@ define([
 
         var detachFromCM = function(sharejsDoc) {
           tearDownSpellCheck()
-          tearDownTrackChanges()
+          if (window.richTextTrackChangesEnabled) {
+            tearDownTrackChanges()
+          }
           tearDownMetadataEventListener()
           sharejsDoc.detachFromCM()
           return sharejsDoc.off('remoteop.richtext')
@@ -213,9 +215,10 @@ define([
           this.trackChangesManager.onChangeSession()
 
           codeMirror.on('swapDoc', this.trackChangesManager.onChangeSession)
-          codeMirror.on('viewportChange', () => {
-            console.log('hello')
-          })
+          codeMirror.on(
+            'viewportChange',
+            this.trackChangesManager.onViewportChange
+          )
         }
 
         const tearDownTrackChanges = function() {
