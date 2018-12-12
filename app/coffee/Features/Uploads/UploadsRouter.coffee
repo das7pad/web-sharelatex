@@ -5,7 +5,8 @@ RateLimiterMiddlewear = require('../Security/RateLimiterMiddlewear')
 Settings = require('settings-sharelatex')
 multer = require('multer')
 
-upload = multer(dest: Settings.path.uploadFolder)
+# handle file uploads with maximum file size of 50MB
+upload = multer(dest: Settings.path.uploadFolder, limits: fileSize: 50*1024*1024)
 
 module.exports =
 	apply: (webRouter, apiRouter) ->
