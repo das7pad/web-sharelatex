@@ -70,7 +70,9 @@ module.exports = ProjectImporter =
 				ProjectImporter._createV2ProjectFromV1Doc v1_project_id, v1_importer_id, doc, callback
 
 	_createV2ProjectFromV1Doc: (v1_project_id, v1_importer_id, doc, callback = (error, v2_project_id) ->) ->
-		v1_owner_id = doc.owner.id
+		v1_owner_id = doc?.owner?.id
+		if !v1_owner_id?
+			return callback(new Error('no doc.owner from v1'))
 		UserMapper.getSlIdFromOlUser doc.owner, (error, v2_owner_id) ->
 			return callback(error) if error?
 

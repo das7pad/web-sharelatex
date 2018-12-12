@@ -495,3 +495,17 @@ describe "ProjectImportTests", ->
 					expect(members[1].privilegeLevel).to.equal('readAndWrite')
 					done()
 				return
+
+	describe 'a project with no owner returned from v1', ->
+		before (done) ->
+			@ol_project_id = 1
+			project = Object.assign({ id: @ol_project_id }, BLANK_PROJECT, {title: "no owner project"})
+			delete project.owner
+			MockOverleafApi.setDoc project
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, @response, body) =>
+				done()
+
+		it 'should not succeed', ->
+			expect(@response.statusCode).to.equal 501
