@@ -209,13 +209,14 @@ test_frontend: test_clean # stop service
 	$(MAKE) compile
 	docker-compose ${DOCKER_COMPOSE_FLAGS} up --exit-code-from test_frontend --abort-on-container-exit test_frontend
 
-test_acceptance: test_clean compile test_acceptance_app_run test_acceptance_modules_run
+test_acceptance: compile test_acceptance_app_run test_acceptance_modules_run
 
-test_acceptance_app: test_clean compile test_acceptance_app_run
+test_acceptance_app: compile test_acceptance_app_run
 
-test_acceptance_module: test_clean compile test_acceptance_module_run
+test_acceptance_module: compile test_acceptance_module_run
 
-test_acceptance_app_run:
+test_acceptance_app_run: test_clean
+	@set -e; \
 	docker-compose ${DOCKER_COMPOSE_FLAGS} run --rm test_acceptance npm -q run test:acceptance:run_dir -- ${MOCHA_ARGS} test/acceptance/js
 
 test_acceptance_modules_run:
@@ -227,7 +228,7 @@ test_acceptance_modules_run:
 		fi; \
 	done
 
-test_acceptance_module_run: $(MODULE_MAKEFILES)
+test_acceptance_module_run: $(MODULE_MAKEFILES) test_clean
 	@if [ -e $(MODULE)/test/acceptance ]; then \
 		cd $(MODULE) && $(MAKE) test_acceptance; \
 	fi
