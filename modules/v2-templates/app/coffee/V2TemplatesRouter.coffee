@@ -35,6 +35,7 @@ module.exports =
 
 		webRouter.get "/latex/templates", V2TemplatesController.getTemplates
 		webRouter.get "/latex/templates/:read_token/clone", V2TemplatesController.cloneTemplate
+		webRouter.get "/latex/templates/:read_token/get_clone", V2TemplatesController.cloneTemplate
 		webRouter.get "/latex/templates/popular", V2TemplatesController.getTemplatesPopular
 		webRouter.get "/latex/templates/popular/page/:page_num", V2TemplatesController.getTemplatesPopular
 		webRouter.get "/latex/templates/recent", V2TemplatesController.getTemplatesRecent
