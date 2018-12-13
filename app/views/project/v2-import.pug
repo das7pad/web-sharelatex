@@ -6,13 +6,13 @@ block content
 			.row
 				.col-sm-8.col-sm-offset-2
 					h1.text-center Move project to Overleaf v2
-					img.v2-import__img(
+					img.v2-import__img.center-block(
 						src="/img/v1-import/v2-editor.png"
 						alt="The new V2 editor."
 					)
 
 					if hasOwner
-						p.text-center
+						p.text-center.row-spaced-small
 							| #[strong #{name}] has not yet been moved into the new version of
 							| Overleaf. You will need to move it in order to continue working
 							| on it. It should only take a few seconds.
@@ -26,19 +26,19 @@ block content
 						)
 							input(name='_csrf', type='hidden', value=csrfToken)
 							form-messages(for="v2ImportForm")
-							input.v2-import__cta(
+							input.row-spaced.btn.btn-primary.text-center.center-block(
 								type="submit"
 								value="Move Project and Continue"
 								ng-disabled="v2ImportForm.inflight || v2ImportForm.response.success"
 							)
 					else
-						p.text-center
+						p.text-center.row-spaced.small
 							| #[strong #{name}] has not yet been moved into the new version of
 							| Overleaf. This project was created anonymously and therefore
 							| cannot be automatically imported. Please download a zip file of
 							| the project and upload that to continue editing it.
 
-						button.v2-import__cta
+						button.row-spaced.btn.btn-primary.text-center.center-block
 							| Download project zip file
 
 
