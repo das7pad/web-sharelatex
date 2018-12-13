@@ -141,11 +141,16 @@ define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
       )
 
       for (let marker of markers) {
-        this.cm.addWidget(
-          { line: marker.position.row, ch: marker.position.column },
-          marker.marker,
-          false
+        const newCoords = this.cm.charCoords(
+          {
+            line: marker.position.row,
+            ch: marker.position.column
+          },
+          'local'
         )
+
+        marker.marker.style.top = newCoords.bottom + 'px'
+        marker.marker.style.left = newCoords.left + 'px'
       }
     }
 
