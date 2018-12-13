@@ -30,6 +30,16 @@ define(['base'], App =>
         showOnlyLabels: false
       }
 
+      let _deregistershowOnlyLabelsWatcher = $scope.$watch(
+        'history.showOnlyLabels',
+        showOnlyLabels => {
+          if (showOnlyLabels != null) {
+            $scope.toolbarUIConfig.showOnlyLabels = showOnlyLabels
+            _deregistershowOnlyLabelsWatcher()
+          }
+        }
+      )
+
       $scope.$watch('toolbarUIConfig.showOnlyLabels', (newVal, oldVal) => {
         if (newVal != null && newVal !== oldVal) {
           if (newVal) {
@@ -41,7 +51,6 @@ define(['base'], App =>
       })
 
       $scope.toggleHistoryViewMode = () => {
-        $scope.toolbarUIConfig.showOnlyLabels = false
         ide.historyManager.toggleHistoryViewMode()
       }
 

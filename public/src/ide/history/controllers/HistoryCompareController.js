@@ -4,16 +4,6 @@
     no-return-assign,
     no-undef,
 */
-// TODO: This file was created by bulk-decaffeinate.
-// Fix any style issues and re-enable lint.
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS205: Consider reworking code to avoid use of IIFEs
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 define(['base', 'ide/history/util/displayNameForUser'], function(
   App,
   displayNameForUser
@@ -29,7 +19,7 @@ define(['base', 'ide/history/util/displayNameForUser'], function(
 
       $scope.$watch('project.members', function(newVal) {
         if (newVal != null) {
-          return ($scope.projectUsers = newVal.concat($scope.project.owner))
+          $scope.projectUsers = newVal.concat($scope.project.owner)
         }
       })
 
@@ -70,9 +60,10 @@ define(['base', 'ide/history/util/displayNameForUser'], function(
       // local data structures.
       $scope.getUserById = id =>
         _.find($scope.projectUsers, function(user) {
-          const curUserId =
-            (user != null ? user._id : undefined) ||
-            (user != null ? user.id : undefined)
+          let curUserId
+          if (user) {
+            curUserId = user._id || user.id
+          }
           return curUserId === id
         })
 

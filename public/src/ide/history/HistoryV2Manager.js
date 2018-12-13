@@ -40,17 +40,24 @@ define([
     HistoryManager = class HistoryManager {
       static initClass() {
         this.prototype.MAX_RECENT_UPDATES_TO_SELECT = 5
-
         this.prototype.BATCH_SIZE = 10
       }
-      constructor(ide, $scope) {
+      constructor(ide, $scope, localStorage) {
         this.labelCurrentVersion = this.labelCurrentVersion.bind(this)
         this.deleteLabel = this.deleteLabel.bind(this)
         this._addLabelLocally = this._addLabelLocally.bind(this)
         this.ide = ide
         this.$scope = $scope
-        this.hardReset()
+        this.localStorage = localStorage
         this.$scope.HistoryViewModes = HistoryViewModes
+        this._localStorageViewModeProjKey = `history.userPrefs.viewMode.${
+          $scope.project_id
+        }`
+        this._localStorageShowOnlyLabelsProjKey = `history.userPrefs.showOnlyLabels.${
+          $scope.project_id
+        }`
+
+        this.hardReset()
 
         this.$scope.toggleHistory = () => {
           if (this.$scope.ui.view === 'history') {
@@ -81,33 +88,52 @@ define([
             }
           }
         )
-
-        let _deregisterFeatureWatcher = this.$scope.$watch(
-          'project.features.versioning',
-          hasVersioning => {
-            if (hasVersioning != null) {
-              this.$scope.history.userHasFullFeature = hasVersioning
-              _deregisterFeatureWatcher()
-            }
-          }
-        )
       }
 
       show() {
         this.$scope.ui.view = 'history'
         this.hardReset()
-        this.$scope.history.viewMode = HistoryViewModes.POINT_IN_TIME
+        if (this.$scope.history.showOnlyLabels) {
+          this.fetchNextBatchOfUpdates()
+        }
       }
 
       hide() {
         this.$scope.ui.view = 'editor'
       }
 
+      _getViewModeUserPref() {
+        return (
+          this.localStorage(this._localStorageViewModeProjKey) ||
+          HistoryViewModes.POINT_IN_TIME
+        )
+      }
+      _getShowOnlyLabelsUserPref() {
+        return (
+          this.localStorage(this._localStorageShowOnlyLabelsProjKey) || false
+        )
+      }
+
+      _setViewModeUserPref(viewModeUserPref) {
+        if (
+          viewModeUserPref === HistoryViewModes.POINT_IN_TIME ||
+          viewModeUserPref === HistoryViewModes.COMPARE
+        ) {
+          this.localStorage(this._localStorageViewModeProjKey, viewModeUserPref)
+        }
+      }
+      _setShowOnlyLabelsUserPref(showOnlyLabelsUserPref) {
+        this.localStorage(
+          this._localStorageShowOnlyLabelsProjKey,
+          !!showOnlyLabelsUserPref
+        )
+      }
+
       hardReset() {
         this.$scope.history = {
           isV2: true,
           updates: [],
-          viewMode: null,
+          viewMode: this._getViewModeUserPref(),
           nextBeforeTimestamp: null,
           atEnd: false,
           userHasFullFeature: undefined,
@@ -130,14 +156,23 @@ define([
             file: null
           },
           error: null,
-          showOnlyLabels: false,
+          showOnlyLabels: this._getShowOnlyLabelsUserPref(),
           labels: null,
           loadingFileTree: true
         }
+        let _deregisterFeatureWatcher = this.$scope.$watch(
+          'project.features.versioning',
+          hasVersioning => {
+            if (hasVersioning != null) {
+              this.$scope.history.userHasFullFeature = hasVersioning
+              _deregisterFeatureWatcher()
+            }
+          }
+        )
       }
 
       softReset() {
-        this.$scope.history.viewMode = null
+        this.$scope.history.viewMode = this._getViewModeUserPref()
         this.$scope.history.selection = {
           docs: {},
           pathname: null,
@@ -156,7 +191,7 @@ define([
           file: null
         }
         this.$scope.history.error = null
-        this.$scope.history.showOnlyLabels = false
+        this.$scope.history.showOnlyLabels = this._getShowOnlyLabelsUserPref()
         this.$scope.history.loadingFileTree = true
       }
 
@@ -164,9 +199,11 @@ define([
         if (this.$scope.history.viewMode === HistoryViewModes.COMPARE) {
           this.softReset()
           this.$scope.history.viewMode = HistoryViewModes.POINT_IN_TIME
+          this._setViewModeUserPref(HistoryViewModes.POINT_IN_TIME)
         } else {
           this.softReset()
           this.$scope.history.viewMode = HistoryViewModes.COMPARE
+          this._setViewModeUserPref(HistoryViewModes.COMPARE)
         }
         this._handleHistoryUIStateChange()
         this.ide.$timeout(() => {
@@ -184,7 +221,7 @@ define([
         } else {
           // Point-in-time mode
           if (this.$scope.history.showOnlyLabels) {
-            this.selectedLabelFromUpdatesSelection()
+            this.selectLabelFromUpdatesSelection()
           } else {
             this.autoSelectLastVersionForPointInTime()
           }
@@ -215,6 +252,7 @@ define([
       showAllUpdates() {
         if (this.$scope.history.showOnlyLabels) {
           this.$scope.history.showOnlyLabels = false
+          this._setShowOnlyLabelsUserPref(false)
           this._handleHistoryUIStateChange()
         }
       }
@@ -222,6 +260,7 @@ define([
       showOnlyLabels() {
         if (!this.$scope.history.showOnlyLabels) {
           this.$scope.history.showOnlyLabels = true
+          this._setShowOnlyLabelsUserPref(true)
           this._handleHistoryUIStateChange()
         }
       }
@@ -315,7 +354,10 @@ define([
       }
 
       autoSelectLastLabel() {
-        if (this.$scope.history.labels.length === 0) {
+        if (
+          this.$scope.history.labels == null ||
+          this.$scope.history.labels.length === 0
+        ) {
           return
         }
         return this.selectLabelForPointInTime(this.$scope.history.labels[0])
@@ -337,12 +379,16 @@ define([
         this.loadFileTreeForVersion(version)
       }
 
-      selectedLabelFromUpdatesSelection() {
+      selectLabelFromUpdatesSelection() {
         const selectedUpdate = this._getUpdateForVersion(
           this.$scope.history.selection.range.toV
         )
-        const nSelectedLabels =
-          selectedUpdate.labels != null ? selectedUpdate.labels.length : 0
+        let nSelectedLabels = 0
+
+        if (selectedUpdate != null && selectedUpdate.labels != null) {
+          nSelectedLabels = selectedUpdate.labels.length
+        }
+
         // If the currently selected update has no labels, select the last one (version-wise)
         if (nSelectedLabels === 0) {
           this.autoSelectLastLabel()
@@ -407,13 +453,17 @@ define([
         if (nLabels === 1) {
           selection.range.toV = labels[0].version
           selection.range.fromV = labels[0].version
-        } else {
+        } else if (nLabels > 1) {
           selection.range.toV = labels[0].version
           selection.range.fromV = labels[1].version
         }
       }
 
       fetchNextBatchOfUpdates() {
+        if (this.$scope.history.atEnd) {
+          return
+        }
+
         let updatesURL = `/project/${this.ide.project_id}/updates?min_count=${
           this.BATCH_SIZE
         }`
@@ -463,8 +513,15 @@ define([
         let needsPseudoCurrentStateLabel = false
         if (sortedLabels.length > 0 && lastUpdateToV) {
           hasPseudoCurrentStateLabel = sortedLabels[0].isPseudoCurrentStateLabel
-          needsPseudoCurrentStateLabel =
-            sortedLabels[0].version !== lastUpdateToV
+          if (hasPseudoCurrentStateLabel) {
+            needsPseudoCurrentStateLabel =
+              sortedLabels.length > 1
+                ? sortedLabels[1].version !== lastUpdateToV
+                : false
+          } else {
+            needsPseudoCurrentStateLabel =
+              sortedLabels[0].version !== lastUpdateToV
+          }
           if (needsPseudoCurrentStateLabel && !hasPseudoCurrentStateLabel) {
             sortedLabels.unshift({
               id: '1',
@@ -611,12 +668,11 @@ define([
       }
 
       _isLabelSelected(label) {
-        return (
-          label.id ===
-          (this.$scope.history.selection.label != null
-            ? this.$scope.history.selection.label.id
-            : undefined)
-        )
+        if (this.$scope.history.selection.label) {
+          return label.id === this.$scope.history.selection.label.id
+        } else {
+          return false
+        }
       }
 
       _parseDiff(diff) {
@@ -742,7 +798,6 @@ define([
         )
 
         if (firstLoad) {
-          // Make sure that at least the first update is visible
           this._handleHistoryUIStateChange()
         }
       }
