@@ -1,5 +1,6 @@
 AuthorizationManager = require "../../../../app/js/Features/Authorization/AuthorizationManager"
 ProjectCollabratecDetailsHandler = require "../../../../app/js/Features/Project/ProjectCollabratecDetailsHandler"
+ProjectGetter = require "../../../../app/js/Features/Project/ProjectGetter"
 V1Api = require "../../../../app/js/Features/V1/V1Api"
 fs = require "fs"
 logger = require "logger-sharelatex"
@@ -22,11 +23,22 @@ module.exports = CollabratecMiddlewear =
 			CollabratecMiddlewear._handleAuthResponse req, res, next, err, canRead && !becauseSiteAdmin, "read", 403
 
 	v1Proxy: (req, res, next) ->
-		# use v2 if feature flag is set and this is either not a project
-		# route or this is a project route and the project is v2
-		return next() if req.oauth_user.useCollabratecV2 && (!req.params.project_id? || mongojs.ObjectId.isValid(req.params.project_id))
-		# proxy to v1 for all users without feature flag and for v1 projects
-		CollabratecMiddlewear._v1Proxy req, res, next
+		# always proxy to v1 unless feature flag set
+		return CollabratecMiddlewear._v1Proxy req, res, next unless req.oauth_user.useCollabratecV2
+		# always use v2 if not a project query
+		return next() unless req.params.project_id?
+		# always use v2 for v2 project ids
+		return next() if mongojs.ObjectId.isValid(req.params.project_id)
+		# check if v1 project id (readAndWrite token) has been imported to v2
+		ProjectGetter.getProjectIdByReadAndWriteToken req.params.project_id, (err, v2_project_id) ->
+			return next(err) if err?
+			# if project has been imported then handle in v2
+			if v2_project_id?
+				req.params.project_id = v2_project_id
+				next()
+			# otherwise proxy to v1
+			else
+				CollabratecMiddlewear._v1Proxy req, res, next
 
 	_handleAuthResponse: (req, res, next, err, isAuthed, resource, errStatus) ->
 		return next err if err?

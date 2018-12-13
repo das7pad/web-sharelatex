@@ -16,6 +16,7 @@ DocstoreManager = require('../../../../../app/js/Features/Docstore/DocstoreManag
 File = require('../../../../../app/js/models/File').File
 FileStoreHandler = require('../../../../../app/js/Features/FileStore/FileStoreHandler')
 
+ProjectCollabratecDetailsHandler = require "../../../../../app/js/Features/Project/ProjectCollabratecDetailsHandler"
 ProjectCreationHandler = require "../../../../../app/js/Features/Project/ProjectCreationHandler"
 ProjectDetailsHandler = require "../../../../../app/js/Features/Project/ProjectDetailsHandler"
 ProjectEntityUpdateHandler = require "../../../../../app/js/Features/Project/ProjectEntityUpdateHandler"
@@ -109,6 +110,8 @@ module.exports = ProjectImporter =
 				ProjectImporter._importLabels doc.id, v2_project_id, v1_owner_id, cb
 			(cb) ->
 				ProjectImporter._importTags v1_project_id, v2_project_id, v1_owner_id, v2_owner_id, cb
+			(cb) ->
+				ProjectImporter._importCollabratecUsers v2_project_id, v1_owner_id, v2_owner_id, doc.collabratec_users, cb
 			(cb) ->
 				ProjectImporter._confirmExport v1_project_id, v2_project_id, v1_importer_id, cb
 		], (error) ->
@@ -282,6 +285,24 @@ module.exports = ProjectImporter =
 			async.mapSeries(body.tags, (tag, cb) ->
 				TagsHandler.addProjectToTagName v2_user_id, tag, v2_project_id, cb
 			, callback)
+
+	_importCollabratecUsers: (v2_project_id, v1_owner_id, v2_owner_id, collabratec_users, callback = (error) ->) ->
+		return callback() unless collabratec_users? && collabratec_users.length > 0
+		ProjectImporter._populateV2UserIds collabratec_users, v1_owner_id, v2_owner_id, (error) ->
+			return callback error if error?
+			ProjectCollabratecDetailsHandler.setCollabratecUsers v2_project_id, collabratec_users, callback
+
+	_populateV2UserIds: (collabratec_users, v1_owner_id, v2_owner_id, callback = (error) ->) ->
+		async.each collabratec_users,
+			(collabratec_user, cb) ->
+				if collabratec_user.user_id == v1_owner_id
+					collabratec_user.user_id = v2_owner_id
+					return cb()
+				UserMapper.getSlIdFromOlUser {id: collabratec_user.user_id}, (error, v2_user_id) ->
+					return cb error if error?
+					collabratec_user.user_id = v2_user_id
+					cb()
+			callback
 
 	_checkFiles: (files) ->
 		for file in files
