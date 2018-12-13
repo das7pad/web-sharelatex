@@ -51,11 +51,17 @@ module.exports = ProjectImportController =
 			else if error instanceof InvalidNameError
 				unsupportedError("Sorry! #{error.message}, please rename your project and try again")
 			else if error instanceof V2ExportCompleted
-				importCompleted({redir: "/project/#{error.v2_project_id}"})
+				importCompleted({ redir: ProjectImportController._redirUrl(ol_doc_id) })
 			else if error?
 				unsupportedError("Sorry! There was a problem with your import, please try again")
 			else
-				importCompleted({ redir: "/project/#{sl_project_id}" })
+				importCompleted({ redir: ProjectImportController._redirUrl(ol_doc_id) })
+
+	_redirUrl: (ol_doc_id) ->
+		if /^\d/.test ol_doc_id
+			"/#{ol_doc_id}"
+		else
+			"/read/#{ol_doc_id}"
 
 	getFailures: (req, res, next = (error) ->) ->
 		ProjectImportErrorRecorder.getFailures (error, result) ->
