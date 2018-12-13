@@ -728,5 +728,8 @@ describe "Collabratec", ->
 					expect(response.body).to.deep.equal {
 						filename: "test-template.zip"
 						size: 523
+						body:
+							collabratec_document_id: "collabratec-document-id"
+							collabratec_privategroup_id: "collabratec-privategroup-id"
 					}
 					done()
