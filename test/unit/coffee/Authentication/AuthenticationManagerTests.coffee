@@ -18,6 +18,8 @@ describe "AuthenticationManager", ->
 				ObjectId: ObjectId
 			"bcrypt": @bcrypt = {}
 			"settings-sharelatex": @settings
+			"../V1/V1Handler": @V1Handler = {}
+			"../User/UserGetter": @UserGetter = {}
 		@callback = sinon.stub()
 
 	describe "authenticate", ->
@@ -186,29 +188,45 @@ describe "AuthenticationManager", ->
 					done()
 
 		describe "successful set", ->
-			beforeEach -> 
-				@AuthenticationManager.setUserPassword(@user_id, @password, @callback)
+			describe "with SL user in SL", ->
+				beforeEach -> 
+					@UserGetter.getUser = sinon.stub().yields(null, { overleaf: null })
+					@AuthenticationManager.setUserPassword(@user_id, @password, @callback)
 
-			it "should update the user's password in the database", ->
-				args = @db.users.update.lastCall.args
-				expect(args[0]).to.deep.equal {_id: ObjectId(@user_id.toString())}
-				expect(args[1]).to.deep.equal {
-					$set: {
-						"hashedPassword": @hashedPassword
+				it 'should look up the user', ->
+					@UserGetter.getUser.calledWith(@user_id).should.equal true
+
+				it "should update the user's password in the database", ->
+					args = @db.users.update.lastCall.args
+					expect(args[0]).to.deep.equal {_id: ObjectId(@user_id.toString())}
+					expect(args[1]).to.deep.equal {
+						$set: {
+							"hashedPassword": @hashedPassword
+						}
+						$unset: password: true
 					}
-					$unset: password: true
-				}
 
-			it "should hash the password", ->
-				@bcrypt.genSalt
-					.calledWith(12)
-					.should.equal true
-				@bcrypt.hash
-					.calledWith(@password, @salt)
-					.should.equal true
+				it "should hash the password", ->
+					@bcrypt.genSalt
+						.calledWith(12)
+						.should.equal true
+					@bcrypt.hash
+						.calledWith(@password, @salt)
+						.should.equal true
 
-			it "should call the callback", ->
-				@callback.called.should.equal true
+				it "should call the callback", ->
+					@callback.called.should.equal true
+
+			describe "with SL user in v2", ->
+				it "should error"
+
+			describe "with v2 user in SL", ->
+				it "should error"
+
+			describe "with v2 user in v2", ->
+				it "should set the password in v2"
+
+
 
 
 
