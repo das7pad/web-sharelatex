@@ -51,6 +51,7 @@ module.exports = CollabratecMiddlewear =
 						filename: req.file.originalname
 						contentType: req.file.mimetype
 					value: fs.createReadStream req.file.path
+			Object.assign(options.formData, req.body)
 		else if req.body?
 			options.json = req.body
 		V1Api.oauthRequest options, req.token, (err, response, body) ->

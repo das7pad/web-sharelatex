@@ -106,7 +106,7 @@ module.exports = MockOverleafApi =
 
 		app.post "/api/v1/collabratec/users/current_user/projects/upload", upload.single('zipfile'), (req, res) ->
 			res.sendStatus 422 unless req.file?
-			res.json { filename: req.file.originalname, size: req.file.size }
+			res.json { filename: req.file.originalname, size: req.file.size, body: req.body }
 
 		app.listen 5000, (error) ->
 			throw error if error?
