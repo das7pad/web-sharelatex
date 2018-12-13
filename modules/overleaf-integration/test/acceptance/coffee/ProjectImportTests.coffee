@@ -176,10 +176,17 @@ describe "ProjectImportTests", ->
 
 			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
 				@response = response
-				done()
+				getProject response, (error, project) =>
+					@project = project
+					done()
 
-		it 'throws an error', ->
-			expect(@response.statusCode).to.equal 501
+		it 'should import a project with a user stub for the owner id', (done) ->
+			user_stub_id = @project.owner_ref.toString()
+			UserStub.findOne { _id: user_stub_id }, (error, user_stub) =>
+				throw error if error?
+				expect(user_stub.overleaf.id).to.equal @unmigrated_v1_owner_id
+				done()
+			return
 
 	describe 'a project with a migrated owner', ->
 		before (done) ->
@@ -488,3 +495,17 @@ describe "ProjectImportTests", ->
 					expect(members[1].privilegeLevel).to.equal('readAndWrite')
 					done()
 				return
+
+	describe 'a project with no owner returned from v1', ->
+		before (done) ->
+			@ol_project_id = 1
+			project = Object.assign({ id: @ol_project_id }, BLANK_PROJECT, {title: "no owner project"})
+			delete project.owner
+			MockOverleafApi.setDoc project
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, @response, body) =>
+				done()
+
+		it 'should not succeed', ->
+			expect(@response.statusCode).to.equal 501
