@@ -104,8 +104,8 @@ define(['ace/ace', 'ide/editor/EditorShareJsCodec'], function(
       const {
         background_marker_id,
         callout_marker_id
-      } = this.adapter.changeIdToMarkerIdMap[change.id]
-      delete this.adapter.changeIdToMarkerIdMap[change.id]
+      } = this.changeIdToMarkerIdMap[change.id]
+      delete this.changeIdToMarkerIdMap[change.id]
 
       const session = this.editor.getSession()
       session.removeMarker(background_marker_id)

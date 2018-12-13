@@ -25,10 +25,12 @@ define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
     tearDown() {
       // Clear html-node based markers
       const markers = Object.values(this.changeIdToMarkerIdMap).filter(
-        marker => marker.parentNode
+        marker => typeof marker === 'object'
       )
 
-      for (let marker of markers) {
+      const markerNodes = markers.map(marker => marker.marker)
+
+      for (let marker of markerNodes) {
         marker.parentNode.removeChild(marker)
       }
 
