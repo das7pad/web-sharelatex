@@ -15,6 +15,7 @@ module.exports = CollabratecApi =
 		return callback(new Error "collabratec api not configured") unless DEFAULT_PARAMS.baseUrl?
 		return callback(new Error "method required") unless options.method?
 		return callback(new Error "uri required") unless options.uri?
+		return callback(new Error "collabratec_customer_id required") unless collabratec_customer_id?
 		# get RFC-1123 time which is included in in headers and signed
 		current_time = new Date().toUTCString()
 		# get uppercase method for signature

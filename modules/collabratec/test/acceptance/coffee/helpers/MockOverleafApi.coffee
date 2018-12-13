@@ -1,9 +1,13 @@
+Settings = require "settings-sharelatex"
 bearerToken = require "express-bearer-token"
 bodyParser = require "body-parser"
 express = require "express"
 fs = require "fs"
 logger = require "logger-sharelatex"
+multer = require "multer"
 sinon = require "sinon"
+
+upload = multer(dest: Settings.path.uploadFolder)
 
 app = express()
 
@@ -99,6 +103,10 @@ module.exports = MockOverleafApi =
 
 		app.post "/api/v1/collabratec/users/current_user/projects/bad-project-id/clone", (req, res) ->
 			res.sendStatus 422
+
+		app.post "/api/v1/collabratec/users/current_user/projects/upload", upload.single('zipfile'), (req, res) ->
+			res.sendStatus 422 unless req.file?
+			res.json { filename: req.file.originalname, size: req.file.size }
 
 		app.listen 5000, (error) ->
 			throw error if error?

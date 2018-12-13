@@ -1,17 +1,23 @@
 AuthenticationController = require "../../../../app/js/Features/Authentication/AuthenticationController"
 CollabratecController = require "./CollabratecController"
 CollabratecMiddleware = require "./CollabratecMiddleware"
-settings = require "settings-sharelatex"
+Settings = require "settings-sharelatex"
+multer = require "multer"
+
+upload = multer(
+	dest: Settings.path.uploadFolder
+	limits: fileSize: Settings.maxUploadSize
+)
 
 module.exports = 
 	apply: (webRouter, privateApiRouter, publicApiRouter) ->
-		return unless settings.overleaf
+		return unless Settings.overleaf
 
 		publicApiRouter.get "/api/v1/collabratec/users/current_user/projects", AuthenticationController.requireOauth(), CollabratecMiddleware.v1Proxy, CollabratecController.getProjects
 
 		publicApiRouter.post "/api/v1/collabratec/users/current_user/projects", AuthenticationController.requireOauth(), CollabratecController.createProject
 
-		publicApiRouter.post "/api/v1/collabratec/users/current_user/projects/upload", AuthenticationController.requireOauth(), CollabratecController.uploadProject
+		publicApiRouter.post "/api/v1/collabratec/users/current_user/projects/upload", AuthenticationController.requireOauth(), upload.single('zipfile'), CollabratecMiddleware.v1Proxy, CollabratecController.uploadProject
 
 		publicApiRouter.delete "/api/v1/collabratec/users/current_user/projects/:project_id", AuthenticationController.requireOauth(), CollabratecMiddleware.v1Proxy, CollabratecMiddleware.ensureUserCanDeleteProject, CollabratecController.deleteProject
 

@@ -32,6 +32,14 @@ describe "Collabratec", ->
 								return done error if error?
 								@project_id = project_id
 								mkdirp settings.path.dumpFolder, done
+		@token1 =
+			access_token:
+				resource_owner_id: 1
+			collabratec_customer_id: "collabratec-customer-id"
+			user_profile:
+				id: 1
+				email: @user.email
+		MockOverleafApi.addToken "good-token", @token1
 
 	before (done) ->
 		@user2 = new User()
@@ -51,6 +59,23 @@ describe "Collabratec", ->
 				id: 2
 				email: @user2.email
 		MockOverleafApi.addToken "good-token2", @token2
+
+	before (done) ->
+		@v1User = new User()
+		@v1User.ensureUserExists (error) =>
+			return done error if error?
+			@v1User.deleteProjects (error) =>
+				return done error if error?
+				@v1User.setOverleafId 3, (error) =>
+					return done error if error?
+					@v1User.login done
+		@v1Token =
+			access_token:
+				resource_owner_id: 3
+			user_profile:
+				id: 3
+				email: @v1User.email
+		MockOverleafApi.addToken "v1-token", @v1Token
 
 	describe "getProjects", ->
 		describe "without auth", ->
@@ -90,13 +115,6 @@ describe "Collabratec", ->
 					{ id: "proj-15", title: "v1 project o" },
 					{ id: "proj-16", title: "v1 project p" },
 				]
-				@token =
-					access_token:
-						resource_owner_id: 1
-					user_profile:
-						id: 1
-						email: @user.email
-				MockOverleafApi.addToken "good-token", @token
 				MockOverleafApi.addProjects "good-token", @projects
 
 			it "should return projects", (done) ->
@@ -178,15 +196,6 @@ describe "Collabratec", ->
 					done()
 
 	describe "getProjectMetadata", ->
-		before ->
-			@token =
-				access_token:
-					resource_owner_id: 1
-				user_profile:
-					id: 1
-					email: "test@user.com"
-			MockOverleafApi.addToken "good-token", @token
-
 		describe "with v1 project id", ->
 			before ->
 				@project = { id: "proj-1", title: "v1 project a" }
@@ -243,15 +252,6 @@ describe "Collabratec", ->
 					done()
 
 	describe "createProject", ->
-		before ->
-			@token =
-				access_token:
-					resource_owner_id: 1
-				user_profile:
-					id: 1
-					email: "test@user.com"
-			MockOverleafApi.addToken "good-token", @token
-
 		describe "with missing template_id", ->
 			it "should return 422", (done) ->
 				options =
@@ -322,15 +322,6 @@ describe "Collabratec", ->
 					done()
 
 	describe "deleteProject", ->
-		before ->
-			@token =
-				access_token:
-					resource_owner_id: 1
-				user_profile:
-					id: 1
-					email: "test@user.com"
-			MockOverleafApi.addToken "good-token", @token
-
 		describe "with v1 project id", ->
 			describe "when delete succeeds", ->
 				it "should proxy to v1", (done) ->
@@ -400,15 +391,6 @@ describe "Collabratec", ->
 						done()
 
 	describe "linkProject", ->
-		before ->
-			@token =
-				access_token:
-					resource_owner_id: 1
-				user_profile:
-					id: 1
-					email: "test@user.com"
-			MockOverleafApi.addToken "good-token", @token
-
 		describe "with v1 project id", ->
 			describe "when link succeeds", ->
 				it "should proxy to v1", (done) ->
@@ -472,15 +454,6 @@ describe "Collabratec", ->
 						done()
 
 	describe "unlinkProject", ->
-		before ->
-			@token =
-				access_token:
-					resource_owner_id: 1
-				user_profile:
-					id: 1
-					email: "test@user.com"
-			MockOverleafApi.addToken "good-token", @token
-
 		describe "with v1 project id", ->
 			describe "when unlink succeeds", ->
 				it "should proxy to v1", (done) ->
@@ -538,15 +511,6 @@ describe "Collabratec", ->
 						done()
 
 	describe "cloneProject", ->
-		before ->
-			@token =
-				access_token:
-					resource_owner_id: 1
-				user_profile:
-					id: 1
-					email: "test@user.com"
-			MockOverleafApi.addToken "good-token", @token
-
 		describe "with v1 project id", ->
 			describe "when clone succeeds", ->
 				it "should proxy to v1", (done) ->
@@ -678,82 +642,91 @@ describe "Collabratec", ->
 						done()
 
 	describe "uploadProject", ->
-		before ->
-			@token =
-				access_token:
-					resource_owner_id: 1
-				collabratec_customer_id: "collabratec-customer-id"
-				user_profile:
-					id: 1
-					email: "test@user.com"
-
-			MockOverleafApi.addToken "good-token", @token
-
 		beforeEach ->
 			MockCollabratecApi.reset()
 
-		describe "with valid args", ->
-			it "should upload project", (done) ->
+		describe "with collabratec v2 user", () ->
+			describe "with valid args", ->
+				it "should upload project", (done) ->
+					options =
+						auth: bearer: "good-token"
+						formData:
+							collabratec_document_id: "collabratec-document-id"
+							collabratec_privategroup_id: "collabratec-privategroup-id"
+							zipfile: fs.createReadStream(Path.resolve __dirname, "../files/test-template.zip")
+						method: "POST"
+						url: "/api/v1/collabratec/users/current_user/projects/upload"
+					request options, (error, response, body) =>
+						expect(response.statusCode).to.equal 204
+						# api calls back immediately so must wait for upload to complete
+						# retry this 100 times waiting 100ms between tries (10s max)
+						async.retry(
+							100
+							(callback) =>
+								setTimeout(
+									() =>
+										return callback(new Error("project upload did not complete")) if MockCollabratecApi.requests.length == 0
+										expect(MockCollabratecApi.requests.length).to.equal 1
+										expect(MockCollabratecApi.requests[0].body.storageProviderId).to.be.defined
+										expect(MockCollabratecApi.requests[0].body.uploadStatus).to.equal "success"
+										expect(MockCollabratecApi.requests[0].headers["x-ppct-signature"]).to.be.defined
+										expect(MockCollabratecApi.requests[0].headers["x-ppct-date"]).to.be.defined
+										expect(MockCollabratecApi.requests[0].headers["x-extnet-access"]).to.equal "Y29sbGFicmF0ZWMtY3VzdG9tZXItaWQ="
+										project_id = MockCollabratecApi.requests[0].body.storageProviderId
+										ProjectModel.findOne {_id: project_id }, (err, project) =>
+											return done err if err?
+											expect(project.collabratecUsers[0].collabratec_document_id).to.equal "collabratec-document-id"
+											expect(project.collabratecUsers[0].collabratec_privategroup_id).to.equal "collabratec-privategroup-id"
+											expect(project.collabratecUsers[0].user_id.toString()).to.equal @user.id
+										callback()
+									100
+								)
+							(err) =>
+								expect(err).to.be.undefined
+								done()
+						)
+
+			describe "without collabratec_document_id", ->
+				it "should return 422", (done) ->
+					options =
+						auth: bearer: "good-token"
+						formData:
+							collabratec_privategroup_id: "collabratec-privategroup-id"
+							zipfile: fs.createReadStream(Path.resolve __dirname, "../files/test-template.zip")
+						method: "POST"
+						url: "/api/v1/collabratec/users/current_user/projects/upload"
+					request options, (error, response, body) =>
+						expect(response.statusCode).to.equal 422
+						done()
+
+			describe "without zipfile", ->
+				it "should return 422", (done) ->
+					options =
+						auth: bearer: "good-token"
+						formData:
+							collabratec_document_id: "collabratec-document-id"
+							collabratec_privategroup_id: "collabratec-privategroup-id"
+						method: "POST"
+						url: "/api/v1/collabratec/users/current_user/projects/upload"
+					request options, (error, response, body) =>
+						expect(response.statusCode).to.equal 422
+						done()
+
+		describe "with collabratec v1 user", () ->
+			it "should proxy request to v1", (done) ->
 				options =
-					auth: bearer: "good-token"
+					auth: bearer: "v1-token"
 					formData:
 						collabratec_document_id: "collabratec-document-id"
 						collabratec_privategroup_id: "collabratec-privategroup-id"
 						zipfile: fs.createReadStream(Path.resolve __dirname, "../files/test-template.zip")
+					json: true
 					method: "POST"
 					url: "/api/v1/collabratec/users/current_user/projects/upload"
 				request options, (error, response, body) =>
-					expect(response.statusCode).to.equal 204
-					# api calls back immediately so must wait for upload to complete
-					# retry this 100 times waiting 100ms between tries (10s max)
-					async.retry(
-						100
-						(callback) =>
-							setTimeout(
-								() =>
-									return callback(new Error("project upload did not complete")) if MockCollabratecApi.requests.length == 0
-									expect(MockCollabratecApi.requests.length).to.equal 1
-									expect(MockCollabratecApi.requests[0].body.storageProviderId).to.be.defined
-									expect(MockCollabratecApi.requests[0].body.uploadStatus).to.equal "success"
-									expect(MockCollabratecApi.requests[0].headers["x-ppct-signature"]).to.be.defined
-									expect(MockCollabratecApi.requests[0].headers["x-ppct-date"]).to.be.defined
-									expect(MockCollabratecApi.requests[0].headers["x-extnet-access"]).to.equal "Y29sbGFicmF0ZWMtY3VzdG9tZXItaWQ="
-									project_id = MockCollabratecApi.requests[0].body.storageProviderId
-									ProjectModel.findOne {_id: project_id }, (err, project) =>
-										return done err if err?
-										expect(project.collabratecUsers[0].collabratec_document_id).to.equal "collabratec-document-id"
-										expect(project.collabratecUsers[0].collabratec_privategroup_id).to.equal "collabratec-privategroup-id"
-										expect(project.collabratecUsers[0].user_id.toString()).to.equal @user.id
-									callback()
-								100
-							)
-						(err) =>
-							expect(err).to.be.undefined
-							done()
-					)
-
-		describe "without collabratec_document_id", ->
-			it "should return 422", (done) ->
-				options =
-					auth: bearer: "good-token"
-					formData:
-						collabratec_privategroup_id: "collabratec-privategroup-id"
-						zipfile: fs.createReadStream(Path.resolve __dirname, "../files/test-template.zip")
-					method: "POST"
-					url: "/api/v1/collabratec/users/current_user/projects/upload"
-				request options, (error, response, body) =>
-					expect(response.statusCode).to.equal 422
-					done()
-
-		describe "without zipfile", ->
-			it "should return 422", (done) ->
-				options =
-					auth: bearer: "good-token"
-					formData:
-						collabratec_document_id: "collabratec-document-id"
-						collabratec_privategroup_id: "collabratec-privategroup-id"
-					method: "POST"
-					url: "/api/v1/collabratec/users/current_user/projects/upload"
-				request options, (error, response, body) =>
-					expect(response.statusCode).to.equal 422
+					expect(response.statusCode).to.equal 200
+					expect(response.body).to.deep.equal {
+						filename: "test-template.zip"
+						size: 523
+					}
 					done()
