@@ -6,6 +6,7 @@ modulePath = "../../../../app/js/Features/Authentication/AuthenticationManager.j
 SandboxedModule = require('sandboxed-module')
 events = require "events"
 ObjectId = require("mongojs").ObjectId
+Errors = require "../../../../app/js/Features/Errors/Errors"
 
 describe "AuthenticationManager", ->
 	beforeEach ->
@@ -30,7 +31,7 @@ describe "AuthenticationManager", ->
 					email: @email = "USER@sharelatex.com"
 				@unencryptedPassword = "banana"
 				@User.findOne = sinon.stub().callsArgWith(1, null, @user)
-		
+
 			describe "when the hashed password matches", ->
 				beforeEach (done) ->
 					@user.hashedPassword = @hashedPassword = "asdfjadflasdf"
@@ -153,7 +154,7 @@ describe "AuthenticationManager", ->
 		describe "too long", ->
 			beforeEach ->
 				@settings.passwordStrengthOptions =
-					length: 
+					length:
 						max:10
 				@password = "dsdsadsadsadsadsadkjsadjsadjsadljs"
 
@@ -187,9 +188,9 @@ describe "AuthenticationManager", ->
 					@bcrypt.hash.called.should.equal false
 					done()
 
-		describe "successful set", ->
+		describe "password set attempt", ->
 			describe "with SL user in SL", ->
-				beforeEach -> 
+				beforeEach ->
 					@UserGetter.getUser = sinon.stub().yields(null, { overleaf: null })
 					@AuthenticationManager.setUserPassword(@user_id, @password, @callback)
 
@@ -218,15 +219,31 @@ describe "AuthenticationManager", ->
 					@callback.called.should.equal true
 
 			describe "with SL user in v2", ->
-				it "should error"
+				beforeEach (done) ->
+					@settings.overleaf = true
+					@UserGetter.getUser = sinon.stub().yields(null, { overleaf: null })
+					@AuthenticationManager.setUserPassword @user_id, @password, (err, changed) =>
+						@callback(err, changed)
+						done()
+				it "should error", ->
+					@callback.calledWith(new Errors.SLInV2Error("Password Reset Attempt")).should.equal true
 
 			describe "with v2 user in SL", ->
-				it "should error"
+				beforeEach (done) ->
+					@UserGetter.getUser = sinon.stub().yields(null, { overleaf: {id: 1} })
+					@AuthenticationManager.setUserPassword @user_id, @password, (err, changed) =>
+						@callback(err, changed)
+						done()
+				it "should error", ->
+					@callback.calledWith(new Errors.NotInV2Error("Password Reset Attempt")).should.equal true
 
 			describe "with v2 user in v2", ->
-				it "should set the password in v2"
-
-
-
-
-
+				beforeEach (done) ->
+					@settings.overleaf = true
+					@UserGetter.getUser = sinon.stub().yields(null, { overleaf: {id: 1} })
+					@V1Handler.doPasswordReset = sinon.stub().yields(null, true)
+					@AuthenticationManager.setUserPassword @user_id, @password, (err, changed) =>
+						@callback(err, changed)
+						done()
+				it "should set the password in v2", ->
+					@callback.calledWith(null, true).should.equal true
