@@ -40,14 +40,14 @@ script(type="text/ng-template", id="historyFileEntityTpl")
 				) {{ ::$ctrl.fileEntity.name }}
 				span.history-file-entity-operation-badge(
 					ng-if="::$ctrl.hasOperation && $ctrl.fileEntity.operation !== 'renamed' && $ctrl.fileEntity.operation !== 'removed'"
-				) {{ ::$ctrl.getFileOperationName('#{ translate('file_action_edited') }', '#{ translate('file_action_renamed') }', '#{ translate('file_action_created') }', '#{ translate('file_action_deleted') }') }}
+				) {{ ::$ctrl.getFileOperationName() }}
 				span.history-file-entity-operation-badge(
 					ng-if="::$ctrl.hasOperation && $ctrl.fileEntity.operation === 'renamed'"
 					tooltip-append-to-body="true"
 					tooltip-placement="right"
 					tooltip-class="tooltip-history-file-tree"
-					tooltip-html=`::$ctrl.getRenameTooltip('${ translate('file_action_renamed') }')`
-				) {{ ::$ctrl.getFileOperationName('#{ translate('file_action_edited') }', '#{ translate('file_action_renamed') }', '#{ translate('file_action_created') }', '#{ translate('file_action_deleted') }') }}
+					tooltip-html=`::$ctrl.getRenameTooltip()`
+				) {{ ::$ctrl.getFileOperationName() }}
 		div(
 			ng-show="$ctrl.isOpen"
 		)
@@ -55,3 +55,8 @@ script(type="text/ng-template", id="historyFileEntityTpl")
 				ng-repeat="childEntity in $ctrl.fileEntity.children"
 				file-entity="childEntity"
 			)
+
+script(type="template", id="file_action_edited_str") #{ translate('file_action_edited') }
+script(type="template", id="file_action_renamed_str") #{ translate('file_action_renamed') }
+script(type="template", id="file_action_created_str") #{ translate('file_action_created') }
+script(type="template", id="file_action_deleted_str") #{ translate('file_action_deleted') }

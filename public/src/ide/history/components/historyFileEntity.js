@@ -10,10 +10,11 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['base', 'ide/file-tree/util/iconTypeFromName'], function(
-  App,
-  iconTypeFromName
-) {
+define([
+  'base',
+  'ide/file-tree/util/iconTypeFromName',
+  'ide/file-tree/util/fileOperationI18nNames'
+], function(App, iconTypeFromName, fileOperationI18nNames) {
   const historyFileEntityController = function($scope, $element, $attrs) {
     const ctrl = this
     ctrl.hasOperation = false
@@ -22,22 +23,19 @@ define(['base', 'ide/file-tree/util/iconTypeFromName'], function(
         ctrl.fileEntity.oldPathname,
         ctrl.fileEntity.pathname
       )
-      return `${i18nRenamedStr} <strong>${simplifiedOldPathname}</strong> &rarr; <strong>${simplifiedPathname}</strong>`
+      return `${
+        fileOperationI18nNames.renamed
+      } <strong>${simplifiedOldPathname}</strong> &rarr; <strong>${simplifiedPathname}</strong>`
     }
-    ctrl.getFileOperationName = (
-      i18nEditedStr,
-      i18nRenamedStr,
-      i18nCreatedStr,
-      i18nDeletedStr
-    ) => {
+    ctrl.getFileOperationName = () => {
       if (ctrl.fileEntity.operation === 'edited') {
-        return i18nEditedStr
+        return fileOperationI18nNames.edited
       } else if (ctrl.fileEntity.operation === 'renamed') {
-        return i18nRenamedStr
+        return fileOperationI18nNames.renamed
       } else if (ctrl.fileEntity.operation === 'added') {
-        return i18nCreatedStr
+        return fileOperationI18nNames.created
       } else if (ctrl.fileEntity.operation === 'removed') {
-        return i18nDeletedStr
+        return fileOperationI18nNames.deleted
       } else {
         return ''
       }
