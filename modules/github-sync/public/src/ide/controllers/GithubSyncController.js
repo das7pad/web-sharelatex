@@ -30,7 +30,7 @@ define(['base'], App =>
       )
       return (
         ide.$scope.project.owner._id === ide.$scope.user.id ||
-        projectMembers.includes(ide.$scope.user.ud)
+        projectMembers.includes(ide.$scope.user.id)
       )
     }
   }))
