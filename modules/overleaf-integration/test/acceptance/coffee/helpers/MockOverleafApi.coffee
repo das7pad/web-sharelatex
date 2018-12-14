@@ -26,6 +26,9 @@ module.exports = MockOverleafApi =
 	setHistoryExportVersion: (docId, version) ->
 		@historyExportVersions[docId] = version
 
+	nextV1Id: () ->
+		@v1Id++
+
 	addAffiliation: sinon.stub()
 
 	setDoc: (doc) ->
@@ -53,7 +56,21 @@ module.exports = MockOverleafApi =
       res.sendStatus 204
 
 		app.get "/api/v1/sharelatex/users/:ol_user_id/docs/:ol_doc_id/export/history", (req, res, next) =>
-			res.json exported: true
+			doc = @docs[req.params.ol_doc_id]
+			if doc?.exported?
+				res.json
+					exported: doc.exported
+					latest_ver_id: doc.latest_ver_id
+			else
+				res.json exported: true
+
+		app.post "/api/v1/sharelatex/users/:ol_user_id/docs/:ol_doc_id/export/start_history_export", (req, res, next) =>
+			doc = @docs[req.params.ol_doc_id]
+			if doc?.authorized == false
+				return res.sendStatus 403
+			if doc?.onExportStart?
+				doc?.onExportStart()
+			res.sendStatus 200
 
 		app.get "/api/v1/sharelatex/users/:ol_user_id/docs/:ol_doc_id/export/tags", (req, res, next) =>
 			doc = @docs[req.params.ol_doc_id]

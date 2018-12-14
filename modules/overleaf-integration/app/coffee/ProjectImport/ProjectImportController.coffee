@@ -1,7 +1,11 @@
 logger = require "logger-sharelatex"
 ProjectImporter = require "./ProjectImporter"
 ProjectImportErrorRecorder = require "./ProjectImportErrorRecorder"
-AuthenticationController = require "../../../../../app/js/Features/Authentication/AuthenticationController"
+WEB_PATH = "../../../../../app/js"
+AuthenticationController = require "#{WEB_PATH}/Features/Authentication/AuthenticationController"
+UserGetter = require "#{WEB_PATH}/Features/User/UserGetter"
+HistoryController = require "#{WEB_PATH}/Features/History/HistoryController"
+V1Api = require "#{WEB_PATH}/Features/V1/V1Api"
 {
 	UnsupportedFileTypeError,
 	UnsupportedExportRecordsError
@@ -56,3 +60,22 @@ module.exports = ProjectImportController =
 		ProjectImportErrorRecorder.getFailures (error, result) ->
 			return next(error) if error?
 			res.send {failures: result}
+
+	downloadZip: (req, res, next) ->
+		userId = AuthenticationController.getLoggedInUserId(req)
+		{ol_doc_id} = req.params
+		UserGetter.getUser userId, {overleaf: 1}, (err, user) ->
+			return next(err) if err?
+			v1_user_id = user.overleaf?.id?
+			return next(new Error('expected v1 id')) if !v1_user_id?
+			ProjectImportController._startHistoryExport ol_doc_id, v1_user_id, (err) ->
+				return next(err) if err?
+				ProjectImporter._waitForV1HistoryExport ol_doc_id, v1_user_id, (err, latest_ver_id) ->
+					return next(err) if err?
+					HistoryController._pipeHistoryZipToResponse ol_doc_id, latest_ver_id, ol_doc_id, res, next
+
+	_startHistoryExport: (ol_doc_id, v1_user_id, callback = (error) ->) ->
+		V1Api.request {
+			method: "POST",
+			url: "/api/v1/sharelatex/users/#{v1_user_id}/docs/#{ol_doc_id}/export/start_history_export"
+		}, callback

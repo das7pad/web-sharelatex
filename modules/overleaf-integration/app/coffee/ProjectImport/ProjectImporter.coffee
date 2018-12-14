@@ -512,10 +512,10 @@ module.exports = ProjectImporter =
 					readStream.resume()
 					return callback(error)
 
-	_waitForV1HistoryExport: (v1_project_id, v1_importer_id, callback = (error) ->) ->
+	_waitForV1HistoryExport: (v1_project_id, v1_importer_id, callback = (error, latest_ver_id) ->) ->
 		ProjectImporter._checkV1HistoryExportStatus v1_project_id, v1_importer_id, 0, callback
 
-	_checkV1HistoryExportStatus: (v1_project_id, v1_importer_id, requestCount, callback = (error) ->) ->
+	_checkV1HistoryExportStatus: (v1_project_id, v1_importer_id, requestCount, callback = (error, latest_ver_id) ->) ->
 		V1SharelatexApi.request {
 			method: 'GET'
 			url: @_exportUrl(v1_project_id, v1_importer_id, "history")
@@ -536,7 +536,7 @@ module.exports = ProjectImporter =
 						interval
 					)
 			else
-				callback(null)
+				callback(null, status.latest_ver_id)
 
 	_getLabels: (v1_project_id, callback = (error, labels) ->) ->
 		V1SharelatexApi.request {
