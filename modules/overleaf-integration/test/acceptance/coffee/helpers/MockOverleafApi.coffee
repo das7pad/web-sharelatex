@@ -19,7 +19,8 @@ module.exports = MockOverleafApi =
 		user.v1Id = @v1Id
 		@v1Id++
 
-	docs: {}
+	docs_by_token: {}
+	docs_by_id: {}
 	users: []
 	historyExportVersions: {}
 
@@ -32,10 +33,12 @@ module.exports = MockOverleafApi =
 	addAffiliation: sinon.stub()
 
 	setDoc: (doc) ->
-		@docs[doc.id] = doc
+		@docs_by_token[doc.token] = doc
+		@docs_by_id[doc.id] = doc
 
 	reset: () ->
-		@docs = {}
+		@docs_by_token = {}
+		@docs_by_id = {}
 		@teamExports = {}
 		@historyExportVersions = {}
 
@@ -43,7 +46,7 @@ module.exports = MockOverleafApi =
 
 		# Project import routes
 		app.post "/api/v1/sharelatex/users/:ol_user_id/docs/:ol_doc_id/export/start", (req, res, next) =>
-			doc = @docs[req.params.ol_doc_id]
+			doc = @docs_by_token[req.params.ol_doc_id]
 			if doc
 				res.json doc
 			else
@@ -78,14 +81,14 @@ module.exports = MockOverleafApi =
 			}
 
 		app.get "/api/v1/sharelatex/users/:ol_user_id/docs/:ol_doc_id/export/tags", (req, res, next) =>
-			doc = @docs[req.params.ol_doc_id]
+			doc = @docs_by_token[req.params.ol_doc_id]
 			if doc
 				res.json tags: doc.tags || []
 			else
 				res.sendStatus 404
 
 		app.get "/api/v1/sharelatex/docs/:ol_doc_id/labels", (req, res, next) =>
-			doc = @docs[req.params.ol_doc_id]
+			doc = @docs_by_id[req.params.ol_doc_id]
 			if doc
 				res.json labels: doc.labels
 			else
