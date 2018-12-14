@@ -22,7 +22,7 @@ module.exports = CollabratecController =
 		logger.log { user, saml_user }, "CollabratecController oauthLinkAfterSaml"
 		template_data =
 			saml_user: saml_user
-			title: "Link Overleaf to IEEE Collabratec™"
+			title: "Link Overleaf to IEEE Collabratec®"
 			user: user
 		CollabratecManager.validateSamlData saml_user, (err) ->
 			return CollabratecController._render_oauth_error req, res, err if err?
@@ -80,7 +80,7 @@ module.exports = CollabratecController =
 			if !created
 				template_data =
 					saml_user: saml_user
-					title: "Link Overleaf to IEEE Collabratec™"
+					title: "Link Overleaf to IEEE Collabratec®"
 					user: req.session.user
 					v1_user_exists: true
 				template_path = Path.resolve __dirname, "../../views/oauth_link_after_saml_logged_out"
