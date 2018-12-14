@@ -111,7 +111,7 @@ module.exports = V1LoginController =
 			if !isValid
 				logger.log {email},  "failed login via v1"
 				AuthenticationController._recordFailedLogin()
-				return res.json message: {type: 'error', text: req.i18n.translate('email_or_password_wrong_try_again')}
+				return res.json message: {type: 'error', text: req.i18n.translate('email_or_password_wrong_try_again') + ', or <a href="/user/password/reset">set or reset your password</a>'}
 			else
 				V1LoginController._login(profile, req, res, next)
 
