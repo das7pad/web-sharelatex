@@ -14,12 +14,12 @@ block content
 							h1.template-title #{pub.title}
 					.row.cta-links
 						.col-md-12
-							if open_in_v2_links && pub.show_source
+							if link_to_template
 								if brand_variation_id
 									a(ng-click="openViewInV1Modal()" class="btn btn-success cta-link") Open as Template
 								else
 									a(href=open_in_v2_links.main.v2 class="btn btn-success cta-link") Open as Template
-							if source && pub.show_source
+							if link_to_show_source
 								a(href, ng-click="openViewSourceModal()" class="btn btn-success cta-link") View Source
 							if pub.pdf_url
 								a(href=pub.pdf_url class="btn btn-success cta-link") Download PDF
@@ -80,34 +80,36 @@ block content
 			//- 						if old_version.open_link
 			//- 							a(href=old_version.open_link) Open as Template
 
-	script(type='text/ng-template', id='viewSourceModalTemplate')
-		.modal-header
-			button.close(
-				type="button"
-				data-dismiss="modal"
-				ng-click="$dismiss('cancel')"
-			) &times;
-			h3 Source
-		.modal-body
-			pre
-				code(ng-non-bindable) #{source}
-		.modal-footer
-			button.btn.btn-default(ng-click="$dismiss('cancel')") Close
+	if link_to_show_source
+		script(type='text/ng-template', id='viewSourceModalTemplate')
+			.modal-header
+				button.close(
+					type="button"
+					data-dismiss="modal"
+					ng-click="$dismiss('cancel')"
+				) &times;
+				h3 Source
+			.modal-body
+				pre
+					code(ng-non-bindable) #{source}
+			.modal-footer
+				button.btn.btn-default(ng-click="$dismiss('cancel')") Close
 
-	script(type='text/ng-template', id='viewInV1ModalTemplate')
-		.modal-header
-			button.close(
-				type="button"
-				data-dismiss="modal"
-				ng-click="$dismiss('cancel')"
-			) &times;
-			h3 Open Template
-		.modal-body
-			p Projects created from this template have extra features that are specific to the template, which are currently only in Overleaf v1. We are working to bring these features to Overleaf v2. You can open the template in Overleaf v1 or Overleaf v2.
-				.row.text-center.cta-links
-						a(href=settings.overleaf.host + open_in_v2_links.main.v1 class="btn btn-success cta-link") Open in v1
-						a(href=open_in_v2_links.main.v2 class="btn btn-info cta-link") Try it in v2
-		.modal-footer
-			button.btn.btn-default(ng-click="$dismiss('cancel')") Close
+	if link_to_template
+		script(type='text/ng-template', id='viewInV1ModalTemplate')
+			.modal-header
+				button.close(
+					type="button"
+					data-dismiss="modal"
+					ng-click="$dismiss('cancel')"
+				) &times;
+				h3 Open Template
+			.modal-body
+				p Projects created from this template have extra features that are specific to the template, which are currently only in Overleaf v1. We are working to bring these features to Overleaf v2. You can open the template in Overleaf v1 or Overleaf v2.
+					.row.text-center.cta-links
+							a(href=settings.overleaf.host + open_in_v2_links.main.v1 class="btn btn-success cta-link") Open in v1
+							a(href=open_in_v2_links.main.v2 class="btn btn-info cta-link") Try it in v2
+			.modal-footer
+				button.btn.btn-default(ng-click="$dismiss('cancel')") Close
 
-	script(src=mathJaxPath)
+		script(src=mathJaxPath)
