@@ -85,7 +85,7 @@ module.exports =
 		)
 
 		webRouter.get(
-			'/overleaf/project/:ol_doc_id/download/zip',
+			'/overleaf/project/:ol_doc_token/download/zip',
 			AuthenticationController.requireLogin(),
 			ProjectImportController.downloadZip
 		)

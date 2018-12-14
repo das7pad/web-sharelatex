@@ -6,6 +6,7 @@ AuthenticationController = require "#{WEB_PATH}/Features/Authentication/Authenti
 UserGetter = require "#{WEB_PATH}/Features/User/UserGetter"
 HistoryController = require "#{WEB_PATH}/Features/History/HistoryController"
 V1Api = require "#{WEB_PATH}/Features/V1/V1Api"
+settings = require 'settings-sharelatex'
 {
 	UnsupportedFileTypeError,
 	UnsupportedExportRecordsError
@@ -63,19 +64,27 @@ module.exports = ProjectImportController =
 
 	downloadZip: (req, res, next) ->
 		userId = AuthenticationController.getLoggedInUserId(req)
-		{ol_doc_id} = req.params
+		{ol_doc_token} = req.params
 		UserGetter.getUser userId, {overleaf: 1}, (err, user) ->
 			return next(err) if err?
-			v1_user_id = user.overleaf?.id?
+			v1_user_id = user.overleaf?.id
 			return next(new Error('expected v1 id')) if !v1_user_id?
-			ProjectImportController._startHistoryExport ol_doc_id, v1_user_id, (err) ->
+			ProjectImportController._startHistoryExport ol_doc_token, v1_user_id, (err, ol_doc_id) ->
 				return next(err) if err?
-				ProjectImporter._waitForV1HistoryExport ol_doc_id, v1_user_id, (err, latest_ver_id) ->
+				ProjectImportController._waitForHistoryExport ol_doc_token, v1_user_id, (err, history_export_version) ->
 					return next(err) if err?
-					HistoryController._pipeHistoryZipToResponse ol_doc_id, latest_ver_id, ol_doc_id, res, next
+					HistoryController._pipeHistoryZipToResponse ol_doc_id, history_export_version, ol_doc_token, res, next
 
-	_startHistoryExport: (ol_doc_id, v1_user_id, callback = (error) ->) ->
+	_startHistoryExport: (ol_doc_token, v1_user_id, callback = (error) ->) ->
 		V1Api.request {
 			method: "POST",
-			url: "/api/v1/sharelatex/users/#{v1_user_id}/docs/#{ol_doc_id}/export/start_history_export"
-		}, callback
+			url: "/api/v1/sharelatex/users/#{v1_user_id}/docs/#{ol_doc_token}/history_export/start"
+		}, (error, response, body) ->
+			return callback(error) if error?
+			return callback null, body.doc_id
+
+	_waitForHistoryExport: (ol_doc_token, v1_user_id, callback = (error, history_export_version) ->) ->
+		url = "#{settings.apis.v1.url}/api/v1/sharelatex/users/#{v1_user_id}/docs/#{ol_doc_token}/history_export/status"
+		ProjectImporter._checkV1HistoryExportStatus url, 0, (error, data) ->
+			return callback(error) if error?
+			return callback null, data.history_export_version
