@@ -16,7 +16,7 @@ define(['ide/history/HistoryV2Manager'], HistoryV2Manager =>
       this.defaultHistoryScope = {
         isV2: true,
         updates: [],
-        viewMode: null,
+        viewMode: 'point_in_time',
         nextBeforeTimestamp: null,
         atEnd: false,
         userHasFullFeature: undefined,
@@ -152,20 +152,14 @@ define(['ide/history/HistoryV2Manager'], HistoryV2Manager =>
           $q: $q,
           $http: $http
         }
-        this.historyManager = new HistoryV2Manager(this.ide, this.$scope)
+        this.localStorage = sinon.stub().returns(null)
+        this.historyManager = new HistoryV2Manager(
+          this.ide,
+          this.$scope,
+          this.localStorage
+        )
         done()
       })
-
-      // this.$scope = {
-      //   $watch: sinon.stub(),
-      //   $watchGroup: sinon.stub(),
-      //   $on: sinon.stub(),
-      //   project: {
-      //     features: {
-      //       versioning: true
-      //     }
-      //   }
-      // }
     })
 
     it('should setup the history scope on initialization', function() {
@@ -198,7 +192,11 @@ define(['ide/history/HistoryV2Manager'], HistoryV2Manager =>
 
     it('should setup history without full access to the feature if the project does not have versioning', function() {
       this.$scope.project.features.versioning = false
-      this.historyManager = new HistoryV2Manager(this.ide, this.$scope)
+      this.historyManager = new HistoryV2Manager(
+        this.ide,
+        this.$scope,
+        this.localStorage
+      )
       this.$scope.$digest()
       expect(this.$scope.history.userHasFullFeature).to.equal(false)
     })
