@@ -32,7 +32,7 @@ module.exports = PasswordResetHandler =
 			if data.user_id?
 				AuthenticationManager.setUserPasswordInV2 data.user_id, password, (err, reset) ->
 					if err then return callback(err)
-					callback null, reset, user_id
+					callback null, reset, data.user_id
 			else if data.v1_user_id?
 				AuthenticationManager.setUserPasswordInV1 {
 					email: data.email,
