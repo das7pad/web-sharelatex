@@ -15,20 +15,20 @@ User = require "#{WEB_PATH}/test/acceptance/js/helpers/User"
 describe "ProjectZipDownloadTests", ->
 	before (done) ->
 		@owner = new User()
-		@owner.setV1Id MockOverleafApi.nextV1Id(), (error) =>
+		@owner.login (error) =>
 			return done(error) if error?
-			@owner.login done
+			@owner.setV1Id MockOverleafApi.nextV1Id(), done
 
 	describe 'a project the user has access to', ->
 		before (done) ->
 			@doc = {
 				id: MockOverleafApi.nextV1Id(),
 				exported: false,
-				latest_ver_id: 30,
+				history_export_version: 30,
 				onExportStart: () =>
 					setTimeout () =>
 						@doc.exported = true
-						@doc.latest_ver_id = 42
+						@doc.history_export_version = 42
 					, 200
 			}
 			MockOverleafApi.setDoc @doc

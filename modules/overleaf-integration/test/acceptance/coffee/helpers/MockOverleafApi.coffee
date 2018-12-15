@@ -56,21 +56,26 @@ module.exports = MockOverleafApi =
       res.sendStatus 204
 
 		app.get "/api/v1/sharelatex/users/:ol_user_id/docs/:ol_doc_id/export/history", (req, res, next) =>
+			res.json exported: true
+
+		app.get "/api/v1/sharelatex/users/:ol_user_id/docs/:ol_doc_id/history_export/status", (req, res, next) =>
 			doc = @docs[req.params.ol_doc_id]
 			if doc?.exported?
 				res.json
 					exported: doc.exported
-					latest_ver_id: doc.latest_ver_id
+					history_export_version: doc.history_export_version
 			else
-				res.json exported: true
+				res.sendStatus 404
 
-		app.post "/api/v1/sharelatex/users/:ol_user_id/docs/:ol_doc_id/export/start_history_export", (req, res, next) =>
+		app.post "/api/v1/sharelatex/users/:ol_user_id/docs/:ol_doc_id/history_export/start", (req, res, next) =>
 			doc = @docs[req.params.ol_doc_id]
 			if doc?.authorized == false
 				return res.sendStatus 403
 			if doc?.onExportStart?
 				doc?.onExportStart()
-			res.sendStatus 200
+			res.json {
+				doc_id: doc.id
+			}
 
 		app.get "/api/v1/sharelatex/users/:ol_user_id/docs/:ol_doc_id/export/tags", (req, res, next) =>
 			doc = @docs[req.params.ol_doc_id]
