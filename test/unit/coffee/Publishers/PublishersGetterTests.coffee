@@ -33,5 +33,4 @@ describe 'PublishersGetter', ->
 			it 'fetches v1 data before returning publisher list', (done) ->
 				@PublishersGetter.getManagedPublishers @userId, (error, publishers) ->
 					publishers.length.should.equal 1
-					publishers[0].fetchV1Data.calledOnce.should.equal true
 					done()
