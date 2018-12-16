@@ -131,17 +131,17 @@ module.exports = UserAdminController =
 		'features.referencesSearch',
 		'features.mendeley',
 		'features.zotero',
+		'awareOfV2',
+		'refered_user_count'
+	]
+	SUPER_ADMIN_ALLOWED_ATTRIBUTES: [
+		'isAdmin',
 		'staffAccess.publisherMetrics',
 		'staffAccess.publisherManagement',
 		'staffAccess.institutionMetrics',
 		'staffAccess.institutionManagement',
 		'staffAccess.groupMetrics',
-		'staffAccess.groupManagement',
-		'awareOfV2',
-		'refered_user_count'
-	]
-	SUPER_ADMIN_ALLOWED_ATTRIBUTES: [
-		'isAdmin'
+		'staffAccess.groupManagement'
 	]
 	BOOLEAN_ATTRIBUTES: [
 		'betaProgram',

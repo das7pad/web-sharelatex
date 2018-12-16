@@ -265,6 +265,7 @@ p
 							ng-model="user.betaProgram"
 						)
 
+			if isSuperAdmin
 				tr
 					th(colspan=2).text-center Staff Access
 
@@ -328,7 +329,6 @@ p
 							ng-model="user.staffAccess.groupManagement"
 						)
 
-			if isSuperAdmin
 				tr
 					th(colspan=2).text-center Site Admin.
 

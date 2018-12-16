@@ -20,7 +20,7 @@ module.exports =
 
 		webRouter.get(
 			'/metrics/teams/:id/?(:startDate/:endDate)?',
-			UserMembershipAuthorization.requireTeamAccess,
+			UserMembershipAuthorization.requireTeamMetricsAccess,
 			MetricsController.teamMetrics
 		)
 
@@ -42,7 +42,7 @@ module.exports =
 
 		webRouter.get(
 			'/metrics/templates/:id/?(:startDate/:endDate)?',
-			UserMembershipAuthorization.requireTemplateAccess,
+			UserMembershipAuthorization.requireTemplateMetricsAccess,
 			MetricsController.templateMetrics
 		)
 
