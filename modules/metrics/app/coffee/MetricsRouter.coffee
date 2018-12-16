@@ -26,7 +26,7 @@ module.exports =
 
 		webRouter.get(
 			'/metrics/groups/:id/?(:startDate/:endDate)?',
-			UserMembershipAuthorization.requireGroupAccess,
+			UserMembershipAuthorization.requireGroupMetricsAccess,
 			(req, res, next) ->
 				if req.entity.overleaf?.id?
 					MetricsController.teamMetrics(req, res, next)
@@ -36,7 +36,7 @@ module.exports =
 
 		webRouter.get(
 			'/metrics/institutions/:id/?(:startDate/:endDate)?',
-			UserMembershipAuthorization.requireInstitutionAccess,
+			UserMembershipAuthorization.requireInstitutionMetricsAccess,
 			MetricsController.institutionMetrics
 		)
 
@@ -60,31 +60,31 @@ module.exports =
 
 		webRouter.get(
 			'/institutions/:id/hub',
-			UserMembershipAuthorization.requireInstitutionAccess,
+			UserMembershipAuthorization.requireInstitutionMetricsAccess,
 			InstitutionHubsController.institutionHub
 		)
 
 		webRouter.get(
 			'/institutions/:id/externalCollaboration',
-			UserMembershipAuthorization.requireInstitutionAccess,
+			UserMembershipAuthorization.requireInstitutionMetricsAccess,
 			InstitutionHubsController.institutionExternalCollaboration
 		)
 
 		webRouter.get(
 			'/institutions/:id/departments',
-			UserMembershipAuthorization.requireInstitutionAccess,
+			UserMembershipAuthorization.requireInstitutionMetricsAccess,
 			InstitutionHubsController.institutionDepartments
 		)
 
 		webRouter.get(
 			'/institutions/:id/roles',
-			UserMembershipAuthorization.requireInstitutionAccess,
+			UserMembershipAuthorization.requireInstitutionMetricsAccess,
 			InstitutionHubsController.institutionRoles
 		)
 
 		webRouter.get(
 			'/publishers/:id/hub',
-			UserMembershipAuthorization.requirePublisherAccess,
+			UserMembershipAuthorization.requirePublisherMetricsAccess,
 			PublisherHubsController.publisherHub
 		)
 

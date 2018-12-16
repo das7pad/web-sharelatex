@@ -27,19 +27,19 @@ module.exports = UserMembershipAuthorization =
 		requireAccessToEntity('institution', req.params.id, req, res, next)
 
 	requireInstitutionMetricsAccess:	(req, res, next) ->
-		requireAccessToEntity('group', req.params.id, req, res, next, 'institutionMetrics')
+		requireAccessToEntity('institution', req.params.id, req, res, next, 'institutionMetrics')
 
 	requireInstitutionManagementAccess:	(req, res, next) ->
-		requireAccessToEntity('group', req.params.id, req, res, next, 'institutionManagement')
+		requireAccessToEntity('institution', req.params.id, req, res, next, 'institutionManagement')
 
 	requirePublisherAccess: (req, res, next) ->
 		requireAccessToEntity('publisher', req.params.id, req, res, next)
 
 	requirePublisherMetricsAccess:	(req, res, next) ->
-		requireAccessToEntity('group', req.params.id, req, res, next, 'publisherMetrics')
+		requireAccessToEntity('publisher', req.params.id, req, res, next, 'publisherMetrics')
 
 	requirePublisherManagementAccess:	(req, res, next) ->
-		requireAccessToEntity('group', req.params.id, req, res, next, 'publisherManagement')
+		requireAccessToEntity('publisher', req.params.id, req, res, next, 'publisherManagement')
 
 	requireTemplateAccess: (req, res, next) ->
 		templateId = req.params.id
@@ -69,15 +69,19 @@ module.exports = UserMembershipAuthorization =
 				id: body.id
 				title: body.title
 			if body?.brand?.slug
-				requireAccessToEntity('publisher', body.brand.slug, req, res, next)
+				req.params.id = body.brand.slug
+				UserMembershipAuthorization.requirePublisherMetricsAccess(req, res, next)
 			else
 				AuthorizationMiddlewear.ensureUserIsSiteAdmin(req, res, next)
 
 	requireGraphAccess: (req, res, next) ->
+		req.params.id = req.query.resource_id
 		if req.query.resource_type == 'template'
-			# templates are a special case; can't use requireaccesstoentity directly
-			req.params.id = req.query.resource_id
 			return UserMembershipAuthorization.requireTemplateAccess(req, res, next)
+		else if req.query.resource_type == 'institution'
+			return UserMembershipAuthorization.requireInstitutionMetricsAccess(req, res, next)
+		else if req.query.resource_type == 'group'
+			return UserMembershipAuthorization.requireGroupMetricsAccess(req, res, next)
 
 		requireAccessToEntity(
 			req.query.resource_type, req.query.resource_id, req, res, next
