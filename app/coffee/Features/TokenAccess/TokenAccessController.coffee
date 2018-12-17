@@ -38,17 +38,23 @@ module.exports = TokenAccessController =
 			if !projectExists and settings.overleaf
 				logger.log {token, userId},
 					"[TokenAccess] no project found for this token"
-				TokenAccessHandler.getV1DocInfo token, userId, (err, doc_info) ->
-					return next err if err?
-					return next(new Errors.NotFoundError()) if doc_info.exported
-					if Features.hasFeature('force-import-to-v2')
-						return res.render('project/v2-import', {
-							projectId: token,
-							hasOwner: doc_info.has_owner,
-							name: doc_info.name
-						})
+				if !userId?
+					if Features.hasFeature('force-import-to-v1')
+						return res.render('project/v2-import-anon')
 					else
 						return res.redirect(302, "/sign_in_to_v1?return_to=/#{token}")
+				else
+					TokenAccessHandler.getV1DocInfo token, userId, (err, doc_info) ->
+						return next err if err?
+						return next(new Errors.NotFoundError()) if doc_info.exported
+						if Features.hasFeature('force-import-to-v2')
+							return res.render('project/v2-import', {
+								projectId: token,
+								hasOwner: doc_info.has_owner,
+								name: doc_info.name
+							})
+						else
+							return res.redirect(302, "/sign_in_to_v1?return_to=/#{token}")
 			else if !project?
 				logger.log {token, userId},
 					"[TokenAccess] no token-based project found for readAndWrite token"
