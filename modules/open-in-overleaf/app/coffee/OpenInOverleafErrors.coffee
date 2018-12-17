@@ -47,6 +47,13 @@ TemplateNotFoundError = (message) ->
 	return error
 TemplateNotFoundError.prototype.__proto__ = Error.prototype
 
+ConversionNotFoundError = (message) ->
+	error = new Error(message)
+	error.name = "ConversionNotFoundError"
+	error.__proto__ = ConversionNotFoundError.prototype
+	return error
+ConversionNotFoundError.prototype.__proto__ = Error.prototype
+
 module.exports = OpenInOverleafErrors =
 	MissingParametersError: MissingParametersError
 	AmbiguousParametersError: AmbiguousParametersError
@@ -55,3 +62,4 @@ module.exports = OpenInOverleafErrors =
 	InvalidUriError: InvalidUriError
 	PublisherNotFoundError: PublisherNotFoundError
 	TemplateNotFoundError: TemplateNotFoundError
+	ConversionNotFoundError: ConversionNotFoundError

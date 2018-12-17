@@ -63,6 +63,15 @@ I have a bad name
 			slug: "OSF"
 			default_variation_id: 1234
 
+		MockV1Api.validation_clients["ieee_latexqc"] =
+			brand_variation_id: "1234"
+			conversions:
+				conversion_foo: 'http://example.org/project.zip'
+		MockV1Api.validation_clients["wombat_university"] =
+			brand_variation_id: null
+			conversions:
+				conversion_bar: 'http://example.org/project.zip'
+
 	beforeEach (done) ->
 		@user = new User()
 		@user.login done
@@ -571,6 +580,89 @@ I have a bad name
 			it "should return an 'ambiguous parameters' error", ->
 				expect(@res.statusCode).to.equal 400
 				expect(JSON.parse(@body).error).to.equal 'more_than_one_kind_of_snippet_was_requested'
+
+		describe "when POSTing a partner and client_media_id", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						partner: 'ieee_latexqc'
+						client_media_id: 'conversion_foo'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should not produce an error", ->
+				expect(@err).not.to.exist
+
+			it "should redirect to a project", ->
+				expect(@res.statusCode).to.equal 302
+				expect(@res.headers.location).to.match @uri_regex
+
+			it "should use the partner's brand variation", (done) ->
+				projectId = @res.headers.location.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				ProjectGetter.getProject projectId, (error, project) ->
+					return done(error) if error?
+
+					expect(project).to.exist
+					expect(project.brandVariationId).to.equal "1234"
+					done()
+
+		describe "when POSTing a partner and client_media_id that does not exist", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						partner: 'potato'
+						client_media_id: 'conversion_foo'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should not produce an error", ->
+				expect(@err).not.to.exist
+
+			it "should redirect to a project", ->
+				expect(@res.statusCode).to.equal 404
+				expect(@res.headers.location).not.to.exist
+
+		describe "when POSTing a partner and client_media_id that has no brand variation", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						partner: 'wombat_university'
+						client_media_id: 'conversion_bar'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should not produce an error", ->
+				expect(@err).not.to.exist
+
+			it "should redirect to a project", ->
+				expect(@res.statusCode).to.equal 302
+				expect(@res.headers.location).to.match @uri_regex
+
+			it "should have a null brand variation", (done) ->
+				projectId = @res.headers.location.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				ProjectGetter.getProject projectId, (error, project) ->
+					return done(error) if error?
+
+					expect(project).to.exist
+					expect(project.brandVariationId).not.to.exist
+					done()
 
 		describe "when the document has a title", ->
 			beforeEach (done) ->
