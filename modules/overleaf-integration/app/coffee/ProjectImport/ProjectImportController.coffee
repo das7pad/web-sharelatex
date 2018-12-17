@@ -17,6 +17,7 @@ AuthenticationController = require "../../../../../app/js/Features/Authenticatio
 
 module.exports = ProjectImportController =
 	importProject: (req, res) ->
+		res.setTimeout(5 * 60 * 1000) # allow extra time for the import to complete
 		{ol_doc_id} = req.params
 		user_id = AuthenticationController.getLoggedInUserId req
 		logger.log {user_id, ol_doc_id}, "importing project from overleaf"
