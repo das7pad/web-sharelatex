@@ -20,6 +20,8 @@ settings = require 'settings-sharelatex'
 	V1ProjectHasAssignments
 } = require "./Errors"
 
+READ_AND_WRITE_TOKEN_REGEX = /^[0-9a-z]+/
+
 module.exports = ProjectImportController =
 	importProject: (req, res) ->
 		res.setTimeout(5 * 60 * 1000) # allow extra time for the import to complete
@@ -58,7 +60,7 @@ module.exports = ProjectImportController =
 				importCompleted({ redir: ProjectImportController._redirUrl(ol_doc_id) })
 
 	_redirUrl: (ol_doc_id) ->
-		if /^\d/.test ol_doc_id
+		if READ_AND_WRITE_TOKEN_REGEX.test ol_doc_id
 			"/#{ol_doc_id}"
 		else
 			"/read/#{ol_doc_id}"

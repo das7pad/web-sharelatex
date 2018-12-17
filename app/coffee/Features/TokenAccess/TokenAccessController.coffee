@@ -114,7 +114,14 @@ module.exports = TokenAccessController =
 						TokenAccessHandler.getV1DocInfo token, userId, (err, doc_info) ->
 							return next err if err?
 							return next(new Errors.NotFoundError()) if doc_info.exported
-							return res.redirect(302, "/sign_in_to_v1?return_to=/read/#{token}")
+							if Features.hasFeature('force-import-to-v2')
+								return res.render('project/v2-import', {
+									projectId: token,
+									hasOwner: doc_info.has_owner,
+									name: doc_info.name
+								})
+							else
+								return res.redirect(302, "/sign_in_to_v1?return_to=/read/#{token}")
 				else if !project?
 					logger.log {token, userId},
 						"[TokenAccess] no project found for readOnly token"

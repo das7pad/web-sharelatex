@@ -658,6 +658,83 @@ describe "TokenAccessController", ->
 					)).to.equal true
 					done()
 
+			describe 'when project was not exported from v1 but forcing import to v2', ->
+				beforeEach ->
+					@Features.hasFeature.returns(true)
+					@req = new MockRequest()
+					@res = new MockResponse()
+					@res.render = sinon.stub()
+					@next = sinon.stub()
+					@req.params['read_only_token'] = 'abcd'
+					@TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
+						.callsArgWith(1, null, null, false)
+
+				describe 'with project name', ->
+					beforeEach ->
+						@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+							allow: true
+							exists: true
+							exported: false
+							has_owner: true
+							name: 'A title'
+						})
+						@TokenAccessController.readOnlyToken @req, @res, @next
+
+					it 'should render v2-import page with name', (done) ->
+						expect(@res.render.calledWith(
+							'project/v2-import',
+							{
+								projectId: 'abcd'
+								name: 'A title'
+								hasOwner: true
+							}
+						)).to.equal true
+						done()
+
+				describe 'with project owner', ->
+					beforeEach ->
+						@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+							allow: true
+							exists: true
+							exported: false
+							has_owner: true
+							name: 'A title'
+						})
+						@TokenAccessController.readOnlyToken @req, @res, @next
+
+					it 'should render v2-import page', (done) ->
+						expect(@res.render.calledWith(
+							'project/v2-import',
+							{
+								projectId: 'abcd',
+								hasOwner: true
+								name: 'A title'
+							}
+						)).to.equal true
+						done()
+
+				describe 'without project owner', ->
+					beforeEach ->
+						@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+							allow: true
+							exists: true
+							exported: false
+							has_owner: false
+							name: 'A title'
+						})
+						@TokenAccessController.readOnlyToken @req, @res, @next
+
+					it 'should render v2-import page', (done) ->
+						expect(@res.render.calledWith(
+							'project/v2-import',
+							{
+								projectId: 'abcd',
+								hasOwner: false
+								name: 'A title'
+							}
+						)).to.equal true
+						done()
+
 			describe 'when project was exported from v1', ->
 				beforeEach ->
 					@req = new MockRequest()
