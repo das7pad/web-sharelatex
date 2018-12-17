@@ -47,6 +47,10 @@ I have a bad name
 				res.sendFile path.join(__dirname, '../fixtures', 'project.zip')
 			else if req.query.url == 'http://example.org/badname.zip'
 				res.sendFile path.join(__dirname, '../fixtures', 'badname.zip')
+			else if req.query.url == 'https://production-overleaf-static.s3.amazonaws.com/v1templates/peerj.zip'
+				res.sendFile path.join(__dirname, '../fixtures', 'peerj.zip')
+			else if req.query.url == 'https://production-overleaf-static.s3.amazonaws.com/v1templates/blank.zip'
+				res.sendFile path.join(__dirname, '../fixtures', 'blank.zip')
 			else
 				res.sendStatus(404)
 
@@ -478,6 +482,95 @@ I have a bad name
 			it "should return a 'not found' error", ->
 				expect(@res.statusCode).to.equal 404
 				expect(JSON.parse(@body).error).to.equal 'not_found_error_from_the_supplied_url'
+
+		describe "when POSTing a template name", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						template: 'blank'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should not produce an error", ->
+				expect(@err).not.to.exist
+
+			it "should redirect to a project", ->
+				expect(@res.statusCode).to.equal 302
+				expect(@res.headers.location).to.match @uri_regex
+
+		describe "when POSTing a template name that links to a template with a brand variation", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						template: 'peerj'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should not produce an error", ->
+				expect(@err).not.to.exist
+
+			it "should redirect to a project", ->
+				expect(@res.statusCode).to.equal 302
+				expect(@res.headers.location).to.match @uri_regex
+
+			it "should not create a project with an invalid name", (done) ->
+				projectId = @res.headers.location.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				ProjectGetter.getProject projectId, (error, project) ->
+					return done(error) if error?
+
+					expect(project).to.exist
+					expect(project.brandVariationId).to.equal '69'
+					done()
+
+		describe "when POSTing a template name that does not exist", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						template: 'wombat'
+					headers:
+						'X-Requested-With': 'XMLHttpRequest'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should return a 'not found' error", ->
+				expect(@res.statusCode).to.equal 404
+				expect(JSON.parse(@body).error).to.equal 'the_requested_template_was_not_found'
+
+		describe "when sending more than one kind of snippet parameter", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						template: 'wombat'
+						snip_uri: 'http://banana.net/pineapple.tex'
+					headers:
+						'X-Requested-With': 'XMLHttpRequest'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should return an 'ambiguous parameters' error", ->
+				expect(@res.statusCode).to.equal 400
+				expect(JSON.parse(@body).error).to.equal 'more_than_one_kind_of_snippet_was_requested'
 
 		describe "when the document has a title", ->
 			beforeEach (done) ->

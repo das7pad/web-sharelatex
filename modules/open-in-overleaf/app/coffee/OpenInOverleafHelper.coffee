@@ -19,6 +19,8 @@ DocumentHelper = require('../../../../app/js/Features/Documents/DocumentHelper')
 V1Api = require('../../../../app/js/Features/V1/V1Api')
 
 module.exports = OpenInOverleafHelper =
+	TEMPLATE_DATA: require('../config/templates.json')
+
 	getDocumentLinesFromSnippet: (snippet, content = null) ->
 		return (
 			snippet.comment + OpenInOverleafHelper._normalizeMainSrcContent(snippet, content)
@@ -76,14 +78,14 @@ module.exports = OpenInOverleafHelper =
 				OpenInOverleafHelper._ensureFilesHaveUniqueNames files, (err) ->
 					return callback(err) if err?
 
-					snippet = JSON.parse(JSON.stringify(source_snippet))
+					snippet = OpenInOverleafHelper._cloneSnippet(source_snippet)
 					snippet.files = files
 					OpenInOverleafHelper._setSnippetRootDocAndTitleFromFileArray(snippet)
 					callback(null, snippet)
 		)
 
 	populateSnippetFromUri: (uri, source_snippet, cb = (error, result)->) ->
-		return cb(new Error('Invalid URI')) unless urlValidator.isWebUri(uri)
+		return cb(new OpenInOverleafErrors.InvalidUriError) unless urlValidator.isWebUri(uri)
 		uri = UrlHelper.wrapUrlWithProxy(uri)
 
 		# TODO: Implement a file size limit here to prevent shenanigans
@@ -94,7 +96,7 @@ module.exports = OpenInOverleafHelper =
 			magic.detectFile fspath, (error, ctype) ->
 				return cb(error) if error?
 
-				snippet = JSON.parse(JSON.stringify(source_snippet))
+				snippet = OpenInOverleafHelper._cloneSnippet(source_snippet)
 
 				if ctype == 'application/zip'
 					snippet.projectFile = fspath
@@ -108,6 +110,15 @@ module.exports = OpenInOverleafHelper =
 				else
 					logger.log uri:uri, ctype:ctype, "refusing to open unrecognised content type"
 					cb(new OpenInOverleafErrors.InvalidFileTypeError)
+
+	populateSnippetFromTemplate: (template, source_snippet, cb = (error, result)->) ->
+		templateData = OpenInOverleafHelper.TEMPLATE_DATA[template]
+		return cb(new OpenInOverleafErrors.TemplateNotFoundError) unless templateData?
+
+		snippet = OpenInOverleafHelper._cloneSnippet(source_snippet)
+
+		snippet.brandVariationId = templateData.brand_variation_id if templateData.brand_variation_id?
+		OpenInOverleafHelper.populateSnippetFromUri("#{settings.openInOverleaf?.templateUriPrefix}#{template}.zip", snippet, cb)
 
 	populateProjectFromFileList: (project, snippet, callback = (error)->) ->
 		async.eachLimit(
@@ -184,6 +195,8 @@ module.exports = OpenInOverleafHelper =
 """
 		return content
 
+	_cloneSnippet: (snippet) ->
+		return JSON.parse(JSON.stringify(snippet))
 
 	_ensureFilesHaveUniqueNames: (files, callback) ->
 		# ensure all files have unique names:

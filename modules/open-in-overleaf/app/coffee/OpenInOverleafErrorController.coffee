@@ -18,15 +18,24 @@ module.exports = OpenInOverleafErrorController =
 		if error instanceof OpenInOverleafErrors.MissingParametersError
 			logger.warn {err: error, url: req.url}, "missing parameters error"
 			return {status: 400, text: 'the_required_parameters_were_not_supplied'}
+		if error instanceof OpenInOverleafErrors.AmbiguousParametersError
+			logger.warn {err: error, url: req.url}, "ambiguous parameters error"
+			return {status: 400, text: 'more_than_one_kind_of_snippet_was_requested'}
 		if error instanceof OpenInOverleafErrors.ZipExtractError
 			logger.warn {err: error, url: req.url}, "zip extract error"
 			return {status: 422, text: 'unable_to_extract_the_supplied_zip_file'}
 		if error instanceof OpenInOverleafErrors.InvalidFileTypeError
 			logger.warn {err: error, url: req.url}, "invalid file type error"
 			return {status: 422, text: 'the_file_supplied_is_of_an_unsupported_type'}
+		if error instanceof OpenInOverleafErrors.InvalidUriError
+			logger.warn {err: error, url: req.url}, "invalid file type error"
+			return {status: 422, text: 'the_supplied_uri_is_invalid'}
 		if error instanceof OpenInOverleafErrors.PublisherNotFoundError
 			logger.warn {err: error, url: req.url}, "publisher not found error"
 			return {status: 404, text: 'the_requested_publisher_was_not_found'}
+		if error instanceof OpenInOverleafErrors.TemplateNotFoundError
+			logger.warn {err: error, url: req.url}, "template not found error"
+			return {status: 404, text: 'the_requested_template_was_not_found'}
 		if error instanceof Errors.NotFoundError
 			logger.warn {err: error, url: req.url}, "not found error"
 			return {status: 404, text: 'not_found_error_from_the_supplied_url'}
@@ -40,5 +49,5 @@ module.exports = OpenInOverleafErrorController =
 			logger.warn {err: error, url: req.url}, "invalid name error"
 			return {status: 400, text: error.message}
 
-		logger.error err: error, url:req.url, method:req.method, user:user, "unhandled error"
+		logger.error err: error, url:req.url, method:req.method, "unhandled error"
 		return {status: 500, text: 'sorry_something_went_wrong_opening_the_document_please_try_again'}
