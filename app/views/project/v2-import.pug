@@ -48,9 +48,18 @@ block content
 							| cannot be automatically imported. Please download a zip file of
 							| the project and upload that to continue editing it.
 
-						button.row-spaced.btn.btn-primary.text-center.center-block
-							| Download project zip file
-
+						form(
+							async-form="v2ZipDownload"
+							name="v2ZipDownloadForm"
+							action="/overleaf/project/" + projectId + "/download/zip"
+							method="GET"
+						)
+							form-messages(form="v2ZipDownloadForm")
+							input.row-spaced.btn.btn-primary.text-center.center-block(
+								type="submit"
+								value="Download project zip file"
+								ng-disabled="v2ZipDownloadForm.inflight || v2ZipDownloadForm.success"
+							)
 
 					h3 What can I do once I've moved my project?
 					ul
