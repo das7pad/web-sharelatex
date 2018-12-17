@@ -65,7 +65,7 @@ module.exports = AuthenticationManager =
 			overleafId = user.overleaf?.id?
 			if overleafId and Settings.overleaf? # v2 user in v2
 				# v2 user in v2, change password in v1
-				AuthenticationManager.setUserPasswordInV1(overleafId, password, callback)
+				AuthenticationManager.setUserPasswordInV1(user.overleaf.id, password, callback)
 			else if overleafId and !Settings.overleaf?
 				# v2 user in SL
 				return callback(new Errors.NotInV2Error("Password Reset Attempt"))
