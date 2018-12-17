@@ -28,17 +28,16 @@ module.exports = PasswordResetHandler =
 			if !data?
 				return callback null, false, null
 			if typeof data == "string"
-				data = { user_id: data } # backwards compatible with old format
+				# Backwards compatible with old format.
+				# Tokens expire after 1h, so this can be removed soon after deploy.
+				# Possibly we should keep this until we do an onsite release too.
+				data = { user_id: data } 
 			if data.user_id?
-				AuthenticationManager.setUserPasswordInV2 data.user_id, password, (err, reset) ->
+				AuthenticationManager.setUserPassword data.user_id, password, (err, reset) ->
 					if err then return callback(err)
 					callback null, reset, data.user_id
 			else if data.v1_user_id?
-				AuthenticationManager.setUserPasswordInV1 {
-					email: data.email,
-					v1Id: data.v1_user_id,
-					password: password
-				}, (error, reset) ->
+				AuthenticationManager.setUserPasswordInV1 data.v1_user_id, password, (error, reset) ->
 					return callback(error) if error?
 					UserGetter.getUser { 'overleaf.id': data.v1_user_id }, {_id:1}, (error, user) ->
 						return callback(error) if error?
@@ -57,7 +56,7 @@ module.exports = PasswordResetHandler =
 				if response.statusCode == 404
 					return callback null, false
 				else
-					return callback null, true, { v1_user_id: body.user_id, email: email }
+					return callback null, true, { v1_user_id: body.user_id }
 		else
 			# ShareLaTeX
 			UserGetter.getUserByMainEmail email, (err, user)->

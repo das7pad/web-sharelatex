@@ -21,6 +21,7 @@ describe "PasswordResetHandler", ->
 		@EmailHandler = 
 			sendEmail:sinon.stub()
 		@AuthenticationManager =
+			setUserPassword:sinon.stub()
 			setUserPasswordInV1:sinon.stub()
 			setUserPasswordInV2:sinon.stub()
 		@V1Api =
@@ -94,8 +95,7 @@ describe "PasswordResetHandler", ->
 				it 'should set the password token data to the user id and email', ->
 					@OneTimeTokenHandler.getNewToken
 						.calledWith('password', {
-							v1_user_id: 42,
-							email: @email
+							v1_user_id: 42
 						})
 						.should.equal true
 
@@ -135,12 +135,12 @@ describe "PasswordResetHandler", ->
 
 		describe 'when the data is an old style user_id', ->
 			beforeEach ->
-				@AuthenticationManager.setUserPasswordInV2.yields(null, true, @user_id)
+				@AuthenticationManager.setUserPassword.yields(null, true, @user_id)
 				@OneTimeTokenHandler.getValueFromTokenAndExpire.yields(null, @user_id)
 				@PasswordResetHandler.setNewUserPassword @token, @password, @callback
 
 			it 'should call setUserPasswordInV2', ->
-				@AuthenticationManager.setUserPasswordInV2
+				@AuthenticationManager.setUserPassword
 					.calledWith(@user_id, @password)
 					.should.equal true
 
@@ -149,12 +149,12 @@ describe "PasswordResetHandler", ->
 
 		describe 'when the data is a new style user_id', ->
 			beforeEach ->
-				@AuthenticationManager.setUserPasswordInV2.yields(null, true, @user_id)
+				@AuthenticationManager.setUserPassword.yields(null, true, @user_id)
 				@OneTimeTokenHandler.getValueFromTokenAndExpire.yields(null, {@user_id})
 				@PasswordResetHandler.setNewUserPassword @token, @password, @callback
 
 			it 'should call setUserPasswordInV2', ->
-				@AuthenticationManager.setUserPasswordInV2
+				@AuthenticationManager.setUserPassword
 					.calledWith(@user_id, @password)
 					.should.equal true
 
@@ -166,16 +166,12 @@ describe "PasswordResetHandler", ->
 				@v1_user_id = 2345
 				@AuthenticationManager.setUserPasswordInV1.yields(null, true)
 				@UserGetter.getUser.withArgs({'overleaf.id': @v1_user_id}).yields(null, { _id: @user_id })
-				@OneTimeTokenHandler.getValueFromTokenAndExpire.yields(null, {@v1_user_id, @email})
+				@OneTimeTokenHandler.getValueFromTokenAndExpire.yields(null, {@v1_user_id})
 				@PasswordResetHandler.setNewUserPassword @token, @password, @callback
 
 			it 'should call setUserPasswordInV1', ->
 				@AuthenticationManager.setUserPasswordInV1
-					.calledWith({
-						email: @email,
-						v1Id: @v1_user_id
-						password: @password
-					})
+					.calledWith(@v1_user_id, @password)
 					.should.equal true
 
 			it 'should look up the user by v1 id for the v2 user id', ->

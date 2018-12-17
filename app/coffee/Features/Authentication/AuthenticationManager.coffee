@@ -65,11 +65,7 @@ module.exports = AuthenticationManager =
 			overleafId = user.overleaf?.id?
 			if overleafId and Settings.overleaf? # v2 user in v2
 				# v2 user in v2, change password in v1
-				AuthenticationManager.setUserPasswordInV1({
-					v1Id: user.overleaf.id,
-					email: user.email,
-					password: password
-				}, callback)
+				AuthenticationManager.setUserPasswordInV1(overleafId, password, callback)
 			else if overleafId and !Settings.overleaf?
 				# v2 user in SL
 				return callback(new Errors.NotInV2Error("Password Reset Attempt"))
@@ -91,6 +87,9 @@ module.exports = AuthenticationManager =
 			callback()
 
 	setUserPasswordInV2: (user_id, password, callback) ->
+		validation = @validatePassword(password)
+		return callback(validation.message) if validation?
+
 		bcrypt.genSalt BCRYPT_ROUNDS, (error, salt) ->
 			return callback(error) if error?
 			bcrypt.hash password, salt, (error, hash) ->
@@ -105,7 +104,10 @@ module.exports = AuthenticationManager =
 					_checkWriteResult(result, callback)
 				)
 
-	setUserPasswordInV1: (user_data, callback) ->
-		V1Handler.doPasswordReset user_data, (error, reset)->
+	setUserPasswordInV1: (v1_user_id, password, callback) ->
+		validation = @validatePassword(password)
+		return callback(validation.message) if validation?
+
+		V1Handler.doPasswordReset v1_user_id, password, (error, reset)->
 			return callback(error) if error?
 			return callback(error, reset)
