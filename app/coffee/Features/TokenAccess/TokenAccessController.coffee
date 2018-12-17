@@ -87,7 +87,8 @@ module.exports = TokenAccessController =
 		userId = AuthenticationController.getLoggedInUserId(req)
 		token = req.params['read_only_token']
 		logger.log {userId, token}, "[TokenAccess] requesting read-only token access"
-		TokenAccessHandler.getV1DocInfo token, (err, doc_info) ->
+		TokenAccessHandler.getV1DocInfo token, userId, (err, doc_info) ->
+			return next err if err?
 			return res.redirect doc_info.published_path if doc_info.allow == false
 
 			TokenAccessHandler.findProjectWithReadOnlyToken token, (err, project, projectExists) ->
