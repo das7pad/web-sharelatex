@@ -62,17 +62,17 @@ module.exports = AuthenticationManager =
 
 		UserGetter.getUser user_id, { email:1, overleaf: 1 }, (error, user) ->
 			return callback(error) if error?
-			overleafId = user.overleaf?.id?
-			if overleafId and Settings.overleaf? # v2 user in v2
+			v1IdExists = user.overleaf?.id?
+			if v1IdExists and Settings.overleaf? # v2 user in v2
 				# v2 user in v2, change password in v1
 				AuthenticationManager.setUserPasswordInV1(user.overleaf.id, password, callback)
-			else if overleafId and !Settings.overleaf?
+			else if v1IdExists and !Settings.overleaf?
 				# v2 user in SL
 				return callback(new Errors.NotInV2Error("Password Reset Attempt"))
-			else if !overleafId and !Settings.overleaf?
+			else if !v1IdExists and !Settings.overleaf?
 				# SL user in SL, change password in SL
 				AuthenticationManager.setUserPasswordInV2(user_id, password, callback)
-			else if !overleafId and Settings.overleaf?
+			else if !v1IdExists and Settings.overleaf?
 				# SL user in v2, should not happen
 				return callback(new Errors.SLInV2Error("Password Reset Attempt"))
 			else
