@@ -333,7 +333,7 @@ describe 'OpenInOverleafController', ->
 			@OpenInOverleafController._getMainFileCommentFromSnipRequest(@req).should.equal ""
 
 		it "should return the texample comment if the referrer is texample", ->
-			@req.header = sinon.stub().withArgs('Referer').returns('https://asdf.texample.net/1/2/3')
+			@req.body.referrer = 'https://asdf.texample.net/1/2/3'
 			@OpenInOverleafController._getMainFileCommentFromSnipRequest(@req).should.equal "% texample_snippet_comment\n"
 
 	describe "_sendResponse", ->

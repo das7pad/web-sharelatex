@@ -133,8 +133,8 @@ module.exports = OpenInOverleafController =
 	_getMainFileCommentFromSnipRequest: (req) ->
 		comment = ''
 		if req.body.comment != 'none'
-			referer = new URL(req.header('Referer') || '')
-			if referer.hostname && referer.hostname.match /texample\.net$/
+			referrer = new URL(req.body.referrer || '')
+			if referrer.hostname && referrer.hostname.match /texample\.net$/
 				comment = req.i18n.translate('texample_snippet_comment').trim()
 			else
 				comment = req.i18n.translate('default_snippet_comment').trim()
