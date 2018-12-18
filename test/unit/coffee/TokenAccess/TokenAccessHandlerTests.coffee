@@ -492,6 +492,41 @@ describe "TokenAccessHandler", ->
 			expect(@project.tokens.readAndWrite).to.equal 'rw'
 			expect(@project.tokens.readOnly).to.equal 'ro'
 
+	describe 'getDocPublishedInfo', ->
+		beforeEach ->
+			@callback = sinon.stub()
+
+		describe 'when v1 api not set', ->
+			beforeEach ->
+				@TokenAccessHandler.getV1DocPublishedInfo @token, @callback
+
+			it 'should not check access and return default info', ->
+				expect(@V1Api.request.called).to.equal false
+				expect(@callback.calledWith null, {
+					allow: true
+				}).to.equal true
+
+		describe 'when v1 api is set', ->
+			beforeEach ->
+				@settings.apis = { v1: 'v1' }
+
+			describe 'on V1Api.request success', ->
+				beforeEach ->
+					@V1Api.request = sinon.stub().callsArgWith(1, null, null, 'mock-data')
+					@TokenAccessHandler.getV1DocPublishedInfo @token, @callback
+
+				it 'should return response body', ->
+					expect(@V1Api.request.calledWith { url: "/api/v1/sharelatex/docs/#{@token}/published" }).to.equal true
+					expect(@callback.calledWith null, 'mock-data').to.equal true
+
+			describe 'on V1Api.request error', ->
+				beforeEach ->
+					@V1Api.request = sinon.stub().callsArgWith(1, 'error')
+					@TokenAccessHandler.getV1DocPublishedInfo @token, @callback
+
+				it 'should callback with error', ->
+					expect(@callback.calledWith 'error').to.equal true
+
 	describe 'getV1DocInfo', ->
 		beforeEach ->
 			@v2UserId = 123
