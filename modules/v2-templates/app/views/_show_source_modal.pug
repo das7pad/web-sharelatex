@@ -1,0 +1,13 @@
+script(type='text/ng-template', id='viewSourceModalTemplate')
+	.modal-header
+		button.close(
+			type="button"
+			data-dismiss="modal"
+			ng-click="$dismiss('cancel')"
+		) &times;
+		h3 Source
+	.modal-body
+		pre
+			code(ng-non-bindable) #{source}
+	.modal-footer
+		button.btn.btn-default(ng-click="$dismiss('cancel')") Close
