@@ -504,7 +504,6 @@ describe "TokenAccessHandler", ->
 			it 'should not check access and return default info', ->
 				expect(@V1Api.request.called).to.equal false
 				expect(@callback.calledWith null, {
-					allow: true
 					exists: true
 					exported: false
 				}).to.equal true

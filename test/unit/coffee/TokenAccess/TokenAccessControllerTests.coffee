@@ -29,8 +29,10 @@ describe "TokenAccessController", ->
 			'../Project/ProjectController': @ProjectController = {}
 			'../Authentication/AuthenticationController': @AuthenticationController = {}
 			'./TokenAccessHandler': @TokenAccessHandler = {
-				getV1DocInfo: sinon.stub().yields(null, {
+				getV1DocPublishedInfo: sinon.stub().yields(null, {
 					allow: true
+				})
+				getV1DocInfo: sinon.stub().yields(null, {
 					exists: true
 					exported: false
 				})
@@ -506,10 +508,8 @@ describe "TokenAccessController", ->
 				@next = sinon.stub()
 				@TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
 						.callsArgWith(1, null, @project, true)
-				@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+				@TokenAccessHandler.getV1DocPublishedInfo = sinon.stub().yields(null, {
 					allow: false
-					exists: true
-					exported: false
 					published_path: 'doc-url'
 				})
 				@TokenAccessController.readOnlyToken @req, @res, @next
@@ -891,43 +891,50 @@ describe "TokenAccessController", ->
 					@res.redirect = sinon.stub()
 					@next = sinon.stub()
 					@req.params['read_only_token'] = @readOnlyToken
+					@AuthenticationController.getLoggedInUserId = sinon.stub().returns(@userId.toString())
 					@TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
-						.callsArgWith(1, null, null)
-					@TokenAccessHandler.checkV1ProjectExported = sinon.stub()
 						.callsArgWith(1, null, false)
 					@TokenAccessHandler.addReadOnlyUserToProject = sinon.stub()
-						.callsArgWith(2, null)
-					@ProjectController.loadEditor = sinon.stub()
-					@TokenAccessController.readOnlyToken @req, @res, @next
 
-				it 'should try to find a project with this token', (done) ->
-					expect(@TokenAccessHandler.findProjectWithReadOnlyToken.callCount)
-						.to.equal 1
-					expect(@TokenAccessHandler.findProjectWithReadOnlyToken.calledWith(@readOnlyToken))
-						.to.equal true
-					done()
+				describe 'when project does not exist', ->
+					beforeEach ->
+						@TokenAccessController.readOnlyToken @req, @res, @next
 
-				it 'should not give the user session read-only access', (done) ->
-					expect(@TokenAccessHandler.grantSessionTokenAccess.callCount)
-						.to.equal 0
-					done()
+					it 'should try to find a project with this token', (done) ->
+						expect(@TokenAccessHandler.findProjectWithReadOnlyToken.callCount)
+							.to.equal 1
+						expect(@TokenAccessHandler.findProjectWithReadOnlyToken.calledWith(@readOnlyToken))
+							.to.equal true
+						done()
 
-				it 'should not pass control to loadEditor', (done) ->
-					expect(@ProjectController.loadEditor.callCount).to.equal 0
-					expect(@ProjectController.loadEditor.calledWith(@req, @res, @next)).to.equal false
-					done()
+					it 'should not give the user session read-only access', (done) ->
+						expect(@TokenAccessHandler.grantSessionTokenAccess.callCount)
+							.to.equal 0
+						done()
 
-				it 'should not add the user to the project with read-only access', (done) ->
-					expect(@TokenAccessHandler.addReadOnlyUserToProject.callCount)
-						.to.equal 0
-					done()
+					it 'should not add the user to the project with read-only access', (done) ->
+						expect(@TokenAccessHandler.addReadOnlyUserToProject.callCount)
+							.to.equal 0
+						done()
 
 				describe 'when project was exported to v2', ->
 					beforeEach ->
 						@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
-							allow: true
 							exists: true
 							exported: true
+						})
+						@TokenAccessController.readOnlyToken @req, @res, @next
+
+					it 'should call next with not found error', (done) ->
+						expect(@next.callCount).to.equal 1
+						expect(@next.calledWith(new Errors.NotFoundError())).to.equal true
+						done()
+
+				describe 'when project was not exported to v2', ->
+					beforeEach ->
+						@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+							exists: true
+							exported: false
 						})
 						@TokenAccessController.readOnlyToken @req, @res, @next
 
@@ -938,4 +945,24 @@ describe "TokenAccessController", ->
 							"/sign_in_to_v1?return_to=/read/#{@readOnlyToken}"
 						)).to.equal true
 						done()
+
+				describe 'anonymous user', ->
+					beforeEach ->
+						@AuthenticationController.getLoggedInUserId = sinon.stub().returns(@userId.toString())
+
+					describe 'when project was not exported to v2', ->
+						beforeEach ->
+							@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+								exists: true
+								exported: false
+							})
+							@TokenAccessController.readOnlyToken @req, @res, @next
+
+						it 'should redirect to v1', (done) ->
+							expect(@res.redirect.callCount).to.equal 1
+							expect(@res.redirect.calledWith(
+								302,
+								"/sign_in_to_v1?return_to=/read/#{@readOnlyToken}"
+							)).to.equal true
+							done()
 
