@@ -25,6 +25,7 @@ describe "ProjectImporter", ->
 					@linkedFileData = options.linkedFileData
 
 		@ProjectImporter = SandboxedModule.require modulePath, requires:
+			"../../../../../app/js/Features/Project/ProjectCollabratecDetailsHandler": @ProjectCollabratecDetailsHandler = {}
 			"../../../../../app/js/Features/Project/ProjectCreationHandler": @ProjectCreationHandler = {}
 			"../../../../../app/js/Features/Project/ProjectDetailsHandler": @ProjectDetailsHandler = {}
 			"../../../../../app/js/Features/Project/ProjectEntityUpdateHandler": @ProjectEntityUpdateHandler = {}

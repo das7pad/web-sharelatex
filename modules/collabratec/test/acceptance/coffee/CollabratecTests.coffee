@@ -16,66 +16,72 @@ settings = require "settings-sharelatex"
 
 expect = chai.expect
 
+_createUser = (overleafId, useCollabratecV2, callback) ->
+	user = new User()
+	user.ensureUserExists (err) ->
+		return callback err if err?
+		user.deleteProjects (err) ->
+			return callback err if err?
+			user.mongoUpdate { $set: { useCollabratecV2: useCollabratecV2} }, (err) ->
+				return callback err if err?
+				user.setOverleafId overleafId, (err) ->
+					return callback err if err?
+					user.login (err) ->
+						callback err, user
+
 describe "Collabratec", ->
 	before (done) ->
-		@user = new User()
-		@user.ensureUserExists (error) =>
-			return done error if error?
-			@user.deleteProjects (error) =>
-				return done error if error?
-				@user.mongoUpdate { $set: { useCollabratecV2: true} }, (error) =>
-					return done error if error?
-					@user.setOverleafId 1, (error) =>
-						return done error if error?
-						@user.login (error) =>
-							@user.createProject "v2 project", {}, (error, project_id) =>
-								return done error if error?
-								@project_id = project_id
-								mkdirp settings.path.dumpFolder, done
-		@token1 =
-			access_token:
-				resource_owner_id: 1
-			collabratec_customer_id: "collabratec-customer-id"
-			user_profile:
-				id: 1
-				email: @user.email
-		MockOverleafApi.addToken "good-token", @token1
+		mkdirp settings.path.dumpFolder, done
 
 	before (done) ->
-		@user2 = new User()
-		@user2.ensureUserExists (error) =>
-			return done error if error?
-			@user2.deleteProjects (error) =>
-				return done error if error?
-				@user2.mongoUpdate { $set: { useCollabratecV2: true} }, (error) =>
-					return done error if error?
-					@user2.setOverleafId 2, (error) =>
-						return done error if error?
-						@user2.login done
-		@token2 =
-			access_token:
-				resource_owner_id: 2
-			user_profile:
-				id: 2
-				email: @user2.email
-		MockOverleafApi.addToken "good-token2", @token2
+		_createUser 1, true, (err, user) =>
+			return done err if err?
+			@user = user
+			@user.createProject "v2 project", {}, (err, project_id) =>
+				return done err if err?
+				@project_id = project_id
+				@user.createProject "v1 import project", {}, (err, project_id) =>
+					return done err if err?
+					@v1_import_project_id = project_id
+					@v1_import_project_token = '999token'
+					set =
+						"overleaf.id": "999"
+						"tokens.readAndWrite": @v1_import_project_token
+					ProjectModel.update {_id: project_id}, {$set: set}, done		
+			@token1 =
+				access_token:
+					resource_owner_id: 1
+				collabratec_customer_id: "collabratec-customer-id"
+				user_profile:
+					id: 1
+					email: @user.email
+			MockOverleafApi.addToken "good-token", @token1
 
 	before (done) ->
-		@v1User = new User()
-		@v1User.ensureUserExists (error) =>
-			return done error if error?
-			@v1User.deleteProjects (error) =>
-				return done error if error?
-				@v1User.setOverleafId 3, (error) =>
-					return done error if error?
-					@v1User.login done
-		@v1Token =
-			access_token:
-				resource_owner_id: 3
-			user_profile:
-				id: 3
-				email: @v1User.email
-		MockOverleafApi.addToken "v1-token", @v1Token
+		_createUser 2, true, (err, user) =>
+			return done err if err?
+			@user2 = user
+			@token2 =
+				access_token:
+					resource_owner_id: 2
+				user_profile:
+					id: 2
+					email: @user2.email
+			MockOverleafApi.addToken "good-token2", @token2
+			done()
+
+	before (done) ->
+		_createUser 3, false, (err, user) =>
+			return done err if err?
+			@v1User = user
+			@v1Token =
+				access_token:
+					resource_owner_id: 3
+				user_profile:
+					id: 3
+					email: @v1User.email
+			MockOverleafApi.addToken "v1-token", @v1Token
+			done()
 
 	describe "getProjects", ->
 		describe "without auth", ->
@@ -124,11 +130,11 @@ describe "Collabratec", ->
 					url: "/api/v1/collabratec/users/current_user/projects"
 				request options, (error, response, body) ->
 					expect(response.statusCode).to.equal 200
-					expect(body.projects.length).to.equal 17
+					expect(body.projects.length).to.equal 18
 					expect(body.paging).to.deep.equal {
 						current_page: 1
 						total_pages: 1
-						total_items: 17
+						total_items: 18
 					}
 					done()
 
@@ -142,9 +148,10 @@ describe "Collabratec", ->
 						page_size: 5
 				request options, (error, response, body) ->
 					expect(response.statusCode).to.equal 200
-					expect(body.projects.length).to.equal 2
-					expect(body.projects[0].title).to.equal "v1 project p"
-					expect(body.projects[1].title).to.equal "v2 project"
+					expect(body.projects.length).to.equal 3
+					expect(body.projects[0].title).to.equal "v1 project o"
+					expect(body.projects[1].title).to.equal "v1 project p"
+					expect(body.projects[2].title).to.equal "v2 project"
 					done()
 
 			it "should apply page_size", (done) ->
@@ -160,7 +167,7 @@ describe "Collabratec", ->
 					expect(body.paging).to.deep.equal {
 						current_page: 1
 						total_pages: 4
-						total_items: 17
+						total_items: 18
 					}
 					done()
 
@@ -178,7 +185,7 @@ describe "Collabratec", ->
 					expect(body.paging).to.deep.equal {
 						current_page: 3
 						total_pages: 4
-						total_items: 17
+						total_items: 18
 					}
 					done()
 
@@ -193,6 +200,19 @@ describe "Collabratec", ->
 					expect(response.statusCode).to.equal 200
 					expect(body.projects.length).to.equal 1
 					expect(body.projects[0].title).to.equal "v2 project"
+					done()
+
+			it "should return v1 id for imported project", (done) ->
+				options =
+					auth: bearer: "good-token"
+					json: true
+					url: "/api/v1/collabratec/users/current_user/projects"
+					qs:
+						search: "v1 import"
+				request options, (error, response, body) =>
+					expect(response.statusCode).to.equal 200
+					expect(body.projects.length).to.equal 1
+					expect(body.projects[0].id).to.equal @v1_import_project_token
 					done()
 
 	describe "getProjectMetadata", ->
@@ -229,6 +249,17 @@ describe "Collabratec", ->
 				request options, (error, response, body) =>
 					expect(response.statusCode).to.equal 200
 					expect(body.title).to.equal "v2 project"
+					done()
+
+		describe "with v1 import project id", ->
+			it "should return v2 project metadata", (done) ->
+				options =
+					auth: bearer: "good-token"
+					json: true
+					url: "/api/v1/collabratec/users/current_user/projects/#{@v1_import_project_token}/metadata"
+				request options, (error, response, body) =>
+					expect(response.statusCode).to.equal 200
+					expect(body.title).to.equal "v1 import project"
 					done()
 
 		describe "with invalid v2 project id", ->
@@ -355,6 +386,10 @@ describe "Collabratec", ->
 						}
 						ProjectModel.update {_id: @project_id}, update, done
 
+					after (done) ->
+						update = $unset: { collabratecUsers: 1 }
+						ProjectModel.update {_id: @project_id}, update, done
+
 					it "should archive project and return 204", (done) ->
 						options =
 							auth: bearer: "good-token"
@@ -367,10 +402,6 @@ describe "Collabratec", ->
 								done()
 
 				describe "when project is not linked to collabratec", ->
-					before (done) ->
-						update = $unset: { collabratecUsers: 1 }
-						ProjectModel.update {_id: @project_id}, update, done
-
 					it "should return 422 error", (done) ->
 						options =
 							auth: bearer: "good-token"
@@ -388,6 +419,31 @@ describe "Collabratec", ->
 						url: "/api/v1/collabratec/users/current_user/projects/#{@project_id}"
 					request options, (error, response, body) =>
 						expect(response.statusCode).to.equal 422
+						done()
+
+		describe "with v1 import project id", ->
+			before (done) ->
+				update = $set: {
+					collabratecUsers: [ {
+						collabratec_document_id: "9999"
+						user_id: @user.id
+					} ]
+				}
+				ProjectModel.update {_id: @v1_import_project_id}, update, done
+
+			after (done) ->
+				update = $unset: { collabratecUsers: 1 }
+				ProjectModel.update {_id: @v1_import_project_id}, update, done
+
+			it "should archive project and return 204", (done) ->
+				options =
+					auth: bearer: "good-token"
+					method: "DELETE"
+					url: "/api/v1/collabratec/users/current_user/projects/#{@v1_import_project_token}"
+				request options, (error, response, body) =>
+					expect(response.statusCode).to.equal 204
+					ProjectModel.find {_id: @v1_import_project_id }, (err, project) ->
+						return done err if err?
 						done()
 
 	describe "linkProject", ->
@@ -453,6 +509,21 @@ describe "Collabratec", ->
 						expect(response.statusCode).to.equal 403
 						done()
 
+		describe "with v1 import project id", ->
+			it "should link project and return 201", (done) ->
+				options =
+					auth: bearer: "good-token"
+					json: collabratec_document_id: "collabratec-document-id"
+					method: "POST"
+					url: "/api/v1/collabratec/users/current_user/projects/#{@v1_import_project_token}/collabratec"
+				request options, (error, response, body) =>
+					expect(response.statusCode).to.equal 201
+					expect(body.title).to.equal "v1 import project"
+					ProjectModel.findOne {_id: @v1_import_project_id }, (err, project) ->
+						return done err if err?
+						expect(project.collabratecUsers[0].collabratec_document_id).to.equal "collabratec-document-id"
+						done()
+
 	describe "unlinkProject", ->
 		describe "with v1 project id", ->
 			describe "when unlink succeeds", ->
@@ -479,14 +550,13 @@ describe "Collabratec", ->
 		describe "with v2 project id", ->
 			describe "when user owns project", ->
 				before (done) ->
-					options =
-						auth: bearer: "good-token"
-						json: collabratec_document_id: "collabratec-document-id"
-						method: "POST"
-						url: "/api/v1/collabratec/users/current_user/projects/#{@project_id}/collabratec"
-					request options, (error, response, body) =>
-						expect(response.statusCode).to.equal 201
-						done()
+					update = $set: {
+						collabratecUsers: [ {
+							collabratec_document_id: "9999"
+							user_id: @user.id
+						} ]
+					}
+					ProjectModel.update {_id: @project_id}, update, done
 
 				it "should unlink project and return 201", (done) ->
 					options =
@@ -508,6 +578,28 @@ describe "Collabratec", ->
 						url: "/api/v1/collabratec/users/current_user/projects/#{@project_id}/collabratec"
 					request options, (error, response, body) =>
 						expect(response.statusCode).to.equal 403
+						done()
+
+		describe "with v1 import project id", ->
+			before (done) ->
+				update = $set: {
+					collabratecUsers: [ {
+						collabratec_document_id: "9999"
+						user_id: @user.id
+					} ]
+				}
+				ProjectModel.update {_id: @v1_import_project_id}, update, done
+
+			it "should unlink project and return 201", (done) ->
+				options =
+					auth: bearer: "good-token"
+					method: "DELETE"
+					url: "/api/v1/collabratec/users/current_user/projects/#{@v1_import_project_token}/collabratec"
+				request options, (error, response, body) =>
+					expect(response.statusCode).to.equal 204
+					ProjectModel.findOne {_id: @v1_import_project_id }, (err, project) ->
+						return done err if err?
+						expect(project.collabratecUsers.length).to.equal 0
 						done()
 
 	describe "cloneProject", ->
@@ -639,6 +731,27 @@ describe "Collabratec", ->
 						url: "/api/v1/collabratec/users/current_user/projects/#{@project_id}/clone"
 					request options, (error, response, body) =>
 						expect(response.statusCode).to.equal 403
+						done()
+
+		describe "with v1 import project id", ->
+			before ->
+				MockOverleafApi.addCollabratecUser "collabratec-user-id-1", 1
+				MockOverleafApi.addCollabratecUser "collabratec-user-id-2", 2
+
+			it "should clone project and return 201", (done) ->
+				options =
+					auth: bearer: "good-token"
+					json:
+						protect: "true"
+						new_collabratec_document_id: "collabratec-document-id"
+						new_owner_collabratec_customer_id: "collabratec-user-id-1"
+					method: "POST"
+					url: "/api/v1/collabratec/users/current_user/projects/#{@v1_import_project_token}/clone"
+				request options, (error, response, body) =>
+					expect(response.statusCode).to.equal 201
+					ProjectModel.findOne { _id: body.id }, (err, project) =>
+						return done err if err?
+						expect(project.name).to.equal "v1 import project (1)"
 						done()
 
 	describe "uploadProject", ->

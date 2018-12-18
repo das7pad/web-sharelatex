@@ -302,3 +302,32 @@ describe "UserMapper", ->
 					expect(user.emails.length).to.equal 1
 					expect(user.emails[0].email).to.equal @slUser.email
 					done()
+
+		describe "with a collabratecUser mapped to the user stub", ->
+			beforeEach (done) ->
+				@collabratecUsers = [
+					{
+						user_id: @userStub._id
+						collabratec_document_id: "9999"
+					}
+				]
+				async.series [
+					(cb) =>
+						ProjectCreationHandler._createBlankProject @slUser.id, 'test-project', {collabratecUsers: @collabratecUsers}, (error, @project) =>
+							cb(error)
+					(cb) =>
+						UserMapper.mergeWithSlUser @slUser._id, {
+							id: @olId,
+							email: @slUser.email
+						}, cb
+				], done
+
+			it "should replace user stub references in collabratecUser", (done) ->
+				Project.findOne _id: @project._id, (error, project) =>
+					expect(
+						project.collabratecUsers[0].user_id.toString()
+					).to.equal(
+						@slUser._id.toString()
+					)
+					done()
+				return

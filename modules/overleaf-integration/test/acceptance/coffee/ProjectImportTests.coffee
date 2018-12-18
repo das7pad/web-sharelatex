@@ -509,3 +509,45 @@ describe "ProjectImportTests", ->
 
 		it 'should not succeed', ->
 			expect(@response.statusCode).to.equal 501
+
+	describe 'a project with collabratec users', ->
+		before (done) ->
+			@ol_project_id = 1
+			@user_stub_v1_id = 789
+			MockOverleafApi.setDoc Object.assign(
+				{ id: @ol_project_id },
+				BLANK_PROJECT,
+				{
+					collabratec_users: [
+						{
+							user_id: OWNER_V1_ID,
+							collabratec_document_id: "8888",
+						},
+						{
+							user_id: @user_stub_v1_id,
+							collabratec_document_id: "9999",
+							collabratec_privategroup_id: "1111"
+						},
+					]
+				}
+			)
+
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+				getProject response, (error, project) =>
+					@project = project
+					done()
+
+		it 'should import a project with collabratecUsers when user exists', ->
+			expect(@project.collabratecUsers[0].user_id.toString()).to.equal @owner.id
+			expect(@project.collabratecUsers[0].collabratec_document_id).to.equal "8888"
+
+		it 'should create stub user when collabratec user does not exist', (done) ->
+			UserStub.findOne { _id: @project.collabratecUsers[1].user_id }, (error, user_stub) =>
+				throw error if error?
+				expect(user_stub.overleaf.id).to.equal @user_stub_v1_id
+				expect(@project.collabratecUsers[1].collabratec_document_id).to.equal "9999"
+				expect(@project.collabratecUsers[1].collabratec_privategroup_id).to.equal "1111"
+				done()
+			return
