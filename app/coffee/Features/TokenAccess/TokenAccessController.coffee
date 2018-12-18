@@ -39,8 +39,8 @@ module.exports = TokenAccessController =
 				logger.log {token, userId},
 					"[TokenAccess] no project found for this token"
 				if !userId?
-					if Features.hasFeature('force-import-to-v1')
-						return res.render('project/v2-import-anon')
+					if Features.hasFeature('force-import-to-v2')
+						return res.render('project/v2-import', { loginRedirect: "/#{token}" })
 					else
 						return res.redirect(302, "/sign_in_to_v1?return_to=/#{token}")
 				else
@@ -107,9 +107,9 @@ module.exports = TokenAccessController =
 						"[TokenAccess] no project found for this token"
 					if !userId?
 						if Features.hasFeature('force-import-to-v2')
-							return res.render('project/v2-import-anon')
+							return res.render('project/v2-import', { loginRedirect: "/read/#{token}" })
 						else
-							return res.redirect(302, "/sign_in_to_v1?return_to=/#{token}")
+							return res.redirect(302, "/sign_in_to_v1?return_to=/read/#{token}")
 					else
 						TokenAccessHandler.getV1DocInfo token, userId, (err, doc_info) ->
 							return next err if err?

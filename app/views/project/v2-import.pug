@@ -11,7 +11,17 @@ block content
 						alt="The new V2 editor."
 					)
 
-					if hasOwner
+					if loginRedirect
+						p.text-center.row-spaced-small
+							| This project has not yet been moved into the new version of
+							| Overleaf. You will need to log in and move it in order to
+							| continue working on it.
+
+						.row-spaced.text-center
+							a.btn.btn-primary(
+								href="/login?redir=" + loginRedirect
+							) Log In To Move Project
+					else if hasOwner
 						p.text-center.row-spaced-small
 							| #[strong #{name}] has not yet been moved into the new version of
 							| Overleaf. You will need to move it in order to continue working
