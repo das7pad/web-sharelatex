@@ -348,6 +348,19 @@ describe "TokenAccessController", ->
 								)).to.equal true
 								done()
 
+						describe 'with anonymous user', ->
+							beforeEach ->
+								@AuthenticationController.getLoggedInUserId = sinon.stub().returns(null)
+								@TokenAccessController.readAndWriteToken @req, @res, @next
+
+							it 'should render anonymous import status page', (done) ->
+								expect(@res.render.callCount).to.equal 1
+								expect(@res.render.calledWith(
+									'project/v2-import',
+									{ loginRedirect: '/123abc' }
+								)).to.equal true
+								done()
+
 					describe 'when project was exported from v1', ->
 						beforeEach ->
 							@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
@@ -965,4 +978,25 @@ describe "TokenAccessController", ->
 								"/sign_in_to_v1?return_to=/read/#{@readOnlyToken}"
 							)).to.equal true
 							done()
+
+					describe 'force-import-to-v2 flag is on', ->
+						beforeEach ->
+							@res.render = sinon.stub()
+							@Features.hasFeature.returns(true)
+
+						describe 'when project was not exported to v2', ->
+							beforeEach ->
+								@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+									exists: true
+									exported: false
+								})
+								@TokenAccessController.readOnlyToken @req, @res, @next
+
+							it 'should render anonymous import status page', (done) ->
+								expect(@res.render.callCount).to.equal 1
+								expect(@res.render.calledWith(
+									'project/v2-import',
+									{ loginRedirect: "/read/#{@readOnlyToken}" }
+								)).to.equal true
+								done()
 
