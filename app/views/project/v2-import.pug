@@ -49,7 +49,9 @@ block content
 							| the project and upload that to continue editing it.
 
 						form(
-							method="get"
+							async-form="v2ZipDownload"
+							name="v2ZipDownloadForm"
+							method="GET"
 							action="/overleaf/project/" + projectId + "/download/zip"
 						)
 							form-messages(form="v2ZipDownloadForm")

@@ -53,12 +53,18 @@ define(['base', 'libs/passfield'], function(App) {
 
         scope[attrs.name].inflight = true
 
+        const method = element.attr('method').toLowerCase() || 'post'
+        const $HTTP_FNS = {
+          post: $http.post,
+          get: $http.get
+        }
+        const methodFn = $HTTP_FNS[method]
+
         // for asyncForm prevent automatic redirect to /login if
         // authentication fails, we will handle it ourselves
-        return $http
-          .post(element.attr('action'), formData, {
-            disableAutoLoginRedirect: true
-          })
+        return methodFn(element.attr('action'), formData, {
+          disableAutoLoginRedirect: true
+        })
           .then(function(httpResponse) {
             let config, headers, status
             ;({ data, status, headers, config } = httpResponse)
