@@ -117,7 +117,7 @@ module.exports = TokenAccessHandler =
 			allow: true
 		}) unless Settings.apis?.v1?
 
-		V1Api.request { url: "/api/v1/sharelatex/docs/#{token}/published" }, (err, response, body) ->
+		V1Api.request { url: "/api/v1/sharelatex/docs/#{token}/is_published" }, (err, response, body) ->
 			return callback err if err?
 			callback null, body
 

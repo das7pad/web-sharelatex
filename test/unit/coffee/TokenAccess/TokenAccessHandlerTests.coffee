@@ -516,7 +516,7 @@ describe "TokenAccessHandler", ->
 					@TokenAccessHandler.getV1DocPublishedInfo @token, @callback
 
 				it 'should return response body', ->
-					expect(@V1Api.request.calledWith { url: "/api/v1/sharelatex/docs/#{@token}/published" }).to.equal true
+					expect(@V1Api.request.calledWith { url: "/api/v1/sharelatex/docs/#{@token}/is_published" }).to.equal true
 					expect(@callback.calledWith null, 'mock-data').to.equal true
 
 			describe 'on V1Api.request error', ->
