@@ -948,7 +948,7 @@ describe "TokenAccessController", ->
 
 				describe 'anonymous user', ->
 					beforeEach ->
-						@AuthenticationController.getLoggedInUserId = sinon.stub().returns(@userId.toString())
+						@AuthenticationController.getLoggedInUserId = sinon.stub().returns(null)
 
 					describe 'when project was not exported to v2', ->
 						beforeEach ->
