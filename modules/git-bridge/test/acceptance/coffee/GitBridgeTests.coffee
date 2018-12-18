@@ -37,14 +37,82 @@ describe 'GitBridge', ->
 				}, cb
 		], done
 
-	_latestVersionRequest = (owner, projectId, callback) =>
+	_request = (owner, url, callback) =>
 		owner.request {
 			method: 'GET',
-			url: "/api/v0/docs/#{projectId}",
+			url: url,
 			headers:
 				'Authorization': "Bearer #{owner.v1Id}"
 			json: true
 		}, callback
+
+	_latestVersionRequest = (owner, projectId, callback) =>
+		_request(owner, "/api/v0/docs/#{projectId}", callback)
+
+	_savedVersRequest = (owner, projectId, callback) =>
+		_request(owner, "/api/v0/docs/#{projectId}/saved_vers", callback)
+
+	describe 'get saved vers', ->
+		before ->
+
+		describe 'missing project', ->
+			before ->
+
+			it 'should produce a 404 json response', (done) ->
+				_savedVersRequest @owner, "#{mongoose.Types.ObjectId()}", (err, response, body) =>
+					expect(err).to.not.exist
+					expect(response.statusCode).to.equal 404
+					expect(body.message).to.equal 'Project not found'
+					done()
+
+		describe 'native v2 project', ->
+			before (done) ->
+				@projectId = null
+				async.series [
+					(cb) => @owner.createProject "#{Math.random()}", (err, projectId) =>
+						@projectId = projectId
+						cb(err)
+					(cb) =>
+						labelOne = {
+							version: 1,
+							comment: "one",
+							created_at: new Date().toISOString(),
+							user_id: @owner._id.toString()
+						}
+						labelTwo = {
+							version: 2,
+							comment: "two",
+							created_at: new Date().toISOString(),
+							user_id: null
+						}
+						MockProjectHistoryApi.addLabel @projectId, labelOne
+						MockProjectHistoryApi.addLabel @projectId, labelTwo
+						cb()
+				], done
+
+			it "should send back saved-vers", (done) ->
+				_savedVersRequest @owner, @projectId, (err, response, body) =>
+					expect(err).to.not.exist
+					expect(response.statusCode).to.equal 200
+					expect(body.length).to.equal 2
+					for {idx, versionId, comment, user_present, user_email} in [
+						{idx: 0, versionId: 1, comment: "one", user_present: true, user_email: @owner.email},
+						{idx: 1, versionId: 2, comment: "two", user_present: false}
+					]
+						savedVer = body[idx]
+						expect(savedVer.versionId).to.exist
+						expect(savedVer.comment).to.exist
+						expect(savedVer.createdAt).to.exist
+						expect(savedVer.user?).to.equal user_present
+						expect(savedVer.versionId).to.equal versionId
+						expect(savedVer.comment).to.equal comment
+						if user_present
+							expect(savedVer.user?.email).to.equal user_email
+					done()
+
+
+
+
 
 	describe 'get latest version info', ->
 		before ->

@@ -36,6 +36,49 @@ module.exports = GitBridgeHandler =
 							return callback(err) if err?
 							callback(null, project)
 
+	getSavedVers: (userId, projectId, callback=(err, data)->) ->
+		GitBridgeHandler._checkAccess userId, projectId, (err, project) ->
+			return callback(err) if err?
+			# Only support native v2 projects for now
+			if project?.overleaf?.imported_at_ver_id?
+				logger.log {projectId}, '[GitBridgeHandler] cannot get savedVers for imported project'
+				return callback(null, [])
+			request.get {
+				url: GitBridgeHandler._projectHistoryUrl("/project/#{projectId}/labels"),
+				json: true
+			}, (err, response, body) ->
+				return callback(err) if err?
+				if response.statusCode != 200
+					err = new Error("Non-success status from project-history api: #{response.statusCode}")
+					logger.err {err}, "Error while communicating with project-history api"
+					return callback(err)
+				if !_.isArray(body)
+					err = new Error('response from project-history versions api is not an array')
+					logger.err {projectId, err}, "[GitBridgeHandler] #{err.message}"
+					return callback(err)
+				Async.mapSeries body, GitBridgeHandler._formatLabelAsSavedVer, (err, savedVers) ->
+						return callback(err) if err?
+						callback(null, savedVers)
+
+	_formatLabelAsSavedVer: (label, callback=(err, savedVer)->) ->
+		return callback(null, null) if !label?
+		savedVer = {  # ported from `saved_vers_controller` in v1
+			versionId: label.version
+			comment:   label.comment
+			createdAt: label.created_at
+		}
+		if label.user_id?
+			UserGetter.getUser label.user_id, (err, user) ->
+				return callback(err) if err?
+				if user?
+					savedVer.user = {
+						name: "#{user.first_name} #{user.last_name}",
+						email: user.email
+					}
+				callback(null, savedVer)
+		else
+			callback(null, savedVer)
+
 	getLatestProjectVersion: (userId, projectId, callback=(err, data)->) ->
 		GitBridgeHandler._checkAccess userId, projectId, (err, project) ->
 			return callback(err) if err?
