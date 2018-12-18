@@ -3,7 +3,7 @@ define([
     ], App =>
 
         // For integration-module
-        App.controller("OpenInOverleafGatewayController", function($scope, $http) {
+        App.controller("OpenInOverleafGatewayController", function($scope, $http, localStorage) {
             $scope.error = false;
 
             $scope.handleGateway = function(base64EncodedInput) {
@@ -52,6 +52,9 @@ define([
                     if (response.error) {
                         $scope.serverError = response.error;
                     } else if (response.data && response.data.redirect) {
+                        if (params.rich_text === 'true') {
+                            localStorage('editor.mode.' + response.data.projectId, 'rich-text');
+                        }
                         window.location.replace(response.data.redirect);
                     } else {
                         $scope.error = true;

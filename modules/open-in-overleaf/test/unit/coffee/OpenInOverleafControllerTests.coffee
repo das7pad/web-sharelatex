@@ -88,7 +88,7 @@ describe 'OpenInOverleafController', ->
 					sinon.assert.calledWith(@OpenInOverleafHelper.getDocumentLinesFromSnippet, sinon.match.has("snip", @snip))
 					sinon.assert.calledWith(@ProjectCreationHandler.createProjectFromSnippet, @user._id, "new_snippet_project", @documentLines)
 					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
-					content.should.equal JSON.stringify({redirect: '/project/' + @project_id})
+					content.should.equal JSON.stringify({redirect: '/project/' + @project_id, projectId: @project_id})
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
@@ -140,7 +140,7 @@ describe 'OpenInOverleafController', ->
 			it "should create a project and send a redirect to it", (done)->
 				@res.send = (content)=>
 					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
-					content.should.equal JSON.stringify({redirect: '/project/' + @project_id})
+					content.should.equal JSON.stringify({redirect: '/project/' + @project_id, projectId: @project_id})
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
@@ -151,7 +151,7 @@ describe 'OpenInOverleafController', ->
 			it "should create a project and redirect to it", (done)->
 				@res.send = (content)=>
 					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
-					content.should.equal JSON.stringify({redirect: '/project/' + @project_id})
+					content.should.equal JSON.stringify({redirect: '/project/' + @project_id, projectId: @project_id})
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
@@ -162,7 +162,7 @@ describe 'OpenInOverleafController', ->
 			it "should create a project and redirect to it", (done)->
 				@res.send = (content)=>
 					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
-					content.should.equal JSON.stringify({redirect: '/project/' + @project_id})
+					content.should.equal JSON.stringify({redirect: '/project/' + @project_id, projectId: @project_id})
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
@@ -173,7 +173,7 @@ describe 'OpenInOverleafController', ->
 			it "should create a project and redirect to it", (done)->
 				@res.send = (content)=>
 					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
-					content.should.equal JSON.stringify({redirect: '/project/' + @project_id})
+					content.should.equal JSON.stringify({redirect: '/project/' + @project_id, projectId: @project_id})
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
@@ -198,7 +198,7 @@ describe 'OpenInOverleafController', ->
 				@res.send = (content)=>
 					sinon.assert.calledWith(@ProjectUploadManager.createProjectFromZipArchive, @user._id, "foo", "/foo/bar.zip")
 					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
-					content.should.equal JSON.stringify({redirect: '/project/' + @project_id})
+					content.should.equal JSON.stringify({redirect: '/project/' + @project_id, projectId: @project_id})
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
@@ -210,7 +210,7 @@ describe 'OpenInOverleafController', ->
 				})
 				@res.send = (content)=>
 					sinon.assert.calledWith(@ProjectUploadManager.createProjectFromZipArchive, @user._id, "potato", "/foo/bar.zip")
-					content.should.equal JSON.stringify({redirect: '/project/' + @project_id})
+					content.should.equal JSON.stringify({redirect: '/project/' + @project_id, projectId: @project_id})
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
@@ -342,7 +342,7 @@ describe 'OpenInOverleafController', ->
 				_id: @project_id
 			@OpenInOverleafController._sendResponse(@req, @res, project)
 			sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
-			sinon.assert.calledWith(@res.send, JSON.stringify({redirect: "/project/#{@project_id}"}))
+			sinon.assert.calledWith(@res.send, JSON.stringify({redirect: "/project/#{@project_id}", projectId: @project_id}))
 			sinon.assert.notCalled(@res.redirect)
 
 		it "should send a redirect for standard requests", ->

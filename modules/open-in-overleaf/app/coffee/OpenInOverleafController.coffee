@@ -149,7 +149,7 @@ module.exports = OpenInOverleafController =
 
 		if req.xhr || req.headers.accept?.indexOf('json') > -1
 			res.setHeader('Content-Type', 'application/json')
-			res.send(JSON.stringify({redirect: uri}))
+			res.send(JSON.stringify({redirect: uri, projectId: project._id}))
 		else
 			res.redirect uri
 
