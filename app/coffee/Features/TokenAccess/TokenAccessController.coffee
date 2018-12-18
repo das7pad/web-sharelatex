@@ -93,9 +93,9 @@ module.exports = TokenAccessController =
 		userId = AuthenticationController.getLoggedInUserId(req)
 		token = req.params['read_only_token']
 		logger.log {userId, token}, "[TokenAccess] requesting read-only token access"
-		TokenAccessHandler.getV1DocInfo token, userId, (err, doc_info) ->
+		TokenAccessHandler.getV1DocPublishedInfo token, (err, doc_published_info) ->
 			return next err if err?
-			return res.redirect doc_info.published_path if doc_info.allow == false
+			return res.redirect doc_published_info.published_path if doc_published_info.allow == false
 
 			TokenAccessHandler.findProjectWithReadOnlyToken token, (err, project, projectExists) ->
 				if err?
@@ -105,8 +105,16 @@ module.exports = TokenAccessController =
 				if !projectExists and settings.overleaf
 					logger.log {token, userId},
 						"[TokenAccess] no project found for this token"
-					return next(new Errors.NotFoundError()) if doc_info.exported
-					return res.redirect(302, "/sign_in_to_v1?return_to=/read/#{token}")
+					if !userId?
+						if Features.hasFeature('force-import-to-v2')
+							return res.render('project/v2-import-anon')
+						else
+							return res.redirect(302, "/sign_in_to_v1?return_to=/#{token}")
+					else
+						TokenAccessHandler.getV1DocInfo token, userId, (err, doc_info) ->
+							return next err if err?
+							return next(new Errors.NotFoundError()) if doc_info.exported
+							return res.redirect(302, "/sign_in_to_v1?return_to=/read/#{token}")
 				else if !project?
 					logger.log {token, userId},
 						"[TokenAccess] no project found for readOnly token"

@@ -111,10 +111,19 @@ module.exports = TokenAccessHandler =
 			if privilegeLevel != PrivilegeLevels.READ_ONLY
 				project.tokens.readOnly = ''
 
-	getV1DocInfo: (token, v2UserId, callback=(err, info)->) ->
-		# default to allowing access and not exported
+	getV1DocPublishedInfo: (token, callback = (err, publishedInfo) ->) ->
+		# default to allowing access
 		return callback(null, {
 			allow: true
+		}) unless Settings.apis?.v1?
+
+		V1Api.request { url: "/api/v1/sharelatex/docs/#{token}/info" }, (err, response, body) ->
+			return callback err if err?
+			callback null, body
+
+	getV1DocInfo: (token, v2UserId, callback=(err, info)->) ->
+		# default to not exported
+		return callback(null, {
 			exists: true
 			exported: false
 		}) unless Settings.apis?.v1?
