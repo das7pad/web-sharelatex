@@ -62,6 +62,8 @@ describe 'OpenInOverleafController', ->
 			)
 			populateProjectFromFileList: sinon.stub().callsArg(2)
 			setProjectBrandVariationFromSlug: sinon.stub().callsArg(2)
+			snippetFileComment: sinon.stub().returns("% default_snippet_comment\n")
+		@OpenInOverleafHelper.snippetFileComment.withArgs('texample').returns("% texample_snippet_comment\n")
 		@Csrf =
 			validateRequest: sinon.stub().callsArgWith(1, true)
 		@AuthenticationController =
