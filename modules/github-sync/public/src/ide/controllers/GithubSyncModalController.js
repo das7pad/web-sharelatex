@@ -149,15 +149,15 @@ define(['base'], App =>
                   .then(function(response) {
                     const commits = response.data
                     $scope.status.commits.commits = commits
-                    return ($scope.status.commits.loading = false)
+                    $scope.status.commits.loading = false
                   })
                   .catch(function(response) {
                     let status
                     ;({ data, status } = response)
                     if (status != null) {
-                      return ($scope.status.error = { status })
+                      $scope.status.error = { status }
                     } else {
-                      return ($scope.status.error = true)
+                      $scope.status.error = true
                     }
                   })
               }
@@ -166,18 +166,18 @@ define(['base'], App =>
               let status
               ;({ data, status } = response)
               if (status != null) {
-                return ($scope.status.error = { status })
+                $scope.status.error = { status }
               } else {
-                return ($scope.status.error = true)
+                $scope.status.error = true
               }
             })
         })
         .catch(function(response) {
           const { data, status } = response
           if (status != null) {
-            return ($scope.status.error = { status })
+            $scope.status.error = { status }
           } else {
-            return ($scope.status.error = true)
+            $scope.status.error = true
           }
         })
     })()
