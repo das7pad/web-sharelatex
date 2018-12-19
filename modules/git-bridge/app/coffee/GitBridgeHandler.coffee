@@ -9,6 +9,7 @@ SafePath = require '../../../../app/js/Features/Project/SafePath'
 FileWriter = require '../../../../app/js/infrastructure/FileWriter'
 UpdateMerger = require '../../../../app/js/Features/ThirdPartyDataStore/UpdateMerger'
 Errors = require './GitBridgeErrors'
+V1Api = require '../../../../app/js/Features/V1/V1Api'
 request = require 'request'
 url = require 'url'
 _ = require 'lodash'
@@ -39,10 +40,10 @@ module.exports = GitBridgeHandler =
 	getSavedVers: (userId, projectId, callback=(err, data)->) ->
 		GitBridgeHandler._checkAccess userId, projectId, (err, project) ->
 			return callback(err) if err?
-			# Only support native v2 projects for now
-			if project?.overleaf?.imported_at_ver_id?
-				logger.log {projectId}, '[GitBridgeHandler] cannot get savedVers for imported project'
-				return callback(null, [])
+			# # Only support native v2 projects for now
+			# if project?.overleaf?.imported_at_ver_id?
+			# 	logger.log {projectId}, '[GitBridgeHandler] cannot get savedVers for imported project'
+			# 	return callback(null, [])
 			request.get {
 				url: GitBridgeHandler._projectHistoryUrl("/project/#{projectId}/labels"),
 				json: true
@@ -58,7 +59,39 @@ module.exports = GitBridgeHandler =
 					return callback(err)
 				Async.mapSeries body, GitBridgeHandler._formatLabelAsSavedVer, (err, savedVers) ->
 					return callback(err) if err?
-					callback(null, savedVers)
+					importedAtVerId = project?.overleaf?.imported_at_ver_id
+					if importedAtVerId?
+						GitBridgeHandler._savedVersForImportedProject userId, project, savedVers, (err, savedVers) ->
+							return callback(err) if err?
+							callback(null, savedVers)
+					else
+						callback(null, savedVers)
+
+	_savedVersForImportedProject: (userId, project, savedVers, callback) ->
+		UserGetter.getUser userId, {'tokens': 1, 'overleaf': 1}, (err, user) ->
+			return callback(err) if err?
+			if !user? or !user.overleaf?.id?
+				err = new Error('User does not have overleaf id, cannot talk to overleaf api')
+				logger.err {projectId: project._id, userId, err}, "[GitBridgeHandler] #{err.message}"
+				return callback(err)
+			v1UserId = user.overleaf.id
+			v1DocId = project.tokens.readAndWrite  # TODO: fix this, doesn't seem right
+			V1Api.request {
+				url: "/api/v1/sharelatex/users/#{v1UserId}/docs/#{v1DocId}/history_export/status",
+				json: true
+			}, (err, response, body) ->
+				return callback(err) if err?
+				if response.statusCode != 200
+					err = new Error("Non-success status from v1 api: #{response.statusCode}")
+					logger.err {err}, "Error while communicating with v1 export status api"
+					return callback(err)
+				exportedAtHistoryVersion = body.history_export_version
+				filtered = savedVers.filter (sv) ->
+					sv.versionId > exportedAtHistoryVersion
+				console.log ">>>> savedVers", savedVers
+				console.log ">>>> exportedAtHistoryVersion", exportedAtHistoryVersion
+				console.log ">>>> filtered", filtered
+				callback(null, filtered)
 
 	_formatLabelAsSavedVer: (label, callback=(err, savedVer)->) ->
 		return callback(null, null) if !label?
