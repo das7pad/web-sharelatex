@@ -138,4 +138,4 @@ module.exports = TokenAccessHandler =
 module.exports.READ_AND_WRITE_TOKEN_REGEX =  /^(\d+)(\w+)$/
 module.exports.READ_AND_WRITE_URL_REGEX =  /^\/(\d+)(\w+)$/
 module.exports.READ_ONLY_TOKEN_REGEX =  /^([a-z]{12})$/
-module.exports.READ_ONLY_URL_REGEX =  /^\/([a-z]{12})$/
+module.exports.READ_ONLY_URL_REGEX =  /^\/read\/([a-z]{12})$/
