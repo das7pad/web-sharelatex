@@ -20,7 +20,8 @@ settings = require 'settings-sharelatex'
 	V1ProjectHasAssignments
 } = require "./Errors"
 
-READ_AND_WRITE_TOKEN_REGEX = /^[0-9a-z]+/
+READ_AND_WRITE_TOKEN_REGEX = /(\d+)(\w+)/
+READ_ONLY_TOKEN_REGEX = /[a-z]{12}/
 
 module.exports = ProjectImportController =
 	importProject: (req, res) ->
@@ -62,8 +63,10 @@ module.exports = ProjectImportController =
 	_redirUrl: (ol_doc_id) ->
 		if READ_AND_WRITE_TOKEN_REGEX.test ol_doc_id
 			"/#{ol_doc_id}"
-		else
+		else if READ_ONLY_TOKEN_REGEX.test ol_doc_id
 			"/read/#{ol_doc_id}"
+		else
+			throw new Error('unknown v1 token')
 
 	getFailures: (req, res, next = (error) ->) ->
 		ProjectImportErrorRecorder.getFailures (error, result) ->
