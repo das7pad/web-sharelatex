@@ -84,8 +84,10 @@ define(['base', 'libs/passfield'], function(App) {
               } else {
                 return ga('send', 'event', formName, 'success')
               }
-            } else if (headers('Content-Type') !== 'application/json') {
-              const blob = new Blob([data], { type: headers('Content-Type') })
+            } else if (scope.$eval(attrs.asyncFormDownloadResponse)) {
+              const blob = new Blob([data], {
+                type: headers('Content-Type')
+              })
               location.href = URL.createObjectURL(blob) // Trigger file save
             }
           })
