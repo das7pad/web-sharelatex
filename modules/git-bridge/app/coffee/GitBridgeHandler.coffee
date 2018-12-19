@@ -57,8 +57,8 @@ module.exports = GitBridgeHandler =
 					logger.err {projectId, err}, "[GitBridgeHandler] #{err.message}"
 					return callback(err)
 				Async.mapSeries body, GitBridgeHandler._formatLabelAsSavedVer, (err, savedVers) ->
-						return callback(err) if err?
-						callback(null, savedVers)
+					return callback(err) if err?
+					callback(null, savedVers)
 
 	_formatLabelAsSavedVer: (label, callback=(err, savedVer)->) ->
 		return callback(null, null) if !label?
@@ -72,7 +72,7 @@ module.exports = GitBridgeHandler =
 				return callback(err) if err?
 				if user?
 					savedVer.user = {
-						name: "#{user.first_name} #{user.last_name}",
+						name: "#{user.first_name} #{user.last_name}".trim(),
 						email: user.email
 					}
 				callback(null, savedVer)
