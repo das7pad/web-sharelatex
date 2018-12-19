@@ -57,13 +57,13 @@ module.exports = GitBridgeHandler =
 					return callback(err) if err?
 					importedAtVerId = project?.overleaf?.imported_at_ver_id
 					if importedAtVerId?
-						GitBridgeHandler._savedVersForImportedProject userId, project, savedVers, (err, savedVers) ->
+						GitBridgeHandler._savedVersForImportedProject project, savedVers, (err, savedVers) ->
 							return callback(err) if err?
 							callback(null, savedVers)
 					else
 						callback(null, savedVers)
 
-	_savedVersForImportedProject: (userId, project, savedVers, callback) ->
+	_savedVersForImportedProject: (project, savedVers, callback) ->
 		GitBridgeHandler._getMigratedFromId project, (err, v1DocId) ->
 			return callback(err) if err?
 			V1Api.request {
