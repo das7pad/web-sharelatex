@@ -7,6 +7,7 @@ ErrorController = require '../../../../app/js/Features/Errors/ErrorController'
 AuthenticationController = require '../../../../app/js/Features/Authentication/AuthenticationController'
 UserGetter = require '../../../../app/js/Features/User/UserGetter'
 SubscriptionGroupHandler = require '../../../../app/js/Features/Subscription/SubscriptionGroupHandler'
+V1Api = require '../../../../app/js/Features/V1/V1Api'
 TemplatesUtilities = require '../../../v2-templates/app/js/TemplatesUtilities'
 Settings = require 'settings-sharelatex'
 
@@ -152,3 +153,16 @@ module.exports = PortalsController =
 
 	getPortalOrg: (req, res, next) ->
 		_getPortal(req, res, next, 'org')
+
+	friendlyTemplateLink: (req, res, next) ->
+		V1Api.request {
+			method: 'GET'
+			url: req.path
+			expectedStatusCodes: [200]
+		}, (err, response, body) ->
+			return next(err) if err
+			if response.statusCode in [200] and response.body.kind and response.body.read_token and response.body.slug
+				res.redirect 301, "/latex/#{response.body.kind}s/#{response.body.slug}/#{response.body.read_token}"
+			else
+				logger.err {path: req.path, err}, "v1 publisher friendly template link not found"
+				ErrorController.notFound req, res
