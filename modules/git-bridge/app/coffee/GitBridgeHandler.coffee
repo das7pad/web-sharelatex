@@ -73,9 +73,13 @@ module.exports = GitBridgeHandler =
 				return callback(err) if err?
 				if response.statusCode != 200
 					err = new Error("Non-success status from v1 api: #{response.statusCode}")
-					logger.err {err}, "Error while communicating with v1 export status api"
+					logger.err {err}, "[GitBridgeHandler] Error while communicating with v1 export status api"
 					return callback(err)
 				exportedAtHistoryVersion = body.history_export_version
+				if !exportedAtHistoryVersion?
+					err = new Error('expected a history_export_version value from v1')
+					logger.err {projectId: project._id, err}, "[GitBridgeHandler] Error getting export status from v1"
+					return callback(err)
 				filtered = savedVers.filter (sv) ->
 					sv.versionId > exportedAtHistoryVersion
 				callback(null, filtered)
