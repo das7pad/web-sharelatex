@@ -23,7 +23,15 @@ module.exports =
 		removeRoute(webRouter, 'get', '/login')
 		removeRoute(webRouter, 'post', '/login')
 		webRouter.get '/login', V1LoginController.loginPage
-		webRouter.post '/login', V1LoginController.doLogin
+		webRouter.post(
+			'/login', 
+			RateLimiterMiddlewear.rateLimit({
+				endpointName: 'overleaf-login',
+				maxRequests: 10
+				timeInterval: 60
+			}),
+			V1LoginController.doLogin
+		)
 		webRouter.get '/welcome/sl', OverleafAuthenticationController.welcomeScreen
 
 		webRouter.get '/login/finish', V1LoginController.loginProfile
