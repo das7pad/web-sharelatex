@@ -68,30 +68,20 @@ module.exports = GitBridgeHandler =
 						callback(null, savedVers)
 
 	_savedVersForImportedProject: (userId, project, savedVers, callback) ->
-		UserGetter.getUser userId, {'tokens': 1, 'overleaf': 1}, (err, user) ->
+		v1DocId = project.tokens.readAndWrite  # TODO: fix this, doesn't seem right
+		V1Api.request {
+			url: "/api/v1/sharelatex/docs/#{v1DocId}/history_export/status",
+			json: true
+		}, (err, response, body) ->
 			return callback(err) if err?
-			if !user? or !user.overleaf?.id?
-				err = new Error('User does not have overleaf id, cannot talk to overleaf api')
-				logger.err {projectId: project._id, userId, err}, "[GitBridgeHandler] #{err.message}"
+			if response.statusCode != 200
+				err = new Error("Non-success status from v1 api: #{response.statusCode}")
+				logger.err {err}, "Error while communicating with v1 export status api"
 				return callback(err)
-			v1UserId = user.overleaf.id
-			v1DocId = project.tokens.readAndWrite  # TODO: fix this, doesn't seem right
-			V1Api.request {
-				url: "/api/v1/sharelatex/users/#{v1UserId}/docs/#{v1DocId}/history_export/status",
-				json: true
-			}, (err, response, body) ->
-				return callback(err) if err?
-				if response.statusCode != 200
-					err = new Error("Non-success status from v1 api: #{response.statusCode}")
-					logger.err {err}, "Error while communicating with v1 export status api"
-					return callback(err)
-				exportedAtHistoryVersion = body.history_export_version
-				filtered = savedVers.filter (sv) ->
-					sv.versionId > exportedAtHistoryVersion
-				console.log ">>>> savedVers", savedVers
-				console.log ">>>> exportedAtHistoryVersion", exportedAtHistoryVersion
-				console.log ">>>> filtered", filtered
-				callback(null, filtered)
+			exportedAtHistoryVersion = body.history_export_version
+			filtered = savedVers.filter (sv) ->
+				sv.versionId > exportedAtHistoryVersion
+			callback(null, filtered)
 
 	_formatLabelAsSavedVer: (label, callback=(err, savedVer)->) ->
 		return callback(null, null) if !label?
