@@ -38,23 +38,13 @@ module.exports = TokenAccessController =
 			if !projectExists and settings.overleaf
 				logger.log {token, userId},
 					"[TokenAccess] no project found for this token"
-				if !userId?
-					if Features.hasFeature('force-import-to-v2')
-						return res.render('project/v2-import', { loginRedirect: "/#{token}" })
-					else
-						return res.redirect(302, "/sign_in_to_v1?return_to=/#{token}")
-				else
-					TokenAccessHandler.getV1DocInfo token, userId, (err, doc_info) ->
-						return next err if err?
-						return next(new Errors.NotFoundError()) if doc_info.exported
-						if Features.hasFeature('force-import-to-v2')
-							return res.render('project/v2-import', {
-								projectId: token,
-								hasOwner: doc_info.has_owner,
-								name: doc_info.name
-							})
-						else
-							return res.redirect(302, "/sign_in_to_v1?return_to=/#{token}")
+				TokenAccessController._handleV1Project(
+					token,
+					userId,
+					"/#{token}",
+					res,
+					next
+				)
 			else if !project?
 				logger.log {token, userId},
 					"[TokenAccess] no token-based project found for readAndWrite token"
@@ -105,23 +95,13 @@ module.exports = TokenAccessController =
 				if !projectExists and settings.overleaf
 					logger.log {token, userId},
 						"[TokenAccess] no project found for this token"
-					if !userId?
-						if Features.hasFeature('force-import-to-v2')
-							return res.render('project/v2-import', { loginRedirect: "/read/#{token}" })
-						else
-							return res.redirect(302, "/sign_in_to_v1?return_to=/read/#{token}")
-					else
-						TokenAccessHandler.getV1DocInfo token, userId, (err, doc_info) ->
-							return next err if err?
-							return next(new Errors.NotFoundError()) if doc_info.exported
-							if Features.hasFeature('force-import-to-v2')
-								return res.render('project/v2-import', {
-									projectId: token,
-									hasOwner: doc_info.has_owner,
-									name: doc_info.name
-								})
-							else
-								return res.redirect(302, "/sign_in_to_v1?return_to=/read/#{token}")
+					TokenAccessController._handleV1Project(
+						token,
+						userId,
+						"/read/#{token}",
+						res,
+						next
+					)
 				else if !project?
 					logger.log {token, userId},
 						"[TokenAccess] no project found for readOnly token"
@@ -150,3 +130,22 @@ module.exports = TokenAccessController =
 									"[TokenAccess] error adding user to project with readAndWrite token"
 								return next(err)
 							return TokenAccessController._loadEditor(project._id, req, res, next)
+
+	_handleV1Project: (token, userId, redirectPath, res, next) ->
+		if !userId?
+			if Features.hasFeature('force-import-to-v2')
+				return res.render('project/v2-import', { loginRedirect: redirectPath })
+			else
+				return res.redirect(302, "/sign_in_to_v1?return_to=#{redirectPath}")
+		else
+			TokenAccessHandler.getV1DocInfo token, userId, (err, doc_info) ->
+				return next err if err?
+				return next(new Errors.NotFoundError()) if doc_info.exported
+				if Features.hasFeature('force-import-to-v2')
+					return res.render('project/v2-import', {
+						projectId: token,
+						hasOwner: doc_info.has_owner,
+						name: doc_info.name
+					})
+				else
+					return res.redirect(302, "/sign_in_to_v1?return_to=#{redirectPath}")
