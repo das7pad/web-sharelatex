@@ -62,6 +62,8 @@ describe 'OpenInOverleafController', ->
 			)
 			populateProjectFromFileList: sinon.stub().callsArg(2)
 			setProjectBrandVariationFromSlug: sinon.stub().callsArg(2)
+			snippetFileComment: sinon.stub().returns("% default_snippet_comment\n")
+		@OpenInOverleafHelper.snippetFileComment.withArgs('texample').returns("% texample_snippet_comment\n")
 		@Csrf =
 			validateRequest: sinon.stub().callsArgWith(1, true)
 		@AuthenticationController =
@@ -333,7 +335,7 @@ describe 'OpenInOverleafController', ->
 			@OpenInOverleafController._getMainFileCommentFromSnipRequest(@req).should.equal ""
 
 		it "should return the texample comment if the referrer is texample", ->
-			@req.header = sinon.stub().withArgs('Referer').returns('https://asdf.texample.net/1/2/3')
+			@req.body.referrer = 'https://asdf.texample.net/1/2/3'
 			@OpenInOverleafController._getMainFileCommentFromSnipRequest(@req).should.equal "% texample_snippet_comment\n"
 
 	describe "_sendResponse", ->
