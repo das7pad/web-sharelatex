@@ -20,6 +20,10 @@ User = require "#{WEB_PATH}/test/acceptance/js/helpers/User"
 {Project} = require "#{WEB_PATH}/app/js/models/Project"
 {ProjectInvite} = require "#{WEB_PATH}/app/js/models/ProjectInvite"
 {UserStub} = require "#{WEB_PATH}/app/js/models/UserStub"
+{
+	READ_AND_WRITE_URL_REGEX,
+	READ_ONLY_URL_REGEX
+} = require "#{WEB_PATH}/app/js/Features/TokenAccess/TokenAccessHandler"
 
 OWNER_V1_ID = 123
 
@@ -39,9 +43,6 @@ BLANK_PROJECT = {
 	labels: []
 }
 
-READ_WRITE_URL_REGEX = /^\/([0-9a-z]+)/
-READ_ONLY_URL_REGEX = /^\/([a-z]+)/
-
 getProject = (response, callback) ->
 	expect(response.statusCode).to.equal 200
 
@@ -51,10 +52,11 @@ getProject = (response, callback) ->
 		callback null, project
 
 	redirect_path = JSON.parse(response.body).redir
-	if READ_WRITE_URL_REGEX.test(redirect_path)
-		token = READ_WRITE_URL_REGEX.exec(redirect_path)[1]
+	if READ_AND_WRITE_URL_REGEX.test(redirect_path)
+		id = READ_AND_WRITE_URL_REGEX.exec(redirect_path)[1]
+		token = READ_AND_WRITE_URL_REGEX.exec(redirect_path)[2]
 		expect(token).to.be.a('string')
-		Project.findOne { "tokens.readAndWrite": token }, handleProjectCb
+		Project.findOne { "tokens.readAndWrite": "#{id}#{token}" }, handleProjectCb
 	else if READ_ONLY_URL_REGEX.test(redirect_path)
 		token = READ_ONLY_URL_REGEX.exec(redirect_path)[1]
 		expect(token).to.be.a('string')

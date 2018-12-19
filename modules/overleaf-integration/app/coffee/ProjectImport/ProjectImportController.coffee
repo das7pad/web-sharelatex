@@ -19,9 +19,10 @@ settings = require 'settings-sharelatex'
 	V1ExportInProgress,
 	V1ProjectHasAssignments
 } = require "./Errors"
-
-READ_AND_WRITE_TOKEN_REGEX = /(\d+)(\w+)/
-READ_ONLY_TOKEN_REGEX = /[a-z]{12}/
+{
+	READ_AND_WRITE_TOKEN_REGEX,
+	READ_ONLY_TOKEN_REGEX
+} = require "#{WEB_PATH}/Features/TokenAccess/TokenAccessHandler"
 
 module.exports = ProjectImportController =
 	importProject: (req, res) ->

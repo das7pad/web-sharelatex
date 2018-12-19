@@ -134,3 +134,8 @@ module.exports = TokenAccessHandler =
 			V1Api.request { url: "/api/v1/sharelatex/users/#{v1UserId}/docs/#{token}/info" }, (err, response, body) ->
 				return callback err if err?
 				callback null, body
+
+module.exports.READ_AND_WRITE_TOKEN_REGEX =  /^(\d+)(\w+)$/
+module.exports.READ_AND_WRITE_URL_REGEX =  /^\/(\d+)(\w+)$/
+module.exports.READ_ONLY_TOKEN_REGEX =  /^([a-z]{12})$/
+module.exports.READ_ONLY_URL_REGEX =  /^\/([a-z]{12})$/
