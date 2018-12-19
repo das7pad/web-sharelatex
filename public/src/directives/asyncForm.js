@@ -117,7 +117,8 @@ define(['base', 'libs/passfield'], function(App) {
               }
             } else if (status === 429) {
               response.message = {
-                text: 'Too many attempts. Please wait a while and try again.',
+                text:
+                  'Too many attempts. Please wait for a while and try again.',
                 type: 'error'
               }
             } else {
