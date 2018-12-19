@@ -53,16 +53,10 @@ define(['base', 'libs/passfield'], function(App) {
 
         scope[attrs.name].inflight = true
 
-        const method = element.attr('method').toLowerCase() || 'post'
-        const $HTTP_FNS = {
-          post: $http.post,
-          get: $http.get
-        }
-        const methodFn = $HTTP_FNS[method]
-
         // for asyncForm prevent automatic redirect to /login if
         // authentication fails, we will handle it ourselves
-        return methodFn(element.attr('action'), formData, {
+        const httpRequestFn = _httpRequestFn(element.attr('method'))
+        return httpRequestFn(element.attr('action'), formData, {
           disableAutoLoginRedirect: true
         })
           .then(function(httpResponse) {
@@ -144,6 +138,14 @@ define(['base', 'libs/passfield'], function(App) {
 
       const submit = () =>
         validateCaptchaIfEnabled(response => submitRequest(response))
+
+      const _httpRequestFn = (method = 'post') => {
+        const $HTTP_FNS = {
+          post: $http.post,
+          get: $http.get
+        }
+        return $HTTP_FNS[method.toLowerCase()]
+      }
 
       element.on('submit', function(e) {
         e.preventDefault()
