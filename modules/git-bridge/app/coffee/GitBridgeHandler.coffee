@@ -9,6 +9,7 @@ SafePath = require '../../../../app/js/Features/Project/SafePath'
 FileWriter = require '../../../../app/js/infrastructure/FileWriter'
 UpdateMerger = require '../../../../app/js/Features/ThirdPartyDataStore/UpdateMerger'
 Errors = require './GitBridgeErrors'
+V1Api = require '../../../../app/js/Features/V1/V1Api'
 request = require 'request'
 url = require 'url'
 _ = require 'lodash'
@@ -39,10 +40,6 @@ module.exports = GitBridgeHandler =
 	getSavedVers: (userId, projectId, callback=(err, data)->) ->
 		GitBridgeHandler._checkAccess userId, projectId, (err, project) ->
 			return callback(err) if err?
-			# Only support native v2 projects for now
-			if project?.overleaf?.imported_at_ver_id?
-				logger.log {projectId}, '[GitBridgeHandler] cannot get savedVers for imported project'
-				return callback(null, [])
 			request.get {
 				url: GitBridgeHandler._projectHistoryUrl("/project/#{projectId}/labels"),
 				json: true
@@ -58,7 +55,34 @@ module.exports = GitBridgeHandler =
 					return callback(err)
 				Async.mapSeries body, GitBridgeHandler._formatLabelAsSavedVer, (err, savedVers) ->
 					return callback(err) if err?
-					callback(null, savedVers)
+					importedAtVerId = project?.overleaf?.imported_at_ver_id
+					if importedAtVerId?
+						GitBridgeHandler._savedVersForImportedProject project, savedVers, (err, savedVers) ->
+							return callback(err) if err?
+							callback(null, savedVers)
+					else
+						callback(null, savedVers)
+
+	_savedVersForImportedProject: (project, savedVers, callback) ->
+		GitBridgeHandler._getMigratedFromId project, (err, v1DocId) ->
+			return callback(err) if err?
+			V1Api.request {
+				url: "/api/v1/sharelatex/docs/#{v1DocId}/history_export/status",
+				json: true
+			}, (err, response, body) ->
+				return callback(err) if err?
+				if response.statusCode != 200
+					err = new Error("Non-success status from v1 api: #{response.statusCode}")
+					logger.err {err}, "[GitBridgeHandler] Error while communicating with v1 export status api"
+					return callback(err)
+				exportedAtHistoryVersion = body.history_export_version
+				if !exportedAtHistoryVersion?
+					err = new Error('expected a history_export_version value from v1')
+					logger.err {projectId: project._id, err}, "[GitBridgeHandler] Error getting export status from v1"
+					return callback(err)
+				filtered = savedVers.filter (sv) ->
+					sv.versionId > exportedAtHistoryVersion
+				callback(null, filtered)
 
 	_formatLabelAsSavedVer: (label, callback=(err, savedVer)->) ->
 		return callback(null, null) if !label?
