@@ -4,10 +4,10 @@ block vars
 	- var suppressNavContentLinks = true
 
 block content
-	.container
-		.row
-			.col-md-6.col-md-offset-3
-				.card
+	.content
+		.container
+			.row
+				.col-md-8.col-md-offset-2
 					.page-header
 						h1 #{translate('loading_content')}
 					.message
@@ -16,5 +16,7 @@ block content
 						ng-controller="OpenInOverleafGatewayController",
 						ng-init="handleGateway('"+Buffer.from(JSON.stringify({params: form_data, action: action, target: target, csrfToken: csrfToken, error: error})).toString('base64')+"')"
 					)
+						.spinner.text-center(ng-hide="error || serverError")
+							i.fa.fa-5x.fa-spin.fa-spinner
 						.alert.alert-danger(ng-show="error" ng-cloak) #{translate('sorry_something_went_wrong_opening_the_document_please_try_again')}
 						.alert.alert-danger(ng-show="serverError" ng-cloak) {{serverError}}
