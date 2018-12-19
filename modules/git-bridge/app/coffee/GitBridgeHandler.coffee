@@ -68,20 +68,21 @@ module.exports = GitBridgeHandler =
 						callback(null, savedVers)
 
 	_savedVersForImportedProject: (userId, project, savedVers, callback) ->
-		v1DocId = project.tokens.readAndWrite  # TODO: fix this, doesn't seem right
-		V1Api.request {
-			url: "/api/v1/sharelatex/docs/#{v1DocId}/history_export/status",
-			json: true
-		}, (err, response, body) ->
+		GitBridgeHandler._getMigratedFromId project, (err, v1DocId) ->
 			return callback(err) if err?
-			if response.statusCode != 200
-				err = new Error("Non-success status from v1 api: #{response.statusCode}")
-				logger.err {err}, "Error while communicating with v1 export status api"
-				return callback(err)
-			exportedAtHistoryVersion = body.history_export_version
-			filtered = savedVers.filter (sv) ->
-				sv.versionId > exportedAtHistoryVersion
-			callback(null, filtered)
+			V1Api.request {
+				url: "/api/v1/sharelatex/docs/#{v1DocId}/history_export/status",
+				json: true
+			}, (err, response, body) ->
+				return callback(err) if err?
+				if response.statusCode != 200
+					err = new Error("Non-success status from v1 api: #{response.statusCode}")
+					logger.err {err}, "Error while communicating with v1 export status api"
+					return callback(err)
+				exportedAtHistoryVersion = body.history_export_version
+				filtered = savedVers.filter (sv) ->
+					sv.versionId > exportedAtHistoryVersion
+				callback(null, filtered)
 
 	_formatLabelAsSavedVer: (label, callback=(err, savedVer)->) ->
 		return callback(null, null) if !label?
