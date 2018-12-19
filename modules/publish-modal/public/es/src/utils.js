@@ -80,7 +80,7 @@ function pollExportStatus(exportId, projectId, _this, timeout) {
           title: status.title,
           articleZipURL: link + '/zip',
           pdfURL: link + '/pdf',
-          revisionURL: '', // TODO: agree on this with F1000
+          revisionURL: 'https://www.overleaf.com/learn/how-to/Overleaf_v2_FAQ',
           // general-purpose
           token: status.token
         })

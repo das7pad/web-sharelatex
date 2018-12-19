@@ -18,7 +18,7 @@ export default class F1000Export extends Component {
       title: null,
       articleZipURL: null,
       pdfURL: null,
-      revisionURL: 'https://www.overleaf.com/learn/how-to/Overleaf_v2_FAQ',
+      revisionURL: null,
       token: null
     }
   }
