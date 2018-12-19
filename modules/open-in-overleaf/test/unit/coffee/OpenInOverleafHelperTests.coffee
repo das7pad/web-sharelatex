@@ -221,6 +221,57 @@ snap snap
 			it "should not try and download anything", ->
 				sinon.assert.notCalled(@UrlHelper.wrapUrlWithProxy)
 
+	describe "populateSnippetFromConversionJob", ->
+		beforeEach ->
+			@V1Api.request.withArgs({ uri: "/api/v2/partners/ieee_latexqc/conversions/wombat-1" }).callsArgWith(
+				1, null, {statusCode: 200}, { brand_variation_id: null, input_file_uri: 'http://example.org/potato.zip' }
+			)
+			@V1Api.request.withArgs({ uri: "/api/v2/partners/OSF/conversions/wombat-1" }).callsArgWith(
+				1, null, {statusCode: 200}, { brand_variation_id: '1234', input_file_uri: 'http://example.org/potato.zip' }
+			)
+
+		describe "when the conversion job exists", ->
+			beforeEach (done) ->
+				@OpenInOverleafHelper.populateSnippetFromConversionJob 'OSF', 'wombat-1', {}, (err, snip) =>
+					@err = err
+					@snippet = snip
+					done()
+
+			it 'should not raise an error', ->
+				expect(@err).not.to.exist
+
+			it 'should add the brand variation id to the snippet', ->
+				expect(@snippet.brandVariationId).to.equal '1234'
+
+			it 'downloads the file', ->
+				sinon.assert.calledWith(@FileWriter.writeUrlToDisk, sinon.match.any, 'http://example.org/potato.zip')
+
+		describe "when the conversion job exists, but has no brand variation", ->
+			beforeEach (done) ->
+				@OpenInOverleafHelper.populateSnippetFromConversionJob 'ieee_latexqc', 'wombat-1', {}, (err, snip) =>
+					@err = err
+					@snippet = snip
+					done()
+
+			it 'should not raise an error', ->
+				expect(@err).not.to.exist
+
+			it 'should not add a brand variation id to the snippet', ->
+				expect(@snippet.brandVariationId).not.to.exist
+
+			it 'downloads the file', ->
+				sinon.assert.calledWith(@FileWriter.writeUrlToDisk, sinon.match.any, 'http://example.org/potato.zip')
+
+		describe "when the conversion job does not exist", ->
+			beforeEach (done) ->
+				@OpenInOverleafHelper.populateSnippetFromConversionJob 'wombat_university', 'wombat-1', {}, (err, snip) =>
+					@err = err
+					@snippet = snip
+					done()
+
+			it 'should not raise an error', ->
+				expect(@err.name).to.equal "ConversionNotFoundError"
+
 	describe 'populateSnippetFromUriArray', ->
 		beforeEach ->
 			@uris = [

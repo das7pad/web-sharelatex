@@ -231,6 +231,60 @@ describe 'OpenInOverleafController', ->
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
+		describe "when there is a partner and client_media_id", ->
+			describe "when the partner and client_media_id exist", ->
+				beforeEach ->
+					@req.body.partner = 'ieee_latexqc'
+					@req.body.client_media_id = 'wombat1'
+					@OpenInOverleafHelper.populateSnippetFromConversionJob = sinon.stub().callsArgWith(3, null, {
+						projectFile: '/foo/bar.zip'
+						defaultTitle: 'new_snippet_project'
+						brandVariationId: '1234'
+					})
+
+				it "should populate the snippet from the conversion job", (done)->
+					@res.send = (content)=>
+						sinon.assert.calledWith(@OpenInOverleafHelper.populateSnippetFromConversionJob, "ieee_latexqc", "wombat1")
+						done()
+					@OpenInOverleafController.openInOverleaf @req, @res
+
+				it "should set the brand variation on the project", (done)->
+					@res.send = (content)=>
+						sinon.assert.calledWith(@ProjectOptionsHandler.setBrandVariationId, sinon.match.any, "1234")
+						done()
+					@OpenInOverleafController.openInOverleaf @req, @res
+
+				it "should create a project from the zip file and redirect to it", (done)->
+					@res.send = (content)=>
+						sinon.assert.calledWith(@ProjectUploadManager.createProjectFromZipArchive, @user._id, "new_snippet_project", "/foo/bar.zip")
+						sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
+						content.should.equal JSON.stringify({redirect: '/project/' + @project_id, projectId: @project_id})
+						done()
+					@OpenInOverleafController.openInOverleaf @req, @res
+
+			describe "when the partner does not have a brand variation", ->
+				beforeEach ->
+					@req.body.partner = 'ieee_latexqc'
+					@req.body.client_media_id = 'wombat1'
+					@OpenInOverleafHelper.populateSnippetFromConversionJob = sinon.stub().callsArgWith(3, null, {
+						projectFile: '/foo/bar.zip'
+						defaultTitle: 'new_snippet_project'
+					})
+
+				it "should create a project from the zip file and redirect to it", (done)->
+					@res.send = (content)=>
+						sinon.assert.calledWith(@ProjectUploadManager.createProjectFromZipArchive, @user._id, "new_snippet_project", "/foo/bar.zip")
+						sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
+						content.should.equal JSON.stringify({redirect: '/project/' + @project_id, projectId: @project_id})
+						done()
+					@OpenInOverleafController.openInOverleaf @req, @res
+
+				it "should not the brand variation on the project", (done)->
+					@res.send = (content)=>
+						sinon.assert.notCalled(@ProjectOptionsHandler.setBrandVariationId)
+						done()
+					@OpenInOverleafController.openInOverleaf @req, @res
+
 		describe "when there is a template parameter", ->
 			beforeEach ->
 				@req.body.template = 'wombat'

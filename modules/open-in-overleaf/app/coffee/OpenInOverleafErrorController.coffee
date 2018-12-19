@@ -36,6 +36,9 @@ module.exports = OpenInOverleafErrorController =
 		if error instanceof OpenInOverleafErrors.TemplateNotFoundError
 			logger.warn {err: error, url: req.url}, "template not found error"
 			return {status: 404, text: 'the_requested_template_was_not_found'}
+		if error instanceof OpenInOverleafErrors.ConversionNotFoundError
+			logger.warn {err: error, url: req.url}, "conversion not found error"
+			return {status: 404, text: 'the_requested_conversion_job_was_not_found'}
 		if error instanceof Errors.NotFoundError
 			logger.warn {err: error, url: req.url}, "not found error"
 			return {status: 404, text: 'not_found_error_from_the_supplied_url'}

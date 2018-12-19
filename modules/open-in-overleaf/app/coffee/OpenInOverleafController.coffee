@@ -16,7 +16,12 @@ OpenInOverleafErrors = require('./OpenInOverleafErrors')
 module.exports = OpenInOverleafController =
 	# 'open in overleaf' /docs API
 	openInOverleaf: (req, res, next)->
-		paramCount = req.body.snip? + req.body.encoded_snip? + req.body.snip_uri? + req.body.zip_uri? + req.body.template?
+		paramCount = req.body.snip? +
+			req.body.encoded_snip? +
+			req.body.snip_uri? +
+			req.body.zip_uri? +
+			req.body.template? +
+			(req.body.partner? && req.body.client_media_id?)
 		return next(new OpenInOverleafErrors.MissingParametersError) if paramCount == 0
 		return next(new OpenInOverleafErrors.AmbiguousParametersError) if paramCount > 1
 
@@ -127,6 +132,8 @@ module.exports = OpenInOverleafController =
 			OpenInOverleafHelper.populateSnippetFromUri req.body.snip_uri || req.body.zip_uri, snippet, cb
 		else if req.body.template?
 			OpenInOverleafHelper.populateSnippetFromTemplate req.body.template, snippet, cb
+		else if (req.body.partner? && req.body.client_media_id?)
+			OpenInOverleafHelper.populateSnippetFromConversionJob req.body.partner, req.body.client_media_id, snippet, cb
 		else
 			cb(new OpenInOverleafErrors.MissingParametersError)
 
