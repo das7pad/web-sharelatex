@@ -40,10 +40,6 @@ module.exports = GitBridgeHandler =
 	getSavedVers: (userId, projectId, callback=(err, data)->) ->
 		GitBridgeHandler._checkAccess userId, projectId, (err, project) ->
 			return callback(err) if err?
-			# # Only support native v2 projects for now
-			# if project?.overleaf?.imported_at_ver_id?
-			# 	logger.log {projectId}, '[GitBridgeHandler] cannot get savedVers for imported project'
-			# 	return callback(null, [])
 			request.get {
 				url: GitBridgeHandler._projectHistoryUrl("/project/#{projectId}/labels"),
 				json: true
