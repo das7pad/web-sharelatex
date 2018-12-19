@@ -55,13 +55,13 @@ module.exports = ProjectImportController =
 			else if error instanceof InvalidNameError
 				unsupportedError("Sorry! #{error.message}, please rename your project and try again")
 			else if error instanceof V2ExportCompleted
-				importCompleted({ redir: ProjectImportController._redirUrl(ol_doc_id) })
+				importCompleted({ redir: ProjectImportController._buildRedirectUrlFromToken(ol_doc_id) })
 			else if error?
 				unsupportedError("Sorry! There was a problem with your import, please try again")
 			else
-				importCompleted({ redir: ProjectImportController._redirUrl(ol_doc_id) })
+				importCompleted({ redir: ProjectImportController._buildRedirectUrlFromToken(ol_doc_id) })
 
-	_redirUrl: (ol_doc_id) ->
+	_buildRedirectUrlFromToken: (ol_doc_id) ->
 		if READ_AND_WRITE_TOKEN_REGEX.test ol_doc_id
 			"/#{ol_doc_id}"
 		else if READ_ONLY_TOKEN_REGEX.test ol_doc_id
