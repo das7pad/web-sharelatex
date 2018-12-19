@@ -5,13 +5,20 @@ block vars
 	- var suppressFooter= true
 
 block content
+	script.
+		$(document).ready(function () {
+			setTimeout(function() {
+				$('.loading-screen-brand').css('height', '20%')
+			}, 500);
+		});
+
 	.editor.full-size(
 			ng-controller="OpenInOverleafGatewayController",
 			ng-init=("handleGateway('" + Buffer.from(JSON.stringify({params: form_data, action: action, target: target, csrfToken: csrfToken, error: error})).toString('base64') + "')")
 		)
 		.loading-screen(ng-hide="error || serverError")
 			.loading-screen-brand-container
-				.loading-screen-brand(style="height: 20%;")
+				.loading-screen-brand
 			h3.loading-screen-label() #{translate('loading_content')}
 				span.loading-screen-ellip .
 				span.loading-screen-ellip .
