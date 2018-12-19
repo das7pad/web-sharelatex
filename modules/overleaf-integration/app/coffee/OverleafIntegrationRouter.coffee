@@ -32,7 +32,6 @@ module.exports =
 			}),
 			V1LoginController.doLogin
 		)
-		webRouter.get '/welcome/sl', OverleafAuthenticationController.welcomeScreen
 
 		webRouter.get '/login/finish', V1LoginController.loginProfile
 
