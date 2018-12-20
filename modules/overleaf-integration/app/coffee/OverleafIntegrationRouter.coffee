@@ -85,6 +85,12 @@ module.exports =
 		)
 
 		webRouter.get(
+			'/overleaf/project/:ol_doc_token/download/zip',
+			AuthenticationController.requireLogin(),
+			ProjectImportController.downloadZip
+		)
+
+		webRouter.get(
 			'/overleaf/auth_from_sl',
 			SharelatexAuthController.authFromSharelatex
 		)

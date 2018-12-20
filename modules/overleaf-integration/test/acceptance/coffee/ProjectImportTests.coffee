@@ -17,8 +17,13 @@ ProjectGetter = require "#{WEB_PATH}/app/js/Features/Project/ProjectGetter"
 ProjectEntityHandler = require "#{WEB_PATH}/app/js/Features/Project/ProjectEntityHandler"
 CollaboratorsHandler = require "#{WEB_PATH}/app/js/Features/Collaborators/CollaboratorsHandler"
 User = require "#{WEB_PATH}/test/acceptance/js/helpers/User"
+{Project} = require "#{WEB_PATH}/app/js/models/Project"
 {ProjectInvite} = require "#{WEB_PATH}/app/js/models/ProjectInvite"
 {UserStub} = require "#{WEB_PATH}/app/js/models/UserStub"
+{
+	READ_AND_WRITE_URL_REGEX,
+	READ_ONLY_URL_REGEX
+} = require "#{WEB_PATH}/app/js/Features/TokenAccess/TokenAccessHandler"
 
 OWNER_V1_ID = 123
 
@@ -41,17 +46,23 @@ BLANK_PROJECT = {
 getProject = (response, callback) ->
 	expect(response.statusCode).to.equal 200
 
-	url_regex = /\/project\/(\w*)/
-	redirect_path = JSON.parse(response.body).redir
-	expect(redirect_path).to.match(url_regex)
-
-	project_id = url_regex.exec(redirect_path)[1]
-	expect(project_id).to.be.a('string')
-
-	ProjectGetter.getProject project_id, (error, project) ->
+	handleProjectCb = (error, project) ->
 		throw error if error?
 		throw new Error('could not find imported project') if !project?
 		callback null, project
+
+	redirect_path = JSON.parse(response.body).redir
+	if READ_AND_WRITE_URL_REGEX.test(redirect_path)
+		id = READ_AND_WRITE_URL_REGEX.exec(redirect_path)[1]
+		token = READ_AND_WRITE_URL_REGEX.exec(redirect_path)[2]
+		expect(token).to.be.a('string')
+		Project.findOne { "tokens.readAndWrite": "#{id}#{token}" }, handleProjectCb
+	else if READ_ONLY_URL_REGEX.test(redirect_path)
+		token = READ_ONLY_URL_REGEX.exec(redirect_path)[1]
+		expect(token).to.be.a('string')
+		Project.findOne { "tokens.readOnly": token }, handleProjectCb
+	else
+		expect.fail('no matching redirect found')
 
 count = 0
 newUser = () ->
@@ -75,11 +86,12 @@ describe "ProjectImportTests", ->
 	describe 'an empty project', ->
 		before (done) ->
 			@ol_project_id = 1
-			MockOverleafApi.setDoc Object.assign({ id: @ol_project_id }, BLANK_PROJECT, {title: "empty project"})
+			@ol_project_token = "#{@ol_project_id}abc"
+			MockOverleafApi.setDoc Object.assign({ id: @ol_project_id }, BLANK_PROJECT, {token: @ol_project_token, title: "empty project"})
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 
-			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+			@owner.request.post "/overleaf/project/#{@ol_project_token}/import", (error, response, body) =>
 				getProject response, (error, project) =>
 					@project = project
 					done()
@@ -99,11 +111,12 @@ describe "ProjectImportTests", ->
 				main: true
 			]
 			@ol_project_id = 2
-			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, files, title: "docs project" })
+			@ol_project_token = "#{@ol_project_id}def"
+			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, token: @ol_project_token, files, title: "docs project" })
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 
-			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+			@owner.request.post "/overleaf/project/#{@ol_project_token}/import", (error, response, body) =>
 				getProject response, (error, project) =>
 					@project = project
 					done()
@@ -133,11 +146,12 @@ describe "ProjectImportTests", ->
 				file_path: "file/#{file.id}"
 			]
 			@ol_project_id = 3
-			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, files, title: "files project" })
+			@ol_project_token = "#{@ol_project_id}ghi"
+			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, token: @ol_project_token, files, title: "files project" })
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 
-			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+			@owner.request.post "/overleaf/project/#{@ol_project_token}/import", (error, response, body) =>
 				getProject response, (error, project) =>
 					@project = project
 					done()
@@ -160,10 +174,12 @@ describe "ProjectImportTests", ->
 			# to v2
 			@unmigrated_v1_owner_id = 9876
 			@ol_project_id = 1200000
+			@ol_project_token = "#{@ol_project_id}jkl"
 			MockOverleafApi.setDoc Object.assign(
 				{ id: @ol_project_id },
 				BLANK_PROJECT,
 				{
+					token: @ol_project_token
 					owner: {
 						id: @unmigrated_v1_owner_id
 						email: 'unmigrated-owner@example.com'
@@ -174,7 +190,7 @@ describe "ProjectImportTests", ->
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 
-			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+			@owner.request.post "/overleaf/project/#{@ol_project_token}/import", (error, response, body) =>
 				@response = response
 				getProject response, (error, project) =>
 					@project = project
@@ -192,11 +208,13 @@ describe "ProjectImportTests", ->
 		before (done) ->
 			@other_owner_v1_id = 6543
 			@ol_project_id = 1000000
+			@ol_project_token = "#{@ol_project_id}mno"
 
 			MockOverleafApi.setDoc Object.assign(
 				{ id: @ol_project_id },
 				BLANK_PROJECT,
 				{
+					token: @ol_project_token
 					owner: {
 						id: @other_owner_v1_id
 						email: 'migrated@example.com'
@@ -213,7 +231,7 @@ describe "ProjectImportTests", ->
 				@other_owner.setV1Id @other_owner_v1_id, (error) =>
 					throw error if error?
 
-					@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+					@owner.request.post "/overleaf/project/#{@ol_project_token}/import", (error, response, body) =>
 						getProject response, (error, project) =>
 							@project = project
 							done()
@@ -224,6 +242,7 @@ describe "ProjectImportTests", ->
 	describe 'a project with docs, files and external files', ->
 		before (done) ->
 			@ol_project_id = 100
+			@ol_project_token = "#{@ol_project_id}pqr"
 			file = {
 				id: new ObjectId()
 				stream: fs.createReadStream(Path.resolve(__dirname + '/../files/1pixel.png'))
@@ -239,10 +258,10 @@ describe "ProjectImportTests", ->
 				{type: 'att', file: '1pixel.png', file_path: "file/#{file.id}"}
 				{type: 'ext', file: 'foo.bib', file_path: "file/#{ext.id}", agent: "mendeley", agent_data: {importer_id:123, group:456}}
 			]
-			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, files, title: "docs and files project" })
+			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, token: @ol_project_token, files, title: "docs and files project" })
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 
-			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+			@owner.request.post "/overleaf/project/#{@ol_project_token}/import", (error, response, body) =>
 				getProject response, (error, project) =>
 					@project = project
 					done()
@@ -269,10 +288,12 @@ describe "ProjectImportTests", ->
 	describe 'a project with a brand variation id', ->
 		before (done) ->
 			@ol_project_id = 1
+			@ol_project_token = "#{@ol_project_id}stu"
 			MockOverleafApi.setDoc Object.assign(
 				{ id: @ol_project_id },
 				BLANK_PROJECT,
 				{
+					token: @ol_project_token
 					title: "project with brand variation id"
 					brand_variation_id: 123
 				}
@@ -280,7 +301,7 @@ describe "ProjectImportTests", ->
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 
-			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+			@owner.request.post "/overleaf/project/#{@ol_project_token}/import", (error, response, body) =>
 				getProject response, (error, project) =>
 					@project = project
 					done()
@@ -296,13 +317,14 @@ describe "ProjectImportTests", ->
 				file_path: "file/linked_file.pdf"
 			]
 			@ol_project_id = 4
-			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, files, title: "New name" })
+			@ol_project_token = "#{@ol_project_id}vwy"
+			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, token: @ol_project_token, files, title: "New name" })
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 			done()
 
 		it 'should return an error message', (done) ->
-			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+			@owner.request.post "/overleaf/project/#{@ol_project_token}/import", (error, response, body) =>
 				expect(response.statusCode).to.equal(501)
 				expect(JSON.parse(body).message).to.equal("Sorry! Projects with linked or external files aren't fully supported yet.")
 				done()
@@ -310,6 +332,7 @@ describe "ProjectImportTests", ->
 	describe 'a project with labels', ->
 		before (done) ->
 			@ol_project_id = 1
+			@ol_project_token = "#{@ol_project_id}zab"
 			@collaborator_v1_id = 234
 			@date = new Date()
 			labels = [
@@ -317,12 +340,12 @@ describe "ProjectImportTests", ->
 				{ user_id: @collaborator_v1_id, history_version: 2, comment: 'goodbye', created_at: @date }
 				{ history_version: 3, comment: 'foobar', created_at: @date }
 			]
-			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, labels, title: "Project with labels" })
+			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, token: @ol_project_token, labels, title: "Project with labels" })
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 			MockProjectHistoryApi.reset()
 
-			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+			@owner.request.post "/overleaf/project/#{@ol_project_token}/import", (error, response, body) =>
 				throw error if error?
 				getProject response, (error, project) =>
 					@project = project
@@ -345,11 +368,12 @@ describe "ProjectImportTests", ->
 	describe 'a project with name containing a /', ->
 		before (done) ->
 			@ol_project_id = 1
-			MockOverleafApi.setDoc Object.assign({ id: @ol_project_id }, BLANK_PROJECT, { title: "foo/bar/baz" })
+			@ol_project_token = "#{@ol_project_id}cde"
+			MockOverleafApi.setDoc Object.assign({ id: @ol_project_id }, BLANK_PROJECT, { token: @ol_project_token, title: "foo/bar/baz" })
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 
-			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+			@owner.request.post "/overleaf/project/#{@ol_project_token}/import", (error, response, body) =>
 				getProject response, (error, project) =>
 					@project = project
 					done()
@@ -361,11 +385,12 @@ describe "ProjectImportTests", ->
 	describe 'a project with a long name', ->
 		before (done) ->
 			@ol_project_id = 1
-			MockOverleafApi.setDoc Object.assign({ id: @ol_project_id }, BLANK_PROJECT, { title: "x".repeat(160) })
+			@ol_project_token = "#{@ol_project_id}fgh"
+			MockOverleafApi.setDoc Object.assign({ id: @ol_project_id }, BLANK_PROJECT, { token: @ol_project_token, title: "x".repeat(160) })
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 
-			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+			@owner.request.post "/overleaf/project/#{@ol_project_token}/import", (error, response, body) =>
 				getProject response, (error, project) =>
 					@project = project
 					done()
@@ -377,11 +402,12 @@ describe "ProjectImportTests", ->
 	describe 'a project that uses the "latex_dvipdf" engine', ->
 		before (done) ->
 			@ol_project_id = 1
-			MockOverleafApi.setDoc Object.assign({ id: @ol_project_id }, BLANK_PROJECT, { latex_engine: 'latex_dvipdf', title: "dvipdf project" })
+			@ol_project_token = "#{@ol_project_id}ijk"
+			MockOverleafApi.setDoc Object.assign({ id: @ol_project_id }, BLANK_PROJECT, { token: @ol_project_token, latex_engine: 'latex_dvipdf', title: "dvipdf project" })
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 
-			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+			@owner.request.post "/overleaf/project/#{@ol_project_token}/import", (error, response, body) =>
 				getProject response, (error, project) =>
 					@project = project
 					done()
@@ -393,6 +419,7 @@ describe "ProjectImportTests", ->
 	describe 'a project with invites', ->
 		before (done) ->
 			@ol_project_id = 1
+			@ol_project_token = "#{@ol_project_id}lmn"
 			@pendingInviteCode = 'pending-invite-code'
 
 			@acceptedInvitee = newUser()
@@ -403,6 +430,7 @@ describe "ProjectImportTests", ->
 			MockOverleafApi.addV1User(@inviter)
 
 			MockOverleafApi.setDoc Object.assign({ id: @ol_project_id }, BLANK_PROJECT, {
+				token: @ol_project_token
 				invites: [{
 					access_level: 'read_write',
 					invitee: {
@@ -429,7 +457,7 @@ describe "ProjectImportTests", ->
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 
-			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+			@owner.request.post "/overleaf/project/#{@ol_project_token}/import", (error, response, body) =>
 				getProject response, (error, project) =>
 					@project = project
 					done()
@@ -460,11 +488,13 @@ describe "ProjectImportTests", ->
 	describe 'a project with token-access invites', ->
 		before (done) ->
 			@ol_project_id = 1
+			@ol_project_token = "#{@ol_project_id}opq"
 
 			@tokenAccessInvitee = newUser()
 			MockOverleafApi.addV1User(@tokenAccessInvitee)
 
 			MockOverleafApi.setDoc Object.assign({ id: @ol_project_id }, BLANK_PROJECT, {
+				token: @ol_project_token
 				general_access: 'read_write',
 				token_access_invites: [{
 					invitee: {
@@ -477,7 +507,7 @@ describe "ProjectImportTests", ->
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 
-			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+			@owner.request.post "/overleaf/project/#{@ol_project_token}/import", (error, response, body) =>
 				getProject response, (error, project) =>
 					@project = project
 					done()
@@ -499,12 +529,13 @@ describe "ProjectImportTests", ->
 	describe 'a project with no owner returned from v1', ->
 		before (done) ->
 			@ol_project_id = 1
+			@ol_project_token = "#{@ol_project_id}rst"
 			project = Object.assign({ id: @ol_project_id }, BLANK_PROJECT, {title: "no owner project"})
 			delete project.owner
 			MockOverleafApi.setDoc project
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 
-			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, @response, body) =>
+			@owner.request.post "/overleaf/project/#{@ol_project_token}/import", (error, @response, body) =>
 				done()
 
 		it 'should not succeed', ->
@@ -513,11 +544,14 @@ describe "ProjectImportTests", ->
 	describe 'a project with collabratec users', ->
 		before (done) ->
 			@ol_project_id = 1
+			@ol_project_token = "#{@ol_project_id}uvw"
 			@user_stub_v1_id = 789
 			MockOverleafApi.setDoc Object.assign(
-				{ id: @ol_project_id },
+				{},
 				BLANK_PROJECT,
 				{
+					id: @ol_project_id,
+					token: @ol_project_token,
 					collabratec_users: [
 						{
 							user_id: OWNER_V1_ID,
@@ -534,7 +568,7 @@ describe "ProjectImportTests", ->
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 
-			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+			@owner.request.post "/overleaf/project/#{@ol_project_token}/import", (error, response, body) =>
 				getProject response, (error, project) =>
 					@project = project
 					done()

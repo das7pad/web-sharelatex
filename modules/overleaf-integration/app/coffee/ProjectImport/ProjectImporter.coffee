@@ -512,13 +512,13 @@ module.exports = ProjectImporter =
 					readStream.resume()
 					return callback(error)
 
-	_waitForV1HistoryExport: (v1_project_id, v1_importer_id, callback = (error) ->) ->
-		ProjectImporter._checkV1HistoryExportStatus v1_project_id, v1_importer_id, 0, callback
+	_waitForV1HistoryExport: (v1_project_id, v1_importer_id, callback = (error, latest_ver_id) ->) ->
+		ProjectImporter._checkV1HistoryExportStatus @_exportUrl(v1_project_id, v1_importer_id, "history"), 0, callback
 
-	_checkV1HistoryExportStatus: (v1_project_id, v1_importer_id, requestCount, callback = (error) ->) ->
+	_checkV1HistoryExportStatus: (url, requestCount, callback = (error, latest_ver_id) ->) ->
 		V1SharelatexApi.request {
 			method: 'GET'
-			url: @_exportUrl(v1_project_id, v1_importer_id, "history")
+			url: url
 		}, (error, res, status) ->
 			return callback(error) if error?
 
@@ -526,17 +526,17 @@ module.exports = ProjectImporter =
 				error ?= new V1HistoryNotSyncedError('v1 history not synced')
 
 			if error?
-				logger.log {v1_project_id, v1_importer_id, requestCount, error}, "error checking v1 history sync"
+				logger.log {url, requestCount, error}, "error checking v1 history sync"
 				if requestCount >= V1_HISTORY_SYNC_REQUEST_TIMES.length
 					return callback(error)
 				else
 					interval = (V1_HISTORY_SYNC_REQUEST_TIMES[requestCount + 1] - V1_HISTORY_SYNC_REQUEST_TIMES[requestCount]) * 1000
 					setTimeout(
-						() -> ProjectImporter._checkV1HistoryExportStatus v1_project_id, v1_importer_id, requestCount + 1, callback
+						() -> ProjectImporter._checkV1HistoryExportStatus url, requestCount + 1, callback
 						interval
 					)
 			else
-				callback(null)
+				callback(null, status)
 
 	_getLabels: (v1_project_id, callback = (error, labels) ->) ->
 		V1SharelatexApi.request {
