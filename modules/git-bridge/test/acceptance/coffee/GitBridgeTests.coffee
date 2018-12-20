@@ -52,6 +52,41 @@ describe 'GitBridge', ->
 	_savedVersRequest = (owner, projectId, callback) =>
 		_request(owner, "/api/v0/docs/#{projectId}/saved_vers", callback)
 
+	_snapshotRequest = (owner, projectId, version, callback) =>
+		_request(owner, "/api/v0/docs/#{projectId}/snapshots/#{version}", callback)
+
+	describe 'get snapshot', ->
+		before (done) ->
+			@projectId = null
+			async.series [
+				(cb) => @owner.createProject "#{Math.random()}", (err, projectId) =>
+					@projectId = projectId
+					snapshot = {
+						files: {
+							'main.tex': {data: {content: 'one two three'}},
+							'other.png': {data: {hash: 'abcd'}},
+							'test.tex': {data: {content: 'four five'}}
+						}
+					}
+					MockProjectHistoryApi.addProjectSnapshot @projectId, 42, snapshot
+					cb(err)
+			], done
+
+		it 'should get the snapshot', (done) ->
+			_snapshotRequest @owner, @projectId, 42, (err, response, body) =>
+				expect(err).to.not.exist
+				expect(response.statusCode).to.equal 200
+				expect(body).to.deep.equal {
+					srcs: [
+						[ 'one two three', 'main.tex' ],
+						[ 'four five', 'test.tex' ]
+					],
+					atts: [
+						[ 'http://localhost:3100/api/blobs/abcd/content', 'other.png' ]
+					]
+				}
+				done()
+
 	describe 'get saved vers', ->
 		before ->
 
