@@ -47,7 +47,7 @@ module.exports =
 
 		removeRoute(webRouter, 'get', '/register')
 		removeRoute(webRouter, 'post', '/register')
-		webRouter.get '/register', V1LoginController.registrationPage
+		webRouter.get '/register', OverleafAuthenticationController.saveRedir, V1LoginController.registrationPage
 		webRouter.post '/register', V1LoginController.doRegistration
 
 		webRouter.post(
