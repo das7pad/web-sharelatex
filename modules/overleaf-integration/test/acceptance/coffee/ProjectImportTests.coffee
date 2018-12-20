@@ -535,7 +535,7 @@ describe "ProjectImportTests", ->
 			MockOverleafApi.setDoc project
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 
-			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, @response, body) =>
+			@owner.request.post "/overleaf/project/#{@ol_project_token}/import", (error, @response, body) =>
 				done()
 
 		it 'should not succeed', ->
@@ -544,11 +544,14 @@ describe "ProjectImportTests", ->
 	describe 'a project with collabratec users', ->
 		before (done) ->
 			@ol_project_id = 1
+			@ol_project_token = "#{@ol_project_id}uvw"
 			@user_stub_v1_id = 789
 			MockOverleafApi.setDoc Object.assign(
-				{ id: @ol_project_id },
+				{},
 				BLANK_PROJECT,
 				{
+					id: @ol_project_id,
+					token: @ol_project_token,
 					collabratec_users: [
 						{
 							user_id: OWNER_V1_ID,
@@ -565,7 +568,7 @@ describe "ProjectImportTests", ->
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 
-			@owner.request.post "/overleaf/project/#{@ol_project_id}/import", (error, response, body) =>
+			@owner.request.post "/overleaf/project/#{@ol_project_token}/import", (error, response, body) =>
 				getProject response, (error, project) =>
 					@project = project
 					done()
