@@ -127,6 +127,11 @@ module.exports = class Router
 		if Features.hasFeature 'affiliations'
 			webRouter.post '/user/emails',
 				AuthenticationController.requireLogin(),
+				RateLimiterMiddlewear.rateLimit({
+					endpointName: 'add-email',
+					maxRequests: 10
+					timeInterval: 60
+				}),
 				UserEmailsController.add
 			webRouter.post '/user/emails/delete',
 				AuthenticationController.requireLogin(),

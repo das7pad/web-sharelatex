@@ -52,6 +52,11 @@ module.exports =
 		webRouter.post(
 			'/user/change_password/v1',
 			AuthenticationController.requireLogin(),
+			RateLimiterMiddlewear.rateLimit({
+				endpointName: 'overleaf-change-password',
+				maxRequests: 10
+				timeInterval: 60
+			}),
 			V1LoginController.doPasswordChange
 		)
 
