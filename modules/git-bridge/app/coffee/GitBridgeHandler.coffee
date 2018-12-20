@@ -24,12 +24,10 @@ module.exports = GitBridgeHandler =
 				u?.features?.gitBridge
 			UserGetter.getUser project.owner_ref, {features: 1}, (err, owner) ->
 				return callback(err) if err?
-				UserGetter.getUser userId, {features: 1, betaProgram: 1}, (err, user) ->
+				UserGetter.getUser userId, {features: 1}, (err, user) ->
 					return callback(err) if err?
 					if !(_userCanAccess(owner) || _userCanAccess(user))
 						return callback(new Errors.FeatureNotAvailable('Neither user nor project owner has gitBridge feature'))
-					if !user.betaProgram
-						return callback(new Errors.FeatureNotAvailable('User is not in beta program'))
 					if project.overleaf?.history?.id?
 						return callback(null, project)
 					else
