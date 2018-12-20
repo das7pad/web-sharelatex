@@ -67,9 +67,6 @@ module.exports = OverleafAuthenticationController =
 			AuthenticationController.setRedirectInSession(req, req.query.redir)
 		next()
 
-	welcomeScreen: (req, res, next) ->
-		res.render Path.resolve(__dirname, "../../views/welcome"), req.query
-
 	showCheckAccountsPage: (req, res, next) ->
 		if req.session.login_profile?
 			{ email, id } = req.session.login_profile

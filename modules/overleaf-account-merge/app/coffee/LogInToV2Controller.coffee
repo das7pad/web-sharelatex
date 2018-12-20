@@ -49,7 +49,7 @@ module.exports = LogInToV2Controller =
 			return next(err) if err?
 
 			res.render Path.resolve(__dirname, "../views/offer_ol_account_merge"),
-				v1LoginUrl: "#{Settings.accountMerge.betaHost}/overleaf/login",
+				v1LoginUrl: "#{Settings.accountMerge.betaHost}/login",
 				hasSubscription: hasSubscription
 
 	_renderCheckAccountsPage: (req, res, next) ->
