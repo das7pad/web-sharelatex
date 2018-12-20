@@ -2,7 +2,9 @@ AuthenticationController = require "../../../../../app/js/Features/Authenticatio
 FeaturesUpdater = require "../../../../../app/js/Features/Subscription/FeaturesUpdater"
 CollabratecManager = require "./CollabratecManager"
 OverleafAuthenticationManager = require "../Authentication/OverleafAuthenticationManager"
+ObjectId = require("mongojs").ObjectId
 Path = require "path"
+ProjectGetter = require "../../../../../app/js/Features/Project/ProjectGetter"
 UserGetter = require "../../../../../app/js/Features/User/UserGetter"
 V1LoginHandler = require "../V1Login/V1LoginHandler"
 logger = require "logger-sharelatex"
@@ -104,7 +106,7 @@ module.exports = CollabratecController =
 			res.redirect "/org/ieee/collabratec/auth/link_after_saml_response"
 		else
 			CollabratecManager.getV1UserByCollabratecId saml_user.MemberNumber, (err, profile) ->
-				return _render_saml_error req, res, err if err?
+				return CollabratecController._render_saml_error req, res, err if err?
 				if profile?
 					CollabratecController._setupUser req, res, next, profile
 				else
@@ -144,19 +146,35 @@ module.exports = CollabratecController =
 				url = OverleafAuthenticationController.prepareAccountMerge info, req
 				res.redirect url
 			else
-				CollabratecController._finishLogin req
-				AuthenticationController.finishLogin user, req, res, next
+				CollabratecController._finishLogin req, () ->
+					AuthenticationController.finishLogin user, req, res, next
 
-	_finishLogin: (req) ->
+	_finishLogin: (req, callback) ->
 		oauth_params = req.session.collabratec_oauth_params
 		project_id = req.session.show_project_id
+		CollabratecManager.clearSession req.session
+		# redirect to oauth flow if oauth params in session
 		if oauth_params?
 			redirect_url = CollabratecManager.oauthRedirectUrl oauth_params
 			AuthenticationController.setRedirectInSession req, redirect_url
-		else if project_id?
-			redirect_url = "/sign_in_to_v1?return_to="+encodeURIComponent("/"+project_id)
+			return callback()
+		# do not do any redirects if there is a project id
+		if !project_id?
+			return callback()
+		# allways redirect to v2 if it is a v2 project id
+		if ObjectId.isValid(project_id)
+			AuthenticationController.setRedirectInSession req, "/project/#{project_id}"
+			return callback()
+		# check if v1 project id has neen imported to v2
+		ProjectGetter.getProjectIdByReadAndWriteToken project_id, (err, v2_project_id) ->
+			# redirect to v2 if project found
+			if v2_project_id?
+				redirect_url = "/project/#{v2_project_id}"
+			# if v2 project not found (including error) then redirect to v1
+			else
+				redirect_url = "/sign_in_to_v1?return_to="+encodeURIComponent("/"+project_id)
 			AuthenticationController.setRedirectInSession req, redirect_url
-		CollabratecManager.clearSession req.session
+			callback()
 
 	_completeOauthLink: (req, user, callback) ->
 		oauth_params = req.session.collabratec_oauth_params
@@ -164,5 +182,5 @@ module.exports = CollabratecController =
 		collabratec_user = req.session.collabratec_saml_user
 		CollabratecManager.setV1UserCollabratecId user.overleaf.id, collabratec_user.MemberNumber, (err, profile) ->
 			return callback err if err?
-			CollabratecController._finishLogin req
-			callback null, true
+			CollabratecController._finishLogin req, () ->
+				callback null, true

@@ -18,6 +18,9 @@ module.exports = MockProjectHistoryApi =
 		@labels = {}
 
 	run: () ->
+		app.post "/project", (req, res, next) =>
+			res.json project: id: 1
+
 		app.post "/project/:project_id/user/:user_id/labels", (req, res, next) =>
 			{project_id, user_id } = req.params
 			{version, comment, created_at} = req.body
@@ -31,7 +34,7 @@ module.exports = MockProjectHistoryApi =
 		app.listen 3054, (error) ->
 			throw error if error?
 		.on "error", (error) ->
-			console.error "error starting MockOverleafApi:", error.message
+			console.error "error starting MockProjectHistoryApi:", error.message
 			process.exit(1)
 
 MockProjectHistoryApi.run()
