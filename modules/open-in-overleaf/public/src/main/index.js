@@ -6,8 +6,8 @@ define([
         App.controller("OpenInOverleafGatewayController", function($scope, $http, localStorage) {
             $scope.error = false;
 
-            $scope.handleGateway = function(base64EncodedInput) {
-                let input = JSON.parse(atob(base64EncodedInput));
+            $scope.handleGateway = function() {
+                let input = JSON.parse($('#overleaf-gateway-data').text());
                 _addReferrer(input.params);
 
                 if (!_validateInput(input)) {
@@ -35,20 +35,20 @@ define([
                     return true;
                 }
                 return input.action === 'submit' && input.params;
-            };
+            }
 
             function _storeParamsAndRedirect(params, target) {
                 _addReferrer(params);
                 window.sessionStorage.setItem('openInOverleaf', JSON.stringify(params));
                 window.location.replace(target);
-            };
+            }
 
             function _retrieveParamsIfMissing(params) {
                 if (Object.keys(params).length === 0) {
                     return JSON.parse(window.sessionStorage.getItem('openInOverleaf')) || {};
                 }
                 return params;
-            };
+            }
 
             function _submitParamsAndOpen(params, csrfToken) {
                 params._csrf = csrfToken;
@@ -74,6 +74,6 @@ define([
                         $scope.error = true;
                     }
                 });
-            };
+            }
         })
 );
