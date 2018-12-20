@@ -63,7 +63,16 @@ block content
 							)
 
 					.row-spaced.text-center
-						if brandInfo == 'f1000'
+						if hasAssignment
+							p
+								| #[span.fa.fa-exclamation-triangle]
+								| This project is an assignment, and the assignment toolkit is
+								| no longer supported in Overleaf v2. When you move it to
+								| Overleaf v2, it will become a normal project.
+								| #[a(href="https://www.overleaf.com/learn/how-to/Overleaf_v2_FAQ#assignment-tools") Please see our FAQ]
+								| for more information or contact your instructor if you haven't
+								| already submitted it.
+						else if brandInfo == 'f1000'
 							p
 								| #[span.fa.fa-exclamation-triangle]
 								| This project is an F1000Research article, and our integration

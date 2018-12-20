@@ -146,6 +146,7 @@ module.exports = TokenAccessController =
 						projectId: token,
 						hasOwner: doc_info.has_owner,
 						name: doc_info.name,
+						hasAssignment: doc_info.has_assignment,
 						brandInfo: doc_info.brand_info
 					})
 				else
