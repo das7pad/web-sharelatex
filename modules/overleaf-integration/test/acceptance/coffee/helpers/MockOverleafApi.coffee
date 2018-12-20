@@ -19,8 +19,12 @@ module.exports = MockOverleafApi =
 		user.v1Id = @v1Id
 		@v1Id++
 
-	docs: { }
+	docs: {}
 	users: []
+	historyExportVersions: {}
+
+	setHistoryExportVersion: (docId, version) ->
+		@historyExportVersions[docId] = version
 
 	addAffiliation: sinon.stub()
 
@@ -30,6 +34,7 @@ module.exports = MockOverleafApi =
 	reset: () ->
 		@docs = {}
 		@teamExports = {}
+		@historyExportVersions = {}
 
 	run: () ->
 
@@ -163,6 +168,16 @@ module.exports = MockOverleafApi =
 			return res.json({
 				user_profile: {id: id}
 			})
+
+		app.get "/api/v1/sharelatex/docs/:docId/history_export/status", (req, res, next) =>
+			docId = req.params['docId']
+			historyExportVersion = @historyExportVersions[docId]
+			if !historyExportVersion?
+				return res.sendStatus(500)
+			return res.json {
+				exported: true,
+				history_export_version: historyExportVersion
+			}
 
 		app.listen 5000, (error) ->
 			throw error if error?
