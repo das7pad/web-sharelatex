@@ -63,5 +63,19 @@ block content
 							)
 
 					.row-spaced.text-center
-						a(href="https://www.overleaf.com/learn/how-to/Overleaf_v2_FAQ")
-							| Find out more about moving to Overleaf v2
+						if brandInfo == 'f1000'
+							p
+								| #[span.fa.fa-exclamation-triangle]
+								| This project is an F1000Research article, and our integration
+								| with F1000Research has changed in Overleaf v2.
+								| #[a(href="https://www.overleaf.com/learn/how-to/Overleaf_v2_FAQ#f1000research") Find out more about moving to Overleaf v2]
+						else if brandInfo == 'wellcome'
+							p
+								| #[span.fa.fa-exclamation-triangle]
+								| This project is an Wellcome Open Research article, and our
+								| integration with Wellcome Open Research has changed in
+								| Overleaf v2.
+								| #[a(href="https://www.overleaf.com/learn/how-to/Overleaf_v2_FAQ#f1000research") Find out more about moving to Overleaf v2]
+						else
+							a(href="https://www.overleaf.com/learn/how-to/Overleaf_v2_FAQ")
+								| Find out more about moving to Overleaf v2
