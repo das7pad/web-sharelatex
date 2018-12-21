@@ -125,7 +125,6 @@ describe 'GitBridge', ->
 					expect(body).to.deep.equal {code: 'outOfDate', message: 'Out of Date'}
 					done()
 
-
 	describe 'get snapshot', ->
 		before (done) ->
 			@projectId = null
