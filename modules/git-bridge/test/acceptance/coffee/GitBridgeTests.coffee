@@ -55,6 +55,77 @@ describe 'GitBridge', ->
 	_snapshotRequest = (owner, projectId, version, callback) =>
 		_request(owner, "/api/v0/docs/#{projectId}/snapshots/#{version}", callback)
 
+	_postSnapshotRequest = (owner, projectId, snapshot, callback) =>
+		owner.request {
+			method: 'POST',
+			url: "/api/v0/docs/#{projectId}/snapshots",
+			headers:
+				'Authorization': "Bearer #{owner.v1Id}"
+			json: snapshot
+		}, callback
+
+	describe 'apply snapshot', ->
+		before (done) ->
+			@projectId = null
+			async.series [
+				(cb) => @owner.createProject "#{Math.random()}", (err, projectId) =>
+					@projectId = projectId
+					cb(err)
+				(cb) =>
+					MockProjectHistoryApi.setProjectVersionInfo(
+						@projectId,
+						{version: 12, timestamp: new Date().toISOString(), v2Authors: [@owner._id]}
+					)
+					cb()
+			], done
+
+		describe 'with a good snapshot', ->
+			before ->
+				@snapshot = {
+					latestVerId: 13
+					files: [
+						{
+							name: 'one.tex', # spaces are deliberate
+							url: 'http://example.com/one'
+						},
+						{
+							name: 'stuff/two.tex',
+							url: 'http://example.com/two'
+						}
+					]
+				}
+
+			it 'should accept the snapshot', (done) ->
+				_postSnapshotRequest @owner, @projectId, @snapshot, (err, response, body) =>
+					expect(err).to.not.exist
+					expect(response.statusCode).to.equal 202
+					expect(body).to.deep.equal {code: 'accepted', message: 'Accepted'}
+					done()
+
+		describe 'with snapshot version less than the current version', ->
+			before ->
+				@snapshot = {
+					latestVerId: 10
+					files: [
+						{
+							name: 'one.tex',
+							url: 'http://example.com/one'
+						},
+						{
+							name: 'stuff/two.tex',
+							url: 'http://example.com/two'
+						}
+					]
+				}
+
+			it 'should refuse the snapshot, out-of-date', (done) ->
+				_postSnapshotRequest @owner, @projectId, @snapshot, (err, response, body) =>
+					expect(err).to.not.exist
+					expect(response.statusCode).to.equal 409
+					expect(body).to.deep.equal {code: 'outOfDate', message: 'Out of Date'}
+					done()
+
+
 	describe 'get snapshot', ->
 		before (done) ->
 			@projectId = null
