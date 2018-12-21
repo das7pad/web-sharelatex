@@ -4,6 +4,7 @@ assert = require "assert"
 chai = require "chai"
 sinon = require "sinon"
 sinonChai = require "sinon-chai"
+timekeeper = require "timekeeper"
 
 chai.use sinonChai
 expect = chai.expect
@@ -28,11 +29,10 @@ describe "CollabratecApi", ->
 
 	describe "request", ->
 		before ->
-			@origDate = global.Date
-			global.Date = () -> toUTCString: () -> "Thu, 20 Dec 2018 14:16:58 GMT"
+			timekeeper.freeze "Thu, 20 Dec 2018 14:16:58 GMT"
 
 		after ->
-			global.Date = @origDate
+			timekeeper.reset()
 
 		beforeEach ->
 			options =
