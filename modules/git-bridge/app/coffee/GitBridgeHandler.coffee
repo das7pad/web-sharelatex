@@ -193,6 +193,7 @@ module.exports = GitBridgeHandler =
 						err = new Errors.OutOfDateError("project out of date: #{projectId}")
 						logger.err {err, projectId, latestVerId, snapshotVerId},
 							"[GitBridgeHandler] project out of date, can't apply snapshot"
+						return callback(err)
 					logger.log {userId, projectId}, "[GitBridgeHandler] starting snapshot application"
 					callback()  # Do the actual import async, like the original rails implementation
 					GitBridgeHandler._asyncApplySnapshot(userId, project, snapshot)
