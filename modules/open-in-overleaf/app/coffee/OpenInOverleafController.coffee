@@ -14,6 +14,10 @@ OpenInOverleafHelper = require('./OpenInOverleafHelper')
 OpenInOverleafErrors = require('./OpenInOverleafErrors')
 
 module.exports = OpenInOverleafController =
+	# /devs documentation page
+	showDocumentation: (req, res, next)->
+		res.render Path.resolve(__dirname, '../views/documentation')
+
 	# 'open in overleaf' /docs API
 	openInOverleaf: (req, res, next)->
 		paramCount = req.body.snip? +

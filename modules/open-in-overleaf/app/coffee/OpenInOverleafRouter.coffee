@@ -8,3 +8,5 @@ module.exports =
 		webRouter.csrf.disableDefaultCsrfProtection('/docs', 'POST')
 		webRouter.get  '/docs', OpenInOverleafMiddleware.middleware, OpenInOverleafController.openInOverleaf, OpenInOverleafErrorController.handleError
 		webRouter.post '/docs', OpenInOverleafMiddleware.middleware, OpenInOverleafController.openInOverleaf, OpenInOverleafErrorController.handleError
+
+		webRouter.get '/devs', OpenInOverleafController.showDocumentation
