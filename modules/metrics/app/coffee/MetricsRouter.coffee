@@ -59,6 +59,12 @@ module.exports =
 		)
 
 		webRouter.get(
+			'/metrics/csv?',
+			UserMembershipAuthorization.requireGraphAccess,
+			MetricsController.analyticsProxy
+		)
+
+		webRouter.get(
 			'/institutions/:id/hub',
 			UserMembershipAuthorization.requireInstitutionAccess,
 			InstitutionHubsController.institutionHub
