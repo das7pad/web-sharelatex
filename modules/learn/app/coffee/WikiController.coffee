@@ -129,7 +129,11 @@ module.exports = WikiController =
 		if page.categories?.length > 0 and 'Hide' in page.categories and !preview
 			return ErrorController.notFound(null, res)
 		if page.redirects?.length > 0 and page.redirects[0].to != 'Kb/Knowledge Base'
-			return res.redirect "/learn/#{encodeURI(page.redirects[0].to)}"
+			# Encoding ? below because some titles contain it, but it is not encoded in
+			# the API, and is then handled as an empty query parameter and dropped,
+			# resulting in a 404.
+			redirectTo = encodeURI(page.redirects[0].to).replace(/\?/g, '%3F')
+			return res.redirect "/learn/#{redirectTo}"
 		if page.revid == 0
 			return ErrorController.notFound(null, res)
 		
