@@ -32,38 +32,43 @@ export default class ExportGuide extends Component {
 
 function Continue({ entry, onSwitch, pdfUrl, logs }) {
   if (pdfUrl) {
-    return (
-      <div>
-        <p>
-          To begin a direct export from Overleaf please click the button below
-        </p>
-        <p>
-          <button
-            className="btn btn-primary"
-            style={{ display: 'inline-block' }}
-            onClick={() => onSwitch('export', entry.id)}
-          >
-            Continue
-          </button>
-        </p>
-        <p>
-          Please note that you'll have chance to confirm your submission on the
-          next page before your files are sent
-        </p>
-        {logs.errors.length > 0 && (
+    if (logs.errors.length == 0) {
+      return (
+        <div>
           <p>
-            <strong> Warning: </strong> LaTeX errors on this project may affect
-            submissions. Please check the logs before continuing
+            To begin a direct export from Overleaf please click the button below
           </p>
-        )}
-        {logs.warnings.length > 0 && (
           <p>
-            <strong> Warning: </strong> LaTeX warnings on this project may
-            affect submissions. Please check the logs before continuing
+            <button
+              className="btn btn-primary"
+              style={{ display: 'inline-block' }}
+              onClick={() => onSwitch('export', entry.id)}
+            >
+              Continue
+            </button>
           </p>
-        )}
-      </div>
-    )
+          <p>
+            Please note that you'll have chance to confirm your submission on the
+            next page before your files are sent
+          </p>
+          {logs.warnings.length > 0 && (
+            <p>
+              <strong> Warning: </strong> LaTeX warnings on this project may
+              affect submissions. Please check the logs before continuing
+            </p>
+          )}
+        </div>
+      )
+    } else {
+      return(
+        <p>
+          <strong>
+            LaTeX errors on this project affect
+            submission. Please check the logs before continuing
+          </strong>
+        </p>
+      )
+    }
   } else {
     return (
       <p>
