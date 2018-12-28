@@ -80,6 +80,26 @@ describe('<PublishGuide />', () => {
         })
     })
 
+    it('triggers file download after completed export', () => {
+      // Mock poll request to succeed
+      ajaxStub
+        .onSecondCall()
+        .returns(
+          Promise.resolve({ export_json: { status_summary: 'succeeded' } })
+        )
+      const downloadFile = sinon.spy()
+      const { getByText } = renderPublishGuide({ downloadFile })
+
+      const downloadButton = getByText(/download project zip/i)
+      fireEvent.click(downloadButton)
+
+      return waitForElement(() => getByText(/download project zip/i)).then(
+        () => {
+          expect(downloadFile).to.have.been.called
+        }
+      )
+    })
+
     it('shows error on polling error response', () => {
       // Mock first poll request to fail
       ajaxStub.onSecondCall().returns(Promise.reject(new Error()))
