@@ -44,7 +44,7 @@ export function initiateExport(entry, projectId, _this) {
       _this.setState({ exportId: resp.export_v1_id })
       pollExportStatus(resp.export_v1_id, projectId, _this, 1000)
     })
-    .catch(resp => {
+    .catch(() => {
       _this.setState({ exportState: 'error' })
     })
 }
@@ -62,48 +62,61 @@ function startExport(url, data) {
   })
 }
 
-function pollExportStatus(exportId, projectId, _this, timeout) {
-  var siteUrl = window.ExposedSettings.siteUrl
-  var link = `${siteUrl}/project/${projectId}/export/${exportId}`
-  $.ajax({
-    url: link,
-    type: 'GET'
-  })
-    .done(resp => {
-      const status = resp.export_json
-      if (status.status_summary === 'failed') {
-        _this.setState({
-          exportState: 'error',
-          errorDetails: status.status_detail
-        })
-      } else if (status.status_summary === 'succeeded') {
-        _this.setState({
-          exportState: 'complete',
-          // for ScholarOne
-          partner_submission_id: status.partner_submission_id,
-          // for F1000/Wellcome
-          authorEmail: status.v2_user_email,
-          authorName: [
-            status.v2_user_first_name,
-            status.v2_user_last_name
-          ].join(' '),
-          title: status.title,
-          articleZipURL: link + '/zip',
-          pdfURL: link + '/pdf',
-          revisionURL: `${siteUrl}/exports/${exportId}${status.token}/revise`,
-          // general-purpose
-          token: status.token
-        })
-      } else {
-        setTimeout(function() {
-          if (timeout < 10000) {
-            timeout = timeout + 1000
-          }
-          pollExportStatus(exportId, projectId, _this, timeout)
-        }, timeout)
+function pollExportStatus(exportId, projectId, _this) {
+  const siteUrl = window.ExposedSettings.siteUrl
+  const url = `${siteUrl}/project/${projectId}/export/${exportId}`
+  return networkPoll(
+    { url },
+    ({ export_json: status }) => status.status_summary === 'succeeded',
+    ({ export_json: status }) => status.status_summary === 'failed'
+  )
+    .then(status => {
+      _this.setState({
+        exportState: 'complete',
+        // for ScholarOne
+        partner_submission_id: status.partner_submission_id,
+        // for F1000/Wellcome
+        authorEmail: status.v2_user_email,
+        authorName: [status.v2_user_first_name, status.v2_user_last_name].join(
+          ' '
+        ),
+        title: status.title,
+        articleZipURL: url + '/zip',
+        pdfURL: url + '/pdf',
+        revisionURL: 'https://www.overleaf.com/learn/how-to/Overleaf_v2_FAQ',
+        // general-purpose
+        token: status.token
+      })
+    })
+    .catch(status => {
+      const state = { exportState: 'error' }
+      if (status.status_detail) {
+        state.errorDetails = status.status_detail
       }
+      _this.setState(state)
     })
-    .fail(resp => {
-      _this.setState({ exportState: 'error' })
-    })
+}
+
+function networkPoll(ajaxOpts, checkSuccess, checkError, timeout = 1000) {
+  return new Promise((resolve, reject) => {
+    function poll() {
+      $.ajax(ajaxOpts)
+        .done(res => {
+          if (checkError(res)) {
+            reject(res)
+          } else if (checkSuccess(res)) {
+            resolve(res)
+          } else {
+            setTimeout(() => {
+              if (timeout < 10000) {
+                timeout = timeout + 1000
+              }
+              poll()
+            }, timeout)
+          }
+        })
+        .fail(reject)
+    }
+    poll()
+  })
 }
