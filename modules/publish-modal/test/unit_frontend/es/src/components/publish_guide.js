@@ -146,17 +146,22 @@ describe('<PublishGuide />', () => {
   })
 })
 
-function renderPublishGuide() {
-  return render(
-    <PublishGuide
-      returnText="Return"
-      entry={{
+function renderPublishGuide(args) {
+  const props = Object.assign(
+    {},
+    {
+      returnText: 'Return',
+      entry: {
         id: 2,
         publish_guide_html: 'Some HTML',
         publish_link_destination: 'http://example.com'
-      }}
-      onReturn={() => {}}
-      projectId="1"
-    />
+      },
+      onReturn: () => {},
+      projectId: '1',
+      downloadFile: () => {}
+    },
+    args
   )
+
+  return render(<PublishGuide {...props} />)
 }
