@@ -152,10 +152,12 @@ function Submit({ entry }) {
 }
 
 function downloadFileWithLocation(url) {
-  window.location = url
+  // Trigger download of file in background, doesn't actually navigate away
+  window.location.pathname = url
 }
 
 PublishGuide.defaultProps = {
+  // Note: provided as a prop, only because it can then be mocked in testing
   downloadFile: downloadFileWithLocation
 }
 
@@ -164,7 +166,7 @@ PublishGuide.propTypes = {
   returnText: PropTypes.string,
   onReturn: PropTypes.func,
   projectId: PropTypes.string.isRequired,
-  downloadFile: PropTypes.func
+  downloadFile: PropTypes.func.isRequired
 }
 
 GuideHtml.propTypes = {
