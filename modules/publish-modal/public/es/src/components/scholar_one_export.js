@@ -7,7 +7,7 @@ export default class ScholarOneExport extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      exportState: 'unintiated',
+      exportState: 'uninitiated',
       errorDetails: null
     }
   }
@@ -39,7 +39,7 @@ export default class ScholarOneExport extends Component {
       })
   }
 
-  renderUnintiated(entry, projectId) {
+  renderUninitiated(entry, projectId) {
     return (
       <span>
         <p>Thanks for using Overleaf to submit your article.</p>
@@ -101,8 +101,8 @@ export default class ScholarOneExport extends Component {
   render() {
     const { entry, onReturn, projectId, returnText } = this.props
     let body
-    if (this.state.exportState === 'unintiated') {
-      body = this.renderUnintiated(entry, projectId)
+    if (this.state.exportState === 'uninitiated') {
+      body = this.renderUninitiated(entry, projectId)
     } else if (this.state.exportState === 'initiated') {
       body = this.renderInitiated(entry, projectId)
     } else if (this.state.exportState === 'complete') {

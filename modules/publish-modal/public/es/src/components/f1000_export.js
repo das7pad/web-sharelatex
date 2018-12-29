@@ -7,7 +7,7 @@ export default class F1000Export extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      exportState: 'unintiated',
+      exportState: 'uninitiated',
       errorDetails: null
     }
   }
@@ -46,7 +46,7 @@ export default class F1000Export extends Component {
       })
   }
 
-  renderUnintiated(entry, projectId) {
+  renderUninitiated(entry, projectId) {
     return (
       <span>
         <p>Thanks for using Overleaf to write your article.</p>
@@ -92,8 +92,8 @@ export default class F1000Export extends Component {
   render() {
     const { entry, onReturn, projectId, returnText } = this.props
     let body
-    if (this.state.exportState === 'unintiated') {
-      body = this.renderUnintiated(entry, projectId)
+    if (this.state.exportState === 'uninitiated') {
+      body = this.renderUninitiated(entry, projectId)
     } else if (this.state.exportState === 'initiated') {
       body = this.renderInitiated(entry, projectId)
     } else if (this.state.exportState === 'complete') {

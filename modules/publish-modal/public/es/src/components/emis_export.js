@@ -6,7 +6,7 @@ export default class EmisExport extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      exportState: 'unintiated',
+      exportState: 'uninitiated',
       submissionValid: true,
       errorDetails: null
     }
@@ -94,7 +94,7 @@ export default class EmisExport extends Component {
               Submit to: <br />
               <strong> {entry.name} </strong>
             </h3>
-            {this.state.exportState === 'unintiated' && (
+            {this.state.exportState === 'uninitiated' && (
               <span>
                 <p>Thanks for using Overleaf to submit your article.</p>
                 <p>

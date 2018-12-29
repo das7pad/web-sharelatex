@@ -6,7 +6,7 @@ export default class GalleryExport extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      exportState: 'unintiated',
+      exportState: 'uninitiated',
       submissionValid: true,
       errorDetails: null
     }
@@ -183,7 +183,7 @@ export default class GalleryExport extends Component {
     const { entry, onReturn, returnText } = this.props
 
     let body
-    if (this.state.exportState === 'unintiated') {
+    if (this.state.exportState === 'uninitiated') {
       body = this.renderUninitiated()
     } else if (this.state.exportState === 'initiated') {
       body = this.renderInitiated()
