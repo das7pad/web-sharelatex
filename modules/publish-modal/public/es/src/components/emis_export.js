@@ -1,6 +1,6 @@
 import React, { PropTypes, Component } from 'react'
 import ReturnButton from './return_button'
-import { initiateExport2 } from '../utils'
+import { initiateExport } from '../utils'
 
 export default class EmisExport extends Component {
   constructor(props) {
@@ -24,7 +24,7 @@ export default class EmisExport extends Component {
         exportState: 'initiated'
       })
 
-      initiateExport2(entry, projectId, {
+      initiateExport(entry, projectId, {
         firstName: this.firstName.value,
         lastName: this.lastName.value
       })

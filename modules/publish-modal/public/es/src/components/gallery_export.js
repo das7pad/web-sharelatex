@@ -1,6 +1,6 @@
 import React, { PropTypes, Component } from 'react'
 import ReturnButton from './return_button'
-import { initiateExport2 } from '../utils'
+import { initiateExport } from '../utils'
 
 export default class GalleryExport extends Component {
   constructor(props) {
@@ -34,7 +34,7 @@ export default class GalleryExport extends Component {
         license: this.license.value
       }
 
-      initiateExport2(entry, projectId, data)
+      initiateExport(entry, projectId, data)
         .then(() => {
           this.setState({ exportState: 'complete' })
         })

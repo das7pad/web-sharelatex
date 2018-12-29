@@ -1,7 +1,7 @@
 /* global $, FormData */
 import React, { PropTypes, Component } from 'react'
 import ReturnButton from './return_button'
-import { initiateExport2 } from '../utils'
+import { initiateExport } from '../utils'
 
 export default class ScholarOneExport extends Component {
   constructor(props) {
@@ -15,7 +15,7 @@ export default class ScholarOneExport extends Component {
   runExport(entry, projectId) {
     this.setState({ exportState: 'initiated' })
 
-    initiateExport2(entry, projectId)
+    initiateExport(entry, projectId)
       .then(({ exportId, token, submissionId }) => {
         this.setState({ exportState: 'complete' })
 

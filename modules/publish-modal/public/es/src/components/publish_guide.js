@@ -1,6 +1,6 @@
 import React, { PropTypes, Component } from 'react'
 import ReturnButton from './return_button'
-import { initiateExport2 } from '../utils'
+import { initiateExport } from '../utils'
 
 export default class PublishGuide extends Component {
   constructor(props) {
@@ -14,7 +14,7 @@ export default class PublishGuide extends Component {
 
   initiateGuideExport(entry, projectId, type) {
     this.setState({ exportState: 'initiated' })
-    initiateExport2(entry, projectId)
+    initiateExport(entry, projectId)
       .then(({ exportId }) => {
         // Trigger download of file in background, doesn't actually navigate
         // away
