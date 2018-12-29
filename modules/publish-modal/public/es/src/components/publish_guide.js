@@ -46,11 +46,16 @@ export default class PublishGuide extends Component {
         <div className="col-sm-12">
           <ReturnButton onReturn={onReturn} returnText={returnText} />
           <GuideHtml
-            entry={entry}
-            projectId={projectId}
-            exportState={this.state.exportState}
-            initiateGuideExport={this.initiateGuideExport}
-            errorDetails={this.state.errorDetails}
+            guideHtml={entry.publish_guide_html}
+            renderDownload={
+              <Download
+                entry={entry}
+                projectId={projectId}
+                exportState={this.state.exportState}
+                initiateGuideExport={this.initiateGuideExport}
+                errorDetails={this.state.errorDetails}
+              />
+            }
           />
           {entry.publish_link_destination && (
             <div>
@@ -70,26 +75,13 @@ export default class PublishGuide extends Component {
   }
 }
 
-export function GuideHtml({
-  entry,
-  projectId,
-  exportState,
-  initiateGuideExport,
-  errorDetails
-}) {
-  const html = entry.publish_guide_html
-  if (html.indexOf('DOWNLOAD') !== -1) {
-    const htmlParts = html.split('DOWNLOAD')
+export function GuideHtml({ guideHtml, renderDownload }) {
+  if (guideHtml.indexOf('DOWNLOAD') !== -1) {
+    const htmlParts = guideHtml.split('DOWNLOAD')
     return (
       <div>
         <div dangerouslySetInnerHTML={{ __html: htmlParts[0] }} />
-        <Download
-          entry={entry}
-          projectId={projectId}
-          exportState={exportState}
-          initiateGuideExport={initiateGuideExport}
-          errorDetails={errorDetails}
-        />
+        {renderDownload}
         <div
           style={{ marginLeft: '140px', paddingLeft: '15px' }}
           dangerouslySetInnerHTML={{ __html: htmlParts[1] }}
@@ -97,9 +89,7 @@ export function GuideHtml({
       </div>
     )
   } else {
-    return (
-      <div dangerouslySetInnerHTML={{ __html: entry.publish_guide_html }} />
-    )
+    return <div dangerouslySetInnerHTML={{ __html: guideHtml }} />
   }
 }
 
@@ -197,11 +187,8 @@ PublishGuide.propTypes = {
 }
 
 GuideHtml.propTypes = {
-  entry: PropTypes.object.isRequired,
-  projectId: PropTypes.string.isRequired,
-  exportState: PropTypes.string.isRequired,
-  initiateGuideExport: PropTypes.func.isRequired,
-  errorDetails: PropTypes.object
+  guideHtml: PropTypes.string.isRequired,
+  renderDownload: PropTypes.node
 }
 
 Download.propTypes = {
@@ -209,7 +196,7 @@ Download.propTypes = {
   projectId: PropTypes.string.isRequired,
   exportState: PropTypes.string.isRequired,
   initiateGuideExport: PropTypes.func.isRequired,
-  errorDetails: PropTypes.object
+  errorDetails: PropTypes.string
 }
 
 Submit.propTypes = {
