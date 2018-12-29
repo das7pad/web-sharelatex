@@ -43,6 +43,22 @@ module.exports = function (config) {
     frameworks: ['requirejs', 'mocha', 'chai-sinon'],
     // Configure webpack in the tests
     webpack: {
+      module: {
+        rules: [{
+          // Pass application JS files through babel-loader, compiling to ES5
+          test: /\.js$/,
+          // Only compile application files (dependencies are in ES5 already)
+          exclude: /node_modules/,
+          use: [{
+            loader: 'babel-loader',
+            options: {
+              // Configure babel-loader to cache compiled output so that subsequent
+              // compile runs are much faster
+              cacheDirectory: true
+            }
+          }]
+        }]
+      },
       resolve: {
         alias: {
           // Alias Src in import pathnames to public/es
