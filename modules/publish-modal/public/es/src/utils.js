@@ -12,10 +12,10 @@ export function findEntryInCategories(categories, id) {
   return entry
 }
 
-export function initiateExport2(entry, projectId) {
+export function initiateExport2(entry, projectId, data) {
   const url = `/project/${projectId}/export/${entry.id}`
 
-  return startExport(url).then(startResponse => {
+  return startExport(url, data).then(startResponse => {
     return pollExportStatus2(startResponse.export_v1_id, projectId)
       .then(() => {
         return {

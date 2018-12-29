@@ -27,7 +27,14 @@ export default class GalleryExport extends Component {
         exportState: 'initiated'
       })
 
-      initiateExport2(entry, projectId)
+      const data = {
+        title: this.title.value,
+        author: this.author.value,
+        description: this.description.value,
+        license: this.license.value
+      }
+
+      initiateExport2(entry, projectId, data)
         .then(() => {
           this.setState({ exportState: 'complete' })
         })
