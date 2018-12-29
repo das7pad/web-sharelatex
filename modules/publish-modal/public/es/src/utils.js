@@ -17,9 +17,11 @@ export function initiateExport2(entry, projectId, data) {
 
   return startExport(url, data).then(startResponse => {
     return pollExportStatus2(startResponse.export_v1_id, projectId)
-      .then(() => {
+      .then(pollResponse => {
         return {
-          exportId: startResponse.export_v1_id
+          exportId: startResponse.export_v1_id,
+          token: pollResponse.token,
+          submissionId: pollResponse.partner_submission_id
         }
       })
       .catch(error => {

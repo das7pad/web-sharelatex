@@ -1,29 +1,42 @@
-/* global $ */
+/* global $, FormData */
 import React, { PropTypes, Component } from 'react'
 import ReturnButton from './return_button'
-import { initiateExport } from '../utils'
+import { initiateExport2 } from '../utils'
 
 export default class ScholarOneExport extends Component {
   constructor(props) {
     super(props)
     this.state = {
       exportState: 'unintiated',
-      submissionValid: true,
-      errorDetails: null,
-      exportId: null,
-      partner_submission_id: null,
-      token: null
+      errorDetails: null
     }
   }
 
   runExport(entry, projectId) {
-    initiateExport(entry, projectId, this)
-  }
+    this.setState({ exportState: 'initiated' })
 
-  componentDidUpdate() {
-    if (this.state.exportState === 'complete') {
-      $('#export_form').submit()
-    }
+    initiateExport2(entry, projectId)
+      .then(({ exportId, token, submissionId }) => {
+        this.setState({ exportState: 'complete' })
+
+        const formData = new FormData()
+        formData.append('export_id', `${exportId}${token}`)
+        formData.append('submission_id', submissionId)
+        formData.append('EXT_ACTION', 'OVERLEAF_SUBMISSION')
+
+        $.ajax({
+          url: this.props.entry.export_url,
+          method: 'POST',
+          contentType: 'multipart/form-data',
+          data: formData
+        })
+      })
+      .catch(({ errorDetails }) => {
+        this.setState({
+          exportState: 'error',
+          errorDetails
+        })
+      })
   }
 
   renderUnintiated(entry, projectId) {
@@ -72,31 +85,8 @@ export default class ScholarOneExport extends Component {
     )
   }
 
-  renderComplete(entry) {
-    return (
-      <span>
-        <form action={entry.export_url} method="post" id="export_form">
-          <input
-            id="export_id"
-            name="export_id"
-            type="hidden"
-            value={this.state.exportId + this.state.token}
-          />
-          <input
-            id="submission_id"
-            name="submission_id"
-            type="hidden"
-            value={this.state.partner_submission_id}
-          />
-          <input
-            id="EXT_ACTION"
-            name="EXT_ACTION"
-            type="hidden"
-            value="OVERLEAF_SUBMISSION"
-          />
-        </form>
-      </span>
-    )
+  renderComplete() {
+    return <span data-testid="export-complete" />
   }
 
   renderError() {
