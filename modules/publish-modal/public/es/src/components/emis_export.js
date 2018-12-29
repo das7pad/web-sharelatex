@@ -1,6 +1,6 @@
 import React, { PropTypes, Component } from 'react'
 import ReturnButton from './return_button'
-import { initiateExport } from '../utils'
+import { initiateExport2 } from '../utils'
 
 export default class EmisExport extends Component {
   constructor(props) {
@@ -10,11 +10,33 @@ export default class EmisExport extends Component {
       submissionValid: true,
       errorDetails: null
     }
+
+    this.runExport = this.runExport.bind(this)
   }
 
-  runExport(entry, projectId) {
+  runExport(e) {
+    e.preventDefault()
+    const { entry, projectId } = this.props
+
     if (this.firstName.value && this.lastName.value) {
-      initiateExport(entry, projectId, this)
+      this.setState({
+        submissionValid: true,
+        exportState: 'initiated'
+      })
+
+      initiateExport2(entry, projectId, {
+        firstName: this.firstName.value,
+        lastName: this.lastName.value
+      })
+        .then(() => {
+          this.setState({ exportState: 'complete' })
+        })
+        .catch(({ errorDetails }) => {
+          this.setState({
+            exportState: 'error',
+            errorDetails
+          })
+        })
     } else {
       this.setState({ submissionValid: false })
     }
@@ -24,7 +46,6 @@ export default class EmisExport extends Component {
     const {
       entry,
       onReturn,
-      projectId,
       returnText,
       hasFolders,
       firstName,
@@ -86,33 +107,32 @@ export default class EmisExport extends Component {
                 <p>
                   To send your article, please confirm your first and last name:
                 </p>
-                <p>
-                  <input
-                    type="text"
-                    className="form-control"
-                    defaultValue={firstName}
-                    style={{ width: '30%', display: 'inline-block' }}
-                    maxLength="255"
-                    placeholder="First Name"
-                    ref={input => (this.firstName = input)}
-                  />
-                  <input
-                    type="text"
-                    className="form-control"
-                    defaultValue={lastName}
-                    style={{ width: '30%', display: 'inline-block' }}
-                    maxLength="255"
-                    placeholder="Last Name"
-                    ref={input => (this.lastName = input)}
-                  />
-                </p>
-                <br />
-                <button
-                  className="btn btn-primary"
-                  onClick={() => this.runExport(entry, projectId)}
-                >
-                  Submit to {entry.name}
-                </button>
+                <form onSubmit={this.runExport}>
+                  <p>
+                    <input
+                      type="text"
+                      className="form-control"
+                      defaultValue={firstName}
+                      style={{ width: '30%', display: 'inline-block' }}
+                      maxLength="255"
+                      placeholder="First Name"
+                      ref={input => (this.firstName = input)}
+                    />
+                    <input
+                      type="text"
+                      className="form-control"
+                      defaultValue={lastName}
+                      style={{ width: '30%', display: 'inline-block' }}
+                      maxLength="255"
+                      placeholder="Last Name"
+                      ref={input => (this.lastName = input)}
+                    />
+                  </p>
+                  <br />
+                  <button type="submit" className="btn btn-primary">
+                    Submit to {entry.name}
+                  </button>
+                </form>
                 {!this.state.submissionValid && (
                   <p style={{ color: 'red' }}>
                     Please add valid first and last names before continuing
