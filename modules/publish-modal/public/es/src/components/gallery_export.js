@@ -1,6 +1,6 @@
 import React, { PropTypes, Component } from 'react'
 import ReturnButton from './return_button'
-import { initiateExport } from '../utils'
+import { initiateExport2 } from '../utils'
 
 export default class GalleryExport extends Component {
   constructor(props) {
@@ -14,17 +14,32 @@ export default class GalleryExport extends Component {
 
   runExport(ev) {
     ev.preventDefault()
-    let valid =
+    if (
       this.title.value &&
       this.author.value &&
       this.description.value &&
       this.license.value
-    if (valid) {
+    ) {
       const { entry, projectId } = this.props
-      initiateExport(entry, projectId, this)
+
+      this.setState({
+        submissionValid: true,
+        exportState: 'initiated'
+      })
+
+      initiateExport2(entry, projectId)
+        .then(() => {
+          this.setState({ exportState: 'complete' })
+        })
+        .catch(({ errorDetails }) => {
+          this.setState({
+            exportState: 'error',
+            errorDetails
+          })
+        })
+    } else {
+      this.setState({ submissionValid: false })
     }
-    this.setState({ submissionValid: valid })
-    return valid
   }
 
   renderUninitiated() {
@@ -108,11 +123,9 @@ export default class GalleryExport extends Component {
           </label>
         </div>
         <div className="form-control-box no-label">
-          <input
-            type="submit"
-            className="btn btn-primary"
-            value={'Submit to ' + entry.name}
-          />
+          <button type="submit" className="btn btn-primary">
+            Submit to {entry.name}
+          </button>
           {!this.state.submissionValid && (
             <p style={{ color: 'red' }}>
               Please provide all of title, author(s) and description before
@@ -196,7 +209,7 @@ GalleryExport.propTypes = {
   returnText: PropTypes.string,
   onReturn: PropTypes.func,
   projectId: PropTypes.string.isRequired,
-  author: PropTypes.string.isRequired,
+  author: PropTypes.string,
   title: PropTypes.string,
   description: PropTypes.string,
   showSource: PropTypes.bool
