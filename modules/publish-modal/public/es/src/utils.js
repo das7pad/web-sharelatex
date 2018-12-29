@@ -25,6 +25,9 @@ export function initiateExport(entry, projectId, data) {
           .filter(Boolean)
           .join(' ')
 
+        // FIXME: just return the whole combined {start,poll}Response objects?
+        // Arguably this is just the network layer that shouldn't know anything
+        // about business logic
         return {
           exportId: startResponse.export_v1_id,
           token: pollResponse.token,
