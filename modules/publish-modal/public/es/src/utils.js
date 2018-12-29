@@ -18,10 +18,20 @@ export function initiateExport2(entry, projectId, data) {
   return startExport(url, data).then(startResponse => {
     return pollExportStatus2(startResponse.export_v1_id, projectId)
       .then(pollResponse => {
+        const authorName = [
+          pollResponse.v2_user_first_name,
+          pollResponse.v2_user_last_name
+        ]
+          .filter(Boolean)
+          .join(' ')
+
         return {
           exportId: startResponse.export_v1_id,
           token: pollResponse.token,
-          submissionId: pollResponse.partner_submission_id
+          submissionId: pollResponse.partner_submission_id,
+          authorEmail: pollResponse.v2_user_email,
+          authorName,
+          title: pollResponse.title
         }
       })
       .catch(error => {

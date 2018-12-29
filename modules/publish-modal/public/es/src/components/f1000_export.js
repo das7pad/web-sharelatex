@@ -1,36 +1,49 @@
 /* global $ */
 import React, { PropTypes, Component } from 'react'
 import ReturnButton from './return_button'
-import { initiateExport } from '../utils'
+import { initiateExport2 } from '../utils'
 
 export default class F1000Export extends Component {
   constructor(props) {
     super(props)
     this.state = {
       exportState: 'unintiated',
-      submissionValid: true,
-      errorDetails: null,
-      exportId: null,
-      partnerName: null,
-      partnerContactURL: null,
-      authorEmail: null,
-      authorName: null,
-      title: null,
-      articleZipURL: null,
-      pdfURL: null,
-      revisionURL: null,
-      token: null
+      errorDetails: null
     }
   }
 
   runExport(entry, projectId) {
-    initiateExport(entry, projectId, this)
-  }
+    this.setState({ exportState: 'initiated' })
 
-  componentDidUpdate() {
-    if (this.state.exportState === 'complete') {
-      $('#export_form').submit()
-    }
+    initiateExport2(entry, projectId)
+      .then(({ authorEmail, authorName, title }) => {
+        this.setState({ exportState: 'complete' })
+
+        $.ajax({
+          url: this.props.entry.export_url,
+          method: 'GET',
+          data: {
+            authorEmail,
+            authorName,
+            title,
+            articleZipURL: `/project/${projectId}/export/${entry.id}/zip`,
+            pdfURL: `/project/${projectId}/export/${entry.id}/pdf`,
+            revisionURL:
+              'https://www.overleaf.com/learn/how-to/Overleaf_v2_FAQ',
+            submissionURL: '',
+            publicationURL: '',
+            rejectionURL: '',
+            newVersionURL: '',
+            articleId: ''
+          }
+        })
+      })
+      .catch(({ errorDetails }) => {
+        this.setState({
+          exportState: 'error',
+          errorDetails
+        })
+      })
   }
 
   renderUnintiated(entry, projectId) {
@@ -63,69 +76,8 @@ export default class F1000Export extends Component {
     )
   }
 
-  renderComplete(entry) {
-    return (
-      <span>
-        <form action={entry.export_url} method="get" id="export_form">
-          <input
-            id="authorEmail"
-            name="authorEmail"
-            type="hidden"
-            value={this.state.authorEmail}
-          />
-          <input
-            id="authorName"
-            name="authorName"
-            type="hidden"
-            value={this.state.authorName}
-          />
-          <input
-            id="title"
-            name="title"
-            type="hidden"
-            value={this.state.title}
-          />
-          <input
-            id="articleZipURL"
-            name="articleZipURL"
-            type="hidden"
-            value={this.state.articleZipURL}
-          />
-          <input
-            id="pdfURL"
-            name="pdfURL"
-            type="hidden"
-            value={this.state.pdfURL}
-          />
-          <input
-            id="revisionURL"
-            name="revisionURL"
-            type="hidden"
-            value={this.state.revisionURL}
-          />
-          <input
-            id="submissionURL"
-            name="submissionURL"
-            type="hidden"
-            value=""
-          />
-          <input
-            id="publicationURL"
-            name="publicationURL"
-            type="hidden"
-            value=""
-          />
-          <input id="rejectionURL" name="rejectionURL" type="hidden" value="" />
-          <input
-            id="newVersionURL"
-            name="newVersionURL"
-            type="hidden"
-            value=""
-          />
-          <input id="articleId" name="articleId" type="hidden" value="" />
-        </form>
-      </span>
-    )
+  renderComplete() {
+    return <span data-testid="export-complete" />
   }
 
   renderError() {
@@ -145,7 +97,7 @@ export default class F1000Export extends Component {
     } else if (this.state.exportState === 'initiated') {
       body = this.renderInitiated(entry, projectId)
     } else if (this.state.exportState === 'complete') {
-      body = this.renderComplete(entry)
+      body = this.renderComplete()
     } else {
       body = this.renderError()
     }
