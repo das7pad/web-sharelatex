@@ -1,36 +1,37 @@
 import React, { PropTypes, Component } from 'react'
 import ReturnButton from './return_button'
-import { initiateExport } from '../utils'
+import { initiateExport2 } from '../utils'
 
 export default class PublishGuide extends Component {
   constructor(props) {
     super(props)
     this.state = {
       exportState: 'uninitiated',
-      exportId: null,
-      downloadRequested: null
+      errorDetails: null
     }
+    this.initiateGuideExport = this.initiateGuideExport.bind(this)
   }
 
-  componentDidUpdate() {
-    if (this.state.exportState === 'complete') {
-      var link = `/project/${this.props.projectId}/export/${
-        this.state.exportId
-      }/`
-      if (this.state.downloadRequested === 'zip') {
-        link = link + 'zip'
-      } else {
-        link = link + 'pdf'
-      }
-      this.props.downloadFile(link)
-      // eslint-disable-next-line react/no-did-update-set-state
-      this.setState({ exportState: 'uninitiated' })
-    }
-  }
+  initiateGuideExport(entry, projectId, type) {
+    this.setState({ exportState: 'initiated' })
+    initiateExport2(entry, projectId)
+      .then(({ exportId }) => {
+        // Trigger download of file in background, doesn't actually navigate
+        // away
+        this.props.downloadFile(
+          `/project/${projectId}/export/${exportId}/${
+            type === 'zip' ? 'zip' : 'pdf'
+          }`
+        )
 
-  initiateGuideExport(entry, projectId, _this, type) {
-    this.setState({ downloadRequested: type })
-    initiateExport(entry, projectId, _this)
+        this.setState({ exportState: 'uninitiated' })
+      })
+      .catch(({ errorDetails }) => {
+        this.setState({
+          exportState: 'error',
+          errorDetails
+        })
+      })
   }
 
   render() {
@@ -44,10 +45,22 @@ export default class PublishGuide extends Component {
       >
         <div className="col-sm-12">
           <ReturnButton onReturn={onReturn} returnText={returnText} />
-          <GuideHtml entry={entry} projectId={projectId} _this={this} />
+          <GuideHtml
+            entry={entry}
+            projectId={projectId}
+            exportState={this.state.exportState}
+            initiateGuideExport={this.initiateGuideExport}
+            errorDetails={this.state.errorDetails}
+          />
           {entry.publish_link_destination && (
             <div>
-              <Download entry={entry} projectId={projectId} _this={this} />
+              <Download
+                entry={entry}
+                projectId={projectId}
+                exportState={this.state.exportState}
+                initiateGuideExport={this.initiateGuideExport}
+                errorDetails={this.state.errorDetails}
+              />
               <Submit entry={entry} />
             </div>
           )}
@@ -57,14 +70,26 @@ export default class PublishGuide extends Component {
   }
 }
 
-export function GuideHtml({ entry, projectId, _this }) {
+export function GuideHtml({
+  entry,
+  projectId,
+  exportState,
+  initiateGuideExport,
+  errorDetails
+}) {
   const html = entry.publish_guide_html
   if (html.indexOf('DOWNLOAD') !== -1) {
     const htmlParts = html.split('DOWNLOAD')
     return (
       <div>
         <div dangerouslySetInnerHTML={{ __html: htmlParts[0] }} />
-        <Download entry={entry} projectId={projectId} _this={_this} />
+        <Download
+          entry={entry}
+          projectId={projectId}
+          exportState={exportState}
+          initiateGuideExport={initiateGuideExport}
+          errorDetails={errorDetails}
+        />
         <div
           style={{ marginLeft: '140px', paddingLeft: '15px' }}
           dangerouslySetInnerHTML={{ __html: htmlParts[1] }}
@@ -78,7 +103,13 @@ export function GuideHtml({ entry, projectId, _this }) {
   }
 }
 
-function Download({ entry, projectId, _this }) {
+function Download({
+  entry,
+  projectId,
+  exportState,
+  initiateGuideExport,
+  errorDetails
+}) {
   return (
     <div style={{ marginLeft: '140px', paddingLeft: '15px' }}>
       {/* Most publish guides have an image column
@@ -86,14 +117,12 @@ function Download({ entry, projectId, _this }) {
       <p>
         <strong>Step 1: Download files</strong>
       </p>
-      {_this.state.exportState === 'uninitiated' && (
+      {exportState === 'uninitiated' && (
         <span>
           <p>
             <button
               className="btn btn-primary"
-              onClick={() =>
-                _this.initiateGuideExport(entry, projectId, _this, 'zip')
-              }
+              onClick={() => initiateGuideExport(entry, projectId, 'zip')}
             >
               Download project ZIP with submission files (e.g. .bbl)
             </button>
@@ -101,26 +130,24 @@ function Download({ entry, projectId, _this }) {
           <p>
             <button
               className="btn btn-primary"
-              onClick={() =>
-                _this.initiateGuideExport(entry, projectId, _this, 'pdf')
-              }
+              onClick={() => initiateGuideExport(entry, projectId, 'pdf')}
             >
               Download PDF file of your article
             </button>
           </p>
         </span>
       )}
-      {_this.state.exportState === 'initiated' && (
+      {exportState === 'initiated' && (
         <p style={{ fontSize: 20, margin: '20px 0px 20px' }}>
           <i className="fa fa-refresh fa-spin fa-fw" />
           <span> &nbsp; Compiling project, please wait...</span>
         </p>
       )}
-      {_this.state.exportState === 'error' && (
+      {exportState === 'error' && (
         <p>
           Project failed to compile
           <br />
-          Error message: {_this.state.errorDetails}
+          Error message: {errorDetails}
         </p>
       )}
     </div>
@@ -172,13 +199,17 @@ PublishGuide.propTypes = {
 GuideHtml.propTypes = {
   entry: PropTypes.object.isRequired,
   projectId: PropTypes.string.isRequired,
-  _this: PropTypes.object.isRequired
+  exportState: PropTypes.string.isRequired,
+  initiateGuideExport: PropTypes.func.isRequired,
+  errorDetails: PropTypes.object
 }
 
 Download.propTypes = {
   entry: PropTypes.object.isRequired,
   projectId: PropTypes.string.isRequired,
-  _this: PropTypes.object.isRequired
+  exportState: PropTypes.string.isRequired,
+  initiateGuideExport: PropTypes.func.isRequired,
+  errorDetails: PropTypes.object
 }
 
 Submit.propTypes = {

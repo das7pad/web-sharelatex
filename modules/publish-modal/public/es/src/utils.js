@@ -12,6 +12,34 @@ export function findEntryInCategories(categories, id) {
   return entry
 }
 
+export function initiateExport2(entry, projectId) {
+  const url = `/project/${projectId}/export/${entry.id}`
+
+  return startExport(url).then(startResponse => {
+    return pollExportStatus2(startResponse.export_v1_id, projectId)
+      .then(() => {
+        return {
+          exportId: startResponse.export_v1_id
+        }
+      })
+      .catch(error => {
+        // Rethrow with nicely formatted data
+        throw new Error({
+          errorDetails: error.status_detail || null
+        })
+      })
+  })
+}
+
+function pollExportStatus2(exportId, projectId) {
+  const url = `/project/${projectId}/export/${exportId}`
+  return networkPoll(
+    { url },
+    ({ export_json: status }) => status.status_summary === 'succeeded',
+    ({ export_json: status }) => status.status_summary === 'failed'
+  )
+}
+
 export function initiateExport(entry, projectId, _this) {
   var link = `/project/${projectId}/export/${entry.id}`
 
@@ -39,6 +67,7 @@ export function initiateExport(entry, projectId, _this) {
   }
 
   _this.setState({ exportState: 'initiated' })
+
   startExport(link, data)
     .then(resp => {
       _this.setState({ exportId: resp.export_v1_id })
@@ -49,7 +78,7 @@ export function initiateExport(entry, projectId, _this) {
     })
 }
 
-function startExport(url, data) {
+function startExport(url, data = {}) {
   return new Promise((resolve, reject) => {
     $.ajax({
       url,
