@@ -171,6 +171,9 @@ define(['base'], function(App) {
         x1 => x1.user_id
       )} ${query}`
       return algolia.search(query, function(err, response) {
+        if (err) {
+          return updateHits([])
+        }
         if (response.hits.length === 0) {
           return updateHits([])
         } else {
