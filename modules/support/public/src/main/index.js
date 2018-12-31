@@ -77,12 +77,10 @@ define(['base', 'libs/platform', 'services/algolia-search'], function(
             x => x.replace(/\s/g, '_')
           )
           const pageSlug = encodeURIComponent(pageUnderscored)
-          result.push(
-            (suggestion = {
-              url: `/learn/how-to/${pageSlug}`,
-              name: hit._highlightResult.pageName.value
-            })
-          )
+          result.push({
+            url: `/learn/how-to/${pageSlug}`,
+            name: hit._highlightResult.pageName.value
+          })
         }
         return result
       })()
