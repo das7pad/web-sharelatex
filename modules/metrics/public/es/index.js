@@ -9,7 +9,8 @@ metricsApp.init = function() {
   metricsApp.router = new Router()
   Backbone.history.start({ pushState: true, root: '/metrics' })
 
-  var metricsView = new MetricsView()
+  // eslint-disable-next-line no-new
+  new MetricsView()
 }
 
 export { metricsApp, chartApp, institutionHub }
