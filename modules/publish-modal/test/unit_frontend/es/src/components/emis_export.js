@@ -41,6 +41,8 @@ describe('<EmisExport />', () => {
       const { data } = $.ajax.firstCall.args[0]
       expect(data.firstName).to.equal('FirstName')
       expect(data.lastName).to.equal('LastName')
+
+      return waitForElement(() => getByText(/export successful/i))
     })
 
     it('waits for download poll to succeed', () => {

@@ -45,6 +45,8 @@ describe('<GalleryExport />', () => {
       expect(data.title).to.equal('My title')
       expect(data.description).to.equal('My description')
       expect(data.license).to.equal('cc_by_4.0')
+
+      return waitForElement(() => getByText(/export successful/i))
     })
 
     it('waits for download poll to succeed', () => {
