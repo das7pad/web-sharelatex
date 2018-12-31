@@ -33,11 +33,15 @@ describe('<GalleryExport />', () => {
         .returns(
           Promise.resolve({ export_json: { status_summary: 'succeeded' } })
         )
-      const { getByLabelText, getByText } = renderGalleryExport()
+      const {
+        getByLabelText,
+        getByText,
+        getByDisplayValue
+      } = renderGalleryExport()
 
       const licenseSelect = getByLabelText(/license/i)
       fireEvent.change(licenseSelect, { target: { value: 'cc_by_4.0' } })
-      const submitButton = getByText(/submit to MyJournal/i)
+      const submitButton = getByDisplayValue(/submit to myjournal/i)
       fireEvent.click(submitButton)
 
       const { data } = $.ajax.firstCall.args[0]
@@ -55,11 +59,15 @@ describe('<GalleryExport />', () => {
         .returns(
           Promise.resolve({ export_json: { status_summary: 'succeeded' } })
         )
-      const { getByLabelText, getByText } = renderGalleryExport()
+      const {
+        getByLabelText,
+        getByText,
+        getByDisplayValue
+      } = renderGalleryExport()
 
       const licenseSelect = getByLabelText(/license/i)
       fireEvent.change(licenseSelect, { target: { value: 'cc_by_4.0' } })
-      const submitButton = getByText(/submit to MyJournal/i)
+      const submitButton = getByDisplayValue(/submit to myjournal/i)
       fireEvent.click(submitButton)
 
       return waitForElement(() => getByText(/exporting files/i))
@@ -84,11 +92,15 @@ describe('<GalleryExport />', () => {
           Promise.resolve({ export_json: { status_summary: 'succeeded' } })
         )
 
-      const { getByLabelText, getByText } = renderGalleryExport()
+      const {
+        getByLabelText,
+        getByText,
+        getByDisplayValue
+      } = renderGalleryExport()
 
       const licenseSelect = getByLabelText(/license/i)
       fireEvent.change(licenseSelect, { target: { value: 'cc_by_4.0' } })
-      const submitButton = getByText(/submit to MyJournal/i)
+      const submitButton = getByDisplayValue(/submit to myjournal/i)
       fireEvent.click(submitButton)
 
       return waitForElement(() => getByText(/exporting files/i))
@@ -106,11 +118,15 @@ describe('<GalleryExport />', () => {
       // Mock first poll request to fail
       ajaxStub.onSecondCall().returns(Promise.reject(new Error()))
 
-      const { getByLabelText, getByText } = renderGalleryExport()
+      const {
+        getByLabelText,
+        getByText,
+        getByDisplayValue
+      } = renderGalleryExport()
 
       const licenseSelect = getByLabelText(/license/i)
       fireEvent.change(licenseSelect, { target: { value: 'cc_by_4.0' } })
-      const submitButton = getByText(/submit to MyJournal/i)
+      const submitButton = getByDisplayValue(/submit to myjournal/i)
       fireEvent.click(submitButton)
 
       return waitForElement(() => getByText(/exporting files/i))
@@ -130,11 +146,15 @@ describe('<GalleryExport />', () => {
         .onSecondCall()
         .returns(Promise.resolve({ export_json: { status_summary: 'failed' } }))
 
-      const { getByLabelText, getByText } = renderGalleryExport()
+      const {
+        getByLabelText,
+        getByText,
+        getByDisplayValue
+      } = renderGalleryExport()
 
       const licenseSelect = getByLabelText(/license/i)
       fireEvent.change(licenseSelect, { target: { value: 'cc_by_4.0' } })
-      const submitButton = getByText(/submit to MyJournal/i)
+      const submitButton = getByDisplayValue(/submit to myjournal/i)
       fireEvent.click(submitButton)
 
       return waitForElement(() => getByText(/exporting files/i))
