@@ -144,8 +144,7 @@ define(['base'], function(App) {
     }
 
     const buildHitViewModel = function(hit) {
-      let result
-      return (result = {
+      return {
         name: hit._highlightResult.name.value,
         description: hit._highlightResult.description.value,
         url: `/templates/${hit._id}`,
@@ -155,7 +154,7 @@ define(['base'], function(App) {
         )}/templates/${hit._id}/v/${
           hit.version
         }/pdf-converted-cache/style-thumbnail`
-      })
+      }
     }
 
     var updateHits = hits => $scope.safeApply(() => ($scope.hits = hits))

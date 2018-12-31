@@ -18,12 +18,11 @@ define(['base', 'libs/platform', 'services/algolia-search'], function(
     ($scope, $modal) =>
       // the button to open the support modal / form with affected URL input
       ($scope.contactUsModal = function() {
-        let modalInstance
-        return (modalInstance = $modal.open({
+        $modal.open({
           templateUrl: 'contactModalTemplate',
           controller: 'ContactModalController',
           scope: $scope
-        }))
+        })
       })
   )
 
@@ -32,11 +31,10 @@ define(['base', 'libs/platform', 'services/algolia-search'], function(
     ($scope, $modal) =>
       // the button to open the general modal / form WITHOUT affected URL input
       ($scope.openModal = function() {
-        let modalInstance
-        return (modalInstance = $modal.open({
+        $modal.open({
           templateUrl: 'contactGeneralModalTemplate',
           controller: 'ContactGeneralModalController'
-        }))
+        })
       })
   )
 
@@ -74,7 +72,6 @@ define(['base', 'libs/platform', 'services/algolia-search'], function(
       const suggestions = (() => {
         const result = []
         for (let hit of Array.from(results.hits)) {
-          var suggestion
           const pageUnderscored = __guard__(
             hit != null ? hit.pageName : undefined,
             x => x.replace(/\s/g, '_')
