@@ -32,7 +32,7 @@ export default class ExportGuide extends Component {
 
 function Continue({ entry, onSwitch, pdfUrl, logs }) {
   if (pdfUrl) {
-    if (logs.errors.length == 0) {
+    if (logs.errors.length === 0) {
       return (
         <div>
           <p>
