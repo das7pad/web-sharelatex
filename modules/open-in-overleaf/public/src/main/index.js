@@ -1,3 +1,5 @@
+/* global atob */
+
 define(['base'], App =>
   // For integration-module
   App.controller('OpenInOverleafGatewayController', function(
