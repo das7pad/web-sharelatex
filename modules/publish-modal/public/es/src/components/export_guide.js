@@ -48,8 +48,8 @@ function Continue({ entry, onSwitch, pdfUrl, logs }) {
             </button>
           </p>
           <p>
-            Please note that you'll have chance to confirm your submission on the
-            next page before your files are sent
+            Please note that you'll have chance to confirm your submission on
+            the next page before your files are sent
           </p>
           {logs.warnings.length > 0 && (
             <p>
@@ -60,11 +60,11 @@ function Continue({ entry, onSwitch, pdfUrl, logs }) {
         </div>
       )
     } else {
-      return(
+      return (
         <p>
           <strong>
-            LaTeX errors on this project affect
-            submission. Please check the logs before continuing
+            LaTeX errors on this project affect submission. Please check the
+            logs before continuing
           </strong>
         </p>
       )
