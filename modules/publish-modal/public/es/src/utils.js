@@ -39,19 +39,27 @@ export function initiateExport(entry, projectId, _this) {
   }
 
   _this.setState({ exportState: 'initiated' })
-  $.ajax({
-    url: link,
-    type: 'POST',
-    data: data,
-    headers: { 'X-CSRF-Token': window.csrfToken }
-  })
-    .done(resp => {
+  startExport(link, data)
+    .then(resp => {
       _this.setState({ exportId: resp.export_v1_id })
       pollExportStatus(resp.export_v1_id, projectId, _this, 1000)
     })
-    .fail(resp => {
+    .catch(resp => {
       _this.setState({ exportState: 'error' })
     })
+}
+
+function startExport(url, data) {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      url,
+      type: 'POST',
+      data,
+      headers: { 'X-CSRF-Token': window.csrfToken }
+    })
+      .done(resolve)
+      .fail(reject)
+  })
 }
 
 function pollExportStatus(exportId, projectId, _this, timeout) {
