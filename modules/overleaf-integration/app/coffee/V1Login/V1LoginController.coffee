@@ -116,6 +116,11 @@ module.exports = V1LoginController =
 				V1LoginController._login(profile, req, res, next)
 
 	doPasswordChange: (req, res, next) ->
+		unless req.body.newPassword1 == req.body.newPassword2
+			return res.json message: {
+				type: 'error',
+				text: req.i18n.translate('password_change_passwords_do_not_match')
+			}
 		lightUser = AuthenticationController.getSessionUser(req)
 		UserGetter.getUser lightUser._id, (err, user) ->
 			return next(err) if err?
