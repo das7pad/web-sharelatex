@@ -1,4 +1,4 @@
-/* global $, FormData */
+/* global $ */
 import React, { PropTypes, Component } from 'react'
 import ReturnButton from './return_button'
 import { initiateExport } from '../utils'
@@ -19,16 +19,14 @@ export default class ScholarOneExport extends Component {
       .then(({ exportId, token, submissionId }) => {
         this.setState({ exportState: 'complete' })
 
-        const formData = new FormData()
-        formData.append('export_id', `${exportId}${token}`)
-        formData.append('submission_id', submissionId)
-        formData.append('EXT_ACTION', 'OVERLEAF_SUBMISSION')
-
         $.ajax({
           url: this.props.entry.export_url,
           method: 'POST',
-          contentType: 'multipart/form-data',
-          data: formData
+          data: {
+            export_id: `${exportId}${token}`,
+            submission_id: submissionId,
+            EXT_ACTION: 'OVERLEAF_SUBMISSION'
+          }
         })
       })
       .catch(({ errorDetails }) => {

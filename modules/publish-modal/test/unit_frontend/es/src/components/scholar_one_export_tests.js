@@ -95,9 +95,9 @@ describe('<ScholarOneExport />', () => {
         const { url, method, data } = $.ajax.thirdCall.args[0]
         expect(url).to.equal('http://example.com')
         expect(method).to.equal('POST')
-        expect(data.get('export_id')).to.equal('3token')
-        expect(data.get('submission_id')).to.equal('4')
-        expect(data.get('EXT_ACTION')).to.equal('OVERLEAF_SUBMISSION')
+        expect(data.export_id).to.equal('3token')
+        expect(data.submission_id).to.equal(4)
+        expect(data.EXT_ACTION).to.equal('OVERLEAF_SUBMISSION')
       })
     })
 
