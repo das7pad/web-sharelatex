@@ -20,7 +20,7 @@ describe('<GalleryExport />', () => {
       ajaxStub = sinon
         .stub($, 'ajax')
         .onFirstCall()
-        .returns(Promise.resolve({ export_v1_id: 3 }))
+        .returns($.Deferred().resolve({ export_v1_id: 3 }))
     })
 
     afterEach(() => {
@@ -31,7 +31,7 @@ describe('<GalleryExport />', () => {
       ajaxStub
         .onSecondCall()
         .returns(
-          Promise.resolve({ export_json: { status_summary: 'succeeded' } })
+          $.Deferred().resolve({ export_json: { status_summary: 'succeeded' } })
         )
       const {
         getByLabelText,
@@ -57,7 +57,7 @@ describe('<GalleryExport />', () => {
       ajaxStub
         .onSecondCall()
         .returns(
-          Promise.resolve({ export_json: { status_summary: 'succeeded' } })
+          $.Deferred().resolve({ export_json: { status_summary: 'succeeded' } })
         )
       const {
         getByLabelText,
@@ -85,11 +85,11 @@ describe('<GalleryExport />', () => {
       ajaxStub
         // Mock first poll request to be still pending
         .onSecondCall()
-        .returns(Promise.resolve({ export_json: {} }))
+        .returns($.Deferred().resolve({ export_json: {} }))
         // Mock second poll request to succeed
         .onThirdCall()
         .returns(
-          Promise.resolve({ export_json: { status_summary: 'succeeded' } })
+          $.Deferred().resolve({ export_json: { status_summary: 'succeeded' } })
         )
 
       const {
@@ -116,7 +116,7 @@ describe('<GalleryExport />', () => {
 
     it('shows error on polling error response', () => {
       // Mock first poll request to fail
-      ajaxStub.onSecondCall().returns(Promise.reject(new Error()))
+      ajaxStub.onSecondCall().returns($.Deferred().reject(new Error()))
 
       const {
         getByLabelText,
@@ -144,7 +144,9 @@ describe('<GalleryExport />', () => {
       // Mock first poll request to succeed, but with failed message
       ajaxStub
         .onSecondCall()
-        .returns(Promise.resolve({ export_json: { status_summary: 'failed' } }))
+        .returns(
+          $.Deferred().resolve({ export_json: { status_summary: 'failed' } })
+        )
 
       const {
         getByLabelText,

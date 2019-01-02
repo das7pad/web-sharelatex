@@ -20,7 +20,7 @@ describe('<PublishGuide />', () => {
       ajaxStub = sinon
         .stub($, 'ajax')
         .onFirstCall()
-        .returns(Promise.resolve({ export_v1_id: 3 }))
+        .returns($.Deferred().resolve({ export_v1_id: 3 }))
     })
 
     afterEach(() => {
@@ -32,7 +32,7 @@ describe('<PublishGuide />', () => {
       ajaxStub
         .onSecondCall()
         .returns(
-          Promise.resolve({ export_json: { status_summary: 'succeeded' } })
+          $.Deferred().resolve({ export_json: { status_summary: 'succeeded' } })
         )
       const { getByText } = renderPublishGuide()
 
@@ -56,11 +56,11 @@ describe('<PublishGuide />', () => {
       ajaxStub
         // Mock first poll request to be still pending
         .onSecondCall()
-        .returns(Promise.resolve({ export_json: {} }))
+        .returns($.Deferred().resolve({ export_json: {} }))
         // Mock second poll request to succeed
         .onThirdCall()
         .returns(
-          Promise.resolve({ export_json: { status_summary: 'succeeded' } })
+          $.Deferred().resolve({ export_json: { status_summary: 'succeeded' } })
         )
       const { getByText } = renderPublishGuide()
 
@@ -85,7 +85,7 @@ describe('<PublishGuide />', () => {
       ajaxStub
         .onSecondCall()
         .returns(
-          Promise.resolve({ export_json: { status_summary: 'succeeded' } })
+          $.Deferred().resolve({ export_json: { status_summary: 'succeeded' } })
         )
       const downloadFile = sinon.spy()
       const { getByText } = renderPublishGuide({ downloadFile })
@@ -102,7 +102,7 @@ describe('<PublishGuide />', () => {
 
     it('shows error on polling error response', () => {
       // Mock first poll request to fail
-      ajaxStub.onSecondCall().returns(Promise.reject(new Error()))
+      ajaxStub.onSecondCall().returns($.Deferred().reject(new Error()))
       const { getByText } = renderPublishGuide()
 
       const downloadButton = getByText(/download project zip/i)
@@ -125,7 +125,9 @@ describe('<PublishGuide />', () => {
       // Mock first poll request to succeed, but with failed message
       ajaxStub
         .onSecondCall()
-        .returns(Promise.resolve({ export_json: { status_summary: 'failed' } }))
+        .returns(
+          $.Deferred().resolve({ export_json: { status_summary: 'failed' } })
+        )
       const { getByText } = renderPublishGuide()
 
       const downloadButton = getByText(/download project zip/i)
