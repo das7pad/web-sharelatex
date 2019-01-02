@@ -41,7 +41,7 @@ pipeline {
     stage('Install') {
       agent {
         docker {
-          image 'node:6.9.5'
+          image 'node:6.15.1'
           args "-v /var/lib/jenkins/.npm:/tmp/.npm"
           reuseNode true
         }
@@ -60,7 +60,7 @@ pipeline {
     stage('Compile') {
       agent {
         docker {
-          image 'node:6.9.5'
+          image 'node:6.15.1'
           reuseNode true
         }
       }
@@ -76,7 +76,7 @@ pipeline {
         stage('Format') {
           agent {
             docker {
-              image 'node:6.9.5'
+              image 'node:6.15.1'
               reuseNode true
             }
           }
@@ -88,7 +88,7 @@ pipeline {
         stage('Lint') {
           agent {
             docker {
-              image 'node:6.9.5'
+              image 'node:6.15.1'
               reuseNode true
             }
           }
@@ -104,7 +104,7 @@ pipeline {
         stage('Unit Test') {
           agent {
             docker {
-              image 'node:6.9.5'
+              image 'node:6.15.1'
               reuseNode true
             }
           }
@@ -123,7 +123,7 @@ pipeline {
         stage('Minify') {
           agent {
             docker {
-              image 'node:6.9.5'
+              image 'node:6.15.1'
               reuseNode true
             }
           }
