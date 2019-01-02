@@ -8,7 +8,7 @@ import {
   waitForElement
 } from 'react-testing-library'
 
-import GalleryExport from '../../../../../public/es/src/components/gallery_export'
+import GalleryExport from 'PublishModalSrc/components/gallery_export'
 
 describe('<GalleryExport />', () => {
   let ajaxStub

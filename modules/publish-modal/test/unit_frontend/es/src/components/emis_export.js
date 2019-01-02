@@ -8,7 +8,7 @@ import {
   waitForElement
 } from 'react-testing-library'
 
-import EmisExport from '../../../../../public/es/src/components/emis_export'
+import EmisExport from 'PublishModalSrc/components/emis_export'
 
 describe('<EmisExport />', () => {
   let ajaxStub

@@ -8,7 +8,7 @@ import {
   waitForElement
 } from 'react-testing-library'
 
-import PublishGuide from '../../../../../public/es/src/components/publish_guide'
+import PublishGuide from 'PublishModalSrc/components/publish_guide'
 
 describe('<PublishGuide />', () => {
   let ajaxStub
