@@ -56,6 +56,7 @@ export function initiateExport(entry, projectId, _this) {
 
 function pollExportStatus(exportId, projectId, _this, timeout) {
   var link = `/project/${projectId}/export/${exportId}`
+  var siteUrl = window.ExposedSettings.siteUrl
   $.ajax({
     url: link,
     type: 'GET',
@@ -80,7 +81,7 @@ function pollExportStatus(exportId, projectId, _this, timeout) {
           title: status.title,
           articleZipURL: link + '/zip',
           pdfURL: link + '/pdf',
-          revisionURL: `/exports/${exportId}${status.token}/revise`,
+          revisionURL: `${siteUrl}/exports/${exportId}${status.token}/revise`,
           // general-purpose
           token: status.token
         })
