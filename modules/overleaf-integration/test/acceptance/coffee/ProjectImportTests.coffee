@@ -309,24 +309,42 @@ describe "ProjectImportTests", ->
 		it 'should import a project with the brand variation id', ->
 			expect(@project.brandVariationId).to.equal '123'
 
-	describe 'a project with unsupported file type', ->
+	describe 'a project with unsupported linked file agent', ->
 		before (done) ->
+			ext = {
+				id: new ObjectId()
+				stream: fs.createReadStream(Path.resolve(__dirname + '/../files/foo.bib'))
+			}
+			MockS3Api.setFile ext
 			files = [
 				type: 'ext'
-				file: 'linked_file.pdf'
-				file_path: "file/linked_file.pdf"
+				file: 'foo.bib'
+				file_path: "file/#{ext.id}"
+				agent: 'citeulike'
+				agent_data: {}
 			]
 			@ol_project_id = 4
 			@ol_project_token = "#{@ol_project_id}vwy"
-			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, token: @ol_project_token, files, title: "New name" })
+			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, {
+				id: @ol_project_id,
+				token: @ol_project_token,
+				files,
+				title: "New name"
+			})
 
 			MockDocUpdaterApi.clearProjectStructureUpdates()
-			done()
 
-		it 'should return an error message', (done) ->
 			@owner.request.post "/overleaf/project/#{@ol_project_token}/import", (error, response, body) =>
-				expect(response.statusCode).to.equal(501)
-				expect(JSON.parse(body).message).to.equal("Sorry! Projects with linked or external files aren't fully supported yet.")
+				throw error if error?
+				getProject response, (error, project) =>
+					@project = project
+					done()
+
+		it 'should add file as non-external file', (done) ->
+			ProjectEntityHandler.getAllEntitiesFromProject @project, (error, docs, files) ->
+				throw error if error?
+				expect(files).to.have.lengthOf(1)
+				expect(files[0].path).to.equal('/foo.bib')
 				done()
 
 	describe 'a project with labels', ->

@@ -315,8 +315,6 @@ module.exports = ProjectImporter =
 				if !file.file_path?
 					return new Error("expected file.file_path")
 			else if file.type == "ext"
-				if file.agent not in SUPPORTED_V1_EXT_AGENTS
-					return  new UnsupportedFileTypeError("expected file.agent to be valid, instead got '#{file.agent}'")
 				if !file.file_path?
 					return new Error("expected file.file_path")
 				if !file.agent_data?
@@ -386,7 +384,7 @@ module.exports = ProjectImporter =
 		buildLinkedFileData = (file, _cb) ->
 			cb = (err) ->
 				setImmediate _cb, err  # make the callback asynchronous
-			if file.type is "ext"
+			if file.type is "ext" and file.agent in SUPPORTED_V1_EXT_AGENTS
 				ProjectImporter._buildLinkedFileDataForExtFile file, (err, linkedFileData) ->
 					return cb(err) if err?
 					return new Error('Could not build linkedFileData for agent #{file.agent}') if !linkedFileData?

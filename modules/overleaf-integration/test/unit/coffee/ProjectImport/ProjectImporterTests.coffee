@@ -770,18 +770,23 @@ describe "ProjectImporter", ->
 					.should.equal true
 
 		describe "with an ext file, from an unknown agent", ->
-			beforeEach ->
+			beforeEach (done) ->
 				@file = {
 					file: "images/image.jpeg"
 					file_path: "s3/image.jpeg"
 					type: "ext"
 					agent: "unknown"
+					agent_data: {}
 				}
-				@ProjectImporter._importFiles @project_id, [@file], @callback
+				@ProjectImporter._writeS3ObjectToDisk = sinon.stub().yields(null, "path/on/disk")
+				@ProjectImporter._importFiles @project_id, [@file], done
 
-			it 'should throw an error', ->
-				err = @callback.lastCall.args[0]
-				expect(err).to.exist
+			it "should add the file to the project", ->
+				@ProjectEntityUpdateHandler._addFileAndSendToTpds
+					.calledWith(
+						@project_id, @folder_id, sinon.match({name: "image.jpeg"})
+					)
+					.should.equal true
 
 		describe "with an unknown file type", ->
 			beforeEach ->
@@ -833,6 +838,19 @@ describe "ProjectImporter", ->
 				@ProjectImporter._importFiles @project_id, [@att_file], (error) ->
 					error.message.should.equal("expected file.file_path")
 					done()
+
+			describe 'with a ext file type', ->
+				beforeEach ->
+					@file = {
+						file: 'linked_file.pdf'
+						file_path: 's3/linked_file.pdf'
+						type: 'ext'
+					}
+
+				it 'should require file.agent_data', (done) ->
+					@ProjectImporter._importFiles @project_id, [@file], (error) ->
+						error.message.should.equal("expected file.agent_data")
+						done()
 
 
 	describe "_confirmExport", ->
