@@ -23,8 +23,6 @@ module.exports = CollabratecMiddlewear =
 			CollabratecMiddlewear._handleAuthResponse req, res, next, err, canRead && !becauseSiteAdmin, "read", 403
 
 	v1Proxy: (req, res, next) ->
-		# always proxy to v1 unless feature flag set
-		return CollabratecMiddlewear._v1Proxy req, res, next unless req.oauth_user.useCollabratecV2
 		# always use v2 if not a project query
 		return next() unless req.params.project_id?
 		# always use v2 for v2 project ids
