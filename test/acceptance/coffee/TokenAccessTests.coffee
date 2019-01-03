@@ -445,6 +445,7 @@ describe 'TokenAccess', ->
 
 	describe 'importing v1 project', ->
 		before (done) ->
+			settings.projectImportingCheckMaxCreateDelta = 3600
 			settings.overleaf =
 				host: 'http://localhost:5000'
 			@owner.createProject "token-rw-test#{Math.random()}", (err, project_id) =>
@@ -462,6 +463,7 @@ describe 'TokenAccess', ->
 							done()
 
 		after ->
+			delete settings.projectImportingCheckMaxCreateDelta
 			delete settings.overleaf
 
 		it 'should show importing page for read and write token', (done) ->
@@ -475,3 +477,13 @@ describe 'TokenAccess', ->
 				expect(response.statusCode).to.equal 200
 				expect(body).to.include('ImportingController')
 			, done)
+
+		describe 'when importing check not configured', ->
+			before ->
+				delete settings.projectImportingCheckMaxCreateDelta
+
+			it 'should load editor', (done) ->
+				try_read_and_write_token_access(@owner, @tokens.readAndWrite, (response, body) =>
+					expect(response.statusCode).to.equal 200
+					expect(body).to.include('IdeController')
+				, done)

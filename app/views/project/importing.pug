@@ -18,17 +18,3 @@ block content
 				span.loading-screen-ellip .
 				span.loading-screen-ellip .
 				span.loading-screen-ellip .
-
-block requirejs
-	script(type='text/javascript').
-		window.requirejs = {
-			"paths" : {
-				"importing": "#{buildJsPath('importing.js', {hashedPath:settings.useMinifiedJs, removeExtension:true})}"
-			}
-		};
-
-	script(
-		data-main=buildJsPath("importing.js", {hashedPath:false}),
-		baseurl=fullJsPath,
-		src=buildJsPath('libs/require.js', {hashedPath:true})
-	)

@@ -280,7 +280,9 @@ module.exports = ProjectController =
 					{ name: 1, lastUpdated: 1, track_changes: 1, owner_ref: 1, brandVariationId: 1, overleaf: 1, tokens: 1 },
 					(err, project) ->
 						return cb(err) if err?
-						return cb(null, project) unless project.overleaf?.id? and project.tokens?.readAndWrite?
+						return cb(null, project) unless project.overleaf?.id? and project.tokens?.readAndWrite? and Settings.projectImportingCheckMaxCreateDelta?
+						createDelta = (new Date().getTime() - new Date(project._id.getTimestamp()).getTime()) / 1000
+						return cb(null, project) unless createDelta < Settings.projectImportingCheckMaxCreateDelta
 						TokenAccessHandler.getV1DocInfo project.tokens.readAndWrite, null, (err, doc_info) ->
 							return next err if err?
 							project.exporting = doc_info.exporting

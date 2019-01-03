@@ -1,4 +1,4 @@
-define(['base', 'analytics/AbTestingManager'], function(App) {
+define(['base'], function(App) {
   App.controller('ImportingController', function(
     $interval,
     $scope,
@@ -18,6 +18,4 @@ define(['base', 'analytics/AbTestingManager'], function(App) {
       load_progress: 20
     }
   })
-
-  return angular.bootstrap(document.body, ['SharelatexApp'])
 })
