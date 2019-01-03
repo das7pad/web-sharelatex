@@ -2,6 +2,7 @@ expect = require("chai").expect
 async = require("async")
 express = require("express")
 path = require("path")
+translations = require('translations-sharelatex').setup()
 {db, ObjectId} = require("../../../../../app/js/infrastructure/mongojs")
 User = require("../../../../../test/acceptance/js/helpers/User")
 ProjectGetter = require("../../../../../app/js/Features/Project/ProjectGetter")
@@ -490,7 +491,7 @@ I have a bad name
 
 			it "should return a 'not found' error", ->
 				expect(@res.statusCode).to.equal 404
-				expect(JSON.parse(@body).error).to.equal 'not_found_error_from_the_supplied_url'
+				expect(JSON.parse(@body).error).to.equal translations.i18n.translate('not_found_error_from_the_supplied_url')
 
 		describe "when POSTing a template name", ->
 			beforeEach (done) ->
@@ -579,7 +580,7 @@ I have a bad name
 
 			it "should return an 'ambiguous parameters' error", ->
 				expect(@res.statusCode).to.equal 400
-				expect(JSON.parse(@body).error).to.equal 'more_than_one_kind_of_snippet_was_requested'
+				expect(JSON.parse(@body).error).to.equal translations.i18n.translate('more_than_one_kind_of_snippet_was_requested')
 
 		describe "when POSTing a partner and client_media_id", ->
 			beforeEach (done) ->
@@ -775,14 +776,14 @@ I have a bad name
 						@body = _body
 						done()
 
-				it "should create a project with the deault project name", (done) ->
+				it "should create a project with the default project name", (done) ->
 					projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
 					expect(projectId).to.exist
 
 					ProjectGetter.getProject projectId, (error, project) ->
 						return done(error) if error?
 
-						expect(project.name).to.equal "new_snippet_project"
+						expect(project.name).to.equal translations.i18n.translate("new_snippet_project")
 						done()
 
 				it "should add the .tex file as a document", (done) ->
