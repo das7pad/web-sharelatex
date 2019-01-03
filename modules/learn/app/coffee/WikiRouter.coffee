@@ -3,6 +3,7 @@ WikiController = require("./WikiController")
 settings = require("settings-sharelatex")
 logger = require('logger-sharelatex')
 _ = require('lodash')
+Url = require "url"
 
 
 module.exports =
@@ -40,7 +41,10 @@ module.exports =
 			# these are still under kb on the wiki,
 			# the controller is set up to query for correct page.
 			webRouter.get /^\/learn\/kb(\/.*)?$/i, (req, res) ->
-				res.redirect req.path.replace(/learn\/kb/i, 'learn/how-to').replace(/%20/g, '_').replace(/\/Knowledge Base/i, '')
+				res.redirect(Url.format({
+					pathname: req.path.replace(/learn\/kb/i, 'learn/how-to').replace(/%20/g, '_').replace(/\/Knowledge Base/i, ''),
+					query: req.query,
+				}))
 
 			# Match either /learn/latex/:page or /learn/how-to/:page
 			webRouter.get /^\/learn\/(latex|how-to)(\/.*)?$/i, RateLimiterMiddlewear.rateLimit({
