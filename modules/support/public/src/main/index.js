@@ -119,7 +119,7 @@ define([
 		var _setupSuggestionsWatcher = () =>
 			$scope.$watch("form.subject", function(newVal, oldVal) {
 				if (newVal && (newVal !== oldVal) && (newVal.length > 3)) {
-					return algoliaSearch.searchKB(newVal, _handleSearchResults, {
+					return algoliaSearch.searchWiki(newVal, _handleSearchResults, {
 						hitsPerPage: 3,
 						typoTolerance: 'strict'
 					});
