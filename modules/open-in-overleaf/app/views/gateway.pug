@@ -2,7 +2,7 @@ extends ../../../../app/views/layout
 
 block vars
 	- var suppressNavbar = true
-	- var suppressFooter= true
+	- var suppressFooter = true
 
 block content
 	script.
@@ -12,9 +12,11 @@ block content
 			}, 500);
 		});
 
+	script(type="template", id="overleaf-gateway-data")!= StringHelper.stringifyJsonForScript({params: form_data, action: action, target: target, csrfToken: csrfToken, error: error})
+
 	.editor.full-size(
 			ng-controller="OpenInOverleafGatewayController",
-			ng-init=("handleGateway('" + Buffer.from(JSON.stringify({params: form_data, action: action, target: target, csrfToken: csrfToken, error: error})).toString('base64') + "')")
+			ng-init="handleGateway();"
 		)
 		.loading-screen(ng-hide="error || serverError")
 			.loading-screen-brand-container
