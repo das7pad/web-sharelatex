@@ -92,6 +92,7 @@ describe "V1LoginController", ->
 					id: -1
 			@req.body =
 				newPassword1: @newPassword
+				newPassword2: @newPassword
 			@AuthenticationController.getSessionUser = sinon.stub().returns(@lightUser)
 			@UserGetter.getUser = sinon.stub().withArgs(@userid).callsArgWith(1, null, @user)
 			@V1LoginHandler.doPasswordChange = sinon.stub()
@@ -158,6 +159,21 @@ describe "V1LoginController", ->
 				expect(@res.json).to.be.calledWith message: {
 					type: 'error',
 					text: 'internal_error'
+				}
+
+		describe "when the new passwords do not match", ->
+			beforeEach ->
+				@req.body.newPassword2 = "#{@req.body.newPassword1}x"
+				@req.body.currentPassword = @oldPassword
+				@V1LoginController.doPasswordChange(@req, @res, @next)
+
+			it "should not try to change the password", ->
+				expect(@V1LoginHandler.doPasswordChange).not.to.be.called
+
+			it "should return an error", ->
+				expect(@res.json).to.be.calledWith message: {
+					type: 'error',
+					text: 'password_change_passwords_do_not_match'
 				}
 
 	describe "_login", ->

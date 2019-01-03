@@ -44,3 +44,15 @@ describe "OverleafPasswordChange", ->
 				expect(body.message.type).to.equal 'error'
 				done()
 
+		it 'should error if the new passwords do not match', (done) ->
+			@user.request.post {
+				url: '/user/change_password/v1',
+				json:
+					currentPassword: @user.password,
+					newPassword1: 'wombat123456',
+					newPassword2: '123456wombat',
+			}, (error, response, body) ->
+				expect(error).to.be.null
+				expect(response.statusCode).to.equal 200
+				expect(body.message.type).to.equal 'error'
+				done()
