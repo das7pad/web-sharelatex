@@ -1,11 +1,9 @@
-if showGitBridge
-	span(ng-controller="GitBridgeController", ng-show="permissions.write")
-		// TODO: Remove restriction on user having feature, and show upsell instead
-		ul.list-unstyled.nav(ng-if="project.features.gitBridge || user.features.gitBridge")
-			li
-				a(ng-click="openGitBridgeModal()")
-					i.fa.fa-code-fork.fa-fw
-					| &nbsp;&nbsp; #{translate('git')}
+span(ng-controller="GitBridgeController", ng-show="permissions.write")
+	ul.list-unstyled.nav
+		li
+			a(ng-click="openGitBridgeModal()")
+				i.fa.fa-code-fork.fa-fw
+				| &nbsp;&nbsp; #{translate('git')}
 
 
 script(type="text/ng-template", id="gitBridgeModalTemplate")

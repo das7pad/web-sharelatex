@@ -31,7 +31,6 @@ describe 'GitBridge', ->
 					$set: {
 						isAdmin: true,
 						'overleaf.id': @owner.v1Id,
-						betaProgram: true,
 						'features.gitBridge': true
 					}
 				}, cb
