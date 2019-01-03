@@ -1,26 +1,4 @@
 const path = require('path')
-const fs = require('fs')
-
-const MODULES_PATH = path.join(__dirname, '/modules')
-
-// Generate a hash of module ES directories
-const moduleSrcDirs = {}
-if (fs.existsSync(MODULES_PATH)) {
-	fs.readdirSync(MODULES_PATH).reduce((acc, module) => {
-		const moduleDir = path.join(MODULES_PATH, module, '/public/es/src')
-		if (fs.existsSync(moduleDir)) {
-			acc[`${toCamelCase(module)}Src`] = moduleDir
-		}
-		return acc
-	}, moduleSrcDirs)
-}
-
-function toCamelCase(str) {
-  return str
-    .split('-')
-    .map(piece => piece[0].toUpperCase() + piece.slice(1))
-    .join('')
-}
 
 module.exports = function (config) {
   config.set({
@@ -84,9 +62,10 @@ module.exports = function (config) {
       resolve: {
         // Alias common directories in import pathnames to cut down on the
         // amount of ../../ etc
-        alias: Object.assign({}, moduleSrcDirs, {
-          Src: path.join(__dirname, 'public/es/')
-        })
+        alias: {
+          Src: path.join(__dirname, 'public/es/'),
+          Modules: path.join(__dirname, 'modules')
+        }
       }
     },
     // Configure the webpack dev server used to serve test files
