@@ -65,8 +65,9 @@ define([
 					var suggestion;
 					const page_underscored = __guard__(hit != null ? hit.pageName : undefined, x => x.replace(/\s/g,'_'));
 					const page_slug = encodeURIComponent(page_underscored);
+					const page_path = hit.kb ? 'how-to' : 'latex'
 					result.push(suggestion = {
-						url : `/learn/how-to/${page_slug}`,
+						url : `/learn/${page_path}/${page_slug}`,
 						name : hit._highlightResult.pageName.value
 					});
 				}
