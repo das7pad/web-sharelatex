@@ -331,7 +331,10 @@ define(['base'], function(App) {
         }
         const fileName = newVal.split('/').reverse()[0]
         if (fileName) {
-          return ($scope.data.name = fileName)
+          currentProjectFileNames = ide.$scope.docs.map(doc => doc.path)
+          $scope.data.name = currentProjectFileNames.includes(fileName)
+            ? 'example.tex'
+            : fileName
         }
       })
 
@@ -384,7 +387,7 @@ define(['base'], function(App) {
         const { state, data } = $scope
         return (
           !state.inFlight.projects &&
-          (data.projects.length === 0 || data.projects == null)
+          (data.projects == null || data.projects.length === 0)
         )
       }
 
