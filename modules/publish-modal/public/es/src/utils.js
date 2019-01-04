@@ -55,8 +55,8 @@ export function initiateExport(entry, projectId, _this) {
 }
 
 function pollExportStatus(exportId, projectId, _this, timeout) {
-  var link = `/project/${projectId}/export/${exportId}`
   var siteUrl = window.ExposedSettings.siteUrl
+  var link = `${siteUrl}/project/${projectId}/export/${exportId}`
   $.ajax({
     url: link,
     type: 'GET',
