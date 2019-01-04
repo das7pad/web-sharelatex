@@ -59,7 +59,7 @@ block content
 							form-messages(form="v2ZipDownloadForm")
 							input.row-spaced.btn.btn-primary.text-center.center-block(
 								type="submit"
-								value="Download project zip file"
+								ng-value="v2ZipDownloadForm.inflight || v2ZipDownloadForm.success ? 'Downloading zip file...' : 'Download project zip file'"
 								ng-disabled="v2ZipDownloadForm.inflight || v2ZipDownloadForm.success"
 							)
 
