@@ -141,7 +141,7 @@ define(['base'], function(App) {
 
       const validate = function() {
         const { name } = $scope.inputs
-        return ($scope.state.valid = name != null && name.length > 0)
+        $scope.state.valid = name != null && name.length > 0
       }
       $scope.$watch('inputs.name', validate)
 
@@ -162,7 +162,7 @@ define(['base'], function(App) {
           .catch(function(response) {
             const { data } = response
             $scope.error = data
-            return ($scope.state.inflight = false)
+            $scope.state.inflight = false
           })
       })
     }
@@ -348,14 +348,14 @@ define(['base'], function(App) {
             $scope.data.projects,
             p => p._id === $scope.data.selectedProjectId
           )
-          return ($scope.data.name =
+          $scope.data.name =
             (project != null ? project.name : undefined) != null
               ? `${project.name}.pdf`
-              : 'output.pdf')
+              : 'output.pdf'
         } else {
           const fileName = newVal.split('/').reverse()[0]
           if (fileName) {
-            return ($scope.data.name = fileName)
+            $scope.data.name = fileName
           }
         }
       })
@@ -414,7 +414,7 @@ define(['base'], function(App) {
       const validate = function() {
         const { state } = $scope
         const { data } = $scope
-        return ($scope.state.valid =
+        $scope.state.valid =
           !state.inFlight.projects &&
           !state.inFlight.entities &&
           data.projects &&
@@ -425,7 +425,7 @@ define(['base'], function(App) {
             ($scope.state.isOutputFilesMode &&
               data.projectOutputFiles &&
               data.selectedProjectOutputFile)) &&
-          data.name)
+          data.name
       }
       $scope.$watch('state', validate, true)
       $scope.$watch('data', validate, true)
@@ -515,7 +515,7 @@ define(['base'], function(App) {
           }
         }
         _setInFlight('create')
-        return ide.fileTreeManager
+        ide.fileTreeManager
           .createLinkedFile(name, $scope.parent_folder, provider, payload)
           .then(function() {
             _reset({ err: false })
@@ -523,7 +523,8 @@ define(['base'], function(App) {
           })
           .catch(function(response) {
             const { data } = response
-            return _reset({ err: true })
+            $scope.error = data
+            // return _reset({ err: true , message: message})
           })
       })
     }
