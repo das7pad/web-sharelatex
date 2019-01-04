@@ -502,7 +502,7 @@ module.exports = settings =
 	modules:
 		sanitize:
 			options:
-				allowedTags: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol', 'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div', 'table', 'thead', 'col', 'caption', 'tbody', 'tr', 'th', 'td', 'pre', 'iframe', 'img', 'figure', 'figcaption', 'span', 'source', 'video', 'del' ]
+				allowedTags: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol', 'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div', 'table', 'thead', 'col', 'caption', 'tbody', 'tr', 'th', 'td', 'tfoot', 'pre', 'iframe', 'img', 'figure', 'figcaption', 'span', 'source', 'video', 'del' ]
 				allowedAttributes:
 					'a': [ 'href', 'name', 'target', 'class', 'event-tracking', 'event-tracking-ga', 'event-tracking-label', 'event-tracking-trigger' ]
 					'div': [ 'class', 'id', 'style' ]
@@ -521,4 +521,6 @@ module.exports = settings =
 					'source': [ 'src', 'type' ]
 					'span': [ 'class', 'id', 'style' ]
 					'table': [ 'border', 'class', 'id', 'style' ]
+					'td': [ 'colspan', 'rowspan', 'headers' ]
+					'th': [ 'abbr', 'headers', 'colspan', 'rowspan', 'scope', 'sorted' ]
 					'video': [ 'alt', 'class', 'controls', 'height', 'width' ]
