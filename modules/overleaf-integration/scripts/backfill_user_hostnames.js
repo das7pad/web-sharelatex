@@ -15,7 +15,7 @@ backfillUserEmailHostnames = function (user, callback) {
   async.mapSeries(user.emails, function (userEmail, innerCallback) {
     // skip emails with a reversedHostname or invalid emails
     if (userEmail.reversedHostname || userEmail.email.indexOf('@') === -1) {
-      innerCallback()
+      return innerCallback()
     }
     const reversedHostname =
       userEmail.email.split('@')[1].split('').reverse().join('')
