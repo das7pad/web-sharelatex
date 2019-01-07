@@ -1,12 +1,12 @@
 /* global _ */
 
 import React, { PropTypes, Component } from 'react'
+import PublishGuide from './publish_guide'
 import PublishSections from './publish_sections'
 
 export default class BrandedPublishModal extends Component {
   render() {
     const { entries } = this.props
-    const brandGuide = entries.brand_data.publish_guide_html
     const loopEntries = _.omit(entries, 'brand_data')
     return (
       <span>
@@ -15,9 +15,9 @@ export default class BrandedPublishModal extends Component {
           className="modal-body-content row content-as-table"
         >
           <div className="col-md-12">
-            <div
-              id="brand-guide"
-              dangerouslySetInnerHTML={{ __html: brandGuide }}
+            <PublishGuide
+              entry={entries.brand_data}
+              projectId={this.props.initParams.projectId}
             />
             <br />
             <PublishSections
@@ -33,5 +33,6 @@ export default class BrandedPublishModal extends Component {
 
 BrandedPublishModal.propTypes = {
   entries: PropTypes.object.isRequired,
-  onSwitch: PropTypes.func.isRequired
+  onSwitch: PropTypes.func.isRequired,
+  initParams: PropTypes.object.isRequired
 }
