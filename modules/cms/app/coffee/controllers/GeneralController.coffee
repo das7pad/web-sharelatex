@@ -16,7 +16,8 @@ module.exports = PageController =
 
 			# include is for the depth of the query, for linked data
 			cmsQuery = {
-				content_type: 'page'
+				content_type: 'page',
+				'fields.path': req.params.path,
 				'fields.slug': req.params.slug,
 				include: 3
 			}

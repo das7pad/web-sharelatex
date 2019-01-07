@@ -18,6 +18,8 @@ removeRoute = (webRouter, method, path) ->
 send404 = (req, res) ->
 	ErrorController.notFound req, res
 
+cmsPathOptions = 'about|for'
+
 module.exports =
 	apply: (webRouter) ->
 		removeRoute webRouter, 'get', '/about'
@@ -32,5 +34,5 @@ module.exports =
 		webRouter.get '/blog/tagged/:tag/page/:page', BlogController.getBlog
 		webRouter.get '/blog/feed*', send404 # RSS isn't implemented yet
 		webRouter.get '/blog/:slug', BlogController.getBlogPost
-		webRouter.get '/for/:parent_slug/:slug', GeneralController.getPage
-		webRouter.get '/for/:slug', GeneralController.getPage
+		webRouter.get "/:path(#{cmsPathOptions})/:parent_slug/:slug", GeneralController.getPage
+		webRouter.get "/:path(#{cmsPathOptions})/:slug", GeneralController.getPage
