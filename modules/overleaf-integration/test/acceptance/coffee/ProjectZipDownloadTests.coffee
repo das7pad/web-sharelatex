@@ -21,6 +21,7 @@ describe "ProjectZipDownloadTests", ->
 
 	describe 'a project the user has access to', ->
 		before (done) ->
+			MockProjectHistoryApi.fakeZipCall = 0
 			@doc = {
 				id: MockOverleafApi.nextV1Id(),
 				exported: false,
