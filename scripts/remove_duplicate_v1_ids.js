@@ -1,4 +1,4 @@
-const { db, ObjectId } = require('../app/js/infrastructure/mongojs')
+const { db } = require('../app/js/infrastructure/mongojs')
 const async = require('async')
 const minimist = require('minimist')
 
