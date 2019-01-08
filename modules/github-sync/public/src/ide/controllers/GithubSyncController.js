@@ -18,9 +18,19 @@ define(['base'], App =>
         scope: $scope
       })
 
-    return (ide.githubSyncManager = {
+    ide.githubSyncManager = {
       openGithubSyncModal() {
         return $scope.openGithubSyncModal()
       }
-    })
+    }
+
+    $scope.isProjectMember = function() {
+      const projectMembers = ide.$scope.project.members.map(
+        member => member._id
+      )
+      return (
+        ide.$scope.project.owner._id === ide.$scope.user.id ||
+        projectMembers.includes(ide.$scope.user.id)
+      )
+    }
   }))

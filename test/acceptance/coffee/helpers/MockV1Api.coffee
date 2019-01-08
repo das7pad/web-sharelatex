@@ -38,7 +38,13 @@ module.exports = MockV1Api =
 
 	brands: {}
 
+	validation_clients: {}
+
 	setAffiliations: (affiliations) -> @affiliations = affiliations
+
+	doc_exported: {}
+
+	setDocExported: (token, info) -> @doc_exported[token] = info
 
 	run: () ->
 		app.get "/api/v1/sharelatex/users/:v1_user_id/plan_code", (req, res, next) =>
@@ -126,13 +132,28 @@ module.exports = MockV1Api =
 				valid: false
 			}
 
+		app.get "/api/v2/partners/:partner/conversions/:id", (req, res, next) =>
+			partner = @validation_clients[req.params.partner]
+			conversion = partner?.conversions?[req.params.id]
+			if conversion?
+				res.status(200).json {input_file_uri: conversion, brand_variation_id: partner.brand_variation_id}
+			else
+				res.status(404).json {}
+
+		app.get '/api/v1/sharelatex/docs/:token/is_published', (req, res, next) =>
+			res.json { allow: true }
+
+		app.get '/api/v1/sharelatex/users/:user_id/docs/:token/info', (req, res, next) =>
+			res.json { exported: false }
+
+		app.get '/api/v1/sharelatex/docs/:token/exported_to_v2', (req, res, next) =>
+			return res.json @doc_exported[req.params.token] if @doc_exported[req.params.token]?
+			res.json { exporting: false, exported: false }
+
 		app.listen 5000, (error) ->
 			throw error if error?
 		.on "error", (error) ->
 			console.error "error starting MockV1Api:", error.message
 			process.exit(1)
-		
-		app.get '/api/v1/sharelatex/docs/:token/info', (req, res, next) =>
-			res.json { allow: true, exported: false }
 
 MockV1Api.run()

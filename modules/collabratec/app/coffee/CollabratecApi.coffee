@@ -25,7 +25,7 @@ module.exports = CollabratecApi =
 		# build token text to sign
 		token_text = [ method, collabratec_customer_id, current_time, uri ].join("\n")
 		# generate hmac signature
-		hmac = crypto.createHmac("sha256", settings.collabratec.api.hmac_key)
+		hmac = crypto.createHmac("sha256", settings.collabratec.api.secret)
 		hmac.update(token_text)
 		signature = hmac.digest("base64")
 		# set auth headers - this authenication scheme is something custom that ieee
@@ -34,7 +34,7 @@ module.exports = CollabratecApi =
 		# in collaboration with ieee is the only authoritative specification that
 		# i am aware of.
 		options.headers =
-			"X-ppct-signature": "#{settings.collabratec.api.secret}:#{signature}"
+			"X-ppct-signature": "#{settings.collabratec.api.hmac_key}:#{signature}"
 			"X-ppct-date": current_time
 			"X-extnet-access": Buffer.from(collabratec_customer_id).toString("base64")
 		# make request

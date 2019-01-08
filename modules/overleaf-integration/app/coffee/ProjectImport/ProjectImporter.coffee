@@ -16,6 +16,7 @@ DocstoreManager = require('../../../../../app/js/Features/Docstore/DocstoreManag
 File = require('../../../../../app/js/models/File').File
 FileStoreHandler = require('../../../../../app/js/Features/FileStore/FileStoreHandler')
 
+ProjectCollabratecDetailsHandler = require "../../../../../app/js/Features/Project/ProjectCollabratecDetailsHandler"
 ProjectCreationHandler = require "../../../../../app/js/Features/Project/ProjectCreationHandler"
 ProjectDetailsHandler = require "../../../../../app/js/Features/Project/ProjectDetailsHandler"
 ProjectEntityUpdateHandler = require "../../../../../app/js/Features/Project/ProjectEntityUpdateHandler"
@@ -109,6 +110,8 @@ module.exports = ProjectImporter =
 				ProjectImporter._importLabels doc.id, v2_project_id, v1_owner_id, cb
 			(cb) ->
 				ProjectImporter._importTags v1_project_id, v2_project_id, v1_owner_id, v2_owner_id, cb
+			(cb) ->
+				ProjectImporter._importCollabratecUsers v2_project_id, v1_owner_id, v2_owner_id, doc.collabratec_users, cb
 			(cb) ->
 				ProjectImporter._confirmExport v1_project_id, v2_project_id, v1_importer_id, cb
 		], (error) ->
@@ -283,6 +286,24 @@ module.exports = ProjectImporter =
 				TagsHandler.addProjectToTagName v2_user_id, tag, v2_project_id, cb
 			, callback)
 
+	_importCollabratecUsers: (v2_project_id, v1_owner_id, v2_owner_id, collabratec_users, callback = (error) ->) ->
+		return callback() unless collabratec_users? && collabratec_users.length > 0
+		ProjectImporter._populateV2UserIds collabratec_users, v1_owner_id, v2_owner_id, (error) ->
+			return callback error if error?
+			ProjectCollabratecDetailsHandler.setCollabratecUsers v2_project_id, collabratec_users, callback
+
+	_populateV2UserIds: (collabratec_users, v1_owner_id, v2_owner_id, callback = (error) ->) ->
+		async.each collabratec_users,
+			(collabratec_user, cb) ->
+				if collabratec_user.user_id == v1_owner_id
+					collabratec_user.user_id = v2_owner_id
+					return cb()
+				UserMapper.getSlIdFromOlUser {id: collabratec_user.user_id}, (error, v2_user_id) ->
+					return cb error if error?
+					collabratec_user.user_id = v2_user_id
+					cb()
+			callback
+
 	_checkFiles: (files) ->
 		for file in files
 			if !file.type? or !file.file?
@@ -294,8 +315,6 @@ module.exports = ProjectImporter =
 				if !file.file_path?
 					return new Error("expected file.file_path")
 			else if file.type == "ext"
-				if file.agent not in SUPPORTED_V1_EXT_AGENTS
-					return  new UnsupportedFileTypeError("expected file.agent to be valid, instead got '#{file.agent}'")
 				if !file.file_path?
 					return new Error("expected file.file_path")
 				if !file.agent_data?
@@ -365,7 +384,7 @@ module.exports = ProjectImporter =
 		buildLinkedFileData = (file, _cb) ->
 			cb = (err) ->
 				setImmediate _cb, err  # make the callback asynchronous
-			if file.type is "ext"
+			if file.type is "ext" and file.agent in SUPPORTED_V1_EXT_AGENTS
 				ProjectImporter._buildLinkedFileDataForExtFile file, (err, linkedFileData) ->
 					return cb(err) if err?
 					return new Error('Could not build linkedFileData for agent #{file.agent}') if !linkedFileData?
@@ -491,13 +510,13 @@ module.exports = ProjectImporter =
 					readStream.resume()
 					return callback(error)
 
-	_waitForV1HistoryExport: (v1_project_id, v1_importer_id, callback = (error) ->) ->
-		ProjectImporter._checkV1HistoryExportStatus v1_project_id, v1_importer_id, 0, callback
+	_waitForV1HistoryExport: (v1_project_id, v1_importer_id, callback = (error, latest_ver_id) ->) ->
+		ProjectImporter._checkV1HistoryExportStatus @_exportUrl(v1_project_id, v1_importer_id, "history"), 0, callback
 
-	_checkV1HistoryExportStatus: (v1_project_id, v1_importer_id, requestCount, callback = (error) ->) ->
+	_checkV1HistoryExportStatus: (url, requestCount, callback = (error, latest_ver_id) ->) ->
 		V1SharelatexApi.request {
 			method: 'GET'
-			url: @_exportUrl(v1_project_id, v1_importer_id, "history")
+			url: url
 		}, (error, res, status) ->
 			return callback(error) if error?
 
@@ -505,17 +524,17 @@ module.exports = ProjectImporter =
 				error ?= new V1HistoryNotSyncedError('v1 history not synced')
 
 			if error?
-				logger.log {v1_project_id, v1_importer_id, requestCount, error}, "error checking v1 history sync"
+				logger.log {url, requestCount, error}, "error checking v1 history sync"
 				if requestCount >= V1_HISTORY_SYNC_REQUEST_TIMES.length
 					return callback(error)
 				else
 					interval = (V1_HISTORY_SYNC_REQUEST_TIMES[requestCount + 1] - V1_HISTORY_SYNC_REQUEST_TIMES[requestCount]) * 1000
 					setTimeout(
-						() -> ProjectImporter._checkV1HistoryExportStatus v1_project_id, v1_importer_id, requestCount + 1, callback
+						() -> ProjectImporter._checkV1HistoryExportStatus url, requestCount + 1, callback
 						interval
 					)
 			else
-				callback(null)
+				callback(null, status)
 
 	_getLabels: (v1_project_id, callback = (error, labels) ->) ->
 		V1SharelatexApi.request {

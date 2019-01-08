@@ -24,6 +24,10 @@ block content
 							-hasAnySubscription = true
 							include ./dashboard/_managed_institutions
 
+						-if (managedPublishers && managedPublishers.length > 0)
+							-hasAnySubscription = true
+							include ./dashboard/_managed_publishers
+
 						-if (memberGroupSubscriptions && memberGroupSubscriptions.length > 0)
 							-hasAnySubscription = true
 							include ./dashboard/_group_memberships
@@ -31,9 +35,6 @@ block content
 						-if (confirmedMemberInstitutions && confirmedMemberInstitutions.length > 0)
 							-hasAnySubscription = true
 							include ./dashboard/_institution_memberships
-
-						-if (settings.overleaf && v1Subscriptions)
-							include ./dashboard/_v1_subscriptions
 
 						-if (v1SubscriptionStatus)
 							include ./dashboard/_v1_subscription_status

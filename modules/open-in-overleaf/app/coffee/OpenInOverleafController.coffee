@@ -14,9 +14,18 @@ OpenInOverleafHelper = require('./OpenInOverleafHelper')
 OpenInOverleafErrors = require('./OpenInOverleafErrors')
 
 module.exports = OpenInOverleafController =
+	# /devs documentation page
+	showDocumentation: (req, res, next)->
+		res.render Path.resolve(__dirname, '../views/documentation')
+
 	# 'open in overleaf' /docs API
 	openInOverleaf: (req, res, next)->
-		paramCount = req.body.snip? + req.body.encoded_snip? + req.body.snip_uri? + req.body.zip_uri? + req.body.template?
+		paramCount = req.body.snip? +
+			req.body.encoded_snip? +
+			req.body.snip_uri? +
+			req.body.zip_uri? +
+			req.body.template? +
+			(req.body.partner? && req.body.client_media_id?)
 		return next(new OpenInOverleafErrors.MissingParametersError) if paramCount == 0
 		return next(new OpenInOverleafErrors.AmbiguousParametersError) if paramCount > 1
 
@@ -127,20 +136,19 @@ module.exports = OpenInOverleafController =
 			OpenInOverleafHelper.populateSnippetFromUri req.body.snip_uri || req.body.zip_uri, snippet, cb
 		else if req.body.template?
 			OpenInOverleafHelper.populateSnippetFromTemplate req.body.template, snippet, cb
+		else if (req.body.partner? && req.body.client_media_id?)
+			OpenInOverleafHelper.populateSnippetFromConversionJob req.body.partner, req.body.client_media_id, snippet, cb
 		else
 			cb(new OpenInOverleafErrors.MissingParametersError)
 
 	_getMainFileCommentFromSnipRequest: (req) ->
 		comment = ''
 		if req.body.comment != 'none'
-			referer = new URL(req.header('Referer') || '')
-			if referer.hostname && referer.hostname.match /texample\.net$/
-				comment = req.i18n.translate('texample_snippet_comment').trim()
+			referrer = new URL(req.body.referrer || '')
+			if referrer.hostname && referrer.hostname.match /texample\.net$/
+				comment = OpenInOverleafHelper.snippetFileComment('texample')
 			else
-				comment = req.i18n.translate('default_snippet_comment').trim()
-
-			# Add comment character to each line, and terminate with a newline to ensure the following content isn't commented
-			comment = comment.split("\n").map((line)-> "% #{line}").join("\n") + "\n"
+				comment = OpenInOverleafHelper.snippetFileComment('default')
 
 		return comment
 
@@ -149,7 +157,7 @@ module.exports = OpenInOverleafController =
 
 		if req.xhr || req.headers.accept?.indexOf('json') > -1
 			res.setHeader('Content-Type', 'application/json')
-			res.send(JSON.stringify({redirect: uri}))
+			res.send(JSON.stringify({redirect: uri, projectId: project._id}))
 		else
 			res.redirect uri
 

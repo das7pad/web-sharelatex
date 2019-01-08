@@ -33,6 +33,7 @@ crypto = require 'crypto'
 Features = require('../../infrastructure/Features')
 BrandVariationsHandler = require("../BrandVariations/BrandVariationsHandler")
 { getUserAffiliations } = require("../Institutions/InstitutionsAPI")
+V1Handler = require "../V1/V1Handler"
 
 module.exports = ProjectController =
 
@@ -277,8 +278,16 @@ module.exports = ProjectController =
 			project: (cb)->
 				ProjectGetter.getProject(
 					project_id,
-					{ name: 1, lastUpdated: 1, track_changes: 1, owner_ref: 1, brandVariationId: 1, overleaf: 1 },
-					cb
+					{ name: 1, lastUpdated: 1, track_changes: 1, owner_ref: 1, brandVariationId: 1, overleaf: 1, tokens: 1 },
+					(err, project) ->
+						return cb(err) if err?
+						return cb(null, project) unless project.overleaf?.id? and project.tokens?.readAndWrite? and Settings.projectImportingCheckMaxCreateDelta?
+						createDelta = (new Date().getTime() - new Date(project._id.getTimestamp()).getTime()) / 1000
+						return cb(null, project) unless createDelta < Settings.projectImportingCheckMaxCreateDelta
+						V1Handler.getDocExported project.tokens.readAndWrite, (err, doc_exported) ->
+							return next err if err?
+							project.exporting = doc_exported.exporting
+							cb(null, project)
 				)
 			user: (cb)->
 				if !user_id?
@@ -327,10 +336,13 @@ module.exports = ProjectController =
 				if !privilegeLevel? or privilegeLevel == PrivilegeLevels.NONE
 					return res.sendStatus 401
 
+				if project.exporting
+					res.render 'project/importing',
+						bodyClasses: ["editor"]
+					return
+
 				if subscription? and subscription.freeTrial? and subscription.freeTrial.expiresAt?
 					allowedFreeTrial = !!subscription.freeTrial.allowed || true
-
-				showGitBridge = user.betaProgram
 
 				logger.log project_id:project_id, "rendering editor page"
 				res.render 'project/editor',
@@ -379,7 +391,6 @@ module.exports = ProjectController =
 					brandVariation: brandVariation
 					allowedImageNames: Settings.allowedImageNames || []
 					gitBridgePublicBaseUrl: Settings.gitBridgePublicBaseUrl
-					showGitBridge: showGitBridge
 				timer.done()
 
 	_buildProjectList: (allProjects, v1Projects = [])->

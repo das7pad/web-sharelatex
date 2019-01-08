@@ -7,6 +7,7 @@ UserCreator = require "../../../../../app/js/Features/User/UserCreator"
 CollaboratorsHandler = require "../../../../../app/js/Features/Collaborators/CollaboratorsHandler"
 SubscriptionGroupHandler = require "../../../../../app/js/Features/Subscription/SubscriptionGroupHandler"
 FeaturesUpdater = require "../../../../../app/js/Features/Subscription/FeaturesUpdater"
+ProjectCollabratecDetailsHandler = require "../../../../../app/js/Features/Project/ProjectCollabratecDetailsHandler"
 TagsHandler = require "../../../../../app/js/Features/Tags/TagsHandler"
 UserGetter = require "../../../../../app/js/Features/User/UserGetter"
 UserUpdater = require "../../../../../app/js/Features/User/UserUpdater"
@@ -115,7 +116,9 @@ module.exports = UserMapper =
 					return callback(error) if error?
 					TagsHandler.updateTagUserIds userStubId, slUserId, (error) ->
 						return callback(error) if error?
-						UserMapper.removeOlUserStub olUser.id, callback
+						ProjectCollabratecDetailsHandler.updateCollabratecUserIds userStubId, slUserId, (error) ->
+							return callback(error) if error?
+							UserMapper.removeOlUserStub olUser.id, callback
 
 	_transferLabels: (fromUserId, toUserId, callback = (error) ->) ->
 		request.post {

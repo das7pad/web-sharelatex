@@ -23,8 +23,15 @@ module.exports =
 		removeRoute(webRouter, 'get', '/login')
 		removeRoute(webRouter, 'post', '/login')
 		webRouter.get '/login', V1LoginController.loginPage
-		webRouter.post '/login', V1LoginController.doLogin
-		webRouter.get '/welcome/sl', OverleafAuthenticationController.welcomeScreen
+		webRouter.post(
+			'/login', 
+			RateLimiterMiddlewear.rateLimit({
+				endpointName: 'overleaf-login',
+				maxRequests: 10
+				timeInterval: 60
+			}),
+			V1LoginController.doLogin
+		)
 
 		webRouter.get '/login/finish', V1LoginController.loginProfile
 
@@ -39,12 +46,17 @@ module.exports =
 
 		removeRoute(webRouter, 'get', '/register')
 		removeRoute(webRouter, 'post', '/register')
-		webRouter.get '/register', V1LoginController.registrationPage
+		webRouter.get '/register', OverleafAuthenticationController.saveRedir, V1LoginController.registrationPage
 		webRouter.post '/register', V1LoginController.doRegistration
 
 		webRouter.post(
 			'/user/change_password/v1',
 			AuthenticationController.requireLogin(),
+			RateLimiterMiddlewear.rateLimit({
+				endpointName: 'overleaf-change-password',
+				maxRequests: 10
+				timeInterval: 60
+			}),
 			V1LoginController.doPasswordChange
 		)
 
@@ -75,6 +87,12 @@ module.exports =
 			'/overleaf/project/:ol_doc_id/import',
 			AuthenticationController.requireLogin(),
 			ProjectImportController.importProject
+		)
+
+		webRouter.get(
+			'/overleaf/project/:ol_doc_token/download/zip',
+			AuthenticationController.requireLogin(),
+			ProjectImportController.downloadZip
 		)
 
 		webRouter.get(

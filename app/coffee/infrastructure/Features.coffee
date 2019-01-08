@@ -15,7 +15,7 @@ module.exports = Features =
 			when 'git-bridge'
 				return Settings.enableGitBridge
 			when 'v1-return-message'
-				return Settings.accountMerge? and Settings.overleaf?
+				return Settings.accountMerge? and Settings.overleaf? and !Settings.forceImportToV2
 			when 'custom-togglers'
 				return Settings.overleaf?
 			when 'publish-templates'
@@ -29,5 +29,7 @@ module.exports = Features =
 				Settings.overleaf? and isEnabled
 			when 'redirect-sl'
 				return Settings.redirectToV2?
+			when 'force-import-to-v2'
+				return Settings.forceImportToV2
 			else
 				throw new Error("unknown feature: #{feature}")

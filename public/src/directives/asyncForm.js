@@ -55,13 +55,12 @@ define(['base', 'libs/passfield'], function(App) {
 
         // for asyncForm prevent automatic redirect to /login if
         // authentication fails, we will handle it ourselves
-        return $http
-          .post(element.attr('action'), formData, {
-            disableAutoLoginRedirect: true
-          })
+        const httpRequestFn = _httpRequestFn(element.attr('method'))
+        return httpRequestFn(element.attr('action'), formData, {
+          disableAutoLoginRedirect: true
+        })
           .then(function(httpResponse) {
-            let config, headers, status
-            ;({ data, status, headers, config } = httpResponse)
+            const { data, headers } = httpResponse
             scope[attrs.name].inflight = false
             response.success = true
             response.error = false
@@ -85,6 +84,11 @@ define(['base', 'libs/passfield'], function(App) {
               } else {
                 return ga('send', 'event', formName, 'success')
               }
+            } else if (scope.$eval(attrs.asyncFormDownloadResponse)) {
+              const blob = new Blob([data], {
+                type: headers('Content-Type')
+              })
+              location.href = URL.createObjectURL(blob) // Trigger file save
             }
           })
           .catch(function(httpResponse) {
@@ -115,6 +119,12 @@ define(['base', 'libs/passfield'], function(App) {
                   'Session error. Please check you have cookies enabled. If the problem persists, try clearing your cache and cookies.',
                 type: 'error'
               }
+            } else if (status === 429) {
+              response.message = {
+                text:
+                  'Too many attempts. Please wait for a while and try again.',
+                type: 'error'
+              }
             } else {
               response.message = {
                 text:
@@ -131,6 +141,14 @@ define(['base', 'libs/passfield'], function(App) {
       const submit = () =>
         validateCaptchaIfEnabled(response => submitRequest(response))
 
+      const _httpRequestFn = (method = 'post') => {
+        const $HTTP_FNS = {
+          post: $http.post,
+          get: $http.get
+        }
+        return $HTTP_FNS[method.toLowerCase()]
+      }
+
       element.on('submit', function(e) {
         e.preventDefault()
         return submit()
@@ -146,8 +164,8 @@ define(['base', 'libs/passfield'], function(App) {
     restrict: 'E',
     template: `\
 <div class="alert" ng-class="{
-	'alert-danger': form.response.message.type == 'error',
-	'alert-success': form.response.message.type != 'error'
+  'alert-danger': form.response.message.type == 'error',
+  'alert-success': form.response.message.type != 'error'
 }" ng-show="!!form.response.message" ng-bind-html="form.response.message.text">
 </div>
 <div ng-transclude></div>\
@@ -170,7 +188,7 @@ define(['base', 'libs/passfield'], function(App) {
           max: 128
         },
         allowEmpty: false,
-        allowAnyChars: false,
+        allowAnyChars: true,
         isMasked: true,
         showToggle: false,
         showGenerate: false,

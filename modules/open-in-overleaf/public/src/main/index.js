@@ -3,11 +3,12 @@ define([
     ], App =>
 
         // For integration-module
-        App.controller("OpenInOverleafGatewayController", function($scope, $http) {
+        App.controller("OpenInOverleafGatewayController", function($scope, $http, localStorage) {
             $scope.error = false;
 
-            $scope.handleGateway = function(base64EncodedInput) {
-                let input = JSON.parse(atob(base64EncodedInput));
+            $scope.handleGateway = function() {
+                let input = JSON.parse($('#overleaf-gateway-data').text());
+                _addReferrer(input.params);
 
                 if (!_validateInput(input)) {
                     $scope.error = true;
@@ -20,6 +21,12 @@ define([
                 }
             };
 
+            function _addReferrer(params) {
+                if (document.referrer && !params.referrer) {
+                    params.referrer = document.referrer;
+                }
+            }
+
             function _validateInput(input) {
                 if (input.error) {
                     return true;
@@ -28,19 +35,20 @@ define([
                     return true;
                 }
                 return input.action === 'submit' && input.params;
-            };
+            }
 
             function _storeParamsAndRedirect(params, target) {
+                _addReferrer(params);
                 window.sessionStorage.setItem('openInOverleaf', JSON.stringify(params));
                 window.location.replace(target);
-            };
+            }
 
             function _retrieveParamsIfMissing(params) {
-                if (Object.keys(params).length === 0) {
+                if (Object.keys(params).filter((k) => k !== 'referrer').length === 0) {
                     return JSON.parse(window.sessionStorage.getItem('openInOverleaf')) || {};
                 }
                 return params;
-            };
+            }
 
             function _submitParamsAndOpen(params, csrfToken) {
                 params._csrf = csrfToken;
@@ -52,6 +60,9 @@ define([
                     if (response.error) {
                         $scope.serverError = response.error;
                     } else if (response.data && response.data.redirect) {
+                        if (params.rich_text === 'true') {
+                            localStorage('editor.mode.' + response.data.projectId, 'rich-text');
+                        }
                         window.location.replace(response.data.redirect);
                     } else {
                         $scope.error = true;
@@ -63,6 +74,6 @@ define([
                         $scope.error = true;
                     }
                 });
-            };
+            }
         })
 );

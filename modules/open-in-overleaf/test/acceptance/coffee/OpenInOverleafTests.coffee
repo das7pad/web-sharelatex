@@ -2,6 +2,7 @@ expect = require("chai").expect
 async = require("async")
 express = require("express")
 path = require("path")
+translations = require('translations-sharelatex').setup()
 {db, ObjectId} = require("../../../../../app/js/infrastructure/mongojs")
 User = require("../../../../../test/acceptance/js/helpers/User")
 ProjectGetter = require("../../../../../app/js/Features/Project/ProjectGetter")
@@ -62,6 +63,15 @@ I have a bad name
 			partner: null
 			slug: "OSF"
 			default_variation_id: 1234
+
+		MockV1Api.validation_clients["ieee_latexqc"] =
+			brand_variation_id: "1234"
+			conversions:
+				conversion_foo: 'http://example.org/project.zip'
+		MockV1Api.validation_clients["wombat_university"] =
+			brand_variation_id: null
+			conversions:
+				conversion_bar: 'http://example.org/project.zip'
 
 	beforeEach (done) ->
 		@user = new User()
@@ -481,7 +491,7 @@ I have a bad name
 
 			it "should return a 'not found' error", ->
 				expect(@res.statusCode).to.equal 404
-				expect(JSON.parse(@body).error).to.equal 'not_found_error_from_the_supplied_url'
+				expect(JSON.parse(@body).error).to.equal translations.i18n.translate('not_found_error_from_the_supplied_url')
 
 		describe "when POSTing a template name", ->
 			beforeEach (done) ->
@@ -570,7 +580,90 @@ I have a bad name
 
 			it "should return an 'ambiguous parameters' error", ->
 				expect(@res.statusCode).to.equal 400
-				expect(JSON.parse(@body).error).to.equal 'more_than_one_kind_of_snippet_was_requested'
+				expect(JSON.parse(@body).error).to.equal translations.i18n.translate('more_than_one_kind_of_snippet_was_requested')
+
+		describe "when POSTing a partner and client_media_id", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						partner: 'ieee_latexqc'
+						client_media_id: 'conversion_foo'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should not produce an error", ->
+				expect(@err).not.to.exist
+
+			it "should redirect to a project", ->
+				expect(@res.statusCode).to.equal 302
+				expect(@res.headers.location).to.match @uri_regex
+
+			it "should use the partner's brand variation", (done) ->
+				projectId = @res.headers.location.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				ProjectGetter.getProject projectId, (error, project) ->
+					return done(error) if error?
+
+					expect(project).to.exist
+					expect(project.brandVariationId).to.equal "1234"
+					done()
+
+		describe "when POSTing a partner and client_media_id that does not exist", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						partner: 'potato'
+						client_media_id: 'conversion_foo'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should not produce an error", ->
+				expect(@err).not.to.exist
+
+			it "should redirect to a project", ->
+				expect(@res.statusCode).to.equal 404
+				expect(@res.headers.location).not.to.exist
+
+		describe "when POSTing a partner and client_media_id that has no brand variation", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						partner: 'wombat_university'
+						client_media_id: 'conversion_bar'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should not produce an error", ->
+				expect(@err).not.to.exist
+
+			it "should redirect to a project", ->
+				expect(@res.statusCode).to.equal 302
+				expect(@res.headers.location).to.match @uri_regex
+
+			it "should have a null brand variation", (done) ->
+				projectId = @res.headers.location.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				ProjectGetter.getProject projectId, (error, project) ->
+					return done(error) if error?
+
+					expect(project).to.exist
+					expect(project.brandVariationId).not.to.exist
+					done()
 
 		describe "when the document has a title", ->
 			beforeEach (done) ->
@@ -683,14 +776,14 @@ I have a bad name
 						@body = _body
 						done()
 
-				it "should create a project with the deault project name", (done) ->
+				it "should create a project with the default project name", (done) ->
 					projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
 					expect(projectId).to.exist
 
 					ProjectGetter.getProject projectId, (error, project) ->
 						return done(error) if error?
 
-						expect(project.name).to.equal "new_snippet_project"
+						expect(project.name).to.equal translations.i18n.translate("new_snippet_project")
 						done()
 
 				it "should add the .tex file as a document", (done) ->

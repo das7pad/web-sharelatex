@@ -199,25 +199,47 @@ describe "Collabratec", ->
 				expect(url.path).to.equal '/org/ieee/saml/init'
 				done()
 
-		it "should redirect to v1 project after sign-in", (done) ->
-			options =
-				method: 'get'
-				url: '/org/ieee/collabratec/projects/mock-project-id'
-			@user.request options, (error, response, body) =>
-				expect(response.statusCode).to.equal 302
-				url = URL.parse(response.headers.location)
-				expect(url.path).to.equal '/org/ieee/saml/init'
-
+		describe "with v1 project id", ->
+			it "should redirect to v1 project after sign-in", (done) ->
 				options =
-					form:
-						SAMLResponse: login_collabratec_id_exists_saml
-					method: 'post'
-					url: '/org/ieee/saml/consume'
+					method: 'get'
+					url: '/org/ieee/collabratec/projects/mock-project-id'
 				@user.request options, (error, response, body) =>
 					expect(response.statusCode).to.equal 302
 					url = URL.parse(response.headers.location)
-					expect(url.path).to.equal '/sign_in_to_v1?return_to=%2Fmock-project-id'
-					done()
+					expect(url.path).to.equal '/org/ieee/saml/init'
+
+					options =
+						form:
+							SAMLResponse: login_collabratec_id_exists_saml
+						method: 'post'
+						url: '/org/ieee/saml/consume'
+					@user.request options, (error, response, body) =>
+						expect(response.statusCode).to.equal 302
+						url = URL.parse(response.headers.location)
+						expect(url.path).to.equal '/mock-project-id'
+						done()
+
+		describe "with v2 project id", ->
+			it "should redirect to v2 project after sign-in", (done) ->
+				options =
+					method: 'get'
+					url: '/org/ieee/collabratec/projects/5c07e81e63573801493d93c3'
+				@user.request options, (error, response, body) =>
+					expect(response.statusCode).to.equal 302
+					url = URL.parse(response.headers.location)
+					expect(url.path).to.equal '/org/ieee/saml/init'
+
+					options =
+						form:
+							SAMLResponse: login_collabratec_id_exists_saml
+						method: 'post'
+						url: '/org/ieee/saml/consume'
+					@user.request options, (error, response, body) =>
+						expect(response.statusCode).to.equal 302
+						url = URL.parse(response.headers.location)
+						expect(url.path).to.equal '/project/5c07e81e63573801493d93c3'
+						done()
 
 	describe "showDash", ->
 

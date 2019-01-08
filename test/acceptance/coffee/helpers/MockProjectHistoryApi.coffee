@@ -13,8 +13,13 @@ module.exports = MockProjectHistoryApi =
 
 	labels: {}
 
+	projectSnapshots: {}
+
 	addOldFile: (project_id, version, pathname, content) ->
 		@oldFiles["#{project_id}:#{version}:#{pathname}"] = content
+
+	addProjectSnapshot: (project_id, version, snapshot) ->
+		@projectSnapshots["#{project_id}:#{version}"] = snapshot
 
 	setProjectVersion: (project_id, version) ->
 		@projectVersions[project_id] = {version: version}
@@ -22,9 +27,11 @@ module.exports = MockProjectHistoryApi =
 	setProjectVersionInfo: (project_id, versionInfo) ->
 		@projectVersions[project_id] = versionInfo
 
-	addLabel: (project_id, label_id, comment, version) ->
+	addLabel: (project_id, label) ->
+		if !label.id?
+			label.id = new ObjectId().toString()
 		@labels[project_id] ?= {}
-		@labels[project_id][label_id] = {label_id,comment,version}
+		@labels[project_id][label.id] = label
 
 	deleteLabel: (project_id, label_id) ->
 		delete @labels[project_id][label_id]
@@ -50,6 +57,14 @@ module.exports = MockProjectHistoryApi =
 			else
 				res.send 404
 
+		app.get "/project/:project_id/version/:version", (req, res, next) =>
+			{project_id, version} = req.params
+			key = "#{project_id}:#{version}"
+			if @projectSnapshots[key]?
+				res.json @projectSnapshots[key]
+			else
+				res.sendStatus 404
+
 		app.get "/project/:project_id/version", (req, res, next) =>
 			{project_id} = req.params
 			if @projectVersions[project_id]?
@@ -69,7 +84,7 @@ module.exports = MockProjectHistoryApi =
 			{project_id} = req.params
 			{comment, version} = req.body
 			label_id = new ObjectId().toString()
-			@addLabel project_id, label_id, comment, version
+			@addLabel project_id, {id: label_id, comment, version}
 			res.json {label_id, comment, version}
 
 		app.delete "/project/:project_id/user/:user_id/labels/:label_id", (req, res, next) =>

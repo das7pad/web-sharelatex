@@ -82,7 +82,7 @@ describe "CollabratecManager", ->
 							keywords: [ "keyword one", "keyword two" ],
 							created_at: 1540993059000,
 							updated_at: 1541066400000,
-							url: "site-url/project/5bd9b0232688a3011fd7cb4c"
+							url: "site-url/org/ieee/collabratec/projects/5bd9b0232688a3011fd7cb4c"
 						}
 
 				describe "when error occurs with getDoc", ->
@@ -107,7 +107,7 @@ describe "CollabratecManager", ->
 						title: "project-title",
 						created_at: 1540993059000,
 						updated_at: 1541066400000,
-						url: "site-url/project/5bd9b0232688a3011fd7cb4c"
+						url: "site-url/org/ieee/collabratec/projects/5bd9b0232688a3011fd7cb4c"
 					}
 
 		describe "when project id is not found", ->

@@ -16,6 +16,9 @@ describe "UserMapper", ->
 			"request": @request = {}
 			"../../../../../app/js/Features/User/UserCreator": @UserCreator = {}
 			"../../../../../app/js/Features/Subscription/FeaturesUpdater": @FeaturesUpdater = {}
+			"../../../../../app/js/Features/Project/ProjectCollabratecDetailsHandler": @ProjectCollabratecDetailsHandler = {
+				updateCollabratecUserIds: sinon.stub().yields()
+			}
 			"../../../../../app/js/models/User": User: @User = {}
 			"../../../../../app/js/models/UserStub": UserStub: @UserStub = {}
 			"../../../../../app/js/Features/Subscription/SubscriptionGroupHandler": @SubscriptionGroupHandler = {}

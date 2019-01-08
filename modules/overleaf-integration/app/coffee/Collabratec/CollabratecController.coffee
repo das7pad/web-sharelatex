@@ -2,6 +2,7 @@ AuthenticationController = require "../../../../../app/js/Features/Authenticatio
 FeaturesUpdater = require "../../../../../app/js/Features/Subscription/FeaturesUpdater"
 CollabratecManager = require "./CollabratecManager"
 OverleafAuthenticationManager = require "../Authentication/OverleafAuthenticationManager"
+ObjectId = require("mongojs").ObjectId
 Path = require "path"
 UserGetter = require "../../../../../app/js/Features/User/UserGetter"
 V1LoginHandler = require "../V1Login/V1LoginHandler"
@@ -104,7 +105,7 @@ module.exports = CollabratecController =
 			res.redirect "/org/ieee/collabratec/auth/link_after_saml_response"
 		else
 			CollabratecManager.getV1UserByCollabratecId saml_user.MemberNumber, (err, profile) ->
-				return _render_saml_error req, res, err if err?
+				return CollabratecController._render_saml_error req, res, err if err?
 				if profile?
 					CollabratecController._setupUser req, res, next, profile
 				else
@@ -150,13 +151,17 @@ module.exports = CollabratecController =
 	_finishLogin: (req) ->
 		oauth_params = req.session.collabratec_oauth_params
 		project_id = req.session.show_project_id
+		CollabratecManager.clearSession req.session
+		# redirect to oauth flow if oauth params in session
 		if oauth_params?
 			redirect_url = CollabratecManager.oauthRedirectUrl oauth_params
 			AuthenticationController.setRedirectInSession req, redirect_url
-		else if project_id?
-			redirect_url = "/sign_in_to_v1?return_to="+encodeURIComponent("/"+project_id)
-			AuthenticationController.setRedirectInSession req, redirect_url
-		CollabratecManager.clearSession req.session
+			return
+		# do not do any redirects if there is no project id
+		return unless project_id?
+		# redirect to v1 or v2 project url
+		redirect_url = if ObjectId.isValid(project_id) then "/project/#{project_id}" else "/#{project_id}"
+		AuthenticationController.setRedirectInSession req, redirect_url
 
 	_completeOauthLink: (req, user, callback) ->
 		oauth_params = req.session.collabratec_oauth_params

@@ -19,23 +19,34 @@ module.exports = MockOverleafApi =
 		user.v1Id = @v1Id
 		@v1Id++
 
-	docs: { }
+	docs_by_token: {}
+	docs_by_id: {}
 	users: []
+	historyExportVersions: {}
+
+	setHistoryExportVersion: (docId, version) ->
+		@historyExportVersions[docId] = version
+
+	nextV1Id: () ->
+		@v1Id++
 
 	addAffiliation: sinon.stub()
 
 	setDoc: (doc) ->
-		@docs[doc.id] = doc
+		@docs_by_token[doc.token] = doc
+		@docs_by_id[doc.id] = doc
 
 	reset: () ->
-		@docs = {}
+		@docs_by_token = {}
+		@docs_by_id = {}
 		@teamExports = {}
+		@historyExportVersions = {}
 
 	run: () ->
 
 		# Project import routes
 		app.post "/api/v1/sharelatex/users/:ol_user_id/docs/:ol_doc_id/export/start", (req, res, next) =>
-			doc = @docs[req.params.ol_doc_id]
+			doc = @docs_by_token[req.params.ol_doc_id]
 			if doc
 				res.json doc
 			else
@@ -50,15 +61,34 @@ module.exports = MockOverleafApi =
 		app.get "/api/v1/sharelatex/users/:ol_user_id/docs/:ol_doc_id/export/history", (req, res, next) =>
 			res.json exported: true
 
+		app.get "/api/v1/sharelatex/users/:ol_user_id/docs/:ol_doc_id/history_export/status", (req, res, next) =>
+			doc = @docs_by_id[req.params.ol_doc_id]
+			if doc?.exported?
+				res.json
+					exported: doc.exported
+					history_export_version: doc.history_export_version
+			else
+				res.sendStatus 404
+
+		app.post "/api/v1/sharelatex/users/:ol_user_id/docs/:ol_doc_id/history_export/start", (req, res, next) =>
+			doc = @docs_by_id[req.params.ol_doc_id]
+			if doc?.authorized == false
+				return res.sendStatus 403
+			if doc?.onExportStart?
+				doc?.onExportStart()
+			res.json {
+				doc_id: doc.id
+			}
+
 		app.get "/api/v1/sharelatex/users/:ol_user_id/docs/:ol_doc_id/export/tags", (req, res, next) =>
-			doc = @docs[req.params.ol_doc_id]
+			doc = @docs_by_token[req.params.ol_doc_id]
 			if doc
 				res.json tags: doc.tags || []
 			else
 				res.sendStatus 404
 
 		app.get "/api/v1/sharelatex/docs/:ol_doc_id/labels", (req, res, next) =>
-			doc = @docs[req.params.ol_doc_id]
+			doc = @docs_by_id[req.params.ol_doc_id]
 			if doc
 				res.json labels: doc.labels
 			else
@@ -163,6 +193,16 @@ module.exports = MockOverleafApi =
 			return res.json({
 				user_profile: {id: id}
 			})
+
+		app.get "/api/v1/sharelatex/docs/:docId/history_export/status", (req, res, next) =>
+			docId = req.params['docId']
+			historyExportVersion = @historyExportVersions[docId]
+			if !historyExportVersion?
+				return res.sendStatus(500)
+			return res.json {
+				exported: true,
+				history_export_version: historyExportVersion
+			}
 
 		app.listen 5000, (error) ->
 			throw error if error?

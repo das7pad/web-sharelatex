@@ -1,11 +1,9 @@
-if showGitBridge
-	span(ng-controller="GitBridgeController", ng-show="permissions.write")
-		// TODO: Remove restriction on user having feature, and show upsell instead
-		ul.list-unstyled.nav(ng-if="project.features.gitBridge || user.features.gitBridge")
-			li
-				a(ng-click="openGitBridgeModal()")
-					i.fa.fa-code-fork.fa-fw
-					| &nbsp;&nbsp; #{translate('git')}
+span(ng-controller="GitBridgeController", ng-show="permissions.write")
+	ul.list-unstyled.nav
+		li
+			a(ng-click="openGitBridgeModal()")
+				i.fa.fa-code-fork.fa-fw
+				| &nbsp;&nbsp; #{translate('git')}
 
 
 script(type="text/ng-template", id="gitBridgeModalTemplate")
@@ -24,24 +22,42 @@ script(type="text/ng-template", id="gitBridgeModalTemplate")
 			pre.text-center
 				kbd git clone {{ gitUrl }}
 
-		div(ng-if="!hasGitBridgeFeature")
+		div(ng-if="!hasGitBridgeFeature && userIsProjectOwner")
+			.teaser-video-container
+				video.teaser-video(autoplay, loop)
+					source(ng-src="{{ '/img/teasers/git-bridge/teaser-git-bridge.mp4' }}", type="video/mp4")
+					img(src="/img/teasers/git-bridge/teaser-git-bridge.gif",alt="Demonstrating Git integration")
+
+			h4.teaser-title Collaborate online and offline, using your own workflow
+
+			p.small(ng-show="startedFreeTrial")
+				| #{translate("refresh_page_after_starting_free_trial")}
+
+			.row
+				.col-md-8.col-md-offset-2
+					ul.list-unstyled
+						li
+							i.fa.fa-check &nbsp;
+							| Get the collaborative benefits from Overleaf, even if you prefer to work offline
+
+						li
+							i.fa.fa-check &nbsp;
+							| Use your own machine, with your own setup
+
+						li
+							i.fa.fa-check &nbsp;
+							| Store your work on your own infrastructure
+
+			.row.text-center(ng-controller="FreeTrialModalController")
+				a.btn.btn-success(
+					href
+					ng-class="buttonClass"
+					ng-click="startFreeTrial('gitBridge')"
+				) #{translate('try_it_for_free')}
+
+		div(ng-if="!hasGitBridgeFeature && !userIsProjectOwner")
 			h4.teaser-title #{translate('access_your_projects_with_git')}
-			div(ng-if="userIsProjectOwner")
-				img.teaser-img(
-					src="/img/teasers/git-bridge/teaser-git-bridge-editor.png"
-					alt="git-bridge"
-				)
-				p.small(ng-show="startedFreeTrial")
-					| #{translate("refresh_page_after_starting_free_trial")}
-
-				.row.text-center(ng-controller="FreeTrialModalController")
-					a.btn.btn-success(
-						href
-						ng-class="buttonClass"
-						ng-click="startFreeTrial('gitBridge')"
-					) #{translate('try_it_for_free')}
-
-			div(ng-if="!userIsProjectOwner")
+			div
 				p.text-center
 					| #{translate('ask_proj_owner_to_upgrade_for_git_bridge')}
 

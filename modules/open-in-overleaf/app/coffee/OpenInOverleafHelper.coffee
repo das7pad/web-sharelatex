@@ -120,6 +120,15 @@ module.exports = OpenInOverleafHelper =
 		snippet.brandVariationId = templateData.brand_variation_id if templateData.brand_variation_id?
 		OpenInOverleafHelper.populateSnippetFromUri("#{settings.openInOverleaf?.templateUriPrefix}#{template}.zip", snippet, cb)
 
+	populateSnippetFromConversionJob: (partner, clientMediaId, source_snippet, cb = (error, result)->) ->
+		V1Api.request { uri: "/api/v2/partners/#{encodeURIComponent(partner)}/conversions/#{encodeURIComponent(clientMediaId)}" }, (err, response, body) ->
+			return cb(new OpenInOverleafErrors.ConversionNotFoundError) if err?.statusCode == 404 || response?.statusCode == 404 || !body?.input_file_uri?
+			return cb(err) if err?
+
+			snippet = OpenInOverleafHelper._cloneSnippet(source_snippet)
+			snippet.brandVariationId = body.brand_variation_id if body.brand_variation_id?
+			OpenInOverleafHelper.populateSnippetFromUri body.input_file_uri, snippet, cb
+
 	populateProjectFromFileList: (project, snippet, callback = (error)->) ->
 		async.eachLimit(
 			snippet.files
@@ -175,6 +184,33 @@ module.exports = OpenInOverleafHelper =
 			]
 			callback
 		)
+
+	snippetFileComment: (key = 'default') ->
+		return {
+			default: '''
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Welcome to Overleaf --- just edit your LaTeX on the left,
+% and we'll compile it for you on the right. If you open the
+% 'Share' menu, you can invite other users to edit at the same
+% time. See www.overleaf.com/learn for more info. Enjoy!
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+'''
+			texample: '''
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+% Welcome to Overleaf --- just edit your LaTeX on the left,
+% and we'll compile it for you on the right. If you open the
+% 'Share' menu, you can invite other users to edit at the same
+% time. See www.overleaf.com/learn for more info. Enjoy!
+%
+% Note: you can export the pdf to see the result at full
+% resolution.
+%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+'''
+		}[key] + "\n"
 
 	_normalizeMainSrcContent: (snippet, content = null) ->
 		r = OpenInOverleafHelper._wrapSnippetIfNoDocumentClass(OpenInOverleafHelper.normalizeLatexContent(content || snippet.snip), snippet.defaultTitle)

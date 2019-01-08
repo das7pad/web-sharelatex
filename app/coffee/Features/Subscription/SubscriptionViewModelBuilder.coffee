@@ -6,6 +6,7 @@ LimitationsManager = require("./LimitationsManager")
 SubscriptionLocator = require("./SubscriptionLocator")
 V1SubscriptionManager = require("./V1SubscriptionManager")
 InstitutionsGetter = require("../Institutions/InstitutionsGetter")
+PublishersGetter = require("../Publishers/PublishersGetter")
 logger = require('logger-sharelatex')
 _ = require("underscore")
 async = require('async')
@@ -46,11 +47,8 @@ module.exports =
 				InstitutionsGetter.getConfirmedInstitutions user._id, cb
 			managedInstitutions: (cb) ->
 				InstitutionsGetter.getManagedInstitutions user._id, cb
-			v1Subscriptions: (cb) ->
-				V1SubscriptionManager.getSubscriptionsFromV1 user._id, (error, subscriptions, v1Id) ->
-					return cb(error) if error?
-					# Only return one argument to async.auto, otherwise it returns an array
-					cb(null, subscriptions)
+			managedPublishers: (cb) ->
+				PublishersGetter.getManagedPublishers user._id, cb
 			v1SubscriptionStatus: (cb) ->
 				V1SubscriptionManager.getSubscriptionStatusFromV1 user._id, (error, status, v1Id) ->
 					return cb(error) if error?
@@ -63,7 +61,7 @@ module.exports =
 				managedGroupSubscriptions,
 				confirmedMemberInstitutions,
 				managedInstitutions,
-				v1Subscriptions,
+				managedPublishers,
 				v1SubscriptionStatus,
 				recurlySubscription,
 				plan
@@ -72,7 +70,6 @@ module.exports =
 			managedGroupSubscriptions ?= []
 			confirmedMemberInstitutions ?= []
 			managedInstitutions ?= []
-			v1Subscriptions ?= {}
 			v1SubscriptionStatus ?= {}
 
 
@@ -103,7 +100,7 @@ module.exports =
 				memberGroupSubscriptions,
 				confirmedMemberInstitutions,
 				managedInstitutions,
-				v1Subscriptions,
+				managedPublishers,
 				v1SubscriptionStatus
 			}
 

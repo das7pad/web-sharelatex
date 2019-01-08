@@ -147,7 +147,7 @@ module.exports = CollabratecManager =
 			title: project.name
 			created_at: new Date(project._id.getTimestamp()).getTime()
 			updated_at: new Date(project.lastUpdated).getTime()
-			url: "#{Settings.siteUrl}/project/#{project._id}"
+			url: CollabratecManager._projectUrl project._id
 		if (content?)
 			metadata.doc_abstract = DocMetadata.abstractFromContent content
 			metadata.primary_author = DocMetadata.firstAuthorFromContent content
@@ -155,12 +155,16 @@ module.exports = CollabratecManager =
 		return metadata
 
 	_formatV2Project: (project, user) ->
+		# continue to use v1 project id because collabratec may already have
+		# this in their system for this project
+		project_id = if project.overleaf?.id && project.tokens?.readAndWrite then project.tokens?.readAndWrite else project._id
 		collabratecProject = {
-			id: project._id
+			id: project_id
 			title: project.name
 			created_at: new Date(project._id.getTimestamp()).getTime()
 			updated_at: new Date(project.lastUpdated).getTime()
-			url: "#{Settings.siteUrl}/project/#{project._id}"
+			# always return the new v2 project url
+			url: CollabratecManager._projectUrl project._id
 		}
 
 		if (project.collabratecUsers?)
@@ -171,7 +175,7 @@ module.exports = CollabratecManager =
 			if (collabratecUser?)
 				collabratecProject.collabratec_document_id = collabratecUser.collabratec_document_id
 				collabratecProject.collabratec_privategroup_id = collabratecUser.collabratec_privategroup_id
-				collabratecProject.owned_by_collabratec_service_account = collabratecUser.collabratec_privategroup_id?
+				collabratecProject.owned_by_collabratec_service_account = if collabratecUser.collabratec_privategroup_id? then "true" else "false"
 
 		return collabratecProject
 
@@ -186,7 +190,7 @@ module.exports = CollabratecManager =
 			callback null, body.projects
 
 	_getProjectsV2: (user, callback) ->
-		ProjectGetter.findAllUsersProjects user._id, 'name lastUpdated publicAccesLevel archived owner_ref tokens collabratecUsers', (err, projects) ->
+		ProjectGetter.findAllUsersProjects user._id, 'name lastUpdated publicAccesLevel archived overleaf owner_ref tokens collabratecUsers', (err, projects) ->
 			projects = projects.owned.concat(projects.readAndWrite, projects.tokenReadAndWrite)
 			projects = projects.filter (project) ->
 				return false if project.archived
@@ -213,3 +217,6 @@ module.exports = CollabratecManager =
 			paging: { current_page, total_pages, total_items }
 			projects: projects
 		}
+
+	_projectUrl: (project_id) ->
+		return "#{Settings.siteUrl}/org/ieee/collabratec/projects/#{project_id}"

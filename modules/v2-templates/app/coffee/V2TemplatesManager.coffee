@@ -95,6 +95,12 @@ module.exports = V2TemplatesManager =
 			return callback new Error "invalid response" unless page?.pub?
 			content_type = content_types[page.pub.kind]
 			return callback new Error "invalid page.kind" if !content_type
+			if page.pub.show_source
+				page.link_to_show_source = page.source?
+				page.link_to_template = page.open_in_v2_links?
+			else
+				page.link_to_show_source = false
+				page.link_to_template = false
 			V2TemplatesManager._formatTemplateData page, content_type
 			# metadata
 			page.metadata = {

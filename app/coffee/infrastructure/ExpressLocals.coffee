@@ -49,14 +49,14 @@ pathList = [
 	"/stylesheets/ol-ieee-style.css"
 ].concat(Modules.moduleAssetFiles(jsPath))
 
-if !Settings.useMinifiedJs 
+if !Settings.useMinifiedJs
 	logger.log "not using minified JS, not hashing static files"
 else
 	logger.log "Generating file hashes..."
 	for path in pathList
 		content = getFileContent(path)
 		hash = crypto.createHash("md5").update(content).digest("hex")
-		
+
 		splitPath = path.split("/")
 		filenameSplit = splitPath.pop().split(".")
 		filenameSplit.splice(filenameSplit.length-1, 0, hash)
@@ -145,7 +145,7 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 
 			if opts.removeExtension == true
 				path = path.slice(0,-3)
-				
+
 			if qs? and qs.length > 0
 				path = path + "?" + qs
 			return path
@@ -224,6 +224,10 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 			user = AuthenticationController.getSessionUser(req)
 			email = user?.email or ""
 			return email
+		next()
+
+	webRouter.use (req, res, next) ->
+		res.locals.StringHelper = require('../Features/Helpers/StringHelper')
 		next()
 
 	webRouter.use (req, res, next)->
@@ -339,7 +343,7 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 
 	webRouter.use (req, res, next) ->
 		isOl = (Settings.brandPrefix == 'ol-')
-		res.locals.uiConfig = 
+		res.locals.uiConfig =
 			defaultResizerSizeOpen     : if isOl then 7 else 24
 			defaultResizerSizeClosed   : if isOl then 7 else 24
 			eastResizerCursor          : if isOl then "ew-resize" else null
@@ -368,4 +372,5 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 		res.locals.ExposedSettings =
 			isOverleaf: Settings.overleaf?
 			appName: Settings.appName
+			siteUrl: Settings.siteUrl
 		next()
