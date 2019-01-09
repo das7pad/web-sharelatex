@@ -51,25 +51,16 @@ module.exports = AuthenticationManager =
 	validatePassword: (password) ->
 		return { message: 'password not set' } unless password?
 
-		digits = Settings.passwordStrengthOptions?.chars?.digits || '1234567890'
-		letters = Settings.passwordStrengthOptions?.chars?.letters || 'abcdefghijklmnopqrstuvwxyz'
-		letters_up = Settings.passwordStrengthOptions?.chars?.letters_up || 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-		symbols = Settings.passwordStrengthOptions?.chars?.symbols || '@#$%^&*()-_=+[]{};:<>/?!£€.,'
-
 		allowAnyChars = Settings.passwordStrengthOptions?.allowAnyChars == true
 		min = Settings.passwordStrengthOptions?.length?.min || 6
 		max = Settings.passwordStrengthOptions?.length?.max || 72
+
 		# we don't support passwords > 72 characters in length, because bcrypt truncates them
 		max = 72 if max > 72
 
 		return { message: 'password is too short' } unless password.length >= min
 		return { message: 'password is too long' } unless password.length <= max
-		return null if allowAnyChars == true
-		for charIndex in [0..password.length - 1]
-			return { message: 'password contains an invalid character' } unless digits.indexOf(password[charIndex]) > -1 or
-				letters.indexOf(password[charIndex]) > -1 or
-				letters_up.indexOf(password[charIndex]) > -1 or
-				symbols.indexOf(password[charIndex]) > -1
+		return { message: 'password contains an invalid character' } unless allowAnyChars || AuthenticationManager._passwordCharactersAreValid(password)
 		return null
 
 	setUserPassword: (user_id, password, callback = (error, changed) ->) ->
@@ -127,3 +118,16 @@ module.exports = AuthenticationManager =
 		V1Handler.doPasswordReset v1_user_id, password, (error, reset)->
 			return callback(error) if error?
 			return callback(error, reset)
+
+	_passwordCharactersAreValid: (password) ->
+		digits = Settings.passwordStrengthOptions?.chars?.digits || '1234567890'
+		letters = Settings.passwordStrengthOptions?.chars?.letters || 'abcdefghijklmnopqrstuvwxyz'
+		letters_up = Settings.passwordStrengthOptions?.chars?.letters_up || 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+		symbols = Settings.passwordStrengthOptions?.chars?.symbols || '@#$%^&*()-_=+[]{};:<>/?!£€.,'
+
+		for charIndex in [0..password.length - 1]
+			return false unless digits.indexOf(password[charIndex]) > -1 or
+				letters.indexOf(password[charIndex]) > -1 or
+				letters_up.indexOf(password[charIndex]) > -1 or
+				symbols.indexOf(password[charIndex]) > -1
+		return true
