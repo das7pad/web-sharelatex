@@ -39,6 +39,9 @@ describe 'OpenInOverleafHelper', ->
 		@V1Api.request.withArgs({ uri: "/api/v2/brands/OSF" }).callsArgWith(
 			1, null, {statusCode: 200}, { default_variation_id: 1234 }
 		)
+		@V1Api.request.withArgs({ uri: "/api/v2/brand_variations/wombat" }).callsArgWith(
+			1, null, {statusCode: 200}, {}
+		)
 
 		@OpenInOverleafHelper = SandboxedModule.require modulePath, requires:
 			'mmmagic': mmmagic
@@ -422,7 +425,6 @@ snap snap
 				sinon.assert.calledWith(@ProjectOptionsHandler.setBrandVariationId, @project._id, 1234)
 
 		describe "when the slug doesn't exist in v1", ->
-			beforeEach ->
 			beforeEach (done) ->
 				@OpenInOverleafHelper.setProjectBrandVariationFromSlug @project, "wombat", (err) =>
 					@err = err
@@ -432,7 +434,43 @@ snap snap
 				sinon.assert.calledWith(@V1Api.request, { uri: "/api/v2/brands/wombat" })
 
 			it "calls the callback with an error", ->
-				expect(@err).to.be.truthy
+				expect(@err.name).to.equal "PublisherNotFoundError"
+
+			it "does not try to set the brand variation", ->
+				sinon.assert.notCalled(@ProjectOptionsHandler.setBrandVariationId)
+
+	describe 'setProjectBrandVariationFromId', ->
+		beforeEach ->
+			@project = {
+				_id: "1234"
+			}
+
+		describe 'when the brand variation id exists in v1', ->
+			beforeEach (done) ->
+				@OpenInOverleafHelper.setProjectBrandVariationFromId @project, "wombat", (err) =>
+					@err = err
+					done()
+
+			it "calls the V1 API with the variation id", ->
+				sinon.assert.calledWith(@V1Api.request, { uri: "/api/v2/brand_variations/wombat" })
+
+			it "calls the callback without error", ->
+				expect(@err).to.be.falsey
+
+			it "sets the brand variation for the project", ->
+				sinon.assert.calledWith(@ProjectOptionsHandler.setBrandVariationId, @project._id, 'wombat')
+
+		describe 'when the brand variation id does not exist in v1', ->
+			beforeEach (done) ->
+				@OpenInOverleafHelper.setProjectBrandVariationFromId @project, "potato", (err) =>
+					@err = err
+					done()
+
+			it "calls the V1 API with the variation id", ->
+				sinon.assert.calledWith(@V1Api.request, { uri: "/api/v2/brand_variations/potato" })
+
+			it "calls the callback with an error", ->
+				expect(@err.name).to.equal "PublisherNotFoundError"
 
 			it "does not try to set the brand variation", ->
 				sinon.assert.notCalled(@ProjectOptionsHandler.setBrandVariationId)
