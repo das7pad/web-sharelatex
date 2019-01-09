@@ -31,6 +31,7 @@ PrivilegeLevels = require "../../../../../app/js/Features/Authorization/Privileg
 	UnsupportedFileTypeError
 	UnsupportedExportRecordsError
 	V1HistoryNotSyncedError
+	InvalidNameError
 } = require "../../../../../app/js/Features/Errors/Errors"
 UserGetter = require "../../../../../app/js/Features/User/UserGetter"
 
@@ -324,7 +325,14 @@ module.exports = ProjectImporter =
 
 		# check files have valid names
 		for file in files
-			file.file = file.file.split("/").map(SafePath.clean).join('/')
+			path = "/" + file.file
+			dirname = Path.dirname(path)
+			name = Path.basename(path)
+			for folder in dirname.split('/')
+				if folder.length > 0 and not SafePath.isCleanFilename folder
+					return new InvalidNameError("Invalid element name: #{folder}")
+			if not SafePath.isCleanFilename name
+				return new InvalidNameError("Invalid element name: #{name}")
 
 		return null
 
