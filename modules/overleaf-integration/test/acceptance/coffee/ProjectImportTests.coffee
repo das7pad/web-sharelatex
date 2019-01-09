@@ -168,7 +168,7 @@ describe "ProjectImportTests", ->
 			updates = MockDocUpdaterApi.getProjectStructureUpdates(@project._id).fileUpdates
 			expect(updates.length).to.equal(0)
 
-	describe 'a project with invalid file names ASDFASDFASDFASDFADS', ->
+	describe 'a project with invalid file names', ->
 		before (done) ->
 			files = [
 				type: 'src'
