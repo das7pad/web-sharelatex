@@ -16,25 +16,23 @@ settings = require "settings-sharelatex"
 
 expect = chai.expect
 
-_createUser = (overleafId, useCollabratecV2, callback) ->
+_createUser = (overleafId, callback) ->
 	user = new User()
 	user.ensureUserExists (err) ->
 		return callback err if err?
 		user.deleteProjects (err) ->
 			return callback err if err?
-			user.mongoUpdate { $set: { useCollabratecV2: useCollabratecV2} }, (err) ->
+			user.setOverleafId overleafId, (err) ->
 				return callback err if err?
-				user.setOverleafId overleafId, (err) ->
-					return callback err if err?
-					user.login (err) ->
-						callback err, user
+				user.login (err) ->
+					callback err, user
 
 describe "Collabratec", ->
 	before (done) ->
 		mkdirp settings.path.dumpFolder, done
 
 	before (done) ->
-		_createUser 1, true, (err, user) =>
+		_createUser 1, (err, user) =>
 			return done err if err?
 			@user = user
 			@user.createProject "v2 project", {}, (err, project_id) =>
@@ -58,7 +56,7 @@ describe "Collabratec", ->
 			MockOverleafApi.addToken "good-token", @token1
 
 	before (done) ->
-		_createUser 2, true, (err, user) =>
+		_createUser 2, (err, user) =>
 			return done err if err?
 			@user2 = user
 			@token2 =
@@ -68,19 +66,6 @@ describe "Collabratec", ->
 					id: 2
 					email: @user2.email
 			MockOverleafApi.addToken "good-token2", @token2
-			done()
-
-	before (done) ->
-		_createUser 3, false, (err, user) =>
-			return done err if err?
-			@v1User = user
-			@v1Token =
-				access_token:
-					resource_owner_id: 3
-				user_profile:
-					id: 3
-					email: @v1User.email
-			MockOverleafApi.addToken "v1-token", @v1Token
 			done()
 
 	describe "getProjects", ->
@@ -709,7 +694,7 @@ describe "Collabratec", ->
 							expect(response.statusCode).to.equal 422
 							done()
 
-				describe "without invalid new_owner_collabratec_customer_id", ->
+				describe "without new_owner_collabratec_customer_id", ->
 					it "should return 422", (done) ->
 						options =
 							auth: bearer: "good-token"
@@ -824,25 +809,3 @@ describe "Collabratec", ->
 					request options, (error, response, body) =>
 						expect(response.statusCode).to.equal 422
 						done()
-
-		describe "with collabratec v1 user", () ->
-			it "should proxy request to v1", (done) ->
-				options =
-					auth: bearer: "v1-token"
-					formData:
-						collabratec_document_id: "collabratec-document-id"
-						collabratec_privategroup_id: "collabratec-privategroup-id"
-						zipfile: fs.createReadStream(Path.resolve __dirname, "../files/test-template.zip")
-					json: true
-					method: "POST"
-					url: "/api/v1/collabratec/users/current_user/projects/upload"
-				request options, (error, response, body) =>
-					expect(response.statusCode).to.equal 200
-					expect(response.body).to.deep.equal {
-						filename: "test-template.zip"
-						size: 523
-						body:
-							collabratec_document_id: "collabratec-document-id"
-							collabratec_privategroup_id: "collabratec-privategroup-id"
-					}
-					done()

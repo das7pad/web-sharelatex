@@ -63,7 +63,8 @@ function startExport(url, data) {
 }
 
 function pollExportStatus(exportId, projectId, _this, timeout) {
-  var link = `/project/${projectId}/export/${exportId}`
+  var siteUrl = window.ExposedSettings.siteUrl
+  var link = `${siteUrl}/project/${projectId}/export/${exportId}`
   $.ajax({
     url: link,
     type: 'GET'
@@ -89,7 +90,7 @@ function pollExportStatus(exportId, projectId, _this, timeout) {
           title: status.title,
           articleZipURL: link + '/zip',
           pdfURL: link + '/pdf',
-          revisionURL: 'https://www.overleaf.com/learn/how-to/Overleaf_v2_FAQ',
+          revisionURL: `${siteUrl}/exports/${exportId}${status.token}/revise`,
           // general-purpose
           token: status.token
         })
