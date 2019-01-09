@@ -168,6 +168,27 @@ describe "ProjectImportTests", ->
 			updates = MockDocUpdaterApi.getProjectStructureUpdates(@project._id).fileUpdates
 			expect(updates.length).to.equal(0)
 
+	describe 'a project with invalid file names ASDFASDFASDFASDFADS', ->
+		before (done) ->
+			files = [
+				type: 'src'
+				file: 'bad*name.tex'
+				latest_content: 'Test Content'
+				main: true
+			]
+			@ol_project_id = 4
+			@ol_project_token = "#{@ol_project_id}def"
+			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, token: @ol_project_token, files, title: "docs project" })
+
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			@owner.request.post "/overleaf/project/#{@ol_project_token}/import", (error, @response, @body) =>
+				done()
+
+		it 'should return an error', ->
+			expect(@response.statusCode).to.equal 501
+			expect(JSON.parse(@body).message).to.equal "Sorry! Invalid element name: bad*name.tex. Please contact support to import this project to Overleaf v2"
+
 	describe 'a project with an un-migrated owner', ->
 		before (done) ->
 			# Another user owns the project that we are importing, but is not migrated

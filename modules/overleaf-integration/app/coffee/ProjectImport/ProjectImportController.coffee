@@ -53,7 +53,7 @@ module.exports = ProjectImportController =
 			else if error instanceof V1ProjectHasAssignments
 				unsupportedError("Sorry! This project is being used as an assignment, and assignments are not supported in Overleaf v2. Please see https://www.overleaf.com/learn/how-to/Teaching_in_Overleaf_v2 for more information about teaching tools in Overleaf v2.")
 			else if error instanceof InvalidNameError
-				unsupportedError("Sorry! #{error.message}, please rename your project and try again")
+				unsupportedError("Sorry! #{error.message}. Please contact support to import this project to Overleaf v2")
 			else if error instanceof V2ExportCompleted
 				importCompleted({ redir: ProjectImportController._buildRedirectUrlFromToken(ol_doc_id) })
 			else if error?
