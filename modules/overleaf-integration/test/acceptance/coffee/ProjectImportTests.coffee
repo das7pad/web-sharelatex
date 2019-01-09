@@ -168,6 +168,33 @@ describe "ProjectImportTests", ->
 			updates = MockDocUpdaterApi.getProjectStructureUpdates(@project._id).fileUpdates
 			expect(updates.length).to.equal(0)
 
+	describe 'a project with invalid file names', ->
+		before (done) ->
+			files = [
+				type: 'src'
+				file: 'bad*name.tex'
+				latest_content: 'Test Content'
+				main: true
+			]
+			@ol_project_id = 4
+			@ol_project_token = "#{@ol_project_id}def"
+			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, token: @ol_project_token, files, title: "docs project" })
+
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			@owner.request.post "/overleaf/project/#{@ol_project_token}/import", (error, @response, @body) =>
+				getProject @response, (error, project) =>
+					@project = project
+					done()
+
+		it 'should import with changed names', (done) ->
+			ProjectEntityHandler.getAllEntitiesFromProject @project, (error, docs, files) ->
+				throw error if error?
+				expect(files).to.have.lengthOf(0)
+				expect(docs).to.have.lengthOf(1)
+				expect(docs[0].path).to.equal('/bad_name.tex')
+				done()
+
 	describe 'a project with an un-migrated owner', ->
 		before (done) ->
 			# Another user owns the project that we are importing, but is not migrated
@@ -283,7 +310,6 @@ describe "ProjectImportTests", ->
 		it 'should not version importing the file', ->
 			updates = MockDocUpdaterApi.getProjectStructureUpdates(@project._id).fileUpdates
 			expect(updates.length).to.equal(0)
-
 
 	describe 'a project with a brand variation id', ->
 		before (done) ->

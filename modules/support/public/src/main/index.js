@@ -65,9 +65,16 @@ define([
 					var suggestion;
 					const page_underscored = __guard__(hit != null ? hit.pageName : undefined, x => x.replace(/\s/g,'_'));
 					const page_slug = encodeURIComponent(page_underscored);
+					const page_path = hit.kb ? 'how-to' : 'latex'
+					const section_exists = hit.sectionName && hit.sectionName != ''
+					const page_anchor = section_exists ? `#${hit.sectionName.replace(/\s/g, '_')}` : ``
+					let page_name = hit._highlightResult.pageName.value
+					if (section_exists) {
+						page_name += ' ― ' + hit.sectionName
+					}
 					result.push(suggestion = {
-						url : `/learn/how-to/${page_slug}`,
-						name : hit._highlightResult.pageName.value
+						url : `/learn/${page_path}/${page_slug}${page_anchor}`,
+						name : page_name
 					});
 				}
 				return result;
@@ -119,7 +126,7 @@ define([
 		var _setupSuggestionsWatcher = () =>
 			$scope.$watch("form.subject", function(newVal, oldVal) {
 				if (newVal && (newVal !== oldVal) && (newVal.length > 3)) {
-					return algoliaSearch.searchKB(newVal, _handleSearchResults, {
+					return algoliaSearch.searchWiki(newVal, _handleSearchResults, {
 						hitsPerPage: 3,
 						typoTolerance: 'strict'
 					});

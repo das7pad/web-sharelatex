@@ -33,6 +33,7 @@ crypto = require 'crypto'
 Features = require('../../infrastructure/Features')
 BrandVariationsHandler = require("../BrandVariations/BrandVariationsHandler")
 { getUserAffiliations } = require("../Institutions/InstitutionsAPI")
+V1Handler = require "../V1/V1Handler"
 
 module.exports = ProjectController =
 
@@ -283,9 +284,9 @@ module.exports = ProjectController =
 						return cb(null, project) unless project.overleaf?.id? and project.tokens?.readAndWrite? and Settings.projectImportingCheckMaxCreateDelta?
 						createDelta = (new Date().getTime() - new Date(project._id.getTimestamp()).getTime()) / 1000
 						return cb(null, project) unless createDelta < Settings.projectImportingCheckMaxCreateDelta
-						TokenAccessHandler.getV1DocInfo project.tokens.readAndWrite, null, (err, doc_info) ->
+						V1Handler.getDocExported project.tokens.readAndWrite, (err, doc_exported) ->
 							return next err if err?
-							project.exporting = doc_info.exporting
+							project.exporting = doc_exported.exporting
 							cb(null, project)
 				)
 			user: (cb)->
@@ -465,7 +466,7 @@ module.exports = ProjectController =
 		for user_id, _ of users
 			do (user_id) ->
 				jobs.push (callback) ->
-					User.findById user_id, "first_name last_name", (error, user) ->
+					UserGetter.getUserOrUserStubById user_id, { first_name: 1, last_name: 1 }, (error, user) ->
 						return callback(error) if error?
 						users[user_id] = user
 						callback()

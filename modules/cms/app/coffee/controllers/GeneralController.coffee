@@ -16,10 +16,16 @@ module.exports = PageController =
 
 			# include is for the depth of the query, for linked data
 			cmsQuery = {
-				content_type: 'page'
+				content_type: 'page',
+				'fields.path': req.params.path,
 				'fields.slug': req.params.slug,
 				include: 3
 			}
+
+			if req.params.parent_slug
+				# parentPage is a referenced entry
+				cmsQuery['fields.parentPage.sys.contentType.sys.id'] = 'page'
+				cmsQuery['fields.parentPage.fields.slug'] = req.params.parent_slug
 
 			# need to check fields? below, because if a linked entry was deleted
 			# without first unlinking, then there will still be an "entry" for it
@@ -36,7 +42,8 @@ module.exports = PageController =
 							ErrorController.notFound req, res
 						else if pageData.parentPage && pageData.parentPage.fields?.slug && req.params.parent_slug != pageData.parentPage.fields?.slug
 							# subpages should not be loaded with the wrong parent slug
-							# for example: /_wrong_path_/_correct_parent_slug/_correct_subpage_slug_
+							# for example: /_correct_path_/_wrong_parent_slug/_correct_subpage_slug_
+							# this should not happen, because the query includes the parent_slug
 							ErrorController.notFound req, res
 						else
 							if pageData.content

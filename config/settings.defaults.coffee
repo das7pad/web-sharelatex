@@ -488,6 +488,8 @@ module.exports = settings =
 
 	# currentImage: "texlive-full:2017.1"
 	# imageRoot: "<DOCKER REPOSITORY ROOT>" # without any trailing slash
+	
+	compileBodySizeLimitMb: process.env['COMPILE_BODY_SIZE_LIMIT_MB'] or 5
 
 	# allowedImageNames: [
 	# 	{imageName: 'texlive-full:2017.1', imageDesc: 'TeXLive 2017'}
@@ -502,7 +504,7 @@ module.exports = settings =
 	modules:
 		sanitize:
 			options:
-				allowedTags: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol', 'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div', 'table', 'thead', 'caption', 'tbody', 'tr', 'th', 'td', 'pre', 'iframe', 'img', 'figure', 'figcaption', 'span', 'source', 'video' ]
+				allowedTags: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol', 'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div', 'table', 'thead', 'col', 'caption', 'tbody', 'tr', 'th', 'td', 'tfoot', 'pre', 'iframe', 'img', 'figure', 'figcaption', 'span', 'source', 'video', 'del' ]
 				allowedAttributes:
 					'a': [ 'href', 'name', 'target', 'class', 'event-tracking', 'event-tracking-ga', 'event-tracking-label', 'event-tracking-trigger' ]
 					'div': [ 'class', 'id', 'style' ]
@@ -512,10 +514,15 @@ module.exports = settings =
 					'h4': [ 'class', 'id' ]
 					'h5': [ 'class', 'id' ]
 					'h6': [ 'class', 'id' ]
+					'col': [ 'width' ]
 					'figure': [ 'class', 'id', 'style']
 					'figcaption': [ 'class', 'id', 'style']
+					'i': [ 'aria-hidden', 'aria-label', 'class', 'id' ] 
 					'iframe': [ 'allowfullscreen', 'frameborder', 'height', 'src', 'style', 'width' ]
 					'img': [ 'alt', 'class', 'src', 'style' ]
 					'source': [ 'src', 'type' ]
 					'span': [ 'class', 'id', 'style' ]
+					'table': [ 'border', 'class', 'id', 'style' ]
+					'td': [ 'colspan', 'rowspan', 'headers' ]
+					'th': [ 'abbr', 'headers', 'colspan', 'rowspan', 'scope', 'sorted' ]
 					'video': [ 'alt', 'class', 'controls', 'height', 'width' ]

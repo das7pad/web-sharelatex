@@ -324,14 +324,7 @@ module.exports = ProjectImporter =
 
 		# check files have valid names
 		for file in files
-			path = "/" + file.file
-			dirname = Path.dirname(path)
-			name = Path.basename(path)
-			for folder in dirname.split('/')
-				if folder.length > 0 and not SafePath.isCleanFilename folder
-					return new Errors.InvalidNameError("invalid element name")
-			if not SafePath.isCleanFilename name
-				return new Errors.InvalidNameError("invalid element name")
+			file.file = file.file.split("/").map(SafePath.clean).join('/')
 
 		return null
 
