@@ -96,6 +96,9 @@ module.exports = OverleafAuthenticationController =
 						email: data.email
 					}
 
+	logoutPage: (req, res, next) ->
+		res.render Path.resolve(__dirname, "../../views/logout")
+
 	logout: (req, res, next) ->
 		UserController._doLogout req, (err) ->
 			return next(err) if err?

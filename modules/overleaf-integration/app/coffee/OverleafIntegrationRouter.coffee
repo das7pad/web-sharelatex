@@ -42,7 +42,8 @@ module.exports =
 			webRouter.post '/login/legacy', AuthenticationController.passportLogin
 
 		removeRoute(webRouter, 'get', '/logout')
-		webRouter.get '/logout', OverleafAuthenticationController.logout
+		webRouter.get '/logout', OverleafAuthenticationController.logoutPage
+		webRouter.post '/logout', OverleafAuthenticationController.logout
 
 		removeRoute(webRouter, 'get', '/register')
 		removeRoute(webRouter, 'post', '/register')
