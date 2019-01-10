@@ -12,6 +12,11 @@ import EmisExport from 'Modules/publish-modal/public/es/src/components/emis_expo
 
 describe('<EmisExport />', () => {
   let ajaxStub
+
+  beforeEach(() => {
+    window.ExposedSettings = { siteUrl: 'http://example.com' }
+  })
+
   afterEach(cleanup)
 
   describe('successful initial request', () => {
