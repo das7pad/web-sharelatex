@@ -151,6 +151,54 @@ describe "ProjectGetter", ->
 					expect(@db.projects.find.callCount).to.equal 0
 					expect(@callback.lastCall.args[0]).to.be.instanceOf Error
 
+	describe "getProjectWithoutLock", ->
+		beforeEach ()->
+			@project =
+				_id: @project_id = "56d46b0a1d3422b87c5ebcb1"
+			@db.projects.find = sinon.stub().callsArgWith(2, null, [@project])
+
+		describe "without projection", ->
+			describe "with project id", ->
+				beforeEach ->
+					@ProjectGetter.getProjectWithoutLock @project_id, @callback
+
+				it "should call find with the project id", ->
+					expect(@db.projects.find.callCount).to.equal 1
+					expect(@db.projects.find.lastCall.args[0]).to.deep.equal {
+						_id: ObjectId(@project_id)
+					}
+
+			describe "without project id", ->
+				beforeEach ->
+					@ProjectGetter.getProjectWithoutLock null, @callback
+
+				it "should callback with error", ->
+					expect(@db.projects.find.callCount).to.equal 0
+					expect(@callback.lastCall.args[0]).to.be.instanceOf Error
+
+		describe "with projection", ->
+			beforeEach ->
+				@projection = {_id: 1}
+
+			describe "with project id", ->
+				beforeEach ->
+					@ProjectGetter.getProjectWithoutLock @project_id, @projection, @callback
+
+				it "should call find with the project id", ->
+					expect(@db.projects.find.callCount).to.equal 1
+					expect(@db.projects.find.lastCall.args[0]).to.deep.equal {
+						_id: ObjectId(@project_id)
+					}
+					expect(@db.projects.find.lastCall.args[1]).to.deep.equal @projection
+
+			describe "without project id", ->
+				beforeEach ->
+					@ProjectGetter.getProjectWithoutLock null, @callback
+
+				it "should callback with error", ->
+					expect(@db.projects.find.callCount).to.equal 0
+					expect(@callback.lastCall.args[0]).to.be.instanceOf Error
+
 	describe "findAllUsersProjects", ->
 		beforeEach ->
 			@fields = {"mock": "fields"}
