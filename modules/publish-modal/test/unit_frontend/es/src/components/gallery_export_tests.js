@@ -10,8 +10,11 @@ import {
 
 import GalleryExport from 'Modules/publish-modal/public/es/src/components/gallery_export'
 
-describe('<GalleryExport />', () => {
+describe('<GalleryExport />', function() {
   let ajaxStub
+
+  this.timeout(5000)
+
   afterEach(cleanup)
 
   describe('successful initial request', () => {

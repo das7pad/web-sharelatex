@@ -10,8 +10,10 @@ import {
 
 import EmisExport from 'Modules/publish-modal/public/es/src/components/emis_export'
 
-describe('<EmisExport />', () => {
+describe('<EmisExport />', function() {
   let ajaxStub
+
+  this.timeout(5000)
 
   beforeEach(() => {
     window.ExposedSettings = { siteUrl: 'http://example.com' }

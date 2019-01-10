@@ -10,8 +10,11 @@ import {
 
 import PublishGuide from 'Modules/publish-modal/public/es/src/components/publish_guide'
 
-describe('<PublishGuide />', () => {
+describe('<PublishGuide />', function() {
   let ajaxStub
+
+  this.timeout(5000)
+
   afterEach(cleanup)
 
   describe('successful start export request', () => {
