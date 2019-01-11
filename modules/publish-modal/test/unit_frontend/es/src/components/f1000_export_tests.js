@@ -10,9 +10,19 @@ import {
 
 import F1000Export from '../../../../../public/es/src/components/f1000_export'
 
-describe('<F1000Export />', () => {
+describe('<F1000Export />', function() {
   let ajaxStub
-  afterEach(cleanup)
+
+  this.timeout(5000)
+
+  beforeEach(() => {
+    window.ExposedSettings = { siteUrl: 'http://example.com' }
+  })
+
+  afterEach(() => {
+    delete window.ExposedSettings
+    cleanup()
+  })
 
   describe('successful initial request', () => {
     beforeEach(() => {

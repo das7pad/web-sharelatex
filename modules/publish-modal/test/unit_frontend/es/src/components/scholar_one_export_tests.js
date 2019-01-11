@@ -10,9 +10,19 @@ import {
 
 import ScholarOneExport from '../../../../../public/es/src/components/scholar_one_export'
 
-describe('<ScholarOneExport />', () => {
+describe('<ScholarOneExport />', function() {
   let ajaxStub
-  afterEach(cleanup)
+
+  this.timeout(5000)
+
+  beforeEach(() => {
+    window.ExposedSettings = { siteUrl: 'http://example.com' }
+  })
+
+  afterEach(() => {
+    delete window.ExposedSettings
+    cleanup()
+  })
 
   describe('successful initial request', () => {
     beforeEach(() => {
