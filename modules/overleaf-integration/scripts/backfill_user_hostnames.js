@@ -13,7 +13,10 @@ const asyncLimit = argv.async || 1
 backfillUserEmailHostnames = function (user, callback) {
   processedUsers++
   async.mapSeries(user.emails, function (userEmail, innerCallback) {
-    if (userEmail.reversedHostname) innerCallback()
+    // skip emails with a reversedHostname or invalid emails
+    if (userEmail.reversedHostname || userEmail.email.indexOf('@') === -1) {
+      return innerCallback()
+    }
     const reversedHostname =
       userEmail.email.split('@')[1].split('').reverse().join('')
     const query = {_id: user._id, 'emails.email': userEmail.email}
