@@ -115,8 +115,6 @@ module.exports = LockManager =
 					callback(null, lockValue)
 				else
 					setTimeout attempt, testInterval
-					# back off when the lock is taken to avoid overloading
-					testInterval = Math.min(testInterval * 2, LockManager.MAX_TEST_INTERVAL)
 
 	_releaseLock: (key, lockValue, callback)->
 		rclient.eval LockManager.unlockScript, 1, key, lockValue, (err, result) ->
