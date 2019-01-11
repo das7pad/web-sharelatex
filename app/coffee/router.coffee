@@ -331,8 +331,14 @@ module.exports = class Router
 		# webRouter.post "/beta/opt-in", AuthenticationController.requireLogin(), BetaProgramController.optIn
 		# webRouter.post "/beta/opt-out", AuthenticationController.requireLogin(), BetaProgramController.optOut
 		webRouter.get "/confirm-password", AuthenticationController.requireLogin(), SudoModeController.sudoModePrompt
-		webRouter.post "/confirm-password", AuthenticationController.requireLogin(), SudoModeController.submitPassword
-
+		webRouter.post "/confirm-password",
+			AuthenticationController.requireLogin(),
+			RateLimiterMiddlewear.rateLimit({
+				endpointName: "confirm-password"
+				maxRequests: 10
+				timeInterval: 60
+			}),
+			SudoModeController.submitPassword
 
 		# New "api" endpoints. Started as a way for v1 to call over to v2 (for
 		# long-term features, as opposed to the nominally temporary ones in the
