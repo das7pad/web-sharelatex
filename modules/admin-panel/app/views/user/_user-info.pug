@@ -269,7 +269,11 @@ p
 				tr
 					th(colspan=2).text-center Staff Access
 
-				tr
+				tr(ng-show="!showStaffAccess")
+					td(colspan=2)
+						a(href,ng-click="showStaffAccess = true", ng-show="!showStaffAccess") Show
+
+				tr(ng-show="showStaffAccess")
 					td
 						label(for="publisherMetrics") Publisher Metrics
 					td
@@ -279,7 +283,7 @@ p
 							ng-model="user.staffAccess.publisherMetrics"
 						)
 
-				tr
+				tr(ng-show="showStaffAccess")
 					td
 						label(for="publisherManagement") Publisher Management
 					td
@@ -289,7 +293,7 @@ p
 							ng-model="user.staffAccess.publisherManagement"
 						)
 
-				tr
+				tr(ng-show="showStaffAccess")
 					td
 						label(for="institutionMetrics") Institution Metrics
 					td
@@ -299,7 +303,7 @@ p
 							ng-model="user.staffAccess.institutionMetrics"
 						)
 
-				tr
+				tr(ng-show="showStaffAccess")
 					td
 						label(for="institutionManagement") Institution Management
 					td
@@ -309,7 +313,7 @@ p
 							ng-model="user.staffAccess.institutionManagement"
 						)
 
-				tr
+				tr(ng-show="showStaffAccess")
 					td
 						label(for="groupMetrics") Group Metrics
 					td
@@ -319,7 +323,7 @@ p
 							ng-model="user.staffAccess.groupMetrics"
 						)
 
-				tr
+				tr(ng-show="showStaffAccess")
 					td
 						label(for="groupManagement") Group Management
 					td
