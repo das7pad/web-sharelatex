@@ -3,6 +3,7 @@ V1LoginHandler = require './V1LoginHandler'
 logger = require 'logger-sharelatex'
 WEB = "../../../../.."
 AuthenticationController = require "#{WEB}/app/js/Features/Authentication/AuthenticationController"
+AuthenticationManager = require "#{WEB}/app/js/Features/Authentication/AuthenticationManager"
 UserGetter = require "#{WEB}/app/js/Features/User/UserGetter"
 UserRegistrationHandler = require "#{WEB}/app/js/Features/User/UserRegistrationHandler"
 ReferalAllocator = require("#{WEB}/app/js/Features/Referal/ReferalAllocator")
@@ -47,6 +48,10 @@ module.exports = V1LoginController =
 		if !email
 			logger.err {email}, "registration email invalid"
 			return res.json message: {type: 'error', text: req.i18n.translate('invalid_email')}
+		validationError = AuthenticationManager.validatePassword(password)
+		if validationError?
+			logger.err {email}, "registration password invalid"
+			return res.json message: {type: 'error', text: validationError.message}
 		logger.log {email}, "trying to create account via v1"
 		subscribeToNewsletter = req.body.subscribeToNewsletter == 'true'
 		V1LoginHandler.getUserByEmail email, (err, existingUser) ->
@@ -120,6 +125,12 @@ module.exports = V1LoginController =
 			return res.json message: {
 				type: 'error',
 				text: req.i18n.translate('password_change_passwords_do_not_match')
+			}
+		validationError = AuthenticationManager.validatePassword(req.body.newPassword1)
+		if validationError?
+			return res.json message: {
+				type: 'error',
+				text: validationError.message
 			}
 		lightUser = AuthenticationController.getSessionUser(req)
 		UserGetter.getUser lightUser._id, (err, user) ->
