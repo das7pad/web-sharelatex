@@ -19,7 +19,10 @@ describe('<EmisExport />', function() {
     window.ExposedSettings = { siteUrl: 'http://example.com' }
   })
 
-  afterEach(cleanup)
+  afterEach(() => {
+    delete window.ExposedSettings
+    cleanup()
+  })
 
   describe('successful initial request', () => {
     beforeEach(() => {

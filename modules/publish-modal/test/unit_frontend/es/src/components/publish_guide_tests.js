@@ -15,7 +15,14 @@ describe('<PublishGuide />', function() {
 
   this.timeout(5000)
 
-  afterEach(cleanup)
+  beforeEach(() => {
+    window.ExposedSettings = { siteUrl: 'http://example.com' }
+  })
+
+  afterEach(() => {
+    delete window.ExposedSettings
+    cleanup()
+  })
 
   describe('successful start export request', () => {
     beforeEach(() => {
