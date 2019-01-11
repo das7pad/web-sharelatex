@@ -64,6 +64,13 @@ I have a bad name
 			slug: "OSF"
 			default_variation_id: 1234
 
+		MockV1Api.brand_variations[1234] =
+			id: 1235
+		MockV1Api.brand_variations[6789] =
+			id: 6789
+		MockV1Api.brand_variations[69] =
+			id: 69
+
 		MockV1Api.validation_clients["ieee_latexqc"] =
 			brand_variation_id: "1234"
 			conversions:
@@ -168,6 +175,33 @@ I have a bad name
 
 					expect(project).to.exist
 					expect(project.compiler).to.equal "latex"
+
+					done()
+
+		describe "when POSTing a snippet which specifies a brand_variation_id", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						snip: "test"
+						brand_variation_id: "6789"
+					headers:
+						'X-Requested-With': 'XMLHttpRequest'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should create a project with the requested brand variation", (done) ->
+				projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				ProjectGetter.getProject projectId, (error, project) ->
+					return done(error) if error?
+
+					expect(project).to.exist
+					expect(project.brandVariationId).to.equal "6789"
 
 					done()
 
@@ -429,6 +463,37 @@ I have a bad name
 
 					expect(project).to.exist
 					expect(project.brandVariationId).to.equal "1234"
+					done()
+
+		describe "when POSTing a zip_uri that contains a brand variation id", ->
+			beforeEach (done) ->
+				@user.request.post
+					url: "/docs"
+					form:
+						_csrf: @user.csrfToken
+						zip_uri: 'http://example.org/project.zip'
+						brand_variation_id: '6789'
+				, (_err, _res, _body) =>
+					@err = _err
+					@res = _res
+					@body = _body
+					done()
+
+			it "should not produce an error", ->
+				expect(@err).not.to.exist
+
+			it "should redirect to a project", ->
+				expect(@res.statusCode).to.equal 302
+				expect(@res.headers.location).to.match @uri_regex
+
+			it "should create a project with the correct brand variation id", (done) ->
+				projectId = @res.headers.location.match(@uri_regex)[1]
+				expect(projectId).to.exist
+				ProjectGetter.getProject projectId, (error, project) ->
+					return done(error) if error?
+
+					expect(project).to.exist
+					expect(project.brandVariationId).to.equal "6789"
 					done()
 
 		describe "when POSTing a zip_uri that contains an invalid publisher_slug", ->
@@ -842,3 +907,54 @@ I have a bad name
 						expect(project.rootFolder[0].fileRefs.length).to.equal 1
 						expect(project.rootFolder[0].fileRefs[0].name).to.equal 'potato.zip'
 						done()
+
+			describe "when the brand variation is supplied", ->
+				beforeEach (done) ->
+					@user.request.post
+						url: "/docs"
+						form:
+							_csrf: @user.csrfToken
+							snip_uri: [
+								'http://example.org/test.tex'
+								'http://example.org/project.zip'
+							]
+							brand_variation_id: '6789'
+						headers:
+							'X-Requested-With': 'XMLHttpRequest'
+					, (_err, _res, _body) =>
+						@err = _err
+						@res = _res
+						@body = _body
+						done()
+
+				it "should use the supplied brand variation id", (done) ->
+					projectId = JSON.parse(@body).redirect.match(@uri_regex)[1]
+					expect(projectId).to.exist
+
+					ProjectGetter.getProject projectId, (error, project) ->
+						return done(error) if error?
+
+						expect(project.brandVariationId).to.equal '6789'
+						done()
+
+			describe "when the brand variation is supplied but does not exist", ->
+				beforeEach (done) ->
+					@user.request.post
+						url: "/docs"
+						form:
+							_csrf: @user.csrfToken
+							snip_uri: [
+								'http://example.org/test.tex'
+								'http://example.org/project.zip'
+							]
+							brand_variation_id: 'wombat'
+						headers:
+							'X-Requested-With': 'XMLHttpRequest'
+					, (_err, _res, _body) =>
+						@err = _err
+						@res = _res
+						@body = _body
+						done()
+
+				it "should generate a 'not found' error", ->
+					expect(@res.statusCode).to.equal 404

@@ -185,6 +185,21 @@ module.exports = OpenInOverleafHelper =
 			callback
 		)
 
+	setProjectBrandVariationFromId: (project, brandVariationId, callback = (error)->) ->
+		async.waterfall(
+			[
+				(cb) ->
+					# ensure the brand variation exists, or we'll create an un-openable project
+					V1Api.request { uri: "/api/v2/brand_variations/#{encodeURIComponent(brandVariationId)}" }, (err, response, body) ->
+						return cb(new OpenInOverleafErrors.PublisherNotFoundError) if err?.statusCode == 404 || response?.statusCode == 404
+						cb(err)
+				(cb) ->
+					ProjectOptionsHandler.setBrandVariationId project._id, brandVariationId, (err) ->
+						cb(err)
+			]
+			callback
+		)
+
 	snippetFileComment: (key = 'default') ->
 		return {
 			default: '''
