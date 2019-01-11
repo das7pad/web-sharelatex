@@ -63,7 +63,7 @@ module.exports = UserAdminController =
 		async.parallel {
 			user: (cb) ->
 				UserGetter.getUser user_id, {
-					_id:1, first_name:1, last_name:1, email:1, betaProgram:1, features: 1, isAdmin: 1, awareOfV2: 1, overleaf: 1, emails: 1, signUpDate:1, loginCount:1, lastLoggedIn:1, lastLoginIp:1, refered_user_count: 1
+					_id:1, first_name:1, last_name:1, email:1, betaProgram:1, features: 1, isAdmin: 1, awareOfV2: 1, overleaf: 1, emails: 1, signUpDate:1, loginCount:1, lastLoggedIn:1, lastLoginIp:1, refered_user_count: 1, staffAccess: 1
 				}, cb
 			projects: (cb) ->
 				ProjectGetter.findAllUsersProjects user_id, {
@@ -135,7 +135,13 @@ module.exports = UserAdminController =
 		'refered_user_count'
 	]
 	SUPER_ADMIN_ALLOWED_ATTRIBUTES: [
-		'isAdmin'
+		'isAdmin',
+		'staffAccess.publisherMetrics',
+		'staffAccess.publisherManagement',
+		'staffAccess.institutionMetrics',
+		'staffAccess.institutionManagement',
+		'staffAccess.groupMetrics',
+		'staffAccess.groupManagement'
 	]
 	BOOLEAN_ATTRIBUTES: [
 		'betaProgram',
@@ -149,6 +155,12 @@ module.exports = UserAdminController =
 		'features.referencesSearch',
 		'features.mendeley',
 		'features.zotero',
+		'staffAccess.publisherMetrics',
+		'staffAccess.publisherManagement',
+		'staffAccess.institutionMetrics',
+		'staffAccess.institutionManagement',
+		'staffAccess.groupMetrics',
+		'staffAccess.groupManagement',
 		'awareOfV2',
 		'isAdmin'
 	]
