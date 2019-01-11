@@ -122,6 +122,11 @@ module.exports = class Router
 			UserEmailsController.confirm
 		webRouter.post '/user/emails/resend_confirmation',
 			AuthenticationController.requireLogin(),
+			RateLimiterMiddlewear.rateLimit({
+				endpointName: "resend-confirmation"
+				maxRequests: 10
+				timeInterval: 60
+			}),
 			UserEmailsController.resendConfirmation
 
 		if Features.hasFeature 'affiliations'
