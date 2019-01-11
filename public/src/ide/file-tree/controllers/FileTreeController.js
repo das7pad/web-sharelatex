@@ -524,7 +524,6 @@ define(['base'], function(App) {
           .catch(function(response) {
             const { data } = response
             $scope.error = data
-            // return _reset({ err: true , message: message})
           })
       })
     }

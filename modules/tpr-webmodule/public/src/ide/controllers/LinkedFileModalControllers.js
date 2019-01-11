@@ -39,8 +39,6 @@ define(['base'], function(App) {
         x => x[provider]
       )
 
-      $timeout(() => $scope.$broadcast('open'), 200)
-
       $scope.canLoadBibtex = () =>
         $scope.userHasProviderFeature && $scope.userHasProviderLink
 
@@ -55,7 +53,8 @@ define(['base'], function(App) {
         isInitialized: false,
         groups: null,
         selectedGroupId: null,
-        format: 'bibtex'
+        format: 'bibtex',
+        name: 'references.bib'
       }
 
       const _handleError = function(err) {
@@ -128,6 +127,8 @@ define(['base'], function(App) {
 
       $scope.$watch('data.name', validate)
       validate()
+      // $timeout(() => console.log('open'), 200)
+      $timeout(() => $scope.$broadcast('open'), 200)
 
       $scope.$on('create', function() {
         if (!$scope.data.isInitialized) {

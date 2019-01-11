@@ -47,12 +47,13 @@ mixin providerPanel(providerKey, controller, providerName)
 								label(for="name") File name in this project
 								input.form-control(
 									type="text",
-									value="references.bib",
+									placeholder="File name in this project",
 									required,
 									ng-model="data.name",
 									on-enter="create()",
-									name="name",
-									focus-on="open"
+									select-name-on="open",
+									valid-file,
+									name="name"
 								)
 
 							if (providerKey == 'zotero')
