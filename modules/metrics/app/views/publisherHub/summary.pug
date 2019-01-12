@@ -1,0 +1,34 @@
+table.overbox
+
+.admin-sub-item
+	h6 In the past month
+	.row
+		.col-xs-3
+			.hub-circle
+				span.hub-circle-number #{yearlySummary.hours_editing}
+				|hours editing
+		.col-xs-3
+			.hub-circle
+				span.hub-circle-number #{yearlySummary.active_users}
+				|active users
+		.col-xs-3
+			.hub-circle
+				span.hub-circle-number #{yearlySummary.active_projects}
+				|active projects
+		.col-xs-3
+			.hub-circle
+				span.hub-circle-number #{yearlySummary.advanced_active_projects}
+				|advanced projects
+
+.admin-sub-item.recent-activity
+	h6 Last month
+	.row.overbox.overbox-small#recent-activity
+		.col-xs-4
+			span.hub-big-number #{monthlySummary.new_projects}
+			span.hub-number-label new projects
+		.col-xs-4
+			span.hub-big-number #{monthlySummary.active_projects}
+			span.hub-number-label projects created or edited
+		.col-xs-4
+			span.hub-big-number #{monthlySummary.new_collaborators}
+			span.hub-number-label new authors/collaborators
