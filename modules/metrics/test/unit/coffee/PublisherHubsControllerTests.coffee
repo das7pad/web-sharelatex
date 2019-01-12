@@ -92,7 +92,6 @@ describe "PublisherHubsController", ->
 			@request.get = sinon.stub().callsArgWith(1, null, {statusCode: 200}, @mockAnalytics)
 			@PublisherHubsController._fetchAnalytics(@data, @callback)
 			@request.get.calledOnce.should.equal.true
-			console.log(@request.get.lastCall)
 			@request.get.calledWith({
 				url: @Settings.apis.analytics.url + '/recentV1TemplateIdsActivity?v1_templates=209,208'
 				json: true

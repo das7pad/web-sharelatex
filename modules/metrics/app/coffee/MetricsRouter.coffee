@@ -65,6 +65,12 @@ module.exports =
 		)
 
 		webRouter.get(
+			'/institutions/:id/usersCSV',
+			UserMembershipAuthorization.requireInstitutionMetricsAccess,
+			InstitutionHubsController.institutionUsersCSV
+		)
+
+		webRouter.get(
 			'/institutions/:id/externalCollaboration',
 			UserMembershipAuthorization.requireInstitutionMetricsAccess,
 			InstitutionHubsController.institutionExternalCollaboration

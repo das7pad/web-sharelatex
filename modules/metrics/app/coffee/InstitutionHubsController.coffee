@@ -30,6 +30,13 @@ module.exports = InstitutionHubsController =
 				)
 			)
 
+	institutionUsersCSV: (req, res, next) ->
+		InstitutionHubsController._v1InstitutionsApi(req.entity.v1Id, 'affiliations', (err, response, body)->
+			return next(err) if err?
+			res.attachment('users.csv')
+			res.send(InstitutionHubsController._formatUsersCSV(body))
+		)
+
 	institutionExternalCollaboration: (req, res, next) ->
 		InstitutionHubsController._v1InstitutionsApi(req.entity.v1Id, 'external_collaboration_data', (err, response, body)->
 			return next(err) if err?
@@ -67,6 +74,18 @@ module.exports = InstitutionHubsController =
 				callback(InstitutionHubsController._formatRecentActivity(body))
 			else
 				callback(null)
+
+	_formatUsersCSV: (data) ->
+		headers = ['email', 'role', 'department', 'created_at']
+		csv = headers.toString() + '\n'
+		for user in data
+			rowData = ''
+			console.log(user)
+			for col in headers
+				console.log(user[col])
+				rowData = rowData + '\"' + user[col] + '\"' + ','
+			csv = csv + rowData + '\n'
+		return csv
 
 	_formatRecentActivity: (data) ->
 		recentActivity = []

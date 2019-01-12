@@ -31,7 +31,7 @@ describe "InstitutionHubsController", ->
 				institution.portalSlug = 'slug'
 				callback(null, institution)
 		@req = entity: institution
-		@res = { send: sinon.stub() }
+		@res = { send: sinon.stub(), attachment: sinon.stub() }
 
 	describe "institutionHub rendering", ->
 		it 'renders the institution hub template', (done) ->
@@ -151,3 +151,23 @@ describe "InstitutionHubsController", ->
 				}).should.equal true
 				expect(data).to.deep.equal(@v1JsonResp)
 				done()
+
+		it 'calls v1 and returns csv of users', (done) ->
+			v1JsonResp = [{
+				'email': 'test@test.test',
+				'role': 'student',
+				'department': 'engineering',
+				'created_at': '2018-10-08T12:53:00.058Z'
+			}]
+			jsonAsCSV = 'email,role,department,created_at\n"test@test.test","student","engineering","2018-10-08T12:53:00.058Z",\n'
+			@request.get = sinon.stub().callsArgWith(1, null, null, v1JsonResp)
+			endpoint = /5\/affiliations/
+			@InstitutionHubsController.institutionUsersCSV(@req, @res)
+			@request.get.calledWith({
+				url: sinon.match(endpoint)
+				auth: @v1Auth
+				json: true
+			}).should.equal true
+			@res.attachment.calledWith('users.csv').should.equal true
+			@res.send.calledWith(jsonAsCSV).should.equal true
+			done()
