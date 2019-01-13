@@ -68,7 +68,9 @@ describe "PublisherHubsController", ->
 				sinon.match('views/publisherHub'), {
 					name: 'IEEE',
 					templates: @data,
-					templatesAnalytics: @mockAnalytics.yearly_summary.v1Templates
+					templatesAnalytics: @mockAnalytics.yearly_summary.v1Templates,
+					yearlySummary: @mockAnalytics.yearly_summary,
+					monthlySummary: @mockAnalytics.monthly_summary
 				}
 			).should.equal true
 
