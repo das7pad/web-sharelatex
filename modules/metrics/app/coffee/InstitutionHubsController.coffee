@@ -89,7 +89,7 @@ module.exports = InstitutionHubsController =
 		recentActivity = []
 		if data['month']['users'] + data['month']['projects'] == 0
 			return null
-		lags = { day: 'Yesterday', week: 'Last Week', month: 'Last Month' }
+		lags = { day: 'Yesterday', week: 'Last Week', month: 'Last Month', year: 'This Year' }
 		for lag, title of lags
 			recentActivity.push(
 				title: title,

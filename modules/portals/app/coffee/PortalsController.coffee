@@ -52,7 +52,7 @@ _portalLayoutData = (req, data) ->
 		data.metadata.title = data.portal.title
 	data.metadata.viewport = true
 
-	data
+  data
 
 _getPortal = (req, res, next, portalType) ->
 	if req.query.prtl || Settings.showContentPages

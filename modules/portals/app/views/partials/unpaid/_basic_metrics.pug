@@ -1,0 +1,11 @@
+.basic-metrics
+	.hub-circle
+		span.hub-circle-number
+			|#{team.current_count}
+		|Users
+
+	.hub-circle(style="margin-left: 40px;")
+		span.hub-circle-number
+			|#{recentActivity[3].docs}
+		|Edited projects
+		sup.has-tooltip(data-html="true" data-toggle="tooltip" title="Projects in the past year")  (?)
