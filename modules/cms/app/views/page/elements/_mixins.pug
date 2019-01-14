@@ -27,20 +27,18 @@ mixin btn_other_page(content)
 	
 mixin quote(fields)
 	if fields.halfWidth
-		.col-sm-6
-			.row
-				if fields.picture
-					.col-sm-3
-						img(src=fields.picture.fields.file.url class="img-circle pull-right" alt=fields.picture.fields.title)
-				div(class=fields.picture ? "col-sm-9" : "col-sm-12")
-					blockquote !{fields.quote}
-						if fields.person || fields.position
-							footer
-								| #{fields.person}
-								if fields.person && fields.position
-									| , #{fields.position}
-								else
-									| #{fields.position}
+		if fields.picture
+			.col-sm-3
+				img(src=fields.picture.fields.file.url class="img-circle pull-right" alt=fields.picture.fields.title)
+		div(class=fields.picture ? "col-sm-9" : "col-sm-12")
+			blockquote !{fields.quote}
+				if fields.person || fields.position
+					footer
+						| #{fields.person}
+						if fields.person && fields.position
+							| , #{fields.position}
+						else
+							| #{fields.position}
 	else
 		.col-sm-9.quote-full-width
 			blockquote !{fields.quote}
