@@ -394,7 +394,7 @@ define(['base'], function(App) {
         const { state, data } = $scope
         return (
           !state.inFlight.projects &&
-          (data.projects.length === 0 || data.projects == null)
+          (data.projects == null || data.projects.length === 0)
         )
       }
 
