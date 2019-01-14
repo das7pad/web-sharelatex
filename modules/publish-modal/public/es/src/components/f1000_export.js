@@ -42,11 +42,12 @@ export default class F1000Export extends Component {
 
   componentDidUpdate() {
     if (this.state.exportState === 'complete') {
-      // When completionForm is rendered, submit it
+      // When the completion form is rendered, submit it by clicking the submit
+      // button.
       // This needs to be done via a form submission because F1000 will
       // respond with their log in form html, which the browser will then
       // render. It cannot be done via XHR
-      this.completionForm.submit()
+      this.submitButton.click()
     }
   }
 
@@ -85,9 +86,6 @@ export default class F1000Export extends Component {
       <form
         action={this.props.entry.export_url}
         method="GET"
-        ref={form => {
-          this.completionForm = form
-        }}
         data-testid="export-complete"
       >
         <input
@@ -131,6 +129,14 @@ export default class F1000Export extends Component {
         <input id="rejectionURL" name="rejectionURL" type="hidden" value="" />
         <input id="newVersionURL" name="newVersionURL" type="hidden" value="" />
         <input id="articleId" name="articleId" type="hidden" value="" />
+        <button
+          style={{ display: 'none' }}
+          ref={button => {
+            this.submitButton = button
+          }}
+        >
+          Submit
+        </button>
       </form>
     )
   }
