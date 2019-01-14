@@ -106,6 +106,7 @@ define(['base'], function(App) {
             $scope.data.groups = data.groups
             $scope.data.selectedGroup = null
             $scope.data.isInitialized = true
+            $scope.$applyAsync(() => $scope.$broadcast('open'))
             return _reset()
           })
           .catch(function(err) {
@@ -127,8 +128,6 @@ define(['base'], function(App) {
 
       $scope.$watch('data.name', validate)
       validate()
-      // $timeout(() => console.log('open'), 200)
-      $timeout(() => $scope.$broadcast('open'), 200)
 
       $scope.$on('create', function() {
         if (!$scope.data.isInitialized) {
