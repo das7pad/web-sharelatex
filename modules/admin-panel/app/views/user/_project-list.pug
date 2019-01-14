@@ -73,6 +73,9 @@
 							)
 							span
 								a.projectName(href="/project/{{project._id}}",target="_blank") {{project.name}}
+								| &nbsp;&nbsp;
+								a(href="/admin/project/{{project._id}}")
+									i.fa.fa-info-circle
 								span(
 									ng-controller="TagListController"
 								)
