@@ -41,16 +41,6 @@ describe "OverleafAuthenticationController", ->
 		@res.status.returns(@res)
 		@next = sinon.stub()
 
-	describe "logout", ->
-		beforeEach ->
-			@UserController._doLogout = sinon.stub().callsArgWith(1, null)
-			@OverleafAuthenticationController.logout @req, @res, @next
-
-		it "redirects to v1", () ->
-			@res.redirect.calledWith(
-				'http://v1.example.com/users/ensure_signed_out'
-			).should.equal true
-
 	describe "setupUser", ->
 		describe "with a conflicting email", ->
 			beforeEach ->
