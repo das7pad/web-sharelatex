@@ -9,6 +9,8 @@ app.use(bodyParser.urlencoded({ extended: true }))
 module.exports = MockOverleafApi =
 	template_content: null
 
+	lastUrl: ""
+
 	setTemplateContent: (content) ->
 		@template_content = content
 
@@ -21,6 +23,10 @@ module.exports = MockOverleafApi =
 
 		app.get "/latex/templates/slug/read_token", (req, res, next) =>
 			res.json @getTemplateContent()
+
+		app.get /.*/, (req, res) =>
+			@lastUrl = req.originalUrl
+			res.json { tags: [ {} ] }
 
 		app.listen 5000, (error) ->
 			throw error if error?
