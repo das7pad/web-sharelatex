@@ -44,7 +44,7 @@ export default class PublishGuide extends Component {
         key={entry.id}
       >
         <div className="col-sm-12">
-          {!!(onReturn && returnText) && (
+          {onReturn && returnText && (
             <ReturnButton onReturn={onReturn} returnText={returnText} />
           )}
           <GuideHtml
