@@ -19,5 +19,8 @@ block content_cms
 					//- must check c.fields, because an entry could have been created without adding any fields
 					if c.fields && c.fields.tabGroupTitle
 						include ./elements/_tabs
+					else if c.type == 'layoutGrid'
+						+content_row(c.fields)
 					else
+						//- DEPRECATED
 						+page_content(c, content[cIndex+1])

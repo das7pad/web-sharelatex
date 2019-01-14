@@ -6,6 +6,8 @@ sanitizeOptions = if Settings?.modules?.sanitize?.options? then Settings.modules
 
 module.exports = ContentParser =
 	parse: (content) ->
+		# For parsing types `Element | _` on CMS
+
 		# Data easier to use in pug template
 		content.type = content.sys?.contentType?.sys?.id
 
@@ -29,10 +31,6 @@ module.exports = ContentParser =
 			else if content.fields.footer
 				content.fields.footer = marked(content.fields.footer)
 				content.fields.footer = sanitizeHtml(content.fields.footer, sanitizeOptions)
-			else if content.fields.tabs
-				content.fields.tabs = ContentParser.parseArray(content.fields.tabs)
-			else if content.fields.tabContent
-				content.fields.tabContent = ContentParser.parseArray(content.fields.tabContent)
 			else if content.fields.quote
 				# input is a textarea but still need to parse for line breaks
 				content.fields.quote = marked(content.fields.quote)
@@ -42,16 +40,34 @@ module.exports = ContentParser =
 
 		content
 
+	columnStyleGroups: (styleGroups) ->
+		styleGroups.map (group) ->
+			if group.fields?.elements?
+				group.fields.elements.map (element) -> ContentParser.parse(element)
+		styleGroups
+
 	parseArray: (arr) ->
 		arr.map (content, index) ->
+			# newRow and prevContent are being deprecated
 			newRow = false # for the grid layout
 			prevContent = arr[index-1] # for the grid layout
 
 			if content && content.fields
 				# Must check for fields, because an entry could have been added, but with no fields added
-
+				layoutContentType = content.sys?.contentType?.sys?.id
 				# Parse markdown to HTML
-				content = ContentParser.parse(content)
+				if layoutContentType == 'layoutTabGroup'
+					content.fields.tabs = ContentParser.parseArray(content.fields.tabs)
+				else if layoutContentType == 'layoutTab'
+					content.fields.tabContent = ContentParser.parseArray(content.fields.tabContent)
+				else if layoutContentType == 'layoutGrid'
+					content.type = 'layoutGrid'
+					if content.fields.column1?
+						content.fields.column1 = ContentParser.columnStyleGroups(content.fields.column1)
+					if content.fields.column2?
+						content.fields.column2 = ContentParser.columnStyleGroups(content.fields.column2)
+				else
+					content = ContentParser.parse(content)
 
 				# Set up grid layout - Determine if content entry should be the start of a new row
 				if (!content.fields.halfWidth) || # entry is full width

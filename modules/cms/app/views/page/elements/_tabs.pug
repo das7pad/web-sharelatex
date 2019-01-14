@@ -6,4 +6,8 @@ tabset.ol-tabs(bookmarkable-tabset)
 		if tab.fields
 			tab(bookmarkable-tab=tab.fields.tabId, heading=tab.fields.tabTitle)
 				for tabContent, tabContentIndex in tab.fields.tabContent || []
-					+page_content(tabContent, tab.fields.tabContent[tabContentIndex+1])
+					if tabContent.type == 'layoutGrid'
+						+content_row(tabContent.fields)
+					else
+						//- DEPRECATED
+						+page_content(tabContent, tab.fields.tabContent[tabContentIndex+1])
