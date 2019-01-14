@@ -1,0 +1,19 @@
+extends ../../../../../app/views/layout
+
+block content
+	script#data(type="application/json").
+		!{JSON.stringify({project: project}).replace(/\//g, '\\/')}
+
+	script(type="text/javascript").
+		window.data = JSON.parse($("#data").text());
+
+	.content.content-alt(ng-controller="AdminProjectController")
+		.container(ng-cloak)
+			p
+				strong
+					| Project
+				| &nbsp;&gt;&nbsp;
+				strong {{ project._id }}
+			tabset
+				tab(heading="Project Info")
+					include ./_project-info

@@ -1,0 +1,54 @@
+p
+	table.table.table-striped.table-bordered(style="margin-bottom: 12px;")
+
+		tr
+			td
+				label ID
+			td
+				| {{ project._id }}
+				| &nbsp;
+				| (#[a(href="/project/{{project._id}}", target="_blank") open project])
+
+		tr
+			td
+				label Name
+			td {{ project.name }}
+
+		tr
+			td
+				label Owner
+			td
+				a(href="/admin/user/{{project.owner_ref}}")
+					| {{ project.owner_ref }}
+
+		tr
+			td
+				label Active?
+			td {{ project.active == true}}
+
+		tr
+			td
+				label Archived?
+			td {{ project.archived == true }}
+
+		tr
+			td
+				label Last Updated
+			td {{ project.lastUpdated }}
+
+		tr
+			td
+				label Last Opened
+			td {{ project.lastOpened }}
+
+
+		tr
+			td
+				label Public Access Level
+			td {{ project.publicAccesLevel }}
+
+		tr(ng-if="project.overleaf.id")
+			td
+				label Overleaf ID
+			td {{ project.overleaf.id }}
+

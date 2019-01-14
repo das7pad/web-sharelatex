@@ -1,4 +1,5 @@
 UserAdminController = require("./UserAdminController")
+ProjectAdminController = require("./ProjectAdminController")
 SubscriptionAdminController = require("./SubscriptionAdminController")
 GraphController = require("./GraphController")
 AuthorizationMiddlewear = require('../../../../app/js/Features/Authorization/AuthorizationMiddlewear')
@@ -32,3 +33,5 @@ module.exports =
 	
 		adminRouter.get    "/user/graph/:user_id", GraphController.userGraph
 		adminRouter.delete "/project/:Project_id", ProjectController.deleteProject
+
+		adminRouter.get    "/project/:Project_id", ProjectAdminController.show
