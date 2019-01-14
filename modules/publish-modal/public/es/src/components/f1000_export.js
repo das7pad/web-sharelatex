@@ -17,25 +17,19 @@ export default class F1000Export extends Component {
 
     initiateExport(entry, projectId)
       .then(({ authorEmail, authorName, title }) => {
-        this.setState({ exportState: 'complete' })
-
-        $.ajax({
-          url: this.props.entry.export_url,
-          method: 'GET',
-          data: {
-            authorEmail,
-            authorName,
-            title,
-            articleZipURL: `/project/${projectId}/export/${entry.id}/zip`,
-            pdfURL: `/project/${projectId}/export/${entry.id}/pdf`,
-            revisionURL:
-              'https://www.overleaf.com/learn/how-to/Overleaf_v2_FAQ',
-            submissionURL: '',
-            publicationURL: '',
-            rejectionURL: '',
-            newVersionURL: '',
-            articleId: ''
-          }
+        this.setState({
+          exportState: 'complete',
+          authorEmail,
+          authorName,
+          title,
+          articleZipURL: `/project/${projectId}/export/${entry.id}/zip`,
+          pdfURL: `/project/${projectId}/export/${entry.id}/pdf`,
+          revisionURL: 'https://www.overleaf.com/learn/how-to/Overleaf_v2_FAQ',
+          submissionURL: '',
+          publicationURL: '',
+          rejectionURL: '',
+          newVersionURL: '',
+          articleId: ''
         })
       })
       .catch(({ errorDetails }) => {
@@ -44,6 +38,16 @@ export default class F1000Export extends Component {
           errorDetails
         })
       })
+  }
+
+  componentDidUpdate() {
+    if (this.state.exportState === 'complete') {
+      // When completionForm is rendered, submit it
+      // This needs to be done via a form submission because F1000 will
+      // respond with their log in form html, which the browser will then
+      // render. It cannot be done via XHR
+      this.completionForm.submit()
+    }
   }
 
   renderUninitiated(entry, projectId) {
@@ -77,7 +81,58 @@ export default class F1000Export extends Component {
   }
 
   renderComplete() {
-    return <span data-testid="export-complete" />
+    return (
+      <form
+        action={this.props.entry.export_url}
+        method="GET"
+        ref={form => {
+          this.completionForm = form
+        }}
+        data-testid="export-complete"
+      >
+        <input
+          id="authorEmail"
+          name="authorEmail"
+          type="hidden"
+          value={this.state.authorEmail}
+        />
+        <input
+          id="authorName"
+          name="authorName"
+          type="hidden"
+          value={this.state.authorName}
+        />
+        <input id="title" name="title" type="hidden" value={this.state.title} />
+        <input
+          id="articleZipURL"
+          name="articleZipURL"
+          type="hidden"
+          value={this.state.articleZipURL}
+        />
+        <input
+          id="pdfURL"
+          name="pdfURL"
+          type="hidden"
+          value={this.state.pdfURL}
+        />
+        <input
+          id="revisionURL"
+          name="revisionURL"
+          type="hidden"
+          value={this.state.revisionURL}
+        />
+        <input id="submissionURL" name="submissionURL" type="hidden" value="" />
+        <input
+          id="publicationURL"
+          name="publicationURL"
+          type="hidden"
+          value=""
+        />
+        <input id="rejectionURL" name="rejectionURL" type="hidden" value="" />
+        <input id="newVersionURL" name="newVersionURL" type="hidden" value="" />
+        <input id="articleId" name="articleId" type="hidden" value="" />
+      </form>
+    )
   }
 
   renderError() {
