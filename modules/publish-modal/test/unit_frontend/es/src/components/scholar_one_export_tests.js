@@ -11,18 +11,39 @@ import {
 import ScholarOneExport from '../../../../../public/es/src/components/scholar_one_export'
 
 describe('<ScholarOneExport />', function() {
-  let ajaxStub
+  let formSubmissionStub, formData, ajaxStub
 
   this.timeout(5000)
 
   beforeEach(() => {
+    // Stub the globally exposed settings
     window.ExposedSettings = { siteUrl: 'http://example.com' }
+    // The F1000 component triggers a form submission when the export is
+    // complete. This causes problems with Karma because it throws an error if
+    // the page is navigated away (through the form submission). We therefore
+    // prevent the form submission from happening by calling preventDefault()
+    // on the submit event
+    formSubmissionStub = preventFormSubmission(formData)
+    document.addEventListener('submit', formSubmissionStub)
   })
 
   afterEach(() => {
     delete window.ExposedSettings
     cleanup()
   })
+
+  function preventFormSubmission() {
+    return e => {
+      e.preventDefault()
+
+      // To assert that the form submission contains the correct data, we also
+      // capture the form data and transform it an object with name/value pairs
+      formData = Array.from(e.target.elements).reduce(
+        (acc, elem) => Object.assign(acc, { [elem.name]: elem.value }),
+        {}
+      )
+    }
+  }
 
   describe('successful initial request', () => {
     beforeEach(() => {
@@ -102,12 +123,9 @@ describe('<ScholarOneExport />', function() {
       fireEvent.click(submitButton)
 
       return waitForElement(() => getByTestId('export-complete')).then(() => {
-        const { url, method, data } = $.ajax.thirdCall.args[0]
-        expect(url).to.equal('http://example.com')
-        expect(method).to.equal('POST')
-        expect(data.export_id).to.equal('3token')
-        expect(data.submission_id).to.equal(4)
-        expect(data.EXT_ACTION).to.equal('OVERLEAF_SUBMISSION')
+        expect(formData.export_id).to.equal('3token')
+        expect(formData.submission_id).to.equal('4')
+        expect(formData.EXT_ACTION).to.equal('OVERLEAF_SUBMISSION')
       })
     })
 

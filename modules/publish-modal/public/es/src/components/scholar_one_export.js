@@ -17,16 +17,10 @@ export default class ScholarOneExport extends Component {
 
     initiateExport(entry, projectId)
       .then(({ exportId, token, submissionId }) => {
-        this.setState({ exportState: 'complete' })
-
-        $.ajax({
-          url: this.props.entry.export_url,
-          method: 'POST',
-          data: {
-            export_id: `${exportId}${token}`,
-            submission_id: submissionId,
-            EXT_ACTION: 'OVERLEAF_SUBMISSION'
-          }
+        this.setState({
+          exportState: 'complete',
+          exportId: `${exportId}${token}`,
+          submissionId: submissionId
         })
       })
       .catch(({ errorDetails }) => {
@@ -35,6 +29,22 @@ export default class ScholarOneExport extends Component {
           errorDetails
         })
       })
+  }
+
+  componentDidUpdate() {
+    if (this.state.exportState === 'complete') {
+      // When the completion form is rendered, submit it by clicking the submit
+      // button.
+      // This needs to be done via a form submission because ScholarOne will
+      // respond with their log in form html, which the browser will then
+      // render. It cannot be done via XHR.
+      // It needs to be button.click(), not a direct call to form.submit()
+      // because React's synthetic events system seems to propagate the submit
+      // event up to the window. This means that in the tests, we cannot prevent
+      // the event navigating the page, which is something that Karma does not
+      // like.
+      this.submitButton.click()
+    }
   }
 
   renderUninitiated(entry, projectId) {
@@ -84,7 +94,41 @@ export default class ScholarOneExport extends Component {
   }
 
   renderComplete() {
-    return <span data-testid="export-complete" />
+    return (
+      <form
+        action={this.props.entry.export_url}
+        method="post"
+        id="export_form"
+        data-testid="export-complete"
+      >
+        <input
+          id="export_id"
+          name="export_id"
+          type="hidden"
+          value={this.state.exportId}
+        />
+        <input
+          id="submission_id"
+          name="submission_id"
+          type="hidden"
+          value={this.state.submissionId}
+        />
+        <input
+          id="EXT_ACTION"
+          name="EXT_ACTION"
+          type="hidden"
+          value="OVERLEAF_SUBMISSION"
+        />
+        <button
+          style={{ display: 'none' }}
+          ref={button => {
+            this.submitButton = button
+          }}
+        >
+          Submit
+        </button>
+      </form>
+    )
   }
 
   renderError() {
