@@ -123,7 +123,8 @@ define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
         marker => marker.style.top === markerTopValue
       )
 
-      // Find the marker on the most left of that line, which we don't want to affect
+      // Find the marker on the most left of that line
+      // (Which we don't want to affect)
       const markersMatchingTopLefts = markersMatchingTop.map(marker =>
         parseInt(marker.style.left)
       )

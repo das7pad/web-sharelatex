@@ -235,9 +235,9 @@ define(['ace/ace', 'ide/editor/EditorShareJsCodec'], function(
         position.column
       )
       // Our delete marker is zero characters wide, but Ace doesn't draw ranges
-      // that are empty. So we monkey patch the range to tell Ace it's not empty.
-      // We do want to claim to be empty if we're off screen after clipping rows though.
-      // This is the code we need to trick:
+      // that are empty. So we monkey patch the range to tell Ace it's not empty
+      // We do want to claim to be empty if we're off screen after clipping rows
+      //  though. This is the code we need to trick:
       //   var range = marker.range.clipRows(config.firstRow, config.lastRow);
       //   if (range.isEmpty()) continue;
       ace_range.clipRows = function(first_row, last_row) {

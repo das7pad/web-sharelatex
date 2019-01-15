@@ -1,9 +1,7 @@
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+/* global _ */
+/* eslint-disable
+    camelcase,
+    max-len
  */
 define([
   'base',
@@ -27,20 +25,15 @@ define([
   'ide/files/services/files'
 ], function(
   App,
-  Ace,
   _ignore1,
   _ignore2,
   _ignore3,
-  UndoManager,
-  AutoCompleteManager,
   SpellCheckManager,
   SpellCheckAdapter,
-  HighlightsManager,
   CursorPositionManager,
   CursorPositionAdapter,
   TrackChangesManager,
-  TrackChangesAdapter,
-  MetadataManager
+  TrackChangesAdapter
 ) {
   let syntaxValidationEnabled
   const { EditSession } = ace.require('ace/edit_session')
@@ -70,16 +63,11 @@ define([
   }
 
   App.directive('aceEditor', function(
-    $timeout,
     $compile,
     $rootScope,
     event_tracking,
     localStorage,
     $cacheFactory,
-    metadata,
-    graphics,
-    preamble,
-    files,
     $http,
     $q,
     $window
@@ -169,8 +157,6 @@ define([
           )
         }
 
-        const undoManager = new UndoManager(scope, editor, element)
-        const highlightsManager = new HighlightsManager(scope, editor, element)
         const cursorPositionManager = new CursorPositionManager(
           scope,
           new CursorPositionAdapter(editor),
@@ -181,21 +167,6 @@ define([
           editor,
           element,
           new TrackChangesAdapter(editor)
-        )
-        const metadataManager = new MetadataManager(
-          scope,
-          editor,
-          element,
-          metadata
-        )
-        const autoCompleteManager = new AutoCompleteManager(
-          scope,
-          editor,
-          element,
-          metadataManager,
-          graphics,
-          preamble,
-          files
         )
 
         scope.$watch('onSave', function(callback) {
@@ -380,10 +351,6 @@ define([
             cursorPosition.row,
             cursorPosition.column
           )
-          const screenPos = editor.renderer.textToScreenCoordinates(
-            sessionPos.row,
-            sessionPos.column
-          )
           return (
             sessionPos.row * editor.renderer.lineHeight - session.getScrollTop()
           )
@@ -453,12 +420,21 @@ define([
         )
 
         scope.$watch('fontFamily', function(value) {
+          const monospaceFamilies = [
+            'Monaco',
+            'Menlo',
+            'Ubuntu Mono',
+            'Consolas',
+            'source-code-pro',
+            'monospace'
+          ]
+
           if (value != null) {
             switch (value) {
               case 'monaco':
                 return editor.setOption(
                   'fontFamily',
-                  '"Monaco", "Menlo", "Ubuntu Mono", "Consolas", "source-code-pro", monospace'
+                  monospaceFamilies.join(', ')
                 )
               case 'lucida':
                 return editor.setOption(
@@ -591,7 +567,9 @@ define([
           if (!spellCheckManager) return
           spellCheckManager.init()
           editor.on('changeSession', onSessionChangeForSpellCheck)
-          onSessionChangeForSpellCheck({ session: editor.getSession() }) // Force initial setup
+          onSessionChangeForSpellCheck({
+            session: editor.getSession()
+          }) // Force initial setup
           return editor.on('nativecontextmenu', spellCheckManager.onContextMenu)
         }
 
@@ -613,7 +591,9 @@ define([
           if (!trackChangesManager) return
           editor.on('changeSelection', trackChangesManager.onChangeSelection)
 
-          editor.on('change', trackChangesManager.onChangeSelection) // Selection also moves with updates elsewhere in the document
+          // Selection also moves with updates elsewhere in the document
+          editor.on('change', trackChangesManager.onChangeSelection)
+
           editor.on('changeSession', trackChangesManager.onChangeSession)
           editor.on('cut', trackChangesManager.onCut)
           editor.on('paste', trackChangesManager.onPaste)
@@ -650,7 +630,10 @@ define([
 
         const initCursorPosition = function() {
           editor.on('changeSession', onSessionChangeForCursorPosition)
-          onSessionChangeForCursorPosition({ session: editor.getSession() }) // Force initial setup
+
+          // Force initial setup
+          onSessionChangeForCursorPosition({ session: editor.getSession() })
+
           return $(window).on('unload', onUnloadForCursorPosition)
         }
 
@@ -711,8 +694,10 @@ define([
             session.setOption('useWorker', scope.syntaxValidation)
           }
 
+          // set to readonly until document change handlers are attached
+          editor.setReadOnly(true)
+
           // now attach session to editor
-          editor.setReadOnly(true) // set to readonly until document change handlers are attached
           editor.setSession(session)
 
           const doc = session.getDocument()
@@ -721,8 +706,10 @@ define([
           editor.initing = true
           sharejs_doc.attachToAce(editor)
           editor.initing = false
+
           // now ready to edit document
-          editor.setReadOnly(scope.readOnly) // respect the readOnly setting, normally false
+          // respect the readOnly setting, normally false
+          editor.setReadOnly(scope.readOnly)
           triggerEditorInitEvent()
           initSpellCheck()
           initTrackChanges()

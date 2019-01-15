@@ -1,5 +1,6 @@
 /* eslint-disable
-    camelcase
+    camelcase,
+    max-len
  */
 define([
   'ace/ace',
@@ -189,7 +190,8 @@ define([
     updateAnnotations() {
       // Doc updates with multiple ops, like search/replace or block comments
       // will call this with every individual op in a single event loop. So only
-      // do the first this loop, then schedule an update for the next loop for the rest.
+      // do the first this loop, then schedule an update for the next loop for
+      // the rest.
       if (!this._doneUpdateThisLoop) {
         this._doUpdateAnnotations()
         this._doneUpdateThisLoop = true
@@ -473,12 +475,14 @@ define([
         }
         const pasted_text = change.lines.join('\n')
         const paste_offset = this._rangeToShareJs(change.start)
-        // We have to wait until the change has been processed by the range tracker,
-        // since if we move the ops into place beforehand, they will be moved again
-        // when the changes are processed by the range tracker. This ranges:dirty
-        // event is fired after the doc has applied the changes to the range tracker.
+        // We have to wait until the change has been processed by the range
+        // tracker, since if we move the ops into place beforehand, they will be
+        // moved again when the changes are processed by the range tracker. This
+        // ranges:dirty event is fired after the doc has applied the changes to
+        // the range tracker.
         this.$scope.sharejsDoc.on('ranges:dirty.paste', () => {
-          this.$scope.sharejsDoc.off('ranges:dirty.paste') // Doc event emitter uses namespaced events
+          // Doc event emitter uses namespaced events
+          this.$scope.sharejsDoc.off('ranges:dirty.paste')
           if (
             pasted_text === this._cutState.text &&
             this.$scope.docId === this._cutState.docId
@@ -599,7 +603,6 @@ define([
     recalculateReviewEntriesScreenPositions() {
       const session = this.editor.getSession()
       const { renderer } = this.editor
-      const { firstRow, lastRow } = renderer.layerConfig
       const entries = this._getCurrentDocEntries()
       const object = entries || {}
       for (let entry_id in object) {
@@ -622,7 +625,11 @@ define([
 
     recalculateVisibleEntries() {
       const OFFSCREEN_ROWS = 20
-      const CULL_AFTER = 100 // With less than this number of entries, don't bother culling to avoid little UI jumps when scrolling.
+
+      // With less than this number of entries, don't bother culling to avoid
+      // little UI jumps when scrolling.
+      const CULL_AFTER = 100
+
       const { firstRow, lastRow } = this.editor.renderer.layerConfig
       const entries = this._getCurrentDocEntries() || {}
       const entriesLength = Object.keys(entries).length

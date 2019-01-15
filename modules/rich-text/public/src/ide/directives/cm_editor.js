@@ -1,3 +1,7 @@
+/* global _ */
+/* eslint-disable
+    no-use-before-define
+*/
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
