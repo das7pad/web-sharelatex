@@ -56,7 +56,7 @@ define([
         this._localStorageShowOnlyLabelsProjKey = `history.userPrefs.showOnlyLabels.${
           $scope.project_id
         }`
-
+        this._previouslySelectedPathname = null
         this.hardReset()
 
         this.$scope.toggleHistory = () => {
@@ -298,6 +298,17 @@ define([
           .get(url)
           .then(response => {
             this.$scope.history.selection.files = response.data.diff
+            for (let file of this.$scope.history.selection.files) {
+              if (file.newPathname != null) {
+                file.oldPathname = file.pathname
+                file.pathname = file.newPathname
+                delete file.newPathname
+              }
+            }
+            this.autoSelectFile()
+          })
+          .catch(err => {
+            console.error(err)
           })
           .finally(() => {
             this.$scope.history.loadingFileTree = false
@@ -309,7 +320,8 @@ define([
 
       selectFile(file) {
         if (file != null && file.pathname != null) {
-          this.$scope.history.selection.pathname = file.pathname
+          this.$scope.history.selection.pathname = this._previouslySelectedPathname =
+            file.pathname
           this.$scope.history.selection.file = file
           if (this.$scope.history.viewMode === HistoryViewModes.POINT_IN_TIME) {
             this.loadFileAtPointInTime()
@@ -317,6 +329,50 @@ define([
             this.reloadDiff()
           }
         }
+      }
+
+      autoSelectFile() {
+        let selectedPathname = null
+        let files = this.$scope.history.selection.files
+        let fileToSelect = null
+        let previouslySelectedFile = null
+        const orderedOpTypes = ['edited', 'added', 'renamed', 'removed']
+
+        if (this._previouslySelectedPathname != null) {
+          previouslySelectedFile = _.find(files, {
+            pathname: this._previouslySelectedPathname
+          })
+        }
+
+        if (previouslySelectedFile != null) {
+          fileToSelect = previouslySelectedFile
+        } else {
+          for (let opType of orderedOpTypes) {
+            let fileWithMatchingOpType = _.find(files, { operation: opType })
+            if (fileWithMatchingOpType != null) {
+              fileToSelect = fileWithMatchingOpType
+              break
+            }
+          }
+          if (fileToSelect == null) {
+            let mainFile = _.find(files, function(file) {
+              return /main\.tex$/.test(file.pathname)
+            })
+            if (mainFile != null) {
+              fileToSelect = mainFile
+            } else {
+              let anyTeXFile = _.find(files, function(file) {
+                return /\.tex$/.test(file.pathname)
+              })
+              if (anyTeXFile != null) {
+                fileToSelect = anyTeXFile
+              } else {
+                fileToSelect = files[0]
+              }
+            }
+          }
+        }
+        this.selectFile(fileToSelect)
       }
 
       autoSelectRecentUpdates() {
