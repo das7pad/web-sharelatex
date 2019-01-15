@@ -429,7 +429,7 @@ module.exports = (grunt) ->
 	grunt.registerTask 'compile:server', 'Compile the server side coffee script', ['clean:app', 'coffee:app', 'coffee:app_dir', 'compile:modules:server']
 	grunt.registerTask 'compile:client', 'Compile the client side coffee script', ['coffee:client', 'coffee:sharejs', 'wrap_sharejs', "compile:modules:client", 'compile:modules:inject_clientside_includes']
 	grunt.registerTask 'compile:css', 'Compile the less files to css', ['less', 'postcss:dist']
-	grunt.registerTask 'compile:minify', 'Concat and minify the client side js and css', ['requirejs', "file_append", "exec:cssmin_sl", "exec:cssmin_ol", "exec:cssmin_ol_light"]
+	grunt.registerTask 'compile:minify', 'Concat and minify the client side js', ['requirejs', "file_append"]
 	grunt.registerTask 'compile:unit_tests', 'Compile the unit tests', ['clean:unit_tests', 'coffee:unit_tests']
 	grunt.registerTask 'compile:acceptance_tests', 'Compile the acceptance tests', ['clean:acceptance_tests', 'coffee:acceptance_tests']
 	grunt.registerTask 'compile:smoke_tests', 'Compile the smoke tests', ['coffee:smoke_tests']
