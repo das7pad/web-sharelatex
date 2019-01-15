@@ -1,6 +1,7 @@
 logger = require 'logger-sharelatex'
 MetricsController = require './MetricsController'
-HubsController = require './HubsController'
+InstitutionHubsController = require './InstitutionHubsController'
+PublisherHubsController = require './PublisherHubsController'
 AnalyticsController = require("../../../../app/js/Features/Analytics/AnalyticsController")
 AuthenticationController = require("../../../../app/js/Features/Authentication/AuthenticationController")
 AuthorizationMiddlewear = require('../../../../app/js/Features/Authorization/AuthorizationMiddlewear')
@@ -19,54 +20,72 @@ module.exports =
 
 		webRouter.get(
 			'/metrics/teams/:id/?(:startDate/:endDate)?',
-			UserMembershipAuthorization.requireEntityAccess('team'),
+			UserMembershipAuthorization.requireTeamMetricsAccess,
 			MetricsController.teamMetrics
 		)
 
 		webRouter.get(
+			'/metrics/groups/:id/?(:startDate/:endDate)?',
+			UserMembershipAuthorization.requireGroupMetricsAccess,
+			(req, res, next) ->
+				if req.entity.overleaf?.id?
+					MetricsController.teamMetrics(req, res, next)
+				else
+					MetricsController.groupMetrics(req, res, next)
+		)
+
+		webRouter.get(
 			'/metrics/institutions/:id/?(:startDate/:endDate)?',
-			UserMembershipAuthorization.requireEntityAccess('institution'),
+			UserMembershipAuthorization.requireInstitutionMetricsAccess,
 			MetricsController.institutionMetrics
 		)
 
 		webRouter.get(
+			'/metrics/templates/:id/?(:startDate/:endDate)?',
+			UserMembershipAuthorization.requireTemplateMetricsAccess,
+			MetricsController.templateMetrics
+		)
+
+		webRouter.get(
 			'/graphs/licences',
-			AuthorizationMiddlewear.ensureUserIsSiteAdmin,
+			UserMembershipAuthorization.requireGraphAccess,
 			AnalyticsController.licences
 		)
 
 		webRouter.get(
 			'/graphs/(:graph)?',
-			(req, res, next) ->
-				UserMembershipAuthorization.requireEntityAccess(
-					req.query.resource_type,
-					req.query.resource_id
-				)(req, res, next)
+			UserMembershipAuthorization.requireGraphAccess,
 			MetricsController.analyticsProxy
 		)
 
 		webRouter.get(
 			'/institutions/:id/hub',
-			UserMembershipAuthorization.requireEntityAccess('institution'),
-			HubsController.institutionHub
+			UserMembershipAuthorization.requireInstitutionMetricsAccess,
+			InstitutionHubsController.institutionHub
 		)
 
 		webRouter.get(
 			'/institutions/:id/externalCollaboration',
-			UserMembershipAuthorization.requireEntityAccess('institution'),
-			HubsController.institutionExternalCollaboration
+			UserMembershipAuthorization.requireInstitutionMetricsAccess,
+			InstitutionHubsController.institutionExternalCollaboration
 		)
 
 		webRouter.get(
 			'/institutions/:id/departments',
-			UserMembershipAuthorization.requireEntityAccess('institution'),
-			HubsController.institutionDepartments
+			UserMembershipAuthorization.requireInstitutionMetricsAccess,
+			InstitutionHubsController.institutionDepartments
 		)
 
 		webRouter.get(
 			'/institutions/:id/roles',
-			UserMembershipAuthorization.requireEntityAccess('institution'),
-			HubsController.institutionRoles
+			UserMembershipAuthorization.requireInstitutionMetricsAccess,
+			InstitutionHubsController.institutionRoles
+		)
+
+		webRouter.get(
+			'/publishers/:id/hub',
+			UserMembershipAuthorization.requirePublisherMetricsAccess,
+			PublisherHubsController.publisherHub
 		)
 
 		privateApiRouter.get(

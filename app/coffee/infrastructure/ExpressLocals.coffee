@@ -16,6 +16,7 @@ hashedFiles = {}
 Path = require 'path'
 Features = require "./Features"
 Modules = require "./Modules"
+moment = require 'moment'
 
 jsPath =
 	if Settings.useMinifiedJs
@@ -45,16 +46,17 @@ pathList = [
 	"/stylesheets/style.css"
 	"/stylesheets/ol-style.css"
 	"/stylesheets/ol-light-style.css"
+	"/stylesheets/ol-ieee-style.css"
 ].concat(Modules.moduleAssetFiles(jsPath))
 
-if !Settings.useMinifiedJs 
+if !Settings.useMinifiedJs
 	logger.log "not using minified JS, not hashing static files"
 else
 	logger.log "Generating file hashes..."
 	for path in pathList
 		content = getFileContent(path)
 		hash = crypto.createHash("md5").update(content).digest("hex")
-		
+
 		splitPath = path.split("/")
 		filenameSplit = splitPath.pop().split(".")
 		filenameSplit.splice(filenameSplit.length-1, 0, hash)
@@ -125,7 +127,7 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 		res.locals.fullJsPath = Url.resolve(staticFilesBase, jsPath)
 		res.locals.lib = PackageVersions.lib
 
-
+		res.locals.moment = moment
 
 		res.locals.buildJsPath = (jsFile, opts = {})->
 			path = Path.join(jsPath, jsFile)
@@ -143,7 +145,7 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 
 			if opts.removeExtension == true
 				path = path.slice(0,-3)
-				
+
 			if qs? and qs.length > 0
 				path = path + "?" + qs
 			return path
@@ -157,20 +159,32 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 			else
 				return res.locals.buildJsPath(jsFile, opts)
 
-		res.locals.buildCssPath = (cssFile, opts)->
-			path = Path.join("/stylesheets/", cssFile)
-			if opts?.hashedPath && hashedFiles[path]?
+
+		IEEE_BRAND_ID = 15
+		res.locals.isIEEE = (brandVariation) ->
+			brandVariation?.brand_id == IEEE_BRAND_ID
+
+		_buildCssFileName = (themeModifier) ->
+			return "/" + Settings.brandPrefix + (if themeModifier then themeModifier else "") + "style.css"
+
+		res.locals.getCssThemeModifier = (userSettings, brandVariation) ->
+			# Themes only exist in OL v2
+			if Settings.overleaf?
+				# The IEEE theme takes precedence over the user personal setting, i.e. a user with
+				# a theme setting of "light" will still get the IEE theme in IEEE branded projects.
+				if res.locals.isIEEE(brandVariation)
+					themeModifier = "ieee-"
+				else if userSettings?.overallTheme?
+					themeModifier = userSettings.overallTheme
+			return themeModifier
+
+		res.locals.buildCssPath = (themeModifier, buildOpts) ->
+			cssFileName = _buildCssFileName themeModifier
+			path = Path.join("/stylesheets/", cssFileName)
+			if buildOpts?.hashedPath && hashedFiles[path]?
 				hashedPath = hashedFiles[path]
 				return Url.resolve(staticFilesBase, hashedPath)
 			return Url.resolve(staticFilesBase, path)
-
-		res.locals.buildCssFileNameForUser = (userSettings) ->
-			if userSettings?.overallTheme? and Settings.overleaf?
-				themeModifier = userSettings.overallTheme
-			return res.locals.buildCssFileName(themeModifier)
-
-		res.locals.buildCssFileName = (themeModifier) ->
-			return "/" + Settings.brandPrefix + (if themeModifier then themeModifier else "") + "style.css"
 
 		res.locals.buildImgPath = (imgFile)->
 			path = Path.join("/img/", imgFile)
@@ -182,8 +196,6 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 		)
 
 		next()
-
-
 
 	webRouter.use (req, res, next)->
 		res.locals.settings = Settings
@@ -212,6 +224,10 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 			user = AuthenticationController.getSessionUser(req)
 			email = user?.email or ""
 			return email
+		next()
+
+	webRouter.use (req, res, next) ->
+		res.locals.StringHelper = require('../Features/Helpers/StringHelper')
 		next()
 
 	webRouter.use (req, res, next)->
@@ -327,7 +343,7 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 
 	webRouter.use (req, res, next) ->
 		isOl = (Settings.brandPrefix == 'ol-')
-		res.locals.uiConfig = 
+		res.locals.uiConfig =
 			defaultResizerSizeOpen     : if isOl then 7 else 24
 			defaultResizerSizeClosed   : if isOl then 7 else 24
 			eastResizerCursor          : if isOl then "ew-resize" else null
@@ -344,10 +360,11 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 		next()
 
 	webRouter.use (req, res, next) ->
+		#TODO
 		if Settings.overleaf?
 			res.locals.overallThemes = [
-				{ name: "Default", val: "",       path: res.locals.buildCssPath(res.locals.buildCssFileName(), {hashedPath:true}) }
-				{ name: "Light",   val: "light-", path: res.locals.buildCssPath(res.locals.buildCssFileName("light-"), {hashedPath:true}) }
+				{ name: "Default", val: "",       path: res.locals.buildCssPath(null,     { hashedPath: true }) }
+				{ name: "Light",   val: "light-", path: res.locals.buildCssPath("light-", { hashedPath: true }) }
 			]
 		next()
 
@@ -355,4 +372,5 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 		res.locals.ExposedSettings =
 			isOverleaf: Settings.overleaf?
 			appName: Settings.appName
+			siteUrl: Settings.siteUrl
 		next()

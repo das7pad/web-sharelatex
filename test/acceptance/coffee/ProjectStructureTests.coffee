@@ -125,6 +125,7 @@ describe "ProjectStructureChanges", ->
 			MockDocUpdaterApi.clearProjectStructureUpdates()
 
 			zip_file = fs.createReadStream(Path.resolve(__dirname + '/../files/test_project.zip'))
+			@test_project_name = 'wombat'
 
 			req = @owner.request.post {
 				uri: "project/new/upload",
@@ -137,7 +138,7 @@ describe "ProjectStructureChanges", ->
 				@uploaded_project_id = JSON.parse(body).project_id
 				done()
 
-		it "should version the dosc created", ->
+		it "should version the docs created", ->
 			{docUpdates: updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(@uploaded_project_id)
 			expect(updates.length).to.equal(1)
 			update = updates[0]
@@ -154,6 +155,102 @@ describe "ProjectStructureChanges", ->
 			expect(update.pathname).to.equal("/1pixel.png")
 			expect(update.url).to.be.a('string');
 			expect(version).to.equal(2)
+
+	describe "uploading a project with a name", ->
+		before (done) ->
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			zip_file = fs.createReadStream(Path.resolve(__dirname + '/../files/test_project_with_name.zip'))
+			@test_project_name = 'wombat'
+
+			req = @owner.request.post {
+				uri: "project/new/upload",
+				formData:
+					qqfile: zip_file
+			}, (error, res, body) =>
+				throw error if error?
+				if res.statusCode < 200 || res.statusCode >= 300
+					throw new Error("failed to upload project #{res.statusCode}")
+				@uploaded_project_id = JSON.parse(body).project_id
+				done()
+
+		it "should set the project name from the zip contents", (done) ->
+			ProjectGetter.getProject @uploaded_project_id, (error, project) =>
+				expect(error).not.to.exist
+				expect(project.name).to.equal @test_project_name
+				done()
+
+	describe "uploading a project with an invalid name", ->
+		before (done) ->
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			zip_file = fs.createReadStream(Path.resolve(__dirname + '/../files/test_project_with_invalid_name.zip'))
+			@test_project_match = /^bad[^\\]+name$/
+
+			req = @owner.request.post {
+				uri: "project/new/upload",
+				formData:
+					qqfile: zip_file
+			}, (error, res, body) =>
+				throw error if error?
+				if res.statusCode < 200 || res.statusCode >= 300
+					throw new Error("failed to upload project #{res.statusCode}")
+				@uploaded_project_id = JSON.parse(body).project_id
+				done()
+
+		it "should set the project name from the zip contents", (done) ->
+			ProjectGetter.getProject @uploaded_project_id, (error, project) =>
+				expect(error).not.to.exist
+				expect(project.name).to.match @test_project_match
+				done()
+
+	describe "uploading a project with a shared top-level folder", ->
+		before (done) ->
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			zip_file = fs.createReadStream(Path.resolve(__dirname + '/../files/test_project_with_shared_top_level_folder.zip'))
+
+			@owner.request.post {
+				uri: "project/new/upload",
+				formData:
+					qqfile: zip_file
+			}, (error, res, body) =>
+				throw error if error?
+				if res.statusCode < 200 || res.statusCode >= 300
+					throw new Error("failed to upload project #{res.statusCode}")
+				@uploaded_project_id = JSON.parse(body).project_id
+				done()
+
+		it "should not create the top-level folder", (done) ->
+			ProjectGetter.getProject @uploaded_project_id, (error, project) ->
+				expect(error).not.to.exist
+				expect(project.rootFolder[0].folders.length).to.equal 0
+				expect(project.rootFolder[0].docs.length).to.equal 2
+				done()
+
+	describe "uploading a project with backslashes in the path names", ->
+		before (done) ->
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			zip_file = fs.createReadStream(Path.resolve(__dirname + '/../files/test_project_with_backslash_in_filename.zip'))
+
+			@owner.request.post {
+				uri: "project/new/upload",
+				formData:
+					qqfile: zip_file
+			}, (error, res, body) =>
+				throw error if error?
+				if res.statusCode < 200 || res.statusCode >= 300
+					throw new Error("failed to upload project #{res.statusCode}")
+				@uploaded_project_id = JSON.parse(body).project_id
+				done()
+
+		it "should treat the backslash as a directory separator", (done) ->
+			ProjectGetter.getProject @uploaded_project_id, (error, project) ->
+				expect(error).not.to.exist
+				expect(project.rootFolder[0].folders[0].name).to.equal('styles')
+				expect(project.rootFolder[0].folders[0].docs[0].name).to.equal('ao.sty')
+				done()
 
 	describe "uploading a file", ->
 		beforeEach (done) ->
@@ -243,11 +340,11 @@ describe "ProjectStructureChanges", ->
 		before (done) ->
 			@owner.request.post {
 				uri: "project/#{example_project_id}/folder",
-				formData:
+				json:
 					name: 'foo'
 			}, (error, res, body) =>
 				throw error if error?
-				example_folder_id_1 = JSON.parse(body)._id
+				example_folder_id_1 = body._id
 				done()
 
 		beforeEach (done) ->
@@ -311,11 +408,11 @@ describe "ProjectStructureChanges", ->
 		it "should version moving a folder", (done) ->
 			@owner.request.post {
 				uri: "project/#{example_project_id}/folder",
-				formData:
+				json:
 					name: 'bar'
 			}, (error, res, body) =>
 				throw error if error?
-				example_folder_id_2 = JSON.parse(body)._id
+				example_folder_id_2 = body._id
 
 				@owner.request.post {
 					uri: "project/#{example_project_id}/Folder/#{example_folder_id_1}/move",

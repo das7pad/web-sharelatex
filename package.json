@@ -10,10 +10,7 @@
     "public": "./public"
   },
   "scripts": {
-    "test:acceptance:wait_for_app": "echo 'Waiting for app to be accessible' && while (! curl -s -o /dev/null localhost:3000/status) do sleep 1; done",
-    "test:acceptance:run": "bin/acceptance_test $@",
-    "test:acceptance:dir": "npm -q run test:acceptance:wait_for_app && npm -q run test:acceptance:run -- $@",
-    "test:acceptance": "npm -q run test:acceptance:dir -- $@ test/acceptance/js",
+    "test:acceptance:run_dir": "mocha --recursive --reporter spec --timeout 15000 --exit $@",
     "test:unit": "npm -q run compile && bin/unit_test $@",
     "test:unit:app": "npm -q run compile && bin/unit_test_app $@",
     "test:frontend": "karma start",
@@ -24,7 +21,8 @@
     "webpack": "webpack-dev-server --config webpack.config.dev.js",
     "webpack:production": "webpack --config webpack.config.prod.js",
     "lint": "eslint -f unix .",
-    "format": "prettier-eslint '**/*.js' --list-different"
+    "format": "prettier-eslint '**/*.js' --list-different",
+    "format:fix": "prettier-eslint '**/*.js' --write"
   },
   "dependencies": {
     "archiver": "0.9.0",
@@ -70,7 +68,7 @@
     "mocha": "^5.0.1",
     "mongojs": "2.4.0",
     "mongoose": "4.11.4",
-    "multer": "^0.1.8",
+    "multer": "git+https://github.com/overleaf/multer.git",
     "node-html-encoder": "0.0.2",
     "nodemailer": "2.1.0",
     "nodemailer-mandrill-transport": "^1.2.0",
@@ -107,7 +105,7 @@
     "v8-profiler": "^5.2.3",
     "valid-url": "^1.0.9",
     "xml2js": "0.2.0",
-    "yauzl": "^2.8.0"
+    "yauzl": "^2.10.0"
   },
   "devDependencies": {
     "autoprefixer": "^6.6.1",
@@ -118,8 +116,8 @@
     "babel-preset-react": "^6.16.0",
     "bunyan": "0.22.1",
     "chai": "3.5.0",
-    "chai-spies": "",
-    "clean-css": "^3.4.18",
+    "chai-spies": "^1.0.0",
+    "clean-css-cli": "^4.2.1",
     "coffee-script": "^1.7.1",
     "es6-promise": "^4.0.5",
     "eslint": "^4.18.1",
@@ -143,7 +141,6 @@
     "grunt-cli": "^1.2.0",
     "grunt-contrib-clean": "0.5.0",
     "grunt-contrib-coffee": "0.10.0",
-    "grunt-contrib-less": "1.4.x",
     "grunt-contrib-requirejs": "0.4.1",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-env": "0.4.4",
@@ -155,7 +152,6 @@
     "grunt-mocha-test": "0.9.0",
     "grunt-newer": "^1.2.0",
     "grunt-parallel": "^0.5.1",
-    "grunt-postcss": "^0.8.0",
     "grunt-sed": "^0.1.1",
     "grunt-shell": "^2.1.0",
     "handlebars-loader": "^1.7.0",
@@ -166,9 +162,12 @@
     "karma-mocha-reporter": "^2.2.5",
     "karma-requirejs": "^1.1.0",
     "karma-webpack": "^2.0.9",
+    "less": "^2.7.3",
+    "less-plugin-autoprefix": "^2.0.0",
     "mkdirp": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.1.tgz",
     "nodemon": "^1.14.3",
     "prettier-eslint-cli": "^4.7.1",
+    "react-testing-library": "^5.4.2",
     "requirejs": "^2.1.22",
     "sandboxed-module": "0.2.0",
     "sinon": "^1.17.0",

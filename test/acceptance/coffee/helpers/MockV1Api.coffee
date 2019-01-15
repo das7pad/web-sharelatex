@@ -5,7 +5,11 @@ sinon = require 'sinon'
 
 app.use(bodyParser.json())
 
+v1Id = 1000
+
 module.exports = MockV1Api =
+	nextV1Id: -> v1Id++
+
 	users: { }
 
 	setUser: (id, user) ->
@@ -32,13 +36,45 @@ module.exports = MockV1Api =
 
 	existingEmails: []
 
+	brands: {}
+
+	brand_variations: {}
+
+	validation_clients: {}
+
 	setAffiliations: (affiliations) -> @affiliations = affiliations
+
+	doc_exported: {}
+
+	setDocExported: (token, info) -> @doc_exported[token] = info
 
 	run: () ->
 		app.get "/api/v1/sharelatex/users/:v1_user_id/plan_code", (req, res, next) =>
 			user = @users[req.params.v1_user_id]
 			if user
 				res.json user
+			else
+				res.sendStatus 404
+
+		app.get "/api/v1/sharelatex/users/:v1_user_id/subscriptions", (req, res, next) =>
+			user = @users[req.params.v1_user_id]
+			if user?.subscription?
+				res.json user.subscription
+			else
+				res.sendStatus 404
+
+		app.get "/api/v1/sharelatex/users/:v1_user_id/subscription_status", (req, res, next) =>
+			user = @users[req.params.v1_user_id]
+			if user?.subscription_status?
+				res.json user.subscription_status
+			else
+				res.sendStatus 404
+
+		app.delete "/api/v1/sharelatex/users/:v1_user_id/subscription", (req, res, next) =>
+			user = @users[req.params.v1_user_id]
+			if user?
+				user.canceled = true
+				res.sendStatus 200
 			else
 				res.sendStatus 404
 
@@ -59,11 +95,20 @@ module.exports = MockV1Api =
 		app.delete "/api/v2/users/:userId/affiliations/:email", (req, res, next) =>
 			res.sendStatus 204
 
+		app.get "/api/v2/brands/:slug", (req, res, next) =>
+			if brand = @brands[req.params.slug]
+				res.json brand
+			else
+				res.sendStatus 404
+
 		app.get '/universities/list', (req, res, next) ->
 			res.json []
 
 		app.get '/universities/list/:id', (req, res, next) ->
-			res.json id: parseInt(req.params.id)
+			res.json {
+				id: parseInt(req.params.id)
+				name: "Institution #{req.params.id}"
+			}
 
 		app.get '/university/domains', (req, res, next) ->
 			res.json []
@@ -89,13 +134,35 @@ module.exports = MockV1Api =
 				valid: false
 			}
 
+		app.get "/api/v2/partners/:partner/conversions/:id", (req, res, next) =>
+			partner = @validation_clients[req.params.partner]
+			conversion = partner?.conversions?[req.params.id]
+			if conversion?
+				res.status(200).json {input_file_uri: conversion, brand_variation_id: partner.brand_variation_id}
+			else
+				res.status(404).json {}
+
+		app.get "/api/v2/brand_variations/:id", (req, res, next) =>
+			variation = @brand_variations[req.params.id]
+			if variation?
+				res.status(200).json variation
+			else
+				res.status(404).json {}
+
+		app.get '/api/v1/sharelatex/docs/:token/is_published', (req, res, next) =>
+			res.json { allow: true }
+
+		app.get '/api/v1/sharelatex/users/:user_id/docs/:token/info', (req, res, next) =>
+			res.json { exported: false }
+
+		app.get '/api/v1/sharelatex/docs/:token/exported_to_v2', (req, res, next) =>
+			return res.json @doc_exported[req.params.token] if @doc_exported[req.params.token]?
+			res.json { exporting: false, exported: false }
+
 		app.listen 5000, (error) ->
 			throw error if error?
 		.on "error", (error) ->
 			console.error "error starting MockV1Api:", error.message
 			process.exit(1)
-		
-		app.get '/api/v1/sharelatex/docs/:token/info', (req, res, next) =>
-			res.json { allow: true, exported: false }
 
 MockV1Api.run()

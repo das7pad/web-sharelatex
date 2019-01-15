@@ -70,7 +70,7 @@ class User
 		options = {upsert: true, new: true, setDefaultsOnInsert: true}
 		UserModel.findOneAndUpdate filter, {}, options, (error, user) =>
 			return callback(error) if error?
-			AuthenticationManager.setUserPassword user._id, @password, (error) =>
+			AuthenticationManager.setUserPasswordInV2 user._id, @password, (error) =>
 				return callback(error) if error?
 				UserUpdater.updateUser user._id, $set: emails: @emails, (error) =>
 					return callback(error) if error?
@@ -317,5 +317,13 @@ class User
 				return callback(null, false)
 			else
 				return callback(new Error("unexpected status code from /user/personal_info: #{response.statusCode}"))
+
+	setV1Id: (v1Id, callback) ->
+		UserModel.update {
+			_id: @_id
+		}, {
+			overleaf:
+				id: v1Id
+		}, callback
 
 module.exports = User

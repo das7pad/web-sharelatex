@@ -393,7 +393,10 @@ define(['base'], function(App) {
           $scope.projects.push({
             name,
             _id: data.project_id,
-            accessLevel: 'owner'
+            accessLevel: 'owner',
+            owner: {
+              _id: window.user_id
+            }
             // TODO: Check access level if correct after adding it in
             // to the rest of the app
           })
@@ -688,13 +691,23 @@ define(['base'], function(App) {
 
     $scope.isLinkSharingProject = project => project.source === 'token'
 
+    $scope.hasGenericOwnerName = () => {
+      const { first_name, last_name, email } = $scope.project.owner
+      return !first_name && !last_name && !email
+    }
+
     $scope.ownerName = function() {
       if ($scope.project.accessLevel === 'owner') {
         return 'You'
       } else if ($scope.project.owner != null) {
-        return [$scope.project.owner.first_name, $scope.project.owner.last_name]
-          .filter(n => n != null)
-          .join(' ')
+        const { first_name, last_name, email } = $scope.project.owner
+        if (first_name || last_name) {
+          return [first_name, last_name].filter(n => n != null).join(' ')
+        } else if (email) {
+          return email
+        } else {
+          return 'An Overleaf v1 User'
+        }
       } else {
         return 'None'
       }

@@ -17,6 +17,8 @@ describe "V1LoginController", ->
 				@UserGetter = {}
 			"../../../../../app/js/Features/Authentication/AuthenticationController":
 				@AuthenticationController = {}
+			"../../../../../app/js/Features/Authentication/AuthenticationManager":
+				@AuthenticationManager = {}
 			"../../../../../app/js/Features/User/UserRegistrationHandler":
 				@UserRegistrationHandler = {}
 			"../../../../../app/js/Features/Newsletter/NewsletterManager":
@@ -43,6 +45,7 @@ describe "V1LoginController", ->
 			redirect: sinon.stub()
 		@res.status.returns(@res)
 		@next = sinon.stub()
+		@AuthenticationManager.validatePassword = sinon.stub()
 
 	describe "loginProfile", ->
 		beforeEach ->
@@ -92,6 +95,7 @@ describe "V1LoginController", ->
 					id: -1
 			@req.body =
 				newPassword1: @newPassword
+				newPassword2: @newPassword
 			@AuthenticationController.getSessionUser = sinon.stub().returns(@lightUser)
 			@UserGetter.getUser = sinon.stub().withArgs(@userid).callsArgWith(1, null, @user)
 			@V1LoginHandler.doPasswordChange = sinon.stub()
@@ -158,6 +162,38 @@ describe "V1LoginController", ->
 				expect(@res.json).to.be.calledWith message: {
 					type: 'error',
 					text: 'internal_error'
+				}
+
+		describe "when the new passwords do not match", ->
+			beforeEach ->
+				@req.body.newPassword2 = "#{@req.body.newPassword1}x"
+				@req.body.currentPassword = @oldPassword
+				@V1LoginController.doPasswordChange(@req, @res, @next)
+
+			it "should not try to change the password", ->
+				expect(@V1LoginHandler.doPasswordChange).not.to.be.called
+
+			it "should return an error", ->
+				expect(@res.json).to.be.calledWith message: {
+					type: 'error',
+					text: 'password_change_passwords_do_not_match'
+				}
+
+		describe "when the new password is invalid", ->
+			beforeEach ->
+				@req.body.newPassword1 = 'correct horse battery staple'
+				@req.body.newPassword2 = 'correct horse battery staple'
+				@req.body.currentPassword = @oldPassword
+				@AuthenticationManager.validatePassword = sinon.stub().returns { message: 'password contains invalid characters' }
+				@V1LoginController.doPasswordChange(@req, @res, @next)
+
+			it "should not try to change the password", ->
+				expect(@V1LoginHandler.doPasswordChange).not.to.be.called
+
+			it "should return an error", ->
+				expect(@res.json).to.be.calledWith message: {
+					type: 'error',
+					text: 'password contains invalid characters'
 				}
 
 	describe "_login", ->

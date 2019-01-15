@@ -17,7 +17,7 @@ import HighlightedWordManager from './spell_check/highlighted_word_manager'
 import * as textWrapping from './key_bindings/text_wrapping'
 
 export class Editor {
-  constructor (
+  constructor(
     rootEl,
     richTextAdapter,
     autocompleteAdapter,
@@ -46,64 +46,64 @@ export class Editor {
     makeKeyUpHandler(this.codeMirror)
   }
 
-  getCodeMirror () {
+  getCodeMirror() {
     return this.codeMirror
   }
 
-  openDoc (content) {
+  openDoc(content) {
     const newDoc = Doc(content, 'latex')
     this.codeMirror.swapDoc(newDoc)
 
     return newDoc
   }
 
-  enable () {
+  enable() {
     this.richText = new RichText(this.codeMirror, this.adapter)
     this.richText.enable()
   }
 
-  disable () {
+  disable() {
     this.richText.disable()
     tearDownKeyUpHandler(this.codeMirror)
   }
 
-  update () {
+  update() {
     this.richText.update()
   }
 
-  setReadOnly (readOnly) {
+  setReadOnly(readOnly) {
     this.codeMirror.setOption('readOnly', readOnly)
   }
 
-  wrapBold () {
+  wrapBold() {
     textWrapping.wrapBold(this.codeMirror)
   }
 
-  wrapItalic () {
+  wrapItalic() {
     textWrapping.wrapItalic(this.codeMirror)
   }
 
-  wrapSection () {
+  wrapSection() {
     textWrapping.wrapSection(this.codeMirror)
   }
 
-  wrapSubsection () {
+  wrapSubsection() {
     textWrapping.wrapSubsection(this.codeMirror)
   }
 
-  wrapInlineMath () {
+  wrapInlineMath() {
     textWrapping.wrapInlineMath(this.codeMirror)
   }
 
-  wrapDisplayMath () {
+  wrapDisplayMath() {
     textWrapping.wrapDisplayMath(this.codeMirror)
   }
 
-  wrapNumberedList () {
+  wrapNumberedList() {
     textWrapping.wrapNumberedList(this.codeMirror)
   }
 
-  wrapBulletList () {
+  wrapBulletList() {
     textWrapping.wrapBulletList(this.codeMirror)
   }
 }

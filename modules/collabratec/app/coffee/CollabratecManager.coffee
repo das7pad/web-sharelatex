@@ -1,22 +1,41 @@
+CollabratecApi = require "./CollabratecApi"
 DocMetadata = require "./DocMetadata"
 DocumentUpdaterHandler = require "../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler"
 Errors = require "../../../../app/js/Features/Errors/Errors"
 ObjectId = require("mongojs").ObjectId
 Path = require "path"
 ProjectCollabratecDetailsHandler = require "../../../../app/js/Features/Project/ProjectCollabratecDetailsHandler"
+ProjectDeleter = require "../../../../app/js/Features/Project/ProjectDeleter"
 ProjectDetailsHandler = require "../../../../app/js/Features/Project/ProjectDetailsHandler"
+ProjectDuplicator = require "../../../../app/js/Features/Project/ProjectDuplicator"
 ProjectEntityHandler = require "../../../../app/js/Features/Project/ProjectEntityHandler"
 ProjectEntityUpdateHandler = require "../../../../app/js/Features/Project/ProjectEntityUpdateHandler"
 ProjectGetter = require "../../../../app/js/Features/Project/ProjectGetter"
 ProjectRootDocManager = require "../../../../app/js/Features/Project/ProjectRootDocManager"
+ProjectUploadManager = require "../../../../app/js/Features/Uploads/ProjectUploadManager"
 Settings = require "settings-sharelatex"
 TemplatesManager = require "../../../../app/js/Features/Templates/TemplatesManager"
+UserGetter = require "../../../../app/js/Features/User/UserGetter"
 V1Api = require "../../../../app/js/Features/V1/V1Api"
 _ = require "lodash"
 async = require "async"
-request = require "request"
+fs = require "fs"
+logger = require "logger-sharelatex"
 
 module.exports = CollabratecManager =
+	cloneProject: (user, project_id, protect, new_collabratec_document_id, new_owner_collabratec_customer_id, collabratec_privategroup_id, callback) ->
+		ProjectGetter.getProject project_id, {name: 1}, (err, project) ->
+			return callback err if err?
+			ProjectDetailsHandler.generateUniqueName user._id, project.name, (err, project_name) ->
+				return callback err if err?
+				ProjectDuplicator.duplicate user, project_id, project_name, (err, project) ->
+					return callback err if err?
+					ProjectCollabratecDetailsHandler.initializeCollabratecProject project._id, user._id, new_collabratec_document_id,collabratec_privategroup_id, (err) ->
+						return callback err if err?
+						callback null, {
+							id: project._id,
+							url: "#{Settings.siteUrl}/project/#{project._id}"
+						}
 
 	createProject: (user_id, template_id, title, doc_abstract, keywords, primary_author, collabratec_document_id, collabratec_privategroup_id, callback) ->
 		options =
@@ -29,12 +48,15 @@ module.exports = CollabratecManager =
 				return callback err if err?
 				CollabratecManager._injectProjectMetadata user_id, project, title, doc_abstract, keywords, (err) ->
 					return callback err if err?
-					ProjectCollabratecDetailsHandler.initializeCollabratecProject project._id, title, user_id, collabratec_document_id,collabratec_privategroup_id, (err) ->
+					ProjectCollabratecDetailsHandler.initializeCollabratecProject project._id, user_id, collabratec_document_id,collabratec_privategroup_id, (err) ->
 						return callback err if err?
 						callback null, {
 							id: project._id,
 							url: "#{Settings.siteUrl}/project/#{project._id}"
 						}
+
+	deleteProject: (project_id, callback) ->
+		ProjectDeleter.archiveProject project_id, callback
 
 	getProjects: (user, token, current_page, page_size, search, callback) ->
 		async.parallel {
@@ -52,7 +74,7 @@ module.exports = CollabratecManager =
 					project.title.toLowerCase().match(search)
 			callback null, CollabratecManager._paginate(projects, current_page, page_size)
 
-	getProjectMetadata: (user, project_id, callback) ->
+	getProjectMetadata: (project_id, callback) ->
 		projection =
 			_id: 1
 			lastUpdated: 1
@@ -70,12 +92,62 @@ module.exports = CollabratecManager =
 						content = DocMetadata.contentFromLines(lines)
 						callback null, CollabratecManager._formatProjectMetadata(project, content)
 
+	getUserByCollabratecId: (collabratec_id, callback) ->
+		V1Api.request {
+			expectedStatusCodes: [404]
+			qs: { collabratec_id }
+			uri: "/api/v1/sharelatex/user_collabratec_id"
+		}, (err, response, body) ->
+			return callback err if err?
+			return callback null, null unless body?.id?
+			UserGetter.getUser {"overleaf.id": parseInt(body.id)}, (err, user) ->
+				callback err if err?
+				return callback null, user
+
+	linkProject: (project_id, user_id, collabratec_document_id, callback) ->
+		ProjectCollabratecDetailsHandler.linkCollabratecUserProject project_id, user_id, collabratec_document_id, (err) ->
+			return callback err if err?
+			CollabratecManager.getProjectMetadata project_id, callback
+
+	unlinkProject: (project_id, user_id, callback) ->
+		ProjectCollabratecDetailsHandler.unlinkCollabratecUserProject project_id, user_id, callback
+
+	uploadProject: (user_id, file, collabratec_document_id, collabratec_privategroup_id, callback) ->
+		name = Path.basename(file.originalname, ".zip")
+		ProjectUploadManager.createProjectFromZipArchive user_id, name, file.path, (err, project) ->
+			# always delete upload but continue on errors
+			fs.unlink file.path, (err) ->
+				logger.error { err }, "error deleting collabratec zip upload"
+			return callback err if err?
+			ProjectCollabratecDetailsHandler.initializeCollabratecProject project._id, user_id, collabratec_document_id, collabratec_privategroup_id, (err) ->
+				return callback err if err?
+				CollabratecManager.getProjectMetadata project._id, (err, project_metadata) ->
+					return callback err if err?
+					callback null, project, project_metadata
+
+	uploadProjectCallback: (collabratec_customer_id, collabratec_document_id, project_id, project_metadata, callback) ->
+		upload_status = if project_metadata? then "success" else "failure"
+		options =
+			json:
+				storageProviderId: project_id
+				viewerLink: project_metadata?.url
+				collabratecDocumentID: collabratec_document_id
+				documentTitle: project_metadata?.title
+				docAbstract: project_metadata?.doc_abstract
+				primaryAuthor: project_metadata?.primary_author
+				keyWords: project_metadata?.keywords
+				uploadStatus: upload_status
+				uploadMessages: []
+			method: "post"
+			uri: "/ext/v1/document/callback/overleaf/project"
+		CollabratecApi.request collabratec_customer_id, options, callback
+
 	_formatProjectMetadata: (project, content) ->
 		metadata =
 			title: project.name
 			created_at: new Date(project._id.getTimestamp()).getTime()
 			updated_at: new Date(project.lastUpdated).getTime()
-			url: "#{Settings.siteUrl}/project/#{project._id}"
+			url: CollabratecManager._projectUrl project._id
 		if (content?)
 			metadata.doc_abstract = DocMetadata.abstractFromContent content
 			metadata.primary_author = DocMetadata.firstAuthorFromContent content
@@ -83,21 +155,27 @@ module.exports = CollabratecManager =
 		return metadata
 
 	_formatV2Project: (project, user) ->
+		# continue to use v1 project id because collabratec may already have
+		# this in their system for this project
+		project_id = if project.overleaf?.id && project.tokens?.readAndWrite then project.tokens?.readAndWrite else project._id
 		collabratecProject = {
-			id: project._id
+			id: project_id
 			title: project.name
 			created_at: new Date(project._id.getTimestamp()).getTime()
 			updated_at: new Date(project.lastUpdated).getTime()
-			url: "#{Settings.siteUrl}/project/#{project._id}"
+			# always return the new v2 project url
+			url: CollabratecManager._projectUrl project._id
 		}
 
 		if (project.collabratecUsers?)
-			collabratecUser = project.collabratecUsers.find (collabratecUser) ->
-				return collabratecUser.user_id == user._id
+			# if is possible (though unlikely) to have multiple entries with different collabratec
+			# document ids for the same user so use reverse to find the most recently added entry
+			collabratecUser = project.collabratecUsers.reverse().find (collabratecUser) ->
+				return collabratecUser.user_id.toString() == user._id.toString()
 			if (collabratecUser?)
 				collabratecProject.collabratec_document_id = collabratecUser.collabratec_document_id
 				collabratecProject.collabratec_privategroup_id = collabratecUser.collabratec_privategroup_id
-				collabratecProject.owned_by_collabratec_service_account = collabratecUser.collabratec_privategroup_id?
+				collabratecProject.owned_by_collabratec_service_account = if collabratecUser.collabratec_privategroup_id? then "true" else "false"
 
 		return collabratecProject
 
@@ -112,8 +190,11 @@ module.exports = CollabratecManager =
 			callback null, body.projects
 
 	_getProjectsV2: (user, callback) ->
-		ProjectGetter.findAllUsersProjects user._id, 'name lastUpdated publicAccesLevel archived owner_ref tokens', (err, projects) ->
+		ProjectGetter.findAllUsersProjects user._id, 'name lastUpdated publicAccesLevel archived overleaf owner_ref tokens collabratecUsers', (err, projects) ->
 			projects = projects.owned.concat(projects.readAndWrite, projects.tokenReadAndWrite)
+			projects = projects.filter (project) ->
+				return false if project.archived
+				return true
 			projects = projects.map (project) ->
 				CollabratecManager._formatV2Project project, user
 			callback null, projects
@@ -136,3 +217,6 @@ module.exports = CollabratecManager =
 			paging: { current_page, total_pages, total_items }
 			projects: projects
 		}
+
+	_projectUrl: (project_id) ->
+		return "#{Settings.siteUrl}/org/ieee/collabratec/projects/#{project_id}"

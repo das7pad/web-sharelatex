@@ -122,14 +122,29 @@ module.exports = class Router
 			UserEmailsController.confirm
 		webRouter.post '/user/emails/resend_confirmation',
 			AuthenticationController.requireLogin(),
+			RateLimiterMiddlewear.rateLimit({
+				endpointName: "resend-confirmation"
+				maxRequests: 10
+				timeInterval: 60
+			}),
 			UserEmailsController.resendConfirmation
 
 		if Features.hasFeature 'affiliations'
 			webRouter.post '/user/emails',
 				AuthenticationController.requireLogin(),
+				RateLimiterMiddlewear.rateLimit({
+					endpointName: 'add-email',
+					maxRequests: 10
+					timeInterval: 60
+				}),
 				UserEmailsController.add
 			webRouter.post '/user/emails/delete',
 				AuthenticationController.requireLogin(),
+				RateLimiterMiddlewear.rateLimit({
+					endpointName: 'delete-email',
+					maxRequests: 10
+					timeInterval: 60
+				}),
 				UserEmailsController.remove
 			webRouter.post '/user/emails/default',
 				AuthenticationController.requireLogin(),
@@ -162,7 +177,7 @@ module.exports = class Router
 		webRouter.get  '/Project/:Project_id', RateLimiterMiddlewear.rateLimit({
 			endpointName: "open-project"
 			params: ["Project_id"]
-			maxRequests: 10
+			maxRequests: 15
 			timeInterval: 60
 		}), AuthorizationMiddlewear.ensureUserCanReadProject, ProjectController.loadEditor
 		webRouter.get  '/Project/:Project_id/file/:File_id', AuthorizationMiddlewear.ensureUserCanReadProject, FileStoreController.getFile
@@ -242,6 +257,7 @@ module.exports = class Router
 		webRouter.post "/project/:Project_id/doc/:doc_id/version/:version_id/restore", AuthorizationMiddlewear.ensureUserCanWriteProjectContent, HistoryController.selectHistoryApi, HistoryController.proxyToHistoryApi
 		webRouter.post '/project/:project_id/doc/:doc_id/restore', AuthorizationMiddlewear.ensureUserCanWriteProjectContent, HistoryController.restoreDocFromDeletedDoc
 		webRouter.post "/project/:project_id/restore_file", AuthorizationMiddlewear.ensureUserCanWriteProjectContent, HistoryController.restoreFileFromV2
+		webRouter.get  "/project/:project_id/version/:version/zip", AuthorizationMiddlewear.ensureUserCanReadProject, HistoryController.downloadZipOfVersion
 		privateApiRouter.post "/project/:Project_id/history/resync", AuthenticationController.httpAuth, HistoryController.resyncProjectHistory
 
 		webRouter.get "/project/:Project_id/labels", AuthorizationMiddlewear.ensureUserCanReadProject, HistoryController.selectHistoryApi, HistoryController.ensureProjectHistoryEnabled, HistoryController.getLabels
@@ -315,8 +331,14 @@ module.exports = class Router
 		# webRouter.post "/beta/opt-in", AuthenticationController.requireLogin(), BetaProgramController.optIn
 		# webRouter.post "/beta/opt-out", AuthenticationController.requireLogin(), BetaProgramController.optOut
 		webRouter.get "/confirm-password", AuthenticationController.requireLogin(), SudoModeController.sudoModePrompt
-		webRouter.post "/confirm-password", AuthenticationController.requireLogin(), SudoModeController.submitPassword
-
+		webRouter.post "/confirm-password",
+			AuthenticationController.requireLogin(),
+			RateLimiterMiddlewear.rateLimit({
+				endpointName: "confirm-password"
+				maxRequests: 10
+				timeInterval: 60
+			}),
+			SudoModeController.submitPassword
 
 		# New "api" endpoints. Started as a way for v1 to call over to v2 (for
 		# long-term features, as opposed to the nominally temporary ones in the
@@ -334,16 +356,6 @@ module.exports = class Router
 			AuthenticationController.httpAuth,
 			CompileController.getFileFromClsiWithoutUser
 		publicApiRouter.post '/api/institutions/confirm_university_domain', AuthenticationController.httpAuth, InstitutionsController.confirmDomain
-
-		webRouter.get '/teams', (req, res, next) ->
-			# Match v1 behaviour - if the user is signed in, show their teams list
-			# Otherwise show some information about teams
-			if AuthenticationController.isUserLoggedIn(req)
-				res.redirect('/user/subscription')
-			else if Settings.overleaf?.host
-				res.redirect("#{Settings.overleaf.host}/teams")
-			else
-				next()
 
 		webRouter.get '/chrome', (req, res, next) ->
 			# Match v1 behaviour - this is used for a Chrome web app
@@ -438,7 +450,7 @@ module.exports = class Router
 		webRouter.get '/read/:read_only_token([a-z]+)',
 			RateLimiterMiddlewear.rateLimit({
 				endpointName: 'read-only-token',
-				maxRequests: 10,
+				maxRequests: 15,
 				timeInterval: 60
 			}),
 			TokenAccessController.readOnlyToken
@@ -446,7 +458,7 @@ module.exports = class Router
 		webRouter.get '/:read_and_write_token([0-9]+[a-z]+)',
 			RateLimiterMiddlewear.rateLimit({
 				endpointName: 'read-and-write-token',
-				maxRequests: 10,
+				maxRequests: 15,
 				timeInterval: 60
 			}),
 			TokenAccessController.readAndWriteToken

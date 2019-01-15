@@ -8,6 +8,8 @@ _ = require("underscore")
 PublicAccessLevels = require("../Authorization/PublicAccessLevels")
 Errors = require("../Errors/Errors")
 ProjectTokenGenerator = require('./ProjectTokenGenerator')
+ProjectHelper = require('./ProjectHelper')
+settings = require('settings-sharelatex')
 
 module.exports = ProjectDetailsHandler =
 	getDetails: (project_id, callback)->
@@ -22,7 +24,7 @@ module.exports = ProjectDetailsHandler =
 					name : project.name
 					description: project.description
 					compiler: project.compiler
-					features: user.features
+					features: user?.features or settings.defaultFeatures
 
 				if project.overleaf?
 					details.overleaf = project.overleaf
@@ -74,13 +76,7 @@ module.exports = ProjectDetailsHandler =
 		if arguments.length is 3 && typeof suffixes is 'function' # make suffixes an optional argument
 			callback = suffixes
 			suffixes = []
-		timestamp = new Date().toISOString().replace(/T(\d+):(\d+):(\d+)\..*/,' $1$2$3') # strip out unwanted characters
-		ProjectDetailsHandler.ensureProjectNameIsUnique user_id, name, suffixes.concat(" (#{timestamp})"), callback
-
-	_addSuffixToProjectName: (name, suffix = '') ->
-		# append the suffix and truncate the project title if needed
-		truncatedLength = ProjectDetailsHandler.MAX_PROJECT_NAME_LENGTH - suffix.length
-		return name.substr(0, truncatedLength) + suffix
+		ProjectDetailsHandler.ensureProjectNameIsUnique user_id, name, suffixes, callback
 
 	# FIXME: we should put a lock around this to make it completely safe, but we would need to do that at
 	# the point of project creation, rather than just checking the name at the start of the import.
@@ -93,21 +89,7 @@ module.exports = ProjectDetailsHandler =
 			# allUsersProjectNames is returned as a hash {owned: [name1, name2, ...], readOnly: [....]}
 			# collect all of the names and flatten them into a single array
 			projectNameList = _.pluck(_.flatten(_.values(allUsersProjectNames)),'name')
-			# create a set of all project names
-			allProjectNames = new Set()
-			for projectName in projectNameList
-				allProjectNames.add(projectName)
-			isUnique = (x) -> !allProjectNames.has(x)
-			# check if the supplied name is already unique
-			if isUnique(name)
-				return callback(null, name, false)
-			# the name already exists, try adding the user-supplied suffixes to generate a unique name
-			for suffix in suffixes
-				candidateName = ProjectDetailsHandler._addSuffixToProjectName(name, suffix)
-				if isUnique(candidateName)
-					return callback(null, candidateName, true)
-			# we couldn't make the name unique, something is wrong
-			return callback new Errors.InvalidNameError("Project name could not be made unique")
+			ProjectHelper.ensureNameIsUnique projectNameList, name, suffixes, ProjectDetailsHandler.MAX_PROJECT_NAME_LENGTH, callback
 	
 	fixProjectName: (name) ->
 		if name == "" || !name

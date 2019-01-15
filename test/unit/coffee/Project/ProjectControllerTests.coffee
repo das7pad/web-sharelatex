@@ -22,7 +22,7 @@ describe "ProjectController", ->
 				chat:
 					url:"chat.com"
 			siteUrl: "mysite.com"
-		@brandVariationDetails = 
+		@brandVariationDetails =
 			id: "12"
 			active: true
 			brand_name: "The journal"
@@ -79,13 +79,15 @@ describe "ProjectController", ->
 			ipMatcherAffiliation: sinon.stub().returns({create: sinon.stub()})
 		@UserGetter =
 			getUser: sinon.stub().callsArgWith 2, null, {lastLoginIp: '192.170.18.2'}
+			getUserOrUserStubById: sinon.stub().callsArgWith 2, null, {}
 		@Modules =
 			hooks:
 				fire: sinon.stub()
 		@Features =
 			hasFeature: sinon.stub()
-		@BrandVariationsHandler = 
+		@BrandVariationsHandler =
 			getBrandVariationById: sinon.stub().callsArgWith 1, null, @brandVariationDetails
+		@getUserAffiliations = sinon.stub().callsArgWith(1, null, [])
 
 		@ProjectController = SandboxedModule.require modulePath, requires:
 			"settings-sharelatex":@settings
@@ -121,6 +123,8 @@ describe "ProjectController", ->
 			"../Notifications/NotificationsBuilder":@NotificationBuilder
 			"../User/UserGetter": @UserGetter
 			"../BrandVariations/BrandVariationsHandler": @BrandVariationsHandler
+			'../Institutions/InstitutionsAPI':
+				getUserAffiliations: @getUserAffiliations
 
 		@projectName = "£12321jkj9ujkljds"
 		@req =
@@ -300,6 +304,8 @@ describe "ProjectController", ->
 					first_name: 'Henry'
 			@users[@user._id] = @user # Owner
 			@UserModel.findById = (id, fields, callback) =>
+				callback null, @users[id]
+			@UserGetter.getUserOrUserStubById = (id, fields, callback) =>
 				callback null, @users[id]
 
 			@LimitationsManager.hasPaidSubscription.callsArgWith(1, null, false)
@@ -736,5 +742,3 @@ describe "ProjectController", ->
 				false,
 				false
 			]
-
-

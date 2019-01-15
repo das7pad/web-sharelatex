@@ -4,6 +4,12 @@ v1Api =
 module.exports =
 	enableSubscriptions: true
 
+	apis:
+		recurly:
+			# Set up our own mock recurly server
+			url: 'http://localhost:6034'
+			subdomain: 'test'
+
 	# for registration via SL, set enableLegacyRegistration to true
 	# for registration via Overleaf v1, set enableLegacyLogin to true
 
@@ -119,9 +125,6 @@ module.exports =
 			methods: ['get', 'post'],
 			path: '/destination/get_and_post'
 		}
-
-	overleaf:
-		host: "http://overleaf.test:5000"
 
 	redirects:
 		'/redirect/one': '/destination/one',

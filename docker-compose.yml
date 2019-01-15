@@ -5,10 +5,9 @@ volumes:
 
 services:
   test_acceptance:
-    image: node:6.9.5
+    image: node:6.15.1
     volumes:
-      - .:/app:ro
-      - data:/app/data:rw
+      - .:/app
     working_dir: /app
     environment:
       REDIS_HOST: redis
@@ -17,13 +16,13 @@ services:
       PROJECT_HISTORY_ENABLED: 'true'
       ENABLED_LINKED_FILE_TYPES: 'url'
       LINKED_URL_PROXY: 'http://localhost:6543'
-      ENABLED_LINKED_FILE_TYPES: 'url,project_file,project_output_file,mendeley'
+      ENABLED_LINKED_FILE_TYPES: 'url,project_file,project_output_file,mendeley,zotero'
       SHARELATEX_CONFIG: /app/test/acceptance/config/settings.test.coffee
       NODE_ENV: production
     depends_on:
       - redis
       - mongo
-    command: node app.js
+    command: npm run test:acceptance:app
 
   test_frontend:
     build:

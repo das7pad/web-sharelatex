@@ -4,18 +4,26 @@ Errors = require('../Errors/Errors')
 EntityModels =
 	Institution: require('../../models/Institution').Institution
 	Subscription: require('../../models/Subscription').Subscription
+	Publisher: require('../../models/Publisher').Publisher
 UserMembershipViewModel = require('./UserMembershipViewModel')
 UserGetter = require('../User/UserGetter')
 logger = require('logger-sharelatex')
+UserMembershipEntityConfigs = require "./UserMembershipEntityConfigs"
 
 module.exports =
-	getEntity: (entityId, entityConfig, loggedInUser, callback = (error, entity) ->) ->
-		entityId = ObjectId(entityId) if ObjectId.isValid(entityId.toString())
-		query = Object.assign({}, entityConfig.baseQuery)
-		query[entityConfig.fields.primaryKey] = entityId
-		unless loggedInUser.isAdmin
+	getEntity: (entityId, entityConfig, loggedInUser, requiredStaffAccess, callback = (error, entity) ->) ->
+		query = buildEntityQuery(entityId, entityConfig)
+		unless loggedInUser.isAdmin or loggedInUser.staffAccess?[requiredStaffAccess]
 			query[entityConfig.fields.access] = ObjectId(loggedInUser._id)
 		EntityModels[entityConfig.modelName].findOne query, callback
+
+	getEntityWithoutAuthorizationCheck: (entityId, entityConfig, callback = (error, entity) ->) ->
+		query = buildEntityQuery(entityId, entityConfig)
+		EntityModels[entityConfig.modelName].findOne query, callback
+
+	createEntity: (entityId, entityConfig, callback = (error, entity) ->) ->
+		data = buildEntityQuery(entityId, entityConfig)
+		EntityModels[entityConfig.modelName].create data, callback
 
 	getUsers: (entity, entityConfig, callback = (error, users) ->) ->
 		attributes = entityConfig.fields.read
@@ -39,6 +47,15 @@ module.exports =
 			return callback(isAdmin: true)
 		removeUserFromEntity entity, attribute, userId, callback
 
+	getEntitiesByUser: (entityConfig, userId, callback = (error, entities) ->) ->
+		query = Object.assign({}, entityConfig.baseQuery)
+		query[entityConfig.fields.access] = userId
+		EntityModels[entityConfig.modelName].find query, (error, entities = []) ->
+			return callback(error) if error?
+			async.mapSeries entities,
+				(entity, cb) -> entity.fetchV1Data(cb),
+				callback
+
 getPopulatedListOfMembers = (entity, attributes, callback = (error, users)->)->
 		userObjects = []
 
@@ -61,3 +78,9 @@ removeUserFromEntity = (entity, attribute, userId, callback = (error)->) ->
 	fieldUpdate = {}
 	fieldUpdate[attribute] = userId
 	entity.update { $pull: fieldUpdate }, callback
+
+buildEntityQuery = (entityId, entityConfig, loggedInUser) ->
+	entityId = ObjectId(entityId) if ObjectId.isValid(entityId.toString())
+	query = Object.assign({}, entityConfig.baseQuery)
+	query[entityConfig.fields.primaryKey] = entityId
+	query

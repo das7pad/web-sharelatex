@@ -3,7 +3,6 @@ logger = require 'logger-sharelatex'
 GitBridgeHandler = require './GitBridgeHandler'
 GitBridgeErrors = require './GitBridgeErrors'
 
-
 module.exports = GitBridgeController =
 
 	getLatestProjectVersion: (req, res, next) ->
@@ -15,8 +14,12 @@ module.exports = GitBridgeController =
 			res.json(data)
 
 	showSavedVers: (req, res, next) ->
-		# No saved vers, for now
-		return res.json([])
+		projectId = req.params['project_id']
+		userId = req.oauth_user._id
+		logger.log {projectId, userId}, "[GitBridgeController] getting saved-vers for project"
+		GitBridgeHandler.getSavedVers userId, projectId, (err, data) ->
+			return GitBridgeController._handleError(err, req, res, next) if err?
+			res.json(data)
 
 	showSnapshot: (req, res, next) ->
 		projectId = req.params['project_id']

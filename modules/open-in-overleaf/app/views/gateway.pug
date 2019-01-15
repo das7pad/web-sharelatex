@@ -1,21 +1,38 @@
 extends ../../../../app/views/layout
 
 block vars
-	- var suppressNavContentLinks = true
+	- var suppressNavbar = true
+	- var suppressFooter = true
 
 block content
-	script(type="text/javascript").
+	script.
 		$(document).ready(function () {
-			$('#create_form').submit();
+			setTimeout(function() {
+				$('.loading-screen-brand').css('height', '20%')
+			}, 500);
 		});
 
-	form(method="POST", id="create_form", action="/docs" novalidate)
-		input(type="hidden", name="_csrf", value=csrfToken)
+	script(type="template", id="overleaf-gateway-data")!= StringHelper.stringifyJsonForScript({params: form_data, action: action, target: target, csrfToken: csrfToken, error: error})
 
-	.container
-		.row
-			.col-md-6.col-md-offset-3
-				.card
+	.editor.full-size(
+			ng-controller="OpenInOverleafGatewayController",
+			ng-init="handleGateway();"
+		)
+		.loading-screen(ng-hide="error || serverError")
+			.loading-screen-brand-container
+				.loading-screen-brand
+			h3.loading-screen-label() #{translate('loading_content')}
+				span.loading-screen-ellip .
+				span.loading-screen-ellip .
+				span.loading-screen-ellip .
+		.container(ng-show="error || serverError" ng-cloak)
+			.row
+				.col-md-8.col-md-offset-2
 					.page-header
 						h1 #{translate('loading_content')}
-						p #{translate('opening_your_content_please_wait')}
+					.message
+						p #{translate('there_was_an_error_opening_your_content')}
+					.errors
+						.alert.alert-danger(ng-show="error" ng-cloak) #{translate('sorry_something_went_wrong_opening_the_document_please_try_again')}
+						.alert.alert-danger(ng-show="serverError" ng-cloak) {{serverError}}
+						a.error-btn(href="/") Home

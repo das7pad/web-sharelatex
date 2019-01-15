@@ -26,7 +26,19 @@
 				ng-click="openUploadProjectModal()"
 			) #{translate("upload_project")}
 		!= moduleIncludes("newProjectMenu", locals)
+
+		if portalTemplates.length > 0
+			//- portalTemplates is set in ProjectController
+			li.divider
+			li.dropdown-header #{translate("institution")} #{translate("templates")}
+			for portal in portalTemplates
+				li
+					a.menu-indent(href=portal.url + "#templates") #{portal.name}
+
+
+
 		if (templates)
+			//- templates is an express local var, via settings.templateLinks
 			li.divider
 			li.dropdown-header #{translate("templates")}
 			each item in templates
@@ -52,7 +64,7 @@
 			h2 #{translate("tags_slash_folders")}
 		li.tag(ng-cloak)
 			a.tag-name(href, ng-click="openNewTagModal()")
-				i.fa.fa-fw.fa-plus(aria-hidden)
+				i.fa.fa-fw.fa-plus(aria-hidden="true")
 				span.name #{translate("new_folder")}
 		li.tag(
 			ng-repeat="tag in tags | orderBy:'name'",
@@ -66,7 +78,7 @@
 						'fa-folder-open-o': tag.selected,\
 						'fa-folder-o': !tag.selected\
 					}"
-					aria-hidden
+					aria-hidden="true"
 				)
 				span.name {{tag.name}} 
 					span.subdued  ({{tag.project_ids.length}})
@@ -108,7 +120,7 @@
 .row-spaced(ng-if="projects.length == 0", ng-cloak)
 	.first-project
 		div
-			i.fa.fa-arrow-up.fa-2x(aria-hidden)
+			i.fa.fa-arrow-up.fa-2x(aria-hidden="true")
 		div
 			strong #{translate("create_your_first_project")}
 			
@@ -137,5 +149,3 @@
 			
 script.
 	window.userHasNoSubscription = #{!!(settings.enableSubscriptions && !hasSubscription)}
-
-

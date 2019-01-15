@@ -39,27 +39,37 @@ export function initiateExport(entry, projectId, _this) {
   }
 
   _this.setState({ exportState: 'initiated' })
-  $.ajax({
-    url: link,
-    type: 'POST',
-    data: data,
-    headers: { 'X-CSRF-Token': window.csrfToken },
-    success: resp => {
+  startExport(link, data)
+    .then(resp => {
       _this.setState({ exportId: resp.export_v1_id })
       pollExportStatus(resp.export_v1_id, projectId, _this, 1000)
-    },
-    error: resp => {
+    })
+    .catch(resp => {
       _this.setState({ exportState: 'error' })
-    }
+    })
+}
+
+function startExport(url, data) {
+  return new Promise((resolve, reject) => {
+    $.ajax({
+      url,
+      type: 'POST',
+      data,
+      headers: { 'X-CSRF-Token': window.csrfToken }
+    })
+      .done(resolve)
+      .fail(reject)
   })
 }
 
 function pollExportStatus(exportId, projectId, _this, timeout) {
-  var link = `/project/${projectId}/export/${exportId}`
+  var siteUrl = window.ExposedSettings.siteUrl
+  var link = `${siteUrl}/project/${projectId}/export/${exportId}`
   $.ajax({
     url: link,
-    type: 'GET',
-    success: resp => {
+    type: 'GET'
+  })
+    .done(resp => {
       const status = resp.export_json
       if (status.status_summary === 'failed') {
         _this.setState({
@@ -69,7 +79,19 @@ function pollExportStatus(exportId, projectId, _this, timeout) {
       } else if (status.status_summary === 'succeeded') {
         _this.setState({
           exportState: 'complete',
+          // for ScholarOne
           partner_submission_id: status.partner_submission_id,
+          // for F1000/Wellcome
+          authorEmail: status.v2_user_email,
+          authorName: [
+            status.v2_user_first_name,
+            status.v2_user_last_name
+          ].join(' '),
+          title: status.title,
+          articleZipURL: link + '/zip',
+          pdfURL: link + '/pdf',
+          revisionURL: `${siteUrl}/exports/${exportId}${status.token}/revise`,
+          // general-purpose
           token: status.token
         })
       } else {
@@ -80,9 +102,8 @@ function pollExportStatus(exportId, projectId, _this, timeout) {
           pollExportStatus(exportId, projectId, _this, timeout)
         }, timeout)
       }
-    },
-    error: resp => {
+    })
+    .fail(resp => {
       _this.setState({ exportState: 'error' })
-    }
-  })
+    })
 }

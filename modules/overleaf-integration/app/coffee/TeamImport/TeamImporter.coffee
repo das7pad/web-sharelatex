@@ -1,5 +1,6 @@
 logger = require "logger-sharelatex"
 UserMapper = require "../OverleafUsers/UserMapper"
+OverleafAuthenticationManager = require "../Authentication/OverleafAuthenticationManager"
 SubscriptionUpdater = require "../../../../../app/js/Features/Subscription/SubscriptionUpdater"
 TeamInvitesHandler = require "../../../../../app/js/Features/Subscription/TeamInvitesHandler"
 SubscriptionLocator = require("../../../../../app/js/Features/Subscription/SubscriptionLocator")
@@ -22,10 +23,10 @@ importTeam = (origV1Team, callback = (error, v2TeamId) ->) ->
 		callback(null, v2Team)
 
 createV2Team = (v1Team, callback = (error, v1Team, v2Team) ->) ->
-	UserGetter.getUser { 'overleaf.id': v1Team.owner.id }, { _id: 1 }, (error, teamAdmin) ->
+	OverleafAuthenticationManager.setupUser v1Team.owner, (error, teamAdmin) ->
 		return callback(error) if error?
 		teamAdminId = teamAdmin?._id
-		return callback(new Errors.UserNotFoundError('Team admin does not exist in v2')) unless teamAdminId?
+		return callback(new Errors.UserNotFoundError('Team admin cannot be created in v2')) unless teamAdminId?
 
 		SubscriptionLocator.getUsersSubscription teamAdminId, (error, existingSubscription) ->
 			return callback(error) if error?
@@ -36,9 +37,11 @@ createV2Team = (v1Team, callback = (error, v1Team, v2Team) ->) ->
 					id: v1Team.id
 				teamName: v1Team.name
 				admin_id: teamAdminId
+				manager_ids: [teamAdminId]
 				groupPlan: true
 				planCode: "v1_#{v1Team.plan_name}"
 				membersLimit: v1Team.n_licences
+				customAccount: true
 			)
 
 			subscription.save (error) ->
@@ -52,8 +55,8 @@ importTeamMembers = (v1Team, v2Team, callback = (error, v1Team, v2Team) ->) ->
 
 		memberIds = memberIds.map (mId) -> mId.toString()
 
-		SubscriptionUpdater.addUsersToGroup v2Team._id, memberIds, (error, updated) ->
-			callback(error) if error?
+		SubscriptionUpdater.addUsersToGroupWithoutFeaturesRefresh v2Team._id, memberIds, (error) ->
+			return callback(error) if error?
 			logger.log {memberIds}, "[TeamImporter] Members added to the team #{v2Team.id}"
 			callback(null, v1Team, v2Team)
 
@@ -63,7 +66,7 @@ importPendingInvites = (v1Team, v2Team, callback = (error, v1Team, v2Team) ->) -
 		TeamInvitesHandler.importInvite(v2Team, v1Team.name, pendingInvite.email,
 			pendingInvite.code, pendingInvite.updated_at, cb)
 
-	async.map v1Team.pending_invites, importInvite, (error, invites) ->
+	async.mapSeries v1Team.pending_invites, importInvite, (error, invites) ->
 		callback(error, v1Team, v2Team)
 
 importTeamManagers = (v1Team, v2Team, callback = (error, v1Team, v2Team) ->) ->

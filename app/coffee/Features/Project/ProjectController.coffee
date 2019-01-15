@@ -32,6 +32,8 @@ crypto = require 'crypto'
 { V1ConnectionError } = require '../Errors/Errors'
 Features = require('../../infrastructure/Features')
 BrandVariationsHandler = require("../BrandVariations/BrandVariationsHandler")
+{ getUserAffiliations } = require("../Institutions/InstitutionsAPI")
+V1Handler = require "../V1/V1Handler"
 
 module.exports = ProjectController =
 
@@ -198,6 +200,8 @@ module.exports = ProjectController =
 					return cb(error, hasPaidSubscription)
 			user: (cb) ->
 				User.findById user_id, "featureSwitches overleaf awareOfV2 features", cb
+			userAffiliations: (cb) ->
+				getUserAffiliations user_id, cb
 			}, (err, results)->
 				if err?
 					logger.err err:err, "error getting data for project list page"
@@ -208,8 +212,10 @@ module.exports = ProjectController =
 				notifications = require("underscore").map results.notifications, (notification)->
 					notification.html = req.i18n.translate(notification.templateKey, notification.messageOpts)
 					return notification
+				portalTemplates = ProjectController._buildPortalTemplatesList results.userAffiliations
 				projects = ProjectController._buildProjectList results.projects, results.v1Projects?.projects
 				user = results.user
+				userAffiliations = results.userAffiliations
 				warnings = ProjectController._buildWarningsList results.v1Projects
 
 				# in v2 add notifications for matching university IPs
@@ -226,7 +232,9 @@ module.exports = ProjectController =
 						projects: projects
 						tags: tags
 						notifications: notifications or []
+						portalTemplates: portalTemplates
 						user: user
+						userAffiliations: userAffiliations
 						hasSubscription: results.hasSubscription
 						isShowingV1Projects: results.v1Projects?
 						warnings: warnings
@@ -270,8 +278,16 @@ module.exports = ProjectController =
 			project: (cb)->
 				ProjectGetter.getProject(
 					project_id,
-					{ name: 1, lastUpdated: 1, track_changes: 1, owner_ref: 1, brandVariationId: 1, 'overleaf.history.display': 1 },
-					cb
+					{ name: 1, lastUpdated: 1, track_changes: 1, owner_ref: 1, brandVariationId: 1, overleaf: 1, tokens: 1 },
+					(err, project) ->
+						return cb(err) if err?
+						return cb(null, project) unless project.overleaf?.id? and project.tokens?.readAndWrite? and Settings.projectImportingCheckMaxCreateDelta?
+						createDelta = (new Date().getTime() - new Date(project._id.getTimestamp()).getTime()) / 1000
+						return cb(null, project) unless createDelta < Settings.projectImportingCheckMaxCreateDelta
+						V1Handler.getDocExported project.tokens.readAndWrite, (err, doc_exported) ->
+							return next err if err?
+							project.exporting = doc_exported.exporting
+							cb(null, project)
 				)
 			user: (cb)->
 				if !user_id?
@@ -309,7 +325,7 @@ module.exports = ProjectController =
 			user = results.user
 			subscription = results.subscription
 			brandVariation = results.brandVariation
-			
+
 			daysSinceLastUpdated =  (new Date() - project.lastUpdated) / 86400000
 			logger.log project_id:project_id, daysSinceLastUpdated:daysSinceLastUpdated, "got db results for loading editor"
 
@@ -319,6 +335,11 @@ module.exports = ProjectController =
 				return next(error) if error?
 				if !privilegeLevel? or privilegeLevel == PrivilegeLevels.NONE
 					return res.sendStatus 401
+
+				if project.exporting
+					res.render 'project/importing',
+						bodyClasses: ["editor"]
+					return
 
 				if subscription? and subscription.freeTrial? and subscription.freeTrial.expiresAt?
 					allowedFreeTrial = !!subscription.freeTrial.allowed || true
@@ -370,7 +391,6 @@ module.exports = ProjectController =
 					brandVariation: brandVariation
 					allowedImageNames: Settings.allowedImageNames || []
 					gitBridgePublicBaseUrl: Settings.gitBridgePublicBaseUrl
-					showGitBridge: req.query?.gitbridge == 'true' || user.isAdmin
 				timer.done()
 
 	_buildProjectList: (allProjects, v1Projects = [])->
@@ -446,7 +466,7 @@ module.exports = ProjectController =
 		for user_id, _ of users
 			do (user_id) ->
 				jobs.push (callback) ->
-					User.findById user_id, "first_name last_name", (error, user) ->
+					UserGetter.getUserOrUserStubById user_id, { first_name: 1, last_name: 1, email: 1 }, (error, user) ->
 						return callback(error) if error?
 						users[user_id] = user
 						callback()
@@ -464,6 +484,17 @@ module.exports = ProjectController =
 		if v1ProjectData.hasHiddenV1Projects
 			warnings.push "Looks like you've got a lot of V1 projects! Some of them may be hidden on V2. To view them all, use the V1 dashboard."
 		return warnings
+
+	_buildPortalTemplatesList: (affiliations = []) ->
+			portalTemplates = []
+			for aff in affiliations
+				if aff.portal && aff.portal.slug && aff.portal.templates_count && aff.portal.templates_count > 0
+					portalPath = if aff.institution.isUniversity then '/edu/' else '/org/'
+					portalTemplates.push({
+						name: aff.institution.name
+						url: Settings.siteUrl + portalPath + aff.portal.slug
+					})
+			return portalTemplates
 
 defaultSettingsForAnonymousUser = (user_id)->
 	id : user_id

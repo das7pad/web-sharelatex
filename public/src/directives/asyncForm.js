@@ -10,7 +10,6 @@
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
  * DS102: Remove unnecessary code created because of implicit returns
- * DS103: Rewrite code to no longer use __guard__
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
@@ -55,13 +54,12 @@ define(['base', 'libs/passfield'], function(App) {
 
         // for asyncForm prevent automatic redirect to /login if
         // authentication fails, we will handle it ourselves
-        return $http
-          .post(element.attr('action'), formData, {
-            disableAutoLoginRedirect: true
-          })
+        const httpRequestFn = _httpRequestFn(element.attr('method'))
+        return httpRequestFn(element.attr('action'), formData, {
+          disableAutoLoginRedirect: true
+        })
           .then(function(httpResponse) {
-            let config, headers, status
-            ;({ data, status, headers, config } = httpResponse)
+            const { data, headers } = httpResponse
             scope[attrs.name].inflight = false
             response.success = true
             response.error = false
@@ -85,6 +83,11 @@ define(['base', 'libs/passfield'], function(App) {
               } else {
                 return ga('send', 'event', formName, 'success')
               }
+            } else if (scope.$eval(attrs.asyncFormDownloadResponse)) {
+              const blob = new Blob([data], {
+                type: headers('Content-Type')
+              })
+              location.href = URL.createObjectURL(blob) // Trigger file save
             }
           })
           .catch(function(httpResponse) {
@@ -93,6 +96,8 @@ define(['base', 'libs/passfield'], function(App) {
             scope[attrs.name].inflight = false
             response.success = false
             response.error = true
+            response.status = status
+            response.data = data
 
             const onErrorHandler = scope[attrs.onError]
             if (onErrorHandler) {
@@ -113,6 +118,12 @@ define(['base', 'libs/passfield'], function(App) {
                   'Session error. Please check you have cookies enabled. If the problem persists, try clearing your cache and cookies.',
                 type: 'error'
               }
+            } else if (status === 429) {
+              response.message = {
+                text:
+                  'Too many attempts. Please wait for a while and try again.',
+                type: 'error'
+              }
             } else {
               response.message = {
                 text:
@@ -129,6 +140,14 @@ define(['base', 'libs/passfield'], function(App) {
       const submit = () =>
         validateCaptchaIfEnabled(response => submitRequest(response))
 
+      const _httpRequestFn = (method = 'post') => {
+        const $HTTP_FNS = {
+          post: $http.post,
+          get: $http.get
+        }
+        return $HTTP_FNS[method.toLowerCase()]
+      }
+
       element.on('submit', function(e) {
         e.preventDefault()
         return submit()
@@ -144,10 +163,9 @@ define(['base', 'libs/passfield'], function(App) {
     restrict: 'E',
     template: `\
 <div class="alert" ng-class="{
-	'alert-danger': form.response.message.type == 'error',
-	'alert-success': form.response.message.type != 'error'
-}" ng-show="!!form.response.message">
-	{{form.response.message.text}}
+  'alert-danger': form.response.message.type == 'error',
+  'alert-success': form.response.message.type != 'error'
+}" ng-show="!!form.response.message" ng-bind-html="form.response.message.text">
 </div>
 <div ng-transclude></div>\
 `,
@@ -156,85 +174,4 @@ define(['base', 'libs/passfield'], function(App) {
       form: '=for'
     }
   }))
-
-  return App.directive('complexPassword', () => ({
-    require: ['^asyncForm', 'ngModel'],
-
-    link(scope, element, attrs, ctrl) {
-      PassField.Config.blackList = []
-      const defaultPasswordOpts = {
-        pattern: '',
-        length: {
-          min: 6,
-          max: 128
-        },
-        allowEmpty: false,
-        allowAnyChars: false,
-        isMasked: true,
-        showToggle: false,
-        showGenerate: false,
-        showTip: false,
-        showWarn: false,
-        checkMode: PassField.CheckModes.STRICT,
-        chars: {
-          digits: '1234567890',
-          letters: 'abcdefghijklmnopqrstuvwxyz',
-          letters_up: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-          symbols: '@#$%^&*()-_=+[]{};:<>/?!£€.,'
-        }
-      }
-
-      const opts = _.defaults(
-        window.passwordStrengthOptions || {},
-        defaultPasswordOpts
-      )
-      if (opts.length.min === 1) {
-        opts.acceptRate = 0 // this allows basically anything to be a valid password
-      }
-      const passField = new PassField.Field('passwordField', opts)
-
-      const [asyncFormCtrl, ngModelCtrl] = Array.from(ctrl)
-
-      return ngModelCtrl.$parsers.unshift(function(modelValue) {
-        let isValid = passField.validatePass()
-        const email = asyncFormCtrl.getEmail() || window.usersEmail
-        if (!isValid) {
-          scope.complexPasswordErrorMessage = passField.getPassValidationMessage()
-        } else if (email != null && email !== '') {
-          const startOfEmail = __guard__(
-            email != null ? email.split('@') : undefined,
-            x => x[0]
-          )
-          if (
-            modelValue.indexOf(email) !== -1 ||
-            modelValue.indexOf(startOfEmail) !== -1
-          ) {
-            isValid = false
-            scope.complexPasswordErrorMessage =
-              'Password can not contain email address'
-          }
-        }
-        if (opts.length.max != null && modelValue.length === opts.length.max) {
-          isValid = false
-          scope.complexPasswordErrorMessage = `Maximum password length ${
-            opts.length.max
-          } reached`
-        }
-        if (opts.length.min != null && modelValue.length < opts.length.min) {
-          isValid = false
-          scope.complexPasswordErrorMessage = `Password too short, minimum ${
-            opts.length.min
-          }`
-        }
-        ngModelCtrl.$setValidity('complexPassword', isValid)
-        return modelValue
-      })
-    }
-  }))
 })
-
-function __guard__(value, transform) {
-  return typeof value !== 'undefined' && value !== null
-    ? transform(value)
-    : undefined
-}

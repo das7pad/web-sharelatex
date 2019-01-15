@@ -15,6 +15,8 @@ User = require "#{WEB_PATH}/test/acceptance/js/helpers/User"
 UserMapper = require "../../../app/js/OverleafUsers/UserMapper"
 Subscription = require("#{WEB_PATH}/app/js/models/Subscription").Subscription
 UserStub = require("#{WEB_PATH}/app/js/models/UserStub").UserStub
+ProjectCreationHandler = require("#{WEB_PATH}/app/js/Features/Project/ProjectCreationHandler")
+Project = require("#{WEB_PATH}/app/js/models/Project").Project
 
 logger = require "logger-sharelatex"
 logger.logger.level('fatal')
@@ -116,6 +118,29 @@ describe "UserMapper", ->
 					expect(subscription.member_ids.length).to.eq(1)
 					expect(
 						subscription.member_ids[0].toString()
+					).to.equal(
+						@slUser._id.toString()
+					)
+					done()
+				return
+
+		describe "with a project owner mapped to the user stub", ->
+			beforeEach (done) ->
+				async.series [
+					(cb) =>
+						ProjectCreationHandler._createBlankProject @userStub._id, 'test-project', {}, (error, @project) =>
+							cb(error)
+					(cb) =>
+						UserMapper.mergeWithSlUser @slUser._id, {
+							id: @olId,
+							email: @slUser.email
+						}, cb
+				], done
+
+			it "should replace user stub references in project owner_ref", (done) ->
+				Project.findOne _id: @project._id, (error, project) =>
+					expect(
+						project.owner_ref.toString()
 					).to.equal(
 						@slUser._id.toString()
 					)
@@ -277,3 +302,32 @@ describe "UserMapper", ->
 					expect(user.emails.length).to.equal 1
 					expect(user.emails[0].email).to.equal @slUser.email
 					done()
+
+		describe "with a collabratecUser mapped to the user stub", ->
+			beforeEach (done) ->
+				@collabratecUsers = [
+					{
+						user_id: @userStub._id
+						collabratec_document_id: "9999"
+					}
+				]
+				async.series [
+					(cb) =>
+						ProjectCreationHandler._createBlankProject @slUser.id, 'test-project', {collabratecUsers: @collabratecUsers}, (error, @project) =>
+							cb(error)
+					(cb) =>
+						UserMapper.mergeWithSlUser @slUser._id, {
+							id: @olId,
+							email: @slUser.email
+						}, cb
+				], done
+
+			it "should replace user stub references in collabratecUser", (done) ->
+				Project.findOne _id: @project._id, (error, project) =>
+					expect(
+						project.collabratecUsers[0].user_id.toString()
+					).to.equal(
+						@slUser._id.toString()
+					)
+					done()
+				return

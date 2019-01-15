@@ -171,6 +171,8 @@ module.exports = settings =
 			pass: v1Api.pass
 		v1_history:
 			url: "http://#{process.env['V1_HISTORY_HOST'] or "localhost"}:3100/api"
+			user: 'staging'
+			pass: 'password'
 
 	templates:
 		user_id: process.env.TEMPLATES_USER_ID or "5395eb7aad1f29a88756c7f2"
@@ -487,6 +489,8 @@ module.exports = settings =
 	# currentImage: "texlive-full:2017.1"
 	# imageRoot: "<DOCKER REPOSITORY ROOT>" # without any trailing slash
 	
+	compileBodySizeLimitMb: process.env['COMPILE_BODY_SIZE_LIMIT_MB'] or 5
+
 	# allowedImageNames: [
 	# 	{imageName: 'texlive-full:2017.1', imageDesc: 'TeXLive 2017'}
 	# 	{imageName:   'wl_texlive:2018.1', imageDesc: 'Legacy OL TeXLive 2015'}
@@ -499,10 +503,10 @@ module.exports = settings =
 	# ----------
 	modules:
 		sanitize:
-			options: 
-				allowedTags: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol', 'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div', 'table', 'thead', 'caption', 'tbody', 'tr', 'th', 'td', 'pre', 'iframe', 'img', 'figure', 'figcaption', 'source', 'video' ]
+			options:
+				allowedTags: [ 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'blockquote', 'p', 'a', 'ul', 'ol', 'nl', 'li', 'b', 'i', 'strong', 'em', 'strike', 'code', 'hr', 'br', 'div', 'table', 'thead', 'col', 'caption', 'tbody', 'tr', 'th', 'td', 'tfoot', 'pre', 'iframe', 'img', 'figure', 'figcaption', 'span', 'source', 'video', 'del' ]
 				allowedAttributes:
-					'a': [ 'href', 'name', 'target', 'class' ]
+					'a': [ 'href', 'name', 'target', 'class', 'event-tracking', 'event-tracking-ga', 'event-tracking-label', 'event-tracking-trigger' ]
 					'div': [ 'class', 'id', 'style' ]
 					'h1': [ 'class', 'id' ]
 					'h2': [ 'class', 'id' ]
@@ -510,9 +514,15 @@ module.exports = settings =
 					'h4': [ 'class', 'id' ]
 					'h5': [ 'class', 'id' ]
 					'h6': [ 'class', 'id' ]
+					'col': [ 'width' ]
 					'figure': [ 'class', 'id', 'style']
 					'figcaption': [ 'class', 'id', 'style']
-					'iframe': [ 'allowfullscreen', 'frameborder', 'height', 'src', 'width' ]
+					'i': [ 'aria-hidden', 'aria-label', 'class', 'id' ] 
+					'iframe': [ 'allowfullscreen', 'frameborder', 'height', 'src', 'style', 'width' ]
 					'img': [ 'alt', 'class', 'src', 'style' ]
 					'source': [ 'src', 'type' ]
+					'span': [ 'class', 'id', 'style' ]
+					'table': [ 'border', 'class', 'id', 'style' ]
+					'td': [ 'colspan', 'rowspan', 'headers' ]
+					'th': [ 'abbr', 'headers', 'colspan', 'rowspan', 'scope', 'sorted' ]
 					'video': [ 'alt', 'class', 'controls', 'height', 'width' ]

@@ -1,4 +1,3 @@
-AuthorizationMiddlewear = require "../../../../app/js/Features/Authorization/AuthorizationMiddlewear"
 V2TemplatesController = require "./V2TemplatesController"
 settings = require "settings-sharelatex"
 
@@ -8,6 +7,7 @@ module.exports =
 
 		webRouter.get "/articles", V2TemplatesController.getArticles
 		webRouter.get "/articles/:read_token/clone", V2TemplatesController.cloneTemplate
+		webRouter.get "/articles/:read_token/get_clone", V2TemplatesController.cloneTemplate
 		webRouter.get "/articles/popular", V2TemplatesController.getArticlesPopular
 		webRouter.get "/articles/popular/page/:page_num", V2TemplatesController.getArticlesPopular
 		webRouter.get "/articles/recent", V2TemplatesController.getArticlesRecent
@@ -26,6 +26,7 @@ module.exports =
 
 		webRouter.get "/latex/examples", V2TemplatesController.getExamples
 		webRouter.get "/latex/examples/:read_token/clone", V2TemplatesController.cloneTemplate
+		webRouter.get "/latex/examples/:read_token/get_clone", V2TemplatesController.cloneTemplate
 		webRouter.get "/latex/examples/popular", V2TemplatesController.getExamplesPopular
 		webRouter.get "/latex/examples/popular/page/:page_num", V2TemplatesController.getExamplesPopular
 		webRouter.get "/latex/examples/recent", V2TemplatesController.getExamplesRecent
@@ -36,6 +37,7 @@ module.exports =
 
 		webRouter.get "/latex/templates", V2TemplatesController.getTemplates
 		webRouter.get "/latex/templates/:read_token/clone", V2TemplatesController.cloneTemplate
+		webRouter.get "/latex/templates/:read_token/get_clone", V2TemplatesController.cloneTemplate
 		webRouter.get "/latex/templates/popular", V2TemplatesController.getTemplatesPopular
 		webRouter.get "/latex/templates/popular/page/:page_num", V2TemplatesController.getTemplatesPopular
 		webRouter.get "/latex/templates/recent", V2TemplatesController.getTemplatesRecent

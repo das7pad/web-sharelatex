@@ -24,6 +24,7 @@ module.exports = AuthenticationController =
 			first_name: user.first_name
 			last_name: user.last_name
 			isAdmin: user.isAdmin
+			staffAccess: user.staffAccess
 			email: user.email
 			referal_id: user.referal_id
 			session_created: (new Date()).toISOString()
@@ -185,7 +186,10 @@ module.exports = AuthenticationController =
 				User.findOne { "overleaf.id": body.user_profile.id }, (error, user) ->
 					return next(error) if error?
 					return res.status(401).send({error: "invalid_token"}) unless user?
-					req.oauth = access_token: body.access_token
+					req.oauth =
+						access_token: body.access_token
+						collabratec_customer_id: body.collabratec_customer_id
+						user_profile: body.user_profile
 					req.oauth_user = user
 					next()
 
@@ -203,7 +207,7 @@ module.exports = AuthenticationController =
 			return next()
 		else
 			logger.log url:req.url, "user trying to access endpoint not in global whitelist"
-			AuthenticationController._setRedirectInSession(req)
+			AuthenticationController.setRedirectInSession(req)
 			return res.redirect "/login"
 
 	httpAuth: basicAuth (user, pass)->
@@ -211,6 +215,16 @@ module.exports = AuthenticationController =
 		if !isValid
 			logger.err user:user, pass:pass, "invalid login details"
 		return isValid
+
+	setRedirectInSession: (req, value) ->
+		if !value?
+			value = if Object.keys(req.query).length > 0 then "#{req.path}?#{querystring.stringify(req.query)}" else "#{req.path}"
+		if (
+			req.session? &&
+				!/^\/(socket.io|js|stylesheets|img)\/.*$/.test(value) &&
+				!/^.*\.(png|jpeg|svg)$/.test(value)
+		)
+			req.session.postLoginRedirect = value
 
 	_redirectToLoginOrRegisterPage: (req, res)->
 		if (req.query.zipUrl? or req.query.project_name? or req.path == '/user/subscription/new')
@@ -220,14 +234,14 @@ module.exports = AuthenticationController =
 
 	_redirectToLoginPage: (req, res) ->
 		logger.log url: req.url, "user not logged in so redirecting to login page"
-		AuthenticationController._setRedirectInSession(req)
+		AuthenticationController.setRedirectInSession(req)
 		url = "/login?#{querystring.stringify(req.query)}"
 		res.redirect url
 		Metrics.inc "security.login-redirect"
 
 	_redirectToRegisterPage: (req, res) ->
 		logger.log url: req.url, "user not logged in so redirecting to register page"
-		AuthenticationController._setRedirectInSession(req)
+		AuthenticationController.setRedirectInSession(req)
 		url = "/register?#{querystring.stringify(req.query)}"
 		res.redirect url
 		Metrics.inc "security.login-redirect"
@@ -244,16 +258,6 @@ module.exports = AuthenticationController =
 	_recordFailedLogin: (callback = (error) ->) ->
 		Metrics.inc "user.login.failed"
 		callback()
-
-	_setRedirectInSession: (req, value) ->
-		if !value?
-			value = if Object.keys(req.query).length > 0 then "#{req.path}?#{querystring.stringify(req.query)}" else "#{req.path}"
-		if (
-			req.session? &&
-			!/^\/(socket.io|js|stylesheets|img)\/.*$/.test(value) &&
-			!/^.*\.(png|jpeg|svg)$/.test(value)
-		)
-			req.session.postLoginRedirect = value
 
 	_getRedirectFromSession: (req) ->
 		return req?.session?.postLoginRedirect || null

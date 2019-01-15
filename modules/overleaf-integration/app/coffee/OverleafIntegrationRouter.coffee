@@ -23,8 +23,15 @@ module.exports =
 		removeRoute(webRouter, 'get', '/login')
 		removeRoute(webRouter, 'post', '/login')
 		webRouter.get '/login', V1LoginController.loginPage
-		webRouter.post '/login', V1LoginController.doLogin
-		webRouter.get '/welcome/sl', OverleafAuthenticationController.welcomeScreen
+		webRouter.post(
+			'/login', 
+			RateLimiterMiddlewear.rateLimit({
+				endpointName: 'overleaf-login',
+				maxRequests: 10
+				timeInterval: 60
+			}),
+			V1LoginController.doLogin
+		)
 
 		webRouter.get '/login/finish', V1LoginController.loginProfile
 
@@ -39,12 +46,17 @@ module.exports =
 
 		removeRoute(webRouter, 'get', '/register')
 		removeRoute(webRouter, 'post', '/register')
-		webRouter.get '/register', V1LoginController.registrationPage
+		webRouter.get '/register', OverleafAuthenticationController.saveRedir, V1LoginController.registrationPage
 		webRouter.post '/register', V1LoginController.doRegistration
 
 		webRouter.post(
 			'/user/change_password/v1',
 			AuthenticationController.requireLogin(),
+			RateLimiterMiddlewear.rateLimit({
+				endpointName: 'overleaf-change-password',
+				maxRequests: 10
+				timeInterval: 60
+			}),
 			V1LoginController.doPasswordChange
 		)
 
@@ -75,6 +87,12 @@ module.exports =
 			'/overleaf/project/:ol_doc_id/import',
 			AuthenticationController.requireLogin(),
 			ProjectImportController.importProject
+		)
+
+		webRouter.get(
+			'/overleaf/project/:ol_doc_token/download/zip',
+			AuthenticationController.requireLogin(),
+			ProjectImportController.downloadZip
 		)
 
 		webRouter.get(
@@ -155,9 +173,10 @@ module.exports =
 			webRouter.get settings.collabratec.saml.init_path, (req, res, next) ->
 				(passport.authenticate('saml'))(req, res, next)
 			webRouter.get '/org/ieee/collabratec/auth/link_after_saml_response', CollabratecController.oauthLinkAfterSaml
-			webRouter.get '/org/ieee/collabratec/projects/:project_id', CollabratecController.showProject
 			webRouter.post '/org/ieee/collabratec/auth/confirm_link', CollabratecController.oauthConfirmLink
 			webRouter.post '/org/ieee/collabratec/auth/sign_in_to_link', CollabratecController.oauthSignin
+			webRouter.get '/org/ieee/collabratec/dash', CollabratecController.showDash
+			webRouter.get '/org/ieee/collabratec/projects/:project_id', CollabratecController.showProject
 
 		webRouter.get '/sign_in_to_v1', V1RedirectController.sign_in_and_redirect
 

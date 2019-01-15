@@ -20,6 +20,14 @@ module.exports = MetricsController =
 			resourceType: 'team',
 		}
 
+	groupMetrics: (req, res, next) ->
+		res.render Path.resolve(__dirname, '../views/metricsApp'), {
+			metricsEndpoint: "/graphs",
+			resourceId: req.entity._id,
+			resourceName: req.entity.teamName,
+			resourceType: 'group',
+		}
+
 	institutionMetrics: (req, res, next) ->
 		{ entity } = req
 		entity.fetchV1Data (error, entity) ->
@@ -30,8 +38,19 @@ module.exports = MetricsController =
 				resourceType: 'institution',
 			}
 
+	templateMetrics: (req, res, next) ->
+		template = req.template
+		res.render Path.resolve(__dirname, '../views/metricsApp'), {
+			metricsEndpoint: "/graphs",
+			resourceId: template.id
+			resourceName: template.title
+			resourceType: 'template',
+		}
+
 	analyticsProxy: (req, res, next) ->
+		res.setTimeout(5 * 60 * 1000)
 		analyticsUrl = settings.apis.analytics.url + req.originalUrl
+		analyticsUrl = analyticsUrl.replace('template', 'v1_template')
 		logger.log req.query, "requesting from analytics #{analyticsUrl}"
 		request
 			.get(analyticsUrl)

@@ -2,11 +2,14 @@ logger = require("logger-sharelatex")
 fs = require("fs")
 request = require("request")
 settings = require("settings-sharelatex")
+Async = require('async')
 
 oneMinInMs = 60 * 1000
 fiveMinsInMs = oneMinInMs * 5
 
 module.exports = FileStoreHandler =
+
+	RETRY_ATTEMPTS: 3
 
 	uploadFileFromDisk: (project_id, file_id, fsPath, callback)->
 		fs.lstat fsPath, (err, stat)->
@@ -19,7 +22,14 @@ module.exports = FileStoreHandler =
 			if !stat.isFile()
 				logger.log project_id:project_id, file_id:file_id, fsPath:fsPath, "tried to upload symlink, not contining"
 				return callback(new Error("can not upload symlink"))
+			Async.retry FileStoreHandler.RETRY_ATTEMPTS, (cb) ->
+				FileStoreHandler._doUploadFileFromDisk project_id, file_id, fsPath, cb
+			, (err, url) ->
+				if err?
+					logger.err {err, project_id, file_id}, "Error uploading file, retries failed"
+				callback(err, url)
 
+	_doUploadFileFromDisk: (project_id, file_id, fsPath, callback) ->
 			_cb = callback
 			callback = (err, url) ->
 				callback = ->	# avoid double callbacks
@@ -89,10 +99,17 @@ module.exports = FileStoreHandler =
 					file_id:oldFile_id
 			uri: @_buildUrl(newProject_id, newFile_id)
 			timeout:fiveMinsInMs
-		request opts, (err)->
+		request opts, (err, response)->
 			if err?
 				logger.err err:err, oldProject_id:oldProject_id, oldFile_id:oldFile_id, newProject_id:newProject_id, newFile_id:newFile_id, "something went wrong telling filestore api to copy file"
-			callback(err, opts.uri)
+				callback(err)
+			else if 200 <= response.statusCode < 300
+				# successful response
+				callback(null, opts.uri)
+			else
+				err = new Error("non-ok response from filestore for copyFile: #{response.statusCode}")
+				logger.err {uri: opts.uri, statusCode: response.statusCode}, "error uploading to filestore"
+				callback(err)
 
 	_buildUrl: (project_id, file_id)->
 		return "#{settings.apis.filestore.url}/project/#{project_id}/file/#{file_id}"

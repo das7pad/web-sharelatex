@@ -24,13 +24,11 @@ module.exports = ProjectGetter =
 		ProjectGetter.getProject project_id, excludes, callback
 
 	getProject: (project_id, projection, callback) ->
-		if !project_id?
-			return callback(new Error("no project_id provided"))
-
 		if typeof(projection) == "function" && !callback?
 			callback = projection
 			projection = {}
-
+		if !project_id?
+			return callback(new Error("no project_id provided"))
 		if typeof(projection) != "object"
 			return callback(new Error("projection is not an object"))
 
@@ -43,13 +41,11 @@ module.exports = ProjectGetter =
 			ProjectGetter.getProjectWithoutLock project_id, projection, callback
 
 	getProjectWithoutLock: (project_id, projection, callback) ->
-		if !project_id?
-			return callback(new Error("no project_id provided"))
-
 		if typeof(projection) == "function" && !callback?
 			callback = projection
 			projection = {}
-
+		if !project_id?
+			return callback(new Error("no project_id provided"))
 		if typeof(projection) != "object"
 			return callback(new Error("projection is not an object"))
 
@@ -69,6 +65,12 @@ module.exports = ProjectGetter =
 				logger.err err:err, query:query, projection:projection, "error getting project"
 				return callback(err)
 			callback(null, project?[0])
+
+	getProjectIdByReadAndWriteToken: (token, callback=(err, project_id)->) ->
+		Project.findOne {'tokens.readAndWrite': token}, {_id: 1}, (err, project) ->
+			return callback err if err?
+			return callback() unless project?
+			callback null, project._id
 
 	findAllUsersProjects: (
 		user_id,

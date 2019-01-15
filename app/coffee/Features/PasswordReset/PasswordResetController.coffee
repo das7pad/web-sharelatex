@@ -1,6 +1,7 @@
 PasswordResetHandler = require("./PasswordResetHandler")
 RateLimiter = require("../../infrastructure/RateLimiter")
 AuthenticationController = require("../Authentication/AuthenticationController")
+AuthenticationManager = require("../Authentication/AuthenticationManager")
 UserGetter = require("../User/UserGetter")
 UserSessionsManager = require("../User/UserSessionsManager")
 logger = require "logger-sharelatex"
@@ -21,7 +22,7 @@ module.exports =
 			throttle: 6
 		RateLimiter.addCount opts, (err, canContinue)->
 			if !canContinue
-				return res.send 500, { message: req.i18n.translate("rate_limit_hit_wait")}
+				return res.send 429, { message: req.i18n.translate("rate_limit_hit_wait")}
 			PasswordResetHandler.generateAndEmailResetToken email, (err, exists)->
 				if err?
 					res.send 500, {message:err?.message}
@@ -42,12 +43,22 @@ module.exports =
 
 	setNewUserPassword: (req, res, next)->
 		{passwordResetToken, password} = req.body
-		if !password? or password.length == 0 or !passwordResetToken? or passwordResetToken.length == 0
+		if !password? or password.length == 0 or !passwordResetToken? or passwordResetToken.length == 0 or AuthenticationManager.validatePassword(password?.trim())?
 			return res.sendStatus 400
 		delete req.session.resetToken
 		PasswordResetHandler.setNewUserPassword passwordResetToken?.trim(), password?.trim(), (err, found, user_id) ->
-			return next(err) if err?
-			if found
+			if err and err.name and err.name == "NotFoundError"
+				res.status(404).send("NotFoundError")
+			else if err and err.name and err.name == "NotInV2Error"
+				res.status(403).send("NotInV2Error")
+			else if err and err.name and err.name == "SLInV2Error"
+				res.status(403).send("SLInV2Error")
+			else if err and err.statusCode and err.statusCode == 500
+				res.status(500)
+			else if err and !err.statusCode
+				res.status(500)
+			else if found
+				return res.sendStatus 200 if !user_id? # will not exist for v1-only users
 				UserSessionsManager.revokeAllUserSessions {_id: user_id}, [], (err) ->
 					return next(err) if err?
 					if req.body.login_after

@@ -7,6 +7,7 @@ ErrorController = require '../../../../app/js/Features/Errors/ErrorController'
 AuthenticationController = require '../../../../app/js/Features/Authentication/AuthenticationController'
 UserGetter = require '../../../../app/js/Features/User/UserGetter'
 SubscriptionGroupHandler = require '../../../../app/js/Features/Subscription/SubscriptionGroupHandler'
+V1Api = require '../../../../app/js/Features/V1/V1Api'
 TemplatesUtilities = require '../../../v2-templates/app/js/TemplatesUtilities'
 Settings = require 'settings-sharelatex'
 
@@ -31,7 +32,7 @@ _portalRedirect = (req, res, data, portalType) ->
 	if portalType != correctPortalType
 		res.redirect 301, "/#{correctPortalType}/#{req.params.slug}"
 		return true
-	
+
 	return false
 
 
@@ -57,12 +58,12 @@ _getPortal = (req, res, next, portalType) ->
 	if req.query.prtl || Settings.showContentPages
 		if req.params.slug && req.params.slug != 'undefined'
 			v1PortalPath = "/#{portalType}/#{req.params.slug}"
-				
+
 			PortalsManager.get v1PortalPath, (err, data) ->
 				return next(err) if err
 				if data.portal?
 					redirected = _portalRedirect req, res, data, portalType
-					if !redirected 
+					if !redirected
 						# check if user is affiliated with portal
 						_getUser req, next, (err, userId, userEmails) ->
 							if userEmails
@@ -127,10 +128,15 @@ _formatAndRender = (req, res, data) ->
 		data.portal_templates = _formatTemplatesData(data.portal_templates)
 	res.render(portalLayout, data)
 
-_formatTemplatesData = (templates) ->
-	for template in templates
-		template = TemplatesUtilities.format_template(template)
-	templates
+_formatTemplatesData = (allTemplates) ->
+	# allTemplates is an array of objects
+	# each object is a different template list
+	# which contains the list plus UI data: header_class, header
+	for templatesObj in allTemplates
+		if templatesObj.list
+			for template in templatesObj.list
+				TemplatesUtilities.format_template(template)
+	allTemplates
 
 module.exports = PortalsController =
 	# to do: decide if using v1 content
@@ -147,3 +153,16 @@ module.exports = PortalsController =
 
 	getPortalOrg: (req, res, next) ->
 		_getPortal(req, res, next, 'org')
+
+	friendlyTemplateLink: (req, res, next) ->
+		V1Api.request {
+			method: 'GET'
+			url: req.path
+			expectedStatusCodes: [200]
+		}, (err, response, body) ->
+			return next(err) if err
+			if response.statusCode in [200] and response.body.kind and response.body.read_token and response.body.slug
+				res.redirect 301, "/latex/#{response.body.kind}s/#{response.body.slug}/#{response.body.read_token}"
+			else
+				logger.err {path: req.path, err}, "v1 publisher friendly template link not found"
+				ErrorController.notFound req, res

@@ -31,7 +31,7 @@ module.exports = MockProjectHistoryApi =
 		app.listen 3054, (error) ->
 			throw error if error?
 		.on "error", (error) ->
-			console.error "error starting MockOverleafApi:", error.message
+			console.error "error starting MockProjectHistoryApi:", error.message
 			process.exit(1)
 
 MockProjectHistoryApi.run()

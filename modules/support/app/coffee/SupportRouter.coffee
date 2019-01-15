@@ -5,7 +5,12 @@ logger = require("logger-sharelatex")
 
 module.exports = 
 	apply: (webRouter, apiRouter, publicApiRouter) ->
-		webRouter.post "/support", SupportController.newSupportRequest
+		webRouter.post "/support",
+			RateLimiterMiddlewear.rateLimit({
+				endpointName: "support-front"
+				maxRequests: 20
+				timeInterval: 60
+			}),SupportController.newSupportRequest
 		webRouter.get "/support/user_details", SupportController.renderInfoPanelLoader
 		publicApiRouter.post "/support/user_details", 
 			RateLimiterMiddlewear.rateLimit({

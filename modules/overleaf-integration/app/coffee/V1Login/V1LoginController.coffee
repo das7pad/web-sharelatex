@@ -3,6 +3,7 @@ V1LoginHandler = require './V1LoginHandler'
 logger = require 'logger-sharelatex'
 WEB = "../../../../.."
 AuthenticationController = require "#{WEB}/app/js/Features/Authentication/AuthenticationController"
+AuthenticationManager = require "#{WEB}/app/js/Features/Authentication/AuthenticationManager"
 UserGetter = require "#{WEB}/app/js/Features/User/UserGetter"
 UserRegistrationHandler = require "#{WEB}/app/js/Features/User/UserRegistrationHandler"
 ReferalAllocator = require("#{WEB}/app/js/Features/Referal/ReferalAllocator")
@@ -47,6 +48,10 @@ module.exports = V1LoginController =
 		if !email
 			logger.err {email}, "registration email invalid"
 			return res.json message: {type: 'error', text: req.i18n.translate('invalid_email')}
+		validationError = AuthenticationManager.validatePassword(password)
+		if validationError?
+			logger.err {email}, "registration password invalid"
+			return res.json message: {type: 'error', text: validationError.message}
 		logger.log {email}, "trying to create account via v1"
 		subscribeToNewsletter = req.body.subscribeToNewsletter == 'true'
 		V1LoginHandler.getUserByEmail email, (err, existingUser) ->
@@ -94,7 +99,7 @@ module.exports = V1LoginController =
 		# such as being sent from the editor to /login, then set the redirect explicitly
 		if req.query.redir? and !AuthenticationController._getRedirectFromSession(req)?
 			logger.log {redir: req.query.redir}, "setting explicit redirect from login page"
-			AuthenticationController._setRedirectInSession(req, req.query.redir)
+			AuthenticationController.setRedirectInSession(req, req.query.redir)
 		res.render Path.resolve(__dirname, "../../views/login"),
 			title: 'Log in to Overleaf',
 			email: req.query.email
@@ -111,11 +116,22 @@ module.exports = V1LoginController =
 			if !isValid
 				logger.log {email},  "failed login via v1"
 				AuthenticationController._recordFailedLogin()
-				return res.json message: {type: 'error', text: req.i18n.translate('email_or_password_wrong_try_again')}
+				return res.json message: {type: 'error', text: req.i18n.translate('email_or_password_wrong_try_again') + ', or <a href="/user/password/reset">set or reset your password</a>'}
 			else
 				V1LoginController._login(profile, req, res, next)
 
 	doPasswordChange: (req, res, next) ->
+		unless req.body.newPassword1 == req.body.newPassword2
+			return res.json message: {
+				type: 'error',
+				text: req.i18n.translate('password_change_passwords_do_not_match')
+			}
+		validationError = AuthenticationManager.validatePassword(req.body.newPassword1)
+		if validationError?
+			return res.json message: {
+				type: 'error',
+				text: validationError.message
+			}
 		lightUser = AuthenticationController.getSessionUser(req)
 		UserGetter.getUser lightUser._id, (err, user) ->
 			return next(err) if err?

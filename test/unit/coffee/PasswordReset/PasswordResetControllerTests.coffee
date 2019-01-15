@@ -19,16 +19,20 @@ describe "PasswordResetController", ->
 			addCount: sinon.stub()
 		@UserSessionsManager =
 			revokeAllUserSessions: sinon.stub().callsArgWith(2, null)
+		@AuthenticationManager =
+			validatePassword: sinon.stub()
 		@PasswordResetController = SandboxedModule.require modulePath, requires:
 			"settings-sharelatex":@settings
 			"./PasswordResetHandler":@PasswordResetHandler
 			"logger-sharelatex": log:->
 			"../../infrastructure/RateLimiter":@RateLimiter
 			"../Authentication/AuthenticationController": @AuthenticationController = {}
+			"../Authentication/AuthenticationManager": @AuthenticationManager
 			"../User/UserGetter": @UserGetter = {}
 			"../User/UserSessionsManager": @UserSessionsManager
 
 		@email = "bob@bob.com "
+		@user_id = 'mock-user-id'
 		@token = "my security token that was emailed to me"
 		@password = "my new password"
 		@req =
@@ -50,7 +54,7 @@ describe "PasswordResetController", ->
 			@PasswordResetHandler.generateAndEmailResetToken.callsArgWith(1, null, true)
 			@RateLimiter.addCount.callsArgWith(1, null, false)
 			@res.send = (code)=>
-				code.should.equal 500
+				code.should.equal 429
 				@PasswordResetHandler.generateAndEmailResetToken.calledWith(@email.trim()).should.equal false
 				done()
 			@PasswordResetController.requestReset @req, @res
@@ -98,7 +102,7 @@ describe "PasswordResetController", ->
 			@req.session.resetToken = @token
 
 		it "should tell the user handler to reset the password", (done)->
-			@PasswordResetHandler.setNewUserPassword.callsArgWith(2, null, true)
+			@PasswordResetHandler.setNewUserPassword.callsArgWith(2, null, true, @user_id)
 			@res.sendStatus = (code)=>
 				code.should.equal 200
 				@PasswordResetHandler.setNewUserPassword.calledWith(@token, @password).should.equal true
@@ -106,7 +110,7 @@ describe "PasswordResetController", ->
 			@PasswordResetController.setNewUserPassword @req, @res
 
 		it "should send 404 if the token didn't work", (done)->
-			@PasswordResetHandler.setNewUserPassword.callsArgWith(2, null, false)
+			@PasswordResetHandler.setNewUserPassword.callsArgWith(2, null, false, @user_id)
 			@res.sendStatus = (code)=>
 				code.should.equal 404
 				done()
@@ -130,8 +134,18 @@ describe "PasswordResetController", ->
 				done()
 			@PasswordResetController.setNewUserPassword @req, @res
 
+		it "should return 400 (Bad Request) if the password is invalid", (done)->
+			@req.body.password = "correct horse battery staple"
+			@AuthenticationManager.validatePassword = sinon.stub().returns { message: 'password contains invalid characters' }
+			@PasswordResetHandler.setNewUserPassword.callsArgWith(2)
+			@res.sendStatus = (code)=>
+				code.should.equal 400
+				@PasswordResetHandler.setNewUserPassword.called.should.equal false
+				done()
+			@PasswordResetController.setNewUserPassword @req, @res
+
 		it "should clear the session.resetToken", (done) ->
-			@PasswordResetHandler.setNewUserPassword.callsArgWith(2, null, true)
+			@PasswordResetHandler.setNewUserPassword.callsArgWith(2, null, true, @user_id)
 			@res.sendStatus = (code)=>
 				code.should.equal 200
 				@req.session.should.not.have.property 'resetToken'
@@ -139,7 +153,7 @@ describe "PasswordResetController", ->
 			@PasswordResetController.setNewUserPassword @req, @res
 
 		it 'should clear sessions', (done) ->
-			@PasswordResetHandler.setNewUserPassword.callsArgWith(2, null, true)
+			@PasswordResetHandler.setNewUserPassword.callsArgWith(2, null, true, @user_id)
 			@res.sendStatus = (code)=>
 				@UserSessionsManager.revokeAllUserSessions.callCount.should.equal 1
 				done()

@@ -9,6 +9,7 @@ SafePath = require '../../../../app/js/Features/Project/SafePath'
 FileWriter = require '../../../../app/js/infrastructure/FileWriter'
 UpdateMerger = require '../../../../app/js/Features/ThirdPartyDataStore/UpdateMerger'
 Errors = require './GitBridgeErrors'
+V1Api = require '../../../../app/js/Features/V1/V1Api'
 request = require 'request'
 url = require 'url'
 _ = require 'lodash'
@@ -20,19 +21,85 @@ module.exports = GitBridgeHandler =
 		ProjectGetter.getProjectWithoutDocLines projectId, (err, project) ->
 			return callback(err) if err?
 			_userCanAccess = (u) ->
-				u?.features?.gitBridge && u.isAdmin # Restrict to admins for now
-			UserGetter.getUser project.owner_ref, {features: 1, isAdmin: 1}, (err, owner) ->
+				u?.features?.gitBridge
+			UserGetter.getUser project.owner_ref, {features: 1}, (err, owner) ->
 				return callback(err) if err?
-				UserGetter.getUser userId, {features: 1, isAdmin: 1}, (err, user) ->
+				UserGetter.getUser userId, {features: 1}, (err, user) ->
 					return callback(err) if err?
 					if !(_userCanAccess(owner) || _userCanAccess(user))
-						return callback(new Errors.FeatureNotAvailable('Neither user nor has gitBridge feature'))
+						return callback(new Errors.FeatureNotAvailable('Neither user nor project owner has gitBridge feature'))
 					if project.overleaf?.history?.id?
 						return callback(null, project)
 					else
 						ProjectHistoryHandler.ensureHistoryExistsForProject projectId, (err) ->
 							return callback(err) if err?
 							callback(null, project)
+
+	getSavedVers: (userId, projectId, callback=(err, data)->) ->
+		GitBridgeHandler._checkAccess userId, projectId, (err, project) ->
+			return callback(err) if err?
+			request.get {
+				url: GitBridgeHandler._projectHistoryUrl("/project/#{projectId}/labels"),
+				json: true
+			}, (err, response, body) ->
+				return callback(err) if err?
+				if response.statusCode != 200
+					err = new Error("Non-success status from project-history api: #{response.statusCode}")
+					logger.err {err}, "Error while communicating with project-history api"
+					return callback(err)
+				if !_.isArray(body)
+					err = new Error('response from project-history versions api is not an array')
+					logger.err {projectId, err}, "[GitBridgeHandler] #{err.message}"
+					return callback(err)
+				Async.mapSeries body, GitBridgeHandler._formatLabelAsSavedVer, (err, savedVers) ->
+					return callback(err) if err?
+					importedAtVerId = project?.overleaf?.imported_at_ver_id
+					if importedAtVerId?
+						GitBridgeHandler._savedVersForImportedProject project, savedVers, (err, savedVers) ->
+							return callback(err) if err?
+							callback(null, savedVers)
+					else
+						callback(null, savedVers)
+
+	_savedVersForImportedProject: (project, savedVers, callback) ->
+		GitBridgeHandler._getMigratedFromId project, (err, v1DocId) ->
+			return callback(err) if err?
+			V1Api.request {
+				url: "/api/v1/sharelatex/docs/#{v1DocId}/history_export/status",
+				json: true
+			}, (err, response, body) ->
+				return callback(err) if err?
+				if response.statusCode != 200
+					err = new Error("Non-success status from v1 api: #{response.statusCode}")
+					logger.err {err}, "[GitBridgeHandler] Error while communicating with v1 export status api"
+					return callback(err)
+				exportedAtHistoryVersion = body.history_export_version
+				if !exportedAtHistoryVersion?
+					err = new Error('expected a history_export_version value from v1')
+					logger.err {projectId: project._id, err}, "[GitBridgeHandler] Error getting export status from v1"
+					return callback(err)
+				filtered = savedVers.filter (sv) ->
+					sv.versionId > exportedAtHistoryVersion
+				callback(null, filtered)
+
+	_formatLabelAsSavedVer: (label, callback=(err, savedVer)->) ->
+		return callback(null, null) if !label?
+		savedVer = {  # ported from `saved_vers_controller` in v1
+			versionId: label.version
+			comment:   label.comment
+			createdAt: label.created_at
+		}
+		if label.user_id?
+			UserGetter.getUser label.user_id, (err, user) ->
+				return callback(err) if err?
+				if user?
+					savedVer.user = {
+						name: "#{user.first_name} #{user.last_name}".trim(),
+						email: user.email
+					}
+				callback(null, savedVer)
+		else
+			callback(null, savedVer)
 
 	getLatestProjectVersion: (userId, projectId, callback=(err, data)->) ->
 		GitBridgeHandler._checkAccess userId, projectId, (err, project) ->
@@ -50,12 +117,28 @@ module.exports = GitBridgeHandler =
 					err = new Error("No version received from project-history api")
 					logger.err {err}, "Error while communicating with project-history api"
 					return callback(err)
-				data = {
-					latestVerId: body.version
-					latestVerAt: body.timestamp
-					latestVerBy: (body.v2Authors or [])[0]
-				}
-				callback(null, data)
+				authorId = (body.v2Authors or [])[0] or null
+				GitBridgeHandler._getAuthorInfo authorId, (err, authorInfo) ->
+					return callback(err) if err?
+					data = {
+						latestVerId: body.version
+						latestVerAt: body.timestamp
+						latestVerBy: authorInfo
+					}
+					GitBridgeHandler._getMigratedFromId project, (err, migratedFromId) ->
+						return callback(err) if err?
+						if migratedFromId?
+							logger.log {projectId, userId, migratedFromId}, "Adding migratedFromId to response"
+							data.migratedFromId = migratedFromId
+						callback(null, data)
+
+	_getMigratedFromId: (project, callback=(err, migratedFromId)->) ->
+		if !project?.overleaf?.id?
+			return callback(null, null)
+		if !project.tokens?.readAndWrite? || !project.tokens?.readAndWrite?.startsWith("#{project.overleaf.id}")
+			logger.err {projectId: project._id}, '[GitBridgeHandler] Inconsistent readAndWriteToken'
+			return callback(new Error('Inconsistent readAndWrite token'))
+		callback(null, project.tokens.readAndWrite)
 
 	showSnapshot: (userId, projectId, version, callback=(err, data)->) ->
 		GitBridgeHandler._checkAccess userId, projectId, (err, project) ->
@@ -108,6 +191,7 @@ module.exports = GitBridgeHandler =
 						err = new Errors.OutOfDateError("project out of date: #{projectId}")
 						logger.err {err, projectId, latestVerId, snapshotVerId},
 							"[GitBridgeHandler] project out of date, can't apply snapshot"
+						return callback(err)
 					logger.log {userId, projectId}, "[GitBridgeHandler] starting snapshot application"
 					callback()  # Do the actual import async, like the original rails implementation
 					GitBridgeHandler._asyncApplySnapshot(userId, project, snapshot)
@@ -137,7 +221,7 @@ module.exports = GitBridgeHandler =
 		errorPayload = if err instanceof Errors.OutOfDateError
 				{code: 'outOfDate', message: 'Out of Date'}
 			else if err instanceof Errors.InvalidFileError
-				{code: 'invalidFiles', message: 'Invalid Files'}
+				{code: 'invalidFiles', message: 'Invalid Files', errors: err.errors}
 			else
 				{code: 'error', message: 'Unexpected Error'}
 		logger.log {errorPayload, projectId: project._id},
@@ -151,23 +235,36 @@ module.exports = GitBridgeHandler =
 
 	_prepareSnapshotFiles: (project, snapshot, callback=(err, files)->) ->
 		files = []
+		fileErrors = []
 		for file in (snapshot.files or [])
 			if !file.name?
 				return callback(new Errors.InvalidFileError("file object has no name"))
 			name = file.name
 			if !EditorHttpController._nameIsAcceptableLength(name)
-				err = new Errors.InvalidFileError("file name is not acceptible length: #{name}")
-				logger.err {err, projectId: project._id}, "[GitBridgeHandler] #{err.message}"
-				return callback(err)
+				logger.log {projectId: project._id, file}, '[GitBridgeHandler] invalid file length'
+				fileErrors.push({
+					file: file.name,
+					state: 'error'
+				})
+				continue
 			if !SafePath.isCleanPath(name)
-				err = new Errors.InvalidFileError("file name invalid: #{name}")
-				logger.err {err, projectId: project._id}, "[GitBridgeHandler] #{err.message}"
-				return callback(err)
+				logger.log {projectId: project._id, file}, '[GitBridgeHandler] invalid file name'
+				fileErrors.push({
+					file: file.name,
+					state: 'error'
+				})
+				continue
 			newFile = {name: name}
 			if file.url?
 				newFile.url = url.parse(file.url).format()
 			files.push(newFile)
-		callback(null, files)
+		if fileErrors.length > 0
+			err = new Errors.InvalidFileError()
+			err.errors = fileErrors
+			logger.err {err, errors: err.errors, projectId: project._id}, "[GitBridgeHandler] invalid files"
+			return callback(err)
+		else
+			callback(null, files)
 
 	_prepareEntityOperations: (project, snapshotFiles, callback=(err, operations)->) ->
 		deleteEntities = []
@@ -242,3 +339,13 @@ module.exports = GitBridgeHandler =
 
 	_projectHistoryUrl: (path) ->
 		"#{Settings.apis.project_history.url}#{path}"
+
+	_getAuthorInfo: (userId, callback=(err, info)->) ->
+		if !userId?
+			return callback(null, null)
+		UserGetter.getUser userId, {first_name: 1, last_name: 1, email: 1}, (err, user) ->
+			return callback(err) if err?
+			if !user?
+				return callback(null, null)
+			callback(null, {email: user.email, name: "#{user.first_name} #{user.last_name}"})
+

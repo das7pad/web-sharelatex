@@ -5,6 +5,13 @@ NotFoundError = (message) ->
 	return error
 NotFoundError.prototype.__proto__ = Error.prototype
 
+ForbiddenError = (message) ->
+	error = new Error(message)
+	error.name = "ForbiddenError"
+	error.__proto__ = ForbiddenError.prototype
+	return error
+ForbiddenError.prototype.__proto__ = Error.prototype
+
 ServiceNotConfiguredError = (message) ->
 	error = new Error(message)
 	error.name = "ServiceNotConfiguredError"
@@ -32,13 +39,6 @@ UnsupportedFileTypeError = (message) ->
 	error.__proto__ = UnsupportedFileTypeError.prototype
 	return error
 UnsupportedFileTypeError.prototype.__proto__ = Error.prototype
-
-UnsupportedBrandError = (message) ->
-	error = new Error(message)
-	error.name = "UnsupportedBrandError"
-	error.__proto__ = UnsupportedBrandError.prototype
-	return error
-UnsupportedBrandError.prototype.__proto__ = Error.prototype
 
 UnsupportedExportRecordsError = (message) ->
 	error = new Error(message)
@@ -96,13 +96,27 @@ AccountMergeError = (message) ->
 	return error
 AccountMergeError.prototype.__proto__ = Error.prototype
 
+NotInV2Error = (message) ->
+	error = new Error(message)
+	error.name = "NotInV2Error"
+	error.__proto__ = NotInV2Error.prototype
+	return error
+NotInV2Error.prototype.__proto__ = Error.prototype
+
+SLInV2Error = (message) ->
+	error = new Error(message)
+	error.name = "SLInV2Error"
+	error.__proto__ = SLInV2Error.prototype
+	return error
+SLInV2Error.prototype.__proto__ = Error.prototype
+
 module.exports = Errors =
 	NotFoundError: NotFoundError
+	ForbiddenError: ForbiddenError
 	ServiceNotConfiguredError: ServiceNotConfiguredError
 	TooManyRequestsError: TooManyRequestsError
 	InvalidNameError: InvalidNameError
 	UnsupportedFileTypeError: UnsupportedFileTypeError
-	UnsupportedBrandError: UnsupportedBrandError
 	UnsupportedExportRecordsError: UnsupportedExportRecordsError
 	V1HistoryNotSyncedError: V1HistoryNotSyncedError
 	ProjectHistoryDisabledError: ProjectHistoryDisabledError
@@ -111,3 +125,5 @@ module.exports = Errors =
 	EmailExistsError: EmailExistsError
 	InvalidError: InvalidError
 	AccountMergeError: AccountMergeError
+	NotInV2Error: NotInV2Error
+	SLInV2Error: SLInV2Error

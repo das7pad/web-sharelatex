@@ -8,3 +8,4 @@ module.exports =
 		# webRouter.get '/org', PortalsController.getIndexOrg
 		webRouter.get '/edu/:slug', PortalsController.getPortalEdu
 		webRouter.get '/org/:slug', PortalsController.getPortalOrg
+		webRouter.get '/org/:publisher/journal/:journal', PortalsController.friendlyTemplateLink

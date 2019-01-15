@@ -25,3 +25,36 @@ module.exports = V1Handler =
 			else
 				err = new Error("Unexpected status from v1 login api: #{response.statusCode}")
 				callback(err)
+
+	doPasswordReset: (v1_user_id, password, callback=(err, created)->) ->
+		logger.log({v1_user_id},
+			"sending password reset request to v1 login api")
+		V1Api.request {
+			method: 'POST'
+			url: "/api/v1/sharelatex/reset_password"
+			json: {
+				user_id: v1_user_id,
+				password: password
+			}
+			expectedStatusCodes: [200]
+		}, (err, response, body) ->
+			if err?
+				logger.err {v1_user_id, err}, "error while talking to v1 password reset api"
+				return callback(err, false)
+			if response.statusCode in [200]
+				logger.log {v1_user_id, changed: true}, "got success response from v1 password reset api"
+				callback(null, true)
+			else
+				err = new Error("Unexpected status from v1 password reset api: #{response.statusCode}")
+				callback(err, false)
+
+	getDocExported: (token, callback=(err, info)->) ->
+		# default to not exported
+		return callback(null, {
+			exported: false
+			exporting: false
+		}) unless Settings.apis?.v1?
+
+		V1Api.request { url: "/api/v1/sharelatex/docs/#{token}/exported_to_v2" }, (err, response, body) ->
+			return callback err if err?
+			callback null, body

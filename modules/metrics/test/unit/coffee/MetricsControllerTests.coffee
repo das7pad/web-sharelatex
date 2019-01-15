@@ -59,6 +59,26 @@ describe "MetricsController", ->
 
 			done()
 
+	describe 'groupMetrics', ->
+		it 'renders the metricsApp template', (done) ->
+			@req = entity:
+				_id: '123abc'
+				teamName: 'Test Group Name'
+			@res = { render: sinon.stub() }
+
+			@MetricsController.groupMetrics(@req, @res)
+
+			@res.render.calledWith(
+				sinon.match('views/metricsApp'), {
+					metricsEndpoint: '/graphs',
+					resourceId: '123abc',
+					resourceName: 'Test Group Name',
+					resourceType: 'group',
+				}
+			).should.equal true
+
+			done()
+
 	describe 'institutionMetrics', ->
 		it 'renders the metricsApp template after calling v1 for the name', (done) ->
 			@req = entity: @institution
@@ -77,6 +97,26 @@ describe "MetricsController", ->
 
 			done()
 
+	describe 'TemplateMetrics', ->
+		it 'renders the metricsApp template', (done) ->
+			@req = template:
+				id: 123
+				title: 'Template Title'
+			@res = { render: sinon.stub() }
+
+			@MetricsController.templateMetrics(@req, @res)
+
+			@res.render.calledWith(
+				sinon.match('views/metricsApp'), {
+					metricsEndpoint: '/graphs',
+					resourceId: 123,
+					resourceName: 'Template Title',
+					resourceType: 'template',
+				}
+			).should.equal true
+
+			done()
+
 	describe 'analyticsProxy', ->
 		it 'proxies requests to the analytics service', (done) ->
 			@request.get  = sinon.stub().returns(@request)
@@ -85,6 +125,7 @@ describe "MetricsController", ->
 
 			@req = { originalUrl: '/graphs?resource_type=team&resource_id=6' }
 
+			@res = { setTimeout: sinon.stub() }
 			@MetricsController.analyticsProxy(@req, @res)
 
 			@request.get.calledWith(
