@@ -1,3 +1,6 @@
+/* eslint-disable
+    camelcase,
+*/
 // TODO: This file was created by bulk-decaffeinate.
 // Sanity-check the conversion and remove this comment.
 /*
@@ -57,7 +60,7 @@ define(['base', 'libs/platform', 'services/algolia-search'], function(
   return App.controller('ContactFormController', function(
     $scope,
     algoliaSearch,
-    eventTracking,
+    event_tracking,
     $http
   ) {
     // the form
@@ -86,7 +89,7 @@ define(['base', 'libs/platform', 'services/algolia-search'], function(
       })()
 
       if (results.hits.length) {
-        eventTracking.sendMB('contact-form-suggestions-shown')
+        event_tracking.sendMB('contact-form-suggestions-shown')
       }
 
       return $scope.$applyAsync(() => ($scope.suggestions = suggestions))
@@ -156,7 +159,7 @@ define(['base', 'libs/platform', 'services/algolia-search'], function(
       })
 
     return ($scope.clickSuggestionLink = url =>
-      eventTracking.sendMB('contact-form-suggestions-clicked', { url }))
+      event_tracking.sendMB('contact-form-suggestions-clicked', { url }))
   })
 })
 
