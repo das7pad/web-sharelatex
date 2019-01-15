@@ -1,5 +1,3 @@
-/* global atob */
-
 define(['base'], App =>
   // For integration-module
   App.controller('OpenInOverleafGatewayController', function(
@@ -9,8 +7,8 @@ define(['base'], App =>
   ) {
     $scope.error = false
 
-    $scope.handleGateway = function(base64EncodedInput) {
-      let input = JSON.parse(atob(base64EncodedInput))
+    $scope.handleGateway = function() {
+      let input = JSON.parse($('#overleaf-gateway-data').text())
       _addReferrer(input.params)
 
       if (!_validateInput(input)) {
@@ -50,7 +48,7 @@ define(['base'], App =>
     }
 
     function _retrieveParamsIfMissing(params) {
-      if (Object.keys(params).length === 0) {
+      if (Object.keys(params).filter(k => k !== 'referrer').length === 0) {
         return JSON.parse(window.sessionStorage.getItem('openInOverleaf')) || {}
       }
       return params
