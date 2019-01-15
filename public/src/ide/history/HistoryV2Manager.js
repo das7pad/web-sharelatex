@@ -78,8 +78,8 @@ define([
               let [newTo, newFrom] = newRange
               let [prevTo, prevFrom] = prevRange
               if (
-                newTo &&
-                newFrom &&
+                newTo != null &&
+                newFrom != null &&
                 newTo !== prevTo &&
                 newFrom !== prevFrom
               ) {
