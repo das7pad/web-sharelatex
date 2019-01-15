@@ -42,6 +42,7 @@ define(['base', 'directives/mathjax', 'services/algolia-search'], function(
     }
 
     const buildHitViewModel = function(hit) {
+      const pagePath = hit.kb ? 'how-to/' : 'latex/'
       const page_underscored = hit.pageName.replace(/\s/g, '_')
       const section_underscored = hit.sectionName.replace(/\s/g, '_')
       let content = hit._highlightResult.content.value
@@ -64,7 +65,7 @@ define(['base', 'directives/mathjax', 'services/algolia-search'], function(
           hit._highlightResult.pageName.value +
           ' - ' +
           hit._highlightResult.sectionName.value,
-        url: `/learn/${page_underscored}#${section_underscored}`,
+        url: `/learn/${pagePath}${page_underscored}#${section_underscored}`,
         content
       }
       return result
