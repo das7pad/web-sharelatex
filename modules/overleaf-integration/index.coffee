@@ -66,9 +66,10 @@ OverleafIntegration =
 					passport.use(
 						new GoogleStrategy(
 							{
-								clientID: google.client_id,
-								clientSecret: google.client_secret,
+								clientID: google.client_id
+								clientSecret: google.client_secret
 								callbackURL: callback_url
+								userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
 							},
 							(accessToken, refreshToken, profile, callback) ->
 								if profile.name?.givenName? && profile.name?.familyName?
