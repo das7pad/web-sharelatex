@@ -1,9 +1,5 @@
-/* eslint-disable
-    max-len,
-    no-return-assign,
-    no-undef,
-    no-unreachable,
-*/
+/* global PDFJS */
+
 define(['base'], App => {
   const EXTERNAL_LINK_TARGET = '_blank'
   const REL_NOOPENER = 'noreferrer noopener'
