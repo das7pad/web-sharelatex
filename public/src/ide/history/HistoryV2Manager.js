@@ -149,10 +149,10 @@ define([
               fromV: null,
               toV: null
             },
-            diff: null, // When history.viewMode == HistoryViewModes.COMPARE
-            files: [], // When history.viewMode == HistoryViewModes.COMPARE
-            update: null, // When history.viewMode == HistoryViewModes.POINT_IN_TIME
-            label: null, // When history.viewMode == HistoryViewModes.POINT_IN_TIME
+            diff: null,
+            files: [],
+            update: null,
+            label: null,
             file: null
           },
           error: null,
