@@ -81,7 +81,7 @@ define(['base', 'libs/platform', 'services/algolia-search'], function(
           )
           const pageSlug = encodeURIComponent(pageUnderscored)
           const pagePath = hit.kb ? 'how-to' : 'latex'
-          const sectionExists = hit.sectionExists && hit.sectionName !== ''
+          const sectionExists = hit.sectionName && hit.sectionName !== ''
           const pageAnchor = sectionExists
             ? `#${hit.sectionName.replace(/\s/g, '_')}`
             : ''
