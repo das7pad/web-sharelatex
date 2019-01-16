@@ -4,16 +4,6 @@
     no-undef,
     no-unreachable,
 */
-// TODO: This file was created by bulk-decaffeinate.
-// Fix any style issues and re-enable lint.
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS205: Consider reworking code to avoid use of IIFEs
- * DS206: Consider reworking classes to avoid initClass
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 define(['base'], App => {
   const EXTERNAL_LINK_TARGET = '_blank'
   const REL_NOOPENER = 'noreferrer noopener'
@@ -27,28 +17,24 @@ define(['base'], App => {
       }
 
       setAnnotations(annotations) {
-        return (() => {
-          const result = []
-          for (let annotation of Array.from(annotations)) {
-            switch (annotation.subtype) {
-              case 'Link':
-                result.push(this.addLink(annotation))
-                break
-              case 'Text':
-                continue
-                break
-              default:
-                result.push(undefined)
-            }
+        const result = []
+        for (let annotation of annotations) {
+          switch (annotation.subtype) {
+            case 'Link':
+              result.push(this.addLink(annotation))
+              break
+            case 'Text':
+              continue
+            default:
+              result.push(undefined)
           }
-          return result
-        })()
+        }
       }
 
       addLink(link) {
         const element = this.buildLinkElementFromRect(link.rect)
         this.setLinkTarget(element, link)
-        return this.annotationsLayerDiv.appendChild(element)
+        this.annotationsLayerDiv.appendChild(element)
       }
 
       buildLinkElementFromRect(rect) {
