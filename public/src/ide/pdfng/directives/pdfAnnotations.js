@@ -16,6 +16,7 @@
  */
 define(['base'], App => {
   const EXTERNAL_LINK_TARGET = '_blank'
+  const REL_NOOPENER = 'noreferrer noopener'
 
   App.factory('pdfAnnotations', function() {
     class pdfAnnotations {
@@ -64,13 +65,14 @@ define(['base'], App => {
       setLinkTarget(element, link) {
         if (link.url) {
           element.href = link.url
-          return (element.target = EXTERNAL_LINK_TARGET)
+          element.target = EXTERNAL_LINK_TARGET
+          element.rel = REL_NOOPENER
         } else if (link.dest) {
           element.href = `#${link.dest}`
-          return (element.onclick = e => {
+          element.onclick = () => {
             this.navigateFn(link)
             return false
-          })
+          }
         }
       }
     }
