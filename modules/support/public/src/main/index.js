@@ -80,9 +80,18 @@ define(['base', 'libs/platform', 'services/algolia-search'], function(
             x => x.replace(/\s/g, '_')
           )
           const pageSlug = encodeURIComponent(pageUnderscored)
+          const pagePath = hit.kb ? 'how-to' : 'latex'
+          const sectionExists = hit.sectionExists && hit.sectionName !== ''
+          const pageAnchor = sectionExists
+            ? `#${hit.sectionName.replace(/\s/g, '_')}`
+            : ''
+          let pageName = hit._highlightResult.pageName.value
+          if (sectionExists) {
+            pageName += ' - ' + hit.sectionName
+          }
           result.push({
-            url: `/learn/how-to/${pageSlug}`,
-            name: hit._highlightResult.pageName.value
+            url: `/learn/${pagePath}/${pageSlug}${pageAnchor}`,
+            name: pageName
           })
         }
         return result
@@ -149,7 +158,7 @@ define(['base', 'libs/platform', 'services/algolia-search'], function(
     var _setupSuggestionsWatcher = () =>
       $scope.$watch('form.subject', function(newVal, oldVal) {
         if (newVal && newVal !== oldVal && newVal.length > 3) {
-          return algoliaSearch.searchKB(newVal, _handleSearchResults, {
+          return algoliaSearch.searchWiki(newVal, _handleSearchResults, {
             hitsPerPage: 3,
             typoTolerance: 'strict'
           })
