@@ -1,4 +1,4 @@
-- if (v1SubscriptionStatus['team'])
+- if (v1SubscriptionStatus['team'] && v1SubscriptionStatus['team']['default_plan_name'] != 'free')
   p
     | You have a legacy group licence from Overleaf v1.
   - if (v1SubscriptionStatus['team']['will_end_at'])
