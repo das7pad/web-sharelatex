@@ -14,14 +14,11 @@
  * DS206: Consider reworking classes to avoid initClass
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['base'], App =>
-  // App = angular.module 'pdfAnnotations', []
+define(['base'], App => {
+  const EXTERNAL_LINK_TARGET = '_blank'
+
   App.factory('pdfAnnotations', function() {
     class pdfAnnotations {
-      static initClass() {
-        this.EXTERNAL_LINK_TARGET = '_blank'
-      }
-
       constructor(options) {
         this.annotationsLayerDiv = options.annotations
         this.viewport = options.viewport
@@ -67,7 +64,7 @@ define(['base'], App =>
       setLinkTarget(element, link) {
         if (link.url) {
           element.href = link.url
-          return (element.target = this.EXTERNAL_LINK_TARGET)
+          return (element.target = EXTERNAL_LINK_TARGET)
         } else if (link.dest) {
           element.href = `#${link.dest}`
           return (element.onclick = e => {
@@ -78,4 +75,5 @@ define(['base'], App =>
       }
     }
     return pdfAnnotations
-  }))
+  })
+})
