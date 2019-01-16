@@ -25,15 +25,20 @@ define([
   'ide/files/services/files'
 ], function(
   App,
+  Ace,
   _ignore1,
   _ignore2,
   _ignore3,
+  UndoManager,
+  AutoCompleteManager,
   SpellCheckManager,
   SpellCheckAdapter,
+  HighlightsManager,
   CursorPositionManager,
   CursorPositionAdapter,
   TrackChangesManager,
-  TrackChangesAdapter
+  TrackChangesAdapter,
+  MetadataManager
 ) {
   let syntaxValidationEnabled
   const { EditSession } = ace.require('ace/edit_session')
@@ -63,11 +68,16 @@ define([
   }
 
   App.directive('aceEditor', function(
+    $timeout,
     $compile,
     $rootScope,
     event_tracking,
     localStorage,
     $cacheFactory,
+    metadata,
+    graphics,
+    preamble,
+    files,
     $http,
     $q,
     $window
@@ -157,6 +167,8 @@ define([
           )
         }
 
+        const undoManager = new UndoManager(scope, editor, element)
+        const highlightsManager = new HighlightsManager(scope, editor, element)
         const cursorPositionManager = new CursorPositionManager(
           scope,
           new CursorPositionAdapter(editor),
@@ -167,6 +179,22 @@ define([
           editor,
           element,
           new TrackChangesAdapter(editor)
+        )
+
+        const metadataManager = new MetadataManager(
+          scope,
+          editor,
+          element,
+          metadata
+        )
+        const autoCompleteManager = new AutoCompleteManager(
+          scope,
+          editor,
+          element,
+          metadataManager,
+          graphics,
+          preamble,
+          files
         )
 
         scope.$watch('onSave', function(callback) {
