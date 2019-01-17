@@ -20,7 +20,7 @@ module.exports = RateLimiter =
 			if err?
 				return callback(err)
 			allowed = timeLeft == 0
-			Metrics.inc "rate-limit-hit-#{opts.endpointName}", 1, {path: opts.endpointName} unless allowed
+			Metrics.inc "rate-limit-hit.#{opts.endpointName}", 1, {path: opts.endpointName} unless allowed
 			callback(null, allowed)
 
 	clearRateLimit: (endpointName, subject, callback) ->

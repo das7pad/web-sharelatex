@@ -86,7 +86,7 @@ describe "RateLimiter", ->
 
 		it 'should increment the metric', (done) ->
 			@limiter.addCount {endpointName: @endpointName}, (err, should) =>
-				sinon.assert.calledWith(@Metrics.inc, "rate-limit-hit-#{@endpointName}", 1, {path: @endpointName})
+				sinon.assert.calledWith(@Metrics.inc, "rate-limit-hit.#{@endpointName}", 1, {path: @endpointName})
 				done()
 
 	describe 'when limiter produces an error', ->
