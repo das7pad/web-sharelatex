@@ -52,3 +52,27 @@ p
 				label Overleaf ID
 			td {{ project.overleaf.id }}
 
+		tr
+			td
+				label Brand Variation ID
+
+			td
+				form(async-form="adminProjectBrandVariationId", name="adminProjectBrandVariationIdForm", method="POST", action="/admin/project/" + project._id + "/brandVariationId", novalidate)
+					input(type="hidden", name="_csrf", value=csrfToken)
+					div(ng-show="!editingBrandVariationId")
+						span(ng-if="project.brandVariationId") {{ project.brandVariationId }}
+						span(ng-if="!project.brandVariationId") [none]
+						| &nbsp;&nbsp;
+						a(href, ng-click="editingBrandVariationId = true") (edit)
+					div(ng-show="editingBrandVariationId")
+						input#brand-variation-id.form-control(
+							name='brandVariationId',
+							ng-model="project.brandVariationId"
+						)
+						.row-spaced-small
+							button.btn.btn-primary(type='submit', ng-disabled="adminProjectBrandVariationIdForm.inflight")
+								span(ng-show="!adminProjectBrandVariationIdForm.inflight") Save
+								span(ng-show="adminProjectBrandVariationIdForm.inflight") Saving...
+							| &nbsp;
+							a.btn.btn-default(href, ng-click="editingBrandVariationId = false") Cancel
+

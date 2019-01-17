@@ -6,5 +6,6 @@ define(['base', 'libs/md5'], function(App) {
     queuedHttp
   ) {
     $scope.project = window.data.project
+    $scope.editingBrandVariationId = false
   })
 })

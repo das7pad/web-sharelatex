@@ -35,3 +35,4 @@ module.exports =
 		adminRouter.delete "/project/:Project_id", ProjectController.deleteProject
 
 		adminRouter.get    "/project/:Project_id", ProjectAdminController.show
+		adminRouter.post    "/project/:Project_id/brandVariationId", ProjectAdminController.updateBrandVariationId
