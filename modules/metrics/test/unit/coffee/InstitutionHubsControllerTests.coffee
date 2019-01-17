@@ -31,7 +31,7 @@ describe "InstitutionHubsController", ->
 				institution.portalSlug = 'slug'
 				callback(null, institution)
 		@req = entity: institution
-		@res = { send: sinon.stub(), attachment: sinon.stub() }
+		@res = { send: sinon.stub(), header: sinon.stub(), contentType: sinon.stub() }
 
 	describe "institutionHub rendering", ->
 		it 'renders the institution hub template', (done) ->
@@ -159,7 +159,7 @@ describe "InstitutionHubsController", ->
 				'department': 'engineering',
 				'created_at': '2018-10-08T12:53:00.058Z'
 			}]
-			jsonAsCSV = 'email,role,department,created_at\n"test@test.test","student","engineering","2018-10-08T12:53:00.058Z",\n'
+			jsonAsCSV = '"email","role","department","created_at"\n"test@test.test","student","engineering","2018-10-08T12:53:00.058Z"'
 			@request.get = sinon.stub().callsArgWith(1, null, null, v1JsonResp)
 			endpoint = /5\/affiliations/
 			@InstitutionHubsController.institutionUsersCSV(@req, @res)
@@ -168,6 +168,6 @@ describe "InstitutionHubsController", ->
 				auth: @v1Auth
 				json: true
 			}).should.equal true
-			@res.attachment.calledWith('users.csv').should.equal true
+			@res.header.calledWith('Content-Disposition', 'attachment; filename=Users.csv').should.equal true
 			@res.send.calledWith(jsonAsCSV).should.equal true
 			done()

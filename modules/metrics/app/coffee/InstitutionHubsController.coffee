@@ -2,6 +2,7 @@ settings = require 'settings-sharelatex'
 request = require 'request'
 Path = require("path")
 InstitutionsGetter = require '../../../../app/js/Features/Institutions/InstitutionsGetter'
+CSVParser = require('json2csv').Parser
 logger = require 'logger-sharelatex'
 
 module.exports = InstitutionHubsController =
@@ -33,7 +34,11 @@ module.exports = InstitutionHubsController =
 	institutionUsersCSV: (req, res, next) ->
 		InstitutionHubsController._v1InstitutionsApi(req.entity.v1Id, 'affiliations', (err, response, body)->
 			return next(err) if err?
-			res.attachment('users.csv')
+			res.header(
+				"Content-Disposition",
+				"attachment; filename=Users.csv"
+			)
+			res.contentType('text/csv')
 			res.send(InstitutionHubsController._formatUsersCSV(body))
 		)
 
@@ -76,16 +81,9 @@ module.exports = InstitutionHubsController =
 				callback(null)
 
 	_formatUsersCSV: (data) ->
-		headers = ['email', 'role', 'department', 'created_at']
-		csv = headers.toString() + '\n'
-		for user in data
-			rowData = ''
-			console.log(user)
-			for col in headers
-				console.log(user[col])
-				rowData = rowData + '\"' + user[col] + '\"' + ','
-			csv = csv + rowData + '\n'
-		return csv
+		fields = ['email', 'role', 'department', 'created_at']
+		csvParser = new CSVParser({fields})
+		return csvParser.parse(data)
 
 	_formatRecentActivity: (data) ->
 		recentActivity = []
