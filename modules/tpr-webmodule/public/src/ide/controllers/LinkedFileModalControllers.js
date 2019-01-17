@@ -157,8 +157,10 @@ define(['base'], function(App) {
             payload
           )
           .then(function() {
-            $scope.$emit('references:should-reindex', {})
-            $scope.$emit('done')
+            $scope.$emit('done', {
+              name: $scope.data.name,
+              shouldReindexReferences: true
+            })
             return _reset()
           })
           .catch(err => _handleError(err))
