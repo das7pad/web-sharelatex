@@ -161,7 +161,7 @@ module.exports = class Router
 				AuthenticationController.requireLogin(),
 				RateLimiterMiddlewear.rateLimit({
 					endpointName: "endorse-email"
-					maxRequests: 100
+					maxRequests: 30
 					timeInterval: 60
 				}),
 				UserEmailsController.endorse

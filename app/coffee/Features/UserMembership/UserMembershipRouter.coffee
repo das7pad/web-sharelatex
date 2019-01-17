@@ -29,7 +29,7 @@ module.exports =
 			UserMembershipAuthorization.requireGroupManagementAccess,
 			RateLimiterMiddlewear.rateLimit({
 				endpointName: "export-team-csv"
-				maxRequests: 100
+				maxRequests: 30
 				timeInterval: 60
 			}),
 			UserMembershipController.exportCsv
