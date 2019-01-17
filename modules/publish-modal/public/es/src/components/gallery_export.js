@@ -140,12 +140,10 @@ export default class GalleryExport extends Component {
       <span>
         <p>Export Successful!</p>
         <p>
-          Thanks for submitting to {this.props.entry.name}. Your manuscript and
-          supporting files have been sent directly to the journal's editorial
-          team, and they will send a follow-up email with instructions for how
-          to complete your submission.
+          Thank you for submitting {this.props.entry.name} to the Overleaf
+          Gallery. We'll be in touch shortly, once we've checked and approved
+          your submission.
         </p>
-        <p>Please check your email for confirmation of your submission.</p>
       </span>
     )
   }
