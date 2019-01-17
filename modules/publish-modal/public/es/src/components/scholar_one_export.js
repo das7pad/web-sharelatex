@@ -39,10 +39,8 @@ export default class ScholarOneExport extends Component {
       // respond with their log in form html, which the browser will then
       // render. It cannot be done via XHR.
       // It needs to be button.click(), not a direct call to form.submit()
-      // because React's synthetic events system seems to propagate the submit
-      // event up to the window. This means that in the tests, we cannot prevent
-      // the event navigating the page, which is something that Karma does not
-      // like.
+      // because the .submit() method does not fire the submit event. See:
+      // https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/submit
       this.submitButton.click()
     }
   }
