@@ -59,7 +59,7 @@ module.exports =
 		)
 
 		webRouter.get(
-			'/metrics/csv?',
+			'/metrics/csv',
 			UserMembershipAuthorization.requireGraphAccess,
 			MetricsController.analyticsProxy
 		)
