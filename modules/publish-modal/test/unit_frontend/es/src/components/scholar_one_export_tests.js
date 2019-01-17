@@ -11,7 +11,7 @@ import {
 import ScholarOneExport from '../../../../../public/es/src/components/scholar_one_export'
 
 describe('<ScholarOneExport />', function() {
-  let formSubmissionStub, formData, ajaxStub
+  let formData, ajaxStub
 
   this.timeout(5000)
 
@@ -23,26 +23,24 @@ describe('<ScholarOneExport />', function() {
     // the page is navigated away (through the form submission). We therefore
     // prevent the form submission from happening by calling preventDefault()
     // on the submit event
-    formSubmissionStub = preventFormSubmission(formData)
-    document.addEventListener('submit', formSubmissionStub)
+    document.addEventListener('submit', preventFormSubmission)
   })
 
   afterEach(() => {
     delete window.ExposedSettings
+    document.removeEventListener('submit', preventFormSubmission)
     cleanup()
   })
 
-  function preventFormSubmission() {
-    return e => {
-      e.preventDefault()
+  function preventFormSubmission(e) {
+    e.preventDefault()
 
-      // To assert that the form submission contains the correct data, we also
-      // capture the form data and transform it an object with name/value pairs
-      formData = Array.from(e.target.elements).reduce(
-        (acc, elem) => Object.assign(acc, { [elem.name]: elem.value }),
-        {}
-      )
-    }
+    // To assert that the form submission contains the correct data, we also
+    // capture the form data and transform it an object with name/value pairs
+    formData = Array.from(e.target.elements).reduce(
+      (acc, elem) => Object.assign(acc, { [elem.name]: elem.value }),
+      {}
+    )
   }
 
   describe('successful initial request', () => {
