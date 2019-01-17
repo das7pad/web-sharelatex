@@ -63,7 +63,7 @@ p
 						span(ng-if="project.brandVariationId") {{ project.brandVariationId }}
 						span(ng-if="!project.brandVariationId") [none]
 						| &nbsp;&nbsp;
-						a(href, ng-click="editingBrandVariationId = true") (edit)
+						| (#[a(href, ng-click="editingBrandVariationId = true") edit])
 					div(ng-show="editingBrandVariationId")
 						input#brand-variation-id.form-control(
 							name='brandVariationId',

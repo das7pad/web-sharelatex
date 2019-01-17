@@ -23,5 +23,9 @@ module.exports = ProjectAdminController =
 		projectId = req.params.Project_id
 		brandVariationId = req.body.brandVariationId.trim()
 		logger.info {projectId, brandVariationId}, "[ProjectAdminController] setting brandVariationId on project"
-		ProjectOptionsHandler.setBrandVariationId projectId, brandVariationId, () ->
+		done = () ->
 			res.status(204).send()
+		if !brandVariationId
+			ProjectOptionsHandler.unsetBrandVariationId projectId, done
+		else
+			ProjectOptionsHandler.setBrandVariationId projectId, brandVariationId, done
