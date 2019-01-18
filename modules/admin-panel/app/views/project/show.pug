@@ -1,11 +1,8 @@
 extends ../../../../../app/views/layout
 
 block content
-	script#data(type="application/json").
-		!{JSON.stringify({project: project}).replace(/\//g, '\\/')}
 
-	script(type="text/javascript").
-		window.data = JSON.parse($("#data").text());
+	script(type="template", id="admin-project-data")!= StringHelper.stringifyJsonForScript({project: project})
 
 	.content.content-alt(ng-controller="AdminProjectController")
 		.container(ng-cloak)
