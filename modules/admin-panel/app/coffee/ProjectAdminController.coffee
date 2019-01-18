@@ -28,4 +28,8 @@ module.exports = ProjectAdminController =
 		if !brandVariationId
 			ProjectOptionsHandler.unsetBrandVariationId projectId, done
 		else
-			ProjectOptionsHandler.setBrandVariationId projectId, brandVariationId, done
+			if !parseInt(brandVariationId)
+				logger.info {projectId, brandVariationId}, "[ProjectAdminController] invalid brandVariationId"
+				return res.status(400).send()
+			else
+				ProjectOptionsHandler.setBrandVariationId projectId, brandVariationId, done

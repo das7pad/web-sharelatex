@@ -70,6 +70,9 @@ p
 							ng-model="project.brandVariationId"
 						)
 						.row-spaced-small
+							form-messages(
+								for="adminProjectBrandVariationIdForm"
+							)
 							button.btn.btn-primary(type='submit', ng-disabled="adminProjectBrandVariationIdForm.inflight")
 								span(ng-show="!adminProjectBrandVariationIdForm.inflight") Save
 								span(ng-show="adminProjectBrandVariationIdForm.inflight") Saving...
