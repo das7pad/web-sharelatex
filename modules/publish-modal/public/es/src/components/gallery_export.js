@@ -140,9 +140,9 @@ export default class GalleryExport extends Component {
       <span>
         <p>Export Successful!</p>
         <p>
-          Thank you for submitting {this.props.entry.name} to the Overleaf
-          Gallery. We'll be in touch shortly, once we've checked and approved
-          your submission.
+          Thanks for submitting to our gallery! We approve most submissions
+          within a few hours. We've sent you an e-mail to confirm your
+          submission, and we'll send you another one once it's approved.
         </p>
       </span>
     )
