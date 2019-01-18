@@ -136,7 +136,6 @@
     "eslint-plugin-react": "^7.11.1",
     "eslint-plugin-standard": "^3.0.1",
     "grunt": "0.4.5",
-    "grunt-available-tasks": "0.4.1",
     "grunt-bunyan": "0.5.0",
     "grunt-cli": "^1.2.0",
     "grunt-contrib-requirejs": "0.4.1",

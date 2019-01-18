@@ -74,22 +74,7 @@ module.exports = (grunt) ->
 				pattern: "@@RELEASE@@"
 				replacement: process.env.BUILD_NUMBER || "(unknown build)"
 
-		availabletasks:
-			tasks:
-				options:
-					filter: 'exclude',
-					tasks: [
-						'availabletasks'
-						'requirejs'
-						'version'
-					]
-					groups:
-						"Compile tasks": [
-							"compile:minify"
-						]
-
 	grunt.initConfig config
-	grunt.registerTask 'help', 'Display this help list', 'availabletasks'
 	grunt.registerTask 'compile:minify', 'Concat and minify the client side js', ['requirejs', "file_append"]
 	grunt.registerTask 'version', "Write the version number into sentry.pug", ['git-rev-parse', 'sed']
 
