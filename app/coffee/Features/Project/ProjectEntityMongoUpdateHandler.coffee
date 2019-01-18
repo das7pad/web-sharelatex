@@ -71,7 +71,15 @@ module.exports = ProjectEntityMongoUpdateHandler = self =
 						return callback(err) if err?
 						callback null, fileRef, project, path
 
-	mkdirp: wrapWithLock (project_id, path, callback) ->
+	mkdirp: wrapWithLock (project_id, path, options, callback) ->
+		# defaults to case insensitive paths, use options={exactCaseMatch:true}
+		# to make matching case-sensitive
+
+		# handle any existing calls with the original signature
+		if typeof options is 'function'
+			callback = options
+			options = {}
+
 		folders = path.split('/')
 		folders = _.select folders, (folder)->
 			return folder.length != 0
@@ -89,7 +97,7 @@ module.exports = ProjectEntityMongoUpdateHandler = self =
 				if parentFolder?
 					parentFolder_id = parentFolder._id
 				builtUpPath = "#{builtUpPath}/#{folderName}"
-				ProjectLocator.findElementByPath project: project, path: builtUpPath, (err, foundFolder)=>
+				ProjectLocator.findElementByPath project: project, path: builtUpPath, exactCaseMatch: options?.exactCaseMatch, (err, foundFolder)=>
 					if !foundFolder?
 						logger.log path:path, project_id:project._id, folderName:folderName, "making folder from mkdirp"
 						self.addFolder.withoutLock project_id, parentFolder_id, folderName, (err, newFolder, parentFolder_id)->
