@@ -14,6 +14,9 @@ define(['base'], App =>
         $scope.userAffiliations = emails
           .filter(email => email.affiliation)
           .map(email => email.affiliation)
+        $scope.userOnPayingUniversity = $scope.userAffiliations.some(
+          affiliation => affiliation.institution.licence !== 'free'
+        )
       })
     }
 
