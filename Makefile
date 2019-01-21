@@ -253,8 +253,9 @@ lint:
 	npm -q run lint
 
 version:
-	sed -i '' -e "s/@@COMMIT@@/${GIT_SHA}/g" $(SENTRY_TEMPLATE)
-	sed -i '' -e "s/@@RELEASE@@/${BUILD_NUMBER}/g" $(SENTRY_TEMPLATE)
+	sed -i.original -e "s/@@COMMIT@@/${GIT_SHA}/g" $(SENTRY_TEMPLATE)
+	sed -i.original -e "s/@@RELEASE@@/${BUILD_NUMBER}/g" $(SENTRY_TEMPLATE)
+	rm $(SENTRY_TEMPLATE).original
 
 .PHONY:
 	all add install update test test_unit test_frontend test_acceptance \
