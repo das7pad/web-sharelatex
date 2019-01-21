@@ -72,10 +72,11 @@ module.exports = ProjectEntityMongoUpdateHandler = self =
 						callback null, fileRef, project, path
 
 	mkdirp: wrapWithLock (project_id, path, options, callback) ->
-		# defaults to case insensitive paths, use options={exactCaseMatch:true}
+		# defaults to case insensitive paths, use options {exactCaseMatch:true}
 		# to make matching case-sensitive
 
-		# handle any existing calls with the original signature
+		# handle any existing calls with the original signature (they should
+		# all have been changed so this should never happen)
 		if typeof options is 'function'
 			callback = options
 			options = {}
