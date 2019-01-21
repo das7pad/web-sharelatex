@@ -252,9 +252,6 @@ format_fix:
 lint:
 	npm -q run lint
 
-git_rev_parse:
-	git rev-parse HEAD
-
 version:
 	sed -i '' -e "s/@@COMMIT@@/${GIT_SHA}/g" $(SENTRY_TEMPLATE)
 	sed -i '' -e "s/@@RELEASE@@/${BUILD_NUMBER}/g" $(SENTRY_TEMPLATE)
