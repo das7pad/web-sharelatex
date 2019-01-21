@@ -2,17 +2,14 @@ define(['base'], function(App) {
   return App.factory('validateCaptchaV3', function() {
     const grecaptcha = window.grecaptcha
     const ExposedSettings = window.ExposedSettings
-    var validateCaptchaV3 = function validateCaptchaV3(actionName, callback) {
+    return function validateCaptchaV3(actionName, callback) {
       if (callback == null) {
         callback = function callback(response) {}
       }
-      if (typeof grecaptcha === 'undefined' || grecaptcha === null) {
+      if (!grecaptcha) {
         return
       }
-      if (
-        typeof ExposedSettings === 'undefined' ||
-        typeof ExposedSettings.recaptchaSiteKeyV3 === 'undefined'
-      ) {
+      if (!ExposedSettings || !ExposedSettings.recaptchaSiteKeyV3) {
         return
       }
       grecaptcha.ready(function() {
@@ -21,6 +18,5 @@ define(['base'], function(App) {
           .then(callback)
       })
     }
-    return validateCaptchaV3
   })
 })
