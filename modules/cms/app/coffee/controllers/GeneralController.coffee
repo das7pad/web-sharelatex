@@ -19,7 +19,7 @@ module.exports = PageController =
 				content_type: 'page',
 				'fields.path': req.params.path,
 				'fields.slug': req.params.slug,
-				include: 3
+				include: 5
 			}
 
 			if req.params.parent_slug

@@ -136,7 +136,8 @@ module.exports = UserController =
 	logout : (req, res, next)->
 		UserController._doLogout req, (err) ->
 			return next(err) if err?
-			res.redirect '/login'
+			redirect_url = if settings.overleaf? then settings.overleaf.host + '/users/ensure_signed_out' else '/login'
+			res.redirect redirect_url
 
 	register : (req, res, next = (error) ->)->
 		email = req.body.email
@@ -168,12 +169,19 @@ module.exports = UserController =
 				logger.log user: user._id, "changing password"
 				newPassword1 = req.body.newPassword1
 				newPassword2 = req.body.newPassword2
+				validationError = AuthenticationManager.validatePassword(newPassword1)
 				if newPassword1 != newPassword2
 					logger.log user: user, "passwords do not match"
 					res.send
 						message:
 							type:'error'
 							text:'Your passwords do not match'
+				else if validationError?
+					logger.log user: user, validationError.message
+					res.send
+						message:
+							type: 'error'
+							text: validationError.message
 				else
 					logger.log user: user, "password changed"
 					AuthenticationManager.setUserPassword user._id, newPassword1, (error) ->

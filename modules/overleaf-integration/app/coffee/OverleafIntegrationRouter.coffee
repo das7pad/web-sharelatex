@@ -41,9 +41,6 @@ module.exports =
 			AuthenticationController.addEndpointToLoginWhitelist '/login/legacy'
 			webRouter.post '/login/legacy', AuthenticationController.passportLogin
 
-		removeRoute(webRouter, 'get', '/logout')
-		webRouter.get '/logout', OverleafAuthenticationController.logout
-
 		removeRoute(webRouter, 'get', '/register')
 		removeRoute(webRouter, 'post', '/register')
 		webRouter.get '/register', OverleafAuthenticationController.saveRedir, V1LoginController.registrationPage

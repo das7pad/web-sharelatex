@@ -267,6 +267,73 @@ p
 
 			if isSuperAdmin
 				tr
+					th(colspan=2).text-center Staff Access
+
+				tr(ng-show="!showStaffAccess")
+					td(colspan=2)
+						a(href,ng-click="showStaffAccess = true", ng-show="!showStaffAccess") Show
+
+				tr(ng-show="showStaffAccess")
+					td
+						label(for="publisherMetrics") Publisher Metrics
+					td
+						input#publisherMetrics(
+							type="checkbox"
+							name="staffAccess.publisherMetrics"
+							ng-model="user.staffAccess.publisherMetrics"
+						)
+
+				tr(ng-show="showStaffAccess")
+					td
+						label(for="publisherManagement") Publisher Management
+					td
+						input#publisherManagement(
+							type="checkbox"
+							name="staffAccess.publisherManagement"
+							ng-model="user.staffAccess.publisherManagement"
+						)
+
+				tr(ng-show="showStaffAccess")
+					td
+						label(for="institutionMetrics") Institution Metrics
+					td
+						input#InstitutionMetrics(
+							type="checkbox"
+							name="staffAccess.institutionMetrics"
+							ng-model="user.staffAccess.institutionMetrics"
+						)
+
+				tr(ng-show="showStaffAccess")
+					td
+						label(for="institutionManagement") Institution Management
+					td
+						input#InstitutionManagement(
+							type="checkbox"
+							name="staffAccess.institutionManagement"
+							ng-model="user.staffAccess.institutionManagement"
+						)
+
+				tr(ng-show="showStaffAccess")
+					td
+						label(for="groupMetrics") Group Metrics
+					td
+						input#groupMetrics(
+							type="checkbox"
+							name="staffAccess.groupMetrics"
+							ng-model="user.staffAccess.groupMetrics"
+						)
+
+				tr(ng-show="showStaffAccess")
+					td
+						label(for="groupManagement") Group Management
+					td
+						input#groupManagement(
+							type="checkbox"
+							name="staffAccess.groupManagement"
+							ng-model="user.staffAccess.groupManagement"
+						)
+
+				tr
 					th(colspan=2).text-center Site Admin.
 
 				tr(ng-show="!showIsAdmin")

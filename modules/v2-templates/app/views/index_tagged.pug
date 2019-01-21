@@ -28,14 +28,14 @@ block content
 
 
 		.container
-			if tagged_docs.length
+			if tagged_docs && tagged_docs.length
 				+doc_rows(tagged_docs)
 				if tagged_docs_pagination
 					+pagination(tagged_docs_pagination)
 			else
 				h2 There are no articles matching your tags
 
-		if related_tags.length
+		if related_tags && related_tags.length
 			.container
 				h2 Related Tags
 				each tag in related_tags

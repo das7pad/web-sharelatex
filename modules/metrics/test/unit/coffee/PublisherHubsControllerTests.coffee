@@ -68,7 +68,9 @@ describe "PublisherHubsController", ->
 				sinon.match('views/publisherHub'), {
 					name: 'IEEE',
 					templates: @data,
-					templatesAnalytics: @mockAnalytics.yearly_summary.v1Templates
+					templatesAnalytics: @mockAnalytics.yearly_summary.v1Templates,
+					yearlySummary: @mockAnalytics.yearly_summary,
+					monthlySummary: @mockAnalytics.monthly_summary
 				}
 			).should.equal true
 
@@ -92,7 +94,6 @@ describe "PublisherHubsController", ->
 			@request.get = sinon.stub().callsArgWith(1, null, {statusCode: 200}, @mockAnalytics)
 			@PublisherHubsController._fetchAnalytics(@data, @callback)
 			@request.get.calledOnce.should.equal.true
-			console.log(@request.get.lastCall)
 			@request.get.calledWith({
 				url: @Settings.apis.analytics.url + '/recentV1TemplateIdsActivity?v1_templates=209,208'
 				json: true

@@ -21,7 +21,8 @@
     "webpack": "webpack-dev-server --config webpack.config.dev.js",
     "webpack:production": "webpack --config webpack.config.prod.js",
     "lint": "eslint -f unix .",
-    "format": "prettier-eslint '**/*.js' --list-different"
+    "format": "prettier-eslint '**/*.js' --list-different",
+    "format:fix": "prettier-eslint '**/*.js' --write"
   },
   "dependencies": {
     "archiver": "0.9.0",
@@ -53,6 +54,7 @@
     "http-proxy": "^1.8.1",
     "jade": "~1.3.1",
     "jquery": "^1.11.1",
+    "json2csv": "^4.3.3",
     "jsonwebtoken": "^8.0.1",
     "ldapjs": "^0.7.1",
     "lodash": "^4.13.1",
@@ -115,7 +117,7 @@
     "babel-preset-react": "^6.16.0",
     "bunyan": "0.22.1",
     "chai": "3.5.0",
-    "chai-spies": "",
+    "chai-spies": "^1.0.0",
     "clean-css-cli": "^4.2.1",
     "coffee-script": "^1.7.1",
     "es6-promise": "^4.0.5",
@@ -130,7 +132,6 @@
     "eslint-plugin-jsx-a11y": "^6.1.2",
     "eslint-plugin-mocha": "^5.2.0",
     "eslint-plugin-node": "^6.0.0",
-    "eslint-plugin-prettier": "^2.7.0",
     "eslint-plugin-promise": "^3.6.0",
     "eslint-plugin-react": "^7.11.1",
     "eslint-plugin-standard": "^3.0.1",
@@ -166,6 +167,7 @@
     "mkdirp": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.1.tgz",
     "nodemon": "^1.14.3",
     "prettier-eslint-cli": "^4.7.1",
+    "react-testing-library": "^5.4.2",
     "requirejs": "^2.1.22",
     "sandboxed-module": "0.2.0",
     "sinon": "^1.17.0",

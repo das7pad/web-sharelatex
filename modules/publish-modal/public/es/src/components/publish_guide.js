@@ -22,7 +22,7 @@ export default class PublishGuide extends Component {
       } else {
         link = link + 'pdf'
       }
-      window.location = link
+      this.props.downloadFile(link)
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState({ exportState: 'uninitiated' })
     }
@@ -151,11 +151,20 @@ function Submit({ entry }) {
   )
 }
 
+function downloadFileWithLocation(url) {
+  window.location = url
+}
+
+PublishGuide.defaultProps = {
+  downloadFile: downloadFileWithLocation
+}
+
 PublishGuide.propTypes = {
   entry: PropTypes.object.isRequired,
   returnText: PropTypes.string,
   onReturn: PropTypes.func,
-  projectId: PropTypes.string.isRequired
+  projectId: PropTypes.string.isRequired,
+  downloadFile: PropTypes.func
 }
 
 GuideHtml.propTypes = {

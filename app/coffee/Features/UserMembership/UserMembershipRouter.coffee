@@ -3,57 +3,68 @@ UserMembershipController = require './UserMembershipController'
 SubscriptionGroupController = require '../Subscription/SubscriptionGroupController'
 TeamInvitesController = require '../Subscription/TeamInvitesController'
 AuthorizationMiddlewear = require('../Authorization/AuthorizationMiddlewear')
+RateLimiterMiddlewear = require('../Security/RateLimiterMiddlewear')
 
 module.exports =
 	apply: (webRouter) ->
 		# group members routes
 		webRouter.get '/manage/groups/:id/members',
-			UserMembershipAuthorization.requireGroupAccess,
+			UserMembershipAuthorization.requireGroupManagementAccess,
 			UserMembershipController.index
 		webRouter.post '/manage/groups/:id/invites',
-			UserMembershipAuthorization.requireGroupAccess,
+			UserMembershipAuthorization.requireGroupManagementAccess,
+			RateLimiterMiddlewear.rateLimit({
+				endpointName: "create-team-invite"
+				maxRequests: 100
+				timeInterval: 60
+			}),
 			TeamInvitesController.createInvite
 		webRouter.delete '/manage/groups/:id/user/:user_id',
-			UserMembershipAuthorization.requireGroupAccess,
+			UserMembershipAuthorization.requireGroupManagementAccess,
 			SubscriptionGroupController.removeUserFromGroup
 		webRouter.delete '/manage/groups/:id/invites/:email',
-			UserMembershipAuthorization.requireGroupAccess,
+			UserMembershipAuthorization.requireGroupManagementAccess,
 			TeamInvitesController.revokeInvite
 		webRouter.get '/manage/groups/:id/members/export',
-			UserMembershipAuthorization.requireGroupAccess,
+			UserMembershipAuthorization.requireGroupManagementAccess,
+			RateLimiterMiddlewear.rateLimit({
+				endpointName: "export-team-csv"
+				maxRequests: 30
+				timeInterval: 60
+			}),
 			UserMembershipController.exportCsv
 
 		# group managers routes
 		webRouter.get "/manage/groups/:id/managers",
-			UserMembershipAuthorization.requireGroupManagersAccess,
+			UserMembershipAuthorization.requireGroupManagersManagementAccess,
 			UserMembershipController.index
 		webRouter.post "/manage/groups/:id/managers",
-			UserMembershipAuthorization.requireGroupManagersAccess,
+			UserMembershipAuthorization.requireGroupManagersManagementAccess,
 			UserMembershipController.add
 		webRouter.delete "/manage/groups/:id/managers/:userId",
-			UserMembershipAuthorization.requireGroupManagersAccess,
+			UserMembershipAuthorization.requireGroupManagersManagementAccess,
 			UserMembershipController.remove
 
 		# institution members routes
 		webRouter.get "/manage/institutions/:id/managers",
-			UserMembershipAuthorization.requireInstitutionAccess,
+			UserMembershipAuthorization.requireInstitutionManagementAccess,
 			UserMembershipController.index
 		webRouter.post "/manage/institutions/:id/managers",
-			UserMembershipAuthorization.requireInstitutionAccess,
+			UserMembershipAuthorization.requireInstitutionManagementAccess,
 			UserMembershipController.add
 		webRouter.delete "/manage/institutions/:id/managers/:userId",
-			UserMembershipAuthorization.requireInstitutionAccess,
+			UserMembershipAuthorization.requireInstitutionManagementAccess,
 			UserMembershipController.remove
 
 		# publisher members routes
 		webRouter.get "/manage/publishers/:id/managers",
-			UserMembershipAuthorization.requirePublisherAccess,
+			UserMembershipAuthorization.requirePublisherManagementAccess,
 			UserMembershipController.index
 		webRouter.post "/manage/publishers/:id/managers",
-			UserMembershipAuthorization.requirePublisherAccess,
+			UserMembershipAuthorization.requirePublisherManagementAccess,
 			UserMembershipController.add
 		webRouter.delete "/manage/publishers/:id/managers/:userId",
-			UserMembershipAuthorization.requirePublisherAccess,
+			UserMembershipAuthorization.requirePublisherManagementAccess,
 			UserMembershipController.remove
 
 		# create new entitites

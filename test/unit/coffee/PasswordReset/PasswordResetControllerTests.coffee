@@ -19,12 +19,15 @@ describe "PasswordResetController", ->
 			addCount: sinon.stub()
 		@UserSessionsManager =
 			revokeAllUserSessions: sinon.stub().callsArgWith(2, null)
+		@AuthenticationManager =
+			validatePassword: sinon.stub()
 		@PasswordResetController = SandboxedModule.require modulePath, requires:
 			"settings-sharelatex":@settings
 			"./PasswordResetHandler":@PasswordResetHandler
 			"logger-sharelatex": log:->
 			"../../infrastructure/RateLimiter":@RateLimiter
 			"../Authentication/AuthenticationController": @AuthenticationController = {}
+			"../Authentication/AuthenticationManager": @AuthenticationManager
 			"../User/UserGetter": @UserGetter = {}
 			"../User/UserSessionsManager": @UserSessionsManager
 
@@ -51,7 +54,7 @@ describe "PasswordResetController", ->
 			@PasswordResetHandler.generateAndEmailResetToken.callsArgWith(1, null, true)
 			@RateLimiter.addCount.callsArgWith(1, null, false)
 			@res.send = (code)=>
-				code.should.equal 500
+				code.should.equal 429
 				@PasswordResetHandler.generateAndEmailResetToken.calledWith(@email.trim()).should.equal false
 				done()
 			@PasswordResetController.requestReset @req, @res
@@ -124,6 +127,16 @@ describe "PasswordResetController", ->
 
 		it "should return 400 (Bad Request) if there is no passwordResetToken", (done)->
 			@req.body.passwordResetToken = ""
+			@PasswordResetHandler.setNewUserPassword.callsArgWith(2)
+			@res.sendStatus = (code)=>
+				code.should.equal 400
+				@PasswordResetHandler.setNewUserPassword.called.should.equal false
+				done()
+			@PasswordResetController.setNewUserPassword @req, @res
+
+		it "should return 400 (Bad Request) if the password is invalid", (done)->
+			@req.body.password = "correct horse battery staple"
+			@AuthenticationManager.validatePassword = sinon.stub().returns { message: 'password contains invalid characters' }
 			@PasswordResetHandler.setNewUserPassword.callsArgWith(2)
 			@res.sendStatus = (code)=>
 				code.should.equal 400

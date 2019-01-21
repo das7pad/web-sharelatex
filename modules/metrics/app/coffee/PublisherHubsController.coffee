@@ -18,7 +18,9 @@ module.exports = PublisherHubsController =
 					res.render Path.resolve(__dirname, '../views/publisherHub.pug'), {
 						name: publisher.name,
 						templates: templates,
-						templatesAnalytics: templatesAnalytics
+						templatesAnalytics: templatesAnalytics,
+						yearlySummary: analytics?.yearly_summary,
+						monthlySummary: analytics?.monthly_summary
 					}
 				)
 			)

@@ -6,7 +6,6 @@ AuthenticationController = require('../../../../app/js/Features/Authentication/A
 ProjectCreationHandler = require('../../../../app/js/Features/Project/ProjectCreationHandler')
 ProjectHelper = require('../../../../app/js/Features/Project/ProjectHelper')
 ProjectDetailsHandler = require('../../../../app/js/Features/Project/ProjectDetailsHandler')
-ProjectOptionsHandler = require('../../../../app/js/Features/Project/ProjectOptionsHandler')
 DocumentHelper = require('../../../../app/js/Features/Documents/DocumentHelper')
 ProjectUploadManager = require('../../../../app/js/Features/Uploads/ProjectUploadManager')
 Errors = require('../../../../app/js/Features/Errors/Errors')
@@ -61,6 +60,13 @@ module.exports = OpenInOverleafController =
 				(project, cb) ->
 					OpenInOverleafHelper.setCompilerForProject project, snippet.engine, (err) ->
 						cb(err, project)
+				(project, cb) ->
+					if snippet.brandVariationId?
+						OpenInOverleafHelper.setProjectBrandVariationFromId project, snippet.brandVariationId, (err) ->
+							return cb(err) if err?
+							cb(null, project)
+					else
+						cb(null, project)
 			]
 			callback
 		)
@@ -77,6 +83,13 @@ module.exports = OpenInOverleafController =
 				(project, cb) ->
 					OpenInOverleafHelper.populateProjectFromFileList project, snippet, (err) ->
 						cb(err, project)
+				(project, cb) ->
+					if snippet.brandVariationId?
+						OpenInOverleafHelper.setProjectBrandVariationFromId project, snippet.brandVariationId, (err) ->
+							return cb(err) if err?
+							cb(null, project)
+					else
+						cb(null, project)
 			]
 			callback
 		)
@@ -95,7 +108,7 @@ module.exports = OpenInOverleafController =
 							return cb(err) if err?
 							cb(null, project)
 					else if snippet.brandVariationId?
-						ProjectOptionsHandler.setBrandVariationId project._id, snippet.brandVariationId, (err) ->
+						OpenInOverleafHelper.setProjectBrandVariationFromId project, snippet.brandVariationId, (err) ->
 							return cb(err) if err?
 							cb(null, project)
 					else
@@ -120,6 +133,7 @@ module.exports = OpenInOverleafController =
 		snippet = {}
 		snippet.snip_name = req.body.snip_name if req.body.snip_name?
 		snippet.snip_name = snippet.snip_name[0] if Array.isArray(snippet.snip_name) && snippet.snip_name.length == 1
+		snippet.brandVariationId = req.body.brand_variation_id if req.body.brand_variation_id?
 
 		if req.body.snip?
 			snippet.snip = req.body.snip

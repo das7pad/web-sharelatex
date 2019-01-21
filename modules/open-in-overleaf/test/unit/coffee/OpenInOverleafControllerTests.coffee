@@ -48,8 +48,6 @@ describe 'OpenInOverleafController', ->
 			fixProjectName: sinon.stub().returnsArg(0)
 		@ProjectUploadManager =
 			createProjectFromZipArchive: sinon.stub().callsArgWith(3, null, @project)
-		@ProjectOptionsHandler =
-			setBrandVariationId: sinon.stub().callsArg(2)
 
 		@OpenInOverleafHelper =
 			getDocumentLinesFromSnippet: sinon.stub().returns((@comment + @snip).split("\n"))
@@ -63,6 +61,7 @@ describe 'OpenInOverleafController', ->
 			populateProjectFromFileList: sinon.stub().callsArg(2)
 			setProjectBrandVariationFromSlug: sinon.stub().callsArg(2)
 			snippetFileComment: sinon.stub().returns("% default_snippet_comment\n")
+			setProjectBrandVariationFromId: sinon.stub().callsArg(2)
 		@OpenInOverleafHelper.snippetFileComment.withArgs('texample').returns("% texample_snippet_comment\n")
 		@Csrf =
 			validateRequest: sinon.stub().callsArgWith(1, true)
@@ -76,7 +75,6 @@ describe 'OpenInOverleafController', ->
 			'../../../../app/js/Features/Authentication/AuthenticationController': @AuthenticationController
 			'../../../../app/js/Features/Project/ProjectCreationHandler': @ProjectCreationHandler
 			'../../../../app/js/Features/Project/ProjectDetailsHandler': @ProjectDetailsHandler
-			'../../../../app/js/Features/Project/ProjectOptionsHandler': @ProjectOptionsHandler
 			'../../../../app/js/Features/Uploads/ProjectUploadManager': @ProjectUploadManager
 			'./OpenInOverleafHelper': @OpenInOverleafHelper
 
@@ -98,6 +96,13 @@ describe 'OpenInOverleafController', ->
 				@req.body.engine = 'latex_dvipdf'
 				@res.send = =>
 					sinon.assert.calledWith(@OpenInOverleafHelper.setCompilerForProject, sinon.match.any, 'latex_dvipdf')
+					done()
+				@OpenInOverleafController.openInOverleaf @req, @res
+
+			it "should update the project with the requested brand variation id, if supplied", (done)->
+				@req.body.brand_variation_id = 'wombat'
+				@res.send = =>
+					sinon.assert.calledWith(@OpenInOverleafHelper.setProjectBrandVariationFromId, sinon.match.any, 'wombat')
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
@@ -130,7 +135,6 @@ describe 'OpenInOverleafController', ->
 				@OpenInOverleafController._populateSnippetFromRequest = sinon.stub()
 				delete @req.body.snip
 				@OpenInOverleafController.openInOverleaf @req, @res, (error) =>
-					console.log(JSON.stringify(error))
 					expect(error.name).to.equal "MissingParametersError"
 					sinon.assert.notCalled(@OpenInOverleafController._populateSnippetFromRequest)
 					done()
@@ -250,7 +254,7 @@ describe 'OpenInOverleafController', ->
 
 				it "should set the brand variation on the project", (done)->
 					@res.send = (content)=>
-						sinon.assert.calledWith(@ProjectOptionsHandler.setBrandVariationId, sinon.match.any, "1234")
+						sinon.assert.calledWith(@OpenInOverleafHelper.setProjectBrandVariationFromId, sinon.match.any, "1234")
 						done()
 					@OpenInOverleafController.openInOverleaf @req, @res
 
@@ -281,7 +285,7 @@ describe 'OpenInOverleafController', ->
 
 				it "should not the brand variation on the project", (done)->
 					@res.send = (content)=>
-						sinon.assert.notCalled(@ProjectOptionsHandler.setBrandVariationId)
+						sinon.assert.notCalled(@OpenInOverleafHelper.setProjectBrandVariationFromId)
 						done()
 					@OpenInOverleafController.openInOverleaf @req, @res
 
@@ -322,7 +326,7 @@ describe 'OpenInOverleafController', ->
 
 				it "should set the brand variation id on the project", (done) ->
 					@res.send = =>
-						sinon.assert.calledWith(@ProjectOptionsHandler.setBrandVariationId, sinon.match.any, 1234)
+						sinon.assert.calledWith(@OpenInOverleafHelper.setProjectBrandVariationFromId, sinon.match.any, 1234)
 						done()
 					@OpenInOverleafController.openInOverleaf @req, @res
 
