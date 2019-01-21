@@ -26,8 +26,8 @@ export function initiateExport(entry, projectId, data) {
           .join(' ')
 
         // FIXME: just return the whole combined {start,poll}Response objects?
-        // Arguably this is just the network layer that shouldn't know anything
-        // about business logic
+        // Arguably this is just the network layer that shouldn't know
+        // anything about business logic
         return {
           exportId: startResponse.export_v1_id,
           token: pollResponse.export_json.token,
@@ -39,9 +39,9 @@ export function initiateExport(entry, projectId, data) {
       })
       .catch(error => {
         // Rethrow with nicely formatted data
-        throw new Error({
-          errorDetails: error.status_detail || null
-        })
+        throw new Error(
+          (error.export_json && error.export_json.status_detail) || null
+        )
       })
   })
 }
@@ -54,7 +54,14 @@ function startExport(url, data = {}) {
       data,
       headers: { 'X-CSRF-Token': window.csrfToken }
     })
-      .done(resolve)
+      .done(res => {
+        if (res.status >= 400) {
+          // handle error forwarded from v1
+          reject(new Error(res.message))
+        } else {
+          resolve(res)
+        }
+      })
       .fail(reject)
   })
 }
