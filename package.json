@@ -141,7 +141,6 @@
     "grunt-contrib-requirejs": "0.4.1",
     "grunt-execute": "^0.2.2",
     "grunt-file-append": "0.0.6",
-    "grunt-git-rev-parse": "^0.1.4",
     "handlebars-loader": "^1.7.0",
     "karma": "^2.0.0",
     "karma-chai-sinon": "^0.1.5",

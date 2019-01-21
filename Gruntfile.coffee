@@ -4,9 +4,7 @@ Settings = require "settings-sharelatex"
 require('es6-promise').polyfill()
 
 module.exports = (grunt) ->
-	grunt.loadNpmTasks 'grunt-available-tasks'
 	grunt.loadNpmTasks 'grunt-contrib-requirejs'
-	grunt.loadNpmTasks 'grunt-git-rev-parse'
 	grunt.loadNpmTasks 'grunt-file-append'
 
 	config =
@@ -51,12 +49,6 @@ module.exports = (grunt) ->
 
 					]
 
-		"git-rev-parse":
-			version:
-				options:
-					prop: 'commit'
-
-
 		file_append:
 			default_options: files: [ {
 				append: '\n//ide.js is complete - used for automated testing'
@@ -64,17 +56,6 @@ module.exports = (grunt) ->
 				output: 'public/minjs/ide.js'
 			}]
 
-		sed:
-			version:
-				path: "app/views/sentry.pug"
-				pattern: '@@COMMIT@@',
-				replacement: '<%= commit %>',
-			release:
-				path: "app/views/sentry.pug"
-				pattern: "@@RELEASE@@"
-				replacement: process.env.BUILD_NUMBER || "(unknown build)"
-
 	grunt.initConfig config
 	grunt.registerTask 'compile:minify', 'Concat and minify the client side js', ['requirejs', "file_append"]
-	grunt.registerTask 'version', "Write the version number into sentry.pug", ['git-rev-parse', 'sed']
 
