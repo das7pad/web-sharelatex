@@ -1,5 +1,7 @@
 define(['base'], function(App) {
   return App.factory('validateCaptchaV3', function() {
+    const grecaptcha = window.grecaptcha
+    const ExposedSettings = window.ExposedSettings
     var validateCaptchaV3 = function validateCaptchaV3(actionName, callback) {
       if (callback == null) {
         callback = function callback(response) {}
