@@ -15,3 +15,11 @@ module.exports = PublishModalController =
 		request.get(url, (err, response, body)->
 			res.send(body)
 		)
+
+	latestTemplate: (req, res)->
+		projectId = req.params.project_id
+		brandId = req.params.brand_id
+		url = "#{settings.apis.v1.url}/templates/latest/#{project_id}/#{brandId}"
+		request.get(url, (err, response, body)->
+			res.send(body)
+		)
