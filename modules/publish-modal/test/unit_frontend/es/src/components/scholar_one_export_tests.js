@@ -8,21 +8,40 @@ import {
   waitForElement
 } from 'react-testing-library'
 
-import GalleryExport from 'Modules/publish-modal/public/es/src/components/gallery_export'
+import ScholarOneExport from '../../../../../public/es/src/components/scholar_one_export'
 
-describe('<GalleryExport />', function() {
-  let ajaxStub
+describe('<ScholarOneExport />', function() {
+  let formData, ajaxStub
 
   this.timeout(5000)
 
   beforeEach(() => {
+    // Stub the globally exposed settings
     window.ExposedSettings = { siteUrl: 'http://example.com' }
+    // The F1000 component triggers a form submission when the export is
+    // complete. This causes problems with Karma because it throws an error if
+    // the page is navigated away (through the form submission). We therefore
+    // prevent the form submission from happening by calling preventDefault()
+    // on the submit event
+    document.addEventListener('submit', preventFormSubmission)
   })
 
   afterEach(() => {
     delete window.ExposedSettings
+    document.removeEventListener('submit', preventFormSubmission)
     cleanup()
   })
+
+  function preventFormSubmission(e) {
+    e.preventDefault()
+
+    // To assert that the form submission contains the correct data, we also
+    // capture the form data and transform it an object with name/value pairs
+    formData = Array.from(e.target.elements).reduce(
+      (acc, elem) => Object.assign(acc, { [elem.name]: elem.value }),
+      {}
+    )
+  }
 
   describe('successful initial request', () => {
     beforeEach(() => {
@@ -37,49 +56,26 @@ describe('<GalleryExport />', function() {
       $.ajax.restore()
     })
 
-    it('sends data when starting export', () => {
-      ajaxStub
-        .onSecondCall()
-        .returns(
-          $.Deferred().resolve({ export_json: { status_summary: 'succeeded' } })
-        )
-      const { getByLabelText, getByText } = renderGalleryExport()
-
-      const licenseSelect = getByLabelText(/license/i)
-      fireEvent.change(licenseSelect, { target: { value: 'cc_by_4.0' } })
-      const submitButton = getByText(/submit to myjournal/i)
-      fireEvent.click(submitButton)
-
-      const { data } = $.ajax.firstCall.args[0]
-      expect(data.author).to.equal('Author Name')
-      expect(data.title).to.equal('My title')
-      expect(data.description).to.equal('My description')
-      expect(data.license).to.equal('cc_by_4.0')
-
-      return waitForElement(() => getByText(/export successful/i))
-    })
-
     it('waits for download poll to succeed', () => {
       ajaxStub
         .onSecondCall()
         .returns(
           $.Deferred().resolve({ export_json: { status_summary: 'succeeded' } })
         )
-      const { getByLabelText, getByText } = renderGalleryExport()
 
-      const licenseSelect = getByLabelText(/license/i)
-      fireEvent.change(licenseSelect, { target: { value: 'cc_by_4.0' } })
+      const { getByText, getByTestId } = renderScholarOneExport()
+
       const submitButton = getByText(/submit to myjournal/i)
       fireEvent.click(submitButton)
 
-      return waitForElement(() => getByText(/exporting files/i))
+      return waitForElement(() => getByText(/exporting files, please wait/i))
         .then(pollingText => {
           expect(pollingText).to.exist
 
-          return waitForElement(() => getByText(/export successful/i))
+          return waitForElement(() => getByTestId('export-complete'))
         })
-        .then(successMessage => {
-          expect(successMessage).to.exist
+        .then(completeEl => {
+          expect(completeEl).to.exist
         })
     })
 
@@ -94,36 +90,53 @@ describe('<GalleryExport />', function() {
           $.Deferred().resolve({ export_json: { status_summary: 'succeeded' } })
         )
 
-      const { getByLabelText, getByText } = renderGalleryExport()
+      const { getByText, getByTestId } = renderScholarOneExport()
 
-      const licenseSelect = getByLabelText(/license/i)
-      fireEvent.change(licenseSelect, { target: { value: 'cc_by_4.0' } })
       const submitButton = getByText(/submit to myjournal/i)
       fireEvent.click(submitButton)
 
-      return waitForElement(() => getByText(/exporting files/i))
+      return waitForElement(() => getByText(/exporting files, please wait/i))
         .then(pollingText => {
           expect(pollingText).to.exist
 
-          return waitForElement(() => getByText(/export successful/i))
+          return waitForElement(() => getByTestId('export-complete'))
         })
-        .then(successMessage => {
-          expect(successMessage).to.exist
+        .then(completeEl => {
+          expect(completeEl).to.exist
         })
+    })
+
+    it('sends request upon completion', () => {
+      ajaxStub.onSecondCall().returns(
+        $.Deferred().resolve({
+          export_json: { status_summary: 'succeeded' },
+          token: 'token',
+          partner_submission_id: 4
+        })
+      )
+
+      const { getByText, getByTestId } = renderScholarOneExport()
+
+      const submitButton = getByText(/submit to myjournal/i)
+      fireEvent.click(submitButton)
+
+      return waitForElement(() => getByTestId('export-complete')).then(() => {
+        expect(formData.export_id).to.equal('3token')
+        expect(formData.submission_id).to.equal('4')
+        expect(formData.EXT_ACTION).to.equal('OVERLEAF_SUBMISSION')
+      })
     })
 
     it('shows error on polling error response', () => {
       // Mock first poll request to fail
       ajaxStub.onSecondCall().returns($.Deferred().reject(new Error()))
 
-      const { getByLabelText, getByText } = renderGalleryExport()
+      const { getByText } = renderScholarOneExport()
 
-      const licenseSelect = getByLabelText(/license/i)
-      fireEvent.change(licenseSelect, { target: { value: 'cc_by_4.0' } })
       const submitButton = getByText(/submit to myjournal/i)
       fireEvent.click(submitButton)
 
-      return waitForElement(() => getByText(/exporting files/i))
+      return waitForElement(() => getByText(/exporting files, please wait/i))
         .then(pollingText => {
           expect(pollingText).to.exist
 
@@ -142,14 +155,12 @@ describe('<GalleryExport />', function() {
           $.Deferred().resolve({ export_json: { status_summary: 'failed' } })
         )
 
-      const { getByLabelText, getByText } = renderGalleryExport()
+      const { getByText } = renderScholarOneExport()
 
-      const licenseSelect = getByLabelText(/license/i)
-      fireEvent.change(licenseSelect, { target: { value: 'cc_by_4.0' } })
       const submitButton = getByText(/submit to myjournal/i)
       fireEvent.click(submitButton)
 
-      return waitForElement(() => getByText(/exporting files/i))
+      return waitForElement(() => getByText(/exporting files, please wait/i))
         .then(pollingText => {
           expect(pollingText).to.exist
 
@@ -162,19 +173,17 @@ describe('<GalleryExport />', function() {
   })
 })
 
-function renderGalleryExport() {
+function renderScholarOneExport() {
   return render(
-    <GalleryExport
+    <ScholarOneExport
       returnText="Return"
       entry={{
         id: 2,
-        name: 'MyJournal'
+        name: 'MyJournal',
+        export_url: 'http://example.com'
       }}
       onReturn={() => {}}
       projectId="1"
-      author="Author Name" /* Use default data */
-      title="My title"
-      description="My description"
     />
   )
 }
