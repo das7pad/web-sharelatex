@@ -6,7 +6,7 @@ export default class GalleryExport extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      exportState: 'uninitiated',
+      exportState: 'unintiated',
       submissionValid: true,
       errorDetails: null
     }
@@ -14,39 +14,17 @@ export default class GalleryExport extends Component {
 
   runExport(ev) {
     ev.preventDefault()
-    if (
+    let valid =
       this.title.value &&
       this.author.value &&
       this.description.value &&
       this.license.value
-    ) {
+    if (valid) {
       const { entry, projectId } = this.props
-
-      this.setState({
-        submissionValid: true,
-        exportState: 'initiated'
-      })
-
-      const data = {
-        title: this.title.value,
-        author: this.author.value,
-        description: this.description.value,
-        license: this.license.value
-      }
-
-      initiateExport(entry, projectId, data)
-        .then(() => {
-          this.setState({ exportState: 'complete' })
-        })
-        .catch(({ errorDetails }) => {
-          this.setState({
-            exportState: 'error',
-            errorDetails
-          })
-        })
-    } else {
-      this.setState({ submissionValid: false })
+      initiateExport(entry, projectId, this)
     }
+    this.setState({ submissionValid: valid })
+    return valid
   }
 
   renderUninitiated() {
@@ -130,9 +108,11 @@ export default class GalleryExport extends Component {
           </label>
         </div>
         <div className="form-control-box no-label">
-          <button type="submit" className="btn btn-primary">
-            Submit to {entry.name}
-          </button>
+          <input
+            type="submit"
+            className="btn btn-primary"
+            value={'Submit to ' + entry.name}
+          />
           {!this.state.submissionValid && (
             <p style={{ color: 'red' }}>
               Please provide all of title, author(s) and description before
@@ -181,7 +161,7 @@ export default class GalleryExport extends Component {
     const { entry, onReturn, returnText } = this.props
 
     let body
-    if (this.state.exportState === 'uninitiated') {
+    if (this.state.exportState === 'unintiated') {
       body = this.renderUninitiated()
     } else if (this.state.exportState === 'initiated') {
       body = this.renderInitiated()
@@ -214,7 +194,7 @@ GalleryExport.propTypes = {
   returnText: PropTypes.string,
   onReturn: PropTypes.func,
   projectId: PropTypes.string.isRequired,
-  author: PropTypes.string,
+  author: PropTypes.string.isRequired,
   title: PropTypes.string,
   description: PropTypes.string,
   showSource: PropTypes.bool
