@@ -331,10 +331,7 @@ define(['base'], function(App) {
         }
         const fileName = newVal.split('/').reverse()[0]
         if (fileName) {
-          currentProjectFileNames = ide.$scope.docs.map(doc => doc.path)
-          $scope.data.name = currentProjectFileNames.includes(fileName)
-            ? 'example.tex'
-            : fileName
+          $scope.data.name = fileName
         }
       })
 

@@ -84,7 +84,6 @@ define(['base'], function(App) {
     // Select up to last '.'. I.e. everything except the file extension
     element.focus()
     const name = element.val()
-    console.log(name)
     if (element[0].setSelectionRange != null) {
       let selectionEnd = name.lastIndexOf('.')
       if (selectionEnd === -1) {
