@@ -155,7 +155,8 @@ describe 'ProjectEntityMongoUpdateHandler', ->
 			@project = _id: project_id, rootFolder: [@rootFolder]
 
 			@ProjectGetter.getProjectWithOnlyFolders = sinon.stub().yields(null, @project)
-			@ProjectLocator.findElementByPath = (options, cb) =>
+			@ProjectLocator.findElementByPath = ->
+			sinon.stub @ProjectLocator, "findElementByPath", (options, cb) =>
 				{path} = options
 				@parentFolder = {_id:"parentFolder_id_here"}
 				lastFolder = path.substring(path.lastIndexOf("/"))
@@ -210,6 +211,20 @@ describe 'ProjectEntityMongoUpdateHandler', ->
 				folders[0].parentFolder_id.should.equal @parentFolder_id
 				lastFolder.name.should.equal "level3"
 				lastFolder.parentFolder_id.should.equal @parentFolder_id
+				done()
+
+		it 'should use a case-insensitive match by default', (done)->
+			path = "/differentFolder/"
+			@subject.mkdirp project_id, path, {}, (err, folders, lastFolder)=>
+				@ProjectLocator.findElementByPath.calledWithMatch({exactCaseMatch:undefined})
+				.should.equal true
+				done()
+
+		it 'should use a case-sensitive match if exactCaseMatch option is set', (done)->
+			path = "/differentFolder/"
+			@subject.mkdirp project_id, path, {exactCaseMatch:true}, (err, folders, lastFolder)=>
+				@ProjectLocator.findElementByPath.calledWithMatch({exactCaseMatch:true})
+				.should.equal true
 				done()
 
 	describe 'moveEntity', ->
