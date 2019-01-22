@@ -169,14 +169,14 @@ describe 'ProjectEntityMongoUpdateHandler', ->
 
 		it 'should return the root folder if the path is just a slash', (done)->
 			path = "/"
-			@subject.mkdirp project_id, path, (err, folders, lastFolder)=>
+			@subject.mkdirp project_id, path, {}, (err, folders, lastFolder)=>
 				lastFolder.should.deep.equal @rootFolder
 				assert.equal lastFolder.parentFolder_id, undefined
 				done()
 
 		it 'should make just one folder', (done)->
 			path = "/differentFolder/"
-			@subject.mkdirp project_id, path, (err, folders, lastFolder)=>
+			@subject.mkdirp project_id, path, {}, (err, folders, lastFolder)=>
 				folders.length.should.equal 1
 				lastFolder.name.should.equal "differentFolder"
 				lastFolder.parentFolder_id.should.equal @parentFolder_id
@@ -184,7 +184,7 @@ describe 'ProjectEntityMongoUpdateHandler', ->
 
 		it 'should make the final folder in path if it doesnt exist with one level', (done)->
 			path = "level1/level2"
-			@subject.mkdirp project_id, path, (err, folders, lastFolder)=>
+			@subject.mkdirp project_id, path, {}, (err, folders, lastFolder)=>
 				folders.length.should.equal 1
 				lastFolder.name.should.equal "level2"
 				lastFolder.parentFolder_id.should.equal @parentFolder_id
@@ -193,7 +193,7 @@ describe 'ProjectEntityMongoUpdateHandler', ->
 		it 'should make the final folder in path if it doesnt exist with mutliple levels', (done)->
 			path = "level1/level2/level3"
 
-			@subject.mkdirp project_id, path,(err, folders, lastFolder) =>
+			@subject.mkdirp project_id, path, {}, (err, folders, lastFolder) =>
 				folders.length.should.equal 2
 				folders[0].name.should.equal "level2"
 				folders[0].parentFolder_id.should.equal @parentFolder_id
@@ -204,7 +204,7 @@ describe 'ProjectEntityMongoUpdateHandler', ->
 		it 'should work with slashes either side', (done)->
 			path = "/level1/level2/level3/"
 
-			@subject.mkdirp project_id, path, (err, folders, lastFolder)=>
+			@subject.mkdirp project_id, path, {}, (err, folders, lastFolder)=>
 				folders.length.should.equal 2
 				folders[0].name.should.equal "level2"
 				folders[0].parentFolder_id.should.equal @parentFolder_id

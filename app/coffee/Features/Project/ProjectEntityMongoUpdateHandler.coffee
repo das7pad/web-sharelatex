@@ -74,13 +74,6 @@ module.exports = ProjectEntityMongoUpdateHandler = self =
 	mkdirp: wrapWithLock (project_id, path, options, callback) ->
 		# defaults to case insensitive paths, use options {exactCaseMatch:true}
 		# to make matching case-sensitive
-
-		# handle any existing calls with the original signature (they should
-		# all have been changed so this should never happen)
-		if typeof options is 'function'
-			callback = options
-			options = {}
-
 		folders = path.split('/')
 		folders = _.select folders, (folder)->
 			return folder.length != 0
