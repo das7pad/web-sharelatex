@@ -46,14 +46,15 @@ mixin column_groups(groups)
 	for group in groups
 		div(class={"card" : group.fields.card, "text-center" : group.fields.centerText})
 			if group.fields
-				for element in group.fields.elements
-					if element.fields
-						if element.fields.quote
-								//- quotes are the only element that will handle col independently due to special layouts
-								.row
-									+quote(element.fields)
-						else
-							+element(element)
+				if group.fields.elements
+					for element in group.fields.elements
+						if element.fields
+							if element.fields.quote
+									//- quotes are the only element that will handle col independently due to special layouts
+									.row
+										+quote(element.fields)
+							else
+								+element(element)
 
 mixin content_row(row)
 	//- FOR: type `Layout | Grid` on CMS
