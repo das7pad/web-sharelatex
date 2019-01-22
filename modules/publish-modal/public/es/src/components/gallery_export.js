@@ -140,12 +140,10 @@ export default class GalleryExport extends Component {
       <span>
         <p>Export Successful!</p>
         <p>
-          Thanks for submitting to {this.props.entry.name}. Your manuscript and
-          supporting files have been sent directly to the journal's editorial
-          team, and they will send a follow-up email with instructions for how
-          to complete your submission.
+          Thanks for submitting to our gallery! We approve most submissions
+          within a few hours. We've sent you an e-mail to confirm your
+          submission, and we'll send you another one once it's approved.
         </p>
-        <p>Please check your email for confirmation of your submission.</p>
       </span>
     )
   }
