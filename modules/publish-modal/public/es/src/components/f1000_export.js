@@ -7,54 +7,33 @@ export default class F1000Export extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      exportState: 'uninitiated',
-      errorDetails: null
+      exportState: 'unintiated',
+      submissionValid: true,
+      errorDetails: null,
+      exportId: null,
+      partnerName: null,
+      partnerContactURL: null,
+      authorEmail: null,
+      authorName: null,
+      title: null,
+      articleZipURL: null,
+      pdfURL: null,
+      revisionURL: null,
+      token: null
     }
   }
 
   runExport(entry, projectId) {
-    this.setState({ exportState: 'initiated' })
-
-    initiateExport(entry, projectId)
-      .then(({ authorEmail, authorName, title }) => {
-        this.setState({
-          exportState: 'complete',
-          authorEmail,
-          authorName,
-          title,
-          articleZipURL: `/project/${projectId}/export/${entry.id}/zip`,
-          pdfURL: `/project/${projectId}/export/${entry.id}/pdf`,
-          revisionURL: 'https://www.overleaf.com/learn/how-to/Overleaf_v2_FAQ',
-          submissionURL: '',
-          publicationURL: '',
-          rejectionURL: '',
-          newVersionURL: '',
-          articleId: ''
-        })
-      })
-      .catch(({ errorDetails }) => {
-        this.setState({
-          exportState: 'error',
-          errorDetails
-        })
-      })
+    initiateExport(entry, projectId, this)
   }
 
   componentDidUpdate() {
     if (this.state.exportState === 'complete') {
-      // When the completion form is rendered, submit it by clicking the submit
-      // button.
-      // This needs to be done via a form submission because F1000 will
-      // respond with their log in form html, which the browser will then
-      // render. It cannot be done via XHR.
-      // It needs to be button.click(), not a direct call to form.submit()
-      // because the .submit() method does not fire the submit event. See:
-      // https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/submit
-      this.submitButton.click()
+      $('#export_form').submit()
     }
   }
 
-  renderUninitiated(entry, projectId) {
+  renderUnintiated(entry, projectId) {
     return (
       <span>
         <p>Thanks for using Overleaf to write your article.</p>
@@ -84,63 +63,68 @@ export default class F1000Export extends Component {
     )
   }
 
-  renderComplete() {
+  renderComplete(entry) {
     return (
-      <form
-        action={this.props.entry.export_url}
-        method="GET"
-        data-testid="export-complete"
-      >
-        <input
-          id="authorEmail"
-          name="authorEmail"
-          type="hidden"
-          value={this.state.authorEmail}
-        />
-        <input
-          id="authorName"
-          name="authorName"
-          type="hidden"
-          value={this.state.authorName}
-        />
-        <input id="title" name="title" type="hidden" value={this.state.title} />
-        <input
-          id="articleZipURL"
-          name="articleZipURL"
-          type="hidden"
-          value={this.state.articleZipURL}
-        />
-        <input
-          id="pdfURL"
-          name="pdfURL"
-          type="hidden"
-          value={this.state.pdfURL}
-        />
-        <input
-          id="revisionURL"
-          name="revisionURL"
-          type="hidden"
-          value={this.state.revisionURL}
-        />
-        <input id="submissionURL" name="submissionURL" type="hidden" value="" />
-        <input
-          id="publicationURL"
-          name="publicationURL"
-          type="hidden"
-          value=""
-        />
-        <input id="rejectionURL" name="rejectionURL" type="hidden" value="" />
-        <input id="newVersionURL" name="newVersionURL" type="hidden" value="" />
-        <input id="articleId" name="articleId" type="hidden" value="" />
-        <button
-          style={{ display: 'none' }}
-          ref={button => {
-            this.submitButton = button
-          }}
-        >
-          Submit
-        </button>
-      </form>
+      <span>
+        <form action={entry.export_url} method="get" id="export_form">
+          <input
+            id="authorEmail"
+            name="authorEmail"
+            type="hidden"
+            value={this.state.authorEmail}
+          />
+          <input
+            id="authorName"
+            name="authorName"
+            type="hidden"
+            value={this.state.authorName}
+          />
+          <input
+            id="title"
+            name="title"
+            type="hidden"
+            value={this.state.title}
+          />
+          <input
+            id="articleZipURL"
+            name="articleZipURL"
+            type="hidden"
+            value={this.state.articleZipURL}
+          />
+          <input
+            id="pdfURL"
+            name="pdfURL"
+            type="hidden"
+            value={this.state.pdfURL}
+          />
+          <input
+            id="revisionURL"
+            name="revisionURL"
+            type="hidden"
+            value={this.state.revisionURL}
+          />
+          <input
+            id="submissionURL"
+            name="submissionURL"
+            type="hidden"
+            value=""
+          />
+          <input
+            id="publicationURL"
+            name="publicationURL"
+            type="hidden"
+            value=""
+          />
+          <input id="rejectionURL" name="rejectionURL" type="hidden" value="" />
+          <input
+            id="newVersionURL"
+            name="newVersionURL"
+            type="hidden"
+            value=""
+          />
+          <input id="articleId" name="articleId" type="hidden" value="" />
+        </form>
+      </span>
     )
   }
 
@@ -156,12 +140,12 @@ export default class F1000Export extends Component {
   render() {
     const { entry, onReturn, projectId, returnText } = this.props
     let body
-    if (this.state.exportState === 'uninitiated') {
-      body = this.renderUninitiated(entry, projectId)
+    if (this.state.exportState === 'unintiated') {
+      body = this.renderUnintiated(entry, projectId)
     } else if (this.state.exportState === 'initiated') {
       body = this.renderInitiated(entry, projectId)
     } else if (this.state.exportState === 'complete') {
-      body = this.renderComplete()
+      body = this.renderComplete(entry)
     } else {
       body = this.renderError()
     }

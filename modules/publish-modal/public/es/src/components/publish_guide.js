@@ -7,31 +7,30 @@ export default class PublishGuide extends Component {
     super(props)
     this.state = {
       exportState: 'uninitiated',
-      errorDetails: null
+      exportId: null,
+      downloadRequested: null
     }
-    this.initiateGuideExport = this.initiateGuideExport.bind(this)
   }
 
-  initiateGuideExport(entry, projectId, type) {
-    this.setState({ exportState: 'initiated' })
-    initiateExport(entry, projectId)
-      .then(({ exportId }) => {
-        // Trigger download of file in background, doesn't actually navigate
-        // away
-        this.props.downloadFile(
-          `/project/${projectId}/export/${exportId}/${
-            type === 'zip' ? 'zip' : 'pdf'
-          }`
-        )
+  componentDidUpdate() {
+    if (this.state.exportState === 'complete') {
+      var link = `/project/${this.props.projectId}/export/${
+        this.state.exportId
+      }/`
+      if (this.state.downloadRequested === 'zip') {
+        link = link + 'zip'
+      } else {
+        link = link + 'pdf'
+      }
+      this.props.downloadFile(link)
+      // eslint-disable-next-line react/no-did-update-set-state
+      this.setState({ exportState: 'uninitiated' })
+    }
+  }
 
-        this.setState({ exportState: 'uninitiated' })
-      })
-      .catch(({ errorDetails }) => {
-        this.setState({
-          exportState: 'error',
-          errorDetails
-        })
-      })
+  initiateGuideExport(entry, projectId, _this, type) {
+    this.setState({ downloadRequested: type })
+    initiateExport(entry, projectId, _this)
   }
 
   render() {
@@ -45,27 +44,10 @@ export default class PublishGuide extends Component {
       >
         <div className="col-sm-12">
           <ReturnButton onReturn={onReturn} returnText={returnText} />
-          <GuideHtml
-            guideHtml={entry.publish_guide_html}
-            renderDownload={
-              <Download
-                entry={entry}
-                projectId={projectId}
-                exportState={this.state.exportState}
-                initiateGuideExport={this.initiateGuideExport}
-                errorDetails={this.state.errorDetails}
-              />
-            }
-          />
+          <GuideHtml entry={entry} projectId={projectId} _this={this} />
           {entry.publish_link_destination && (
             <div>
-              <Download
-                entry={entry}
-                projectId={projectId}
-                exportState={this.state.exportState}
-                initiateGuideExport={this.initiateGuideExport}
-                errorDetails={this.state.errorDetails}
-              />
+              <Download entry={entry} projectId={projectId} _this={this} />
               <Submit entry={entry} />
             </div>
           )}
@@ -75,13 +57,14 @@ export default class PublishGuide extends Component {
   }
 }
 
-export function GuideHtml({ guideHtml, renderDownload }) {
-  if (guideHtml.indexOf('DOWNLOAD') !== -1) {
-    const htmlParts = guideHtml.split('DOWNLOAD')
+export function GuideHtml({ entry, projectId, _this }) {
+  const html = entry.publish_guide_html
+  if (html.indexOf('DOWNLOAD') !== -1) {
+    const htmlParts = html.split('DOWNLOAD')
     return (
       <div>
         <div dangerouslySetInnerHTML={{ __html: htmlParts[0] }} />
-        {renderDownload}
+        <Download entry={entry} projectId={projectId} _this={_this} />
         <div
           style={{ marginLeft: '140px', paddingLeft: '15px' }}
           dangerouslySetInnerHTML={{ __html: htmlParts[1] }}
@@ -89,17 +72,13 @@ export function GuideHtml({ guideHtml, renderDownload }) {
       </div>
     )
   } else {
-    return <div dangerouslySetInnerHTML={{ __html: guideHtml }} />
+    return (
+      <div dangerouslySetInnerHTML={{ __html: entry.publish_guide_html }} />
+    )
   }
 }
 
-function Download({
-  entry,
-  projectId,
-  exportState,
-  initiateGuideExport,
-  errorDetails
-}) {
+function Download({ entry, projectId, _this }) {
   return (
     <div style={{ marginLeft: '140px', paddingLeft: '15px' }}>
       {/* Most publish guides have an image column
@@ -107,12 +86,14 @@ function Download({
       <p>
         <strong>Step 1: Download files</strong>
       </p>
-      {exportState === 'uninitiated' && (
+      {_this.state.exportState === 'uninitiated' && (
         <span>
           <p>
             <button
               className="btn btn-primary"
-              onClick={() => initiateGuideExport(entry, projectId, 'zip')}
+              onClick={() =>
+                _this.initiateGuideExport(entry, projectId, _this, 'zip')
+              }
             >
               Download project ZIP with submission files (e.g. .bbl)
             </button>
@@ -120,24 +101,26 @@ function Download({
           <p>
             <button
               className="btn btn-primary"
-              onClick={() => initiateGuideExport(entry, projectId, 'pdf')}
+              onClick={() =>
+                _this.initiateGuideExport(entry, projectId, _this, 'pdf')
+              }
             >
               Download PDF file of your article
             </button>
           </p>
         </span>
       )}
-      {exportState === 'initiated' && (
+      {_this.state.exportState === 'initiated' && (
         <p style={{ fontSize: 20, margin: '20px 0px 20px' }}>
           <i className="fa fa-refresh fa-spin fa-fw" />
           <span> &nbsp; Compiling project, please wait...</span>
         </p>
       )}
-      {exportState === 'error' && (
+      {_this.state.exportState === 'error' && (
         <p>
           Project failed to compile
           <br />
-          Error message: {errorDetails}
+          Error message: {_this.state.errorDetails}
         </p>
       )}
     </div>
@@ -169,12 +152,10 @@ function Submit({ entry }) {
 }
 
 function downloadFileWithLocation(url) {
-  // Trigger download of file in background, doesn't actually navigate away
-  window.location.pathname = url
+  window.location = url
 }
 
 PublishGuide.defaultProps = {
-  // Note: provided as a prop, only because it can then be mocked in testing
   downloadFile: downloadFileWithLocation
 }
 
@@ -183,20 +164,19 @@ PublishGuide.propTypes = {
   returnText: PropTypes.string,
   onReturn: PropTypes.func,
   projectId: PropTypes.string.isRequired,
-  downloadFile: PropTypes.func.isRequired
+  downloadFile: PropTypes.func
 }
 
 GuideHtml.propTypes = {
-  guideHtml: PropTypes.string.isRequired,
-  renderDownload: PropTypes.node
+  entry: PropTypes.object.isRequired,
+  projectId: PropTypes.string.isRequired,
+  _this: PropTypes.object.isRequired
 }
 
 Download.propTypes = {
   entry: PropTypes.object.isRequired,
   projectId: PropTypes.string.isRequired,
-  exportState: PropTypes.string.isRequired,
-  initiateGuideExport: PropTypes.func.isRequired,
-  errorDetails: PropTypes.string
+  _this: PropTypes.object.isRequired
 }
 
 Submit.propTypes = {

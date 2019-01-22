@@ -7,45 +7,26 @@ export default class ScholarOneExport extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      exportState: 'uninitiated',
-      errorDetails: null
+      exportState: 'unintiated',
+      submissionValid: true,
+      errorDetails: null,
+      exportId: null,
+      partner_submission_id: null,
+      token: null
     }
   }
 
   runExport(entry, projectId) {
-    this.setState({ exportState: 'initiated' })
-
-    initiateExport(entry, projectId)
-      .then(({ exportId, token, submissionId }) => {
-        this.setState({
-          exportState: 'complete',
-          exportId: `${exportId}${token}`,
-          submissionId: submissionId
-        })
-      })
-      .catch(({ errorDetails }) => {
-        this.setState({
-          exportState: 'error',
-          errorDetails
-        })
-      })
+    initiateExport(entry, projectId, this)
   }
 
   componentDidUpdate() {
     if (this.state.exportState === 'complete') {
-      // When the completion form is rendered, submit it by clicking the submit
-      // button.
-      // This needs to be done via a form submission because ScholarOne will
-      // respond with their log in form html, which the browser will then
-      // render. It cannot be done via XHR.
-      // It needs to be button.click(), not a direct call to form.submit()
-      // because the .submit() method does not fire the submit event. See:
-      // https://developer.mozilla.org/en-US/docs/Web/API/HTMLFormElement/submit
-      this.submitButton.click()
+      $('#export_form').submit()
     }
   }
 
-  renderUninitiated(entry, projectId) {
+  renderUnintiated(entry, projectId) {
     return (
       <span>
         <p>Thanks for using Overleaf to submit your article.</p>
@@ -91,41 +72,30 @@ export default class ScholarOneExport extends Component {
     )
   }
 
-  renderComplete() {
+  renderComplete(entry) {
     return (
-      <form
-        action={this.props.entry.export_url}
-        method="post"
-        id="export_form"
-        data-testid="export-complete"
-      >
-        <input
-          id="export_id"
-          name="export_id"
-          type="hidden"
-          value={this.state.exportId}
-        />
-        <input
-          id="submission_id"
-          name="submission_id"
-          type="hidden"
-          value={this.state.submissionId}
-        />
-        <input
-          id="EXT_ACTION"
-          name="EXT_ACTION"
-          type="hidden"
-          value="OVERLEAF_SUBMISSION"
-        />
-        <button
-          style={{ display: 'none' }}
-          ref={button => {
-            this.submitButton = button
-          }}
-        >
-          Submit
-        </button>
-      </form>
+      <span>
+        <form action={entry.export_url} method="post" id="export_form">
+          <input
+            id="export_id"
+            name="export_id"
+            type="hidden"
+            value={this.state.exportId + this.state.token}
+          />
+          <input
+            id="submission_id"
+            name="submission_id"
+            type="hidden"
+            value={this.state.partner_submission_id}
+          />
+          <input
+            id="EXT_ACTION"
+            name="EXT_ACTION"
+            type="hidden"
+            value="OVERLEAF_SUBMISSION"
+          />
+        </form>
+      </span>
     )
   }
 
@@ -141,8 +111,8 @@ export default class ScholarOneExport extends Component {
   render() {
     const { entry, onReturn, projectId, returnText } = this.props
     let body
-    if (this.state.exportState === 'uninitiated') {
-      body = this.renderUninitiated(entry, projectId)
+    if (this.state.exportState === 'unintiated') {
+      body = this.renderUnintiated(entry, projectId)
     } else if (this.state.exportState === 'initiated') {
       body = this.renderInitiated(entry, projectId)
     } else if (this.state.exportState === 'complete') {

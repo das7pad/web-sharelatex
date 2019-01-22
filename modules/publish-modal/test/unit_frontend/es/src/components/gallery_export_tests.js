@@ -43,11 +43,15 @@ describe('<GalleryExport />', function() {
         .returns(
           $.Deferred().resolve({ export_json: { status_summary: 'succeeded' } })
         )
-      const { getByLabelText, getByText } = renderGalleryExport()
+      const {
+        getByLabelText,
+        getByText,
+        getByDisplayValue
+      } = renderGalleryExport()
 
       const licenseSelect = getByLabelText(/license/i)
       fireEvent.change(licenseSelect, { target: { value: 'cc_by_4.0' } })
-      const submitButton = getByText(/submit to myjournal/i)
+      const submitButton = getByDisplayValue(/submit to myjournal/i)
       fireEvent.click(submitButton)
 
       const { data } = $.ajax.firstCall.args[0]
@@ -65,11 +69,15 @@ describe('<GalleryExport />', function() {
         .returns(
           $.Deferred().resolve({ export_json: { status_summary: 'succeeded' } })
         )
-      const { getByLabelText, getByText } = renderGalleryExport()
+      const {
+        getByLabelText,
+        getByText,
+        getByDisplayValue
+      } = renderGalleryExport()
 
       const licenseSelect = getByLabelText(/license/i)
       fireEvent.change(licenseSelect, { target: { value: 'cc_by_4.0' } })
-      const submitButton = getByText(/submit to myjournal/i)
+      const submitButton = getByDisplayValue(/submit to myjournal/i)
       fireEvent.click(submitButton)
 
       return waitForElement(() => getByText(/exporting files/i))
@@ -94,11 +102,15 @@ describe('<GalleryExport />', function() {
           $.Deferred().resolve({ export_json: { status_summary: 'succeeded' } })
         )
 
-      const { getByLabelText, getByText } = renderGalleryExport()
+      const {
+        getByLabelText,
+        getByText,
+        getByDisplayValue
+      } = renderGalleryExport()
 
       const licenseSelect = getByLabelText(/license/i)
       fireEvent.change(licenseSelect, { target: { value: 'cc_by_4.0' } })
-      const submitButton = getByText(/submit to myjournal/i)
+      const submitButton = getByDisplayValue(/submit to myjournal/i)
       fireEvent.click(submitButton)
 
       return waitForElement(() => getByText(/exporting files/i))
@@ -116,11 +128,15 @@ describe('<GalleryExport />', function() {
       // Mock first poll request to fail
       ajaxStub.onSecondCall().returns($.Deferred().reject(new Error()))
 
-      const { getByLabelText, getByText } = renderGalleryExport()
+      const {
+        getByLabelText,
+        getByText,
+        getByDisplayValue
+      } = renderGalleryExport()
 
       const licenseSelect = getByLabelText(/license/i)
       fireEvent.change(licenseSelect, { target: { value: 'cc_by_4.0' } })
-      const submitButton = getByText(/submit to myjournal/i)
+      const submitButton = getByDisplayValue(/submit to myjournal/i)
       fireEvent.click(submitButton)
 
       return waitForElement(() => getByText(/exporting files/i))
@@ -142,11 +158,15 @@ describe('<GalleryExport />', function() {
           $.Deferred().resolve({ export_json: { status_summary: 'failed' } })
         )
 
-      const { getByLabelText, getByText } = renderGalleryExport()
+      const {
+        getByLabelText,
+        getByText,
+        getByDisplayValue
+      } = renderGalleryExport()
 
       const licenseSelect = getByLabelText(/license/i)
       fireEvent.change(licenseSelect, { target: { value: 'cc_by_4.0' } })
-      const submitButton = getByText(/submit to myjournal/i)
+      const submitButton = getByDisplayValue(/submit to myjournal/i)
       fireEvent.click(submitButton)
 
       return waitForElement(() => getByText(/exporting files/i))

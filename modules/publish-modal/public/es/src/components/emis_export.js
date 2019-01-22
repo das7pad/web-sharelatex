@@ -6,37 +6,15 @@ export default class EmisExport extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      exportState: 'uninitiated',
+      exportState: 'unintiated',
       submissionValid: true,
       errorDetails: null
     }
-
-    this.runExport = this.runExport.bind(this)
   }
 
-  runExport(e) {
-    e.preventDefault()
-    const { entry, projectId } = this.props
-
+  runExport(entry, projectId) {
     if (this.firstName.value && this.lastName.value) {
-      this.setState({
-        submissionValid: true,
-        exportState: 'initiated'
-      })
-
-      initiateExport(entry, projectId, {
-        firstName: this.firstName.value,
-        lastName: this.lastName.value
-      })
-        .then(() => {
-          this.setState({ exportState: 'complete' })
-        })
-        .catch(({ errorDetails }) => {
-          this.setState({
-            exportState: 'error',
-            errorDetails
-          })
-        })
+      initiateExport(entry, projectId, this)
     } else {
       this.setState({ submissionValid: false })
     }
@@ -46,6 +24,7 @@ export default class EmisExport extends Component {
     const {
       entry,
       onReturn,
+      projectId,
       returnText,
       hasFolders,
       firstName,
@@ -94,7 +73,7 @@ export default class EmisExport extends Component {
               Submit to: <br />
               <strong> {entry.name} </strong>
             </h3>
-            {this.state.exportState === 'uninitiated' && (
+            {this.state.exportState === 'unintiated' && (
               <span>
                 <p>Thanks for using Overleaf to submit your article.</p>
                 <p>
@@ -107,32 +86,33 @@ export default class EmisExport extends Component {
                 <p>
                   To send your article, please confirm your first and last name:
                 </p>
-                <form onSubmit={this.runExport}>
-                  <p>
-                    <input
-                      type="text"
-                      className="form-control"
-                      defaultValue={firstName}
-                      style={{ width: '30%', display: 'inline-block' }}
-                      maxLength="255"
-                      placeholder="First Name"
-                      ref={input => (this.firstName = input)}
-                    />
-                    <input
-                      type="text"
-                      className="form-control"
-                      defaultValue={lastName}
-                      style={{ width: '30%', display: 'inline-block' }}
-                      maxLength="255"
-                      placeholder="Last Name"
-                      ref={input => (this.lastName = input)}
-                    />
-                  </p>
-                  <br />
-                  <button type="submit" className="btn btn-primary">
-                    Submit to {entry.name}
-                  </button>
-                </form>
+                <p>
+                  <input
+                    type="text"
+                    className="form-control"
+                    defaultValue={firstName}
+                    style={{ width: '30%', display: 'inline-block' }}
+                    maxLength="255"
+                    placeholder="First Name"
+                    ref={input => (this.firstName = input)}
+                  />
+                  <input
+                    type="text"
+                    className="form-control"
+                    defaultValue={lastName}
+                    style={{ width: '30%', display: 'inline-block' }}
+                    maxLength="255"
+                    placeholder="Last Name"
+                    ref={input => (this.lastName = input)}
+                  />
+                </p>
+                <br />
+                <button
+                  className="btn btn-primary"
+                  onClick={() => this.runExport(entry, projectId)}
+                >
+                  Submit to {entry.name}
+                </button>
                 {!this.state.submissionValid && (
                   <p style={{ color: 'red' }}>
                     Please add valid first and last names before continuing
