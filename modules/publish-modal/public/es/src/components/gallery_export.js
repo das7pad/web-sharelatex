@@ -10,6 +10,8 @@ export default class GalleryExport extends Component {
       submissionValid: true,
       errorDetails: null
     }
+    this.retrievePriorSubmission = this.retrievePriorSubmission.bind(this)
+    this.retrievePriorSubmission(props)
   }
 
   runExport(ev) {
@@ -25,6 +27,20 @@ export default class GalleryExport extends Component {
     }
     this.setState({ submissionValid: valid })
     return valid
+  }
+
+  retrievePriorSubmission(props) {
+    $.ajax({
+      url: `/latest_template/{props.projectId}`,
+      type: 'GET',
+      success: function(jsonResponse) {
+        var template = JSON.parse(jsonResponse)
+        console.log('LATEST TEMPLATE RETURNED ', template)
+        props.description = template.description
+        props.author = template.author
+        props.license = template.license
+      }
+    })
   }
 
   renderUninitiated() {
