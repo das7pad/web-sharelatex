@@ -215,7 +215,7 @@ module.exports = GitBridgeHandler =
 			else
 				logger.log {projectId, latestVerId: snapshot.latestVerId},
 					"[GitBridgeHandler] applied snapshot to project, finishing up"
-					GitBridgeHandler._finishSnapshotApplication userId, project, snapshot, () ->
+				GitBridgeHandler._finishSnapshotApplication userId, project, snapshot, () ->
 
 	_handleApplySnapshotError: (project, snapshot, err, callback=(err)->) ->
 		errorPayload = if err instanceof Errors.OutOfDateError
