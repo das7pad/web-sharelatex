@@ -109,9 +109,11 @@ describe('<ScholarOneExport />', function() {
     it('sends request upon completion', () => {
       ajaxStub.onSecondCall().returns(
         $.Deferred().resolve({
-          export_json: { status_summary: 'succeeded' },
-          token: 'token',
-          partner_submission_id: 4
+          export_json: {
+            status_summary: 'succeeded',
+            token: 'token',
+            partner_submission_id: 4
+          }
         })
       )
 

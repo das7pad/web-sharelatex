@@ -19,8 +19,8 @@ export function initiateExport(entry, projectId, data) {
     return pollExportStatus(startResponse.export_v1_id, projectId)
       .then(pollResponse => {
         const authorName = [
-          pollResponse.v2_user_first_name,
-          pollResponse.v2_user_last_name
+          pollResponse.export_json.v2_user_first_name,
+          pollResponse.export_json.v2_user_last_name
         ]
           .filter(Boolean)
           .join(' ')
@@ -30,11 +30,11 @@ export function initiateExport(entry, projectId, data) {
         // about business logic
         return {
           exportId: startResponse.export_v1_id,
-          token: pollResponse.token,
-          submissionId: pollResponse.partner_submission_id,
-          authorEmail: pollResponse.v2_user_email,
+          token: pollResponse.export_json.token,
+          submissionId: pollResponse.export_json.partner_submission_id,
+          authorEmail: pollResponse.export_json.v2_user_email,
           authorName,
-          title: pollResponse.title
+          title: pollResponse.export_json.title
         }
       })
       .catch(error => {

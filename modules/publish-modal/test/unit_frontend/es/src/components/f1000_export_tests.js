@@ -109,11 +109,13 @@ describe('<F1000Export />', function() {
     it('sends request upon completion', () => {
       ajaxStub.onSecondCall().returns(
         $.Deferred().resolve({
-          export_json: { status_summary: 'succeeded' },
-          v2_user_email: 'test@example.com',
-          v2_user_first_name: 'FirstName',
-          v2_user_last_name: 'LastName',
-          title: 'My title'
+          export_json: {
+            status_summary: 'succeeded',
+            v2_user_email: 'test@example.com',
+            v2_user_first_name: 'FirstName',
+            v2_user_last_name: 'LastName',
+            title: 'My title'
+          }
         })
       )
 
