@@ -41,7 +41,8 @@ define(['base'], App =>
           const publishModalConfig = {
             isBranded:
               CobrandingDataService.isProjectCobranded() &&
-              (CobrandingDataService.getPublishGuideHtml() != null ||
+              ((CobrandingDataService.getPublishGuideHtml() != null &&
+                CobrandingDataService.getPublishGuideHtml() !== '') ||
                 CobrandingDataService.getPartner() != null),
             brandedMenu: CobrandingDataService.hasBrandedMenu(),
             brandId: CobrandingDataService.getBrandId(),

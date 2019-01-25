@@ -539,7 +539,7 @@ describe "ProjectImporter", ->
 			@doc = { _id: @doc_id = "mock-doc-id" }
 			@DocstoreManager.updateDoc = sinon.stub().yields(null)
 			@FileStoreHandler.uploadFileFromDisk = sinon.stub().yields(null, "filestore-url")
-			@ProjectEntityUpdateHandler.mkdirp = sinon.stub().yields(null, [], { _id: @folder_id = "mock-folder-id" })
+			@ProjectEntityUpdateHandler.mkdirpWithExactCase = sinon.stub().yields(null, [], { _id: @folder_id = "mock-folder-id" })
 			@ProjectEntityUpdateHandler._addDocAndSendToTpds = sinon.stub().yields()
 			@ProjectEntityUpdateHandler._addFileAndSendToTpds = sinon.stub().yields()
 			@ProjectEntityUpdateHandler.setRootDoc = sinon.stub().yields()
@@ -555,7 +555,7 @@ describe "ProjectImporter", ->
 
 
 			it "should create the file's folder", ->
-				@ProjectEntityUpdateHandler.mkdirp
+				@ProjectEntityUpdateHandler.mkdirpWithExactCase
 					.calledWith(@project_id, "/folder")
 					.should.equal true
 
@@ -588,7 +588,7 @@ describe "ProjectImporter", ->
 				@ProjectImporter._importFiles @project_id, [@file], done
 
 			it "should create the file's folder", ->
-				@ProjectEntityUpdateHandler.mkdirp
+				@ProjectEntityUpdateHandler.mkdirpWithExactCase
 					.calledWith(@project_id, "/")
 					.should.equal true
 
@@ -608,7 +608,7 @@ describe "ProjectImporter", ->
 				@ProjectImporter._importFiles @project_id, [@file], done
 
 			it "should create the file's folder", ->
-				@ProjectEntityUpdateHandler.mkdirp
+				@ProjectEntityUpdateHandler.mkdirpWithExactCase
 					.calledWith(@project_id, "/images")
 					.should.equal true
 
@@ -646,7 +646,7 @@ describe "ProjectImporter", ->
 				@ProjectImporter._importFiles @project_id, [@file], done
 
 			it "should create the file's folder", ->
-				@ProjectEntityUpdateHandler.mkdirp
+				@ProjectEntityUpdateHandler.mkdirpWithExactCase
 					.calledWith(@project_id, "/images")
 					.should.equal true
 
@@ -682,7 +682,7 @@ describe "ProjectImporter", ->
 				@ProjectImporter._importFiles @project_id, [@file], done
 
 			it "should create the file's folder", ->
-				@ProjectEntityUpdateHandler.mkdirp
+				@ProjectEntityUpdateHandler.mkdirpWithExactCase
 					.calledWith(@project_id, "/images")
 					.should.equal true
 
@@ -717,7 +717,7 @@ describe "ProjectImporter", ->
 				@ProjectImporter._importFiles @project_id, [@file], done
 
 			it "should create the file's folder", ->
-				@ProjectEntityUpdateHandler.mkdirp
+				@ProjectEntityUpdateHandler.mkdirpWithExactCase
 					.calledWith(@project_id, "/images")
 					.should.equal true
 

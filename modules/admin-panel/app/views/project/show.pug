@@ -1,0 +1,16 @@
+extends ../../../../../app/views/layout
+
+block content
+
+	script(type="template", id="admin-project-data")!= StringHelper.stringifyJsonForScript({project: project})
+
+	.content.content-alt(ng-controller="AdminProjectController")
+		.container(ng-cloak)
+			p
+				strong
+					| Project
+				| &nbsp;&gt;&nbsp;
+				strong {{ project._id }}
+			tabset
+				tab(heading="Project Info")
+					include ./_project-info

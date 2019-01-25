@@ -8,7 +8,7 @@ block content
 					.card
 						.page-header
 							h1 Add Email
-						form(async-form="register", name="registerForm", action="/register/sso_email", method="POST", captcha, ng-cloak)
+						form(async-form="register", name="registerForm", action="/register/sso_email", method="POST", ng-cloak)
 							input(name='_csrf', type='hidden', value=csrfToken)
 							form-messages(for="registerForm")
 							.form-group

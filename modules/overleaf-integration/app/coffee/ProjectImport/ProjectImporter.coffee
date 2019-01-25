@@ -369,14 +369,14 @@ module.exports = ProjectImporter =
 		# store the uploaded docs and files
 		storeDoc = (uploadResult, cb) ->
 			{file, dirname, doc} = uploadResult
-			ProjectEntityUpdateHandler.mkdirp project_id, dirname, (err, folders, lastFolder) ->
+			ProjectEntityUpdateHandler.mkdirpWithExactCase project_id, dirname, (err, folders, lastFolder) ->
 				return cb(err) if err?
 				folder_id = lastFolder._id
 				ProjectEntityUpdateHandler._addDocAndSendToTpds project_id, folder_id, doc, cb
 
 		storeFile = (uploadResult, cb) ->
 			{file, dirname, fileRef} = uploadResult
-			ProjectEntityUpdateHandler.mkdirp project_id, dirname, (err, folders, lastFolder) ->
+			ProjectEntityUpdateHandler.mkdirpWithExactCase project_id, dirname, (err, folders, lastFolder) ->
 				return cb(err) if err?
 				folder_id = lastFolder._id
 				ProjectEntityUpdateHandler._addFileAndSendToTpds project_id, folder_id, fileRef, cb

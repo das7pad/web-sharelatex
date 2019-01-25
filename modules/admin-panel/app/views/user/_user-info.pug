@@ -12,6 +12,9 @@ p
 				td
 					div(ng-show="!editingEmail")
 						a(href="mailto:{{user.email}}") {{ user.email }} &nbsp;
+						span(ng-if="user.emails.length == 1 && user.emails[0].confirmedAt != null")
+							i.fa.fa-check
+							| &nbsp;&nbsp;
 						a.small(href, ng-click="editingEmail = true") Edit
 					div(ng-show="editingEmail")
 						input#email.form-control(

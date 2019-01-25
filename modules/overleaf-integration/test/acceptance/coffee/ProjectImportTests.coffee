@@ -305,6 +305,58 @@ describe "ProjectImportTests", ->
 			updates = MockDocUpdaterApi.getProjectStructureUpdates(@project._id).fileUpdates
 			expect(updates.length).to.equal(0)
 
+	describe 'a project with docs, files and external files with case-sensitive paths', ->
+		before (done) ->
+			@ol_project_id = 1001
+			@ol_project_token = "#{@ol_project_id}pqr1"
+			file = {
+				id: new ObjectId()
+				stream: fs.createReadStream(Path.resolve(__dirname + '/../files/1pixel.png'))
+			}
+			MockS3Api.setFile file
+			ext = {
+				id: new ObjectId()
+				stream: fs.createReadStream(Path.resolve(__dirname + '/../files/foo.bib'))
+			}
+			MockS3Api.setFile ext
+			files = [
+				{type: 'src', file: 'main.tex', latest_content: 'Test Content', main: true}
+				{type: 'src', file: 'folder/other.tex', latest_content: 'Test Content'}
+				{type: 'src', file: 'Folder/other.tex', latest_content: 'Test Content'}
+				{type: 'src', file: 'FOLDER/other.tex', latest_content: 'Test Content'}
+				{type: 'att', file: 'folder/aaa.png', file_path: "file/#{file.id}"}
+				{type: 'att', file: 'Folder/aaa.png', file_path: "file/#{file.id}"}
+				{type: 'att', file: 'FOLDER/aaa.png', file_path: "file/#{file.id}"}
+				{type: 'ext', file: 'folder/foo.bib', file_path: "file/#{ext.id}", agent: "mendeley", agent_data: {importer_id:123, group:456}}
+				{type: 'ext', file: 'Folder/foo.bib', file_path: "file/#{ext.id}", agent: "mendeley", agent_data: {importer_id:123, group:456}}
+				{type: 'ext', file: 'FOLDER/foo.bib', file_path: "file/#{ext.id}", agent: "mendeley", agent_data: {importer_id:123, group:456}}
+			]
+			MockOverleafApi.setDoc Object.assign({}, BLANK_PROJECT, { id: @ol_project_id, token: @ol_project_token, files, title: "docs and files project" })
+			MockDocUpdaterApi.clearProjectStructureUpdates()
+
+			@owner.request.post "/overleaf/project/#{@ol_project_token}/import", (error, response, body) =>
+				getProject response, (error, project) =>
+					@project = project
+					done()
+
+		it 'should import the docs, files and external files', (done) ->
+			ProjectEntityHandler.getAllEntitiesFromProject @project, (error, docs, files) ->
+				throw error if error?
+				expect(files).to.have.lengthOf(6)
+				expect(docs).to.have.lengthOf(4)
+				console.log "DOCS", docs
+				console.log "FILES", files
+				expect(docs[0].path).to.equal('/main.tex')
+				expect(docs[1].path).to.equal('/folder/other.tex')
+				expect(docs[2].path).to.equal('/Folder/other.tex')
+				expect(docs[3].path).to.equal('/FOLDER/other.tex')
+				expect(files[0].path).to.equal('/folder/aaa.png')
+				expect(files[1].path).to.equal('/folder/foo.bib')
+				expect(files[2].path).to.equal('/Folder/aaa.png')
+				expect(files[3].path).to.equal('/Folder/foo.bib')
+				expect(files[4].path).to.equal('/FOLDER/aaa.png')
+				expect(files[5].path).to.equal('/FOLDER/foo.bib')
+				done()
 
 	describe 'a project with a brand variation id', ->
 		before (done) ->

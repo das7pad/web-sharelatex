@@ -12,44 +12,41 @@ export function findEntryInCategories(categories, id) {
   return entry
 }
 
-export function initiateExport(entry, projectId, _this) {
-  var link = `/project/${projectId}/export/${entry.id}`
+export function initiateExport(entry, projectId, data) {
+  const url = `/project/${projectId}/export/${entry.id}`
 
-  var data = {}
-  if (_this.firstName) {
-    data['firstName'] = _this.firstName.value
-  }
-  if (_this.lastName) {
-    data['lastName'] = _this.lastName.value
-  }
-  if (_this.author) {
-    data['author'] = _this.author.value
-  }
-  if (_this.description) {
-    data['description'] = _this.description.value
-  }
-  if (_this.title) {
-    data['title'] = _this.title.value
-  }
-  if (_this.license) {
-    data['license'] = _this.license.value
-  }
-  if (_this.showSource) {
-    data['showSource'] = _this.showSource.checked
-  }
+  return startExport(url, data).then(startResponse => {
+    return pollExportStatus(startResponse.export_v1_id, projectId)
+      .then(pollResponse => {
+        const authorName = [
+          pollResponse.export_json.v2_user_first_name,
+          pollResponse.export_json.v2_user_last_name
+        ]
+          .filter(Boolean)
+          .join(' ')
 
-  _this.setState({ exportState: 'initiated' })
-  startExport(link, data)
-    .then(resp => {
-      _this.setState({ exportId: resp.export_v1_id })
-      pollExportStatus(resp.export_v1_id, projectId, _this, 1000)
-    })
-    .catch(resp => {
-      _this.setState({ exportState: 'error' })
-    })
+        // FIXME: just return the whole combined {start,poll}Response objects?
+        // Arguably this is just the network layer that shouldn't know anything
+        // about business logic
+        return {
+          exportId: startResponse.export_v1_id,
+          token: pollResponse.export_json.token,
+          submissionId: pollResponse.export_json.partner_submission_id,
+          authorEmail: pollResponse.export_json.v2_user_email,
+          authorName,
+          title: pollResponse.export_json.title
+        }
+      })
+      .catch(error => {
+        // Rethrow with nicely formatted data
+        throw new Error({
+          errorDetails: error.status_detail || null
+        })
+      })
+  })
 }
 
-function startExport(url, data) {
+function startExport(url, data = {}) {
   return new Promise((resolve, reject) => {
     $.ajax({
       url,
@@ -62,48 +59,36 @@ function startExport(url, data) {
   })
 }
 
-function pollExportStatus(exportId, projectId, _this, timeout) {
-  var siteUrl = window.ExposedSettings.siteUrl
-  var link = `${siteUrl}/project/${projectId}/export/${exportId}`
-  $.ajax({
-    url: link,
-    type: 'GET'
-  })
-    .done(resp => {
-      const status = resp.export_json
-      if (status.status_summary === 'failed') {
-        _this.setState({
-          exportState: 'error',
-          errorDetails: status.status_detail
-        })
-      } else if (status.status_summary === 'succeeded') {
-        _this.setState({
-          exportState: 'complete',
-          // for ScholarOne
-          partner_submission_id: status.partner_submission_id,
-          // for F1000/Wellcome
-          authorEmail: status.v2_user_email,
-          authorName: [
-            status.v2_user_first_name,
-            status.v2_user_last_name
-          ].join(' '),
-          title: status.title,
-          articleZipURL: link + '/zip',
-          pdfURL: link + '/pdf',
-          revisionURL: `${siteUrl}/exports/${exportId}${status.token}/revise`,
-          // general-purpose
-          token: status.token
-        })
-      } else {
-        setTimeout(function() {
-          if (timeout < 10000) {
-            timeout = timeout + 1000
+function pollExportStatus(exportId, projectId) {
+  const siteUrl = window.ExposedSettings.siteUrl
+  const url = `${siteUrl}/project/${projectId}/export/${exportId}`
+  return networkPoll(
+    { url },
+    ({ export_json: status }) => status.status_summary === 'succeeded',
+    ({ export_json: status }) => status.status_summary === 'failed'
+  )
+}
+
+function networkPoll(ajaxOpts, checkSuccess, checkError, timeout = 1000) {
+  return new Promise((resolve, reject) => {
+    function poll() {
+      $.ajax(ajaxOpts)
+        .done(res => {
+          if (checkError(res)) {
+            reject(res)
+          } else if (checkSuccess(res)) {
+            resolve(res)
+          } else {
+            setTimeout(() => {
+              if (timeout < 10000) {
+                timeout = timeout + 1000
+              }
+              poll()
+            }, timeout)
           }
-          pollExportStatus(exportId, projectId, _this, timeout)
-        }, timeout)
-      }
-    })
-    .fail(resp => {
-      _this.setState({ exportState: 'error' })
-    })
+        })
+        .fail(reject)
+    }
+    poll()
+  })
 }

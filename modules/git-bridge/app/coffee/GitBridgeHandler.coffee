@@ -215,7 +215,7 @@ module.exports = GitBridgeHandler =
 			else
 				logger.log {projectId, latestVerId: snapshot.latestVerId},
 					"[GitBridgeHandler] applied snapshot to project, finishing up"
-					GitBridgeHandler._finishSnapshotApplication userId, project, snapshot, () ->
+				GitBridgeHandler._finishSnapshotApplication userId, project, snapshot, () ->
 
 	_handleApplySnapshotError: (project, snapshot, err, callback=(err)->) ->
 		errorPayload = if err instanceof Errors.OutOfDateError
@@ -305,14 +305,14 @@ module.exports = GitBridgeHandler =
 		source = 'git-bridge'
 		logger.log {userId, projectId: project._id, deleteCount: deleteEntities.length},
 			"[GitBridgeHandler] applying delete operations to project"
-		Async.each deleteEntities,
+		Async.eachLimit deleteEntities, 5,
 			(entity, cb) ->
 				UpdateMerger.deleteUpdate userId, projectId, entity.path, source, cb
 			, (err) ->
 				return callback(err) if err?
 				logger.log {userId, projectId: project._id, changeCount: changeEntities.length},
 					"[GitBridgeHandler] applying change operations to project"
-				Async.each changeEntities,
+				Async.eachLimit changeEntities, 5,
 					(entity, cb) ->
 						UpdateMerger._mergeUpdate userId, projectId, entity.path, entity.contentFsPath, source, cb
 					, (err) ->

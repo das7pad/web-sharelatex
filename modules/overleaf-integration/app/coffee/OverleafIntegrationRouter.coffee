@@ -17,6 +17,7 @@ passport = require "passport"
 logger = require "logger-sharelatex"
 qs = require 'querystring'
 settings = require 'settings-sharelatex'
+CaptchaMiddleware = require '../../../../app/js/Features/Captcha/CaptchaMiddleware'
 
 module.exports =
 	apply: (webRouter, privateApiRouter, publicApiRouter) ->
@@ -44,7 +45,7 @@ module.exports =
 		removeRoute(webRouter, 'get', '/register')
 		removeRoute(webRouter, 'post', '/register')
 		webRouter.get '/register', OverleafAuthenticationController.saveRedir, V1LoginController.registrationPage
-		webRouter.post '/register', V1LoginController.doRegistration
+		webRouter.post '/register', CaptchaMiddleware.validateCaptcha, V1LoginController.doRegistration
 
 		webRouter.post(
 			'/user/change_password/v1',

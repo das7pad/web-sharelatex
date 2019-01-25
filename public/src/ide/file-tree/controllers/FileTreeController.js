@@ -116,10 +116,11 @@ define(['base'], function(App) {
 
   App.controller('NewFileModalController', [
     '$scope',
+    'ide',
     'type',
     'parent_folder',
     '$modalInstance',
-    function($scope, type, parent_folder, $modalInstance) {
+    function($scope, ide, type, parent_folder, $modalInstance) {
       $scope.type = type
       $scope.parent_folder = parent_folder
       $scope.state = {
@@ -128,7 +129,13 @@ define(['base'], function(App) {
       }
       $scope.cancel = () => $modalInstance.dismiss('cancel')
       $scope.create = () => $scope.$broadcast('create')
-      return $scope.$on('done', () => $modalInstance.dismiss('done'))
+      return $scope.$on('done', (e, opts = {}) => {
+        isBibFile = opts.name && opts.name.match(/^.*\.bib$$/)
+        if (opts.shouldReindexReferences || isBibFile) {
+          ide.$scope.$emit('references:should-reindex', {})
+        }
+        $modalInstance.dismiss('done')
+      })
     }
   ])
 
@@ -141,7 +148,7 @@ define(['base'], function(App) {
 
       const validate = function() {
         const { name } = $scope.inputs
-        return ($scope.state.valid = name != null && name.length > 0)
+        $scope.state.valid = name != null && name.length > 0
       }
       $scope.$watch('inputs.name', validate)
 
@@ -162,7 +169,7 @@ define(['base'], function(App) {
           .catch(function(response) {
             const { data } = response
             $scope.error = data
-            return ($scope.state.inflight = false)
+            $scope.state.inflight = false
           })
       })
     }
@@ -210,7 +217,7 @@ define(['base'], function(App) {
             $rootScope.$broadcast('file:upload:complete', response)
           }
           if (uploadCount === 0 && response != null && response.success) {
-            return $scope.$emit('done')
+            return $scope.$emit('done', { name: name })
           }
         }, 250)
 
@@ -331,7 +338,7 @@ define(['base'], function(App) {
         }
         const fileName = newVal.split('/').reverse()[0]
         if (fileName) {
-          return ($scope.data.name = fileName)
+          $scope.data.name = fileName
         }
       })
 
@@ -345,14 +352,14 @@ define(['base'], function(App) {
             $scope.data.projects,
             p => p._id === $scope.data.selectedProjectId
           )
-          return ($scope.data.name =
+          $scope.data.name =
             (project != null ? project.name : undefined) != null
               ? `${project.name}.pdf`
-              : 'output.pdf')
+              : 'output.pdf'
         } else {
           const fileName = newVal.split('/').reverse()[0]
           if (fileName) {
-            return ($scope.data.name = fileName)
+            $scope.data.name = fileName
           }
         }
       })
@@ -384,7 +391,7 @@ define(['base'], function(App) {
         const { state, data } = $scope
         return (
           !state.inFlight.projects &&
-          (data.projects.length === 0 || data.projects == null)
+          (data.projects == null || data.projects.length === 0)
         )
       }
 
@@ -411,7 +418,7 @@ define(['base'], function(App) {
       const validate = function() {
         const { state } = $scope
         const { data } = $scope
-        return ($scope.state.valid =
+        $scope.state.valid =
           !state.inFlight.projects &&
           !state.inFlight.entities &&
           data.projects &&
@@ -422,7 +429,7 @@ define(['base'], function(App) {
             ($scope.state.isOutputFilesMode &&
               data.projectOutputFiles &&
               data.selectedProjectOutputFile)) &&
-          data.name)
+          data.name
       }
       $scope.$watch('state', validate, true)
       $scope.$watch('data', validate, true)
@@ -512,15 +519,15 @@ define(['base'], function(App) {
           }
         }
         _setInFlight('create')
-        return ide.fileTreeManager
+        ide.fileTreeManager
           .createLinkedFile(name, $scope.parent_folder, provider, payload)
           .then(function() {
             _reset({ err: false })
-            return $scope.$emit('done')
+            return $scope.$emit('done', { name: name })
           })
           .catch(function(response) {
             const { data } = response
-            return _reset({ err: true })
+            $scope.error = data
           })
       })
     }
@@ -576,7 +583,7 @@ define(['base'], function(App) {
           .createLinkedFile(name, $scope.parent_folder, 'url', { url })
           .then(function() {
             $scope.state.inflight = false
-            return $scope.$emit('done')
+            return $scope.$emit('done', { name: name })
           })
           .catch(function(response) {
             const { data } = response

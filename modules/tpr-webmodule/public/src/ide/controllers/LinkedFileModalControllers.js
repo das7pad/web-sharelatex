@@ -39,8 +39,6 @@ define(['base'], function(App) {
         x => x[provider]
       )
 
-      $timeout(() => $scope.$broadcast('open'), 200)
-
       $scope.canLoadBibtex = () =>
         $scope.userHasProviderFeature && $scope.userHasProviderLink
 
@@ -55,7 +53,8 @@ define(['base'], function(App) {
         isInitialized: false,
         groups: null,
         selectedGroupId: null,
-        format: 'bibtex'
+        format: 'bibtex',
+        name: 'references.bib'
       }
 
       const _handleError = function(err) {
@@ -107,6 +106,7 @@ define(['base'], function(App) {
             $scope.data.groups = data.groups
             $scope.data.selectedGroup = null
             $scope.data.isInitialized = true
+            $scope.$applyAsync(() => $scope.$broadcast('open'))
             return _reset()
           })
           .catch(function(err) {
@@ -157,8 +157,10 @@ define(['base'], function(App) {
             payload
           )
           .then(function() {
-            $scope.$emit('references:should-reindex', {})
-            $scope.$emit('done')
+            $scope.$emit('done', {
+              name: $scope.data.name,
+              shouldReindexReferences: true
+            })
             return _reset()
           })
           .catch(err => _handleError(err))

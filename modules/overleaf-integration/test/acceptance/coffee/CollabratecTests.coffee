@@ -123,6 +123,22 @@ describe "Collabratec", ->
 							expect(body).not.to.match /It looks like you've already signed up to Overleaf/
 							done()
 
+			describe "after login", ->
+				it "should set pro features", (done) ->
+					oauthLink login_collabratec_id_exists_saml, @user, (err) =>
+						return done(err) if err?
+						options =
+							url: '/org/ieee/collabratec/auth/link_after_saml_response'
+						@user.request options, (error, response, body) =>
+							expect(response.statusCode).to.equal 200
+							expect(body).to.match /Link Overleaf to IEEE Collabratec/
+							@user.login (err) =>
+								@user.get (err, user) =>
+									return done(err) if err?
+									expect(user.features.collaborators).to.equal -1
+									expect(user.features.dropbox).to.equal true
+									done()
+
 		describe "when logged in", ->
 			beforeEach (done) ->
 				@user.login done

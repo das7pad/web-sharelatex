@@ -6,7 +6,7 @@ export default class GalleryExport extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      exportState: 'unintiated',
+      exportState: 'uninitiated',
       submissionValid: true,
       errorDetails: null
     }
@@ -16,17 +16,39 @@ export default class GalleryExport extends Component {
 
   runExport(ev) {
     ev.preventDefault()
-    let valid =
+    if (
       this.title.value &&
       this.author.value &&
       this.description.value &&
       this.license.value
-    if (valid) {
+    ) {
       const { entry, projectId } = this.props
-      initiateExport(entry, projectId, this)
+
+      this.setState({
+        submissionValid: true,
+        exportState: 'initiated'
+      })
+
+      const data = {
+        title: this.title.value,
+        author: this.author.value,
+        description: this.description.value,
+        license: this.license.value
+      }
+
+      initiateExport(entry, projectId, data)
+        .then(() => {
+          this.setState({ exportState: 'complete' })
+        })
+        .catch(({ errorDetails }) => {
+          this.setState({
+            exportState: 'error',
+            errorDetails
+          })
+        })
+    } else {
+      this.setState({ submissionValid: false })
     }
-    this.setState({ submissionValid: valid })
-    return valid
   }
 
   retrievePriorSubmission(props) {
@@ -124,11 +146,9 @@ export default class GalleryExport extends Component {
           </label>
         </div>
         <div className="form-control-box no-label">
-          <input
-            type="submit"
-            className="btn btn-primary"
-            value={'Submit to ' + entry.name}
-          />
+          <button type="submit" className="btn btn-primary">
+            Submit to {entry.name}
+          </button>
           {!this.state.submissionValid && (
             <p style={{ color: 'red' }}>
               Please provide all of title, author(s) and description before
@@ -156,12 +176,10 @@ export default class GalleryExport extends Component {
       <span>
         <p>Export Successful!</p>
         <p>
-          Thanks for submitting to {this.props.entry.name}. Your manuscript and
-          supporting files have been sent directly to the journal's editorial
-          team, and they will send a follow-up email with instructions for how
-          to complete your submission.
+          Thanks for submitting to our gallery! We approve most submissions
+          within a few hours. We've sent you an e-mail to confirm your
+          submission, and we'll send you another one once it's approved.
         </p>
-        <p>Please check your email for confirmation of your submission.</p>
       </span>
     )
   }
@@ -179,7 +197,7 @@ export default class GalleryExport extends Component {
     const { entry, onReturn, returnText } = this.props
 
     let body
-    if (this.state.exportState === 'unintiated') {
+    if (this.state.exportState === 'uninitiated') {
       body = this.renderUninitiated()
     } else if (this.state.exportState === 'initiated') {
       body = this.renderInitiated()
@@ -212,7 +230,7 @@ GalleryExport.propTypes = {
   returnText: PropTypes.string,
   onReturn: PropTypes.func,
   projectId: PropTypes.string.isRequired,
-  author: PropTypes.string.isRequired,
+  author: PropTypes.string,
   title: PropTypes.string,
   description: PropTypes.string,
   showSource: PropTypes.bool

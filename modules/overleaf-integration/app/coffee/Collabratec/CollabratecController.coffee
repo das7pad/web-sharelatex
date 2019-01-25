@@ -169,5 +169,7 @@ module.exports = CollabratecController =
 		collabratec_user = req.session.collabratec_saml_user
 		CollabratecManager.setV1UserCollabratecId user.overleaf.id, collabratec_user.MemberNumber, (err, profile) ->
 			return callback err if err?
-			CollabratecController._finishLogin req
-			callback null, true
+			FeaturesUpdater.refreshFeatures user._id, false, (err) ->
+				return next err if err?
+				CollabratecController._finishLogin req
+				callback null, true
