@@ -15,6 +15,8 @@ export default class F1000Export extends Component {
   runExport(entry, projectId) {
     this.setState({ exportState: 'initiated' })
 
+    const { siteUrl } = window.ExposedSettings
+
     initiateExport(entry, projectId)
       .then(({ authorEmail, authorName, title }) => {
         this.setState({
@@ -22,8 +24,10 @@ export default class F1000Export extends Component {
           authorEmail,
           authorName,
           title,
-          articleZipURL: `/project/${projectId}/export/${entry.id}/zip`,
-          pdfURL: `/project/${projectId}/export/${entry.id}/pdf`,
+          articleZipURL: `${siteUrl}/project/${projectId}/export/${
+            entry.id
+          }/zip`,
+          pdfURL: `${siteUrl}/project/${projectId}/export/${entry.id}/pdf`,
           revisionURL: 'https://www.overleaf.com/learn/how-to/Overleaf_v2_FAQ',
           submissionURL: '',
           publicationURL: '',

@@ -17,7 +17,7 @@ describe('<F1000Export />', function() {
 
   beforeEach(() => {
     // Stub the globally exposed settings
-    window.ExposedSettings = { siteUrl: 'http://example.com' }
+    window.ExposedSettings = { siteUrl: 'http://v2.overleaf.test:4000' }
     // The F1000 component triggers a form submission when the export is
     // complete. This causes problems with Karma because it throws an error if
     // the page is navigated away (through the form submission). We therefore
@@ -128,8 +128,12 @@ describe('<F1000Export />', function() {
         expect(formData.authorEmail).to.equal('test@example.com')
         expect(formData.authorName).to.equal('FirstName LastName')
         expect(formData.title).to.equal('My title')
-        expect(formData.articleZipURL).to.equal('/project/1/export/2/zip')
-        expect(formData.pdfURL).to.equal('/project/1/export/2/pdf')
+        expect(formData.articleZipURL).to.equal(
+          'http://v2.overleaf.test:4000/project/1/export/2/zip'
+        )
+        expect(formData.pdfURL).to.equal(
+          'http://v2.overleaf.test:4000/project/1/export/2/pdf'
+        )
         expect(formData.revisionURL).to.equal(
           'https://www.overleaf.com/learn/how-to/Overleaf_v2_FAQ'
         )

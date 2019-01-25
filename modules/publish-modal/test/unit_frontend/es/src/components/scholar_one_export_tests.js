@@ -17,7 +17,7 @@ describe('<ScholarOneExport />', function() {
 
   beforeEach(() => {
     // Stub the globally exposed settings
-    window.ExposedSettings = { siteUrl: 'http://example.com' }
+    window.ExposedSettings = { siteUrl: 'http://v2.overleaf.com:4000' }
     // The F1000 component triggers a form submission when the export is
     // complete. This causes problems with Karma because it throws an error if
     // the page is navigated away (through the form submission). We therefore
