@@ -114,7 +114,8 @@ describe('<F1000Export />', function() {
             v2_user_email: 'test@example.com',
             v2_user_first_name: 'FirstName',
             v2_user_last_name: 'LastName',
-            title: 'My title'
+            title: 'My title',
+            token: 'token'
           }
         })
       )
@@ -135,7 +136,7 @@ describe('<F1000Export />', function() {
           'http://v2.overleaf.test:4000/project/1/export/2/pdf'
         )
         expect(formData.revisionURL).to.equal(
-          'https://www.overleaf.com/learn/how-to/Overleaf_v2_FAQ'
+          `http://v2.overleaf.test:4000/exports/3token/revise`
         )
         expect(formData.submissionURL).to.equal('')
         expect(formData.publicationURL).to.equal('')
