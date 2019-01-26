@@ -161,7 +161,7 @@ describe "InstitutionHubsController", ->
 			}]
 			jsonAsCSV = '"email","role","department","created_at"\n"test@test.test","student","engineering","2018-10-08T12:53:00.058Z"'
 			@request.get = sinon.stub().callsArgWith(1, null, null, v1JsonResp)
-			endpoint = /5\/affiliations/
+			endpoint = /5\/confirmed_affiliations/
 			@InstitutionHubsController.institutionUsersCSV(@req, @res)
 			@request.get.calledWith({
 				url: sinon.match(endpoint)
