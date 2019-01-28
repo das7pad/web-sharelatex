@@ -51,32 +51,43 @@ function _getJournalsAndRender(
   brandVariationId,
   initialShown
 ) {
+  let props = {
+    initialShown: initialShown,
+    initParams: initParams,
+    brandVariationId: brandVariationId
+  }
   const showPublishModal = jsonResponse => {
     let entries = JSON.parse(jsonResponse)
-    let props = {
-      entries: entries,
-      initialShown: initialShown,
-      initParams: initParams,
-      brandVariationId: brandVariationId
-    }
+    props.entries = entries
     ReactDOM.render(React.createElement(PublishModal, props), rootEl)
   }
+  const aggregateProps = template => {
+    props.initParams.description = template.description
+    props.initParams.author = template.author
+    props.initParams.license = template.license
+  }
+  // TODO create an error component to render here instead
   const showError = jsonResponse => {
-    // TODO create an error component to render here instead
-    let props = {
-      entries: entries,
-      initialShown: initialShown,
-      initParams: initParams,
-      brandVariationId: brandVariationId
-    }
+    let entries = JSON.parse(jsonResponse)
+    props.entries = entries
     ReactDOM.render(React.createElement(PublishModal, props), rootEl)
   }
-  promiseJournalsRequest(url).then(showPublishModal, showError)
+  promiseJournalsRequest(url)
+    .then(jsonResponse => {
+      promisePriorSubmissionRequest(initParams.projectId)
+        .then(aggregateProps)
+        .catch(e => {
+          // retrieval of prior submission is not essential
+          console.log('Failed retrieval prior submission for this project ', e)
+        })
+      return jsonResponse
+    })
+    .then(showPublishModal)
+    .catch(showError)
 }
 
 function promiseJournalsRequest(url) {
   return new Promise((resolve, reject) => {
-    console.log('RETRIEVE JOURNAL LIST ', url)
     $.ajax({
       url: url,
       type: 'GET'
@@ -88,18 +99,12 @@ function promiseJournalsRequest(url) {
 
 function promisePriorSubmissionRequest(projectId) {
   return new Promise((resolve, reject) => {
-    let url = `/latest_template/{projectId}`
-    console.log('RETRIEVE LATEST SUBMISSION ', url)
+    let url = `/latest_template/${projectId}`
     $.ajax({
       url: url,
-      type: 'GET',
-      success: function(jsonResponse) {
-        var template = JSON.parse(jsonResponse)
-        console.log('LATEST TEMPLATE RETURNED ', template)
-        props.description = template.description
-        props.author = template.author
-        props.license = template.license
-      }
+      type: 'GET'
     })
+      .done(resolve)
+      .fail(reject)
   })
 }
