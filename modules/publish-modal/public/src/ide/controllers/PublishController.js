@@ -27,7 +27,6 @@ define(['base'], App =>
             downloadLink = $scope.pdf.downloadUrl
           }
 
-          console.log('PUBLISH MODAL SCOPE PROJECT ', $scope.project)
           const initParams = {
             projectId: $scope.project_id,
             pdfUrl: downloadLink,
@@ -37,7 +36,6 @@ define(['base'], App =>
             lastName: $scope.user.last_name,
             title: $scope.project.name
           }
-          console.log('PUBLISH MODAL PARAMS ', initParams)
           const publishModalConfig = {
             isBranded:
               CobrandingDataService.isProjectCobranded() &&
