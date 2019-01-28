@@ -20,9 +20,13 @@ module.exports = PublishModalController =
 	latestTemplate: (req, res)->
 		projectId = req.params.project_id
 		ProjectHistoryHandler.getHistoryId(projectId, (err, history_id) ->
-			console.log "HISTORY RESULT ", history_id
-			url = "#{settings.apis.v1.url}/templates/latest/#{history_id}"
-			request.get(url, (err, response, body) ->
+			url = "#{settings.apis.v1.url}/api/v1/sharelatex/templates/latest/#{history_id}"
+			request.get(url, {
+				auth:
+					user: settings.apis.v1.user
+					pass: settings.apis.v1.pass
+				json: true,
+			}, (err, response, body) ->
 				res.send(body)
 			)
 		)
