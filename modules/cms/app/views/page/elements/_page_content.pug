@@ -22,7 +22,10 @@ mixin element(element)
 		-var affectedProject = element.fields && element.fields.formInputs && element.fields.formInputs.indexOf('Affected Project URL') > -1 ? true : false
 		-var wikiSuggestions = element.fields && element.fields.formInputs && element.fields.formInputs.indexOf('Subject Suggestions from Learn Wiki') > -1 ? true : false
 		+contact-form(affectedProject, wikiSuggestions)
-	| !{element.fields.footer}
+		| !{element.fields.footer}
+	else if element.type == 'pageAboutTeam'
+		//- to do: rename type to elementTeamList?
+		+team(element)
 
 mixin actual_content(content)
 	//- DEPRECATED
@@ -42,14 +45,16 @@ mixin column_groups(groups)
 	//- This type applies styling to a group of types `Element | _` and `Layout | TabGroup`
 	for group in groups
 		div(class={"card" : group.fields.card, "text-center" : group.fields.centerText})
-			for element in group.fields.elements
-				if element.fields
-					if element.fields.quote
-							//- quotes are the only element that will handle col independently due to special layouts
-							.row
-								+quote(element.fields)
-					else
-						+element(element)
+			if group.fields
+				if group.fields.elements
+					for element in group.fields.elements
+						if element.fields
+							if element.fields.quote
+									//- quotes are the only element that will handle col independently due to special layouts
+									.row
+										+quote(element.fields)
+							else
+								+element(element)
 
 mixin content_row(row)
 	//- FOR: type `Layout | Grid` on CMS

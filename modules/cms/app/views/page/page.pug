@@ -2,18 +2,18 @@ extends ../layout
 include ./elements/_page_content
 
 //- A page from the CMS
-//- This is the model "Page" on the CMS
-//- These are for the path /for/_SLUG_ (other paths might be added)
 
 block content_cms
+	- var defaultCol = 'col-xs-12 col-sm-10 col-sm-offset-1'
+	- var aboutCol = 'col-xs-12 col-sm-8 col-sm-offset-2'
 	.row
-		.col-xs-12.col-sm-10.col-sm-offset-1
+		div(class=pageAbout ? aboutCol : defaultCol)
 			.page-header
 				h1 #{title}
 
 	if content
 		.row
-			.col-xs-12.col-sm-10.col-sm-offset-1.content-container
+			.content-container(class=pageAbout ? aboutCol : defaultCol)
 				for c, cIndex in content
 					//- tabGroupTitle is a required field on CMS but can be opted out of display on site
 					//- must check c.fields, because an entry could have been created without adding any fields
