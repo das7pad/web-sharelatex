@@ -120,6 +120,7 @@ export const MetricView = Backbone.View.extend({
 
     var router = metricsApp.router
     var path =
+      '/metrics/csv?' +
       'resource_id=' +
       METRICS_RESOURCE_ID +
       '&resource_type=' +
@@ -130,7 +131,7 @@ export const MetricView = Backbone.View.extend({
       router.endDate.unix() +
       '&lag=' +
       lag.selected
-    $csvElt[0].search = path
+    $csvElt[0].href = path
   },
 
   refresh: function() {
