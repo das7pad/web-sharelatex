@@ -1,13 +1,11 @@
 if c.fields.displayTabGroupTitle
 	h2 #{c.fields.tabGroupTitle}
 
-tabset.ol-tabs(bookmarkable-tabset)
-	for tab, tabIndex in c.fields.tabs
-		if tab.fields
-			tab(bookmarkable-tab=tab.fields.tabId, heading=tab.fields.tabTitle)
-				for tabContent, tabContentIndex in tab.fields.tabContent || []
-					if tabContent.type == 'layoutGrid'
-						+content_row(tabContent.fields)
-					else
-						//- DEPRECATED
-						+page_content(tabContent, tab.fields.tabContent[tabContentIndex+1])
+.row.section-row
+	.col-sm-12
+		tabset.ol-tabs(bookmarkable-tabset)
+			for tab, tabIndex in c.fields.tabs
+				if tab.fields
+					tab(bookmarkable-tab=tab.fields.tabId, heading=tab.fields.tabTitle)
+						for tabContent, tabContentIndex in tab.fields.tabContent || []
+							+content_row(tabContent.fields)
