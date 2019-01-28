@@ -10,9 +10,6 @@ mixin element(element)
 					p #{element.fields.youTubeTitle}
 				div.embed-responsive.embed-responsive-16by9
 					iframe(src=element.fields.youTube title=element.fields.youTubeTitle || "YouTube Video")
-			if element.fields.contactForm
-				//- to do - move this to a separate content type
-				include ../../../../../support/app/views/contact_form/form_general
 	else if element.type == 'buttonContact'
 			+btn_contact(element)
 	else if element.type == 'buttonOtherPage'
