@@ -50,7 +50,7 @@ export default class GalleryExport extends Component {
   }
 
   renderUninitiated() {
-    const { entry, author, title, description } = this.props
+    const { entry, author, title, description, license } = this.props
     var showSource = this.props.showSource !== false
     return (
       <form onSubmit={ev => this.runExport(ev)}>
@@ -100,6 +100,7 @@ export default class GalleryExport extends Component {
           <select
             id="gallery-export-license"
             ref={input => (this.license = input)}
+            defaultValue={license}
           >
             <option value="cc_by_4.0">Creative Commons CC BY 4.0</option>
             <option value="lppl_1.3c">LaTeX Project Public License 1.3c</option>
