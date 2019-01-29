@@ -68,6 +68,7 @@ export default class PublishModal extends Component {
           onSwitch={this.handleSwitch}
           entries={entries}
           initialEntry={this.state.initialEntry}
+          initParams={initParams}
         />
       )
     }
