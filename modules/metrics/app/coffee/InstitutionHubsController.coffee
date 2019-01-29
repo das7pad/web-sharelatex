@@ -32,7 +32,7 @@ module.exports = InstitutionHubsController =
 			)
 
 	institutionUsersCSV: (req, res, next) ->
-		InstitutionHubsController._v1InstitutionsApi(req.entity.v1Id, 'affiliations', (err, response, body)->
+		InstitutionHubsController._v1InstitutionsApi(req.entity.v1Id, 'confirmed_affiliations', (err, response, body)->
 			return next(err) if err?
 			res.header(
 				"Content-Disposition",
