@@ -55,6 +55,7 @@ describe('<GalleryExport />', function() {
       expect(data.title).to.equal('My title')
       expect(data.description).to.equal('My description')
       expect(data.license).to.equal('cc_by_4.0')
+      expect(data.showSource).to.be.true
 
       return waitForElement(() => getByText(/export successful/i))
     })
@@ -175,6 +176,7 @@ function renderGalleryExport() {
       author="Author Name" /* Use default data */
       title="My title"
       description="My description"
+      showSource={true}
     />
   )
 }
