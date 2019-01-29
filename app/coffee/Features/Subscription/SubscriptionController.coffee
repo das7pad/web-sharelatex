@@ -100,30 +100,37 @@ module.exports = SubscriptionController =
 				managedPublishers,
 				v1SubscriptionStatus
 			} = results
-			logger.log {
-				user,
-				personalSubscription,
-				memberGroupSubscriptions,
-				managedGroupSubscriptions,
-				confirmedMemberInstitutions,
-				managedInstitutions,
-				managedPublishers,
-				v1SubscriptionStatus
-			}, "showing subscription dashboard"
-			plans = SubscriptionViewModelBuilder.buildViewModel()
-			data = {
-				title: "your_subscription"
-				plans,
-				user,
-				personalSubscription,
-				memberGroupSubscriptions,
-				managedGroupSubscriptions,
-				confirmedMemberInstitutions,
-				managedInstitutions,
-				managedPublishers,
-				v1SubscriptionStatus
-			}
-			res.render "subscriptions/dashboard", data
+			LimitationsManager.userHasV1OrV2Subscription user, (err, hasSubscription) ->
+				return next(error) if error?
+				fromPlansPage = req.header('Referer') && req.header('Referer').indexOf('user/subscription/plans') != -1
+				logger.log {
+					user,
+					hasSubscription,
+					fromPlansPage,
+					personalSubscription,
+					memberGroupSubscriptions,
+					managedGroupSubscriptions,
+					confirmedMemberInstitutions,
+					managedInstitutions,
+					managedPublishers,
+					v1SubscriptionStatus
+				}, "showing subscription dashboard"
+				plans = SubscriptionViewModelBuilder.buildViewModel()
+				data = {
+					title: "your_subscription"
+					plans,
+					user,
+					hasSubscription,
+					fromPlansPage,
+					personalSubscription,
+					memberGroupSubscriptions,
+					managedGroupSubscriptions,
+					confirmedMemberInstitutions,
+					managedInstitutions,
+					managedPublishers,
+					v1SubscriptionStatus
+				}
+				res.render "subscriptions/dashboard", data
 
 	createSubscription: (req, res, next)->
 		user = AuthenticationController.getSessionUser(req)
