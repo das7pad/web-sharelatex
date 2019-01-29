@@ -176,7 +176,7 @@ function renderGalleryExport() {
       author="Author Name" /* Use default data */
       title="My title"
       description="My description"
-      showSource={true}
+      showSource
     />
   )
 }
