@@ -21,8 +21,6 @@ describe "PublicRegistrationController", ->
 			registerNewUser: sinon.stub()
 		@ReferalAllocator =
 			allocate:sinon.stub().yields()
-		@SubscriptionDomainHandler =
-			getDomainLicencePage:sinon.stub()
 		@UserUpdater =
 			changeEmailAddress:sinon.stub()
 		@UserEmailsConfirmationHandler =
@@ -40,7 +38,6 @@ describe "PublicRegistrationController", ->
 		@PublicRegistrationController = SandboxedModule.require modulePath, requires:
 			"../../../../app/js/Features/User/UserRegistrationHandler":@UserRegistrationHandler
 			"../../../../app/js/Features/Referal/ReferalAllocator":@ReferalAllocator
-			"../../../../app/js/Features/Subscription/SubscriptionDomainHandler":@SubscriptionDomainHandler
 			"../../../../app/js/Features/Email/Layouts/PersonalEmailLayout":{}
 			"../../../../app/js/Features/Email/EmailBuilder": templates:{welcome:{}}, CTAEmailTemplate: sinon.stub()
 			"../../../../app/js/Features/Email/EmailHandler": {}
@@ -136,17 +133,6 @@ describe "PublicRegistrationController", ->
 			@UserRegistrationHandler.registerNewUser.callsArgWith(1, null, @user)
 			@res.json = (opts)=>
 				@UserHandler.populateTeamInvites.calledWith(@user).should.equal true
-				done()
-			@PublicRegistrationController.register @req, @res
-
-
-		it "should send user to verifiy link if they are part of domain licnece", (done)->
-			@UserRegistrationHandler.registerNewUser.callsArgWith(1, null, @user)
-			stubbedVerifiyLink = "/go/here/domain/person"
-			@SubscriptionDomainHandler.getDomainLicencePage.returns(stubbedVerifiyLink)
-			@res.json = (opts)=>
-				@SubscriptionDomainHandler.getDomainLicencePage.calledWith(@user).should.equal true
-				opts.redir.should.equal stubbedVerifiyLink
 				done()
 			@PublicRegistrationController.register @req, @res
 
