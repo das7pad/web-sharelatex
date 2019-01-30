@@ -1,16 +1,3 @@
-/* eslint-disable
-    max-len,
-    no-return-assign,
-    no-undef,
-*/
-// TODO: This file was created by bulk-decaffeinate.
-// Fix any style issues and re-enable lint.
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 define(['base'], App =>
   App.controller('GithubSyncExportModalController', function(
     $scope,
@@ -39,17 +26,17 @@ define(['base'], App =>
         $scope.status.user = data.user
         $scope.status.orgs = data.orgs
         $scope.status.loading = false
-        return ($scope.form.org = $scope.status.user.login)
+        $scope.form.org = $scope.status.user.login
       })
       .catch(function(response) {
         const { data, status } = response
-        return ($scope.status.error = {
+        $scope.status.error = {
           message: data != null ? data.error : undefined,
           statusCode: status
-        })
+        }
       })
 
-    return ($scope.create = function() {
+    $scope.create = function() {
       $scope.status.inflight = true
       let data = {
         _csrf: window.csrfToken,
@@ -72,10 +59,9 @@ define(['base'], App =>
           $modalInstance.dismiss()
           return ide.githubSyncManager.openGithubSyncModal()
         })
-        .catch(function(response) {
-          ;({ data } = response)
+        .catch(function({ data }) {
           $scope.form.error = data.error
-          return ($scope.status.inflight = false)
+          $scope.status.inflight = false
         })
-    })
+    }
   }))
