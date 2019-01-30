@@ -72,9 +72,10 @@ function _getJournalsAndRender(
     props.entries = entries
     ReactDOM.render(React.createElement(PublishModal, props), rootEl)
   }
-  promiseJournalsRequest(url)
+  promiseAjaxGet(url)
     .then(jsonResponse => {
-      promisePriorSubmissionRequest(initParams.projectId)
+      let template_url = `/latest_template/${initParams.projectId}`
+      promiseAjaxGet(template_url)
         .then(aggregateProps)
         .catch(e => {
           // retrieval of prior submission is not essential
@@ -86,20 +87,8 @@ function _getJournalsAndRender(
     .catch(showError)
 }
 
-function promiseJournalsRequest(url) {
+function promiseAjaxGet(url) {
   return new Promise((resolve, reject) => {
-    $.ajax({
-      url: url,
-      type: 'GET'
-    })
-      .done(resolve)
-      .fail(reject)
-  })
-}
-
-function promisePriorSubmissionRequest(projectId) {
-  return new Promise((resolve, reject) => {
-    let url = `/latest_template/${projectId}`
     $.ajax({
       url: url,
       type: 'GET'
