@@ -389,7 +389,7 @@ module.exports = settings =
 	appName: "ShareLaTeX (Community Edition)"
 	adminEmail: "placeholder@example.com"
 
-	brandPrefix: "sl-" # Set to 'ol-' for overleaf styles
+	brandPrefix: "sl-"
 
 	nav:
 		title: "ShareLaTeX Community Edition"
