@@ -22,7 +22,7 @@ define(['base'], App =>
             __guardMethod__(
               entity != null ? entity.name : undefined,
               'match',
-              o => o.match(/.*\.(tex|txt|md)/)
+              o => o.match(/.*\.(tex|txt|md|tikz)/)
             )
           ) {
             const cloned = _.clone(entity)
