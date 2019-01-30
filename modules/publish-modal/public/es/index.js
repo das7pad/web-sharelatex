@@ -1,3 +1,4 @@
+import DestinationsError from './src/components/destinations_error'
 import PublishModal from './src/components/publish_modal'
 import ReactDOM from 'react-dom'
 import React from 'react'
@@ -27,9 +28,7 @@ export function init(rootEl, initParams, publishModalConfig) {
     }
     // TODO create an error component to render here instead
     const showError = jsonResponse => {
-      let entries = JSON.parse(jsonResponse)
-      props.entries = entries
-      ReactDOM.render(React.createElement(PublishModal, props), rootEl)
+      ReactDOM.render(React.createElement(DestinationsError, {}), rootEl)
     }
     const promiseAjaxGet = url => {
       return new Promise((resolve, reject) => {
@@ -48,10 +47,6 @@ export function init(rootEl, initParams, publishModalConfig) {
           .then(aggregateProps)
           .catch(e => {
             // retrieval of prior submission is not essential
-            console.log(
-              'Failed retrieval prior submission for this project ',
-              e
-            )
           })
         return jsonResponse
       })
