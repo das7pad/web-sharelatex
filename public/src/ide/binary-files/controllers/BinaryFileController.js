@@ -101,7 +101,11 @@ define(['base', 'moment'], (App, moment) =>
           .finally(() => {
             $scope.refreshing = false
             const provider = file.linkedFileData.provider
-            if (provider === 'mendeley' || provider === 'zotero') {
+            if (
+              provider === 'mendeley' ||
+              provider === 'zotero' ||
+              file.name.match(/^.*\.bib$/)
+            ) {
               ide.$scope.$emit('references:should-reindex', {})
             }
           })
