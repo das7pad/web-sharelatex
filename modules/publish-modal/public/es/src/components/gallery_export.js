@@ -219,5 +219,6 @@ GalleryExport.propTypes = {
   author: PropTypes.string,
   title: PropTypes.string,
   description: PropTypes.string,
+  license: PropTypes.string,
   showSource: PropTypes.bool
 }
