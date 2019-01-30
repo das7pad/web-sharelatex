@@ -42,8 +42,8 @@ export function init(rootEl, initParams, publishModalConfig) {
     }
     promiseAjaxGet(url)
       .then(jsonResponse => {
-        let template_url = `/latest_template/${initParams.projectId}`
-        promiseAjaxGet(template_url)
+        let templateURL = `/latest_template/${initParams.projectId}`
+        promiseAjaxGet(templateURL)
           .then(aggregateProps)
           .catch(e => {
             // retrieval of prior submission is not essential
