@@ -433,7 +433,6 @@ define([
     }
 
     onViewportChange() {
-      console.log('here')
       this.adapter.changeMarkerPositions()
     }
 

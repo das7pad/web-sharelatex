@@ -167,6 +167,7 @@ define([
           )
         }
 
+        /* eslint-disable no-unused-vars */
         const undoManager = new UndoManager(scope, editor, element)
         const highlightsManager = new HighlightsManager(scope, editor, element)
         const cursorPositionManager = new CursorPositionManager(
@@ -196,6 +197,8 @@ define([
           preamble,
           files
         )
+
+        /* eslint-enable no-unused-vars */
 
         scope.$watch('onSave', function(callback) {
           if (callback != null) {
