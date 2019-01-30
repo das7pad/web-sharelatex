@@ -13,7 +13,6 @@ pipeline {
   }
 
   triggers {
-    pollSCM('* * * * *')
     cron(cron_string)
   }
 
@@ -67,7 +66,7 @@ pipeline {
       steps {
         sh 'make clean compile_full'
         // replace the build number placeholder for sentry
-        sh 'node_modules/.bin/grunt version'
+        sh 'make version'
       }
     }
 

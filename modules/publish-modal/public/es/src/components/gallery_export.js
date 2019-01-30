@@ -31,7 +31,8 @@ export default class GalleryExport extends Component {
         title: this.title.value,
         author: this.author.value,
         description: this.description.value,
-        license: this.license.value
+        license: this.license.value,
+        showSource: this.showSource.checked
       }
 
       initiateExport(entry, projectId, data)

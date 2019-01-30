@@ -4,10 +4,11 @@ mixin btn_contact(content)
 	a.btn.btn-default(
 		href="/contact"
 		event-tracking-ga=content.fields.gaCategory || null
-		event-tracking-action=content.fields.gaAction || 'Clicked Contact Button'
+		event-tracking=content.fields.gaAction || 'Clicked Contact Button'
 		event-tracking-label=content.fields.gaLabel || content.fields.contactButtonText
 		event-tracking-mb=content.fields.mbCategory || null
 		event-segmentation=content.fields.mbData || null
+		event-tracking-trigger="click"
 	)
 		| #{content.fields.contactButtonText}
 
@@ -19,10 +20,11 @@ mixin btn_other_page(content)
 		a.btn.btn-default(
 			href=content.href
 			event-tracking-ga=content.fields.gaCategory || null
-			event-tracking-action=content.fields.gaAction || 'Clicked Other Page Button'
+			event-tracking=content.fields.gaAction || 'Clicked Other Page Button'
 			event-tracking-label=content.fields.gaLabel || content.fields.buttonText
 			event-tracking-mb=content.fields.mbCategory || null
 			event-segmentation=content.fields.mbData || null
+			event-tracking-trigger="click"
 		) #{content.fields.buttonText}
 	
 mixin quote(fields)
@@ -49,3 +51,40 @@ mixin quote(fields)
 				h5.quote-by #{fields.person}
 			if fields.position
 				.small.quote-by #{fields.position}
+
+mixin team(list)
+	if list.fields
+		.row
+			.col-xs-12
+				h2 #{list.fields.header}
+				ul.team
+					if list.fields.team
+						for member in list.fields.team
+							li.team-member
+								if member.fields
+									if member.fields.picture
+										img(src=member.fields.picture.fields.file.url class="img-circle team-pic" width="100" alt=member.fields.picture.fields.title || member.fields.firstName)
+									div.team-info
+										h3 #{member.fields.firstName} #{member.fields.lastName}
+										if member.fields.title
+											h4 #{member.fields.title}
+										if member.fields.about
+											span #{member.fields.about}
+										if typeof(member.fields.displayLinks) == "undefined" || member.fields.displayLinks == true
+											//- default is to show the links, but can opt out per person
+											ul.team-connect
+												if (member.fields.twitterHandle)
+													li
+														a(href="https://twitter.com/"+member.fields.twitterHandle target="_BLANK" rel="nofollow" aria-label="Twitter")
+															i(class="fa fa-twitter" aria-hidden="true")
+															.sr-only Opens in new window
+												if (member.fields.linkedInUrl)
+													li
+														a(href=member.fields.linkedInUrl target="_BLANK" rel="nofollow" aria-label="LinkedIn")
+															i(class="fa fa-linkedin" aria-hidden="true")
+															.sr-only Opens in new window
+												if (member.fields.email)
+													li
+														a(href="mailto:"+member.fields.email aria-label="Email")
+															i(class="fa fa-envelope" aria-hidden="true")
+															.sr-only Email opens mail client

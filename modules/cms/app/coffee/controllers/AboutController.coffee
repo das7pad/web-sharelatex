@@ -2,6 +2,7 @@ logger = require 'logger-sharelatex'
 marked = require 'marked'
 sanitizeHtml = require 'sanitize-html'
 ContentfulClient = require '../ContentfulClient'
+ContentParser = require '../ContentParser'
 ErrorController = require '../../../../../app/js/Features/Errors/ErrorController'
 CmsHandler = require '../CmsHandler'
 Settings = require 'settings-sharelatex'
@@ -29,10 +30,10 @@ module.exports =
 						next(new Error('About page not found on CMS'))
 					else
 						cmsData = collection.items?[0]?.fields
-						if cmsData.about
-							cmsData.about = marked(cmsData.about)
-							cmsData.about = sanitizeHtml(cmsData.about, sanitizeOptions)
-						CmsHandler.render(res, 'about/page', cmsData, req.query)
+						cmsData.pageAbout = true
+						if cmsData.content
+							ContentParser.parseArray(cmsData.content)
+						CmsHandler.render(res, 'page/page', cmsData, req.query)
 				.catch (err) ->
 					next(err)
 		else
