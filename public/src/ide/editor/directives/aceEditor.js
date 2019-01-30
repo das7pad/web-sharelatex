@@ -19,6 +19,8 @@ define([
   'ide/editor/directives/aceEditor/track-changes/TrackChangesManager',
   'ide/editor/directives/aceEditor/track-changes/TrackChangesAdapter',
   'ide/editor/directives/aceEditor/metadata/MetadataManager',
+  'ide/editor/directives/aceEditor/keybinding/KeybindingManager',
+  'ide/editor/directives/aceEditor/keybinding/KeybindingAdapter',
   'ide/metadata/services/metadata',
   'ide/graphics/services/graphics',
   'ide/preamble/services/preamble',
@@ -38,7 +40,9 @@ define([
   CursorPositionAdapter,
   TrackChangesManager,
   TrackChangesAdapter,
-  MetadataManager
+  MetadataManager,
+  KeybindingManager,
+  KeybindingAdapter
 ) {
   let syntaxValidationEnabled
   const { EditSession } = ace.require('ace/edit_session')
@@ -197,8 +201,11 @@ define([
           preamble,
           files
         )
-
         /* eslint-enable no-unused-vars */
+
+        const keybindingManager = new KeybindingManager(
+          new KeybindingAdapter(editor)
+        )
 
         scope.$watch('onSave', function(callback) {
           if (callback != null) {
@@ -674,6 +681,7 @@ define([
         }
 
         initCursorPosition()
+        keybindingManager.init()
 
         // Trigger the event once *only* - this is called after Ace is connected
         // to the ShareJs instance but this event should only be triggered the
@@ -794,6 +802,7 @@ define([
         var detachFromAce = function(sharejs_doc) {
           tearDownSpellCheck()
           tearDownTrackChanges()
+          keybindingManager.tearDown()
           sharejs_doc.detachFromAce()
           sharejs_doc.off('remoteop.recordRemote')
 
