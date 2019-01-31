@@ -1,15 +1,13 @@
 String cron_string = BRANCH_NAME == "master" ? "@daily" : ""
 
 pipeline {
-
   agent any
 
-  environment  {
-      HOME = "/tmp"
-      GIT_PROJECT = "web-sharelatex-internal"
-      JENKINS_WORKFLOW = "web-sharelatex-internal"
-      TARGET_URL = "${env.JENKINS_URL}blue/organizations/jenkins/${JENKINS_WORKFLOW}/detail/$BRANCH_NAME/$BUILD_NUMBER/pipeline"
-      GIT_API_URL = "https://api.github.com/repos/sharelatex/${GIT_PROJECT}/statuses/$GIT_COMMIT"
+  environment {
+    GIT_PROJECT = "web-sharelatex"
+    JENKINS_WORKFLOW = "web-sharelatex"
+    TARGET_URL = "${env.JENKINS_URL}blue/organizations/jenkins/${JENKINS_WORKFLOW}/detail/$BRANCH_NAME/$BUILD_NUMBER/pipeline"
+    GIT_API_URL = "https://api.github.com/repos/sharelatex/${GIT_PROJECT}/statuses/$GIT_COMMIT"
   }
 
   triggers {
@@ -17,7 +15,7 @@ pipeline {
   }
 
   stages {
-    stage('Pre') {
+    stage('Install') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'GITHUB_INTEGRATION', usernameVariable: 'GH_AUTH_USERNAME', passwordVariable: 'GH_AUTH_PASSWORD')]) {
           sh "curl $GIT_API_URL \
@@ -37,158 +35,67 @@ pipeline {
       }
     }
 
-    stage('Install') {
-      agent {
-        docker {
-          image 'node:6.15.1'
-          args "-v /var/lib/jenkins/.npm:/tmp/.npm"
-          reuseNode true
-        }
-      }
+    stage('Delete node modules') {
       steps {
-        sh 'git config --global core.logallrefupdates false'
-        sh 'rm -rf node_modules/'
-        sh 'npm install --quiet'
-        sh 'npm rebuild'
-        // It's too easy to end up shrinkwrapping to an outdated version of translations.
-        // Ensure translations are always latest, regardless of shrinkwrap
-        sh 'npm install git+https://github.com/sharelatex/translations-sharelatex.git#master'
+        sh 'ls -al'
+        sh 'rm -rf node_modules'
       }
     }
 
-    stage('Compile') {
-      agent {
-        docker {
-          image 'node:6.15.1'
-          reuseNode true
-        }
-      }
+
+    stage('build') {
       steps {
-        sh 'make clean compile_full'
-        // replace the build number placeholder for sentry
-        sh 'make version'
+        sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make build'
       }
     }
-
-    stage('Format and Lint') {
-      parallel {
-        stage('Format') {
-          agent {
-            docker {
-              image 'node:6.15.1'
-              reuseNode true
-            }
-          }
-          steps {
-            sh 'make --no-print-directory format'
-          }
-        }
-
-        stage('Lint') {
-          agent {
-            docker {
-              image 'node:6.15.1'
-              reuseNode true
-            }
-          }
-          steps {
-            sh 'make --no-print-directory lint'
-          }
-        }
-      }
-    }
-
-    stage('Test and Minify') {
-      parallel {
-        stage('Unit Test') {
-          agent {
-            docker {
-              image 'node:6.15.1'
-              reuseNode true
-            }
-          }
-          steps {
-            sh 'make --no-print-directory test_unit MOCHA_ARGS="--reporter tap"'
-          }
-        }
-
-        stage('Acceptance Test') {
-          steps {
-            // Spawns its own docker containers
-            sh 'make --no-print-directory test_acceptance MOCHA_ARGS="--reporter tap"'
-          }
-        }
-
-        stage('Minify') {
-          agent {
-            docker {
-              image 'node:6.15.1'
-              reuseNode true
-            }
-          }
-          steps {
-            sh 'WEBPACK_ENV=production make minify'
-          }
-        }
-      }
-    }
-
-    stage('Frontend Unit Test') {
+    
+    stage('Unit Tests') {
       steps {
-        // Spawns its own docker containers
-        sh 'make --no-print-directory test_frontend'
+        sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_unit'
       }
     }
 
-    stage('Package') {
+    stage('Acceptance Tests') {
       steps {
-        sh 'rm -rf ./node_modules/grunt*'
-        sh 'echo ${BUILD_NUMBER} > build_number.txt'
-        sh 'touch build.tar.gz' // Avoid tar warning about files changing during read
-        sh 'tar -czf build.tar.gz --exclude=build.tar.gz --exclude-vcs .'
+        sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_acceptance_app_run'
       }
     }
 
-    stage('Publish') {
+    stage('Package and publish build') {
       steps {
-        withAWS(credentials:'S3_CI_BUILDS_AWS_KEYS', region:"${S3_REGION_BUILD_ARTEFACTS}") {
-          retry(3) {
-            s3Upload(file:'build.tar.gz', bucket:"${S3_BUCKET_BUILD_ARTEFACTS}", path:"${JOB_NAME}/${BUILD_NUMBER}.tar.gz")
-          }
-          retry(3) {
-            // The deployment process uses this file to figure out the latest build
-            s3Upload(file:'build_number.txt', bucket:"${S3_BUCKET_BUILD_ARTEFACTS}", path:"${JOB_NAME}/latest")
-          }
+        withCredentials([file(credentialsId: 'gcr.io_overleaf-ops', variable: 'DOCKER_REPO_KEY_PATH')]) {
+          sh 'docker login -u _json_key --password-stdin https://gcr.io/overleaf-ops < ${DOCKER_REPO_KEY_PATH}'
         }
+        sh 'DOCKER_REPO=gcr.io/overleaf-ops make publish'
+        sh 'docker logout https://gcr.io/overleaf-ops'
+        
       }
     }
-
+    
     stage('Sync OSS') {
       when {
         branch 'master'
       }
-      agent {
-        docker {
-          image 'sharelatex/copybara'
-          args "-u 0:0 -v /tmp/copybara:/root/copybara/cache"
-        }
-      }
       steps {
         sshagent (credentials: ['GIT_DEPLOY_KEY']) {
-          sh 'git config --global user.name Copybot'
-          sh 'git config --global user.email copybot@overleaf.com'
-          sh 'mkdir -p /root/.ssh'
-          sh 'ssh-keyscan github.com >> /root/.ssh/known_hosts'
-          sh 'COPYBARA_CONFIG=./copybara/copy.bara.sky copybara --git-committer-email=copybot@overleaf.com --git-committer-name=Copybot || true'
+          sh 'git push git@github.com:sharelatex/web-sharelatex.git HEAD:master'
+        }
+      }
+    }
+
+    stage('Publish build number') {
+      steps {
+        sh 'echo ${BRANCH_NAME}-${BUILD_NUMBER} > build_number.txt'
+        withAWS(credentials:'S3_CI_BUILDS_AWS_KEYS', region:"${S3_REGION_BUILD_ARTEFACTS}") {
+            // The deployment process uses this file to figure out the latest build
+            s3Upload(file:'build_number.txt', bucket:"${S3_BUCKET_BUILD_ARTEFACTS}", path:"${JOB_NAME}/latest")
         }
       }
     }
   }
 
   post {
-    always {
-      sh 'make clean_ci'
-    }
+    
 
     success {
       withCredentials([usernamePassword(credentialsId: 'GITHUB_INTEGRATION', usernameVariable: 'GH_AUTH_USERNAME', passwordVariable: 'GH_AUTH_PASSWORD')]) {
@@ -219,16 +126,12 @@ pipeline {
     }
   }
 
-
   // The options directive is for configuration that applies to the whole job.
   options {
-    // Only build one at a time
-    disableConcurrentBuilds()
-
     // we'd like to make sure remove old builds, so we don't fill up our storage!
     buildDiscarder(logRotator(numToKeepStr:'50'))
 
     // And we'd really like to be sure that this build doesn't hang forever, so let's time it out after:
-    timeout(time: 30, unit: 'MINUTES')
+    timeout(time: 45, unit: 'MINUTES')
   }
 }

@@ -7,34 +7,28 @@ services:
 
   test_unit:
     build: .
-    volumes:
-      - .:/app
-    environment:
-      MOCHA_GREP: ${MOCHA_GREP}
     image: ci/$PROJECT_NAME:$BRANCH_NAME-$BUILD_NUMBER
     user: node
     command: npm run test:unit
 
   test_acceptance:
-    image: node:6.15.1
-    volumes:
-      - .:/app:ro
+    build: .
+    image: ci/$PROJECT_NAME:$BRANCH_NAME-$BUILD_NUMBER
     working_dir: /app
     environment:
       REDIS_HOST: redis
       MONGO_URL: "mongodb://mongo/sharelatex"
       SHARELATEX_ALLOW_PUBLIC_ACCESS: 'true'
       PROJECT_HISTORY_ENABLED: 'true'
-      ENABLED_LINKED_FILE_TYPES: 'url'
+      ENABLED_LINKED_FILE_TYPES: 'url,project_file,project_output_file'
       LINKED_URL_PROXY: 'http://localhost:6543'
-      ENABLED_LINKED_FILE_TYPES: 'url,project_file,project_output_file,mendeley,zotero'
       SHARELATEX_CONFIG: /app/test/acceptance/config/settings.test.coffee
-      MOCHA_GREP: ${MOCHA_GREP}
       NODE_ENV: production
+    user: root
     depends_on:
       - redis
       - mongo
-    command: npm run test:acceptance:app
+    command: node app.js
 
   test_frontend:
     build:
