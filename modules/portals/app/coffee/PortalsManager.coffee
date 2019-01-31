@@ -19,6 +19,5 @@ module.exports = PortalsManager =
 				data = httpResponse.body
 				InstitutionHubsController._recentActivity data.university.id, (recentActivity) ->
 					data.recentActivity = recentActivity
-					console.log(data)
 					callback null, data
 

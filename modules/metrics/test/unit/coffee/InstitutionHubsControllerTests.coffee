@@ -61,6 +61,7 @@ describe "InstitutionHubsController", ->
 				day: { users: 76, projects: 143 },
 				week: { users: 221, projects: 513 },
 				month: { users: 277, projects: 1006 },
+				year: { users: 290, projects: 1220 },
 				institutionId: 5
 			}
 
@@ -71,7 +72,8 @@ describe "InstitutionHubsController", ->
 			formatted = [
 				{ title: 'Yesterday', users: 76, docs: 143 },
 				{ title: 'Last Week', users: 221, docs: 513 },
-				{ title: 'Last Month', users: 277, docs: 1006 }
+				{ title: 'Last Month', users: 277, docs: 1006 },
+				{ title: 'This Year', users: 290, docs: 1220 }
 			]
 			@callback.calledWith(formatted).should.equal true
 			done()
