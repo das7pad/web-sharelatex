@@ -4,10 +4,11 @@ mixin btn_contact(content)
 	a.btn.btn-default(
 		href="/contact"
 		event-tracking-ga=content.fields.gaCategory || null
-		event-tracking-action=content.fields.gaAction || 'Clicked Contact Button'
+		event-tracking=content.fields.gaAction || 'Clicked Contact Button'
 		event-tracking-label=content.fields.gaLabel || content.fields.contactButtonText
 		event-tracking-mb=content.fields.mbCategory || null
 		event-segmentation=content.fields.mbData || null
+		event-tracking-trigger="click"
 	)
 		| #{content.fields.contactButtonText}
 
@@ -19,10 +20,11 @@ mixin btn_other_page(content)
 		a.btn.btn-default(
 			href=content.href
 			event-tracking-ga=content.fields.gaCategory || null
-			event-tracking-action=content.fields.gaAction || 'Clicked Other Page Button'
+			event-tracking=content.fields.gaAction || 'Clicked Other Page Button'
 			event-tracking-label=content.fields.gaLabel || content.fields.buttonText
 			event-tracking-mb=content.fields.mbCategory || null
 			event-segmentation=content.fields.mbData || null
+			event-tracking-trigger="click"
 		) #{content.fields.buttonText}
 	
 mixin quote(fields)

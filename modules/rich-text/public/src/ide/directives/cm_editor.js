@@ -1,10 +1,7 @@
+/* global _ */
 /* eslint-disable
-    max-len,
-    no-undef,
-    no-use-before-define,
+    no-use-before-define
 */
-// TODO: This file was created by bulk-decaffeinate.
-// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -20,7 +17,9 @@ define([
   'ide/rich-text/directives/spell_check/spell_check_adapter',
   'ide/rich-text/autocomplete_adapter',
   'ide/editor/directives/aceEditor/cursor-position/CursorPositionManager',
-  'ide/rich-text/directives/cursor_position/cursor_position_adapter'
+  'ide/rich-text/directives/cursor_position/cursor_position_adapter',
+  'ide/editor/directives/aceEditor/track-changes/TrackChangesManager',
+  'ide/rich-text/directives/track_changes/track_changes_adapter'
 ], (
   App,
   RichTextAdapter,
@@ -28,7 +27,9 @@ define([
   SpellCheckAdapter,
   AutocompleteAdapter,
   CursorPositionManager,
-  CursorPositionAdapter
+  CursorPositionAdapter,
+  TrackChangesManager,
+  TrackChangesAdapter
 ) =>
   App.directive(
     'cmEditor',
@@ -41,6 +42,7 @@ define([
         readOnly: '=',
         spellCheck: '=',
         spellCheckLanguage: '=',
+        trackChanges: '=',
         autoComplete: '=',
         autoCloseBrackets: '=',
         fontSize: '=',
@@ -150,11 +152,17 @@ define([
             editor.getCodeMirror().clearHistory()
             triggerEditorInitEvent()
             initSpellCheck()
+            if (window.richTextTrackChangesEnabled) {
+              initTrackChanges()
+            }
             return setUpMetadataEventListener()
           })
 
         var detachFromCM = function(sharejsDoc) {
           tearDownSpellCheck()
+          if (window.richTextTrackChangesEnabled) {
+            tearDownTrackChanges()
+          }
           tearDownMetadataEventListener()
           sharejsDoc.detachFromCM()
           return sharejsDoc.off('remoteop.richtext')
@@ -193,6 +201,35 @@ define([
             this.spellCheckManager.onContextMenu
           )
           return codeMirror.off('scroll', this.spellCheckManager.onScroll)
+        }
+
+        const initTrackChanges = function() {
+          const codeMirror = editor.getCodeMirror()
+
+          this.trackChangesManager = new TrackChangesManager(
+            scope,
+            null,
+            element,
+            new TrackChangesAdapter(editor)
+          )
+
+          this.trackChangesManager.rangesTracker = scope.sharejsDoc.ranges
+
+          // Call this initially because swapDoc doesn't occur on load
+          this.trackChangesManager.onChangeSession()
+
+          codeMirror.on('swapDoc', this.trackChangesManager.onChangeSession)
+          codeMirror.on(
+            'viewportChange',
+            this.trackChangesManager.onViewportChange
+          )
+        }
+
+        const tearDownTrackChanges = function() {
+          const codeMirror = editor.getCodeMirror()
+
+          this.trackChangesManager.tearDown()
+          codeMirror.off('swapDoc', this.trackChangesManager.onChangeSession)
         }
 
         var initCursorPosition = function() {
