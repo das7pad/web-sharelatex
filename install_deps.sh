@@ -7,6 +7,6 @@ chown -R node:node /app/public
 
 rm -rf /app/data
 mkdir -p /data/{dumpFolder,logs,pdf,uploads,zippedProjects}
-chmod -R 0666 /data/
+chmod -R 0766 /data/
 chown -R node:node /data/
 ln -s /data/ /app/data
