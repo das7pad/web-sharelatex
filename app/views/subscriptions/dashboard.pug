@@ -8,7 +8,7 @@ block content
 			.row
 				.col-md-8.col-md-offset-2
 					-if (fromPlansPage)
-						.alert.alert-info
+						.alert.alert-warning
 							p You already have a subscription
 					.card
 						.page-header
@@ -40,9 +40,9 @@ block content
 
 						-if (hasSubscription && !hasDisplayedSubscription)
 							-hasDisplayedSubscription = true
-							p Contact 
+							p You're on an #{settings.appName} Paid plan. Contact 
 								a(href="mailto:support@overleaf.com") support@overleaf.com
-								|  to know why you have a subscription
+								|  to find out more. 
 
 						-if (!hasSubscription)
 							p You're on the #{settings.appName} Free plan.

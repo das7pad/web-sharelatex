@@ -49,14 +49,14 @@ module.exports = SubscriptionController =
 		LimitationsManager.userHasV1OrV2Subscription user, (err, hasSubscription)->
 			return next(err) if err?
 			if hasSubscription or !plan?
-				res.redirect "/user/subscription"
+				res.redirect "/user/subscription?hasSubscription=true"
 			else
 				# LimitationsManager.userHasV2Subscription only checks Mongo. Double check with
 				# Recurly as well at this point (we don't do this most places for speed).
 				SubscriptionHandler.validateNoSubscriptionInRecurly user._id, (error, valid) ->
 					return next(error) if error?
 					if !valid
-						res.redirect "/user/subscription"
+						res.redirect "/user/subscription?hasSubscription=true"
 						return
 					else
 						currency = req.query.currency?.toUpperCase()
@@ -102,7 +102,7 @@ module.exports = SubscriptionController =
 			} = results
 			LimitationsManager.userHasV1OrV2Subscription user, (err, hasSubscription) ->
 				return next(error) if error?
-				fromPlansPage = req.header('Referer') && req.header('Referer').indexOf('user/subscription/plans') != -1
+				fromPlansPage = req.query.hasSubscription
 				logger.log {
 					user,
 					hasSubscription,
