@@ -226,7 +226,7 @@ test_acceptance_app: compile test_acceptance_app_run
 
 test_acceptance_module: compile test_acceptance_module_run
 
-test_acceptance_app_run:
+test_acceptance_app_run: test_clean
 	$(DOCKER_COMPOSE) run --rm test_acceptance npm -q run test:acceptance:run_dir -- ${MOCHA_ARGS} test/acceptance/js
 
 test_acceptance_modules_run:
