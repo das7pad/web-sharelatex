@@ -15,7 +15,7 @@ pipeline {
   }
 
   stages {
-    stage('pre') {
+    stage('Pre') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'GITHUB_INTEGRATION', usernameVariable: 'GH_AUTH_USERNAME', passwordVariable: 'GH_AUTH_PASSWORD')]) {
           sh "curl $GIT_API_URL \
@@ -60,18 +60,22 @@ pipeline {
       }
     }
 
-    stage('Package and docker push') {
+    stage('Package') {
       steps {
         sh 'echo ${BUILD_NUMBER} > build_number.txt'
         sh 'touch build.tar.gz' // Avoid tar warning about files changing during read
         sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make tar'
         
+      }
+    }
+
+    stage('Publish docker') {
+      steps {
         withCredentials([file(credentialsId: 'gcr.io_overleaf-ops', variable: 'DOCKER_REPO_KEY_PATH')]) {
           sh 'docker login -u _json_key --password-stdin https://gcr.io/overleaf-ops < ${DOCKER_REPO_KEY_PATH}'
         }
         sh 'DOCKER_REPO=gcr.io/overleaf-ops make publish'
         sh 'docker logout https://gcr.io/overleaf-ops'
-        
       }
     }
 
