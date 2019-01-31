@@ -6,7 +6,7 @@ volumes:
 services:
 
   test_unit:
-    build: .
+    image: node:6.15.1
     volumes:
       - .:/app
     environment:
