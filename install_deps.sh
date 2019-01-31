@@ -1,6 +1,4 @@
 WEBPACK_ENV=production make minify
-make --no-print-directory format
-make --no-print-directory lint
 
 npm install git+https://github.com/sharelatex/translations-sharelatex.git#master
 
