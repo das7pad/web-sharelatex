@@ -205,7 +205,7 @@ clean_css:
 	rm -f public/stylesheets/*.css*
 
 clean_ci:
-	$(DOCKER_COMPOSE) down -v
+	$(DOCKER_COMPOSE) down -v -t 0
 
 test: test_unit test_frontend test_acceptance
 
@@ -244,7 +244,7 @@ test_acceptance_module_run: $(MODULE_MAKEFILES) test_clean
 	fi
 
 test_clean:
-	$(DOCKER_COMPOSE) down -v
+	$(DOCKER_COMPOSE) down -v -t 0
 
 ci:
 	MOCHA_ARGS="--reporter tap" \
