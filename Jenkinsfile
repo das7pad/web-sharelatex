@@ -172,6 +172,6 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr:'50'))
 
     // And we'd really like to be sure that this build doesn't hang forever, so let's time it out after:
-    timeout(time: 45, unit: 'MINUTES')
+    timeout(time: 30, unit: 'MINUTES')
   }
 }
