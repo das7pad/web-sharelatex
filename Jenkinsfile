@@ -113,7 +113,14 @@ pipeline {
 
   post {
     
-
+    always {
+      stage('clean') {
+        steps {
+          sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make clean'
+        }
+      }
+    }
+    
     success {
       withCredentials([usernamePassword(credentialsId: 'GITHUB_INTEGRATION', usernameVariable: 'GH_AUTH_USERNAME', passwordVariable: 'GH_AUTH_PASSWORD')]) {
         sh "curl $GIT_API_URL \
