@@ -55,6 +55,7 @@ pipeline {
       
         stage('Unit Tests') {
           steps {
+            sh 'sleep 10'
             sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_unit'
           }
         }
@@ -67,6 +68,7 @@ pipeline {
 
         stage('Package') {
           steps {
+            sh 'sleep 20'
             sh 'echo ${BUILD_NUMBER} > build_number.txt'
             sh 'touch build.tar.gz' // Avoid tar warning about files changing during read
             sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make tar'
