@@ -112,13 +112,9 @@ pipeline {
   }
 
   post {
-    
+
     always {
-      stage('clean') {
-        steps {
-          sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make clean'
-        }
-      }
+      sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make clean_ci'
     }
     
     success {
