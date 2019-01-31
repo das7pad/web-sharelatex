@@ -52,3 +52,4 @@ services:
 
   mongo:
     image: mongo:3.4.6
+    container_name: mongo-ci-$BUILD_NUMBER

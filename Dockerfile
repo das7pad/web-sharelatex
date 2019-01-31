@@ -6,8 +6,10 @@ WORKDIR /app
 COPY package.json npm-shrinkwrap.json /app/
 
 RUN npm install --quiet
-RUN npm run lint
+
+RUN npm run linit
 RUN npm run format
+
 COPY . /app
 
 RUN make compile_full
@@ -20,4 +22,4 @@ WORKDIR /app
 RUN chmod 0755 ./install_deps.sh && ./install_deps.sh
 USER node
 
-CMD ["node","app.js"]
+CMD ["node", "--expose-gc", "app.js"]

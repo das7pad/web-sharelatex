@@ -15,7 +15,7 @@ pipeline {
   }
 
   stages {
-    stage('Install') {
+    stage('pre') {
       steps {
         withCredentials([usernamePassword(credentialsId: 'GITHUB_INTEGRATION', usernameVariable: 'GH_AUTH_USERNAME', passwordVariable: 'GH_AUTH_PASSWORD')]) {
           sh "curl $GIT_API_URL \
@@ -37,7 +37,6 @@ pipeline {
 
     stage('Delete node modules') {
       steps {
-        sh 'ls -al'
         sh 'rm -rf node_modules'
       }
     }
