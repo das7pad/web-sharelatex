@@ -123,7 +123,7 @@ define(['base', 'libs/platform', 'services/algolia-search'], function(
         message: message || '',
         subject: $scope.form.subject + ` - [${ticketNumber}]`,
         labels: 'support',
-        inbox: 'support',
+        inbox: $scope.inbox || 'support',
         about: `<div>browser: ${platform != null ? platform.name : undefined} ${
           platform != null ? platform.version : undefined
         }</div> \
@@ -142,6 +142,11 @@ define(['base', 'libs/platform', 'services/algolia-search'], function(
         return console.log('the request failed')
       })
     }
+
+    var _inboxWatcher = $scope.$watch('inbox', function(inbox) {
+      return $scope.inbox
+    })
+    _inboxWatcher()
 
     var _deregisterShowSuggestionsWatcher = $scope.$watch(
       'showContactFormSuggestions',
