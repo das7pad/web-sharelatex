@@ -42,7 +42,7 @@ pipeline {
     }
 
 
-    stage('build') {
+    stage('Build') {
       steps {
         sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make build'
       }
@@ -62,13 +62,20 @@ pipeline {
 
         stage('Acceptance Tests') {
           steps {
-            sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_acceptance_app_run'
+            sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_acceptance_run'
+          }
+        }
+
+        stage('Frontend Tests') {
+          steps {
+            sh 'sleep 20'
+            sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_frontend_run'
           }
         }
 
         stage('Package') {
           steps {
-            sh 'sleep 20'
+            sh 'sleep 30'
             sh 'echo ${BUILD_NUMBER} > build_number.txt'
             sh 'touch build.tar.gz' // Avoid tar warning about files changing during read
             sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make tar'

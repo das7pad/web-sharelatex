@@ -7,8 +7,6 @@ COPY package.json npm-shrinkwrap.json /app/
 
 RUN npm install --quiet
 
-RUN npm run lint
-RUN npm run format
 
 COPY . /app
 
