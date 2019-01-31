@@ -26,7 +26,6 @@ export function init(rootEl, initParams, publishModalConfig) {
       props.initParams.author = template.author
       props.initParams.license = template.license
     }
-    // TODO create an error component to render here instead
     const showError = jsonResponse => {
       ReactDOM.render(React.createElement(DestinationsError, {}), rootEl)
     }
@@ -40,17 +39,12 @@ export function init(rootEl, initParams, publishModalConfig) {
           .fail(reject)
       })
     }
-    promiseAjaxGet(url)
-      .then(jsonResponse => {
-        let templateURL = `/latest_template/${initParams.projectId}`
-        promiseAjaxGet(templateURL)
-          .then(aggregateProps)
-          .catch(e => {
-            // retrieval of prior submission is not essential
-          })
-        return jsonResponse
+    const templateURL = `/latest_template/${initParams.projectId}`
+    Promise.all([promiseAjaxGet(templateURL), promiseAjaxGet(url)])
+      .then(responses => {
+        aggregateProps(responses.shift())
+        showPublishModal(responses.shift())
       })
-      .then(showPublishModal)
       .catch(showError)
   }
 
