@@ -203,7 +203,6 @@ define([
         )
         /* eslint-enable no-unused-vars */
 
-        console.log('OOOO')
         const keybindingManager = new GlobalKeybindingManager(
           new GlobalKeybindingAdapter(editor)
         )
@@ -682,7 +681,6 @@ define([
         }
 
         initCursorPosition()
-        keybindingManager.init()
 
         // Trigger the event once *only* - this is called after Ace is connected
         // to the ShareJs instance but this event should only be triggered the
@@ -753,6 +751,7 @@ define([
           triggerEditorInitEvent()
           initSpellCheck()
           initTrackChanges()
+          keybindingManager.init()
 
           resetScrollMargins()
 
