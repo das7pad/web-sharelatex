@@ -1,7 +1,7 @@
 define(['ace/ace', 'ace/ext-searchbox'], function() {
   const SearchBox = ace.require('ace/ext/searchbox')
 
-  class KeybindingAdapter {
+  class GlobalKeybindingAdapter {
     constructor(editor) {
       this.editor = editor
     }
@@ -13,5 +13,5 @@ define(['ace/ace', 'ace/ext-searchbox'], function() {
     }
   }
 
-  return KeybindingAdapter
+  return GlobalKeybindingAdapter
 })

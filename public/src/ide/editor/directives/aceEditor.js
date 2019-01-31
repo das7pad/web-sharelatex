@@ -19,8 +19,8 @@ define([
   'ide/editor/directives/aceEditor/track-changes/TrackChangesManager',
   'ide/editor/directives/aceEditor/track-changes/TrackChangesAdapter',
   'ide/editor/directives/aceEditor/metadata/MetadataManager',
-  'ide/editor/directives/aceEditor/keybinding/KeybindingManager',
-  'ide/editor/directives/aceEditor/keybinding/KeybindingAdapter',
+  'ide/editor/directives/aceEditor/global-key-binding/GlobalKeybindingManager',
+  'ide/editor/directives/aceEditor/global-key-binding/GlobalKeybindingAdapter',
   'ide/metadata/services/metadata',
   'ide/graphics/services/graphics',
   'ide/preamble/services/preamble',
@@ -41,8 +41,8 @@ define([
   TrackChangesManager,
   TrackChangesAdapter,
   MetadataManager,
-  KeybindingManager,
-  KeybindingAdapter
+  GlobalKeybindingManager,
+  GlobalKeybindingAdapter
 ) {
   let syntaxValidationEnabled
   const { EditSession } = ace.require('ace/edit_session')
@@ -203,8 +203,9 @@ define([
         )
         /* eslint-enable no-unused-vars */
 
-        const keybindingManager = new KeybindingManager(
-          new KeybindingAdapter(editor)
+        console.log('OOOO')
+        const keybindingManager = new GlobalKeybindingManager(
+          new GlobalKeybindingAdapter(editor)
         )
 
         scope.$watch('onSave', function(callback) {

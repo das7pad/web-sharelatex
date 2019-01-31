@@ -1,5 +1,5 @@
 define([], function() {
-  class KeybindingAdapter {
+  class GlobalKeybindingAdapter {
     constructor(editor) {
       this.editor = editor
     }
@@ -11,5 +11,5 @@ define([], function() {
     }
   }
 
-  return KeybindingAdapter
+  return GlobalKeybindingAdapter
 })

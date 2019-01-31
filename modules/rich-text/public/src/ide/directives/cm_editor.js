@@ -20,8 +20,8 @@ define([
   'ide/rich-text/directives/cursor_position/cursor_position_adapter',
   'ide/editor/directives/aceEditor/track-changes/TrackChangesManager',
   'ide/rich-text/directives/track_changes/track_changes_adapter',
-  'ide/editor/directives/aceEditor/keybinding/KeybindingManager',
-  'ide/rich-text/directives/key_binding/key_binding_adapter'
+  'ide/editor/directives/aceEditor/global-key-binding/GlobalKeybindingManager',
+  'ide/rich-text/directives/key_binding/global_key_binding_adapter'
 ], (
   App,
   RichTextAdapter,

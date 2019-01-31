@@ -1,7 +1,7 @@
 define([], function() {
   const F_KEY = 70
 
-  class KeyBindingManager {
+  class GlobalKeyBindingManager {
     constructor(adapter) {
       this.adapter = adapter
       this.handleKey = this.handleKey.bind(this)
@@ -25,5 +25,5 @@ define([], function() {
     }
   }
 
-  return KeyBindingManager
+  return GlobalKeyBindingManager
 })
