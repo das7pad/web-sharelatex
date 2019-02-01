@@ -5272,19 +5272,29 @@
       "dev": true
     },
     "ioredis": {
-      "version": "3.2.2",
-      "from": "ioredis@>=3.2.1 <4.0.0",
-      "resolved": "https://registry.npmjs.org/ioredis/-/ioredis-3.2.2.tgz",
+      "version": "4.6.0",
+      "from": "ioredis@4.6.0",
+      "resolved": "https://registry.npmjs.org/ioredis/-/ioredis-4.6.0.tgz",
       "dependencies": {
-        "bluebird": {
-          "version": "3.5.3",
-          "from": "bluebird@>=3.3.4 <4.0.0",
-          "resolved": "https://registry.npmjs.org/bluebird/-/bluebird-3.5.3.tgz"
-        },
         "debug": {
-          "version": "2.6.9",
-          "from": "debug@>=2.6.9 <3.0.0",
-          "resolved": "https://registry.npmjs.org/debug/-/debug-2.6.9.tgz"
+          "version": "3.2.6",
+          "from": "debug@>=3.1.0 <4.0.0",
+          "resolved": "https://registry.npmjs.org/debug/-/debug-3.2.6.tgz"
+        },
+        "ms": {
+          "version": "2.1.1",
+          "from": "ms@>=2.1.1 <3.0.0",
+          "resolved": "https://registry.npmjs.org/ms/-/ms-2.1.1.tgz"
+        },
+        "redis-commands": {
+          "version": "1.4.0",
+          "from": "redis-commands@1.4.0",
+          "resolved": "https://registry.npmjs.org/redis-commands/-/redis-commands-1.4.0.tgz"
+        },
+        "redis-parser": {
+          "version": "3.0.0",
+          "from": "redis-parser@>=3.0.0 <4.0.0",
+          "resolved": "https://registry.npmjs.org/redis-parser/-/redis-parser-3.0.0.tgz"
         }
       }
     },
@@ -6394,35 +6404,16 @@
       "from": "lodash@>=4.13.1 <5.0.0",
       "resolved": "http://registry.npmjs.org/lodash/-/lodash-4.17.4.tgz"
     },
-    "lodash.assign": {
-      "version": "4.2.0",
-      "from": "lodash.assign@>=4.2.0 <5.0.0",
-      "resolved": "https://registry.npmjs.org/lodash.assign/-/lodash.assign-4.2.0.tgz"
-    },
-    "lodash.bind": {
-      "version": "4.2.1",
-      "from": "lodash.bind@>=4.2.1 <5.0.0",
-      "resolved": "https://registry.npmjs.org/lodash.bind/-/lodash.bind-4.2.1.tgz"
-    },
-    "lodash.clone": {
-      "version": "4.5.0",
-      "from": "lodash.clone@>=4.5.0 <5.0.0",
-      "resolved": "https://registry.npmjs.org/lodash.clone/-/lodash.clone-4.5.0.tgz"
-    },
     "lodash.clonedeep": {
       "version": "4.5.0",
       "from": "lodash.clonedeep@>=4.5.0 <5.0.0",
-      "resolved": "https://registry.npmjs.org/lodash.clonedeep/-/lodash.clonedeep-4.5.0.tgz"
+      "resolved": "https://registry.npmjs.org/lodash.clonedeep/-/lodash.clonedeep-4.5.0.tgz",
+      "dev": true
     },
     "lodash.defaults": {
       "version": "4.2.0",
       "from": "lodash.defaults@>=4.2.0 <5.0.0",
       "resolved": "https://registry.npmjs.org/lodash.defaults/-/lodash.defaults-4.2.0.tgz"
-    },
-    "lodash.difference": {
-      "version": "4.5.0",
-      "from": "lodash.difference@>=4.5.0 <5.0.0",
-      "resolved": "https://registry.npmjs.org/lodash.difference/-/lodash.difference-4.5.0.tgz"
     },
     "lodash.escaperegexp": {
       "version": "4.1.2",
@@ -6434,11 +6425,6 @@
       "version": "4.4.0",
       "from": "lodash.flatten@>=4.4.0 <5.0.0",
       "resolved": "https://registry.npmjs.org/lodash.flatten/-/lodash.flatten-4.4.0.tgz"
-    },
-    "lodash.foreach": {
-      "version": "4.5.0",
-      "from": "lodash.foreach@>=4.5.0 <5.0.0",
-      "resolved": "https://registry.npmjs.org/lodash.foreach/-/lodash.foreach-4.5.0.tgz"
     },
     "lodash.get": {
       "version": "4.4.2",
@@ -6454,11 +6440,6 @@
       "version": "3.0.3",
       "from": "lodash.isboolean@>=3.0.3 <4.0.0",
       "resolved": "https://registry.npmjs.org/lodash.isboolean/-/lodash.isboolean-3.0.3.tgz"
-    },
-    "lodash.isempty": {
-      "version": "4.4.0",
-      "from": "lodash.isempty@>=4.4.0 <5.0.0",
-      "resolved": "https://registry.npmjs.org/lodash.isempty/-/lodash.isempty-4.4.0.tgz"
     },
     "lodash.isinteger": {
       "version": "4.0.4",
@@ -6480,11 +6461,6 @@
       "from": "lodash.isstring@>=4.0.1 <5.0.0",
       "resolved": "https://registry.npmjs.org/lodash.isstring/-/lodash.isstring-4.0.1.tgz"
     },
-    "lodash.keys": {
-      "version": "4.2.0",
-      "from": "lodash.keys@>=4.2.0 <5.0.0",
-      "resolved": "https://registry.npmjs.org/lodash.keys/-/lodash.keys-4.2.0.tgz"
-    },
     "lodash.memoize": {
       "version": "4.1.2",
       "from": "lodash.memoize@>=4.1.2 <5.0.0",
@@ -6503,25 +6479,10 @@
       "resolved": "https://registry.npmjs.org/lodash.mergewith/-/lodash.mergewith-4.6.1.tgz",
       "dev": true
     },
-    "lodash.noop": {
-      "version": "3.0.1",
-      "from": "lodash.noop@>=3.0.1 <4.0.0",
-      "resolved": "https://registry.npmjs.org/lodash.noop/-/lodash.noop-3.0.1.tgz"
-    },
     "lodash.once": {
       "version": "4.1.1",
       "from": "lodash.once@>=4.0.0 <5.0.0",
       "resolved": "https://registry.npmjs.org/lodash.once/-/lodash.once-4.1.1.tgz"
-    },
-    "lodash.partial": {
-      "version": "4.2.1",
-      "from": "lodash.partial@>=4.2.1 <5.0.0",
-      "resolved": "https://registry.npmjs.org/lodash.partial/-/lodash.partial-4.2.1.tgz"
-    },
-    "lodash.pick": {
-      "version": "4.4.0",
-      "from": "lodash.pick@>=4.4.0 <5.0.0",
-      "resolved": "https://registry.npmjs.org/lodash.pick/-/lodash.pick-4.4.0.tgz"
     },
     "lodash.pickby": {
       "version": "4.6.0",
@@ -6533,31 +6494,16 @@
       "from": "lodash.reduce@4.6.0",
       "resolved": "https://registry.npmjs.org/lodash.reduce/-/lodash.reduce-4.6.0.tgz"
     },
-    "lodash.sample": {
-      "version": "4.2.1",
-      "from": "lodash.sample@>=4.2.1 <5.0.0",
-      "resolved": "https://registry.npmjs.org/lodash.sample/-/lodash.sample-4.2.1.tgz"
-    },
     "lodash.set": {
       "version": "4.3.2",
       "from": "lodash.set@>=4.3.2 <5.0.0",
       "resolved": "https://registry.npmjs.org/lodash.set/-/lodash.set-4.3.2.tgz"
-    },
-    "lodash.shuffle": {
-      "version": "4.2.0",
-      "from": "lodash.shuffle@>=4.2.0 <5.0.0",
-      "resolved": "https://registry.npmjs.org/lodash.shuffle/-/lodash.shuffle-4.2.0.tgz"
     },
     "lodash.unescape": {
       "version": "4.0.1",
       "from": "lodash.unescape@4.0.1",
       "resolved": "https://registry.npmjs.org/lodash.unescape/-/lodash.unescape-4.0.1.tgz",
       "dev": true
-    },
-    "lodash.values": {
-      "version": "4.3.0",
-      "from": "lodash.values@>=4.3.0 <5.0.0",
-      "resolved": "https://registry.npmjs.org/lodash.values/-/lodash.values-4.3.0.tgz"
     },
     "log-symbols": {
       "version": "2.2.0",
@@ -9613,6 +9559,11 @@
       "from": "redis-commands@>=1.2.0 <2.0.0",
       "resolved": "https://registry.npmjs.org/redis-commands/-/redis-commands-1.3.1.tgz"
     },
+    "redis-errors": {
+      "version": "1.2.0",
+      "from": "redis-errors@>=1.2.0 <2.0.0",
+      "resolved": "https://registry.npmjs.org/redis-errors/-/redis-errors-1.2.0.tgz"
+    },
     "redis-parser": {
       "version": "2.6.0",
       "from": "redis-parser@>=2.6.0 <3.0.0",
@@ -9636,9 +9587,9 @@
       }
     },
     "redis-sharelatex": {
-      "version": "1.0.4",
-      "from": "git+https://github.com/sharelatex/redis-sharelatex.git#ca4e906559c1405d132e8edd7db763d64a57be62",
-      "resolved": "git+https://github.com/sharelatex/redis-sharelatex.git#ca4e906559c1405d132e8edd7db763d64a57be62",
+      "version": "1.0.5",
+      "from": "redis-sharelatex@1.0.5",
+      "resolved": "https://registry.npmjs.org/redis-sharelatex/-/redis-sharelatex-1.0.5.tgz",
       "dependencies": {
         "async": {
           "version": "2.6.1",
@@ -10740,6 +10691,11 @@
       "version": "0.0.9",
       "from": "stack-trace@0.0.9",
       "resolved": "https://registry.npmjs.org/stack-trace/-/stack-trace-0.0.9.tgz"
+    },
+    "standard-as-callback": {
+      "version": "1.0.1",
+      "from": "standard-as-callback@>=1.0.0 <2.0.0",
+      "resolved": "https://registry.npmjs.org/standard-as-callback/-/standard-as-callback-1.0.1.tgz"
     },
     "static-extend": {
       "version": "0.1.2",

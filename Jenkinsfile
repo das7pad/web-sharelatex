@@ -49,10 +49,6 @@ pipeline {
     }
 
 
-    stage('Acceptance Tests') {
-
-      parallel {
-
         stage('Frontend Tests') {
           steps {
             sh 'sleep 20'
@@ -79,8 +75,6 @@ pipeline {
           }
         }
 
-      }
-    }
 
 
 
