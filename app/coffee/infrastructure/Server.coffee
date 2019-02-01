@@ -42,7 +42,7 @@ AuthenticationController = require "../Features/Authentication/AuthenticationCon
 
 metrics.event_loop?.monitor(logger)
 
-Settings.editorIsOpen = true unless Settings.editorIsOpen?
+Settings.editorIsOpen ?= true
 
 if Settings.cacheStaticAssets
 	staticCacheAge = (oneDayInMilliseconds * 365)

@@ -16,6 +16,9 @@ describe "CloseSite", ->
 		beforeEach ->
 			Settings.closeSite = true
 
+		afterEach ->
+			Settings.closeSite = false
+
 		it "should return maintenance page", (done) ->
 			request.get "/login", (error, response) ->
 				response.statusCode.should.equal 503
