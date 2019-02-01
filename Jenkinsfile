@@ -49,21 +49,22 @@ pipeline {
     }
 
 
-        stage('Frontend Tests') {
-          steps {
-            sh 'sleep 20'
-            sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_frontend_run'
-          }
-        }
+    stage('Tests') {
 
-      
+      parallel {
+
         stage('Unit Tests') {
           steps {
-            sh 'sleep 10'
             sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_unit'
           }
         }
 
+        stage('Frontend Tests') {
+          steps {
+            sh 'sleep 10'
+            sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_frontend_run'
+          }
+        }
 
         stage('Package') {
           steps {
@@ -75,14 +76,16 @@ pipeline {
           }
         }
 
+      }
+    }
 
 
 
     stage('Acceptance Tests main') {
-          steps {
-            sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_acceptance_app_run'
-          }
-        }
+      steps {
+        sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_acceptance_app_run'
+      }
+    }
 
     stage('Acceptance Tests modules') {
       steps {
