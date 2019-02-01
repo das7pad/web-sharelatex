@@ -47,7 +47,13 @@ pipeline {
         sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make build'
       }
     }
-        stage('Acceptance Tests') {
+
+
+    stage('Acceptance Tests') {
+
+
+      parallel {
+        stage('Acceptance Tests main') {
           steps {
             sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_acceptance_app_run'
           }
@@ -55,36 +61,38 @@ pipeline {
 
         stage('Acceptance Tests modules') {
           steps {
+            sh 'sleep 10'
             sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_acceptance_modules_run'
           }
         }
+      }
+    }
+
+    stage('Frontend Tests') {
+      steps {
+        sh 'sleep 20'
+        sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_frontend_run'
+      }
+    }
+
+  
+    stage('Unit Tests') {
+      steps {
+        sh 'sleep 10'
+        sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_unit'
+      }
+    }
 
 
-        stage('Frontend Tests') {
-          steps {
-            sh 'sleep 20'
-            sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_frontend_run'
-          }
-        }
-
-      
-        stage('Unit Tests') {
-          steps {
-            sh 'sleep 10'
-            sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_unit'
-          }
-        }
-
-
-        stage('Package') {
-          steps {
-            sh 'sleep 30'
-            sh 'echo ${BUILD_NUMBER} > build_number.txt'
-            sh 'touch build.tar.gz' // Avoid tar warning about files changing during read
-            sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make tar'
-            
-          }
-        }
+    stage('Package') {
+      steps {
+        sh 'sleep 30'
+        sh 'echo ${BUILD_NUMBER} > build_number.txt'
+        sh 'touch build.tar.gz' // Avoid tar warning about files changing during read
+        sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make tar'
+        
+      }
+    }
 
     
 
