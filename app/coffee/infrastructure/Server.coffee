@@ -42,7 +42,7 @@ AuthenticationController = require "../Features/Authentication/AuthenticationCon
 
 metrics.event_loop?.monitor(logger)
 
-Settings.editorIsOpen ||= true
+Settings.editorIsOpen = true unless Settings.editorIsOpen?
 
 if Settings.cacheStaticAssets
 	staticCacheAge = (oneDayInMilliseconds * 365)
@@ -134,6 +134,13 @@ app.use (req, res, next)->
 	metrics.inc "http-request"
 	crawlerLogger.log(req)
 	next()
+
+webRouter.use (req, res, next) ->
+	if Settings.closeSite
+		res.status(503)
+		res.render("general/closed", {title:"maintenance"})
+	else
+		next()
 
 webRouter.use (req, res, next) ->
 	if Settings.editorIsOpen
