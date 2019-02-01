@@ -47,19 +47,6 @@ pipeline {
         sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make build'
       }
     }
-
-    stage('Test') {
-
-
-      parallel {
-      
-        stage('Unit Tests') {
-          steps {
-            sh 'sleep 10'
-            sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_unit'
-          }
-        }
-
         stage('Acceptance Tests') {
           steps {
             sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_acceptance_run'
@@ -73,6 +60,15 @@ pipeline {
           }
         }
 
+      
+        stage('Unit Tests') {
+          steps {
+            sh 'sleep 10'
+            sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_unit'
+          }
+        }
+
+
         stage('Package') {
           steps {
             sh 'sleep 30'
@@ -83,9 +79,7 @@ pipeline {
           }
         }
 
-      }
-    }
-
+    
 
     stage('Publish') {
 
