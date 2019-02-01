@@ -49,9 +49,16 @@ pipeline {
     }
         stage('Acceptance Tests') {
           steps {
-            sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_acceptance_run'
+            sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_acceptance_app_run'
           }
         }
+
+        stage('Acceptance Tests modules') {
+          steps {
+            sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_acceptance_modules_run'
+          }
+        }
+
 
         stage('Frontend Tests') {
           steps {
