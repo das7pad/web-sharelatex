@@ -390,6 +390,7 @@ module.exports = settings =
 	#
 	smokeTest:
 		user: process.env['SMOKE_TEST_USER']
+		userId: process.env['SMOKE_TEST_USER_ID']
 		password: process.env['SMOKE_TEST_PASSWORD']
 		projectId: process.env['SMOKE_TEST_PROJECT_ID']
 
