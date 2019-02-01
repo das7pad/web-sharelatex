@@ -103,7 +103,7 @@ module.exports = settings =
 	# options incase you want to run some services on remote hosts.
 	apis:
 		web:
-			url: "http://#{process.env['WEB_HOST'] or 'localhost'}:#{webPort}"
+			url: "http://#{process.env['WEB_API_HOST'] or process.env['WEB_HOST'] or "localhost"}:#{process.env['WEB_API_PORT'] or process.env['WEB_PORT'] or 3000}"
 			user: httpAuthUser
 			pass: httpAuthPass
 		documentupdater:
