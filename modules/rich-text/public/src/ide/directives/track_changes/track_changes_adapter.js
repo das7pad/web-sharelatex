@@ -110,6 +110,9 @@ define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
       }
     }
 
+    // Commented out while not implementing callouts on delete markers
+    // (which caused the overlapping)
+
     // clearOverlappingDeleteMarkers(markerNode) {
     //   const markers = Object.values(this.changeIdToMarkerIdMap).filter(
     //     marker => typeof marker === 'object'
