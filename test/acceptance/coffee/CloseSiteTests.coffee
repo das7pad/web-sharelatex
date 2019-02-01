@@ -2,22 +2,19 @@ Settings = require "settings-sharelatex"
 chai = require "chai"
 request = require "./helpers/request"
 
-describe "CloseSite", ->
-	describe "when siteClosed: false", ->
-		beforeEach ->
-			Settings.closeSite = false
-
+describe "siteIsOpen", ->
+	describe "when siteIsOpen is default (true)", ->
 		it "should get page", (done) ->
 			request.get "/login", (error, response, body) ->
 				response.statusCode.should.equal 200
 				done()
 
-	describe "when siteClosed: true", ->
+	describe "when siteIsOpen is false", ->
 		beforeEach ->
-			Settings.closeSite = true
+			Settings.siteIsOpen = false
 
 		afterEach ->
-			Settings.closeSite = false
+			Settings.siteIsOpen = true
 
 		it "should return maintenance page", (done) ->
 			request.get "/login", (error, response) ->

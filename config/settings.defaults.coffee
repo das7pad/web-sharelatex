@@ -348,10 +348,10 @@ module.exports = settings =
 	allowPublicAccess: if process.env["SHARELATEX_ALLOW_PUBLIC_ACCESS"] == 'true' then true else false
 
 	# editor should be open by default
-	editorIsOpen: if process.env["EDITOR_CLOSED"] == 'true' then false else true
+	editorIsOpen: if process.env["EDITOR_OPEN"] == 'false' then false else true
 
 	# site should be open by default
-	closeSite: if process.env["SITE_CLOSED"] == 'true' then true else false
+	siteIsOpen: if process.env["SITE_OPEN"] == 'false' then false else true
 
 	# Use a single compile directory for all users in a project
 	# (otherwise each user has their own directory)

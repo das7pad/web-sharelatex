@@ -134,11 +134,11 @@ app.use (req, res, next)->
 	next()
 
 webRouter.use (req, res, next) ->
-	if Settings.closeSite
+	if Settings.siteIsOpen
+		next()
+	else
 		res.status(503)
 		res.render("general/closed", {title:"maintenance"})
-	else
-		next()
 
 webRouter.use (req, res, next) ->
 	if Settings.editorIsOpen
