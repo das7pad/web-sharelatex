@@ -4,6 +4,17 @@ import ReactDOM from 'react-dom'
 import React from 'react'
 
 export function init(rootEl, initParams, publishModalConfig) {
+  const promiseAjaxGet = url => {
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        url: url,
+        type: 'GET'
+      })
+        .done(resolve)
+        .fail(reject)
+    })
+  }
+
   const getJournalsAndRender = (
     url,
     rootEl,
@@ -29,21 +40,11 @@ export function init(rootEl, initParams, publishModalConfig) {
     const showError = jsonResponse => {
       ReactDOM.render(React.createElement(DestinationsError, {}), rootEl)
     }
-    const promiseAjaxGet = url => {
-      return new Promise((resolve, reject) => {
-        $.ajax({
-          url: url,
-          type: 'GET'
-        })
-          .done(resolve)
-          .fail(reject)
-      })
-    }
     const templateURL = `/latest_template/${initParams.projectId}`
     Promise.all([promiseAjaxGet(templateURL), promiseAjaxGet(url)])
       .then(responses => {
-        aggregateProps(responses.shift())
-        showPublishModal(responses.shift())
+        aggregateProps(responses[0])
+        showPublishModal(responses[1])
       })
       .catch(showError)
   }
