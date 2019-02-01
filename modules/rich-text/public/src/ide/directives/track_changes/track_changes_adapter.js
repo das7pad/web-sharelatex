@@ -159,6 +159,8 @@ define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
 
         marker.marker.style.top = newCoords.bottom + 'px'
         marker.marker.style.left = newCoords.left + 'px'
+        marker.marker.style.marginTop =
+          0 - (newCoords.bottom - newCoords.top) + 'px'
         marker.marker.style.height =
           newCoords.bottom - newCoords.top - excess + 'px'
       }
