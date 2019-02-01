@@ -347,6 +347,9 @@ module.exports = settings =
 	# public projects, /learn, /templates, about pages, etc.
 	allowPublicAccess: if process.env["SHARELATEX_ALLOW_PUBLIC_ACCESS"] == 'true' then true else false
 
+	# site should be open by default
+	editorIsOpen: true
+
 	# Use a single compile directory for all users in a project
 	# (otherwise each user has their own directory)
 	# disablePerUserCompiles: true
