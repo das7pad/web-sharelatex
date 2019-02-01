@@ -1,5 +1,6 @@
 MODULE_NAME := $(notdir $(shell pwd))
 MODULE_DIR := modules/$(MODULE_NAME)
+PROJECT_NAME = web
 COFFEE := ../../node_modules/.bin/coffee
 BABEL := ../../node_modules/.bin/babel
 
