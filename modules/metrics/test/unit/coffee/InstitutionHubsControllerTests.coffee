@@ -124,6 +124,7 @@ describe "InstitutionHubsController", ->
 			done()
 
 		it 'calls correct endpoint for departments', (done) ->
+			@req.params = { id: 5 }
 			@InstitutionHubsController.institutionDepartments(@req, @res)
 			@request.get.calledWith({
 				url: @Settings.apis.v1.url + @institutionsApi + '5/departments_data'

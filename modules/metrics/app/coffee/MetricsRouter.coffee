@@ -84,7 +84,7 @@ module.exports =
 
 		webRouter.get(
 			'/institutions/:id/departments',
-			UserMembershipAuthorization.requireInstitutionMetricsAccess,
+			AuthenticationController.requireLogin(),
 			InstitutionHubsController.institutionDepartments
 		)
 

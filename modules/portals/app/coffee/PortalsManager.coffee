@@ -17,7 +17,7 @@ module.exports = PortalsManager =
 				callback err
 			else
 				data = httpResponse.body
-				InstitutionHubsController._recentActivity data.university.id, (recentActivity) ->
+				InstitutionHubsController._recentActivity data.university?.id, (recentActivity) ->
 					data.recentActivity = recentActivity
 					callback null, data
 

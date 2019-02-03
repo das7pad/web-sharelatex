@@ -49,7 +49,7 @@ module.exports = InstitutionHubsController =
 		)
 
 	institutionDepartments: (req, res, next) ->
-		InstitutionHubsController._v1InstitutionsApi(req.entity.v1Id, 'departments_data', (err, response, body)->
+		InstitutionHubsController._v1InstitutionsApi(req.params.id, 'departments_data', (err, response, body)->
 			return next(err) if err?
 			res.send(body)
 		)
