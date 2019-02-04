@@ -208,6 +208,7 @@ describe "SubscriptionController", ->
 				memberGroupSubscriptions: @memberGroupSubscriptions = { 'group-subscriptions': 'mock' }
 			})
 			@SubscriptionViewModelBuilder.buildViewModel.returns(@plans = {'plans': 'mock'})
+			@LimitationsManager.userHasV1OrV2Subscription.callsArgWith(1, null, false)
 			@res.render = (view, @data) =>
 				expect(view).to.equal 'subscriptions/dashboard'
 				done()
