@@ -23,10 +23,10 @@ export default class ScholarOneExport extends Component {
           submissionId: submissionId
         })
       })
-      .catch(({ errorDetails }) => {
+      .catch(error => {
         this.setState({
           exportState: 'error',
-          errorDetails
+          errorDetails: error.message
         })
       })
   }
