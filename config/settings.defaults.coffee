@@ -189,7 +189,7 @@ module.exports = settings =
 	siteUrl : siteUrl = process.env['PUBLIC_URL'] or 'http://localhost:3000'
 
 	# Optional separate location for websocket connections, if unset defaults to siteUrl.
-	# wsUrl: 'https://localhost:3000'
+	wsUrl: process.env['WEBSOCKET_URL']
 
 	# cookie domain
 	# use full domain for cookies to only be accessible from that domain,
