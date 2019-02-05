@@ -1,14 +1,3 @@
-/* eslint-disable
-    max-len,
-    no-undef,
-*/
-// TODO: This file was created by bulk-decaffeinate.
-// Fix any style issues and re-enable lint.
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 define(['base'], App =>
   App.controller('GithubSyncMergeModalController', function(
     $scope,
@@ -35,17 +24,16 @@ define(['base'], App =>
           $scope.status.inflight = false
           $modalInstance.dismiss()
           ide.githubSyncManager.openGithubSyncModal()
-          return ide.editorManager.stopIgnoringExternalUpdates()
+          ide.editorManager.stopIgnoringExternalUpdates()
         })
-        .catch(function(response) {
-          ;({ data } = response)
+        .catch(function({ data }) {
           $scope.form.error = data.error
           $scope.status.inflight = false
-          return ide.editorManager.stopIgnoringExternalUpdates()
+          ide.editorManager.stopIgnoringExternalUpdates()
         })
     }
 
     if (mergeImmediately) {
-      return $scope.merge()
+      $scope.merge()
     }
   }))

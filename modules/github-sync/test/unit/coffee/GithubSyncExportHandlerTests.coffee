@@ -24,20 +24,14 @@ describe "GithubSyncExportHandler", ->
 		
 	describe "exportProject", ->
 		beforeEach ->
-			@owner_id = "owner-id-123"
+			@user_id = "user-id-123"
 			@name = "mock-name"
 			@description = "Repository description"
-			@ProjectGetter.getProject = sinon.stub().callsArgWith(2, null, @project = { owner_ref: @owner_id })
 			@GithubSyncApiHandler.exportProject = sinon.stub().callsArg(4)
 			@GithubSyncExportHandler._buildFileList = sinon.stub().callsArgWith(1, null, @files = ["mock-files"])
 			@DocumentUpdaterHandler.flushProjectToMongo = sinon.stub().callsArg(1)
-			@GithubSyncExportHandler.exportProject @project_id, { name: @name, description: @description }, @callback
+			@GithubSyncExportHandler.exportProject @project_id, @user_id, { name: @name, description: @description }, @callback
 			
-		it "should look up the project owner", ->
-			@ProjectGetter.getProject
-				.calledWith(@project_id, {owner_ref: 1})
-				.should.equal true
-				
 		it "should flush the document to Mongo", ->
 			@DocumentUpdaterHandler.flushProjectToMongo
 				.calledWith(@project_id)
@@ -52,7 +46,7 @@ describe "GithubSyncExportHandler", ->
 			@GithubSyncApiHandler.exportProject
 				.calledWith(
 					@project_id,
-					@owner_id,
+					@user_id,
 					{ name: @name, description: @description }, 
 					@files
 				)

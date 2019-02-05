@@ -20,5 +20,5 @@ module.exports =
 		app.get '/project/:Project_id/github-sync/commits/unmerged', AuthorizationMiddlewear.ensureUserCanReadProject, GithubSyncController.getProjectUnmergedCommits
 		app.post '/project/:Project_id/github-sync/merge', AuthorizationMiddlewear.ensureUserCanWriteProjectContent, GithubSyncController.mergeProject
 
-		app.post '/project/:Project_id/github-sync/export', AuthorizationMiddlewear.ensureUserCanAdminProject, GithubSyncController.exportProject
+		app.post '/project/:Project_id/github-sync/export', AuthorizationMiddlewear.ensureUserCanWriteProjectContent, GithubSyncController.exportProject
 		app.post '/project/new/github-sync', AuthenticationController.requireLogin(), GithubSyncController.importProject

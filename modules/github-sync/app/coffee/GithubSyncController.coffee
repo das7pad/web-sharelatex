@@ -100,9 +100,10 @@ module.exports = GithubSyncController =
 
 	exportProject: (req, res, next) ->
 		project_id = req.params.Project_id
+		user_id = AuthenticationController.getLoggedInUserId(req)
 		{name, description, org} = req.body
 		priv = req.body.private
-		GithubSyncExportHandler.exportProject project_id, {
+		GithubSyncExportHandler.exportProject project_id, user_id, {
 			name: name
 			description: description
 			org: org
