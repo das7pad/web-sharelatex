@@ -9,6 +9,7 @@ describe 'DropboxUserController', ->
 
 	beforeEach ->
 		@user_id = "23j21lk3j1312j321jkljkl"
+		@csrfToken = "wombat"
 		@DropboxHandler =
 			getDropboxRegisterUrl: sinon.stub()
 			completeRegistration: sinon.stub()
@@ -16,12 +17,15 @@ describe 'DropboxUserController', ->
 			setAccessToken:sinon.stub()
 		@AuthenticationController =
 			getLoggedInUserId: sinon.stub().returns(@user_id)
+		@Csrf =
+			validateRequest: sinon.stub().callsArgWith(1, true)
 		@controller = SandboxedModule.require modulePath, requires:
 			'./DropboxHandler': @DropboxHandler
 			'logger-sharelatex':
 				log:->
 				err:->
 			'../../../../app/js/Features/Authentication/AuthenticationController': @AuthenticationController
+			'../../../../app/js/infrastructure/Csrf': @Csrf
 
 		@req =
 			body:
@@ -29,18 +33,20 @@ describe 'DropboxUserController', ->
 			session:
 				user:
 					_id: @user_id
+			csrfToken: ()-> "wombat"
+			headers: {}
 		@res = {}
 
 	describe "redirectUserToDropboxAuth", ->
 		beforeEach ->
 			@dropboxUrl = "www.dropbox.com"
-			@DropboxHandler.getDropboxRegisterUrl.callsArgWith(1, null, @dropboxUrl)
+			@DropboxHandler.getDropboxRegisterUrl.callsArgWith(2, null, @dropboxUrl)
 
 		it "should call getDropboxRegisterUrl with the user id", (done)->
 
 			@res.redirect = (redirectUrl)=>
 				redirectUrl.should.equal @dropboxUrl
-				@DropboxHandler.getDropboxRegisterUrl.calledWith(@user_id).should.equal true
+				sinon.assert.calledWith(@DropboxHandler.getDropboxRegisterUrl, @user_id, @csrfToken)
 				done()
 
 			@controller.redirectUserToDropboxAuth @req, @res
@@ -49,7 +55,7 @@ describe 'DropboxUserController', ->
 		beforeEach ->
 			@DropboxHandler.setAccessToken.callsArgWith(3)
 
-		it "should call getDropboxRegisterUrl with the user id", (done)->
+		it "should call setAccessToken with the access token", (done)->
 
 			@res.sendStatus = (statusCode)=>
 				statusCode.should.equal 200
@@ -58,13 +64,31 @@ describe 'DropboxUserController', ->
 
 			@controller.completeDropboxRegistration @req, @res
 
+		describe "when the CSRF token is invalid", ->
+			beforeEach ->
+				@Csrf.validateRequest = sinon.stub().callsArgWith(1, false)
+
+			it "should not call setAccessToken", (done)->
+				@res.sendStatus = (statusCode)=>
+					sinon.assert.notCalled(@DropboxHandler.setAccessToken)
+					done()
+
+				@controller.completeDropboxRegistration @req, @res
+
+			it "should return an authentication error", (done)->
+				@res.sendStatus = (statusCode)=>
+					statusCode.should.equal 403
+					done()
+
+				@controller.completeDropboxRegistration @req, @res
+
 
 	describe "unlinkDropbox", ->
 
 		beforeEach ->
 			@DropboxHandler.unlinkAccount.callsArgWith(1)
 
-		it "should call getDropboxRegisterUrl with the user id", (done)->
+		it "should call unlinkAccount with the user id", (done)->
 
 			@res.redirect = (redirectUrl)=>
 				redirectUrl.should.equal "/user/settings#dropboxSettings"
