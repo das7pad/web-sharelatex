@@ -9,6 +9,7 @@ siteUrl = "www.sharelatex.com"
 
 describe 'DropboxHandler', ->
 	user_id = "123nd3ijdks"
+	state = "wombat"
 
 	beforeEach ->
 		@stubGet = sinon.stub()
@@ -38,13 +39,13 @@ describe 'DropboxHandler', ->
 			done()
 
 	it 'should be able to get auth url with callback url on it', (done)->
-		url = "http://www.dropbox.com"
+		url = "http://www.dropbox.com?state=wombat"
 		body = JSON.stringify({authorize_url:url})
 		opts =
 			url: "#{thirdPartyDataStoreApiUrl}/user/#{user_id}/dropbox/register"
 			timeout: 5000
 		@stubGet.withArgs(opts).callsArgWith(1, null, {statusCode:200}, body)
-		@handler.getDropboxRegisterUrl user_id, (err, returnedUrl)->
+		@handler.getDropboxRegisterUrl user_id, state, (err, returnedUrl)->
 			returnedUrl.should.equal url
 			done()
 

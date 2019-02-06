@@ -25,7 +25,7 @@ module.exports = DropboxHandler =
 				logger.log status:body, "getting dropbox registration status for user #{user_id}"
 				callback err, body
 
-	getDropboxRegisterUrl: (user_id, callback)->
+	getDropboxRegisterUrl: (user_id, state, callback)->
 		if !user_id?
 			err = new Error("no user id passed to getDropboxRegisterUrl")
 			logger.err err
@@ -34,7 +34,7 @@ module.exports = DropboxHandler =
 			url: "#{settings.apis.thirdPartyDataStore.url}/user/#{user_id}/dropbox/register"
 			timeout: 5000
 		if settings.apis.thirdPartyDataStore.dropboxApp?
-			opts.qs = {app: settings.apis.thirdPartyDataStore.dropboxApp}
+			opts.qs = {app: settings.apis.thirdPartyDataStore.dropboxApp, state: state}
 		request.get opts, (err, response, body)->
 			safelyGetResponse err, response, body, (err, body)->
 				if err?
