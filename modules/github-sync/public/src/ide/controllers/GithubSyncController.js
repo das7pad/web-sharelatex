@@ -25,12 +25,6 @@ define(['base'], App =>
     }
 
     $scope.isProjectMember = function() {
-      const projectMembers = ide.$scope.project.members.map(
-        member => member._id
-      )
-      return (
-        ide.$scope.project.owner._id === ide.$scope.user.id ||
-        projectMembers.includes(ide.$scope.user.id)
-      )
+      return ide.$scope.permissions.write
     }
   }))

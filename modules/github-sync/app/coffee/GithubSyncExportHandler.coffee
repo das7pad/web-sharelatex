@@ -5,22 +5,20 @@ GithubSyncApiHandler = require "./GithubSyncApiHandler"
 settings = require "settings-sharelatex"
 
 module.exports = GithubSyncExportHandler =
-	exportProject: (project_id, options, callback = (error) ->) ->
-		ProjectGetter.getProject project_id, {owner_ref: 1}, (error, project) ->
+	exportProject: (project_id, user_id, options, callback = (error) ->) ->
+		DocumentUpdaterHandler.flushProjectToMongo project_id, (error) ->
 			return callback(error) if error?
-			DocumentUpdaterHandler.flushProjectToMongo project_id, (error) ->
+			GithubSyncExportHandler._buildFileList project_id, (error, files) ->
 				return callback(error) if error?
-				GithubSyncExportHandler._buildFileList project_id, (error, files) ->
-					return callback(error) if error?
-					GithubSyncApiHandler.exportProject project_id, project.owner_ref, options, files, callback
-					
+				GithubSyncApiHandler.exportProject project_id, user_id, options, files, callback
+
 	mergeProject: (project_id, options, callback = (error) ->) ->
 		DocumentUpdaterHandler.flushProjectToMongo project_id, (error) ->
 			return callback(error) if error?
 			GithubSyncExportHandler._buildFileList project_id, (error, files) ->
 				return callback(error) if error?
 				GithubSyncApiHandler.mergeProject project_id, options, files, callback
-		
+
 	_buildFileList: (project_id, callback = (error, files) ->) ->
 		# This shares similar code with Features/Compile/ClsiManager.coffee#_buildRequest
 		# Consider refactoring out shared logic?
@@ -37,7 +35,7 @@ module.exports = GithubSyncExportHandler =
 						id:      doc._id.toString()
 						rev:     doc.rev
 					}
-				
+
 				for path, file of files
 					fileList.push {
 						path: path.replace(/^\//, "") # Remove leading /
@@ -45,6 +43,6 @@ module.exports = GithubSyncExportHandler =
 						id:   file._id.toString()
 						rev:  file.rev
 					}
-				
+
 				callback null, fileList
-		
+

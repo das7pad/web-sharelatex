@@ -66,7 +66,7 @@ define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
         marker: markerNode
       }
 
-      this.clearOverlappingDeleteMarkers(markerNode)
+      // this.clearOverlappingDeleteMarkers(markerNode)
     }
 
     onChangeMoved(change) {
@@ -106,37 +106,40 @@ define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
           false
         )
 
-        this.clearOverlappingDeleteMarkers(markerNode)
+        // this.clearOverlappingDeleteMarkers(markerNode)
       }
     }
 
-    clearOverlappingDeleteMarkers(markerNode) {
-      const markers = Object.values(this.changeIdToMarkerIdMap).filter(
-        marker => typeof marker === 'object'
-      )
+    // Commented out while not implementing callouts on delete markers
+    // (which caused the overlapping)
 
-      const markerNodes = markers.map(marker => marker.marker)
+    // clearOverlappingDeleteMarkers(markerNode) {
+    //   const markers = Object.values(this.changeIdToMarkerIdMap).filter(
+    //     marker => typeof marker === 'object'
+    //   )
 
-      // Find overlapping markers (markers on the same line)
-      const markerTopValue = markerNode.style.top
-      const markersMatchingTop = markerNodes.filter(
-        marker => marker.style.top === markerTopValue
-      )
+    //   const markerNodes = markers.map(marker => marker.marker)
 
-      // Find the marker on the most left of that line
-      // (Which we don't want to affect)
-      const markersMatchingTopLefts = markersMatchingTop.map(marker =>
-        parseInt(marker.style.left)
-      )
-      const mostLeftMarkerValue = Math.min(...markersMatchingTopLefts)
+    //   // Find overlapping markers (markers on the same line)
+    //   const markerTopValue = markerNode.style.top
+    //   const markersMatchingTop = markerNodes.filter(
+    //     marker => marker.style.top === markerTopValue
+    //   )
 
-      // Reduce the width of all non-far-left markers on that line
-      for (let marker of markersMatchingTop) {
-        if (parseInt(marker.style.left) > mostLeftMarkerValue) {
-          marker.style.width = 0
-        }
-      }
-    }
+    //   // Find the marker on the most left of that line
+    //   // (Which we don't want to affect)
+    //   const markersMatchingTopLefts = markersMatchingTop.map(marker =>
+    //     parseInt(marker.style.left)
+    //   )
+    //   const mostLeftMarkerValue = Math.min(...markersMatchingTopLefts)
+
+    //   // Reduce the width of all non-far-left markers on that line
+    //   for (let marker of markersMatchingTop) {
+    //     if (parseInt(marker.style.left) > mostLeftMarkerValue) {
+    //       marker.style.width = 0
+    //     }
+    //   }
+    // }
 
     changeMarkerPositions() {
       const markers = Object.values(this.changeIdToMarkerIdMap).filter(
@@ -152,8 +155,14 @@ define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
           'local'
         )
 
+        const excess = (newCoords.bottom - newCoords.top) / 3
+
         marker.marker.style.top = newCoords.bottom + 'px'
         marker.marker.style.left = newCoords.left + 'px'
+        marker.marker.style.marginTop =
+          0 - (newCoords.bottom - newCoords.top) + 'px'
+        marker.marker.style.height =
+          newCoords.bottom - newCoords.top - excess + 'px'
       }
     }
 

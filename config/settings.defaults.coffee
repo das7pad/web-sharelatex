@@ -193,6 +193,9 @@ module.exports = settings =
 
 	# Used to close the editor off to users
 	editorIsOpen: process.env['EDITOR_IS_OPEN'] or true
+	
+	# Optional separate location for websocket connections, if unset defaults to siteUrl.
+	wsUrl: process.env['WEBSOCKET_URL']
 
 	# cookie domain
 	# use full domain for cookies to only be accessible from that domain,
