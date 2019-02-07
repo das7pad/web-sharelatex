@@ -14,6 +14,7 @@ AuthenticationController = require('../../../../app/js/Features/Authentication/A
 EditorController = require('../../../../app/js/Features/Editor/EditorController')
 UserGetter = require('../../../../app/js/Features/User/UserGetter')
 UserUpdater = require("../../../../app/js/Features/User/UserUpdater")
+Csrf = require("../../../../app/js/infrastructure/Csrf")
 
 module.exports = ReferencesApiHandler =
 	_getRefProviderBackendKey: (req) ->
@@ -40,33 +41,37 @@ module.exports = ReferencesApiHandler =
 				return res.send 403
 			opts =
 				method:"get"
-				url: "/user/#{user_id}/#{ref_provider}/oauth"
+				url: "/user/#{user_id}/#{ref_provider}/oauth?state=#{encodeURIComponent(req.csrfToken())}"
 				json:true
 			ReferencesApiHandler.make3rdRequest opts, (err, response, body)->
 				if err
 					logger.error {user_id, ref_provider, err}, "error contacting tpr api"
 					return next(err)
 				logger.log body:body, statusCode:response.statusCode, "thirdparty return"
+				if response.statusCode != 200
+					return next(new Error('failure code returned from references service'))
 				res.redirect(body.redirect)
 
 	completeAuth: (req, res, next)->
 		user_id = AuthenticationController.getLoggedInUserId(req)
 		ref_provider = ReferencesApiHandler._getRefProviderBackendKey(req)
-		ReferencesApiHandler.userCanMakeRequest user_id, ref_provider, (err, canMakeRequest) ->
-			if err
-				return next(err)
-			if !canMakeRequest
-				return res.send 403
-			opts =
-				method:"get"
-				url: "/user/#{user_id}/#{ref_provider}/tokenexchange"
-				qs: req.query
-			ReferencesApiHandler.make3rdRequest opts, (err, response, body)->
+		Csrf.validateToken req.query.state, req.session, (csrfValid) ->
+			return res.sendStatus 403 unless csrfValid
+			ReferencesApiHandler.userCanMakeRequest user_id, ref_provider, (err, canMakeRequest) ->
 				if err
-					logger.error {user_id, ref_provider, err}, "error contacting tpr api"
 					return next(err)
-				logger.log {user_id, ref_provider}, "auth complete"
-				res.redirect "/user/settings"
+				if !canMakeRequest
+					return res.send 403
+				opts =
+					method:"get"
+					url: "/user/#{user_id}/#{ref_provider}/tokenexchange"
+					qs: req.query
+				ReferencesApiHandler.make3rdRequest opts, (err, response, body)->
+					if err
+						logger.error {user_id, ref_provider, err}, "error contacting tpr api"
+						return next(err)
+					logger.log {user_id, ref_provider}, "auth complete"
+					res.redirect "/user/settings"
 
 	make3rdRequest: (opts, callback)->
 		opts.url = "#{thirdpartyUrl}#{opts.url}"
