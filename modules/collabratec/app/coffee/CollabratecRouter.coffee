@@ -11,7 +11,10 @@ try
 		limits: fileSize: Settings.maxUploadSize
 	)
 catch err
-	logger.err err:err, "caught error from multer in CollabratecRouter"
+	if err.message == "EEXIST"
+		logger.log uploadFolder:Settings.path.uploadFolder, "dir already exists, continuing"
+	else
+		logger.err err:err, "caught error from multer in CollabratecRouter"
 
 module.exports = 
 	apply: (webRouter, privateApiRouter, publicApiRouter) ->
