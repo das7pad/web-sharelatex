@@ -36,5 +36,5 @@ if !module.parent # Called directly
 		if argv.group
 			process.setgid argv.group
 			logger.info "Running as group: #{argv.group}"
-console.log Settings
+
 module.exports = Server.server
