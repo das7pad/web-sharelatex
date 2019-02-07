@@ -55,6 +55,8 @@ module.exports = ReferencesApiHandler =
 	completeAuth: (req, res, next)->
 		user_id = AuthenticationController.getLoggedInUserId(req)
 		ref_provider = ReferencesApiHandler._getRefProviderBackendKey(req)
+		# Zotero uses OAuth v1 which doesn't require/use a state parameter so we should just allow this to go through
+		req.query.state = req.csrfToken() if ref_provider == 'zotero'
 		Csrf.validateToken req.query.state, req.session, (csrfValid) ->
 			return res.sendStatus 403 unless csrfValid
 			ReferencesApiHandler.userCanMakeRequest user_id, ref_provider, (err, canMakeRequest) ->
