@@ -43,7 +43,7 @@ block content_cms
 							if post.tag
 								.row
 									.col-sm-12
-										include _blog_tags
+										+blog_tags(post.tag)
 
 				if pages && pages.total_pages > 1
 					+paginate(pages, url_path)

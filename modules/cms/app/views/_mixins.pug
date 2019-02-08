@@ -1,3 +1,11 @@
+mixin blog_tags(tags, tags_title = 'Tags')
+	div.tags
+		small #{tags_title}:
+		ul.tags-list
+			for t in tags
+				if t.fields && t.fields.tag
+					li
+						a.tag.btn.btn-default(href= '/blog/tagged/' + t.fields.tag) #{t.fields.tag}
 mixin preview()
 	//- When on preview mode this element is fixed to the top of the screen
 	//- To get on preview mode, add "?preview" to URL
