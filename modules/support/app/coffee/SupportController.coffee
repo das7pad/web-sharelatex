@@ -11,7 +11,10 @@ inboxes = {
 	"accounts":
 		id:"inb_bmf"
 		email:"sales@overleaf.com"
-}
+	"sales":
+		id:"inb_bmf"
+		email:"sales@overleaf.com"
+	}
 module.exports  =
 
 	newSupportRequest: (req, res, next)->
@@ -39,7 +42,7 @@ module.exports  =
 
 		request opts, (err, response, body)->
 			if err? or response.statusCode!= 202
-				logger.err err:err, body:body, statusCode: res.statusCode, "error creating support ticket"
+				logger.err err:err, body:body, statusCode: response.statusCode, "error creating support ticket"
 				res.sendStatus(500)
 			else
 				res.sendStatus(200)
