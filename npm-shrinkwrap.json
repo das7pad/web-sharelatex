@@ -2990,7 +2990,7 @@
         "readable-stream": {
           "version": "2.3.6",
           "from": "readable-stream@>=2.0.0 <3.0.0",
-          "resolved": "http://registry.npmjs.org/readable-stream/-/readable-stream-2.3.6.tgz"
+          "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.3.6.tgz"
         },
         "string_decoder": {
           "version": "1.1.1",
@@ -8109,7 +8109,7 @@
         "readable-stream": {
           "version": "2.3.6",
           "from": "readable-stream@^2.0.2",
-          "resolved": "http://registry.npmjs.org/readable-stream/-/readable-stream-2.3.6.tgz",
+          "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.3.6.tgz",
           "dev": true
         },
         "readdirp": {
@@ -10780,7 +10780,7 @@
         "readable-stream": {
           "version": "2.3.6",
           "from": "readable-stream@^2.3.6",
-          "resolved": "http://registry.npmjs.org/readable-stream/-/readable-stream-2.3.6.tgz",
+          "resolved": "https://registry.npmjs.org/readable-stream/-/readable-stream-2.3.6.tgz",
           "dev": true
         },
         "string_decoder": {
