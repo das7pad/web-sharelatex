@@ -31,10 +31,10 @@ export default class EmisExport extends Component {
         .then(() => {
           this.setState({ exportState: 'complete' })
         })
-        .catch(({ errorDetails }) => {
+        .catch(error => {
           this.setState({
             exportState: 'error',
-            errorDetails
+            errorDetails: error.message
           })
         })
     } else {

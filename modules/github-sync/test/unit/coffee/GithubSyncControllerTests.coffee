@@ -233,12 +233,12 @@ describe 'GithubSyncController', ->
 				description: "Test description"
 				org: "sharelatex"
 				private: true
-			@GithubSyncExportHandler.exportProject = sinon.stub().callsArgWith(2, null)
+			@GithubSyncExportHandler.exportProject = sinon.stub().callsArgWith(3, null)
 			@GithubSyncController.exportProject @req, @res
 
 		it "should export the project", ->
 			@GithubSyncExportHandler.exportProject
-				.calledWith(@project_id, {
+				.calledWith(@project_id, @user_id, {
 					name: "Test repo"
 					description: "Test description"
 					org: "sharelatex"

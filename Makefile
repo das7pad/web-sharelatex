@@ -210,14 +210,14 @@ clean_ci:
 test: test_unit test_frontend test_acceptance
 
 test_unit:
-	echo $(DOCKER_COMPOSE)
 	@[ ! -d test/unit ] && echo "web has no unit tests" || $(DOCKER_COMPOSE) run --rm test_unit
 
 test_unit_app:
 	npm -q run test:unit:app -- ${MOCHA_ARGS}
 
-test_frontend: test_clean # stop service
-	$(MAKE) compile
+test_frontend: test_clean compile test_frontend_run
+
+test_frontend_run:
 	$(DOCKER_COMPOSE) up test_frontend
 
 test_acceptance: compile test_acceptance_app_run test_acceptance_modules_run
@@ -225,6 +225,8 @@ test_acceptance: compile test_acceptance_app_run test_acceptance_modules_run
 test_acceptance_app: compile test_acceptance_app_run
 
 test_acceptance_module: compile test_acceptance_module_run
+
+test_acceptance_run: test_acceptance_app_run test_acceptance_modules_run
 
 test_acceptance_app_run: test_clean
 	$(DOCKER_COMPOSE) run --rm test_acceptance npm -q run test:acceptance:run_dir -- ${MOCHA_ARGS} test/acceptance/js

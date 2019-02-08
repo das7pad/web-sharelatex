@@ -42,31 +42,33 @@ pipeline {
     }
 
 
-    stage('build') {
+    stage('Build') {
       steps {
         sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make build'
       }
     }
 
-    stage('Test') {
 
+    stage('Tests') {
 
       parallel {
-      
+
         stage('Unit Tests') {
           steps {
             sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_unit'
           }
         }
 
-        stage('Acceptance Tests') {
+        stage('Frontend Tests') {
           steps {
-            sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_acceptance_app_run'
+            sh 'sleep 10'
+            sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_frontend_run'
           }
         }
 
         stage('Package') {
           steps {
+            sh 'sleep 30'
             sh 'echo ${BUILD_NUMBER} > build_number.txt'
             sh 'touch build.tar.gz' // Avoid tar warning about files changing during read
             sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make tar'
@@ -78,42 +80,68 @@ pipeline {
     }
 
 
-      stage('Publish docker') {
-        steps {
-          withCredentials([file(credentialsId: 'gcr.io_overleaf-ops', variable: 'DOCKER_REPO_KEY_PATH')]) {
-            sh 'docker login -u _json_key --password-stdin https://gcr.io/overleaf-ops < ${DOCKER_REPO_KEY_PATH}'
-          }
-          sh 'DOCKER_REPO=gcr.io/overleaf-ops make publish'
-          sh 'docker logout https://gcr.io/overleaf-ops'
-        }
-      }
 
-      stage('Publish to s3') {
-        steps {
-          sh 'echo ${BRANCH_NAME}-${BUILD_NUMBER} > build_number.txt'
-          withAWS(credentials:'S3_CI_BUILDS_AWS_KEYS', region:"${S3_REGION_BUILD_ARTEFACTS}") {
-              s3Upload(file:'build.tar.gz', bucket:"${S3_BUCKET_BUILD_ARTEFACTS}", path:"${JOB_NAME}/${BUILD_NUMBER}.tar.gz")
-          }
-          withAWS(credentials:'S3_CI_BUILDS_AWS_KEYS', region:"${S3_REGION_BUILD_ARTEFACTS}") {
-              // The deployment process uses this file to figure out the latest build
-              s3Upload(file:'build_number.txt', bucket:"${S3_BUCKET_BUILD_ARTEFACTS}", path:"${JOB_NAME}/latest")
-          }
-        }
+    stage('Acceptance Tests main') {
+      steps {
+        sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_acceptance_app_run'
       }
+    }
 
-
-      stage('Sync OSS') {
-        when {
-          branch 'master'
-        }
-        steps {
-          sshagent (credentials: ['GIT_DEPLOY_KEY']) {
-            sh 'git push git@github.com:sharelatex/web-sharelatex.git HEAD:master'
-          }
-        }
+    stage('Acceptance Tests modules') {
+      steps {
+        sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_acceptance_modules_run'
       }
+    }
 
     
+
+    stage('Publish') {
+
+
+      parallel {
+
+        stage('Publish docker') {
+          steps {
+            withCredentials([file(credentialsId: 'gcr.io_overleaf-ops', variable: 'DOCKER_REPO_KEY_PATH')]) {
+              sh 'docker login -u _json_key --password-stdin https://gcr.io/overleaf-ops < ${DOCKER_REPO_KEY_PATH}'
+            }
+            sh 'DOCKER_REPO=gcr.io/overleaf-ops make publish'
+            sh 'docker logout https://gcr.io/overleaf-ops'
+          }
+        }
+
+        stage('Publish to s3') {
+          steps {
+            sh 'echo ${BRANCH_NAME}-${BUILD_NUMBER} > build_number.txt'
+            withAWS(credentials:'S3_CI_BUILDS_AWS_KEYS', region:"${S3_REGION_BUILD_ARTEFACTS}") {
+              retry(3) {
+                s3Upload(file:'build.tar.gz', bucket:"${S3_BUCKET_BUILD_ARTEFACTS}", path:"${JOB_NAME}/${BUILD_NUMBER}.tar.gz")
+              }
+            }
+            withAWS(credentials:'S3_CI_BUILDS_AWS_KEYS', region:"${S3_REGION_BUILD_ARTEFACTS}") {
+              retry(3) {
+                // The deployment process uses this file to figure out the latest build
+                s3Upload(file:'build_number.txt', bucket:"${S3_BUCKET_BUILD_ARTEFACTS}", path:"${JOB_NAME}/latest")
+              }
+            }
+          }
+        }
+
+
+        stage('Sync OSS') {
+          when {
+            branch 'master'
+          }
+          steps {
+            sshagent (credentials: ['GIT_DEPLOY_KEY']) {
+              sh 'git push git@github.com:sharelatex/web-sharelatex.git HEAD:master'
+            }
+          }
+        }
+
+      }
+    }
+
 
     
   }
@@ -159,6 +187,6 @@ pipeline {
     buildDiscarder(logRotator(numToKeepStr:'50'))
 
     // And we'd really like to be sure that this build doesn't hang forever, so let's time it out after:
-    timeout(time: 45, unit: 'MINUTES')
+    timeout(time: 30, unit: 'MINUTES')
   }
 }

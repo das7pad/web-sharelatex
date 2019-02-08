@@ -36,10 +36,10 @@ export default class F1000Export extends Component {
           articleId: ''
         })
       })
-      .catch(({ errorDetails }) => {
+      .catch(error => {
         this.setState({
           exportState: 'error',
-          errorDetails
+          errorDetails: error.message
         })
       })
   }

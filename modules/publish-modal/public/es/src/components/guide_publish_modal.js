@@ -54,6 +54,7 @@ export default class GuidePublishModal extends Component {
             firstName={initParams.firstName}
             lastName={initParams.lastName}
             title={initParams.title}
+            author={initParams.author}
             description={initParams.description}
             license={initParams.license}
             showSource={initParams.showSource}

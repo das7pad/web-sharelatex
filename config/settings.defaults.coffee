@@ -103,7 +103,7 @@ module.exports = settings =
 	# options incase you want to run some services on remote hosts.
 	apis:
 		web:
-			url: "http://#{process.env['WEB_HOST'] or 'localhost'}:#{webPort}"
+			url: "http://#{process.env['WEB_API_HOST'] or process.env['WEB_HOST'] or "localhost"}:#{process.env['WEB_API_PORT'] or process.env['WEB_PORT'] or 3000}"
 			user: httpAuthUser
 			pass: httpAuthPass
 		documentupdater:
@@ -193,6 +193,9 @@ module.exports = settings =
 
 	# Used to close the editor off to users
 	editorIsOpen: process.env['EDITOR_IS_OPEN'] or true
+	
+	# Optional separate location for websocket connections, if unset defaults to siteUrl.
+	wsUrl: process.env['WEBSOCKET_URL']
 
 	# cookie domain
 	# use full domain for cookies to only be accessible from that domain,
@@ -390,6 +393,7 @@ module.exports = settings =
 	#
 	smokeTest:
 		user: process.env['SMOKE_TEST_USER']
+		userId: process.env['SMOKE_TEST_USER_ID']
 		password: process.env['SMOKE_TEST_PASSWORD']
 		projectId: process.env['SMOKE_TEST_PROJECT_ID']
 
