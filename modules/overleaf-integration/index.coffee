@@ -22,6 +22,7 @@ OverleafIntegration =
 					authorizationURL: "#{settings.overleaf.host}/oauth/authorize",
 					tokenURL: "#{settings.apis.v1.url}/oauth/token",
 					callbackURL: "#{settings.siteUrl}/overleaf/callback"
+					state: true
 					clientID, clientSecret
 			}, OverleafAuthenticationManager.setupOAuthUser)
 
