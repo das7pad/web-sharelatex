@@ -11,10 +11,11 @@ h3 #{translate("dropbox_integration")}
 - else if (dropbox.error)
 	.alert.alert-danger #{translate("dropbox_sync_error")}
 - else if(dropbox.registered)
-	.alert.alert-success
+	form.alert.alert-success(action='/dropbox/unlink' method='POST' id='unlink_dropbox')
 		| #{translate("account_is_linked")}.
 		| 
-		a(href='/dropbox/unlink') #{translate("unlink_dropbox")}
+		input(type='hidden' name='_csrf' value=csrfToken)
+		input.btn-inline-link(type="submit" value=translate("unlink_dropbox"))
 - else
 	p.small #{translate("dropbox_sync_description")}
 	p
