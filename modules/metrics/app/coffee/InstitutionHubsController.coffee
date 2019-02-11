@@ -49,7 +49,7 @@ module.exports = InstitutionHubsController =
 		)
 
 	institutionDepartments: (req, res, next) ->
-		InstitutionHubsController._v1InstitutionsApi(req.entity.v1Id, 'departments_data', (err, response, body)->
+		InstitutionHubsController._v1InstitutionsApi(req.params.id, 'departments_data', (err, response, body)->
 			return next(err) if err?
 			res.send(body)
 		)
@@ -89,7 +89,7 @@ module.exports = InstitutionHubsController =
 		recentActivity = []
 		if data['month']['users'] + data['month']['projects'] == 0
 			return null
-		lags = { day: 'Yesterday', week: 'Last Week', month: 'Last Month' }
+		lags = { day: 'Yesterday', week: 'Last Week', month: 'Last Month', year: 'This Year' }
 		for lag, title of lags
 			recentActivity.push(
 				title: title,

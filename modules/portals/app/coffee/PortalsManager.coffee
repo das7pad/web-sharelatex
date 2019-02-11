@@ -2,6 +2,7 @@ _ = require 'lodash'
 path = require 'path'
 request = require 'request'
 settings = require 'settings-sharelatex'
+InstitutionHubsController = require '../../../metrics/app/js/InstitutionHubsController'
 
 module.exports = PortalsManager =
 	get: (path, callback) ->
@@ -15,4 +16,8 @@ module.exports = PortalsManager =
 			if err?
 				callback err
 			else
-				callback null, httpResponse.body
+				data = httpResponse.body
+				InstitutionHubsController._recentActivity data.university?.id, (recentActivity) ->
+					data.recentActivity = recentActivity
+					callback null, data
+
