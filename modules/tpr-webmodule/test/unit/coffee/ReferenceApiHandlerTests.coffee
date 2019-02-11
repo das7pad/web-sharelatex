@@ -26,6 +26,11 @@ describe 'ReferencesApiHandler', ->
 		@mongojs = () =>
 			@db
 		@mongojs.ObjectId = ObjectId
+		@csrfToken = "wombat"
+
+		@Csrf =
+			validateToken: sinon.stub().callsArgWith(2, false)
+		@Csrf.validateToken.withArgs(@csrfToken, sinon.match.any).callsArgWith(2, true)
 
 		@ReferencesApiHandler = SandboxedModule.require modulePath, requires:
 			'request': @request = sinon.stub()
@@ -48,6 +53,7 @@ describe 'ReferencesApiHandler', ->
 			'../../../../app/js/Features/Editor/EditorController': @EditorController = {
 				upsertFileWithPath: sinon.stub().yields()
 			}
+			'../../../../app/js/infrastructure/Csrf': @Csrf
 			'temp': @temp = {
 				track: sinon.stub()
 				createWriteStream: sinon.stub()
@@ -62,6 +68,7 @@ describe 'ReferencesApiHandler', ->
 			params:
 				ref_provider: 'refProvider'
 				Project_id: @project_id
+			csrfToken: ()=> return @csrfToken
 		@res =
 			redirect: sinon.stub()
 			json: sinon.stub()
@@ -72,19 +79,68 @@ describe 'ReferencesApiHandler', ->
 	describe "startAuth", ->
 		beforeEach ->
 			@redirect = "http://localhost/tokenexchange"
-			@ReferencesApiHandler.make3rdRequest = sinon.stub().callsArgWith(1, null, {}, {redirect: @redirect} )
-			@ReferencesApiHandler.startAuth @req, @res
 
-		it "should redirect to the complete auth url", ->
-			@res.redirect.calledWith(@redirect).should.equal true
+		describe "when it works", ->
+			beforeEach ->
+				@redirect = "http://localhost/tokenexchange"
+				@ReferencesApiHandler.make3rdRequest = sinon.stub().callsArgWith(1, null, {statusCode: 200}, {redirect: @redirect} )
+				@ReferencesApiHandler.startAuth @req, @res, @next
+
+			it "should succeed", ->
+				sinon.assert.notCalled(@next)
+
+			it "should redirect to the complete auth url", ->
+				sinon.assert.calledWith(@res.redirect, @redirect)
+
+			it "should send the userid, provider and csrf token to the API", ->
+				sinon.assert.calledWith @ReferencesApiHandler.make3rdRequest, {
+					method: 'get'
+					url: "/user/#{@user_id}/refProvider/oauth?state=#{@csrfToken}"
+					json: true
+				}
+
+		describe "when the api returns an error", ->
+			beforeEach ->
+				@ReferencesApiHandler.make3rdRequest = sinon.stub().callsArgWith(1, null, {statusCode: 403}, {redirect: @redirect} )
+				@ReferencesApiHandler.startAuth @req, @res, @next
+
+			it "should raise an error", ->
+				sinon.assert.called(@next)
+				sinon.assert.notCalled(@res.redirect)
 
 	describe "completeAuth", ->
 		beforeEach ->
 			@ReferencesApiHandler.make3rdRequest = sinon.stub().callsArgWith(1, null, {}, {} )
-			@ReferencesApiHandler.completeAuth @req, @res
 
-		it "should redirect to user settings page", ->
-			@res.redirect.calledWith("/user/settings").should.equal true
+		describe "with a valid csrf token", ->
+			beforeEach ->
+				@req.query = {state: @csrfToken}
+				@ReferencesApiHandler.completeAuth @req, @res
+
+			it "should redirect to user settings page", ->
+				sinon.assert.calledWith(@res.redirect, "/user/settings")
+
+		describe "without a csrf token", ->
+			beforeEach ->
+				@req.query = {}
+				@ReferencesApiHandler.completeAuth @req, @res
+
+			it "should return 'forbidden'", ->
+				sinon.assert.calledWith(@res.sendStatus, 403)
+
+			it "should not call the API", ->
+				sinon.assert.notCalled(@ReferencesApiHandler.make3rdRequest)
+
+		describe "with an invalid csrf token", ->
+			beforeEach ->
+				@req.query = {state: '3v1lh4x0r'}
+				@ReferencesApiHandler.completeAuth @req, @res
+
+			it "should return 'forbidden'", ->
+				sinon.assert.calledWith(@res.sendStatus, 403)
+
+			it "should not call the API", ->
+				sinon.assert.notCalled(@ReferencesApiHandler.make3rdRequest)
 
 	describe "unlink", ->
 		beforeEach ->
