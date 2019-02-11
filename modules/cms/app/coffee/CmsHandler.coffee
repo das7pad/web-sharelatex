@@ -30,6 +30,10 @@ module.exports =
 					data.metadata.twitterDescription = data.metadata.description
 				if !data.metadata.openGraphDescription
 					data.metadata.openGraphDescription = data.metadata.description
+			# add protocol to image URL
+			for metadataKey of data.metadata
+				if metadataKey.indexOf('image') != -1 and data.metadata[metadataKey].fields?.file?.url? and data.metadata[metadataKey].fields.file.url.indexOf('https') == -1
+					data.metadata[metadataKey].fields.file.url = "https:" + data.metadata[metadataKey].fields.file.url
 		# metadata - for blog list page. CMS not set up for metadata for list page
 		if page == 'blog/blog'
 			data.title = 'Blog'
