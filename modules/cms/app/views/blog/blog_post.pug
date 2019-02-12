@@ -3,6 +3,7 @@ extends ../layout
 //- Page for a single blog post
 
 block content_cms
+	- var popular_tags = [ {fields: {tag: 'publishers'}}, {fields: {tag: 'events'}}, {fields: {tag: 'latex'}}, {fields: {tag: 'tech'}}, {fields: {tag: 'press'}}, {fields: {tag: 'features'}}, {fields: {tag: 'guides'}}, {fields: {tag: 'institutions'}}, {fields: {tag: 'case studies'}}, {fields: {tag: 'advisors'}}]
 	.row
 		.col-sm-8.col-sm-offset-2.col-xs-12
 			.page-header
@@ -20,6 +21,14 @@ block content_cms
 									|  by #{authorDisplay}
 								if (publishDatePretty)
 									|  on #{publishDatePretty}
+
 						mathjax(delimiter="no-single-dollar") !{content}
+
+						if tag
+							.row
+								.col-sm-12
+									+blog_tags(tag)
+
+						+blog_tags(popular_tags, 'Popular Tags')
 
 	script(src=mathJaxPath) 
