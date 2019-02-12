@@ -1,11 +1,9 @@
 .row.row-spaced.hidden-print
 	.col-sm-12.text-center
 		p
-			//- to do: link back to portal
-			+linkSignIn(null, 'btn btn-primary capitalised')
+			+linkSignIn(null, 'btn btn-primary capitalised', `/${university && university.id && !university.institution ? 'edu': 'org'}/${portal.slug}`)
 			| &nbsp;&nbsp; if you already have an #{settings.appName} account.
 		p or
 		p 
-			//- to do: link back to portal
-			+linkSignUp(null, 'btn btn-primary capitalised')
+			+linkSignUp(null, 'btn btn-primary capitalised', `/${university && university.id && !university.institution ? 'edu': 'org'}/${portal.slug}`)
 			| &nbsp;&nbsp; if you don't have an #{settings.appName} account yet.
