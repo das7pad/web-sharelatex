@@ -407,7 +407,7 @@ module.exports = settings =
 	appName:  process.env['APP_NAME'] or "ShareLaTeX (Community Edition)"
 	adminEmail: process.env['ADMIN_EMAIL'] or "placeholder@example.com"
 
-	brandPrefix: process.env['BRAND_PREFIX'] or "" # Set to 'ol-' for overleaf styles
+	brandPrefix: process.env['BRAND_PREFIX'] or "sl-" # Set to 'ol-' for overleaf styles
 
 	nav:
 		title: "ShareLaTeX Community Edition"
