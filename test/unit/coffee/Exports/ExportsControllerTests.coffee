@@ -33,6 +33,11 @@ describe 'ExportsController', ->
 					_id:user_id
 			i18n:
 				translate:->
+		@res =
+			send: sinon.stub()
+			status: sinon.stub()
+		@res.status.returns(@res)
+		@next = sinon.stub()
 		@AuthenticationController =
 			getLoggedInUserId: sinon.stub().returns(@req.session.user._id)
 		@controller = SandboxedModule.require modulePath, requires:
@@ -86,9 +91,10 @@ describe 'ExportsController', ->
 		it 'should forward the response onward', (done) ->
 			@error_json = { status: 422, message: 'nope' }
 			@handler.exportProject = sinon.stub().yields({forwardResponse: @error_json})
-			@controller.exportProject @req, send:(body) =>
-				expect(body).to.deep.equal @error_json
-				done()
+			@controller.exportProject @req, @res, @next
+			expect(@res.send.args[0][0]).to.deep.equal @error_json
+			expect(@res.status.args[0][0]).to.equal @error_json.status
+			done()
 
 	it 'should ask the handler to return the status of an export', (done) ->
 		@handler.fetchExport = sinon.stub().yields(

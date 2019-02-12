@@ -54,15 +54,10 @@ function startExport(url, data = {}) {
       data,
       headers: { 'X-CSRF-Token': window.csrfToken }
     })
-      .done(res => {
-        if (res.status >= 400) {
-          // handle error forwarded from v1
-          reject(new Error(res.message))
-        } else {
-          resolve(res)
-        }
+      .done(resolve)
+      .fail(res => {
+        reject(new Error(res.responseJSON && res.responseJSON.message) || null)
       })
-      .fail(reject)
   })
 }
 

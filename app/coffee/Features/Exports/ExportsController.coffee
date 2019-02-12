@@ -27,7 +27,8 @@ module.exports =
 			if err?
 				if err.forwardResponse?
 					logger.log {responseError: err.forwardResponse}, "forwarding response"
-					return res.send err.forwardResponse
+					statusCode = err.forwardResponse.status || 500
+					return res.status(statusCode).send err.forwardResponse
 				else
 					return next(err)
 			logger.log
