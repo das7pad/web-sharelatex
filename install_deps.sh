@@ -1,10 +1,10 @@
 #!/bin/bash
 
-WEBPACK_ENV=production make minify
-make --no-print-directory format
-make --no-print-directory lint
-
-npm install git+https://github.com/sharelatex/translations-sharelatex.git#master
+WEBPACK_ENV=production make minify &
+make --no-print-directory format & 
+make --no-print-directory lint & 
+npm install git+https://github.com/sharelatex/translations-sharelatex.git#master &
+wait
 
 chmod -R 0755 /app/public
 chown -R node:node /app/public
