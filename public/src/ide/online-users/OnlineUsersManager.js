@@ -103,7 +103,7 @@ define([
 
           // If the user's name is empty use their email as display name
           // Otherwise they're probably an anonymous user
-          if ((user.name != null ? user.name.trim().length : undefined) === 0) {
+          if (user.name === null || user.name.trim().length === 0) {
             if (user.email) {
               user.name = user.email.trim()
             } else if (user.user_id === 'anonymous-user') {
