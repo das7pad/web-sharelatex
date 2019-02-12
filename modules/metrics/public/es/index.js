@@ -3,6 +3,7 @@ import Router from './metrics/router'
 import metricsApp from './metrics/metrics_app'
 import chartApp from './charts/chart_app'
 import institutionHub from './charts/institutionHub'
+import portal from './charts/portal'
 import { MetricsView } from './metrics/views/metrics'
 
 metricsApp.init = function() {
@@ -13,4 +14,4 @@ metricsApp.init = function() {
   new MetricsView()
 }
 
-export { metricsApp, chartApp, institutionHub }
+export { metricsApp, chartApp, institutionHub, portal }

@@ -425,6 +425,8 @@ module.exports = class Router
 		webRouter.post '/admin/messages', AuthorizationMiddlewear.ensureUserIsSiteAdmin, AdminController.createMessage
 		webRouter.post '/admin/messages/clear', AuthorizationMiddlewear.ensureUserIsSiteAdmin, AdminController.clearMessages
 
+		privateApiRouter.post '/disconnectAllUsers', AdminController.dissconectAllUsers
+
 		privateApiRouter.get '/perfTest', (req,res)->
 			res.send("hello")
 
@@ -467,13 +469,6 @@ module.exports = class Router
 					sendRes 200, "Compiler returned in less than 10 seconds"
 				else
 					sendRes 500, "Compiler returned failure #{status}"
-
-		webRouter.get "/ip", (req, res, next) ->
-			res.send({
-				ip: req.ip
-				ips: req.ips
-				headers: req.headers
-			})
 
 		webRouter.get "/no-cache", (req, res, next)->
 			res.header("Cache-Control", "max-age=0")

@@ -33,19 +33,18 @@
 
 				li Provide students, faculty and staff with a custom&nbsp;
 					strong institutional portal&nbsp;
-					| on #{settings.appName} that includes helpful templates, resources and links – examples of customized #{settings.appName} institutional portals can be seen here:
+					| on #{settings.appName} that includes helpful templates, resources and links
 
-			//- hr
-			//- .text-center
+			hr
+			.text-center
 				h4 #{portal.title} members already using #{settings.appName}
-				//- TO DO: metrics <%= render partial: 'portals/show/unpaid/basic_metrics' %>
+				include _basic_metrics
 
-			//-div
-			//-	h5 Departments
-			//-	span(id="departments-label") Number of users from #{portal.title} by department
-
-			//-	.custom-donut-container.chart-container
-					//- TO DO: SVG //- <svg id='university-departments-chart' data-url='<%= departments_data_portal_path(@portal.slug) %>'></svg>
+			h5 Departments
+			span#departments-label Number of users from #{portal.title} by department
+			.row
+				.custom-donut-container.chart-container.col-xs-12
+					svg#institutional-departments-chart(data-url="/institutions/" + university.id + "/departments")
 
 			hr
 

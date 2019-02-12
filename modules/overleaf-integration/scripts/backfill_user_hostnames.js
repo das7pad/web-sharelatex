@@ -12,31 +12,38 @@ const asyncLimit = argv.async || 1
 
 backfillUserEmailHostnames = function (user, callback) {
   processedUsers++
-  async.mapSeries(user.emails, function (userEmail, innerCallback) {
-    // skip emails with a reversedHostname or invalid emails
-    if (userEmail.reversedHostname || userEmail.email.indexOf('@') === -1) {
-      return innerCallback()
-    }
-    const reversedHostname =
-      userEmail.email.split('@')[1].split('').reverse().join('')
-    const query = {_id: user._id, 'emails.email': userEmail.email}
-    const update = {$set: {'emails.$.reversedHostname': reversedHostname}}
+  if (user.emails) {
+    async.mapSeries(user.emails, function (userEmail, innerCallback) {
+      // skip emails with a reversedHostname or invalid emails
+      if (userEmail.reversedHostname || userEmail.email.indexOf('@') === -1) {
+        return innerCallback()
+      }
+      const reversedHostname =
+        userEmail.email.split('@')[1].split('').reverse().join('')
+      const query = {_id: user._id, 'emails.email': userEmail.email}
+      const update = {$set: {'emails.$.reversedHostname': reversedHostname}}
 
-    UserUpdater.updateUser(query, update, function (error, res) {
-      console.log(
-        'ADDING HOSTNAME FOR', user._id, userEmail.email, reversedHostname
-      )
-      if (error) return innerCallback(error)
-      innerCallback()
+      UserUpdater.updateUser(query, update, function (error, res) {
+        console.log(
+          'ADDING HOSTNAME FOR', user._id, userEmail.email, reversedHostname
+        )
+        if (error) return innerCallback(error)
+        innerCallback()
+      })
+    }, function (error) {
+      if (error) throw error
+      callback()
     })
-  }, function (error) {
-    if (error) throw error
+  } else {
+    console.log(
+      'EMAILS LIST MISSING FOR', user._id
+    )
     callback()
-  })
+  }
 }
 
 db.users.find({
-  'emails.reversedHostname': {$exists: false}
+  'emails': {$elemMatch: {'reversedHostname': {$exists: false}} }
 }, {
   emails: 1
 }, function (error, users) {

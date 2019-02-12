@@ -11,7 +11,7 @@ module.exports =
 		webRouter.get  '/dropbox/beginAuth', AuthenticationController.requireLogin(), DropboxUserController.redirectUserToDropboxAuth
 		webRouter.get  '/dropbox/completeRegistration', AuthenticationController.requireLogin(), DropboxUserController.completeDropboxRegistrationPage
 		webRouter.post  '/dropbox/completeRegistration', AuthenticationController.requireLogin(), DropboxUserController.completeDropboxRegistration
-		webRouter.get  '/dropbox/unlink', AuthenticationController.requireLogin(), DropboxUserController.unlinkDropbox
+		webRouter.post  '/dropbox/unlink', AuthenticationController.requireLogin(), DropboxUserController.unlinkDropbox
 		
 		webRouter.get '/dropbox/status', AuthenticationController.requireLogin(), DropboxProjectController.getStatus
 
