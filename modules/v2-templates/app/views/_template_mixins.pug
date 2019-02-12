@@ -24,6 +24,7 @@ mixin templates_list(templates)
 					img.thumbnail(src=template.image_url alt=template.title)
 					.caption__title #{template.title}
 				div.caption
+					//- description and author sanitized by api
 					div.caption__description=template.description_plain
-					//- sanitized by api
-					div!= template.author
+					if template.author_plain
+						div!= template.author_plain

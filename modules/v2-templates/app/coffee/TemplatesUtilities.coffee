@@ -11,5 +11,7 @@ module.exports = TemplatesUtilities =
 
 		# plain text description for list pages
 		template.description_plain = sanitizeHtml(template.description, sanitizeOptionsNoTags)
+		if template.author
+			template.author_plain = sanitizeHtml(template.author, sanitizeOptionsNoTags)
 
 		template
