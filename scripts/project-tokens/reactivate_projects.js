@@ -11,7 +11,7 @@ Async.eachLimit(
   (projectId, cb) => {
     ProjectDetailsHandler.setPublicAccessLevel(projectId, 'tokenBased', err => {
       if (err) {
-        throw err
+        return cb(err)
       }
       console.log(
         `>> Set public-access-level to tokenBased for project ${projectId}`
