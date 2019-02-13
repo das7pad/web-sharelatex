@@ -9,6 +9,11 @@ describe 'GithubSyncController', ->
 		@user_id = "user-id-123"
 		@AuthenticationController =
 			getLoggedInUserId: sinon.stub().returns(@user_id)
+		@user =
+			features:
+				github: true
+		@UserGetter =
+			getUser: sinon.stub().callsArgWith(1, null, @user)
 		@GithubSyncController = SandboxedModule.require modulePath, requires:
 			'request': @request = sinon.stub()
 			'settings-sharelatex': @settings = {}
@@ -16,8 +21,9 @@ describe 'GithubSyncController', ->
 			"./GithubSyncApiHandler": @GithubSyncApiHandler = {}
 			"./GithubSyncExportHandler": @GithubSyncExportHandler = {}
 			"./GithubSyncImportHandler": @GithubSyncImportHandler = {}
+			'../../../../app/js/Features/User/UserGetter': @UserGetter
 			"../../../../app/js/Features/Authentication/AuthenticationController": @AuthenticationController
-			"../../../../app/js/Features/User/UserGetter": @UserGetter = {getUser: sinon.stub()}
+			"../../../../app/js/Features/User/UserGetter": @UserGetter
 
 		@settings.apis =
 			githubSync:
@@ -41,17 +47,28 @@ describe 'GithubSyncController', ->
 			@loginUrl = "https://github.example.com/login/oauth/authorize?client_id=foo"
 			@authUrl = "#{@settings.siteUrl}/github-sync/completeRegistration"
 			@GithubSyncApiHandler.getLoginUrl = sinon.stub().callsArgWith(1, null, @loginUrl)
+
+		it "should call fetch the OAuth login URL from the github Sync API", (done) ->
+			@res.redirect = =>
+				sinon.assert.calledWith(@GithubSyncApiHandler.getLoginUrl, @user_id)
+				done()
+
 			@GithubSyncController.login @req, @res
 
-		it "should call fetch the OAuth login URL from the github Sync API", ->
-			@GithubSyncApiHandler.getLoginUrl
-				.calledWith(@user_id)
-				.should.equal true
+		it "should redirect to the Github OAuth URL", (done) ->
+			@res.redirect = (url) =>
+				url.should.equal @loginUrl + "&redirect_uri=#{@authUrl}"
+				done()
 
-		it "should redirect to the Github OAuth URL", ->
-			@res.redirect
-				.calledWith(@loginUrl + "&redirect_uri=#{@authUrl}")
-				.should.equal true
+			@GithubSyncController.login @req, @res
+
+		it "should return 403 when the user does not have the Github feature", (done) ->
+			@res.sendStatus = (status) =>
+				status.should.equal 403
+				done()
+
+			@user.features.github = false
+			@GithubSyncController.login @req, @res
 
 	describe "auth", ->
 		beforeEach ->
