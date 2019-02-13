@@ -17,7 +17,7 @@ block content
 			main(ng-cloak, id="university-content-container" class=print ? 'print' : '')
 				div.banner-image.hidden-print(style=`background-image:url(${backgroundImage})`)
 				if portal.logo_url
-					div.institution-logo
+					div.institution-logo.hidden-print
 						div
 							span.image-fill
 							img(src=portal.logo_url alt=portal.title)
