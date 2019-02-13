@@ -4,18 +4,18 @@ minimist = require('minimist')
 async = require('async')
 EmailHandler = require('../../../../app/js/Features/Email/EmailHandler')
 Institution = require('../../../../app/js/models/Institution')
-User = require('../../../../app/js/models/User')
+UserGetter = require '../../../../app/js/Features/User/UserGetter'
 InstitutionHubsController = require('./InstitutionHubsController')
 logger = require 'logger-sharelatex'
+moment = require('moment')
 require('./MetricsEmailBuilder')
 
 module.exports = MetricsEmailController =
 
 	sendAll: (req, res, next) ->
 		# find all the institutions with managers
-		Institution.Institution.find { managerIds: $exists: true }, (error, institutions) ->
-			if error
-				throw error
+		Institution.Institution.find { managerIds: $exists: true, $ne: [] }, (error, institutions) ->
+			return next(error) if error
 			logger.log 'SENDING INSTITUTION METRICS EMAILS FOR', institutions.length, 'INSTITUTIONS'
 			async.map institutions, MetricsEmailController.send, (error) ->
 				return next(error) if error
@@ -23,11 +23,9 @@ module.exports = MetricsEmailController =
 				res.send(200)
 
 	send: (institution,  callback) ->
-		# Day 0 of this month gives last day of previous month
-		date = new Date
-		endDate = new Date(date.getFullYear(), date.getMonth(), 0)
-		date.setMonth date.getMonth() - 1
-		startDate = new Date(date.getFullYear(), date.getMonth(), 1)
+		lastMonth = moment().subtract(1, 'month')
+		startDate = moment(lastMonth).startOf('month')
+		endDate = moment(lastMonth).endOf('month')
 
 		institution.fetchV1Data (error, entity) ->
 			if error
@@ -37,7 +35,7 @@ module.exports = MetricsEmailController =
 				if error
 					return callback(error)
 				async.mapSeries institution.managerIds, ((userId, innerCallback) ->
-					User.User.findOne userId, (error, user) ->
+					UserGetter.getUser userId, {email: 1, first_name: 1}, (error, user) ->
 						if error
 							return innerCallback(error)
 						opts = 
@@ -46,30 +44,25 @@ module.exports = MetricsEmailController =
 							institutionName: entity.name
 							hubUrl: "#{settings.siteUrl}/institutions/#{institution.v1Id}/hub"
 							metricsUrl: "#{settings.siteUrl}/metrics/institutions/" +
-								"#{institution.v1Id}/#{MetricsEmailController._metricsPathDate(startDate)}" +
-								"/#{MetricsEmailController._metricsPathDate(endDate)}"
+								"#{institution.v1Id}/#{startDate.format('YYYY-M-D')}" +
+								"/#{endDate.format('YYYY-M-D')}"
 							metrics: metrics
-						EmailHandler.sendEmail 'institutionMetricsEmail', opts, ->
-							return innerCallback()					
+							month: startDate.format('MMMM')
+						EmailHandler.sendEmail 'institutionMetricsEmail', opts, (err) ->
+							return innerCallback(err)
 				), (error) ->
 					if error
 						return callback(error)
-					return callback()					
-
-	_metricsPathDate: (date) ->
-		# Metrics dashboard uses ISO date format without minutes/seconds
-		# js indexes months from 0, so add one
-		date.getFullYear() + '-' + date.getMonth() + 1 + '-' + date.getDate()
+					callback()
 
 	_fetchMetrics: (institution, startDate, endDate, callback) ->
 		metrics = {}
 		# fetch signups
-		query = "?start_date=#{startDate.getTime() / 1000}" +
-			"&end_date=#{endDate.getTime() / 1000}"
+		query = "?start_date=#{startDate.valueOf() / 1000}" +
+			"&end_date=#{endDate.valueOf() / 1000}"
 		endpoint = "usage_signup_data#{query}"
 		InstitutionHubsController._v1InstitutionsApi institution.v1Id, endpoint, (err, response, body) ->
-			if err
-				callback err
+			callback err if err
 			metrics.newUsers = body.count
 			MetricsEmailController._recentMetrics institution.v1Id, startDate, endDate, (error, usage) ->
 				metrics.usage = usage
@@ -83,8 +76,8 @@ module.exports = MetricsEmailController =
 		]
 		usage = {}
 		async.mapSeries keys, ((key, innerCallback) ->
-			query = "?start_date=#{startDate.getTime() /1000}" +
-				"&end_date=#{endDate.getTime() / 1000}" +
+			query = "?start_date=#{startDate.valueOf() /1000}" +
+				"&end_date=#{endDate.valueOf() / 1000}" +
 				"&resource_type=institution&resource_id=#{v1Id}&lag=monthly"
 			endpoint = "/graphs/#{key}#{query}"
 			request {
@@ -100,5 +93,4 @@ module.exports = MetricsEmailController =
 					usage[key] = 0
 				innerCallback()
 		), (error) ->
-			return callback error, null if error
-			callback null, usage
+			callback error, usage

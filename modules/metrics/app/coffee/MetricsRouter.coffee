@@ -113,7 +113,7 @@ module.exports =
 			MetricsController.projectMetricsSegmentation
 		)
 
-		privateApiRouter.get(
+		privateApiRouter.post(
 			'/metrics/institutional_emails',
 			AuthenticationController.httpAuth,
 			MetricsEmailController.sendAll
