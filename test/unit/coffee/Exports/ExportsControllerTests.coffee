@@ -34,7 +34,7 @@ describe 'ExportsController', ->
 			i18n:
 				translate:->
 		@res =
-			send: sinon.stub()
+			json: sinon.stub()
 			status: sinon.stub()
 		@res.status.returns(@res)
 		@next = sinon.stub()
@@ -56,7 +56,7 @@ describe 'ExportsController', ->
 				brand_variation_id: brand_variation_id
 				first_name: firstName
 				last_name: lastName
-			@controller.exportProject @req, send:(body) =>
+			@controller.exportProject @req, json:(body) =>
 				expect(@handler.exportProject.args[0][0]).to.deep.equal expected
 				expect(body).to.deep.equal {export_v1_id: 897}
 				done()
@@ -82,7 +82,7 @@ describe 'ExportsController', ->
 				author: author
 				license: license
 				show_source: show_source
-			@controller.exportProject @req, send:(body) =>
+			@controller.exportProject @req, json:(body) =>
 				expect(@handler.exportProject.args[0][0]).to.deep.equal expected
 				expect(body).to.deep.equal {export_v1_id: 897}
 				done()
@@ -92,7 +92,7 @@ describe 'ExportsController', ->
 			@error_json = { status: 422, message: 'nope' }
 			@handler.exportProject = sinon.stub().yields({forwardResponse: @error_json})
 			@controller.exportProject @req, @res, @next
-			expect(@res.send.args[0][0]).to.deep.equal @error_json
+			expect(@res.json.args[0][0]).to.deep.equal @error_json
 			expect(@res.status.args[0][0]).to.equal @error_json.status
 			done()
 
@@ -112,7 +112,7 @@ describe 'ExportsController', ->
 			}")
 
 		@req.params = {project_id: project_id, export_id: 897}
-		@controller.exportStatus @req, send:(body) =>
+		@controller.exportStatus @req, json:(body) =>
 			expect(body).to.deep.equal {export_json: {
 				status_summary: 'completed',
 				status_detail: "all done",
