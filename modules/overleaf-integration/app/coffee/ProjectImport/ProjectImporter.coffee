@@ -143,6 +143,10 @@ module.exports = ProjectImporter =
 		# clean up project name
 		doc.title = ProjectDetailsHandler.fixProjectName(doc.title)
 
+		tokenPrefix = TokenAccessHandler._extractNumericPrefix(doc.token)?[1]
+		if !tokenPrefix
+			err = new Error("No numeric prefix on readAndWrite token: #{doc.token}")
+			return callback(err)
 		attributes =
 			overleaf:
 				id: doc.id
@@ -153,6 +157,7 @@ module.exports = ProjectImporter =
 			tokens:
 				readOnly: doc.read_token
 				readAndWrite: doc.token
+				readAndWritePrefix: tokenPrefix
 
 		if doc.template_id?
 			attributes.fromV1TemplateId = doc.template_id

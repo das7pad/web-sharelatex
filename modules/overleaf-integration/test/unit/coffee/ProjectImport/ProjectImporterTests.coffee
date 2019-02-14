@@ -184,7 +184,7 @@ describe "ProjectImporter", ->
 				latex_engine: "latex_dvipdf"
 				id: 42
 				latest_ver_id: 1234
-				token: "token"
+				token: "123token"
 				read_token: "read_token"
 				general_access: "read_write"
 				template_id: '10'
@@ -193,6 +193,7 @@ describe "ProjectImporter", ->
 			@ProjectDetailsHandler.fixProjectName = sinon.stub().returns('fixed-project-name')
 			@ProjectDetailsHandler.generateUniqueName = (user_id, name, suffixes, callback) -> callback(null, name)
 			@ProjectCreationHandler.createBlankProject = sinon.stub().yields(null, @project)
+			@TokenAccessHandler._extractNumericPrefix = sinon.stub().returns([null, '123'])
 
 		describe "successfully", ->
 			beforeEach ->
@@ -209,6 +210,7 @@ describe "ProjectImporter", ->
 					tokens:
 						readOnly: @doc.read_token
 						readAndWrite: @doc.token
+						readAndWritePrefix: '123'
 					fromV1TemplateId: @doc.template_id
 					fromV1TemplateVersionId: @doc.template_ver_id
 					publicAccesLevel: 'tokenBased'
