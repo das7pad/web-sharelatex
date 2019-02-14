@@ -4,31 +4,35 @@ extends ../layout
 
 block content_cms
 	- var popular_tags = [ {fields: {tag: 'publishers'}}, {fields: {tag: 'events'}}, {fields: {tag: 'latex'}}, {fields: {tag: 'tech'}}, {fields: {tag: 'press'}}, {fields: {tag: 'features'}}, {fields: {tag: 'guides'}}, {fields: {tag: 'institutions'}}, {fields: {tag: 'case studies'}}, {fields: {tag: 'advisors'}}]
-	.row
-		.col-sm-8.col-sm-offset-2.col-xs-12
-			.page-header
-				h1
-					a(href="/blog") Blog
+	.content-container.container-small
+		section
+			.row.section-row
+				.col-xs-12
+					.page-header
+						h1
+							a(href="/blog") Blog
+						
+		section
+			.row.section-row.blog(ng-cloak ng-controller="BlogController")
+				.col-xs-12
+					ul.blog-list
+						li.card
+							.card-header
+								h2 !{title}
+							if (authorDisplay || publishDatePretty)
+								small Posted
+									if (authorDisplay)
+										|  by #{authorDisplay}
+									if (publishDatePretty)
+										|  on #{publishDatePretty}
 
-			.blog(ng-cloak ng-controller="BlogController")
-				ul.blog-list
-					li.card
-						.card-header
-							h2 !{title}
-						if (authorDisplay || publishDatePretty)
-							small Posted
-								if (authorDisplay)
-									|  by #{authorDisplay}
-								if (publishDatePretty)
-									|  on #{publishDatePretty}
+							mathjax(delimiter="no-single-dollar") !{content}
 
-						mathjax(delimiter="no-single-dollar") !{content}
+							if tag
+								.row
+									.col-sm-12
+										+blog_tags(tag)
 
-						if tag
-							.row
-								.col-sm-12
-									+blog_tags(tag)
-
-						+blog_tags(popular_tags, 'Popular Tags')
+							+blog_tags(popular_tags, 'Popular Tags')
 
 	script(src=mathJaxPath) 
