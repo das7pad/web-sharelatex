@@ -10,11 +10,12 @@
     "public": "./public"
   },
   "scripts": {
-    "test:acceptance:run_dir": "mocha --recursive --reporter spec --timeout 15000 --exit $@",
-    "test:unit": "npm -q run compile && bin/unit_test $@",
-    "test:unit:app": "npm -q run compile && bin/unit_test_app $@",
+    "test:acceptance:run_dir": "mocha --recursive --reporter spec --timeout 15000 --exit --grep=$MOCHA_GREP $@",
+    "test:unit": "npm -q run compile:app && bin/unit_test --grep=$MOCHA_GREP $@",
+    "test:unit:app": "npm -q run compile:app && bin/unit_test_app $@",
     "test:frontend": "karma start",
     "compile": "make compile",
+    "compile:app": "make compile_app",
     "start": "npm -q run compile && node $NODE_APP_OPTIONS app.js",
     "nodemon": "nodemon --config nodemon.json",
     "nodemon:frontend": "nodemon --config nodemon.frontend.json",

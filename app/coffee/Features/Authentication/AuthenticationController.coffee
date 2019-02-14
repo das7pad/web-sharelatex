@@ -15,8 +15,6 @@ NotificationsBuilder = require("../Notifications/NotificationsBuilder")
 SudoModeHandler = require '../SudoMode/SudoModeHandler'
 V1Api = require "../V1/V1Api"
 {User} = require "../../models/User"
-console.log("URLLLLLLL")
-console.log(require('url'))
 { URL } = require('url')
 
 module.exports = AuthenticationController =

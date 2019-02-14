@@ -126,7 +126,9 @@ minify_css: $(CSS_FILES)
 minify_es:
 	npm -q run webpack:production
 
-compile: $(JS_FILES) $(OUTPUT_SRC_FILES) css public/js/main.js public/js/ide.js
+compile: compile_app $(OUTPUT_SRC_FILES) css public/js/main.js public/js/ide.js
+
+compile_app: $(JS_FILES)
 	@$(MAKE) compile_modules
 
 compile_full:
