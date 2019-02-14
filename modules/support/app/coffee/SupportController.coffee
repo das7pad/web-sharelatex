@@ -14,15 +14,19 @@ inboxes = {
 	"sales":
 		id:"inb_bmf"
 		email:"sales@overleaf.com"
+	"portals":
+		id:"inb_1tu7"
+		email:"sales@overleaf.com"
 	}
 module.exports  =
 
 	newSupportRequest: (req, res, next)->
-		{message, subject, email, about, inbox} = req.body
+		{message, subject, email, about, inbox, tags = ''} = req.body
 		inboxId = inboxes[inbox].id
 		inboxEmail = inboxes[inbox].email
 		if !inboxId?
 			return res.sendStatus 500
+
 		opts =
 			url: "https://api2.frontapp.com/inboxes/#{inboxId}/imported_messages"
 			headers:
@@ -39,6 +43,9 @@ module.exports  =
 				metadata:
 					is_inbound:true
 					is_archived:false
+					should_skip_rules: false
+				tags: [tags]
+
 
 		request opts, (err, response, body)->
 			if err? or response.statusCode!= 202

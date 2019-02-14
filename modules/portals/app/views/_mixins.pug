@@ -22,6 +22,102 @@ mixin community_count(count, title)
 		| &nbsp;over #{count}
 	| &nbsp;authors at #{title}
 
+mixin portal_form()
+	div(ng-cloak ng-controller="PortalFormController" ng-init="portalSlug='" + portal.slug + "'; portalTitle='" + portal.title + "'; portalType='" + portalType + "'; siteUrl='" + settings.siteUrl + "'")
+		form(name="portalForm" role="form" aria-label="Show Your Support" ng-hide="sent")
+				label.desc
+					| #{translate("first_name")}
+				.form-group
+					input.field.text.medium.span8.form-control(
+						aria-label=translate("first_name")
+						maxlength='255',
+						name="name",
+						ng-model="form.firstName",
+						ng-init="form.firstName = '"+user.first_name+"'",
+						spellcheck='false',
+						type='text', 
+						required,
+						value='')
+
+				label.desc
+					| #{translate("last_name")}
+				.form-group
+					input.field.text.medium.span8.form-control(
+						aria-label=translate("last_name")
+						maxlength='255',
+						name="name",
+						ng-model="form.lastName",
+						ng-init="form.lastName = '"+user.last_name+"'",
+						spellcheck='false',
+						type='text',
+						required,
+						value='')
+
+				label.desc
+					| #{translate("email")}
+				.form-group
+					input.field.text.medium.span8.form-control(
+						aria-label=translate("email")
+						maxlength='255',
+						name="email",
+						ng-model="form.email",
+						ng-init="form.email = '"+getUserEmail()+"'",
+						spellcheck='false',
+						type='email', 
+						required,
+						value='')
+
+				label.desc
+					| #{translate("role")}
+				.form-group
+					input.field.text.medium.span8.form-control(
+						aria-label=translate("role")
+						maxlength='255',
+						name="role",
+						ng-model="form.role",
+						spellcheck='true',
+						type='text', 
+						value='')
+
+				label.desc
+					| #{translate("department")}
+				.form-group
+					input.field.text.medium.span8.form-control(
+						aria-label=translate("department")
+						name="role",
+						maxlength='255'
+						ng-model="form.department",
+						type='text', spellcheck='true',
+						value='')
+
+				label.desc
+					| #{translate("contact_message_label")}
+				.form-group
+					textarea.field.text.medium.span8.form-control(
+						aria-label=translate("contact_message_label")
+						name="body",
+						ng-model="form.message",
+						required
+						type='text'
+					)
+
+				span(ng-show="sent == false")
+					.alert.alert-danger(aria-live="polite" ng-show="error")
+						span(ng-show="error === true") #{translate('generic_something_went_wrong')}
+						span(ng-show="error !== true") {{error}}
+
+				.form-group.text-center
+					input.btn-success.btn.btn-lg(
+						aria-label="Show Your Support",
+						ng-disabled="supportForm.$invalid || sending",
+						ng-click="submitSupport()",
+						type='submit',
+						value="Show Your Support"
+					)
+
+		span(ng-show="sent")
+			p(style="margin-bottom: 0;") #{translate("request_sent_thank_you")}
+
 mixin portal_templates(templates)
 	if templates
 		each templatesData in templates
