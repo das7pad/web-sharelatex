@@ -9,11 +9,11 @@ services:
     image: node:6.15.1
     volumes:
       - .:/app
+    working_dir: /app
     environment:
       MOCHA_GREP: ${MOCHA_GREP}
-    image: ci/$PROJECT_NAME:$BRANCH_NAME-$BUILD_NUMBER
-    user: node
     command: npm run test:unit
+    user: node
 
   test_acceptance:
     image: node:6.15.1
