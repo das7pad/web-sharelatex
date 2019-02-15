@@ -79,7 +79,7 @@ script(type="text/ng-template", id="githubSyncModalTemplate")
 			div(ng-if="status.project.enabled")
 				div(ng-if="status.project.merge_status == 'success'")
 					p.text-center #{translate("project_synced_with_git_repo_at")} 
-						a(ng-href="https://github.com/{{status.project.repo}}", target="_blank") {{status.project.repo}}
+						a(ng-href="https://github.com/{{status.project.repo}}", target="_blank" rel="noreferrer noopener") {{status.project.repo}}
 					
 					hr
 					
@@ -95,10 +95,12 @@ script(type="text/ng-template", id="githubSyncModalTemplate")
 									a(
 										ng-href="https://github.com/{{status.project.repo}}/commit/{{commit.sha}}"
 										target="_blank"
+										rel="noreferrer noopener"
 									) {{commit.sha.slice(0,6)}}
 								a(
 									ng-href="https://github.com/{{status.project.repo}}/commit/{{commit.sha}}"
 									target="_blank"
+									rel="noreferrer noopener"
 								) {{commit.message}}
 								div.small by {{commit.author.name}} <{{commit.author.email}}>
 						
