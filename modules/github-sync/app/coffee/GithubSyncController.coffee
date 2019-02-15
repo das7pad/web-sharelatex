@@ -14,11 +14,14 @@ UserGetter = require "../../../../app/js/Features/User/UserGetter"
 module.exports = GithubSyncController =
 	login: (req, res, next) ->
 		user_id = AuthenticationController.getLoggedInUserId(req)
-		GithubSyncApiHandler.getLoginUrl user_id, (error, loginUrl) ->
-			return next(error) if error?
-			authUrl = "#{settings.siteUrl}/github-sync/completeRegistration"
-			redirectUrl = "#{loginUrl}&redirect_uri=#{authUrl}"
-			res.redirect redirectUrl
+		UserGetter.getUser user_id, (err, user) ->
+			return next(err) if err?
+			return res.sendStatus(403) unless user.features?.github
+			GithubSyncApiHandler.getLoginUrl user_id, (error, loginUrl) ->
+				return next(error) if error?
+				authUrl = "#{settings.siteUrl}/github-sync/completeRegistration"
+				redirectUrl = "#{loginUrl}&redirect_uri=#{authUrl}"
+				res.redirect redirectUrl
 
 	auth: (req, res, next) ->
 		user_id = AuthenticationController.getLoggedInUserId(req)
