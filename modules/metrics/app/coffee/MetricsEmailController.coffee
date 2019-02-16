@@ -8,9 +8,20 @@ UserGetter = require '../../../../app/js/Features/User/UserGetter'
 InstitutionHubsController = require('./InstitutionHubsController')
 logger = require 'logger-sharelatex'
 moment = require('moment')
+mongoose = require('mongoose');
+_ = require('underscore')
 require('./MetricsEmailBuilder')
 
 module.exports = MetricsEmailController =
+
+	updateSubscription: (req, res, next) ->
+		{ entity, user } = req
+		userId = mongoose.Types.ObjectId(user._id)
+		if _.some(entity.metricsEmail.optedOutUserIds, (id) -> return id.equals(userId))
+			entity.metricsEmail.optedOutUserIds.remove(user._id)
+		else
+			entity.metricsEmail.optedOutUserIds.push(user._id)
+		entity.save(res.sendStatus(200))
 
 	sendAll: (req, res, next) ->
 		# find all the institutions with managers
@@ -27,8 +38,8 @@ module.exports = MetricsEmailController =
 		startDate = moment(lastMonth).startOf('month')
 		endDate = moment(lastMonth).endOf('month')
 
-		if institution.metricsEmailLastSent &&
-			 moment(institution.metricsEmailLastSent).month() == moment().month()
+		if institution.metricsEmail.lastSent &&
+			 moment(institution.metricsEmail.lastSent).month() == moment().month()
 			logger.log 'EMAIL ALREADY SENT FOR INSTITUTION (', institution.v1Id, ') THIS MONTH, SKIPPING'
 			return callback()
 
@@ -40,6 +51,7 @@ module.exports = MetricsEmailController =
 				if error
 					return callback(error)
 				async.mapSeries institution.managerIds, ((userId, innerCallback) ->
+					return innerCallback if userId in institution.metricsEmail.optedOutUserIds
 					UserGetter.getUser userId, {email: 1, first_name: 1}, (error, user) ->
 						if error
 							return innerCallback(error)
@@ -58,7 +70,7 @@ module.exports = MetricsEmailController =
 				), (error) ->
 					if error
 						return callback(error)
-					institution.update({metricsEmailLastSent: moment()}, callback)
+					institution.update({metricsEmail: {lastSent: moment()}}, callback)
 
 	_fetchMetrics: (institution, startDate, endDate, callback) ->
 		metrics = {}

@@ -95,6 +95,12 @@ module.exports =
 			InstitutionHubsController.institutionRoles
 		)
 
+		webRouter.post(
+			'/institutions/:id/emailSubscription',
+			UserMembershipAuthorization.requireInstitutionMetricsAccess,
+			MetricsEmailController.updateSubscription
+		)
+
 		webRouter.get(
 			'/publishers/:id/hub',
 			UserMembershipAuthorization.requirePublisherMetricsAccess,
