@@ -20,12 +20,17 @@ module.exports = MetricsEmailController =
 			async.map institutions, MetricsEmailController.send, (error) ->
 				return next(error) if error
 				logger.log 'DONE SENDING INSTITUTION METRICS'
-				res.send(200)
+				res.sendStatus(200)
 
 	send: (institution,  callback) ->
 		lastMonth = moment().subtract(1, 'month')
 		startDate = moment(lastMonth).startOf('month')
 		endDate = moment(lastMonth).endOf('month')
+
+		if institution.metricsEmailLastSent &&
+			 moment(institution.metricsEmailLastSent).month() == moment().month()
+			logger.log 'EMAIL ALREADY SENT FOR INSTITUTION (', institution.v1Id, ') THIS MONTH, SKIPPING'
+			return callback()
 
 		institution.fetchV1Data (error, entity) ->
 			if error
@@ -53,7 +58,7 @@ module.exports = MetricsEmailController =
 				), (error) ->
 					if error
 						return callback(error)
-					callback()
+					institution.update({metricsEmailLastSent: moment()}, callback)
 
 	_fetchMetrics: (institution, startDate, endDate, callback) ->
 		metrics = {}
