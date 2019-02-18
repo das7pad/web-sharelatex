@@ -42,6 +42,10 @@ block content_cms
 
 									.row.row-spaced
 										.col-sm-12
+											a.btn.btn-success(href='/blog/' + post.slug) Read More
+
+									.row
+										.col-sm-12
 											+blog_tags(post.tag)
 
 					if pages && pages.total_pages > 1
