@@ -36,8 +36,7 @@ describe 'OpenInOverleafController', ->
 			i18n:
 				translate: sinon.stub().returnsArg(0)
 		@res =
-			setHeader: sinon.stub()
-			send: sinon.stub()
+			json: sinon.stub()
 			redirect: sinon.stub()
 		@project = {_id:@project_id}
 		@ProjectCreationHandler =
@@ -84,30 +83,29 @@ describe 'OpenInOverleafController', ->
 				@req.body.snip = @snip
 
 			it "should process the snippet, create a project and redirect to it", (done)->
-				@res.send = (content)=>
+				@res.json = (content)=>
 					sinon.assert.calledWith(@OpenInOverleafHelper.getDocumentLinesFromSnippet, sinon.match.has("snip", @snip))
 					sinon.assert.calledWith(@ProjectCreationHandler.createProjectFromSnippet, @user._id, "new_snippet_project", @documentLines)
-					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
-					content.should.equal JSON.stringify({redirect: '/project/' + @project_id, projectId: @project_id})
+					assert.deepEqual(content, {redirect: '/project/' + @project_id, projectId: @project_id})
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
 			it "should update the project with the requested engine, if supplied", (done)->
 				@req.body.engine = 'latex_dvipdf'
-				@res.send = =>
+				@res.json = =>
 					sinon.assert.calledWith(@OpenInOverleafHelper.setCompilerForProject, sinon.match.any, 'latex_dvipdf')
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
 			it "should update the project with the requested brand variation id, if supplied", (done)->
 				@req.body.brand_variation_id = 'wombat'
-				@res.send = =>
+				@res.json = =>
 					sinon.assert.calledWith(@OpenInOverleafHelper.setProjectBrandVariationFromId, sinon.match.any, 'wombat')
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
 			it "should use the default title if the document has no title", (done) ->
-				@res.send = =>
+				@res.json = =>
 					sinon.assert.calledWith(@ProjectDetailsHandler.generateUniqueName, @user._id, "new_snippet_project")
 					sinon.assert.called(@ProjectDetailsHandler.fixProjectName)
 					done()
@@ -117,7 +115,7 @@ describe 'OpenInOverleafController', ->
 				@snip = "\\title{wombat}"
 				@req.body.snip = @snip
 				@OpenInOverleafHelper.getDocumentLinesFromSnippet = sinon.stub().returns((@comment + @snip).split("\n"))
-				@res.send = =>
+				@res.json = =>
 					sinon.assert.calledWith(@ProjectDetailsHandler.generateUniqueName, @user._id, "wombat")
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
@@ -125,7 +123,7 @@ describe 'OpenInOverleafController', ->
 			it "should create a project with the snip name, if supplied", (done) ->
 				@req.body.snip_name = 'potato'
 				@OpenInOverleafHelper.getDocumentLinesFromSnippet = sinon.stub().returns((@comment + @snip).split("\n"))
-				@res.send = =>
+				@res.json = =>
 					sinon.assert.calledWith(@ProjectDetailsHandler.generateUniqueName, @user._id, "potato")
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
@@ -144,9 +142,8 @@ describe 'OpenInOverleafController', ->
 				@req.body.encoded_snip = encodeURIComponent(@snip)
 
 			it "should create a project and send a redirect to it", (done)->
-				@res.send = (content)=>
-					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
-					content.should.equal JSON.stringify({redirect: '/project/' + @project_id, projectId: @project_id})
+				@res.json = (content)=>
+					assert.deepEqual(content, {redirect: '/project/' + @project_id, projectId: @project_id})
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
@@ -155,9 +152,8 @@ describe 'OpenInOverleafController', ->
 				@req.body.snip_uri = @snip_uri
 
 			it "should create a project and redirect to it", (done)->
-				@res.send = (content)=>
-					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
-					content.should.equal JSON.stringify({redirect: '/project/' + @project_id, projectId: @project_id})
+				@res.json = (content)=>
+					assert.deepEqual(content, {redirect: '/project/' + @project_id, projectId: @project_id})
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
@@ -166,9 +162,8 @@ describe 'OpenInOverleafController', ->
 				@req.body.zip_uri = @snip_uri
 
 			it "should create a project and redirect to it", (done)->
-				@res.send = (content)=>
-					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
-					content.should.equal JSON.stringify({redirect: '/project/' + @project_id, projectId: @project_id})
+				@res.json = (content)=>
+					assert.deepEqual(content, {redirect: '/project/' + @project_id, projectId: @project_id})
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
@@ -177,14 +172,13 @@ describe 'OpenInOverleafController', ->
 				@req.body.snip_uri = [@snip_uri, 'http://foo.net/foo.tex']
 
 			it "should create a project and redirect to it", (done)->
-				@res.send = (content)=>
-					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
-					content.should.equal JSON.stringify({redirect: '/project/' + @project_id, projectId: @project_id})
+				@res.json = (content)=>
+					assert.deepEqual(content, {redirect: '/project/' + @project_id, projectId: @project_id})
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
 			it "should cate a blank project and populate it with a list of files", (done)->
-				@res.send = =>
+				@res.json = =>
 					sinon.assert.called(@ProjectDetailsHandler.generateUniqueName)
 					sinon.assert.called(@ProjectDetailsHandler.fixProjectName)
 					sinon.assert.called(@ProjectCreationHandler.createBlankProject)
@@ -201,10 +195,9 @@ describe 'OpenInOverleafController', ->
 				})
 
 			it "should create a project from the zip file and redirect to it", (done)->
-				@res.send = (content)=>
+				@res.json = (content)=>
 					sinon.assert.calledWith(@ProjectUploadManager.createProjectFromZipArchive, @user._id, "foo", "/foo/bar.zip")
-					sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
-					content.should.equal JSON.stringify({redirect: '/project/' + @project_id, projectId: @project_id})
+					assert.deepEqual(content, {redirect: '/project/' + @project_id, projectId: @project_id})
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
@@ -214,9 +207,9 @@ describe 'OpenInOverleafController', ->
 					defaultTitle: "new_snippet_project"
 					snip_name: 'potato'
 				})
-				@res.send = (content)=>
+				@res.json = (content)=>
 					sinon.assert.calledWith(@ProjectUploadManager.createProjectFromZipArchive, @user._id, "potato", "/foo/bar.zip")
-					content.should.equal JSON.stringify({redirect: '/project/' + @project_id, projectId: @project_id})
+					assert.deepEqual(content, {redirect: '/project/' + @project_id, projectId: @project_id})
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
@@ -230,7 +223,7 @@ describe 'OpenInOverleafController', ->
 				})
 
 			it "should set the brand variation on the project", (done)->
-				@res.send = (content)=>
+				@res.json = (content)=>
 					sinon.assert.calledWith(@OpenInOverleafHelper.setProjectBrandVariationFromSlug, sinon.match.any, "OSF")
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
@@ -247,22 +240,21 @@ describe 'OpenInOverleafController', ->
 					})
 
 				it "should populate the snippet from the conversion job", (done)->
-					@res.send = (content)=>
+					@res.json = (content)=>
 						sinon.assert.calledWith(@OpenInOverleafHelper.populateSnippetFromConversionJob, "ieee_latexqc", "wombat1")
 						done()
 					@OpenInOverleafController.openInOverleaf @req, @res
 
 				it "should set the brand variation on the project", (done)->
-					@res.send = (content)=>
+					@res.json = (content)=>
 						sinon.assert.calledWith(@OpenInOverleafHelper.setProjectBrandVariationFromId, sinon.match.any, "1234")
 						done()
 					@OpenInOverleafController.openInOverleaf @req, @res
 
 				it "should create a project from the zip file and redirect to it", (done)->
-					@res.send = (content)=>
+					@res.json = (content)=>
 						sinon.assert.calledWith(@ProjectUploadManager.createProjectFromZipArchive, @user._id, "new_snippet_project", "/foo/bar.zip")
-						sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
-						content.should.equal JSON.stringify({redirect: '/project/' + @project_id, projectId: @project_id})
+						assert.deepEqual(content, {redirect: '/project/' + @project_id, projectId: @project_id})
 						done()
 					@OpenInOverleafController.openInOverleaf @req, @res
 
@@ -276,15 +268,14 @@ describe 'OpenInOverleafController', ->
 					})
 
 				it "should create a project from the zip file and redirect to it", (done)->
-					@res.send = (content)=>
+					@res.json = (content)=>
 						sinon.assert.calledWith(@ProjectUploadManager.createProjectFromZipArchive, @user._id, "new_snippet_project", "/foo/bar.zip")
-						sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
-						content.should.equal JSON.stringify({redirect: '/project/' + @project_id, projectId: @project_id})
+						assert.deepEqual(content, {redirect: '/project/' + @project_id, projectId: @project_id})
 						done()
 					@OpenInOverleafController.openInOverleaf @req, @res
 
 				it "should not the brand variation on the project", (done)->
-					@res.send = (content)=>
+					@res.json = (content)=>
 						sinon.assert.notCalled(@OpenInOverleafHelper.setProjectBrandVariationFromId)
 						done()
 					@OpenInOverleafController.openInOverleaf @req, @res
@@ -299,19 +290,19 @@ describe 'OpenInOverleafController', ->
 
 			it "should not raise an error", (done) ->
 				next = sinon.stub()
-				@res.send = =>
+				@res.json = =>
 					sinon.assert.notCalled(next)
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res, next
 
 			it "should populate the snippet from the template", (done) ->
-				@res.send = =>
+				@res.json = =>
 					sinon.assert.calledWith(@OpenInOverleafHelper.populateSnippetFromTemplate, 'wombat')
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
 
 			it "should create a project from the associated zip", (done) ->
-				@res.send = =>
+				@res.json = =>
 					sinon.assert.called(@ProjectUploadManager.createProjectFromZipArchive)
 					done()
 				@OpenInOverleafController.openInOverleaf @req, @res
@@ -325,7 +316,7 @@ describe 'OpenInOverleafController', ->
 					})
 
 				it "should set the brand variation id on the project", (done) ->
-					@res.send = =>
+					@res.json = =>
 						sinon.assert.calledWith(@OpenInOverleafHelper.setProjectBrandVariationFromId, sinon.match.any, 1234)
 						done()
 					@OpenInOverleafController.openInOverleaf @req, @res
@@ -401,8 +392,7 @@ describe 'OpenInOverleafController', ->
 			project =
 				_id: @project_id
 			@OpenInOverleafController._sendResponse(@req, @res, project)
-			sinon.assert.calledWith(@res.setHeader, 'Content-Type', 'application/json')
-			sinon.assert.calledWith(@res.send, JSON.stringify({redirect: "/project/#{@project_id}", projectId: @project_id}))
+			sinon.assert.calledWith(@res.json, {redirect: "/project/#{@project_id}", projectId: @project_id})
 			sinon.assert.notCalled(@res.redirect)
 
 		it "should send a redirect for standard requests", ->
@@ -410,6 +400,5 @@ describe 'OpenInOverleafController', ->
 				_id: @project_id
 			delete @req.headers.accept
 			@OpenInOverleafController._sendResponse(@req, @res, project)
-			sinon.assert.notCalled(@res.setHeader)
-			sinon.assert.notCalled(@res.send)
+			sinon.assert.notCalled(@res.json)
 			sinon.assert.calledWith(@res.redirect, "/project/#{@project_id}")
