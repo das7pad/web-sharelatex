@@ -64,6 +64,7 @@ _getPortal = (req, res, next, portalType) ->
 				if data.portal?
 					redirected = _portalRedirect req, res, data, portalType
 					if !redirected
+						data.portalType = portalType
 						# check if user is affiliated with portal
 						_getUser req, next, (err, userId, userEmails) ->
 							if userEmails
