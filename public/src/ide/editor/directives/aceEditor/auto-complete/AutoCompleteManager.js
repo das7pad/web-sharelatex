@@ -375,19 +375,19 @@ define([
                       // example: '\cite{}' -> '\cite'
                       if (matchData.snippet != null) {
                         matchData.snippet = matchData.snippet.replace(
-                          /[{\[].*[}\]]/,
+                          /[{[].*[}\]]/,
                           ''
                         )
                       }
                       if (matchData.caption != null) {
                         matchData.caption = matchData.caption.replace(
-                          /[{\[].*[}\]]/,
+                          /[{[].*[}\]]/,
                           ''
                         )
                       }
                       if (matchData.value != null) {
                         matchData.value = matchData.value.replace(
-                          /[{\[].*[}\]]/,
+                          /[{[].*[}\]]/,
                           ''
                         )
                       }
