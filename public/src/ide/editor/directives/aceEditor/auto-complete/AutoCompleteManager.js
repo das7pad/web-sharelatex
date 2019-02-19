@@ -1,5 +1,4 @@
 /* eslint-disable
-    max-len,
     no-cond-assign,
     no-return-assign,
     no-undef,
@@ -263,7 +262,8 @@ define([
       }
       // Check that this change was made by us, not a collaborator
       // (Cursor is still one place behind)
-      // NOTE: this is also the case when a user backspaces over a highlighted region
+      // NOTE: this is also the case when a user backspaces over a highlighted
+      // region
       if (
         change.action === 'insert' &&
         end.row === cursorPosition.row &&
@@ -280,6 +280,7 @@ define([
       }
       if (
         change.action === 'insert' &&
+        // eslint-disable-next-line max-len
         /(begin|end|[a-zA-Z]*ref|usepackage|[a-z]*cite[a-z]*|input|include)/.test(
           __guard__(change.lines[0].match(/\\(\w+){}/), x => x[1])
         )
@@ -311,11 +312,13 @@ define([
           }
 
           // Provide our own `insertMatch` implementation.
-          // See the `insertMatch` method of Autocomplete in `ext-language_tools.js`.
-          // We need this to account for editing existing commands, particularly when
-          // adding a prefix.
-          // We fix this by detecting when the cursor is in the middle of an existing
-          // command, and adjusting the insertions/deletions accordingly.
+          // See the `insertMatch` method of Autocomplete in
+          // `ext-language_tools.js`.
+          // We need this to account for editing existing commands, particularly
+          // when adding a prefix.
+          // We fix this by detecting when the cursor is in the middle of an
+          // existing command, and adjusting the insertions/deletions
+          // accordingly.
           // Example:
           //   when changing `\ref{}` to `\href{}`, ace default behaviour
           //   is likely to end up with `\href{}ref{}`
@@ -374,7 +377,8 @@ define([
                       rightRange.end.column +=
                         commandTail.length - completions.filterText.length
                       editor.session.remove(rightRange)
-                      // trim the completion text to just the command, without braces or brackets
+                      // trim the completion text to just the command, without
+                      // braces or brackets
                       // example: '\cite{}' -> '\cite'
                       if (matchData.snippet != null) {
                         matchData.snippet = matchData.snippet.replace(
