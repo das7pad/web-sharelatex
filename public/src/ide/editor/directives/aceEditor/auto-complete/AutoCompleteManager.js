@@ -1,15 +1,4 @@
 /* global _ */
-// TODO: This file was created by bulk-decaffeinate.
-// Fix any style issues and re-enable lint.
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS103: Rewrite code to no longer use __guard__
- * DS202: Simplify dynamic range loops
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 define([
   'ide/editor/directives/aceEditor/auto-complete/CommandManager',
   'ide/editor/directives/aceEditor/auto-complete/EnvironmentManager',
@@ -42,19 +31,19 @@ define([
 
       this.$scope.$watch('autoComplete', autocomplete => {
         if (autocomplete) {
-          return this.enable()
+          this.enable()
         } else {
-          return this.disable()
+          this.disable()
         }
       })
 
       const onChange = change => {
-        return this.onChange(change)
+        this.onChange(change)
       }
 
       this.editor.on('changeSession', e => {
         e.oldSession.off('change', onChange)
-        return e.session.on('change', onChange)
+        e.session.on('change', onChange)
       })
     }
 
@@ -82,12 +71,12 @@ define([
             )
             if (match) {
               // eslint-disable-next-line no-unused-vars
-              let [_ignore1, commandName] = Array.from(match)
+              let [_ignore1, commandName] = match
               const graphicsPaths = Preamble.getGraphicsPaths()
               const result = []
-              for (let graphic of Array.from(Graphics.getGraphicsFiles())) {
+              for (let graphic of Graphics.getGraphicsFiles()) {
                 let { path } = graphic
-                for (let graphicsPath of Array.from(graphicsPaths)) {
+                for (let graphicsPath of graphicsPaths) {
                   if (path.indexOf(graphicsPath) === 0) {
                     path = path.slice(graphicsPath.length)
                     break
@@ -100,7 +89,7 @@ define([
                   score: 50
                 })
               }
-              return callback(null, result)
+              callback(null, result)
             }
           }
         }
@@ -114,9 +103,9 @@ define([
             const match = commandFragment.match(/^\\(input|include){(\w*)/)
             if (match) {
               // eslint-disable-next-line no-unused-vars
-              const [_ignore, commandName] = Array.from(match)
+              const [_ignore, commandName] = match
               const result = []
-              for (let file of Array.from(Files.getTeXFiles())) {
+              for (let file of Files.getTeXFiles()) {
                 if (file.id !== this.$scope.docId) {
                   const { path } = file
                   result.push({
@@ -127,7 +116,7 @@ define([
                   })
                 }
               }
-              return callback(null, result)
+              callback(null, result)
             }
           }
         }
@@ -142,7 +131,7 @@ define([
             )
             if (refMatch) {
               // eslint-disable-next-line no-unused-vars
-              const [_ignore, commandName] = Array.from(refMatch)
+              const [_ignore, commandName] = refMatch
               const result = []
               if (commandName !== 'ref') {
                 // ref is in top 100 commands
@@ -153,7 +142,7 @@ define([
                   score: 60
                 })
               }
-              for (let label of Array.from(metadataManager.getAllLabels())) {
+              for (let label of metadataManager.getAllLabels()) {
                 result.push({
                   caption: `\\${commandName}{${label}}`,
                   value: `\\${commandName}{${label}}`,
@@ -161,7 +150,7 @@ define([
                   score: 50
                 })
               }
-              return callback(null, result)
+              callback(null, result)
             }
           }
         }
@@ -177,7 +166,7 @@ define([
             )
             if (citeMatch) {
               // eslint-disable-next-line no-unused-vars
-              let [_ignore, commandName, previousArgs] = Array.from(citeMatch)
+              let [_ignore, commandName, previousArgs] = citeMatch
               if (previousArgs == null) {
                 previousArgs = ''
               }
@@ -201,9 +190,9 @@ define([
                     })
                   }
                 })
-                return callback(null, result)
+                callback(null, result)
               } else {
-                return callback(null, result)
+                callback(null, result)
               }
             }
           }
@@ -246,11 +235,9 @@ define([
       const lastTwoChars = lineUpToCursor.slice(-2)
       // Don't offer autocomplete on double-backslash, backslash-colon, etc
       if (/^\\[^a-zA-Z]$/.test(lastTwoChars)) {
-        __guardMethod__(
-          this.editor != null ? this.editor.completer : undefined,
-          'detach',
-          o => o.detach()
-        )
+        if (this.editor.completer) {
+          this.editor.completer.detach()
+        }
         return
       }
       // Check that this change was made by us, not a collaborator
@@ -267,19 +254,21 @@ define([
           lastCharIsBackslash
         ) {
           setTimeout(() => {
-            return this.editor.execCommand('startAutocomplete')
+            this.editor.execCommand('startAutocomplete')
           }, 0)
         }
       }
+      const match = change.lines[0].match(/\\(\w+){}/)
       if (
         change.action === 'insert' &&
+        (match && match[1]) &&
         // eslint-disable-next-line max-len
         /(begin|end|[a-zA-Z]*ref|usepackage|[a-z]*cite[a-z]*|input|include)/.test(
-          __guard__(change.lines[0].match(/\\(\w+){}/), x => x[1])
+          match[1]
         )
       ) {
         return setTimeout(() => {
-          return this.editor.execCommand('startAutocomplete')
+          this.editor.execCommand('startAutocomplete')
         }, 0)
       }
     }
@@ -321,7 +310,7 @@ define([
             data = popup.getData(popup.getRow())
             data.completer = {
               insertMatch(editor, matchData) {
-                for (range of Array.from(editor.selection.getAllRanges())) {
+                for (range of editor.selection.getAllRanges()) {
                   const leftRange = _.clone(range)
                   const rightRange = _.clone(range)
                   // trim to left of cursor
@@ -358,12 +347,10 @@ define([
                     )
 
                   if (lineBeyondCursor) {
-                    var partialCommandMatch
-                    if (
-                      (partialCommandMatch = lineBeyondCursor.match(
-                        /^([a-zA-Z0-9]+)\{/
-                      ))
-                    ) {
+                    const partialCommandMatch = lineBeyondCursor.match(
+                      /^([a-zA-Z0-9]+)\{/
+                    )
+                    if (partialCommandMatch) {
                       // We've got a partial command after the cursor
                       const commandTail = partialCommandMatch[1]
                       // remove rest of the partial command, right of cursor
@@ -396,12 +383,9 @@ define([
                 }
                 // finally, insert the match
                 if (matchData.snippet) {
-                  return aceSnippetManager.insertSnippet(
-                    editor,
-                    matchData.snippet
-                  )
+                  aceSnippetManager.insertSnippet(editor, matchData.snippet)
                 } else {
-                  return editor.execCommand(
+                  editor.execCommand(
                     'insertstring',
                     matchData.value || matchData
                   )
@@ -410,7 +394,7 @@ define([
             }
           }
 
-          return Autocomplete.prototype._insertMatch.call(this, data)
+          Autocomplete.prototype._insertMatch.call(this, data)
         }
 
         // Overwrite this to set autoInsert = false and set font size
@@ -432,15 +416,10 @@ define([
             )
             container.css({ 'font-size': this.$scope.fontSize + 'px' })
             // Dynamically set width of autocomplete popup
-            if (
-              (filtered = __guard__(
-                __guard__(
-                  editor != null ? editor.completer : undefined,
-                  x1 => x1.completions
-                ),
-                x => x.filtered
-              ))
-            ) {
+            filtered =
+              editor.completer.completions &&
+              editor.completer.completions.filtered
+            if (filtered) {
               const longestCaption = _.max(filtered.map(c => c.caption.length))
               const longestMeta = _.max(filtered.map(c => c.meta.length))
               const charWidth = editor.renderer.characterWidth
@@ -458,31 +437,17 @@ define([
               )
               container.css({ width: `${width}px` })
             }
-            if (
-              __guard__(
-                __guard__(
-                  editor.completer != null
-                    ? editor.completer.completions
-                    : undefined,
-                  x3 => x3.filtered
-                ),
-                x2 => x2.length
-              ) === 0
-            ) {
-              return editor.completer.detach()
+            if (filtered.length === 0) {
+              editor.completer.detach()
             }
           },
           bindKey: 'Ctrl-Space|Ctrl-Shift-Space|Alt-Space'
         }
       }
 
-      return (Util.retrievePrecedingIdentifier = function(text, pos, regex) {
+      Util.retrievePrecedingIdentifier = function(text, pos, regex) {
         let currentLineOffset = 0
-        for (
-          let start = pos - 1, i = start, asc = start <= 0;
-          asc ? i <= 0 : i >= 0;
-          asc ? i++ : i--
-        ) {
+        for (let i = pos - 1; i <= 0; i++) {
           if (text[i] === '\n') {
             currentLineOffset = i + 1
             break
@@ -491,26 +456,9 @@ define([
         const currentLine = text.slice(currentLineOffset, pos)
         const fragment = Helpers.getLastCommandFragment(currentLine) || ''
         return fragment
-      })
+      }
     }
   }
 
   return AutoCompleteManager
 })
-
-function __guardMethod__(obj, methodName, transform) {
-  if (
-    typeof obj !== 'undefined' &&
-    obj !== null &&
-    typeof obj[methodName] === 'function'
-  ) {
-    return transform(obj, methodName)
-  } else {
-    return undefined
-  }
-}
-function __guard__(value, transform) {
-  return typeof value !== 'undefined' && value !== null
-    ? transform(value)
-    : undefined
-}
