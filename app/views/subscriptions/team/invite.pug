@@ -22,6 +22,7 @@ block content
 
 						div(ng-show="view =='personalSubscription'")
 							p #{translate("cancel_personal_subscription_first")}
+							.alert.alert-danger(ng-show="cancel_error" ng-cloak) #{translate("something_went_wrong_canceling_your_subscription")}
 							p
 								a.btn.btn.btn-default(ng-click="keepPersonalSubscription()", ng-disabled="inflight") #{translate("not_now")}
 								| &nbsp;
