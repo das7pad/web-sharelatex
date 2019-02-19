@@ -1,6 +1,7 @@
 dropboxHandler = require('./DropboxHandler')
 AuthenticationController = require('../../../../app/js/Features/Authentication/AuthenticationController')
 Csrf = require("../../../../app/js/infrastructure/Csrf")
+UserGetter = require("../../../../app/js/Features/User/UserGetter")
 logger = require('logger-sharelatex')
 path = require("path")
 qs = require("querystring")
@@ -9,10 +10,13 @@ module.exports =
 
 	redirectUserToDropboxAuth: (req, res, next)->
 		user_id = AuthenticationController.getLoggedInUserId(req)
-		dropboxHandler.getDropboxRegisterUrl user_id, req.csrfToken(), (err, url)->
+		UserGetter.getUser user_id, (err, user) ->
 			return next(err) if err?
-			logger.log url:url, "redirecting user for dropbox auth"
-			res.redirect url
+			return res.sendStatus(403) unless user.features?.dropbox
+			dropboxHandler.getDropboxRegisterUrl user_id, req.csrfToken(), (err, url)->
+				return next(err) if err?
+				logger.log url:url, "redirecting user for dropbox auth"
+				res.redirect url
 
 	completeDropboxRegistrationPage: (req, res, next)->
 		viewPath = path.join(__dirname, "../views/user/completeRegistration")

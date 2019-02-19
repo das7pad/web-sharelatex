@@ -19,9 +19,7 @@ define([
   'ide/editor/directives/aceEditor/cursor-position/CursorPositionManager',
   'ide/rich-text/directives/cursor_position/cursor_position_adapter',
   'ide/editor/directives/aceEditor/track-changes/TrackChangesManager',
-  'ide/rich-text/directives/track_changes/track_changes_adapter',
-  'ide/editor/directives/aceEditor/global-key-binding/GlobalKeybindingManager',
-  'ide/rich-text/directives/key_binding/global_key_binding_adapter'
+  'ide/rich-text/directives/track_changes/track_changes_adapter'
 ], (
   App,
   RichTextAdapter,
@@ -31,9 +29,7 @@ define([
   CursorPositionManager,
   CursorPositionAdapter,
   TrackChangesManager,
-  TrackChangesAdapter,
-  GlobalKeybindingManager,
-  GlobalKeybindingAdapter
+  TrackChangesAdapter
 ) =>
   App.directive(
     'cmEditor',
@@ -59,7 +55,6 @@ define([
         const bodyEl = element.find('.cm-editor-body')
         let editor = null
         let cursorPositionManager = null
-        let globalKeybindingManager = null
         const autocompleteAdapter = new AutocompleteAdapter(
           scope,
           metadata,
@@ -160,8 +155,7 @@ define([
             if (window.richTextTrackChangesEnabled) {
               initTrackChanges()
             }
-            setUpMetadataEventListener()
-            initGlobalKeybinding()
+            return setUpMetadataEventListener()
           })
 
         var detachFromCM = function(sharejsDoc) {
@@ -170,7 +164,6 @@ define([
             tearDownTrackChanges()
           }
           tearDownMetadataEventListener()
-          tearDownGlobalKeybinding()
           sharejsDoc.detachFromCM()
           return sharejsDoc.off('remoteop.richtext')
         }
@@ -265,17 +258,6 @@ define([
 
         var tearDownMetadataEventListener = () =>
           editor.getCodeMirror().off('change', autocompleteAdapter.onChange)
-
-        function initGlobalKeybinding() {
-          globalKeybindingManager = new GlobalKeybindingManager(
-            new GlobalKeybindingAdapter(editor)
-          )
-          globalKeybindingManager.init()
-        }
-
-        function tearDownGlobalKeybinding() {
-          globalKeybindingManager.tearDown()
-        }
 
         var getSetting = key => scope[key]
 

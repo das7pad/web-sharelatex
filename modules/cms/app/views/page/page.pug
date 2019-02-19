@@ -4,23 +4,23 @@ include ./elements/_page_content
 //- A page from the CMS
 
 block content_cms
-	- var defaultCol = 'col-xs-12 col-sm-10 col-sm-offset-1'
-	- var aboutCol = 'col-xs-12 col-sm-8 col-sm-offset-2'
-	.row
-		div(class=pageAbout ? aboutCol : defaultCol)
-			.page-header
-				h1 #{title}
+	.content-container(class=pageAbout ? "container-small" : "")
+		section
+			.row.section-row
+				.col-sm-12
+					.page-header
+						h1 #{title}
 
-	if content
-		.row
-			.content-container(class=pageAbout ? aboutCol : defaultCol)
-				for c, cIndex in content
+		if content
+			for c, cIndex in content
+				if c.fields
 					//- tabGroupTitle is a required field on CMS but can be opted out of display on site
 					//- must check c.fields, because an entry could have been created without adding any fields
-					if c.fields && c.fields.tabGroupTitle
-						include ./elements/_tabs
-					else if c.type == 'layoutGrid'
-						+content_row(c.fields)
-					else
-						//- DEPRECATED
-						+page_content(c, content[cIndex+1])
+					section(class=`${c.fields.colorBlock ? "color-block " + c.fields.colorBlock : ""} ${c.fields.noTopPadding ? "no-top-padding" : ""}`)
+						if c.fields.tabGroupTitle
+								include ./elements/_tabs
+						else if c.type == 'layoutGrid'
+							+content_row(c.fields)
+						else
+							//- Just About | Team List
+							+element(c, content[cIndex+1])

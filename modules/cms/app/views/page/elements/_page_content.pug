@@ -24,19 +24,6 @@ mixin element(element)
 		//- to do: rename type to elementTeamList?
 		+team(element)
 
-mixin actual_content(content)
-	//- DEPRECATED
-	//- @param {object}		content		A content block
-	//- content block= From the CMS, which includes the content and UI settings
-	if content.fields
-		if content.fields.quote
-			//- quotes are the only element that will handle col independently due to special layouts
-			+quote(content.fields)
-		else
-			div(class=content.fields.halfWidth ? "col-sm-6" : "col-sm-12")
-				div(class={"card" : content.fields.card, "text-center" : content.fields.centerText})
-					+element(content)
-
 mixin column_groups(groups)
 	//- FOR: type `Style | Elements` on CMS
 	//- This type applies styling to a group of types `Element | _` and `Layout | TabGroup`
@@ -60,23 +47,10 @@ mixin content_row(row)
 	//- `row.grid` will be one of the combinations above,
 	//- where the numbers represent the column width for left and right col
 	-var gridCol = row.grid.split('|')
-	.row.row-spaced
+	.row.section-row
 		if row.column1
 			div(class="col-xs-12 col-sm-" + gridCol[0])
 				+column_groups(row.column1)
 		if row.column2 && row.column1 && gridCol[0] != 12
 			div(class="col-xs-12 col-sm-" + gridCol[1])
 				+column_groups(row.column2)
-
-mixin page_content(content, nextContent)
-	//- DEPRECATED 
-	//- Handles the grid layout for CMS generated pages
-	//- @param {object}	content, nextContent	A content block
-	//- content block= From the CMS, which includes the content and UI settings
-
-	if content
-		if content.newRow
-			.row.row-spaced
-				+actual_content(content)
-				if nextContent && !nextContent.newRow
-					+actual_content(nextContent)

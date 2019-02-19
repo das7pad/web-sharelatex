@@ -15,6 +15,11 @@ describe 'DropboxUserController', ->
 			completeRegistration: sinon.stub()
 			unlinkAccount: sinon.stub()
 			setAccessToken:sinon.stub()
+		@user =
+			features:
+				dropbox: true
+		@UserGetter =
+			getUser: sinon.stub().callsArgWith(1, null, @user)
 		@AuthenticationController =
 			getLoggedInUserId: sinon.stub().returns(@user_id)
 		@Csrf =
@@ -25,6 +30,7 @@ describe 'DropboxUserController', ->
 				log:->
 				err:->
 			'../../../../app/js/Features/Authentication/AuthenticationController': @AuthenticationController
+			'../../../../app/js/Features/User/UserGetter': @UserGetter
 			'../../../../app/js/infrastructure/Csrf': @Csrf
 
 		@req =
@@ -47,6 +53,15 @@ describe 'DropboxUserController', ->
 			@res.redirect = (redirectUrl)=>
 				redirectUrl.should.equal @dropboxUrl
 				sinon.assert.calledWith(@DropboxHandler.getDropboxRegisterUrl, @user_id, @csrfToken)
+				done()
+
+			@controller.redirectUserToDropboxAuth @req, @res
+
+		it "should return 403 if the user does not have the Dropbox feature", (done) ->
+			@user.features.dropbox = false
+
+			@res.sendStatus = (status)=>
+				status.should.equal 403
 				done()
 
 			@controller.redirectUserToDropboxAuth @req, @res
