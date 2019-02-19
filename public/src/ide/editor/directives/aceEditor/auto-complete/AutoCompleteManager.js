@@ -289,7 +289,10 @@ define([
 
           // If we are in \begin{it|}, then we need to remove the trailing }
           // since it will be adding in with the autocomplete of \begin{item}...
-          if (/^\\\w+{/.test(this.completions.filterText) && nextChar === '}') {
+          if (
+            /^\\\w+(\[[\w\\,= ]*\])?{/.test(this.completions.filterText) &&
+            nextChar === '}'
+          ) {
             editor.session.remove(range)
           }
 
