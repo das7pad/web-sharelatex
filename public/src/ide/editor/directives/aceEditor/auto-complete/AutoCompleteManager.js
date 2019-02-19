@@ -1,10 +1,4 @@
-/* eslint-disable
-    no-cond-assign,
-    no-return-assign,
-    no-undef,
-    no-unused-vars,
-    no-useless-escape,
-*/
+/* global _ */
 // TODO: This file was created by bulk-decaffeinate.
 // Fix any style issues and re-enable lint.
 /*
@@ -24,11 +18,10 @@ define([
   'ace/ace',
   'ace/ext-language_tools'
 ], function(CommandManager, EnvironmentManager, PackageManager, Helpers) {
-  let AutoCompleteManager
   const { Range } = ace.require('ace/range')
   const aceSnippetManager = ace.require('ace/snippets').snippetManager
 
-  return (AutoCompleteManager = class AutoCompleteManager {
+  class AutoCompleteManager {
     constructor(
       $scope,
       editor,
@@ -88,9 +81,8 @@ define([
               /^~?\\(includegraphics(?:\[.*])?){([^}]*, *)?(\w*)/
             )
             if (match) {
-              let [_ignore1, commandName, _ignore2, currentArg] = Array.from(
-                match
-              )
+              // eslint-disable-next-line no-unused-vars
+              let [_ignore1, commandName] = Array.from(match)
               const graphicsPaths = Preamble.getGraphicsPaths()
               const result = []
               for (let graphic of Array.from(Graphics.getGraphicsFiles())) {
@@ -121,7 +113,8 @@ define([
           if (commandFragment) {
             const match = commandFragment.match(/^\\(input|include){(\w*)/)
             if (match) {
-              const [_, commandName, currentArg] = Array.from(match)
+              // eslint-disable-next-line no-unused-vars
+              const [_ignore, commandName] = Array.from(match)
               const result = []
               for (let file of Array.from(Files.getTeXFiles())) {
                 if (file.id !== this.$scope.docId) {
@@ -148,7 +141,8 @@ define([
               /^~?\\([a-zA-Z]*ref){([^}]*, *)?(\w*)/
             )
             if (refMatch) {
-              const [_, commandName, currentArg] = Array.from(refMatch)
+              // eslint-disable-next-line no-unused-vars
+              const [_ignore, commandName] = Array.from(refMatch)
               const result = []
               if (commandName !== 'ref') {
                 // ref is in top 100 commands
@@ -182,9 +176,8 @@ define([
               /^~?\\([a-z]*cite[a-z]*(?:\[.*])?){([^}]*, *)?(\w*)/
             )
             if (citeMatch) {
-              let [_, commandName, previousArgs, currentArg] = Array.from(
-                citeMatch
-              )
+              // eslint-disable-next-line no-unused-vars
+              let [_ignore, commandName, previousArgs] = Array.from(citeMatch)
               if (previousArgs == null) {
                 previousArgs = ''
               }
@@ -500,7 +493,9 @@ define([
         return fragment
       })
     }
-  })
+  }
+
+  return AutoCompleteManager
 })
 
 function __guardMethod__(obj, methodName, transform) {
