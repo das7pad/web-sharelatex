@@ -24,10 +24,8 @@ export default class F1000Export extends Component {
           authorEmail,
           authorName,
           title,
-          articleZipURL: `${siteUrl}/project/${projectId}/export/${
-            entry.id
-          }/zip`,
-          pdfURL: `${siteUrl}/project/${projectId}/export/${entry.id}/pdf`,
+          articleZipURL: `${siteUrl}/exports/${exportId}${token}.zip`,
+          pdfURL: `${siteUrl}/exports/${exportId}${token}.pdf`,
           revisionURL: `${siteUrl}/exports/${exportId}${token}/revise`,
           submissionURL: '',
           publicationURL: '',
