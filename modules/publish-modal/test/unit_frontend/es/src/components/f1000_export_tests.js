@@ -130,10 +130,10 @@ describe('<F1000Export />', function() {
         expect(formData.authorName).to.equal('FirstName LastName')
         expect(formData.title).to.equal('My title')
         expect(formData.articleZipURL).to.equal(
-          'http://v2.overleaf.test:4000/project/1/export/2/zip'
+          'http://v2.overleaf.test:4000/exports/3token.zip'
         )
         expect(formData.pdfURL).to.equal(
-          'http://v2.overleaf.test:4000/project/1/export/2/pdf'
+          'http://v2.overleaf.test:4000/exports/3token.pdf'
         )
         expect(formData.revisionURL).to.equal(
           `http://v2.overleaf.test:4000/exports/3token/revise`
