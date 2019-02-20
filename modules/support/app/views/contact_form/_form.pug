@@ -1,8 +1,8 @@
-mixin contact-form(showAffectedProjectUrl, showContactFormSuggestions = true)
+mixin contact-form(showAffectedProjectUrl, showContactFormSuggestions = true, inbox = 'support')
 	div(
 		ng-cloak
 		ng-controller="ContactFormController"
-		ng-init="showContactFormSuggestions = " + showContactFormSuggestions
+		ng-init="showContactFormSuggestions = " + showContactFormSuggestions + "; inbox = '" + inbox + "'"
 	)
 		form(name="contactForm" role="form" aria-label=translate("contact_us"))
 			span(ng-show="sent == false")

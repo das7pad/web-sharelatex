@@ -16,9 +16,10 @@ mixin element(element)
 			+btn_other_page(element)
 	else if element.type == 'contactForm'
 		| !{element.fields.content}
+		-var inbox = element.fields && element.fields.inbox ? element.fields.inbox : 'support'
 		-var affectedProject = element.fields && element.fields.formInputs && element.fields.formInputs.indexOf('Affected Project URL') > -1 ? true : false
 		-var wikiSuggestions = element.fields && element.fields.formInputs && element.fields.formInputs.indexOf('Subject Suggestions from Learn Wiki') > -1 ? true : false
-		+contact-form(affectedProject, wikiSuggestions)
+		+contact-form(affectedProject, wikiSuggestions, inbox)
 		| !{element.fields.footer}
 	else if element.type == 'pageAboutTeam'
 		//- to do: rename type to elementTeamList?
