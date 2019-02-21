@@ -3,7 +3,7 @@ extends ../layout
 //- Page for a single blog post
 
 block content_cms
-	.content-container.container-small
+	.content-container
 		section
 			.row.section-row
 				.col-xs-12
@@ -13,7 +13,7 @@ block content_cms
 						
 		section.blog(ng-cloak ng-controller="BlogController")
 			.row.section-row
-				.col-xs-12
+				.col-xs-12.col-md-8
 					ul.blog-list
 						li.card
 							.card-header
@@ -32,6 +32,6 @@ block content_cms
 									.col-sm-12
 										+blog_tags(tag, 'Tags')
 
-							+blog_tags(popular_tags, 'Popular Tags')
-
+				.col-sm-12.col-md-4
+					+sidebar_blog
 	script(src=mathJaxPath) 

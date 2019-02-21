@@ -5,7 +5,7 @@ include ../../../../../app/views/mixins/_pagination
 //- or page for a list of blog posts returned from a tag query
 
 block content_cms
-	.content-container.container-small
+	.content-container
 		section
 			.row.section-row
 				.col-sm-12
@@ -18,7 +18,7 @@ block content_cms
 							h1 #{translate('blog')}
 		section.blog(ng-cloak ng-controller="BlogController")
 			.row.section-row
-				.col-sm-12
+				.col-sm-12.col-md-8
 					ul.blog-list
 						for post in items
 							li.card.blog-post
@@ -49,5 +49,8 @@ block content_cms
 
 					if pages && pages.total_pages > 1
 						+paginate(pages, url_path)
+
+				.col-sm-12.col-md-4
+					+sidebar_blog
 
 	script(src=mathJaxPath)

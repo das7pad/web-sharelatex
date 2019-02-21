@@ -12,3 +12,46 @@ mixin preview()
 	//- To get on preview mode, add "?preview" to URL
 	if preview
 		.cms-preview(ng-cloak)
+
+mixin sidebar_blog()
+	.card.text-center
+		if !getSessionUser()
+			h3 Sign up for a free account and receive regular updates
+			a.btn.btn-primary(href="/register") #{translate('register')}
+			hr
+
+		h3 Popular Tags
+		+blog_tags(popular_tags)
+
+		hr
+		+start_writing_now()
+
+		hr
+		h3 Company
+		ul.list-without-style
+			li 
+				a(href="/about") About us
+			li 
+				a(href="/contact") Contact us
+			li 
+				a(href="/for/partners") Partners
+			li 
+				a(href="/for/community") Community
+			li 
+				a(href="/for/community/advisors") Advisors
+			li 
+				a(href="/for/press") Press
+
+mixin start_writing_now()
+	.text-center
+		h3
+			i Start writing now!
+		a.btn.btn-primary(href="/docs?template=overleaf&rich_text=true") Create A New Paper
+		h4
+			i #{settings.appName} is
+				b.text-lowercase &nbsp;#{translate('free')}
+		small 
+			i
+				| New to LaTeX?
+				br
+				a(href="/latex/templates") Start with a template		
