@@ -11,8 +11,8 @@ block content_cms
 						h1
 							a(href="/blog") #{translate('blog')}
 						
-		section
-			.row.section-row.blog(ng-cloak ng-controller="BlogController")
+		section.blog(ng-cloak ng-controller="BlogController")
+			.row.section-row
 				.col-xs-12
 					ul.blog-list
 						li.card
