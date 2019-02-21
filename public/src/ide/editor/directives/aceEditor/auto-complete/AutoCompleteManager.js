@@ -199,7 +199,7 @@ define([
         }
       }
 
-      return (this.editor.completers = [
+      this.editor.completers = [
         CommandCompleter,
         SnippetCompleter,
         PackageCompleter,
@@ -207,7 +207,7 @@ define([
         LabelsCompleter,
         GraphicsCompleter,
         FilesCompleter
-      ])
+      ]
     }
 
     disable() {
