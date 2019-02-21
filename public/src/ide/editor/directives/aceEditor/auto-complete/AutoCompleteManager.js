@@ -71,7 +71,7 @@ define([
             )
             if (match) {
               // eslint-disable-next-line no-unused-vars
-              let [_ignore1, commandName] = match
+              let commandName = match[1]
               const graphicsPaths = Preamble.getGraphicsPaths()
               const result = []
               for (let graphic of Graphics.getGraphicsFiles()) {
@@ -103,7 +103,7 @@ define([
             const match = commandFragment.match(/^\\(input|include){(\w*)/)
             if (match) {
               // eslint-disable-next-line no-unused-vars
-              const [_ignore, commandName] = match
+              const commandName = match[1]
               const result = []
               for (let file of Files.getTeXFiles()) {
                 if (file.id !== this.$scope.docId) {
@@ -131,7 +131,7 @@ define([
             )
             if (refMatch) {
               // eslint-disable-next-line no-unused-vars
-              const [_ignore, commandName] = refMatch
+              const commandName = refMatch[1]
               const result = []
               if (commandName !== 'ref') {
                 // ref is in top 100 commands
