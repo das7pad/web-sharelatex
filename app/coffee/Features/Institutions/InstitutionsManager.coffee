@@ -13,16 +13,10 @@ Institution = require("../../models/Institution").Institution
 ASYNC_LIMIT = 10
 module.exports = InstitutionsManager =
 	upgradeInstitutionUsers: (institutionId, callback = (error) ->) ->
-		institution = null
 		async.waterfall [
 			(cb) ->
-				Institution.findOne {v1Id: institutionId}, (err, institution) -> cb(err, institution)
-			(i, cb) ->
-				i.fetchV1Data  (err, institution) -> cb(err, institution)
-			(i, cb) ->
-				institution = i
-				getInstitutionAffiliations institutionId, (err, affiliations) -> cb(err, affiliations)
-			(affiliations, cb) ->
+				fetchInstitutionAndAffiliations institutionId, cb
+			(institution, affiliations, cb) ->
 				affiliations = _.map affiliations, (affiliation) ->
 					affiliation.institutionName = institution.name
 					affiliation.institutionId = institutionId
@@ -39,32 +33,48 @@ module.exports = InstitutionsManager =
 					callback(error, checkFeatures(users))
 				)
 
+fetchInstitutionAndAffiliations = (institutionId, callback) ->
+	async.waterfall [
+		(cb) ->
+			Institution.findOne {v1Id: institutionId}, (err, institution) -> cb(err, institution)
+		(institution, cb) ->
+			institution.fetchV1Data  (err, institution) -> cb(err, institution)
+		(institution, cb) ->
+			getInstitutionAffiliations institutionId, (err, affiliations) -> cb(err, institution, affiliations)
+	], callback
+
 refreshFeatures = (affiliation, callback) ->
 	userId = ObjectId(affiliation.user_id)
-	user = null
-	subscription = null
-	featuresChanged = false
 	async.waterfall [
 		(cb) ->
 			FeaturesUpdater.refreshFeatures userId, true, (err, features, featuresChanged) -> cb(err, featuresChanged)
-		(changed, cb) ->
-			featuresChanged = changed
-			UserGetter.getUser userId, (err, user) -> cb(err, user)
-		(u, cb) ->
-			user = u
-			SubscriptionLocator.getUsersSubscription u, (err, subscription) -> cb(err, subscription)
-		(s, cb) ->
-			subscription = s
+		(featuresChanged, cb) ->
+			getUserInfo userId, (error, user, subscription) -> cb(error, user, subscription, featuresChanged)
+		(user, subscription, featuresChanged, cb) ->
+			notifyUser user, affiliation, subscription, featuresChanged, cb
+	], callback
+
+getUserInfo = (userId, callback) ->
+	async.waterfall [
+		(cb) ->
+			UserGetter.getUser userId, cb
+		(user, cb) ->
+			SubscriptionLocator.getUsersSubscription user, (err, subscription) -> cb(err, user, subscription)
+	], callback
+
+notifyUser = (user, affiliation, subscription, featuresChanged, callback) ->
+	async.parallel [
+		(cb) ->
 			if featuresChanged
-				NotificationsBuilder.featuresUpgradedByAffiliation(affiliation, user).create (err)-> cb(err)
+				NotificationsBuilder.featuresUpgradedByAffiliation(affiliation, user).create cb
 			else
 				cb()
 		(cb) ->
 			if subscription? and !subscription.planCode.match(/(free|trial)/)? and !subscription.groupPlan
-				NotificationsBuilder.redundantPersonalSubscription(affiliation, user).create (err)-> cb(err)
+				NotificationsBuilder.redundantPersonalSubscription(affiliation, user).create cb
 			else
 				cb()
-	], callback
+		], callback
 
 checkFeatures = (users) ->
 	usersSummary = {
