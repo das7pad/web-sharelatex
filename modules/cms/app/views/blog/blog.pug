@@ -45,7 +45,7 @@ block content_cms
 
 								.row
 									.col-sm-12
-										+blog_tags(post.tag)
+										+blog_tags(post.tag, 'Tags')
 
 					if pages && pages.total_pages > 1
 						+paginate(pages, url_path)

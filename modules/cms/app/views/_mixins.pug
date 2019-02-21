@@ -1,6 +1,7 @@
-mixin blog_tags(tags, tags_title = 'Tags')
+mixin blog_tags(tags, tags_title)
 	div.tags
-		small #{tags_title}:
+		if tags_title
+			small #{tags_title}:
 		ul.tags-list
 			for t in tags
 				if t.fields && t.fields.tag
