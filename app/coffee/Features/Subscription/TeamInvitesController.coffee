@@ -47,7 +47,7 @@ module.exports =
 				res.render "subscriptions/team/invite",
 					inviterName: invite.inviterName
 					inviteToken: invite.token
-					hasPersonalSubscription: hasIndividualRecurlySubscription
+					hasIndividualRecurlySubscription: hasIndividualRecurlySubscription
 					appName: settings.appName
 
 	acceptInvite: (req, res, next) ->
