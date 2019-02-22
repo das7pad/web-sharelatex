@@ -3,6 +3,7 @@ path = require 'path'
 
 module.exports =
 	render: (res, page, data, reqQuery) ->
+		contentType = 'text/html'
 		pagePath = path.resolve(__dirname, '../../app/views/' + page)
 
 		# Query param data
@@ -37,7 +38,10 @@ module.exports =
 		# metadata - for blog list page. CMS not set up for metadata for list page
 		if page == 'blog/blog'
 			data.title = 'Blog'
+		else if page == 'blog/feed'
+			contentType = 'text/xml'
+
 		# metadata- viewport
 		data.metadata.viewport = true
+		res.set('Content-Type',contentType).render(pagePath, data);
 
-		res.render pagePath, data

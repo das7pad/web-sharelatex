@@ -80,7 +80,6 @@ getAndRenderBlog = (req, res, next, blogQuery, page) ->
 					_v1IdQuery(slugPieces[0], req, res)
 				else
 					ErrorController.notFound req, res
-
 			else if page == 'blog/blog_post'
 				# a single blog post
 				cmsData = parseBlogPost(collection.items[0].fields)
@@ -101,7 +100,8 @@ getAndRenderBlog = (req, res, next, blogQuery, page) ->
 		.catch (err) ->
 			next(err)
 
-_getBlog = (req, res, next) ->
+_getBlog = (req, res, next, rss) ->
+		template = if rss then 'blog/rss' else 'blog/blog'
 		if req.query.cms || Settings.showContentPages
 			# Select operator limits fields returned. It has some restrictions,
 			# such as it can only select properties to a depth of 2.
@@ -124,14 +124,14 @@ _getBlog = (req, res, next) ->
 					.then (tagData) ->
 						if tagData && tagData.items[0] && tagData.items[0].sys && tagData.items[0].sys.id
 							blogQuery['fields.tag.sys.id[in]'] = tagData.items[0].sys.id
-							getAndRenderBlog(req, res, next, blogQuery, 'blog/blog')
+							getAndRenderBlog(req, res, next, blogQuery, template)
 						else
 							# to do - better 404 - specific for blog tag
 							ErrorController.notFound req, res
 					.catch (tagErr) ->
 						next(tagErr)
 			else
-				getAndRenderBlog(req, res, next, blogQuery, 'blog/blog')
+				getAndRenderBlog(req, res, next, blogQuery, template)
 		else
 			ErrorController.notFound req, res
 
@@ -161,6 +161,9 @@ module.exports =
 
 	getBlog: (req, res, next)->
 		_getBlog(req, res, next)
+
+	getFeed: (req, res, next)->
+		_getBlog(req, res, next, true)
 
 	getBlogPost: (req, res, next)->
 		if req.query.cms || Settings.showContentPages
