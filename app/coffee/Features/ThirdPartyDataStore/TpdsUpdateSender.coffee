@@ -65,12 +65,12 @@ module.exports = TpdsUpdateSender =
 	
 	addFile : (options, callback = (err)->)->
 		metrics.inc("tpds.add-file")
-		options.streamOrigin = settings.apis.filestore.url + path.join("/project/#{options.project_id}/file/","#{options.file_id}")
+		options.streamOrigin = (settings.apis.filestore.linode_url or settings.apis.filestore.url) + path.join("/project/#{options.project_id}/file/","#{options.file_id}")
 		@_addEntity(options, callback)
 
 	addDoc : (options, callback = (err)->)->
 		metrics.inc("tpds.add-doc")
-		options.streamOrigin = settings.apis.docstore.pubUrl + path.join("/project/#{options.project_id}/doc/","#{options.doc_id}/raw")
+		options.streamOrigin = (settings.apis.docstore.linode_url or settings.apis.docstore.pubUrl) + path.join("/project/#{options.project_id}/doc/","#{options.doc_id}/raw")
 		@_addEntity(options, callback)
   
 
