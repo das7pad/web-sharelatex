@@ -82,10 +82,10 @@ const main = () => {
 
   if (filter && (filter === '--help' || filter == 'help')) {
     print('')
-    print('  Usage: node ./scripts/print_routes [filter]')
+    print('  Usage: bin/routes [filter]')
     print('  Examples:')
-    print('    node ./scripts/print_routes')
-    print('    node ./scripts/print_routes GitBridge')
+    print('    bin/routes')
+    print('    bin/routes GitBridge')
     print('')
     process.exit(0)
   }
