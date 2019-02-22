@@ -126,7 +126,6 @@ module.exports = settings =
 		docstore:
 			url : "http://#{process.env['DOCSTORE_HOST'] or 'localhost'}:3016"
 			pubUrl: "http://#{process.env['DOCSTORE_HOST'] or 'localhost'}:3016"
-			linode_url: "http://#{process.env['DOCSTORE_LINODE_HOST'] or 'localhost'}:3016"
 		chat:
 			url: "http://#{process.env['CHAT_HOST'] or 'localhost'}:3010"
 			internal_url: "http://#{process.env['CHAT_HOST'] or 'localhost'}:3010"
@@ -137,7 +136,6 @@ module.exports = settings =
 			url: "http://localhost:3011"
 		filestore:
 			url: "http://#{process.env['FILESTORE_HOST'] or 'localhost'}:3009"
-			linode_url: "http://#{process.env['FILESTORE_LINODE_HOST'] or 'localhost'}:3009"
 		clsi:
 			url: "http://#{process.env['CLSI_HOST'] or 'localhost'}:3013"
 			# url: "http://#{process.env['CLSI_LB_HOST']}:3014"
