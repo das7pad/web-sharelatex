@@ -53,6 +53,7 @@ TemplatesRouter = require './Features/Templates/TemplatesRouter'
 InstitutionsController = require './Features/Institutions/InstitutionsController'
 UserMembershipRouter = require './Features/UserMembership/UserMembershipRouter'
 
+bodyParser = require('body-parser')
 logger = require("logger-sharelatex")
 _ = require("underscore")
 
@@ -345,7 +346,7 @@ module.exports = class Router
 			), AuthenticationController.httpAuth, CompileController.getFileFromClsi
 
 		privateApiRouter.get  '/project/:Project_id/doc/:doc_id', AuthenticationController.httpAuth, DocumentController.getDocument
-		privateApiRouter.post '/project/:Project_id/doc/:doc_id', AuthenticationController.httpAuth, DocumentController.setDocument
+		privateApiRouter.post '/project/:Project_id/doc/:doc_id', AuthenticationController.httpAuth, bodyParser.json({limit: "5mb"}), DocumentController.setDocument
 
 		privateApiRouter.post '/user/:user_id/update/*', AuthenticationController.httpAuth, TpdsController.mergeUpdate
 		privateApiRouter.delete '/user/:user_id/update/*', AuthenticationController.httpAuth, TpdsController.deleteUpdate
