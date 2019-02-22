@@ -46,6 +46,12 @@ parseBlogPost = (post) ->
 			if author.fields && author.fields.firstName
 				authorsList.push(author.fields.firstName)
 
+	if post.tag
+		post.tagsPretty = []
+		for tag in post.tag
+			if tag.fields && tag.fields.tag
+				post.tagsPretty.push(tag.fields.tag)
+
 	post.authorDisplay = blogPostAuthors(authorsList)
 
 	post

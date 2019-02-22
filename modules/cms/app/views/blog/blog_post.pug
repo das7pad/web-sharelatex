@@ -3,6 +3,7 @@ extends ../layout
 //- Page for a single blog post
 
 block content_cms
+	- var popular_tags = ['publishers', 'events', 'latex', 'tech', 'press', 'features', 'guides', 'institutions', 'case studies', 'advisors']
 	.content-container
 		section
 			.row.section-row
@@ -30,7 +31,7 @@ block content_cms
 							if tag
 								.row
 									.col-sm-12
-										+blog_tags(tag, 'Tags')
+										+blog_tags(tagsPretty, 'Tags')
 
 				.col-sm-12.col-md-4
 					+sidebar_blog
