@@ -23,6 +23,7 @@ const isMethod = str => {
   return Methods.has(str)
 }
 
+// Check if the expression is a call on a router, return data about it, or null
 const routerCall = callExpression => {
   const callee = callExpression.callee
   const property = callee.property
@@ -31,7 +32,7 @@ const routerCall = callExpression => {
     return false
   }
   const routerName = callee.object.name
-  if (
+  if ( // Match known names for the Express routers: app, webRouter, whateverRouter, etc...
     isMethod(property.name) &&
     (routerName === 'app' || routerName.match('^.*[rR]outer$'))
   ) {
@@ -54,7 +55,9 @@ const formatMethodCall = expression => {
 
 const parseAndPrintRoutesSync = path => {
   const content = fs.readFileSync(path)
+  // Walk the AST (Abstract Syntax Tree)
   acornWalk.simple(acorn.parse(content), {
+	// We only care about call expression ( like `a.b()` )
     CallExpression(node) {
       const call = routerCall(node)
       if (call) {
@@ -78,6 +81,7 @@ const parseAndPrintRoutesSync = path => {
 }
 
 const main = () => {
+  // Take an optional filter to apply to file names
   const filter = process.argv[2] || null
 
   if (filter && (filter === '--help' || filter == 'help')) {
@@ -90,11 +94,13 @@ const main = () => {
     process.exit(0)
   }
 
+  // Find all routers
   glob('*[rR]outer.js', { matchBase: true }, (err, files) => {
     for (file of files) {
       if (file.match('^node_modules.*$') || file.match('.*/public/.*')) {
         continue
       }
+	  // Restrict to the filter (if filter is present)
       if (filter && !file.match(`.*${filter}.*`)) {
         continue
       }
