@@ -200,6 +200,8 @@ module.exports = settings =
 
 
 	maxEntitiesPerProject: 2000
+	
+	maxUploadSize: 50 * 1024 * 1024 # 50 MB
 
 	# Security
 	# --------
