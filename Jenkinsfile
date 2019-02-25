@@ -48,55 +48,50 @@ pipeline {
       }
     }
 
-
-    stage('Tests') {
+    stage('Parallel Tests') {
 
       parallel {
 
-        stage('Unit Tests') {
+        stage('Module Acceptance Tests') {
           steps {
-            sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_unit'
+            sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_acceptance_modules_run'
           }
         }
 
         stage('Frontend Tests') {
           steps {
-            sh 'sleep 10'
-            sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_frontend_run'
+            sh 'sleep 15'
+            sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_frontend_build_run'
+          }
+        }
+
+        stage('Unit Tests') {
+          steps {
+            sh 'sleep 30'
+            sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_unit'
+          }
+        }
+
+        stage('App Acceptance Tests') {
+          steps {
+            sh 'sleep 60'
+            sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_acceptance_app_run'
           }
         }
 
         stage('Package') {
           steps {
-            sh 'sleep 30'
+            sh 'sleep 90'
             sh 'echo ${BUILD_NUMBER} > build_number.txt'
             sh 'touch build.tar.gz' // Avoid tar warning about files changing during read
             sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make tar'
-            
           }
         }
-
       }
+
     }
-
-
-
-    stage('Acceptance Tests main') {
-      steps {
-        sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_acceptance_app_run'
-      }
-    }
-
-    stage('Acceptance Tests modules') {
-      steps {
-        sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make test_acceptance_modules_run'
-      }
-    }
-
-    
 
     stage('Publish') {
-
 
       parallel {
 
@@ -127,7 +122,6 @@ pipeline {
           }
         }
 
-
         stage('Sync OSS') {
           when {
             branch 'master'
@@ -141,9 +135,6 @@ pipeline {
 
       }
     }
-
-
-    
   }
 
   post {
