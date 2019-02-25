@@ -65,7 +65,7 @@ const parseAndPrintRoutesSync = path => {
         const lastArg = _.last(call.args)
         try {
           print(
-            `  ${call.routerName}\t .${call.method} \t: ${
+            `  ${formatRouterName(call.routerName)}\t .${call.method} \t: ${
               firstArg.value
             } => ${formatMethodCall(lastArg)}`
           )
@@ -78,6 +78,14 @@ const parseAndPrintRoutesSync = path => {
       }
     }
   })
+}
+
+const routerNameMapping = {
+  'privateApiRouter': 'privateApi',
+  'publicApiRouter': 'publicApi'
+}
+const formatRouterName = (name) => {
+  return routerNameMapping[name] || name
 }
 
 const main = () => {
