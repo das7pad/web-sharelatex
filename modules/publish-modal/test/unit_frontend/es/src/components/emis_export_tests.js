@@ -149,9 +149,17 @@ describe('<EmisExport />', function() {
         })
     })
   })
+
+  describe('failure on opening', () => {
+    it('shows error on project having folders', () => {
+      const { getByText } = renderEmisExport(true)
+      const errorMessage = getByText(/must be at top folder level/i)
+      expect(errorMessage).to.exist
+    })
+  })
 })
 
-function renderEmisExport() {
+function renderEmisExport(hasFolders = false) {
   return render(
     <EmisExport
       returnText="Return"
@@ -161,7 +169,7 @@ function renderEmisExport() {
       }}
       onReturn={() => {}}
       projectId="1"
-      hasFolders={false}
+      hasFolders={hasFolders}
       firstName="FirstName"
       lastName="LastName"
     />
