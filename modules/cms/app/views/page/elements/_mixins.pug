@@ -75,12 +75,12 @@ mixin team(list)
 											ul.team-connect
 												if (member.fields.twitterHandle)
 													li
-														a(href="https://twitter.com/"+member.fields.twitterHandle target="_BLANK" rel="nofollow" aria-label="Twitter")
+														a(href="https://twitter.com/"+member.fields.twitterHandle target="_BLANK" rel="noopener noreferrer" aria-label="Twitter")
 															i(class="fa fa-twitter" aria-hidden="true")
 															.sr-only Opens in new window
 												if (member.fields.linkedInUrl)
 													li
-														a(href=member.fields.linkedInUrl target="_BLANK" rel="nofollow" aria-label="LinkedIn")
+														a(href=member.fields.linkedInUrl target="_BLANK" rel="noopener noreferrer" aria-label="LinkedIn")
 															i(class="fa fa-linkedin" aria-hidden="true")
 															.sr-only Opens in new window
 												if (member.fields.email)
