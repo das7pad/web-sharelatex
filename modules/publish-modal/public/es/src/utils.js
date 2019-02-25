@@ -62,8 +62,7 @@ function startExport(url, data = {}) {
 }
 
 function pollExportStatus(exportId, projectId) {
-  const siteUrl = window.ExposedSettings.siteUrl
-  const url = `${siteUrl}/project/${projectId}/export/${exportId}`
+  const url = `/project/${projectId}/export/${exportId}`
   return networkPoll(
     { url },
     ({ export_json: status }) => status.status_summary === 'succeeded',
