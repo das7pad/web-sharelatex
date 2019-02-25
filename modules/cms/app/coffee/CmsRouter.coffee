@@ -29,7 +29,9 @@ module.exports =
 		webRouter.get '/blog', BlogController.getBlog
 		webRouter.get '/contact', ContactContoller.getContactPage
 		webRouter.get '/legal', LegalController.getLegal
+		webRouter.get '/blog/page', BlogController.redirectToList
 		webRouter.get '/blog/page/:page', BlogController.getBlog
+		webRouter.get '/blog/tagged', BlogController.redirectToList
 		webRouter.get '/blog/tagged/:tag', BlogController.getBlog
 		webRouter.get '/blog/tagged/:tag/page/:page', BlogController.getBlog
 		webRouter.get '/blog/feed', BlogController.getFeed

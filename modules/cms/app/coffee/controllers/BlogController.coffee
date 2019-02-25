@@ -162,11 +162,7 @@ module.exports =
 		_getBlog(req, res, next, true)
 
 	getBlogPost: (req, res, next)->
-		if req.params.slug == 'page' || req.params.slug == 'tagged'
-			# for if someone went to /blog/page/ or /blog/tagged/
-			# without a page number or tag param
-			_getBlog(req, res, next)
-		else if !isNaN(req.params.slug)
+		if !isNaN(req.params.slug)
 			# v1 would sometimes link to blog ID
 			_v1IdQuery(req.params.slug, req, res)
 		else
@@ -175,3 +171,6 @@ module.exports =
 				'fields.slug': req.params.slug
 			}
 			getAndRenderBlog(req, res, next, blogQuery, 'blog/blog_post')
+
+	redirectToList: (req, res)->
+		res.redirect 301, "/blog"
