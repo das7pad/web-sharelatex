@@ -1,6 +1,7 @@
 import React, { PropTypes, Component } from 'react'
 import PublishGuide from './publish_guide'
 import ExportGuide from './export_guide'
+import EJPExport from './ejp_export'
 import EmisExport from './emis_export'
 import GalleryExport from './gallery_export'
 import ScholarOneExport from './scholar_one_export'
@@ -80,6 +81,17 @@ export default class GuidePublishModal extends Component {
             partnerContactURL={entry.home_url + '/contact'} // works; not ideal
             returnText={returnText}
             projectId={initParams.projectId}
+          />
+        )
+      } else if (entry.partner === 'ejp') {
+        return (
+          <EJPExport
+            onReturn={onReturn}
+            entry={entry}
+            returnText={returnText}
+            projectId={initParams.projectId}
+            firstName={initParams.firstName}
+            lastName={initParams.lastName}
           />
         )
       } else {
