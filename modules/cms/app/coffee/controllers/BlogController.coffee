@@ -10,7 +10,7 @@ Settings = require 'settings-sharelatex'
 resultsPerPage = 5;
 sanitizeOptions = if Settings?.modules?.sanitize?.options? then Settings.modules.sanitize.options else sanitizeHtml.defaults
 
-blogPostAuthors = (authorArr) ->
+_blogPostAuthors = (authorArr) ->
 	authors = ''
 
 	if authorArr.length == 1
@@ -23,7 +23,7 @@ blogPostAuthors = (authorArr) ->
 
 	authors
 
-parseBlogPost = (post) ->
+_parseBlogPost = (post) ->
 	authorsList = []
 
 	if post.content
@@ -52,125 +52,137 @@ parseBlogPost = (post) ->
 			if tag.fields && tag.fields.tag
 				post.tagsPretty.push(tag.fields.tag)
 
-	post.authorDisplay = blogPostAuthors(authorsList)
+	post.authorDisplay = _blogPostAuthors(authorsList)
 
 	post
 
-getTagId = (tag) ->
+_getTagId = (tag) ->
 	query = {
 		content_type: 'blogTag'
 		'fields.tag': tag
 	}
 	ContentfulClient.client.getEntries(query)
 
-getAndRenderBlog = (req, res, next, blogQuery, page) ->
+_queryApi = (blogQuery, preview=false) ->
 	# clientType determines which API to use.
 	# client is for published data
 	# clientPreview is for unpublished data
-	clientType = if req.query.preview || req.query.preview == '' then 'clientPreview' else 'client'
-	url_path = "/blog#{if req.params.tag then "/tagged/#{req.params.tag}" else ''}"
-
-	_queryApi(clientType, blogQuery)
-		.then (collection) ->
-			if collection.items.length == 0
-				# check if they have a v1 ID but with the wrong slug
-				if req.params.slug
-					slugPieces = req.params.slug.split('-')
-				if slugPieces && slugPieces[0] && !isNaN(slugPieces[0])
-					_v1IdQuery(slugPieces[0], req, res)
-				else
-					ErrorController.notFound req, res
-			else if page == 'blog/blog_post'
-				# a single blog post
-				cmsData = parseBlogPost(collection.items[0].fields)
-				CmsHandler.render(res, page, cmsData, req.query)
-			else
-				# a list of blog posts (either all or filtered by tag)
-				cmsData = {
-					items: (collection.items.map (post) -> parseBlogPost(post.fields)),
-					pages: {
-						current_page: if req.params.page && !isNaN(req.params.page) then req.params.page else 1,
-						total: collection.total,
-						total_pages: Math.ceil(collection.total/resultsPerPage)
-					},
-					tag: req.params.tag,
-					url_path: url_path
-				}
-				CmsHandler.render(res, page, cmsData, req.query)
-		.catch (err) ->
-			next(err)
-
-_getBlog = (req, res, next, rss) ->
-	template = if rss then 'blog/rss' else 'blog/blog'
-	# Select operator limits fields returned. It has some restrictions,
-	# such as it can only select properties to a depth of 2.
-	# Not a problem now, but if we link more then we'll need to remove operator
-	blogQuery = {
-		content_type: 'blogPost'
-		order: '-fields.publishDate'
-		select: 'fields.author,fields.content,fields.contentPreview,fields.publishDate,fields.slug,fields.tag,fields.title',
-		limit: resultsPerPage
-	}
-
-	# Pagination
-	if req.params.page && !isNaN(req.params.page)
-		blogQuery.skip = (parseInt(req.params.page - 1, 10) * resultsPerPage)
-
-	# Filter by tag
-	if req.params.tag
-		# get the ID of the tag via the tag in the URL
-		getTagId(req.params.tag)
-			.then (tagData) ->
-				if tagData && tagData.items[0] && tagData.items[0].sys && tagData.items[0].sys.id
-					blogQuery['fields.tag.sys.id[in]'] = tagData.items[0].sys.id
-					getAndRenderBlog(req, res, next, blogQuery, template)
-				else
-					# to do - better 404 - specific for blog tag
-					ErrorController.notFound req, res
-			.catch (tagErr) ->
-				next(tagErr)
-	else
-		getAndRenderBlog(req, res, next, blogQuery, template)
-
-_queryApi = (clientType, blogQuery) ->
+	clientType = if preview || preview == '' then 'clientPreview' else 'client'
 	ContentfulClient[clientType].getEntries(blogQuery)
 
-_v1IdQuery = (id, req, res) ->
+_readyBlogListData = (req, collection) ->
+	url_path = "/blog#{if req.params.tag then "/tagged/#{req.params.tag}" else ''}"
+	return {
+		items: (collection.items.map (post) -> _parseBlogPost(post.fields)),
+		pages: {
+			current_page: if req.params.page && !isNaN(req.params.page) then req.params.page else 1,
+			total: collection.total,
+			total_pages: Math.ceil(collection.total/resultsPerPage)
+		},
+		tag: req.params.tag,
+		url_path: url_path
+	}
+
+_getSlugViaV1Id = (id, req, res) ->
 	# separating ID out of req, because of another use for this:
 	# for if the slug contains an ID with the wrong slug
-
 	blogQuery = {
 		content_type: 'blogPost'
 		'fields.v1Id': parseInt(id, 10)
 	}
 
-	_queryApi('client', blogQuery)
+	_queryApi(blogQuery)
 		.then (collection) ->
-			if collection.items?[0]?.fields?.slug?
-				res.redirect 301, "/blog/#{collection.items[0].fields.slug}"
-			else
-				ErrorController.notFound req, res
-		.catch (err) ->
-			next(err)
+			collection?.items?[0]?.fields?.slug
+		
+
+_makeBlogListQuery = (req, res) ->
+	return new Promise (resolve, reject) ->
+		blogQuery = {
+			content_type: 'blogPost'
+			order: '-fields.publishDate'
+			select: 'fields.author,fields.content,fields.contentPreview,fields.publishDate,fields.slug,fields.tag,fields.title',
+			limit: resultsPerPage
+		}
+
+		# Pagination
+		if req.params.page && !isNaN(req.params.page)
+			blogQuery.skip = (parseInt(req.params.page - 1, 10) * resultsPerPage)
+
+		# Filter by tag
+		if req.params.tag
+			# get the ID of the tag via the tag in the URL
+			_getTagId(req.params.tag)
+				.then (tagData) ->
+					if tagData && tagData.items[0] && tagData.items[0].sys && tagData.items[0].sys.id
+						blogQuery['fields.tag.sys.id[in]'] = tagData.items[0].sys.id
+						resolve(blogQuery)
+					else
+						# to do - better 404 - specific for blog tag
+						ErrorController.notFound req, res
+				.catch (tagErr) ->
+					reject(tagErr)
+		else
+			resolve(blogQuery)
+
 
 module.exports =
 
 	getBlog: (req, res, next)->
-		_getBlog(req, res, next)
+		_makeBlogListQuery(req, res, next)
+			.then (blogQuery) ->
+				_queryApi(blogQuery, req.query.preview)
+					.then (cmsResponse) ->
+						cmsData = _readyBlogListData(req, cmsResponse)
+						CmsHandler.render(res, 'blog/blog', cmsData, req.query)
+					.catch (next)
+			.catch (next)
+
 
 	getFeed: (req, res, next)->
-		_getBlog(req, res, next, true)
+		_makeBlogListQuery(req, res, next)
+			.then (blogQuery) ->
+				_queryApi(blogQuery, req.query.preview)
+					.then (cmsResponse) ->
+						cmsData = _readyBlogListData(req, cmsResponse)
+						CmsHandler.render(res, 'blog/feed', cmsData, req.query)
+					.catch (next)
+			.catch (next)
 
 	getBlogPost: (req, res, next)->
 		if !isNaN(req.params.slug)
 			# v1 would sometimes link to blog ID
-			_v1IdQuery(req.params.slug, req, res)
+			_getSlugViaV1Id(req.params.slug, req, res)
+				.then (slug) ->
+					if slug
+						res.redirect 301, "/blog/#{slug}"
+					else
+						ErrorController.notFound req, res
+				.catch (next)
 		else
 			blogQuery = {
 				content_type: 'blogPost'
 				'fields.slug': req.params.slug
 			}
-			getAndRenderBlog(req, res, next, blogQuery, 'blog/blog_post')
+			_queryApi(blogQuery, req.query.preview)
+				.then (collection) ->
+					if collection?.items?[0]
+						cmsData = _parseBlogPost(collection.items[0].fields)
+						CmsHandler.render(res, 'blog/blog_post', cmsData)
+					else
+						# check if they have a v1 ID but with the wrong slug
+						slugPieces = req.params.slug.split('-')
+						if slugPieces && slugPieces[0] && !isNaN(slugPieces[0])
+							_getSlugViaV1Id(slugPieces[0], req, res)
+								.then (slug) ->
+									if slug
+										res.redirect 301, "/blog/#{slug}"
+									else
+										ErrorController.notFound req, res
+								.catch (next)
+						else
+							ErrorController.notFound req, res
+				.catch (next)
 
 	redirectToList: (req, res)->
 		res.redirect 301, "/blog"
