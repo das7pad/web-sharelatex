@@ -105,6 +105,7 @@ module.exports = settings =
 			url :"http://#{process.env['TAGS_HOST'] or 'localhost'}:3012"
 		spelling:
 			url : "http://#{process.env['SPELLING_HOST'] or 'localhost'}:3005"
+			host: process.env['SPELLING_HOST']
 		trackchanges:
 			url : "http://#{process.env['TRACK_CHANGES_HOST'] or 'localhost'}:3015"
 		project_history:
