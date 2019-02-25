@@ -101,40 +101,36 @@ getAndRenderBlog = (req, res, next, blogQuery, page) ->
 			next(err)
 
 _getBlog = (req, res, next, rss) ->
-		template = if rss then 'blog/rss' else 'blog/blog'
-		if req.query.cms || Settings.showContentPages
-			# Select operator limits fields returned. It has some restrictions,
-			# such as it can only select properties to a depth of 2.
-			# Not a problem now, but if we link more then we'll need to remove operator
-			blogQuery = {
-				content_type: 'blogPost'
-				order: '-fields.publishDate'
-				select: 'fields.author,fields.content,fields.contentPreview,fields.publishDate,fields.slug,fields.tag,fields.title',
-				limit: resultsPerPage
-			}
+	template = if rss then 'blog/rss' else 'blog/blog'
+	# Select operator limits fields returned. It has some restrictions,
+	# such as it can only select properties to a depth of 2.
+	# Not a problem now, but if we link more then we'll need to remove operator
+	blogQuery = {
+		content_type: 'blogPost'
+		order: '-fields.publishDate'
+		select: 'fields.author,fields.content,fields.contentPreview,fields.publishDate,fields.slug,fields.tag,fields.title',
+		limit: resultsPerPage
+	}
 
-			# Pagination
-			if req.params.page && !isNaN(req.params.page)
-				blogQuery.skip = (parseInt(req.params.page - 1, 10) * resultsPerPage)
+	# Pagination
+	if req.params.page && !isNaN(req.params.page)
+		blogQuery.skip = (parseInt(req.params.page - 1, 10) * resultsPerPage)
 
-			# Filter by tag
-			if req.params.tag
-				# get the ID of the tag via the tag in the URL
-				getTagId(req.params.tag)
-					.then (tagData) ->
-						if tagData && tagData.items[0] && tagData.items[0].sys && tagData.items[0].sys.id
-							blogQuery['fields.tag.sys.id[in]'] = tagData.items[0].sys.id
-							getAndRenderBlog(req, res, next, blogQuery, template)
-						else
-							# to do - better 404 - specific for blog tag
-							ErrorController.notFound req, res
-					.catch (tagErr) ->
-						next(tagErr)
-			else
-				getAndRenderBlog(req, res, next, blogQuery, template)
-		else
-			ErrorController.notFound req, res
-
+	# Filter by tag
+	if req.params.tag
+		# get the ID of the tag via the tag in the URL
+		getTagId(req.params.tag)
+			.then (tagData) ->
+				if tagData && tagData.items[0] && tagData.items[0].sys && tagData.items[0].sys.id
+					blogQuery['fields.tag.sys.id[in]'] = tagData.items[0].sys.id
+					getAndRenderBlog(req, res, next, blogQuery, template)
+				else
+					# to do - better 404 - specific for blog tag
+					ErrorController.notFound req, res
+			.catch (tagErr) ->
+				next(tagErr)
+	else
+		getAndRenderBlog(req, res, next, blogQuery, template)
 
 _queryApi = (clientType, blogQuery) ->
 	ContentfulClient[clientType].getEntries(blogQuery)
@@ -166,19 +162,16 @@ module.exports =
 		_getBlog(req, res, next, true)
 
 	getBlogPost: (req, res, next)->
-		if req.query.cms || Settings.showContentPages
-			if req.params.slug == 'page' || req.params.slug == 'tagged'
-				# for if someone went to /blog/page/ or /blog/tagged/
-				# without a page number or tag param
-				_getBlog(req, res, next)
-			else if !isNaN(req.params.slug)
-				# v1 would sometimes link to blog ID
-				_v1IdQuery(req.params.slug, req, res)
-			else
-				blogQuery = {
-					content_type: 'blogPost'
-					'fields.slug': req.params.slug
-				}
-				getAndRenderBlog(req, res, next, blogQuery, 'blog/blog_post')
+		if req.params.slug == 'page' || req.params.slug == 'tagged'
+			# for if someone went to /blog/page/ or /blog/tagged/
+			# without a page number or tag param
+			_getBlog(req, res, next)
+		else if !isNaN(req.params.slug)
+			# v1 would sometimes link to blog ID
+			_v1IdQuery(req.params.slug, req, res)
 		else
-			ErrorController.notFound req, res
+			blogQuery = {
+				content_type: 'blogPost'
+				'fields.slug': req.params.slug
+			}
+			getAndRenderBlog(req, res, next, blogQuery, 'blog/blog_post')
