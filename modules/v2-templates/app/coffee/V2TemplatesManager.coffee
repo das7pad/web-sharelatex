@@ -90,7 +90,7 @@ module.exports = V2TemplatesManager =
 			callback null, page
 
 	getTemplate: (slug, read_token, callback) ->
-		V2TemplatesManager._get "/latex/templates/#{slug}/#{read_token}", (err, page) ->
+		V2TemplatesManager._get encodeURI("/latex/templates/#{slug}/#{read_token}"), (err, page) ->
 			return callback err if err
 			return callback new Error "invalid response" unless page?.pub?
 			content_type = content_types[page.pub.kind]
