@@ -8,9 +8,9 @@ import {
   waitForElement
 } from 'react-testing-library'
 
-import EmisExport from 'Modules/publish-modal/public/es/src/components/emis_export'
+import EJPExport from 'Modules/publish-modal/public/es/src/components/ejp_export'
 
-describe('<EmisExport />', function() {
+describe('<EJPExport />', function() {
   let ajaxStub
 
   this.timeout(5000)
@@ -43,7 +43,7 @@ describe('<EmisExport />', function() {
         .returns(
           $.Deferred().resolve({ export_json: { status_summary: 'succeeded' } })
         )
-      const { getByText } = renderEmisExport()
+      const { getByText } = renderEJPExport()
 
       const submitButton = getByText(/submit to myjournal/i)
       fireEvent.click(submitButton)
@@ -62,7 +62,7 @@ describe('<EmisExport />', function() {
         .returns(
           $.Deferred().resolve({ export_json: { status_summary: 'succeeded' } })
         )
-      const { getByText } = renderEmisExport()
+      const { getByText } = renderEJPExport()
 
       const submitButton = getByText(/submit to myjournal/i)
       fireEvent.click(submitButton)
@@ -89,7 +89,7 @@ describe('<EmisExport />', function() {
           $.Deferred().resolve({ export_json: { status_summary: 'succeeded' } })
         )
 
-      const { getByText } = renderEmisExport()
+      const { getByText } = renderEJPExport()
 
       const submitButton = getByText(/submit to myjournal/i)
       fireEvent.click(submitButton)
@@ -109,7 +109,7 @@ describe('<EmisExport />', function() {
       // Mock first poll request to fail
       ajaxStub.onSecondCall().returns($.Deferred().reject(new Error()))
 
-      const { getByText } = renderEmisExport()
+      const { getByText } = renderEJPExport()
 
       const submitButton = getByText(/submit to myjournal/i)
       fireEvent.click(submitButton)
@@ -133,7 +133,7 @@ describe('<EmisExport />', function() {
           $.Deferred().resolve({ export_json: { status_summary: 'failed' } })
         )
 
-      const { getByText } = renderEmisExport()
+      const { getByText } = renderEJPExport()
 
       const submitButton = getByText(/submit to myjournal/i)
       fireEvent.click(submitButton)
@@ -149,19 +149,11 @@ describe('<EmisExport />', function() {
         })
     })
   })
-
-  describe('failure on opening', () => {
-    it('shows error on project having folders', () => {
-      const { getByText } = renderEmisExport(true)
-      const errorMessage = getByText(/must be at top folder level/i)
-      expect(errorMessage).to.exist
-    })
-  })
 })
 
-function renderEmisExport(hasFolders = false) {
+function renderEJPExport() {
   return render(
-    <EmisExport
+    <EJPExport
       returnText="Return"
       entry={{
         id: 2,
@@ -169,7 +161,6 @@ function renderEmisExport(hasFolders = false) {
       }}
       onReturn={() => {}}
       projectId="1"
-      hasFolders={hasFolders}
       firstName="FirstName"
       lastName="LastName"
     />
