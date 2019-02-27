@@ -18,59 +18,49 @@ const argv = minimist(process.argv.slice(2))
 const bvId = argv._[0]
 const commit = argv.commit !== undefined
 
-removeBrandVariationIdMatchingId(bvId, commit)
+console.log(
+  (commit ? 'Remove' : 'Dry run for remove') +
+    ' brandVariationId from projects that have { brandVariationId: ' +
+    bvId +
+    ' }'
+)
+
+results = db.projects.find({ brandVariationId: bvId }, { _id: 1, name: 1 })
+var count = 0
+var problems = 0
+
+results.forEach(removeBrandVariationId, announceProblem)
+
+console.log(
+  'BrandVariationId ' +
+    (commit ? 'removed' : 'would be removed') +
+    ' from ' +
+    count +
+    ' projects'
+)
+if (0 < problems) console.log('There were ' + problems + ' problems')
+
 process.exit()
 
-function removeBrandVariationIdMatchingId(bvId, commit = false) {
+function removeBrandVariationId(project) {
+  count += 1
   console.log(
-    (commit ? 'Remove' : 'Dry run for remove') +
-      ' brandVariationId from projects that have { brandVariationId: ' +
-      bvId +
-      ' }'
+    (commit ? 'Removing' : 'Would remove') +
+      ' brandVariationId on project ' +
+      project._id +
+      ', name, "' +
+      project.name +
+      '"'
   )
-  db.projects.aggregate(
-    [{ $match: { brandVariationId: { bvId } } }],
-    { allowDiskUse: true },
-    function(err, results) {
-      if (err) throw err
-      console.log('Found ' + results.length + ' projects')
-      async.each(results, brandVariationIdRemover(commit), function(err) {
-        if (err) throw err
-        console.log(
-          'BrandVariationId ' +
-            (commit ? 'removed' : 'would be removed') +
-            ' from ' +
-            results.length +
-            ' projects'
-        )
-      })
-    }
-  )
+  if (commit) {
+    db.projects.update(
+      { _id: project._id },
+      { $unset: { brandVariationId: '' } }
+    )
+  }
 }
 
-// return an async function to remove BrandVariationId from a project
-// The value of commit is in the closure for the function, which
-// only commits the database change if commit is true.
-// Either way it puts a message on the console that shows the project.
-function brandVariationIdRemover(commit = false) {
-  const commitRemoval = commit
-  function removeBrandVariationId(project, callback) {
-    console.log(
-      (commitRemoval ? 'Removing' : 'Would remove') +
-        ' brandVariationId on project ' +
-        project._id +
-        ', name, "' +
-        project.name +
-        '"'
-    )
-    if (commitRemoval) {
-      db.projects.update(
-        { _id: project._id },
-        { $unset: { 'overleaf.id': '' } },
-        callback
-      )
-    } else {
-      callback()
-    }
-  }
+function announceProblem(err) {
+  problems += 1
+  console.log('Encountered problem, ', err)
 }
