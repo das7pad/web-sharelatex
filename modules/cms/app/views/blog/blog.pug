@@ -5,50 +5,52 @@ include ../../../../../app/views/mixins/_pagination
 //- or page for a list of blog posts returned from a tag query
 
 block content_cms
-	.content-container.container-small
+	.content-container
 		section
 			.row.section-row
 				.col-sm-12
 					.page-header
 						if tag
 							h1
-								a(href="/blog") Blog
+								a(href="/blog") #{translate('blog')}
 							small Posts tagged #{tag}
 						else
-							h1 Blog
-		section
+							h1 #{translate('blog')}
+		section.blog(ng-cloak ng-controller="BlogController")
 			.row.section-row
-				.col-sm-12
-					.blog(ng-cloak ng-controller="BlogController")
-						ul.blog-list
-							for post in items
-								li.card.blog-post
-									.card-header
-										h2
-											a(href='/blog/' + post.slug)
-												| !{post.title}
-									if (post.authorDisplay || post.publishDatePretty)
-										.row
-											.col-sm-12
-												small Posted
-													if (post.authorDisplay)
-														|  by #{post.authorDisplay}
-													if (post.publishDatePretty)
-														|  on #{post.publishDatePretty}
-
+				.col-sm-12.col-md-8
+					ul.blog-list
+						for post in items
+							li.card.blog-post
+								.card-header
+									h2
+										a(href='/blog/' + post.slug)
+											| !{post.title}
+								if (post.authorDisplay || post.publishDatePretty)
 									.row
 										.col-sm-12
-											mathjax(delimiter="no-single-dollar") !{post.contentPreview}
+											small Posted
+												if (post.authorDisplay)
+													|  by #{post.authorDisplay}
+												if (post.publishDatePretty)
+													|  on #{post.publishDatePretty}
 
-									.row.row-spaced
-										.col-sm-12
-											a.btn.btn-success(href='/blog/' + post.slug) Read More
+								.row
+									.col-sm-12
+										mathjax(delimiter="no-single-dollar") !{post.contentPreview}
 
-									.row
-										.col-sm-12
-											+blog_tags(post.tag)
+								.row.row-spaced
+									.col-sm-12
+										a.btn.btn-success(href='/blog/' + post.slug) Read More
+
+								.row
+									.col-sm-12
+										+blog_tags(post.tag, 'Tags')
 
 					if pages && pages.total_pages > 1
 						+paginate(pages, url_path)
+
+				.col-sm-12.col-md-4
+					+sidebar_blog
 
 	script(src=mathJaxPath)

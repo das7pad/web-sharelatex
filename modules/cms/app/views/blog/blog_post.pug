@@ -3,18 +3,17 @@ extends ../layout
 //- Page for a single blog post
 
 block content_cms
-	- var popular_tags = [ {fields: {tag: 'publishers'}}, {fields: {tag: 'events'}}, {fields: {tag: 'latex'}}, {fields: {tag: 'tech'}}, {fields: {tag: 'press'}}, {fields: {tag: 'features'}}, {fields: {tag: 'guides'}}, {fields: {tag: 'institutions'}}, {fields: {tag: 'case studies'}}, {fields: {tag: 'advisors'}}]
-	.content-container.container-small
+	.content-container
 		section
 			.row.section-row
 				.col-xs-12
 					.page-header
 						h1
-							a(href="/blog") Blog
+							a(href="/blog") #{translate('blog')}
 						
-		section
-			.row.section-row.blog(ng-cloak ng-controller="BlogController")
-				.col-xs-12
+		section.blog(ng-cloak ng-controller="BlogController")
+			.row.section-row
+				.col-xs-12.col-md-8
 					ul.blog-list
 						li.card
 							.card-header
@@ -31,8 +30,8 @@ block content_cms
 							if tag
 								.row
 									.col-sm-12
-										+blog_tags(tag)
+										+blog_tags(tag, 'Tags')
 
-							+blog_tags(popular_tags, 'Popular Tags')
-
+				.col-sm-12.col-md-4
+					+sidebar_blog
 	script(src=mathJaxPath) 
