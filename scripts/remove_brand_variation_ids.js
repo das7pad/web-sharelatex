@@ -25,42 +25,51 @@ console.log(
     ' }'
 )
 
-results = db.projects.find({ brandVariationId: bvId }, { _id: 1, name: 1 })
 var count = 0
-var problems = 0
 
-results.forEach(removeBrandVariationId, announceProblem)
-
-console.log(
-  'BrandVariationId ' +
-    (commit ? 'removed' : 'would be removed') +
-    ' from ' +
-    count +
-    ' projects'
+db.projects.find(
+  { brandVariationId: bvId.toString() },
+  { _id: 1, name: 1 },
+  processRemovals
 )
-if (0 < problems) console.log('There were ' + problems + ' problems')
 
-process.exit()
+function processRemovals(err, projects) {
+  if (err) throw err
+  async.mapSeries(
+    projects,
+    function(project, cb) {
+      count += 1
+      console.log(
+        (commit ? 'Removing' : 'Would remove') +
+          ' brandVariationId on project ' +
+          project._id +
+          ', name: "' +
+          project.name +
+          '"'
+      )
+      if (commit) {
+        db.projects.update(
+          { _id: project._id },
+          { $unset: { brandVariationId: '' } },
+          cb
+        )
+      } else {
+        cb()
+      }
+    },
+    function(err) {
+      if (err) {
+        console.log('There was a problem: ', err)
+      }
+      console.log(
+        'BrandVariationId ' +
+          (commit ? 'removed' : 'would be removed') +
+          ' from ' +
+          count +
+          ' projects'
+      )
 
-function removeBrandVariationId(project) {
-  count += 1
-  console.log(
-    (commit ? 'Removing' : 'Would remove') +
-      ' brandVariationId on project ' +
-      project._id +
-      ', name, "' +
-      project.name +
-      '"'
+      process.exit()
+    }
   )
-  if (commit) {
-    db.projects.update(
-      { _id: project._id },
-      { $unset: { brandVariationId: '' } }
-    )
-  }
-}
-
-function announceProblem(err) {
-  problems += 1
-  console.log('Encountered problem, ', err)
 }
