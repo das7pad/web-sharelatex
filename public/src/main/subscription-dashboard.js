@@ -29,9 +29,9 @@ define(['base'], function(App) {
         return institution.v1Id === parseInt(institutionId)
       })
       if (inst.metricsEmail.optedOutUserIds.includes(window.user_id)) {
-        return 'You are unsubscribed to monthly metrics emails'
+        return 'Subscribe'
       } else {
-        return 'You are subscribed to monthly metrics emails'
+        return 'Unsubscribe'
       }
     }
 
