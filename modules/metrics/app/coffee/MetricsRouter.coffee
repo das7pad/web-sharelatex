@@ -2,6 +2,7 @@ logger = require 'logger-sharelatex'
 MetricsController = require './MetricsController'
 InstitutionHubsController = require './InstitutionHubsController'
 PublisherHubsController = require './PublisherHubsController'
+MetricsEmailController = require './MetricsEmailController'
 AnalyticsController = require("../../../../app/js/Features/Analytics/AnalyticsController")
 AuthenticationController = require("../../../../app/js/Features/Authentication/AuthenticationController")
 AuthorizationMiddlewear = require('../../../../app/js/Features/Authorization/AuthorizationMiddlewear')
@@ -110,4 +111,10 @@ module.exports =
 			'/project/:project_id/v1/metrics_segmentation',
 			AuthenticationController.httpAuth,
 			MetricsController.projectMetricsSegmentation
+		)
+
+		privateApiRouter.post(
+			'/metrics/institutional_emails',
+			AuthenticationController.httpAuth,
+			MetricsEmailController.sendAll
 		)
