@@ -21,7 +21,7 @@ module.exports = MetricsEmailController =
 			entity.metricsEmail.optedOutUserIds.remove(user._id)
 		else
 			entity.metricsEmail.optedOutUserIds.push(user._id)
-		entity.save(res.sendStatus(200))
+		entity.save(res.status(200).send(entity.metricsEmail.optedOutUserIds))
 
 	sendAll: (req, res, next) ->
 		# find all the institutions with managers
