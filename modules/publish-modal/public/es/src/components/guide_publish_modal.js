@@ -71,8 +71,10 @@ export default class GuidePublishModal extends Component {
             projectId={initParams.projectId}
           />
         )
-      }
-      if (entry.partner === 'f1000' || entry.partner === 'wellcome_trust') {
+      } else if (
+        entry.partner === 'f1000' ||
+        entry.partner === 'wellcome_trust'
+      ) {
         return (
           <F1000Export
             onReturn={onReturn}
