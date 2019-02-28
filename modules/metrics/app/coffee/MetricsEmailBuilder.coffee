@@ -17,4 +17,5 @@ For more detailed v2 metrics you can visit the metrics hub using the button belo
 """
 	ctaText: (opts) -> "Visit #{opts.institutionName} Hub"
 	ctaURL: (opts) -> opts.hubUrl
+	secondaryMessage: () -> "Visit your <a href=\"#{settings.siteUrl}/user/subscription\"> subscriptions </a> to manage metrics email subscriptions"
 })
