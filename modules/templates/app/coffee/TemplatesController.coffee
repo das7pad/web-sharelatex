@@ -17,22 +17,13 @@ async = require("async")
 
 module.exports = TemplatesController =
 
-	beginCreateProjectFromZipTemplate: (req, res)->
+	createProjectFromZipTemplate: (req, res)->
+		currentUserId = AuthenticationController.getLoggedInUserId(req)
 		logger.log body:req.session.templateData, "creating project from zip"
 		if !req.session.templateData?
 			return res.redirect "/project"
 
-		templateData = req.session.templateData
-		delete req.session.templateData
-
-		res.render path.resolve(__dirname, "../views/project/editor/new_from_template"), templateData
-
-	createProjectFromZipTemplate: (req, res)->
-		currentUserId = AuthenticationController.getLoggedInUserId(req)
-		if !req.body.zipUrl?
-			return res.redirect "/project"
-
-		zipUrl = req.body.zipUrl
+		zipUrl = req.session.templateData.zipUrl
 
 		if zipUrl.slice(0,12).indexOf("templates") == -1
 			zipUrl = "#{settings.siteUrl}#{zipUrl}"
@@ -44,9 +35,9 @@ module.exports = TemplatesController =
 		TemplatesController.createFromZip(
 			zipReq,
 			{
-				templateName: req.body.templateName,
-				currentUserId: currentUserId,
-				compiler: req.body.compiler
+				templateName: req.session.templateData.templateName,
+				currentUserId:currentUserId,
+				compiler: req.session.templateData.compiler
 			},
 			req,
 			res
