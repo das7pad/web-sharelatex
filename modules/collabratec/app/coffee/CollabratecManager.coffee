@@ -44,7 +44,7 @@ module.exports = CollabratecManager =
 		V1Api.request options, (err, response, body) ->
 			return callback new Errors.NotFoundError() if err? && err.statusCode == 404
 			return callback err if err?
-			TemplatesManager.createProjectFromV1Template null, null, null, body.pub.doc_id, title, body.pub.published_ver_id, user_id, (err, project) ->
+			TemplatesManager.createProjectFromV1Template null, null, null, body.pub.doc_id, title, body.pub.published_ver_id, user_id, null, (err, project) ->
 				return callback err if err?
 				CollabratecManager._injectProjectMetadata user_id, project, title, doc_abstract, keywords, (err) ->
 					return callback err if err?
