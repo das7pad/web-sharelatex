@@ -140,7 +140,7 @@ pipeline {
   post {
 
     always {
-      sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make clean_ci'
+      sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make clean_ci || true'
     }
     
     success {
