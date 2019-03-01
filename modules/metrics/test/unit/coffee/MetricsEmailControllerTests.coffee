@@ -9,7 +9,8 @@ expect = require("chai").expect
 describe "MetricsEmailController", ->
 	beforeEach ->
     # set date to Jan 2019, so metrics should be for Dec 2018
-		clock = sinon.useFakeTimers(new Date(2019,0,15).getTime())
+		@date = new Date(2019,0,15).getTime()
+		clock = sinon.useFakeTimers(@date)
 		@institution =
 			_id: 'mock-institution-id'
 			v1Id: 5
@@ -18,6 +19,7 @@ describe "MetricsEmailController", ->
 				institution = Object.assign({}, @institution)
 				institution.name = 'Stanford'
 				callback(null, institution)
+			update: sinon.stub().callsArgWith(1, null)
 
 		@getUser = sinon.stub()
 		@getUser.onFirstCall().callsArgWith(2, null, {
@@ -50,17 +52,17 @@ describe "MetricsEmailController", ->
 			'../../../../app/js/Features/Email/EmailHandler': sendEmail: @sendEmail
 			'../../../../app/js/Features/User/UserGetter': getUser: @getUser
 			'../../../../app/js/models/Institution':
-				 Institution: find: sinon.stub().callsArgWith(1, null, [@institution])
+				 Institution: @Institution = find: sinon.stub().callsArgWith(1, null, [@institution])
 			'./InstitutionHubsController':
 				 _v1InstitutionsApi: sinon.stub().callsArgWith(2, null, null, {count: 12})
 			'./MetricsEmailBuilder': sinon.stub()
 		@req = {}
-		@res = send: sinon.stub()
+		@res = sendStatus: sinon.stub()
 
 	it 'sends the metrics emails', (done) ->
 		@MetricsEmailController.sendAll(@req, @res)
-		@res.send.calledOnce.should.equal true
-		@res.send.calledWith(200).should.equal true
+		@res.sendStatus.calledOnce.should.equal true
+		@res.sendStatus.calledWith(200).should.equal true
 		@getUser.calledThrice.should.equal true
 		@sendEmail.calledThrice.should.equal true
 		@sendEmail.lastCall.args[0].should.equal 'institutionMetricsEmail'
@@ -74,5 +76,19 @@ describe "MetricsEmailController", ->
 		sendOpts.metrics.newUsers.should.equal 12
 		sendOpts.metrics.usage['active-users'].should.equal 0
 		sendOpts.month.should.equal 'December'
+
+		done()
+
+	it 'should not send the metrics emails twice in a month', (done) ->
+		#send the emails
+		@MetricsEmailController.sendAll(@req, @res)
+		@institution.metricsEmailLastSent = @date
+		@MetricsEmailController.sendAll(@req, @res)
+
+		@res.sendStatus.calledTwice.should.equal true
+		@res.sendStatus.calledWith(200).should.equal true
+		# only 3 emails should be sent, not 6
+		@getUser.calledThrice.should.equal true
+		@sendEmail.calledThrice.should.equal true
 
 		done()
