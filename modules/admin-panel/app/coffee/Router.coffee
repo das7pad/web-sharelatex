@@ -2,7 +2,7 @@ UserAdminController = require("./UserAdminController")
 ProjectAdminController = require("./ProjectAdminController")
 SubscriptionAdminController = require("./SubscriptionAdminController")
 GraphController = require("./GraphController")
-AuthorizationMiddlewear = require('../../../../app/js/Features/Authorization/AuthorizationMiddlewear')
+AuthorizationMiddleware = require('../../../../app/js/Features/Authorization/AuthorizationMiddleware')
 ProjectController = require("../../../../app/js/Features/Project/ProjectController")
 express = require "express"
 
@@ -12,7 +12,7 @@ module.exports =
 		adminRouter = express.Router()
 		webRouter.use "/admin", adminRouter
 		
-		adminRouter.use(AuthorizationMiddlewear.ensureUserIsSiteAdmin)
+		adminRouter.use(AuthorizationMiddleware.ensureUserIsSiteAdmin)
 		adminRouter.get    "/user",          UserAdminController.index
 		adminRouter.post   "/user/search",   UserAdminController.search
 		adminRouter.get    "/user/:user_id", UserAdminController.show

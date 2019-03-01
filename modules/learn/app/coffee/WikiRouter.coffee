@@ -1,4 +1,4 @@
-RateLimiterMiddlewear = require("../../../../app/js/Features/Security/RateLimiterMiddlewear.js")
+RateLimiterMiddleware = require("../../../../app/js/Features/Security/RateLimiterMiddleware.js")
 WikiController = require("./WikiController")
 settings = require("settings-sharelatex")
 logger = require('logger-sharelatex')
@@ -11,7 +11,7 @@ module.exports =
 
 		if settings.apis.wiki?.url? or settings.proxyLearn
 			#used for images onsite installs
-			webRouter.get /^\/learn-scripts\/images/, RateLimiterMiddlewear.rateLimit({
+			webRouter.get /^\/learn-scripts\/images/, RateLimiterMiddleware.rateLimit({
 				endpointName: "wiki"
 				params: []
 				maxRequests: 60
@@ -19,7 +19,7 @@ module.exports =
 			}), WikiController.proxy
 
 			# wiki root, `/learn`
-			webRouter.get /^\/learn\/?$/i, RateLimiterMiddlewear.rateLimit({
+			webRouter.get /^\/learn\/?$/i, RateLimiterMiddleware.rateLimit({
 				endpointName: "wiki"
 				params: []
 				maxRequests: 60
@@ -47,7 +47,7 @@ module.exports =
 				}))
 
 			# Match either /learn/latex/:page or /learn/how-to/:page
-			webRouter.get /^\/learn\/(latex|how-to)(\/.*)?$/i, RateLimiterMiddlewear.rateLimit({
+			webRouter.get /^\/learn\/(latex|how-to)(\/.*)?$/i, RateLimiterMiddleware.rateLimit({
 				endpointName: "wiki"
 				params: []
 				maxRequests: 60

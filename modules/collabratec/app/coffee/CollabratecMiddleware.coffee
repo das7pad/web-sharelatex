@@ -6,21 +6,21 @@ fs = require "fs"
 logger = require "logger-sharelatex"
 mongojs = require "mongojs"
 
-module.exports = CollabratecMiddlewear =
+module.exports = CollabratecMiddleware =
 	ensureUserCanAdminProject: (req, res, next) ->
 		AuthorizationManager.canUserAdminProject req.oauth_user._id, req.params.project_id, null, (err, canAdmin, becauseSiteAdmin) ->
-			CollabratecMiddlewear._handleAuthResponse req, res, next, err, canAdmin && !becauseSiteAdmin, "admin", 403
+			CollabratecMiddleware._handleAuthResponse req, res, next, err, canAdmin && !becauseSiteAdmin, "admin", 403
 
 	ensureUserCanDeleteProject: (req, res, next) ->
 		AuthorizationManager.canUserAdminProject req.oauth_user._id, req.params.project_id, null, (err, canAdmin, becauseSiteAdmin) ->
 			return next err if err?
 			ProjectCollabratecDetailsHandler.isLinkedCollabratecUserProject req.params.project_id, req.oauth_user._id, (err, isLinked) ->
 				return next err if err?
-				CollabratecMiddlewear._handleAuthResponse req, res, next, err, canAdmin && !becauseSiteAdmin && isLinked, "delete", 422
+				CollabratecMiddleware._handleAuthResponse req, res, next, err, canAdmin && !becauseSiteAdmin && isLinked, "delete", 422
 
 	ensureUserCanReadProject: (req, res, next) ->
 		AuthorizationManager.canUserReadProject req.oauth_user._id, req.params.project_id, null, (err, canRead, becauseSiteAdmin) ->
-			CollabratecMiddlewear._handleAuthResponse req, res, next, err, canRead && !becauseSiteAdmin, "read", 403
+			CollabratecMiddleware._handleAuthResponse req, res, next, err, canRead && !becauseSiteAdmin, "read", 403
 
 	v1Proxy: (req, res, next) ->
 		# always use v2 if not a project query
@@ -36,7 +36,7 @@ module.exports = CollabratecMiddlewear =
 				next()
 			# otherwise proxy to v1
 			else
-				CollabratecMiddlewear._v1Proxy req, res, next
+				CollabratecMiddleware._v1Proxy req, res, next
 
 	_handleAuthResponse: (req, res, next, err, isAuthed, resource, errStatus) ->
 		return next err if err?

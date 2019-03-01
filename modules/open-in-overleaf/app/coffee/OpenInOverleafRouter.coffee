@@ -1,14 +1,14 @@
 OpenInOverleafController = require("./OpenInOverleafController")
 OpenInOverleafMiddleware = require("./OpenInOverleafMiddleware")
 OpenInOverleafErrorController = require("./OpenInOverleafErrorController")
-RateLimiterMiddlewear = require("../../../../app/js/Features/Security/RateLimiterMiddlewear")
+RateLimiterMiddleware = require("../../../../app/js/Features/Security/RateLimiterMiddleware")
 
 module.exports =
 	apply: (webRouter) ->
 		webRouter.csrf.disableDefaultCsrfProtection('/docs', 'POST')
 		webRouter.get  '/docs', OpenInOverleafMiddleware.middleware, OpenInOverleafController.openInOverleaf, OpenInOverleafErrorController.handleError
 		webRouter.post '/docs', OpenInOverleafMiddleware.middleware,
-			RateLimiterMiddlewear.rateLimit({
+			RateLimiterMiddleware.rateLimit({
 				endpointName: "open-in-overleaf"
 				maxRequests: 20
 				timeInterval: 60
