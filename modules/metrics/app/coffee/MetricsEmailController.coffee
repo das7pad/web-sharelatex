@@ -51,7 +51,8 @@ module.exports = MetricsEmailController =
 				if error
 					return callback(error)
 				async.mapSeries institution.managerIds, ((userId, innerCallback) ->
-					return innerCallback if userId in institution.metricsEmail.optedOutUserIds
+					return innerCallback if institution.metricsEmail?.optedOutUserIds &&
+           userId in institution.metricsEmail.optedOutUserIds
 					UserGetter.getUser userId, {email: 1, first_name: 1}, (error, user) ->
 						if error
 							return innerCallback(error)

@@ -15,6 +15,7 @@ describe "MetricsEmailController", ->
 			_id: 'mock-institution-id'
 			v1Id: 5
 			managerIds: [1, 2, 3]
+			metricsEmail: {}
 			fetchV1Data: (callback) =>
 				institution = Object.assign({}, @institution)
 				institution.name = 'Stanford'
@@ -82,7 +83,7 @@ describe "MetricsEmailController", ->
 	it 'should not send the metrics emails twice in a month', (done) ->
 		#send the emails
 		@MetricsEmailController.sendAll(@req, @res)
-		@institution.metricsEmailLastSent = @date
+		@institution.metricsEmail.lastSent = @date
 		@MetricsEmailController.sendAll(@req, @res)
 
 		@res.sendStatus.calledTwice.should.equal true
