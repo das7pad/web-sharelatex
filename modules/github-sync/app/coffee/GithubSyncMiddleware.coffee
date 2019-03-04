@@ -2,7 +2,7 @@ GithubSyncApiHandler = require "./GithubSyncApiHandler"
 AuthenticationController = require('../../../../app/js/Features/Authentication/AuthenticationController')
 logger = require "logger-sharelatex"
 
-module.exports = GithubSyncMiddlewear =
+module.exports = GithubSyncMiddleware =
 	injectUserSettings: (req, res, next) ->
 		if !AuthenticationController.isUserLoggedIn(req)?
 			return next()

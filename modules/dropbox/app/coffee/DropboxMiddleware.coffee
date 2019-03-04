@@ -2,7 +2,7 @@ DropboxHandler = require "./DropboxHandler"
 logger = require "logger-sharelatex"
 AuthenticationController = require "../../../../app/js/Features/Authentication/AuthenticationController"
 
-module.exports = DropboxMiddlewear =
+module.exports = DropboxMiddleware =
 	injectUserSettings: (req, res, next) ->
 		if !AuthenticationController.isUserLoggedIn(req)?
 			return next()

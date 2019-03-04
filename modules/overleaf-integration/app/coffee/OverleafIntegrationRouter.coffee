@@ -11,8 +11,8 @@ SharelatexAuthController = require "./SharelatexAuth/SharelatexAuthController"
 SSOController = require "./SSO/SSOController"
 V1LoginController = require "./V1Login/V1LoginController"
 V1RedirectController = require "./V1Redirect/V1RedirectController"
-AuthorizationMiddlewear = require('../../../../app/js/Features/Authorization/AuthorizationMiddlewear')
-RateLimiterMiddlewear = require('../../../../app/js/Features/Security/RateLimiterMiddlewear')
+AuthorizationMiddleware = require('../../../../app/js/Features/Authorization/AuthorizationMiddleware')
+RateLimiterMiddleware = require('../../../../app/js/Features/Security/RateLimiterMiddleware')
 passport = require "passport"
 logger = require "logger-sharelatex"
 qs = require 'querystring'
@@ -26,7 +26,7 @@ module.exports =
 		webRouter.get '/login', V1LoginController.loginPage
 		webRouter.post(
 			'/login', 
-			RateLimiterMiddlewear.rateLimit({
+			RateLimiterMiddleware.rateLimit({
 				endpointName: 'overleaf-login',
 				maxRequests: 10
 				timeInterval: 60
@@ -50,7 +50,7 @@ module.exports =
 		webRouter.post(
 			'/user/change_password/v1',
 			AuthenticationController.requireLogin(),
-			RateLimiterMiddlewear.rateLimit({
+			RateLimiterMiddleware.rateLimit({
 				endpointName: 'overleaf-change-password',
 				maxRequests: 10
 				timeInterval: 60
@@ -106,7 +106,7 @@ module.exports =
 
 		publicApiRouter.post(
 			'/overleaf/user/:v1_user_id/sync',
-			RateLimiterMiddlewear.rateLimit({
+			RateLimiterMiddleware.rateLimit({
 				endpointName: 'overleaf-user-details-sync',
 				params: ["v1_user_id"]
 				maxRequests: 10
@@ -147,7 +147,7 @@ module.exports =
 				AccountMergeEmailController.renderConfirmMergeFromEmailPage
 
 			webRouter.post '/account-merge/email/confirm',
-				RateLimiterMiddlewear.rateLimit({
+				RateLimiterMiddleware.rateLimit({
 					endpointName: "account-merge-email-confirm",
 					ipOnly: true,
 					maxRequests: 10
@@ -159,7 +159,7 @@ module.exports =
 				AccountMergeEmailController.renderAccountMergeFromEmailFinishPage
 
 			webRouter.post '/account-merge/email/sharelatex',
-				RateLimiterMiddlewear.rateLimit({
+				RateLimiterMiddleware.rateLimit({
 					endpointName: "account-merge-email-sharelatex"
 					maxRequests: 10
 					timeInterval: 60

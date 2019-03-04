@@ -5,7 +5,7 @@ PublisherHubsController = require './PublisherHubsController'
 MetricsEmailController = require './MetricsEmailController'
 AnalyticsController = require("../../../../app/js/Features/Analytics/AnalyticsController")
 AuthenticationController = require("../../../../app/js/Features/Authentication/AuthenticationController")
-AuthorizationMiddlewear = require('../../../../app/js/Features/Authorization/AuthorizationMiddlewear')
+AuthorizationMiddleware = require('../../../../app/js/Features/Authorization/AuthorizationMiddleware')
 UserMembershipAuthorization = require('../../../../app/js/Features/UserMembership/UserMembershipAuthorization')
 settings = require 'settings-sharelatex'
 
