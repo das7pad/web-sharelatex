@@ -23,7 +23,9 @@ module.exports =
 
 		# Make sure the /project/new/template route comes before the /project/:project_id/template route
 		# This is a get request so that it can be linked to.
-		app.get '/project/new/template', TemplatesMiddleware.saveTemplateDataInSession, AuthenticationController.requireLogin(), TemplatesController.createProjectFromZipTemplate
+		app.get '/project/new/template', TemplatesMiddleware.saveTemplateDataInSession, AuthenticationController.requireLogin(), TemplatesController.beginCreateProjectFromZipTemplate
+		# Second step in creating projects from templates. /step2 prevents route collision with the OL template system
+		app.post '/project/new/template/step2', AuthenticationController.requireLogin(), TemplatesController.createProjectFromZipTemplate
 
 		if Features.hasFeature('publish-templates')
 			app.get  "/project/:Project_id/template", AuthorizationMiddleware.ensureUserCanReadProject, TemplatesController.getTemplateDetails

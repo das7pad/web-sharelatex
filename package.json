@@ -10,7 +10,7 @@
     "public": "./public"
   },
   "scripts": {
-    "test:acceptance:run_dir": "mocha --recursive --reporter spec --timeout 15000 --exit --grep=$MOCHA_GREP $@",
+    "test:acceptance:run_dir": "mocha --recursive --reporter spec --timeout 25000 --exit --grep=$MOCHA_GREP $@",
     "test:unit": "npm -q run compile:app && bin/unit_test --grep=$MOCHA_GREP $@",
     "test:unit:ci": "bin/unit_test --timeout 10000",
     "test:unit:app": "npm -q run compile:app && bin/unit_test_app $@",
@@ -54,6 +54,7 @@
     "heapdump": "^0.3.7",
     "helmet": "^3.8.1",
     "http-proxy": "^1.8.1",
+    "is-utf8": "^0.2.1",
     "jade": "~1.3.1",
     "jquery": "^1.11.1",
     "json2csv": "^4.3.3",

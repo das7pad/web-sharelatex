@@ -4,8 +4,8 @@ pipeline {
   agent any
 
   environment {
-    GIT_PROJECT = "web-sharelatex"
-    JENKINS_WORKFLOW = "web-sharelatex"
+    GIT_PROJECT = "web-sharelatex-internal"
+    JENKINS_WORKFLOW = "web-sharelatex-internal"
     TARGET_URL = "${env.JENKINS_URL}blue/organizations/jenkins/${JENKINS_WORKFLOW}/detail/$BRANCH_NAME/$BUILD_NUMBER/pipeline"
     GIT_API_URL = "https://api.github.com/repos/sharelatex/${GIT_PROJECT}/statuses/$GIT_COMMIT"
   }
@@ -140,7 +140,7 @@ pipeline {
   post {
 
     always {
-      sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make clean_ci'
+      sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make clean_ci || true'
     }
     
     success {
