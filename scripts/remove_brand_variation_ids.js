@@ -35,7 +35,7 @@ db.projects.find(
 
 function processRemovals(err, projects) {
   if (err) throw err
-  async.mapSeries(
+  async.each(
     projects,
     function(project, cb) {
       count += 1
