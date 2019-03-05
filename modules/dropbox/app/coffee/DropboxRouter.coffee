@@ -1,12 +1,12 @@
 DropboxUserController = require './DropboxUserController'
 DropboxWebhookController = require './DropboxWebhookController'
 DropboxProjectController = require "./DropboxProjectController"
-DropboxMiddlewear = require "./DropboxMiddlewear"
-AuthorizationMiddlewear = require "../../../../app/js/Features/Authorization/AuthorizationMiddlewear"
+DropboxMiddleware = require "./DropboxMiddleware"
+AuthorizationMiddleware = require "../../../../app/js/Features/Authorization/AuthorizationMiddleware"
 AuthenticationController = require "../../../../app/js/Features/Authentication/AuthenticationController"
 module.exports =
 	apply: (webRouter, privateApiRouter, publicApiRouter) ->
-		webRouter.get  '/user/settings', DropboxMiddlewear.injectUserSettings
+		webRouter.get  '/user/settings', DropboxMiddleware.injectUserSettings
 		
 		webRouter.get  '/dropbox/beginAuth', AuthenticationController.requireLogin(), DropboxUserController.redirectUserToDropboxAuth
 		webRouter.get  '/dropbox/completeRegistration', AuthenticationController.requireLogin(), DropboxUserController.completeDropboxRegistrationPage

@@ -1,18 +1,18 @@
 ReferencesSearchController = require './ReferencesSearchController'
-RateLimiterMiddlewear = require('../../../../app/js/Features/Security/RateLimiterMiddlewear')
-AuthorizationMiddlewear = require('../../../../app/js/Features/Authorization/AuthorizationMiddlewear')
+RateLimiterMiddleware = require('../../../../app/js/Features/Security/RateLimiterMiddleware')
+AuthorizationMiddleware = require('../../../../app/js/Features/Authorization/AuthorizationMiddleware')
 
 module.exports = ReferencesSearchRouter =
 
 	apply: (webRouter, apiRouter) ->
 		webRouter.post(
 			"/project/:Project_id/references/search",
-			RateLimiterMiddlewear.rateLimit({
+			RateLimiterMiddleware.rateLimit({
 				endpointName: "search-references"
 				params: ["Project_id"]
 				maxRequests: 100
 				timeInterval: 60
 			}),
-			AuthorizationMiddlewear.ensureUserCanReadProject,
+			AuthorizationMiddleware.ensureUserCanReadProject,
 			ReferencesSearchController.search
 		)

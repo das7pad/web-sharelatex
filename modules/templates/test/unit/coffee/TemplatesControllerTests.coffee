@@ -62,13 +62,13 @@ describe 'TemplatesController', ->
 		@req =
 			session:
 				user: _id:@user_id
-				templateData:
-					zipUrl: @zipUrl
-					templateName: @templateName
+			body:
+				zipUrl: @zipUrl
+				templateName: @templateName
 		@redirect = {}
 		@AuthenticationController.getLoggedInUserId.returns(@user_id)
 
-	describe 'reciving a request to create project from templates.sharelatex.com', ->
+	describe 'recieving a request to create project from templates.sharelatex.com', ->
 
 		it 'should take the zip url and write it to disk', (done)->
 			redirect = =>
@@ -81,7 +81,7 @@ describe 'TemplatesController', ->
 
 
 		it "should go to the web api if the url does not contain templates", (done)->
-			@req.session.templateData.zipUrl = @zipUrl = "/project/52fd24abf080d80a22000fbd/download/zip&templateName=Example_Project&compiler=xelatex"
+			@req.body.zipUrl = @zipUrl = "/project/52fd24abf080d80a22000fbd/download/zip&templateName=Example_Project&compiler=xelatex"
 			redirect = =>
 				@request.calledWith("#{@siteUrl}#{@zipUrl}").should.equal true
 				done()
@@ -89,7 +89,7 @@ describe 'TemplatesController', ->
 			@controller.createProjectFromZipTemplate @req, res
 
 		it "should go to the web api if the url has template futher down the string", (done)->
-			@req.session.templateData.zipUrl = @zipUrl = "/project/52fd24abf080d80a22000fbd/download/zip&templateName=templates&compiler=xelatex"
+			@req.body.zipUrl = @zipUrl = "/project/52fd24abf080d80a22000fbd/download/zip&templateName=templates&compiler=xelatex"
 			redirect = =>
 				@request.calledWith("#{@siteUrl}#{@zipUrl}").should.equal true
 				done()
@@ -150,7 +150,7 @@ describe 'TemplatesController', ->
 
 	describe 'settings the compiler from the query string', ->
 		it 'should use the said compiler', (done)->
-			@req.session.templateData.compiler = "xelatex"
+			@req.body.compiler = "xelatex"
 			redirect = =>
 				@ProjectOptionsHandler.setCompiler.calledWith(project_id, "xelatex").should.equal true
 				done()
