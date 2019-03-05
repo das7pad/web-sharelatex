@@ -3,10 +3,9 @@ mixin blog_tags(tags, tags_title)
 		if tags_title
 			small #{tags_title}:
 		ul.tags-list
-			for t in tags
-				if t.fields && t.fields.tag
-					li
-						a.tag.btn.btn-default(href= '/blog/tagged/' + t.fields.tag) #{t.fields.tag}
+			for tag in tags
+				li
+					a.tag.btn.btn-default(href= '/blog/tagged/' + tag) #{tag}
 mixin preview()
 	//- When on preview mode this element is fixed to the top of the screen
 	//- To get on preview mode, add "?preview" to URL

@@ -29,10 +29,12 @@ module.exports =
 		webRouter.get '/blog', BlogController.getBlog
 		webRouter.get '/contact', ContactContoller.getContactPage
 		webRouter.get '/legal', LegalController.getLegal
+		webRouter.get '/blog/page', BlogController.redirectToList
 		webRouter.get '/blog/page/:page', BlogController.getBlog
+		webRouter.get '/blog/tagged', BlogController.redirectToList
 		webRouter.get '/blog/tagged/:tag', BlogController.getBlog
 		webRouter.get '/blog/tagged/:tag/page/:page', BlogController.getBlog
-		webRouter.get '/blog/feed*', send404 # RSS isn't implemented yet
+		webRouter.get '/blog/feed', BlogController.getFeed
 		webRouter.get '/blog/:slug', BlogController.getBlogPost
 		webRouter.get "/:path(#{cmsPathOptions})/:parent_slug/:slug", GeneralController.getPage
 		webRouter.get "/:path(#{cmsPathOptions})/:slug", GeneralController.getPage
