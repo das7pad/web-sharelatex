@@ -67,6 +67,12 @@ module.exports = ProjectEntityMongoUpdateHandler = self =
 					update =
 						"$inc": inc
 						"$set": set
+					# Note: Mongoose uses new:true to return the modified document
+					# https://mongoosejs.com/docs/api.html#model_Model.findOneAndUpdate
+					# but Mongo uses returnNewDocument:true instead
+					# https://docs.mongodb.com/manual/reference/method/db.collection.findOneAndUpdate/
+					# We are using Mongoose here, but if we ever switch to a direct mongo call
+					# the next line will need to be updated.
 					Project.findOneAndUpdate conditions, update, {new:true}, (err, newProject) ->
 						return callback(err) if err?
 						callback null, fileRef, project, path, newProject
