@@ -56,7 +56,7 @@ function processRemovals(err, projects) {
           cb
         )
       } else {
-        cb()
+        async.setImmediate(cb)
       }
     },
     function(err) {
