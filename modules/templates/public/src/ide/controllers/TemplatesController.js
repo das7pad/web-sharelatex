@@ -65,7 +65,6 @@ define(['base', 'ide/permissions/PermissionsManager', 'moment'], function(
         })
         .catch(() => problemTalkingToTemplateApi())
 
-    refreshPublishedStatus()
     $scope.$watch($scope.problemTalkingToTemplateApi, function(value) {
       if (value != null) {
         return refreshPublishedStatus()
