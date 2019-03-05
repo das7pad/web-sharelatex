@@ -130,7 +130,7 @@ describe "CollabratecManager", ->
 				@CollabratecManager.createProject "user-id", "template-id", "title", "doc-abstract", ["keyword-1", "keyword-2"], "author", "collabratec-document-id", "collabratec-privategroup-id", @callback
 
 			it "should create project", ->
-				expect(@TemplatesManager.createProjectFromV1Template).to.have.been.calledOnce.and.calledWithMatch null, null, null, "doc-id", "title", "published-ver-id", "user-id"
+				expect(@TemplatesManager.createProjectFromV1Template).to.have.been.calledOnce.and.calledWithMatch null, null, null, "doc-id", "title", "published-ver-id", "user-id", null
 
 			describe "when create project succeeds", ->
 				beforeEach ->
