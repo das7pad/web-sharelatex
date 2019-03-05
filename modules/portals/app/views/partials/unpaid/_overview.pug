@@ -1,7 +1,14 @@
 .row
 	.col-sm-12
 		.content-item
-			h3.text-center.hidden-print You've joined&nbsp;
-				+community_count(team.current_count, portal.title)
-
+			if affiliation == 'confirmed'
+				h3.text-center.hidden-print You've joined&nbsp;
+					+community_count(team.current_count, portal.title)
+			else
+				h3.text-center.hidden-print Join&nbsp;
+					+community_count(team.current_count, portal.title)
+				p.text-center Please confirm an email address for #{portal.title} by clicking on the link in the email we sent you.
+					br
+					| You can request another confirmation email via your&nbsp;
+					a(href="/user/settings") settings page.
 			include ./_overview_affiliated_and_not

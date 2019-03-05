@@ -4,7 +4,8 @@
 			//- to do? not confirmed
 			if affiliation
 				include partials/unpaid/_overview
-				//- include partials/unpaid/_show_support_and_contact
+				if affiliation == 'confirmed'
+					include partials/unpaid/_show_support_and_contact
 				include partials/unpaid/_get_pro_now
 				include partials/unpaid/_share
 				include partials/unpaid/_request_for_service
