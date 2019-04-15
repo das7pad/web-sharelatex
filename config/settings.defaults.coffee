@@ -135,7 +135,6 @@ module.exports = settings =
 		githubSync:
 			url: "http://#{process.env['GITHUB_SYNC_HOST'] or 'localhost'}:3022"
 		recurly:
-			privateKey: process.env['RECURLY_PRIVATE_KEY'] or ''
 			apiKey: process.env['RECURLY_API_KEY'] or ''
 			subdomain: process.env['RECURLY_SUBDOMAIN'] or ''
 			publicKey: process.env['RECURLY_PUBLIC_KEY'] or ''
@@ -400,6 +399,8 @@ module.exports = settings =
 	appName: process.env['APP_NAME'] or "ShareLaTeX (Community Edition)"
 
 	adminEmail: process.env['ADMIN_EMAIL'] or "placeholder@example.com"
+
+	statusPageUrl: process.env['OVERLEAF_STATUS_URL'] or "status.overleaf.com"
 
 	brandPrefix: process.env['BRAND_PREFIX'] or "sl-" # Set to 'ol-' for overleaf styles
 

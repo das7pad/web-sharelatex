@@ -20,7 +20,6 @@ define([
       this.onPaste = this.onPaste.bind(this)
       this.onResize = this.onResize.bind(this)
       this.tearDown = this.tearDown.bind(this)
-      this.onViewportChange = this.onViewportChange.bind(this)
 
       this.$scope = $scope
       this.editor = editor
@@ -176,13 +175,11 @@ define([
         }
       }
 
-      if (this.adapter.onCommentAdded) {
-        Array.from(this.rangesTracker.comments).map(comment => {
-          if (!this.isCommentResolved(comment)) {
-            this.adapter.onCommentAdded(comment)
-          }
-        })
-      }
+      Array.from(this.rangesTracker.comments).map(comment => {
+        if (!this.isCommentResolved(comment)) {
+          this.adapter.onCommentAdded(comment)
+        }
+      })
 
       this.broadcastChange()
     }
@@ -237,13 +234,13 @@ define([
 
       for (id in dirty.comment.added) {
         comment = dirty.comment.added[id]
-        if (this.adapter.onCommentAdded && !this.isCommentResolved(comment)) {
+        if (!this.isCommentResolved(comment)) {
           this.adapter.onCommentAdded(comment)
         }
       }
       for (id in dirty.comment.removed) {
         comment = dirty.comment.removed[id]
-        if (this.adapter.onCommentRemoved && !this.isCommentResolved(comment)) {
+        if (!this.isCommentResolved(comment)) {
           this.adapter.onCommentRemoved(comment)
         }
       }
@@ -404,9 +401,7 @@ define([
 
       for (let comment of comments) {
         if (resolve_ids[comment.op.t]) {
-          if (this.adapter.onCommentRemoved) {
-            this.adapter.onCommentRemoved(comment)
-          }
+          this.adapter.onCommentRemoved(comment)
         }
       }
       return this.broadcastChange()
@@ -416,9 +411,7 @@ define([
       let comments = this.rangesTracker.comments || []
       for (let comment of comments) {
         if (comment.op.t === thread_id && !this.isCommentResolved(comment)) {
-          if (this.adapter.onCommentAdded) {
-            this.adapter.onCommentAdded(comment)
-          }
+          this.adapter.onCommentAdded(comment)
         }
       }
       return this.broadcastChange()
@@ -430,10 +423,6 @@ define([
         comments: [],
         docId: null
       })
-    }
-
-    onViewportChange() {
-      this.adapter.changeMarkerPositions()
     }
 
     onCut() {
@@ -656,16 +645,18 @@ define([
     }
 
     updateFocus() {
-      const selection = this.editor.getSelectionRange()
-      const selection_start = this._rangeToShareJs(selection.start)
-      const selection_end = this._rangeToShareJs(selection.end)
-      const is_selection = selection_start !== selection_end
-      this.$scope.$emit(
-        'editor:focus:changed',
-        selection_start,
-        selection_end,
-        is_selection
-      )
+      if (this.editor) {
+        const selection = this.editor.getSelectionRange()
+        const selection_start = this._rangeToShareJs(selection.start)
+        const selection_end = this._rangeToShareJs(selection.end)
+        const is_selection = selection_start !== selection_end
+        this.$scope.$emit(
+          'editor:focus:changed',
+          selection_start,
+          selection_end,
+          is_selection
+        )
+      }
     }
 
     _rangeToShareJs(range) {

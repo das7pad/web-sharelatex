@@ -239,6 +239,7 @@ module.exports = ProjectController =
 						hasSubscription: results.hasSubscription
 						isShowingV1Projects: results.v1Projects?
 						warnings: warnings
+						zipFileSizeLimit: Settings.maxUploadSize
 					}
 
 					if Settings?.algolia?.app_id? and Settings?.algolia?.read_only_api_key?
@@ -391,7 +392,7 @@ module.exports = ProjectController =
 					editorThemes: THEME_LIST
 					maxDocLength: Settings.max_doc_length
 					useV2History: !!project.overleaf?.history?.display
-					richTextTrackChangesEnabled: req.query?.rttc == 'true'
+					richTextTrackChangesEnabled: req.query?.rttc == 'true' || user.betaProgram
 					showTestControls: req.query?.tc == 'true' || user.isAdmin
 					brandVariation: brandVariation
 					allowedImageNames: Settings.allowedImageNames || []

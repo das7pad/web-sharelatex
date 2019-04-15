@@ -87,6 +87,24 @@ block content
 						aside.project-list-sidebar
 							include ./list/side-bar
 
+						.project-list-sidebar-survey(
+							ng-if="shouldShowSurveyLink"
+						)
+							| Let us know what you think about the new Overleaf by 
+							a.project-list-sidebar-survey-link(
+								href="https://digitalscienceta.qualtrics.com/jfe/form/SV_3sMm9UAnx7ptpjL?source=dashboard"
+								target="_blank"
+								rel="noreferrer noopener"
+							) taking our survey
+							| .
+							button.project-list-sidebar-survey-dismiss(
+								type="button"
+								title="Dismiss survey notice"
+								ng-click="dismissSurvey()"
+							)
+								span(
+									aria-hidden="true"
+								) &times;
 						if hasFeature('v1-return-message')
 							.project-list-sidebar-v2-pane(ng-controller="OverleafV1NotificationController")
 								div
@@ -94,7 +112,7 @@ block content
 										ng-click="toggle()"
 									)
 										i.fa.fa-fw(ng-class="{ 'fa-chevron-up': !visible, 'fa-close': visible }" aria-hidden="true")
-										span.sr-only Toggle welcome to #{settings.appName} message
+										span.sr-only(ng-non-bindable) Toggle welcome to #{settings.appName} message
 									| Welcome to Overleaf v2!
 								div(ng-show="visible") #[a(href="https://www.overleaf.com/help/342-overleaf-v2-faq") Find out more].
 								if userIsFromOLv1(user)

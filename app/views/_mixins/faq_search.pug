@@ -1,7 +1,7 @@
 mixin faq_search(headerText, headerClass)
 	- if(typeof(settings.algolia) != "undefined" && typeof(settings.algolia.indexes) != "undefined" && typeof(settings.algolia.indexes.wiki) != "undefined")
 		if headerText
-			div(class=headerClass) #{headerText}
+			div(class=headerClass, ng-non-bindable) #{headerText}
 		.wiki(ng-controller="SearchWikiController")
 			form.project-search.form-horizontal(role="search")
 				.form-group.has-feedback.has-feedback-left
@@ -15,6 +15,7 @@ mixin faq_search(headerText, headerClass)
 							aria-hidden="true"
 						)
 						button.sr-only(
+							type="button"
 							ng-click="clearSearchText()",
 							ng-show="searchQueryText.length > 0"
 						) #{translate('clear_search')}

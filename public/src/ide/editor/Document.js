@@ -395,7 +395,8 @@ define([
           doc_id: this.doc_id,
           remote_doc_id: update != null ? update.doc : undefined,
           wantToBeJoined: this.wantToBeJoined,
-          update
+          update,
+          hasDoc: this.doc != null
         })
 
         if (
@@ -420,7 +421,11 @@ define([
           (update != null ? update.doc : undefined) === this.doc_id &&
           this.doc != null
         ) {
-          this.doc.processUpdateFromServer(update)
+          this.ide.pushEvent('received-update:processing', {
+            update
+          })
+          // FIXME: change this back to processUpdateFromServer when redis fixed
+          this.doc.processUpdateFromServerInOrder(update)
 
           if (!this.wantToBeJoined) {
             return this.leave()
@@ -476,6 +481,10 @@ define([
           callback = function(error) {}
         }
         if (this.doc != null) {
+          this.ide.pushEvent('joinDoc:existing', {
+            doc_id: this.doc_id,
+            version: this.doc.getVersion()
+          })
           return this.ide.socket.emit(
             'joinDoc',
             this.doc_id,
@@ -496,6 +505,9 @@ define([
             }
           )
         } else {
+          this.ide.pushEvent('joinDoc:new', {
+            doc_id: this.doc_id
+          })
           return this.ide.socket.emit(
             'joinDoc',
             this.doc_id,
@@ -505,6 +517,10 @@ define([
                 return callback(error)
               }
               this.joined = true
+              this.ide.pushEvent('joinDoc:inited', {
+                doc_id: this.doc_id,
+                version
+              })
               this.doc = new ShareJsDoc(
                 this.doc_id,
                 docLines,
