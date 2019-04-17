@@ -12,4 +12,3 @@ module.exports =
 		webRouter.post '/user/password/set', PasswordResetController.setNewUserPassword
 		AuthenticationController.addEndpointToLoginWhitelist '/user/password/set'
 
-		webRouter.post '/user/reconfirm', PasswordResetController.requestReset
