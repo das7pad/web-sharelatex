@@ -1,13 +1,10 @@
-define(['base', 'libs/platform'], function(
-  App,
-  platform
-) {
+define(['base', 'libs/platform'], function(App, platform) {
   return App.controller('PortalFormController', function(
     $scope,
     eventTracking,
     $http
   ) {
-    const defaultMessage = 
+    const defaultMessage =
       'Yes! I would like to explore an Overleaf Institutional Account.'
     // the form
     $scope.form = {
@@ -41,14 +38,14 @@ define(['base', 'libs/platform'], function(
         \n**Portal Link:** ${pUrl}
         `
 
-      const tags = message.trim() === defaultMessage
-        ? '' : 'Custom Portal Message'
+      const tags =
+        message.trim() === defaultMessage ? '' : 'Custom Portal Message'
 
       const data = {
         _csrf: window.csrfToken,
         email: $scope.form.email,
         message: messageFormatted || '',
-        subject: "Overleaf Portal Contact",
+        subject: 'Overleaf Portal Contact',
         inbox: 'portals',
         tags: tags
       }

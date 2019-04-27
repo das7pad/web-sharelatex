@@ -43,13 +43,7 @@ export default class EJPExport extends Component {
   }
 
   render() {
-    const {
-      entry,
-      onReturn,
-      returnText,
-      firstName,
-      lastName
-    } = this.props
+    const { entry, onReturn, returnText, firstName, lastName } = this.props
     return (
       <div
         className="publish-guide modal-body-content row content-as-table"
@@ -66,8 +60,8 @@ export default class EJPExport extends Component {
               <p>Thanks for using Overleaf to submit your article.</p>
               <p>
                 When you submit using the button below, your manuscript and
-                supporting files will be sent to the journal automatically,
-                and you will receive a confirmation email from Overleaf. The
+                supporting files will be sent to the journal automatically, and
+                you will receive a confirmation email from Overleaf. The
                 journal's editorial team will then send you a follow-up email
                 with instructions for how to complete your submission.
               </p>
