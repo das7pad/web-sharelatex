@@ -1,0 +1,82 @@
+pipeline {
+  agent {
+    label 'sharelatex'
+  }
+  environment {
+    DOCKER_COMPOSE_FLAGS = "-f docker-compose.ci.yml"
+  }
+
+  stages {
+    stage('CI') {
+      options {
+        timeout(time: 30, unit: 'MINUTES')
+      }
+      stages {
+        stage('Build') {
+          steps {
+            sh 'make build'
+          }
+        }
+
+        stage('Unit Tests') {
+          steps {
+            sh 'make test_unit'
+          }
+        }
+
+        stage('Acceptance Tests') {
+          parallel {
+            stage('Module Acceptance Tests') {
+              steps {
+                sh 'make test_acceptance_modules_run'
+              }
+            }
+
+            stage('Frontend Tests') {
+              steps {
+                sh 'make test_frontend_build_run'
+              }
+            }
+
+            stage('App Acceptance Tests') {
+              steps {
+                sh 'make test_acceptance_app_run'
+              }
+            }
+          }
+        }
+      }
+    }
+
+    stage('Submit results') {
+      options {
+        timeout(time: 30, unit: 'MINUTES')
+      }
+      stages {
+        stage('docker push') {
+          when {
+            expression {
+              env.SHARELATEX_DOCKER_REPOS != null
+            }
+          }
+          environment {
+            IMAGE = "${env.SHARELATEX_DOCKER_REPOS}/web-sharelatex:$BRANCH_NAME-$BUILD_NUMBER"
+          }
+          steps {
+            script {
+              sh 'docker build -t $IMAGE .'
+              sh 'docker push $IMAGE'
+              sh 'docker rmi $IMAGE'
+            }
+          }
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      sh 'make clean_ci'
+    }
+  }
+}
