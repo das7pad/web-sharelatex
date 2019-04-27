@@ -60,7 +60,7 @@ define(['base', 'libs/platform', 'services/algolia-search'], function(
   return App.controller('ContactFormController', function(
     $scope,
     algoliaSearch,
-    event_tracking,
+    eventTracking,
     $http
   ) {
     // the form
@@ -98,7 +98,7 @@ define(['base', 'libs/platform', 'services/algolia-search'], function(
       })()
 
       if (results.hits.length) {
-        event_tracking.sendMB('contact-form-suggestions-shown')
+        eventTracking.sendMB('contact-form-suggestions-shown')
       }
 
       return $scope.$applyAsync(() => ($scope.suggestions = suggestions))
@@ -173,7 +173,7 @@ define(['base', 'libs/platform', 'services/algolia-search'], function(
       })
 
     return ($scope.clickSuggestionLink = url =>
-      event_tracking.sendMB('contact-form-suggestions-clicked', { url }))
+      eventTracking.sendMB('contact-form-suggestions-clicked', { url }))
   })
 })
 

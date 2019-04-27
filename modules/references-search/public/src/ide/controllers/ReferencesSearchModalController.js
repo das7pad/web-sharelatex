@@ -19,7 +19,7 @@ define(['base'], App =>
     $window,
     $timeout,
     ide,
-    event_tracking
+    eventTracking
   ) {
     if (!$scope.searchFeatureEnabled()) {
       return
@@ -175,7 +175,7 @@ define(['base'], App =>
 
     $scope.acceptSelectedSearchResult = function() {
       if ($scope.state.searchResults && $scope.state.selectedIndex !== null) {
-        event_tracking.sendMB('bib-search-result-inserted')
+        eventTracking.sendMB('bib-search-result-inserted')
         const result = $scope.state.searchResults[$scope.state.selectedIndex]
         return $modalInstance.close(result._source.EntryKey)
       }

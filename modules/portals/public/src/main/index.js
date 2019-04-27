@@ -4,7 +4,7 @@ define(['base', 'libs/platform'], function(
 ) {
   return App.controller('PortalFormController', function(
     $scope,
-    event_tracking,
+    eventTracking,
     $http
   ) {
     const defaultMessage = 

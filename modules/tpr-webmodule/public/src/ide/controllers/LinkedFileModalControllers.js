@@ -18,7 +18,7 @@ define(['base'], function(App) {
     '$timeout',
     '$window',
     '$interval',
-    'event_tracking',
+    'eventTracking',
     'sixpack',
     function(
       $scope,
@@ -26,7 +26,7 @@ define(['base'], function(App) {
       $timeout,
       $window,
       $interval,
-      event_tracking,
+      eventTracking,
       sixpack
     ) {
       const features =
@@ -147,7 +147,7 @@ define(['base'], function(App) {
         if (provider === 'zotero') {
           payload.format = $scope.data.format
         }
-        event_tracking.send(`references-${provider}`, 'modal', 'import-bibtex')
+        eventTracking.send(`references-${provider}`, 'modal', 'import-bibtex')
         $scope.state.inflight = true
         return ide.fileTreeManager
           .createLinkedFile(
@@ -218,7 +218,7 @@ define(['base'], function(App) {
           'reference-auth',
           'width=700,height=500'
         )
-        event_tracking.send(
+        eventTracking.send(
           `references-${provider}`,
           'modal',
           'start-link-account'
@@ -237,7 +237,7 @@ define(['base'], function(App) {
           }
           if (pathname === '/user/settings') {
             authWindow.close()
-            event_tracking.send(
+            eventTracking.send(
               `references-${provider}`,
               'modal',
               'end-link-account'

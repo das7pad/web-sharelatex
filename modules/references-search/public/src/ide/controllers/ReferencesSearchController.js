@@ -32,7 +32,7 @@ define(['base', 'ace/ace'], function(App) {
     ide,
     $timeout,
     sixpack,
-    event_tracking,
+    eventTracking,
     $rootScope
   ) {
     $scope.searchFeatureEnabled = () => true
@@ -70,7 +70,7 @@ define(['base', 'ace/ace'], function(App) {
 
     $scope._hintNode = null
     $scope._buildHintNode = function() {
-      event_tracking.sendMBOnce('bib-search-hint-shown-once')
+      eventTracking.sendMBOnce('bib-search-hint-shown-once')
       // pluck the hidden node out of the dom,
       // make it visible then hand it over to the caller
       const hintNode = $('.sl_references_search_hint')[0]
@@ -216,7 +216,7 @@ define(['base', 'ace/ace'], function(App) {
             ) === true &&
             isAtCitation === true
           ) {
-            event_tracking.sendMB('bib-search-modal-opened')
+            eventTracking.sendMB('bib-search-modal-opened')
 
             if ($scope.shouldABTestBibSearch) {
               sixpack.convert('bib-search-highlight')

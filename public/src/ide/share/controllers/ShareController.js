@@ -19,18 +19,18 @@ define(['base'], App =>
     'ide',
     'projectInvites',
     'projectMembers',
-    'event_tracking',
+    'eventTracking',
     function(
       $scope,
       $modal,
       ide,
       projectInvites,
       projectMembers,
-      event_tracking
+      eventTracking
     ) {
       $scope.openShareProjectModal = function(isAdmin) {
         $scope.isAdmin = isAdmin
-        event_tracking.sendMBOnce('ide-open-share-modal-once')
+        eventTracking.sendMBOnce('ide-open-share-modal-once')
 
         return $modal.open({
           templateUrl: 'shareProjectModalTemplate',
