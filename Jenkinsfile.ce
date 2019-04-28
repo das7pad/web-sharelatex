@@ -60,7 +60,7 @@ pipeline {
             }
           }
           environment {
-            IMAGE = "${env.SHARELATEX_DOCKER_REPOS}/web-sharelatex:$BRANCH_NAME-$BUILD_NUMBER"
+            IMAGE = "${env.SHARELATEX_DOCKER_REPOS}/web:$BRANCH_NAME-$BUILD_NUMBER"
           }
           steps {
             script {
