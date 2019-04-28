@@ -1,4 +1,4 @@
-FROM node:6.15.1 as app
+FROM node:6.17.1 as app
 
 WORKDIR /app
 
@@ -12,7 +12,7 @@ COPY . /app
 
 RUN make compile_full
 
-FROM node:6.15.1
+FROM node:6.17.1
 
 COPY --from=app /app /app
 
