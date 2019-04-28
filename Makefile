@@ -172,6 +172,7 @@ clean_modules:
 clean_css:
 	rm -f public/stylesheets/*.css*
 
+clean_ci: clean_test_acceptance_modules
 clean_ci: clean_test_frontend
 	$(DOCKER_COMPOSE) down -v -t 0
 	docker rmi -f \
@@ -199,8 +200,6 @@ test_acceptance: compile test_acceptance_app_run test_acceptance_modules_run
 
 test_acceptance_app: compile test_acceptance_app_run
 
-test_acceptance_module: compile test_acceptance_module_run
-
 test_acceptance_run: test_acceptance_app_run test_acceptance_modules_run
 
 test_acceptance_app_run:
@@ -208,21 +207,11 @@ test_acceptance_app_run:
 	COMPOSE_PROJECT_NAME=acceptance_test_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) run --rm test_acceptance npm -q run test:acceptance:run_dir test/acceptance/js
 	COMPOSE_PROJECT_NAME=acceptance_test_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) down -v -t 0
 
-test_acceptance_modules_run:
-	@set -e; \
-	for dir in $(MODULE_DIRS); \
-	do \
-		if [ -e $$dir/test/acceptance ]; then \
-			$(MAKE) test_acceptance_module_run MODULE=$$dir; \
-		fi; \
-	done
+TEST_ACCEPTANCE_MODULES = $(addsuffix /test_acceptance,$(MODULE_DIRS))
+test_acceptance_modules_run: $(TEST_ACCEPTANCE_MODULES)
 
-test_acceptance_module_run: $(MODULE_MAKEFILES)
-	@if [ -e $(MODULE)/test/acceptance ]; then \
-		COMPOSE_PROJECT_NAME=acceptance_test_$(BUILD_DIR_NAME)_$(MODULE) $(DOCKER_COMPOSE) down -v -t 0; \
-		cd $(MODULE) && COMPOSE_PROJECT_NAME=acceptance_test_$(BUILD_DIR_NAME)_$(MODULE) $(MAKE) test_acceptance; \
-		cd $(CURDIR) && COMPOSE_PROJECT_NAME=acceptance_test_$(BUILD_DIR_NAME)_$(MODULE) $(DOCKER_COMPOSE) down -v -t 0; \
-	fi
+CLEAN_TEST_ACCEPTANCE_MODULES = $(addsuffix /clean_test_acceptance,$(MODULE_DIRS))
+clean_test_acceptance_modules: $(CLEAN_TEST_ACCEPTANCE_MODULES)
 
 ci:
 	MOCHA_ARGS="--reporter tap" \
@@ -259,6 +248,8 @@ tar:
 MODULE_TARGETS = \
 	$(COMPILE_MODULES) \
 	$(COMPILE_FULL_MODULES) \
+	$(TEST_ACCEPTANCE_MODULES) \
+	$(CLEAN_TEST_ACCEPTANCE_MODULES) \
 
 $(MODULE_TARGETS): $(MODULE_MAKEFILES)
 	$(MAKE) -C $(dir $@) $(notdir $@)
