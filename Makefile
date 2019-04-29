@@ -172,6 +172,7 @@ clean_modules:
 clean_css:
 	rm -f public/stylesheets/*.css*
 
+clean_ci: clean_build
 clean_ci: clean_test_acceptance_modules
 clean_ci: clean_test_frontend
 	$(DOCKER_COMPOSE) down -v -t 0
@@ -227,6 +228,11 @@ build:
 	docker build --pull --tag ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER) \
 		--tag gcr.io/overleaf-ops/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER) \
 		.
+
+clean_build:
+	docker rmi -f \
+		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER) \
+		gcr.io/overleaf-ops/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER) \
 
 build_test_frontend:
 	COMPOSE_PROJECT_NAME=frontend_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) build test_frontend
