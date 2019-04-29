@@ -175,9 +175,9 @@ clean_css:
 clean_ci: clean_test_acceptance_modules
 clean_ci: clean_test_frontend
 	$(DOCKER_COMPOSE) down -v -t 0
-	docker rmi -f \
-		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER) \
-		gcr.io/overleaf-ops/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)
+	docker container list | grep 'days ago' | cut -d ' ' -f 1 - | xargs -r docker container stop
+	docker image prune -af --filter "until=48h"
+	docker network prune -f
 
 test: test_unit test_frontend test_acceptance
 
