@@ -371,8 +371,8 @@ module.exports = settings =
 		# If we ever need to write something to disk (e.g. incoming requests
 		# that need processing but may be too big for memory, then write
 		# them to disk here).
-		dumpFolder: "/data/dumpFolder"
-		uploadFolder: "/data/uploads"
+		dumpFolder: "/app/data/dumpFolder"
+		uploadFolder: "/app/data/uploads"
 
 	# Automatic Snapshots
 	# -------------------
