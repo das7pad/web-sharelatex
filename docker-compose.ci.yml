@@ -1,12 +1,12 @@
-version: "2"
+# This file was auto-generated, do not edit it directly.
+# Instead run bin/update_build_scripts from
+# https://github.com/das7pad/sharelatex-dev-env
+# Version: 1.1.18
 
-volumes:
-  data:
+version: "3.1"
 
 services:
-
   test_unit:
-    build: .
     image: ci/$PROJECT_NAME:$BRANCH_NAME-$BUILD_NUMBER
     user: node
     command: npm run test:unit:ci
@@ -14,20 +14,23 @@ services:
   test_acceptance:
     build: .
     image: ci/$PROJECT_NAME:$BRANCH_NAME-$BUILD_NUMBER
-    working_dir: /app
     environment:
+      ELASTIC_SEARCH_DSN: es:9200
       REDIS_HOST: redis
-      MONGO_URL: "mongodb://mongo/sharelatex"
+      MONGO_HOST: mongo
+      POSTGRES_HOST: postgres
+      MOCHA_GREP: ${MOCHA_GREP}
       SHARELATEX_ALLOW_PUBLIC_ACCESS: 'true'
       PROJECT_HISTORY_ENABLED: 'true'
       ENABLED_LINKED_FILE_TYPES: 'url,project_file,project_output_file,mendeley,zotero'
       LINKED_URL_PROXY: 'http://localhost:6543'
       SHARELATEX_CONFIG: /app/test/acceptance/config/settings.test.coffee
       NODE_ENV: production
-    user: root
     depends_on:
-      - redis
       - mongo
+      - redis
+    user: node
+    command: npm run test:acceptance:_run
 
   test_frontend:
     build:
@@ -53,4 +56,4 @@ services:
     image: redis
 
   mongo:
-    image: mongo:3.4.6
+    image: mongo:3.4

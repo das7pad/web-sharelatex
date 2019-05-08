@@ -13,8 +13,6 @@
 
 !/Gruntfile.coffee
 
-!/install_deps.sh
-
 !/karma.conf.js
 
 !/Makefile
@@ -22,6 +20,8 @@
 
 !/npm-shrinkwrap.json
 !/package.json
+
+!/setup_env.sh
 
 !/webpack.config.js
 !/webpack.config.prod.js

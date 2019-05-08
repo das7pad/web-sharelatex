@@ -14,10 +14,14 @@ RUN make compile_full
 
 FROM node:10.15.3
 
-COPY --from=app /app /app
+CMD ["node", "--expose-gc", "app.js"]
 
 WORKDIR /app
-RUN chmod 0755 ./install_deps.sh && ./install_deps.sh
-USER node
 
-CMD ["node", "--expose-gc", "app.js"]
+
+
+COPY --from=app /app /app
+
+RUN /app/setup_env.sh
+
+USER node
