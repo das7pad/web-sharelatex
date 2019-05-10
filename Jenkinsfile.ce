@@ -100,14 +100,32 @@ pipeline {
             IMAGE_BRANCH = "$SHARELATEX_DOCKER_REPOS/web:$BRANCH_NAME"
           }
           steps {
-            script {
-              sh 'docker tag $IMAGE_CI $IMAGE'
-              sh 'docker push $IMAGE'
-              sh 'docker tag $IMAGE $IMAGE_BRANCH'
-              sh 'docker push $IMAGE_BRANCH'
-              sh 'docker tag $IMAGE_CI-build $IMAGE_BRANCH-build'
-              sh 'docker push $IMAGE_BRANCH-build'
-              sh 'docker rmi $IMAGE $IMAGE_BRANCH $IMAGE_BRANCH-build'
+            sh 'docker tag $IMAGE_CI $IMAGE'
+            sh 'docker push $IMAGE'
+            sh 'docker tag $IMAGE $IMAGE_BRANCH'
+            sh 'docker push $IMAGE_BRANCH'
+            sh 'docker tag $IMAGE_CI-build $IMAGE_BRANCH-build'
+            sh 'docker push $IMAGE_BRANCH-build'
+            sh 'docker rmi $IMAGE $IMAGE_BRANCH $IMAGE_BRANCH-build'
+          }
+        }
+        stage('archive public') {
+          steps {
+            sh '''docker run \
+              --rm \
+              --entrypoint tar \
+              $IMAGE_CI \
+                --create \
+                --xz \
+                -C /app/public \
+                . \
+              > public.tar.xz
+            '''
+            archiveArtifacts artifacts: 'public.tar.xz', fingerprint: true
+          }
+          post {
+            cleanup {
+              sh 'rm -f public.tar.xz'
             }
           }
         }
@@ -116,7 +134,7 @@ pipeline {
   }
 
   post {
-    always {
+    cleanup {
       sh 'make clean_ci'
     }
   }
