@@ -44,6 +44,8 @@ else
 			content = getFileContent path, path.replace('minjs', 'js')
 			if !content
 				logger.err path:path, "No source candidate available"
+				if !module.parent
+					process.exit(1)
 
 		hash = crypto.createHash("md5").update(content).digest("hex")
 
