@@ -1,0 +1,103 @@
+extends ../../../../app/views/layout
+
+block vars
+	- metadata = { viewport: true }
+
+block content
+	.content.content-alt
+		.login-register-container
+			if ssoError
+				.alert.alert-danger
+					| Login Error: #{translate(ssoError )}
+
+			.card.login-register-card(ng-cloak)
+				.login-register-header
+					h1.login-register-header-heading #{translate("login_to_overleaf")}
+				form.login-register-form(async-form="login", name="loginForm", action='/login', method="POST", ng-cloak)
+					input(name='_csrf', type='hidden', value=csrfToken)
+					form-messages(for="loginForm")
+					.form-group
+						label.sr-only(for='email') #{translate("email")}
+						input.form-control(
+							type='email'
+							name='email'
+							required
+							placeholder="Email"
+							ng-model="email"
+							ng-model-options="{ updateOn: 'blur' }"
+							ng-init="email = "+JSON.stringify(email)
+							focus="true"
+						)
+						span.small.text-danger(ng-show="loginForm.email.$invalid && loginForm.email.$dirty")
+							| #{translate("must_be_email_address")}
+					.form-group
+						label.sr-only(for='password') #{translate("password")}
+						input.form-control(
+							type='password'
+							name='password'
+							required
+							placeholder="Password"
+							ng-model="password"
+						)
+						span.small.text-danger(ng-show="loginForm.password.$invalid && loginForm.password.$dirty")
+							| #{translate("required")}
+					.actions
+						button.btn-primary.btn.btn-block(
+							type='submit',
+							ng-disabled="loginForm.inflight"
+						)
+							span(ng-show="!loginForm.inflight") #{translate("login_with_email")}
+							span(ng-show="loginForm.inflight") #{translate("logging_in")}...
+					p.login-register-hr-text-container
+						span.login-register-hr-text #{translate("login_register_or")}
+					.form-group.text-center
+						//- TODO remove the hard-coded domain part for the IEEE link
+						//- The `href` attribute needs an hard-coded  domain until this codes lives on
+						//- www.overleaf.com, as IEEE will only accept a login flow started from the 
+						//- v1 domain. Once we have this code running on www.overleaf.com, we can 
+						//- remove the hard-coded domain.
+						a.btn.btn-default.btn-block.login-btn-ieee(
+							href="/org/ieee/saml/init"
+						) 
+							i.login-btn-icon.login-btn-icon-ieee
+							| #{translate("login_with_service", {service:"IEEE"})}
+					.form-group.text-center
+						a.btn.btn-default.btn-block.login-btn-google(
+							href="/auth/google?intent=sign_in"
+						) 
+							i.login-btn-icon.login-btn-icon-google
+							| #{translate("login_with_service", {service:"Google"})}
+					.form-group.text-center
+						a.btn.btn-default.btn-block.login-btn-twitter(
+							href="/auth/twitter?intent=sign_in"
+						) 
+							i.login-btn-icon.login-btn-icon-twitter
+							| #{translate("login_with_service", {service:"Twitter"})}
+					.form-group.text-center
+						a.btn.btn-default.btn-block.login-btn-orcid(
+							href="/auth/orcid?intent=sign_in"
+						) 
+							i.login-btn-icon.login-btn-icon-orcid
+							| #{translate("login_with_service", {service:"ORCID"})}
+				.login-register-sharelatex
+					p.login-register-text
+						| #{translate("first_time_sl_user")}
+						i.fa.fa-question-circle.login-register-sharelatex-tooltip(
+							tooltip=translate("sl_extra_info_tooltip")
+							aria-hidden="true"
+						)
+						span.sr-only #{translate("sl_extra_info_tooltip")}
+					.form-group.text-center
+						a.btn.btn-default.btn-block.login-btn-sharelatex(
+							href=settings.accountMerge.sharelatexHost + "/logout"
+						) 
+							i.login-btn-icon.login-btn-icon-sharelatex 
+							| #{translate("migrate_from_sl")}
+				.login-register-other-links
+					p.login-register-text 
+						| #{translate("dont_have_account")}
+						|
+						a(href="/register") #{translate("register")}
+					p.login-register-text 
+						a(href="/user/password/reset") #{translate("forgot_your_password")}?
+
