@@ -4,8 +4,8 @@ Errors = require "./ProjectImport/Errors"
 
 DEFAULT_V1_PARAMS = {
 	auth:
-		user: settings.apis.v1.user
-		pass: settings.apis.v1.pass
+		user: settings.apis.v1?.user
+		pass: settings.apis.v1?.pass
 	json: true,
 	timeout: 30 * 1000
 }
