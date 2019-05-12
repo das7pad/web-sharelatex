@@ -55,6 +55,8 @@ else
 	logger.log "Generating file hashes..."
 	for path in pathList
 		content = getFileContent(path)
+		if !content?
+			content = getFileContent(path.replace('minjs', 'js'))
 		hash = crypto.createHash("md5").update(content).digest("hex")
 
 		splitPath = path.split("/")
@@ -66,10 +68,15 @@ else
 		hashedFiles[path] = hashPath
 
 		fsHashPath = Path.join __dirname, "../../../", "public#{hashPath}"
-		fs.writeFileSync(fsHashPath, content)
+
+		fs.stat fsHashPath, (err, stats) ->
+			if err?.code is 'ENOENT'
+				fs.writeFileSync(fsHashPath, content)
 
 
 		logger.log "Finished hashing static content"
+		if !module.parent
+			process.exit(0)
 
 cdnAvailable = Settings.cdn?.web?.host?
 darkCdnAvailable = Settings.cdn?.web?.darkHost?
