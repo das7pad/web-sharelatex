@@ -74,9 +74,9 @@ else
 				fs.writeFileSync(fsHashPath, content)
 
 
-		logger.log "Finished hashing static content"
-		if !module.parent
-			process.exit(0)
+	logger.log "Finished hashing static content"
+	if !module.parent
+		process.exit(0)
 
 cdnAvailable = Settings.cdn?.web?.host?
 darkCdnAvailable = Settings.cdn?.web?.darkHost?
