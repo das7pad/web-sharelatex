@@ -53,7 +53,9 @@ if !Settings.useMinifiedJs
 	logger.log "not using minified JS, not hashing static files"
 else
 	logger.log "Generating file hashes..."
-	for path in pathList
+
+	generate_hash = (path, done) ->
+		logger.log filePath:path, "Started hashing static content"
 		content = getFileContent(path)
 		if !content?
 			content = getFileContent(path.replace('minjs', 'js'))
@@ -72,11 +74,13 @@ else
 		fs.stat fsHashPath, (err, stats) ->
 			if err?.code is 'ENOENT'
 				fs.writeFileSync(fsHashPath, content)
+			logger.log filePath:path, "Finished hashing static content"
+			done()
 
-
-	logger.log "Finished hashing static content"
-	if !module.parent
-		process.exit(0)
+	async.map pathList, generate_hash, () ->
+		logger.log "Finished hashing static content"
+		if !module.parent
+			process.exit(0)
 
 cdnAvailable = Settings.cdn?.web?.host?
 darkCdnAvailable = Settings.cdn?.web?.darkHost?
