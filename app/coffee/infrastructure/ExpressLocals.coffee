@@ -1,18 +1,14 @@
 logger = require 'logger-sharelatex'
-fs = require 'fs'
-crypto = require 'crypto'
 Settings = require('settings-sharelatex')
 SubscriptionFormatters = require('../Features/Subscription/SubscriptionFormatters')
 querystring = require('querystring')
 SystemMessageManager = require("../Features/SystemMessages/SystemMessageManager")
 AuthenticationController = require("../Features/Authentication/AuthenticationController")
 _ = require("underscore")
-async = require("async")
-Modules = require "./Modules"
 Url = require "url"
 PackageVersions = require "./PackageVersions"
 htmlEncoder = new require("node-html-encoder").Encoder("numerical")
-hashedFiles = {}
+hashedFiles = require "./HashedFiles"
 Path = require 'path'
 Features = require "./Features"
 Modules = require "./Modules"
@@ -27,60 +23,6 @@ jsPath =
 ace = PackageVersions.lib('ace')
 pdfjs = PackageVersions.lib('pdfjs')
 fineuploader = PackageVersions.lib('fineuploader')
-
-getFileContent = (filePath)->
-	filePath = Path.join __dirname, "../../../", "public#{filePath}"
-	exists = fs.existsSync filePath
-	if exists
-		content = fs.readFileSync filePath, "UTF-8"
-		return content
-	else
-		logger.log filePath:filePath, "file does not exist for hashing"
-		return ""
-
-pathList = [
-	"#{jsPath}libs/require.js"
-	"#{jsPath}ide.js"
-	"#{jsPath}main.js"
-	"#{jsPath}libraries.js"
-	"/stylesheets/style.css"
-	"/stylesheets/light-style.css"
-	"/stylesheets/ieee-style.css"
-	"/stylesheets/sl-style.css"
-].concat(Modules.moduleAssetFiles(jsPath))
-
-if !Settings.useMinifiedJs
-	logger.log "not using minified JS, not hashing static files"
-else
-	logger.log "Generating file hashes..."
-
-	generate_hash = (path, done) ->
-		logger.log filePath:path, "Started hashing static content"
-		content = getFileContent(path)
-		if !content?
-			content = getFileContent(path.replace('minjs', 'js'))
-		hash = crypto.createHash("md5").update(content).digest("hex")
-
-		splitPath = path.split("/")
-		filenameSplit = splitPath.pop().split(".")
-		filenameSplit.splice(filenameSplit.length-1, 0, hash)
-		splitPath.push(filenameSplit.join("."))
-
-		hashPath = splitPath.join("/")
-		hashedFiles[path] = hashPath
-
-		fsHashPath = Path.join __dirname, "../../../", "public#{hashPath}"
-
-		fs.stat fsHashPath, (err, stats) ->
-			if err?.code is 'ENOENT'
-				fs.writeFileSync(fsHashPath, content)
-			logger.log filePath:path, "Finished hashing static content"
-			done()
-
-	async.map pathList, generate_hash, () ->
-		logger.log "Finished hashing static content"
-		if !module.parent
-			process.exit(0)
 
 cdnAvailable = Settings.cdn?.web?.host?
 darkCdnAvailable = Settings.cdn?.web?.darkHost?
