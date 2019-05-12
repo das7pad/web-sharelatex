@@ -1,9 +1,0 @@
-.row.row-spaced.hidden-print
-	.col-sm-12.text-center
-		p
-			+linkSignIn(null, 'btn btn-primary capitalised', `/${university && university.id && !university.institution ? 'edu': 'org'}/${portal.slug}`)
-			| &nbsp;&nbsp; if you already have an #{settings.appName} account.
-		p or
-		p 
-			+linkSignUp(null, 'btn btn-primary capitalised', `/${university && university.id && !university.institution ? 'edu': 'org'}/${portal.slug}`)
-			| &nbsp;&nbsp; if you don't have an #{settings.appName} account yet.
