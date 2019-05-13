@@ -254,6 +254,8 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 		res.locals.sentrySrc     = Settings.sentry?.src
 		res.locals.sentryPublicDSN = Settings.sentry?.publicDSN
 		res.locals.sentrySampleRate = Settings.sentry?.sampleRate or 0.01
+		res.locals.sentryCommit = Settings.sentry?.commit or '@@COMMIT@@'
+		res.locals.sentryRelease = Settings.sentry?.release or '@@RELEASE@@'
 		next()
 
 	webRouter.use (req, res, next) ->

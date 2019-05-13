@@ -9,8 +9,8 @@
 		require(["raven"], function(Raven) {
 			if (typeof(Raven) != "undefined" && Raven.config) {
 				Raven.config("#{sentryPublicDSN}", {
-				tags: { 'commit': '@@COMMIT@@', 'build': '@@RELEASE@@' },
-				release: '@@RELEASE@@',
+				tags: { 'commit': '#{sentryCommit}', 'build': '#{sentryBuild}' },
+				release: '#{sentryBuild}',
 				// Ignore list based off: https://gist.github.com/1878283
 				ignoreErrors: [
 					'DealPly',
