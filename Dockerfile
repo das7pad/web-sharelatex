@@ -25,3 +25,9 @@ COPY --from=app /app /app
 RUN /app/setup_env.sh
 
 USER node
+
+ARG RELEASE
+ARG COMMIT
+ENV RELEASE=${RELEASE} \
+    SENTRY_RELEASE=${RELEASE} \
+    COMMIT=${COMMIT}

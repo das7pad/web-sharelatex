@@ -3,6 +3,8 @@ DOCKER_COMPOSE_FLAGS ?= -f docker-compose.yml
 
 BUILD_NUMBER ?= local
 BRANCH_NAME ?= $(shell git rev-parse --abbrev-ref HEAD)
+COMMIT ?= $(shell git rev-parse HEAD)
+RELEASE ?= $(shell git describe --tags | sed s/-g/+/)
 PROJECT_NAME = web
 BUILD_DIR_NAME = $(shell pwd | xargs basename | tr -cd '[a-zA-Z0-9_.\-]')
 
@@ -239,6 +241,8 @@ build:
 		--tag gcr.io/overleaf-ops/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER) \
 		--cache-from ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-cache \
 		--cache-from ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-build \
+		--build-arg RELEASE=$(RELEASE) \
+		--build-arg COMMIT=$(COMMIT) \
 		.
 
 clean_build:
