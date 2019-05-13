@@ -253,6 +253,7 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 		res.locals.tenderUrl     = Settings.tenderUrl
 		res.locals.sentrySrc     = Settings.sentry?.src
 		res.locals.sentryPublicDSN = Settings.sentry?.publicDSN
+		res.locals.sentrySampleRate = Settings.sentry?.sampleRate or 0.01
 		next()
 
 	webRouter.use (req, res, next) ->

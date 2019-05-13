@@ -307,6 +307,7 @@ module.exports = settings =
 	#
 	# Client-side error logging is provided by getsentry.com
 	# sentry:
+	#   sampleRate: 0.01
 	#   src: ""
 	#   publicDSN: ""
 	#
