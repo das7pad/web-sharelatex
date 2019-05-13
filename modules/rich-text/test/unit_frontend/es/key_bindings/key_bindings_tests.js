@@ -413,7 +413,6 @@ describe('Key bindings', function() {
       this.cm.setCursor({ line: 4, ch: 7 })
 
       setTimeout(() => {
-        this.cm.refresh()
         fakeNamedKey(this.cm, 'Up')
         expectCursorAt(this.cm, 3, 7)
         fakeNamedKey(this.cm, 'Up')
