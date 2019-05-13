@@ -9,8 +9,8 @@
 		require(["raven"], function(Raven) {
 			if (typeof(Raven) != "undefined" && Raven.config) {
 				Raven.config("#{sentryPublicDSN}", {
-				tags: { 'commit': '#{sentryCommit}', 'build': '#{sentryBuild}' },
-				release: '#{sentryBuild}',
+				tags: { 'commit': '#{sentryCommit}', 'build': '#{sentryRelease}' },
+				release: '#{sentryRelease}',
 				// Ignore list based off: https://gist.github.com/1878283
 				ignoreErrors: [
 					'DealPly',
@@ -59,7 +59,7 @@
 				],
 				shouldSendCallback: function(data) {
 					// only send a fraction of errors
-					return (Math.random() <= sampleRate);
+					return (Math.random() <= #{sentrySampleRate});
 				},
 				dataCallback: function(data) {
 					// remove circular references from object
