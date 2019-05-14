@@ -225,7 +225,9 @@ define([
             this.ide.socket.disconnect()
             this.ide.reportError(error, meta)
             if (window.Raven != null) {
-              window.Raven.captureException(new Error(message), {extra: {error: error, meta: meta}})
+              window.Raven.captureException(new Error(message), {
+                extra: { error: error, meta: meta }
+              })
             }
             this.ide.showGenericMessageModal(
               'Out of sync',
