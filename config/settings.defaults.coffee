@@ -47,6 +47,11 @@ module.exports = settings =
 			port: process.env['WEB_REDIS_PORT'] || process.env['REDIS_PORT'] || "6379"
 			password: process.env['WEB_REDIS_PASSWORD'] || process.env["REDIS_PASSWORD"] or ""
 
+		websessions:
+			host: process.env['WEB_SESSIONS_REDIS_HOST'] || process.env['REDIS_HOST'] || 'localhost'
+			port: process.env['WEB_SESSIONS_REDIS_PORT'] || process.env['REDIS_PORT'] || '6379'
+			password: process.env['WEB_SESSIONS_REDIS_PASSWORD'] || process.env['REDIS_PASSWORD'] or ''
+
 		# websessions:
 		# 	cluster: [
 		# 		{host: 'localhost', port: 7000}
