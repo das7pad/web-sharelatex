@@ -32,6 +32,16 @@ module.exports = settings =
 		url : process.env['MONGO_CONNECTION_STRING'] || process.env['MONGO_URL'] || "mongodb://#{process.env['MONGO_HOST'] or '127.0.0.1'}/sharelatex"
 
 	redis:
+		lock:
+			host: process.env['LOCK_REDIS_HOST'] || process.env['REDIS_HOST'] || 'localhost'
+			port: process.env['LOCK_REDIS_PORT'] || process.env['REDIS_PORT'] || '6379'
+			password: process.env['LOCK_REDIS_PASSWORD'] || process.env['REDIS_PASSWORD'] or ''
+
+		realtime:
+			host: process.env['REAL_TIME_REDIS_HOST'] || process.env['REDIS_HOST'] || 'localhost'
+			port: process.env['REAL_TIME_REDIS_PORT'] || process.env['REDIS_PORT'] || '6379'
+			password: process.env['REAL_TIME_REDIS_PASSWORD'] || process.env['REDIS_PASSWORD'] or ''
+
 		web:
 			host: process.env['WEB_REDIS_HOST'] || process.env['REDIS_HOST'] || "localhost"
 			port: process.env['WEB_REDIS_PORT'] || process.env['REDIS_PORT'] || "6379"
