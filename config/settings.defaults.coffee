@@ -33,9 +33,9 @@ module.exports = settings =
 
 	redis:
 		web:
-			host: process.env['REDIS_HOST'] || "localhost"
-			port: process.env['REDIS_PORT'] || "6379"
-			password: process.env["REDIS_PASSWORD"] or ""
+			host: process.env['WEB_REDIS_HOST'] || process.env['REDIS_HOST'] || "localhost"
+			port: process.env['WEB_REDIS_PORT'] || process.env['REDIS_PORT'] || "6379"
+			password: process.env['WEB_REDIS_PASSWORD'] || process.env["REDIS_PASSWORD"] or ""
 
 		# websessions:
 		# 	cluster: [
@@ -68,9 +68,9 @@ module.exports = settings =
 		# 	]
 
 		api:
-			host: process.env['REDIS_HOST'] || "localhost"
-			port: process.env['REDIS_PORT'] || "6379"
-			password: process.env["REDIS_PASSWORD"] or ""
+			host: process.env['API_REDIS_HOST'] || process.env['REDIS_HOST'] || "localhost"
+			port: process.env['API_REDIS_PORT'] || process.env['REDIS_PORT'] || "6379"
+			password: process.env['API_REDIS_PASSWORD'] || process.env["REDIS_PASSWORD"] or ""
 
 	# Service locations
 	# -----------------
