@@ -218,6 +218,13 @@ test_acceptance_modules_run: $(TEST_ACCEPTANCE_MODULES)
 CLEAN_TEST_ACCEPTANCE_MODULES = $(addsuffix /clean_test_acceptance,$(MODULE_DIRS))
 clean_test_acceptance_modules: $(CLEAN_TEST_ACCEPTANCE_MODULES)
 
+build_app: compile_full
+build_app: install_translations
+	WEBPACK_ENV=production $(MAKE) minify
+
+install_translations:
+	npm install git+https://github.com/sharelatex/translations-sharelatex.git#master
+
 ci:
 	MOCHA_ARGS="--reporter tap" \
 	$(MAKE) test

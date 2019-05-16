@@ -2,15 +2,14 @@ FROM node:10.15.3 as app
 
 WORKDIR /app
 
-#wildcard as some files may not be in all repos
 COPY package.json npm-shrinkwrap.json /app/
 
 RUN npm install --quiet
 
-
 COPY . /app
 
-RUN make compile_full
+RUN make build_app
+
 
 FROM node:10.15.3
 
