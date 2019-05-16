@@ -34,8 +34,6 @@ define([
   'main/affiliations/controllers/UserAffiliationsController',
   'main/affiliations/factories/UserAffiliationsDataService',
   'main/keys',
-  'main/cms/blog',
-  'main/cms/index',
   'main/importing',
   'analytics/AbTestingManager',
   'directives/autoSubmitForm',
