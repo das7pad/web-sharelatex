@@ -1,36 +1,79 @@
+# This file was auto-generated, do not edit it directly.
+# Instead run bin/update_build_scripts from
+# https://github.com/das7pad/sharelatex-dev-env
+
+# ignore everything but our whitelist
 *
+
+!/LICENSE
+
+########
+# core #
+!/npm-shrinkwrap.json
+!/package.json
+# core #
+########
+
+########
+# make #
+!/Makefile
+
+!/Makefile.module
+# make #
+########
+
+###########
+# scripts #
+!/setup_env.sh
+
+!/bin/unit_test
+!/bin/unit_test_app
+# scripts #
+###########
+
+###############
+# tool config #
+!/.eslintrc
+
+!/.prettierrc
 
 !/.babelrc
 
 !/.eslintignore
-!/.eslintrc
 
 !/.prettierignore
-!/.prettierrc
-
-!/bin/unit_test
-!/bin/unit_test_app
 
 !/Gruntfile.coffee
 
 !/karma.conf.js
 
-!/Makefile
-!/Makefile.module
-
-!/npm-shrinkwrap.json
-!/package.json
-
-!/setup_env.sh
-
 !/webpack.config.js
 !/webpack.config.prod.js
+# tool config #
+###############
 
-!/app.coffee
-!/app
-/app/js
-
+##############
+# app config #
 !/config/settings.defaults.coffee
+# app config #
+##############
+
+#######
+# app #
+!/app.coffee
+!/app/coffee
+!/app/lib
+
+!/test/acceptance/coffee
+!/test/acceptance/config
+!/test/acceptance/fixtures
+!/test/acceptance/libs
+!/test/fixtures
+!/test/smoke/coffee
+!/test/unit/coffee
+
+!/app/templates
+!/app/views
 
 !/modules
 /modules/*/Makefile
@@ -39,32 +82,31 @@
 /modules/*/test/unit/js
 /modules/*/test/acceptance/js
 
-!/public
-/public/es/modules
+!/public/*.ico
+!/public/*.png
+!/public/*.svg
+!/public/*.txt
 
-/public/js/*.js
-/public/js/*.map
-/public/js/analytics/
-/public/js/directives/
-/public/js/components/
-/public/js/es/
-/public/js/filters/
-/public/js/ide/
-/public/js/main/
-/public/js/modules/
-/public/js/services/
-/public/js/utils/
+!/public/brand
+!/public/font
+!/public/img
 
-/public/stylesheets/style*.css
-/public/stylesheets/sl-style*.css
-/public/stylesheets/light-style*.css
-/public/stylesheets/ieee-style*.css
-/public/stylesheets/*.map
+!/public/js/ace-1.2.9
+!/public/js/libs
+/public/js/libs/angular-1.3.15.min.js
+/public/js/libs/pdfjs-1.8.188
+/public/js/libs/pdfjs-1.7.225
 
-/public/minjs/
+!/public/recurly
+!/public/src
+!/public/static
 
-!/test
-/test/unit/js
-/test/unit_frontend/js
-/test/smoke/js
-/test/acceptance/js
+!/public/stylesheets/
+public/stylesheets/*.css
+public/stylesheets/*.map
+
+!/test/acceptance/files
+!/test/unit_frontend/es
+!/test/unit_frontend/src
+# app #
+#######
