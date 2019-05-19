@@ -1,4 +1,5 @@
 PublicRegistrationController = require("./PublicRegistrationController")
+AuthenticationController = require('../../../../app/js/Features/Authentication/AuthenticationController')
 CaptchaMiddleware = require '../../../../app/js/Features/Captcha/CaptchaMiddleware'
 Settings = require 'settings-sharelatex'
 
@@ -15,6 +16,7 @@ module.exports =
 			removeRoute webRouter, "get", "/register"
 			webRouter.get "/register", PublicRegistrationController.showRegisterPage
 			webRouter.post "/register", CaptchaMiddleware.validateCaptcha, PublicRegistrationController.register
+			AuthenticationController.addEndpointToLoginWhitelist '/register'
 
 removeRoute = (webRouter, method, path)->
 	index = null
