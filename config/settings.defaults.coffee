@@ -438,6 +438,11 @@ module.exports = settings =
 		# Example:
 		#   header_extras: [{text: "Some Page", url: "http://example.com/some/page", class: "subdued"}]
 
+	recaptcha:
+		disabled:
+			invite: true
+			register: false
+
 	customisation: {}
 
 #	templates: [{
