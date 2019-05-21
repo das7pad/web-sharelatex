@@ -14,9 +14,9 @@
 define(['base', 'ace/ace'], function(App) {
   App.controller(
     'HotkeysController',
-    ($scope, $modal, eventTracking) =>
+    ($scope, $modal, event_tracking) =>
       ($scope.openHotkeysModal = function() {
-        eventTracking.sendMB('ide-open-hotkeys-modal')
+        event_tracking.sendMB('ide-open-hotkeys-modal')
 
         return $modal.open({
           templateUrl: 'hotkeysModalTemplate',

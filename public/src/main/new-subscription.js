@@ -9,7 +9,7 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
     $scope,
     MultiCurrencyPricing,
     $http,
-    eventTracking,
+    event_tracking,
     ccUtils
   ) {
     if (typeof recurly === 'undefined') {
@@ -24,10 +24,10 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
     $scope.switchToStudent = function() {
       const currentPlanCode = window.plan_code
       const planCode = currentPlanCode.replace('collaborator', 'student')
-      eventTracking.sendMB('subscription-form-switch-to-student', {
+      event_tracking.sendMB('subscription-form-switch-to-student', {
         plan: window.plan_code
       })
-      eventTracking.send(
+      event_tracking.send(
         'subscription-funnel',
         'subscription-form-switch-to-student',
         window.plan_code
@@ -37,8 +37,8 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
       }&cc=${$scope.data.coupon}`
     }
 
-    eventTracking.sendMB('subscription-form', { plan: window.plan_code })
-    eventTracking.send(
+    event_tracking.sendMB('subscription-form', { plan: window.plan_code })
+    event_tracking.send(
       'subscription-funnel',
       'subscription-form-viewed',
       window.plan_code
@@ -173,8 +173,8 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
     const completeSubscription = function(err, recurly_token_id) {
       $scope.validation.errorFields = {}
       if (err != null) {
-        eventTracking.sendMB('subscription-error', err)
-        eventTracking.send('subscription-funnel', 'subscription-error')
+        event_tracking.sendMB('subscription-error', err)
+        event_tracking.send('subscription-funnel', 'subscription-error')
         // We may or may not be in a digest loop here depending on
         // whether recurly could do validation locally, so do it async
         $scope.$evalAsync(function() {
@@ -205,13 +205,13 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
           }
         }
 
-        eventTracking.sendMB('subscription-form-submitted', {
+        event_tracking.sendMB('subscription-form-submitted', {
           currencyCode: postData.subscriptionDetails.currencyCode,
           plan_code: postData.subscriptionDetails.plan_code,
           coupon_code: postData.subscriptionDetails.coupon_code,
           isPaypal: postData.subscriptionDetails.isPaypal
         })
-        eventTracking.send(
+        event_tracking.send(
           'subscription-funnel',
           'subscription-form-submitted',
           postData.subscriptionDetails.plan_code
@@ -220,8 +220,8 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
         return $http
           .post('/user/subscription/create', postData)
           .then(function() {
-            eventTracking.sendMB('subscription-submission-success')
-            eventTracking.send(
+            event_tracking.sendMB('subscription-submission-success')
+            event_tracking.send(
               'subscription-funnel',
               'subscription-submission-success',
               postData.subscriptionDetails.plan_code

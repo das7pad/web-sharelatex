@@ -82,7 +82,7 @@ define([
     ide,
     localStorage,
     sixpack,
-    eventTracking,
+    event_tracking,
     metadata,
     $q,
     CobrandingDataService
@@ -142,7 +142,7 @@ define([
         return
       }
       $scope.ui.reviewPanelOpen = !$scope.ui.reviewPanelOpen
-      return eventTracking.sendMB('rp-toggle-panel', {
+      return event_tracking.sendMB('rp-toggle-panel', {
         value: $scope.ui.reviewPanelOpen
       })
     }
@@ -161,24 +161,24 @@ define([
     // Tracking code.
     $scope.$watch('ui.view', function(newView, oldView) {
       if (newView != null && newView !== 'editor' && newView !== 'pdf') {
-        return eventTracking.sendMBOnce(`ide-open-view-${newView}-once`)
+        return event_tracking.sendMBOnce(`ide-open-view-${newView}-once`)
       }
     })
 
     $scope.$watch('ui.chatOpen', function(isOpen) {
       if (isOpen) {
-        return eventTracking.sendMBOnce('ide-open-chat-once')
+        return event_tracking.sendMBOnce('ide-open-chat-once')
       }
     })
 
     $scope.$watch('ui.leftMenuShown', function(isOpen) {
       if (isOpen) {
-        return eventTracking.sendMBOnce('ide-open-left-menu-once')
+        return event_tracking.sendMBOnce('ide-open-left-menu-once')
       }
     })
 
     $scope.trackHover = feature =>
-      eventTracking.sendMBOnce(`ide-hover-${feature}-once`)
+      event_tracking.sendMBOnce(`ide-hover-${feature}-once`)
     // End of tracking code.
 
     window._ide = ide
@@ -252,7 +252,7 @@ If the project has been renamed please look in your project list for a new proje
       return (_loaded = true)
     })
 
-    $scope.$on('cursor:editor:update', eventTracking.editingSessionHeartbeat)
+    $scope.$on('cursor:editor:update', event_tracking.editingSessionHeartbeat)
 
     const DARK_THEMES = [
       'ambiance',

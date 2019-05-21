@@ -192,7 +192,7 @@ define(['base', 'libs/recurly-4.8.5'], function(App, recurly) {
   App.controller('PlansController', function(
     $scope,
     $modal,
-    eventTracking,
+    event_tracking,
     MultiCurrencyPricing,
     $http,
     $filter,
@@ -232,8 +232,8 @@ define(['base', 'libs/recurly-4.8.5'], function(App, recurly) {
         plan = `${plan}_annual`
       }
       plan = eventLabel(plan, location)
-      eventTracking.sendMB('plans-page-start-trial')
-      eventTracking.send('subscription-funnel', 'sign_up_now_button', plan)
+      event_tracking.sendMB('plans-page-start-trial')
+      event_tracking.send('subscription-funnel', 'sign_up_now_button', plan)
     }
 
     $scope.switchToMonthly = function(e, location) {
@@ -265,7 +265,7 @@ define(['base', 'libs/recurly-4.8.5'], function(App, recurly) {
         .result.finally(() =>
           history.replaceState(null, document.title, window.location.pathname)
         )
-      eventTracking.send(
+      event_tracking.send(
         'subscription-funnel',
         'plans-page',
         'group-inquiry-potential'
@@ -280,7 +280,7 @@ define(['base', 'libs/recurly-4.8.5'], function(App, recurly) {
     switchEvent = function(e, label, location) {
       e.preventDefault()
       const gaLabel = eventLabel(label, location)
-      eventTracking.send('subscription-funnel', 'plans-page', gaLabel)
+      event_tracking.send('subscription-funnel', 'plans-page', gaLabel)
     }
   })
 

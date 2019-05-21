@@ -17,7 +17,7 @@ define(['base'], App =>
     $scope,
     abTestManager,
     sixpack,
-    eventTracking
+    event_tracking
   ) {
     $scope.buttonClass = 'btn-primary'
 
@@ -46,7 +46,7 @@ define(['base'], App =>
         }
         $scope.startedFreeTrial = true
 
-        eventTracking.sendMB('subscription-start-trial', { source, plan })
+        event_tracking.sendMB('subscription-start-trial', { source, plan })
 
         return (w.location = url)
       }

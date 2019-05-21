@@ -36,8 +36,8 @@ const isInViewport = function(element) {
 
 define(['base'], App =>
   App.directive('eventTracking', [
-    'eventTracking',
-    eventTracking => ({
+    'event_tracking',
+    event_tracking => ({
       scope: {
         eventTracking: '@',
         eventSegmentation: '=?'
@@ -59,10 +59,10 @@ define(['base'], App =>
 						@param {boolean}		scrollEvent		Use to unbind scroll event
 					*/
           if (sendMB) {
-            eventTracking[sendMBFunction](scope.eventTracking, segmentation)
+            event_tracking[sendMBFunction](scope.eventTracking, segmentation)
           }
           if (sendGA) {
-            eventTracking[sendGAFunction](
+            event_tracking[sendGAFunction](
               attrs.eventTrackingGa,
               attrs.eventTrackingAction || scope.eventTracking,
               attrs.eventTrackingLabel || ''
@@ -89,11 +89,11 @@ define(['base'], App =>
             })
             .on('mouseleave', () => clearTimeout(timer))
         } else if (attrs.eventTrackingTrigger === 'scroll') {
-          if (!eventTracking.eventInCache(scope.eventTracking)) {
+          if (!event_tracking.eventInCache(scope.eventTracking)) {
             return $(window).on('resize scroll', () =>
               _.throttle(
                 isInViewport(element) &&
-                !eventTracking.eventInCache(scope.eventTracking)
+                !event_tracking.eventInCache(scope.eventTracking)
                   ? sendEvent(true)
                   : undefined,
                 500

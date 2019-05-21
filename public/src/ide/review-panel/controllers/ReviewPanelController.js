@@ -28,7 +28,7 @@ define([
     $timeout,
     $http,
     $modal,
-    eventTracking,
+    event_tracking,
     localStorage
   ) {
     let UserTCSyncState
@@ -613,14 +613,14 @@ define([
 
     $scope.acceptChanges = function(change_ids) {
       _doAcceptChanges(change_ids)
-      return eventTracking.sendMB('rp-changes-accepted', {
+      return event_tracking.sendMB('rp-changes-accepted', {
         view: $scope.ui.reviewPanelOpen ? $scope.reviewPanel.subView : 'mini'
       })
     }
 
     $scope.rejectChanges = function(change_ids) {
       _doRejectChanges(change_ids)
-      return eventTracking.sendMB('rp-changes-rejected', {
+      return event_tracking.sendMB('rp-changes-rejected', {
         view: $scope.ui.reviewPanelOpen ? $scope.reviewPanel.subView : 'mini'
       })
     }
@@ -640,7 +640,7 @@ define([
 
     const bulkAccept = function() {
       _doAcceptChanges($scope.reviewPanel.selectedEntryIds.slice())
-      return eventTracking.sendMB('rp-bulk-accept', {
+      return event_tracking.sendMB('rp-bulk-accept', {
         view: $scope.ui.reviewPanelOpen ? $scope.reviewPanel.subView : 'mini',
         nEntries: $scope.reviewPanel.nVisibleSelectedChanges
       })
@@ -648,7 +648,7 @@ define([
 
     const bulkReject = function() {
       _doRejectChanges($scope.reviewPanel.selectedEntryIds.slice())
-      return eventTracking.sendMB('rp-bulk-reject', {
+      return event_tracking.sendMB('rp-bulk-reject', {
         view: $scope.ui.reviewPanelOpen ? $scope.reviewPanel.subView : 'mini',
         nEntries: $scope.reviewPanel.nVisibleSelectedChanges
       })
@@ -737,7 +737,7 @@ define([
         )
       $scope.$broadcast('editor:clearSelection')
       $timeout(() => $scope.$broadcast('review-panel:layout'))
-      return eventTracking.sendMB('rp-new-comment', { size: content.length })
+      return event_tracking.sendMB('rp-new-comment', { size: content.length })
     }
 
     $scope.cancelNewComment = entry =>
@@ -774,7 +774,7 @@ define([
       entry.replyContent = ''
       entry.replying = false
       $timeout(() => $scope.$broadcast('review-panel:layout'))
-      return eventTracking.sendMB('rp-comment-reply', trackingMetadata)
+      return event_tracking.sendMB('rp-comment-reply', trackingMetadata)
     }
 
     $scope.cancelReply = function(entry) {
@@ -790,7 +790,7 @@ define([
         { _csrf: window.csrfToken }
       )
       _onCommentResolved(entry.thread_id, ide.$scope.user)
-      return eventTracking.sendMB('rp-comment-resolve', {
+      return event_tracking.sendMB('rp-comment-resolve', {
         view: $scope.ui.reviewPanelOpen ? $scope.reviewPanel.subView : 'mini'
       })
     }
@@ -800,7 +800,7 @@ define([
       $http.post(`/project/${$scope.project_id}/thread/${thread_id}/reopen`, {
         _csrf: window.csrfToken
       })
-      return eventTracking.sendMB('rp-comment-reopen')
+      return event_tracking.sendMB('rp-comment-reopen')
     }
 
     var _onCommentResolved = function(thread_id, user) {
@@ -864,7 +864,7 @@ define([
           'X-CSRF-Token': window.csrfToken
         }
       })
-      return eventTracking.sendMB('rp-comment-delete')
+      return event_tracking.sendMB('rp-comment-delete')
     }
 
     $scope.saveEdit = function(thread_id, comment) {
@@ -896,7 +896,7 @@ define([
 
     $scope.setSubView = function(subView) {
       $scope.reviewPanel.subView = subView
-      return eventTracking.sendMB('rp-subview-change', { subView })
+      return event_tracking.sendMB('rp-subview-change', { subView })
     }
 
     $scope.gotoEntry = (doc_id, entry) =>

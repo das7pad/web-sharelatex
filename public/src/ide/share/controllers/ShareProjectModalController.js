@@ -29,7 +29,7 @@ define(['base'], App =>
     validateCaptcha,
     validateCaptchaV3,
     settings,
-    eventTracking
+    event_tracking
   ) {
     let loadAutocompleteUsers
     $scope.inputs = {
@@ -297,7 +297,7 @@ define(['base'], App =>
     $scope.makeTokenBased = function() {
       $scope.project.publicAccesLevel = 'tokenBased'
       settings.saveProjectAdminSettings({ publicAccessLevel: 'tokenBased' })
-      return eventTracking.sendMB('project-make-token-based')
+      return event_tracking.sendMB('project-make-token-based')
     }
 
     $scope.makePrivate = function() {

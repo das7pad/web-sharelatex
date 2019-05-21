@@ -15,7 +15,7 @@ define(['base'], App =>
   App.controller('AnnouncementsController', function(
     $scope,
     $http,
-    eventTracking,
+    event_tracking,
     $window,
     _
   ) {
@@ -35,12 +35,12 @@ define(['base'], App =>
       })
 
     const markAnnouncementsAsRead = () =>
-      eventTracking.sendMB('announcement-alert-dismissed', {
+      event_tracking.sendMB('announcement-alert-dismissed', {
         blogPostId: $scope.announcements[0].id
       })
 
     $scope.logAnnouncementClick = () =>
-      eventTracking.sendMB('announcement-read-more-clicked', {
+      event_tracking.sendMB('announcement-read-more-clicked', {
         blogPostId: $scope.announcements[0].id
       })
 

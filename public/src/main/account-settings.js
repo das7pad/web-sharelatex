@@ -18,13 +18,13 @@ define(['base'], function(App) {
     '$scope',
     '$http',
     '$modal',
-    'eventTracking',
+    'event_tracking',
     'UserAffiliationsDataService',
     function(
       $scope,
       $http,
       $modal,
-      eventTracking,
+      event_tracking,
       UserAffiliationsDataService
     ) {
       $scope.subscribed = true
@@ -66,7 +66,7 @@ define(['base'], function(App) {
       }
 
       return ($scope.upgradeIntegration = service =>
-        eventTracking.send('subscription-funnel', 'settings-page', service))
+        event_tracking.send('subscription-funnel', 'settings-page', service))
     }
   ])
 

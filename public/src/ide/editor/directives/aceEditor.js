@@ -71,7 +71,7 @@ define([
     $timeout,
     $compile,
     $rootScope,
-    eventTracking,
+    event_tracking,
     localStorage,
     $cacheFactory,
     metadata,
@@ -542,7 +542,7 @@ define([
           updateCount++
 
           if (updateCount === 100) {
-            eventTracking.send('editor-interaction', 'multi-doc-update')
+            event_tracking.send('editor-interaction', 'multi-doc-update')
           }
           return scope.$emit(`${scope.name}:change`)
         }
@@ -751,16 +751,16 @@ define([
           // deletes and then inserts document content
           session.setAnnotations(scope.annotations)
 
-          session.on('changeScrollTop', eventTracking.editingSessionHeartbeat)
+          session.on('changeScrollTop', event_tracking.editingSessionHeartbeat)
 
           angular
             .element($window)
-            .on('click', eventTracking.editingSessionHeartbeat)
+            .on('click', event_tracking.editingSessionHeartbeat)
 
           scope.$on('$destroy', () =>
             angular
               .element($window)
-              .off('click', eventTracking.editingSessionHeartbeat)
+              .off('click', event_tracking.editingSessionHeartbeat)
           )
 
           if (scope.eventsBridge != null) {

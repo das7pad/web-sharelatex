@@ -16,9 +16,9 @@ define(['base'], App =>
     '$scope',
     '$modal',
     'ide',
-    'eventTracking',
+    'event_tracking',
     'waitFor',
-    ($scope, $modal, ide, eventTracking, waitFor) => {
+    ($scope, $modal, ide, event_tracking, waitFor) => {
       let openEntity
 
       $scope.currentUpdate = null
@@ -79,7 +79,7 @@ define(['base'], App =>
           return
         }
 
-        eventTracking.sendMB('history-v2-restore-deleted')
+        event_tracking.sendMB('history-v2-restore-deleted')
         $scope.restoreState.inflight = true
         return ide.historyManager
           .restoreFile(deletedAtV, pathname)
