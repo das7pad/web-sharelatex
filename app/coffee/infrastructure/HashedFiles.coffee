@@ -1,21 +1,18 @@
+# This file was auto-generated, do not edit it directly.
+# Instead run bin/update_build_scripts from
+# https://github.com/das7pad/sharelatex-dev-env
+
 async = require "async"
-crypto = require 'crypto'
+crypto = require "crypto"
 fs = require "fs"
-logger = require 'logger-sharelatex'
-Path = require 'path'
-Modules = require "./Modules"
-Settings = require('settings-sharelatex')
+Path = require "path"
 
-hashedFiles = {}
+logger = require "logger-sharelatex"
 
-if !Settings.useMinifiedJs
-	logger.log "not using minified JS, not hashing static files"
-	if !module.parent
-		process.exit(0)
+REPOSITORY_ROOT = Path.join __dirname, "../../../"
+module.exports = hashedFiles = {}
 
-else
-	logger.log "Generating file hashes..."
-
+fillHashedFiles = () ->
 	pathList = [
 		"/minjs/libs/require.js"
 		"/minjs/ide.js"
@@ -25,49 +22,57 @@ else
 		"/stylesheets/light-style.css"
 		"/stylesheets/ieee-style.css"
 		"/stylesheets/sl-style.css"
-	].concat(Modules.moduleAssetFiles('/minjs/'))
+	]
 
-	getFileContent = (path, candidate) ->
-		filePath = Path.join __dirname, "../../../", "public", candidate
-		exists = fs.existsSync filePath
-		if exists
-			content = fs.readFileSync filePath, "UTF-8"
-			return content
-		else
-			logger.log {filePath:filePath, path:path}, "file does not exist for hashing"
-			return ""
+	modulesPath = Path.join REPOSITORY_ROOT, "modules"
+	for moduleName in fs.readdirSync(modulesPath)
+		index = Path.join(modulesPath, moduleName, "index.js")
+		content = fs.readFileSync(index, "utf-8")
+		filesMatch = /assetFiles: \[(.+)\]/.exec(content)
+		if not filesMatch
+			continue
+		for file in filesMatch[1].split(",")
+			pathList.push(Path.join "/minjs", /['"](.+)['"]/.exec(file)[1])
 
-	generate_hash = (path, done) ->
-		logger.log path:path, "Started hashing static content"
-		content = getFileContent path, path
-		if !content
-			content = getFileContent path, path.replace('minjs', 'js')
-			if !content
-				logger.err path:path, "No source candidate available"
-				if !module.parent
-					process.exit(1)
+	md5 = (path) ->
+		buffer = fs.readFileSync path
+		return crypto.createHash("md5").update(buffer).digest("hex")
 
-		hash = crypto.createHash("md5").update(content).digest("hex")
+	generateHash = (path, done) ->
+		fsPath = Path.join REPOSITORY_ROOT, "public", path
 
-		splitPath = path.split("/")
-		filenameSplit = splitPath.pop().split(".")
-		filenameSplit.splice(filenameSplit.length-1, 0, hash)
-		splitPath.push(filenameSplit.join("."))
+		hash = md5(fsPath)
 
-		hashPath = splitPath.join("/")
+		extension = Path.extname(path)
+		filename = Path.basename(path, extension)
+		params = {
+			dir: Path.dirname(path),
+			name: "#{filename}.#{hash}",
+			ext: extension
+		}
+		hashPath = Path.format(params)
 		hashedFiles[path] = hashPath
 
-		fsHashPath = Path.join __dirname, "../../../", "public", hashPath
+		fsHashPath = Path.join REPOSITORY_ROOT, "public", hashPath
 
 		fs.stat fsHashPath, (err) ->
-			if err?.code is 'ENOENT'
-				fs.writeFileSync(fsHashPath, content)
-			logger.log path:path, "Finished hashing static content"
+			if not err?
+				logger.log path:path, "Nothing to do"
+				return done()
+
+			if err?.code is "ENOENT"
+				logger.log path:path, "Creating symlink"
+				return fs.copyFile fsPath, fsHashPath, (err) ->
+					if err?
+						logger.log path:path, "Creating symlink failed", err
+					done()
+			logger.log {path:path, err:err}, "Calling stat failed"
 			done()
 
-	async.map pathList, generate_hash, () ->
+	logger.log "Started hashing static content"
+	async.map pathList, generateHash, () ->
 		logger.log "Finished hashing static content"
-		if !module.parent
-			process.exit(0)
 
-module.exports = hashedFiles
+invokedDirectly = !module.parent
+if invokedDirectly or require("settings-sharelatex").useMinifiedJs
+	fillHashedFiles()
