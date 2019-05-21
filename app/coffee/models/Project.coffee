@@ -11,14 +11,19 @@ ObjectId = Schema.ObjectId
 
 DeletedDocSchema = new Schema
 	name: String
+	deletedAt: {type: Date}
 
 DeletedFileSchema = new Schema
-	name: String
-	deletedAt: {type: Date}
+	name           : String
+	created        : type:Date
+	linkedFileData : { type: Schema.Types.Mixed }
+	hash           : type:String
+	deletedAt      : {type: Date}
 
 ProjectSchema = new Schema
 	name              :   {type:String, default:'new project'}
 	lastUpdated       :   {type:Date, default: () -> new Date()}
+	lastUpdatedBy     :   {type:ObjectId, ref: 'User'}
 	lastOpened        :   {type:Date}
 	active            :   { type: Boolean,  default: true }
 	owner_ref         :   {type:ObjectId, ref:'User'}
@@ -72,6 +77,7 @@ ProjectSchema = new Schema
 		history         :
 			id            : { type: Number }
 			display       : { type: Boolean }
+			upgradedAt    : { type: Date }
 	collabratecUsers	: [
 		{
 			user_id						: { type: ObjectId, ref:'User' }

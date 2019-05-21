@@ -57,6 +57,8 @@ module.exports = ProjectEntityUpdateHandler = self =
 					fileProperties = name : SafePath.clean(origonalFileRef.name)
 					if origonalFileRef.linkedFileData?
 						fileProperties.linkedFileData = origonalFileRef.linkedFileData
+					if origonalFileRef.hash?
+						fileProperties.hash = origonalFileRef.hash
 					fileRef = new File(fileProperties)
 					FileStoreHandler.copyFile originalProject_id, origonalFileRef._id, project._id, fileRef._id, (err, fileStoreUrl)->
 						if err?
@@ -81,7 +83,7 @@ module.exports = ProjectEntityUpdateHandler = self =
 						return callback(error) if error?
 						callback null, fileRef, folder_id
 
-	updateDocLines: (project_id, doc_id, lines, version, ranges, callback = (error) ->)->
+	updateDocLines: (project_id, doc_id, lines, version, ranges, lastUpdatedAt, lastUpdatedBy, callback = (error) ->)->
 		ProjectGetter.getProjectWithoutDocLines project_id, (err, project)->
 			return callback(err) if err?
 			return callback(new Errors.NotFoundError("project not found")) if !project?
@@ -113,7 +115,7 @@ module.exports = ProjectEntityUpdateHandler = self =
 					# path will only be present if the doc is not deleted
 					if modified && !isDeletedDoc
 						# Don't need to block for marking as updated
-						ProjectUpdateHandler.markAsUpdated project_id
+						ProjectUpdateHandler.markAsUpdated project_id, lastUpdatedAt, lastUpdatedBy
 						TpdsUpdateSender.addDoc {project_id:project_id, path:path.fileSystem, doc_id:doc_id, project_name:project.name, rev:rev}, callback
 					else
 						callback()
@@ -141,18 +143,21 @@ module.exports = ProjectEntityUpdateHandler = self =
 				return callback(err) if err?
 				callback(null, result, project)
 
-	addDoc: wrapWithLock
+	addDoc: (project_id, folder_id, docName, docLines, userId, callback) ->
+		self.addDocWithRanges(project_id, folder_id, docName, docLines, {}, userId, callback)
+
+	addDocWithRanges: wrapWithLock
 		beforeLock: (next) ->
-			(project_id, folder_id, docName, docLines, userId, callback = (error, doc, folder_id) ->) ->
+			(project_id, folder_id, docName, docLines, ranges, userId, callback = (error, doc, folder_id) ->) ->
 				if not SafePath.isCleanFilename docName
 					return callback new Errors.InvalidNameError("invalid element name")
 				# Put doc in docstore first, so that if it errors, we don't have a doc_id in the project
 				# which hasn't been created in docstore.
 				doc = new Doc name: docName
-				DocstoreManager.updateDoc project_id.toString(), doc._id.toString(), docLines, 0, {}, (err, modified, rev) ->
+				DocstoreManager.updateDoc project_id.toString(), doc._id.toString(), docLines, 0, ranges, (err, modified, rev) ->
 					return callback(err) if err?
-					next(project_id, folder_id, doc, docName, docLines, userId, callback)
-		withLock: (project_id, folder_id, doc, docName, docLines, userId, callback = (error, doc, folder_id) ->) ->
+					next(project_id, folder_id, doc, docName, docLines, ranges, userId, callback)
+		withLock: (project_id, folder_id, doc, docName, docLines, ranges, userId, callback = (error, doc, folder_id) ->) ->
 			ProjectEntityUpdateHandler._addDocAndSendToTpds project_id, folder_id, doc, (err, result, project) ->
 				return callback(err) if err?
 				docPath = result?.path?.fileSystem
@@ -166,18 +171,17 @@ module.exports = ProjectEntityUpdateHandler = self =
 					return callback(error) if error?
 					callback null, doc, folder_id
 
-	_uploadFile: (project_id, folder_id, fileName, fsPath, linkedFileData, callback = (error, fileRef, fileStoreUrl) ->)->
+	_uploadFile: (project_id, folder_id, fileName, fsPath, linkedFileData, callback = (error, fileStoreUrl, fileRef) ->)->
 		if not SafePath.isCleanFilename fileName
 			return callback new Errors.InvalidNameError("invalid element name")
-		fileRef = new File(
+		fileArgs =
 			name: fileName
 			linkedFileData: linkedFileData
-		)
-		FileStoreHandler.uploadFileFromDisk project_id, fileRef._id, fsPath, (err, fileStoreUrl)->
+		FileStoreHandler.uploadFileFromDisk project_id, fileArgs, fsPath, (err, fileStoreUrl, fileRef)->
 			if err?
 				logger.err err:err, project_id: project_id, folder_id: folder_id, file_name: fileName, fileRef:fileRef, "error uploading image to s3"
 				return callback(err)
-			callback(null, fileRef, fileStoreUrl)
+			callback(null, fileStoreUrl, fileRef)
 
 	_addFileAndSendToTpds: (project_id, folder_id, fileRef, callback = (error) ->)->
 		ProjectEntityMongoUpdateHandler.addFile project_id, folder_id, fileRef, (err, result, project) ->
@@ -193,7 +197,7 @@ module.exports = ProjectEntityUpdateHandler = self =
 			(project_id, folder_id, fileName, fsPath, linkedFileData, userId, callback) ->
 				if not SafePath.isCleanFilename fileName
 					return callback new Errors.InvalidNameError("invalid element name")
-				ProjectEntityUpdateHandler._uploadFile project_id, folder_id, fileName, fsPath, linkedFileData, (error, fileRef, fileStoreUrl) ->
+				ProjectEntityUpdateHandler._uploadFile project_id, folder_id, fileName, fsPath, linkedFileData, (error, fileStoreUrl, fileRef) ->
 					return callback(error) if error?
 					next(project_id, folder_id, fileName, fsPath, linkedFileData, userId, fileRef, fileStoreUrl, callback)
 		withLock: (project_id, folder_id, fileName, fsPath, linkedFileData, userId, fileRef, fileStoreUrl, callback = (error, fileRef, folder_id) ->)->
@@ -213,11 +217,10 @@ module.exports = ProjectEntityUpdateHandler = self =
 		beforeLock: (next) ->
 			(project_id, file_id, fsPath, linkedFileData, userId, callback)->
 				# create a new file
-				fileRef = new File(
+				fileArgs =
 					name: "dummy-upload-filename"
 					linkedFileData: linkedFileData
-				)
-				FileStoreHandler.uploadFileFromDisk project_id, fileRef._id, fsPath, (err, fileStoreUrl)->
+				FileStoreHandler.uploadFileFromDisk project_id, fileArgs, fsPath, (err, fileStoreUrl, fileRef)->
 					return callback(err) if err?
 					next project_id, file_id, fsPath, linkedFileData, userId, fileRef, fileStoreUrl, callback
 		withLock: (project_id, file_id, fsPath, linkedFileData, userId, newFileRef, fileStoreUrl, callback)->
@@ -261,7 +264,7 @@ module.exports = ProjectEntityUpdateHandler = self =
 						return callback(err) if err?
 						callback null, existingDoc, !existingDoc?
 			else
-				self.addDoc.withoutLock project_id, folder_id, docName, docLines, userId, (err, doc) ->
+				self.addDocWithRanges.withoutLock project_id, folder_id, docName, docLines, {}, userId, (err, doc) ->
 					return callback(err) if err?
 					callback null, doc, !existingDoc?
 
@@ -271,11 +274,10 @@ module.exports = ProjectEntityUpdateHandler = self =
 				if not SafePath.isCleanFilename fileName
 					return callback new Errors.InvalidNameError("invalid element name")
 				# create a new file
-				fileRef = new File(
+				fileArgs =
 					name: fileName
 					linkedFileData: linkedFileData
-				)
-				FileStoreHandler.uploadFileFromDisk project_id, fileRef._id, fsPath, (err, fileStoreUrl)->
+				FileStoreHandler.uploadFileFromDisk project_id, fileArgs, fsPath, (err, fileStoreUrl, fileRef)->
 					return callback(err) if err?
 					next(project_id, folder_id, fileName, fsPath, linkedFileData, userId, fileRef, fileStoreUrl, callback)
 		withLock: (project_id, folder_id, fileName, fsPath, linkedFileData, userId, newFileRef, fileStoreUrl, callback = (err, file, isNewFile, existingFile)->)->
@@ -317,11 +319,10 @@ module.exports = ProjectEntityUpdateHandler = self =
 				fileName = path.basename(elementPath)
 				folderPath = path.dirname(elementPath)
 				# create a new file
-				fileRef = new File(
+				fileArgs =
 					name: fileName
 					linkedFileData: linkedFileData
-				)
-				FileStoreHandler.uploadFileFromDisk project_id, fileRef._id, fsPath, (err, fileStoreUrl)->
+				FileStoreHandler.uploadFileFromDisk project_id, fileArgs, fsPath, (err, fileStoreUrl, fileRef)->
 					return callback(err) if err?
 					next project_id, folderPath, fileName, fsPath, linkedFileData, userId, fileRef, fileStoreUrl, callback
 		withLock: (project_id, folderPath, fileName, fsPath, linkedFileData, userId, fileRef, fileStoreUrl, callback) ->

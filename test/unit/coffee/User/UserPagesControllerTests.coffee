@@ -10,11 +10,23 @@ describe "UserPagesController", ->
 
 	beforeEach ->
 
-		@settings = {}
+		@settings = {
+			apis:
+				v1:
+						url: 'some.host'
+						user: 'one'
+						pass: 'two'
+		}
 		@user =
 			_id: @user_id = "kwjewkl"
 			features:{}
 			email: "joe@example.com"
+			thirdPartyIdentifiers: [
+				{
+					"providerId": "google",
+					"externalUserId": "testId"
+				}
+			]
 
 		@UserGetter = getUser: sinon.stub()
 		@UserSessionsManager =
@@ -39,6 +51,7 @@ describe "UserPagesController", ->
 			"../Errors/ErrorController": @ErrorController
 			'../Dropbox/DropboxHandler': @DropboxHandler
 			'../Authentication/AuthenticationController': @AuthenticationController
+			'request': @request = sinon.stub()
 		@req =
 			query:{}
 			session:
@@ -133,6 +146,7 @@ describe "UserPagesController", ->
 
 	describe "settingsPage", ->
 		beforeEach ->
+			@request.get = sinon.stub().callsArgWith(1, null, {statusCode: 200}, {has_password: true})
 			@UserGetter.getUser = sinon.stub().callsArgWith(1, null, @user)
 
 		it "should render user/settings", (done)->
@@ -150,6 +164,15 @@ describe "UserPagesController", ->
 		it "should set 'shouldAllowEditingDetails' to true", (done)->
 			@res.render = (page, opts)=>
 				opts.shouldAllowEditingDetails.should.equal true
+				done()
+			@UserPagesController.settingsPage @req, @res
+
+		it "should restructure thirdPartyIdentifiers data for template use", (done)->
+			expectedResult = {
+				google: "testId"
+			}
+			@res.render = (page, opts)=>
+				expect(opts.thirdPartyIds).to.include expectedResult
 				done()
 			@UserPagesController.settingsPage @req, @res
 

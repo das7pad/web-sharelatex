@@ -168,7 +168,7 @@ define([
         }
 
         /* eslint-disable no-unused-vars */
-        const undoManager = new UndoManager(scope, editor, element)
+        const undoManager = new UndoManager(editor)
         const highlightsManager = new HighlightsManager(scope, editor, element)
         const cursorPositionManager = new CursorPositionManager(
           scope,
@@ -390,16 +390,18 @@ define([
         if (attrs.resizeOn != null) {
           for (let event of Array.from(attrs.resizeOn.split(','))) {
             scope.$on(event, function() {
-              const previousScreenPosition = getCursorScreenPosition()
-              editor.resize()
-              // Put cursor back to same vertical position on screen
-              const newScreenPosition = getCursorScreenPosition()
-              const session = editor.getSession()
-              return session.setScrollTop(
-                session.getScrollTop() +
-                  newScreenPosition -
-                  previousScreenPosition
-              )
+              scope.$applyAsync(() => {
+                const previousScreenPosition = getCursorScreenPosition()
+                editor.resize()
+                // Put cursor back to same vertical position on screen
+                const newScreenPosition = getCursorScreenPosition()
+                const session = editor.getSession()
+                return session.setScrollTop(
+                  session.getScrollTop() +
+                    newScreenPosition -
+                    previousScreenPosition
+                )
+              })
             })
           }
         }
@@ -643,6 +645,18 @@ define([
           editor.renderer.off('resize', trackChangesManager.onResize)
         }
 
+        const initUndo = function() {
+          // Emulate onChangeSession event. Note: listening to changeSession
+          // event is unnecessary since this method is called when we switch
+          // sessions (via ShareJS changing) anyway
+          undoManager.onChangeSession(editor.getSession())
+          editor.on('change', undoManager.onChange)
+        }
+
+        const tearDownUndo = function() {
+          editor.off('change', undoManager.onChange)
+        }
+
         const onSessionChangeForCursorPosition = function(e) {
           if (e.oldSession != null) {
             e.oldSession.selection.off(
@@ -744,6 +758,7 @@ define([
           triggerEditorInitEvent()
           initSpellCheck()
           initTrackChanges()
+          initUndo()
 
           resetScrollMargins()
 
@@ -794,6 +809,7 @@ define([
         var detachFromAce = function(sharejs_doc) {
           tearDownSpellCheck()
           tearDownTrackChanges()
+          tearDownUndo()
           sharejs_doc.detachFromAce()
           sharejs_doc.off('remoteop.recordRemote')
 
@@ -823,6 +839,7 @@ define([
             scope.$broadcast('changeEditor')
             tearDownSpellCheck()
             tearDownCursorPosition()
+            tearDownUndo()
             detachFromAce(scope.sharejsDoc)
             const session = editor.getSession()
             if (session != null) {

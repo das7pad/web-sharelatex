@@ -84,6 +84,10 @@ describe 'ProjectDetailsHandler', ->
 				done()
 
 	describe "transferOwnership", ->
+		beforeEach ->
+			@handler.generateUniqueName = sinon.stub().callsArgWith(2, null, 'teapot')
+			@ProjectModel.update.callsArgWith(2)
+
 		it "should return a not found error if the project can't be found", (done) ->
 			@ProjectGetter.getProject.callsArgWith(2)
 			@handler.transferOwnership 'abc', '123', (err) ->
@@ -99,17 +103,24 @@ describe 'ProjectDetailsHandler', ->
 				done()
 
 		it "should transfer ownership of the project", (done) ->
-			@ProjectModel.update.callsArgWith(2)
 			@handler.transferOwnership 'abc', '123', () =>
-				sinon.assert.calledWith(@ProjectModel.update, {_id: 'abc'})
+				sinon.assert.calledWith(@ProjectModel.update, {_id: 'abc'}, sinon.match({$set: {name: 'teapot'}}))
 				done()
 
 		it "should flush the project to tpds", (done) ->
-			@ProjectModel.update.callsArgWith(2)
 			@handler.transferOwnership 'abc', '123', () =>
 				sinon.assert.calledWith(@ProjectEntityHandler.flushProjectToThirdPartyDataStore, 'abc')
 				done()
 
+		it "should generate a unique name for the project", (done) ->
+			@handler.transferOwnership 'abc', '123', () =>
+				sinon.assert.calledWith(@handler.generateUniqueName, '123', @project.name)
+				done()
+
+		it "should append the supplied suffix to the project name, if passed", (done) ->
+			@handler.transferOwnership 'abc', '123', ' wombat', () =>
+				sinon.assert.calledWith(@handler.generateUniqueName, '123', "#{@project.name} wombat")
+				done()
 
 	describe "getProjectDescription", ->
 

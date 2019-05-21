@@ -64,6 +64,7 @@ module.exports = ProjectEntityMongoUpdateHandler = self =
 					set["#{path.mongo}.created"] = new Date()
 					set["#{path.mongo}.linkedFileData"] = newFileRef.linkedFileData
 					inc["#{path.mongo}.rev"] = 1
+					set["#{path.mongo}.hash"] = newFileRef.hash
 					update =
 						"$inc": inc
 						"$set": set
@@ -145,7 +146,7 @@ module.exports = ProjectEntityMongoUpdateHandler = self =
 							# have not moved a folder subfolder of itself (which
 							# is done by _checkValidMove above) because that
 							# would lead to it being deleted.
-							self._removeElementFromMongoArray Project, project_id, entityPath.mongo, (err, newProject)->
+							self._removeElementFromMongoArray Project, project_id, entityPath.mongo, entity_id, (err, newProject)->
 								return callback(err) if err?
 								ProjectEntityHandler.getAllEntitiesFromProject newProject, (err, newDocs, newFiles) ->
 									return callback(err) if err?
@@ -171,7 +172,7 @@ module.exports = ProjectEntityMongoUpdateHandler = self =
 			return callback(error) if error?
 			ProjectLocator.findElement {project: project, element_id: entity_id, type: entityType}, (error, entity, path) ->
 				return callback(error) if error?
-				self._removeElementFromMongoArray Project, project_id, path.mongo, (error, newProject) ->
+				self._removeElementFromMongoArray Project, project_id, path.mongo, entity_id, (error, newProject) ->
 					return callback(error) if error?
 					callback null, entity, path, project, newProject
 
@@ -217,17 +218,15 @@ module.exports = ProjectEntityMongoUpdateHandler = self =
 						return callback(err)
 					callback null, folder, parentFolder_id
 
-	_removeElementFromMongoArray: (model, model_id, path, callback = (err, project) ->)->
+	_removeElementFromMongoArray: (model, model_id, path, element_id, callback = (err, project) ->)->
 		conditions = {_id:model_id}
-		update = {"$unset":{}}
-		update["$unset"][path] = 1
-		model.update conditions, update, {}, (err)->
-			pullUpdate = {"$pull":{}, "$inc":{}}
-			nonArrayPath = path.slice(0, path.lastIndexOf("."))
-			pullUpdate["$pull"][nonArrayPath] = null
-			# we need to increment the project version number for any structure change
-			pullUpdate["$inc"]["version"] = 1
-			model.findOneAndUpdate conditions, pullUpdate, {"new": true}, callback
+		pullUpdate = {"$pull":{}, "$inc":{}}
+		nonArrayPath = path.slice(0, path.lastIndexOf("."))
+		# remove specific element from array by id
+		pullUpdate["$pull"][nonArrayPath] = {_id: element_id}
+		# we need to increment the project version number for any structure change
+		pullUpdate["$inc"]["version"] = 1
+		model.findOneAndUpdate conditions, pullUpdate, {"new": true}, callback
 
 	_countElements: (project)->
 		countFolder = (folder)->
@@ -366,6 +365,7 @@ module.exports = ProjectEntityMongoUpdateHandler = self =
 				deletedDocs: {
 					_id:  doc._id
 					name: doc.name
+					deletedAt: new Date()
 				}
 			}
 		}, {}, callback
@@ -379,6 +379,7 @@ module.exports = ProjectEntityMongoUpdateHandler = self =
 					_id:  fileRef._id
 					name: fileRef.name
 					linkedFileData: fileRef.linkedFileData
+					hash: fileRef.hash
 					deletedAt: new Date()
 				}
 			}
