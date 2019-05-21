@@ -5,6 +5,8 @@ module.exports =
 	enableSubscriptions: true
 
 	apis:
+		analytics:
+			url: undefined
 		recurly:
 			# Set up our own mock recurly server
 			url: 'http://localhost:6034'
