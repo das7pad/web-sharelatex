@@ -2,6 +2,9 @@ module.exports =
 	enableLegacyRegistration: true
 	enableLegacyLogin: false
 	apis:
+		analytics:
+			enabled: false
+			url: undefined
 		v1:
 			host: "http://localhost:5000"
 	collabratec:

@@ -6,6 +6,9 @@ Errors = require '../Errors/Errors'
 
 
 makeFaultTolerantRequest = (userId, options, callback) ->
+	if not settings.apis?.analytics?.enabled
+		return callback()
+
 	if userId+"" == settings.smokeTest?.userId+""
 		return callback()
 
@@ -24,6 +27,8 @@ makeFaultTolerantRequest = (userId, options, callback) ->
 	callback() # Do not wait for all the attempts
 
 makeRequest = (opts, callback)->
+	if not settings.apis?.analytics?.enabled
+		return callback(new Errors.ServiceDisabledError('Analytics service is disabled'))
 	if settings.apis?.analytics?.url?
 		urlPath = opts.url
 		opts.url = "#{settings.apis.analytics.url}#{urlPath}"
@@ -102,6 +107,8 @@ module.exports =
 			url: "/user/#{user_id}/event/last_occurrence"
 		makeRequest opts, (err, response, body)->
 			if err?
+				if err.name? == 'ServiceDisabledError'
+					return callback err
 				console.log response, opts
 				logger.err {user_id, err}, "error getting last occurance of event"
 				return callback err

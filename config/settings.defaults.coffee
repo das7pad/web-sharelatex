@@ -166,6 +166,7 @@ module.exports = settings =
 		notifications:
 			url: "http://#{process.env['NOTIFICATIONS_HOST'] or 'localhost'}:3042"
 		analytics:
+			enabled: true
 			url: "http://#{process.env['ANALYTICS_HOST'] or 'localhost'}:3050"
 		linkedUrlProxy:
 			url: process.env['LINKED_URL_PROXY']

@@ -19,6 +19,13 @@ ServiceNotConfiguredError = (message) ->
 	return error
 ServiceNotConfiguredError.prototype.__proto__ = Error.prototype
 
+ServiceDisabledError = (message) ->
+	error = new Error(message)
+	error.name = "ServiceDisabledError"
+	error.__proto__ = ServiceDisabledError.prototype
+	return error
+ServiceDisabledError.prototype.__proto__ = ServiceNotConfiguredError.prototype
+
 TooManyRequestsError = (message) ->
 	error = new Error(message)
 	error.name = "TooManyRequestsError"
@@ -122,6 +129,7 @@ module.exports = Errors =
 	NotFoundError: NotFoundError
 	ForbiddenError: ForbiddenError
 	ServiceNotConfiguredError: ServiceNotConfiguredError
+	ServiceDisabledError: ServiceDisabledError
 	TooManyRequestsError: TooManyRequestsError
 	InvalidNameError: InvalidNameError
 	UnsupportedFileTypeError: UnsupportedFileTypeError

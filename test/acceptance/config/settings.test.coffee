@@ -6,6 +6,7 @@ module.exports =
 
 	apis:
 		analytics:
+			enabled: false
 			url: undefined
 		recurly:
 			# Set up our own mock recurly server
