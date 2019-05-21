@@ -488,7 +488,6 @@ define(['base', 'pdfjs-dist/build/pdf'], (App, PDFJS) =>
                     typeof self.errorCallback === 'function'
                       ? self.errorCallback(error)
                       : undefined
-
                 )
                 return page
                   .getAnnotations()

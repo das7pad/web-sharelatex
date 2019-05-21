@@ -24,10 +24,11 @@ define(['base'], function(App) {
     minLength = minLength || DEF_MIN_LENGTH
     const words = baseStr.split(' ')
 
-    const wordsWrapped = Array.from(words).map(word =>
-      _decodeHTMLEntities(word).length >= minLength
-        ? `<${wrapperElName} class=\"break-word\">${word}</${wrapperElName}>`
-        : word
+    const wordsWrapped = Array.from(words).map(
+      word =>
+        _decodeHTMLEntities(word).length >= minLength
+          ? `<${wrapperElName} class=\"break-word\">${word}</${wrapperElName}>`
+          : word
     )
 
     return (outputStr = wordsWrapped.join(' '))

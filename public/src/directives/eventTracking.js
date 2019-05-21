@@ -93,7 +93,7 @@ define(['base'], App =>
             return $(window).on('resize scroll', () =>
               _.throttle(
                 isInViewport(element) &&
-                  !eventTracking.eventInCache(scope.eventTracking)
+                !eventTracking.eventInCache(scope.eventTracking)
                   ? sendEvent(true)
                   : undefined,
                 500
