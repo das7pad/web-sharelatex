@@ -8,6 +8,8 @@ module.exports =
 		analytics:
 			enabled: false
 			url: undefined
+		notifications:
+			url: undefined
 		recurly:
 			# Set up our own mock recurly server
 			url: 'http://localhost:6034'
