@@ -126,3 +126,5 @@ module.exports = LockManager =
 				return callback(new Error("tried to release timed out lock"))
 			else
 				callback(null,result)
+
+		return null
