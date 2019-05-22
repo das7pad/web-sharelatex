@@ -21,6 +21,7 @@ services:
       - .:/app
     working_dir: /app
     environment:
+      LOG_LEVEL: fatal
       MONGO_HOST: mongo
       API_REDIS_HOST: redis_api
       LOCK_REDIS_HOST: redis_lock
