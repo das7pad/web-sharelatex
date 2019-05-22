@@ -21,8 +21,8 @@ describe "UserGetter", ->
 		@find = sinon.stub().callsArgWith(2, null, [ @fakeUser ])
 		@Mongo =
 			db: users:
-				 findOne: @findOne
-				 find: @find
+				findOne: @findOne
+				find: @find
 			ObjectId: (id) -> return id
 		settings = apis: { v1: { url: 'v1.url', user: '', pass: '' } }
 		@getUserAffiliations = sinon.stub().callsArgWith(1, null, [])

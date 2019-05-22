@@ -32,8 +32,8 @@ describe 'NotificationsBuilder', ->
 				content: @body.enrolment_ad_html
 			@handler.createNotification.calledWith(
 				user_id,
-				 "ip-matched-affiliation-#{@body.id}",
-				 "notification_ip_matched_affiliation",
-				 expectedOpts
+				"ip-matched-affiliation-#{@body.id}",
+				"notification_ip_matched_affiliation",
+				expectedOpts
 			).should.equal true
 			done()

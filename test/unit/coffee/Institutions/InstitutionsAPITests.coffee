@@ -20,7 +20,7 @@ describe "InstitutionsAPI", ->
 			'settings-sharelatex': @settings
 			'request': @request
 			"../Notifications/NotificationsBuilder":
-				 ipMatcherAffiliation: sinon.stub().returns(@ipMatcherNotification)
+				ipMatcherAffiliation: sinon.stub().returns(@ipMatcherNotification)
 
 		@stubbedUser = 
 			_id: "3131231"
