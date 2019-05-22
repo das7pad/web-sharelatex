@@ -82,7 +82,9 @@ describe "CSRF protection", ->
 
 	it 'should register with the csrf token', (done) ->
 		@user.request.get '/login', (err, res, body) =>
+			expect(err?).to.equal false
 			@user.getCsrfToken (error) =>
+				expect(error?).to.equal false
 				@user.request.post {
 					url: "/register"
 					json:
@@ -92,7 +94,7 @@ describe "CSRF protection", ->
 						"x-csrf-token": @user.csrfToken
 					}
 				}, (error, response, body) =>
-					expect(err?).to.equal false
+					expect(error?).to.equal false
 					expect(response.statusCode).to.equal 200
 					done()
 

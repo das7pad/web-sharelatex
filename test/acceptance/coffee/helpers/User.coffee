@@ -251,6 +251,8 @@ class User
 			url: "/dev/csrf"
 		}, (err, response, body) =>
 			return callback(err) if err?
+			if response.statusCode != 200
+				return callback(new Error(response.statusCode))
 			@csrfToken = body
 			@request = @request.defaults({
 				headers:
