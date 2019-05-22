@@ -27,7 +27,8 @@ module.exports = ContactsController =
 
 				Modules.hooks.fire "getContacts", user_id, contacts, (error, additional_contacts) ->
 					return next(error) if error?
-					contacts = contacts.concat(additional_contacts...)
+					if additional_contacts
+						contacts = contacts.concat(additional_contacts...)
 					res.send({
 						contacts: contacts
 					})
