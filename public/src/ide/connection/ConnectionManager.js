@@ -94,14 +94,11 @@ define([], function() {
           }
         })
 
-        this.ide.socket = io.connect(
-          this.wsUrl,
-          {
-            reconnect: false,
-            'connect timeout': 30 * 1000,
-            'force new connection': true
-          }
-        )
+        this.ide.socket = io.connect(this.wsUrl, {
+          reconnect: false,
+          'connect timeout': 30 * 1000,
+          'force new connection': true
+        })
 
         // handle network-level websocket errors (e.g. failed dns lookups)
 

@@ -93,8 +93,8 @@ define(['moment', 'base', 'modules/localStorage'], function(moment, App) {
           heartbeatsSent <= 2
             ? 30
             : heartbeatsSent <= 6
-              ? (heartbeatsSent - 2) * 60
-              : 300
+            ? (heartbeatsSent - 2) * 60
+            : 300
 
         return (nextHeartbeat = moment()
           .add(backoffSecs, 'seconds')
