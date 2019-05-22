@@ -21,6 +21,7 @@ v1Api =
 	pass: process.env['V1_API_PASSWORD'] or 'password'
 
 module.exports = settings =
+	enableLegacyRegistration: true
 
 	allowAnonymousReadAndWriteSharing:
 		process.env['SHARELATEX_ALLOW_ANONYMOUS_READ_AND_WRITE_SHARING'] == 'true'
