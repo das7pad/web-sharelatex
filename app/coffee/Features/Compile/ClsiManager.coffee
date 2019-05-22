@@ -192,6 +192,8 @@ module.exports = ClsiManager =
 			if project.compiler not in ClsiManager.VALID_COMPILERS
 				project.compiler = "pdflatex"
 
+			options = options or {}
+
 			if options.incrementalCompilesEnabled or options.syncType? # new way, either incremental or full
 				timer = new Metrics.Timer("editor.compile-getdocs-redis")
 				ClsiManager.getContentFromDocUpdaterIfMatch project_id, project, options, (error, projectStateHash, docUpdaterDocs) ->
