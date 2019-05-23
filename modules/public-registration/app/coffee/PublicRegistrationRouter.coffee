@@ -15,7 +15,7 @@ module.exports =
 		if Settings.enableLegacyRegistration
 			removeRoute webRouter, "get", "/register"
 			webRouter.get "/register", PublicRegistrationController.showRegisterPage
-			webRouter.post "/register", CaptchaMiddleware.validateCaptcha, PublicRegistrationController.register
+			webRouter.post "/register", CaptchaMiddleware.validateCaptcha('register'), PublicRegistrationController.register
 			AuthenticationController.addEndpointToLoginWhitelist '/register'
 
 removeRoute = (webRouter, method, path)->
