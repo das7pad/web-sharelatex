@@ -27,7 +27,7 @@ module.exports = DocumentHelper =
 			.replace(/\\(?:[a-zA-Z]+|.|)/g, '')
 			.replace(/{}|~/g, ' ')
 			.replace(/[${}]/g, '')
-			.replace(/ +/g, ' ')
+			.replace(/\ +/g, ' ')
 			.trim()
 
 	_getLinesFromContent: (content, maxContentToScan) ->

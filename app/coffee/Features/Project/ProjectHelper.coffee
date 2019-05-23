@@ -34,7 +34,7 @@ module.exports = ProjectHelper =
 		return name.substr(0, truncatedLength) + suffix
 
 	_addNumericSuffixToProjectName: (name, allProjectNames, maxLength) ->
-		NUMERIC_SUFFIX_MATCH = / \((\d+)\)$/
+		NUMERIC_SUFFIX_MATCH = /\ \((\d+)\)$/
 		suffixedName = (basename, number) ->
 			suffix = " (#{number})"
 			return basename.substr(0, maxLength - suffix.length) + suffix
