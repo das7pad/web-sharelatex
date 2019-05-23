@@ -398,30 +398,6 @@ describe('Key bindings', function() {
       fakeNamedKey(this.cm, 'Up')
       expectCursorAt(this.cm, 0, 0)
     })
-
-    it('should go up a line when inside an empty list', function(done) {
-      this.cm.setValue(
-        '\n' +
-          '\\begin{itemize}\n' +
-          '\\item a\n' +
-          '\\item b\n' +
-          '\\item c\n' +
-          '\\end{itemize}'
-      )
-      // Place cursor after \item c
-      // \item c|
-      this.cm.setCursor({ line: 4, ch: 7 })
-
-      setTimeout(() => {
-        fakeNamedKey(this.cm, 'Up')
-        expectCursorAt(this.cm, 3, 7)
-        fakeNamedKey(this.cm, 'Up')
-        expectCursorAt(this.cm, 2, 7)
-        fakeNamedKey(this.cm, 'Up')
-        expectCursorAt(this.cm, 0, 0)
-        done()
-      })
-    })
   })
 
   describe('Backspace key', function() {
