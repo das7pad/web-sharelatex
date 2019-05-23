@@ -9,7 +9,8 @@ module.exports = Modules =
 	modules: []
 	loadModules: () ->
 		for moduleName in fs.readdirSync(MODULE_BASE_PATH)
-			if fs.existsSync(Path.join(MODULE_BASE_PATH, moduleName, "index.js"))
+			modulePath = Path.join(MODULE_BASE_PATH, moduleName)
+			if fs.existsSync(Path.join(modulePath, "index.js")) || fs.existsSync(Path.join(modulePath, "index.coffee"))
 				loadedModule = require(Path.join(MODULE_BASE_PATH, moduleName, "index"))
 				loadedModule.name = moduleName
 				@modules.push loadedModule
