@@ -15,6 +15,7 @@ describe 'History', ->
 
 	describe 'zip download of version', ->
 		it 'should stream the zip file of a version', (done) ->
+			@timeout(10000)
 			@owner.createProject 'example-project', (error, @project_id) =>
 				return done(error) if error?
 				@v1_history_id = 42
