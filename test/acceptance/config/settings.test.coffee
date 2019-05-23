@@ -3,13 +3,26 @@ v1Api =
 
 module.exports =
 	enableSubscriptions: true
+	allowPublicAccess: true
+
+	enabledLinkedFileTypes: 'url,project_file,project_output_file,mendeley,zotero'.split(',')
 
 	apis:
 		analytics:
 			enabled: false
 			url: undefined
+
+		linkedUrlProxy:
+			url: 'http://localhost:6543'
+
 		notifications:
 			url: undefined
+
+		project_history:
+			sendProjectStructureOps: true
+			initializeHistoryForNewProjects: true
+			displayHistoryForNewProjects: true
+
 		recurly:
 			# Set up our own mock recurly server
 			url: 'http://localhost:6034'
