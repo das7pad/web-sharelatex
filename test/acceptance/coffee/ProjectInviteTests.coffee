@@ -5,6 +5,10 @@ request = require "./helpers/request"
 settings = require "settings-sharelatex"
 CollaboratorsEmailHandler = require "../../../app/js/Features/Collaborators/CollaboratorsEmailHandler"
 
+require "./helpers/MockDocstoreApi"
+require "./helpers/MockDocUpdaterApi"
+require "./helpers/MockProjectHistoryApi"
+
 
 createInvite = (sendingUser, projectId, email, callback=(err, invite)->) ->
 	sendingUser.getCsrfToken (err) ->

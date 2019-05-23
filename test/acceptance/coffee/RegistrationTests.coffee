@@ -7,6 +7,10 @@ settings = require "settings-sharelatex"
 redis = require "./helpers/redis"
 _ = require 'lodash'
 
+require "./helpers/MockDocstoreApi"
+require "./helpers/MockDocUpdaterApi"
+require "./helpers/MockProjectHistoryApi"
+
 # Currently this is testing registration via the 'public-registration' module,
 # whereas in production we're using the 'overleaf-integration' module.
 

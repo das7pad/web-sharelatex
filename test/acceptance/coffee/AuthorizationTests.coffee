@@ -6,6 +6,7 @@ settings = require "settings-sharelatex"
 
 MockDocstoreApi = require './helpers/MockDocstoreApi'
 MockDocUpdaterApi = require './helpers/MockDocUpdaterApi'
+require "./helpers/MockProjectHistoryApi"
 
 try_read_access = (user, project_id, test, callback) ->
 	async.series [

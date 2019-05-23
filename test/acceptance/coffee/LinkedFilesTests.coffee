@@ -9,6 +9,9 @@ request = require "./helpers/request"
 User = require "./helpers/User"
 
 MockClsiApi = require "./helpers/MockClsiApi"
+require "./helpers/MockDocstoreApi"
+require "./helpers/MockDocUpdaterApi"
+require "./helpers/MockProjectHistoryApi"
 
 
 express = require("express")

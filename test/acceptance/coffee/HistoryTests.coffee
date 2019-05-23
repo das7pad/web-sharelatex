@@ -4,6 +4,10 @@
 MockV1HistoryApi = require './helpers/MockV1HistoryApi'
 User = require './helpers/User'
 
+require "./helpers/MockDocstoreApi"
+require "./helpers/MockDocUpdaterApi"
+require "./helpers/MockProjectHistoryApi"
+
 describe 'History', ->
 	beforeEach (done) ->
 		@owner = new User()
