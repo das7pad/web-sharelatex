@@ -1,14 +1,8 @@
-# This file was auto-generated, do not edit it directly.
-# Instead run bin/update_build_scripts from
-# https://github.com/das7pad/sharelatex-dev-env
-
-DOCKER_COMPOSE_FLAGS ?= -f docker-compose.yml
+DOCKER_COMPOSE_FLAGS ?= -f docker-compose.yml --log-level ERROR
 
 
 BUILD_NUMBER ?= local
 BRANCH_NAME ?= $(shell git rev-parse --abbrev-ref HEAD)
-COMMIT ?= $(shell git rev-parse HEAD)
-RELEASE ?= $(shell git describe --tags | sed 's/-g/+/;s/^v//')
 PROJECT_NAME = web
 BUILD_DIR_NAME = $(shell pwd | xargs basename | tr -cd '[a-zA-Z0-9_.\-]')
 
@@ -20,6 +14,7 @@ DOCKER_COMPOSE := BUILD_NUMBER=$(BUILD_NUMBER) \
 
 MODULE_DIRS := $(shell find modules -mindepth 1 -maxdepth 1 -type d -not -name '.git' )
 MODULE_MAKEFILES := $(MODULE_DIRS:=/Makefile)
+MODULE_NAME=$(shell basename $(MODULE))
 
 COFFEE := node_modules/.bin/coffee -m $(COFFEE_OPTIONS)
 COFFEE := node_modules/.bin/coffee $(COFFEE_OPTIONS)
@@ -83,21 +78,33 @@ test/smoke/js/%.js: test/smoke/coffee/%.coffee
 
 
 public/js/ide.js: public/src/ide.js $(MODULE_IDE_SRC_FILES)
-public/js/main.js: public/src/main.js $(MODULE_MAIN_SRC_FILES)
-public/js/main.js public/js/ide.js:
-	@echo Compiling and injecting module includes into $@
+	@echo Compiling and injecting module includes into public/js/ide.js
 	@INCLUDES=""; \
-	DEST=$(shell basename $(basename $@)); \
 	for dir in modules/*; \
 	do \
 		MODULE=`echo $$dir | cut -d/ -f2`; \
-		if [ -e $$dir/$(basename $<)/index.js ]; then \
-			INCLUDES="\"$$DEST/$$MODULE/index\",$$INCLUDES"; \
+		if [ -e $$dir/public/src/ide/index.js ]; then \
+			INCLUDES="\"ide/$$MODULE/index\",$$INCLUDES"; \
 		fi \
 	done; \
 	INCLUDES=$${INCLUDES%?}; \
 	$(BABEL) $< | \
-		sed -E s=\'__[A-Z]+_CLIENTSIDE_INCLUDES__\'=$$INCLUDES= \
+		sed -e s=\'__IDE_CLIENTSIDE_INCLUDES__\'=$$INCLUDES= \
+		> $@
+
+public/js/main.js: public/src/main.js $(MODULE_MAIN_SRC_FILES)
+	@echo Compiling and injecting module includes into public/js/main.js
+	@INCLUDES=""; \
+	for dir in modules/*; \
+	do \
+		MODULE=`echo $$dir | cut -d/ -f2`; \
+		if [ -e $$dir/public/src/main/index.js ]; then \
+			INCLUDES="\"main/$$MODULE/index\",$$INCLUDES"; \
+		fi \
+	done; \
+	INCLUDES=$${INCLUDES%?}; \
+	$(BABEL) $< | \
+		sed -e s=\'__MAIN_CLIENTSIDE_INCLUDES__\'=$$INCLUDES= \
 		> $@
 
 public/stylesheets/%.css: $(LESS_FILES)
@@ -111,10 +118,6 @@ minify: $(CSS_FILES) $(JS_FILES) $(OUTPUT_SRC_FILES)
 	$(GRUNT) compile:minify
 	$(MAKE) minify_css
 	$(MAKE) minify_es
-	$(MAKE) hash_static_files
-
-hash_static_files: app/js/infrastructure/HashedFiles.js
-	MINIFIED_JS='true' node $<
 
 minify_css: $(CSS_FILES) 
 	$(CLEANCSS) $(CLEANCSS_FLAGS) -o $(CSS_SL_FILE) $(CSS_SL_FILE)
@@ -146,14 +149,40 @@ compile_full:
 compile_css_full:
 	$(MAKE) css_full
 
-COMPILE_MODULES = $(addsuffix /compile,$(MODULE_DIRS))
-compile_modules: $(COMPILE_MODULES)
+compile_module:
+	cd modules/$(MODULE_NAME) && $(MAKE) compile
 
-COMPILE_FULL_MODULES = $(addsuffix /compile_full,$(MODULE_DIRS))
-compile_modules_full: $(COMPILE_FULL_MODULES)
+compile_modules: $(MODULE_MAKEFILES)
+	@set -e; \
+	for dir in $(MODULE_DIRS); \
+	do \
+		if [ -e $$dir/Makefile ]; then \
+			(cd $$dir && $(MAKE) compile); \
+		fi; \
+		if [ ! -e $$dir/Makefile ]; then \
+			echo "No makefile found in $$dir"; \
+		fi; \
+	done
+
+compile_modules_full: $(MODULE_MAKEFILES)
+	@set -e; \
+	for dir in $(MODULE_DIRS); \
+	do \
+		if [ -e $$dir/Makefile ]; then \
+			echo "Compiling $$dir in full"; \
+			(cd $$dir && $(MAKE) compile_full); \
+		fi; \
+		if [ ! -e $$dir/Makefile ]; then \
+			echo "No makefile found in $$dir"; \
+		fi; \
+	done
 
 $(MODULE_MAKEFILES): Makefile.module
-	cp Makefile.module $@
+	@set -e; \
+	for makefile in $(MODULE_MAKEFILES); \
+	do \
+		cp Makefile.module $$makefile; \
+	done
 
 clean: clean_app clean_frontend clean_css clean_tests clean_modules
 
@@ -178,23 +207,27 @@ clean_modules:
 		rm -rf $$dir/test/unit/js; \
 		rm -rf $$dir/test/acceptance/js; \
 	done
-	rm -f $(MODULE_MAKEFILES)
 
 clean_css:
 	rm -f public/stylesheets/*.css*
 
-clean_test_acceptance: clean_test_acceptance_app
-clean_test_acceptance: clean_test_acceptance_modules
-clean_test_acceptance: clean_test_frontend
-
-clean_ci: clean_build
-clean_ci: clean_test_acceptance
-	rm -f $(MODULE_MAKEFILES)
+clean_ci:
+	$(DOCKER_COMPOSE) down -v -t 0
+	docker container list | grep 'days ago' | cut -d ' ' -f 1 - | xargs -r docker container stop
+	docker image prune -af --filter "until=48h"
+	docker network prune -f
 
 test: test_unit test_frontend test_acceptance
 
+test_module: compile_module test_unit_module_run test_acceptance_module_run
+
 test_unit:
 	@[ ! -d test/unit ] && echo "web has no unit tests" || COMPOSE_PROJECT_NAME=unit_test_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) run --name unit_test_$(BUILD_DIR_NAME) --rm test_unit
+
+test_unit_module: compile_module test_unit_module_run
+
+test_unit_module_run:
+	COMPOSE_PROJECT_NAME=unit_test_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) run --name unit_test_$(BUILD_DIR_NAME) --rm test_unit bin/unit_test_module $(MODULE_NAME) --grep=$(MOCHA_GREP)
 
 test_unit_app:
 	npm -q run test:unit:app -- ${MOCHA_ARGS}
@@ -212,6 +245,8 @@ test_acceptance: compile test_acceptance_app_run test_acceptance_modules_run
 
 test_acceptance_app: compile test_acceptance_app_run
 
+test_acceptance_module: compile_module test_acceptance_module_run
+
 test_acceptance_run: test_acceptance_app_run test_acceptance_modules_run
 
 test_acceptance_app_run:
@@ -219,21 +254,21 @@ test_acceptance_app_run:
 	COMPOSE_PROJECT_NAME=acceptance_test_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) run --rm test_acceptance npm -q run test:acceptance:run_dir test/acceptance/js
 	COMPOSE_PROJECT_NAME=acceptance_test_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) down -v -t 0
 
-clean_test_acceptance_app:
-	COMPOSE_PROJECT_NAME=acceptance_test_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) down -v -t 0
+test_acceptance_modules_run:
+	@set -e; \
+	for dir in $(MODULE_DIRS); \
+	do \
+		if [ -e $$dir/test/acceptance ]; then \
+			$(MAKE) test_acceptance_module_run MODULE=$$dir; \
+		fi; \
+	done
 
-TEST_ACCEPTANCE_MODULES = $(addsuffix /test_acceptance,$(MODULE_DIRS))
-test_acceptance_modules_run: $(TEST_ACCEPTANCE_MODULES)
-
-CLEAN_TEST_ACCEPTANCE_MODULES = $(addsuffix /clean_test_acceptance,$(MODULE_DIRS))
-clean_test_acceptance_modules: $(CLEAN_TEST_ACCEPTANCE_MODULES)
-
-build_app: compile_full
-build_app: install_translations
-	WEBPACK_ENV=production $(MAKE) minify
-
-install_translations:
-	npm install git+https://github.com/sharelatex/translations-sharelatex.git#master
+test_acceptance_module_run: $(MODULE_MAKEFILES)
+	@if [ -e modules/$(MODULE_NAME)/test/acceptance ]; then \
+		COMPOSE_PROJECT_NAME=acceptance_test_$(BUILD_DIR_NAME)_$(MODULE_NAME) $(DOCKER_COMPOSE) down -v -t 0 \
+		&& cd modules/$(MODULE_NAME) && COMPOSE_PROJECT_NAME=acceptance_test_$(BUILD_DIR_NAME)_$(MODULE_NAME) $(MAKE) test_acceptance \
+		&& cd $(CURDIR) && COMPOSE_PROJECT_NAME=acceptance_test_$(BUILD_DIR_NAME)_$(MODULE_NAME) $(DOCKER_COMPOSE) down -v -t 0; \
+	fi
 
 ci:
 	MOCHA_ARGS="--reporter tap" \
@@ -249,34 +284,12 @@ lint:
 	npm -q run lint
 	
 build:
-	docker pull node:10.15.3
-	docker build --tag ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-build \
-		--cache-from ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-build-cache \
-		--target app \
-		.
-	docker build --tag ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER) \
+	docker build --pull --tag ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER) \
 		--tag gcr.io/overleaf-ops/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER) \
-		--cache-from ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-cache \
-		--cache-from ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-build \
-		--build-arg RELEASE=$(RELEASE) \
-		--build-arg COMMIT=$(COMMIT) \
 		.
-
-clean_build:
-	docker rmi -f \
-		node:10.15.3 \
-		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER) \
-		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-cache \
-		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-build \
-		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-build-cache \
-		gcr.io/overleaf-ops/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER) \
 
 build_test_frontend:
 	COMPOSE_PROJECT_NAME=frontend_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) build test_frontend
-
-clean_test_frontend:
-	COMPOSE_PROJECT_NAME=frontend_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) down -v -t 0
-	docker rmi -f frontend_$(BUILD_DIR_NAME)_test_frontend
 
 publish:
 	docker push $(DOCKER_REPO)/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)
@@ -285,17 +298,7 @@ tar:
 	COMPOSE_PROJECT_NAME=tar_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) run --rm tar
 	COMPOSE_PROJECT_NAME=tar_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) down -v -t 0
 
-MODULE_TARGETS = \
-	$(COMPILE_MODULES) \
-	$(COMPILE_FULL_MODULES) \
-	$(TEST_ACCEPTANCE_MODULES) \
-	$(CLEAN_TEST_ACCEPTANCE_MODULES) \
-
-$(MODULE_TARGETS): $(MODULE_MAKEFILES)
-	$(MAKE) -C $(dir $@) $(notdir $@)
-
 .PHONY:
-	$(MODULE_TARGETS) \
 	all add install update test test_unit test_frontend test_acceptance \
 	test_acceptance_start_service test_acceptance_stop_service \
 	test_acceptance_run ci ci_clean compile clean css
