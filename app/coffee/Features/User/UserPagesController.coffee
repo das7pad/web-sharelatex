@@ -102,6 +102,7 @@ module.exports = UserPagesController =
 				sessions: sessions
 
 	_hasPassword: (user, callback) ->
+		return callback(null, true) unless Settings.apis.v1?.url?
 		request.get {
 			url: "#{Settings.apis.v1.url}/api/v1/sharelatex/has_password"
 			auth: { user: Settings.apis.v1.user, pass: Settings.apis.v1.pass }
