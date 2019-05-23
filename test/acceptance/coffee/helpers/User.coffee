@@ -6,7 +6,7 @@ UserModel = require("../../../../app/js/models/User").User
 UserUpdater = require("../../../../app/js/Features/User/UserUpdater")
 AuthenticationManager = require("../../../../app/js/Features/Authentication/AuthenticationManager")
 
-count = 0
+count = Math.random()
 
 class User
 	constructor: (options = {}) ->

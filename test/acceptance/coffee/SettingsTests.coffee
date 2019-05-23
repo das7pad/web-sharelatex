@@ -31,7 +31,7 @@ describe 'SettingsPage', ->
 			done()
 
 	it 'update main email address', (done) ->
-		newEmail = 'foo@bar.com'
+		newEmail = "foo#{Math.random()}@bar.com"
 		@user.updateSettings email: newEmail, (error) =>
 			should.not.exist error
 			@user.get (error, user) ->

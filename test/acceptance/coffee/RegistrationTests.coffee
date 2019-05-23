@@ -43,7 +43,7 @@ describe "LoginRateLimit", ->
 
 	before ->
 		@user = new User()
-		@badEmail = 'bademail@example.com'
+		@badEmail = "bademail+#{Math.random()}@example.com"
 		@badPassword = 'badpassword'
 
 	it 'should rate limit login attempts after 10 within two minutes', (done) ->

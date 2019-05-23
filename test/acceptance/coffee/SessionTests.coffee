@@ -10,7 +10,7 @@ describe "Sessions", ->
 	before (done) ->
 		@timeout(20000)
 		@user1 = new User()
-		@site_admin = new User({email: "admin@example.com"})
+		@site_admin = new User({email: "admin#{Math.random()}@example.com"})
 		async.series [
 			(cb) => @user1.login cb
 			(cb) => @user1.logout cb
