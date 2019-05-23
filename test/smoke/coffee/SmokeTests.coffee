@@ -10,8 +10,8 @@ port = Settings.web?.web_router_port or ownPort # send requests to web router if
 cookeFilePath = "/tmp/smoke-test-cookie-#{ownPort}-to-#{port}.txt"
 buildUrl = (path) -> " -b #{cookeFilePath} --resolve 'smoke#{Settings.cookieDomain}:#{port}:127.0.0.1' http://smoke#{Settings.cookieDomain}:#{port}/#{path}?setLng=en"
 logger = require "logger-sharelatex"
-LoginRateLimiter = require("../../../app/js/Features/Security/LoginRateLimiter.js")
-RateLimiter = require("../../../app/js/infrastructure/RateLimiter.js")
+LoginRateLimiter = require("../../../app/js/Features/Security/LoginRateLimiter")
+RateLimiter = require("../../../app/js/infrastructure/RateLimiter")
 
 # Change cookie to be non secure so curl will send it
 convertCookieFile = (callback) ->

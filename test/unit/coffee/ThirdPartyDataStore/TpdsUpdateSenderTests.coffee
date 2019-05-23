@@ -1,7 +1,7 @@
 SandboxedModule = require('sandboxed-module')
 assert = require('assert')
 require('chai').should()
-modulePath = require('path').join __dirname, '../../../../app/js/Features/ThirdPartyDataStore/TpdsUpdateSender.js'
+modulePath = require('path').join __dirname, '../../../../app/js/Features/ThirdPartyDataStore/TpdsUpdateSender'
 sinon = require('sinon')
 ath = require('path')
 project_id = "project_id_here"

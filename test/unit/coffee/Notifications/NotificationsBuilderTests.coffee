@@ -2,7 +2,7 @@ SandboxedModule = require('sandboxed-module')
 assert = require('chai').assert
 require('chai').should()
 sinon = require('sinon')
-modulePath = require('path').join __dirname, '../../../../app/js/Features/Notifications/NotificationsBuilder.js'
+modulePath = require('path').join __dirname, '../../../../app/js/Features/Notifications/NotificationsBuilder'
 
 describe 'NotificationsBuilder', ->
 	user_id = "123nd3ijdks"

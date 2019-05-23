@@ -2,7 +2,7 @@ SandboxedModule = require('sandboxed-module')
 sinon = require('sinon')
 require('chai').should()
 expect = require('chai').expect
-modulePath = require('path').join __dirname, '../../../../app/js/Features/ThirdPartyDataStore/TpdsUpdateHandler.js'
+modulePath = require('path').join __dirname, '../../../../app/js/Features/ThirdPartyDataStore/TpdsUpdateHandler'
 
 describe 'TpdsUpdateHandler', ->
 	beforeEach ->

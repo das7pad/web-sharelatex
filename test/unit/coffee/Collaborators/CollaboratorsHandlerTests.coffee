@@ -5,7 +5,7 @@ path = require('path')
 sinon = require('sinon')
 modulePath = path.join __dirname, "../../../../app/js/Features/Collaborators/CollaboratorsHandler"
 expect = require("chai").expect
-Errors = require "../../../../app/js/Features/Errors/Errors.js"
+Errors = require "../../../../app/js/Features/Errors/Errors"
 ObjectId = require('mongojs').ObjectId
 
 describe "CollaboratorsHandler", ->

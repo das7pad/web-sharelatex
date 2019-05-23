@@ -1,4 +1,4 @@
-App = require '../../../../../app.js'
+App = require '../../../../../app'
 require("logger-sharelatex").logger.level("error")
 
 before (done) ->

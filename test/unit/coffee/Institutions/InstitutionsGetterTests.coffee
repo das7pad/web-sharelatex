@@ -2,7 +2,7 @@ SandboxedModule = require('sandboxed-module')
 require('chai').should()
 expect = require('chai').expect
 sinon = require('sinon')
-modulePath = require('path').join __dirname, '../../../../app/js/Features/Institutions/InstitutionsGetter.js'
+modulePath = require('path').join __dirname, '../../../../app/js/Features/Institutions/InstitutionsGetter'
 
 describe 'InstitutionsGetter', ->
 	beforeEach ->

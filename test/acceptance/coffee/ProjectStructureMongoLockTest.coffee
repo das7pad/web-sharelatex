@@ -1,10 +1,10 @@
 APP_PATH = "../../../app/js"
 
 LockManager = require "#{APP_PATH}/infrastructure/LockManager"
-ProjectCreationHandler = require "#{APP_PATH}/Features/Project/ProjectCreationHandler.js"
-ProjectGetter = require "#{APP_PATH}/Features/Project/ProjectGetter.js"
-ProjectEntityMongoUpdateHandler = require "#{APP_PATH}/Features/Project/ProjectEntityMongoUpdateHandler.js"
-UserCreator = require "#{APP_PATH}/Features/User/UserCreator.js"
+ProjectCreationHandler = require "#{APP_PATH}/Features/Project/ProjectCreationHandler"
+ProjectGetter = require "#{APP_PATH}/Features/Project/ProjectGetter"
+ProjectEntityMongoUpdateHandler = require "#{APP_PATH}/Features/Project/ProjectEntityMongoUpdateHandler"
+UserCreator = require "#{APP_PATH}/Features/User/UserCreator"
 
 expect = require("chai").expect
 _ = require("lodash")

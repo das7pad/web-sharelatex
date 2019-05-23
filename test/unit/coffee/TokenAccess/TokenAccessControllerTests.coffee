@@ -8,7 +8,7 @@ expect = require("chai").expect
 ObjectId = require("mongojs").ObjectId
 MockRequest = require('../helpers/MockRequest')
 MockResponse = require('../helpers/MockResponse')
-Errors = require "../../../../app/js/Features/Errors/Errors.js"
+Errors = require "../../../../app/js/Features/Errors/Errors"
 
 describe "TokenAccessController", ->
 

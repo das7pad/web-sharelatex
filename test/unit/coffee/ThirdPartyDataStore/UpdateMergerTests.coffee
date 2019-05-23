@@ -2,7 +2,7 @@ Stream = require('stream')
 SandboxedModule = require('sandboxed-module')
 sinon = require('sinon')
 require('chai').should()
-modulePath = require('path').join __dirname, '../../../../app/js/Features/ThirdPartyDataStore/UpdateMerger.js'
+modulePath = require('path').join __dirname, '../../../../app/js/Features/ThirdPartyDataStore/UpdateMerger'
 BufferedStream = require('bufferedstream')
 
 describe 'UpdateMerger :', ->

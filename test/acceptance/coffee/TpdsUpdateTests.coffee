@@ -1,5 +1,5 @@
 expect = require("chai").expect
-ProjectGetter = require "../../../app/js/Features/Project/ProjectGetter.js"
+ProjectGetter = require "../../../app/js/Features/Project/ProjectGetter"
 request = require "./helpers/request"
 User = require "./helpers/User"
 

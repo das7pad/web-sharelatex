@@ -2,7 +2,7 @@ SandboxedModule = require('sandboxed-module')
 assert = require('assert')
 require('chai').should()
 sinon = require('sinon')
-modulePath = require('path').join __dirname, '../../../../app/js/Features/SystemMessages/SystemMessageManager.js'
+modulePath = require('path').join __dirname, '../../../../app/js/Features/SystemMessages/SystemMessageManager'
 
 
 describe 'SystemMessageManager', ->

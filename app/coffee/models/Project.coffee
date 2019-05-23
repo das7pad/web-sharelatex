@@ -1,7 +1,7 @@
 mongoose = require('mongoose')
 Settings = require 'settings-sharelatex'
 _ = require('underscore')
-FolderSchema = require('./Folder.js').FolderSchema
+FolderSchema = require('./Folder').FolderSchema
 logger = require('logger-sharelatex')
 concreteObjectId = require('mongoose').Types.ObjectId
 Errors  = require "../Features/Errors/Errors"

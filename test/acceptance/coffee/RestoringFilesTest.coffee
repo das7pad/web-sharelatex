@@ -4,7 +4,7 @@ _ = require 'underscore'
 fs = require 'fs'
 Path = require 'path'
 
-ProjectGetter = require "../../../app/js/Features/Project/ProjectGetter.js"
+ProjectGetter = require "../../../app/js/Features/Project/ProjectGetter"
 
 User = require "./helpers/User"
 MockProjectHistoryApi = require "./helpers/MockProjectHistoryApi"

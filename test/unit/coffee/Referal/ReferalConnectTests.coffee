@@ -2,7 +2,7 @@ SandboxedModule = require('sandboxed-module')
 assert = require('assert')
 require('chai').should()
 sinon = require('sinon')
-modulePath = require('path').join __dirname, '../../../../app/js/Features/Referal/ReferalConnect.js'
+modulePath = require('path').join __dirname, '../../../../app/js/Features/Referal/ReferalConnect'
 
 describe 'Referal connect middle wear', ->
 

@@ -1,4 +1,4 @@
-RateLimiterMiddleware = require("../../../../app/js/Features/Security/RateLimiterMiddleware.js")
+RateLimiterMiddleware = require("../../../../app/js/Features/Security/RateLimiterMiddleware")
 WikiController = require("./WikiController")
 settings = require("settings-sharelatex")
 logger = require('logger-sharelatex')

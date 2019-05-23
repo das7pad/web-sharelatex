@@ -1,7 +1,7 @@
 SandboxedModule = require('sandboxed-module')
 sinon = require('sinon')
 require('chai').should()
-modulePath = require('path').join __dirname, '../../../../app/js/Features/ThirdPartyDataStore/TpdsController.js'
+modulePath = require('path').join __dirname, '../../../../app/js/Features/ThirdPartyDataStore/TpdsController'
 
 
 

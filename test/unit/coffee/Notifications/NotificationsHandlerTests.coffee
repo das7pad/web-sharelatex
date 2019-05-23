@@ -2,7 +2,7 @@ SandboxedModule = require('sandboxed-module')
 assert = require('chai').assert
 require('chai').should()
 sinon = require('sinon')
-modulePath = require('path').join __dirname, '../../../../app/js/Features/Notifications/NotificationsHandler.js'
+modulePath = require('path').join __dirname, '../../../../app/js/Features/Notifications/NotificationsHandler'
 _ = require('underscore')
 
 

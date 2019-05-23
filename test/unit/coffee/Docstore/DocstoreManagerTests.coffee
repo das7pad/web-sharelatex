@@ -3,7 +3,7 @@ chai.should()
 sinon = require("sinon")
 modulePath = "../../../../app/js/Features/Docstore/DocstoreManager"
 SandboxedModule = require('sandboxed-module')
-Errors = require "../../../../app/js/Features/Errors/Errors.js"
+Errors = require "../../../../app/js/Features/Errors/Errors"
 
 describe "DocstoreManager", ->
 	beforeEach ->

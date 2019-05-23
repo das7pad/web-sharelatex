@@ -3,7 +3,7 @@ assert = require('assert')
 chai = require('chai')
 expect = chai.expect
 sinon = require('sinon')
-modulePath = require('path').join __dirname, '../../../../app/js/Features/Exports/ExportsController.js'
+modulePath = require('path').join __dirname, '../../../../app/js/Features/Exports/ExportsController'
 
 
 describe 'ExportsController', ->

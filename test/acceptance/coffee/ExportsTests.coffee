@@ -4,8 +4,8 @@ _ = require 'underscore'
 
 
 User = require './helpers/User'
-ProjectGetter = require '../../../app/js/Features/Project/ProjectGetter.js'
-ExportsHandler = require '../../../app/js/Features/Exports/ExportsHandler.js'
+ProjectGetter = require '../../../app/js/Features/Project/ProjectGetter'
+ExportsHandler = require '../../../app/js/Features/Exports/ExportsHandler'
 
 MockProjectHistoryApi = require './helpers/MockProjectHistoryApi'
 MockV1Api = require './helpers/MockV1Api'

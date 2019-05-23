@@ -4,7 +4,7 @@ should = chai.should()
 expect = chai.expect
 modulePath = "../../../../app/js/Features/Authorization/AuthorizationMiddleware.js"
 SandboxedModule = require('sandboxed-module')
-Errors = require "../../../../app/js/Features/Errors/Errors.js"
+Errors = require "../../../../app/js/Features/Errors/Errors"
 
 describe "AuthorizationMiddleware", ->
 	beforeEach ->

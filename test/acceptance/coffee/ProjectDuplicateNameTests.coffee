@@ -8,7 +8,7 @@ fs = require "fs"
 Settings = require "settings-sharelatex"
 _ = require "underscore"
 
-ProjectGetter = require "../../../app/js/Features/Project/ProjectGetter.js"
+ProjectGetter = require "../../../app/js/Features/Project/ProjectGetter"
 
 MockDocStoreApi = require './helpers/MockDocstoreApi'
 MockFileStoreApi = require './helpers/MockFileStoreApi'
