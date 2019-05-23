@@ -66,7 +66,7 @@ tryAcceptInvite = (user, invite, callback=(err, response, body)->) ->
 	}, callback
 
 tryRegisterUser = (user, email, callback=(err, response, body)->) ->
-	user.getCsrfToken (error) =>
+	user.fetchCsrfToken '/register', (error) =>
 		return callback(error) if error?
 		user.request.post {
 			url: "/register"
@@ -76,12 +76,10 @@ tryRegisterUser = (user, email, callback=(err, response, body)->) ->
 		}, callback
 
 tryFollowLoginLink = (user, loginLink, callback=(err, response, body)->) ->
-	user.getCsrfToken (error) =>
-		return callback(error) if error?
 		user.request.get loginLink, callback
 
 tryLoginUser = (user, callback=(err, response, body)->) ->
-	user.getCsrfToken (error) =>
+	user.fetchCsrfToken '/login', (error) =>
 		return callback(error) if error?
 		user.request.post {
 			url: "/login"
@@ -91,15 +89,13 @@ tryLoginUser = (user, callback=(err, response, body)->) ->
 		}, callback
 
 tryGetInviteList = (user, projectId, callback=(err, response, body)->) ->
-	user.getCsrfToken (error) =>
-		return callback(error) if error?
 		user.request.get {
 			url: "/project/#{projectId}/invites"
 			json: true
 		}, callback
 
 tryJoinProject = (user, projectId, callback=(err, response, body)->) ->
-	user.getCsrfToken (error) =>
+	user.fetchCsrfToken '/project', (error) =>
 		return callback(error) if error?
 		user.request.post {
 			url: "/project/#{projectId}/join"

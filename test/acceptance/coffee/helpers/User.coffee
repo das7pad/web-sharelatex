@@ -40,7 +40,7 @@ class User
 
 	registerWithQuery: (query, callback = (error, user) ->) ->
 		return callback(new Error('User already registered')) if @_id?
-		@getCsrfToken (error) =>
+		@fetchCsrfToken '/register', (error) =>
 			return callback(error) if error?
 			@request.post {
 				url: '/register' + query
@@ -58,10 +58,11 @@ class User
 	loginWith: (email, callback = (error) ->) ->
 		@ensureUserExists (error) =>
 			return callback(error) if error?
-			@getCsrfToken (error) =>
+			endpoint = if settings.enableLegacyLogin then "/login/legacy" else "/login"
+			@fetchCsrfToken endpoint, (error) =>
 				return callback(error) if error?
 				@request.post {
-					url: if settings.enableLegacyLogin then "/login/legacy" else "/login"
+					url: endpoint
 					json: { email, @password }
 				}, callback
 
@@ -88,13 +89,16 @@ class User
 
 	logout: (callback = (error) ->) ->
 		@getCsrfToken (error) =>
-			return callback(error) if error?
+			if error
+				@csrfToken = undefined
+				return callback(error)
 			@request.post {
 				url: "/logout"
 				json:
 					email: @email
 					password: @password
 			}, (error, response, body) =>
+				@csrfToken = undefined
 				return callback(error) if error?
 				db.users.findOne {email: @email}, (error, user) =>
 					return callback(error) if error?
@@ -246,18 +250,33 @@ class User
 			return callback(error) if error?
 			callback(null)
 
+	fetchCsrfToken: (params='/', callback=(error)->) =>
+		return callback(null) if @csrfToken
+		@request.get params, (err, response, body) =>
+			@parseCsrfToken body, callback
+
+	parseCsrfToken: (body, callback=(error)->) =>
+		match = /window.csrfToken\ = "(.+)"/.exec(body)
+		return callback(new Error('body has no csrf token')) unless match
+		@setCsrfToken(match[1])
+		return callback(null)
+
+	setCsrfToken: (token) =>
+		@csrfToken = token
+		@request = @request.defaults({
+			headers:
+				"x-csrf-token": @csrfToken
+		})
+
 	getCsrfToken: (callback = (error) ->) ->
+		return callback() if @csrfToken
 		@request.get {
 			url: "/dev/csrf"
 		}, (err, response, body) =>
 			return callback(err) if err?
 			if response.statusCode != 200
 				return callback(new Error(response.statusCode))
-			@csrfToken = body
-			@request = @request.defaults({
-				headers:
-					"x-csrf-token": @csrfToken
-			})
+			@setCsrfToken(body)
 			callback()
 
 	changePassword: (callback = (error) ->) ->

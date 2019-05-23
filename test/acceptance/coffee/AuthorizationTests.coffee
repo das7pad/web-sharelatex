@@ -147,7 +147,7 @@ describe "Authorization", ->
 			(cb) => @owner.login cb
 			(cb) => @other1.login cb
 			(cb) => @other2.login cb
-			(cb) => @anon.getCsrfToken cb
+			(cb) => @anon.fetchCsrfToken '/register', cb
 			(cb) =>
 				@site_admin.login (err) =>
 					return cb(err) if error?

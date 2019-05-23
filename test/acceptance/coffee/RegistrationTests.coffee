@@ -29,7 +29,7 @@ expectNoProjectAccess = (user, projectId, callback=(err,result)->) ->
 
 # Actions
 tryLoginThroughRegistrationForm = (user, email, password, callback=(err, response, body)->) ->
-	user.getCsrfToken (err) ->
+	user.fetchCsrfToken '/register', (err) ->
 		return callback(err) if err?
 		user.request.post {
 			url: "/register"
@@ -47,12 +47,10 @@ describe "LoginRateLimit", ->
 		@badPassword = 'badpassword'
 
 	it 'should rate limit login attempts after 10 within two minutes', (done) ->
-		@user.request.get '/login', (err, res, body) =>
+		@user.fetchCsrfToken '/login', (error) =>
 			async.timesSeries(
 				15
 				, (n, cb) =>
-					@user.getCsrfToken (error) =>
-						return cb(error) if error?
 						@user.request.post {
 							url: "/login"
 							json:
@@ -85,9 +83,7 @@ describe "CSRF protection", ->
 		@user.full_delete_user(@email)
 
 	it 'should register with the csrf token', (done) ->
-		@user.request.get '/login', (err, res, body) =>
-			expect(err?).to.equal false
-			@user.getCsrfToken (error) =>
+		@user.fetchCsrfToken '/register', (error) =>
 				expect(error?).to.equal false
 				@user.request.post {
 					url: "/register"
@@ -103,8 +99,7 @@ describe "CSRF protection", ->
 					done()
 
 	it 'should fail with no csrf token', (done) ->
-		@user.request.get '/login', (err, res, body) =>
-			@user.getCsrfToken (error) =>
+		@user.fetchCsrfToken '/register', (error) =>
 				@user.request.post {
 					url: "/register"
 					json:
@@ -118,10 +113,10 @@ describe "CSRF protection", ->
 					done()
 
 	it 'should fail with a stale csrf token', (done) ->
-		@user.request.get '/login', (err, res, body) =>
-			@user.getCsrfToken (error) =>
+		request.get '/register', (err, res, body) =>
+			@user.parseCsrfToken body, (error) =>
 				oldCsrfToken = @user.csrfToken
-				@user.logout (err) =>
+				@user.request.get '/register', (err, res, body) =>
 					@user.request.post {
 						url: "/register"
 						json:
@@ -141,11 +136,11 @@ describe "Register", ->
 	it 'Set emails attribute', (done) ->
 		@user.register (error, user) =>
 			expect(error).to.not.exist
-			user.email.should.equal @user.email
-			user.emails.should.exist
-			user.emails.should.be.a 'array'
-			user.emails.length.should.equal 1
-			user.emails[0].email.should.equal @user.email
+			expect(user.email).to.equal @user.email
+			expect(user.emails).to.exist
+			expect(user.emails).to.be.a 'array'
+			expect(user.emails.length).to.equal 1
+			expect(user.emails[0].email).to.equal @user.email
 			done()
 
 describe "Register with bonus referal id", ->
@@ -160,7 +155,7 @@ describe "Register with bonus referal id", ->
 	it 'Adds a referal when an id is supplied and the referal source is "bonus"', (done) ->
 		@user1.get (error, user) =>
 			expect(error).to.not.exist
-			user.refered_user_count.should.eql 1
+			expect(user.refered_user_count).to.equal 1
 
 			done()
 
@@ -197,10 +192,12 @@ describe "LoginViaRegistration", ->
 				done()
 
 		it 'should have user1 create a project', (done) ->
-			@user1.createProject 'Private Project', (err, project_id) =>
+			@user1.login (err) =>
 				expect(err?).to.equal false
-				@project_id = project_id
-				done()
+				@user1.createProject 'Private Project', (err, project_id) =>
+					expect(err?).to.equal false
+					@project_id = project_id
+					done()
 
 		it 'should ensure user1 can access their project', (done) ->
 			expectProjectAccess @user1, @project_id, done
@@ -210,6 +207,7 @@ describe "LoginViaRegistration", ->
 
 		it 'should prevent user2 from login/register with user1 email address', (done) ->
 			tryLoginThroughRegistrationForm @user2, @user1.email, 'totally_not_the_right_password', (err, response, body) =>
+				expect(err).to.equal null
 				expect(body.redir?).to.equal false
 				expect(body.message?).to.equal true
 				expect(body.message).to.have.all.keys('type', 'text')

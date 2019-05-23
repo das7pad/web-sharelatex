@@ -16,6 +16,10 @@ describe "Sessions", ->
 			(cb) => @user1.logout cb
 		], done
 
+	afterEach (done) ->
+		@user1.logout () ->
+			done()
+
 	describe "one session", ->
 
 		it "should have one session in UserSessions set", (done) ->
@@ -67,6 +71,7 @@ describe "Sessions", ->
 			@user2.password = @user1.password
 
 		it "should have two sessions in UserSessions set", (done) ->
+			@timeout(10000)
 			async.series(
 				[
 					(next) =>
@@ -167,6 +172,7 @@ describe "Sessions", ->
 			@user3.password = @user1.password
 
 		it "should erase both sessions when password is reset", (done) ->
+			@timeout(10000)
 			async.series(
 				[
 					(next) =>
@@ -255,7 +261,7 @@ describe "Sessions", ->
 
 	describe 'three sessions, sessions page', ->
 
-		before (done) ->
+		before ->
 			# set up second session for this user
 			@user2 = new User()
 			@user2.email = @user1.email
@@ -263,12 +269,9 @@ describe "Sessions", ->
 			@user3 = new User()
 			@user3.email = @user1.email
 			@user3.password = @user1.password
-			async.series [
-				@user2.login.bind(@user2)
-				@user2.activateSudoMode.bind(@user2)
-			], done
 
 		it "should allow the user to erase the other two sessions", (done) ->
+			@timeout(10000)
 			async.series(
 				[
 					(next) =>
