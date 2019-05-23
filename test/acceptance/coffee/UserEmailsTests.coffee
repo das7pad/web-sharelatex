@@ -11,6 +11,7 @@ describe "UserEmails", ->
 		@timeout(20000)
 		@user = new User()
 		@user.login done
+		@newEmail = "newly-added-email#{Math.random()}@example.com"
 
 	describe 'confirming an email', ->
 		it 'should confirm the email', (done) ->
@@ -21,7 +22,7 @@ describe "UserEmails", ->
 						method: 'POST',
 						url: '/user/emails',
 						json:
-							email: 'newly-added-email@example.com'
+							email: @newEmail
 					}, (error, response, body) =>
 						return done(error) if error?
 						expect(response.statusCode).to.equal 204
@@ -40,7 +41,7 @@ describe "UserEmails", ->
 					}, (error, tokens) =>
 						# There should only be one confirmation token at the moment
 						expect(tokens.length).to.equal 1
-						expect(tokens[0].data.email).to.equal 'newly-added-email@example.com'
+						expect(tokens[0].data.email).to.equal @newEmail
 						expect(tokens[0].data.user_id).to.equal @user._id
 						token = tokens[0].token
 						cb()
@@ -75,7 +76,7 @@ describe "UserEmails", ->
 			token1 = null
 			token2 = null
 			@user2 = new User()
-			@email = 'duplicate-email@example.com'
+			@email = "duplicate-email#{Math.random()}@example.com"
 			async.series [
 				(cb) => @user2.login cb
 				(cb) =>
@@ -162,7 +163,7 @@ describe "UserEmails", ->
 						method: 'POST',
 						url: '/user/emails',
 						json:
-							email: @email = 'expired-token-email@example.com'
+							email: @email = "expired-token-email#{Math.random()}@example.com"
 					}, (error, response, body) =>
 						return done(error) if error?
 						expect(response.statusCode).to.equal 204
@@ -207,7 +208,7 @@ describe "UserEmails", ->
 						method: 'POST',
 						url: '/user/emails',
 						json:
-							email: 'reconfirmation-email@example.com'
+							email: @email = "reconfirmation-email#{Math.random()}@example.com"
 					}, (error, response, body) =>
 						return done(error) if error?
 						expect(response.statusCode).to.equal 204
@@ -220,7 +221,7 @@ describe "UserEmails", ->
 					}, (error, tokens) =>
 						# There should only be one confirmation token at the moment
 						expect(tokens.length).to.equal 1
-						expect(tokens[0].data.email).to.equal 'reconfirmation-email@example.com'
+						expect(tokens[0].data.email).to.equal @email
 						expect(tokens[0].data.user_id).to.equal @user._id
 						cb()
 				(cb) =>
@@ -228,7 +229,7 @@ describe "UserEmails", ->
 						method: 'POST',
 						url: '/user/emails/resend_confirmation',
 						json:
-							email: 'reconfirmation-email@example.com'
+							email: @email
 					}, (error, response, body) =>
 						return done(error) if error?
 						expect(response.statusCode).to.equal 200
@@ -241,9 +242,9 @@ describe "UserEmails", ->
 					}, (error, tokens) =>
 						# There should be two tokens now
 						expect(tokens.length).to.equal 2
-						expect(tokens[0].data.email).to.equal 'reconfirmation-email@example.com'
+						expect(tokens[0].data.email).to.equal @email
 						expect(tokens[0].data.user_id).to.equal @user._id
-						expect(tokens[1].data.email).to.equal 'reconfirmation-email@example.com'
+						expect(tokens[1].data.email).to.equal @email
 						expect(tokens[1].data.user_id).to.equal @user._id
 						cb()
 			], done
@@ -288,7 +289,7 @@ describe "UserEmails", ->
 						method: 'POST',
 						url: '/user/emails/resend_confirmation',
 						json:
-							email: 'non-matching-email@example.com'
+							email: "non-matching-email#{Math.random()}@example.com"
 					}, (error, response, body) =>
 						return done(error) if error?
 						expect(response.statusCode).to.equal 422
@@ -312,7 +313,7 @@ describe "UserEmails", ->
 						method: 'POST',
 						url: '/user/emails',
 						json:
-							email: 'new-confirmed-default@example.com'
+							email: @email = "new-confirmed-default#{Math.random()}@example.com"
 					}, (error, response, body) =>
 						return done(error) if error?
 						expect(response.statusCode).to.equal 204
@@ -320,7 +321,7 @@ describe "UserEmails", ->
 				(cb) =>
 					# Mark the email as confirmed
 					db.users.update {
-						'emails.email': 'new-confirmed-default@example.com'
+						'emails.email': @email
 					}, { 
 						$set: {
 							'emails.$.confirmedAt': new Date()
@@ -331,7 +332,7 @@ describe "UserEmails", ->
 						method: 'POST',
 						url: '/user/emails/default',
 						json:
-							email: 'new-confirmed-default@example.com'
+							email: @email
 					}, (error, response, body) =>
 						return done(error) if error?
 						expect(response.statusCode).to.equal 200
@@ -362,7 +363,7 @@ describe "UserEmails", ->
 						method: 'POST',
 						url: '/user/emails',
 						json:
-							email: 'new-unconfirmed-default@example.com'
+							email: @email = "new-unconfirmed-default#{Math.random()}@example.com"
 					}, (error, response, body) =>
 						return done(error) if error?
 						expect(response.statusCode).to.equal 204
@@ -372,7 +373,7 @@ describe "UserEmails", ->
 						method: 'POST',
 						url: '/user/emails/default',
 						json:
-							email: 'new-unconfirmed-default@example.com'
+							email: @email
 					}, (error, response, body) =>
 						return done(error) if error?
 						expect(response.statusCode).to.equal 409
@@ -400,7 +401,7 @@ describe "UserEmails", ->
 						method: 'POST',
 						url: '/user/emails',
 						json:
-							email: 'new-confirmed-default-in-v1@example.com'
+							email: @email = "new-confirmed-default-in-v1#{Math.random()}@example.com"
 					}, (error, response, body) =>
 						return done(error) if error?
 						expect(response.statusCode).to.equal 204
@@ -408,7 +409,7 @@ describe "UserEmails", ->
 				(cb) =>
 					# Mark the email as confirmed
 					db.users.update {
-						'emails.email': 'new-confirmed-default-in-v1@example.com'
+						'emails.email': @email
 					}, { 
 						$set: {
 							'emails.$.confirmedAt': new Date()
@@ -419,7 +420,7 @@ describe "UserEmails", ->
 						method: 'POST',
 						url: '/user/emails/default',
 						json:
-							email: 'new-confirmed-default-in-v1@example.com'
+							email: @email
 					}, (error, response, body) =>
 						return done(error) if error?
 						expect(response.statusCode).to.equal 200
@@ -427,12 +428,12 @@ describe "UserEmails", ->
 			], (error) =>
 				return done(error) if error?
 				expect(
-					MockV1Api.updateEmail.calledWith(42, 'new-confirmed-default-in-v1@example.com')
+					MockV1Api.updateEmail.calledWith(42, @email)
 				).to.equal true
 				done()
 
 		it 'should return an error if the email exists in v1', (done) ->
-			MockV1Api.existingEmails.push 'exists-in-v1@example.com'
+			MockV1Api.existingEmails.push @email = "exists-in-v1#{Math.random()}@example.com"
 			async.series [
 				(cb) =>
 					db.users.update {
@@ -447,7 +448,7 @@ describe "UserEmails", ->
 						method: 'POST',
 						url: '/user/emails',
 						json:
-							email: 'exists-in-v1@example.com'
+							email: @email
 					}, (error, response, body) =>
 						return done(error) if error?
 						expect(response.statusCode).to.equal 204
@@ -455,7 +456,7 @@ describe "UserEmails", ->
 				(cb) =>
 					# Mark the email as confirmed
 					db.users.update {
-						'emails.email': 'exists-in-v1@example.com'
+						'emails.email': @email
 					}, { 
 						$set: {
 							'emails.$.confirmedAt': new Date()
@@ -466,7 +467,7 @@ describe "UserEmails", ->
 						method: 'POST',
 						url: '/user/emails/default',
 						json:
-							email: 'exists-in-v1@example.com'
+							email: @email
 					}, (error, response, body) =>
 						return done(error) if error?
 						expect(response.statusCode).to.equal 409
