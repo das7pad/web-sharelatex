@@ -267,28 +267,28 @@ describe 'Subscriptions', ->
 					subscription_status: {}
 				}
 				MockV1Api.setAffiliations [{
-					email: 'confirmed-affiliation-email@stanford.example.edu'
+					email: @emailConfirmed = "confirmed-affiliation-email#{Math.random()}@stanford.example.edu"
 					institution: { name: 'Stanford', licence: 'pro_plus', confirmed: true }
 				}, {
-					email: 'unconfirmed-affiliation-email@harvard.example.edu'
+					email: @emailUnconfirmed = "unconfirmed-affiliation-email#{Math.random()}@harvard.example.edu"
 					institution: { name: 'Harvard', licence: 'pro_plus', confirmed: true }
 				}, {
-					email: 'confirmed-affiliation-email@mit.example.edu'
+					email: @emailConfirmedMIT = "confirmed-affiliation-email#{Math.random()}@mit.example.edu"
 					institution: { name: 'MIT', licence: 'pro_plus', confirmed: false }
 				}]
 				async.series [
 					(cb) =>
 						@user.setV1Id v1Id, cb
 					(cb) =>
-						@user.addEmail 'unconfirmed-affiliation-email@harvard.example.edu', cb
+						@user.addEmail @emailUnconfirmed, cb
 					(cb) =>
-						@user.addEmail 'confirmed-affiliation-email@stanford.example.edu', cb
+						@user.addEmail @emailConfirmed, cb
 					(cb) =>
-						@user.confirmEmail 'confirmed-affiliation-email@stanford.example.edu', cb
+						@user.confirmEmail @emailConfirmed, cb
 					(cb) =>
-						@user.addEmail 'confirmed-affiliation-email@mit.example.edu', cb
+						@user.addEmail @emailConfirmedMIT, cb
 					(cb) =>
-						@user.confirmEmail 'confirmed-affiliation-email@mit.example.edu', cb
+						@user.confirmEmail @emailConfirmedMIT, cb
 				], (error) =>
 					return done(error) if error?
 					SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel @user, (error, @data) =>
