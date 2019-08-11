@@ -28,9 +28,9 @@ html(itemscope, itemtype='http://schema.org/Product')
 					video.rfp-video.rfp-video-masthead(
 						autoplay
 						loop
-						poster="/img/feature-page/intro-poster.jpg"
+						poster=buildImgPath("feature-page/intro-poster.jpg")
 					)
-						source(src="/img/feature-page/intro.mp4", type="video/mp4")
+						source(src=buildImgPath("feature-page/intro.mp4"), type="video/mp4")
 					p.rfp-lead We remember the old days where you had to choose between using Track Changes in Word, or typesetting with LaTeX.
 					p.rfp-lead.rfp-lead-strong Now you can do both.
 			section.rfp-section.rfp-section-blockquote
@@ -38,7 +38,7 @@ html(itemscope, itemtype='http://schema.org/Product')
 					blockquote.rfp-quote-main 
 						p.rfp-quoted-text I can't tell you what a game-changer this new feature is for me and my collaborators. This feature puts ShareLaTeX (now #{settings.appName}) miles above the competition, as no one else has anything close to it.
 						figure.rfp-quoted-person
-							img.rfp-quoted-person-photo(src="/img/feature-page/pamela-marcum.jpg")
+							img.rfp-quoted-person-photo(src=buildImgPath("feature-page/pamela-marcum.jpg"))
 							figcaption
 								p.rfp-quoted-person-name Dr. Pamela Marcum
 								p.rfp-quoted-person-affil Research Scientist
@@ -53,9 +53,9 @@ html(itemscope, itemtype='http://schema.org/Product')
 					.rfp-feature-video-container
 						video.rfp-video.rfp-video-anim#video-1(
 							loop
-							poster="/img/feature-page/feat-discuss-poster.jpg"
+							poster=buildImgPath("feature-page/feat-discuss-poster.jpg")
 						)
-							source(src="/img/feature-page/feat-discuss.mp4", type="video/mp4")
+							source(src=buildImgPath("feature-page/feat-discuss.mp4"), type="video/mp4")
 			section.rfp-section.rfp-section-feature.rfp-section-feature-alt
 				.rfp-section-wrapper
 					.rfp-feature-description-container
@@ -67,9 +67,9 @@ html(itemscope, itemtype='http://schema.org/Product')
 					.rfp-feature-video-container
 						video.rfp-video.rfp-video-anim.rfp-video-anim-alt#video-2(
 							loop
-							poster="/img/feature-page/feat-changes-poster.jpg"
+							poster=buildImgPath("feature-page/feat-changes-poster.jpg")
 						)
-							source(src="/img/feature-page/feat-changes.mp4", type="video/mp4")
+							source(src=buildImgPath("feature-page/feat-changes.mp4"), type="video/mp4")
 			section.rfp-section.rfp-section-feature
 				.rfp-section-wrapper
 					.rfp-feature-description-container
@@ -82,9 +82,9 @@ html(itemscope, itemtype='http://schema.org/Product')
 					.rfp-feature-video-container
 						video.rfp-video.rfp-video-anim#video-3(
 							loop
-							poster="/img/feature-page/feat-todos-poster.jpg"
+							poster=buildImgPath("feature-page/feat-todos-poster.jpg")
 						)
-							source(src="/img/feature-page/feat-todos.mp4", type="video/mp4")
+							source(src=buildImgPath("feature-page/feat-todos.mp4"), type="video/mp4")
 			section.rfp-section.rfp-section-feature.rfp-section-feature-alt
 				.rfp-section-wrapper
 					.rfp-feature-description-container
@@ -98,9 +98,9 @@ html(itemscope, itemtype='http://schema.org/Product')
 					.rfp-feature-video-container
 						video.rfp-video.rfp-video-anim.rfp-video-anim-alt#video-4(
 							loop
-							poster="/img/feature-page/feat-accept-poster.jpg"
+							poster=buildImgPath("feature-page/feat-accept-poster.jpg")
 						)
-							source(src="/img/feature-page/feat-accept.mp4", type="video/mp4")
+							source(src=buildImgPath("feature-page/feat-accept.mp4"), type="video/mp4")
 			section.rfp-section.rfp-section-feature-white
 				.rfp-section-wrapper
 					h3.rfp-h3 #{settings.appName} is used by over 2 million authors at institutions worldwide, including:
