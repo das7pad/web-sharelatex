@@ -176,7 +176,7 @@ block requirejs
 		window.pdfCMapsPath = "#{pdfCMapsPath}"
 		window.uiConfig = JSON.parse('!{JSON.stringify(uiConfig).replace(/\//g, "\\/")}');
 
-	- if (settings.overleaf != null)
+	- if (settings.hasThemes)
 		script(type='text/javascript').
 			window.overallThemes = JSON.parse('!{JSON.stringify(overallThemes).replace(/\//g, "\\/")}');
 

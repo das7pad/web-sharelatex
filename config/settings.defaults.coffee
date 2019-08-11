@@ -445,6 +445,7 @@ module.exports = settings =
 			invite: true
 			register: true
 
+	hasThemes: false
 	customisation: {}
 
 #	templates: [{

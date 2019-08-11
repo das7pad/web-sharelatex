@@ -122,7 +122,7 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 
 		res.locals.getCssThemeModifier = (userSettings, brandVariation) ->
 			# Themes only exist in OL v2
-			if Settings.overleaf?
+			if Settings.hasThemes?
 				# The IEEE theme takes precedence over the user personal setting, i.e. a user with
 				# a theme setting of "light" will still get the IEE theme in IEEE branded projects.
 				if res.locals.isIEEE(brandVariation)
@@ -317,7 +317,7 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 
 	webRouter.use (req, res, next) ->
 		#TODO
-		if Settings.overleaf?
+		if Settings.hasThemes?
 			res.locals.overallThemes = [
 				{ name: "Default", val: "",       path: res.locals.buildCssPath(null,     { hashedPath: true }) }
 				{ name: "Light",   val: "light-", path: res.locals.buildCssPath("light-", { hashedPath: true }) }
