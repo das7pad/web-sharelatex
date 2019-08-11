@@ -187,7 +187,10 @@ module.exports = settings =
 		showSocialButtons: false
 		showComments: false
 
-	# cdn:
+	cdn:
+		ServeMathJax: false
+		ServeACE: false
+		ServePDFjs: false
 	# 	web:
 	# 		host:"http://nowhere.sharelatex.dev"
 	#		darkHost:"http://cdn.sharelatex.dev:3000"
