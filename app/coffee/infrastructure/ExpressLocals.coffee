@@ -76,8 +76,14 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 		else
 			staticFilesBase = ""
 
+		res.locals.staticPath = (path) ->
+			if staticFilesBase and path.indexOf('/') == 0
+				# preserve the path component of the base url
+				path = path.substring(1)
+			return Url.resolve(staticFilesBase, path)
+
 		res.locals.jsPath = jsPath
-		res.locals.fullJsPath = Url.resolve(staticFilesBase, jsPath)
+		res.locals.fullJsPath = res.locals.staticPath(jsPath)
 		res.locals.lib = PackageVersions.lib
 
 		res.locals.moment = moment
@@ -92,7 +98,7 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 				opts.qs = {}
 
 			if opts.cdn != false
-				path = Url.resolve(staticFilesBase, path)
+				path = res.locals.staticPath(path)
 
 			qs = querystring.stringify(opts.qs)
 
@@ -136,12 +142,12 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 			path = Path.join("/stylesheets/", cssFileName)
 			if buildOpts?.hashedPath && hashedFiles[path]?
 				hashedPath = hashedFiles[path]
-				return Url.resolve(staticFilesBase, hashedPath)
-			return Url.resolve(staticFilesBase, path)
+				return res.locals.staticPath(hashedPath)
+			return res.locals.staticPath(path)
 
 		res.locals.buildImgPath = (imgFile)->
 			path = Path.join("/img/", imgFile)
-			return Url.resolve(staticFilesBase, path)
+			return res.locals.staticPath(path)
 
 		res.locals.mathJaxPath = res.locals.buildJsPath(
 			'libs/mathjax/MathJax.js',
