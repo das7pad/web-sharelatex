@@ -55,7 +55,7 @@ CSS_FILES := $(CSS_SL_FILE) $(CSS_OL_FILE) $(CSS_OL_LIGHT_FILE) $(CSS_OL_IEEE_FI
 
 # The automatic variable $(@D) is the target directory name
 app.js: app.coffee
-	$(COFFEE) --compile -o $(@D) $< 
+	$(COFFEE) --compile -o $(@D) $<
 
 app/js/%.js: app/coffee/%.coffee
 	@mkdir -p $(@D)
@@ -116,7 +116,7 @@ minify: $(CSS_FILES) $(JS_FILES) $(OUTPUT_SRC_FILES)
 hash_static_files: app/js/infrastructure/HashedFiles.js
 	MINIFIED_JS='true' node $<
 
-minify_css: $(CSS_FILES) 
+minify_css: $(CSS_FILES)
 	$(CLEANCSS) $(CLEANCSS_FLAGS) -o $(CSS_SL_FILE) $(CSS_SL_FILE)
 	$(CLEANCSS) $(CLEANCSS_FLAGS) -o $(CSS_OL_FILE) $(CSS_OL_FILE)
 	$(CLEANCSS) $(CLEANCSS_FLAGS) -o $(CSS_OL_LIGHT_FILE) $(CSS_OL_LIGHT_FILE)
@@ -247,9 +247,8 @@ format_fix:
 
 lint:
 	npm -q run lint
-	
+
 build:
-	docker pull node:10.16.0
 	docker build --tag ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-build \
 		--cache-from ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-build-cache \
 		--target app \
@@ -264,7 +263,6 @@ build:
 
 clean_build:
 	docker rmi -f \
-		node:10.16.0 \
 		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER) \
 		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-cache \
 		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-build \
