@@ -2,7 +2,7 @@
 # Instead run bin/update_build_scripts from
 # https://github.com/das7pad/sharelatex-dev-env
 
-FROM node:10.16.0
+FROM node:10.16.3
 
 # Install Google Chrome
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
