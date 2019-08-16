@@ -41,7 +41,6 @@ pipeline {
       }
     }
 
-
     stage('Build') {
       steps {
         sh 'DOCKER_COMPOSE_FLAGS="-f docker-compose.ci.yml" make build'

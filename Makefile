@@ -4,7 +4,6 @@
 
 DOCKER_COMPOSE_FLAGS ?= -f docker-compose.yml
 
-
 BUILD_NUMBER ?= local
 BRANCH_NAME ?= $(shell git rev-parse --abbrev-ref HEAD)
 COMMIT ?= $(shell git rev-parse HEAD)
@@ -80,7 +79,6 @@ test/unit_frontend/js/%.js: test/unit_frontend/src/%.js
 test/smoke/js/%.js: test/smoke/coffee/%.coffee
 	@mkdir -p $(@D)
 	$(COFFEE) --compile -o $(@D) $<
-
 
 public/js/ide.js: public/src/ide.js $(MODULE_IDE_SRC_FILES)
 public/js/main.js: public/src/main.js $(MODULE_MAIN_SRC_FILES)
