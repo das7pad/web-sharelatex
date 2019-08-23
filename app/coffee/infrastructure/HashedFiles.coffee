@@ -62,7 +62,7 @@ fillHashedFiles = () ->
 
 			if err?.code is "ENOENT"
 				logger.log path:path, "Creating symlink"
-				return fs.copyFile fsPath, fsHashPath, (err) ->
+				return fs.symlink "#{filename}#{extension}", fsHashPath, (err) ->
 					if err?
 						logger.log path:path, "Creating symlink failed", err
 					done()
