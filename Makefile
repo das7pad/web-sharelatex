@@ -187,6 +187,9 @@ clean_test_acceptance: clean_test_frontend
 
 clean_ci: clean_build
 clean_ci: clean_test_acceptance
+clean_ci: clean_Makefiles
+
+clean_Makefiles:
 	rm -f $(MODULE_MAKEFILES)
 
 test: test_unit test_frontend test_acceptance
@@ -226,8 +229,7 @@ test_acceptance_modules_run: $(TEST_ACCEPTANCE_MODULES)
 CLEAN_TEST_ACCEPTANCE_MODULES = $(addsuffix /clean_test_acceptance,$(MODULE_DIRS))
 clean_test_acceptance_modules: $(CLEAN_TEST_ACCEPTANCE_MODULES)
 
-build_app: compile_full
-build_app: install_translations
+build_app: compile_full clean_Makefiles
 	WEBPACK_ENV=production $(MAKE) minify
 
 install_translations:
@@ -247,14 +249,8 @@ lint:
 	npm -q run lint
 
 build:
-	docker build --tag ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-build \
-		--cache-from ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-build-cache \
-		--target app \
-		.
 	docker build --tag ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER) \
-		--tag gcr.io/overleaf-ops/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER) \
 		--cache-from ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-cache \
-		--cache-from ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-build \
 		--build-arg RELEASE=$(RELEASE) \
 		--build-arg COMMIT=$(COMMIT) \
 		.
@@ -263,9 +259,6 @@ clean_build:
 	docker rmi -f \
 		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER) \
 		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-cache \
-		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-build \
-		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-build-cache \
-		gcr.io/overleaf-ops/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER) \
 
 build_test_frontend:
 	COMPOSE_PROJECT_NAME=frontend_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) build test_frontend

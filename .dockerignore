@@ -24,6 +24,7 @@
 
 ###########
 # scripts #
+!/docker_cleanup.sh
 !/setup_env.sh
 
 !/bin/unit_test
