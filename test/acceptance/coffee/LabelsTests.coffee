@@ -33,6 +33,7 @@ describe 'Labels', ->
 			expect(response.statusCode).to.equal 200
 			expect(body).to.deep.equal [{ id: label_id, comment, version }]
 			done()
+		return null
 
 	it 'creating a label', (done) ->
 		comment = 'a label comment'
@@ -50,6 +51,7 @@ describe 'Labels', ->
 				MockProjectHistoryApi.getLabels(@project_id)
 			).to.deep.equal [{id: label_id, comment, version} ]
 			done()
+		return null
 
 	it 'deleting a label', (done) ->
 		label_id = new ObjectId().toString()
@@ -66,3 +68,4 @@ describe 'Labels', ->
 			expect(response.statusCode).to.equal 204
 			expect(MockProjectHistoryApi.getLabels(@project_id)).to.deep.equal []
 			done()
+		return null
