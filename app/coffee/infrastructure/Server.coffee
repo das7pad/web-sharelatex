@@ -18,6 +18,7 @@ bodyParser = require('body-parser')
 methodOverride = require('method-override')
 cookieParser = require('cookie-parser')
 bearerToken = require('express-bearer-token')
+serveStatic = require('serve-static')
 
 # Init the session store
 sessionStore = new RedisStore(client:sessionsRedisClient)
@@ -55,7 +56,7 @@ publicApiRouter = express.Router()
 if Settings.behindProxy
 	app.enable('trust proxy')
 
-webRouter.use express.static(__dirname + '/../../../public', {maxAge: staticCacheAge })
+webRouter.use serveStatic(__dirname + '/../../../public', {maxAge: staticCacheAge })
 app.set 'views', __dirname + '/../../views'
 app.set 'view engine', 'pug'
 Modules.loadViewIncludes app
