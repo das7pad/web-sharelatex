@@ -17,7 +17,7 @@ module.exports = UserUpdater =
 	updateUser: (query, update, callback = (error) ->) ->
 		if typeof query == "string"
 			query = _id: ObjectId(query)
-		else if query instanceof ObjectId
+		else if query instanceof ObjectId or query._bsontype == 'ObjectID'
 			query = _id: query
 		else if typeof query._id == "string"
 			query._id = ObjectId(query._id)
