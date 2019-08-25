@@ -1,3 +1,5 @@
+require('./helpers/MockProjectHistoryApi')
+
 APP_PATH = "../../../app/js"
 
 LockManager = require "#{APP_PATH}/infrastructure/LockManager"
@@ -65,7 +67,7 @@ describe "ProjectStructureMongoLock", ->
 			it "can get the project if rootFolder is not in the projection", (done) ->
 				ProjectGetter.getProject @locked_project._id, _id: true, (err, project) =>
 					expect(err).to.equal(null)
-					expect(project._id).to.deep.equal(@locked_project._id)
+					expect(project._id.toString()).to.equal(@locked_project._id.toString())
 					done()
 
 		describe 'interacting with other projects', ->
@@ -84,5 +86,5 @@ describe "ProjectStructureMongoLock", ->
 			it "can get other projects without a projection", (done) ->
 				ProjectGetter.getProject @unlocked_project._id, (err, project) =>
 					expect(err).to.equal(null)
-					expect(project._id).to.deep.equal(@unlocked_project._id)
+					expect(project._id.toString()).to.equal(@unlocked_project._id.toString())
 					done()
