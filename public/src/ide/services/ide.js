@@ -47,17 +47,12 @@ define(['base'], function(App) {
         if (meta == null) {
           meta = {}
         }
-        meta.client_id = __guard__(
-          this.socket != null ? this.socket.socket : undefined,
-          x => x.sessionid
-        )
-        meta.transport = __guard__(
-          __guard__(
-            this.socket != null ? this.socket.socket : undefined,
-            x2 => x2.transport
-          ),
-          x1 => x1.name
-        )
+        if (this.socket != null) {
+          const engine = this.socket.io.engine
+          meta.client_id = engine.id
+          meta.transport =
+            engine.transport != null ? engine.transport.name : undefined
+        }
         meta.client_now = new Date()
         meta.recent_events = this.recentEvents
         const errorObj = {}
@@ -124,9 +119,3 @@ define(['base'], function(App) {
     }
   ])
 })
-
-function __guard__(value, transform) {
-  return typeof value !== 'undefined' && value !== null
-    ? transform(value)
-    : undefined
-}
