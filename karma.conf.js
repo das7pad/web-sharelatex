@@ -1,4 +1,11 @@
 const path = require('path')
+let junit_dest;
+let reporters = ['mocha'];
+if (process.env.HOME === '/home/node') {
+  // assume CI
+  junit_dest = '/home/node/frontend.xml';
+  reporters.push('junit');
+}
 
 module.exports = function (config) {
   config.set({
@@ -80,9 +87,13 @@ module.exports = function (config) {
       require('karma-chai-sinon'),
       require('karma-webpack'),
       require('karma-mocha-reporter'),
+      require('karma-junit-reporter'),
       { 'middleware:fake-img': ['factory', fakeImgMiddlewareFactory] }
     ],
-    reporters: ['mocha']
+    reporters: reporters,
+    junitReporter: {
+      outputFile: junit_dest,
+    },
   });
 }
 
