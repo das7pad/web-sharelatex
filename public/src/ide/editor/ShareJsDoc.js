@@ -67,7 +67,7 @@ define(['utils/EventEmitter', 'libs/sharejs'], function(EventEmitter, ShareJs) {
               Math.random() < window.disconnectOnUpdate
             ) {
               sl_console.log('Disconnecting on update', update)
-              window._ide.socket.socket.disconnect()
+              window._ide.socket.disconnect()
             }
             if (
               window.dropUpdates != null &&
@@ -94,7 +94,7 @@ define(['utils/EventEmitter', 'libs/sharejs'], function(EventEmitter, ShareJs) {
             )
           },
           state: 'ok',
-          id: this.socket.socket.sessionid
+          id: this.socket.io.engine.id
         }
 
         this._doc = new ShareJs.Doc(this.connection, this.doc_id, {
@@ -276,7 +276,7 @@ define(['utils/EventEmitter', 'libs/sharejs'], function(EventEmitter, ShareJs) {
       updateConnectionState(state) {
         sl_console.log(`[updateConnectionState] Setting state to ${state}`)
         this.connection.state = state
-        this.connection.id = this.socket.socket.sessionid
+        this.connection.id = this.socket.io.engine.id
         this._doc.autoOpen = false
         this._doc._connectionStateChanged(state)
         return (this.lastAcked = null) // reset the last ack time when connection changes

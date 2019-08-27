@@ -42,6 +42,7 @@ module.exports = FeaturesUpdater =
 
 			logger.log {user_id, features}, 'updating user features'
 			UserFeaturesUpdater.updateFeatures user_id, features, callback
+		return null
 
 	_getIndividualFeatures: (user_id, callback = (error, features = {}) ->) ->
 		SubscriptionLocator.getUsersSubscription user_id, (err, sub)->

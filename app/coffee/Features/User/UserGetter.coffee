@@ -19,7 +19,7 @@ module.exports = UserGetter =
 				query = _id: ObjectId(query)
 			catch e
 				return callback(null, null)
-		else if query instanceof ObjectId
+		else if query instanceof ObjectId or query?._bsontype == 'ObjectID'
 			query = _id: query
 
 		db.users.findOne query, projection, callback

@@ -367,7 +367,7 @@ Something went wrong connecting to your project. Please refresh if this continue
         this.$scope.connection.reconnecting = true
         // use socket.io connect() here to make a single attempt, the
         // reconnect() method makes multiple attempts
-        this.ide.socket.socket.connect()
+        this.ide.socket.connect()
         // record the time of the last attempt to connect
         this.lastConnectionAttempt = new Date()
         return setTimeout(() => {

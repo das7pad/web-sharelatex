@@ -31,9 +31,11 @@ class User
 
 	get: (callback = (error, user)->) ->
 		db.users.findOne { _id: ObjectId(@_id) }, callback
+		return null
 
 	mongoUpdate: (updateOp, callback=(error)->) ->
 		db.users.update {_id: ObjectId(@_id)}, updateOp, callback
+		return null
 
 	register: (callback = (error, user) ->) ->
 		@registerWithQuery('', callback)
@@ -77,15 +79,18 @@ class User
 					return callback(error) if error?
 					@setExtraAttributes user
 					callback(null, @password)
+		return null
 
 	setFeatures: (features, callback = (error) ->) ->
 		update = {}
 		for key, value of features
 			update["features.#{key}"] = value
 		UserModel.update { _id: @id }, update, callback
+		return null
 
 	setOverleafId: (overleaf_id, callback = (error) ->) ->
 		UserModel.update { _id: @id }, { 'overleaf.id': overleaf_id }, callback
+		return null
 
 	logout: (callback = (error) ->) ->
 		@getCsrfToken (error) =>
@@ -109,14 +114,17 @@ class User
 	addEmail: (email, callback = (error) ->) ->
 		@emails.push(email: email, createdAt: new Date())
 		UserUpdater.addEmailAddress @id, email, callback
+		return null
 
 	confirmEmail: (email, callback = (error) ->) ->
 		for emailData, idx in @emails
 			@emails[idx].confirmedAt = new Date() if emailData.email == email
 		UserUpdater.confirmEmail @id, email, callback
+		return null
 
 	ensure_admin: (callback = (error) ->) ->
 		db.users.update {_id: ObjectId(@id)}, { $set: { isAdmin: true }}, callback
+		return null
 
 	upgradeFeatures: (callback = (error) -> ) ->
 		features = {
@@ -131,6 +139,7 @@ class User
 			trackChangesVisible: true
 		}
 		db.users.update {_id: ObjectId(@id)}, { $set: { features: features }}, callback
+		return null
 
 	downgradeFeatures: (callback = (error) -> ) ->
 		features = {
@@ -145,10 +154,12 @@ class User
 			trackChangesVisible: false
 		}
 		db.users.update {_id: ObjectId(@id)}, { $set: { features: features }}, callback
+		return null
 
 	defaultFeatures: (callback = (error) -> ) ->
 		features = settings.defaultFeatures
 		db.users.update {_id: ObjectId(@id)}, { $set: { features: features }}, callback
+		return null
 
 	full_delete_user: (email, callback = (error) ->) ->
 		db.users.findOne {email: email}, (error, user) =>
@@ -159,12 +170,15 @@ class User
 				if err?
 					callback(err)
 				db.users.remove {_id: ObjectId(user_id)}, callback
+		return null
 
 	getProject: (project_id, callback = (error, project)->) ->
 		db.projects.findOne {_id: ObjectId(project_id.toString())}, callback
+		return null
 
 	saveProject: (project, callback=(error)->) ->
 		db.projects.update {_id: project._id}, project, callback
+		return null
 
 	createProject: (name, options, callback = (error, oroject_id) ->) ->
 		if typeof options == "function"
@@ -181,6 +195,7 @@ class User
 				callback error
 			else
 				callback(null, body.project_id)
+		return null
 
 	deleteProject: (project_id, callback=(error)) ->
 		@request.delete {
@@ -192,6 +207,7 @@ class User
 	deleteProjects: (callback=(error)) ->
 		db.projects.remove owner_ref:ObjectId(@id), {multi:true}, (err)->
 			callback(err)
+		return null
 
 	openProject: (project_id, callback=(error)) ->
 		@request.get {
@@ -202,6 +218,7 @@ class User
 				err = new Error("Non-success response when opening project: #{response.statusCode}")
 				return callback(err)
 			callback(null)
+		return null
 
 	createDocInProject: (project_id, parent_folder_id, name, callback=(error, doc_id)->) ->
 		@getCsrfToken (error) =>
@@ -231,6 +248,7 @@ class User
 		}, (error, response, body) ->
 			return callback(error) if error?
 			callback(null)
+		return null
 
 	makePrivate: (project_id, callback = (error) ->) ->
 		@request.post {
@@ -240,6 +258,7 @@ class User
 		}, (error, response, body) ->
 			return callback(error) if error?
 			callback(null)
+		return null
 
 	makeTokenBased: (project_id, callback = (error) ->) ->
 		@request.post {
@@ -249,11 +268,13 @@ class User
 		}, (error, response, body) ->
 			return callback(error) if error?
 			callback(null)
+		return null
 
 	fetchCsrfToken: (params='/', callback=(error)->) =>
 		return callback(null) if @csrfToken
 		@request.get params, (err, response, body) =>
 			@parseCsrfToken body, callback
+		return null
 
 	parseCsrfToken: (body, callback=(error)->) =>
 		match = /window.csrfToken\ = "(.+)"/.exec(body)
@@ -278,6 +299,7 @@ class User
 				return callback(new Error(response.statusCode))
 			@setCsrfToken(body)
 			callback()
+		return null
 
 	changePassword: (callback = (error) ->) ->
 		@getCsrfToken (error) =>
@@ -348,6 +370,7 @@ class User
 				return callback(null, false)
 			else
 				return callback(new Error("unexpected status code from /user/personal_info: #{response.statusCode}"))
+		return null
 
 	setV1Id: (v1Id, callback) ->
 		UserModel.update {
@@ -356,5 +379,6 @@ class User
 			overleaf:
 				id: v1Id
 		}, callback
+		return null
 
 module.exports = User
