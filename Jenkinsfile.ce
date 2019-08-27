@@ -153,9 +153,6 @@ pipeline {
             }
           }
           post {
-            always {
-              xunit (tools: [JUnit(pattern: 'output/acceptance.xml')])
-            }
             cleanup {
               sh 'make clean_test_acceptance'
             }
