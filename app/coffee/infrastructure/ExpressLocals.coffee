@@ -168,6 +168,9 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 		# Don't include the query string parameters, otherwise Google
 		# treats ?nocdn=true as the canonical version
 		res.locals.currentUrl = Url.parse(req.originalUrl).pathname
+		res.locals.getTranslationUrl = (spec) ->
+			# see settings.i18n.subdomainLang
+			return spec.url + res.locals.currentUrl + '?setGlobalLng=' + spec.lngCode
 		res.locals.capitalize = (string) ->
 			return "" if string.length == 0
 			return string.charAt(0).toUpperCase() + string.slice(1)

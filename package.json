@@ -110,7 +110,7 @@
     "settings-sharelatex": "^1.1.0",
     "sixpack-client": "^1.0.0",
     "temp": "^0.8.3",
-    "translations-sharelatex": "git+https://github.com/sharelatex/translations-sharelatex.git#master",
+    "translations-sharelatex": "git+https://github.com/das7pad/translations-sharelatex.git#e376c8a7670a58dc7d17508180ed648764503d82",
     "underscore": "1.6.0",
     "url": "^0.10.3",
     "uuid": "^3.0.1",

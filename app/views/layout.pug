@@ -26,7 +26,7 @@ html(
 		if settings.i18n.subdomainLang
 			each subdomainDetails in settings.i18n.subdomainLang
 				if !subdomainDetails.hide
-					link(rel="alternate", href=subdomainDetails.url+currentUrl, hreflang=subdomainDetails.lngCode)
+					link(rel="alternate", href=getTranslationUrl(subdomainDetails), hreflang=subdomainDetails.lngCode)
 
 		//- Scripts
 
