@@ -91,7 +91,7 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 		res.locals.buildJsPath = (jsFile, opts = {})->
 			path = Path.join(jsPath, jsFile)
 
-			if opts.hashedPath && hashedFiles[path]?
+			if opts.hashedPath && !Settings.cdn.hasUniqueURI && hashedFiles[path]?
 				path = hashedFiles[path]
 
 			if !opts.qs?
@@ -140,7 +140,7 @@ module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
 		res.locals.buildCssPath = (themeModifier, buildOpts) ->
 			cssFileName = _buildCssFileName themeModifier
 			path = Path.join("/stylesheets/", cssFileName)
-			if buildOpts?.hashedPath && hashedFiles[path]?
+			if buildOpts?.hashedPath && !Settings.cdn.hasUniqueURI && hashedFiles[path]?
 				hashedPath = hashedFiles[path]
 				return res.locals.staticPath(hashedPath)
 			return res.locals.staticPath(path)

@@ -188,6 +188,7 @@ module.exports = settings =
 		showComments: false
 
 	cdn:
+		hasUniqueURI: false
 		ServeMathJax: false
 		ServeACE: false
 		ServePDFjs: false
