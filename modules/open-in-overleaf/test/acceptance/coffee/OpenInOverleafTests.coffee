@@ -15,7 +15,7 @@ MockDocstoreApi = require('../../../../../test/acceptance/js/helpers/MockDocstor
 MockV1Api = require('../../../../../test/acceptance/js/helpers/MockV1Api')
 
 describe "Open In Overleaf", ->
-	@timeout(10000)
+	@timeout(25000)
 
 	before (done) ->
 		LinkedUrlProxy = express()
