@@ -12,8 +12,7 @@ assertResponse = (path, expectedStatusCode, expectedBody, cb) ->
 		cb()
 
 describe "ProxyUrls", ->
-	before ->
-		@timeout(1000)
+	@timeout(1000)
 
 	it 'proxy static URLs', (done) ->
 		async.series [

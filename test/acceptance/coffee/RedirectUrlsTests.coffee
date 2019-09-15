@@ -12,8 +12,7 @@ assertRedirect = (method, path, expectedStatusCode, destination, cb) ->
 		cb()
 
 describe "RedirectUrls", ->
-	before ->
-		@timeout(1000)
+	@timeout(1000)
 
 	it 'proxy static URLs', (done) ->
 		assertRedirect 'get', '/redirect/one', 302, '/destination/one', done

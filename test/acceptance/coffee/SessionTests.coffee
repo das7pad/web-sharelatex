@@ -7,8 +7,9 @@ redis = require "./helpers/redis"
 MockV1Api = require './helpers/MockV1Api'
 
 describe "Sessions", ->
+	@timeout(20000)
+
 	before (done) ->
-		@timeout(20000)
 		@user1 = new User()
 		@site_admin = new User({email: "admin#{Math.random()}@example.com"})
 		async.series [
@@ -71,7 +72,6 @@ describe "Sessions", ->
 			@user2.password = @user1.password
 
 		it "should have two sessions in UserSessions set", (done) ->
-			@timeout(10000)
 			async.series(
 				[
 					(next) =>
@@ -172,7 +172,6 @@ describe "Sessions", ->
 			@user3.password = @user1.password
 
 		it "should erase both sessions when password is reset", (done) ->
-			@timeout(10000)
 			async.series(
 				[
 					(next) =>
@@ -271,7 +270,6 @@ describe "Sessions", ->
 			@user3.password = @user1.password
 
 		it "should allow the user to erase the other two sessions", (done) ->
-			@timeout(10000)
 			async.series(
 				[
 					(next) =>

@@ -160,9 +160,9 @@ describe "Register with bonus referal id", ->
 			done()
 
 describe "LoginViaRegistration", ->
+	@timeout(60000)
 
 	before (done) ->
-		@timeout(60000)
 		@user1 = new User()
 		@user2 = new User()
 		async.series [

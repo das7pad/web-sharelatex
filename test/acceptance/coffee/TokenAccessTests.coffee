@@ -84,8 +84,9 @@ try_anon_content_access = (user, project_id, token, test, callback) ->
 
 
 describe 'TokenAccess', ->
+	@timeout(90000)
+
 	before (done) ->
-		@timeout(90000)
 		@owner = new User()
 		@other1 = new User()
 		@other2 = new User()

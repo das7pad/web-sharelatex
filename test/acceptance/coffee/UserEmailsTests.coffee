@@ -7,8 +7,9 @@ settings = require "settings-sharelatex"
 MockV1Api = require "./helpers/MockV1Api"
 
 describe "UserEmails", ->
+	@timeout(20000)
+
 	beforeEach (done) ->
-		@timeout(20000)
 		@user = new User()
 		@user.login done
 		@newEmail = "newly-added-email#{Math.random()}@example.com"

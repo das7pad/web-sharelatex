@@ -17,9 +17,9 @@ joinProject = (user_id, project_id, callback) ->
 	}, callback
 
 describe "ProjectFeatures", ->
+	@timeout(90000)
 
 	before (done) ->
-		@timeout(90000)
 		@owner = new User()
 		async.series [
 			(cb) => @owner.login cb
