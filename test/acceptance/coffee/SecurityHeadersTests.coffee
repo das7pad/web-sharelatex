@@ -53,6 +53,7 @@ describe "SecurityHeaders", ->
 			done()
 
 	it 'should have cache headers on project page', (done) ->
+		@timeout(5000)
 		async.series [
 			(cb) => @user.login cb
 			(cb) =>

@@ -9,6 +9,8 @@ MockRecurlyApi = require "./helpers/MockRecurlyApi"
 MockV1Api = require "./helpers/MockV1Api"
 
 describe 'Subscriptions', ->
+	@timeout(25000)
+
 	describe 'dashboard', ->
 		before (done) ->
 			@user = new User()

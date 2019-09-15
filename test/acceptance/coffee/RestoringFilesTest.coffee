@@ -12,6 +12,8 @@ MockDocstoreApi = require "./helpers/MockDocstoreApi"
 MockFileStoreApi = require "./helpers/MockFileStoreApi"
 
 describe "RestoringFiles", ->
+	@timeout(5000)
+
 	before (done) ->
 		@owner = new User()
 		@owner.login (error) =>

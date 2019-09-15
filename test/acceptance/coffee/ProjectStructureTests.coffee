@@ -16,6 +16,8 @@ request = require "./helpers/request"
 User = require "./helpers/User"
 
 describe "ProjectStructureChanges", ->
+	@timeout(5000)
+
 	example_project_id = null
 	example_doc_id = null
 	example_file_id = null

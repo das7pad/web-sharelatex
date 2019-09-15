@@ -7,7 +7,7 @@ redis = require "./helpers/redis"
 MockV1Api = require './helpers/MockV1Api'
 
 describe "Sessions", ->
-	@timeout(20000)
+	@timeout(25000)
 
 	before (done) ->
 		@user1 = new User()

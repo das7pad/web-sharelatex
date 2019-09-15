@@ -201,6 +201,8 @@ expectInvitesInJoinProjectCount = (user, projectId, count, callback=(err,result)
 
 
 describe "ProjectInviteTests", ->
+	@timeout(5000)
+
 	before (done) ->
 		@sendingUser = new User()
 		@user = new User()
