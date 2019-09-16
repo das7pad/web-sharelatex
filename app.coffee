@@ -8,7 +8,7 @@ logger.logger.serializers.docs = require("./app/js/infrastructure/LoggerSerializ
 logger.logger.serializers.files = require("./app/js/infrastructure/LoggerSerializers").files
 logger.logger.serializers.project = require("./app/js/infrastructure/LoggerSerializers").project
 if Settings.sentry?.dsn?
-	logger.initializeErrorReporting(Settings.sentry.dsn)
+	logger.initializeErrorReporting(Settings.sentry.dsn, Settings.sentry.options)
 
 metrics.memory.monitor(logger)
 Server = require("./app/js/infrastructure/Server")
