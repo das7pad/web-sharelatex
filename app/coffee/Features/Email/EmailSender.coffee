@@ -3,7 +3,7 @@ metrics = require('metrics-sharelatex')
 Settings = require('settings-sharelatex')
 nodemailer = require("nodemailer")
 sesTransport = require('nodemailer-ses-transport')
-sgTransport = require('nodemailer-sendgrid-transport')
+sgTransport = require('nodemailer-sendgrid')
 mandrillTransport = require('nodemailer-mandrill-transport')
 rateLimiter = require('../../infrastructure/RateLimiter')
 _ = require("underscore")
@@ -23,7 +23,7 @@ if Settings?.email?.parameters?.AWSAccessKeyID? or Settings?.email?.driver == 's
 	nm_client = nodemailer.createTransport(sesTransport(Settings.email.parameters))
 else if Settings?.email?.parameters?.sendgridApiKey?
 	logger.log "using sendgrid for email"
-	nm_client = nodemailer.createTransport(sgTransport({auth:{api_key:Settings?.email?.parameters?.sendgridApiKey}}))
+	nm_client = nodemailer.createTransport(sgTransport({apiKey:Settings?.email?.parameters?.sendgridApiKey}))
 else if Settings?.email?.parameters?.MandrillApiKey?
 	logger.log "using mandril for email"
 	nm_client = nodemailer.createTransport(mandrillTransport({auth:{apiKey:Settings?.email?.parameters?.MandrillApiKey}}))
