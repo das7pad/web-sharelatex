@@ -167,7 +167,6 @@
     "less": "^2.7.3",
     "less-plugin-autoprefix": "^2.0.0",
     "mkdirp": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.1.tgz",
-    "nodemon": "^1.14.3",
     "prettier-eslint-cli": "^4.7.1",
     "react-testing-library": "^5.4.2",
     "requirejs": "^2.1.22",
