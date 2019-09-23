@@ -192,6 +192,7 @@ module.exports = settings =
 		ServeMathJax: false
 		ServeACE: false
 		ServePDFjs: false
+		ServeSocketIO: false
 	# 	web:
 	# 		host:"http://nowhere.sharelatex.dev"
 	#		darkHost:"http://cdn.sharelatex.dev:3000"
