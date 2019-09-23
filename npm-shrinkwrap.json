@@ -12846,6 +12846,11 @@
       "resolved": "https://registry.npmjs.org/punycode/-/punycode-2.1.1.tgz",
       "integrity": "sha512-XRsRjdf+j5ml+y/6GKHPZbrF/8p2Yga0JPtdqTIY2Xe5ohJPD9saDJJLPvp9+NSBprVvevdXZybnj2cv8OEd0A=="
     },
+    "q": {
+      "version": "0.9.2",
+      "resolved": "https://registry.npmjs.org/q/-/q-0.9.2.tgz",
+      "integrity": "sha1-I8BsRsgTKGFqrhaNPuI6Vr1D2vY="
+    },
     "qjobs": {
       "version": "1.2.0",
       "resolved": "https://registry.npmjs.org/qjobs/-/qjobs-1.2.0.tgz",
@@ -13156,11 +13161,6 @@
         "redis": "0.11.x"
       },
       "dependencies": {
-        "q": {
-          "version": "0.9.2",
-          "resolved": "https://registry.npmjs.org/q/-/q-0.9.2.tgz",
-          "integrity": "sha1-I8BsRsgTKGFqrhaNPuI6Vr1D2vY="
-        },
         "redis": {
           "version": "0.11.0",
           "resolved": "https://registry.npmjs.org/redis/-/redis-0.11.0.tgz",
@@ -13169,8 +13169,8 @@
       }
     },
     "redis-sharelatex": {
-      "version": "git+https://github.com/das7pad/redis-sharelatex.git#760b9345258a843000b544e3d1c36aa8f16b2033",
-      "from": "git+https://github.com/das7pad/redis-sharelatex.git#760b9345258a843000b544e3d1c36aa8f16b2033",
+      "version": "git+https://github.com/das7pad/redis-sharelatex.git#ac6c785d2391fe84e58f220b1fb609e62fac9ef4",
+      "from": "git+https://github.com/das7pad/redis-sharelatex.git#ac6c785d2391fe84e58f220b1fb609e62fac9ef4",
       "requires": {
         "async": "^2.5.0",
         "coffee-script": "1.8.0",
