@@ -7,6 +7,8 @@ MockProjectHistoryApi = require './helpers/MockProjectHistoryApi'
 User = require './helpers/User'
 
 describe 'Labels', ->
+	@timeout(5000)
+
 	beforeEach (done) ->
 		@owner = new User()
 		@owner.login (error) =>
