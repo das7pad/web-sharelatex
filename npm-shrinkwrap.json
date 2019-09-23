@@ -15110,7 +15110,8 @@
     "timekeeper": {
       "version": "2.2.0",
       "resolved": "https://registry.npmjs.org/timekeeper/-/timekeeper-2.2.0.tgz",
-      "integrity": "sha512-W3AmPTJWZkRwu+iSNxPIsLZ2ByADsOLbbLxe46UJyWj3mlYLlwucKiq+/dPm0l9wTzqoF3/2PH0AGFCebjq23A=="
+      "integrity": "sha512-W3AmPTJWZkRwu+iSNxPIsLZ2ByADsOLbbLxe46UJyWj3mlYLlwucKiq+/dPm0l9wTzqoF3/2PH0AGFCebjq23A==",
+      "dev": true
     },
     "timers-browserify": {
       "version": "2.0.10",
