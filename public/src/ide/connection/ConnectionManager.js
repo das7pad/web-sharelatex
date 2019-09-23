@@ -38,7 +38,11 @@ define([], function() {
           console.error(
             'Socket.io javascript not loaded. Please check that the real-time service is running and accessible.'
           )
-          this.ide.socket = { on() {} }
+          this.ide.socket = {
+            on() {},
+            connect() {},
+            disconnect() {}
+          }
           this.$scope.$apply(() => {
             return (this.$scope.state.error =
               'Could not connect to websocket server :(')
