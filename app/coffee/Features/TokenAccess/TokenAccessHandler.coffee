@@ -43,7 +43,7 @@ module.exports = TokenAccessHandler =
 			if !project?
 				return callback(null, null)
 			try
-				if !crypto.timingSafeEqual(new Buffer(token), new Buffer(project.tokens.readAndWrite))
+				if !crypto.timingSafeEqual(Buffer.from(token), Buffer.from(project.tokens.readAndWrite))
 					logger.err {token}, "read-and-write token match on numeric section, but not on full token"
 					return callback(null, null)
 				else

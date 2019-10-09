@@ -5816,7 +5816,7 @@ function clone(parent, circular, depth, prototype) {
     } else if (util.isDate(parent)) {
       child = new Date(parent.getTime());
     } else if (useBuffer && Buffer.isBuffer(parent)) {
-      child = new Buffer(parent.length);
+      child = Buffer.alloc(parent.length);
       parent.copy(child);
       return child;
     } else {

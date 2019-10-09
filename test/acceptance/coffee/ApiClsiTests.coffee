@@ -2,7 +2,7 @@ expect = require("chai").expect
 request = require './helpers/request'
 Settings = require "settings-sharelatex"
 
-auth = new Buffer('sharelatex:password').toString("base64")
+auth = Buffer.from('sharelatex:password').toString("base64")
 authed_request = request.defaults
 	headers:
 		Authorization: "Basic #{auth}"
