@@ -20,7 +20,7 @@ module.exports = ChatController =
 				return next(err) if err?
 				message.user = UserInfoController.formatPersonalInfo(user)
 				EditorRealTimeController.emitToRoom project_id, "new-chat-message", message
-				res.send(204)
+				res.sendStatus(204)
 
 	getMessages: (req, res, next)->
 		project_id = req.params.project_id

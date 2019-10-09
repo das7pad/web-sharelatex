@@ -33,7 +33,7 @@ module.exports = TrackChangesController =
 		DocumentUpdaterHandler.acceptChanges project_id, doc_id, change_ids, (error) ->
 			return next(error) if error?
 			EditorRealTimeController.emitToRoom project_id, "accept-changes", doc_id, change_ids, (err)->
-			res.send 204
+			res.sendStatus 204
 
 	setTrackChangesState: (req, res, next) ->
 		{project_id} = req.params
@@ -49,7 +49,7 @@ module.exports = TrackChangesController =
 					track_changes_state = {}
 				for key, value of req.body.on_for
 					if !key.match? or !key.match(/^[a-f0-9]{24}$/) or typeof value != "boolean"
-						return res.send 400 # bad request
+						return res.sendStatus 400 # bad request
 					else
 						if value
 							track_changes_state[key] = value
@@ -60,7 +60,7 @@ module.exports = TrackChangesController =
 				else
 					delete track_changes_state['__guests__']
 			else
-				return res.send 400 # bad request
+				return res.sendStatus 400 # bad request
 
 			if (
 				typeof track_changes_state == 'object' &&
@@ -72,4 +72,4 @@ module.exports = TrackChangesController =
 			TrackChangesManager.setTrackChangesState project_id, track_changes_state, (error) ->
 				return next(error) if error?
 				EditorRealTimeController.emitToRoom project_id, "toggle-track-changes", track_changes_state, (err)->
-				res.send 204
+				res.sendStatus 204

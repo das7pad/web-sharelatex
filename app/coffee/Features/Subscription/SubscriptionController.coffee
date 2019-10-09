@@ -248,9 +248,9 @@ module.exports = SubscriptionController =
 			return next(err) if err?
 			SubscriptionHandler.extendTrial subscription, 14, (err)->
 				if err?
-					res.send 500
+					res.sendStatus 500
 				else
-					res.send 200
+					res.sendStatus 200
 
 	recurlyNotificationParser: (req, res, next) ->
 		xml = ""

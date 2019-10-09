@@ -29,7 +29,7 @@ describe "ChatController", ->
 				project_id: @project_id
 		@res =
 			json: sinon.stub()
-			send: sinon.stub()
+			sendStatus: sinon.stub()
 
 	describe "sendMessage", ->
 		beforeEach ->
@@ -62,7 +62,7 @@ describe "ChatController", ->
 				.should.equal true
 				
 		it "should return a 204 status code", ->
-			@res.send.calledWith(204).should.equal true
+			@res.sendStatus.calledWith(204).should.equal true
 
 	describe "getMessages", ->
 		beforeEach ->

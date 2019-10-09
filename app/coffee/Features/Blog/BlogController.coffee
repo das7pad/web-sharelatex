@@ -23,7 +23,7 @@ module.exports = BlogController =
 			if r?.statusCode == 404 or r?.statusCode == 403
 				return ErrorController.notFound(req, res, next)
 			if err?
-				return res.send 500
+				return res.sendStatus 500
 			data = data.trim()
 			try
 				data = JSON.parse(data)

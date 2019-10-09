@@ -28,7 +28,7 @@ describe "TrackChanges CommentsController", ->
 		@req = {}
 		@res =
 			json: sinon.stub()
-			send: sinon.stub()
+			sendStatus: sinon.stub()
 
 	describe "sendComment", ->
 		beforeEach ->
@@ -64,7 +64,7 @@ describe "TrackChanges CommentsController", ->
 				.should.equal true
 				
 		it "should return a 204 status code", ->
-			@res.send.calledWith(204).should.equal true
+			@res.sendStatus.calledWith(204).should.equal true
 
 	describe "getThreads", ->
 		beforeEach ->
@@ -113,7 +113,7 @@ describe "TrackChanges CommentsController", ->
 				.should.equal true
 
 		it "should return a success code", ->
-			@res.send.calledWith(204).should.equal
+			@res.sendStatus.calledWith(204).should.equal
 
 	describe "reopenThread", ->
 		beforeEach ->
@@ -134,7 +134,7 @@ describe "TrackChanges CommentsController", ->
 				.should.equal true
 
 		it "should return a success code", ->
-			@res.send.calledWith(204).should.equal
+			@res.sendStatus.calledWith(204).should.equal
 
 	describe "deleteThread", ->
 		beforeEach ->
@@ -162,7 +162,7 @@ describe "TrackChanges CommentsController", ->
 				.should.equal true
 
 		it "should return a success code", ->
-			@res.send.calledWith(204).should.equal
+			@res.sendStatus.calledWith(204).should.equal
 
 	describe "editMessage", ->
 		beforeEach ->
@@ -186,7 +186,7 @@ describe "TrackChanges CommentsController", ->
 				.should.equal true
 
 		it "should return a success code", ->
-			@res.send.calledWith(204).should.equal
+			@res.sendStatus.calledWith(204).should.equal
 
 	describe "deleteMessage", ->
 		beforeEach ->
@@ -208,4 +208,4 @@ describe "TrackChanges CommentsController", ->
 				.should.equal true
 
 		it "should return a success code", ->
-			@res.send.calledWith(204).should.equal
+			@res.sendStatus.calledWith(204).should.equal

@@ -19,7 +19,7 @@ describe "TrackChanges TrackChangesController", ->
 		@req = {}
 		@res =
 			json: sinon.stub()
-			send: sinon.stub()
+			sendStatus: sinon.stub()
 		@next = sinon.stub()
 
 	describe "setTrackChangesState", ->
@@ -51,7 +51,7 @@ describe "TrackChanges TrackChangesController", ->
 					.should.equal true
 			
 			it "should return a 204 response code", ->
-				@res.send.calledWith(204).should.equal true
+				@res.sendStatus.calledWith(204).should.equal true
 
 		describe "when turning on for some users", ->
 			beforeEach ->
@@ -93,7 +93,7 @@ describe "TrackChanges TrackChangesController", ->
 					.should.equal true
 			
 			it "should return a 204 response code", ->
-				@res.send.calledWith(204).should.equal true
+				@res.sendStatus.calledWith(204).should.equal true
 
 		describe 'when turning on for guests', ->
 			describe 'for only guests', ->
@@ -120,7 +120,7 @@ describe "TrackChanges TrackChangesController", ->
 						.should.equal true
 
 				it "should return a 204 response code", ->
-					@res.send.calledWith(204).should.equal true
+					@res.sendStatus.calledWith(204).should.equal true
 
 			describe 'for guests and some users', ->
 				beforeEach ->
@@ -149,28 +149,28 @@ describe "TrackChanges TrackChangesController", ->
 						.should.equal true
 
 				it "should return a 204 response code", ->
-					@res.send.calledWith(204).should.equal true
+					@res.sendStatus.calledWith(204).should.equal true
 
 		describe "with malformed data", ->
 			it "should reject no data", ->
 				@req.body = {}
 				@TrackChangesController.setTrackChangesState @req, @res, @next
-				@res.send.calledWith(400).should.equal true
+				@res.sendStatus.calledWith(400).should.equal true
 
 			it "should reject non-user ids", ->
 				@req.body = { on_for: { "foo": true }}
 				@TrackChangesController.setTrackChangesState @req, @res, @next
-				@res.send.calledWith(400).should.equal true
+				@res.sendStatus.calledWith(400).should.equal true
 
 			it "should reject non-boolean values", ->
 				@req.body = { on_for: { "aaaabbbbccccddddeeeeffff": "bar" }}
 				@TrackChangesController.setTrackChangesState @req, @res, @next
-				@res.send.calledWith(400).should.equal true
+				@res.sendStatus.calledWith(400).should.equal true
 
 			it "should reject non-objects", ->
 				@req.body = { on_for: [true] }
 				@TrackChangesController.setTrackChangesState @req, @res, @next
-				@res.send.calledWith(400).should.equal true
+				@res.sendStatus.calledWith(400).should.equal true
 
 			it "should cast non-boolean values for global setting", ->
 				@req.body = { on: 1 }

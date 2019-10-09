@@ -127,10 +127,10 @@ module.exports = CompileController =
 			rateLimit (err, canContinue)->
 				if err?
 					logger.err err:err, "error checking rate limit for pdf download"
-					return res.send 500
+					return res.sendStatus 500
 				else if !canContinue
 					logger.log project_id:project_id, ip:req.ip, "rate limit hit downloading pdf"
-					res.send 500
+					res.sendStatus 500
 				else
 					CompileController._downloadAsUser req, (error, user_id) ->
 						url = CompileController._getFileUrl project_id, user_id, req.params.build_id, "output.pdf"

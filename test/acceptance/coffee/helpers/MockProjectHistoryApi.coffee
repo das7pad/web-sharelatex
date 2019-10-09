@@ -55,7 +55,7 @@ module.exports = MockProjectHistoryApi =
 			if @oldFiles[key]?
 				res.send @oldFiles[key]
 			else
-				res.send 404
+				res.sendStatus 404
 
 		app.get "/project/:project_id/version/:version", (req, res, next) =>
 			{project_id, version} = req.params
@@ -70,7 +70,7 @@ module.exports = MockProjectHistoryApi =
 			if @projectVersions[project_id]?
 				res.json @projectVersions[project_id]
 			else
-				res.send 404
+				res.sendStatus 404
 
 		app.get "/project/:project_id/labels", (req, res, next) =>
 			{project_id} = req.params
@@ -78,7 +78,7 @@ module.exports = MockProjectHistoryApi =
 			if labels?
 				res.json labels
 			else
-				res.send 404
+				res.sendStatus 404
 
 		app.post "/project/:project_id/user/:user_id/labels", bodyParser.json(), (req, res, next) =>
 			{project_id} = req.params
@@ -92,9 +92,9 @@ module.exports = MockProjectHistoryApi =
 			label = @labels[project_id]?[label_id]
 			if label?
 				@deleteLabel project_id, label_id
-				res.send 204
+				res.sendStatus 204
 			else
-				res.send 404
+				res.sendStatus 404
 
 		app.post "/project/:project_id/flush", (req, res, next) =>
 			res.sendStatus 200

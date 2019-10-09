@@ -117,7 +117,7 @@ module.exports = UserController =
 						User.findById user_id, (err, user)->
 							if err?
 								logger.err err:err, user_id:user_id, "error getting user for email update"
-								return res.send 500
+								return res.sendStatus 500
 							AuthenticationController.setInSessionUser(req, {email: user.email, first_name: user.first_name, last_name: user.last_name})
 							UserHandler.populateTeamInvites user, (err)-> #need to refresh this in the background
 								if err?

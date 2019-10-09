@@ -17,7 +17,7 @@ module.exports = AnalyticsController =
 				AnalyticsManager.updateEditingSession userId, projectId, countryCode, (error) ->
 					respondWith(error, res, next)
 		else
-			res.send 204
+			res.sendStatus 204
 
 	recordEvent: (req, res, next) ->
 		user_id = AuthenticationController.getLoggedInUserId(req) or req.sessionID
@@ -35,8 +35,8 @@ module.exports = AnalyticsController =
 respondWith = (error, res, next) ->
 	if error instanceof Errors.ServiceNotConfiguredError
 		# ignore, no-op
-		res.send(204)
+		res.sendStatus(204)
 	else if error?
 		next(error)
 	else
-		res.send 204
+		res.sendStatus 204

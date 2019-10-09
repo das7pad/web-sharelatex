@@ -31,6 +31,7 @@ describe 'AnalyticsController', ->
 
 		@res =
 			send:->
+			sendStatus:->
 
 	describe "updateEditingSession", ->
 		beforeEach ->

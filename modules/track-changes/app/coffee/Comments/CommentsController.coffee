@@ -23,7 +23,7 @@ module.exports = CommentsController =
 				return next(err) if err?
 				comment.user = UserInfoController.formatPersonalInfo(user)
 				EditorRealTimeController.emitToRoom project_id, "new-comment", thread_id, comment, (err) ->
-				res.send 204
+				res.sendStatus 204
 
 	getThreads: (req, res, next) ->
 		{project_id} = req.params
@@ -43,7 +43,7 @@ module.exports = CommentsController =
 			UserInfoManager.getPersonalInfo user_id, (err, user) ->
 				return next(err) if err?
 				EditorRealTimeController.emitToRoom project_id, "resolve-thread", thread_id, UserInfoController.formatPersonalInfo(user), (err)->
-				res.send 204
+				res.sendStatus 204
 
 	reopenThread: (req, res, next) ->
 		{project_id, thread_id} = req.params
@@ -51,7 +51,7 @@ module.exports = CommentsController =
 		ChatApiHandler.reopenThread project_id, thread_id, (err, threads) ->
 			return next(err) if err?
 			EditorRealTimeController.emitToRoom project_id, "reopen-thread", thread_id, (err)->
-			res.send 204
+			res.sendStatus 204
 	
 	deleteThread: (req, res, next) ->
 		{project_id, doc_id, thread_id} = req.params
@@ -61,7 +61,7 @@ module.exports = CommentsController =
 			ChatApiHandler.deleteThread project_id, thread_id, (err, threads) ->
 				return next(err) if err?
 				EditorRealTimeController.emitToRoom project_id, "delete-thread", thread_id, (err)->
-				res.send 204
+				res.sendStatus 204
 	
 	editMessage: (req, res, next) ->
 		{project_id, thread_id, message_id} = req.params
@@ -70,7 +70,7 @@ module.exports = CommentsController =
 		ChatApiHandler.editMessage project_id, thread_id, message_id, content, (err) ->
 			return next(err) if err?
 			EditorRealTimeController.emitToRoom project_id, "edit-message", thread_id, message_id, content, (err)->
-			res.send 204
+			res.sendStatus 204
 	
 	deleteMessage: (req, res, next) ->
 		{project_id, thread_id, message_id} = req.params
@@ -78,4 +78,4 @@ module.exports = CommentsController =
 		ChatApiHandler.deleteMessage project_id, thread_id, message_id, (err, threads) ->
 			return next(err) if err?
 			EditorRealTimeController.emitToRoom project_id, "delete-message", thread_id, message_id, (err)->
-			res.send 204
+			res.sendStatus 204

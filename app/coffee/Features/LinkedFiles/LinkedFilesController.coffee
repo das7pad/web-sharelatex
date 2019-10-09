@@ -73,7 +73,7 @@ module.exports = LinkedFilesController = {
 			name = file.name
 			linkedFileData = file.linkedFileData
 			if !linkedFileData? || !linkedFileData?.provider?
-				return res.send(409)
+				return res.sendStatus(409)
 			provider = linkedFileData.provider
 			parent_folder_id = parentFolder._id
 			Agent = LinkedFilesController._getAgent(provider)

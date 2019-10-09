@@ -27,7 +27,7 @@ module.exports = UserController =
 		else if /^[a-f0-9]{24}$/.test(user_id)
 			query = { _id: ObjectId(user_id) }
 		else
-			return res.send(400)
+			return res.sendStatus(400)
 
 		UserGetter.getUser query, { _id: true, first_name: true, last_name: true, email: true}, (error, user) ->
 			logger.log user_id: req.params.user_id, "receiving request for getting users personal info"
