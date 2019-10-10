@@ -21,6 +21,7 @@ for (let file in window.__karma__.files) {
 requirejs.config({
   baseUrl: '/base/public/js',
   paths: {
+    ace: 'ace-1.4.4',
     moment: 'libs/moment-2.9.0'
   },
   map: {

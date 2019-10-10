@@ -1,3 +1,4 @@
+# when updating ace, do not forged /test/unit_frontend/src/test-main.js
 version = {
 	"socket.io": "2.2.0",
 	"pdfjs": "2.0.943"
