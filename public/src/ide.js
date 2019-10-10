@@ -43,7 +43,8 @@ define([
   'ide/directives/layout',
   'ide/directives/validFile',
   'ide/services/ide',
-  '__IDE_CLIENTSIDE_INCLUDES__',
+  // OPTIONAL MODULE INCLUDES
+  /* INJECTED BY MAKEFILE */ 'ide/rich-text/index',
   'analytics/AbTestingManager',
   'directives/focus',
   'directives/fineUpload',

@@ -20,9 +20,8 @@ DOCKER_COMPOSE := BUILD_NUMBER=$(BUILD_NUMBER) \
 MODULE_DIRS := $(shell find modules -mindepth 1 -maxdepth 1 -type d -not -name '.git' )
 MODULE_MAKEFILES := $(MODULE_DIRS:=/Makefile)
 
-COFFEE := node_modules/.bin/coffee -m $(COFFEE_OPTIONS)
-COFFEE := node_modules/.bin/coffee $(COFFEE_OPTIONS)
-BABEL := node_modules/.bin/babel
+COFFEE := node_modules/.bin/coffee --map $(COFFEE_OPTIONS)
+BABEL := node_modules/.bin/babel --source-maps true
 GRUNT := node_modules/.bin/grunt
 LESSC := node_modules/.bin/lessc
 CLEANCSS := node_modules/.bin/cleancss
@@ -80,23 +79,22 @@ test/smoke/js/%.js: test/smoke/coffee/%.coffee
 	@mkdir -p $(@D)
 	$(COFFEE) --compile -o $(@D) $<
 
-public/js/ide.js: public/src/ide.js $(MODULE_IDE_SRC_FILES)
-public/js/main.js: public/src/main.js $(MODULE_MAIN_SRC_FILES)
-public/js/main.js public/js/ide.js:
-	@echo Compiling and injecting module includes into $@
-	@INCLUDES=""; \
-	DEST=$(shell basename $(basename $@)); \
-	for dir in modules/*; \
-	do \
-		MODULE=`echo $$dir | cut -d/ -f2`; \
-		if [ -e $$dir/$(basename $<)/index.js ]; then \
-			INCLUDES="\"$$DEST/$$MODULE/index\",$$INCLUDES"; \
-		fi \
-	done; \
-	INCLUDES=$${INCLUDES%?}; \
-	$(BABEL) $< | \
-		sed -E s=\'__[A-Z]+_CLIENTSIDE_INCLUDES__\'=$$INCLUDES= \
-		> $@
+INJECTED_MARKER := INJECTED BY MAKEFILE
+MODULE_INCLUDES_MARKER = OPTIONAL MODULE INCLUDES
+public/src/ide.js: $(MODULE_IDE_SRC_FILES)
+public/src/main.js: $(MODULE_MAIN_SRC_FILES)
+public/src/ide.js public/src/main.js:
+	sed -i '/$(INJECTED_MARKER)/d' $@
+	IDE_OR_MAIN=$(notdir $(basename $@)); \
+	for MODULE in $$(echo $^ | sort | sed -E 's=modules/([^/]+)/\S+=\1=g'); do \
+		LABEL=""; \
+		sed -i \
+			"/$(MODULE_INCLUDES_MARKER)/a \
+			\ \ \/* $(INJECTED_MARKER) *\/ '$$IDE_OR_MAIN\/$$MODULE\/index'," \
+		$@; \
+	done
+	npx prettier-eslint $@ --write
+	touch --reference $(firstword $?) $@
 
 public/stylesheets/%.css: $(LESS_FILES)
 	$(LESSC) $(LESSC_COMMON_FLAGS) $(@D)/$*.less $(@D)/$*.css
@@ -129,17 +127,15 @@ compile_app: $(JS_FILES)
 	@$(MAKE) compile_modules
 
 compile_full:
-	$(COFFEE) -c -p app.coffee > app.js
+	$(COFFEE) -c app.coffee
 	$(COFFEE) -o app/js -c app/coffee
 	$(BABEL) public/src --out-dir public/js
 	$(COFFEE) -o test/acceptance/js -c test/acceptance/coffee
 	$(COFFEE) -o test/smoke/js -c test/smoke/coffee
 	$(COFFEE) -o test/unit/js -c test/unit/coffee
 	$(BABEL) test/unit_frontend/src --out-dir test/unit_frontend/js
-	rm -f public/js/ide.js public/js/main.js # We need to generate ide.js, main.js manually later
 	$(MAKE) css_full
 	$(MAKE) compile_modules_full
-	$(MAKE) compile # ide.js, main.js, share.js, and anything missed
 
 compile_css_full:
 	$(MAKE) css_full
