@@ -37,7 +37,7 @@ node_modules/*
 data/*
 
 app.js
-app.js.map
+*.js.map
 app/js/*
 test/unit/js/*
 test/unit_frontend/js/*
