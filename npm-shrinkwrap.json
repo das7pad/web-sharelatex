@@ -2267,6 +2267,11 @@
       "integrity": "sha1-tUc7M9yXxCTl2Y3IfVXU2KKci/I=",
       "dev": true
     },
+    "charenc": {
+      "version": "0.0.2",
+      "resolved": "https://registry.npmjs.org/charenc/-/charenc-0.0.2.tgz",
+      "integrity": "sha1-wKHS86cJLgN3S/qD8UwPxXkKhmc="
+    },
     "chokidar": {
       "version": "1.7.0",
       "resolved": "https://registry.npmjs.org/chokidar/-/chokidar-1.7.0.tgz",
@@ -3319,6 +3324,11 @@
           "dev": true
         }
       }
+    },
+    "crypt": {
+      "version": "0.0.2",
+      "resolved": "https://registry.npmjs.org/crypt/-/crypt-0.0.2.tgz",
+      "integrity": "sha1-iNf/fsDfuG9xPch7u0LQRNPmxBs="
     },
     "cryptiles": {
       "version": "2.0.5",
@@ -9284,12 +9294,12 @@
       }
     },
     "logger-sharelatex": {
-      "version": "git+https://github.com/das7pad/logger-sharelatex.git#0a27a2785df04b627bb3557f01ac6e7573a97c61",
-      "from": "git+https://github.com/das7pad/logger-sharelatex.git#0a27a2785df04b627bb3557f01ac6e7573a97c61",
+      "version": "git+https://github.com/das7pad/logger-sharelatex.git#c9e043041b1f6a4c76ce36a3642cef64483e99f3",
+      "from": "git+https://github.com/das7pad/logger-sharelatex.git#c9e043041b1f6a4c76ce36a3642cef64483e99f3",
       "requires": {
         "@overleaf/o-error": "^2.0.0",
         "bunyan": "1.8.12",
-        "raven": "1.1.3",
+        "raven": "^2.6.4",
         "request": "2.88.0"
       },
       "dependencies": {
@@ -9398,11 +9408,6 @@
         "currently-unhandled": "^0.4.1",
         "signal-exit": "^3.0.0"
       }
-    },
-    "lsmod": {
-      "version": "1.0.0",
-      "resolved": "https://registry.npmjs.org/lsmod/-/lsmod-1.0.0.tgz",
-      "integrity": "sha1-mgD3bco26yP6BTUK/htYXUKZ5ks="
     },
     "lynx": {
       "version": "0.1.1",
@@ -9513,6 +9518,16 @@
       "integrity": "sha512-rUxjysqif/BZQH2yhd5Aaq7vXMSx9NdEsQcyA07uEzIvxgI7zIr33gGsh+RU0/XjmQpCW7RsVof1vlkvQVCK5A==",
       "dev": true,
       "optional": true
+    },
+    "md5": {
+      "version": "2.2.1",
+      "resolved": "https://registry.npmjs.org/md5/-/md5-2.2.1.tgz",
+      "integrity": "sha1-U6s41f48iJG6RlMp6iP6wFQBJvk=",
+      "requires": {
+        "charenc": "~0.0.1",
+        "crypt": "~0.0.1",
+        "is-buffer": "~1.1.1"
+      }
     },
     "md5.js": {
       "version": "1.3.5",
@@ -12268,26 +12283,21 @@
       "dev": true
     },
     "raven": {
-      "version": "1.1.3",
-      "resolved": "https://registry.npmjs.org/raven/-/raven-1.1.3.tgz",
-      "integrity": "sha1-QnPBrm005CMPUbLAEEGjK5Iygio=",
+      "version": "2.6.4",
+      "resolved": "https://registry.npmjs.org/raven/-/raven-2.6.4.tgz",
+      "integrity": "sha512-6PQdfC4+DQSFncowthLf+B6Hr0JpPsFBgTVYTAOq7tCmx/kR4SXbeawtPch20+3QfUcQDoJBLjWW1ybvZ4kXTw==",
       "requires": {
         "cookie": "0.3.1",
-        "json-stringify-safe": "5.0.1",
-        "lsmod": "1.0.0",
-        "stack-trace": "0.0.9",
-        "uuid": "3.0.0"
+        "md5": "^2.2.1",
+        "stack-trace": "0.0.10",
+        "timed-out": "4.0.1",
+        "uuid": "3.3.2"
       },
       "dependencies": {
         "cookie": {
           "version": "0.3.1",
           "resolved": "https://registry.npmjs.org/cookie/-/cookie-0.3.1.tgz",
           "integrity": "sha1-5+Ch+e9DtMi6klxcWpboBtFoc7s="
-        },
-        "uuid": {
-          "version": "3.0.0",
-          "resolved": "https://registry.npmjs.org/uuid/-/uuid-3.0.0.tgz",
-          "integrity": "sha1-Zyj8BFnEUNeWqZwxg3VpvfZy1yg="
         }
       }
     },
@@ -13884,9 +13894,9 @@
       }
     },
     "stack-trace": {
-      "version": "0.0.9",
-      "resolved": "https://registry.npmjs.org/stack-trace/-/stack-trace-0.0.9.tgz",
-      "integrity": "sha1-qPbq7KkGdMMz58Q5U/J1tFFRBpU="
+      "version": "0.0.10",
+      "resolved": "https://registry.npmjs.org/stack-trace/-/stack-trace-0.0.10.tgz",
+      "integrity": "sha1-VHxws0fo0ytOEI6hoqFZ5f3eGcA="
     },
     "standard-as-callback": {
       "version": "2.0.1",
@@ -14321,6 +14331,11 @@
       "resolved": "https://registry.npmjs.org/time-stamp/-/time-stamp-2.2.0.tgz",
       "integrity": "sha512-zxke8goJQpBeEgD82CXABeMh0LSJcj7CXEd0OHOg45HgcofF7pxNwZm9+RknpxpDhwN4gFpySkApKfFYfRQnUA==",
       "dev": true
+    },
+    "timed-out": {
+      "version": "4.0.1",
+      "resolved": "https://registry.npmjs.org/timed-out/-/timed-out-4.0.1.tgz",
+      "integrity": "sha1-8y6srFoXW+ol1/q1Zas+2HQe9W8="
     },
     "timekeeper": {
       "version": "2.2.0",
