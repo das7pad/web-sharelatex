@@ -40,6 +40,7 @@ tryLoginThroughRegistrationForm = (user, email, password, callback=(err, respons
 
 
 describe "LoginRateLimit", ->
+	@timeout(5000)
 
 	before ->
 		@user = new User()
@@ -73,6 +74,7 @@ describe "LoginRateLimit", ->
 
 
 describe "CSRF protection", ->
+	@timeout(5000)
 
 	beforeEach ->
 		@user = new User()
@@ -130,6 +132,8 @@ describe "CSRF protection", ->
 						done()
 
 describe "Register", ->
+	@timeout(5000)
+
 	before ->
 		@user = new User()
 
@@ -144,6 +148,8 @@ describe "Register", ->
 			done()
 
 describe "Register with bonus referal id", ->
+	@timeout(5000)
+
 	before (done) ->
 		@user1 = new User()
 		@user2 = new User()
