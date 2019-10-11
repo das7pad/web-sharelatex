@@ -43,6 +43,7 @@ describe "SecurityHeaders", ->
 			done()
 
 	it 'should have cache headers when user is logged in', (done) ->
+		@timeout(5000)
 		async.series [
 			(cb) => @user.login cb
 			(cb) => @user.request.get '/', cb
