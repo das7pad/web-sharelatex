@@ -1,5 +1,3 @@
-const Path = require('path')
-const fs = require('fs')
 const crypto = require('crypto')
 const async = require('async')
 const logger = require('logger-sharelatex')
@@ -21,7 +19,6 @@ const ProjectUpdateHandler = require('./ProjectUpdateHandler')
 const ProjectGetter = require('./ProjectGetter')
 const PrivilegeLevels = require('../Authorization/PrivilegeLevels')
 const AuthenticationController = require('../Authentication/AuthenticationController')
-const PackageVersions = require('../../infrastructure/PackageVersions')
 const Sources = require('../Authorization/Sources')
 const TokenAccessHandler = require('../TokenAccess/TokenAccessHandler')
 const CollaboratorsGetter = require('../Collaborators/CollaboratorsGetter')
@@ -791,7 +788,7 @@ const ProjectController = {
                 isTokenMember
               ),
               languages: Settings.languages,
-              editorThemes: THEME_LIST,
+              editorThemes: Settings.editorThemes,
               maxDocLength: Settings.max_doc_length,
               useV2History:
                 project.overleaf &&
@@ -1048,22 +1045,5 @@ var defaultSettingsForAnonymousUser = userId => ({
     github: false
   }
 })
-
-var THEME_LIST = []
-function generateThemeList() {
-  const files = fs.readdirSync(
-    Path.join(__dirname, '/../../../../public/js/', PackageVersions.lib('ace'))
-  )
-  const result = []
-  for (let file of files) {
-    if (file.slice(-2) === 'js' && /^theme-/.test(file)) {
-      const cleanName = file.slice(0, -3).slice(6)
-      result.push(THEME_LIST.push(cleanName))
-    } else {
-      result.push(undefined)
-    }
-  }
-}
-generateThemeList()
 
 module.exports = ProjectController
