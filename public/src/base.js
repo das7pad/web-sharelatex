@@ -21,8 +21,7 @@ define([
   'libs/polyfills/array-includes',
   'modules/recursionHelper',
   'modules/errorCatcher',
-  'modules/localStorage',
-  'modules/sessionStorage',
+  'modules/storage',
   'utils/underscore'
 ], function() {
   const App = angular
@@ -35,8 +34,7 @@ define([
       'ngSanitize',
       'ipCookie',
       'ErrorCatcher',
-      'localStorage',
-      'sessionStorage',
+      'storage',
       'ngTagsInput',
       'ui.select'
     ])
