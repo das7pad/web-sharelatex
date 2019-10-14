@@ -82,7 +82,7 @@
     "querystring": "^0.2.0",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
-    "redis-sharelatex": "git+https://github.com/das7pad/redis-sharelatex.git#ac6c785d2391fe84e58f220b1fb609e62fac9ef4",
+    "redis-sharelatex": "git+https://github.com/das7pad/redis-sharelatex.git#ebedde93447c6d6ad826e8950760f76ec2df95bb",
     "request": "^2.69.0",
     "requestretry": "^1.13.0",
     "requests": "^0.1.7",
