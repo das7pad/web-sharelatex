@@ -15,9 +15,16 @@ App.controller('EditorLoaderController', function($scope, localStorage) {
     )
 
     if (val && !$scope.richText.bundle && !$scope.richText.bundleLoading) {
-      $scope.richText.bundleLoading = import(/* webpackChunkName: "rich-text" */ '../../rich_text_editor')
-        .then(bundle =>
-          $scope.$applyAsync(() => ($scope.richText.bundle = bundle))
+      const MathJaxLoading = import('../../../../../../public/src/MathJaxBundle')
+      const richTextLoading = import(/* webpackChunkName: "rich-text" */ '../../rich_text_editor')
+      $scope.richText.bundleLoading = Promise.all([
+        richTextLoading,
+        MathJaxLoading
+      ])
+        .then(() =>
+          richTextLoading.then(bundle =>
+            $scope.$applyAsync(() => ($scope.richText.bundle = bundle))
+          )
         )
         .finally(() => ($scope.richText.bundleLoading = null))
     }

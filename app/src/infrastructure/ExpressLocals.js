@@ -174,11 +174,6 @@ module.exports = function(app, webRouter, privateApiRouter, publicApiRouter) {
       return path
     }
 
-    res.locals.mathJaxPath = res.locals.buildJsPath('libs/mathjax/MathJax.js', {
-      cdn: Settings.cdn.ServeMathJax,
-      qs: { config: 'TeX-AMS_HTML,Safe' }
-    })
-
     const IEEE_BRAND_ID = 15
     res.locals.isIEEE = brandVariation =>
       (brandVariation != null ? brandVariation.brand_id : undefined) ===

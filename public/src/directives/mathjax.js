@@ -1,11 +1,13 @@
-/* global MathJax */
+import App from '../base'
 
-define(['base'], function(App) {
-  return App.directive('mathjax', function($compile, $parse) {
-    return {
-      link(scope, element, attrs) {
-        if (!(MathJax && MathJax.Hub)) return
-
+if (window.preLoadMathJax) {
+  // e.g. learn
+  import(/* webpackChunkName: "MathJaxBundle" */ '../MathJaxBundle')
+}
+App.directive('mathjax', function($compile, $parse) {
+  return {
+    link(scope, element, attrs) {
+      import('../MathJaxBundle').then(MathJax => {
         // Allowing HTML can be unsafe unless using something like
         // `ng-bind-html` because of potential Angular XSS via {{/}}
         if (!$parse(attrs.mathjaxAllowHtml)(scope)) {
@@ -35,7 +37,7 @@ define(['base'], function(App) {
         setTimeout(() => {
           MathJax.Hub.Queue(['Typeset', MathJax.Hub, element.get(0)])
         }, 0)
-      }
+      })
     }
-  })
+  }
 })

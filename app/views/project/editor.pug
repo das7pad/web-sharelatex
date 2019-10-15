@@ -149,6 +149,5 @@ block content
 
 block foot-scripts
 	script(src=buildJsPath('/libs/' + lib('socket.io') + '/socket.io.js', {cdn:settings.cdn.ServeSocketIO}), onerror='disableCDN()')
-	script(src=mathJaxPath, onerror='disableCDN()')
 	script(src=buildJsPath('libraries.js'), onerror='disableCDN()')
 	script(src=buildJsPath('ide.js'), onerror='disableCDN()')
