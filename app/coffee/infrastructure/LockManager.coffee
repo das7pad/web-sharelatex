@@ -30,7 +30,9 @@ module.exports = LockManager =
 
 	unlockScript: 'if redis.call("get", KEYS[1]) == ARGV[1] then return redis.call("del", KEYS[1]) else return 0 end'
 
-	runWithLock: (namespace, id, runner = ( (releaseLock = (error) ->) -> ), callback = ( (error) -> )) ->
+	runWithLock: (namespace, id, runner, callback = (error) -> ) ->
+		# runner must be a function accepting a callback, e.g. runner = (cb) ->
+
 		# This error is defined here so we get a useful stacktrace
 		slowExecutionError = new Error "slow execution during lock"
 

@@ -34,7 +34,8 @@ module.exports = BetaProgramController =
 			if err
 				logger.err {err, user_id}, "error fetching user"
 				return next(err)
-			res.render 'beta_program/opt_in',
-				title:'sharelatex_beta_program'
+			res.render 'beta_program/opt_in', {
+				title: 'sharelatex_beta_program',
 				user: user,
 				languages: Settings.languages,
+			}
