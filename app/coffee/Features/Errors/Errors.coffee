@@ -125,6 +125,14 @@ ThirdPartyUserNotFoundError = (message) ->
 	return error
 ThirdPartyUserNotFoundError.prototype.__proto__ = Error.prototype
 
+SubscriptionAdminDeletionError = (message) ->
+	message = "subscription admins cannot be deleted" unless message?
+	error = new Error(message)
+	error.name = "SubscriptionAdminDeletionError"
+	error.__proto__ = SubscriptionAdminDeletionError.prototype
+	return error
+SubscriptionAdminDeletionError.prototype.__proto__ = Error.prototype
+
 module.exports = Errors =
 	NotFoundError: NotFoundError
 	ForbiddenError: ForbiddenError
@@ -144,3 +152,4 @@ module.exports = Errors =
 	NotInV2Error: NotInV2Error
 	SLInV2Error: SLInV2Error
 	ThirdPartyUserNotFoundError: ThirdPartyUserNotFoundError
+	SubscriptionAdminDeletionError: SubscriptionAdminDeletionError
