@@ -1,5 +1,116 @@
-#!/usr/local/bin/zsh
+#!/usr/bin/env bash
 set -ex
+
+GIT_AUTHOR="decaffeinate <`git config user.email`>"
+ARGS=$@
+
+function decaffeinateClean() {
+    npx bulk-decaffeinate clean
+}
+function decaffeinateDirectory() {
+    [[ -e "$1/coffee" ]] || return 0
+
+    npx bulk-decaffeinate convert ${ARGS} --dir "$1/coffee"
+}
+function decaffeinateSingle() {
+    [[ -e "$1.coffee" ]] || return 0
+
+    npx bulk-decaffeinate convert ${ARGS} --file "$1.coffee"
+}
+
+function gitCommit() {
+    [[ `git status --porcelain` ]] || return 0
+
+    git commit --author "$GIT_AUTHOR" -a -m "decaffeinate: $@"
+}
+function gitRename() {
+    [[ -e "$1/coffee" ]] || return 0
+
+    git mv "$1/coffee" "$1/src"
+}
+
+function prettierDirectory() {
+    [[ -e "$1/src" ]] || return 0
+
+    npx prettier-eslint --write "$1/src/**/*.js"
+
+    # apparently the output is not stable and some files* receive more changes
+    #  upon a second run through prettier-eslint.
+    # lets rerun prettier on any changed file.
+    #
+    # * - e.g. app/src/infrastructure/RandomLogging.js looses line 6
+    git status --porcelain | cut -d' ' -f3 | xargs npx prettier-eslint --write
+}
+function prettierSingle() {
+    [[ -e "$1.js" ]] || return 0
+
+    npx prettier-eslint --write "$1.js"
+
+    # see comment above
+    git status --porcelain | grep -q "$1.js" || return 0
+    npx prettier-eslint --write "$1.js"
+}
+
+function processSingleFile() {
+    name=$1
+    echo "----------------------------------------"
+    echo "--- processSingleFile $name.coffee"
+    echo "----------------------------------------"
+
+    decaffeinateSingle "$name"
+    decaffeinateClean
+
+    prettierSingle "$name"
+    gitCommit "Convert $name.js to Prettier format"
+}
+function processSingleFileInModules() {
+    name=$1
+    echo "----------------------------------------"
+    echo "--- processSingleFileInModules $name.coffee"
+    echo "----------------------------------------"
+
+    if [[ -e modules ]]; then
+        for module in modules/*; do
+            decaffeinateSingle "$module/$name"
+        done
+        decaffeinateClean
+
+        for module in modules/; do
+            prettierSingle "$module/$name"
+        done
+        gitCommit "Convert $name.js of modules to Prettier format"
+    fi
+}
+function processDirectory() {
+    dir=$1
+    echo "----------------------------------------"
+    echo "--- processDirectory $dir/coffee"
+    echo "----------------------------------------"
+
+    decaffeinateDirectory "$dir"
+    if [[ -e modules ]]; then
+        for module in modules/*; do
+            decaffeinateDirectory "$module/$dir"
+        done
+    fi
+    decaffeinateClean
+
+    gitRename "$dir"
+    if [[ -e modules ]]; then
+        for module in modules/*; do
+            gitRename "$module/$dir"
+        done
+    fi
+    gitCommit "Rename $dir/coffee to $dir/src"
+
+    prettierDirectory "$dir"
+    if [[ -e modules ]]; then
+        for module in modules/*; do
+            prettierDirectory "$module/$dir"
+        done
+    fi
+    gitCommit "Convert $dir/src to Prettier format"
+}
 
 echo "----------------------------------------"
 echo "-------GIT CLEANING UNUSED FILES--------"
@@ -8,175 +119,45 @@ echo "----------------------------------------"
 git clean -fd
 
 echo "----------------------------------------"
-echo "--------------ENTRY FILE----------------"
+echo "--------------DECAFFEINATE--------------"
 echo "----------------------------------------"
 
-npx bulk-decaffeinate convert --file app.coffee
+processSingleFile app
+processSingleFileInModules index
 
-for entryPoint in modules/**/index.coffee; do
-  npx bulk-decaffeinate convert --file $entryPoint
-done
+processSingleFile Gruntfile
 
-npx bulk-decaffeinate clean
-
-npx prettier-eslint 'app.js' --write
-
-for entryPoint in modules/**/index.js; do
-  npx prettier-eslint "$entryPoint" --write
-done
-
-git add .
-git commit -m "Prettier: convert app.js & index.js decaffeinated files to Prettier format"
-
-echo "----------------------------------------"
-echo "------------GRUNTFILE FILE--------------"
-echo "----------------------------------------"
-
-npx bulk-decaffeinate convert --file Gruntfile.coffee
-
-npx bulk-decaffeinate clean
-
-npx prettier-eslint 'Gruntfile.js' --write
-
-git add .
-git commit -m "Prettier: convert Gruntfile.coffee decaffeinated files to Prettier format"
-
-echo "----------------------------------------"
-echo "------------------APP-------------------"
-echo "----------------------------------------"
-
-npx bulk-decaffeinate convert --dir app/coffee
-
-for module in modules/**/app/coffee; do
-  npx bulk-decaffeinate convert --dir $module
-done
-
-npx bulk-decaffeinate clean
-
-git mv app/coffee app/src
-
-for module in modules/**/app; do
-  if [ -e $module/coffee ]; then
-    git mv $module/coffee $module/src
-  fi
-done
-
-git commit -m "Rename app/coffee dir to app/src"
-
-npx prettier-eslint 'app/src/**/*.js' --write
-
-for module in modules/**/app/src; do
-  npx prettier-eslint "$module/**/*.js" --write
-done
-
-git add .
-git commit -m "Prettier: convert app/src decaffeinated files to Prettier format"
-
-echo "----------------------------------------"
-echo "--------------UNIT TESTS----------------"
-echo "----------------------------------------"
-
-npx bulk-decaffeinate convert --dir test/unit/coffee
-
-for module in modules/**/test/unit/coffee; do
-  npx bulk-decaffeinate convert --dir $module
-done
-
-npx bulk-decaffeinate clean
-
-git mv test/unit/coffee test/unit/src
-
-for module in modules/**/test/unit; do
-  if [ -e $module/coffee ]; then
-    git mv $module/coffee $module/src
-  fi
-done
-
-git commit -m "Rename test/unit/coffee to test/unit/src"
-
-npx prettier-eslint 'test/unit/src/**/*.js' --write
-
-for module in modules/**/test/unit/src; do
-  npx prettier-eslint "$module/**/*.js" --write
-done
-
-git add .
-git commit -m "Prettier: convert test/unit decaffeinated files to Prettier format"
-
-echo "----------------------------------------"
-echo "-----------ACCEPTANCE TESTS-------------"
-echo "----------------------------------------"
-
-npx bulk-decaffeinate convert --dir test/acceptance/coffee
-
-for module in modules/**/test/acceptance/coffee; do
-  npx bulk-decaffeinate convert --dir $module
-done
-
-npx bulk-decaffeinate clean
-
-git mv test/acceptance/coffee test/acceptance/src
-
-for module in modules/**/test/acceptance; do
-  if [ -e $module/coffee ]; then
-    git mv $module/coffee $module/src
-  fi
-done
-
-git commit -m "Rename test/acceptance/coffee to test/acceptance/src"
-
-npx prettier-eslint 'test/acceptance/src/**/*.js' --write
-
-for module in modules/**/test/acceptance/src; do
-  npx prettier-eslint "$module/**/*.js" --write
-done
-
-git add .
-git commit -m "Prettier: convert test/acceptance decaffeinated files to Prettier format"
-
-echo "----------------------------------------"
-echo "-------------SMOKE TESTS----------------"
-echo "----------------------------------------"
-
-npx bulk-decaffeinate convert --dir test/smoke/coffee
-
-npx bulk-decaffeinate clean
-
-git mv test/smoke/coffee test/smoke/src
-
-git commit -m "Rename test/smoke/coffee to test/smoke/src"
-
-npx prettier-eslint 'test/smoke/src/**/*.js' --write
-
-git add .
-git commit -m "Prettier: convert test/smoke decaffeinated files to Prettier format"
+processDirectory app
+processDirectory test/unit
+processDirectory test/acceptance
+processDirectory test/smoke
 
 echo "----------------------------------------"
 echo "-----------FIX REQUIRE PATHS------------"
 echo "----------------------------------------"
 
-perl -i.bak -pe "s/([\'\"\`].*)\/app\/js(.*[\'\"\`])/\1\/app\/src\2/g" app.js
-rm app.js.bak
+# enable to glob modules/**/index.js
+DEMO_MODULE=modules/__decaffeinate__/
+mkdir -p "$DEMO_MODULE/src"
+touch "$DEMO_MODULE/index.js"
 
-perl -i.bak -pe "s/([\'\"\`].*)\/app\/js(.*[\'\"\`])/\1\/app\/src\2/g" Gruntfile.js
-rm Gruntfile.js.bak
+find \
+  app.js \
+  Gruntfile.js \
+  app/src/ \
+  modules/*/index.js \
+  modules/*/src \
+  test/acceptance/src \
+  test/smoke/src \
+  test/unit/src \
+  -name '*.js' \
+| xargs sed -i \
+  -E "s#(['\`].*)(/app|/test/acceptance|test/smoke)/js(.*['\`])#\1\2/src\3#g"
+# assume that all require calls use single quotes by now - enforced via Prettier
 
-perl -i.bak -pe "s/([\'\"\`].*)\/app\/js(.*[\'\"\`])/\1\/app\/src\2/g" modules/**/index.js
-rm modules/**/index.js.bak
-
-perl -i.bak -pe "s/([\'\"\`].*)\/app\/js(.*[\'\"\`])/\1\/app\/src\2/g" **/src/**/*.js
-rm **/src/**/*.js.bak
-
-perl -i.bak -pe "s/([\'\"\`].*)\/test\/acceptance\/js(.*[\'\"\`])/\1\/test\/acceptance\/src\2/g" **/src/**/*.js
-rm **/src/**/*.js.bak
-
-perl -i.bak -pe "s/([\'\"\`].*)test\/smoke\/js(.*[\'\"\`])/\1test\/smoke\/src\2/g" **/src/**/*.js
-rm **/src/**/*.js.bak
+rm -rf "$DEMO_MODULE"
 
 # Fix formatting after rewriting paths - extra character can make a difference
 make format_fix
 
-git add .
-git commit -m "Fix require paths in modules after decaffeination" || true
-
-echo "done"
+gitCommit "Fix require paths after decaffeination"
