@@ -1,4 +1,5 @@
-WikiRouter = require "./app/js/WikiRouter"
+let Wiki;
+const WikiRouter = require("./app/js/WikiRouter");
 
-module.exports = Wiki =
-	router: WikiRouter
+module.exports = (Wiki =
+	{router: WikiRouter});
