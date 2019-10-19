@@ -10,9 +10,6 @@ let count = Math.random()
 
 class User {
   constructor(options) {
-    this.fetchCsrfToken = this.fetchCsrfToken.bind(this)
-    this.parseCsrfToken = this.parseCsrfToken.bind(this)
-    this.setCsrfToken = this.setCsrfToken.bind(this)
     if (options == null) {
       options = {}
     }
@@ -57,7 +54,7 @@ class User {
     if (this._id != null) {
       return callback(new Error('User already registered'))
     }
-    this.fetchCsrfToken('/register', error => {
+    this.getCsrfToken(error => {
       if (error != null) {
         return callback(error)
       }
@@ -97,7 +94,7 @@ class User {
         }
         this.request.post(
           {
-            url: endpoint,
+            url: settings.enableLegacyLogin ? '/login/legacy' : '/login',
             json: { email, password: this.password }
           },
           callback
@@ -134,7 +131,6 @@ class User {
         }
       )
     })
-    return null
   }
 
   setFeatures(features, callback) {
@@ -144,7 +140,6 @@ class User {
       update[`features.${key}`] = value
     }
     UserModel.update({ _id: this.id }, update, callback)
-    return null
   }
 
   setOverleafId(overleafId, callback) {
@@ -153,8 +148,7 @@ class User {
 
   logout(callback) {
     this.getCsrfToken(error => {
-      if (error) {
-        this.csrfToken = undefined
+      if (error != null) {
         return callback(error)
       }
       this.request.post(
@@ -166,7 +160,6 @@ class User {
           }
         },
         (error, response, body) => {
-          this.csrfToken = undefined
           if (error != null) {
             return callback(error)
           }
@@ -189,7 +182,6 @@ class User {
   addEmail(email, callback) {
     this.emails.push({ email, createdAt: new Date() })
     UserUpdater.addEmailAddress(this.id, email, callback)
-    return null
   }
 
   confirmEmail(email, callback) {
@@ -200,7 +192,6 @@ class User {
       }
     }
     UserUpdater.confirmEmail(this.id, email, callback)
-    return null
   }
 
   ensureAdmin(callback) {
@@ -209,7 +200,6 @@ class User {
       { $set: { isAdmin: true } },
       callback
     )
-    return null
   }
 
   ensureStaffAccess(flag, callback) {
@@ -235,7 +225,6 @@ class User {
       { $set: { features } },
       callback
     )
-    return null
   }
 
   downgradeFeatures(callback) {
@@ -255,7 +244,6 @@ class User {
       { $set: { features } },
       callback
     )
-    return null
   }
 
   defaultFeatures(callback) {
@@ -265,7 +253,6 @@ class User {
       { $set: { features } },
       callback
     )
-    return null
   }
 
   getFeatures(callback) {
@@ -296,7 +283,6 @@ class User {
         }
       )
     })
-    return null
   }
 
   deleteUser(callback) {
@@ -365,7 +351,6 @@ class User {
         }
       }
     )
-    return null
   }
 
   deleteProject(projectId, callback) {
@@ -386,7 +371,6 @@ class User {
     db.projects.remove({ owner_ref: ObjectId(this.id) }, { multi: true }, err =>
       callback(err)
     )
-    return null
   }
 
   openProject(projectId, callback) {
@@ -407,7 +391,6 @@ class User {
         callback(null)
       }
     )
-    return null
   }
 
   createDocInProject(projectId, parentFolderId, name, callback) {
@@ -460,7 +443,6 @@ class User {
         callback(null)
       }
     )
-    return null
   }
 
   makePrivate(projectId, callback) {
@@ -478,7 +460,6 @@ class User {
         callback(null)
       }
     )
-    return null
   }
 
   makeTokenBased(projectId, callback) {
@@ -496,50 +477,9 @@ class User {
         callback(null)
       }
     )
-    return null
-  }
-
-  fetchCsrfToken(params, callback) {
-    if (params == null) {
-      params = '/'
-    }
-    if (callback == null) {
-      callback = function(error) {}
-    }
-    if (this.csrfToken) {
-      return callback(null)
-    }
-    this.request.get(params, (err, response, body) => {
-      return this.parseCsrfToken(body, callback)
-    })
-    return null
-  }
-
-  parseCsrfToken(body, callback) {
-    if (callback == null) {
-      callback = function(error) {}
-    }
-    const match = /window.csrfToken\ = "(.+)"/.exec(body)
-    if (!match) {
-      return callback(new Error('body has no csrf token'))
-    }
-    this.setCsrfToken(match[1])
-    return callback(null)
-  }
-
-  setCsrfToken(token) {
-    this.csrfToken = token
-    return (this.request = this.request.defaults({
-      headers: {
-        'x-csrf-token': this.csrfToken
-      }
-    }))
   }
 
   getCsrfToken(callback) {
-    if (this.csrfToken) {
-      return callback()
-    }
     this.request.get(
       {
         url: '/dev/csrf'
@@ -548,14 +488,15 @@ class User {
         if (err != null) {
           return callback(err)
         }
-        if (response.statusCode !== 200) {
-          return callback(new Error(response.statusCode))
-        }
-        this.setCsrfToken(body)
+        this.csrfToken = body
+        this.request = this.request.defaults({
+          headers: {
+            'x-csrf-token': this.csrfToken
+          }
+        })
         callback()
       }
     )
-    return null
   }
 
   changePassword(callback) {
@@ -695,7 +636,6 @@ class User {
         )
       }
     })
-    return null
   }
 
   transferProjectOwnership(projectId, userId, callback) {
@@ -737,7 +677,6 @@ class User {
       },
       callback
     )
-    return null
   }
 
   setCollaboratorInfo(projectId, userId, info, callback) {
