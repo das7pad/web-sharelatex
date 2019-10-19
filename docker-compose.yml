@@ -43,7 +43,7 @@ services:
       - redis_realtime
       - redis_web
       - redis_websessions
-    command: npm run test:acceptance:run_dir test/acceptance/js
+    command: npm run test:acceptance:run_dir test/acceptance/src
 
   test_frontend:
     build:

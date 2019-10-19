@@ -17,8 +17,10 @@ services:
       - xunit
       - --reporter-options
       - output=/home/node/unit.xml,suiteName='Unit Tests'
-      - test/unit/js
-      - modules/*/test/unit/js/**.js
+      - --require
+      - test/unit/bootstrap.js
+      - test/unit/src
+      - modules/*/test/unit/src/**.js
     volumes:
       - ./output:/home/node:z
 
@@ -58,8 +60,8 @@ services:
       - --reporter-options
     command:
       - output=/home/node/acceptance.xml,suiteName='App Acceptance Tests'
-      - test/acceptance/js/Init.js
-      - test/acceptance/js
+      - test/acceptance/src/Init.js
+      - test/acceptance/src
     volumes:
       - ./output:/home/node:z
 

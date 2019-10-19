@@ -84,8 +84,8 @@ minify: $(CSS_FILES) $(DIST_FILES)
 	$(MAKE) minify_es
 	$(MAKE) hash_static_files
 
-hash_static_files: app/js/infrastructure/HashedFiles.js
-	MINIFIED_JS='true' node $<
+hash_static_files:
+	MINIFIED_JS='true' node app/src/infrastructure/HashedFiles.js
 
 minify_css: $(CSS_FILES)
 	$(CLEANCSS) $(CLEANCSS_FLAGS) -o $(CSS_SL_FILE) $(CSS_SL_FILE)
