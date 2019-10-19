@@ -44,15 +44,15 @@ module.exports = FeaturesUpdater =
 			UserFeaturesUpdater.updateFeatures user_id, features, callback
 		return null
 
-	_getIndividualFeatures: (user_id, callback = (error, features = {}) ->) ->
+	_getIndividualFeatures: (user_id, callback = (error, features) ->) ->
 		SubscriptionLocator.getUsersSubscription user_id, (err, sub)->
 			callback err, FeaturesUpdater._subscriptionToFeatures(sub)
 
-	_getGroupFeatureSets: (user_id, callback = (error, featureSets = []) ->) ->
+	_getGroupFeatureSets: (user_id, callback = (error, featureSets) ->) ->
 		SubscriptionLocator.getGroupSubscriptionsMemberOf user_id, (err, subs) ->
 			callback err, (subs or []).map FeaturesUpdater._subscriptionToFeatures
 
-	_getV1Features: (user_id, callback = (error, features = {}) ->) ->
+	_getV1Features: (user_id, callback = (error, features) ->) ->
 		V1SubscriptionManager.getPlanCodeFromV1 user_id, (err, planCode, v1Id) ->
 			if err?
 				return callback(null, []) if err?.name == 'NotFoundError'
