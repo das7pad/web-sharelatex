@@ -5,7 +5,7 @@ const URL = require('url')
 
 module.exports = {
   call(basePath) {
-    if (!settings.apis.analytics) {
+    if (!settings.apis.analytics || !settings.apis.analytics.enabled) {
       return (req, res, next) =>
         next(
           new Errors.ServiceNotConfiguredError(
