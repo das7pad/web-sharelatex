@@ -12,7 +12,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 const { expect } = require('chai')
-const ProjectGetter = require('../../../app/js/Features/Project/ProjectGetter')
+const ProjectGetter = require('../../../app/src/Features/Project/ProjectGetter')
 const request = require('./helpers/request')
 const User = require('./helpers/User')
 

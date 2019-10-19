@@ -20,7 +20,7 @@ const chai = require('chai')
 const should = chai.should()
 const { expect } = chai
 const modulePath =
-  '../../../../app/js/Features/Downloads/ProjectZipStreamManager.js'
+  '../../../../app/src/Features/Downloads/ProjectZipStreamManager.js'
 const SandboxedModule = require('sandboxed-module')
 const { EventEmitter } = require('events')
 

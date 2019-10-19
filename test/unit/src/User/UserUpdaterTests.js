@@ -17,7 +17,7 @@ const path = require('path')
 const sinon = require('sinon')
 const modulePath = path.join(
   __dirname,
-  '../../../../app/js/Features/User/UserUpdater'
+  '../../../../app/src/Features/User/UserUpdater'
 )
 const { expect } = require('chai')
 const tk = require('timekeeper')

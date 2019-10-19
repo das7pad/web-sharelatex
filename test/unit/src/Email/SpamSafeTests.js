@@ -12,7 +12,7 @@
 const path = require('path')
 const modulePath = path.join(
   __dirname,
-  '../../../../app/js/Features/Email/SpamSafe'
+  '../../../../app/src/Features/Email/SpamSafe'
 )
 const SpamSafe = require(modulePath)
 const { expect } = require('chai')

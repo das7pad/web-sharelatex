@@ -17,9 +17,9 @@ const { assert } = require('chai')
 const should = chai.should()
 const { expect } = chai
 const modulePath =
-  '../../../../app/js/Features/Project/ProjectEntityUpdateHandler'
+  '../../../../app/src/Features/Project/ProjectEntityUpdateHandler'
 const sinon = require('sinon')
-const Errors = require('../../../../app/js/Features/Errors/Errors')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 const SandboxedModule = require('sandboxed-module')
 const { ObjectId } = require('mongoose').Types
 

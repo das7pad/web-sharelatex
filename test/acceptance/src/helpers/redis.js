@@ -15,7 +15,7 @@ const Settings = require('settings-sharelatex')
 const logger = require('logger-sharelatex')
 const Async = require('async')
 
-const UserSessionsRedis = require('../../../../app/js/Features/User/UserSessionsRedis')
+const UserSessionsRedis = require('../../../../app/src/Features/User/UserSessionsRedis')
 
 // rclient = redis.createClient(Settings.redis.web)
 const rclient = UserSessionsRedis.client()

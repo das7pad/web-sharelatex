@@ -16,7 +16,7 @@ require('chai').should()
 const { expect } = require('chai')
 const modulePath = require('path').join(
   __dirname,
-  '../../../../app/js/Features/Cooldown/CooldownManager'
+  '../../../../app/src/Features/Cooldown/CooldownManager'
 )
 
 describe('CooldownManager', function() {

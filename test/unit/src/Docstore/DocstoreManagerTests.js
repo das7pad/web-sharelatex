@@ -12,9 +12,9 @@
 const chai = require('chai')
 chai.should()
 const sinon = require('sinon')
-const modulePath = '../../../../app/js/Features/Docstore/DocstoreManager'
+const modulePath = '../../../../app/src/Features/Docstore/DocstoreManager'
 const SandboxedModule = require('sandboxed-module')
-const Errors = require('../../../../app/js/Features/Errors/Errors')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 describe('DocstoreManager', function() {
   beforeEach(function() {

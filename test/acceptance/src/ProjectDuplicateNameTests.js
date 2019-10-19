@@ -25,7 +25,7 @@ const fs = require('fs')
 const Settings = require('settings-sharelatex')
 const _ = require('underscore')
 
-const ProjectGetter = require('../../../app/js/Features/Project/ProjectGetter')
+const ProjectGetter = require('../../../app/src/Features/Project/ProjectGetter')
 
 const MockDocStoreApi = require('./helpers/MockDocstoreApi')
 const MockFileStoreApi = require('./helpers/MockFileStoreApi')

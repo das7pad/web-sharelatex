@@ -18,7 +18,7 @@ const { expect } = require('chai')
 const sinon = require('sinon')
 const crypto = require('crypto')
 const querystring = require('querystring')
-const modulePath = '../../../../app/js/Features/Subscription/RecurlyWrapper'
+const modulePath = '../../../../app/src/Features/Subscription/RecurlyWrapper'
 const SandboxedModule = require('sandboxed-module')
 const tk = require('timekeeper')
 

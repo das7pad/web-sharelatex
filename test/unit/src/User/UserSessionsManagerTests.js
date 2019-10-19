@@ -15,7 +15,7 @@ const sinon = require('sinon')
 const chai = require('chai')
 const should = chai.should()
 const { expect } = chai
-const modulePath = '../../../../app/js/Features/User/UserSessionsManager.js'
+const modulePath = '../../../../app/src/Features/User/UserSessionsManager.js'
 const SandboxedModule = require('sandboxed-module')
 const Async = require('async')
 

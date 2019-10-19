@@ -19,7 +19,7 @@ const should = chai.should()
 const path = require('path')
 const modulePath = path.join(
   __dirname,
-  '../../../../../app/js/infrastructure/LockManager.js'
+  '../../../../../app/src/infrastructure/LockManager.js'
 )
 const SandboxedModule = require('sandboxed-module')
 

@@ -17,10 +17,10 @@ const spies = require('chai-spies')
 const chai = require('chai').use(spies)
 const { assert } = require('chai')
 const should = chai.should()
-const modulePath = '../../../../app/js/Features/Project/ProjectLocator'
+const modulePath = '../../../../app/src/Features/Project/ProjectLocator'
 const SandboxedModule = require('sandboxed-module')
 const sinon = require('sinon')
-const Errors = require('../../../../app/js/Features/Errors/Errors')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 const { expect } = require('chai')
 var Project = (Project = class Project {})
 

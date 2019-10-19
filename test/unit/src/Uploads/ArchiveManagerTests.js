@@ -16,8 +16,8 @@ const sinon = require('sinon')
 const { expect } = require('chai')
 const chai = require('chai')
 const should = chai.should()
-const modulePath = '../../../../app/js/Features/Uploads/ArchiveManager.js'
-const Errors = require('../../../../app/js/Features/Errors/Errors')
+const modulePath = '../../../../app/src/Features/Uploads/ArchiveManager.js'
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 const SandboxedModule = require('sandboxed-module')
 const events = require('events')
 

@@ -19,7 +19,7 @@ const sinon = require('sinon')
 const chai = require('chai')
 const should = chai.should()
 const { expect } = chai
-const modulePath = '../../../../app/js/Features/FileStore/FileStoreHandler.js'
+const modulePath = '../../../../app/src/Features/FileStore/FileStoreHandler.js'
 const SandboxedModule = require('sandboxed-module')
 
 describe('FileStoreHandler', function() {

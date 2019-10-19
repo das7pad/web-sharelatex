@@ -17,7 +17,7 @@ require('chai').should()
 const sinon = require('sinon')
 const modulePath = require('path').join(
   __dirname,
-  '../../../../app/js/Features/Tags/TagsHandler'
+  '../../../../app/src/Features/Tags/TagsHandler'
 )
 const _ = require('underscore')
 

@@ -13,7 +13,7 @@ const chai = require('chai')
 chai.should()
 const { expect } = chai
 const sinon = require('sinon')
-const modulePath = '../../../../app/js/Features/Metadata/MetaController'
+const modulePath = '../../../../app/src/Features/Metadata/MetaController'
 const SandboxedModule = require('sandboxed-module')
 
 describe('MetaController', function() {

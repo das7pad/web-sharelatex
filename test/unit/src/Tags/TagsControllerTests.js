@@ -17,7 +17,7 @@ require('chai').should()
 const sinon = require('sinon')
 const modulePath = require('path').join(
   __dirname,
-  '../../../../app/js/Features/Tags/TagsController'
+  '../../../../app/src/Features/Tags/TagsController'
 )
 
 describe('TagsController', function() {

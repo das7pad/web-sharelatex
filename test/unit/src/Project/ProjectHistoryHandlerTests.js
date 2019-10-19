@@ -17,7 +17,7 @@ const { assert } = require('chai')
 const should = chai.should()
 const { expect } = chai
 const sinon = require('sinon')
-const modulePath = '../../../../app/js/Features/Project/ProjectHistoryHandler'
+const modulePath = '../../../../app/src/Features/Project/ProjectHistoryHandler'
 const SandboxedModule = require('sandboxed-module')
 const { ObjectId } = require('mongoose').Types
 

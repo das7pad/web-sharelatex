@@ -17,7 +17,7 @@ const { expect } = require('chai')
 const sinon = require('sinon')
 const modulePath = require('path').join(
   __dirname,
-  '../../../../app/js/Features/SudoMode/SudoModeMiddleware'
+  '../../../../app/src/Features/SudoMode/SudoModeMiddleware'
 )
 
 describe('SudoModeMiddleware', function() {

@@ -13,8 +13,8 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 const should = require('chai').should()
-const modulePath = '../../../../app/js/Features/Project/ProjectDetailsHandler'
-const Errors = require('../../../../app/js/Features/Errors/Errors')
+const modulePath = '../../../../app/src/Features/Project/ProjectDetailsHandler'
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 const SandboxedModule = require('sandboxed-module')
 const sinon = require('sinon')
 const { assert } = require('chai')

@@ -16,7 +16,7 @@ const chai = require('chai')
 const should = chai.should()
 const { expect } = chai
 const modulePath =
-  '../../../../app/js/Features/Collaborators/CollaboratorsInviteController.js'
+  '../../../../app/src/Features/Collaborators/CollaboratorsInviteController.js'
 const SandboxedModule = require('sandboxed-module')
 const events = require('events')
 const MockRequest = require('../helpers/MockRequest')

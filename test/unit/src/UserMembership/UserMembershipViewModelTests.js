@@ -19,7 +19,7 @@ const assertNotCalled = sinon.assert.notCalled
 const mongojs = require('mongojs')
 const { ObjectId } = mongojs
 const modulePath =
-  '../../../../app/js/Features/UserMembership/UserMembershipViewModel'
+  '../../../../app/src/Features/UserMembership/UserMembershipViewModel'
 const SandboxedModule = require('sandboxed-module')
 
 describe('UserMembershipViewModel', function() {

@@ -17,7 +17,7 @@ const assert = require('assert')
 const path = require('path')
 const modulePath = path.join(
   __dirname,
-  '../../../../app/js/Features/Announcements/AnnouncementsHandler'
+  '../../../../app/src/Features/Announcements/AnnouncementsHandler'
 )
 const sinon = require('sinon')
 const { expect } = require('chai')

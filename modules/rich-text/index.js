@@ -3,13 +3,13 @@
 */
 // TODO: This file was created by bulk-decaffeinate.
 // Fix any style issues and re-enable lint.
-const Features = require('../../app/js/infrastructure/Features');
+const Features = require('../../app/src/infrastructure/Features')
 
 module.exports = {
-  assetFiles: ["es/rich-text.js"],
+  assetFiles: ['es/rich-text.js'],
 
   viewIncludes: {
-    "editor:script": "script",
-    "editor:main": "main"
+    'editor:script': 'script',
+    'editor:main': 'main'
   }
-};
+}

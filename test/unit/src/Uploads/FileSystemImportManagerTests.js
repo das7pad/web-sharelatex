@@ -15,7 +15,7 @@ const sinon = require('sinon')
 const chai = require('chai')
 const should = chai.should()
 const modulePath =
-  '../../../../app/js/Features/Uploads/FileSystemImportManager.js'
+  '../../../../app/src/Features/Uploads/FileSystemImportManager.js'
 const SandboxedModule = require('sandboxed-module')
 
 describe('FileSystemImportManager', function() {

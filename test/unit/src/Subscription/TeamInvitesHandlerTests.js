@@ -16,10 +16,11 @@ const should = require('chai').should()
 const sinon = require('sinon')
 const { expect } = require('chai')
 const querystring = require('querystring')
-const modulePath = '../../../../app/js/Features/Subscription/TeamInvitesHandler'
+const modulePath =
+  '../../../../app/src/Features/Subscription/TeamInvitesHandler'
 
 const { ObjectId } = require('mongojs')
-const Errors = require('../../../../app/js/Features/Errors/Errors')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 describe('TeamInvitesHandler', function() {
   beforeEach(function() {

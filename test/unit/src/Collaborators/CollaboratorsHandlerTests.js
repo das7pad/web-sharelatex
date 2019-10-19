@@ -20,10 +20,10 @@ const path = require('path')
 const sinon = require('sinon')
 const modulePath = path.join(
   __dirname,
-  '../../../../app/js/Features/Collaborators/CollaboratorsHandler'
+  '../../../../app/src/Features/Collaborators/CollaboratorsHandler'
 )
 const { expect } = require('chai')
-const Errors = require('../../../../app/js/Features/Errors/Errors')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 const { ObjectId } = require('mongojs')
 
 describe('CollaboratorsHandler', function() {

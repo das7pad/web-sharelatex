@@ -14,7 +14,7 @@ const assert = require('assert')
 const path = require('path')
 const modulePath = path.join(
   __dirname,
-  '../../../../../app/js/infrastructure/LockManager.js'
+  '../../../../../app/src/infrastructure/LockManager.js'
 )
 const lockKey = `lock:web:{${5678}}`
 const lockValue = '123456'

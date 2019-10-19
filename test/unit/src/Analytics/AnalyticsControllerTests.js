@@ -16,7 +16,7 @@ const assert = require('assert')
 const path = require('path')
 const modulePath = path.join(
   __dirname,
-  '../../../../app/js/Features/Analytics/AnalyticsController'
+  '../../../../app/src/Features/Analytics/AnalyticsController'
 )
 const sinon = require('sinon')
 const { expect } = require('chai')

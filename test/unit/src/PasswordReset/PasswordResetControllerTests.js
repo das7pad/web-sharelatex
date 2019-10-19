@@ -19,7 +19,7 @@ const path = require('path')
 const sinon = require('sinon')
 const modulePath = path.join(
   __dirname,
-  '../../../../app/js/Features/PasswordReset/PasswordResetController'
+  '../../../../app/src/Features/PasswordReset/PasswordResetController'
 )
 ;({ expect } = require('chai'))
 

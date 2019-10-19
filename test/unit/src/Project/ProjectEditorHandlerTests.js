@@ -14,7 +14,7 @@ const chai = require('chai')
 const { expect } = chai
 const should = chai.should()
 
-const modulePath = '../../../../app/js/Features/Project/ProjectEditorHandler'
+const modulePath = '../../../../app/src/Features/Project/ProjectEditorHandler'
 const SandboxedModule = require('sandboxed-module')
 
 describe('ProjectEditorHandler', function() {

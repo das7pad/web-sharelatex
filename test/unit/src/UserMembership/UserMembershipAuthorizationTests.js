@@ -15,11 +15,11 @@ const sinon = require('sinon')
 const chai = require('chai')
 const { expect } = require('chai')
 const modulePath =
-  '../../../../app/js/Features/UserMembership/UserMembershipAuthorization.js'
+  '../../../../app/src/Features/UserMembership/UserMembershipAuthorization.js'
 const SandboxedModule = require('sandboxed-module')
 const MockRequest = require('../helpers/MockRequest')
-const EntityConfigs = require('../../../../app/js/Features/UserMembership/UserMembershipEntityConfigs')
-const Errors = require('../../../../app/js/Features/Errors/Errors')
+const EntityConfigs = require('../../../../app/src/Features/UserMembership/UserMembershipEntityConfigs')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 describe('UserMembershipAuthorization', function() {
   beforeEach(function() {

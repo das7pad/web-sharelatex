@@ -14,7 +14,8 @@
  */
 const sinon = require('sinon')
 const chai = require('chai').should()
-const modulePath = '../../../../app/js/Features/Project/ProjectUpdateHandler.js'
+const modulePath =
+  '../../../../app/src/Features/Project/ProjectUpdateHandler.js'
 const SandboxedModule = require('sandboxed-module')
 
 describe('ProjectUpdateHandler', function() {

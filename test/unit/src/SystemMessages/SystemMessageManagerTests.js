@@ -16,7 +16,7 @@ require('chai').should()
 const sinon = require('sinon')
 const modulePath = require('path').join(
   __dirname,
-  '../../../../app/js/Features/SystemMessages/SystemMessageManager'
+  '../../../../app/src/Features/SystemMessages/SystemMessageManager'
 )
 
 describe('SystemMessageManager', function() {

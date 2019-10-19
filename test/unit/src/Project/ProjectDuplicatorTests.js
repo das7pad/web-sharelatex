@@ -13,7 +13,7 @@
  */
 const sinon = require('sinon')
 const chai = require('chai').should()
-const modulePath = '../../../../app/js/Features/Project/ProjectDuplicator.js'
+const modulePath = '../../../../app/src/Features/Project/ProjectDuplicator.js'
 const SandboxedModule = require('sandboxed-module')
 
 describe('ProjectDuplicator', function() {

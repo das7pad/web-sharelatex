@@ -13,7 +13,7 @@ const chai = require('chai')
 chai.should()
 const { expect } = chai
 const sinon = require('sinon')
-const modulePath = '../../../../app/js/Features/History/HistoryManager'
+const modulePath = '../../../../app/src/Features/History/HistoryManager'
 const SandboxedModule = require('sandboxed-module')
 
 describe('HistoryManager', function() {

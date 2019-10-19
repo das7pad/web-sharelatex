@@ -18,7 +18,7 @@ require('chai').should()
 const sinon = require('sinon')
 const modulePath = require('path').join(
   __dirname,
-  '../../../../app/js/Features/Notifications/NotificationsHandler'
+  '../../../../app/src/Features/Notifications/NotificationsHandler'
 )
 const _ = require('underscore')
 

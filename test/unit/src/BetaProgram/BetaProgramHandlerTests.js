@@ -17,7 +17,7 @@ const assert = require('assert')
 const path = require('path')
 const modulePath = path.join(
   __dirname,
-  '../../../../app/js/Features/BetaProgram/BetaProgramHandler'
+  '../../../../app/src/Features/BetaProgram/BetaProgramHandler'
 )
 const sinon = require('sinon')
 const { expect } = require('chai')

@@ -22,7 +22,7 @@ const { expect } = chai
 
 const modulePath = Path.join(
   __dirname,
-  '../../../../app/js/Features/Project/ProjectCollabratecDetailsHandler'
+  '../../../../app/src/Features/Project/ProjectCollabratecDetailsHandler'
 )
 
 describe('ProjectCollabratecDetailsHandler', function() {

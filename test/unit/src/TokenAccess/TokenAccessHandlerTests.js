@@ -18,7 +18,7 @@ const path = require('path')
 const sinon = require('sinon')
 const modulePath = path.join(
   __dirname,
-  '../../../../app/js/Features/TokenAccess/TokenAccessHandler'
+  '../../../../app/src/Features/TokenAccess/TokenAccessHandler'
 )
 const { expect } = require('chai')
 const { ObjectId } = require('mongojs')

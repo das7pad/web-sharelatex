@@ -18,7 +18,7 @@ const assert = require('assert')
 const path = require('path')
 const modulePath = path.join(
   __dirname,
-  '../../../../app/js/Features/Subscription/V1SubscriptionManager'
+  '../../../../app/src/Features/Subscription/V1SubscriptionManager'
 )
 const sinon = require('sinon')
 const { expect } = require('chai')

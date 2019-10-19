@@ -17,7 +17,7 @@ const sinon = require('sinon')
 
 const should = require('chai').should()
 
-const modulePath = '../../../../app/js/Features/Templates/TemplatesManager'
+const modulePath = '../../../../app/src/Features/Templates/TemplatesManager'
 
 describe('TemplatesManager', function() {
   beforeEach(function() {

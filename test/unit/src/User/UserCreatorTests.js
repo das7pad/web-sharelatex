@@ -15,7 +15,7 @@ const sinon = require('sinon')
 const chai = require('chai')
 const assert = require('assert')
 const should = chai.should()
-const modulePath = '../../../../app/js/Features/User/UserCreator.js'
+const modulePath = '../../../../app/src/Features/User/UserCreator.js'
 const SandboxedModule = require('sandboxed-module')
 
 describe('UserCreator', function() {

@@ -17,13 +17,13 @@ const path = require('path')
 const sinon = require('sinon')
 const modulePath = path.join(
   __dirname,
-  '../../../../app/js/Features/TokenAccess/TokenAccessController'
+  '../../../../app/src/Features/TokenAccess/TokenAccessController'
 )
 const { expect } = require('chai')
 const { ObjectId } = require('mongojs')
 const MockRequest = require('../helpers/MockRequest')
 const MockResponse = require('../helpers/MockResponse')
-const Errors = require('../../../../app/js/Features/Errors/Errors')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 describe('TokenAccessController', function() {
   beforeEach(function() {

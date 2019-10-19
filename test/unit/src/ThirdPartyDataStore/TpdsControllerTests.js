@@ -14,7 +14,7 @@ const sinon = require('sinon')
 require('chai').should()
 const modulePath = require('path').join(
   __dirname,
-  '../../../../app/js/Features/ThirdPartyDataStore/TpdsController'
+  '../../../../app/src/Features/ThirdPartyDataStore/TpdsController'
 )
 
 describe('TpdsController', function() {

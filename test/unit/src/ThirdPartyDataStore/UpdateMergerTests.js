@@ -16,7 +16,7 @@ const sinon = require('sinon')
 require('chai').should()
 const modulePath = require('path').join(
   __dirname,
-  '../../../../app/js/Features/ThirdPartyDataStore/UpdateMerger'
+  '../../../../app/src/Features/ThirdPartyDataStore/UpdateMerger'
 )
 const BufferedStream = require('bufferedstream')
 

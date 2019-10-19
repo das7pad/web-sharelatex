@@ -19,10 +19,10 @@
 const request = require('./request')
 const _ = require('underscore')
 const settings = require('settings-sharelatex')
-const { db, ObjectId } = require('../../../../app/js/infrastructure/mongojs')
-const UserModel = require('../../../../app/js/models/User').User
-const UserUpdater = require('../../../../app/js/Features/User/UserUpdater')
-const AuthenticationManager = require('../../../../app/js/Features/Authentication/AuthenticationManager')
+const { db, ObjectId } = require('../../../../app/src/infrastructure/mongojs')
+const UserModel = require('../../../../app/src/models/User').User
+const UserUpdater = require('../../../../app/src/Features/User/UserUpdater')
+const AuthenticationManager = require('../../../../app/src/Features/Authentication/AuthenticationManager')
 
 let count = Math.random()
 

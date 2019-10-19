@@ -16,7 +16,7 @@ const sinon = require('sinon')
 const chai = require('chai')
 const should = chai.should()
 const { expect } = chai
-const modulePath = '../../../../app/js/Features/Compile/ClsiManager.js'
+const modulePath = '../../../../app/src/Features/Compile/ClsiManager.js'
 const SandboxedModule = require('sandboxed-module')
 
 describe('ClsiManager', function() {

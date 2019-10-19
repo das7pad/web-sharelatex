@@ -14,12 +14,13 @@ const sinon = require('sinon')
 const chai = require('chai')
 const should = chai.should()
 const { expect } = chai
-const modulePath = '../../../../app/js/Features/Documents/DocumentController.js'
+const modulePath =
+  '../../../../app/src/Features/Documents/DocumentController.js'
 const SandboxedModule = require('sandboxed-module')
 const events = require('events')
 const MockRequest = require('../helpers/MockRequest')
 const MockResponse = require('../helpers/MockResponse')
-const Errors = require('../../../../app/js/Features/Errors/Errors')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 describe('DocumentController', function() {
   beforeEach(function() {

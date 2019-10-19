@@ -17,7 +17,7 @@ const chai = require('chai')
 const should = chai.should()
 const { expect } = chai
 const modulePath =
-  '../../../../app/js/Features/Authentication/AuthenticationController.js'
+  '../../../../app/src/Features/Authentication/AuthenticationController.js'
 const SandboxedModule = require('sandboxed-module')
 const events = require('events')
 const tk = require('timekeeper')
@@ -71,7 +71,7 @@ describe('AuthenticationController', function() {
         }),
         '../V1/V1Api': (this.V1Api = { request: sinon.stub() }),
         '../../models/User': { User: this.UserModel },
-        '../../../../modules/oauth2-server/app/js/Oauth2Server': (this.Oauth2Server = {
+        '../../../../modules/oauth2-server/app/src/Oauth2Server': (this.Oauth2Server = {
           Request: sinon.stub(),
           Response: sinon.stub(),
           server: { authenticate: sinon.stub() }

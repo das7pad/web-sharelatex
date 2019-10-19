@@ -15,7 +15,7 @@ require('chai').should()
 const { expect } = require('chai')
 const modulePath = require('path').join(
   __dirname,
-  '../../../../app/js/Features/Cooldown/CooldownMiddleware'
+  '../../../../app/src/Features/Cooldown/CooldownMiddleware'
 )
 
 describe('CooldownMiddleware', function() {

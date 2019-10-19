@@ -14,7 +14,7 @@
 const sinon = require('sinon')
 const chai = require('chai')
 const should = chai.should()
-const modulePath = '../../../../app/js/Features/Uploads/FileTypeManager.js'
+const modulePath = '../../../../app/src/Features/Uploads/FileTypeManager.js'
 const SandboxedModule = require('sandboxed-module')
 const isUtf8 = require('is-utf8')
 

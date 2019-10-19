@@ -13,7 +13,7 @@
  */
 require('./helpers/MockProjectHistoryApi')
 
-const APP_PATH = '../../../app/js'
+const APP_PATH = '../../../app/src'
 
 const LockManager = require(`${APP_PATH}/infrastructure/LockManager`)
 const ProjectCreationHandler = require(`${APP_PATH}/Features/Project/ProjectCreationHandler`)

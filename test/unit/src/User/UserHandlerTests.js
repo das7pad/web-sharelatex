@@ -13,7 +13,7 @@
 const sinon = require('sinon')
 const chai = require('chai')
 const should = chai.should()
-const modulePath = '../../../../app/js/Features/User/UserHandler.js'
+const modulePath = '../../../../app/src/Features/User/UserHandler.js'
 const SandboxedModule = require('sandboxed-module')
 
 describe('UserHandler', function() {

@@ -16,8 +16,8 @@ const request = require('./helpers/request')
 const _ = require('underscore')
 
 const User = require('./helpers/User')
-const ProjectGetter = require('../../../app/js/Features/Project/ProjectGetter')
-const ExportsHandler = require('../../../app/js/Features/Exports/ExportsHandler')
+const ProjectGetter = require('../../../app/src/Features/Project/ProjectGetter')
+const ExportsHandler = require('../../../app/src/Features/Exports/ExportsHandler')
 
 const MockProjectHistoryApi = require('./helpers/MockProjectHistoryApi')
 const MockV1Api = require('./helpers/MockV1Api')
