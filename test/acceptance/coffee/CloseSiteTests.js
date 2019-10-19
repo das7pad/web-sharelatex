@@ -1,22 +1,26 @@
-Settings = require "settings-sharelatex"
-chai = require "chai"
-request = require "./helpers/request"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const Settings = require("settings-sharelatex");
+const chai = require("chai");
+const request = require("./helpers/request");
 
-describe "siteIsOpen", ->
-	describe "when siteIsOpen is default (true)", ->
-		it "should get page", (done) ->
-			request.get "/login", (error, response, body) ->
-				response.statusCode.should.equal 200
-				done()
+describe("siteIsOpen", function() {
+	describe("when siteIsOpen is default (true)", () => it("should get page", done => request.get("/login", function(error, response, body) {
+        response.statusCode.should.equal(200);
+        return done();
+    })));
 
-	describe "when siteIsOpen is false", ->
-		beforeEach ->
-			Settings.siteIsOpen = false
+	return describe("when siteIsOpen is false", function() {
+		beforeEach(() => Settings.siteIsOpen = false);
 
-		afterEach ->
-			Settings.siteIsOpen = true
+		afterEach(() => Settings.siteIsOpen = true);
 
-		it "should return maintenance page", (done) ->
-			request.get "/login", (error, response) ->
-				response.statusCode.should.equal 503
-				done()
+		return it("should return maintenance page", done => request.get("/login", function(error, response) {
+            response.statusCode.should.equal(503);
+            return done();
+        }));
+	});
+});

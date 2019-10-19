@@ -1,37 +1,58 @@
-expect = require("chai").expect
-ProjectGetter = require "../../../app/js/Features/Project/ProjectGetter.js"
-request = require "./helpers/request"
-User = require "./helpers/User"
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const {
+    expect
+} = require("chai");
+const ProjectGetter = require("../../../app/js/Features/Project/ProjectGetter.js");
+const request = require("./helpers/request");
+const User = require("./helpers/User");
 
-describe "TpdsUpdateTests", ->
-	before (done) ->
-		@owner = new User()
-		@owner.login (error) =>
-			throw error if error?
-			@owner.createProject "test-project", {template: "example"}, (error, project_id) =>
-				throw error if error?
-				@project_id = project_id
-				done()
+describe("TpdsUpdateTests", function() {
+	before(function(done) {
+		this.owner = new User();
+		return this.owner.login(error => {
+			if (error != null) { throw error; }
+			return this.owner.createProject("test-project", {template: "example"}, (error, project_id) => {
+				if (error != null) { throw error; }
+				this.project_id = project_id;
+				return done();
+			});
+		});
+	});
 
-	describe "deleting a file", ->
-		before (done) ->
-			request {
-				method: "DELETE"
-				url: "/project/#{@project_id}/contents/main.tex"
-				auth:
-					username: "sharelatex"
-					password: "password"
+	return describe("deleting a file", function() {
+		before(function(done) {
+			return request({
+				method: "DELETE",
+				url: `/project/${this.project_id}/contents/main.tex`,
+				auth: {
+					username: "sharelatex",
+					password: "password",
 					sendImmediately: true
-			}, (error, response, body) ->
-				throw error if error?
-				expect(response.statusCode).to.equal 200
-				done()
+				}
+			}, function(error, response, body) {
+				if (error != null) { throw error; }
+				expect(response.statusCode).to.equal(200);
+				return done();
+			});
+		});
 
-		it "should have deleted the file", (done) ->
-			ProjectGetter.getProject @project_id, (error, project) ->
-				throw error if error?
-				projectFolder = project.rootFolder[0]
-				for doc in projectFolder.docs
-					if doc.name == "main.tex"
-						throw new Error("expected main.tex to have been deleted")
-				done()
+		return it("should have deleted the file", function(done) {
+			return ProjectGetter.getProject(this.project_id, function(error, project) {
+				if (error != null) { throw error; }
+				const projectFolder = project.rootFolder[0];
+				for (let doc of Array.from(projectFolder.docs)) {
+					if (doc.name === "main.tex") {
+						throw new Error("expected main.tex to have been deleted");
+					}
+				}
+				return done();
+			});
+		});
+	});
+});

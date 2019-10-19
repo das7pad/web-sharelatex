@@ -1,41 +1,56 @@
-should = require('chai').should()
-async = require("async")
-User = require "./helpers/User"
-MockV1Api = require './helpers/MockV1Api'
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const should = require('chai').should();
+const async = require("async");
+const User = require("./helpers/User");
+const MockV1Api = require('./helpers/MockV1Api');
 
-describe 'SettingsPage', ->
+describe('SettingsPage', function() {
 
-	before (done) ->
-		@user = new User()
-		@v1Id = 1234
-		@v1User =
-			id: @v1Id
-			email: @user.email
-			password: @user.password
-			profile:
-				id: @v1Id
-				email: @user.email
-		async.series [
-			@user.ensureUserExists.bind(@user)
-			@user.login.bind(@user)
-			(cb) => @user.mongoUpdate {$set: {'overleaf.id': @v1Id}}, cb
-			(cb) =>
-				MockV1Api.setUser @v1Id, @v1User
-				cb()
-			@user.activateSudoMode.bind(@user)
-		], done
+	before(function(done) {
+		this.user = new User();
+		this.v1Id = 1234;
+		this.v1User = {
+			id: this.v1Id,
+			email: this.user.email,
+			password: this.user.password,
+			profile: {
+				id: this.v1Id,
+				email: this.user.email
+			}
+		};
+		return async.series([
+			this.user.ensureUserExists.bind(this.user),
+			this.user.login.bind(this.user),
+			cb => this.user.mongoUpdate({$set: {'overleaf.id': this.v1Id}}, cb),
+			cb => {
+				MockV1Api.setUser(this.v1Id, this.v1User);
+				return cb();
+			},
+			this.user.activateSudoMode.bind(this.user)
+		], done);
+	});
 
-	it 'load settings page', (done) ->
-		@user.getUserSettingsPage (err, statusCode) ->
-			statusCode.should.equal 200
-			done()
+	it('load settings page', function(done) {
+		return this.user.getUserSettingsPage(function(err, statusCode) {
+			statusCode.should.equal(200);
+			return done();
+		});
+	});
 
-	it 'update main email address', (done) ->
-		newEmail = 'foo@bar.com'
-		@user.updateSettings email: newEmail, (error) =>
-			should.not.exist error
-			@user.get (error, user) ->
-				user.email.should.equal newEmail
-				user.emails.length.should.equal 1
-				user.emails[0].email.should.equal newEmail
-				done()
+	return it('update main email address', function(done) {
+		const newEmail = 'foo@bar.com';
+		return this.user.updateSettings({email: newEmail}, error => {
+			should.not.exist(error);
+			return this.user.get(function(error, user) {
+				user.email.should.equal(newEmail);
+				user.emails.length.should.equal(1);
+				user.emails[0].email.should.equal(newEmail);
+				return done();
+			});
+		});
+	});
+});

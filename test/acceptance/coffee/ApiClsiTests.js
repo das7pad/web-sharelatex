@@ -1,88 +1,108 @@
-expect = require("chai").expect
-request = require './helpers/request'
-Settings = require "settings-sharelatex"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const {
+    expect
+} = require("chai");
+const request = require('./helpers/request');
+const Settings = require("settings-sharelatex");
 
-auth = new Buffer('sharelatex:password').toString("base64")
-authed_request = request.defaults
-	headers:
-		Authorization: "Basic #{auth}"
+const auth = new Buffer('sharelatex:password').toString("base64");
+const authed_request = request.defaults({
+	headers: {
+		Authorization: `Basic ${auth}`
+	}
+});
 
 
-describe 'ApiClsiTests', ->
-	describe 'compile', ->
-		before (done) ->
-			@compileSpec =
-				compile:
-					options:
-						compiler: 'pdflatex'
+describe('ApiClsiTests', function() {
+	describe('compile', function() {
+		before(function(done) {
+			this.compileSpec = {
+				compile: {
+					options: {
+						compiler: 'pdflatex',
 						timeout: 60
-					rootResourcePath: 'main.tex'
-					resources: [
-						path: 'main/tex'
+					},
+					rootResourcePath: 'main.tex',
+					resources: [{
+						path: 'main/tex',
 						content: "\\documentclass{article}\n\\begin{document}\nHello World\n\\end{document}"
-					,
-						path: 'image.png'
-						url: 'www.example.com/image.png'
+					}
+					, {
+						path: 'image.png',
+						url: 'www.example.com/image.png',
 						modified: 123456789
+					}
 					]
-			done()
+				}
+			};
+			return done();
+		});
 
-		describe 'valid request', ->
-			it 'returns success and a list of output files', (done) ->
-				authed_request.post {
-					uri: '/api/clsi/compile/abcd'
-					json: @compileSpec
-					}, (error, response, body) ->
-						throw error if error?
-						expect(response.statusCode).to.equal 200
-						expect(response.body).to.deep.equal {
-							status: 'success'
-							outputFiles: [
-								path: 'project.pdf'
-								url: '/project/abcd/build/1234/output/project.pdf'
-								type: 'pdf'
-								build: 1234
-							,
-								path: 'project.log'
-								url: '/project/abcd/build/1234/output/project.log'
-								type: 'log'
-								build: 1234
-							]
-						}
-						done()
+		describe('valid request', () => it('returns success and a list of output files', function(done) {
+            return authed_request.post({
+                uri: '/api/clsi/compile/abcd',
+                json: this.compileSpec
+                }, function(error, response, body) {
+                    if (error != null) { throw error; }
+                    expect(response.statusCode).to.equal(200);
+                    expect(response.body).to.deep.equal({
+                        status: 'success',
+                        outputFiles: [{
+                            path: 'project.pdf',
+                            url: '/project/abcd/build/1234/output/project.pdf',
+                            type: 'pdf',
+                            build: 1234
+                        }
+                        , {
+                            path: 'project.log',
+                            url: '/project/abcd/build/1234/output/project.log',
+                            type: 'log',
+                            build: 1234
+                        }
+                        ]
+                    });
+                    return done();
+            });
+        }));
 
-		describe 'unauthorized', ->
-			it 'returns 401', (done) ->
-				request.post {
-					uri: '/api/clsi/compile/abcd'
-					json: @compileSpec
-					}, (error, response, body) ->
-						throw error if error?
-						expect(response.statusCode).to.equal 401
-						expect(response.body).to.equal 'Unauthorized'
-						done()
+		return describe('unauthorized', () => it('returns 401', function(done) {
+            return request.post({
+                uri: '/api/clsi/compile/abcd',
+                json: this.compileSpec
+                }, function(error, response, body) {
+                    if (error != null) { throw error; }
+                    expect(response.statusCode).to.equal(401);
+                    expect(response.body).to.equal('Unauthorized');
+                    return done();
+            });
+        }));
+	});
 
-	describe 'get output', ->
-		describe 'valid file', ->
-			it 'returns the file', (done) ->
-				authed_request.get '/api/clsi/compile/abcd/build/1234/output/project.pdf', (error, response, body) ->
-					throw error if error?
-					expect(response.statusCode).to.equal 200
-					expect(response.body).to.equal 'mock-pdf'
-					done()
+	return describe('get output', function() {
+		describe('valid file', () => it('returns the file', done => authed_request.get('/api/clsi/compile/abcd/build/1234/output/project.pdf', function(error, response, body) {
+            if (error != null) { throw error; }
+            expect(response.statusCode).to.equal(200);
+            expect(response.body).to.equal('mock-pdf');
+            return done();
+        })));
 
-		describe 'invalid file', ->
-			it 'returns 404', (done) ->
-				authed_request.get '/api/clsi/compile/abcd/build/1234/output/project.aux', (error, response, body) ->
-					throw error if error?
-					expect(response.statusCode).to.equal 404
-					expect(response.body).to.not.equal 'mock-pdf'
-					done()
+		describe('invalid file', () => it('returns 404', done => authed_request.get('/api/clsi/compile/abcd/build/1234/output/project.aux', function(error, response, body) {
+            if (error != null) { throw error; }
+            expect(response.statusCode).to.equal(404);
+            expect(response.body).to.not.equal('mock-pdf');
+            return done();
+        })));
 
-		describe 'unauthorized', ->
-			it 'returns 401', (done) ->
-				request.get '/api/clsi/compile/abcd/build/1234/output/project.pdf', (error, response, body) ->
-					throw error if error?
-					expect(response.statusCode).to.equal 401
-					expect(response.body).to.not.equal 'mock-pdf'
-					done()
+		return describe('unauthorized', () => it('returns 401', done => request.get('/api/clsi/compile/abcd/build/1234/output/project.pdf', function(error, response, body) {
+            if (error != null) { throw error; }
+            expect(response.statusCode).to.equal(401);
+            expect(response.body).to.not.equal('mock-pdf');
+            return done();
+        })));
+	});
+});
