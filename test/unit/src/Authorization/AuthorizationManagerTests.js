@@ -18,7 +18,7 @@ const { expect } = chai
 const modulePath =
   '../../../../app/src/Features/Authorization/AuthorizationManager.js'
 const SandboxedModule = require('sandboxed-module')
-const Errors = require('../../../../app/src/Features/Errors/Errors.js')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 describe('AuthorizationManager', function() {
   beforeEach(function() {

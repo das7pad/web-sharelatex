@@ -17,7 +17,7 @@ const _ = require('underscore')
 const fs = require('fs')
 const Path = require('path')
 
-const ProjectGetter = require('../../../app/src/Features/Project/ProjectGetter.js')
+const ProjectGetter = require('../../../app/src/Features/Project/ProjectGetter')
 
 const User = require('./helpers/User')
 const MockProjectHistoryApi = require('./helpers/MockProjectHistoryApi')

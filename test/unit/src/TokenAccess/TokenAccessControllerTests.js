@@ -23,7 +23,7 @@ const { expect } = require('chai')
 const { ObjectId } = require('mongojs')
 const MockRequest = require('../helpers/MockRequest')
 const MockResponse = require('../helpers/MockResponse')
-const Errors = require('../../../../app/src/Features/Errors/Errors.js')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 describe('TokenAccessController', function() {
   beforeEach(function() {

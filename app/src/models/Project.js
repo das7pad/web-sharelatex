@@ -14,7 +14,7 @@
 const mongoose = require('mongoose')
 const Settings = require('settings-sharelatex')
 const _ = require('underscore')
-const { FolderSchema } = require('./Folder.js')
+const { FolderSchema } = require('./Folder')
 const logger = require('logger-sharelatex')
 const concreteObjectId = require('mongoose').Types.ObjectId
 const Errors = require('../Features/Errors/Errors')

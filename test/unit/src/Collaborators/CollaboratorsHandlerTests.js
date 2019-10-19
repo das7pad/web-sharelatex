@@ -23,7 +23,7 @@ const modulePath = path.join(
   '../../../../app/src/Features/Collaborators/CollaboratorsHandler'
 )
 const { expect } = require('chai')
-const Errors = require('../../../../app/src/Features/Errors/Errors.js')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 const { ObjectId } = require('mongojs')
 
 describe('CollaboratorsHandler', function() {
