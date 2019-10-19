@@ -23,6 +23,8 @@ const MockProjectHistoryApi = require('./helpers/MockProjectHistoryApi')
 const MockV1Api = require('./helpers/MockV1Api')
 
 describe('Exports', function() {
+  this.timeout(5000)
+
   before(function(done) {
     this.brand_variation_id = '18'
     this.owner = new User()
