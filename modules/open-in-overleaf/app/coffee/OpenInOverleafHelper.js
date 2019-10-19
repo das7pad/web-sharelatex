@@ -1,208 +1,252 @@
-logger = require('logger-sharelatex')
-settings = require('settings-sharelatex')
-mmm = require('mmmagic')
-fs = require('fs')
-path = require('path')
-async = require('async')
-_ = require('underscore')
-urlValidator = require('valid-url')
-FileWriter = require("../../../../app/js/infrastructure/FileWriter")
-UrlHelper = require('../../../../app/js/Features/Helpers/UrlHelper')
-ProjectHelper = require('../../../../app/js/Features/Project/ProjectHelper')
-ProjectRootDocManager = require('../../../../app/js/Features/Project/ProjectRootDocManager')
-ProjectOptionsHandler = require('../../../../app/js/Features/Project/ProjectOptionsHandler')
-ProjectEntityUpdateHandler = require('../../../../app/js/Features/Project/ProjectEntityUpdateHandler')
-OpenInOverleafErrors = require('./OpenInOverleafErrors')
-Errors = require('../../../../app/js/Features/Errors/Errors')
-SafePath = require('../../../../app/js/Features/Project/SafePath')
-DocumentHelper = require('../../../../app/js/Features/Documents/DocumentHelper')
-V1Api = require('../../../../app/js/Features/V1/V1Api')
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS205: Consider reworking code to avoid use of IIFEs
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let OpenInOverleafHelper;
+const logger = require('logger-sharelatex');
+const settings = require('settings-sharelatex');
+const mmm = require('mmmagic');
+const fs = require('fs');
+const path = require('path');
+const async = require('async');
+const _ = require('underscore');
+const urlValidator = require('valid-url');
+const FileWriter = require("../../../../app/js/infrastructure/FileWriter");
+const UrlHelper = require('../../../../app/js/Features/Helpers/UrlHelper');
+const ProjectHelper = require('../../../../app/js/Features/Project/ProjectHelper');
+const ProjectRootDocManager = require('../../../../app/js/Features/Project/ProjectRootDocManager');
+const ProjectOptionsHandler = require('../../../../app/js/Features/Project/ProjectOptionsHandler');
+const ProjectEntityUpdateHandler = require('../../../../app/js/Features/Project/ProjectEntityUpdateHandler');
+const OpenInOverleafErrors = require('./OpenInOverleafErrors');
+const Errors = require('../../../../app/js/Features/Errors/Errors');
+const SafePath = require('../../../../app/js/Features/Project/SafePath');
+const DocumentHelper = require('../../../../app/js/Features/Documents/DocumentHelper');
+const V1Api = require('../../../../app/js/Features/V1/V1Api');
 
-module.exports = OpenInOverleafHelper =
-	TEMPLATE_DATA: require('../config/templates.json')
+module.exports = (OpenInOverleafHelper = {
+	TEMPLATE_DATA: require('../config/templates.json'),
 
-	getDocumentLinesFromSnippet: (snippet, content = null) ->
+	getDocumentLinesFromSnippet(snippet, content = null) {
 		return (
 			snippet.comment + OpenInOverleafHelper._normalizeMainSrcContent(snippet, content)
-		).trim().split('\n')
+		).trim().split('\n');
+	},
 
-	normalizeLatexContent: (content) ->
-		# TODO: handle non-UTF8 content and make best effort to convert.
-		# see: https://github.com/overleaf/write_latex/blob/master/main/lib/text_normalization.rb
-		return content
+	normalizeLatexContent(content) {
+		// TODO: handle non-UTF8 content and make best effort to convert.
+		// see: https://github.com/overleaf/write_latex/blob/master/main/lib/text_normalization.rb
+		return content;
+	},
 
-	populateSnippetFromUriArray: (uris, source_snippet, callback = (error, results)->) ->
-		# add names to uris, if present
-		names = source_snippet.snip_name || []
-		names = [names] if typeof names is 'string'
-		urisWithName = _.map uris, (uri, index) ->
-			{uri: uri, name: names[index]}
+	populateSnippetFromUriArray(uris, source_snippet, callback) {
+		// add names to uris, if present
+		if (callback == null) { callback = function(error, results){}; }
+		let names = source_snippet.snip_name || [];
+		if (typeof names === 'string') { names = [names]; }
+		const urisWithName = _.map(uris, (uri, index) => ({
+            uri,
+            name: names[index]
+        }));
 
-		async.mapLimit(
-			urisWithName
-			5
-			(uri, mapcb)->
-				async.waterfall(
-					[
-						(cb)->
-							FileWriter.writeUrlToDisk 'open_in_overleaf_snippet', UrlHelper.wrapUrlWithProxy(uri.uri), (error, fspath) ->
-								return cb(new Errors.NotFoundError) if error?
-								cb(null, {uri: uri.uri, fspath: fspath})
-						(file, cb)->
-							magic = new mmm.Magic(mmm.MAGIC_MIME_TYPE)
-							magic.detectFile file.fspath, (error, ctype) ->
-								return cb(error) if error?
-								file.ctype = ctype
-								cb(null, file)
-						(file, cb)->
-							if file.ctype.match(/^text\//)
-								fs.readFile file.fspath, encoding: 'utf8', (error, content) ->
-									return cb(error) if error?
-									file.content = content
-									cb(null, file)
-							else
-								cb(null, file)
-						(file, cb) ->
-							file.name = SafePath.clean(uri.name || path.basename(uri.uri))
-							cb(null, file)
-					]
-					mapcb
-				)
-			(error, files)->
-				return callback(error) if error?
+		return async.mapLimit(
+			urisWithName,
+			5,
+			(uri, mapcb) => async.waterfall(
+                [
+                    cb => FileWriter.writeUrlToDisk('open_in_overleaf_snippet', UrlHelper.wrapUrlWithProxy(uri.uri), function(error, fspath) {
+                        if (error != null) { return cb(new Errors.NotFoundError); }
+                        return cb(null, {uri: uri.uri, fspath});
+                    }),
+                    function(file, cb){
+                        const magic = new mmm.Magic(mmm.MAGIC_MIME_TYPE);
+                        return magic.detectFile(file.fspath, function(error, ctype) {
+                            if (error != null) { return cb(error); }
+                            file.ctype = ctype;
+                            return cb(null, file);
+                        });
+                    },
+                    function(file, cb){
+                        if (file.ctype.match(/^text\//)) {
+                            return fs.readFile(file.fspath, {encoding: 'utf8'}, function(error, content) {
+                                if (error != null) { return cb(error); }
+                                file.content = content;
+                                return cb(null, file);
+                            });
+                        } else {
+                            return cb(null, file);
+                        }
+                    },
+                    function(file, cb) {
+                        file.name = SafePath.clean(uri.name || path.basename(uri.uri));
+                        return cb(null, file);
+                    }
+                ],
+                mapcb
+            ),
+			function(error, files){
+				if (error != null) { return callback(error); }
 
-				# sort files based on the order supplied so that the user can control project name if more than one .tex document has a documentclass
-				groups = _.groupBy(files, (file)-> file.uri)
-				files = _.map(uris, (uri)-> groups[uri].shift())
+				// sort files based on the order supplied so that the user can control project name if more than one .tex document has a documentclass
+				const groups = _.groupBy(files, file => file.uri);
+				files = _.map(uris, uri => groups[uri].shift());
 
-				OpenInOverleafHelper._ensureFilesHaveUniqueNames files, (err) ->
-					return callback(err) if err?
+				return OpenInOverleafHelper._ensureFilesHaveUniqueNames(files, function(err) {
+					if (err != null) { return callback(err); }
 
-					snippet = OpenInOverleafHelper._cloneSnippet(source_snippet)
-					snippet.files = files
-					OpenInOverleafHelper._setSnippetRootDocAndTitleFromFileArray(snippet)
-					callback(null, snippet)
-		)
+					const snippet = OpenInOverleafHelper._cloneSnippet(source_snippet);
+					snippet.files = files;
+					OpenInOverleafHelper._setSnippetRootDocAndTitleFromFileArray(snippet);
+					return callback(null, snippet);
+			});
+		});
+	},
 
-	populateSnippetFromUri: (uri, source_snippet, cb = (error, result)->) ->
-		return cb(new OpenInOverleafErrors.InvalidUriError) unless urlValidator.isWebUri(uri)
-		uri = UrlHelper.wrapUrlWithProxy(uri)
+	populateSnippetFromUri(uri, source_snippet, cb) {
+		if (cb == null) { cb = function(error, result){}; }
+		if (!urlValidator.isWebUri(uri)) { return cb(new OpenInOverleafErrors.InvalidUriError); }
+		uri = UrlHelper.wrapUrlWithProxy(uri);
 
-		# TODO: Implement a file size limit here to prevent shenanigans
-		FileWriter.writeUrlToDisk 'open_in_overleaf_snippet', uri, (error, fspath) ->
-			return cb(new Errors.NotFoundError) if error? || !fspath?
+		// TODO: Implement a file size limit here to prevent shenanigans
+		return FileWriter.writeUrlToDisk('open_in_overleaf_snippet', uri, function(error, fspath) {
+			if ((error != null) || (fspath == null)) { return cb(new Errors.NotFoundError); }
 
-			magic = new mmm.Magic(mmm.MAGIC_MIME_TYPE)
-			magic.detectFile fspath, (error, ctype) ->
-				return cb(error) if error?
+			const magic = new mmm.Magic(mmm.MAGIC_MIME_TYPE);
+			return magic.detectFile(fspath, function(error, ctype) {
+				if (error != null) { return cb(error); }
 
-				snippet = OpenInOverleafHelper._cloneSnippet(source_snippet)
+				const snippet = OpenInOverleafHelper._cloneSnippet(source_snippet);
 
-				if ctype == 'application/zip'
-					snippet.projectFile = fspath
-					cb(null, snippet)
-				else if ctype.match(/^text\//)
-					# TODO: handle non-UTF8 properly
-					fs.readFile fspath, encoding: 'utf8', (error, data) ->
-						return cb(error) if error?
-						snippet.snip = data
-						cb(null, snippet)
-				else
-					logger.log uri:uri, ctype:ctype, "refusing to open unrecognised content type"
-					cb(new OpenInOverleafErrors.InvalidFileTypeError)
+				if (ctype === 'application/zip') {
+					snippet.projectFile = fspath;
+					return cb(null, snippet);
+				} else if (ctype.match(/^text\//)) {
+					// TODO: handle non-UTF8 properly
+					return fs.readFile(fspath, {encoding: 'utf8'}, function(error, data) {
+						if (error != null) { return cb(error); }
+						snippet.snip = data;
+						return cb(null, snippet);
+					});
+				} else {
+					logger.log({uri, ctype}, "refusing to open unrecognised content type");
+					return cb(new OpenInOverleafErrors.InvalidFileTypeError);
+				}
+			});
+		});
+	},
 
-	populateSnippetFromTemplate: (template, source_snippet, cb = (error, result)->) ->
-		templateData = OpenInOverleafHelper.TEMPLATE_DATA[template]
-		return cb(new OpenInOverleafErrors.TemplateNotFoundError) unless templateData?
+	populateSnippetFromTemplate(template, source_snippet, cb) {
+		if (cb == null) { cb = function(error, result){}; }
+		const templateData = OpenInOverleafHelper.TEMPLATE_DATA[template];
+		if (templateData == null) { return cb(new OpenInOverleafErrors.TemplateNotFoundError); }
 
-		snippet = OpenInOverleafHelper._cloneSnippet(source_snippet)
+		const snippet = OpenInOverleafHelper._cloneSnippet(source_snippet);
 
-		snippet.brandVariationId = templateData.brand_variation_id if templateData.brand_variation_id?
-		OpenInOverleafHelper.populateSnippetFromUri("#{settings.openInOverleaf?.templateUriPrefix}#{template}.zip", snippet, cb)
+		if (templateData.brand_variation_id != null) { snippet.brandVariationId = templateData.brand_variation_id; }
+		return OpenInOverleafHelper.populateSnippetFromUri(`${(settings.openInOverleaf != null ? settings.openInOverleaf.templateUriPrefix : undefined)}${template}.zip`, snippet, cb);
+	},
 
-	populateSnippetFromConversionJob: (partner, clientMediaId, source_snippet, cb = (error, result)->) ->
-		V1Api.request { uri: "/api/v2/partners/#{encodeURIComponent(partner)}/conversions/#{encodeURIComponent(clientMediaId)}" }, (err, response, body) ->
-			return cb(new OpenInOverleafErrors.ConversionNotFoundError) if err?.statusCode == 404 || response?.statusCode == 404 || !body?.input_file_uri?
-			return cb(err) if err?
+	populateSnippetFromConversionJob(partner, clientMediaId, source_snippet, cb) {
+		if (cb == null) { cb = function(error, result){}; }
+		return V1Api.request({ uri: `/api/v2/partners/${encodeURIComponent(partner)}/conversions/${encodeURIComponent(clientMediaId)}` }, function(err, response, body) {
+			if (((err != null ? err.statusCode : undefined) === 404) || ((response != null ? response.statusCode : undefined) === 404) || ((body != null ? body.input_file_uri : undefined) == null)) { return cb(new OpenInOverleafErrors.ConversionNotFoundError); }
+			if (err != null) { return cb(err); }
 
-			snippet = OpenInOverleafHelper._cloneSnippet(source_snippet)
-			snippet.brandVariationId = body.brand_variation_id if body.brand_variation_id?
-			OpenInOverleafHelper.populateSnippetFromUri body.input_file_uri, snippet, cb
+			const snippet = OpenInOverleafHelper._cloneSnippet(source_snippet);
+			if (body.brand_variation_id != null) { snippet.brandVariationId = body.brand_variation_id; }
+			return OpenInOverleafHelper.populateSnippetFromUri(body.input_file_uri, snippet, cb);
+		});
+	},
 
-	populateProjectFromFileList: (project, snippet, callback = (error)->) ->
-		async.eachLimit(
-			snippet.files
-			5
-			(file, cb) ->
-				if file.content?
-					ProjectEntityUpdateHandler.addDoc(
-						project._id
-						project.rootFolder[0]._id
-						file.name
-						OpenInOverleafHelper.getDocumentLinesFromSnippet(snippet, file.content)
-						project.owner_ref
+	populateProjectFromFileList(project, snippet, callback) {
+		if (callback == null) { callback = function(error){}; }
+		return async.eachLimit(
+			snippet.files,
+			5,
+			function(file, cb) {
+				if (file.content != null) {
+					return ProjectEntityUpdateHandler.addDoc(
+						project._id,
+						project.rootFolder[0]._id,
+						file.name,
+						OpenInOverleafHelper.getDocumentLinesFromSnippet(snippet, file.content),
+						project.owner_ref,
 						cb
-					)
-				else
-					ProjectEntityUpdateHandler.addFile(
-						project._id
-						project.rootFolder[0]._id
-						file.name
-						file.fspath
-						null
-						project.owner_ref
+					);
+				} else {
+					return ProjectEntityUpdateHandler.addFile(
+						project._id,
+						project.rootFolder[0]._id,
+						file.name,
+						file.fspath,
+						null,
+						project.owner_ref,
 						cb
-					)
-			(error) ->
-				return callback(error) if error?
-				if snippet.rootDoc?
-					ProjectRootDocManager.setRootDocFromName project._id, snippet.rootDoc, callback
-				else
-					callback()
-		)
+					);
+				}
+			},
+			function(error) {
+				if (error != null) { return callback(error); }
+				if (snippet.rootDoc != null) {
+					return ProjectRootDocManager.setRootDocFromName(project._id, snippet.rootDoc, callback);
+				} else {
+					return callback();
+				}
+		});
+	},
 
-	setCompilerForProject: (project, engine, callback = (error)->) ->
-		compiler = ProjectHelper.compilerFromV1Engine(engine)
+	setCompilerForProject(project, engine, callback) {
+		if (callback == null) { callback = function(error){}; }
+		const compiler = ProjectHelper.compilerFromV1Engine(engine);
 
-		if compiler?
-			ProjectOptionsHandler.setCompiler project._id, compiler, callback
-		else
-			callback()
+		if (compiler != null) {
+			return ProjectOptionsHandler.setCompiler(project._id, compiler, callback);
+		} else {
+			return callback();
+		}
+	},
 
-	setProjectBrandVariationFromSlug: (project, publisherSlug, callback = (error)->) ->
-		async.waterfall(
+	setProjectBrandVariationFromSlug(project, publisherSlug, callback) {
+		if (callback == null) { callback = function(error){}; }
+		return async.waterfall(
 			[
-				(cb) ->
-					V1Api.request { uri: "/api/v2/brands/#{encodeURIComponent(publisherSlug)}" }, (err, response, body) ->
-						return cb(new OpenInOverleafErrors.PublisherNotFoundError) if err?.statusCode == 404 || response?.statusCode == 404 || !body?.default_variation_id?
-						return cb(err) if err?
+				cb => V1Api.request({ uri: `/api/v2/brands/${encodeURIComponent(publisherSlug)}` }, function(err, response, body) {
+                    if (((err != null ? err.statusCode : undefined) === 404) || ((response != null ? response.statusCode : undefined) === 404) || ((body != null ? body.default_variation_id : undefined) == null)) { return cb(new OpenInOverleafErrors.PublisherNotFoundError); }
+                    if (err != null) { return cb(err); }
 
-						cb(null, body.default_variation_id)
-				(brandVariationId, cb) ->
-					ProjectOptionsHandler.setBrandVariationId project._id, brandVariationId, (err) ->
-						cb(err)
-			]
+                    return cb(null, body.default_variation_id);
+                }),
+				(brandVariationId, cb) => ProjectOptionsHandler.setBrandVariationId(project._id, brandVariationId, err => cb(err))
+			],
 			callback
-		)
+		);
+	},
 
-	setProjectBrandVariationFromId: (project, brandVariationId, callback = (error)->) ->
-		async.waterfall(
+	setProjectBrandVariationFromId(project, brandVariationId, callback) {
+		if (callback == null) { callback = function(error){}; }
+		return async.waterfall(
 			[
-				(cb) ->
-					# ensure the brand variation exists, or we'll create an un-openable project
-					V1Api.request { uri: "/api/v2/brand_variations/#{encodeURIComponent(brandVariationId)}" }, (err, response, body) ->
-						return cb(new OpenInOverleafErrors.PublisherNotFoundError) if err?.statusCode == 404 || response?.statusCode == 404
-						cb(err)
-				(cb) ->
-					ProjectOptionsHandler.setBrandVariationId project._id, brandVariationId, (err) ->
-						cb(err)
-			]
+				cb => // ensure the brand variation exists, or we'll create an un-openable project
+                V1Api.request(
+                    { uri: `/api/v2/brand_variations/${encodeURIComponent(brandVariationId)}` },
+                    function(err, response, body) {
+						if (((err != null ? err.statusCode : undefined) === 404) || ((response != null ? response.statusCode : undefined) === 404)) { return cb(new OpenInOverleafErrors.PublisherNotFoundError); }
+						return cb(err);
+					}
+                ),
+				cb => ProjectOptionsHandler.setBrandVariationId(project._id, brandVariationId, err => cb(err))
+			],
 			callback
-		)
+		);
+	},
 
-	snippetFileComment: (key = 'default') ->
+	snippetFileComment(key) {
+		if (key == null) { key = 'default'; }
 		return {
-			default: '''
+			default: `\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Welcome to Overleaf --- just edit your LaTeX on the left,
@@ -210,9 +254,9 @@ module.exports = OpenInOverleafHelper =
 % 'Share' menu, you can invite other users to edit at the same
 % time. See www.overleaf.com/learn for more info. Enjoy!
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-'''
-			texample: '''
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
+`,
+			texample: `\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 % Welcome to Overleaf --- just edit your LaTeX on the left,
@@ -223,52 +267,75 @@ module.exports = OpenInOverleafHelper =
 % Note: you can export the pdf to see the result at full
 % resolution.
 %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-'''
-		}[key] + "\n"
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%\
+`
+		}[key] + "\n";
+	},
 
-	_normalizeMainSrcContent: (snippet, content = null) ->
-		r = OpenInOverleafHelper._wrapSnippetIfNoDocumentClass(OpenInOverleafHelper.normalizeLatexContent(content || snippet.snip), snippet.defaultTitle)
-		return r
+	_normalizeMainSrcContent(snippet, content = null) {
+		const r = OpenInOverleafHelper._wrapSnippetIfNoDocumentClass(OpenInOverleafHelper.normalizeLatexContent(content || snippet.snip), snippet.defaultTitle);
+		return r;
+	},
 
-	_wrapSnippetIfNoDocumentClass: (content, title) ->
-		unless content.match /\\documentclass/
-			content = """
+	_wrapSnippetIfNoDocumentClass(content, title) {
+		if (!content.match(/\\documentclass/)) {
+			content = `\
 \\documentclass[12pt]{article}
 \\usepackage[english]{babel}
 \\usepackage[utf8x]{inputenc}
 \\usepackage{amsmath}
 \\usepackage{tikz}
 \\begin{document}
-\\title{#{title}}
-#{content}
-\\end{document}
-"""
-		return content
+\\title{${title}}
+${content}
+\\end{document}\
+`;
+		}
+		return content;
+	},
 
-	_cloneSnippet: (snippet) ->
-		return JSON.parse(JSON.stringify(snippet))
+	_cloneSnippet(snippet) {
+		return JSON.parse(JSON.stringify(snippet));
+	},
 
-	_ensureFilesHaveUniqueNames: (files, callback) ->
-		# ensure all files have unique names:
-		# keep track of unique filenames for each file extension, so when generating a unique filename we can put the
-		# suffix before the extension if one is necessary. e.g. "main (2).tex" instead of "main.tex (2)"
-		filenamesByExtension = {}
-		for file in files
-			ext = path.extname(file.name)
-			filenamesByExtension[ext] = [] unless filenamesByExtension[ext]?
-			base = file.name.substring(0, file.name.length - ext.length)
-			ProjectHelper.ensureNameIsUnique filenamesByExtension[ext], base, [], 100, (error, name) ->
-				return callback(error) if error?
-				file.name = "#{name}#{ext}"
-				filenamesByExtension[ext].push(name)
-		callback()
+	_ensureFilesHaveUniqueNames(files, callback) {
+		// ensure all files have unique names:
+		// keep track of unique filenames for each file extension, so when generating a unique filename we can put the
+		// suffix before the extension if one is necessary. e.g. "main (2).tex" instead of "main.tex (2)"
+		const filenamesByExtension = {};
+		for (var file of Array.from(files)) {
+			var ext = path.extname(file.name);
+			if (filenamesByExtension[ext] == null) { filenamesByExtension[ext] = []; }
+			const base = file.name.substring(0, file.name.length - ext.length);
+			ProjectHelper.ensureNameIsUnique(filenamesByExtension[ext], base, [], 100, function(error, name) {
+				if (error != null) { return callback(error); }
+				file.name = `${name}${ext}`;
+				return filenamesByExtension[ext].push(name);
+			});
+		}
+		return callback();
+	},
 
-	_setSnippetRootDocAndTitleFromFileArray: (snippet) ->
-		for file in snippet.files
-			if file.content?
-				snippet.rootDoc = file.name if !snippet.rootDoc? && DocumentHelper.contentHasDocumentclass(file.content)
-				title = DocumentHelper.getTitleFromTexContent(file.content)
-				if title?
-					snippet.title = title
-					break if file.name == snippet.rootDoc
+	_setSnippetRootDocAndTitleFromFileArray(snippet) {
+		return (() => {
+			const result = [];
+			for (let file of Array.from(snippet.files)) {
+				if (file.content != null) {
+					if ((snippet.rootDoc == null) && DocumentHelper.contentHasDocumentclass(file.content)) { snippet.rootDoc = file.name; }
+					const title = DocumentHelper.getTitleFromTexContent(file.content);
+					if (title != null) {
+						snippet.title = title;
+						if (file.name === snippet.rootDoc) { break; } else {
+							result.push(undefined);
+						}
+					} else {
+						result.push(undefined);
+					}
+				} else {
+					result.push(undefined);
+				}
+			}
+			return result;
+		})();
+	}
+});

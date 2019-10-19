@@ -1,19 +1,26 @@
-OpenInOverleafController = require("./OpenInOverleafController")
-OpenInOverleafMiddleware = require("./OpenInOverleafMiddleware")
-OpenInOverleafErrorController = require("./OpenInOverleafErrorController")
-RateLimiterMiddleware = require("../../../../app/js/Features/Security/RateLimiterMiddleware")
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const OpenInOverleafController = require("./OpenInOverleafController");
+const OpenInOverleafMiddleware = require("./OpenInOverleafMiddleware");
+const OpenInOverleafErrorController = require("./OpenInOverleafErrorController");
+const RateLimiterMiddleware = require("../../../../app/js/Features/Security/RateLimiterMiddleware");
 
-module.exports =
-	apply: (webRouter) ->
-		webRouter.csrf.disableDefaultCsrfProtection('/docs', 'POST')
-		webRouter.get  '/docs', OpenInOverleafMiddleware.middleware, OpenInOverleafController.openInOverleaf, OpenInOverleafErrorController.handleError
-		webRouter.post '/docs', OpenInOverleafMiddleware.middleware,
+module.exports = {
+	apply(webRouter) {
+		webRouter.csrf.disableDefaultCsrfProtection('/docs', 'POST');
+		webRouter.get('/docs', OpenInOverleafMiddleware.middleware, OpenInOverleafController.openInOverleaf, OpenInOverleafErrorController.handleError);
+		webRouter.post('/docs', OpenInOverleafMiddleware.middleware,
 			RateLimiterMiddleware.rateLimit({
-				endpointName: "open-in-overleaf"
-				maxRequests: 20
+				endpointName: "open-in-overleaf",
+				maxRequests: 20,
 				timeInterval: 60
 			}),
 			OpenInOverleafController.openInOverleaf,
-			OpenInOverleafErrorController.handleError
+			OpenInOverleafErrorController.handleError);
 
-		webRouter.get '/devs', OpenInOverleafController.showDocumentation
+		return webRouter.get('/devs', OpenInOverleafController.showDocumentation);
+	}
+};
