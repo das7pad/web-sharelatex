@@ -1,847 +1,1046 @@
-async = require "async"
-expect = require("chai").expect
-mkdirp = require "mkdirp"
-ObjectId = require("mongojs").ObjectId
-Path = require "path"
-fs = require "fs"
-Settings = require "settings-sharelatex"
-_ = require "underscore"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const async = require("async");
+const {
+    expect
+} = require("chai");
+const mkdirp = require("mkdirp");
+const {
+    ObjectId
+} = require("mongojs");
+const Path = require("path");
+const fs = require("fs");
+const Settings = require("settings-sharelatex");
+const _ = require("underscore");
 
-ProjectGetter = require "../../../app/js/Features/Project/ProjectGetter"
+const ProjectGetter = require("../../../app/js/Features/Project/ProjectGetter");
 
-MockDocUpdaterApi = require './helpers/MockDocUpdaterApi'
-MockFileStoreApi = require './helpers/MockFileStoreApi'
-MockProjectHistoryApi = require './helpers/MockProjectHistoryApi'
-request = require "./helpers/request"
-User = require "./helpers/User"
+const MockDocUpdaterApi = require('./helpers/MockDocUpdaterApi');
+const MockFileStoreApi = require('./helpers/MockFileStoreApi');
+const MockProjectHistoryApi = require('./helpers/MockProjectHistoryApi');
+const request = require("./helpers/request");
+const User = require("./helpers/User");
 
-describe "ProjectStructureChanges", ->
-	@timeout(5000)
+describe("ProjectStructureChanges", function() {
+	this.timeout(5000);
 
-	example_project_id = null
-	example_doc_id = null
-	example_file_id = null
-	example_folder_id_1 = null
-	example_folder_id_2 = null
+	let example_project_id = null;
+	let example_doc_id = null;
+	let example_file_id = null;
+	let example_folder_id_1 = null;
+	let example_folder_id_2 = null;
 
-	before (done) ->
-		@owner = new User()
-		@owner.login done
+	before(function(done) {
+		this.owner = new User();
+		return this.owner.login(done);
+	});
 
-	describe "creating a project from the example template", ->
-		before (done) ->
-			MockDocUpdaterApi.clearProjectStructureUpdates()
-			@owner.createProject "example-project", {template: "example"}, (error, project_id) =>
-				throw error if error?
-				example_project_id = project_id
-				done()
+	describe("creating a project from the example template", function() {
+		before(function(done) {
+			MockDocUpdaterApi.clearProjectStructureUpdates();
+			return this.owner.createProject("example-project", {template: "example"}, (error, project_id) => {
+				if (error != null) { throw error; }
+				example_project_id = project_id;
+				return done();
+			});
+		});
 
-		it "should version creating a doc", ->
-			{docUpdates: updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id)
-			expect(updates.length).to.equal(2)
-			_.each updates, (update) =>
-				expect(update.userId).to.equal(@owner._id)
-				expect(update.docLines).to.be.a('string')
-			expect(_.where(updates, pathname: "/main.tex").length).to.equal 1
-			expect(_.where(updates, pathname: "/references.bib").length).to.equal 1
-			expect(version).to.equal(3)
+		it("should version creating a doc", function() {
+			const {docUpdates: updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id);
+			expect(updates.length).to.equal(2);
+			_.each(updates, update => {
+				expect(update.userId).to.equal(this.owner._id);
+				return expect(update.docLines).to.be.a('string');
+			});
+			expect(_.where(updates, {pathname: "/main.tex"}).length).to.equal(1);
+			expect(_.where(updates, {pathname: "/references.bib"}).length).to.equal(1);
+			return expect(version).to.equal(3);
+		});
 
-		it "should version creating a file", ->
-			{fileUpdates: updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id)
-			expect(updates.length).to.equal(1)
-			update = updates[0]
-			expect(update.userId).to.equal(@owner._id)
-			expect(update.pathname).to.equal("/universe.jpg")
+		return it("should version creating a file", function() {
+			const {fileUpdates: updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id);
+			expect(updates.length).to.equal(1);
+			const update = updates[0];
+			expect(update.userId).to.equal(this.owner._id);
+			expect(update.pathname).to.equal("/universe.jpg");
 			expect(update.url).to.be.a('string');
-			expect(version).to.equal(3)
+			return expect(version).to.equal(3);
+		});
+	});
 
-	describe "duplicating a project", ->
-		before (done) ->
-			MockDocUpdaterApi.clearProjectStructureUpdates()
-			@owner.request.post {
-				uri: "/Project/#{example_project_id}/clone",
-				json:
+	describe("duplicating a project", function() {
+		before(function(done) {
+			MockDocUpdaterApi.clearProjectStructureUpdates();
+			return this.owner.request.post({
+				uri: `/Project/${example_project_id}/clone`,
+				json: {
 					projectName: 'new.tex'
-			}, (error, res, body) =>
-				throw error if error?
-				if res.statusCode < 200 || res.statusCode >= 300
-					throw new Error("failed to add doc #{res.statusCode}")
-				@dup_project_id = body.project_id
-				done()
+				}
+			}, (error, res, body) => {
+				if (error != null) { throw error; }
+				if ((res.statusCode < 200) || (res.statusCode >= 300)) {
+					throw new Error(`failed to add doc ${res.statusCode}`);
+				}
+				this.dup_project_id = body.project_id;
+				return done();
+			});
+		});
 
-		it "should version the docs created", ->
-			{docUpdates: updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(@dup_project_id)
-			expect(updates.length).to.equal(2)
-			_.each updates, (update) =>
-				expect(update.userId).to.equal(@owner._id)
-				expect(update.docLines).to.be.a('string')
-			expect(_.where(updates, pathname: "/main.tex").length).to.equal(1)
-			expect(_.where(updates, pathname: "/references.bib").length).to.equal(1)
-			expect(version).to.equal(3)
+		it("should version the docs created", function() {
+			const {docUpdates: updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(this.dup_project_id);
+			expect(updates.length).to.equal(2);
+			_.each(updates, update => {
+				expect(update.userId).to.equal(this.owner._id);
+				return expect(update.docLines).to.be.a('string');
+			});
+			expect(_.where(updates, {pathname: "/main.tex"}).length).to.equal(1);
+			expect(_.where(updates, {pathname: "/references.bib"}).length).to.equal(1);
+			return expect(version).to.equal(3);
+		});
 
-		it "should version the files created", ->
-			{fileUpdates: updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(@dup_project_id)
-			expect(updates.length).to.equal(1)
-			update = updates[0]
-			expect(update.userId).to.equal(@owner._id)
-			expect(update.pathname).to.equal("/universe.jpg")
+		return it("should version the files created", function() {
+			const {fileUpdates: updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(this.dup_project_id);
+			expect(updates.length).to.equal(1);
+			const update = updates[0];
+			expect(update.userId).to.equal(this.owner._id);
+			expect(update.pathname).to.equal("/universe.jpg");
 			expect(update.url).to.be.a('string');
-			expect(version).to.equal(3)
+			return expect(version).to.equal(3);
+		});
+	});
 
-	describe "adding a doc", ->
-		before (done) ->
-			MockDocUpdaterApi.clearProjectStructureUpdates()
+	describe("adding a doc", function() {
+		before(function(done) {
+			MockDocUpdaterApi.clearProjectStructureUpdates();
 
-			ProjectGetter.getProject example_project_id, (error, project) =>
-				throw error if error?
-				@project_0 = project
-				@owner.request.post {
-					uri: "project/#{example_project_id}/doc",
-					json:
-						name: 'new.tex'
+			return ProjectGetter.getProject(example_project_id, (error, project) => {
+				if (error != null) { throw error; }
+				this.project_0 = project;
+				return this.owner.request.post({
+					uri: `project/${example_project_id}/doc`,
+					json: {
+						name: 'new.tex',
 						parent_folder_id: project.rootFolder[0]._id
-				}, (error, res, body) =>
-					throw error if error?
-					if res.statusCode < 200 || res.statusCode >= 300
-						throw new Error("failed to add doc #{res.statusCode}")
-					example_doc_id = body._id
-					ProjectGetter.getProject example_project_id, (error, newProject) =>
-						throw error if error?
-						@project_1 = newProject
-						done()
+					}
+				}, (error, res, body) => {
+					if (error != null) { throw error; }
+					if ((res.statusCode < 200) || (res.statusCode >= 300)) {
+						throw new Error(`failed to add doc ${res.statusCode}`);
+					}
+					example_doc_id = body._id;
+					return ProjectGetter.getProject(example_project_id, (error, newProject) => {
+						if (error != null) { throw error; }
+						this.project_1 = newProject;
+						return done();
+					});
+				});
+			});
+		});
 
-		it "should version the doc added", ->
-			{docUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id)
-			expect(updates.length).to.equal(1)
-			update = updates[0]
-			expect(update.userId).to.equal(@owner._id)
-			expect(update.pathname).to.equal("/new.tex")
+		it("should version the doc added", function() {
+			const {docUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id);
+			expect(updates.length).to.equal(1);
+			const update = updates[0];
+			expect(update.userId).to.equal(this.owner._id);
+			expect(update.pathname).to.equal("/new.tex");
 			expect(update.docLines).to.be.a('string');
-			expect(version).to.equal(@project_0.version + 1)
+			return expect(version).to.equal(this.project_0.version + 1);
+		});
 
-		it "should increment the project structure version number", ->
-			expect(@project_1.version).to.equal(@project_0.version + 1)
+		return it("should increment the project structure version number", function() {
+			return expect(this.project_1.version).to.equal(this.project_0.version + 1);
+		});
+	});
 
-	describe "uploading a project", ->
-		before (done) ->
-			MockDocUpdaterApi.clearProjectStructureUpdates()
+	describe("uploading a project", function() {
+		before(function(done) {
+			let req;
+			MockDocUpdaterApi.clearProjectStructureUpdates();
 
-			zip_file = fs.createReadStream(Path.resolve(__dirname + '/../files/test_project.zip'))
-			@test_project_name = 'wombat'
+			const zip_file = fs.createReadStream(Path.resolve(__dirname + '/../files/test_project.zip'));
+			this.test_project_name = 'wombat';
 
-			req = @owner.request.post {
+			return req = this.owner.request.post({
 				uri: "project/new/upload",
-				formData:
+				formData: {
 					qqfile: zip_file
-			}, (error, res, body) =>
-				throw error if error?
-				if res.statusCode < 200 || res.statusCode >= 300
-					throw new Error("failed to upload project #{res.statusCode}")
-				@uploaded_project_id = JSON.parse(body).project_id
-				done()
+				}
+			}, (error, res, body) => {
+				if (error != null) { throw error; }
+				if ((res.statusCode < 200) || (res.statusCode >= 300)) {
+					throw new Error(`failed to upload project ${res.statusCode}`);
+				}
+				this.uploaded_project_id = JSON.parse(body).project_id;
+				return done();
+			});
+		});
 
-		it "should version the docs created", ->
-			{docUpdates: updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(@uploaded_project_id)
-			expect(updates.length).to.equal(1)
-			update = updates[0]
-			expect(update.userId).to.equal(@owner._id)
-			expect(update.pathname).to.equal("/main.tex")
-			expect(update.docLines).to.equal("Test")
-			expect(version).to.equal(2)
+		it("should version the docs created", function() {
+			const {docUpdates: updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(this.uploaded_project_id);
+			expect(updates.length).to.equal(1);
+			const update = updates[0];
+			expect(update.userId).to.equal(this.owner._id);
+			expect(update.pathname).to.equal("/main.tex");
+			expect(update.docLines).to.equal("Test");
+			return expect(version).to.equal(2);
+		});
 
-		it "should version the files created", ->
-			{fileUpdates: updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(@uploaded_project_id)
-			expect(updates.length).to.equal(1)
-			update = updates[0]
-			expect(update.userId).to.equal(@owner._id)
-			expect(update.pathname).to.equal("/1pixel.png")
+		return it("should version the files created", function() {
+			const {fileUpdates: updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(this.uploaded_project_id);
+			expect(updates.length).to.equal(1);
+			const update = updates[0];
+			expect(update.userId).to.equal(this.owner._id);
+			expect(update.pathname).to.equal("/1pixel.png");
 			expect(update.url).to.be.a('string');
-			expect(version).to.equal(2)
+			return expect(version).to.equal(2);
+		});
+	});
 
-	describe "uploading a project with a name", ->
-		before (done) ->
-			MockDocUpdaterApi.clearProjectStructureUpdates()
+	describe("uploading a project with a name", function() {
+		before(function(done) {
+			let req;
+			MockDocUpdaterApi.clearProjectStructureUpdates();
 
-			zip_file = fs.createReadStream(Path.resolve(__dirname + '/../files/test_project_with_name.zip'))
-			@test_project_name = 'wombat'
+			const zip_file = fs.createReadStream(Path.resolve(__dirname + '/../files/test_project_with_name.zip'));
+			this.test_project_name = 'wombat';
 
-			req = @owner.request.post {
+			return req = this.owner.request.post({
 				uri: "project/new/upload",
-				formData:
+				formData: {
 					qqfile: zip_file
-			}, (error, res, body) =>
-				throw error if error?
-				if res.statusCode < 200 || res.statusCode >= 300
-					throw new Error("failed to upload project #{res.statusCode}")
-				@uploaded_project_id = JSON.parse(body).project_id
-				done()
+				}
+			}, (error, res, body) => {
+				if (error != null) { throw error; }
+				if ((res.statusCode < 200) || (res.statusCode >= 300)) {
+					throw new Error(`failed to upload project ${res.statusCode}`);
+				}
+				this.uploaded_project_id = JSON.parse(body).project_id;
+				return done();
+			});
+		});
 
-		it "should set the project name from the zip contents", (done) ->
-			ProjectGetter.getProject @uploaded_project_id, (error, project) =>
-				expect(error).not.to.exist
-				expect(project.name).to.equal @test_project_name
-				done()
+		return it("should set the project name from the zip contents", function(done) {
+			return ProjectGetter.getProject(this.uploaded_project_id, (error, project) => {
+				expect(error).not.to.exist;
+				expect(project.name).to.equal(this.test_project_name);
+				return done();
+			});
+		});
+	});
 
-	describe "uploading a project with an invalid name", ->
-		before (done) ->
-			MockDocUpdaterApi.clearProjectStructureUpdates()
+	describe("uploading a project with an invalid name", function() {
+		before(function(done) {
+			let req;
+			MockDocUpdaterApi.clearProjectStructureUpdates();
 
-			zip_file = fs.createReadStream(Path.resolve(__dirname + '/../files/test_project_with_invalid_name.zip'))
-			@test_project_match = /^bad[^\\]+name$/
+			const zip_file = fs.createReadStream(Path.resolve(__dirname + '/../files/test_project_with_invalid_name.zip'));
+			this.test_project_match = /^bad[^\\]+name$/;
 
-			req = @owner.request.post {
+			return req = this.owner.request.post({
 				uri: "project/new/upload",
-				formData:
+				formData: {
 					qqfile: zip_file
-			}, (error, res, body) =>
-				throw error if error?
-				if res.statusCode < 200 || res.statusCode >= 300
-					throw new Error("failed to upload project #{res.statusCode}")
-				@uploaded_project_id = JSON.parse(body).project_id
-				done()
+				}
+			}, (error, res, body) => {
+				if (error != null) { throw error; }
+				if ((res.statusCode < 200) || (res.statusCode >= 300)) {
+					throw new Error(`failed to upload project ${res.statusCode}`);
+				}
+				this.uploaded_project_id = JSON.parse(body).project_id;
+				return done();
+			});
+		});
 
-		it "should set the project name from the zip contents", (done) ->
-			ProjectGetter.getProject @uploaded_project_id, (error, project) =>
-				expect(error).not.to.exist
-				expect(project.name).to.match @test_project_match
-				done()
+		return it("should set the project name from the zip contents", function(done) {
+			return ProjectGetter.getProject(this.uploaded_project_id, (error, project) => {
+				expect(error).not.to.exist;
+				expect(project.name).to.match(this.test_project_match);
+				return done();
+			});
+		});
+	});
 
-	describe "uploading a project with a shared top-level folder", ->
-		before (done) ->
-			MockDocUpdaterApi.clearProjectStructureUpdates()
+	describe("uploading a project with a shared top-level folder", function() {
+		before(function(done) {
+			MockDocUpdaterApi.clearProjectStructureUpdates();
 
-			zip_file = fs.createReadStream(Path.resolve(__dirname + '/../files/test_project_with_shared_top_level_folder.zip'))
+			const zip_file = fs.createReadStream(Path.resolve(__dirname + '/../files/test_project_with_shared_top_level_folder.zip'));
 
-			@owner.request.post {
+			return this.owner.request.post({
 				uri: "project/new/upload",
-				formData:
+				formData: {
 					qqfile: zip_file
-			}, (error, res, body) =>
-				throw error if error?
-				if res.statusCode < 200 || res.statusCode >= 300
-					throw new Error("failed to upload project #{res.statusCode}")
-				@uploaded_project_id = JSON.parse(body).project_id
-				done()
+				}
+			}, (error, res, body) => {
+				if (error != null) { throw error; }
+				if ((res.statusCode < 200) || (res.statusCode >= 300)) {
+					throw new Error(`failed to upload project ${res.statusCode}`);
+				}
+				this.uploaded_project_id = JSON.parse(body).project_id;
+				return done();
+			});
+		});
 
-		it "should not create the top-level folder", (done) ->
-			ProjectGetter.getProject @uploaded_project_id, (error, project) ->
-				expect(error).not.to.exist
-				expect(project.rootFolder[0].folders.length).to.equal 0
-				expect(project.rootFolder[0].docs.length).to.equal 2
-				done()
+		return it("should not create the top-level folder", function(done) {
+			return ProjectGetter.getProject(this.uploaded_project_id, function(error, project) {
+				expect(error).not.to.exist;
+				expect(project.rootFolder[0].folders.length).to.equal(0);
+				expect(project.rootFolder[0].docs.length).to.equal(2);
+				return done();
+			});
+		});
+	});
 
-	describe "uploading a project with backslashes in the path names", ->
-		before (done) ->
-			MockDocUpdaterApi.clearProjectStructureUpdates()
+	describe("uploading a project with backslashes in the path names", function() {
+		before(function(done) {
+			MockDocUpdaterApi.clearProjectStructureUpdates();
 
-			zip_file = fs.createReadStream(Path.resolve(__dirname + '/../files/test_project_with_backslash_in_filename.zip'))
+			const zip_file = fs.createReadStream(Path.resolve(__dirname + '/../files/test_project_with_backslash_in_filename.zip'));
 
-			@owner.request.post {
+			return this.owner.request.post({
 				uri: "project/new/upload",
-				formData:
+				formData: {
 					qqfile: zip_file
-			}, (error, res, body) =>
-				throw error if error?
-				if res.statusCode < 200 || res.statusCode >= 300
-					throw new Error("failed to upload project #{res.statusCode}")
-				@uploaded_project_id = JSON.parse(body).project_id
-				done()
+				}
+			}, (error, res, body) => {
+				if (error != null) { throw error; }
+				if ((res.statusCode < 200) || (res.statusCode >= 300)) {
+					throw new Error(`failed to upload project ${res.statusCode}`);
+				}
+				this.uploaded_project_id = JSON.parse(body).project_id;
+				return done();
+			});
+		});
 
-		it "should treat the backslash as a directory separator", (done) ->
-			ProjectGetter.getProject @uploaded_project_id, (error, project) ->
-				expect(error).not.to.exist
-				expect(project.rootFolder[0].folders[0].name).to.equal('styles')
-				expect(project.rootFolder[0].folders[0].docs[0].name).to.equal('ao.sty')
-				done()
+		return it("should treat the backslash as a directory separator", function(done) {
+			return ProjectGetter.getProject(this.uploaded_project_id, function(error, project) {
+				expect(error).not.to.exist;
+				expect(project.rootFolder[0].folders[0].name).to.equal('styles');
+				expect(project.rootFolder[0].folders[0].docs[0].name).to.equal('ao.sty');
+				return done();
+			});
+		});
+	});
 
-	describe "uploading a project with files in different encodings", ->
-		before (done) ->
-			MockDocUpdaterApi.clearProjectStructureUpdates()
+	describe("uploading a project with files in different encodings", function() {
+		before(function(done) {
+			MockDocUpdaterApi.clearProjectStructureUpdates();
 
-			zip_file = fs.createReadStream(Path.resolve(__dirname + '/../files/charsets/charsets.zip'))
+			const zip_file = fs.createReadStream(Path.resolve(__dirname + '/../files/charsets/charsets.zip'));
 
-			@owner.request.post {
+			return this.owner.request.post({
 				uri: "project/new/upload",
-				formData:
+				formData: {
 					qqfile: zip_file
-			}, (error, res, body) =>
-				throw error if error?
-				if res.statusCode < 200 || res.statusCode >= 300
-					throw new Error("failed to upload project #{res.statusCode}")
-				@uploaded_project_id = JSON.parse(body).project_id
-				done()
+				}
+			}, (error, res, body) => {
+				if (error != null) { throw error; }
+				if ((res.statusCode < 200) || (res.statusCode >= 300)) {
+					throw new Error(`failed to upload project ${res.statusCode}`);
+				}
+				this.uploaded_project_id = JSON.parse(body).project_id;
+				return done();
+			});
+		});
 
-		it "should correctly parse windows-1252", ->
-			{docUpdates: updates} = MockDocUpdaterApi.getProjectStructureUpdates(@uploaded_project_id)
-			update = _.find updates, (update) ->
-				update.pathname == '/test-german-windows-1252.tex'
-			expect(update.docLines).to.contain("Der schnelle braune Fuchs sprang träge über den Hund.")
+		it("should correctly parse windows-1252", function() {
+			const {docUpdates: updates} = MockDocUpdaterApi.getProjectStructureUpdates(this.uploaded_project_id);
+			const update = _.find(updates, update => update.pathname === '/test-german-windows-1252.tex');
+			return expect(update.docLines).to.contain("Der schnelle braune Fuchs sprang träge über den Hund.");
+		});
 
-		it "should correctly parse German utf8", ->
-			{docUpdates: updates} = MockDocUpdaterApi.getProjectStructureUpdates(@uploaded_project_id)
-			update = _.find updates, (update) ->
-				update.pathname == '/test-german-utf8x.tex'
-			expect(update.docLines).to.contain("Der schnelle braune Fuchs sprang träge über den Hund.")
+		it("should correctly parse German utf8", function() {
+			const {docUpdates: updates} = MockDocUpdaterApi.getProjectStructureUpdates(this.uploaded_project_id);
+			const update = _.find(updates, update => update.pathname === '/test-german-utf8x.tex');
+			return expect(update.docLines).to.contain("Der schnelle braune Fuchs sprang träge über den Hund.");
+		});
 
-		it "should correctly parse little-endian utf16", ->
-			{docUpdates: updates} = MockDocUpdaterApi.getProjectStructureUpdates(@uploaded_project_id)
-			update = _.find updates, (update) ->
-				update.pathname == '/test-greek-utf16-le-bom.tex'
-			expect(update.docLines).to.contain("Η γρήγορη καστανή αλεπού πήδηξε χαλαρά πάνω από το σκυλί.")
+		it("should correctly parse little-endian utf16", function() {
+			const {docUpdates: updates} = MockDocUpdaterApi.getProjectStructureUpdates(this.uploaded_project_id);
+			const update = _.find(updates, update => update.pathname === '/test-greek-utf16-le-bom.tex');
+			return expect(update.docLines).to.contain("Η γρήγορη καστανή αλεπού πήδηξε χαλαρά πάνω από το σκυλί.");
+		});
 
-		it "should correctly parse Greek utf8", ->
-			{docUpdates: updates} = MockDocUpdaterApi.getProjectStructureUpdates(@uploaded_project_id)
-			update = _.find updates, (update) ->
-				update.pathname == '/test-greek-utf8x.tex'
-			expect(update.docLines).to.contain("Η γρήγορη καστανή αλεπού πήδηξε χαλαρά πάνω από το σκυλί.")
+		return it("should correctly parse Greek utf8", function() {
+			const {docUpdates: updates} = MockDocUpdaterApi.getProjectStructureUpdates(this.uploaded_project_id);
+			const update = _.find(updates, update => update.pathname === '/test-greek-utf8x.tex');
+			return expect(update.docLines).to.contain("Η γρήγορη καστανή αλεπού πήδηξε χαλαρά πάνω από το σκυλί.");
+		});
+	});
 
-	describe "uploading a file", ->
-		beforeEach (done) ->
-			MockDocUpdaterApi.clearProjectStructureUpdates()
-			ProjectGetter.getProject example_project_id, (error, project) =>
-				throw error if error?
-				@root_folder_id = project.rootFolder[0]._id.toString()
-				@project_0 = project
-				done()
+	describe("uploading a file", function() {
+		beforeEach(function(done) {
+			MockDocUpdaterApi.clearProjectStructureUpdates();
+			return ProjectGetter.getProject(example_project_id, (error, project) => {
+				if (error != null) { throw error; }
+				this.root_folder_id = project.rootFolder[0]._id.toString();
+				this.project_0 = project;
+				return done();
+			});
+		});
 
-		it "should version a newly uploaded file", (done) ->
-			image_file = fs.createReadStream(Path.resolve(__dirname + '/../files/1pixel.png'))
+		it("should version a newly uploaded file", function(done) {
+			let req;
+			const image_file = fs.createReadStream(Path.resolve(__dirname + '/../files/1pixel.png'));
 
-			req = @owner.request.post {
-				uri: "project/#{example_project_id}/upload",
-				qs:
-					folder_id: @root_folder_id
-				formData:
-					qqfile:
-						value: image_file
-						options:
+			return req = this.owner.request.post({
+				uri: `project/${example_project_id}/upload`,
+				qs: {
+					folder_id: this.root_folder_id
+				},
+				formData: {
+					qqfile: {
+						value: image_file,
+						options: {
 							filename: '1pixel.png',
 							contentType: 'image/png'
-			}, (error, res, body) =>
-				throw error if error?
-				if res.statusCode < 200 || res.statusCode >= 300
-					throw new Error("failed to upload file #{res.statusCode}")
+						}
+					}
+				}
+			}, (error, res, body) => {
+				if (error != null) { throw error; }
+				if ((res.statusCode < 200) || (res.statusCode >= 300)) {
+					throw new Error(`failed to upload file ${res.statusCode}`);
+				}
 
-				example_file_id = JSON.parse(body).entity_id
+				example_file_id = JSON.parse(body).entity_id;
 
-				{fileUpdates: updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id)
-				expect(updates.length).to.equal(1)
-				update = updates[0]
-				expect(update.userId).to.equal(@owner._id)
-				expect(update.pathname).to.equal("/1pixel.png")
+				const {fileUpdates: updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id);
+				expect(updates.length).to.equal(1);
+				const update = updates[0];
+				expect(update.userId).to.equal(this.owner._id);
+				expect(update.pathname).to.equal("/1pixel.png");
 				expect(update.url).to.be.a('string');
-				@original_file_url = update.url
-				expect(version).to.equal(@project_0.version + 1)
+				this.original_file_url = update.url;
+				expect(version).to.equal(this.project_0.version + 1);
 
-				ProjectGetter.getProject example_project_id, (error, newProject) =>
-					throw error if error?
-					@project_1 = newProject
-					# uploading a new file does change the project structure
-					expect(@project_1.version).to.equal(@project_0.version + 1)
-					done()
+				return ProjectGetter.getProject(example_project_id, (error, newProject) => {
+					if (error != null) { throw error; }
+					this.project_1 = newProject;
+					// uploading a new file does change the project structure
+					expect(this.project_1.version).to.equal(this.project_0.version + 1);
+					return done();
+				});
+			});
+		});
 
-		it "should version a replacement file", (done) ->
-			image_file = fs.createReadStream(Path.resolve(__dirname + '/../files/2pixel.png'))
+		return it("should version a replacement file", function(done) {
+			let req;
+			const image_file = fs.createReadStream(Path.resolve(__dirname + '/../files/2pixel.png'));
 
-			req = @owner.request.post {
-				uri: "project/#{example_project_id}/upload",
-				qs:
-					folder_id: @root_folder_id
-				formData:
-					qqfile:
-						value: image_file
-						options:
+			return req = this.owner.request.post({
+				uri: `project/${example_project_id}/upload`,
+				qs: {
+					folder_id: this.root_folder_id
+				},
+				formData: {
+					qqfile: {
+						value: image_file,
+						options: {
 							filename: '1pixel.png',
 							contentType: 'image/png'
-			}, (error, res, body) =>
-				throw error if error?
-				if res.statusCode < 200 || res.statusCode >= 300
-					throw new Error("failed to upload file #{res.statusCode}")
+						}
+					}
+				}
+			}, (error, res, body) => {
+				if (error != null) { throw error; }
+				if ((res.statusCode < 200) || (res.statusCode >= 300)) {
+					throw new Error(`failed to upload file ${res.statusCode}`);
+				}
 
-				example_file_id = JSON.parse(body).entity_id
+				example_file_id = JSON.parse(body).entity_id;
 
-				{fileUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id)
-				expect(updates.length).to.equal(2)
-				update = updates[0]
-				expect(update.userId).to.equal(@owner._id)
-				expect(update.pathname).to.equal("/1pixel.png")
-				#expect(update.url).to.be.a('string');
-				update = updates[1]
-				expect(update.userId).to.equal(@owner._id)
-				expect(update.pathname).to.equal("/1pixel.png")
+				const {fileUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id);
+				expect(updates.length).to.equal(2);
+				let update = updates[0];
+				expect(update.userId).to.equal(this.owner._id);
+				expect(update.pathname).to.equal("/1pixel.png");
+				//expect(update.url).to.be.a('string');
+				update = updates[1];
+				expect(update.userId).to.equal(this.owner._id);
+				expect(update.pathname).to.equal("/1pixel.png");
 				expect(update.url).to.be.a('string');
-				expect(version).to.equal(@project_0.version + 1)
+				expect(version).to.equal(this.project_0.version + 1);
 
-				ProjectGetter.getProject example_project_id, (error, newProject) =>
-					throw error if error?
-					@project_1 = newProject
-					# replacing a file should update the project structure
-					expect(@project_1.version).to.equal(@project_0.version + 1)
-					done()
+				return ProjectGetter.getProject(example_project_id, (error, newProject) => {
+					if (error != null) { throw error; }
+					this.project_1 = newProject;
+					// replacing a file should update the project structure
+					expect(this.project_1.version).to.equal(this.project_0.version + 1);
+					return done();
+				});
+			});
+		});
+	});
 
-	describe "moving entities", ->
-		before (done) ->
-			@owner.request.post {
-				uri: "project/#{example_project_id}/folder",
-				json:
+	describe("moving entities", function() {
+		before(function(done) {
+			return this.owner.request.post({
+				uri: `project/${example_project_id}/folder`,
+				json: {
 					name: 'foo'
-			}, (error, res, body) =>
-				throw error if error?
-				example_folder_id_1 = body._id
-				done()
+				}
+			}, (error, res, body) => {
+				if (error != null) { throw error; }
+				example_folder_id_1 = body._id;
+				return done();
+			});
+		});
 
-		beforeEach (done) ->
-			MockDocUpdaterApi.clearProjectStructureUpdates()
-			ProjectGetter.getProject example_project_id, (error, project) =>
-				throw error if error?
-				@root_folder_id = project.rootFolder[0]._id.toString()
-				@project_0 = project
-				done()
+		beforeEach(function(done) {
+			MockDocUpdaterApi.clearProjectStructureUpdates();
+			return ProjectGetter.getProject(example_project_id, (error, project) => {
+				if (error != null) { throw error; }
+				this.root_folder_id = project.rootFolder[0]._id.toString();
+				this.project_0 = project;
+				return done();
+			});
+		});
 
-		it "should version moving a doc", (done) ->
-			@owner.request.post {
-				uri: "project/#{example_project_id}/Doc/#{example_doc_id}/move",
-				json:
+		it("should version moving a doc", function(done) {
+			return this.owner.request.post({
+				uri: `project/${example_project_id}/Doc/${example_doc_id}/move`,
+				json: {
 					folder_id: example_folder_id_1
-			}, (error, res, body) =>
-				throw error if error?
-				if res.statusCode < 200 || res.statusCode >= 300
-					throw new Error("failed to move doc #{res.statusCode}")
+				}
+			}, (error, res, body) => {
+				if (error != null) { throw error; }
+				if ((res.statusCode < 200) || (res.statusCode >= 300)) {
+					throw new Error(`failed to move doc ${res.statusCode}`);
+				}
 
-				{docUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id)
-				expect(updates.length).to.equal(1)
-				update = updates[0]
-				expect(update.userId).to.equal(@owner._id)
-				expect(update.pathname).to.equal("/new.tex")
-				expect(update.newPathname).to.equal("/foo/new.tex")
-				expect(version).to.equal(@project_0.version + 2)
+				const {docUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id);
+				expect(updates.length).to.equal(1);
+				const update = updates[0];
+				expect(update.userId).to.equal(this.owner._id);
+				expect(update.pathname).to.equal("/new.tex");
+				expect(update.newPathname).to.equal("/foo/new.tex");
+				expect(version).to.equal(this.project_0.version + 2);
 
-				ProjectGetter.getProject example_project_id, (error, newProject) =>
-					throw error if error?
-					@project_1 = newProject
-					# replacing a file should update the project structure
-					expect(@project_1.version).to.equal(@project_0.version + 2)  # 2 because it's a delete and then add
-					done()
+				return ProjectGetter.getProject(example_project_id, (error, newProject) => {
+					if (error != null) { throw error; }
+					this.project_1 = newProject;
+					// replacing a file should update the project structure
+					expect(this.project_1.version).to.equal(this.project_0.version + 2);  // 2 because it's a delete and then add
+					return done();
+				});
+			});
+		});
 
-		it "should version moving a file", (done) ->
-			@owner.request.post {
-				uri: "project/#{example_project_id}/File/#{example_file_id}/move",
-				json:
+		it("should version moving a file", function(done) {
+			return this.owner.request.post({
+				uri: `project/${example_project_id}/File/${example_file_id}/move`,
+				json: {
 					folder_id: example_folder_id_1
-			}, (error, res, body) =>
-				throw error if error?
-				if res.statusCode < 200 || res.statusCode >= 300
-					throw new Error("failed to move file #{res.statusCode}")
+				}
+			}, (error, res, body) => {
+				if (error != null) { throw error; }
+				if ((res.statusCode < 200) || (res.statusCode >= 300)) {
+					throw new Error(`failed to move file ${res.statusCode}`);
+				}
 
-				{fileUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id)
-				expect(updates.length).to.equal(1)
-				update = updates[0]
-				expect(update.userId).to.equal(@owner._id)
-				expect(update.pathname).to.equal("/1pixel.png")
-				expect(update.newPathname).to.equal("/foo/1pixel.png")
-				expect(version).to.equal(@project_0.version + 2)
+				const {fileUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id);
+				expect(updates.length).to.equal(1);
+				const update = updates[0];
+				expect(update.userId).to.equal(this.owner._id);
+				expect(update.pathname).to.equal("/1pixel.png");
+				expect(update.newPathname).to.equal("/foo/1pixel.png");
+				expect(version).to.equal(this.project_0.version + 2);
 
-				ProjectGetter.getProject example_project_id, (error, newProject) =>
-					throw error if error?
-					@project_1 = newProject
-					# replacing a file should update the project structure
-					expect(@project_1.version).to.equal(@project_0.version + 2) # 2 because it's a delete and then add
-					done()
+				return ProjectGetter.getProject(example_project_id, (error, newProject) => {
+					if (error != null) { throw error; }
+					this.project_1 = newProject;
+					// replacing a file should update the project structure
+					expect(this.project_1.version).to.equal(this.project_0.version + 2); // 2 because it's a delete and then add
+					return done();
+				});
+			});
+		});
 
-		it "should version moving a folder", (done) ->
-			@owner.request.post {
-				uri: "project/#{example_project_id}/folder",
-				json:
+		return it("should version moving a folder", function(done) {
+			return this.owner.request.post({
+				uri: `project/${example_project_id}/folder`,
+				json: {
 					name: 'bar'
-			}, (error, res, body) =>
-				throw error if error?
-				example_folder_id_2 = body._id
+				}
+			}, (error, res, body) => {
+				if (error != null) { throw error; }
+				example_folder_id_2 = body._id;
 
-				@owner.request.post {
-					uri: "project/#{example_project_id}/Folder/#{example_folder_id_1}/move",
-					json:
+				return this.owner.request.post({
+					uri: `project/${example_project_id}/Folder/${example_folder_id_1}/move`,
+					json: {
 						folder_id: example_folder_id_2
-				}, (error, res, body) =>
-					throw error if error?
-					if res.statusCode < 200 || res.statusCode >= 300
-						throw new Error("failed to move folder #{res.statusCode}")
+					}
+				}, (error, res, body) => {
+					if (error != null) { throw error; }
+					if ((res.statusCode < 200) || (res.statusCode >= 300)) {
+						throw new Error(`failed to move folder ${res.statusCode}`);
+					}
 
-					{docUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id)
-					expect(updates.length).to.equal(1)
-					update = updates[0]
-					expect(update.userId).to.equal(@owner._id)
-					expect(update.pathname).to.equal("/foo/new.tex")
-					expect(update.newPathname).to.equal("/bar/foo/new.tex")
-					expect(version).to.equal(@project_0.version + 3)
+					let {docUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id);
+					expect(updates.length).to.equal(1);
+					let update = updates[0];
+					expect(update.userId).to.equal(this.owner._id);
+					expect(update.pathname).to.equal("/foo/new.tex");
+					expect(update.newPathname).to.equal("/bar/foo/new.tex");
+					expect(version).to.equal(this.project_0.version + 3);
 
-					{fileUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id)
-					expect(updates.length).to.equal(1)
-					update = updates[0]
-					expect(update.userId).to.equal(@owner._id)
-					expect(update.pathname).to.equal("/foo/1pixel.png")
-					expect(update.newPathname).to.equal("/bar/foo/1pixel.png")
-					expect(version).to.equal(@project_0.version + 3)
+					({fileUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id));
+					expect(updates.length).to.equal(1);
+					update = updates[0];
+					expect(update.userId).to.equal(this.owner._id);
+					expect(update.pathname).to.equal("/foo/1pixel.png");
+					expect(update.newPathname).to.equal("/bar/foo/1pixel.png");
+					expect(version).to.equal(this.project_0.version + 3);
 
-					ProjectGetter.getProject example_project_id, (error, newProject) =>
-						throw error if error?
-						@project_1 = newProject
-						# replacing a file should update the project structure
-						expect(@project_1.version).to.equal(@project_0.version + 3) # because folder and 2 files move
-						done()
+					return ProjectGetter.getProject(example_project_id, (error, newProject) => {
+						if (error != null) { throw error; }
+						this.project_1 = newProject;
+						// replacing a file should update the project structure
+						expect(this.project_1.version).to.equal(this.project_0.version + 3); // because folder and 2 files move
+						return done();
+					});
+				});
+			});
+		});
+	});
 
-	describe "renaming entities", ->
-		beforeEach (done) ->
-			MockDocUpdaterApi.clearProjectStructureUpdates()
-			ProjectGetter.getProject example_project_id, (error, project) =>
-				throw error if error?
-				@root_folder_id = project.rootFolder[0]._id.toString()
-				@project_0 = project
-				done()
+	describe("renaming entities", function() {
+		beforeEach(function(done) {
+			MockDocUpdaterApi.clearProjectStructureUpdates();
+			return ProjectGetter.getProject(example_project_id, (error, project) => {
+				if (error != null) { throw error; }
+				this.root_folder_id = project.rootFolder[0]._id.toString();
+				this.project_0 = project;
+				return done();
+			});
+		});
 
-		it "should version renaming a doc", (done) ->
-			@owner.request.post {
-				uri: "project/#{example_project_id}/Doc/#{example_doc_id}/rename",
-				json:
+		it("should version renaming a doc", function(done) {
+			return this.owner.request.post({
+				uri: `project/${example_project_id}/Doc/${example_doc_id}/rename`,
+				json: {
 					name: 'new_renamed.tex'
-			}, (error, res, body) =>
-				throw error if error?
-				if res.statusCode < 200 || res.statusCode >= 300
-					throw new Error("failed to move doc #{res.statusCode}")
+				}
+			}, (error, res, body) => {
+				if (error != null) { throw error; }
+				if ((res.statusCode < 200) || (res.statusCode >= 300)) {
+					throw new Error(`failed to move doc ${res.statusCode}`);
+				}
 
-				{docUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id)
-				expect(updates.length).to.equal(1)
-				update = updates[0]
-				expect(update.userId).to.equal(@owner._id)
-				expect(update.pathname).to.equal("/bar/foo/new.tex")
-				expect(update.newPathname).to.equal("/bar/foo/new_renamed.tex")
-				expect(version).to.equal(@project_0.version + 1)
+				const {docUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id);
+				expect(updates.length).to.equal(1);
+				const update = updates[0];
+				expect(update.userId).to.equal(this.owner._id);
+				expect(update.pathname).to.equal("/bar/foo/new.tex");
+				expect(update.newPathname).to.equal("/bar/foo/new_renamed.tex");
+				expect(version).to.equal(this.project_0.version + 1);
 
-				ProjectGetter.getProject example_project_id, (error, newProject) =>
-					throw error if error?
-					@project_1 = newProject
-					# replacing a file should update the project structure
-					expect(@project_1.version).to.equal(@project_0.version + 1)
-					done()
+				return ProjectGetter.getProject(example_project_id, (error, newProject) => {
+					if (error != null) { throw error; }
+					this.project_1 = newProject;
+					// replacing a file should update the project structure
+					expect(this.project_1.version).to.equal(this.project_0.version + 1);
+					return done();
+				});
+			});
+		});
 
-		it "should version renaming a file", (done) ->
-			@owner.request.post {
-				uri: "project/#{example_project_id}/File/#{example_file_id}/rename",
-				json:
+		it("should version renaming a file", function(done) {
+			return this.owner.request.post({
+				uri: `project/${example_project_id}/File/${example_file_id}/rename`,
+				json: {
 					name: '1pixel_renamed.png'
-			}, (error, res, body) =>
-				throw error if error?
-				if res.statusCode < 200 || res.statusCode >= 300
-					throw new Error("failed to move file #{res.statusCode}")
+				}
+			}, (error, res, body) => {
+				if (error != null) { throw error; }
+				if ((res.statusCode < 200) || (res.statusCode >= 300)) {
+					throw new Error(`failed to move file ${res.statusCode}`);
+				}
 
-				{fileUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id)
-				expect(updates.length).to.equal(1)
-				update = updates[0]
-				expect(update.userId).to.equal(@owner._id)
-				expect(update.pathname).to.equal("/bar/foo/1pixel.png")
-				expect(update.newPathname).to.equal("/bar/foo/1pixel_renamed.png")
-				expect(version).to.equal(@project_0.version + 1)
+				const {fileUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id);
+				expect(updates.length).to.equal(1);
+				const update = updates[0];
+				expect(update.userId).to.equal(this.owner._id);
+				expect(update.pathname).to.equal("/bar/foo/1pixel.png");
+				expect(update.newPathname).to.equal("/bar/foo/1pixel_renamed.png");
+				expect(version).to.equal(this.project_0.version + 1);
 
-				ProjectGetter.getProject example_project_id, (error, newProject) =>
-					throw error if error?
-					@project_1 = newProject
-					# replacing a file should update the project structure
-					expect(@project_1.version).to.equal(@project_0.version + 1)
-					done()
+				return ProjectGetter.getProject(example_project_id, (error, newProject) => {
+					if (error != null) { throw error; }
+					this.project_1 = newProject;
+					// replacing a file should update the project structure
+					expect(this.project_1.version).to.equal(this.project_0.version + 1);
+					return done();
+				});
+			});
+		});
 
-		it "should version renaming a folder", (done) ->
-			@owner.request.post {
-				uri: "project/#{example_project_id}/Folder/#{example_folder_id_1}/rename",
-				json:
+		return it("should version renaming a folder", function(done) {
+			return this.owner.request.post({
+				uri: `project/${example_project_id}/Folder/${example_folder_id_1}/rename`,
+				json: {
 					name: 'foo_renamed'
-			}, (error, res, body) =>
-				throw error if error?
-				if res.statusCode < 200 || res.statusCode >= 300
-					throw new Error("failed to move folder #{res.statusCode}")
+				}
+			}, (error, res, body) => {
+				if (error != null) { throw error; }
+				if ((res.statusCode < 200) || (res.statusCode >= 300)) {
+					throw new Error(`failed to move folder ${res.statusCode}`);
+				}
 
-				{docUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id)
-				expect(updates.length).to.equal(1)
-				update = updates[0]
-				expect(update.userId).to.equal(@owner._id)
-				expect(update.pathname).to.equal("/bar/foo/new_renamed.tex")
-				expect(update.newPathname).to.equal("/bar/foo_renamed/new_renamed.tex")
-				expect(version).to.equal(@project_0.version + 1)
+				let {docUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id);
+				expect(updates.length).to.equal(1);
+				let update = updates[0];
+				expect(update.userId).to.equal(this.owner._id);
+				expect(update.pathname).to.equal("/bar/foo/new_renamed.tex");
+				expect(update.newPathname).to.equal("/bar/foo_renamed/new_renamed.tex");
+				expect(version).to.equal(this.project_0.version + 1);
 
-				{fileUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id)
-				expect(updates.length).to.equal(1)
-				update = updates[0]
-				expect(update.userId).to.equal(@owner._id)
-				expect(update.pathname).to.equal("/bar/foo/1pixel_renamed.png")
-				expect(update.newPathname).to.equal("/bar/foo_renamed/1pixel_renamed.png")
-				expect(version).to.equal(@project_0.version + 1)
+				({fileUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id));
+				expect(updates.length).to.equal(1);
+				update = updates[0];
+				expect(update.userId).to.equal(this.owner._id);
+				expect(update.pathname).to.equal("/bar/foo/1pixel_renamed.png");
+				expect(update.newPathname).to.equal("/bar/foo_renamed/1pixel_renamed.png");
+				expect(version).to.equal(this.project_0.version + 1);
 
-				ProjectGetter.getProject example_project_id, (error, newProject) =>
-					throw error if error?
-					@project_1 = newProject
-					# replacing a file should update the project structure
-					expect(@project_1.version).to.equal(@project_0.version + 1)
-					done()
+				return ProjectGetter.getProject(example_project_id, (error, newProject) => {
+					if (error != null) { throw error; }
+					this.project_1 = newProject;
+					// replacing a file should update the project structure
+					expect(this.project_1.version).to.equal(this.project_0.version + 1);
+					return done();
+				});
+			});
+		});
+	});
 
 
-	describe "deleting entities", ->
-		beforeEach (done) ->
-			MockDocUpdaterApi.clearProjectStructureUpdates()
-			ProjectGetter.getProject example_project_id, (error, project) =>
-				throw error if error?
-				@root_folder_id = project.rootFolder[0]._id.toString()
-				@project_0 = project
-				done()
+	describe("deleting entities", function() {
+		beforeEach(function(done) {
+			MockDocUpdaterApi.clearProjectStructureUpdates();
+			return ProjectGetter.getProject(example_project_id, (error, project) => {
+				if (error != null) { throw error; }
+				this.root_folder_id = project.rootFolder[0]._id.toString();
+				this.project_0 = project;
+				return done();
+			});
+		});
 
-		it "should version deleting a folder", (done) ->
-			@owner.request.delete {
-				uri: "project/#{example_project_id}/Folder/#{example_folder_id_2}",
-			}, (error, res, body) =>
-				throw error if error?
-				if res.statusCode < 200 || res.statusCode >= 300
-					throw new Error("failed to delete folder #{res.statusCode}")
+		return it("should version deleting a folder", function(done) {
+			return this.owner.request.delete({
+				uri: `project/${example_project_id}/Folder/${example_folder_id_2}`,
+			}, (error, res, body) => {
+				if (error != null) { throw error; }
+				if ((res.statusCode < 200) || (res.statusCode >= 300)) {
+					throw new Error(`failed to delete folder ${res.statusCode}`);
+				}
 
-				{docUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id)
-				expect(updates.length).to.equal(1)
-				update = updates[0]
-				expect(update.userId).to.equal(@owner._id)
-				expect(update.pathname).to.equal("/bar/foo_renamed/new_renamed.tex")
-				expect(update.newPathname).to.equal("")
-				expect(version).to.equal(@project_0.version + 1)
+				let {docUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id);
+				expect(updates.length).to.equal(1);
+				let update = updates[0];
+				expect(update.userId).to.equal(this.owner._id);
+				expect(update.pathname).to.equal("/bar/foo_renamed/new_renamed.tex");
+				expect(update.newPathname).to.equal("");
+				expect(version).to.equal(this.project_0.version + 1);
 
-				{fileUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id)
-				expect(updates.length).to.equal(1)
-				update = updates[0]
-				expect(update.userId).to.equal(@owner._id)
-				expect(update.pathname).to.equal("/bar/foo_renamed/1pixel_renamed.png")
-				expect(update.newPathname).to.equal("")
-				expect(version).to.equal(@project_0.version + 1)
+				({fileUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id));
+				expect(updates.length).to.equal(1);
+				update = updates[0];
+				expect(update.userId).to.equal(this.owner._id);
+				expect(update.pathname).to.equal("/bar/foo_renamed/1pixel_renamed.png");
+				expect(update.newPathname).to.equal("");
+				expect(version).to.equal(this.project_0.version + 1);
 
-				ProjectGetter.getProject example_project_id, (error, newProject) =>
-					throw error if error?
-					@project_1 = newProject
-					# replacing a file should update the project structure
-					expect(@project_1.version).to.equal(@project_0.version + 1)
-					done()
+				return ProjectGetter.getProject(example_project_id, (error, newProject) => {
+					if (error != null) { throw error; }
+					this.project_1 = newProject;
+					// replacing a file should update the project structure
+					expect(this.project_1.version).to.equal(this.project_0.version + 1);
+					return done();
+				});
+			});
+		});
+	});
 
-	describe "tpds", ->
-		before (done) ->
-			@tpds_project_name = "tpds-project-#{new ObjectId().toString()}"
-			@owner.createProject @tpds_project_name, (error, project_id) =>
-				throw error if error?
-				@tpds_project_id = project_id
-				mkdirp Settings.path.dumpFolder, done
+	describe("tpds", function() {
+		before(function(done) {
+			this.tpds_project_name = `tpds-project-${new ObjectId().toString()}`;
+			return this.owner.createProject(this.tpds_project_name, (error, project_id) => {
+				if (error != null) { throw error; }
+				this.tpds_project_id = project_id;
+				return mkdirp(Settings.path.dumpFolder, done);
+			});
+		});
 
-		beforeEach (done) ->
-			MockDocUpdaterApi.clearProjectStructureUpdates()
-			ProjectGetter.getProject @tpds_project_id, (error, project) =>
-				throw error if error?
-				@root_folder_id = project.rootFolder[0]._id.toString()
-				@project_0 = project
-				done()
+		beforeEach(function(done) {
+			MockDocUpdaterApi.clearProjectStructureUpdates();
+			return ProjectGetter.getProject(this.tpds_project_id, (error, project) => {
+				if (error != null) { throw error; }
+				this.root_folder_id = project.rootFolder[0]._id.toString();
+				this.project_0 = project;
+				return done();
+			});
+		});
 
-		it "should version adding a doc", (done) ->
-			tex_file = fs.createReadStream(Path.resolve(__dirname + '/../files/test.tex'))
+		it("should version adding a doc", function(done) {
+			const tex_file = fs.createReadStream(Path.resolve(__dirname + '/../files/test.tex'));
 
-			req = @owner.request.post {
-				uri: "/user/#{@owner._id}/update/#{@tpds_project_name}/test.tex",
-				auth:
-					user: _.keys(Settings.httpAuthUsers)[0]
-					pass: _.values(Settings.httpAuthUsers)[0]
+			const req = this.owner.request.post({
+				uri: `/user/${this.owner._id}/update/${this.tpds_project_name}/test.tex`,
+				auth: {
+					user: _.keys(Settings.httpAuthUsers)[0],
+					pass: _.values(Settings.httpAuthUsers)[0],
 					sendImmediately: true
-			}
+				}
+			});
 
-			tex_file.on "error", (err) ->
-				throw err
+			tex_file.on("error", function(err) {
+				throw err;
+			});
 
-			req.on "error", (err) ->
-				throw err
+			req.on("error", function(err) {
+				throw err;
+			});
 
-			req.on "response", (res) =>
-				if res.statusCode < 200 || res.statusCode >= 300
-					throw new Error("failed to upload file #{res.statusCode}")
+			req.on("response", res => {
+				if ((res.statusCode < 200) || (res.statusCode >= 300)) {
+					throw new Error(`failed to upload file ${res.statusCode}`);
+				}
 
-				{docUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(@tpds_project_id)
-				expect(updates.length).to.equal(1)
-				update = updates[0]
-				expect(update.userId).to.equal(@owner._id)
-				expect(update.pathname).to.equal("/test.tex")
-				expect(update.docLines).to.equal("Test")
-				expect(version).to.equal(@project_0.version + 1)
+				const {docUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(this.tpds_project_id);
+				expect(updates.length).to.equal(1);
+				const update = updates[0];
+				expect(update.userId).to.equal(this.owner._id);
+				expect(update.pathname).to.equal("/test.tex");
+				expect(update.docLines).to.equal("Test");
+				expect(version).to.equal(this.project_0.version + 1);
 
-				ProjectGetter.getProject @tpds_project_id, (error, newProject) =>
-					throw error if error?
-					@project_1 = newProject
-					# replacing a file should update the project structure
-					expect(@project_1.version).to.equal(@project_0.version + 1)
-					done()
+				return ProjectGetter.getProject(this.tpds_project_id, (error, newProject) => {
+					if (error != null) { throw error; }
+					this.project_1 = newProject;
+					// replacing a file should update the project structure
+					expect(this.project_1.version).to.equal(this.project_0.version + 1);
+					return done();
+				});
+			});
 
-			tex_file.pipe(req)
+			return tex_file.pipe(req);
+		});
 
-		it "should version adding a new file", (done) ->
-			image_file = fs.createReadStream(Path.resolve(__dirname + '/../files/1pixel.png'))
+		it("should version adding a new file", function(done) {
+			const image_file = fs.createReadStream(Path.resolve(__dirname + '/../files/1pixel.png'));
 
-			req = @owner.request.post {
-				uri: "/user/#{@owner._id}/update/#{@tpds_project_name}/1pixel.png",
-				auth:
-					user: _.keys(Settings.httpAuthUsers)[0]
-					pass: _.values(Settings.httpAuthUsers)[0]
+			const req = this.owner.request.post({
+				uri: `/user/${this.owner._id}/update/${this.tpds_project_name}/1pixel.png`,
+				auth: {
+					user: _.keys(Settings.httpAuthUsers)[0],
+					pass: _.values(Settings.httpAuthUsers)[0],
 					sendImmediately: true
-			}
+				}
+			});
 
-			image_file.on "error", (err) ->
-				throw err
+			image_file.on("error", function(err) {
+				throw err;
+			});
 
-			req.on "error", (err) ->
-				throw err
+			req.on("error", function(err) {
+				throw err;
+			});
 
-			req.on "response", (res) =>
-				if res.statusCode < 200 || res.statusCode >= 300
-					throw new Error("failed to upload file #{res.statusCode}")
+			req.on("response", res => {
+				if ((res.statusCode < 200) || (res.statusCode >= 300)) {
+					throw new Error(`failed to upload file ${res.statusCode}`);
+				}
 
-				{fileUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(@tpds_project_id)
-				expect(updates.length).to.equal(1)
-				update = updates[0]
-				expect(update.userId).to.equal(@owner._id)
-				expect(update.pathname).to.equal("/1pixel.png")
+				const {fileUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(this.tpds_project_id);
+				expect(updates.length).to.equal(1);
+				const update = updates[0];
+				expect(update.userId).to.equal(this.owner._id);
+				expect(update.pathname).to.equal("/1pixel.png");
 				expect(update.url).to.be.a('string');
-				expect(version).to.equal(@project_0.version + 1)
+				expect(version).to.equal(this.project_0.version + 1);
 
-				ProjectGetter.getProject @tpds_project_id, (error, newProject) =>
-					throw error if error?
-					@project_1 = newProject
-					# replacing a file should update the project structure
-					expect(@project_1.version).to.equal(@project_0.version + 1)
-					done()
+				return ProjectGetter.getProject(this.tpds_project_id, (error, newProject) => {
+					if (error != null) { throw error; }
+					this.project_1 = newProject;
+					// replacing a file should update the project structure
+					expect(this.project_1.version).to.equal(this.project_0.version + 1);
+					return done();
+				});
+			});
 
-			image_file.pipe(req)
+			return image_file.pipe(req);
+		});
 
-		it "should version replacing a file", (done) ->
-			image_file = fs.createReadStream(Path.resolve(__dirname + '/../files/2pixel.png'))
+		it("should version replacing a file", function(done) {
+			const image_file = fs.createReadStream(Path.resolve(__dirname + '/../files/2pixel.png'));
 
-			req = @owner.request.post {
-				uri: "/user/#{@owner._id}/update/#{@tpds_project_name}/1pixel.png",
-				auth:
-					user: _.keys(Settings.httpAuthUsers)[0]
-					pass: _.values(Settings.httpAuthUsers)[0]
+			const req = this.owner.request.post({
+				uri: `/user/${this.owner._id}/update/${this.tpds_project_name}/1pixel.png`,
+				auth: {
+					user: _.keys(Settings.httpAuthUsers)[0],
+					pass: _.values(Settings.httpAuthUsers)[0],
 					sendImmediately: true
-			}
+				}
+			});
 
-			image_file.on "error", (err) ->
-				throw err
+			image_file.on("error", function(err) {
+				throw err;
+			});
 
-			req.on "error", (err) ->
-				throw err
+			req.on("error", function(err) {
+				throw err;
+			});
 
-			req.on "response", (res) =>
-				if res.statusCode < 200 || res.statusCode >= 300
-					throw new Error("failed to upload file #{res.statusCode}")
+			req.on("response", res => {
+				if ((res.statusCode < 200) || (res.statusCode >= 300)) {
+					throw new Error(`failed to upload file ${res.statusCode}`);
+				}
 
-				{fileUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(@tpds_project_id)
-				expect(updates.length).to.equal(2)
-				update = updates[0]
-				expect(update.userId).to.equal(@owner._id)
-				expect(update.pathname).to.equal("/1pixel.png")
-				#expect(update.url).to.be.a('string');
-				update = updates[1]
-				expect(update.userId).to.equal(@owner._id)
-				expect(update.pathname).to.equal("/1pixel.png")
+				const {fileUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(this.tpds_project_id);
+				expect(updates.length).to.equal(2);
+				let update = updates[0];
+				expect(update.userId).to.equal(this.owner._id);
+				expect(update.pathname).to.equal("/1pixel.png");
+				//expect(update.url).to.be.a('string');
+				update = updates[1];
+				expect(update.userId).to.equal(this.owner._id);
+				expect(update.pathname).to.equal("/1pixel.png");
 				expect(update.url).to.be.a('string');
-				expect(version).to.equal(@project_0.version + 1)
+				expect(version).to.equal(this.project_0.version + 1);
 
-				ProjectGetter.getProject @tpds_project_id, (error, newProject) =>
-					throw error if error?
-					@project_1 = newProject
-					# replacing a file should update the project structure
-					expect(@project_1.version).to.equal(@project_0.version + 1)
-					done()
+				return ProjectGetter.getProject(this.tpds_project_id, (error, newProject) => {
+					if (error != null) { throw error; }
+					this.project_1 = newProject;
+					// replacing a file should update the project structure
+					expect(this.project_1.version).to.equal(this.project_0.version + 1);
+					return done();
+				});
+			});
 
-			image_file.pipe(req)
+			return image_file.pipe(req);
+		});
 
-		it "should version deleting a doc", (done) ->
-			req = @owner.request.delete {
-				uri: "/user/#{@owner._id}/update/#{@tpds_project_name}/test.tex",
-				auth:
-					user: _.keys(Settings.httpAuthUsers)[0]
-					pass: _.values(Settings.httpAuthUsers)[0]
+		return it("should version deleting a doc", function(done) {
+			let req;
+			return req = this.owner.request.delete({
+				uri: `/user/${this.owner._id}/update/${this.tpds_project_name}/test.tex`,
+				auth: {
+					user: _.keys(Settings.httpAuthUsers)[0],
+					pass: _.values(Settings.httpAuthUsers)[0],
 					sendImmediately: true
-			}, (error, res, body) =>
-				throw error if error?
-				if res.statusCode < 200 || res.statusCode >= 300
-					throw new Error("failed to delete doc #{res.statusCode}")
+				}
+			}, (error, res, body) => {
+				if (error != null) { throw error; }
+				if ((res.statusCode < 200) || (res.statusCode >= 300)) {
+					throw new Error(`failed to delete doc ${res.statusCode}`);
+				}
 
-				{docUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(@tpds_project_id)
-				expect(updates.length).to.equal(1)
-				update = updates[0]
-				expect(update.userId).to.equal(@owner._id)
-				expect(update.pathname).to.equal("/test.tex")
-				expect(update.newPathname).to.equal("")
-				expect(version).to.equal(@project_0.version + 1)
+				const {docUpdates:updates, version} = MockDocUpdaterApi.getProjectStructureUpdates(this.tpds_project_id);
+				expect(updates.length).to.equal(1);
+				const update = updates[0];
+				expect(update.userId).to.equal(this.owner._id);
+				expect(update.pathname).to.equal("/test.tex");
+				expect(update.newPathname).to.equal("");
+				expect(version).to.equal(this.project_0.version + 1);
 				
-				ProjectGetter.getProject @tpds_project_id, (error, newProject) =>
-					throw error if error?
-					@project_1 = newProject
-					# replacing a file should update the project structure
-					expect(@project_1.version).to.equal(@project_0.version + 1)
-					done()
+				return ProjectGetter.getProject(this.tpds_project_id, (error, newProject) => {
+					if (error != null) { throw error; }
+					this.project_1 = newProject;
+					// replacing a file should update the project structure
+					expect(this.project_1.version).to.equal(this.project_0.version + 1);
+					return done();
+				});
+			});
+		});
+	});
 
 
-	describe "uploading a document", ->
-		beforeEach (done) ->
-			MockDocUpdaterApi.clearProjectStructureUpdates()
-			ProjectGetter.getProject example_project_id, (error, project) =>
-				throw error if error?
-				@root_folder_id = project.rootFolder[0]._id.toString()
-				@project_0 = project
-				done()
+	return describe("uploading a document", function() {
+		beforeEach(function(done) {
+			MockDocUpdaterApi.clearProjectStructureUpdates();
+			return ProjectGetter.getProject(example_project_id, (error, project) => {
+				if (error != null) { throw error; }
+				this.root_folder_id = project.rootFolder[0]._id.toString();
+				this.project_0 = project;
+				return done();
+			});
+		});
 
-		describe "with an unusual character set", ->
-			it "should correctly handle utf16-le data", (done) ->
-				document_file = fs.createReadStream(Path.resolve(__dirname + '/../files/charsets/test-greek-utf16-le-bom.tex'))
+		return describe("with an unusual character set", function() {
+			it("should correctly handle utf16-le data", function(done) {
+				let req;
+				const document_file = fs.createReadStream(Path.resolve(__dirname + '/../files/charsets/test-greek-utf16-le-bom.tex'));
 
-				req = @owner.request.post {
-					uri: "project/#{example_project_id}/upload",
-					qs:
-						folder_id: @root_folder_id
-					formData:
-						qqfile:
-							value: document_file
-							options:
+				return req = this.owner.request.post({
+					uri: `project/${example_project_id}/upload`,
+					qs: {
+						folder_id: this.root_folder_id
+					},
+					formData: {
+						qqfile: {
+							value: document_file,
+							options: {
 								filename: 'test-greek-utf16-le-bom.tex',
 								contentType: 'text/x-tex'
-				}, (error, res, body) =>
-					throw error if error?
-					if res.statusCode < 200 || res.statusCode >= 300
-						throw new Error("failed to upload file #{res.statusCode}")
+							}
+						}
+					}
+				}, (error, res, body) => {
+					if (error != null) { throw error; }
+					if ((res.statusCode < 200) || (res.statusCode >= 300)) {
+						throw new Error(`failed to upload file ${res.statusCode}`);
+					}
 
-					example_file_id = JSON.parse(body).entity_id
+					example_file_id = JSON.parse(body).entity_id;
 
-					{docUpdates:updates} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id)
-					update = updates[0]
-					expect(update.pathname).to.equal('/test-greek-utf16-le-bom.tex')
-					expect(update.docLines).to.contain("Η γρήγορη καστανή αλεπού πήδηξε χαλαρά πάνω από το σκυλί.")
-					done()
+					const {docUpdates:updates} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id);
+					const update = updates[0];
+					expect(update.pathname).to.equal('/test-greek-utf16-le-bom.tex');
+					expect(update.docLines).to.contain("Η γρήγορη καστανή αλεπού πήδηξε χαλαρά πάνω από το σκυλί.");
+					return done();
+				});
+			});
 
-			it "should correctly handle windows1252/iso-8859-1/latin1 data", (done) ->
-				document_file = fs.createReadStream(Path.resolve(__dirname + '/../files/charsets/test-german-windows-1252.tex'))
+			return it("should correctly handle windows1252/iso-8859-1/latin1 data", function(done) {
+				let req;
+				const document_file = fs.createReadStream(Path.resolve(__dirname + '/../files/charsets/test-german-windows-1252.tex'));
 
-				req = @owner.request.post {
-					uri: "project/#{example_project_id}/upload",
-					qs:
-						folder_id: @root_folder_id
-					formData:
-						qqfile:
-							value: document_file
-							options:
+				return req = this.owner.request.post({
+					uri: `project/${example_project_id}/upload`,
+					qs: {
+						folder_id: this.root_folder_id
+					},
+					formData: {
+						qqfile: {
+							value: document_file,
+							options: {
 								filename: 'test-german-windows-1252.tex',
 								contentType: 'text/x-tex'
-				}, (error, res, body) =>
-					throw error if error?
-					if res.statusCode < 200 || res.statusCode >= 300
-						throw new Error("failed to upload file #{res.statusCode}")
+							}
+						}
+					}
+				}, (error, res, body) => {
+					if (error != null) { throw error; }
+					if ((res.statusCode < 200) || (res.statusCode >= 300)) {
+						throw new Error(`failed to upload file ${res.statusCode}`);
+					}
 
-					example_file_id = JSON.parse(body).entity_id
+					example_file_id = JSON.parse(body).entity_id;
 
-					{docUpdates:updates} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id)
-					update = updates[0]
-					expect(update.pathname).to.equal('/test-german-windows-1252.tex')
-					expect(update.docLines).to.contain("Der schnelle braune Fuchs sprang träge über den Hund.")
-					done()
+					const {docUpdates:updates} = MockDocUpdaterApi.getProjectStructureUpdates(example_project_id);
+					const update = updates[0];
+					expect(update.pathname).to.equal('/test-german-windows-1252.tex');
+					expect(update.docLines).to.contain("Der schnelle braune Fuchs sprang träge über den Hund.");
+					return done();
+				});
+			});
+		});
+	});
+});

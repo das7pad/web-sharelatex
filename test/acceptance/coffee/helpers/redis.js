@@ -1,33 +1,43 @@
-Settings = require('settings-sharelatex')
-logger = require("logger-sharelatex")
-Async = require('async')
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const Settings = require('settings-sharelatex');
+const logger = require("logger-sharelatex");
+const Async = require('async');
 
-UserSessionsRedis = require('../../../../app/js/Features/User/UserSessionsRedis')
+const UserSessionsRedis = require('../../../../app/js/Features/User/UserSessionsRedis');
 
-# rclient = redis.createClient(Settings.redis.web)
-rclient = UserSessionsRedis.client()
+// rclient = redis.createClient(Settings.redis.web)
+const rclient = UserSessionsRedis.client();
 
-module.exports =
+module.exports = {
 
-	getUserSessions: (user, callback=(err, sessionsSet)->) ->
-		rclient.smembers UserSessionsRedis.sessionSetKey(user), (err, result) ->
-			return callback(err, result)
+	getUserSessions(user, callback) {
+		if (callback == null) { callback = function(err, sessionsSet){}; }
+		return rclient.smembers(UserSessionsRedis.sessionSetKey(user), (err, result) => callback(err, result));
+	},
 
-	clearUserSessions: (user, callback=(err)->) ->
-		sessionSetKey = UserSessionsRedis.sessionSetKey(user)
-		rclient.smembers sessionSetKey, (err, sessionKeys) ->
-			if err
-				return callback(err)
-			if sessionKeys.length == 0
-				return callback(null)
-			actions = sessionKeys.map (k) ->
-				(cb) ->
-					rclient.del k, (err) ->
-						cb(err)
-			Async.series(
-				actions, (err, results) ->
-					rclient.srem sessionSetKey, sessionKeys, (err) ->
-						if err
-							return callback(err)
-						callback(null)
-			)
+	clearUserSessions(user, callback) {
+		if (callback == null) { callback = function(err){}; }
+		const sessionSetKey = UserSessionsRedis.sessionSetKey(user);
+		return rclient.smembers(sessionSetKey, function(err, sessionKeys) {
+			if (err) {
+				return callback(err);
+			}
+			if (sessionKeys.length === 0) {
+				return callback(null);
+			}
+			const actions = sessionKeys.map(k => cb => rclient.del(k, err => cb(err)));
+			return Async.series(
+				actions, (err, results) => rclient.srem(sessionSetKey, sessionKeys, function(err) {
+                if (err) {
+                    return callback(err);
+                }
+                return callback(null);
+        }));
+		});
+	}
+};

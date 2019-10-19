@@ -1,33 +1,51 @@
-expect = require("chai").expect
-should = require('chai').should()
-async = require("async")
-User = require "./helpers/User"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const {
+    expect
+} = require("chai");
+const should = require('chai').should();
+const async = require("async");
+const User = require("./helpers/User");
 
-describe 'User Must Reconfirm', ->
+describe('User Must Reconfirm', function() {
 
-	before (done) ->
-		@user = new User()
-		async.series [
-			@user.ensureUserExists.bind(@user)
-			(cb) => @user.mongoUpdate {$set: {'must_reconfirm': true}}, cb
-		], done
+	before(function(done) {
+		this.user = new User();
+		return async.series([
+			this.user.ensureUserExists.bind(this.user),
+			cb => this.user.mongoUpdate({$set: {'must_reconfirm': true}}, cb)
+		], done);
+	});
 
-	it 'should not allow sign in', (done) ->
-		@user.login (err) =>
-			expect(err?).to.equal false
-			@user.isLoggedIn (err, isLoggedIn) ->
-				expect(isLoggedIn).to.equal false
-				done()
+	it('should not allow sign in', function(done) {
+		return this.user.login(err => {
+			expect(err != null).to.equal(false);
+			return this.user.isLoggedIn(function(err, isLoggedIn) {
+				expect(isLoggedIn).to.equal(false);
+				return done();
+			});
+		});
+	});
 
-	describe 'Requesting reconfirmation email', ->
-		it 'should return a success to client for existing account', (done) ->
-			@user.reconfirmAccountRequest @user.email, (err, response) =>
-				expect(err?).to.equal false
-				expect(response.statusCode).to.equal 200
-				done()
+	return describe('Requesting reconfirmation email', function() {
+		it('should return a success to client for existing account', function(done) {
+			return this.user.reconfirmAccountRequest(this.user.email, (err, response) => {
+				expect(err != null).to.equal(false);
+				expect(response.statusCode).to.equal(200);
+				return done();
+			});
+		});
 
-		it 'should return a 404 to client for non-existent account', (done) ->
-			@user.reconfirmAccountRequest 'fake@overleaf.com', (err, response) =>
-				expect(err?).to.equal false
-				expect(response.statusCode).to.equal 404
-				done()
+		return it('should return a 404 to client for non-existent account', function(done) {
+			return this.user.reconfirmAccountRequest('fake@overleaf.com', (err, response) => {
+				expect(err != null).to.equal(false);
+				expect(response.statusCode).to.equal(404);
+				return done();
+			});
+		});
+	});
+});

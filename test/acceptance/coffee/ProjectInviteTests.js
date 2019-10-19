@@ -1,503 +1,643 @@
-expect = require("chai").expect
-Async = require("async")
-User = require "./helpers/User"
-request = require "./helpers/request"
-settings = require "settings-sharelatex"
-CollaboratorsEmailHandler = require "../../../app/js/Features/Collaborators/CollaboratorsEmailHandler"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const {
+    expect
+} = require("chai");
+const Async = require("async");
+const User = require("./helpers/User");
+const request = require("./helpers/request");
+const settings = require("settings-sharelatex");
+const CollaboratorsEmailHandler = require("../../../app/js/Features/Collaborators/CollaboratorsEmailHandler");
 
-require "./helpers/MockDocstoreApi"
-require "./helpers/MockDocUpdaterApi"
-require "./helpers/MockProjectHistoryApi"
+require("./helpers/MockDocstoreApi");
+require("./helpers/MockDocUpdaterApi");
+require("./helpers/MockProjectHistoryApi");
 
 
-createInvite = (sendingUser, projectId, email, callback=(err, invite)->) ->
-	sendingUser.getCsrfToken (err) ->
-		return callback(err) if err
-		sendingUser.request.post {
-			uri: "/project/#{projectId}/invite",
-			json:
-				email: email
+const createInvite = function(sendingUser, projectId, email, callback) {
+	if (callback == null) { callback = function(err, invite){}; }
+	return sendingUser.getCsrfToken(function(err) {
+		if (err) { return callback(err); }
+		return sendingUser.request.post({
+			uri: `/project/${projectId}/invite`,
+			json: {
+				email,
 				privileges: 'readAndWrite'
-		}, (err, response, body) ->
-			return callback(err) if err
-			expect(response.statusCode).to.equal 200
-			callback(null, body.invite)
+			}
+		}, function(err, response, body) {
+			if (err) { return callback(err); }
+			expect(response.statusCode).to.equal(200);
+			return callback(null, body.invite);
+		});
+	});
+};
 
-createProject = (owner, projectName, callback=(err, projectId, project)->) ->
-	owner.createProject projectName, (err, projectId) ->
-		throw err if err
-		fakeProject = {
+const createProject = function(owner, projectName, callback) {
+	if (callback == null) { callback = function(err, projectId, project){}; }
+	return owner.createProject(projectName, function(err, projectId) {
+		if (err) { throw err; }
+		const fakeProject = {
 			_id: projectId,
 			name: projectName,
 			owner_ref: owner
-		}
-		callback(err, projectId, fakeProject)
+		};
+		return callback(err, projectId, fakeProject);
+	});
+};
 
-createProjectAndInvite = (owner, projectName, email, callback=(err, project, invite)->) ->
-	createProject owner, projectName, (err, projectId, project) ->
-		return callback(err) if err
-		createInvite owner, projectId, email, (err, invite) ->
-			return callback(err) if err
-			link =  CollaboratorsEmailHandler._buildInviteUrl(project, invite)
-			callback(null, project, invite, link)
+const createProjectAndInvite = function(owner, projectName, email, callback) {
+	if (callback == null) { callback = function(err, project, invite){}; }
+	return createProject(owner, projectName, function(err, projectId, project) {
+		if (err) { return callback(err); }
+		return createInvite(owner, projectId, email, function(err, invite) {
+			if (err) { return callback(err); }
+			const link =  CollaboratorsEmailHandler._buildInviteUrl(project, invite);
+			return callback(null, project, invite, link);
+		});
+	});
+};
 
-revokeInvite = (sendingUser, projectId, inviteId, callback=(err)->) ->
-	sendingUser.getCsrfToken (err) ->
-		return callback(err) if err
-		sendingUser.request.delete {
-			uri: "/project/#{projectId}/invite/#{inviteId}",
-		}, (err, response, body) ->
-			return callback(err) if err
-			callback(null)
+const revokeInvite = function(sendingUser, projectId, inviteId, callback) {
+	if (callback == null) { callback = function(err){}; }
+	return sendingUser.getCsrfToken(function(err) {
+		if (err) { return callback(err); }
+		return sendingUser.request.delete({
+			uri: `/project/${projectId}/invite/${inviteId}`,
+		}, function(err, response, body) {
+			if (err) { return callback(err); }
+			return callback(null);
+		});
+	});
+};
 
 
-# Actions
-tryFollowInviteLink = (user, link, callback=(err, response, body)->) ->
-	user.request.get {
-		uri: link
+// Actions
+const tryFollowInviteLink = function(user, link, callback) {
+	if (callback == null) { callback = function(err, response, body){}; }
+	return user.request.get({
+		uri: link,
 		baseUrl: null
-	}, callback
+	}, callback);
+};
 
-tryAcceptInvite = (user, invite, callback=(err, response, body)->) ->
-	user.request.post {
-		uri: "/project/#{invite.projectId}/invite/token/#{invite.token}/accept"
-		json:
+const tryAcceptInvite = function(user, invite, callback) {
+	if (callback == null) { callback = function(err, response, body){}; }
+	return user.request.post({
+		uri: `/project/${invite.projectId}/invite/token/${invite.token}/accept`,
+		json: {
 			token: invite.token
-	}, callback
+		}
+	}, callback);
+};
 
-tryRegisterUser = (user, email, callback=(err, response, body)->) ->
-	user.fetchCsrfToken '/register', (error) =>
-		return callback(error) if error?
-		user.request.post {
-			url: "/register"
-			json:
-				email: email
+const tryRegisterUser = function(user, email, callback) {
+	if (callback == null) { callback = function(err, response, body){}; }
+	return user.fetchCsrfToken('/register', error => {
+		if (error != null) { return callback(error); }
+		return user.request.post({
+			url: "/register",
+			json: {
+				email,
 				password: "some_weird_password"
-		}, callback
+			}
+		}, callback);
+	});
+};
 
-tryFollowLoginLink = (user, loginLink, callback=(err, response, body)->) ->
-		user.request.get loginLink, callback
+const tryFollowLoginLink = function(user, loginLink, callback) {
+		if (callback == null) { callback = function(err, response, body){}; }
+		return user.request.get(loginLink, callback);
+	};
 
-tryLoginUser = (user, callback=(err, response, body)->) ->
-	user.fetchCsrfToken '/login', (error) =>
-		return callback(error) if error?
-		user.request.post {
-			url: "/login"
-			json:
-				email: user.email
+const tryLoginUser = function(user, callback) {
+	if (callback == null) { callback = function(err, response, body){}; }
+	return user.fetchCsrfToken('/login', error => {
+		if (error != null) { return callback(error); }
+		return user.request.post({
+			url: "/login",
+			json: {
+				email: user.email,
 				password: user.password
-		}, callback
+			}
+		}, callback);
+	});
+};
 
-tryGetInviteList = (user, projectId, callback=(err, response, body)->) ->
-		user.request.get {
-			url: "/project/#{projectId}/invites"
+const tryGetInviteList = function(user, projectId, callback) {
+		if (callback == null) { callback = function(err, response, body){}; }
+		return user.request.get({
+			url: `/project/${projectId}/invites`,
 			json: true
-		}, callback
+		}, callback);
+	};
 
-tryJoinProject = (user, projectId, callback=(err, response, body)->) ->
-	user.fetchCsrfToken '/project', (error) =>
-		return callback(error) if error?
-		user.request.post {
-			url: "/project/#{projectId}/join"
-			qs: {user_id: user._id}
-			auth:
-				user: settings.apis.web.user
-				pass: settings.apis.web.pass
+const tryJoinProject = function(user, projectId, callback) {
+	if (callback == null) { callback = function(err, response, body){}; }
+	return user.fetchCsrfToken('/project', error => {
+		if (error != null) { return callback(error); }
+		return user.request.post({
+			url: `/project/${projectId}/join`,
+			qs: {user_id: user._id},
+			auth: {
+				user: settings.apis.web.user,
+				pass: settings.apis.web.pass,
 				sendImmediately: true
-			json: true
+			},
+			json: true,
 			jar: false
-		}, callback
+		}, callback);
+	});
+};
 
-# Expectations
-expectProjectAccess = (user, projectId, callback=(err,result)->) ->
-	# should have access to project
-	user.openProject projectId, (err) =>
-		expect(err).to.be.oneOf [null, undefined]
-		callback()
+// Expectations
+const expectProjectAccess = function(user, projectId, callback) {
+	// should have access to project
+	if (callback == null) { callback = function(err,result){}; }
+	return user.openProject(projectId, err => {
+		expect(err).to.be.oneOf([null, undefined]);
+		return callback();
+	});
+};
 
-expectNoProjectAccess = (user, projectId, callback=(err,result)->) ->
-	# should not have access to project page
-	user.openProject projectId, (err) =>
-		expect(err).to.be.instanceof Error
-		callback()
+const expectNoProjectAccess = function(user, projectId, callback) {
+	// should not have access to project page
+	if (callback == null) { callback = function(err,result){}; }
+	return user.openProject(projectId, err => {
+		expect(err).to.be.instanceof(Error);
+		return callback();
+	});
+};
 
-expectInvitePage = (user, link, callback=(err,result)->) ->
-	# view invite
-	tryFollowInviteLink user, link, (err, response, body) ->
-		expect(err).to.be.oneOf [null, undefined]
-		expect(response.statusCode).to.equal 200
-		expect(body).to.match new RegExp("<title>Project Invite - .*</title>")
-		callback()
+const expectInvitePage = function(user, link, callback) {
+	// view invite
+	if (callback == null) { callback = function(err,result){}; }
+	return tryFollowInviteLink(user, link, function(err, response, body) {
+		expect(err).to.be.oneOf([null, undefined]);
+		expect(response.statusCode).to.equal(200);
+		expect(body).to.match(new RegExp("<title>Project Invite - .*</title>"));
+		return callback();
+	});
+};
 
-expectInvalidInvitePage = (user, link, callback=(err,result)->) ->
-	# view invalid invite
-	tryFollowInviteLink user, link, (err, response, body) ->
-		expect(err).to.be.oneOf [null, undefined]
-		expect(response.statusCode).to.equal 200
-		expect(body).to.match new RegExp("<title>Invalid Invite - .*</title>")
-		callback()
+const expectInvalidInvitePage = function(user, link, callback) {
+	// view invalid invite
+	if (callback == null) { callback = function(err,result){}; }
+	return tryFollowInviteLink(user, link, function(err, response, body) {
+		expect(err).to.be.oneOf([null, undefined]);
+		expect(response.statusCode).to.equal(200);
+		expect(body).to.match(new RegExp("<title>Invalid Invite - .*</title>"));
+		return callback();
+	});
+};
 
-expectInviteRedirectToRegister = (user, link, callback=(err,result)->) ->
-	# view invite, redirect to `/register`
-	tryFollowInviteLink user, link, (err, response, body) ->
-		expect(err).to.be.oneOf [null, undefined]
-		expect(response.statusCode).to.equal 302
-		expect(response.headers.location).to.match new RegExp("^/register.*$")
-		# follow redirect to register page and extract the redirectUrl from form
-		user.request.get response.headers.location, (err, response, body) ->
-			callback(null)
+const expectInviteRedirectToRegister = function(user, link, callback) {
+	// view invite, redirect to `/register`
+	if (callback == null) { callback = function(err,result){}; }
+	return tryFollowInviteLink(user, link, function(err, response, body) {
+		expect(err).to.be.oneOf([null, undefined]);
+		expect(response.statusCode).to.equal(302);
+		expect(response.headers.location).to.match(new RegExp("^/register.*$"));
+		// follow redirect to register page and extract the redirectUrl from form
+		return user.request.get(response.headers.location, (err, response, body) => callback(null));
+	});
+};
 
-expectLoginPage = (user, callback=(err, result)->) ->
-	tryFollowLoginLink user, "/login", (err, response, body) ->
-		expect(err).to.be.oneOf [null, undefined]
-		expect(response.statusCode).to.equal 200
-		expect(body).to.match new RegExp("<title>Login - .*</title>")
-		callback(null)
+const expectLoginPage = function(user, callback) {
+	if (callback == null) { callback = function(err, result){}; }
+	return tryFollowLoginLink(user, "/login", function(err, response, body) {
+		expect(err).to.be.oneOf([null, undefined]);
+		expect(response.statusCode).to.equal(200);
+		expect(body).to.match(new RegExp("<title>Login - .*</title>"));
+		return callback(null);
+	});
+};
 
-expectLoginRedirectToInvite = (user, link, callback=(err, result)->) ->
-	tryLoginUser user, (err, response, body) ->
-		expect(err).to.be.oneOf [null, undefined]
-		expect(response.statusCode).to.equal 200
-		callback(null, null)
+const expectLoginRedirectToInvite = function(user, link, callback) {
+	if (callback == null) { callback = function(err, result){}; }
+	return tryLoginUser(user, function(err, response, body) {
+		expect(err).to.be.oneOf([null, undefined]);
+		expect(response.statusCode).to.equal(200);
+		return callback(null, null);
+	});
+};
 
-expectRegistrationRedirectToInvite = (user, email, link, callback=(err, result)->) ->
-	tryRegisterUser user, email, (err, response, body) ->
-		expect(err).to.be.oneOf [null, undefined]
-		expect(response.statusCode).to.equal 200
-		callback(null, null)
+const expectRegistrationRedirectToInvite = function(user, email, link, callback) {
+	if (callback == null) { callback = function(err, result){}; }
+	return tryRegisterUser(user, email, function(err, response, body) {
+		expect(err).to.be.oneOf([null, undefined]);
+		expect(response.statusCode).to.equal(200);
+		return callback(null, null);
+	});
+};
 
-expectInviteRedirectToProject = (user, link, invite, callback=(err,result)->) ->
-	# view invite, redirect straight to project
-	tryFollowInviteLink user, link, (err, response, body) ->
-		expect(err).to.be.oneOf [null, undefined]
-		expect(response.statusCode).to.equal 302
-		expect(response.headers.location).to.equal "/project/#{invite.projectId}"
-		callback()
+const expectInviteRedirectToProject = function(user, link, invite, callback) {
+	// view invite, redirect straight to project
+	if (callback == null) { callback = function(err,result){}; }
+	return tryFollowInviteLink(user, link, function(err, response, body) {
+		expect(err).to.be.oneOf([null, undefined]);
+		expect(response.statusCode).to.equal(302);
+		expect(response.headers.location).to.equal(`/project/${invite.projectId}`);
+		return callback();
+	});
+};
 
-expectAcceptInviteAndRedirect = (user, invite, callback=(err,result)->) ->
-	# should accept the invite and redirect to project
-	tryAcceptInvite user, invite, (err, response, body) =>
-		expect(err).to.be.oneOf [null, undefined]
-		expect(response.statusCode).to.equal 302
-		expect(response.headers.location).to.equal "/project/#{invite.projectId}"
-		callback()
+const expectAcceptInviteAndRedirect = function(user, invite, callback) {
+	// should accept the invite and redirect to project
+	if (callback == null) { callback = function(err,result){}; }
+	return tryAcceptInvite(user, invite, (err, response, body) => {
+		expect(err).to.be.oneOf([null, undefined]);
+		expect(response.statusCode).to.equal(302);
+		expect(response.headers.location).to.equal(`/project/${invite.projectId}`);
+		return callback();
+	});
+};
 
-expectInviteListCount = (user, projectId, count, callback=(err)->) ->
-	tryGetInviteList user, projectId, (err, response, body) ->
-		expect(err).to.be.oneOf [null, undefined]
-		expect(response.statusCode).to.equal 200
-		expect(body).to.have.all.keys ['invites']
-		expect(body.invites.length).to.equal count
-		callback()
+const expectInviteListCount = function(user, projectId, count, callback) {
+	if (callback == null) { callback = function(err){}; }
+	return tryGetInviteList(user, projectId, function(err, response, body) {
+		expect(err).to.be.oneOf([null, undefined]);
+		expect(response.statusCode).to.equal(200);
+		expect(body).to.have.all.keys(['invites']);
+		expect(body.invites.length).to.equal(count);
+		return callback();
+	});
+};
 
-expectInvitesInJoinProjectCount = (user, projectId, count, callback=(err,result)->) ->
-	tryJoinProject user, projectId, (err, response, body) ->
-		expect(err).to.be.oneOf [null, undefined]
-		expect(response.statusCode).to.equal 200
-		expect(body.project).to.contain.keys ['invites']
-		expect(body.project.invites.length).to.equal count
-		callback()
-
-
-
-describe "ProjectInviteTests", ->
-	@timeout(5000)
-
-	before (done) ->
-		@sendingUser = new User()
-		@user = new User()
-		@site_admin = new User({email: "admin@example.com"})
-		@email = 'smoketestuser@example.com'
-		@projectName = 'sharing test'
-		Async.series [
-			(cb) => @user.ensureUserExists cb
-			(cb) => @sendingUser.login cb
-			(cb) => @sendingUser.setFeatures { collaborators: 10 }, cb
-		], done
-
-	describe 'creating invites', ->
-
-		beforeEach (done) ->
-			@projectName = "wat"
-			@projectId = null
-			@fakeProject = null
-			done()
-
-		describe 'creating two invites', ->
-
-			beforeEach (done) ->
-				Async.series [
-					(cb) =>
-						createProject @sendingUser, @projectName, (err, projectId, project) =>
-							@projectId = projectId
-							@fakeProject = project
-							cb()
-				], done
-
-			afterEach (done) ->
-				Async.series [
-					(cb) => @sendingUser.deleteProject(@projectId, cb)
-					(cb) => @sendingUser.deleteProject(@projectId, cb)
-				], done
-
-			it 'should allow the project owner to create and remove invites', (done) ->
-				@invite = null
-				Async.series [
-					(cb) => expectProjectAccess @sendingUser, @projectId, cb
-					(cb) => expectInviteListCount @sendingUser, @projectId, 0, cb
-					# create invite, check invite list count
-					(cb) => createInvite @sendingUser, @projectId, @email, (err, invite) =>
-						return cb(err) if err
-						@invite = invite
-						cb()
-					(cb) => expectInviteListCount @sendingUser, @projectId, 1, cb
-					(cb) => revokeInvite @sendingUser, @projectId, @invite._id, cb
-					(cb) => expectInviteListCount @sendingUser, @projectId, 0, cb
-					# and a second time
-					(cb) => createInvite @sendingUser, @projectId, @email, (err, invite) =>
-						return cb(err) if err
-						@invite = invite
-						cb()
-					(cb) => expectInviteListCount @sendingUser, @projectId, 1, cb
-					# check the joinProject view
-					(cb) => expectInvitesInJoinProjectCount @sendingUser, @projectId, 1, cb
-					# revoke invite
-					(cb) => revokeInvite @sendingUser, @projectId, @invite._id, cb
-					(cb) => expectInviteListCount @sendingUser, @projectId, 0, cb
-					(cb) => expectInvitesInJoinProjectCount @sendingUser, @projectId, 0, cb
-				], done
-
-			it 'should allow the project owner to create many invites at once', (done) ->
-				@inviteOne = null
-				@inviteTwo = null
-				Async.series [
-					(cb) => expectProjectAccess @sendingUser, @projectId, cb
-					(cb) => expectInviteListCount @sendingUser, @projectId, 0, cb
-					# create first invite
-					(cb) => createInvite @sendingUser, @projectId, @email, (err, invite) =>
-						return cb(err) if err
-						@inviteOne = invite
-						cb()
-					(cb) => expectInviteListCount @sendingUser, @projectId, 1, cb
-					# and a second
-					(cb) => createInvite @sendingUser, @projectId, @email, (err, invite) =>
-						return cb(err) if err
-						@inviteTwo = invite
-						cb()
-					# should have two
-					(cb) => expectInviteListCount @sendingUser, @projectId, 2, cb
-					(cb) => expectInvitesInJoinProjectCount @sendingUser, @projectId, 2, cb
-					# revoke first
-					(cb) => revokeInvite @sendingUser, @projectId, @inviteOne._id, cb
-					(cb) => expectInviteListCount @sendingUser, @projectId, 1, cb
-					# revoke second
-					(cb) => revokeInvite @sendingUser, @projectId, @inviteTwo._id, cb
-					(cb) => expectInviteListCount @sendingUser, @projectId, 0, cb
-				], done
-
-	describe 'clicking the invite link', ->
-
-		beforeEach (done) ->
-			@projectId = null
-			@fakeProject = null
-			done()
+const expectInvitesInJoinProjectCount = function(user, projectId, count, callback) {
+	if (callback == null) { callback = function(err,result){}; }
+	return tryJoinProject(user, projectId, function(err, response, body) {
+		expect(err).to.be.oneOf([null, undefined]);
+		expect(response.statusCode).to.equal(200);
+		expect(body.project).to.contain.keys(['invites']);
+		expect(body.project.invites.length).to.equal(count);
+		return callback();
+	});
+};
 
 
-		describe "user is logged in already", ->
 
-			beforeEach (done) ->
-				Async.series [
-					(cb) =>
-						createProjectAndInvite @sendingUser, @projectName, @email, (err, project, invite, link) =>
-							@projectId = project._id
-							@fakeProject = project
-							@invite = invite
-							@link = link
-							cb()
-					(cb) =>
-						@user.login (err) =>
-							if err
-								throw err
-							cb()
-				], done
+describe("ProjectInviteTests", function() {
+	this.timeout(5000);
 
-			afterEach (done) ->
-				Async.series [
-					(cb) => @sendingUser.deleteProject(@projectId, cb)
-					(cb) => @sendingUser.deleteProject(@projectId, cb)
-					(cb) => revokeInvite(@sendingUser, @projectId, @invite._id, cb)
-				], done
+	before(function(done) {
+		this.sendingUser = new User();
+		this.user = new User();
+		this.site_admin = new User({email: "admin@example.com"});
+		this.email = 'smoketestuser@example.com';
+		this.projectName = 'sharing test';
+		return Async.series([
+			cb => this.user.ensureUserExists(cb),
+			cb => this.sendingUser.login(cb),
+			cb => this.sendingUser.setFeatures({ collaborators: 10 }, cb)
+		], done);
+	});
 
-			describe 'user is already a member of the project', ->
+	describe('creating invites', function() {
 
-				beforeEach (done) ->
-					Async.series [
-						(cb) => expectInvitePage @user, @link, cb
-						(cb) => expectAcceptInviteAndRedirect @user, @invite, cb
-						(cb) => expectProjectAccess @user, @invite.projectId, cb
-					], done
+		beforeEach(function(done) {
+			this.projectName = "wat";
+			this.projectId = null;
+			this.fakeProject = null;
+			return done();
+		});
 
-				describe 'when user clicks on the invite a second time', ->
+		return describe('creating two invites', function() {
 
-					it 'should just redirect to the project page', (done) ->
-						Async.series [
-							(cb) => expectProjectAccess @user, @invite.projectId, cb
-							(cb) => expectInviteRedirectToProject @user, @link, @invite, cb
-							(cb) => expectProjectAccess @user, @invite.projectId, cb
-						], done
+			beforeEach(function(done) {
+				return Async.series([
+					cb => {
+						return createProject(this.sendingUser, this.projectName, (err, projectId, project) => {
+							this.projectId = projectId;
+							this.fakeProject = project;
+							return cb();
+						});
+					}
+				], done);
+			});
 
-					describe 'when the user recieves another invite to the same project', ->
+			afterEach(function(done) {
+				return Async.series([
+					cb => this.sendingUser.deleteProject(this.projectId, cb),
+					cb => this.sendingUser.deleteProject(this.projectId, cb)
+				], done);
+			});
 
-						it 'should redirect to the project page', (done) ->
-							Async.series [
-								(cb) =>
-									createInvite @sendingUser, @projectId, @email, (err, invite) =>
-										if err
-											throw err
-										@secondInvite = invite
-										@secondLink = CollaboratorsEmailHandler._buildInviteUrl(@fakeProject, invite)
-										cb()
-								(cb) => expectInviteRedirectToProject @user, @secondLink, @secondInvite, cb
-								(cb) => expectProjectAccess @user, @invite.projectId, cb
-								(cb) => revokeInvite @sendingUser, @projectId, @secondInvite._id, cb
-							], done
+			it('should allow the project owner to create and remove invites', function(done) {
+				this.invite = null;
+				return Async.series([
+					cb => expectProjectAccess(this.sendingUser, this.projectId, cb),
+					cb => expectInviteListCount(this.sendingUser, this.projectId, 0, cb),
+					// create invite, check invite list count
+					cb => { return createInvite(this.sendingUser, this.projectId, this.email, (err, invite) => {
+						if (err) { return cb(err); }
+						this.invite = invite;
+						return cb();
+					}); },
+					cb => expectInviteListCount(this.sendingUser, this.projectId, 1, cb),
+					cb => revokeInvite(this.sendingUser, this.projectId, this.invite._id, cb),
+					cb => expectInviteListCount(this.sendingUser, this.projectId, 0, cb),
+					// and a second time
+					cb => { return createInvite(this.sendingUser, this.projectId, this.email, (err, invite) => {
+						if (err) { return cb(err); }
+						this.invite = invite;
+						return cb();
+					}); },
+					cb => expectInviteListCount(this.sendingUser, this.projectId, 1, cb),
+					// check the joinProject view
+					cb => expectInvitesInJoinProjectCount(this.sendingUser, this.projectId, 1, cb),
+					// revoke invite
+					cb => revokeInvite(this.sendingUser, this.projectId, this.invite._id, cb),
+					cb => expectInviteListCount(this.sendingUser, this.projectId, 0, cb),
+					cb => expectInvitesInJoinProjectCount(this.sendingUser, this.projectId, 0, cb)
+				], done);
+			});
+
+			return it('should allow the project owner to create many invites at once', function(done) {
+				this.inviteOne = null;
+				this.inviteTwo = null;
+				return Async.series([
+					cb => expectProjectAccess(this.sendingUser, this.projectId, cb),
+					cb => expectInviteListCount(this.sendingUser, this.projectId, 0, cb),
+					// create first invite
+					cb => { return createInvite(this.sendingUser, this.projectId, this.email, (err, invite) => {
+						if (err) { return cb(err); }
+						this.inviteOne = invite;
+						return cb();
+					}); },
+					cb => expectInviteListCount(this.sendingUser, this.projectId, 1, cb),
+					// and a second
+					cb => { return createInvite(this.sendingUser, this.projectId, this.email, (err, invite) => {
+						if (err) { return cb(err); }
+						this.inviteTwo = invite;
+						return cb();
+					}); },
+					// should have two
+					cb => expectInviteListCount(this.sendingUser, this.projectId, 2, cb),
+					cb => expectInvitesInJoinProjectCount(this.sendingUser, this.projectId, 2, cb),
+					// revoke first
+					cb => revokeInvite(this.sendingUser, this.projectId, this.inviteOne._id, cb),
+					cb => expectInviteListCount(this.sendingUser, this.projectId, 1, cb),
+					// revoke second
+					cb => revokeInvite(this.sendingUser, this.projectId, this.inviteTwo._id, cb),
+					cb => expectInviteListCount(this.sendingUser, this.projectId, 0, cb)
+				], done);
+			});
+		});
+	});
+
+	return describe('clicking the invite link', function() {
+
+		beforeEach(function(done) {
+			this.projectId = null;
+			this.fakeProject = null;
+			return done();
+		});
 
 
-			describe 'user is not a member of the project', ->
+		describe("user is logged in already", function() {
 
-				it 'should not grant access if the user does not accept the invite', (done) ->
-					Async.series(
+			beforeEach(function(done) {
+				return Async.series([
+					cb => {
+						return createProjectAndInvite(this.sendingUser, this.projectName, this.email, (err, project, invite, link) => {
+							this.projectId = project._id;
+							this.fakeProject = project;
+							this.invite = invite;
+							this.link = link;
+							return cb();
+						});
+					},
+					cb => {
+						return this.user.login(err => {
+							if (err) {
+								throw err;
+							}
+							return cb();
+						});
+					}
+				], done);
+			});
+
+			afterEach(function(done) {
+				return Async.series([
+					cb => this.sendingUser.deleteProject(this.projectId, cb),
+					cb => this.sendingUser.deleteProject(this.projectId, cb),
+					cb => revokeInvite(this.sendingUser, this.projectId, this.invite._id, cb)
+				], done);
+			});
+
+			describe('user is already a member of the project', function() {
+
+				beforeEach(function(done) {
+					return Async.series([
+						cb => expectInvitePage(this.user, this.link, cb),
+						cb => expectAcceptInviteAndRedirect(this.user, this.invite, cb),
+						cb => expectProjectAccess(this.user, this.invite.projectId, cb)
+					], done);
+				});
+
+				return describe('when user clicks on the invite a second time', function() {
+
+					it('should just redirect to the project page', function(done) {
+						return Async.series([
+							cb => expectProjectAccess(this.user, this.invite.projectId, cb),
+							cb => expectInviteRedirectToProject(this.user, this.link, this.invite, cb),
+							cb => expectProjectAccess(this.user, this.invite.projectId, cb)
+						], done);
+					});
+
+					return describe('when the user recieves another invite to the same project', () => it('should redirect to the project page', function(done) {
+                        return Async.series([
+                            cb => {
+                                return createInvite(this.sendingUser, this.projectId, this.email, (err, invite) => {
+                                    if (err) {
+                                        throw err;
+                                    }
+                                    this.secondInvite = invite;
+                                    this.secondLink = CollaboratorsEmailHandler._buildInviteUrl(this.fakeProject, invite);
+                                    return cb();
+                                });
+                            },
+                            cb => expectInviteRedirectToProject(this.user, this.secondLink, this.secondInvite, cb),
+                            cb => expectProjectAccess(this.user, this.invite.projectId, cb),
+                            cb => revokeInvite(this.sendingUser, this.projectId, this.secondInvite._id, cb)
+                        ], done);
+                    }));
+				});
+			});
+
+
+			return describe('user is not a member of the project', function() {
+
+				it('should not grant access if the user does not accept the invite', function(done) {
+					return Async.series(
 						[
-							(cb) => expectInvitePage @user, @link, cb
-							(cb) => expectNoProjectAccess @user, @invite.projectId, cb
+							cb => expectInvitePage(this.user, this.link, cb),
+							cb => expectNoProjectAccess(this.user, this.invite.projectId, cb)
 						], done
-					)
+					);
+				});
 
-				it 'should render the invalid-invite page if the token is invalid', (done) ->
-					Async.series(
+				it('should render the invalid-invite page if the token is invalid', function(done) {
+					return Async.series(
 						[
-							(cb) =>
-								link = @link.replace(@invite.token, 'not_a_real_token')
-								expectInvalidInvitePage @user, link, cb
-							(cb) => expectNoProjectAccess @user, @invite.projectId, cb
-							(cb) => expectNoProjectAccess @user, @invite.projectId, cb
+							cb => {
+								const link = this.link.replace(this.invite.token, 'not_a_real_token');
+								return expectInvalidInvitePage(this.user, link, cb);
+							},
+							cb => expectNoProjectAccess(this.user, this.invite.projectId, cb),
+							cb => expectNoProjectAccess(this.user, this.invite.projectId, cb)
 						], done
-					)
+					);
+				});
 
-				it 'should allow the user to accept the invite and access the project', (done) ->
-					Async.series(
+				return it('should allow the user to accept the invite and access the project', function(done) {
+					return Async.series(
 						[
-							(cb) => expectInvitePage @user, @link, cb
-							(cb) => expectAcceptInviteAndRedirect @user, @invite, cb
-							(cb) => expectProjectAccess @user, @invite.projectId, cb
+							cb => expectInvitePage(this.user, this.link, cb),
+							cb => expectAcceptInviteAndRedirect(this.user, this.invite, cb),
+							cb => expectProjectAccess(this.user, this.invite.projectId, cb)
 						], done
-					)
+					);
+				});
+			});
+		});
 
-		describe 'user is not logged in initially', ->
+		return describe('user is not logged in initially', function() {
 
-			before (done) ->
-				@user.logout done
+			before(function(done) {
+				return this.user.logout(done);
+			});
 
-			beforeEach (done) ->
-				Async.series [
-					(cb) =>
-						createProjectAndInvite @sendingUser, @projectName, @email, (err, project, invite, link) =>
-							@projectId = project._id
-							@fakeProject = project
-							@invite = invite
-							@link = link
-							cb()
-				], done
+			beforeEach(function(done) {
+				return Async.series([
+					cb => {
+						return createProjectAndInvite(this.sendingUser, this.projectName, this.email, (err, project, invite, link) => {
+							this.projectId = project._id;
+							this.fakeProject = project;
+							this.invite = invite;
+							this.link = link;
+							return cb();
+						});
+					}
+				], done);
+			});
 
-			afterEach (done) ->
-				Async.series [
-					(cb) => @sendingUser.deleteProject(@projectId, cb)
-					(cb) => @sendingUser.deleteProject(@projectId, cb)
-					(cb) => revokeInvite(@sendingUser, @projectId, @invite._id, cb)
-				], done
+			afterEach(function(done) {
+				return Async.series([
+					cb => this.sendingUser.deleteProject(this.projectId, cb),
+					cb => this.sendingUser.deleteProject(this.projectId, cb),
+					cb => revokeInvite(this.sendingUser, this.projectId, this.invite._id, cb)
+				], done);
+			});
 
-			describe 'registration prompt workflow with valid token', ->
+			describe('registration prompt workflow with valid token', function() {
 
-				it 'should redirect to the register page', (done) ->
-					Async.series [
-						(cb) => expectInviteRedirectToRegister(@user, @link, cb)
-					], done
+				it('should redirect to the register page', function(done) {
+					return Async.series([
+						cb => expectInviteRedirectToRegister(this.user, this.link, cb)
+					], done);
+				});
 
-				it 'should allow user to accept the invite if the user registers a new account', (done) ->
-					Async.series [
-						(cb) => expectInviteRedirectToRegister @user, @link, cb
-						(cb) => expectRegistrationRedirectToInvite @user, "some_email@example.com", @link, cb
-						(cb) => expectInvitePage @user, @link, cb
-						(cb) => expectAcceptInviteAndRedirect @user, @invite, cb
-						(cb) => expectProjectAccess @user, @invite.projectId, cb
-					], done
+				return it('should allow user to accept the invite if the user registers a new account', function(done) {
+					return Async.series([
+						cb => expectInviteRedirectToRegister(this.user, this.link, cb),
+						cb => expectRegistrationRedirectToInvite(this.user, "some_email@example.com", this.link, cb),
+						cb => expectInvitePage(this.user, this.link, cb),
+						cb => expectAcceptInviteAndRedirect(this.user, this.invite, cb),
+						cb => expectProjectAccess(this.user, this.invite.projectId, cb)
+					], done);
+				});
+			});
 
-			describe 'registration prompt workflow with non-valid token', ->
+			describe('registration prompt workflow with non-valid token', function() {
 
-				before (done)->
-					@user.logout done
+				before(function(done){
+					return this.user.logout(done);
+				});
 
-				it 'should redirect to the register page', (done) ->
-					Async.series [
-						(cb) => expectInviteRedirectToRegister(@user, @link, cb)
-						(cb) => expectNoProjectAccess @user, @invite.projectId, cb
-					], done
+				it('should redirect to the register page', function(done) {
+					return Async.series([
+						cb => expectInviteRedirectToRegister(this.user, this.link, cb),
+						cb => expectNoProjectAccess(this.user, this.invite.projectId, cb)
+					], done);
+				});
 
-				it 'should display invalid-invite if the user registers a new account', (done) ->
-					badLink = @link.replace(@invite.token, 'not_a_real_token')
-					Async.series [
-						(cb) => expectInviteRedirectToRegister @user, badLink, cb
-						(cb) => expectRegistrationRedirectToInvite @user, "some_email@example.com", badLink, cb
-						(cb) => expectInvalidInvitePage @user, badLink, cb
-						(cb) => expectNoProjectAccess @user, @invite.projectId, cb
-					], done
+				return it('should display invalid-invite if the user registers a new account', function(done) {
+					const badLink = this.link.replace(this.invite.token, 'not_a_real_token');
+					return Async.series([
+						cb => expectInviteRedirectToRegister(this.user, badLink, cb),
+						cb => expectRegistrationRedirectToInvite(this.user, "some_email@example.com", badLink, cb),
+						cb => expectInvalidInvitePage(this.user, badLink, cb),
+						cb => expectNoProjectAccess(this.user, this.invite.projectId, cb)
+					], done);
+				});
+			});
 
-			describe 'login workflow with valid token', ->
+			describe('login workflow with valid token', function() {
 
-				before (done)->
-					@user.logout done
+				before(function(done){
+					return this.user.logout(done);
+				});
 
-				it 'should redirect to the register page', (done) ->
-					Async.series [
-						(cb) => expectInviteRedirectToRegister(@user, @link, cb)
-						(cb) => expectNoProjectAccess @user, @invite.projectId, cb
-					], done
+				it('should redirect to the register page', function(done) {
+					return Async.series([
+						cb => expectInviteRedirectToRegister(this.user, this.link, cb),
+						cb => expectNoProjectAccess(this.user, this.invite.projectId, cb)
+					], done);
+				});
 
-				it 'should allow the user to login to view the invite', (done) ->
-					Async.series [
-						(cb) => expectInviteRedirectToRegister @user, @link, cb
-						(cb) => expectLoginPage @user, cb
-						(cb) => expectLoginRedirectToInvite @user, @link, cb
-						(cb) => expectInvitePage @user, @link, cb
-						(cb) => expectNoProjectAccess @user, @invite.projectId, cb
-					], done
+				it('should allow the user to login to view the invite', function(done) {
+					return Async.series([
+						cb => expectInviteRedirectToRegister(this.user, this.link, cb),
+						cb => expectLoginPage(this.user, cb),
+						cb => expectLoginRedirectToInvite(this.user, this.link, cb),
+						cb => expectInvitePage(this.user, this.link, cb),
+						cb => expectNoProjectAccess(this.user, this.invite.projectId, cb)
+					], done);
+				});
 
-				it 'should allow user to accept the invite if the user registers a new account', (done) ->
-					Async.series [
-						(cb) => expectInvitePage @user, @link, cb
-						(cb) => expectAcceptInviteAndRedirect @user, @invite, cb
-						(cb) => expectProjectAccess @user, @invite.projectId, cb
-					], done
+				return it('should allow user to accept the invite if the user registers a new account', function(done) {
+					return Async.series([
+						cb => expectInvitePage(this.user, this.link, cb),
+						cb => expectAcceptInviteAndRedirect(this.user, this.invite, cb),
+						cb => expectProjectAccess(this.user, this.invite.projectId, cb)
+					], done);
+				});
+			});
 
-			describe 'login workflow with non-valid token', ->
+			return describe('login workflow with non-valid token', function() {
 
-				before (done)->
-					@user.logout done
+				before(function(done){
+					return this.user.logout(done);
+				});
 
-				it 'should redirect to the register page', (done) ->
-					Async.series [
-						(cb) => expectInviteRedirectToRegister(@user, @link, cb)
-						(cb) => expectNoProjectAccess @user, @invite.projectId, cb
-					], done
+				it('should redirect to the register page', function(done) {
+					return Async.series([
+						cb => expectInviteRedirectToRegister(this.user, this.link, cb),
+						cb => expectNoProjectAccess(this.user, this.invite.projectId, cb)
+					], done);
+				});
 
-				it 'should show the invalid-invite page once the user has logged in', (done) ->
-					badLink = @link.replace(@invite.token, 'not_a_real_token')
-					Async.series [
-						(cb) =>
-							expectInviteRedirectToRegister @user, badLink, cb
-						(cb) =>
-							expectLoginPage @user, cb
-						(cb) => expectLoginRedirectToInvite @user, badLink, cb
-						(cb) => expectInvalidInvitePage @user, badLink, cb
-						(cb) => expectNoProjectAccess @user, @invite.projectId, cb
-					], done
+				return it('should show the invalid-invite page once the user has logged in', function(done) {
+					const badLink = this.link.replace(this.invite.token, 'not_a_real_token');
+					return Async.series([
+						cb => {
+							return expectInviteRedirectToRegister(this.user, badLink, cb);
+						},
+						cb => {
+							return expectLoginPage(this.user, cb);
+						},
+						cb => expectLoginRedirectToInvite(this.user, badLink, cb),
+						cb => expectInvalidInvitePage(this.user, badLink, cb),
+						cb => expectNoProjectAccess(this.user, this.invite.projectId, cb)
+					], done);
+				});
+			});
+		});
+	});
+});

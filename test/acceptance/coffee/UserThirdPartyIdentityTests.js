@@ -1,94 +1,129 @@
-Errors = require "../../../app/js/Features/Errors/Errors"
-Settings = require "settings-sharelatex"
-User = require "./helpers/User"
-ThirdPartyIdentityManager = require "../../../app/js/Features/User/ThirdPartyIdentityManager"
-chai = require "chai"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const Errors = require("../../../app/js/Features/Errors/Errors");
+const Settings = require("settings-sharelatex");
+const User = require("./helpers/User");
+const ThirdPartyIdentityManager = require("../../../app/js/Features/User/ThirdPartyIdentityManager");
+const chai = require("chai");
 
-expect = chai.expect
+const {
+    expect
+} = chai;
 
-describe "ThirdPartyIdentityManager", ->
-	beforeEach (done) ->
-		@provider = "provider"
-		@externalUserId = "external-user-id"
-		@externalData = test: "data"
-		@user = new User()
-		@user.ensureUserExists done
+describe("ThirdPartyIdentityManager", function() {
+	beforeEach(function(done) {
+		this.provider = "provider";
+		this.externalUserId = "external-user-id";
+		this.externalData = {test: "data"};
+		this.user = new User();
+		return this.user.ensureUserExists(done);
+	});
 
-	afterEach (done) ->
-		@user.full_delete_user @user.email, done
+	afterEach(function(done) {
+		return this.user.full_delete_user(this.user.email, done);
+	});
 
-	describe "login", ->
-		describe "when third party identity exists", ->
-			beforeEach (done) ->
-				ThirdPartyIdentityManager.link @user.id, @provider, @externalUserId, @externalData, done
+	describe("login", function() {
+		describe("when third party identity exists", function() {
+			beforeEach(function(done) {
+				return ThirdPartyIdentityManager.link(this.user.id, this.provider, this.externalUserId, this.externalData, done);
+			});
 
-			it "should return user", (done) ->
-				ThirdPartyIdentityManager.login @provider, @externalUserId, @externalData, (err, user) =>
-					expect(err).to.be.null
-					expect(user._id.toString()).to.equal @user.id
-					done()
-				return
+			it("should return user", function(done) {
+				ThirdPartyIdentityManager.login(this.provider, this.externalUserId, this.externalData, (err, user) => {
+					expect(err).to.be.null;
+					expect(user._id.toString()).to.equal(this.user.id);
+					return done();
+				});
+			});
 
-			it "should merge external data", (done) ->
-				@externalData =
-					test: "different"
+			return it("should merge external data", function(done) {
+				this.externalData = {
+					test: "different",
 					another: "key"
-				ThirdPartyIdentityManager.login @provider, @externalUserId, @externalData, (err, user) =>
-					expect(err).to.be.null
-					expect(user.thirdPartyIdentifiers[0].externalData).to.deep.equal @externalData
-					done()
-				return
+				};
+				ThirdPartyIdentityManager.login(this.provider, this.externalUserId, this.externalData, (err, user) => {
+					expect(err).to.be.null;
+					expect(user.thirdPartyIdentifiers[0].externalData).to.deep.equal(this.externalData);
+					return done();
+				});
+			});
+		});
 
-		describe "when third party identity does not exists", ->
-			it "should return error", (done) ->
-				ThirdPartyIdentityManager.login @provider, @externalUserId, @externalData, (err, user) =>
-					expect(err.name).to.equal "ThirdPartyUserNotFoundError"
-					done()
-				return
+		return describe("when third party identity does not exists", () => it("should return error", function(done) {
+            ThirdPartyIdentityManager.login(this.provider, this.externalUserId, this.externalData, (err, user) => {
+                expect(err.name).to.equal("ThirdPartyUserNotFoundError");
+                return done();
+            });
+        }));
+	});
 
-	describe "link", ->
-		describe "when provider not already linked", ->
-			it "should link provider to user", (done) ->
-				ThirdPartyIdentityManager.link @user.id, @provider, @externalUserId, @externalData, (err, res) ->
-					expect(res.nModified).to.equal 1
-					done()
+	describe("link", function() {
+		describe("when provider not already linked", () => it("should link provider to user", function(done) {
+            return ThirdPartyIdentityManager.link(this.user.id, this.provider, this.externalUserId, this.externalData, function(err, res) {
+                expect(res.nModified).to.equal(1);
+                return done();
+            });
+        }));
 
-		describe "when provider is already linked", ->
-			beforeEach (done) ->
-				ThirdPartyIdentityManager.link @user.id, @provider, @externalUserId, @externalData, done
+		return describe("when provider is already linked", function() {
+			beforeEach(function(done) {
+				return ThirdPartyIdentityManager.link(this.user.id, this.provider, this.externalUserId, this.externalData, done);
+			});
 
-			it "should link provider to user", (done) ->
-				ThirdPartyIdentityManager.link @user.id, @provider, @externalUserId, @externalData, (err, res) ->
-					expect(res.nModified).to.equal 1
-					done()
+			it("should link provider to user", function(done) {
+				return ThirdPartyIdentityManager.link(this.user.id, this.provider, this.externalUserId, this.externalData, function(err, res) {
+					expect(res.nModified).to.equal(1);
+					return done();
+				});
+			});
 
-			it "should not create duplicate thirdPartyIdentifiers", (done) ->
-				ThirdPartyIdentityManager.link @user.id, @provider, @externalUserId, @externalData, (err, res) =>
-					@user.get (err, user) ->
-						expect(user.thirdPartyIdentifiers.length).to.equal 1
-						done()
+			it("should not create duplicate thirdPartyIdentifiers", function(done) {
+				return ThirdPartyIdentityManager.link(this.user.id, this.provider, this.externalUserId, this.externalData, (err, res) => {
+					return this.user.get(function(err, user) {
+						expect(user.thirdPartyIdentifiers.length).to.equal(1);
+						return done();
+					});
+				});
+			});
 
-			it "should replace existing data", (done) ->
-				@externalData = replace: "data"
-				ThirdPartyIdentityManager.link @user.id, @provider, @externalUserId, @externalData, (err, res) =>
-					@user.get (err, user) =>
-						expect(user.thirdPartyIdentifiers[0].externalData).to.deep.equal @externalData
-						done()
+			return it("should replace existing data", function(done) {
+				this.externalData = {replace: "data"};
+				return ThirdPartyIdentityManager.link(this.user.id, this.provider, this.externalUserId, this.externalData, (err, res) => {
+					return this.user.get((err, user) => {
+						expect(user.thirdPartyIdentifiers[0].externalData).to.deep.equal(this.externalData);
+						return done();
+					});
+				});
+			});
+		});
+	});
 
-	describe "unlink", ->
-		describe "when provider not already linked", ->
-			it "should succeed", (done) ->
-				ThirdPartyIdentityManager.unlink @user.id, @provider, (err, res) ->
-					expect(err).to.be.null
-					expect(res.nModified).to.equal 0
-					done()
+	return describe("unlink", function() {
+		describe("when provider not already linked", () => it("should succeed", function(done) {
+            return ThirdPartyIdentityManager.unlink(this.user.id, this.provider, function(err, res) {
+                expect(err).to.be.null;
+                expect(res.nModified).to.equal(0);
+                return done();
+            });
+        }));
 
-		describe "when provider is already linked", ->
-			beforeEach (done) ->
-				ThirdPartyIdentityManager.link @user.id, @provider, @externalUserId, @externalData, done
+		return describe("when provider is already linked", function() {
+			beforeEach(function(done) {
+				return ThirdPartyIdentityManager.link(this.user.id, this.provider, this.externalUserId, this.externalData, done);
+			});
 
-			it "should remove thirdPartyIdentifiers entry", (done) ->
-				ThirdPartyIdentityManager.unlink @user.id, @provider, (err, res) =>
-					@user.get (err, user) ->
-						expect(user.thirdPartyIdentifiers.length).to.equal 0
-						done()
+			return it("should remove thirdPartyIdentifiers entry", function(done) {
+				return ThirdPartyIdentityManager.unlink(this.user.id, this.provider, (err, res) => {
+					return this.user.get(function(err, user) {
+						expect(user.thirdPartyIdentifiers.length).to.equal(0);
+						return done();
+					});
+				});
+			});
+		});
+	});
+});

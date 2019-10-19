@@ -1,61 +1,84 @@
-expect = require("chai").expect
-async = require("async")
-User = require "./helpers/User"
-request = require "./helpers/request"
-settings = require "settings-sharelatex"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const {
+    expect
+} = require("chai");
+const async = require("async");
+const User = require("./helpers/User");
+const request = require("./helpers/request");
+const settings = require("settings-sharelatex");
 
-joinProject = (user_id, project_id, callback) ->
-	request.post {
-		url: "/project/#{project_id}/join"
-		qs: {user_id}
-		auth:
-			user: settings.apis.web.user
-			pass: settings.apis.web.pass
-			sendImmediately: true
-		json: true
-		jar: false
-	}, callback
+const joinProject = (user_id, project_id, callback) => request.post({
+    url: `/project/${project_id}/join`,
+    qs: {user_id},
+    auth: {
+        user: settings.apis.web.user,
+        pass: settings.apis.web.pass,
+        sendImmediately: true
+    },
+    json: true,
+    jar: false
+}, callback);
 
-describe "ProjectFeatures", ->
-	@timeout(90000)
+describe("ProjectFeatures", function() {
+	this.timeout(90000);
 
-	before (done) ->
-		@owner = new User()
-		async.series [
-			(cb) => @owner.login cb
-		], done
+	before(function(done) {
+		this.owner = new User();
+		return async.series([
+			cb => this.owner.login(cb)
+		], done);
+	});
 
-	describe "with private project", ->
-		before (done) ->
-			@owner.createProject "private-project", (error, project_id) =>
-				return done(error) if error?
-				@project_id = project_id
-				done()
+	return describe("with private project", function() {
+		before(function(done) {
+			return this.owner.createProject("private-project", (error, project_id) => {
+				if (error != null) { return done(error); }
+				this.project_id = project_id;
+				return done();
+			});
+		});
 
-		describe "with an upgraded account", ->
-			before (done) ->
-				@owner.upgradeFeatures done
-			after (done) ->
-				@owner.defaultFeatures done
+		describe("with an upgraded account", function() {
+			before(function(done) {
+				return this.owner.upgradeFeatures(done);
+			});
+			after(function(done) {
+				return this.owner.defaultFeatures(done);
+			});
 
-			it "should have premium features", (done) ->
-				joinProject @owner._id, @project_id, (error, response, body) ->
-					expect(body.project.features.compileGroup).to.equal "priority"
-					expect(body.project.features.versioning).to.equal true
-					expect(body.project.features.templates).to.equal true
-					expect(body.project.features.dropbox).to.equal true
-					done()
+			return it("should have premium features", function(done) {
+				return joinProject(this.owner._id, this.project_id, function(error, response, body) {
+					expect(body.project.features.compileGroup).to.equal("priority");
+					expect(body.project.features.versioning).to.equal(true);
+					expect(body.project.features.templates).to.equal(true);
+					expect(body.project.features.dropbox).to.equal(true);
+					return done();
+				});
+			});
+		});
 
-		describe "with an basic account", ->
-			before (done) ->
-				@owner.downgradeFeatures done
-			after (done) ->
-				@owner.defaultFeatures done
+		return describe("with an basic account", function() {
+			before(function(done) {
+				return this.owner.downgradeFeatures(done);
+			});
+			after(function(done) {
+				return this.owner.defaultFeatures(done);
+			});
 
-			it "should have basic features", (done) ->
-				joinProject @owner._id, @project_id, (error, response, body) ->
-					expect(body.project.features.compileGroup).to.equal "standard"
-					expect(body.project.features.versioning).to.equal false
-					expect(body.project.features.templates).to.equal false
-					expect(body.project.features.dropbox).to.equal false
-					done()
+			return it("should have basic features", function(done) {
+				return joinProject(this.owner._id, this.project_id, function(error, response, body) {
+					expect(body.project.features.compileGroup).to.equal("standard");
+					expect(body.project.features.versioning).to.equal(false);
+					expect(body.project.features.templates).to.equal(false);
+					expect(body.project.features.dropbox).to.equal(false);
+					return done();
+				});
+			});
+		});
+	});
+});

@@ -1,213 +1,273 @@
-expect = require("chai").expect
-async = require("async")
-UserClient = require "./helpers/User"
-request = require "./helpers/request"
-settings = require "settings-sharelatex"
-{ObjectId} = require("../../../app/js/infrastructure/mongojs")
-Subscription = require("../../../app/js/models/Subscription").Subscription
-User = require("../../../app/js/models/User").User
-FeaturesUpdater = require("../../../app/js/Features/Subscription/FeaturesUpdater")
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const {
+    expect
+} = require("chai");
+const async = require("async");
+const UserClient = require("./helpers/User");
+const request = require("./helpers/request");
+const settings = require("settings-sharelatex");
+const {ObjectId} = require("../../../app/js/infrastructure/mongojs");
+const {
+    Subscription
+} = require("../../../app/js/models/Subscription");
+const {
+    User
+} = require("../../../app/js/models/User");
+const FeaturesUpdater = require("../../../app/js/Features/Subscription/FeaturesUpdater");
 
-MockV1Api = require "./helpers/MockV1Api"
-logger = require "logger-sharelatex"
-logger.logger.level("error")
+const MockV1Api = require("./helpers/MockV1Api");
+const logger = require("logger-sharelatex");
+logger.logger.level("error");
 
-syncUserAndGetFeatures = (user, callback = (error, features) ->) ->
-	FeaturesUpdater.refreshFeatures user._id, false, (error) ->
-		return callback(error) if error?
-		User.findById user._id, (error, user) ->
-			return callback(error) if error?
-			features = user.toObject().features
-			delete features.$init # mongoose internals
-			return callback null, features
+const syncUserAndGetFeatures = function(user, callback) {
+	if (callback == null) { callback = function(error, features) {}; }
+	return FeaturesUpdater.refreshFeatures(user._id, false, function(error) {
+		if (error != null) { return callback(error); }
+		return User.findById(user._id, function(error, user) {
+			if (error != null) { return callback(error); }
+			const {
+                features
+            } = user.toObject();
+			delete features.$init; // mongoose internals
+			return callback(null, features);
+		});
+	});
+};
 
-describe "FeatureUpdater.refreshFeatures", ->
-	beforeEach (done) ->
-		@user = new UserClient()
-		@user.ensureUserExists (error) ->
-			throw error if error?
-			done()
+describe("FeatureUpdater.refreshFeatures", function() {
+	beforeEach(function(done) {
+		this.user = new UserClient();
+		return this.user.ensureUserExists(function(error) {
+			if (error != null) { throw error; }
+			return done();
+		});
+	});
 
-	describe "when user has no subscriptions", ->
-		it "should set their features to the basic set", (done) ->
-			syncUserAndGetFeatures @user, (error, features) =>
-				throw error if error?
-				expect(features).to.deep.equal(settings.defaultFeatures)
-				done()
+	describe("when user has no subscriptions", () => it("should set their features to the basic set", function(done) {
+        return syncUserAndGetFeatures(this.user, (error, features) => {
+            if (error != null) { throw error; }
+            expect(features).to.deep.equal(settings.defaultFeatures);
+            return done();
+        });
+    }));
 
-	describe "when the user has an individual subscription", ->
-		beforeEach ->
-			Subscription.create {
-				admin_id: @user._id
-				manager_ids: [@user._id]
-				planCode: 'collaborator'
+	describe("when the user has an individual subscription", function() {
+		beforeEach(function() {
+			return Subscription.create({
+				admin_id: this.user._id,
+				manager_ids: [this.user._id],
+				planCode: 'collaborator',
 				customAccount: true
-			} # returns a promise
+			});}); // returns a promise
 
-		it "should set their features to the upgraded set", (done) ->
-			syncUserAndGetFeatures @user, (error, features) =>
-				throw error if error?
-				plan = settings.plans.find (plan) -> plan.planCode == 'collaborator'
-				expect(features).to.deep.equal(plan.features)
-				done()
+		return it("should set their features to the upgraded set", function(done) {
+			return syncUserAndGetFeatures(this.user, (error, features) => {
+				if (error != null) { throw error; }
+				const plan = settings.plans.find(plan => plan.planCode === 'collaborator');
+				expect(features).to.deep.equal(plan.features);
+				return done();
+			});
+		});
+	});
 
-	describe "when the user is in a group subscription", ->
-		beforeEach ->
-			Subscription.create {
-				admin_id: ObjectId()
-				member_ids: [@user._id]
-				groupAccount: true
-				planCode: 'collaborator'
+	describe("when the user is in a group subscription", function() {
+		beforeEach(function() {
+			return Subscription.create({
+				admin_id: ObjectId(),
+				member_ids: [this.user._id],
+				groupAccount: true,
+				planCode: 'collaborator',
 				customAccount: true
-			} # returns a promise
+			});}); // returns a promise
 
-		it "should set their features to the upgraded set", (done) ->
-			syncUserAndGetFeatures @user, (error, features) =>
-				throw error if error?
-				plan = settings.plans.find (plan) -> plan.planCode == 'collaborator'
-				expect(features).to.deep.equal(plan.features)
-				done()
+		return it("should set their features to the upgraded set", function(done) {
+			return syncUserAndGetFeatures(this.user, (error, features) => {
+				if (error != null) { throw error; }
+				const plan = settings.plans.find(plan => plan.planCode === 'collaborator');
+				expect(features).to.deep.equal(plan.features);
+				return done();
+			});
+		});
+	});
 
-	describe "when the user has bonus features", ->
-		beforeEach ->
-			User.update {
-				_id: @user._id
+	describe("when the user has bonus features", function() {
+		beforeEach(function() {
+			return User.update({
+				_id: this.user._id
 			}, {
 				refered_user_count: 10
-			} # returns a promise
+			});}); // returns a promise
 
-		it "should set their features to the bonus set", (done) ->
-			syncUserAndGetFeatures @user, (error, features) =>
-				throw error if error?
+		return it("should set their features to the bonus set", function(done) {
+			return syncUserAndGetFeatures(this.user, (error, features) => {
+				if (error != null) { throw error; }
 				expect(features).to.deep.equal(Object.assign(
 					{}, settings.defaultFeatures,	settings.bonus_features[9]
-				))
-				done()
+				));
+				return done();
+			});
+		});
+	});
 
-	describe "when the user has affiliations", ->
-		beforeEach ->
-			@institutionPlan = settings.plans.find (plan) ->
-				plan.planCode == settings.institutionPlanCode
-			@email = @user.emails[0].email
-			@affiliationData =
-				email: @email
+	describe("when the user has affiliations", function() {
+		beforeEach(function() {
+			this.institutionPlan = settings.plans.find(plan => plan.planCode === settings.institutionPlanCode);
+			this.email = this.user.emails[0].email;
+			return this.affiliationData = {
+				email: this.email,
 				institution: { licence: 'pro_plus', confirmed: true }
+			};});
 
-		it "should not set their features if email is not confirmed", (done) ->
-			MockV1Api.setAffiliations [@affiliationData]
-			syncUserAndGetFeatures @user, (error, features) =>
-				expect(features).to.deep.equal(settings.defaultFeatures)
-				done()
+		it("should not set their features if email is not confirmed", function(done) {
+			MockV1Api.setAffiliations([this.affiliationData]);
+			return syncUserAndGetFeatures(this.user, (error, features) => {
+				expect(features).to.deep.equal(settings.defaultFeatures);
+				return done();
+			});
+		});
 
-		it "should set their features if email is confirmed", (done) ->
-			MockV1Api.setAffiliations [@affiliationData]
-			@user.confirmEmail @email, (error) =>
-				syncUserAndGetFeatures @user, (error, features) =>
-					expect(features).to.deep.equal(@institutionPlan.features)
-					done()
+		it("should set their features if email is confirmed", function(done) {
+			MockV1Api.setAffiliations([this.affiliationData]);
+			return this.user.confirmEmail(this.email, error => {
+				return syncUserAndGetFeatures(this.user, (error, features) => {
+					expect(features).to.deep.equal(this.institutionPlan.features);
+					return done();
+				});
+			});
+		});
 
-		it "should not set their features if institution is not confirmed", (done) ->
-			@affiliationData.institution.confirmed = false
-			MockV1Api.setAffiliations [@affiliationData]
-			@user.confirmEmail @email, (error) =>
-				syncUserAndGetFeatures @user, (error, features) =>
-					expect(features).to.deep.equal(settings.defaultFeatures)
-					done()
+		return it("should not set their features if institution is not confirmed", function(done) {
+			this.affiliationData.institution.confirmed = false;
+			MockV1Api.setAffiliations([this.affiliationData]);
+			return this.user.confirmEmail(this.email, error => {
+				return syncUserAndGetFeatures(this.user, (error, features) => {
+					expect(features).to.deep.equal(settings.defaultFeatures);
+					return done();
+				});
+			});
+		});
+	});
 
-	describe "when the user is due bonus features and has extra features that no longer apply", ->
-		beforeEach ->
-			User.update {
-				_id: @user._id
+	describe("when the user is due bonus features and has extra features that no longer apply", function() {
+		beforeEach(function() {
+			return User.update({
+				_id: this.user._id
 			}, {
 				refered_user_count: 10,
 				'features.github': true
-			} # returns a promise
+			});}); // returns a promise
 
-		it "should set their features to the bonus set and downgrade the extras", (done) ->
-			syncUserAndGetFeatures @user, (error, features) =>
-				throw error if error?
+		return it("should set their features to the bonus set and downgrade the extras", function(done) {
+			return syncUserAndGetFeatures(this.user, (error, features) => {
+				if (error != null) { throw error; }
 				expect(features).to.deep.equal(Object.assign(
 					{}, settings.defaultFeatures,	settings.bonus_features[9]
-				))
-				done()
+				));
+				return done();
+			});
+		});
+	});
 
-	describe "when the user has a v1 plan", ->
-		beforeEach ->
-			MockV1Api.setUser 42, plan_name: 'free'
-			User.update {
-				_id: @user._id
+	describe("when the user has a v1 plan", function() {
+		beforeEach(function() {
+			MockV1Api.setUser(42, {plan_name: 'free'});
+			return User.update({
+				_id: this.user._id
 			}, {
-				overleaf:
+				overleaf: {
 					id: 42
-			} # returns a promise
+				}
+			});}); // returns a promise
 
-		it "should set their features to the v1 plan", (done) ->
-			syncUserAndGetFeatures @user, (error, features) =>
-				throw error if error?
-				plan = settings.plans.find (plan) -> plan.planCode == 'v1_free'
-				expect(features).to.deep.equal(plan.features)
-				done()
+		return it("should set their features to the v1 plan", function(done) {
+			return syncUserAndGetFeatures(this.user, (error, features) => {
+				if (error != null) { throw error; }
+				const plan = settings.plans.find(plan => plan.planCode === 'v1_free');
+				expect(features).to.deep.equal(plan.features);
+				return done();
+			});
+		});
+	});
 
-	describe "when the user has a v1 plan and bonus features", ->
-		beforeEach ->
-			MockV1Api.setUser 42, plan_name: 'free'
-			User.update {
-				_id: @user._id
+	describe("when the user has a v1 plan and bonus features", function() {
+		beforeEach(function() {
+			MockV1Api.setUser(42, {plan_name: 'free'});
+			return User.update({
+				_id: this.user._id
 			}, {
-				overleaf:
+				overleaf: {
 					id: 42
+				},
 				refered_user_count: 10
-			} # returns a promise
+			});}); // returns a promise
 
-		it "should set their features to the best of the v1 plan and bonus features", (done) ->
-			syncUserAndGetFeatures @user, (error, features) =>
-				throw error if error?
-				v1plan = settings.plans.find (plan) -> plan.planCode == 'v1_free'
-				expectedFeatures = Object.assign(
+		return it("should set their features to the best of the v1 plan and bonus features", function(done) {
+			return syncUserAndGetFeatures(this.user, (error, features) => {
+				if (error != null) { throw error; }
+				const v1plan = settings.plans.find(plan => plan.planCode === 'v1_free');
+				const expectedFeatures = Object.assign(
 					{}, v1plan.features, settings.bonus_features[9]
-				)
-				expect(features).to.deep.equal(expectedFeatures)
-				done()
+				);
+				expect(features).to.deep.equal(expectedFeatures);
+				return done();
+			});
+		});
+	});
 
-	describe "when the user has a group and personal subscription", ->
-		beforeEach (done) ->
-			Subscription.create {
-				admin_id: @user._id
-				manager_ids: [@user._id]
-				planCode: 'professional'
+	describe("when the user has a group and personal subscription", function() {
+		beforeEach(function(done) {
+			Subscription.create({
+				admin_id: this.user._id,
+				manager_ids: [this.user._id],
+				planCode: 'professional',
 				customAccount: true
-			}, (error) =>
-				throw error if error?
-				Subscription.create {
-					admin_id: ObjectId()
-					member_ids: [@user._id]
-					groupAccount: true
-					planCode: 'collaborator'
+			}, error => {
+				if (error != null) { throw error; }
+				return Subscription.create({
+					admin_id: ObjectId(),
+					member_ids: [this.user._id],
+					groupAccount: true,
+					planCode: 'collaborator',
 					customAccount: true
-				}, done
-			return
+				}, done);
+			});
+		});
 
-		it "should set their features to the best set", (done) ->
-			syncUserAndGetFeatures @user, (error, features) =>
-				throw error if error?
-				plan = settings.plans.find (plan) -> plan.planCode == 'professional'
-				expect(features).to.deep.equal(plan.features)
-				done()
+		return it("should set their features to the best set", function(done) {
+			return syncUserAndGetFeatures(this.user, (error, features) => {
+				if (error != null) { throw error; }
+				const plan = settings.plans.find(plan => plan.planCode === 'professional');
+				expect(features).to.deep.equal(plan.features);
+				return done();
+			});
+		});
+	});
 
-	describe "when the notifyV1Flag is passed", ->
-		beforeEach ->
-			User.update {
-				_id: @user._id
+	return describe("when the notifyV1Flag is passed", function() {
+		beforeEach(function() {
+			return User.update({
+				_id: this.user._id
 			}, {
-				overleaf:
+				overleaf: {
 					id: 42
-			} # returns a promise
+				}
+			});}); // returns a promise
 
-		it "should ping the v1 API end point to sync", (done) ->
-			FeaturesUpdater.refreshFeatures @user._id, true, (error) =>
-				setTimeout () =>
+		return it("should ping the v1 API end point to sync", function(done) {
+			return FeaturesUpdater.refreshFeatures(this.user._id, true, error => {
+				return setTimeout(() => {
 					expect(
 						MockV1Api.syncUserFeatures.calledWith('42')
-					).to.equal true
-					done()
-				, 500
+					).to.equal(true);
+					return done();
+				}
+				, 500);
+			});
+		});
+	});
+});

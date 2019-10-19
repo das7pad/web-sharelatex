@@ -1,39 +1,54 @@
-expect = require('chai').expect
-async = require("async")
-User = require "./helpers/User"
-{Subscription} = require "../../../app/js/models/Subscription"
-{Institution} = require "../../../app/js/models/Institution"
-SubscriptionViewModelBuilder = require "../../../app/js/Features/Subscription/SubscriptionViewModelBuilder"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const {
+    expect
+} = require('chai');
+const async = require("async");
+const User = require("./helpers/User");
+const {Subscription} = require("../../../app/js/models/Subscription");
+const {Institution} = require("../../../app/js/models/Institution");
+const SubscriptionViewModelBuilder = require("../../../app/js/Features/Subscription/SubscriptionViewModelBuilder");
 
-MockRecurlyApi = require "./helpers/MockRecurlyApi"
-MockV1Api = require "./helpers/MockV1Api"
+const MockRecurlyApi = require("./helpers/MockRecurlyApi");
+const MockV1Api = require("./helpers/MockV1Api");
 
-describe 'Subscriptions', ->
-	@timeout(25000)
+describe('Subscriptions', function() {
+	this.timeout(25000);
 
-	describe 'dashboard', ->
-		before (done) ->
-			@user = new User()
-			@user.ensureUserExists done
+	describe('dashboard', function() {
+		before(function(done) {
+			this.user = new User();
+			return this.user.ensureUserExists(done);
+		});
 
-		describe 'when the user has no subscription', ->
-			before (done) ->
-				SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel @user, (error, @data) =>
-					return done(error) if error?
-					done()
+		describe('when the user has no subscription', function() {
+			before(function(done) {
+				return SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel(this.user, (error, data) => {
+					this.data = data;
+					if (error != null) { return done(error); }
+					return done();
+				});
+			});
 
-			it 'should return no personalSubscription', ->
-				expect(@data.personalSubscription).to.equal null
+			it('should return no personalSubscription', function() {
+				return expect(this.data.personalSubscription).to.equal(null);
+			});
 
-			it 'should return no memberGroupSubscriptions', ->
-				expect(@data.memberGroupSubscriptions).to.deep.equal []
+			return it('should return no memberGroupSubscriptions', function() {
+				return expect(this.data.memberGroupSubscriptions).to.deep.equal([]);
+		});
+	});
 
-		describe 'when the user has a subscription with recurly', ->
-			before (done) ->
-				MockRecurlyApi.accounts['mock-account-id'] = @accounts = {
+		describe('when the user has a subscription with recurly', function() {
+			before(function(done) {
+				MockRecurlyApi.accounts['mock-account-id'] = (this.accounts = {
 					hosted_login_token: 'mock-login-token'
-				}
-				MockRecurlyApi.subscriptions['mock-subscription-id'] = @subscription = {
+				});
+				MockRecurlyApi.subscriptions['mock-subscription-id'] = (this.subscription = {
 					plan_code: 'collaborator',
 					tax_in_cents: 100,
 					tax_rate: 0.2,
@@ -43,314 +58,378 @@ describe 'Subscriptions', ->
 					state: 'active',
 					account_id: 'mock-account-id',
 					trial_ends_at: new Date(2018, 6, 7)
-				}
-				MockRecurlyApi.coupons = @coupons = {
-					'test-coupon-1': { description: 'Test Coupon 1' }
-					'test-coupon-2': { description: 'Test Coupon 2' }
+				});
+				MockRecurlyApi.coupons = (this.coupons = {
+					'test-coupon-1': { description: 'Test Coupon 1' },
+					'test-coupon-2': { description: 'Test Coupon 2' },
 					'test-coupon-3': { name: 'TestCoupon3' }
-				}
-				Subscription.create {
-					admin_id: @user._id,
-					manager_ids: [@user._id],
+				});
+				Subscription.create({
+					admin_id: this.user._id,
+					manager_ids: [this.user._id],
 					recurlySubscription_id: 'mock-subscription-id',
 					planCode: 'collaborator'
-				}, (error) =>
-					return done(error) if error?
-					SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel @user, (error, @data) =>
-						return done(error) if error?
-						done()
-				return
+				}, error => {
+					if (error != null) { return done(error); }
+					return SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel(this.user, (error, data) => {
+						this.data = data;
+						if (error != null) { return done(error); }
+						return done();
+					});
+				});
+			});
 
-			after (done) ->
-				MockRecurlyApi.accounts = {}
-				MockRecurlyApi.subscriptions = {}
-				MockRecurlyApi.coupons = {}
-				MockRecurlyApi.redemptions = {}
-				Subscription.remove {
-					admin_id: @user._id
-				}, done
-				return
+			after(function(done) {
+				MockRecurlyApi.accounts = {};
+				MockRecurlyApi.subscriptions = {};
+				MockRecurlyApi.coupons = {};
+				MockRecurlyApi.redemptions = {};
+				Subscription.remove({
+					admin_id: this.user._id
+				}, done);
+			});
 
-			it 'should return a personalSubscription with populated recurly data', ->
-				subscription = @data.personalSubscription
-				expect(subscription).to.exist
-				expect(subscription.planCode).to.equal 'collaborator'
-				expect(subscription.recurly).to.exist
-				expect(subscription.recurly).to.deep.equal {
-					"activeCoupons": []
-					"billingDetailsLink": "https://test.recurly.com/account/billing_info/edit?ht=mock-login-token"
-					"currency": "GBP"
-					"nextPaymentDueAt": "5th May 2018"
-					"price": "£6.00"
-					"state": "active"
-					"tax": 100
-					"taxRate": 0.2
+			it('should return a personalSubscription with populated recurly data', function() {
+				const subscription = this.data.personalSubscription;
+				expect(subscription).to.exist;
+				expect(subscription.planCode).to.equal('collaborator');
+				expect(subscription.recurly).to.exist;
+				return expect(subscription.recurly).to.deep.equal({
+					"activeCoupons": [],
+					"billingDetailsLink": "https://test.recurly.com/account/billing_info/edit?ht=mock-login-token",
+					"currency": "GBP",
+					"nextPaymentDueAt": "5th May 2018",
+					"price": "£6.00",
+					"state": "active",
+					"tax": 100,
+					"taxRate": 0.2,
 					"trial_ends_at": new Date(2018, 6, 7),
 					"trialEndsAtFormatted": "7th July 2018"
-				}
+				});
+		});
 
-			it 'should return no memberGroupSubscriptions', ->
-				expect(@data.memberGroupSubscriptions).to.deep.equal []
+			it('should return no memberGroupSubscriptions', function() {
+				return expect(this.data.memberGroupSubscriptions).to.deep.equal([]);
+		});
 
-			it 'should include redeemed coupons', (done) ->
+			return it('should include redeemed coupons', function(done) {
 				MockRecurlyApi.redemptions['mock-account-id'] = [
-					{ state: 'active', coupon_code: 'test-coupon-1' }
-					{ state: 'inactive', coupon_code: 'test-coupon-2' }
+					{ state: 'active', coupon_code: 'test-coupon-1' },
+					{ state: 'inactive', coupon_code: 'test-coupon-2' },
 					{ state: 'active', coupon_code: 'test-coupon-3' }
-				]
+				];
 
-				# rebuild the view model with the redemptions
-				SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel @user, (error, data) ->
-					expect(error).to.not.exist
-					expect(data.personalSubscription.recurly.activeCoupons).to.deep.equal [
+				// rebuild the view model with the redemptions
+				return SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel(this.user, function(error, data) {
+					expect(error).to.not.exist;
+					expect(data.personalSubscription.recurly.activeCoupons).to.deep.equal([
 						{
 							coupon_code: 'test-coupon-1',
 							name: '',
 							description: 'Test Coupon 1'
-						}
+						},
 						{
 							coupon_code: 'test-coupon-3',
 							name: 'TestCoupon3',
 							description: ''
 						}
-					]
-					done()
+					]);
+					return done();
+				});
+			});
+		});
 
-		describe 'when the user has a subscription without recurly', ->
-			before (done) ->
-				Subscription.create {
-					admin_id: @user._id,
-					manager_ids: [@user._id],
+		describe('when the user has a subscription without recurly', function() {
+			before(function(done) {
+				Subscription.create({
+					admin_id: this.user._id,
+					manager_ids: [this.user._id],
 					planCode: 'collaborator'
-				}, (error) =>
-					return done(error) if error?
-					SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel @user, (error, @data) =>
-						return done(error) if error?
-						done()
-				return
+				}, error => {
+					if (error != null) { return done(error); }
+					return SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel(this.user, (error, data) => {
+						this.data = data;
+						if (error != null) { return done(error); }
+						return done();
+					});
+				});
+			});
 
-			after (done) ->
-				Subscription.remove {
-					admin_id: @user._id
-				}, done
-				return
+			after(function(done) {
+				Subscription.remove({
+					admin_id: this.user._id
+				}, done);
+			});
 
-			it 'should return a personalSubscription with no recurly data', ->
-				subscription = @data.personalSubscription
-				expect(subscription).to.exist
-				expect(subscription.planCode).to.equal 'collaborator'
-				expect(subscription.recurly).to.not.exist
+			it('should return a personalSubscription with no recurly data', function() {
+				const subscription = this.data.personalSubscription;
+				expect(subscription).to.exist;
+				expect(subscription.planCode).to.equal('collaborator');
+				return expect(subscription.recurly).to.not.exist;
+			});
 
-			it 'should return no memberGroupSubscriptions', ->
-				expect(@data.memberGroupSubscriptions).to.deep.equal []
+			return it('should return no memberGroupSubscriptions', function() {
+				return expect(this.data.memberGroupSubscriptions).to.deep.equal([]);
+		});
+	});
 
-		describe 'when the user is a member of a group subscription', ->
-			before (done) ->
-				@owner1 = new User()
-				@owner2 = new User()
-				async.series [
-					(cb) => @owner1.ensureUserExists cb
-					(cb) => @owner2.ensureUserExists cb
-					(cb) => Subscription.create {
-							admin_id: @owner1._id,
-							manager_ids: [@owner1._id],
+		describe('when the user is a member of a group subscription', function() {
+			before(function(done) {
+				this.owner1 = new User();
+				this.owner2 = new User();
+				async.series([
+					cb => this.owner1.ensureUserExists(cb),
+					cb => this.owner2.ensureUserExists(cb),
+					cb => Subscription.create({
+							admin_id: this.owner1._id,
+							manager_ids: [this.owner1._id],
 							planCode: 'collaborator',
 							groupPlan: true,
-							member_ids: [@user._id]
-						}, cb
-					(cb) => Subscription.create {
-							admin_id: @owner2._id,
-							manager_ids: [@owner2._id],
+							member_ids: [this.user._id]
+						}, cb),
+					cb => Subscription.create({
+							admin_id: this.owner2._id,
+							manager_ids: [this.owner2._id],
 							planCode: 'collaborator',
 							groupPlan: true,
-							member_ids: [@user._id]
-						}, cb
-				], (error) =>				
-					return done(error) if error?
-					SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel @user, (error, @data) =>
-						return done(error) if error?
-						done()
-				return
+							member_ids: [this.user._id]
+						}, cb)
+				], error => {				
+					if (error != null) { return done(error); }
+					return SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel(this.user, (error, data) => {
+						this.data = data;
+						if (error != null) { return done(error); }
+						return done();
+					});
+				});
+			});
 
-			after (done) ->
-				Subscription.remove {
-					admin_id: @owner1._id
-				}, (error) =>
-					return done(error) if error?
-					Subscription.remove {
-						admin_id: @owner2._id
-					}, done
-				return
+			after(function(done) {
+				Subscription.remove({
+					admin_id: this.owner1._id
+				}, error => {
+					if (error != null) { return done(error); }
+					return Subscription.remove({
+						admin_id: this.owner2._id
+					}, done);
+				});
+			});
 
-			it 'should return no personalSubscription', ->
-				expect(@data.personalSubscription).to.equal null
+			it('should return no personalSubscription', function() {
+				return expect(this.data.personalSubscription).to.equal(null);
+			});
 
-			it 'should return the two memberGroupSubscriptions', ->
-				expect(@data.memberGroupSubscriptions.length).to.equal 2
+			return it('should return the two memberGroupSubscriptions', function() {
+				expect(this.data.memberGroupSubscriptions.length).to.equal(2);
 				expect(
-					# Mongoose populates the admin_id with the user
-					@data.memberGroupSubscriptions[0].admin_id._id.toString()
-				).to.equal @owner1._id
-				expect(
-					@data.memberGroupSubscriptions[1].admin_id._id.toString()
-				).to.equal @owner2._id
+					// Mongoose populates the admin_id with the user
+					this.data.memberGroupSubscriptions[0].admin_id._id.toString()
+				).to.equal(this.owner1._id);
+				return expect(
+					this.data.memberGroupSubscriptions[1].admin_id._id.toString()
+				).to.equal(this.owner2._id);
+			});
+		});
 
-		describe 'when the user is a manager of a group subscription', ->
-			before (done) ->
-				@owner1 = new User()
-				@owner2 = new User()
-				async.series [
-					(cb) => @owner1.ensureUserExists cb
-					(cb) => @owner2.ensureUserExists cb
-					(cb) => Subscription.create {
-							admin_id: @owner1._id,
-							manager_ids: [@owner1._id, @user._id],
+		describe('when the user is a manager of a group subscription', function() {
+			before(function(done) {
+				this.owner1 = new User();
+				this.owner2 = new User();
+				async.series([
+					cb => this.owner1.ensureUserExists(cb),
+					cb => this.owner2.ensureUserExists(cb),
+					cb => Subscription.create({
+							admin_id: this.owner1._id,
+							manager_ids: [this.owner1._id, this.user._id],
 							planCode: 'collaborator',
 							groupPlan: true
-						}, cb
-				], (error) =>				
-					return done(error) if error?
-					SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel @user, (error, @data) =>
-						return done(error) if error?
-						done()
-				return
-
-			after (done) ->
-				Subscription.remove {
-					admin_id: @owner1._id
-				}, done
-				return
-
-			it 'should return no personalSubscription', ->
-				expect(@data.personalSubscription).to.equal null
-
-			it 'should return the managedGroupSubscriptions', ->
-				expect(@data.managedGroupSubscriptions.length).to.equal 1
-				subscription = @data.managedGroupSubscriptions[0]
-				expect(
-					# Mongoose populates the admin_id with the user
-					subscription.admin_id._id.toString()
-				).to.equal @owner1._id
-				expect(subscription.groupPlan).to.equal true
-
-		describe 'when the user is a manager of an institution', ->
-			before (done) ->
-				@v1Id = MockV1Api.nextV1Id()
-				async.series [
-					(cb) =>
-						Institution.create({
-							v1Id: @v1Id,
-							managerIds: [@user._id]
 						}, cb)
-				], (error) =>
-					return done(error) if error?
-					SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel @user, (error, @data) =>
-						return done(error) if error?
-						done()
-				return
+				], error => {				
+					if (error != null) { return done(error); }
+					return SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel(this.user, (error, data) => {
+						this.data = data;
+						if (error != null) { return done(error); }
+						return done();
+					});
+				});
+			});
 
-			after (done) ->
-				Institution.remove {
-					v1Id: @v1Id
-				}, done
-				return
+			after(function(done) {
+				Subscription.remove({
+					admin_id: this.owner1._id
+				}, done);
+			});
 
-			it 'should return the managedInstitutions', ->
-				expect(@data.managedInstitutions.length).to.equal 1
-				institution = @data.managedInstitutions[0]
-				expect(institution.v1Id).to.equal @v1Id
-				expect(institution.name).to.equal "Institution #{@v1Id}"
+			it('should return no personalSubscription', function() {
+				return expect(this.data.personalSubscription).to.equal(null);
+			});
 
-		describe 'when the user is a member of an affiliation', ->
-			before (done) ->
-				v1Id = MockV1Api.nextV1Id()
-				MockV1Api.setUser v1Id, {
+			return it('should return the managedGroupSubscriptions', function() {
+				expect(this.data.managedGroupSubscriptions.length).to.equal(1);
+				const subscription = this.data.managedGroupSubscriptions[0];
+				expect(
+					// Mongoose populates the admin_id with the user
+					subscription.admin_id._id.toString()
+				).to.equal(this.owner1._id);
+				return expect(subscription.groupPlan).to.equal(true);
+			});
+		});
+
+		describe('when the user is a manager of an institution', function() {
+			before(function(done) {
+				this.v1Id = MockV1Api.nextV1Id();
+				async.series([
+					cb => {
+						return Institution.create({
+							v1Id: this.v1Id,
+							managerIds: [this.user._id]
+						}, cb);
+					}
+				], error => {
+					if (error != null) { return done(error); }
+					return SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel(this.user, (error, data) => {
+						this.data = data;
+						if (error != null) { return done(error); }
+						return done();
+					});
+				});
+			});
+
+			after(function(done) {
+				Institution.remove({
+					v1Id: this.v1Id
+				}, done);
+			});
+
+			return it('should return the managedInstitutions', function() {
+				expect(this.data.managedInstitutions.length).to.equal(1);
+				const institution = this.data.managedInstitutions[0];
+				expect(institution.v1Id).to.equal(this.v1Id);
+				return expect(institution.name).to.equal(`Institution ${this.v1Id}`);
+			});
+		});
+
+		describe('when the user is a member of an affiliation', function() {
+			before(function(done) {
+				const v1Id = MockV1Api.nextV1Id();
+				MockV1Api.setUser(v1Id, {
 					subscription: {},
 					subscription_status: {}
-				}
-				MockV1Api.setAffiliations [{
-					email: @emailConfirmed = "confirmed-affiliation-email#{Math.random()}@stanford.example.edu"
+				});
+				MockV1Api.setAffiliations([{
+					email: (this.emailConfirmed = `confirmed-affiliation-email${Math.random()}@stanford.example.edu`),
 					institution: { name: 'Stanford', licence: 'pro_plus', confirmed: true }
 				}, {
-					email: @emailUnconfirmed = "unconfirmed-affiliation-email#{Math.random()}@harvard.example.edu"
+					email: (this.emailUnconfirmed = `unconfirmed-affiliation-email${Math.random()}@harvard.example.edu`),
 					institution: { name: 'Harvard', licence: 'pro_plus', confirmed: true }
 				}, {
-					email: @emailConfirmedMIT = "confirmed-affiliation-email#{Math.random()}@mit.example.edu"
+					email: (this.emailConfirmedMIT = `confirmed-affiliation-email${Math.random()}@mit.example.edu`),
 					institution: { name: 'MIT', licence: 'pro_plus', confirmed: false }
-				}]
-				async.series [
-					(cb) =>
-						@user.setV1Id v1Id, cb
-					(cb) =>
-						@user.addEmail @emailUnconfirmed, cb
-					(cb) =>
-						@user.addEmail @emailConfirmed, cb
-					(cb) =>
-						@user.confirmEmail @emailConfirmed, cb
-					(cb) =>
-						@user.addEmail @emailConfirmedMIT, cb
-					(cb) =>
-						@user.confirmEmail @emailConfirmedMIT, cb
-				], (error) =>
-					return done(error) if error?
-					SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel @user, (error, @data) =>
-						return done(error) if error?
-						done()
+				}]);
+				return async.series([
+					cb => {
+						return this.user.setV1Id(v1Id, cb);
+					},
+					cb => {
+						return this.user.addEmail(this.emailUnconfirmed, cb);
+					},
+					cb => {
+						return this.user.addEmail(this.emailConfirmed, cb);
+					},
+					cb => {
+						return this.user.confirmEmail(this.emailConfirmed, cb);
+					},
+					cb => {
+						return this.user.addEmail(this.emailConfirmedMIT, cb);
+					},
+					cb => {
+						return this.user.confirmEmail(this.emailConfirmedMIT, cb);
+					}
+				], error => {
+					if (error != null) { return done(error); }
+					return SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel(this.user, (error, data) => {
+						this.data = data;
+						if (error != null) { return done(error); }
+						return done();
+					});
+				});
+			});
 
-			it 'should return only the affilations with confirmed institutions, and confirmed emails', ->
-				expect(@data.confirmedMemberInstitutions).to.deep.equal [
+			return it('should return only the affilations with confirmed institutions, and confirmed emails', function() {
+				return expect(this.data.confirmedMemberInstitutions).to.deep.equal([
 					{ name: 'Stanford', licence: 'pro_plus', confirmed: true }
-				]
+				]);
+		});
+	});
 
-		describe 'when the user has a v1 subscription', ->
-			before (done) ->
-				MockV1Api.setUser v1Id = MockV1Api.nextV1Id(), {
-					subscription: @subscription = {
+		return describe('when the user has a v1 subscription', function() {
+			before(function(done) {
+				let v1Id;
+				MockV1Api.setUser((v1Id = MockV1Api.nextV1Id()), {
+					subscription: (this.subscription = {
 						trial: false,
 						has_plan: true,
 						teams: [{
 							id: 56,
 							name: 'Test team'
 						}]
-					}
-					subscription_status: @subscription_status = {
-						product: { 'mock': 'product' }
+					}),
+					subscription_status: (this.subscription_status = {
+						product: { 'mock': 'product' },
 						team: null
-					}
-				}
-				@user.setV1Id v1Id, (error) =>
-					return done(error) if error?
-					SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel @user, (error, @data) =>
-						return done(error) if error?
-						done()
+					})
+				});
+				return this.user.setV1Id(v1Id, error => {
+					if (error != null) { return done(error); }
+					return SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel(this.user, (error, data) => {
+						this.data = data;
+						if (error != null) { return done(error); }
+						return done();
+					});
+				});
+			});
 
-			it 'should return no personalSubscription', ->
-				expect(@data.personalSubscription).to.equal null
+			it('should return no personalSubscription', function() {
+				return expect(this.data.personalSubscription).to.equal(null);
+			});
 
-			it 'should return no memberGroupSubscriptions', ->
-				expect(@data.memberGroupSubscriptions).to.deep.equal []
+			it('should return no memberGroupSubscriptions', function() {
+				return expect(this.data.memberGroupSubscriptions).to.deep.equal([]);
+		});
 
-			it 'should return a v1SubscriptionStatus', ->
-				expect(@data.v1SubscriptionStatus).to.deep.equal @subscription_status
+			return it('should return a v1SubscriptionStatus', function() {
+				return expect(this.data.v1SubscriptionStatus).to.deep.equal(this.subscription_status);
+			});
+		});
+	});
 
-	describe 'canceling', ->
-		before (done) ->
-			@user = new User()
-			MockV1Api.setUser v1Id = MockV1Api.nextV1Id(), @v1_user = {}
-			async.series [
-				(cb) => @user.login(cb)
-				(cb) => @user.setV1Id(v1Id, cb)
-			], (error) =>
-				@user.request {
+	return describe('canceling', function() {
+		before(function(done) {
+			let v1Id;
+			this.user = new User();
+			MockV1Api.setUser((v1Id = MockV1Api.nextV1Id()), (this.v1_user = {}));
+			return async.series([
+				cb => this.user.login(cb),
+				cb => this.user.setV1Id(v1Id, cb)
+			], error => {
+				return this.user.request({
 					method: 'POST',
 					url: '/user/subscription/v1/cancel'
-				}, (error, @response) =>
-					return done(error) if error?
-					done()
+				}, (error, response) => {
+					this.response = response;
+					if (error != null) { return done(error); }
+					return done();
+				});
+			});
+		});
 
-		it 'should tell v1 to cancel the subscription', ->
-			expect(@v1_user.canceled).to.equal true
+		it('should tell v1 to cancel the subscription', function() {
+			return expect(this.v1_user.canceled).to.equal(true);
+		});
 
-		it 'should redirect to the subscription dashboard', ->
-			expect(@response.statusCode).to.equal 302
-			expect(@response.headers.location).to.equal '/user/subscription'
+		return it('should redirect to the subscription dashboard', function() {
+			expect(this.response.statusCode).to.equal(302);
+			return expect(this.response.headers.location).to.equal('/user/subscription');
+		});
+	});
+});
