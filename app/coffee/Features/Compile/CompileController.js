@@ -1,3 +1,12 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+    max-len,
+    no-undef,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -153,7 +162,7 @@ module.exports = (CompileController = {
 			res.contentType("application/pdf");
 			const filename = `${CompileController._getSafeProjectName(project)}.pdf`;
 
-			if (!!req.query.popupDownload) {
+			if (req.query.popupDownload) {
 				logger.log({project_id}, "download pdf as popup download");
 				res.setContentDisposition('attachment', {filename});
 			} else {

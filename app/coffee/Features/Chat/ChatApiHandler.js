@@ -1,3 +1,10 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+    max-len,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -14,7 +21,7 @@ module.exports = (ChatApiHandler = {
 		if (callback == null) { callback = function(error, data) {}; }
 		return request(opts, function(error, response, data) {
 			if (error != null) { return callback(error); }
-			if (200 <= response.statusCode && response.statusCode < 300) {
+			if (response.statusCode >= 200 && response.statusCode < 300) {
 				return callback(null, data);
 			} else {
 				error = new Error(`chat api returned non-success code: ${response.statusCode}`);

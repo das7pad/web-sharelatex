@@ -1,3 +1,12 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+    max-len,
+    no-unused-vars,
+    standard/no-callback-literal,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -122,7 +131,7 @@ module.exports = (ExportsHandler = (self = {
 			if (err != null) {
 				logger.err({err, export:export_data}, "error making request to v1 export");
 				return callback(err);
-			} else if (200 <= res.statusCode && res.statusCode < 300) {
+			} else if (res.statusCode >= 200 && res.statusCode < 300) {
 				return callback(null, body.exportId);
 			} else {
 				logger.err({export:export_data}, `v1 export returned failure; forwarding: ${body}`);
@@ -160,7 +169,7 @@ module.exports = (ExportsHandler = (self = {
 			if (err != null) {
 				logger.err({err, export:export_id}, "error making request to v1 export");
 				return callback(err);
-			} else if (200 <= res.statusCode && res.statusCode < 300) {
+			} else if (res.statusCode >= 200 && res.statusCode < 300) {
 				return callback(null, body);
 			} else {
 				err = new Error(`v1 export returned a failure status code: ${res.statusCode}`);
@@ -179,7 +188,7 @@ module.exports = (ExportsHandler = (self = {
 			if (err != null) {
 				logger.err({err, export:export_id}, "error making request to v1 export");
 				return callback(err);
-			} else if (200 <= res.statusCode && res.statusCode < 300) {
+			} else if (res.statusCode >= 200 && res.statusCode < 300) {
 				return callback(null, body);
 			} else {
 				err = new Error(`v1 export returned a failure status code: ${res.statusCode}`);

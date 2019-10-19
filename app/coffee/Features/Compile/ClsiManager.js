@@ -1,3 +1,11 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+    max-len,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -152,7 +160,7 @@ module.exports = (ClsiManager = {
 							if (err != null) {
 								logger.warn({err, project_id}, "error setting server id");
 							}
-							callback(err, response, body); //return as soon as the standard compile has returned
+							callback(err, response, body); // return as soon as the standard compile has returned
 							return cb(err, {response, body, finishTime:new Date() - startTime });
 						});
 					});
@@ -224,7 +232,7 @@ module.exports = (ClsiManager = {
 		};
 		return ClsiManager._makeRequest(project_id, opts, function(error, response, body) {
 			if (error != null) { return callback(error); }
-			if (200 <= response.statusCode && response.statusCode < 300) {
+			if (response.statusCode >= 200 && response.statusCode < 300) {
 				return callback(null, body);
 			} else if (response.statusCode === 413) {
 				return callback(null, {compile:{status:"project-too-large"}});
@@ -464,7 +472,7 @@ module.exports = (ClsiManager = {
 			};
 			return ClsiManager._makeRequest(project_id, opts, function(error, response, body) {
 				if (error != null) { return callback(error); }
-				if (200 <= response.statusCode && response.statusCode < 300) {
+				if (response.statusCode >= 200 && response.statusCode < 300) {
 					return callback(null, body);
 				} else {
 					error = new Error(`CLSI returned non-success code: ${response.statusCode}`);

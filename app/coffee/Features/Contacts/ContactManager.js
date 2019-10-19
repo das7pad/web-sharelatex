@@ -1,3 +1,11 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+    max-len,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -22,7 +30,7 @@ module.exports = (ContactManager = {
 			jar: false
 		}, function(error, res, data) {
 			if (error != null) { return callback(error); }
-			if (200 <= res.statusCode && res.statusCode < 300) {
+			if (res.statusCode >= 200 && res.statusCode < 300) {
 				return callback(null, (data != null ? data.contact_ids : undefined) || []);
 			} else {
 				error = new Error(`contacts api responded with non-success code: ${res.statusCode}`);
@@ -44,7 +52,7 @@ module.exports = (ContactManager = {
 			jar: false
 		}, function(error, res, data) {
 			if (error != null) { return callback(error); }
-			if (200 <= res.statusCode && res.statusCode < 300) {
+			if (res.statusCode >= 200 && res.statusCode < 300) {
 				return callback(null, (data != null ? data.contact_ids : undefined) || []);
 			} else {
 				error = new Error(`contacts api responded with non-success code: ${res.statusCode}`);

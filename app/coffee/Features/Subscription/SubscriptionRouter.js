@@ -1,3 +1,8 @@
+/* eslint-disable
+    max-len,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -40,10 +45,10 @@ module.exports = {
 			}),
 			TeamInvitesController.acceptInvite);
 
-		//recurly callback
+		// recurly callback
 		publicApiRouter.post('/user/subscription/callback',   SubscriptionController.recurlyNotificationParser, SubscriptionController.recurlyCallback);
 
-		//user changes their account state
+		// user changes their account state
 		webRouter.post('/user/subscription/create',     AuthenticationController.requireLogin(), SubscriptionController.createSubscription);
 		webRouter.post('/user/subscription/update',     AuthenticationController.requireLogin(), SubscriptionController.updateSubscription);
 		webRouter.post('/user/subscription/cancel',     AuthenticationController.requireLogin(), SubscriptionController.cancelSubscription);

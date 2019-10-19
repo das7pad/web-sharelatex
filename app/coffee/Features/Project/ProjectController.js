@@ -1,3 +1,12 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+    max-len,
+    no-path-concat,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -395,7 +404,7 @@ module.exports = (ProjectController = {
 				return InactiveProjectManager.reactivateProjectIfRequired(project_id, cb);
 			},
 			markAsOpened(cb){
-				//don't need to wait for this to complete
+				// don't need to wait for this to complete
 				ProjectUpdateHandler.markAsOpened(project_id, function() {});
 				return cb();
 			},

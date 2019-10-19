@@ -1,3 +1,12 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+    max-len,
+    no-undef,
+    standard/no-callback-literal,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -55,7 +64,7 @@ if (nm_client != null) {
 }
 
 const checkCanSendEmail = function(options, callback){
-	if ((options.sendingUser_id == null)) { //email not sent from user, not rate limited
+	if ((options.sendingUser_id == null)) { // email not sent from user, not rate limited
 		return callback(null, true);
 	}
 	const opts = { 

@@ -1,3 +1,12 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+    max-len,
+    no-return-assign,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -56,7 +65,7 @@ module.exports = (SubscriptionController = {
 		});
 	},
 
-	//get to show the recurly.js page
+	// get to show the recurly.js page
 	paymentPage(req, res, next) {
 		const user = AuthenticationController.getSessionUser(req);
 		const plan = PlansLocator.findLocalPlanInSettings(req.query.planCode);
@@ -71,7 +80,7 @@ module.exports = (SubscriptionController = {
 					if (error != null) { return next(error); }
 					if (!valid) {
 						res.redirect("/user/subscription?hasSubscription=true");
-						return;
+						
 					} else {
 						let currency = req.query.currency != null ? req.query.currency.toUpperCase() : undefined;
 						return GeoIpLookup.getCurrencyCode((req.query != null ? req.query.ip : undefined) || req.ip, function(err, recomendedCurrency, countryCode){

@@ -1,3 +1,12 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+    max-len,
+    no-undef,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -181,7 +190,7 @@ module.exports = (HistoryController = {
 	_makeRequest(options, callback) {
 		return request(options, function(error, response, body) {
 			if (error != null) { return callback(error); }
-			if (200 <= response.statusCode && response.statusCode < 300) {
+			if (response.statusCode >= 200 && response.statusCode < 300) {
 				return callback(null, body);
 			} else {
 				error = new Error(`history api responded with non-success code: ${response.statusCode}`);

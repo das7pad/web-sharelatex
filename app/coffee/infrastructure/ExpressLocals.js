@@ -1,3 +1,14 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+    max-len,
+    new-cap,
+    no-new-require,
+    no-unused-vars,
+    no-useless-escape,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -199,7 +210,7 @@ module.exports = function(app, webRouter, privateApiRouter, publicApiRouter){
 		const IEEE_BRAND_ID = 15;
 		res.locals.isIEEE = brandVariation => (brandVariation != null ? brandVariation.brand_id : undefined) === IEEE_BRAND_ID;
 
-		const _buildCssFileName = themeModifier => "/" + Settings.brandPrefix + (themeModifier ? themeModifier : "") + "style.css";
+		const _buildCssFileName = themeModifier => "/" + Settings.brandPrefix + (themeModifier || "") + "style.css";
 
 		res.locals.getCssThemeModifier = function(userSettings, brandVariation) {
 			// Themes only exist in OL v2
@@ -437,7 +448,7 @@ module.exports = function(app, webRouter, privateApiRouter, publicApiRouter){
 	});
 
 	webRouter.use(function(req, res, next) {
-		//TODO
+		// TODO
 		if (Settings.overleaf != null) {
 			res.locals.overallThemes = [
 				{ name: "Default", val: "",       path: res.locals.buildCssPath(null,     { hashedPath: true }) },

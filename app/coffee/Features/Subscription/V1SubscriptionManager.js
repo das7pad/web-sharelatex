@@ -1,3 +1,9 @@
+/* eslint-disable
+    handle-callback-err,
+    max-len,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -124,7 +130,7 @@ module.exports = (V1SubscriptionManager = {
 					if (error.code === 'ECONNREFUSED') { error = new V1ConnectionError('No V1 connection'); }
 					return callback(error);
 				}
-				if (200 <= response.statusCode && response.statusCode < 300) {
+				if (response.statusCode >= 200 && response.statusCode < 300) {
 					return callback(null, body, v1Id);
 				} else {
 					if (response.statusCode === 404) {

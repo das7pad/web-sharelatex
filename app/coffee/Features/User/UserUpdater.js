@@ -1,3 +1,11 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+    max-len,
+    no-undef,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -203,7 +211,7 @@ module.exports = (UserUpdater = {
 				}
 				if (response.statusCode === 409) { // Conflict
 					return callback(new Errors.EmailExistsError('email exists in v1'));
-				} else if (200 <= response.statusCode && response.statusCode < 300) {
+				} else if (response.statusCode >= 200 && response.statusCode < 300) {
 					return callback();
 				} else {
 					return callback(new Error(`non-success code from v1: ${response.statusCode}`));
