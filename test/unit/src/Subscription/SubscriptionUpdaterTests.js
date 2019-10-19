@@ -98,9 +98,7 @@ describe('SubscriptionUpdater', function() {
 
     this.UserGetter = {
       getUsers(memberIds, projection, callback) {
-        const users = memberIds.map(id => ({
-          _id: id
-        }))
+        const users = memberIds.map(id => ({ _id: id }))
         return callback(null, users)
       },
       getUserOrUserStubById: sinon.stub()

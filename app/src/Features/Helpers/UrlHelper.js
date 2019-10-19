@@ -29,7 +29,7 @@ module.exports = UrlHelper = {
 
   prependHttpIfNeeded(url) {
     if (!url.match('://')) {
-      url = 'http://' + url
+      url = `http://${url}`
     }
     return url
   }

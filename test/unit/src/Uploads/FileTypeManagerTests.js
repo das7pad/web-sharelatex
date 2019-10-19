@@ -76,7 +76,7 @@ describe('FileTypeManager', function() {
         .callsArgWith(
           1,
           null,
-          Buffer.from('\uFEFF' + this.contents, 'utf-16le')
+          Buffer.from(`\uFEFF${this.contents}`, 'utf-16le')
         )
       this.fs.readFile
         .withArgs('/path/on/disk/latin1.tex')

@@ -98,7 +98,7 @@ module.exports = {
       next = function(error) {}
     }
     const { project_id } = req.params
-    const path = '/' + req.params[0] // UpdateMerger expects leading slash
+    const path = `/${req.params[0]}` // UpdateMerger expects leading slash
     const source = req.headers['x-sl-update-source'] || 'unknown'
     logger.log({ project_id, path, source }, 'received project contents update')
     return UpdateMerger.mergeUpdate(
@@ -121,7 +121,7 @@ module.exports = {
       next = function(error) {}
     }
     const { project_id } = req.params
-    const path = '/' + req.params[0] // UpdateMerger expects leading slash
+    const path = `/${req.params[0]}` // UpdateMerger expects leading slash
     const source = req.headers['x-sl-update-source'] || 'unknown'
     logger.log(
       { project_id, path, source },

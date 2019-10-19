@@ -33,10 +33,10 @@ module.exports = {
     }
     let string = priceInCents + ''
     if (string.length === 2) {
-      string = '0' + string
+      string = `0${string}`
     }
     if (string.length === 1) {
-      string = '00' + string
+      string = `00${string}`
     }
     if (string.length === 0) {
       string = '000'

@@ -147,10 +147,7 @@ module.exports = LockManager = {
     const queueName = `${key}:${namespace}`
     let queue = LOCK_QUEUES.get(queueName)
     if (queue == null) {
-      const handler = (
-        fn,
-        cb // execute any function as our task
-      ) => fn(cb)
+      const handler = (fn, cb) => fn(cb)
       // set up a new queue for this key
       queue = async.queue(handler, 1)
       queue.push(task)

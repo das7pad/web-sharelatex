@@ -89,7 +89,7 @@ class User {
       }
       return this.request.post(
         {
-          url: '/register' + query,
+          url: `/register${query}`,
           json: { email: this.email, password: this.password }
         },
         (error, response, body) => {

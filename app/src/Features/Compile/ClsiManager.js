@@ -170,9 +170,8 @@ module.exports = ClsiManager = {
       url: compilerUrl,
       method: 'DELETE'
     }
-    return ClsiManager._makeRequest(project_id, opts, (
-      clsiError // always clear the project state from the docupdater, even if there
-    ) =>
+    return ClsiManager._makeRequest(project_id, opts, clsiError =>
+      // always clear the project state from the docupdater, even if there
       // was a problem with the request to the clsi
       DocumentUpdaterHandler.clearProjectState(project_id, function(
         docUpdaterError

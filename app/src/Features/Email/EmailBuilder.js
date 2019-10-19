@@ -18,14 +18,14 @@ const StringHelper = require('../Helpers/StringHelper')
 
 const PersonalEmailLayout = require('./Layouts/PersonalEmailLayout')
 const NotificationEmailLayout = require('./Layouts/NotificationEmailLayout')
-const BaseWithHeaderEmailLayout = require('./Layouts/' +
-  settings.brandPrefix +
-  'BaseWithHeaderEmailLayout')
+const BaseWithHeaderEmailLayout = require(`./Layouts/${
+  settings.brandPrefix
+}BaseWithHeaderEmailLayout`)
 const SpamSafe = require('./SpamSafe')
 
-const SingleCTAEmailBody = require('./Bodies/' +
-  settings.brandPrefix +
-  'SingleCTAEmailBody')
+const SingleCTAEmailBody = require(`./Bodies/${
+  settings.brandPrefix
+}SingleCTAEmailBody`)
 
 const CTAEmailTemplate = function(content) {
   if (content.greeting == null) {

@@ -66,15 +66,11 @@ describe('TemplatesManager', function() {
     this.FileWriter = { ensureDumpFolderExists: sinon.stub().callsArg(0) }
     this.TemplatesManager = SandboxedModule.require(modulePath, {
       requires: {
-        '../../../js/Features/Uploads/ProjectUploadManager': this
-          .ProjectUploadManager,
-        '../../../js/Features/Project/ProjectOptionsHandler': this
-          .ProjectOptionsHandler,
-        '../../../js/Features/Project/ProjectRootDocManager': this
-          .ProjectRootDocManager,
-        '../../../js/Features/Project/ProjectDetailsHandler': this
-          .ProjectDetailsHandler,
-        '../../../js/Features/Authentication/AuthenticationController': (this.AuthenticationController = {
+        '../Uploads/ProjectUploadManager': this.ProjectUploadManager,
+        '../Project/ProjectOptionsHandler': this.ProjectOptionsHandler,
+        '../Project/ProjectRootDocManager': this.ProjectRootDocManager,
+        '../Project/ProjectDetailsHandler': this.ProjectDetailsHandler,
+        '../Authentication/AuthenticationController': (this.AuthenticationController = {
           getLoggedInUserId: sinon.stub()
         }),
         '../../infrastructure/FileWriter': this.FileWriter,
@@ -104,7 +100,7 @@ describe('TemplatesManager', function() {
         },
         request: this.request,
         fs: this.fs,
-        '../../../js/models/Project': { Project: this.Project }
+        '../../models/Project': { Project: this.Project }
       }
     })
     return (this.zipUrl =

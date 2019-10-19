@@ -25,7 +25,7 @@ describe('TemplatesController', function() {
     this.user_id = 'user-id'
     this.TemplatesController = SandboxedModule.require(modulePath, {
       requires: {
-        '../../../js/Features/Authentication/AuthenticationController': (this.AuthenticationController = {
+        '../Authentication/AuthenticationController': (this.AuthenticationController = {
           getLoggedInUserId: sinon.stub().returns(this.user_id)
         }),
         './TemplatesManager': (this.TemplatesManager = {

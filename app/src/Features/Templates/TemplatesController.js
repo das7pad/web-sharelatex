@@ -13,9 +13,9 @@
  */
 let TemplatesController
 const path = require('path')
-const AuthenticationController = require('../../../js/Features/Authentication/AuthenticationController')
+const AuthenticationController = require('../Authentication/AuthenticationController')
 const TemplatesManager = require('./TemplatesManager')
-const ProjectHelper = require('../../../js/Features/Project/ProjectHelper')
+const ProjectHelper = require('../Project/ProjectHelper')
 const logger = require('logger-sharelatex')
 
 module.exports = TemplatesController = {

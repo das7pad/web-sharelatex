@@ -45,7 +45,7 @@ const _request_uri = function(endpoint, params) {
     }
   }
   if (query_string.length) {
-    endpoint += '?' + query_string.join('&')
+    endpoint += `?${query_string.join('&')}`
   }
   return endpoint
 }
@@ -85,7 +85,7 @@ module.exports = sixpack = {
         while (i < alternatives.length) {
           if (!/^[a-z0-9][a-z0-9\-_ ]*$/.test(alternatives[i])) {
             return callback(
-              new Error('Bad alternative name: ' + alternatives[i])
+              new Error(`Bad alternative name: ${alternatives[i]}`)
             )
           }
           i += 1

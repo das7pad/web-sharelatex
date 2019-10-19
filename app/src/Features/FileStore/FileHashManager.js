@@ -25,7 +25,7 @@ module.exports = FileHashManager = {
     callback = _.once(callback) // avoid double callbacks
 
     // taken from v1/history/storage/lib/blob_hash.js
-    const getGitBlobHeader = byteLength => 'blob ' + byteLength + '\x00'
+    const getGitBlobHeader = byteLength => `blob ${byteLength}` + '\x00'
 
     const getByteLengthOfFile = cb =>
       fs.stat(filePath, function(err, stats) {

@@ -1306,7 +1306,7 @@ module.exports = ProjectEntityUpdateHandler = self = {
     if (!SafePath.isCleanFilename(newName)) {
       return callback(new Errors.InvalidNameError('invalid element name'))
     }
-    logger.log({ entity_id, project_id }, 'renaming ' + entityType)
+    logger.log({ entity_id, project_id }, `renaming ${entityType}`)
     if (entityType == null) {
       logger.err({ err: 'No entityType set', project_id, entity_id })
       return callback('No entityType set')

@@ -2,10 +2,7 @@
     camelcase,
     handle-callback-err,
     max-len,
-    no-undef,
-    no-unreachable,
     no-unused-vars,
-    one-var,
 */
 // TODO: This file was created by bulk-decaffeinate.
 // Fix any style issues and re-enable lint.
@@ -13,7 +10,6 @@
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
  * DS102: Remove unnecessary code created because of implicit returns
- * DS201: Simplify complex destructure assignments
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
@@ -324,14 +320,8 @@ module.exports = CollaboratorsHandler = {
 
   getProjectsUserIsMemberOf(user_id, fields, callback) {
     if (callback == null) {
-      callback = function(error, ...rest) {}
+      callback = function(error, results) {}
     }
-    const obj = rest[0],
-      array = obj.readAndWrite,
-      array1 = obj.readOnly,
-      array2 = obj.tokenReadAndWrite,
-      array3 = obj.tokenReadOnly
-    return
     return async.mapLimit(
       [
         { collaberator_refs: user_id },

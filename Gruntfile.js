@@ -10,7 +10,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 const fs = require('fs')
-const PackageVersions = require('./app/coffee/infrastructure/PackageVersions')
+const PackageVersions = require('./app/src/infrastructure/PackageVersions')
 const Settings = require('settings-sharelatex')
 require('es6-promise').polyfill()
 

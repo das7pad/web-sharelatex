@@ -145,7 +145,7 @@ describe('TpdsController', function() {
         .calledWith(
           null,
           this.project_id,
-          '/' + this.path,
+          `/${this.path}`,
           this.req,
           this.source
         )
@@ -179,7 +179,7 @@ describe('TpdsController', function() {
 
     it('should delete the file', function() {
       return this.UpdateMerger.deleteUpdate
-        .calledWith(null, this.project_id, '/' + this.path, this.source)
+        .calledWith(null, this.project_id, `/${this.path}`, this.source)
         .should.equal(true)
     })
 
