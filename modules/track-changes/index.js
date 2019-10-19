@@ -1,8 +1,9 @@
-TrackChangesRouter = require "./app/js/TrackChangesRouter"
-logger = require "logger-sharelatex"
+let TrackChanges;
+const TrackChangesRouter = require("./app/js/TrackChangesRouter");
+const logger = require("logger-sharelatex");
 
-ProjectEditorHandler = require "../../app/js/Features/Project/ProjectEditorHandler"
-ProjectEditorHandler.trackChangesAvailable = true
+const ProjectEditorHandler = require("../../app/js/Features/Project/ProjectEditorHandler");
+ProjectEditorHandler.trackChangesAvailable = true;
 
-module.exports = TrackChanges =	
-	router: TrackChangesRouter
+module.exports = (TrackChanges =	
+	{router: TrackChangesRouter});
