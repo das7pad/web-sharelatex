@@ -1,4 +1,4 @@
-OpenInOverleafRouter = require "./app/js/OpenInOverleafRouter"
+const OpenInOverleafRouter = require("./app/js/OpenInOverleafRouter");
 
 module.exports =
-	router: OpenInOverleafRouter
+	{router: OpenInOverleafRouter};
