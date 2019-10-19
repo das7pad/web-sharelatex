@@ -1,28 +1,42 @@
-sinon = require('sinon')
-chai = require('chai')
-should = chai.should()
-modulePath = "../../../../app/js/Features/User/UserHandler.js"
-SandboxedModule = require('sandboxed-module')
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const sinon = require('sinon');
+const chai = require('chai');
+const should = chai.should();
+const modulePath = "../../../../app/js/Features/User/UserHandler.js";
+const SandboxedModule = require('sandboxed-module');
 
-describe "UserHandler", ->
+describe("UserHandler", function() {
 
-	beforeEach ->
-		@user =
-			_id:"12390i"
-			email: "bob@bob.com"
+	beforeEach(function() {
+		this.user = {
+			_id:"12390i",
+			email: "bob@bob.com",
 			remove: sinon.stub().callsArgWith(0)
+		};
 
-		@TeamInvitesHandler =
-			createTeamInvitesForLegacyInvitedEmail: sinon.stub().yields()
+		this.TeamInvitesHandler =
+			{createTeamInvitesForLegacyInvitedEmail: sinon.stub().yields()};
 
-		@UserHandler = SandboxedModule.require modulePath, requires:
-			"../Subscription/TeamInvitesHandler": @TeamInvitesHandler
+		return this.UserHandler = SandboxedModule.require(modulePath, { requires: {
+			"../Subscription/TeamInvitesHandler": this.TeamInvitesHandler
+		}
+	}
+		);
+	});
 
-	describe "populateTeamInvites", ->
-		beforeEach (done)->
-			@UserHandler.populateTeamInvites @user, done
+	return describe("populateTeamInvites", function() {
+		beforeEach(function(done){
+			return this.UserHandler.populateTeamInvites(this.user, done);
+		});
 
-		it "notifies the user about legacy team invites", ->
-			@TeamInvitesHandler.createTeamInvitesForLegacyInvitedEmail
-				.calledWith(@user.email).should.eq true
+		return it("notifies the user about legacy team invites", function() {
+			return this.TeamInvitesHandler.createTeamInvitesForLegacyInvitedEmail
+				.calledWith(this.user.email).should.eq(true);
+		});
+	});
+});
 

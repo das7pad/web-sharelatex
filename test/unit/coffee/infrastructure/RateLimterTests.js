@@ -1,103 +1,143 @@
-assert = require("chai").assert
-sinon = require('sinon')
-chai = require('chai')
-should = chai.should()
-expect = chai.expect
-modulePath = "../../../../app/js/infrastructure/RateLimiter.js"
-SandboxedModule = require('sandboxed-module')
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const {
+    assert
+} = require("chai");
+const sinon = require('sinon');
+const chai = require('chai');
+const should = chai.should();
+const {
+    expect
+} = chai;
+const modulePath = "../../../../app/js/infrastructure/RateLimiter.js";
+const SandboxedModule = require('sandboxed-module');
 
-describe "RateLimiter", ->
+describe("RateLimiter", function() {
 
-	beforeEach ->
-		@settings = 
-			redis:
-				web:
-					port:"1234"
-					host:"somewhere"
+	beforeEach(function() {
+		this.settings = { 
+			redis: {
+				web: {
+					port:"1234",
+					host:"somewhere",
 					password: "password"
-		@rclient =
-			incr: sinon.stub()
-			get: sinon.stub()
-			expire: sinon.stub()
+				}
+			}
+		};
+		this.rclient = {
+			incr: sinon.stub(),
+			get: sinon.stub(),
+			expire: sinon.stub(),
 			exec: sinon.stub()
-		@rclient.multi = sinon.stub().returns(@rclient)
-		@RedisWrapper =
-			client: sinon.stub().returns(@rclient)
+		};
+		this.rclient.multi = sinon.stub().returns(this.rclient);
+		this.RedisWrapper =
+			{client: sinon.stub().returns(this.rclient)};
 
-		@endpointName = "compiles"
-		@subject = "some-project-id"
-		@timeInterval = 20
-		@throttleLimit = 5
+		this.endpointName = "compiles";
+		this.subject = "some-project-id";
+		this.timeInterval = 20;
+		this.throttleLimit = 5;
 
-		@requires =
-			"settings-sharelatex":@settings
-			"logger-sharelatex" : @logger = {log:sinon.stub(), err:sinon.stub()}
-			"metrics-sharelatex" : @Metrics = {inc: sinon.stub()}
-			"./RedisWrapper": @RedisWrapper
+		this.requires = {
+			"settings-sharelatex":this.settings,
+			"logger-sharelatex" : (this.logger = {log:sinon.stub(), err:sinon.stub()}),
+			"metrics-sharelatex" : (this.Metrics = {inc: sinon.stub()}),
+			"./RedisWrapper": this.RedisWrapper
+		};
 
-		@details = 
-			endpointName: @endpointName
-			subjectName: @subject
-			throttle: @throttleLimit
-			timeInterval: @timeInterval
-		@key = "RateLimiter:#{@endpointName}:{#{@subject}}"
+		this.details = { 
+			endpointName: this.endpointName,
+			subjectName: this.subject,
+			throttle: this.throttleLimit,
+			timeInterval: this.timeInterval
+		};
+		return this.key = `RateLimiter:${this.endpointName}:{${this.subject}}`;
+	});
 
 
 
 
-	describe 'when action is permitted', ->
+	describe('when action is permitted', function() {
 
-		beforeEach ->
-			@requires["rolling-rate-limiter"] = (opts) =>
-				return sinon.stub().callsArgWith(1, null, 0, 22)
-			@limiter = SandboxedModule.require modulePath, requires: @requires
+		beforeEach(function() {
+			this.requires["rolling-rate-limiter"] = opts => {
+				return sinon.stub().callsArgWith(1, null, 0, 22);
+			};
+			return this.limiter = SandboxedModule.require(modulePath, {requires: this.requires});
+		});
 
-		it 'should not produce and error', (done) ->
-			@limiter.addCount {}, (err, should) ->
-				expect(err).to.equal null
-				done()
+		it('should not produce and error', function(done) {
+			return this.limiter.addCount({}, function(err, should) {
+				expect(err).to.equal(null);
+				return done();
+			});
+		});
 
-		it 'should callback with true', (done) ->
-			@limiter.addCount {}, (err, should) ->
-				expect(should).to.equal true
-				done()
+		it('should callback with true', function(done) {
+			return this.limiter.addCount({}, function(err, should) {
+				expect(should).to.equal(true);
+				return done();
+			});
+		});
 
-		it 'should not increment the metric', (done) ->
-			@limiter.addCount {endpointName: @endpointName}, (err, should) =>
-				sinon.assert.notCalled(@Metrics.inc)
-				done()
+		return it('should not increment the metric', function(done) {
+			return this.limiter.addCount({endpointName: this.endpointName}, (err, should) => {
+				sinon.assert.notCalled(this.Metrics.inc);
+				return done();
+			});
+		});
+	});
 
-	describe 'when action is not permitted', ->
+	describe('when action is not permitted', function() {
 
-		beforeEach ->
-			@requires["rolling-rate-limiter"] = (opts) =>
-				return sinon.stub().callsArgWith(1, null, 4000, 0)
-			@limiter = SandboxedModule.require modulePath, requires: @requires
+		beforeEach(function() {
+			this.requires["rolling-rate-limiter"] = opts => {
+				return sinon.stub().callsArgWith(1, null, 4000, 0);
+			};
+			return this.limiter = SandboxedModule.require(modulePath, {requires: this.requires});
+		});
 
-		it 'should not produce and error', (done) ->
-			@limiter.addCount {}, (err, should) ->
-				expect(err).to.equal null
-				done()
+		it('should not produce and error', function(done) {
+			return this.limiter.addCount({}, function(err, should) {
+				expect(err).to.equal(null);
+				return done();
+			});
+		});
 
-		it 'should callback with false', (done) ->
-			@limiter.addCount {}, (err, should) ->
-				expect(should).to.equal false
-				done()
+		it('should callback with false', function(done) {
+			return this.limiter.addCount({}, function(err, should) {
+				expect(should).to.equal(false);
+				return done();
+			});
+		});
 
-		it 'should increment the metric', (done) ->
-			@limiter.addCount {endpointName: @endpointName}, (err, should) =>
-				sinon.assert.calledWith(@Metrics.inc, "rate-limit-hit.#{@endpointName}", 1, {path: @endpointName})
-				done()
+		return it('should increment the metric', function(done) {
+			return this.limiter.addCount({endpointName: this.endpointName}, (err, should) => {
+				sinon.assert.calledWith(this.Metrics.inc, `rate-limit-hit.${this.endpointName}`, 1, {path: this.endpointName});
+				return done();
+			});
+		});
+	});
 
-	describe 'when limiter produces an error', ->
+	return describe('when limiter produces an error', function() {
 
-		beforeEach ->
-			@requires["rolling-rate-limiter"] = (opts) =>
-				return sinon.stub().callsArgWith(1, new Error('woops'))
-			@limiter = SandboxedModule.require modulePath, requires: @requires
+		beforeEach(function() {
+			this.requires["rolling-rate-limiter"] = opts => {
+				return sinon.stub().callsArgWith(1, new Error('woops'));
+			};
+			return this.limiter = SandboxedModule.require(modulePath, {requires: this.requires});
+		});
 
-		it 'should produce and error', (done) ->
-			@limiter.addCount {}, (err, should) ->
-				expect(err).to.not.equal null
-				expect(err).to.be.instanceof Error
-				done()
+		return it('should produce and error', function(done) {
+			return this.limiter.addCount({}, function(err, should) {
+				expect(err).to.not.equal(null);
+				expect(err).to.be.instanceof(Error);
+				return done();
+			});
+		});
+	});
+});

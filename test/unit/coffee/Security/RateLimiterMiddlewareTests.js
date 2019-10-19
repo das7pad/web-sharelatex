@@ -1,118 +1,158 @@
-SandboxedModule = require('sandboxed-module')
-sinon = require('sinon')
-require('chai').should()
-modulePath = require('path').join __dirname, '../../../../app/js/Features/Security/RateLimiterMiddleware'
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS103: Rewrite code to no longer use __guard__
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const SandboxedModule = require('sandboxed-module');
+const sinon = require('sinon');
+require('chai').should();
+const modulePath = require('path').join(__dirname, '../../../../app/js/Features/Security/RateLimiterMiddleware');
 
-describe "RateLimiterMiddleware", ->
-	beforeEach ->
-		@AuthenticationController =
-			getLoggedInUserId: () =>
-				@req?.session?.user?._id
-		@RateLimiterMiddleware = SandboxedModule.require modulePath, requires:
-			'../../infrastructure/RateLimiter' : @RateLimiter = {}
-			"logger-sharelatex": @logger = {warn: sinon.stub()}
-			'../Authentication/AuthenticationController': @AuthenticationController
-		@req =
-			params: {}
-		@res =
-			status: sinon.stub()
-			write: sinon.stub()
-			end: sinon.stub()
-		@next = sinon.stub()
-
-	describe "rateLimit", ->
-		beforeEach ->
-			@rateLimiter = @RateLimiterMiddleware.rateLimit({
-				endpointName: "test-endpoint"
-				params: ["project_id", "doc_id"]
-				timeInterval: 42
-				maxRequests: 12
-			})
-			@req.params = {
-				project_id: @project_id = "project-id"
-				doc_id: @doc_id = "doc-id"
+describe("RateLimiterMiddleware", function() {
+	beforeEach(function() {
+		this.AuthenticationController = {
+			getLoggedInUserId: () => {
+				return __guard__(__guard__(this.req != null ? this.req.session : undefined, x1 => x1.user), x => x._id);
 			}
+		};
+		this.RateLimiterMiddleware = SandboxedModule.require(modulePath, { requires: {
+			'../../infrastructure/RateLimiter' : (this.RateLimiter = {}),
+			"logger-sharelatex": (this.logger = {warn: sinon.stub()}),
+			'../Authentication/AuthenticationController': this.AuthenticationController
+		}
+	}
+		);
+		this.req =
+			{params: {}};
+		this.res = {
+			status: sinon.stub(),
+			write: sinon.stub(),
+			end: sinon.stub()
+		};
+		return this.next = sinon.stub();
+	});
 
-		describe "when there is no session", ->
-			beforeEach ->
-				@RateLimiter.addCount = sinon.stub().callsArgWith(1, null, true)
-				@req.ip = @ip = "1.2.3.4"
-				@rateLimiter(@req, @res, @next)
+	return describe("rateLimit", function() {
+		beforeEach(function() {
+			this.rateLimiter = this.RateLimiterMiddleware.rateLimit({
+				endpointName: "test-endpoint",
+				params: ["project_id", "doc_id"],
+				timeInterval: 42,
+				maxRequests: 12
+			});
+			return this.req.params = {
+				project_id: (this.project_id = "project-id"),
+				doc_id: (this.doc_id = "doc-id")
+			};});
 
-			it "should call the rate limiter backend with the ip address", ->
-				@RateLimiter.addCount
+		describe("when there is no session", function() {
+			beforeEach(function() {
+				this.RateLimiter.addCount = sinon.stub().callsArgWith(1, null, true);
+				this.req.ip = (this.ip = "1.2.3.4");
+				return this.rateLimiter(this.req, this.res, this.next);
+			});
+
+			it("should call the rate limiter backend with the ip address", function() {
+				return this.RateLimiter.addCount
 					.calledWith({
-						endpointName: "test-endpoint"
-						timeInterval: 42
-						throttle: 12
-						subjectName: "#{@project_id}:#{@doc_id}:#{@ip}"
+						endpointName: "test-endpoint",
+						timeInterval: 42,
+						throttle: 12,
+						subjectName: `${this.project_id}:${this.doc_id}:${this.ip}`
 					})
-					.should.equal true
+					.should.equal(true);
+			});
 
-			it "should pass on to next()", ->
+			return it("should pass on to next()", function() {});
+		});
 
 
-		describe "when under the rate limit with logged in user", ->
-			beforeEach ->
-				@req.session =
-					user :
-						_id: @user_id = "user-id"
-				@RateLimiter.addCount = sinon.stub().callsArgWith(1, null, true)
-				@rateLimiter(@req, @res, @next)
+		describe("when under the rate limit with logged in user", function() {
+			beforeEach(function() {
+				this.req.session = {
+					user : {
+						_id: (this.user_id = "user-id")
+					}
+				};
+				this.RateLimiter.addCount = sinon.stub().callsArgWith(1, null, true);
+				return this.rateLimiter(this.req, this.res, this.next);
+			});
 
-			it "should call the rate limiter backend with the user_id", ->
-				@RateLimiter.addCount
+			it("should call the rate limiter backend with the user_id", function() {
+				return this.RateLimiter.addCount
 					.calledWith({
-						endpointName: "test-endpoint"
-						timeInterval: 42
-						throttle: 12
-						subjectName: "#{@project_id}:#{@doc_id}:#{@user_id}"
+						endpointName: "test-endpoint",
+						timeInterval: 42,
+						throttle: 12,
+						subjectName: `${this.project_id}:${this.doc_id}:${this.user_id}`
 					})
-					.should.equal true
+					.should.equal(true);
+			});
 
-			it "should pass on to next()", ->
-				@next.called.should.equal true
+			return it("should pass on to next()", function() {
+				return this.next.called.should.equal(true);
+			});
+		});
 
-		describe "when under the rate limit with anonymous user", ->
-			beforeEach ->
-				@req.ip = @ip = "1.2.3.4"
-				@RateLimiter.addCount = sinon.stub().callsArgWith(1, null, true)
-				@rateLimiter(@req, @res, @next)
+		describe("when under the rate limit with anonymous user", function() {
+			beforeEach(function() {
+				this.req.ip = (this.ip = "1.2.3.4");
+				this.RateLimiter.addCount = sinon.stub().callsArgWith(1, null, true);
+				return this.rateLimiter(this.req, this.res, this.next);
+			});
 
-			it "should call the rate limiter backend with the ip address", ->
-				@RateLimiter.addCount
+			it("should call the rate limiter backend with the ip address", function() {
+				return this.RateLimiter.addCount
 					.calledWith({
-						endpointName: "test-endpoint"
-						timeInterval: 42
-						throttle: 12
-						subjectName: "#{@project_id}:#{@doc_id}:#{@ip}"
+						endpointName: "test-endpoint",
+						timeInterval: 42,
+						throttle: 12,
+						subjectName: `${this.project_id}:${this.doc_id}:${this.ip}`
 					})
-					.should.equal true
+					.should.equal(true);
+			});
 
-			it "should pass on to next()", ->
-				@next.called.should.equal true
+			return it("should pass on to next()", function() {
+				return this.next.called.should.equal(true);
+			});
+		});
 
-		describe "when over the rate limit", ->
-			beforeEach ->
-				@req.session  =
-					user :
-						_id: @user_id = "user-id"
-				@RateLimiter.addCount = sinon.stub().callsArgWith(1, null, false)
-				@rateLimiter(@req, @res, @next)
+		return describe("when over the rate limit", function() {
+			beforeEach(function() {
+				this.req.session  = {
+					user : {
+						_id: (this.user_id = "user-id")
+					}
+				};
+				this.RateLimiter.addCount = sinon.stub().callsArgWith(1, null, false);
+				return this.rateLimiter(this.req, this.res, this.next);
+			});
 
-			it "should return a 429", ->
-				@res.status.calledWith(429).should.equal true
-				@res.end.called.should.equal true
+			it("should return a 429", function() {
+				this.res.status.calledWith(429).should.equal(true);
+				return this.res.end.called.should.equal(true);
+			});
 
-			it "should not continue", ->
-				@next.called.should.equal false
+			it("should not continue", function() {
+				return this.next.called.should.equal(false);
+			});
 
-			it "should log a warning", ->
-				@logger.warn
+			return it("should log a warning", function() {
+				return this.logger.warn
 					.calledWith({
-						endpointName: "test-endpoint"
-						timeInterval: 42
-						throttle: 12
-						subjectName: "#{@project_id}:#{@doc_id}:#{@user_id}"
+						endpointName: "test-endpoint",
+						timeInterval: 42,
+						throttle: 12,
+						subjectName: `${this.project_id}:${this.doc_id}:${this.user_id}`
 					}, "rate limit exceeded")
-					.should.equal true
+					.should.equal(true);
+			});
+		});
+	});
+});
+
+function __guard__(value, transform) {
+  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+}

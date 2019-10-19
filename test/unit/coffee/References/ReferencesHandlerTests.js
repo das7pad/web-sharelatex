@@ -1,25 +1,36 @@
-SandboxedModule = require('sandboxed-module')
-should = require('chai').should()
-expect = require('chai').expect
-sinon = require 'sinon'
-assert = require("chai").assert
-modulePath = "../../../../app/js/Features/References/ReferencesHandler"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const SandboxedModule = require('sandboxed-module');
+const should = require('chai').should();
+const {
+    expect
+} = require('chai');
+const sinon = require('sinon');
+const {
+    assert
+} = require("chai");
+const modulePath = "../../../../app/js/Features/References/ReferencesHandler";
 
-describe 'ReferencesHandler', ->
+describe('ReferencesHandler', function() {
 
-	beforeEach ->
-		@projectId = '222'
-		@fakeProject =
-			_id: @projectId
-			owner_ref: @fakeOwner =
-				_id: 'some_owner'
-				features:
+	beforeEach(function() {
+		this.projectId = '222';
+		this.fakeProject = {
+			_id: this.projectId,
+			owner_ref: (this.fakeOwner = {
+				_id: 'some_owner',
+				features: {
 					references: false
-			rootFolder: [
+				}
+			}),
+			rootFolder: [{
 				docs: [
 					{name: 'one.bib', _id: 'aaa'},
 					{name: 'two.txt', _id: 'bbb'},
-				]
+				],
 				folders: [
 					{
 						docs: [{name: 'three.bib', _id: 'ccc'}],
@@ -27,315 +38,404 @@ describe 'ReferencesHandler', ->
 						folders: []
 					}
 				]
+			}
 			]
-		@docIds = ['aaa', 'ccc']
-		@handler = SandboxedModule.require modulePath, requires:
+		};
+		this.docIds = ['aaa', 'ccc'];
+		this.handler = SandboxedModule.require(modulePath, { requires: {
 			'logger-sharelatex': {
-				log: ->
-				err: ->
-			}
-			'settings-sharelatex': @settings = {
-				apis:
-					references: {url: 'http://some.url/references'}
-					docstore: {url: 'http://some.url/docstore'}
+				log() {},
+				err() {}
+			},
+			'settings-sharelatex': (this.settings = {
+				apis: {
+					references: {url: 'http://some.url/references'},
+					docstore: {url: 'http://some.url/docstore'},
 					filestore: {url: 'http://some.url/filestore'}
-			}
-			'request': @request = {
-				get: sinon.stub()
+				}
+			}),
+			'request': (this.request = {
+				get: sinon.stub(),
 				post: sinon.stub()
-			}
-			'../Project/ProjectGetter': @ProjectGetter = {
-				getProject: sinon.stub().callsArgWith(2, null, @fakeProject)
-			}
-			'../User/UserGetter': @UserGetter = {
+			}),
+			'../Project/ProjectGetter': (this.ProjectGetter = {
+				getProject: sinon.stub().callsArgWith(2, null, this.fakeProject)
+			}),
+			'../User/UserGetter': (this.UserGetter = {
 				getUser: sinon.stub()
-			}
-			'../DocumentUpdater/DocumentUpdaterHandler': @DocumentUpdaterHandler = {
+			}),
+			'../DocumentUpdater/DocumentUpdaterHandler': (this.DocumentUpdaterHandler = {
 				flushDocToMongo: sinon.stub().callsArgWith(2, null)
-			}
-		@fakeResponseData =
-			projectId: @projectId
+			})
+		}
+	});
+		return this.fakeResponseData = {
+			projectId: this.projectId,
 			keys: ['k1', 'k2']
+		};});
 
-	describe 'index', ->
+	describe('index', function() {
 
-		beforeEach ->
-			sinon.stub(@handler, '_findBibDocIds')
-			sinon.stub(@handler, '_findBibFileIds')
-			sinon.stub(@handler, '_isFullIndex').callsArgWith(1, null, true)
-			@request.post.callsArgWith(1, null, {statusCode: 200}, @fakeResponseData)
-			@call = (callback) =>
-				@handler.index @projectId, @docIds, callback
+		beforeEach(function() {
+			sinon.stub(this.handler, '_findBibDocIds');
+			sinon.stub(this.handler, '_findBibFileIds');
+			sinon.stub(this.handler, '_isFullIndex').callsArgWith(1, null, true);
+			this.request.post.callsArgWith(1, null, {statusCode: 200}, this.fakeResponseData);
+			return this.call = callback => {
+				return this.handler.index(this.projectId, this.docIds, callback);
+			};
+		});
 
-		describe 'with docIds as an array', ->
+		describe('with docIds as an array', function() {
 
-			beforeEach ->
-				@docIds = ['aaa', 'ccc']
+			beforeEach(function() {
+				return this.docIds = ['aaa', 'ccc'];});
 
-			it 'should not call _findBibDocIds', (done) ->
-				@call (err, data) =>
-					@handler._findBibDocIds.callCount.should.equal 0
-					done()
+			it('should not call _findBibDocIds', function(done) {
+				return this.call((err, data) => {
+					this.handler._findBibDocIds.callCount.should.equal(0);
+					return done();
+				});
+			});
 
-			it 'should call ProjectGetter.getProject', (done) ->
-				@call (err, data) =>
-					@ProjectGetter.getProject.callCount.should.equal 1
-					@ProjectGetter.getProject.calledWith(@projectId).should.equal true
-					done()
+			it('should call ProjectGetter.getProject', function(done) {
+				return this.call((err, data) => {
+					this.ProjectGetter.getProject.callCount.should.equal(1);
+					this.ProjectGetter.getProject.calledWith(this.projectId).should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should not call _findBibDocIds', (done) ->
-				@call (err, data) =>
-					@handler._findBibDocIds.callCount.should.equal 0
-					done()
+			it('should not call _findBibDocIds', function(done) {
+				return this.call((err, data) => {
+					this.handler._findBibDocIds.callCount.should.equal(0);
+					return done();
+				});
+			});
 
-			it 'should call DocumentUpdaterHandler.flushDocToMongo', (done) ->
-				@call (err, data) =>
-					@DocumentUpdaterHandler.flushDocToMongo.callCount.should.equal 2
-					@docIds.forEach (docId) =>
-						@DocumentUpdaterHandler.flushDocToMongo.calledWith(@projectId, docId).should.equal true
-					done()
+			it('should call DocumentUpdaterHandler.flushDocToMongo', function(done) {
+				return this.call((err, data) => {
+					this.DocumentUpdaterHandler.flushDocToMongo.callCount.should.equal(2);
+					this.docIds.forEach(docId => {
+						return this.DocumentUpdaterHandler.flushDocToMongo.calledWith(this.projectId, docId).should.equal(true);
+					});
+					return done();
+				});
+			});
 
-			it 'should make a request to references service', (done) ->
-				@call (err, data) =>
-					@request.post.callCount.should.equal 1
-					arg = @request.post.firstCall.args[0]
-					expect(arg.json).to.have.all.keys 'docUrls', 'fullIndex'
-					expect(arg.json.docUrls.length).to.equal 2
-					expect(arg.json.fullIndex).to.equal true
-					done()
+			it('should make a request to references service', function(done) {
+				return this.call((err, data) => {
+					this.request.post.callCount.should.equal(1);
+					const arg = this.request.post.firstCall.args[0];
+					expect(arg.json).to.have.all.keys('docUrls', 'fullIndex');
+					expect(arg.json.docUrls.length).to.equal(2);
+					expect(arg.json.fullIndex).to.equal(true);
+					return done();
+				});
+			});
 
-			it 'should not produce an error', (done) ->
-				@call (err, data) =>
-					expect(err).to.equal null
-					done()
+			it('should not produce an error', function(done) {
+				return this.call((err, data) => {
+					expect(err).to.equal(null);
+					return done();
+				});
+			});
 
-			it 'should return data', (done) ->
-				@call (err, data) =>
-					expect(data).to.not.equal null
-					expect(data).to.not.equal undefined
-					expect(data).to.equal @fakeResponseData
-					done()
+			return it('should return data', function(done) {
+				return this.call((err, data) => {
+					expect(data).to.not.equal(null);
+					expect(data).to.not.equal(undefined);
+					expect(data).to.equal(this.fakeResponseData);
+					return done();
+				});
+			});
+		});
 
-		describe 'when ProjectGetter.getProject produces an error', ->
+		describe('when ProjectGetter.getProject produces an error', function() {
 
-			beforeEach ->
-				@ProjectGetter.getProject.callsArgWith(2, new Error('woops'))
+			beforeEach(function() {
+				return this.ProjectGetter.getProject.callsArgWith(2, new Error('woops'));
+			});
 
-			it 'should produce an error', (done) ->
-				@call (err, data) =>
-					expect(err).to.not.equal null
-					expect(err).to.be.instanceof Error
-					expect(data).to.equal undefined
-					done()
+			it('should produce an error', function(done) {
+				return this.call((err, data) => {
+					expect(err).to.not.equal(null);
+					expect(err).to.be.instanceof(Error);
+					expect(data).to.equal(undefined);
+					return done();
+				});
+			});
 
-			it 'should not send request', (done) ->
-				@call (err, data) =>
-					@request.post.callCount.should.equal 0
-					done()
+			return it('should not send request', function(done) {
+				return this.call((err, data) => {
+					this.request.post.callCount.should.equal(0);
+					return done();
+				});
+			});
+		});
 
-		describe 'when _isFullIndex produces an error', ->
+		describe('when _isFullIndex produces an error', function() {
 
-			beforeEach ->
-				@ProjectGetter.getProject.callsArgWith(2, null, @fakeProject)
-				@handler._isFullIndex.callsArgWith(1, new Error('woops'))
+			beforeEach(function() {
+				this.ProjectGetter.getProject.callsArgWith(2, null, this.fakeProject);
+				return this.handler._isFullIndex.callsArgWith(1, new Error('woops'));
+			});
 
-			it 'should produce an error', (done) ->
-				@call (err, data) =>
-					expect(err).to.not.equal null
-					expect(err).to.be.instanceof Error
-					expect(data).to.equal undefined
-					done()
+			it('should produce an error', function(done) {
+				return this.call((err, data) => {
+					expect(err).to.not.equal(null);
+					expect(err).to.be.instanceof(Error);
+					expect(data).to.equal(undefined);
+					return done();
+				});
+			});
 
-			it 'should not send request', (done) ->
-				@call (err, data) =>
-					@request.post.callCount.should.equal 0
-					done()
+			return it('should not send request', function(done) {
+				return this.call((err, data) => {
+					this.request.post.callCount.should.equal(0);
+					return done();
+				});
+			});
+		});
 
-		describe 'when flushDocToMongo produces an error', ->
+		describe('when flushDocToMongo produces an error', function() {
 
-			beforeEach ->
-				@ProjectGetter.getProject.callsArgWith(2, null, @fakeProject)
-				@handler._isFullIndex.callsArgWith(1, false)
-				@DocumentUpdaterHandler.flushDocToMongo.callsArgWith(2, new Error('woops'))
+			beforeEach(function() {
+				this.ProjectGetter.getProject.callsArgWith(2, null, this.fakeProject);
+				this.handler._isFullIndex.callsArgWith(1, false);
+				return this.DocumentUpdaterHandler.flushDocToMongo.callsArgWith(2, new Error('woops'));
+			});
 
-			it 'should produce an error', (done) ->
-				@call (err, data) =>
-					expect(err).to.not.equal null
-					expect(err).to.be.instanceof Error
-					expect(data).to.equal undefined
-					done()
+			it('should produce an error', function(done) {
+				return this.call((err, data) => {
+					expect(err).to.not.equal(null);
+					expect(err).to.be.instanceof(Error);
+					expect(data).to.equal(undefined);
+					return done();
+				});
+			});
 
-			it 'should not send request', (done) ->
-				@call (err, data) =>
-					@request.post.callCount.should.equal 0
-					done()
-
-
-		describe 'when request produces an error', ->
-
-			beforeEach ->
-				@ProjectGetter.getProject.callsArgWith(2, null, @fakeProject)
-				@handler._isFullIndex.callsArgWith(1, null, false)
-				@DocumentUpdaterHandler.flushDocToMongo.callsArgWith(2, null)
-				@request.post.callsArgWith(1, new Error('woops'))
-
-			it 'should produce an error', (done) ->
-				@call (err, data) =>
-					expect(err).to.not.equal null
-					expect(err).to.be.instanceof Error
-					expect(data).to.equal undefined
-					done()
-
-		describe 'when request responds with error status', ->
-
-			beforeEach ->
-				@ProjectGetter.getProject.callsArgWith(2, null, @fakeProject)
-				@handler._isFullIndex.callsArgWith(1, null, false)
-				@request.post.callsArgWith(1, null, {statusCode: 500}, null)
-
-			it 'should produce an error', (done) ->
-				@call (err, data) =>
-					expect(err).to.not.equal null
-					expect(err).to.be.instanceof Error
-					expect(data).to.equal undefined
-					done()
-
-	describe 'indexAll', ->
-
-		beforeEach ->
-			sinon.stub(@handler, '_findBibDocIds').returns(['aaa', 'ccc'])
-			sinon.stub(@handler, '_findBibFileIds').returns(['fff', 'ggg'])
-			sinon.stub(@handler, '_isFullIndex').callsArgWith(1, null, true)
-			@request.post.callsArgWith(1, null, {statusCode: 200}, @fakeResponseData)
-			@call = (callback) =>
-				@handler.indexAll @projectId, callback
-
-		it 'should call _findBibDocIds', (done) ->
-			@call (err, data) =>
-				@handler._findBibDocIds.callCount.should.equal 1
-				@handler._findBibDocIds.calledWith(@fakeProject).should.equal true
-				done()
-
-		it 'should call _findBibFileIds', (done) ->
-			@call (err, data) =>
-				@handler._findBibDocIds.callCount.should.equal 1
-				@handler._findBibDocIds.calledWith(@fakeProject).should.equal true
-				done()
-
-		it 'should call DocumentUpdaterHandler.flushDocToMongo', (done) ->
-			@call (err, data) =>
-				@DocumentUpdaterHandler.flushDocToMongo.callCount.should.equal 2
-				done()
-
-		it 'should make a request to references service', (done) ->
-			@call (err, data) =>
-				@request.post.callCount.should.equal 1
-				arg = @request.post.firstCall.args[0]
-				expect(arg.json).to.have.all.keys 'docUrls', 'fullIndex'
-				expect(arg.json.docUrls.length).to.equal 4
-				expect(arg.json.fullIndex).to.equal true
-				done()
-
-		it 'should not produce an error', (done) ->
-			@call (err, data) =>
-				expect(err).to.equal null
-				done()
-
-		it 'should return data', (done) ->
-			@call (err, data) =>
-				expect(data).to.not.equal null
-				expect(data).to.not.equal undefined
-				expect(data).to.equal @fakeResponseData
-				done()
-
-		describe 'when ProjectGetter.getProject produces an error', ->
-
-			beforeEach ->
-				@ProjectGetter.getProject.callsArgWith(2, new Error('woops'))
-
-			it 'should produce an error', (done) ->
-				@call (err, data) =>
-					expect(err).to.not.equal null
-					expect(err).to.be.instanceof Error
-					expect(data).to.equal undefined
-					done()
-
-			it 'should not send request', (done) ->
-				@call (err, data) =>
-					@request.post.callCount.should.equal 0
-					done()
-
-		describe 'when _isFullIndex produces an error', ->
-
-			beforeEach ->
-				@ProjectGetter.getProject.callsArgWith(2, null, @fakeProject)
-				@handler._isFullIndex.callsArgWith(1, new Error('woops'))
-
-			it 'should produce an error', (done) ->
-				@call (err, data) =>
-					expect(err).to.not.equal null
-					expect(err).to.be.instanceof Error
-					expect(data).to.equal undefined
-					done()
-
-			it 'should not send request', (done) ->
-				@call (err, data) =>
-					@request.post.callCount.should.equal 0
-					done()
-
-		describe 'when flushDocToMongo produces an error', ->
-
-			beforeEach ->
-				@ProjectGetter.getProject.callsArgWith(2, null, @fakeProject)
-				@handler._isFullIndex.callsArgWith(1, false)
-				@DocumentUpdaterHandler.flushDocToMongo.callsArgWith(2, new Error('woops'))
-
-			it 'should produce an error', (done) ->
-				@call (err, data) =>
-					expect(err).to.not.equal null
-					expect(err).to.be.instanceof Error
-					expect(data).to.equal undefined
-					done()
-
-			it 'should not send request', (done) ->
-				@call (err, data) =>
-					@request.post.callCount.should.equal 0
-					done()
+			return it('should not send request', function(done) {
+				return this.call((err, data) => {
+					this.request.post.callCount.should.equal(0);
+					return done();
+				});
+			});
+		});
 
 
-	describe '_findBibDocIds', ->
+		describe('when request produces an error', function() {
 
-		beforeEach ->
-			@fakeProject =
-				rootFolder: [
+			beforeEach(function() {
+				this.ProjectGetter.getProject.callsArgWith(2, null, this.fakeProject);
+				this.handler._isFullIndex.callsArgWith(1, null, false);
+				this.DocumentUpdaterHandler.flushDocToMongo.callsArgWith(2, null);
+				return this.request.post.callsArgWith(1, new Error('woops'));
+			});
+
+			return it('should produce an error', function(done) {
+				return this.call((err, data) => {
+					expect(err).to.not.equal(null);
+					expect(err).to.be.instanceof(Error);
+					expect(data).to.equal(undefined);
+					return done();
+				});
+			});
+		});
+
+		return describe('when request responds with error status', function() {
+
+			beforeEach(function() {
+				this.ProjectGetter.getProject.callsArgWith(2, null, this.fakeProject);
+				this.handler._isFullIndex.callsArgWith(1, null, false);
+				return this.request.post.callsArgWith(1, null, {statusCode: 500}, null);
+			});
+
+			return it('should produce an error', function(done) {
+				return this.call((err, data) => {
+					expect(err).to.not.equal(null);
+					expect(err).to.be.instanceof(Error);
+					expect(data).to.equal(undefined);
+					return done();
+				});
+			});
+		});
+	});
+
+	describe('indexAll', function() {
+
+		beforeEach(function() {
+			sinon.stub(this.handler, '_findBibDocIds').returns(['aaa', 'ccc']);
+			sinon.stub(this.handler, '_findBibFileIds').returns(['fff', 'ggg']);
+			sinon.stub(this.handler, '_isFullIndex').callsArgWith(1, null, true);
+			this.request.post.callsArgWith(1, null, {statusCode: 200}, this.fakeResponseData);
+			return this.call = callback => {
+				return this.handler.indexAll(this.projectId, callback);
+			};
+		});
+
+		it('should call _findBibDocIds', function(done) {
+			return this.call((err, data) => {
+				this.handler._findBibDocIds.callCount.should.equal(1);
+				this.handler._findBibDocIds.calledWith(this.fakeProject).should.equal(true);
+				return done();
+			});
+		});
+
+		it('should call _findBibFileIds', function(done) {
+			return this.call((err, data) => {
+				this.handler._findBibDocIds.callCount.should.equal(1);
+				this.handler._findBibDocIds.calledWith(this.fakeProject).should.equal(true);
+				return done();
+			});
+		});
+
+		it('should call DocumentUpdaterHandler.flushDocToMongo', function(done) {
+			return this.call((err, data) => {
+				this.DocumentUpdaterHandler.flushDocToMongo.callCount.should.equal(2);
+				return done();
+			});
+		});
+
+		it('should make a request to references service', function(done) {
+			return this.call((err, data) => {
+				this.request.post.callCount.should.equal(1);
+				const arg = this.request.post.firstCall.args[0];
+				expect(arg.json).to.have.all.keys('docUrls', 'fullIndex');
+				expect(arg.json.docUrls.length).to.equal(4);
+				expect(arg.json.fullIndex).to.equal(true);
+				return done();
+			});
+		});
+
+		it('should not produce an error', function(done) {
+			return this.call((err, data) => {
+				expect(err).to.equal(null);
+				return done();
+			});
+		});
+
+		it('should return data', function(done) {
+			return this.call((err, data) => {
+				expect(data).to.not.equal(null);
+				expect(data).to.not.equal(undefined);
+				expect(data).to.equal(this.fakeResponseData);
+				return done();
+			});
+		});
+
+		describe('when ProjectGetter.getProject produces an error', function() {
+
+			beforeEach(function() {
+				return this.ProjectGetter.getProject.callsArgWith(2, new Error('woops'));
+			});
+
+			it('should produce an error', function(done) {
+				return this.call((err, data) => {
+					expect(err).to.not.equal(null);
+					expect(err).to.be.instanceof(Error);
+					expect(data).to.equal(undefined);
+					return done();
+				});
+			});
+
+			return it('should not send request', function(done) {
+				return this.call((err, data) => {
+					this.request.post.callCount.should.equal(0);
+					return done();
+				});
+			});
+		});
+
+		describe('when _isFullIndex produces an error', function() {
+
+			beforeEach(function() {
+				this.ProjectGetter.getProject.callsArgWith(2, null, this.fakeProject);
+				return this.handler._isFullIndex.callsArgWith(1, new Error('woops'));
+			});
+
+			it('should produce an error', function(done) {
+				return this.call((err, data) => {
+					expect(err).to.not.equal(null);
+					expect(err).to.be.instanceof(Error);
+					expect(data).to.equal(undefined);
+					return done();
+				});
+			});
+
+			return it('should not send request', function(done) {
+				return this.call((err, data) => {
+					this.request.post.callCount.should.equal(0);
+					return done();
+				});
+			});
+		});
+
+		return describe('when flushDocToMongo produces an error', function() {
+
+			beforeEach(function() {
+				this.ProjectGetter.getProject.callsArgWith(2, null, this.fakeProject);
+				this.handler._isFullIndex.callsArgWith(1, false);
+				return this.DocumentUpdaterHandler.flushDocToMongo.callsArgWith(2, new Error('woops'));
+			});
+
+			it('should produce an error', function(done) {
+				return this.call((err, data) => {
+					expect(err).to.not.equal(null);
+					expect(err).to.be.instanceof(Error);
+					expect(data).to.equal(undefined);
+					return done();
+				});
+			});
+
+			return it('should not send request', function(done) {
+				return this.call((err, data) => {
+					this.request.post.callCount.should.equal(0);
+					return done();
+				});
+			});
+		});
+	});
+
+
+	describe('_findBibDocIds', function() {
+
+		beforeEach(function() {
+			this.fakeProject = {
+				rootFolder: [{
 					docs: [
 						{name: 'one.bib', _id: 'aaa'},
 						{name: 'two.txt', _id: 'bbb'},
-					]
+					],
 					folders: [
 						{docs: [{name: 'three.bib', _id: 'ccc'}], folders: []}
 					]
+				}
 				]
-			@expectedIds = ['aaa', 'ccc']
+			};
+			return this.expectedIds = ['aaa', 'ccc'];});
 
-		it 'should select the correct docIds', ->
-			result = @handler._findBibDocIds(@fakeProject)
-			expect(result).to.deep.equal @expectedIds
+		it('should select the correct docIds', function() {
+			const result = this.handler._findBibDocIds(this.fakeProject);
+			return expect(result).to.deep.equal(this.expectedIds);
+		});
 
-		it 'should not error with a non array of folders from dirty data', ->
-			@fakeProject.rootFolder[0].folders[0].folders = {}
-			result = @handler._findBibDocIds(@fakeProject)
-			expect(result).to.deep.equal @expectedIds
+		return it('should not error with a non array of folders from dirty data', function() {
+			this.fakeProject.rootFolder[0].folders[0].folders = {};
+			const result = this.handler._findBibDocIds(this.fakeProject);
+			return expect(result).to.deep.equal(this.expectedIds);
+		});
+	});
 
-	describe '_findBibFileIds', ->
+	describe('_findBibFileIds', function() {
 
-		beforeEach ->
-			@fakeProject =
-				rootFolder: [
+		beforeEach(function() {
+			this.fakeProject = {
+				rootFolder: [{
 					docs: [
 						{name: 'one.bib', _id: 'aaa'},
 						{name: 'two.txt', _id: 'bbb'},
-					]
+					],
 					fileRefs: [
 						{name: 'other.bib', _id: 'ddd'}
 					],
@@ -346,52 +446,73 @@ describe 'ReferencesHandler', ->
 							folders: []
 						}
 					]
+				}
 				]
-			@expectedIds = ['ddd', 'ghg']
+			};
+			return this.expectedIds = ['ddd', 'ghg'];});
 
-		it 'should select the correct docIds', ->
-			result = @handler._findBibFileIds(@fakeProject)
-			expect(result).to.deep.equal @expectedIds
+		return it('should select the correct docIds', function() {
+			const result = this.handler._findBibFileIds(this.fakeProject);
+			return expect(result).to.deep.equal(this.expectedIds);
+		});
+	});
 
-	describe '_isFullIndex', ->
+	return describe('_isFullIndex', function() {
 
-		beforeEach ->
-			@fakeProject =
-				owner_ref: @owner_ref = "owner-ref-123"
-			@owner =
-				features:
+		beforeEach(function() {
+			this.fakeProject =
+				{owner_ref: (this.owner_ref = "owner-ref-123")};
+			this.owner = {
+				features: {
 					references: false
-			@UserGetter.getUser = sinon.stub()
-			@UserGetter.getUser.withArgs(@owner_ref, {features: true}).yields(null, @owner)
-			@call = (callback) =>
-				@handler._isFullIndex @fakeProject, callback
+				}
+			};
+			this.UserGetter.getUser = sinon.stub();
+			this.UserGetter.getUser.withArgs(this.owner_ref, {features: true}).yields(null, this.owner);
+			return this.call = callback => {
+				return this.handler._isFullIndex(this.fakeProject, callback);
+			};
+		});
 
-		describe 'with references feature on', ->
+		describe('with references feature on', function() {
 
-			beforeEach ->
-				@owner.features.references = true
+			beforeEach(function() {
+				return this.owner.features.references = true;
+			});
 
-			it 'should return true', ->
-				@call (err, isFullIndex) =>
-					expect(err).to.equal null
-					expect(isFullIndex).to.equal true
+			return it('should return true', function() {
+				return this.call((err, isFullIndex) => {
+					expect(err).to.equal(null);
+					return expect(isFullIndex).to.equal(true);
+				});
+			});
+		});
 
-		describe 'with references feature off', ->
+		describe('with references feature off', function() {
 
-			beforeEach ->
-				@owner.features.references = false
+			beforeEach(function() {
+				return this.owner.features.references = false;
+			});
 
-			it 'should return false', ->
-				@call (err, isFullIndex) =>
-					expect(err).to.equal null
-					expect(isFullIndex).to.equal false
+			return it('should return false', function() {
+				return this.call((err, isFullIndex) => {
+					expect(err).to.equal(null);
+					return expect(isFullIndex).to.equal(false);
+				});
+			});
+		});
 
-		describe 'with referencesSearch', ->
+		return describe('with referencesSearch', function() {
 
-			beforeEach ->
-				@owner.features = {referencesSearch: true, references: false}
+			beforeEach(function() {
+				return this.owner.features = {referencesSearch: true, references: false};});
 
-			it 'should return true', ->
-				@call (err, isFullIndex) =>
-					expect(err).to.equal null
-					expect(isFullIndex).to.equal true
+			return it('should return true', function() {
+				return this.call((err, isFullIndex) => {
+					expect(err).to.equal(null);
+					return expect(isFullIndex).to.equal(true);
+				});
+			});
+		});
+	});
+});

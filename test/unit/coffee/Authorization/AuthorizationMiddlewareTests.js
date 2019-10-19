@@ -1,274 +1,352 @@
-sinon = require('sinon')
-chai = require('chai')
-should = chai.should()
-expect = chai.expect
-modulePath = "../../../../app/js/Features/Authorization/AuthorizationMiddleware.js"
-SandboxedModule = require('sandboxed-module')
-Errors = require "../../../../app/js/Features/Errors/Errors"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const sinon = require('sinon');
+const chai = require('chai');
+const should = chai.should();
+const {
+    expect
+} = chai;
+const modulePath = "../../../../app/js/Features/Authorization/AuthorizationMiddleware.js";
+const SandboxedModule = require('sandboxed-module');
+const Errors = require("../../../../app/js/Features/Errors/Errors");
 
-describe "AuthorizationMiddleware", ->
-	beforeEach ->
-		@user_id = "user-id-123"
-		@project_id = "project-id-123"
-		@token = 'some-token'
-		@AuthenticationController =
-			getLoggedInUserId: sinon.stub().returns(@user_id)
+describe("AuthorizationMiddleware", function() {
+	beforeEach(function() {
+		this.user_id = "user-id-123";
+		this.project_id = "project-id-123";
+		this.token = 'some-token';
+		this.AuthenticationController = {
+			getLoggedInUserId: sinon.stub().returns(this.user_id),
 			isUserLoggedIn: sinon.stub().returns(true)
-		@AuthorizationMiddleware = SandboxedModule.require modulePath, requires:
-			"./AuthorizationManager": @AuthorizationManager = {}
-			"logger-sharelatex": {log: () ->}
-			"mongojs": ObjectId: @ObjectId = {}
-			"../Errors/Errors": Errors
-			'../Authentication/AuthenticationController': @AuthenticationController
-			"../TokenAccess/TokenAccessHandler": @TokenAccessHandler =
-				getRequestToken: sinon.stub().returns(@token)
-		@req = {}
-		@res = {}
-		@ObjectId.isValid = sinon.stub()
-		@ObjectId.isValid.withArgs(@project_id).returns true
-		@next = sinon.stub()
-
-	describe "_getUserId", ->
-		beforeEach ->
-			@req = {}
-
-		it "should get the user from session", (done) ->
-			@AuthenticationController.getLoggedInUserId = sinon.stub().returns("1234")
-			@AuthorizationMiddleware._getUserId @req, (err, user_id) =>
-				expect(err).to.not.exist
-				expect(user_id).to.equal "1234"
-				done()
-
-		it "should get oauth_user from request", (done) ->
-			@AuthenticationController.getLoggedInUserId = sinon.stub().returns(null)
-			@req.oauth_user = {_id: "5678"}
-			@AuthorizationMiddleware._getUserId @req, (err, user_id) =>
-				expect(err).to.not.exist
-				expect(user_id).to.equal "5678"
-				done()
-
-		it "should fall back to null", (done) ->
-			@AuthenticationController.getLoggedInUserId = sinon.stub().returns(null)
-			@req.oauth_user = undefined
-			@AuthorizationMiddleware._getUserId @req, (err, user_id) =>
-				expect(err).to.not.exist
-				expect(user_id).to.equal null
-				done()
-
-	METHODS_TO_TEST = {
-		"ensureUserCanReadProject": "canUserReadProject"
-		"ensureUserCanWriteProjectSettings": "canUserWriteProjectSettings"
-		"ensureUserCanWriteProjectContent": "canUserWriteProjectContent"
-		"ensureUserCanAdminProject": "canUserAdminProject"
+		};
+		this.AuthorizationMiddleware = SandboxedModule.require(modulePath, { requires: {
+			"./AuthorizationManager": (this.AuthorizationManager = {}),
+			"logger-sharelatex": {log() {}},
+			"mongojs": { ObjectId: (this.ObjectId = {})
+		},
+			"../Errors/Errors": Errors,
+			'../Authentication/AuthenticationController': this.AuthenticationController,
+			"../TokenAccess/TokenAccessHandler": (this.TokenAccessHandler =
+				{getRequestToken: sinon.stub().returns(this.token)})
+		}
 	}
-	for middlewareMethod, managerMethod of METHODS_TO_TEST
-		do (middlewareMethod, managerMethod) ->
-			describe middlewareMethod, ->
-				beforeEach ->
-					@req.params =
-						project_id: @project_id
-					@AuthorizationManager[managerMethod] = sinon.stub()
-					@AuthorizationMiddleware.redirectToRestricted = sinon.stub()
+		);
+		this.req = {};
+		this.res = {};
+		this.ObjectId.isValid = sinon.stub();
+		this.ObjectId.isValid.withArgs(this.project_id).returns(true);
+		return this.next = sinon.stub();
+	});
 
-				describe "with missing project_id", ->
-					beforeEach ->
-						@req.params = {}
+	describe("_getUserId", function() {
+		beforeEach(function() {
+			return this.req = {};});
 
-					it "should return an error to next", ->
-						@AuthorizationMiddleware[middlewareMethod] @req, @res, @next
-						@next.calledWith(new Error()).should.equal true
+		it("should get the user from session", function(done) {
+			this.AuthenticationController.getLoggedInUserId = sinon.stub().returns("1234");
+			return this.AuthorizationMiddleware._getUserId(this.req, (err, user_id) => {
+				expect(err).to.not.exist;
+				expect(user_id).to.equal("1234");
+				return done();
+			});
+		});
 
-				describe "with logged in user", ->
-					beforeEach ->
-						@AuthenticationController.getLoggedInUserId.returns(@user_id)
+		it("should get oauth_user from request", function(done) {
+			this.AuthenticationController.getLoggedInUserId = sinon.stub().returns(null);
+			this.req.oauth_user = {_id: "5678"};
+			return this.AuthorizationMiddleware._getUserId(this.req, (err, user_id) => {
+				expect(err).to.not.exist;
+				expect(user_id).to.equal("5678");
+				return done();
+			});
+		});
 
-					describe "when user has permission", ->
-						beforeEach ->
-							@AuthorizationManager[managerMethod]
-								.withArgs(@user_id, @project_id, @token)
-								.yields(null, true)
+		return it("should fall back to null", function(done) {
+			this.AuthenticationController.getLoggedInUserId = sinon.stub().returns(null);
+			this.req.oauth_user = undefined;
+			return this.AuthorizationMiddleware._getUserId(this.req, (err, user_id) => {
+				expect(err).to.not.exist;
+				expect(user_id).to.equal(null);
+				return done();
+			});
+		});
+	});
 
-						it "should return next", ->
-							@AuthorizationMiddleware[middlewareMethod] @req, @res, @next
-							@next.called.should.equal true
+	const METHODS_TO_TEST = {
+		"ensureUserCanReadProject": "canUserReadProject",
+		"ensureUserCanWriteProjectSettings": "canUserWriteProjectSettings",
+		"ensureUserCanWriteProjectContent": "canUserWriteProjectContent",
+		"ensureUserCanAdminProject": "canUserAdminProject"
+	};
+	for (let middlewareMethod in METHODS_TO_TEST) {
+		const managerMethod = METHODS_TO_TEST[middlewareMethod];
+		(((middlewareMethod, managerMethod) => describe(middlewareMethod, function() {
+            beforeEach(function() {
+                this.req.params =
+                    {project_id: this.project_id};
+                this.AuthorizationManager[managerMethod] = sinon.stub();
+                return this.AuthorizationMiddleware.redirectToRestricted = sinon.stub();
+            });
 
-					describe "when user doesn't have permission", ->
-						beforeEach ->
-							@AuthorizationManager[managerMethod]
-								.withArgs(@user_id, @project_id, @token)
-								.yields(null, false)
+            describe("with missing project_id", function() {
+                beforeEach(function() {
+                    return this.req.params = {};});
 
-						it "should redirect to redirectToRestricted", ->
-							@AuthorizationMiddleware[middlewareMethod] @req, @res, @next
-							@next.called.should.equal false
-							@AuthorizationMiddleware.redirectToRestricted
-								.calledWith(@req, @res, @next)
-								.should.equal true
+                return it("should return an error to next", function() {
+                    this.AuthorizationMiddleware[middlewareMethod](this.req, this.res, this.next);
+                    return this.next.calledWith(new Error()).should.equal(true);
+                });
+            });
 
-				describe "with anonymous user", ->
-					describe "when user has permission", ->
-						beforeEach ->
-							@AuthenticationController.getLoggedInUserId.returns(null)
-							@AuthorizationManager[managerMethod]
-								.withArgs(null, @project_id, @token)
-								.yields(null, true)
+            describe("with logged in user", function() {
+                beforeEach(function() {
+                    return this.AuthenticationController.getLoggedInUserId.returns(this.user_id);
+                });
 
-						it "should return next", ->
-							@AuthorizationMiddleware[middlewareMethod] @req, @res, @next
-							@next.called.should.equal true
+                describe("when user has permission", function() {
+                    beforeEach(function() {
+                        return this.AuthorizationManager[managerMethod]
+                            .withArgs(this.user_id, this.project_id, this.token)
+                            .yields(null, true);
+                    });
 
-					describe "when user doesn't have permission", ->
-						beforeEach ->
-							@AuthenticationController.getLoggedInUserId.returns(null)
-							@AuthorizationManager[managerMethod]
-								.withArgs(null, @project_id, @token)
-								.yields(null, false)
+                    return it("should return next", function() {
+                        this.AuthorizationMiddleware[middlewareMethod](this.req, this.res, this.next);
+                        return this.next.called.should.equal(true);
+                    });
+                });
 
-						it "should redirect to redirectToRestricted", ->
-							@AuthorizationMiddleware[middlewareMethod] @req, @res, @next
-							@next.called.should.equal false
-							@AuthorizationMiddleware.redirectToRestricted
-								.calledWith(@req, @res, @next)
-								.should.equal true
+                return describe("when user doesn't have permission", function() {
+                    beforeEach(function() {
+                        return this.AuthorizationManager[managerMethod]
+                            .withArgs(this.user_id, this.project_id, this.token)
+                            .yields(null, false);
+                    });
 
-				describe "with malformed project id", ->
-					beforeEach ->
-						@req.params =
-							project_id: "blah"
-						@ObjectId.isValid = sinon.stub().returns false
+                    return it("should redirect to redirectToRestricted", function() {
+                        this.AuthorizationMiddleware[middlewareMethod](this.req, this.res, this.next);
+                        this.next.called.should.equal(false);
+                        return this.AuthorizationMiddleware.redirectToRestricted
+                            .calledWith(this.req, this.res, this.next)
+                            .should.equal(true);
+                    });
+                });
+            });
 
-					it "should return a not found error", (done) ->
-						@AuthorizationMiddleware[middlewareMethod] @req, @res, (error) ->
-							error.should.be.instanceof Errors.NotFoundError
-							done()
+            describe("with anonymous user", function() {
+                describe("when user has permission", function() {
+                    beforeEach(function() {
+                        this.AuthenticationController.getLoggedInUserId.returns(null);
+                        return this.AuthorizationManager[managerMethod]
+                            .withArgs(null, this.project_id, this.token)
+                            .yields(null, true);
+                    });
 
-	describe "ensureUserIsSiteAdmin", ->
-		beforeEach ->
-			@AuthorizationManager.isUserSiteAdmin = sinon.stub()
-			@AuthorizationMiddleware.redirectToRestricted = sinon.stub()
+                    return it("should return next", function() {
+                        this.AuthorizationMiddleware[middlewareMethod](this.req, this.res, this.next);
+                        return this.next.called.should.equal(true);
+                    });
+                });
 
-		describe "with logged in user", ->
-			beforeEach ->
-				@AuthenticationController.getLoggedInUserId.returns(@user_id)
+                return describe("when user doesn't have permission", function() {
+                    beforeEach(function() {
+                        this.AuthenticationController.getLoggedInUserId.returns(null);
+                        return this.AuthorizationManager[managerMethod]
+                            .withArgs(null, this.project_id, this.token)
+                            .yields(null, false);
+                    });
 
-			describe "when user has permission", ->
-				beforeEach ->
-					@AuthorizationManager.isUserSiteAdmin
-						.withArgs(@user_id)
-						.yields(null, true)
+                    return it("should redirect to redirectToRestricted", function() {
+                        this.AuthorizationMiddleware[middlewareMethod](this.req, this.res, this.next);
+                        this.next.called.should.equal(false);
+                        return this.AuthorizationMiddleware.redirectToRestricted
+                            .calledWith(this.req, this.res, this.next)
+                            .should.equal(true);
+                    });
+                });
+            });
 
-				it "should return next", ->
-					@AuthorizationMiddleware.ensureUserIsSiteAdmin @req, @res, @next
-					@next.called.should.equal true
+            return describe("with malformed project id", function() {
+                beforeEach(function() {
+                    this.req.params =
+                        {project_id: "blah"};
+                    return this.ObjectId.isValid = sinon.stub().returns(false);
+                });
 
-			describe "when user doesn't have permission", ->
-				beforeEach ->
-					@AuthorizationManager.isUserSiteAdmin
-						.withArgs(@user_id)
-						.yields(null, false)
+                return it("should return a not found error", function(done) {
+                    return this.AuthorizationMiddleware[middlewareMethod](this.req, this.res, function(error) {
+                        error.should.be.instanceof(Errors.NotFoundError);
+                        return done();
+                    });
+                });
+            });
+        })))(middlewareMethod, managerMethod);
+	}
 
-				it "should redirect to redirectToRestricted", ->
-					@AuthorizationMiddleware.ensureUserIsSiteAdmin @req, @res, @next
-					@next.called.should.equal false
-					@AuthorizationMiddleware.redirectToRestricted
-						.calledWith(@req, @res, @next)
-						.should.equal true
+	describe("ensureUserIsSiteAdmin", function() {
+		beforeEach(function() {
+			this.AuthorizationManager.isUserSiteAdmin = sinon.stub();
+			return this.AuthorizationMiddleware.redirectToRestricted = sinon.stub();
+		});
 
-		describe "with anonymous user", ->
-			describe "when user has permission", ->
-				beforeEach ->
-					@AuthenticationController.getLoggedInUserId.returns(null)
-					@AuthorizationManager.isUserSiteAdmin
+		describe("with logged in user", function() {
+			beforeEach(function() {
+				return this.AuthenticationController.getLoggedInUserId.returns(this.user_id);
+			});
+
+			describe("when user has permission", function() {
+				beforeEach(function() {
+					return this.AuthorizationManager.isUserSiteAdmin
+						.withArgs(this.user_id)
+						.yields(null, true);
+				});
+
+				return it("should return next", function() {
+					this.AuthorizationMiddleware.ensureUserIsSiteAdmin(this.req, this.res, this.next);
+					return this.next.called.should.equal(true);
+				});
+			});
+
+			return describe("when user doesn't have permission", function() {
+				beforeEach(function() {
+					return this.AuthorizationManager.isUserSiteAdmin
+						.withArgs(this.user_id)
+						.yields(null, false);
+				});
+
+				return it("should redirect to redirectToRestricted", function() {
+					this.AuthorizationMiddleware.ensureUserIsSiteAdmin(this.req, this.res, this.next);
+					this.next.called.should.equal(false);
+					return this.AuthorizationMiddleware.redirectToRestricted
+						.calledWith(this.req, this.res, this.next)
+						.should.equal(true);
+				});
+			});
+		});
+
+		return describe("with anonymous user", function() {
+			describe("when user has permission", function() {
+				beforeEach(function() {
+					this.AuthenticationController.getLoggedInUserId.returns(null);
+					return this.AuthorizationManager.isUserSiteAdmin
 						.withArgs(null)
-						.yields(null, true)
+						.yields(null, true);
+				});
 
-				it "should return next", ->
-					@AuthorizationMiddleware.ensureUserIsSiteAdmin @req, @res, @next
-					@next.called.should.equal true
+				return it("should return next", function() {
+					this.AuthorizationMiddleware.ensureUserIsSiteAdmin(this.req, this.res, this.next);
+					return this.next.called.should.equal(true);
+				});
+			});
 
-			describe "when user doesn't have permission", ->
-				beforeEach ->
-					@AuthenticationController.getLoggedInUserId.returns(null)
-					@AuthorizationManager.isUserSiteAdmin
+			return describe("when user doesn't have permission", function() {
+				beforeEach(function() {
+					this.AuthenticationController.getLoggedInUserId.returns(null);
+					return this.AuthorizationManager.isUserSiteAdmin
 						.withArgs(null)
-						.yields(null, false)
+						.yields(null, false);
+				});
 
-				it "should redirect to redirectToRestricted", ->
-					@AuthorizationMiddleware.ensureUserIsSiteAdmin @req, @res, @next
-					@next.called.should.equal false
-					@AuthorizationMiddleware.redirectToRestricted
-						.calledWith(@req, @res, @next)
-						.should.equal true
+				return it("should redirect to redirectToRestricted", function() {
+					this.AuthorizationMiddleware.ensureUserIsSiteAdmin(this.req, this.res, this.next);
+					this.next.called.should.equal(false);
+					return this.AuthorizationMiddleware.redirectToRestricted
+						.calledWith(this.req, this.res, this.next)
+						.should.equal(true);
+				});
+			});
+		});
+	});
 
-	describe "ensureUserCanReadMultipleProjects", ->
-		beforeEach ->
-			@AuthorizationManager.canUserReadProject = sinon.stub()
-			@AuthorizationMiddleware.redirectToRestricted = sinon.stub()
-			@req.query =
-				project_ids: "project1,project2"
+	return describe("ensureUserCanReadMultipleProjects", function() {
+		beforeEach(function() {
+			this.AuthorizationManager.canUserReadProject = sinon.stub();
+			this.AuthorizationMiddleware.redirectToRestricted = sinon.stub();
+			return this.req.query =
+				{project_ids: "project1,project2"};
+		});
 
-		describe "with logged in user", ->
-			beforeEach ->
-				@AuthenticationController.getLoggedInUserId.returns(@user_id)
+		describe("with logged in user", function() {
+			beforeEach(function() {
+				return this.AuthenticationController.getLoggedInUserId.returns(this.user_id);
+			});
 
-			describe "when user has permission to access all projects", ->
-				beforeEach ->
-					@AuthorizationManager.canUserReadProject
-						.withArgs(@user_id, "project1", @token)
-						.yields(null, true)
-					@AuthorizationManager.canUserReadProject
-						.withArgs(@user_id, "project2", @token)
-						.yields(null, true)
+			describe("when user has permission to access all projects", function() {
+				beforeEach(function() {
+					this.AuthorizationManager.canUserReadProject
+						.withArgs(this.user_id, "project1", this.token)
+						.yields(null, true);
+					return this.AuthorizationManager.canUserReadProject
+						.withArgs(this.user_id, "project2", this.token)
+						.yields(null, true);
+				});
 
-				it "should return next", ->
-					@AuthorizationMiddleware.ensureUserCanReadMultipleProjects @req, @res, @next
-					@next.called.should.equal true
+				return it("should return next", function() {
+					this.AuthorizationMiddleware.ensureUserCanReadMultipleProjects(this.req, this.res, this.next);
+					return this.next.called.should.equal(true);
+				});
+			});
 
-			describe "when user doesn't have permission to access one of the projects", ->
-				beforeEach ->
-					@AuthorizationManager.canUserReadProject
-						.withArgs(@user_id, "project1", @token)
-						.yields(null, true)
-					@AuthorizationManager.canUserReadProject
-						.withArgs(@user_id, "project2", @token)
-						.yields(null, false)
+			return describe("when user doesn't have permission to access one of the projects", function() {
+				beforeEach(function() {
+					this.AuthorizationManager.canUserReadProject
+						.withArgs(this.user_id, "project1", this.token)
+						.yields(null, true);
+					return this.AuthorizationManager.canUserReadProject
+						.withArgs(this.user_id, "project2", this.token)
+						.yields(null, false);
+				});
 
-				it "should redirect to redirectToRestricted", ->
-					@AuthorizationMiddleware.ensureUserCanReadMultipleProjects @req, @res, @next
-					@next.called.should.equal false
-					@AuthorizationMiddleware.redirectToRestricted
-						.calledWith(@req, @res, @next)
-						.should.equal true
+				return it("should redirect to redirectToRestricted", function() {
+					this.AuthorizationMiddleware.ensureUserCanReadMultipleProjects(this.req, this.res, this.next);
+					this.next.called.should.equal(false);
+					return this.AuthorizationMiddleware.redirectToRestricted
+						.calledWith(this.req, this.res, this.next)
+						.should.equal(true);
+				});
+			});
+		});
 
-		describe "with anonymous user", ->
-			describe "when user has permission", ->
-				describe "when user has permission to access all projects", ->
-					beforeEach ->
-						@AuthenticationController.getLoggedInUserId.returns(null)
-						@AuthorizationManager.canUserReadProject
-							.withArgs(null, "project1", @token)
-							.yields(null, true)
-						@AuthorizationManager.canUserReadProject
-							.withArgs(null, "project2", @token)
-							.yields(null, true)
+		return describe("with anonymous user", () => describe("when user has permission", function() {
+            describe("when user has permission to access all projects", function() {
+                beforeEach(function() {
+                    this.AuthenticationController.getLoggedInUserId.returns(null);
+                    this.AuthorizationManager.canUserReadProject
+                        .withArgs(null, "project1", this.token)
+                        .yields(null, true);
+                    return this.AuthorizationManager.canUserReadProject
+                        .withArgs(null, "project2", this.token)
+                        .yields(null, true);
+                });
 
-					it "should return next", ->
-						@AuthorizationMiddleware.ensureUserCanReadMultipleProjects @req, @res, @next
-						@next.called.should.equal true
+                return it("should return next", function() {
+                    this.AuthorizationMiddleware.ensureUserCanReadMultipleProjects(this.req, this.res, this.next);
+                    return this.next.called.should.equal(true);
+                });
+            });
 
-				describe "when user doesn't have permission to access one of the projects", ->
-					beforeEach ->
-						@AuthenticationController.getLoggedInUserId.returns(null)
-						@AuthorizationManager.canUserReadProject
-							.withArgs(null, "project1", @token)
-							.yields(null, true)
-						@AuthorizationManager.canUserReadProject
-							.withArgs(null, "project2", @token)
-							.yields(null, false)
+            return describe("when user doesn't have permission to access one of the projects", function() {
+                beforeEach(function() {
+                    this.AuthenticationController.getLoggedInUserId.returns(null);
+                    this.AuthorizationManager.canUserReadProject
+                        .withArgs(null, "project1", this.token)
+                        .yields(null, true);
+                    return this.AuthorizationManager.canUserReadProject
+                        .withArgs(null, "project2", this.token)
+                        .yields(null, false);
+                });
 
-					it "should redirect to redirectToRestricted", ->
-						@AuthorizationMiddleware.ensureUserCanReadMultipleProjects @req, @res, @next
-						@next.called.should.equal false
-						@AuthorizationMiddleware.redirectToRestricted
-							.calledWith(@req, @res, @next)
-							.should.equal true
+                return it("should redirect to redirectToRestricted", function() {
+                    this.AuthorizationMiddleware.ensureUserCanReadMultipleProjects(this.req, this.res, this.next);
+                    this.next.called.should.equal(false);
+                    return this.AuthorizationMiddleware.redirectToRestricted
+                        .calledWith(this.req, this.res, this.next)
+                        .should.equal(true);
+                });
+            });
+        }));
+	});
+});

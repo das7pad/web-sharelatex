@@ -1,199 +1,239 @@
-SandboxedModule = require('sandboxed-module')
-should = require('chai').should()
-expect = require('chai').expect
-sinon = require 'sinon'
-modulePath = "../../../../app/js/Features/Subscription/FeaturesUpdater"
-assert = require("chai").assert
-ObjectId = require('mongoose').Types.ObjectId	
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const SandboxedModule = require('sandboxed-module');
+const should = require('chai').should();
+const {
+    expect
+} = require('chai');
+const sinon = require('sinon');
+const modulePath = "../../../../app/js/Features/Subscription/FeaturesUpdater";
+const {
+    assert
+} = require("chai");
+const {
+    ObjectId
+} = require('mongoose').Types;	
 
-describe "FeaturesUpdater", ->
+describe("FeaturesUpdater", function() {
 
-	beforeEach ->
-		@user_id = ObjectId().toString()
+	beforeEach(function() {
+		this.user_id = ObjectId().toString();
 
-		@FeaturesUpdater = SandboxedModule.require modulePath, requires:
-			'./UserFeaturesUpdater': @UserFeaturesUpdater = {}
-			'./SubscriptionLocator': @SubscriptionLocator = {} 
-			'./PlansLocator': @PlansLocator = {}
-			"logger-sharelatex": log:->
-			'settings-sharelatex': @Settings = {}
-			"../Referal/ReferalFeatures" : @ReferalFeatures = {}
-			"./V1SubscriptionManager": @V1SubscriptionManager = {}
-			'../Institutions/InstitutionsFeatures': @InstitutionsFeatures = {}
+		return this.FeaturesUpdater = SandboxedModule.require(modulePath, { requires: {
+			'./UserFeaturesUpdater': (this.UserFeaturesUpdater = {}),
+			'./SubscriptionLocator': (this.SubscriptionLocator = {}), 
+			'./PlansLocator': (this.PlansLocator = {}),
+			"logger-sharelatex": { log() {}
+		},
+			'settings-sharelatex': (this.Settings = {}),
+			"../Referal/ReferalFeatures" : (this.ReferalFeatures = {}),
+			"./V1SubscriptionManager": (this.V1SubscriptionManager = {}),
+			'../Institutions/InstitutionsFeatures': (this.InstitutionsFeatures = {})
+		}
+	});});
 
-	describe "refreshFeatures", ->
-		beforeEach ->
-			@V1SubscriptionManager.notifyV1OfFeaturesChange = sinon.stub().yields()
-			@UserFeaturesUpdater.updateFeatures = sinon.stub().yields()
-			@FeaturesUpdater._getIndividualFeatures = sinon.stub().yields(null, { 'individual': 'features' })
-			@FeaturesUpdater._getGroupFeatureSets = sinon.stub().yields(null, [{ 'group': 'features' }, { 'group': 'features2' }])
-			@InstitutionsFeatures.getInstitutionsFeatures = sinon.stub().yields(null, { 'institutions': 'features' })
-			@FeaturesUpdater._getV1Features = sinon.stub().yields(null, { 'v1': 'features' })
-			@ReferalFeatures.getBonusFeatures = sinon.stub().yields(null, { 'bonus': 'features' })
-			@FeaturesUpdater._mergeFeatures = sinon.stub().returns({'merged': 'features'})
-			@callback = sinon.stub()
+	describe("refreshFeatures", function() {
+		beforeEach(function() {
+			this.V1SubscriptionManager.notifyV1OfFeaturesChange = sinon.stub().yields();
+			this.UserFeaturesUpdater.updateFeatures = sinon.stub().yields();
+			this.FeaturesUpdater._getIndividualFeatures = sinon.stub().yields(null, { 'individual': 'features' });
+			this.FeaturesUpdater._getGroupFeatureSets = sinon.stub().yields(null, [{ 'group': 'features' }, { 'group': 'features2' }]);
+			this.InstitutionsFeatures.getInstitutionsFeatures = sinon.stub().yields(null, { 'institutions': 'features' });
+			this.FeaturesUpdater._getV1Features = sinon.stub().yields(null, { 'v1': 'features' });
+			this.ReferalFeatures.getBonusFeatures = sinon.stub().yields(null, { 'bonus': 'features' });
+			this.FeaturesUpdater._mergeFeatures = sinon.stub().returns({'merged': 'features'});
+			return this.callback = sinon.stub();
+		});
 
-		describe "normally", ->
-			beforeEach ->
-				@FeaturesUpdater.refreshFeatures @user_id, @callback
+		describe("normally", function() {
+			beforeEach(function() {
+				return this.FeaturesUpdater.refreshFeatures(this.user_id, this.callback);
+			});
 
-			it "should get the individual features", ->
-				@FeaturesUpdater._getIndividualFeatures
-					.calledWith(@user_id)
-					.should.equal true
+			it("should get the individual features", function() {
+				return this.FeaturesUpdater._getIndividualFeatures
+					.calledWith(this.user_id)
+					.should.equal(true);
+			});
 
-			it "should get the group features", ->
-				@FeaturesUpdater._getGroupFeatureSets
-					.calledWith(@user_id)
-					.should.equal true
+			it("should get the group features", function() {
+				return this.FeaturesUpdater._getGroupFeatureSets
+					.calledWith(this.user_id)
+					.should.equal(true);
+			});
 
-			it "should get the institution features", ->
-				@InstitutionsFeatures.getInstitutionsFeatures
-					.calledWith(@user_id)
-					.should.equal true
+			it("should get the institution features", function() {
+				return this.InstitutionsFeatures.getInstitutionsFeatures
+					.calledWith(this.user_id)
+					.should.equal(true);
+			});
 
-			it "should get the v1 features", ->
-				@FeaturesUpdater._getV1Features
-					.calledWith(@user_id)
-					.should.equal true
+			it("should get the v1 features", function() {
+				return this.FeaturesUpdater._getV1Features
+					.calledWith(this.user_id)
+					.should.equal(true);
+			});
 
-			it "should get the bonus features", ->
-				@ReferalFeatures.getBonusFeatures
-					.calledWith(@user_id)
-					.should.equal true
+			it("should get the bonus features", function() {
+				return this.ReferalFeatures.getBonusFeatures
+					.calledWith(this.user_id)
+					.should.equal(true);
+			});
 
-			it "should merge from the default features", ->
-				@FeaturesUpdater._mergeFeatures.calledWith(@Settings.defaultFeatures).should.equal true
+			it("should merge from the default features", function() {
+				return this.FeaturesUpdater._mergeFeatures.calledWith(this.Settings.defaultFeatures).should.equal(true);
+			});
 
-			it "should merge the individual features", ->
-				@FeaturesUpdater._mergeFeatures.calledWith(sinon.match.any, { 'individual': 'features' }).should.equal true
+			it("should merge the individual features", function() {
+				return this.FeaturesUpdater._mergeFeatures.calledWith(sinon.match.any, { 'individual': 'features' }).should.equal(true);
+			});
 
-			it "should merge the group features", ->
-				@FeaturesUpdater._mergeFeatures.calledWith(sinon.match.any, { 'group': 'features' }).should.equal true
-				@FeaturesUpdater._mergeFeatures.calledWith(sinon.match.any, { 'group': 'features2' }).should.equal true
+			it("should merge the group features", function() {
+				this.FeaturesUpdater._mergeFeatures.calledWith(sinon.match.any, { 'group': 'features' }).should.equal(true);
+				return this.FeaturesUpdater._mergeFeatures.calledWith(sinon.match.any, { 'group': 'features2' }).should.equal(true);
+			});
 
-			it "should merge the institutions features", ->
-				@FeaturesUpdater._mergeFeatures.calledWith(sinon.match.any, { 'institutions': 'features' }).should.equal true
+			it("should merge the institutions features", function() {
+				return this.FeaturesUpdater._mergeFeatures.calledWith(sinon.match.any, { 'institutions': 'features' }).should.equal(true);
+			});
 
-			it "should merge the v1 features", ->
-				@FeaturesUpdater._mergeFeatures.calledWith(sinon.match.any, { 'v1': 'features' }).should.equal true
+			it("should merge the v1 features", function() {
+				return this.FeaturesUpdater._mergeFeatures.calledWith(sinon.match.any, { 'v1': 'features' }).should.equal(true);
+			});
 
-			it "should merge the bonus features", ->
-				@FeaturesUpdater._mergeFeatures.calledWith(sinon.match.any, { 'bonus': 'features' }).should.equal true
+			it("should merge the bonus features", function() {
+				return this.FeaturesUpdater._mergeFeatures.calledWith(sinon.match.any, { 'bonus': 'features' }).should.equal(true);
+			});
 
-			it "should update the user with the merged features", ->
-				@UserFeaturesUpdater.updateFeatures
-					.calledWith(@user_id, {'merged': 'features'})
-					.should.equal true
+			it("should update the user with the merged features", function() {
+				return this.UserFeaturesUpdater.updateFeatures
+					.calledWith(this.user_id, {'merged': 'features'})
+					.should.equal(true);
+			});
 
-			it "should notify v1", ->
-				@V1SubscriptionManager.notifyV1OfFeaturesChange
-					.called.should.equal true
+			return it("should notify v1", function() {
+				return this.V1SubscriptionManager.notifyV1OfFeaturesChange
+					.called.should.equal(true);
+			});
+		});
 
-		describe "with notifyV1 == false", ->
-			beforeEach ->
-				@FeaturesUpdater.refreshFeatures @user_id, false, @callback
+		return describe("with notifyV1 == false", function() {
+			beforeEach(function() {
+				return this.FeaturesUpdater.refreshFeatures(this.user_id, false, this.callback);
+			});
 
-			it "should not notify v1", ->
-				@V1SubscriptionManager.notifyV1OfFeaturesChange
-					.called.should.equal false
+			return it("should not notify v1", function() {
+				return this.V1SubscriptionManager.notifyV1OfFeaturesChange
+					.called.should.equal(false);
+			});
+		});
+	});
 
-	describe "_mergeFeatures", ->
-		it "should prefer priority over standard for compileGroup", ->
-			expect(@FeaturesUpdater._mergeFeatures({
+	return describe("_mergeFeatures", function() {
+		it("should prefer priority over standard for compileGroup", function() {
+			expect(this.FeaturesUpdater._mergeFeatures({
 				compileGroup: 'priority'
 			}, {
 				compileGroup: 'standard'
 			})).to.deep.equal({
 				compileGroup: 'priority'
-			})
-			expect(@FeaturesUpdater._mergeFeatures({
+			});
+			expect(this.FeaturesUpdater._mergeFeatures({
 				compileGroup: 'standard'
 			}, {
 				compileGroup: 'priority'
 			})).to.deep.equal({
 				compileGroup: 'priority'
-			})
-			expect(@FeaturesUpdater._mergeFeatures({
+			});
+			expect(this.FeaturesUpdater._mergeFeatures({
 				compileGroup: 'priority'
 			}, {
 				compileGroup: 'priority'
 			})).to.deep.equal({
 				compileGroup: 'priority'
-			})
-			expect(@FeaturesUpdater._mergeFeatures({
+			});
+			return expect(this.FeaturesUpdater._mergeFeatures({
 				compileGroup: 'standard'
 			}, {
 				compileGroup: 'standard'
 			})).to.deep.equal({
 				compileGroup: 'standard'
-			})
+			});
+		});
 
-		it "should prefer -1 over any other for collaborators", ->
-			expect(@FeaturesUpdater._mergeFeatures({
+		it("should prefer -1 over any other for collaborators", function() {
+			expect(this.FeaturesUpdater._mergeFeatures({
 				collaborators: -1
 			}, {
 				collaborators: 10
 			})).to.deep.equal({
 				collaborators: -1
-			})
-			expect(@FeaturesUpdater._mergeFeatures({
+			});
+			expect(this.FeaturesUpdater._mergeFeatures({
 				collaborators: 10
 			}, {
 				collaborators: -1
 			})).to.deep.equal({
 				collaborators: -1
-			})
-			expect(@FeaturesUpdater._mergeFeatures({
+			});
+			return expect(this.FeaturesUpdater._mergeFeatures({
 				collaborators: 4
 			}, {
 				collaborators: 10
 			})).to.deep.equal({
 				collaborators: 10
-			})
+			});
+		});
 
-		it "should prefer the higher of compileTimeout", ->
-			expect(@FeaturesUpdater._mergeFeatures({
+		it("should prefer the higher of compileTimeout", function() {
+			expect(this.FeaturesUpdater._mergeFeatures({
 				compileTimeout: 20
 			}, {
 				compileTimeout: 10
 			})).to.deep.equal({
 				compileTimeout: 20
-			})
-			expect(@FeaturesUpdater._mergeFeatures({
+			});
+			return expect(this.FeaturesUpdater._mergeFeatures({
 				compileTimeout: 10
 			}, {
 				compileTimeout: 20
 			})).to.deep.equal({
 				compileTimeout: 20
-			})
+			});
+		});
 
-		it "should prefer the true over false for other keys", ->
-			expect(@FeaturesUpdater._mergeFeatures({
+		return it("should prefer the true over false for other keys", function() {
+			expect(this.FeaturesUpdater._mergeFeatures({
 				github: true
 			}, {
 				github: false
 			})).to.deep.equal({
 				github: true
-			})
-			expect(@FeaturesUpdater._mergeFeatures({
+			});
+			expect(this.FeaturesUpdater._mergeFeatures({
 				github: false
 			}, {
 				github: true
 			})).to.deep.equal({
 				github: true
-			})
-			expect(@FeaturesUpdater._mergeFeatures({
+			});
+			expect(this.FeaturesUpdater._mergeFeatures({
 				github: true
 			}, {
 				github: true
 			})).to.deep.equal({
 				github: true
-			})
-			expect(@FeaturesUpdater._mergeFeatures({
+			});
+			return expect(this.FeaturesUpdater._mergeFeatures({
 				github: false
 			}, {
 				github: false
 			})).to.deep.equal({
 				github: false
-			})
+			});
+		});
+	});
+});

@@ -1,105 +1,148 @@
-chai = require('chai')
-assert = require('chai').assert
-should = chai.should()
-expect = chai.expect
-sinon = require 'sinon'
-modulePath = "../../../../app/js/Features/Project/ProjectHistoryHandler"
-SandboxedModule = require('sandboxed-module')
-ObjectId = require("mongoose").Types.ObjectId
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS206: Consider reworking classes to avoid initClass
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const chai = require('chai');
+const {
+    assert
+} = require('chai');
+const should = chai.should();
+const {
+    expect
+} = chai;
+const sinon = require('sinon');
+const modulePath = "../../../../app/js/Features/Project/ProjectHistoryHandler";
+const SandboxedModule = require('sandboxed-module');
+const {
+    ObjectId
+} = require("mongoose").Types;
 
-describe 'ProjectHistoryHandler', ->
-	project_id = '4eecb1c1bffa66588e0000a1'
-	userId = 1234
+describe('ProjectHistoryHandler', function() {
+	const project_id = '4eecb1c1bffa66588e0000a1';
+	const userId = 1234;
 
-	beforeEach ->
-		@ProjectModel = class Project
-			constructor:(options)->
-				@._id = project_id
-				@name = "project_name_here"
-				@rev = 0
-			rootFolder:[@rootFolder]
-		@project = new @ProjectModel()
+	beforeEach(function() {
+		let Project;
+		this.ProjectModel = (Project = (function() {
+			Project = class Project {
+				static initClass() {
+					this.prototype.rootFolder =[this.rootFolder];
+				}
+				constructor(options){
+					this._id = project_id;
+					this.name = "project_name_here";
+					this.rev = 0;
+				}
+			};
+			Project.initClass();
+			return Project;
+		})());
+		this.project = new this.ProjectModel();
 
-		@callback = sinon.stub()
+		this.callback = sinon.stub();
 
-		@ProjectHistoryHandler = SandboxedModule.require modulePath, requires:
-			'logger-sharelatex': @logger = {log:sinon.stub(), error: sinon.stub(), err:->}
-			'settings-sharelatex': @Settings = {}
-			'../../models/Project': Project:@ProjectModel
-			'./ProjectDetailsHandler': @ProjectDetailsHandler = {}
-			'../History/HistoryManager': @HistoryManager = {}
-			'./ProjectEntityUpdateHandler': @ProjectEntityUpdateHandler = {}
+		return this.ProjectHistoryHandler = SandboxedModule.require(modulePath, { requires: {
+			'logger-sharelatex': (this.logger = {log:sinon.stub(), error: sinon.stub(), err() {}}),
+			'settings-sharelatex': (this.Settings = {}),
+			'../../models/Project': { Project:this.ProjectModel
+		},
+			'./ProjectDetailsHandler': (this.ProjectDetailsHandler = {}),
+			'../History/HistoryManager': (this.HistoryManager = {}),
+			'./ProjectEntityUpdateHandler': (this.ProjectEntityUpdateHandler = {})
+		}
+	});});
 
-	describe "starting history for an existing project", ->
-		beforeEach ->
-			@newHistoryId = 123456789
-			@HistoryManager.initializeProject = sinon.stub().callsArgWith(0, null, {overleaf_id: @newHistoryId})
-			@HistoryManager.flushProject = sinon.stub().callsArg(1)
-			@ProjectEntityUpdateHandler.resyncProjectHistory = sinon.stub().callsArg(1)
+	return describe("starting history for an existing project", function() {
+		beforeEach(function() {
+			this.newHistoryId = 123456789;
+			this.HistoryManager.initializeProject = sinon.stub().callsArgWith(0, null, {overleaf_id: this.newHistoryId});
+			this.HistoryManager.flushProject = sinon.stub().callsArg(1);
+			return this.ProjectEntityUpdateHandler.resyncProjectHistory = sinon.stub().callsArg(1);
+		});
 
-		describe "when the history does not already exist", ->
-			beforeEach ->
-				@ProjectDetailsHandler.getDetails = sinon.stub().withArgs(project_id).callsArgWith(1, null, @project)
-				@ProjectModel.update = sinon.stub().callsArgWith(2,null,{n:1})
-				@ProjectHistoryHandler.ensureHistoryExistsForProject project_id, @callback
+		describe("when the history does not already exist", function() {
+			beforeEach(function() {
+				this.ProjectDetailsHandler.getDetails = sinon.stub().withArgs(project_id).callsArgWith(1, null, this.project);
+				this.ProjectModel.update = sinon.stub().callsArgWith(2,null,{n:1});
+				return this.ProjectHistoryHandler.ensureHistoryExistsForProject(project_id, this.callback);
+			});
 
-			it "should get any existing history id for the project", ->
-				@ProjectDetailsHandler.getDetails
+			it("should get any existing history id for the project", function() {
+				return this.ProjectDetailsHandler.getDetails
 					.calledWith(project_id)
-					.should.equal true
+					.should.equal(true);
+			});
 
-			it "should initialize a new history in the v1 history service", ->
-				@HistoryManager.initializeProject
-					.called.should.equal.true
+			it("should initialize a new history in the v1 history service", function() {
+				return this.HistoryManager.initializeProject
+					.called.should.equal.true;
+			});
 			
-			it "should set the new history id on the project", ->
-				@ProjectModel.update
-					.calledWith({_id: project_id, "overleaf.history.id": {$exists:false}}, {"overleaf.history.id":@newHistoryId})
-					.should.equal true
+			it("should set the new history id on the project", function() {
+				return this.ProjectModel.update
+					.calledWith({_id: project_id, "overleaf.history.id": {$exists:false}}, {"overleaf.history.id":this.newHistoryId})
+					.should.equal(true);
+			});
 
-			it "should resync the project history", ->
-				@ProjectEntityUpdateHandler.resyncProjectHistory
+			it("should resync the project history", function() {
+				return this.ProjectEntityUpdateHandler.resyncProjectHistory
 					.calledWith(project_id)
-					.should.equal true
+					.should.equal(true);
+			});
 
-			it "should flush the project history", ->
-				@HistoryManager.flushProject
+			it("should flush the project history", function() {
+				return this.HistoryManager.flushProject
 					.calledWith(project_id)
-					.should.equal true
+					.should.equal(true);
+			});
 			
-			it "should call the callback without an error", ->
-				@callback.called.should.equal true
+			return it("should call the callback without an error", function() {
+				return this.callback.called.should.equal(true);
+			});
+		});
 
-		describe "when the history already exists", ->
-			beforeEach ->
-				@project.overleaf = {history: {id: 1234}}
-				@ProjectDetailsHandler.getDetails = sinon.stub().withArgs(project_id).callsArgWith(1, null, @project)
-				@ProjectModel.update = sinon.stub()
-				@ProjectHistoryHandler.ensureHistoryExistsForProject project_id, @callback
+		return describe("when the history already exists", function() {
+			beforeEach(function() {
+				this.project.overleaf = {history: {id: 1234}};
+				this.ProjectDetailsHandler.getDetails = sinon.stub().withArgs(project_id).callsArgWith(1, null, this.project);
+				this.ProjectModel.update = sinon.stub();
+				return this.ProjectHistoryHandler.ensureHistoryExistsForProject(project_id, this.callback);
+			});
 
-			it "should get any existing history id for the project", ->
-				@ProjectDetailsHandler.getDetails
+			it("should get any existing history id for the project", function() {
+				return this.ProjectDetailsHandler.getDetails
 					.calledWith(project_id)
-					.should.equal true
+					.should.equal(true);
+			});
 
-			it "should not initialize a new history in the v1 history service", ->
-				@HistoryManager.initializeProject
-					.called.should.equal false
+			it("should not initialize a new history in the v1 history service", function() {
+				return this.HistoryManager.initializeProject
+					.called.should.equal(false);
+			});
 			
-			it "should not set the new history id on the project", ->
-				@ProjectModel.update
+			it("should not set the new history id on the project", function() {
+				return this.ProjectModel.update
 					.called
-					.should.equal false
+					.should.equal(false);
+			});
 
-			it "should not resync the project history", ->
-				@ProjectEntityUpdateHandler.resyncProjectHistory
+			it("should not resync the project history", function() {
+				return this.ProjectEntityUpdateHandler.resyncProjectHistory
 					.called
-					.should.equal false
+					.should.equal(false);
+			});
 
-			it "should not flush the project history", ->
-				@HistoryManager.flushProject
+			it("should not flush the project history", function() {
+				return this.HistoryManager.flushProject
 					.called
-					.should.equal false
+					.should.equal(false);
+			});
 			
-			it "should call the callback", ->
-				@callback.calledWith().should.equal true
+			return it("should call the callback", function() {
+				return this.callback.calledWith().should.equal(true);
+			});
+		});
+	});
+});

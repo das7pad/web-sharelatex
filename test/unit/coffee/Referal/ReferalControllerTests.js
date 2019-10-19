@@ -1,13 +1,21 @@
-SandboxedModule = require('sandboxed-module')
-assert = require('assert')
-require('chai').should()
-sinon = require('sinon')
-modulePath = require('path').join __dirname, '../../../../app/js/Features/Referal/ReferalController'
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const SandboxedModule = require('sandboxed-module');
+const assert = require('assert');
+require('chai').should();
+const sinon = require('sinon');
+const modulePath = require('path').join(__dirname, '../../../../app/js/Features/Referal/ReferalController');
 
-describe 'Referal controller', ->
-
-	beforeEach ->
-		@controller = SandboxedModule.require modulePath, requires:
-			'logger-sharelatex':
-				log:->
-				err:->
+describe('Referal controller', () => beforeEach(function() {
+    return this.controller = SandboxedModule.require(modulePath, { requires: {
+        'logger-sharelatex': {
+            log() {},
+            err() {}
+        }
+    }
+}
+    );
+}));

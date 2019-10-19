@@ -1,235 +1,297 @@
-should = require('chai').should()
-expect = require("chai").expect
-SandboxedModule = require('sandboxed-module')
-assert = require('assert')
-path = require('path')
-sinon = require('sinon')
-modulePath = path.join __dirname, "../../../../app/js/Features/PasswordReset/PasswordResetController"
-expect = require("chai").expect
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const should = require('chai').should();
+let {
+    expect
+} = require("chai");
+const SandboxedModule = require('sandboxed-module');
+const assert = require('assert');
+const path = require('path');
+const sinon = require('sinon');
+const modulePath = path.join(__dirname, "../../../../app/js/Features/PasswordReset/PasswordResetController");
+({
+    expect
+} = require("chai"));
 
-describe "PasswordResetController", ->
+describe("PasswordResetController", function() {
 
-	beforeEach ->
+	beforeEach(function() {
 
-		@settings = {}
-		@PasswordResetHandler =
-			generateAndEmailResetToken:sinon.stub()
+		this.settings = {};
+		this.PasswordResetHandler = {
+			generateAndEmailResetToken:sinon.stub(),
 			setNewUserPassword:sinon.stub()
-		@RateLimiter =
-			addCount: sinon.stub()
-		@UserSessionsManager =
-			revokeAllUserSessions: sinon.stub().callsArgWith(2, null)
-		@AuthenticationManager =
-			validatePassword: sinon.stub()
-		@UserUpdater =
-			removeReconfirmFlag: sinon.stub().callsArgWith(1, null)
-		@PasswordResetController = SandboxedModule.require modulePath, requires:
-			"settings-sharelatex":@settings
-			"./PasswordResetHandler":@PasswordResetHandler
-			"logger-sharelatex": log:->
-			"../../infrastructure/RateLimiter":@RateLimiter
-			"../Authentication/AuthenticationController": @AuthenticationController = {}
-			"../Authentication/AuthenticationManager": @AuthenticationManager
-			"../User/UserGetter": @UserGetter = {}
-			"../User/UserSessionsManager": @UserSessionsManager
-			"../User/UserUpdater": 	@UserUpdater
+		};
+		this.RateLimiter =
+			{addCount: sinon.stub()};
+		this.UserSessionsManager =
+			{revokeAllUserSessions: sinon.stub().callsArgWith(2, null)};
+		this.AuthenticationManager =
+			{validatePassword: sinon.stub()};
+		this.UserUpdater =
+			{removeReconfirmFlag: sinon.stub().callsArgWith(1, null)};
+		this.PasswordResetController = SandboxedModule.require(modulePath, { requires: {
+			"settings-sharelatex":this.settings,
+			"./PasswordResetHandler":this.PasswordResetHandler,
+			"logger-sharelatex": { log() {}
+		},
+			"../../infrastructure/RateLimiter":this.RateLimiter,
+			"../Authentication/AuthenticationController": (this.AuthenticationController = {}),
+			"../Authentication/AuthenticationManager": this.AuthenticationManager,
+			"../User/UserGetter": (this.UserGetter = {}),
+			"../User/UserSessionsManager": this.UserSessionsManager,
+			"../User/UserUpdater": 	this.UserUpdater
+		}
+	}
+		);
 
-		@email = "bob@bob.com "
-		@user_id = 'mock-user-id'
-		@token = "my security token that was emailed to me"
-		@password = "my new password"
-		@req =
-			body:
-				email:@email
-				passwordResetToken:@token
-				password:@password
-			i18n:
-				translate:->
-			session: {}
+		this.email = "bob@bob.com ";
+		this.user_id = 'mock-user-id';
+		this.token = "my security token that was emailed to me";
+		this.password = "my new password";
+		this.req = {
+			body: {
+				email:this.email,
+				passwordResetToken:this.token,
+				password:this.password
+			},
+			i18n: {
+				translate() {}
+			},
+			session: {},
 			query: {}
+		};
 
-		@res = {}
-
-
-	describe "requestReset", ->
-
-		it "should error if the rate limit is hit", (done)->
-			@PasswordResetHandler.generateAndEmailResetToken.callsArgWith(1, null, 'primary')
-			@RateLimiter.addCount.callsArgWith(1, null, false)
-			@res.sendStatus = (code)=>
-				code.should.equal 429
-				@PasswordResetHandler.generateAndEmailResetToken.calledWith(@email.trim()).should.equal false
-				done()
-			@PasswordResetController.requestReset @req, @res
+		return this.res = {};});
 
 
-		it "should tell the handler to process that email", (done)->
-			@RateLimiter.addCount.callsArgWith(1, null, true)
-			@PasswordResetHandler.generateAndEmailResetToken.callsArgWith(1, null, 'primary')
-			@res.sendStatus = (code)=>
-				code.should.equal 200
-				@PasswordResetHandler.generateAndEmailResetToken.calledWith(@email.trim()).should.equal true
-				done()
-			@PasswordResetController.requestReset @req, @res
+	describe("requestReset", function() {
 
-		it "should send a 500 if there is an error", (done)->
-			@RateLimiter.addCount.callsArgWith(1, null, true)
-			@PasswordResetHandler.generateAndEmailResetToken.callsArgWith(1, "error")
-			@res.sendStatus = (code)=>
-				code.should.equal 500
-				done()
-			@PasswordResetController.requestReset @req, @res
+		it("should error if the rate limit is hit", function(done){
+			this.PasswordResetHandler.generateAndEmailResetToken.callsArgWith(1, null, 'primary');
+			this.RateLimiter.addCount.callsArgWith(1, null, false);
+			this.res.sendStatus = code=> {
+				code.should.equal(429);
+				this.PasswordResetHandler.generateAndEmailResetToken.calledWith(this.email.trim()).should.equal(false);
+				return done();
+			};
+			return this.PasswordResetController.requestReset(this.req, this.res);
+		});
 
-		it "should send a 404 if the email doesn't exist", (done)->
-			@RateLimiter.addCount.callsArgWith(1, null, true)
-			@PasswordResetHandler.generateAndEmailResetToken.callsArgWith(1, null, null)
-			@res.sendStatus = (code)=>
-				code.should.equal 404
-				done()
-			@PasswordResetController.requestReset @req, @res
 
-		it "should send a 404 if the email is registered as a secondard email", (done)->
-			@RateLimiter.addCount.callsArgWith(1, null, true)
-			@PasswordResetHandler.generateAndEmailResetToken.callsArgWith(1, null, 'secondary')
-			@res.sendStatus = (code)=>
-				code.should.equal 404
-				done()
-			@PasswordResetController.requestReset @req, @res
+		it("should tell the handler to process that email", function(done){
+			this.RateLimiter.addCount.callsArgWith(1, null, true);
+			this.PasswordResetHandler.generateAndEmailResetToken.callsArgWith(1, null, 'primary');
+			this.res.sendStatus = code=> {
+				code.should.equal(200);
+				this.PasswordResetHandler.generateAndEmailResetToken.calledWith(this.email.trim()).should.equal(true);
+				return done();
+			};
+			return this.PasswordResetController.requestReset(this.req, this.res);
+		});
 
-		it "should lowercase the email address", (done)->
-			@email = "UPerCaseEMAIL@example.Com"
-			@req.body.email = @email
-			@RateLimiter.addCount.callsArgWith(1, null, true)
-			@PasswordResetHandler.generateAndEmailResetToken.callsArgWith(1, null, 'primary')
-			@res.sendStatus = (code)=>
-				code.should.equal 200
-				@PasswordResetHandler.generateAndEmailResetToken.calledWith(@email.toLowerCase()).should.equal true
-				done()
-			@PasswordResetController.requestReset @req, @res
+		it("should send a 500 if there is an error", function(done){
+			this.RateLimiter.addCount.callsArgWith(1, null, true);
+			this.PasswordResetHandler.generateAndEmailResetToken.callsArgWith(1, "error");
+			this.res.sendStatus = code=> {
+				code.should.equal(500);
+				return done();
+			};
+			return this.PasswordResetController.requestReset(this.req, this.res);
+		});
 
-	describe "setNewUserPassword", ->
+		it("should send a 404 if the email doesn't exist", function(done){
+			this.RateLimiter.addCount.callsArgWith(1, null, true);
+			this.PasswordResetHandler.generateAndEmailResetToken.callsArgWith(1, null, null);
+			this.res.sendStatus = code=> {
+				code.should.equal(404);
+				return done();
+			};
+			return this.PasswordResetController.requestReset(this.req, this.res);
+		});
 
-		beforeEach ->
-			@req.session.resetToken = @token
+		it("should send a 404 if the email is registered as a secondard email", function(done){
+			this.RateLimiter.addCount.callsArgWith(1, null, true);
+			this.PasswordResetHandler.generateAndEmailResetToken.callsArgWith(1, null, 'secondary');
+			this.res.sendStatus = code=> {
+				code.should.equal(404);
+				return done();
+			};
+			return this.PasswordResetController.requestReset(this.req, this.res);
+		});
 
-		it "should tell the user handler to reset the password", (done)->
-			@PasswordResetHandler.setNewUserPassword.callsArgWith(2, null, true, @user_id)
-			@res.sendStatus = (code)=>
-				code.should.equal 200
-				@PasswordResetHandler.setNewUserPassword.calledWith(@token, @password).should.equal true
-				done()
-			@PasswordResetController.setNewUserPassword @req, @res
+		return it("should lowercase the email address", function(done){
+			this.email = "UPerCaseEMAIL@example.Com";
+			this.req.body.email = this.email;
+			this.RateLimiter.addCount.callsArgWith(1, null, true);
+			this.PasswordResetHandler.generateAndEmailResetToken.callsArgWith(1, null, 'primary');
+			this.res.sendStatus = code=> {
+				code.should.equal(200);
+				this.PasswordResetHandler.generateAndEmailResetToken.calledWith(this.email.toLowerCase()).should.equal(true);
+				return done();
+			};
+			return this.PasswordResetController.requestReset(this.req, this.res);
+		});
+	});
 
-		it "should send 404 if the token didn't work", (done)->
-			@PasswordResetHandler.setNewUserPassword.callsArgWith(2, null, false, @user_id)
-			@res.sendStatus = (code)=>
-				code.should.equal 404
-				done()
-			@PasswordResetController.setNewUserPassword @req, @res
+	describe("setNewUserPassword", function() {
 
-		it "should return 400 (Bad Request) if there is no password", (done)->
-			@req.body.password = ""
-			@PasswordResetHandler.setNewUserPassword.callsArgWith(2)
-			@res.sendStatus = (code)=>
-				code.should.equal 400
-				@PasswordResetHandler.setNewUserPassword.called.should.equal false
-				done()
-			@PasswordResetController.setNewUserPassword @req, @res
+		beforeEach(function() {
+			return this.req.session.resetToken = this.token;
+		});
 
-		it "should return 400 (Bad Request) if there is no passwordResetToken", (done)->
-			@req.body.passwordResetToken = ""
-			@PasswordResetHandler.setNewUserPassword.callsArgWith(2)
-			@res.sendStatus = (code)=>
-				code.should.equal 400
-				@PasswordResetHandler.setNewUserPassword.called.should.equal false
-				done()
-			@PasswordResetController.setNewUserPassword @req, @res
+		it("should tell the user handler to reset the password", function(done){
+			this.PasswordResetHandler.setNewUserPassword.callsArgWith(2, null, true, this.user_id);
+			this.res.sendStatus = code=> {
+				code.should.equal(200);
+				this.PasswordResetHandler.setNewUserPassword.calledWith(this.token, this.password).should.equal(true);
+				return done();
+			};
+			return this.PasswordResetController.setNewUserPassword(this.req, this.res);
+		});
 
-		it "should return 400 (Bad Request) if the password is invalid", (done)->
-			@req.body.password = "correct horse battery staple"
-			@AuthenticationManager.validatePassword = sinon.stub().returns { message: 'password contains invalid characters' }
-			@PasswordResetHandler.setNewUserPassword.callsArgWith(2)
-			@res.sendStatus = (code)=>
-				code.should.equal 400
-				@PasswordResetHandler.setNewUserPassword.called.should.equal false
-				done()
-			@PasswordResetController.setNewUserPassword @req, @res
+		it("should send 404 if the token didn't work", function(done){
+			this.PasswordResetHandler.setNewUserPassword.callsArgWith(2, null, false, this.user_id);
+			this.res.sendStatus = code=> {
+				code.should.equal(404);
+				return done();
+			};
+			return this.PasswordResetController.setNewUserPassword(this.req, this.res);
+		});
 
-		it "should clear the session.resetToken", (done) ->
-			@PasswordResetHandler.setNewUserPassword.callsArgWith(2, null, true, @user_id)
-			@res.sendStatus = (code)=>
-				code.should.equal 200
-				@req.session.should.not.have.property 'resetToken'
-				done()
-			@PasswordResetController.setNewUserPassword @req, @res
+		it("should return 400 (Bad Request) if there is no password", function(done){
+			this.req.body.password = "";
+			this.PasswordResetHandler.setNewUserPassword.callsArgWith(2);
+			this.res.sendStatus = code=> {
+				code.should.equal(400);
+				this.PasswordResetHandler.setNewUserPassword.called.should.equal(false);
+				return done();
+			};
+			return this.PasswordResetController.setNewUserPassword(this.req, this.res);
+		});
 
-		it 'should clear sessions', (done) ->
-			@PasswordResetHandler.setNewUserPassword.callsArgWith(2, null, true, @user_id)
-			@res.sendStatus = (code)=>
-				@UserSessionsManager.revokeAllUserSessions.callCount.should.equal 1
-				done()
-			@PasswordResetController.setNewUserPassword @req, @res
+		it("should return 400 (Bad Request) if there is no passwordResetToken", function(done){
+			this.req.body.passwordResetToken = "";
+			this.PasswordResetHandler.setNewUserPassword.callsArgWith(2);
+			this.res.sendStatus = code=> {
+				code.should.equal(400);
+				this.PasswordResetHandler.setNewUserPassword.called.should.equal(false);
+				return done();
+			};
+			return this.PasswordResetController.setNewUserPassword(this.req, this.res);
+		});
 
-		it 'should call removeReconfirmFlag', (done) ->
-			@PasswordResetHandler.setNewUserPassword.callsArgWith(2, null, true, @user_id)
-			@res.sendStatus = (code)=>
-				@UserUpdater.removeReconfirmFlag.callCount.should.equal 1
-				done()
-			@PasswordResetController.setNewUserPassword @req, @res
+		it("should return 400 (Bad Request) if the password is invalid", function(done){
+			this.req.body.password = "correct horse battery staple";
+			this.AuthenticationManager.validatePassword = sinon.stub().returns({ message: 'password contains invalid characters' });
+			this.PasswordResetHandler.setNewUserPassword.callsArgWith(2);
+			this.res.sendStatus = code=> {
+				code.should.equal(400);
+				this.PasswordResetHandler.setNewUserPassword.called.should.equal(false);
+				return done();
+			};
+			return this.PasswordResetController.setNewUserPassword(this.req, this.res);
+		});
 
-		describe 'when login_after is set', ->
+		it("should clear the session.resetToken", function(done) {
+			this.PasswordResetHandler.setNewUserPassword.callsArgWith(2, null, true, this.user_id);
+			this.res.sendStatus = code=> {
+				code.should.equal(200);
+				this.req.session.should.not.have.property('resetToken');
+				return done();
+			};
+			return this.PasswordResetController.setNewUserPassword(this.req, this.res);
+		});
 
-			beforeEach ->
-				@UserGetter.getUser = sinon.stub().callsArgWith(2, null, { email: "joe@example.com" })
-				@PasswordResetHandler.setNewUserPassword.callsArgWith(2, null, true, @user_id = "user-id-123")
-				@req.body.login_after = "true"
-				@res.json = sinon.stub()
-				@AuthenticationController.afterLoginSessionSetup = sinon.stub().callsArgWith(2, null)
-				@AuthenticationController._getRedirectFromSession = sinon.stub().returns('/some/path')
+		it('should clear sessions', function(done) {
+			this.PasswordResetHandler.setNewUserPassword.callsArgWith(2, null, true, this.user_id);
+			this.res.sendStatus = code=> {
+				this.UserSessionsManager.revokeAllUserSessions.callCount.should.equal(1);
+				return done();
+			};
+			return this.PasswordResetController.setNewUserPassword(this.req, this.res);
+		});
 
-			it "should login user if login_after is set", (done) ->
-				@PasswordResetController.setNewUserPassword @req, @res
-				@AuthenticationController.afterLoginSessionSetup.callCount.should.equal 1
-				@AuthenticationController.afterLoginSessionSetup.calledWith(
-					@req,
+		it('should call removeReconfirmFlag', function(done) {
+			this.PasswordResetHandler.setNewUserPassword.callsArgWith(2, null, true, this.user_id);
+			this.res.sendStatus = code=> {
+				this.UserUpdater.removeReconfirmFlag.callCount.should.equal(1);
+				return done();
+			};
+			return this.PasswordResetController.setNewUserPassword(this.req, this.res);
+		});
+
+		return describe('when login_after is set', function() {
+
+			beforeEach(function() {
+				this.UserGetter.getUser = sinon.stub().callsArgWith(2, null, { email: "joe@example.com" });
+				this.PasswordResetHandler.setNewUserPassword.callsArgWith(2, null, true, (this.user_id = "user-id-123"));
+				this.req.body.login_after = "true";
+				this.res.json = sinon.stub();
+				this.AuthenticationController.afterLoginSessionSetup = sinon.stub().callsArgWith(2, null);
+				return this.AuthenticationController._getRedirectFromSession = sinon.stub().returns('/some/path');
+			});
+
+			return it("should login user if login_after is set", function(done) {
+				this.PasswordResetController.setNewUserPassword(this.req, this.res);
+				this.AuthenticationController.afterLoginSessionSetup.callCount.should.equal(1);
+				this.AuthenticationController.afterLoginSessionSetup.calledWith(
+					this.req,
 					{email: 'joe@example.com'}
-				).should.equal true
-				@AuthenticationController._getRedirectFromSession.callCount.should.equal 1
-				@res.json.callCount.should.equal 1
-				@res.json.calledWith({redir: '/some/path'}).should.equal true
-				done()
+				).should.equal(true);
+				this.AuthenticationController._getRedirectFromSession.callCount.should.equal(1);
+				this.res.json.callCount.should.equal(1);
+				this.res.json.calledWith({redir: '/some/path'}).should.equal(true);
+				return done();
+			});
+		});
+	});
 
-	describe "renderSetPasswordForm", ->
+	return describe("renderSetPasswordForm", function() {
 
-		describe "with token in query-string", ->
-			beforeEach ->
-				@req.query.passwordResetToken = @token
+		describe("with token in query-string", function() {
+			beforeEach(function() {
+				return this.req.query.passwordResetToken = this.token;
+			});
 
-			it "should set session.resetToken and redirect", (done) ->
-				@req.session.should.not.have.property 'resetToken'
-				@res.redirect = (path) =>
-					path.should.equal '/user/password/set'
-					@req.session.resetToken.should.equal @token
-					done()
-				@PasswordResetController.renderSetPasswordForm(@req, @res)
+			return it("should set session.resetToken and redirect", function(done) {
+				this.req.session.should.not.have.property('resetToken');
+				this.res.redirect = path => {
+					path.should.equal('/user/password/set');
+					this.req.session.resetToken.should.equal(this.token);
+					return done();
+				};
+				return this.PasswordResetController.renderSetPasswordForm(this.req, this.res);
+			});
+		});
 
-		describe "without a token in query-string", ->
+		return describe("without a token in query-string", function() {
 
-			describe "with token in session", ->
-				beforeEach ->
-					@req.session.resetToken = @token
+			describe("with token in session", function() {
+				beforeEach(function() {
+					return this.req.session.resetToken = this.token;
+				});
 
-				it "should render the page, passing the reset token", (done) ->
-					@res.render = (template_path, options) =>
-						options.passwordResetToken.should.equal @req.session.resetToken
-						done()
-					@PasswordResetController.renderSetPasswordForm(@req, @res)
+				return it("should render the page, passing the reset token", function(done) {
+					this.res.render = (template_path, options) => {
+						options.passwordResetToken.should.equal(this.req.session.resetToken);
+						return done();
+					};
+					return this.PasswordResetController.renderSetPasswordForm(this.req, this.res);
+				});
+			});
 
-			describe "without a token in session", ->
-
-				it "should redirect to the reset request page", (done) ->
-					@res.redirect = (path) =>
-						path.should.equal "/user/password/reset"
-						@req.session.should.not.have.property 'resetToken'
-						done()
-					@PasswordResetController.renderSetPasswordForm(@req, @res)
+			return describe("without a token in session", () => it("should redirect to the reset request page", function(done) {
+                this.res.redirect = path => {
+                    path.should.equal("/user/password/reset");
+                    this.req.session.should.not.have.property('resetToken');
+                    return done();
+                };
+                return this.PasswordResetController.renderSetPasswordForm(this.req, this.res);
+            }));
+		});
+	});
+});

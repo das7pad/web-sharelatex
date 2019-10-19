@@ -1,88 +1,119 @@
-sinon = require "sinon"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS206: Consider reworking classes to avoid initClass
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const sinon = require("sinon");
 
-class MockResponse
-	constructor: ->
-		@rendered = false
-		@redirected = false
-		@returned = false
-		@headers = {}
-
-	render: (template, variables) ->
-		@success = true
-		@rendered = true
-		@returned = true
-		@renderedTemplate  = template
-		@renderedVariables = variables
-		@callback() if @callback?
+class MockResponse {
+	static initClass() {
 	
-	redirect: (url) ->
-		@success = true
-		@redirected = true
-		@returned = true
-		@redirectedTo = url
-		@callback() if @callback?
+		this.prototype.setContentDisposition = sinon.stub();
 	
-	sendStatus: (status) ->
-		if arguments.length < 2
-			if typeof status != "number"
-				body = status
-				status = 200
-		@statusCode = status
-		@returned = true
-		if 200 <= status < 300
-			@success = true
-		else
-			@success = false
-		@callback() if @callback?
+		this.prototype.header = sinon.stub();
+	
+		this.prototype.contentType = sinon.stub();
+	}
+	constructor() {
+		this.rendered = false;
+		this.redirected = false;
+		this.returned = false;
+		this.headers = {};
+	}
 
-	send: (status, body) ->
-		if arguments.length < 2
-			if typeof status != "number"
-				body = status
-				status = 200
-		@statusCode = status
-		@returned = true
-		if 200 <= status < 300
-			@success = true
-		else
-			@success = false
-		@body = body if body
-		@callback() if @callback?
+	render(template, variables) {
+		this.success = true;
+		this.rendered = true;
+		this.returned = true;
+		this.renderedTemplate  = template;
+		this.renderedVariables = variables;
+		if (this.callback != null) { return this.callback(); }
+	}
+	
+	redirect(url) {
+		this.success = true;
+		this.redirected = true;
+		this.returned = true;
+		this.redirectedTo = url;
+		if (this.callback != null) { return this.callback(); }
+	}
+	
+	sendStatus(status) {
+		if (arguments.length < 2) {
+			if (typeof status !== "number") {
+				const body = status;
+				status = 200;
+			}
+		}
+		this.statusCode = status;
+		this.returned = true;
+		if (200 <= status && status < 300) {
+			this.success = true;
+		} else {
+			this.success = false;
+		}
+		if (this.callback != null) { return this.callback(); }
+	}
+
+	send(status, body) {
+		if (arguments.length < 2) {
+			if (typeof status !== "number") {
+				body = status;
+				status = 200;
+			}
+		}
+		this.statusCode = status;
+		this.returned = true;
+		if (200 <= status && status < 300) {
+			this.success = true;
+		} else {
+			this.success = false;
+		}
+		if (body) { this.body = body; }
+		if (this.callback != null) { return this.callback(); }
+	}
 		
-	json: (status, body) ->
-		if arguments.length < 2
-			if typeof status != "number"
-				body = status
-				status = @statusCode || 200
-		@statusCode = status
-		@returned = true
-		@type = 'application/json'
-		if 200 <= status < 300
-			@success = true
-		else
-			@success = false
-		@body = JSON.stringify(body) if body
-		@callback() if @callback?
+	json(status, body) {
+		if (arguments.length < 2) {
+			if (typeof status !== "number") {
+				body = status;
+				status = this.statusCode || 200;
+			}
+		}
+		this.statusCode = status;
+		this.returned = true;
+		this.type = 'application/json';
+		if (200 <= status && status < 300) {
+			this.success = true;
+		} else {
+			this.success = false;
+		}
+		if (body) { this.body = JSON.stringify(body); }
+		if (this.callback != null) { return this.callback(); }
+	}
 
-	status: (status)->
-		@statusCode = status
-		return @
+	status(status){
+		this.statusCode = status;
+		return this;
+	}
 
 
-	setHeader: (header, value) ->
-		@headers[header] = value
+	setHeader(header, value) {
+		return this.headers[header] = value;
+	}
 
-	setContentDisposition: sinon.stub()
+	setTimeout(timout){
+		this.timout = timout;
+	}
 
-	setTimeout: (@timout)->
+	end(data, encoding) {
+		if (this.callback) { return this.callback(); }
+	}
 
-	header: sinon.stub()
+	type(type) { return this.type = type; }
+}
+MockResponse.initClass();
 
-	contentType: sinon.stub()
-
-	end: (data, encoding) ->
-		@callback() if @callback
-
-	type: (type) -> @type = type
-
-module.exports = MockResponse
+module.exports = MockResponse;

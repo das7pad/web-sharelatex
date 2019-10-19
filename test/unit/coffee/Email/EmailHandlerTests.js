@@ -1,92 +1,121 @@
-should = require('chai').should()
-SandboxedModule = require('sandboxed-module')
-assert = require('assert')
-path = require('path')
-sinon = require('sinon')
-modulePath = path.join __dirname, "../../../../app/js/Features/Email/EmailHandler"
-expect = require("chai").expect
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const should = require('chai').should();
+const SandboxedModule = require('sandboxed-module');
+const assert = require('assert');
+const path = require('path');
+const sinon = require('sinon');
+const modulePath = path.join(__dirname, "../../../../app/js/Features/Email/EmailHandler");
+const {
+    expect
+} = require("chai");
 
-describe "EmailHandler", ->
+describe("EmailHandler", function() {
 
-	beforeEach ->
+	beforeEach(function() {
 
-		@settings =
-			email:{}
-		@EmailBuilder =
-			buildEmail:sinon.stub()
-		@EmailSender =
-			sendEmail:sinon.stub()
-		@EmailHandler = SandboxedModule.require modulePath, requires:
-			"./EmailBuilder":@EmailBuilder
-			"./EmailSender":@EmailSender
-			"settings-sharelatex":@settings
-			"logger-sharelatex": log:->
+		this.settings =
+			{email:{}};
+		this.EmailBuilder =
+			{buildEmail:sinon.stub()};
+		this.EmailSender =
+			{sendEmail:sinon.stub()};
+		this.EmailHandler = SandboxedModule.require(modulePath, { requires: {
+			"./EmailBuilder":this.EmailBuilder,
+			"./EmailSender":this.EmailSender,
+			"settings-sharelatex":this.settings,
+			"logger-sharelatex": { log() {}
+		}
+		}
+	}
+		);
 
-		@html = "<html>hello</html>"
+		return this.html = "<html>hello</html>";
+	});
 
-	describe "send email", ->
+	return describe("send email", function() {
 
-		it "should use the correct options", (done)->
-			@EmailBuilder.buildEmail.returns({html:@html})
-			@EmailSender.sendEmail.callsArgWith(1)
+		it("should use the correct options", function(done){
+			this.EmailBuilder.buildEmail.returns({html:this.html});
+			this.EmailSender.sendEmail.callsArgWith(1);
 
-			opts =
-				to: "bob@bob.com"
-			@EmailHandler.sendEmail "welcome", opts, =>
-				args = @EmailSender.sendEmail.args[0][0]
-				args.html.should.equal @html
-				done()
+			const opts =
+				{to: "bob@bob.com"};
+			return this.EmailHandler.sendEmail("welcome", opts, () => {
+				const args = this.EmailSender.sendEmail.args[0][0];
+				args.html.should.equal(this.html);
+				return done();
+			});
+		});
 
-		it "should return the erroor", (done)->
-			@EmailBuilder.buildEmail.returns({html:@html})
-			@EmailSender.sendEmail.callsArgWith(1, "error")
+		it("should return the erroor", function(done){
+			this.EmailBuilder.buildEmail.returns({html:this.html});
+			this.EmailSender.sendEmail.callsArgWith(1, "error");
 
-			opts =
-				to: "bob@bob.com"
+			const opts = {
+				to: "bob@bob.com",
 				subject:"hello bob"
-			@EmailHandler.sendEmail "welcome", opts, (err)=>
-				err.should.equal "error"
-				done()
+			};
+			return this.EmailHandler.sendEmail("welcome", opts, err=> {
+				err.should.equal("error");
+				return done();
+			});
+		});
 
-		it "should not send an email if lifecycle is not enabled", (done)->
-			@settings.email.lifecycle = false
-			@EmailBuilder.buildEmail.returns({type:"lifecycle"})
-			@EmailHandler.sendEmail "welcome", {}, =>
-				@EmailSender.sendEmail.called.should.equal false
-				done()
+		it("should not send an email if lifecycle is not enabled", function(done){
+			this.settings.email.lifecycle = false;
+			this.EmailBuilder.buildEmail.returns({type:"lifecycle"});
+			return this.EmailHandler.sendEmail("welcome", {}, () => {
+				this.EmailSender.sendEmail.called.should.equal(false);
+				return done();
+			});
+		});
 
-		it "should send an email if lifecycle is not enabled but the type is notification", (done)->
-			@settings.email.lifecycle = false
-			@EmailBuilder.buildEmail.returns({type:"notification"})
-			@EmailSender.sendEmail.callsArgWith(1)
-			opts =
-				to: "bob@bob.com"
-			@EmailHandler.sendEmail "welcome", opts, =>
-				@EmailSender.sendEmail.called.should.equal true
-				done()
+		it("should send an email if lifecycle is not enabled but the type is notification", function(done){
+			this.settings.email.lifecycle = false;
+			this.EmailBuilder.buildEmail.returns({type:"notification"});
+			this.EmailSender.sendEmail.callsArgWith(1);
+			const opts =
+				{to: "bob@bob.com"};
+			return this.EmailHandler.sendEmail("welcome", opts, () => {
+				this.EmailSender.sendEmail.called.should.equal(true);
+				return done();
+			});
+		});
 
-		it "should send lifecycle email if it is enabled", (done)->
-			@settings.email.lifecycle = true
-			@EmailBuilder.buildEmail.returns({type:"lifecycle"})
-			@EmailSender.sendEmail.callsArgWith(1)
-			opts =
-				to: "bob@bob.com"
-			@EmailHandler.sendEmail "welcome", opts, =>
-				@EmailSender.sendEmail.called.should.equal true
-				done()
+		it("should send lifecycle email if it is enabled", function(done){
+			this.settings.email.lifecycle = true;
+			this.EmailBuilder.buildEmail.returns({type:"lifecycle"});
+			this.EmailSender.sendEmail.callsArgWith(1);
+			const opts =
+				{to: "bob@bob.com"};
+			return this.EmailHandler.sendEmail("welcome", opts, () => {
+				this.EmailSender.sendEmail.called.should.equal(true);
+				return done();
+			});
+		});
 
-		describe 'with plain-text email content', () ->
+		return describe('with plain-text email content', function() {
 
-			beforeEach ->
-				@text = "hello there"
+			beforeEach(function() {
+				return this.text = "hello there";
+			});
 
-			it 'should pass along the text field', (done) ->
-				@EmailBuilder.buildEmail.returns({html: @html, text: @text})
-				@EmailSender.sendEmail.callsArgWith(1)
-				opts =
-					to: "bob@bob.com"
-				@EmailHandler.sendEmail "welcome", opts, =>
-					args = @EmailSender.sendEmail.args[0][0]
-					args.html.should.equal @html
-					args.text.should.equal @text
-					done()
+			return it('should pass along the text field', function(done) {
+				this.EmailBuilder.buildEmail.returns({html: this.html, text: this.text});
+				this.EmailSender.sendEmail.callsArgWith(1);
+				const opts =
+					{to: "bob@bob.com"};
+				return this.EmailHandler.sendEmail("welcome", opts, () => {
+					const args = this.EmailSender.sendEmail.args[0][0];
+					args.html.should.equal(this.html);
+					args.text.should.equal(this.text);
+					return done();
+				});
+			});
+		});
+	});
+});

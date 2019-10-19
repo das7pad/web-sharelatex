@@ -1,23 +1,38 @@
-SandboxedModule = require('sandboxed-module')
-should = require('chai').should()
-sinon = require 'sinon'
-modulePath = "../../../../app/js/Features/Subscription/UserFeaturesUpdater"
-assert = require("chai").assert
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const SandboxedModule = require('sandboxed-module');
+const should = require('chai').should();
+const sinon = require('sinon');
+const modulePath = "../../../../app/js/Features/Subscription/UserFeaturesUpdater";
+const {
+    assert
+} = require("chai");
 
-describe "UserFeaturesUpdater", ->
-	beforeEach ->
-		@User =
-			update: sinon.stub().callsArgWith(2)
-		@UserFeaturesUpdater = SandboxedModule.require modulePath, requires:
-			'../../models/User': User:@User
-			"logger-sharelatex": log:->
+describe("UserFeaturesUpdater", function() {
+	beforeEach(function() {
+		this.User =
+			{update: sinon.stub().callsArgWith(2)};
+		return this.UserFeaturesUpdater = SandboxedModule.require(modulePath, { requires: {
+			'../../models/User': { User:this.User
+		},
+			"logger-sharelatex": { log() {}
+		}
+		}
+	}
+		);
+	});
 
-	describe "updateFeatures", ->
-		it "should send the users features", (done)->
-			user_id = "5208dd34438842e2db000005"
-			@features = {versioning:true, collaborators:10}
-			@UserFeaturesUpdater.updateFeatures user_id, @features, (err, features)=>
-				update = {"features.versioning":true, "features.collaborators":10}
-				@User.update.calledWith({"_id":user_id}, update).should.equal true
-				features.should.deep.equal @features
-				done()
+	return describe("updateFeatures", () => it("should send the users features", function(done){
+        const user_id = "5208dd34438842e2db000005";
+        this.features = {versioning:true, collaborators:10};
+        return this.UserFeaturesUpdater.updateFeatures(user_id, this.features, (err, features)=> {
+            const update = {"features.versioning":true, "features.collaborators":10};
+            this.User.update.calledWith({"_id":user_id}, update).should.equal(true);
+            features.should.deep.equal(this.features);
+            return done();
+        });
+    }));
+});

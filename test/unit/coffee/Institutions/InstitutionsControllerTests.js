@@ -1,71 +1,94 @@
-should = require('chai').should()
-SandboxedModule = require('sandboxed-module')
-assert = require('assert')
-path = require('path')
-sinon = require('sinon')
-modulePath = path.join __dirname, "../../../../app/js/Features/Institutions/InstitutionsController"
-expect = require("chai").expect
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const should = require('chai').should();
+const SandboxedModule = require('sandboxed-module');
+const assert = require('assert');
+const path = require('path');
+const sinon = require('sinon');
+const modulePath = path.join(__dirname, "../../../../app/js/Features/Institutions/InstitutionsController");
+const {
+    expect
+} = require("chai");
 
-describe "InstitutionsController", ->
+describe("InstitutionsController", function() {
 
-	beforeEach ->
-		@logger = err: sinon.stub(), log: ->
-		@host = "mit.edu".split('').reverse().join('')
-		@stubbedUser1 =
-			_id: "3131231"
-			name:"bob"
-			email:"hello@world.com"
+	beforeEach(function() {
+		this.logger = {err: sinon.stub(), log() {}};
+		this.host = "mit.edu".split('').reverse().join('');
+		this.stubbedUser1 = {
+			_id: "3131231",
+			name:"bob",
+			email:"hello@world.com",
 			emails: [
-				{"email":"stubb1@mit.edu","reversedHostname":@host},
+				{"email":"stubb1@mit.edu","reversedHostname":this.host},
 				{"email":"test@test.com","reversedHostname":"test.com"},
-				{"email":"another@mit.edu","reversedHostname":@host}
+				{"email":"another@mit.edu","reversedHostname":this.host}
 			]
-		@stubbedUser2 =
-			_id: "3131232"
-			name:"test"
-			email:"hello2@world.com"
+		};
+		this.stubbedUser2 = {
+			_id: "3131232",
+			name:"test",
+			email:"hello2@world.com",
 			emails: [
-				{"email":"subb2@mit.edu","reversedHostname":@host}
+				{"email":"subb2@mit.edu","reversedHostname":this.host}
 			]
+		};
 		
-		@getUsersByHostname = sinon.stub().callsArgWith(2, null, [ @stubbedUser1, @stubbedUser2 ])
-		@addAffiliation = sinon.stub().callsArgWith(3, null)
-		@refreshFeatures = sinon.stub().callsArgWith(2, null)
-		@InstitutionsController = SandboxedModule.require modulePath, requires:
-			'logger-sharelatex': @logger
-			'../User/UserGetter':
-				getUsersByHostname: @getUsersByHostname
-			'../Institutions/InstitutionsAPI':
-				addAffiliation: @addAffiliation
-			'../Subscription/FeaturesUpdater':
-				refreshFeatures: @refreshFeatures
+		this.getUsersByHostname = sinon.stub().callsArgWith(2, null, [ this.stubbedUser1, this.stubbedUser2 ]);
+		this.addAffiliation = sinon.stub().callsArgWith(3, null);
+		this.refreshFeatures = sinon.stub().callsArgWith(2, null);
+		this.InstitutionsController = SandboxedModule.require(modulePath, { requires: {
+			'logger-sharelatex': this.logger,
+			'../User/UserGetter': {
+				getUsersByHostname: this.getUsersByHostname
+			},
+			'../Institutions/InstitutionsAPI': {
+				addAffiliation: this.addAffiliation
+			},
+			'../Subscription/FeaturesUpdater': {
+				refreshFeatures: this.refreshFeatures
+			}
+		}
+	}
+		);
 
-		@req =
-			body: hostname: 'mit.edu'
+		this.req =
+			{body: {hostname: 'mit.edu'}};
 
-		@res =
-			send: sinon.stub()
+		this.res = {
+			send: sinon.stub(),
 			json: sinon.stub()
-		@next = sinon.stub()
+		};
+		return this.next = sinon.stub();
+	});
 
-	describe 'affiliateUsers', ->
-		it 'should add affiliations for matching users', (done)->
-			@res.sendStatus = (code) =>
-				code.should.equal 200
-				@getUsersByHostname.calledOnce.should.equal true
-				@addAffiliation.calledThrice.should.equal true
-				@addAffiliation.calledWith(@stubbedUser1._id, @stubbedUser1.emails[0].email).should.equal true
-				@addAffiliation.calledWith(@stubbedUser1._id, @stubbedUser1.emails[2].email).should.equal true
-				@addAffiliation.calledWith(@stubbedUser2._id, @stubbedUser2.emails[0].email).should.equal true
-				@refreshFeatures.calledWith(@stubbedUser1._id, true).should.equal true
-				@refreshFeatures.calledWith(@stubbedUser2._id, true).should.equal true
-				done()
-			@InstitutionsController.confirmDomain @req, @res, @next
+	return describe('affiliateUsers', function() {
+		it('should add affiliations for matching users', function(done){
+			this.res.sendStatus = code => {
+				code.should.equal(200);
+				this.getUsersByHostname.calledOnce.should.equal(true);
+				this.addAffiliation.calledThrice.should.equal(true);
+				this.addAffiliation.calledWith(this.stubbedUser1._id, this.stubbedUser1.emails[0].email).should.equal(true);
+				this.addAffiliation.calledWith(this.stubbedUser1._id, this.stubbedUser1.emails[2].email).should.equal(true);
+				this.addAffiliation.calledWith(this.stubbedUser2._id, this.stubbedUser2.emails[0].email).should.equal(true);
+				this.refreshFeatures.calledWith(this.stubbedUser1._id, true).should.equal(true);
+				this.refreshFeatures.calledWith(this.stubbedUser2._id, true).should.equal(true);
+				return done();
+			};
+			return this.InstitutionsController.confirmDomain(this.req, this.res, this.next);
+		});
 
-		it 'should return errors if last affiliation cannot be added', (done)->
-			@addAffiliation.onCall(2).callsArgWith(3, new Error("error"))
-			@next = (error) =>
-				expect(error).to.exist
-				@getUsersByHostname.calledOnce.should.equal true
-				done()
-			@InstitutionsController.confirmDomain @req, @res, @next
+		return it('should return errors if last affiliation cannot be added', function(done){
+			this.addAffiliation.onCall(2).callsArgWith(3, new Error("error"));
+			this.next = error => {
+				expect(error).to.exist;
+				this.getUsersByHostname.calledOnce.should.equal(true);
+				return done();
+			};
+			return this.InstitutionsController.confirmDomain(this.req, this.res, this.next);
+		});
+	});
+});

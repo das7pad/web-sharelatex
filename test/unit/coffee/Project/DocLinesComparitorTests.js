@@ -1,71 +1,89 @@
-sinon = require('sinon')
-chai = require('chai')
-should = chai.should()
-modulePath = "../../../../app/js/Features/Project/DocLinesComparitor.js"
-SandboxedModule = require('sandboxed-module')
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const sinon = require('sinon');
+const chai = require('chai');
+const should = chai.should();
+const modulePath = "../../../../app/js/Features/Project/DocLinesComparitor.js";
+const SandboxedModule = require('sandboxed-module');
 
-describe 'doc lines comparitor', ->
+describe('doc lines comparitor', function() {
 
-	beforeEach ->
-		@comparitor = SandboxedModule.require modulePath, requires:
-			'logger-sharelatex':{log:->}
+	beforeEach(function() {
+		return this.comparitor = SandboxedModule.require(modulePath, { requires: {
+			'logger-sharelatex':{log() {}}
+		}
+	});});
 
-	it 'should return true when the lines are the same', ->
-		lines1 = ["hello", "world"]
-		lines2 = ["hello", "world"]
-		result = @comparitor.areSame lines1, lines2
-		result.should.equal true
+	it('should return true when the lines are the same', function() {
+		const lines1 = ["hello", "world"];
+		const lines2 = ["hello", "world"];
+		const result = this.comparitor.areSame(lines1, lines2);
+		return result.should.equal(true);
+	});
 
-	it 'should return false when the lines are different', ->
-		lines1 = ["hello", "world"]
-		lines2 = ["diff", "world"]
-		result = @comparitor.areSame lines1, lines2
-		result.should.equal false
+	it('should return false when the lines are different', function() {
+		const lines1 = ["hello", "world"];
+		const lines2 = ["diff", "world"];
+		const result = this.comparitor.areSame(lines1, lines2);
+		return result.should.equal(false);
+	});
 
-	it 'should return false when the lines are different', ->
-		lines1 = ["hello", "world"]
-		lines2 = ["hello", "wrld"]
-		result = @comparitor.areSame lines1, lines2
-		result.should.equal false
+	it('should return false when the lines are different', function() {
+		const lines1 = ["hello", "world"];
+		const lines2 = ["hello", "wrld"];
+		const result = this.comparitor.areSame(lines1, lines2);
+		return result.should.equal(false);
+	});
 
-	it 'should return true when the lines are same', ->
-		lines1 = ["hello", "world"]
-		lines2 = ['hello', "world"]
-		result = @comparitor.areSame lines1, lines2
-		result.should.equal true
+	it('should return true when the lines are same', function() {
+		const lines1 = ["hello", "world"];
+		const lines2 = ['hello', "world"];
+		const result = this.comparitor.areSame(lines1, lines2);
+		return result.should.equal(true);
+	});
 
-	it 'should return false if the doc lines are different in length', ->
-		lines1 = ["hello", "world"]
-		lines2 = ['hello', "world", "please"]
-		result = @comparitor.areSame lines1, lines2
-		result.should.equal false
+	it('should return false if the doc lines are different in length', function() {
+		const lines1 = ["hello", "world"];
+		const lines2 = ['hello', "world", "please"];
+		const result = this.comparitor.areSame(lines1, lines2);
+		return result.should.equal(false);
+	});
 
-	it 'should return false if the first array is undefined', ->
-		lines1 = undefined
-		lines2 = ['hello', "world"]
-		result = @comparitor.areSame lines1, lines2
-		result.should.equal false
+	it('should return false if the first array is undefined', function() {
+		const lines1 = undefined;
+		const lines2 = ['hello', "world"];
+		const result = this.comparitor.areSame(lines1, lines2);
+		return result.should.equal(false);
+	});
 
-	it 'should return false if the second array is undefined', ->
-		lines1 = ["hello"]
-		lines2 = undefined
-		result = @comparitor.areSame lines1, lines2
-		result.should.equal false
+	it('should return false if the second array is undefined', function() {
+		const lines1 = ["hello"];
+		const lines2 = undefined;
+		const result = this.comparitor.areSame(lines1, lines2);
+		return result.should.equal(false);
+	});
 
-	it 'should return false if the second array is not an array', ->
-		lines1 = ["hello"]
-		lines2 = ""
-		result = @comparitor.areSame lines1, lines2
-		result.should.equal false
+	it('should return false if the second array is not an array', function() {
+		const lines1 = ["hello"];
+		const lines2 = "";
+		const result = this.comparitor.areSame(lines1, lines2);
+		return result.should.equal(false);
+	});
 
-	it "should return true when comparing equal orchard docs", ->
-		lines1 = [{ text: "hello world" }]
-		lines2 = [{ text: "hello world" }]
-		result = @comparitor.areSame lines1, lines2
-		result.should.equal true
+	it("should return true when comparing equal orchard docs", function() {
+		const lines1 = [{ text: "hello world" }];
+		const lines2 = [{ text: "hello world" }];
+		const result = this.comparitor.areSame(lines1, lines2);
+		return result.should.equal(true);
+	});
 		
-	it "should return false when comparing different orchard docs", ->
-		lines1 = [{ text: "goodbye world" }]
-		lines2 = [{ text: "hello world" }]
-		result = @comparitor.areSame lines1, lines2
-		result.should.equal false
+	return it("should return false when comparing different orchard docs", function() {
+		const lines1 = [{ text: "goodbye world" }];
+		const lines2 = [{ text: "hello world" }];
+		const result = this.comparitor.areSame(lines1, lines2);
+		return result.should.equal(false);
+	});
+});

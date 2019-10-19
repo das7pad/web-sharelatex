@@ -1,190 +1,243 @@
-chai = require('chai')
-chai.should()
-expect = chai.expect
-sinon = require("sinon")
-modulePath = "../../../../app/js/Features/History/HistoryManager"
-SandboxedModule = require('sandboxed-module')
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const chai = require('chai');
+chai.should();
+const {
+    expect
+} = chai;
+const sinon = require("sinon");
+const modulePath = "../../../../app/js/Features/History/HistoryManager";
+const SandboxedModule = require('sandboxed-module');
 
-describe "HistoryManager", ->
-	beforeEach ->
-		@callback = sinon.stub()
-		@user_id = "user-id-123"
-		@AuthenticationController =
-			getLoggedInUserId: sinon.stub().returns(@user_id)
-		@HistoryManager = SandboxedModule.require modulePath, requires:
-			"request" : @request = sinon.stub()
-			"settings-sharelatex": @settings = {}
-			"../User/UserGetter": @UserGetter = {}
-		@settings.apis =
-			trackchanges:
-				enabled: false
+describe("HistoryManager", function() {
+	beforeEach(function() {
+		this.callback = sinon.stub();
+		this.user_id = "user-id-123";
+		this.AuthenticationController =
+			{getLoggedInUserId: sinon.stub().returns(this.user_id)};
+		this.HistoryManager = SandboxedModule.require(modulePath, { requires: {
+			"request" : (this.request = sinon.stub()),
+			"settings-sharelatex": (this.settings = {}),
+			"../User/UserGetter": (this.UserGetter = {})
+		}
+	});
+		return this.settings.apis = {
+			trackchanges: {
+				enabled: false,
 				url: "http://trackchanges.example.com"
-			project_history:
+			},
+			project_history: {
 				url: "http://project_history.example.com"
+			}
+		};
+	});
 
-	describe "initializeProject", ->
-		describe "with project history enabled", ->
-			beforeEach ->
-				@settings.apis.project_history.initializeHistoryForNewProjects = true
+	describe("initializeProject", function() {
+		describe("with project history enabled", function() {
+			beforeEach(function() {
+				return this.settings.apis.project_history.initializeHistoryForNewProjects = true;
+			});
 
-			describe "project history returns a successful response", ->
-				beforeEach ->
-					@overleaf_id = 1234
-					@res = statusCode: 200
-					@body = JSON.stringify(project: id: @overleaf_id)
-					@request.post = sinon.stub().callsArgWith(1, null, @res, @body)
+			describe("project history returns a successful response", function() {
+				beforeEach(function() {
+					this.overleaf_id = 1234;
+					this.res = {statusCode: 200};
+					this.body = JSON.stringify({project: {id: this.overleaf_id}});
+					this.request.post = sinon.stub().callsArgWith(1, null, this.res, this.body);
 
-					@HistoryManager.initializeProject @callback
+					return this.HistoryManager.initializeProject(this.callback);
+				});
 
-				it "should call the project history api", ->
-					@request.post.calledWith(
-						url: "#{@settings.apis.project_history.url}/project"
-					).should.equal true
+				it("should call the project history api", function() {
+					return this.request.post.calledWith({
+						url: `${this.settings.apis.project_history.url}/project`
+					}).should.equal(true);
+				});
 
-				it "should return the callback with the overleaf id", ->
-					@callback.calledWithExactly(null, { @overleaf_id }).should.equal true
+				return it("should return the callback with the overleaf id", function() {
+					return this.callback.calledWithExactly(null, { overleaf_id: this.overleaf_id }).should.equal(true);
+				});
+			});
 
-			describe "project history returns a response without the project id", ->
-				beforeEach ->
-					@res = statusCode: 200
-					@body = JSON.stringify(project: {})
-					@request.post = sinon.stub().callsArgWith(1, null, @res, @body)
+			describe("project history returns a response without the project id", function() {
+				beforeEach(function() {
+					this.res = {statusCode: 200};
+					this.body = JSON.stringify({project: {}});
+					this.request.post = sinon.stub().callsArgWith(1, null, this.res, this.body);
 
-					@HistoryManager.initializeProject @callback
+					return this.HistoryManager.initializeProject(this.callback);
+				});
 
-				it "should return the callback with an error", ->
-					@callback
+				return it("should return the callback with an error", function() {
+					return this.callback
 						.calledWith(sinon.match.has("message", "project-history did not provide an id"))
-						.should.equal true
+						.should.equal(true);
+				});
+			});
 
-			describe "project history returns a unsuccessful response", ->
-				beforeEach ->
-					@res = statusCode: 404
-					@request.post = sinon.stub().callsArgWith(1, null, @res)
+			describe("project history returns a unsuccessful response", function() {
+				beforeEach(function() {
+					this.res = {statusCode: 404};
+					this.request.post = sinon.stub().callsArgWith(1, null, this.res);
 
-					@HistoryManager.initializeProject @callback
+					return this.HistoryManager.initializeProject(this.callback);
+				});
 
-				it "should return the callback with an error", ->
-					@callback
+				return it("should return the callback with an error", function() {
+					return this.callback
 						.calledWith(sinon.match.has("message", "project-history returned a non-success status code: 404"))
-						.should.equal true
+						.should.equal(true);
+				});
+			});
 
-			describe "project history errors", ->
-				beforeEach ->
-					@error = sinon.stub()
-					@request.post = sinon.stub().callsArgWith(1, @error)
+			return describe("project history errors", function() {
+				beforeEach(function() {
+					this.error = sinon.stub();
+					this.request.post = sinon.stub().callsArgWith(1, this.error);
 
-					@HistoryManager.initializeProject @callback
+					return this.HistoryManager.initializeProject(this.callback);
+				});
 
-				it "should return the callback with the error", ->
-					@callback.calledWithExactly(@error).should.equal true
+				return it("should return the callback with the error", function() {
+					return this.callback.calledWithExactly(this.error).should.equal(true);
+				});
+			});
+		});
 
-		describe "with project history disabled", ->
-			beforeEach ->
-				@settings.apis.project_history.initializeHistoryForNewProjects = false
-				@HistoryManager.initializeProject @callback
+		return describe("with project history disabled", function() {
+			beforeEach(function() {
+				this.settings.apis.project_history.initializeHistoryForNewProjects = false;
+				return this.HistoryManager.initializeProject(this.callback);
+			});
 
-			it "should return the callback", ->
-				@callback.calledWithExactly().should.equal true
+			return it("should return the callback", function() {
+				return this.callback.calledWithExactly().should.equal(true);
+			});
+		});
+	});
 
-	describe "injectUserDetails", ->
-		beforeEach ->
-			@user1 = {
-				_id: @user_id1 = "123456"
+	return describe("injectUserDetails", function() {
+		beforeEach(function() {
+			this.user1 = {
+				_id: (this.user_id1 = "123456"),
 				first_name: "Jane",
-				last_name: "Doe"
+				last_name: "Doe",
 				email: "jane@example.com"
-			}
-			@user1_view = {
-				id: @user_id1
+			};
+			this.user1_view = {
+				id: this.user_id1,
 				first_name: "Jane",
-				last_name: "Doe"
+				last_name: "Doe",
 				email: "jane@example.com"
-			}
-			@user2 = {
-				_id: @user_id2 = "abcdef"
+			};
+			this.user2 = {
+				_id: (this.user_id2 = "abcdef"),
 				first_name: "John",
-				last_name: "Doe"
+				last_name: "Doe",
 				email: "john@example.com"
-			}
-			@user2_view = {
-				id: @user_id2
+			};
+			this.user2_view = {
+				id: this.user_id2,
 				first_name: "John",
-				last_name: "Doe"
+				last_name: "Doe",
 				email: "john@example.com"
-			}
-			@UserGetter.getUsers = sinon.stub().yields(null, [@user1, @user2])
+			};
+			return this.UserGetter.getUsers = sinon.stub().yields(null, [this.user1, this.user2]);
+		});
 
-		describe "with a diff", ->
-			it "should turn user_ids into user objects", (done) ->
-				@HistoryManager.injectUserDetails {
+		describe("with a diff", function() {
+			it("should turn user_ids into user objects", function(done) {
+				return this.HistoryManager.injectUserDetails({
 					diff: [{
-						i: "foo"
-						meta:
-							users: [@user_id1]
+						i: "foo",
+						meta: {
+							users: [this.user_id1]
+						}
 					}, {
-						i: "bar"
-						meta:
-							users: [@user_id2]
+						i: "bar",
+						meta: {
+							users: [this.user_id2]
+						}
 					}]
-				}, (error, diff) =>
-					expect(error).to.be.null
-					expect(diff.diff[0].meta.users).to.deep.equal [@user1_view]
-					expect(diff.diff[1].meta.users).to.deep.equal [@user2_view]
-					done()
+				}, (error, diff) => {
+					expect(error).to.be.null;
+					expect(diff.diff[0].meta.users).to.deep.equal([this.user1_view]);
+					expect(diff.diff[1].meta.users).to.deep.equal([this.user2_view]);
+					return done();
+				});
+			});
 
-			it "should leave user objects", (done) ->
-				@HistoryManager.injectUserDetails {
+			return it("should leave user objects", function(done) {
+				return this.HistoryManager.injectUserDetails({
 					diff: [{
-						i: "foo"
-						meta:
-							users: [@user1_view]
+						i: "foo",
+						meta: {
+							users: [this.user1_view]
+						}
 					}, {
-						i: "bar"
-						meta:
-							users: [@user_id2]
+						i: "bar",
+						meta: {
+							users: [this.user_id2]
+						}
 					}]
-				}, (error, diff) =>
-					expect(error).to.be.null
-					expect(diff.diff[0].meta.users).to.deep.equal [@user1_view]
-					expect(diff.diff[1].meta.users).to.deep.equal [@user2_view]
-					done()
+				}, (error, diff) => {
+					expect(error).to.be.null;
+					expect(diff.diff[0].meta.users).to.deep.equal([this.user1_view]);
+					expect(diff.diff[1].meta.users).to.deep.equal([this.user2_view]);
+					return done();
+				});
+			});
+		});
 
-		describe "with a list of updates", ->
-			it "should turn user_ids into user objects", (done) ->
-				@HistoryManager.injectUserDetails {
+		return describe("with a list of updates", function() {
+			it("should turn user_ids into user objects", function(done) {
+				return this.HistoryManager.injectUserDetails({
 					updates: [{
-						fromV: 5
-						toV: 8
-						meta:
-							users: [@user_id1]
+						fromV: 5,
+						toV: 8,
+						meta: {
+							users: [this.user_id1]
+						}
 					}, {
-						fromV: 4 
-						toV: 5
-						meta:
-							users: [@user_id2]
+						fromV: 4, 
+						toV: 5,
+						meta: {
+							users: [this.user_id2]
+						}
 					}]
-				}, (error, updates) =>
-					expect(error).to.be.null
-					expect(updates.updates[0].meta.users).to.deep.equal [@user1_view]
-					expect(updates.updates[1].meta.users).to.deep.equal [@user2_view]
-					done()
+				}, (error, updates) => {
+					expect(error).to.be.null;
+					expect(updates.updates[0].meta.users).to.deep.equal([this.user1_view]);
+					expect(updates.updates[1].meta.users).to.deep.equal([this.user2_view]);
+					return done();
+				});
+			});
 
-			it "should leave user objects", (done) ->
-				@HistoryManager.injectUserDetails {
+			return it("should leave user objects", function(done) {
+				return this.HistoryManager.injectUserDetails({
 					updates: [{
-						fromV: 5
-						toV: 8
-						meta:
-							users: [@user1_view]
+						fromV: 5,
+						toV: 8,
+						meta: {
+							users: [this.user1_view]
+						}
 					}, {
-						fromV: 4 
-						toV: 5
-						meta:
-							users: [@user_id2]
+						fromV: 4, 
+						toV: 5,
+						meta: {
+							users: [this.user_id2]
+						}
 					}]
-				}, (error, updates) =>
-					expect(error).to.be.null
-					expect(updates.updates[0].meta.users).to.deep.equal [@user1_view]
-					expect(updates.updates[1].meta.users).to.deep.equal [@user2_view]
-					done()
+				}, (error, updates) => {
+					expect(error).to.be.null;
+					expect(updates.updates[0].meta.users).to.deep.equal([this.user1_view]);
+					expect(updates.updates[1].meta.users).to.deep.equal([this.user2_view]);
+					return done();
+				});
+			});
+		});
+	});
+});

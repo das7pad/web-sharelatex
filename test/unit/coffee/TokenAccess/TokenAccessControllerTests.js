@@ -1,1221 +1,1432 @@
-should = require('chai').should()
-SandboxedModule = require('sandboxed-module')
-assert = require('assert')
-path = require('path')
-sinon = require('sinon')
-modulePath = path.join __dirname, "../../../../app/js/Features/TokenAccess/TokenAccessController"
-expect = require("chai").expect
-ObjectId = require("mongojs").ObjectId
-MockRequest = require('../helpers/MockRequest')
-MockResponse = require('../helpers/MockResponse')
-Errors = require "../../../../app/js/Features/Errors/Errors"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const should = require('chai').should();
+const SandboxedModule = require('sandboxed-module');
+const assert = require('assert');
+const path = require('path');
+const sinon = require('sinon');
+const modulePath = path.join(__dirname, "../../../../app/js/Features/TokenAccess/TokenAccessController");
+const {
+    expect
+} = require("chai");
+const {
+    ObjectId
+} = require("mongojs");
+const MockRequest = require('../helpers/MockRequest');
+const MockResponse = require('../helpers/MockResponse');
+const Errors = require("../../../../app/js/Features/Errors/Errors");
 
-describe "TokenAccessController", ->
+describe("TokenAccessController", function() {
 
-	beforeEach ->
-		@readOnlyToken = 'somereadonlytoken'
-		@readAndWriteToken = '42somereadandwritetoken'
-		@projectId = ObjectId()
-		@ownerId = 'owner'
-		@project =
-			_id: @projectId
-			publicAccesLevel: 'tokenBased'
-			tokens:
-				readOnly: @readOnlyToken
-				readAndWrite: @readAndWriteToken
-			owner_ref: @ownerId
-		@userId = ObjectId()
-		@TokenAccessController = SandboxedModule.require modulePath, requires:
-			'../Project/ProjectController': @ProjectController = {}
-			'../Authentication/AuthenticationController': @AuthenticationController = {}
-			'./TokenAccessHandler': @TokenAccessHandler = {
+	beforeEach(function() {
+		this.readOnlyToken = 'somereadonlytoken';
+		this.readAndWriteToken = '42somereadandwritetoken';
+		this.projectId = ObjectId();
+		this.ownerId = 'owner';
+		this.project = {
+			_id: this.projectId,
+			publicAccesLevel: 'tokenBased',
+			tokens: {
+				readOnly: this.readOnlyToken,
+				readAndWrite: this.readAndWriteToken
+			},
+			owner_ref: this.ownerId
+		};
+		this.userId = ObjectId();
+		this.TokenAccessController = SandboxedModule.require(modulePath, { requires: {
+			'../Project/ProjectController': (this.ProjectController = {}),
+			'../Authentication/AuthenticationController': (this.AuthenticationController = {}),
+			'./TokenAccessHandler': (this.TokenAccessHandler = {
 				getV1DocPublishedInfo: sinon.stub().yields(null, {
 					allow: true
-				})
+				}),
 				getV1DocInfo: sinon.stub().yields(null, {
-					exists: true
+					exists: true,
 					exported: false
 				})
-			}
-			'../../infrastructure/Features': @Features = {
+			}),
+			'../../infrastructure/Features': (this.Features = {
 				hasFeature: sinon.stub().returns(false)
-			}
-			'logger-sharelatex': {log: sinon.stub(), err: sinon.stub()}
+			}),
+			'logger-sharelatex': {log: sinon.stub(), err: sinon.stub()},
 			'settings-sharelatex': {
-				overleaf:
+				overleaf: {
 					host: 'http://overleaf.test:5000'
-			}
-			'../V1/V1Api': @V1Api = {
+				}
+			},
+			'../V1/V1Api': (this.V1Api = {
 				request: sinon.stub().callsArgWith(1, null, {}, { allow: true })
-			}
+			})
+		}
+	});
 
-		@AuthenticationController.getLoggedInUserId = sinon.stub().returns(@userId.toString())
+		return this.AuthenticationController.getLoggedInUserId = sinon.stub().returns(this.userId.toString());
+	});
 
 
-	describe 'readAndWriteToken', ->
-		beforeEach ->
+	describe('readAndWriteToken', function() {
+		beforeEach(function() {});
 
-		describe 'when all goes well', ->
-			beforeEach ->
-				@req = new MockRequest()
-				@res = new MockResponse()
-				@next = sinon.stub()
-				@req.params['read_and_write_token'] = @readAndWriteToken
-				@TokenAccessHandler.findProjectWithReadAndWriteToken = sinon.stub()
-					.callsArgWith(1, null, @project, true)
-				@TokenAccessHandler.addReadAndWriteUserToProject = sinon.stub()
-					.callsArgWith(2, null)
-				@ProjectController.loadEditor = sinon.stub()
-				@AuthenticationController.setRedirectInSession = sinon.stub()
-				@TokenAccessController.readAndWriteToken @req, @res, @next
+		describe('when all goes well', function() {
+			beforeEach(function() {
+				this.req = new MockRequest();
+				this.res = new MockResponse();
+				this.next = sinon.stub();
+				this.req.params['read_and_write_token'] = this.readAndWriteToken;
+				this.TokenAccessHandler.findProjectWithReadAndWriteToken = sinon.stub()
+					.callsArgWith(1, null, this.project, true);
+				this.TokenAccessHandler.addReadAndWriteUserToProject = sinon.stub()
+					.callsArgWith(2, null);
+				this.ProjectController.loadEditor = sinon.stub();
+				this.AuthenticationController.setRedirectInSession = sinon.stub();
+				return this.TokenAccessController.readAndWriteToken(this.req, this.res, this.next);
+			});
 
-			it 'should try to find a project with this token', (done) ->
-				expect(@TokenAccessHandler.findProjectWithReadAndWriteToken.callCount)
-					.to.equal 1
-				expect(@TokenAccessHandler.findProjectWithReadAndWriteToken.calledWith(@readAndWriteToken))
-					.to.equal true
-				done()
+			it('should try to find a project with this token', function(done) {
+				expect(this.TokenAccessHandler.findProjectWithReadAndWriteToken.callCount)
+					.to.equal(1);
+				expect(this.TokenAccessHandler.findProjectWithReadAndWriteToken.calledWith(this.readAndWriteToken))
+					.to.equal(true);
+				return done();
+			});
 
-			it 'should add the user to the project with read-write access', (done) ->
-				expect(@TokenAccessHandler.addReadAndWriteUserToProject.callCount)
-					.to.equal 1
-				expect(@TokenAccessHandler.addReadAndWriteUserToProject.calledWith(
-					@userId.toString(), @projectId
+			it('should add the user to the project with read-write access', function(done) {
+				expect(this.TokenAccessHandler.addReadAndWriteUserToProject.callCount)
+					.to.equal(1);
+				expect(this.TokenAccessHandler.addReadAndWriteUserToProject.calledWith(
+					this.userId.toString(), this.projectId
 				))
-					.to.equal true
-				done()
+					.to.equal(true);
+				return done();
+			});
 
-			it 'should pass control to loadEditor', (done) ->
-				expect(@req.params.Project_id).to.equal @projectId.toString()
-				expect(@ProjectController.loadEditor.callCount).to.equal 1
-				expect(@ProjectController.loadEditor.calledWith(@req, @res, @next)).to.equal true
-				done()
+			return it('should pass control to loadEditor', function(done) {
+				expect(this.req.params.Project_id).to.equal(this.projectId.toString());
+				expect(this.ProjectController.loadEditor.callCount).to.equal(1);
+				expect(this.ProjectController.loadEditor.calledWith(this.req, this.res, this.next)).to.equal(true);
+				return done();
+			});
+		});
 
-		describe 'when the user is already the owner', ->
-			beforeEach ->
-				@req = new MockRequest()
-				@res = new MockResponse()
-				@next = sinon.stub()
-				@req.params['read_and_write_token'] = @readAndWriteToken
-				@project.owner_ref = @userId
-				@TokenAccessHandler.findProjectWithReadAndWriteToken = sinon.stub()
-					.callsArgWith(1, null, @project, true)
-				@TokenAccessHandler.addReadAndWriteUserToProject = sinon.stub()
-					.callsArgWith(2, null)
-				@ProjectController.loadEditor = sinon.stub()
-				@TokenAccessController.readAndWriteToken @req, @res, @next
+		describe('when the user is already the owner', function() {
+			beforeEach(function() {
+				this.req = new MockRequest();
+				this.res = new MockResponse();
+				this.next = sinon.stub();
+				this.req.params['read_and_write_token'] = this.readAndWriteToken;
+				this.project.owner_ref = this.userId;
+				this.TokenAccessHandler.findProjectWithReadAndWriteToken = sinon.stub()
+					.callsArgWith(1, null, this.project, true);
+				this.TokenAccessHandler.addReadAndWriteUserToProject = sinon.stub()
+					.callsArgWith(2, null);
+				this.ProjectController.loadEditor = sinon.stub();
+				return this.TokenAccessController.readAndWriteToken(this.req, this.res, this.next);
+			});
 
-			it 'should try to find a project with this token', (done) ->
-				expect(@TokenAccessHandler.findProjectWithReadAndWriteToken.callCount)
-					.to.equal 1
-				expect(@TokenAccessHandler.findProjectWithReadAndWriteToken.calledWith(@readAndWriteToken))
-					.to.equal true
-				done()
+			it('should try to find a project with this token', function(done) {
+				expect(this.TokenAccessHandler.findProjectWithReadAndWriteToken.callCount)
+					.to.equal(1);
+				expect(this.TokenAccessHandler.findProjectWithReadAndWriteToken.calledWith(this.readAndWriteToken))
+					.to.equal(true);
+				return done();
+			});
 
-			it 'should not add the user to the project with read-write access', (done) ->
-				expect(@TokenAccessHandler.addReadAndWriteUserToProject.callCount)
-					.to.equal 0
-				done()
+			it('should not add the user to the project with read-write access', function(done) {
+				expect(this.TokenAccessHandler.addReadAndWriteUserToProject.callCount)
+					.to.equal(0);
+				return done();
+			});
 
-			it 'should pass control to loadEditor', (done) ->
-				expect(@req.params.Project_id).to.equal @projectId.toString()
-				expect(@ProjectController.loadEditor.callCount).to.equal 1
-				expect(@ProjectController.loadEditor.calledWith(@req, @res, @next)).to.equal true
-				done()
+			return it('should pass control to loadEditor', function(done) {
+				expect(this.req.params.Project_id).to.equal(this.projectId.toString());
+				expect(this.ProjectController.loadEditor.callCount).to.equal(1);
+				expect(this.ProjectController.loadEditor.calledWith(this.req, this.res, this.next)).to.equal(true);
+				return done();
+			});
+		});
 
 
-		describe 'when there is no user', ->
-			beforeEach ->
-				@AuthenticationController.getLoggedInUserId =
-					sinon.stub().returns(null)
+		describe('when there is no user', function() {
+			beforeEach(function() {
+				return this.AuthenticationController.getLoggedInUserId =
+					sinon.stub().returns(null);
+			});
 
-			describe 'when anonymous read-write access is enabled', ->
-				beforeEach ->
-					@TokenAccessHandler.ANONYMOUS_READ_AND_WRITE_ENABLED = true
-					@req = new MockRequest()
-					@res = new MockResponse()
-					@next = sinon.stub()
-					@req.params['read_and_write_token'] = @readAndWriteToken
-					@TokenAccessHandler.findProjectWithReadAndWriteToken = sinon.stub()
-						.callsArgWith(1, null, @project, true)
-					@TokenAccessHandler.addReadAndWriteUserToProject = sinon.stub()
-						.callsArgWith(2, null)
-					@ProjectController.loadEditor = sinon.stub()
-					@TokenAccessHandler.grantSessionTokenAccess = sinon.stub()
-					@TokenAccessController.readAndWriteToken @req, @res, @next
+			describe('when anonymous read-write access is enabled', function() {
+				beforeEach(function() {
+					this.TokenAccessHandler.ANONYMOUS_READ_AND_WRITE_ENABLED = true;
+					this.req = new MockRequest();
+					this.res = new MockResponse();
+					this.next = sinon.stub();
+					this.req.params['read_and_write_token'] = this.readAndWriteToken;
+					this.TokenAccessHandler.findProjectWithReadAndWriteToken = sinon.stub()
+						.callsArgWith(1, null, this.project, true);
+					this.TokenAccessHandler.addReadAndWriteUserToProject = sinon.stub()
+						.callsArgWith(2, null);
+					this.ProjectController.loadEditor = sinon.stub();
+					this.TokenAccessHandler.grantSessionTokenAccess = sinon.stub();
+					return this.TokenAccessController.readAndWriteToken(this.req, this.res, this.next);
+				});
 
-				it 'should not add the user to the project with read-write access', (done) ->
-					expect(@TokenAccessHandler.addReadAndWriteUserToProject.callCount)
-						.to.equal 0
-					done()
+				it('should not add the user to the project with read-write access', function(done) {
+					expect(this.TokenAccessHandler.addReadAndWriteUserToProject.callCount)
+						.to.equal(0);
+					return done();
+				});
 
-				it 'should give the user session token access', (done) ->
-					expect(@TokenAccessHandler.grantSessionTokenAccess.callCount)
-						.to.equal 1
-					expect(@TokenAccessHandler.grantSessionTokenAccess.calledWith(
-						@req, @projectId, @readAndWriteToken
+				it('should give the user session token access', function(done) {
+					expect(this.TokenAccessHandler.grantSessionTokenAccess.callCount)
+						.to.equal(1);
+					expect(this.TokenAccessHandler.grantSessionTokenAccess.calledWith(
+						this.req, this.projectId, this.readAndWriteToken
 					))
-						.to.equal true
-					done()
+						.to.equal(true);
+					return done();
+				});
 
-				it 'should pass control to loadEditor', (done) ->
-					expect(@req.params.Project_id).to.equal @projectId.toString()
-					expect(@ProjectController.loadEditor.callCount).to.equal 1
-					expect(@ProjectController.loadEditor.calledWith(@req, @res, @next)).to.equal true
-					done()
+				return it('should pass control to loadEditor', function(done) {
+					expect(this.req.params.Project_id).to.equal(this.projectId.toString());
+					expect(this.ProjectController.loadEditor.callCount).to.equal(1);
+					expect(this.ProjectController.loadEditor.calledWith(this.req, this.res, this.next)).to.equal(true);
+					return done();
+				});
+			});
 
-			describe 'when anonymous read-write access is not enabled', ->
-				beforeEach ->
-					@TokenAccessHandler.ANONYMOUS_READ_AND_WRITE_ENABLED = false
-					@req = new MockRequest()
-					@res = new MockResponse()
-					@res.redirect = sinon.stub()
-					@next = sinon.stub()
-					@req.params['read_and_write_token'] = @readAndWriteToken
-					@TokenAccessHandler.findProjectWithReadAndWriteToken = sinon.stub()
-						.callsArgWith(1, null, @project, true)
-					@TokenAccessHandler.addReadAndWriteUserToProject = sinon.stub()
-						.callsArgWith(2, null)
-					@ProjectController.loadEditor = sinon.stub()
-					@TokenAccessHandler.grantSessionTokenAccess = sinon.stub()
-					@AuthenticationController.setRedirectInSession = sinon.stub()
-					@TokenAccessController.readAndWriteToken @req, @res, @next
+			return describe('when anonymous read-write access is not enabled', function() {
+				beforeEach(function() {
+					this.TokenAccessHandler.ANONYMOUS_READ_AND_WRITE_ENABLED = false;
+					this.req = new MockRequest();
+					this.res = new MockResponse();
+					this.res.redirect = sinon.stub();
+					this.next = sinon.stub();
+					this.req.params['read_and_write_token'] = this.readAndWriteToken;
+					this.TokenAccessHandler.findProjectWithReadAndWriteToken = sinon.stub()
+						.callsArgWith(1, null, this.project, true);
+					this.TokenAccessHandler.addReadAndWriteUserToProject = sinon.stub()
+						.callsArgWith(2, null);
+					this.ProjectController.loadEditor = sinon.stub();
+					this.TokenAccessHandler.grantSessionTokenAccess = sinon.stub();
+					this.AuthenticationController.setRedirectInSession = sinon.stub();
+					return this.TokenAccessController.readAndWriteToken(this.req, this.res, this.next);
+				});
 
-				it 'should not add the user to the project with read-write access', (done) ->
-					expect(@TokenAccessHandler.addReadAndWriteUserToProject.callCount)
-						.to.equal 0
-					done()
+				it('should not add the user to the project with read-write access', function(done) {
+					expect(this.TokenAccessHandler.addReadAndWriteUserToProject.callCount)
+						.to.equal(0);
+					return done();
+				});
 
-				it 'should give the user session token access', (done) ->
-					expect(@TokenAccessHandler.grantSessionTokenAccess.callCount)
-						.to.equal 0
-					done()
+				it('should give the user session token access', function(done) {
+					expect(this.TokenAccessHandler.grantSessionTokenAccess.callCount)
+						.to.equal(0);
+					return done();
+				});
 
-				it 'should not pass control to loadEditor', (done) ->
-					expect(@ProjectController.loadEditor.callCount).to.equal 0
-					expect(@ProjectController.loadEditor.calledWith(@req, @res, @next)).to.equal false
-					done()
+				it('should not pass control to loadEditor', function(done) {
+					expect(this.ProjectController.loadEditor.callCount).to.equal(0);
+					expect(this.ProjectController.loadEditor.calledWith(this.req, this.res, this.next)).to.equal(false);
+					return done();
+				});
 
-				it 'should set redirect in session', (done) ->
-					expect(@AuthenticationController.setRedirectInSession.callCount).to.equal 1
-					expect(@AuthenticationController.setRedirectInSession.calledWith(@req)).to.equal true
-					done()
+				it('should set redirect in session', function(done) {
+					expect(this.AuthenticationController.setRedirectInSession.callCount).to.equal(1);
+					expect(this.AuthenticationController.setRedirectInSession.calledWith(this.req)).to.equal(true);
+					return done();
+				});
 
-				it 'should redirect to restricted page', (done) ->
-					expect(@res.redirect.callCount).to.equal 1
-					expect(@res.redirect.calledWith('/restricted')).to.equal true
-					done()
+				return it('should redirect to restricted page', function(done) {
+					expect(this.res.redirect.callCount).to.equal(1);
+					expect(this.res.redirect.calledWith('/restricted')).to.equal(true);
+					return done();
+				});
+			});
+		});
 
-		describe 'when findProject produces an error', ->
-			beforeEach ->
-				@req = new MockRequest()
-				@res = new MockResponse()
-				@next = sinon.stub()
-				@req.params['read_and_write_token'] = @readAndWriteToken
-				@TokenAccessHandler.findProjectWithReadAndWriteToken = sinon.stub()
-					.callsArgWith(1, new Error('woops'))
-				@TokenAccessHandler.addReadAndWriteUserToProject = sinon.stub()
-					.callsArgWith(2, null)
-				@ProjectController.loadEditor = sinon.stub()
-				@TokenAccessController.readAndWriteToken @req, @res, @next
+		describe('when findProject produces an error', function() {
+			beforeEach(function() {
+				this.req = new MockRequest();
+				this.res = new MockResponse();
+				this.next = sinon.stub();
+				this.req.params['read_and_write_token'] = this.readAndWriteToken;
+				this.TokenAccessHandler.findProjectWithReadAndWriteToken = sinon.stub()
+					.callsArgWith(1, new Error('woops'));
+				this.TokenAccessHandler.addReadAndWriteUserToProject = sinon.stub()
+					.callsArgWith(2, null);
+				this.ProjectController.loadEditor = sinon.stub();
+				return this.TokenAccessController.readAndWriteToken(this.req, this.res, this.next);
+			});
 
-			it 'should try to find a project with this token', (done) ->
-				expect(@TokenAccessHandler.findProjectWithReadAndWriteToken.callCount)
-					.to.equal 1
-				expect(@TokenAccessHandler.findProjectWithReadAndWriteToken.calledWith(@readAndWriteToken))
-					.to.equal true
-				done()
+			it('should try to find a project with this token', function(done) {
+				expect(this.TokenAccessHandler.findProjectWithReadAndWriteToken.callCount)
+					.to.equal(1);
+				expect(this.TokenAccessHandler.findProjectWithReadAndWriteToken.calledWith(this.readAndWriteToken))
+					.to.equal(true);
+				return done();
+			});
 
-			it 'should not add the user to the project with read-write access', (done) ->
-				expect(@TokenAccessHandler.addReadAndWriteUserToProject.callCount)
-					.to.equal 0
-				done()
+			it('should not add the user to the project with read-write access', function(done) {
+				expect(this.TokenAccessHandler.addReadAndWriteUserToProject.callCount)
+					.to.equal(0);
+				return done();
+			});
 
-			it 'should not pass control to loadEditor', (done) ->
-				expect(@ProjectController.loadEditor.callCount).to.equal 0
-				expect(@ProjectController.loadEditor.calledWith(@req, @res, @next)).to.equal false
-				done()
+			it('should not pass control to loadEditor', function(done) {
+				expect(this.ProjectController.loadEditor.callCount).to.equal(0);
+				expect(this.ProjectController.loadEditor.calledWith(this.req, this.res, this.next)).to.equal(false);
+				return done();
+			});
 
-			it 'should call next with an error', (done) ->
-				expect(@next.callCount).to.equal 1
-				expect(@next.lastCall.args[0]).to.be.instanceof Error
-				done()
+			return it('should call next with an error', function(done) {
+				expect(this.next.callCount).to.equal(1);
+				expect(this.next.lastCall.args[0]).to.be.instanceof(Error);
+				return done();
+			});
+		});
 
-		describe 'when findProject does not find a project', ->
-			beforeEach ->
+		describe('when findProject does not find a project', function() {
+			beforeEach(function() {});
 
-			describe 'when user is present', ->
-				beforeEach ->
-					@AuthenticationController.getLoggedInUserId =
-						sinon.stub().returns(@userId.toString())
+			return describe('when user is present', function() {
+				beforeEach(function() {
+					return this.AuthenticationController.getLoggedInUserId =
+						sinon.stub().returns(this.userId.toString());
+				});
 
-				describe 'when project does not exist', ->
-					beforeEach ->
-						@req = new MockRequest()
-						@req.url = '/123abc'
-						@res = new MockResponse()
-						@res.redirect = sinon.stub()
-						@res.render = sinon.stub()
-						@next = sinon.stub()
-						@req.params['read_and_write_token'] = '123abc'
-						@TokenAccessHandler.findProjectWithReadAndWriteToken = sinon.stub()
-							.callsArgWith(1, null, null, false)
+				describe('when project does not exist', function() {
+					beforeEach(function() {
+						this.req = new MockRequest();
+						this.req.url = '/123abc';
+						this.res = new MockResponse();
+						this.res.redirect = sinon.stub();
+						this.res.render = sinon.stub();
+						this.next = sinon.stub();
+						this.req.params['read_and_write_token'] = '123abc';
+						return this.TokenAccessHandler.findProjectWithReadAndWriteToken = sinon.stub()
+							.callsArgWith(1, null, null, false);
+					});
 
-					describe 'when project was not exported from v1', ->
-						beforeEach ->
-							@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
-									exists: true
+					describe('when project was not exported from v1', function() {
+						beforeEach(function() {
+							this.TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+									exists: true,
 									exported: false
-								})
-							@TokenAccessController.readAndWriteToken @req, @res, @next
+								});
+							return this.TokenAccessController.readAndWriteToken(this.req, this.res, this.next);
+						});
 
-						it 'should redirect to v1', (done) ->
-							expect(@res.redirect.callCount).to.equal 1
-							expect(@res.redirect.calledWith(
+						return it('should redirect to v1', function(done) {
+							expect(this.res.redirect.callCount).to.equal(1);
+							expect(this.res.redirect.calledWith(
 								302,
 								'/sign_in_to_v1?return_to=/123abc'
-							)).to.equal true
-							done()
+							)).to.equal(true);
+							return done();
+						});
+					});
 
-					describe 'when project was not exported from v1 but forcing import to v2', ->
-						beforeEach ->
-							@Features.hasFeature.returns(true)
+					describe('when project was not exported from v1 but forcing import to v2', function() {
+						beforeEach(function() {
+							return this.Features.hasFeature.returns(true);
+						});
 
-						describe 'with project name', ->
-							beforeEach ->
-								@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
-									exists: true
-									exported: false
-									has_owner: true
-									name: 'A title'
-									has_assignment: false
+						describe('with project name', function() {
+							beforeEach(function() {
+								this.TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+									exists: true,
+									exported: false,
+									has_owner: true,
+									name: 'A title',
+									has_assignment: false,
 									brand_info: null
-								})
-								@TokenAccessController.readAndWriteToken @req, @res, @next
+								});
+								return this.TokenAccessController.readAndWriteToken(this.req, this.res, this.next);
+							});
 
-							it 'should render v2-import page with name', (done) ->
-								expect(@res.render.calledWith(
-									'project/v2-import',
-									{
-										projectId: '123abc'
-										name: 'A title'
-										hasOwner: true
-										hasAssignment: false
-										brandInfo: null
-									}
-								)).to.equal true
-								done()
-
-						describe 'with project owner', ->
-							beforeEach ->
-								@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
-									exists: true
-									exported: false
-									has_owner: true
-									name: 'A title'
-									has_assignment: false
-									brand_info: null
-								})
-								@TokenAccessController.readAndWriteToken @req, @res, @next
-
-							it 'should render v2-import page', (done) ->
-								expect(@res.render.calledWith(
-									'project/v2-import',
-									{
-										projectId: '123abc'
-										hasOwner: true
-										name: 'A title'
-										hasAssignment: false
-										brandInfo: null
-									}
-								)).to.equal true
-								done()
-
-						describe 'without project owner', ->
-							beforeEach ->
-								@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
-									exists: true
-									exported: false
-									has_owner: false
-									name: 'A title'
-									has_assignment: false
-									brand_info: null
-								})
-								@TokenAccessController.readAndWriteToken @req, @res, @next
-
-							it 'should render v2-import page', (done) ->
-								expect(@res.render.calledWith(
+							return it('should render v2-import page with name', function(done) {
+								expect(this.res.render.calledWith(
 									'project/v2-import',
 									{
 										projectId: '123abc',
-										hasOwner: false
+										name: 'A title',
+										hasOwner: true,
+										hasAssignment: false,
+										brandInfo: null
+									}
+								)).to.equal(true);
+								return done();
+							});
+						});
+
+						describe('with project owner', function() {
+							beforeEach(function() {
+								this.TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+									exists: true,
+									exported: false,
+									has_owner: true,
+									name: 'A title',
+									has_assignment: false,
+									brand_info: null
+								});
+								return this.TokenAccessController.readAndWriteToken(this.req, this.res, this.next);
+							});
+
+							return it('should render v2-import page', function(done) {
+								expect(this.res.render.calledWith(
+									'project/v2-import',
+									{
+										projectId: '123abc',
+										hasOwner: true,
 										name: 'A title',
 										hasAssignment: false,
 										brandInfo: null
 									}
-								)).to.equal true
-								done()
+								)).to.equal(true);
+								return done();
+							});
+						});
 
-						describe 'with assignment', ->
-							beforeEach ->
-								@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
-									exists: true
-									exported: false
-									has_owner: false
-									name: 'A title'
-									has_assignment: true
+						describe('without project owner', function() {
+							beforeEach(function() {
+								this.TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+									exists: true,
+									exported: false,
+									has_owner: false,
+									name: 'A title',
+									has_assignment: false,
 									brand_info: null
-								})
-								@TokenAccessController.readAndWriteToken @req, @res, @next
+								});
+								return this.TokenAccessController.readAndWriteToken(this.req, this.res, this.next);
+							});
 
-							it 'should render v2-import page', (done) ->
-								expect(@res.render.calledWith(
+							return it('should render v2-import page', function(done) {
+								expect(this.res.render.calledWith(
 									'project/v2-import',
 									{
 										projectId: '123abc',
-										hasOwner: false
+										hasOwner: false,
+										name: 'A title',
+										hasAssignment: false,
+										brandInfo: null
+									}
+								)).to.equal(true);
+								return done();
+							});
+						});
+
+						describe('with assignment', function() {
+							beforeEach(function() {
+								this.TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+									exists: true,
+									exported: false,
+									has_owner: false,
+									name: 'A title',
+									has_assignment: true,
+									brand_info: null
+								});
+								return this.TokenAccessController.readAndWriteToken(this.req, this.res, this.next);
+							});
+
+							return it('should render v2-import page', function(done) {
+								expect(this.res.render.calledWith(
+									'project/v2-import',
+									{
+										projectId: '123abc',
+										hasOwner: false,
 										name: 'A title',
 										hasAssignment: true,
 										brandInfo: null
 									}
-								)).to.equal true
-								done()
+								)).to.equal(true);
+								return done();
+							});
+						});
 
-						describe 'with brand info', ->
-							beforeEach ->
-								@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
-									exists: true
-									exported: false
-									has_owner: false
-									name: 'A title'
-									has_assignment: false
+						describe('with brand info', function() {
+							beforeEach(function() {
+								this.TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+									exists: true,
+									exported: false,
+									has_owner: false,
+									name: 'A title',
+									has_assignment: false,
 									brand_info: 'wellcome'
-								})
-								@TokenAccessController.readAndWriteToken @req, @res, @next
+								});
+								return this.TokenAccessController.readAndWriteToken(this.req, this.res, this.next);
+							});
 
-							it 'should render v2-import page', (done) ->
-								expect(@res.render.calledWith(
+							return it('should render v2-import page', function(done) {
+								expect(this.res.render.calledWith(
 									'project/v2-import',
 									{
 										projectId: '123abc',
-										hasOwner: false
+										hasOwner: false,
 										name: 'A title',
 										hasAssignment: false,
 										brandInfo: 'wellcome'
 									}
-								)).to.equal true
-								done()
+								)).to.equal(true);
+								return done();
+							});
+						});
 
-						describe 'with anonymous user', ->
-							beforeEach ->
-								@AuthenticationController.getLoggedInUserId = sinon.stub().returns(null)
-								@TokenAccessController.readAndWriteToken @req, @res, @next
+						return describe('with anonymous user', function() {
+							beforeEach(function() {
+								this.AuthenticationController.getLoggedInUserId = sinon.stub().returns(null);
+								return this.TokenAccessController.readAndWriteToken(this.req, this.res, this.next);
+							});
 
-							it 'should render anonymous import status page', (done) ->
-								expect(@res.render.callCount).to.equal 1
-								expect(@res.render.calledWith(
+							return it('should render anonymous import status page', function(done) {
+								expect(this.res.render.callCount).to.equal(1);
+								expect(this.res.render.calledWith(
 									'project/v2-import',
 									{ loginRedirect: '/123abc' }
-								)).to.equal true
-								done()
+								)).to.equal(true);
+								return done();
+							});
+						});
+					});
 
-					describe 'when project was exported from v1', ->
-						beforeEach ->
-							@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
-									exists: true
+					describe('when project was exported from v1', function() {
+						beforeEach(function() {
+							this.TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+									exists: true,
 									exported: true
-								})
-							@TokenAccessController.readAndWriteToken @req, @res, @next
+								});
+							return this.TokenAccessController.readAndWriteToken(this.req, this.res, this.next);
+						});
 
-						it 'should call next with a not-found error', (done) ->
-							expect(@next.callCount).to.equal 1
-							done()
+						return it('should call next with a not-found error', function(done) {
+							expect(this.next.callCount).to.equal(1);
+							return done();
+						});
+					});
 
-					describe 'when project does not exist on v1', ->
-						beforeEach ->
-							@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
-								exists: false
+					return describe('when project does not exist on v1', function() {
+						beforeEach(function() {
+							this.TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+								exists: false,
 								exported: false
-							})
-							@TokenAccessController.readAndWriteToken @req, @res, @next
+							});
+							return this.TokenAccessController.readAndWriteToken(this.req, this.res, this.next);
+						});
 
-						it 'should call next with a not-found error', (done) ->
-							expect(@next.callCount).to.equal 1
-							expect(@next.calledWith(new Errors.NotFoundError())).to.equal true
-							done()
+						return it('should call next with a not-found error', function(done) {
+							expect(this.next.callCount).to.equal(1);
+							expect(this.next.calledWith(new Errors.NotFoundError())).to.equal(true);
+							return done();
+						});
+					});
+				});
 
-				describe 'when token access is off, but user has higher access anyway', ->
-					beforeEach ->
-						@req = new MockRequest()
-						@res = new MockResponse()
-						@res.redirect = sinon.stub()
-						@next = sinon.stub()
-						@req.params['read_and_write_token'] = @readAndWriteToken
-						@TokenAccessHandler.findProjectWithReadAndWriteToken = sinon.stub()
-							.callsArgWith(1, null, null, true)
-						@TokenAccessHandler.findProjectWithHigherAccess =
+				describe('when token access is off, but user has higher access anyway', function() {
+					beforeEach(function() {
+						this.req = new MockRequest();
+						this.res = new MockResponse();
+						this.res.redirect = sinon.stub();
+						this.next = sinon.stub();
+						this.req.params['read_and_write_token'] = this.readAndWriteToken;
+						this.TokenAccessHandler.findProjectWithReadAndWriteToken = sinon.stub()
+							.callsArgWith(1, null, null, true);
+						this.TokenAccessHandler.findProjectWithHigherAccess =
 							sinon.stub()
-							.callsArgWith(2, null, @project)
-						@TokenAccessHandler.addReadAndWriteUserToProject = sinon.stub()
-							.callsArgWith(2, null)
-						@ProjectController.loadEditor = sinon.stub()
-						@TokenAccessController.readAndWriteToken @req, @res, @next
+							.callsArgWith(2, null, this.project);
+						this.TokenAccessHandler.addReadAndWriteUserToProject = sinon.stub()
+							.callsArgWith(2, null);
+						this.ProjectController.loadEditor = sinon.stub();
+						return this.TokenAccessController.readAndWriteToken(this.req, this.res, this.next);
+					});
 
-					it 'should try to find a project with this token', (done) ->
-						expect(@TokenAccessHandler.findProjectWithReadAndWriteToken.callCount)
-							.to.equal 1
-						expect(@TokenAccessHandler.findProjectWithReadAndWriteToken
-							.calledWith(@readAndWriteToken)
-						).to.equal true
-						done()
+					it('should try to find a project with this token', function(done) {
+						expect(this.TokenAccessHandler.findProjectWithReadAndWriteToken.callCount)
+							.to.equal(1);
+						expect(this.TokenAccessHandler.findProjectWithReadAndWriteToken
+							.calledWith(this.readAndWriteToken)
+						).to.equal(true);
+						return done();
+					});
 
-					it 'should check if user has higher access to the token project', (done) ->
+					it('should check if user has higher access to the token project', function(done) {
 						expect(
-							@TokenAccessHandler.findProjectWithHigherAccess.callCount
-						).to.equal 1
-						done()
+							this.TokenAccessHandler.findProjectWithHigherAccess.callCount
+						).to.equal(1);
+						return done();
+					});
 
-					it 'should not add the user to the project with read-write access', (done) ->
-						expect(@TokenAccessHandler.addReadAndWriteUserToProject.callCount)
-							.to.equal 0
-						done()
+					it('should not add the user to the project with read-write access', function(done) {
+						expect(this.TokenAccessHandler.addReadAndWriteUserToProject.callCount)
+							.to.equal(0);
+						return done();
+					});
 
-					it 'should not pass control to loadEditor', (done) ->
-						expect(@ProjectController.loadEditor.callCount).to.equal 0
-						expect(@ProjectController.loadEditor.calledWith(@req, @res, @next)).to.equal false
-						done()
+					it('should not pass control to loadEditor', function(done) {
+						expect(this.ProjectController.loadEditor.callCount).to.equal(0);
+						expect(this.ProjectController.loadEditor.calledWith(this.req, this.res, this.next)).to.equal(false);
+						return done();
+					});
 
-					it 'should not call next with a not-found error', (done) ->
-						expect(@next.callCount).to.equal 0
-						done()
+					it('should not call next with a not-found error', function(done) {
+						expect(this.next.callCount).to.equal(0);
+						return done();
+					});
 
-					it 'should redirect to the canonical project url', (done) ->
-						expect(@res.redirect.callCount).to.equal 1
-						expect(@res.redirect.calledWith(302, "/project/#{@project._id}")).to.equal true
-						done()
+					return it('should redirect to the canonical project url', function(done) {
+						expect(this.res.redirect.callCount).to.equal(1);
+						expect(this.res.redirect.calledWith(302, `/project/${this.project._id}`)).to.equal(true);
+						return done();
+					});
+				});
 
-				describe 'when higher access is not available', ->
-					beforeEach ->
-						@req = new MockRequest()
-						@res = new MockResponse()
-						@next = sinon.stub()
-						@req.params['read_and_write_token'] = @readAndWriteToken
-						@TokenAccessHandler.findProjectWithReadAndWriteToken = sinon.stub()
-							.callsArgWith(1, null, null, true)
-						@TokenAccessHandler.findProjectWithHigherAccess =
+				return describe('when higher access is not available', function() {
+					beforeEach(function() {
+						this.req = new MockRequest();
+						this.res = new MockResponse();
+						this.next = sinon.stub();
+						this.req.params['read_and_write_token'] = this.readAndWriteToken;
+						this.TokenAccessHandler.findProjectWithReadAndWriteToken = sinon.stub()
+							.callsArgWith(1, null, null, true);
+						this.TokenAccessHandler.findProjectWithHigherAccess =
 							sinon.stub()
-							.callsArgWith(2, null, null)
-						@TokenAccessHandler.addReadAndWriteUserToProject = sinon.stub()
-							.callsArgWith(2, null)
-						@ProjectController.loadEditor = sinon.stub()
-						@TokenAccessController.readAndWriteToken @req, @res, @next
+							.callsArgWith(2, null, null);
+						this.TokenAccessHandler.addReadAndWriteUserToProject = sinon.stub()
+							.callsArgWith(2, null);
+						this.ProjectController.loadEditor = sinon.stub();
+						return this.TokenAccessController.readAndWriteToken(this.req, this.res, this.next);
+					});
 
-					it 'should try to find a project with this token', (done) ->
-						expect(@TokenAccessHandler.findProjectWithReadAndWriteToken.callCount)
-							.to.equal 1
-						expect(@TokenAccessHandler.findProjectWithReadAndWriteToken.calledWith(
-							@readAndWriteToken
-						)).to.equal true
-						done()
+					it('should try to find a project with this token', function(done) {
+						expect(this.TokenAccessHandler.findProjectWithReadAndWriteToken.callCount)
+							.to.equal(1);
+						expect(this.TokenAccessHandler.findProjectWithReadAndWriteToken.calledWith(
+							this.readAndWriteToken
+						)).to.equal(true);
+						return done();
+					});
 
-					it 'should check if user has higher access to the token project', (done) ->
+					it('should check if user has higher access to the token project', function(done) {
 						expect(
-							@TokenAccessHandler.findProjectWithHigherAccess.callCount
-						).to.equal 1
-						done()
+							this.TokenAccessHandler.findProjectWithHigherAccess.callCount
+						).to.equal(1);
+						return done();
+					});
 
-					it 'should not add the user to the project with read-write access', (done) ->
-						expect(@TokenAccessHandler.addReadAndWriteUserToProject.callCount)
-							.to.equal 0
-						done()
+					it('should not add the user to the project with read-write access', function(done) {
+						expect(this.TokenAccessHandler.addReadAndWriteUserToProject.callCount)
+							.to.equal(0);
+						return done();
+					});
 
-					it 'should not pass control to loadEditor', (done) ->
-						expect(@ProjectController.loadEditor.callCount).to.equal 0
-						expect(@ProjectController.loadEditor.calledWith(@req, @res, @next)).to.equal false
-						done()
+					it('should not pass control to loadEditor', function(done) {
+						expect(this.ProjectController.loadEditor.callCount).to.equal(0);
+						expect(this.ProjectController.loadEditor.calledWith(this.req, this.res, this.next)).to.equal(false);
+						return done();
+					});
 
-					it 'should call next with a not-found error', (done) ->
-						expect(@next.callCount).to.equal 1
-						expect(@next.lastCall.args[0]).to.be.instanceof Error
-						done()
+					return it('should call next with a not-found error', function(done) {
+						expect(this.next.callCount).to.equal(1);
+						expect(this.next.lastCall.args[0]).to.be.instanceof(Error);
+						return done();
+					});
+				});
+			});
+		});
 
-		describe 'when adding user to project produces an error', ->
-			beforeEach ->
-				@req = new MockRequest()
-				@res = new MockResponse()
-				@next = sinon.stub()
-				@req.params['read_and_write_token'] = @readAndWriteToken
-				@TokenAccessHandler.findProjectWithReadAndWriteToken = sinon.stub()
-					.callsArgWith(1, null, @project, true)
-				@TokenAccessHandler.addReadAndWriteUserToProject = sinon.stub()
-					.callsArgWith(2, new Error('woops'))
-				@ProjectController.loadEditor = sinon.stub()
-				@TokenAccessController.readAndWriteToken @req, @res, @next
+		return describe('when adding user to project produces an error', function() {
+			beforeEach(function() {
+				this.req = new MockRequest();
+				this.res = new MockResponse();
+				this.next = sinon.stub();
+				this.req.params['read_and_write_token'] = this.readAndWriteToken;
+				this.TokenAccessHandler.findProjectWithReadAndWriteToken = sinon.stub()
+					.callsArgWith(1, null, this.project, true);
+				this.TokenAccessHandler.addReadAndWriteUserToProject = sinon.stub()
+					.callsArgWith(2, new Error('woops'));
+				this.ProjectController.loadEditor = sinon.stub();
+				return this.TokenAccessController.readAndWriteToken(this.req, this.res, this.next);
+			});
 
-			it 'should try to find a project with this token', (done) ->
-				expect(@TokenAccessHandler.findProjectWithReadAndWriteToken.callCount)
-					.to.equal 1
-				expect(@TokenAccessHandler.findProjectWithReadAndWriteToken.calledWith(@readAndWriteToken))
-					.to.equal true
-				done()
+			it('should try to find a project with this token', function(done) {
+				expect(this.TokenAccessHandler.findProjectWithReadAndWriteToken.callCount)
+					.to.equal(1);
+				expect(this.TokenAccessHandler.findProjectWithReadAndWriteToken.calledWith(this.readAndWriteToken))
+					.to.equal(true);
+				return done();
+			});
 
-			it 'should add the user to the project with read-write access', (done) ->
-				expect(@TokenAccessHandler.addReadAndWriteUserToProject.callCount)
-					.to.equal 1
-				expect(@TokenAccessHandler.addReadAndWriteUserToProject.calledWith(
-					@userId.toString(), @projectId
+			it('should add the user to the project with read-write access', function(done) {
+				expect(this.TokenAccessHandler.addReadAndWriteUserToProject.callCount)
+					.to.equal(1);
+				expect(this.TokenAccessHandler.addReadAndWriteUserToProject.calledWith(
+					this.userId.toString(), this.projectId
 				))
-					.to.equal true
-				done()
+					.to.equal(true);
+				return done();
+			});
 
-			it 'should not pass control to loadEditor', (done) ->
-				expect(@ProjectController.loadEditor.callCount).to.equal 0
-				expect(@ProjectController.loadEditor.calledWith(@req, @res, @next)).to.equal false
-				done()
+			it('should not pass control to loadEditor', function(done) {
+				expect(this.ProjectController.loadEditor.callCount).to.equal(0);
+				expect(this.ProjectController.loadEditor.calledWith(this.req, this.res, this.next)).to.equal(false);
+				return done();
+			});
 
-			it 'should call next with an error', (done) ->
-				expect(@next.callCount).to.equal 1
-				expect(@next.lastCall.args[0]).to.be.instanceof Error
-				done()
+			return it('should call next with an error', function(done) {
+				expect(this.next.callCount).to.equal(1);
+				expect(this.next.lastCall.args[0]).to.be.instanceof(Error);
+				return done();
+			});
+		});
+	});
 
 
-	describe 'readOnlyToken', ->
-		beforeEach ->
-			@TokenAccessHandler.checkV1Access = sinon.stub().callsArgWith(1, null, true)
+	return describe('readOnlyToken', function() {
+		beforeEach(function() {
+			return this.TokenAccessHandler.checkV1Access = sinon.stub().callsArgWith(1, null, true);
+		});
 
-		describe 'when access not allowed by v1 api', ->
-			beforeEach ->
-				@req = new MockRequest()
-				@res = new MockResponse()
-				@res.redirect = sinon.stub()
-				@next = sinon.stub()
-				@TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
-						.callsArgWith(1, null, @project, true)
-				@TokenAccessHandler.getV1DocPublishedInfo = sinon.stub().yields(null, {
-					allow: false
+		describe('when access not allowed by v1 api', function() {
+			beforeEach(function() {
+				this.req = new MockRequest();
+				this.res = new MockResponse();
+				this.res.redirect = sinon.stub();
+				this.next = sinon.stub();
+				this.TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
+						.callsArgWith(1, null, this.project, true);
+				this.TokenAccessHandler.getV1DocPublishedInfo = sinon.stub().yields(null, {
+					allow: false,
 					published_path: 'doc-url'
-				})
-				@TokenAccessController.readOnlyToken @req, @res, @next
+				});
+				return this.TokenAccessController.readOnlyToken(this.req, this.res, this.next);
+			});
 
-			it 'should redirect to doc-url', ->
-				expect(@res.redirect.calledWith('doc-url')).to.equal true
+			return it('should redirect to doc-url', function() {
+				return expect(this.res.redirect.calledWith('doc-url')).to.equal(true);
+			});
+		});
 
-		describe 'with a user', ->
-			beforeEach ->
-				@AuthenticationController.getLoggedInUserId = sinon.stub().returns(@userId.toString())
+		describe('with a user', function() {
+			beforeEach(function() {
+				return this.AuthenticationController.getLoggedInUserId = sinon.stub().returns(this.userId.toString());
+			});
 
-			describe 'when all goes well', ->
-				beforeEach ->
-					@req = new MockRequest()
-					@res = new MockResponse()
-					@next = sinon.stub()
-					@req.params['read_only_token'] = @readOnlyToken
-					@TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
-						.callsArgWith(1, null, @project, true)
-					@TokenAccessHandler.addReadOnlyUserToProject = sinon.stub()
-						.callsArgWith(2, null)
-					@ProjectController.loadEditor = sinon.stub()
-					@TokenAccessController.readOnlyToken @req, @res, @next
+			describe('when all goes well', function() {
+				beforeEach(function() {
+					this.req = new MockRequest();
+					this.res = new MockResponse();
+					this.next = sinon.stub();
+					this.req.params['read_only_token'] = this.readOnlyToken;
+					this.TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
+						.callsArgWith(1, null, this.project, true);
+					this.TokenAccessHandler.addReadOnlyUserToProject = sinon.stub()
+						.callsArgWith(2, null);
+					this.ProjectController.loadEditor = sinon.stub();
+					return this.TokenAccessController.readOnlyToken(this.req, this.res, this.next);
+				});
 
-				it 'should try to find a project with this token', (done) ->
-					expect(@TokenAccessHandler.findProjectWithReadOnlyToken.callCount)
-						.to.equal 1
-					expect(@TokenAccessHandler.findProjectWithReadOnlyToken.calledWith(@readOnlyToken))
-						.to.equal true
-					done()
+				it('should try to find a project with this token', function(done) {
+					expect(this.TokenAccessHandler.findProjectWithReadOnlyToken.callCount)
+						.to.equal(1);
+					expect(this.TokenAccessHandler.findProjectWithReadOnlyToken.calledWith(this.readOnlyToken))
+						.to.equal(true);
+					return done();
+				});
 
-				it 'should add the user to the project with read-only access', (done) ->
-					expect(@TokenAccessHandler.addReadOnlyUserToProject.callCount)
-						.to.equal 1
-					expect(@TokenAccessHandler.addReadOnlyUserToProject.calledWith(
-						@userId.toString(), @projectId
+				it('should add the user to the project with read-only access', function(done) {
+					expect(this.TokenAccessHandler.addReadOnlyUserToProject.callCount)
+						.to.equal(1);
+					expect(this.TokenAccessHandler.addReadOnlyUserToProject.calledWith(
+						this.userId.toString(), this.projectId
 					))
-						.to.equal true
-					done()
+						.to.equal(true);
+					return done();
+				});
 
-				it 'should pass control to loadEditor', (done) ->
-					expect(@req.params.Project_id).to.equal @projectId.toString()
-					expect(@ProjectController.loadEditor.callCount).to.equal 1
-					expect(@ProjectController.loadEditor.calledWith(@req, @res, @next)).to.equal true
-					done()
+				return it('should pass control to loadEditor', function(done) {
+					expect(this.req.params.Project_id).to.equal(this.projectId.toString());
+					expect(this.ProjectController.loadEditor.callCount).to.equal(1);
+					expect(this.ProjectController.loadEditor.calledWith(this.req, this.res, this.next)).to.equal(true);
+					return done();
+				});
+			});
 
-			describe 'when the user is already the owner', ->
-				beforeEach ->
-					@req = new MockRequest()
-					@res = new MockResponse()
-					@next = sinon.stub()
-					@req.params['read_only_token'] = @readOnlyToken
-					@project.owner_ref = @userId
-					@TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
-						.callsArgWith(1, null, @project, true)
-					@TokenAccessHandler.addReadOnlyUserToProject = sinon.stub()
-						.callsArgWith(2, null)
-					@ProjectController.loadEditor = sinon.stub()
-					@TokenAccessController.readOnlyToken @req, @res, @next
+			describe('when the user is already the owner', function() {
+				beforeEach(function() {
+					this.req = new MockRequest();
+					this.res = new MockResponse();
+					this.next = sinon.stub();
+					this.req.params['read_only_token'] = this.readOnlyToken;
+					this.project.owner_ref = this.userId;
+					this.TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
+						.callsArgWith(1, null, this.project, true);
+					this.TokenAccessHandler.addReadOnlyUserToProject = sinon.stub()
+						.callsArgWith(2, null);
+					this.ProjectController.loadEditor = sinon.stub();
+					return this.TokenAccessController.readOnlyToken(this.req, this.res, this.next);
+				});
 
-				it 'should try to find a project with this token', (done) ->
-					expect(@TokenAccessHandler.findProjectWithReadOnlyToken.callCount)
-						.to.equal 1
-					expect(@TokenAccessHandler.findProjectWithReadOnlyToken.calledWith(@readOnlyToken))
-						.to.equal true
-					done()
+				it('should try to find a project with this token', function(done) {
+					expect(this.TokenAccessHandler.findProjectWithReadOnlyToken.callCount)
+						.to.equal(1);
+					expect(this.TokenAccessHandler.findProjectWithReadOnlyToken.calledWith(this.readOnlyToken))
+						.to.equal(true);
+					return done();
+				});
 
-				it 'should not add the user to the project with read-only access', (done) ->
-					expect(@TokenAccessHandler.addReadOnlyUserToProject.callCount)
-						.to.equal 0
-					done()
+				it('should not add the user to the project with read-only access', function(done) {
+					expect(this.TokenAccessHandler.addReadOnlyUserToProject.callCount)
+						.to.equal(0);
+					return done();
+				});
 
-				it 'should pass control to loadEditor', (done) ->
-					expect(@req.params.Project_id).to.equal @projectId.toString()
-					expect(@ProjectController.loadEditor.callCount).to.equal 1
-					expect(@ProjectController.loadEditor.calledWith(@req, @res, @next)).to.equal true
-					done()
+				return it('should pass control to loadEditor', function(done) {
+					expect(this.req.params.Project_id).to.equal(this.projectId.toString());
+					expect(this.ProjectController.loadEditor.callCount).to.equal(1);
+					expect(this.ProjectController.loadEditor.calledWith(this.req, this.res, this.next)).to.equal(true);
+					return done();
+				});
+			});
 
-			describe 'when findProject produces an error', ->
-				beforeEach ->
-					@req = new MockRequest()
-					@res = new MockResponse()
-					@next = sinon.stub()
-					@req.params['read_only_token'] = @readOnlyToken
-					@TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
-						.callsArgWith(1, new Error('woops'))
-					@TokenAccessHandler.addReadOnlyUserToProject = sinon.stub()
-						.callsArgWith(2, null)
-					@ProjectController.loadEditor = sinon.stub()
-					@TokenAccessController.readOnlyToken @req, @res, @next
+			return describe('when findProject produces an error', function() {
+				beforeEach(function() {
+					this.req = new MockRequest();
+					this.res = new MockResponse();
+					this.next = sinon.stub();
+					this.req.params['read_only_token'] = this.readOnlyToken;
+					this.TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
+						.callsArgWith(1, new Error('woops'));
+					this.TokenAccessHandler.addReadOnlyUserToProject = sinon.stub()
+						.callsArgWith(2, null);
+					this.ProjectController.loadEditor = sinon.stub();
+					return this.TokenAccessController.readOnlyToken(this.req, this.res, this.next);
+				});
 
-				it 'should try to find a project with this token', (done) ->
-					expect(@TokenAccessHandler.findProjectWithReadOnlyToken.callCount)
-						.to.equal 1
-					expect(@TokenAccessHandler.findProjectWithReadOnlyToken.calledWith(@readOnlyToken))
-						.to.equal true
-					done()
+				it('should try to find a project with this token', function(done) {
+					expect(this.TokenAccessHandler.findProjectWithReadOnlyToken.callCount)
+						.to.equal(1);
+					expect(this.TokenAccessHandler.findProjectWithReadOnlyToken.calledWith(this.readOnlyToken))
+						.to.equal(true);
+					return done();
+				});
 
-				it 'should not add the user to the project with read-only access', (done) ->
-					expect(@TokenAccessHandler.addReadOnlyUserToProject.callCount)
-						.to.equal 0
-					done()
+				it('should not add the user to the project with read-only access', function(done) {
+					expect(this.TokenAccessHandler.addReadOnlyUserToProject.callCount)
+						.to.equal(0);
+					return done();
+				});
 
-				it 'should not pass control to loadEditor', (done) ->
-					expect(@ProjectController.loadEditor.callCount).to.equal 0
-					expect(@ProjectController.loadEditor.calledWith(@req, @res, @next)).to.equal false
-					done()
+				it('should not pass control to loadEditor', function(done) {
+					expect(this.ProjectController.loadEditor.callCount).to.equal(0);
+					expect(this.ProjectController.loadEditor.calledWith(this.req, this.res, this.next)).to.equal(false);
+					return done();
+				});
 
-				it 'should call next with an error', (done) ->
-					expect(@next.callCount).to.equal 1
-					expect(@next.lastCall.args[0]).to.be.instanceof Error
-					done()
+				return it('should call next with an error', function(done) {
+					expect(this.next.callCount).to.equal(1);
+					expect(this.next.lastCall.args[0]).to.be.instanceof(Error);
+					return done();
+				});
+			});
+		});
 
-		describe 'when findProject does not find a project', ->
-			describe 'when project does not exist', ->
-				beforeEach ->
-					@req = new MockRequest()
-					@res = new MockResponse()
-					@res.redirect = sinon.stub()
-					@next = sinon.stub()
-					@req.params['read_only_token'] = 'abcd'
-					@TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
-						.callsArgWith(1, null, null, false)
-					@TokenAccessHandler.checkV1ProjectExported = sinon.stub()
-						.callsArgWith(1, null, false)
-					@TokenAccessController.readOnlyToken @req, @res, @next
+		describe('when findProject does not find a project', function() {
+			describe('when project does not exist', function() {
+				beforeEach(function() {
+					this.req = new MockRequest();
+					this.res = new MockResponse();
+					this.res.redirect = sinon.stub();
+					this.next = sinon.stub();
+					this.req.params['read_only_token'] = 'abcd';
+					this.TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
+						.callsArgWith(1, null, null, false);
+					this.TokenAccessHandler.checkV1ProjectExported = sinon.stub()
+						.callsArgWith(1, null, false);
+					return this.TokenAccessController.readOnlyToken(this.req, this.res, this.next);
+				});
 
-				it 'should redirect to v1', (done) ->
-					expect(@res.redirect.callCount).to.equal 1
-					expect(@res.redirect.calledWith(
+				return it('should redirect to v1', function(done) {
+					expect(this.res.redirect.callCount).to.equal(1);
+					expect(this.res.redirect.calledWith(
 						302,
 						'/sign_in_to_v1?return_to=/read/abcd'
-					)).to.equal true
-					done()
+					)).to.equal(true);
+					return done();
+				});
+			});
 
-			describe 'when project was not exported from v1 but forcing import to v2', ->
-				beforeEach ->
-					@Features.hasFeature.returns(true)
-					@req = new MockRequest()
-					@res = new MockResponse()
-					@res.render = sinon.stub()
-					@next = sinon.stub()
-					@req.params['read_only_token'] = 'abcd'
-					@TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
-						.callsArgWith(1, null, null, false)
+			describe('when project was not exported from v1 but forcing import to v2', function() {
+				beforeEach(function() {
+					this.Features.hasFeature.returns(true);
+					this.req = new MockRequest();
+					this.res = new MockResponse();
+					this.res.render = sinon.stub();
+					this.next = sinon.stub();
+					this.req.params['read_only_token'] = 'abcd';
+					return this.TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
+						.callsArgWith(1, null, null, false);
+				});
 
-				describe 'with project name', ->
-					beforeEach ->
-						@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
-							exists: true
-							exported: false
-							has_owner: true
-							name: 'A title'
-							has_assignment: false
+				describe('with project name', function() {
+					beforeEach(function() {
+						this.TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+							exists: true,
+							exported: false,
+							has_owner: true,
+							name: 'A title',
+							has_assignment: false,
 							brand_info: null
-						})
-						@TokenAccessController.readOnlyToken @req, @res, @next
+						});
+						return this.TokenAccessController.readOnlyToken(this.req, this.res, this.next);
+					});
 
-					it 'should render v2-import page with name', (done) ->
-						expect(@res.render.calledWith(
-							'project/v2-import',
-							{
-								projectId: 'abcd'
-								name: 'A title'
-								hasOwner: true
-								hasAssignment: false
-								brandInfo: null
-							}
-						)).to.equal true
-						done()
-
-				describe 'with project owner', ->
-					beforeEach ->
-						@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
-							exists: true
-							exported: false
-							has_owner: true
-							name: 'A title'
-							has_assignment: false
-							brand_info: null
-						})
-						@TokenAccessController.readOnlyToken @req, @res, @next
-
-					it 'should render v2-import page', (done) ->
-						expect(@res.render.calledWith(
+					return it('should render v2-import page with name', function(done) {
+						expect(this.res.render.calledWith(
 							'project/v2-import',
 							{
 								projectId: 'abcd',
-								hasOwner: true
-								name: 'A title'
-								hasAssignment: false
+								name: 'A title',
+								hasOwner: true,
+								hasAssignment: false,
 								brandInfo: null
 							}
-						)).to.equal true
-						done()
+						)).to.equal(true);
+						return done();
+					});
+				});
 
-				describe 'without project owner', ->
-					beforeEach ->
-						@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
-							exists: true
-							exported: false
-							has_owner: false
-							name: 'A title'
-							has_assignment: false
+				describe('with project owner', function() {
+					beforeEach(function() {
+						this.TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+							exists: true,
+							exported: false,
+							has_owner: true,
+							name: 'A title',
+							has_assignment: false,
 							brand_info: null
-						})
-						@TokenAccessController.readOnlyToken @req, @res, @next
+						});
+						return this.TokenAccessController.readOnlyToken(this.req, this.res, this.next);
+					});
 
-					it 'should render v2-import page', (done) ->
-						expect(@res.render.calledWith(
+					return it('should render v2-import page', function(done) {
+						expect(this.res.render.calledWith(
 							'project/v2-import',
 							{
 								projectId: 'abcd',
-								hasOwner: false
-								name: 'A title'
-								hasAssignment: false
+								hasOwner: true,
+								name: 'A title',
+								hasAssignment: false,
 								brandInfo: null
 							}
-						)).to.equal true
-						done()
+						)).to.equal(true);
+						return done();
+					});
+				});
 
-				describe 'with assignment', ->
-					beforeEach ->
-						@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
-							exists: true
-							exported: false
-							has_owner: false
-							name: 'A title'
-							has_assignment: true
+				describe('without project owner', function() {
+					beforeEach(function() {
+						this.TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+							exists: true,
+							exported: false,
+							has_owner: false,
+							name: 'A title',
+							has_assignment: false,
 							brand_info: null
-						})
-						@TokenAccessController.readOnlyToken @req, @res, @next
+						});
+						return this.TokenAccessController.readOnlyToken(this.req, this.res, this.next);
+					});
 
-					it 'should render v2-import page', (done) ->
-						expect(@res.render.calledWith(
+					return it('should render v2-import page', function(done) {
+						expect(this.res.render.calledWith(
 							'project/v2-import',
 							{
 								projectId: 'abcd',
-								hasOwner: false
-								name: 'A title'
-								hasAssignment: true
+								hasOwner: false,
+								name: 'A title',
+								hasAssignment: false,
 								brandInfo: null
 							}
-						)).to.equal true
-						done()
+						)).to.equal(true);
+						return done();
+					});
+				});
 
-				describe 'with brand info', ->
-					beforeEach ->
-						@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
-							exists: true
-							exported: false
-							has_owner: false
-							name: 'A title'
-							has_assignment: false
+				describe('with assignment', function() {
+					beforeEach(function() {
+						this.TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+							exists: true,
+							exported: false,
+							has_owner: false,
+							name: 'A title',
+							has_assignment: true,
+							brand_info: null
+						});
+						return this.TokenAccessController.readOnlyToken(this.req, this.res, this.next);
+					});
+
+					return it('should render v2-import page', function(done) {
+						expect(this.res.render.calledWith(
+							'project/v2-import',
+							{
+								projectId: 'abcd',
+								hasOwner: false,
+								name: 'A title',
+								hasAssignment: true,
+								brandInfo: null
+							}
+						)).to.equal(true);
+						return done();
+					});
+				});
+
+				return describe('with brand info', function() {
+					beforeEach(function() {
+						this.TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+							exists: true,
+							exported: false,
+							has_owner: false,
+							name: 'A title',
+							has_assignment: false,
 							brand_info: 'f1000'
-						})
-						@TokenAccessController.readOnlyToken @req, @res, @next
+						});
+						return this.TokenAccessController.readOnlyToken(this.req, this.res, this.next);
+					});
 
-					it 'should render v2-import page', (done) ->
-						expect(@res.render.calledWith(
+					return it('should render v2-import page', function(done) {
+						expect(this.res.render.calledWith(
 							'project/v2-import',
 							{
 								projectId: 'abcd',
-								hasOwner: false
-								name: 'A title'
-								hasAssignment: false
+								hasOwner: false,
+								name: 'A title',
+								hasAssignment: false,
 								brandInfo: 'f1000'
 							}
-						)).to.equal true
-						done()
+						)).to.equal(true);
+						return done();
+					});
+				});
+			});
 
-			describe 'when project was exported from v1', ->
-				beforeEach ->
-					@req = new MockRequest()
-					@res = new MockResponse()
-					@res.redirect = sinon.stub()
-					@next = sinon.stub()
-					@req.params['read_only_token'] = 'abcd'
-					@TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
-						.callsArgWith(1, null, null, false)
-					@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
-						allow: true
-						exists: true
+			describe('when project was exported from v1', function() {
+				beforeEach(function() {
+					this.req = new MockRequest();
+					this.res = new MockResponse();
+					this.res.redirect = sinon.stub();
+					this.next = sinon.stub();
+					this.req.params['read_only_token'] = 'abcd';
+					this.TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
+						.callsArgWith(1, null, null, false);
+					this.TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+						allow: true,
+						exists: true,
 						exported: true
-					})
-					@TokenAccessController.readOnlyToken @req, @res, @next
+					});
+					return this.TokenAccessController.readOnlyToken(this.req, this.res, this.next);
+				});
 
-				it 'should call next with a not-found error', (done) ->
-					expect(@next.callCount).to.equal 1
-					done()
+				return it('should call next with a not-found error', function(done) {
+					expect(this.next.callCount).to.equal(1);
+					return done();
+				});
+			});
 
-			describe 'when token access is off, but user has higher access anyway', ->
-				beforeEach ->
-					@req = new MockRequest()
-					@res = new MockResponse()
-					@res.redirect = sinon.stub()
-					@next = sinon.stub()
-					@req.params['read_and_write_token'] = @readAndWriteToken
-					@TokenAccessHandler.findProjectWithReadAndWriteToken = sinon.stub()
-						.callsArgWith(1, null, null, true)
-					@TokenAccessHandler.findProjectWithHigherAccess =
+			describe('when token access is off, but user has higher access anyway', function() {
+				beforeEach(function() {
+					this.req = new MockRequest();
+					this.res = new MockResponse();
+					this.res.redirect = sinon.stub();
+					this.next = sinon.stub();
+					this.req.params['read_and_write_token'] = this.readAndWriteToken;
+					this.TokenAccessHandler.findProjectWithReadAndWriteToken = sinon.stub()
+						.callsArgWith(1, null, null, true);
+					this.TokenAccessHandler.findProjectWithHigherAccess =
 						sinon.stub()
-						.callsArgWith(2, null, @project)
-					@TokenAccessHandler.addReadAndWriteUserToProject = sinon.stub()
-						.callsArgWith(2, null)
-					@ProjectController.loadEditor = sinon.stub()
-					@TokenAccessController.readAndWriteToken @req, @res, @next
+						.callsArgWith(2, null, this.project);
+					this.TokenAccessHandler.addReadAndWriteUserToProject = sinon.stub()
+						.callsArgWith(2, null);
+					this.ProjectController.loadEditor = sinon.stub();
+					return this.TokenAccessController.readAndWriteToken(this.req, this.res, this.next);
+				});
 
-				it 'should try to find a project with this token', (done) ->
-					expect(@TokenAccessHandler.findProjectWithReadAndWriteToken.callCount)
-						.to.equal 1
-					expect(@TokenAccessHandler.findProjectWithReadAndWriteToken.calledWith(@readAndWriteToken))
-						.to.equal true
-					done()
+				it('should try to find a project with this token', function(done) {
+					expect(this.TokenAccessHandler.findProjectWithReadAndWriteToken.callCount)
+						.to.equal(1);
+					expect(this.TokenAccessHandler.findProjectWithReadAndWriteToken.calledWith(this.readAndWriteToken))
+						.to.equal(true);
+					return done();
+				});
 
-				it 'should check if user has higher access to the token project', (done) ->
+				it('should check if user has higher access to the token project', function(done) {
 					expect(
-						@TokenAccessHandler.findProjectWithHigherAccess.callCount
-					).to.equal 1
-					done()
+						this.TokenAccessHandler.findProjectWithHigherAccess.callCount
+					).to.equal(1);
+					return done();
+				});
 
-				it 'should not add the user to the project with read-write access', (done) ->
-					expect(@TokenAccessHandler.addReadAndWriteUserToProject.callCount)
-						.to.equal 0
-					done()
+				it('should not add the user to the project with read-write access', function(done) {
+					expect(this.TokenAccessHandler.addReadAndWriteUserToProject.callCount)
+						.to.equal(0);
+					return done();
+				});
 
-				it 'should not pass control to loadEditor', (done) ->
-					expect(@ProjectController.loadEditor.callCount).to.equal 0
-					expect(@ProjectController.loadEditor.calledWith(@req, @res, @next)).to.equal false
-					done()
+				it('should not pass control to loadEditor', function(done) {
+					expect(this.ProjectController.loadEditor.callCount).to.equal(0);
+					expect(this.ProjectController.loadEditor.calledWith(this.req, this.res, this.next)).to.equal(false);
+					return done();
+				});
 
-				it 'should not call next with a not-found error', (done) ->
-					expect(@next.callCount).to.equal 0
-					done()
+				it('should not call next with a not-found error', function(done) {
+					expect(this.next.callCount).to.equal(0);
+					return done();
+				});
 
-				it 'should redirect to the canonical project url', (done) ->
-					expect(@res.redirect.callCount).to.equal 1
-					expect(@res.redirect.calledWith(302, "/project/#{@project._id}")).to.equal true
-					done()
+				return it('should redirect to the canonical project url', function(done) {
+					expect(this.res.redirect.callCount).to.equal(1);
+					expect(this.res.redirect.calledWith(302, `/project/${this.project._id}`)).to.equal(true);
+					return done();
+				});
+			});
 
-			describe 'when higher access is not available', ->
-				beforeEach ->
-					@req = new MockRequest()
-					@res = new MockResponse()
-					@next = sinon.stub()
-					@req.params['read_and_write_token'] = @readAndWriteToken
-					@TokenAccessHandler.findProjectWithReadAndWriteToken = sinon.stub()
-						.callsArgWith(1, null, null, true)
-					@TokenAccessHandler.findProjectWithHigherAccess =
+			return describe('when higher access is not available', function() {
+				beforeEach(function() {
+					this.req = new MockRequest();
+					this.res = new MockResponse();
+					this.next = sinon.stub();
+					this.req.params['read_and_write_token'] = this.readAndWriteToken;
+					this.TokenAccessHandler.findProjectWithReadAndWriteToken = sinon.stub()
+						.callsArgWith(1, null, null, true);
+					this.TokenAccessHandler.findProjectWithHigherAccess =
 						sinon.stub()
-						.callsArgWith(2, null, null)
-					@TokenAccessHandler.addReadOnlyUserToProject = sinon.stub()
-						.callsArgWith(2, null)
-					@ProjectController.loadEditor = sinon.stub()
-					@TokenAccessController.readAndWriteToken @req, @res, @next
+						.callsArgWith(2, null, null);
+					this.TokenAccessHandler.addReadOnlyUserToProject = sinon.stub()
+						.callsArgWith(2, null);
+					this.ProjectController.loadEditor = sinon.stub();
+					return this.TokenAccessController.readAndWriteToken(this.req, this.res, this.next);
+				});
 
-				it 'should try to find a project with this token', (done) ->
-					expect(@TokenAccessHandler.findProjectWithReadAndWriteToken.callCount)
-						.to.equal 1
-					expect(@TokenAccessHandler.findProjectWithReadAndWriteToken.calledWith(
-						@readAndWriteToken
-					)).to.equal true
-					done()
+				it('should try to find a project with this token', function(done) {
+					expect(this.TokenAccessHandler.findProjectWithReadAndWriteToken.callCount)
+						.to.equal(1);
+					expect(this.TokenAccessHandler.findProjectWithReadAndWriteToken.calledWith(
+						this.readAndWriteToken
+					)).to.equal(true);
+					return done();
+				});
 
-				it 'should check if user has higher access to the token project', (done) ->
+				it('should check if user has higher access to the token project', function(done) {
 					expect(
-						@TokenAccessHandler.findProjectWithHigherAccess.callCount
-					).to.equal 1
-					done()
+						this.TokenAccessHandler.findProjectWithHigherAccess.callCount
+					).to.equal(1);
+					return done();
+				});
 
-				it 'should not add the user to the project with read-write access', (done) ->
-					expect(@TokenAccessHandler.addReadOnlyUserToProject.callCount)
-						.to.equal 0
-					done()
+				it('should not add the user to the project with read-write access', function(done) {
+					expect(this.TokenAccessHandler.addReadOnlyUserToProject.callCount)
+						.to.equal(0);
+					return done();
+				});
 
-				it 'should not pass control to loadEditor', (done) ->
-					expect(@ProjectController.loadEditor.callCount).to.equal 0
-					expect(@ProjectController.loadEditor.calledWith(@req, @res, @next)).to.equal false
-					done()
+				it('should not pass control to loadEditor', function(done) {
+					expect(this.ProjectController.loadEditor.callCount).to.equal(0);
+					expect(this.ProjectController.loadEditor.calledWith(this.req, this.res, this.next)).to.equal(false);
+					return done();
+				});
 
-				it 'should call next with a not-found error', (done) ->
-					expect(@next.callCount).to.equal 1
-					expect(@next.lastCall.args[0]).to.be.instanceof Error
-					done()
+				return it('should call next with a not-found error', function(done) {
+					expect(this.next.callCount).to.equal(1);
+					expect(this.next.lastCall.args[0]).to.be.instanceof(Error);
+					return done();
+				});
+			});
+		});
 
-		describe 'when adding user to project produces an error', ->
-			beforeEach ->
-				@req = new MockRequest()
-				@res = new MockResponse()
-				@next = sinon.stub()
-				@req.params['read_only_token'] = @readOnlyToken
-				@TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
-					.callsArgWith(1, null, @project, true)
-				@TokenAccessHandler.addReadOnlyUserToProject = sinon.stub()
-					.callsArgWith(2, new Error('woops'))
-				@ProjectController.loadEditor = sinon.stub()
-				@TokenAccessController.readOnlyToken @req, @res, @next
+		describe('when adding user to project produces an error', function() {
+			beforeEach(function() {
+				this.req = new MockRequest();
+				this.res = new MockResponse();
+				this.next = sinon.stub();
+				this.req.params['read_only_token'] = this.readOnlyToken;
+				this.TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
+					.callsArgWith(1, null, this.project, true);
+				this.TokenAccessHandler.addReadOnlyUserToProject = sinon.stub()
+					.callsArgWith(2, new Error('woops'));
+				this.ProjectController.loadEditor = sinon.stub();
+				return this.TokenAccessController.readOnlyToken(this.req, this.res, this.next);
+			});
 
-			it 'should try to find a project with this token', (done) ->
-				expect(@TokenAccessHandler.findProjectWithReadOnlyToken.callCount)
-					.to.equal 1
-				expect(@TokenAccessHandler.findProjectWithReadOnlyToken.calledWith(@readOnlyToken))
-					.to.equal true
-				done()
+			it('should try to find a project with this token', function(done) {
+				expect(this.TokenAccessHandler.findProjectWithReadOnlyToken.callCount)
+					.to.equal(1);
+				expect(this.TokenAccessHandler.findProjectWithReadOnlyToken.calledWith(this.readOnlyToken))
+					.to.equal(true);
+				return done();
+			});
 
-			it 'should add the user to the project with read-only access', (done) ->
-				expect(@TokenAccessHandler.addReadOnlyUserToProject.callCount)
-					.to.equal 1
-				expect(@TokenAccessHandler.addReadOnlyUserToProject.calledWith(
-					@userId.toString(), @projectId
+			it('should add the user to the project with read-only access', function(done) {
+				expect(this.TokenAccessHandler.addReadOnlyUserToProject.callCount)
+					.to.equal(1);
+				expect(this.TokenAccessHandler.addReadOnlyUserToProject.calledWith(
+					this.userId.toString(), this.projectId
 				))
-					.to.equal true
-				done()
+					.to.equal(true);
+				return done();
+			});
 
-			it 'should not pass control to loadEditor', (done) ->
-				expect(@ProjectController.loadEditor.callCount).to.equal 0
-				expect(@ProjectController.loadEditor.calledWith(@req, @res, @next)).to.equal false
-				done()
+			it('should not pass control to loadEditor', function(done) {
+				expect(this.ProjectController.loadEditor.callCount).to.equal(0);
+				expect(this.ProjectController.loadEditor.calledWith(this.req, this.res, this.next)).to.equal(false);
+				return done();
+			});
 
-			it 'should call next with an error', (done) ->
-				expect(@next.callCount).to.equal 1
-				expect(@next.lastCall.args[0]).to.be.instanceof Error
-				done()
+			return it('should call next with an error', function(done) {
+				expect(this.next.callCount).to.equal(1);
+				expect(this.next.lastCall.args[0]).to.be.instanceof(Error);
+				return done();
+			});
+		});
 
-		describe 'anonymous', ->
-			beforeEach ->
-				@AuthenticationController.getLoggedInUserId = sinon.stub().returns(null)
-				@TokenAccessHandler.grantSessionTokenAccess = sinon.stub()
+		return describe('anonymous', function() {
+			beforeEach(function() {
+				this.AuthenticationController.getLoggedInUserId = sinon.stub().returns(null);
+				return this.TokenAccessHandler.grantSessionTokenAccess = sinon.stub();
+			});
 
-			describe 'when all goes well', ->
-				beforeEach ->
-					@req = new MockRequest()
-					@res = new MockResponse()
-					@next = sinon.stub()
-					@req.params['read_only_token'] = @readOnlyToken
-					@TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
-						.callsArgWith(1, null, @project, true)
-					@TokenAccessHandler.addReadOnlyUserToProject = sinon.stub()
-						.callsArgWith(2, null)
-					@ProjectController.loadEditor = sinon.stub()
-					@TokenAccessController.readOnlyToken @req, @res, @next
+			describe('when all goes well', function() {
+				beforeEach(function() {
+					this.req = new MockRequest();
+					this.res = new MockResponse();
+					this.next = sinon.stub();
+					this.req.params['read_only_token'] = this.readOnlyToken;
+					this.TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
+						.callsArgWith(1, null, this.project, true);
+					this.TokenAccessHandler.addReadOnlyUserToProject = sinon.stub()
+						.callsArgWith(2, null);
+					this.ProjectController.loadEditor = sinon.stub();
+					return this.TokenAccessController.readOnlyToken(this.req, this.res, this.next);
+				});
 
-				it 'should try to find a project with this token', (done) ->
-					expect(@TokenAccessHandler.findProjectWithReadOnlyToken.callCount)
-						.to.equal 1
-					expect(@TokenAccessHandler.findProjectWithReadOnlyToken.calledWith(@readOnlyToken))
-						.to.equal true
-					done()
+				it('should try to find a project with this token', function(done) {
+					expect(this.TokenAccessHandler.findProjectWithReadOnlyToken.callCount)
+						.to.equal(1);
+					expect(this.TokenAccessHandler.findProjectWithReadOnlyToken.calledWith(this.readOnlyToken))
+						.to.equal(true);
+					return done();
+				});
 
-				it 'should give the user session read-only access', (done) ->
-					expect(@TokenAccessHandler.grantSessionTokenAccess.callCount)
-						.to.equal 1
-					expect(@TokenAccessHandler.grantSessionTokenAccess.calledWith(
-						@req, @projectId, @readOnlyToken
+				it('should give the user session read-only access', function(done) {
+					expect(this.TokenAccessHandler.grantSessionTokenAccess.callCount)
+						.to.equal(1);
+					expect(this.TokenAccessHandler.grantSessionTokenAccess.calledWith(
+						this.req, this.projectId, this.readOnlyToken
 					))
-						.to.equal true
-					done()
+						.to.equal(true);
+					return done();
+				});
 
-				it 'should not add the user to the project with read-only access', (done) ->
-					expect(@TokenAccessHandler.addReadOnlyUserToProject.callCount)
-						.to.equal 0
-					done()
+				it('should not add the user to the project with read-only access', function(done) {
+					expect(this.TokenAccessHandler.addReadOnlyUserToProject.callCount)
+						.to.equal(0);
+					return done();
+				});
 
-				it 'should pass control to loadEditor', (done) ->
-					expect(@req.params.Project_id).to.equal @projectId.toString()
-					expect(@req._anonymousAccessToken).to.equal @readOnlyToken
-					expect(@ProjectController.loadEditor.callCount).to.equal 1
-					expect(@ProjectController.loadEditor.calledWith(@req, @res, @next)).to.equal true
-					done()
+				return it('should pass control to loadEditor', function(done) {
+					expect(this.req.params.Project_id).to.equal(this.projectId.toString());
+					expect(this.req._anonymousAccessToken).to.equal(this.readOnlyToken);
+					expect(this.ProjectController.loadEditor.callCount).to.equal(1);
+					expect(this.ProjectController.loadEditor.calledWith(this.req, this.res, this.next)).to.equal(true);
+					return done();
+				});
+			});
 
-			describe 'when findProject produces an error', ->
-				beforeEach ->
-					@req = new MockRequest()
-					@res = new MockResponse()
-					@next = sinon.stub()
-					@req.params['read_only_token'] = @readOnlyToken
-					@TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
-						.callsArgWith(1, new Error('woops'))
-					@TokenAccessHandler.addReadOnlyUserToProject = sinon.stub()
-						.callsArgWith(2, null)
-					@ProjectController.loadEditor = sinon.stub()
-					@TokenAccessController.readOnlyToken @req, @res, @next
+			describe('when findProject produces an error', function() {
+				beforeEach(function() {
+					this.req = new MockRequest();
+					this.res = new MockResponse();
+					this.next = sinon.stub();
+					this.req.params['read_only_token'] = this.readOnlyToken;
+					this.TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
+						.callsArgWith(1, new Error('woops'));
+					this.TokenAccessHandler.addReadOnlyUserToProject = sinon.stub()
+						.callsArgWith(2, null);
+					this.ProjectController.loadEditor = sinon.stub();
+					return this.TokenAccessController.readOnlyToken(this.req, this.res, this.next);
+				});
 
-				it 'should try to find a project with this token', (done) ->
-					expect(@TokenAccessHandler.findProjectWithReadOnlyToken.callCount)
-						.to.equal 1
-					expect(@TokenAccessHandler.findProjectWithReadOnlyToken.calledWith(@readOnlyToken))
-						.to.equal true
-					done()
+				it('should try to find a project with this token', function(done) {
+					expect(this.TokenAccessHandler.findProjectWithReadOnlyToken.callCount)
+						.to.equal(1);
+					expect(this.TokenAccessHandler.findProjectWithReadOnlyToken.calledWith(this.readOnlyToken))
+						.to.equal(true);
+					return done();
+				});
 
-				it 'should not give the user session read-only access', (done) ->
-					expect(@TokenAccessHandler.grantSessionTokenAccess.callCount)
-						.to.equal 0
-					done()
+				it('should not give the user session read-only access', function(done) {
+					expect(this.TokenAccessHandler.grantSessionTokenAccess.callCount)
+						.to.equal(0);
+					return done();
+				});
 
-				it 'should not add the user to the project with read-only access', (done) ->
-					expect(@TokenAccessHandler.addReadOnlyUserToProject.callCount)
-						.to.equal 0
-					done()
+				it('should not add the user to the project with read-only access', function(done) {
+					expect(this.TokenAccessHandler.addReadOnlyUserToProject.callCount)
+						.to.equal(0);
+					return done();
+				});
 
-				it 'should not pass control to loadEditor', (done) ->
-					expect(@ProjectController.loadEditor.callCount).to.equal 0
-					expect(@ProjectController.loadEditor.calledWith(@req, @res, @next)).to.equal false
-					done()
+				it('should not pass control to loadEditor', function(done) {
+					expect(this.ProjectController.loadEditor.callCount).to.equal(0);
+					expect(this.ProjectController.loadEditor.calledWith(this.req, this.res, this.next)).to.equal(false);
+					return done();
+				});
 
-				it 'should call next with an error', (done) ->
-					expect(@next.callCount).to.equal 1
-					expect(@next.lastCall.args[0]).to.be.instanceof Error
-					done()
+				return it('should call next with an error', function(done) {
+					expect(this.next.callCount).to.equal(1);
+					expect(this.next.lastCall.args[0]).to.be.instanceof(Error);
+					return done();
+				});
+			});
 
-			describe 'when findProject does not find a project', ->
-				beforeEach ->
-					@req = new MockRequest()
-					@res = new MockResponse()
-					@res.redirect = sinon.stub()
-					@next = sinon.stub()
-					@req.params['read_only_token'] = @readOnlyToken
-					@AuthenticationController.getLoggedInUserId = sinon.stub().returns(@userId.toString())
-					@TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
-						.callsArgWith(1, null, false)
-					@TokenAccessHandler.addReadOnlyUserToProject = sinon.stub()
+			return describe('when findProject does not find a project', function() {
+				beforeEach(function() {
+					this.req = new MockRequest();
+					this.res = new MockResponse();
+					this.res.redirect = sinon.stub();
+					this.next = sinon.stub();
+					this.req.params['read_only_token'] = this.readOnlyToken;
+					this.AuthenticationController.getLoggedInUserId = sinon.stub().returns(this.userId.toString());
+					this.TokenAccessHandler.findProjectWithReadOnlyToken = sinon.stub()
+						.callsArgWith(1, null, false);
+					return this.TokenAccessHandler.addReadOnlyUserToProject = sinon.stub();
+				});
 
-				describe 'when project does not exist', ->
-					beforeEach ->
-						@TokenAccessController.readOnlyToken @req, @res, @next
+				describe('when project does not exist', function() {
+					beforeEach(function() {
+						return this.TokenAccessController.readOnlyToken(this.req, this.res, this.next);
+					});
 
-					it 'should try to find a project with this token', (done) ->
-						expect(@TokenAccessHandler.findProjectWithReadOnlyToken.callCount)
-							.to.equal 1
-						expect(@TokenAccessHandler.findProjectWithReadOnlyToken.calledWith(@readOnlyToken))
-							.to.equal true
-						done()
+					it('should try to find a project with this token', function(done) {
+						expect(this.TokenAccessHandler.findProjectWithReadOnlyToken.callCount)
+							.to.equal(1);
+						expect(this.TokenAccessHandler.findProjectWithReadOnlyToken.calledWith(this.readOnlyToken))
+							.to.equal(true);
+						return done();
+					});
 
-					it 'should not give the user session read-only access', (done) ->
-						expect(@TokenAccessHandler.grantSessionTokenAccess.callCount)
-							.to.equal 0
-						done()
+					it('should not give the user session read-only access', function(done) {
+						expect(this.TokenAccessHandler.grantSessionTokenAccess.callCount)
+							.to.equal(0);
+						return done();
+					});
 
-					it 'should not add the user to the project with read-only access', (done) ->
-						expect(@TokenAccessHandler.addReadOnlyUserToProject.callCount)
-							.to.equal 0
-						done()
+					return it('should not add the user to the project with read-only access', function(done) {
+						expect(this.TokenAccessHandler.addReadOnlyUserToProject.callCount)
+							.to.equal(0);
+						return done();
+					});
+				});
 
-				describe 'when project was exported to v2', ->
-					beforeEach ->
-						@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
-							exists: true
+				describe('when project was exported to v2', function() {
+					beforeEach(function() {
+						this.TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+							exists: true,
 							exported: true
-						})
-						@TokenAccessController.readOnlyToken @req, @res, @next
+						});
+						return this.TokenAccessController.readOnlyToken(this.req, this.res, this.next);
+					});
 
-					it 'should call next with not found error', (done) ->
-						expect(@next.callCount).to.equal 1
-						expect(@next.calledWith(new Errors.NotFoundError())).to.equal true
-						done()
+					return it('should call next with not found error', function(done) {
+						expect(this.next.callCount).to.equal(1);
+						expect(this.next.calledWith(new Errors.NotFoundError())).to.equal(true);
+						return done();
+					});
+				});
 
-				describe 'when project was not exported to v2', ->
-					beforeEach ->
-						@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
-							exists: true
+				describe('when project was not exported to v2', function() {
+					beforeEach(function() {
+						this.TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+							exists: true,
 							exported: false
-						})
-						@TokenAccessController.readOnlyToken @req, @res, @next
+						});
+						return this.TokenAccessController.readOnlyToken(this.req, this.res, this.next);
+					});
 
-					it 'should redirect to v1', (done) ->
-						expect(@res.redirect.callCount).to.equal 1
-						expect(@res.redirect.calledWith(
+					return it('should redirect to v1', function(done) {
+						expect(this.res.redirect.callCount).to.equal(1);
+						expect(this.res.redirect.calledWith(
 							302,
-							"/sign_in_to_v1?return_to=/read/#{@readOnlyToken}"
-						)).to.equal true
-						done()
+							`/sign_in_to_v1?return_to=/read/${this.readOnlyToken}`
+						)).to.equal(true);
+						return done();
+					});
+				});
 
-				describe 'when project does not exist on v1', ->
-					beforeEach ->
-						@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+				describe('when project does not exist on v1', function() {
+					beforeEach(function() {
+						this.TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
 							exists: false,
 							exported: false
-						})
-						@TokenAccessController.readOnlyToken @req, @res, @next
+						});
+						return this.TokenAccessController.readOnlyToken(this.req, this.res, this.next);
+					});
 
-					it 'should call next with not found error', (done) ->
-						expect(@next.callCount).to.equal 1
-						expect(@next.calledWith(new Errors.NotFoundError())).to.equal true
-						done()
+					return it('should call next with not found error', function(done) {
+						expect(this.next.callCount).to.equal(1);
+						expect(this.next.calledWith(new Errors.NotFoundError())).to.equal(true);
+						return done();
+					});
+				});
 
-				describe 'anonymous user', ->
-					beforeEach ->
-						@AuthenticationController.getLoggedInUserId = sinon.stub().returns(null)
+				return describe('anonymous user', function() {
+					beforeEach(function() {
+						return this.AuthenticationController.getLoggedInUserId = sinon.stub().returns(null);
+					});
 
-					describe 'when project was not exported to v2', ->
-						beforeEach ->
-							@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
-								exists: true
+					describe('when project was not exported to v2', function() {
+						beforeEach(function() {
+							this.TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+								exists: true,
 								exported: false
-							})
-							@TokenAccessController.readOnlyToken @req, @res, @next
+							});
+							return this.TokenAccessController.readOnlyToken(this.req, this.res, this.next);
+						});
 
-						it 'should redirect to v1', (done) ->
-							expect(@res.redirect.callCount).to.equal 1
-							expect(@res.redirect.calledWith(
+						return it('should redirect to v1', function(done) {
+							expect(this.res.redirect.callCount).to.equal(1);
+							expect(this.res.redirect.calledWith(
 								302,
-								"/sign_in_to_v1?return_to=/read/#{@readOnlyToken}"
-							)).to.equal true
-							done()
+								`/sign_in_to_v1?return_to=/read/${this.readOnlyToken}`
+							)).to.equal(true);
+							return done();
+						});
+					});
 
-					describe 'force-import-to-v2 flag is on', ->
-						beforeEach ->
-							@res.render = sinon.stub()
-							@Features.hasFeature.returns(true)
+					return describe('force-import-to-v2 flag is on', function() {
+						beforeEach(function() {
+							this.res.render = sinon.stub();
+							return this.Features.hasFeature.returns(true);
+						});
 
-						describe 'when project was not exported to v2', ->
-							beforeEach ->
-								@TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
-									exists: true
+						return describe('when project was not exported to v2', function() {
+							beforeEach(function() {
+								this.TokenAccessHandler.getV1DocInfo = sinon.stub().yields(null, {
+									exists: true,
 									exported: false
-								})
-								@TokenAccessController.readOnlyToken @req, @res, @next
+								});
+								return this.TokenAccessController.readOnlyToken(this.req, this.res, this.next);
+							});
 
-							it 'should render anonymous import status page', (done) ->
-								expect(@res.render.callCount).to.equal 1
-								expect(@res.render.calledWith(
+							return it('should render anonymous import status page', function(done) {
+								expect(this.res.render.callCount).to.equal(1);
+								expect(this.res.render.calledWith(
 									'project/v2-import',
-									{ loginRedirect: "/read/#{@readOnlyToken}" }
-								)).to.equal true
-								done()
+									{ loginRedirect: `/read/${this.readOnlyToken}` }
+								)).to.equal(true);
+								return done();
+							});
+						});
+					});
+				});
+			});
+		});
+	});
+});
 

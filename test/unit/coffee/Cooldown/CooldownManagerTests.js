@@ -1,120 +1,169 @@
-SandboxedModule = require('sandboxed-module')
-sinon = require('sinon')
-require('chai').should()
-expect = require('chai').expect
-modulePath = require('path').join __dirname, '../../../../app/js/Features/Cooldown/CooldownManager'
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const SandboxedModule = require('sandboxed-module');
+const sinon = require('sinon');
+require('chai').should();
+const {
+    expect
+} = require('chai');
+const modulePath = require('path').join(__dirname, '../../../../app/js/Features/Cooldown/CooldownManager');
 
 
-describe "CooldownManager", ->
+describe("CooldownManager", function() {
 
-	beforeEach ->
-		@projectId = 'abcdefg'
-		@rclient = {set: sinon.stub(), get: sinon.stub()}
-		@RedisWrapper =
-			client: () => @rclient
-		@CooldownManager = SandboxedModule.require modulePath, requires:
-			'../../infrastructure/RedisWrapper': @RedisWrapper
+	beforeEach(function() {
+		this.projectId = 'abcdefg';
+		this.rclient = {set: sinon.stub(), get: sinon.stub()};
+		this.RedisWrapper =
+			{client: () => this.rclient};
+		return this.CooldownManager = SandboxedModule.require(modulePath, { requires: {
+			'../../infrastructure/RedisWrapper': this.RedisWrapper,
 			'logger-sharelatex': {log: sinon.stub()}
+		}
+	});});
 
-	describe '_buildKey', ->
+	describe('_buildKey', () => it('should build a properly formatted redis key', function() {
+        return expect(this.CooldownManager._buildKey('ABC')).to.equal('Cooldown:{ABC}');
+    }));
 
-		it 'should build a properly formatted redis key', ->
-			expect(@CooldownManager._buildKey('ABC')).to.equal 'Cooldown:{ABC}'
+	describe('isProjectOnCooldown', function() {
+		beforeEach(function() {
+			return this.call = cb => {
+				return this.CooldownManager.isProjectOnCooldown(this.projectId, cb);
+			};
+		});
 
-	describe 'isProjectOnCooldown', ->
-		beforeEach ->
-			@call = (cb) =>
-				@CooldownManager.isProjectOnCooldown @projectId, cb
+		describe('when project is on cooldown', function() {
+			beforeEach(function() {
+				return this.rclient.get = sinon.stub().callsArgWith(1, null, '1');
+			});
 
-		describe 'when project is on cooldown', ->
-			beforeEach ->
-				@rclient.get = sinon.stub().callsArgWith(1, null, '1')
+			it('should fetch key from redis', function(done) {
+				return this.call((err, result) => {
+					this.rclient.get.callCount.should.equal(1);
+					this.rclient.get.calledWith('Cooldown:{abcdefg}').should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should fetch key from redis', (done) ->
-				@call (err, result) =>
-					@rclient.get.callCount.should.equal 1
-					@rclient.get.calledWith('Cooldown:{abcdefg}').should.equal true
-					done()
+			it('should not produce an error', function(done) {
+				return this.call((err, result) => {
+					expect(err).to.equal(null);
+					return done();
+				});
+			});
 
-			it 'should not produce an error', (done) ->
-				@call (err, result) =>
-					expect(err).to.equal null
-					done()
+			return it('should produce a true result', function(done) {
+				return this.call((err, result) => {
+					expect(result).to.equal(true);
+					return done();
+				});
+			});
+		});
 
-			it 'should produce a true result', (done) ->
-				@call (err, result) =>
-					expect(result).to.equal true
-					done()
+		describe('when project is not on cooldown', function() {
+			beforeEach(function() {
+				return this.rclient.get = sinon.stub().callsArgWith(1, null, null);
+			});
 
-		describe 'when project is not on cooldown', ->
-			beforeEach ->
-				@rclient.get = sinon.stub().callsArgWith(1, null, null)
+			it('should fetch key from redis', function(done) {
+				return this.call((err, result) => {
+					this.rclient.get.callCount.should.equal(1);
+					this.rclient.get.calledWith('Cooldown:{abcdefg}').should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should fetch key from redis', (done) ->
-				@call (err, result) =>
-					@rclient.get.callCount.should.equal 1
-					@rclient.get.calledWith('Cooldown:{abcdefg}').should.equal true
-					done()
+			it('should not produce an error', function(done) {
+				return this.call((err, result) => {
+					expect(err).to.equal(null);
+					return done();
+				});
+			});
 
-			it 'should not produce an error', (done) ->
-				@call (err, result) =>
-					expect(err).to.equal null
-					done()
+			return it('should produce a false result', function(done) {
+				return this.call((err, result) => {
+					expect(result).to.equal(false);
+					return done();
+				});
+			});
+		});
 
-			it 'should produce a false result', (done) ->
-				@call (err, result) =>
-					expect(result).to.equal false
-					done()
+		return describe('when rclient.get produces an error', function() {
+			beforeEach(function() {
+				return this.rclient.get = sinon.stub().callsArgWith(1, new Error('woops'));
+			});
 
-		describe 'when rclient.get produces an error', ->
-			beforeEach ->
-				@rclient.get = sinon.stub().callsArgWith(1, new Error('woops'))
+			it('should fetch key from redis', function(done) {
+				return this.call((err, result) => {
+					this.rclient.get.callCount.should.equal(1);
+					this.rclient.get.calledWith('Cooldown:{abcdefg}').should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should fetch key from redis', (done) ->
-				@call (err, result) =>
-					@rclient.get.callCount.should.equal 1
-					@rclient.get.calledWith('Cooldown:{abcdefg}').should.equal true
-					done()
+			return it('should produce an error', function(done) {
+				return this.call((err, result) => {
+					expect(err).to.not.equal(null);
+					expect(err).to.be.instanceof(Error);
+					return done();
+				});
+			});
+		});
+	});
 
-			it 'should produce an error', (done) ->
-				@call (err, result) =>
-					expect(err).to.not.equal null
-					expect(err).to.be.instanceof Error
-					done()
+	return describe('putProjectOnCooldown', function() {
 
-	describe 'putProjectOnCooldown', ->
+		beforeEach(function() {
+			return this.call = cb => {
+				return this.CooldownManager.putProjectOnCooldown(this.projectId, cb);
+			};
+		});
 
-		beforeEach ->
-			@call = (cb) =>
-				@CooldownManager.putProjectOnCooldown @projectId, cb
+		describe('when rclient.set does not produce an error', function() {
+			beforeEach(function() {
+				return this.rclient.set = sinon.stub().callsArgWith(4, null);
+			});
 
-		describe 'when rclient.set does not produce an error', ->
-			beforeEach ->
-				@rclient.set = sinon.stub().callsArgWith(4, null)
+			it('should set a key in redis', function(done) {
+				return this.call(err => {
+					this.rclient.set.callCount.should.equal(1);
+					this.rclient.set.calledWith('Cooldown:{abcdefg}').should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should set a key in redis', (done) ->
-				@call (err) =>
-					@rclient.set.callCount.should.equal 1
-					@rclient.set.calledWith('Cooldown:{abcdefg}').should.equal true
-					done()
+			return it('should not produce an error', function(done) {
+				return this.call(err => {
+					expect(err).to.equal(null);
+					return done();
+				});
+			});
+		});
 
-			it 'should not produce an error', (done) ->
-				@call (err) =>
-					expect(err).to.equal null
-					done()
+		return describe('when rclient.set produces an error', function() {
+			beforeEach(function() {
+				return this.rclient.set = sinon.stub().callsArgWith(4, new Error('woops'));
+			});
 
-		describe 'when rclient.set produces an error', ->
-			beforeEach ->
-				@rclient.set = sinon.stub().callsArgWith(4, new Error('woops'))
+			it('should set a key in redis', function(done) {
+				return this.call(err => {
+					this.rclient.set.callCount.should.equal(1);
+					this.rclient.set.calledWith('Cooldown:{abcdefg}').should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should set a key in redis', (done) ->
-				@call (err) =>
-					@rclient.set.callCount.should.equal 1
-					@rclient.set.calledWith('Cooldown:{abcdefg}').should.equal true
-					done()
-
-			it 'produce an error', (done) ->
-				@call (err) =>
-					expect(err).to.not.equal null
-					expect(err).to.be.instanceof Error
-					done()
+			return it('produce an error', function(done) {
+				return this.call(err => {
+					expect(err).to.not.equal(null);
+					expect(err).to.be.instanceof(Error);
+					return done();
+				});
+			});
+		});
+	});
+});

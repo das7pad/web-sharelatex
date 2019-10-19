@@ -1,100 +1,138 @@
-should = require('chai').should()
-SandboxedModule = require('sandboxed-module')
-assert = require('assert')
-path = require('path')
-modulePath = path.join __dirname, '../../../../app/js/Features/BetaProgram/BetaProgramHandler'
-sinon = require("sinon")
-expect = require("chai").expect
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const should = require('chai').should();
+const SandboxedModule = require('sandboxed-module');
+const assert = require('assert');
+const path = require('path');
+const modulePath = path.join(__dirname, '../../../../app/js/Features/BetaProgram/BetaProgramHandler');
+const sinon = require("sinon");
+const {
+    expect
+} = require("chai");
 
 
-describe 'BetaProgramHandler', ->
+describe('BetaProgramHandler', function() {
 
-	beforeEach ->
-		@user_id = "some_id"
-		@user =
-			_id: @user_id
-			email: 'user@example.com'
-			features: {}
-			betaProgram: false
+	beforeEach(function() {
+		this.user_id = "some_id";
+		this.user = {
+			_id: this.user_id,
+			email: 'user@example.com',
+			features: {},
+			betaProgram: false,
 			save: sinon.stub().callsArgWith(0, null)
-		@handler = SandboxedModule.require modulePath, requires:
+		};
+		return this.handler = SandboxedModule.require(modulePath, { requires: {
 			"../../models/User": {
-				User:
-					findById: sinon.stub().callsArgWith(1, null, @user)
+				User: {
+					findById: sinon.stub().callsArgWith(1, null, this.user)
+				}
 			},
-			"logger-sharelatex": @logger = {
-				log: sinon.stub()
+			"logger-sharelatex": (this.logger = {
+				log: sinon.stub(),
 				err: sinon.stub()
-			},
-			"metrics-sharelatex": @logger = {
+			}),
+			"metrics-sharelatex": (this.logger = {
 				inc: sinon.stub()
-			}
+			})
+		}
+	});});
 
 
-	describe "optIn", ->
+	describe("optIn", function() {
 
-		beforeEach ->
-			@user.betaProgram = false
-			@call = (callback) =>
-				@handler.optIn @user_id, callback
+		beforeEach(function() {
+			this.user.betaProgram = false;
+			return this.call = callback => {
+				return this.handler.optIn(this.user_id, callback);
+			};
+		});
 
-		it "should set betaProgram = true on user object", (done) ->
-			@call (err) =>
-				@user.betaProgram.should.equal true
-				done()
+		it("should set betaProgram = true on user object", function(done) {
+			return this.call(err => {
+				this.user.betaProgram.should.equal(true);
+				return done();
+			});
+		});
 
-		it "should call user.save", (done) ->
-			@call (err) =>
-				@user.save.callCount.should.equal 1
-				done()
+		it("should call user.save", function(done) {
+			return this.call(err => {
+				this.user.save.callCount.should.equal(1);
+				return done();
+			});
+		});
 
-		it "should not produce an error", (done) ->
-			@call (err) =>
-				expect(err).to.equal null
-				expect(err).to.not.be.instanceof Error
-				done()
+		it("should not produce an error", function(done) {
+			return this.call(err => {
+				expect(err).to.equal(null);
+				expect(err).to.not.be.instanceof(Error);
+				return done();
+			});
+		});
 
-		describe "when user.save produces an error", ->
+		return describe("when user.save produces an error", function() {
 
-			beforeEach ->
-				@user.save.callsArgWith(0, new Error('woops'))
+			beforeEach(function() {
+				return this.user.save.callsArgWith(0, new Error('woops'));
+			});
 
-			it "should produce an error", (done) ->
-				@call (err) =>
-					expect(err).to.not.equal null
-					expect(err).to.be.instanceof Error
-					done()
+			return it("should produce an error", function(done) {
+				return this.call(err => {
+					expect(err).to.not.equal(null);
+					expect(err).to.be.instanceof(Error);
+					return done();
+				});
+			});
+		});
+	});
 
-	describe "optOut", ->
+	return describe("optOut", function() {
 
-		beforeEach ->
-			@user.betaProgram = true
-			@call = (callback) =>
-				@handler.optOut @user_id, callback
+		beforeEach(function() {
+			this.user.betaProgram = true;
+			return this.call = callback => {
+				return this.handler.optOut(this.user_id, callback);
+			};
+		});
 
-		it "should set betaProgram = true on user object", (done) ->
-			@call (err) =>
-				@user.betaProgram.should.equal false
-				done()
+		it("should set betaProgram = true on user object", function(done) {
+			return this.call(err => {
+				this.user.betaProgram.should.equal(false);
+				return done();
+			});
+		});
 
-		it "should call user.save", (done) ->
-			@call (err) =>
-				@user.save.callCount.should.equal 1
-				done()
+		it("should call user.save", function(done) {
+			return this.call(err => {
+				this.user.save.callCount.should.equal(1);
+				return done();
+			});
+		});
 
-		it "should not produce an error", (done) ->
-			@call (err) =>
-				expect(err).to.equal null
-				expect(err).to.not.be.instanceof Error
-				done()
+		it("should not produce an error", function(done) {
+			return this.call(err => {
+				expect(err).to.equal(null);
+				expect(err).to.not.be.instanceof(Error);
+				return done();
+			});
+		});
 
-		describe "when user.save produces an error", ->
+		return describe("when user.save produces an error", function() {
 
-			beforeEach ->
-				@user.save.callsArgWith(0, new Error('woops'))
+			beforeEach(function() {
+				return this.user.save.callsArgWith(0, new Error('woops'));
+			});
 
-			it "should produce an error", (done) ->
-				@call (err) =>
-					expect(err).to.not.equal null
-					expect(err).to.be.instanceof Error
-					done()
+			return it("should produce an error", function(done) {
+				return this.call(err => {
+					expect(err).to.not.equal(null);
+					expect(err).to.be.instanceof(Error);
+					return done();
+				});
+			});
+		});
+	});
+});

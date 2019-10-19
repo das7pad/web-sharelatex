@@ -1,45 +1,62 @@
-SandboxedModule = require('sandboxed-module')
-sinon = require('sinon')
-require('chai').should()
-modulePath = require('path').join __dirname, '../../../../app/js/Features/Editor/EditorRealTimeController'
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const SandboxedModule = require('sandboxed-module');
+const sinon = require('sinon');
+require('chai').should();
+const modulePath = require('path').join(__dirname, '../../../../app/js/Features/Editor/EditorRealTimeController');
 
-describe "EditorRealTimeController", ->
-	beforeEach ->
-		@rclient =
-			publish: sinon.stub()
-		@EditorRealTimeController = SandboxedModule.require modulePath, requires:
-			"../../infrastructure/RedisWrapper":
-				client: () => @rclient
-			"../../infrastructure/Server" : io: @io = {}
-			"settings-sharelatex":{redis:{}}
-			"crypto": @crypto = { randomBytes: sinon.stub().withArgs(4).returns(Buffer.from([0x1, 0x2, 0x3, 0x4])) }
-			"os": @os = {hostname: sinon.stub().returns("somehost")}
+describe("EditorRealTimeController", function() {
+	beforeEach(function() {
+		this.rclient =
+			{publish: sinon.stub()};
+		this.EditorRealTimeController = SandboxedModule.require(modulePath, { requires: {
+			"../../infrastructure/RedisWrapper": {
+				client: () => this.rclient
+			},
+			"../../infrastructure/Server" : { io: (this.io = {})
+		},
+			"settings-sharelatex":{redis:{}},
+			"crypto": (this.crypto = { randomBytes: sinon.stub().withArgs(4).returns(Buffer.from([0x1, 0x2, 0x3, 0x4])) }),
+			"os": (this.os = {hostname: sinon.stub().returns("somehost")})
+		}
+	});
 
-		@room_id = "room-id"
-		@message = "message-to-editor"
-		@payload = ["argument one", 42]
+		this.room_id = "room-id";
+		this.message = "message-to-editor";
+		return this.payload = ["argument one", 42];});
 
-	describe "emitToRoom", ->
-		beforeEach ->
-			@message_id = "web:somehost:01020304-0"
-			@EditorRealTimeController.emitToRoom(@room_id, @message, @payload...)
+	describe("emitToRoom", function() {
+		beforeEach(function() {
+			this.message_id = "web:somehost:01020304-0";
+			return this.EditorRealTimeController.emitToRoom(this.room_id, this.message, ...Array.from(this.payload));
+		});
 
-		it "should publish the message to redis", ->
-			@rclient.publish
-				.calledWith("editor-events", JSON.stringify(
-					room_id: @room_id,
-					message: @message
-					payload: @payload
-					_id: @message_id
-				))
-				.should.equal true
+		return it("should publish the message to redis", function() {
+			return this.rclient.publish
+				.calledWith("editor-events", JSON.stringify({
+					room_id: this.room_id,
+					message: this.message,
+					payload: this.payload,
+					_id: this.message_id
+				}))
+				.should.equal(true);
+		});
+	});
 
-	describe "emitToAll", ->
-		beforeEach ->
-			@EditorRealTimeController.emitToRoom = sinon.stub()
-			@EditorRealTimeController.emitToAll @message, @payload...
+	return describe("emitToAll", function() {
+		beforeEach(function() {
+			this.EditorRealTimeController.emitToRoom = sinon.stub();
+			return this.EditorRealTimeController.emitToAll(this.message, ...Array.from(this.payload));
+		});
 
-		it "should emit to the room 'all'", ->
-			@EditorRealTimeController.emitToRoom
-				.calledWith("all", @message, @payload...)
-				.should.equal true
+		return it("should emit to the room 'all'", function() {
+			return this.EditorRealTimeController.emitToRoom
+				.calledWith("all", this.message, ...Array.from(this.payload))
+				.should.equal(true);
+		});
+	});
+});

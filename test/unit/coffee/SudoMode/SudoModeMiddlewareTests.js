@@ -1,130 +1,179 @@
-SandboxedModule = require('sandboxed-module')
-assert = require('assert')
-require('chai').should()
-expect = require('chai').expect
-sinon = require('sinon')
-modulePath = require('path').join __dirname, '../../../../app/js/Features/SudoMode/SudoModeMiddleware'
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const SandboxedModule = require('sandboxed-module');
+const assert = require('assert');
+require('chai').should();
+const {
+    expect
+} = require('chai');
+const sinon = require('sinon');
+const modulePath = require('path').join(__dirname, '../../../../app/js/Features/SudoMode/SudoModeMiddleware');
 
 
-describe 'SudoModeMiddleware', ->
-	beforeEach ->
-		@userId = 'some_user_id'
-		@SudoModeHandler =
-			isSudoModeActive: sinon.stub()
-		@AuthenticationController =
-			getLoggedInUserId: sinon.stub().returns(@userId)
+describe('SudoModeMiddleware', function() {
+	beforeEach(function() {
+		this.userId = 'some_user_id';
+		this.SudoModeHandler =
+			{isSudoModeActive: sinon.stub()};
+		this.AuthenticationController = {
+			getLoggedInUserId: sinon.stub().returns(this.userId),
 			setRedirectInSession: sinon.stub()
-		@SudoModeMiddleware = SandboxedModule.require modulePath, requires:
-			'./SudoModeHandler': @SudoModeHandler
-			'../Authentication/AuthenticationController': @AuthenticationController
-			'logger-sharelatex': {log: sinon.stub(), err: sinon.stub()}
-			'settings-sharelatex': @Settings = {}
+		};
+		return this.SudoModeMiddleware = SandboxedModule.require(modulePath, { requires: {
+			'./SudoModeHandler': this.SudoModeHandler,
+			'../Authentication/AuthenticationController': this.AuthenticationController,
+			'logger-sharelatex': {log: sinon.stub(), err: sinon.stub()},
+			'settings-sharelatex': (this.Settings = {})
+		}
+	});});
 
-	describe 'protectPage', ->
-		beforeEach ->
-			@externalAuth = false
-			@call = (cb) =>
-				@req = {externalAuthenticationSystemUsed: sinon.stub().returns(@externalAuth)}
-				@res = {redirect: sinon.stub()}
-				@next = sinon.stub()
-				@SudoModeMiddleware.protectPage @req, @res, @next
-				cb()
+	return describe('protectPage', function() {
+		beforeEach(function() {
+			this.externalAuth = false;
+			return this.call = cb => {
+				this.req = {externalAuthenticationSystemUsed: sinon.stub().returns(this.externalAuth)};
+				this.res = {redirect: sinon.stub()};
+				this.next = sinon.stub();
+				this.SudoModeMiddleware.protectPage(this.req, this.res, this.next);
+				return cb();
+			};
+		});
 
-		describe 'when sudo mode is active', ->
-			beforeEach ->
-				@AuthenticationController.getLoggedInUserId = sinon.stub().returns(@userId)
-				@SudoModeHandler.isSudoModeActive = sinon.stub().callsArgWith(1, null, true)
+		describe('when sudo mode is active', function() {
+			beforeEach(function() {
+				this.AuthenticationController.getLoggedInUserId = sinon.stub().returns(this.userId);
+				return this.SudoModeHandler.isSudoModeActive = sinon.stub().callsArgWith(1, null, true);
+			});
 
-			it 'should get the current user id', (done) ->
-				@call () =>
-					@AuthenticationController.getLoggedInUserId.callCount.should.equal 1
-					done()
+			it('should get the current user id', function(done) {
+				return this.call(() => {
+					this.AuthenticationController.getLoggedInUserId.callCount.should.equal(1);
+					return done();
+				});
+			});
 
-			it 'should check if sudo-mode is active', (done) ->
-				@call () =>
-					@SudoModeHandler.isSudoModeActive.callCount.should.equal 1
-					@SudoModeHandler.isSudoModeActive.calledWith(@userId).should.equal true
-					done()
+			it('should check if sudo-mode is active', function(done) {
+				return this.call(() => {
+					this.SudoModeHandler.isSudoModeActive.callCount.should.equal(1);
+					this.SudoModeHandler.isSudoModeActive.calledWith(this.userId).should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should call next', (done) ->
-				@call () =>
-					@next.callCount.should.equal 1
-					expect(@next.lastCall.args[0]).to.equal undefined
-					done()
+			return it('should call next', function(done) {
+				return this.call(() => {
+					this.next.callCount.should.equal(1);
+					expect(this.next.lastCall.args[0]).to.equal(undefined);
+					return done();
+				});
+			});
+		});
 
-		describe 'when sudo mode is not active', ->
-			beforeEach ->
-				@AuthenticationController.setRedirectInSession = sinon.stub()
-				@AuthenticationController.getLoggedInUserId = sinon.stub().returns(@userId)
-				@SudoModeHandler.isSudoModeActive = sinon.stub().callsArgWith(1, null, false)
+		describe('when sudo mode is not active', function() {
+			beforeEach(function() {
+				this.AuthenticationController.setRedirectInSession = sinon.stub();
+				this.AuthenticationController.getLoggedInUserId = sinon.stub().returns(this.userId);
+				return this.SudoModeHandler.isSudoModeActive = sinon.stub().callsArgWith(1, null, false);
+			});
 
-			it 'should get the current user id', (done) ->
-				@call () =>
-					@AuthenticationController.getLoggedInUserId.callCount.should.equal 1
-					done()
+			it('should get the current user id', function(done) {
+				return this.call(() => {
+					this.AuthenticationController.getLoggedInUserId.callCount.should.equal(1);
+					return done();
+				});
+			});
 
-			it 'should check if sudo-mode is active', (done) ->
-				@call () =>
-					@SudoModeHandler.isSudoModeActive.callCount.should.equal 1
-					@SudoModeHandler.isSudoModeActive.calledWith(@userId).should.equal true
-					done()
+			it('should check if sudo-mode is active', function(done) {
+				return this.call(() => {
+					this.SudoModeHandler.isSudoModeActive.callCount.should.equal(1);
+					this.SudoModeHandler.isSudoModeActive.calledWith(this.userId).should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should set redirect in session', (done) ->
-				@call () =>
-					@AuthenticationController.setRedirectInSession.callCount.should.equal 1
-					@AuthenticationController.setRedirectInSession.calledWith(@req).should.equal true
-					done()
+			it('should set redirect in session', function(done) {
+				return this.call(() => {
+					this.AuthenticationController.setRedirectInSession.callCount.should.equal(1);
+					this.AuthenticationController.setRedirectInSession.calledWith(this.req).should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should redirect to the password-prompt page', (done) ->
-				@call () =>
-					@res.redirect.callCount.should.equal 1
-					@res.redirect.calledWith('/confirm-password').should.equal true
-					done()
+			return it('should redirect to the password-prompt page', function(done) {
+				return this.call(() => {
+					this.res.redirect.callCount.should.equal(1);
+					this.res.redirect.calledWith('/confirm-password').should.equal(true);
+					return done();
+				});
+			});
+		});
 
-		describe 'when isSudoModeActive produces an error', ->
-			beforeEach ->
-				@AuthenticationController.getLoggedInUserId = sinon.stub().returns(@userId)
-				@SudoModeHandler.isSudoModeActive = sinon.stub().callsArgWith(1, new Error('woops'))
+		describe('when isSudoModeActive produces an error', function() {
+			beforeEach(function() {
+				this.AuthenticationController.getLoggedInUserId = sinon.stub().returns(this.userId);
+				return this.SudoModeHandler.isSudoModeActive = sinon.stub().callsArgWith(1, new Error('woops'));
+			});
 
-			it 'should get the current user id', (done) ->
-				@call () =>
-					@AuthenticationController.getLoggedInUserId.callCount.should.equal 1
-					done()
+			it('should get the current user id', function(done) {
+				return this.call(() => {
+					this.AuthenticationController.getLoggedInUserId.callCount.should.equal(1);
+					return done();
+				});
+			});
 
-			it 'should check if sudo-mode is active', (done) ->
-				@call () =>
-					@SudoModeHandler.isSudoModeActive.callCount.should.equal 1
-					@SudoModeHandler.isSudoModeActive.calledWith(@userId).should.equal true
-					done()
+			it('should check if sudo-mode is active', function(done) {
+				return this.call(() => {
+					this.SudoModeHandler.isSudoModeActive.callCount.should.equal(1);
+					this.SudoModeHandler.isSudoModeActive.calledWith(this.userId).should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should call next with an error', (done) ->
-				@call () =>
-					@next.callCount.should.equal 1
-					expect(@next.lastCall.args[0]).to.be.instanceof Error
-					done()
+			return it('should call next with an error', function(done) {
+				return this.call(() => {
+					this.next.callCount.should.equal(1);
+					expect(this.next.lastCall.args[0]).to.be.instanceof(Error);
+					return done();
+				});
+			});
+		});
 
-		describe 'when external auth is being used', ->
-			beforeEach ->
-				@externalAuth = true
-				@call = (cb) =>
-					@req = {externalAuthenticationSystemUsed: sinon.stub().returns(@externalAuth)}
-					@res = {redirect: sinon.stub()}
-					@next = sinon.stub()
-					@SudoModeMiddleware.protectPage @req, @res, @next
-					cb()
+		return describe('when external auth is being used', function() {
+			beforeEach(function() {
+				this.externalAuth = true;
+				return this.call = cb => {
+					this.req = {externalAuthenticationSystemUsed: sinon.stub().returns(this.externalAuth)};
+					this.res = {redirect: sinon.stub()};
+					this.next = sinon.stub();
+					this.SudoModeMiddleware.protectPage(this.req, this.res, this.next);
+					return cb();
+				};
+			});
 
-			it 'should immediately return next with no args', (done) ->
-				@call () =>
-					@next.callCount.should.equal 1
-					expect(@next.lastCall.args[0]).to.not.exist
-					done()
+			it('should immediately return next with no args', function(done) {
+				return this.call(() => {
+					this.next.callCount.should.equal(1);
+					expect(this.next.lastCall.args[0]).to.not.exist;
+					return done();
+				});
+			});
 
-			it 'should not get the current user id', (done) ->
-				@call () =>
-					@AuthenticationController.getLoggedInUserId.callCount.should.equal 0
-					done()
+			it('should not get the current user id', function(done) {
+				return this.call(() => {
+					this.AuthenticationController.getLoggedInUserId.callCount.should.equal(0);
+					return done();
+				});
+			});
 
-			it 'should not check if sudo-mode is active', (done) ->
-				@call () =>
-					@SudoModeHandler.isSudoModeActive.callCount.should.equal 0
-					done()
+			return it('should not check if sudo-mode is active', function(done) {
+				return this.call(() => {
+					this.SudoModeHandler.isSudoModeActive.callCount.should.equal(0);
+					return done();
+				});
+			});
+		});
+	});
+});

@@ -1,162 +1,205 @@
-sinon = require('sinon')
-chai = require('chai')
-assert = require("chai").assert
-should = chai.should()
-expect = chai.expect
-modulePath = "../../../../app/js/Features/User/UserInfoController.js"
-SandboxedModule = require('sandboxed-module')
-events = require "events"
-MockResponse = require "../helpers/MockResponse"
-MockRequest = require "../helpers/MockRequest"
-ObjectId = require("mongojs").ObjectId
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const sinon = require('sinon');
+const chai = require('chai');
+const {
+    assert
+} = require("chai");
+const should = chai.should();
+const {
+    expect
+} = chai;
+const modulePath = "../../../../app/js/Features/User/UserInfoController.js";
+const SandboxedModule = require('sandboxed-module');
+const events = require("events");
+const MockResponse = require("../helpers/MockResponse");
+const MockRequest = require("../helpers/MockRequest");
+const {
+    ObjectId
+} = require("mongojs");
 
-describe "UserInfoController", ->
-	beforeEach ->
-		@UserDeleter =
-			deleteUser: sinon.stub().callsArgWith(1)
-		@UserUpdater =
-			updatePersonalInfo: sinon.stub()
-		@sanitizer = escape:(v)->v
-		sinon.spy @sanitizer, "escape"
-		@UserGetter = {}
+describe("UserInfoController", function() {
+	beforeEach(function() {
+		this.UserDeleter =
+			{deleteUser: sinon.stub().callsArgWith(1)};
+		this.UserUpdater =
+			{updatePersonalInfo: sinon.stub()};
+		this.sanitizer = {escape(v){ return v; }};
+		sinon.spy(this.sanitizer, "escape");
+		this.UserGetter = {};
 
 
-		@UserInfoController = SandboxedModule.require modulePath, requires:
-			"./UserGetter": @UserGetter
-			"./UserUpdater": @UserUpdater
-			"./UserDeleter": @UserDeleter
-			"logger-sharelatex": log:->
-			"sanitizer":@sanitizer
-			'../Authentication/AuthenticationController': @AuthenticationController = {getLoggedInUserId: sinon.stub()}
+		this.UserInfoController = SandboxedModule.require(modulePath, { requires: {
+			"./UserGetter": this.UserGetter,
+			"./UserUpdater": this.UserUpdater,
+			"./UserDeleter": this.UserDeleter,
+			"logger-sharelatex": { log() {}
+		},
+			"sanitizer":this.sanitizer,
+			'../Authentication/AuthenticationController': (this.AuthenticationController = {getLoggedInUserId: sinon.stub()})
+		}
+	});
 
-		@req = new MockRequest()
-		@res = new MockResponse()
-		@next = sinon.stub()
+		this.req = new MockRequest();
+		this.res = new MockResponse();
+		return this.next = sinon.stub();
+	});
 
-	describe "getLoggedInUsersPersonalInfo", ->
-		beforeEach ->
-			@user =
-				_id: ObjectId()
-			@req.user = @user
-			@req.session.user = @user
-			@UserInfoController.sendFormattedPersonalInfo = sinon.stub()
-			@UserGetter.getUser = sinon.stub().callsArgWith(2, null, @user)
-			@AuthenticationController.getLoggedInUserId = sinon.stub().returns(@user._id)
-			@UserInfoController.getLoggedInUsersPersonalInfo(@req, @res, @next)
+	describe("getLoggedInUsersPersonalInfo", function() {
+		beforeEach(function() {
+			this.user =
+				{_id: ObjectId()};
+			this.req.user = this.user;
+			this.req.session.user = this.user;
+			this.UserInfoController.sendFormattedPersonalInfo = sinon.stub();
+			this.UserGetter.getUser = sinon.stub().callsArgWith(2, null, this.user);
+			this.AuthenticationController.getLoggedInUserId = sinon.stub().returns(this.user._id);
+			return this.UserInfoController.getLoggedInUsersPersonalInfo(this.req, this.res, this.next);
+		});
 
-		it "should call sendFormattedPersonalInfo", ->
-			@UserInfoController.sendFormattedPersonalInfo
-				.calledWith(@user, @res, @next)
-				.should.equal true
+		return it("should call sendFormattedPersonalInfo", function() {
+			return this.UserInfoController.sendFormattedPersonalInfo
+				.calledWith(this.user, this.res, this.next)
+				.should.equal(true);
+		});
+	});
 
-	describe "getPersonalInfo", ->
-		describe "when the user exists with sharelatex id", ->
-			beforeEach ->
-				@user_id = ObjectId().toString()
-				@user =
-					_id: ObjectId(@user_id)
-				@req.params = user_id: @user_id
-				@UserGetter.getUser = sinon.stub().callsArgWith(2, null, @user)
-				@UserInfoController.sendFormattedPersonalInfo = sinon.stub()
-				@UserInfoController.getPersonalInfo(@req, @res, @next)
+	describe("getPersonalInfo", function() {
+		describe("when the user exists with sharelatex id", function() {
+			beforeEach(function() {
+				this.user_id = ObjectId().toString();
+				this.user =
+					{_id: ObjectId(this.user_id)};
+				this.req.params = {user_id: this.user_id};
+				this.UserGetter.getUser = sinon.stub().callsArgWith(2, null, this.user);
+				this.UserInfoController.sendFormattedPersonalInfo = sinon.stub();
+				return this.UserInfoController.getPersonalInfo(this.req, this.res, this.next);
+			});
 
-			it "should look up the user in the database", ->
-				@UserGetter.getUser
+			it("should look up the user in the database", function() {
+				return this.UserGetter.getUser
 					.calledWith(
-						{ _id: ObjectId(@user_id) },
+						{ _id: ObjectId(this.user_id) },
 						{ _id: true, first_name: true, last_name: true, email: true }
-					).should.equal true
+					).should.equal(true);
+			});
 
-			it "should send the formatted details back to the client", ->
-				@UserInfoController.sendFormattedPersonalInfo
-					.calledWith(@user, @res, @next)
-					.should.equal true
+			return it("should send the formatted details back to the client", function() {
+				return this.UserInfoController.sendFormattedPersonalInfo
+					.calledWith(this.user, this.res, this.next)
+					.should.equal(true);
+			});
+		});
 
-		describe "when the user exists with overleaf id", ->
-			beforeEach ->
-				@user_id = 12345
-				@user =
-					_id: ObjectId()
-					overleaf:
-						id: @user_id
-				@req.params = user_id: @user_id.toString()
-				@UserGetter.getUser = sinon.stub().callsArgWith(2, null, @user)
-				@UserInfoController.sendFormattedPersonalInfo = sinon.stub()
-				@UserInfoController.getPersonalInfo(@req, @res, @next)
+		describe("when the user exists with overleaf id", function() {
+			beforeEach(function() {
+				this.user_id = 12345;
+				this.user = {
+					_id: ObjectId(),
+					overleaf: {
+						id: this.user_id
+					}
+				};
+				this.req.params = {user_id: this.user_id.toString()};
+				this.UserGetter.getUser = sinon.stub().callsArgWith(2, null, this.user);
+				this.UserInfoController.sendFormattedPersonalInfo = sinon.stub();
+				return this.UserInfoController.getPersonalInfo(this.req, this.res, this.next);
+			});
 
-			it "should look up the user in the database", ->
-				@UserGetter.getUser
+			it("should look up the user in the database", function() {
+				return this.UserGetter.getUser
 					.calledWith(
-						{ "overleaf.id": @user_id },
+						{ "overleaf.id": this.user_id },
 						{ _id: true, first_name: true, last_name: true, email: true }
-					).should.equal true
+					).should.equal(true);
+			});
 
-			it "should send the formatted details back to the client", ->
-				@UserInfoController.sendFormattedPersonalInfo
-					.calledWith(@user, @res, @next)
-					.should.equal true
+			return it("should send the formatted details back to the client", function() {
+				return this.UserInfoController.sendFormattedPersonalInfo
+					.calledWith(this.user, this.res, this.next)
+					.should.equal(true);
+			});
+		});
 
-		describe "when the user does not exist", ->
-			beforeEach ->
-				@user_id = ObjectId().toString()
-				@req.params = user_id: @user_id
-				@UserGetter.getUser = sinon.stub().callsArgWith(2, null, null)
-				@UserInfoController.getPersonalInfo(@req, @res, @next)
+		describe("when the user does not exist", function() {
+			beforeEach(function() {
+				this.user_id = ObjectId().toString();
+				this.req.params = {user_id: this.user_id};
+				this.UserGetter.getUser = sinon.stub().callsArgWith(2, null, null);
+				return this.UserInfoController.getPersonalInfo(this.req, this.res, this.next);
+			});
 
-			it "should return 404 to the client", ->
-				@res.statusCode.should.equal 404
+			return it("should return 404 to the client", function() {
+				return this.res.statusCode.should.equal(404);
+			});
+		});
 
-		describe "when the user id is invalid", ->
-			beforeEach ->
-				@user_id = "invalid"
-				@req.params = user_id: @user_id
-				@UserGetter.getUser = sinon.stub().callsArgWith(2, null, null)
-				@UserInfoController.getPersonalInfo(@req, @res, @next)
+		return describe("when the user id is invalid", function() {
+			beforeEach(function() {
+				this.user_id = "invalid";
+				this.req.params = {user_id: this.user_id};
+				this.UserGetter.getUser = sinon.stub().callsArgWith(2, null, null);
+				return this.UserInfoController.getPersonalInfo(this.req, this.res, this.next);
+			});
 
-			it "should return 400 to the client", ->
-				@res.statusCode.should.equal 400
+			return it("should return 400 to the client", function() {
+				return this.res.statusCode.should.equal(400);
+			});
+		});
+	});
 
-	describe "sendFormattedPersonalInfo", ->
-		beforeEach ->
-			@user =
-				_id: ObjectId()
-				first_name: "Douglas"
-				last_name: "Adams"
+	describe("sendFormattedPersonalInfo", function() {
+		beforeEach(function() {
+			this.user = {
+				_id: ObjectId(),
+				first_name: "Douglas",
+				last_name: "Adams",
 				email: "doug@sharelatex.com"
-			@formattedInfo =
-				id: @user._id.toString()
-				first_name: @user.first_name
-				last_name: @user.last_name
-				email: @user.email
-			@UserInfoController.formatPersonalInfo = sinon.stub().returns(@formattedInfo)
-			@UserInfoController.sendFormattedPersonalInfo @user, @res
+			};
+			this.formattedInfo = {
+				id: this.user._id.toString(),
+				first_name: this.user.first_name,
+				last_name: this.user.last_name,
+				email: this.user.email
+			};
+			this.UserInfoController.formatPersonalInfo = sinon.stub().returns(this.formattedInfo);
+			return this.UserInfoController.sendFormattedPersonalInfo(this.user, this.res);
+		});
 
-		it "should format the user details for the response", ->
-			@UserInfoController.formatPersonalInfo
-				.calledWith(@user)
-				.should.equal true
+		it("should format the user details for the response", function() {
+			return this.UserInfoController.formatPersonalInfo
+				.calledWith(this.user)
+				.should.equal(true);
+		});
 
-		it "should send the formatted details back to the client", ->
-			@res.body.should.equal JSON.stringify(@formattedInfo)
+		return it("should send the formatted details back to the client", function() {
+			return this.res.body.should.equal(JSON.stringify(this.formattedInfo));
+		});
+	});
 
-	describe "formatPersonalInfo", ->
-		it "should return the correctly formatted data", ->
-			@user =
-				_id: ObjectId()
-				first_name: "Douglas"
-				last_name: "Adams"
-				email: "doug@sharelatex.com"
-				password: "should-not-get-included"
-				signUpDate: new Date()
-				role:"student"
-				institution:"sheffield"
-			expect(@UserInfoController.formatPersonalInfo(@user)).to.deep.equal {
-				id: @user._id.toString()
-				first_name: @user.first_name
-				last_name: @user.last_name
-				email: @user.email
-				signUpDate: @user.signUpDate
-				role: @user.role
-				institution: @user.institution
-			}
+	return describe("formatPersonalInfo", () => it("should return the correctly formatted data", function() {
+        this.user = {
+            _id: ObjectId(),
+            first_name: "Douglas",
+            last_name: "Adams",
+            email: "doug@sharelatex.com",
+            password: "should-not-get-included",
+            signUpDate: new Date(),
+            role:"student",
+            institution:"sheffield"
+        };
+        return expect(this.UserInfoController.formatPersonalInfo(this.user)).to.deep.equal({
+            id: this.user._id.toString(),
+            first_name: this.user.first_name,
+            last_name: this.user.last_name,
+            email: this.user.email,
+            signUpDate: this.user.signUpDate,
+            role: this.user.role,
+            institution: this.user.institution
+        });
+}));
+});
 
