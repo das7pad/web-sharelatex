@@ -1,3 +1,10 @@
+/* eslint-disable
+    handle-callback-err,
+    max-len,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -27,7 +34,7 @@ module.exports = (GraphController = {
 
 		const idsToSearch = []; 
 		if (graphPrev.nodes.length > 0) {
-			//create a list with nodes not searched
+			// create a list with nodes not searched
 			for (let node of Array.from(graphPrev.nodes)) {
 				if (usersObjId.indexOf(node.id) === -1) {
 					idsToSearch.push(ObjectId(node.id));

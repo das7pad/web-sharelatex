@@ -1,3 +1,8 @@
+/* eslint-disable
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -41,7 +46,7 @@ module.exports = (SigmaJSGraph = {
 
 	addEdge(nodeS, nodeT, project) {
 
-		//create a hash to compare
+		// create a hash to compare
 		let hash;
 		if (nodeS > nodeT) {
 			hash = nodeS + nodeT + project._id;
