@@ -1,3 +1,12 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+    max-len,
+    no-return-assign,
+    no-use-before-define,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -345,13 +354,13 @@ describe('ProjectLocator', function() {
 			it("should not call the callback more than once", function(done){
 				const path = `${this.duplicateFolder.name}/${this.doc.name}`;
 				return this.locator.findElementByPath({project: this.project, path}, () => done());
-			}); //mocha will throw exception if done called multiple times
+			}); // mocha will throw exception if done called multiple times
 
 			return it("should not call the callback more than once when the path is longer than 1 level below the duplicate level", function(done){
 				const path = `${this.duplicateFolder.name}/1/main.tex`;
 				return this.locator.findElementByPath({project: this.project, path}, () => done());
 			});
-		}); //mocha will throw exception if done called multiple times
+		}); // mocha will throw exception if done called multiple times
 
 		describe("with a null doc", function() {
 			beforeEach(function() {

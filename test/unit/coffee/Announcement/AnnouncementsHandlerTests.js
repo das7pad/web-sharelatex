@@ -1,3 +1,11 @@
+/* eslint-disable
+    handle-callback-err,
+    max-len,
+    no-return-assign,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -18,7 +26,7 @@ describe('AnnouncementsHandler', function() {
 
 	beforeEach(function() {
 		this.user = { 
-			_id:"3c6afe000000000000000000", //2002-02-14T00:00:00.000Z
+			_id:"3c6afe000000000000000000", // 2002-02-14T00:00:00.000Z
 			email: "someone@gmail.com"
 		};
 		this.AnalyticsManager =
