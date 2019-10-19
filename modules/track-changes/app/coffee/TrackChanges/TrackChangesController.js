@@ -1,75 +1,107 @@
-RangesManager = require "./RangesManager"
-logger = require "logger-sharelatex"
-UserInfoController = require "../../../../../app/js/Features/User/UserInfoController"
-DocumentUpdaterHandler = require "../../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler"
-EditorRealTimeController = require("../../../../../app/js/Features/Editor/EditorRealTimeController")
-TrackChangesManager = require "./TrackChangesManager"
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let TrackChangesController;
+const RangesManager = require("./RangesManager");
+const logger = require("logger-sharelatex");
+const UserInfoController = require("../../../../../app/js/Features/User/UserInfoController");
+const DocumentUpdaterHandler = require("../../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler");
+const EditorRealTimeController = require("../../../../../app/js/Features/Editor/EditorRealTimeController");
+const TrackChangesManager = require("./TrackChangesManager");
 
-module.exports = TrackChangesController =
-	getAllRanges: (req, res, next) ->
-		project_id = req.params.project_id
-		logger.log {project_id}, "request for project ranges"
-		RangesManager.getAllRanges project_id, (error, docs = []) ->
-			return next(error) if error?
-			docs = ({id: d._id, ranges: d.ranges} for d in docs)
-			res.json docs
+module.exports = (TrackChangesController = {
+	getAllRanges(req, res, next) {
+		const {
+            project_id
+        } = req.params;
+		logger.log({project_id}, "request for project ranges");
+		return RangesManager.getAllRanges(project_id, function(error, docs) {
+			if (docs == null) { docs = []; }
+			if (error != null) { return next(error); }
+			docs = (Array.from(docs).map((d) => ({id: d._id, ranges: d.ranges})));
+			return res.json(docs);
+		});
+	},
 	
-	getAllChangesUsers: (req, res, next) ->
-		project_id = req.params.project_id
-		logger.log {project_id}, "request for project range users"
-		RangesManager.getAllChangesUsers project_id, (error, users) ->
-			return next(error) if error?
-			users = (UserInfoController.formatPersonalInfo(user) for user in users)
-			# Get rid of any anonymous/deleted user objects
-			users = users.filter (u) -> u?.id?
-			res.json users
+	getAllChangesUsers(req, res, next) {
+		const {
+            project_id
+        } = req.params;
+		logger.log({project_id}, "request for project range users");
+		return RangesManager.getAllChangesUsers(project_id, function(error, users) {
+			if (error != null) { return next(error); }
+			users = (Array.from(users).map((user) => UserInfoController.formatPersonalInfo(user)));
+			// Get rid of any anonymous/deleted user objects
+			users = users.filter(u => (u != null ? u.id : undefined) != null);
+			return res.json(users);
+		});
+	},
 
-	acceptChanges: (req, res, next) ->
-		{project_id, doc_id } = req.params
-		{change_ids} = req.body
-		if !change_ids?
-			change_ids = [ req.params.change_id ]
-		logger.log {project_id, doc_id }, "request to accept #{ change_ids.length } changes"
-		DocumentUpdaterHandler.acceptChanges project_id, doc_id, change_ids, (error) ->
-			return next(error) if error?
-			EditorRealTimeController.emitToRoom project_id, "accept-changes", doc_id, change_ids, (err)->
-			res.sendStatus 204
+	acceptChanges(req, res, next) {
+		const {project_id, doc_id } = req.params;
+		let {change_ids} = req.body;
+		if ((change_ids == null)) {
+			change_ids = [ req.params.change_id ];
+		}
+		logger.log({project_id, doc_id }, `request to accept ${ change_ids.length } changes`);
+		return DocumentUpdaterHandler.acceptChanges(project_id, doc_id, change_ids, function(error) {
+			if (error != null) { return next(error); }
+			EditorRealTimeController.emitToRoom(project_id, "accept-changes", doc_id, change_ids, function(err){});
+			return res.sendStatus(204);
+		});
+	},
 
-	setTrackChangesState: (req, res, next) ->
-		{project_id} = req.params
-		logger.log {project_id }, "request to toggle track changes"
-		TrackChangesManager.getTrackChangesState project_id, (error, track_changes_state) ->
-			return next(error) if error?
-			logger.log {project_id, track_changes_state}, "track changes current state"
+	setTrackChangesState(req, res, next) {
+		const {project_id} = req.params;
+		logger.log({project_id }, "request to toggle track changes");
+		return TrackChangesManager.getTrackChangesState(project_id, function(error, track_changes_state) {
+			if (error != null) { return next(error); }
+			logger.log({project_id, track_changes_state}, "track changes current state");
 
-			if req.body.on?
-				track_changes_state = !!req.body.on
-			else if req.body.on_for?
-				if typeof track_changes_state is "boolean"
-					track_changes_state = {}
-				for key, value of req.body.on_for
-					if !key.match? or !key.match(/^[a-f0-9]{24}$/) or typeof value != "boolean"
-						return res.sendStatus 400 # bad request
-					else
-						if value
-							track_changes_state[key] = value
-						else
-							delete track_changes_state[key]
-				if req.body.on_for_guests == true
-					track_changes_state['__guests__'] = true
-				else
-					delete track_changes_state['__guests__']
-			else
-				return res.sendStatus 400 # bad request
+			if (req.body.on != null) {
+				track_changes_state = !!req.body.on;
+			} else if (req.body.on_for != null) {
+				if (typeof track_changes_state === "boolean") {
+					track_changes_state = {};
+				}
+				for (let key in req.body.on_for) {
+					const value = req.body.on_for[key];
+					if ((key.match == null) || !key.match(/^[a-f0-9]{24}$/) || (typeof value !== "boolean")) {
+						return res.sendStatus(400); // bad request
+					} else {
+						if (value) {
+							track_changes_state[key] = value;
+						} else {
+							delete track_changes_state[key];
+						}
+					}
+				}
+				if (req.body.on_for_guests === true) {
+					track_changes_state['__guests__'] = true;
+				} else {
+					delete track_changes_state['__guests__'];
+				}
+			} else {
+				return res.sendStatus(400); // bad request
+			}
 
 			if (
-				typeof track_changes_state == 'object' &&
-				Object.keys(track_changes_state).length == 0
-			)
-				track_changes_state = false
+				(typeof track_changes_state === 'object') &&
+				(Object.keys(track_changes_state).length === 0)
+			) {
+				track_changes_state = false;
+			}
 
-			logger.log {project_id, track_changes_state}, "track changes updated state"
-			TrackChangesManager.setTrackChangesState project_id, track_changes_state, (error) ->
-				return next(error) if error?
-				EditorRealTimeController.emitToRoom project_id, "toggle-track-changes", track_changes_state, (err)->
-				res.sendStatus 204
+			logger.log({project_id, track_changes_state}, "track changes updated state");
+			return TrackChangesManager.setTrackChangesState(project_id, track_changes_state, function(error) {
+				if (error != null) { return next(error); }
+				EditorRealTimeController.emitToRoom(project_id, "toggle-track-changes", track_changes_state, function(err){});
+				return res.sendStatus(204);
+			});
+		});
+	}
+});
