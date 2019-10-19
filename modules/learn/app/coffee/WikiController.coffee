@@ -95,7 +95,8 @@ module.exports = WikiController =
 
 		urlStream.pipe(res)
 
-	_getPageContent: (page, callback = (error, data = { content: "", title: "" }) ->) ->
+	_getPageContent: (page, callback = (error, data) ->) ->
+		# the callback parameter `data` has a signature of `{content: "", title: ""}`
 		# @param {string} page
 		request {
 			url: "#{baseWikiUrl}/learn-scripts/api.php"
