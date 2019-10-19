@@ -25,9 +25,13 @@ const Errors = require('../../../../app/src/Features/Errors/Errors')
 describe('DocumentController', function() {
   beforeEach(function() {
     this.DocumentController = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         'logger-sharelatex': {
           log() {},
+          warn() {},
           err() {}
         },
         '../Project/ProjectGetter': (this.ProjectGetter = {}),
@@ -111,7 +115,7 @@ describe('DocumentController', function() {
             .should.equal(true)
         })
 
-        return it('should return the document data to the client as JSON', function() {
+        it('should return the document data to the client as JSON', function() {
           this.res.type.should.equal('application/json')
           return this.res.body.should.equal(
             JSON.stringify({
@@ -124,7 +128,7 @@ describe('DocumentController', function() {
         })
       })
 
-      return describe("when the document doesn't exist", function() {
+      describe("when the document doesn't exist", function() {
         beforeEach(function() {
           this.ProjectLocator.findElement = sinon
             .stub()
@@ -136,7 +140,7 @@ describe('DocumentController', function() {
           )
         })
 
-        return it('should call next with the NotFoundError', function() {
+        it('should call next with the NotFoundError', function() {
           return this.next
             .calledWith(new Errors.NotFoundError('not found'))
             .should.equal(true)
@@ -175,7 +179,7 @@ describe('DocumentController', function() {
         )
       })
 
-      return it('should return the history id to the client as JSON', function() {
+      it('should return the history id to the client as JSON', function() {
         this.res.type.should.equal('application/json')
         return this.res.body.should.equal(
           JSON.stringify({
@@ -189,7 +193,7 @@ describe('DocumentController', function() {
       })
     })
 
-    return describe('when the project does not exist', function() {
+    describe('when the project does not exist', function() {
       beforeEach(function() {
         this.ProjectGetter.getProject = sinon.stub().callsArgWith(2, null, null)
         return this.DocumentController.getDocument(
@@ -199,13 +203,13 @@ describe('DocumentController', function() {
         )
       })
 
-      return it('returns a 404', function() {
+      it('returns a 404', function() {
         return this.res.statusCode.should.equal(404)
       })
     })
   })
 
-  return describe('setDocument', function() {
+  describe('setDocument', function() {
     beforeEach(function() {
       return (this.req.params = {
         Project_id: this.project_id,
@@ -243,12 +247,12 @@ describe('DocumentController', function() {
         )
       })
 
-      return it('should return a successful response', function() {
+      it('should return a successful response', function() {
         return this.res.success.should.equal(true)
       })
     })
 
-    return describe("when the document doesn't exist", function() {
+    describe("when the document doesn't exist", function() {
       beforeEach(function() {
         this.ProjectEntityUpdateHandler.updateDocLines = sinon
           .stub()
@@ -261,7 +265,7 @@ describe('DocumentController', function() {
         )
       })
 
-      return it('should call next with the NotFoundError', function() {
+      it('should call next with the NotFoundError', function() {
         return this.next
           .calledWith(new Errors.NotFoundError('not found'))
           .should.equal(true)

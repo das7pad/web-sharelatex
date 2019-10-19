@@ -17,7 +17,7 @@ const request = require('./helpers/request')
 const User = require('./helpers/User')
 
 describe('TpdsUpdateTests', function() {
-  before(function(done) {
+  beforeEach(function(done) {
     this.owner = new User()
     return this.owner.login(error => {
       if (error != null) {
@@ -37,8 +37,8 @@ describe('TpdsUpdateTests', function() {
     })
   })
 
-  return describe('deleting a file', function() {
-    before(function(done) {
+  describe('deleting a file', function() {
+    beforeEach(function(done) {
       return request(
         {
           method: 'DELETE',
@@ -49,7 +49,7 @@ describe('TpdsUpdateTests', function() {
             sendImmediately: true
           }
         },
-        function(error, response, body) {
+        (error, response, body) => {
           if (error != null) {
             throw error
           }
@@ -59,11 +59,8 @@ describe('TpdsUpdateTests', function() {
       )
     })
 
-    return it('should have deleted the file', function(done) {
-      return ProjectGetter.getProject(this.project_id, function(
-        error,
-        project
-      ) {
+    it('should have deleted the file', function(done) {
+      return ProjectGetter.getProject(this.project_id, (error, project) => {
         if (error != null) {
           throw error
         }

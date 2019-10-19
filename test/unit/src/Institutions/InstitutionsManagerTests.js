@@ -64,6 +64,9 @@ describe('InstitutionsManager', function() {
     this.Mongo = { ObjectId: sinon.stub().returnsArg(0) }
 
     return (this.InstitutionsManager = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         'logger-sharelatex': this.logger,
         './InstitutionsAPI': {
@@ -102,9 +105,7 @@ describe('InstitutionsManager', function() {
       this.SubscriptionLocator.getUsersSubscription
         .withArgs(this.user2)
         .callsArgWith(1, null, this.subscription)
-      this.refreshFeatures
-        .withArgs(this.user1Id)
-        .callsArgWith(2, null, {}, true)
+      this.refreshFeatures.withArgs(this.user1Id).yields(null, {}, true)
       return this.getInstitutionAffiliations.yields(null, this.affiliations)
     })
 
@@ -137,7 +138,7 @@ describe('InstitutionsManager', function() {
       )
     })
 
-    return it('notifies users if they have a subscription that should be cancelled', function(done) {
+    it('notifies users if they have a subscription that should be cancelled', function(done) {
       return this.InstitutionsManager.upgradeInstitutionUsers(
         this.institutionId,
         error => {
@@ -156,7 +157,7 @@ describe('InstitutionsManager', function() {
     })
   })
 
-  describe('checkInstitutionUsers', () =>
+  describe('checkInstitutionUsers', function() {
     it('check all users Features', function(done) {
       const affiliations = [{ email: 'foo@bar.com' }, { email: 'baz@boo.edu' }]
       const stubbedUsers = [
@@ -189,9 +190,10 @@ describe('InstitutionsManager', function() {
           return done()
         }
       )
-    }))
+    })
+  })
 
-  return describe('getInstitutionUsersSubscriptions', () =>
+  describe('getInstitutionUsersSubscriptions', function() {
     it('returns all institution users subscriptions', function(done) {
       const stubbedUsers = [
         { user_id: '123abc123abc123abc123abc' },
@@ -207,5 +209,6 @@ describe('InstitutionsManager', function() {
           return done()
         }
       )
-    }))
+    })
+  })
 })

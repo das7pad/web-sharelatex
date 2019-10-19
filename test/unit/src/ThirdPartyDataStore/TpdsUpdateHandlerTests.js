@@ -51,6 +51,9 @@ describe('TpdsUpdateHandler', function() {
       isProjectOnCooldown: sinon.stub().callsArgWith(1, null, false)
     }
     this.handler = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         './UpdateMerger': this.updateMerger,
         './Editor/EditorController': this.editorController,
@@ -179,7 +182,7 @@ describe('TpdsUpdateHandler', function() {
       )
     })
 
-    return it('should return error and not proceed with update if project is on cooldown', function(done) {
+    it('should return error and not proceed with update if project is on cooldown', function(done) {
       this.CooldownManager.isProjectOnCooldown = sinon
         .stub()
         .callsArgWith(1, null, true)
@@ -214,7 +217,7 @@ describe('TpdsUpdateHandler', function() {
     })
   })
 
-  return describe('getting a delete :', function() {
+  describe('getting a delete :', function() {
     it('should call deleteEntity in the collaberation manager', function(done) {
       const path = '/delete/this'
       const update = {}
@@ -237,7 +240,7 @@ describe('TpdsUpdateHandler', function() {
       )
     })
 
-    return it('should mark the project as deleted by external source if path is a single slash', function(done) {
+    it('should mark the project as deleted by external source if path is a single slash', function(done) {
       const path = '/'
       return this.handler.deleteUpdate(
         this.user_id,

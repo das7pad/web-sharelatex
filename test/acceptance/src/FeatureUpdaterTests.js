@@ -30,11 +30,11 @@ const syncUserAndGetFeatures = function(user, callback) {
   if (callback == null) {
     callback = function(error, features) {}
   }
-  return FeaturesUpdater.refreshFeatures(user._id, false, function(error) {
+  return FeaturesUpdater.refreshFeatures(user._id, error => {
     if (error != null) {
       return callback(error)
     }
-    return User.findById(user._id, function(error, user) {
+    return User.findById(user._id, (error, user) => {
       if (error != null) {
         return callback(error)
       }
@@ -48,7 +48,7 @@ const syncUserAndGetFeatures = function(user, callback) {
 describe('FeatureUpdater.refreshFeatures', function() {
   beforeEach(function(done) {
     this.user = new UserClient()
-    return this.user.ensureUserExists(function(error) {
+    return this.user.ensureUserExists(error => {
       if (error != null) {
         throw error
       }
@@ -56,7 +56,7 @@ describe('FeatureUpdater.refreshFeatures', function() {
     })
   })
 
-  describe('when user has no subscriptions', () =>
+  describe('when user has no subscriptions', function() {
     it('should set their features to the basic set', function(done) {
       return syncUserAndGetFeatures(this.user, (error, features) => {
         if (error != null) {
@@ -65,7 +65,8 @@ describe('FeatureUpdater.refreshFeatures', function() {
         expect(features).to.deep.equal(settings.defaultFeatures)
         return done()
       })
-    }))
+    })
+  })
 
   describe('when the user has an individual subscription', function() {
     beforeEach(function() {
@@ -77,7 +78,7 @@ describe('FeatureUpdater.refreshFeatures', function() {
       })
     }) // returns a promise
 
-    return it('should set their features to the upgraded set', function(done) {
+    it('should set their features to the upgraded set', function(done) {
       return syncUserAndGetFeatures(this.user, (error, features) => {
         if (error != null) {
           throw error
@@ -93,8 +94,10 @@ describe('FeatureUpdater.refreshFeatures', function() {
 
   describe('when the user is in a group subscription', function() {
     beforeEach(function() {
+      const groupAdminId = ObjectId()
       return Subscription.create({
-        admin_id: ObjectId(),
+        admin_id: groupAdminId,
+        manager_ids: [groupAdminId],
         member_ids: [this.user._id],
         groupAccount: true,
         planCode: 'collaborator',
@@ -102,7 +105,7 @@ describe('FeatureUpdater.refreshFeatures', function() {
       })
     }) // returns a promise
 
-    return it('should set their features to the upgraded set', function(done) {
+    it('should set their features to the upgraded set', function(done) {
       return syncUserAndGetFeatures(this.user, (error, features) => {
         if (error != null) {
           throw error
@@ -128,7 +131,7 @@ describe('FeatureUpdater.refreshFeatures', function() {
       )
     }) // returns a promise
 
-    return it('should set their features to the bonus set', function(done) {
+    it('should set their features to the bonus set', function(done) {
       return syncUserAndGetFeatures(this.user, (error, features) => {
         if (error != null) {
           throw error
@@ -175,7 +178,7 @@ describe('FeatureUpdater.refreshFeatures', function() {
       })
     })
 
-    return it('should not set their features if institution is not confirmed', function(done) {
+    it('should not set their features if institution is not confirmed', function(done) {
       this.affiliationData.institution.confirmed = false
       MockV1Api.setAffiliations([this.affiliationData])
       return this.user.confirmEmail(this.email, error => {
@@ -200,7 +203,7 @@ describe('FeatureUpdater.refreshFeatures', function() {
       )
     }) // returns a promise
 
-    return it('should set their features to the bonus set and downgrade the extras', function(done) {
+    it('should set their features to the bonus set and downgrade the extras', function(done) {
       return syncUserAndGetFeatures(this.user, (error, features) => {
         if (error != null) {
           throw error
@@ -232,7 +235,7 @@ describe('FeatureUpdater.refreshFeatures', function() {
       )
     }) // returns a promise
 
-    return it('should set their features to the v1 plan', function(done) {
+    it('should set their features to the v1 plan', function(done) {
       return syncUserAndGetFeatures(this.user, (error, features) => {
         if (error != null) {
           throw error
@@ -260,7 +263,7 @@ describe('FeatureUpdater.refreshFeatures', function() {
       )
     }) // returns a promise
 
-    return it('should set their features to the best of the v1 plan and bonus features', function(done) {
+    it('should set their features to the best of the v1 plan and bonus features', function(done) {
       return syncUserAndGetFeatures(this.user, (error, features) => {
         if (error != null) {
           throw error
@@ -279,6 +282,8 @@ describe('FeatureUpdater.refreshFeatures', function() {
 
   describe('when the user has a group and personal subscription', function() {
     beforeEach(function(done) {
+      const groupAdminId = ObjectId()
+
       Subscription.create(
         {
           admin_id: this.user._id,
@@ -292,7 +297,8 @@ describe('FeatureUpdater.refreshFeatures', function() {
           }
           return Subscription.create(
             {
-              admin_id: ObjectId(),
+              admin_id: groupAdminId,
+              manager_ids: [groupAdminId],
               member_ids: [this.user._id],
               groupAccount: true,
               planCode: 'collaborator',
@@ -304,7 +310,7 @@ describe('FeatureUpdater.refreshFeatures', function() {
       )
     })
 
-    return it('should set their features to the best set', function(done) {
+    it('should set their features to the best set', function(done) {
       return syncUserAndGetFeatures(this.user, (error, features) => {
         if (error != null) {
           throw error
@@ -318,7 +324,7 @@ describe('FeatureUpdater.refreshFeatures', function() {
     })
   })
 
-  return describe('when the notifyV1Flag is passed', function() {
+  describe('when the notifyV1Flag is passed', function() {
     beforeEach(function() {
       return User.update(
         {
@@ -331,14 +337,5 @@ describe('FeatureUpdater.refreshFeatures', function() {
         }
       )
     }) // returns a promise
-
-    return it('should ping the v1 API end point to sync', function(done) {
-      return FeaturesUpdater.refreshFeatures(this.user._id, true, error => {
-        return setTimeout(() => {
-          expect(MockV1Api.syncUserFeatures.calledWith('42')).to.equal(true)
-          return done()
-        }, 500)
-      })
-    })
   })
 })

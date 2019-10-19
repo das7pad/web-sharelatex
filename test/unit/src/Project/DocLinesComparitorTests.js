@@ -20,6 +20,9 @@ const SandboxedModule = require('sandboxed-module')
 describe('doc lines comparitor', function() {
   beforeEach(function() {
     return (this.comparitor = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         'logger-sharelatex': { log() {} }
       }
@@ -89,7 +92,7 @@ describe('doc lines comparitor', function() {
     return result.should.equal(true)
   })
 
-  return it('should return false when comparing different orchard docs', function() {
+  it('should return false when comparing different orchard docs', function() {
     const lines1 = [{ text: 'goodbye world' }]
     const lines2 = [{ text: 'hello world' }]
     const result = this.comparitor.areSame(lines1, lines2)

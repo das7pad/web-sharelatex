@@ -77,7 +77,7 @@ module.exports = FileTypeManager = {
   // returns charset as understood by fs.readFile,
   getType(name, fsPath, callback) {
     if (callback == null) {
-      callback = function(error, isBinary, charset) {}
+      callback = function(error, isBinary, charset, bytes) {}
     }
     const parts = name.split('.')
     const extension = parts.slice(-1)[0].toLowerCase()
@@ -104,7 +104,7 @@ module.exports = FileTypeManager = {
         }
 
         if (isUtf8(bytes)) {
-          return callback(null, false, 'utf-8')
+          return callback(null, false, 'utf-8', bytes)
         }
         // check for little-endian unicode bom (nodejs does not support big-endian)
         if (bytes[0] === 0xff && bytes[1] === 0xfe) {
@@ -116,12 +116,47 @@ module.exports = FileTypeManager = {
     })
   },
 
+  // For compatibility with the history service, only accept valid utf8 with no
+  // nulls or non-BMP characters as text, eveything else is binary.
+  getStrictType(name, fsPath, callback) {
+    FileTypeManager.getType(name, fsPath, function(
+      err,
+      isBinary,
+      charset,
+      bytes
+    ) {
+      if (err) {
+        return callback(err)
+      }
+      if (isBinary || charset !== 'utf-8' || !bytes) {
+        return callback(null, true)
+      }
+      let data = bytes.toString()
+      if (data.indexOf('\x00') !== -1) {
+        return callback(null, true)
+      }
+      if (/[\uD800-\uDFFF]/.test(data)) {
+        // non-BMP characters (high and low surrogate characters)
+        return callback(null, true)
+      }
+      return callback(null, false)
+    })
+  },
+
+  getExtension(fileName) {
+    const nameSplit = fileName.split('.')
+    if (nameSplit.length < 2) {
+      return undefined
+    }
+    return nameSplit.pop()
+  },
+
   shouldIgnore(path, callback) {
     if (callback == null) {
       callback = function(error, result) {}
     }
     const name = Path.basename(path)
-    let extension = name.split('.').slice(-1)[0]
+    let extension = this.getExtension(name)
     if (extension != null) {
       extension = extension.toLowerCase()
     }

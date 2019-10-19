@@ -32,10 +32,14 @@ describe('LaunchpadController', function() {
 
     this.User = {}
     this.LaunchpadController = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         'settings-sharelatex': (this.Settings = {}),
         'logger-sharelatex': (this.Logger = {
           log() {},
+          warn() {},
           err() {},
           error() {}
         }),
@@ -97,7 +101,7 @@ describe('LaunchpadController', function() {
           )
         })
 
-        return it('should render the launchpad page', function() {
+        it('should render the launchpad page', function() {
           const viewPath = require('path').join(
             __dirname,
             '../../../app/views/launchpad'
@@ -112,7 +116,7 @@ describe('LaunchpadController', function() {
         })
       })
 
-      return describe('when there is at least one admin', function() {
+      describe('when there is at least one admin', function() {
         beforeEach(function() {
           this._atLeastOneAdminExists.callsArgWith(0, null, true)
           return this.LaunchpadController.launchpadPage(
@@ -128,13 +132,13 @@ describe('LaunchpadController', function() {
           )
         })
 
-        return it('should not render the launchpad page', function() {
+        it('should not render the launchpad page', function() {
           return this.res.render.callCount.should.equal(0)
         })
       })
     })
 
-    return describe('when the user is logged in', function() {
+    describe('when the user is logged in', function() {
       beforeEach(function() {
         this.user = {
           _id: 'abcd',
@@ -160,7 +164,7 @@ describe('LaunchpadController', function() {
           )
         })
 
-        return it('should render the launchpad page', function() {
+        it('should render the launchpad page', function() {
           const viewPath = require('path').join(
             __dirname,
             '../../../app/views/launchpad'
@@ -175,7 +179,7 @@ describe('LaunchpadController', function() {
         })
       })
 
-      return describe('when the user is not an admin', function() {
+      describe('when the user is not an admin', function() {
         beforeEach(function() {
           this.UserGetter.getUser = sinon
             .stub()
@@ -187,7 +191,7 @@ describe('LaunchpadController', function() {
           )
         })
 
-        return it('should redirect to restricted page', function() {
+        it('should redirect to restricted page', function() {
           this.res.redirect.callCount.should.equal(1)
           return this.res.redirect.calledWith('/restricted').should.equal(true)
         })
@@ -203,7 +207,7 @@ describe('LaunchpadController', function() {
           .callsArgWith(2, null, null))
       })
 
-      return it('should callback with false', function(done) {
+      it('should callback with false', function(done) {
         return this.LaunchpadController._atLeastOneAdminExists(
           (err, exists) => {
             expect(err).to.equal(null)
@@ -221,7 +225,7 @@ describe('LaunchpadController', function() {
           .callsArgWith(2, null, { _id: 'abcd' }))
       })
 
-      return it('should callback with true', function(done) {
+      it('should callback with true', function(done) {
         return this.LaunchpadController._atLeastOneAdminExists(
           (err, exists) => {
             expect(err).to.equal(null)
@@ -232,14 +236,14 @@ describe('LaunchpadController', function() {
       })
     })
 
-    return describe('when getUser produces an error', function() {
+    describe('when getUser produces an error', function() {
       beforeEach(function() {
         return (this.UserGetter.getUser = sinon
           .stub()
           .callsArgWith(2, new Error('woops')))
       })
 
-      return it('should produce an error', function(done) {
+      it('should produce an error', function(done) {
         return this.LaunchpadController._atLeastOneAdminExists(
           (err, exists) => {
             expect(err).to.not.equal(null)
@@ -286,19 +290,19 @@ describe('LaunchpadController', function() {
           .callsArgWith(2, new Error('woops')))
       })
 
-      return it('should call next with an error', function() {
+      it('should call next with an error', function() {
         this.LaunchpadController.sendTestEmail(this.req, this.res, this.next)
         this.next.callCount.should.equal(1)
         return expect(this.next.lastCall.args[0]).to.be.instanceof(Error)
       })
     })
 
-    return describe('when no email address is supplied', function() {
+    describe('when no email address is supplied', function() {
       beforeEach(function() {
         return (this.req.body.email = undefined)
       })
 
-      return it('should produce a 400 response', function() {
+      it('should produce a 400 response', function() {
         this.LaunchpadController.sendTestEmail(this.req, this.res, this.next)
         this.res.sendStatus.callCount.should.equal(1)
         return this.res.sendStatus.calledWith(400).should.equal(true)
@@ -362,11 +366,19 @@ describe('LaunchpadController', function() {
       it('should have updated the user to make them an admin', function() {
         this.User.update.callCount.should.equal(1)
         return this.User.update
-          .calledWith({ _id: this.user._id }, { $set: { isAdmin: true } })
+          .calledWithMatch(
+            { _id: this.user._id },
+            {
+              $set: {
+                isAdmin: true,
+                emails: [{ email: this.user.email }]
+              }
+            }
+          )
           .should.equal(true)
       })
 
-      return it('should have set a redirect in session', function() {
+      it('should have set a redirect in session', function() {
         this.AuthenticationController.setRedirectInSession.callCount.should.equal(
           1
         )
@@ -408,7 +420,7 @@ describe('LaunchpadController', function() {
         return this._atLeastOneAdminExists.callCount.should.equal(0)
       })
 
-      return it('should not call registerNewUser', function() {
+      it('should not call registerNewUser', function() {
         return this.UserRegistrationHandler.registerNewUser.callCount.should.equal(
           0
         )
@@ -447,7 +459,7 @@ describe('LaunchpadController', function() {
         return this._atLeastOneAdminExists.callCount.should.equal(0)
       })
 
-      return it('should not call registerNewUser', function() {
+      it('should not call registerNewUser', function() {
         return this.UserRegistrationHandler.registerNewUser.callCount.should.equal(
           0
         )
@@ -482,7 +494,7 @@ describe('LaunchpadController', function() {
         return this.res.sendStatus.calledWith(403).should.equal(true)
       })
 
-      return it('should not call registerNewUser', function() {
+      it('should not call registerNewUser', function() {
         return this.UserRegistrationHandler.registerNewUser.callCount.should.equal(
           0
         )
@@ -521,7 +533,7 @@ describe('LaunchpadController', function() {
         return this._atLeastOneAdminExists.callCount.should.equal(1)
       })
 
-      return it('should not call registerNewUser', function() {
+      it('should not call registerNewUser', function() {
         return this.UserRegistrationHandler.registerNewUser.callCount.should.equal(
           0
         )
@@ -569,7 +581,7 @@ describe('LaunchpadController', function() {
           .should.equal(true)
       })
 
-      return it('should not call update', function() {
+      it('should not call update', function() {
         return this.User.update.callCount.should.equal(0)
       })
     })
@@ -608,7 +620,7 @@ describe('LaunchpadController', function() {
         return this._atLeastOneAdminExists.callCount.should.equal(1)
       })
 
-      return it('should have called registerNewUser', function() {
+      it('should have called registerNewUser', function() {
         this.UserRegistrationHandler.registerNewUser.callCount.should.equal(1)
         return this.UserRegistrationHandler.registerNewUser
           .calledWith({ email: this.email, password: this.password })
@@ -616,7 +628,7 @@ describe('LaunchpadController', function() {
       })
     })
 
-    return describe('when overleaf', function() {
+    describe('when overleaf', function() {
       beforeEach(function() {
         this.Settings.overleaf = { one: 1 }
         this.Settings.createV1AccountOnLogin = true
@@ -673,11 +685,19 @@ describe('LaunchpadController', function() {
 
       it('should have updated the user to make them an admin', function() {
         return this.User.update
-          .calledWith({ _id: this.user._id }, { $set: { isAdmin: true } })
+          .calledWith(
+            { _id: this.user._id },
+            {
+              $set: {
+                isAdmin: true,
+                emails: [{ email: this.user.email }]
+              }
+            }
+          )
           .should.equal(true)
       })
 
-      return it('should have set a redirect in session', function() {
+      it('should have set a redirect in session', function() {
         this.AuthenticationController.setRedirectInSession.callCount.should.equal(
           1
         )
@@ -688,7 +708,7 @@ describe('LaunchpadController', function() {
     })
   })
 
-  return describe('registerExternalAuthAdmin', function() {
+  describe('registerExternalAuthAdmin', function() {
     beforeEach(function() {
       this.Settings.ldap = { one: 1 }
       return (this._atLeastOneAdminExists = sinon.stub(
@@ -717,9 +737,11 @@ describe('LaunchpadController', function() {
         this.AuthenticationController.setRedirectInSession = sinon.stub()
         this.res.json = sinon.stub()
         this.next = sinon.stub()
-        return this.LaunchpadController.registerExternalAuthAdmin(
-          'ldap'
-        )(this.req, this.res, this.next)
+        return this.LaunchpadController.registerExternalAuthAdmin('ldap')(
+          this.req,
+          this.res,
+          this.next
+        )
       })
 
       it('should send back a json response', function() {
@@ -746,11 +768,17 @@ describe('LaunchpadController', function() {
       it('should have updated the user to make them an admin', function() {
         this.User.update.callCount.should.equal(1)
         return this.User.update
-          .calledWith({ _id: this.user._id }, { $set: { isAdmin: true } })
+          .calledWith(
+            { _id: this.user._id },
+            {
+              $set: { isAdmin: true },
+              emails: [{ email: this.user.email }]
+            }
+          )
           .should.equal(true)
       })
 
-      return it('should have set a redirect in session', function() {
+      it('should have set a redirect in session', function() {
         this.AuthenticationController.setRedirectInSession.callCount.should.equal(
           1
         )
@@ -788,7 +816,7 @@ describe('LaunchpadController', function() {
         return this._atLeastOneAdminExists.callCount.should.equal(0)
       })
 
-      return it('should not call registerNewUser', function() {
+      it('should not call registerNewUser', function() {
         return this.UserRegistrationHandler.registerNewUser.callCount.should.equal(
           0
         )
@@ -809,9 +837,11 @@ describe('LaunchpadController', function() {
         this.AuthenticationController.setRedirectInSession = sinon.stub()
         this.res.sendStatus = sinon.stub()
         this.next = sinon.stub()
-        return this.LaunchpadController.registerExternalAuthAdmin(
-          'ldap'
-        )(this.req, this.res, this.next)
+        return this.LaunchpadController.registerExternalAuthAdmin('ldap')(
+          this.req,
+          this.res,
+          this.next
+        )
       })
 
       it('should send a 400 response', function() {
@@ -823,7 +853,7 @@ describe('LaunchpadController', function() {
         return this._atLeastOneAdminExists.callCount.should.equal(0)
       })
 
-      return it('should not call registerNewUser', function() {
+      it('should not call registerNewUser', function() {
         return this.UserRegistrationHandler.registerNewUser.callCount.should.equal(
           0
         )
@@ -844,9 +874,11 @@ describe('LaunchpadController', function() {
         this.AuthenticationController.setRedirectInSession = sinon.stub()
         this.res.sendStatus = sinon.stub()
         this.next = sinon.stub()
-        return this.LaunchpadController.registerExternalAuthAdmin(
-          'ldap'
-        )(this.req, this.res, this.next)
+        return this.LaunchpadController.registerExternalAuthAdmin('ldap')(
+          this.req,
+          this.res,
+          this.next
+        )
       })
 
       it('should send a 403 response', function() {
@@ -854,7 +886,7 @@ describe('LaunchpadController', function() {
         return this.res.sendStatus.calledWith(403).should.equal(true)
       })
 
-      return it('should not call registerNewUser', function() {
+      it('should not call registerNewUser', function() {
         return this.UserRegistrationHandler.registerNewUser.callCount.should.equal(
           0
         )
@@ -875,9 +907,11 @@ describe('LaunchpadController', function() {
         this.AuthenticationController.setRedirectInSession = sinon.stub()
         this.res.sendStatus = sinon.stub()
         this.next = sinon.stub()
-        return this.LaunchpadController.registerExternalAuthAdmin(
-          'ldap'
-        )(this.req, this.res, this.next)
+        return this.LaunchpadController.registerExternalAuthAdmin('ldap')(
+          this.req,
+          this.res,
+          this.next
+        )
       })
 
       it('should call next with an error', function() {
@@ -889,7 +923,7 @@ describe('LaunchpadController', function() {
         return this._atLeastOneAdminExists.callCount.should.equal(1)
       })
 
-      return it('should not call registerNewUser', function() {
+      it('should not call registerNewUser', function() {
         return this.UserRegistrationHandler.registerNewUser.callCount.should.equal(
           0
         )
@@ -912,9 +946,11 @@ describe('LaunchpadController', function() {
         this.AuthenticationController.setRedirectInSession = sinon.stub()
         this.res.json = sinon.stub()
         this.next = sinon.stub()
-        return this.LaunchpadController.registerExternalAuthAdmin(
-          'ldap'
-        )(this.req, this.res, this.next)
+        return this.LaunchpadController.registerExternalAuthAdmin('ldap')(
+          this.req,
+          this.res,
+          this.next
+        )
       })
 
       it('should call next with an error', function() {
@@ -938,12 +974,12 @@ describe('LaunchpadController', function() {
           .should.equal(true)
       })
 
-      return it('should not call update', function() {
+      it('should not call update', function() {
         return this.User.update.callCount.should.equal(0)
       })
     })
 
-    return describe('when user update produces an error', function() {
+    describe('when user update produces an error', function() {
       beforeEach(function() {
         this._atLeastOneAdminExists.callsArgWith(0, null, false)
         this.email = 'someone@example.com'
@@ -959,9 +995,11 @@ describe('LaunchpadController', function() {
         this.AuthenticationController.setRedirectInSession = sinon.stub()
         this.res.json = sinon.stub()
         this.next = sinon.stub()
-        return this.LaunchpadController.registerExternalAuthAdmin(
-          'ldap'
-        )(this.req, this.res, this.next)
+        return this.LaunchpadController.registerExternalAuthAdmin('ldap')(
+          this.req,
+          this.res,
+          this.next
+        )
       })
 
       it('should call next with an error', function() {
@@ -973,7 +1011,7 @@ describe('LaunchpadController', function() {
         return this._atLeastOneAdminExists.callCount.should.equal(1)
       })
 
-      return it('should have called registerNewUser', function() {
+      it('should have called registerNewUser', function() {
         this.UserRegistrationHandler.registerNewUser.callCount.should.equal(1)
         return this.UserRegistrationHandler.registerNewUser
           .calledWith({

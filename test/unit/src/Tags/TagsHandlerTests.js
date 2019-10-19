@@ -36,18 +36,22 @@ describe('TagsHandler', function() {
     }
     this.callback = sinon.stub()
     return (this.handler = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         'settings-sharelatex': { apis: { tags: { url: tagsUrl } } },
         request: this.request,
         'logger-sharelatex': {
           log() {},
+          warn() {},
           err() {}
         }
       }
     }))
   })
 
-  describe('removeProjectFromAllTags', () =>
+  describe('removeProjectFromAllTags', function() {
     it('should tell the tags api to remove the project_id from all the users tags', function(done) {
       return this.handler.removeProjectFromAllTags(user_id, project_id, () => {
         this.request.del
@@ -58,25 +62,8 @@ describe('TagsHandler', function() {
           .should.equal(true)
         return done()
       })
-    }))
-
-  describe('_groupTagsByProject', () =>
-    it('should 	group the tags by project_id', function(done) {
-      const rawTags = [
-        { name: 'class101', project_ids: ['1234', '51db33e31a55afd212000007'] },
-        { name: 'class201', project_ids: ['1234', '51db33e31a55afd212000007'] },
-        {
-          name: 'research group',
-          project_ids: ['12', '51da65f2e2c39a2f09000100', 'odjaskdas', 'dasdsa']
-        },
-        { name: 'different', project_ids: ['1234', 'e2c39a2f09000100'] }
-      ]
-
-      return this.handler._groupTagsByProject(rawTags, function(err, tags) {
-        _.size(tags).should.equal(7)
-        return done()
-      })
-    }))
+    })
+  })
 
   describe('_requestTags', function() {
     it('should return an err and empty array on error', function(done) {
@@ -116,7 +103,7 @@ describe('TagsHandler', function() {
       })
     })
 
-    return it('should return an err and empty array on no body and no response', function(done) {
+    it('should return an err and empty array on no body and no response', function(done) {
       this.request.get.callsArgWith(
         1,
         { something: 'wrong' },
@@ -154,7 +141,7 @@ describe('TagsHandler', function() {
       })
     })
 
-    return it('should return empty arrays if there are no tags', function() {
+    it('should return empty arrays if there are no tags', function() {
       this.request.get.callsArgWith(1, null, { statusCode: 200 }, null)
       return this.handler.getAllTags(
         user_id,
@@ -190,7 +177,7 @@ describe('TagsHandler', function() {
         .should.equal(true)
     })
 
-    return it('should call the callback with no error', function() {
+    it('should call the callback with no error', function() {
       return this.callback.calledWith(null).should.equal(true)
     })
   })
@@ -213,12 +200,12 @@ describe('TagsHandler', function() {
           .should.equal(true)
       })
 
-      return it('should call the callback with no error', function() {
+      it('should call the callback with no error', function() {
         return this.callback.calledWith(null).should.equal(true)
       })
     })
 
-    return describe('with error', function() {
+    describe('with error', function() {
       beforeEach(function() {
         this.request.del = sinon
           .stub()
@@ -226,7 +213,7 @@ describe('TagsHandler', function() {
         return this.handler.deleteTag(user_id, tag_id, this.callback)
       })
 
-      return it('should call the callback with an Error', function() {
+      it('should call the callback with an Error', function() {
         return this.callback.calledWith(new Error()).should.equal(true)
       })
     })
@@ -258,12 +245,12 @@ describe('TagsHandler', function() {
           .should.equal(true)
       })
 
-      return it('should call the callback with no error', function() {
+      it('should call the callback with no error', function() {
         return this.callback.calledWith(null).should.equal(true)
       })
     })
 
-    return describe('with error', function() {
+    describe('with error', function() {
       beforeEach(function() {
         this.request.post = sinon
           .stub()
@@ -271,7 +258,7 @@ describe('TagsHandler', function() {
         return this.handler.renameTag(user_id, tag_id, 'name', this.callback)
       })
 
-      return it('should call the callback with an Error', function() {
+      it('should call the callback with an Error', function() {
         return this.callback.calledWith(new Error()).should.equal(true)
       })
     })
@@ -300,12 +287,12 @@ describe('TagsHandler', function() {
           .should.equal(true)
       })
 
-      return it('should call the callback with no error', function() {
+      it('should call the callback with no error', function() {
         return this.callback.calledWith(null).should.equal(true)
       })
     })
 
-    return describe('with error', function() {
+    describe('with error', function() {
       beforeEach(function() {
         this.request.del = sinon
           .stub()
@@ -318,7 +305,7 @@ describe('TagsHandler', function() {
         )
       })
 
-      return it('should call the callback with an Error', function() {
+      it('should call the callback with an Error', function() {
         return this.callback.calledWith(new Error()).should.equal(true)
       })
     })
@@ -347,12 +334,12 @@ describe('TagsHandler', function() {
           .should.equal(true)
       })
 
-      return it('should call the callback with no error', function() {
+      it('should call the callback with no error', function() {
         return this.callback.calledWith(null).should.equal(true)
       })
     })
 
-    return describe('with error', function() {
+    describe('with error', function() {
       beforeEach(function() {
         this.request.post = sinon
           .stub()
@@ -365,7 +352,7 @@ describe('TagsHandler', function() {
         )
       })
 
-      return it('should call the callback with an Error', function() {
+      it('should call the callback with an Error', function() {
         return this.callback.calledWith(new Error()).should.equal(true)
       })
     })
@@ -397,12 +384,12 @@ describe('TagsHandler', function() {
           .should.equal(true)
       })
 
-      return it('should call the callback with no error', function() {
+      it('should call the callback with no error', function() {
         return this.callback.calledWith(null).should.equal(true)
       })
     })
 
-    return describe('with error', function() {
+    describe('with error', function() {
       beforeEach(function() {
         this.request.post = sinon
           .stub()
@@ -415,13 +402,13 @@ describe('TagsHandler', function() {
         )
       })
 
-      return it('should call the callback with an Error', function() {
+      it('should call the callback with an Error', function() {
         return this.callback.calledWith(new Error()).should.equal(true)
       })
     })
   })
 
-  return describe('updateTagUserIds', function() {
+  describe('updateTagUserIds', function() {
     describe('successfully', function() {
       beforeEach(function() {
         this.request.put = sinon
@@ -446,12 +433,12 @@ describe('TagsHandler', function() {
           .should.equal(true)
       })
 
-      return it('should call the callback with no error', function() {
+      it('should call the callback with no error', function() {
         return this.callback.calledWith(null).should.equal(true)
       })
     })
 
-    return describe('with error', function() {
+    describe('with error', function() {
       beforeEach(function() {
         this.request.put = sinon
           .stub()
@@ -463,7 +450,7 @@ describe('TagsHandler', function() {
         )
       })
 
-      return it('should call the callback with an Error', function() {
+      it('should call the callback with an Error', function() {
         return this.callback.calledWith(new Error()).should.equal(true)
       })
     })

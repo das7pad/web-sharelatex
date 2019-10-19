@@ -2,8 +2,7 @@
     camelcase,
     max-len
 */
-/* global define,history */
-define(['base', 'libs/recurly-4.8.5'], function(App, recurly) {
+define(['base'], function(App) {
   App.factory('MultiCurrencyPricing', function() {
     const currencyCode = window.recomendedCurrency
 
@@ -273,6 +272,26 @@ define(['base', 'libs/recurly-4.8.5'], function(App, recurly) {
     }
     if ($location.hash() === 'groups') {
       $scope.openGroupPlanModal()
+    }
+
+    $scope.openPayByInvoiceModal = function() {
+      const path = `${window.location.pathname}${window.location.search}`
+      history.replaceState(null, document.title, path + '#pay-by-invoice')
+      $modal
+        .open({
+          templateUrl: 'groupPlanModalInquiryTemplate'
+        })
+        .result.finally(() =>
+          history.replaceState(null, document.title, window.location.pathname)
+        )
+      event_tracking.send(
+        'subscription-funnel',
+        'plans-page',
+        'group-inquiry-potential'
+      )
+    }
+    if ($location.hash() === 'pay-by-invoice') {
+      $scope.openPayByInvoiceModal()
     }
 
     var eventLabel = (label, location) => label

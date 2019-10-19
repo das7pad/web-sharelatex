@@ -14,7 +14,7 @@
 let EditorRealTimeController
 const Settings = require('settings-sharelatex')
 const RedisWrapper = require('../../infrastructure/RedisWrapper')
-const rclient = RedisWrapper.client('realtime')
+const rclient = RedisWrapper.client('pubsub')
 const os = require('os')
 const crypto = require('crypto')
 
@@ -26,8 +26,14 @@ module.exports = EditorRealTimeController = {
   emitToRoom(room_id, message, ...payload) {
     // create a unique message id using a counter
     const message_id = `web:${HOST}:${RND}-${COUNT++}`
+    var channel
+    if (room_id === 'all' || !Settings.publishOnIndividualChannels) {
+      channel = 'editor-events'
+    } else {
+      channel = `editor-events:${room_id}`
+    }
     return rclient.publish(
-      'editor-events',
+      channel,
       JSON.stringify({
         room_id,
         message,

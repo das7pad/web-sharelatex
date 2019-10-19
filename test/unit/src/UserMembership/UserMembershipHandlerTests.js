@@ -68,6 +68,9 @@ describe('UserMembershipHandler', function() {
       create: sinon.stub().yields(null, this.publisher)
     }
     return (this.UserMembershipHandler = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         './UserMembershipViewModel': this.UserMembershipViewModel,
         '../User/UserGetter': this.UserGetter,
@@ -83,80 +86,6 @@ describe('UserMembershipHandler', function() {
     }))
   })
 
-  describe('getEntity', () =>
-    describe('group subscriptions', function() {
-      it('get subscription', function(done) {
-        return this.UserMembershipHandler.getEntity(
-          this.fakeEntityId,
-          EntityConfigs.group,
-          this.user,
-          null,
-          (error, subscription) => {
-            should.not.exist(error)
-            const expectedQuery = {
-              groupPlan: true,
-              _id: this.fakeEntityId,
-              manager_ids: ObjectId(this.user._id)
-            }
-            assertCalledWith(this.Subscription.findOne, expectedQuery)
-            expect(subscription).to.equal(this.subscription)
-            expect(subscription.membersLimit).to.equal(10)
-            return done()
-          }
-        )
-      })
-
-      it('get for admin', function(done) {
-        return this.UserMembershipHandler.getEntity(
-          this.fakeEntityId,
-          EntityConfigs.group,
-          { isAdmin: true },
-          null,
-          (error, subscription) => {
-            should.not.exist(error)
-            const expectedQuery = {
-              groupPlan: true,
-              _id: this.fakeEntityId
-            }
-            assertCalledWith(this.Subscription.findOne, expectedQuery)
-            return done()
-          }
-        )
-      })
-
-      it('get with staffAccess field', function(done) {
-        return this.UserMembershipHandler.getEntity(
-          this.fakeEntityId,
-          EntityConfigs.group,
-          { staffAccess: { institutionMetrics: true } },
-          'institutionMetrics',
-          (error, subscription) => {
-            should.not.exist(error)
-            const expectedQuery = {
-              groupPlan: true,
-              _id: this.fakeEntityId
-            }
-            assertCalledWith(this.Subscription.findOne, expectedQuery)
-            return done()
-          }
-        )
-      })
-
-      return it('handle error', function(done) {
-        this.Subscription.findOne.yields(new Error('some error'))
-        return this.UserMembershipHandler.getEntity(
-          this.fakeEntityId,
-          EntityConfigs.group,
-          this.user._id,
-          null,
-          (error, subscription) => {
-            should.exist(error)
-            return done()
-          }
-        )
-      })
-    }))
-
   describe('getEntityWithoutAuthorizationCheck', function() {
     it('get publisher', function(done) {
       return this.UserMembershipHandler.getEntityWithoutAuthorizationCheck(
@@ -171,66 +100,10 @@ describe('UserMembershipHandler', function() {
         }
       )
     })
-
-    describe('institutions', function() {
-      it('get institution', function(done) {
-        return this.UserMembershipHandler.getEntity(
-          this.institution.v1Id,
-          EntityConfigs.institution,
-          this.user,
-          null,
-          (error, institution) => {
-            should.not.exist(error)
-            const expectedQuery = {
-              v1Id: this.institution.v1Id,
-              managerIds: ObjectId(this.user._id)
-            }
-            assertCalledWith(this.Institution.findOne, expectedQuery)
-            expect(institution).to.equal(this.institution)
-            return done()
-          }
-        )
-      })
-
-      return it('handle errors', function(done) {
-        this.Institution.findOne.yields(new Error('nope'))
-        return this.UserMembershipHandler.getEntity(
-          this.fakeEntityId,
-          EntityConfigs.institution,
-          this.user._id,
-          null,
-          (error, institution) => {
-            should.exist(error)
-            expect(error).to.not.be.an.instanceof(Errors.NotFoundError)
-            return done()
-          }
-        )
-      })
-    })
-
-    return describe('publishers', () =>
-      it('get publisher', function(done) {
-        return this.UserMembershipHandler.getEntity(
-          this.publisher.slug,
-          EntityConfigs.publisher,
-          this.user,
-          null,
-          (error, institution) => {
-            should.not.exist(error)
-            const expectedQuery = {
-              slug: this.publisher.slug,
-              managerIds: ObjectId(this.user._id)
-            }
-            assertCalledWith(this.Publisher.findOne, expectedQuery)
-            expect(institution).to.equal(this.publisher)
-            return done()
-          }
-        )
-      }))
   })
 
   describe('getUsers', function() {
-    describe('group', () =>
+    describe('group', function() {
       it('build view model for all users', function(done) {
         return this.UserMembershipHandler.getUsers(
           this.subscription,
@@ -246,9 +119,10 @@ describe('UserMembershipHandler', function() {
             return done()
           }
         )
-      }))
+      })
+    })
 
-    describe('group mamagers', () =>
+    describe('group mamagers', function() {
       it('build view model for all managers', function(done) {
         return this.UserMembershipHandler.getUsers(
           this.subscription,
@@ -261,9 +135,10 @@ describe('UserMembershipHandler', function() {
             return done()
           }
         )
-      }))
+      })
+    })
 
-    return describe('institution', () =>
+    describe('institution', function() {
       it('build view model for all managers', function(done) {
         return this.UserMembershipHandler.getUsers(
           this.institution,
@@ -276,10 +151,11 @@ describe('UserMembershipHandler', function() {
             return done()
           }
         )
-      }))
+      })
+    })
   })
 
-  describe('createEntity', () =>
+  describe('createEntity', function() {
     it('creates publisher', function(done) {
       return this.UserMembershipHandler.createEntity(
         this.fakeEntityId,
@@ -290,14 +166,15 @@ describe('UserMembershipHandler', function() {
           return done()
         }
       )
-    }))
+    })
+  })
 
   describe('addUser', function() {
     beforeEach(function() {
       return (this.email = this.newUser.email)
     })
 
-    return describe('institution', function() {
+    describe('institution', function() {
       it('get user', function(done) {
         return this.UserMembershipHandler.addUser(
           this.institution,
@@ -352,7 +229,7 @@ describe('UserMembershipHandler', function() {
         )
       })
 
-      return it('return user view', function(done) {
+      it('return user view', function(done) {
         return this.UserMembershipHandler.addUser(
           this.institution,
           EntityConfigs.institution,
@@ -366,7 +243,7 @@ describe('UserMembershipHandler', function() {
     })
   })
 
-  return describe('removeUser', () =>
+  describe('removeUser', function() {
     describe('institution', function() {
       it('remove user from institution', function(done) {
         return this.UserMembershipHandler.removeUser(
@@ -383,7 +260,7 @@ describe('UserMembershipHandler', function() {
         )
       })
 
-      return it('handle admin', function(done) {
+      it('handle admin', function(done) {
         this.subscription.admin_id = this.newUser._id
         return this.UserMembershipHandler.removeUser(
           this.subscription,
@@ -396,5 +273,6 @@ describe('UserMembershipHandler', function() {
           }
         )
       })
-    }))
+    })
+  })
 })

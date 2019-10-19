@@ -58,7 +58,7 @@ module.exports = LockManager = {
 
     const timer = new metrics.Timer(`lock.${namespace}`)
     const key = `lock:web:${namespace}:${id}`
-    return LockManager._getLock(key, namespace, function(error, lockValue) {
+    LockManager._getLock(key, namespace, function(error, lockValue) {
       if (error != null) {
         return callback(error)
       }
@@ -108,7 +108,7 @@ module.exports = LockManager = {
       callback = function(err, isFree, lockValue) {}
     }
     const lockValue = LockManager.randomLock()
-    return rclient.set(
+    rclient.set(
       key,
       lockValue,
       'EX',
@@ -203,7 +203,7 @@ module.exports = LockManager = {
         return callback(err)
       } else if (result != null && result !== 1) {
         // successful unlock should release exactly one key
-        logger.error(
+        logger.warn(
           { key, lockValue, redis_err: err, redis_result: result },
           'unlocking error'
         )

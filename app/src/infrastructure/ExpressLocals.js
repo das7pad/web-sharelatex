@@ -27,26 +27,44 @@ const _ = require('underscore')
 const Url = require('url')
 const PackageVersions = require('./PackageVersions')
 const htmlEncoder = new require('node-html-encoder').Encoder('numerical')
-const hashedFiles = require('./HashedFiles')
 const Path = require('path')
 const Features = require('./Features')
 const Modules = require('./Modules')
 const moment = require('moment')
+const lodash = require('lodash')
+const chokidar = require('chokidar')
 
 const jsPath = Settings.useMinifiedJs ? '/minjs/' : '/js/'
 
-const ace = PackageVersions.lib('ace')
-const pdfjs = PackageVersions.lib('pdfjs')
-const fineuploader = PackageVersions.lib('fineuploader')
+const webpackManifestPath = Path.join(
+  __dirname,
+  `../../../public${jsPath}manifest.json`
+)
+let webpackManifest
+if (['development', 'test'].includes(process.env.NODE_ENV)) {
+  // In dev the web and webpack containers can race (and therefore the manifest
+  // file may not be created when web is running), so watch the file for changes
+  // and reload
+  webpackManifest = {}
+  const reloadManifest = () => {
+    logger.log('[DEV] Reloading webpack manifest')
+    webpackManifest = require(webpackManifestPath)
+  }
 
-const cdnAvailable =
-  __guard__(Settings.cdn != null ? Settings.cdn.web : undefined, x => x.host) !=
-  null
+  logger.log('[DEV] Watching webpack manifest')
+  chokidar
+    .watch(webpackManifestPath)
+    .on('add', reloadManifest)
+    .on('change', reloadManifest)
+} else {
+  logger.log('[PRODUCTION] Loading webpack manifest')
+  webpackManifest = require(webpackManifestPath)
+}
+
+const cdnAvailable = Settings.cdn && Settings.cdn.web && !!Settings.cdn.web.host
+
 const darkCdnAvailable =
-  __guard__(
-    Settings.cdn != null ? Settings.cdn.web : undefined,
-    x1 => x1.darkHost
-  ) != null
+  Settings.cdn && Settings.cdn.web && !!Settings.cdn.web.darkHost
 
 module.exports = function(app, webRouter, privateApiRouter, publicApiRouter) {
   webRouter.use(function(req, res, next) {
@@ -79,10 +97,6 @@ module.exports = function(app, webRouter, privateApiRouter, publicApiRouter) {
     res.locals.externalAuthenticationSystemUsed =
       Features.externalAuthenticationSystemUsed
     req.hasFeature = res.locals.hasFeature = Features.hasFeature
-    res.locals.userIsFromOLv1 = user =>
-      (user.overleaf != null ? user.overleaf.id : undefined) != null
-    res.locals.userIsFromSL = user =>
-      (user.overleaf != null ? user.overleaf.id : undefined) == null
     return next()
   })
 
@@ -116,15 +130,9 @@ module.exports = function(app, webRouter, privateApiRouter, publicApiRouter) {
     const isLive = !isDark && !isSmoke
 
     if (cdnAvailable && isLive && !cdnBlocked) {
-      staticFilesBase = __guard__(
-        Settings.cdn != null ? Settings.cdn.web : undefined,
-        x6 => x6.host
-      )
+      staticFilesBase = Settings.cdn.web.host
     } else if (darkCdnAvailable && isDark) {
-      staticFilesBase = __guard__(
-        Settings.cdn != null ? Settings.cdn.web : undefined,
-        x7 => x7.darkHost
-      )
+      staticFilesBase = Settings.cdn.web.darkHost
     } else {
       staticFilesBase = ''
     }
@@ -143,54 +151,30 @@ module.exports = function(app, webRouter, privateApiRouter, publicApiRouter) {
 
     res.locals.moment = moment
 
-    res.locals.buildJsPath = function(jsFile, opts) {
-      if (opts == null) {
-        opts = {}
-      }
-      let path = Path.join(jsPath, jsFile)
-
-      if (
-        opts.hashedPath &&
-        !Settings.cdn.hasUniqueURI &&
-        hashedFiles[path] != null
-      ) {
-        path = hashedFiles[path]
-      }
-
-      if (opts.qs == null) {
-        opts.qs = {}
+    res.locals.buildJsPath = function(jsFile, opts = {}) {
+      // Resolve path from webpack manifest file
+      let path = webpackManifest[jsFile]
+      // If not found in manifest, it is directly linked, so fallback to
+      // relevant public directory
+      if (!path) {
+        path = Path.join(jsPath, jsFile)
       }
 
       if (opts.cdn !== false) {
         path = res.locals.staticPath(path)
       }
 
-      const qs = querystring.stringify(opts.qs)
-
-      if (opts.removeExtension === true) {
-        path = path.slice(0, -3)
+      if (opts.qs) {
+        path = path + '?' + querystring.stringify(opts.qs)
       }
 
-      if (qs != null && qs.length > 0) {
-        path = path + '?' + qs
-      }
       return path
     }
 
-    res.locals.buildWebpackPath = function(jsFile, opts) {
-      if (opts == null) {
-        opts = {}
-      }
-      if (Settings.webpack != null && !Settings.useMinifiedJs) {
-        let path = Path.join(jsPath, jsFile)
-        if (opts.removeExtension === true) {
-          path = path.slice(0, -3)
-        }
-        return `${Settings.webpack.url}/public${path}`
-      } else {
-        return res.locals.buildJsPath(jsFile, opts)
-      }
-    }
+    res.locals.mathJaxPath = res.locals.buildJsPath('libs/mathjax/MathJax.js', {
+      cdn: Settings.cdn.ServeMathJax,
+      qs: { config: 'TeX-AMS_HTML,Safe' }
+    })
 
     const IEEE_BRAND_ID = 15
     res.locals.isIEEE = brandVariation =>
@@ -220,14 +204,6 @@ module.exports = function(app, webRouter, privateApiRouter, publicApiRouter) {
     res.locals.buildCssPath = function(themeModifier, buildOpts) {
       const cssFileName = _buildCssFileName(themeModifier)
       const path = Path.join('/stylesheets/', cssFileName)
-      if (
-        (buildOpts != null ? buildOpts.hashedPath : undefined) &&
-        !Settings.cdn.hasUniqueURI &&
-        hashedFiles[path] != null
-      ) {
-        const hashedPath = hashedFiles[path]
-        return res.locals.staticPath(hashedPath)
-      }
       return res.locals.staticPath(path)
     }
 
@@ -235,11 +211,6 @@ module.exports = function(app, webRouter, privateApiRouter, publicApiRouter) {
       const path = Path.join('/img/', imgFile)
       return res.locals.staticPath(path)
     }
-
-    res.locals.mathJaxPath = res.locals.buildJsPath('libs/mathjax/MathJax.js', {
-      cdn: Settings.cdn.ServeMathJax,
-      qs: { config: 'TeX-AMS_HTML,Safe' }
-    })
 
     return next()
   })
@@ -393,13 +364,8 @@ module.exports = function(app, webRouter, privateApiRouter, publicApiRouter) {
         delete req.session.justLoggedIn
       }
     }
-    res.locals.gaToken = __guard__(
-      Settings.analytics != null ? Settings.analytics.ga : undefined,
-      x2 => x2.token
-    )
+    res.locals.gaToken = Settings.analytics && Settings.analytics.ga.token
     res.locals.tenderUrl = Settings.tenderUrl
-    res.locals.sentrySrc =
-      Settings.sentry != null ? Settings.sentry.src : undefined
     res.locals.sentryPublicDSN =
       Settings.sentry != null ? Settings.sentry.publicDSN : undefined
     res.locals.sentrySampleRate =
@@ -515,11 +481,15 @@ module.exports = function(app, webRouter, privateApiRouter, publicApiRouter) {
     res.locals.ExposedSettings = {
       isOverleaf: Settings.overleaf != null,
       appName: Settings.appName,
+      hasSamlBeta: req.session.samlBeta,
+      hasSamlFeature: Features.hasFeature('saml'),
+      samlInitPath: lodash.get(Settings, ['saml', 'ukamf', 'initPath']),
       siteUrl: Settings.siteUrl,
       recaptchaSiteKeyV3:
         Settings.recaptcha != null ? Settings.recaptcha.siteKeyV3 : undefined,
       recaptchaDisabled:
-        Settings.recaptcha != null ? Settings.recaptcha.disabled : undefined
+        Settings.recaptcha != null ? Settings.recaptcha.disabled : undefined,
+      validRootDocExtensions: Settings.validRootDocExtensions
     }
     return next()
   })

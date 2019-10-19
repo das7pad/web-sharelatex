@@ -23,7 +23,7 @@ const { expect } = require('chai')
 
 describe('InstitutionsController', function() {
   beforeEach(function() {
-    this.logger = { err: sinon.stub(), log() {} }
+    this.logger = { err: sinon.stub(), warn: sinon.stub(), log() {} }
     this.host = 'mit.edu'
       .split('')
       .reverse()
@@ -49,8 +49,11 @@ describe('InstitutionsController', function() {
       .stub()
       .callsArgWith(2, null, [this.stubbedUser1, this.stubbedUser2])
     this.addAffiliation = sinon.stub().callsArgWith(3, null)
-    this.refreshFeatures = sinon.stub().callsArgWith(2, null)
+    this.refreshFeatures = sinon.stub().yields(null)
     this.InstitutionsController = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         'logger-sharelatex': this.logger,
         '../User/UserGetter': {
@@ -74,7 +77,7 @@ describe('InstitutionsController', function() {
     return (this.next = sinon.stub())
   })
 
-  return describe('affiliateUsers', function() {
+  describe('affiliateUsers', function() {
     it('should add affiliations for matching users', function(done) {
       this.res.sendStatus = code => {
         code.should.equal(200)
@@ -90,10 +93,10 @@ describe('InstitutionsController', function() {
           .calledWith(this.stubbedUser2._id, this.stubbedUser2.emails[0].email)
           .should.equal(true)
         this.refreshFeatures
-          .calledWith(this.stubbedUser1._id, true)
+          .calledWith(this.stubbedUser1._id)
           .should.equal(true)
         this.refreshFeatures
-          .calledWith(this.stubbedUser2._id, true)
+          .calledWith(this.stubbedUser2._id)
           .should.equal(true)
         return done()
       }
@@ -104,7 +107,7 @@ describe('InstitutionsController', function() {
       )
     })
 
-    return it('should return errors if last affiliation cannot be added', function(done) {
+    it('should return errors if last affiliation cannot be added', function(done) {
       this.addAffiliation.onCall(2).callsArgWith(3, new Error('error'))
       this.next = error => {
         expect(error).to.exist

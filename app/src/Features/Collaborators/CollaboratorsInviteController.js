@@ -16,7 +16,7 @@ let CollaboratorsInviteController
 const ProjectGetter = require('../Project/ProjectGetter')
 const LimitationsManager = require('../Subscription/LimitationsManager')
 const UserGetter = require('../User/UserGetter')
-const CollaboratorsHandler = require('./CollaboratorsHandler')
+const CollaboratorsGetter = require('./CollaboratorsGetter')
 const CollaboratorsInviteHandler = require('./CollaboratorsInviteHandler')
 const logger = require('logger-sharelatex')
 const Settings = require('settings-sharelatex')
@@ -37,7 +37,7 @@ module.exports = CollaboratorsInviteController = {
       invites
     ) {
       if (err != null) {
-        logger.err({ projectId }, 'error getting invites for project')
+        logger.warn({ projectId }, 'error getting invites for project')
         return next(err)
       }
       return res.json({ invites })
@@ -144,7 +144,7 @@ module.exports = CollaboratorsInviteController = {
               email,
               function(err, shouldAllowInvite) {
                 if (err != null) {
-                  logger.err(
+                  logger.warn(
                     { err, email, projectId, sendingUserId },
                     'error checking if we can invite this email address'
                   )
@@ -167,7 +167,7 @@ module.exports = CollaboratorsInviteController = {
                   privileges,
                   function(err, invite) {
                     if (err != null) {
-                      logger.err(
+                      logger.warn(
                         { projectId, email, sendingUserId },
                         'error creating project invite'
                       )
@@ -202,7 +202,7 @@ module.exports = CollaboratorsInviteController = {
       inviteId,
       function(err) {
         if (err != null) {
-          logger.err({ projectId, inviteId }, 'error revoking invite')
+          logger.warn({ projectId, inviteId }, 'error revoking invite')
           return next(err)
         }
         EditorRealTimeController.emitToRoom(
@@ -235,7 +235,7 @@ module.exports = CollaboratorsInviteController = {
           inviteId,
           function(err) {
             if (err != null) {
-              logger.err({ projectId, inviteId }, 'error resending invite')
+              logger.warn({ projectId, inviteId }, 'error resending invite')
               return next(err)
             }
             return res.sendStatus(201)
@@ -257,12 +257,12 @@ module.exports = CollaboratorsInviteController = {
     }
     // check if the user is already a member of the project
     const currentUser = AuthenticationController.getSessionUser(req)
-    return CollaboratorsHandler.isUserInvitedMemberOfProject(
+    return CollaboratorsGetter.isUserInvitedMemberOfProject(
       currentUser._id,
       projectId,
-      function(err, isMember, _privilegeLevel) {
+      function(err, isMember) {
         if (err != null) {
-          logger.err(
+          logger.warn(
             { err, projectId },
             'error checking if user is member of project'
           )
@@ -281,7 +281,7 @@ module.exports = CollaboratorsInviteController = {
           token,
           function(err, invite) {
             if (err != null) {
-              logger.err({ projectId, token }, 'error getting invite by token')
+              logger.warn({ projectId, token }, 'error getting invite by token')
               return next(err)
             }
             // check if invite is gone, or otherwise non-existent
@@ -295,7 +295,7 @@ module.exports = CollaboratorsInviteController = {
               { email: 1, first_name: 1, last_name: 1 },
               function(err, owner) {
                 if (err != null) {
-                  logger.err({ err, projectId }, 'error getting project owner')
+                  logger.warn({ err, projectId }, 'error getting project owner')
                   return next(err)
                 }
                 if (owner == null) {
@@ -308,7 +308,7 @@ module.exports = CollaboratorsInviteController = {
                   project
                 ) {
                   if (err != null) {
-                    logger.err({ err, projectId }, 'error getting project')
+                    logger.warn({ err, projectId }, 'error getting project')
                     return next(err)
                   }
                   if (project == null) {
@@ -345,7 +345,7 @@ module.exports = CollaboratorsInviteController = {
       currentUser,
       function(err) {
         if (err != null) {
-          logger.err({ projectId, token }, 'error accepting invite by token')
+          logger.warn({ projectId, token }, 'error accepting invite by token')
           return next(err)
         }
         EditorRealTimeController.emitToRoom(

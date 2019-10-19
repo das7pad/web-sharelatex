@@ -28,11 +28,15 @@ describe('BlogController', function() {
         blog: {
           url: 'http://blog.sharelatex.env'
         }
-      }
+      },
+      cdn: { web: { host: null } }
     }
     this.request = { get: sinon.stub() }
     this.ErrorController = {}
     this.BlogController = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         'settings-sharelatex': this.settings,
         'logger-sharelatex': { log() {} },
@@ -76,7 +80,7 @@ describe('BlogController', function() {
       return this.BlogController.getPage(this.req, this.res)
     })
 
-    return it('should proxy the image urls', function(done) {
+    it('should proxy the image urls', function(done) {
       this.BlogController._directProxy = sinon.stub()
       this.req.url = '/something.png'
       this.BlogController.getPage(this.req, this.res)
@@ -87,7 +91,7 @@ describe('BlogController', function() {
     })
   })
 
-  return describe('getIndexPage', () =>
+  describe('getIndexPage', function() {
     it('should change the url and send it to getPage', function(done) {
       this.req.url = '/blog'
       this.BlogController.getPage = function(req, res) {
@@ -95,5 +99,6 @@ describe('BlogController', function() {
         return done()
       }
       return this.BlogController.getIndexPage(this.req, this.res)
-    }))
+    })
+  })
 })

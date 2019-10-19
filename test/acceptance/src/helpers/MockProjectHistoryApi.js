@@ -68,13 +68,16 @@ module.exports = MockProjectHistoryApi = {
 
   reset() {
     this.oldFiles = {}
+    this.projectHistoryId = 1
     this.projectVersions = {}
     return (this.labels = {})
   },
 
   run() {
+    this.reset()
+
     app.post('/project', (req, res, next) => {
-      return res.json({ project: { id: 1 } })
+      return res.json({ project: { id: this.projectHistoryId++ } })
     })
 
     app.get(
@@ -153,12 +156,12 @@ module.exports = MockProjectHistoryApi = {
     })
 
     return app
-      .listen(3054, function(error) {
+      .listen(3054, error => {
         if (error != null) {
           throw error
         }
       })
-      .on('error', function(error) {
+      .on('error', error => {
         console.error('error starting MockProjectHistoryApi:', error.message)
         return process.exit(1)
       })

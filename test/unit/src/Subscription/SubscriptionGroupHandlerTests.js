@@ -86,6 +86,9 @@ describe('SubscriptionGroupHandler', function() {
     }
 
     return (this.Handler = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         'logger-sharelatex': { log() {} },
         '../User/UserCreator': this.UserCreator,
@@ -109,7 +112,7 @@ describe('SubscriptionGroupHandler', function() {
     }))
   })
 
-  describe('removeUserFromGroup', () =>
+  describe('removeUserFromGroup', function() {
     it('should call the subscription updater to remove the user', function(done) {
       return this.Handler.removeUserFromGroup(
         this.adminUser_id,
@@ -121,7 +124,8 @@ describe('SubscriptionGroupHandler', function() {
           return done()
         }
       )
-    }))
+    })
+  })
 
   describe('replaceUserReferencesInGroups', function() {
     beforeEach(function(done) {
@@ -158,7 +162,7 @@ describe('SubscriptionGroupHandler', function() {
         .should.equal(true)
     })
 
-    return it('replaces the member ids', function() {
+    it('replaces the member ids', function() {
       this.Subscription.update
         .calledWith(
           { member_ids: this.oldId },
@@ -189,14 +193,14 @@ describe('SubscriptionGroupHandler', function() {
       return this.Handler.isUserPartOfGroup(
         this.user_id,
         this.subscription_id,
-        function(err, partOfGroup) {
+        (err, partOfGroup) => {
           partOfGroup.should.equal(true)
           return done()
         }
       )
     })
 
-    return it('should return false when no subscription is found', function(done) {
+    it('should return false when no subscription is found', function(done) {
       this.SubscriptionLocator.getSubscriptionByMemberIdAndId.callsArgWith(
         2,
         null
@@ -204,7 +208,7 @@ describe('SubscriptionGroupHandler', function() {
       return this.Handler.isUserPartOfGroup(
         this.user_id,
         this.subscription_id,
-        function(err, partOfGroup) {
+        (err, partOfGroup) => {
           partOfGroup.should.equal(false)
           return done()
         }
@@ -212,12 +216,12 @@ describe('SubscriptionGroupHandler', function() {
     })
   })
 
-  return describe('getTotalConfirmedUsersInGroup', function() {
+  describe('getTotalConfirmedUsersInGroup', function() {
     describe('for existing subscriptions', function() {
       beforeEach(function() {
         return (this.subscription.member_ids = ['12321', '3121321'])
       })
-      return it('should call the subscription locator and return 2 users', function(done) {
+      it('should call the subscription locator and return 2 users', function(done) {
         return this.Handler.getTotalConfirmedUsersInGroup(
           this.subscription_id,
           (err, count) => {
@@ -230,7 +234,7 @@ describe('SubscriptionGroupHandler', function() {
         )
       })
     })
-    return describe('for nonexistent subscriptions', () =>
+    describe('for nonexistent subscriptions', function() {
       it('should return undefined', function(done) {
         return this.Handler.getTotalConfirmedUsersInGroup(
           'fake-id',
@@ -239,6 +243,7 @@ describe('SubscriptionGroupHandler', function() {
             return done()
           }
         )
-      }))
+      })
+    })
   })
 })

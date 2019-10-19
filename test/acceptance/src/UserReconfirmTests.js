@@ -17,7 +17,7 @@ const async = require('async')
 const User = require('./helpers/User')
 
 describe('User Must Reconfirm', function() {
-  before(function(done) {
+  beforeEach(function(done) {
     this.user = new User()
     return async.series(
       [
@@ -31,14 +31,14 @@ describe('User Must Reconfirm', function() {
   it('should not allow sign in', function(done) {
     return this.user.login(err => {
       expect(err != null).to.equal(false)
-      return this.user.isLoggedIn(function(err, isLoggedIn) {
+      return this.user.isLoggedIn((err, isLoggedIn) => {
         expect(isLoggedIn).to.equal(false)
         return done()
       })
     })
   })
 
-  return describe('Requesting reconfirmation email', function() {
+  describe('Requesting reconfirmation email', function() {
     it('should return a success to client for existing account', function(done) {
       return this.user.reconfirmAccountRequest(
         this.user.email,
@@ -50,7 +50,7 @@ describe('User Must Reconfirm', function() {
       )
     })
 
-    return it('should return a 404 to client for non-existent account', function(done) {
+    it('should return a 404 to client for non-existent account', function(done) {
       return this.user.reconfirmAccountRequest(
         'fake@overleaf.com',
         (err, response) => {

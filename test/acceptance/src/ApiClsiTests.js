@@ -24,7 +24,7 @@ const authed_request = request.defaults({
 
 describe('ApiClsiTests', function() {
   describe('compile', function() {
-    before(function(done) {
+    beforeEach(function(done) {
       this.compileSpec = {
         compile: {
           options: {
@@ -49,14 +49,14 @@ describe('ApiClsiTests', function() {
       return done()
     })
 
-    describe('valid request', () =>
+    describe('valid request', function() {
       it('returns success and a list of output files', function(done) {
         return authed_request.post(
           {
             uri: '/api/clsi/compile/abcd',
             json: this.compileSpec
           },
-          function(error, response, body) {
+          (error, response, body) => {
             if (error != null) {
               throw error
             }
@@ -81,16 +81,17 @@ describe('ApiClsiTests', function() {
             return done()
           }
         )
-      }))
+      })
+    })
 
-    return describe('unauthorized', () =>
+    describe('unauthorized', function() {
       it('returns 401', function(done) {
         return request.post(
           {
             uri: '/api/clsi/compile/abcd',
             json: this.compileSpec
           },
-          function(error, response, body) {
+          (error, response, body) => {
             if (error != null) {
               throw error
             }
@@ -99,15 +100,16 @@ describe('ApiClsiTests', function() {
             return done()
           }
         )
-      }))
+      })
+    })
   })
 
-  return describe('get output', function() {
-    describe('valid file', () =>
-      it('returns the file', done =>
-        authed_request.get(
+  describe('get output', function() {
+    describe('valid file', function() {
+      it('returns the file', function(done) {
+        return authed_request.get(
           '/api/clsi/compile/abcd/build/1234/output/project.pdf',
-          function(error, response, body) {
+          (error, response, body) => {
             if (error != null) {
               throw error
             }
@@ -115,13 +117,15 @@ describe('ApiClsiTests', function() {
             expect(response.body).to.equal('mock-pdf')
             return done()
           }
-        )))
+        )
+      })
+    })
 
-    describe('invalid file', () =>
-      it('returns 404', done =>
-        authed_request.get(
+    describe('invalid file', function() {
+      it('returns 404', function(done) {
+        return authed_request.get(
           '/api/clsi/compile/abcd/build/1234/output/project.aux',
-          function(error, response, body) {
+          (error, response, body) => {
             if (error != null) {
               throw error
             }
@@ -129,13 +133,15 @@ describe('ApiClsiTests', function() {
             expect(response.body).to.not.equal('mock-pdf')
             return done()
           }
-        )))
+        )
+      })
+    })
 
-    return describe('unauthorized', () =>
-      it('returns 401', done =>
-        request.get(
+    describe('unauthorized', function() {
+      it('returns 401', function(done) {
+        return request.get(
           '/api/clsi/compile/abcd/build/1234/output/project.pdf',
-          function(error, response, body) {
+          (error, response, body) => {
             if (error != null) {
               throw error
             }
@@ -143,6 +149,8 @@ describe('ApiClsiTests', function() {
             expect(response.body).to.not.equal('mock-pdf')
             return done()
           }
-        )))
+        )
+      })
+    })
   })
 })

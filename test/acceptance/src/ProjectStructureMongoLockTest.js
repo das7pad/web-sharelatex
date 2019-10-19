@@ -32,9 +32,9 @@ const _ = require('lodash')
 // It is tested that these methods DO work when the lock has not been taken in
 // other acceptance tests.
 
-describe('ProjectStructureMongoLock', () =>
+describe('ProjectStructureMongoLock', function() {
   describe('whilst a project lock is taken', function() {
-    before(function(done) {
+    beforeEach(function(done) {
       // We want to instantly fail if the lock is taken
       LockManager.MAX_LOCK_WAIT_TIME = 1
       this.lockValue = 'lock-value'
@@ -87,7 +87,7 @@ describe('ProjectStructureMongoLock', () =>
         it(`cannot call ProjectEntityMongoUpdateHandler.${methodName}`, function(done) {
           const method = ProjectEntityMongoUpdateHandler[methodName]
           const args = _.times(method.length - 2, _.constant(null))
-          return method(this.locked_project._id, args, function(err) {
+          return method(this.locked_project._id, args, err => {
             expect(err).to.deep.equal(new Error('Timeout'))
             return done()
           })
@@ -95,7 +95,7 @@ describe('ProjectStructureMongoLock', () =>
       }
 
       it('cannot get the project without a projection', function(done) {
-        return ProjectGetter.getProject(this.locked_project._id, function(err) {
+        return ProjectGetter.getProject(this.locked_project._id, err => {
           expect(err).to.deep.equal(new Error('Timeout'))
           return done()
         })
@@ -105,14 +105,14 @@ describe('ProjectStructureMongoLock', () =>
         return ProjectGetter.getProject(
           this.locked_project._id,
           { rootFolder: true },
-          function(err) {
+          err => {
             expect(err).to.deep.equal(new Error('Timeout'))
             return done()
           }
         )
       })
 
-      return it('can get the project if rootFolder is not in the projection', function(done) {
+      it('can get the project if rootFolder is not in the projection', function(done) {
         return ProjectGetter.getProject(
           this.locked_project._id,
           { _id: true },
@@ -127,8 +127,8 @@ describe('ProjectStructureMongoLock', () =>
       })
     })
 
-    return describe('interacting with other projects', function() {
-      before(function(done) {
+    describe('interacting with other projects', function() {
+      beforeEach(function(done) {
         return ProjectCreationHandler.createBlankProject(
           this.user._id,
           'unlocked-project',
@@ -147,7 +147,7 @@ describe('ProjectStructureMongoLock', () =>
           this.unlocked_project._id,
           this.unlocked_project.rootFolder[0]._id,
           'new folder',
-          function(err, folder) {
+          (err, folder) => {
             expect(err).to.equal(null)
             expect(folder).to.be.defined
             return done()
@@ -155,7 +155,7 @@ describe('ProjectStructureMongoLock', () =>
         )
       })
 
-      return it('can get other projects without a projection', function(done) {
+      it('can get other projects without a projection', function(done) {
         return ProjectGetter.getProject(
           this.unlocked_project._id,
           (err, project) => {
@@ -168,4 +168,5 @@ describe('ProjectStructureMongoLock', () =>
         )
       })
     })
-  }))
+  })
+})

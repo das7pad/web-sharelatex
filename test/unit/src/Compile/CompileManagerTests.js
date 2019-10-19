@@ -27,9 +27,13 @@ describe('CompileManager', function() {
     const { rateLimitGetStub } = this
     this.ratelimiter = { addCount: sinon.stub() }
     this.CompileManager = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         'settings-sharelatex': (this.settings = {
-          redis: { web: { host: 'localhost', port: 42 } }
+          redis: { web: { host: 'localhost', port: 42 } },
+          rateLimit: { autoCompile: {} }
         }),
         '../../infrastructure/RedisWrapper': {
           client: () => {
@@ -140,7 +144,7 @@ describe('CompileManager', function() {
         return this.Metrics.Timer.prototype.done.called.should.equal(true)
       })
 
-      return it('should log out the compile', function() {
+      it('should log out the compile', function() {
         return this.logger.log
           .calledWith(
             { project_id: this.project_id, user_id: this.user_id },
@@ -150,7 +154,7 @@ describe('CompileManager', function() {
       })
     })
 
-    describe('when the project has been recently compiled', () =>
+    describe('when the project has been recently compiled', function() {
       it('should return', function(done) {
         this.CompileManager._checkIfAutoCompileLimitHasBeenHit = (
           isAutoCompile,
@@ -164,14 +168,15 @@ describe('CompileManager', function() {
           this.project_id,
           this.user_id,
           {},
-          function(err, status) {
+          (err, status) => {
             status.should.equal('too-recently-compiled')
             return done()
           }
         )
-      }))
+      })
+    })
 
-    return describe('should check the rate limit', () =>
+    describe('should check the rate limit', function() {
       it('should return', function(done) {
         this.CompileManager._checkIfAutoCompileLimitHasBeenHit = sinon
           .stub()
@@ -180,12 +185,13 @@ describe('CompileManager', function() {
           this.project_id,
           this.user_id,
           {},
-          function(err, status) {
+          (err, status) => {
             status.should.equal('autocompile-backoff')
             return done()
           }
         )
-      }))
+      })
+    })
   })
 
   describe('getProjectCompileLimits', function() {
@@ -222,7 +228,7 @@ describe('CompileManager', function() {
         .should.equal(true)
     })
 
-    return it('should return the limits', function() {
+    it('should return the limits', function() {
       return this.callback
         .calledWith(null, {
           timeout: this.timeout,
@@ -261,7 +267,7 @@ describe('CompileManager', function() {
         .should.equal(true)
     })
 
-    return it('should call the callback', function() {
+    it('should call the callback', function() {
       return this.callback.called.should.equal(true)
     })
   })
@@ -289,12 +295,12 @@ describe('CompileManager', function() {
           .should.equal(true)
       })
 
-      return it('should call the callback with true', function() {
+      it('should call the callback with true', function() {
         return this.callback.calledWith(null, true).should.equal(true)
       })
     })
 
-    return describe('when the key does not exist in redis', function() {
+    describe('when the key does not exist in redis', function() {
       beforeEach(function() {
         this.rclient.set = sinon.stub().callsArgWith(5, null, 'OK')
         return this.CompileManager._checkIfRecentlyCompiled(
@@ -316,7 +322,7 @@ describe('CompileManager', function() {
           .should.equal(true)
       })
 
-      return it('should call the callback with false', function() {
+      it('should call the callback with false', function() {
         return this.callback.calledWith(null, false).should.equal(true)
       })
     })
@@ -364,7 +370,7 @@ describe('CompileManager', function() {
       )
     })
 
-    return it('should return false if there is an error in the rate limit', function(done) {
+    it('should return false if there is an error in the rate limit', function(done) {
       this.ratelimiter.addCount.callsArgWith(1, 'error')
       return this.CompileManager._checkIfAutoCompileLimitHasBeenHit(
         true,
@@ -377,7 +383,7 @@ describe('CompileManager', function() {
     })
   })
 
-  return describe('wordCount', function() {
+  describe('wordCount', function() {
     beforeEach(function() {
       this.CompileManager.getProjectCompileLimits = sinon
         .stub()
@@ -407,7 +413,7 @@ describe('CompileManager', function() {
         .should.equal(true)
     })
 
-    return it('should call the callback', function() {
+    it('should call the callback', function() {
       return this.callback.called.should.equal(true)
     })
   })

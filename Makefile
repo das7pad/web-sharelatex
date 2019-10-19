@@ -2,8 +2,6 @@
 # Instead run bin/update_build_scripts from
 # https://github.com/das7pad/sharelatex-dev-env
 
-DOCKER_COMPOSE_FLAGS ?= -f docker-compose.yml
-
 BUILD_NUMBER ?= local
 BRANCH_NAME ?= $(shell git rev-parse --abbrev-ref HEAD)
 COMMIT ?= $(shell git rev-parse HEAD)
@@ -19,18 +17,12 @@ DOCKER_COMPOSE := BUILD_NUMBER=$(BUILD_NUMBER) \
 
 MODULE_DIRS := $(shell find modules -mindepth 1 -maxdepth 1 -type d -not -name '.git' )
 MODULE_MAKEFILES := $(MODULE_DIRS:=/Makefile)
+MODULE_MAIN_SRC_FILES := $(shell find modules -type f -wholename '*main/index.js')
+MODULE_IDE_SRC_FILES := $(shell find modules -type f -wholename '*ide/index.js')
 
-BABEL := node_modules/.bin/babel --source-maps true
-GRUNT := node_modules/.bin/grunt
 LESSC := node_modules/.bin/lessc
 CLEANCSS := node_modules/.bin/cleancss
 
-FRONT_END_SRC_FILES := $(shell find public/src -name '*.js')
-TEST_SRC_FILES := $(shell find test/unit_frontend/src -name '*.js')
-MODULE_MAIN_SRC_FILES := $(shell find modules -type f -wholename '*main/index.js')
-MODULE_IDE_SRC_FILES := $(shell find modules -type f -wholename '*ide/index.js')
-SRC_FILES := $(FRONT_END_SRC_FILES) $(TEST_SRC_FILES)
-OUTPUT_SRC_FILES := $(subst src,js,$(SRC_FILES))
 LESS_FILES := $(shell find public/stylesheets -name '*.less')
 LESSC_COMMON_FLAGS := --source-map --autoprefix="last 2 versions, ie >= 10" --relative-urls
 CLEANCSS_FLAGS := --s0 --source-map
@@ -45,15 +37,6 @@ LESS_OL_IEEE_FILE := public/stylesheets/ieee-style.less
 CSS_OL_IEEE_FILE := public/stylesheets/ieee-style.css
 
 CSS_FILES := $(CSS_SL_FILE) $(CSS_OL_FILE) $(CSS_OL_LIGHT_FILE) $(CSS_OL_IEEE_FILE)
-
-# The automatic variable $(@D) is the target directory name
-public/js/%.js: public/src/%.js
-	@mkdir -p $(@D)
-	$(BABEL) $< --out-file $@
-
-test/unit_frontend/js/%.js: test/unit_frontend/src/%.js
-	@mkdir -p $(@D)
-	$(BABEL) $< --out-file $@
 
 INJECTED_MARKER := INJECTED BY MAKEFILE
 MODULE_INCLUDES_MARKER = OPTIONAL MODULE INCLUDES
@@ -79,60 +62,27 @@ css_full: $(CSS_FILES)
 
 css: $(CSS_OL_FILE)
 
-minify: $(CSS_FILES) $(OUTPUT_SRC_FILES)
-	$(GRUNT) compile:minify
-	$(MAKE) minify_css
-	$(MAKE) minify_es
-	$(MAKE) hash_static_files
-
-hash_static_files:
-	MINIFIED_JS='true' node app/src/infrastructure/HashedFiles.js
-
-minify_css: $(CSS_FILES)
+minify: $(CSS_FILES)
 	$(CLEANCSS) $(CLEANCSS_FLAGS) -o $(CSS_SL_FILE) $(CSS_SL_FILE)
 	$(CLEANCSS) $(CLEANCSS_FLAGS) -o $(CSS_OL_FILE) $(CSS_OL_FILE)
 	$(CLEANCSS) $(CLEANCSS_FLAGS) -o $(CSS_OL_LIGHT_FILE) $(CSS_OL_LIGHT_FILE)
 	$(CLEANCSS) $(CLEANCSS_FLAGS) -o $(CSS_OL_IEEE_FILE) $(CSS_OL_IEEE_FILE)
 
-minify_es:
-	npm -q run webpack:production
+compile: css
 
-compile: compile_app $(OUTPUT_SRC_FILES) css public/js/main.js public/js/ide.js
-
-compile_app: compile_modules
-
-compile_full:
-	$(BABEL) public/src --out-dir public/js
-	$(BABEL) test/unit_frontend/src --out-dir test/unit_frontend/js
-	$(MAKE) css_full
-	$(MAKE) compile_modules_full
-
-compile_css_full:
-	$(MAKE) css_full
-
-COMPILE_MODULES = $(addsuffix /compile,$(MODULE_DIRS))
-compile_modules: $(COMPILE_MODULES)
-
-COMPILE_FULL_MODULES = $(addsuffix /compile_full,$(MODULE_DIRS))
-compile_modules_full: $(COMPILE_FULL_MODULES)
+compile_full: css_full
 
 $(MODULE_MAKEFILES): Makefile.module
 	cp Makefile.module $@
 
-clean: clean_frontend clean_css clean_tests clean_modules
-
-clean_frontend:
-	rm -rf public/js/{analytics,directives,es,filters,ide,main,modules,services,utils}
-	rm -f public/js/*.{js,map}
-
-clean_tests:
-	rm -rf test/unit_frontend/js
-
-clean_modules:
+clean_Makefiles:
 	rm -f $(MODULE_MAKEFILES)
 
 clean_css:
 	rm -f public/stylesheets/*.css*
+
+clean: clean_css
+clean: clean_Makefiles
 
 clean_test_acceptance: clean_test_acceptance_app
 clean_test_acceptance: clean_test_acceptance_modules
@@ -141,9 +91,6 @@ clean_test_acceptance: clean_test_frontend
 clean_ci: clean_build
 clean_ci: clean_test_acceptance
 clean_ci: clean_Makefiles
-
-clean_Makefiles:
-	rm -f $(MODULE_MAKEFILES)
 
 test: test_unit test_frontend test_acceptance
 
@@ -231,8 +178,6 @@ tar:
 	COMPOSE_PROJECT_NAME=tar_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) down -v -t 0
 
 MODULE_TARGETS = \
-	$(COMPILE_MODULES) \
-	$(COMPILE_FULL_MODULES) \
 	$(TEST_ACCEPTANCE_MODULES) \
 	$(TEST_ACCEPTANCE_CI_MODULES) \
 	$(CLEAN_TEST_ACCEPTANCE_MODULES) \

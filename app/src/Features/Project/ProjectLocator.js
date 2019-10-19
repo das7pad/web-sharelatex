@@ -21,6 +21,7 @@
 let ProjectLocator
 const { Project } = require('../../models/Project')
 const ProjectGetter = require('./ProjectGetter')
+const ProjectHelper = require('./ProjectHelper')
 const Errors = require('../Errors/Errors')
 const _ = require('underscore')
 const logger = require('logger-sharelatex')
@@ -146,7 +147,7 @@ module.exports = ProjectLocator = {
         { rootFolder: true, rootDoc_id: true },
         function(err, project) {
           if (err != null) {
-            logger.err({ err }, 'error getting project')
+            logger.warn({ err }, 'error getting project')
             return callback(err)
           } else {
             return getRootDoc(project)
@@ -272,16 +273,14 @@ module.exports = ProjectLocator = {
     }
 
     if (typeof err !== 'undefined' && err !== null) {
-      logger.err(
+      logger.warn(
         { err, project_id: project._id },
         'error getting project for finding element'
       )
       return callback(err)
     }
     if (project == null) {
-      return callback(
-        `project could not be found for finding a element ${project._id}`
-      )
+      return callback('Tried to find an element for a null project')
     }
     if (needlePath === '' || needlePath === '/') {
       return callback(null, project.rootFolder[0], 'folder')
@@ -307,7 +306,7 @@ module.exports = ProjectLocator = {
   findUsersProjectByName(user_id, projectName, callback) {
     return ProjectGetter.findAllUsersProjects(
       user_id,
-      'name archived',
+      'name archived trashed',
       function(err, allProjects) {
         if (typeof error !== 'undefined' && error !== null) {
           return callback(error)
@@ -319,7 +318,7 @@ module.exports = ProjectLocator = {
           projects,
           project =>
             project.name.toLowerCase() === projectName &&
-            project.archived !== true
+            !ProjectHelper.isArchivedOrTrashed(project, user_id)
         )
         logger.log(
           { user_id, projectName, totalProjects: projects.length, project },

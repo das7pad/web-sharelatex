@@ -8,18 +8,35 @@
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
  * DS102: Remove unnecessary code created because of implicit returns
- * DS103: Rewrite code to no longer use __guard__
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-let InstitutionsAPI
 const logger = require('logger-sharelatex')
 const metrics = require('metrics-sharelatex')
 const settings = require('settings-sharelatex')
 const request = require('request')
+const { promisifyAll } = require('../../util/promises')
 const NotificationsBuilder = require('../Notifications/NotificationsBuilder')
+const V1Api = require('../V1/V1Api')
 
-module.exports = InstitutionsAPI = {
+function getInstitutionViaDomain(domain) {
+  return new Promise(function(resolve, reject) {
+    V1Api.request(
+      {
+        timeout: 20 * 1000,
+        uri: `api/v1/sharelatex/university_saml?hostname=${domain}`
+      },
+      function(error, response, body) {
+        if (error) {
+          reject(error)
+        }
+        resolve(body)
+      }
+    )
+  })
+}
+
+const InstitutionsAPI = {
   getInstitutionAffiliations(institutionId, callback) {
     if (callback == null) {
       callback = function(error, body) {}
@@ -34,6 +51,8 @@ module.exports = InstitutionsAPI = {
     )
   },
 
+  getInstitutionViaDomain,
+
   getInstitutionLicences(institutionId, startDate, endDate, lag, callback) {
     if (callback == null) {
       callback = function(error, body) {}
@@ -44,6 +63,21 @@ module.exports = InstitutionsAPI = {
         path: `/api/v2/institutions/${institutionId.toString()}/institution_licences`,
         body: { start_date: startDate, end_date: endDate, lag },
         defaultErrorMessage: "Couldn't get institution licences"
+      },
+      callback
+    )
+  },
+
+  getInstitutionNewLicences(institutionId, startDate, endDate, lag, callback) {
+    if (callback == null) {
+      callback = function(error, body) {}
+    }
+    return makeAffiliationRequest(
+      {
+        method: 'GET',
+        path: `/api/v2/institutions/${institutionId.toString()}/new_institution_licences`,
+        body: { start_date: startDate, end_date: endDate, lag },
+        defaultErrorMessage: "Couldn't get institution new licences"
       },
       callback
     )
@@ -83,17 +117,17 @@ module.exports = InstitutionsAPI = {
           return callback(error, body)
         }
         // have notifications delete any ip matcher notifications for this university
-        logger.log(university)
         return NotificationsBuilder.ipMatcherAffiliation(userId).read(
           university != null ? university.id : undefined,
           function(err) {
             if (err) {
+              // log and ignore error
               logger.err(
                 { err },
                 'Something went wrong marking ip notifications read'
               )
             }
-            return callback(error, body)
+            return callback(null, body)
           }
         )
       }
@@ -150,12 +184,7 @@ var makeAffiliationRequest = function(requestOptions, callback) {
   if (callback == null) {
     callback = function(error) {}
   }
-  if (
-    !__guard__(
-      __guard__(settings != null ? settings.apis : undefined, x1 => x1.v1),
-      x => x.url
-    )
-  ) {
+  if (!settings.apis.v1.url) {
     return callback(null)
   } // service is not configured
   if (!requestOptions.extraSuccessStatusCodes) {
@@ -190,7 +219,7 @@ var makeAffiliationRequest = function(requestOptions, callback) {
           }`
         }
 
-        logger.err(
+        logger.warn(
           { path: requestOptions.path, body: requestOptions.body },
           errorMessage
         )
@@ -216,8 +245,5 @@ var makeAffiliationRequest = function(requestOptions, callback) {
   )
 )
 
-function __guard__(value, transform) {
-  return typeof value !== 'undefined' && value !== null
-    ? transform(value)
-    : undefined
-}
+InstitutionsAPI.promises = promisifyAll(InstitutionsAPI)
+module.exports = InstitutionsAPI

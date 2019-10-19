@@ -33,6 +33,9 @@ describe('BetaProgramHandler', function() {
       save: sinon.stub().callsArgWith(0, null)
     }
     return (this.handler = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         '../../models/User': {
           User: {
@@ -41,6 +44,7 @@ describe('BetaProgramHandler', function() {
         },
         'logger-sharelatex': (this.logger = {
           log: sinon.stub(),
+          warn: sinon.stub(),
           err: sinon.stub()
         }),
         'metrics-sharelatex': (this.logger = {
@@ -80,12 +84,12 @@ describe('BetaProgramHandler', function() {
       })
     })
 
-    return describe('when user.save produces an error', function() {
+    describe('when user.save produces an error', function() {
       beforeEach(function() {
         return this.user.save.callsArgWith(0, new Error('woops'))
       })
 
-      return it('should produce an error', function(done) {
+      it('should produce an error', function(done) {
         return this.call(err => {
           expect(err).to.not.equal(null)
           expect(err).to.be.instanceof(Error)
@@ -95,7 +99,7 @@ describe('BetaProgramHandler', function() {
     })
   })
 
-  return describe('optOut', function() {
+  describe('optOut', function() {
     beforeEach(function() {
       this.user.betaProgram = true
       return (this.call = callback => {
@@ -125,12 +129,12 @@ describe('BetaProgramHandler', function() {
       })
     })
 
-    return describe('when user.save produces an error', function() {
+    describe('when user.save produces an error', function() {
       beforeEach(function() {
         return this.user.save.callsArgWith(0, new Error('woops'))
       })
 
-      return it('should produce an error', function(done) {
+      it('should produce an error', function(done) {
         return this.call(err => {
           expect(err).to.not.equal(null)
           expect(err).to.be.instanceof(Error)

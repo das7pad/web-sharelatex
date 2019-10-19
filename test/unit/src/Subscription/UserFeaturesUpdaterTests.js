@@ -23,6 +23,9 @@ describe('UserFeaturesUpdater', function() {
   beforeEach(function() {
     this.User = { update: sinon.stub().callsArgWith(2) }
     return (this.UserFeaturesUpdater = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         '../../models/User': { User: this.User },
         'logger-sharelatex': { log() {} }
@@ -30,7 +33,7 @@ describe('UserFeaturesUpdater', function() {
     }))
   })
 
-  return describe('updateFeatures', () =>
+  describe('updateFeatures', function() {
     it('should send the users features', function(done) {
       const user_id = '5208dd34438842e2db000005'
       this.features = { versioning: true, collaborators: 10 }
@@ -49,5 +52,6 @@ describe('UserFeaturesUpdater', function() {
           return done()
         }
       )
-    }))
+    })
+  })
 })

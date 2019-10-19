@@ -60,7 +60,8 @@ define([
   'services/wait-for',
   'filters/formatDate',
   'main/event',
-  'main/account-upgrade'
+  'main/account-upgrade',
+  'main/exposed-settings'
 ], function(
   App,
   FileTreeManager,
@@ -82,7 +83,6 @@ define([
     $timeout,
     ide,
     localStorage,
-    sixpack,
     event_tracking,
     metadata,
     $q,
@@ -127,6 +127,7 @@ define([
     $scope.settings = window.userSettings
     $scope.anonymous = window.anonymous
     $scope.isTokenMember = window.isTokenMember
+    $scope.isRestrictedTokenMember = window.isRestrictedTokenMember
 
     $scope.cobranding = {
       isProjectCobranded: CobrandingDataService.isProjectCobranded(),

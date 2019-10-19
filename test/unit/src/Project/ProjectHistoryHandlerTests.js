@@ -46,6 +46,9 @@ describe('ProjectHistoryHandler', function() {
     this.callback = sinon.stub()
 
     return (this.ProjectHistoryHandler = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         'logger-sharelatex': (this.logger = {
           log: sinon.stub(),
@@ -61,7 +64,7 @@ describe('ProjectHistoryHandler', function() {
     }))
   })
 
-  return describe('starting history for an existing project', function() {
+  describe('starting history for an existing project', function() {
     beforeEach(function() {
       this.newHistoryId = 123456789
       this.HistoryManager.initializeProject = sinon
@@ -117,12 +120,12 @@ describe('ProjectHistoryHandler', function() {
           .should.equal(true)
       })
 
-      return it('should call the callback without an error', function() {
+      it('should call the callback without an error', function() {
         return this.callback.called.should.equal(true)
       })
     })
 
-    return describe('when the history already exists', function() {
+    describe('when the history already exists', function() {
       beforeEach(function() {
         this.project.overleaf = { history: { id: 1234 } }
         this.ProjectDetailsHandler.getDetails = sinon
@@ -160,7 +163,7 @@ describe('ProjectHistoryHandler', function() {
         return this.HistoryManager.flushProject.called.should.equal(false)
       })
 
-      return it('should call the callback', function() {
+      it('should call the callback', function() {
         return this.callback.calledWith().should.equal(true)
       })
     })

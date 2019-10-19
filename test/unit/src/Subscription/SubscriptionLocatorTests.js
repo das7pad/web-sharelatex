@@ -27,15 +27,25 @@ describe('Subscription Locator Tests', function() {
       findOne: sinon.stub(),
       find: sinon.stub()
     }
+    this.DeletedSubscription = {
+      findOne: sinon.stub().yields(),
+      find: sinon.stub().yields()
+    }
     return (this.SubscriptionLocator = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         '../../models/Subscription': { Subscription: this.Subscription },
+        '../../models/DeletedSubscription': {
+          DeletedSubscription: this.DeletedSubscription
+        },
         'logger-sharelatex': { log() {} }
       }
     }))
   })
 
-  return describe('finding users subscription', function() {
+  describe('finding users subscription', function() {
     it('should send the users features', function(done) {
       this.Subscription.findOne.callsArgWith(1, null, this.subscription)
       return this.SubscriptionLocator.getUsersSubscription(
@@ -75,7 +85,7 @@ describe('Subscription Locator Tests', function() {
       )
     })
 
-    return describe('finding managed subscription', () =>
+    describe('finding managed subscription', function() {
       it('should query the database', function(done) {
         this.Subscription.findOne.callsArgWith(1, null, this.subscription)
         return this.SubscriptionLocator.findManagedSubscription(
@@ -88,6 +98,7 @@ describe('Subscription Locator Tests', function() {
             return done()
           }
         )
-      }))
+      })
+    })
   })
 })

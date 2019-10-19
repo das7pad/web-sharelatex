@@ -29,18 +29,21 @@ describe('UserHandler', function() {
     }
 
     return (this.UserHandler = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         '../Subscription/TeamInvitesHandler': this.TeamInvitesHandler
       }
     }))
   })
 
-  return describe('populateTeamInvites', function() {
+  describe('populateTeamInvites', function() {
     beforeEach(function(done) {
       return this.UserHandler.populateTeamInvites(this.user, done)
     })
 
-    return it('notifies the user about legacy team invites', function() {
+    it('notifies the user about legacy team invites', function() {
       return this.TeamInvitesHandler.createTeamInvitesForLegacyInvitedEmail
         .calledWith(this.user.email)
         .should.eq(true)

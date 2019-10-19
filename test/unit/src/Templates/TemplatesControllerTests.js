@@ -24,6 +24,9 @@ describe('TemplatesController', function() {
   beforeEach(function() {
     this.user_id = 'user-id'
     this.TemplatesController = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         '../Authentication/AuthenticationController': (this.AuthenticationController = {
           getLoggedInUserId: sinon.stub().returns(this.user_id)
@@ -55,7 +58,7 @@ describe('TemplatesController', function() {
     return (this.res = { redirect: sinon.stub() })
   })
 
-  return describe('createProjectFromV1Template', function() {
+  describe('createProjectFromV1Template', function() {
     describe('on success', function() {
       beforeEach(function() {
         this.project = { _id: 'project-id' }
@@ -88,12 +91,12 @@ describe('TemplatesController', function() {
         )
       })
 
-      return it('should delete session', function() {
+      it('should delete session', function() {
         return expect(this.req.session.templateData).to.be.undefined
       })
     })
 
-    return describe('on error', function() {
+    describe('on error', function() {
       beforeEach(function() {
         this.TemplatesManager.createProjectFromV1Template.yields('error')
         return this.TemplatesController.createProjectFromV1Template(
@@ -107,7 +110,7 @@ describe('TemplatesController', function() {
         return this.next.should.have.been.calledWith('error')
       })
 
-      return it('should not redirect', function() {
+      it('should not redirect', function() {
         return this.res.redirect.called.should.equal(false)
       })
     })

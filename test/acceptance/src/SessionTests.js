@@ -18,13 +18,16 @@ const request = require('./helpers/request')
 const settings = require('settings-sharelatex')
 const redis = require('./helpers/redis')
 const MockV1Api = require('./helpers/MockV1Api')
+const MockTagsApi = require('./helpers/MockTagsApi')
 
 describe('Sessions', function() {
-  this.timeout(25000)
+  this.timeout(20000)
 
-  before(function(done) {
+  beforeEach(function(done) {
+    this.timeout(20000)
     this.user1 = new User()
     this.site_admin = new User({ email: `admin${Math.random()}@example.com` })
+    MockTagsApi.tags[this.user1] = []
     return async.series(
       [cb => this.user1.login(cb), cb => this.user1.logout(cb)],
       done
@@ -35,7 +38,7 @@ describe('Sessions', function() {
     return this.user1.logout(() => done())
   })
 
-  describe('one session', () =>
+  describe('one session', function() {
     it('should have one session in UserSessions set', function(done) {
       return async.series(
         [
@@ -84,17 +87,18 @@ describe('Sessions', function() {
           return done()
         }
       )
-    }))
+    })
+  })
 
   describe('two sessions', function() {
-    before(function() {
+    beforeEach(function() {
       // set up second session for this user
       this.user2 = new User()
       this.user2.email = this.user1.email
       return (this.user2.password = this.user1.password)
     })
 
-    return it('should have two sessions in UserSessions set', function(done) {
+    it('should have two sessions in UserSessions set', function(done) {
       return async.series(
         [
           next => {
@@ -207,7 +211,7 @@ describe('Sessions', function() {
   })
 
   describe('three sessions, password reset', function() {
-    before(function() {
+    beforeEach(function() {
       // set up second session for this user
       this.user2 = new User()
       this.user2.email = this.user1.email
@@ -217,7 +221,7 @@ describe('Sessions', function() {
       return (this.user3.password = this.user1.password)
     })
 
-    return it('should erase both sessions when password is reset', function(done) {
+    it('should erase both sessions when password is reset', function(done) {
       return async.series(
         [
           next => {
@@ -325,8 +329,8 @@ describe('Sessions', function() {
     })
   })
 
-  return describe('three sessions, sessions page', function() {
-    before(function() {
+  describe('three sessions, sessions page', function() {
+    beforeEach(function() {
       // set up second session for this user
       this.user2 = new User()
       this.user2.email = this.user1.email
@@ -336,7 +340,7 @@ describe('Sessions', function() {
       return (this.user3.password = this.user1.password)
     })
 
-    return it('should allow the user to erase the other two sessions', function(done) {
+    it('should allow the user to erase the other two sessions', function(done) {
       return async.series(
         [
           next => {

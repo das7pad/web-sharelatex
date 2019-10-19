@@ -6,7 +6,6 @@
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
- * DS103: Rewrite code to no longer use __guard__
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
@@ -35,42 +34,27 @@ module.exports = Features = {
         return Settings.enableGithubSync
       case 'git-bridge':
         return Settings.enableGitBridge
-      case 'v1-return-message':
-        return (
-          Settings.accountMerge != null &&
-          Settings.overleaf != null &&
-          !Settings.forceImportToV2
-        )
       case 'custom-togglers':
         return Settings.overleaf != null
       case 'oauth':
         return Settings.oauth != null
-      case 'publish-templates':
-        return true
-      case 'view-templates':
+      case 'templates-server-pro':
         return Settings.overleaf == null
       case 'affiliations':
-        return (
-          __guard__(
-            __guard__(
-              Settings != null ? Settings.apis : undefined,
-              x1 => x1.v1
-            ),
-            x => x.url
-          ) != null
-        )
+        // Checking both properties is needed for the time being to allow
+        // enabling the feature in web-api and disabling in Server Pro
+        // see https://github.com/overleaf/web-internal/pull/2127
+        return Settings.apis.v1 && !!Settings.apis.v1.url
       case 'redirect-sl':
         return Settings.redirectToV2 != null
-      case 'force-import-to-v2':
-        return Settings.forceImportToV2
+      case 'overleaf-integration':
+        return Settings.overleaf != null
+      case 'references':
+        return Settings.apis.references.url != null
+      case 'saml':
+        return Settings.enableSaml
       default:
         throw new Error(`unknown feature: ${feature}`)
     }
   }
-}
-
-function __guard__(value, transform) {
-  return typeof value !== 'undefined' && value !== null
-    ? transform(value)
-    : undefined
 }

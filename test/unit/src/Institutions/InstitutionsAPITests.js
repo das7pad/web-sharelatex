@@ -24,13 +24,16 @@ const modulePath = path.join(
 
 describe('InstitutionsAPI', function() {
   beforeEach(function() {
-    this.logger = { err: sinon.stub(), log() {} }
+    this.logger = { warn: sinon.stub(), err: sinon.stub(), log() {} }
     this.settings = { apis: { v1: { url: 'v1.url', user: '', pass: '' } } }
     this.request = sinon.stub()
     this.ipMatcherNotification = {
       read: (this.markAsReadIpMatcher = sinon.stub().callsArgWith(1, null))
     }
     this.InstitutionsAPI = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         'logger-sharelatex': this.logger,
         'metrics-sharelatex': { timeAsyncMethod: sinon.stub() },
@@ -38,6 +41,9 @@ describe('InstitutionsAPI', function() {
         request: this.request,
         '../Notifications/NotificationsBuilder': {
           ipMatcherAffiliation: sinon.stub().returns(this.ipMatcherNotification)
+        },
+        '../../../../../app/src/Features/V1/V1Api': {
+          request: sinon.stub()
         }
       }
     })
@@ -73,8 +79,9 @@ describe('InstitutionsAPI', function() {
       )
     })
 
-    return it('handle empty response', function(done) {
-      this.settings.apis = null
+    it('handle empty response', function(done) {
+      this.settings.apis.v1.url = ''
+
       return this.InstitutionsAPI.getInstitutionAffiliations(
         this.institutionId,
         (err, body) => {
@@ -87,7 +94,7 @@ describe('InstitutionsAPI', function() {
     })
   })
 
-  describe('getInstitutionLicences', () =>
+  describe('getInstitutionLicences', function() {
     it('get licences', function(done) {
       this.institutionId = 123
       const responseBody = {
@@ -118,7 +125,8 @@ describe('InstitutionsAPI', function() {
           return done()
         }
       )
-    }))
+    })
+  })
 
   describe('getUserAffiliations', function() {
     it('get affiliations', function(done) {
@@ -156,8 +164,8 @@ describe('InstitutionsAPI', function() {
       )
     })
 
-    return it('handle empty response', function(done) {
-      this.settings.apis = null
+    it('handle empty response', function(done) {
+      this.settings.apis.v1.url = ''
       return this.InstitutionsAPI.getUserAffiliations(
         this.stubbedUser._id,
         (err, body) => {
@@ -209,7 +217,7 @@ describe('InstitutionsAPI', function() {
       )
     })
 
-    return it('handle error', function(done) {
+    it('handle error', function(done) {
       const body = { errors: 'affiliation error message' }
       this.request.callsArgWith(1, null, { statusCode: 422 }, body)
       return this.InstitutionsAPI.addAffiliation(
@@ -250,7 +258,7 @@ describe('InstitutionsAPI', function() {
       )
     })
 
-    return it('handle error', function(done) {
+    it('handle error', function(done) {
       this.request.callsArgWith(1, null, { statusCode: 500 })
       return this.InstitutionsAPI.removeAffiliation(
         this.stubbedUser._id,
@@ -283,7 +291,7 @@ describe('InstitutionsAPI', function() {
       )
     })
 
-    return it('handle error', function(done) {
+    it('handle error', function(done) {
       const body = { errors: 'affiliation error message' }
       this.request.callsArgWith(1, null, { statusCode: 518 }, body)
       return this.InstitutionsAPI.deleteAffiliations(
@@ -298,12 +306,12 @@ describe('InstitutionsAPI', function() {
     })
   })
 
-  return describe('endorseAffiliation', function() {
+  describe('endorseAffiliation', function() {
     beforeEach(function() {
       return this.request.callsArgWith(1, null, { statusCode: 204 })
     })
 
-    return it('endorse affiliation', function(done) {
+    it('endorse affiliation', function(done) {
       return this.InstitutionsAPI.endorseAffiliation(
         this.stubbedUser._id,
         this.newEmail,

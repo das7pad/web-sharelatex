@@ -20,7 +20,7 @@ const modulePath =
 const SandboxedModule = require('sandboxed-module')
 const MockRequest = require('../helpers/MockRequest')
 const MockResponse = require('../helpers/MockResponse')
-const Errors = require('../../../../app/src/Features/Errors/Errors')
+const ArchiveErrors = require('../../../../app/src/Features/Uploads/ArchiveErrors')
 
 describe('ProjectUploadController', function() {
   beforeEach(function() {
@@ -44,6 +44,9 @@ describe('ProjectUploadController', function() {
     }
 
     return (this.ProjectUploadController = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         './ProjectUploadManager': (this.ProjectUploadManager = {}),
         './FileSystemImportManager': (this.FileSystemImportManager = {}),
@@ -55,6 +58,7 @@ describe('ProjectUploadController', function() {
         'metrics-sharelatex': this.metrics,
         '../Authentication/AuthenticationController': this
           .AuthenticationController,
+        './ArchiveErrors': ArchiveErrors,
         fs: (this.fs = {})
       }
     }))
@@ -121,7 +125,7 @@ describe('ProjectUploadController', function() {
           .should.equal(true)
       })
 
-      return it('should remove the uploaded file', function() {
+      it('should remove the uploaded file', function() {
         return this.fs.unlink.calledWith(this.path).should.equal(true)
       })
     })
@@ -140,36 +144,37 @@ describe('ProjectUploadController', function() {
         )
       })
 
-      return it('should output an error log line', function() {
+      it('should output an error log line', function() {
         return this.logger.error
           .calledWith(sinon.match.any, 'error uploading project')
           .should.equal(true)
       })
     })
 
-    return describe('when ProjectUploadManager.createProjectFromZipArchive reports the file as invalid', function() {
+    describe('when ProjectUploadManager.createProjectFromZipArchive reports the file as invalid', function() {
       beforeEach(function() {
         this.ProjectUploadManager.createProjectFromZipArchive = sinon
           .stub()
           .callsArgWith(
             3,
-            new Errors.InvalidError('zip_contents_too_large'),
+            new ArchiveErrors.ZipContentsTooLargeError(),
             this.project
           )
         return this.ProjectUploadController.uploadProject(this.req, this.res)
       })
 
       it('should return the reported error to the FileUploader client', function() {
-        return expect(this.res.body).to.deep.equal(
-          JSON.stringify({ success: false, error: 'zip_contents_too_large' })
-        )
+        expect(JSON.parse(this.res.body)).to.deep.equal({
+          success: false,
+          error: 'zip_contents_too_large'
+        })
       })
 
       it("should return an 'unprocessable entity' status code", function() {
         return expect(this.res.statusCode).to.equal(422)
       })
 
-      return it('should output an error log line', function() {
+      it('should output an error log line', function() {
         return this.logger.error
           .calledWith(sinon.match.any, 'error uploading project')
           .should.equal(true)
@@ -177,7 +182,7 @@ describe('ProjectUploadController', function() {
     })
   })
 
-  return describe('uploadFile', function() {
+  describe('uploadFile', function() {
     beforeEach(function() {
       this.project_id = 'project-id-123'
       this.folder_id = 'folder-id-123'
@@ -239,7 +244,7 @@ describe('ProjectUploadController', function() {
         return this.metrics.Timer.prototype.done.called.should.equal(true)
       })
 
-      return it('should remove the uploaded file', function() {
+      it('should remove the uploaded file', function() {
         return this.fs.unlink.calledWith(this.path).should.equal(true)
       })
     })
@@ -258,20 +263,20 @@ describe('ProjectUploadController', function() {
         })
       })
 
-      return it('should output an error log line', function() {
+      it('should output an error log line', function() {
         return this.logger.error
           .calledWith(sinon.match.any, 'error uploading file')
           .should.equal(true)
       })
     })
 
-    return describe('with a bad request', function() {
+    describe('with a bad request', function() {
       beforeEach(function() {
         this.req.file.originalname = ''
         return this.ProjectUploadController.uploadFile(this.req, this.res)
       })
 
-      return it('should return a a non success response', function() {
+      it('should return a a non success response', function() {
         return expect(this.res.body).to.deep.equal({
           success: false
         })

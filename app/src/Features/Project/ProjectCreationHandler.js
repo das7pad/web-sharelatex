@@ -9,11 +9,9 @@
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
- * DS103: Rewrite code to no longer use __guard__
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-let ProjectCreationHandler
 const logger = require('logger-sharelatex')
 const async = require('async')
 const metrics = require('metrics-sharelatex')
@@ -27,10 +25,11 @@ const HistoryManager = require('../History/HistoryManager')
 const { User } = require('../../models/User')
 const fs = require('fs')
 const Path = require('path')
+const { promisify } = require('util')
 const _ = require('underscore')
 const AnalyticsManger = require('../Analytics/AnalyticsManager')
 
-module.exports = ProjectCreationHandler = {
+const ProjectCreationHandler = {
   createBlankProject(owner_id, projectName, attributes, callback) {
     if (callback == null) {
       callback = function(error, project) {}
@@ -38,7 +37,7 @@ module.exports = ProjectCreationHandler = {
     metrics.inc('project-creation')
     if (arguments.length === 3) {
       callback = attributes
-      attributes = null
+      attributes = {}
     }
 
     return ProjectDetailsHandler.validateProjectName(projectName, function(
@@ -48,7 +47,7 @@ module.exports = ProjectCreationHandler = {
         return callback(error)
       }
       logger.log({ owner_id, projectName }, 'creating blank project')
-      if (attributes != null) {
+      if (attributes.overleaf !== undefined && attributes.overleaf != null) {
         return ProjectCreationHandler._createBlankProject(
           owner_id,
           projectName,
@@ -69,10 +68,8 @@ module.exports = ProjectCreationHandler = {
           if (error != null) {
             return callback(error)
           }
-          attributes = {
-            overleaf: {
-              history: { id: history != null ? history.overleaf_id : undefined }
-            }
+          attributes.overleaf = {
+            history: { id: history != null ? history.overleaf_id : undefined }
           }
           return ProjectCreationHandler._createBlankProject(
             owner_id,
@@ -83,7 +80,8 @@ module.exports = ProjectCreationHandler = {
                 return callback(error)
               }
               AnalyticsManger.recordEvent(owner_id, 'project-created', {
-                projectId: project._id
+                projectId: project._id,
+                attributes
               })
               return callback(error, project)
             }
@@ -105,12 +103,7 @@ module.exports = ProjectCreationHandler = {
 
     Object.assign(project, attributes)
 
-    if (
-      __guard__(
-        Settings.apis != null ? Settings.apis.project_history : undefined,
-        x => x.displayHistoryForNewProjects
-      )
-    ) {
+    if (Settings.apis.project_history.displayHistoryForNewProjects) {
       project.overleaf.history.display = true
     }
     if (Settings.currentImageName != null) {
@@ -124,10 +117,7 @@ module.exports = ProjectCreationHandler = {
       err,
       user
     ) {
-      if (user != null) {
-        // It's possible the owner_id is a UserStub
-        project.spellCheckLanguage = user.ace.spellCheckLanguage
-      }
+      project.spellCheckLanguage = user.ace.spellCheckLanguage
       return project.save(function(err) {
         if (err != null) {
           return callback(err)
@@ -141,119 +131,122 @@ module.exports = ProjectCreationHandler = {
     if (callback == null) {
       callback = function(error, project) {}
     }
-    return this.createBlankProject(owner_id, projectName, function(
-      error,
-      project
-    ) {
-      if (error != null) {
-        return callback(error)
+    return ProjectCreationHandler.createBlankProject(
+      owner_id,
+      projectName,
+      function(error, project) {
+        if (error != null) {
+          return callback(error)
+        }
+        return ProjectCreationHandler._createRootDoc(
+          project,
+          owner_id,
+          docLines,
+          callback
+        )
       }
-      return ProjectCreationHandler._createRootDoc(
-        project,
-        owner_id,
-        docLines,
-        callback
-      )
-    })
+    )
   },
 
   createBasicProject(owner_id, projectName, callback) {
     if (callback == null) {
       callback = function(error, project) {}
     }
-    const self = this
-    return this.createBlankProject(owner_id, projectName, function(
-      error,
-      project
-    ) {
-      if (error != null) {
-        return callback(error)
-      }
-      return self._buildTemplate(
-        'mainbasic.tex',
-        owner_id,
-        projectName,
-        function(error, docLines) {
-          if (error != null) {
-            return callback(error)
-          }
-          return ProjectCreationHandler._createRootDoc(
-            project,
-            owner_id,
-            docLines,
-            callback
-          )
+    return ProjectCreationHandler.createBlankProject(
+      owner_id,
+      projectName,
+      function(error, project) {
+        if (error != null) {
+          return callback(error)
         }
-      )
-    })
+        return ProjectCreationHandler._buildTemplate(
+          'mainbasic.tex',
+          owner_id,
+          projectName,
+          function(error, docLines) {
+            if (error != null) {
+              return callback(error)
+            }
+            return ProjectCreationHandler._createRootDoc(
+              project,
+              owner_id,
+              docLines,
+              callback
+            )
+          }
+        )
+      }
+    )
   },
 
   createExampleProject(owner_id, projectName, callback) {
     if (callback == null) {
       callback = function(error, project) {}
     }
-    const self = this
-    return this.createBlankProject(owner_id, projectName, function(
-      error,
-      project
-    ) {
-      if (error != null) {
-        return callback(error)
-      }
-      return async.series(
-        [
-          callback =>
-            self._buildTemplate('main.tex', owner_id, projectName, function(
-              error,
-              docLines
-            ) {
-              if (error != null) {
-                return callback(error)
-              }
-              return ProjectCreationHandler._createRootDoc(
-                project,
+    return ProjectCreationHandler.createBlankProject(
+      owner_id,
+      projectName,
+      function(error, project) {
+        if (error != null) {
+          return callback(error)
+        }
+        return async.series(
+          [
+            callback =>
+              ProjectCreationHandler._buildTemplate(
+                'main.tex',
                 owner_id,
-                docLines,
+                projectName,
+                function(error, docLines) {
+                  if (error != null) {
+                    return callback(error)
+                  }
+                  return ProjectCreationHandler._createRootDoc(
+                    project,
+                    owner_id,
+                    docLines,
+                    callback
+                  )
+                }
+              ),
+            callback =>
+              ProjectCreationHandler._buildTemplate(
+                'references.bib',
+                owner_id,
+                projectName,
+                function(error, docLines) {
+                  if (error != null) {
+                    return callback(error)
+                  }
+                  return ProjectEntityUpdateHandler.addDoc(
+                    project._id,
+                    project.rootFolder[0]._id,
+                    'references.bib',
+                    docLines,
+                    owner_id,
+                    (error, doc) => callback(error)
+                  )
+                }
+              ),
+            function(callback) {
+              const universePath = Path.resolve(
+                __dirname + '/../../../templates/project_files/universe.jpg'
+              )
+              return ProjectEntityUpdateHandler.addFile(
+                project._id,
+                project.rootFolder[0]._id,
+                'universe.jpg',
+                universePath,
+                null,
+                owner_id,
                 callback
               )
-            }),
-          callback =>
-            self._buildTemplate(
-              'references.bib',
-              owner_id,
-              projectName,
-              function(error, docLines) {
-                if (error != null) {
-                  return callback(error)
-                }
-                return ProjectEntityUpdateHandler.addDoc(
-                  project._id,
-                  project.rootFolder[0]._id,
-                  'references.bib',
-                  docLines,
-                  owner_id,
-                  (error, doc) => callback(error)
-                )
-              }
-            ),
-          function(callback) {
-            const universePath = Path.resolve(
-              __dirname + '/../../../templates/project_files/universe.jpg'
-            )
-            return ProjectEntityUpdateHandler.addFile(
-              project._id,
-              project.rootFolder[0]._id,
-              'universe.jpg',
-              universePath,
-              null,
-              owner_id,
-              callback
-            )
-          }
-        ],
-        error => callback(error, project)
-      )
-    })
+            }
+          ],
+          error => callback(error, project)
+        )
+      }
+    )
   },
 
   _createRootDoc(project, owner_id, docLines, callback) {
@@ -268,7 +261,7 @@ module.exports = ProjectCreationHandler = {
       owner_id,
       function(error, doc) {
         if (error != null) {
-          logger.err(
+          logger.warn(
             { err: error },
             'error adding root doc when creating project'
           )
@@ -336,8 +329,10 @@ metrics.timeAsyncMethod(
   logger
 )
 
-function __guard__(value, transform) {
-  return typeof value !== 'undefined' && value !== null
-    ? transform(value)
-    : undefined
+const promises = {
+  createBlankProject: promisify(ProjectCreationHandler.createBlankProject)
 }
+
+ProjectCreationHandler.promises = promises
+
+module.exports = ProjectCreationHandler

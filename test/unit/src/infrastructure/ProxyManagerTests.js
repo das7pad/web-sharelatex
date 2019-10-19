@@ -28,6 +28,9 @@ describe('ProxyManager', function() {
       pipe() {}
     })
     this.proxyManager = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         'settings-sharelatex': this.settings,
         'logger-sharelatex': { log() {} },
@@ -53,7 +56,7 @@ describe('ProxyManager', function() {
       return assertCalledWith(this.router.get, '/foo/:id')
     })
 
-    return it('applies methods other than get', function() {
+    it('applies methods other than get', function() {
       this.router = {
         post: sinon.stub(),
         put: sinon.stub()
@@ -70,7 +73,7 @@ describe('ProxyManager', function() {
     })
   })
 
-  return describe('createProxy', function() {
+  describe('createProxy', function() {
     beforeEach(function() {
       this.req.url = this.proxyPath
       this.req.route.path = this.proxyPath
@@ -182,7 +185,7 @@ describe('ProxyManager', function() {
       })
     })
 
-    return it('passes body for put', function() {
+    it('passes body for put', function() {
       const target = {
         baseUrl: 'api.v1',
         path: '/foo',

@@ -22,6 +22,9 @@ const modulePath = require('path').join(
 describe('ReferalFeatures', function() {
   beforeEach(function() {
     this.ReferalFeatures = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         '../../models/User': { User: (this.User = {}) },
         'settings-sharelatex': (this.Settings = {}),
@@ -63,14 +66,14 @@ describe('ReferalFeatures', function() {
         .should.equal(true)
     })
 
-    return it('should call the callback with the features', function() {
+    it('should call the callback with the features', function() {
       return this.callback
         .calledWith(null, this.Settings.bonus_features[3])
         .should.equal(true)
     })
   })
 
-  return describe('when the user is not at a bonus level', function() {
+  describe('when the user is not at a bonus level', function() {
     beforeEach(function() {
       this.refered_user_count = 0
       this.Settings.bonus_features = {
@@ -92,7 +95,7 @@ describe('ReferalFeatures', function() {
         .should.equal(true)
     })
 
-    return it('should call the callback with no features', function() {
+    it('should call the callback with no features', function() {
       return this.callback.calledWith(null, {}).should.equal(true)
     })
   })

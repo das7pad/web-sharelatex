@@ -26,6 +26,9 @@ const SandboxedModule = require('sandboxed-module')
 describe('LockManager - getting the lock', function() {
   beforeEach(function() {
     this.LockManager = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         'logger-sharelatex': { log() {} },
         './RedisWrapper': {
@@ -65,7 +68,7 @@ describe('LockManager - getting the lock', function() {
       return this.LockManager._tryLock.callCount.should.equal(1)
     })
 
-    return it('should return the callback', function() {
+    it('should return the callback', function() {
       return this.callback.calledWith(null).should.equal(true)
     })
   })
@@ -98,7 +101,7 @@ describe('LockManager - getting the lock', function() {
       return (this.LockManager._tryLock.callCount > 1).should.equal(true)
     })
 
-    return it('should return the callback', function() {
+    it('should return the callback', function() {
       return this.callback.calledWith(null).should.equal(true)
     })
   })
@@ -114,12 +117,12 @@ describe('LockManager - getting the lock', function() {
       })
     })
 
-    return it('should return the callback with an error', function() {
+    it('should return the callback with an error', function() {
       return this.callback.calledWith(new Error('timeout')).should.equal(true)
     })
   })
 
-  return describe('when there are multiple requests for the same lock', function() {
+  describe('when there are multiple requests for the same lock', function() {
     beforeEach(function(done) {
       let locked = false
       this.results = []
@@ -166,7 +169,7 @@ describe('LockManager - getting the lock', function() {
       )
     })
 
-    return it('should process the requests in order', function() {
+    it('should process the requests in order', function() {
       return this.results.should.deep.equal([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
     })
   })

@@ -36,8 +36,15 @@ describe('SudoModeController', function() {
     }
     this.UserGetter = { getUser: sinon.stub() }
     return (this.SudoModeController = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
-        'logger-sharelatex': { log: sinon.stub(), err: sinon.stub() },
+        'logger-sharelatex': {
+          log: sinon.stub(),
+          warn: sinon.stub(),
+          err: sinon.stub()
+        },
         './SudoModeHandler': this.SudoModeHandler,
         '../Authentication/AuthenticationController': this
           .AuthenticationController,
@@ -116,13 +123,13 @@ describe('SudoModeController', function() {
         return expect(this.next.lastCall.args[0]).to.be.instanceof(Error)
       })
 
-      return it('should not render page', function() {
+      it('should not render page', function() {
         this.SudoModeController.sudoModePrompt(this.req, this.res, this.next)
         return this.res.render.callCount.should.equal(0)
       })
     })
 
-    return describe('when external auth system is used', function() {
+    describe('when external auth system is used', function() {
       beforeEach(function() {
         return (this.req.externalAuthenticationSystemUsed = sinon
           .stub()
@@ -140,14 +147,14 @@ describe('SudoModeController', function() {
         return this.SudoModeHandler.isSudoModeActive.callCount.should.equal(0)
       })
 
-      return it('should not render page', function() {
+      it('should not render page', function() {
         this.SudoModeController.sudoModePrompt(this.req, this.res, this.next)
         return this.res.render.callCount.should.equal(0)
       })
     })
   })
 
-  return describe('submitPassword', function() {
+  describe('submitPassword', function() {
     beforeEach(function() {
       this.AuthenticationController._getRedirectFromSession = sinon
         .stub()
@@ -163,7 +170,7 @@ describe('SudoModeController', function() {
       return (this.next = sinon.stub())
     })
 
-    return describe('when all goes well', function() {
+    describe('when all goes well', function() {
       beforeEach(function() {})
 
       it('should get the logged in user id', function() {
@@ -250,7 +257,7 @@ describe('SudoModeController', function() {
           return this.SudoModeHandler.activateSudoMode.callCount.should.equal(0)
         })
 
-        return it('should not send back a json response', function() {
+        it('should not send back a json response', function() {
           this.SudoModeController.submitPassword(this.req, this.res, this.next)
           return this.res.json.callCount.should.equal(0)
         })
@@ -288,7 +295,7 @@ describe('SudoModeController', function() {
           return this.SudoModeHandler.activateSudoMode.callCount.should.equal(0)
         })
 
-        return it('should not send back a json response', function() {
+        it('should not send back a json response', function() {
           this.SudoModeController.submitPassword(this.req, this.res, this.next)
           return this.res.json.callCount.should.equal(0)
         })
@@ -324,7 +331,7 @@ describe('SudoModeController', function() {
           return this.SudoModeHandler.activateSudoMode.callCount.should.equal(0)
         })
 
-        return it('should not send back a json response', function() {
+        it('should not send back a json response', function() {
           this.SudoModeController.submitPassword(this.req, this.res, this.next)
           return this.res.json.callCount.should.equal(0)
         })
@@ -367,7 +374,7 @@ describe('SudoModeController', function() {
             .should.equal(true)
         })
 
-        return it('should not activate sudo mode', function() {
+        it('should not activate sudo mode', function() {
           this.SudoModeController.submitPassword(this.req, this.res, this.next)
           return this.SudoModeHandler.activateSudoMode.callCount.should.equal(0)
         })
@@ -403,13 +410,13 @@ describe('SudoModeController', function() {
             .should.equal(true)
         })
 
-        return it('should not activate sudo mode', function() {
+        it('should not activate sudo mode', function() {
           this.SudoModeController.submitPassword(this.req, this.res, this.next)
           return this.SudoModeHandler.activateSudoMode.callCount.should.equal(0)
         })
       })
 
-      return describe('when sudo mode activation produces an error', function() {
+      describe('when sudo mode activation produces an error', function() {
         beforeEach(function() {
           this.SudoModeHandler.activateSudoMode = sinon
             .stub()
@@ -439,7 +446,7 @@ describe('SudoModeController', function() {
             .should.equal(true)
         })
 
-        return it('should have tried to activate sudo mode', function() {
+        it('should have tried to activate sudo mode', function() {
           this.SudoModeController.submitPassword(this.req, this.res, this.next)
           this.SudoModeHandler.activateSudoMode.callCount.should.equal(1)
           return this.SudoModeHandler.activateSudoMode

@@ -1,26 +1,10 @@
-/* eslint-disable
-    camelcase,
-    handle-callback-err,
-    max-len,
-    no-undef,
-*/
-// TODO: This file was created by bulk-decaffeinate.
-// Fix any style issues and re-enable lint.
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS103: Rewrite code to no longer use __guard__
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-let UserUpdater
 const logger = require('logger-sharelatex')
 const mongojs = require('../../infrastructure/mongojs')
 const metrics = require('metrics-sharelatex')
 const { db } = mongojs
 const async = require('async')
 const { ObjectId } = mongojs
+const { promisify } = require('util')
 const UserGetter = require('./UserGetter')
 const {
   addAffiliation,
@@ -29,14 +13,12 @@ const {
 const FeaturesUpdater = require('../Subscription/FeaturesUpdater')
 const EmailHelper = require('../Helpers/EmailHelper')
 const Errors = require('../Errors/Errors')
-const Settings = require('settings-sharelatex')
-const request = require('request')
 const NewsletterManager = require('../Newsletter/NewsletterManager')
 
-module.exports = UserUpdater = {
+const UserUpdater = {
   updateUser(query, update, callback) {
     if (callback == null) {
-      callback = function(error) {}
+      callback = () => {}
     }
     if (typeof query === 'string') {
       query = { _id: ObjectId(query) }
@@ -46,7 +28,7 @@ module.exports = UserUpdater = {
       query._id = ObjectId(query._id)
     }
 
-    return db.users.update(query, update, callback)
+    db.users.update(query, update, callback)
   },
 
   //
@@ -64,15 +46,15 @@ module.exports = UserUpdater = {
     logger.log({ userId, newEmail }, 'updaing email address of user')
 
     let oldEmail = null
-    return async.series(
+    async.series(
       [
         cb =>
-          UserGetter.getUserEmail(userId, function(error, email) {
+          UserGetter.getUserEmail(userId, (error, email) => {
             oldEmail = email
-            return cb(error)
+            cb(error)
           }),
         cb => UserUpdater.addEmailAddress(userId, newEmail, cb),
-        cb => UserUpdater.setDefaultEmailAddress(userId, newEmail, cb),
+        cb => UserUpdater.setDefaultEmailAddress(userId, newEmail, true, cb),
         cb => UserUpdater.removeEmailAddress(userId, oldEmail, cb)
       ],
       callback
@@ -92,14 +74,17 @@ module.exports = UserUpdater = {
       return callback(new Error('invalid email'))
     }
 
-    return UserGetter.ensureUniqueEmailAddress(newEmail, error => {
+    UserGetter.ensureUniqueEmailAddress(newEmail, error => {
       if (error != null) {
         return callback(error)
       }
 
-      return addAffiliation(userId, newEmail, affiliationOptions, error => {
+      addAffiliation(userId, newEmail, affiliationOptions, error => {
         if (error != null) {
-          logger.err({ error }, 'problem adding affiliation while adding email')
+          logger.warn(
+            { error },
+            'problem adding affiliation while adding email'
+          )
           return callback(error)
         }
 
@@ -113,12 +98,12 @@ module.exports = UserUpdater = {
             emails: { email: newEmail, createdAt: new Date(), reversedHostname }
           }
         }
-        return this.updateUser(userId, update, function(error) {
+        UserUpdater.updateUser(userId, update, error => {
           if (error != null) {
-            logger.err({ error }, 'problem updating users emails')
+            logger.warn({ error }, 'problem updating users emails')
             return callback(error)
           }
-          return callback()
+          callback()
         })
       })
     })
@@ -131,137 +116,73 @@ module.exports = UserUpdater = {
     if (email == null) {
       return callback(new Error('invalid email'))
     }
-    return removeAffiliation(userId, email, error => {
+    removeAffiliation(userId, email, error => {
       if (error != null) {
-        logger.err({ error }, 'problem removing affiliation')
+        logger.warn({ error }, 'problem removing affiliation')
         return callback(error)
       }
 
       const query = { _id: userId, email: { $ne: email } }
       const update = { $pull: { emails: { email } } }
-      return this.updateUser(query, update, function(error, res) {
+      UserUpdater.updateUser(query, update, (error, res) => {
         if (error != null) {
-          logger.err({ error }, 'problem removing users email')
+          logger.warn({ error }, 'problem removing users email')
           return callback(error)
         }
         if (res.n === 0) {
           return callback(new Error('Cannot remove email'))
         }
-        return callback()
+        callback()
       })
     })
   },
 
   // set the default email address by setting the `email` attribute. The email
   // must be one of the user's multiple emails (`emails` attribute)
-  setDefaultEmailAddress(userId, email, callback) {
+  setDefaultEmailAddress(userId, email, allowUnconfirmed, callback) {
+    if (typeof allowUnconfirmed === 'function') {
+      callback = allowUnconfirmed
+      allowUnconfirmed = false
+    }
     email = EmailHelper.parseEmail(email)
     if (email == null) {
       return callback(new Error('invalid email'))
     }
-    return UserGetter.getUserEmail(userId, (error, oldEmail) => {
-      if (typeof err !== 'undefined' && err !== null) {
-        return callback(error)
+    UserGetter.getUser(userId, { email: 1, emails: 1 }, (err, user) => {
+      if (err) {
+        return callback(err)
+      }
+      if (!user) {
+        return callback(new Error('invalid userId'))
+      }
+      const oldEmail = user.email
+      const userEmail = user.emails.find(e => e.email === email)
+      if (!userEmail) {
+        return callback(new Error('Default email does not belong to user'))
+      }
+      if (!userEmail.confirmedAt && !allowUnconfirmed) {
+        return callback(new Errors.UnconfirmedEmailError())
       }
       const query = { _id: userId, 'emails.email': email }
       const update = { $set: { email } }
-      return this.updateUser(query, update, function(error, res) {
-        if (error != null) {
-          logger.err({ error }, 'problem setting default emails')
-          return callback(error)
-        } else if (res.n === 0) {
-          // TODO: Check n or nMatched?
-          return callback(new Error('Default email does not belong to user'))
-        } else {
-          NewsletterManager.changeEmail(oldEmail, email, function() {})
-          return callback()
+      UserUpdater.updateUser(query, update, (err, res) => {
+        if (err) {
+          return callback(err)
         }
-      })
-    })
-  },
-
-  updateV1AndSetDefaultEmailAddress(userId, email, callback) {
-    return this.updateEmailAddressInV1(userId, email, error => {
-      if (error != null) {
-        return callback(error)
-      }
-      return this.setDefaultEmailAddress(userId, email, callback)
-    })
-  },
-
-  updateEmailAddressInV1(userId, newEmail, callback) {
-    if (
-      __guard__(
-        Settings.apis != null ? Settings.apis.v1 : undefined,
-        x => x.url
-      ) == null
-    ) {
-      return callback()
-    }
-    return UserGetter.getUser(userId, { 'overleaf.id': 1, emails: 1 }, function(
-      error,
-      user
-    ) {
-      let email
-      if (error != null) {
-        return callback(error)
-      }
-      if (user == null) {
-        return callback(new Errors.NotFoundError('no user found'))
-      }
-      if ((user.overleaf != null ? user.overleaf.id : undefined) == null) {
-        return callback()
-      }
-      let newEmailIsConfirmed = false
-      for (email of Array.from(user.emails)) {
-        if (email.email === newEmail && email.confirmedAt != null) {
-          newEmailIsConfirmed = true
-          break
+        // this should not happen
+        if (res.n === 0) {
+          return callback(new Error('email update error'))
         }
-      }
-      if (!newEmailIsConfirmed) {
-        return callback(
-          new Errors.UnconfirmedEmailError(
-            "can't update v1 with unconfirmed email"
-          )
-        )
-      }
-      return request(
-        {
-          baseUrl: Settings.apis.v1.url,
-          url: `/api/v1/sharelatex/users/${user.overleaf.id}/email`,
-          method: 'PUT',
-          auth: {
-            user: Settings.apis.v1.user,
-            pass: Settings.apis.v1.pass,
-            sendImmediately: true
-          },
-          json: {
-            user: {
-              email: newEmail
-            }
-          },
-          timeout: 5 * 1000
-        },
-        function(error, response, body) {
-          if (error != null) {
-            if (error.code === 'ECONNREFUSED') {
-              error = new Errors.V1ConnectionError('No V1 connection')
-            }
-            return callback(error)
-          }
-          if (response.statusCode === 409) {
-            // Conflict
-            return callback(new Errors.EmailExistsError('email exists in v1'))
-          } else if (response.statusCode >= 200 && response.statusCode < 300) {
-            return callback()
-          } else {
-            return callback(
-              new Error(`non-success code from v1: ${response.statusCode}`)
+        NewsletterManager.changeEmail(user, email, err => {
+          if (err != null) {
+            logger.warn(
+              { err, oldEmail, newEmail: email },
+              'Failed to change email in newsletter subscription'
             )
           }
-        }
-      )
+        })
+        callback()
+      })
     })
   },
 
@@ -275,9 +196,9 @@ module.exports = UserUpdater = {
       return callback(new Error('invalid email'))
     }
     logger.log({ userId, email }, 'confirming user email')
-    return addAffiliation(userId, email, { confirmedAt }, error => {
+    addAffiliation(userId, email, { confirmedAt }, error => {
       if (error != null) {
-        logger.err(
+        logger.warn(
           { error },
           'problem adding affiliation while confirming email'
         )
@@ -293,7 +214,7 @@ module.exports = UserUpdater = {
           'emails.$.confirmedAt': confirmedAt
         }
       }
-      return this.updateUser(query, update, function(error, res) {
+      UserUpdater.updateUser(query, update, (error, res) => {
         if (error != null) {
           return callback(error)
         }
@@ -303,14 +224,14 @@ module.exports = UserUpdater = {
             new Errors.NotFoundError('user id and email do no match')
           )
         }
-        return FeaturesUpdater.refreshFeatures(userId, true, callback)
+        FeaturesUpdater.refreshFeatures(userId, callback)
       })
     })
   },
 
-  removeReconfirmFlag(user_id, callback) {
-    return UserUpdater.updateUser(
-      user_id.toString(),
+  removeReconfirmFlag(userId, callback) {
+    UserUpdater.updateUser(
+      userId.toString(),
       {
         $set: { must_reconfirm: false }
       },
@@ -329,8 +250,12 @@ module.exports = UserUpdater = {
   metrics.timeAsyncMethod(UserUpdater, method, 'mongo.UserUpdater', logger)
 )
 
-function __guard__(value, transform) {
-  return typeof value !== 'undefined' && value !== null
-    ? transform(value)
-    : undefined
+const promises = {
+  addEmailAddress: promisify(UserUpdater.addEmailAddress),
+  confirmEmail: promisify(UserUpdater.confirmEmail),
+  updateUser: promisify(UserUpdater.updateUser)
 }
+
+UserUpdater.promises = promises
+
+module.exports = UserUpdater

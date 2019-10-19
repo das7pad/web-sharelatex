@@ -30,6 +30,9 @@ describe('NotificationsHandler', function() {
   beforeEach(function() {
     this.request = sinon.stub().callsArgWith(1)
     return (this.handler = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         'settings-sharelatex': {
           apis: { notifications: { url: notificationUrl } }
@@ -68,7 +71,7 @@ describe('NotificationsHandler', function() {
       )
     })
 
-    return it('should return empty arrays if there are no notifications', function() {
+    it('should return empty arrays if there are no notifications', function() {
       this.request.callsArgWith(1, null, { statusCode: 200 }, null)
       return this.handler.getUserNotifications(
         user_id,
@@ -84,7 +87,7 @@ describe('NotificationsHandler', function() {
       return (this.key = 'some key here')
     })
 
-    return it('should send a delete request when a delete has been received to mark a notification', function(done) {
+    it('should send a delete request when a delete has been received to mark a notification', function(done) {
       return this.handler.markAsReadWithKey(user_id, this.key, () => {
         const opts = {
           uri: `${notificationUrl}/user/${user_id}`,
@@ -131,7 +134,7 @@ describe('NotificationsHandler', function() {
       )
     })
 
-    return describe('when expiry date is supplied', function() {
+    describe('when expiry date is supplied', function() {
       beforeEach(function() {
         this.key = 'some key here'
         this.messageOpts = { value: 12344 }
@@ -139,7 +142,7 @@ describe('NotificationsHandler', function() {
         return (this.expiry = new Date())
       })
 
-      return it('should post the message over with expiry field', function(done) {
+      it('should post the message over with expiry field', function(done) {
         return this.handler.createNotification(
           user_id,
           this.key,
@@ -165,12 +168,12 @@ describe('NotificationsHandler', function() {
     })
   })
 
-  return describe('markAsReadByKeyOnly', function() {
+  describe('markAsReadByKeyOnly', function() {
     beforeEach(function() {
       return (this.key = 'some key here')
     })
 
-    return it('should send a delete request when a delete has been received to mark a notification', function(done) {
+    it('should send a delete request when a delete has been received to mark a notification', function(done) {
       return this.handler.markAsReadByKeyOnly(this.key, () => {
         const opts = {
           uri: `${notificationUrl}/key/${this.key}`,

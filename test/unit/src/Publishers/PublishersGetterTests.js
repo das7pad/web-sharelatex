@@ -29,6 +29,9 @@ describe('PublishersGetter', function() {
     }
 
     this.PublishersGetter = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         '../User/UserGetter': this.UserGetter,
         '../UserMembership/UserMembershipsHandler': (this.UserMembershipsHandler = {
@@ -57,14 +60,15 @@ describe('PublishersGetter', function() {
     return (this.userId = '12345abcde')
   })
 
-  return describe('getManagedPublishers', () =>
+  describe('getManagedPublishers', function() {
     it('fetches v1 data before returning publisher list', function(done) {
-      return this.PublishersGetter.getManagedPublishers(this.userId, function(
-        error,
-        publishers
-      ) {
-        publishers.length.should.equal(1)
-        return done()
-      })
-    }))
+      return this.PublishersGetter.getManagedPublishers(
+        this.userId,
+        (error, publishers) => {
+          publishers.length.should.equal(1)
+          return done()
+        }
+      )
+    })
+  })
 })

@@ -18,7 +18,7 @@ const ProjectGetter = require('../Project/ProjectGetter')
 const UserGetter = require('../User/UserGetter')
 const SubscriptionLocator = require('./SubscriptionLocator')
 const Settings = require('settings-sharelatex')
-const CollaboratorsHandler = require('../Collaborators/CollaboratorsHandler')
+const CollaboratorsGetter = require('../Collaborators/CollaboratorsGetter')
 const CollaboratorsInvitesHandler = require('../Collaborators/CollaboratorsInviteHandler')
 const V1SubscriptionManager = require('./V1SubscriptionManager')
 
@@ -62,7 +62,7 @@ module.exports = LimitationsManager = {
         if (error != null) {
           return callback(error)
         }
-        return CollaboratorsHandler.getInvitedCollaboratorCount(
+        return CollaboratorsGetter.getInvitedCollaboratorCount(
           project_id,
           (error, current_number) => {
             if (error != null) {
@@ -241,12 +241,12 @@ module.exports = LimitationsManager = {
       subscription
     ) {
       if (err != null) {
-        logger.err({ err, subscriptionId }, 'error getting subscription')
+        logger.warn({ err, subscriptionId }, 'error getting subscription')
         return callback(err)
       }
       if (subscription == null) {
-        logger.err({ subscriptionId }, 'no subscription found')
-        return callback('no subscription found')
+        logger.warn({ subscriptionId }, 'no subscription found')
+        return callback(new Error('no subscription found'))
       }
 
       const limitReached = LimitationsManager.teamHasReachedMemberLimit(

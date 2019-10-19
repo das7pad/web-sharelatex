@@ -33,6 +33,9 @@ describe('ChatController', function() {
       getLoggedInUserId: sinon.stub().returns(this.user_id)
     }
     this.ChatController = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         'settings-sharelatex': this.settings,
         'logger-sharelatex': { log() {} },
@@ -99,7 +102,7 @@ describe('ChatController', function() {
         .should.equal(true)
     })
 
-    return it('should return a 204 status code', function() {
+    it('should return a 204 status code', function() {
       return this.res.sendStatus.calledWith(204).should.equal(true)
     })
   })
@@ -123,12 +126,12 @@ describe('ChatController', function() {
         .should.equal(true)
     })
 
-    return it('should return the messages', function() {
+    it('should return the messages', function() {
       return this.res.json.calledWith(this.messages).should.equal(true)
     })
   })
 
-  return describe('_injectUserInfoIntoThreads', function() {
+  describe('_injectUserInfoIntoThreads', function() {
     beforeEach(function() {
       this.users = {
         user_id_1: {
@@ -173,7 +176,7 @@ describe('ChatController', function() {
             ]
           }
         },
-        function(error, threads) {
+        (error, threads) => {
           expect(threads).to.deep.equal({
             thread1: {
               resolved: true,
@@ -207,7 +210,7 @@ describe('ChatController', function() {
       )
     })
 
-    return it('should only need to look up each user once', function(done) {
+    it('should only need to look up each user once', function(done) {
       return this.ChatController._injectUserInfoIntoThreads(
         [
           {

@@ -3,8 +3,8 @@
     max-len,
     no-return-assign
 */
-/* global recurly,_,define */
-define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
+/* global recurly */
+define(['base', 'directives/creditCards'], App =>
   App.controller('NewSubscriptionController', function(
     $scope,
     MultiCurrencyPricing,
@@ -12,10 +12,12 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
     event_tracking,
     ccUtils
   ) {
-    if (typeof recurly === 'undefined') {
-      throw new Error('Recurly API Library Missing.')
+    if (typeof recurly === 'undefined' || !recurly) {
+      $scope.recurlyLoadError = true
+      return
     }
 
+    $scope.recurlyLoadError = false
     $scope.currencyCode = MultiCurrencyPricing.currencyCode
     $scope.allCurrencies = MultiCurrencyPricing.plans
     $scope.availableCurrencies = {}
@@ -61,6 +63,14 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
     $scope.validation = {}
 
     $scope.processing = false
+
+    $scope.threeDSecureFlow = false
+    $scope.threeDSecureContainer = document.querySelector(
+      '.three-d-secure-container'
+    )
+    $scope.threeDSecureRecurlyContainer = document.querySelector(
+      '.three-d-secure-recurly-container'
+    )
 
     recurly.configure({
       publicKey: window.recurlyApiKey,
@@ -170,7 +180,17 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
       $scope.genericError = ''
     }
 
-    const completeSubscription = function(err, recurly_token_id) {
+    let cachedRecurlyBillingToken
+    const completeSubscription = function(
+      err,
+      recurlyBillingToken,
+      recurly3DSecureResultToken
+    ) {
+      if (recurlyBillingToken) {
+        // temporary store the billing token as it might be needed when
+        // re-sending the request after SCA authentication
+        cachedRecurlyBillingToken = recurlyBillingToken
+      }
       $scope.validation.errorFields = {}
       if (err != null) {
         event_tracking.sendMB('subscription-error', err)
@@ -188,11 +208,15 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
       } else {
         const postData = {
           _csrf: window.csrfToken,
-          recurly_token_id: recurly_token_id.id,
+          recurly_token_id: cachedRecurlyBillingToken.id,
+          recurly_three_d_secure_action_result_token_id:
+            recurly3DSecureResultToken && recurly3DSecureResultToken.id,
           subscriptionDetails: {
             currencyCode: pricing.items.currency,
             plan_code: pricing.items.plan.code,
             coupon_code: pricing.items.coupon ? pricing.items.coupon.code : '',
+            first_name: $scope.data.first_name,
+            last_name: $scope.data.last_name,
 
             isPaypal: $scope.paymentMethod.value === 'paypal',
             address: {
@@ -228,9 +252,16 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
             )
             window.location.href = '/user/subscription/thank-you'
           })
-          .catch(function() {
+          .catch(response => {
             $scope.processing = false
-            $scope.genericError = 'Something went wrong processing the request'
+            const { data } = response
+            $scope.genericError =
+              (data && data.message) ||
+              'Something went wrong processing the request'
+
+            if (data.threeDSecureActionTokenId) {
+              initThreeDSecure(data.threeDSecureActionTokenId)
+            }
           })
       }
     }
@@ -245,8 +276,48 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
       }
     }
 
+    const initThreeDSecure = function(threeDSecureActionTokenId) {
+      // instanciate and configure Recurly 3DSecure flow
+      const risk = recurly.Risk()
+      const threeDSecure = risk.ThreeDSecure({
+        actionTokenId: threeDSecureActionTokenId
+      })
+
+      // on SCA verification error: show payment UI with the error message
+      threeDSecure.on('error', error => {
+        $scope.genericError = `Error: ${error.message}`
+        $scope.threeDSecureFlow = false
+        $scope.$apply()
+      })
+
+      // on SCA verification success: show payment UI in processing mode and
+      // resubmit the payment with the new token final success or error will be
+      // handled by `completeSubscription`
+      threeDSecure.on('token', recurly3DSecureResultToken => {
+        completeSubscription(null, null, recurly3DSecureResultToken)
+        $scope.genericError = null
+        $scope.threeDSecureFlow = false
+        $scope.processing = true
+        $scope.$apply()
+      })
+
+      // make sure the threeDSecureRecurlyContainer is empty (in case of
+      // retries) and show 3DSecure UI
+      $scope.threeDSecureRecurlyContainer.innerHTML = ''
+      $scope.threeDSecureFlow = true
+      threeDSecure.attach($scope.threeDSecureRecurlyContainer)
+
+      // scroll the UI into view (timeout needed to make sure the element is
+      // visible)
+      window.setTimeout(() => {
+        $scope.threeDSecureContainer.scrollIntoView()
+      }, 0)
+    }
+
+    // list taken from Recurly (see https://docs.recurly.com/docs/countries-provinces-and-states). Country code must exist on Recurly, so update with care
     $scope.countries = [
       { code: 'AF', name: 'Afghanistan' },
+      { code: 'AX', name: 'Åland Islands' },
       { code: 'AL', name: 'Albania' },
       { code: 'DZ', name: 'Algeria' },
       { code: 'AS', name: 'American Samoa' },
@@ -266,6 +337,7 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
       { code: 'BH', name: 'Bahrain' },
       { code: 'BD', name: 'Bangladesh' },
       { code: 'BB', name: 'Barbados' },
+      { code: 'BY', name: 'Belarus' },
       { code: 'BE', name: 'Belgium' },
       { code: 'BZ', name: 'Belize' },
       { code: 'BJ', name: 'Benin' },
@@ -283,12 +355,12 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
       { code: 'BG', name: 'Bulgaria' },
       { code: 'BF', name: 'Burkina Faso' },
       { code: 'BI', name: 'Burundi' },
+      { code: 'CV', name: 'Cabo Verde' },
       { code: 'KH', name: 'Cambodia' },
       { code: 'CM', name: 'Cameroon' },
       { code: 'CA', name: 'Canada' },
       { code: 'IC', name: 'Canary Islands' },
       { code: 'CT', name: 'Canton and Enderbury Islands' },
-      { code: 'CV', name: 'Cape Verde' },
       { code: 'KY', name: 'Cayman Islands' },
       { code: 'CF', name: 'Central African Republic' },
       { code: 'EA', name: 'Ceuta and Melilla' },
@@ -300,9 +372,13 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
       { code: 'CC', name: 'Cocos [Keeling] Islands' },
       { code: 'CO', name: 'Colombia' },
       { code: 'KM', name: 'Comoros' },
+      { code: 'CG', name: 'Congo - Brazzaville' },
+      { code: 'CD', name: 'Congo - Kinshasa' },
       { code: 'CD', name: 'Congo [DRC]' },
+      { code: 'CG', name: 'Congo [Republic]' },
       { code: 'CK', name: 'Cook Islands' },
       { code: 'CR', name: 'Costa Rica' },
+      { code: 'CI', name: 'Côte d’Ivoire' },
       { code: 'HR', name: 'Croatia' },
       { code: 'CU', name: 'Cuba' },
       { code: 'CY', name: 'Cyprus' },
@@ -317,17 +393,20 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
       { code: 'EC', name: 'Ecuador' },
       { code: 'EG', name: 'Egypt' },
       { code: 'SV', name: 'El Salvador' },
+      { code: 'GQ', name: 'Equatorial Guinea' },
+      { code: 'ER', name: 'Eritrea' },
       { code: 'EE', name: 'Estonia' },
       { code: 'ET', name: 'Ethiopia' },
       { code: 'FK', name: 'Falkland Islands [Islas Malvinas]' },
+      { code: 'FK', name: 'Falkland Islands' },
       { code: 'FO', name: 'Faroe Islands' },
       { code: 'FJ', name: 'Fiji' },
       { code: 'FI', name: 'Finland' },
       { code: 'FR', name: 'France' },
       { code: 'GF', name: 'French Guiana' },
       { code: 'PF', name: 'French Polynesia' },
-      { code: 'TF', name: 'French Southern Territories' },
       { code: 'FQ', name: 'French Southern and Antarctic Territories' },
+      { code: 'TF', name: 'French Southern Territories' },
       { code: 'GA', name: 'Gabon' },
       { code: 'GM', name: 'Gambia' },
       { code: 'GE', name: 'Georgia' },
@@ -342,6 +421,7 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
       { code: 'GT', name: 'Guatemala' },
       { code: 'GG', name: 'Guernsey' },
       { code: 'GW', name: 'Guinea-Bissau' },
+      { code: 'GN', name: 'Guinea' },
       { code: 'GY', name: 'Guyana' },
       { code: 'HT', name: 'Haiti' },
       { code: 'HM', name: 'Heard Island and McDonald Islands' },
@@ -351,10 +431,13 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
       { code: 'IS', name: 'Iceland' },
       { code: 'IN', name: 'India' },
       { code: 'ID', name: 'Indonesia' },
+      { code: 'IR', name: 'Iran' },
+      { code: 'IQ', name: 'Iraq' },
       { code: 'IE', name: 'Ireland' },
       { code: 'IM', name: 'Isle of Man' },
       { code: 'IL', name: 'Israel' },
       { code: 'IT', name: 'Italy' },
+      { code: 'CI', name: 'Ivory Coast' },
       { code: 'JM', name: 'Jamaica' },
       { code: 'JP', name: 'Japan' },
       { code: 'JE', name: 'Jersey' },
@@ -367,13 +450,17 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
       { code: 'KG', name: 'Kyrgyzstan' },
       { code: 'LA', name: 'Laos' },
       { code: 'LV', name: 'Latvia' },
+      { code: 'LB', name: 'Lebanon' },
       { code: 'LS', name: 'Lesotho' },
+      { code: 'LR', name: 'Liberia' },
       { code: 'LY', name: 'Libya' },
       { code: 'LI', name: 'Liechtenstein' },
       { code: 'LT', name: 'Lithuania' },
       { code: 'LU', name: 'Luxembourg' },
+      { code: 'MO', name: 'Macau SAR China' },
       { code: 'MO', name: 'Macau' },
       { code: 'MK', name: 'Macedonia [FYROM]' },
+      { code: 'MK', name: 'Macedonia' },
       { code: 'MG', name: 'Madagascar' },
       { code: 'MW', name: 'Malawi' },
       { code: 'MY', name: 'Malaysia' },
@@ -396,12 +483,12 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
       { code: 'MS', name: 'Montserrat' },
       { code: 'MA', name: 'Morocco' },
       { code: 'MZ', name: 'Mozambique' },
+      { code: 'MM', name: 'Myanmar [Burma]' },
       { code: 'NA', name: 'Namibia' },
       { code: 'NR', name: 'Nauru' },
       { code: 'NP', name: 'Nepal' },
-      { code: 'NL', name: 'Netherlands' },
       { code: 'AN', name: 'Netherlands Antilles' },
-      { code: 'NT', name: 'Neutral Zone' },
+      { code: 'NL', name: 'Netherlands' },
       { code: 'NC', name: 'New Caledonia' },
       { code: 'NZ', name: 'New Zealand' },
       { code: 'NI', name: 'Nicaragua' },
@@ -409,6 +496,7 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
       { code: 'NG', name: 'Nigeria' },
       { code: 'NU', name: 'Niue' },
       { code: 'NF', name: 'Norfolk Island' },
+      { code: 'KP', name: 'North Korea' },
       { code: 'VD', name: 'North Vietnam' },
       { code: 'MP', name: 'Northern Mariana Islands' },
       { code: 'NO', name: 'Norway' },
@@ -418,10 +506,11 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
       { code: 'PK', name: 'Pakistan' },
       { code: 'PW', name: 'Palau' },
       { code: 'PS', name: 'Palestinian Territories' },
-      { code: 'PA', name: 'Panama' },
       { code: 'PZ', name: 'Panama Canal Zone' },
+      { code: 'PA', name: 'Panama' },
+      { code: 'PG', name: 'Papua New Guinea' },
       { code: 'PY', name: 'Paraguay' },
-      { code: 'YD', name: 'People&apos;s Democratic Republic of Yemen' },
+      { code: 'YD', name: "People's Democratic Republic of Yemen" },
       { code: 'PE', name: 'Peru' },
       { code: 'PH', name: 'Philippines' },
       { code: 'PN', name: 'Pitcairn Islands' },
@@ -429,11 +518,11 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
       { code: 'PT', name: 'Portugal' },
       { code: 'PR', name: 'Puerto Rico' },
       { code: 'QA', name: 'Qatar' },
+      { code: 'RE', name: 'Réunion' },
       { code: 'RO', name: 'Romania' },
       { code: 'RU', name: 'Russia' },
       { code: 'RW', name: 'Rwanda' },
-      { code: 'RE', name: 'R&eacute;union' },
-      { code: 'BL', name: 'Saint Barth&eacute;lemy' },
+      { code: 'BL', name: 'Saint Barthélemy' },
       { code: 'SH', name: 'Saint Helena' },
       { code: 'KN', name: 'Saint Kitts and Nevis' },
       { code: 'LC', name: 'Saint Lucia' },
@@ -442,31 +531,35 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
       { code: 'VC', name: 'Saint Vincent and the Grenadines' },
       { code: 'WS', name: 'Samoa' },
       { code: 'SM', name: 'San Marino' },
+      { code: 'ST', name: 'São Tomé and Príncipe' },
       { code: 'SA', name: 'Saudi Arabia' },
       { code: 'SN', name: 'Senegal' },
-      { code: 'RS', name: 'Serbia' },
       { code: 'CS', name: 'Serbia and Montenegro' },
+      { code: 'RS', name: 'Serbia' },
       { code: 'SC', name: 'Seychelles' },
       { code: 'SL', name: 'Sierra Leone' },
       { code: 'SG', name: 'Singapore' },
       { code: 'SK', name: 'Slovakia' },
       { code: 'SI', name: 'Slovenia' },
       { code: 'SB', name: 'Solomon Islands' },
+      { code: 'SO', name: 'Somalia' },
       { code: 'ZA', name: 'South Africa' },
       { code: 'GS', name: 'South Georgia and the South Sandwich Islands' },
       { code: 'KR', name: 'South Korea' },
       { code: 'ES', name: 'Spain' },
       { code: 'LK', name: 'Sri Lanka' },
+      { code: 'SD', name: 'Sudan' },
       { code: 'SR', name: 'Suriname' },
       { code: 'SJ', name: 'Svalbard and Jan Mayen' },
       { code: 'SZ', name: 'Swaziland' },
       { code: 'SE', name: 'Sweden' },
       { code: 'CH', name: 'Switzerland' },
-      { code: 'ST', name: 'S&atilde;o Tom&eacute; and Pr&iacute;ncipe' },
+      { code: 'SY', name: 'Syria' },
       { code: 'TW', name: 'Taiwan' },
       { code: 'TJ', name: 'Tajikistan' },
       { code: 'TZ', name: 'Tanzania' },
       { code: 'TH', name: 'Thailand' },
+      { code: 'TL', name: 'Timor-Leste' },
       { code: 'TG', name: 'Togo' },
       { code: 'TK', name: 'Tokelau' },
       { code: 'TO', name: 'Tonga' },
@@ -496,6 +589,6 @@ define(['base', 'directives/creditCards', 'libs/recurly-4.8.5'], App =>
       { code: 'EH', name: 'Western Sahara' },
       { code: 'YE', name: 'Yemen' },
       { code: 'ZM', name: 'Zambia' },
-      { code: 'AX', name: '&angst;land Islandscode:' }
+      { code: 'ZW', name: 'Zimbabwe' }
     ]
   }))

@@ -10,7 +10,6 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-let TemplatesManager
 const { Project } = require('../../models/Project')
 const ProjectDetailsHandler = require('../Project/ProjectDetailsHandler')
 const ProjectOptionsHandler = require('../Project/ProjectOptionsHandler')
@@ -19,12 +18,15 @@ const ProjectUploadManager = require('../Uploads/ProjectUploadManager')
 const FileWriter = require('../../infrastructure/FileWriter')
 const async = require('async')
 const fs = require('fs')
+const util = require('util')
 const logger = require('logger-sharelatex')
 const request = require('request')
+const requestPromise = require('request-promise-native')
 const settings = require('settings-sharelatex')
 const uuid = require('uuid')
+const Errors = require('../Errors/Errors')
 
-module.exports = TemplatesManager = {
+const TemplatesManager = {
   createProjectFromV1Template(
     brandVariationId,
     compiler,
@@ -46,7 +48,7 @@ module.exports = TemplatesManager = {
       }
     })
     zipReq.on('error', function(err) {
-      logger.error({ err }, 'error getting zip from template API')
+      logger.warn({ err }, 'error getting zip from template API')
       return callback(err)
     })
     return FileWriter.ensureDumpFolderExists(function(err) {
@@ -57,9 +59,13 @@ module.exports = TemplatesManager = {
       const projectName = ProjectDetailsHandler.fixProjectName(templateName)
       const dumpPath = `${settings.path.dumpFolder}/${uuid.v4()}`
       const writeStream = fs.createWriteStream(dumpPath)
+      const attributes = {
+        fromV1TemplateId: templateId,
+        fromV1TemplateVersionId: templateVersionId
+      }
       writeStream.on('close', function() {
         if (zipReq.response.statusCode !== 200) {
-          logger.err(
+          logger.warn(
             { uri: zipUrl, statusCode: zipReq.response.statusCode },
             'non-success code getting zip from template API'
           )
@@ -69,9 +75,10 @@ module.exports = TemplatesManager = {
           user_id,
           projectName,
           dumpPath,
+          attributes,
           function(err, project) {
             if (err != null) {
-              logger.err({ err, zipReq }, 'problem building project from zip')
+              logger.warn({ err, zipReq }, 'problem building project from zip')
               return callback(err)
             }
             return async.series(
@@ -153,5 +160,42 @@ module.exports = TemplatesManager = {
       brandVariationId,
       callback
     )
+  },
+
+  promises: {
+    async fetchFromV1(templateId) {
+      let { body, statusCode } = await requestPromise({
+        baseUrl: settings.apis.v1.url,
+        url: `/api/v2/templates/${templateId}`,
+        method: 'GET',
+        auth: {
+          user: settings.apis.v1.user,
+          pass: settings.apis.v1.pass,
+          sendImmediately: true
+        },
+        resolveWithFullResponse: true,
+        simple: false,
+        json: true
+      })
+
+      if (statusCode === 404) {
+        throw new Errors.NotFoundError()
+      }
+
+      if (statusCode !== 200) {
+        logger.warn(
+          { templateId },
+          "[TemplateMetrics] Couldn't fetch template data from v1"
+        )
+        throw new Error("Couldn't fetch template data from v1")
+      }
+
+      return body
+    }
   }
 }
+
+TemplatesManager.fetchFromV1 = util.callbackify(
+  TemplatesManager.promises.fetchFromV1
+)
+module.exports = TemplatesManager

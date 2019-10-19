@@ -1,44 +1,28 @@
-/* eslint-disable
-    camelcase,
-    handle-callback-err,
-    max-len,
-    no-return-assign,
-    no-undef,
-    no-unused-vars,
-*/
-// TODO: This file was created by bulk-decaffeinate.
-// Fix any style issues and re-enable lint.
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS103: Rewrite code to no longer use __guard__
- * DS205: Consider reworking code to avoid use of IIFEs
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-let AuthenticationController
 const AuthenticationManager = require('./AuthenticationManager')
 const LoginRateLimiter = require('../Security/LoginRateLimiter')
 const UserUpdater = require('../User/UserUpdater')
 const Metrics = require('metrics-sharelatex')
 const logger = require('logger-sharelatex')
 const querystring = require('querystring')
-const Url = require('url')
 const Settings = require('settings-sharelatex')
 const basicAuth = require('basic-auth-connect')
 const UserHandler = require('../User/UserHandler')
 const UserSessionsManager = require('../User/UserSessionsManager')
+const SessionStoreManager = require('../../infrastructure/SessionStoreManager')
 const Analytics = require('../Analytics/AnalyticsManager')
 const passport = require('passport')
 const NotificationsBuilder = require('../Notifications/NotificationsBuilder')
+const UrlHelper = require('../Helpers/UrlHelper')
 const SudoModeHandler = require('../SudoMode/SudoModeHandler')
-const V1Api = require('../V1/V1Api')
-const { User } = require('../../models/User')
-const { URL } = require('url')
+const _ = require('lodash')
 
-module.exports = AuthenticationController = {
+const AuthenticationController = (module.exports = {
   serializeUser(user, callback) {
+    if (!user._id || !user.email) {
+      const err = new Error('serializeUser called with non-user object')
+      logger.warn({ user }, err.message)
+      return callback(err)
+    }
     const lightUser = {
       _id: user._id,
       first_name: user.first_name,
@@ -52,52 +36,52 @@ module.exports = AuthenticationController = {
       must_reconfirm: user.must_reconfirm,
       v1_id: user.overleaf != null ? user.overleaf.id : undefined
     }
-    return callback(null, lightUser)
+    callback(null, lightUser)
   },
 
   deserializeUser(user, cb) {
-    return cb(null, user)
+    cb(null, user)
   },
 
   afterLoginSessionSetup(req, user, callback) {
     if (callback == null) {
-      callback = function(err) {}
+      callback = function() {}
     }
-    return req.login(user, function(err) {
-      if (err != null) {
-        logger.err({ user_id: user._id, err }, 'error from req.login')
+    req.login(user, function(err) {
+      if (err) {
+        logger.warn({ user_id: user._id, err }, 'error from req.login')
         return callback(err)
       }
       // Regenerate the session to get a new sessionID (cookie value) to
       // protect against session fixation attacks
       const oldSession = req.session
-      return req.session.destroy(function(err) {
-        if (err != null) {
-          logger.err(
+      req.session.destroy(function(err) {
+        if (err) {
+          logger.warn(
             { user_id: user._id, err },
             'error when trying to destroy old session'
           )
           return callback(err)
         }
         req.sessionStore.generate(req)
+        // Note: the validation token is not writable, so it does not get
+        // transferred to the new session below.
         for (let key in oldSession) {
           const value = oldSession[key]
           if (key !== '__tmp') {
             req.session[key] = value
           }
         }
-        // copy to the old `session.user` location, for backward-comptability
-        req.session.user = req.session.passport.user
-        return req.session.save(function(err) {
-          if (err != null) {
-            logger.err(
+        req.session.save(function(err) {
+          if (err) {
+            logger.warn(
               { user_id: user._id },
               'error saving regenerated session after login'
             )
             return callback(err)
           }
           UserSessionsManager.trackSession(user, req.sessionID, function() {})
-          return callback(null)
+          callback(null)
         })
       })
     })
@@ -107,8 +91,8 @@ module.exports = AuthenticationController = {
     // This function is middleware which wraps the passport.authenticate middleware,
     // so we can send back our custom `{message: {text: "", type: ""}}` responses on failure,
     // and send a `{redir: ""}` response on success
-    return passport.authenticate('local', function(err, user, info) {
-      if (err != null) {
+    passport.authenticate('local', function(err, user, info) {
+      if (err) {
         return next(err)
       }
       if (user) {
@@ -130,60 +114,49 @@ module.exports = AuthenticationController = {
     } // OAuth2 'state' mismatch
     if (user.must_reconfirm) {
       return AuthenticationController._redirectToReconfirmPage(req, res, user)
-    } else {
-      const redir =
-        AuthenticationController._getRedirectFromSession(req) || '/project'
-      AuthenticationController._loginAsyncHandlers(req, user)
-      return AuthenticationController.afterLoginSessionSetup(
-        req,
-        user,
-        function(err) {
-          if (err != null) {
-            return next(err)
-          }
-          return SudoModeHandler.activateSudoMode(user._id, function(err) {
-            if (err != null) {
-              logger.err(
-                { err, user_id: user._id },
-                'Error activating Sudo Mode on login, continuing'
-              )
-            }
-            AuthenticationController._clearRedirectFromSession(req)
-            if (
-              __guard__(
-                req.headers != null ? req.headers['accept'] : undefined,
-                x => x.match(/^application\/json.*$/)
-              )
-            ) {
-              return res.json({ redir })
-            } else {
-              return res.redirect(redir)
-            }
-          })
-        }
-      )
     }
+    const redir =
+      AuthenticationController._getRedirectFromSession(req) || '/project'
+    AuthenticationController._loginAsyncHandlers(req, user)
+    AuthenticationController.afterLoginSessionSetup(req, user, function(err) {
+      if (err) {
+        return next(err)
+      }
+      SudoModeHandler.activateSudoMode(user._id, function(err) {
+        if (err) {
+          logger.err(
+            { err, user_id: user._id },
+            'Error activating Sudo Mode on login, continuing'
+          )
+        }
+        AuthenticationController._clearRedirectFromSession(req)
+        if (
+          _.get(req, ['headers', 'accept'], '').match(/^application\/json.*$/)
+        ) {
+          res.json({ redir })
+        } else {
+          res.redirect(redir)
+        }
+      })
+    })
   },
 
   doPassportLogin(req, username, password, done) {
     const email = username.toLowerCase()
     const Modules = require('../../infrastructure/Modules')
-    return Modules.hooks.fire('preDoPassportLogin', req, email, function(
+    Modules.hooks.fire('preDoPassportLogin', req, email, function(
       err,
       infoList
     ) {
-      if (err != null) {
-        return next(err)
+      if (err) {
+        return done(err)
       }
       const info = infoList.find(i => i != null)
       if (info != null) {
         return done(null, false, info)
       }
-      return LoginRateLimiter.processLoginRequest(email, function(
-        err,
-        isAllowed
-      ) {
-        if (err != null) {
+      LoginRateLimiter.processLoginRequest(email, function(err, isAllowed) {
+        if (err) {
           return done(err)
         }
         if (!isAllowed) {
@@ -193,7 +166,7 @@ module.exports = AuthenticationController = {
             type: 'error'
           })
         }
-        return AuthenticationManager.authenticate({ email }, password, function(
+        AuthenticationManager.authenticate({ email }, password, function(
           error,
           user
         ) {
@@ -202,11 +175,11 @@ module.exports = AuthenticationController = {
           }
           if (user != null) {
             // async actions
-            return done(null, user)
+            done(null, user)
           } else {
             AuthenticationController._recordFailedLogin()
             logger.log({ email }, 'failed log in')
-            return done(null, false, {
+            done(null, false, {
               text: req.i18n.translate('email_or_password_wrong_try_again'),
               type: 'error'
             })
@@ -217,7 +190,11 @@ module.exports = AuthenticationController = {
   },
 
   _loginAsyncHandlers(req, user) {
-    UserHandler.setupLoginData(user, function() {})
+    UserHandler.setupLoginData(user, err => {
+      if (err != null) {
+        logger.warn({ err }, 'error setting up login data')
+      }
+    })
     LoginRateLimiter.recordSuccessfulLogin(user.email)
     AuthenticationController._recordSuccessfulLogin(user._id)
     AuthenticationController.ipMatchCheck(req, user)
@@ -242,34 +219,20 @@ module.exports = AuthenticationController = {
   },
 
   setInSessionUser(req, props) {
-    return (() => {
-      const result = []
-      for (let key in props) {
-        const value = props[key]
-        if (
-          __guard__(
-            __guard__(req != null ? req.session : undefined, x1 => x1.passport),
-            x => x.user
-          ) != null
-        ) {
-          req.session.passport.user[key] = value
-        }
-        if (
-          __guard__(req != null ? req.session : undefined, x2 => x2.user) !=
-          null
-        ) {
-          result.push((req.session.user[key] = value))
-        } else {
-          result.push(undefined)
-        }
-      }
-      return result
-    })()
+    const sessionUser = AuthenticationController.getSessionUser(req)
+    if (!sessionUser) {
+      return
+    }
+    for (let key in props) {
+      const value = props[key]
+      sessionUser[key] = value
+    }
+    return null
   },
 
   isUserLoggedIn(req) {
-    const user_id = AuthenticationController.getLoggedInUserId(req)
-    return ![null, undefined, false].includes(user_id)
+    const userId = AuthenticationController.getLoggedInUserId(req)
+    return ![null, undefined, false].includes(userId)
   },
 
   // TODO: perhaps should produce an error if the current user is not present
@@ -292,24 +255,18 @@ module.exports = AuthenticationController = {
   },
 
   getSessionUser(req) {
-    if (__guard__(req != null ? req.session : undefined, x => x.user) != null) {
-      return req.session.user
-    } else if (
-      __guard__(
-        __guard__(req != null ? req.session : undefined, x2 => x2.passport),
-        x1 => x1.user
-      )
-    ) {
-      return req.session.passport.user
-    } else {
+    if (!SessionStoreManager.checkValidationToken(req)) {
       return null
     }
+    const sessionUser = _.get(req, ['session', 'user'])
+    const sessionPassportUser = _.get(req, ['session', 'passport', 'user'])
+    return sessionUser || sessionPassportUser || null
   },
 
   requireLogin() {
     const doRequest = function(req, res, next) {
       if (next == null) {
-        next = function(error) {}
+        next = function() {}
       }
       if (!AuthenticationController.isUserLoggedIn(req)) {
         return AuthenticationController._redirectToLoginOrRegisterPage(req, res)
@@ -322,18 +279,12 @@ module.exports = AuthenticationController = {
     return doRequest
   },
 
-  // access tokens might be associated with user stubs if the user is
-  // not yet migrated to v2. if api can work with user stubs then set
-  // allowUserStub true when adding middleware to route.
-  requireOauth(allowUserStub) {
+  requireOauth() {
     // require this here because module may not be included in some versions
-    if (allowUserStub == null) {
-      allowUserStub = false
-    }
     const Oauth2Server = require('../../../../modules/oauth2-server/app/src/Oauth2Server')
     return function(req, res, next) {
       if (next == null) {
-        next = function(error) {}
+        next = function() {}
       }
       const request = new Oauth2Server.Request(req)
       const response = new Oauth2Server.Response(res)
@@ -341,7 +292,7 @@ module.exports = AuthenticationController = {
         err,
         token
       ) {
-        if (err != null) {
+        if (err) {
           // use a 401 status code for malformed header for git-bridge
           if (
             err.code === 400 &&
@@ -349,21 +300,10 @@ module.exports = AuthenticationController = {
           ) {
             err.code = 401
           }
-          // fall back to v1 on invalid token
-          if (err.code === 401) {
-            return AuthenticationController._requireOauthV1Fallback(
-              req,
-              res,
-              next
-            )
-          }
           // send all other errors
           return res
             .status(err.code)
             .json({ error: err.name, error_description: err.message })
-        }
-        if (token.user.constructor.modelName === 'UserStub' && !allowUserStub) {
-          return res.sendStatus(401)
         }
         req.oauth = { access_token: token.accessToken }
         req.oauth_token = token
@@ -373,40 +313,6 @@ module.exports = AuthenticationController = {
     }
   },
 
-  _requireOauthV1Fallback(req, res, next) {
-    if (req.token == null) {
-      return res.sendStatus(401)
-    }
-    const options = {
-      expectedStatusCodes: [401],
-      json: { token: req.token },
-      method: 'POST',
-      uri: '/api/v1/sharelatex/oauth_authorize'
-    }
-    return V1Api.request(options, function(error, response, body) {
-      if (error != null) {
-        return next(error)
-      }
-      if (!__guard__(body != null ? body.user_profile : undefined, x => x.id)) {
-        return res.status(401).json({ error: 'invalid_token' })
-      }
-      return User.findOne({ 'overleaf.id': body.user_profile.id }, function(
-        error,
-        user
-      ) {
-        if (error != null) {
-          return next(error)
-        }
-        if (user == null) {
-          return res.status(401).json({ error: 'invalid_token' })
-        }
-        req.oauth = { access_token: body.access_token }
-        req.oauth_user = user
-        return next()
-      })
-    })
-  },
-
   _globalLoginWhitelist: [],
   addEndpointToLoginWhitelist(endpoint) {
     return AuthenticationController._globalLoginWhitelist.push(endpoint)
@@ -414,7 +320,7 @@ module.exports = AuthenticationController = {
 
   requireGlobalLogin(req, res, next) {
     if (
-      Array.from(AuthenticationController._globalLoginWhitelist).includes(
+      AuthenticationController._globalLoginWhitelist.includes(
         req._parsedUrl.pathname
       )
     ) {
@@ -422,16 +328,16 @@ module.exports = AuthenticationController = {
     }
 
     if (req.headers['authorization'] != null) {
-      return AuthenticationController.httpAuth(req, res, next)
+      AuthenticationController.httpAuth(req, res, next)
     } else if (AuthenticationController.isUserLoggedIn(req)) {
-      return next()
+      next()
     } else {
       logger.log(
         { url: req.url },
         'user trying to access endpoint not in global whitelist'
       )
       AuthenticationController.setRedirectInSession(req)
-      return res.redirect('/login')
+      res.redirect('/login')
     }
   },
 
@@ -455,7 +361,7 @@ module.exports = AuthenticationController = {
       !/^\/(socket.io|js|stylesheets|img)\/.*$/.test(value) &&
       !/^.*\.(png|jpeg|svg)$/.test(value)
     ) {
-      const safePath = AuthenticationController._getSafeRedirectPath(value)
+      const safePath = UrlHelper.getSafeRedirectPath(value)
       return (req.session.postLoginRedirect = safePath)
     }
   },
@@ -466,9 +372,9 @@ module.exports = AuthenticationController = {
       req.query.project_name != null ||
       req.path === '/user/subscription/new'
     ) {
-      return AuthenticationController._redirectToRegisterPage(req, res)
+      AuthenticationController._redirectToRegisterPage(req, res)
     } else {
-      return AuthenticationController._redirectToLoginPage(req, res)
+      AuthenticationController._redirectToLoginPage(req, res)
     }
   },
 
@@ -480,7 +386,7 @@ module.exports = AuthenticationController = {
     AuthenticationController.setRedirectInSession(req)
     const url = `/login?${querystring.stringify(req.query)}`
     res.redirect(url)
-    return Metrics.inc('security.login-redirect')
+    Metrics.inc('security.login-redirect')
   },
 
   _redirectToReconfirmPage(req, res, user) {
@@ -490,14 +396,10 @@ module.exports = AuthenticationController = {
     )
     req.session.reconfirm_email = user != null ? user.email : undefined
     const redir = '/user/reconfirm'
-    if (
-      __guard__(req.headers != null ? req.headers['accept'] : undefined, x =>
-        x.match(/^application\/json.*$/)
-      )
-    ) {
-      return res.json({ redir })
+    if (_.get(req, ['headers', 'accept'], '').match(/^application\/json.*$/)) {
+      res.json({ redir })
     } else {
-      return res.redirect(redir)
+      res.redirect(redir)
     }
   },
 
@@ -509,15 +411,15 @@ module.exports = AuthenticationController = {
     AuthenticationController.setRedirectInSession(req)
     const url = `/register?${querystring.stringify(req.query)}`
     res.redirect(url)
-    return Metrics.inc('security.login-redirect')
+    Metrics.inc('security.login-redirect')
   },
 
-  _recordSuccessfulLogin(user_id, callback) {
+  _recordSuccessfulLogin(userId, callback) {
     if (callback == null) {
-      callback = function(error) {}
+      callback = function() {}
     }
-    return UserUpdater.updateUser(
-      user_id.toString(),
+    UserUpdater.updateUser(
+      userId.toString(),
       {
         $set: { lastLoggedIn: new Date() },
         $inc: { loginCount: 1 }
@@ -527,50 +429,28 @@ module.exports = AuthenticationController = {
           callback(error)
         }
         Metrics.inc('user.login.success')
-        return callback()
+        callback()
       }
     )
   },
 
   _recordFailedLogin(callback) {
-    if (callback == null) {
-      callback = function(error) {}
-    }
     Metrics.inc('user.login.failed')
-    return callback()
+    if (callback) callback()
   },
 
   _getRedirectFromSession(req) {
     let safePath
-    const value = __guard__(
-      req != null ? req.session : undefined,
-      x => x.postLoginRedirect
-    )
+    const value = _.get(req, ['session', 'postLoginRedirect'])
     if (value) {
-      safePath = AuthenticationController._getSafeRedirectPath(value)
+      safePath = UrlHelper.getSafeRedirectPath(value)
     }
     return safePath || null
   },
 
   _clearRedirectFromSession(req) {
     if (req.session != null) {
-      return delete req.session.postLoginRedirect
+      delete req.session.postLoginRedirect
     }
-  },
-
-  _getSafeRedirectPath(value) {
-    const baseURL = Settings.siteUrl // base URL is required to construct URL from path
-    const url = new URL(value, baseURL)
-    let safePath = `${url.pathname}${url.search}${url.hash}`
-    if (safePath === '/') {
-      safePath = undefined
-    }
-    return safePath
   }
-}
-
-function __guard__(value, transform) {
-  return typeof value !== 'undefined' && value !== null
-    ? transform(value)
-    : undefined
-}
+})

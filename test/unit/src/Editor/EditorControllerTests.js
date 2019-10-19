@@ -45,6 +45,9 @@ describe('EditorController', function() {
     this.callback = sinon.stub()
 
     return (this.EditorController = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         '../Project/ProjectEntityUpdateHandler': (this.ProjectEntityUpdateHandler = {}),
         '../Project/ProjectOptionsHandler': (this.ProjectOptionsHandler = {
@@ -114,7 +117,7 @@ describe('EditorController', function() {
         .should.equal(true)
     })
 
-    return it('calls the callback', function() {
+    it('calls the callback', function() {
       return this.callback.calledWith(null, this.doc).should.equal(true)
     })
   })
@@ -162,7 +165,7 @@ describe('EditorController', function() {
         .should.equal(true)
     })
 
-    return it('calls the callback', function() {
+    it('calls the callback', function() {
       return this.callback.calledWith(null, this.file).should.equal(true)
     })
   })
@@ -199,7 +202,7 @@ describe('EditorController', function() {
       return this.callback.calledWith(null, this.doc).should.equal(true)
     })
 
-    return describe('doc does not exist', function() {
+    describe('doc does not exist', function() {
       beforeEach(function() {
         this.ProjectEntityUpdateHandler.upsertDoc = sinon
           .stub()
@@ -215,7 +218,7 @@ describe('EditorController', function() {
         )
       })
 
-      return it('sends an update out to users in the project', function() {
+      it('sends an update out to users in the project', function() {
         return this.EditorRealTimeController.emitToRoom
           .calledWith(
             this.project_id,
@@ -263,7 +266,7 @@ describe('EditorController', function() {
       return this.callback.calledWith(null, this.newFile).should.equal(true)
     })
 
-    return describe('file does not exist', function() {
+    describe('file does not exist', function() {
       beforeEach(function() {
         this.ProjectEntityUpdateHandler.upsertFile = sinon
           .stub()
@@ -280,7 +283,7 @@ describe('EditorController', function() {
         )
       })
 
-      return it('should send the update out to users in the project', function() {
+      it('should send the update out to users in the project', function() {
         return this.EditorRealTimeController.emitToRoom
           .calledWith(
             this.project_id,
@@ -333,7 +336,7 @@ describe('EditorController', function() {
         )
       })
 
-      return it('should send the update for the doc out to users in the project', function() {
+      it('should send the update for the doc out to users in the project', function() {
         return this.EditorRealTimeController.emitToRoom
           .calledWith(
             this.project_id,
@@ -346,7 +349,7 @@ describe('EditorController', function() {
       })
     })
 
-    return describe('folders required for doc do not exist', function() {
+    describe('folders required for doc do not exist', function() {
       beforeEach(function() {
         const folders = [
           (this.folderA = { _id: 2, parentFolder_id: 1 }),
@@ -365,7 +368,7 @@ describe('EditorController', function() {
         )
       })
 
-      return it('should send the update for each folder to users in the project', function() {
+      it('should send the update for each folder to users in the project', function() {
         this.EditorRealTimeController.emitToRoom
           .calledWith(
             this.project_id,
@@ -431,7 +434,7 @@ describe('EditorController', function() {
         )
       })
 
-      return it('should send the update for the file out to users in the project', function() {
+      it('should send the update for the file out to users in the project', function() {
         return this.EditorRealTimeController.emitToRoom
           .calledWith(
             this.project_id,
@@ -445,7 +448,7 @@ describe('EditorController', function() {
       })
     })
 
-    return describe('folders required for file do not exist', function() {
+    describe('folders required for file do not exist', function() {
       beforeEach(function() {
         const folders = [
           (this.folderA = { _id: 2, parentFolder_id: 1 }),
@@ -465,7 +468,7 @@ describe('EditorController', function() {
         )
       })
 
-      return it('should send the update for each folder to users in the project', function() {
+      it('should send the update for each folder to users in the project', function() {
         this.EditorRealTimeController.emitToRoom
           .calledWith(
             this.project_id,
@@ -517,7 +520,7 @@ describe('EditorController', function() {
       )
     })
 
-    return it('should return the folder in the callback', function() {
+    it('should return the folder in the callback', function() {
       return this.callback.calledWith(null, this.folder).should.equal(true)
     })
   })
@@ -555,7 +558,7 @@ describe('EditorController', function() {
       )
     })
 
-    return it('should return the folder in the callback', function() {
+    it('should return the folder in the callback', function() {
       return this.callback
         .calledWith(null, this.folders, this.folder)
         .should.equal(true)
@@ -586,7 +589,7 @@ describe('EditorController', function() {
       ).should.equal.true
     })
 
-    return it('notify users an entity has been deleted', function() {
+    it('notify users an entity has been deleted', function() {
       return this.EditorRealTimeController.emitToRoom
         .calledWith(
           this.project_id,
@@ -622,7 +625,7 @@ describe('EditorController', function() {
       ).should.equal.true
     })
 
-    return it('notify users an entity has been deleted', function() {
+    it('notify users an entity has been deleted', function() {
       return this.EditorRealTimeController.emitToRoom
         .calledWith(
           this.project_id,
@@ -634,7 +637,7 @@ describe('EditorController', function() {
     })
   })
 
-  describe('notifyUsersProjectHasBeenDeletedOrRenamed', () =>
+  describe('notifyUsersProjectHasBeenDeletedOrRenamed', function() {
     it('should emmit a message to all users in a project', function(done) {
       return this.EditorController.notifyUsersProjectHasBeenDeletedOrRenamed(
         this.project_id,
@@ -648,7 +651,8 @@ describe('EditorController', function() {
           return done()
         }
       )
-    }))
+    })
+  })
 
   describe('updateProjectDescription', function() {
     beforeEach(function() {
@@ -666,7 +670,7 @@ describe('EditorController', function() {
         .should.equal(true)
     })
 
-    return it('should notify the other clients about the updated description', function() {
+    it('should notify the other clients about the updated description', function() {
       return this.EditorRealTimeController.emitToRoom
         .calledWith(
           this.project_id,
@@ -685,7 +689,7 @@ describe('EditorController', function() {
         .callsArgWith(1, this.err))
     })
 
-    return it('should call the project handler', function(done) {
+    it('should call the project handler', function(done) {
       return this.EditorController.deleteProject(this.project_id, err => {
         err.should.equal(this.err)
         this.ProjectDeleter.deleteProject
@@ -725,7 +729,7 @@ describe('EditorController', function() {
         .should.equal(true)
     })
 
-    return it('should emit the update to the room', function() {
+    it('should emit the update to the room', function() {
       return this.EditorRealTimeController.emitToRoom
         .calledWith(
           this.project_id,
@@ -775,7 +779,7 @@ describe('EditorController', function() {
         .should.equal(true)
     })
 
-    return it('calls the callback', function() {
+    it('calls the callback', function() {
       return this.callback.called.should.equal(true)
     })
   })
@@ -797,7 +801,7 @@ describe('EditorController', function() {
         .should.equal(true)
     })
 
-    return it('should emit the update to the room', function() {
+    it('should emit the update to the room', function() {
       return this.EditorRealTimeController.emitToRoom
         .calledWith(this.project_id, 'projectNameUpdated', this.newName)
         .should.equal(true)
@@ -814,7 +818,7 @@ describe('EditorController', function() {
       )
     })
 
-    return it('should send the new compiler and project id to the project options handler', function() {
+    it('should send the new compiler and project id to the project options handler', function() {
       this.ProjectOptionsHandler.setCompiler
         .calledWith(this.project_id, this.compiler)
         .should.equal(true)
@@ -834,7 +838,7 @@ describe('EditorController', function() {
       )
     })
 
-    return it('should send the new imageName and project id to the project options handler', function() {
+    it('should send the new imageName and project id to the project options handler', function() {
       this.ProjectOptionsHandler.setImageName
         .calledWith(this.project_id, this.imageName)
         .should.equal(true)
@@ -854,7 +858,7 @@ describe('EditorController', function() {
       )
     })
 
-    return it('should send the new languageCode and project id to the project options handler', function() {
+    it('should send the new languageCode and project id to the project options handler', function() {
       this.ProjectOptionsHandler.setSpellCheckLanguage
         .calledWith(this.project_id, this.languageCode)
         .should.equal(true)
@@ -900,7 +904,7 @@ describe('EditorController', function() {
           .should.equal(false)
       })
 
-      return it('should not broadcast a token change', function() {
+      it('should not broadcast a token change', function() {
         return this.EditorRealTimeController.emitToRoom
           .calledWith(this.project_id, 'project:tokens:changed', {
             tokens: this.tokens
@@ -909,7 +913,7 @@ describe('EditorController', function() {
       })
     })
 
-    return describe('when setting to tokenBased', function() {
+    describe('when setting to tokenBased', function() {
       beforeEach(function() {
         this.newAccessLevel = 'tokenBased'
         this.tokens = { readOnly: 'aaa', readAndWrite: '42bbb' }
@@ -941,7 +945,7 @@ describe('EditorController', function() {
           .should.equal(true)
       })
 
-      return it('should broadcast the token change too', function() {
+      it('should broadcast the token change too', function() {
         return this.EditorRealTimeController.emitToRoom
           .calledWith(this.project_id, 'project:tokens:changed', {
             tokens: this.tokens
@@ -951,7 +955,7 @@ describe('EditorController', function() {
     })
   })
 
-  return describe('setRootDoc', function() {
+  describe('setRootDoc', function() {
     beforeEach(function() {
       this.newRootDocID = '21312321321'
       this.ProjectEntityUpdateHandler.setRootDoc = sinon.stub().yields()
@@ -968,7 +972,7 @@ describe('EditorController', function() {
         .should.equal(true)
     })
 
-    return it('should emit the update to the room', function() {
+    it('should emit the update to the room', function() {
       return this.EditorRealTimeController.emitToRoom
         .calledWith(this.project_id, 'rootDocUpdated', this.newRootDocID)
         .should.equal(true)

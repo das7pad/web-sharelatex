@@ -19,6 +19,9 @@ const MockRequest = require('../helpers/MockRequest')
 const MockResponse = require('../helpers/MockResponse')
 const modulePath =
   '../../../../app/src/Features/Subscription/SubscriptionController'
+const SubscriptionErrors = require('../../../../app/src/Features/Subscription/Errors')
+const OError = require('@overleaf/o-error')
+const HttpErrors = require('@overleaf/o-error/http')
 
 const mockSubscriptions = {
   'subscription-123-active': {
@@ -57,7 +60,7 @@ describe('SubscriptionController', function() {
       updateSubscription: sinon.stub().callsArgWith(3),
       reactivateSubscription: sinon.stub().callsArgWith(1),
       cancelSubscription: sinon.stub().callsArgWith(1),
-      recurlyCallback: sinon.stub().callsArgWith(1),
+      recurlyCallback: sinon.stub().yields(),
       startFreeTrial: sinon.stub()
     }
 
@@ -89,8 +92,13 @@ describe('SubscriptionController', function() {
       gaExperiments: {}
     }
     this.GeoIpLookup = { getCurrencyCode: sinon.stub() }
-    this.UserGetter = { getUser: sinon.stub().callsArgWith(2, null, this.user) }
+    this.UserGetter = {
+      getUser: sinon.stub().callsArgWith(2, null, this.user)
+    }
     this.SubscriptionController = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         '../Authentication/AuthenticationController': this
           .AuthenticationController,
@@ -108,7 +116,9 @@ describe('SubscriptionController', function() {
         './RecurlyWrapper': (this.RecurlyWrapper = {}),
         './FeaturesUpdater': (this.FeaturesUpdater = {}),
         './GroupPlansData': (this.GroupPlansData = {}),
-        './V1SubscriptionManager': (this.V1SubscriptionManager = {})
+        './V1SubscriptionManager': (this.V1SubscriptionManager = {}),
+        './Errors': SubscriptionErrors,
+        '@overleaf/o-error/http': HttpErrors
       }
     })
 
@@ -140,7 +150,7 @@ describe('SubscriptionController', function() {
         return done()
       })
 
-      return describe('not dependant on logged in state', function(done) {
+      describe('not dependant on logged in state', function(done) {
         // these could have been put in 'when user is not logged in' too
         it('should set the recommended currency from the geoiplookup', function(done) {
           this.res.renderedVariables.recomendedCurrency.should.equal(
@@ -151,14 +161,14 @@ describe('SubscriptionController', function() {
             .should.equal(true)
           return done()
         })
-        return it('should include data for features table', function(done) {
+        it('should include data for features table', function(done) {
           this.res.renderedVariables.planFeatures.length.should.not.equal(0)
           return done()
         })
       })
     })
 
-    return describe('when user is not logged in', function(done) {
+    describe('when user is not logged in', function(done) {
       beforeEach(function(done) {
         this.res.callback = done
         this.AuthenticationController.getLoggedInUserId = sinon
@@ -167,7 +177,7 @@ describe('SubscriptionController', function() {
         return this.SubscriptionController.plansPage(this.req, this.res)
       })
 
-      return it('should not fetch the current user', function(done) {
+      it('should not fetch the current user', function(done) {
         this.UserGetter.getUser.callCount.should.equal(0)
         return done()
       })
@@ -197,17 +207,18 @@ describe('SubscriptionController', function() {
         return this.PlansLocator.findLocalPlanInSettings.returns({})
       })
 
-      return describe('with a valid plan code', () =>
+      describe('with a valid plan code', function() {
         it('should render the new subscription page', function(done) {
           this.res.render = (page, opts) => {
             page.should.equal('subscriptions/new')
             return done()
           }
           return this.SubscriptionController.paymentPage(this.req, this.res)
-        }))
+        })
+      })
     })
 
-    describe('with a user with subscription', () =>
+    describe('with a user with subscription', function() {
       it('should redirect to the subscription dashboard', function(done) {
         this.LimitationsManager.userHasV1OrV2Subscription.callsArgWith(
           1,
@@ -219,9 +230,10 @@ describe('SubscriptionController', function() {
           return done()
         }
         return this.SubscriptionController.paymentPage(this.req, this.res)
-      }))
+      })
+    })
 
-    describe('with an invalid plan code', () =>
+    describe('with an invalid plan code', function() {
       it('should redirect to the subscription dashboard', function(done) {
         this.LimitationsManager.userHasV1OrV2Subscription.callsArgWith(
           1,
@@ -234,7 +246,8 @@ describe('SubscriptionController', function() {
           return done()
         }
         return this.SubscriptionController.paymentPage(this.req, this.res)
-      }))
+      })
+    })
 
     describe('which currency to use', function() {
       beforeEach(function() {
@@ -265,7 +278,7 @@ describe('SubscriptionController', function() {
         return this.SubscriptionController.paymentPage(this.req, this.res)
       })
 
-      return it('should use the geo ip currency if non is provided', function(done) {
+      it('should use the geo ip currency if non is provided', function(done) {
         this.req.query.currency = null
         this.res.render = (page, opts) => {
           opts.currency.should.equal(this.stubbedCurrencyCode)
@@ -275,7 +288,7 @@ describe('SubscriptionController', function() {
       })
     })
 
-    return describe('with a recurly subscription already', () =>
+    describe('with a recurly subscription already', function() {
       it('should redirect to the subscription dashboard', function(done) {
         this.LimitationsManager.userHasV1OrV2Subscription.callsArgWith(
           1,
@@ -290,10 +303,11 @@ describe('SubscriptionController', function() {
           return done()
         }
         return this.SubscriptionController.paymentPage(this.req, this.res)
-      }))
+      })
+    })
   })
 
-  describe('successful_subscription', () =>
+  describe('successful_subscription', function() {
     beforeEach(function(done) {
       this.SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel.callsArgWith(
         1,
@@ -305,7 +319,8 @@ describe('SubscriptionController', function() {
         this.req,
         this.res
       )
-    }))
+    })
+  })
 
   describe('userSubscriptionPage', function() {
     beforeEach(function(done) {
@@ -353,7 +368,7 @@ describe('SubscriptionController', function() {
       return expect(this.data.user).to.deep.equal(this.user)
     })
 
-    return it('should load the plans', function() {
+    it('should load the plans', function() {
       return expect(this.data.plans).to.deep.equal(this.plans)
     })
   })
@@ -370,7 +385,12 @@ describe('SubscriptionController', function() {
         card: '1234',
         cvv: '123'
       }
-      this.req.body.recurly_token_id = '1234'
+      this.recurlyTokenIds = {
+        billing: '1234',
+        threeDSecureActionResult: '5678'
+      }
+      this.req.body.recurly_token_id = this.recurlyTokenIds.billing
+      this.req.body.recurly_three_d_secure_action_result_token_id = this.recurlyTokenIds.threeDSecureActionResult
       this.req.body.subscriptionDetails = this.subscriptionDetails
       this.LimitationsManager.userHasV1OrV2Subscription.yields(null, false)
       return this.SubscriptionController.createSubscription(this.req, this.res)
@@ -378,17 +398,38 @@ describe('SubscriptionController', function() {
 
     it('should send the user and subscriptionId to the handler', function(done) {
       this.SubscriptionHandler.createSubscription
-        .calledWith(
+        .calledWithMatch(
           this.user,
           this.subscriptionDetails,
-          this.req.body.recurly_token_id
+          this.recurlyTokenIds
         )
         .should.equal(true)
       return done()
     })
 
-    return it('should redurect to the subscription page', function(done) {
+    it('should redurect to the subscription page', function(done) {
       this.res.sendStatus.calledWith(201).should.equal(true)
+      return done()
+    })
+  })
+
+  describe('createSubscription with errors', function() {
+    it('should handle 3DSecure errors', function(done) {
+      this.next = sinon.stub()
+      this.LimitationsManager.userHasV1OrV2Subscription.yields(null, false)
+      this.SubscriptionHandler.createSubscription.yields(
+        new SubscriptionErrors.RecurlyTransactionError({})
+      )
+      this.SubscriptionController.createSubscription(this.req, null, error => {
+        expect(error).to.exist
+        expect(error).to.be.instanceof(HttpErrors.UnprocessableEntityError)
+        expect(
+          OError.hasCauseInstanceOf(
+            error,
+            SubscriptionErrors.RecurlyTransactionError
+          )
+        ).to.be.true
+      })
       return done()
     })
   })
@@ -413,7 +454,7 @@ describe('SubscriptionController', function() {
       return done()
     })
 
-    return it('should redurect to the subscription page', function(done) {
+    it('should redurect to the subscription page', function(done) {
       this.res.redirect.calledWith('/user/subscription').should.equal(true)
       return done()
     })
@@ -440,7 +481,7 @@ describe('SubscriptionController', function() {
       return done()
     })
 
-    return it('should redurect to the subscription page', function(done) {
+    it('should redurect to the subscription page', function(done) {
       this.res.redirect.calledWith('/user/subscription').should.equal(true)
       return done()
     })
@@ -464,7 +505,7 @@ describe('SubscriptionController', function() {
       return done()
     })
 
-    return it('should redurect to the subscription page', function(done) {
+    it('should redurect to the subscription page', function(done) {
       this.res.redirect
         .calledWith('/user/subscription/canceled')
         .should.equal(true)
@@ -498,18 +539,18 @@ describe('SubscriptionController', function() {
         return done()
       })
 
-      return it('should send a 200', function(done) {
+      it('should send a 200', function(done) {
         this.res.sendStatus.calledWith(200)
         return done()
       })
     })
 
-    return describe('with a non-actionable request', function() {
+    describe('with a non-actionable request', function() {
       beforeEach(function(done) {
         this.user.id = this.activeRecurlySubscription.account.account_code
         this.req = {
           body: {
-            new_subscription_notification: {
+            renewed_subscription_notification: {
               subscription: {
                 uuid: this.activeRecurlySubscription.uuid
               }
@@ -531,7 +572,7 @@ describe('SubscriptionController', function() {
         )
       })
 
-      return it('should respond with a 200 status', function() {
+      it('should respond with a 200 status', function() {
         return this.res.sendStatus.calledWith(200)
       })
     })
@@ -585,7 +626,7 @@ describe('SubscriptionController', function() {
       )
     })
 
-    return it('should pass annual as the plan name if the user is already on an annual plan', function(done) {
+    it('should pass annual as the plan name if the user is already on an annual plan', function(done) {
       this.LimitationsManager.userHasV2Subscription.callsArgWith(
         1,
         null,
@@ -603,7 +644,7 @@ describe('SubscriptionController', function() {
     })
   })
 
-  return describe('processUpgradeToAnnualPlan', function() {
+  describe('processUpgradeToAnnualPlan', function() {
     beforeEach(function() {})
 
     it('should tell the subscription handler to update the subscription with the annual plan and apply a coupon code', function(done) {
@@ -622,7 +663,7 @@ describe('SubscriptionController', function() {
       )
     })
 
-    return it('should get the collaborator coupon code', function(done) {
+    it('should get the collaborator coupon code', function(done) {
       this.req.body = { planName: 'collaborator' }
 
       this.res.sendStatus = url => {

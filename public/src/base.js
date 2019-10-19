@@ -22,6 +22,7 @@ define([
   'modules/recursionHelper',
   'modules/errorCatcher',
   'modules/localStorage',
+  'modules/sessionStorage',
   'utils/underscore'
 ], function() {
   const App = angular
@@ -33,25 +34,15 @@ define([
       'underscore',
       'ngSanitize',
       'ipCookie',
-      'mvdSixpack',
       'ErrorCatcher',
       'localStorage',
+      'sessionStorage',
       'ngTagsInput',
       'ui.select'
     ])
-    .config(function(
-      $qProvider,
-      sixpackProvider,
-      $httpProvider,
-      uiSelectConfig
-    ) {
+    .config(function($qProvider, $httpProvider, uiSelectConfig) {
       $qProvider.errorOnUnhandledRejections(false)
       uiSelectConfig.spinnerClass = 'fa fa-refresh ui-select-spin'
-      sixpackProvider.setOptions({
-        debug: false,
-        baseUrl: window.sharelatex.sixpackDomain,
-        client_id: window.user_id
-      })
 
       return __guard__(
         typeof MathJax !== 'undefined' && MathJax !== null

@@ -22,6 +22,9 @@ const modulePath = require('path').join(
 describe('ReferalAllocator', function() {
   beforeEach(function() {
     this.ReferalAllocator = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         '../../models/User': { User: (this.User = {}) },
         '../Subscription/FeaturesUpdater': (this.FeaturesUpdater = {}),
@@ -44,7 +47,7 @@ describe('ReferalAllocator', function() {
       .callsArgWith(1, null, { _id: this.user_id }))
   })
 
-  return describe('allocate', function() {
+  describe('allocate', function() {
     describe('when the referal was a bonus referal', function() {
       beforeEach(function() {
         this.referal_source = 'bonus'
@@ -87,7 +90,7 @@ describe('ReferalAllocator', function() {
           .should.equal(true)
       })
 
-      return it('should call the callback', function() {
+      it('should call the callback', function() {
         return this.callback.called.should.equal(true)
       })
     })
@@ -120,12 +123,12 @@ describe('ReferalAllocator', function() {
         return this.FeaturesUpdater.refreshFeatures.called.should.equal(false)
       })
 
-      return it('should call the callback', function() {
+      it('should call the callback', function() {
         return this.callback.called.should.equal(true)
       })
     })
 
-    return describe('when the referal is not a bonus referal', function() {
+    describe('when the referal is not a bonus referal', function() {
       beforeEach(function() {
         this.referal_source = 'public_share'
         return this.ReferalAllocator.allocate(
@@ -151,7 +154,7 @@ describe('ReferalAllocator', function() {
         return this.FeaturesUpdater.refreshFeatures.called.should.equal(false)
       })
 
-      return it('should call the callback', function() {
+      it('should call the callback', function() {
         return this.callback.called.should.equal(true)
       })
     })
