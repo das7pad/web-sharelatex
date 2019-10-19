@@ -68,7 +68,7 @@ describe('PublicRegistrationController', function() {
           .AuthenticationController,
         '../../../../app/src/Features/User/UserSessionsManager': this
           .UserSessionsManager,
-        '../../../../app/coffee/Features/Analytics/AnalyticsManager': this
+        '../../../../app/src/Features/Analytics/AnalyticsManager': this
           .AnalyticsManager,
         'logger-sharelatex': { log() {} },
         'metrics-sharelatex': { inc() {} },

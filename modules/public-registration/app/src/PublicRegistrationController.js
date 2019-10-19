@@ -25,7 +25,7 @@ const _ = require('underscore')
 const UserHandler = require('../../../../app/src/Features/User/UserHandler')
 const UserSessionsManager = require('../../../../app/src/Features/User/UserSessionsManager')
 const AuthenticationController = require('../../../../app/src/Features/Authentication/AuthenticationController')
-const AnalyticsManager = require('../../../../app/coffee/Features/Analytics/AnalyticsManager')
+const AnalyticsManager = require('../../../../app/src/Features/Analytics/AnalyticsManager')
 const settings = require('settings-sharelatex')
 
 EmailBuilder.templates.welcome = EmailBuilder.CTAEmailTemplate({
