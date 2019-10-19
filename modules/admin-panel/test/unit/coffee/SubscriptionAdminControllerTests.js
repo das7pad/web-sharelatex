@@ -1,3 +1,10 @@
+/* eslint-disable
+    max-len,
+    no-return-assign,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -35,7 +42,7 @@ describe("SubscriptionAdminController", function() {
 				(this.FeaturesUpdater = {refreshFeatures: sinon.stub().yields()}),
 			"../../../../app/js/models/Subscription": { Subscription: (this.Subscription =
 				(Subscription = (function() {
-					let createSubscription = undefined;
+					let createSubscription;
 					Subscription = class Subscription {
 						static initClass() {
 							this.prototype.save = sinon.stub().yields();
