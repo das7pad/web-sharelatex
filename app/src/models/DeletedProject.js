@@ -2,7 +2,7 @@
 // Sanity-check the conversion and remove this comment.
 const mongoose = require('mongoose')
 const Settings = require('settings-sharelatex')
-const { ProjectSchema } = require('./Project.js')
+const { ProjectSchema } = require('./Project')
 
 const { Schema } = mongoose
 const { ObjectId } = Schema
