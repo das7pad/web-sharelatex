@@ -1,3 +1,10 @@
+/* eslint-disable
+    camelcase,
+    max-len,
+    no-cond-assign,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -17,7 +24,7 @@ module.exports = {
 	apply(webRouter, apiRouter) {
 
 		if (((settings.apis.wiki != null ? settings.apis.wiki.url : undefined) != null) || settings.proxyLearn) {
-			//used for images onsite installs
+			// used for images onsite installs
 			webRouter.get(/^\/learn-scripts\/images/, RateLimiterMiddleware.rateLimit({
 				endpointName: "wiki",
 				params: [],
