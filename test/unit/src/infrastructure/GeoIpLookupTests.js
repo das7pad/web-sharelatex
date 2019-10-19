@@ -18,7 +18,7 @@ const path = require('path')
 const sinon = require('sinon')
 const modulePath = path.join(
   __dirname,
-  '../../../../app/js/infrastructure/GeoIpLookup'
+  '../../../../app/src/infrastructure/GeoIpLookup'
 )
 const { expect } = require('chai')
 

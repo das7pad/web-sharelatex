@@ -17,7 +17,7 @@ const should = require('chai').should()
 const sinon = require('sinon')
 const { assert } = require('chai')
 const modulePath =
-  '../../../../app/js/Features/Subscription/SubscriptionGroupHandler'
+  '../../../../app/src/Features/Subscription/SubscriptionGroupHandler'
 
 describe('SubscriptionGroupHandler', function() {
   beforeEach(function() {

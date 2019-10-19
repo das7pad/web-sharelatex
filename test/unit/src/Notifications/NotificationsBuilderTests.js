@@ -17,7 +17,7 @@ require('chai').should()
 const sinon = require('sinon')
 const modulePath = require('path').join(
   __dirname,
-  '../../../../app/js/Features/Notifications/NotificationsBuilder.js'
+  '../../../../app/src/Features/Notifications/NotificationsBuilder.js'
 )
 
 describe('NotificationsBuilder', function() {

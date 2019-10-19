@@ -17,7 +17,7 @@ const path = require('path')
 const sinon = require('sinon')
 const modulePath = path.join(
   __dirname,
-  '../../../../app/js/Features/Email/EmailHandler'
+  '../../../../app/src/Features/Email/EmailHandler'
 )
 const { expect } = require('chai')
 

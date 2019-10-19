@@ -15,7 +15,7 @@ const sinon = require('sinon')
 const chai = require('chai')
 const should = chai.should()
 const { expect } = chai
-const modulePath = '../../../../app/js/infrastructure/Csrf.js'
+const modulePath = '../../../../app/src/infrastructure/Csrf.js'
 const SandboxedModule = require('sandboxed-module')
 
 describe('Csrf', function() {

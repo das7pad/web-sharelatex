@@ -18,7 +18,7 @@ const { expect } = require('chai')
 
 const modulePath = require('path').join(
   __dirname,
-  '../../../../app/js/Features/Editor/EditorController'
+  '../../../../app/src/Features/Editor/EditorController'
 )
 const MockClient = require('../helpers/MockClient')
 const assert = require('assert')

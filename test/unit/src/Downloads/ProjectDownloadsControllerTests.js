@@ -15,7 +15,7 @@ const chai = require('chai')
 const should = chai.should()
 const { expect } = chai
 const modulePath =
-  '../../../../app/js/Features/Downloads/ProjectDownloadsController.js'
+  '../../../../app/src/Features/Downloads/ProjectDownloadsController.js'
 const SandboxedModule = require('sandboxed-module')
 const MockRequest = require('../helpers/MockRequest')
 const MockResponse = require('../helpers/MockResponse')

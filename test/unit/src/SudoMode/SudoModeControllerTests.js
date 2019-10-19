@@ -16,7 +16,7 @@ const should = require('chai').should()
 const { expect } = require('chai')
 const MockRequest = require('../helpers/MockRequest')
 const MockResponse = require('../helpers/MockResponse')
-const modulePath = '../../../../app/js/Features/SudoMode/SudoModeController'
+const modulePath = '../../../../app/src/Features/SudoMode/SudoModeController'
 
 describe('SudoModeController', function() {
   beforeEach(function() {

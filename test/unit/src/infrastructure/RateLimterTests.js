@@ -16,7 +16,7 @@ const sinon = require('sinon')
 const chai = require('chai')
 const should = chai.should()
 const { expect } = chai
-const modulePath = '../../../../app/js/infrastructure/RateLimiter.js'
+const modulePath = '../../../../app/src/infrastructure/RateLimiter.js'
 const SandboxedModule = require('sandboxed-module')
 
 describe('RateLimiter', function() {

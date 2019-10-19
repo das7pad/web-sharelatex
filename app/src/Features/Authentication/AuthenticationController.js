@@ -330,7 +330,7 @@ module.exports = AuthenticationController = {
     if (allowUserStub == null) {
       allowUserStub = false
     }
-    const Oauth2Server = require('../../../../modules/oauth2-server/app/js/Oauth2Server')
+    const Oauth2Server = require('../../../../modules/oauth2-server/app/src/Oauth2Server')
     return function(req, res, next) {
       if (next == null) {
         next = function(error) {}

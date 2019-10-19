@@ -17,7 +17,7 @@ const { expect } = require('chai')
 const sinon = require('sinon')
 const modulePath = require('path').join(
   __dirname,
-  '../../../../app/js/Features/Institutions/InstitutionsFeatures.js'
+  '../../../../app/src/Features/Institutions/InstitutionsFeatures.js'
 )
 
 describe('InstitutionsFeatures', function() {

@@ -10,10 +10,10 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const Errors = require('../../../app/js/Features/Errors/Errors')
+const Errors = require('../../../app/src/Features/Errors/Errors')
 const Settings = require('settings-sharelatex')
 const User = require('./helpers/User')
-const ThirdPartyIdentityManager = require('../../../app/js/Features/User/ThirdPartyIdentityManager')
+const ThirdPartyIdentityManager = require('../../../app/src/Features/User/ThirdPartyIdentityManager')
 const chai = require('chai')
 
 const { expect } = chai

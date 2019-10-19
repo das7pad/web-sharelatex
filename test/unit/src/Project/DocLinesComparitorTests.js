@@ -14,7 +14,7 @@
 const sinon = require('sinon')
 const chai = require('chai')
 const should = chai.should()
-const modulePath = '../../../../app/js/Features/Project/DocLinesComparitor.js'
+const modulePath = '../../../../app/src/Features/Project/DocLinesComparitor.js'
 const SandboxedModule = require('sandboxed-module')
 
 describe('doc lines comparitor', function() {

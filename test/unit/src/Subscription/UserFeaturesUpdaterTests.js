@@ -16,7 +16,7 @@ const SandboxedModule = require('sandboxed-module')
 const should = require('chai').should()
 const sinon = require('sinon')
 const modulePath =
-  '../../../../app/js/Features/Subscription/UserFeaturesUpdater'
+  '../../../../app/src/Features/Subscription/UserFeaturesUpdater'
 const { assert } = require('chai')
 
 describe('UserFeaturesUpdater', function() {

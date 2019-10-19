@@ -15,16 +15,16 @@ metrics.initialize(process.env['METRICS_APP_NAME'] || 'web')
 const Settings = require('settings-sharelatex')
 const logger = require('logger-sharelatex')
 logger.initialize(process.env['METRICS_APP_NAME'] || 'web')
-logger.logger.serializers.user = require('./app/js/infrastructure/LoggerSerializers').user
-logger.logger.serializers.docs = require('./app/js/infrastructure/LoggerSerializers').docs
-logger.logger.serializers.files = require('./app/js/infrastructure/LoggerSerializers').files
-logger.logger.serializers.project = require('./app/js/infrastructure/LoggerSerializers').project
+logger.logger.serializers.user = require('./app/src/infrastructure/LoggerSerializers').user
+logger.logger.serializers.docs = require('./app/src/infrastructure/LoggerSerializers').docs
+logger.logger.serializers.files = require('./app/src/infrastructure/LoggerSerializers').files
+logger.logger.serializers.project = require('./app/src/infrastructure/LoggerSerializers').project
 if ((Settings.sentry != null ? Settings.sentry.dsn : undefined) != null) {
   logger.initializeErrorReporting(Settings.sentry.dsn)
 }
 
 metrics.memory.monitor(logger)
-const Server = require('./app/js/infrastructure/Server')
+const Server = require('./app/src/infrastructure/Server')
 
 const { argv } = require('optimist')
   .options('user', {

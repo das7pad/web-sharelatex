@@ -19,7 +19,7 @@ const sinon = require('sinon')
 ;({ expect } = require('chai'))
 const modulePath = path.join(
   __dirname,
-  '../../../../app/js/Features/BrandVariations/BrandVariationsHandler'
+  '../../../../app/src/Features/BrandVariations/BrandVariationsHandler'
 )
 
 describe('BrandVariationsHandler', function() {

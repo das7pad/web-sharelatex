@@ -15,7 +15,7 @@ const { assert } = require('chai')
 const should = chai.should()
 const { expect } = chai
 const sinon = require('sinon')
-const modulePath = '../../../../app/js/Features/Project/SafePath'
+const modulePath = '../../../../app/src/Features/Project/SafePath'
 const SandboxedModule = require('sandboxed-module')
 
 describe('SafePath', function() {

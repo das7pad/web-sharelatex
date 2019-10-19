@@ -16,7 +16,7 @@ const chai = require('chai')
 const should = chai.should()
 const { assert } = chai
 const { expect } = chai
-const modulePath = '../../../../app/js/Features/Contacts/ContactController.js'
+const modulePath = '../../../../app/src/Features/Contacts/ContactController.js'
 const SandboxedModule = require('sandboxed-module')
 
 describe('ContactController', function() {

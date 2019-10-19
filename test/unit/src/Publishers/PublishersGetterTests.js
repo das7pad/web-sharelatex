@@ -17,7 +17,7 @@ const { expect } = require('chai')
 const sinon = require('sinon')
 const modulePath = require('path').join(
   __dirname,
-  '../../../../app/js/Features/Publishers/PublishersGetter.js'
+  '../../../../app/src/Features/Publishers/PublishersGetter.js'
 )
 
 describe('PublishersGetter', function() {

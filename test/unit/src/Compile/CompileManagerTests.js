@@ -16,7 +16,7 @@ const sinon = require('sinon')
 const chai = require('chai')
 const should = chai.should()
 const { expect } = chai
-const modulePath = '../../../../app/js/Features/Compile/CompileManager.js'
+const modulePath = '../../../../app/src/Features/Compile/CompileManager.js'
 const { assert } = require('chai')
 const SandboxedModule = require('sandboxed-module')
 

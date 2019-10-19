@@ -17,12 +17,12 @@ const { expect } = require('chai')
 const sinon = require('sinon')
 const assertCalledWith = sinon.assert.calledWith
 const assertNotCalled = sinon.assert.notCalled
-const { ObjectId } = require('../../../../app/js/infrastructure/mongojs')
+const { ObjectId } = require('../../../../app/src/infrastructure/mongojs')
 const modulePath =
-  '../../../../app/js/Features/UserMembership/UserMembershipHandler'
+  '../../../../app/src/Features/UserMembership/UserMembershipHandler'
 const SandboxedModule = require('sandboxed-module')
-const Errors = require('../../../../app/js/Features/Errors/Errors')
-const EntityConfigs = require('../../../../app/js/Features/UserMembership/UserMembershipEntityConfigs')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
+const EntityConfigs = require('../../../../app/src/Features/UserMembership/UserMembershipEntityConfigs')
 
 describe('UserMembershipHandler', function() {
   beforeEach(function() {

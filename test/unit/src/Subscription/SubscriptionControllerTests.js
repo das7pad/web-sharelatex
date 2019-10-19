@@ -18,7 +18,7 @@ const { expect } = require('chai')
 const MockRequest = require('../helpers/MockRequest')
 const MockResponse = require('../helpers/MockResponse')
 const modulePath =
-  '../../../../app/js/Features/Subscription/SubscriptionController'
+  '../../../../app/src/Features/Subscription/SubscriptionController'
 
 const mockSubscriptions = {
   'subscription-123-active': {

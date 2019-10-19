@@ -19,7 +19,7 @@ const { expect } = chai
 const sinon = require('sinon')
 const modulePath = require('path').join(
   __dirname,
-  '../../../../app/js/Features/Exports/ExportsController.js'
+  '../../../../app/src/Features/Exports/ExportsController.js'
 )
 
 describe('ExportsController', function() {

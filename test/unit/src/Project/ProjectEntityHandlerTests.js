@@ -18,10 +18,10 @@ const { assert } = require('chai')
 const should = chai.should()
 const { expect } = chai
 const sinon = require('sinon')
-const modulePath = '../../../../app/js/Features/Project/ProjectEntityHandler'
+const modulePath = '../../../../app/src/Features/Project/ProjectEntityHandler'
 const SandboxedModule = require('sandboxed-module')
 const { ObjectId } = require('mongoose').Types
-const Errors = require('../../../../app/js/Features/Errors/Errors')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 describe('ProjectEntityHandler', function() {
   const project_id = '4eecb1c1bffa66588e0000a1'

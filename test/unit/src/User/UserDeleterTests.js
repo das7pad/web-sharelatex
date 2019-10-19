@@ -14,9 +14,9 @@ const sinon = require('sinon')
 const chai = require('chai')
 const should = chai.should()
 const { expect } = chai
-const modulePath = '../../../../app/js/Features/User/UserDeleter.js'
+const modulePath = '../../../../app/src/Features/User/UserDeleter.js'
 const SandboxedModule = require('sandboxed-module')
-const Errors = require('../../../../app/js/Features/Errors/Errors')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 describe('UserDeleter', function() {
   beforeEach(function() {

@@ -18,7 +18,7 @@ const chai = require('chai')
 const { expect } = chai
 const should = chai.should()
 const modulePath =
-  '../../../../app/js/Features/Project/ProjectOptionsHandler.js'
+  '../../../../app/src/Features/Project/ProjectOptionsHandler.js'
 const SandboxedModule = require('sandboxed-module')
 
 describe('ProjectOptionsHandler', function() {

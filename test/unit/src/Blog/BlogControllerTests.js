@@ -17,7 +17,7 @@ const path = require('path')
 const sinon = require('sinon')
 const modulePath = path.join(
   __dirname,
-  '../../../../app/js/Features/Blog/BlogController'
+  '../../../../app/src/Features/Blog/BlogController'
 )
 const { expect } = require('chai')
 

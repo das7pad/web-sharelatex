@@ -13,9 +13,9 @@
 const { expect } = require('chai')
 const async = require('async')
 const User = require('./helpers/User')
-const { Subscription } = require('../../../app/js/models/Subscription')
-const { Institution } = require('../../../app/js/models/Institution')
-const SubscriptionViewModelBuilder = require('../../../app/js/Features/Subscription/SubscriptionViewModelBuilder')
+const { Subscription } = require('../../../app/src/models/Subscription')
+const { Institution } = require('../../../app/src/models/Institution')
+const SubscriptionViewModelBuilder = require('../../../app/src/Features/Subscription/SubscriptionViewModelBuilder')
 
 const MockRecurlyApi = require('./helpers/MockRecurlyApi')
 const MockV1Api = require('./helpers/MockV1Api')

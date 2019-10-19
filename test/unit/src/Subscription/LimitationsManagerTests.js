@@ -17,7 +17,7 @@ const sinon = require('sinon')
 require('chai').should()
 const modulePath = require('path').join(
   __dirname,
-  '../../../../app/js/Features/Subscription/LimitationsManager'
+  '../../../../app/src/Features/Subscription/LimitationsManager'
 )
 const Settings = require('settings-sharelatex')
 

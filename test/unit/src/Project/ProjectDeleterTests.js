@@ -15,7 +15,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 const should = require('chai').should()
-const modulePath = '../../../../app/js/Features/Project/ProjectDeleter'
+const modulePath = '../../../../app/src/Features/Project/ProjectDeleter'
 const SandboxedModule = require('sandboxed-module')
 const sinon = require('sinon')
 

@@ -17,7 +17,7 @@ const assert = require('assert')
 require('chai').should()
 const modulePath = require('path').join(
   __dirname,
-  '../../../../app/js/Features/ThirdPartyDataStore/TpdsUpdateSender.js'
+  '../../../../app/src/Features/ThirdPartyDataStore/TpdsUpdateSender.js'
 )
 const sinon = require('sinon')
 const ath = require('path')

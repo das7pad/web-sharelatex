@@ -16,11 +16,11 @@ const assertNotCalled = sinon.assert.notCalled
 const chai = require('chai')
 const should = chai.should()
 const { assert } = chai
-const modulePath = '../../../../app/js/Features/User/UserEmailsController.js'
+const modulePath = '../../../../app/src/Features/User/UserEmailsController.js'
 const SandboxedModule = require('sandboxed-module')
 const MockRequest = require('../helpers/MockRequest')
 const MockResponse = require('../helpers/MockResponse')
-const Errors = require('../../../../app/js/Features/Errors/Errors')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 describe('UserEmailsController', function() {
   beforeEach(function() {

@@ -15,7 +15,7 @@ const should = require('chai').should()
 const sinon = require('sinon')
 const querystring = require('querystring')
 const modulePath =
-  '../../../../app/js/Features/Subscription/SubscriptionHandler'
+  '../../../../app/src/Features/Subscription/SubscriptionHandler'
 
 const mockRecurlySubscriptions = {
   'subscription-123-active': {

@@ -17,7 +17,7 @@ const path = require('path')
 const sinon = require('sinon')
 const modulePath = path.join(
   __dirname,
-  '../../../../app/js/Features/Chat/ChatApiHandler'
+  '../../../../app/src/Features/Chat/ChatApiHandler'
 )
 const { expect } = require('chai')
 

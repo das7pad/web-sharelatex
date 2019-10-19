@@ -14,7 +14,7 @@ const sinon = require('sinon')
 require('chai').should()
 const modulePath = require('path').join(
   __dirname,
-  '../../../../app/js/Features/Editor/EditorHttpController'
+  '../../../../app/src/Features/Editor/EditorHttpController'
 )
 
 describe('EditorHttpController', function() {

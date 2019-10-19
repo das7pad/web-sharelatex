@@ -16,7 +16,7 @@ const sinon = require('sinon')
 require('chai').should()
 const modulePath = require('path').join(
   __dirname,
-  '../../../../app/js/Features/Security/RateLimiterMiddleware'
+  '../../../../app/src/Features/Security/RateLimiterMiddleware'
 )
 
 describe('RateLimiterMiddleware', function() {

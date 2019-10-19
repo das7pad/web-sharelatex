@@ -16,7 +16,7 @@ const chai = require('chai')
 const { assert } = chai
 const should = chai.should()
 const { expect } = chai
-const modulePath = '../../../../app/js/Features/Compile/ClsiCookieManager.js'
+const modulePath = '../../../../app/src/Features/Compile/ClsiCookieManager.js'
 const SandboxedModule = require('sandboxed-module')
 const realRequst = require('request')
 

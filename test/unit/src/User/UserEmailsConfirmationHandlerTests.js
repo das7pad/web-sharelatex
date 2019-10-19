@@ -17,11 +17,11 @@ const path = require('path')
 const sinon = require('sinon')
 const modulePath = path.join(
   __dirname,
-  '../../../../app/js/Features/User/UserEmailsConfirmationHandler'
+  '../../../../app/src/Features/User/UserEmailsConfirmationHandler'
 )
 const { expect } = require('chai')
-const Errors = require('../../../../app/js/Features/Errors/Errors')
-const EmailHelper = require('../../../../app/js/Features/Helpers/EmailHelper')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
+const EmailHelper = require('../../../../app/src/Features/Helpers/EmailHelper')
 
 describe('UserEmailsConfirmationHandler', function() {
   beforeEach(function() {

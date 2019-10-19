@@ -12,9 +12,9 @@
  */
 const sinon = require('sinon')
 const assertCalledWith = sinon.assert.calledWith
-const { ObjectId } = require('../../../../app/js/infrastructure/mongojs')
+const { ObjectId } = require('../../../../app/src/infrastructure/mongojs')
 const modulePath =
-  '../../../../app/js/Features/UserMembership/UserMembershipsHandler'
+  '../../../../app/src/Features/UserMembership/UserMembershipsHandler'
 const SandboxedModule = require('sandboxed-module')
 
 describe('UserMembershipsHandler', function() {

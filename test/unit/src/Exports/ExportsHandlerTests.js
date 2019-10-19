@@ -15,7 +15,7 @@ const sinon = require('sinon')
 const chai = require('chai')
 const should = chai.should()
 const { expect } = chai
-const modulePath = '../../../../app/js/Features/Exports/ExportsHandler.js'
+const modulePath = '../../../../app/src/Features/Exports/ExportsHandler.js'
 const SandboxedModule = require('sandboxed-module')
 
 describe('ExportsHandler', function() {

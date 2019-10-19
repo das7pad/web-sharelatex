@@ -21,7 +21,7 @@ const sinon = require('sinon')
 const should = chai.should()
 const { expect } = chai
 const modulePath =
-  '../../../../app/js/Features/Project/ProjectCreationHandler.js'
+  '../../../../app/src/Features/Project/ProjectCreationHandler.js'
 const SandboxedModule = require('sandboxed-module')
 const Settings = require('settings-sharelatex')
 const Path = require('path')

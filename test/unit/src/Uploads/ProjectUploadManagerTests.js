@@ -13,7 +13,8 @@
 const sinon = require('sinon')
 const chai = require('chai')
 const should = chai.should()
-const modulePath = '../../../../app/js/Features/Uploads/ProjectUploadManager.js'
+const modulePath =
+  '../../../../app/src/Features/Uploads/ProjectUploadManager.js'
 const SandboxedModule = require('sandboxed-module')
 
 describe('ProjectUploadManager', function() {

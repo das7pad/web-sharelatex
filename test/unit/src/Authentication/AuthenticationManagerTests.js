@@ -17,11 +17,11 @@ const chai = require('chai')
 const should = chai.should()
 const { expect } = chai
 const modulePath =
-  '../../../../app/js/Features/Authentication/AuthenticationManager.js'
+  '../../../../app/src/Features/Authentication/AuthenticationManager.js'
 const SandboxedModule = require('sandboxed-module')
 const events = require('events')
 const { ObjectId } = require('mongojs')
-const Errors = require('../../../../app/js/Features/Errors/Errors')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 describe('AuthenticationManager', function() {
   beforeEach(function() {

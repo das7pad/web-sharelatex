@@ -19,7 +19,7 @@ const should = require('chai').should()
 const { expect } = require('chai')
 const sinon = require('sinon')
 const modulePath =
-  '../../../../app/js/Features/Subscription/SubscriptionUpdater'
+  '../../../../app/src/Features/Subscription/SubscriptionUpdater'
 const { assert } = require('chai')
 const { ObjectId } = require('mongoose').Types
 

@@ -17,11 +17,11 @@ const assert = require('assert')
 const path = require('path')
 const modulePath = path.join(
   __dirname,
-  '../../../../app/js/Features/User/UserRegistrationHandler'
+  '../../../../app/src/Features/User/UserRegistrationHandler'
 )
 const sinon = require('sinon')
 const { expect } = require('chai')
-const EmailHelper = require('../../../../app/js/Features/Helpers/EmailHelper')
+const EmailHelper = require('../../../../app/src/Features/Helpers/EmailHelper')
 
 describe('UserRegistrationHandler', function() {
   beforeEach(function() {

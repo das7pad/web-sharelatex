@@ -20,8 +20,8 @@ const should = chai.should()
 const sinon = require('sinon')
 const tk = require('timekeeper')
 const modulePath =
-  '../../../../app/js/Features/Project/ProjectEntityMongoUpdateHandler'
-const Errors = require('../../../../app/js/Features/Errors/Errors')
+  '../../../../app/src/Features/Project/ProjectEntityMongoUpdateHandler'
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 const { ObjectId } = require('mongoose').Types
 const SandboxedModule = require('sandboxed-module')
 

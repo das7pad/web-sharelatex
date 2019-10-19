@@ -15,7 +15,7 @@ const should = require('chai').should()
 const sinon = require('sinon')
 const { assert } = require('chai')
 const modulePath =
-  '../../../../app/js/Features/Subscription/SubscriptionGroupController'
+  '../../../../app/src/Features/Subscription/SubscriptionGroupController'
 const MockResponse = require('../helpers/MockResponse')
 
 describe('SubscriptionGroupController', function() {

@@ -11,7 +11,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const APP_PATH = '../../../app/js'
+const APP_PATH = '../../../app/src'
 
 const LockManager = require(`${APP_PATH}/infrastructure/LockManager`)
 const ProjectCreationHandler = require(`${APP_PATH}/Features/Project/ProjectCreationHandler.js`)

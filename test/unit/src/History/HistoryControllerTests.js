@@ -13,9 +13,9 @@ const chai = require('chai')
 chai.should()
 const sinon = require('sinon')
 
-const Errors = require('../../../../app/js/Features/Errors/Errors')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
-const modulePath = '../../../../app/js/Features/History/HistoryController'
+const modulePath = '../../../../app/src/Features/History/HistoryController'
 const SandboxedModule = require('sandboxed-module')
 
 describe('HistoryController', function() {

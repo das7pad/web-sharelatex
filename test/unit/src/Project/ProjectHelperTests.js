@@ -14,7 +14,7 @@ const sinon = require('sinon')
 const chai = require('chai')
 const should = chai.should()
 const { expect } = chai
-const modulePath = '../../../../app/js/Features/Project/ProjectHelper.js'
+const modulePath = '../../../../app/src/Features/Project/ProjectHelper.js'
 const SandboxedModule = require('sandboxed-module')
 
 describe('ProjectHelper', function() {

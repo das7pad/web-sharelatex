@@ -17,7 +17,7 @@ require('chai').should()
 const { expect } = require('chai')
 const modulePath = require('path').join(
   __dirname,
-  '../../../../app/js/Features/ThirdPartyDataStore/TpdsUpdateHandler.js'
+  '../../../../app/src/Features/ThirdPartyDataStore/TpdsUpdateHandler.js'
 )
 
 describe('TpdsUpdateHandler', function() {

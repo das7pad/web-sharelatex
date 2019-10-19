@@ -16,7 +16,7 @@ require('chai').should()
 const sinon = require('sinon')
 const modulePath = require('path').join(
   __dirname,
-  '../../../../app/js/Features/Referal/ReferalConnect.js'
+  '../../../../app/src/Features/Referal/ReferalConnect.js'
 )
 
 describe('Referal connect middle wear', function() {

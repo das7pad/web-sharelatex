@@ -17,9 +17,9 @@ const { expect } = require('chai')
 const sinon = require('sinon')
 const modulePath = require('path').join(
   __dirname,
-  '../../../../app/js/Features/History/RestoreManager'
+  '../../../../app/src/Features/History/RestoreManager'
 )
-const Errors = require('../../../../app/js/Features/Errors/Errors')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 const tk = require('timekeeper')
 const moment = require('moment')
 

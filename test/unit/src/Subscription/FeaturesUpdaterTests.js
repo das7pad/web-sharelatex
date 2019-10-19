@@ -14,7 +14,7 @@ const SandboxedModule = require('sandboxed-module')
 const should = require('chai').should()
 const { expect } = require('chai')
 const sinon = require('sinon')
-const modulePath = '../../../../app/js/Features/Subscription/FeaturesUpdater'
+const modulePath = '../../../../app/src/Features/Subscription/FeaturesUpdater'
 const { assert } = require('chai')
 const { ObjectId } = require('mongoose').Types
 

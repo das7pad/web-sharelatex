@@ -18,7 +18,7 @@ const MockV1Api = require('./helpers/MockV1Api')
 const User = require('./helpers/User')
 const request = require('./helpers/request')
 const settings = require('settings-sharelatex')
-const { db, ObjectId } = require('../../../app/js/infrastructure/mongojs')
+const { db, ObjectId } = require('../../../app/src/infrastructure/mongojs')
 
 const try_read_access = (user, project_id, test, callback) =>
   async.series(

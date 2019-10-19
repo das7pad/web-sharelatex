@@ -13,7 +13,7 @@
  */
 const { expect } = require('chai')
 
-const { db, ObjectId } = require('../../../app/js/infrastructure/mongojs')
+const { db, ObjectId } = require('../../../app/src/infrastructure/mongojs')
 const MockV1HistoryApi = require('./helpers/MockV1HistoryApi')
 const User = require('./helpers/User')
 

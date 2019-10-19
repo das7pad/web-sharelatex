@@ -12,7 +12,7 @@
 const chai = require('chai')
 chai.should()
 const sinon = require('sinon')
-const modulePath = '../../../../app/js/Features/Contacts/ContactManager'
+const modulePath = '../../../../app/src/Features/Contacts/ContactManager'
 const SandboxedModule = require('sandboxed-module')
 
 describe('ContactManager', function() {

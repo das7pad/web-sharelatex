@@ -21,7 +21,7 @@ const _ = require('underscore')
 const { ObjectId } = require('mongojs')
 const modulePath = path.join(
   __dirname,
-  '../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler'
+  '../../../../app/src/Features/DocumentUpdater/DocumentUpdaterHandler'
 )
 
 describe('DocumentUpdaterHandler', function() {

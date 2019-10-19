@@ -16,7 +16,7 @@ const should = chai.should()
 const { expect } = chai
 const sinon = require('sinon')
 const modulePath =
-  '../../../../app/js/Features/Project/ProjectRootDocManager.js'
+  '../../../../app/src/Features/Project/ProjectRootDocManager.js'
 const SandboxedModule = require('sandboxed-module')
 
 describe('ProjectRootDocManager', function() {

@@ -14,7 +14,8 @@ const SandboxedModule = require('sandboxed-module')
 const should = require('chai').should()
 const sinon = require('sinon')
 const { assert } = require('chai')
-const modulePath = '../../../../app/js/Features/References/ReferencesController'
+const modulePath =
+  '../../../../app/src/Features/References/ReferencesController'
 const MockRequest = require('../helpers/MockRequest')
 const MockResponse = require('../helpers/MockResponse')
 

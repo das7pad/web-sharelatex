@@ -16,7 +16,7 @@ const Async = require('async')
 const User = require('./helpers/User')
 const request = require('./helpers/request')
 const settings = require('settings-sharelatex')
-const CollaboratorsEmailHandler = require('../../../app/js/Features/Collaborators/CollaboratorsEmailHandler')
+const CollaboratorsEmailHandler = require('../../../app/src/Features/Collaborators/CollaboratorsEmailHandler')
 
 const createInvite = function(sendingUser, projectId, email, callback) {
   if (callback == null) {

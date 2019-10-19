@@ -17,7 +17,7 @@ require('chai').should()
 const sinon = require('sinon')
 const modulePath = require('path').join(
   __dirname,
-  '../../../../app/js/Features/Referal/ReferalHandler.js'
+  '../../../../app/src/Features/Referal/ReferalHandler.js'
 )
 
 describe('Referal handler', function() {

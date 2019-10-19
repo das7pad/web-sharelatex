@@ -17,10 +17,10 @@ const path = require('path')
 const sinon = require('sinon')
 const modulePath = path.join(
   __dirname,
-  '../../../../app/js/Features/Project/ProjectController'
+  '../../../../app/src/Features/Project/ProjectController'
 )
 const { expect } = require('chai')
-const Errors = require('../../../../app/js/Features/Errors/Errors')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 describe('ProjectController', function() {
   beforeEach(function() {

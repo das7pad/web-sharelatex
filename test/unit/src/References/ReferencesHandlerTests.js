@@ -17,7 +17,7 @@ const should = require('chai').should()
 const { expect } = require('chai')
 const sinon = require('sinon')
 const { assert } = require('chai')
-const modulePath = '../../../../app/js/Features/References/ReferencesHandler'
+const modulePath = '../../../../app/src/Features/References/ReferencesHandler'
 
 describe('ReferencesHandler', function() {
   beforeEach(function() {

@@ -38,8 +38,8 @@ const buildUrl = path =>
     Settings.cookieDomain
   }:${port}/${path}?setLng=en`
 const logger = require('logger-sharelatex')
-const LoginRateLimiter = require('../../../app/js/Features/Security/LoginRateLimiter.js')
-const RateLimiter = require('../../../app/js/infrastructure/RateLimiter.js')
+const LoginRateLimiter = require('../../../app/src/Features/Security/LoginRateLimiter.js')
+const RateLimiter = require('../../../app/src/infrastructure/RateLimiter.js')
 
 // Change cookie to be non secure so curl will send it
 const convertCookieFile = function(callback) {

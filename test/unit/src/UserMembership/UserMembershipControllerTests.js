@@ -18,12 +18,12 @@ const should = chai.should()
 const { assert } = chai
 const { expect } = require('chai')
 const modulePath =
-  '../../../../app/js/Features/UserMembership/UserMembershipController.js'
+  '../../../../app/src/Features/UserMembership/UserMembershipController.js'
 const SandboxedModule = require('sandboxed-module')
 const MockRequest = require('../helpers/MockRequest')
 const MockResponse = require('../helpers/MockResponse')
-const EntityConfigs = require('../../../../app/js/Features/UserMembership/UserMembershipEntityConfigs')
-const Errors = require('../../../../app/js/Features/Errors/Errors')
+const EntityConfigs = require('../../../../app/src/Features/UserMembership/UserMembershipEntityConfigs')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 describe('UserMembershipController', function() {
   beforeEach(function() {
