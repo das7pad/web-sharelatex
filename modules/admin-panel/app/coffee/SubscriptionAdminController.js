@@ -1,33 +1,47 @@
-logger = require "logger-sharelatex"
-metrics = require "metrics-sharelatex"
-_ = require "underscore"
-Path = require("path")
-UserGetter = require "../../../../app/js/Features/User/UserGetter"
-UserAdminController = require("./UserAdminController")
-SubscriptionLocator = require("../../../../app/js/Features/Subscription/SubscriptionLocator")
-SubscriptionUpdater = require("../../../../app/js/Features/Subscription/SubscriptionUpdater")
-FeaturesUpdater = require("../../../../app/js/Features/Subscription/FeaturesUpdater")
-Subscription = require("../../../../app/js/models/Subscription").Subscription
-ErrorController = require("../../../../app/js/Features/Errors/ErrorController")
-async = require "async"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let SubscriptionAdminController;
+const logger = require("logger-sharelatex");
+const metrics = require("metrics-sharelatex");
+const _ = require("underscore");
+const Path = require("path");
+const UserGetter = require("../../../../app/js/Features/User/UserGetter");
+const UserAdminController = require("./UserAdminController");
+const SubscriptionLocator = require("../../../../app/js/Features/Subscription/SubscriptionLocator");
+const SubscriptionUpdater = require("../../../../app/js/Features/Subscription/SubscriptionUpdater");
+const FeaturesUpdater = require("../../../../app/js/Features/Subscription/FeaturesUpdater");
+const {
+    Subscription
+} = require("../../../../app/js/models/Subscription");
+const ErrorController = require("../../../../app/js/Features/Errors/ErrorController");
+const async = require("async");
 
-module.exports = SubscriptionAdminController =
-	show: (req, res, next)->
-		# The user_id isn't used in the look up, it just provides a nice
-		# breadcrumb trail of where we came from for navigation
-		{subscription_id, user_id} = req.params
-		logger.log {subscription_id}, "getting admin request for subscription"
-		SubscriptionLocator.getSubscription subscription_id, (err, subscription) ->
-			return next(err) if err?
-			if !subscription?
-				return ErrorController.notFound req, res
-			UserGetter.getUsers subscription.member_ids, { email: 1 }, (err, members) ->
-				return next(err) if err?
-				managerIds = subscription.manager_ids || []
-				UserGetter.getUsers managerIds, { email: 1 }, (err, managers) ->
-					return next(err) if err?
-					res.render Path.resolve(__dirname, "../views/subscription/show"),
-						{subscription, user_id, members, managers}
+module.exports = (SubscriptionAdminController = {
+	show(req, res, next){
+		// The user_id isn't used in the look up, it just provides a nice
+		// breadcrumb trail of where we came from for navigation
+		const {subscription_id, user_id} = req.params;
+		logger.log({subscription_id}, "getting admin request for subscription");
+		return SubscriptionLocator.getSubscription(subscription_id, function(err, subscription) {
+			if (err != null) { return next(err); }
+			if ((subscription == null)) {
+				return ErrorController.notFound(req, res);
+			}
+			return UserGetter.getUsers(subscription.member_ids, { email: 1 }, function(err, members) {
+				if (err != null) { return next(err); }
+				const managerIds = subscription.manager_ids || [];
+				return UserGetter.getUsers(managerIds, { email: 1 }, function(err, managers) {
+					if (err != null) { return next(err); }
+					return res.render(Path.resolve(__dirname, "../views/subscription/show"),
+						{subscription, user_id, members, managers});
+			});
+		});
+	});
+	},
 
 	ALLOWED_ATTRIBUTES: [
 		'recurlySubscription_id',
@@ -37,48 +51,56 @@ module.exports = SubscriptionAdminController =
 		'membersLimit',
 		'groupPlan',
 		'customAccount'
-	]
-	BOOLEAN_ATTRIBUTES: ['groupPlan', 'customAccount']
-	update: (req, res, next) ->
-		{subscription_id, user_id} = req.params
-		update = UserAdminController._reqToMongoUpdate(
+	],
+	BOOLEAN_ATTRIBUTES: ['groupPlan', 'customAccount'],
+	update(req, res, next) {
+		const {subscription_id, user_id} = req.params;
+		const update = UserAdminController._reqToMongoUpdate(
 			req.body,
 			SubscriptionAdminController.ALLOWED_ATTRIBUTES,
 			SubscriptionAdminController.BOOLEAN_ATTRIBUTES
-		)
-		logger.log {subscription_id, update}, "updating subscription via admin panel"
-		Subscription.findAndModify {_id: subscription_id}, { $set: update }, (error, subscription) ->
-			return next(error) if error?
-			async.eachSeries(
+		);
+		logger.log({subscription_id, update}, "updating subscription via admin panel");
+		return Subscription.findAndModify({_id: subscription_id}, { $set: update }, function(error, subscription) {
+			if (error != null) { return next(error); }
+			return async.eachSeries(
 				[subscription.admin_id].concat(subscription.member_ids)
-				, (user_id, callback) ->
-					FeaturesUpdater.refreshFeatures user_id, true, callback
-				, (error) ->
-					return next(error) if error?
-					res.sendStatus 204
-			)
+				, (user_id, callback) => FeaturesUpdater.refreshFeatures(user_id, true, callback)
+				, function(error) {
+					if (error != null) { return next(error); }
+					return res.sendStatus(204);
+			});
+		});
+	},
 
-	new: (req, res, next) ->
-		res.render Path.resolve(__dirname, "../views/subscription/new"), {
+	new(req, res, next) {
+		return res.render(Path.resolve(__dirname, "../views/subscription/new"), {
 			admin_id: req.params.user_id
-		}
+		});
+	},
 
-	create: (req, res, next) ->
-		update = UserAdminController._reqToMongoUpdate(
+	create(req, res, next) {
+		const update = UserAdminController._reqToMongoUpdate(
 			req.body,
 			SubscriptionAdminController.ALLOWED_ATTRIBUTES,
 			SubscriptionAdminController.BOOLEAN_ATTRIBUTES
-		)
-		update.admin_id = req.body.admin_id
-		update.manager_ids = [req.body.admin_id]
-		logger.log {update}, "creating subscription via admin panel"
-		new Subscription(update).save (error, subscription) ->
-			return next(error) if error?
-			res.json {subscription}
+		);
+		update.admin_id = req.body.admin_id;
+		update.manager_ids = [req.body.admin_id];
+		logger.log({update}, "creating subscription via admin panel");
+		return new Subscription(update).save(function(error, subscription) {
+			if (error != null) { return next(error); }
+			return res.json({subscription});});
+	},
 
-	delete: (req, res)->
-		subscription_id = req.params.subscription_id
-		logger.log subscription_id: subscription_id, "received admin request to delete subscription"
-		SubscriptionUpdater.deleteSubscription subscription_id, (err) ->
-			return next(err) if err?
-			res.sendStatus 204
+	delete(req, res){
+		const {
+            subscription_id
+        } = req.params;
+		logger.log({subscription_id}, "received admin request to delete subscription");
+		return SubscriptionUpdater.deleteSubscription(subscription_id, function(err) {
+			if (err != null) { return next(err); }
+			return res.sendStatus(204);
+		});
+	}
+});

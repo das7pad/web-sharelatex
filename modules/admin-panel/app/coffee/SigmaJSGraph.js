@@ -1,49 +1,65 @@
-module.exports = SigmaJSGraph =
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let SigmaJSGraph;
+module.exports = (SigmaJSGraph = {
 
-	nodes: []
-	edges: []
+	nodes: [],
+	edges: [],
 
-	new: () ->
-		this.nodes = []
-		this.edges = []
-		return this
+	new() {
+		this.nodes = [];
+		this.edges = [];
+		return this;
+	},
 
-	addNode: (ref, label, color) ->
+	addNode(ref, label, color) {
 
-		# avoid duplicate nodes
-		exists = false
-		for node in this.nodes
-			if node.id == ref.toString()
-				exists = true
-				break
+		// avoid duplicate nodes
+		let exists = false;
+		for (let node of Array.from(this.nodes)) {
+			if (node.id === ref.toString()) {
+				exists = true;
+				break;
+			}
+		}
 
-		if !exists
-			this.nodes.push({
+		if (!exists) {
+			return this.nodes.push({
 				id:ref.toString(),
-				label:label, 
+				label, 
 				x:this.nodes.length, 
 				y:Math.floor((Math.random() * 10) + 1), 
 				size: 2, 
-				color:color
+				color
 			});
+		}
+	},
 
-	addEdge: (nodeS, nodeT, project) ->
+	addEdge(nodeS, nodeT, project) {
 
-		#create a hash to compare
-		if nodeS > nodeT
-			hash = nodeS + nodeT + project._id
-		else
-			hash = nodeT + nodeS + project._id
+		//create a hash to compare
+		let hash;
+		if (nodeS > nodeT) {
+			hash = nodeS + nodeT + project._id;
+		} else {
+			hash = nodeT + nodeS + project._id;
+		}
 
-		# avoid duplicate edges
-		exists = false
-		for edge in this.edges
-			if edge.hash == hash
-				exists = true
-				break
+		// avoid duplicate edges
+		let exists = false;
+		for (let edge of Array.from(this.edges)) {
+			if (edge.hash === hash) {
+				exists = true;
+				break;
+			}
+		}
 				
-		if !exists
-			this.edges.push({
+		if (!exists) {
+			return this.edges.push({
 				id:Math.random().toString(), 
 				label: project.name, 
 				source: nodeS, 
@@ -52,5 +68,8 @@ module.exports = SigmaJSGraph =
 				count: Math.floor((Math.random() * 10) + 1),
 				size: 2,
 				projectId: project._id,
-				hash: hash
-			})
+				hash
+			});
+		}
+	}
+});
