@@ -56,7 +56,7 @@ describe "PasswordResetController", ->
 		it "should error if the rate limit is hit", (done)->
 			@PasswordResetHandler.generateAndEmailResetToken.callsArgWith(1, null, 'primary')
 			@RateLimiter.addCount.callsArgWith(1, null, false)
-			@res.send = (code)=>
+			@res.sendStatus = (code)=>
 				code.should.equal 429
 				@PasswordResetHandler.generateAndEmailResetToken.calledWith(@email.trim()).should.equal false
 				done()
@@ -66,7 +66,7 @@ describe "PasswordResetController", ->
 		it "should tell the handler to process that email", (done)->
 			@RateLimiter.addCount.callsArgWith(1, null, true)
 			@PasswordResetHandler.generateAndEmailResetToken.callsArgWith(1, null, 'primary')
-			@res.send = (code)=>
+			@res.sendStatus = (code)=>
 				code.should.equal 200
 				@PasswordResetHandler.generateAndEmailResetToken.calledWith(@email.trim()).should.equal true
 				done()
@@ -75,7 +75,7 @@ describe "PasswordResetController", ->
 		it "should send a 500 if there is an error", (done)->
 			@RateLimiter.addCount.callsArgWith(1, null, true)
 			@PasswordResetHandler.generateAndEmailResetToken.callsArgWith(1, "error")
-			@res.send = (code)=>
+			@res.sendStatus = (code)=>
 				code.should.equal 500
 				done()
 			@PasswordResetController.requestReset @req, @res
@@ -83,7 +83,7 @@ describe "PasswordResetController", ->
 		it "should send a 404 if the email doesn't exist", (done)->
 			@RateLimiter.addCount.callsArgWith(1, null, true)
 			@PasswordResetHandler.generateAndEmailResetToken.callsArgWith(1, null, null)
-			@res.send = (code)=>
+			@res.sendStatus = (code)=>
 				code.should.equal 404
 				done()
 			@PasswordResetController.requestReset @req, @res
@@ -91,7 +91,7 @@ describe "PasswordResetController", ->
 		it "should send a 404 if the email is registered as a secondard email", (done)->
 			@RateLimiter.addCount.callsArgWith(1, null, true)
 			@PasswordResetHandler.generateAndEmailResetToken.callsArgWith(1, null, 'secondary')
-			@res.send = (code)=>
+			@res.sendStatus = (code)=>
 				code.should.equal 404
 				done()
 			@PasswordResetController.requestReset @req, @res
@@ -101,7 +101,7 @@ describe "PasswordResetController", ->
 			@req.body.email = @email
 			@RateLimiter.addCount.callsArgWith(1, null, true)
 			@PasswordResetHandler.generateAndEmailResetToken.callsArgWith(1, null, 'primary')
-			@res.send = (code)=>
+			@res.sendStatus = (code)=>
 				code.should.equal 200
 				@PasswordResetHandler.generateAndEmailResetToken.calledWith(@email.toLowerCase()).should.equal true
 				done()

@@ -32,7 +32,7 @@ module.exports = UserController =
 		UserGetter.getUser query, { _id: true, first_name: true, last_name: true, email: true}, (error, user) ->
 			logger.log user_id: req.params.user_id, "receiving request for getting users personal info"
 			return next(error) if error?
-			return res.send(404) if !user?
+			return res.sendStatus(404) if !user?
 			UserController.sendFormattedPersonalInfo(user, res, next)
 
 	sendFormattedPersonalInfo: (user, res, next = (error) ->) ->

@@ -116,7 +116,7 @@ module.exports = UserController =
 								message = req.i18n.translate("email_already_registered")
 							else
 								message = req.i18n.translate("problem_changing_email_address")
-							return res.send 500, {message:message}
+							return res.sendStatus 500, {message:message}
 						User.findById user_id, (err, user)->
 							if err?
 								logger.err err:err, user_id:user_id, "error getting user for email update"
