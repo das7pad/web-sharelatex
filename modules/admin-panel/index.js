@@ -1,4 +1,5 @@
-AdminPanelRouter = require "./app/js/Router"
+let Templates;
+const AdminPanelRouter = require("./app/js/Router");
 
-module.exports = Templates =
-	router: AdminPanelRouter
+module.exports = (Templates =
+	{router: AdminPanelRouter});
