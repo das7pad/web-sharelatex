@@ -15,7 +15,7 @@ const sinon = require('sinon')
 const chai = require('chai')
 const should = chai.should()
 const { expect } = chai
-const modulePath = '../../../app/js/OpenInOverleafMiddleware.js'
+const modulePath = '../../../app/src/OpenInOverleafMiddleware.js'
 const SandboxedModule = require('sandboxed-module')
 
 describe('OpenInOverleafMiddleware', function() {
@@ -47,9 +47,9 @@ describe('OpenInOverleafMiddleware', function() {
             log() {},
             err() {}
           },
-          '../../../../app/js/Features/Authentication/AuthenticationController': this
+          '../../../../app/src/Features/Authentication/AuthenticationController': this
             .AuthenticationController,
-          '../../../../app/js/infrastructure/Csrf': this.Csrf
+          '../../../../app/src/infrastructure/Csrf': this.Csrf
         }
       }
     ))

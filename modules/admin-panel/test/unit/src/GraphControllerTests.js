@@ -18,7 +18,7 @@ const sinon = require('sinon')
 const chai = require('chai')
 const should = chai.should()
 const { expect } = chai
-const modulePath = '../../../app/js/GraphController.js'
+const modulePath = '../../../app/src/GraphController.js'
 const SandboxedModule = require('sandboxed-module')
 const events = require('events')
 const { ObjectId } = require('mongojs')
@@ -43,8 +43,8 @@ describe('GraphController', function() {
           log() {},
           err() {}
         },
-        '../../../../app/js/Features/User/UserGetter': this.UserGetter,
-        '../../../../app/js/infrastructure/mongojs': {
+        '../../../../app/src/Features/User/UserGetter': this.UserGetter,
+        '../../../../app/src/infrastructure/mongojs': {
           db: (this.db = {
             projects: {},
             users: {}

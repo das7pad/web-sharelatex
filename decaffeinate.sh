@@ -145,11 +145,9 @@ find \
   app.js \
   Gruntfile.js \
   app/src/ \
-  modules/*/index.js \
-  modules/*/src \
-  test/acceptance/src \
-  test/smoke/src \
-  test/unit/src \
+  test/ \
+  modules/ \
+  scripts/ \
   -name '*.js' \
 | xargs sed -i \
   -E "s#(['\`].*)(/app|/test/acceptance|test/smoke)/js(.*['\`])#\1\2/src\3#g"

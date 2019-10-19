@@ -17,7 +17,7 @@ const path = require('path')
 const sinon = require('sinon')
 const modulePath = path.join(
   __dirname,
-  '../../../app/js/Comments/CommentsController'
+  '../../../app/src/Comments/CommentsController'
 )
 const { expect } = require('chai')
 
@@ -34,16 +34,16 @@ describe('TrackChanges CommentsController', function() {
       requires: {
         'settings-sharelatex': this.settings,
         'logger-sharelatex': { log() {} },
-        '../../../../../app/js/Features/Chat/ChatApiHandler': this
+        '../../../../../app/src/Features/Chat/ChatApiHandler': this
           .ChatApiHandler,
-        '../../../../../app/js/Features/Editor/EditorRealTimeController': this
+        '../../../../../app/src/Features/Editor/EditorRealTimeController': this
           .EditorRealTimeController,
-        '../../../../../app/js/Features/Authentication/AuthenticationController': this
+        '../../../../../app/src/Features/Authentication/AuthenticationController': this
           .AuthenticationController,
-        '../../../../../app/js/Features/User/UserInfoManager': (this.UserInfoManager = {}),
-        '../../../../../app/js/Features/User/UserInfoController': (this.UserInfoController = {}),
-        '../../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler': (this.DocumentUpdaterHandler = {}),
-        '../../../../../app/js/Features/Chat/ChatController': (this.ChatController = {})
+        '../../../../../app/src/Features/User/UserInfoManager': (this.UserInfoManager = {}),
+        '../../../../../app/src/Features/User/UserInfoController': (this.UserInfoController = {}),
+        '../../../../../app/src/Features/DocumentUpdater/DocumentUpdaterHandler': (this.DocumentUpdaterHandler = {}),
+        '../../../../../app/src/Features/Chat/ChatController': (this.ChatController = {})
       }
     })
     this.req = {}

@@ -17,7 +17,7 @@ const path = require('path')
 const sinon = require('sinon')
 const modulePath = path.join(
   __dirname,
-  '../../../app/js/TrackChanges/TrackChangesController'
+  '../../../app/src/TrackChanges/TrackChangesController'
 )
 const { expect } = require('chai')
 
@@ -29,9 +29,9 @@ describe('TrackChanges TrackChangesController', function() {
         'logger-sharelatex': { log() {} },
         './RangesManager': (this.RangesManager = {}),
         './TrackChangesManager': (this.TrackChangesManager = {}),
-        '../../../../../app/js/Features/Editor/EditorRealTimeController': (this.EditorRealTimeController = {}),
-        '../../../../../app/js/Features/User/UserInfoController': (this.UserInfoController = {}),
-        '../../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler': (this.DocumentUpdaterHandler = {})
+        '../../../../../app/src/Features/Editor/EditorRealTimeController': (this.EditorRealTimeController = {}),
+        '../../../../../app/src/Features/User/UserInfoController': (this.UserInfoController = {}),
+        '../../../../../app/src/Features/DocumentUpdater/DocumentUpdaterHandler': (this.DocumentUpdaterHandler = {})
       }
     })
     this.req = {}

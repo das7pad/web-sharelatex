@@ -15,7 +15,7 @@ const sinon = require('sinon')
 const chai = require('chai')
 const should = chai.should()
 const { expect } = chai
-const modulePath = '../../../app/js/SubscriptionAdminController.js'
+const modulePath = '../../../app/src/SubscriptionAdminController.js'
 const SandboxedModule = require('sandboxed-module')
 const events = require('events')
 const { ObjectId } = require('mongojs')
@@ -32,13 +32,13 @@ describe('SubscriptionAdminController', function() {
           err() {}
         },
         './UserAdminController': (this.UserAdminController = {}),
-        '../../../../app/js/Features/User/UserGetter': (this.UserGetter = {}),
-        '../../../../app/js/Features/Subscription/SubscriptionLocator': (this.SubscriptionLocator = {}),
-        '../../../../app/js/Features/Subscription/SubscriptionUpdater': (this.SubscriptionUpdater = {}),
-        '../../../../app/js/Features/Subscription/FeaturesUpdater': (this.FeaturesUpdater = {
+        '../../../../app/src/Features/User/UserGetter': (this.UserGetter = {}),
+        '../../../../app/src/Features/Subscription/SubscriptionLocator': (this.SubscriptionLocator = {}),
+        '../../../../app/src/Features/Subscription/SubscriptionUpdater': (this.SubscriptionUpdater = {}),
+        '../../../../app/src/Features/Subscription/FeaturesUpdater': (this.FeaturesUpdater = {
           refreshFeatures: sinon.stub().yields()
         }),
-        '../../../../app/js/models/Subscription': {
+        '../../../../app/src/models/Subscription': {
           Subscription: (this.Subscription = Subscription = (function() {
             let createSubscription
             Subscription = class Subscription {
@@ -56,7 +56,7 @@ describe('SubscriptionAdminController', function() {
             return Subscription
           })())
         },
-        '../../../../app/js/Features/Errors/ErrorController': (this.ErrorController = {}),
+        '../../../../app/src/Features/Errors/ErrorController': (this.ErrorController = {}),
         'metrics-sharelatex': {
           gauge() {}
         }

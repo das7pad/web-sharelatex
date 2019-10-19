@@ -17,7 +17,7 @@ const sinon = require('sinon')
 const chai = require('chai')
 const should = chai.should()
 const { expect } = chai
-const modulePath = '../../../app/js/UserAdminController.js'
+const modulePath = '../../../app/src/UserAdminController.js'
 const SandboxedModule = require('sandboxed-module')
 const events = require('events')
 const { ObjectId } = require('mongojs')
@@ -87,18 +87,19 @@ describe('UserAdminController', function() {
           log() {},
           err() {}
         },
-        '../../../../app/js/Features/User/UserGetter': this.UserGetter,
-        '../../../../app/js/Features/User/UserDeleter': this.UserDeleter,
-        '../../../../app/js/Features/User/UserUpdater': this.UserUpdater,
-        '../../../../app/js/Features/Authentication/AuthenticationManager': this
+        '../../../../app/src/Features/User/UserGetter': this.UserGetter,
+        '../../../../app/src/Features/User/UserDeleter': this.UserDeleter,
+        '../../../../app/src/Features/User/UserUpdater': this.UserUpdater,
+        '../../../../app/src/Features/Authentication/AuthenticationManager': this
           .AuthenticationManager,
-        '../../../../app/js/Features/Authentication/AuthenticationController': this
+        '../../../../app/src/Features/Authentication/AuthenticationController': this
           .AuthenticationController,
-        '../../../../app/js/Features/Subscription/SubscriptionLocator': this
+        '../../../../app/src/Features/Subscription/SubscriptionLocator': this
           .SubscriptionLocator,
-        '../../../../app/js/models/User': { User: this.User },
-        '../../../../app/js/Features/Project/ProjectGetter': this.ProjectGetter,
-        '../../../../app/js/Features/Subscription/FeaturesUpdater': (this.FeaturesUpdater = {}),
+        '../../../../app/src/models/User': { User: this.User },
+        '../../../../app/src/Features/Project/ProjectGetter': this
+          .ProjectGetter,
+        '../../../../app/src/Features/Subscription/FeaturesUpdater': (this.FeaturesUpdater = {}),
         'metrics-sharelatex': {
           gauge() {}
         },

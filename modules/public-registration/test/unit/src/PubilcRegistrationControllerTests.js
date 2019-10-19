@@ -14,7 +14,7 @@ const sinon = require('sinon')
 const chai = require('chai')
 const should = chai.should()
 const { expect } = chai
-const modulePath = '../../../app/js/PublicRegistrationController.js'
+const modulePath = '../../../app/src/PublicRegistrationController.js'
 const SandboxedModule = require('sandboxed-module')
 const events = require('events')
 const { ObjectId } = require('mongojs')
@@ -51,22 +51,22 @@ describe('PublicRegistrationController', function() {
     this.AnalyticsManager = { identifyUser: sinon.stub() }
     this.PublicRegistrationController = SandboxedModule.require(modulePath, {
       requires: {
-        '../../../../app/js/Features/User/UserRegistrationHandler': this
+        '../../../../app/src/Features/User/UserRegistrationHandler': this
           .UserRegistrationHandler,
-        '../../../../app/js/Features/Referal/ReferalAllocator': this
+        '../../../../app/src/Features/Referal/ReferalAllocator': this
           .ReferalAllocator,
-        '../../../../app/js/Features/Email/Layouts/PersonalEmailLayout': {},
-        '../../../../app/js/Features/Email/EmailBuilder': {
+        '../../../../app/src/Features/Email/Layouts/PersonalEmailLayout': {},
+        '../../../../app/src/Features/Email/EmailBuilder': {
           templates: { welcome: {} },
           CTAEmailTemplate: sinon.stub()
         },
-        '../../../../app/js/Features/Email/EmailHandler': {},
-        '../../../../app/js/Features/User/UserHandler': this.UserHandler,
-        '../../../../app/js/Features/User/UserEmailsConfirmationHandler': this
+        '../../../../app/src/Features/Email/EmailHandler': {},
+        '../../../../app/src/Features/User/UserHandler': this.UserHandler,
+        '../../../../app/src/Features/User/UserEmailsConfirmationHandler': this
           .UserEmailsConfirmationHandler,
-        '../../../../app/js/Features/Authentication/AuthenticationController': this
+        '../../../../app/src/Features/Authentication/AuthenticationController': this
           .AuthenticationController,
-        '../../../../app/js/Features/User/UserSessionsManager': this
+        '../../../../app/src/Features/User/UserSessionsManager': this
           .UserSessionsManager,
         '../../../../app/coffee/Features/Analytics/AnalyticsManager': this
           .AnalyticsManager,

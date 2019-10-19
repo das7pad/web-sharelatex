@@ -1,7 +1,7 @@
 // TODO: This file was created by bulk-decaffeinate.
 // Sanity-check the conversion and remove this comment.
-const PublicRegistrationRouter = require('./app/js/PublicRegistrationRouter')
-const Features = require('../../app/js/infrastructure/Features')
+const PublicRegistrationRouter = require('./app/src/PublicRegistrationRouter')
+const Features = require('../../app/src/infrastructure/Features')
 
 const PublicRegistrationModule = { router: PublicRegistrationRouter }
 

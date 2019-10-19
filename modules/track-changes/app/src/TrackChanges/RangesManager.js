@@ -14,9 +14,9 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 let RangesManager
-const DocumentUpdaterHandler = require('../../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler')
-const DocstoreManager = require('../../../../../app/js/Features/Docstore/DocstoreManager')
-const UserInfoManager = require('../../../../../app/js/Features/User/UserInfoManager')
+const DocumentUpdaterHandler = require('../../../../../app/src/Features/DocumentUpdater/DocumentUpdaterHandler')
+const DocstoreManager = require('../../../../../app/src/Features/Docstore/DocstoreManager')
+const UserInfoManager = require('../../../../../app/src/Features/User/UserInfoManager')
 const async = require('async')
 
 module.exports = RangesManager = {

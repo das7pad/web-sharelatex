@@ -11,8 +11,8 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 const PublicRegistrationController = require('./PublicRegistrationController')
-const AuthenticationController = require('../../../../app/js/Features/Authentication/AuthenticationController')
-const CaptchaMiddleware = require('../../../../app/js/Features/Captcha/CaptchaMiddleware')
+const AuthenticationController = require('../../../../app/src/Features/Authentication/AuthenticationController')
+const CaptchaMiddleware = require('../../../../app/src/Features/Captcha/CaptchaMiddleware')
 const Settings = require('settings-sharelatex')
 
 const logger = require('logger-sharelatex')

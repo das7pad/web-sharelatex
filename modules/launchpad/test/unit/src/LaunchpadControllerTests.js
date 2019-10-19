@@ -18,7 +18,7 @@ const sinon = require('sinon')
 const { ObjectId } = require('mongojs')
 const modulePath = require('path').join(
   __dirname,
-  '../../../app/js/LaunchpadController.js'
+  '../../../app/src/LaunchpadController.js'
 )
 
 describe('LaunchpadController', function() {
@@ -40,12 +40,12 @@ describe('LaunchpadController', function() {
           error() {}
         }),
         'metrics-sharelatex': (this.Metrics = {}),
-        '../../../../app/js/Features/User/UserRegistrationHandler': (this.UserRegistrationHandler = {}),
-        '../../../../app/js/Features/Email/EmailHandler': (this.EmailHandler = {}),
-        '../../../../app/js/Features/User/UserGetter': (this.UserGetter = {}),
-        '../../../../app/js/models/User': { User: this.User },
-        '../../../../app/js/Features/Authentication/AuthenticationController': (this.AuthenticationController = {}),
-        '../../../overleaf-integration/app/js/SharelatexAuth/SharelatexAuthController': (this.SharelatexAuthController = {})
+        '../../../../app/src/Features/User/UserRegistrationHandler': (this.UserRegistrationHandler = {}),
+        '../../../../app/src/Features/Email/EmailHandler': (this.EmailHandler = {}),
+        '../../../../app/src/Features/User/UserGetter': (this.UserGetter = {}),
+        '../../../../app/src/models/User': { User: this.User },
+        '../../../../app/src/Features/Authentication/AuthenticationController': (this.AuthenticationController = {}),
+        '../../../overleaf-integration/app/src/SharelatexAuth/SharelatexAuthController': (this.SharelatexAuthController = {})
       }
     })
 

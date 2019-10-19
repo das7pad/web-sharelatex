@@ -16,16 +16,19 @@ const async = require('async')
 const express = require('express')
 const path = require('path')
 const translations = require('translations-sharelatex').setup()
-const { db, ObjectId } = require('../../../../../app/js/infrastructure/mongojs')
-const User = require('../../../../../test/acceptance/js/helpers/User')
-const ProjectGetter = require('../../../../../app/js/Features/Project/ProjectGetter')
-const ProjectEntityHandler = require('../../../../../app/js/Features/Project/ProjectEntityHandler')
+const {
+  db,
+  ObjectId
+} = require('../../../../../app/src/infrastructure/mongojs')
+const User = require('../../../../../test/acceptance/src/helpers/User')
+const ProjectGetter = require('../../../../../app/src/Features/Project/ProjectGetter')
+const ProjectEntityHandler = require('../../../../../app/src/Features/Project/ProjectEntityHandler')
 
-const MockProjectHistoryApi = require('../../../../../test/acceptance/js/helpers/MockProjectHistoryApi')
-const MockDocUpdaterApi = require('../../../../../test/acceptance/js/helpers/MockDocUpdaterApi')
-const MockFileStoreApi = require('../../../../../test/acceptance/js/helpers/MockFileStoreApi')
-const MockDocstoreApi = require('../../../../../test/acceptance/js/helpers/MockDocstoreApi')
-const MockV1Api = require('../../../../../test/acceptance/js/helpers/MockV1Api')
+const MockProjectHistoryApi = require('../../../../../test/acceptance/src/helpers/MockProjectHistoryApi')
+const MockDocUpdaterApi = require('../../../../../test/acceptance/src/helpers/MockDocUpdaterApi')
+const MockFileStoreApi = require('../../../../../test/acceptance/src/helpers/MockFileStoreApi')
+const MockDocstoreApi = require('../../../../../test/acceptance/src/helpers/MockDocstoreApi')
+const MockV1Api = require('../../../../../test/acceptance/src/helpers/MockV1Api')
 
 describe('Open In Overleaf', function() {
   this.timeout(25000)

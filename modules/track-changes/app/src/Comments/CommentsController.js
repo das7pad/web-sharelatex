@@ -13,14 +13,14 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 let CommentsController
-const ChatApiHandler = require('../../../../../app/js/Features/Chat/ChatApiHandler')
-const ChatController = require('../../../../../app/js/Features/Chat/ChatController')
-const EditorRealTimeController = require('../../../../../app/js/Features/Editor/EditorRealTimeController')
+const ChatApiHandler = require('../../../../../app/src/Features/Chat/ChatApiHandler')
+const ChatController = require('../../../../../app/src/Features/Chat/ChatController')
+const EditorRealTimeController = require('../../../../../app/src/Features/Editor/EditorRealTimeController')
 const logger = require('logger-sharelatex')
-const AuthenticationController = require('../../../../../app/js/Features/Authentication/AuthenticationController')
-const UserInfoManager = require('../../../../../app/js/Features/User/UserInfoManager')
-const UserInfoController = require('../../../../../app/js/Features/User/UserInfoController')
-const DocumentUpdaterHandler = require('../../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler')
+const AuthenticationController = require('../../../../../app/src/Features/Authentication/AuthenticationController')
+const UserInfoManager = require('../../../../../app/src/Features/User/UserInfoManager')
+const UserInfoController = require('../../../../../app/src/Features/User/UserInfoController')
+const DocumentUpdaterHandler = require('../../../../../app/src/Features/DocumentUpdater/DocumentUpdaterHandler')
 const async = require('async')
 
 module.exports = CommentsController = {

@@ -10,7 +10,7 @@
  */
 const CommentsController = require('./Comments/CommentsController')
 const TrackChangesController = require('./TrackChanges/TrackChangesController')
-const AuthorizationMiddleware = require('../../../../app/js/Features/Authorization/AuthorizationMiddleware')
+const AuthorizationMiddleware = require('../../../../app/src/Features/Authorization/AuthorizationMiddleware')
 
 module.exports = {
   apply(webRouter, apiRouter) {

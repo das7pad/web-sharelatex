@@ -13,7 +13,7 @@ let OpenInOverleafErrorController
 const logger = require('logger-sharelatex')
 const Path = require('path')
 const OpenInOverleafErrors = require('./OpenInOverleafErrors')
-const Errors = require('../../../../app/js/Features/Errors/Errors')
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 module.exports = OpenInOverleafErrorController = {
   handleError(err, req, res, next) {

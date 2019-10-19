@@ -19,7 +19,7 @@ const sinon = require('sinon')
 const path = require('path')
 const modulePath = path.join(
   __dirname,
-  '../../../app/js/TrackChanges/RangesManager'
+  '../../../app/src/TrackChanges/RangesManager'
 )
 const { expect } = require('chai')
 
@@ -27,9 +27,9 @@ describe('TrackChanges RangesManager', function() {
   beforeEach(function() {
     return (this.RangesManager = SandboxedModule.require(modulePath, {
       requires: {
-        '../../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler': (this.DocumentUpdaterHandler = {}),
-        '../../../../../app/js/Features/Docstore/DocstoreManager': (this.DocstoreManager = {}),
-        '../../../../../app/js/Features/User/UserInfoManager': (this.UserInfoManager = {})
+        '../../../../../app/src/Features/DocumentUpdater/DocumentUpdaterHandler': (this.DocumentUpdaterHandler = {}),
+        '../../../../../app/src/Features/Docstore/DocstoreManager': (this.DocstoreManager = {}),
+        '../../../../../app/src/Features/User/UserInfoManager': (this.UserInfoManager = {})
       }
     }))
   })

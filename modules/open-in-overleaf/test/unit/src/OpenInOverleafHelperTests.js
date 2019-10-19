@@ -18,9 +18,9 @@ const chai = require('chai')
 const _ = require('underscore')
 const should = chai.should()
 const { expect } = chai
-const modulePath = '../../../app/js/OpenInOverleafHelper.js'
+const modulePath = '../../../app/src/OpenInOverleafHelper.js'
 const SandboxedModule = require('sandboxed-module')
-const OpenInOverleafErrors = require('../../../app/js/OpenInOverleafErrors')
+const OpenInOverleafErrors = require('../../../app/src/OpenInOverleafErrors')
 
 const mmmagic = { Magic: sinon.stub() }
 
@@ -80,15 +80,15 @@ describe('OpenInOverleafHelper', function() {
     this.OpenInOverleafHelper = SandboxedModule.require(modulePath, {
       requires: {
         mmmagic: mmmagic,
-        '../../../../app/js/infrastructure/FileWriter': this.FileWriter,
-        '../../../../app/js/Features/Helpers/UrlHelper': this.UrlHelper,
-        '../../../../app/js/Features/Project/ProjectRootDocManager': this
+        '../../../../app/src/infrastructure/FileWriter': this.FileWriter,
+        '../../../../app/src/Features/Helpers/UrlHelper': this.UrlHelper,
+        '../../../../app/src/Features/Project/ProjectRootDocManager': this
           .ProjectRootDocManager,
-        '../../../../app/js/Features/Project/ProjectEntityUpdateHandler': this
+        '../../../../app/src/Features/Project/ProjectEntityUpdateHandler': this
           .ProjectEntityUpdateHandler,
-        '../../../../app/js/Features/Project/ProjectOptionsHandler': this
+        '../../../../app/src/Features/Project/ProjectOptionsHandler': this
           .ProjectOptionsHandler,
-        '../../../../app/js/Features/V1/V1Api': this.V1Api,
+        '../../../../app/src/Features/V1/V1Api': this.V1Api,
         'settings-sharelatex': this.settings,
         fs: this.fs,
         'logger-sharelatex': {

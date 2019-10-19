@@ -17,12 +17,12 @@ const Path = require('path')
 const Url = require('url')
 const logger = require('logger-sharelatex')
 const metrics = require('metrics-sharelatex')
-const UserRegistrationHandler = require('../../../../app/js/Features/User/UserRegistrationHandler')
-const EmailHandler = require('../../../../app/js/Features/Email/EmailHandler')
+const UserRegistrationHandler = require('../../../../app/src/Features/User/UserRegistrationHandler')
+const EmailHandler = require('../../../../app/src/Features/Email/EmailHandler')
 const _ = require('underscore')
-const UserGetter = require('../../../../app/js/Features/User/UserGetter')
-const { User } = require('../../../../app/js/models/User')
-const AuthenticationController = require('../../../../app/js/Features/Authentication/AuthenticationController')
+const UserGetter = require('../../../../app/src/Features/User/UserGetter')
+const { User } = require('../../../../app/src/models/User')
+const AuthenticationController = require('../../../../app/src/Features/Authentication/AuthenticationController')
 
 module.exports = LaunchpadController = {
   _getAuthMethod() {
@@ -250,7 +250,7 @@ module.exports = LaunchpadController = {
             { user_id: user._id },
             'Creating backing account in v1 for new admin user'
           )
-          const SharelatexAuthController = require('../../../overleaf-integration/app/js/SharelatexAuth/SharelatexAuthController')
+          const SharelatexAuthController = require('../../../overleaf-integration/app/src/SharelatexAuth/SharelatexAuthController')
           return UserGetter.getUser(user._id, function(err, user) {
             if (err != null) {
               return next(err)

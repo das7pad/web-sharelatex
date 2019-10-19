@@ -11,8 +11,8 @@
  */
 const logger = require('logger-sharelatex')
 const LaunchpadController = require('./LaunchpadController')
-const AuthenticationController = require('../../../../app/js/Features/Authentication/AuthenticationController')
-const AuthorizationMiddleware = require('../../../../app/js/Features/Authorization/AuthorizationMiddleware')
+const AuthenticationController = require('../../../../app/src/Features/Authentication/AuthenticationController')
+const AuthorizationMiddleware = require('../../../../app/src/Features/Authorization/AuthorizationMiddleware')
 
 module.exports = {
   apply(webRouter, apiRouter) {

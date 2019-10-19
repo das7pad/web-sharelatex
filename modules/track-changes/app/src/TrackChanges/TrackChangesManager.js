@@ -13,8 +13,8 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 let TrackChangesManager
-const { Project } = require('../../../../../app/js/models/Project')
-const ProjectGetter = require('../../../../../app/js/Features/Project/ProjectGetter')
+const { Project } = require('../../../../../app/src/models/Project')
+const ProjectGetter = require('../../../../../app/src/Features/Project/ProjectGetter')
 
 module.exports = TrackChangesManager = {
   setTrackChangesState(project_id, track_changes_state, callback) {

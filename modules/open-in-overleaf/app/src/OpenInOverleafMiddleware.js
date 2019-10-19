@@ -11,10 +11,10 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 let OpenInOverleafMiddleware
-const Csrf = require('../../../../app/js/infrastructure/Csrf')
+const Csrf = require('../../../../app/src/infrastructure/Csrf')
 const Path = require('path')
 const querystring = require('querystring')
-const AuthenticationController = require('../../../../app/js/Features/Authentication/AuthenticationController')
+const AuthenticationController = require('../../../../app/src/Features/Authentication/AuthenticationController')
 
 // middleware to accept an external request and redirect to it via a gateway that adds a csrf token. Will also
 // redirect via the login page if the user is not authenticated.

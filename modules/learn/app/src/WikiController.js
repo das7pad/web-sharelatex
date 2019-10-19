@@ -18,9 +18,9 @@ let WikiController
 const request = require('request')
 const settings = require('settings-sharelatex')
 const logger = require('logger-sharelatex')
-const ErrorController = require('../../../../app/js/Features/Errors/ErrorController')
+const ErrorController = require('../../../../app/src/Features/Errors/ErrorController')
 const _ = require('underscore')
-const AuthenticationController = require('../../../../app/js/Features/Authentication/AuthenticationController')
+const AuthenticationController = require('../../../../app/src/Features/Authentication/AuthenticationController')
 const metrics = require('metrics-sharelatex')
 
 const async = require('async')

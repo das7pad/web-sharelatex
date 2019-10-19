@@ -12,7 +12,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const RateLimiterMiddleware = require('../../../../app/js/Features/Security/RateLimiterMiddleware')
+const RateLimiterMiddleware = require('../../../../app/src/Features/Security/RateLimiterMiddleware')
 const WikiController = require('./WikiController')
 const settings = require('settings-sharelatex')
 const logger = require('logger-sharelatex')

@@ -12,8 +12,8 @@ const UserAdminController = require('./UserAdminController')
 const ProjectAdminController = require('./ProjectAdminController')
 const SubscriptionAdminController = require('./SubscriptionAdminController')
 const GraphController = require('./GraphController')
-const AuthorizationMiddleware = require('../../../../app/js/Features/Authorization/AuthorizationMiddleware')
-const ProjectController = require('../../../../app/js/Features/Project/ProjectController')
+const AuthorizationMiddleware = require('../../../../app/src/Features/Authorization/AuthorizationMiddleware')
+const ProjectController = require('../../../../app/src/Features/Project/ProjectController')
 const express = require('express')
 
 module.exports = {

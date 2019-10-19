@@ -16,9 +16,9 @@
 let TrackChangesController
 const RangesManager = require('./RangesManager')
 const logger = require('logger-sharelatex')
-const UserInfoController = require('../../../../../app/js/Features/User/UserInfoController')
-const DocumentUpdaterHandler = require('../../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler')
-const EditorRealTimeController = require('../../../../../app/js/Features/Editor/EditorRealTimeController')
+const UserInfoController = require('../../../../../app/src/Features/User/UserInfoController')
+const DocumentUpdaterHandler = require('../../../../../app/src/Features/DocumentUpdater/DocumentUpdaterHandler')
+const EditorRealTimeController = require('../../../../../app/src/Features/Editor/EditorRealTimeController')
 const TrackChangesManager = require('./TrackChangesManager')
 
 module.exports = TrackChangesController = {

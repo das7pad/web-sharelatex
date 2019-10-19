@@ -16,11 +16,11 @@ const chai = require('chai')
 const _ = require('underscore')
 const should = chai.should()
 const { expect } = chai
-const modulePath = '../../../app/js/OpenInOverleafController.js'
+const modulePath = '../../../app/src/OpenInOverleafController.js'
 const SandboxedModule = require('sandboxed-module')
 const { ObjectId } = require('mongojs')
-const Errors = require('../../../../../app/js/Features/Errors/Errors')
-const OpenInOverleafErrors = require('../../../app/js/OpenInOverleafErrors')
+const Errors = require('../../../../../app/src/Features/Errors/Errors')
+const OpenInOverleafErrors = require('../../../app/src/OpenInOverleafErrors')
 
 describe('OpenInOverleafController', function() {
   beforeEach(function() {
@@ -120,13 +120,13 @@ describe('OpenInOverleafController', function() {
             log() {},
             err() {}
           },
-          '../../../../app/js/Features/Authentication/AuthenticationController': this
+          '../../../../app/src/Features/Authentication/AuthenticationController': this
             .AuthenticationController,
-          '../../../../app/js/Features/Project/ProjectCreationHandler': this
+          '../../../../app/src/Features/Project/ProjectCreationHandler': this
             .ProjectCreationHandler,
-          '../../../../app/js/Features/Project/ProjectDetailsHandler': this
+          '../../../../app/src/Features/Project/ProjectDetailsHandler': this
             .ProjectDetailsHandler,
-          '../../../../app/js/Features/Uploads/ProjectUploadManager': this
+          '../../../../app/src/Features/Uploads/ProjectUploadManager': this
             .ProjectUploadManager,
           './OpenInOverleafHelper': this.OpenInOverleafHelper
         }

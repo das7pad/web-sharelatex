@@ -11,7 +11,7 @@
 const OpenInOverleafController = require('./OpenInOverleafController')
 const OpenInOverleafMiddleware = require('./OpenInOverleafMiddleware')
 const OpenInOverleafErrorController = require('./OpenInOverleafErrorController')
-const RateLimiterMiddleware = require('../../../../app/js/Features/Security/RateLimiterMiddleware')
+const RateLimiterMiddleware = require('../../../../app/src/Features/Security/RateLimiterMiddleware')
 
 module.exports = {
   apply(webRouter) {
