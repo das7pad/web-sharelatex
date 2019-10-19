@@ -1,3 +1,10 @@
+/* eslint-disable
+    max-len,
+    no-return-assign,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -55,7 +62,7 @@ describe("DocumentHelper", function() {
 		});
 
 		// NICETOHAVE: Current implementation doesn't do this
-		//it "should keep content that surrounds formatting elements", ->
+		// it "should keep content that surrounds formatting elements", ->
 		//	document = "\\title{Second Year \\large{LaTeX} Exercise}"
 		//	expect(@DocumentHelper.getTitleFromTexContent(document)).to.equal "Second Year LaTeX Exercise"
 

@@ -1,3 +1,9 @@
+/* eslint-disable
+    no-return-assign,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -49,7 +55,7 @@ class MockResponse {
 		}
 		this.statusCode = status;
 		this.returned = true;
-		if (200 <= status && status < 300) {
+		if (status >= 200 && status < 300) {
 			this.success = true;
 		} else {
 			this.success = false;
@@ -66,7 +72,7 @@ class MockResponse {
 		}
 		this.statusCode = status;
 		this.returned = true;
-		if (200 <= status && status < 300) {
+		if (status >= 200 && status < 300) {
 			this.success = true;
 		} else {
 			this.success = false;
@@ -85,7 +91,7 @@ class MockResponse {
 		this.statusCode = status;
 		this.returned = true;
 		this.type = 'application/json';
-		if (200 <= status && status < 300) {
+		if (status >= 200 && status < 300) {
 			this.success = true;
 		} else {
 			this.success = false;
