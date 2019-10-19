@@ -8,24 +8,19 @@ const Errors = require('../Errors/Errors')
 // analytics service is configured
 const checkAnalyticsRequest = function(userId) {
   if (
-    !__guard__(
-      settings.apis != null ? settings.apis.analytics : undefined,
-      x => x.enabled
-    )
-  ) {
-    return { error: new Errors.ServiceDisabledError(
-        'Analytics service is disabled'
-      ),
-      skip: true
-    }
-  }
-  if (
     settings.smokeTest &&
     settings.smokeTest.userId &&
     settings.smokeTest.userId.toString() === userId.toString()
   ) {
     // ignore smoke test user
     return { error: null, skip: true }
+  }
+  if (settings.apis.analytics && !settings.apis.analytics.enabled) {
+    return { error: new Errors.ServiceDisabledError(
+        'Analytics service is disabled'
+      ),
+      skip: true
+    }
   }
 
   if (!settings.apis.analytics) {
