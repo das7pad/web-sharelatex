@@ -9,43 +9,64 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const should = require('chai').should();
-const {
-    assert
-} = require('chai');
-const async = require("async");
-const request = require("./helpers/request");
-const MockV1Api = require("./helpers/MockV1Api");
+const should = require('chai').should()
+const { assert } = require('chai')
+const async = require('async')
+const request = require('./helpers/request')
+const MockV1Api = require('./helpers/MockV1Api')
 
-const assertResponse = (path, expectedStatusCode, expectedBody, cb) => request.get(path, function(error, response) {
-    should.not.exist(error);
-    response.statusCode.should.equal(expectedStatusCode);
-    if (expectedBody) { assert.deepEqual(JSON.parse(response.body), expectedBody); }
-    return cb();
-});
+const assertResponse = (path, expectedStatusCode, expectedBody, cb) =>
+  request.get(path, function(error, response) {
+    should.not.exist(error)
+    response.statusCode.should.equal(expectedStatusCode)
+    if (expectedBody) {
+      assert.deepEqual(JSON.parse(response.body), expectedBody)
+    }
+    return cb()
+  })
 
-describe("ProxyUrls", function() {
-	this.timeout(1000);
+describe('ProxyUrls', function() {
+  this.timeout(1000)
 
-	it('proxy static URLs', done => async.series([
+  it('proxy static URLs', done =>
+    async.series(
+      [
         cb => assertResponse('/institutions/list', 200, [], cb),
         cb => assertResponse('/institutions/domains', 200, [], cb)
-    ],
-    done));
+      ],
+      done
+    ))
 
-	it('proxy dynamic URLs', done => async.series([
-        cb => assertResponse('/institutions/list/123', 200, { id: 123, name: "Institution 123" }, cb),
-        cb => assertResponse('/institutions/list/456', 200, { id: 456, name: "Institution 456" }, cb)
-    ],
-    done));
+  it('proxy dynamic URLs', done =>
+    async.series(
+      [
+        cb =>
+          assertResponse(
+            '/institutions/list/123',
+            200,
+            { id: 123, name: 'Institution 123' },
+            cb
+          ),
+        cb =>
+          assertResponse(
+            '/institutions/list/456',
+            200,
+            { id: 456, name: 'Institution 456' },
+            cb
+          )
+      ],
+      done
+    ))
 
-	it('return 404 if proxy is not set', done => async.series([
-        cb => assertResponse('/institutions/foobar', 404, null, cb)
-    ],
-    done));
+  it('return 404 if proxy is not set', done =>
+    async.series(
+      [cb => assertResponse('/institutions/foobar', 404, null, cb)],
+      done
+    ))
 
-	return it('handle missing baseUrl', done => async.series([
-        cb => assertResponse('/proxy/missing/baseUrl', 500, null, cb)
-    ],
-    done));
-});
+  return it('handle missing baseUrl', done =>
+    async.series(
+      [cb => assertResponse('/proxy/missing/baseUrl', 500, null, cb)],
+      done
+    ))
+})
