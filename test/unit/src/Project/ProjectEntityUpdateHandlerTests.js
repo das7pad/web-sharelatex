@@ -560,7 +560,7 @@ describe('ProjectEntityUpdateHandler', function() {
         return this.ProjectEntityUpdateHandler.addDoc(
           project_id,
           folder_id,
-          '*' + this.docName,
+          `*${this.docName}`,
           this.docLines,
           userId,
           this.callback
@@ -669,7 +669,7 @@ describe('ProjectEntityUpdateHandler', function() {
         return this.ProjectEntityUpdateHandler.addFile(
           project_id,
           folder_id,
-          '*' + this.fileName,
+          `*${this.fileName}`,
           this.fileSystemPath,
           this.linkedFileData,
           userId,
@@ -906,7 +906,7 @@ describe('ProjectEntityUpdateHandler', function() {
         return this.ProjectEntityUpdateHandler.upsertDoc(
           project_id,
           folder_id,
-          '*' + this.docName,
+          `*${this.docName}`,
           this.docLines,
           this.source,
           userId,
@@ -1041,7 +1041,7 @@ describe('ProjectEntityUpdateHandler', function() {
         return this.ProjectEntityUpdateHandler.upsertFile(
           project_id,
           folder_id,
-          '*' + this.fileName,
+          `*${this.fileName}`,
           this.fileSystemPath,
           this.linkedFileData,
           userId,

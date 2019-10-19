@@ -10,6 +10,7 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
+const { ObjectId } = require('mongojs')
 const should = require('chai').should()
 const SandboxedModule = require('sandboxed-module')
 const assert = require('assert')
@@ -41,9 +42,7 @@ describe('UserGetter', function() {
           find: this.find
         }
       },
-      ObjectId(id) {
-        return id
-      }
+      ObjectId
     }
     const settings = { apis: { v1: { url: 'v1.url', user: '', pass: '' } } }
     this.getUserAffiliations = sinon.stub().callsArgWith(1, null, [])

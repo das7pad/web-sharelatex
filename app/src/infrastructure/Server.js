@@ -206,7 +206,7 @@ webRouter.use(function(req, res, next) {
 
 privateApiRouter.get('/heapdump', (req, res) =>
   require('heapdump').writeSnapshot(
-    '/tmp/' + Date.now() + '.web.heapsnapshot',
+    `/tmp/${Date.now()}.web.heapsnapshot`,
     (err, filename) => res.send(filename)
   )
 )

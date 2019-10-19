@@ -267,11 +267,7 @@ module.exports = ProjectController = {
         projects = ProjectController._buildProjectList(projects)
           .filter(p => !p.archived)
           .filter(p => !p.isV1Project)
-          .map(p => ({
-            _id: p.id,
-            name: p.name,
-            accessLevel: p.accessLevel
-          }))
+          .map(p => ({ _id: p.id, name: p.name, accessLevel: p.accessLevel }))
 
         return res.json({ projects })
       }
@@ -923,7 +919,6 @@ module.exports = ProjectController = {
 
 var defaultSettingsForAnonymousUser = user_id => ({
   id: user_id,
-
   ace: {
     mode: 'none',
     theme: 'textmate',
@@ -933,13 +928,11 @@ var defaultSettingsForAnonymousUser = user_id => ({
     pdfViewer: '',
     syntaxValidation: true
   },
-
   subscription: {
     freeTrial: {
       allowed: true
     }
   },
-
   featureSwitches: {
     github: false
   }

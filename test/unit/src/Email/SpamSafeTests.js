@@ -65,8 +65,9 @@ describe('SpamSafe', () =>
     )
     expect(
       SpamSafe.safeProjectName(
-        'A Very long title for a very long book that will never be read' +
-          'a'.repeat(250),
+        `A Very long title for a very long book that will never be read${'a'.repeat(
+          250
+        )}`,
         'A Project'
       )
     ).to.equal('A Project')
@@ -77,10 +78,7 @@ describe('SpamSafe', () =>
       SpamSafe.safeEmail('Բարեւ@another.domain', 'A collaborator')
     ).to.equal('Բարեւ@another.domain')
     expect(
-      SpamSafe.safeEmail(
-        'me+' + 'a'.repeat(40) + '@googoole.con',
-        'A collaborator'
-      )
+      SpamSafe.safeEmail(`me+${'a'.repeat(40)}@googoole.con`, 'A collaborator')
     ).to.equal('A collaborator')
     return expect(
       SpamSafe.safeEmail('sendME$$$@iAmAprince.com', 'A collaborator')

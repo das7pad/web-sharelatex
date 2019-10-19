@@ -248,7 +248,7 @@ describe('Register with bonus referal id', function() {
         cb => this.user1.register(cb),
         cb =>
           this.user2.registerWithQuery(
-            '?r=' + this.user1.referal_id + '&rm=d&rs=b',
+            `?r=${this.user1.referal_id}&rm=d&rs=b`,
             cb
           )
       ],

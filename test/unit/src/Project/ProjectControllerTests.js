@@ -123,8 +123,8 @@ describe('ProjectController', function() {
           err() {}
         },
         'metrics-sharelatex': {
-          Timer() {
-            return { done() {} }
+          Timer: class {
+            done() {}
           },
           inc() {}
         },

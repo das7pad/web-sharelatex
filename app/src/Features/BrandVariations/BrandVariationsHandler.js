@@ -79,9 +79,8 @@ var _formatBrandVariationDetails = function(details) {
   }
 }
 
-var _setV1AsHostIfRelativeURL = (
-  urlString // The first argument is the base URL to resolve against if the second argument is not absolute.
-) =>
+var _setV1AsHostIfRelativeURL = urlString =>
+  // The first argument is the base URL to resolve against if the second argument is not absolute.
   // As it only applies if the second argument is not absolute, we can use it to transform relative URLs into
   // absolute ones using v1 as the host. If the URL is absolute (e.g. a filepicker one), then the base
   // argument is just ignored

@@ -65,8 +65,8 @@ var buildUserViewModel = function(user, isInvite) {
 
 var buildUserViewModelWithEmail = email => buildUserViewModel({ email }, true)
 
-var buildUserViewModelWithStub = (
-  user // user stubs behave as invites
-) => buildUserViewModel(user, true)
+var buildUserViewModelWithStub = user =>
+  // user stubs behave as invites
+  buildUserViewModel(user, true)
 
 var buildUserViewModelWithId = id => buildUserViewModel({ _id: id }, false)

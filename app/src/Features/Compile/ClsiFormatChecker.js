@@ -53,9 +53,7 @@ module.exports = ClsiFormatChecker = {
       return matchingPaths.length > 0
     })
 
-    const conflictObjects = _.map(conflicts, conflict => ({
-      path: conflict
-    }))
+    const conflictObjects = _.map(conflicts, conflict => ({ path: conflict }))
 
     return callback(null, conflictObjects)
   },

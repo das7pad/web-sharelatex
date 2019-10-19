@@ -11,11 +11,11 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 let TemplatesManager
-const { Project } = require('../../../js/models/Project')
-const ProjectDetailsHandler = require('../../../js/Features/Project/ProjectDetailsHandler')
-const ProjectOptionsHandler = require('../../../js/Features/Project/ProjectOptionsHandler')
-const ProjectRootDocManager = require('../../../js/Features/Project/ProjectRootDocManager')
-const ProjectUploadManager = require('../../../js/Features/Uploads/ProjectUploadManager')
+const { Project } = require('../../models/Project')
+const ProjectDetailsHandler = require('../Project/ProjectDetailsHandler')
+const ProjectOptionsHandler = require('../Project/ProjectOptionsHandler')
+const ProjectRootDocManager = require('../Project/ProjectRootDocManager')
+const ProjectUploadManager = require('../Uploads/ProjectUploadManager')
 const FileWriter = require('../../infrastructure/FileWriter')
 const async = require('async')
 const fs = require('fs')

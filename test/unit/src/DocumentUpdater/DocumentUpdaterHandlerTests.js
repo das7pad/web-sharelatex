@@ -61,8 +61,8 @@ describe('DocumentUpdaterHandler', function() {
         '../../models/Project': { Project: (this.Project = {}) },
         '../../Features/Project/ProjectLocator': {},
         'metrics-sharelatex': {
-          Timer() {
-            return { done() {} }
+          Timer: class {
+            done() {}
           }
         }
       }
