@@ -1,69 +1,97 @@
-assert = require("chai").assert
-sinon = require('sinon')
-chai = require('chai')
-should = chai.should()
-expect = chai.expect
-modulePath = "../../../app/js/OpenInOverleafMiddleware.js"
-SandboxedModule = require('sandboxed-module')
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const {
+    assert
+} = require("chai");
+const sinon = require('sinon');
+const chai = require('chai');
+const should = chai.should();
+const {
+    expect
+} = chai;
+const modulePath = "../../../app/js/OpenInOverleafMiddleware.js";
+const SandboxedModule = require('sandboxed-module');
 
-describe 'OpenInOverleafMiddleware', ->
-	beforeEach ->
-		@snip = 'snippy snippy snap snap'
-		@Csrf =
-			validateRequest: sinon.stub().callsArgWith(1, true)
-		@AuthenticationController =
-			isUserLoggedIn: sinon.stub().returns(true)
+describe('OpenInOverleafMiddleware', function() {
+	beforeEach(function() {
+		this.snip = 'snippy snippy snap snap';
+		this.Csrf =
+			{validateRequest: sinon.stub().callsArgWith(1, true)};
+		this.AuthenticationController = {
+			isUserLoggedIn: sinon.stub().returns(true),
 			setRedirectInSession: sinon.stub()
-		@req =
-			method: 'POST'
-			originalUrl: '/docs'
-			body:
+		};
+		this.req = {
+			method: 'POST',
+			originalUrl: '/docs',
+			body: {
 				type: 'body'
-			query:
+			},
+			query: {
 				type: 'query'
-		@res = {}
-		@next = sinon.stub()
+			}
+		};
+		this.res = {};
+		this.next = sinon.stub();
 
-		@OpenInOverleafMiddleware = SandboxedModule.require modulePath, requires:
-			"logger-sharelatex":
-				log:->
-				err:->
-			'../../../../app/js/Features/Authentication/AuthenticationController': @AuthenticationController
-			'../../../../app/js/infrastructure/Csrf': @Csrf
+		return this.OpenInOverleafMiddleware = SandboxedModule.require(modulePath, { requires: {
+			"logger-sharelatex": {
+				log() {},
+				err() {}
+			},
+			'../../../../app/js/Features/Authentication/AuthenticationController': this.AuthenticationController,
+			'../../../../app/js/infrastructure/Csrf': this.Csrf
+		}
+	}
+		);
+	});
 
-	describe 'middleware', ->
-		beforeEach ->
-			@OpenInOverleafMiddleware._renderGateway = sinon.stub()
+	return describe('middleware', function() {
+		beforeEach(function() {
+			return this.OpenInOverleafMiddleware._renderGateway = sinon.stub();
+		});
 
-		it 'calls the callback when the user is logged in and the csrf is valid', ->
-			@OpenInOverleafMiddleware.middleware(@req, @res, @next)
-			sinon.assert.called(@next)
-			sinon.assert.notCalled(@OpenInOverleafMiddleware._renderGateway)
+		it('calls the callback when the user is logged in and the csrf is valid', function() {
+			this.OpenInOverleafMiddleware.middleware(this.req, this.res, this.next);
+			sinon.assert.called(this.next);
+			return sinon.assert.notCalled(this.OpenInOverleafMiddleware._renderGateway);
+		});
 
-		it 'renders the gateway for submission if the user is logged in but the csrf is invalid', ->
-			@Csrf.validateRequest = sinon.stub().callsArgWith(1, false)
-			@OpenInOverleafMiddleware.middleware(@req, @res, @next)
-			sinon.assert.calledWith(@OpenInOverleafMiddleware._renderGateway, @req, 'submit')
-			sinon.assert.notCalled(@next)
+		it('renders the gateway for submission if the user is logged in but the csrf is invalid', function() {
+			this.Csrf.validateRequest = sinon.stub().callsArgWith(1, false);
+			this.OpenInOverleafMiddleware.middleware(this.req, this.res, this.next);
+			sinon.assert.calledWith(this.OpenInOverleafMiddleware._renderGateway, this.req, 'submit');
+			return sinon.assert.notCalled(this.next);
+		});
 
-		it 'renders the gateway for redirecting if the user is not logged in ', ->
-			@AuthenticationController.isUserLoggedIn = sinon.stub().returns(false)
-			@OpenInOverleafMiddleware.middleware(@req, @res, @next)
-			sinon.assert.calledWith(@OpenInOverleafMiddleware._renderGateway, @req, 'store', sinon.match(/^\/login/))
-			sinon.assert.called(@AuthenticationController.setRedirectInSession)
-			sinon.assert.notCalled(@next)
+		it('renders the gateway for redirecting if the user is not logged in ', function() {
+			this.AuthenticationController.isUserLoggedIn = sinon.stub().returns(false);
+			this.OpenInOverleafMiddleware.middleware(this.req, this.res, this.next);
+			sinon.assert.calledWith(this.OpenInOverleafMiddleware._renderGateway, this.req, 'store', sinon.match(/^\/login/));
+			sinon.assert.called(this.AuthenticationController.setRedirectInSession);
+			return sinon.assert.notCalled(this.next);
+		});
 
-		describe "when the method is GET", ->
-			beforeEach ->
-				@req.method = 'GET'
+		return describe("when the method is GET", function() {
+			beforeEach(function() {
+				return this.req.method = 'GET';
+			});
 
-			it 'renders the gateway for submission if the user is logged in and the csrf is valid', ->
-				@OpenInOverleafMiddleware.middleware(@req, @res, @next)
-				sinon.assert.calledWith(@OpenInOverleafMiddleware._renderGateway, @req, 'submit')
+			it('renders the gateway for submission if the user is logged in and the csrf is valid', function() {
+				this.OpenInOverleafMiddleware.middleware(this.req, this.res, this.next);
+				return sinon.assert.calledWith(this.OpenInOverleafMiddleware._renderGateway, this.req, 'submit');
+			});
 
-			it 'renders the gateway for redirecting if the user is not logged in', ->
-				@AuthenticationController.isUserLoggedIn = sinon.stub().returns(false)
-				@OpenInOverleafMiddleware.middleware(@req, @res, @next)
-				sinon.assert.calledWith(@OpenInOverleafMiddleware._renderGateway, @req, 'store', sinon.match(/^\/login/))
-				sinon.assert.called(@AuthenticationController.setRedirectInSession)
-				sinon.assert.notCalled(@next)
+			return it('renders the gateway for redirecting if the user is not logged in', function() {
+				this.AuthenticationController.isUserLoggedIn = sinon.stub().returns(false);
+				this.OpenInOverleafMiddleware.middleware(this.req, this.res, this.next);
+				sinon.assert.calledWith(this.OpenInOverleafMiddleware._renderGateway, this.req, 'store', sinon.match(/^\/login/));
+				sinon.assert.called(this.AuthenticationController.setRedirectInSession);
+				return sinon.assert.notCalled(this.next);
+			});
+		});
+	});
+});
