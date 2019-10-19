@@ -1,183 +1,234 @@
-sinon = require('sinon')
-chai = require('chai')
-expect = require('chai').expect
-modulePath = "../../../../app/js/Features/UserMembership/UserMembershipAuthorization.js"
-SandboxedModule = require('sandboxed-module')
-MockRequest = require "../helpers/MockRequest"
-EntityConfigs = require("../../../../app/js/Features/UserMembership/UserMembershipEntityConfigs")
-Errors = require("../../../../app/js/Features/Errors/Errors")
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const sinon = require('sinon');
+const chai = require('chai');
+const {
+    expect
+} = require('chai');
+const modulePath = "../../../../app/js/Features/UserMembership/UserMembershipAuthorization.js";
+const SandboxedModule = require('sandboxed-module');
+const MockRequest = require("../helpers/MockRequest");
+const EntityConfigs = require("../../../../app/js/Features/UserMembership/UserMembershipEntityConfigs");
+const Errors = require("../../../../app/js/Features/Errors/Errors");
 
-describe "UserMembershipAuthorization", ->
-	beforeEach ->
-		@req = new MockRequest()
-		@req.params.id = 'mock-entity-id'
-		@user = _id: 'mock-user-id'
-		@subscription = { _id: 'mock-subscription-id'}
+describe("UserMembershipAuthorization", function() {
+	beforeEach(function() {
+		this.req = new MockRequest();
+		this.req.params.id = 'mock-entity-id';
+		this.user = {_id: 'mock-user-id'};
+		this.subscription = { _id: 'mock-subscription-id'};
 
-		@AuthenticationController =
-			getSessionUser: sinon.stub().returns(@user)
-		@UserMembershipHandler =
-			getEntity: sinon.stub().yields(null, @subscription)
-			getEntityWithoutAuthorizationCheck: sinon.stub().yields(null, @subscription)
-		@AuthorizationMiddleware =
-			redirectToRestricted: sinon.stub().yields()
+		this.AuthenticationController =
+			{getSessionUser: sinon.stub().returns(this.user)};
+		this.UserMembershipHandler = {
+			getEntity: sinon.stub().yields(null, this.subscription),
+			getEntityWithoutAuthorizationCheck: sinon.stub().yields(null, this.subscription)
+		};
+		this.AuthorizationMiddleware = {
+			redirectToRestricted: sinon.stub().yields(),
 			ensureUserIsSiteAdmin: sinon.stub().yields()
-		@UserMembershipAuthorization = SandboxedModule.require modulePath, requires:
-			'../Authentication/AuthenticationController': @AuthenticationController
-			'../Authorization/AuthorizationMiddleware': @AuthorizationMiddleware
-			'./UserMembershipHandler': @UserMembershipHandler
-			'./EntityConfigs': EntityConfigs
-			'../Errors/Errors': Errors
-			'request': @request = sinon.stub().yields(null, null, {})
-			"logger-sharelatex":
-				log: ->
-				err: ->
+		};
+		return this.UserMembershipAuthorization = SandboxedModule.require(modulePath, { requires: {
+			'../Authentication/AuthenticationController': this.AuthenticationController,
+			'../Authorization/AuthorizationMiddleware': this.AuthorizationMiddleware,
+			'./UserMembershipHandler': this.UserMembershipHandler,
+			'./EntityConfigs': EntityConfigs,
+			'../Errors/Errors': Errors,
+			'request': (this.request = sinon.stub().yields(null, null, {})),
+			"logger-sharelatex": {
+				log() {},
+				err() {}
+			}
+		}
+	}
+		);
+	});
 
-	describe 'requireAccessToEntity', ->
-		it 'get entity', (done) ->
-			@UserMembershipAuthorization.requireGroupMetricsAccess @req, null, (error) =>
-				expect(error).to.not.extist
+	describe('requireAccessToEntity', function() {
+		it('get entity', function(done) {
+			return this.UserMembershipAuthorization.requireGroupMetricsAccess(this.req, null, error => {
+				expect(error).to.not.extist;
 				sinon.assert.calledWithMatch(
-					@UserMembershipHandler.getEntity,
-					@req.params.id,
-					modelName: 'Subscription',
-					@user
-				)
-				expect(@req.entity).to.equal @subscription
-				expect(@req.entityConfig).to.exist
-				done()
+					this.UserMembershipHandler.getEntity,
+					this.req.params.id,
+					{modelName: 'Subscription'},
+					this.user
+				);
+				expect(this.req.entity).to.equal(this.subscription);
+				expect(this.req.entityConfig).to.exist;
+				return done();
+			});
+		});
 
-		it 'handle entity not found as non-admin', (done) ->
-			@UserMembershipHandler.getEntity.yields(null, null)
-			@UserMembershipHandler.getEntityWithoutAuthorizationCheck.yields(null, null)
-			@UserMembershipAuthorization.requireGroupMetricsAccess @req, null, (error) =>
-				expect(error).to.extist
-				expect(error).to.be.instanceof(Error)
-				expect(error.constructor.name).to.equal('NotFoundError')
-				sinon.assert.called(@UserMembershipHandler.getEntity)
-				expect(@req.entity).to.not.exist
-				done()
+		it('handle entity not found as non-admin', function(done) {
+			this.UserMembershipHandler.getEntity.yields(null, null);
+			this.UserMembershipHandler.getEntityWithoutAuthorizationCheck.yields(null, null);
+			return this.UserMembershipAuthorization.requireGroupMetricsAccess(this.req, null, error => {
+				expect(error).to.extist;
+				expect(error).to.be.instanceof(Error);
+				expect(error.constructor.name).to.equal('NotFoundError');
+				sinon.assert.called(this.UserMembershipHandler.getEntity);
+				expect(this.req.entity).to.not.exist;
+				return done();
+			});
+		});
 
-		it 'handle entity not found an admin can create', (done) ->
-			@user.isAdmin = true
-			@UserMembershipHandler.getEntity.yields(null, null)
-			@UserMembershipHandler.getEntityWithoutAuthorizationCheck.yields(null, null)
-			@UserMembershipAuthorization.requirePublisherMetricsAccess @req, redirect: (path) =>
-				expect(path).to.extist
-				expect(path).to.match /create/
-				done()
+		it('handle entity not found an admin can create', function(done) {
+			this.user.isAdmin = true;
+			this.UserMembershipHandler.getEntity.yields(null, null);
+			this.UserMembershipHandler.getEntityWithoutAuthorizationCheck.yields(null, null);
+			return this.UserMembershipAuthorization.requirePublisherMetricsAccess(this.req, { redirect: path => {
+				expect(path).to.extist;
+				expect(path).to.match(/create/);
+				return done();
+			}
+		}
+			);
+		});
 
-		it 'handle entity not found a non-admin can create', (done) ->
-			@user.staffAccess = { institutionManagement: true }
-			@UserMembershipHandler.getEntity.yields(null, null)
-			@UserMembershipHandler.getEntityWithoutAuthorizationCheck.yields(null, null)
-			@UserMembershipAuthorization.requirePublisherMetricsAccess @req, redirect: (path) =>
-				expect(path).to.extist
-				expect(path).to.match /create/
-				done()
+		it('handle entity not found a non-admin can create', function(done) {
+			this.user.staffAccess = { institutionManagement: true };
+			this.UserMembershipHandler.getEntity.yields(null, null);
+			this.UserMembershipHandler.getEntityWithoutAuthorizationCheck.yields(null, null);
+			return this.UserMembershipAuthorization.requirePublisherMetricsAccess(this.req, { redirect: path => {
+				expect(path).to.extist;
+				expect(path).to.match(/create/);
+				return done();
+			}
+		}
+			);
+		});
 
-		it 'handle entity not found an admin cannot create', (done) ->
-			@user.isAdmin = true
-			@UserMembershipHandler.getEntity.yields(null, null)
-			@UserMembershipHandler.getEntityWithoutAuthorizationCheck.yields(null, null)
-			@UserMembershipAuthorization.requireGroupMetricsAccess @req, null, (error) =>
-				expect(error).to.extist
-				expect(error).to.be.instanceof(Error)
-				expect(error.constructor.name).to.equal('NotFoundError')
-				done()
+		it('handle entity not found an admin cannot create', function(done) {
+			this.user.isAdmin = true;
+			this.UserMembershipHandler.getEntity.yields(null, null);
+			this.UserMembershipHandler.getEntityWithoutAuthorizationCheck.yields(null, null);
+			return this.UserMembershipAuthorization.requireGroupMetricsAccess(this.req, null, error => {
+				expect(error).to.extist;
+				expect(error).to.be.instanceof(Error);
+				expect(error.constructor.name).to.equal('NotFoundError');
+				return done();
+			});
+		});
 
-		it 'handle entity no access', (done) ->
-			@UserMembershipHandler.getEntity.yields(null, null)
-			@UserMembershipAuthorization.requireGroupMetricsAccess @req, null, (error) =>
-				sinon.assert.called(@AuthorizationMiddleware.redirectToRestricted)
-				done()
+		it('handle entity no access', function(done) {
+			this.UserMembershipHandler.getEntity.yields(null, null);
+			return this.UserMembershipAuthorization.requireGroupMetricsAccess(this.req, null, error => {
+				sinon.assert.called(this.AuthorizationMiddleware.redirectToRestricted);
+				return done();
+			});
+		});
 
-		it 'handle anonymous user', (done) ->
-			@AuthenticationController.getSessionUser.returns(null)
-			@UserMembershipAuthorization.requireGroupMetricsAccess @req, null, (error) =>
-				expect(error).to.extist
-				sinon.assert.called(@AuthorizationMiddleware.redirectToRestricted)
-				sinon.assert.notCalled(@UserMembershipHandler.getEntity)
-				expect(@req.entity).to.not.exist
-				done()
+		return it('handle anonymous user', function(done) {
+			this.AuthenticationController.getSessionUser.returns(null);
+			return this.UserMembershipAuthorization.requireGroupMetricsAccess(this.req, null, error => {
+				expect(error).to.extist;
+				sinon.assert.called(this.AuthorizationMiddleware.redirectToRestricted);
+				sinon.assert.notCalled(this.UserMembershipHandler.getEntity);
+				expect(this.req.entity).to.not.exist;
+				return done();
+			});
+		});
+	});
 
-	describe 'requireEntityAccess', ->
-		it 'handle team access', (done) ->
-			@UserMembershipAuthorization.requireTeamMetricsAccess @req, null, (error) =>
-				expect(error).to.not.extist
+	return describe('requireEntityAccess', function() {
+		it('handle team access', function(done) {
+			return this.UserMembershipAuthorization.requireTeamMetricsAccess(this.req, null, error => {
+				expect(error).to.not.extist;
 				sinon.assert.calledWithMatch(
-					@UserMembershipHandler.getEntity,
-					@req.params.id,
-					fields: primaryKey: 'overleaf.id'
-				)
-				done()
+					this.UserMembershipHandler.getEntity,
+					this.req.params.id,
+					{fields: {primaryKey: 'overleaf.id'}}
+				);
+				return done();
+			});
+		});
 
-		it 'handle group access', (done) ->
-			@UserMembershipAuthorization.requireGroupMetricsAccess @req, null, (error) =>
-				expect(error).to.not.extist
+		it('handle group access', function(done) {
+			return this.UserMembershipAuthorization.requireGroupMetricsAccess(this.req, null, error => {
+				expect(error).to.not.extist;
 				sinon.assert.calledWithMatch(
-					@UserMembershipHandler.getEntity,
-					@req.params.id,
-					translations: title: 'group_account'
-				)
-				done()
+					this.UserMembershipHandler.getEntity,
+					this.req.params.id,
+					{translations: {title: 'group_account'}}
+				);
+				return done();
+			});
+		});
 
-		it 'handle group managers access', (done) ->
-			@UserMembershipAuthorization.requireGroupManagersManagementAccess @req, null, (error) =>
-				expect(error).to.not.extist
+		it('handle group managers access', function(done) {
+			return this.UserMembershipAuthorization.requireGroupManagersManagementAccess(this.req, null, error => {
+				expect(error).to.not.extist;
 				sinon.assert.calledWithMatch(
-					@UserMembershipHandler.getEntity,
-					@req.params.id,
-					translations: subtitle: 'managers_management'
-				)
-				done()
+					this.UserMembershipHandler.getEntity,
+					this.req.params.id,
+					{translations: {subtitle: 'managers_management'}}
+				);
+				return done();
+			});
+		});
 
-		it 'handle institution access', (done) ->
-			@UserMembershipAuthorization.requireInstitutionMetricsAccess @req, null, (error) =>
-				expect(error).to.not.extist
+		it('handle institution access', function(done) {
+			return this.UserMembershipAuthorization.requireInstitutionMetricsAccess(this.req, null, error => {
+				expect(error).to.not.extist;
 				sinon.assert.calledWithMatch(
-					@UserMembershipHandler.getEntity,
-					@req.params.id,
-					modelName: 'Institution',
-				)
-				done()
+					this.UserMembershipHandler.getEntity,
+					this.req.params.id,
+					{modelName: 'Institution'}
+				);
+				return done();
+			});
+		});
 
-		it 'handle template with brand access', (done) ->
-			templateData =
-				id: 123
-				title: 'Template Title'
+		it('handle template with brand access', function(done) {
+			const templateData = {
+				id: 123,
+				title: 'Template Title',
 				brand: { slug: 'brand-slug' }
-			@request.yields(null, { statusCode: 200 }, JSON.stringify(templateData))
-			@UserMembershipAuthorization.requireTemplateMetricsAccess @req, null, (error) =>
-				expect(error).to.not.extist
+			};
+			this.request.yields(null, { statusCode: 200 }, JSON.stringify(templateData));
+			return this.UserMembershipAuthorization.requireTemplateMetricsAccess(this.req, null, error => {
+				expect(error).to.not.extist;
 				sinon.assert.calledWithMatch(
-					@UserMembershipHandler.getEntity,
+					this.UserMembershipHandler.getEntity,
 					'brand-slug',
-					modelName: 'Publisher',
-				)
-				done()
+					{modelName: 'Publisher'}
+				);
+				return done();
+			});
+		});
 
-		it 'handle template without brand access', (done) ->
-			templateData =
-				id: 123
-				title: 'Template Title'
+		it('handle template without brand access', function(done) {
+			const templateData = {
+				id: 123,
+				title: 'Template Title',
 				brand: null
-			@request.yields(null, { statusCode: 200 }, JSON.stringify(templateData))
-			@UserMembershipAuthorization.requireTemplateMetricsAccess @req, null, (error) =>
-				expect(error).to.not.extist
-				sinon.assert.notCalled(@UserMembershipHandler.getEntity)
-				sinon.assert.calledOnce(@AuthorizationMiddleware.ensureUserIsSiteAdmin)
-				done()
+			};
+			this.request.yields(null, { statusCode: 200 }, JSON.stringify(templateData));
+			return this.UserMembershipAuthorization.requireTemplateMetricsAccess(this.req, null, error => {
+				expect(error).to.not.extist;
+				sinon.assert.notCalled(this.UserMembershipHandler.getEntity);
+				sinon.assert.calledOnce(this.AuthorizationMiddleware.ensureUserIsSiteAdmin);
+				return done();
+			});
+		});
 
-		it 'handle graph access', (done) ->
-			@req.query.resource_id = 'mock-resource-id'
-			@req.query.resource_type = 'institution'
-			middleware = @UserMembershipAuthorization.requireGraphAccess
-			middleware @req, null, (error) =>
-				expect(error).to.not.extist
+		return it('handle graph access', function(done) {
+			this.req.query.resource_id = 'mock-resource-id';
+			this.req.query.resource_type = 'institution';
+			const middleware = this.UserMembershipAuthorization.requireGraphAccess;
+			return middleware(this.req, null, error => {
+				expect(error).to.not.extist;
 				sinon.assert.calledWithMatch(
-					@UserMembershipHandler.getEntity,
-					@req.query.resource_id,
-					modelName: 'Institution',
-				)
-				done()
+					this.UserMembershipHandler.getEntity,
+					this.req.query.resource_id,
+					{modelName: 'Institution'}
+				);
+				return done();
+			});
+		});
+	});
+});

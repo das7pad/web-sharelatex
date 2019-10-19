@@ -1,246 +1,312 @@
-chai = require('chai')
-chai.should()
-sinon = require("sinon")
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const chai = require('chai');
+chai.should();
+const sinon = require("sinon");
 
-Errors = require "../../../../app/js/Features/Errors/Errors"
+const Errors = require("../../../../app/js/Features/Errors/Errors");
 
-modulePath = "../../../../app/js/Features/History/HistoryController"
-SandboxedModule = require('sandboxed-module')
+const modulePath = "../../../../app/js/Features/History/HistoryController";
+const SandboxedModule = require('sandboxed-module');
 
-describe "HistoryController", ->
-	beforeEach ->
-		@callback = sinon.stub()
-		@user_id = "user-id-123"
-		@AuthenticationController =
-			getLoggedInUserId: sinon.stub().returns(@user_id)
-		@HistoryController = SandboxedModule.require modulePath, requires:
-			"request" : @request = sinon.stub()
-			"settings-sharelatex": @settings = {}
-			"logger-sharelatex": @logger = {log: sinon.stub(), error: sinon.stub()}
-			"../Authentication/AuthenticationController": @AuthenticationController
-			"../Errors/Errors": Errors
-			"./HistoryManager": @HistoryManager = {}
-			"../Project/ProjectDetailsHandler": @ProjectDetailsHandler = {}
-			"../Project/ProjectEntityUpdateHandler": @ProjectEntityUpdateHandler = {}
-			"./RestoreManager": @RestoreManager = {}
-		@settings.apis =
-			trackchanges:
-				enabled: false
+describe("HistoryController", function() {
+	beforeEach(function() {
+		this.callback = sinon.stub();
+		this.user_id = "user-id-123";
+		this.AuthenticationController =
+			{getLoggedInUserId: sinon.stub().returns(this.user_id)};
+		this.HistoryController = SandboxedModule.require(modulePath, { requires: {
+			"request" : (this.request = sinon.stub()),
+			"settings-sharelatex": (this.settings = {}),
+			"logger-sharelatex": (this.logger = {log: sinon.stub(), error: sinon.stub()}),
+			"../Authentication/AuthenticationController": this.AuthenticationController,
+			"../Errors/Errors": Errors,
+			"./HistoryManager": (this.HistoryManager = {}),
+			"../Project/ProjectDetailsHandler": (this.ProjectDetailsHandler = {}),
+			"../Project/ProjectEntityUpdateHandler": (this.ProjectEntityUpdateHandler = {}),
+			"./RestoreManager": (this.RestoreManager = {})
+		}
+	});
+		return this.settings.apis = {
+			trackchanges: {
+				enabled: false,
 				url: "http://trackchanges.example.com"
-			project_history:
+			},
+			project_history: {
 				url: "http://project_history.example.com"
+			}
+		};
+	});
 
-	describe "selectHistoryApi", ->
-		beforeEach ->
-			@req = { url: "/mock/url", method: "POST" }
-			@res = "mock-res"
-			@next = sinon.stub()
+	describe("selectHistoryApi", function() {
+		beforeEach(function() {
+			this.req = { url: "/mock/url", method: "POST" };
+			this.res = "mock-res";
+			return this.next = sinon.stub();
+		});
 
-		describe "for a project with project history", ->
-			beforeEach ->
-				@ProjectDetailsHandler.getDetails = sinon.stub().callsArgWith(1, null, {overleaf:{history:{id: 42, display:true}}})
-				@HistoryController.selectHistoryApi @req, @res, @next
+		describe("for a project with project history", function() {
+			beforeEach(function() {
+				this.ProjectDetailsHandler.getDetails = sinon.stub().callsArgWith(1, null, {overleaf:{history:{id: 42, display:true}}});
+				return this.HistoryController.selectHistoryApi(this.req, this.res, this.next);
+			});
 
-			it "should set the flag for project history to true", ->
-				@req.useProjectHistory.should.equal true
+			return it("should set the flag for project history to true", function() {
+				return this.req.useProjectHistory.should.equal(true);
+			});
+		});
 
-		describe "for any other project ", ->
-			beforeEach ->
-				@ProjectDetailsHandler.getDetails = sinon.stub().callsArgWith(1, null, {})
-				@HistoryController.selectHistoryApi @req, @res, @next
+		return describe("for any other project ", function() {
+			beforeEach(function() {
+				this.ProjectDetailsHandler.getDetails = sinon.stub().callsArgWith(1, null, {});
+				return this.HistoryController.selectHistoryApi(this.req, this.res, this.next);
+			});
 
-			it "should not set the flag for project history to false", ->
-				@req.useProjectHistory.should.equal false
+			return it("should not set the flag for project history to false", function() {
+				return this.req.useProjectHistory.should.equal(false);
+			});
+		});
+	});
 
 
-	describe "proxyToHistoryApi", ->
-		beforeEach ->
-			@req = { url: "/mock/url", method: "POST" }
-			@res = "mock-res"
-			@next = sinon.stub()
-			@proxy =
-				events: {}
-				pipe: sinon.stub()
-				on: (event, handler) -> @events[event] = handler
-			@request.returns @proxy
+	describe("proxyToHistoryApi", function() {
+		beforeEach(function() {
+			this.req = { url: "/mock/url", method: "POST" };
+			this.res = "mock-res";
+			this.next = sinon.stub();
+			this.proxy = {
+				events: {},
+				pipe: sinon.stub(),
+				on(event, handler) { return this.events[event] = handler; }
+			};
+			return this.request.returns(this.proxy);
+		});
 
-		describe "for a project with the project history flag", ->
-			beforeEach ->
-				@req.useProjectHistory = true
-				@HistoryController.proxyToHistoryApi @req, @res, @next
+		describe("for a project with the project history flag", function() {
+			beforeEach(function() {
+				this.req.useProjectHistory = true;
+				return this.HistoryController.proxyToHistoryApi(this.req, this.res, this.next);
+			});
 
-			it "should get the user id", ->
-				@AuthenticationController.getLoggedInUserId
-					.calledWith(@req)
-					.should.equal true
+			it("should get the user id", function() {
+				return this.AuthenticationController.getLoggedInUserId
+					.calledWith(this.req)
+					.should.equal(true);
+			});
 
-			it "should call the project history api", ->
-				@request
+			it("should call the project history api", function() {
+				return this.request
 					.calledWith({
-						url: "#{@settings.apis.project_history.url}#{@req.url}"
-						method: @req.method
-						headers:
-							"X-User-Id": @user_id
+						url: `${this.settings.apis.project_history.url}${this.req.url}`,
+						method: this.req.method,
+						headers: {
+							"X-User-Id": this.user_id
+						}
 					})
-					.should.equal true
+					.should.equal(true);
+			});
 
-			it "should pipe the response to the client", ->
-				@proxy.pipe
-					.calledWith(@res)
-					.should.equal true
+			return it("should pipe the response to the client", function() {
+				return this.proxy.pipe
+					.calledWith(this.res)
+					.should.equal(true);
+			});
+		});
 
-		describe "for a project without the project history flag", ->
-			beforeEach ->
-				@req.useProjectHistory = false
-				@HistoryController.proxyToHistoryApi @req, @res, @next
+		describe("for a project without the project history flag", function() {
+			beforeEach(function() {
+				this.req.useProjectHistory = false;
+				return this.HistoryController.proxyToHistoryApi(this.req, this.res, this.next);
+			});
 
-			it "should get the user id", ->
-				@AuthenticationController.getLoggedInUserId
-					.calledWith(@req)
-					.should.equal true
+			it("should get the user id", function() {
+				return this.AuthenticationController.getLoggedInUserId
+					.calledWith(this.req)
+					.should.equal(true);
+			});
 
-			it "should call the track changes api", ->
-				@request
+			it("should call the track changes api", function() {
+				return this.request
 					.calledWith({
-						url: "#{@settings.apis.trackchanges.url}#{@req.url}"
-						method: @req.method
-						headers:
-							"X-User-Id": @user_id
+						url: `${this.settings.apis.trackchanges.url}${this.req.url}`,
+						method: this.req.method,
+						headers: {
+							"X-User-Id": this.user_id
+						}
 					})
-					.should.equal true
+					.should.equal(true);
+			});
 
-			it "should pipe the response to the client", ->
-				@proxy.pipe
-					.calledWith(@res)
-					.should.equal true
+			return it("should pipe the response to the client", function() {
+				return this.proxy.pipe
+					.calledWith(this.res)
+					.should.equal(true);
+			});
+		});
 
-		describe "with an error", ->
-			beforeEach ->
-				@HistoryController.proxyToHistoryApi @req, @res, @next
-				@proxy.events["error"].call(@proxy, @error = new Error("oops"))
+		return describe("with an error", function() {
+			beforeEach(function() {
+				this.HistoryController.proxyToHistoryApi(this.req, this.res, this.next);
+				return this.proxy.events["error"].call(this.proxy, (this.error = new Error("oops")));
+			});
 
-			it "should pass the error up the call chain", ->
-				@next.calledWith(@error).should.equal true
+			return it("should pass the error up the call chain", function() {
+				return this.next.calledWith(this.error).should.equal(true);
+			});
+		});
+	});
 
-	describe "proxyToHistoryApiAndInjectUserDetails", ->
-		beforeEach ->
-			@req = { url: "/mock/url", method: "POST" }
-			@res =
-				json: sinon.stub()
-			@next = sinon.stub()
-			@request.yields(null, {statusCode: 200}, @data = "mock-data")
-			@HistoryManager.injectUserDetails = sinon.stub().yields(null, @data_with_users = "mock-injected-data")
+	describe("proxyToHistoryApiAndInjectUserDetails", function() {
+		beforeEach(function() {
+			this.req = { url: "/mock/url", method: "POST" };
+			this.res =
+				{json: sinon.stub()};
+			this.next = sinon.stub();
+			this.request.yields(null, {statusCode: 200}, (this.data = "mock-data"));
+			return this.HistoryManager.injectUserDetails = sinon.stub().yields(null, (this.data_with_users = "mock-injected-data"));
+		});
 
-		describe "for a project with the project history flag", ->
-			beforeEach ->
-				@req.useProjectHistory = true
-				@HistoryController.proxyToHistoryApiAndInjectUserDetails @req, @res, @next
+		describe("for a project with the project history flag", function() {
+			beforeEach(function() {
+				this.req.useProjectHistory = true;
+				return this.HistoryController.proxyToHistoryApiAndInjectUserDetails(this.req, this.res, this.next);
+			});
 
-			it "should get the user id", ->
-				@AuthenticationController.getLoggedInUserId
-					.calledWith(@req)
-					.should.equal true
+			it("should get the user id", function() {
+				return this.AuthenticationController.getLoggedInUserId
+					.calledWith(this.req)
+					.should.equal(true);
+			});
 
-			it "should call the project history api", ->
-				@request
+			it("should call the project history api", function() {
+				return this.request
 					.calledWith({
-						url: "#{@settings.apis.project_history.url}#{@req.url}"
-						method: @req.method
-						json: true
-						headers:
-							"X-User-Id": @user_id
+						url: `${this.settings.apis.project_history.url}${this.req.url}`,
+						method: this.req.method,
+						json: true,
+						headers: {
+							"X-User-Id": this.user_id
+						}
 					})
-					.should.equal true
+					.should.equal(true);
+			});
 
-			it "should inject the user data", ->
-				@HistoryManager.injectUserDetails
-					.calledWith(@data)
-					.should.equal true
+			it("should inject the user data", function() {
+				return this.HistoryManager.injectUserDetails
+					.calledWith(this.data)
+					.should.equal(true);
+			});
 
-			it "should return the data with users to the client", ->
-				@res.json.calledWith(@data_with_users).should.equal true
+			return it("should return the data with users to the client", function() {
+				return this.res.json.calledWith(this.data_with_users).should.equal(true);
+			});
+		});
 
-		describe "for a project without the project history flag", ->
-			beforeEach ->
-				@req.useProjectHistory = false
-				@HistoryController.proxyToHistoryApiAndInjectUserDetails @req, @res, @next
+		return describe("for a project without the project history flag", function() {
+			beforeEach(function() {
+				this.req.useProjectHistory = false;
+				return this.HistoryController.proxyToHistoryApiAndInjectUserDetails(this.req, this.res, this.next);
+			});
 
-			it "should get the user id", ->
-				@AuthenticationController.getLoggedInUserId
-					.calledWith(@req)
-					.should.equal true
+			it("should get the user id", function() {
+				return this.AuthenticationController.getLoggedInUserId
+					.calledWith(this.req)
+					.should.equal(true);
+			});
 
-			it "should call the track changes api", ->
-				@request
+			it("should call the track changes api", function() {
+				return this.request
 					.calledWith({
-						url: "#{@settings.apis.trackchanges.url}#{@req.url}"
-						method: @req.method
-						json: true
-						headers:
-							"X-User-Id": @user_id
+						url: `${this.settings.apis.trackchanges.url}${this.req.url}`,
+						method: this.req.method,
+						json: true,
+						headers: {
+							"X-User-Id": this.user_id
+						}
 					})
-					.should.equal true
+					.should.equal(true);
+			});
 
-			it "should inject the user data", ->
-				@HistoryManager.injectUserDetails
-					.calledWith(@data)
-					.should.equal true
+			it("should inject the user data", function() {
+				return this.HistoryManager.injectUserDetails
+					.calledWith(this.data)
+					.should.equal(true);
+			});
 
-			it "should return the data with users to the client", ->
-				@res.json.calledWith(@data_with_users).should.equal true
+			return it("should return the data with users to the client", function() {
+				return this.res.json.calledWith(this.data_with_users).should.equal(true);
+			});
+		});
+	});
 
-	describe "proxyToHistoryApiAndInjectUserDetails (with the history API failing)", ->
-		beforeEach ->
-			@req = { url: "/mock/url", method: "POST", useProjectHistory: true }
-			@res = { json: sinon.stub() }
-			@next = sinon.stub()
-			@request.yields(null, {statusCode: 500}, @data = "mock-data")
-			@HistoryManager.injectUserDetails = sinon.stub().yields(null, @data_with_users = "mock-injected-data")
-			@HistoryController.proxyToHistoryApiAndInjectUserDetails @req, @res, @next
+	describe("proxyToHistoryApiAndInjectUserDetails (with the history API failing)", function() {
+		beforeEach(function() {
+			this.req = { url: "/mock/url", method: "POST", useProjectHistory: true };
+			this.res = { json: sinon.stub() };
+			this.next = sinon.stub();
+			this.request.yields(null, {statusCode: 500}, (this.data = "mock-data"));
+			this.HistoryManager.injectUserDetails = sinon.stub().yields(null, (this.data_with_users = "mock-injected-data"));
+			return this.HistoryController.proxyToHistoryApiAndInjectUserDetails(this.req, this.res, this.next);
+		});
 
-		it "should not inject the user data", ->
-			@HistoryManager.injectUserDetails
-				.calledWith(@data)
-				.should.equal false
+		it("should not inject the user data", function() {
+			return this.HistoryManager.injectUserDetails
+				.calledWith(this.data)
+				.should.equal(false);
+		});
 
-		it "should not return the data with users to the client", ->
-			@res.json.calledWith(@data_with_users).should.equal false
+		return it("should not return the data with users to the client", function() {
+			return this.res.json.calledWith(this.data_with_users).should.equal(false);
+		});
+	});
 
-	describe "resyncProjectHistory", ->
-		describe "for a project without project-history enabled", ->
-			beforeEach ->
-				@project_id = 'mock-project-id'
-				@req = params: Project_id: @project_id
-				@res = sendStatus: sinon.stub()
-				@next = sinon.stub()
+	return describe("resyncProjectHistory", function() {
+		describe("for a project without project-history enabled", function() {
+			beforeEach(function() {
+				this.project_id = 'mock-project-id';
+				this.req = {params: {Project_id: this.project_id}};
+				this.res = {sendStatus: sinon.stub()};
+				this.next = sinon.stub();
 
-				@error = new Errors.ProjectHistoryDisabledError()
-				@ProjectEntityUpdateHandler.resyncProjectHistory = sinon.stub().yields(@error)
+				this.error = new Errors.ProjectHistoryDisabledError();
+				this.ProjectEntityUpdateHandler.resyncProjectHistory = sinon.stub().yields(this.error);
 
-				@HistoryController.resyncProjectHistory @req, @res, @next
+				return this.HistoryController.resyncProjectHistory(this.req, this.res, this.next);
+			});
 
-			it "response with a 404", ->
-				@res.sendStatus
+			return it("response with a 404", function() {
+				return this.res.sendStatus
 					.calledWith(404)
-					.should.equal true
+					.should.equal(true);
+			});
+		});
 
-		describe "for a project with project-history enabled", ->
-			beforeEach ->
-				@project_id = 'mock-project-id'
-				@req = params: Project_id: @project_id
-				@res = sendStatus: sinon.stub()
-				@next = sinon.stub()
+		return describe("for a project with project-history enabled", function() {
+			beforeEach(function() {
+				this.project_id = 'mock-project-id';
+				this.req = {params: {Project_id: this.project_id}};
+				this.res = {sendStatus: sinon.stub()};
+				this.next = sinon.stub();
 
-				@ProjectEntityUpdateHandler.resyncProjectHistory = sinon.stub().yields()
+				this.ProjectEntityUpdateHandler.resyncProjectHistory = sinon.stub().yields();
 
-				@HistoryController.resyncProjectHistory @req, @res, @next
+				return this.HistoryController.resyncProjectHistory(this.req, this.res, this.next);
+			});
 
-			it "resyncs the project", ->
-				@ProjectEntityUpdateHandler.resyncProjectHistory
-					.calledWith(@project_id)
-					.should.equal true
+			it("resyncs the project", function() {
+				return this.ProjectEntityUpdateHandler.resyncProjectHistory
+					.calledWith(this.project_id)
+					.should.equal(true);
+			});
 
-			it "responds with a 204", ->
-				@res.sendStatus
+			return it("responds with a 204", function() {
+				return this.res.sendStatus
 					.calledWith(204)
-					.should.equal true
+					.should.equal(true);
+			});
+		});
+	});
+});

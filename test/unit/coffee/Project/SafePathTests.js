@@ -1,205 +1,265 @@
-chai = require('chai')
-assert = require('chai').assert
-should = chai.should()
-expect = chai.expect
-sinon = require 'sinon'
-modulePath = "../../../../app/js/Features/Project/SafePath"
-SandboxedModule = require('sandboxed-module')
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const chai = require('chai');
+const {
+    assert
+} = require('chai');
+const should = chai.should();
+const {
+    expect
+} = chai;
+const sinon = require('sinon');
+const modulePath = "../../../../app/js/Features/Project/SafePath";
+const SandboxedModule = require('sandboxed-module');
 
-describe 'SafePath', ->
-	beforeEach ->
-		@SafePath = SandboxedModule.require modulePath
+describe('SafePath', function() {
+	beforeEach(function() {
+		return this.SafePath = SandboxedModule.require(modulePath);
+	});
 
-	describe 'isCleanFilename', ->
-		it 'should accept a valid filename "main.tex"', ->
-			result = @SafePath.isCleanFilename 'main.tex'
-			result.should.equal true
+	describe('isCleanFilename', function() {
+		it('should accept a valid filename "main.tex"', function() {
+			const result = this.SafePath.isCleanFilename('main.tex');
+			return result.should.equal(true);
+		});
 
-		it 'should not accept an empty filename', ->
-			result = @SafePath.isCleanFilename ''
-			result.should.equal false
+		it('should not accept an empty filename', function() {
+			const result = this.SafePath.isCleanFilename('');
+			return result.should.equal(false);
+		});
 
-		it 'should not accept / anywhere', ->
-			result = @SafePath.isCleanFilename 'foo/bar'
-			result.should.equal false
+		it('should not accept / anywhere', function() {
+			const result = this.SafePath.isCleanFilename('foo/bar');
+			return result.should.equal(false);
+		});
 
-		it 'should not accept .', ->
-			result = @SafePath.isCleanFilename '.'
-			result.should.equal false
+		it('should not accept .', function() {
+			const result = this.SafePath.isCleanFilename('.');
+			return result.should.equal(false);
+		});
 
-		it 'should not accept ..', ->
-			result = @SafePath.isCleanFilename '..'
-			result.should.equal false
+		it('should not accept ..', function() {
+			const result = this.SafePath.isCleanFilename('..');
+			return result.should.equal(false);
+		});
 
-		it 'should not accept * anywhere', ->
-			result = @SafePath.isCleanFilename 'foo*bar'
-			result.should.equal false
+		it('should not accept * anywhere', function() {
+			const result = this.SafePath.isCleanFilename('foo*bar');
+			return result.should.equal(false);
+		});
 
-		it 'should not accept leading whitespace', ->
-			result = @SafePath.isCleanFilename ' foobar.tex'
-			result.should.equal false
+		it('should not accept leading whitespace', function() {
+			const result = this.SafePath.isCleanFilename(' foobar.tex');
+			return result.should.equal(false);
+		});
 
-		it 'should not accept trailing whitespace', ->
-			result = @SafePath.isCleanFilename 'foobar.tex '
-			result.should.equal false
+		it('should not accept trailing whitespace', function() {
+			const result = this.SafePath.isCleanFilename('foobar.tex ');
+			return result.should.equal(false);
+		});
 
-		it 'should not accept leading and trailing whitespace', ->
-			result = @SafePath.isCleanFilename ' foobar.tex '
-			result.should.equal false
+		it('should not accept leading and trailing whitespace', function() {
+			const result = this.SafePath.isCleanFilename(' foobar.tex ');
+			return result.should.equal(false);
+		});
 
-		it 'should not accept control characters (0-31)', ->
-			result = @SafePath.isCleanFilename 'foo\u0010bar'
-			result.should.equal false
+		it('should not accept control characters (0-31)', function() {
+			const result = this.SafePath.isCleanFilename('foo\u0010bar');
+			return result.should.equal(false);
+		});
 
-		it 'should not accept control characters (127, delete)', ->
-			result = @SafePath.isCleanFilename 'foo\u007fbar'
-			result.should.equal false
+		it('should not accept control characters (127, delete)', function() {
+			const result = this.SafePath.isCleanFilename('foo\u007fbar');
+			return result.should.equal(false);
+		});
 
-		it 'should not accept control characters (128-159)', ->
-			result = @SafePath.isCleanFilename 'foo\u0080\u0090bar'
-			result.should.equal false
+		it('should not accept control characters (128-159)', function() {
+			const result = this.SafePath.isCleanFilename('foo\u0080\u0090bar');
+			return result.should.equal(false);
+		});
 
-		it 'should not accept surrogate characters (128-159)', ->
-			result = @SafePath.isCleanFilename 'foo\uD800\uDFFFbar'
-			result.should.equal false
+		it('should not accept surrogate characters (128-159)', function() {
+			const result = this.SafePath.isCleanFilename('foo\uD800\uDFFFbar');
+			return result.should.equal(false);
+		});
 
-		it 'should accept javascript property names', ->
-			result = @SafePath.isCleanFilename 'prototype'
-			result.should.equal true
+		it('should accept javascript property names', function() {
+			const result = this.SafePath.isCleanFilename('prototype');
+			return result.should.equal(true);
+		});
 
-		it 'should accept javascript property names in the prototype', ->
-			result = @SafePath.isCleanFilename 'hasOwnProperty'
-			result.should.equal true
+		it('should accept javascript property names in the prototype', function() {
+			const result = this.SafePath.isCleanFilename('hasOwnProperty');
+			return result.should.equal(true);
+		});
 
-		# this test never worked correctly because the spaces are not replaced by underscores in isCleanFilename
-		# it 'should not accept javascript property names resulting from substitutions', ->
-		# 	result = @SafePath.isCleanFilename '  proto  '
-		# 	result.should.equal false
+		// this test never worked correctly because the spaces are not replaced by underscores in isCleanFilename
+		// it 'should not accept javascript property names resulting from substitutions', ->
+		// 	result = @SafePath.isCleanFilename '  proto  '
+		// 	result.should.equal false
 
-		# it 'should not accept a trailing .', ->
-		# 	result = @SafePath.isCleanFilename 'hello.'
-		# 	result.should.equal false
+		// it 'should not accept a trailing .', ->
+		// 	result = @SafePath.isCleanFilename 'hello.'
+		// 	result.should.equal false
 
-		it 'should not accept \\', ->
-			result = @SafePath.isCleanFilename 'foo\\bar'
-			result.should.equal false
+		return it('should not accept \\', function() {
+			const result = this.SafePath.isCleanFilename('foo\\bar');
+			return result.should.equal(false);
+		});
+	});
 
-	describe 'isCleanPath', ->
-		it 'should accept a valid filename "main.tex"', ->
-			result = @SafePath.isCleanPath 'main.tex'
-			result.should.equal true
+	describe('isCleanPath', function() {
+		it('should accept a valid filename "main.tex"', function() {
+			const result = this.SafePath.isCleanPath('main.tex');
+			return result.should.equal(true);
+		});
 
-		it 'should accept a valid path "foo/main.tex"', ->
-			result = @SafePath.isCleanPath 'foo/main.tex'
-			result.should.equal true
+		it('should accept a valid path "foo/main.tex"', function() {
+			const result = this.SafePath.isCleanPath('foo/main.tex');
+			return result.should.equal(true);
+		});
 
-		it 'should accept empty path elements', ->
-			result = @SafePath.isCleanPath 'foo//main.tex'
-			result.should.equal true
+		it('should accept empty path elements', function() {
+			const result = this.SafePath.isCleanPath('foo//main.tex');
+			return result.should.equal(true);
+		});
 
-		it 'should not accept an empty filename', ->
-			result = @SafePath.isCleanPath 'foo/bar/'
-			result.should.equal false
+		it('should not accept an empty filename', function() {
+			const result = this.SafePath.isCleanPath('foo/bar/');
+			return result.should.equal(false);
+		});
 
-		it 'should accept a path that starts with a slash', ->
-			result = @SafePath.isCleanPath '/etc/passwd'
-			result.should.equal true
+		it('should accept a path that starts with a slash', function() {
+			const result = this.SafePath.isCleanPath('/etc/passwd');
+			return result.should.equal(true);
+		});
 
-		it 'should not accept a path that has an asterisk as the 0th element', ->
-			result = @SafePath.isCleanPath '*/foo/bar'
-			result.should.equal false
+		it('should not accept a path that has an asterisk as the 0th element', function() {
+			const result = this.SafePath.isCleanPath('*/foo/bar');
+			return result.should.equal(false);
+		});
 
-		it 'should not accept a path that has an asterisk as a middle element', ->
-			result = @SafePath.isCleanPath 'foo/*/bar'
-			result.should.equal false
+		it('should not accept a path that has an asterisk as a middle element', function() {
+			const result = this.SafePath.isCleanPath('foo/*/bar');
+			return result.should.equal(false);
+		});
 
-		it 'should not accept a path that has an asterisk as the filename', ->
-			result = @SafePath.isCleanPath 'foo/bar/*'
-			result.should.equal false
+		it('should not accept a path that has an asterisk as the filename', function() {
+			const result = this.SafePath.isCleanPath('foo/bar/*');
+			return result.should.equal(false);
+		});
 
-		it 'should not accept a path that contains an asterisk in the 0th element', ->
-			result = @SafePath.isCleanPath 'f*o/bar/baz'
-			result.should.equal false
+		it('should not accept a path that contains an asterisk in the 0th element', function() {
+			const result = this.SafePath.isCleanPath('f*o/bar/baz');
+			return result.should.equal(false);
+		});
 
-		it 'should not accept a path that contains an asterisk in a middle element', ->
-			result = @SafePath.isCleanPath 'foo/b*r/baz'
-			result.should.equal false
+		it('should not accept a path that contains an asterisk in a middle element', function() {
+			const result = this.SafePath.isCleanPath('foo/b*r/baz');
+			return result.should.equal(false);
+		});
 
-		it 'should not accept a path that contains an asterisk in the filename', ->
-			result = @SafePath.isCleanPath 'foo/bar/b*z'
-			result.should.equal false
+		it('should not accept a path that contains an asterisk in the filename', function() {
+			const result = this.SafePath.isCleanPath('foo/bar/b*z');
+			return result.should.equal(false);
+		});
 
-		it 'should not accept multiple problematic elements', ->
-			result = @SafePath.isCleanPath 'f*o/b*r/b*z'
-			result.should.equal false
+		it('should not accept multiple problematic elements', function() {
+			const result = this.SafePath.isCleanPath('f*o/b*r/b*z');
+			return result.should.equal(false);
+		});
 
-		it 'should not accept a problematic path with an empty element', ->
-			result = @SafePath.isCleanPath 'foo//*/bar'
-			result.should.equal false
+		it('should not accept a problematic path with an empty element', function() {
+			const result = this.SafePath.isCleanPath('foo//*/bar');
+			return result.should.equal(false);
+		});
 
-		it 'should not accept javascript property names', ->
-			result = @SafePath.isCleanPath 'prototype'
-			result.should.equal false
+		it('should not accept javascript property names', function() {
+			const result = this.SafePath.isCleanPath('prototype');
+			return result.should.equal(false);
+		});
 
-		it 'should not accept javascript property names in the prototype', ->
-			result = @SafePath.isCleanPath 'hasOwnProperty'
-			result.should.equal false
+		it('should not accept javascript property names in the prototype', function() {
+			const result = this.SafePath.isCleanPath('hasOwnProperty');
+			return result.should.equal(false);
+		});
 
-		it 'should not accept javascript property names resulting from substitutions', ->
-			result = @SafePath.isCleanPath '  proto  '
-			result.should.equal false
+		return it('should not accept javascript property names resulting from substitutions', function() {
+			const result = this.SafePath.isCleanPath('  proto  ');
+			return result.should.equal(false);
+		});
+	});
 
-	describe 'isAllowedLength', ->
-		it 'should accept a valid path "main.tex"', ->
-			result = @SafePath.isAllowedLength 'main.tex'
-			result.should.equal true
+	describe('isAllowedLength', function() {
+		it('should accept a valid path "main.tex"', function() {
+			const result = this.SafePath.isAllowedLength('main.tex');
+			return result.should.equal(true);
+		});
 
-		it 'should not accept an extremely long path', ->
-			longPath =  new Array(1000).join("/subdir") + '/main.tex'
-			result = @SafePath.isAllowedLength longPath
-			result.should.equal false
+		it('should not accept an extremely long path', function() {
+			const longPath =  new Array(1000).join("/subdir") + '/main.tex';
+			const result = this.SafePath.isAllowedLength(longPath);
+			return result.should.equal(false);
+		});
 
-		it 'should not accept an empty path', ->
-			result = @SafePath.isAllowedLength ''
-			result.should.equal false
+		return it('should not accept an empty path', function() {
+			const result = this.SafePath.isAllowedLength('');
+			return result.should.equal(false);
+		});
+	});
 
-	describe 'clean', ->
-		it 'should not modify a valid filename', ->
-			result = @SafePath.clean 'main.tex'
-			result.should.equal 'main.tex'
+	return describe('clean', function() {
+		it('should not modify a valid filename', function() {
+			const result = this.SafePath.clean('main.tex');
+			return result.should.equal('main.tex');
+		});
 
-		it 'should replace invalid characters with _', ->
-			result = @SafePath.clean 'foo/bar*/main.tex'
-			result.should.equal 'foo_bar__main.tex'
+		it('should replace invalid characters with _', function() {
+			const result = this.SafePath.clean('foo/bar*/main.tex');
+			return result.should.equal('foo_bar__main.tex');
+		});
 
-		it 'should replace "." with "_"', ->
-			result = @SafePath.clean '.'
-			result.should.equal '_'
+		it('should replace "." with "_"', function() {
+			const result = this.SafePath.clean('.');
+			return result.should.equal('_');
+		});
 
-		it 'should replace ".." with "__"', ->
-			result = @SafePath.clean '..'
-			result.should.equal '__'
+		it('should replace ".." with "__"', function() {
+			const result = this.SafePath.clean('..');
+			return result.should.equal('__');
+		});
 
-		it 'should replace a single trailing space with _', ->
-			result = @SafePath.clean 'foo '
-			result.should.equal 'foo_'
+		it('should replace a single trailing space with _', function() {
+			const result = this.SafePath.clean('foo ');
+			return result.should.equal('foo_');
+		});
 
-		it 'should replace a multiple trailing spaces with ___', ->
-			result = @SafePath.clean 'foo  '
-			result.should.equal 'foo__'
+		it('should replace a multiple trailing spaces with ___', function() {
+			const result = this.SafePath.clean('foo  ');
+			return result.should.equal('foo__');
+		});
 
-		it 'should replace a single leading space with _', ->
-			result = @SafePath.clean ' foo'
-			result.should.equal '_foo'
+		it('should replace a single leading space with _', function() {
+			const result = this.SafePath.clean(' foo');
+			return result.should.equal('_foo');
+		});
 
-		it 'should replace a multiple leading spaces with ___', ->
-			result = @SafePath.clean '  foo'
-			result.should.equal '__foo'
+		it('should replace a multiple leading spaces with ___', function() {
+			const result = this.SafePath.clean('  foo');
+			return result.should.equal('__foo');
+		});
 
-		it 'should prefix javascript property names with @', ->
-			result = @SafePath.clean 'prototype'
-			result.should.equal '@prototype'
+		it('should prefix javascript property names with @', function() {
+			const result = this.SafePath.clean('prototype');
+			return result.should.equal('@prototype');
+		});
 
-		it 'should prefix javascript property names in the prototype with @', ->
-			result = @SafePath.clean 'hasOwnProperty'
-			result.should.equal '@hasOwnProperty'
+		return it('should prefix javascript property names in the prototype with @', function() {
+			const result = this.SafePath.clean('hasOwnProperty');
+			return result.should.equal('@hasOwnProperty');
+		});
+	});
+});

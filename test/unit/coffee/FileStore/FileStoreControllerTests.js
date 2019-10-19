@@ -1,136 +1,185 @@
-assert = require("chai").assert
-sinon = require('sinon')
-chai = require('chai')
-should = chai.should()
-expect = chai.expect
-modulePath = "../../../../app/js/Features/FileStore/FileStoreController.js"
-SandboxedModule = require('sandboxed-module')
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const {
+    assert
+} = require("chai");
+const sinon = require('sinon');
+const chai = require('chai');
+const should = chai.should();
+const {
+    expect
+} = chai;
+const modulePath = "../../../../app/js/Features/FileStore/FileStoreController.js";
+const SandboxedModule = require('sandboxed-module');
 
-describe "FileStoreController", ->
+describe("FileStoreController", function() {
 
-	beforeEach ->
-		@FileStoreHandler =
-			getFileStream: sinon.stub()
-		@ProjectLocator =
-			findElement: sinon.stub()
-		@controller = SandboxedModule.require modulePath, requires:
-			"settings-sharelatex": @settings
-			"logger-sharelatex" : @logger = {log:sinon.stub(), err:sinon.stub()}
-			"../Project/ProjectLocator": @ProjectLocator
-			"./FileStoreHandler": @FileStoreHandler
-		@stream = {}
-		@project_id = "2k3j1lk3j21lk3j"
-		@file_id = "12321kklj1lk3jk12"
-		@req =
-			params:
-				Project_id: @project_id
-				File_id: @file_id
-			query: "query string here"
-			get: (key) -> undefined
-		@res =
-			setHeader: sinon.stub()
+	beforeEach(function() {
+		this.FileStoreHandler =
+			{getFileStream: sinon.stub()};
+		this.ProjectLocator =
+			{findElement: sinon.stub()};
+		this.controller = SandboxedModule.require(modulePath, { requires: {
+			"settings-sharelatex": this.settings,
+			"logger-sharelatex" : (this.logger = {log:sinon.stub(), err:sinon.stub()}),
+			"../Project/ProjectLocator": this.ProjectLocator,
+			"./FileStoreHandler": this.FileStoreHandler
+		}
+	}
+		);
+		this.stream = {};
+		this.project_id = "2k3j1lk3j21lk3j";
+		this.file_id = "12321kklj1lk3jk12";
+		this.req = {
+			params: {
+				Project_id: this.project_id,
+				File_id: this.file_id
+			},
+			query: "query string here",
+			get(key) { return undefined; }
+		};
+		this.res = {
+			setHeader: sinon.stub(),
 			setContentDisposition: sinon.stub()
-		@file =
-			name: "myfile.png"
+		};
+		return this.file =
+			{name: "myfile.png"};
+	});
 
-	describe "getFile", ->
+	return describe("getFile", function() {
 
-		beforeEach ->
-			@FileStoreHandler.getFileStream.callsArgWith(3, null, @stream)
-			@ProjectLocator.findElement.callsArgWith(1, null, @file)
+		beforeEach(function() {
+			this.FileStoreHandler.getFileStream.callsArgWith(3, null, this.stream);
+			return this.ProjectLocator.findElement.callsArgWith(1, null, this.file);
+		});
 
-		it "should call the file store handler with the project_id file_id and any query string", (done)->
-			@stream.pipe = (des)=>
-				@FileStoreHandler.getFileStream.calledWith(@req.params.Project_id, @req.params.File_id, @req.query).should.equal true
-				done()
-			@controller.getFile @req, @res
+		it("should call the file store handler with the project_id file_id and any query string", function(done){
+			this.stream.pipe = des=> {
+				this.FileStoreHandler.getFileStream.calledWith(this.req.params.Project_id, this.req.params.File_id, this.req.query).should.equal(true);
+				return done();
+			};
+			return this.controller.getFile(this.req, this.res);
+		});
 
-		it "should pipe to res", (done)->
-			@stream.pipe = (des)=>
-				des.should.equal @res
-				done()
-			@controller.getFile @req, @res
+		it("should pipe to res", function(done){
+			this.stream.pipe = des=> {
+				des.should.equal(this.res);
+				return done();
+			};
+			return this.controller.getFile(this.req, this.res);
+		});
 
-		it "should get the file from the db", (done)->
-			@stream.pipe = (des)=>
-				opts =
-					project_id: @project_id
-					element_id: @file_id
+		it("should get the file from the db", function(done){
+			this.stream.pipe = des=> {
+				const opts = {
+					project_id: this.project_id,
+					element_id: this.file_id,
 					type: "file"
-				@ProjectLocator.findElement.calledWith(opts).should.equal true
-				done()
-			@controller.getFile @req, @res
+				};
+				this.ProjectLocator.findElement.calledWith(opts).should.equal(true);
+				return done();
+			};
+			return this.controller.getFile(this.req, this.res);
+		});
 
-		it "should set the Content-Disposition header", (done)->
-			@stream.pipe = (des)=>
-				@res.setContentDisposition.calledWith(
-					"attachment", {filename: @file.name}
-				).should.equal true
-				done()
-			@controller.getFile @req, @res
+		it("should set the Content-Disposition header", function(done){
+			this.stream.pipe = des=> {
+				this.res.setContentDisposition.calledWith(
+					"attachment", {filename: this.file.name}
+				).should.equal(true);
+				return done();
+			};
+			return this.controller.getFile(this.req, this.res);
+		});
 
-		# Test behaviour around handling html files
-		['.html', '.htm', '.xhtml'].forEach (extension) ->
-			describe "with a '#{extension}' file extension", ->
+		// Test behaviour around handling html files
+		['.html', '.htm', '.xhtml'].forEach(extension => describe(`with a '${extension}' file extension`, function() {
 
-				beforeEach ->
-					@file.name = "bad#{extension}"
-					@req.get = (key) =>
-						if key == 'User-Agent'
-							return 'A generic browser'
+            beforeEach(function() {
+                this.file.name = `bad${extension}`;
+                return this.req.get = key => {
+                    if (key === 'User-Agent') {
+                        return 'A generic browser';
+                    }
+                };
+            });
 
-				describe "from a non-ios browser", ->
+            describe("from a non-ios browser", () => it("should not set Content-Type", function(done) {
+                this.stream.pipe = des => {
+                    this.res.setHeader.calledWith("Content-Type", "text/plain").should.equal(false);
+                    return done();
+                };
+                return this.controller.getFile(this.req, this.res);
+            }));
 
-					it "should not set Content-Type", (done) ->
-						@stream.pipe = (des) =>
-							@res.setHeader.calledWith("Content-Type", "text/plain").should.equal false
-							done()
-						@controller.getFile @req, @res
+            describe("from an iPhone", function() {
 
-				describe "from an iPhone", ->
+                beforeEach(function() {
+                    return this.req.get = key => {
+                        if (key === 'User-Agent') {
+                            return "An iPhone browser";
+                        }
+                    };
+                });
 
-					beforeEach ->
-						@req.get = (key) =>
-							if key == 'User-Agent'
-								return "An iPhone browser"
+                return it("should set Content-Type to 'text/plain'", function(done) {
+                    this.stream.pipe = des => {
+                        this.res.setHeader.calledWith("Content-Type", "text/plain").should.equal(true);
+                        return done();
+                    };
+                    return this.controller.getFile(this.req, this.res);
+                });
+            });
 
-					it "should set Content-Type to 'text/plain'", (done) ->
-						@stream.pipe = (des) =>
-							@res.setHeader.calledWith("Content-Type", "text/plain").should.equal true
-							done()
-						@controller.getFile @req, @res
+            return describe("from an iPad", function() {
 
-				describe "from an iPad", ->
+                beforeEach(function() {
+                    return this.req.get = key => {
+                        if (key === 'User-Agent') {
+                            return "An iPad browser";
+                        }
+                    };
+                });
 
-					beforeEach ->
-						@req.get = (key) =>
-							if key == 'User-Agent'
-								return "An iPad browser"
+                return it("should set Content-Type to 'text/plain'", function(done) {
+                    this.stream.pipe = des => {
+                        this.res.setHeader.calledWith("Content-Type", "text/plain").should.equal(true);
+                        return done();
+                    };
+                    return this.controller.getFile(this.req, this.res);
+                });
+            });
+        }));
 
-					it "should set Content-Type to 'text/plain'", (done) ->
-						@stream.pipe = (des) =>
-							@res.setHeader.calledWith("Content-Type", "text/plain").should.equal true
-							done()
-						@controller.getFile @req, @res
+		// None of these should trigger the iOS/html logic
+		return ['x.html-is-rad', 'html.pdf', '.html-is-good-for-hidden-files', 'somefile'].forEach(filename => describe(`with filename as '${filename}'`, function() {
 
-		# None of these should trigger the iOS/html logic
-		['x.html-is-rad', 'html.pdf', '.html-is-good-for-hidden-files', 'somefile'].forEach (filename) ->
-			describe "with filename as '#{filename}'", ->
+            beforeEach(function() {
+                this.user_agent = 'A generic browser';
+                this.file.name = filename;
+                return this.req.get = key => {
+                    if (key === 'User-Agent') {
+                        return this.user_agent;
+                    }
+                };
+            });
 
-				beforeEach ->
-					@user_agent = 'A generic browser'
-					@file.name = filename
-					@req.get = (key) =>
-						if key == 'User-Agent'
-							@user_agent
+            return ['iPhone', 'iPad', 'Firefox', 'Chrome'].forEach(browser => describe(`downloaded from ${browser}`, function() {
+                beforeEach(function() {
+                    return this.user_agent = `Some ${browser} thing`;
+                });
 
-				['iPhone', 'iPad', 'Firefox', 'Chrome'].forEach (browser) ->
-					describe "downloaded from #{browser}", ->
-						beforeEach ->
-							@user_agent = "Some #{browser} thing"
-
-						it 'Should not set the Content-type', (done) ->
-							@stream.pipe = (des) =>
-								@res.setHeader.calledWith("Content-Type", "text/plain").should.equal false
-								done()
-							@controller.getFile @req, @res
+                return it('Should not set the Content-type', function(done) {
+                    this.stream.pipe = des => {
+                        this.res.setHeader.calledWith("Content-Type", "text/plain").should.equal(false);
+                        return done();
+                    };
+                    return this.controller.getFile(this.req, this.res);
+                });
+            }));
+        }));
+	});
+});

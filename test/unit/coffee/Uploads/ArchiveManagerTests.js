@@ -1,325 +1,435 @@
-sinon = require('sinon')
-expect = require("chai").expect
-chai = require('chai')
-should = chai.should()
-modulePath = "../../../../app/js/Features/Uploads/ArchiveManager.js"
-Errors = require("../../../../app/js/Features/Errors/Errors")
-SandboxedModule = require('sandboxed-module')
-events = require "events"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS206: Consider reworking classes to avoid initClass
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const sinon = require('sinon');
+const {
+    expect
+} = require("chai");
+const chai = require('chai');
+const should = chai.should();
+const modulePath = "../../../../app/js/Features/Uploads/ArchiveManager.js";
+const Errors = require("../../../../app/js/Features/Errors/Errors");
+const SandboxedModule = require('sandboxed-module');
+const events = require("events");
 
-describe "ArchiveManager", ->
-	beforeEach ->
-		@logger =
-			error: sinon.stub()
-			warn: sinon.stub()
-			err:->
+describe("ArchiveManager", function() {
+	beforeEach(function() {
+		let Timer;
+		this.logger = {
+			error: sinon.stub(),
+			warn: sinon.stub(),
+			err() {},
 			log: sinon.stub()
-		@metrics =
-			Timer: class Timer
-				done: sinon.stub()
-		@zipfile = new events.EventEmitter
-		@zipfile.readEntry = sinon.stub()
-		@zipfile.close = sinon.stub()
+		};
+		this.metrics = {
+			Timer: (Timer = (function() {
+				Timer = class Timer {
+					static initClass() {
+						this.prototype.done = sinon.stub();
+					}
+				};
+				Timer.initClass();
+				return Timer;
+			})())
+		};
+		this.zipfile = new events.EventEmitter;
+		this.zipfile.readEntry = sinon.stub();
+		this.zipfile.close = sinon.stub();
 
-		@ArchiveManager = SandboxedModule.require modulePath, requires:
-			"yauzl": @yauzl = {open: sinon.stub().callsArgWith(2, null, @zipfile)}
-			"logger-sharelatex": @logger
-			"metrics-sharelatex": @metrics
-			"fs": @fs = {}
-			"fs-extra": @fse = {}
-		@callback = sinon.stub()
+		this.ArchiveManager = SandboxedModule.require(modulePath, { requires: {
+			"yauzl": (this.yauzl = {open: sinon.stub().callsArgWith(2, null, this.zipfile)}),
+			"logger-sharelatex": this.logger,
+			"metrics-sharelatex": this.metrics,
+			"fs": (this.fs = {}),
+			"fs-extra": (this.fse = {})
+		}
+	});
+		return this.callback = sinon.stub();
+	});
 	
-	describe "extractZipArchive", ->
-		beforeEach ->
-			@source = "/path/to/zip/source.zip"
-			@destination = "/path/to/zip/destination"
-			@ArchiveManager._isZipTooLarge = sinon.stub().callsArgWith(1, null, false)
+	describe("extractZipArchive", function() {
+		beforeEach(function() {
+			this.source = "/path/to/zip/source.zip";
+			this.destination = "/path/to/zip/destination";
+			return this.ArchiveManager._isZipTooLarge = sinon.stub().callsArgWith(1, null, false);
+		});
 
-		describe "successfully", ->
-			beforeEach (done) ->
-				@ArchiveManager.extractZipArchive @source, @destination, done
-				@zipfile.emit "end"
+		describe("successfully", function() {
+			beforeEach(function(done) {
+				this.ArchiveManager.extractZipArchive(this.source, this.destination, done);
+				return this.zipfile.emit("end");
+			});
 
-			it "should run yauzl", ->
-				@yauzl.open.calledWith(@source).should.equal true
+			it("should run yauzl", function() {
+				return this.yauzl.open.calledWith(this.source).should.equal(true);
+			});
 
-			it "should time the unzip", ->
-				@metrics.Timer::done.called.should.equal true
+			it("should time the unzip", function() {
+				return this.metrics.Timer.prototype.done.called.should.equal(true);
+			});
 
-			it "should log the unzip", ->
-				@logger.log.calledWith(sinon.match.any, "unzipping file").should.equal true
+			return it("should log the unzip", function() {
+				return this.logger.log.calledWith(sinon.match.any, "unzipping file").should.equal(true);
+			});
+		});
 
-		describe "with an error in the zip file header", ->
-			beforeEach (done) ->
-				@yauzl.open = sinon.stub().callsArgWith(2, new Errors.InvalidError("invalid_zip_file"))
-				@ArchiveManager.extractZipArchive @source, @destination, (error) =>
-					@callback(error)
-					done()
+		describe("with an error in the zip file header", function() {
+			beforeEach(function(done) {
+				this.yauzl.open = sinon.stub().callsArgWith(2, new Errors.InvalidError("invalid_zip_file"));
+				return this.ArchiveManager.extractZipArchive(this.source, this.destination, error => {
+					this.callback(error);
+					return done();
+				});
+			});
 
-			it "should return the callback with an error", ->
-				sinon.assert.calledWithExactly(@callback, new Errors.InvalidError("invalid_zip_file"))
+			it("should return the callback with an error", function() {
+				return sinon.assert.calledWithExactly(this.callback, new Errors.InvalidError("invalid_zip_file"));
+			});
 
-			it "should log out the error", ->
-				@logger.error.called.should.equal true
+			return it("should log out the error", function() {
+				return this.logger.error.called.should.equal(true);
+			});
+		});
 
-		describe "with a zip that is too large", ->
-			beforeEach (done) ->
-				@ArchiveManager._isZipTooLarge = sinon.stub().callsArgWith(1, null, true)
-				@ArchiveManager.extractZipArchive @source, @destination, (error) =>
-					@callback(error)
-					done()
+		describe("with a zip that is too large", function() {
+			beforeEach(function(done) {
+				this.ArchiveManager._isZipTooLarge = sinon.stub().callsArgWith(1, null, true);
+				return this.ArchiveManager.extractZipArchive(this.source, this.destination, error => {
+					this.callback(error);
+					return done();
+				});
+			});
 
-			it "should return the callback with an error", ->
-				sinon.assert.calledWithExactly(@callback, new Errors.InvalidError("zip_contents_too_large"))
+			it("should return the callback with an error", function() {
+				return sinon.assert.calledWithExactly(this.callback, new Errors.InvalidError("zip_contents_too_large"));
+			});
 
-			it "should not call yauzl.open", ->
-				@yauzl.open.called.should.equal false
+			return it("should not call yauzl.open", function() {
+				return this.yauzl.open.called.should.equal(false);
+			});
+		});
 
-		describe "with an error in the extracted files", ->
-			beforeEach (done) ->
-				@ArchiveManager.extractZipArchive @source, @destination, (error) =>
-					@callback(error)
-					done()
-				@zipfile.emit "error", new Error("Something went wrong")
+		describe("with an error in the extracted files", function() {
+			beforeEach(function(done) {
+				this.ArchiveManager.extractZipArchive(this.source, this.destination, error => {
+					this.callback(error);
+					return done();
+				});
+				return this.zipfile.emit("error", new Error("Something went wrong"));
+			});
 
-			it "should return the callback with an error", ->
-				@callback.calledWithExactly(new Error("Something went wrong")).should.equal true
+			it("should return the callback with an error", function() {
+				return this.callback.calledWithExactly(new Error("Something went wrong")).should.equal(true);
+			});
 
-			it "should log out the error", ->
-				@logger.error.called.should.equal true
+			return it("should log out the error", function() {
+				return this.logger.error.called.should.equal(true);
+			});
+		});
 
-		describe "with a relative extracted file path", ->
-			beforeEach (done) ->
-				@zipfile.openReadStream = sinon.stub()
-				@ArchiveManager.extractZipArchive @source, @destination, (error) =>
-					@callback(error)
-					done()
-				@zipfile.emit "entry", {fileName: "../testfile.txt"}
-				@zipfile.emit "end"
+		describe("with a relative extracted file path", function() {
+			beforeEach(function(done) {
+				this.zipfile.openReadStream = sinon.stub();
+				this.ArchiveManager.extractZipArchive(this.source, this.destination, error => {
+					this.callback(error);
+					return done();
+				});
+				this.zipfile.emit("entry", {fileName: "../testfile.txt"});
+				return this.zipfile.emit("end");
+			});
 
-			it "should not write try to read the file entry", ->
-				@zipfile.openReadStream.called.should.equal false
+			it("should not write try to read the file entry", function() {
+				return this.zipfile.openReadStream.called.should.equal(false);
+			});
 
-			it "should log out a warning", ->
-				@logger.warn.called.should.equal true
+			return it("should log out a warning", function() {
+				return this.logger.warn.called.should.equal(true);
+			});
+		});
 
-		describe "with an unnormalized extracted file path", ->
-			beforeEach (done) ->
-				@zipfile.openReadStream = sinon.stub()
-				@ArchiveManager.extractZipArchive @source, @destination, (error) =>
-					@callback(error)
-					done()
-				@zipfile.emit "entry", {fileName: "foo/./testfile.txt"}
-				@zipfile.emit "end"
+		describe("with an unnormalized extracted file path", function() {
+			beforeEach(function(done) {
+				this.zipfile.openReadStream = sinon.stub();
+				this.ArchiveManager.extractZipArchive(this.source, this.destination, error => {
+					this.callback(error);
+					return done();
+				});
+				this.zipfile.emit("entry", {fileName: "foo/./testfile.txt"});
+				return this.zipfile.emit("end");
+			});
 
-			it "should not try to read the file entry", ->
-				@zipfile.openReadStream.called.should.equal false
+			it("should not try to read the file entry", function() {
+				return this.zipfile.openReadStream.called.should.equal(false);
+			});
 
-			it "should log out a warning", ->
-				@logger.warn.called.should.equal true
+			return it("should log out a warning", function() {
+				return this.logger.warn.called.should.equal(true);
+			});
+		});
 
-		describe "with backslashes in the path", ->
-			beforeEach (done) ->
-				@readStream = new events.EventEmitter
-				@readStream.pipe = sinon.stub()
-				@writeStream = new events.EventEmitter
-				@fs.createWriteStream = sinon.stub().returns @writeStream
-				@zipfile.openReadStream = sinon.stub().callsArgWith(1, null, @readStream)
-				@fse.ensureDir = sinon.stub().callsArg(1)
-				@ArchiveManager.extractZipArchive @source, @destination, (error) =>
-					@callback(error)
-					done()
-				@zipfile.emit "entry", {fileName: 'wombat\\foo.tex'}
-				@zipfile.emit "entry", {fileName: 'potato\\bar.tex'}
-				@zipfile.emit "end"
+		describe("with backslashes in the path", function() {
+			beforeEach(function(done) {
+				this.readStream = new events.EventEmitter;
+				this.readStream.pipe = sinon.stub();
+				this.writeStream = new events.EventEmitter;
+				this.fs.createWriteStream = sinon.stub().returns(this.writeStream);
+				this.zipfile.openReadStream = sinon.stub().callsArgWith(1, null, this.readStream);
+				this.fse.ensureDir = sinon.stub().callsArg(1);
+				this.ArchiveManager.extractZipArchive(this.source, this.destination, error => {
+					this.callback(error);
+					return done();
+				});
+				this.zipfile.emit("entry", {fileName: 'wombat\\foo.tex'});
+				this.zipfile.emit("entry", {fileName: 'potato\\bar.tex'});
+				return this.zipfile.emit("end");
+			});
 
-			it "should read the file entry with its original path", ->
-				@zipfile.openReadStream.should.be.calledWith({fileName: 'wombat\\foo.tex'})
-				@zipfile.openReadStream.should.be.calledWith({fileName: 'potato\\bar.tex'})
+			it("should read the file entry with its original path", function() {
+				this.zipfile.openReadStream.should.be.calledWith({fileName: 'wombat\\foo.tex'});
+				return this.zipfile.openReadStream.should.be.calledWith({fileName: 'potato\\bar.tex'});
+			});
 
-			it "should treat the backslashes as a directory separator when creating the directory", ->
-				@fse.ensureDir.should.be.calledWith("#{@destination}/wombat");
-				@fse.ensureDir.should.be.calledWith("#{@destination}/potato");
+			it("should treat the backslashes as a directory separator when creating the directory", function() {
+				this.fse.ensureDir.should.be.calledWith(`${this.destination}/wombat`);
+				return this.fse.ensureDir.should.be.calledWith(`${this.destination}/potato`);
+			});
 
-			it "should treat the backslashes as a directory separator when creating the file", ->
-				@fs.createWriteStream.should.be.calledWith("#{@destination}/wombat/foo.tex");
-				@fs.createWriteStream.should.be.calledWith("#{@destination}/potato/bar.tex");
+			return it("should treat the backslashes as a directory separator when creating the file", function() {
+				this.fs.createWriteStream.should.be.calledWith(`${this.destination}/wombat/foo.tex`);
+				return this.fs.createWriteStream.should.be.calledWith(`${this.destination}/potato/bar.tex`);
+			});
+		});
 
-		describe "with a directory entry", ->
-			beforeEach (done) ->
-				@zipfile.openReadStream = sinon.stub()
-				@ArchiveManager.extractZipArchive @source, @destination, (error) =>
-					@callback(error)
-					done()
-				@zipfile.emit "entry", {fileName: "testdir/"}
-				@zipfile.emit "end"
+		describe("with a directory entry", function() {
+			beforeEach(function(done) {
+				this.zipfile.openReadStream = sinon.stub();
+				this.ArchiveManager.extractZipArchive(this.source, this.destination, error => {
+					this.callback(error);
+					return done();
+				});
+				this.zipfile.emit("entry", {fileName: "testdir/"});
+				return this.zipfile.emit("end");
+			});
 
-			it "should not try to read the entry", ->
-				@zipfile.openReadStream.called.should.equal false
+			it("should not try to read the entry", function() {
+				return this.zipfile.openReadStream.called.should.equal(false);
+			});
 
-			it "should not log out a warning", ->
-				@logger.warn.called.should.equal false
+			return it("should not log out a warning", function() {
+				return this.logger.warn.called.should.equal(false);
+			});
+		});
 
-		describe "with an error opening the file read stream", ->
-			beforeEach (done) ->
-				@zipfile.openReadStream = sinon.stub().callsArgWith(1, new Error("Something went wrong"))
-				@writeStream = new events.EventEmitter
-				@ArchiveManager.extractZipArchive @source, @destination, (error) =>
-					@callback(error)
-					done()
-				@zipfile.emit "entry", {fileName: "testfile.txt"}
-				@zipfile.emit "end"
+		describe("with an error opening the file read stream", function() {
+			beforeEach(function(done) {
+				this.zipfile.openReadStream = sinon.stub().callsArgWith(1, new Error("Something went wrong"));
+				this.writeStream = new events.EventEmitter;
+				this.ArchiveManager.extractZipArchive(this.source, this.destination, error => {
+					this.callback(error);
+					return done();
+				});
+				this.zipfile.emit("entry", {fileName: "testfile.txt"});
+				return this.zipfile.emit("end");
+			});
 
-			it "should return the callback with an error", ->
-				@callback.calledWithExactly(new Error("Something went wrong")).should.equal true
+			it("should return the callback with an error", function() {
+				return this.callback.calledWithExactly(new Error("Something went wrong")).should.equal(true);
+			});
 
-			it "should log out the error", ->
-				@logger.error.called.should.equal true
+			it("should log out the error", function() {
+				return this.logger.error.called.should.equal(true);
+			});
 
-			it "should close the zipfile", ->
-				@zipfile.close.called.should.equal true
+			return it("should close the zipfile", function() {
+				return this.zipfile.close.called.should.equal(true);
+			});
+		});
 
-		describe "with an error in the file read stream", ->
-			beforeEach (done) ->
-				@readStream = new events.EventEmitter
-				@readStream.pipe = sinon.stub()
-				@zipfile.openReadStream = sinon.stub().callsArgWith(1, null, @readStream)
-				@writeStream = new events.EventEmitter
-				@fs.createWriteStream = sinon.stub().returns @writeStream
-				@fse.ensureDir = sinon.stub().callsArg(1)
-				@ArchiveManager.extractZipArchive @source, @destination, (error) =>
-					@callback(error)
-					done()
-				@zipfile.emit "entry", {fileName: "testfile.txt"}
-				@readStream.emit "error", new Error("Something went wrong")
-				@zipfile.emit "end"
+		describe("with an error in the file read stream", function() {
+			beforeEach(function(done) {
+				this.readStream = new events.EventEmitter;
+				this.readStream.pipe = sinon.stub();
+				this.zipfile.openReadStream = sinon.stub().callsArgWith(1, null, this.readStream);
+				this.writeStream = new events.EventEmitter;
+				this.fs.createWriteStream = sinon.stub().returns(this.writeStream);
+				this.fse.ensureDir = sinon.stub().callsArg(1);
+				this.ArchiveManager.extractZipArchive(this.source, this.destination, error => {
+					this.callback(error);
+					return done();
+				});
+				this.zipfile.emit("entry", {fileName: "testfile.txt"});
+				this.readStream.emit("error", new Error("Something went wrong"));
+				return this.zipfile.emit("end");
+			});
 
-			it "should return the callback with an error", ->
-				@callback.calledWithExactly(new Error("Something went wrong")).should.equal true
+			it("should return the callback with an error", function() {
+				return this.callback.calledWithExactly(new Error("Something went wrong")).should.equal(true);
+			});
 
-			it "should log out the error", ->
-				@logger.error.called.should.equal true
+			it("should log out the error", function() {
+				return this.logger.error.called.should.equal(true);
+			});
 
-			it "should close the zipfile", ->
-				@zipfile.close.called.should.equal true
+			return it("should close the zipfile", function() {
+				return this.zipfile.close.called.should.equal(true);
+			});
+		});
 
-		describe "with an error in the file write stream", ->
-			beforeEach (done) ->
-				@readStream = new events.EventEmitter
-				@readStream.pipe = sinon.stub()
-				@readStream.unpipe = sinon.stub()
-				@readStream.destroy = sinon.stub()
-				@zipfile.openReadStream = sinon.stub().callsArgWith(1, null, @readStream)
-				@writeStream = new events.EventEmitter
-				@fs.createWriteStream = sinon.stub().returns @writeStream
-				@fse.ensureDir = sinon.stub().callsArg(1)
-				@ArchiveManager.extractZipArchive @source, @destination, (error) =>
-					@callback(error)
-					done()
-				@zipfile.emit "entry", {fileName: "testfile.txt"}
-				@writeStream.emit "error", new Error("Something went wrong")
-				@zipfile.emit "end"
+		return describe("with an error in the file write stream", function() {
+			beforeEach(function(done) {
+				this.readStream = new events.EventEmitter;
+				this.readStream.pipe = sinon.stub();
+				this.readStream.unpipe = sinon.stub();
+				this.readStream.destroy = sinon.stub();
+				this.zipfile.openReadStream = sinon.stub().callsArgWith(1, null, this.readStream);
+				this.writeStream = new events.EventEmitter;
+				this.fs.createWriteStream = sinon.stub().returns(this.writeStream);
+				this.fse.ensureDir = sinon.stub().callsArg(1);
+				this.ArchiveManager.extractZipArchive(this.source, this.destination, error => {
+					this.callback(error);
+					return done();
+				});
+				this.zipfile.emit("entry", {fileName: "testfile.txt"});
+				this.writeStream.emit("error", new Error("Something went wrong"));
+				return this.zipfile.emit("end");
+			});
 
-			it "should return the callback with an error", ->
-				@callback.calledWithExactly(new Error("Something went wrong")).should.equal true
+			it("should return the callback with an error", function() {
+				return this.callback.calledWithExactly(new Error("Something went wrong")).should.equal(true);
+			});
 
-			it "should log out the error", ->
-				@logger.error.called.should.equal true
+			it("should log out the error", function() {
+				return this.logger.error.called.should.equal(true);
+			});
 
-			it "should unpipe from the readstream", ->
-				@readStream.unpipe.called.should.equal true
+			it("should unpipe from the readstream", function() {
+				return this.readStream.unpipe.called.should.equal(true);
+			});
 
-			it "should destroy the readstream", ->
-				@readStream.destroy.called.should.equal true
+			it("should destroy the readstream", function() {
+				return this.readStream.destroy.called.should.equal(true);
+			});
 
-			it "should close the zipfile", ->
-				@zipfile.close.called.should.equal true
+			return it("should close the zipfile", function() {
+				return this.zipfile.close.called.should.equal(true);
+			});
+		});
+	});
 
-	describe "_isZipTooLarge", ->
+	describe("_isZipTooLarge", function() {
 
-		it "should return false with small output", (done)->
-			@ArchiveManager._isZipTooLarge @source, (error, isTooLarge) =>
-				isTooLarge.should.equal false
-				done()
-			@zipfile.emit "entry", {uncompressedSize: 109042}
-			@zipfile.emit "end"
+		it("should return false with small output", function(done){
+			this.ArchiveManager._isZipTooLarge(this.source, (error, isTooLarge) => {
+				isTooLarge.should.equal(false);
+				return done();
+			});
+			this.zipfile.emit("entry", {uncompressedSize: 109042});
+			return this.zipfile.emit("end");
+		});
 
-		it "should return true with large bytes", (done)->
-			@ArchiveManager._isZipTooLarge @source, (error, isTooLarge) =>
-				isTooLarge.should.equal true
-				done()
-			@zipfile.emit "entry", {uncompressedSize: 1090000000000000042}
-			@zipfile.emit "end"
+		it("should return true with large bytes", function(done){
+			this.ArchiveManager._isZipTooLarge(this.source, (error, isTooLarge) => {
+				isTooLarge.should.equal(true);
+				return done();
+			});
+			this.zipfile.emit("entry", {uncompressedSize: 1090000000000000042});
+			return this.zipfile.emit("end");
+		});
 
-		it "should return error on no data", (done)->
-			@ArchiveManager._isZipTooLarge @source, (error, isTooLarge) =>
-				expect(error).to.exist
-				done()
-			@zipfile.emit "entry", {}
-			@zipfile.emit "end"
+		it("should return error on no data", function(done){
+			this.ArchiveManager._isZipTooLarge(this.source, (error, isTooLarge) => {
+				expect(error).to.exist;
+				return done();
+			});
+			this.zipfile.emit("entry", {});
+			return this.zipfile.emit("end");
+		});
 
-		it "should return error if it didn't get a number", (done)->
-			@ArchiveManager._isZipTooLarge @source, (error, isTooLarge) =>
-				expect(error).to.exist
-				done()
-			@zipfile.emit "entry", {uncompressedSize:"random-error"}
-			@zipfile.emit "end"
+		it("should return error if it didn't get a number", function(done){
+			this.ArchiveManager._isZipTooLarge(this.source, (error, isTooLarge) => {
+				expect(error).to.exist;
+				return done();
+			});
+			this.zipfile.emit("entry", {uncompressedSize:"random-error"});
+			return this.zipfile.emit("end");
+		});
 
-		it "should return error if there is no data", (done)->
-			@ArchiveManager._isZipTooLarge @source, (error, isTooLarge) =>
-				expect(error).to.exist
-				done()
-			@zipfile.emit "end"
+		return it("should return error if there is no data", function(done){
+			this.ArchiveManager._isZipTooLarge(this.source, (error, isTooLarge) => {
+				expect(error).to.exist;
+				return done();
+			});
+			return this.zipfile.emit("end");
+		});
+	});
 
-	describe "findTopLevelDirectory", ->
-		beforeEach ->
-			@fs.readdir = sinon.stub()
-			@fs.stat = sinon.stub()
-			@directory = "test/directory"
+	return describe("findTopLevelDirectory", function() {
+		beforeEach(function() {
+			this.fs.readdir = sinon.stub();
+			this.fs.stat = sinon.stub();
+			return this.directory = "test/directory";
+		});
 
-		describe "with multiple files", ->
-			beforeEach ->
-				@fs.readdir.callsArgWith(1, null, ["multiple", "files"])
-				@ArchiveManager.findTopLevelDirectory(@directory, @callback)
+		describe("with multiple files", function() {
+			beforeEach(function() {
+				this.fs.readdir.callsArgWith(1, null, ["multiple", "files"]);
+				return this.ArchiveManager.findTopLevelDirectory(this.directory, this.callback);
+			});
 			
-			it "should find the files in the directory", ->
-				@fs.readdir
-					.calledWith(@directory)
-					.should.equal true
+			it("should find the files in the directory", function() {
+				return this.fs.readdir
+					.calledWith(this.directory)
+					.should.equal(true);
+			});
 			
-			it "should return the original directory", ->
-				@callback
-					.calledWith(null, @directory)
-					.should.equal true
+			return it("should return the original directory", function() {
+				return this.callback
+					.calledWith(null, this.directory)
+					.should.equal(true);
+			});
+		});
 		
-		describe "with a single file (not folder)", ->
-			beforeEach ->
-				@fs.readdir.callsArgWith(1, null, ["foo.tex"])
-				@fs.stat.callsArgWith(1, null, { isDirectory: () -> false })
-				@ArchiveManager.findTopLevelDirectory(@directory, @callback)
+		describe("with a single file (not folder)", function() {
+			beforeEach(function() {
+				this.fs.readdir.callsArgWith(1, null, ["foo.tex"]);
+				this.fs.stat.callsArgWith(1, null, { isDirectory() { return false; } });
+				return this.ArchiveManager.findTopLevelDirectory(this.directory, this.callback);
+			});
 			
-			it "should check if the file is a directory", ->
-				@fs.stat
-					.calledWith(@directory + "/foo.tex")
-					.should.equal true
+			it("should check if the file is a directory", function() {
+				return this.fs.stat
+					.calledWith(this.directory + "/foo.tex")
+					.should.equal(true);
+			});
 			
-			it "should return the original directory", ->
-				@callback
-					.calledWith(null, @directory)
-					.should.equal true
+			return it("should return the original directory", function() {
+				return this.callback
+					.calledWith(null, this.directory)
+					.should.equal(true);
+			});
+		});
 		
-		describe "with a single top-level folder", ->
-			beforeEach ->
-				@fs.readdir.callsArgWith(1, null, ["folder"])
-				@fs.stat.callsArgWith(1, null, { isDirectory: () -> true })
-				@ArchiveManager.findTopLevelDirectory(@directory, @callback)
+		return describe("with a single top-level folder", function() {
+			beforeEach(function() {
+				this.fs.readdir.callsArgWith(1, null, ["folder"]);
+				this.fs.stat.callsArgWith(1, null, { isDirectory() { return true; } });
+				return this.ArchiveManager.findTopLevelDirectory(this.directory, this.callback);
+			});
 			
-			it "should check if the file is a directory", ->
-				@fs.stat
-					.calledWith(@directory + "/folder")
-					.should.equal true
+			it("should check if the file is a directory", function() {
+				return this.fs.stat
+					.calledWith(this.directory + "/folder")
+					.should.equal(true);
+			});
 			
-			it "should return the child directory", ->
-				@callback
-					.calledWith(null, @directory + "/folder")
-					.should.equal true
+			return it("should return the child directory", function() {
+				return this.callback
+					.calledWith(null, this.directory + "/folder")
+					.should.equal(true);
+			});
+		});
+	});
+});

@@ -1,723 +1,990 @@
-sinon = require('sinon')
-chai = require('chai')
-should = chai.should()
-expect = chai.expect
-modulePath = "../../../../app/js/Features/Collaborators/CollaboratorsInviteHandler.js"
-SandboxedModule = require('sandboxed-module')
-events = require "events"
-ObjectId = require("mongojs").ObjectId
-Crypto = require('crypto')
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS206: Consider reworking classes to avoid initClass
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const sinon = require('sinon');
+const chai = require('chai');
+const should = chai.should();
+const {
+    expect
+} = chai;
+const modulePath = "../../../../app/js/Features/Collaborators/CollaboratorsInviteHandler.js";
+const SandboxedModule = require('sandboxed-module');
+const events = require("events");
+const {
+    ObjectId
+} = require("mongojs");
+const Crypto = require('crypto');
 
-describe "CollaboratorsInviteHandler", ->
-	beforeEach ->
-		@ProjectInvite = class ProjectInvite
-			constructor: (options={}) ->
-				this._id = ObjectId()
-				for k,v of options
-					this[k] = v
-				this
-			save: sinon.stub()
-			@findOne: sinon.stub()
-			@find: sinon.stub()
-			@remove: sinon.stub()
-			@count: sinon.stub()
-		@Crypto = Crypto
-		@CollaboratorsInviteHandler = SandboxedModule.require modulePath, requires:
-			'settings-sharelatex': @settings = {}
-			'../../models/ProjectInvite': {ProjectInvite: @ProjectInvite}
-			'logger-sharelatex': @logger = {err: sinon.stub(), error: sinon.stub(), log: sinon.stub()}
-			'./CollaboratorsEmailHandler': @CollaboratorsEmailHandler = {}
-			"./CollaboratorsHandler": @CollaboratorsHandler = {addUserIdToProject: sinon.stub()}
-			'../User/UserGetter': @UserGetter = {getUser: sinon.stub()}
-			"../Project/ProjectGetter": @ProjectGetter = {}
-			"../Notifications/NotificationsBuilder": @NotificationsBuilder = {}
-			'crypto': @Crypto
+describe("CollaboratorsInviteHandler", function() {
+	beforeEach(function() {
+		let ProjectInvite;
+		this.ProjectInvite = (ProjectInvite = (function() {
+			ProjectInvite = class ProjectInvite {
+				static initClass() {
+					this.prototype.save = sinon.stub();
+					this.findOne = sinon.stub();
+					this.find = sinon.stub();
+					this.remove = sinon.stub();
+					this.count = sinon.stub();
+				}
+				constructor(options) {
+					if (options == null) { options = {}; }
+					this._id = ObjectId();
+					for (let k in options) {
+						const v = options[k];
+						this[k] = v;
+					}
+					this;
+				}
+			};
+			ProjectInvite.initClass();
+			return ProjectInvite;
+		})());
+		this.Crypto = Crypto;
+		this.CollaboratorsInviteHandler = SandboxedModule.require(modulePath, { requires: {
+			'settings-sharelatex': (this.settings = {}),
+			'../../models/ProjectInvite': {ProjectInvite: this.ProjectInvite},
+			'logger-sharelatex': (this.logger = {err: sinon.stub(), error: sinon.stub(), log: sinon.stub()}),
+			'./CollaboratorsEmailHandler': (this.CollaboratorsEmailHandler = {}),
+			"./CollaboratorsHandler": (this.CollaboratorsHandler = {addUserIdToProject: sinon.stub()}),
+			'../User/UserGetter': (this.UserGetter = {getUser: sinon.stub()}),
+			"../Project/ProjectGetter": (this.ProjectGetter = {}),
+			"../Notifications/NotificationsBuilder": (this.NotificationsBuilder = {}),
+			'crypto': this.Crypto
+		}
+	}
+		);
 
-		@projectId = ObjectId()
-		@sendingUserId = ObjectId()
-		@sendingUser =
-			_id: @sendingUserId
+		this.projectId = ObjectId();
+		this.sendingUserId = ObjectId();
+		this.sendingUser = {
+			_id: this.sendingUserId,
 			name: "Bob"
-		@email = "user@example.com"
-		@userId = ObjectId()
-		@user =
-			_id: @userId
+		};
+		this.email = "user@example.com";
+		this.userId = ObjectId();
+		this.user = {
+			_id: this.userId,
 			email: 'someone@example.com'
-		@inviteId = ObjectId()
-		@token = 'hnhteaosuhtaeosuahs'
-		@privileges = "readAndWrite"
-		@fakeInvite =
-			_id:            @inviteId
-			email:          @email
-			token:          @token
-			sendingUserId:  @sendingUserId
-			projectId:      @projectId
-			privileges:     @privileges
+		};
+		this.inviteId = ObjectId();
+		this.token = 'hnhteaosuhtaeosuahs';
+		this.privileges = "readAndWrite";
+		return this.fakeInvite = {
+			_id:            this.inviteId,
+			email:          this.email,
+			token:          this.token,
+			sendingUserId:  this.sendingUserId,
+			projectId:      this.projectId,
+			privileges:     this.privileges,
 			createdAt:      new Date()
+		};
+	});
 
-	describe 'getInviteCount', ->
+	describe('getInviteCount', function() {
 
-		beforeEach ->
-			@ProjectInvite.count.callsArgWith(1, null, 2)
-			@call = (callback) =>
-				@CollaboratorsInviteHandler.getInviteCount @projectId, callback
+		beforeEach(function() {
+			this.ProjectInvite.count.callsArgWith(1, null, 2);
+			return this.call = callback => {
+				return this.CollaboratorsInviteHandler.getInviteCount(this.projectId, callback);
+			};
+		});
 
-		it 'should not produce an error', (done) ->
-			@call (err, invites) =>
-				expect(err).to.not.be.instanceof Error
-				expect(err).to.be.oneOf [null, undefined]
-				done()
+		it('should not produce an error', function(done) {
+			return this.call((err, invites) => {
+				expect(err).to.not.be.instanceof(Error);
+				expect(err).to.be.oneOf([null, undefined]);
+				return done();
+			});
+		});
 
-		it 'should produce the count of documents', (done) ->
-			@call (err, count) =>
-				expect(count).to.equal 2
-				done()
+		it('should produce the count of documents', function(done) {
+			return this.call((err, count) => {
+				expect(count).to.equal(2);
+				return done();
+			});
+		});
 
-		describe 'when model.count produces an error', ->
+		return describe('when model.count produces an error', function() {
 
-			beforeEach ->
-				@ProjectInvite.count.callsArgWith(1, new Error('woops'))
+			beforeEach(function() {
+				return this.ProjectInvite.count.callsArgWith(1, new Error('woops'));
+			});
 
-			it 'should produce an error', (done) ->
-				@call (err, count) =>
-					expect(err).to.be.instanceof Error
-					done()
+			return it('should produce an error', function(done) {
+				return this.call((err, count) => {
+					expect(err).to.be.instanceof(Error);
+					return done();
+				});
+			});
+		});
+	});
 
-	describe 'getAllInvites', ->
+	describe('getAllInvites', function() {
 
-		beforeEach ->
-			@fakeInvites = [
+		beforeEach(function() {
+			this.fakeInvites = [
 				{_id: ObjectId(), one: 1},
 				{_id: ObjectId(), two: 2}
-			]
-			@ProjectInvite.find.callsArgWith(1, null, @fakeInvites)
-			@call = (callback) =>
-				@CollaboratorsInviteHandler.getAllInvites @projectId, callback
-
-		describe 'when all goes well', ->
-
-			beforeEach ->
-
-			it 'should not produce an error', (done) ->
-				@call (err, invites) =>
-					expect(err).to.not.be.instanceof Error
-					expect(err).to.be.oneOf [null, undefined]
-					done()
-
-			it 'should produce a list of invite objects', (done) ->
-				@call (err, invites) =>
-					expect(invites).to.not.be.oneOf [null, undefined]
-					expect(invites).to.deep.equal @fakeInvites
-					done()
-
-			it 'should have called ProjectInvite.find', (done) ->
-				@call (err, invites) =>
-					@ProjectInvite.find.callCount.should.equal 1
-					@ProjectInvite.find.calledWith({projectId: @projectId}).should.equal true
-					done()
-
-		describe 'when ProjectInvite.find produces an error', ->
-
-			beforeEach ->
-				@ProjectInvite.find.callsArgWith(1, new Error('woops'))
-
-			it 'should produce an error', (done) ->
-				@call (err, invites) =>
-					expect(err).to.be.instanceof Error
-					done()
-
-	describe 'inviteToProject', ->
-
-		beforeEach ->
-			@ProjectInvite::save = sinon.spy (cb) -> cb(null, this)
-			@randomBytesSpy = sinon.spy(@Crypto, 'randomBytes')
-			@CollaboratorsInviteHandler._sendMessages = sinon.stub().callsArgWith(3, null)
-			@call = (callback) =>
-				@CollaboratorsInviteHandler.inviteToProject @projectId, @sendingUser, @email, @privileges, callback
-
-		afterEach ->
-			@randomBytesSpy.restore()
-
-		describe 'when all goes well', ->
-
-			beforeEach ->
-
-			it 'should not produce an error', (done) ->
-				@call (err, invite) =>
-					expect(err).to.not.be.instanceof Error
-					expect(err).to.be.oneOf [null, undefined]
-					done()
-
-			it 'should produce the invite object', (done) ->
-				@call (err, invite) =>
-					expect(invite).to.not.equal null
-					expect(invite).to.not.equal undefined
-					expect(invite).to.be.instanceof Object
-					expect(invite).to.have.all.keys ['_id', 'email', 'token', 'sendingUserId', 'projectId', 'privileges']
-					done()
-
-			it 'should have generated a random token', (done) ->
-				@call (err, invite) =>
-					@randomBytesSpy.callCount.should.equal 1
-					done()
-
-			it 'should have called ProjectInvite.save', (done) ->
-				@call (err, invite) =>
-					@ProjectInvite::save.callCount.should.equal 1
-					done()
-
-			it 'should have called _sendMessages', (done) ->
-				@call (err, invite) =>
-					@CollaboratorsInviteHandler._sendMessages.callCount.should.equal 1
-					@CollaboratorsInviteHandler._sendMessages.calledWith(@projectId, @sendingUser).should.equal true
-					done()
-
-		describe 'when saving model produces an error', ->
-
-			beforeEach ->
-				@ProjectInvite::save = sinon.spy (cb) -> cb(new Error('woops'), this)
-
-			it 'should produce an error', (done) ->
-				@call (err, invite) =>
-					expect(err).to.be.instanceof Error
-					done()
-
-	describe '_sendMessages', ->
-
-		beforeEach ->
-			@CollaboratorsEmailHandler.notifyUserOfProjectInvite = sinon.stub().callsArgWith(4, null)
-			@CollaboratorsInviteHandler._trySendInviteNotification = sinon.stub().callsArgWith(3, null)
-			@call = (callback) =>
-				@CollaboratorsInviteHandler._sendMessages @projectId, @sendingUser, @fakeInvite, callback
-
-		describe 'when all goes well', ->
-
-			it 'should not produce an error', (done) ->
-				@call (err) =>
-					expect(err).to.not.be.instanceof Error
-					expect(err).to.be.oneOf [null, undefined]
-					done()
-
-			it 'should call CollaboratorsEmailHandler.notifyUserOfProjectInvite', (done) ->
-				@call (err) =>
-					@CollaboratorsEmailHandler.notifyUserOfProjectInvite.callCount.should.equal 1
-					@CollaboratorsEmailHandler.notifyUserOfProjectInvite.calledWith(@projectId, @fakeInvite.email, @fakeInvite).should.equal true
-					done()
-
-			it 'should call _trySendInviteNotification', (done) ->
-				@call (err) =>
-					@CollaboratorsInviteHandler._trySendInviteNotification.callCount.should.equal 1
-					@CollaboratorsInviteHandler._trySendInviteNotification.calledWith(@projectId, @sendingUser, @fakeInvite).should.equal true
-					done()
-
-		describe 'when CollaboratorsEmailHandler.notifyUserOfProjectInvite produces an error', ->
-
-			beforeEach ->
-				@CollaboratorsEmailHandler.notifyUserOfProjectInvite = sinon.stub().callsArgWith(4, new Error('woops'))
-
-			it 'should produce an error', (done) ->
-				@call (err, invite) =>
-					expect(err).to.be.instanceof Error
-					done()
-
-			it 'should not call _trySendInviteNotification', (done) ->
-				@call (err) =>
-					@CollaboratorsInviteHandler._trySendInviteNotification.callCount.should.equal 0
-					done()
-
-		describe 'when _trySendInviteNotification produces an error', ->
-
-			beforeEach ->
-				@CollaboratorsInviteHandler._trySendInviteNotification = sinon.stub().callsArgWith(3, new Error('woops'))
-
-			it 'should produce an error', (done) ->
-				@call (err, invite) =>
-					expect(err).to.be.instanceof Error
-					done()
-
-	describe 'revokeInvite', ->
-
-		beforeEach ->
-			@ProjectInvite.remove.callsArgWith(1, null)
-			@CollaboratorsInviteHandler._tryCancelInviteNotification = sinon.stub().callsArgWith(1, null)
-			@call = (callback) =>
-				@CollaboratorsInviteHandler.revokeInvite @projectId, @inviteId, callback
-
-		describe 'when all goes well', ->
-
-			beforeEach ->
-
-			it 'should not produce an error', (done) ->
-				@call (err) =>
-					expect(err).to.not.be.instanceof Error
-					expect(err).to.be.oneOf [null, undefined]
-					done()
-
-			it 'should call ProjectInvite.remove', (done) ->
-				@call (err) =>
-					@ProjectInvite.remove.callCount.should.equal 1
-					@ProjectInvite.remove.calledWith({projectId: @projectId, _id: @inviteId}).should.equal true
-					done()
-
-			it 'should call _tryCancelInviteNotification', (done) ->
-				@call (err) =>
-					@CollaboratorsInviteHandler._tryCancelInviteNotification.callCount.should.equal 1
-					@CollaboratorsInviteHandler._tryCancelInviteNotification.calledWith(@inviteId).should.equal true
-					done()
-
-		describe 'when remove produces an error', ->
-
-			beforeEach ->
-				@ProjectInvite.remove.callsArgWith(1, new Error('woops'))
-
-			it 'should produce an error', (done) ->
-				@call (err) =>
-					expect(err).to.be.instanceof Error
-					done()
-
-	describe 'resendInvite', ->
-
-		beforeEach ->
-			@ProjectInvite.findOne.callsArgWith(1, null, @fakeInvite)
-			@CollaboratorsInviteHandler._sendMessages = sinon.stub().callsArgWith(3, null)
-			@call = (callback) =>
-				@CollaboratorsInviteHandler.resendInvite @projectId, @sendingUser, @inviteId, callback
-
-		describe 'when all goes well', ->
-
-			beforeEach ->
-
-			it 'should not produce an error', (done) ->
-				@call (err) =>
-					expect(err).to.not.be.instanceof Error
-					expect(err).to.be.oneOf [null, undefined]
-					done()
-
-			it 'should call ProjectInvite.findOne', (done) ->
-				@call (err, invite) =>
-					@ProjectInvite.findOne.callCount.should.equal 1
-					@ProjectInvite.findOne.calledWith({_id: @inviteId, projectId: @projectId}).should.equal true
-					done()
-
-			it 'should have called _sendMessages', (done) ->
-				@call (err, invite) =>
-					@CollaboratorsInviteHandler._sendMessages.callCount.should.equal 1
-					@CollaboratorsInviteHandler._sendMessages.calledWith(@projectId, @sendingUser, @fakeInvite).should.equal true
-					done()
-
-		describe 'when findOne produces an error', ->
-
-			beforeEach ->
-				@ProjectInvite.findOne.callsArgWith(1, new Error('woops'))
-
-			it 'should produce an error', (done) ->
-				@call (err, invite) =>
-					expect(err).to.be.instanceof Error
-					done()
-
-			it 'should not have called _sendMessages', (done) ->
-				@call (err, invite) =>
-					@CollaboratorsInviteHandler._sendMessages.callCount.should.equal 0
-					done()
-
-		describe 'when findOne does not find an invite', ->
-
-			beforeEach ->
-				@ProjectInvite.findOne.callsArgWith(1, null, null)
-
-			it 'should not produce an error', (done) ->
-				@call (err, invite) =>
-					expect(err).to.not.be.instanceof Error
-					expect(err).to.be.oneOf [null, undefined]
-					done()
-
-			it 'should not have called _sendMessages', (done) ->
-				@call (err, invite) =>
-					@CollaboratorsInviteHandler._sendMessages.callCount.should.equal 0
-					done()
-
-	describe 'getInviteByToken', ->
-
-		beforeEach ->
-			@ProjectInvite.findOne.callsArgWith(1, null, @fakeInvite)
-			@call = (callback) =>
-				@CollaboratorsInviteHandler.getInviteByToken @projectId, @token, callback
-
-		describe 'when all goes well', ->
-
-			beforeEach ->
-
-			it 'should not produce an error', (done) ->
-				@call (err, invite) =>
-					expect(err).to.not.be.instanceof Error
-					expect(err).to.be.oneOf [null, undefined]
-					done()
-
-			it 'should produce the invite object', (done) ->
-				@call (err, invite) =>
-					expect(invite).to.deep.equal @fakeInvite
-					done()
-
-			it 'should call ProjectInvite.findOne', (done) ->
-				@call (err, invite) =>
-					@ProjectInvite.findOne.callCount.should.equal 1
-					@ProjectInvite.findOne.calledWith({projectId: @projectId, token: @token}).should.equal true
-					done()
-
-		describe 'when findOne produces an error', ->
-
-			beforeEach ->
-				@ProjectInvite.findOne.callsArgWith(1, new Error('woops'))
-
-			it 'should produce an error', (done) ->
-				@call (err, invite) =>
-					expect(err).to.be.instanceof Error
-					done()
-
-		describe 'when findOne does not find an invite', ->
-
-			beforeEach ->
-				@ProjectInvite.findOne.callsArgWith(1, null, null)
-
-			it 'should not produce an error', (done) ->
-				@call (err, invite) =>
-					expect(err).to.not.be.instanceof Error
-					expect(err).to.be.oneOf [null, undefined]
-					done()
-
-			it 'should not produce an invite object', (done) ->
-				@call (err, invite) =>
-					expect(invite).to.not.be.instanceof Error
-					expect(invite).to.be.oneOf [null, undefined]
-					done()
-
-	describe 'acceptInvite', ->
-
-		beforeEach ->
-			@fakeProject =
-				_id: @projectId
-				collaberator_refs: []
+			];
+			this.ProjectInvite.find.callsArgWith(1, null, this.fakeInvites);
+			return this.call = callback => {
+				return this.CollaboratorsInviteHandler.getAllInvites(this.projectId, callback);
+			};
+		});
+
+		describe('when all goes well', function() {
+
+			beforeEach(function() {});
+
+			it('should not produce an error', function(done) {
+				return this.call((err, invites) => {
+					expect(err).to.not.be.instanceof(Error);
+					expect(err).to.be.oneOf([null, undefined]);
+					return done();
+				});
+			});
+
+			it('should produce a list of invite objects', function(done) {
+				return this.call((err, invites) => {
+					expect(invites).to.not.be.oneOf([null, undefined]);
+					expect(invites).to.deep.equal(this.fakeInvites);
+					return done();
+				});
+			});
+
+			return it('should have called ProjectInvite.find', function(done) {
+				return this.call((err, invites) => {
+					this.ProjectInvite.find.callCount.should.equal(1);
+					this.ProjectInvite.find.calledWith({projectId: this.projectId}).should.equal(true);
+					return done();
+				});
+			});
+		});
+
+		return describe('when ProjectInvite.find produces an error', function() {
+
+			beforeEach(function() {
+				return this.ProjectInvite.find.callsArgWith(1, new Error('woops'));
+			});
+
+			return it('should produce an error', function(done) {
+				return this.call((err, invites) => {
+					expect(err).to.be.instanceof(Error);
+					return done();
+				});
+			});
+		});
+	});
+
+	describe('inviteToProject', function() {
+
+		beforeEach(function() {
+			this.ProjectInvite.prototype.save = sinon.spy(function(cb) { return cb(null, this); });
+			this.randomBytesSpy = sinon.spy(this.Crypto, 'randomBytes');
+			this.CollaboratorsInviteHandler._sendMessages = sinon.stub().callsArgWith(3, null);
+			return this.call = callback => {
+				return this.CollaboratorsInviteHandler.inviteToProject(this.projectId, this.sendingUser, this.email, this.privileges, callback);
+			};
+		});
+
+		afterEach(function() {
+			return this.randomBytesSpy.restore();
+		});
+
+		describe('when all goes well', function() {
+
+			beforeEach(function() {});
+
+			it('should not produce an error', function(done) {
+				return this.call((err, invite) => {
+					expect(err).to.not.be.instanceof(Error);
+					expect(err).to.be.oneOf([null, undefined]);
+					return done();
+				});
+			});
+
+			it('should produce the invite object', function(done) {
+				return this.call((err, invite) => {
+					expect(invite).to.not.equal(null);
+					expect(invite).to.not.equal(undefined);
+					expect(invite).to.be.instanceof(Object);
+					expect(invite).to.have.all.keys(['_id', 'email', 'token', 'sendingUserId', 'projectId', 'privileges']);
+					return done();
+				});
+			});
+
+			it('should have generated a random token', function(done) {
+				return this.call((err, invite) => {
+					this.randomBytesSpy.callCount.should.equal(1);
+					return done();
+				});
+			});
+
+			it('should have called ProjectInvite.save', function(done) {
+				return this.call((err, invite) => {
+					this.ProjectInvite.prototype.save.callCount.should.equal(1);
+					return done();
+				});
+			});
+
+			return it('should have called _sendMessages', function(done) {
+				return this.call((err, invite) => {
+					this.CollaboratorsInviteHandler._sendMessages.callCount.should.equal(1);
+					this.CollaboratorsInviteHandler._sendMessages.calledWith(this.projectId, this.sendingUser).should.equal(true);
+					return done();
+				});
+			});
+		});
+
+		return describe('when saving model produces an error', function() {
+
+			beforeEach(function() {
+				return this.ProjectInvite.prototype.save = sinon.spy(function(cb) { return cb(new Error('woops'), this); });
+			});
+
+			return it('should produce an error', function(done) {
+				return this.call((err, invite) => {
+					expect(err).to.be.instanceof(Error);
+					return done();
+				});
+			});
+		});
+	});
+
+	describe('_sendMessages', function() {
+
+		beforeEach(function() {
+			this.CollaboratorsEmailHandler.notifyUserOfProjectInvite = sinon.stub().callsArgWith(4, null);
+			this.CollaboratorsInviteHandler._trySendInviteNotification = sinon.stub().callsArgWith(3, null);
+			return this.call = callback => {
+				return this.CollaboratorsInviteHandler._sendMessages(this.projectId, this.sendingUser, this.fakeInvite, callback);
+			};
+		});
+
+		describe('when all goes well', function() {
+
+			it('should not produce an error', function(done) {
+				return this.call(err => {
+					expect(err).to.not.be.instanceof(Error);
+					expect(err).to.be.oneOf([null, undefined]);
+					return done();
+				});
+			});
+
+			it('should call CollaboratorsEmailHandler.notifyUserOfProjectInvite', function(done) {
+				return this.call(err => {
+					this.CollaboratorsEmailHandler.notifyUserOfProjectInvite.callCount.should.equal(1);
+					this.CollaboratorsEmailHandler.notifyUserOfProjectInvite.calledWith(this.projectId, this.fakeInvite.email, this.fakeInvite).should.equal(true);
+					return done();
+				});
+			});
+
+			return it('should call _trySendInviteNotification', function(done) {
+				return this.call(err => {
+					this.CollaboratorsInviteHandler._trySendInviteNotification.callCount.should.equal(1);
+					this.CollaboratorsInviteHandler._trySendInviteNotification.calledWith(this.projectId, this.sendingUser, this.fakeInvite).should.equal(true);
+					return done();
+				});
+			});
+		});
+
+		describe('when CollaboratorsEmailHandler.notifyUserOfProjectInvite produces an error', function() {
+
+			beforeEach(function() {
+				return this.CollaboratorsEmailHandler.notifyUserOfProjectInvite = sinon.stub().callsArgWith(4, new Error('woops'));
+			});
+
+			it('should produce an error', function(done) {
+				return this.call((err, invite) => {
+					expect(err).to.be.instanceof(Error);
+					return done();
+				});
+			});
+
+			return it('should not call _trySendInviteNotification', function(done) {
+				return this.call(err => {
+					this.CollaboratorsInviteHandler._trySendInviteNotification.callCount.should.equal(0);
+					return done();
+				});
+			});
+		});
+
+		return describe('when _trySendInviteNotification produces an error', function() {
+
+			beforeEach(function() {
+				return this.CollaboratorsInviteHandler._trySendInviteNotification = sinon.stub().callsArgWith(3, new Error('woops'));
+			});
+
+			return it('should produce an error', function(done) {
+				return this.call((err, invite) => {
+					expect(err).to.be.instanceof(Error);
+					return done();
+				});
+			});
+		});
+	});
+
+	describe('revokeInvite', function() {
+
+		beforeEach(function() {
+			this.ProjectInvite.remove.callsArgWith(1, null);
+			this.CollaboratorsInviteHandler._tryCancelInviteNotification = sinon.stub().callsArgWith(1, null);
+			return this.call = callback => {
+				return this.CollaboratorsInviteHandler.revokeInvite(this.projectId, this.inviteId, callback);
+			};
+		});
+
+		describe('when all goes well', function() {
+
+			beforeEach(function() {});
+
+			it('should not produce an error', function(done) {
+				return this.call(err => {
+					expect(err).to.not.be.instanceof(Error);
+					expect(err).to.be.oneOf([null, undefined]);
+					return done();
+				});
+			});
+
+			it('should call ProjectInvite.remove', function(done) {
+				return this.call(err => {
+					this.ProjectInvite.remove.callCount.should.equal(1);
+					this.ProjectInvite.remove.calledWith({projectId: this.projectId, _id: this.inviteId}).should.equal(true);
+					return done();
+				});
+			});
+
+			return it('should call _tryCancelInviteNotification', function(done) {
+				return this.call(err => {
+					this.CollaboratorsInviteHandler._tryCancelInviteNotification.callCount.should.equal(1);
+					this.CollaboratorsInviteHandler._tryCancelInviteNotification.calledWith(this.inviteId).should.equal(true);
+					return done();
+				});
+			});
+		});
+
+		return describe('when remove produces an error', function() {
+
+			beforeEach(function() {
+				return this.ProjectInvite.remove.callsArgWith(1, new Error('woops'));
+			});
+
+			return it('should produce an error', function(done) {
+				return this.call(err => {
+					expect(err).to.be.instanceof(Error);
+					return done();
+				});
+			});
+		});
+	});
+
+	describe('resendInvite', function() {
+
+		beforeEach(function() {
+			this.ProjectInvite.findOne.callsArgWith(1, null, this.fakeInvite);
+			this.CollaboratorsInviteHandler._sendMessages = sinon.stub().callsArgWith(3, null);
+			return this.call = callback => {
+				return this.CollaboratorsInviteHandler.resendInvite(this.projectId, this.sendingUser, this.inviteId, callback);
+			};
+		});
+
+		describe('when all goes well', function() {
+
+			beforeEach(function() {});
+
+			it('should not produce an error', function(done) {
+				return this.call(err => {
+					expect(err).to.not.be.instanceof(Error);
+					expect(err).to.be.oneOf([null, undefined]);
+					return done();
+				});
+			});
+
+			it('should call ProjectInvite.findOne', function(done) {
+				return this.call((err, invite) => {
+					this.ProjectInvite.findOne.callCount.should.equal(1);
+					this.ProjectInvite.findOne.calledWith({_id: this.inviteId, projectId: this.projectId}).should.equal(true);
+					return done();
+				});
+			});
+
+			return it('should have called _sendMessages', function(done) {
+				return this.call((err, invite) => {
+					this.CollaboratorsInviteHandler._sendMessages.callCount.should.equal(1);
+					this.CollaboratorsInviteHandler._sendMessages.calledWith(this.projectId, this.sendingUser, this.fakeInvite).should.equal(true);
+					return done();
+				});
+			});
+		});
+
+		describe('when findOne produces an error', function() {
+
+			beforeEach(function() {
+				return this.ProjectInvite.findOne.callsArgWith(1, new Error('woops'));
+			});
+
+			it('should produce an error', function(done) {
+				return this.call((err, invite) => {
+					expect(err).to.be.instanceof(Error);
+					return done();
+				});
+			});
+
+			return it('should not have called _sendMessages', function(done) {
+				return this.call((err, invite) => {
+					this.CollaboratorsInviteHandler._sendMessages.callCount.should.equal(0);
+					return done();
+				});
+			});
+		});
+
+		return describe('when findOne does not find an invite', function() {
+
+			beforeEach(function() {
+				return this.ProjectInvite.findOne.callsArgWith(1, null, null);
+			});
+
+			it('should not produce an error', function(done) {
+				return this.call((err, invite) => {
+					expect(err).to.not.be.instanceof(Error);
+					expect(err).to.be.oneOf([null, undefined]);
+					return done();
+				});
+			});
+
+			return it('should not have called _sendMessages', function(done) {
+				return this.call((err, invite) => {
+					this.CollaboratorsInviteHandler._sendMessages.callCount.should.equal(0);
+					return done();
+				});
+			});
+		});
+	});
+
+	describe('getInviteByToken', function() {
+
+		beforeEach(function() {
+			this.ProjectInvite.findOne.callsArgWith(1, null, this.fakeInvite);
+			return this.call = callback => {
+				return this.CollaboratorsInviteHandler.getInviteByToken(this.projectId, this.token, callback);
+			};
+		});
+
+		describe('when all goes well', function() {
+
+			beforeEach(function() {});
+
+			it('should not produce an error', function(done) {
+				return this.call((err, invite) => {
+					expect(err).to.not.be.instanceof(Error);
+					expect(err).to.be.oneOf([null, undefined]);
+					return done();
+				});
+			});
+
+			it('should produce the invite object', function(done) {
+				return this.call((err, invite) => {
+					expect(invite).to.deep.equal(this.fakeInvite);
+					return done();
+				});
+			});
+
+			return it('should call ProjectInvite.findOne', function(done) {
+				return this.call((err, invite) => {
+					this.ProjectInvite.findOne.callCount.should.equal(1);
+					this.ProjectInvite.findOne.calledWith({projectId: this.projectId, token: this.token}).should.equal(true);
+					return done();
+				});
+			});
+		});
+
+		describe('when findOne produces an error', function() {
+
+			beforeEach(function() {
+				return this.ProjectInvite.findOne.callsArgWith(1, new Error('woops'));
+			});
+
+			return it('should produce an error', function(done) {
+				return this.call((err, invite) => {
+					expect(err).to.be.instanceof(Error);
+					return done();
+				});
+			});
+		});
+
+		return describe('when findOne does not find an invite', function() {
+
+			beforeEach(function() {
+				return this.ProjectInvite.findOne.callsArgWith(1, null, null);
+			});
+
+			it('should not produce an error', function(done) {
+				return this.call((err, invite) => {
+					expect(err).to.not.be.instanceof(Error);
+					expect(err).to.be.oneOf([null, undefined]);
+					return done();
+				});
+			});
+
+			return it('should not produce an invite object', function(done) {
+				return this.call((err, invite) => {
+					expect(invite).to.not.be.instanceof(Error);
+					expect(invite).to.be.oneOf([null, undefined]);
+					return done();
+				});
+			});
+		});
+	});
+
+	describe('acceptInvite', function() {
+
+		beforeEach(function() {
+			this.fakeProject = {
+				_id: this.projectId,
+				collaberator_refs: [],
 				readOnly_refs: []
-			@CollaboratorsHandler.addUserIdToProject.callsArgWith(4, null)
-			@_getInviteByToken = sinon.stub(@CollaboratorsInviteHandler, 'getInviteByToken')
-			@_getInviteByToken.callsArgWith(2, null, @fakeInvite)
-			@CollaboratorsInviteHandler._tryCancelInviteNotification = sinon.stub().callsArgWith(1, null)
-			@ProjectInvite.remove.callsArgWith(1, null)
-			@call = (callback) =>
-				@CollaboratorsInviteHandler.acceptInvite @projectId, @token, @user, callback
+			};
+			this.CollaboratorsHandler.addUserIdToProject.callsArgWith(4, null);
+			this._getInviteByToken = sinon.stub(this.CollaboratorsInviteHandler, 'getInviteByToken');
+			this._getInviteByToken.callsArgWith(2, null, this.fakeInvite);
+			this.CollaboratorsInviteHandler._tryCancelInviteNotification = sinon.stub().callsArgWith(1, null);
+			this.ProjectInvite.remove.callsArgWith(1, null);
+			return this.call = callback => {
+				return this.CollaboratorsInviteHandler.acceptInvite(this.projectId, this.token, this.user, callback);
+			};
+		});
 
-		afterEach ->
-			@_getInviteByToken.restore()
+		afterEach(function() {
+			return this._getInviteByToken.restore();
+		});
 
-		describe 'when all goes well', ->
+		describe('when all goes well', function() {
 
-			beforeEach ->
+			beforeEach(function() {});
 
-			it 'should not produce an error', (done) ->
-				@call (err) =>
-					expect(err).to.not.be.instanceof Error
-					expect(err).to.be.oneOf [null, undefined]
-					done()
+			it('should not produce an error', function(done) {
+				return this.call(err => {
+					expect(err).to.not.be.instanceof(Error);
+					expect(err).to.be.oneOf([null, undefined]);
+					return done();
+				});
+			});
 
-			it 'should have called getInviteByToken', (done) ->
-				@call (err) =>
-					@_getInviteByToken.callCount.should.equal 1
-					@_getInviteByToken.calledWith(@projectId, @token).should.equal true
-					done()
+			it('should have called getInviteByToken', function(done) {
+				return this.call(err => {
+					this._getInviteByToken.callCount.should.equal(1);
+					this._getInviteByToken.calledWith(this.projectId, this.token).should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should have called CollaboratorsHandler.addUserIdToProject', (done) ->
-				@call (err) =>
-					@CollaboratorsHandler.addUserIdToProject.callCount.should.equal 1
-					@CollaboratorsHandler.addUserIdToProject.calledWith(@projectId, @sendingUserId, @userId, @fakeInvite.privileges).should.equal true
-					done()
+			it('should have called CollaboratorsHandler.addUserIdToProject', function(done) {
+				return this.call(err => {
+					this.CollaboratorsHandler.addUserIdToProject.callCount.should.equal(1);
+					this.CollaboratorsHandler.addUserIdToProject.calledWith(this.projectId, this.sendingUserId, this.userId, this.fakeInvite.privileges).should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should have called ProjectInvite.remove', (done) ->
-				@call (err) =>
-					@ProjectInvite.remove.callCount.should.equal 1
-					@ProjectInvite.remove.calledWith({_id: @inviteId}).should.equal true
-					done()
+			return it('should have called ProjectInvite.remove', function(done) {
+				return this.call(err => {
+					this.ProjectInvite.remove.callCount.should.equal(1);
+					this.ProjectInvite.remove.calledWith({_id: this.inviteId}).should.equal(true);
+					return done();
+				});
+			});
+		});
 
-		describe 'when the invite is for readOnly access', ->
+		describe('when the invite is for readOnly access', function() {
 
-			beforeEach ->
-				@fakeInvite.privileges = 'readOnly'
-				@_getInviteByToken.callsArgWith(2, null, @fakeInvite)
+			beforeEach(function() {
+				this.fakeInvite.privileges = 'readOnly';
+				return this._getInviteByToken.callsArgWith(2, null, this.fakeInvite);
+			});
 
-			it 'should not produce an error', (done) ->
-				@call (err) =>
-					expect(err).to.not.be.instanceof Error
-					expect(err).to.be.oneOf [null, undefined]
-					done()
+			it('should not produce an error', function(done) {
+				return this.call(err => {
+					expect(err).to.not.be.instanceof(Error);
+					expect(err).to.be.oneOf([null, undefined]);
+					return done();
+				});
+			});
 
-			it 'should have called CollaboratorsHandler.addUserIdToProject', (done) ->
-				@call (err) =>
-					@CollaboratorsHandler.addUserIdToProject.callCount.should.equal 1
-					@CollaboratorsHandler.addUserIdToProject.calledWith(@projectId, @sendingUserId, @userId, @fakeInvite.privileges).should.equal true
-					done()
+			return it('should have called CollaboratorsHandler.addUserIdToProject', function(done) {
+				return this.call(err => {
+					this.CollaboratorsHandler.addUserIdToProject.callCount.should.equal(1);
+					this.CollaboratorsHandler.addUserIdToProject.calledWith(this.projectId, this.sendingUserId, this.userId, this.fakeInvite.privileges).should.equal(true);
+					return done();
+				});
+			});
+		});
 
-		describe 'when getInviteByToken does not find an invite', ->
+		describe('when getInviteByToken does not find an invite', function() {
 
-			beforeEach ->
-				@_getInviteByToken.callsArgWith(2, null, null)
+			beforeEach(function() {
+				return this._getInviteByToken.callsArgWith(2, null, null);
+			});
 
-			it 'should produce an error', (done) ->
-				@call (err) =>
-					expect(err).to.be.instanceof Error
-					expect(err.name).to.equal "NotFoundError"
-					done()
+			it('should produce an error', function(done) {
+				return this.call(err => {
+					expect(err).to.be.instanceof(Error);
+					expect(err.name).to.equal("NotFoundError");
+					return done();
+				});
+			});
 
-			it 'should have called getInviteByToken', (done) ->
-				@call (err) =>
-					@_getInviteByToken.callCount.should.equal 1
-					@_getInviteByToken.calledWith(@projectId, @token).should.equal true
-					done()
+			it('should have called getInviteByToken', function(done) {
+				return this.call(err => {
+					this._getInviteByToken.callCount.should.equal(1);
+					this._getInviteByToken.calledWith(this.projectId, this.token).should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should not have called CollaboratorsHandler.addUserIdToProject', (done) ->
-				@call (err) =>
-					@CollaboratorsHandler.addUserIdToProject.callCount.should.equal 0
-					done()
+			it('should not have called CollaboratorsHandler.addUserIdToProject', function(done) {
+				return this.call(err => {
+					this.CollaboratorsHandler.addUserIdToProject.callCount.should.equal(0);
+					return done();
+				});
+			});
 
-			it 'should not have called ProjectInvite.remove', (done) ->
-				@call (err) =>
-					@ProjectInvite.remove.callCount.should.equal 0
-					done()
+			return it('should not have called ProjectInvite.remove', function(done) {
+				return this.call(err => {
+					this.ProjectInvite.remove.callCount.should.equal(0);
+					return done();
+				});
+			});
+		});
 
-		describe 'when getInviteByToken produces an error', ->
+		describe('when getInviteByToken produces an error', function() {
 
-			beforeEach ->
-				@_getInviteByToken.callsArgWith(2, new Error('woops'))
+			beforeEach(function() {
+				return this._getInviteByToken.callsArgWith(2, new Error('woops'));
+			});
 
-			it 'should produce an error', (done) ->
-				@call (err) =>
-					expect(err).to.be.instanceof Error
-					done()
+			it('should produce an error', function(done) {
+				return this.call(err => {
+					expect(err).to.be.instanceof(Error);
+					return done();
+				});
+			});
 
-			it 'should have called getInviteByToken', (done) ->
-				@call (err) =>
-					@_getInviteByToken.callCount.should.equal 1
-					@_getInviteByToken.calledWith(@projectId, @token).should.equal true
-					done()
+			it('should have called getInviteByToken', function(done) {
+				return this.call(err => {
+					this._getInviteByToken.callCount.should.equal(1);
+					this._getInviteByToken.calledWith(this.projectId, this.token).should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should not have called CollaboratorsHandler.addUserIdToProject', (done) ->
-				@call (err) =>
-					@CollaboratorsHandler.addUserIdToProject.callCount.should.equal 0
-					done()
+			it('should not have called CollaboratorsHandler.addUserIdToProject', function(done) {
+				return this.call(err => {
+					this.CollaboratorsHandler.addUserIdToProject.callCount.should.equal(0);
+					return done();
+				});
+			});
 
-			it 'should not have called ProjectInvite.remove', (done) ->
-				@call (err) =>
-					@ProjectInvite.remove.callCount.should.equal 0
-					done()
+			return it('should not have called ProjectInvite.remove', function(done) {
+				return this.call(err => {
+					this.ProjectInvite.remove.callCount.should.equal(0);
+					return done();
+				});
+			});
+		});
 
-		describe 'when addUserIdToProject produces an error', ->
+		describe('when addUserIdToProject produces an error', function() {
 
-			beforeEach ->
-				@CollaboratorsHandler.addUserIdToProject.callsArgWith(4, new Error('woops'))
+			beforeEach(function() {
+				return this.CollaboratorsHandler.addUserIdToProject.callsArgWith(4, new Error('woops'));
+			});
 
-			it 'should produce an error', (done) ->
-				@call (err) =>
-					expect(err).to.be.instanceof Error
-					done()
+			it('should produce an error', function(done) {
+				return this.call(err => {
+					expect(err).to.be.instanceof(Error);
+					return done();
+				});
+			});
 
-			it 'should have called getInviteByToken', (done) ->
-				@call (err) =>
-					@_getInviteByToken.callCount.should.equal 1
-					@_getInviteByToken.calledWith(@projectId, @token).should.equal true
-					done()
+			it('should have called getInviteByToken', function(done) {
+				return this.call(err => {
+					this._getInviteByToken.callCount.should.equal(1);
+					this._getInviteByToken.calledWith(this.projectId, this.token).should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should have called CollaboratorsHandler.addUserIdToProject', (done) ->
-				@call (err) =>
-					@CollaboratorsHandler.addUserIdToProject.callCount.should.equal 1
-					@CollaboratorsHandler.addUserIdToProject.calledWith(@projectId, @sendingUserId, @userId, @fakeInvite.privileges).should.equal true
-					done()
+			it('should have called CollaboratorsHandler.addUserIdToProject', function(done) {
+				return this.call(err => {
+					this.CollaboratorsHandler.addUserIdToProject.callCount.should.equal(1);
+					this.CollaboratorsHandler.addUserIdToProject.calledWith(this.projectId, this.sendingUserId, this.userId, this.fakeInvite.privileges).should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should not have called ProjectInvite.remove', (done) ->
-				@call (err) =>
-					@ProjectInvite.remove.callCount.should.equal 0
-					done()
+			return it('should not have called ProjectInvite.remove', function(done) {
+				return this.call(err => {
+					this.ProjectInvite.remove.callCount.should.equal(0);
+					return done();
+				});
+			});
+		});
 
-		describe 'when ProjectInvite.remove produces an error', ->
+		return describe('when ProjectInvite.remove produces an error', function() {
 
-			beforeEach ->
-				@ProjectInvite.remove.callsArgWith(1, new Error('woops'))
+			beforeEach(function() {
+				return this.ProjectInvite.remove.callsArgWith(1, new Error('woops'));
+			});
 
-			it 'should produce an error', (done) ->
-				@call (err) =>
-					expect(err).to.be.instanceof Error
-					done()
+			it('should produce an error', function(done) {
+				return this.call(err => {
+					expect(err).to.be.instanceof(Error);
+					return done();
+				});
+			});
 
-			it 'should have called getInviteByToken', (done) ->
-				@call (err) =>
-					@_getInviteByToken.callCount.should.equal 1
-					@_getInviteByToken.calledWith(@projectId, @token).should.equal true
-					done()
+			it('should have called getInviteByToken', function(done) {
+				return this.call(err => {
+					this._getInviteByToken.callCount.should.equal(1);
+					this._getInviteByToken.calledWith(this.projectId, this.token).should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should have called CollaboratorsHandler.addUserIdToProject', (done) ->
-				@call (err) =>
-					@CollaboratorsHandler.addUserIdToProject.callCount.should.equal 1
-					@CollaboratorsHandler.addUserIdToProject.calledWith(@projectId, @sendingUserId, @userId, @fakeInvite.privileges).should.equal true
-					done()
+			it('should have called CollaboratorsHandler.addUserIdToProject', function(done) {
+				return this.call(err => {
+					this.CollaboratorsHandler.addUserIdToProject.callCount.should.equal(1);
+					this.CollaboratorsHandler.addUserIdToProject.calledWith(this.projectId, this.sendingUserId, this.userId, this.fakeInvite.privileges).should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should have called ProjectInvite.remove', (done) ->
-				@call (err) =>
-					@ProjectInvite.remove.callCount.should.equal 1
-					done()
+			return it('should have called ProjectInvite.remove', function(done) {
+				return this.call(err => {
+					this.ProjectInvite.remove.callCount.should.equal(1);
+					return done();
+				});
+			});
+		});
+	});
 
-	describe '_tryCancelInviteNotification', ->
-		beforeEach ->
-			@inviteId = ObjectId()
-			@currentUser = {_id: ObjectId()}
-			@notification = {read: sinon.stub().callsArgWith(0, null)}
-			@NotificationsBuilder.projectInvite = sinon.stub().returns(@notification)
-			@call = (callback) =>
-				@CollaboratorsInviteHandler._tryCancelInviteNotification @inviteId, callback
+	describe('_tryCancelInviteNotification', function() {
+		beforeEach(function() {
+			this.inviteId = ObjectId();
+			this.currentUser = {_id: ObjectId()};
+			this.notification = {read: sinon.stub().callsArgWith(0, null)};
+			this.NotificationsBuilder.projectInvite = sinon.stub().returns(this.notification);
+			return this.call = callback => {
+				return this.CollaboratorsInviteHandler._tryCancelInviteNotification(this.inviteId, callback);
+			};
+		});
 
-		it 'should not produce an error', (done) ->
-			@call (err) =>
-				expect(err).to.be.oneOf [null, undefined]
-				done()
+		it('should not produce an error', function(done) {
+			return this.call(err => {
+				expect(err).to.be.oneOf([null, undefined]);
+				return done();
+			});
+		});
 
-		it 'should call notification.read', (done) ->
-			@call (err) =>
-				@notification.read.callCount.should.equal 1
-				done()
+		it('should call notification.read', function(done) {
+			return this.call(err => {
+				this.notification.read.callCount.should.equal(1);
+				return done();
+			});
+		});
 
-		describe 'when notification.read produces an error', ->
-			beforeEach ->
-				@notification = {read: sinon.stub().callsArgWith(0, new Error('woops'))}
-				@NotificationsBuilder.projectInvite = sinon.stub().returns(@notification)
+		return describe('when notification.read produces an error', function() {
+			beforeEach(function() {
+				this.notification = {read: sinon.stub().callsArgWith(0, new Error('woops'))};
+				return this.NotificationsBuilder.projectInvite = sinon.stub().returns(this.notification);
+			});
 
-			it 'should produce an error', (done) ->
-				@call (err) =>
-					expect(err).to.be.instanceof Error
-					done()
+			return it('should produce an error', function(done) {
+				return this.call(err => {
+					expect(err).to.be.instanceof(Error);
+					return done();
+				});
+			});
+		});
+	});
 
-	describe "_trySendInviteNotification", ->
+	return describe("_trySendInviteNotification", function() {
 
-		beforeEach ->
-			@invite =
+		beforeEach(function() {
+			this.invite = {
 				_id: ObjectId(),
 				token: "some_token",
 				sendingUserId: ObjectId(),
-				projectId: @project_id,
-				targetEmail: 'user@example.com'
+				projectId: this.project_id,
+				targetEmail: 'user@example.com',
 				createdAt: new Date(),
-			@sendingUser =
-				_id: ObjectId()
+			};
+			this.sendingUser = {
+				_id: ObjectId(),
 				first_name: "jim"
-			@existingUser = {_id: ObjectId()}
-			@UserGetter.getUserByAnyEmail = sinon.stub().callsArgWith(2, null, @existingUser)
-			@fakeProject =
-				_id: @project_id
+			};
+			this.existingUser = {_id: ObjectId()};
+			this.UserGetter.getUserByAnyEmail = sinon.stub().callsArgWith(2, null, this.existingUser);
+			this.fakeProject = {
+				_id: this.project_id,
 				name: "some project"
-			@ProjectGetter.getProject = sinon.stub().callsArgWith(2, null, @fakeProject)
-			@notification = {create: sinon.stub().callsArgWith(0, null)}
-			@NotificationsBuilder.projectInvite = sinon.stub().returns(@notification)
-			@call = (callback) =>
-				@CollaboratorsInviteHandler._trySendInviteNotification @project_id, @sendingUser, @invite, callback
+			};
+			this.ProjectGetter.getProject = sinon.stub().callsArgWith(2, null, this.fakeProject);
+			this.notification = {create: sinon.stub().callsArgWith(0, null)};
+			this.NotificationsBuilder.projectInvite = sinon.stub().returns(this.notification);
+			return this.call = callback => {
+				return this.CollaboratorsInviteHandler._trySendInviteNotification(this.project_id, this.sendingUser, this.invite, callback);
+			};
+		});
 
-		describe 'when the user exists', ->
+		describe('when the user exists', function() {
 
-			beforeEach ->
+			beforeEach(function() {});
 
-			it 'should not produce an error', (done) ->
-				@call (err) =>
-					expect(err).to.be.oneOf [null, undefined]
-					done()
+			it('should not produce an error', function(done) {
+				return this.call(err => {
+					expect(err).to.be.oneOf([null, undefined]);
+					return done();
+				});
+			});
 
-			it 'should call getUser', (done) ->
-				@call (err) =>
-					@UserGetter.getUserByAnyEmail.callCount.should.equal 1
-					@UserGetter.getUserByAnyEmail.calledWith(@invite.email).should.equal true
-					done()
+			it('should call getUser', function(done) {
+				return this.call(err => {
+					this.UserGetter.getUserByAnyEmail.callCount.should.equal(1);
+					this.UserGetter.getUserByAnyEmail.calledWith(this.invite.email).should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should call getProject', (done) ->
-				@call (err) =>
-					@ProjectGetter.getProject.callCount.should.equal 1
-					@ProjectGetter.getProject.calledWith(@project_id).should.equal true
-					done()
+			it('should call getProject', function(done) {
+				return this.call(err => {
+					this.ProjectGetter.getProject.callCount.should.equal(1);
+					this.ProjectGetter.getProject.calledWith(this.project_id).should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should call NotificationsBuilder.projectInvite.create', (done) ->
-				@call (err) =>
-					@NotificationsBuilder.projectInvite.callCount.should.equal 1
-					@notification.create.callCount.should.equal 1
-					done()
+			it('should call NotificationsBuilder.projectInvite.create', function(done) {
+				return this.call(err => {
+					this.NotificationsBuilder.projectInvite.callCount.should.equal(1);
+					this.notification.create.callCount.should.equal(1);
+					return done();
+				});
+			});
 
-			describe 'when getProject produces an error', ->
+			describe('when getProject produces an error', function() {
 
-				beforeEach ->
-					@ProjectGetter.getProject.callsArgWith(2, new Error('woops'))
+				beforeEach(function() {
+					return this.ProjectGetter.getProject.callsArgWith(2, new Error('woops'));
+				});
 
-				it 'should produce an error', (done) ->
-					@call (err) =>
-						expect(err).to.be.instanceof Error
-						done()
+				it('should produce an error', function(done) {
+					return this.call(err => {
+						expect(err).to.be.instanceof(Error);
+						return done();
+					});
+				});
 
-				it 'should not call NotificationsBuilder.projectInvite.create', (done) ->
-					@call (err) =>
-						@NotificationsBuilder.projectInvite.callCount.should.equal 0
-						@notification.create.callCount.should.equal 0
-						done()
+				return it('should not call NotificationsBuilder.projectInvite.create', function(done) {
+					return this.call(err => {
+						this.NotificationsBuilder.projectInvite.callCount.should.equal(0);
+						this.notification.create.callCount.should.equal(0);
+						return done();
+					});
+				});
+			});
 
-			describe 'when projectInvite.create produces an error', ->
+			return describe('when projectInvite.create produces an error', function() {
 
-				beforeEach ->
-					@notification.create.callsArgWith(0, new Error('woops'))
+				beforeEach(function() {
+					return this.notification.create.callsArgWith(0, new Error('woops'));
+				});
 
-				it 'should produce an error', (done) ->
-					@call (err) =>
-						expect(err).to.be.instanceof Error
-						done()
+				return it('should produce an error', function(done) {
+					return this.call(err => {
+						expect(err).to.be.instanceof(Error);
+						return done();
+					});
+				});
+			});
+		});
 
-		describe 'when the user does not exist', ->
+		describe('when the user does not exist', function() {
 
-			beforeEach ->
-				@UserGetter.getUserByAnyEmail = sinon.stub().callsArgWith(2, null, null)
+			beforeEach(function() {
+				return this.UserGetter.getUserByAnyEmail = sinon.stub().callsArgWith(2, null, null);
+			});
 
-			it 'should not produce an error', (done) ->
-				@call (err) =>
-					expect(err).to.be.oneOf [null, undefined]
-					done()
+			it('should not produce an error', function(done) {
+				return this.call(err => {
+					expect(err).to.be.oneOf([null, undefined]);
+					return done();
+				});
+			});
 
-			it 'should call getUser', (done) ->
-				@call (err) =>
-					@UserGetter.getUserByAnyEmail.callCount.should.equal 1
-					@UserGetter.getUserByAnyEmail.calledWith(@invite.email).should.equal true
-					done()
+			it('should call getUser', function(done) {
+				return this.call(err => {
+					this.UserGetter.getUserByAnyEmail.callCount.should.equal(1);
+					this.UserGetter.getUserByAnyEmail.calledWith(this.invite.email).should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should not call getProject', (done) ->
-				@call (err) =>
-					@ProjectGetter.getProject.callCount.should.equal 0
-					done()
+			it('should not call getProject', function(done) {
+				return this.call(err => {
+					this.ProjectGetter.getProject.callCount.should.equal(0);
+					return done();
+				});
+			});
 
-			it 'should not call NotificationsBuilder.projectInvite.create', (done) ->
-				@call (err) =>
-					@NotificationsBuilder.projectInvite.callCount.should.equal 0
-					@notification.create.callCount.should.equal 0
-					done()
+			return it('should not call NotificationsBuilder.projectInvite.create', function(done) {
+				return this.call(err => {
+					this.NotificationsBuilder.projectInvite.callCount.should.equal(0);
+					this.notification.create.callCount.should.equal(0);
+					return done();
+				});
+			});
+		});
 
-		describe 'when the getUser produces an error', ->
+		return describe('when the getUser produces an error', function() {
 
-			beforeEach ->
-				@UserGetter.getUserByAnyEmail = sinon.stub().callsArgWith(2, new Error('woops'))
+			beforeEach(function() {
+				return this.UserGetter.getUserByAnyEmail = sinon.stub().callsArgWith(2, new Error('woops'));
+			});
 
-			it 'should produce an error', (done) ->
-				@call (err) =>
-					expect(err).to.be.instanceof Error
-					done()
+			it('should produce an error', function(done) {
+				return this.call(err => {
+					expect(err).to.be.instanceof(Error);
+					return done();
+				});
+			});
 
-			it 'should call getUser', (done) ->
-				@call (err) =>
-					@UserGetter.getUserByAnyEmail.callCount.should.equal 1
-					@UserGetter.getUserByAnyEmail.calledWith(@invite.email).should.equal true
-					done()
+			it('should call getUser', function(done) {
+				return this.call(err => {
+					this.UserGetter.getUserByAnyEmail.callCount.should.equal(1);
+					this.UserGetter.getUserByAnyEmail.calledWith(this.invite.email).should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should not call getProject', (done) ->
-				@call (err) =>
-					@ProjectGetter.getProject.callCount.should.equal 0
-					done()
+			it('should not call getProject', function(done) {
+				return this.call(err => {
+					this.ProjectGetter.getProject.callCount.should.equal(0);
+					return done();
+				});
+			});
 
-			it 'should not call NotificationsBuilder.projectInvite.create', (done) ->
-				@call (err) =>
-					@NotificationsBuilder.projectInvite.callCount.should.equal 0
-					@notification.create.callCount.should.equal 0
-					done()
+			return it('should not call NotificationsBuilder.projectInvite.create', function(done) {
+				return this.call(err => {
+					this.NotificationsBuilder.projectInvite.callCount.should.equal(0);
+					this.notification.create.callCount.should.equal(0);
+					return done();
+				});
+			});
+		});
+	});
+});

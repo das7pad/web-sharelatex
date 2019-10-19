@@ -1,278 +1,363 @@
-should = require('chai').should()
-SandboxedModule = require('sandboxed-module')
-assert = require('assert')
-path = require('path')
-sinon = require('sinon')
-modulePath = path.join __dirname, "../../../../app/js/Features/User/UserUpdater"
-expect = require("chai").expect
-tk = require('timekeeper')
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const should = require('chai').should();
+const SandboxedModule = require('sandboxed-module');
+const assert = require('assert');
+const path = require('path');
+const sinon = require('sinon');
+const modulePath = path.join(__dirname, "../../../../app/js/Features/User/UserUpdater");
+const {
+    expect
+} = require("chai");
+const tk = require('timekeeper');
 
-describe "UserUpdater", ->
+describe("UserUpdater", function() {
 
-	beforeEach ->
-		tk.freeze(Date.now())
-		@mongojs = 
-			db:{}
-			ObjectId:(id)-> return id
-		@UserGetter =
-			getUserEmail: sinon.stub()
-			getUserByAnyEmail: sinon.stub()
+	beforeEach(function() {
+		tk.freeze(Date.now());
+		this.mongojs = { 
+			db:{},
+			ObjectId(id){ return id; }
+		};
+		this.UserGetter = {
+			getUserEmail: sinon.stub(),
+			getUserByAnyEmail: sinon.stub(),
 			ensureUniqueEmailAddress: sinon.stub()
-		@logger = 
-			err: sinon.stub()
-			log: ->
-			warn: ->
-		@addAffiliation = sinon.stub().yields()
-		@removeAffiliation = sinon.stub().callsArgWith(2, null)
-		@refreshFeatures = sinon.stub().yields()
-		@NewsletterManager = 
-			changeEmail:sinon.stub()
-		@UserUpdater = SandboxedModule.require modulePath, requires:
-			"logger-sharelatex": @logger
-			"../../infrastructure/mongojs":@mongojs
-			"metrics-sharelatex": timeAsyncMethod: sinon.stub()
-			"./UserGetter": @UserGetter
-			'../Institutions/InstitutionsAPI':
-				addAffiliation: @addAffiliation
-				removeAffiliation: @removeAffiliation
-			'../Subscription/FeaturesUpdater': refreshFeatures: @refreshFeatures
-			"settings-sharelatex": @settings = {}
-			"request": @request = {}
-			"../Newsletter/NewsletterManager": @NewsletterManager
+		};
+		this.logger = { 
+			err: sinon.stub(),
+			log() {},
+			warn() {}
+		};
+		this.addAffiliation = sinon.stub().yields();
+		this.removeAffiliation = sinon.stub().callsArgWith(2, null);
+		this.refreshFeatures = sinon.stub().yields();
+		this.NewsletterManager = 
+			{changeEmail:sinon.stub()};
+		this.UserUpdater = SandboxedModule.require(modulePath, { requires: {
+			"logger-sharelatex": this.logger,
+			"../../infrastructure/mongojs":this.mongojs,
+			"metrics-sharelatex": { timeAsyncMethod: sinon.stub()
+		},
+			"./UserGetter": this.UserGetter,
+			'../Institutions/InstitutionsAPI': {
+				addAffiliation: this.addAffiliation,
+				removeAffiliation: this.removeAffiliation
+			},
+			'../Subscription/FeaturesUpdater': { refreshFeatures: this.refreshFeatures
+		},
+			"settings-sharelatex": (this.settings = {}),
+			"request": (this.request = {}),
+			"../Newsletter/NewsletterManager": this.NewsletterManager
+		}
+	}
+		);
 
-		@stubbedUser = 
-			_id: "3131231"
-			name:"bob"
+		this.stubbedUser = { 
+			_id: "3131231",
+			name:"bob",
 			email:"hello@world.com"
-		@newEmail = "bob@bob.com"
+		};
+		return this.newEmail = "bob@bob.com";
+	});
 
-	afterEach ->
-		tk.reset()
+	afterEach(() => tk.reset());
 
-	describe 'changeEmailAddress', ->
-		beforeEach ->
-			@UserGetter.getUserEmail.callsArgWith(1, null, @stubbedUser.email)
-			@UserUpdater.addEmailAddress = sinon.stub().callsArgWith(2)
-			@UserUpdater.setDefaultEmailAddress = sinon.stub().callsArgWith(2)
-			@UserUpdater.removeEmailAddress = sinon.stub().callsArgWith(2)
+	describe('changeEmailAddress', function() {
+		beforeEach(function() {
+			this.UserGetter.getUserEmail.callsArgWith(1, null, this.stubbedUser.email);
+			this.UserUpdater.addEmailAddress = sinon.stub().callsArgWith(2);
+			this.UserUpdater.setDefaultEmailAddress = sinon.stub().callsArgWith(2);
+			return this.UserUpdater.removeEmailAddress = sinon.stub().callsArgWith(2);
+		});
 
-		it 'change email', (done)->
-			@UserUpdater.changeEmailAddress @stubbedUser._id, @newEmail, (err)=>
-				should.not.exist(err)
-				@UserUpdater.addEmailAddress.calledWith(
-					@stubbedUser._id, @newEmail
-				).should.equal true
-				@UserUpdater.setDefaultEmailAddress.calledWith(
-					@stubbedUser._id, @newEmail
-				).should.equal true
-				@UserUpdater.removeEmailAddress.calledWith(
-					@stubbedUser._id, @stubbedUser.email
-				).should.equal true
-				done()
+		it('change email', function(done){
+			return this.UserUpdater.changeEmailAddress(this.stubbedUser._id, this.newEmail, err=> {
+				should.not.exist(err);
+				this.UserUpdater.addEmailAddress.calledWith(
+					this.stubbedUser._id, this.newEmail
+				).should.equal(true);
+				this.UserUpdater.setDefaultEmailAddress.calledWith(
+					this.stubbedUser._id, this.newEmail
+				).should.equal(true);
+				this.UserUpdater.removeEmailAddress.calledWith(
+					this.stubbedUser._id, this.stubbedUser.email
+				).should.equal(true);
+				return done();
+			});
+		});
 
-		it 'validates email', (done)->
-			@UserUpdater.changeEmailAddress @stubbedUser._id, 'foo', (err)=>
-				should.exist(err)
-				done()
+		it('validates email', function(done){
+			return this.UserUpdater.changeEmailAddress(this.stubbedUser._id, 'foo', err=> {
+				should.exist(err);
+				return done();
+			});
+		});
 
-		it 'handle error', (done)->
-			@UserUpdater.removeEmailAddress.callsArgWith(2, new Error('nope'))
-			@UserUpdater.changeEmailAddress @stubbedUser._id, @newEmail, (err)=>
-				should.exist(err)
-				done()
+		return it('handle error', function(done){
+			this.UserUpdater.removeEmailAddress.callsArgWith(2, new Error('nope'));
+			return this.UserUpdater.changeEmailAddress(this.stubbedUser._id, this.newEmail, err=> {
+				should.exist(err);
+				return done();
+			});
+		});
+	});
 
-	describe 'addEmailAddress', ->
-		beforeEach ->
-			@UserGetter.ensureUniqueEmailAddress = sinon.stub().callsArgWith(1)
-			@UserUpdater.updateUser = sinon.stub().callsArgWith(2, null)
+	describe('addEmailAddress', function() {
+		beforeEach(function() {
+			this.UserGetter.ensureUniqueEmailAddress = sinon.stub().callsArgWith(1);
+			return this.UserUpdater.updateUser = sinon.stub().callsArgWith(2, null);
+		});
 
-		it 'add email', (done)->
-			@UserUpdater.addEmailAddress @stubbedUser._id, @newEmail, (err)=>
-				@UserGetter.ensureUniqueEmailAddress.called.should.equal true
-				should.not.exist(err)
-				reversedHostname = @newEmail.split('@')[1].split('').reverse().join('')
-				@UserUpdater.updateUser.calledWith(
-					@stubbedUser._id,
-					$push: { emails: { email: @newEmail, createdAt: sinon.match.date, reversedHostname: reversedHostname } }
-				).should.equal true
-				done()
+		it('add email', function(done){
+			return this.UserUpdater.addEmailAddress(this.stubbedUser._id, this.newEmail, err=> {
+				this.UserGetter.ensureUniqueEmailAddress.called.should.equal(true);
+				should.not.exist(err);
+				const reversedHostname = this.newEmail.split('@')[1].split('').reverse().join('');
+				this.UserUpdater.updateUser.calledWith(
+					this.stubbedUser._id,
+					{$push: { emails: { email: this.newEmail, createdAt: sinon.match.date, reversedHostname } }}
+				).should.equal(true);
+				return done();
+			});
+		});
 
-		it 'add affiliation', (done)->
-			affiliationOptions =
-				university: { id: 1 }
-				role: 'Prof'
+		it('add affiliation', function(done){
+			const affiliationOptions = {
+				university: { id: 1 },
+				role: 'Prof',
 				department: 'Math'
-			@UserUpdater.addEmailAddress @stubbedUser._id, @newEmail, affiliationOptions, (err)=>
-				should.not.exist(err)
-				@addAffiliation.calledOnce.should.equal true
-				args = @addAffiliation.lastCall.args
-				args[0].should.equal @stubbedUser._id
-				args[1].should.equal @newEmail
-				args[2].should.equal affiliationOptions
-				done()
+			};
+			return this.UserUpdater.addEmailAddress(this.stubbedUser._id, this.newEmail, affiliationOptions, err=> {
+				should.not.exist(err);
+				this.addAffiliation.calledOnce.should.equal(true);
+				const {
+                    args
+                } = this.addAffiliation.lastCall;
+				args[0].should.equal(this.stubbedUser._id);
+				args[1].should.equal(this.newEmail);
+				args[2].should.equal(affiliationOptions);
+				return done();
+			});
+		});
 
-		it 'handle error', (done)->
-			@UserUpdater.updateUser = sinon.stub().callsArgWith(2, new Error('nope'))
+		it('handle error', function(done){
+			this.UserUpdater.updateUser = sinon.stub().callsArgWith(2, new Error('nope'));
 
-			@UserUpdater.addEmailAddress @stubbedUser._id, @newEmail, (err)=>
-				@logger.err.called.should.equal true
-				should.exist(err)
-				done()
+			return this.UserUpdater.addEmailAddress(this.stubbedUser._id, this.newEmail, err=> {
+				this.logger.err.called.should.equal(true);
+				should.exist(err);
+				return done();
+			});
+		});
 
-		it 'handle affiliation error', (done)->
-			body = errors: 'affiliation error message'
-			@addAffiliation.callsArgWith(3, new Error('nope'))
-			@UserUpdater.addEmailAddress @stubbedUser._id, @newEmail, (err)=>
-				should.exist(err)
-				@UserUpdater.updateUser.called.should.equal false
-				done()
+		it('handle affiliation error', function(done){
+			const body = {errors: 'affiliation error message'};
+			this.addAffiliation.callsArgWith(3, new Error('nope'));
+			return this.UserUpdater.addEmailAddress(this.stubbedUser._id, this.newEmail, err=> {
+				should.exist(err);
+				this.UserUpdater.updateUser.called.should.equal(false);
+				return done();
+			});
+		});
 
-		it 'validates email', (done)->
-			@UserUpdater.addEmailAddress @stubbedUser._id, 'bar', (err)=>
-				should.exist(err)
-				done()
+		return it('validates email', function(done){
+			return this.UserUpdater.addEmailAddress(this.stubbedUser._id, 'bar', err=> {
+				should.exist(err);
+				return done();
+			});
+		});
+	});
 
-	describe 'removeEmailAddress', ->
-		beforeEach ->
-			@UserUpdater.updateUser = sinon.stub().callsArgWith(2, null, nMatched: 1)
+	describe('removeEmailAddress', function() {
+		beforeEach(function() {
+			return this.UserUpdater.updateUser = sinon.stub().callsArgWith(2, null, {nMatched: 1});
+		});
 
-		it 'remove email', (done)->
-			@UserUpdater.removeEmailAddress @stubbedUser._id, @newEmail, (err)=>
-				should.not.exist(err)
-				@UserUpdater.updateUser.calledWith(
-					{ _id: @stubbedUser._id, email: { $ne: @newEmail } },
-					$pull: { emails: { email: @newEmail } }
-				).should.equal true
-				done()
+		it('remove email', function(done){
+			return this.UserUpdater.removeEmailAddress(this.stubbedUser._id, this.newEmail, err=> {
+				should.not.exist(err);
+				this.UserUpdater.updateUser.calledWith(
+					{ _id: this.stubbedUser._id, email: { $ne: this.newEmail } },
+					{$pull: { emails: { email: this.newEmail } }}
+				).should.equal(true);
+				return done();
+			});
+		});
 
-		it 'remove affiliation', (done)->
-			@UserUpdater.removeEmailAddress @stubbedUser._id, @newEmail, (err)=>
-				should.not.exist(err)
-				@removeAffiliation.calledOnce.should.equal true
-				args = @removeAffiliation.lastCall.args
-				args[0].should.equal @stubbedUser._id
-				args[1].should.equal @newEmail
-				done()
+		it('remove affiliation', function(done){
+			return this.UserUpdater.removeEmailAddress(this.stubbedUser._id, this.newEmail, err=> {
+				should.not.exist(err);
+				this.removeAffiliation.calledOnce.should.equal(true);
+				const {
+                    args
+                } = this.removeAffiliation.lastCall;
+				args[0].should.equal(this.stubbedUser._id);
+				args[1].should.equal(this.newEmail);
+				return done();
+			});
+		});
 
-		it 'handle error', (done)->
-			@UserUpdater.updateUser = sinon.stub().callsArgWith(2, new Error('nope'))
+		it('handle error', function(done){
+			this.UserUpdater.updateUser = sinon.stub().callsArgWith(2, new Error('nope'));
 
-			@UserUpdater.removeEmailAddress @stubbedUser._id, @newEmail, (err)=>
-				should.exist(err)
-				done()
+			return this.UserUpdater.removeEmailAddress(this.stubbedUser._id, this.newEmail, err=> {
+				should.exist(err);
+				return done();
+			});
+		});
 
-		it 'handle missed update', (done)->
-			@UserUpdater.updateUser = sinon.stub().callsArgWith(2, null, n: 0)
+		it('handle missed update', function(done){
+			this.UserUpdater.updateUser = sinon.stub().callsArgWith(2, null, {n: 0});
 
-			@UserUpdater.removeEmailAddress @stubbedUser._id, @newEmail, (err)=>
-				should.exist(err)
-				done()
+			return this.UserUpdater.removeEmailAddress(this.stubbedUser._id, this.newEmail, err=> {
+				should.exist(err);
+				return done();
+			});
+		});
 
-		it 'handle affiliation error', (done)->
-			@removeAffiliation.callsArgWith(2, new Error('nope'))
-			@UserUpdater.removeEmailAddress @stubbedUser._id, @newEmail, (err)=>
-				should.exist(err)
-				@UserUpdater.updateUser.called.should.equal false
-				done()
+		it('handle affiliation error', function(done){
+			this.removeAffiliation.callsArgWith(2, new Error('nope'));
+			return this.UserUpdater.removeEmailAddress(this.stubbedUser._id, this.newEmail, err=> {
+				should.exist(err);
+				this.UserUpdater.updateUser.called.should.equal(false);
+				return done();
+			});
+		});
 
-		it 'validates email', (done)->
-			@UserUpdater.removeEmailAddress @stubbedUser._id, 'baz', (err)=>
-				should.exist(err)
-				done()
+		return it('validates email', function(done){
+			return this.UserUpdater.removeEmailAddress(this.stubbedUser._id, 'baz', err=> {
+				should.exist(err);
+				return done();
+			});
+		});
+	});
 
-	describe 'setDefaultEmailAddress', ->
-		beforeEach ->
-			@UserGetter.getUserEmail.callsArgWith(1, null, @stubbedUser.email)
-			@NewsletterManager.changeEmail.callsArgWith(2, null)
+	describe('setDefaultEmailAddress', function() {
+		beforeEach(function() {
+			this.UserGetter.getUserEmail.callsArgWith(1, null, this.stubbedUser.email);
+			return this.NewsletterManager.changeEmail.callsArgWith(2, null);
+		});
 
-		it 'set default', (done)->
-			@UserUpdater.updateUser = sinon.stub().callsArgWith(2, null, n: 1)
+		it('set default', function(done){
+			this.UserUpdater.updateUser = sinon.stub().callsArgWith(2, null, {n: 1});
 
-			@UserUpdater.setDefaultEmailAddress @stubbedUser._id, @newEmail, (err)=>
-				should.not.exist(err)
-				@UserUpdater.updateUser.calledWith(
-					{ _id: @stubbedUser._id, 'emails.email': @newEmail },
-					$set: { email: @newEmail }
-				).should.equal true
-				done()
+			return this.UserUpdater.setDefaultEmailAddress(this.stubbedUser._id, this.newEmail, err=> {
+				should.not.exist(err);
+				this.UserUpdater.updateUser.calledWith(
+					{ _id: this.stubbedUser._id, 'emails.email': this.newEmail },
+					{$set: { email: this.newEmail }}
+				).should.equal(true);
+				return done();
+			});
+		});
 
-		it 'set changed the email in newsletter', (done)->
-			@UserUpdater.updateUser = sinon.stub().callsArgWith(2, null, n: 1)
+		it('set changed the email in newsletter', function(done){
+			this.UserUpdater.updateUser = sinon.stub().callsArgWith(2, null, {n: 1});
 
-			@UserUpdater.setDefaultEmailAddress @stubbedUser._id, @newEmail, (err)=>
-				should.not.exist(err)
-				@NewsletterManager.changeEmail.calledWith(
-					@stubbedUser.email, @newEmail
-				).should.equal true
-				done()
+			return this.UserUpdater.setDefaultEmailAddress(this.stubbedUser._id, this.newEmail, err=> {
+				should.not.exist(err);
+				this.NewsletterManager.changeEmail.calledWith(
+					this.stubbedUser.email, this.newEmail
+				).should.equal(true);
+				return done();
+			});
+		});
 
-		it 'handle error', (done)->
-			@UserUpdater.updateUser = sinon.stub().callsArgWith(2, new Error('nope'))
+		it('handle error', function(done){
+			this.UserUpdater.updateUser = sinon.stub().callsArgWith(2, new Error('nope'));
 
-			@UserUpdater.setDefaultEmailAddress @stubbedUser._id, @newEmail, (err)=>
-				should.exist(err)
-				done()
+			return this.UserUpdater.setDefaultEmailAddress(this.stubbedUser._id, this.newEmail, err=> {
+				should.exist(err);
+				return done();
+			});
+		});
 
-		it 'handle missed update', (done)->
-			@UserUpdater.updateUser = sinon.stub().callsArgWith(2, null, n: 0)
+		it('handle missed update', function(done){
+			this.UserUpdater.updateUser = sinon.stub().callsArgWith(2, null, {n: 0});
 
-			@UserUpdater.setDefaultEmailAddress @stubbedUser._id, @newEmail, (err)=>
-				should.exist(err)
-				done()
+			return this.UserUpdater.setDefaultEmailAddress(this.stubbedUser._id, this.newEmail, err=> {
+				should.exist(err);
+				return done();
+			});
+		});
 
-		it 'validates email', (done)->
-			@UserUpdater.setDefaultEmailAddress @stubbedUser._id, '.edu', (err)=>
-				should.exist(err)
-				done()
+		return it('validates email', function(done){
+			return this.UserUpdater.setDefaultEmailAddress(this.stubbedUser._id, '.edu', err=> {
+				should.exist(err);
+				return done();
+			});
+		});
+	});
 
-	describe 'confirmEmail', ->
-		beforeEach ->
-			@UserUpdater.updateUser = sinon.stub().callsArgWith(2, null, n: 1)
+	return describe('confirmEmail', function() {
+		beforeEach(function() {
+			return this.UserUpdater.updateUser = sinon.stub().callsArgWith(2, null, {n: 1});
+		});
 
-		it 'should update the email record', (done)->
-			@UserUpdater.confirmEmail @stubbedUser._id, @newEmail, (err)=>
-				should.not.exist(err)
-				@UserUpdater.updateUser.calledWith(
-					{ _id: @stubbedUser._id, 'emails.email': @newEmail },
-					$set: { 'emails.$.confirmedAt': new Date() }
-				).should.equal true
-				done()
+		it('should update the email record', function(done){
+			return this.UserUpdater.confirmEmail(this.stubbedUser._id, this.newEmail, err=> {
+				should.not.exist(err);
+				this.UserUpdater.updateUser.calledWith(
+					{ _id: this.stubbedUser._id, 'emails.email': this.newEmail },
+					{$set: { 'emails.$.confirmedAt': new Date() }}
+				).should.equal(true);
+				return done();
+			});
+		});
 
-		it 'add affiliation', (done)->
-			@UserUpdater.confirmEmail @stubbedUser._id, @newEmail, (err)=>
-				should.not.exist(err)
-				@addAffiliation.calledOnce.should.equal true
-				sinon.assert.calledWith(@addAffiliation, @stubbedUser._id, @newEmail, { confirmedAt: new Date() } )
-				done()
+		it('add affiliation', function(done){
+			return this.UserUpdater.confirmEmail(this.stubbedUser._id, this.newEmail, err=> {
+				should.not.exist(err);
+				this.addAffiliation.calledOnce.should.equal(true);
+				sinon.assert.calledWith(this.addAffiliation, this.stubbedUser._id, this.newEmail, { confirmedAt: new Date() } );
+				return done();
+			});
+		});
 
-		it 'handle error', (done)->
-			@UserUpdater.updateUser = sinon.stub().callsArgWith(2, new Error('nope'))
+		it('handle error', function(done){
+			this.UserUpdater.updateUser = sinon.stub().callsArgWith(2, new Error('nope'));
 
-			@UserUpdater.confirmEmail @stubbedUser._id, @newEmail, (err)=>
-				should.exist(err)
-				done()
+			return this.UserUpdater.confirmEmail(this.stubbedUser._id, this.newEmail, err=> {
+				should.exist(err);
+				return done();
+			});
+		});
 
-		it 'handle missed update', (done)->
-			@UserUpdater.updateUser = sinon.stub().callsArgWith(2, null, n: 0)
+		it('handle missed update', function(done){
+			this.UserUpdater.updateUser = sinon.stub().callsArgWith(2, null, {n: 0});
 
-			@UserUpdater.confirmEmail @stubbedUser._id, @newEmail, (err)=>
-				should.exist(err)
-				done()
+			return this.UserUpdater.confirmEmail(this.stubbedUser._id, this.newEmail, err=> {
+				should.exist(err);
+				return done();
+			});
+		});
 
-		it 'validates email', (done)->
-			@UserUpdater.confirmEmail @stubbedUser._id, '@', (err)=>
-				should.exist(err)
-				done()
+		it('validates email', function(done){
+			return this.UserUpdater.confirmEmail(this.stubbedUser._id, '@', err=> {
+				should.exist(err);
+				return done();
+			});
+		});
 
-		it 'handle affiliation error', (done)->
-			@addAffiliation.callsArgWith(3, new Error('nope'))
-			@UserUpdater.confirmEmail @stubbedUser._id, @newEmail, (err)=>
-				should.exist(err)
-				@UserUpdater.updateUser.called.should.equal false
-				done()
+		it('handle affiliation error', function(done){
+			this.addAffiliation.callsArgWith(3, new Error('nope'));
+			return this.UserUpdater.confirmEmail(this.stubbedUser._id, this.newEmail, err=> {
+				should.exist(err);
+				this.UserUpdater.updateUser.called.should.equal(false);
+				return done();
+			});
+		});
 
-		it 'refresh features', (done)->
-			@UserUpdater.confirmEmail @stubbedUser._id, @newEmail, (err)=>
-				should.not.exist(err)
-				sinon.assert.calledWith(@refreshFeatures, @stubbedUser._id, true)
-				done()
+		return it('refresh features', function(done){
+			return this.UserUpdater.confirmEmail(this.stubbedUser._id, this.newEmail, err=> {
+				should.not.exist(err);
+				sinon.assert.calledWith(this.refreshFeatures, this.stubbedUser._id, true);
+				return done();
+			});
+		});
+	});
+});

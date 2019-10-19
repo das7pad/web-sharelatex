@@ -1,244 +1,327 @@
-SandboxedModule = require('sandboxed-module')
-should = require('chai').should()
-sinon = require 'sinon'
-assert = require("chai").assert
-modulePath = "../../../../app/js/Features/References/ReferencesController"
-MockRequest = require "../helpers/MockRequest"
-MockResponse = require "../helpers/MockResponse"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const SandboxedModule = require('sandboxed-module');
+const should = require('chai').should();
+const sinon = require('sinon');
+const {
+    assert
+} = require("chai");
+const modulePath = "../../../../app/js/Features/References/ReferencesController";
+const MockRequest = require("../helpers/MockRequest");
+const MockResponse = require("../helpers/MockResponse");
 
-describe "ReferencesController", ->
+describe("ReferencesController", function() {
 
-	beforeEach ->
-		@projectId = '2222'
-		@controller = SandboxedModule.require modulePath, requires:
+	beforeEach(function() {
+		this.projectId = '2222';
+		this.controller = SandboxedModule.require(modulePath, { requires: {
 			'logger-sharelatex': {
-				log: ->
-				err: ->
+				log() {},
+				err() {}
 			},
-			'settings-sharelatex': @settings = {
+			'settings-sharelatex': (this.settings = {
 				apis: {web: {url: 'http://some.url'}}
-			},
-			'./ReferencesHandler': @ReferencesHandler = {
-				index: sinon.stub()
+			}),
+			'./ReferencesHandler': (this.ReferencesHandler = {
+				index: sinon.stub(),
 				indexAll: sinon.stub()
-			},
-			'../Editor/EditorRealTimeController': @EditorRealTimeController = {
+			}),
+			'../Editor/EditorRealTimeController': (this.EditorRealTimeController = {
 				emitToRoom: sinon.stub()
-			}
-		@req = new MockRequest()
-		@req.params.Project_id = @projectId
-		@req.body =
-			docIds: @docIds = ['aaa', 'bbb']
+			})
+		}
+	});
+		this.req = new MockRequest();
+		this.req.params.Project_id = this.projectId;
+		this.req.body = {
+			docIds: (this.docIds = ['aaa', 'bbb']),
 			shouldBroadcast: false
-		@res = new MockResponse()
-		@res.json = sinon.stub()
-		@res.send = sinon.stub()
-		@res.sendStatus = sinon.stub()
-		@fakeResponseData =
-			projectId: @projectId,
+		};
+		this.res = new MockResponse();
+		this.res.json = sinon.stub();
+		this.res.send = sinon.stub();
+		this.res.sendStatus = sinon.stub();
+		return this.fakeResponseData = {
+			projectId: this.projectId,
 			keys: ['one', 'two', 'three']
+		};});
 
-	describe 'indexAll', ->
+	describe('indexAll', function() {
 
-		beforeEach ->
-			@req.body = {shouldBroadcast: false}
-			@ReferencesHandler.indexAll.callsArgWith(1, null, @fakeResponseData)
-			@call = (callback) =>
-				@controller.indexAll @req, @res
-				callback()
+		beforeEach(function() {
+			this.req.body = {shouldBroadcast: false};
+			this.ReferencesHandler.indexAll.callsArgWith(1, null, this.fakeResponseData);
+			return this.call = callback => {
+				this.controller.indexAll(this.req, this.res);
+				return callback();
+			};
+		});
 
-		it 'should not produce an error', (done) ->
-			@call () =>
-				@res.sendStatus.callCount.should.equal 0
-				@res.sendStatus.calledWith(500).should.equal false
-				@res.sendStatus.calledWith(400).should.equal false
-				done()
+		it('should not produce an error', function(done) {
+			return this.call(() => {
+				this.res.sendStatus.callCount.should.equal(0);
+				this.res.sendStatus.calledWith(500).should.equal(false);
+				this.res.sendStatus.calledWith(400).should.equal(false);
+				return done();
+			});
+		});
 
-		it 'should return data', (done) ->
-			@call () =>
-				@res.json.callCount.should.equal 1
-				@res.json.calledWith(@fakeResponseData).should.equal true
-				done()
+		it('should return data', function(done) {
+			return this.call(() => {
+				this.res.json.callCount.should.equal(1);
+				this.res.json.calledWith(this.fakeResponseData).should.equal(true);
+				return done();
+			});
+		});
 
-		it 'should call ReferencesHandler.indexAll', (done) ->
-			@call () =>
-				@ReferencesHandler.indexAll.callCount.should.equal 1
-				@ReferencesHandler.indexAll.calledWith(@projectId).should.equal true
-				done()
+		it('should call ReferencesHandler.indexAll', function(done) {
+			return this.call(() => {
+				this.ReferencesHandler.indexAll.callCount.should.equal(1);
+				this.ReferencesHandler.indexAll.calledWith(this.projectId).should.equal(true);
+				return done();
+			});
+		});
 
-		describe 'when shouldBroadcast is true', ->
+		describe('when shouldBroadcast is true', function() {
 
-			beforeEach ->
-				@ReferencesHandler.index.callsArgWith(2, null, @fakeResponseData)
-				@req.body.shouldBroadcast = true
+			beforeEach(function() {
+				this.ReferencesHandler.index.callsArgWith(2, null, this.fakeResponseData);
+				return this.req.body.shouldBroadcast = true;
+			});
 
-			it 'should call EditorRealTimeController.emitToRoom', (done) ->
-				@call () =>
-					@EditorRealTimeController.emitToRoom.callCount.should.equal 1
-					done()
+			it('should call EditorRealTimeController.emitToRoom', function(done) {
+				return this.call(() => {
+					this.EditorRealTimeController.emitToRoom.callCount.should.equal(1);
+					return done();
+				});
+			});
 
-			it 'should not produce an error', (done) ->
-				@call () =>
-					@res.sendStatus.callCount.should.equal 0
-					@res.sendStatus.calledWith(500).should.equal false
-					@res.sendStatus.calledWith(400).should.equal false
-					done()
+			it('should not produce an error', function(done) {
+				return this.call(() => {
+					this.res.sendStatus.callCount.should.equal(0);
+					this.res.sendStatus.calledWith(500).should.equal(false);
+					this.res.sendStatus.calledWith(400).should.equal(false);
+					return done();
+				});
+			});
 
-			it 'should still return data', (done) ->
-				@call () =>
-					@res.json.callCount.should.equal 1
-					@res.json.calledWith(@fakeResponseData).should.equal true
-					done()
+			return it('should still return data', function(done) {
+				return this.call(() => {
+					this.res.json.callCount.should.equal(1);
+					this.res.json.calledWith(this.fakeResponseData).should.equal(true);
+					return done();
+				});
+			});
+		});
 
-		describe 'when shouldBroadcast is false', ->
+		return describe('when shouldBroadcast is false', function() {
 
-			beforeEach ->
-				@ReferencesHandler.index.callsArgWith(2, null, @fakeResponseData)
-				@req.body.shouldBroadcast = false
+			beforeEach(function() {
+				this.ReferencesHandler.index.callsArgWith(2, null, this.fakeResponseData);
+				return this.req.body.shouldBroadcast = false;
+			});
 
-			it 'should not call EditorRealTimeController.emitToRoom', (done) ->
-				@call () =>
-					@EditorRealTimeController.emitToRoom.callCount.should.equal 0
-					done()
+			it('should not call EditorRealTimeController.emitToRoom', function(done) {
+				return this.call(() => {
+					this.EditorRealTimeController.emitToRoom.callCount.should.equal(0);
+					return done();
+				});
+			});
 
-			it 'should not produce an error', (done) ->
-				@call () =>
-					@res.sendStatus.callCount.should.equal 0
-					@res.sendStatus.calledWith(500).should.equal false
-					@res.sendStatus.calledWith(400).should.equal false
-					done()
+			it('should not produce an error', function(done) {
+				return this.call(() => {
+					this.res.sendStatus.callCount.should.equal(0);
+					this.res.sendStatus.calledWith(500).should.equal(false);
+					this.res.sendStatus.calledWith(400).should.equal(false);
+					return done();
+				});
+			});
 
-			it 'should still return data', (done) ->
-				@call () =>
-					@res.json.callCount.should.equal 1
-					@res.json.calledWith(@fakeResponseData).should.equal true
-					done()
+			return it('should still return data', function(done) {
+				return this.call(() => {
+					this.res.json.callCount.should.equal(1);
+					this.res.json.calledWith(this.fakeResponseData).should.equal(true);
+					return done();
+				});
+			});
+		});
+	});
 
-	describe 'there is no data', ->
+	describe('there is no data', function() {
 
-			beforeEach ->
-				@ReferencesHandler.indexAll.callsArgWith(1)
-				@call = (callback) =>
-					@controller.indexAll @req, @res
-					callback()
+			beforeEach(function() {
+				this.ReferencesHandler.indexAll.callsArgWith(1);
+				return this.call = callback => {
+					this.controller.indexAll(this.req, this.res);
+					return callback();
+				};
+			});
 
-			it 'should not call EditorRealTimeController.emitToRoom', (done) ->
-				@call () =>
-					@EditorRealTimeController.emitToRoom.callCount.should.equal 0
-					done()
+			it('should not call EditorRealTimeController.emitToRoom', function(done) {
+				return this.call(() => {
+					this.EditorRealTimeController.emitToRoom.callCount.should.equal(0);
+					return done();
+				});
+			});
 
-			it 'should not produce an error', (done) ->
-				@call () =>
-					@res.sendStatus.callCount.should.equal 0
-					@res.sendStatus.calledWith(500).should.equal false
-					@res.sendStatus.calledWith(400).should.equal false
-					done()
+			it('should not produce an error', function(done) {
+				return this.call(() => {
+					this.res.sendStatus.callCount.should.equal(0);
+					this.res.sendStatus.calledWith(500).should.equal(false);
+					this.res.sendStatus.calledWith(400).should.equal(false);
+					return done();
+				});
+			});
 
-			it 'should send a response with an empty keys list', (done) ->
-				@call () =>
-					@res.json.called.should.equal true
-					@res.json.calledWith({projectId: @projectId, keys: []}).should.equal true
-					done()
+			return it('should send a response with an empty keys list', function(done) {
+				return this.call(() => {
+					this.res.json.called.should.equal(true);
+					this.res.json.calledWith({projectId: this.projectId, keys: []}).should.equal(true);
+					return done();
+				});
+			});
+	});
 
-	describe 'index', ->
+	return describe('index', function() {
 
-		beforeEach ->
-			@call = (callback) =>
-				@controller.index @req, @res
-				callback()
+		beforeEach(function() {
+			return this.call = callback => {
+				this.controller.index(this.req, this.res);
+				return callback();
+			};
+		});
 
-		describe 'with docIds as an array and shouldBroadcast as false', ->
+		describe('with docIds as an array and shouldBroadcast as false', function() {
 
-			beforeEach ->
-				@ReferencesHandler.index.callsArgWith(2, null, @fakeResponseData)
+			beforeEach(function() {
+				return this.ReferencesHandler.index.callsArgWith(2, null, this.fakeResponseData);
+			});
 
-			it 'should call ReferencesHandler.index', (done) ->
-				@call () =>
-					@ReferencesHandler.index.callCount.should.equal 1
-					@ReferencesHandler.index.calledWith(@projectId, @docIds).should.equal true
-					done()
+			it('should call ReferencesHandler.index', function(done) {
+				return this.call(() => {
+					this.ReferencesHandler.index.callCount.should.equal(1);
+					this.ReferencesHandler.index.calledWith(this.projectId, this.docIds).should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should return data', (done) ->
-				@call () =>
-					@res.json.callCount.should.equal 1
-					@res.json.calledWith(@fakeResponseData).should.equal true
-					done()
+			it('should return data', function(done) {
+				return this.call(() => {
+					this.res.json.callCount.should.equal(1);
+					this.res.json.calledWith(this.fakeResponseData).should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should not produce an error', (done) ->
-				@call () =>
-					@res.sendStatus.callCount.should.equal 0
-					@res.sendStatus.calledWith(500).should.equal false
-					@res.sendStatus.calledWith(400).should.equal false
-					done()
+			it('should not produce an error', function(done) {
+				return this.call(() => {
+					this.res.sendStatus.callCount.should.equal(0);
+					this.res.sendStatus.calledWith(500).should.equal(false);
+					this.res.sendStatus.calledWith(400).should.equal(false);
+					return done();
+				});
+			});
 
-			it 'should not call EditorRealTimController.emitToRoom', (done) ->
-				@call () =>
-					@EditorRealTimeController.emitToRoom.callCount.should.equal 0
-					done()
+			it('should not call EditorRealTimController.emitToRoom', function(done) {
+				return this.call(() => {
+					this.EditorRealTimeController.emitToRoom.callCount.should.equal(0);
+					return done();
+				});
+			});
 
-			describe 'when ReferencesHandler.index produces an error', ->
+			return describe('when ReferencesHandler.index produces an error', function() {
 
-				beforeEach ->
-					@ReferencesHandler.index.callsArgWith(2, new Error('woops'), null)
+				beforeEach(function() {
+					return this.ReferencesHandler.index.callsArgWith(2, new Error('woops'), null);
+				});
 
-				it 'should produce an error response', (done) ->
-					@call () =>
-						@res.sendStatus.callCount.should.equal 1
-						@res.sendStatus.calledWith(500).should.equal true
-						done()
+				return it('should produce an error response', function(done) {
+					return this.call(() => {
+						this.res.sendStatus.callCount.should.equal(1);
+						this.res.sendStatus.calledWith(500).should.equal(true);
+						return done();
+					});
+				});
+			});
+		});
 
-		describe 'when shouldBroadcast is true', ->
+		describe('when shouldBroadcast is true', function() {
 
-			beforeEach ->
-				@ReferencesHandler.index.callsArgWith(2, null, @fakeResponseData)
-				@req.body.shouldBroadcast = true
+			beforeEach(function() {
+				this.ReferencesHandler.index.callsArgWith(2, null, this.fakeResponseData);
+				return this.req.body.shouldBroadcast = true;
+			});
 
-			it 'should call EditorRealTimeController.emitToRoom', (done) ->
-				@call () =>
-					@EditorRealTimeController.emitToRoom.callCount.should.equal 1
-					done()
+			it('should call EditorRealTimeController.emitToRoom', function(done) {
+				return this.call(() => {
+					this.EditorRealTimeController.emitToRoom.callCount.should.equal(1);
+					return done();
+				});
+			});
 
-			it 'should not produce an error', (done) ->
-				@call () =>
-					@res.sendStatus.callCount.should.equal 0
-					@res.sendStatus.calledWith(500).should.equal false
-					@res.sendStatus.calledWith(400).should.equal false
-					done()
+			it('should not produce an error', function(done) {
+				return this.call(() => {
+					this.res.sendStatus.callCount.should.equal(0);
+					this.res.sendStatus.calledWith(500).should.equal(false);
+					this.res.sendStatus.calledWith(400).should.equal(false);
+					return done();
+				});
+			});
 
-			it 'should still return data', (done) ->
-				@call () =>
-					@res.json.callCount.should.equal 1
-					@res.json.calledWith(@fakeResponseData).should.equal true
-					done()
+			return it('should still return data', function(done) {
+				return this.call(() => {
+					this.res.json.callCount.should.equal(1);
+					this.res.json.calledWith(this.fakeResponseData).should.equal(true);
+					return done();
+				});
+			});
+		});
 
-		describe 'with missing docIds', ->
+		describe('with missing docIds', function() {
 
-			beforeEach ->
-				delete @req.body.docIds
+			beforeEach(function() {
+				return delete this.req.body.docIds;
+			});
 
-			it 'should produce an error response', (done) ->
-				@call () =>
-					@res.sendStatus.callCount.should.equal 1
-					@res.sendStatus.calledWith(400).should.equal true
-					done()
+			it('should produce an error response', function(done) {
+				return this.call(() => {
+					this.res.sendStatus.callCount.should.equal(1);
+					this.res.sendStatus.calledWith(400).should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should not call ReferencesHandler.index', (done) ->
-				@call () =>
-					@ReferencesHandler.index.callCount.should.equal 0
-					done()
+			return it('should not call ReferencesHandler.index', function(done) {
+				return this.call(() => {
+					this.ReferencesHandler.index.callCount.should.equal(0);
+					return done();
+				});
+			});
+		});
 
-		describe 'with invalid docIds', ->
+		return describe('with invalid docIds', function() {
 
-			beforeEach ->
-				@req.body.docIds = 42
+			beforeEach(function() {
+				return this.req.body.docIds = 42;
+			});
 
-			it 'should produce an error response', (done) ->
-				@call () =>
-					@res.sendStatus.callCount.should.equal 1
-					@res.sendStatus.calledWith(400).should.equal true
-					done()
+			it('should produce an error response', function(done) {
+				return this.call(() => {
+					this.res.sendStatus.callCount.should.equal(1);
+					this.res.sendStatus.calledWith(400).should.equal(true);
+					return done();
+				});
+			});
 
-			it 'should not call ReferencesHandler.index', (done) ->
-				@call () =>
-					@ReferencesHandler.index.callCount.should.equal 0
-					done()
+			return it('should not call ReferencesHandler.index', function(done) {
+				return this.call(() => {
+					this.ReferencesHandler.index.callCount.should.equal(0);
+					return done();
+				});
+			});
+		});
+	});
+});

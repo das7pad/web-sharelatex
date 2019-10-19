@@ -1,79 +1,101 @@
-should = require('chai').should()
-SandboxedModule = require('sandboxed-module')
-assert = require('assert')
-path = require('path')
-sinon = require('sinon')
-modulePath = path.join __dirname, "../../../../app/js/Features/Security/OneTimeTokenHandler"
-expect = require("chai").expect
-Errors = require "../../../../app/js/Features/Errors/Errors"
-tk = require("timekeeper")
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const should = require('chai').should();
+const SandboxedModule = require('sandboxed-module');
+const assert = require('assert');
+const path = require('path');
+const sinon = require('sinon');
+const modulePath = path.join(__dirname, "../../../../app/js/Features/Security/OneTimeTokenHandler");
+const {
+    expect
+} = require("chai");
+const Errors = require("../../../../app/js/Features/Errors/Errors");
+const tk = require("timekeeper");
 
-describe "OneTimeTokenHandler", ->
-	beforeEach ->
-		tk.freeze Date.now() # freeze the time for these tests
-		@stubbedToken = "mock-token"
-		@callback = sinon.stub()
-		@OneTimeTokenHandler = SandboxedModule.require modulePath, requires:
-			"settings-sharelatex":@settings
-			"logger-sharelatex": log:->
-			"crypto": randomBytes: () => @stubbedToken
-			"../Errors/Errors": Errors
-			"../../infrastructure/mongojs": db: @db = tokens: {}
+describe("OneTimeTokenHandler", function() {
+	beforeEach(function() {
+		tk.freeze(Date.now()); // freeze the time for these tests
+		this.stubbedToken = "mock-token";
+		this.callback = sinon.stub();
+		return this.OneTimeTokenHandler = SandboxedModule.require(modulePath, { requires: {
+			"settings-sharelatex":this.settings,
+			"logger-sharelatex": { log() {}
+		},
+			"crypto": { randomBytes: () => this.stubbedToken
+		},
+			"../Errors/Errors": Errors,
+			"../../infrastructure/mongojs": { db: (this.db = {tokens: {}})
+		}
+		}
+	});});
 
-	afterEach ->
-		tk.reset()
+	afterEach(() => tk.reset());
 
-	describe "getNewToken", ->
-		beforeEach ->
-			@db.tokens.insert = sinon.stub().yields()
+	describe("getNewToken", function() {
+		beforeEach(function() {
+			return this.db.tokens.insert = sinon.stub().yields();
+		});
 
-		describe 'normally', ->
-			beforeEach ->
-				@OneTimeTokenHandler.getNewToken 'password', 'mock-data-to-store', @callback
+		describe('normally', function() {
+			beforeEach(function() {
+				return this.OneTimeTokenHandler.getNewToken('password', 'mock-data-to-store', this.callback);
+			});
 
-			it "should insert a generated token with a 1 hour expiry", ->
-				@db.tokens.insert
+			it("should insert a generated token with a 1 hour expiry", function() {
+				return this.db.tokens.insert
 					.calledWith({
-						use: 'password'
-						token: @stubbedToken,
+						use: 'password',
+						token: this.stubbedToken,
 						createdAt: new Date(),
-						expiresAt: new Date(Date.now() + 60 * 60 * 1000)
+						expiresAt: new Date(Date.now() + (60 * 60 * 1000)),
 						data: 'mock-data-to-store'
 					})
-					.should.equal true
+					.should.equal(true);
+			});
 
-			it 'should call the callback with the token', ->
-				@callback.calledWith(null, @stubbedToken).should.equal true
+			return it('should call the callback with the token', function() {
+				return this.callback.calledWith(null, this.stubbedToken).should.equal(true);
+			});
+		});
 
-		describe 'with an optional expiresIn parameter', ->
-			beforeEach ->
-				@OneTimeTokenHandler.getNewToken 'password', 'mock-data-to-store', { expiresIn: 42 }, @callback
+		return describe('with an optional expiresIn parameter', function() {
+			beforeEach(function() {
+				return this.OneTimeTokenHandler.getNewToken('password', 'mock-data-to-store', { expiresIn: 42 }, this.callback);
+			});
 
-			it "should insert a generated token with a custom expiry", ->
-				@db.tokens.insert
+			it("should insert a generated token with a custom expiry", function() {
+				return this.db.tokens.insert
 					.calledWith({
-						use: 'password'
-						token: @stubbedToken,
+						use: 'password',
+						token: this.stubbedToken,
 						createdAt: new Date(),
-						expiresAt: new Date(Date.now() + 42 * 1000)
+						expiresAt: new Date(Date.now() + (42 * 1000)),
 						data: 'mock-data-to-store'
 					})
-					.should.equal true
+					.should.equal(true);
+			});
 
-			it 'should call the callback with the token', ->
-				@callback.calledWith(null, @stubbedToken).should.equal true
+			return it('should call the callback with the token', function() {
+				return this.callback.calledWith(null, this.stubbedToken).should.equal(true);
+			});
+		});
+	});
 
-	describe "getValueFromTokenAndExpire", ->
-		describe 'successfully', ->
-			beforeEach ->
-				@db.tokens.findAndModify = sinon.stub().yields(null, { data: 'mock-data' })
-				@OneTimeTokenHandler.getValueFromTokenAndExpire 'password', 'mock-token', @callback
+	return describe("getValueFromTokenAndExpire", function() {
+		describe('successfully', function() {
+			beforeEach(function() {
+				this.db.tokens.findAndModify = sinon.stub().yields(null, { data: 'mock-data' });
+				return this.OneTimeTokenHandler.getValueFromTokenAndExpire('password', 'mock-token', this.callback);
+			});
 
-			it 'should expire the token', ->
-				@db.tokens.findAndModify
+			it('should expire the token', function() {
+				return this.db.tokens.findAndModify
 					.calledWith({
 						query: {
-							use: 'password'
+							use: 'password',
 							token: 'mock-token',
 							expiresAt: { $gt: new Date() },
 							usedAt: { $exists: false }
@@ -82,20 +104,28 @@ describe "OneTimeTokenHandler", ->
 							$set: { usedAt: new Date() }
 						}
 					})
-					.should.equal true
+					.should.equal(true);
+			});
 
-			it 'should return the data', ->
-				@callback.calledWith(null, 'mock-data').should.equal true
+			return it('should return the data', function() {
+				return this.callback.calledWith(null, 'mock-data').should.equal(true);
+			});
+		});
 
-		describe 'when a valid token is not found', ->
-			beforeEach ->
-				@db.tokens.findAndModify = sinon.stub().yields(null, null)
-				@OneTimeTokenHandler.getValueFromTokenAndExpire 'password', 'mock-token', @callback
+		return describe('when a valid token is not found', function() {
+			beforeEach(function() {
+				this.db.tokens.findAndModify = sinon.stub().yields(null, null);
+				return this.OneTimeTokenHandler.getValueFromTokenAndExpire('password', 'mock-token', this.callback);
+			});
 
-			it 'should return a NotFoundError', ->
-				@callback
+			return it('should return a NotFoundError', function() {
+				return this.callback
 					.calledWith(sinon.match.instanceOf(Errors.NotFoundError))
-					.should.equal true
+					.should.equal(true);
+			});
+		});
+	});
+});
 
 
 

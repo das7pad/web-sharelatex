@@ -1,268 +1,356 @@
-SandboxedModule = require('sandboxed-module')
-assert = require('chai').assert
-require('chai').should()
-sinon = require('sinon')
-modulePath = require('path').join __dirname, '../../../../app/js/Features/Tags/TagsHandler.js'
-_ = require('underscore')
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const SandboxedModule = require('sandboxed-module');
+const {
+    assert
+} = require('chai');
+require('chai').should();
+const sinon = require('sinon');
+const modulePath = require('path').join(__dirname, '../../../../app/js/Features/Tags/TagsHandler.js');
+const _ = require('underscore');
 
 
-describe 'TagsHandler', ->
-	user_id = "user-id-123"
-	tag_id = "tag-id-123"
-	project_id = "project-id-123"
-	tagsUrl = "tags.sharelatex.testing"
-	tag = "tag_name"
+describe('TagsHandler', function() {
+	const user_id = "user-id-123";
+	const tag_id = "tag-id-123";
+	const project_id = "project-id-123";
+	const tagsUrl = "tags.sharelatex.testing";
+	const tag = "tag_name";
 
-	beforeEach ->
-		@request = 
-			post: sinon.stub().callsArgWith(1)
-			del: sinon.stub().callsArgWith(1)
+	beforeEach(function() {
+		this.request = { 
+			post: sinon.stub().callsArgWith(1),
+			del: sinon.stub().callsArgWith(1),
 			get: sinon.stub()
-		@callback = sinon.stub()
-		@handler = SandboxedModule.require modulePath, requires:
-			"settings-sharelatex": apis:{tags:{url:tagsUrl}}
-			"request":@request
-			'logger-sharelatex':
-				log:->
-				err:->
+		};
+		this.callback = sinon.stub();
+		return this.handler = SandboxedModule.require(modulePath, { requires: {
+			"settings-sharelatex": { apis:{tags:{url:tagsUrl}}
+		},
+			"request":this.request,
+			'logger-sharelatex': {
+				log() {},
+				err() {}
+			}
+		}
+	}
+		);
+	});
 
-	describe "removeProjectFromAllTags", ->
-		it 'should tell the tags api to remove the project_id from all the users tags', (done)->
-			@handler.removeProjectFromAllTags user_id, project_id, =>
-				@request.del.calledWith({url:"#{tagsUrl}/user/#{user_id}/project/#{project_id}", timeout:1000}).should.equal true
-				done()
+	describe("removeProjectFromAllTags", () => it('should tell the tags api to remove the project_id from all the users tags', function(done){
+        return this.handler.removeProjectFromAllTags(user_id, project_id, () => {
+            this.request.del.calledWith({url:`${tagsUrl}/user/${user_id}/project/${project_id}`, timeout:1000}).should.equal(true);
+            return done();
+        });
+    }));
 
-	describe "_groupTagsByProject", ->
-		it 'should 	group the tags by project_id', (done)->
-			rawTags = [
-				{name:"class101", project_ids:["1234", "51db33e31a55afd212000007"]}
-				{name:"class201", project_ids:["1234", "51db33e31a55afd212000007"]}
-				{name:"research group", project_ids:["12", "51da65f2e2c39a2f09000100", "odjaskdas","dasdsa"]}
-				{name:"different", project_ids:["1234", "e2c39a2f09000100"]}
-			]
+	describe("_groupTagsByProject", () => it('should 	group the tags by project_id', function(done){
+        const rawTags = [
+            {name:"class101", project_ids:["1234", "51db33e31a55afd212000007"]},
+            {name:"class201", project_ids:["1234", "51db33e31a55afd212000007"]},
+            {name:"research group", project_ids:["12", "51da65f2e2c39a2f09000100", "odjaskdas","dasdsa"]},
+            {name:"different", project_ids:["1234", "e2c39a2f09000100"]}
+        ];
 
-			@handler._groupTagsByProject rawTags, (err, tags)->
-				_.size(tags).should.equal 7
-				done()
+        return this.handler._groupTagsByProject(rawTags, function(err, tags){
+            _.size(tags).should.equal(7);
+            return done();
+        });
+    }));
 
-	describe "_requestTags", ->
-		it 'should return an err and empty array on error', (done)->
-			@request.get.callsArgWith(1, {something:"wrong"}, {statusCode:200}, [])
-			@handler._requestTags user_id, (err, allTags)=>
-				allTags.length.should.equal 0
-				assert.isDefined err
-				done()
+	describe("_requestTags", function() {
+		it('should return an err and empty array on error', function(done){
+			this.request.get.callsArgWith(1, {something:"wrong"}, {statusCode:200}, []);
+			return this.handler._requestTags(user_id, (err, allTags)=> {
+				allTags.length.should.equal(0);
+				assert.isDefined(err);
+				return done();
+			});
+		});
 
-		it 'should return an err and empty array on no body', (done)->
-			@request.get.callsArgWith(1, {something:"wrong"}, {statusCode:200}, undefined)
-			@handler._requestTags user_id, (err, allTags)=>
-				allTags.length.should.equal 0
-				assert.isDefined err
-				done()
+		it('should return an err and empty array on no body', function(done){
+			this.request.get.callsArgWith(1, {something:"wrong"}, {statusCode:200}, undefined);
+			return this.handler._requestTags(user_id, (err, allTags)=> {
+				allTags.length.should.equal(0);
+				assert.isDefined(err);
+				return done();
+			});
+		});
 
-		it 'should return an err and empty array on non 200 response', (done)->
-			@request.get.callsArgWith(1, null, {statusCode:201}, [])
-			@handler._requestTags user_id, (err, allTags)=>
-				allTags.length.should.equal 0
-				assert.isDefined err
-				done()
+		it('should return an err and empty array on non 200 response', function(done){
+			this.request.get.callsArgWith(1, null, {statusCode:201}, []);
+			return this.handler._requestTags(user_id, (err, allTags)=> {
+				allTags.length.should.equal(0);
+				assert.isDefined(err);
+				return done();
+			});
+		});
 
-		it 'should return an err and empty array on no body and no response', (done)->
-			@request.get.callsArgWith(1, {something:"wrong"}, undefined, undefined)
-			@handler._requestTags user_id, (err, allTags)=>
-				allTags.length.should.equal 0
-				assert.isDefined err
-				done()
+		return it('should return an err and empty array on no body and no response', function(done){
+			this.request.get.callsArgWith(1, {something:"wrong"}, undefined, undefined);
+			return this.handler._requestTags(user_id, (err, allTags)=> {
+				allTags.length.should.equal(0);
+				assert.isDefined(err);
+				return done();
+			});
+		});
+	});
 
-	describe "getAllTags", ->
-		it 'should get all tags', (done)->
-			stubbedAllTags = [{name:"tag", project_ids:["123423","423423"]}]
-			@request.get.callsArgWith(1, null, {statusCode:200}, stubbedAllTags)
-			@handler.getAllTags user_id, (err, allTags)=>
-				stubbedAllTags.should.deep.equal allTags
-				getOpts =
-					url: "#{tagsUrl}/user/#{user_id}/tag"
-					json:true
+	describe("getAllTags", function() {
+		it('should get all tags', function(done){
+			const stubbedAllTags = [{name:"tag", project_ids:["123423","423423"]}];
+			this.request.get.callsArgWith(1, null, {statusCode:200}, stubbedAllTags);
+			return this.handler.getAllTags(user_id, (err, allTags)=> {
+				stubbedAllTags.should.deep.equal(allTags);
+				const getOpts = {
+					url: `${tagsUrl}/user/${user_id}/tag`,
+					json:true,
 					timeout:1000
-				@request.get.calledWith(getOpts).should.equal true
-				done()
+				};
+				this.request.get.calledWith(getOpts).should.equal(true);
+				return done();
+			});
+		});
 
-		it 'should return empty arrays if there are no tags', ->
-			@request.get.callsArgWith(1, null, {statusCode:200}, null)
-			@handler.getAllTags user_id, (err, allTags, projectGroupedTags)=>
-				allTags.length.should.equal 0
-				_.size(projectGroupedTags).should.equal 0
+		return it('should return empty arrays if there are no tags', function() {
+			this.request.get.callsArgWith(1, null, {statusCode:200}, null);
+			return this.handler.getAllTags(user_id, (err, allTags, projectGroupedTags)=> {
+				allTags.length.should.equal(0);
+				return _.size(projectGroupedTags).should.equal(0);
+			});
+		});
+	});
 	
-	describe "createTag", ->
-		beforeEach ->
-			@request.post = sinon.stub().callsArgWith(1, null, {statusCode: 204}, "")
-			@handler.createTag user_id, @name = "tag_name", @callback
+	describe("createTag", function() {
+		beforeEach(function() {
+			this.request.post = sinon.stub().callsArgWith(1, null, {statusCode: 204}, "");
+			return this.handler.createTag(user_id, (this.name = "tag_name"), this.callback);
+		});
 		
-		it "should send a request to the tag backend", ->
-			@request.post
+		it("should send a request to the tag backend", function() {
+			return this.request.post
 				.calledWith({
-					url: "#{tagsUrl}/user/#{user_id}/tag"
-					json:
-						name: @name
+					url: `${tagsUrl}/user/${user_id}/tag`,
+					json: {
+						name: this.name
+					},
 					timeout: 1000
 				})
-				.should.equal true
+				.should.equal(true);
+		});
 		
-		it "should call the callback with no error", ->
-			@callback.calledWith(null).should.equal true
+		return it("should call the callback with no error", function() {
+			return this.callback.calledWith(null).should.equal(true);
+		});
+	});
 	
-	describe "deleteTag", ->
-		describe "successfully", ->
-			beforeEach ->
-				@request.del = sinon.stub().callsArgWith(1, null, {statusCode: 204}, "")
-				@handler.deleteTag user_id, tag_id, @callback
+	describe("deleteTag", function() {
+		describe("successfully", function() {
+			beforeEach(function() {
+				this.request.del = sinon.stub().callsArgWith(1, null, {statusCode: 204}, "");
+				return this.handler.deleteTag(user_id, tag_id, this.callback);
+			});
 			
-			it "should send a request to the tag backend", ->
-				@request.del
+			it("should send a request to the tag backend", function() {
+				return this.request.del
 					.calledWith({
-						url: "#{tagsUrl}/user/#{user_id}/tag/#{tag_id}"
+						url: `${tagsUrl}/user/${user_id}/tag/${tag_id}`,
 						timeout: 1000
 					})
-					.should.equal true
+					.should.equal(true);
+			});
 			
-			it "should call the callback with no error", ->
-				@callback.calledWith(null).should.equal true
+			return it("should call the callback with no error", function() {
+				return this.callback.calledWith(null).should.equal(true);
+			});
+		});
 			
-		describe "with error", ->
-			beforeEach ->
-				@request.del = sinon.stub().callsArgWith(1, null, {statusCode: 500}, "")
-				@handler.deleteTag user_id, tag_id, @callback
+		return describe("with error", function() {
+			beforeEach(function() {
+				this.request.del = sinon.stub().callsArgWith(1, null, {statusCode: 500}, "");
+				return this.handler.deleteTag(user_id, tag_id, this.callback);
+			});
 			
-			it "should call the callback with an Error", ->
-				@callback.calledWith(new Error()).should.equal true
+			return it("should call the callback with an Error", function() {
+				return this.callback.calledWith(new Error()).should.equal(true);
+			});
+		});
+	});
 
-	describe "renameTag", ->
-		describe "successfully", ->
-			beforeEach ->
-				@request.post = sinon.stub().callsArgWith(1, null, {statusCode: 204}, "")
-				@handler.renameTag user_id, tag_id, @name = "new-name", @callback
+	describe("renameTag", function() {
+		describe("successfully", function() {
+			beforeEach(function() {
+				this.request.post = sinon.stub().callsArgWith(1, null, {statusCode: 204}, "");
+				return this.handler.renameTag(user_id, tag_id, (this.name = "new-name"), this.callback);
+			});
 			
-			it "should send a request to the tag backend", ->
-				@request.post
+			it("should send a request to the tag backend", function() {
+				return this.request.post
 					.calledWith({
-						url: "#{tagsUrl}/user/#{user_id}/tag/#{tag_id}/rename"
-						json:
-							name: @name
+						url: `${tagsUrl}/user/${user_id}/tag/${tag_id}/rename`,
+						json: {
+							name: this.name
+						},
 						timeout: 1000
 					})
-					.should.equal true
+					.should.equal(true);
+			});
 			
-			it "should call the callback with no error", ->
-				@callback.calledWith(null).should.equal true
+			return it("should call the callback with no error", function() {
+				return this.callback.calledWith(null).should.equal(true);
+			});
+		});
 			
-		describe "with error", ->
-			beforeEach ->
-				@request.post = sinon.stub().callsArgWith(1, null, {statusCode: 500}, "")
-				@handler.renameTag user_id, tag_id, "name", @callback
+		return describe("with error", function() {
+			beforeEach(function() {
+				this.request.post = sinon.stub().callsArgWith(1, null, {statusCode: 500}, "");
+				return this.handler.renameTag(user_id, tag_id, "name", this.callback);
+			});
 			
-			it "should call the callback with an Error", ->
-				@callback.calledWith(new Error()).should.equal true
+			return it("should call the callback with an Error", function() {
+				return this.callback.calledWith(new Error()).should.equal(true);
+			});
+		});
+	});
 	
-	describe "removeProjectFromTag", ->
-		describe "successfully", ->
-			beforeEach ->
-				@request.del = sinon.stub().callsArgWith(1, null, {statusCode: 204}, "")
-				@handler.removeProjectFromTag user_id, tag_id, project_id, @callback
+	describe("removeProjectFromTag", function() {
+		describe("successfully", function() {
+			beforeEach(function() {
+				this.request.del = sinon.stub().callsArgWith(1, null, {statusCode: 204}, "");
+				return this.handler.removeProjectFromTag(user_id, tag_id, project_id, this.callback);
+			});
 			
-			it "should send a request to the tag backend", ->
-				@request.del
+			it("should send a request to the tag backend", function() {
+				return this.request.del
 					.calledWith({
-						url: "#{tagsUrl}/user/#{user_id}/tag/#{tag_id}/project/#{project_id}"
+						url: `${tagsUrl}/user/${user_id}/tag/${tag_id}/project/${project_id}`,
 						timeout: 1000
 					})
-					.should.equal true
+					.should.equal(true);
+			});
 			
-			it "should call the callback with no error", ->
-				@callback.calledWith(null).should.equal true
+			return it("should call the callback with no error", function() {
+				return this.callback.calledWith(null).should.equal(true);
+			});
+		});
 			
-		describe "with error", ->
-			beforeEach ->
-				@request.del = sinon.stub().callsArgWith(1, null, {statusCode: 500}, "")
-				@handler.removeProjectFromTag user_id, tag_id, project_id, @callback
+		return describe("with error", function() {
+			beforeEach(function() {
+				this.request.del = sinon.stub().callsArgWith(1, null, {statusCode: 500}, "");
+				return this.handler.removeProjectFromTag(user_id, tag_id, project_id, this.callback);
+			});
 			
-			it "should call the callback with an Error", ->
-				@callback.calledWith(new Error()).should.equal true
+			return it("should call the callback with an Error", function() {
+				return this.callback.calledWith(new Error()).should.equal(true);
+			});
+		});
+	});
 
-	describe "addProjectToTag", ->
-		describe "successfully", ->
-			beforeEach ->
-				@request.post = sinon.stub().callsArgWith(1, null, {statusCode: 204}, "")
-				@handler.addProjectToTag user_id, tag_id, project_id, @callback
+	describe("addProjectToTag", function() {
+		describe("successfully", function() {
+			beforeEach(function() {
+				this.request.post = sinon.stub().callsArgWith(1, null, {statusCode: 204}, "");
+				return this.handler.addProjectToTag(user_id, tag_id, project_id, this.callback);
+			});
 			
-			it "should send a request to the tag backend", ->
-				@request.post
+			it("should send a request to the tag backend", function() {
+				return this.request.post
 					.calledWith({
-						url: "#{tagsUrl}/user/#{user_id}/tag/#{tag_id}/project/#{project_id}"
+						url: `${tagsUrl}/user/${user_id}/tag/${tag_id}/project/${project_id}`,
 						timeout: 1000
 					})
-					.should.equal true
+					.should.equal(true);
+			});
 			
-			it "should call the callback with no error", ->
-				@callback.calledWith(null).should.equal true
+			return it("should call the callback with no error", function() {
+				return this.callback.calledWith(null).should.equal(true);
+			});
+		});
 			
-		describe "with error", ->
-			beforeEach ->
-				@request.post = sinon.stub().callsArgWith(1, null, {statusCode: 500}, "")
-				@handler.addProjectToTag user_id, tag_id, project_id, @callback
+		return describe("with error", function() {
+			beforeEach(function() {
+				this.request.post = sinon.stub().callsArgWith(1, null, {statusCode: 500}, "");
+				return this.handler.addProjectToTag(user_id, tag_id, project_id, this.callback);
+			});
 			
-			it "should call the callback with an Error", ->
-				@callback.calledWith(new Error()).should.equal true
+			return it("should call the callback with an Error", function() {
+				return this.callback.calledWith(new Error()).should.equal(true);
+			});
+		});
+	});
 
-	describe "addProjectToTagName", ->
-		describe "successfully", ->
-			beforeEach ->
-				@request.post = sinon.stub().callsArgWith(1, null, {statusCode: 204}, "")
-				@handler.addProjectToTagName user_id, tag, project_id, @callback
+	describe("addProjectToTagName", function() {
+		describe("successfully", function() {
+			beforeEach(function() {
+				this.request.post = sinon.stub().callsArgWith(1, null, {statusCode: 204}, "");
+				return this.handler.addProjectToTagName(user_id, tag, project_id, this.callback);
+			});
 
-			it "should send a request to the tag backend", ->
-				@request.post
+			it("should send a request to the tag backend", function() {
+				return this.request.post
 					.calledWith({
-						json:
+						json: {
 							name: tag
-						url: "#{tagsUrl}/user/#{user_id}/tag/project/#{project_id}"
+						},
+						url: `${tagsUrl}/user/${user_id}/tag/project/${project_id}`,
 						timeout: 1000
 					})
-					.should.equal true
+					.should.equal(true);
+			});
 
-			it "should call the callback with no error", ->
-				@callback.calledWith(null).should.equal true
+			return it("should call the callback with no error", function() {
+				return this.callback.calledWith(null).should.equal(true);
+			});
+		});
 
-		describe "with error", ->
-			beforeEach ->
-				@request.post = sinon.stub().callsArgWith(1, null, {statusCode: 500}, "")
-				@handler.addProjectToTagName user_id, tag_id, project_id, @callback
+		return describe("with error", function() {
+			beforeEach(function() {
+				this.request.post = sinon.stub().callsArgWith(1, null, {statusCode: 500}, "");
+				return this.handler.addProjectToTagName(user_id, tag_id, project_id, this.callback);
+			});
 
-			it "should call the callback with an Error", ->
-				@callback.calledWith(new Error()).should.equal true
+			return it("should call the callback with an Error", function() {
+				return this.callback.calledWith(new Error()).should.equal(true);
+			});
+		});
+	});
 
-	describe "updateTagUserIds", ->
-		describe "successfully", ->
-			beforeEach ->
-				@request.put = sinon.stub().callsArgWith(1, null, {statusCode: 204}, "")
-				@handler.updateTagUserIds "old-user-id", "new-user-id", @callback
+	return describe("updateTagUserIds", function() {
+		describe("successfully", function() {
+			beforeEach(function() {
+				this.request.put = sinon.stub().callsArgWith(1, null, {statusCode: 204}, "");
+				return this.handler.updateTagUserIds("old-user-id", "new-user-id", this.callback);
+			});
 
-			it "should send a request to the tag backend", ->
-				@request.put
+			it("should send a request to the tag backend", function() {
+				return this.request.put
 					.calledWith({
-						json:
+						json: {
 							user_id: "new-user-id"
-						url: "#{tagsUrl}/user/old-user-id/tag"
+						},
+						url: `${tagsUrl}/user/old-user-id/tag`,
 						timeout: 1000
 					})
-					.should.equal true
+					.should.equal(true);
+			});
 
-			it "should call the callback with no error", ->
-				@callback.calledWith(null).should.equal true
+			return it("should call the callback with no error", function() {
+				return this.callback.calledWith(null).should.equal(true);
+			});
+		});
 
-		describe "with error", ->
-			beforeEach ->
-				@request.put = sinon.stub().callsArgWith(1, null, {statusCode: 500}, "")
-				@handler.updateTagUserIds "old-user-id", "new-user-id", @callback
+		return describe("with error", function() {
+			beforeEach(function() {
+				this.request.put = sinon.stub().callsArgWith(1, null, {statusCode: 500}, "");
+				return this.handler.updateTagUserIds("old-user-id", "new-user-id", this.callback);
+			});
 
-			it "should call the callback with an Error", ->
-				@callback.calledWith(new Error()).should.equal true
+			return it("should call the callback with an Error", function() {
+				return this.callback.calledWith(new Error()).should.equal(true);
+			});
+		});
+	});
+});

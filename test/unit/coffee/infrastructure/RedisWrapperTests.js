@@ -1,36 +1,57 @@
-assert = require("chai").assert
-sinon = require('sinon')
-chai = require('chai')
-should = chai.should()
-expect = chai.expect
-modulePath = "../../../../app/js/infrastructure/RedisWrapper.js"
-SandboxedModule = require('sandboxed-module')
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const {
+    assert
+} = require("chai");
+const sinon = require('sinon');
+const chai = require('chai');
+const should = chai.should();
+const {
+    expect
+} = chai;
+const modulePath = "../../../../app/js/infrastructure/RedisWrapper.js";
+const SandboxedModule = require('sandboxed-module');
 
-describe 'RedisWrapper', ->
+describe('RedisWrapper', function() {
 
-	beforeEach ->
-		@settings = { redis: {} }
-		@redis =
-			createClient: sinon.stub()
-		@RedisWrapper = SandboxedModule.require modulePath, requires:
-			'settings-sharelatex': @settings
-			'redis-sharelatex': @redis
+	beforeEach(function() {
+		this.settings = { redis: {} };
+		this.redis =
+			{createClient: sinon.stub()};
+		return this.RedisWrapper = SandboxedModule.require(modulePath, { requires: {
+			'settings-sharelatex': this.settings,
+			'redis-sharelatex': this.redis
+		}
+	}
+		);
+	});
 
-	describe 'client', ->
-		it "should use the feature settings if present", ->
-			@settings.redis =
-				my_feature:
-					port:"23456"
-					host:"otherhost"
+	return describe('client', function() {
+		it("should use the feature settings if present", function() {
+			this.settings.redis = {
+				my_feature: {
+					port:"23456",
+					host:"otherhost",
 					password: "banana"
-			@RedisWrapper.client("my_feature")
-			@redis.createClient.calledWith(@settings.redis.my_feature).should.equal true
+				}
+			};
+			this.RedisWrapper.client("my_feature");
+			return this.redis.createClient.calledWith(this.settings.redis.my_feature).should.equal(true);
+		});
 
-		it "should use the web settings if feature not present", ->
-			@settings.redis =
-				web:
-					port:"43"
-					host:"otherhost"
+		return it("should use the web settings if feature not present", function() {
+			this.settings.redis = {
+				web: {
+					port:"43",
+					host:"otherhost",
 					password: "banana"
-			@RedisWrapper.client("my_feature")
-			@redis.createClient.calledWith(@settings.redis.web).should.equal true
+				}
+			};
+			this.RedisWrapper.client("my_feature");
+			return this.redis.createClient.calledWith(this.settings.redis.web).should.equal(true);
+		});
+	});
+});

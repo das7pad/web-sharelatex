@@ -1,89 +1,123 @@
-should = require('chai').should()
-SandboxedModule = require('sandboxed-module')
-assert = require('assert')
-path = require('path')
-sinon = require('sinon')
-modulePath = path.join __dirname, "../../../../app/js/Features/Chat/ChatApiHandler"
-expect = require("chai").expect
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const should = require('chai').should();
+const SandboxedModule = require('sandboxed-module');
+const assert = require('assert');
+const path = require('path');
+const sinon = require('sinon');
+const modulePath = path.join(__dirname, "../../../../app/js/Features/Chat/ChatApiHandler");
+const {
+    expect
+} = require("chai");
 
-describe "ChatApiHandler", ->
-	beforeEach ->
-		@settings = 
-			apis:
-				chat:
+describe("ChatApiHandler", function() {
+	beforeEach(function() {
+		this.settings = { 
+			apis: {
+				chat: {
 					internal_url:"chat.sharelatex.env"
-		@request = sinon.stub()
-		@ChatApiHandler = SandboxedModule.require modulePath, requires:
-			"settings-sharelatex": @settings
-			"logger-sharelatex": { log: sinon.stub(), error: sinon.stub() }
-			"request": @request
-		@project_id = "3213213kl12j"
-		@user_id = "2k3jlkjs9"
-		@content = "my message here"
-		@callback = sinon.stub()
+				}
+			}
+		};
+		this.request = sinon.stub();
+		this.ChatApiHandler = SandboxedModule.require(modulePath, { requires: {
+			"settings-sharelatex": this.settings,
+			"logger-sharelatex": { log: sinon.stub(), error: sinon.stub() },
+			"request": this.request
+		}
+	}
+		);
+		this.project_id = "3213213kl12j";
+		this.user_id = "2k3jlkjs9";
+		this.content = "my message here";
+		return this.callback = sinon.stub();
+	});
 
-	describe "sendGlobalMessage", ->
-		describe "successfully", ->
-			beforeEach ->
-				@message = { "mock": "message" }
-				@request.callsArgWith(1, null, {statusCode: 200}, @message)
-				@ChatApiHandler.sendGlobalMessage @project_id, @user_id, @content, @callback
+	describe("sendGlobalMessage", function() {
+		describe("successfully", function() {
+			beforeEach(function() {
+				this.message = { "mock": "message" };
+				this.request.callsArgWith(1, null, {statusCode: 200}, this.message);
+				return this.ChatApiHandler.sendGlobalMessage(this.project_id, this.user_id, this.content, this.callback);
+			});
 				
-			it "should post the data to the chat api", ->
-				@request.calledWith({
-					url: "#{@settings.apis.chat.internal_url}/project/#{@project_id}/messages"
-					method: "POST"
-					json:
-						content: @content
-						user_id: @user_id
-				}).should.equal true
+			it("should post the data to the chat api", function() {
+				return this.request.calledWith({
+					url: `${this.settings.apis.chat.internal_url}/project/${this.project_id}/messages`,
+					method: "POST",
+					json: {
+						content: this.content,
+						user_id: this.user_id
+					}
+				}).should.equal(true);
+			});
 
-			it "should return the message from the post", ->
-				@callback.calledWith(null, @message).should.equal true
+			return it("should return the message from the post", function() {
+				return this.callback.calledWith(null, this.message).should.equal(true);
+			});
+		});
 	
-		describe "with a non-success status code", ->
-			beforeEach ->
-				@request.callsArgWith(1, null, {statusCode: 500})
-				@ChatApiHandler.sendGlobalMessage @project_id, @user_id, @content, @callback
+		return describe("with a non-success status code", function() {
+			beforeEach(function() {
+				this.request.callsArgWith(1, null, {statusCode: 500});
+				return this.ChatApiHandler.sendGlobalMessage(this.project_id, this.user_id, this.content, this.callback);
+			});
 			
-			it "should return an error", ->
-				error = new Error()
-				error.statusCode = 500
-				@callback.calledWith(error).should.equal true
+			return it("should return an error", function() {
+				const error = new Error();
+				error.statusCode = 500;
+				return this.callback.calledWith(error).should.equal(true);
+			});
+		});
+	});
 
-	describe "getGlobalMessages", ->
-		beforeEach ->
-			@messages = [{ "mock": "message" }]
-			@limit = 30
-			@before = "1234"
+	return describe("getGlobalMessages", function() {
+		beforeEach(function() {
+			this.messages = [{ "mock": "message" }];
+			this.limit = 30;
+			return this.before = "1234";
+		});
 
-		describe "successfully", ->
-			beforeEach ->
-				@request.callsArgWith(1, null, {statusCode: 200}, @messages)
-				@ChatApiHandler.getGlobalMessages @project_id, @limit, @before, @callback
+		describe("successfully", function() {
+			beforeEach(function() {
+				this.request.callsArgWith(1, null, {statusCode: 200}, this.messages);
+				return this.ChatApiHandler.getGlobalMessages(this.project_id, this.limit, this.before, this.callback);
+			});
 	
-			it "should make get request for room to chat api", ->
-				@request.calledWith({
-					method: "GET"
-					url: "#{@settings.apis.chat.internal_url}/project/#{@project_id}/messages"
-					qs:
-						limit: @limit
-						before: @before
+			it("should make get request for room to chat api", function() {
+				return this.request.calledWith({
+					method: "GET",
+					url: `${this.settings.apis.chat.internal_url}/project/${this.project_id}/messages`,
+					qs: {
+						limit: this.limit,
+						before: this.before
+					},
 					json: true
-				}).should.equal true
+				}).should.equal(true);
+			});
 	
-			it "should return the messages from the request", ->
-				@callback.calledWith(null, @messages).should.equal true
+			return it("should return the messages from the request", function() {
+				return this.callback.calledWith(null, this.messages).should.equal(true);
+			});
+		});
 
-		describe "with failure error code", ->
-			beforeEach ->
-				@request.callsArgWith(1, null, {statusCode: 500}, null)
-				@ChatApiHandler.getGlobalMessages @project_id, @limit, @before, @callback
+		return describe("with failure error code", function() {
+			beforeEach(function() {
+				this.request.callsArgWith(1, null, {statusCode: 500}, null);
+				return this.ChatApiHandler.getGlobalMessages(this.project_id, this.limit, this.before, this.callback);
+			});
 			
-			it "should return an error", ->
-				error = new Error()
-				error.statusCode = 500
-				@callback.calledWith(error).should.equal true
+			return it("should return an error", function() {
+				const error = new Error();
+				error.statusCode = 500;
+				return this.callback.calledWith(error).should.equal(true);
+			});
+		});
+	});
+});
 
 
 

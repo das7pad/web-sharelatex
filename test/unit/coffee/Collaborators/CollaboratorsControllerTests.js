@@ -1,110 +1,144 @@
-sinon = require('sinon')
-chai = require('chai')
-should = chai.should()
-expect = chai.expect
-modulePath = "../../../../app/js/Features/Collaborators/CollaboratorsController.js"
-SandboxedModule = require('sandboxed-module')
-events = require "events"
-MockRequest = require "../helpers/MockRequest"
-MockResponse = require "../helpers/MockResponse"
-ObjectId = require("mongojs").ObjectId
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const sinon = require('sinon');
+const chai = require('chai');
+const should = chai.should();
+const {
+    expect
+} = chai;
+const modulePath = "../../../../app/js/Features/Collaborators/CollaboratorsController.js";
+const SandboxedModule = require('sandboxed-module');
+const events = require("events");
+const MockRequest = require("../helpers/MockRequest");
+const MockResponse = require("../helpers/MockResponse");
+const {
+    ObjectId
+} = require("mongojs");
 
-describe "CollaboratorsController", ->
-	beforeEach ->
-		@CollaboratorsController = SandboxedModule.require modulePath, requires:
-			"../Project/ProjectGetter": @ProjectGetter = {}
-			"./CollaboratorsHandler": @CollaboratorsHandler = {}
-			"../Editor/EditorRealTimeController": @EditorRealTimeController = {}
-			'../Subscription/LimitationsManager' : @LimitationsManager = {}
-			'../Project/ProjectEditorHandler' : @ProjectEditorHandler = {}
-			'../User/UserGetter': @UserGetter = {}
-			'logger-sharelatex': @logger = {err: sinon.stub(), erro: sinon.stub(), log: sinon.stub()}
-		@res = new MockResponse()
-		@req = new MockRequest()
+describe("CollaboratorsController", function() {
+	beforeEach(function() {
+		this.CollaboratorsController = SandboxedModule.require(modulePath, { requires: {
+			"../Project/ProjectGetter": (this.ProjectGetter = {}),
+			"./CollaboratorsHandler": (this.CollaboratorsHandler = {}),
+			"../Editor/EditorRealTimeController": (this.EditorRealTimeController = {}),
+			'../Subscription/LimitationsManager' : (this.LimitationsManager = {}),
+			'../Project/ProjectEditorHandler' : (this.ProjectEditorHandler = {}),
+			'../User/UserGetter': (this.UserGetter = {}),
+			'logger-sharelatex': (this.logger = {err: sinon.stub(), erro: sinon.stub(), log: sinon.stub()})
+		}
+	});
+		this.res = new MockResponse();
+		this.req = new MockRequest();
 
-		@project_id = "project-id-123"
-		@callback = sinon.stub()
+		this.project_id = "project-id-123";
+		return this.callback = sinon.stub();
+	});
 
-	describe "removeUserFromProject", ->
-		beforeEach ->
-			@req.params =
-				Project_id: @project_id = "project-id-123"
-				user_id: @user_id = "user-id-123"
-			@res.sendStatus = sinon.stub()
-			@EditorRealTimeController.emitToRoom = sinon.stub()
-			@CollaboratorsHandler.removeUserFromProject = sinon.stub().callsArg(2)
-			@CollaboratorsController.removeUserFromProject @req, @res
+	describe("removeUserFromProject", function() {
+		beforeEach(function() {
+			this.req.params = {
+				Project_id: (this.project_id = "project-id-123"),
+				user_id: (this.user_id = "user-id-123")
+			};
+			this.res.sendStatus = sinon.stub();
+			this.EditorRealTimeController.emitToRoom = sinon.stub();
+			this.CollaboratorsHandler.removeUserFromProject = sinon.stub().callsArg(2);
+			return this.CollaboratorsController.removeUserFromProject(this.req, this.res);
+		});
 
-		it "should from the user from the project", ->
-			@CollaboratorsHandler.removeUserFromProject
-				.calledWith(@project_id, @user_id)
-				.should.equal true
+		it("should from the user from the project", function() {
+			return this.CollaboratorsHandler.removeUserFromProject
+				.calledWith(this.project_id, this.user_id)
+				.should.equal(true);
+		});
 
-		it "should emit a userRemovedFromProject event to the proejct", ->
-			@EditorRealTimeController.emitToRoom
-				.calledWith(@project_id, 'userRemovedFromProject', @user_id)
-				.should.equal true
+		it("should emit a userRemovedFromProject event to the proejct", function() {
+			return this.EditorRealTimeController.emitToRoom
+				.calledWith(this.project_id, 'userRemovedFromProject', this.user_id)
+				.should.equal(true);
+		});
 
-		it "should send the back a success response", ->
-			@res.sendStatus.calledWith(204).should.equal true
+		it("should send the back a success response", function() {
+			return this.res.sendStatus.calledWith(204).should.equal(true);
+		});
 
-		it 'should have called emitToRoom', ->
-			@EditorRealTimeController.emitToRoom.calledWith(@project_id, 'project:membership:changed').should.equal true
+		return it('should have called emitToRoom', function() {
+			return this.EditorRealTimeController.emitToRoom.calledWith(this.project_id, 'project:membership:changed').should.equal(true);
+		});
+	});
 
-	describe "removeSelfFromProject", ->
-		beforeEach ->
-			@req.session =
-				user: _id: @user_id = "user-id-123"
-			@req.params = Project_id: @project_id
-			@res.sendStatus = sinon.stub()
-			@EditorRealTimeController.emitToRoom = sinon.stub()
-			@CollaboratorsHandler.removeUserFromProject = sinon.stub().callsArg(2)
-			@CollaboratorsController.removeSelfFromProject(@req, @res)
+	describe("removeSelfFromProject", function() {
+		beforeEach(function() {
+			this.req.session =
+				{user: {_id: (this.user_id = "user-id-123")}};
+			this.req.params = {Project_id: this.project_id};
+			this.res.sendStatus = sinon.stub();
+			this.EditorRealTimeController.emitToRoom = sinon.stub();
+			this.CollaboratorsHandler.removeUserFromProject = sinon.stub().callsArg(2);
+			return this.CollaboratorsController.removeSelfFromProject(this.req, this.res);
+		});
 
-		it "should remove the logged in user from the project", ->
-			@CollaboratorsHandler.removeUserFromProject
-				.calledWith(@project_id, @user_id)
-				.should.equal true
+		it("should remove the logged in user from the project", function() {
+			return this.CollaboratorsHandler.removeUserFromProject
+				.calledWith(this.project_id, this.user_id)
+				.should.equal(true);
+		});
 
-		it "should emit a userRemovedFromProject event to the proejct", ->
-			@EditorRealTimeController.emitToRoom
-				.calledWith(@project_id, 'userRemovedFromProject', @user_id)
-				.should.equal true
+		it("should emit a userRemovedFromProject event to the proejct", function() {
+			return this.EditorRealTimeController.emitToRoom
+				.calledWith(this.project_id, 'userRemovedFromProject', this.user_id)
+				.should.equal(true);
+		});
 
-		it "should return a success code", ->
-			@res.sendStatus.calledWith(204).should.equal true
+		return it("should return a success code", function() {
+			return this.res.sendStatus.calledWith(204).should.equal(true);
+		});
+	});
 
-	describe 'getAllMembers', ->
-		beforeEach ->
-			@req.session =
-				user: _id: @user_id = "user-id-123"
-			@req.params = Project_id: @project_id
-			@res.json = sinon.stub()
-			@next = sinon.stub()
-			@members = [{a: 1}]
-			@CollaboratorsHandler.getAllInvitedMembers = sinon.stub().callsArgWith(1, null, @members)
-			@CollaboratorsController.getAllMembers(@req, @res, @next)
+	return describe('getAllMembers', function() {
+		beforeEach(function() {
+			this.req.session =
+				{user: {_id: (this.user_id = "user-id-123")}};
+			this.req.params = {Project_id: this.project_id};
+			this.res.json = sinon.stub();
+			this.next = sinon.stub();
+			this.members = [{a: 1}];
+			this.CollaboratorsHandler.getAllInvitedMembers = sinon.stub().callsArgWith(1, null, this.members);
+			return this.CollaboratorsController.getAllMembers(this.req, this.res, this.next);
+		});
 
-		it 'should not produce an error', ->
-			@next.callCount.should.equal 0
+		it('should not produce an error', function() {
+			return this.next.callCount.should.equal(0);
+		});
 
-		it 'should produce a json response', ->
-			@res.json.callCount.should.equal 1
-			@res.json.calledWith({members: @members}).should.equal true
+		it('should produce a json response', function() {
+			this.res.json.callCount.should.equal(1);
+			return this.res.json.calledWith({members: this.members}).should.equal(true);
+		});
 
-		it 'should call CollaboratorsHandler.getAllMembers', ->
-			@CollaboratorsHandler.getAllInvitedMembers.callCount.should.equal 1
+		it('should call CollaboratorsHandler.getAllMembers', function() {
+			return this.CollaboratorsHandler.getAllInvitedMembers.callCount.should.equal(1);
+		});
 
-		describe 'when CollaboratorsHandler.getAllInvitedMembers produces an error', ->
-			beforeEach ->
-				@res.json = sinon.stub()
-				@next = sinon.stub()
-				@CollaboratorsHandler.getAllInvitedMembers = sinon.stub().callsArgWith(1, new Error('woops'))
-				@CollaboratorsController.getAllMembers(@req, @res, @next)
+		return describe('when CollaboratorsHandler.getAllInvitedMembers produces an error', function() {
+			beforeEach(function() {
+				this.res.json = sinon.stub();
+				this.next = sinon.stub();
+				this.CollaboratorsHandler.getAllInvitedMembers = sinon.stub().callsArgWith(1, new Error('woops'));
+				return this.CollaboratorsController.getAllMembers(this.req, this.res, this.next);
+			});
 
-			it 'should produce an error', ->
-				@next.callCount.should.equal 1
-				@next.firstCall.args[0].should.be.instanceof Error
+			it('should produce an error', function() {
+				this.next.callCount.should.equal(1);
+				return this.next.firstCall.args[0].should.be.instanceof(Error);
+			});
 
-			it 'should not produce a json response', ->
-				@res.json.callCount.should.equal 0
+			return it('should not produce a json response', function() {
+				return this.res.json.callCount.should.equal(0);
+			});
+		});
+	});
+});

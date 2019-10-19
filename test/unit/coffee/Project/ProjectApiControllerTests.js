@@ -1,41 +1,58 @@
-should = require('chai').should()
-modulePath = "../../../../app/js/Features/Project/ProjectApiController"
-SandboxedModule = require('sandboxed-module')
-sinon = require('sinon')
-require('chai').should()
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const should = require('chai').should();
+const modulePath = "../../../../app/js/Features/Project/ProjectApiController";
+const SandboxedModule = require('sandboxed-module');
+const sinon = require('sinon');
+require('chai').should();
 
-describe 'Project api controller', ->
+describe('Project api controller', function() {
 
-	beforeEach ->
-		@ProjectDetailsHandler = 
-			getDetails : sinon.stub()
-		@controller = SandboxedModule.require modulePath, requires:
-			"./ProjectDetailsHandler":@ProjectDetailsHandler
-			'logger-sharelatex':
-				log:->
-		@project_id = "321l3j1kjkjl"
-		@req = 
-			params: 
-				project_id:@project_id
-			session:
+	beforeEach(function() {
+		this.ProjectDetailsHandler = 
+			{getDetails : sinon.stub()};
+		this.controller = SandboxedModule.require(modulePath, { requires: {
+			"./ProjectDetailsHandler":this.ProjectDetailsHandler,
+			'logger-sharelatex': {
+				log() {}
+			}
+		}
+	}
+		);
+		this.project_id = "321l3j1kjkjl";
+		this.req = { 
+			params: { 
+				project_id:this.project_id
+			},
+			session: {
 				destroy:sinon.stub()
-		@res = {}
-		@next = sinon.stub()
-		@projDetails = {name:"something"}
+			}
+		};
+		this.res = {};
+		this.next = sinon.stub();
+		return this.projDetails = {name:"something"};});
 
 
-	describe "getProjectDetails", ->
+	return describe("getProjectDetails", function() {
 
-		it "should ask the project details handler for proj details", (done)->
-			@ProjectDetailsHandler.getDetails.callsArgWith(1, null, @projDetails)
-			@res.json = (data)=>
-				@ProjectDetailsHandler.getDetails.calledWith(@project_id).should.equal true
-				data.should.deep.equal @projDetails
-				done()
-			@controller.getProjectDetails @req, @res
+		it("should ask the project details handler for proj details", function(done){
+			this.ProjectDetailsHandler.getDetails.callsArgWith(1, null, this.projDetails);
+			this.res.json = data=> {
+				this.ProjectDetailsHandler.getDetails.calledWith(this.project_id).should.equal(true);
+				data.should.deep.equal(this.projDetails);
+				return done();
+			};
+			return this.controller.getProjectDetails(this.req, this.res);
+		});
 
 
-		it "should send a 500 if there is an error", ()->
-			@ProjectDetailsHandler.getDetails.callsArgWith(1, "error")
-			@controller.getProjectDetails @req, @res, @next
-			@next.calledWith("error").should.equal true
+		return it("should send a 500 if there is an error", function(){
+			this.ProjectDetailsHandler.getDetails.callsArgWith(1, "error");
+			this.controller.getProjectDetails(this.req, this.res, this.next);
+			return this.next.calledWith("error").should.equal(true);
+		});
+	});
+});

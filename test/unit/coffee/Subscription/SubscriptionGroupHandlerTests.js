@@ -1,154 +1,190 @@
-SandboxedModule = require('sandboxed-module')
-should = require('chai').should()
-sinon = require 'sinon'
-assert = require("chai").assert
-modulePath = "../../../../app/js/Features/Subscription/SubscriptionGroupHandler"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const SandboxedModule = require('sandboxed-module');
+const should = require('chai').should();
+const sinon = require('sinon');
+const {
+    assert
+} = require("chai");
+const modulePath = "../../../../app/js/Features/Subscription/SubscriptionGroupHandler";
 
 
-describe "SubscriptionGroupHandler", ->
+describe("SubscriptionGroupHandler", function() {
 
-	beforeEach ->
-		@adminUser_id = "12321"
-		@newEmail = "bob@smith.com"
-		@user_id = "3121321"
-		@email = "jim@example.com"
-		@user = {_id:@user_id, email:@newEmail}
-		@subscription_id = "31DSd1123D"
+	beforeEach(function() {
+		this.adminUser_id = "12321";
+		this.newEmail = "bob@smith.com";
+		this.user_id = "3121321";
+		this.email = "jim@example.com";
+		this.user = {_id:this.user_id, email:this.newEmail};
+		this.subscription_id = "31DSd1123D";
 
-		@subscription =
-			admin_id: @adminUser_id
-			manager_ids: [@adminUser_id]
-			_id:@subscription_id
+		this.subscription = {
+			admin_id: this.adminUser_id,
+			manager_ids: [this.adminUser_id],
+			_id:this.subscription_id
+		};
 
-		@SubscriptionLocator =
-			getUsersSubscription: sinon.stub()
-			getSubscriptionByMemberIdAndId: sinon.stub()
-			getSubscription: sinon.stub().callsArgWith(1, null, @subscription)
+		this.SubscriptionLocator = {
+			getUsersSubscription: sinon.stub(),
+			getSubscriptionByMemberIdAndId: sinon.stub(),
+			getSubscription: sinon.stub().callsArgWith(1, null, this.subscription)
+		};
 
-		@UserCreator =
-			getUserOrCreateHoldingAccount: sinon.stub().callsArgWith(1, null, @user)
+		this.UserCreator =
+			{getUserOrCreateHoldingAccount: sinon.stub().callsArgWith(1, null, this.user)};
 
-		@SubscriptionUpdater =
-			removeUserFromGroup: sinon.stub().callsArgWith(2)
+		this.SubscriptionUpdater = {
+			removeUserFromGroup: sinon.stub().callsArgWith(2),
 			getSubscription: sinon.stub().callsArgWith(2)
+		};
 
-		@TeamInvitesHandler =
-			createInvite: sinon.stub().callsArgWith(2)
+		this.TeamInvitesHandler =
+			{createInvite: sinon.stub().callsArgWith(2)};
 
-		@UserGetter =
-			getUser: sinon.stub()
+		this.UserGetter = {
+			getUser: sinon.stub(),
 			getUserByAnyEmail: sinon.stub()
+		};
 
-		@LimitationsManager =
-			hasGroupMembersLimitReached: sinon.stub()
+		this.LimitationsManager =
+			{hasGroupMembersLimitReached: sinon.stub()};
 
-		@OneTimeTokenHandler =
-			getValueFromTokenAndExpire:sinon.stub()
+		this.OneTimeTokenHandler = {
+			getValueFromTokenAndExpire:sinon.stub(),
 			getNewToken:sinon.stub()
+		};
 
-		@EmailHandler =
-			sendEmail:sinon.stub()
+		this.EmailHandler =
+			{sendEmail:sinon.stub()};
 
-		@Subscription =
-			update: sinon.stub().yields()
+		this.Subscription = {
+			update: sinon.stub().yields(),
 			findOne: sinon.stub().yields()
+		};
 
-		@settings =
-			siteUrl:"http://www.sharelatex.com"
+		this.settings =
+			{siteUrl:"http://www.sharelatex.com"};
 
-		@readStub = sinon.stub()
-		@NotificationsBuilder =
-			groupPlan: sinon.stub().returns({read:@readStub})
+		this.readStub = sinon.stub();
+		this.NotificationsBuilder =
+			{groupPlan: sinon.stub().returns({read:this.readStub})};
 
-		@UserMembershipViewModel =
-			build: (email) -> { email }
+		this.UserMembershipViewModel =
+			{build(email) { return { email }; }};
 
-		@Handler = SandboxedModule.require modulePath, requires:
-			"logger-sharelatex": log:->
-			"../User/UserCreator": @UserCreator
-			"./SubscriptionUpdater": @SubscriptionUpdater
-			"./SubscriptionLocator": @SubscriptionLocator
-			"../../models/Subscription": Subscription: @Subscription
-			"../User/UserGetter": @UserGetter
-			"./LimitationsManager": @LimitationsManager
-			"../Security/OneTimeTokenHandler":@OneTimeTokenHandler
-			"../Email/EmailHandler":@EmailHandler
-			"settings-sharelatex":@settings
-			"../Notifications/NotificationsBuilder": @NotificationsBuilder
-			"../UserMembership/UserMembershipViewModel": @UserMembershipViewModel
-			"logger-sharelatex":
-				err:->
-				log:->
-				warn:->
+		return this.Handler = SandboxedModule.require(modulePath, { requires: {
+			"logger-sharelatex": { log() {}
+		},
+			"../User/UserCreator": this.UserCreator,
+			"./SubscriptionUpdater": this.SubscriptionUpdater,
+			"./SubscriptionLocator": this.SubscriptionLocator,
+			"../../models/Subscription": { Subscription: this.Subscription
+		},
+			"../User/UserGetter": this.UserGetter,
+			"./LimitationsManager": this.LimitationsManager,
+			"../Security/OneTimeTokenHandler":this.OneTimeTokenHandler,
+			"../Email/EmailHandler":this.EmailHandler,
+			"settings-sharelatex":this.settings,
+			"../Notifications/NotificationsBuilder": this.NotificationsBuilder,
+			"../UserMembership/UserMembershipViewModel": this.UserMembershipViewModel,
+			"logger-sharelatex": {
+				err() {},
+				log() {},
+				warn() {}
+			}
+		}
+	}
+		);
+	});
 
 
-	describe "removeUserFromGroup", ->
+	describe("removeUserFromGroup", () => it("should call the subscription updater to remove the user", function(done){
+        return this.Handler.removeUserFromGroup(this.adminUser_id, this.user._id, err=> {
+            this.SubscriptionUpdater.removeUserFromGroup.calledWith(this.adminUser_id, this.user._id).should.equal(true);
+            return done();
+        });
+    }));
 
-		it "should call the subscription updater to remove the user", (done)->
-			@Handler.removeUserFromGroup @adminUser_id, @user._id, (err)=>
-				@SubscriptionUpdater.removeUserFromGroup.calledWith(@adminUser_id, @user._id).should.equal true
-				done()
+	describe("replaceUserReferencesInGroups", function() {
+		beforeEach(function(done){
+			this.oldId = "ba5eba11";
+			this.newId = "5ca1ab1e";
+			return this.Handler.replaceUserReferencesInGroups(this.oldId, this.newId, () => done());
+		});
 
-	describe "replaceUserReferencesInGroups", ->
-		beforeEach (done)->
-			@oldId = "ba5eba11"
-			@newId = "5ca1ab1e"
-			@Handler.replaceUserReferencesInGroups @oldId, @newId, ->
-				done()
+		it("replaces the admin_id", function() {
+				return this.Subscription.update.calledWith(
+					{ admin_id: this.oldId },
+					{ admin_id: this.newId }
+				).should.equal(true);
+		});
 
-		it "replaces the admin_id", ->
-				@Subscription.update.calledWith(
-					{ admin_id: @oldId },
-					{ admin_id: @newId }
-				).should.equal true
-
-		it "replaces the manager_ids", ->
-				@Subscription.update.calledWith(
+		it("replaces the manager_ids", function() {
+				this.Subscription.update.calledWith(
 					{manager_ids:"ba5eba11"},{$addToSet:{manager_ids:"5ca1ab1e"}},{multi:true}
-				).should.equal true
+				).should.equal(true);
 
-				@Subscription.update.calledWith(
+				return this.Subscription.update.calledWith(
 					{manager_ids:"ba5eba11"},{$pull:{manager_ids:"ba5eba11"}},{multi:true}
-				).should.equal true
+				).should.equal(true);
+		});
 
-		it "replaces the member ids", ->
-			@Subscription.update.calledWith(
-				{ member_ids: @oldId },
-				{ $addToSet: { member_ids: @newId } }
-			).should.equal true
+		return it("replaces the member ids", function() {
+			this.Subscription.update.calledWith(
+				{ member_ids: this.oldId },
+				{ $addToSet: { member_ids: this.newId } }
+			).should.equal(true);
 
-			@Subscription.update.calledWith(
-				{ member_ids: @oldId },
-				{ $pull: { member_ids: @oldId } }
-			).should.equal true
+			return this.Subscription.update.calledWith(
+				{ member_ids: this.oldId },
+				{ $pull: { member_ids: this.oldId } }
+			).should.equal(true);
+		});
+	});
 
-	describe "isUserPartOfGroup", ->
-		beforeEach ->
-			@subscription_id = "123ed13123"
+	describe("isUserPartOfGroup", function() {
+		beforeEach(function() {
+			return this.subscription_id = "123ed13123";
+		});
 
-		it "should return true when user is part of subscription", (done)->
-			@SubscriptionLocator.getSubscriptionByMemberIdAndId.callsArgWith(2, null, {_id:@subscription_id})
-			@Handler.isUserPartOfGroup @user_id, @subscription_id, (err, partOfGroup)->
-				partOfGroup.should.equal true
-				done()
+		it("should return true when user is part of subscription", function(done){
+			this.SubscriptionLocator.getSubscriptionByMemberIdAndId.callsArgWith(2, null, {_id:this.subscription_id});
+			return this.Handler.isUserPartOfGroup(this.user_id, this.subscription_id, function(err, partOfGroup){
+				partOfGroup.should.equal(true);
+				return done();
+			});
+		});
 
-		it "should return false when no subscription is found", (done)->
-			@SubscriptionLocator.getSubscriptionByMemberIdAndId.callsArgWith(2, null)
-			@Handler.isUserPartOfGroup @user_id, @subscription_id, (err, partOfGroup)->
-				partOfGroup.should.equal false
-				done()
+		return it("should return false when no subscription is found", function(done){
+			this.SubscriptionLocator.getSubscriptionByMemberIdAndId.callsArgWith(2, null);
+			return this.Handler.isUserPartOfGroup(this.user_id, this.subscription_id, function(err, partOfGroup){
+				partOfGroup.should.equal(false);
+				return done();
+			});
+		});
+	});
 
-	describe "getTotalConfirmedUsersInGroup", ->
-		describe "for existing subscriptions", ->
-			beforeEach ->
-				@subscription.member_ids = ["12321", "3121321"]
-			it "should call the subscription locator and return 2 users", (done)->
-				@Handler.getTotalConfirmedUsersInGroup @subscription_id, (err, count)=>
-					@SubscriptionLocator.getSubscription.calledWith(@subscription_id).should.equal true
-					count.should.equal 2
-					done()
-		describe "for nonexistent subscriptions", ->
-			it "should return undefined", (done)->
-				@Handler.getTotalConfirmedUsersInGroup "fake-id", (err, count)=>
-					should.not.exist(count)
-					done()
+	return describe("getTotalConfirmedUsersInGroup", function() {
+		describe("for existing subscriptions", function() {
+			beforeEach(function() {
+				return this.subscription.member_ids = ["12321", "3121321"];});
+			return it("should call the subscription locator and return 2 users", function(done){
+				return this.Handler.getTotalConfirmedUsersInGroup(this.subscription_id, (err, count)=> {
+					this.SubscriptionLocator.getSubscription.calledWith(this.subscription_id).should.equal(true);
+					count.should.equal(2);
+					return done();
+				});
+			});
+		});
+		return describe("for nonexistent subscriptions", () => it("should return undefined", function(done){
+            return this.Handler.getTotalConfirmedUsersInGroup("fake-id", (err, count)=> {
+                should.not.exist(count);
+                return done();
+            });
+        }));
+	});
+});

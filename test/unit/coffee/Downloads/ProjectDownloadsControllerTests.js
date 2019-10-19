@@ -1,124 +1,155 @@
-sinon = require('sinon')
-chai = require('chai')
-should = chai.should()
-expect = chai.expect
-modulePath = "../../../../app/js/Features/Downloads/ProjectDownloadsController.js"
-SandboxedModule = require('sandboxed-module')
-MockRequest = require "../helpers/MockRequest"
-MockResponse = require "../helpers/MockResponse"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const sinon = require('sinon');
+const chai = require('chai');
+const should = chai.should();
+const {
+    expect
+} = chai;
+const modulePath = "../../../../app/js/Features/Downloads/ProjectDownloadsController.js";
+const SandboxedModule = require('sandboxed-module');
+const MockRequest = require("../helpers/MockRequest");
+const MockResponse = require("../helpers/MockResponse");
 
-describe "ProjectDownloadsController", ->
-	beforeEach ->
-		@project_id = "project-id-123"
-		@req = new MockRequest()
-		@res = new MockResponse()
-		@next = sinon.stub()
-		@DocumentUpdaterHandler = sinon.stub()
-		@ProjectDownloadsController = SandboxedModule.require modulePath, requires:
-			"./ProjectZipStreamManager"   : @ProjectZipStreamManager = {}
-			"../Project/ProjectGetter"    : @ProjectGetter = {}
-			"metrics-sharelatex": @metrics = {}
-			"logger-sharelatex"           : @logger = {log: sinon.stub()}
-			"../DocumentUpdater/DocumentUpdaterHandler": @DocumentUpdaterHandler
+describe("ProjectDownloadsController", function() {
+	beforeEach(function() {
+		this.project_id = "project-id-123";
+		this.req = new MockRequest();
+		this.res = new MockResponse();
+		this.next = sinon.stub();
+		this.DocumentUpdaterHandler = sinon.stub();
+		return this.ProjectDownloadsController = SandboxedModule.require(modulePath, { requires: {
+			"./ProjectZipStreamManager"   : (this.ProjectZipStreamManager = {}),
+			"../Project/ProjectGetter"    : (this.ProjectGetter = {}),
+			"metrics-sharelatex": (this.metrics = {}),
+			"logger-sharelatex"           : (this.logger = {log: sinon.stub()}),
+			"../DocumentUpdater/DocumentUpdaterHandler": this.DocumentUpdaterHandler
+		}
+	}
+		);
+	});
 
-	describe "downloadProject", ->
-		beforeEach ->
-			@stream =
-				pipe: sinon.stub()
-			@ProjectZipStreamManager.createZipStreamForProject =
-				sinon.stub().callsArgWith(1, null, @stream)
-			@req.params = Project_id: @project_id
-			@res.contentType = sinon.stub()
-			@res.header = sinon.stub()
-			@project_name = "project name with accênts"
-			@ProjectGetter.getProject = sinon.stub().callsArgWith(2, null, name: @project_name)
-			@DocumentUpdaterHandler.flushProjectToMongo = sinon.stub().callsArgWith(1)
-			@metrics.inc = sinon.stub()
-			@ProjectDownloadsController.downloadProject @req, @res, @next
+	describe("downloadProject", function() {
+		beforeEach(function() {
+			this.stream =
+				{pipe: sinon.stub()};
+			this.ProjectZipStreamManager.createZipStreamForProject =
+				sinon.stub().callsArgWith(1, null, this.stream);
+			this.req.params = {Project_id: this.project_id};
+			this.res.contentType = sinon.stub();
+			this.res.header = sinon.stub();
+			this.project_name = "project name with accênts";
+			this.ProjectGetter.getProject = sinon.stub().callsArgWith(2, null, {name: this.project_name});
+			this.DocumentUpdaterHandler.flushProjectToMongo = sinon.stub().callsArgWith(1);
+			this.metrics.inc = sinon.stub();
+			return this.ProjectDownloadsController.downloadProject(this.req, this.res, this.next);
+		});
 
-		it "should create a zip from the project", ->
-			@ProjectZipStreamManager.createZipStreamForProject
-				.calledWith(@project_id)
-				.should.equal true
+		it("should create a zip from the project", function() {
+			return this.ProjectZipStreamManager.createZipStreamForProject
+				.calledWith(this.project_id)
+				.should.equal(true);
+		});
 
-		it "should stream the zip to the request", ->
-			@stream.pipe.calledWith(@res)
-				.should.equal true
+		it("should stream the zip to the request", function() {
+			return this.stream.pipe.calledWith(this.res)
+				.should.equal(true);
+		});
 
-		it "should set the correct content type on the request", ->
-			@res.contentType
+		it("should set the correct content type on the request", function() {
+			return this.res.contentType
 				.calledWith("application/zip")
-				.should.equal true
+				.should.equal(true);
+		});
 
-		it "should flush the project to mongo", ->
-			@DocumentUpdaterHandler.flushProjectToMongo
-				.calledWith(@project_id)
-				.should.equal true
+		it("should flush the project to mongo", function() {
+			return this.DocumentUpdaterHandler.flushProjectToMongo
+				.calledWith(this.project_id)
+				.should.equal(true);
+		});
 
-		it "should look up the project's name", ->
-			@ProjectGetter.getProject
-				.calledWith(@project_id, name: true)
-				.should.equal(true)
+		it("should look up the project's name", function() {
+			return this.ProjectGetter.getProject
+				.calledWith(this.project_id, {name: true})
+				.should.equal(true);
+		});
 
-		it "should name the downloaded file after the project", ->
-			@res.setContentDisposition
+		it("should name the downloaded file after the project", function() {
+			return this.res.setContentDisposition
 				.calledWith(
 					'attachment',
-					{filename: "#{@project_name}.zip"})
-				.should.equal true
+					{filename: `${this.project_name}.zip`})
+				.should.equal(true);
+		});
 
-		it "should record the action via Metrics", ->
-			@metrics.inc.calledWith("zip-downloads").should.equal true
+		it("should record the action via Metrics", function() {
+			return this.metrics.inc.calledWith("zip-downloads").should.equal(true);
+		});
 
-		it "should log the action", ->
-			@logger.log
+		return it("should log the action", function() {
+			return this.logger.log
 				.calledWith(sinon.match.any, "downloading project")
-				.should.equal true
+				.should.equal(true);
+		});
+	});
 
-	describe "downloadMultipleProjects", ->
-		beforeEach ->
-			@stream =
-				pipe: sinon.stub()
-			@ProjectZipStreamManager.createZipStreamForMultipleProjects =
-				sinon.stub().callsArgWith(1, null, @stream)
-			@project_ids = ["project-1", "project-2"]
-			@req.query = project_ids: @project_ids.join(",")
-			@res.contentType = sinon.stub()
-			@res.header = sinon.stub()
-			@DocumentUpdaterHandler.flushMultipleProjectsToMongo = sinon.stub().callsArgWith(1)
-			@metrics.inc = sinon.stub()
-			@ProjectDownloadsController.downloadMultipleProjects @req, @res, @next
+	return describe("downloadMultipleProjects", function() {
+		beforeEach(function() {
+			this.stream =
+				{pipe: sinon.stub()};
+			this.ProjectZipStreamManager.createZipStreamForMultipleProjects =
+				sinon.stub().callsArgWith(1, null, this.stream);
+			this.project_ids = ["project-1", "project-2"];
+			this.req.query = {project_ids: this.project_ids.join(",")};
+			this.res.contentType = sinon.stub();
+			this.res.header = sinon.stub();
+			this.DocumentUpdaterHandler.flushMultipleProjectsToMongo = sinon.stub().callsArgWith(1);
+			this.metrics.inc = sinon.stub();
+			return this.ProjectDownloadsController.downloadMultipleProjects(this.req, this.res, this.next);
+		});
 
-		it "should create a zip from the project", ->
-			@ProjectZipStreamManager.createZipStreamForMultipleProjects
-				.calledWith(@project_ids)
-				.should.equal true
+		it("should create a zip from the project", function() {
+			return this.ProjectZipStreamManager.createZipStreamForMultipleProjects
+				.calledWith(this.project_ids)
+				.should.equal(true);
+		});
 
-		it "should stream the zip to the request", ->
-			@stream.pipe.calledWith(@res)
-				.should.equal true
+		it("should stream the zip to the request", function() {
+			return this.stream.pipe.calledWith(this.res)
+				.should.equal(true);
+		});
 
-		it "should set the correct content type on the request", ->
-			@res.contentType
+		it("should set the correct content type on the request", function() {
+			return this.res.contentType
 				.calledWith("application/zip")
-				.should.equal true
+				.should.equal(true);
+		});
 
-		it "should flush the projects to mongo", ->
-			@DocumentUpdaterHandler.flushMultipleProjectsToMongo
-				.calledWith(@project_ids)
-				.should.equal true
+		it("should flush the projects to mongo", function() {
+			return this.DocumentUpdaterHandler.flushMultipleProjectsToMongo
+				.calledWith(this.project_ids)
+				.should.equal(true);
+		});
 
-		it "should name the downloaded file after the project", ->
-			@res.setContentDisposition
+		it("should name the downloaded file after the project", function() {
+			return this.res.setContentDisposition
 				.calledWith(
 					'attachment',
 					{filename: "Overleaf Projects (2 items).zip"})
-				.should.equal true
+				.should.equal(true);
+		});
 
-		it "should record the action via Metrics", ->
-			@metrics.inc.calledWith("zip-downloads-multiple").should.equal true
+		it("should record the action via Metrics", function() {
+			return this.metrics.inc.calledWith("zip-downloads-multiple").should.equal(true);
+		});
 
-		it "should log the action", ->
-			@logger.log
+		return it("should log the action", function() {
+			return this.logger.log
 				.calledWith(sinon.match.any, "downloading multiple projects")
-				.should.equal true
+				.should.equal(true);
+		});
+	});
+});

@@ -1,59 +1,84 @@
-SandboxedModule = require('sandboxed-module')
-assert = require('assert')
-require('chai').should()
-sinon = require('sinon')
-modulePath = require('path').join __dirname, '../../../../app/js/Features/SystemMessages/SystemMessageManager.js'
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const SandboxedModule = require('sandboxed-module');
+const assert = require('assert');
+require('chai').should();
+const sinon = require('sinon');
+const modulePath = require('path').join(__dirname, '../../../../app/js/Features/SystemMessages/SystemMessageManager.js');
 
 
-describe 'SystemMessageManager', ->
-	beforeEach ->
-		@SystemMessage = {}
-		@SystemMessageManager = SandboxedModule.require modulePath, requires:
-			"../../models/SystemMessage": SystemMessage: @SystemMessage
-		@callback = sinon.stub()
+describe('SystemMessageManager', function() {
+	beforeEach(function() {
+		this.SystemMessage = {};
+		this.SystemMessageManager = SandboxedModule.require(modulePath, { requires: {
+			"../../models/SystemMessage": {SystemMessage: this.SystemMessage}
+		}
+	}
+		);
+		return this.callback = sinon.stub();
+	});
 			
-	describe "getMessage", ->
-		beforeEach ->
-			@messages = ["messages-stub"]
-			@SystemMessage.find = sinon.stub().callsArgWith(1, null, @messages)
+	describe("getMessage", function() {
+		beforeEach(function() {
+			this.messages = ["messages-stub"];
+			return this.SystemMessage.find = sinon.stub().callsArgWith(1, null, this.messages);
+		});
 			
-		describe "when the messages are not cached", ->
-			beforeEach ->
-				@SystemMessageManager.getMessages @callback
+		describe("when the messages are not cached", function() {
+			beforeEach(function() {
+				return this.SystemMessageManager.getMessages(this.callback);
+			});
 				
-			it "should look the messages up in the database", ->
-				@SystemMessage.find
+			it("should look the messages up in the database", function() {
+				return this.SystemMessage.find
 					.calledWith({})
-					.should.equal true
+					.should.equal(true);
+			});
 					
-			it "should return the messages", ->
-				@callback.calledWith(null, @messages).should.equal true
+			it("should return the messages", function() {
+				return this.callback.calledWith(null, this.messages).should.equal(true);
+			});
 				
-			it "should cache the messages", ->
-				@SystemMessageManager._cachedMessages.should.equal @messages
+			return it("should cache the messages", function() {
+				return this.SystemMessageManager._cachedMessages.should.equal(this.messages);
+			});
+		});
 				
-		describe "when the messages are cached", ->
-			beforeEach ->
-				@SystemMessageManager._cachedMessages = @messages
-				@SystemMessageManager.getMessages @callback
+		return describe("when the messages are cached", function() {
+			beforeEach(function() {
+				this.SystemMessageManager._cachedMessages = this.messages;
+				return this.SystemMessageManager.getMessages(this.callback);
+			});
 				
-			it "should not look the messages up in the database", ->
-				@SystemMessage.find.called.should.equal false
+			it("should not look the messages up in the database", function() {
+				return this.SystemMessage.find.called.should.equal(false);
+			});
 					
-			it "should return the messages", ->
-				@callback.calledWith(null, @messages).should.equal true
+			return it("should return the messages", function() {
+				return this.callback.calledWith(null, this.messages).should.equal(true);
+			});
+		});
+	});
 				
-	describe "clearMessages", ->
-		beforeEach ->
-			@SystemMessage.remove = sinon.stub().callsArg(1)
-			@SystemMessageManager.clearMessages @callback
+	return describe("clearMessages", function() {
+		beforeEach(function() {
+			this.SystemMessage.remove = sinon.stub().callsArg(1);
+			return this.SystemMessageManager.clearMessages(this.callback);
+		});
 			
-		it "should remove the messages from the database", ->
-			@SystemMessage.remove
+		it("should remove the messages from the database", function() {
+			return this.SystemMessage.remove
 				.calledWith({})
-				.should.equal true
+				.should.equal(true);
+		});
 				
-		it "should return the callback", ->
-			@callback.called.should.equal true
+		return it("should return the callback", function() {
+			return this.callback.called.should.equal(true);
+		});
+	});
+});
 			
 			

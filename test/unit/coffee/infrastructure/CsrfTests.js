@@ -1,114 +1,150 @@
-assert = require("chai").assert
-sinon = require('sinon')
-chai = require('chai')
-should = chai.should()
-expect = chai.expect
-modulePath = "../../../../app/js/infrastructure/Csrf.js"
-SandboxedModule = require('sandboxed-module')
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const {
+    assert
+} = require("chai");
+const sinon = require('sinon');
+const chai = require('chai');
+const should = chai.should();
+const {
+    expect
+} = chai;
+const modulePath = "../../../../app/js/infrastructure/Csrf.js";
+const SandboxedModule = require('sandboxed-module');
 
-describe "Csrf", ->
+describe("Csrf", function() {
 
-	beforeEach ->
-		@csurf_csrf = sinon.stub().callsArgWith(2, @err = {code: 'EBADCSRFTOKEN'})
-		@Csrf = SandboxedModule.require modulePath, requires:
-			csurf: sinon.stub().returns(@csurf_csrf)
-		@csrf = new @Csrf()
-		@next = sinon.stub()
-		@path = '/foo/bar'
-		@req =
-			path: @path
+	beforeEach(function() {
+		this.csurf_csrf = sinon.stub().callsArgWith(2, (this.err = {code: 'EBADCSRFTOKEN'}));
+		this.Csrf = SandboxedModule.require(modulePath, { requires: {
+			csurf: sinon.stub().returns(this.csurf_csrf)
+		}
+	}
+		);
+		this.csrf = new this.Csrf();
+		this.next = sinon.stub();
+		this.path = '/foo/bar';
+		this.req = {
+			path: this.path,
 			method: 'POST'
-		@res = {}
+		};
+		return this.res = {};});
 
-	describe 'the middleware', ->
-		describe 'when there are no excluded routes', ->
-			it 'passes the csrf error on', ->
-				@csrf.middleware @req, @res, @next
-				expect(@next.calledWith(@err)).to.equal true
+	describe('the middleware', function() {
+		describe('when there are no excluded routes', () => it('passes the csrf error on', function() {
+            this.csrf.middleware(this.req, this.res, this.next);
+            return expect(this.next.calledWith(this.err)).to.equal(true);
+        }));
 
-		describe 'when the route is excluded', ->
-			it 'does not pass the csrf error on', ->
-				@csrf.disableDefaultCsrfProtection(@path, 'POST')
-				@csrf.middleware @req, @res, @next
-				expect(@next.calledWith(@err)).to.equal false
+		describe('when the route is excluded', () => it('does not pass the csrf error on', function() {
+            this.csrf.disableDefaultCsrfProtection(this.path, 'POST');
+            this.csrf.middleware(this.req, this.res, this.next);
+            return expect(this.next.calledWith(this.err)).to.equal(false);
+        }));
 
-		describe 'when there is a partial route match', ->
-			it 'passes the csrf error on when the match is too short', ->
-				@csrf.disableDefaultCsrfProtection('/foo', 'POST')
-				@csrf.middleware @req, @res, @next
-				expect(@next.calledWith(@err)).to.equal true
+		describe('when there is a partial route match', function() {
+			it('passes the csrf error on when the match is too short', function() {
+				this.csrf.disableDefaultCsrfProtection('/foo', 'POST');
+				this.csrf.middleware(this.req, this.res, this.next);
+				return expect(this.next.calledWith(this.err)).to.equal(true);
+			});
 
-			it 'passes the csrf error on when the match is too long', ->
-				@csrf.disableDefaultCsrfProtection('/foo/bar/baz', 'POST')
-				@csrf.middleware @req, @res, @next
-				expect(@next.calledWith(@err)).to.equal true
+			return it('passes the csrf error on when the match is too long', function() {
+				this.csrf.disableDefaultCsrfProtection('/foo/bar/baz', 'POST');
+				this.csrf.middleware(this.req, this.res, this.next);
+				return expect(this.next.calledWith(this.err)).to.equal(true);
+			});
+		});
 
-		describe 'when there are multiple exclusions', ->
-			it 'does not pass the csrf error on when the match is present', ->
-				@csrf.disableDefaultCsrfProtection(@path, 'POST')
-				@csrf.disableDefaultCsrfProtection('/test', 'POST')
-				@csrf.disableDefaultCsrfProtection('/a/b/c', 'POST')
-				@csrf.middleware @req, @res, @next
-				expect(@next.calledWith(@err)).to.equal false
+		describe('when there are multiple exclusions', function() {
+			it('does not pass the csrf error on when the match is present', function() {
+				this.csrf.disableDefaultCsrfProtection(this.path, 'POST');
+				this.csrf.disableDefaultCsrfProtection('/test', 'POST');
+				this.csrf.disableDefaultCsrfProtection('/a/b/c', 'POST');
+				this.csrf.middleware(this.req, this.res, this.next);
+				return expect(this.next.calledWith(this.err)).to.equal(false);
+			});
 
-			it 'passes the csrf error on when the match is not present', ->
-				@csrf.disableDefaultCsrfProtection('/url', 'POST')
-				@csrf.disableDefaultCsrfProtection('/test', 'POST')
-				@csrf.disableDefaultCsrfProtection('/a/b/c', 'POST')
-				@csrf.middleware @req, @res, @next
-				expect(@next.calledWith(@err)).to.equal true
+			return it('passes the csrf error on when the match is not present', function() {
+				this.csrf.disableDefaultCsrfProtection('/url', 'POST');
+				this.csrf.disableDefaultCsrfProtection('/test', 'POST');
+				this.csrf.disableDefaultCsrfProtection('/a/b/c', 'POST');
+				this.csrf.middleware(this.req, this.res, this.next);
+				return expect(this.next.calledWith(this.err)).to.equal(true);
+			});
+		});
 
-		describe 'when the method does not match', ->
-			it 'passes the csrf error on', ->
-				@csrf.disableDefaultCsrfProtection(@path, 'POST')
-				@req.method = 'GET'
-				@csrf.middleware @req, @res, @next
-				expect(@next.calledWith(@err)).to.equal true
+		describe('when the method does not match', () => it('passes the csrf error on', function() {
+            this.csrf.disableDefaultCsrfProtection(this.path, 'POST');
+            this.req.method = 'GET';
+            this.csrf.middleware(this.req, this.res, this.next);
+            return expect(this.next.calledWith(this.err)).to.equal(true);
+        }));
 
-		describe 'when the route is excluded, but the error is not a bad-csrf-token error', ->
-			it 'passes the error on', ->
-				@Csrf = SandboxedModule.require modulePath, requires:
-					csurf: @csurf = sinon.stub().returns(@csurf_csrf = sinon.stub().callsArgWith(2, err = {code: 'EOTHER'}))
-				@csrf = new @Csrf()
-				@csrf.disableDefaultCsrfProtection(@path, 'POST')
-				@csrf.middleware @req, @res, @next
-				expect(@next.calledWith(err)).to.equal true
-				expect(@next.calledWith(@err)).to.equal false
+		return describe('when the route is excluded, but the error is not a bad-csrf-token error', () => it('passes the error on', function() {
+            let err;
+            this.Csrf = SandboxedModule.require(modulePath, { requires: {
+                csurf: (this.csurf = sinon.stub().returns(this.csurf_csrf = sinon.stub().callsArgWith(2, (err = {code: 'EOTHER'}))))
+            }
+        }
+            );
+            this.csrf = new this.Csrf();
+            this.csrf.disableDefaultCsrfProtection(this.path, 'POST');
+            this.csrf.middleware(this.req, this.res, this.next);
+            expect(this.next.calledWith(err)).to.equal(true);
+            return expect(this.next.calledWith(this.err)).to.equal(false);
+        }));
+	});
 
-	describe 'validateRequest', ->
-		describe 'when the request is invalid', ->
-			it 'calls the callback with `false`', ->
-				@cb = sinon.stub()
-				@Csrf.validateRequest(@req, @cb)
-				expect(@cb.calledWith(false)).to.equal true
+	describe('validateRequest', function() {
+		describe('when the request is invalid', () => it('calls the callback with `false`', function() {
+            this.cb = sinon.stub();
+            this.Csrf.validateRequest(this.req, this.cb);
+            return expect(this.cb.calledWith(false)).to.equal(true);
+        }));
 
-		describe 'when the request is valid', ->
-			it 'calls the callback with `true`', ->
-				@Csrf = SandboxedModule.require modulePath, requires:
-					csurf: @csurf = sinon.stub().returns(@csurf_csrf = sinon.stub().callsArg(2))
-				@cb = sinon.stub()
-				@Csrf.validateRequest(@req, @cb)
-				expect(@cb.calledWith(true)).to.equal true
+		return describe('when the request is valid', () => it('calls the callback with `true`', function() {
+            this.Csrf = SandboxedModule.require(modulePath, { requires: {
+                csurf: (this.csurf = sinon.stub().returns(this.csurf_csrf = sinon.stub().callsArg(2)))
+            }
+        }
+            );
+            this.cb = sinon.stub();
+            this.Csrf.validateRequest(this.req, this.cb);
+            return expect(this.cb.calledWith(true)).to.equal(true);
+        }));
+	});
 
-	describe 'validateToken', ->
-		describe 'when the request is invalid', ->
-			it 'calls the callback with `false`', ->
-				@cb = sinon.stub()
-				@Csrf.validateToken('token', {}, @cb)
-				expect(@cb.calledWith(false)).to.equal true
+	return describe('validateToken', function() {
+		describe('when the request is invalid', () => it('calls the callback with `false`', function() {
+            this.cb = sinon.stub();
+            this.Csrf.validateToken('token', {}, this.cb);
+            return expect(this.cb.calledWith(false)).to.equal(true);
+        }));
 
-		describe 'when the request is valid', ->
-			it 'calls the callback with `true`', ->
-				@Csrf = SandboxedModule.require modulePath, requires:
-					csurf: @csurf = sinon.stub().returns(@csurf_csrf = sinon.stub().callsArg(2))
-				@cb = sinon.stub()
-				@Csrf.validateToken('goodtoken', {}, @cb)
-				expect(@cb.calledWith(true)).to.equal true
+		describe('when the request is valid', () => it('calls the callback with `true`', function() {
+            this.Csrf = SandboxedModule.require(modulePath, { requires: {
+                csurf: (this.csurf = sinon.stub().returns(this.csurf_csrf = sinon.stub().callsArg(2)))
+            }
+        }
+            );
+            this.cb = sinon.stub();
+            this.Csrf.validateToken('goodtoken', {}, this.cb);
+            return expect(this.cb.calledWith(true)).to.equal(true);
+        }));
 
-		describe 'when there is no token', ->
-			it 'calls the callback with `false`', ->
-				@Csrf = SandboxedModule.require modulePath, requires:
-					csurf: @csurf = sinon.stub().returns(@csurf_csrf = sinon.stub().callsArg(2))
-				@cb = sinon.stub()
-				@Csrf.validateToken(null, {}, @cb)
-				expect(@cb.calledWith(false)).to.equal true
+		return describe('when there is no token', () => it('calls the callback with `false`', function() {
+            this.Csrf = SandboxedModule.require(modulePath, { requires: {
+                csurf: (this.csurf = sinon.stub().returns(this.csurf_csrf = sinon.stub().callsArg(2)))
+            }
+        }
+            );
+            this.cb = sinon.stub();
+            this.Csrf.validateToken(null, {}, this.cb);
+            return expect(this.cb.calledWith(false)).to.equal(true);
+        }));
+	});
+});

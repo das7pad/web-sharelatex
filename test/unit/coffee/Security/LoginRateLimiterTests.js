@@ -1,74 +1,107 @@
-SandboxedModule = require('sandboxed-module')
-sinon = require('sinon')
-require('chai').should()
-expect = require('chai').expect
-modulePath = require('path').join __dirname, '../../../../app/js/Features/Security/LoginRateLimiter'
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const SandboxedModule = require('sandboxed-module');
+const sinon = require('sinon');
+require('chai').should();
+const {
+    expect
+} = require('chai');
+const modulePath = require('path').join(__dirname, '../../../../app/js/Features/Security/LoginRateLimiter');
 
 
-describe "LoginRateLimiter", ->
+describe("LoginRateLimiter", function() {
 
-	beforeEach ->
-		@email = "bob@bob.com"
-		@RateLimiter =
-			clearRateLimit: sinon.stub()
+	beforeEach(function() {
+		this.email = "bob@bob.com";
+		this.RateLimiter = {
+			clearRateLimit: sinon.stub(),
 			addCount: sinon.stub()
+		};
 
-		@LoginRateLimiter = SandboxedModule.require modulePath, requires:
-			'../../infrastructure/RateLimiter': @RateLimiter
+		return this.LoginRateLimiter = SandboxedModule.require(modulePath, { requires: {
+			'../../infrastructure/RateLimiter': this.RateLimiter
+		}
+	}
+		);
+	});
 
-	describe "processLoginRequest", ->
+	describe("processLoginRequest", function() {
 
-		beforeEach ->
-			@RateLimiter.addCount = sinon.stub().callsArgWith(1, null, true)
+		beforeEach(function() {
+			return this.RateLimiter.addCount = sinon.stub().callsArgWith(1, null, true);
+		});
 
-		it 'should call RateLimiter.addCount', (done) ->
-			@LoginRateLimiter.processLoginRequest @email, (err, allow) =>
-				@RateLimiter.addCount.callCount.should.equal 1
-				expect(@RateLimiter.addCount.lastCall.args[0].endpointName).to.equal 'login'
-				expect(@RateLimiter.addCount.lastCall.args[0].subjectName).to.equal @email
-				done()
+		it('should call RateLimiter.addCount', function(done) {
+			return this.LoginRateLimiter.processLoginRequest(this.email, (err, allow) => {
+				this.RateLimiter.addCount.callCount.should.equal(1);
+				expect(this.RateLimiter.addCount.lastCall.args[0].endpointName).to.equal('login');
+				expect(this.RateLimiter.addCount.lastCall.args[0].subjectName).to.equal(this.email);
+				return done();
+			});
+		});
 
-		describe 'when login is allowed', ->
+		describe('when login is allowed', function() {
 
-			beforeEach ->
-				@RateLimiter.addCount = sinon.stub().callsArgWith(1, null, true)
+			beforeEach(function() {
+				return this.RateLimiter.addCount = sinon.stub().callsArgWith(1, null, true);
+			});
 
-			it 'should call pass allow=true', (done) ->
-				@LoginRateLimiter.processLoginRequest @email, (err, allow) =>
-					expect(err).to.equal null
-					expect(allow).to.equal true
-					done()
+			return it('should call pass allow=true', function(done) {
+				return this.LoginRateLimiter.processLoginRequest(this.email, (err, allow) => {
+					expect(err).to.equal(null);
+					expect(allow).to.equal(true);
+					return done();
+				});
+			});
+		});
 
-		describe 'when login is blocked', ->
+		describe('when login is blocked', function() {
 
-			beforeEach ->
-				@RateLimiter.addCount = sinon.stub().callsArgWith(1, null, false)
+			beforeEach(function() {
+				return this.RateLimiter.addCount = sinon.stub().callsArgWith(1, null, false);
+			});
 
-			it 'should call pass allow=false', (done) ->
-				@LoginRateLimiter.processLoginRequest @email, (err, allow) =>
-					expect(err).to.equal null
-					expect(allow).to.equal false
-					done()
+			return it('should call pass allow=false', function(done) {
+				return this.LoginRateLimiter.processLoginRequest(this.email, (err, allow) => {
+					expect(err).to.equal(null);
+					expect(allow).to.equal(false);
+					return done();
+				});
+			});
+		});
 
-		describe 'when addCount produces an error', ->
+		return describe('when addCount produces an error', function() {
 
-			beforeEach ->
-				@RateLimiter.addCount = sinon.stub().callsArgWith(1, new Error('woops'))
+			beforeEach(function() {
+				return this.RateLimiter.addCount = sinon.stub().callsArgWith(1, new Error('woops'));
+			});
 
-			it 'should produce an error', (done) ->
-				@LoginRateLimiter.processLoginRequest @email, (err, allow) =>
-					expect(err).to.not.equal null
-					expect(err).to.be.instanceof Error
-					done()
+			return it('should produce an error', function(done) {
+				return this.LoginRateLimiter.processLoginRequest(this.email, (err, allow) => {
+					expect(err).to.not.equal(null);
+					expect(err).to.be.instanceof(Error);
+					return done();
+				});
+			});
+		});
+	});
 
 
-	describe "recordSuccessfulLogin", ->
+	return describe("recordSuccessfulLogin", function() {
 
-		beforeEach ->
-			@RateLimiter.clearRateLimit = sinon.stub().callsArgWith 2, null
+		beforeEach(function() {
+			return this.RateLimiter.clearRateLimit = sinon.stub().callsArgWith(2, null);
+		});
 
-		it "should call clearRateLimit", (done)->
-			@LoginRateLimiter.recordSuccessfulLogin @email, =>
-				@RateLimiter.clearRateLimit.callCount.should.equal 1
-				@RateLimiter.clearRateLimit.calledWith('login', @email).should.equal true
-				done()
+		return it("should call clearRateLimit", function(done){
+			return this.LoginRateLimiter.recordSuccessfulLogin(this.email, () => {
+				this.RateLimiter.clearRateLimit.callCount.should.equal(1);
+				this.RateLimiter.clearRateLimit.calledWith('login', this.email).should.equal(true);
+				return done();
+			});
+		});
+	});
+});

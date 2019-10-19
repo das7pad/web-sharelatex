@@ -1,196 +1,257 @@
-should = require('chai').should()
-SandboxedModule = require('sandboxed-module')
-assert = require('assert')
-path = require('path')
-sinon = require('sinon')
-modulePath = path.join __dirname, "../../../../app/js/Features/User/UserGetter"
-expect = require("chai").expect
-Errors = require "../../../../app/js/Features/Errors/Errors"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const should = require('chai').should();
+const SandboxedModule = require('sandboxed-module');
+const assert = require('assert');
+const path = require('path');
+const sinon = require('sinon');
+const modulePath = path.join(__dirname, "../../../../app/js/Features/User/UserGetter");
+const {
+    expect
+} = require("chai");
+const Errors = require("../../../../app/js/Features/Errors/Errors");
 
-describe "UserGetter", ->
+describe("UserGetter", function() {
 
-	beforeEach ->
-		@fakeUser =
-			_id: '12390i'
-			email: 'email2@foo.bar'
+	beforeEach(function() {
+		this.fakeUser = {
+			_id: '12390i',
+			email: 'email2@foo.bar',
 			emails: [
-				{ email: 'email1@foo.bar', reversedHostname: 'rab.oof' }
+				{ email: 'email1@foo.bar', reversedHostname: 'rab.oof' },
 				{ email: 'email2@foo.bar', reversedHostname: 'rab.oof' }
 			]
-		@findOne = sinon.stub().callsArgWith(2, null, @fakeUser)
-		@find = sinon.stub().callsArgWith(2, null, [ @fakeUser ])
-		@Mongo =
-			db: users:
-				 findOne: @findOne
-				 find: @find
-			ObjectId: (id) -> return id
-		settings = apis: { v1: { url: 'v1.url', user: '', pass: '' } }
-		@getUserAffiliations = sinon.stub().callsArgWith(1, null, [])
+		};
+		this.findOne = sinon.stub().callsArgWith(2, null, this.fakeUser);
+		this.find = sinon.stub().callsArgWith(2, null, [ this.fakeUser ]);
+		this.Mongo = {
+			db: { users: {
+				 findOne: this.findOne,
+				 find: this.find
+			}
+		},
+			ObjectId(id) { return id; }
+		};
+		const settings = {apis: { v1: { url: 'v1.url', user: '', pass: '' } }};
+		this.getUserAffiliations = sinon.stub().callsArgWith(1, null, []);
 
-		@UserGetter = SandboxedModule.require modulePath, requires:
-			"logger-sharelatex": log:->
-			"../../infrastructure/mongojs": @Mongo
-			"metrics-sharelatex": timeAsyncMethod: sinon.stub()
-			'settings-sharelatex': settings
-			'../Institutions/InstitutionsAPI':
-				getUserAffiliations: @getUserAffiliations
+		return this.UserGetter = SandboxedModule.require(modulePath, { requires: {
+			"logger-sharelatex": { log() {}
+		},
+			"../../infrastructure/mongojs": this.Mongo,
+			"metrics-sharelatex": { timeAsyncMethod: sinon.stub()
+		},
+			'settings-sharelatex': settings,
+			'../Institutions/InstitutionsAPI': {
+				getUserAffiliations: this.getUserAffiliations
+			},
 			"../Errors/Errors": Errors
+		}
+	}
+		);
+	});
 
-	describe "getUser", ->
-		it "should get user", (done)->
-			query = _id: 'foo'
-			projection = email: 1
-			@UserGetter.getUser query, projection, (error, user) =>
-				@findOne.called.should.equal true
-				@findOne.calledWith(query, projection).should.equal true
-				user.should.deep.equal @fakeUser
-				done()
+	describe("getUser", function() {
+		it("should get user", function(done){
+			const query = {_id: 'foo'};
+			const projection = {email: 1};
+			return this.UserGetter.getUser(query, projection, (error, user) => {
+				this.findOne.called.should.equal(true);
+				this.findOne.calledWith(query, projection).should.equal(true);
+				user.should.deep.equal(this.fakeUser);
+				return done();
+			});
+		});
 
-		it "should not allow email in query", (done)->
-			@UserGetter.getUser email: 'foo@bar.com', {}, (error, user) =>
-				error.should.exist
-				done()
+		it("should not allow email in query", function(done){
+			return this.UserGetter.getUser({email: 'foo@bar.com'}, {}, (error, user) => {
+				error.should.exist;
+				return done();
+			});
+		});
 
-		it "should not allow null query", (done)->
-			@UserGetter.getUser null, {}, (error, user) =>
-				error.should.exist
-				done()
+		return it("should not allow null query", function(done){
+			return this.UserGetter.getUser(null, {}, (error, user) => {
+				error.should.exist;
+				return done();
+			});
+		});
+	});
 
-	describe "getUserFullEmails", ->
-		it "should get user", (done)->
-			@UserGetter.getUser = sinon.stub().callsArgWith(2, null, @fakeUser)
-			projection = email: 1, emails: 1
-			@UserGetter.getUserFullEmails @fakeUser._id, (error, fullEmails) =>
-				@UserGetter.getUser.called.should.equal true
-				@UserGetter.getUser.calledWith(@fakeUser._id, projection).should.equal true
-				done()
+	describe("getUserFullEmails", function() {
+		it("should get user", function(done){
+			this.UserGetter.getUser = sinon.stub().callsArgWith(2, null, this.fakeUser);
+			const projection = {email: 1, emails: 1};
+			return this.UserGetter.getUserFullEmails(this.fakeUser._id, (error, fullEmails) => {
+				this.UserGetter.getUser.called.should.equal(true);
+				this.UserGetter.getUser.calledWith(this.fakeUser._id, projection).should.equal(true);
+				return done();
+			});
+		});
 
-		it "should fetch emails data", (done)->
-			@UserGetter.getUser = sinon.stub().callsArgWith(2, null, @fakeUser)
-			@UserGetter.getUserFullEmails @fakeUser._id, (error, fullEmails) =>
-				assert.deepEqual fullEmails, [
-					{ email: 'email1@foo.bar', reversedHostname: 'rab.oof', default: false }
+		it("should fetch emails data", function(done){
+			this.UserGetter.getUser = sinon.stub().callsArgWith(2, null, this.fakeUser);
+			return this.UserGetter.getUserFullEmails(this.fakeUser._id, (error, fullEmails) => {
+				assert.deepEqual(fullEmails, [
+					{ email: 'email1@foo.bar', reversedHostname: 'rab.oof', default: false },
 					{ email: 'email2@foo.bar', reversedHostname: 'rab.oof', default: true }
-				]
-				done()
+				]);
+				return done();
+			});
+		});
 
-		it "should merge affiliation data", (done)->
-			@UserGetter.getUser = sinon.stub().callsArgWith(2, null, @fakeUser)
-			affiliationsData = [
+		it("should merge affiliation data", function(done){
+			this.UserGetter.getUser = sinon.stub().callsArgWith(2, null, this.fakeUser);
+			const affiliationsData = [
 				{
-					email: 'email1@foo.bar'
-					role: 'Prof'
-					department: 'Maths'
-					inferred: false
+					email: 'email1@foo.bar',
+					role: 'Prof',
+					department: 'Maths',
+					inferred: false,
 					institution: { name: 'University Name', isUniversity: true }
 				}
-			]
-			@getUserAffiliations.callsArgWith(1, null, affiliationsData)
-			@UserGetter.getUserFullEmails @fakeUser._id, (error, fullEmails) =>
-				assert.deepEqual fullEmails, [
+			];
+			this.getUserAffiliations.callsArgWith(1, null, affiliationsData);
+			return this.UserGetter.getUserFullEmails(this.fakeUser._id, (error, fullEmails) => {
+				assert.deepEqual(fullEmails, [
 					{
 						email: 'email1@foo.bar',
-						reversedHostname: 'rab.oof'
-						default: false
-						affiliation:
-							institution: affiliationsData[0].institution
-							inferred: affiliationsData[0].inferred
-							department: affiliationsData[0].department
+						reversedHostname: 'rab.oof',
+						default: false,
+						affiliation: {
+							institution: affiliationsData[0].institution,
+							inferred: affiliationsData[0].inferred,
+							department: affiliationsData[0].department,
 							role: affiliationsData[0].role
-					}
+						}
+					},
 					{ email: 'email2@foo.bar', reversedHostname: 'rab.oof', default: true }
-				]
-				done()
+				]);
+				return done();
+			});
+		});
 
-		it "should get user when it has no emails field", (done)->
-			@fakeUser =
-				_id: '12390i'
+		return it("should get user when it has no emails field", function(done){
+			this.fakeUser = {
+				_id: '12390i',
 				email: 'email2@foo.bar'
-			@UserGetter.getUser = sinon.stub().callsArgWith(2, null, @fakeUser)
-			projection = email: 1, emails: 1
-			@UserGetter.getUserFullEmails @fakeUser._id, (error, fullEmails) =>
-				@UserGetter.getUser.called.should.equal true
-				@UserGetter.getUser.calledWith(@fakeUser._id, projection).should.equal true
-				assert.deepEqual fullEmails, []
-				done()
+			};
+			this.UserGetter.getUser = sinon.stub().callsArgWith(2, null, this.fakeUser);
+			const projection = {email: 1, emails: 1};
+			return this.UserGetter.getUserFullEmails(this.fakeUser._id, (error, fullEmails) => {
+				this.UserGetter.getUser.called.should.equal(true);
+				this.UserGetter.getUser.calledWith(this.fakeUser._id, projection).should.equal(true);
+				assert.deepEqual(fullEmails, []);
+				return done();
+			});
+		});
+	});
 
-	describe "getUserbyMainEmail", ->
-		it "query user by main email", (done)->
-			email = 'hello@world.com'
-			projection = emails: 1
-			@UserGetter.getUserByMainEmail email, projection, (error, user) =>
-				@findOne.called.should.equal true
-				@findOne.calledWith(email: email, projection).should.equal true
-				done()
+	describe("getUserbyMainEmail", function() {
+		it("query user by main email", function(done){
+			const email = 'hello@world.com';
+			const projection = {emails: 1};
+			return this.UserGetter.getUserByMainEmail(email, projection, (error, user) => {
+				this.findOne.called.should.equal(true);
+				this.findOne.calledWith({email}, projection).should.equal(true);
+				return done();
+			});
+		});
 
-		it "return user if found", (done)->
-			email = 'hello@world.com'
-			@UserGetter.getUserByMainEmail email, (error, user) =>
-				user.should.deep.equal @fakeUser
-				done()
+		it("return user if found", function(done){
+			const email = 'hello@world.com';
+			return this.UserGetter.getUserByMainEmail(email, (error, user) => {
+				user.should.deep.equal(this.fakeUser);
+				return done();
+			});
+		});
 
-		it "trim email", (done)->
-			email = 'hello@world.com'
-			@UserGetter.getUserByMainEmail " #{email} ", (error, user) =>
-				@findOne.called.should.equal true
-				@findOne.calledWith(email: email).should.equal true
-				done()
+		return it("trim email", function(done){
+			const email = 'hello@world.com';
+			return this.UserGetter.getUserByMainEmail(` ${email} `, (error, user) => {
+				this.findOne.called.should.equal(true);
+				this.findOne.calledWith({email}).should.equal(true);
+				return done();
+			});
+		});
+	});
 
-	describe "getUserByAnyEmail", ->
-		it "query user for any email", (done)->
-			email = 'hello@world.com'
-			expectedQuery =
-				emails: { $exists: true }
+	describe("getUserByAnyEmail", function() {
+		it("query user for any email", function(done){
+			const email = 'hello@world.com';
+			const expectedQuery = {
+				emails: { $exists: true },
 				'emails.email': email
-			projection = emails: 1
-			@UserGetter.getUserByAnyEmail " #{email} ", projection, (error, user) =>
-				@findOne.calledWith(expectedQuery, projection).should.equal true
-				user.should.deep.equal @fakeUser
-				done()
+			};
+			const projection = {emails: 1};
+			return this.UserGetter.getUserByAnyEmail(` ${email} `, projection, (error, user) => {
+				this.findOne.calledWith(expectedQuery, projection).should.equal(true);
+				user.should.deep.equal(this.fakeUser);
+				return done();
+			});
+		});
 
-		it "query contains $exists:true so partial index is used", (done)->
-			expectedQuery =
-				emails: { $exists: true }
+		it("query contains $exists:true so partial index is used", function(done){
+			const expectedQuery = {
+				emails: { $exists: true },
 				'emails.email': ''
-			@UserGetter.getUserByAnyEmail '', {}, (error, user) =>
-				@findOne.calledWith(expectedQuery, {}).should.equal true
-				done()
+			};
+			return this.UserGetter.getUserByAnyEmail('', {}, (error, user) => {
+				this.findOne.calledWith(expectedQuery, {}).should.equal(true);
+				return done();
+			});
+		});
 
-		it "checks main email as well", (done)->
-			@findOne.callsArgWith(2, null, null)
-			email = 'hello@world.com'
-			projection = emails: 1
-			@UserGetter.getUserByAnyEmail " #{email} ", projection, (error, user) =>
-				@findOne.calledTwice.should.equal true
-				@findOne.calledWith(email: email, projection).should.equal true
-				done()
+		return it("checks main email as well", function(done){
+			this.findOne.callsArgWith(2, null, null);
+			const email = 'hello@world.com';
+			const projection = {emails: 1};
+			return this.UserGetter.getUserByAnyEmail(` ${email} `, projection, (error, user) => {
+				this.findOne.calledTwice.should.equal(true);
+				this.findOne.calledWith({email}, projection).should.equal(true);
+				return done();
+			});
+		});
+	});
 
-	describe "getUsersByHostname", ->
-		it "should find user by hostname", (done)->
-			hostname = "bar.foo"
-			expectedQuery =
-				emails: {$exists: true },
-				'emails.reversedHostname': hostname.split('').reverse().join('')
-			projection = emails: 1
-			@UserGetter.getUsersByHostname hostname, projection, (error, users) =>
-				@find.calledOnce.should.equal true
-				@find.calledWith(expectedQuery, projection).should.equal true
-				done()
+	describe("getUsersByHostname", () => it("should find user by hostname", function(done){
+        const hostname = "bar.foo";
+        const expectedQuery = {
+            emails: {$exists: true },
+            'emails.reversedHostname': hostname.split('').reverse().join('')
+        };
+        const projection = {emails: 1};
+        return this.UserGetter.getUsersByHostname(hostname, projection, (error, users) => {
+            this.find.calledOnce.should.equal(true);
+            this.find.calledWith(expectedQuery, projection).should.equal(true);
+            return done();
+        });
+    }));
 
-	describe 'ensureUniqueEmailAddress', ->
-		beforeEach ->
-			@UserGetter.getUserByAnyEmail = sinon.stub()
+	return describe('ensureUniqueEmailAddress', function() {
+		beforeEach(function() {
+			return this.UserGetter.getUserByAnyEmail = sinon.stub();
+		});
 
-		it 'should return error if existing user is found', (done)->
-			@UserGetter.getUserByAnyEmail.callsArgWith(1, null, @fakeUser)
-			@UserGetter.ensureUniqueEmailAddress @newEmail, (err)=>
-				should.exist(err)
-				expect(err).to.be.an.instanceof(Errors.EmailExistsError)
-				err.message.should.equal 'alread_exists'
-				done()
+		it('should return error if existing user is found', function(done){
+			this.UserGetter.getUserByAnyEmail.callsArgWith(1, null, this.fakeUser);
+			return this.UserGetter.ensureUniqueEmailAddress(this.newEmail, err=> {
+				should.exist(err);
+				expect(err).to.be.an.instanceof(Errors.EmailExistsError);
+				err.message.should.equal('alread_exists');
+				return done();
+			});
+		});
 
-		it 'should return null if no user is found', (done)->
-			@UserGetter.getUserByAnyEmail.callsArgWith(1)
-			@UserGetter.ensureUniqueEmailAddress @newEmail, (err)=>
-				should.not.exist(err)
-				done()
+		return it('should return null if no user is found', function(done){
+			this.UserGetter.getUserByAnyEmail.callsArgWith(1);
+			return this.UserGetter.ensureUniqueEmailAddress(this.newEmail, err=> {
+				should.not.exist(err);
+				return done();
+			});
+		});
+	});
+});

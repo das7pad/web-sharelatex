@@ -1,103 +1,142 @@
-SandboxedModule = require('sandboxed-module')
-assert = require('chai').assert
-require('chai').should()
-sinon = require('sinon')
-modulePath = require('path').join __dirname, '../../../../app/js/Features/Notifications/NotificationsHandler.js'
-_ = require('underscore')
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const SandboxedModule = require('sandboxed-module');
+const {
+    assert
+} = require('chai');
+require('chai').should();
+const sinon = require('sinon');
+const modulePath = require('path').join(__dirname, '../../../../app/js/Features/Notifications/NotificationsHandler.js');
+const _ = require('underscore');
 
 
-describe 'NotificationsHandler', ->
-	user_id = "123nd3ijdks"
-	notification_id = "123njdskj9jlk"
-	notificationUrl = "notification.sharelatex.testing"
+describe('NotificationsHandler', function() {
+	const user_id = "123nd3ijdks";
+	const notification_id = "123njdskj9jlk";
+	const notificationUrl = "notification.sharelatex.testing";
 
-	beforeEach ->
-		@request = sinon.stub().callsArgWith(1)
-		@handler = SandboxedModule.require modulePath, requires:
-			"settings-sharelatex": apis:{notifications:{url:notificationUrl}}
-			"request":@request
-			'logger-sharelatex':
-				log:->
-				err:->
+	beforeEach(function() {
+		this.request = sinon.stub().callsArgWith(1);
+		return this.handler = SandboxedModule.require(modulePath, { requires: {
+			"settings-sharelatex": { apis:{notifications:{url:notificationUrl}}
+		},
+			"request":this.request,
+			'logger-sharelatex': {
+				log() {},
+				err() {}
+			}
+		}
+	}
+		);
+	});
 
-	describe "getUserNotifications", ->
-		it 'should get unread notifications', (done)->
-			stubbedNotifications = [{_id: notification_id, user_id: user_id}]
-			@request.callsArgWith(1, null, {statusCode:200}, stubbedNotifications)
-			@handler.getUserNotifications user_id, (err, unreadNotifications)=>
-				stubbedNotifications.should.deep.equal unreadNotifications
-				getOpts =
-					uri: "#{notificationUrl}/user/#{user_id}"
-					json:true
-					timeout:1000
+	describe("getUserNotifications", function() {
+		it('should get unread notifications', function(done){
+			const stubbedNotifications = [{_id: notification_id, user_id}];
+			this.request.callsArgWith(1, null, {statusCode:200}, stubbedNotifications);
+			return this.handler.getUserNotifications(user_id, (err, unreadNotifications)=> {
+				stubbedNotifications.should.deep.equal(unreadNotifications);
+				const getOpts = {
+					uri: `${notificationUrl}/user/${user_id}`,
+					json:true,
+					timeout:1000,
 					method: "GET"
-				@request.calledWith(getOpts).should.equal true
-				done()
+				};
+				this.request.calledWith(getOpts).should.equal(true);
+				return done();
+			});
+		});
 
-		it 'should return empty arrays if there are no notifications', ->
-			@request.callsArgWith(1, null, {statusCode:200}, null)
-			@handler.getUserNotifications user_id, (err, unreadNotifications)=>
-				unreadNotifications.length.should.equal 0
+		return it('should return empty arrays if there are no notifications', function() {
+			this.request.callsArgWith(1, null, {statusCode:200}, null);
+			return this.handler.getUserNotifications(user_id, (err, unreadNotifications)=> {
+				return unreadNotifications.length.should.equal(0);
+			});
+		});
+	});
 
-	describe "markAsRead", ->
-		beforeEach ->
-			@key = "some key here"
+	describe("markAsRead", function() {
+		beforeEach(function() {
+			return this.key = "some key here";
+		});
 
-		it 'should send a delete request when a delete has been received to mark a notification', (done)->
-			@handler.markAsReadWithKey user_id, @key, =>
-				opts =
-					uri: "#{notificationUrl}/user/#{user_id}"
-					json:
-						key:@key
-					timeout:1000
+		return it('should send a delete request when a delete has been received to mark a notification', function(done){
+			return this.handler.markAsReadWithKey(user_id, this.key, () => {
+				const opts = {
+					uri: `${notificationUrl}/user/${user_id}`,
+					json: {
+						key:this.key
+					},
+					timeout:1000,
 					method: "DELETE"
-				@request.calledWith(opts).should.equal true
-				done()
+				};
+				this.request.calledWith(opts).should.equal(true);
+				return done();
+			});
+		});
+	});
 
 
-	describe "createNotification", ->
-		beforeEach ->
-			@key = "some key here"
-			@messageOpts = {value:12344}
-			@templateKey = "renderThisHtml"
-			@expiry = null
+	describe("createNotification", function() {
+		beforeEach(function() {
+			this.key = "some key here";
+			this.messageOpts = {value:12344};
+			this.templateKey = "renderThisHtml";
+			return this.expiry = null;
+		});
 
-		it "should post the message over", (done)->
-			@handler.createNotification user_id, @key, @templateKey, @messageOpts, @expiry, =>
-				args = @request.args[0][0]
-				args.uri.should.equal "#{notificationUrl}/user/#{user_id}"
-				args.timeout.should.equal 1000
-				expectedJson = {key:@key, templateKey:@templateKey, messageOpts:@messageOpts,  forceCreate:true}
-				assert.deepEqual(args.json, expectedJson)
-				done()
+		it("should post the message over", function(done){
+			return this.handler.createNotification(user_id, this.key, this.templateKey, this.messageOpts, this.expiry, () => {
+				const args = this.request.args[0][0];
+				args.uri.should.equal(`${notificationUrl}/user/${user_id}`);
+				args.timeout.should.equal(1000);
+				const expectedJson = {key:this.key, templateKey:this.templateKey, messageOpts:this.messageOpts,  forceCreate:true};
+				assert.deepEqual(args.json, expectedJson);
+				return done();
+			});
+		});
 
-		describe 'when expiry date is supplied', ->
-			beforeEach ->
-				@key = "some key here"
-				@messageOpts = {value:12344}
-				@templateKey = "renderThisHtml"
-				@expiry = new Date()
+		return describe('when expiry date is supplied', function() {
+			beforeEach(function() {
+				this.key = "some key here";
+				this.messageOpts = {value:12344};
+				this.templateKey = "renderThisHtml";
+				return this.expiry = new Date();
+			});
 
-			it 'should post the message over with expiry field', (done) ->
-				@handler.createNotification user_id, @key, @templateKey, @messageOpts, @expiry, =>
-					args = @request.args[0][0]
-					args.uri.should.equal "#{notificationUrl}/user/#{user_id}"
-					args.timeout.should.equal 1000
-					expectedJson = {key:@key, templateKey:@templateKey, messageOpts:@messageOpts, expires: @expiry, forceCreate:true}
-					assert.deepEqual(args.json, expectedJson)
-					done()
+			return it('should post the message over with expiry field', function(done) {
+				return this.handler.createNotification(user_id, this.key, this.templateKey, this.messageOpts, this.expiry, () => {
+					const args = this.request.args[0][0];
+					args.uri.should.equal(`${notificationUrl}/user/${user_id}`);
+					args.timeout.should.equal(1000);
+					const expectedJson = {key:this.key, templateKey:this.templateKey, messageOpts:this.messageOpts, expires: this.expiry, forceCreate:true};
+					assert.deepEqual(args.json, expectedJson);
+					return done();
+				});
+			});
+		});
+	});
 
 	
 
-	describe "markAsReadByKeyOnly", ->
-		beforeEach ->
-			@key = "some key here"
+	return describe("markAsReadByKeyOnly", function() {
+		beforeEach(function() {
+			return this.key = "some key here";
+		});
 
-		it 'should send a delete request when a delete has been received to mark a notification', (done)->
-			@handler.markAsReadByKeyOnly @key, =>
-				opts =
-					uri: "#{notificationUrl}/key/#{@key}"
-					timeout:1000
+		return it('should send a delete request when a delete has been received to mark a notification', function(done){
+			return this.handler.markAsReadByKeyOnly(this.key, () => {
+				const opts = {
+					uri: `${notificationUrl}/key/${this.key}`,
+					timeout:1000,
 					method: "DELETE"
-				@request.calledWith(opts).should.equal true
-				done()
+				};
+				this.request.calledWith(opts).should.equal(true);
+				return done();
+			});
+		});
+	});
+});

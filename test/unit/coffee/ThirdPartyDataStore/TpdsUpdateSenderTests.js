@@ -1,153 +1,187 @@
-SandboxedModule = require('sandboxed-module')
-assert = require('assert')
-require('chai').should()
-modulePath = require('path').join __dirname, '../../../../app/js/Features/ThirdPartyDataStore/TpdsUpdateSender.js'
-sinon = require('sinon')
-ath = require('path')
-project_id = "project_id_here"
-user_id = "user_id_here"
-read_only_ref_1 = "read_only_ref_1_id_here"
-collaberator_ref_1 = "collaberator_ref_1_here"
-project_name = "project_name_here"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const SandboxedModule = require('sandboxed-module');
+const assert = require('assert');
+require('chai').should();
+const modulePath = require('path').join(__dirname, '../../../../app/js/Features/ThirdPartyDataStore/TpdsUpdateSender.js');
+const sinon = require('sinon');
+const ath = require('path');
+const project_id = "project_id_here";
+const user_id = "user_id_here";
+const read_only_ref_1 = "read_only_ref_1_id_here";
+const collaberator_ref_1 = "collaberator_ref_1_here";
+const project_name = "project_name_here";
 
-thirdPartyDataStoreApiUrl = "http://third-party-json-store.herokuapp.com"
-httpUsername = "user"
-httpPass = "pass"
-siteUrl = "http://www.localhost:3000"
-httpAuthSiteUrl = "http://#{httpUsername}:#{httpPass}@www.localhost:3000"
-filestoreUrl = "filestore.sharelatex.com"
+const thirdPartyDataStoreApiUrl = "http://third-party-json-store.herokuapp.com";
+const httpUsername = "user";
+const httpPass = "pass";
+const siteUrl = "http://www.localhost:3000";
+const httpAuthSiteUrl = `http://${httpUsername}:${httpPass}@www.localhost:3000`;
+const filestoreUrl = "filestore.sharelatex.com";
 
-describe 'TpdsUpdateSender', ->
-	beforeEach ->
-		@requestQueuer = (queue, meth, opts, callback)->
-		project = {owner_ref:user_id}
-		member_ids = [collaberator_ref_1, read_only_ref_1, user_id]
-		@CollaboratorsHandler =
-			getInvitedMemberIds: sinon.stub().yields(null, member_ids)
-		@ProjectGetter = getProject: sinon.stub().callsArgWith(2, null, project)
-		@docstoreUrl = "docstore.sharelatex.env"
-		@request = sinon.stub().returns(pipe:->)
-		@settings = 
-			siteUrl:siteUrl
-			httpAuthSiteUrl:httpAuthSiteUrl,
-			apis: 
-				thirdPartyDataStore: {url: thirdPartyDataStoreApiUrl}
-				filestore:
+describe('TpdsUpdateSender', function() {
+	beforeEach(function() {
+		this.requestQueuer = function(queue, meth, opts, callback){};
+		const project = {owner_ref:user_id};
+		const member_ids = [collaberator_ref_1, read_only_ref_1, user_id];
+		this.CollaboratorsHandler =
+			{getInvitedMemberIds: sinon.stub().yields(null, member_ids)};
+		this.ProjectGetter = {getProject: sinon.stub().callsArgWith(2, null, project)};
+		this.docstoreUrl = "docstore.sharelatex.env";
+		this.request = sinon.stub().returns({pipe() {}});
+		this.settings = { 
+			siteUrl,
+			httpAuthSiteUrl,
+			apis: { 
+				thirdPartyDataStore: {url: thirdPartyDataStoreApiUrl},
+				filestore: {
 					url: filestoreUrl
-				docstore:
-					pubUrl: @docstoreUrl
-		@updateSender = SandboxedModule.require modulePath, requires:
-			"settings-sharelatex": @settings
-			"logger-sharelatex":{log:->}
-			'../Project/ProjectGetter': @ProjectGetter
-			'request':@request
-			'../Collaborators/CollaboratorsHandler': @CollaboratorsHandler
-			"metrics-sharelatex":
-				inc:-> 
+				},
+				docstore: {
+					pubUrl: this.docstoreUrl
+				}
+			}
+		};
+		return this.updateSender = SandboxedModule.require(modulePath, { requires: {
+			"settings-sharelatex": this.settings,
+			"logger-sharelatex":{log() {}},
+			'../Project/ProjectGetter': this.ProjectGetter,
+			'request':this.request,
+			'../Collaborators/CollaboratorsHandler': this.CollaboratorsHandler,
+			"metrics-sharelatex": {
+				inc() {}
+			}
+		}
+	}
+		);
+	}); 
 
-	describe "_enqueue", ->
+	describe("_enqueue", function() {
 
-		it "should not call request if there is no tpdsworker url", (done)->
-			@updateSender._enqueue null, null, null, (err)=>
-				@request.called.should.equal false
-				done()
+		it("should not call request if there is no tpdsworker url", function(done){
+			return this.updateSender._enqueue(null, null, null, err=> {
+				this.request.called.should.equal(false);
+				return done();
+			});
+		});
 
-		it "should post the message to the tpdsworker", (done)->
-			@settings.apis.tpdsworker = url:"www.tpdsworker.env"
-			group = "myproject"
-			method = "somemethod"
-			job = "do something"
-			@request.callsArgWith(1)
-			@updateSender._enqueue group, method, job, (err)=>
-				args = @request.args[0][0]
-				args.json.group.should.equal group
-				args.json.job.should.equal job
-				args.json.method.should.equal method
-				args.uri.should.equal "www.tpdsworker.env/enqueue/web_to_tpds_http_requests"
-				done()
+		return it("should post the message to the tpdsworker", function(done){
+			this.settings.apis.tpdsworker = {url:"www.tpdsworker.env"};
+			const group = "myproject";
+			const method = "somemethod";
+			const job = "do something";
+			this.request.callsArgWith(1);
+			return this.updateSender._enqueue(group, method, job, err=> {
+				const args = this.request.args[0][0];
+				args.json.group.should.equal(group);
+				args.json.job.should.equal(job);
+				args.json.method.should.equal(method);
+				args.uri.should.equal("www.tpdsworker.env/enqueue/web_to_tpds_http_requests");
+				return done();
+			});
+		});
+	});
 
 
 
-	describe 'sending updates', ->
+	return describe('sending updates', function() {
 
-		it 'queues a post the file with user and file id', (done)->
-			file_id = '4545345'
-			path = '/some/path/here.jpg'
-			@updateSender._enqueue = (uid, method, job, callback)->
-				uid.should.equal project_id
-				job.method.should.equal "post"
-				job.streamOrigin.should.equal "#{filestoreUrl}/project/#{project_id}/file/#{file_id}"
-				expectedUrl = "#{thirdPartyDataStoreApiUrl}/user/#{user_id}/entity/#{encodeURIComponent(project_name)}#{encodeURIComponent(path)}"
-				job.uri.should.equal expectedUrl
-				job.headers.sl_all_user_ids.should.eql(JSON.stringify([collaberator_ref_1, read_only_ref_1, user_id]))
-				done()
-			@updateSender.addFile {project_id:project_id, file_id:file_id, path:path, project_name:project_name}, ->
+		it('queues a post the file with user and file id', function(done){
+			const file_id = '4545345';
+			const path = '/some/path/here.jpg';
+			this.updateSender._enqueue = function(uid, method, job, callback){
+				uid.should.equal(project_id);
+				job.method.should.equal("post");
+				job.streamOrigin.should.equal(`${filestoreUrl}/project/${project_id}/file/${file_id}`);
+				const expectedUrl = `${thirdPartyDataStoreApiUrl}/user/${user_id}/entity/${encodeURIComponent(project_name)}${encodeURIComponent(path)}`;
+				job.uri.should.equal(expectedUrl);
+				job.headers.sl_all_user_ids.should.eql(JSON.stringify([collaberator_ref_1, read_only_ref_1, user_id]));
+				return done();
+			};
+			return this.updateSender.addFile({project_id, file_id, path, project_name}, function() {});
+		});
 
-		it 'post doc with stream origin of docstore', (done)->
-			doc_id = "4545345"
-			path = "/some/path/here.tex"
-			lines = ["line1", "line2", "line3"]
+		it('post doc with stream origin of docstore', function(done){
+			const doc_id = "4545345";
+			const path = "/some/path/here.tex";
+			const lines = ["line1", "line2", "line3"];
 
-			@updateSender._enqueue = (uid, method, job, callback)=>
-				uid.should.equal project_id
-				job.method.should.equal "post"
-				expectedUrl = "#{thirdPartyDataStoreApiUrl}/user/#{user_id}/entity/#{encodeURIComponent(project_name)}#{encodeURIComponent(path)}"
-				job.uri.should.equal expectedUrl
-				job.streamOrigin.should.equal "#{@docstoreUrl}/project/#{project_id}/doc/#{doc_id}/raw"
-				job.headers.sl_all_user_ids.should.eql(JSON.stringify([collaberator_ref_1, read_only_ref_1, user_id]))
-				done()
-			@updateSender.addDoc {project_id:project_id, doc_id:doc_id, path:path, docLines:lines,project_name:project_name}
+			this.updateSender._enqueue = (uid, method, job, callback)=> {
+				uid.should.equal(project_id);
+				job.method.should.equal("post");
+				const expectedUrl = `${thirdPartyDataStoreApiUrl}/user/${user_id}/entity/${encodeURIComponent(project_name)}${encodeURIComponent(path)}`;
+				job.uri.should.equal(expectedUrl);
+				job.streamOrigin.should.equal(`${this.docstoreUrl}/project/${project_id}/doc/${doc_id}/raw`);
+				job.headers.sl_all_user_ids.should.eql(JSON.stringify([collaberator_ref_1, read_only_ref_1, user_id]));
+				return done();
+			};
+			return this.updateSender.addDoc({project_id, doc_id, path, docLines:lines,project_name});
+	});
 
-		it 'deleting entity', (done)->
-			path = "/path/here/t.tex"
-			@updateSender._enqueue = (uid, method, job, callback)->
-				uid.should.equal project_id
-				job.method.should.equal "DELETE"
-				expectedUrl = "#{thirdPartyDataStoreApiUrl}/user/#{user_id}/entity/#{encodeURIComponent(project_name)}#{encodeURIComponent(path)}"
-				job.headers.sl_all_user_ids.should.eql(JSON.stringify([collaberator_ref_1, read_only_ref_1, user_id]))
-				job.uri.should.equal expectedUrl
-				done()
-			@updateSender.deleteEntity {project_id:project_id, path:path, project_name:project_name}
+		it('deleting entity', function(done){
+			const path = "/path/here/t.tex";
+			this.updateSender._enqueue = function(uid, method, job, callback){
+				uid.should.equal(project_id);
+				job.method.should.equal("DELETE");
+				const expectedUrl = `${thirdPartyDataStoreApiUrl}/user/${user_id}/entity/${encodeURIComponent(project_name)}${encodeURIComponent(path)}`;
+				job.headers.sl_all_user_ids.should.eql(JSON.stringify([collaberator_ref_1, read_only_ref_1, user_id]));
+				job.uri.should.equal(expectedUrl);
+				return done();
+			};
+			return this.updateSender.deleteEntity({project_id, path, project_name});
+	});
 
-		it 'moving entity', (done)->
-			startPath = "staring/here/file.tex"
-			endPath = "ending/here/file.tex"
-			@updateSender._enqueue = (uid, method, job, callback)->
-				uid.should.equal project_id
-				job.method.should.equal "put"
-				job.uri.should.equal "#{thirdPartyDataStoreApiUrl}/user/#{user_id}/entity"
-				job.json.startPath.should.equal "/#{project_name}/#{startPath}"
-				job.json.endPath.should.equal "/#{project_name}/#{endPath}"
-				job.headers.sl_all_user_ids.should.eql(JSON.stringify([collaberator_ref_1, read_only_ref_1, user_id]))
-				done()
-			@updateSender.moveEntity {project_id:project_id, startPath:startPath, endPath:endPath, project_name:project_name}
+		it('moving entity', function(done){
+			const startPath = "staring/here/file.tex";
+			const endPath = "ending/here/file.tex";
+			this.updateSender._enqueue = function(uid, method, job, callback){
+				uid.should.equal(project_id);
+				job.method.should.equal("put");
+				job.uri.should.equal(`${thirdPartyDataStoreApiUrl}/user/${user_id}/entity`);
+				job.json.startPath.should.equal(`/${project_name}/${startPath}`);
+				job.json.endPath.should.equal(`/${project_name}/${endPath}`);
+				job.headers.sl_all_user_ids.should.eql(JSON.stringify([collaberator_ref_1, read_only_ref_1, user_id]));
+				return done();
+			};
+			return this.updateSender.moveEntity({project_id, startPath, endPath, project_name});
+	});
 
-		it 'should be able to rename a project using the move entity func', (done)->
-			oldProjectName = "/oldProjectName/"
-			newProjectName = "/newProjectName/"
-			@updateSender._enqueue = (uid, method, job, callback)->
-				uid.should.equal project_id
-				job.method.should.equal "put"
-				job.uri.should.equal "#{thirdPartyDataStoreApiUrl}/user/#{user_id}/entity"
-				job.json.startPath.should.equal oldProjectName
-				job.json.endPath.should.equal newProjectName
-				job.headers.sl_all_user_ids.should.eql(JSON.stringify([collaberator_ref_1, read_only_ref_1, user_id]))
-				done()
-			@updateSender.moveEntity {project_id:project_id, project_name:oldProjectName, newProjectName:newProjectName}
+		it('should be able to rename a project using the move entity func', function(done){
+			const oldProjectName = "/oldProjectName/";
+			const newProjectName = "/newProjectName/";
+			this.updateSender._enqueue = function(uid, method, job, callback){
+				uid.should.equal(project_id);
+				job.method.should.equal("put");
+				job.uri.should.equal(`${thirdPartyDataStoreApiUrl}/user/${user_id}/entity`);
+				job.json.startPath.should.equal(oldProjectName);
+				job.json.endPath.should.equal(newProjectName);
+				job.headers.sl_all_user_ids.should.eql(JSON.stringify([collaberator_ref_1, read_only_ref_1, user_id]));
+				return done();
+			};
+			return this.updateSender.moveEntity({project_id, project_name:oldProjectName, newProjectName});
+	});
 			
-		it "pollDropboxForUser", (done) ->
-			@updateSender._enqueue = sinon.stub().callsArg(3)
-			@updateSender.pollDropboxForUser user_id, (error) =>
-				@updateSender._enqueue
+		return it("pollDropboxForUser", function(done) {
+			this.updateSender._enqueue = sinon.stub().callsArg(3);
+			return this.updateSender.pollDropboxForUser(user_id, error => {
+				this.updateSender._enqueue
 					.calledWith(
-						"poll-dropbox:#{user_id}",
+						`poll-dropbox:${user_id}`,
 						"standardHttpRequest",
 						{
-							method: "POST"
-							uri: "#{thirdPartyDataStoreApiUrl}/user/poll"
-							json:
+							method: "POST",
+							uri: `${thirdPartyDataStoreApiUrl}/user/poll`,
+							json: {
 								user_ids: [user_id]
+							}
 						}
 					)
-					.should.equal true
-				done()
+					.should.equal(true);
+				return done();
+			});
+		});
+	});
+});

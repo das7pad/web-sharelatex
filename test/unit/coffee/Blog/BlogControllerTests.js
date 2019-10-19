@@ -1,72 +1,93 @@
-should = require('chai').should()
-SandboxedModule = require('sandboxed-module')
-assert = require('assert')
-path = require('path')
-sinon = require('sinon')
-modulePath = path.join __dirname, "../../../../app/js/Features/Blog/BlogController"
-expect = require("chai").expect
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const should = require('chai').should();
+const SandboxedModule = require('sandboxed-module');
+const assert = require('assert');
+const path = require('path');
+const sinon = require('sinon');
+const modulePath = path.join(__dirname, "../../../../app/js/Features/Blog/BlogController");
+const {
+    expect
+} = require("chai");
 
-describe "BlogController", ->
+describe("BlogController", function() {
 
-	beforeEach ->
+	beforeEach(function() {
 
-		@settings =
-			apis:
-				blog:
+		this.settings = {
+			apis: {
+				blog: {
 					url:"http://blog.sharelatex.env"
-		@request = 
-			get: sinon.stub()
-		@ErrorController = {}
-		@BlogController = SandboxedModule.require modulePath, requires:
-			"settings-sharelatex":@settings
-			"logger-sharelatex": log:->
-			"../Errors/ErrorController": @ErrorController
-			"request": @request
+				}
+			}
+		};
+		this.request = 
+			{get: sinon.stub()};
+		this.ErrorController = {};
+		this.BlogController = SandboxedModule.require(modulePath, { requires: {
+			"settings-sharelatex":this.settings,
+			"logger-sharelatex": { log() {}
+		},
+			"../Errors/ErrorController": this.ErrorController,
+			"request": this.request
+		}
+	}
+		);
 
-		@req = {}
-		@res = {}
+		this.req = {};
+		return this.res = {};});
 
 
-	describe "getPage", ()->
+	describe("getPage", function(){
 
-		it "should get the data from the blog api", (done)->
-			@req.url = "/blog/something.html"
-			body = {"stuff":"here"}
+		it("should get the data from the blog api", function(done){
+			this.req.url = "/blog/something.html";
+			const body = {"stuff":"here"};
 
-			@request.get.callsArgWith(1, null, null, JSON.stringify(body))
-			@res.render = (view, data)=>
-				@request.get.calledWith("#{@settings.apis.blog.url}#{@req.url}")
-				view.should.equal "blog/blog_holder"
-				assert.deepEqual body, data
-				done()
+			this.request.get.callsArgWith(1, null, null, JSON.stringify(body));
+			this.res.render = (view, data)=> {
+				this.request.get.calledWith(`${this.settings.apis.blog.url}${this.req.url}`);
+				view.should.equal("blog/blog_holder");
+				assert.deepEqual(body, data);
+				return done();
+			};
 
-			@BlogController.getPage @req, @res
+			return this.BlogController.getPage(this.req, this.res);
+		});
 
-		it "should send to the error controller if the blog responds 404", (done)->
-			@req.url = "/blog/something.html"
-			@request.get.callsArgWith(1, null, {statusCode:404})
+		it("should send to the error controller if the blog responds 404", function(done){
+			this.req.url = "/blog/something.html";
+			this.request.get.callsArgWith(1, null, {statusCode:404});
 			
-			@ErrorController.notFound = (req, res)=>
-				assert.deepEqual req, @req
-				assert.deepEqual res, @res
-				done()
+			this.ErrorController.notFound = (req, res)=> {
+				assert.deepEqual(req, this.req);
+				assert.deepEqual(res, this.res);
+				return done();
+			};
 
-			@BlogController.getPage @req, @res
+			return this.BlogController.getPage(this.req, this.res);
+		});
 
-		it "should proxy the image urls", (done)->
-			@BlogController._directProxy = sinon.stub()
-			@req.url = "/something.png"
-			@BlogController.getPage @req, @res
-			@BlogController._directProxy.calledWith("#{@settings.apis.blog.url}#{@req.url}", @res).should.equal true
-			done()
+		return it("should proxy the image urls", function(done){
+			this.BlogController._directProxy = sinon.stub();
+			this.req.url = "/something.png";
+			this.BlogController.getPage(this.req, this.res);
+			this.BlogController._directProxy.calledWith(`${this.settings.apis.blog.url}${this.req.url}`, this.res).should.equal(true);
+			return done();
+		});
+	});
 
 
-	describe "getIndexPage", ->
-
-		it "should change the url and send it to getPage", (done)->
-			@req.url = "/blog"
-			@BlogController.getPage = (req, res)->
-				req.url.should.equal "/blog/index.html"
-				done()
-			@BlogController.getIndexPage @req, @res
+	return describe("getIndexPage", () => it("should change the url and send it to getPage", function(done){
+        this.req.url = "/blog";
+        this.BlogController.getPage = function(req, res){
+            req.url.should.equal("/blog/index.html");
+            return done();
+        };
+        return this.BlogController.getIndexPage(this.req, this.res);
+    }));
+});
 

@@ -1,243 +1,299 @@
-chai = require('chai')
-chai.should()
-expect = chai.expect
-sinon = require("sinon")
-modulePath = "../../../../app/js/Features/Metadata/MetaHandler"
-SandboxedModule = require('sandboxed-module')
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const chai = require('chai');
+chai.should();
+const {
+    expect
+} = chai;
+const sinon = require("sinon");
+const modulePath = "../../../../app/js/Features/Metadata/MetaHandler";
+const SandboxedModule = require('sandboxed-module');
 
 
-describe 'MetaHandler', ->
-	beforeEach ->
-		@projectId = 'someprojectid'
-		@docId = 'somedocid'
-		@ProjectEntityHandler = {
-			getAllDocs: sinon.stub()
+describe('MetaHandler', function() {
+	beforeEach(function() {
+		this.projectId = 'someprojectid';
+		this.docId = 'somedocid';
+		this.ProjectEntityHandler = {
+			getAllDocs: sinon.stub(),
 			getDoc: sinon.stub()
-		}
-		@DocumentUpdaterHandler = {
+		};
+		this.DocumentUpdaterHandler = {
 			flushDocToMongo: sinon.stub()
-		}
-		@packageMapping =
+		};
+		this.packageMapping = {
 			foo: [
 				{
-					caption: '\\bar'
-					snippet: '\\bar'
-					meta: 'foo-cmd'
+					caption: '\\bar',
+					snippet: '\\bar',
+					meta: 'foo-cmd',
 					score: 12
 				}, {
-					caption: '\\bat[]{}'
-					snippet: '\\bar[$1]{$2}'
-					meta: 'foo-cmd'
+					caption: '\\bat[]{}',
+					snippet: '\\bar[$1]{$2}',
+					meta: 'foo-cmd',
 					score: 10
 				}
 			],
 			baz: [
 				{
-					caption: '\\longercommandtest{}'
-					snippet: '\\longercommandtest{$1}'
-					meta: 'baz-cmd'
+					caption: '\\longercommandtest{}',
+					snippet: '\\longercommandtest{$1}',
+					meta: 'baz-cmd',
 					score: 50
 				}
 			]
+		};
 
-		@MetaHandler = SandboxedModule.require modulePath, requires:
-			'../Project/ProjectEntityHandler': @ProjectEntityHandler
-			'../DocumentUpdater/DocumentUpdaterHandler': @DocumentUpdaterHandler
-			'./packageMapping': @packageMapping
+		return this.MetaHandler = SandboxedModule.require(modulePath, { requires: {
+			'../Project/ProjectEntityHandler': this.ProjectEntityHandler,
+			'../DocumentUpdater/DocumentUpdaterHandler': this.DocumentUpdaterHandler,
+			'./packageMapping': this.packageMapping
+		}
+	}
+		);
+	});
 
-	describe 'extractMetaFromDoc', ->
-		beforeEach ->
-			@lines = [
-				'\\usepackage{foo}'
-				'\\usepackage{amsmath, booktabs}'
-				'one'
-				'two'
-				'three \\label{aaa}'
-				'four five'
-				'\\label{bbb}'
+	describe('extractMetaFromDoc', function() {
+		beforeEach(function() {
+			return this.lines = [
+				'\\usepackage{foo}',
+				'\\usepackage{amsmath, booktabs}',
+				'one',
+				'two',
+				'three \\label{aaa}',
+				'four five',
+				'\\label{bbb}',
 				'six seven'
-			]
+			];});
 
-		it 'should extract all the labels and packages', ->
-			docMeta = @MetaHandler.extractMetaFromDoc @lines
-			expect(docMeta).to.deep.equal {
-				labels: ['aaa', 'bbb']
-				packages:
+		return it('should extract all the labels and packages', function() {
+			const docMeta = this.MetaHandler.extractMetaFromDoc(this.lines);
+			return expect(docMeta).to.deep.equal({
+				labels: ['aaa', 'bbb'],
+				packages: {
 					foo: [
 						{
-							caption: '\\bar'
-							snippet: '\\bar'
-							meta: 'foo-cmd'
+							caption: '\\bar',
+							snippet: '\\bar',
+							meta: 'foo-cmd',
 							score: 12
 						}, {
-							caption: '\\bat[]{}'
-							snippet: '\\bar[$1]{$2}'
-							meta: 'foo-cmd'
+							caption: '\\bat[]{}',
+							snippet: '\\bar[$1]{$2}',
+							meta: 'foo-cmd',
 							score: 10
 						}
 					]
-			}
+				}
+			});
+	});
+});
 
-	describe 'extractMetaFromProjectDocs', ->
-		beforeEach ->
-			@docs =
-				'doc_one':
-					_id: 'id_one'
+	describe('extractMetaFromProjectDocs', function() {
+		beforeEach(function() {
+			return this.docs = {
+				'doc_one': {
+					_id: 'id_one',
 					lines: ['one', '\\label{aaa} two', 'three']
-				'doc_two':
-					_id: 'id_two'
+				},
+				'doc_two': {
+					_id: 'id_two',
 					lines: ['four']
-				'doc_three':
-					_id: 'id_three'
+				},
+				'doc_three': {
+					_id: 'id_three',
 					lines: [
-						'\\label{bbb}'
-						'five six'
+						'\\label{bbb}',
+						'five six',
 						'seven eight \\label{ccc} nine'
 					]
-				'doc_four':
-					_id: 'id_four'
+				},
+				'doc_four': {
+					_id: 'id_four',
 					lines: [
-						'\\usepackage[width=\\textwidth]{baz}'
+						'\\usepackage[width=\\textwidth]{baz}',
 						'\\usepackage{amsmath}'
 					]
-				'doc_five':
-					_id: 'id_five'
+				},
+				'doc_five': {
+					_id: 'id_five',
 					lines: [
-						'\\usepackage{foo,baz}'
-						'\\usepackage[options=foo]{hello}'
-						'some text'
-						'\\section{this}\\label{sec:intro}'
-						'In Section \\ref{sec:intro} we saw'
+						'\\usepackage{foo,baz}',
+						'\\usepackage[options=foo]{hello}',
+						'some text',
+						'\\section{this}\\label{sec:intro}',
+						'In Section \\ref{sec:intro} we saw',
 						'nothing'
 					]
+				}
+			};});
 
-		it 'should extract all metadata', ->
-			projectMeta = @MetaHandler.extractMetaFromProjectDocs @docs
-			expect(projectMeta).to.deep.equal {
-				'id_one': {labels: ['aaa'], packages: {}}
-				'id_two': {labels: [], packages: {}}
-				'id_three': {labels: ['bbb', 'ccc'], packages: {}}
-				'id_four':
-					labels: []
-					packages:
+		return it('should extract all metadata', function() {
+			const projectMeta = this.MetaHandler.extractMetaFromProjectDocs(this.docs);
+			return expect(projectMeta).to.deep.equal({
+				'id_one': {labels: ['aaa'], packages: {}},
+				'id_two': {labels: [], packages: {}},
+				'id_three': {labels: ['bbb', 'ccc'], packages: {}},
+				'id_four': {
+					labels: [],
+					packages: {
 						baz: [{
-							caption: '\\longercommandtest{}'
-							snippet: '\\longercommandtest{$1}'
-							meta: 'baz-cmd'
+							caption: '\\longercommandtest{}',
+							snippet: '\\longercommandtest{$1}',
+							meta: 'baz-cmd',
 							score: 50}]
-				'id_five':
-					labels: ['sec:intro']
-					packages:
+					}
+				},
+				'id_five': {
+					labels: ['sec:intro'],
+					packages: {
 						foo: [
 							{
-								caption: '\\bar'
-								snippet: '\\bar'
-								meta: 'foo-cmd'
+								caption: '\\bar',
+								snippet: '\\bar',
+								meta: 'foo-cmd',
 								score: 12
 							}, {
-								caption: '\\bat[]{}'
-								snippet: '\\bar[$1]{$2}'
-								meta: 'foo-cmd'
+								caption: '\\bat[]{}',
+								snippet: '\\bar[$1]{$2}',
+								meta: 'foo-cmd',
 								score: 10
 							}
-						]
+						],
 						baz: [
 							{
-								caption: '\\longercommandtest{}'
-								snippet: '\\longercommandtest{$1}'
-								meta: 'baz-cmd'
+								caption: '\\longercommandtest{}',
+								snippet: '\\longercommandtest{$1}',
+								meta: 'baz-cmd',
 								score: 50
 							}
 						]
-			}
+					}
+				}
+			});
+	});
+});
 
-	describe 'getMetaForDoc', ->
-		beforeEach ->
-			@fakeLines = ['\\usepackage{abc}', 'one', '\\label{aaa}', 'two']
-			@fakeMeta = {labels: ['aaa'], packages: ['abc']}
-			@DocumentUpdaterHandler.flushDocToMongo = sinon.stub().callsArgWith 2, null
-			@ProjectEntityHandler.getDoc = sinon.stub().callsArgWith 2, null, @fakeLines
-			@MetaHandler.extractMetaFromDoc = sinon.stub().returns @fakeMeta
-			@call = (callback) =>
-				@MetaHandler.getMetaForDoc @projectId, @docId, callback
+	describe('getMetaForDoc', function() {
+		beforeEach(function() {
+			this.fakeLines = ['\\usepackage{abc}', 'one', '\\label{aaa}', 'two'];
+			this.fakeMeta = {labels: ['aaa'], packages: ['abc']};
+			this.DocumentUpdaterHandler.flushDocToMongo = sinon.stub().callsArgWith(2, null);
+			this.ProjectEntityHandler.getDoc = sinon.stub().callsArgWith(2, null, this.fakeLines);
+			this.MetaHandler.extractMetaFromDoc = sinon.stub().returns(this.fakeMeta);
+			return this.call = callback => {
+				return this.MetaHandler.getMetaForDoc(this.projectId, this.docId, callback);
+			};
+		});
 
-		it 'should not produce an error', (done) ->
-			@call (err, docMeta) =>
-				expect(err).to.equal null
-				done()
+		it('should not produce an error', function(done) {
+			return this.call((err, docMeta) => {
+				expect(err).to.equal(null);
+				return done();
+			});
+		});
 
-		it 'should produce docMeta', (done) ->
-			@call (err, docMeta) =>
-				expect(docMeta).to.equal @fakeMeta
-				done()
+		it('should produce docMeta', function(done) {
+			return this.call((err, docMeta) => {
+				expect(docMeta).to.equal(this.fakeMeta);
+				return done();
+			});
+		});
 
-		it 'should call flushDocToMongo', (done) ->
-			@call (err, docMeta) =>
-				@DocumentUpdaterHandler.flushDocToMongo.callCount.should.equal 1
-				@DocumentUpdaterHandler.flushDocToMongo.calledWith(@projectId, @docId).should.equal true
-				done()
+		it('should call flushDocToMongo', function(done) {
+			return this.call((err, docMeta) => {
+				this.DocumentUpdaterHandler.flushDocToMongo.callCount.should.equal(1);
+				this.DocumentUpdaterHandler.flushDocToMongo.calledWith(this.projectId, this.docId).should.equal(true);
+				return done();
+			});
+		});
 
-		it 'should call getDoc', (done) ->
-			@call (err, docMeta) =>
-				@ProjectEntityHandler.getDoc.callCount.should.equal 1
-				@ProjectEntityHandler.getDoc.calledWith(@projectId, @docId).should.equal true
-				done()
+		it('should call getDoc', function(done) {
+			return this.call((err, docMeta) => {
+				this.ProjectEntityHandler.getDoc.callCount.should.equal(1);
+				this.ProjectEntityHandler.getDoc.calledWith(this.projectId, this.docId).should.equal(true);
+				return done();
+			});
+		});
 
-		it 'should call extractMetaFromDoc', (done) ->
-			@call (err, docMeta) =>
-				@MetaHandler.extractMetaFromDoc.callCount.should.equal 1
-				@MetaHandler.extractMetaFromDoc.calledWith(@fakeLines).should.equal true
-				done()
+		return it('should call extractMetaFromDoc', function(done) {
+			return this.call((err, docMeta) => {
+				this.MetaHandler.extractMetaFromDoc.callCount.should.equal(1);
+				this.MetaHandler.extractMetaFromDoc.calledWith(this.fakeLines).should.equal(true);
+				return done();
+			});
+		});
+	});
 
-	describe 'getAllMetaForProject', ->
-		beforeEach ->
-			@fakeDocs =
-				'doc_one':
+	return describe('getAllMetaForProject', function() {
+		beforeEach(function() {
+			this.fakeDocs = {
+				'doc_one': {
 					lines: [
-						'\\usepackage[some-options,more=foo]{foo}'
+						'\\usepackage[some-options,more=foo]{foo}',
 						'\\label{aaa}'
 					]
+				}
+			};
 
-			@fakeMeta =
-				labels: ['aaa']
-				packages:
+			this.fakeMeta = {
+				labels: ['aaa'],
+				packages: {
 					foo: [
 						{
-							caption: '\\bar'
-							snippet: '\\bar'
-							meta: 'foo-cmd'
+							caption: '\\bar',
+							snippet: '\\bar',
+							meta: 'foo-cmd',
 							score: 12
 						}, {
-							caption: '\\bat[]{}'
-							snippet: '\\bar[$1]{$2}'
-							meta: 'foo-cmd'
+							caption: '\\bat[]{}',
+							snippet: '\\bar[$1]{$2}',
+							meta: 'foo-cmd',
 							score: 10
 						}
 					]
-			@DocumentUpdaterHandler.flushProjectToMongo = sinon.stub().callsArgWith 1, null
-			@ProjectEntityHandler.getAllDocs = sinon.stub().callsArgWith 1, null, @fakeDocs
-			@MetaHandler.extractMetaFromProjectDocs = sinon.stub().returns @fakeMeta
-			@call = (callback) =>
-				@MetaHandler.getAllMetaForProject @projectId, callback
+				}
+			};
+			this.DocumentUpdaterHandler.flushProjectToMongo = sinon.stub().callsArgWith(1, null);
+			this.ProjectEntityHandler.getAllDocs = sinon.stub().callsArgWith(1, null, this.fakeDocs);
+			this.MetaHandler.extractMetaFromProjectDocs = sinon.stub().returns(this.fakeMeta);
+			return this.call = callback => {
+				return this.MetaHandler.getAllMetaForProject(this.projectId, callback);
+			};
+		});
 
-		it 'should not produce an error', (done) ->
-			@call (err, projectMeta) =>
-				expect(err).to.equal null
-				done()
+		it('should not produce an error', function(done) {
+			return this.call((err, projectMeta) => {
+				expect(err).to.equal(null);
+				return done();
+			});
+		});
 
-		it 'should produce projectMeta', (done) ->
-			@call (err, projectMeta) =>
-				expect(projectMeta).to.equal @fakeMeta
-				done()
+		it('should produce projectMeta', function(done) {
+			return this.call((err, projectMeta) => {
+				expect(projectMeta).to.equal(this.fakeMeta);
+				return done();
+			});
+		});
 
-		it 'should call getAllDocs', (done) ->
-			@call (err, projectMeta) =>
-				@ProjectEntityHandler.getAllDocs.callCount.should.equal 1
-				@ProjectEntityHandler.getAllDocs.calledWith(@projectId).should.equal true
-				done()
+		it('should call getAllDocs', function(done) {
+			return this.call((err, projectMeta) => {
+				this.ProjectEntityHandler.getAllDocs.callCount.should.equal(1);
+				this.ProjectEntityHandler.getAllDocs.calledWith(this.projectId).should.equal(true);
+				return done();
+			});
+		});
 
-		it 'should call extractMetaFromDoc', (done) ->
-			@call (err, docMeta) =>
-				@MetaHandler.extractMetaFromProjectDocs.callCount.should.equal 1
-				@MetaHandler.extractMetaFromProjectDocs.calledWith(@fakeDocs).should.equal true
-				done()
+		return it('should call extractMetaFromDoc', function(done) {
+			return this.call((err, docMeta) => {
+				this.MetaHandler.extractMetaFromProjectDocs.callCount.should.equal(1);
+				this.MetaHandler.extractMetaFromProjectDocs.calledWith(this.fakeDocs).should.equal(true);
+				return done();
+			});
+		});
+	});
+});

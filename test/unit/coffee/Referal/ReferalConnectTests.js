@@ -1,101 +1,145 @@
-SandboxedModule = require('sandboxed-module')
-assert = require('assert')
-require('chai').should()
-sinon = require('sinon')
-modulePath = require('path').join __dirname, '../../../../app/js/Features/Referal/ReferalConnect.js'
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const SandboxedModule = require('sandboxed-module');
+const assert = require('assert');
+require('chai').should();
+const sinon = require('sinon');
+const modulePath = require('path').join(__dirname, '../../../../app/js/Features/Referal/ReferalConnect.js');
 
-describe 'Referal connect middle wear', ->
+describe('Referal connect middle wear', function() {
 
-	beforeEach ->
-		@connect = SandboxedModule.require modulePath, requires:
-			'logger-sharelatex':
-				log:->
-				err:->
+	beforeEach(function() {
+		return this.connect = SandboxedModule.require(modulePath, { requires: {
+			'logger-sharelatex': {
+				log() {},
+				err() {}
+			}
+		}
+	}
+		);
+	});
 
-	it 'should take a referal query string and put it on the session if it exists', (done)->
-		req =
-			query: {referal : "12345"}
+	it('should take a referal query string and put it on the session if it exists', function(done){
+		const req = {
+			query: {referal : "12345"},
 			session : {}
-		@connect.use req, {}, ->
-			req.session.referal_id.should.equal(req.query.referal)
-			done()
+		};
+		return this.connect.use(req, {}, function() {
+			req.session.referal_id.should.equal(req.query.referal);
+			return done();
+		});
+	});
 
-	it 'should not change the referal_id on the session if not in query', (done)->
-		req =
-			query: {}
+	it('should not change the referal_id on the session if not in query', function(done){
+		const req = {
+			query: {},
 			session : {referal_id : "same"}
-		@connect.use req, {}, ->
-			req.session.referal_id.should.equal("same")
-			done()
+		};
+		return this.connect.use(req, {}, function() {
+			req.session.referal_id.should.equal("same");
+			return done();
+		});
+	});
 
-	it 'should take a facebook referal query string and put it on the session if it exists', (done)->
-		req =
-			query: {fb_ref : "12345"}
+	it('should take a facebook referal query string and put it on the session if it exists', function(done){
+		const req = {
+			query: {fb_ref : "12345"},
 			session : {}
-		@connect.use req, {}, ->
-			req.session.referal_id.should.equal(req.query.fb_ref)
-			done()
+		};
+		return this.connect.use(req, {}, function() {
+			req.session.referal_id.should.equal(req.query.fb_ref);
+			return done();
+		});
+	});
 
-	it "should map the facebook medium into the session", (done) ->
-		req =
-			query: {rm : "fb"}
+	it("should map the facebook medium into the session", function(done) {
+		const req = {
+			query: {rm : "fb"},
 			session : {}
-		@connect.use req, {}, ->
-			req.session.referal_medium.should.equal("facebook")
-			done()
+		};
+		return this.connect.use(req, {}, function() {
+			req.session.referal_medium.should.equal("facebook");
+			return done();
+		});
+	});
 
-	it "should map the twitter medium into the session", (done) ->
-		req =
-			query: {rm : "t"}
+	it("should map the twitter medium into the session", function(done) {
+		const req = {
+			query: {rm : "t"},
 			session : {}
-		@connect.use req, {}, ->
-			req.session.referal_medium.should.equal("twitter")
-			done()
+		};
+		return this.connect.use(req, {}, function() {
+			req.session.referal_medium.should.equal("twitter");
+			return done();
+		});
+	});
 
-	it "should map the google plus medium into the session", (done) ->
-		req =
-			query: {rm : "gp"}
+	it("should map the google plus medium into the session", function(done) {
+		const req = {
+			query: {rm : "gp"},
 			session : {}
-		@connect.use req, {}, ->
-			req.session.referal_medium.should.equal("google_plus")
-			done()
+		};
+		return this.connect.use(req, {}, function() {
+			req.session.referal_medium.should.equal("google_plus");
+			return done();
+		});
+	});
 
-	it "should map the email medium into the session", (done) ->
-		req =
-			query: {rm : "e"}
+	it("should map the email medium into the session", function(done) {
+		const req = {
+			query: {rm : "e"},
 			session : {}
-		@connect.use req, {}, ->
-			req.session.referal_medium.should.equal("email")
-			done()
+		};
+		return this.connect.use(req, {}, function() {
+			req.session.referal_medium.should.equal("email");
+			return done();
+		});
+	});
 
-	it "should map the direct medium into the session", (done) ->
-		req =
-			query: {rm : "d"}
+	it("should map the direct medium into the session", function(done) {
+		const req = {
+			query: {rm : "d"},
 			session : {}
-		@connect.use req, {}, ->
-			req.session.referal_medium.should.equal("direct")
-			done()
+		};
+		return this.connect.use(req, {}, function() {
+			req.session.referal_medium.should.equal("direct");
+			return done();
+		});
+	});
 
-	it "should map the bonus source into the session", (done) ->
-		req =
-			query: {rs : "b"}
+	it("should map the bonus source into the session", function(done) {
+		const req = {
+			query: {rs : "b"},
 			session : {}
-		@connect.use req, {}, ->
-			req.session.referal_source.should.equal("bonus")
-			done()
+		};
+		return this.connect.use(req, {}, function() {
+			req.session.referal_source.should.equal("bonus");
+			return done();
+		});
+	});
 
-	it "should map the public share source into the session", (done) ->
-		req =
-			query: {rs : "ps"}
+	it("should map the public share source into the session", function(done) {
+		const req = {
+			query: {rs : "ps"},
 			session : {}
-		@connect.use req, {}, ->
-			req.session.referal_source.should.equal("public_share")
-			done()
+		};
+		return this.connect.use(req, {}, function() {
+			req.session.referal_source.should.equal("public_share");
+			return done();
+		});
+	});
 
-	it "should map the collaborator invite into the session", (done) ->
-		req =
-			query: {rs : "ci"}
+	return it("should map the collaborator invite into the session", function(done) {
+		const req = {
+			query: {rs : "ci"},
 			session : {}
-		@connect.use req, {}, ->
-			req.session.referal_source.should.equal("collaborator_invite")
-			done()
+		};
+		return this.connect.use(req, {}, function() {
+			req.session.referal_source.should.equal("collaborator_invite");
+			return done();
+		});
+	});
+});

@@ -1,88 +1,116 @@
-should = require('chai').should()
-SandboxedModule = require('sandboxed-module')
-assert = require('assert')
-path = require('path')
-modulePath = path.join __dirname, '../../../../app/js/Features/Analytics/AnalyticsController'
-sinon = require("sinon")
-expect = require("chai").expect
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const should = require('chai').should();
+const SandboxedModule = require('sandboxed-module');
+const assert = require('assert');
+const path = require('path');
+const modulePath = path.join(__dirname, '../../../../app/js/Features/Analytics/AnalyticsController');
+const sinon = require("sinon");
+const {
+    expect
+} = require("chai");
 
 
-describe 'AnalyticsController', ->
+describe('AnalyticsController', function() {
 
-	beforeEach ->
-		@AuthenticationController =
-			getLoggedInUserId: sinon.stub()
+	beforeEach(function() {
+		this.AuthenticationController =
+			{getLoggedInUserId: sinon.stub()};
 
-		@AnalyticsManager =
-			updateEditingSession: sinon.stub().callsArgWith(3)
+		this.AnalyticsManager = {
+			updateEditingSession: sinon.stub().callsArgWith(3),
 			recordEvent: sinon.stub().callsArgWith(3)
+		};
 
-		@InstitutionsAPI =
-			getInstitutionLicences: sinon.stub().callsArgWith(4)
+		this.InstitutionsAPI =
+			{getInstitutionLicences: sinon.stub().callsArgWith(4)};
 
-		@controller = SandboxedModule.require modulePath, requires:
-			"./AnalyticsManager":@AnalyticsManager
-			"../Authentication/AuthenticationController":@AuthenticationController
-			"../Institutions/InstitutionsAPI":@InstitutionsAPI
-			"logger-sharelatex":
-				log:->
-			'../../infrastructure/GeoIpLookup': @GeoIpLookup =
-				getDetails: sinon.stub()
+		this.controller = SandboxedModule.require(modulePath, { requires: {
+			"./AnalyticsManager":this.AnalyticsManager,
+			"../Authentication/AuthenticationController":this.AuthenticationController,
+			"../Institutions/InstitutionsAPI":this.InstitutionsAPI,
+			"logger-sharelatex": {
+				log() {}
+			},
+			'../../infrastructure/GeoIpLookup': (this.GeoIpLookup =
+				{getDetails: sinon.stub()})
+		}
+	}
+		);
 
-		@res =
-			send:->
+		return this.res =
+			{send() {}};
+	});
 
-	describe "updateEditingSession", ->
-		beforeEach ->
-			@req =
-				params:
+	describe("updateEditingSession", function() {
+		beforeEach(function() {
+			this.req = {
+				params: {
 					projectId: "a project id"
-			@GeoIpLookup.getDetails = sinon.stub()
-				.callsArgWith(1, null, {country_code: 'XY'})
+				}
+			};
+			return this.GeoIpLookup.getDetails = sinon.stub()
+				.callsArgWith(1, null, {country_code: 'XY'});
+		});
 
-		it "delegates to the AnalyticsManager", (done) ->
-			@AuthenticationController.getLoggedInUserId.returns("1234")
-			@controller.updateEditingSession @req, @res
+		return it("delegates to the AnalyticsManager", function(done) {
+			this.AuthenticationController.getLoggedInUserId.returns("1234");
+			this.controller.updateEditingSession(this.req, this.res);
 
-			@AnalyticsManager.updateEditingSession.calledWith(
+			this.AnalyticsManager.updateEditingSession.calledWith(
 				"1234",
 				"a project id",
 				'XY'
-			).should.equal true
-			done()
+			).should.equal(true);
+			return done();
+		});
+	});
 
-	describe "recordEvent", ->
-		beforeEach ->
-			@req =
-				params:
+	describe("recordEvent", function() {
+		beforeEach(function() {
+			return this.req = {
+				params: {
 					event:"i_did_something"
-				body:"stuff"
-				sessionID: "sessionIDHere"
+				},
+				body:"stuff",
+				sessionID: "sessionIDHere",
 				session: {}
+			};});
 
-		it "should use the user_id", (done)->
-			@AuthenticationController.getLoggedInUserId.returns("1234")
-			@controller.recordEvent @req, @res
-			@AnalyticsManager.recordEvent.calledWith("1234", @req.params["event"], @req.body).should.equal true
-			done()
+		it("should use the user_id", function(done){
+			this.AuthenticationController.getLoggedInUserId.returns("1234");
+			this.controller.recordEvent(this.req, this.res);
+			this.AnalyticsManager.recordEvent.calledWith("1234", this.req.params["event"], this.req.body).should.equal(true);
+			return done();
+		});
 
-		it "should use the session id", (done)->
-			@controller.recordEvent @req, @res
-			@AnalyticsManager.recordEvent.calledWith(@req.sessionID, @req.params["event"], @req.body).should.equal true
-			done()
+		return it("should use the session id", function(done){
+			this.controller.recordEvent(this.req, this.res);
+			this.AnalyticsManager.recordEvent.calledWith(this.req.sessionID, this.req.params["event"], this.req.body).should.equal(true);
+			return done();
+		});
+	});
 
-	describe "licences", ->
-		beforeEach ->
-			@req =
-				query:
-					resource_id:1
-					start_date:'1514764800'
-					end_date:'1530662400'
+	return describe("licences", function() {
+		beforeEach(function() {
+			return this.req = {
+				query: {
+					resource_id:1,
+					start_date:'1514764800',
+					end_date:'1530662400',
 					resource_type:'institution'
-				sessionID: "sessionIDHere"
+				},
+				sessionID: "sessionIDHere",
 				session: {}
+			};});
 
-		it "should trigger institutions api to fetch licences graph data", (done)->
-			@controller.licences @req, @res
-			@InstitutionsAPI.getInstitutionLicences.calledWith(@req.query["resource_id"], @req.query["start_date"], @req.query["end_date"], @req.query["lag"]).should.equal true
-			done()
+		return it("should trigger institutions api to fetch licences graph data", function(done){
+			this.controller.licences(this.req, this.res);
+			this.InstitutionsAPI.getInstitutionLicences.calledWith(this.req.query["resource_id"], this.req.query["start_date"], this.req.query["end_date"], this.req.query["lag"]).should.equal(true);
+			return done();
+		});
+	});
+});

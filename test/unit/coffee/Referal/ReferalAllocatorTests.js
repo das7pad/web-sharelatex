@@ -1,94 +1,126 @@
-SandboxedModule = require('sandboxed-module')
-assert = require('assert')
-require('chai').should()
-sinon = require('sinon')
-modulePath = require('path').join __dirname, '../../../../app/js/Features/Referal/ReferalAllocator.js'
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const SandboxedModule = require('sandboxed-module');
+const assert = require('assert');
+require('chai').should();
+const sinon = require('sinon');
+const modulePath = require('path').join(__dirname, '../../../../app/js/Features/Referal/ReferalAllocator.js');
 
-describe 'ReferalAllocator', ->
+describe('ReferalAllocator', function() {
 
-	beforeEach ->
-		@ReferalAllocator = SandboxedModule.require modulePath, requires:
-			'../../models/User': User: @User = {}
-			"../Subscription/FeaturesUpdater": @FeaturesUpdater = {}
-			"settings-sharelatex": @Settings = {}
-			'logger-sharelatex':
-				log:->
-				err:->
-		@callback = sinon.stub()
-		@referal_id = "referal-id-123"
-		@referal_medium = "twitter"
-		@user_id = "user-id-123"
-		@new_user_id = "new-user-id-123"
-		@FeaturesUpdater.refreshFeatures = sinon.stub().yields()
-		@User.update = sinon.stub().callsArgWith 3, null
-		@User.findOne = sinon.stub().callsArgWith 1, null, { _id: @user_id }
+	beforeEach(function() {
+		this.ReferalAllocator = SandboxedModule.require(modulePath, { requires: {
+			'../../models/User': { User: (this.User = {})
+		},
+			"../Subscription/FeaturesUpdater": (this.FeaturesUpdater = {}),
+			"settings-sharelatex": (this.Settings = {}),
+			'logger-sharelatex': {
+				log() {},
+				err() {}
+			}
+		}
+	}
+		);
+		this.callback = sinon.stub();
+		this.referal_id = "referal-id-123";
+		this.referal_medium = "twitter";
+		this.user_id = "user-id-123";
+		this.new_user_id = "new-user-id-123";
+		this.FeaturesUpdater.refreshFeatures = sinon.stub().yields();
+		this.User.update = sinon.stub().callsArgWith(3, null);
+		return this.User.findOne = sinon.stub().callsArgWith(1, null, { _id: this.user_id });});
 
-	describe "allocate", ->
-		describe "when the referal was a bonus referal", ->
-			beforeEach ->
-				@referal_source = "bonus"
-				@ReferalAllocator.allocate @referal_id, @new_user_id, @referal_source, @referal_medium, @callback
+	return describe("allocate", function() {
+		describe("when the referal was a bonus referal", function() {
+			beforeEach(function() {
+				this.referal_source = "bonus";
+				return this.ReferalAllocator.allocate(this.referal_id, this.new_user_id, this.referal_source, this.referal_medium, this.callback);
+			});
 
-			it 'should update the referring user with the refered users id', ->
-				@User.update.calledWith({
-					"referal_id":@referal_id
+			it('should update the referring user with the refered users id', function() {
+				return this.User.update.calledWith({
+					"referal_id":this.referal_id
 				}, {
-					$push:
-						refered_users: @new_user_id
-					$inc:
+					$push: {
+						refered_users: this.new_user_id
+					},
+					$inc: {
 						refered_user_count: 1
-				}).should.equal true
+					}
+				}).should.equal(true);
+			});
 
-			it "find the referring users id", ->
-				@User.findOne
-					.calledWith( referal_id: @referal_id )
-					.should.equal true
+			it("find the referring users id", function() {
+				return this.User.findOne
+					.calledWith({ referal_id: this.referal_id })
+					.should.equal(true);
+			});
 
-			it "should refresh the user's subscription", ->
-				@FeaturesUpdater.refreshFeatures
-					.calledWith(@user_id)
-					.should.equal true
+			it("should refresh the user's subscription", function() {
+				return this.FeaturesUpdater.refreshFeatures
+					.calledWith(this.user_id)
+					.should.equal(true);
+			});
 
-			it "should call the callback", ->
-				@callback.called.should.equal true
+			return it("should call the callback", function() {
+				return this.callback.called.should.equal(true);
+			});
+		});
 
-		describe "when there is no user for the referal id", ->
-			beforeEach ->
-				@referal_source = "bonus"
-				@referal_id = "wombat"
-				@User.findOne = sinon.stub().callsArgWith 1, null, null
-				@ReferalAllocator.allocate @referal_id, @new_user_id, @referal_source, @referal_medium, @callback
+		describe("when there is no user for the referal id", function() {
+			beforeEach(function() {
+				this.referal_source = "bonus";
+				this.referal_id = "wombat";
+				this.User.findOne = sinon.stub().callsArgWith(1, null, null);
+				return this.ReferalAllocator.allocate(this.referal_id, this.new_user_id, this.referal_source, this.referal_medium, this.callback);
+			});
 
-			it "should find the referring users id", ->
-				@User.findOne
-					.calledWith( referal_id: @referal_id )
-					.should.equal true
+			it("should find the referring users id", function() {
+				return this.User.findOne
+					.calledWith({ referal_id: this.referal_id })
+					.should.equal(true);
+			});
 
-			it 'should not update the referring user with the refered users id', ->
-				@User.update.called.should.equal false
+			it('should not update the referring user with the refered users id', function() {
+				return this.User.update.called.should.equal(false);
+			});
 
-			it "should not assign the user a bonus", ->
-				@FeaturesUpdater.refreshFeatures.called.should.equal false
+			it("should not assign the user a bonus", function() {
+				return this.FeaturesUpdater.refreshFeatures.called.should.equal(false);
+			});
 
-			it "should call the callback", ->
-				@callback.called.should.equal true
+			return it("should call the callback", function() {
+				return this.callback.called.should.equal(true);
+			});
+		});
 
 
-		describe "when the referal is not a bonus referal", ->
-			beforeEach ->
-				@referal_source = "public_share"
-				@ReferalAllocator.allocate @referal_id, @new_user_id, @referal_source, @referal_medium, @callback
+		return describe("when the referal is not a bonus referal", function() {
+			beforeEach(function() {
+				this.referal_source = "public_share";
+				return this.ReferalAllocator.allocate(this.referal_id, this.new_user_id, this.referal_source, this.referal_medium, this.callback);
+			});
 
-			it 'should not update the referring user with the refered users id', ->
-				@User.update.called.should.equal false
+			it('should not update the referring user with the refered users id', function() {
+				return this.User.update.called.should.equal(false);
+			});
 
-			it "find the referring users id", ->
-				@User.findOne
-					.calledWith( referal_id: @referal_id )
-					.should.equal true
+			it("find the referring users id", function() {
+				return this.User.findOne
+					.calledWith({ referal_id: this.referal_id })
+					.should.equal(true);
+			});
 
-			it "should not assign the user a bonus", ->
-				@FeaturesUpdater.refreshFeatures.called.should.equal false
+			it("should not assign the user a bonus", function() {
+				return this.FeaturesUpdater.refreshFeatures.called.should.equal(false);
+			});
 
-			it "should call the callback", ->
-				@callback.called.should.equal true
+			return it("should call the callback", function() {
+				return this.callback.called.should.equal(true);
+			});
+		});
+	});
+});

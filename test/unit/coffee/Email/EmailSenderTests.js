@@ -1,135 +1,174 @@
-should = require('chai').should()
-SandboxedModule = require('sandboxed-module')
-assert = require('assert')
-path = require('path')
-sinon = require('sinon')
-modulePath = path.join __dirname, "../../../../app/js/Features/Email/EmailSender.js"
-expect = require("chai").expect
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const should = require('chai').should();
+const SandboxedModule = require('sandboxed-module');
+const assert = require('assert');
+const path = require('path');
+const sinon = require('sinon');
+const modulePath = path.join(__dirname, "../../../../app/js/Features/Email/EmailSender.js");
+const {
+    expect
+} = require("chai");
 
-describe "EmailSender", ->
+describe("EmailSender", function() {
 
-	beforeEach ->
+	beforeEach(function() {
 
-		@RateLimiter =
-			addCount:sinon.stub()
+		this.RateLimiter =
+			{addCount:sinon.stub()};
 
-		@settings =
-			email:
-				transport: "ses"
-				parameters:
-					AWSAccessKeyID: "key"
+		this.settings = {
+			email: {
+				transport: "ses",
+				parameters: {
+					AWSAccessKeyID: "key",
 					AWSSecretKey: "secret"
-				fromAddress: "bob@bob.com"
+				},
+				fromAddress: "bob@bob.com",
 				replyToAddress: "sally@gmail.com"
+			}
+		};
 
-		@sesClient =
-			sendMail: sinon.stub()
+		this.sesClient =
+			{sendMail: sinon.stub()};
 
-		@ses =
-			createTransport: => @sesClient
-
-
-		@sender = SandboxedModule.require modulePath, requires:
-			'nodemailer': @ses
-			"nodemailer-mandrill-transport":{}
-			"nodemailer-sendgrid-transport":{}
-			"settings-sharelatex":@settings
-			'../../infrastructure/RateLimiter':@RateLimiter
-			"logger-sharelatex":
-				log:->
-				warn:->
-				err:->
-			"metrics-sharelatex": inc:->
+		this.ses =
+			{createTransport: () => this.sesClient};
 
 
+		this.sender = SandboxedModule.require(modulePath, { requires: {
+			'nodemailer': this.ses,
+			"nodemailer-mandrill-transport":{},
+			"nodemailer-sendgrid-transport":{},
+			"settings-sharelatex":this.settings,
+			'../../infrastructure/RateLimiter':this.RateLimiter,
+			"logger-sharelatex": {
+				log() {},
+				warn() {},
+				err() {}
+			},
+			"metrics-sharelatex": { inc() {}
+		}
+		}
+	}
+		);
 
-		@opts =
-			to: "bob@bob.com"
-			subject: "new email"
+
+
+		return this.opts = {
+			to: "bob@bob.com",
+			subject: "new email",
 			html: "<hello></hello>"
+		};
+	});
 
-	describe "sendEmail", ->
+	return describe("sendEmail", function() {
 
-		it "should set the properties on the email to send", (done)->
-			@sesClient.sendMail.callsArgWith(1)
+		it("should set the properties on the email to send", function(done){
+			this.sesClient.sendMail.callsArgWith(1);
 
-			@sender.sendEmail @opts, (err) =>
-				expect(err).to.not.exist
-				args = @sesClient.sendMail.args[0][0]
-				args.html.should.equal @opts.html
-				args.to.should.equal @opts.to
-				args.subject.should.equal @opts.subject
-				done()
+			return this.sender.sendEmail(this.opts, err => {
+				expect(err).to.not.exist;
+				const args = this.sesClient.sendMail.args[0][0];
+				args.html.should.equal(this.opts.html);
+				args.to.should.equal(this.opts.to);
+				args.subject.should.equal(this.opts.subject);
+				return done();
+			});
+		});
 
-		it "should return a non-specific error", (done)->
-			@sesClient.sendMail.callsArgWith(1, "error")
-			@sender.sendEmail {}, (err)=>
-				err.should.exist
-				err.toString().should.equal 'Error: Cannot send email'
-				done()
-
-
-		it "should use the from address from settings", (done)->
-			@sesClient.sendMail.callsArgWith(1)
-
-			@sender.sendEmail @opts, =>
-				args = @sesClient.sendMail.args[0][0]
-				args.from.should.equal @settings.email.fromAddress
-				done()
-
-		it "should use the reply to address from settings", (done)->
-			@sesClient.sendMail.callsArgWith(1)
-
-			@sender.sendEmail @opts, =>
-				args = @sesClient.sendMail.args[0][0]
-				args.replyTo.should.equal @settings.email.replyToAddress
-				done()
+		it("should return a non-specific error", function(done){
+			this.sesClient.sendMail.callsArgWith(1, "error");
+			return this.sender.sendEmail({}, err=> {
+				err.should.exist;
+				err.toString().should.equal('Error: Cannot send email');
+				return done();
+			});
+		});
 
 
-		it "should use the reply to address in options as an override", (done)->
-			@sesClient.sendMail.callsArgWith(1)
+		it("should use the from address from settings", function(done){
+			this.sesClient.sendMail.callsArgWith(1);
 
-			@opts.replyTo = "someone@else.com"
-			@sender.sendEmail @opts, =>
-				args = @sesClient.sendMail.args[0][0]
-				args.replyTo.should.equal @opts.replyTo
-				done()
+			return this.sender.sendEmail(this.opts, () => {
+				const args = this.sesClient.sendMail.args[0][0];
+				args.from.should.equal(this.settings.email.fromAddress);
+				return done();
+			});
+		});
+
+		it("should use the reply to address from settings", function(done){
+			this.sesClient.sendMail.callsArgWith(1);
+
+			return this.sender.sendEmail(this.opts, () => {
+				const args = this.sesClient.sendMail.args[0][0];
+				args.replyTo.should.equal(this.settings.email.replyToAddress);
+				return done();
+			});
+		});
 
 
-		it "should not send an email when the rate limiter says no", (done)->
-			@opts.sendingUser_id = "12321312321"
-			@RateLimiter.addCount.callsArgWith(1, null, false)
-			@sender.sendEmail @opts, =>
-				@sesClient.sendMail.called.should.equal false
-				done()
+		it("should use the reply to address in options as an override", function(done){
+			this.sesClient.sendMail.callsArgWith(1);
 
-		it "should send the email when the rate limtier says continue",  (done)->
-			@sesClient.sendMail.callsArgWith(1)
-			@opts.sendingUser_id = "12321312321"
-			@RateLimiter.addCount.callsArgWith(1, null, true)
-			@sender.sendEmail @opts, =>
-				@sesClient.sendMail.called.should.equal true
-				done()
+			this.opts.replyTo = "someone@else.com";
+			return this.sender.sendEmail(this.opts, () => {
+				const args = this.sesClient.sendMail.args[0][0];
+				args.replyTo.should.equal(this.opts.replyTo);
+				return done();
+			});
+		});
 
-		it "should not check the rate limiter when there is no sendingUser_id", (done)->
-			@sesClient.sendMail.callsArgWith(1)
-			@sender.sendEmail @opts, =>
-				@sesClient.sendMail.called.should.equal true
-				@RateLimiter.addCount.called.should.equal false
-				done()
 
-		describe 'with plain-text email content', () ->
+		it("should not send an email when the rate limiter says no", function(done){
+			this.opts.sendingUser_id = "12321312321";
+			this.RateLimiter.addCount.callsArgWith(1, null, false);
+			return this.sender.sendEmail(this.opts, () => {
+				this.sesClient.sendMail.called.should.equal(false);
+				return done();
+			});
+		});
 
-			beforeEach ->
-				@opts.text = "hello there"
+		it("should send the email when the rate limtier says continue",  function(done){
+			this.sesClient.sendMail.callsArgWith(1);
+			this.opts.sendingUser_id = "12321312321";
+			this.RateLimiter.addCount.callsArgWith(1, null, true);
+			return this.sender.sendEmail(this.opts, () => {
+				this.sesClient.sendMail.called.should.equal(true);
+				return done();
+			});
+		});
 
-			it "should set the text property on the email to send", (done)->
-				@sesClient.sendMail.callsArgWith(1)
+		it("should not check the rate limiter when there is no sendingUser_id", function(done){
+			this.sesClient.sendMail.callsArgWith(1);
+			return this.sender.sendEmail(this.opts, () => {
+				this.sesClient.sendMail.called.should.equal(true);
+				this.RateLimiter.addCount.called.should.equal(false);
+				return done();
+			});
+		});
 
-				@sender.sendEmail @opts, =>
-					args = @sesClient.sendMail.args[0][0]
-					args.html.should.equal @opts.html
-					args.text.should.equal @opts.text
-					args.to.should.equal @opts.to
-					args.subject.should.equal @opts.subject
-					done()
+		return describe('with plain-text email content', function() {
+
+			beforeEach(function() {
+				return this.opts.text = "hello there";
+			});
+
+			return it("should set the text property on the email to send", function(done){
+				this.sesClient.sendMail.callsArgWith(1);
+
+				return this.sender.sendEmail(this.opts, () => {
+					const args = this.sesClient.sendMail.args[0][0];
+					args.html.should.equal(this.opts.html);
+					args.text.should.equal(this.opts.text);
+					args.to.should.equal(this.opts.to);
+					args.subject.should.equal(this.opts.subject);
+					return done();
+				});
+			});
+		});
+	});
+});
