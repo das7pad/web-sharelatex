@@ -1,144 +1,182 @@
-sinon = require('sinon')
-chai = require('chai')
-should = chai.should()
-expect = chai.expect
-modulePath = "../../../app/js/PublicRegistrationController.js"
-SandboxedModule = require('sandboxed-module')
-events = require "events"
-ObjectId = require("mongojs").ObjectId
-assert = require("assert")
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const sinon = require('sinon');
+const chai = require('chai');
+const should = chai.should();
+const {
+    expect
+} = chai;
+const modulePath = "../../../app/js/PublicRegistrationController.js";
+const SandboxedModule = require('sandboxed-module');
+const events = require("events");
+const {
+    ObjectId
+} = require("mongojs");
+const assert = require("assert");
 
-describe "PublicRegistrationController", ->
-	beforeEach ->
-		@user_id = "323123"
+describe("PublicRegistrationController", function() {
+	beforeEach(function() {
+		this.user_id = "323123";
 
-		@user =
-			_id:@user_id
-			save:sinon.stub().callsArgWith(0)
+		this.user = {
+			_id:this.user_id,
+			save:sinon.stub().callsArgWith(0),
 			ace:{}
+		};
 
-		@UserRegistrationHandler =
-			registerNewUser: sinon.stub()
-		@ReferalAllocator =
-			allocate:sinon.stub().yields()
-		@UserUpdater =
-			changeEmailAddress:sinon.stub()
-		@UserEmailsConfirmationHandler =
-			sendConfirmationEmail: sinon.stub().yields()
-		@UserHandler =
-			populateTeamInvites: sinon.stub().callsArgWith(1).yields()
-		@AuthenticationController =
-			passportLogin: sinon.stub()
-			_getRedirectFromSession: sinon.stub().returns("/somewhere")
+		this.UserRegistrationHandler =
+			{registerNewUser: sinon.stub()};
+		this.ReferalAllocator =
+			{allocate:sinon.stub().yields()};
+		this.UserUpdater =
+			{changeEmailAddress:sinon.stub()};
+		this.UserEmailsConfirmationHandler =
+			{sendConfirmationEmail: sinon.stub().yields()};
+		this.UserHandler =
+			{populateTeamInvites: sinon.stub().callsArgWith(1).yields()};
+		this.AuthenticationController = {
+			passportLogin: sinon.stub(),
+			_getRedirectFromSession: sinon.stub().returns("/somewhere"),
 			_clearRedirectFromSession: sinon.stub()
-		@UserSessionsManager =
-			trackSession:sinon.stub().yields()
-		@AnalyticsManager =
-			identifyUser:sinon.stub()
-		@PublicRegistrationController = SandboxedModule.require modulePath, requires:
-			"../../../../app/js/Features/User/UserRegistrationHandler":@UserRegistrationHandler
-			"../../../../app/js/Features/Referal/ReferalAllocator":@ReferalAllocator
-			"../../../../app/js/Features/Email/Layouts/PersonalEmailLayout":{}
-			"../../../../app/js/Features/Email/EmailBuilder": templates:{welcome:{}}, CTAEmailTemplate: sinon.stub()
-			"../../../../app/js/Features/Email/EmailHandler": {}
-			"../../../../app/js/Features/User/UserHandler": @UserHandler
-			"../../../../app/js/Features/User/UserEmailsConfirmationHandler": @UserEmailsConfirmationHandler
-			"../../../../app/js/Features/Authentication/AuthenticationController": @AuthenticationController
-			"../../../../app/js/Features/User/UserSessionsManager":@UserSessionsManager
-			"../../../../app/coffee/Features/Analytics/AnalyticsManager": @AnalyticsManager
-			"logger-sharelatex": {log:->}
-			"metrics-sharelatex": { inc: () ->}
+		};
+		this.UserSessionsManager =
+			{trackSession:sinon.stub().yields()};
+		this.AnalyticsManager =
+			{identifyUser:sinon.stub()};
+		this.PublicRegistrationController = SandboxedModule.require(modulePath, { requires: {
+			"../../../../app/js/Features/User/UserRegistrationHandler":this.UserRegistrationHandler,
+			"../../../../app/js/Features/Referal/ReferalAllocator":this.ReferalAllocator,
+			"../../../../app/js/Features/Email/Layouts/PersonalEmailLayout":{},
+			"../../../../app/js/Features/Email/EmailBuilder": { templates:{welcome:{}}, CTAEmailTemplate: sinon.stub()
+		},
+			"../../../../app/js/Features/Email/EmailHandler": {},
+			"../../../../app/js/Features/User/UserHandler": this.UserHandler,
+			"../../../../app/js/Features/User/UserEmailsConfirmationHandler": this.UserEmailsConfirmationHandler,
+			"../../../../app/js/Features/Authentication/AuthenticationController": this.AuthenticationController,
+			"../../../../app/js/Features/User/UserSessionsManager":this.UserSessionsManager,
+			"../../../../app/coffee/Features/Analytics/AnalyticsManager": this.AnalyticsManager,
+			"logger-sharelatex": {log() {}},
+			"metrics-sharelatex": { inc() {}},
 			"settings-sharelatex": {}
+		}
+	});
 
-		@req =
-			session:
-				destroy:->
-				user :
-					_id : @user_id
-			body:{}
-			login: sinon.stub().callsArgWith(1, null)  # passport
-		@res = {json: sinon.stub()}
-		@next = sinon.stub()
+		this.req = {
+			session: {
+				destroy() {},
+				user : {
+					_id : this.user_id
+				}
+			},
+			body:{},
+			login: sinon.stub().callsArgWith(1, null)  // passport
+		};
+		this.res = {json: sinon.stub()};
+		return this.next = sinon.stub();
+	});
 
-	describe "register", ->
+	return describe("register", function() {
 
-		beforeEach ->
-			@AuthenticationController._getRedirectFromSession = sinon.stub().returns(null)
-			@req.session.passport = {user: {_id: @user_id}}
+		beforeEach(function() {
+			this.AuthenticationController._getRedirectFromSession = sinon.stub().returns(null);
+			return this.req.session.passport = {user: {_id: this.user_id}};});
 
-		it "should ask the UserRegistrationHandler to register user", (done)->
-			@UserRegistrationHandler.registerNewUser.callsArgWith(1, null, @user)
-			@res.json = =>
-				@UserRegistrationHandler.registerNewUser.calledWith(@req.body).should.equal true
-				done()
-			@PublicRegistrationController.register @req, @res
+		it("should ask the UserRegistrationHandler to register user", function(done){
+			this.UserRegistrationHandler.registerNewUser.callsArgWith(1, null, this.user);
+			this.res.json = () => {
+				this.UserRegistrationHandler.registerNewUser.calledWith(this.req.body).should.equal(true);
+				return done();
+			};
+			return this.PublicRegistrationController.register(this.req, this.res);
+		});
 
-		it "should try and log the user in if there is an EmailAlreadyRegistered error", (done)->
+		it("should try and log the user in if there is an EmailAlreadyRegistered error", function(done){
 
-			@UserRegistrationHandler.registerNewUser.callsArgWith(1, new Error("EmailAlreadyRegistered"))
-			@PublicRegistrationController.register @req, @res, @next
-			@req.login.callCount.should.equal 0
-			@req.login.calledWith(@user).should.equal false
-			@AuthenticationController.passportLogin.callCount.should.equal 1
-			@AuthenticationController.passportLogin.calledWith(@req, @res, @next).should.equal true
-			done()
+			this.UserRegistrationHandler.registerNewUser.callsArgWith(1, new Error("EmailAlreadyRegistered"));
+			this.PublicRegistrationController.register(this.req, this.res, this.next);
+			this.req.login.callCount.should.equal(0);
+			this.req.login.calledWith(this.user).should.equal(false);
+			this.AuthenticationController.passportLogin.callCount.should.equal(1);
+			this.AuthenticationController.passportLogin.calledWith(this.req, this.res, this.next).should.equal(true);
+			return done();
+		});
 
-		it "should tell the user about the overleaf beta if trying to register with an existing linked overleaf email", (done)->
-			@UserRegistrationHandler.registerNewUser.callsArgWith(1, new Error("EmailAlreadyRegistered"), { overleaf: { id: "exists" }})
-			@res.json = (opts)=>
-				opts.message.text.should.equal "You are already registered in ShareLaTeX through the Overleaf Beta. Please log in via Overleaf."
-				done()
-			@PublicRegistrationController.register @req, @res, @next
+		it("should tell the user about the overleaf beta if trying to register with an existing linked overleaf email", function(done){
+			this.UserRegistrationHandler.registerNewUser.callsArgWith(1, new Error("EmailAlreadyRegistered"), { overleaf: { id: "exists" }});
+			this.res.json = opts=> {
+				opts.message.text.should.equal("You are already registered in ShareLaTeX through the Overleaf Beta. Please log in via Overleaf.");
+				return done();
+			};
+			return this.PublicRegistrationController.register(this.req, this.res, this.next);
+		});
 
-		it "should put the user on the session and mark them as justRegistered", (done)->
-			@UserRegistrationHandler.registerNewUser.callsArgWith(1, null, @user)
-			@res.json = =>
-				@req.login
-					.calledWith(@user)
-					.should.equal true
-				assert.equal @req.session.justRegistered, true
-				done()
-			@PublicRegistrationController.register @req, @res
+		it("should put the user on the session and mark them as justRegistered", function(done){
+			this.UserRegistrationHandler.registerNewUser.callsArgWith(1, null, this.user);
+			this.res.json = () => {
+				this.req.login
+					.calledWith(this.user)
+					.should.equal(true);
+				assert.equal(this.req.session.justRegistered, true);
+				return done();
+			};
+			return this.PublicRegistrationController.register(this.req, this.res);
+		});
 
-		it "should redirect to project page", (done)->
-			@UserRegistrationHandler.registerNewUser.callsArgWith(1, null, @user)
-			@res.json = (opts)=>
-				opts.redir.should.equal "/project"
-				done()
-			@PublicRegistrationController.register @req, @res
+		it("should redirect to project page", function(done){
+			this.UserRegistrationHandler.registerNewUser.callsArgWith(1, null, this.user);
+			this.res.json = opts=> {
+				opts.redir.should.equal("/project");
+				return done();
+			};
+			return this.PublicRegistrationController.register(this.req, this.res);
+		});
 
-		it "should redirect passed redir if it exists", (done)->
-			@UserRegistrationHandler.registerNewUser.callsArgWith(1, null, @user)
-			@AuthenticationController._getRedirectFromSession = sinon.stub().returns('/somewhere')
-			@res.json = (opts)=>
-				opts.redir.should.equal "/somewhere"
-				done()
-			@PublicRegistrationController.register @req, @res
+		it("should redirect passed redir if it exists", function(done){
+			this.UserRegistrationHandler.registerNewUser.callsArgWith(1, null, this.user);
+			this.AuthenticationController._getRedirectFromSession = sinon.stub().returns('/somewhere');
+			this.res.json = opts=> {
+				opts.redir.should.equal("/somewhere");
+				return done();
+			};
+			return this.PublicRegistrationController.register(this.req, this.res);
+		});
 
-		it "should allocate the referals", (done)->
-			@req.session =
-				referal_id : "23123"
-				referal_source : "email"
-				referal_medium : "bob"
-				passport: {user: {_id: @user_id}}
+		it("should allocate the referals", function(done){
+			this.req.session = {
+				referal_id : "23123",
+				referal_source : "email",
+				referal_medium : "bob",
+				passport: {user: {_id: this.user_id}}
+			};
 
-			@UserRegistrationHandler.registerNewUser.callsArgWith(1, null, @user)
-			@AuthenticationController._getRedirectFromSession = sinon.stub().returns('/somewhere')
-			@res.json = (opts)=>
-				@ReferalAllocator.allocate.calledWith(@req.session.referal_id, @user._id, @req.session.referal_source, @req.session.referal_medium).should.equal true
-				done()
-			@PublicRegistrationController.register @req, @res
+			this.UserRegistrationHandler.registerNewUser.callsArgWith(1, null, this.user);
+			this.AuthenticationController._getRedirectFromSession = sinon.stub().returns('/somewhere');
+			this.res.json = opts=> {
+				this.ReferalAllocator.allocate.calledWith(this.req.session.referal_id, this.user._id, this.req.session.referal_source, this.req.session.referal_medium).should.equal(true);
+				return done();
+			};
+			return this.PublicRegistrationController.register(this.req, this.res);
+		});
 
-		it "should call populateTeamInvites", (done)->
-			@UserRegistrationHandler.registerNewUser.callsArgWith(1, null, @user)
-			@res.json = (opts)=>
-				@UserHandler.populateTeamInvites.calledWith(@user).should.equal true
-				done()
-			@PublicRegistrationController.register @req, @res
+		it("should call populateTeamInvites", function(done){
+			this.UserRegistrationHandler.registerNewUser.callsArgWith(1, null, this.user);
+			this.res.json = opts=> {
+				this.UserHandler.populateTeamInvites.calledWith(this.user).should.equal(true);
+				return done();
+			};
+			return this.PublicRegistrationController.register(this.req, this.res);
+		});
 
-		it "should send a welcome email", (done)->
-			@UserRegistrationHandler.registerNewUser.callsArgWith(1, null, @user)
-			@res.json = (opts)=>
-				@UserEmailsConfirmationHandler.sendConfirmationEmail.calledWith(@user._id, @user.email, 'welcome').should.equal true
-				done()
-			@PublicRegistrationController.register @req, @res
+		return it("should send a welcome email", function(done){
+			this.UserRegistrationHandler.registerNewUser.callsArgWith(1, null, this.user);
+			this.res.json = opts=> {
+				this.UserEmailsConfirmationHandler.sendConfirmationEmail.calledWith(this.user._id, this.user.email, 'welcome').should.equal(true);
+				return done();
+			};
+			return this.PublicRegistrationController.register(this.req, this.res);
+		});
+	});
+});
