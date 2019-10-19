@@ -8,10 +8,6 @@ module.exports =
 	enabledLinkedFileTypes: 'url,project_file,project_output_file,mendeley,zotero'.split(',')
 
 	apis:
-		analytics:
-			enabled: false
-			url: undefined
-
 		linkedUrlProxy:
 			url: 'http://localhost:6543'
 
