@@ -9,37 +9,40 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const sinon = require('sinon');
-const assert = require('assert');
-const path = require('path');
-const modulePath = path.join(__dirname, '../../../../../app/js/infrastructure/LockManager.js');
-const lockKey = `lock:web:{${5678}}`;
-const lockValue = "123456";
-const SandboxedModule = require('sandboxed-module');
+const sinon = require('sinon')
+const assert = require('assert')
+const path = require('path')
+const modulePath = path.join(
+  __dirname,
+  '../../../../../app/js/infrastructure/LockManager.js'
+)
+const lockKey = `lock:web:{${5678}}`
+const lockValue = '123456'
+const SandboxedModule = require('sandboxed-module')
 
-describe('LockManager - releasing the lock', function(){
+describe('LockManager - releasing the lock', function() {
+  const deleteStub = sinon.stub().callsArgWith(4)
+  const mocks = {
+    'logger-sharelatex': { log() {} },
 
-	const deleteStub = sinon.stub().callsArgWith(4);
-	const mocks = {
-		"logger-sharelatex": { log() {}
-	},
+    './RedisWrapper': {
+      client() {
+        return {
+          auth() {},
+          eval: deleteStub
+        }
+      }
+    }
+  }
 
-		"./RedisWrapper": {
-			client(){
-				return {
-					auth() {},
-					eval:deleteStub
-				};
-			}
-		}
-	};
+  const LockManager = SandboxedModule.require(modulePath, { requires: mocks })
+  LockManager.unlockScript = 'this is the unlock script'
 
-	const LockManager = SandboxedModule.require(modulePath, {requires: mocks});
-	LockManager.unlockScript = "this is the unlock script";
-	
-	return it('should put a all data into memory', done => LockManager._releaseLock(lockKey, lockValue, function() {
-        deleteStub.calledWith(LockManager.unlockScript, 1, lockKey, lockValue).should.equal(true);
-        return done();
-    }));
-});
-
+  return it('should put a all data into memory', done =>
+    LockManager._releaseLock(lockKey, lockValue, function() {
+      deleteStub
+        .calledWith(LockManager.unlockScript, 1, lockKey, lockValue)
+        .should.equal(true)
+      return done()
+    }))
+})

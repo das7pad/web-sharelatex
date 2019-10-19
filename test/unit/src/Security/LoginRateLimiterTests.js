@@ -10,105 +10,126 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const SandboxedModule = require('sandboxed-module');
-const sinon = require('sinon');
-require('chai').should();
-const {
-    expect
-} = require('chai');
-const modulePath = require('path').join(__dirname, '../../../../app/js/Features/Security/LoginRateLimiter');
+const SandboxedModule = require('sandboxed-module')
+const sinon = require('sinon')
+require('chai').should()
+const { expect } = require('chai')
+const modulePath = require('path').join(
+  __dirname,
+  '../../../../app/js/Features/Security/LoginRateLimiter'
+)
 
+describe('LoginRateLimiter', function() {
+  beforeEach(function() {
+    this.email = 'bob@bob.com'
+    this.RateLimiter = {
+      clearRateLimit: sinon.stub(),
+      addCount: sinon.stub()
+    }
 
-describe("LoginRateLimiter", function() {
+    return (this.LoginRateLimiter = SandboxedModule.require(modulePath, {
+      requires: {
+        '../../infrastructure/RateLimiter': this.RateLimiter
+      }
+    }))
+  })
 
-	beforeEach(function() {
-		this.email = "bob@bob.com";
-		this.RateLimiter = {
-			clearRateLimit: sinon.stub(),
-			addCount: sinon.stub()
-		};
+  describe('processLoginRequest', function() {
+    beforeEach(function() {
+      return (this.RateLimiter.addCount = sinon
+        .stub()
+        .callsArgWith(1, null, true))
+    })
 
-		return this.LoginRateLimiter = SandboxedModule.require(modulePath, { requires: {
-			'../../infrastructure/RateLimiter': this.RateLimiter
-		}
-	}
-		);
-	});
+    it('should call RateLimiter.addCount', function(done) {
+      return this.LoginRateLimiter.processLoginRequest(
+        this.email,
+        (err, allow) => {
+          this.RateLimiter.addCount.callCount.should.equal(1)
+          expect(
+            this.RateLimiter.addCount.lastCall.args[0].endpointName
+          ).to.equal('login')
+          expect(
+            this.RateLimiter.addCount.lastCall.args[0].subjectName
+          ).to.equal(this.email)
+          return done()
+        }
+      )
+    })
 
-	describe("processLoginRequest", function() {
+    describe('when login is allowed', function() {
+      beforeEach(function() {
+        return (this.RateLimiter.addCount = sinon
+          .stub()
+          .callsArgWith(1, null, true))
+      })
 
-		beforeEach(function() {
-			return this.RateLimiter.addCount = sinon.stub().callsArgWith(1, null, true);
-		});
+      return it('should call pass allow=true', function(done) {
+        return this.LoginRateLimiter.processLoginRequest(
+          this.email,
+          (err, allow) => {
+            expect(err).to.equal(null)
+            expect(allow).to.equal(true)
+            return done()
+          }
+        )
+      })
+    })
 
-		it('should call RateLimiter.addCount', function(done) {
-			return this.LoginRateLimiter.processLoginRequest(this.email, (err, allow) => {
-				this.RateLimiter.addCount.callCount.should.equal(1);
-				expect(this.RateLimiter.addCount.lastCall.args[0].endpointName).to.equal('login');
-				expect(this.RateLimiter.addCount.lastCall.args[0].subjectName).to.equal(this.email);
-				return done();
-			});
-		});
+    describe('when login is blocked', function() {
+      beforeEach(function() {
+        return (this.RateLimiter.addCount = sinon
+          .stub()
+          .callsArgWith(1, null, false))
+      })
 
-		describe('when login is allowed', function() {
+      return it('should call pass allow=false', function(done) {
+        return this.LoginRateLimiter.processLoginRequest(
+          this.email,
+          (err, allow) => {
+            expect(err).to.equal(null)
+            expect(allow).to.equal(false)
+            return done()
+          }
+        )
+      })
+    })
 
-			beforeEach(function() {
-				return this.RateLimiter.addCount = sinon.stub().callsArgWith(1, null, true);
-			});
+    return describe('when addCount produces an error', function() {
+      beforeEach(function() {
+        return (this.RateLimiter.addCount = sinon
+          .stub()
+          .callsArgWith(1, new Error('woops')))
+      })
 
-			return it('should call pass allow=true', function(done) {
-				return this.LoginRateLimiter.processLoginRequest(this.email, (err, allow) => {
-					expect(err).to.equal(null);
-					expect(allow).to.equal(true);
-					return done();
-				});
-			});
-		});
+      return it('should produce an error', function(done) {
+        return this.LoginRateLimiter.processLoginRequest(
+          this.email,
+          (err, allow) => {
+            expect(err).to.not.equal(null)
+            expect(err).to.be.instanceof(Error)
+            return done()
+          }
+        )
+      })
+    })
+  })
 
-		describe('when login is blocked', function() {
+  return describe('recordSuccessfulLogin', function() {
+    beforeEach(function() {
+      return (this.RateLimiter.clearRateLimit = sinon
+        .stub()
+        .callsArgWith(2, null))
+    })
 
-			beforeEach(function() {
-				return this.RateLimiter.addCount = sinon.stub().callsArgWith(1, null, false);
-			});
-
-			return it('should call pass allow=false', function(done) {
-				return this.LoginRateLimiter.processLoginRequest(this.email, (err, allow) => {
-					expect(err).to.equal(null);
-					expect(allow).to.equal(false);
-					return done();
-				});
-			});
-		});
-
-		return describe('when addCount produces an error', function() {
-
-			beforeEach(function() {
-				return this.RateLimiter.addCount = sinon.stub().callsArgWith(1, new Error('woops'));
-			});
-
-			return it('should produce an error', function(done) {
-				return this.LoginRateLimiter.processLoginRequest(this.email, (err, allow) => {
-					expect(err).to.not.equal(null);
-					expect(err).to.be.instanceof(Error);
-					return done();
-				});
-			});
-		});
-	});
-
-
-	return describe("recordSuccessfulLogin", function() {
-
-		beforeEach(function() {
-			return this.RateLimiter.clearRateLimit = sinon.stub().callsArgWith(2, null);
-		});
-
-		return it("should call clearRateLimit", function(done){
-			return this.LoginRateLimiter.recordSuccessfulLogin(this.email, () => {
-				this.RateLimiter.clearRateLimit.callCount.should.equal(1);
-				this.RateLimiter.clearRateLimit.calledWith('login', this.email).should.equal(true);
-				return done();
-			});
-		});
-	});
-});
+    return it('should call clearRateLimit', function(done) {
+      return this.LoginRateLimiter.recordSuccessfulLogin(this.email, () => {
+        this.RateLimiter.clearRateLimit.callCount.should.equal(1)
+        this.RateLimiter.clearRateLimit
+          .calledWith('login', this.email)
+          .should.equal(true)
+        return done()
+      })
+    })
+  })
+})
