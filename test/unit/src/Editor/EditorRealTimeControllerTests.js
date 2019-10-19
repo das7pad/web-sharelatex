@@ -22,6 +22,9 @@ describe('EditorRealTimeController', function() {
   beforeEach(function() {
     this.rclient = { publish: sinon.stub() }
     this.EditorRealTimeController = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         '../../infrastructure/RedisWrapper': {
           client: () => this.rclient
@@ -55,7 +58,7 @@ describe('EditorRealTimeController', function() {
       )
     })
 
-    return it('should publish the message to redis', function() {
+    it('should publish the message to redis', function() {
       return this.rclient.publish
         .calledWith(
           'editor-events',
@@ -70,7 +73,7 @@ describe('EditorRealTimeController', function() {
     })
   })
 
-  return describe('emitToAll', function() {
+  describe('emitToAll', function() {
     beforeEach(function() {
       this.EditorRealTimeController.emitToRoom = sinon.stub()
       return this.EditorRealTimeController.emitToAll(
@@ -79,7 +82,7 @@ describe('EditorRealTimeController', function() {
       )
     })
 
-    return it("should emit to the room 'all'", function() {
+    it("should emit to the room 'all'", function() {
       return this.EditorRealTimeController.emitToRoom
         .calledWith('all', this.message, ...Array.from(this.payload))
         .should.equal(true)

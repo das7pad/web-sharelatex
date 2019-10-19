@@ -48,6 +48,9 @@ describe('UserGetter', function() {
     this.getUserAffiliations = sinon.stub().callsArgWith(1, null, [])
 
     return (this.UserGetter = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         'logger-sharelatex': {
           log() {}
@@ -59,6 +62,9 @@ describe('UserGetter', function() {
         'settings-sharelatex': settings,
         '../Institutions/InstitutionsAPI': {
           getUserAffiliations: this.getUserAffiliations
+        },
+        '../../infrastructure/Features': {
+          hasFeature: sinon.stub().returns(true)
         },
         '../Errors/Errors': Errors
       }
@@ -77,18 +83,7 @@ describe('UserGetter', function() {
       })
     })
 
-    it('should not allow email in query', function(done) {
-      return this.UserGetter.getUser(
-        { email: 'foo@bar.com' },
-        {},
-        (error, user) => {
-          error.should.exist
-          return done()
-        }
-      )
-    })
-
-    return it('should not allow null query', function(done) {
+    it('should not allow null query', function(done) {
       return this.UserGetter.getUser(null, {}, (error, user) => {
         error.should.exist
         return done()
@@ -178,7 +173,7 @@ describe('UserGetter', function() {
       )
     })
 
-    return it('should get user when it has no emails field', function(done) {
+    it('should get user when it has no emails field', function(done) {
       this.fakeUser = {
         _id: '12390i',
         email: 'email2@foo.bar'
@@ -224,7 +219,7 @@ describe('UserGetter', function() {
       })
     })
 
-    return it('trim email', function(done) {
+    it('trim email', function(done) {
       const email = 'hello@world.com'
       return this.UserGetter.getUserByMainEmail(` ${email} `, (error, user) => {
         this.findOne.called.should.equal(true)
@@ -264,7 +259,7 @@ describe('UserGetter', function() {
       })
     })
 
-    return it('checks main email as well', function(done) {
+    it('checks main email as well', function(done) {
       this.findOne.callsArgWith(2, null, null)
       const email = 'hello@world.com'
       const projection = { emails: 1 }
@@ -280,7 +275,7 @@ describe('UserGetter', function() {
     })
   })
 
-  describe('getUsersByHostname', () =>
+  describe('getUsersByHostname', function() {
     it('should find user by hostname', function(done) {
       const hostname = 'bar.foo'
       const expectedQuery = {
@@ -300,9 +295,29 @@ describe('UserGetter', function() {
           return done()
         }
       )
-    }))
+    })
+  })
 
-  return describe('ensureUniqueEmailAddress', function() {
+  describe('getUsersByV1Id', function() {
+    it('should find users by list of v1 ids', function(done) {
+      const v1Ids = [501]
+      const expectedQuery = {
+        'overleaf.id': { $in: v1Ids }
+      }
+      const projection = { emails: 1 }
+      return this.UserGetter.getUsersByV1Ids(
+        v1Ids,
+        projection,
+        (error, users) => {
+          this.find.calledOnce.should.equal(true)
+          this.find.calledWith(expectedQuery, projection).should.equal(true)
+          return done()
+        }
+      )
+    })
+  })
+
+  describe('ensureUniqueEmailAddress', function() {
     beforeEach(function() {
       return (this.UserGetter.getUserByAnyEmail = sinon.stub())
     })
@@ -312,12 +327,11 @@ describe('UserGetter', function() {
       return this.UserGetter.ensureUniqueEmailAddress(this.newEmail, err => {
         should.exist(err)
         expect(err).to.be.an.instanceof(Errors.EmailExistsError)
-        err.message.should.equal('alread_exists')
         return done()
       })
     })
 
-    return it('should return null if no user is found', function(done) {
+    it('should return null if no user is found', function(done) {
       this.UserGetter.getUserByAnyEmail.callsArgWith(1)
       return this.UserGetter.ensureUniqueEmailAddress(this.newEmail, err => {
         should.not.exist(err)

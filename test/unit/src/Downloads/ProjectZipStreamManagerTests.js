@@ -33,6 +33,9 @@ describe('ProjectZipStreamManager', function() {
       append: sinon.stub()
     }
     return (this.ProjectZipStreamManager = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         archiver: (this.archiver = sinon.stub().returns(this.archive)),
         'logger-sharelatex': (this.logger = {
@@ -46,7 +49,7 @@ describe('ProjectZipStreamManager', function() {
     }))
   })
 
-  describe('createZipStreamForMultipleProjects', () =>
+  describe('createZipStreamForMultipleProjects', function() {
     describe('successfully', function() {
       beforeEach(function(done) {
         this.project_ids = ['project-1', 'project-2']
@@ -116,7 +119,7 @@ describe('ProjectZipStreamManager', function() {
         )
       })
 
-      return it('should add all of the projects to the zip', function() {
+      it('should add all of the projects to the zip', function() {
         return Array.from(this.project_ids).map(project_id =>
           this.archive.append
             .calledWith(this.zip_streams[project_id], {
@@ -125,7 +128,8 @@ describe('ProjectZipStreamManager', function() {
             .should.equal(true)
         )
       })
-    }))
+    })
+  })
 
   describe('createZipStreamForProject', function() {
     describe('successfully', function() {
@@ -171,7 +175,7 @@ describe('ProjectZipStreamManager', function() {
           .should.equal(true)
       })
 
-      return it('should finalise the stream', function() {
+      it('should finalise the stream', function() {
         return this.archive.finalize.called.should.equal(true)
       })
     })
@@ -197,7 +201,7 @@ describe('ProjectZipStreamManager', function() {
           .should.equal(true)
       })
 
-      return it('should continue with the process', function() {
+      it('should continue with the process', function() {
         this.ProjectZipStreamManager.addAllDocsToArchive.called.should.equal(
           true
         )
@@ -208,7 +212,7 @@ describe('ProjectZipStreamManager', function() {
       })
     })
 
-    return describe('with an error adding files', function() {
+    describe('with an error adding files', function() {
       beforeEach(function() {
         this.ProjectZipStreamManager.addAllDocsToArchive = sinon
           .stub()
@@ -229,7 +233,7 @@ describe('ProjectZipStreamManager', function() {
           .should.equal(true)
       })
 
-      return it('should continue with the process', function() {
+      it('should continue with the process', function() {
         this.ProjectZipStreamManager.addAllDocsToArchive.called.should.equal(
           true
         )
@@ -275,7 +279,7 @@ describe('ProjectZipStreamManager', function() {
         .should.equal(true)
     })
 
-    return it('should add each doc to the archive', function() {
+    it('should add each doc to the archive', function() {
       return (() => {
         const result = []
         for (let path in this.docs) {
@@ -292,7 +296,7 @@ describe('ProjectZipStreamManager', function() {
     })
   })
 
-  return describe('addAllFilesToArchive', function() {
+  describe('addAllFilesToArchive', function() {
     beforeEach(function() {
       this.files = {
         '/image.png': {
@@ -351,7 +355,7 @@ describe('ProjectZipStreamManager', function() {
       })()
     })
 
-    return it('should add each file to the archive', function() {
+    it('should add each file to the archive', function() {
       return (() => {
         const result = []
         for (let path in this.files) {

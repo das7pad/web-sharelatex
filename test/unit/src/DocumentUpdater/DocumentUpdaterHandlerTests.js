@@ -1,23 +1,6 @@
-/* eslint-disable
-    max-len,
-    no-return-assign,
-    no-unused-vars,
-*/
-// TODO: This file was created by bulk-decaffeinate.
-// Fix any style issues and re-enable lint.
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-const should = require('chai').should()
-const spies = require('chai-spies')
-const chai = require('chai').use(spies)
 const sinon = require('sinon')
 const SandboxedModule = require('sandboxed-module')
-const { assert } = require('chai')
 const path = require('path')
-const _ = require('underscore')
 const { ObjectId } = require('mongojs')
 const modulePath = path.join(
   __dirname,
@@ -48,7 +31,10 @@ describe('DocumentUpdaterHandler', function() {
     }
 
     this.callback = sinon.stub()
-    return (this.handler = SandboxedModule.require(modulePath, {
+    this.handler = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         request: {
           defaults: () => {
@@ -68,18 +54,18 @@ describe('DocumentUpdaterHandler', function() {
           }
         }
       }
-    }))
+    })
   })
 
   describe('flushProjectToMongo', function() {
     describe('successfully', function() {
       beforeEach(function() {
         this.request.callsArgWith(1, null, { statusCode: 204 }, '')
-        return this.handler.flushProjectToMongo(this.project_id, this.callback)
+        this.handler.flushProjectToMongo(this.project_id, this.callback)
       })
 
       it('should flush the document from the document updater', function() {
-        return this.request
+        this.request
           .calledWithMatch({
             url: `${this.settings.apis.documentupdater.url}/project/${
               this.project_id
@@ -89,8 +75,8 @@ describe('DocumentUpdaterHandler', function() {
           .should.equal(true)
       })
 
-      return it('should call the callback with no error', function() {
-        return this.callback.calledWith(null).should.equal(true)
+      it('should call the callback with no error', function() {
+        this.callback.calledWith(null).should.equal(true)
       })
     })
 
@@ -102,22 +88,22 @@ describe('DocumentUpdaterHandler', function() {
           null,
           null
         )
-        return this.handler.flushProjectToMongo(this.project_id, this.callback)
+        this.handler.flushProjectToMongo(this.project_id, this.callback)
       })
 
-      return it('should return an error to the callback', function() {
-        return this.callback.calledWith(this.error).should.equal(true)
+      it('should return an error to the callback', function() {
+        this.callback.calledWith(this.error).should.equal(true)
       })
     })
 
-    return describe('when the document updater returns a failure error code', function() {
+    describe('when the document updater returns a failure error code', function() {
       beforeEach(function() {
         this.request.callsArgWith(1, null, { statusCode: 500 }, '')
-        return this.handler.flushProjectToMongo(this.project_id, this.callback)
+        this.handler.flushProjectToMongo(this.project_id, this.callback)
       })
 
-      return it('should return the callback with an error', function() {
-        return this.callback
+      it('should return the callback with an error', function() {
+        this.callback
           .calledWith(
             new Error('doc updater returned failure status code: 500')
           )
@@ -130,14 +116,14 @@ describe('DocumentUpdaterHandler', function() {
     describe('successfully', function() {
       beforeEach(function() {
         this.request.callsArgWith(1, null, { statusCode: 204 }, '')
-        return this.handler.flushProjectToMongoAndDelete(
+        this.handler.flushProjectToMongoAndDelete(
           this.project_id,
           this.callback
         )
       })
 
       it('should delete the project from the document updater', function() {
-        return this.request
+        this.request
           .calledWithMatch({
             url: `${this.settings.apis.documentupdater.url}/project/${
               this.project_id
@@ -147,8 +133,8 @@ describe('DocumentUpdaterHandler', function() {
           .should.equal(true)
       })
 
-      return it('should call the callback with no error', function() {
-        return this.callback.calledWith(null).should.equal(true)
+      it('should call the callback with no error', function() {
+        this.callback.calledWith(null).should.equal(true)
       })
     })
 
@@ -160,28 +146,28 @@ describe('DocumentUpdaterHandler', function() {
           null,
           null
         )
-        return this.handler.flushProjectToMongoAndDelete(
+        this.handler.flushProjectToMongoAndDelete(
           this.project_id,
           this.callback
         )
       })
 
-      return it('should return an error to the callback', function() {
-        return this.callback.calledWith(this.error).should.equal(true)
+      it('should return an error to the callback', function() {
+        this.callback.calledWith(this.error).should.equal(true)
       })
     })
 
-    return describe('when the document updater returns a failure error code', function() {
+    describe('when the document updater returns a failure error code', function() {
       beforeEach(function() {
         this.request.callsArgWith(1, null, { statusCode: 500 }, '')
-        return this.handler.flushProjectToMongoAndDelete(
+        this.handler.flushProjectToMongoAndDelete(
           this.project_id,
           this.callback
         )
       })
 
-      return it('should return the callback with an error', function() {
-        return this.callback
+      it('should return the callback with an error', function() {
+        this.callback
           .calledWith(
             new Error('doc updater returned failure status code: 500')
           )
@@ -194,7 +180,7 @@ describe('DocumentUpdaterHandler', function() {
     describe('successfully', function() {
       beforeEach(function() {
         this.request.callsArgWith(1, null, { statusCode: 204 }, '')
-        return this.handler.flushDocToMongo(
+        this.handler.flushDocToMongo(
           this.project_id,
           this.doc_id,
           this.callback
@@ -202,7 +188,7 @@ describe('DocumentUpdaterHandler', function() {
       })
 
       it('should flush the document from the document updater', function() {
-        return this.request
+        this.request
           .calledWithMatch({
             url: `${this.settings.apis.documentupdater.url}/project/${
               this.project_id
@@ -212,8 +198,8 @@ describe('DocumentUpdaterHandler', function() {
           .should.equal(true)
       })
 
-      return it('should call the callback with no error', function() {
-        return this.callback.calledWith(null).should.equal(true)
+      it('should call the callback with no error', function() {
+        this.callback.calledWith(null).should.equal(true)
       })
     })
 
@@ -225,30 +211,30 @@ describe('DocumentUpdaterHandler', function() {
           null,
           null
         )
-        return this.handler.flushDocToMongo(
+        this.handler.flushDocToMongo(
           this.project_id,
           this.doc_id,
           this.callback
         )
       })
 
-      return it('should return an error to the callback', function() {
-        return this.callback.calledWith(this.error).should.equal(true)
+      it('should return an error to the callback', function() {
+        this.callback.calledWith(this.error).should.equal(true)
       })
     })
 
-    return describe('when the document updater returns a failure error code', function() {
+    describe('when the document updater returns a failure error code', function() {
       beforeEach(function() {
         this.request.callsArgWith(1, null, { statusCode: 500 }, '')
-        return this.handler.flushDocToMongo(
+        this.handler.flushDocToMongo(
           this.project_id,
           this.doc_id,
           this.callback
         )
       })
 
-      return it('should return the callback with an error', function() {
-        return this.callback
+      it('should return the callback with an error', function() {
+        this.callback
           .calledWith(
             new Error('doc updater returned failure status code: 500')
           )
@@ -261,15 +247,11 @@ describe('DocumentUpdaterHandler', function() {
     describe('successfully', function() {
       beforeEach(function() {
         this.request.callsArgWith(1, null, { statusCode: 204 }, '')
-        return this.handler.deleteDoc(
-          this.project_id,
-          this.doc_id,
-          this.callback
-        )
+        this.handler.deleteDoc(this.project_id, this.doc_id, this.callback)
       })
 
       it('should delete the document from the document updater', function() {
-        return this.request
+        this.request
           .calledWithMatch({
             url: `${this.settings.apis.documentupdater.url}/project/${
               this.project_id
@@ -279,8 +261,8 @@ describe('DocumentUpdaterHandler', function() {
           .should.equal(true)
       })
 
-      return it('should call the callback with no error', function() {
-        return this.callback.calledWith(null).should.equal(true)
+      it('should call the callback with no error', function() {
+        this.callback.calledWith(null).should.equal(true)
       })
     })
 
@@ -292,30 +274,22 @@ describe('DocumentUpdaterHandler', function() {
           null,
           null
         )
-        return this.handler.deleteDoc(
-          this.project_id,
-          this.doc_id,
-          this.callback
-        )
+        this.handler.deleteDoc(this.project_id, this.doc_id, this.callback)
       })
 
-      return it('should return an error to the callback', function() {
-        return this.callback.calledWith(this.error).should.equal(true)
+      it('should return an error to the callback', function() {
+        this.callback.calledWith(this.error).should.equal(true)
       })
     })
 
-    return describe('when the document updater returns a failure error code', function() {
+    describe('when the document updater returns a failure error code', function() {
       beforeEach(function() {
         this.request.callsArgWith(1, null, { statusCode: 500 }, '')
-        return this.handler.deleteDoc(
-          this.project_id,
-          this.doc_id,
-          this.callback
-        )
+        this.handler.deleteDoc(this.project_id, this.doc_id, this.callback)
       })
 
-      return it('should return the callback with an error', function() {
-        return this.callback
+      it('should return the callback with an error', function() {
+        this.callback
           .calledWith(
             new Error('doc updater returned failure status code: 500')
           )
@@ -326,13 +300,13 @@ describe('DocumentUpdaterHandler', function() {
 
   describe('setDocument', function() {
     beforeEach(function() {
-      return (this.source = 'dropbox')
+      this.source = 'dropbox'
     })
 
     describe('successfully', function() {
       beforeEach(function() {
         this.request.callsArgWith(1, null, { statusCode: 204 }, '')
-        return this.handler.setDocument(
+        this.handler.setDocument(
           this.project_id,
           this.doc_id,
           this.user_id,
@@ -343,7 +317,7 @@ describe('DocumentUpdaterHandler', function() {
       })
 
       it('should set the document in the document updater', function() {
-        return this.request
+        this.request
           .calledWith({
             url: `${this.settings.apis.documentupdater.url}/project/${
               this.project_id
@@ -358,8 +332,8 @@ describe('DocumentUpdaterHandler', function() {
           .should.equal(true)
       })
 
-      return it('should call the callback with no error', function() {
-        return this.callback.calledWith(null).should.equal(true)
+      it('should call the callback with no error', function() {
+        this.callback.calledWith(null).should.equal(true)
       })
     })
 
@@ -371,7 +345,7 @@ describe('DocumentUpdaterHandler', function() {
           null,
           null
         )
-        return this.handler.setDocument(
+        this.handler.setDocument(
           this.project_id,
           this.doc_id,
           this.user_id,
@@ -381,15 +355,15 @@ describe('DocumentUpdaterHandler', function() {
         )
       })
 
-      return it('should return an error to the callback', function() {
-        return this.callback.calledWith(this.error).should.equal(true)
+      it('should return an error to the callback', function() {
+        this.callback.calledWith(this.error).should.equal(true)
       })
     })
 
-    return describe('when the document updater returns a failure error code', function() {
+    describe('when the document updater returns a failure error code', function() {
       beforeEach(function() {
         this.request.callsArgWith(1, null, { statusCode: 500 }, '')
-        return this.handler.setDocument(
+        this.handler.setDocument(
           this.project_id,
           this.doc_id,
           this.user_id,
@@ -399,8 +373,8 @@ describe('DocumentUpdaterHandler', function() {
         )
       })
 
-      return it('should return the callback with an error', function() {
-        return this.callback
+      it('should return the callback with an error', function() {
+        this.callback
           .calledWith(
             new Error('doc updater returned failure status code: 500')
           )
@@ -420,7 +394,7 @@ describe('DocumentUpdaterHandler', function() {
         }
         this.fromVersion = 2
         this.request.callsArgWith(1, null, { statusCode: 200 }, this.body)
-        return this.handler.getDocument(
+        this.handler.getDocument(
           this.project_id,
           this.doc_id,
           this.fromVersion,
@@ -429,7 +403,7 @@ describe('DocumentUpdaterHandler', function() {
       })
 
       it('should get the document from the document updater', function() {
-        return this.request
+        this.request
           .calledWith({
             url: `${this.settings.apis.documentupdater.url}/project/${
               this.project_id
@@ -440,8 +414,8 @@ describe('DocumentUpdaterHandler', function() {
           .should.equal(true)
       })
 
-      return it('should call the callback with the lines and version', function() {
-        return this.callback
+      it('should call the callback with the lines and version', function() {
+        this.callback
           .calledWith(null, this.lines, this.version, this.ranges, this.ops)
           .should.equal(true)
       })
@@ -455,7 +429,7 @@ describe('DocumentUpdaterHandler', function() {
           null,
           null
         )
-        return this.handler.getDocument(
+        this.handler.getDocument(
           this.project_id,
           this.doc_id,
           this.fromVersion,
@@ -463,15 +437,15 @@ describe('DocumentUpdaterHandler', function() {
         )
       })
 
-      return it('should return an error to the callback', function() {
-        return this.callback.calledWith(this.error).should.equal(true)
+      it('should return an error to the callback', function() {
+        this.callback.calledWith(this.error).should.equal(true)
       })
     })
 
-    return describe('when the document updater returns a failure error code', function() {
+    describe('when the document updater returns a failure error code', function() {
       beforeEach(function() {
         this.request.callsArgWith(1, null, { statusCode: 500 }, '')
-        return this.handler.getDocument(
+        this.handler.getDocument(
           this.project_id,
           this.doc_id,
           this.fromVersion,
@@ -479,8 +453,8 @@ describe('DocumentUpdaterHandler', function() {
         )
       })
 
-      return it('should return the callback with an error', function() {
-        return this.callback
+      it('should return the callback with an error', function() {
+        this.callback
           .calledWith(
             new Error('doc updater returned failure status code: 500')
           )
@@ -491,7 +465,7 @@ describe('DocumentUpdaterHandler', function() {
 
   describe('getProjectDocsIfMatch', function() {
     beforeEach(function() {
-      return (this.project_state_hash = '1234567890abcdef')
+      this.project_state_hash = '1234567890abcdef'
     })
 
     describe('successfully', function() {
@@ -506,7 +480,7 @@ describe('DocumentUpdaterHandler', function() {
         this.request.post = sinon
           .stub()
           .callsArgWith(1, null, { statusCode: 200 }, this.body)
-        return this.handler.getProjectDocsIfMatch(
+        this.handler.getProjectDocsIfMatch(
           this.project_id,
           this.project_state_hash,
           this.callback
@@ -517,13 +491,11 @@ describe('DocumentUpdaterHandler', function() {
         const url = `${this.settings.apis.documentupdater.url}/project/${
           this.project_id
         }/get_and_flush_if_old?state=${this.project_state_hash}`
-        return this.request.post.calledWith(url).should.equal(true)
+        this.request.post.calledWith(url).should.equal(true)
       })
 
-      return it('should call the callback with the documents', function() {
-        return this.callback
-          .calledWithExactly(null, this.docs)
-          .should.equal(true)
+      it('should call the callback with the documents', function() {
+        this.callback.calledWithExactly(null, this.docs).should.equal(true)
       })
     })
 
@@ -537,32 +509,32 @@ describe('DocumentUpdaterHandler', function() {
             null,
             null
           )
-        return this.handler.getProjectDocsIfMatch(
+        this.handler.getProjectDocsIfMatch(
           this.project_id,
           this.project_state_hash,
           this.callback
         )
       })
 
-      return it('should return an error to the callback', function() {
-        return this.callback.calledWith(this.error).should.equal(true)
+      it('should return an error to the callback', function() {
+        this.callback.calledWith(this.error).should.equal(true)
       })
     })
 
-    return describe('when the document updater returns a conflict error code', function() {
+    describe('when the document updater returns a conflict error code', function() {
       beforeEach(function() {
         this.request.post = sinon
           .stub()
           .callsArgWith(1, null, { statusCode: 409 }, 'Conflict')
-        return this.handler.getProjectDocsIfMatch(
+        this.handler.getProjectDocsIfMatch(
           this.project_id,
           this.project_state_hash,
           this.callback
         )
       })
 
-      return it('should return the callback with no documents', function() {
-        return this.callback.alwaysCalledWithExactly().should.equal(true)
+      it('should return the callback with no documents', function() {
+        this.callback.alwaysCalledWithExactly().should.equal(true)
       })
     })
   })
@@ -571,11 +543,11 @@ describe('DocumentUpdaterHandler', function() {
     describe('successfully', function() {
       beforeEach(function() {
         this.request.callsArgWith(1, null, { statusCode: 200 })
-        return this.handler.clearProjectState(this.project_id, this.callback)
+        this.handler.clearProjectState(this.project_id, this.callback)
       })
 
       it('should clear the project state from the document updater', function() {
-        return this.request
+        this.request
           .calledWithMatch({
             url: `${this.settings.apis.documentupdater.url}/project/${
               this.project_id
@@ -585,8 +557,8 @@ describe('DocumentUpdaterHandler', function() {
           .should.equal(true)
       })
 
-      return it('should call the callback', function() {
-        return this.callback.calledWith(null).should.equal(true)
+      it('should call the callback', function() {
+        this.callback.calledWith(null).should.equal(true)
       })
     })
 
@@ -598,22 +570,22 @@ describe('DocumentUpdaterHandler', function() {
           null,
           null
         )
-        return this.handler.clearProjectState(this.project_id, this.callback)
+        this.handler.clearProjectState(this.project_id, this.callback)
       })
 
-      return it('should return an error to the callback', function() {
-        return this.callback.calledWith(this.error).should.equal(true)
+      it('should return an error to the callback', function() {
+        this.callback.calledWith(this.error).should.equal(true)
       })
     })
 
-    return describe('when the document updater returns an error code', function() {
+    describe('when the document updater returns an error code', function() {
       beforeEach(function() {
         this.request.callsArgWith(1, null, { statusCode: 500 }, null)
-        return this.handler.clearProjectState(this.project_id, this.callback)
+        this.handler.clearProjectState(this.project_id, this.callback)
       })
 
-      return it('should return the callback with no documents', function() {
-        return this.callback
+      it('should return the callback with no documents', function() {
+        this.callback
           .calledWith(
             new Error('doc updater returned failure status code: 500')
           )
@@ -624,13 +596,13 @@ describe('DocumentUpdaterHandler', function() {
 
   describe('acceptChanges', function() {
     beforeEach(function() {
-      return (this.change_id = 'mock-change-id-1')
+      this.change_id = 'mock-change-id-1'
     })
 
     describe('successfully', function() {
       beforeEach(function() {
         this.request.callsArgWith(1, null, { statusCode: 200 }, this.body)
-        return this.handler.acceptChanges(
+        this.handler.acceptChanges(
           this.project_id,
           this.doc_id,
           [this.change_id],
@@ -639,7 +611,7 @@ describe('DocumentUpdaterHandler', function() {
       })
 
       it('should accept the change in the document updater', function() {
-        return this.request
+        this.request
           .calledWith({
             url: `${this.settings.apis.documentupdater.url}/project/${
               this.project_id
@@ -652,8 +624,8 @@ describe('DocumentUpdaterHandler', function() {
           .should.equal(true)
       })
 
-      return it('should call the callback', function() {
-        return this.callback.calledWith(null).should.equal(true)
+      it('should call the callback', function() {
+        this.callback.calledWith(null).should.equal(true)
       })
     })
 
@@ -665,7 +637,7 @@ describe('DocumentUpdaterHandler', function() {
           null,
           null
         )
-        return this.handler.acceptChanges(
+        this.handler.acceptChanges(
           this.project_id,
           this.doc_id,
           [this.change_id],
@@ -673,15 +645,15 @@ describe('DocumentUpdaterHandler', function() {
         )
       })
 
-      return it('should return an error to the callback', function() {
-        return this.callback.calledWith(this.error).should.equal(true)
+      it('should return an error to the callback', function() {
+        this.callback.calledWith(this.error).should.equal(true)
       })
     })
 
-    return describe('when the document updater returns a failure error code', function() {
+    describe('when the document updater returns a failure error code', function() {
       beforeEach(function() {
         this.request.callsArgWith(1, null, { statusCode: 500 }, '')
-        return this.handler.acceptChanges(
+        this.handler.acceptChanges(
           this.project_id,
           this.doc_id,
           [this.change_id],
@@ -689,8 +661,8 @@ describe('DocumentUpdaterHandler', function() {
         )
       })
 
-      return it('should return the callback with an error', function() {
-        return this.callback
+      it('should return the callback with an error', function() {
+        this.callback
           .calledWith(
             new Error('doc updater returned failure status code: 500')
           )
@@ -701,13 +673,13 @@ describe('DocumentUpdaterHandler', function() {
 
   describe('deleteThread', function() {
     beforeEach(function() {
-      return (this.thread_id = 'mock-thread-id-1')
+      this.thread_id = 'mock-thread-id-1'
     })
 
     describe('successfully', function() {
       beforeEach(function() {
         this.request.callsArgWith(1, null, { statusCode: 200 }, this.body)
-        return this.handler.deleteThread(
+        this.handler.deleteThread(
           this.project_id,
           this.doc_id,
           this.thread_id,
@@ -716,7 +688,7 @@ describe('DocumentUpdaterHandler', function() {
       })
 
       it('should delete the thread in the document updater', function() {
-        return this.request
+        this.request
           .calledWithMatch({
             url: `${this.settings.apis.documentupdater.url}/project/${
               this.project_id
@@ -726,8 +698,8 @@ describe('DocumentUpdaterHandler', function() {
           .should.equal(true)
       })
 
-      return it('should call the callback', function() {
-        return this.callback.calledWith(null).should.equal(true)
+      it('should call the callback', function() {
+        this.callback.calledWith(null).should.equal(true)
       })
     })
 
@@ -739,7 +711,7 @@ describe('DocumentUpdaterHandler', function() {
           null,
           null
         )
-        return this.handler.deleteThread(
+        this.handler.deleteThread(
           this.project_id,
           this.doc_id,
           this.thread_id,
@@ -747,15 +719,15 @@ describe('DocumentUpdaterHandler', function() {
         )
       })
 
-      return it('should return an error to the callback', function() {
-        return this.callback.calledWith(this.error).should.equal(true)
+      it('should return an error to the callback', function() {
+        this.callback.calledWith(this.error).should.equal(true)
       })
     })
 
-    return describe('when the document updater returns a failure error code', function() {
+    describe('when the document updater returns a failure error code', function() {
       beforeEach(function() {
         this.request.callsArgWith(1, null, { statusCode: 500 }, '')
-        return this.handler.deleteThread(
+        this.handler.deleteThread(
           this.project_id,
           this.doc_id,
           this.thread_id,
@@ -763,8 +735,8 @@ describe('DocumentUpdaterHandler', function() {
         )
       })
 
-      return it('should return the callback with an error', function() {
-        return this.callback
+      it('should return the callback with an error', function() {
+        this.callback
           .calledWith(
             new Error('doc updater returned failure status code: 500')
           )
@@ -773,16 +745,16 @@ describe('DocumentUpdaterHandler', function() {
     })
   })
 
-  return describe('updateProjectStructure ', function() {
+  describe('updateProjectStructure ', function() {
     beforeEach(function() {
       this.user_id = 1234
-      return (this.version = 999)
+      this.version = 999
     })
 
     describe('with project history disabled', function() {
       beforeEach(function() {
         this.settings.apis.project_history.sendProjectStructureOps = false
-        return this.handler.updateProjectStructure(
+        this.handler.updateProjectStructure(
           this.project_id,
           this.projectHistoryId,
           this.user_id,
@@ -792,24 +764,24 @@ describe('DocumentUpdaterHandler', function() {
       })
 
       it('does not make a web request', function() {
-        return this.request.called.should.equal(false)
+        this.request.called.should.equal(false)
       })
 
-      return it('calls the callback', function() {
-        return this.callback.called.should.equal(true)
+      it('calls the callback', function() {
+        this.callback.called.should.equal(true)
       })
     })
 
-    return describe('with project history enabled', function() {
+    describe('with project history enabled', function() {
       beforeEach(function() {
         this.settings.apis.project_history.sendProjectStructureOps = true
         this.url = `${this.settings.apis.documentupdater.url}/project/${
           this.project_id
         }`
-        return this.request.callsArgWith(1, null, { statusCode: 204 }, '')
+        this.request.callsArgWith(1, null, { statusCode: 204 }, '')
       })
 
-      describe('when an entity has changed name', () =>
+      describe('when an entity has changed name', function() {
         it('should send the structure update to the document updater', function(done) {
           this.docIdA = new ObjectId()
           this.docIdB = new ObjectId()
@@ -840,7 +812,7 @@ describe('DocumentUpdaterHandler', function() {
             }
           ]
 
-          return this.handler.updateProjectStructure(
+          this.handler.updateProjectStructure(
             this.project_id,
             this.projectHistoryId,
             this.user_id,
@@ -859,12 +831,13 @@ describe('DocumentUpdaterHandler', function() {
                   }
                 })
                 .should.equal(true)
-              return done()
+              done()
             }
           )
-        }))
+        })
+      })
 
-      describe('when a doc has been added', () =>
+      describe('when a doc has been added', function() {
         it('should send the structure update to the document updater', function(done) {
           this.docId = new ObjectId()
           this.changes = {
@@ -884,7 +857,7 @@ describe('DocumentUpdaterHandler', function() {
             }
           ]
 
-          return this.handler.updateProjectStructure(
+          this.handler.updateProjectStructure(
             this.project_id,
             this.projectHistoryId,
             this.user_id,
@@ -903,12 +876,13 @@ describe('DocumentUpdaterHandler', function() {
                   }
                 })
                 .should.equal(true)
-              return done()
+              done()
             }
           )
-        }))
+        })
+      })
 
-      describe('when a file has been added', () =>
+      describe('when a file has been added', function() {
         it('should send the structure update to the document updater', function(done) {
           this.fileId = new ObjectId()
           this.changes = {
@@ -932,7 +906,7 @@ describe('DocumentUpdaterHandler', function() {
             }
           ]
 
-          return this.handler.updateProjectStructure(
+          this.handler.updateProjectStructure(
             this.project_id,
             this.projectHistoryId,
             this.user_id,
@@ -951,12 +925,13 @@ describe('DocumentUpdaterHandler', function() {
                   }
                 })
                 .should.equal(true)
-              return done()
+              done()
             }
           )
-        }))
+        })
+      })
 
-      describe('when an entity has been deleted', () =>
+      describe('when an entity has been deleted', function() {
         it('should end the structure update to the document updater', function(done) {
           this.docId = new ObjectId()
           this.changes = {
@@ -974,7 +949,7 @@ describe('DocumentUpdaterHandler', function() {
             }
           ]
 
-          return this.handler.updateProjectStructure(
+          this.handler.updateProjectStructure(
             this.project_id,
             this.projectHistoryId,
             this.user_id,
@@ -993,12 +968,13 @@ describe('DocumentUpdaterHandler', function() {
                   }
                 })
                 .should.equal(true)
-              return done()
+              done()
             }
           )
-        }))
+        })
+      })
 
-      return describe('when the project version is missing', () =>
+      describe('when the project version is missing', function() {
         it('should call the callback with an error', function() {
           this.docId = new ObjectId()
           this.changes = {
@@ -1006,14 +982,6 @@ describe('DocumentUpdaterHandler', function() {
               { path: '/foo', docLines: 'a\nb', doc: { _id: this.docId } }
             ]
           }
-
-          const docUpdates = [
-            {
-              id: this.docId.toString(),
-              pathname: '/foo',
-              newPathname: ''
-            }
-          ]
 
           this.handler.updateProjectStructure(
             this.project_id,
@@ -1025,10 +993,11 @@ describe('DocumentUpdaterHandler', function() {
 
           this.callback.calledWith(new Error()).should.equal(true)
           const firstCallArgs = this.callback.args[0]
-          return firstCallArgs[0].message.should.equal(
+          firstCallArgs[0].message.should.equal(
             'did not receive project version in changes'
           )
-        }))
+        })
+      })
     })
   })
 })

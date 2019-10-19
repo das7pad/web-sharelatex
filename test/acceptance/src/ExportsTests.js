@@ -23,7 +23,7 @@ const MockProjectHistoryApi = require('./helpers/MockProjectHistoryApi')
 const MockV1Api = require('./helpers/MockV1Api')
 
 describe('Exports', function() {
-  before(function(done) {
+  beforeEach(function(done) {
     this.brand_variation_id = '18'
     this.owner = new User()
     return this.owner.login(error => {
@@ -44,7 +44,7 @@ describe('Exports', function() {
     })
   })
 
-  return describe('exporting a project', function() {
+  describe('exporting a project', function() {
     beforeEach(function(done) {
       this.version = Math.floor(Math.random() * 10000)
       MockProjectHistoryApi.setProjectVersion(this.project_id, this.version)
@@ -101,7 +101,7 @@ describe('Exports', function() {
       return done()
     })
 
-    return it('should have returned the export ID provided by v1', function(done) {
+    it('should have returned the export ID provided by v1', function(done) {
       expect(this.exportResponseBody.export_v1_id).to.equal(this.export_id)
       return done()
     })

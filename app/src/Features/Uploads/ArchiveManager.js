@@ -12,20 +12,24 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-let ArchiveManager
 const logger = require('logger-sharelatex')
 const metrics = require('metrics-sharelatex')
 const fs = require('fs')
+const { promisify } = require('util')
 const Path = require('path')
 const fse = require('fs-extra')
 const yauzl = require('yauzl')
 const Settings = require('settings-sharelatex')
-const Errors = require('../Errors/Errors')
+const {
+  InvalidZipFileError,
+  EmptyZipFileError,
+  ZipContentsTooLargeError
+} = require('./ArchiveErrors')
 const _ = require('underscore')
 
 const ONE_MEG = 1024 * 1024
 
-module.exports = ArchiveManager = {
+const ArchiveManager = {
   _isZipTooLarge(source, callback) {
     if (callback == null) {
       callback = function(err, isTooLarge) {}
@@ -35,7 +39,7 @@ module.exports = ArchiveManager = {
     let totalSizeInBytes = null
     return yauzl.open(source, { lazyEntries: true }, function(err, zipfile) {
       if (err != null) {
-        return callback(new Errors.InvalidError('invalid_zip_file'))
+        return callback(new InvalidZipFileError().withCause(err))
       }
 
       if (
@@ -57,8 +61,13 @@ module.exports = ArchiveManager = {
       // no more entries to read
       return zipfile.on('end', function() {
         if (totalSizeInBytes == null || isNaN(totalSizeInBytes)) {
-          logger.err({ source, totalSizeInBytes }, 'error getting bytes of zip')
-          return callback(new Error('error getting bytes of zip'))
+          logger.warn(
+            { source, totalSizeInBytes },
+            'error getting bytes of zip'
+          )
+          return callback(
+            new InvalidZipFileError({ info: { totalSizeInBytes } })
+          )
         }
         const isTooLarge = totalSizeInBytes > ONE_MEG * 300
         return callback(null, isTooLarge)
@@ -136,6 +145,8 @@ module.exports = ArchiveManager = {
       zipfile.on('error', callback)
       // read all the entries
       zipfile.readEntry()
+
+      let entryFileCount = 0
       zipfile.on('entry', function(entry) {
         logger.log(
           { source, fileName: entry.fileName },
@@ -158,13 +169,14 @@ module.exports = ArchiveManager = {
               destFile,
               function(err) {
                 if (err != null) {
-                  logger.error(
+                  logger.warn(
                     { err, source, destFile },
                     'error unzipping file entry'
                   )
                   zipfile.close() // bail out, stop reading file entries
                   return callback(err)
                 } else {
+                  entryFileCount++
                   return zipfile.readEntry()
                 }
               }
@@ -176,7 +188,13 @@ module.exports = ArchiveManager = {
         })
       })
       // no more entries to read
-      return zipfile.on('end', callback)
+      return zipfile.on('end', () => {
+        if (entryFileCount > 0) {
+          callback()
+        } else {
+          callback(new EmptyZipFileError())
+        }
+      })
     })
   },
 
@@ -191,12 +209,12 @@ module.exports = ArchiveManager = {
 
     return ArchiveManager._isZipTooLarge(source, function(err, isTooLarge) {
       if (err != null) {
-        logger.err({ err }, 'error checking size of zip file')
+        logger.warn({ err }, 'error checking size of zip file')
         return callback(err)
       }
 
       if (isTooLarge) {
-        return callback(new Errors.InvalidError('zip_contents_too_large'))
+        return callback(new ZipContentsTooLargeError())
       }
 
       const timer = new metrics.Timer('unzipDirectory')
@@ -207,7 +225,7 @@ module.exports = ArchiveManager = {
       ) {
         timer.done()
         if (err != null) {
-          logger.error({ err, source, destination }, 'unzip failed')
+          logger.warn({ err, source, destination }, 'unzip failed')
           return callback(err)
         } else {
           return callback()
@@ -242,3 +260,11 @@ module.exports = ArchiveManager = {
     })
   }
 }
+
+const promises = {
+  extractZipArchive: promisify(ArchiveManager.extractZipArchive)
+}
+
+ArchiveManager.promises = promises
+
+module.exports = ArchiveManager

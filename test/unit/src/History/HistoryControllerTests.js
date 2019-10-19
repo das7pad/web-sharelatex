@@ -26,11 +26,15 @@ describe('HistoryController', function() {
       getLoggedInUserId: sinon.stub().returns(this.user_id)
     }
     this.HistoryController = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         request: (this.request = sinon.stub()),
         'settings-sharelatex': (this.settings = {}),
         'logger-sharelatex': (this.logger = {
           log: sinon.stub(),
+          warn: sinon.stub(),
           error: sinon.stub()
         }),
         '../Authentication/AuthenticationController': this
@@ -74,12 +78,12 @@ describe('HistoryController', function() {
         )
       })
 
-      return it('should set the flag for project history to true', function() {
+      it('should set the flag for project history to true', function() {
         return this.req.useProjectHistory.should.equal(true)
       })
     })
 
-    return describe('for any other project ', function() {
+    describe('for any other project ', function() {
       beforeEach(function() {
         this.ProjectDetailsHandler.getDetails = sinon
           .stub()
@@ -91,7 +95,7 @@ describe('HistoryController', function() {
         )
       })
 
-      return it('should not set the flag for project history to false', function() {
+      it('should not set the flag for project history to false', function() {
         return this.req.useProjectHistory.should.equal(false)
       })
     })
@@ -140,7 +144,7 @@ describe('HistoryController', function() {
           .should.equal(true)
       })
 
-      return it('should pipe the response to the client', function() {
+      it('should pipe the response to the client', function() {
         return this.proxy.pipe.calledWith(this.res).should.equal(true)
       })
     })
@@ -173,12 +177,12 @@ describe('HistoryController', function() {
           .should.equal(true)
       })
 
-      return it('should pipe the response to the client', function() {
+      it('should pipe the response to the client', function() {
         return this.proxy.pipe.calledWith(this.res).should.equal(true)
       })
     })
 
-    return describe('with an error', function() {
+    describe('with an error', function() {
       beforeEach(function() {
         this.HistoryController.proxyToHistoryApi(this.req, this.res, this.next)
         return this.proxy.events['error'].call(
@@ -187,7 +191,7 @@ describe('HistoryController', function() {
         )
       })
 
-      return it('should pass the error up the call chain', function() {
+      it('should pass the error up the call chain', function() {
         return this.next.calledWith(this.error).should.equal(true)
       })
     })
@@ -239,12 +243,12 @@ describe('HistoryController', function() {
           .should.equal(true)
       })
 
-      return it('should return the data with users to the client', function() {
+      it('should return the data with users to the client', function() {
         return this.res.json.calledWith(this.data_with_users).should.equal(true)
       })
     })
 
-    return describe('for a project without the project history flag', function() {
+    describe('for a project without the project history flag', function() {
       beforeEach(function() {
         this.req.useProjectHistory = false
         return this.HistoryController.proxyToHistoryApiAndInjectUserDetails(
@@ -279,7 +283,7 @@ describe('HistoryController', function() {
           .should.equal(true)
       })
 
-      return it('should return the data with users to the client', function() {
+      it('should return the data with users to the client', function() {
         return this.res.json.calledWith(this.data_with_users).should.equal(true)
       })
     })
@@ -307,12 +311,12 @@ describe('HistoryController', function() {
         .should.equal(false)
     })
 
-    return it('should not return the data with users to the client', function() {
+    it('should not return the data with users to the client', function() {
       return this.res.json.calledWith(this.data_with_users).should.equal(false)
     })
   })
 
-  return describe('resyncProjectHistory', function() {
+  describe('resyncProjectHistory', function() {
     describe('for a project without project-history enabled', function() {
       beforeEach(function() {
         this.project_id = 'mock-project-id'
@@ -332,12 +336,12 @@ describe('HistoryController', function() {
         )
       })
 
-      return it('response with a 404', function() {
+      it('response with a 404', function() {
         return this.res.sendStatus.calledWith(404).should.equal(true)
       })
     })
 
-    return describe('for a project with project-history enabled', function() {
+    describe('for a project with project-history enabled', function() {
       beforeEach(function() {
         this.project_id = 'mock-project-id'
         this.req = { params: { Project_id: this.project_id } }
@@ -361,7 +365,7 @@ describe('HistoryController', function() {
           .should.equal(true)
       })
 
-      return it('responds with a 204', function() {
+      it('responds with a 204', function() {
         return this.res.sendStatus.calledWith(204).should.equal(true)
       })
     })

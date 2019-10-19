@@ -1,131 +1,118 @@
-/* eslint-disable
-    camelcase,
-    handle-callback-err,
-    max-len,
-    no-unused-vars,
-    standard/no-callback-literal,
-*/
-// TODO: This file was created by bulk-decaffeinate.
-// Fix any style issues and re-enable lint.
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-let UserDeleter
+const { callbackify } = require('util')
+const logger = require('logger-sharelatex')
+const moment = require('moment')
 const { User } = require('../../models/User')
+const { DeletedUser } = require('../../models/DeletedUser')
 const NewsletterManager = require('../Newsletter/NewsletterManager')
 const ProjectDeleter = require('../Project/ProjectDeleter')
-const logger = require('logger-sharelatex')
 const SubscriptionHandler = require('../Subscription/SubscriptionHandler')
 const SubscriptionUpdater = require('../Subscription/SubscriptionUpdater')
 const SubscriptionLocator = require('../Subscription/SubscriptionLocator')
 const UserMembershipsHandler = require('../UserMembership/UserMembershipsHandler')
-const async = require('async')
 const InstitutionsAPI = require('../Institutions/InstitutionsAPI')
 const Errors = require('../Errors/Errors')
-const { db, ObjectId } = require('../../infrastructure/mongojs')
 
-module.exports = UserDeleter = {
-  softDeleteUserForMigration(user_id, callback) {
-    if (callback == null) {
-      callback = function(err) {}
-    }
-    if (user_id == null) {
-      logger.err('user_id is null when trying to delete user')
-      return callback(new Error('no user_id'))
-    }
-    return User.findById(user_id, function(err, user) {
-      if (err != null) {
-        return callback(err)
-      }
-      if (user == null) {
-        return callback(new Errors.NotFoundError('user not found'))
-      }
-      return async.series(
-        [
-          cb => UserDeleter._ensureCanDeleteUser(user, cb),
-          cb => UserDeleter._cleanupUser(user, cb),
-          cb => ProjectDeleter.deleteUsersProjects(user._id, cb),
-          function(cb) {
-            user.deletedAt = new Date()
-            return db.usersDeletedByMigration.insert(user, cb)
-          },
-          cb => user.remove(cb)
-        ],
-        callback
-      )
-    })
-  },
+module.exports = {
+  deleteUser: callbackify(deleteUser),
+  expireDeletedUser: callbackify(expireDeletedUser),
+  ensureCanDeleteUser: callbackify(ensureCanDeleteUser),
+  expireDeletedUsersAfterDuration: callbackify(expireDeletedUsersAfterDuration),
 
-  deleteUser(user_id, callback) {
-    if (callback == null) {
-      callback = function() {}
-    }
-    if (user_id == null) {
-      logger.err('user_id is null when trying to delete user')
-      return callback('no user_id')
-    }
-    return User.findById(user_id, function(err, user) {
-      if (err != null) {
-        return callback(err)
-      }
-      logger.log({ user }, 'deleting user')
-      return async.series(
-        [
-          cb => UserDeleter._ensureCanDeleteUser(user, cb),
-          cb => UserDeleter._cleanupUser(user, cb),
-          cb => ProjectDeleter.deleteUsersProjects(user._id, cb),
-          cb => user.remove(cb)
-        ],
-        function(err) {
-          if (err != null) {
-            logger.err(
-              { err, user_id },
-              'something went wrong deleteing the user'
-            )
-          }
-          return callback(err)
-        }
-      )
-    })
-  },
-
-  _cleanupUser(user, callback) {
-    if (user == null) {
-      return callback(new Error('no user supplied'))
-    }
-    return async.series(
-      [
-        cb =>
-          NewsletterManager.unsubscribe(user, function(err) {
-            logger.err('Failed to unsubscribe user from newsletter', {
-              user_id: user._id,
-              error: err
-            })
-            return cb()
-          }),
-        cb => SubscriptionHandler.cancelSubscription(user, cb),
-        cb => InstitutionsAPI.deleteAffiliations(user._id, cb),
-        cb => SubscriptionUpdater.removeUserFromAllGroups(user._id, cb),
-        cb => UserMembershipsHandler.removeUserFromAllEntities(user._id, cb)
-      ],
-      callback
-    )
-  },
-
-  _ensureCanDeleteUser(user, callback) {
-    return SubscriptionLocator.getUsersSubscription(user, function(
-      error,
-      subscription
-    ) {
-      if (subscription != null) {
-        if (!error) {
-          error = new Errors.SubscriptionAdminDeletionError()
-        }
-      }
-      return callback(error)
-    })
+  promises: {
+    deleteUser: deleteUser,
+    expireDeletedUser: expireDeletedUser,
+    ensureCanDeleteUser: ensureCanDeleteUser,
+    expireDeletedUsersAfterDuration: expireDeletedUsersAfterDuration
   }
+}
+
+async function deleteUser(userId, options = {}) {
+  if (!userId) {
+    logger.warn('user_id is null when trying to delete user')
+    throw new Error('no user_id')
+  }
+
+  try {
+    let user = await User.findById(userId).exec()
+    logger.log({ user }, 'deleting user')
+
+    await ensureCanDeleteUser(user)
+    await _cleanupUser(user)
+    await _createDeletedUser(user, options)
+    await ProjectDeleter.promises.deleteUsersProjects(user._id)
+    await User.deleteOne({ _id: userId }).exec()
+  } catch (error) {
+    logger.warn({ error, userId }, 'something went wrong deleting the user')
+    throw error
+  }
+}
+
+async function expireDeletedUser(userId) {
+  let deletedUser = await DeletedUser.findOne({
+    'deleterData.deletedUserId': userId
+  }).exec()
+
+  deletedUser.user = undefined
+  deletedUser.deleterData.deleterIpAddress = undefined
+  await deletedUser.save()
+}
+
+async function expireDeletedUsersAfterDuration() {
+  const DURATION = 90
+  let deletedUsers = await DeletedUser.find({
+    'deleterData.deletedAt': {
+      $lt: new Date(moment().subtract(DURATION, 'days'))
+    },
+    user: {
+      $ne: null
+    }
+  }).exec()
+
+  if (deletedUsers.length === 0) {
+    logger.log('No deleted users were found for duration')
+    return
+  }
+
+  for (let i = 0; i < deletedUsers.length; i++) {
+    await expireDeletedUser(deletedUsers[i].deleterData.deletedUserId)
+  }
+}
+
+async function ensureCanDeleteUser(user) {
+  const subscription = await SubscriptionLocator.promises.getUsersSubscription(
+    user
+  )
+  if (subscription) {
+    throw new Errors.SubscriptionAdminDeletionError({})
+  }
+}
+
+async function _createDeletedUser(user, options) {
+  await DeletedUser.create({
+    user: user,
+    deleterData: {
+      deletedAt: new Date(),
+      deleterId: options.deleterUser ? options.deleterUser._id : undefined,
+      deleterIpAddress: options.ipAddress,
+      deletedUserId: user._id,
+      deletedUserLastLoggedIn: user.lastLoggedIn,
+      deletedUserSignUpDate: user.signUpDate,
+      deletedUserLoginCount: user.loginCount,
+      deletedUserReferralId: user.referal_id,
+      deletedUserReferredUsers: user.refered_users,
+      deletedUserReferredUserCount: user.refered_user_count,
+      deletedUserOverleafId: user.overleaf ? user.overleaf.id : undefined
+    }
+  })
+}
+
+async function _cleanupUser(user) {
+  if (user == null) {
+    throw new Error('no user supplied')
+  }
+  await NewsletterManager.promises.unsubscribe(user, { delete: true })
+  await SubscriptionHandler.promises.cancelSubscription(user)
+  await InstitutionsAPI.promises.deleteAffiliations(user._id)
+  await SubscriptionUpdater.promises.removeUserFromAllGroups(user._id)
+  await UserMembershipsHandler.promises.removeUserFromAllEntities(user._id)
 }

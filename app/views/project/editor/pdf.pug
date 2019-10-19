@@ -1,5 +1,5 @@
 div.full-size.pdf(ng-controller="PdfController")
-	.toolbar.toolbar-pdf(ng-class="{ 'uncompiled-changes': uncompiledChanges && !autoCompileLintingError }")
+	.toolbar.toolbar-pdf(ng-class="{ 'changes-to-autocompile': changesToAutoCompile && !autoCompileLintingError }")
 		.btn-group.btn-recompile-group#recompile(
 			dropdown,
 			tooltip-html="'"+translate('recompile_pdf')+" <span class=\"keyboard-shortcut\">({{modifierKey}} + Enter)</span>'"
@@ -93,7 +93,7 @@ div.full-size.pdf(ng-controller="PdfController")
 			
 		.toolbar-right
 			span.auto-compile-status.small(
-				ng-show="uncompiledChanges && !compiling && !autoCompileLintingError"
+				ng-show="changesToAutoCompile && !compiling && !autoCompileLintingError"
 			) #{translate('uncompiled_changes')}
 			span.auto-compile-status.auto-compile-error.small(
 				ng-show="autoCompileLintingError"
@@ -312,11 +312,11 @@ div.full-size.pdf(ng-controller="PdfController")
 			if settings.enableSubscriptions
 				.alert.alert-success(ng-show="pdf.timedout && !hasPremiumCompile")
 					p(ng-if="project.owner._id == user.id")
-						strong #{translate("upgrade_for_faster_compiles")}
+						strong #{translate("upgrade_for_longer_compiles")}
 					p(ng-if="project.owner._id != user.id")
-						strong #{translate("ask_proj_owner_to_upgrade_for_faster_compiles")}
+						strong #{translate("ask_proj_owner_to_upgrade_for_longer_compiles")}
 					p #{translate("free_accounts_have_timeout_upgrade_to_increase")}
-					p Plus:
+					p #{translate("plus_upgraded_accounts_receive")}:
 					div
 						ul.list-unstyled
 							li

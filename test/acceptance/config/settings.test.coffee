@@ -141,6 +141,19 @@ module.exports =
 		},
 		'/redirect/qs': '/destination/qs'
 		'/docs_v1': {
-			authWithV1: true
 			url: '/docs'
 		}
+
+	oauthProviders:
+		'provider': {
+			name: 'provider'
+		},
+		'collabratec': {
+			name: 'collabratec'
+		}
+		'google': {
+			name: 'google'
+		},
+  # setting to true since many features are enabled/disabled after availability of this
+  # property (check Features.js)
+	overleaf: true

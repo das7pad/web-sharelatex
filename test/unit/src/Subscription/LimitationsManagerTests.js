@@ -50,12 +50,15 @@ describe('LimitationsManager', function() {
     }
 
     return (this.LimitationsManager = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         '../Project/ProjectGetter': this.ProjectGetter,
         '../User/UserGetter': this.UserGetter,
         './SubscriptionLocator': this.SubscriptionLocator,
         'settings-sharelatex': (this.Settings = {}),
-        '../Collaborators/CollaboratorsHandler': (this.CollaboratorsHandler = {}),
+        '../Collaborators/CollaboratorsGetter': (this.CollaboratorsGetter = {}),
         '../Collaborators/CollaboratorsInviteHandler': (this.CollaboratorsInviteHandler = {}),
         './V1SubscriptionManager': (this.V1SubscriptionManager = {}),
         'logger-sharelatex': {
@@ -78,14 +81,14 @@ describe('LimitationsManager', function() {
         )
       })
 
-      return it('should return the default number', function() {
+      it('should return the default number', function() {
         return this.callback
           .calledWith(null, this.Settings.defaultFeatures.collaborators)
           .should.equal(true)
       })
     })
 
-    return describe('when the project is owned by a user with a subscription', function() {
+    describe('when the project is owned by a user with a subscription', function() {
       beforeEach(function() {
         this.project.owner_ref = this.user_id
         this.user.features = { collaborators: 21 }
@@ -96,7 +99,7 @@ describe('LimitationsManager', function() {
         )
       })
 
-      return it('should return the number of collaborators the user is allowed', function() {
+      it('should return the number of collaborators the user is allowed', function() {
         return this.callback
           .calledWith(null, this.user.features.collaborators)
           .should.equal(true)
@@ -116,14 +119,14 @@ describe('LimitationsManager', function() {
         )
       })
 
-      return it('should return the default number', function() {
+      it('should return the default number', function() {
         return this.callback
           .calledWith(null, this.Settings.defaultFeatures.collaborators)
           .should.equal(true)
       })
     })
 
-    return describe('when the user has features', function() {
+    describe('when the user has features', function() {
       beforeEach(function() {
         this.user.features = { collaborators: 21 }
         this.callback = sinon.stub()
@@ -133,7 +136,7 @@ describe('LimitationsManager', function() {
         )
       })
 
-      return it('should return the number of collaborators the user is allowed', function() {
+      it('should return the number of collaborators the user is allowed', function() {
         return this.callback
           .calledWith(null, this.user.features.collaborators)
           .should.equal(true)
@@ -147,7 +150,7 @@ describe('LimitationsManager', function() {
         this.current_number = 1
         this.allowed_number = 2
         this.invite_count = 0
-        this.CollaboratorsHandler.getInvitedCollaboratorCount = (
+        this.CollaboratorsGetter.getInvitedCollaboratorCount = (
           project_id,
           callback
         ) => callback(null, this.current_number)
@@ -170,7 +173,7 @@ describe('LimitationsManager', function() {
         )
       })
 
-      return it('should return true', function() {
+      it('should return true', function() {
         return this.callback.calledWith(null, true).should.equal(true)
       })
     })
@@ -180,7 +183,7 @@ describe('LimitationsManager', function() {
         this.current_number = 1
         this.allowed_number = 4
         this.invite_count = 1
-        this.CollaboratorsHandler.getInvitedCollaboratorCount = (
+        this.CollaboratorsGetter.getInvitedCollaboratorCount = (
           project_id,
           callback
         ) => callback(null, this.current_number)
@@ -203,7 +206,7 @@ describe('LimitationsManager', function() {
         )
       })
 
-      return it('should return true', function() {
+      it('should return true', function() {
         return this.callback.calledWith(null, true).should.equal(true)
       })
     })
@@ -213,7 +216,7 @@ describe('LimitationsManager', function() {
         this.current_number = 1
         this.allowed_number = 2
         this.invite_count = 0
-        this.CollaboratorsHandler.getInvitedCollaboratorCount = (
+        this.CollaboratorsGetter.getInvitedCollaboratorCount = (
           project_id,
           callback
         ) => callback(null, this.current_number)
@@ -236,7 +239,7 @@ describe('LimitationsManager', function() {
         )
       })
 
-      return it('should return false', function() {
+      it('should return false', function() {
         return this.callback.calledWith(null, false).should.equal(true)
       })
     })
@@ -246,7 +249,7 @@ describe('LimitationsManager', function() {
         this.current_number = 3
         this.allowed_number = 2
         this.invite_count = 0
-        this.CollaboratorsHandler.getInvitedCollaboratorCount = (
+        this.CollaboratorsGetter.getInvitedCollaboratorCount = (
           project_id,
           callback
         ) => callback(null, this.current_number)
@@ -269,7 +272,7 @@ describe('LimitationsManager', function() {
         )
       })
 
-      return it('should return false', function() {
+      it('should return false', function() {
         return this.callback.calledWith(null, false).should.equal(true)
       })
     })
@@ -279,7 +282,7 @@ describe('LimitationsManager', function() {
         this.current_number = 100
         this.allowed_number = -1
         this.invite_count = 0
-        this.CollaboratorsHandler.getInvitedCollaboratorCount = (
+        this.CollaboratorsGetter.getInvitedCollaboratorCount = (
           project_id,
           callback
         ) => callback(null, this.current_number)
@@ -302,7 +305,7 @@ describe('LimitationsManager', function() {
         )
       })
 
-      return it('should return true', function() {
+      it('should return true', function() {
         return this.callback.calledWith(null, true).should.equal(true)
       })
     })
@@ -312,7 +315,7 @@ describe('LimitationsManager', function() {
         this.current_number = 0
         this.allowed_number = 2
         this.invite_count = 2
-        this.CollaboratorsHandler.getInvitedCollaboratorCount = (
+        this.CollaboratorsGetter.getInvitedCollaboratorCount = (
           project_id,
           callback
         ) => callback(null, this.current_number)
@@ -335,17 +338,17 @@ describe('LimitationsManager', function() {
         )
       })
 
-      return it('should return false', function() {
+      it('should return false', function() {
         return this.callback.calledWith(null, false).should.equal(true)
       })
     })
 
-    return describe('when the project has more invites and collaborators than allowed', function() {
+    describe('when the project has more invites and collaborators than allowed', function() {
       beforeEach(function() {
         this.current_number = 1
         this.allowed_number = 2
         this.invite_count = 1
-        this.CollaboratorsHandler.getInvitedCollaboratorCount = (
+        this.CollaboratorsGetter.getInvitedCollaboratorCount = (
           project_id,
           callback
         ) => callback(null, this.current_number)
@@ -368,7 +371,7 @@ describe('LimitationsManager', function() {
         )
       })
 
-      return it('should return false', function() {
+      it('should return false', function() {
         return this.callback.calledWith(null, false).should.equal(true)
       })
     })
@@ -383,36 +386,36 @@ describe('LimitationsManager', function() {
       this.SubscriptionLocator.getUsersSubscription.callsArgWith(1, null, {
         recurlySubscription_id: '1234'
       })
-      return this.LimitationsManager.userHasV2Subscription(this.user, function(
-        err,
-        hasSubscription
-      ) {
-        hasSubscription.should.equal(true)
-        return done()
-      })
+      return this.LimitationsManager.userHasV2Subscription(
+        this.user,
+        (err, hasSubscription) => {
+          hasSubscription.should.equal(true)
+          return done()
+        }
+      )
     })
 
     it('should return false if the recurly token is not set', function(done) {
       this.SubscriptionLocator.getUsersSubscription.callsArgWith(1, null, {})
       this.subscription = {}
-      return this.LimitationsManager.userHasV2Subscription(this.user, function(
-        err,
-        hasSubscription
-      ) {
-        hasSubscription.should.equal(false)
-        return done()
-      })
+      return this.LimitationsManager.userHasV2Subscription(
+        this.user,
+        (err, hasSubscription) => {
+          hasSubscription.should.equal(false)
+          return done()
+        }
+      )
     })
 
     it('should return false if the subscription is undefined', function(done) {
       this.SubscriptionLocator.getUsersSubscription.callsArgWith(1)
-      return this.LimitationsManager.userHasV2Subscription(this.user, function(
-        err,
-        hasSubscription
-      ) {
-        hasSubscription.should.equal(false)
-        return done()
-      })
+      return this.LimitationsManager.userHasV2Subscription(
+        this.user,
+        (err, hasSubscription) => {
+          hasSubscription.should.equal(false)
+          return done()
+        }
+      )
     })
 
     it('should return the subscription', function(done) {
@@ -422,17 +425,16 @@ describe('LimitationsManager', function() {
         null,
         stubbedSubscription
       )
-      return this.LimitationsManager.userHasV2Subscription(this.user, function(
-        err,
-        hasSubOrIsGroupMember,
-        subscription
-      ) {
-        subscription.should.deep.equal(stubbedSubscription)
-        return done()
-      })
+      return this.LimitationsManager.userHasV2Subscription(
+        this.user,
+        (err, hasSubOrIsGroupMember, subscription) => {
+          subscription.should.deep.equal(stubbedSubscription)
+          return done()
+        }
+      )
     })
 
-    return describe('when user has a custom account', function() {
+    describe('when user has a custom account', function() {
       beforeEach(function() {
         this.fakeSubscription = { customAccount: true }
         return this.SubscriptionLocator.getUsersSubscription.callsArgWith(
@@ -445,14 +447,14 @@ describe('LimitationsManager', function() {
       it('should return true', function(done) {
         return this.LimitationsManager.userHasV2Subscription(
           this.user,
-          function(err, hasSubscription, subscription) {
+          (err, hasSubscription, subscription) => {
             hasSubscription.should.equal(true)
             return done()
           }
         )
       })
 
-      return it('should return the subscription', function(done) {
+      it('should return the subscription', function(done) {
         return this.LimitationsManager.userHasV2Subscription(
           this.user,
           (err, hasSubscription, subscription) => {
@@ -473,14 +475,14 @@ describe('LimitationsManager', function() {
       this.SubscriptionLocator.getMemberSubscriptions.callsArgWith(1, null, [])
       return this.LimitationsManager.userIsMemberOfGroupSubscription(
         this.user,
-        function(err, isMember) {
+        (err, isMember) => {
           isMember.should.equal(false)
           return done()
         }
       )
     })
 
-    return it('should return true if there are no groups subcriptions', function(done) {
+    it('should return true if there are no groups subcriptions', function(done) {
       let subscriptions
       this.SubscriptionLocator.getMemberSubscriptions.callsArgWith(
         1,
@@ -489,7 +491,7 @@ describe('LimitationsManager', function() {
       )
       return this.LimitationsManager.userIsMemberOfGroupSubscription(
         this.user,
-        function(err, isMember, retSubscriptions) {
+        (err, isMember, retSubscriptions) => {
           isMember.should.equal(true)
           retSubscriptions.should.equal(subscriptions)
           return done()
@@ -515,55 +517,55 @@ describe('LimitationsManager', function() {
       this.LimitationsManager.userIsMemberOfGroupSubscription = sinon
         .stub()
         .yields(null, true)
-      return this.LimitationsManager.hasPaidSubscription(this.user, function(
-        err,
-        hasSubOrIsGroupMember
-      ) {
-        hasSubOrIsGroupMember.should.equal(true)
-        return done()
-      })
+      return this.LimitationsManager.hasPaidSubscription(
+        this.user,
+        (err, hasSubOrIsGroupMember) => {
+          hasSubOrIsGroupMember.should.equal(true)
+          return done()
+        }
+      )
     })
 
     it('should return true if userHasV2Subscription', function(done) {
       this.LimitationsManager.userHasV2Subscription = sinon
         .stub()
         .yields(null, true)
-      return this.LimitationsManager.hasPaidSubscription(this.user, function(
-        err,
-        hasSubOrIsGroupMember
-      ) {
-        hasSubOrIsGroupMember.should.equal(true)
-        return done()
-      })
+      return this.LimitationsManager.hasPaidSubscription(
+        this.user,
+        (err, hasSubOrIsGroupMember) => {
+          hasSubOrIsGroupMember.should.equal(true)
+          return done()
+        }
+      )
     })
 
     it('should return true if userHasV1Subscription', function(done) {
       this.LimitationsManager.userHasV1Subscription = sinon
         .stub()
         .yields(null, true)
-      return this.LimitationsManager.hasPaidSubscription(this.user, function(
-        err,
-        hasSubOrIsGroupMember
-      ) {
-        hasSubOrIsGroupMember.should.equal(true)
-        return done()
-      })
+      return this.LimitationsManager.hasPaidSubscription(
+        this.user,
+        (err, hasSubOrIsGroupMember) => {
+          hasSubOrIsGroupMember.should.equal(true)
+          return done()
+        }
+      )
     })
 
     it('should return false if none are true', function(done) {
-      return this.LimitationsManager.hasPaidSubscription(this.user, function(
-        err,
-        hasSubOrIsGroupMember
-      ) {
-        hasSubOrIsGroupMember.should.equal(false)
-        return done()
-      })
+      return this.LimitationsManager.hasPaidSubscription(
+        this.user,
+        (err, hasSubOrIsGroupMember) => {
+          hasSubOrIsGroupMember.should.equal(false)
+          return done()
+        }
+      )
     })
 
-    return it('should have userHasSubscriptionOrIsGroupMember alias', function(done) {
+    it('should have userHasSubscriptionOrIsGroupMember alias', function(done) {
       return this.LimitationsManager.userHasSubscriptionOrIsGroupMember(
         this.user,
-        function(err, hasSubOrIsGroupMember) {
+        (err, hasSubOrIsGroupMember) => {
           hasSubOrIsGroupMember.should.equal(false)
           return done()
         }
@@ -587,7 +589,7 @@ describe('LimitationsManager', function() {
         .yields(null, true)
       return this.LimitationsManager.userHasV1OrV2Subscription(
         this.user,
-        function(err, hasSub) {
+        (err, hasSub) => {
           hasSub.should.equal(true)
           return done()
         }
@@ -600,17 +602,17 @@ describe('LimitationsManager', function() {
         .yields(null, true)
       return this.LimitationsManager.userHasV1OrV2Subscription(
         this.user,
-        function(err, hasSub) {
+        (err, hasSub) => {
           hasSub.should.equal(true)
           return done()
         }
       )
     })
 
-    return it('should return false if none are true', function(done) {
+    it('should return false if none are true', function(done) {
       return this.LimitationsManager.userHasV1OrV2Subscription(
         this.user,
-        function(err, hasSub) {
+        (err, hasSub) => {
           hasSub.should.equal(false)
           return done()
         }
@@ -638,7 +640,7 @@ describe('LimitationsManager', function() {
       )
       return this.LimitationsManager.hasGroupMembersLimitReached(
         this.subscriptionId,
-        function(err, limitReached) {
+        (err, limitReached) => {
           limitReached.should.equal(true)
           return done()
         }
@@ -654,14 +656,14 @@ describe('LimitationsManager', function() {
       )
       return this.LimitationsManager.hasGroupMembersLimitReached(
         this.subscriptionId,
-        function(err, limitReached) {
+        (err, limitReached) => {
           limitReached.should.equal(false)
           return done()
         }
       )
     })
 
-    return it('should return true if the limit has been exceded (including members and invites)', function(done) {
+    it('should return true if the limit has been exceded (including members and invites)', function(done) {
       this.subscription.membersLimit = 2
       this.SubscriptionLocator.getSubscription.callsArgWith(
         1,
@@ -670,7 +672,7 @@ describe('LimitationsManager', function() {
       )
       return this.LimitationsManager.hasGroupMembersLimitReached(
         this.subscriptionId,
-        function(err, limitReached) {
+        (err, limitReached) => {
           limitReached.should.equal(true)
           return done()
         }
@@ -678,7 +680,7 @@ describe('LimitationsManager', function() {
     })
   })
 
-  return describe('userHasV1Subscription', function() {
+  describe('userHasV1Subscription', function() {
     it('should return true if v1 returns has_subscription = true', function(done) {
       this.V1SubscriptionManager.getSubscriptionsFromV1 = sinon
         .stub()
@@ -711,7 +713,7 @@ describe('LimitationsManager', function() {
       )
     })
 
-    return it('should return false if v1 returns nothing', function(done) {
+    it('should return false if v1 returns nothing', function(done) {
       this.V1SubscriptionManager.getSubscriptionsFromV1 = sinon
         .stub()
         .yields(null, null)

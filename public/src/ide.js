@@ -43,7 +43,6 @@ define([
   'ide/directives/layout',
   'ide/directives/validFile',
   'ide/services/ide',
-  '__IDE_CLIENTSIDE_INCLUDES__',
   'analytics/AbTestingManager',
   'directives/focus',
   'directives/fineUpload',
@@ -59,7 +58,9 @@ define([
   'services/wait-for',
   'filters/formatDate',
   'main/event',
-  'main/account-upgrade'
+  'main/account-upgrade',
+  'main/exposed-settings',
+  '../../modules/modules-ide.js'
 ], function(
   App,
   FileTreeManager,
@@ -81,7 +82,6 @@ define([
     $timeout,
     ide,
     localStorage,
-    sixpack,
     event_tracking,
     metadata,
     $q,
@@ -126,6 +126,7 @@ define([
     $scope.settings = window.userSettings
     $scope.anonymous = window.anonymous
     $scope.isTokenMember = window.isTokenMember
+    $scope.isRestrictedTokenMember = window.isRestrictedTokenMember
 
     $scope.cobranding = {
       isProjectCobranded: CobrandingDataService.isProjectCobranded(),

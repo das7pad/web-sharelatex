@@ -20,6 +20,7 @@ let ProjectEntityUpdateHandler, self
 const _ = require('lodash')
 const async = require('async')
 const logger = require('logger-sharelatex')
+const Settings = require('settings-sharelatex')
 const path = require('path')
 const { Doc } = require('../../models/Doc')
 const DocstoreManager = require('../Docstore/DocstoreManager')
@@ -38,6 +39,12 @@ const SafePath = require('./SafePath')
 const TpdsUpdateSender = require('../ThirdPartyDataStore/TpdsUpdateSender')
 
 const LOCK_NAMESPACE = 'sequentialProjectStructureUpdateLock'
+
+const validRootDocExtensions = Settings.validRootDocExtensions
+const validRootDocRegExp = new RegExp(
+  `^\\.(${validRootDocExtensions.join('|')})$`,
+  'i'
+)
 
 const wrapWithLock = function(methodWithoutLock) {
   // This lock is used to make sure that the project structure updates are made
@@ -128,7 +135,7 @@ module.exports = ProjectEntityUpdateHandler = self = {
               fileRef._id,
               function(err, fileStoreUrl) {
                 if (err != null) {
-                  logger.err(
+                  logger.warn(
                     {
                       err,
                       project_id,
@@ -182,7 +189,7 @@ module.exports = ProjectEntityUpdateHandler = self = {
         'file',
         function(err, result, newProject) {
           if (err != null) {
-            logger.err(
+            logger.warn(
               { err, project_id, folder_id },
               'error putting element as part of copy'
             )
@@ -286,7 +293,7 @@ module.exports = ProjectEntityUpdateHandler = self = {
 
           if (doc == null) {
             // Do not allow an update to a doc which has never exist on this project
-            logger.error(
+            logger.warn(
               { doc_id, project_id, lines },
               'doc not found while updating doc lines'
             )
@@ -305,7 +312,7 @@ module.exports = ProjectEntityUpdateHandler = self = {
             ranges,
             function(err, modified, rev) {
               if (err != null) {
-                logger.error(
+                logger.warn(
                   { err, doc_id, project_id, lines },
                   'error sending doc to docstore'
                 )
@@ -348,11 +355,33 @@ module.exports = ProjectEntityUpdateHandler = self = {
       callback = function(error) {}
     }
     logger.log({ project_id, rootDocId: newRootDocID }, 'setting root doc')
-    return Project.update(
-      { _id: project_id },
-      { rootDoc_id: newRootDocID },
-      {},
-      callback
+    if (project_id == null || newRootDocID == null) {
+      return callback(
+        new Errors.InvalidError('missing arguments (project or doc)')
+      )
+    }
+    ProjectEntityHandler.getDocPathByProjectIdAndDocId(
+      project_id,
+      newRootDocID,
+      function(err, docPath) {
+        if (err != null) {
+          return callback(err)
+        }
+        if (ProjectEntityUpdateHandler.isPathValidForRootDoc(docPath)) {
+          return Project.update(
+            { _id: project_id },
+            { rootDoc_id: newRootDocID },
+            {},
+            callback
+          )
+        } else {
+          return callback(
+            new Errors.UnsupportedFileTypeError(
+              'invalid file extension for root doc'
+            )
+          )
+        }
+      }
     )
   },
 
@@ -379,7 +408,7 @@ module.exports = ProjectEntityUpdateHandler = self = {
       doc,
       function(err, result, project) {
         if (err != null) {
-          logger.err(
+          logger.warn(
             {
               err,
               project_id,
@@ -546,7 +575,7 @@ module.exports = ProjectEntityUpdateHandler = self = {
       fsPath,
       function(err, fileStoreUrl, fileRef) {
         if (err != null) {
-          logger.err(
+          logger.warn(
             { err, project_id, folder_id, file_name: fileName, fileRef },
             'error uploading image to s3'
           )
@@ -567,7 +596,7 @@ module.exports = ProjectEntityUpdateHandler = self = {
       fileRef,
       function(err, result, project) {
         if (err != null) {
-          logger.err(
+          logger.warn(
             { err, project_id, folder_id, file_name: fileRef.name, fileRef },
             'error adding file with project'
           )
@@ -1129,8 +1158,8 @@ module.exports = ProjectEntityUpdateHandler = self = {
     }
     logger.log({ entity_id, entityType, project_id }, 'deleting project entity')
     if (entityType == null) {
-      logger.err({ err: 'No entityType set', project_id, entity_id })
-      return callback('No entityType set')
+      logger.warn({ err: 'No entityType set', project_id, entity_id })
+      return callback(new Error('No entityType set'))
     }
     entityType = entityType.toLowerCase()
     return ProjectEntityMongoUpdateHandler.deleteEntity(
@@ -1260,8 +1289,8 @@ module.exports = ProjectEntityUpdateHandler = self = {
       'moving entity'
     )
     if (entityType == null) {
-      logger.err({ err: 'No entityType set', project_id, entity_id })
-      return callback('No entityType set')
+      logger.warn({ err: 'No entityType set', project_id, entity_id })
+      return callback(new Error('No entityType set'))
     }
     entityType = entityType.toLowerCase()
     return ProjectEntityMongoUpdateHandler.moveEntity(
@@ -1308,8 +1337,8 @@ module.exports = ProjectEntityUpdateHandler = self = {
     }
     logger.log({ entity_id, project_id }, `renaming ${entityType}`)
     if (entityType == null) {
-      logger.err({ err: 'No entityType set', project_id, entity_id })
-      return callback('No entityType set')
+      logger.warn({ err: 'No entityType set', project_id, entity_id })
+      return callback(new Error('No entityType set'))
     }
     entityType = entityType.toLowerCase()
 
@@ -1400,6 +1429,11 @@ module.exports = ProjectEntityUpdateHandler = self = {
       }
     )
   ),
+
+  isPathValidForRootDoc(docPath) {
+    let docExtension = path.extname(docPath)
+    return validRootDocRegExp.test(docExtension)
+  },
 
   _cleanUpEntity(
     project,

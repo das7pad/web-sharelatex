@@ -29,6 +29,8 @@ const FeaturesUpdater = require('./FeaturesUpdater')
 const planFeatures = require('./planFeatures')
 const GroupPlansData = require('./GroupPlansData')
 const V1SubscriptionManager = require('./V1SubscriptionManager')
+const SubscriptionErrors = require('./Errors')
+const HttpErrors = require('@overleaf/o-error/http')
 
 module.exports = SubscriptionController = {
   plansPage(req, res, next) {
@@ -199,10 +201,14 @@ module.exports = SubscriptionController = {
 
   createSubscription(req, res, next) {
     const user = AuthenticationController.getSessionUser(req)
-    const { recurly_token_id } = req.body
+    const recurlyTokenIds = {
+      billing: req.body.recurly_token_id,
+      threeDSecureActionResult:
+        req.body.recurly_three_d_secure_action_result_token_id
+    }
     const { subscriptionDetails } = req.body
     logger.log(
-      { recurly_token_id, user_id: user._id, subscriptionDetails },
+      { user_id: user._id, subscriptionDetails },
       'creating subscription'
     )
 
@@ -220,16 +226,23 @@ module.exports = SubscriptionController = {
       return SubscriptionHandler.createSubscription(
         user,
         subscriptionDetails,
-        recurly_token_id,
+        recurlyTokenIds,
         function(err) {
-          if (err != null) {
-            logger.err(
-              { err, user_id: user._id },
-              'something went wrong creating subscription'
-            )
-            return next(err)
+          if (!err) {
+            return res.sendStatus(201)
           }
-          return res.sendStatus(201)
+
+          if (err instanceof SubscriptionErrors.RecurlyTransactionError) {
+            return next(
+              new HttpErrors.UnprocessableEntityError({}).withCause(err)
+            )
+          }
+
+          logger.warn(
+            { err, user_id: user._id },
+            'something went wrong creating subscription'
+          )
+          next(err)
         }
       )
     })
@@ -259,7 +272,7 @@ module.exports = SubscriptionController = {
     logger.log({ user_id: user._id }, 'canceling subscription')
     return SubscriptionHandler.cancelSubscription(user, function(err) {
       if (err != null) {
-        logger.err(
+        logger.warn(
           { err, user_id: user._id },
           'something went wrong canceling subscription'
         )
@@ -283,7 +296,7 @@ module.exports = SubscriptionController = {
     logger.log({ user_id }, 'canceling v1 subscription')
     return V1SubscriptionManager.cancelV1Subscription(user_id, function(err) {
       if (err != null) {
-        logger.err(
+        logger.warn(
           { err, user_id },
           'something went wrong canceling v1 subscription'
         )
@@ -300,7 +313,7 @@ module.exports = SubscriptionController = {
     const planCode = req.body.plan_code
     if (planCode == null) {
       const err = new Error('plan_code is not defined')
-      logger.err(
+      logger.warn(
         { user_id: user._id, err, planCode, origin: _origin, body: req.body },
         '[Subscription] error in updateSubscription form'
       )
@@ -313,7 +326,7 @@ module.exports = SubscriptionController = {
       null,
       function(err) {
         if (err != null) {
-          logger.err(
+          logger.warn(
             { err, user_id: user._id },
             'something went wrong updating subscription'
           )
@@ -329,7 +342,7 @@ module.exports = SubscriptionController = {
     logger.log({ user_id: user._id }, 'reactivating subscription')
     return SubscriptionHandler.reactivateSubscription(user, function(err) {
       if (err != null) {
-        logger.err(
+        logger.warn(
           { err, user_id: user._id },
           'something went wrong reactivating subscription'
         )
@@ -342,20 +355,26 @@ module.exports = SubscriptionController = {
   recurlyCallback(req, res, next) {
     logger.log({ data: req.body }, 'received recurly callback')
     // we only care if a subscription has exipired
+    const event = Object.keys(req.body)[0]
+    const eventData = req.body[event]
     if (
-      req.body != null &&
-      req.body['expired_subscription_notification'] != null
+      [
+        'new_subscription_notification',
+        'updated_subscription_notification',
+        'expired_subscription_notification'
+      ].includes(event)
     ) {
-      const recurlySubscription =
-        req.body['expired_subscription_notification'].subscription
-      return SubscriptionHandler.recurlyCallback(recurlySubscription, function(
-        err
-      ) {
-        if (err != null) {
-          return next(err)
+      const recurlySubscription = eventData.subscription
+      return SubscriptionHandler.recurlyCallback(
+        recurlySubscription,
+        { ip: req.ip },
+        function(err) {
+          if (err != null) {
+            return next(err)
+          }
+          return res.sendStatus(200)
         }
-        return res.sendStatus(200)
-      })
+      )
     } else {
       return res.sendStatus(200)
     }
@@ -414,7 +433,7 @@ module.exports = SubscriptionController = {
       coupon_code,
       function(err) {
         if (err != null) {
-          logger.err({ err, user_id: user._id }, 'error updating subscription')
+          logger.warn({ err, user_id: user._id }, 'error updating subscription')
           return next(err)
         }
         return res.sendStatus(200)

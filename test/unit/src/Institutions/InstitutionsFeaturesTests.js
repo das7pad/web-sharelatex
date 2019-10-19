@@ -26,6 +26,9 @@ describe('InstitutionsFeatures', function() {
     this.PlansLocator = { findLocalPlanInSettings: sinon.stub() }
     this.institutionPlanCode = 'institution_plan_code'
     this.InstitutionsFeatures = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         './InstitutionsGetter': this.InstitutionsGetter,
         '../Subscription/PlansLocator': this.PlansLocator,
@@ -45,13 +48,13 @@ describe('InstitutionsFeatures', function() {
   describe('hasLicence', function() {
     it('should handle error', function(done) {
       this.InstitutionsGetter.getConfirmedInstitutions.yields(new Error('Nope'))
-      return this.InstitutionsFeatures.hasLicence(this.userId, function(
-        error,
-        hasLicence
-      ) {
-        expect(error).to.exist
-        return done()
-      })
+      return this.InstitutionsFeatures.hasLicence(
+        this.userId,
+        (error, hasLicence) => {
+          expect(error).to.exist
+          return done()
+        }
+      )
     })
 
     it('should return false if user has no confirmed affiliations', function(done) {
@@ -60,14 +63,14 @@ describe('InstitutionsFeatures', function() {
         null,
         institutions
       )
-      return this.InstitutionsFeatures.hasLicence(this.userId, function(
-        error,
-        hasLicence
-      ) {
-        expect(error).to.not.exist
-        expect(hasLicence).to.be.false
-        return done()
-      })
+      return this.InstitutionsFeatures.hasLicence(
+        this.userId,
+        (error, hasLicence) => {
+          expect(error).to.not.exist
+          expect(hasLicence).to.be.false
+          return done()
+        }
+      )
     })
 
     it('should return false if user has no paid affiliations', function(done) {
@@ -76,17 +79,17 @@ describe('InstitutionsFeatures', function() {
         null,
         institutions
       )
-      return this.InstitutionsFeatures.hasLicence(this.userId, function(
-        error,
-        hasLicence
-      ) {
-        expect(error).to.not.exist
-        expect(hasLicence).to.be.false
-        return done()
-      })
+      return this.InstitutionsFeatures.hasLicence(
+        this.userId,
+        (error, hasLicence) => {
+          expect(error).to.not.exist
+          expect(hasLicence).to.be.false
+          return done()
+        }
+      )
     })
 
-    return it('should return true if user has confirmed paid affiliation', function(done) {
+    it('should return true if user has confirmed paid affiliation', function(done) {
       const institutions = [
         { licence: 'pro_plus' },
         { licence: 'free' },
@@ -97,14 +100,14 @@ describe('InstitutionsFeatures', function() {
         null,
         institutions
       )
-      return this.InstitutionsFeatures.hasLicence(this.userId, function(
-        error,
-        hasLicence
-      ) {
-        expect(error).to.not.exist
-        expect(hasLicence).to.be.true
-        return done()
-      })
+      return this.InstitutionsFeatures.hasLicence(
+        this.userId,
+        (error, hasLicence) => {
+          expect(error).to.not.exist
+          expect(hasLicence).to.be.true
+          return done()
+        }
+      )
     })
   })
 
@@ -121,7 +124,7 @@ describe('InstitutionsFeatures', function() {
       this.InstitutionsFeatures.getInstitutionsPlan.yields(new Error('Nope'))
       return this.InstitutionsFeatures.getInstitutionsFeatures(
         this.userId,
-        function(error, features) {
+        (error, features) => {
           expect(error).to.exist
           return done()
         }
@@ -132,7 +135,7 @@ describe('InstitutionsFeatures', function() {
       this.InstitutionsFeatures.getInstitutionsPlan.yields(null, null)
       return this.InstitutionsFeatures.getInstitutionsFeatures(
         this.userId,
-        function(error, features) {
+        (error, features) => {
           expect(error).to.not.exist
           expect(features).to.deep.equal({})
           return done()
@@ -140,7 +143,7 @@ describe('InstitutionsFeatures', function() {
       )
     })
 
-    return it('should return feaures if user has affiliations plan code', function(done) {
+    it('should return feaures if user has affiliations plan code', function(done) {
       this.InstitutionsFeatures.getInstitutionsPlan.yields(
         null,
         this.institutionPlanCode
@@ -156,7 +159,7 @@ describe('InstitutionsFeatures', function() {
     })
   })
 
-  return describe('getInstitutionsPlan', function() {
+  describe('getInstitutionsPlan', function() {
     beforeEach(function() {
       return (this.InstitutionsFeatures.hasLicence = sinon.stub())
     })
@@ -165,7 +168,7 @@ describe('InstitutionsFeatures', function() {
       this.InstitutionsFeatures.hasLicence.yields(new Error('Nope'))
       return this.InstitutionsFeatures.getInstitutionsPlan(
         this.userId,
-        function(error) {
+        error => {
           expect(error).to.exist
           return done()
         }
@@ -176,7 +179,7 @@ describe('InstitutionsFeatures', function() {
       this.InstitutionsFeatures.hasLicence.yields(null, false)
       return this.InstitutionsFeatures.getInstitutionsPlan(
         this.userId,
-        function(error, plan) {
+        (error, plan) => {
           expect(error).to.not.exist
           expect(plan).to.equal(null)
           return done()
@@ -184,7 +187,7 @@ describe('InstitutionsFeatures', function() {
       )
     })
 
-    return it('should return plan if user has licence', function(done) {
+    it('should return plan if user has licence', function(done) {
       this.InstitutionsFeatures.hasLicence.yields(null, true)
       return this.InstitutionsFeatures.getInstitutionsPlan(
         this.userId,

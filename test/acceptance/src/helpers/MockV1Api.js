@@ -73,6 +73,12 @@ module.exports = MockV1Api = {
     return (this.doc_exported[token] = info)
   },
 
+  templates: {},
+
+  setTemplates(templates) {
+    this.templates = templates
+  },
+
   run() {
     app.get(
       '/api/v1/sharelatex/users/:v1_user_id/plan_code',
@@ -138,6 +144,10 @@ module.exports = MockV1Api = {
     })
 
     app.post('/api/v2/users/:userId/affiliations', (req, res, next) => {
+      return res.sendStatus(201)
+    })
+
+    app.delete('/api/v2/users/:userId/affiliations', (req, res, next) => {
       return res.sendStatus(201)
     })
 
@@ -255,13 +265,21 @@ module.exports = MockV1Api = {
       }
     )
 
+    app.get('/api/v2/templates/:templateId', (req, res, next) => {
+      const template = this.templates[req.params.templateId]
+      if (!template) {
+        res.sendStatus(404)
+      }
+      return res.json(template)
+    })
+
     return app
-      .listen(5000, function(error) {
+      .listen(5000, error => {
         if (error != null) {
           throw error
         }
       })
-      .on('error', function(error) {
+      .on('error', error => {
         console.error('error starting MockV1Api:', error.message)
         return process.exit(1)
       })

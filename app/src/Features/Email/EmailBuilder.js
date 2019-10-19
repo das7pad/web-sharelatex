@@ -1,33 +1,17 @@
-/* eslint-disable
-    max-len,
-    no-unused-vars,
-*/
-// TODO: This file was created by bulk-decaffeinate.
-// Fix any style issues and re-enable lint.
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS103: Rewrite code to no longer use __guard__
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 const _ = require('underscore')
 const settings = require('settings-sharelatex')
 const marked = require('marked')
 const StringHelper = require('../Helpers/StringHelper')
-
-const PersonalEmailLayout = require('./Layouts/PersonalEmailLayout')
-const NotificationEmailLayout = require('./Layouts/NotificationEmailLayout')
 const BaseWithHeaderEmailLayout = require(`./Layouts/${
   settings.brandPrefix
 }BaseWithHeaderEmailLayout`)
 const SpamSafe = require('./SpamSafe')
-
 const SingleCTAEmailBody = require(`./Bodies/${
   settings.brandPrefix
 }SingleCTAEmailBody`)
+const NoCTAEmailBody = require(`./Bodies/NoCTAEmailBody`)
 
-const CTAEmailTemplate = function(content) {
+function CTAEmailTemplate(content) {
   if (content.greeting == null) {
     content.greeting = () => 'Hi,'
   }
@@ -71,6 +55,64 @@ The ${settings.appName} Team - ${settings.siteUrl}\
         StringHelper
       })
     }
+  }
+}
+
+function NoCTAEmailTemplate(content) {
+  if (content.greeting == null) {
+    content.greeting = () => 'Hi,'
+  }
+  if (content.secondaryMessage == null) {
+    content.secondaryMessage = () => ''
+  }
+  return {
+    subject(opts) {
+      return content.subject(opts)
+    },
+    layout: BaseWithHeaderEmailLayout,
+    plainTextTemplate(opts) {
+      return `\
+${content.greeting(opts)}
+${content.message(opts).trim()}
+${(typeof content.secondaryMessage === 'function'
+        ? content.secondaryMessage(opts).trim()
+        : undefined) || ''}
+Regards,
+The ${settings.appName} Team - ${settings.siteUrl}\
+`
+    },
+    compiledTemplate(opts) {
+      return NoCTAEmailBody({
+        title:
+          typeof content.title === 'function' ? content.title(opts) : undefined,
+        greeting: content.greeting(opts),
+        message: marked(content.message(opts).trim()),
+        secondaryMessage: marked(content.secondaryMessage(opts).trim()),
+        gmailGoToAction:
+          typeof content.gmailGoToAction === 'function'
+            ? content.gmailGoToAction(opts)
+            : undefined,
+        StringHelper
+      })
+    }
+  }
+}
+
+function buildEmail(templateName, opts) {
+  const template = templates[templateName]
+  opts.siteUrl = settings.siteUrl
+  opts.body = template.compiledTemplate(opts)
+  if (
+    settings.email &&
+    settings.email.template &&
+    settings.email.template.customFooter
+  ) {
+    opts.body += settings.email.template.customFooter
+  }
+  return {
+    subject: template.subject(opts),
+    html: template.layout(opts),
+    text: template.plainTextTemplate && template.plainTextTemplate(opts)
   }
 }
 
@@ -188,6 +230,20 @@ If you didn't request a password reset, let us know.\
   },
   ctaURL(opts) {
     return opts.setNewPasswordUrl
+  }
+})
+
+templates.passwordChanged = NoCTAEmailTemplate({
+  subject(opts) {
+    return `Password Changed - ${settings.appName}`
+  },
+  title(opts) {
+    return `Password Changed`
+  },
+  message(opts) {
+    return `We're contacting you to notify you that your password has been set or changed.
+
+If you have recently set your password for the first time, or if you just changed your password, you don't need to take any further action. If you didn't set or change your password, please contact us.`
   }
 })
 
@@ -420,47 +476,114 @@ If you have any questions, you can contact our support team by reply.\
   }
 })
 
+templates.emailThirdPartyIdentifierLinked = NoCTAEmailTemplate({
+  subject(opts) {
+    return `Your ${settings.appName} account is now linked with ${
+      opts.provider
+    }`
+  },
+  title(opts) {
+    return `Accounts Linked`
+  },
+  message(opts) {
+    let message = `We're contacting you to notify you that your ${opts.provider}
+    account is now linked to your ${settings.appName} account.`
+    return message
+  }
+})
+
+templates.emailThirdPartyIdentifierUnlinked = NoCTAEmailTemplate({
+  subject(opts) {
+    return `Your ${settings.appName} account is no longer linked with ${
+      opts.provider
+    }`
+  },
+  title(opts) {
+    return `Accounts No Longer Linked`
+  },
+  message(opts) {
+    let message = `We're contacting you to notify you that your ${opts.provider}
+    account is no longer linked with your ${settings.appName} account.`
+    return message
+  }
+})
+
+templates.ownershipTransferConfirmationPreviousOwner = NoCTAEmailTemplate({
+  subject(opts) {
+    return `Project ownership transfer - ${settings.appName}`
+  },
+  title(opts) {
+    const projectName = _.escape(
+      SpamSafe.safeProjectName(opts.project.name, 'Your project')
+    )
+    return `${projectName} - Owner change`
+  },
+  message(opts) {
+    const nameAndEmail = _.escape(
+      _formatUserNameAndEmail(opts.newOwner, 'a collaborator')
+    )
+    const projectName = _.escape(
+      SpamSafe.safeProjectName(opts.project.name, 'your project')
+    )
+    return `\
+As per your request, we have made ${nameAndEmail} the owner of ${projectName}.
+
+If you haven't asked to change the owner of ${projectName}, please get in touch
+with us via ${settings.adminEmail}.
+`
+  }
+})
+
+templates.ownershipTransferConfirmationNewOwner = CTAEmailTemplate({
+  subject(opts) {
+    return `Project ownership transfer - ${settings.appName}`
+  },
+  title(opts) {
+    const projectName = _.escape(
+      SpamSafe.safeProjectName(opts.project.name, 'Your project')
+    )
+    return `${projectName} - Owner change`
+  },
+  message(opts) {
+    const nameAndEmail = _.escape(
+      _formatUserNameAndEmail(opts.previousOwner, 'A collaborator')
+    )
+    const projectName = _.escape(
+      SpamSafe.safeProjectName(opts.project.name, 'a project')
+    )
+    return `\
+${nameAndEmail} has made you the owner of ${projectName}. You can now
+manage ${projectName} sharing settings.
+`
+  },
+  ctaText(opts) {
+    return 'View project'
+  },
+  ctaURL(opts) {
+    const projectUrl = `${
+      settings.siteUrl
+    }/project/${opts.project._id.toString()}`
+    return projectUrl
+  }
+})
+
+function _formatUserNameAndEmail(user, placeholder) {
+  if (user.first_name && user.last_name) {
+    const fullName = `${user.first_name} ${user.last_name}`
+    if (SpamSafe.isSafeUserName(fullName)) {
+      if (SpamSafe.isSafeEmail(user.email)) {
+        return `${fullName} (${user.email})`
+      } else {
+        return fullName
+      }
+    }
+  }
+  return SpamSafe.safeEmail(user.email, placeholder)
+}
+
 module.exports = {
   templates,
   CTAEmailTemplate,
-  buildEmail(templateName, opts) {
-    const template = templates[templateName]
-    opts.siteUrl = settings.siteUrl
-    opts.body = template.compiledTemplate(opts)
-    if (
-      __guard__(
-        settings.email != null ? settings.email.templates : undefined,
-        x => x.customFooter
-      ) != null
-    ) {
-      opts.body += __guard__(
-        settings.email != null ? settings.email.templates : undefined,
-        x1 => x1.customFooter
-      )
-    }
-    return {
-      subject: template.subject(opts),
-      html: template.layout(opts),
-      text: __guardMethod__(template, 'plainTextTemplate', o =>
-        o.plainTextTemplate(opts)
-      )
-    }
-  }
-}
-
-function __guard__(value, transform) {
-  return typeof value !== 'undefined' && value !== null
-    ? transform(value)
-    : undefined
-}
-function __guardMethod__(obj, methodName, transform) {
-  if (
-    typeof obj !== 'undefined' &&
-    obj !== null &&
-    typeof obj[methodName] === 'function'
-  ) {
-    return transform(obj, methodName)
-  } else {
-    return undefined
-  }
+  NoCTAEmailTemplate,
+  buildEmail
 }

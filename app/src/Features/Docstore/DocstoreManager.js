@@ -18,6 +18,8 @@ const logger = require('logger-sharelatex')
 const settings = require('settings-sharelatex')
 const Errors = require('../Errors/Errors')
 
+const TIMEOUT = 30 * 1000 // request timeout
+
 module.exports = DocstoreManager = {
   deleteDoc(project_id, doc_id, callback) {
     if (callback == null) {
@@ -27,7 +29,11 @@ module.exports = DocstoreManager = {
     const url = `${
       settings.apis.docstore.url
     }/project/${project_id}/doc/${doc_id}`
-    return request.del(url, function(error, res, body) {
+    return request.del({ url: url, timeout: TIMEOUT }, function(
+      error,
+      res,
+      body
+    ) {
       if (error != null) {
         return callback(error)
       }
@@ -35,7 +41,7 @@ module.exports = DocstoreManager = {
         return callback(null)
       } else if (res.statusCode === 404) {
         error = new Errors.NotFoundError('tried to delete doc not in docstore')
-        logger.error(
+        logger.warn(
           { err: error, project_id, doc_id },
           'tried to delete doc not in docstore'
         )
@@ -44,7 +50,7 @@ module.exports = DocstoreManager = {
         error = new Error(
           `docstore api responded with non-success code: ${res.statusCode}`
         )
-        logger.error(
+        logger.warn(
           { err: error, project_id, doc_id },
           'error deleting doc in docstore'
         )
@@ -62,6 +68,7 @@ module.exports = DocstoreManager = {
     return request.get(
       {
         url,
+        timeout: TIMEOUT,
         json: true
       },
       function(error, res, docs) {
@@ -74,7 +81,7 @@ module.exports = DocstoreManager = {
           error = new Error(
             `docstore api responded with non-success code: ${res.statusCode}`
           )
-          logger.error(
+          logger.warn(
             { err: error, project_id },
             'error getting all docs from docstore'
           )
@@ -96,6 +103,7 @@ module.exports = DocstoreManager = {
     return request.get(
       {
         url,
+        timeout: TIMEOUT,
         json: true
       },
       function(error, res, docs) {
@@ -108,7 +116,7 @@ module.exports = DocstoreManager = {
           error = new Error(
             `docstore api responded with non-success code: ${res.statusCode}`
           )
-          logger.error(
+          logger.warn(
             { err: error, project_id },
             'error getting all doc ranges from docstore'
           )
@@ -139,6 +147,7 @@ module.exports = DocstoreManager = {
     return request.get(
       {
         url,
+        timeout: TIMEOUT,
         json: true
       },
       function(error, res, doc) {
@@ -153,7 +162,7 @@ module.exports = DocstoreManager = {
           return callback(null, doc.lines, doc.rev, doc.version, doc.ranges)
         } else if (res.statusCode === 404) {
           error = new Errors.NotFoundError('doc not found in docstore')
-          logger.error(
+          logger.warn(
             { err: error, project_id, doc_id },
             'doc not found in docstore'
           )
@@ -162,7 +171,7 @@ module.exports = DocstoreManager = {
           error = new Error(
             `docstore api responded with non-success code: ${res.statusCode}`
           )
-          logger.error(
+          logger.warn(
             { err: error, project_id, doc_id },
             'error getting doc from docstore'
           )
@@ -183,6 +192,7 @@ module.exports = DocstoreManager = {
     return request.post(
       {
         url,
+        timeout: TIMEOUT,
         json: {
           lines,
           version,
@@ -203,7 +213,7 @@ module.exports = DocstoreManager = {
           error = new Error(
             `docstore api responded with non-success code: ${res.statusCode}`
           )
-          logger.error(
+          logger.warn(
             { err: error, project_id, doc_id },
             'error updating doc in docstore'
           )
@@ -214,47 +224,41 @@ module.exports = DocstoreManager = {
   },
 
   archiveProject(project_id, callback) {
-    const url = `${settings.apis.docstore.url}/project/${project_id}/archive`
-    logger.log({ project_id }, 'archiving project in docstore')
-    return request.post(url, function(err, res, docs) {
-      if (err != null) {
-        logger.err({ err, project_id }, 'error archving project in docstore')
-        return callback(err)
-      }
-      if (res.statusCode >= 200 && res.statusCode < 300) {
-        return callback()
-      } else {
-        const error = new Error(
-          `docstore api responded with non-success code: ${res.statusCode}`
-        )
-        logger.err(
-          { err: error, project_id },
-          'error archiving project in docstore'
-        )
-        return callback(error)
-      }
-    })
+    DocstoreManager._operateOnProject(project_id, 'archive', callback)
   },
 
   unarchiveProject(project_id, callback) {
-    const url = `${settings.apis.docstore.url}/project/${project_id}/unarchive`
-    logger.log({ project_id }, 'unarchiving project in docstore')
-    return request.post(url, function(err, res, docs) {
+    DocstoreManager._operateOnProject(project_id, 'unarchive', callback)
+  },
+
+  destroyProject(project_id, callback) {
+    DocstoreManager._operateOnProject(project_id, 'destroy', callback)
+  },
+
+  _operateOnProject(project_id, method, callback) {
+    const url = `${settings.apis.docstore.url}/project/${project_id}/${method}`
+    logger.log({ project_id }, `calling ${method} for project in docstore`)
+    // use default timeout for archiving/unarchiving/destroying
+    request.post(url, function(err, res, docs) {
       if (err != null) {
-        logger.err({ err, project_id }, 'error unarchiving project in docstore')
+        logger.warn(
+          { err, project_id },
+          `error calling ${method} project in docstore`
+        )
         return callback(err)
       }
+
       if (res.statusCode >= 200 && res.statusCode < 300) {
-        return callback()
+        callback()
       } else {
         const error = new Error(
           `docstore api responded with non-success code: ${res.statusCode}`
         )
-        logger.err(
+        logger.warn(
           { err: error, project_id },
-          'error unarchiving project in docstore'
+          `error calling ${method} project in docstore`
         )
-        return callback(error)
+        callback(error)
       }
     })
   }

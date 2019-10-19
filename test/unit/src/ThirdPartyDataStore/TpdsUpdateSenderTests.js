@@ -39,7 +39,7 @@ describe('TpdsUpdateSender', function() {
     this.requestQueuer = function(queue, meth, opts, callback) {}
     const project = { owner_ref: user_id }
     const member_ids = [collaberator_ref_1, read_only_ref_1, user_id]
-    this.CollaboratorsHandler = {
+    this.CollaboratorsGetter = {
       getInvitedMemberIds: sinon.stub().yields(null, member_ids)
     }
     this.ProjectGetter = {
@@ -61,12 +61,15 @@ describe('TpdsUpdateSender', function() {
       }
     }
     return (this.updateSender = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         'settings-sharelatex': this.settings,
         'logger-sharelatex': { log() {} },
         '../Project/ProjectGetter': this.ProjectGetter,
         request: this.request,
-        '../Collaborators/CollaboratorsHandler': this.CollaboratorsHandler,
+        '../Collaborators/CollaboratorsGetter': this.CollaboratorsGetter,
         'metrics-sharelatex': {
           inc() {}
         }
@@ -82,7 +85,7 @@ describe('TpdsUpdateSender', function() {
       })
     })
 
-    return it('should post the message to the tpdsworker', function(done) {
+    it('should post the message to the tpdsworker', function(done) {
       this.settings.apis.tpdsworker = { url: 'www.tpdsworker.env' }
       const group = 'myproject'
       const method = 'somemethod'
@@ -101,7 +104,7 @@ describe('TpdsUpdateSender', function() {
     })
   })
 
-  return describe('sending updates', function() {
+  describe('sending updates', function() {
     it('queues a post the file with user and file id', function(done) {
       const file_id = '4545345'
       const path = '/some/path/here.jpg'
@@ -122,7 +125,7 @@ describe('TpdsUpdateSender', function() {
       }
       return this.updateSender.addFile(
         { project_id, file_id, path, project_name },
-        function() {}
+        () => {}
       )
     })
 
@@ -219,7 +222,7 @@ describe('TpdsUpdateSender', function() {
       })
     })
 
-    return it('pollDropboxForUser', function(done) {
+    it('pollDropboxForUser', function(done) {
       this.updateSender._enqueue = sinon.stub().callsArg(3)
       return this.updateSender.pollDropboxForUser(user_id, error => {
         this.updateSender._enqueue

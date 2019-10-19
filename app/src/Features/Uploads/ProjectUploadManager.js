@@ -12,126 +12,46 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-let ProjectUploadHandler
 const path = require('path')
 const rimraf = require('rimraf')
-const async = require('async')
+const { promisify, callbackify } = require('util')
 const ArchiveManager = require('./ArchiveManager')
 const FileSystemImportManager = require('./FileSystemImportManager')
 const ProjectCreationHandler = require('../Project/ProjectCreationHandler')
 const ProjectRootDocManager = require('../Project/ProjectRootDocManager')
 const ProjectDetailsHandler = require('../Project/ProjectDetailsHandler')
+const ProjectDeleter = require('../Project/ProjectDeleter').promises
 const DocumentHelper = require('../Documents/DocumentHelper')
+const logger = require('logger-sharelatex')
 
-module.exports = ProjectUploadHandler = {
-  createProjectFromZipArchive(owner_id, defaultName, zipPath, callback) {
-    if (callback == null) {
-      callback = function(error, project) {}
-    }
-    const destination = this._getDestinationDirectory(zipPath)
-    let docPath = null
-    let project = null
-
-    return async.waterfall(
-      [
-        cb => ArchiveManager.extractZipArchive(zipPath, destination, cb),
-        cb =>
-          ProjectRootDocManager.findRootDocFileFromDirectory(
-            destination,
-            (error, _docPath, docContents) => cb(error, _docPath, docContents)
-          ),
-        function(_docPath, docContents, cb) {
-          docPath = _docPath
-          const proposedName = ProjectDetailsHandler.fixProjectName(
-            DocumentHelper.getTitleFromTexContent(docContents || '') ||
-              defaultName
-          )
-          return ProjectDetailsHandler.generateUniqueName(
-            owner_id,
-            proposedName,
-            (error, name) => cb(error, name)
-          )
-        },
-        (name, cb) =>
-          ProjectCreationHandler.createBlankProject(
-            owner_id,
-            name,
-            (error, _project) => cb(error, _project)
-          ),
-        (_project, cb) => {
-          project = _project
-          return this._insertZipContentsIntoFolder(
-            owner_id,
-            project._id,
-            project.rootFolder[0]._id,
-            destination,
-            cb
-          )
-        },
-        function(cb) {
-          if (docPath != null) {
-            return ProjectRootDocManager.setRootDocFromName(
-              project._id,
-              docPath,
-              error => cb(error)
-            )
-          } else {
-            return cb(null)
-          }
-        },
-        cb => cb(null, project)
-      ],
+const ProjectUploadManager = {
+  createProjectFromZipArchive(ownerId, defaultName, zipPath, callback) {
+    callbackify(ProjectUploadManager.promises.createProjectFromZipArchive)(
+      ownerId,
+      defaultName,
+      zipPath,
       callback
     )
   },
 
   createProjectFromZipArchiveWithName(
-    owner_id,
+    ownerId,
     proposedName,
     zipPath,
+    attributes,
     callback
   ) {
     if (callback == null) {
       callback = function(error, project) {}
     }
-    return ProjectDetailsHandler.generateUniqueName(
-      owner_id,
-      ProjectDetailsHandler.fixProjectName(proposedName),
-      (error, name) => {
-        if (error != null) {
-          return callback(error)
-        }
-        return ProjectCreationHandler.createBlankProject(
-          owner_id,
-          name,
-          (error, project) => {
-            if (error != null) {
-              return callback(error)
-            }
-            return this.insertZipArchiveIntoFolder(
-              owner_id,
-              project._id,
-              project.rootFolder[0]._id,
-              zipPath,
-              function(error) {
-                if (error != null) {
-                  return callback(error)
-                }
-                return ProjectRootDocManager.setRootDocAutomatically(
-                  project._id,
-                  function(error) {
-                    if (error != null) {
-                      return callback(error)
-                    }
-                    return callback(error, project)
-                  }
-                )
-              }
-            )
-          }
-        )
-      }
-    )
+    if (arguments.length === 4) {
+      callback = attributes
+      attributes = {}
+    }
+
+    callbackify(
+      ProjectUploadManager.promises.createProjectFromZipArchiveWithName
+    )(ownerId, proposedName, zipPath, attributes, callback)
   },
 
   insertZipArchiveIntoFolder(
@@ -144,13 +64,13 @@ module.exports = ProjectUploadHandler = {
     if (callback == null) {
       callback = function(error) {}
     }
-    const destination = this._getDestinationDirectory(zipPath)
+    const destination = ProjectUploadManager._getDestinationDirectory(zipPath)
     return ArchiveManager.extractZipArchive(zipPath, destination, error => {
       if (error != null) {
         return callback(error)
       }
 
-      return this._insertZipContentsIntoFolder(
+      return ProjectUploadManager._insertZipContentsIntoFolder(
         owner_id,
         project_id,
         folder_id,
@@ -200,3 +120,114 @@ module.exports = ProjectUploadHandler = {
     )
   }
 }
+
+const promises = {
+  async createProjectFromZipArchive(ownerId, defaultName, zipPath) {
+    const destination = ProjectUploadManager._getDestinationDirectory(zipPath)
+    await ArchiveManager.promises.extractZipArchive(zipPath, destination)
+
+    const {
+      path,
+      content
+    } = await ProjectRootDocManager.promises.findRootDocFileFromDirectory(
+      destination
+    )
+
+    const projectName =
+      DocumentHelper.getTitleFromTexContent(content || '') || defaultName
+    const proposedName = ProjectDetailsHandler.fixProjectName(projectName)
+    const uniqueName = await ProjectDetailsHandler.promises.generateUniqueName(
+      ownerId,
+      proposedName
+    )
+
+    const project = await ProjectCreationHandler.promises.createBlankProject(
+      ownerId,
+      uniqueName
+    )
+    try {
+      await ProjectUploadManager.promises._insertZipContentsIntoFolder(
+        ownerId,
+        project._id,
+        project.rootFolder[0]._id,
+        destination
+      )
+
+      if (path) {
+        await ProjectRootDocManager.promises.setRootDocFromName(
+          project._id,
+          path
+        )
+      }
+    } catch (err) {
+      // no need to wait for the cleanup here
+      ProjectDeleter.deleteProject(project._id).catch(err =>
+        logger.error(
+          { err, projectId: project._id },
+          'there was an error cleaning up project after importing a zip failed'
+        )
+      )
+      throw err
+    }
+    return project
+  },
+
+  async createProjectFromZipArchiveWithName(
+    ownerId,
+    proposedName,
+    zipPath,
+    attributes
+  ) {
+    attributes = attributes || {}
+
+    const fixedProjectName = ProjectDetailsHandler.fixProjectName(proposedName)
+    const projectName = await ProjectDetailsHandler.promises.generateUniqueName(
+      ownerId,
+      fixedProjectName
+    )
+
+    const project = await ProjectCreationHandler.promises.createBlankProject(
+      ownerId,
+      projectName,
+      attributes
+    )
+
+    try {
+      await ProjectUploadManager.promises.insertZipArchiveIntoFolder(
+        ownerId,
+        project._id,
+        project.rootFolder[0]._id,
+        zipPath
+      )
+      await ProjectRootDocManager.promises.setRootDocAutomatically(project._id)
+    } catch (err) {
+      // no need to wait for the cleanup here
+      ProjectDeleter.deleteProject(project._id).catch(err =>
+        logger.error(
+          { err, projectId: project._id },
+          'there was an error cleaning up project after importing a zip failed'
+        )
+      )
+      throw err
+    }
+
+    return project
+  },
+
+  _insertZipContentsIntoFolder: promisify(
+    ProjectUploadManager._insertZipContentsIntoFolder
+  ),
+
+  insertZipArchiveIntoFolder(ownerId, projectId, folderId, zipPath) {
+    return promisify(ProjectUploadManager.insertZipArchiveIntoFolder)(
+      ownerId,
+      projectId,
+      folderId,
+      zipPath
+    )
+  }
+}
+
+ProjectUploadManager.promises = promises
+
+module.exports = ProjectUploadManager

@@ -1,13 +1,12 @@
-block scripts
+block head-scripts
 	script(type='text/javascript').
-		window.oauthFallback = #{oauthFallback}
 		window.oauthProviders = !{StringHelper.stringifyJsonForScript(oauthProviders)}
 		window.thirdPartyIds = !{StringHelper.stringifyJsonForScript(thirdPartyIds)}
 
 mixin providerList()
 	ul.list-like-table
-		li(ng-repeat="(key, provider) in providers")
-			.row(ng-if="key != 'collabratec' || (key == 'collabratec' && v2ThirdPartyIds[key])")
+		li(ng-repeat="(key, provider) in providers" ng-if="!provider.hideWhenNotLinked || (provider.hideWhenNotLinked && thirdPartyIds[key])")
+			.row
 				.col-xs-12.col-sm-8.col-md-10
 					h4 {{provider.name}}
 					p.small(ng-bind-html="provider.description")
@@ -16,12 +15,12 @@ mixin providerList()
 					button.btn.btn-default(
 						ng-click="unlink(key)"
 						ng-disabled="providers[key].ui.isProcessing"
-						ng-if="thirdPartyIds[key] || (key == 'collabratec' && v2ThirdPartyIds[key])"
+						ng-if="thirdPartyIds[key]"
 					)
 						span(ng-if="!providers[key].ui.isProcessing") #{translate("unlink")}
 						span(ng-if="providers[key].ui.isProcessing") #{translate("processing")}
 					//- Link
-					a.btn.btn-primary(
+					a.btn.btn-primary.text-capitalize(
 						href="{{provider.linkPath}}?intent=link"
 						ng-if="!thirdPartyIds[key] && !provider.hideWhenNotLinked"
 					) #{translate("link")}
@@ -44,20 +43,4 @@ mixin providerList()
 	.col-xs-12
 		h3.text-capitalize#linked-accounts #{translate("linked_accounts")}
 		p.small #{translate("linked_accounts_explained", {appName:'{{settings.appName}}'})}
-
-		if settings.oauthFallback
-			div.text-center(ng-if="ui.isLoadingV1Ids") 
-				i.fa.fa-fw.fa-spin.fa-refresh(aria-hidden="true")
-				| &nbsp;#{translate("loading")}...
-
-			div(ng-if="ui.isLoadingV1Ids == false && ui.hasError == false")
-				+providerList()
-
-			.alert.alert-danger(
-				ng-if="ui.hasError"
-			)
-				i.fa.fa-fw.fa-exclamation-triangle(aria-hidden="true")
-				span(ng-if="!ui.errorMessage") &nbsp;#{translate("error_performing_request")}
-				span(ng-if="ui.errorMessage") &nbsp;{{ui.errorMessage}}
-		else
-			+providerList()
+		+providerList()

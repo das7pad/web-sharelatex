@@ -24,6 +24,9 @@ describe('HistoryManager', function() {
       getLoggedInUserId: sinon.stub().returns(this.user_id)
     }
     this.HistoryManager = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         request: (this.request = sinon.stub()),
         'settings-sharelatex': (this.settings = {}),
@@ -67,7 +70,7 @@ describe('HistoryManager', function() {
             .should.equal(true)
         })
 
-        return it('should return the callback with the overleaf id', function() {
+        it('should return the callback with the overleaf id', function() {
           return this.callback
             .calledWithExactly(null, { overleaf_id: this.overleaf_id })
             .should.equal(true)
@@ -85,7 +88,7 @@ describe('HistoryManager', function() {
           return this.HistoryManager.initializeProject(this.callback)
         })
 
-        return it('should return the callback with an error', function() {
+        it('should return the callback with an error', function() {
           return this.callback
             .calledWith(
               sinon.match.has(
@@ -105,7 +108,7 @@ describe('HistoryManager', function() {
           return this.HistoryManager.initializeProject(this.callback)
         })
 
-        return it('should return the callback with an error', function() {
+        it('should return the callback with an error', function() {
           return this.callback
             .calledWith(
               sinon.match.has(
@@ -117,7 +120,7 @@ describe('HistoryManager', function() {
         })
       })
 
-      return describe('project history errors', function() {
+      describe('project history errors', function() {
         beforeEach(function() {
           this.error = sinon.stub()
           this.request.post = sinon.stub().callsArgWith(1, this.error)
@@ -125,31 +128,32 @@ describe('HistoryManager', function() {
           return this.HistoryManager.initializeProject(this.callback)
         })
 
-        return it('should return the callback with the error', function() {
+        it('should return the callback with the error', function() {
           return this.callback.calledWithExactly(this.error).should.equal(true)
         })
       })
     })
 
-    return describe('with project history disabled', function() {
+    describe('with project history disabled', function() {
       beforeEach(function() {
         this.settings.apis.project_history.initializeHistoryForNewProjects = false
         return this.HistoryManager.initializeProject(this.callback)
       })
 
-      return it('should return the callback', function() {
+      it('should return the callback', function() {
         return this.callback.calledWithExactly().should.equal(true)
       })
     })
   })
 
-  return describe('injectUserDetails', function() {
+  describe('injectUserDetails', function() {
     beforeEach(function() {
       this.user1 = {
         _id: (this.user_id1 = '123456'),
         first_name: 'Jane',
         last_name: 'Doe',
-        email: 'jane@example.com'
+        email: 'jane@example.com',
+        overleaf: { id: 5011 }
       }
       this.user1_view = {
         id: this.user_id1,
@@ -169,6 +173,7 @@ describe('HistoryManager', function() {
         last_name: 'Doe',
         email: 'john@example.com'
       }
+      this.UserGetter.getUsersByV1Ids = sinon.stub().yields(null, [this.user1])
       return (this.UserGetter.getUsers = sinon
         .stub()
         .yields(null, [this.user1, this.user2]))
@@ -202,7 +207,34 @@ describe('HistoryManager', function() {
         )
       })
 
-      return it('should leave user objects', function(done) {
+      it('should handle v1 user ids', function(done) {
+        return this.HistoryManager.injectUserDetails(
+          {
+            diff: [
+              {
+                i: 'foo',
+                meta: {
+                  users: [5011]
+                }
+              },
+              {
+                i: 'bar',
+                meta: {
+                  users: [this.user_id2]
+                }
+              }
+            ]
+          },
+          (error, diff) => {
+            expect(error).to.be.null
+            expect(diff.diff[0].meta.users).to.deep.equal([this.user1_view])
+            expect(diff.diff[1].meta.users).to.deep.equal([this.user2_view])
+            return done()
+          }
+        )
+      })
+
+      it('should leave user objects', function(done) {
         return this.HistoryManager.injectUserDetails(
           {
             diff: [
@@ -230,7 +262,7 @@ describe('HistoryManager', function() {
       })
     })
 
-    return describe('with a list of updates', function() {
+    describe('with a list of updates', function() {
       it('should turn user_ids into user objects', function(done) {
         return this.HistoryManager.injectUserDetails(
           {
@@ -264,7 +296,7 @@ describe('HistoryManager', function() {
         )
       })
 
-      return it('should leave user objects', function(done) {
+      it('should leave user objects', function(done) {
         return this.HistoryManager.injectUserDetails(
           {
             updates: [

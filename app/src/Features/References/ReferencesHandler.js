@@ -16,6 +16,7 @@ let ReferencesHandler
 const logger = require('logger-sharelatex')
 const request = require('request')
 const settings = require('settings-sharelatex')
+const Features = require('../../infrastructure/Features')
 const ProjectGetter = require('../Project/ProjectGetter')
 const UserGetter = require('../User/UserGetter')
 const DocumentUpdaterHandler = require('../DocumentUpdater/DocumentUpdaterHandler')
@@ -25,12 +26,7 @@ const Async = require('async')
 const oneMinInMs = 60 * 1000
 const fiveMinsInMs = oneMinInMs * 5
 
-if (
-  __guard__(
-    settings.apis != null ? settings.apis.references : undefined,
-    x => x.url
-  ) == null
-) {
+if (!Features.hasFeature('references')) {
   logger.log('references search not enabled')
 }
 
@@ -108,7 +104,7 @@ module.exports = ReferencesHandler = {
       { rootFolder: true, owner_ref: 1 },
       function(err, project) {
         if (err) {
-          logger.err({ err, projectId }, 'error finding project')
+          logger.warn({ err, projectId }, 'error finding project')
           return callback(err)
         }
         logger.log({ projectId }, 'indexing all bib files in project')
@@ -134,7 +130,7 @@ module.exports = ReferencesHandler = {
       { rootFolder: true, owner_ref: 1 },
       function(err, project) {
         if (err) {
-          logger.err({ err, projectId }, 'error finding project')
+          logger.warn({ err, projectId }, 'error finding project')
           return callback(err)
         }
         return ReferencesHandler._doIndexOperation(
@@ -149,17 +145,12 @@ module.exports = ReferencesHandler = {
   },
 
   _doIndexOperation(projectId, project, docIds, fileIds, callback) {
-    if (
-      __guard__(
-        settings.apis != null ? settings.apis.references : undefined,
-        x1 => x1.url
-      ) == null
-    ) {
+    if (!Features.hasFeature('references')) {
       return callback()
     }
     return ReferencesHandler._isFullIndex(project, function(err, isFullIndex) {
       if (err) {
-        logger.err(
+        logger.warn(
           { err, projectId },
           'error checking whether to do full index'
         )
@@ -176,7 +167,7 @@ module.exports = ReferencesHandler = {
         function(err) {
           // continue
           if (err) {
-            logger.err(
+            logger.warn(
               { err, projectId, docIds },
               'error flushing docs to mongo'
             )
@@ -203,7 +194,7 @@ module.exports = ReferencesHandler = {
             },
             function(err, res, data) {
               if (err) {
-                logger.err(
+                logger.warn(
                   { err, projectId },
                   'error communicating with references api'
                 )

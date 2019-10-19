@@ -26,6 +26,9 @@ const { expect } = require('chai')
 describe('V1SubscriptionManager', function() {
   beforeEach(function() {
     this.V1SubscriptionManager = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         '../User/UserGetter': (this.UserGetter = {}),
         'logger-sharelatex': {
@@ -36,7 +39,8 @@ describe('V1SubscriptionManager', function() {
         'settings-sharelatex': (this.Settings = {
           apis: {
             v1: {
-              host: (this.host = 'http://overleaf.example.com')
+              host: (this.host = 'http://overleaf.example.com'),
+              url: 'v1.url'
             }
           },
           v1GrandfatheredFeaturesUidCutoff: 10,
@@ -73,7 +77,7 @@ describe('V1SubscriptionManager', function() {
       })
     })
 
-    return describe('when all goes well', function() {
+    describe('when all goes well', function() {
       it('should call _v1Request', function(done) {
         return this.call((err, planCode) => {
           expect(this.V1SubscriptionManager._v1Request.callCount).to.equal(1)
@@ -99,12 +103,12 @@ describe('V1SubscriptionManager', function() {
         })
       })
 
-      return describe('when the plan_name from v1 is null', function() {
+      describe('when the plan_name from v1 is null', function() {
         beforeEach(function() {
           return (this.responseBody.plan_name = null)
         })
 
-        return it('should produce a null plan-code without error', function(done) {
+        it('should produce a null plan-code without error', function(done) {
           return this.call((err, planCode) => {
             expect(err).to.not.exist
             expect(planCode).to.equal(null)
@@ -116,15 +120,16 @@ describe('V1SubscriptionManager', function() {
   })
 
   describe('getGrandfatheredFeaturesForV1User', function() {
-    describe('when the user ID is greater than the cutoff', () =>
+    describe('when the user ID is greater than the cutoff', function() {
       it('should return an empty feature set', function(done) {
         expect(
           this.V1SubscriptionManager.getGrandfatheredFeaturesForV1User(100)
         ).to.eql({})
         return done()
-      }))
+      })
+    })
 
-    return describe('when the user ID is less than the cutoff', () =>
+    describe('when the user ID is less than the cutoff', function() {
       it('should return a feature set with grandfathered properties for github and mendeley', function(done) {
         expect(
           this.V1SubscriptionManager.getGrandfatheredFeaturesForV1User(1)
@@ -133,7 +138,8 @@ describe('V1SubscriptionManager', function() {
           mendeley: true
         })
         return done()
-      }))
+      })
+    })
   })
 
   describe('_v1Request', function() {
@@ -166,7 +172,7 @@ describe('V1SubscriptionManager', function() {
         })
       })
 
-      return it('should produce an error', function(done) {
+      it('should produce an error', function(done) {
         return this.call((err, planCode) => {
           expect(err).to.exist
           return done()
@@ -197,7 +203,7 @@ describe('V1SubscriptionManager', function() {
         })
       })
 
-      return it('should not error', function(done) {
+      it('should not error', function(done) {
         return this.call(err => {
           expect(err).to.not.exist
           return done()
@@ -221,7 +227,7 @@ describe('V1SubscriptionManager', function() {
         })
       })
 
-      return it('should produce an error', function(done) {
+      it('should produce an error', function(done) {
         return this.call(err => {
           expect(err).to.exist
           return done()
@@ -262,7 +268,7 @@ describe('V1SubscriptionManager', function() {
         })
       })
 
-      return it('should return the http response body', function(done) {
+      it('should return the http response body', function(done) {
         return this.call((err, body, v1Id) => {
           expect(body).to.equal('{}')
           return done()
@@ -289,7 +295,7 @@ describe('V1SubscriptionManager', function() {
         })
       })
 
-      return it('should produce an error', function(done) {
+      it('should produce an error', function(done) {
         return this.call((err, body, v1Id) => {
           expect(err).to.exist
           return done()
@@ -297,7 +303,7 @@ describe('V1SubscriptionManager', function() {
       })
     })
 
-    return describe('when the call returns an http not-found status code', function() {
+    describe('when the call returns an http not-found status code', function() {
       beforeEach(function() {
         this.V1SubscriptionManager.v1IdForUser = sinon
           .stub()
@@ -316,7 +322,7 @@ describe('V1SubscriptionManager', function() {
         })
       })
 
-      return it('should produce an not-found error', function(done) {
+      it('should produce an not-found error', function(done) {
         return this.call((err, body, v1Id) => {
           expect(err).to.exist
           expect(err.name).to.equal('NotFoundError')
@@ -326,7 +332,7 @@ describe('V1SubscriptionManager', function() {
     })
   })
 
-  return describe('v1IdForUser', function() {
+  describe('v1IdForUser', function() {
     beforeEach(function() {
       return (this.UserGetter.getUser = sinon.stub().yields(null, this.user))
     })
@@ -339,7 +345,7 @@ describe('V1SubscriptionManager', function() {
         })
       })
 
-      return it('should produce an error', function(done) {
+      it('should produce an error', function(done) {
         return this.call(err => {
           expect(err).to.exist
           return done()
@@ -355,7 +361,7 @@ describe('V1SubscriptionManager', function() {
         })
       })
 
-      return it('should not error', function(done) {
+      it('should not error', function(done) {
         return this.call((err, user_id) => {
           expect(err).to.not.exist
           return done()
@@ -363,7 +369,7 @@ describe('V1SubscriptionManager', function() {
       })
     })
 
-    return describe('when it works', function() {
+    describe('when it works', function() {
       beforeEach(function() {
         return (this.call = cb => {
           return this.V1SubscriptionManager.v1IdForUser(this.user_id, cb)
@@ -377,7 +383,7 @@ describe('V1SubscriptionManager', function() {
         })
       })
 
-      return it('should return the v1 user id', function(done) {
+      it('should return the v1 user id', function(done) {
         return this.call((err, user_id) => {
           expect(user_id).to.eql(42)
           return done()

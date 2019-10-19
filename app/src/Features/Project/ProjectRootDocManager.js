@@ -20,6 +20,7 @@ const ProjectGetter = require('./ProjectGetter')
 const DocumentHelper = require('../Documents/DocumentHelper')
 const Path = require('path')
 const fs = require('fs')
+const { promisify } = require('util')
 const async = require('async')
 const globby = require('globby')
 const _ = require('underscore')
@@ -39,7 +40,7 @@ module.exports = ProjectRootDocManager = {
         (doc, path) =>
           function(cb) {
             if (
-              /\.R?tex$/.test(Path.extname(path)) &&
+              ProjectEntityUpdateHandler.isPathValidForRootDoc(path) &&
               DocumentHelper.contentHasDocumentclass(doc.lines)
             ) {
               return cb(doc._id)
@@ -231,14 +232,11 @@ module.exports = ProjectRootDocManager = {
             if (rootDocValid) {
               return callback()
             } else {
-              return ProjectEntityUpdateHandler.setRootDoc(
-                project_id,
-                null,
-                () =>
-                  ProjectRootDocManager.setRootDocAutomatically(
-                    project_id,
-                    callback
-                  )
+              return ProjectEntityUpdateHandler.unsetRootDoc(project_id, () =>
+                ProjectRootDocManager.setRootDocAutomatically(
+                  project_id,
+                  callback
+                )
               )
             }
           }
@@ -307,3 +305,28 @@ module.exports = ProjectRootDocManager = {
     return a.path.localeCompare(b.path)
   }
 }
+
+const promises = {
+  setRootDocAutomatically: promisify(
+    ProjectRootDocManager.setRootDocAutomatically
+  ),
+
+  findRootDocFileFromDirectory: directoryPath =>
+    new Promise((resolve, reject) => {
+      ProjectRootDocManager.findRootDocFileFromDirectory(
+        directoryPath,
+        (error, path, content) => {
+          if (error) {
+            reject(error)
+          } else {
+            resolve({ path, content })
+          }
+        }
+      )
+    }),
+  setRootDocFromName: promisify(ProjectRootDocManager.setRootDocFromName)
+}
+
+ProjectRootDocManager.promises = promises
+
+module.exports = ProjectRootDocManager

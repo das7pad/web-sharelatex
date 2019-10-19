@@ -8,7 +8,6 @@
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
- * DS103: Rewrite code to no longer use __guard__
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
@@ -21,15 +20,8 @@ if (Object.prototype.should == null) {
 }
 const { expect } = chai
 const Settings = require('settings-sharelatex')
-const ownPort =
-  __guard__(
-    Settings.internal != null ? Settings.internal.web : undefined,
-    x => x.port
-  ) ||
-  Settings.port ||
-  3000
-const port =
-  (Settings.web != null ? Settings.web.web_router_port : undefined) || ownPort // send requests to web router if this is the api process
+let ownPort = Settings.internal.web.port || Settings.port || 3000
+const port = Settings.web.web_router_port || ownPort // send requests to web router if this is the api process
 const cookeFilePath = `/tmp/smoke-test-cookie-${ownPort}-to-${port}.txt`
 const buildUrl = path =>
   ` -b ${cookeFilePath} --resolve 'smoke${
@@ -44,7 +36,7 @@ const RateLimiter = require('../../../app/src/infrastructure/RateLimiter.js')
 // Change cookie to be non secure so curl will send it
 const convertCookieFile = function(callback) {
   fs = require('fs')
-  return fs.readFile(cookeFilePath, 'utf8', function(err, data) {
+  return fs.readFile(cookeFilePath, 'utf8', (err, data) => {
     if (err) {
       return callback(err)
     }
@@ -52,7 +44,7 @@ const convertCookieFile = function(callback) {
     const secondTrue = data.indexOf('TRUE', firstTrue + 4)
     const result =
       data.slice(0, secondTrue) + 'FALSE' + data.slice(secondTrue + 4)
-    return fs.writeFile(cookeFilePath, result, 'utf8', function(err) {
+    return fs.writeFile(cookeFilePath, result, 'utf8', err => {
       if (err) {
         return callback(err)
       }
@@ -64,9 +56,7 @@ const convertCookieFile = function(callback) {
 describe('Opening', function() {
   before(function(done) {
     logger.log('smoke test: setup')
-    LoginRateLimiter.recordSuccessfulLogin(Settings.smokeTest.user, function(
-      err
-    ) {
+    LoginRateLimiter.recordSuccessfulLogin(Settings.smokeTest.user, err => {
       if (err != null) {
         logger.err({ err }, 'smoke test: error recoring successful login')
         return done(err)
@@ -74,7 +64,7 @@ describe('Opening', function() {
       return RateLimiter.clearRateLimit(
         'open-project',
         `${Settings.smokeTest.projectId}:${Settings.smokeTest.userId}`,
-        function(err) {
+        err => {
           if (err != null) {
             logger.err(
               { err },
@@ -85,7 +75,7 @@ describe('Opening', function() {
           return RateLimiter.clearRateLimit(
             'overleaf-login',
             Settings.smokeTest.rateLimitSubject,
-            function(err) {
+            err => {
               if (err != null) {
                 logger.err(
                   { err },
@@ -106,13 +96,13 @@ describe('Opening', function() {
     let command = `\
 curl -H  "X-Forwarded-Proto: https" -c ${cookeFilePath} ${buildUrl('dev/csrf')}\
 `
-    child.exec(command, function(err, stdout, stderr) {
+    child.exec(command, (err, stdout, stderr) => {
       if (err != null) {
         done(err)
       }
       const csrf = stdout
       logger.log('smoke test: converting cookie file 1')
-      return convertCookieFile(function(err) {
+      return convertCookieFile(err => {
         if (err != null) {
           return done(err)
         }
@@ -122,7 +112,7 @@ curl -c ${cookeFilePath} -H "Content-Type: application/json" -H "X-Forwarded-Pro
           Settings.smokeTest.user
         }", "password":"${Settings.smokeTest.password}"}' ${buildUrl('login')}\
 `
-        return child.exec(command, function(err) {
+        return child.exec(command, err => {
           if (err != null) {
             return done(err)
           }
@@ -135,7 +125,7 @@ curl -c ${cookeFilePath} -H "Content-Type: application/json" -H "X-Forwarded-Pro
 
   after(function(done) {
     logger.log('smoke test: converting cookie file 2')
-    convertCookieFile(function(err) {
+    convertCookieFile(err => {
       if (err != null) {
         return done(err)
       }
@@ -143,13 +133,13 @@ curl -c ${cookeFilePath} -H "Content-Type: application/json" -H "X-Forwarded-Pro
       let command = `\
 curl -H  "X-Forwarded-Proto: https" -c ${cookeFilePath} ${buildUrl('dev/csrf')}\
 `
-      return child.exec(command, function(err, stdout, stderr) {
+      return child.exec(command, (err, stdout, stderr) => {
         if (err != null) {
           done(err)
         }
         const csrf = stdout
         logger.log('smoke test: converting cookie file 3')
-        return convertCookieFile(function(err) {
+        return convertCookieFile(err => {
           if (err != null) {
             return done(err)
           }
@@ -158,7 +148,7 @@ curl -H "Content-Type: application/json" -H "X-Forwarded-Proto: https" -d '{"_cs
             'logout'
           )}\
 `
-          return child.exec(command, function(err, stdout, stderr) {
+          return child.exec(command, (err, stdout, stderr) => {
             if (err != null) {
               return done(err)
             }
@@ -177,7 +167,7 @@ curl -H "X-Forwarded-Proto: https" -v ${buildUrl(
       `project/${Settings.smokeTest.projectId}`
     )}\
 `
-    return child.exec(command, function(error, stdout, stderr) {
+    return child.exec(command, (error, stdout, stderr) => {
       expect(error, 'smoke test: error in getting project').to.not.exist
 
       const statusCodeMatch = !!stderr.match('200 OK')
@@ -198,17 +188,15 @@ curl -H "X-Forwarded-Proto: https" -v ${buildUrl(
     })
   })
 
-  return it('the project list', function(done) {
+  it('the project list', function(done) {
     logger.log('smoke test: Checking can load project list')
     this.timeout(4000)
     const command = `\
 curl -H "X-Forwarded-Proto: https" -v ${buildUrl('project')}\
 `
-    return child.exec(command, function(error, stdout, stderr) {
-      expect(
-        error,
-        'smoke test: error returned in getting project list'
-      ).to.not.exist
+    return child.exec(command, (error, stdout, stderr) => {
+      expect(error, 'smoke test: error returned in getting project list').to.not
+        .exist
       expect(
         !!stderr.match('200 OK'),
         'smoke test: response code is not 200 getting project list'
@@ -227,9 +215,3 @@ curl -H "X-Forwarded-Proto: https" -v ${buildUrl('project')}\
     })
   })
 })
-
-function __guard__(value, transform) {
-  return typeof value !== 'undefined' && value !== null
-    ? transform(value)
-    : undefined
-}

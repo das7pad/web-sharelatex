@@ -12,26 +12,19 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-let TagsHandler
-const _ = require('underscore')
 const settings = require('settings-sharelatex')
 const request = require('request')
 const logger = require('logger-sharelatex')
+const { promisifyAll } = require('../../util/promises')
 
 const TIMEOUT = 1000
-module.exports = TagsHandler = {
+const TagsHandler = {
   getAllTags(user_id, callback) {
-    return this._requestTags(user_id, (err, allTags) => {
+    this._requestTags(user_id, (err, allTags) => {
       if (allTags == null) {
         allTags = []
       }
-      return this._groupTagsByProject(allTags, function(err, groupedByProject) {
-        logger.log(
-          { allTags, user_id, groupedByProject },
-          'got all tags from tags api'
-        )
-        return callback(err, allTags, groupedByProject)
-      })
+      callback(err, allTags)
     })
   },
 
@@ -175,7 +168,7 @@ module.exports = TagsHandler = {
   _handleResponse(err, res, params, callback) {
     if (err != null) {
       params.err = err
-      logger.err(params, 'error in tag api')
+      logger.warn(params, 'error in tag api')
       return callback(err)
     } else if (res != null && res.statusCode >= 200 && res.statusCode < 300) {
       return callback(null)
@@ -186,7 +179,7 @@ module.exports = TagsHandler = {
         }`
       )
       params.err = err
-      logger.err(
+      logger.warn(
         params,
         `tags api returned failure status code: ${
           res != null ? res.statusCode : undefined
@@ -210,21 +203,8 @@ module.exports = TagsHandler = {
         return callback(null, body || [])
       })
     )
-  },
-
-  _groupTagsByProject(tags, callback) {
-    const result = {}
-    _.each(tags, tag =>
-      _.each(tag.project_ids, project_id => (result[project_id] = []))
-    )
-
-    _.each(tags, tag =>
-      _.each(tag.project_ids, function(project_id) {
-        const clonedTag = _.clone(tag)
-        delete clonedTag.project_ids
-        return result[project_id].push(clonedTag)
-      })
-    )
-    return callback(null, result)
   }
 }
+
+TagsHandler.promises = promisifyAll(TagsHandler)
+module.exports = TagsHandler

@@ -27,7 +27,8 @@ const UserSchema = new Schema({
           return new Date()
         }
       },
-      confirmedAt: { type: Date }
+      confirmedAt: { type: Date },
+      samlProviderId: { type: String }
     }
   ],
   first_name: { type: String, default: '' },
@@ -42,7 +43,8 @@ const UserSchema = new Schema({
     institutionMetrics: { type: Boolean, default: false },
     institutionManagement: { type: Boolean, default: false },
     groupMetrics: { type: Boolean, default: false },
-    groupManagement: { type: Boolean, default: false }
+    groupManagement: { type: Boolean, default: false },
+    adminMetrics: { type: Boolean, default: false }
   },
   signUpDate: {
     type: Date,
@@ -97,6 +99,9 @@ const UserSchema = new Schema({
       default: Settings.defaultFeatures.referencesSearch
     }
   },
+  // when auto-merged from SL and must-reconfirm is set, we may end up using
+  // `sharelatexHashedPassword` to recover accounts...
+  sharelatexHashedPassword: String,
   must_reconfirm: { type: Boolean, default: false },
   referal_id: {
     type: String,
@@ -117,6 +122,7 @@ const UserSchema = new Schema({
     refreshToken: { type: String }
   },
   awareOfV2: { type: Boolean, default: false },
+  samlIdentifiers: { type: Array, default: [] },
   thirdPartyIdentifiers: { type: Array, default: [] },
   migratedAt: { type: Date }
 })
@@ -130,3 +136,4 @@ const User = conn.model('User', UserSchema)
 
 const model = mongoose.model('User', UserSchema)
 exports.User = User
+exports.UserSchema = UserSchema

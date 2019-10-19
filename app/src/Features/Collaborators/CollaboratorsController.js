@@ -1,109 +1,84 @@
-/* eslint-disable
-    camelcase,
-    handle-callback-err,
-    max-len,
-    no-unused-vars,
-*/
-// TODO: This file was created by bulk-decaffeinate.
-// Fix any style issues and re-enable lint.
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * DS103: Rewrite code to no longer use __guard__
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-let CollaboratorsController
-const ProjectGetter = require('../Project/ProjectGetter')
+const OError = require('@overleaf/o-error')
+const HttpErrors = require('@overleaf/o-error/http')
 const CollaboratorsHandler = require('./CollaboratorsHandler')
-const ProjectEditorHandler = require('../Project/ProjectEditorHandler')
+const CollaboratorsGetter = require('./CollaboratorsGetter')
+const AuthenticationController = require('../Authentication/AuthenticationController')
 const EditorRealTimeController = require('../Editor/EditorRealTimeController')
-const LimitationsManager = require('../Subscription/LimitationsManager')
-const UserGetter = require('../User/UserGetter')
-const EmailHelper = require('../Helpers/EmailHelper')
+const TagsHandler = require('../Tags/TagsHandler')
+const Errors = require('../Errors/Errors')
 const logger = require('logger-sharelatex')
+const { expressify } = require('../../util/promises')
 
-module.exports = CollaboratorsController = {
-  removeUserFromProject(req, res, next) {
-    const project_id = req.params.Project_id
-    const { user_id } = req.params
-    return CollaboratorsController._removeUserIdFromProject(
-      project_id,
-      user_id,
-      function(error) {
-        if (error != null) {
-          return next(error)
-        }
-        EditorRealTimeController.emitToRoom(
-          project_id,
-          'project:membership:changed',
-          { members: true }
-        )
-        return res.sendStatus(204)
-      }
-    )
-  },
+module.exports = {
+  removeUserFromProject: expressify(removeUserFromProject),
+  removeSelfFromProject: expressify(removeSelfFromProject),
+  getAllMembers: expressify(getAllMembers),
+  setCollaboratorInfo: expressify(setCollaboratorInfo)
+}
 
-  removeSelfFromProject(req, res, next) {
-    if (next == null) {
-      next = function(error) {}
-    }
-    const project_id = req.params.Project_id
-    const user_id = __guard__(
-      req.session != null ? req.session.user : undefined,
-      x => x._id
-    )
-    return CollaboratorsController._removeUserIdFromProject(
-      project_id,
-      user_id,
-      function(error) {
-        if (error != null) {
-          return next(error)
-        }
-        return res.sendStatus(204)
-      }
-    )
-  },
+async function removeUserFromProject(req, res, next) {
+  const projectId = req.params.Project_id
+  const userId = req.params.user_id
+  await _removeUserIdFromProject(projectId, userId)
+  EditorRealTimeController.emitToRoom(projectId, 'project:membership:changed', {
+    members: true
+  })
+  res.sendStatus(204)
+}
 
-  _removeUserIdFromProject(project_id, user_id, callback) {
-    if (callback == null) {
-      callback = function(error) {}
-    }
-    return CollaboratorsHandler.removeUserFromProject(
-      project_id,
-      user_id,
-      function(error) {
-        if (error != null) {
-          return callback(error)
-        }
-        EditorRealTimeController.emitToRoom(
-          project_id,
-          'userRemovedFromProject',
-          user_id
-        )
-        return callback()
-      }
-    )
-  },
+async function removeSelfFromProject(req, res, next) {
+  const projectId = req.params.Project_id
+  const userId = AuthenticationController.getLoggedInUserId(req)
+  await _removeUserIdFromProject(projectId, userId)
+  res.sendStatus(204)
+}
 
-  getAllMembers(req, res, next) {
+async function getAllMembers(req, res, next) {
+  const projectId = req.params.Project_id
+  logger.log({ projectId }, 'getting all active members for project')
+  let members
+  try {
+    members = await CollaboratorsGetter.promises.getAllInvitedMembers(projectId)
+  } catch (err) {
+    throw new OError({
+      message: 'error getting members for project',
+      info: { projectId }
+    }).withCause(err)
+  }
+  res.json({ members })
+}
+
+async function setCollaboratorInfo(req, res, next) {
+  try {
     const projectId = req.params.Project_id
-    logger.log({ projectId }, 'getting all active members for project')
-    return CollaboratorsHandler.getAllInvitedMembers(projectId, function(
-      err,
-      members
-    ) {
-      if (err != null) {
-        logger.err({ projectId }, 'error getting members for project')
-        return next(err)
-      }
-      return res.json({ members })
-    })
+    const userId = req.params.user_id
+    const { privilegeLevel } = req.body
+    await CollaboratorsHandler.promises.setCollaboratorPrivilegeLevel(
+      projectId,
+      userId,
+      privilegeLevel
+    )
+    EditorRealTimeController.emitToRoom(
+      projectId,
+      'project:membership:changed',
+      { members: true }
+    )
+    res.sendStatus(204)
+  } catch (err) {
+    if (err instanceof Errors.NotFoundError) {
+      throw new HttpErrors.NotFoundError({})
+    } else {
+      throw new HttpErrors.InternalServerError({}).withCause(err)
+    }
   }
 }
 
-function __guard__(value, transform) {
-  return typeof value !== 'undefined' && value !== null
-    ? transform(value)
-    : undefined
+async function _removeUserIdFromProject(projectId, userId) {
+  await CollaboratorsHandler.promises.removeUserFromProject(projectId, userId)
+  EditorRealTimeController.emitToRoom(
+    projectId,
+    'userRemovedFromProject',
+    userId
+  )
+  await TagsHandler.promises.removeProjectFromAllTags(userId, projectId)
 }

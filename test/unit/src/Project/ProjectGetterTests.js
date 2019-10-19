@@ -23,7 +23,14 @@ const { assert } = require('chai')
 describe('ProjectGetter', function() {
   beforeEach(function() {
     this.callback = sinon.stub()
+    this.deletedProject = { deleterData: { wombat: 'potato' } }
+    this.DeletedProject = {
+      find: sinon.stub().yields(null, [this.deletedProject])
+    }
     return (this.ProjectGetter = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         '../../infrastructure/mongojs': {
           db: (this.db = {
@@ -38,7 +45,10 @@ describe('ProjectGetter', function() {
         '../../models/Project': {
           Project: (this.Project = {})
         },
-        '../Collaborators/CollaboratorsHandler': (this.CollaboratorsHandler = {}),
+        '../../models/DeletedProject': {
+          DeletedProject: this.DeletedProject
+        },
+        '../Collaborators/CollaboratorsGetter': (this.CollaboratorsGetter = {}),
         '../../infrastructure/LockManager': (this.LockManager = {
           runWithLock: sinon.spy((namespace, id, runner, callback) =>
             runner(callback)
@@ -63,7 +73,7 @@ describe('ProjectGetter', function() {
       return (this.ProjectGetter.getProject = sinon.stub().yields())
     })
 
-    return describe('passing an id', function() {
+    describe('passing an id', function() {
       beforeEach(function() {
         return this.ProjectGetter.getProjectWithoutDocLines(
           this.project_id,
@@ -94,7 +104,7 @@ describe('ProjectGetter', function() {
           .should.equal(true)
       })
 
-      return it('should call the callback', function() {
+      it('should call the callback', function() {
         return this.callback.called.should.equal(true)
       })
     })
@@ -106,7 +116,7 @@ describe('ProjectGetter', function() {
       return (this.ProjectGetter.getProject = sinon.stub().yields())
     })
 
-    return describe('passing an id', function() {
+    describe('passing an id', function() {
       beforeEach(function() {
         return this.ProjectGetter.getProjectWithOnlyFolders(
           this.project_id,
@@ -144,7 +154,7 @@ describe('ProjectGetter', function() {
           .should.equal(true)
       })
 
-      return it('should call the callback with the project', function() {
+      it('should call the callback with the project', function() {
         return this.callback.called.should.equal(true)
       })
     })
@@ -164,7 +174,7 @@ describe('ProjectGetter', function() {
           return this.ProjectGetter.getProject(this.project_id, this.callback)
         })
 
-        return it('should call find with the project id', function() {
+        it('should call find with the project id', function() {
           expect(this.db.projects.find.callCount).to.equal(1)
           return expect(this.db.projects.find.lastCall.args[0]).to.deep.equal({
             _id: ObjectId(this.project_id)
@@ -172,19 +182,19 @@ describe('ProjectGetter', function() {
         })
       })
 
-      return describe('without project id', function() {
+      describe('without project id', function() {
         beforeEach(function() {
           return this.ProjectGetter.getProject(null, this.callback)
         })
 
-        return it('should callback with error', function() {
+        it('should callback with error', function() {
           expect(this.db.projects.find.callCount).to.equal(0)
           return expect(this.callback.lastCall.args[0]).to.be.instanceOf(Error)
         })
       })
     })
 
-    return describe('with projection', function() {
+    describe('with projection', function() {
       beforeEach(function() {
         return (this.projection = { _id: 1 })
       })
@@ -198,7 +208,7 @@ describe('ProjectGetter', function() {
           )
         })
 
-        return it('should call find with the project id', function() {
+        it('should call find with the project id', function() {
           expect(this.db.projects.find.callCount).to.equal(1)
           expect(this.db.projects.find.lastCall.args[0]).to.deep.equal({
             _id: ObjectId(this.project_id)
@@ -209,12 +219,12 @@ describe('ProjectGetter', function() {
         })
       })
 
-      return describe('without project id', function() {
+      describe('without project id', function() {
         beforeEach(function() {
           return this.ProjectGetter.getProject(null, this.callback)
         })
 
-        return it('should callback with error', function() {
+        it('should callback with error', function() {
           expect(this.db.projects.find.callCount).to.equal(0)
           return expect(this.callback.lastCall.args[0]).to.be.instanceOf(Error)
         })
@@ -239,7 +249,7 @@ describe('ProjectGetter', function() {
           )
         })
 
-        return it('should call find with the project id', function() {
+        it('should call find with the project id', function() {
           expect(this.db.projects.find.callCount).to.equal(1)
           return expect(this.db.projects.find.lastCall.args[0]).to.deep.equal({
             _id: ObjectId(this.project_id)
@@ -247,19 +257,19 @@ describe('ProjectGetter', function() {
         })
       })
 
-      return describe('without project id', function() {
+      describe('without project id', function() {
         beforeEach(function() {
           return this.ProjectGetter.getProjectWithoutLock(null, this.callback)
         })
 
-        return it('should callback with error', function() {
+        it('should callback with error', function() {
           expect(this.db.projects.find.callCount).to.equal(0)
           return expect(this.callback.lastCall.args[0]).to.be.instanceOf(Error)
         })
       })
     })
 
-    return describe('with projection', function() {
+    describe('with projection', function() {
       beforeEach(function() {
         return (this.projection = { _id: 1 })
       })
@@ -273,7 +283,7 @@ describe('ProjectGetter', function() {
           )
         })
 
-        return it('should call find with the project id', function() {
+        it('should call find with the project id', function() {
           expect(this.db.projects.find.callCount).to.equal(1)
           expect(this.db.projects.find.lastCall.args[0]).to.deep.equal({
             _id: ObjectId(this.project_id)
@@ -284,12 +294,12 @@ describe('ProjectGetter', function() {
         })
       })
 
-      return describe('without project id', function() {
+      describe('without project id', function() {
         beforeEach(function() {
           return this.ProjectGetter.getProjectWithoutLock(null, this.callback)
         })
 
-        return it('should callback with error', function() {
+        it('should callback with error', function() {
           expect(this.db.projects.find.callCount).to.equal(0)
           return expect(this.callback.lastCall.args[0]).to.be.instanceOf(Error)
         })
@@ -304,8 +314,8 @@ describe('ProjectGetter', function() {
       this.Project.find
         .withArgs({ owner_ref: this.user_id }, this.fields)
         .yields(null, ['mock-owned-projects'])
-      this.CollaboratorsHandler.getProjectsUserIsMemberOf = sinon.stub()
-      this.CollaboratorsHandler.getProjectsUserIsMemberOf
+      this.CollaboratorsGetter.getProjectsUserIsMemberOf = sinon.stub()
+      this.CollaboratorsGetter.getProjectsUserIsMemberOf
         .withArgs(this.user_id, this.fields)
         .yields(null, {
           readAndWrite: ['mock-rw-projects'],
@@ -320,7 +330,7 @@ describe('ProjectGetter', function() {
       )
     })
 
-    return it('should call the callback with all the projects', function() {
+    it('should call the callback with all the projects', function() {
       return this.callback
         .calledWith(null, {
           owned: ['mock-owned-projects'],
@@ -333,7 +343,7 @@ describe('ProjectGetter', function() {
     })
   })
 
-  return describe('getProjectIdByReadAndWriteToken', function() {
+  describe('getProjectIdByReadAndWriteToken', function() {
     describe('when project find returns project', function() {
       this.beforeEach(function() {
         this.Project.findOne = sinon.stub().yields(null, { _id: 'project-id' })
@@ -349,7 +359,7 @@ describe('ProjectGetter', function() {
           .should.equal(true)
       })
 
-      return it('should callback with project id', function() {
+      it('should callback with project id', function() {
         return this.callback.calledWith(null, 'project-id').should.equal(true)
       })
     })
@@ -363,12 +373,12 @@ describe('ProjectGetter', function() {
         )
       })
 
-      return it('should callback empty', function() {
+      it('should callback empty', function() {
         return expect(this.callback.firstCall.args.length).to.equal(0)
       })
     })
 
-    return describe('when project find returns error', function() {
+    describe('when project find returns error', function() {
       this.beforeEach(function() {
         this.Project.findOne = sinon.stub().yields('error')
         return this.ProjectGetter.getProjectIdByReadAndWriteToken(
@@ -377,8 +387,32 @@ describe('ProjectGetter', function() {
         )
       })
 
-      return it('should callback with error', function() {
+      it('should callback with error', function() {
         return this.callback.calledWith('error').should.equal(true)
+      })
+    })
+  })
+
+  describe('getUsersDeletedProjects', function() {
+    it('should look up the deleted projects by deletedProjectOwnerId', function(done) {
+      this.ProjectGetter.getUsersDeletedProjects('giraffe', err => {
+        if (err) {
+          return done(err)
+        }
+        sinon.assert.calledWith(this.DeletedProject.find, {
+          'deleterData.deletedProjectOwnerId': 'giraffe'
+        })
+        done()
+      })
+    })
+
+    it('should pass the found projects to the callback', function(done) {
+      this.ProjectGetter.getUsersDeletedProjects('giraffe', (err, docs) => {
+        if (err) {
+          return done(err)
+        }
+        expect(docs).to.deep.equal([this.deletedProject])
+        done()
       })
     })
   })

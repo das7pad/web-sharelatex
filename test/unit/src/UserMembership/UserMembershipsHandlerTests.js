@@ -25,6 +25,9 @@ describe('UserMembershipsHandler', function() {
     this.Subscription = { updateMany: sinon.stub().yields(null) }
     this.Publisher = { updateMany: sinon.stub().yields(null) }
     return (this.UserMembershipsHandler = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         '../../models/Institution': {
           Institution: this.Institution
@@ -39,7 +42,7 @@ describe('UserMembershipsHandler', function() {
     }))
   })
 
-  return describe('remove user', () =>
+  describe('remove user', function() {
     it('remove user from all entities', function(done) {
       return this.UserMembershipsHandler.removeUserFromAllEntities(
         this.user._id,
@@ -62,5 +65,6 @@ describe('UserMembershipsHandler', function() {
           return done()
         }
       )
-    }))
+    })
+  })
 })

@@ -23,31 +23,14 @@ const logger = require('logger-sharelatex')
 const ReferalFeatures = require('../Referal/ReferalFeatures')
 const V1SubscriptionManager = require('./V1SubscriptionManager')
 const InstitutionsFeatures = require('../Institutions/InstitutionsFeatures')
+const UserGetter = require('../User/UserGetter')
 
 const oneMonthInSeconds = 60 * 60 * 24 * 30
 
 module.exports = FeaturesUpdater = {
-  refreshFeatures(user_id, notifyV1, callback) {
-    if (notifyV1 == null) {
-      notifyV1 = true
-    }
+  refreshFeatures(user_id, callback) {
     if (callback == null) {
       callback = function(error, features, featuresChanged) {}
-    }
-    if (typeof notifyV1 === 'function') {
-      callback = notifyV1
-      notifyV1 = true
-    }
-
-    if (notifyV1) {
-      V1SubscriptionManager.notifyV1OfFeaturesChange(user_id, function(error) {
-        if (error != null) {
-          return logger.err(
-            { err: error, user_id },
-            'error notifying v1 about updated features'
-          )
-        }
-      })
     }
 
     const jobs = {
@@ -65,11 +48,14 @@ module.exports = FeaturesUpdater = {
       },
       bonusFeatures(cb) {
         return ReferalFeatures.getBonusFeatures(user_id, cb)
+      },
+      samlFeatures(cb) {
+        return FeaturesUpdater._getSamlFeatures(user_id, cb)
       }
     }
     return async.series(jobs, function(err, results) {
       if (err != null) {
-        logger.err(
+        logger.warn(
           { err, user_id },
           'error getting subscription or group for refreshFeatures'
         )
@@ -81,7 +67,8 @@ module.exports = FeaturesUpdater = {
         groupFeatureSets,
         institutionFeatures,
         v1Features,
-        bonusFeatures
+        bonusFeatures,
+        samlFeatures
       } = results
       logger.log(
         {
@@ -90,7 +77,8 @@ module.exports = FeaturesUpdater = {
           groupFeatureSets,
           institutionFeatures,
           v1Features,
-          bonusFeatures
+          bonusFeatures,
+          samlFeatures
         },
         'merging user features'
       )
@@ -98,7 +86,8 @@ module.exports = FeaturesUpdater = {
         individualFeatures,
         institutionFeatures,
         v1Features,
-        bonusFeatures
+        bonusFeatures,
+        samlFeatures
       ])
       const features = _.reduce(
         featureSets,
@@ -129,6 +118,30 @@ module.exports = FeaturesUpdater = {
       (err, subs) =>
         callback(err, (subs || []).map(FeaturesUpdater._subscriptionToFeatures))
     )
+  },
+
+  _getSamlFeatures(user_id, callback) {
+    UserGetter.getUser(user_id, (err, user) => {
+      if (err) {
+        return callback(err)
+      }
+      if (
+        !user ||
+        !Array.isArray(user.samlIdentifiers) ||
+        !user.samlIdentifiers.length
+      ) {
+        return callback(null, {})
+      }
+      for (const samlIdentifier of user.samlIdentifiers) {
+        if (samlIdentifier && samlIdentifier.hasEntitlement) {
+          return callback(
+            null,
+            FeaturesUpdater._planCodeToFeatures('professional')
+          )
+        }
+      }
+      return callback(null, {})
+    })
   },
 
   _getV1Features(user_id, callback) {

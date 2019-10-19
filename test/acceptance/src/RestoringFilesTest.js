@@ -25,7 +25,7 @@ const MockDocstoreApi = require('./helpers/MockDocstoreApi')
 const MockFileStoreApi = require('./helpers/MockFileStoreApi')
 
 describe('RestoringFiles', function() {
-  before(function(done) {
+  beforeEach(function(done) {
     this.owner = new User()
     return this.owner.login(error => {
       if (error != null) {
@@ -88,7 +88,7 @@ describe('RestoringFiles', function() {
       })
     })
 
-    return it('should have restored the doc', function(done) {
+    it('should have restored the doc', function(done) {
       return this.owner.getProject(this.project_id, (error, project) => {
         if (error != null) {
           throw error
@@ -110,7 +110,7 @@ describe('RestoringFiles', function() {
     })
   })
 
-  return describe('restoring from v2 history', function() {
+  describe('restoring from v2 history', function() {
     describe('restoring a text file', function() {
       beforeEach(function(done) {
         MockProjectHistoryApi.addOldFile(
@@ -128,7 +128,7 @@ describe('RestoringFiles', function() {
               version: 42
             }
           },
-          function(error, response, body) {
+          (error, response, body) => {
             if (error != null) {
               throw error
             }
@@ -138,7 +138,7 @@ describe('RestoringFiles', function() {
         )
       })
 
-      return it('should have created a doc', function(done) {
+      it('should have created a doc', function(done) {
         return this.owner.getProject(this.project_id, (error, project) => {
           if (error != null) {
             throw error
@@ -175,7 +175,7 @@ describe('RestoringFiles', function() {
               version: 42
             }
           },
-          function(error, response, body) {
+          (error, response, body) => {
             if (error != null) {
               throw error
             }
@@ -185,7 +185,7 @@ describe('RestoringFiles', function() {
         )
       })
 
-      return it('should have created a file', function(done) {
+      it('should have created a file', function(done) {
         return this.owner.getProject(this.project_id, (error, project) => {
           if (error != null) {
             throw error
@@ -230,7 +230,7 @@ describe('RestoringFiles', function() {
                   version: 42
                 }
               },
-              function(error, response, body) {
+              (error, response, body) => {
                 if (error != null) {
                   throw error
                 }
@@ -242,7 +242,7 @@ describe('RestoringFiles', function() {
         )
       })
 
-      return it('should have created the doc in the named folder', function(done) {
+      it('should have created the doc in the named folder', function(done) {
         return this.owner.getProject(this.project_id, (error, project) => {
           if (error != null) {
             throw error
@@ -276,7 +276,7 @@ describe('RestoringFiles', function() {
               version: 42
             }
           },
-          function(error, response, body) {
+          (error, response, body) => {
             if (error != null) {
               throw error
             }
@@ -286,7 +286,7 @@ describe('RestoringFiles', function() {
         )
       })
 
-      return it('should have created the folder and restored the doc to it', function(done) {
+      it('should have created the folder and restored the doc to it', function(done) {
         return this.owner.getProject(this.project_id, (error, project) => {
           if (error != null) {
             throw error
@@ -304,7 +304,7 @@ describe('RestoringFiles', function() {
       })
     })
 
-    return describe('restoring to a filename that already exists', function() {
+    describe('restoring to a filename that already exists', function() {
       beforeEach(function(done) {
         MockProjectHistoryApi.addOldFile(
           this.project_id,
@@ -321,7 +321,7 @@ describe('RestoringFiles', function() {
               version: 42
             }
           },
-          function(error, response, body) {
+          (error, response, body) => {
             if (error != null) {
               throw error
             }
@@ -331,7 +331,7 @@ describe('RestoringFiles', function() {
         )
       })
 
-      return it('should have created the doc in the root folder', function(done) {
+      it('should have created the doc in the root folder', function(done) {
         return this.owner.getProject(this.project_id, (error, project) => {
           if (error != null) {
             throw error

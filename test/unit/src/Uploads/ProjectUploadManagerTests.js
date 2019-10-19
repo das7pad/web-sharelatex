@@ -7,7 +7,6 @@
 // Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 const sinon = require('sinon')
@@ -17,11 +16,14 @@ const modulePath =
   '../../../../app/src/Features/Uploads/ProjectUploadManager.js'
 const SandboxedModule = require('sandboxed-module')
 
+const promiseStub = val => new Promise(resolve => resolve(val))
+const failedPromiseStub = err => new Promise((resolve, reject) => reject(err))
+
 describe('ProjectUploadManager', function() {
   beforeEach(function() {
     this.project_id = 'project-id-123'
     this.folder_id = 'folder-id-123'
-    this.owner_id = 'onwer-id-123'
+    this.owner_id = 'owner-id-123'
     this.callback = sinon.stub()
     this.source = '/path/to/zip/file-name.zip'
     this.destination = '/path/to/zile/file-extracted'
@@ -34,18 +36,33 @@ describe('ProjectUploadManager', function() {
       rootFolder: [{ _id: this.root_folder_id }]
     }
     this.ProjectUploadManager = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         './FileSystemImportManager': (this.FileSystemImportManager = {}),
-        './ArchiveManager': (this.ArchiveManager = {}),
-        '../Project/ProjectCreationHandler': (this.ProjectCreationHandler = {}),
-        '../Project/ProjectRootDocManager': (this.ProjectRootDocManager = {}),
-        '../Project/ProjectDetailsHandler': (this.ProjectDetailsHandler = {}),
+        './ArchiveManager': (this.ArchiveManager = { promises: {} }),
+        '../Project/ProjectCreationHandler': (this.ProjectCreationHandler = {
+          promises: {}
+        }),
+        '../Project/ProjectRootDocManager': (this.ProjectRootDocManager = {
+          promises: {}
+        }),
+        '../Project/ProjectDetailsHandler': (this.ProjectDetailsHandler = {
+          promises: {}
+        }),
+        '../Project/ProjectDeleter': (this.ProjectDeleter = {
+          promises: {}
+        }),
         '../Documents/DocumentHelper': (this.DocumentHelper = {}),
         rimraf: (this.rimraf = sinon.stub().callsArg(1))
       }
     })
 
     this.ArchiveManager.extractZipArchive = sinon.stub().callsArg(2)
+    this.ArchiveManager.promises.extractZipArchive = sinon
+      .stub()
+      .returns(promiseStub())
     this.ArchiveManager.findTopLevelDirectory = sinon
       .stub()
       .callsArgWith(
@@ -53,17 +70,19 @@ describe('ProjectUploadManager', function() {
         null,
         (this.topLevelDestination = '/path/to/zip/file-extracted/nested')
       )
-    this.ProjectCreationHandler.createBlankProject = sinon
+    this.ProjectCreationHandler.promises.createBlankProject = sinon
       .stub()
-      .callsArgWith(2, null, this.project)
-    this.ProjectRootDocManager.setRootDocAutomatically = sinon
+      .returns(promiseStub(this.project))
+    this.ProjectRootDocManager.promises.setRootDocAutomatically = sinon
       .stub()
-      .callsArg(1)
+      .returns(promiseStub())
     this.FileSystemImportManager.addFolderContents = sinon.stub().callsArg(5)
-    this.ProjectRootDocManager.findRootDocFileFromDirectory = sinon
+    this.ProjectRootDocManager.promises.findRootDocFileFromDirectory = sinon
       .stub()
-      .callsArgWith(1, null, 'main.tex', this.othername)
-    this.ProjectRootDocManager.setRootDocFromName = sinon.stub().callsArg(2)
+      .returns(promiseStub({ path: 'main.tex', content: this.othername }))
+    this.ProjectRootDocManager.promises.setRootDocFromName = sinon
+      .stub()
+      .returns(promiseStub())
     this.DocumentHelper.getTitleFromTexContent = sinon
       .stub()
       .returns(this.othername)
@@ -78,9 +97,9 @@ describe('ProjectUploadManager', function() {
         this.ProjectUploadManager._getDestinationDirectory = sinon
           .stub()
           .returns(this.destination)
-        this.ProjectDetailsHandler.generateUniqueName = sinon
+        this.ProjectDetailsHandler.promises.generateUniqueName = sinon
           .stub()
-          .callsArgWith(2, null, this.othername)
+          .returns(promiseStub(this.othername))
         return this.ProjectUploadManager.createProjectFromZipArchive(
           this.owner_id,
           this.name,
@@ -93,25 +112,25 @@ describe('ProjectUploadManager', function() {
       })
 
       it('should set up the directory to extract the archive to', function() {
-        return this.ProjectUploadManager._getDestinationDirectory
+        this.ProjectUploadManager._getDestinationDirectory
           .calledWith(this.source)
           .should.equal(true)
       })
 
       it('should extract the archive', function() {
-        return this.ArchiveManager.extractZipArchive
+        this.ArchiveManager.promises.extractZipArchive
           .calledWith(this.source, this.destination)
           .should.equal(true)
       })
 
       it('should find the top level directory', function() {
-        return this.ArchiveManager.findTopLevelDirectory
+        this.ArchiveManager.findTopLevelDirectory
           .calledWith(this.destination)
           .should.equal(true)
       })
 
       it('should insert the extracted archive into the folder', function() {
-        return this.FileSystemImportManager.addFolderContents
+        this.FileSystemImportManager.addFolderContents
           .calledWith(
             this.owner_id,
             this.project_id,
@@ -123,53 +142,52 @@ describe('ProjectUploadManager', function() {
       })
 
       it('should create a project owned by the owner_id', function() {
-        return this.ProjectCreationHandler.createBlankProject
+        this.ProjectCreationHandler.promises.createBlankProject
           .calledWith(this.owner_id)
           .should.equal(true)
       })
 
       it('should create a project with the correct name', function() {
-        return this.ProjectCreationHandler.createBlankProject
+        this.ProjectCreationHandler.promises.createBlankProject
           .calledWith(sinon.match.any, this.othername)
           .should.equal(true)
       })
 
       it('should read the title from the tex contents', function() {
-        return this.DocumentHelper.getTitleFromTexContent.called.should.equal(
-          true
-        )
+        this.DocumentHelper.getTitleFromTexContent.called.should.equal(true)
       })
 
       it('should set the root document', function() {
-        return this.ProjectRootDocManager.setRootDocFromName
+        this.ProjectRootDocManager.promises.setRootDocFromName
           .calledWith(this.project_id, 'main.tex')
           .should.equal(true)
       })
 
       it('should call the callback', function() {
-        return this.callback
+        this.callback
           .calledWith(sinon.match.falsy, this.project)
           .should.equal(true)
       })
 
-      return it('should ensure the name is valid', function() {
+      it('should ensure the name is valid', function() {
         return this.ProjectDetailsHandler.fixProjectName.called.should.equal(
           true
         )
       })
     })
 
-    return describe("when the root document can't be determined", function() {
+    describe("when the root document can't be determined", function() {
       beforeEach(function(done) {
-        this.ProjectRootDocManager.findRootDocFileFromDirectory = sinon
+        this.ProjectRootDocManager.promises.findRootDocFileFromDirectory = sinon
           .stub()
-          .callsArg(1)
+          .returns(promiseStub())
         this.ProjectUploadManager._getDestinationDirectory = sinon
           .stub()
           .returns(this.destination)
-        this.ProjectDetailsHandler.generateUniqueName = sinon
+        this.ProjectDetailsHandler.promises.generateUniqueName = sinon
           .stub()
-          .callsArgWith(2, null, this.name)
+          .returns(promiseStub(this.name))
+
         return this.ProjectUploadManager.createProjectFromZipArchive(
           this.owner_id,
           this.name,
@@ -181,8 +199,8 @@ describe('ProjectUploadManager', function() {
         )
       })
 
-      return it('should not try to set the root doc', function() {
-        return this.ProjectRootDocManager.setRootDocFromName.called.should.equal(
+      it('should not try to set the root doc', function() {
+        this.ProjectRootDocManager.promises.setRootDocFromName.called.should.equal(
           false
         )
       })
@@ -191,13 +209,16 @@ describe('ProjectUploadManager', function() {
 
   describe('createProjectFromZipArchiveWithName', function() {
     beforeEach(function(done) {
-      this.ProjectDetailsHandler.generateUniqueName = sinon
+      this.ProjectDetailsHandler.promises.generateUniqueName = sinon
         .stub()
-        .callsArgWith(2, null, this.name)
-      this.ProjectUploadManager.insertZipArchiveIntoFolder = sinon
+        .returns(promiseStub(this.name))
+      this.ProjectCreationHandler.promises.createBlankProject = sinon
         .stub()
-        .callsArg(4)
-      return this.ProjectUploadManager.createProjectFromZipArchiveWithName(
+        .returns(promiseStub(this.project))
+      this.ProjectUploadManager.promises.insertZipArchiveIntoFolder = sinon
+        .stub()
+        .returns(promiseStub())
+      this.ProjectUploadManager.createProjectFromZipArchiveWithName(
         this.owner_id,
         this.name,
         this.source,
@@ -209,19 +230,19 @@ describe('ProjectUploadManager', function() {
     })
 
     it('should create a project owned by the owner_id', function() {
-      return this.ProjectCreationHandler.createBlankProject
+      this.ProjectCreationHandler.promises.createBlankProject
         .calledWith(this.owner_id)
         .should.equal(true)
     })
 
     it('should create a project with the correct name', function() {
-      return this.ProjectCreationHandler.createBlankProject
+      this.ProjectCreationHandler.promises.createBlankProject
         .calledWith(sinon.match.any, this.name)
         .should.equal(true)
     })
 
     it('should insert the zip file contents into the root folder', function() {
-      return this.ProjectUploadManager.insertZipArchiveIntoFolder
+      this.ProjectUploadManager.promises.insertZipArchiveIntoFolder
         .calledWith(
           this.owner_id,
           this.project_id,
@@ -232,15 +253,80 @@ describe('ProjectUploadManager', function() {
     })
 
     it('should automatically set the root doc', function() {
-      return this.ProjectRootDocManager.setRootDocAutomatically
+      this.ProjectRootDocManager.promises.setRootDocAutomatically
         .calledWith(this.project_id)
         .should.equal(true)
     })
 
-    return it('should call the callback', function() {
+    it('should call the callback', function() {
       return this.callback
         .calledWith(sinon.match.falsy, this.project)
         .should.equal(true)
+    })
+    describe('when inserting the zip file contents into the root folder fails', function() {
+      beforeEach(function(done) {
+        this.callback = sinon.stub()
+        this.ProjectUploadManager.promises.insertZipArchiveIntoFolder = sinon
+          .stub()
+          .returns(failedPromiseStub('insert-zip-error'))
+        this.ProjectDeleter.promises.deleteProject = sinon
+          .stub()
+          .returns(promiseStub())
+        this.ProjectUploadManager.createProjectFromZipArchiveWithName(
+          this.owner_id,
+          this.name,
+          this.source,
+          (err, project) => {
+            this.callback(err, project)
+            return done()
+          }
+        )
+      })
+
+      it('should pass an error to the callback', function() {
+        return this.callback
+          .calledWith('insert-zip-error', sinon.match.falsy)
+          .should.equal(true)
+      })
+
+      it('should cleanup the blank project created', function() {
+        return this.ProjectDeleter.promises.deleteProject
+          .calledWith(this.project_id)
+          .should.equal(true)
+      })
+    })
+
+    describe('when setting automatically the root doc fails', function() {
+      beforeEach(function(done) {
+        this.callback = sinon.stub()
+        this.ProjectRootDocManager.promises.setRootDocAutomatically = sinon
+          .stub()
+          .returns(failedPromiseStub('set-root-auto-error'))
+        this.ProjectDeleter.promises.deleteProject = sinon
+          .stub()
+          .returns(promiseStub())
+        this.ProjectUploadManager.createProjectFromZipArchiveWithName(
+          this.owner_id,
+          this.name,
+          this.source,
+          (err, project) => {
+            this.callback(err, project)
+            return done()
+          }
+        )
+      })
+
+      it('should pass an error to the callback', function() {
+        return this.callback
+          .calledWith('set-root-auto-error', sinon.match.falsy)
+          .should.equal(true)
+      })
+
+      it('should cleanup the blank project created', function() {
+        return this.ProjectDeleter.promises.deleteProject
+          .calledWith(this.project_id)
+          .should.equal(true)
+      })
     })
   })
 
@@ -262,25 +348,25 @@ describe('ProjectUploadManager', function() {
     })
 
     it('should set up the directory to extract the archive to', function() {
-      return this.ProjectUploadManager._getDestinationDirectory
+      this.ProjectUploadManager._getDestinationDirectory
         .calledWith(this.source)
         .should.equal(true)
     })
 
     it('should extract the archive', function() {
-      return this.ArchiveManager.extractZipArchive
+      this.ArchiveManager.extractZipArchive
         .calledWith(this.source, this.destination)
         .should.equal(true)
     })
 
     it('should find the top level directory', function() {
-      return this.ArchiveManager.findTopLevelDirectory
+      this.ArchiveManager.findTopLevelDirectory
         .calledWith(this.destination)
         .should.equal(true)
     })
 
     it('should insert the extracted archive into the folder', function() {
-      return this.FileSystemImportManager.addFolderContents
+      this.FileSystemImportManager.addFolderContents
         .calledWith(
           this.owner_id,
           this.project_id,
@@ -292,21 +378,22 @@ describe('ProjectUploadManager', function() {
     })
 
     it('should return the callback', function() {
-      return this.callback.called.should.equal(true)
+      this.callback.called.should.equal(true)
     })
 
-    return it('should remove the desintation directory afterwards', function() {
-      return this.rimraf.calledWith(this.destination).should.equal(true)
+    it('should remove the desintation directory afterwards', function() {
+      this.rimraf.calledWith(this.destination).should.equal(true)
     })
   })
 
-  return describe('_getDestinationDirectory', () =>
+  describe('_getDestinationDirectory', function() {
     it('should return the path with the time appended', function() {
       const date = Date.now()
       sinon.stub(Date, 'now', () => date)
       this.ProjectUploadManager._getDestinationDirectory(
         '/path/to/zip/file.zip'
       ).should.equal(`/path/to/zip/file-${date}`)
-      return Date.now.restore()
-    }))
+      Date.now.restore()
+    })
+  })
 })

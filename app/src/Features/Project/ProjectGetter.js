@@ -13,17 +13,18 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-let ProjectGetter
 const mongojs = require('../../infrastructure/mongojs')
 const metrics = require('metrics-sharelatex')
 const { db } = mongojs
 const { ObjectId } = mongojs
 const async = require('async')
+const { promisifyAll } = require('../../util/promises')
 const { Project } = require('../../models/Project')
 const logger = require('logger-sharelatex')
 const LockManager = require('../../infrastructure/LockManager')
+const { DeletedProject } = require('../../models/DeletedProject')
 
-module.exports = ProjectGetter = {
+const ProjectGetter = {
   EXCLUDE_DEPTH: 8,
 
   getProjectWithoutDocLines(project_id, callback) {
@@ -122,7 +123,7 @@ module.exports = ProjectGetter = {
 
     return db.projects.find(query, projection, function(err, project) {
       if (err != null) {
-        logger.err({ err, query, projection }, 'error getting project')
+        logger.warn({ err, query, projection }, 'error getting project')
         return callback(err)
       }
       return callback(null, project != null ? project[0] : undefined)
@@ -148,6 +149,24 @@ module.exports = ProjectGetter = {
     )
   },
 
+  getProjectByV1Id(v1_id, callback) {
+    if (callback == null) {
+      callback = function(err, v1_id) {}
+    }
+    return Project.findOne({ 'overleaf.id': v1_id }, { _id: 1 }, function(
+      err,
+      project
+    ) {
+      if (err != null) {
+        return callback(err)
+      }
+      if (project == null) {
+        return callback()
+      }
+      return callback(null, project._id)
+    })
+  },
+
   findAllUsersProjects(user_id, fields, callback) {
     if (callback == null) {
       callback = function(error, projects) {
@@ -162,7 +181,7 @@ module.exports = ProjectGetter = {
         }
       }
     }
-    const CollaboratorsHandler = require('../Collaborators/CollaboratorsHandler')
+    const CollaboratorsGetter = require('../Collaborators/CollaboratorsGetter')
     return Project.find({ owner_ref: user_id }, fields, function(
       error,
       ownedProjects
@@ -170,7 +189,7 @@ module.exports = ProjectGetter = {
       if (error != null) {
         return callback(error)
       }
-      return CollaboratorsHandler.getProjectsUserIsMemberOf(
+      return CollaboratorsGetter.getProjectsUserIsMemberOf(
         user_id,
         fields,
         function(error, projects) {
@@ -188,8 +207,20 @@ module.exports = ProjectGetter = {
         }
       )
     })
+  },
+
+  getUsersDeletedProjects(user_id, callback) {
+    DeletedProject.find(
+      {
+        'deleterData.deletedProjectOwnerId': user_id
+      },
+      callback
+    )
   }
 }
 ;['getProject', 'getProjectWithoutDocLines'].map(method =>
   metrics.timeAsyncMethod(ProjectGetter, method, 'mongo.ProjectGetter', logger)
 )
+
+ProjectGetter.promises = promisifyAll(ProjectGetter)
+module.exports = ProjectGetter

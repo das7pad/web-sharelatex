@@ -1,12 +1,7 @@
 /* eslint-disable
     camelcase,
-    constructor-super,
     handle-callback-err,
     max-len,
-    no-constant-condition,
-    no-eval,
-    no-return-assign,
-    no-this-before-super,
     no-undef,
 */
 // TODO: This file was created by bulk-decaffeinate.
@@ -73,19 +68,7 @@ define([
       }
 
       constructor(ide, doc_id) {
-        {
-          // Hack: trick Babel/TypeScript into allowing this before super.
-          if (false) {
-            super()
-          }
-          let thisFn = (() => {
-            return this
-          }).toString()
-          let thisName = thisFn
-            .slice(thisFn.indexOf('return') + 6 + 1, thisFn.indexOf(';'))
-            .trim()
-          eval(`${thisName} = this;`)
-        }
+        super()
         this.ide = ide
         this.doc_id = doc_id
         this.connected = this.ide.socket.socket.connected
@@ -97,7 +80,6 @@ define([
           this.ace
         )
         this._checkCMConsistency = _.bind(this._checkConsistency, this, this.cm)
-        this.inconsistentCount = 0
         this._bindToEditorEvents()
         this._bindToSocketEvents()
       }
@@ -161,12 +143,6 @@ define([
             const sharejsValue =
               this.doc != null ? this.doc.getSnapshot() : undefined
             if (editorValue !== sharejsValue) {
-              this.inconsistentCount++
-            } else {
-              this.inconsistentCount = 0
-            }
-
-            if (this.inconsistentCount >= 3) {
               return this._onError(
                 new Error('Editor text does not match server text')
               )
@@ -670,12 +646,19 @@ define([
           return
         }
         if (typeof ga === 'function') {
+          // sanitise the error message before sending (the "delete component"
+          // error in public/js/libs/sharejs.js includes the some document
+          // content).
+          let message = error.message
+          if (/^Delete component/.test(message)) {
+            message = 'Delete component does not match deleted text'
+          }
           ga(
             'send',
             'event',
             'error',
             'shareJsError',
-            `${error.message} - ${this.ide.socket.socket.transport.name}`
+            `${message} - ${this.ide.socket.socket.transport.name}`
           )
         }
         if (this.doc != null) {

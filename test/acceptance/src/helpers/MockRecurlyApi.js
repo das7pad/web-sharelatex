@@ -26,6 +26,14 @@ module.exports = MockRecurlyApi = {
 
   coupons: {},
 
+  addSubscription(subscription) {
+    this.subscriptions[subscription.uuid] = subscription
+  },
+
+  addAccount(account) {
+    this.accounts[account.id] = account
+  },
+
   run() {
     app.get('/subscriptions/:id', (req, res, next) => {
       const subscription = this.subscriptions[req.params.id]
@@ -100,7 +108,7 @@ module.exports = MockRecurlyApi = {
 `)
     })
 
-    return app.listen(6034, function(error) {
+    return app.listen(6034, error => {
       if (error != null) {
         throw error
       }

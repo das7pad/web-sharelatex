@@ -46,6 +46,9 @@ describe('NotificationsController', function() {
       getLoggedInUserId: sinon.stub().returns(this.req.session.user._id)
     }
     return (this.controller = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         './NotificationsHandler': this.handler,
         underscore: (this.underscore = {
@@ -77,7 +80,7 @@ describe('NotificationsController', function() {
     })
   })
 
-  return it('should send a delete request when a delete has been received to mark a notification', function(done) {
+  it('should send a delete request when a delete has been received to mark a notification', function(done) {
     return this.controller.markNotificationAsRead(this.req, {
       send: () => {
         this.handler.markAsRead

@@ -18,6 +18,9 @@ const SandboxedModule = require('sandboxed-module')
 describe('ContactManager', function() {
   beforeEach(function() {
     this.ContactManager = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         request: (this.request = sinon.stub()),
         'settings-sharelatex': (this.settings = {
@@ -29,6 +32,7 @@ describe('ContactManager', function() {
         }),
         'logger-sharelatex': (this.logger = {
           log: sinon.stub(),
+          warn: sinon.stub(),
           error: sinon.stub(),
           err() {}
         })
@@ -71,14 +75,14 @@ describe('ContactManager', function() {
           .should.equal(true)
       })
 
-      return it('should call the callback with the contatcs', function() {
+      it('should call the callback with the contatcs', function() {
         return this.callback
           .calledWith(null, this.contact_ids)
           .should.equal(true)
       })
     })
 
-    return describe('with a failed response code', function() {
+    describe('with a failed response code', function() {
       beforeEach(function() {
         this.request.get = sinon
           .stub()
@@ -98,8 +102,8 @@ describe('ContactManager', function() {
           .should.equal(true)
       })
 
-      return it('should log the error', function() {
-        return this.logger.error
+      it('should log the error', function() {
+        return this.logger.warn
           .calledWith(
             {
               err: new Error(
@@ -114,7 +118,7 @@ describe('ContactManager', function() {
     })
   })
 
-  return describe('addContact', function() {
+  describe('addContact', function() {
     describe('with a successful response code', function() {
       beforeEach(function() {
         this.request.post = sinon
@@ -141,12 +145,12 @@ describe('ContactManager', function() {
           .should.equal(true)
       })
 
-      return it('should call the callback', function() {
+      it('should call the callback', function() {
         return this.callback.called.should.equal(true)
       })
     })
 
-    return describe('with a failed response code', function() {
+    describe('with a failed response code', function() {
       beforeEach(function() {
         this.request.post = sinon
           .stub()
@@ -166,8 +170,8 @@ describe('ContactManager', function() {
           .should.equal(true)
       })
 
-      return it('should log the error', function() {
-        return this.logger.error
+      it('should log the error', function() {
+        return this.logger.warn
           .calledWith(
             {
               err: new Error(

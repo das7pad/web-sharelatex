@@ -148,6 +148,9 @@ describe('ProjectDuplicator', function() {
     this.ProjectDeleter = { deleteProject: sinon.stub().callsArgWith(1, null) }
 
     return (this.duplicator = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         '../../models/Project': { Project: this.Project },
         '../DocumentUpdater/DocumentUpdaterHandler': this
@@ -161,6 +164,7 @@ describe('ProjectDuplicator', function() {
         './ProjectGetter': this.ProjectGetter,
         'logger-sharelatex': {
           log() {},
+          warn() {},
           err() {}
         }
       }
@@ -334,7 +338,7 @@ describe('ProjectDuplicator', function() {
       )
     })
 
-    return it('should copy all the files', function(done) {
+    it('should copy all the files', function(done) {
       return this.duplicator.duplicate(
         this.owner,
         this.old_project_id,
@@ -376,7 +380,7 @@ describe('ProjectDuplicator', function() {
     })
   })
 
-  return describe('when there is an error', function() {
+  describe('when there is an error', function() {
     beforeEach(function() {
       return (this.rootFolder.fileRefs = [
         { name: 'file0', _id: 'file0' },
@@ -414,7 +418,7 @@ describe('ProjectDuplicator', function() {
       )
     })
 
-    return it('should return an error', function(done) {
+    it('should return an error', function(done) {
       return this.duplicator.duplicate(
         this.owner,
         this.old_project_id,

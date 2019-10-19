@@ -36,6 +36,7 @@ module.exports = settings =
 			host: process.env['REDIS_HOST'] || "localhost"
 			port: process.env['REDIS_PORT'] || "6379"
 			password: process.env["REDIS_PASSWORD"] or ""
+			maxRetriesPerRequest: parseInt(process.env["REDIS_MAX_RETRIES_PER_REQUEST"] || '20')
 
 		# websessions:
 		# 	cluster: [
@@ -71,6 +72,7 @@ module.exports = settings =
 			host: process.env['REDIS_HOST'] || "localhost"
 			port: process.env['REDIS_PORT'] || "6379"
 			password: process.env["REDIS_PASSWORD"] or ""
+			maxRetriesPerRequest: parseInt(process.env["REDIS_MAX_RETRIES_PER_REQUEST"] || '20')
 
 	# Service locations
 	# -----------------
@@ -136,6 +138,7 @@ module.exports = settings =
 			url: "http://#{process.env['GITHUB_SYNC_HOST'] or 'localhost'}:3022"
 		recurly:
 			apiKey: process.env['RECURLY_API_KEY'] or ''
+			apiVersion: process.env['RECURLY_API_VERSION']
 			subdomain: process.env['RECURLY_SUBDOMAIN'] or ''
 			publicKey: process.env['RECURLY_PUBLIC_KEY'] or ''
 		geoIpLookup:
@@ -147,7 +150,7 @@ module.exports = settings =
 		sixpack:
 			url: ""
 		references:
-			url: "http://#{process.env['REFERENCES_HOST'] or 'localhost'}:3040"
+			url: if process.env['REFERENCES_HOST']? then "http://#{process.env['REFERENCES_HOST']}:3040" else undefined
 		notifications:
 			url: "http://#{process.env['NOTIFICATIONS_HOST'] or 'localhost'}:3042"
 		analytics:
@@ -198,6 +201,7 @@ module.exports = settings =
 	# Same, but with http auth credentials.
 	httpAuthSiteUrl: "http://#{httpAuthUser}:#{httpAuthPass}@#{siteUrl}"
 
+	robotsNoindex: (process.env['ROBOTS_NOINDEX'] == "true") or false
 
 	maxEntitiesPerProject: 2000
 	
@@ -256,10 +260,56 @@ module.exports = settings =
 	# You must have the corresponding aspell package installed to
 	# be able to use a language.
 	languages: [
-		{name: "English", code: "en"},
-		{name: "French", code: "fr"}
+		{code: "en", name: "English"},
+		{code: "en_US", name: "English (American)"},
+		{code: "en_GB", name: "English (British)"},
+		{code: "en_CA", name: "English (Canadian)"},
+		{code: "af", name: "Afrikaans"},
+		{code: "ar", name: "Arabic"},
+		{code: "gl", name: "Galician"},
+		{code: "eu", name: "Basque"},
+		{code: "br", name: "Breton"},
+		{code: "bg", name: "Bulgarian"},
+		{code: "ca", name: "Catalan"},
+		{code: "hr", name: "Croatian"},
+		{code: "cs", name: "Czech"},
+		{code: "da", name: "Danish"},
+		{code: "nl", name: "Dutch"},
+		{code: "eo", name: "Esperanto"},
+		{code: "et", name: "Estonian"},
+		{code: "fo", name: "Faroese"},
+		{code: "fr", name: "French"},
+		{code: "de", name: "German"},
+		{code: "el", name: "Greek"},
+		{code: "id", name: "Indonesian"},
+		{code: "ga", name: "Irish"},
+		{code: "it", name: "Italian"},
+		{code: "kk", name: "Kazakh"},
+		{code: "ku", name: "Kurdish"},
+		{code: "lv", name: "Latvian"},
+		{code: "lt", name: "Lithuanian"},
+		{code: "nr", name: "Ndebele"},
+		{code: "ns", name: "Northern Sotho"},
+		{code: "no", name: "Norwegian"},
+		{code: "fa", name: "Persian"},
+		{code: "pl", name: "Polish"},
+		{code: "pt_BR", name: "Portuguese (Brazilian)"},
+		{code: "pt_PT", name: "Portuguese (European)"},
+		{code: "pa", name: "Punjabi"},
+		{code: "ro", name: "Romanian"},
+		{code: "ru", name: "Russian"},
+		{code: "sk", name: "Slovak"},
+		{code: "sl", name: "Slovenian"},
+		{code: "st", name: "Southern Sotho"},
+		{code: "es", name: "Spanish"},
+		{code: "sv", name: "Swedish"},
+		{code: "tl", name: "Tagalog"},
+		{code: "ts", name: "Tsonga"},
+		{code: "tn", name: "Tswana"},
+		{code: "hsb", name: "Upper Sorbian"},
+		{code: "cy", name: "Welsh"},
+		{code: "xh", name: "Xhosa"}
 	]
-
 
 	# Password Settings
 	# -----------
@@ -456,7 +506,7 @@ module.exports = settings =
 	redirects:
 		"/templates/index": "/templates/"
 
-	reloadModuleViewsOnEachRequest: process.env['NODE_ENV'] != 'production'
+	reloadModuleViewsOnEachRequest: process.env['NODE_ENV'] == 'development'
 
 	domainLicences: [
 
@@ -499,7 +549,7 @@ module.exports = settings =
 	#	url: "/templates/all"
 	#}]
 
-	rateLimits:
+	rateLimit:
 		autoCompile:
 			everyone: process.env['RATE_LIMIT_AUTO_COMPILE_EVERYONE'] or 100
 			standard: process.env['RATE_LIMIT_AUTO_COMPILE_STANDARD'] or 25
@@ -508,6 +558,8 @@ module.exports = settings =
 	# imageRoot: "<DOCKER REPOSITORY ROOT>" # without any trailing slash
 	
 	compileBodySizeLimitMb: process.env['COMPILE_BODY_SIZE_LIMIT_MB'] or 5
+
+	validRootDocExtensions: ['tex', 'Rtex', 'ltx']
 
 	# allowedImageNames: [
 	# 	{imageName: 'texlive-full:2017.1', imageDesc: 'TeXLive 2017'}

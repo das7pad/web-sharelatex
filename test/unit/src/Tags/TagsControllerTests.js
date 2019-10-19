@@ -39,6 +39,9 @@ describe('TagsController', function() {
       }
     }
     this.controller = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         './TagsHandler': this.handler,
         'logger-sharelatex': {
@@ -66,7 +69,7 @@ describe('TagsController', function() {
     return (this.res.json = sinon.stub())
   })
 
-  describe('getAllTags', () =>
+  describe('getAllTags', function() {
     it('should ask the handler for all tags', function(done) {
       const allTags = [{ name: 'tag', projects: ['123423', '423423'] }]
       this.handler.getAllTags = sinon.stub().callsArgWith(1, null, allTags)
@@ -77,7 +80,8 @@ describe('TagsController', function() {
           return done()
         }
       })
-    }))
+    })
+  })
 
   describe('createTag', function() {
     beforeEach(function() {
@@ -93,7 +97,7 @@ describe('TagsController', function() {
         .should.equal(true)
     })
 
-    return it('should return the tag', function() {
+    it('should return the tag', function() {
       return this.res.json.calledWith(this.tag).should.equal(true)
     })
   })
@@ -111,7 +115,7 @@ describe('TagsController', function() {
         .should.equal(true)
     })
 
-    return it('should return 204 status code', function() {
+    it('should return 204 status code', function() {
       this.res.status.calledWith(204).should.equal(true)
       return this.res.end.called.should.equal(true)
     })
@@ -135,13 +139,13 @@ describe('TagsController', function() {
           .should.equal(true)
       })
 
-      return it('should return 204 status code', function() {
+      it('should return 204 status code', function() {
         this.res.status.calledWith(204).should.equal(true)
         return this.res.end.called.should.equal(true)
       })
     })
 
-    return describe('without a name', function() {
+    describe('without a name', function() {
       beforeEach(function() {
         return this.controller.renameTag(this.req, this.res)
       })
@@ -150,7 +154,7 @@ describe('TagsController', function() {
         return this.handler.renameTag.called.should.equal(false)
       })
 
-      return it('should return 400 (bad request) status code', function() {
+      it('should return 400 (bad request) status code', function() {
         this.res.status.calledWith(400).should.equal(true)
         return this.res.end.called.should.equal(true)
       })
@@ -171,13 +175,13 @@ describe('TagsController', function() {
         .should.equal(true)
     })
 
-    return it('should return 204 status code', function() {
+    it('should return 204 status code', function() {
       this.res.status.calledWith(204).should.equal(true)
       return this.res.end.called.should.equal(true)
     })
   })
 
-  return describe('removeProjectFromTag', function() {
+  describe('removeProjectFromTag', function() {
     beforeEach(function() {
       this.req.params.tag_id = this.tag_id = 'tag-id-123'
       this.req.params.project_id = this.project_id = 'project-id-123'
@@ -191,7 +195,7 @@ describe('TagsController', function() {
         .should.equal(true)
     })
 
-    return it('should return 204 status code', function() {
+    it('should return 204 status code', function() {
       this.res.status.calledWith(204).should.equal(true)
       return this.res.end.called.should.equal(true)
     })

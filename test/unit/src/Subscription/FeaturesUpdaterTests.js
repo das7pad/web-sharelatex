@@ -23,6 +23,9 @@ describe('FeaturesUpdater', function() {
     this.user_id = ObjectId().toString()
 
     return (this.FeaturesUpdater = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         './UserFeaturesUpdater': (this.UserFeaturesUpdater = {}),
         './SubscriptionLocator': (this.SubscriptionLocator = {}),
@@ -33,16 +36,14 @@ describe('FeaturesUpdater', function() {
         'settings-sharelatex': (this.Settings = {}),
         '../Referal/ReferalFeatures': (this.ReferalFeatures = {}),
         './V1SubscriptionManager': (this.V1SubscriptionManager = {}),
-        '../Institutions/InstitutionsFeatures': (this.InstitutionsFeatures = {})
+        '../Institutions/InstitutionsFeatures': (this.InstitutionsFeatures = {}),
+        '../User/UserGetter': (this.UserGetter = {})
       }
     }))
   })
 
   describe('refreshFeatures', function() {
     beforeEach(function() {
-      this.V1SubscriptionManager.notifyV1OfFeaturesChange = sinon
-        .stub()
-        .yields()
       this.UserFeaturesUpdater.updateFeatures = sinon.stub().yields()
       this.FeaturesUpdater._getIndividualFeatures = sinon
         .stub()
@@ -62,6 +63,7 @@ describe('FeaturesUpdater', function() {
       this.FeaturesUpdater._mergeFeatures = sinon
         .stub()
         .returns({ merged: 'features' })
+      this.UserGetter.getUser = sinon.stub().yields(null, {})
       return (this.callback = sinon.stub())
     })
 
@@ -144,32 +146,10 @@ describe('FeaturesUpdater', function() {
           .calledWith(this.user_id, { merged: 'features' })
           .should.equal(true)
       })
-
-      return it('should notify v1', function() {
-        return this.V1SubscriptionManager.notifyV1OfFeaturesChange.called.should.equal(
-          true
-        )
-      })
-    })
-
-    return describe('with notifyV1 == false', function() {
-      beforeEach(function() {
-        return this.FeaturesUpdater.refreshFeatures(
-          this.user_id,
-          false,
-          this.callback
-        )
-      })
-
-      return it('should not notify v1', function() {
-        return this.V1SubscriptionManager.notifyV1OfFeaturesChange.called.should.equal(
-          false
-        )
-      })
     })
   })
 
-  return describe('_mergeFeatures', function() {
+  describe('_mergeFeatures', function() {
     it('should prefer priority over standard for compileGroup', function() {
       expect(
         this.FeaturesUpdater._mergeFeatures(
@@ -287,7 +267,7 @@ describe('FeaturesUpdater', function() {
       })
     })
 
-    return it('should prefer the true over false for other keys', function() {
+    it('should prefer the true over false for other keys', function() {
       expect(
         this.FeaturesUpdater._mergeFeatures(
           {

@@ -69,25 +69,28 @@ describe('RateLimiter', function() {
         return sinon.stub().callsArgWith(1, null, 0, 22)
       }
       return (this.limiter = SandboxedModule.require(modulePath, {
+        globals: {
+          console: console
+        },
         requires: this.requires
       }))
     })
 
     it('should not produce and error', function(done) {
-      return this.limiter.addCount({}, function(err, should) {
+      return this.limiter.addCount({}, (err, should) => {
         expect(err).to.equal(null)
         return done()
       })
     })
 
     it('should callback with true', function(done) {
-      return this.limiter.addCount({}, function(err, should) {
+      return this.limiter.addCount({}, (err, should) => {
         expect(should).to.equal(true)
         return done()
       })
     })
 
-    return it('should not increment the metric', function(done) {
+    it('should not increment the metric', function(done) {
       return this.limiter.addCount(
         { endpointName: this.endpointName },
         (err, should) => {
@@ -104,25 +107,28 @@ describe('RateLimiter', function() {
         return sinon.stub().callsArgWith(1, null, 4000, 0)
       }
       return (this.limiter = SandboxedModule.require(modulePath, {
+        globals: {
+          console: console
+        },
         requires: this.requires
       }))
     })
 
     it('should not produce and error', function(done) {
-      return this.limiter.addCount({}, function(err, should) {
+      return this.limiter.addCount({}, (err, should) => {
         expect(err).to.equal(null)
         return done()
       })
     })
 
     it('should callback with false', function(done) {
-      return this.limiter.addCount({}, function(err, should) {
+      return this.limiter.addCount({}, (err, should) => {
         expect(should).to.equal(false)
         return done()
       })
     })
 
-    return it('should increment the metric', function(done) {
+    it('should increment the metric', function(done) {
       return this.limiter.addCount(
         { endpointName: this.endpointName },
         (err, should) => {
@@ -138,18 +144,21 @@ describe('RateLimiter', function() {
     })
   })
 
-  return describe('when limiter produces an error', function() {
+  describe('when limiter produces an error', function() {
     beforeEach(function() {
       this.requires['rolling-rate-limiter'] = opts => {
         return sinon.stub().callsArgWith(1, new Error('woops'))
       }
       return (this.limiter = SandboxedModule.require(modulePath, {
+        globals: {
+          console: console
+        },
         requires: this.requires
       }))
     })
 
-    return it('should produce and error', function(done) {
-      return this.limiter.addCount({}, function(err, should) {
+    it('should produce and error', function(done) {
+      return this.limiter.addCount({}, (err, should) => {
         expect(err).to.not.equal(null)
         expect(err).to.be.instanceof(Error)
         return done()

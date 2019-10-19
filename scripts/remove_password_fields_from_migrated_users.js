@@ -1,4 +1,4 @@
-const { db } = require('../app/js/infrastructure/mongojs')
+const { db } = require('../app/src/infrastructure/mongojs')
 const minimist = require('minimist')
 
 const argv = minimist(process.argv.slice(2))
@@ -18,13 +18,18 @@ function main(callback) {
     if (!commit) {
       return callback()
     }
-    db.users.update(query, { $unset: { hashedPassword: 1 } }, (err, result) => {
-      if (err) {
-        return callback(err)
+    db.users.update(
+      query,
+      { $unset: { hashedPassword: 1 } },
+      { multi: true },
+      (err, result) => {
+        if (err) {
+          return callback(err)
+        }
+        console.log(`>> Updated users: ${JSON.stringify(result)}`)
+        return callback()
       }
-      console.log(`>> Updated users: ${JSON.stringify(result)}`)
-      return callback()
-    })
+    )
   })
 }
 

@@ -34,6 +34,9 @@ describe('NotificationsBuilder', function() {
       .returns(this.stubResponse)
       .callsArgWith(1, null, response, this.body)
     return (this.controller = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         './NotificationsHandler': this.handler,
         'settings-sharelatex': this.settings,
@@ -46,7 +49,7 @@ describe('NotificationsBuilder', function() {
     }))
   })
 
-  return it('should call v1 and create affiliation notifications', function(done) {
+  it('should call v1 and create affiliation notifications', function(done) {
     const ip = '192.168.0.1'
     return this.controller
       .ipMatcherAffiliation(user_id)

@@ -22,6 +22,9 @@ describe('InstitutionsGetter', function() {
   beforeEach(function() {
     this.UserGetter = { getUserFullEmails: sinon.stub() }
     this.InstitutionsGetter = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         '../User/UserGetter': this.UserGetter,
         '../UserMembership/UserMembershipsHandler': (this.UserMembershipsHandler = {}),
@@ -38,7 +41,7 @@ describe('InstitutionsGetter', function() {
     return (this.userId = '12345abcde')
   })
 
-  return describe('getConfirmedInstitutions', function() {
+  describe('getConfirmedInstitutions', function() {
     it('filters unconfirmed affiliations', function(done) {
       this.userEmails = [
         {
@@ -59,7 +62,7 @@ describe('InstitutionsGetter', function() {
       this.UserGetter.getUserFullEmails.yields(null, this.userEmails)
       return this.InstitutionsGetter.getConfirmedInstitutions(
         this.userId,
-        function(error, institutions) {
+        (error, institutions) => {
           expect(error).to.not.exist
           institutions.length.should.equal(1)
           institutions[0].id.should.equal(456)
@@ -72,7 +75,7 @@ describe('InstitutionsGetter', function() {
       this.UserGetter.getUserFullEmails.yields(null, [])
       return this.InstitutionsGetter.getConfirmedInstitutions(
         this.userId,
-        function(error, institutions) {
+        (error, institutions) => {
           expect(error).to.not.exist
           institutions.length.should.equal(0)
           return done()
@@ -80,11 +83,11 @@ describe('InstitutionsGetter', function() {
       )
     })
 
-    return it('should handle error', function(done) {
+    it('should handle error', function(done) {
       this.UserGetter.getUserFullEmails.yields(new Error('Nope'))
       return this.InstitutionsGetter.getConfirmedInstitutions(
         this.userId,
-        function(error, institutions) {
+        (error, institutions) => {
           expect(error).to.exist
           return done()
         }

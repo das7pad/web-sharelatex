@@ -21,6 +21,9 @@ const SandboxedModule = require('sandboxed-module')
 describe('ClsiFormatChecker', function() {
   beforeEach(function() {
     this.ClsiFormatChecker = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         'settings-sharelatex': (this.settings = { compileBodySizeLimitMb: 5 }),
         'logger-sharelatex': (this.logger = {
@@ -33,7 +36,7 @@ describe('ClsiFormatChecker', function() {
     return (this.project_id = 'project-id')
   })
 
-  return describe('checkRecoursesForProblems', function() {
+  describe('checkRecoursesForProblems', function() {
     beforeEach(function() {
       return (this.resources = [
         {
@@ -151,7 +154,7 @@ describe('ClsiFormatChecker', function() {
 
         return this.ClsiFormatChecker._checkForConflictingPaths(
           this.resources,
-          function(err, conflictPathErrors) {
+          (err, conflictPathErrors) => {
             conflictPathErrors.length.should.equal(1)
             conflictPathErrors[0].path.should.equal('stuff/image')
             return done()
@@ -167,7 +170,7 @@ describe('ClsiFormatChecker', function() {
 
         return this.ClsiFormatChecker._checkForConflictingPaths(
           this.resources,
-          function(err, conflictPathErrors) {
+          (err, conflictPathErrors) => {
             conflictPathErrors.length.should.equal(1)
             conflictPathErrors[0].path.should.equal('stuff')
             return done()
@@ -175,7 +178,7 @@ describe('ClsiFormatChecker', function() {
         )
       })
 
-      return it('should not flag up when the file is a substring of a path', function(done) {
+      it('should not flag up when the file is a substring of a path', function(done) {
         this.resources.push({
           path: 'stuf',
           content: 'other stuff'
@@ -183,7 +186,7 @@ describe('ClsiFormatChecker', function() {
 
         return this.ClsiFormatChecker._checkForConflictingPaths(
           this.resources,
-          function(err, conflictPathErrors) {
+          (err, conflictPathErrors) => {
             conflictPathErrors.length.should.equal(0)
             return done()
           }
@@ -191,7 +194,7 @@ describe('ClsiFormatChecker', function() {
       })
     })
 
-    return describe('_checkDocsAreUnderSizeLimit', function() {
+    describe('_checkDocsAreUnderSizeLimit', function() {
       it('should error when there is more than 5mb of data', function(done) {
         this.resources.push({
           path: 'massive.tex',
@@ -209,7 +212,7 @@ describe('ClsiFormatChecker', function() {
 
         return this.ClsiFormatChecker._checkDocsAreUnderSizeLimit(
           this.resources,
-          function(err, sizeError) {
+          (err, sizeError) => {
             sizeError.totalSize.should.equal(10000016)
             sizeError.resources.length.should.equal(10)
             sizeError.resources[0].path.should.equal('massive.tex')
@@ -219,7 +222,7 @@ describe('ClsiFormatChecker', function() {
         )
       })
 
-      return it('should return nothing when project is correct size', function(done) {
+      it('should return nothing when project is correct size', function(done) {
         this.resources.push({
           path: 'massive.tex',
           content: require('crypto')
@@ -236,7 +239,7 @@ describe('ClsiFormatChecker', function() {
 
         return this.ClsiFormatChecker._checkDocsAreUnderSizeLimit(
           this.resources,
-          function(err, sizeError) {
+          (err, sizeError) => {
             expect(sizeError).to.not.exist
             return done()
           }

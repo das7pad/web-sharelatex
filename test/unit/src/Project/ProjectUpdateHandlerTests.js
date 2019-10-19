@@ -29,6 +29,9 @@ describe('ProjectUpdateHandler', function() {
     this.ProjectModel = Project = class Project {}
     this.ProjectModel.update = sinon.stub().callsArg(3)
     return (this.handler = SandboxedModule.require(modulePath, {
+      globals: {
+        console: console
+      },
       requires: {
         '../../models/Project': { Project: this.ProjectModel },
         'logger-sharelatex': { log: sinon.stub() }
@@ -69,7 +72,7 @@ describe('ProjectUpdateHandler', function() {
       )
     })
 
-    return it('should set smart fallbacks', function(done) {
+    it('should set smart fallbacks', function(done) {
       return this.handler.markAsUpdated(this.project_id, null, null, err => {
         sinon.assert.calledWithMatch(
           this.ProjectModel.update,
@@ -87,7 +90,7 @@ describe('ProjectUpdateHandler', function() {
     })
   })
 
-  describe('markAsOpened', () =>
+  describe('markAsOpened', function() {
     it('should send an update to mongo', function(done) {
       const project_id = 'project_id'
       return this.handler.markAsOpened(project_id, err => {
@@ -98,9 +101,10 @@ describe('ProjectUpdateHandler', function() {
         date.substring(0, 5).should.equal(now.substring(0, 5))
         return done()
       })
-    }))
+    })
+  })
 
-  describe('markAsInactive', () =>
+  describe('markAsInactive', function() {
     it('should send an update to mongo', function(done) {
       const project_id = 'project_id'
       return this.handler.markAsInactive(project_id, err => {
@@ -109,9 +113,10 @@ describe('ProjectUpdateHandler', function() {
         args[1].active.should.equal(false)
         return done()
       })
-    }))
+    })
+  })
 
-  return describe('markAsActive', () =>
+  describe('markAsActive', function() {
     it('should send an update to mongo', function(done) {
       const project_id = 'project_id'
       return this.handler.markAsActive(project_id, err => {
@@ -120,5 +125,6 @@ describe('ProjectUpdateHandler', function() {
         args[1].active.should.equal(true)
         return done()
       })
-    }))
+    })
+  })
 })

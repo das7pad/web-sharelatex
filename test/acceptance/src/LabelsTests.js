@@ -40,7 +40,9 @@ describe('Labels', function() {
     })
   })
 
-  afterEach(() => MockProjectHistoryApi.reset())
+  afterEach(function() {
+    return MockProjectHistoryApi.reset()
+  })
 
   it('getting labels', function(done) {
     const label_id = new ObjectId().toString()
@@ -93,7 +95,7 @@ describe('Labels', function() {
     )
   })
 
-  return it('deleting a label', function(done) {
+  it('deleting a label', function(done) {
     const label_id = new ObjectId().toString()
     const comment = 'a label comment'
     const version = 3
