@@ -1,77 +1,113 @@
-ObjectId = require('mongoose').Types.ObjectId
-async = require("async")
-Errors = require('../Errors/Errors')
-EntityModels =
-	Institution: require('../../models/Institution').Institution
-	Subscription: require('../../models/Subscription').Subscription
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const {
+    ObjectId
+} = require('mongoose').Types;
+const async = require("async");
+const Errors = require('../Errors/Errors');
+const EntityModels = {
+	Institution: require('../../models/Institution').Institution,
+	Subscription: require('../../models/Subscription').Subscription,
 	Publisher: require('../../models/Publisher').Publisher
-UserMembershipViewModel = require('./UserMembershipViewModel')
-UserGetter = require('../User/UserGetter')
-logger = require('logger-sharelatex')
-UserMembershipEntityConfigs = require "./UserMembershipEntityConfigs"
+};
+const UserMembershipViewModel = require('./UserMembershipViewModel');
+const UserGetter = require('../User/UserGetter');
+const logger = require('logger-sharelatex');
+const UserMembershipEntityConfigs = require("./UserMembershipEntityConfigs");
 
-module.exports =
-	getEntity: (entityId, entityConfig, loggedInUser, requiredStaffAccess, callback = (error, entity) ->) ->
-		query = buildEntityQuery(entityId, entityConfig)
-		unless loggedInUser.isAdmin or loggedInUser.staffAccess?[requiredStaffAccess]
-			query[entityConfig.fields.access] = ObjectId(loggedInUser._id)
-		EntityModels[entityConfig.modelName].findOne query, callback
+module.exports = {
+	getEntity(entityId, entityConfig, loggedInUser, requiredStaffAccess, callback) {
+		if (callback == null) { callback = function(error, entity) {}; }
+		const query = buildEntityQuery(entityId, entityConfig);
+		if (!loggedInUser.isAdmin && !(loggedInUser.staffAccess != null ? loggedInUser.staffAccess[requiredStaffAccess] : undefined)) {
+			query[entityConfig.fields.access] = ObjectId(loggedInUser._id);
+		}
+		return EntityModels[entityConfig.modelName].findOne(query, callback);
+	},
 
-	getEntityWithoutAuthorizationCheck: (entityId, entityConfig, callback = (error, entity) ->) ->
-		query = buildEntityQuery(entityId, entityConfig)
-		EntityModels[entityConfig.modelName].findOne query, callback
+	getEntityWithoutAuthorizationCheck(entityId, entityConfig, callback) {
+		if (callback == null) { callback = function(error, entity) {}; }
+		const query = buildEntityQuery(entityId, entityConfig);
+		return EntityModels[entityConfig.modelName].findOne(query, callback);
+	},
 
-	createEntity: (entityId, entityConfig, callback = (error, entity) ->) ->
-		data = buildEntityQuery(entityId, entityConfig)
-		EntityModels[entityConfig.modelName].create data, callback
+	createEntity(entityId, entityConfig, callback) {
+		if (callback == null) { callback = function(error, entity) {}; }
+		const data = buildEntityQuery(entityId, entityConfig);
+		return EntityModels[entityConfig.modelName].create(data, callback);
+	},
 
-	getUsers: (entity, entityConfig, callback = (error, users) ->) ->
-		attributes = entityConfig.fields.read
-		getPopulatedListOfMembers(entity, attributes, callback)
+	getUsers(entity, entityConfig, callback) {
+		if (callback == null) { callback = function(error, users) {}; }
+		const attributes = entityConfig.fields.read;
+		return getPopulatedListOfMembers(entity, attributes, callback);
+	},
 
-	addUser: (entity, entityConfig, email, callback = (error, user) ->) ->
-		attribute = entityConfig.fields.write
-		UserGetter.getUserByAnyEmail email, (error, user) ->
-			return callback(error) if error?
-			unless user
-				return callback(userNotFound: true)
-			if entity[attribute].some((managerId) -> managerId.equals(user._id))
-				return callback(alreadyAdded: true)
+	addUser(entity, entityConfig, email, callback) {
+		if (callback == null) { callback = function(error, user) {}; }
+		const attribute = entityConfig.fields.write;
+		return UserGetter.getUserByAnyEmail(email, function(error, user) {
+			if (error != null) { return callback(error); }
+			if (!user) {
+				return callback({userNotFound: true});
+			}
+			if (entity[attribute].some(managerId => managerId.equals(user._id))) {
+				return callback({alreadyAdded: true});
+			}
 
-			addUserToEntity entity, attribute, user, (error) ->
-				callback(error, UserMembershipViewModel.build(user))
+			return addUserToEntity(entity, attribute, user, error => callback(error, UserMembershipViewModel.build(user)));
+		});
+	},
 
-	removeUser: (entity, entityConfig, userId, callback = (error) ->) ->
-		attribute = entityConfig.fields.write
-		if entity.admin_id?.equals(userId)
-			return callback(isAdmin: true)
-		removeUserFromEntity entity, attribute, userId, callback
+	removeUser(entity, entityConfig, userId, callback) {
+		if (callback == null) { callback = function(error) {}; }
+		const attribute = entityConfig.fields.write;
+		if (entity.admin_id != null ? entity.admin_id.equals(userId) : undefined) {
+			return callback({isAdmin: true});
+		}
+		return removeUserFromEntity(entity, attribute, userId, callback);
+	}
+};
 
-getPopulatedListOfMembers = (entity, attributes, callback = (error, users)->)->
-		userObjects = []
+var getPopulatedListOfMembers = function(entity, attributes, callback){
+		if (callback == null) { callback = function(error, users){}; }
+		const userObjects = [];
 
-		for attribute in attributes
-			for userObject in entity[attribute] or []
-				# userObject can be an email as String, a user id as ObjectId or an
-				# invite as Object with an email attribute as String. We want to pass to
-				# UserMembershipViewModel either an email as (String) or a user id (ObjectId)
-				userIdOrEmail = userObject.email || userObject
-				userObjects.push userIdOrEmail
+		for (let attribute of Array.from(attributes)) {
+			for (let userObject of Array.from(entity[attribute] || [])) {
+				// userObject can be an email as String, a user id as ObjectId or an
+				// invite as Object with an email attribute as String. We want to pass to
+				// UserMembershipViewModel either an email as (String) or a user id (ObjectId)
+				const userIdOrEmail = userObject.email || userObject;
+				userObjects.push(userIdOrEmail);
+			}
+		}
 
-		async.map userObjects, UserMembershipViewModel.buildAsync, callback
+		return async.map(userObjects, UserMembershipViewModel.buildAsync, callback);
+	};
 
-addUserToEntity = (entity, attribute, user, callback = (error)->) ->
-	fieldUpdate = {}
-	fieldUpdate[attribute] = user._id
-	entity.update { $addToSet: fieldUpdate }, callback
+var addUserToEntity = function(entity, attribute, user, callback) {
+	if (callback == null) { callback = function(error){}; }
+	const fieldUpdate = {};
+	fieldUpdate[attribute] = user._id;
+	return entity.update({ $addToSet: fieldUpdate }, callback);
+};
 
-removeUserFromEntity = (entity, attribute, userId, callback = (error)->) ->
-	fieldUpdate = {}
-	fieldUpdate[attribute] = userId
-	entity.update { $pull: fieldUpdate }, callback
+var removeUserFromEntity = function(entity, attribute, userId, callback) {
+	if (callback == null) { callback = function(error){}; }
+	const fieldUpdate = {};
+	fieldUpdate[attribute] = userId;
+	return entity.update({ $pull: fieldUpdate }, callback);
+};
 
-buildEntityQuery = (entityId, entityConfig, loggedInUser) ->
-	entityId = ObjectId(entityId) if ObjectId.isValid(entityId.toString())
-	query = Object.assign({}, entityConfig.baseQuery)
-	query[entityConfig.fields.primaryKey] = entityId
-	query
+var buildEntityQuery = function(entityId, entityConfig, loggedInUser) {
+	if (ObjectId.isValid(entityId.toString())) { entityId = ObjectId(entityId); }
+	const query = Object.assign({}, entityConfig.baseQuery);
+	query[entityConfig.fields.primaryKey] = entityId;
+	return query;
+};

@@ -1,46 +1,71 @@
-RedisWrapper = require('../../infrastructure/RedisWrapper')
-rclient = RedisWrapper.client('sudomode')
-logger = require('logger-sharelatex')
-AuthenticationManager = require '../Authentication/AuthenticationManager'
-Settings = require 'settings-sharelatex'
-V1Handler = require '../V1/V1Handler'
-UserGetter = require '../User/UserGetter'
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let SudoModeHandler;
+const RedisWrapper = require('../../infrastructure/RedisWrapper');
+const rclient = RedisWrapper.client('sudomode');
+const logger = require('logger-sharelatex');
+const AuthenticationManager = require('../Authentication/AuthenticationManager');
+const Settings = require('settings-sharelatex');
+const V1Handler = require('../V1/V1Handler');
+const UserGetter = require('../User/UserGetter');
 
 
-TIMEOUT_IN_SECONDS = 60 * 60
+const TIMEOUT_IN_SECONDS = 60 * 60;
 
 
-module.exports = SudoModeHandler =
+module.exports = (SudoModeHandler = {
 
-	_buildKey: (userId) ->
-		"SudoMode:{#{userId}}"
+	_buildKey(userId) {
+		return `SudoMode:{${userId}}`;
+	},
 
-	authenticate: (email, password, callback=(err, user)->) ->
-		if Settings.overleaf?
-			V1Handler.authWithV1 email, password, (err, isValid, v1Profile) ->
-				if !isValid
-					return callback(null, null)
-				UserGetter.getUser {'overleaf.id': v1Profile.id}, callback
-		else
-			AuthenticationManager.authenticate {email}, password, callback
+	authenticate(email, password, callback) {
+		if (callback == null) { callback = function(err, user){}; }
+		if (Settings.overleaf != null) {
+			return V1Handler.authWithV1(email, password, function(err, isValid, v1Profile) {
+				if (!isValid) {
+					return callback(null, null);
+				}
+				return UserGetter.getUser({'overleaf.id': v1Profile.id}, callback);
+			});
+		} else {
+			return AuthenticationManager.authenticate({email}, password, callback);
+		}
+	},
 
-	activateSudoMode: (userId, callback=(err)->) ->
-		if !userId?
-			return callback(new Error('[SudoMode] user must be supplied'))
-		duration = TIMEOUT_IN_SECONDS
-		logger.log {userId, duration}, "[SudoMode] activating sudo mode for user"
-		rclient.set SudoModeHandler._buildKey(userId), '1', 'EX', duration, callback
+	activateSudoMode(userId, callback) {
+		if (callback == null) { callback = function(err){}; }
+		if ((userId == null)) {
+			return callback(new Error('[SudoMode] user must be supplied'));
+		}
+		const duration = TIMEOUT_IN_SECONDS;
+		logger.log({userId, duration}, "[SudoMode] activating sudo mode for user");
+		return rclient.set(SudoModeHandler._buildKey(userId), '1', 'EX', duration, callback);
+	},
 
-	clearSudoMode: (userId, callback=(err)->) ->
-		if !userId?
-			return callback(new Error('[SudoMode] user must be supplied'))
-		logger.log {userId}, "[SudoMode] clearing sudo mode for user"
-		rclient.del SudoModeHandler._buildKey(userId), callback
+	clearSudoMode(userId, callback) {
+		if (callback == null) { callback = function(err){}; }
+		if ((userId == null)) {
+			return callback(new Error('[SudoMode] user must be supplied'));
+		}
+		logger.log({userId}, "[SudoMode] clearing sudo mode for user");
+		return rclient.del(SudoModeHandler._buildKey(userId), callback);
+	},
 
-	isSudoModeActive: (userId, callback=(err, isActive)->) ->
-		if !userId?
-			return callback(new Error('[SudoMode] user must be supplied'))
-		rclient.get SudoModeHandler._buildKey(userId), (err, result) ->
-			if err?
-				return callback(err)
-			callback(null, result == '1')
+	isSudoModeActive(userId, callback) {
+		if (callback == null) { callback = function(err, isActive){}; }
+		if ((userId == null)) {
+			return callback(new Error('[SudoMode] user must be supplied'));
+		}
+		return rclient.get(SudoModeHandler._buildKey(userId), function(err, result) {
+			if (err != null) {
+				return callback(err);
+			}
+			return callback(null, result === '1');
+		});
+	}
+});

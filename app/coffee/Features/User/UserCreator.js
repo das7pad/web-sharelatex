@@ -1,50 +1,72 @@
-User = require("../../models/User").User
-logger = require("logger-sharelatex")
-metrics = require('metrics-sharelatex')
-{ addAffiliation } = require("../Institutions/InstitutionsAPI")
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let UserCreator;
+const {
+    User
+} = require("../../models/User");
+const logger = require("logger-sharelatex");
+const metrics = require('metrics-sharelatex');
+const { addAffiliation } = require("../Institutions/InstitutionsAPI");
 
 
-module.exports = UserCreator =
+module.exports = (UserCreator = {
 
-	createNewUser: (attributes, options, callback = (error, user) ->)->
-		if arguments.length == 2
-			callback = options
-			options = {}
-		logger.log user: attributes, "creating new user"
-		user = new User()
+	createNewUser(attributes, options, callback){
+		if (callback == null) { callback = function(error, user) {}; }
+		if (arguments.length === 2) {
+			callback = options;
+			options = {};
+		}
+		logger.log({user: attributes}, "creating new user");
+		const user = new User();
 
-		username = attributes.email.match(/^[^@]*/)
-		if !attributes.first_name? or attributes.first_name == ""
-			attributes.first_name = username[0]
+		const username = attributes.email.match(/^[^@]*/);
+		if ((attributes.first_name == null) || (attributes.first_name === "")) {
+			attributes.first_name = username[0];
+		}
 
-		for key, value of attributes
-			user[key] = value
+		for (let key in attributes) {
+			const value = attributes[key];
+			user[key] = value;
+		}
 			
-		user.ace.syntaxValidation = true
-		user.featureSwitches?.pdfng = true
-		user.emails = [
-			email: user.email
-			createdAt: new Date()
+		user.ace.syntaxValidation = true;
+		if (user.featureSwitches != null) {
+			user.featureSwitches.pdfng = true;
+		}
+		user.emails = [{
+			email: user.email,
+			createdAt: new Date(),
 			reversedHostname: user.email.split('@')[1].split('').reverse().join('')
-		]
+		}
+		];
 
-		user.save (err)->
-			callback(err, user)
+		return user.save(function(err){
+			callback(err, user);
 
-			return if options?.skip_affiliation
-			# call addaffiliation after the main callback so it runs in the
-			# background. There is no guaranty this will run so we must no rely on it
-			addAffiliation user._id, user.email, (error) ->
-				if error
-					logger.log { userId: user._id, email: user.email, error: error },
-						"couldn't add affiliation for user on create"
-				else
-					logger.log { userId: user._id, email: user.email },
-					"added affiliation for user on create"
+			if (options != null ? options.skip_affiliation : undefined) { return; }
+			// call addaffiliation after the main callback so it runs in the
+			// background. There is no guaranty this will run so we must no rely on it
+			return addAffiliation(user._id, user.email, function(error) {
+				if (error) {
+					return logger.log({ userId: user._id, email: user.email, error },
+						"couldn't add affiliation for user on create");
+				} else {
+					return logger.log({ userId: user._id, email: user.email },
+					"added affiliation for user on create");
+				}
+			});
+		});
+	}
+});
 
 
 metrics.timeAsyncMethod(
 	UserCreator, 'createNewUser',
 	'mongo.UserCreator',
 	logger
-)
+);

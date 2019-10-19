@@ -1,70 +1,97 @@
-settings = require "settings-sharelatex"
-logger = require("logger-sharelatex")
-TeamInvitesHandler = require('./TeamInvitesHandler')
-AuthenticationController = require("../Authentication/AuthenticationController")
-SubscriptionLocator = require("./SubscriptionLocator")
-ErrorController = require("../Errors/ErrorController")
-EmailHelper = require("../Helpers/EmailHelper")
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const settings = require("settings-sharelatex");
+const logger = require("logger-sharelatex");
+const TeamInvitesHandler = require('./TeamInvitesHandler');
+const AuthenticationController = require("../Authentication/AuthenticationController");
+const SubscriptionLocator = require("./SubscriptionLocator");
+const ErrorController = require("../Errors/ErrorController");
+const EmailHelper = require("../Helpers/EmailHelper");
 
-module.exports =
-	createInvite: (req, res, next) ->
-		teamManagerId = AuthenticationController.getLoggedInUserId(req)
-		subscription = req.entity
-		email = EmailHelper.parseEmail(req.body.email)
-		if !email?
-			return res.status(422).json error:
-				code: 'invalid_email'
+module.exports = {
+	createInvite(req, res, next) {
+		const teamManagerId = AuthenticationController.getLoggedInUserId(req);
+		const subscription = req.entity;
+		const email = EmailHelper.parseEmail(req.body.email);
+		if ((email == null)) {
+			return res.status(422).json({error: {
+				code: 'invalid_email',
 				message: req.i18n.translate('invalid_email')
-
-
-		TeamInvitesHandler.createInvite teamManagerId, subscription, email, (err, invite) ->
-			return next(err) if err?
-			inviteView = { user:
-				{ email: invite.email, sentAt: invite.sentAt, invite: true }
 			}
-			res.json inviteView
+			});
+		}
 
-	viewInvite: (req, res, next) ->
-		token = req.params.token
-		userId = AuthenticationController.getLoggedInUserId(req)
 
-		TeamInvitesHandler.getInvite token, (err, invite, teamSubscription) ->
-			return next(err) if err?
+		return TeamInvitesHandler.createInvite(teamManagerId, subscription, email, function(err, invite) {
+			if (err != null) { return next(err); }
+			const inviteView = { user:
+				{ email: invite.email, sentAt: invite.sentAt, invite: true }
+			};
+			return res.json(inviteView);
+		});
+	},
 
-			if !invite
-				return ErrorController.notFound(req, res, next)
+	viewInvite(req, res, next) {
+		const {
+            token
+        } = req.params;
+		const userId = AuthenticationController.getLoggedInUserId(req);
 
-			SubscriptionLocator.getUsersSubscription userId, (err, personalSubscription) ->
-				return next(err) if err?
+		return TeamInvitesHandler.getInvite(token, function(err, invite, teamSubscription) {
+			if (err != null) { return next(err); }
 
-				hasIndividualRecurlySubscription =
-					personalSubscription? &&
-					!personalSubscription.planCode.match(/(free|trial)/)? &&
-					personalSubscription.groupPlan == false &&
-					personalSubscription.recurlySubscription_id? &&
-					personalSubscription.recurlySubscription_id != ""
+			if (!invite) {
+				return ErrorController.notFound(req, res, next);
+			}
 
-				res.render "subscriptions/team/invite",
-					inviterName: invite.inviterName
-					inviteToken: invite.token
-					hasIndividualRecurlySubscription: hasIndividualRecurlySubscription
+			return SubscriptionLocator.getUsersSubscription(userId, function(err, personalSubscription) {
+				if (err != null) { return next(err); }
+
+				const hasIndividualRecurlySubscription =
+					(personalSubscription != null) &&
+					(personalSubscription.planCode.match(/(free|trial)/) == null) &&
+					(personalSubscription.groupPlan === false) &&
+					(personalSubscription.recurlySubscription_id != null) &&
+					(personalSubscription.recurlySubscription_id !== "");
+
+				return res.render("subscriptions/team/invite", {
+					inviterName: invite.inviterName,
+					inviteToken: invite.token,
+					hasIndividualRecurlySubscription,
 					appName: settings.appName
+				}
+				);
+			});
+		});
+	},
 
-	acceptInvite: (req, res, next) ->
-		token = req.params.token
-		userId = AuthenticationController.getLoggedInUserId(req)
+	acceptInvite(req, res, next) {
+		const {
+            token
+        } = req.params;
+		const userId = AuthenticationController.getLoggedInUserId(req);
 
-		TeamInvitesHandler.acceptInvite token, userId, (err, results) ->
-			return next(err) if err?
-			res.sendStatus 204
+		return TeamInvitesHandler.acceptInvite(token, userId, function(err, results) {
+			if (err != null) { return next(err); }
+			return res.sendStatus(204);
+		});
+	},
 
-	revokeInvite: (req, res) ->
-		subscription = req.entity
-		email = EmailHelper.parseEmail(req.params.email)
-		teamManagerId = AuthenticationController.getLoggedInUserId(req)
-		if !email?
-			return res.sendStatus(400)
+	revokeInvite(req, res) {
+		const subscription = req.entity;
+		const email = EmailHelper.parseEmail(req.params.email);
+		const teamManagerId = AuthenticationController.getLoggedInUserId(req);
+		if ((email == null)) {
+			return res.sendStatus(400);
+		}
 
-		TeamInvitesHandler.revokeInvite teamManagerId, subscription, email, (err, results) ->
-			return next(err) if err?
-			res.sendStatus 204
+		return TeamInvitesHandler.revokeInvite(teamManagerId, subscription, email, function(err, results) {
+			if (err != null) { return next(err); }
+			return res.sendStatus(204);
+		});
+	}
+};

@@ -1,9 +1,17 @@
-Settings = require("settings-sharelatex")
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const Settings = require("settings-sharelatex");
 
-module.exports =
+module.exports = {
 
-	findLocalPlanInSettings: (planCode) ->
-		for plan in Settings.plans
-			return plan if plan.planCode == planCode
-		return null
+	findLocalPlanInSettings(planCode) {
+		for (let plan of Array.from(Settings.plans)) {
+			if (plan.planCode === planCode) { return plan; }
+		}
+		return null;
+	}
+};
 

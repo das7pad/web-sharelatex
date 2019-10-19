@@ -1,29 +1,49 @@
-SystemMessage = require("../../models/SystemMessage").SystemMessage
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let SystemMessageManager;
+const {
+    SystemMessage
+} = require("../../models/SystemMessage");
 
-module.exports = SystemMessageManager =
-	getMessages: (callback = (error, messages) ->) ->
-		if @_cachedMessages?
-			return callback null, @_cachedMessages
-		else
-			@getMessagesFromDB (error, messages) =>
-				return callback(error) if error?
-				@_cachedMessages = messages
-				return callback null, messages
+module.exports = (SystemMessageManager = {
+	getMessages(callback) {
+		if (callback == null) { callback = function(error, messages) {}; }
+		if (this._cachedMessages != null) {
+			return callback(null, this._cachedMessages);
+		} else {
+			return this.getMessagesFromDB((error, messages) => {
+				if (error != null) { return callback(error); }
+				this._cachedMessages = messages;
+				return callback(null, messages);
+			});
+		}
+	},
 				
-	getMessagesFromDB: (callback = (error, messages) ->) ->
-		SystemMessage.find {}, callback
+	getMessagesFromDB(callback) {
+		if (callback == null) { callback = function(error, messages) {}; }
+		return SystemMessage.find({}, callback);
+	},
 				
-	clearMessages: (callback = (error) ->) ->
-		SystemMessage.remove {}, callback
+	clearMessages(callback) {
+		if (callback == null) { callback = function(error) {}; }
+		return SystemMessage.remove({}, callback);
+	},
 		
-	createMessage: (content, callback = (error) ->) ->
-		message = new SystemMessage { content: content }
-		message.save callback
+	createMessage(content, callback) {
+		if (callback == null) { callback = function(error) {}; }
+		const message = new SystemMessage({ content });
+		return message.save(callback);
+	},
 				
-	clearCache: () ->
-		delete @_cachedMessages
+	clearCache() {
+		return delete this._cachedMessages;
+	}
+});
 				
-CACHE_TIMEOUT = 20 * 1000 # 20 seconds		
-setInterval () ->
-	SystemMessageManager.clearCache()
-, CACHE_TIMEOUT
+const CACHE_TIMEOUT = 20 * 1000; // 20 seconds		
+setInterval(() => SystemMessageManager.clearCache()
+, CACHE_TIMEOUT);

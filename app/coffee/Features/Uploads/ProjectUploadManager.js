@@ -1,71 +1,91 @@
-path = require "path"
-rimraf = require "rimraf"
-async = require "async"
-ArchiveManager          = require "./ArchiveManager"
-FileSystemImportManager = require "./FileSystemImportManager"
-ProjectCreationHandler  = require "../Project/ProjectCreationHandler"
-ProjectRootDocManager   = require "../Project/ProjectRootDocManager"
-ProjectDetailsHandler   = require "../Project/ProjectDetailsHandler"
-DocumentHelper          = require "../Documents/DocumentHelper"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let ProjectUploadHandler;
+const path = require("path");
+const rimraf = require("rimraf");
+const async = require("async");
+const ArchiveManager          = require("./ArchiveManager");
+const FileSystemImportManager = require("./FileSystemImportManager");
+const ProjectCreationHandler  = require("../Project/ProjectCreationHandler");
+const ProjectRootDocManager   = require("../Project/ProjectRootDocManager");
+const ProjectDetailsHandler   = require("../Project/ProjectDetailsHandler");
+const DocumentHelper          = require("../Documents/DocumentHelper");
 
-module.exports = ProjectUploadHandler =
-	createProjectFromZipArchive: (owner_id, defaultName, zipPath, callback = (error, project) ->) ->
-		destination = @_getDestinationDirectory zipPath
-		docPath = null
-		project = null
+module.exports = (ProjectUploadHandler = {
+	createProjectFromZipArchive(owner_id, defaultName, zipPath, callback) {
+		if (callback == null) { callback = function(error, project) {}; }
+		const destination = this._getDestinationDirectory(zipPath);
+		let docPath = null;
+		let project = null;
 
-		async.waterfall([
-			(cb) ->
-				ArchiveManager.extractZipArchive zipPath, destination, cb
-			(cb) ->
-				ProjectRootDocManager.findRootDocFileFromDirectory destination, (error, _docPath, docContents) ->
-					cb(error, _docPath, docContents)
-			(_docPath, docContents, cb) ->
-				docPath = _docPath
-				proposedName = ProjectDetailsHandler.fixProjectName(DocumentHelper.getTitleFromTexContent(docContents || '') || defaultName)
-				ProjectDetailsHandler.generateUniqueName owner_id, proposedName, (error, name) ->
-					cb(error, name)
-			(name, cb) ->
-				ProjectCreationHandler.createBlankProject owner_id, name, (error, _project) ->
-					cb(error, _project)
-			(_project, cb) =>
-				project = _project
-				@_insertZipContentsIntoFolder owner_id, project._id, project.rootFolder[0]._id, destination, cb
-			(cb) ->
-				if docPath?
-					ProjectRootDocManager.setRootDocFromName project._id, docPath, (error) ->
-						cb(error)
-				else
-					cb(null)
-			(cb) ->
-				cb(null, project)
-		], callback)
+		return async.waterfall([
+			cb => ArchiveManager.extractZipArchive(zipPath, destination, cb),
+			cb => ProjectRootDocManager.findRootDocFileFromDirectory(destination, (error, _docPath, docContents) => cb(error, _docPath, docContents)),
+			function(_docPath, docContents, cb) {
+				docPath = _docPath;
+				const proposedName = ProjectDetailsHandler.fixProjectName(DocumentHelper.getTitleFromTexContent(docContents || '') || defaultName);
+				return ProjectDetailsHandler.generateUniqueName(owner_id, proposedName, (error, name) => cb(error, name));
+			},
+			(name, cb) => ProjectCreationHandler.createBlankProject(owner_id, name, (error, _project) => cb(error, _project)),
+			(_project, cb) => {
+				project = _project;
+				return this._insertZipContentsIntoFolder(owner_id, project._id, project.rootFolder[0]._id, destination, cb);
+			},
+			function(cb) {
+				if (docPath != null) {
+					return ProjectRootDocManager.setRootDocFromName(project._id, docPath, error => cb(error));
+				} else {
+					return cb(null);
+				}
+			},
+			cb => cb(null, project)
+		], callback);
+	},
 
-	createProjectFromZipArchiveWithName: (owner_id, proposedName, zipPath, callback = (error, project) ->) ->
-		ProjectDetailsHandler.generateUniqueName owner_id, ProjectDetailsHandler.fixProjectName(proposedName), (error, name) =>
-			return callback(error) if error?
-			ProjectCreationHandler.createBlankProject owner_id, name, (error, project) =>
-				return callback(error) if error?
-				@insertZipArchiveIntoFolder owner_id, project._id, project.rootFolder[0]._id, zipPath, (error) ->
-					return callback(error) if error?
-					ProjectRootDocManager.setRootDocAutomatically project._id, (error) ->
-						return callback(error) if error?
-						callback(error, project)
+	createProjectFromZipArchiveWithName(owner_id, proposedName, zipPath, callback) {
+		if (callback == null) { callback = function(error, project) {}; }
+		return ProjectDetailsHandler.generateUniqueName(owner_id, ProjectDetailsHandler.fixProjectName(proposedName), (error, name) => {
+			if (error != null) { return callback(error); }
+			return ProjectCreationHandler.createBlankProject(owner_id, name, (error, project) => {
+				if (error != null) { return callback(error); }
+				return this.insertZipArchiveIntoFolder(owner_id, project._id, project.rootFolder[0]._id, zipPath, function(error) {
+					if (error != null) { return callback(error); }
+					return ProjectRootDocManager.setRootDocAutomatically(project._id, function(error) {
+						if (error != null) { return callback(error); }
+						return callback(error, project);
+					});
+				});
+			});
+		});
+	},
 
-	insertZipArchiveIntoFolder: (owner_id, project_id, folder_id, zipPath, callback = (error) ->) ->
-		destination = @_getDestinationDirectory zipPath
-		ArchiveManager.extractZipArchive zipPath, destination, (error) =>
-			return callback(error) if error?
+	insertZipArchiveIntoFolder(owner_id, project_id, folder_id, zipPath, callback) {
+		if (callback == null) { callback = function(error) {}; }
+		const destination = this._getDestinationDirectory(zipPath);
+		return ArchiveManager.extractZipArchive(zipPath, destination, error => {
+			if (error != null) { return callback(error); }
 
-			@_insertZipContentsIntoFolder owner_id, project_id, folder_id, destination, callback
+			return this._insertZipContentsIntoFolder(owner_id, project_id, folder_id, destination, callback);
+		});
+	},
 
-	_insertZipContentsIntoFolder: (owner_id, project_id, folder_id, destination, callback = (error) ->) ->
-			ArchiveManager.findTopLevelDirectory destination, (error, topLevelDestination) ->
-				return callback(error) if error?
-				FileSystemImportManager.addFolderContents owner_id, project_id, folder_id, topLevelDestination, false, (error) ->
-					return callback(error) if error?
-					rimraf(destination, callback)
+	_insertZipContentsIntoFolder(owner_id, project_id, folder_id, destination, callback) {
+			if (callback == null) { callback = function(error) {}; }
+			return ArchiveManager.findTopLevelDirectory(destination, function(error, topLevelDestination) {
+				if (error != null) { return callback(error); }
+				return FileSystemImportManager.addFolderContents(owner_id, project_id, folder_id, topLevelDestination, false, function(error) {
+					if (error != null) { return callback(error); }
+					return rimraf(destination, callback);
+				});
+			});
+		},
 
-	_getDestinationDirectory: (source) ->
-		return path.join(path.dirname(source), "#{path.basename(source, ".zip")}-#{Date.now()}")
+	_getDestinationDirectory(source) {
+		return path.join(path.dirname(source), `${path.basename(source, ".zip")}-${Date.now()}`);
+	}
+});
 		

@@ -1,111 +1,148 @@
-logger = require("logger-sharelatex")
-metrics = require("metrics-sharelatex")
-settings = require "settings-sharelatex"
-request = require "request"
-NotificationsBuilder = require("../Notifications/NotificationsBuilder")
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS103: Rewrite code to no longer use __guard__
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let InstitutionsAPI;
+const logger = require("logger-sharelatex");
+const metrics = require("metrics-sharelatex");
+const settings = require("settings-sharelatex");
+const request = require("request");
+const NotificationsBuilder = require("../Notifications/NotificationsBuilder");
 
-module.exports = InstitutionsAPI =
-	getInstitutionAffiliations: (institutionId, callback = (error, body) ->) ->
-		makeAffiliationRequest {
-			method: 'GET'
-			path: "/api/v2/institutions/#{institutionId.toString()}/affiliations"
+module.exports = (InstitutionsAPI = {
+	getInstitutionAffiliations(institutionId, callback) {
+		if (callback == null) { callback = function(error, body) {}; }
+		return makeAffiliationRequest({
+			method: 'GET',
+			path: `/api/v2/institutions/${institutionId.toString()}/affiliations`,
 			defaultErrorMessage: "Couldn't get institution affiliations"
-		}, (error, body) -> callback(error, body or [])
+		}, (error, body) => callback(error, body || []));
+	},
 
-	getInstitutionLicences: (institutionId, startDate, endDate, lag, callback = (error, body) ->) ->
-		makeAffiliationRequest {
-			method: 'GET'
-			path: "/api/v2/institutions/#{institutionId.toString()}/institution_licences"
-			body: {start_date: startDate, end_date: endDate, lag}
+	getInstitutionLicences(institutionId, startDate, endDate, lag, callback) {
+		if (callback == null) { callback = function(error, body) {}; }
+		return makeAffiliationRequest({
+			method: 'GET',
+			path: `/api/v2/institutions/${institutionId.toString()}/institution_licences`,
+			body: {start_date: startDate, end_date: endDate, lag},
 			defaultErrorMessage: "Couldn't get institution licences"
-		}, callback
+		}, callback);
+	},
 
-	getUserAffiliations: (userId, callback = (error, body) ->) ->
-		makeAffiliationRequest {
-			method: 'GET'
-			path: "/api/v2/users/#{userId.toString()}/affiliations"
+	getUserAffiliations(userId, callback) {
+		if (callback == null) { callback = function(error, body) {}; }
+		return makeAffiliationRequest({
+			method: 'GET',
+			path: `/api/v2/users/${userId.toString()}/affiliations`,
 			defaultErrorMessage: "Couldn't get user affiliations"
-		}, (error, body) -> callback(error, body or [])
+		}, (error, body) => callback(error, body || []));
+	},
 
-	addAffiliation: (userId, email, affiliationOptions, callback) ->
-		unless callback? # affiliationOptions is optional
-			callback = affiliationOptions
-			affiliationOptions = {}
+	addAffiliation(userId, email, affiliationOptions, callback) {
+		if (callback == null) { // affiliationOptions is optional
+			callback = affiliationOptions;
+			affiliationOptions = {};
+		}
 
-		{ university, department, role, confirmedAt } = affiliationOptions
-		makeAffiliationRequest {
-			method: 'POST'
-			path: "/api/v2/users/#{userId.toString()}/affiliations"
-			body: { email, university, department, role, confirmedAt }
+		const { university, department, role, confirmedAt } = affiliationOptions;
+		return makeAffiliationRequest({
+			method: 'POST',
+			path: `/api/v2/users/${userId.toString()}/affiliations`,
+			body: { email, university, department, role, confirmedAt },
 			defaultErrorMessage: "Couldn't create affiliation"
-		}, (error, body) ->
-			if error
-				return callback(error, body)
-			# have notifications delete any ip matcher notifications for this university
-			logger.log university
-			NotificationsBuilder.ipMatcherAffiliation(userId).read university?.id, (err) ->
-				if err
-					logger.err err:err, "Something went wrong marking ip notifications read"
-				callback(error, body)
+		}, function(error, body) {
+			if (error) {
+				return callback(error, body);
+			}
+			// have notifications delete any ip matcher notifications for this university
+			logger.log(university);
+			return NotificationsBuilder.ipMatcherAffiliation(userId).read(university != null ? university.id : undefined, function(err) {
+				if (err) {
+					logger.err({err}, "Something went wrong marking ip notifications read");
+				}
+				return callback(error, body);
+			});
+		});
+	},
 
-	removeAffiliation: (userId, email, callback = (error) ->) ->
-		makeAffiliationRequest {
-			method: 'POST'
-			path: "/api/v2/users/#{userId.toString()}/affiliations/remove"
-			body: { email }
-			extraSuccessStatusCodes: [404] # `Not Found` responses are considered successful
+	removeAffiliation(userId, email, callback) {
+		if (callback == null) { callback = function(error) {}; }
+		return makeAffiliationRequest({
+			method: 'POST',
+			path: `/api/v2/users/${userId.toString()}/affiliations/remove`,
+			body: { email },
+			extraSuccessStatusCodes: [404], // `Not Found` responses are considered successful
 			defaultErrorMessage: "Couldn't remove affiliation"
-		}, callback
+		}, callback);
+	},
 
 
-	endorseAffiliation: (userId, email, role, department, callback = (error) ->) ->
-		makeAffiliationRequest {
-			method: 'POST'
-			path: "/api/v2/users/#{userId.toString()}/affiliations/endorse"
-			body: { email, role, department }
+	endorseAffiliation(userId, email, role, department, callback) {
+		if (callback == null) { callback = function(error) {}; }
+		return makeAffiliationRequest({
+			method: 'POST',
+			path: `/api/v2/users/${userId.toString()}/affiliations/endorse`,
+			body: { email, role, department },
 			defaultErrorMessage: "Couldn't endorse affiliation"
-		}, callback
+		}, callback);
+	},
 
 
-	deleteAffiliations: (userId, callback = (error) ->) ->
-		makeAffiliationRequest {
-			method: 'DELETE'
-			path: "/api/v2/users/#{userId.toString()}/affiliations"
+	deleteAffiliations(userId, callback) {
+		if (callback == null) { callback = function(error) {}; }
+		return makeAffiliationRequest({
+			method: 'DELETE',
+			path: `/api/v2/users/${userId.toString()}/affiliations`,
 			defaultErrorMessage: "Couldn't delete affiliations"
-		}, callback
+		}, callback);
+	}
+});
 
 
-makeAffiliationRequest = (requestOptions, callback = (error) ->) ->
-	return callback(null) unless settings?.apis?.v1?.url # service is not configured
-	requestOptions.extraSuccessStatusCodes ||= []
-	request {
-		method: requestOptions.method
-		url: "#{settings.apis.v1.url}#{requestOptions.path}"
-		body: requestOptions.body
-		auth: { user: settings.apis.v1.user, pass: settings.apis.v1.pass }
+var makeAffiliationRequest = function(requestOptions, callback) {
+	if (callback == null) { callback = function(error) {}; }
+	if (!__guard__(__guard__(settings != null ? settings.apis : undefined, x1 => x1.v1), x => x.url)) { return callback(null); } // service is not configured
+	if (!requestOptions.extraSuccessStatusCodes) { requestOptions.extraSuccessStatusCodes = []; }
+	return request({
+		method: requestOptions.method,
+		url: `${settings.apis.v1.url}${requestOptions.path}`,
+		body: requestOptions.body,
+		auth: { user: settings.apis.v1.user, pass: settings.apis.v1.pass },
 		json: true,
 		timeout: 20 * 1000
-	}, (error, response, body) ->
-		return callback(error) if error?
-		isSuccess = 200 <= response.statusCode < 300
-		isSuccess ||= response.statusCode in requestOptions.extraSuccessStatusCodes
-		unless isSuccess
-			if body?.errors
-				errorMessage = "#{response.statusCode}: #{body.errors}"
-			else
-				errorMessage = "#{requestOptions.defaultErrorMessage}: #{response.statusCode}"
+	}, function(error, response, body) {
+		if (error != null) { return callback(error); }
+		let isSuccess = 200 <= response.statusCode && response.statusCode < 300;
+		if (!isSuccess) { isSuccess = Array.from(requestOptions.extraSuccessStatusCodes).includes(response.statusCode); }
+		if (!isSuccess) {
+			let errorMessage;
+			if ((body != null ? body.errors : undefined)) {
+				errorMessage = `${response.statusCode}: ${body.errors}`;
+			} else {
+				errorMessage = `${requestOptions.defaultErrorMessage}: ${response.statusCode}`;
+			}
 
-			logger.err path: requestOptions.path, body: requestOptions.body, errorMessage
-			return callback(new Error(errorMessage))
+			logger.err({path: requestOptions.path, body: requestOptions.body}, errorMessage);
+			return callback(new Error(errorMessage));
+		}
 
-		callback(null, body)
+		return callback(null, body);
+	});
+};
 
 [
-	'getInstitutionAffiliations'
+	'getInstitutionAffiliations',
 	'getUserAffiliations',
 	'addAffiliation',
 	'removeAffiliation',
-].map (method) ->
-	metrics.timeAsyncMethod(
-		InstitutionsAPI, method, 'mongo.InstitutionsAPI', logger
-	)
+].map(method => metrics.timeAsyncMethod(
+    InstitutionsAPI, method, 'mongo.InstitutionsAPI', logger
+));
+
+function __guard__(value, transform) {
+  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+}

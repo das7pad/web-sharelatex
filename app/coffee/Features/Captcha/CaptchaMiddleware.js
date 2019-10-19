@@ -1,28 +1,44 @@
-request = require 'request'
-logger = require 'logger-sharelatex'
-Settings = require 'settings-sharelatex'
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let CaptchaMiddleware;
+const request = require('request');
+const logger = require('logger-sharelatex');
+const Settings = require('settings-sharelatex');
 
-module.exports = CaptchaMiddleware =
-	validateCaptcha: (action) ->
-		return (req, res, next) ->
-			if !Settings.recaptcha?.siteKey?
-				return next()
-			inviteAndCaptchaDisabled = action == 'invite' and Settings.recaptcha.disabled.invite
-			registerAndCaptchaDisabled = action == 'register' and Settings.recaptcha.disabled.register
-			if inviteAndCaptchaDisabled or registerAndCaptchaDisabled
-				return next()
-			response = req.body['g-recaptcha-response']
-			options =
-				form:
-					secret: Settings.recaptcha.secretKey
-					response: response
+module.exports = (CaptchaMiddleware = {
+	validateCaptcha(action) {
+		return function(req, res, next) {
+			if (((Settings.recaptcha != null ? Settings.recaptcha.siteKey : undefined) == null)) {
+				return next();
+			}
+			const inviteAndCaptchaDisabled = (action === 'invite') && Settings.recaptcha.disabled.invite;
+			const registerAndCaptchaDisabled = (action === 'register') && Settings.recaptcha.disabled.register;
+			if (inviteAndCaptchaDisabled || registerAndCaptchaDisabled) {
+				return next();
+			}
+			const response = req.body['g-recaptcha-response'];
+			const options = {
+				form: {
+					secret: Settings.recaptcha.secretKey,
+					response
+				},
 				json: true
-			request.post "https://www.google.com/recaptcha/api/siteverify", options, (error, response, body) ->
-				return next(error) if error?
-				if !body?.success
-					logger.warn {statusCode: response.statusCode, body: body}, 'failed recaptcha siteverify request'
+			};
+			return request.post("https://www.google.com/recaptcha/api/siteverify", options, function(error, response, body) {
+				if (error != null) { return next(error); }
+				if (!(body != null ? body.success : undefined)) {
+					logger.warn({statusCode: response.statusCode, body}, 'failed recaptcha siteverify request');
 					return res.status(400).send({errorReason:"cannot_verify_user_not_robot", message:
 						{text:"Sorry, we could not verify that you are not a robot. Please check that Google reCAPTCHA is not being blocked by an ad blocker or firewall."}
-					})
-				else
-					return next()
+					});
+				} else {
+					return next();
+				}
+			});
+		};
+	}
+});

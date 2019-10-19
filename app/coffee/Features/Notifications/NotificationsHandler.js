@@ -1,80 +1,104 @@
-settings = require("settings-sharelatex")
-request = require("request")
-logger = require("logger-sharelatex")
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const settings = require("settings-sharelatex");
+const request = require("request");
+const logger = require("logger-sharelatex");
 
-oneSecond = 1000
+const oneSecond = 1000;
 
-makeRequest = (opts, callback)->
-	if !settings.apis.notifications?.url?
-		return callback(null, statusCode:200)
-	else
-		request(opts, callback)
+const makeRequest = function(opts, callback){
+	if (((settings.apis.notifications != null ? settings.apis.notifications.url : undefined) == null)) {
+		return callback(null, {statusCode:200});
+	} else {
+		return request(opts, callback);
+	}
+};
 
-module.exports =
+module.exports = {
 
-	getUserNotifications: (user_id, callback)->
-		opts =
-			uri: "#{settings.apis.notifications?.url}/user/#{user_id}"
-			json: true
-			timeout: oneSecond
+	getUserNotifications(user_id, callback){
+		const opts = {
+			uri: `${(settings.apis.notifications != null ? settings.apis.notifications.url : undefined)}/user/${user_id}`,
+			json: true,
+			timeout: oneSecond,
 			method: "GET"
-		makeRequest opts, (err, res, unreadNotifications)->
-			statusCode =  if res? then res.statusCode else 500
-			if err? or statusCode != 200
-				e = new Error("something went wrong getting notifications, #{err}, #{statusCode}")
-				logger.err err:err, "something went wrong getting notifications"
-				callback(null, [])
-			else
-				if !unreadNotifications?
-					unreadNotifications = []
-				callback(null, unreadNotifications)
-
-	createNotification: (user_id, key, templateKey, messageOpts, expiryDateTime, forceCreate, callback)->
-		if !callback
-			callback = forceCreate
-			forceCreate = true
-		payload = {
-				key:key
-				messageOpts:messageOpts
-				templateKey:templateKey
-				forceCreate:forceCreate
-		}
-		if expiryDateTime?
-			payload.expires = expiryDateTime
-		opts =
-			uri: "#{settings.apis.notifications?.url}/user/#{user_id}"
-			timeout: oneSecond
-			method:"POST"
-			json: payload
-		logger.log opts:opts, "creating notification for user"
-		makeRequest opts, callback
-
-	markAsReadWithKey: (user_id, key, callback)->
-		opts =
-			uri: "#{settings.apis.notifications?.url}/user/#{user_id}"
-			method: "DELETE"
-			timeout: oneSecond
-			json: {
-				key:key
+		};
+		return makeRequest(opts, function(err, res, unreadNotifications){
+			const statusCode =  (res != null) ? res.statusCode : 500;
+			if ((err != null) || (statusCode !== 200)) {
+				const e = new Error(`something went wrong getting notifications, ${err}, ${statusCode}`);
+				logger.err({err}, "something went wrong getting notifications");
+				return callback(null, []);
+			} else {
+				if ((unreadNotifications == null)) {
+					unreadNotifications = [];
+				}
+				return callback(null, unreadNotifications);
 			}
-		logger.log user_id:user_id, key:key, "sending mark notification as read with key to notifications api"
-		makeRequest opts, callback
+		});
+	},
+
+	createNotification(user_id, key, templateKey, messageOpts, expiryDateTime, forceCreate, callback){
+		if (!callback) {
+			callback = forceCreate;
+			forceCreate = true;
+		}
+		const payload = {
+				key,
+				messageOpts,
+				templateKey,
+				forceCreate
+		};
+		if (expiryDateTime != null) {
+			payload.expires = expiryDateTime;
+		}
+		const opts = {
+			uri: `${(settings.apis.notifications != null ? settings.apis.notifications.url : undefined)}/user/${user_id}`,
+			timeout: oneSecond,
+			method:"POST",
+			json: payload
+		};
+		logger.log({opts}, "creating notification for user");
+		return makeRequest(opts, callback);
+	},
+
+	markAsReadWithKey(user_id, key, callback){
+		const opts = {
+			uri: `${(settings.apis.notifications != null ? settings.apis.notifications.url : undefined)}/user/${user_id}`,
+			method: "DELETE",
+			timeout: oneSecond,
+			json: {
+				key
+			}
+		};
+		logger.log({user_id, key}, "sending mark notification as read with key to notifications api");
+		return makeRequest(opts, callback);
+	},
 
 
-	markAsRead: (user_id, notification_id, callback)->
-		opts =
-			method: "DELETE"
-			uri: "#{settings.apis.notifications?.url}/user/#{user_id}/notification/#{notification_id}"
+	markAsRead(user_id, notification_id, callback){
+		const opts = {
+			method: "DELETE",
+			uri: `${(settings.apis.notifications != null ? settings.apis.notifications.url : undefined)}/user/${user_id}/notification/${notification_id}`,
 			timeout:oneSecond
-		logger.log user_id:user_id, notification_id:notification_id, "sending mark notification as read to notifications api"
-		makeRequest opts, callback
+		};
+		logger.log({user_id, notification_id}, "sending mark notification as read to notifications api");
+		return makeRequest(opts, callback);
+	},
 
-	# removes notification by key, without regard for user_id,
-	# should not be exposed to user via ui/router
-	markAsReadByKeyOnly: (key, callback)->
-		opts =
-			uri: "#{settings.apis.notifications?.url}/key/#{key}"
-			method: "DELETE"
+	// removes notification by key, without regard for user_id,
+	// should not be exposed to user via ui/router
+	markAsReadByKeyOnly(key, callback){
+		const opts = {
+			uri: `${(settings.apis.notifications != null ? settings.apis.notifications.url : undefined)}/key/${key}`,
+			method: "DELETE",
 			timeout: oneSecond
-		logger.log {key:key}, "sending mark notification as read with key-only to notifications api"
-		makeRequest opts, callback
+		};
+		logger.log({key}, "sending mark notification as read with key-only to notifications api");
+		return makeRequest(opts, callback);
+	}
+};

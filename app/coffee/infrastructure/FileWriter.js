@@ -1,60 +1,88 @@
-fs = require 'fs'
-logger = require 'logger-sharelatex'
-uuid = require 'uuid'
-_ = require 'underscore'
-Settings = require 'settings-sharelatex'
-request = require 'request'
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let FileWriter;
+const fs = require('fs');
+const logger = require('logger-sharelatex');
+const uuid = require('uuid');
+const _ = require('underscore');
+const Settings = require('settings-sharelatex');
+const request = require('request');
 
-module.exports = FileWriter =
+module.exports = (FileWriter = {
 
-	ensureDumpFolderExists: (callback=(error)->) ->
-		fs.mkdir Settings.path.dumpFolder, (error) ->
-			if error? and error.code != 'EEXIST'
-				# Ignore error about already existing
-				return callback(error)
-			callback(null)
+	ensureDumpFolderExists(callback) {
+		if (callback == null) { callback = function(error){}; }
+		return fs.mkdir(Settings.path.dumpFolder, function(error) {
+			if ((error != null) && (error.code !== 'EEXIST')) {
+				// Ignore error about already existing
+				return callback(error);
+			}
+			return callback(null);
+		});
+	},
 
-	writeLinesToDisk: (identifier, lines, callback = (error, fsPath)->) ->
-		FileWriter.writeContentToDisk(identifier, lines.join('\n'), callback)
+	writeLinesToDisk(identifier, lines, callback) {
+		if (callback == null) { callback = function(error, fsPath){}; }
+		return FileWriter.writeContentToDisk(identifier, lines.join('\n'), callback);
+	},
 
-	writeContentToDisk: (identifier, content, callback = (error, fsPath)->) ->
-		callback = _.once(callback)
-		fsPath = "#{Settings.path.dumpFolder}/#{identifier}_#{uuid.v4()}"
-		FileWriter.ensureDumpFolderExists (error) ->
-			return callback(error) if error?
-			fs.writeFile fsPath, content, (error) ->
-				return callback(error) if error?
-				callback(null, fsPath)
+	writeContentToDisk(identifier, content, callback) {
+		if (callback == null) { callback = function(error, fsPath){}; }
+		callback = _.once(callback);
+		const fsPath = `${Settings.path.dumpFolder}/${identifier}_${uuid.v4()}`;
+		return FileWriter.ensureDumpFolderExists(function(error) {
+			if (error != null) { return callback(error); }
+			return fs.writeFile(fsPath, content, function(error) {
+				if (error != null) { return callback(error); }
+				return callback(null, fsPath);
+			});
+		});
+	},
 
-	writeStreamToDisk: (identifier, stream, callback = (error, fsPath) ->) ->
-		callback = _.once(callback)
-		fsPath = "#{Settings.path.dumpFolder}/#{identifier}_#{uuid.v4()}"
+	writeStreamToDisk(identifier, stream, callback) {
+		if (callback == null) { callback = function(error, fsPath) {}; }
+		callback = _.once(callback);
+		const fsPath = `${Settings.path.dumpFolder}/${identifier}_${uuid.v4()}`;
 
-		stream.pause()
-		FileWriter.ensureDumpFolderExists (error) ->
-			return callback(error) if error?
-			stream.resume()
+		stream.pause();
+		return FileWriter.ensureDumpFolderExists(function(error) {
+			if (error != null) { return callback(error); }
+			stream.resume();
 
-			writeStream = fs.createWriteStream(fsPath)
-			stream.pipe(writeStream)
+			const writeStream = fs.createWriteStream(fsPath);
+			stream.pipe(writeStream);
 
-			stream.on 'error', (err)->
-				logger.err {err, identifier, fsPath},	"[writeStreamToDisk] something went wrong with incoming stream"
-				callback(err)
-			writeStream.on 'error', (err)->
-				logger.err {err, identifier, fsPath},	"[writeStreamToDisk] something went wrong with writing to disk"
-				callback(err)
-			writeStream.on "finish", ->
-				logger.log {identifier, fsPath}, "[writeStreamToDisk] write stream finished"
-				callback null, fsPath
+			stream.on('error', function(err){
+				logger.err({err, identifier, fsPath},	"[writeStreamToDisk] something went wrong with incoming stream");
+				return callback(err);
+			});
+			writeStream.on('error', function(err){
+				logger.err({err, identifier, fsPath},	"[writeStreamToDisk] something went wrong with writing to disk");
+				return callback(err);
+			});
+			return writeStream.on("finish", function() {
+				logger.log({identifier, fsPath}, "[writeStreamToDisk] write stream finished");
+				return callback(null, fsPath);
+			});
+		});
+	},
 
-	writeUrlToDisk: (identifier, url, callback = (error, fsPath) ->) ->
-		callback = _.once(callback)
-		stream = request.get(url)
-		stream.on 'response', (response) ->
-			if 200 <= response.statusCode < 300
-				FileWriter.writeStreamToDisk identifier, stream, callback
-			else
-				err = new Error("bad response from url: #{response.statusCode}")
-				logger.err {err, identifier, url}, err.message
-				callback(err)
+	writeUrlToDisk(identifier, url, callback) {
+		if (callback == null) { callback = function(error, fsPath) {}; }
+		callback = _.once(callback);
+		const stream = request.get(url);
+		return stream.on('response', function(response) {
+			if (200 <= response.statusCode && response.statusCode < 300) {
+				return FileWriter.writeStreamToDisk(identifier, stream, callback);
+			} else {
+				const err = new Error(`bad response from url: ${response.statusCode}`);
+				logger.err({err, identifier, url}, err.message);
+				return callback(err);
+			}
+		});
+	}
+});

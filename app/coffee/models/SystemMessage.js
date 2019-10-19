@@ -1,16 +1,20 @@
-mongoose = require 'mongoose'
-Settings = require 'settings-sharelatex'
+const mongoose = require('mongoose');
+const Settings = require('settings-sharelatex');
 
-Schema = mongoose.Schema
-ObjectId = Schema.ObjectId
+const {
+    Schema
+} = mongoose;
+const {
+    ObjectId
+} = Schema;
 
-SystemMessageSchema = new Schema
-	content : type: String, default:''
+const SystemMessageSchema = new Schema({
+	content : {type: String, default:''}});
 
-conn = mongoose.createConnection(Settings.mongo.url, {
+const conn = mongoose.createConnection(Settings.mongo.url, {
 	server: {poolSize: Settings.mongo.poolSize || 10},
 	config: {autoIndex: false}
-})
+});
 
 
-exports.SystemMessage = conn.model('SystemMessage', SystemMessageSchema)
+exports.SystemMessage = conn.model('SystemMessage', SystemMessageSchema);

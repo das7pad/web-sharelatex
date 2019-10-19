@@ -1,97 +1,143 @@
-logger = require("logger-sharelatex")
-ProjectGetter = require('../Project/ProjectGetter')
-UserGetter = require("../User/UserGetter")
-SubscriptionLocator = require("./SubscriptionLocator")
-Settings = require("settings-sharelatex")
-CollaboratorsHandler = require("../Collaborators/CollaboratorsHandler")
-CollaboratorsInvitesHandler = require("../Collaborators/CollaboratorsInviteHandler")
-V1SubscriptionManager = require("./V1SubscriptionManager")
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let LimitationsManager;
+const logger = require("logger-sharelatex");
+const ProjectGetter = require('../Project/ProjectGetter');
+const UserGetter = require("../User/UserGetter");
+const SubscriptionLocator = require("./SubscriptionLocator");
+const Settings = require("settings-sharelatex");
+const CollaboratorsHandler = require("../Collaborators/CollaboratorsHandler");
+const CollaboratorsInvitesHandler = require("../Collaborators/CollaboratorsInviteHandler");
+const V1SubscriptionManager = require("./V1SubscriptionManager");
 
-module.exports = LimitationsManager =
-	allowedNumberOfCollaboratorsInProject: (project_id, callback) ->
-		ProjectGetter.getProject project_id, owner_ref: true, (error, project) =>
-			return callback(error) if error?
-			@allowedNumberOfCollaboratorsForUser project.owner_ref, callback
+module.exports = (LimitationsManager = {
+	allowedNumberOfCollaboratorsInProject(project_id, callback) {
+		return ProjectGetter.getProject(project_id, {owner_ref: true}, (error, project) => {
+			if (error != null) { return callback(error); }
+			return this.allowedNumberOfCollaboratorsForUser(project.owner_ref, callback);
+		});
+	},
 
-	allowedNumberOfCollaboratorsForUser: (user_id, callback) ->
-		UserGetter.getUser user_id, {features: 1}, (error, user) ->
-			return callback(error) if error?
-			if user.features? and user.features.collaborators?
-				callback null, user.features.collaborators
-			else
-				callback null, Settings.defaultFeatures.collaborators
+	allowedNumberOfCollaboratorsForUser(user_id, callback) {
+		return UserGetter.getUser(user_id, {features: 1}, function(error, user) {
+			if (error != null) { return callback(error); }
+			if ((user.features != null) && (user.features.collaborators != null)) {
+				return callback(null, user.features.collaborators);
+			} else {
+				return callback(null, Settings.defaultFeatures.collaborators);
+			}
+		});
+	},
 
-	canAddXCollaborators: (project_id, x_collaborators, callback = (error, allowed)->) ->
-		@allowedNumberOfCollaboratorsInProject project_id, (error, allowed_number) =>
-			return callback(error) if error?
-			CollaboratorsHandler.getInvitedCollaboratorCount project_id, (error, current_number) =>
-				return callback(error) if error?
-				CollaboratorsInvitesHandler.getInviteCount project_id, (error, invite_count) =>
-					return callback(error) if error?
-					if current_number + invite_count + x_collaborators <= allowed_number or allowed_number < 0
-						callback null, true
-					else
-						callback null, false
+	canAddXCollaborators(project_id, x_collaborators, callback) {
+		if (callback == null) { callback = function(error, allowed){}; }
+		return this.allowedNumberOfCollaboratorsInProject(project_id, (error, allowed_number) => {
+			if (error != null) { return callback(error); }
+			return CollaboratorsHandler.getInvitedCollaboratorCount(project_id, (error, current_number) => {
+				if (error != null) { return callback(error); }
+				return CollaboratorsInvitesHandler.getInviteCount(project_id, (error, invite_count) => {
+					if (error != null) { return callback(error); }
+					if (((current_number + invite_count + x_collaborators) <= allowed_number) || (allowed_number < 0)) {
+						return callback(null, true);
+					} else {
+						return callback(null, false);
+					}
+				});
+			});
+		});
+	},
 
-	hasPaidSubscription: (user, callback = (err, hasSubscriptionOrIsMember)->) ->
-		@userHasV2Subscription user, (err, hasSubscription, subscription)=>
-			return callback(err) if err?
-			@userIsMemberOfGroupSubscription user, (err, isMember)=>
-				return callback(err) if err?
-				@userHasV1Subscription user, (err, hasV1Subscription)=>
-					return callback(err) if err?
-					logger.log {user_id:user._id, isMember, hasSubscription, hasV1Subscription}, "checking if user has subscription or is group member"
-					callback err, isMember or hasSubscription or hasV1Subscription, subscription
+	hasPaidSubscription(user, callback) {
+		if (callback == null) { callback = function(err, hasSubscriptionOrIsMember){}; }
+		return this.userHasV2Subscription(user, (err, hasSubscription, subscription)=> {
+			if (err != null) { return callback(err); }
+			return this.userIsMemberOfGroupSubscription(user, (err, isMember)=> {
+				if (err != null) { return callback(err); }
+				return this.userHasV1Subscription(user, (err, hasV1Subscription)=> {
+					if (err != null) { return callback(err); }
+					logger.log({user_id:user._id, isMember, hasSubscription, hasV1Subscription}, "checking if user has subscription or is group member");
+					return callback(err, isMember || hasSubscription || hasV1Subscription, subscription);
+				});
+			});
+		});
+	},
 
 
-	# alias for backward-compatibility with modules. Use `haspaidsubscription` instead
-	userHasSubscriptionOrIsGroupMember: (user, callback) ->
-		@hasPaidSubscription(user, callback)
+	// alias for backward-compatibility with modules. Use `haspaidsubscription` instead
+	userHasSubscriptionOrIsGroupMember(user, callback) {
+		return this.hasPaidSubscription(user, callback);
+	},
 
-	userHasV2Subscription: (user, callback = (err, hasSubscription, subscription)->) ->
-		logger.log user_id:user._id, "checking if user has subscription"
-		SubscriptionLocator.getUsersSubscription user._id, (err, subscription)->
-			if err?
-				return callback(err)
-			hasValidSubscription = subscription? and (subscription.recurlySubscription_id? or subscription?.customAccount == true)
-			logger.log user:user, hasValidSubscription:hasValidSubscription, subscription:subscription, "checking if user has subscription"
-			callback err, hasValidSubscription, subscription
+	userHasV2Subscription(user, callback) {
+		if (callback == null) { callback = function(err, hasSubscription, subscription){}; }
+		logger.log({user_id:user._id}, "checking if user has subscription");
+		return SubscriptionLocator.getUsersSubscription(user._id, function(err, subscription){
+			if (err != null) {
+				return callback(err);
+			}
+			const hasValidSubscription = (subscription != null) && ((subscription.recurlySubscription_id != null) || ((subscription != null ? subscription.customAccount : undefined) === true));
+			logger.log({user, hasValidSubscription, subscription}, "checking if user has subscription");
+			return callback(err, hasValidSubscription, subscription);
+		});
+	},
 
-	userHasV1OrV2Subscription: (user, callback = (err, hasSubscription) ->) ->
-		@userHasV2Subscription user, (err, hasV2Subscription) =>
-			return callback(err) if err?
-			return callback null, true if hasV2Subscription
-			@userHasV1Subscription user, (err, hasV1Subscription) =>
-				return callback(err) if err?
-				return callback null, true if hasV1Subscription
-				return callback null, false
+	userHasV1OrV2Subscription(user, callback) {
+		if (callback == null) { callback = function(err, hasSubscription) {}; }
+		return this.userHasV2Subscription(user, (err, hasV2Subscription) => {
+			if (err != null) { return callback(err); }
+			if (hasV2Subscription) { return callback(null, true); }
+			return this.userHasV1Subscription(user, (err, hasV1Subscription) => {
+				if (err != null) { return callback(err); }
+				if (hasV1Subscription) { return callback(null, true); }
+				return callback(null, false);
+			});
+		});
+	},
 
-	userIsMemberOfGroupSubscription: (user, callback = (error, isMember, subscriptions) ->) ->
-		logger.log user_id: user._id, "checking is user is member of subscription groups"
-		SubscriptionLocator.getMemberSubscriptions user._id, (err, subscriptions = []) ->
-			return callback(err) if err?
-			callback err, subscriptions.length > 0, subscriptions
+	userIsMemberOfGroupSubscription(user, callback) {
+		if (callback == null) { callback = function(error, isMember, subscriptions) {}; }
+		logger.log({user_id: user._id}, "checking is user is member of subscription groups");
+		return SubscriptionLocator.getMemberSubscriptions(user._id, function(err, subscriptions) {
+			if (subscriptions == null) { subscriptions = []; }
+			if (err != null) { return callback(err); }
+			return callback(err, subscriptions.length > 0, subscriptions);
+		});
+	},
 
-	userHasV1Subscription: (user, callback = (error, hasV1Subscription) ->) ->
-		V1SubscriptionManager.getSubscriptionsFromV1 user._id, (err, v1Subscription) ->
-			logger.log {user_id: user._id, v1Subscription}, '[userHasV1Subscription]'
-			callback err, !!v1Subscription?.has_subscription
+	userHasV1Subscription(user, callback) {
+		if (callback == null) { callback = function(error, hasV1Subscription) {}; }
+		return V1SubscriptionManager.getSubscriptionsFromV1(user._id, function(err, v1Subscription) {
+			logger.log({user_id: user._id, v1Subscription}, '[userHasV1Subscription]');
+			return callback(err, !!(v1Subscription != null ? v1Subscription.has_subscription : undefined));
+		});
+	},
 
-	teamHasReachedMemberLimit: (subscription) ->
-		currentTotal = (subscription.member_ids or []).length +
-			(subscription.teamInvites or []).length +
-			(subscription.invited_emails or []).length
+	teamHasReachedMemberLimit(subscription) {
+		const currentTotal = (subscription.member_ids || []).length +
+			(subscription.teamInvites || []).length +
+			(subscription.invited_emails || []).length;
 
-		return currentTotal >= subscription.membersLimit
+		return currentTotal >= subscription.membersLimit;
+	},
 
-	hasGroupMembersLimitReached: (subscriptionId, callback = (err, limitReached, subscription)->)->
-		SubscriptionLocator.getSubscription subscriptionId, (err, subscription)->
-			if err?
-				logger.err err:err, subscriptionId: subscriptionId, "error getting subscription"
-				return callback(err)
-			if !subscription?
-				logger.err subscriptionId: subscriptionId, "no subscription found"
-				return callback("no subscription found")
+	hasGroupMembersLimitReached(subscriptionId, callback){
+		if (callback == null) { callback = function(err, limitReached, subscription){}; }
+		return SubscriptionLocator.getSubscription(subscriptionId, function(err, subscription){
+			if (err != null) {
+				logger.err({err, subscriptionId}, "error getting subscription");
+				return callback(err);
+			}
+			if ((subscription == null)) {
+				logger.err({subscriptionId}, "no subscription found");
+				return callback("no subscription found");
+			}
 
-			limitReached = LimitationsManager.teamHasReachedMemberLimit(subscription)
-			callback(err, limitReached, subscription)
+			const limitReached = LimitationsManager.teamHasReachedMemberLimit(subscription);
+			return callback(err, limitReached, subscription);
+		});
+	}
+});

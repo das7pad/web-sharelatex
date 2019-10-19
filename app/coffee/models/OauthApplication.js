@@ -1,30 +1,34 @@
-mongoose = require 'mongoose'
-Settings = require 'settings-sharelatex'
+const mongoose = require('mongoose');
+const Settings = require('settings-sharelatex');
 
-Schema = mongoose.Schema
-ObjectId = Schema.ObjectId
+const {
+    Schema
+} = mongoose;
+const {
+    ObjectId
+} = Schema;
 
-OauthApplicationSchema = new Schema(
+const OauthApplicationSchema = new Schema(
 	{
-		id: String
-		clientSecret: String
-		grants: [ String ]
-		name: String
-		redirectUris: [ String ]
+		id: String,
+		clientSecret: String,
+		grants: [ String ],
+		name: String,
+		redirectUris: [ String ],
 		scopes: [ String ]
 	},
 	{
 		collection: 'oauthApplications'
 	}
-)
+);
 
-conn = mongoose.createConnection(Settings.mongo.url, {
+const conn = mongoose.createConnection(Settings.mongo.url, {
 	server: {poolSize: Settings.mongo.poolSize || 10},
 	config: {autoIndex: false}
-})
+});
 
-OauthApplication = conn.model('OauthApplication', OauthApplicationSchema)
+const OauthApplication = conn.model('OauthApplication', OauthApplicationSchema);
 
-mongoose.model 'OauthApplication', OauthApplicationSchema
-exports.OauthApplication = OauthApplication
-exports.OauthApplicationSchema = OauthApplicationSchema
+mongoose.model('OauthApplication', OauthApplicationSchema);
+exports.OauthApplication = OauthApplication;
+exports.OauthApplicationSchema = OauthApplicationSchema;

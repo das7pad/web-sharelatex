@@ -1,125 +1,162 @@
-projectCreationHandler = require('./ProjectCreationHandler')
-ProjectEntityUpdateHandler = require('./ProjectEntityUpdateHandler')
-projectLocator = require('./ProjectLocator')
-projectOptionsHandler = require('./ProjectOptionsHandler')
-projectDeleter = require('./ProjectDeleter')
-DocumentUpdaterHandler = require("../DocumentUpdater/DocumentUpdaterHandler")
-DocstoreManager = require "../Docstore/DocstoreManager"
-ProjectGetter = require("./ProjectGetter")
-_ = require('underscore')
-async = require('async')
-logger = require("logger-sharelatex")
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let ProjectDuplicator;
+const projectCreationHandler = require('./ProjectCreationHandler');
+const ProjectEntityUpdateHandler = require('./ProjectEntityUpdateHandler');
+const projectLocator = require('./ProjectLocator');
+const projectOptionsHandler = require('./ProjectOptionsHandler');
+const projectDeleter = require('./ProjectDeleter');
+const DocumentUpdaterHandler = require("../DocumentUpdater/DocumentUpdaterHandler");
+const DocstoreManager = require("../Docstore/DocstoreManager");
+const ProjectGetter = require("./ProjectGetter");
+const _ = require('underscore');
+const async = require('async');
+const logger = require("logger-sharelatex");
 
 
-module.exports = ProjectDuplicator =
+module.exports = (ProjectDuplicator = {
 
-	_copyDocs: (owner_id, newProject, originalRootDoc, originalFolder, desFolder, docContents, callback)->
-		setRootDoc = _.once (doc_id)->
-			ProjectEntityUpdateHandler.setRootDoc newProject._id, doc_id
-		docs = originalFolder.docs or []
-		jobs = docs.map (doc)->
-			return (cb)->
-				if !doc?._id?
-					return callback()
-				content = docContents[doc._id.toString()]
-				ProjectEntityUpdateHandler.addDoc newProject._id, desFolder._id, doc.name, content.lines, owner_id, (err, newDoc)->
-					if err?
-						logger.err err:err, "error copying doc"
-						return callback(err)
-					if originalRootDoc? and newDoc.name == originalRootDoc.name
-						setRootDoc newDoc._id
-					cb()
+	_copyDocs(owner_id, newProject, originalRootDoc, originalFolder, desFolder, docContents, callback){
+		const setRootDoc = _.once(doc_id => ProjectEntityUpdateHandler.setRootDoc(newProject._id, doc_id));
+		const docs = originalFolder.docs || [];
+		const jobs = docs.map(doc => (function(cb) {
+            if (((doc != null ? doc._id : undefined) == null)) {
+                return callback();
+            }
+            const content = docContents[doc._id.toString()];
+            return ProjectEntityUpdateHandler.addDoc(newProject._id, desFolder._id, doc.name, content.lines, owner_id, function(err, newDoc){
+                if (err != null) {
+                    logger.err({err}, "error copying doc");
+                    return callback(err);
+                }
+                if ((originalRootDoc != null) && (newDoc.name === originalRootDoc.name)) {
+                    setRootDoc(newDoc._id);
+                }
+                return cb();
+            });
+        }));
 
-		async.series jobs, callback
+		return async.series(jobs, callback);
+	},
 
-	_copyFiles: (owner_id, newProject, originalProject_id, originalFolder, desFolder, callback)->
-		fileRefs = originalFolder.fileRefs or []
-		firstError = null # track first error to exit gracefully from parallel copy
-		jobs = fileRefs.map (file)->
-			return (cb)->
-				return async.setImmediate(cb) if firstError? # skip further copies if an error has occurred
-				ProjectEntityUpdateHandler.copyFileFromExistingProjectWithProject newProject._id, newProject, desFolder._id, originalProject_id, file, owner_id, (err) ->
-					firstError ||= err if err? # set the error flag if this copy failed
-					return cb()
-		# If one of these jobs fails then we wait until all running jobs have
-		# finished, skipping those which have not started yet. We need to wait
-		# for all the copy jobs to finish to avoid them writing to the project
-		# entry in the background while we are deleting it.
-		async.parallelLimit jobs, 5, (err) ->
-			return callback(firstError) if firstError?
-			return callback(err) if err? # shouldn't happen
-			return callback()
+	_copyFiles(owner_id, newProject, originalProject_id, originalFolder, desFolder, callback){
+		const fileRefs = originalFolder.fileRefs || [];
+		let firstError = null; // track first error to exit gracefully from parallel copy
+		const jobs = fileRefs.map(file => (function(cb) {
+            if (firstError != null) { return async.setImmediate(cb); } // skip further copies if an error has occurred
+            return ProjectEntityUpdateHandler.copyFileFromExistingProjectWithProject(newProject._id, newProject, desFolder._id, originalProject_id, file, owner_id, function(err) {
+                if (err != null) { if (!firstError) { firstError = err; } } // set the error flag if this copy failed
+                return cb();
+            });
+        }));
+		// If one of these jobs fails then we wait until all running jobs have
+		// finished, skipping those which have not started yet. We need to wait
+		// for all the copy jobs to finish to avoid them writing to the project
+		// entry in the background while we are deleting it.
+		return async.parallelLimit(jobs, 5, function(err) {
+			if (firstError != null) { return callback(firstError); }
+			if (err != null) { return callback(err); } // shouldn't happen
+			return callback();
+		});
+	},
 
 
-	_copyFolderRecursivly: (owner_id, newProject_id, originalProject_id, originalRootDoc, originalFolder, desFolder, docContents, callback)->
-		ProjectGetter.getProject newProject_id, {rootFolder:true, name:true}, (err, newProject)->
-			if err?
-				logger.err project_id:newProject_id, "could not get project"
-				return callback(err)
+	_copyFolderRecursivly(owner_id, newProject_id, originalProject_id, originalRootDoc, originalFolder, desFolder, docContents, callback){
+		return ProjectGetter.getProject(newProject_id, {rootFolder:true, name:true}, function(err, newProject){
+			if (err != null) {
+				logger.err({project_id:newProject_id}, "could not get project");
+				return callback(err);
+			}
 
-			folders = originalFolder.folders or []
+			const folders = originalFolder.folders || [];
 
-			jobs = folders.map (childFolder)->
-				return (cb)->
-					if !childFolder?._id?
-						return cb()
-					ProjectEntityUpdateHandler.addFolder newProject._id, desFolder?._id, childFolder.name, (err, newFolder)->
-						return cb(err) if err?
-						ProjectDuplicator._copyFolderRecursivly owner_id, newProject_id, originalProject_id, originalRootDoc, childFolder, newFolder, docContents, cb
+			const jobs = folders.map(childFolder => (function(cb) {
+                if (((childFolder != null ? childFolder._id : undefined) == null)) {
+                    return cb();
+                }
+                return ProjectEntityUpdateHandler.addFolder(newProject._id, desFolder != null ? desFolder._id : undefined, childFolder.name, function(err, newFolder){
+                    if (err != null) { return cb(err); }
+                    return ProjectDuplicator._copyFolderRecursivly(owner_id, newProject_id, originalProject_id, originalRootDoc, childFolder, newFolder, docContents, cb);
+                });
+            }));
 
-			jobs.push (cb)->
-				ProjectDuplicator._copyFiles owner_id, newProject, originalProject_id, originalFolder, desFolder, cb
-			jobs.push (cb)->
-				ProjectDuplicator._copyDocs owner_id, newProject, originalRootDoc, originalFolder, desFolder, docContents, cb
+			jobs.push(cb => ProjectDuplicator._copyFiles(owner_id, newProject, originalProject_id, originalFolder, desFolder, cb));
+			jobs.push(cb => ProjectDuplicator._copyDocs(owner_id, newProject, originalRootDoc, originalFolder, desFolder, docContents, cb));
 
-			async.series jobs, callback
+			return async.series(jobs, callback);
+		});
+	},
 
-	duplicate: (owner, originalProject_id, newProjectName, callback)->
+	duplicate(owner, originalProject_id, newProjectName, callback){
 
-		jobs = 
-			flush: (cb)->
-				DocumentUpdaterHandler.flushProjectToMongo originalProject_id, cb
-			originalProject: (cb)->
-				ProjectGetter.getProject originalProject_id, {compiler:true, rootFolder:true, rootDoc_id:true}, cb
-			originalRootDoc: (cb)->
-				projectLocator.findRootDoc {project_id:originalProject_id}, cb
-			docContentsArray: (cb)-> 
-				DocstoreManager.getAllDocs originalProject_id, cb
+		const jobs = { 
+			flush(cb){
+				return DocumentUpdaterHandler.flushProjectToMongo(originalProject_id, cb);
+			},
+			originalProject(cb){
+				return ProjectGetter.getProject(originalProject_id, {compiler:true, rootFolder:true, rootDoc_id:true}, cb);
+			},
+			originalRootDoc(cb){
+				return projectLocator.findRootDoc({project_id:originalProject_id}, cb);
+			},
+			docContentsArray(cb){ 
+				return DocstoreManager.getAllDocs(originalProject_id, cb);
+			}
+		};
 
-		# Get the contents of the original project first
-		async.series jobs, (err, results)->
-			if err?
-				logger.err err:err, originalProject_id:originalProject_id, "error duplicating project reading original project"
-				return callback(err)
-			{originalProject, originalRootDoc, docContentsArray} = results
+		// Get the contents of the original project first
+		return async.series(jobs, function(err, results){
+			if (err != null) {
+				logger.err({err, originalProject_id}, "error duplicating project reading original project");
+				return callback(err);
+			}
+			let {originalProject, originalRootDoc, docContentsArray} = results;
 
-			originalRootDoc = originalRootDoc?[0]
+			originalRootDoc = originalRootDoc != null ? originalRootDoc[0] : undefined;
 
-			docContents = {}
-			for docContent in docContentsArray
-				docContents[docContent._id] = docContent
+			const docContents = {};
+			for (let docContent of Array.from(docContentsArray)) {
+				docContents[docContent._id] = docContent;
+			}
 
-			# Now create the new project, cleaning it up on failure if necessary
-			projectCreationHandler.createBlankProject owner._id, newProjectName, (err, newProject) ->
-				if err?
-					logger.err err:err, originalProject_id:originalProject_id, "error duplicating project when creating new project"
-					return callback(err)
+			// Now create the new project, cleaning it up on failure if necessary
+			return projectCreationHandler.createBlankProject(owner._id, newProjectName, function(err, newProject) {
+				if (err != null) {
+					logger.err({err, originalProject_id}, "error duplicating project when creating new project");
+					return callback(err);
+				}
 
-				copyJobs =
-					setCompiler: (cb) ->
-						projectOptionsHandler.setCompiler newProject._id, originalProject.compiler, cb
-					copyFiles: (cb) ->
-						ProjectDuplicator._copyFolderRecursivly owner._id, newProject._id, originalProject_id, originalRootDoc, originalProject.rootFolder[0], newProject.rootFolder[0], docContents, cb
+				const copyJobs = {
+					setCompiler(cb) {
+						return projectOptionsHandler.setCompiler(newProject._id, originalProject.compiler, cb);
+					},
+					copyFiles(cb) {
+						return ProjectDuplicator._copyFolderRecursivly(owner._id, newProject._id, originalProject_id, originalRootDoc, originalProject.rootFolder[0], newProject.rootFolder[0], docContents, cb);
+					}
+				};
 
-				# Copy the contents of the original project into the new project
-				async.series copyJobs, (err) ->
-					if err?
-						logger.err err:err, originalProject_id:originalProject_id, newProjectName:newProjectName, newProject_id: newProject._id, "error cloning project, will delete broken clone"
-						# Clean up broken clone on error.
-						# Make sure we delete the new failed project, not the original one!
-						projectDeleter.deleteProject newProject._id, (delete_err) ->
-							if delete_err?
-								logger.error newProject_id: newProject._id, delete_err:delete_err, "error deleting broken clone of project"
-							callback(err)
-					else
-						callback(null, newProject)
+				// Copy the contents of the original project into the new project
+				return async.series(copyJobs, function(err) {
+					if (err != null) {
+						logger.err({err, originalProject_id, newProjectName, newProject_id: newProject._id}, "error cloning project, will delete broken clone");
+						// Clean up broken clone on error.
+						// Make sure we delete the new failed project, not the original one!
+						return projectDeleter.deleteProject(newProject._id, function(delete_err) {
+							if (delete_err != null) {
+								logger.error({newProject_id: newProject._id, delete_err}, "error deleting broken clone of project");
+							}
+							return callback(err);
+						});
+					} else {
+						return callback(null, newProject);
+					}
+				});
+			});
+		});
+	}
+});

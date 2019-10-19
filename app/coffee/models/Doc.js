@@ -1,13 +1,17 @@
-mongoose = require 'mongoose'
-Settings = require 'settings-sharelatex'
+const mongoose = require('mongoose');
+const Settings = require('settings-sharelatex');
 
-Schema = mongoose.Schema
-ObjectId = Schema.ObjectId
+const {
+    Schema
+} = mongoose;
+const {
+    ObjectId
+} = Schema;
 
-DocSchema = new Schema
-	name          :     {type:String, default:'new doc'}
+const DocSchema = new Schema({
+	name          :     {type:String, default:'new doc'}});
 
 
-mongoose.model 'Doc', DocSchema
-exports.Doc = mongoose.model 'Doc'
-exports.DocSchema = DocSchema
+mongoose.model('Doc', DocSchema);
+exports.Doc = mongoose.model('Doc');
+exports.DocSchema = DocSchema;

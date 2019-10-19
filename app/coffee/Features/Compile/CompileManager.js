@@ -1,109 +1,166 @@
-Settings = require('settings-sharelatex')
-RedisWrapper = require("../../infrastructure/RedisWrapper")
-rclient = RedisWrapper.client("clsi_recently_compiled")
-ProjectGetter = require('../Project/ProjectGetter')
-ProjectRootDocManager = require "../Project/ProjectRootDocManager"
-UserGetter = require "../User/UserGetter"
-ClsiManager = require "./ClsiManager"
-Metrics = require('metrics-sharelatex')
-logger = require("logger-sharelatex")
-rateLimiter = require("../../infrastructure/RateLimiter")
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS103: Rewrite code to no longer use __guard__
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let CompileManager;
+const Settings = require('settings-sharelatex');
+const RedisWrapper = require("../../infrastructure/RedisWrapper");
+const rclient = RedisWrapper.client("clsi_recently_compiled");
+const ProjectGetter = require('../Project/ProjectGetter');
+const ProjectRootDocManager = require("../Project/ProjectRootDocManager");
+const UserGetter = require("../User/UserGetter");
+const ClsiManager = require("./ClsiManager");
+const Metrics = require('metrics-sharelatex');
+const logger = require("logger-sharelatex");
+const rateLimiter = require("../../infrastructure/RateLimiter");
 
-module.exports = CompileManager =
-
-
-	compile: (project_id, user_id, options = {}, _callback = (error) ->) ->
-		timer = new Metrics.Timer("editor.compile")
-		callback = (args...) ->
-			timer.done()
-			_callback(args...)
-
-		logger.log project_id: project_id, user_id: user_id, "compiling project"
-		CompileManager._checkIfRecentlyCompiled project_id, user_id, (error, recentlyCompiled) ->
-			return callback(error) if error?
-			if recentlyCompiled
-				logger.warn {project_id, user_id}, "project was recently compiled so not continuing"
-				return callback null, "too-recently-compiled", []
-
-			CompileManager._checkIfAutoCompileLimitHasBeenHit options.isAutoCompile, "everyone", (err, canCompile)->
-				if !canCompile
-					return callback null, "autocompile-backoff", []
-
-				ProjectRootDocManager.ensureRootDocumentIsSet project_id, (error) ->
-					return callback(error) if error?
-					CompileManager.getProjectCompileLimits project_id, (error, limits) ->
-						return callback(error) if error?
-						for key, value of limits
-							options[key] = value
-						# Put a lower limit on autocompiles for free users, based on compileGroup
-						CompileManager._checkCompileGroupAutoCompileLimit options.isAutoCompile, limits.compileGroup, (err, canCompile)->
-							if !canCompile
-								return callback null, "autocompile-backoff", []
-							# only pass user_id down to clsi if this is a per-user compile
-							compileAsUser = if Settings.disablePerUserCompiles then undefined else user_id
-							ClsiManager.sendRequest project_id, compileAsUser, options, (error, status, outputFiles, clsiServerId, validationProblems) ->
-								return callback(error) if error?
-								logger.log files: outputFiles, "output files"
-								callback(null, status, outputFiles, clsiServerId, limits, validationProblems)
+module.exports = (CompileManager = {
 
 
-	stopCompile: (project_id, user_id, callback = (error) ->) ->
-		CompileManager.getProjectCompileLimits project_id, (error, limits) ->
-			return callback(error) if error?
-			ClsiManager.stopCompile project_id, user_id, limits, callback
+	compile(project_id, user_id, options, _callback) {
+		if (options == null) { options = {}; }
+		if (_callback == null) { _callback = function(error) {}; }
+		const timer = new Metrics.Timer("editor.compile");
+		const callback = function(...args) {
+			timer.done();
+			return _callback(...Array.from(args || []));
+		};
 
-	deleteAuxFiles: (project_id, user_id, callback = (error) ->) ->
-		CompileManager.getProjectCompileLimits project_id, (error, limits) ->
-			return callback(error) if error?
-			ClsiManager.deleteAuxFiles project_id, user_id, limits, callback
+		logger.log({project_id, user_id}, "compiling project");
+		return CompileManager._checkIfRecentlyCompiled(project_id, user_id, function(error, recentlyCompiled) {
+			if (error != null) { return callback(error); }
+			if (recentlyCompiled) {
+				logger.warn({project_id, user_id}, "project was recently compiled so not continuing");
+				return callback(null, "too-recently-compiled", []);
+			}
 
-	getProjectCompileLimits: (project_id, callback = (error, limits) ->) ->
-		ProjectGetter.getProject project_id, owner_ref: 1, (error, project) ->
-			return callback(error) if error?
-			UserGetter.getUser project.owner_ref, {"features":1}, (err, owner)->
-				return callback(error) if error?
-				callback null, {
-					timeout: owner?.features?.compileTimeout || Settings.defaultFeatures.compileTimeout
-					compileGroup: owner?.features?.compileGroup || Settings.defaultFeatures.compileGroup
+			return CompileManager._checkIfAutoCompileLimitHasBeenHit(options.isAutoCompile, "everyone", function(err, canCompile){
+				if (!canCompile) {
+					return callback(null, "autocompile-backoff", []);
 				}
 
-	COMPILE_DELAY: 1 # seconds
-	_checkIfRecentlyCompiled: (project_id, user_id, callback = (error, recentlyCompiled) ->) ->
-		key = "compile:#{project_id}:#{user_id}"
-		rclient.set key, true, "EX", @COMPILE_DELAY, "NX", (error, ok) ->
-			return callback(error) if error?
-			if ok == "OK"
-				return callback null, false
-			else
-				return callback null, true
+				return ProjectRootDocManager.ensureRootDocumentIsSet(project_id, function(error) {
+					if (error != null) { return callback(error); }
+					return CompileManager.getProjectCompileLimits(project_id, function(error, limits) {
+						if (error != null) { return callback(error); }
+						for (let key in limits) {
+							const value = limits[key];
+							options[key] = value;
+						}
+						// Put a lower limit on autocompiles for free users, based on compileGroup
+						return CompileManager._checkCompileGroupAutoCompileLimit(options.isAutoCompile, limits.compileGroup, function(err, canCompile){
+							if (!canCompile) {
+								return callback(null, "autocompile-backoff", []);
+							}
+							// only pass user_id down to clsi if this is a per-user compile
+							const compileAsUser = Settings.disablePerUserCompiles ? undefined : user_id;
+							return ClsiManager.sendRequest(project_id, compileAsUser, options, function(error, status, outputFiles, clsiServerId, validationProblems) {
+								if (error != null) { return callback(error); }
+								logger.log({files: outputFiles}, "output files");
+								return callback(null, status, outputFiles, clsiServerId, limits, validationProblems);
+							});
+						});
+					});
+				});
+			});
+		});
+	},
 
-	_checkCompileGroupAutoCompileLimit: (isAutoCompile, compileGroup, callback = (err, canCompile)->)->
-		if !isAutoCompile
-			return callback(null, true)
-		if compileGroup is "standard"
-			# apply extra limits to the standard compile group
-			CompileManager._checkIfAutoCompileLimitHasBeenHit isAutoCompile, compileGroup, callback
-		else
-			Metrics.inc "auto-compile-#{compileGroup}"
-			return callback(null, true)	# always allow priority group users to compile
 
-	_checkIfAutoCompileLimitHasBeenHit: (isAutoCompile, compileGroup, callback = (err, canCompile)->)->
-		if !isAutoCompile
-			return callback(null, true)
-		Metrics.inc "auto-compile-#{compileGroup}"
-		opts =
-			endpointName:"auto_compile"
-			timeInterval:20
-			subjectName:compileGroup
-			throttle: Settings?.rateLimit?.autoCompile?[compileGroup] || 25
-		rateLimiter.addCount opts, (err, canCompile)->
-			if err?
-				canCompile = false
-			if !canCompile
-				Metrics.inc "auto-compile-#{compileGroup}-limited"
-			callback err, canCompile
+	stopCompile(project_id, user_id, callback) {
+		if (callback == null) { callback = function(error) {}; }
+		return CompileManager.getProjectCompileLimits(project_id, function(error, limits) {
+			if (error != null) { return callback(error); }
+			return ClsiManager.stopCompile(project_id, user_id, limits, callback);
+		});
+	},
 
-	wordCount: (project_id, user_id, file, callback = (error) ->) ->
-		CompileManager.getProjectCompileLimits project_id, (error, limits) ->
-			return callback(error) if error?
-			ClsiManager.wordCount project_id, user_id, file, limits, callback
+	deleteAuxFiles(project_id, user_id, callback) {
+		if (callback == null) { callback = function(error) {}; }
+		return CompileManager.getProjectCompileLimits(project_id, function(error, limits) {
+			if (error != null) { return callback(error); }
+			return ClsiManager.deleteAuxFiles(project_id, user_id, limits, callback);
+		});
+	},
+
+	getProjectCompileLimits(project_id, callback) {
+		if (callback == null) { callback = function(error, limits) {}; }
+		return ProjectGetter.getProject(project_id, {owner_ref: 1}, function(error, project) {
+			if (error != null) { return callback(error); }
+			return UserGetter.getUser(project.owner_ref, {"features":1}, function(err, owner){
+				if (error != null) { return callback(error); }
+				return callback(null, {
+					timeout: __guard__(owner != null ? owner.features : undefined, x => x.compileTimeout) || Settings.defaultFeatures.compileTimeout,
+					compileGroup: __guard__(owner != null ? owner.features : undefined, x1 => x1.compileGroup) || Settings.defaultFeatures.compileGroup
+				});
+		});
+	});
+	},
+
+	COMPILE_DELAY: 1, // seconds
+	_checkIfRecentlyCompiled(project_id, user_id, callback) {
+		if (callback == null) { callback = function(error, recentlyCompiled) {}; }
+		const key = `compile:${project_id}:${user_id}`;
+		return rclient.set(key, true, "EX", this.COMPILE_DELAY, "NX", function(error, ok) {
+			if (error != null) { return callback(error); }
+			if (ok === "OK") {
+				return callback(null, false);
+			} else {
+				return callback(null, true);
+			}
+		});
+	},
+
+	_checkCompileGroupAutoCompileLimit(isAutoCompile, compileGroup, callback){
+		if (callback == null) { callback = function(err, canCompile){}; }
+		if (!isAutoCompile) {
+			return callback(null, true);
+		}
+		if (compileGroup === "standard") {
+			// apply extra limits to the standard compile group
+			return CompileManager._checkIfAutoCompileLimitHasBeenHit(isAutoCompile, compileGroup, callback);
+		} else {
+			Metrics.inc(`auto-compile-${compileGroup}`);
+			return callback(null, true);
+		}
+	},	// always allow priority group users to compile
+
+	_checkIfAutoCompileLimitHasBeenHit(isAutoCompile, compileGroup, callback){
+		if (callback == null) { callback = function(err, canCompile){}; }
+		if (!isAutoCompile) {
+			return callback(null, true);
+		}
+		Metrics.inc(`auto-compile-${compileGroup}`);
+		const opts = {
+			endpointName:"auto_compile",
+			timeInterval:20,
+			subjectName:compileGroup,
+			throttle: __guard__(__guard__(Settings != null ? Settings.rateLimit : undefined, x1 => x1.autoCompile), x => x[compileGroup]) || 25
+		};
+		return rateLimiter.addCount(opts, function(err, canCompile){
+			if (err != null) {
+				canCompile = false;
+			}
+			if (!canCompile) {
+				Metrics.inc(`auto-compile-${compileGroup}-limited`);
+			}
+			return callback(err, canCompile);
+		});
+	},
+
+	wordCount(project_id, user_id, file, callback) {
+		if (callback == null) { callback = function(error) {}; }
+		return CompileManager.getProjectCompileLimits(project_id, function(error, limits) {
+			if (error != null) { return callback(error); }
+			return ClsiManager.wordCount(project_id, user_id, file, limits, callback);
+		});
+	}
+});
+
+function __guard__(value, transform) {
+  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+}

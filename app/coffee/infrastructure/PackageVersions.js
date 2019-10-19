@@ -1,16 +1,23 @@
-version = {
-	"pdfjs": "2.0.943"
-	"moment": "2.9.0"
-	"ace": "1.4.4" # Upgrade instructions: https://github.com/overleaf/write_latex/wiki/Upgrading-Ace
+/*
+ * decaffeinate suggestions:
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const version = {
+	"pdfjs": "2.0.943",
+	"moment": "2.9.0",
+	"ace": "1.4.4", // Upgrade instructions: https://github.com/overleaf/write_latex/wiki/Upgrading-Ace
 	"fineuploader": "5.15.4"
-}
+};
 
 module.exports = {
-	version: version
+	version,
 
-	lib: (name) ->
-		if version[name]?
-			return "#{name}-#{version[name]}"
-		else
-			return "#{name}"
-}
+	lib(name) {
+		if (version[name] != null) {
+			return `${name}-${version[name]}`;
+		} else {
+			return `${name}`;
+		}
+	}
+};

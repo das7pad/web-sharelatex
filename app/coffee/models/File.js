@@ -1,16 +1,24 @@
-mongoose = require 'mongoose'
-Settings = require 'settings-sharelatex'
+const mongoose = require('mongoose');
+const Settings = require('settings-sharelatex');
 
-Schema = mongoose.Schema
-ObjectId = Schema.ObjectId
+const {
+    Schema
+} = mongoose;
+const {
+    ObjectId
+} = Schema;
 
-FileSchema = new Schema
-	name            :     type:String, default:''
-	created     	:     type:Date, default: () -> new Date()
-	rev 			:	  {type:Number, default:0}
-	linkedFileData: { type: Schema.Types.Mixed }
-	hash			:     type:String
+const FileSchema = new Schema({
+	name            : {     type:String, default:''
+},
+	created     	: {     type:Date, default() { return new Date(); }
+},
+	rev 			:	  {type:Number, default:0},
+	linkedFileData: { type: Schema.Types.Mixed },
+	hash			: {     type:String
+}
+});
 
-mongoose.model 'File', FileSchema
-exports.File = mongoose.model 'File'
-exports.FileSchema = FileSchema
+mongoose.model('File', FileSchema);
+exports.File = mongoose.model('File');
+exports.FileSchema = FileSchema;

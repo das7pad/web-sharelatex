@@ -1,20 +1,28 @@
-mongoose = require('mongoose')
-Settings = require 'settings-sharelatex'
-DocSchema = require('./Doc').DocSchema
-FileSchema = require('./File').FileSchema
+const mongoose = require('mongoose');
+const Settings = require('settings-sharelatex');
+const {
+    DocSchema
+} = require('./Doc');
+const {
+    FileSchema
+} = require('./File');
 
-Schema = mongoose.Schema
-ObjectId = Schema.ObjectId
+const {
+    Schema
+} = mongoose;
+const {
+    ObjectId
+} = Schema;
 
-FolderSchema = new Schema
-	name                         :     {type:String, default:'new folder'}
+const FolderSchema = new Schema({
+	name                         :     {type:String, default:'new folder'}});
 
-FolderSchema.add
-	docs                         :     [DocSchema]
-	fileRefs                     :     [FileSchema]
-	folders                      :     [FolderSchema]
+FolderSchema.add({
+	docs                         :     [DocSchema],
+	fileRefs                     :     [FileSchema],
+	folders                      :     [FolderSchema]});
 
 
-mongoose.model('Folder', FolderSchema)
-exports.Folder = mongoose.model('Folder')
-exports.FolderSchema = FolderSchema
+mongoose.model('Folder', FolderSchema);
+exports.Folder = mongoose.model('Folder');
+exports.FolderSchema = FolderSchema;

@@ -1,4 +1,5 @@
-module.exports =
-	INVITE: 'invite'
-	TOKEN: 'token'
+module.exports = {
+	INVITE: 'invite',
+	TOKEN: 'token',
 	OWNER: 'owner'
+};
