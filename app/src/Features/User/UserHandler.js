@@ -10,16 +10,21 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-let UserHandler;
-const TeamInvitesHandler = require("../Subscription/TeamInvitesHandler");
+let UserHandler
+const TeamInvitesHandler = require('../Subscription/TeamInvitesHandler')
 
-module.exports = (UserHandler = {
-	populateTeamInvites(user, callback) {
-		return TeamInvitesHandler.createTeamInvitesForLegacyInvitedEmail(user.email, callback);
-	},
+module.exports = UserHandler = {
+  populateTeamInvites(user, callback) {
+    return TeamInvitesHandler.createTeamInvitesForLegacyInvitedEmail(
+      user.email,
+      callback
+    )
+  },
 
-	setupLoginData(user, callback){
-		if (callback == null) { callback = function() {}; }
-		return this.populateTeamInvites(user, callback);
-	}
-});
+  setupLoginData(user, callback) {
+    if (callback == null) {
+      callback = function() {}
+    }
+    return this.populateTeamInvites(user, callback)
+  }
+}
