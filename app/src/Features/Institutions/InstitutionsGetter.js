@@ -13,30 +13,57 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-let InstitutionsGetter;
-const UserGetter = require('../User/UserGetter');
-const UserMembershipsHandler = require("../UserMembership/UserMembershipsHandler");
-const UserMembershipEntityConfigs = require("../UserMembership/UserMembershipEntityConfigs");
-const logger = require('logger-sharelatex');
+let InstitutionsGetter
+const UserGetter = require('../User/UserGetter')
+const UserMembershipsHandler = require('../UserMembership/UserMembershipsHandler')
+const UserMembershipEntityConfigs = require('../UserMembership/UserMembershipEntityConfigs')
+const logger = require('logger-sharelatex')
 
-module.exports = (InstitutionsGetter = {
-	getConfirmedInstitutions(userId, callback) {
-		if (callback == null) { callback = function(error, institutions) {}; }
-		return UserGetter.getUserFullEmails(userId, function(error, emailsData) {
-			if (error != null) { return callback(error); }
+module.exports = InstitutionsGetter = {
+  getConfirmedInstitutions(userId, callback) {
+    if (callback == null) {
+      callback = function(error, institutions) {}
+    }
+    return UserGetter.getUserFullEmails(userId, function(error, emailsData) {
+      if (error != null) {
+        return callback(error)
+      }
 
-			const confirmedInstitutions = emailsData.filter(emailData => (emailData.confirmedAt != null) && __guard__(emailData.affiliation != null ? emailData.affiliation.institution : undefined, x => x.confirmed)).map(emailData => emailData.affiliation != null ? emailData.affiliation.institution : undefined);
+      const confirmedInstitutions = emailsData
+        .filter(
+          emailData =>
+            emailData.confirmedAt != null &&
+            __guard__(
+              emailData.affiliation != null
+                ? emailData.affiliation.institution
+                : undefined,
+              x => x.confirmed
+            )
+        )
+        .map(emailData =>
+          emailData.affiliation != null
+            ? emailData.affiliation.institution
+            : undefined
+        )
 
-			return callback(null, confirmedInstitutions);
-		});
-	},
+      return callback(null, confirmedInstitutions)
+    })
+  },
 
-	getManagedInstitutions(user_id, callback) {
-		if (callback == null) { callback = function(error, managedInstitutions) {}; }
-		return UserMembershipsHandler.getEntitiesByUser(UserMembershipEntityConfigs.institution, user_id, callback);
-	}
-});
+  getManagedInstitutions(user_id, callback) {
+    if (callback == null) {
+      callback = function(error, managedInstitutions) {}
+    }
+    return UserMembershipsHandler.getEntitiesByUser(
+      UserMembershipEntityConfigs.institution,
+      user_id,
+      callback
+    )
+  }
+}
 
 function __guard__(value, transform) {
-  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+  return typeof value !== 'undefined' && value !== null
+    ? transform(value)
+    : undefined
 }

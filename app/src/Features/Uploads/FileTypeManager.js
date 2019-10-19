@@ -10,91 +10,131 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-let FileTypeManager;
-const fs = require("fs");
-const Path = require("path");
-const isUtf8 = require('is-utf8');
+let FileTypeManager
+const fs = require('fs')
+const Path = require('path')
+const isUtf8 = require('is-utf8')
 
+module.exports = FileTypeManager = {
+  TEXT_EXTENSIONS: [
+    'tex',
+    'latex',
+    'sty',
+    'cls',
+    'bst',
+    'bib',
+    'bibtex',
+    'txt',
+    'tikz',
+    'rtex',
+    'md',
+    'asy',
+    'latexmkrc',
+    'lbx',
+    'bbx',
+    'cbx',
+    'm'
+  ],
 
-module.exports = (FileTypeManager = {
-	TEXT_EXTENSIONS : [
-		"tex", "latex", "sty", "cls", "bst", "bib", "bibtex", "txt", "tikz", "rtex", "md", "asy", "latexmkrc", "lbx", "bbx", "cbx", "m"
-	],
+  IGNORE_EXTENSIONS: [
+    'dvi',
+    'aux',
+    'log',
+    'toc',
+    'out',
+    'pdfsync',
+    // Index and glossary files
+    'nlo',
+    'ind',
+    'glo',
+    'gls',
+    'glg',
+    // Bibtex
+    'bbl',
+    'blg',
+    // Misc/bad
+    'doc',
+    'docx',
+    'gz'
+  ],
 
-	IGNORE_EXTENSIONS : [
-		"dvi", "aux", "log", "toc", "out", "pdfsync",
-		// Index and glossary files
-		"nlo", "ind", "glo", "gls", "glg",
-		// Bibtex
-		"bbl", "blg",
-		// Misc/bad
-		"doc", "docx", "gz"
-	],
+  IGNORE_FILENAMES: ['__MACOSX', '.git', '.gitignore'],
 
-	IGNORE_FILENAMES : [
-		"__MACOSX",
-		".git",
-		".gitignore"
-	],
-	
-	MAX_TEXT_FILE_SIZE: 1 * 1024 * 1024, // 1 MB
+  MAX_TEXT_FILE_SIZE: 1 * 1024 * 1024, // 1 MB
 
-	isDirectory(path, callback) {
-		if (callback == null) { callback = function(error, result) {}; }
-		return fs.stat(path, function(error, stats) {
-			if (error != null) { return callback(error); }
-			return callback(null, stats != null ? stats.isDirectory() : undefined);
-		});
-	},
+  isDirectory(path, callback) {
+    if (callback == null) {
+      callback = function(error, result) {}
+    }
+    return fs.stat(path, function(error, stats) {
+      if (error != null) {
+        return callback(error)
+      }
+      return callback(null, stats != null ? stats.isDirectory() : undefined)
+    })
+  },
 
-	// returns charset as understood by fs.readFile,
-	getType(name, fsPath, callback) {
-		if (callback == null) { callback = function(error, isBinary, charset) {}; }
-		const parts = name.split(".");
-		const extension = parts.slice(-1)[0].toLowerCase();
-		const isText = ((FileTypeManager.TEXT_EXTENSIONS.indexOf(extension) > -1) && (parts.length > 1)) || (parts[0] === 'latexmkrc');
+  // returns charset as understood by fs.readFile,
+  getType(name, fsPath, callback) {
+    if (callback == null) {
+      callback = function(error, isBinary, charset) {}
+    }
+    const parts = name.split('.')
+    const extension = parts.slice(-1)[0].toLowerCase()
+    const isText =
+      (FileTypeManager.TEXT_EXTENSIONS.indexOf(extension) > -1 &&
+        parts.length > 1) ||
+      parts[0] === 'latexmkrc'
 
-		if (!isText) { return callback(null, true); }
+    if (!isText) {
+      return callback(null, true)
+    }
 
-		return fs.stat(fsPath, function(error, stat) {
-			if (error != null) { return callback(error); }
-			if (stat.size > FileTypeManager.MAX_TEXT_FILE_SIZE) {
-				return callback(null, true); // Treat large text file as binary
-			}
+    return fs.stat(fsPath, function(error, stat) {
+      if (error != null) {
+        return callback(error)
+      }
+      if (stat.size > FileTypeManager.MAX_TEXT_FILE_SIZE) {
+        return callback(null, true) // Treat large text file as binary
+      }
 
-			return fs.readFile(fsPath, function(err, bytes) {
-				if (err != null) { return callback(err); }
+      return fs.readFile(fsPath, function(err, bytes) {
+        if (err != null) {
+          return callback(err)
+        }
 
-				if (isUtf8(bytes)) {
-					return callback(null, false, "utf-8");
-				}
-				// check for little-endian unicode bom (nodejs does not support big-endian)
-				if ((bytes[0] === 0xFF) && (bytes[1] === 0xFE)) {
-					return callback(null, false, "utf-16le");
-				}
+        if (isUtf8(bytes)) {
+          return callback(null, false, 'utf-8')
+        }
+        // check for little-endian unicode bom (nodejs does not support big-endian)
+        if (bytes[0] === 0xff && bytes[1] === 0xfe) {
+          return callback(null, false, 'utf-16le')
+        }
 
-				return callback(null, false, "latin1");
-			});
-		});
-	},
+        return callback(null, false, 'latin1')
+      })
+    })
+  },
 
-	shouldIgnore(path, callback) {
-		if (callback == null) { callback = function(error, result) {}; }
-		const name = Path.basename(path);
-		let extension = name.split(".").slice(-1)[0];
-		if (extension != null) {
-			extension = extension.toLowerCase();
-		}
-		let ignore = false;
-		if ((name[0] === ".") && (extension !== 'latexmkrc')) {
-			ignore = true;
-		}
-		if (this.IGNORE_EXTENSIONS.indexOf(extension) !== -1) {
-			ignore = true;
-		}
-		if (this.IGNORE_FILENAMES.indexOf(name) !== -1) {
-			ignore = true;
-		}
-		return callback(null, ignore);
-	}
-});
+  shouldIgnore(path, callback) {
+    if (callback == null) {
+      callback = function(error, result) {}
+    }
+    const name = Path.basename(path)
+    let extension = name.split('.').slice(-1)[0]
+    if (extension != null) {
+      extension = extension.toLowerCase()
+    }
+    let ignore = false
+    if (name[0] === '.' && extension !== 'latexmkrc') {
+      ignore = true
+    }
+    if (this.IGNORE_EXTENSIONS.indexOf(extension) !== -1) {
+      ignore = true
+    }
+    if (this.IGNORE_FILENAMES.indexOf(name) !== -1) {
+      ignore = true
+    }
+    return callback(null, ignore)
+  }
+}

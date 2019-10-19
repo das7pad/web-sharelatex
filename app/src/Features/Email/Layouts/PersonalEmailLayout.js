@@ -1,8 +1,7 @@
 // TODO: This file was created by bulk-decaffeinate.
 // Sanity-check the conversion and remove this comment.
-const _ = require("underscore");
+const _ = require('underscore')
 
-  
 module.exports = _.template(`\
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
@@ -17,5 +16,4 @@ module.exports = _.template(`\
 	</body>
 </html>
 \
-`
-);
+`)

@@ -11,18 +11,20 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const ProjectDetailsHandler = require("./ProjectDetailsHandler");
-const logger = require("logger-sharelatex");
+const ProjectDetailsHandler = require('./ProjectDetailsHandler')
+const logger = require('logger-sharelatex')
 
-
-module.exports = { 
-
-	getProjectDetails(req, res, next){
-		const {project_id} = req.params;
-		return ProjectDetailsHandler.getDetails(project_id, function(err, projDetails){
-			if (err != null) { return next(err); }
-			return res.json(projDetails);
-		});
-	}
-};
-
+module.exports = {
+  getProjectDetails(req, res, next) {
+    const { project_id } = req.params
+    return ProjectDetailsHandler.getDetails(project_id, function(
+      err,
+      projDetails
+    ) {
+      if (err != null) {
+        return next(err)
+      }
+      return res.json(projDetails)
+    })
+  }
+}

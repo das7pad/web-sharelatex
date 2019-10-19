@@ -11,39 +11,43 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-let RateLimiter;
-const settings = require("settings-sharelatex");
-const Metrics = require('metrics-sharelatex');
-const RedisWrapper = require('./RedisWrapper');
-const rclient = RedisWrapper.client('ratelimiter');
-const RollingRateLimiter = require('rolling-rate-limiter');
+let RateLimiter
+const settings = require('settings-sharelatex')
+const Metrics = require('metrics-sharelatex')
+const RedisWrapper = require('./RedisWrapper')
+const rclient = RedisWrapper.client('ratelimiter')
+const RollingRateLimiter = require('rolling-rate-limiter')
 
+module.exports = RateLimiter = {
+  addCount(opts, callback) {
+    if (callback == null) {
+      callback = function(err, shouldProcess) {}
+    }
+    const namespace = `RateLimit:${opts.endpointName}:`
+    const k = `{${opts.subjectName}}`
+    const limiter = RollingRateLimiter({
+      redis: rclient,
+      namespace,
+      interval: opts.timeInterval * 1000,
+      maxInInterval: opts.throttle
+    })
+    return limiter(k, function(err, timeLeft, actionsLeft) {
+      if (err != null) {
+        return callback(err)
+      }
+      const allowed = timeLeft === 0
+      if (!allowed) {
+        Metrics.inc(`rate-limit-hit.${opts.endpointName}`, 1, {
+          path: opts.endpointName
+        })
+      }
+      return callback(null, allowed)
+    })
+  },
 
-module.exports = (RateLimiter = {
-
-	addCount(opts, callback){
-		if (callback == null) { callback = function(err, shouldProcess){}; }
-		const namespace = `RateLimit:${opts.endpointName}:`;
-		const k = `{${opts.subjectName}}`;
-		const limiter = RollingRateLimiter({
-			redis: rclient,
-			namespace,
-			interval: opts.timeInterval * 1000,
-			maxInInterval: opts.throttle
-		});
-		return limiter(k, function(err, timeLeft, actionsLeft) {
-			if (err != null) {
-				return callback(err);
-			}
-			const allowed = timeLeft === 0;
-			if (!allowed) { Metrics.inc(`rate-limit-hit.${opts.endpointName}`, 1, {path: opts.endpointName}); }
-			return callback(null, allowed);
-		});
-	},
-
-	clearRateLimit(endpointName, subject, callback) {
-		// same as the key which will be built by RollingRateLimiter (namespace+k)
-		const keyName = `RateLimit:${endpointName}:{${subject}}`;
-		return rclient.del(keyName, callback);
-	}
-});
+  clearRateLimit(endpointName, subject, callback) {
+    // same as the key which will be built by RollingRateLimiter (namespace+k)
+    const keyName = `RateLimit:${endpointName}:{${subject}}`
+    return rclient.del(keyName, callback)
+  }
+}
