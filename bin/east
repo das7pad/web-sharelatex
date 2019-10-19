@@ -5,6 +5,9 @@ SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 if [ -f /.dockerenv ]; then
   # I'm running inside docker
   npm run migrations -- "$@"
+elif [ ! -e "$SCRIPTPATH/../../bin/run" ]; then
+  # ...or hello OSS Developer!
+  echo "dev env is missing - skipping migrations" >&2
 else
   ${SCRIPTPATH}/run web_v2 bin/east "$@"
 fi
