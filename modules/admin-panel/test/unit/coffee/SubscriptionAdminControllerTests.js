@@ -1,180 +1,240 @@
-sinon = require('sinon')
-chai = require('chai')
-should = chai.should()
-expect = chai.expect
-modulePath = "../../../app/js/SubscriptionAdminController.js"
-SandboxedModule = require('sandboxed-module')
-events = require "events"
-ObjectId = require("mongojs").ObjectId
-assert = require("assert")
-Path = require "path"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS206: Consider reworking classes to avoid initClass
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const sinon = require('sinon');
+const chai = require('chai');
+const should = chai.should();
+const {
+    expect
+} = chai;
+const modulePath = "../../../app/js/SubscriptionAdminController.js";
+const SandboxedModule = require('sandboxed-module');
+const events = require("events");
+const {
+    ObjectId
+} = require("mongojs");
+const assert = require("assert");
+const Path = require("path");
 
-describe "SubscriptionAdminController", ->
-	beforeEach ->
-		@SubscriptionAdminController = SandboxedModule.require modulePath, requires:
-			"logger-sharelatex":
-				log:->
-				err:->
-			"./UserAdminController": @UserAdminController = {}
-			"../../../../app/js/Features/User/UserGetter": @UserGetter = {}
-			"../../../../app/js/Features/Subscription/SubscriptionLocator": @SubscriptionLocator = {}
-			"../../../../app/js/Features/Subscription/SubscriptionUpdater": @SubscriptionUpdater = {}
+describe("SubscriptionAdminController", function() {
+	beforeEach(function() {
+		let Subscription;
+		this.SubscriptionAdminController = SandboxedModule.require(modulePath, { requires: {
+			"logger-sharelatex": {
+				log() {},
+				err() {}
+			},
+			"./UserAdminController": (this.UserAdminController = {}),
+			"../../../../app/js/Features/User/UserGetter": (this.UserGetter = {}),
+			"../../../../app/js/Features/Subscription/SubscriptionLocator": (this.SubscriptionLocator = {}),
+			"../../../../app/js/Features/Subscription/SubscriptionUpdater": (this.SubscriptionUpdater = {}),
 			"../../../../app/js/Features/Subscription/FeaturesUpdater":
-				@FeaturesUpdater = {refreshFeatures: sinon.stub().yields()}
-			"../../../../app/js/models/Subscription": Subscription: @Subscription =
-				class Subscription
-					constructor: sinon.stub()
-					save: sinon.stub().yields()
-					@remove: sinon.stub().yields()
-					@findAndModify: sinon.stub().yields()
-			"../../../../app/js/Features/Errors/ErrorController": @ErrorController = {}
-			"metrics-sharelatex":
-				gauge:->
+				(this.FeaturesUpdater = {refreshFeatures: sinon.stub().yields()}),
+			"../../../../app/js/models/Subscription": { Subscription: (this.Subscription =
+				(Subscription = (function() {
+					let createSubscription = undefined;
+					Subscription = class Subscription {
+						static initClass() {
+							this.prototype.save = sinon.stub().yields();
+							this.remove = sinon.stub().yields();
+							this.findAndModify = sinon.stub().yields();
+							createSubscription = sinon.stub();
+						}
+						constructor() {
+							return createSubscription.apply(this, arguments);
+						}
+					};
+					Subscription.initClass();
+					return Subscription;
+				})()))
+		},
+			"../../../../app/js/Features/Errors/ErrorController": (this.ErrorController = {}),
+			"metrics-sharelatex": {
+				gauge() {}
+			}
+		}
+	}
+		);
 
-		@res =
-			render: sinon.stub()
-			json: sinon.stub()
+		this.res = {
+			render: sinon.stub(),
+			json: sinon.stub(),
 			sendStatus: sinon.stub()
+		};
 
-		@req = {}
+		this.req = {};
 
-		@ErrorController.notFound = sinon.stub()
+		this.ErrorController.notFound = sinon.stub();
 
-		@subscription_id = ObjectId().toString()
-		@user_id = ObjectId().toString()
+		this.subscription_id = ObjectId().toString();
+		return this.user_id = ObjectId().toString();
+	});
 
-	describe "show", ->
-		beforeEach ->
-			@SubscriptionLocator.getSubscription = sinon.stub()
-			@UserGetter.getUsers = sinon.stub()
-			@req.params = {@subscription_id, @user_id}
+	describe("show", function() {
+		beforeEach(function() {
+			this.SubscriptionLocator.getSubscription = sinon.stub();
+			this.UserGetter.getUsers = sinon.stub();
+			return this.req.params = {subscription_id: this.subscription_id, user_id: this.user_id};});
 
-		describe "successfully", ->
-			beforeEach ->
-				@subscription = {
-					"mock": "subscription"
+		describe("successfully", function() {
+			beforeEach(function() {
+				this.subscription = {
+					"mock": "subscription",
 					member_ids: [ ObjectId(), ObjectId(), ObjectId() ]
-				}
-				@members = @managers = [{"mock": "member2"}, {"mock": "member2"}, {"mock": "member3"}]
-				@UserGetter.getUsers.yields(null, @members)
-				@SubscriptionLocator.getSubscription.yields(null, @subscription)
-				@SubscriptionAdminController.show @req, @res
+				};
+				this.members = (this.managers = [{"mock": "member2"}, {"mock": "member2"}, {"mock": "member3"}]);
+				this.UserGetter.getUsers.yields(null, this.members);
+				this.SubscriptionLocator.getSubscription.yields(null, this.subscription);
+				return this.SubscriptionAdminController.show(this.req, this.res);
+			});
 
-			it "should look up the subscription", ->
-				@SubscriptionLocator.getSubscription
-					.calledWith(@subscription_id)
-					.should.equal true
+			it("should look up the subscription", function() {
+				return this.SubscriptionLocator.getSubscription
+					.calledWith(this.subscription_id)
+					.should.equal(true);
+			});
 
-			it "should look up the member_ids", ->
-				@UserGetter.getUsers
-					.calledWith(@subscription.member_ids, { email: 1 })
-					.should.equal true
+			it("should look up the member_ids", function() {
+				return this.UserGetter.getUsers
+					.calledWith(this.subscription.member_ids, { email: 1 })
+					.should.equal(true);
+			});
 
-			it "should render the subscription page", ->
-				@res.render
+			return it("should render the subscription page", function() {
+				return this.res.render
 					.calledWith(Path.resolve(__dirname, "../../../app/views/subscription/show"),
-					{@subscription, @user_id, @members, @managers})
-					.should.equal true
+					{subscription: this.subscription, user_id: this.user_id, members: this.members, managers: this.managers})
+					.should.equal(true);
+			});
+		});
 
-		describe "when subscription is not found", ->
-			beforeEach ->
-				@SubscriptionLocator.getSubscription.yields(null, null)
-				@SubscriptionAdminController.show @req, @res
+		return describe("when subscription is not found", function() {
+			beforeEach(function() {
+				this.SubscriptionLocator.getSubscription.yields(null, null);
+				return this.SubscriptionAdminController.show(this.req, this.res);
+			});
 
-			it "should render the 404 page", ->
-				@ErrorController.notFound
-					.calledWith(@req, @res)
-					.should.equal true
+			return it("should render the 404 page", function() {
+				return this.ErrorController.notFound
+					.calledWith(this.req, this.res)
+					.should.equal(true);
+			});
+		});
+	});
 
-	describe "update", ->
-		beforeEach ->
-			@req.params = {@subscription_id}
-			@req.body = {
+	describe("update", function() {
+		beforeEach(function() {
+			this.req.params = {subscription_id: this.subscription_id};
+			return this.req.body = {
 				"mock": "data for subscription"
-			}
+			};});
 
-		describe "successfully", ->
-			beforeEach ->
-				@subscription = {
-					"mock": "subscription"
-					"admin_id": "admin-id"
+		return describe("successfully", function() {
+			beforeEach(function() {
+				this.subscription = {
+					"mock": "subscription",
+					"admin_id": "admin-id",
 					"member_ids": ["member-id-1", "member-id-2"]
-				}
-				@Subscription.findAndModify.yields null, @subscription
-				@UserAdminController._reqToMongoUpdate = sinon.stub().returns(@update = {"mock": "update"})
-				@SubscriptionAdminController.update @req, @res
+				};
+				this.Subscription.findAndModify.yields(null, this.subscription);
+				this.UserAdminController._reqToMongoUpdate = sinon.stub().returns(this.update = {"mock": "update"});
+				return this.SubscriptionAdminController.update(this.req, this.res);
+			});
 
-			it "should convert the body params to an update", ->
-				@UserAdminController._reqToMongoUpdate
-					.calledWith(@req.body, @SubscriptionAdminController.ALLOWED_ATTRIBUTES)
-					.should.equal true
+			it("should convert the body params to an update", function() {
+				return this.UserAdminController._reqToMongoUpdate
+					.calledWith(this.req.body, this.SubscriptionAdminController.ALLOWED_ATTRIBUTES)
+					.should.equal(true);
+			});
 
-			it "should update the subscription", ->
-				@Subscription.findAndModify
-					.calledWith({_id: @subscription_id}, { $set: @update })
-					.should.equal true
+			it("should update the subscription", function() {
+				return this.Subscription.findAndModify
+					.calledWith({_id: this.subscription_id}, { $set: this.update })
+					.should.equal(true);
+			});
 
-			it "should refresh features", ->
-				@FeaturesUpdater.refreshFeatures
+			it("should refresh features", function() {
+				return this.FeaturesUpdater.refreshFeatures
 					.callCount
-					.should.equal 3
+					.should.equal(3);
+			});
 
-			it "should refresh features for admin", ->
-				@FeaturesUpdater.refreshFeatures
+			it("should refresh features for admin", function() {
+				return this.FeaturesUpdater.refreshFeatures
 					.calledWith('admin-id')
-					.should.equal true
+					.should.equal(true);
+			});
 
-			it "should refresh features for members", ->
-				@FeaturesUpdater.refreshFeatures
+			it("should refresh features for members", function() {
+				this.FeaturesUpdater.refreshFeatures
 					.calledWith('member-id-1')
-					.should.equal true
-				@FeaturesUpdater.refreshFeatures
+					.should.equal(true);
+				return this.FeaturesUpdater.refreshFeatures
 					.calledWith('member-id-2')
-					.should.equal true
+					.should.equal(true);
+			});
 
-			it "should return 204", ->
-				@res.sendStatus
+			return it("should return 204", function() {
+				return this.res.sendStatus
 					.calledWith(204)
-					.should.equal true
+					.should.equal(true);
+			});
+		});
+	});
 
-	describe "create", ->
-		beforeEach ->
-			@req.body = {
-				"mock": "data for subscription"
-				admin_id: @admin_id = 'mock-admin-id'
-			}
-			@Subscription::save.yields(null, @new_subscription = {"new": "subscription"})
+	describe("create", function() {
+		beforeEach(function() {
+			this.req.body = {
+				"mock": "data for subscription",
+				admin_id: (this.admin_id = 'mock-admin-id')
+			};
+			return this.Subscription.prototype.save.yields(null, (this.new_subscription = {"new": "subscription"}));
+		});
 
-		describe "successfully", ->
-			beforeEach ->
-				@UserAdminController._reqToMongoUpdate = sinon.stub().returns(@update = {"mock": "update"})
-				@SubscriptionAdminController.create @req, @res
+		return describe("successfully", function() {
+			beforeEach(function() {
+				this.UserAdminController._reqToMongoUpdate = sinon.stub().returns(this.update = {"mock": "update"});
+				return this.SubscriptionAdminController.create(this.req, this.res);
+			});
 
-			it "should convert the body params to an update", ->
-				@UserAdminController._reqToMongoUpdate
-					.calledWith(@req.body, @SubscriptionAdminController.ALLOWED_ATTRIBUTES)
-					.should.equal true
+			it("should convert the body params to an update", function() {
+				return this.UserAdminController._reqToMongoUpdate
+					.calledWith(this.req.body, this.SubscriptionAdminController.ALLOWED_ATTRIBUTES)
+					.should.equal(true);
+			});
 
-			it "should create the subscription", ->
-				# @Subscription::constructor.calledWith(@update).should.equal true
-				@Subscription::save.called.should.equal true
+			it("should create the subscription", function() {
+				// @Subscription::constructor.calledWith(@update).should.equal true
+				return this.Subscription.prototype.save.called.should.equal(true);
+			});
 
-			it "should add the admin_id and manager_ids to the update", ->
-				expect(@update.admin_id).to.equal @admin_id
-				expect(@update.manager_ids).to.deep.equal [@admin_id]
+			it("should add the admin_id and manager_ids to the update", function() {
+				expect(this.update.admin_id).to.equal(this.admin_id);
+				return expect(this.update.manager_ids).to.deep.equal([this.admin_id]);
+		});
 
-			it "should return the subscription as json", ->
-				@res.json
-					.calledWith({subscription: @new_subscription})
-					.should.equal true
+			return it("should return the subscription as json", function() {
+				return this.res.json
+					.calledWith({subscription: this.new_subscription})
+					.should.equal(true);
+			});
+		});
+	});
 
-	describe "delete", ->
-		beforeEach ->
-			@SubscriptionUpdater.deleteSubscription = sinon.stub().yields()
-			@req.params = {@subscription_id}
-			@SubscriptionAdminController.delete @req, @res
+	return describe("delete", function() {
+		beforeEach(function() {
+			this.SubscriptionUpdater.deleteSubscription = sinon.stub().yields();
+			this.req.params = {subscription_id: this.subscription_id};
+			return this.SubscriptionAdminController.delete(this.req, this.res);
+		});
 
-		it "should remove the subscription", ->
-			@SubscriptionUpdater.deleteSubscription
-				.calledWith(@subscription_id)
-				.should.equal true
+		return it("should remove the subscription", function() {
+			return this.SubscriptionUpdater.deleteSubscription
+				.calledWith(this.subscription_id)
+				.should.equal(true);
+		});
+	});
+});

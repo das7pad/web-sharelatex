@@ -1,320 +1,422 @@
-sinon = require('sinon')
-chai = require('chai')
-should = chai.should()
-expect = chai.expect
-modulePath = "../../../app/js/UserAdminController.js"
-SandboxedModule = require('sandboxed-module')
-events = require "events"
-ObjectId = require("mongojs").ObjectId
-assert = require("assert")
-Path = require "path"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS206: Consider reworking classes to avoid initClass
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const sinon = require('sinon');
+const chai = require('chai');
+const should = chai.should();
+const {
+    expect
+} = chai;
+const modulePath = "../../../app/js/UserAdminController.js";
+const SandboxedModule = require('sandboxed-module');
+const events = require("events");
+const {
+    ObjectId
+} = require("mongojs");
+const assert = require("assert");
+const Path = require("path");
 
-describe "UserAdminController", ->
-	beforeEach ->
-		@user = {user_id:1,first_name:'James'}
-		@users = users = [{first_name:'James'}, {first_name:'Henry'}]
-		@projects = {owned:[{lastUpdated:1, _id:1, owner_ref: "user-1"}, {lastUpdated:2, _id:2, owner_ref: "user-2"}], readAndWrite:[], readOnly:[]}
-		@user_count = user_count = 35043
+describe("UserAdminController", function() {
+	beforeEach(function() {
+		let User, user_count, users;
+		this.user = {user_id:1,first_name:'James'};
+		this.users = (users = [{first_name:'James'}, {first_name:'Henry'}]);
+		this.projects = {owned:[{lastUpdated:1, _id:1, owner_ref: "user-1"}, {lastUpdated:2, _id:2, owner_ref: "user-2"}], readAndWrite:[], readOnly:[]};
+		this.user_count = (user_count = 35043);
 
-		@UserGetter =
-			getUser: sinon.stub()
+		this.UserGetter =
+			{getUser: sinon.stub()};
 
-		@UserDeleter =
-			deleteUser: sinon.stub().callsArgWith(1)
+		this.UserDeleter =
+			{deleteUser: sinon.stub().callsArgWith(1)};
 	
-		@UserUpdater =
-			changeEmailAddress: sinon.stub()
+		this.UserUpdater =
+			{changeEmailAddress: sinon.stub()};
 		
-		@User = class User
-			@update: sinon.stub().yields()
-			@find: sinon.stub().yields(null, users)
-			@count: sinon.stub().yields(null, user_count)
+		this.User = (User = (function() {
+			User = class User {
+				static initClass() {
+					this.update = sinon.stub().yields();
+					this.find = sinon.stub().yields(null, users);
+					this.count = sinon.stub().yields(null, user_count);
+				}
+			};
+			User.initClass();
+			return User;
+		})());
 
-		@AuthenticationManager =
-			setUserPassword: sinon.stub()
+		this.AuthenticationManager =
+			{setUserPassword: sinon.stub()};
 
-		@AuthenticationController = {}
+		this.AuthenticationController = {};
 	
-		@adminSubscription = _id: 'mock-subscription-id-1'
-		@memberSubscriptions = [
-			( _id: 'mock-subscription-id-2')
-			( _id: 'mock-subscription-id-3')
-		]
-		@managedSubscription = _id: 'mock-subscription-id-4'
-		@SubscriptionLocator =
-			getUsersSubscription: sinon.stub().yields(null, @adminSubscription)
-			getMemberSubscriptions: sinon.stub().yields(null, @memberSubscriptions)
-			findManagedSubscription: sinon.stub().yields(null, @managedSubscription)
+		this.adminSubscription = {_id: 'mock-subscription-id-1'};
+		this.memberSubscriptions = [
+			({ _id: 'mock-subscription-id-2'}),
+			({ _id: 'mock-subscription-id-3'})
+		];
+		this.managedSubscription = {_id: 'mock-subscription-id-4'};
+		this.SubscriptionLocator = {
+			getUsersSubscription: sinon.stub().yields(null, this.adminSubscription),
+			getMemberSubscriptions: sinon.stub().yields(null, this.memberSubscriptions),
+			findManagedSubscription: sinon.stub().yields(null, this.managedSubscription)
+		};
 		
-		@ProjectGetter =
-			findAllUsersProjects: sinon.stub().yields(null, @projects)
+		this.ProjectGetter =
+			{findAllUsersProjects: sinon.stub().yields(null, this.projects)};
 
-		@UserAdminController = SandboxedModule.require modulePath, requires:
-			"logger-sharelatex":
-				log:->
-				err:->
-			"../../../../app/js/Features/User/UserGetter":@UserGetter
-			"../../../../app/js/Features/User/UserDeleter":@UserDeleter
-			"../../../../app/js/Features/User/UserUpdater":@UserUpdater
-			"../../../../app/js/Features/Authentication/AuthenticationManager":@AuthenticationManager
-			"../../../../app/js/Features/Authentication/AuthenticationController":@AuthenticationController
-			"../../../../app/js/Features/Subscription/SubscriptionLocator": @SubscriptionLocator
-			"../../../../app/js/models/User": User: @User
-			"../../../../app/js/Features/Project/ProjectGetter": @ProjectGetter
-			"../../../../app/js/Features/Subscription/FeaturesUpdater": @FeaturesUpdater = {}
-			"metrics-sharelatex":
-				gauge:->
-			"settings-sharelatex": @settings = {}
+		this.UserAdminController = SandboxedModule.require(modulePath, { requires: {
+			"logger-sharelatex": {
+				log() {},
+				err() {}
+			},
+			"../../../../app/js/Features/User/UserGetter":this.UserGetter,
+			"../../../../app/js/Features/User/UserDeleter":this.UserDeleter,
+			"../../../../app/js/Features/User/UserUpdater":this.UserUpdater,
+			"../../../../app/js/Features/Authentication/AuthenticationManager":this.AuthenticationManager,
+			"../../../../app/js/Features/Authentication/AuthenticationController":this.AuthenticationController,
+			"../../../../app/js/Features/Subscription/SubscriptionLocator": this.SubscriptionLocator,
+			"../../../../app/js/models/User": { User: this.User
+		},
+			"../../../../app/js/Features/Project/ProjectGetter": this.ProjectGetter,
+			"../../../../app/js/Features/Subscription/FeaturesUpdater": (this.FeaturesUpdater = {}),
+			"metrics-sharelatex": {
+				gauge() {}
+			},
+			"settings-sharelatex": (this.settings = {})
+		}
+	});
 
-		@perPage = @UserAdminController.PER_PAGE
+		this.perPage = this.UserAdminController.PER_PAGE;
 
-		@UserGetter.getUser = (user_id, fields, callback) =>
-			callback null, @user
+		this.UserGetter.getUser = (user_id, fields, callback) => {
+			return callback(null, this.user);
+		};
 
-		@req =
-			body:
+		this.req = {
+			body: {
 				query: ''
+			}
+		};
 
-		@res =
-			locals:
+		return this.res = {
+			locals: {
 				jsPath:"js path here"
-			send: sinon.stub()
+			},
+			send: sinon.stub(),
 			sendStatus: sinon.stub()
+		};
+	});
 
-	describe "index", ->
+	describe("index", function() {
 
-		it "should render the admin/index page", (done)->
-			@res.render = (pageName, opts)=>
-				pageName.should.equal  Path.resolve(__dirname + "/../../../")+ "/app/views/user/index"
-				done()
-			@UserAdminController.index @req, @res
+		it("should render the admin/index page", function(done){
+			this.res.render = (pageName, opts)=> {
+				pageName.should.equal(Path.resolve(__dirname + "/../../../")+ "/app/views/user/index");
+				return done();
+			};
+			return this.UserAdminController.index(this.req, this.res);
+		});
 
-		it "should send the users", (done)->
-			@res.render = (pageName, opts)=>
-				opts.users.should.deep.equal @users
-				done()
-			@UserAdminController.index @req, @res
+		it("should send the users", function(done){
+			this.res.render = (pageName, opts)=> {
+				opts.users.should.deep.equal(this.users);
+				return done();
+			};
+			return this.UserAdminController.index(this.req, this.res);
+		});
 
-		it "should send the pages", (done)->
-			@res.render = (pageName, opts)=>
-				opts.pages.should.equal Math.ceil(@user_count / @perPage)
-				done()
-			@UserAdminController.index @req, @res
+		return it("should send the pages", function(done){
+			this.res.render = (pageName, opts)=> {
+				opts.pages.should.equal(Math.ceil(this.user_count / this.perPage));
+				return done();
+			};
+			return this.UserAdminController.index(this.req, this.res);
+		});
+	});
 
-	describe "search", ->
+	describe("search", function() {
 
-		beforeEach ->
+		beforeEach(function() {
 
-			@req =
-				body:
-					query: ''
+			return this.req = {
+				body: {
+					query: '',
 					page: 1
+				}
+			};
+		});
 
-		it "should send the users", (done)->
-			@res.send = (code, json)=>
-				code.should.equal 200
-				json.users.should.deep.equal @users
-				done()
-			@UserAdminController.search @req, @res
+		it("should send the users", function(done){
+			this.res.send = (code, json)=> {
+				code.should.equal(200);
+				json.users.should.deep.equal(this.users);
+				return done();
+			};
+			return this.UserAdminController.search(this.req, this.res);
+		});
 
-		it "should send the pages", (done)->
-			@res.send = (code, json)=>
-				code.should.equal 200
-				json.pages.should.equal Math.ceil(@user_count / @perPage)
-				done()
-			@UserAdminController.search @req, @res
+		return it("should send the pages", function(done){
+			this.res.send = (code, json)=> {
+				code.should.equal(200);
+				json.pages.should.equal(Math.ceil(this.user_count / this.perPage));
+				return done();
+			};
+			return this.UserAdminController.search(this.req, this.res);
+		});
+	});
 
-	describe "show", ->
+	describe("show", function() {
 
-		beforeEach ->
-			@UserAdminController._isSuperAdmin = sinon.stub().withArgs(@req).returns(false)
-			@req =
-				params:
+		beforeEach(function() {
+			this.UserAdminController._isSuperAdmin = sinon.stub().withArgs(this.req).returns(false);
+			return this.req = {
+				params: {
 					user_id: 'user_id_here'
+				}
+			};
+		});
 
-		it "should render the admin/userInfo page", (done)->
-			@res.render = (pageName, opts)=>
-				pageName.should.equal  Path.resolve(__dirname + "/../../../")+ "/app/views/user/show"
-				done()
-			@UserAdminController.show @req, @res
+		it("should render the admin/userInfo page", function(done){
+			this.res.render = (pageName, opts)=> {
+				pageName.should.equal(Path.resolve(__dirname + "/../../../")+ "/app/views/user/show");
+				return done();
+			};
+			return this.UserAdminController.show(this.req, this.res);
+		});
 
-		it "should send the user", (done)->
-			@res.render = (pageName, opts)=>
-				opts.user.should.deep.equal @user
-				done()
-			@UserAdminController.show @req, @res
+		it("should send the user", function(done){
+			this.res.render = (pageName, opts)=> {
+				opts.user.should.deep.equal(this.user);
+				return done();
+			};
+			return this.UserAdminController.show(this.req, this.res);
+		});
 
-		it "should send the user projects", (done)->
-			@res.render = (pageName, opts)=>
-				opts.projects.should.deep.equal @projects.owned
-				done()
-			@UserAdminController.show @req, @res
+		it("should send the user projects", function(done){
+			this.res.render = (pageName, opts)=> {
+				opts.projects.should.deep.equal(this.projects.owned);
+				return done();
+			};
+			return this.UserAdminController.show(this.req, this.res);
+		});
 		
-		it "should send the user's subscription", (done) ->
-			@res.render = (pageName, opts)=>
-				opts.adminSubscription.should.deep.equal @adminSubscription
-				done()
-			@UserAdminController.show @req, @res
+		it("should send the user's subscription", function(done) {
+			this.res.render = (pageName, opts)=> {
+				opts.adminSubscription.should.deep.equal(this.adminSubscription);
+				return done();
+			};
+			return this.UserAdminController.show(this.req, this.res);
+		});
 		
-		it "should send the user's member subscriptions", (done) ->
-			@res.render = (pageName, opts)=>
-				opts.memberSubscriptions.should.deep.equal @memberSubscriptions
-				done()
-			@UserAdminController.show @req, @res
+		it("should send the user's member subscriptions", function(done) {
+			this.res.render = (pageName, opts)=> {
+				opts.memberSubscriptions.should.deep.equal(this.memberSubscriptions);
+				return done();
+			};
+			return this.UserAdminController.show(this.req, this.res);
+		});
 
-		it "should send the user's managed subscription", (done) ->
-			@res.render = (pageName, opts)=>
-				opts.managedSubscription.should.deep.equal @managedSubscription
-				done()
-			@UserAdminController.show @req, @res
+		it("should send the user's managed subscription", function(done) {
+			this.res.render = (pageName, opts)=> {
+				opts.managedSubscription.should.deep.equal(this.managedSubscription);
+				return done();
+			};
+			return this.UserAdminController.show(this.req, this.res);
+		});
 
-		it "should set the super admin state", (done) ->
-			@res.render = (pageName, opts)=>
-				expect(opts.isSuperAdmin).to.equal false
-				done()
-			@UserAdminController.show @req, @res
+		it("should set the super admin state", function(done) {
+			this.res.render = (pageName, opts)=> {
+				expect(opts.isSuperAdmin).to.equal(false);
+				return done();
+			};
+			return this.UserAdminController.show(this.req, this.res);
+		});
 
-		it "should set the super admin state to true when super admin", (done) ->
-			@UserAdminController._isSuperAdmin = sinon.stub().withArgs(@req).returns(true)
-			@res.render = (pageName, opts)=>
-				expect(opts.isSuperAdmin).to.equal true
-				done()
-			@UserAdminController.show @req, @res
+		return it("should set the super admin state to true when super admin", function(done) {
+			this.UserAdminController._isSuperAdmin = sinon.stub().withArgs(this.req).returns(true);
+			this.res.render = (pageName, opts)=> {
+				expect(opts.isSuperAdmin).to.equal(true);
+				return done();
+			};
+			return this.UserAdminController.show(this.req, this.res);
+		});
+	});
 
 
-	describe "delete", ->
+	describe("delete", () => it("should delete the user", function(done){
+        this.req = {
+            params: {
+                user_id: 'user_id_here'
+            }
+        };
+        this.res.sendStatus = code=> {
+            this.UserDeleter.deleteUser.calledWith('user_id_here').should.equal(true);
+            code.should.equal(200);
+            return done();
+        };
+        return this.UserAdminController.delete(this.req, this.res);
+    }));
 
-		it "should delete the user", (done)->
-			@req =
-				params:
-					user_id: 'user_id_here'
-			@res.sendStatus = (code)=>
-				@UserDeleter.deleteUser.calledWith('user_id_here').should.equal true
-				code.should.equal 200
-				done()
-			@UserAdminController.delete @req, @res
+	describe("update", function() {
+		beforeEach(function() {
+			this.UserAdminController._isSuperAdmin = sinon.stub().withArgs(this.req).returns(false);
+			this.req.params =
+				{user_id: (this.user_id = ObjectId().toString())};
+			return this.res.sendStatus = sinon.stub();
+		});
 
-	describe "update", ->
-		beforeEach ->
-			@UserAdminController._isSuperAdmin = sinon.stub().withArgs(@req).returns(false)
-			@req.params =
-				user_id: @user_id = ObjectId().toString()
-			@res.sendStatus = sinon.stub()
+		describe("successfully", function() {
+			beforeEach(function() {
+				this.req.body =
+					{first_name: "James"};
+				return this.UserAdminController.update(this.req, this.res);
+			});
 
-		describe "successfully", ->
-			beforeEach ->
-				@req.body =
-					first_name: "James"
-				@UserAdminController.update @req, @res
-
-			it "should call User.update with the updated attributes", ->
-				@User.update
-					.calledWith({_id: @user_id})
-					.should.equal true
-				updateQuery = @User.update.args[0][1]
-				updateQuery.$set.first_name.should.equal "James"
+			return it("should call User.update with the updated attributes", function() {
+				this.User.update
+					.calledWith({_id: this.user_id})
+					.should.equal(true);
+				const updateQuery = this.User.update.args[0][1];
+				return updateQuery.$set.first_name.should.equal("James");
+			});
+		});
 			
-		describe "with unknown attribute", ->
-			beforeEach ->
-				@req.body =
-					foo_bar: 100
-				@UserAdminController.update @req, @res
+		describe("with unknown attribute", function() {
+			beforeEach(function() {
+				this.req.body =
+					{foo_bar: 100};
+				return this.UserAdminController.update(this.req, this.res);
+			});
 
-			it "should ignore the attribute", ->
-				@User.update
-					.calledWith({_id: @user_id})
-					.should.equal true
-				updateQuery = @User.update.args[0][1]
-				expect(updateQuery.$set.foo_bar).to.equal undefined
+			return it("should ignore the attribute", function() {
+				this.User.update
+					.calledWith({_id: this.user_id})
+					.should.equal(true);
+				const updateQuery = this.User.update.args[0][1];
+				return expect(updateQuery.$set.foo_bar).to.equal(undefined);
+			});
+		});
 		
-		describe "with boolean attribute set to 'on'", ->
-			beforeEach ->
-				@req.body =
-					'features.versioning': 'on'
-				@UserAdminController.update @req, @res
+		describe("with boolean attribute set to 'on'", function() {
+			beforeEach(function() {
+				this.req.body =
+					{'features.versioning': 'on'};
+				return this.UserAdminController.update(this.req, this.res);
+			});
 
-			it "should set the attribute to true", ->
-				updateQuery = @User.update.args[0][1]
-				expect(updateQuery.$set['features.versioning']).to.equal true
+			return it("should set the attribute to true", function() {
+				const updateQuery = this.User.update.args[0][1];
+				return expect(updateQuery.$set['features.versioning']).to.equal(true);
+			});
+		});
 			
-		describe "with missing boolean attribute", ->
-			beforeEach ->
-				@req.body = {}
-				@UserAdminController.update @req, @res
+		describe("with missing boolean attribute", function() {
+			beforeEach(function() {
+				this.req.body = {};
+				return this.UserAdminController.update(this.req, this.res);
+			});
 
-			it "should set the attribute to false", ->
-				updateQuery = @User.update.args[0][1]
-				expect(updateQuery.$set['features.versioning']).to.equal false
+			return it("should set the attribute to false", function() {
+				const updateQuery = this.User.update.args[0][1];
+				return expect(updateQuery.$set['features.versioning']).to.equal(false);
+			});
+		});
 
-		describe "with super admin only attribute", ->
-			beforeEach ->
-				@req.body =
-					isAdmin: true
-				@UserAdminController.update @req, @res
+		describe("with super admin only attribute", function() {
+			beforeEach(function() {
+				this.req.body =
+					{isAdmin: true};
+				return this.UserAdminController.update(this.req, this.res);
+			});
 
-			it "should ignore the attribute", ->
-				updateQuery = @User.update.args[0][1]
-				expect(updateQuery.$set.isAdmin).to.equal undefined
+			return it("should ignore the attribute", function() {
+				const updateQuery = this.User.update.args[0][1];
+				return expect(updateQuery.$set.isAdmin).to.equal(undefined);
+			});
+		});
 
-		describe "with super admin only attribute when a super admin", ->
-			beforeEach ->
-				@UserAdminController._isSuperAdmin = sinon.stub().withArgs(@req).returns(true)
-				@req.body =
-					isAdmin: true
-				@UserAdminController.update @req, @res
+		return describe("with super admin only attribute when a super admin", function() {
+			beforeEach(function() {
+				this.UserAdminController._isSuperAdmin = sinon.stub().withArgs(this.req).returns(true);
+				this.req.body =
+					{isAdmin: true};
+				return this.UserAdminController.update(this.req, this.res);
+			});
 
-			it "should ignore the attribute", ->
-				updateQuery = @User.update.args[0][1]
-				expect(updateQuery.$set.isAdmin).to.equal true
+			return it("should ignore the attribute", function() {
+				const updateQuery = this.User.update.args[0][1];
+				return expect(updateQuery.$set.isAdmin).to.equal(true);
+			});
+		});
+	});
 
 				
-	describe "updateEmail", ->
-		beforeEach ->
-			@req.params =
-				user_id: @user_id = ObjectId().toString()
-			@req.body =
-				email: @email = "jane@example.com"
+	describe("updateEmail", function() {
+		beforeEach(function() {
+			this.req.params =
+				{user_id: (this.user_id = ObjectId().toString())};
+			return this.req.body =
+				{email: (this.email = "jane@example.com")};
+		});
 			
-		describe "successfully", ->
-			beforeEach ->
-				@UserUpdater.changeEmailAddress.yields(null)
-				@UserAdminController.updateEmail @req, @res
+		describe("successfully", function() {
+			beforeEach(function() {
+				this.UserUpdater.changeEmailAddress.yields(null);
+				return this.UserAdminController.updateEmail(this.req, this.res);
+			});
 			
-			it "should update the email", ->
-				@UserUpdater.changeEmailAddress
-					.calledWith(@user_id, @email)
-					.should.equal true
+			it("should update the email", function() {
+				return this.UserUpdater.changeEmailAddress
+					.calledWith(this.user_id, this.email)
+					.should.equal(true);
+			});
 			
-			it "should return 204", ->
-				@res.sendStatus.calledWith(204).should.equal true
+			return it("should return 204", function() {
+				return this.res.sendStatus.calledWith(204).should.equal(true);
+			});
+		});
 			
-		describe "with existing email", ->
-			beforeEach ->
-				@UserUpdater.changeEmailAddress.yields({message: "alread_exists"})
-				@UserAdminController.updateEmail @req, @res
+		return describe("with existing email", function() {
+			beforeEach(function() {
+				this.UserUpdater.changeEmailAddress.yields({message: "alread_exists"});
+				return this.UserAdminController.updateEmail(this.req, this.res);
+			});
 			
-			it "should return 400 with a message", ->
-				@res.send.calledWith(400, {message: "Email is in use by another user"}).should.equal true
+			return it("should return 400 with a message", function() {
+				return this.res.send.calledWith(400, {message: "Email is in use by another user"}).should.equal(true);
+			});
+		});
+	});
 			
-	describe "_isSuperAdmin", ->
-		beforeEach ->
-			@current_user_id = 'current_user_id-123'
-			@AuthenticationController.getLoggedInUserId = sinon.stub().withArgs(@req).returns(@current_user_id)
+	return describe("_isSuperAdmin", function() {
+		beforeEach(function() {
+			this.current_user_id = 'current_user_id-123';
+			return this.AuthenticationController.getLoggedInUserId = sinon.stub().withArgs(this.req).returns(this.current_user_id);
+		});
 
-		it "should return false if no super admin setting is set", ->
-			delete @settings.superAdminUserIds
-			expect(
-				@UserAdminController._isSuperAdmin(@req)
-			).to.equal false
+		it("should return false if no super admin setting is set", function() {
+			delete this.settings.superAdminUserIds;
+			return expect(
+				this.UserAdminController._isSuperAdmin(this.req)
+			).to.equal(false);
+		});
 
-		it "should return false if user is not in super admins", ->
-			@settings.superAdminUserIds = ['not-current-user']
-			expect(
-				@UserAdminController._isSuperAdmin(@req)
-			).to.equal false
+		it("should return false if user is not in super admins", function() {
+			this.settings.superAdminUserIds = ['not-current-user'];
+			return expect(
+				this.UserAdminController._isSuperAdmin(this.req)
+			).to.equal(false);
+		});
 
-		it "should return true if user is in super admins", ->
-			@settings.superAdminUserIds = [@current_user_id]
-			expect(
-				@UserAdminController._isSuperAdmin(@req)
-			).to.equal true
+		return it("should return true if user is in super admins", function() {
+			this.settings.superAdminUserIds = [this.current_user_id];
+			return expect(
+				this.UserAdminController._isSuperAdmin(this.req)
+			).to.equal(true);
+		});
+	});
+});
