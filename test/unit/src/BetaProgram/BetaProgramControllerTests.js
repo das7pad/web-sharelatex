@@ -11,185 +11,183 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const should = require('chai').should();
-const SandboxedModule = require('sandboxed-module');
-const assert = require('assert');
-const path = require('path');
-const sinon = require('sinon');
-const modulePath = path.join(__dirname, "../../../../app/js/Features/BetaProgram/BetaProgramController");
-const {
-    expect
-} = require("chai");
+const should = require('chai').should()
+const SandboxedModule = require('sandboxed-module')
+const assert = require('assert')
+const path = require('path')
+const sinon = require('sinon')
+const modulePath = path.join(
+  __dirname,
+  '../../../../app/js/Features/BetaProgram/BetaProgramController'
+)
+const { expect } = require('chai')
 
-describe("BetaProgramController", function() {
+describe('BetaProgramController', function() {
+  beforeEach(function() {
+    this.user = {
+      _id: (this.user_id = 'a_simple_id'),
+      email: 'user@example.com',
+      features: {},
+      betaProgram: false
+    }
+    this.req = {
+      query: {},
+      session: {
+        user: this.user
+      }
+    }
+    this.BetaProgramController = SandboxedModule.require(modulePath, {
+      requires: {
+        './BetaProgramHandler': (this.BetaProgramHandler = {
+          optIn: sinon.stub(),
+          optOut: sinon.stub()
+        }),
+        '../User/UserGetter': (this.UserGetter = {
+          getUser: sinon.stub()
+        }),
+        'settings-sharelatex': (this.settings = {
+          languages: {}
+        }),
+        'logger-sharelatex': (this.logger = {
+          log: sinon.stub(),
+          err: sinon.stub(),
+          error: sinon.stub()
+        }),
+        '../Authentication/AuthenticationController': (this.AuthenticationController = {
+          getLoggedInUserId: sinon.stub().returns(this.user._id)
+        })
+      }
+    })
+    this.res = {
+      send: sinon.stub(),
+      redirect: sinon.stub(),
+      render: sinon.stub()
+    }
+    return (this.next = sinon.stub())
+  })
 
-	beforeEach(function() {
-		this.user = {
-			_id: (this.user_id = "a_simple_id"),
-			email: "user@example.com",
-			features: {},
-			betaProgram: false
-		};
-		this.req = {
-			query: {},
-			session: {
-				user: this.user
-			}
-		};
-		this.BetaProgramController = SandboxedModule.require(modulePath, { requires: {
-			"./BetaProgramHandler": (this.BetaProgramHandler = {
-				optIn: sinon.stub(),
-				optOut: sinon.stub()
-			}),
-			"../User/UserGetter": (this.UserGetter = {
-				getUser: sinon.stub()
-			}),
-			"settings-sharelatex": (this.settings = {
-				languages: {}
-			}),
-			"logger-sharelatex": (this.logger = {
-				log: sinon.stub(),
-				err: sinon.stub(),
-				error: sinon.stub()
-			}),
-			'../Authentication/AuthenticationController': (this.AuthenticationController = {
-				getLoggedInUserId: sinon.stub().returns(this.user._id)
-			})
-		}
-	});
-		this.res = {
-			send: sinon.stub(),
-			redirect: sinon.stub(),
-			render: sinon.stub()
-		};
-		return this.next = sinon.stub();
-	});
+  describe('optIn', function() {
+    beforeEach(function() {
+      return this.BetaProgramHandler.optIn.callsArgWith(1, null)
+    })
 
-	describe("optIn", function() {
+    it("should redirect to '/beta/participate'", function() {
+      this.BetaProgramController.optIn(this.req, this.res, this.next)
+      this.res.redirect.callCount.should.equal(1)
+      return this.res.redirect.firstCall.args[0].should.equal(
+        '/beta/participate'
+      )
+    })
 
-		beforeEach(function() {
-			return this.BetaProgramHandler.optIn.callsArgWith(1, null);
-		});
+    it('should not call next with an error', function() {
+      this.BetaProgramController.optIn(this.req, this.res, this.next)
+      return this.next.callCount.should.equal(0)
+    })
 
-		it("should redirect to '/beta/participate'", function() {
-			this.BetaProgramController.optIn(this.req, this.res, this.next);
-			this.res.redirect.callCount.should.equal(1);
-			return this.res.redirect.firstCall.args[0].should.equal("/beta/participate");
-		});
+    it('should not call next with an error', function() {
+      this.BetaProgramController.optIn(this.req, this.res, this.next)
+      return this.next.callCount.should.equal(0)
+    })
 
-		it("should not call next with an error", function() {
-			this.BetaProgramController.optIn(this.req, this.res, this.next);
-			return this.next.callCount.should.equal(0);
-		});
+    it('should call BetaProgramHandler.optIn', function() {
+      this.BetaProgramController.optIn(this.req, this.res, this.next)
+      return this.BetaProgramHandler.optIn.callCount.should.equal(1)
+    })
 
-		it("should not call next with an error", function() {
-			this.BetaProgramController.optIn(this.req, this.res, this.next);
-			return this.next.callCount.should.equal(0);
-		});
+    return describe('when BetaProgramHandler.opIn produces an error', function() {
+      beforeEach(function() {
+        return this.BetaProgramHandler.optIn.callsArgWith(1, new Error('woops'))
+      })
 
-		it("should call BetaProgramHandler.optIn", function() {
-			this.BetaProgramController.optIn(this.req, this.res, this.next);
-			return this.BetaProgramHandler.optIn.callCount.should.equal(1);
-		});
+      it("should not redirect to '/beta/participate'", function() {
+        this.BetaProgramController.optIn(this.req, this.res, this.next)
+        return this.res.redirect.callCount.should.equal(0)
+      })
 
-		return describe("when BetaProgramHandler.opIn produces an error", function() {
+      return it('should produce an error', function() {
+        this.BetaProgramController.optIn(this.req, this.res, this.next)
+        this.next.callCount.should.equal(1)
+        return this.next.firstCall.args[0].should.be.instanceof(Error)
+      })
+    })
+  })
 
-			beforeEach(function() {
-				return this.BetaProgramHandler.optIn.callsArgWith(1, new Error('woops'));
-			});
+  describe('optOut', function() {
+    beforeEach(function() {
+      return this.BetaProgramHandler.optOut.callsArgWith(1, null)
+    })
 
-			it("should not redirect to '/beta/participate'", function() {
-				this.BetaProgramController.optIn(this.req, this.res, this.next);
-				return this.res.redirect.callCount.should.equal(0);
-			});
+    it("should redirect to '/beta/participate'", function() {
+      this.BetaProgramController.optOut(this.req, this.res, this.next)
+      this.res.redirect.callCount.should.equal(1)
+      return this.res.redirect.firstCall.args[0].should.equal(
+        '/beta/participate'
+      )
+    })
 
-			return it("should produce an error", function() {
-				this.BetaProgramController.optIn(this.req, this.res, this.next);
-				this.next.callCount.should.equal(1);
-				return this.next.firstCall.args[0].should.be.instanceof(Error);
-			});
-		});
-	});
+    it('should not call next with an error', function() {
+      this.BetaProgramController.optOut(this.req, this.res, this.next)
+      return this.next.callCount.should.equal(0)
+    })
 
-	describe("optOut", function() {
+    it('should not call next with an error', function() {
+      this.BetaProgramController.optOut(this.req, this.res, this.next)
+      return this.next.callCount.should.equal(0)
+    })
 
-		beforeEach(function() {
-			return this.BetaProgramHandler.optOut.callsArgWith(1, null);
-		});
+    it('should call BetaProgramHandler.optOut', function() {
+      this.BetaProgramController.optOut(this.req, this.res, this.next)
+      return this.BetaProgramHandler.optOut.callCount.should.equal(1)
+    })
 
-		it("should redirect to '/beta/participate'", function() {
-			this.BetaProgramController.optOut(this.req, this.res, this.next);
-			this.res.redirect.callCount.should.equal(1);
-			return this.res.redirect.firstCall.args[0].should.equal("/beta/participate");
-		});
+    return describe('when BetaProgramHandler.optOut produces an error', function() {
+      beforeEach(function() {
+        return this.BetaProgramHandler.optOut.callsArgWith(
+          1,
+          new Error('woops')
+        )
+      })
 
-		it("should not call next with an error", function() {
-			this.BetaProgramController.optOut(this.req, this.res, this.next);
-			return this.next.callCount.should.equal(0);
-		});
+      it("should not redirect to '/beta/participate'", function() {
+        this.BetaProgramController.optOut(this.req, this.res, this.next)
+        return this.res.redirect.callCount.should.equal(0)
+      })
 
-		it("should not call next with an error", function() {
-			this.BetaProgramController.optOut(this.req, this.res, this.next);
-			return this.next.callCount.should.equal(0);
-		});
+      return it('should produce an error', function() {
+        this.BetaProgramController.optOut(this.req, this.res, this.next)
+        this.next.callCount.should.equal(1)
+        return this.next.firstCall.args[0].should.be.instanceof(Error)
+      })
+    })
+  })
 
-		it("should call BetaProgramHandler.optOut", function() {
-			this.BetaProgramController.optOut(this.req, this.res, this.next);
-			return this.BetaProgramHandler.optOut.callCount.should.equal(1);
-		});
+  return describe('optInPage', function() {
+    beforeEach(function() {
+      return this.UserGetter.getUser.callsArgWith(1, null, this.user)
+    })
 
-		return describe("when BetaProgramHandler.optOut produces an error", function() {
+    it('should render the opt-in page', function() {
+      this.BetaProgramController.optInPage(this.req, this.res, this.next)
+      this.res.render.callCount.should.equal(1)
+      const { args } = this.res.render.firstCall
+      return args[0].should.equal('beta_program/opt_in')
+    })
 
-			beforeEach(function() {
-				return this.BetaProgramHandler.optOut.callsArgWith(1, new Error('woops'));
-			});
+    return describe('when UserGetter.getUser produces an error', function() {
+      beforeEach(function() {
+        return this.UserGetter.getUser.callsArgWith(1, new Error('woops'))
+      })
 
-			it("should not redirect to '/beta/participate'", function() {
-				this.BetaProgramController.optOut(this.req, this.res, this.next);
-				return this.res.redirect.callCount.should.equal(0);
-			});
+      it('should not render the opt-in page', function() {
+        this.BetaProgramController.optInPage(this.req, this.res, this.next)
+        return this.res.render.callCount.should.equal(0)
+      })
 
-			return it("should produce an error", function() {
-				this.BetaProgramController.optOut(this.req, this.res, this.next);
-				this.next.callCount.should.equal(1);
-				return this.next.firstCall.args[0].should.be.instanceof(Error);
-			});
-		});
-	});
-
-
-	return describe("optInPage", function() {
-
-		beforeEach(function() {
-			return this.UserGetter.getUser.callsArgWith(1, null, this.user);
-		});
-
-		it("should render the opt-in page", function() {
-			this.BetaProgramController.optInPage(this.req, this.res, this.next);
-			this.res.render.callCount.should.equal(1);
-			const {
-                args
-            } = this.res.render.firstCall;
-			return args[0].should.equal('beta_program/opt_in');
-		});
-
-
-		return describe("when UserGetter.getUser produces an error", function() {
-
-			beforeEach(function() {
-				return this.UserGetter.getUser.callsArgWith(1, new Error('woops'));
-			});
-
-			it("should not render the opt-in page", function() {
-				this.BetaProgramController.optInPage(this.req, this.res, this.next);
-				return this.res.render.callCount.should.equal(0);
-			});
-
-			return it("should produce an error", function() {
-				this.BetaProgramController.optInPage(this.req, this.res, this.next);
-				this.next.callCount.should.equal(1);
-				return this.next.firstCall.args[0].should.be.instanceof(Error);
-			});
-		});
-	});
-});
+      return it('should produce an error', function() {
+        this.BetaProgramController.optInPage(this.req, this.res, this.next)
+        this.next.callCount.should.equal(1)
+        return this.next.firstCall.args[0].should.be.instanceof(Error)
+      })
+    })
+  })
+})

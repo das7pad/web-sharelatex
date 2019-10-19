@@ -11,115 +11,131 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const sinon = require("sinon");
+const sinon = require('sinon')
 
 class MockResponse {
-	static initClass() {
-	
-		this.prototype.setContentDisposition = sinon.stub();
-	
-		this.prototype.header = sinon.stub();
-	
-		this.prototype.contentType = sinon.stub();
-	}
-	constructor() {
-		this.rendered = false;
-		this.redirected = false;
-		this.returned = false;
-		this.headers = {};
-	}
+  static initClass() {
+    this.prototype.setContentDisposition = sinon.stub()
 
-	render(template, variables) {
-		this.success = true;
-		this.rendered = true;
-		this.returned = true;
-		this.renderedTemplate  = template;
-		this.renderedVariables = variables;
-		if (this.callback != null) { return this.callback(); }
-	}
-	
-	redirect(url) {
-		this.success = true;
-		this.redirected = true;
-		this.returned = true;
-		this.redirectedTo = url;
-		if (this.callback != null) { return this.callback(); }
-	}
-	
-	sendStatus(status) {
-		if (arguments.length < 2) {
-			if (typeof status !== "number") {
-				const body = status;
-				status = 200;
-			}
-		}
-		this.statusCode = status;
-		this.returned = true;
-		if (status >= 200 && status < 300) {
-			this.success = true;
-		} else {
-			this.success = false;
-		}
-		if (this.callback != null) { return this.callback(); }
-	}
+    this.prototype.header = sinon.stub()
 
-	send(status, body) {
-		if (arguments.length < 2) {
-			if (typeof status !== "number") {
-				body = status;
-				status = 200;
-			}
-		}
-		this.statusCode = status;
-		this.returned = true;
-		if (status >= 200 && status < 300) {
-			this.success = true;
-		} else {
-			this.success = false;
-		}
-		if (body) { this.body = body; }
-		if (this.callback != null) { return this.callback(); }
-	}
-		
-	json(status, body) {
-		if (arguments.length < 2) {
-			if (typeof status !== "number") {
-				body = status;
-				status = this.statusCode || 200;
-			}
-		}
-		this.statusCode = status;
-		this.returned = true;
-		this.type = 'application/json';
-		if (status >= 200 && status < 300) {
-			this.success = true;
-		} else {
-			this.success = false;
-		}
-		if (body) { this.body = JSON.stringify(body); }
-		if (this.callback != null) { return this.callback(); }
-	}
+    this.prototype.contentType = sinon.stub()
+  }
+  constructor() {
+    this.rendered = false
+    this.redirected = false
+    this.returned = false
+    this.headers = {}
+  }
 
-	status(status){
-		this.statusCode = status;
-		return this;
-	}
+  render(template, variables) {
+    this.success = true
+    this.rendered = true
+    this.returned = true
+    this.renderedTemplate = template
+    this.renderedVariables = variables
+    if (this.callback != null) {
+      return this.callback()
+    }
+  }
 
+  redirect(url) {
+    this.success = true
+    this.redirected = true
+    this.returned = true
+    this.redirectedTo = url
+    if (this.callback != null) {
+      return this.callback()
+    }
+  }
 
-	setHeader(header, value) {
-		return this.headers[header] = value;
-	}
+  sendStatus(status) {
+    if (arguments.length < 2) {
+      if (typeof status !== 'number') {
+        const body = status
+        status = 200
+      }
+    }
+    this.statusCode = status
+    this.returned = true
+    if (status >= 200 && status < 300) {
+      this.success = true
+    } else {
+      this.success = false
+    }
+    if (this.callback != null) {
+      return this.callback()
+    }
+  }
 
-	setTimeout(timout){
-		this.timout = timout;
-	}
+  send(status, body) {
+    if (arguments.length < 2) {
+      if (typeof status !== 'number') {
+        body = status
+        status = 200
+      }
+    }
+    this.statusCode = status
+    this.returned = true
+    if (status >= 200 && status < 300) {
+      this.success = true
+    } else {
+      this.success = false
+    }
+    if (body) {
+      this.body = body
+    }
+    if (this.callback != null) {
+      return this.callback()
+    }
+  }
 
-	end(data, encoding) {
-		if (this.callback) { return this.callback(); }
-	}
+  json(status, body) {
+    if (arguments.length < 2) {
+      if (typeof status !== 'number') {
+        body = status
+        status = this.statusCode || 200
+      }
+    }
+    this.statusCode = status
+    this.returned = true
+    this.type = 'application/json'
+    if (status >= 200 && status < 300) {
+      this.success = true
+    } else {
+      this.success = false
+    }
+    if (body) {
+      this.body = JSON.stringify(body)
+    }
+    if (this.callback != null) {
+      return this.callback()
+    }
+  }
 
-	type(type) { return this.type = type; }
+  status(status) {
+    this.statusCode = status
+    return this
+  }
+
+  setHeader(header, value) {
+    return (this.headers[header] = value)
+  }
+
+  setTimeout(timout) {
+    this.timout = timout
+  }
+
+  end(data, encoding) {
+    if (this.callback) {
+      return this.callback()
+    }
+  }
+
+  type(type) {
+    return (this.type = type)
+  }
 }
-MockResponse.initClass();
+MockResponse.initClass()
 
-module.exports = MockResponse;
+module.exports = MockResponse
