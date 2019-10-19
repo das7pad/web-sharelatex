@@ -1,3 +1,12 @@
+/* eslint-disable
+    camelcase,
+    max-len,
+    no-return-assign,
+    no-unused-vars,
+    no-useless-escape,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -467,9 +476,9 @@ module.exports = (Router = class Router {
 			}
 		});
 
-		//Admin Stuff
+		// Admin Stuff
 		webRouter.get('/admin', AuthorizationMiddleware.ensureUserIsSiteAdmin, AdminController.index);
-		webRouter.get('/admin/user', AuthorizationMiddleware.ensureUserIsSiteAdmin, (req, res) => res.redirect("/admin/register")); //this gets removed by admin-panel addon
+		webRouter.get('/admin/user', AuthorizationMiddleware.ensureUserIsSiteAdmin, (req, res) => res.redirect("/admin/register")); // this gets removed by admin-panel addon
 		webRouter.get('/admin/register', AuthorizationMiddleware.ensureUserIsSiteAdmin, AdminController.registerNewUser);
 		webRouter.post('/admin/register', AuthorizationMiddleware.ensureUserIsSiteAdmin, UserController.register);
 		webRouter.post('/admin/closeEditor', AuthorizationMiddleware.ensureUserIsSiteAdmin, AdminController.closeEditor);

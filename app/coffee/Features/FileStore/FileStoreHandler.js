@@ -1,3 +1,10 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+    max-len,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -151,7 +158,7 @@ module.exports = (FileStoreHandler = {
 			if (err != null) {
 				logger.err({err, oldProject_id, oldFile_id, newProject_id, newFile_id}, "something went wrong telling filestore api to copy file");
 				return callback(err);
-			} else if (200 <= response.statusCode && response.statusCode < 300) {
+			} else if (response.statusCode >= 200 && response.statusCode < 300) {
 				// successful response
 				return callback(null, opts.uri);
 			} else {

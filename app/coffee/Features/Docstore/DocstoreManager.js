@@ -1,3 +1,11 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+    max-len,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -17,7 +25,7 @@ module.exports = (DocstoreManager = {
 		const url = `${settings.apis.docstore.url}/project/${project_id}/doc/${doc_id}`;
 		return request.del(url, function(error, res, body) {
 			if (error != null) { return callback(error); }
-			if (200 <= res.statusCode && res.statusCode < 300) {
+			if (res.statusCode >= 200 && res.statusCode < 300) {
 				return callback(null);
 			} else if (res.statusCode === 404) {
 				error = new Errors.NotFoundError("tried to delete doc not in docstore");
@@ -40,7 +48,7 @@ module.exports = (DocstoreManager = {
 			json: true
 		}, function(error, res, docs) {
 			if (error != null) { return callback(error); }
-			if (200 <= res.statusCode && res.statusCode < 300) {
+			if (res.statusCode >= 200 && res.statusCode < 300) {
 				return callback(null, docs);
 			} else {
 				error = new Error(`docstore api responded with non-success code: ${res.statusCode}`);
@@ -59,7 +67,7 @@ module.exports = (DocstoreManager = {
 			json: true
 		}, function(error, res, docs) {
 			if (error != null) { return callback(error); }
-			if (200 <= res.statusCode && res.statusCode < 300) {
+			if (res.statusCode >= 200 && res.statusCode < 300) {
 				return callback(null, docs);
 			} else {
 				error = new Error(`docstore api responded with non-success code: ${res.statusCode}`);
@@ -86,7 +94,7 @@ module.exports = (DocstoreManager = {
 			json: true
 		}, function(error, res, doc) {
 			if (error != null) { return callback(error); }
-			if (200 <= res.statusCode && res.statusCode < 300) {
+			if (res.statusCode >= 200 && res.statusCode < 300) {
 				logger.log({doc_id, project_id, version: doc.version, rev: doc.rev}, "got doc from docstore api");
 				return callback(null, doc.lines, doc.rev, doc.version, doc.ranges);
 			} else if (res.statusCode === 404) {
@@ -114,7 +122,7 @@ module.exports = (DocstoreManager = {
 			}
 		}, function(error, res, result) {
 			if (error != null) { return callback(error); }
-			if (200 <= res.statusCode && res.statusCode < 300) {
+			if (res.statusCode >= 200 && res.statusCode < 300) {
 				logger.log({project_id, doc_id}, "update doc in docstore url finished");
 				return callback(null, result.modified, result.rev);
 			} else {
@@ -133,7 +141,7 @@ module.exports = (DocstoreManager = {
 				logger.err({err, project_id}, "error archving project in docstore");
 				return callback(err);
 			}
-			if (200 <= res.statusCode && res.statusCode < 300) {
+			if (res.statusCode >= 200 && res.statusCode < 300) {
 				return callback();	
 			} else {
 				const error = new Error(`docstore api responded with non-success code: ${res.statusCode}`);
@@ -151,7 +159,7 @@ module.exports = (DocstoreManager = {
 				logger.err({err, project_id}, "error unarchiving project in docstore");
 				return callback(err);
 			}
-			if (200 <= res.statusCode && res.statusCode < 300) {
+			if (res.statusCode >= 200 && res.statusCode < 300) {
 				return callback();	
 			} else {
 				const error = new Error(`docstore api responded with non-success code: ${res.statusCode}`);

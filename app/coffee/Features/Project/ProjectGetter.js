@@ -1,3 +1,11 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+    max-len,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -27,7 +35,7 @@ module.exports = (ProjectGetter = {
 	getProjectWithoutDocLines(project_id, callback) {
 		if (callback == null) { callback = function(error, project) {}; }
 		const excludes = {};
-		for (let i = 1, end = ProjectGetter.EXCLUDE_DEPTH, asc = 1 <= end; asc ? i <= end : i >= end; asc ? i++ : i--) {
+		for (let i = 1, end = ProjectGetter.EXCLUDE_DEPTH, asc = end >= 1; asc ? i <= end : i >= end; asc ? i++ : i--) {
 			excludes[`rootFolder${Array(i).join(".folders")}.docs.lines`] = 0;
 		}
 		return ProjectGetter.getProject(project_id, excludes, callback);
@@ -36,7 +44,7 @@ module.exports = (ProjectGetter = {
 	getProjectWithOnlyFolders(project_id, callback) {
 		if (callback == null) { callback = function(error, project) {}; }
 		const excludes = {};
-		for (let i = 1, end = ProjectGetter.EXCLUDE_DEPTH, asc = 1 <= end; asc ? i <= end : i >= end; asc ? i++ : i--) {
+		for (let i = 1, end = ProjectGetter.EXCLUDE_DEPTH, asc = end >= 1; asc ? i <= end : i >= end; asc ? i++ : i--) {
 			excludes[`rootFolder${Array(i).join(".folders")}.docs`] = 0;
 			excludes[`rootFolder${Array(i).join(".folders")}.fileRefs`] = 0;
 		}

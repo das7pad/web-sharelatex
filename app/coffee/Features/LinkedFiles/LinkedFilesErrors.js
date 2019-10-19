@@ -1,3 +1,8 @@
+/* eslint-disable
+    no-proto,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 var UrlFetchFailedError = function(message) {
 	const error = new Error(message);
 	error.name = 'UrlFetchFailedError';

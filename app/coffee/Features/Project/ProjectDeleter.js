@@ -1,3 +1,12 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+    max-len,
+    no-undef,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -87,7 +96,7 @@ module.exports = (ProjectDeleter = {
 						tagsHandler.removeProjectFromAllTags(member_id, project_id, function(err){}));
 				});
 				return cb(null, deletedProject);
-			}, //doesn't matter if this fails or the order it happens in
+			}, // doesn't matter if this fails or the order it happens in
 			(deletedProject, cb) => Project.remove({_id: project_id}, err => cb(err, deletedProject))
 		], function(err, deletedProject) {
 			if (err != null) {

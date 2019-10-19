@@ -1,3 +1,9 @@
+/* eslint-disable
+    max-len,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 let StringHelper;
 const JSON_ESCAPE_REGEXP = /[\u2028\u2029&><]/g;
 

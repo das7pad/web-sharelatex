@@ -1,3 +1,11 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+    max-len,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -166,7 +174,7 @@ module.exports = (UserController = {
 								return res.sendStatus(500);
 							}
 							AuthenticationController.setInSessionUser(req, {email: user.email, first_name: user.first_name, last_name: user.last_name});
-							return UserHandler.populateTeamInvites(user, function(err){ //need to refresh this in the background
+							return UserHandler.populateTeamInvites(user, function(err){ // need to refresh this in the background
 								if (err != null) {
 									logger.err({err}, "error populateTeamInvites");
 								}

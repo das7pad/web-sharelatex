@@ -1,3 +1,11 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+    max-len,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -20,7 +28,7 @@ module.exports = (UrlAgent = {
 			if (err != null) { return callback(err); }
 			readStream.on("error", callback);
 			return readStream.on("response", function(response) {
-				if (200 <= response.statusCode && response.statusCode < 300) {
+				if (response.statusCode >= 200 && response.statusCode < 300) {
 					readStream.resume();
 					return LinkedFilesHandler.importFromStream(project_id,
 						readStream,

@@ -1,3 +1,15 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+    max-len,
+    no-array-constructor,
+    no-return-assign,
+    no-undef,
+    no-unused-vars,
+    standard/no-callback-literal,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -37,20 +49,20 @@ module.exports = (ProjectLocator = {
 
 		var search = function(searchFolder, path){
 			count++;
-			const element = _.find(searchFolder[elementType], el => ((el != null ? el._id : undefined)+'') === (element_id+'')); //need to ToString both id's for robustness
+			const element = _.find(searchFolder[elementType], el => ((el != null ? el._id : undefined)+'') === (element_id+'')); // need to ToString both id's for robustness
 			if ((element == null) && (searchFolder.folders != null) && (searchFolder.folders.length !== 0)) {
 				_.each(searchFolder.folders, function(folder, index){
 					if ((folder == null)) {
 						return;
 					}
 					const newPath = {};
-					for (let key of Object.keys(path || {})) { const value = path[key]; newPath[key] = value; } //make a value copy of the string
+					for (let key of Object.keys(path || {})) { const value = path[key]; newPath[key] = value; } // make a value copy of the string
 					newPath.fileSystem += `/${folder.name}`;
 					newPath.mongo += `.folders.${index}`;
 					return search(folder, newPath);
 				});
 				endOfBranch();
-				return;
+				
 			} else if (element != null) {
 				const elementPlaceInArray = getIndexOf(searchFolder[elementType], element_id);
 				path.fileSystem += `/${element.name}`;

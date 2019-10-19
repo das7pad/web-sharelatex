@@ -1,3 +1,10 @@
+/* eslint-disable
+    max-len,
+    no-proto,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS207: Consider shorter variations of null checks

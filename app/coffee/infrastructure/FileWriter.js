@@ -1,3 +1,9 @@
+/* eslint-disable
+    handle-callback-err,
+    max-len,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -76,7 +82,7 @@ module.exports = (FileWriter = {
 		callback = _.once(callback);
 		const stream = request.get(url);
 		return stream.on('response', function(response) {
-			if (200 <= response.statusCode && response.statusCode < 300) {
+			if (response.statusCode >= 200 && response.statusCode < 300) {
 				return FileWriter.writeStreamToDisk(identifier, stream, callback);
 			} else {
 				const err = new Error(`bad response from url: ${response.statusCode}`);

@@ -1,3 +1,8 @@
+/* eslint-disable
+    max-len,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS101: Remove unnecessary use of Array.from
@@ -47,7 +52,7 @@ module.exports = (V1Api = {
 
 	_responseHandler(options, error, response, body, callback) {
 			if (error != null) { return callback(error, response, body); }
-			if ((200 <= response.statusCode && response.statusCode < 300) || Array.from(options.expectedStatusCodes || []).includes(response.statusCode)) {
+			if ((response.statusCode >= 200 && response.statusCode < 300) || Array.from(options.expectedStatusCodes || []).includes(response.statusCode)) {
 				return callback(null, response, body);
 			} else if (response.statusCode === 403) {
 				error = new Errors.ForbiddenError("overleaf v1 returned forbidden");

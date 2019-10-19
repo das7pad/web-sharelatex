@@ -1,3 +1,10 @@
+/* eslint-disable
+    camelcase,
+    max-len,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -98,7 +105,7 @@ var buildOptions = function(user, is_subscribed){
 		}
 	};
 				
-	//only set status if we explictly want to set it
+	// only set status if we explictly want to set it
 	if (is_subscribed != null) {
 		opts.body.status = status;
 	}

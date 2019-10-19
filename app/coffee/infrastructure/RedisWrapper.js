@@ -1,3 +1,9 @@
+/* eslint-disable
+    max-len,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 let Redis;
 const Settings = require('settings-sharelatex');
 const redis = require('redis-sharelatex');

@@ -1,3 +1,11 @@
+/* eslint-disable
+    camelcase,
+    handle-callback-err,
+    max-len,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -168,7 +176,7 @@ module.exports = (AuthenticationManager = {
 		const letters_up = __guard__(Settings.passwordStrengthOptions != null ? Settings.passwordStrengthOptions.chars : undefined, x3 => x3.letters_up) || 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 		const symbols = __guard__(Settings.passwordStrengthOptions != null ? Settings.passwordStrengthOptions.chars : undefined, x4 => x4.symbols) || '@#$%^&*()-_=+[]{};:<>/?!£€.,';
 
-		for (let charIndex = 0, end = password.length - 1, asc = 0 <= end; asc ? charIndex <= end : charIndex >= end; asc ? charIndex++ : charIndex--) {
+		for (let charIndex = 0, end = password.length - 1, asc = end >= 0; asc ? charIndex <= end : charIndex >= end; asc ? charIndex++ : charIndex--) {
 			if (!(digits.indexOf(password[charIndex]) > -1) &&
 				!(letters.indexOf(password[charIndex]) > -1) &&
 				!(letters_up.indexOf(password[charIndex]) > -1) &&

@@ -1,3 +1,10 @@
+/* eslint-disable
+    handle-callback-err,
+    max-len,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -127,7 +134,7 @@ module.exports = (ReferencesHandler = {
 							logger.err({err, projectId}, "error communicating with references api");
 							return callback(err);
 						}
-						if (200 <= res.statusCode && res.statusCode < 300) {
+						if (res.statusCode >= 200 && res.statusCode < 300) {
 							logger.log({projectId}, "got keys from references api");
 							return callback(null, data);
 						} else {
