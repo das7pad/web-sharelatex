@@ -1,181 +1,227 @@
-should = require('chai').should()
-SandboxedModule = require('sandboxed-module')
-assert = require('assert')
-path = require('path')
-sinon = require('sinon')
-modulePath = path.join __dirname, "../../../app/js/TrackChanges/TrackChangesController"
-expect = require("chai").expect
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const should = require('chai').should();
+const SandboxedModule = require('sandboxed-module');
+const assert = require('assert');
+const path = require('path');
+const sinon = require('sinon');
+const modulePath = path.join(__dirname, "../../../app/js/TrackChanges/TrackChangesController");
+const {
+    expect
+} = require("chai");
 
-describe "TrackChanges TrackChangesController", ->
-	beforeEach ->
-		@TrackChangesController = SandboxedModule.require modulePath, requires:
-			"settings-sharelatex": @settings
-			"logger-sharelatex": log: ->
-			"./RangesManager": @RangesManager = {}
-			"./TrackChangesManager": @TrackChangesManager = {}
-			"../../../../../app/js/Features/Editor/EditorRealTimeController": @EditorRealTimeController = {}
-			'../../../../../app/js/Features/User/UserInfoController': @UserInfoController = {}
-			"../../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler": @DocumentUpdaterHandler = {}
-		@req = {}
-		@res =
-			json: sinon.stub()
+describe("TrackChanges TrackChangesController", function() {
+	beforeEach(function() {
+		this.TrackChangesController = SandboxedModule.require(modulePath, { requires: {
+			"settings-sharelatex": this.settings,
+			"logger-sharelatex": { log() {}
+		},
+			"./RangesManager": (this.RangesManager = {}),
+			"./TrackChangesManager": (this.TrackChangesManager = {}),
+			"../../../../../app/js/Features/Editor/EditorRealTimeController": (this.EditorRealTimeController = {}),
+			'../../../../../app/js/Features/User/UserInfoController': (this.UserInfoController = {}),
+			"../../../../../app/js/Features/DocumentUpdater/DocumentUpdaterHandler": (this.DocumentUpdaterHandler = {})
+		}
+	});
+		this.req = {};
+		this.res = {
+			json: sinon.stub(),
 			sendStatus: sinon.stub()
-		@next = sinon.stub()
+		};
+		return this.next = sinon.stub();
+	});
 
-	describe "setTrackChangesState", ->
-		beforeEach ->
-			@project_id = "mock-project-id"
-			@req.params = { @project_id }
-			@TrackChangesManager.setTrackChangesState = sinon.stub().yields()
-			@TrackChangesManager.getTrackChangesState = sinon.stub().yields()
-			@EditorRealTimeController.emitToRoom = sinon.stub().yields()
+	return describe("setTrackChangesState", function() {
+		beforeEach(function() {
+			this.project_id = "mock-project-id";
+			this.req.params = { project_id: this.project_id };
+			this.TrackChangesManager.setTrackChangesState = sinon.stub().yields();
+			this.TrackChangesManager.getTrackChangesState = sinon.stub().yields();
+			return this.EditorRealTimeController.emitToRoom = sinon.stub().yields();
+		});
 
-		describe "when turning on for all users", ->
-			beforeEach ->
-				@req.body = { on: true }
-				@TrackChangesController.setTrackChangesState @req, @res, @next
+		describe("when turning on for all users", function() {
+			beforeEach(function() {
+				this.req.body = { on: true };
+				return this.TrackChangesController.setTrackChangesState(this.req, this.res, this.next);
+			});
 
-			it "should call getTrackChangesState to get the current state", ->
-				@TrackChangesManager.getTrackChangesState
-					.calledWith @project_id
-					.should.equal true
+			it("should call getTrackChangesState to get the current state", function() {
+				return this.TrackChangesManager.getTrackChangesState
+					.calledWith(this.project_id)
+					.should.equal(true);
+			});
 
-			it "should call setTrackChangesState with the state", ->
-				@TrackChangesManager.setTrackChangesState
-					.calledWith @project_id, true
-					.should.equal true
+			it("should call setTrackChangesState with the state", function() {
+				return this.TrackChangesManager.setTrackChangesState
+					.calledWith(this.project_id, true)
+					.should.equal(true);
+			});
 			
-			it "should emit the new state to the clients", ->
-				@EditorRealTimeController.emitToRoom
-					.calledWith @project_id, "toggle-track-changes", true
-					.should.equal true
+			it("should emit the new state to the clients", function() {
+				return this.EditorRealTimeController.emitToRoom
+					.calledWith(this.project_id, "toggle-track-changes", true)
+					.should.equal(true);
+			});
 			
-			it "should return a 204 response code", ->
-				@res.sendStatus.calledWith(204).should.equal true
+			return it("should return a 204 response code", function() {
+				return this.res.sendStatus.calledWith(204).should.equal(true);
+			});
+		});
 
-		describe "when turning on for some users", ->
-			beforeEach ->
-				@updated_user_id = "e4b2a7ae4b2a7ae4b2a7ae4b"
-				@existing_user1_id = "3a8dca4c3a8dca4c3a8dca4c"
-				@existing_user2_id = "253d177253d177253d177253"
+		describe("when turning on for some users", function() {
+			beforeEach(function() {
+				this.updated_user_id = "e4b2a7ae4b2a7ae4b2a7ae4b";
+				this.existing_user1_id = "3a8dca4c3a8dca4c3a8dca4c";
+				this.existing_user2_id = "253d177253d177253d177253";
 
-				@update = {}
-				@update[@updated_user_id] = true
+				this.update = {};
+				this.update[this.updated_user_id] = true;
 
-				@existing_state = {}
-				@existing_state[@updated_user_id] = false
-				@existing_state[@existing_user1_id] = true
-				@existing_state[@existing_user2_id] = false
+				this.existing_state = {};
+				this.existing_state[this.updated_user_id] = false;
+				this.existing_state[this.existing_user1_id] = true;
+				this.existing_state[this.existing_user2_id] = false;
 				
-				@expected_state = {}
-				@expected_state[@updated_user_id] = true
-				@expected_state[@existing_user1_id] = true
-				@expected_state[@existing_user2_id] = false
+				this.expected_state = {};
+				this.expected_state[this.updated_user_id] = true;
+				this.expected_state[this.existing_user1_id] = true;
+				this.expected_state[this.existing_user2_id] = false;
 
-				@req.body = { on_for: @update }
+				this.req.body = { on_for: this.update };
 
-				@TrackChangesManager.getTrackChangesState = sinon.stub().yields(null, @existing_state)
-				@TrackChangesController.setTrackChangesState @req, @res, @next
+				this.TrackChangesManager.getTrackChangesState = sinon.stub().yields(null, this.existing_state);
+				return this.TrackChangesController.setTrackChangesState(this.req, this.res, this.next);
+			});
 
-			it "should call getTrackChangesState to get the current state", ->
-				@TrackChangesManager.getTrackChangesState
-					.calledWith @project_id
-					.should.equal true
+			it("should call getTrackChangesState to get the current state", function() {
+				return this.TrackChangesManager.getTrackChangesState
+					.calledWith(this.project_id)
+					.should.equal(true);
+			});
 
-			it "should call setTrackChangesState with the updated state", ->
-				@TrackChangesManager.setTrackChangesState
-					.calledWith @project_id, @expected_state
-					.should.equal true
+			it("should call setTrackChangesState with the updated state", function() {
+				return this.TrackChangesManager.setTrackChangesState
+					.calledWith(this.project_id, this.expected_state)
+					.should.equal(true);
+			});
 			
-			it "should emit the new state to the clients", ->
-				@EditorRealTimeController.emitToRoom
-					.calledWith @project_id, "toggle-track-changes", @expected_state
-					.should.equal true
+			it("should emit the new state to the clients", function() {
+				return this.EditorRealTimeController.emitToRoom
+					.calledWith(this.project_id, "toggle-track-changes", this.expected_state)
+					.should.equal(true);
+			});
 			
-			it "should return a 204 response code", ->
-				@res.sendStatus.calledWith(204).should.equal true
+			return it("should return a 204 response code", function() {
+				return this.res.sendStatus.calledWith(204).should.equal(true);
+			});
+		});
 
-		describe 'when turning on for guests', ->
-			describe 'for only guests', ->
-				beforeEach ->
-					@existing_state = true
-					@expected_state = {__guests__: true}
-					@req.body = {on_for_guests: true, on_for: {}}
-					@TrackChangesManager.getTrackChangesState = sinon.stub().yields(null, @existing_state)
-					@TrackChangesController.setTrackChangesState @req, @res, @next
+		describe('when turning on for guests', function() {
+			describe('for only guests', function() {
+				beforeEach(function() {
+					this.existing_state = true;
+					this.expected_state = {__guests__: true};
+					this.req.body = {on_for_guests: true, on_for: {}};
+					this.TrackChangesManager.getTrackChangesState = sinon.stub().yields(null, this.existing_state);
+					return this.TrackChangesController.setTrackChangesState(this.req, this.res, this.next);
+				});
 
-				it "should call getTrackChangesState to get the current state", ->
-					@TrackChangesManager.getTrackChangesState
-						.calledWith @project_id
-						.should.equal true
+				it("should call getTrackChangesState to get the current state", function() {
+					return this.TrackChangesManager.getTrackChangesState
+						.calledWith(this.project_id)
+						.should.equal(true);
+				});
 
-				it "should call setTrackChangesState with the updated state", ->
-					@TrackChangesManager.setTrackChangesState
-						.calledWith @project_id, @expected_state
-						.should.equal true
+				it("should call setTrackChangesState with the updated state", function() {
+					return this.TrackChangesManager.setTrackChangesState
+						.calledWith(this.project_id, this.expected_state)
+						.should.equal(true);
+				});
 
-				it "should emit the new state to the clients", ->
-					@EditorRealTimeController.emitToRoom
-						.calledWith @project_id, "toggle-track-changes", @expected_state
-						.should.equal true
+				it("should emit the new state to the clients", function() {
+					return this.EditorRealTimeController.emitToRoom
+						.calledWith(this.project_id, "toggle-track-changes", this.expected_state)
+						.should.equal(true);
+				});
 
-				it "should return a 204 response code", ->
-					@res.sendStatus.calledWith(204).should.equal true
+				return it("should return a 204 response code", function() {
+					return this.res.sendStatus.calledWith(204).should.equal(true);
+				});
+			});
 
-			describe 'for guests and some users', ->
-				beforeEach ->
-					@some_user_id = '59f0992fb1b43b0a4780b717'
-					@existing_state = true
-					@expected_state = {__guests__: true}
-					@expected_state[@some_user_id] = true
-					@req.body = {on_for: {}, on_for_guests: true}
-					@req.body.on_for[@some_user_id] = true
-					@TrackChangesManager.getTrackChangesState = sinon.stub().yields(null, @existing_state)
-					@TrackChangesController.setTrackChangesState @req, @res, @next
+			return describe('for guests and some users', function() {
+				beforeEach(function() {
+					this.some_user_id = '59f0992fb1b43b0a4780b717';
+					this.existing_state = true;
+					this.expected_state = {__guests__: true};
+					this.expected_state[this.some_user_id] = true;
+					this.req.body = {on_for: {}, on_for_guests: true};
+					this.req.body.on_for[this.some_user_id] = true;
+					this.TrackChangesManager.getTrackChangesState = sinon.stub().yields(null, this.existing_state);
+					return this.TrackChangesController.setTrackChangesState(this.req, this.res, this.next);
+				});
 
-				it "should call getTrackChangesState to get the current state", ->
-					@TrackChangesManager.getTrackChangesState
-						.calledWith @project_id
-						.should.equal true
+				it("should call getTrackChangesState to get the current state", function() {
+					return this.TrackChangesManager.getTrackChangesState
+						.calledWith(this.project_id)
+						.should.equal(true);
+				});
 
-				it "should call setTrackChangesState with the updated state", ->
-					@TrackChangesManager.setTrackChangesState
-						.calledWith @project_id, @expected_state
-						.should.equal true
+				it("should call setTrackChangesState with the updated state", function() {
+					return this.TrackChangesManager.setTrackChangesState
+						.calledWith(this.project_id, this.expected_state)
+						.should.equal(true);
+				});
 
-				it "should emit the new state to the clients", ->
-					@EditorRealTimeController.emitToRoom
-						.calledWith @project_id, "toggle-track-changes", @expected_state
-						.should.equal true
+				it("should emit the new state to the clients", function() {
+					return this.EditorRealTimeController.emitToRoom
+						.calledWith(this.project_id, "toggle-track-changes", this.expected_state)
+						.should.equal(true);
+				});
 
-				it "should return a 204 response code", ->
-					@res.sendStatus.calledWith(204).should.equal true
+				return it("should return a 204 response code", function() {
+					return this.res.sendStatus.calledWith(204).should.equal(true);
+				});
+			});
+		});
 
-		describe "with malformed data", ->
-			it "should reject no data", ->
-				@req.body = {}
-				@TrackChangesController.setTrackChangesState @req, @res, @next
-				@res.sendStatus.calledWith(400).should.equal true
+		return describe("with malformed data", function() {
+			it("should reject no data", function() {
+				this.req.body = {};
+				this.TrackChangesController.setTrackChangesState(this.req, this.res, this.next);
+				return this.res.sendStatus.calledWith(400).should.equal(true);
+			});
 
-			it "should reject non-user ids", ->
-				@req.body = { on_for: { "foo": true }}
-				@TrackChangesController.setTrackChangesState @req, @res, @next
-				@res.sendStatus.calledWith(400).should.equal true
+			it("should reject non-user ids", function() {
+				this.req.body = { on_for: { "foo": true }};
+				this.TrackChangesController.setTrackChangesState(this.req, this.res, this.next);
+				return this.res.sendStatus.calledWith(400).should.equal(true);
+			});
 
-			it "should reject non-boolean values", ->
-				@req.body = { on_for: { "aaaabbbbccccddddeeeeffff": "bar" }}
-				@TrackChangesController.setTrackChangesState @req, @res, @next
-				@res.sendStatus.calledWith(400).should.equal true
+			it("should reject non-boolean values", function() {
+				this.req.body = { on_for: { "aaaabbbbccccddddeeeeffff": "bar" }};
+				this.TrackChangesController.setTrackChangesState(this.req, this.res, this.next);
+				return this.res.sendStatus.calledWith(400).should.equal(true);
+			});
 
-			it "should reject non-objects", ->
-				@req.body = { on_for: [true] }
-				@TrackChangesController.setTrackChangesState @req, @res, @next
-				@res.sendStatus.calledWith(400).should.equal true
+			it("should reject non-objects", function() {
+				this.req.body = { on_for: [true] };
+				this.TrackChangesController.setTrackChangesState(this.req, this.res, this.next);
+				return this.res.sendStatus.calledWith(400).should.equal(true);
+			});
 
-			it "should cast non-boolean values for global setting", ->
-				@req.body = { on: 1 }
-				@TrackChangesController.setTrackChangesState @req, @res, @next
-				@TrackChangesManager.setTrackChangesState
-					.calledWith @project_id, true
-					.should.equal true
+			return it("should cast non-boolean values for global setting", function() {
+				this.req.body = { on: 1 };
+				this.TrackChangesController.setTrackChangesState(this.req, this.res, this.next);
+				return this.TrackChangesManager.setTrackChangesState
+					.calledWith(this.project_id, true)
+					.should.equal(true);
+			});
+		});
+	});
+});
 	
