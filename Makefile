@@ -25,11 +25,12 @@ GRUNT := node_modules/.bin/grunt
 LESSC := node_modules/.bin/lessc
 CLEANCSS := node_modules/.bin/cleancss
 
-SRC_FILES := $(shell find public/src -name '*.js')
-DIST_FILES := $(subst src,js,$(SRC_FILES))
-MAIN_SRC_FILES := $(shell find modules -type f -wholename '*main/index.js')
-IDE_SRC_FILES := $(shell find modules -type f -wholename '*ide/index.js')
-
+FRONT_END_SRC_FILES := $(shell find public/src -name '*.js')
+TEST_SRC_FILES := $(shell find test/unit_frontend/src -name '*.js')
+MODULE_MAIN_SRC_FILES := $(shell find modules -type f -wholename '*main/index.js')
+MODULE_IDE_SRC_FILES := $(shell find modules -type f -wholename '*ide/index.js')
+SRC_FILES := $(FRONT_END_SRC_FILES) $(TEST_SRC_FILES)
+OUTPUT_SRC_FILES := $(subst src,js,$(SRC_FILES))
 LESS_FILES := $(shell find public/stylesheets -name '*.less')
 LESSC_COMMON_FLAGS := --source-map --autoprefix="last 2 versions, ie >= 10" --relative-urls
 CLEANCSS_FLAGS := --s0 --source-map
@@ -78,7 +79,7 @@ css_full: $(CSS_FILES)
 
 css: $(CSS_OL_FILE)
 
-minify: $(CSS_FILES) $(DIST_FILES)
+minify: $(CSS_FILES) $(OUTPUT_SRC_FILES)
 	$(GRUNT) compile:minify
 	$(MAKE) minify_css
 	$(MAKE) minify_es
@@ -96,8 +97,9 @@ minify_css: $(CSS_FILES)
 minify_es:
 	npm -q run webpack:production
 
-compile: $(DIST_FILES) css public/js/main.js public/js/ide.js
-	@$(MAKE) compile_modules
+compile: compile_app $(OUTPUT_SRC_FILES) css public/js/main.js public/js/ide.js
+
+compile_app: compile_modules
 
 compile_full:
 	$(BABEL) public/src --out-dir public/js
@@ -117,7 +119,7 @@ compile_modules_full: $(COMPILE_FULL_MODULES)
 $(MODULE_MAKEFILES): Makefile.module
 	cp Makefile.module $@
 
-clean: clean_frontend clean_css clean_tests
+clean: clean_frontend clean_css clean_tests clean_modules
 
 clean_frontend:
 	rm -rf public/js/{analytics,directives,es,filters,ide,main,modules,services,utils}

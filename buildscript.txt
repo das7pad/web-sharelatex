@@ -1,5 +1,6 @@
 web
---language=coffeescript
+--language=es
+--src-dir=src
 --node-version=10.16.3
 --acceptance-creds=None
 --dependencies=mongo,redis_api,redis_lock,redis_realtime,redis_web,redis_websessions

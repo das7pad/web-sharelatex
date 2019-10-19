@@ -44,7 +44,7 @@
 
 !/.prettierignore
 
-!/Gruntfile.coffee
+!/Gruntfile.js
 
 !/karma.conf.js
 
@@ -61,27 +61,11 @@
 
 #######
 # app #
-!/app.coffee
-!/app/coffee
-!/app/lib
-
-!/test/acceptance/coffee
-!/test/acceptance/config
-!/test/acceptance/fixtures
-!/test/acceptance/libs
-!/test/fixtures
-!/test/smoke/coffee
-!/test/unit/coffee
-
-!/app/templates
-!/app/views
+!/app.js
+!/app
 
 !/modules
 /modules/*/Makefile
-/modules/*/index.js
-/modules/*/app/js
-/modules/*/test/unit/js
-/modules/*/test/acceptance/js
 
 !/public/*.ico
 !/public/*.png
@@ -107,7 +91,12 @@
 public/stylesheets/*.css
 public/stylesheets/*.map
 
+!/test/acceptance/config
 !/test/acceptance/files
+!/test/acceptance/src
+!/test/smoke/src
+!/test/unit/src
+!/test/unit/bootstrap.js
 !/test/unit_frontend/es
 !/test/unit_frontend/src
 # app #

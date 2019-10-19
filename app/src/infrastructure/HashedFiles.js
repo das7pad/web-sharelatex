@@ -1,15 +1,3 @@
-/* eslint-disable
-    max-len,
-*/
-// TODO: This file was created by bulk-decaffeinate.
-// Fix any style issues and re-enable lint.
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 // This file was auto-generated, do not edit it directly.
 // Instead run bin/update_build_scripts from
 // https://github.com/das7pad/sharelatex-dev-env
@@ -38,14 +26,14 @@ const fillHashedFiles = function() {
   ]
 
   const modulesPath = Path.join(REPOSITORY_ROOT, 'modules')
-  for (let moduleName of Array.from(fs.readdirSync(modulesPath))) {
+  for (let moduleName of fs.readdirSync(modulesPath)) {
     const index = Path.join(modulesPath, moduleName, 'index.js')
     const content = fs.readFileSync(index, 'utf-8')
-    const filesMatch = /assetFiles: \[(.+)\]/.exec(content)
+    const filesMatch = /assetFiles: \[(.+)]/.exec(content)
     if (!filesMatch) {
       continue
     }
-    for (let file of Array.from(filesMatch[1].split(','))) {
+    for (let file of filesMatch[1].split(',')) {
       pathList.push(Path.join('/minjs', /['"](.+)['"]/.exec(file)[1]))
     }
   }
@@ -81,22 +69,22 @@ const fillHashedFiles = function() {
         return done()
       }
 
-      if ((err != null ? err.code : undefined) === 'ENOENT') {
-        logger.log({ path }, 'Creating symlink')
-        return fs.symlink(`${filename}${extension}`, fsHashPath, function(err) {
-          if (err != null) {
-            logger.log({ path }, 'Creating symlink failed', err)
-          }
-          return done()
-        })
+      if (err.code !== 'ENOENT') {
+        logger.log({ path, err }, 'Calling stat failed')
+        return done()
       }
-      logger.log({ path, err }, 'Calling stat failed')
-      return done()
+      logger.log({ path }, 'Creating symlink')
+      return fs.symlink(`${filename}${extension}`, fsHashPath, function(err) {
+        if (err != null) {
+          logger.log({ path }, 'Creating symlink failed', err)
+        }
+        done()
+      })
     })
   }
 
   logger.log('Started hashing static content')
-  return async.map(pathList, generateHash, () =>
+  async.map(pathList, generateHash, () =>
     logger.log('Finished hashing static content')
   )
 }
