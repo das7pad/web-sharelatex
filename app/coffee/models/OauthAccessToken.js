@@ -1,31 +1,35 @@
-mongoose = require 'mongoose'
-Settings = require 'settings-sharelatex'
+const mongoose = require('mongoose');
+const Settings = require('settings-sharelatex');
 
-Schema = mongoose.Schema
-ObjectId = Schema.ObjectId
+const {
+    Schema
+} = mongoose;
+const {
+    ObjectId
+} = Schema;
 
-OauthAccessTokenSchema = new Schema(
+const OauthAccessTokenSchema = new Schema(
 	{
-		accessToken: String
-		accessTokenExpiresAt: Date
-		oauthApplication_id: { type: ObjectId, ref: 'OauthApplication' }
-		refreshToken: String
-		refreshTokenExpiresAt: Date
-		scope: String
+		accessToken: String,
+		accessTokenExpiresAt: Date,
+		oauthApplication_id: { type: ObjectId, ref: 'OauthApplication' },
+		refreshToken: String,
+		refreshTokenExpiresAt: Date,
+		scope: String,
 		user_id: { type: ObjectId, ref: 'User' }
 	},
 	{
 		collection: 'oauthAccessTokens'
 	}
-)
+);
 
-conn = mongoose.createConnection(Settings.mongo.url, {
+const conn = mongoose.createConnection(Settings.mongo.url, {
 	server: {poolSize: Settings.mongo.poolSize || 10},
 	config: {autoIndex: false}
-})
+});
 
-OauthAccessToken = conn.model('OauthAccessToken', OauthAccessTokenSchema)
+const OauthAccessToken = conn.model('OauthAccessToken', OauthAccessTokenSchema);
 
-mongoose.model 'OauthAccessToken', OauthAccessTokenSchema
-exports.OauthAccessToken = OauthAccessToken
-exports.OauthAccessTokenSchema = OauthAccessTokenSchema
+mongoose.model('OauthAccessToken', OauthAccessTokenSchema);
+exports.OauthAccessToken = OauthAccessToken;
+exports.OauthAccessTokenSchema = OauthAccessTokenSchema;

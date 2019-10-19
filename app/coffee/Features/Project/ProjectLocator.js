@@ -1,193 +1,262 @@
-Project = require('../../models/Project').Project
-ProjectGetter = require("./ProjectGetter")
-Errors = require "../Errors/Errors"
-_ = require('underscore')
-logger = require('logger-sharelatex')
-async = require('async')
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS203: Remove `|| {}` from converted for-own loops
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let ProjectLocator;
+const {
+    Project
+} = require('../../models/Project');
+const ProjectGetter = require("./ProjectGetter");
+const Errors = require("../Errors/Errors");
+const _ = require('underscore');
+const logger = require('logger-sharelatex');
+const async = require('async');
 
-module.exports = ProjectLocator =
-	findElement: (options, _callback = (err, element, path, parentFolder)->)->
-		callback = (args...) ->
-			_callback(args...)
-			_callback = () ->
+module.exports = (ProjectLocator = {
+	findElement(options, _callback){
+		if (_callback == null) { _callback = function(err, element, path, parentFolder){}; }
+		const callback = function(...args) {
+			_callback(...Array.from(args || []));
+			return _callback = function() {};
+		};
 
-		{project, project_id, element_id, type} = options
-		elementType = sanitizeTypeOfElement type
+		const {project, project_id, element_id, type} = options;
+		const elementType = sanitizeTypeOfElement(type);
 
-		count = 0
-		endOfBranch = ->
-			if --count == 0
-				logger.warn "element #{element_id} could not be found for project #{project_id || project._id}"
-				return callback(new Errors.NotFoundError("entity not found"))
+		let count = 0;
+		const endOfBranch = function() {
+			if (--count === 0) {
+				logger.warn(`element ${element_id} could not be found for project ${project_id || project._id}`);
+				return callback(new Errors.NotFoundError("entity not found"));
+			}
+		};
 
-		search = (searchFolder, path)->
-			count++
-			element = _.find searchFolder[elementType], (el)-> el?._id+'' == element_id+'' #need to ToString both id's for robustness
-			if !element? && searchFolder.folders? && searchFolder.folders.length != 0
-				_.each searchFolder.folders, (folder, index)->
-					if !folder?
-						return
-					newPath = {}
-					newPath[key] = value for own key,value of path #make a value copy of the string
-					newPath.fileSystem += "/#{folder.name}"
-					newPath.mongo += ".folders.#{index}"
-					search folder, newPath
-				endOfBranch()
-				return
-			else if element?
-				elementPlaceInArray = getIndexOf(searchFolder[elementType], element_id)
-				path.fileSystem += "/#{element.name}"
-				path.mongo +=".#{elementType}.#{elementPlaceInArray}"
-				callback(null, element, path, searchFolder)
-			else if !element?
-				return endOfBranch()
+		var search = function(searchFolder, path){
+			count++;
+			const element = _.find(searchFolder[elementType], el => ((el != null ? el._id : undefined)+'') === (element_id+'')); //need to ToString both id's for robustness
+			if ((element == null) && (searchFolder.folders != null) && (searchFolder.folders.length !== 0)) {
+				_.each(searchFolder.folders, function(folder, index){
+					if ((folder == null)) {
+						return;
+					}
+					const newPath = {};
+					for (let key of Object.keys(path || {})) { const value = path[key]; newPath[key] = value; } //make a value copy of the string
+					newPath.fileSystem += `/${folder.name}`;
+					newPath.mongo += `.folders.${index}`;
+					return search(folder, newPath);
+				});
+				endOfBranch();
+				return;
+			} else if (element != null) {
+				const elementPlaceInArray = getIndexOf(searchFolder[elementType], element_id);
+				path.fileSystem += `/${element.name}`;
+				path.mongo +=`.${elementType}.${elementPlaceInArray}`;
+				return callback(null, element, path, searchFolder);
+			} else if ((element == null)) {
+				return endOfBranch();
+			}
+		};
 
-		path = {fileSystem:'',mongo:'rootFolder.0'}
+		const path = {fileSystem:'',mongo:'rootFolder.0'};
 
-		startSearch = (project)->
-			if element_id+'' == project.rootFolder[0]._id+''
-				callback(null, project.rootFolder[0], path, null)
-			else
-				search project.rootFolder[0], path
+		const startSearch = function(project){
+			if ((element_id+'') === (project.rootFolder[0]._id+'')) {
+				return callback(null, project.rootFolder[0], path, null);
+			} else {
+				return search(project.rootFolder[0], path);
+			}
+		};
 
-		if project?
-			startSearch(project)
-		else
-			ProjectGetter.getProject project_id, {rootFolder:true, rootDoc_id:true}, (err, project)->
-				return callback(err) if err?
-				if !project?
-					return callback(new Errors.NotFoundError("project not found"))
-				startSearch project
+		if (project != null) {
+			return startSearch(project);
+		} else {
+			return ProjectGetter.getProject(project_id, {rootFolder:true, rootDoc_id:true}, function(err, project){
+				if (err != null) { return callback(err); }
+				if ((project == null)) {
+					return callback(new Errors.NotFoundError("project not found"));
+				}
+				return startSearch(project);
+			});
+		}
+	},
 
-	findRootDoc : (opts, callback)->
-		getRootDoc = (project)=>
-			if project.rootDoc_id?
-				@findElement {project:project, element_id:project.rootDoc_id, type:"docs"}, (error, args...) ->
-					if error?
-						if error instanceof Errors.NotFoundError
-							return callback null, null
-						else
-							return callback error
-					return callback null, args...
-			else
-				callback null, null
-		{project, project_id} = opts
-		if project?
-			getRootDoc project
-		else
-			ProjectGetter.getProject project_id, {rootFolder:true, rootDoc_id:true}, (err, project)->
-				if err?
-					logger.err err:err, "error getting project"
-					return callback(err)
-				else
-					getRootDoc project
+	findRootDoc(opts, callback){
+		const getRootDoc = project=> {
+			if (project.rootDoc_id != null) {
+				return this.findElement({project, element_id:project.rootDoc_id, type:"docs"}, function(error, ...args) {
+					if (error != null) {
+						if (error instanceof Errors.NotFoundError) {
+							return callback(null, null);
+						} else {
+							return callback(error);
+						}
+					}
+					return callback(null, ...Array.from(args));
+				});
+			} else {
+				return callback(null, null);
+			}
+		};
+		const {project, project_id} = opts;
+		if (project != null) {
+			return getRootDoc(project);
+		} else {
+			return ProjectGetter.getProject(project_id, {rootFolder:true, rootDoc_id:true}, function(err, project){
+				if (err != null) {
+					logger.err({err}, "error getting project");
+					return callback(err);
+				} else {
+					return getRootDoc(project);
+				}
+			});
+		}
+	},
 
-	findElementByPath: (options, callback = (err, foundEntity, type)->)->
-		{project, project_id, path, exactCaseMatch} = options
-		if !path?
-			return new Error('no path provided for findElementByPath')
+	findElementByPath(options, callback){
+		if (callback == null) { callback = function(err, foundEntity, type){}; }
+		const {project, project_id, path, exactCaseMatch} = options;
+		if ((path == null)) {
+			return new Error('no path provided for findElementByPath');
+		}
 
-		if project?
-			ProjectLocator._findElementByPathWithProject project, path, exactCaseMatch, callback
-		else
-			ProjectGetter.getProject project_id, {rootFolder:true, rootDoc_id:true}, (err, project)->
-				return callback(err) if err?
-				ProjectLocator._findElementByPathWithProject project, path, exactCaseMatch, callback
+		if (project != null) {
+			return ProjectLocator._findElementByPathWithProject(project, path, exactCaseMatch, callback);
+		} else {
+			return ProjectGetter.getProject(project_id, {rootFolder:true, rootDoc_id:true}, function(err, project){
+				if (err != null) { return callback(err); }
+				return ProjectLocator._findElementByPathWithProject(project, path, exactCaseMatch, callback);
+			});
+		}
+	},
 
-	_findElementByPathWithProject: (project, needlePath, exactCaseMatch, callback = (err, foundEntity, type)->)->
-		if exactCaseMatch
-			matchFn = (a, b) -> (a == b)
-		else
-			matchFn = (a, b) -> (a?.toLowerCase() == b?.toLowerCase())
+	_findElementByPathWithProject(project, needlePath, exactCaseMatch, callback){
+		let matchFn;
+		if (callback == null) { callback = function(err, foundEntity, type){}; }
+		if (exactCaseMatch) {
+			matchFn = (a, b) => a === b;
+		} else {
+			matchFn = (a, b) => (a != null ? a.toLowerCase() : undefined) === (b != null ? b.toLowerCase() : undefined);
+		}
 
-		getParentFolder = (haystackFolder, foldersList, level, cb)->
-			if foldersList.length == 0
-				return cb null, haystackFolder
-			needleFolderName = foldersList[level]
-			found = false
-			for folder in haystackFolder.folders
-				if matchFn(folder.name, needleFolderName)
-					found = true
-					if level == foldersList.length-1
-						return cb null, folder
-					else
-						return getParentFolder(folder, foldersList, level+1, cb)
-			if !found
-				cb("not found project: #{project._id} search path: #{needlePath}, folder #{foldersList[level]} could not be found")
+		var getParentFolder = function(haystackFolder, foldersList, level, cb){
+			if (foldersList.length === 0) {
+				return cb(null, haystackFolder);
+			}
+			const needleFolderName = foldersList[level];
+			let found = false;
+			for (let folder of Array.from(haystackFolder.folders)) {
+				if (matchFn(folder.name, needleFolderName)) {
+					found = true;
+					if (level === (foldersList.length-1)) {
+						return cb(null, folder);
+					} else {
+						return getParentFolder(folder, foldersList, level+1, cb);
+					}
+				}
+			}
+			if (!found) {
+				return cb(`not found project: ${project._id} search path: ${needlePath}, folder ${foldersList[level]} could not be found`);
+			}
+		};
 
-		getEntity = (folder, entityName, cb)->
-			if !entityName?
-				return cb null, folder, "folder"
-			for file in folder.fileRefs or []
-				if matchFn(file?.name, entityName)
-					result = file
-					type = "file"
-			for doc in folder.docs or []
-				if matchFn(doc?.name, entityName)
-					result = doc
-					type = "doc"
-			for childFolder in folder.folders or []
-				if matchFn(childFolder?.name, entityName)
-					result = childFolder
-					type = "folder"
+		const getEntity = function(folder, entityName, cb){
+			let result, type;
+			if ((entityName == null)) {
+				return cb(null, folder, "folder");
+			}
+			for (let file of Array.from(folder.fileRefs || [])) {
+				if (matchFn(file != null ? file.name : undefined, entityName)) {
+					result = file;
+					type = "file";
+				}
+			}
+			for (let doc of Array.from(folder.docs || [])) {
+				if (matchFn(doc != null ? doc.name : undefined, entityName)) {
+					result = doc;
+					type = "doc";
+				}
+			}
+			for (let childFolder of Array.from(folder.folders || [])) {
+				if (matchFn(childFolder != null ? childFolder.name : undefined, entityName)) {
+					result = childFolder;
+					type = "folder";
+				}
+			}
 
-			if result?
-				cb null, result, type
-			else
-				cb("not found project: #{project._id} search path: #{needlePath}, entity #{entityName} could not be found")
+			if (result != null) {
+				return cb(null, result, type);
+			} else {
+				return cb(`not found project: ${project._id} search path: ${needlePath}, entity ${entityName} could not be found`);
+			}
+		};
 
 
-		if err?
-			logger.err err:err, project_id:project._id, "error getting project for finding element"
-			return callback(err)
-		if !project?
-			return callback("project could not be found for finding a element #{project._id}")
-		if needlePath == '' || needlePath == '/'
-			return callback(null, project.rootFolder[0], "folder")
+		if (typeof err !== 'undefined' && err !== null) {
+			logger.err({err, project_id:project._id}, "error getting project for finding element");
+			return callback(err);
+		}
+		if ((project == null)) {
+			return callback(`project could not be found for finding a element ${project._id}`);
+		}
+		if ((needlePath === '') || (needlePath === '/')) {
+			return callback(null, project.rootFolder[0], "folder");
+		}
 
-		if needlePath.indexOf('/') == 0
-			needlePath = needlePath.substring(1)
-		foldersList = needlePath.split('/')
-		needleName = foldersList.pop()
-		rootFolder = project.rootFolder[0]
+		if (needlePath.indexOf('/') === 0) {
+			needlePath = needlePath.substring(1);
+		}
+		const foldersList = needlePath.split('/');
+		const needleName = foldersList.pop();
+		const rootFolder = project.rootFolder[0];
 
-		logger.log project_id:project._id, path:needlePath, foldersList:foldersList, "looking for element by path"
-		jobs = new Array()
+		logger.log({project_id:project._id, path:needlePath, foldersList}, "looking for element by path");
+		const jobs = new Array();
 		jobs.push(
-			(cb)->
-				getParentFolder rootFolder, foldersList, 0, cb
-		)
+			cb => getParentFolder(rootFolder, foldersList, 0, cb));
 		jobs.push(
-			(folder, cb)->
-				getEntity folder, needleName, cb
-		)
-		async.waterfall jobs, callback
+			(folder, cb) => getEntity(folder, needleName, cb));
+		return async.waterfall(jobs, callback);
+	},
 
-	findUsersProjectByName: (user_id, projectName, callback)->
-		ProjectGetter.findAllUsersProjects user_id, 'name archived', (err, allProjects)->
-			return callback(error) if error?
-			{owned, readAndWrite} = allProjects
-			projects = owned.concat(readAndWrite)
-			projectName = projectName.toLowerCase()
-			project = _.find projects, (project)->
-				project.name.toLowerCase() == projectName and project.archived != true
-			logger.log user_id:user_id, projectName:projectName, totalProjects:projects.length, project:project, "looking for project by name"
-			callback(null, project)
-
-
-sanitizeTypeOfElement = (elementType)->
-	lastChar = elementType.slice -1
-	if lastChar != "s"
-		elementType +="s"
-	if elementType == "files"
-		elementType = "fileRefs"
-	return elementType
+	findUsersProjectByName(user_id, projectName, callback){
+		return ProjectGetter.findAllUsersProjects(user_id, 'name archived', function(err, allProjects){
+			if (typeof error !== 'undefined' && error !== null) { return callback(error); }
+			const {owned, readAndWrite} = allProjects;
+			const projects = owned.concat(readAndWrite);
+			projectName = projectName.toLowerCase();
+			const project = _.find(projects, project => (project.name.toLowerCase() === projectName) && (project.archived !== true));
+			logger.log({user_id, projectName, totalProjects:projects.length, project}, "looking for project by name");
+			return callback(null, project);
+		});
+	}
+});
 
 
-getIndexOf = (searchEntity, id)->
-	length = searchEntity.length
-	count = 0
-	while(count < length)
-		if searchEntity[count]?._id+"" == id+""
-			return count
-		count++
+var sanitizeTypeOfElement = function(elementType){
+	const lastChar = elementType.slice(-1);
+	if (lastChar !== "s") {
+		elementType +="s";
+	}
+	if (elementType === "files") {
+		elementType = "fileRefs";
+	}
+	return elementType;
+};
+
+
+var getIndexOf = function(searchEntity, id){
+	const {
+        length
+    } = searchEntity;
+	let count = 0;
+	while(count < length) {
+		if (((searchEntity[count] != null ? searchEntity[count]._id : undefined)+"") === (id+"")) {
+			return count;
+		}
+		count++;
+	}
+};

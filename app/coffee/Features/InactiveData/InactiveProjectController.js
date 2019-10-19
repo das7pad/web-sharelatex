@@ -1,25 +1,42 @@
-InactiveProjectManager = require("./InactiveProjectManager")
-logger = require("logger-sharelatex")
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const InactiveProjectManager = require("./InactiveProjectManager");
+const logger = require("logger-sharelatex");
 
 
-module.exports = 
+module.exports = { 
 
-	deactivateOldProjects: (req, res)->
-		logger.log "recived request to deactivate old projects"
-		numberOfProjectsToArchive = parseInt(req.body.numberOfProjectsToArchive, 10)
-		ageOfProjects = req.body.ageOfProjects
-		InactiveProjectManager.deactivateOldProjects numberOfProjectsToArchive, ageOfProjects, (err, projectsDeactivated)->
-			if err?
-				res.sendStatus(500)
-			else
-				res.send(projectsDeactivated)
+	deactivateOldProjects(req, res){
+		logger.log("recived request to deactivate old projects");
+		const numberOfProjectsToArchive = parseInt(req.body.numberOfProjectsToArchive, 10);
+		const {
+            ageOfProjects
+        } = req.body;
+		return InactiveProjectManager.deactivateOldProjects(numberOfProjectsToArchive, ageOfProjects, function(err, projectsDeactivated){
+			if (err != null) {
+				return res.sendStatus(500);
+			} else {
+				return res.send(projectsDeactivated);
+			}
+		});
+	},
 
 
-	deactivateProject: (req, res)->
-		project_id = req.params.project_id
-		logger.log project_id:project_id, "recived request to deactivating project"
-		InactiveProjectManager.deactivateProject project_id, (err)->
-			if err?
-				res.sendStatus 500
-			else
-				res.sendStatus 200
+	deactivateProject(req, res){
+		const {
+            project_id
+        } = req.params;
+		logger.log({project_id}, "recived request to deactivating project");
+		return InactiveProjectManager.deactivateProject(project_id, function(err){
+			if (err != null) {
+				return res.sendStatus(500);
+			} else {
+				return res.sendStatus(200);
+			}
+		});
+	}
+};

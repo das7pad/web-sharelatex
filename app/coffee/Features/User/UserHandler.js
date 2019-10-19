@@ -1,8 +1,19 @@
-TeamInvitesHandler = require("../Subscription/TeamInvitesHandler")
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let UserHandler;
+const TeamInvitesHandler = require("../Subscription/TeamInvitesHandler");
 
-module.exports = UserHandler =
-	populateTeamInvites: (user, callback) ->
-		TeamInvitesHandler.createTeamInvitesForLegacyInvitedEmail(user.email, callback)
+module.exports = (UserHandler = {
+	populateTeamInvites(user, callback) {
+		return TeamInvitesHandler.createTeamInvitesForLegacyInvitedEmail(user.email, callback);
+	},
 
-	setupLoginData: (user, callback = ->)->
-		@populateTeamInvites user, callback
+	setupLoginData(user, callback){
+		if (callback == null) { callback = function() {}; }
+		return this.populateTeamInvites(user, callback);
+	}
+});

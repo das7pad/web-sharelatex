@@ -1,13 +1,22 @@
-EMAIL_REGEXP = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\ ".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA -Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let EmailHelper;
+const EMAIL_REGEXP = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\ ".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA -Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
-module.exports = EmailHelper =
+module.exports = (EmailHelper = {
 
-	parseEmail: (email) ->
-		return null unless email?
-		return null if email.length > 254
-		email = email.trim().toLowerCase()
+	parseEmail(email) {
+		if (email == null) { return null; }
+		if (email.length > 254) { return null; }
+		email = email.trim().toLowerCase();
 
-		matched = email.match EMAIL_REGEXP
-		return null unless matched? && matched[0]?
+		const matched = email.match(EMAIL_REGEXP);
+		if ((matched == null) || (matched[0] == null)) { return null; }
 
-		matched[0]
+		return matched[0];
+	}
+});

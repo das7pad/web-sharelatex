@@ -1,143 +1,193 @@
-logger  = require "logger-sharelatex"
-metrics = require "metrics-sharelatex"
-fs      = require "fs"
-Path    = require "path"
-fse     = require "fs-extra"
-yauzl   = require "yauzl"
-Settings = require "settings-sharelatex"
-Errors = require "../Errors/Errors"
-_ = require("underscore")
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let ArchiveManager;
+const logger  = require("logger-sharelatex");
+const metrics = require("metrics-sharelatex");
+const fs      = require("fs");
+const Path    = require("path");
+const fse     = require("fs-extra");
+const yauzl   = require("yauzl");
+const Settings = require("settings-sharelatex");
+const Errors = require("../Errors/Errors");
+const _ = require("underscore");
 
-ONE_MEG = 1024 * 1024
+const ONE_MEG = 1024 * 1024;
 
-module.exports = ArchiveManager =
+module.exports = (ArchiveManager = {
 
-	_isZipTooLarge: (source, callback = (err, isTooLarge)->)->
-		callback = _.once callback
+	_isZipTooLarge(source, callback){
+		if (callback == null) { callback = function(err, isTooLarge){}; }
+		callback = _.once(callback);
 
-		totalSizeInBytes = null
-		yauzl.open source, {lazyEntries: true}, (err, zipfile) ->
-			return callback(new Errors.InvalidError("invalid_zip_file")) if err?
+		let totalSizeInBytes = null;
+		return yauzl.open(source, {lazyEntries: true}, function(err, zipfile) {
+			if (err != null) { return callback(new Errors.InvalidError("invalid_zip_file")); }
 
-			if Settings.maxEntitiesPerProject? and zipfile.entryCount > Settings.maxEntitiesPerProject
-				return callback(null, true) # too many files in zip file
+			if ((Settings.maxEntitiesPerProject != null) && (zipfile.entryCount > Settings.maxEntitiesPerProject)) {
+				return callback(null, true); // too many files in zip file
+			}
 
-			zipfile.on "error", callback
+			zipfile.on("error", callback);
 
-			# read all the entries
-			zipfile.readEntry()
-			zipfile.on "entry", (entry) ->
-				totalSizeInBytes += entry.uncompressedSize
-				zipfile.readEntry() # get the next entry
+			// read all the entries
+			zipfile.readEntry();
+			zipfile.on("entry", function(entry) {
+				totalSizeInBytes += entry.uncompressedSize;
+				return zipfile.readEntry();
+			}); // get the next entry
 
-			# no more entries to read
-			zipfile.on "end", () ->
-				if !totalSizeInBytes? or isNaN(totalSizeInBytes)
-					logger.err source:source, totalSizeInBytes:totalSizeInBytes, "error getting bytes of zip"
-					return callback(new Error("error getting bytes of zip"))
-				isTooLarge = totalSizeInBytes > (ONE_MEG * 300)
-				callback(null, isTooLarge)
+			// no more entries to read
+			return zipfile.on("end", function() {
+				if ((totalSizeInBytes == null) || isNaN(totalSizeInBytes)) {
+					logger.err({source, totalSizeInBytes}, "error getting bytes of zip");
+					return callback(new Error("error getting bytes of zip"));
+				}
+				const isTooLarge = totalSizeInBytes > (ONE_MEG * 300);
+				return callback(null, isTooLarge);
+			});
+		});
+	},
 
-	_checkFilePath: (entry, destination, callback = (err, destFile) ->) ->
-		# transform backslashes to forwardslashes to accommodate badly-behaved zip archives
-		transformedFilename = entry.fileName.replace(/\\/g, '/')
-		# check if the entry is a directory
-		endsWithSlash = /\/$/
-		if endsWithSlash.test(transformedFilename)
-			return callback() # don't give a destfile for directory
-		# check that the file does not use a relative path
-		for dir in transformedFilename.split('/')
-			if dir == '..'
-				return callback(new Error("relative path"))
-		# check that the destination file path is normalized
-		dest = "#{destination}/#{transformedFilename}"
-		if dest != Path.normalize(dest)
-			return callback(new Error("unnormalized path"))
-		else
-			return callback(null, dest)
+	_checkFilePath(entry, destination, callback) {
+		// transform backslashes to forwardslashes to accommodate badly-behaved zip archives
+		if (callback == null) { callback = function(err, destFile) {}; }
+		const transformedFilename = entry.fileName.replace(/\\/g, '/');
+		// check if the entry is a directory
+		const endsWithSlash = /\/$/;
+		if (endsWithSlash.test(transformedFilename)) {
+			return callback(); // don't give a destfile for directory
+		}
+		// check that the file does not use a relative path
+		for (let dir of Array.from(transformedFilename.split('/'))) {
+			if (dir === '..') {
+				return callback(new Error("relative path"));
+			}
+		}
+		// check that the destination file path is normalized
+		const dest = `${destination}/${transformedFilename}`;
+		if (dest !== Path.normalize(dest)) {
+			return callback(new Error("unnormalized path"));
+		} else {
+			return callback(null, dest);
+		}
+	},
 
-	_writeFileEntry: (zipfile, entry, destFile, callback = (err)->) ->
-		callback = _.once callback
+	_writeFileEntry(zipfile, entry, destFile, callback) {
+		if (callback == null) { callback = function(err){}; }
+		callback = _.once(callback);
 
-		zipfile.openReadStream entry, (err, readStream) ->
-			return callback(err) if err?
-			readStream.on "error", callback
-			readStream.on "end", callback
+		return zipfile.openReadStream(entry, function(err, readStream) {
+			if (err != null) { return callback(err); }
+			readStream.on("error", callback);
+			readStream.on("end", callback);
 
-			errorHandler = (err) -> # clean up before calling callback
-				readStream.unpipe()
-				readStream.destroy()
-				callback(err)
+			const errorHandler = function(err) { // clean up before calling callback
+				readStream.unpipe();
+				readStream.destroy();
+				return callback(err);
+			};
 
-			fse.ensureDir Path.dirname(destFile), (err) ->
-				return errorHandler(err) if err?
-				writeStream = fs.createWriteStream destFile
-				writeStream.on 'error', errorHandler
-				readStream.pipe(writeStream)
+			return fse.ensureDir(Path.dirname(destFile), function(err) {
+				if (err != null) { return errorHandler(err); }
+				const writeStream = fs.createWriteStream(destFile);
+				writeStream.on('error', errorHandler);
+				return readStream.pipe(writeStream);
+			});
+		});
+	},
 
-	_extractZipFiles: (source, destination, callback = (err) ->) ->
-		callback = _.once callback
+	_extractZipFiles(source, destination, callback) {
+		if (callback == null) { callback = function(err) {}; }
+		callback = _.once(callback);
 
-		yauzl.open source, {lazyEntries: true}, (err, zipfile) ->
-			return callback(err) if err?
-			zipfile.on "error", callback
-			# read all the entries
-			zipfile.readEntry()
-			zipfile.on "entry", (entry) ->
-				logger.log {source:source, fileName: entry.fileName}, "processing zip file entry"
-				ArchiveManager._checkFilePath entry, destination, (err, destFile) ->
-					if err?
-						logger.warn err:err, source:source, destination:destination, "skipping bad file path"
-						zipfile.readEntry() # bad path, just skip to the next file
-						return
-					if destFile? # only write files
-						ArchiveManager._writeFileEntry zipfile, entry, destFile, (err) ->
-							if err?
-								logger.error err:err, source:source, destFile:destFile, "error unzipping file entry"
-								zipfile.close() # bail out, stop reading file entries
-								return callback(err)
-							else
-								zipfile.readEntry() # continue to the next file
-					else # if it's a directory, continue
-						zipfile.readEntry()
-			# no more entries to read
-			zipfile.on "end", callback
+		return yauzl.open(source, {lazyEntries: true}, function(err, zipfile) {
+			if (err != null) { return callback(err); }
+			zipfile.on("error", callback);
+			// read all the entries
+			zipfile.readEntry();
+			zipfile.on("entry", function(entry) {
+				logger.log({source, fileName: entry.fileName}, "processing zip file entry");
+				return ArchiveManager._checkFilePath(entry, destination, function(err, destFile) {
+					if (err != null) {
+						logger.warn({err, source, destination}, "skipping bad file path");
+						zipfile.readEntry(); // bad path, just skip to the next file
+						return;
+					}
+					if (destFile != null) { // only write files
+						return ArchiveManager._writeFileEntry(zipfile, entry, destFile, function(err) {
+							if (err != null) {
+								logger.error({err, source, destFile}, "error unzipping file entry");
+								zipfile.close(); // bail out, stop reading file entries
+								return callback(err);
+							} else {
+								return zipfile.readEntry();
+							}
+						}); // continue to the next file
+					} else { // if it's a directory, continue
+						return zipfile.readEntry();
+					}
+				});
+			});
+			// no more entries to read
+			return zipfile.on("end", callback);
+		});
+	},
 
-	extractZipArchive: (source, destination, _callback = (err) ->) ->
-		callback = (args...) ->
-			_callback(args...)
-			_callback = () ->
+	extractZipArchive(source, destination, _callback) {
+		if (_callback == null) { _callback = function(err) {}; }
+		const callback = function(...args) {
+			_callback(...Array.from(args || []));
+			return _callback = function() {};
+		};
 
-		ArchiveManager._isZipTooLarge source, (err, isTooLarge)->
-			if err?
-				logger.err err:err, "error checking size of zip file"
-				return callback(err)
+		return ArchiveManager._isZipTooLarge(source, function(err, isTooLarge){
+			if (err != null) {
+				logger.err({err}, "error checking size of zip file");
+				return callback(err);
+			}
 
-			if isTooLarge
-				return callback(new Errors.InvalidError("zip_contents_too_large"))
+			if (isTooLarge) {
+				return callback(new Errors.InvalidError("zip_contents_too_large"));
+			}
 
-			timer = new metrics.Timer("unzipDirectory")
-			logger.log source: source, destination: destination, "unzipping file"
+			const timer = new metrics.Timer("unzipDirectory");
+			logger.log({source, destination}, "unzipping file");
 
-			ArchiveManager._extractZipFiles source, destination, (err) ->
-				timer.done()
-				if err?
-					logger.error {err, source, destination}, "unzip failed"
-					callback(err)
-				else
-					callback()
+			return ArchiveManager._extractZipFiles(source, destination, function(err) {
+				timer.done();
+				if (err != null) {
+					logger.error({err, source, destination}, "unzip failed");
+					return callback(err);
+				} else {
+					return callback();
+				}
+			});
+		});
+	},
 
-	findTopLevelDirectory: (directory, callback = (error, topLevelDir) ->) ->
-		fs.readdir directory, (error, files) ->
-			return callback(error) if error?
-			if files.length == 1
-				childPath = Path.join(directory, files[0])
-				fs.stat childPath, (error, stat) ->
-					return callback(error) if error?
-					if stat.isDirectory()
-						return callback(null, childPath)
-					else
-						return callback(null, directory)
-			else
-				return callback(null, directory)
+	findTopLevelDirectory(directory, callback) {
+		if (callback == null) { callback = function(error, topLevelDir) {}; }
+		return fs.readdir(directory, function(error, files) {
+			if (error != null) { return callback(error); }
+			if (files.length === 1) {
+				const childPath = Path.join(directory, files[0]);
+				return fs.stat(childPath, function(error, stat) {
+					if (error != null) { return callback(error); }
+					if (stat.isDirectory()) {
+						return callback(null, childPath);
+					} else {
+						return callback(null, directory);
+					}
+				});
+			} else {
+				return callback(null, directory);
+			}
+		});
+	}
+});
 

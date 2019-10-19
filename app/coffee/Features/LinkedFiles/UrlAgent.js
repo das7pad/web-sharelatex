@@ -1,51 +1,70 @@
-request = require 'request'
-_ = require "underscore"
-urlValidator = require 'valid-url'
-{ InvalidUrlError, UrlFetchFailedError } = require './LinkedFilesErrors'
-LinkedFilesHandler = require './LinkedFilesHandler'
-UrlHelper = require '../Helpers/UrlHelper'
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let UrlAgent;
+const request = require('request');
+const _ = require("underscore");
+const urlValidator = require('valid-url');
+const { InvalidUrlError, UrlFetchFailedError } = require('./LinkedFilesErrors');
+const LinkedFilesHandler = require('./LinkedFilesHandler');
+const UrlHelper = require('../Helpers/UrlHelper');
 
-module.exports = UrlAgent = {
+module.exports = (UrlAgent = {
 
-	createLinkedFile: (project_id, linkedFileData, name, parent_folder_id, user_id, callback) ->
-		linkedFileData = @._sanitizeData(linkedFileData)
-		@_getUrlStream project_id, linkedFileData, user_id, (err, readStream) ->
-			return callback(err) if err?
-			readStream.on "error", callback
-			readStream.on "response", (response) ->
-				if 200 <= response.statusCode < 300
-					readStream.resume()
-					LinkedFilesHandler.importFromStream project_id,
+	createLinkedFile(project_id, linkedFileData, name, parent_folder_id, user_id, callback) {
+		linkedFileData = this._sanitizeData(linkedFileData);
+		return this._getUrlStream(project_id, linkedFileData, user_id, function(err, readStream) {
+			if (err != null) { return callback(err); }
+			readStream.on("error", callback);
+			return readStream.on("response", function(response) {
+				if (200 <= response.statusCode && response.statusCode < 300) {
+					readStream.resume();
+					return LinkedFilesHandler.importFromStream(project_id,
 						readStream,
 						linkedFileData,
 						name,
 						parent_folder_id,
 						user_id,
-						(err, file) ->
-							return callback(err) if err?
-							callback(null, file._id) # Created
-				else
-					error = new UrlFetchFailedError("url fetch failed: #{linkedFileData.url}")
-					error.statusCode = response.statusCode
-					callback(error)
+						function(err, file) {
+							if (err != null) { return callback(err); }
+							return callback(null, file._id);
+					}); // Created
+				} else {
+					const error = new UrlFetchFailedError(`url fetch failed: ${linkedFileData.url}`);
+					error.statusCode = response.statusCode;
+					return callback(error);
+				}
+			});
+		});
+	},
 
-	refreshLinkedFile: (project_id, linkedFileData, name, parent_folder_id, user_id, callback) ->
-		@createLinkedFile project_id, linkedFileData, name, parent_folder_id, user_id, callback
+	refreshLinkedFile(project_id, linkedFileData, name, parent_folder_id, user_id, callback) {
+		return this.createLinkedFile(project_id, linkedFileData, name, parent_folder_id, user_id, callback);
+	},
 
-	_sanitizeData: (data) ->
+	_sanitizeData(data) {
 		return {
-			provider: data.provider
+			provider: data.provider,
 			url: UrlHelper.prependHttpIfNeeded(data.url)
+		};
+	},
+
+	_getUrlStream(project_id, data, current_user_id, callback) {
+		if (callback == null) { callback = function(error, fsPath) {}; }
+		callback = _.once(callback);
+		let {
+            url
+        } = data;
+		if (!urlValidator.isWebUri(url)) {
+			return callback(new InvalidUrlError(`invalid url: ${url}`));
 		}
+		url = UrlHelper.wrapUrlWithProxy(url);
+		const readStream = request.get(url);
+		readStream.pause();
+		return callback(null, readStream);
+	}
 
-	_getUrlStream: (project_id, data, current_user_id, callback = (error, fsPath) ->) ->
-		callback = _.once(callback)
-		url = data.url
-		if !urlValidator.isWebUri(url)
-			return callback(new InvalidUrlError("invalid url: #{url}"))
-		url = UrlHelper.wrapUrlWithProxy(url)
-		readStream = request.get(url)
-		readStream.pause()
-		callback(null, readStream)
-
-}
+});

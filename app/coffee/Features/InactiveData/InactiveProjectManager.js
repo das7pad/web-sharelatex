@@ -1,59 +1,83 @@
-async = require("async")
-_ = require("underscore")
-logger = require("logger-sharelatex")
-DocstoreManager = require("../Docstore/DocstoreManager")
-ProjectGetter = require("../Project/ProjectGetter")
-ProjectUpdateHandler = require("../Project/ProjectUpdateHandler")
-Project = require("../../models/Project").Project
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let InactiveProjectManager;
+const async = require("async");
+const _ = require("underscore");
+const logger = require("logger-sharelatex");
+const DocstoreManager = require("../Docstore/DocstoreManager");
+const ProjectGetter = require("../Project/ProjectGetter");
+const ProjectUpdateHandler = require("../Project/ProjectUpdateHandler");
+const {
+    Project
+} = require("../../models/Project");
 
-MILISECONDS_IN_DAY = 86400000
-module.exports = InactiveProjectManager =
+const MILISECONDS_IN_DAY = 86400000;
+module.exports = (InactiveProjectManager = {
 
-	reactivateProjectIfRequired: (project_id, callback)->
-		ProjectGetter.getProject project_id, {active:true}, (err, project)->
-			if err?
-				logger.err err:err, project_id:project_id, "error getting project"
-				return callback(err)
-			logger.log project_id:project_id, active:project.active, "seeing if need to reactivate project"
+	reactivateProjectIfRequired(project_id, callback){
+		return ProjectGetter.getProject(project_id, {active:true}, function(err, project){
+			if (err != null) {
+				logger.err({err, project_id}, "error getting project");
+				return callback(err);
+			}
+			logger.log({project_id, active:project.active}, "seeing if need to reactivate project");
 
-			if project.active
-				return callback()
+			if (project.active) {
+				return callback();
+			}
 
-			DocstoreManager.unarchiveProject project_id, (err)->
-				if err?
-					logger.err err:err, project_id:project_id, "error reactivating project in docstore"
-					return callback(err)
-				ProjectUpdateHandler.markAsActive project_id, callback
+			return DocstoreManager.unarchiveProject(project_id, function(err){
+				if (err != null) {
+					logger.err({err, project_id}, "error reactivating project in docstore");
+					return callback(err);
+				}
+				return ProjectUpdateHandler.markAsActive(project_id, callback);
+			});
+		});
+	},
 
-	deactivateOldProjects: (limit = 10, daysOld = 360, callback)->
-		oldProjectDate = new Date() - (MILISECONDS_IN_DAY * daysOld)
-		logger.log oldProjectDate:oldProjectDate, limit:limit, daysOld:daysOld, "starting process of deactivating old projects"
-		Project.find()
+	deactivateOldProjects(limit, daysOld, callback){
+		if (limit == null) { limit = 10; }
+		if (daysOld == null) { daysOld = 360; }
+		const oldProjectDate = new Date() - (MILISECONDS_IN_DAY * daysOld);
+		logger.log({oldProjectDate, limit, daysOld}, "starting process of deactivating old projects");
+		return Project.find()
 			.where("lastOpened").lt(oldProjectDate)
 			.where("active").equals(true)
 			.select("_id")
 			.limit(limit)
-			.exec (err, projects)->
-				if err?
-					logger.err err:err, "could not get projects for deactivating"
-				jobs = _.map projects, (project)->
-					return (cb)->
-						InactiveProjectManager.deactivateProject project._id, cb
-				logger.log numberOfProjects:projects?.length, "deactivating projects"
-				async.series jobs, (err)->
-					if err?
-						logger.err err:err, "error deactivating projects"
-					callback err, projects
+			.exec(function(err, projects){
+				if (err != null) {
+					logger.err({err}, "could not get projects for deactivating");
+				}
+				const jobs = _.map(projects, project => cb => InactiveProjectManager.deactivateProject(project._id, cb));
+				logger.log({numberOfProjects:(projects != null ? projects.length : undefined)}, "deactivating projects");
+				return async.series(jobs, function(err){
+					if (err != null) {
+						logger.err({err}, "error deactivating projects");
+					}
+					return callback(err, projects);
+				});
+		});
+	},
 
 
-	deactivateProject: (project_id, callback)->
-		logger.log project_id:project_id, "deactivating inactive project"
-		jobs = [
-			(cb)-> DocstoreManager.archiveProject project_id, cb
-			(cb)-> ProjectUpdateHandler.markAsInactive project_id, cb
-		]
-		async.series jobs, (err)->
-			if err?
-				logger.err err:err, project_id:project_id, "error deactivating project"
-			callback(err)
+	deactivateProject(project_id, callback){
+		logger.log({project_id}, "deactivating inactive project");
+		const jobs = [
+			cb => DocstoreManager.archiveProject(project_id, cb),
+			cb => ProjectUpdateHandler.markAsInactive(project_id, cb)
+		];
+		return async.series(jobs, function(err){
+			if (err != null) {
+				logger.err({err, project_id}, "error deactivating project");
+			}
+			return callback(err);
+		});
+	}
+});
 

@@ -1,116 +1,165 @@
-mongojs = require("../../infrastructure/mongojs")
-metrics = require('metrics-sharelatex')
-logger = require('logger-sharelatex')
-db = mongojs.db
-ObjectId = mongojs.ObjectId
-{ getUserAffiliations } = require("../Institutions/InstitutionsAPI")
-Errors = require("../Errors/Errors")
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let UserGetter;
+const mongojs = require("../../infrastructure/mongojs");
+const metrics = require('metrics-sharelatex');
+const logger = require('logger-sharelatex');
+const {
+    db
+} = mongojs;
+const {
+    ObjectId
+} = mongojs;
+const { getUserAffiliations } = require("../Institutions/InstitutionsAPI");
+const Errors = require("../Errors/Errors");
 
-module.exports = UserGetter =
-	getUser: (query, projection, callback = (error, user) ->) ->
-		return callback(new Error("no query provided")) unless query?
-		if query?.email?
-			return callback(new Error("Don't use getUser to find user by email"), null)
-		if arguments.length == 2
-			callback = projection
-			projection = {}
-		if typeof query == "string"
-			try
-				query = _id: ObjectId(query)
-			catch e
-				return callback(null, null)
-		else if query instanceof ObjectId or query?._bsontype == 'ObjectID'
-			query = _id: query
+module.exports = (UserGetter = {
+	getUser(query, projection, callback) {
+		if (callback == null) { callback = function(error, user) {}; }
+		if (query == null) { return callback(new Error("no query provided")); }
+		if ((query != null ? query.email : undefined) != null) {
+			return callback(new Error("Don't use getUser to find user by email"), null);
+		}
+		if (arguments.length === 2) {
+			callback = projection;
+			projection = {};
+		}
+		if (typeof query === "string") {
+			try {
+				query = {_id: ObjectId(query)};
+			} catch (e) {
+				return callback(null, null);
+			}
+		} else if (query instanceof ObjectId || ((query != null ? query._bsontype : undefined) === 'ObjectID')) {
+			query = {_id: query};
+		}
 
-		db.users.findOne query, projection, callback
+		return db.users.findOne(query, projection, callback);
+	},
 
-	getUserEmail: (userId, callback = (error, email) ->) ->
-		@getUser userId, { email: 1 }, (error, user) ->
-			callback(error, user?.email)
+	getUserEmail(userId, callback) {
+		if (callback == null) { callback = function(error, email) {}; }
+		return this.getUser(userId, { email: 1 }, (error, user) => callback(error, user != null ? user.email : undefined));
+	},
 
-	getUserFullEmails: (userId, callback = (error, emails) ->) ->
-		@getUser userId, { email: 1, emails: 1 }, (error, user) ->
-			return callback error if error?
-			return callback new Error('User not Found') unless user
+	getUserFullEmails(userId, callback) {
+		if (callback == null) { callback = function(error, emails) {}; }
+		return this.getUser(userId, { email: 1, emails: 1 }, function(error, user) {
+			if (error != null) { return callback(error); }
+			if (!user) { return callback(new Error('User not Found')); }
 
-			getUserAffiliations userId, (error, affiliationsData) ->
-				return callback error if error?
-				callback null, decorateFullEmails(user.email, user.emails or [], affiliationsData)
+			return getUserAffiliations(userId, function(error, affiliationsData) {
+				if (error != null) { return callback(error); }
+				return callback(null, decorateFullEmails(user.email, user.emails || [], affiliationsData));
+			});
+		});
+	},
 
-	getUserByMainEmail: (email, projection, callback = (error, user) ->) ->
-		email = email.trim()
-		if arguments.length == 2
-			callback = projection
-			projection = {}
-		db.users.findOne email: email, projection, callback
+	getUserByMainEmail(email, projection, callback) {
+		if (callback == null) { callback = function(error, user) {}; }
+		email = email.trim();
+		if (arguments.length === 2) {
+			callback = projection;
+			projection = {};
+		}
+		return db.users.findOne({email}, projection, callback);
+	},
 
-	getUserByAnyEmail: (email, projection, callback = (error, user) ->) ->
-		email = email.trim()
-		if arguments.length == 2
-			callback = projection
-			projection = {}
-		# $exists: true MUST be set to use the partial index
-		query = emails: { $exists: true }, 'emails.email': email
-		db.users.findOne query, projection, (error, user) =>
-			return callback(error, user) if error? or user?
+	getUserByAnyEmail(email, projection, callback) {
+		if (callback == null) { callback = function(error, user) {}; }
+		email = email.trim();
+		if (arguments.length === 2) {
+			callback = projection;
+			projection = {};
+		}
+		// $exists: true MUST be set to use the partial index
+		const query = {emails: { $exists: true }, 'emails.email': email};
+		return db.users.findOne(query, projection, (error, user) => {
+			if ((error != null) || (user != null)) { return callback(error, user); }
 
-			# While multiple emails are being rolled out, check for the main email as
-			# well
-			@getUserByMainEmail email, projection, callback
+			// While multiple emails are being rolled out, check for the main email as
+			// well
+			return this.getUserByMainEmail(email, projection, callback);
+		});
+	},
 
-	getUsersByAnyConfirmedEmail: (emails, projection, callback = (error, user) ->) ->
-		if arguments.length == 2
-			callback = projection
-			projection = {}
-		# $exists: true MUST be set to use the partial index
-		query = emails: { $exists: true, $elemMatch: { email: { $in: emails }, confirmedAt: { $exists: true }}}
-		db.users.find query, projection, (error, users) =>
-			callback(error, users)
+	getUsersByAnyConfirmedEmail(emails, projection, callback) {
+		if (callback == null) { callback = function(error, user) {}; }
+		if (arguments.length === 2) {
+			callback = projection;
+			projection = {};
+		}
+		// $exists: true MUST be set to use the partial index
+		const query = {emails: { $exists: true, $elemMatch: { email: { $in: emails }, confirmedAt: { $exists: true }}}};
+		return db.users.find(query, projection, (error, users) => {
+			return callback(error, users);
+		});
+	},
 
-	getUsersByHostname: (hostname, projection, callback = (error, users) ->) ->
-		reversedHostname = hostname.trim().split('').reverse().join('')
-		query = emails: { $exists: true }, 'emails.reversedHostname': reversedHostname
-		db.users.find query, projection, callback
+	getUsersByHostname(hostname, projection, callback) {
+		if (callback == null) { callback = function(error, users) {}; }
+		const reversedHostname = hostname.trim().split('').reverse().join('');
+		const query = {emails: { $exists: true }, 'emails.reversedHostname': reversedHostname};
+		return db.users.find(query, projection, callback);
+	},
 
-	getUsers: (user_ids, projection, callback = (error, users) ->) ->
-		try
-			user_ids = user_ids.map (u) -> ObjectId(u.toString())
-		catch error
-			return callback error
+	getUsers(user_ids, projection, callback) {
+		if (callback == null) { callback = function(error, users) {}; }
+		try {
+			user_ids = user_ids.map(u => ObjectId(u.toString()));
+		} catch (error1) {
+			const error = error1;
+			return callback(error);
+		}
 		
-		db.users.find { _id: { $in: user_ids} }, projection, callback
+		return db.users.find({ _id: { $in: user_ids} }, projection, callback);
+	},
 
-	getUserOrUserStubById: (user_id, projection, callback = (error, user, isStub) ->) ->
-		try
-			query = _id: ObjectId(user_id.toString())
-		catch e
-			return callback(new Error(e))
-		db.users.findOne query, projection, (error, user) ->
-			return callback(error) if error?
-			return callback(null, user, false) if user?
-			db.userstubs.findOne query, projection, (error, user) ->
-				return callback(error) if error
-				return callback() if !user?
-				callback(null, user, true)
+	getUserOrUserStubById(user_id, projection, callback) {
+		let query;
+		if (callback == null) { callback = function(error, user, isStub) {}; }
+		try {
+			query = {_id: ObjectId(user_id.toString())};
+		} catch (e) {
+			return callback(new Error(e));
+		}
+		return db.users.findOne(query, projection, function(error, user) {
+			if (error != null) { return callback(error); }
+			if (user != null) { return callback(null, user, false); }
+			return db.userstubs.findOne(query, projection, function(error, user) {
+				if (error) { return callback(error); }
+				if ((user == null)) { return callback(); }
+				return callback(null, user, true);
+			});
+		});
+	},
 
-	# check for duplicate email address. This is also enforced at the DB level
-	ensureUniqueEmailAddress: (newEmail, callback) ->
-		@getUserByAnyEmail newEmail, (error, user) ->
-			return callback(new Errors.EmailExistsError('alread_exists')) if user?
-			callback(error)
+	// check for duplicate email address. This is also enforced at the DB level
+	ensureUniqueEmailAddress(newEmail, callback) {
+		return this.getUserByAnyEmail(newEmail, function(error, user) {
+			if (user != null) { return callback(new Errors.EmailExistsError('alread_exists')); }
+			return callback(error);
+		});
+	}
+});
 
-decorateFullEmails = (defaultEmail, emailsData, affiliationsData) ->
-	emailsData.map (emailData) ->
-		emailData.default = emailData.email == defaultEmail
+var decorateFullEmails = (defaultEmail, emailsData, affiliationsData) => emailsData.map(function(emailData) {
+    emailData.default = emailData.email === defaultEmail;
 
-		affiliation = affiliationsData.find (aff) -> aff.email == emailData.email
-		if affiliation?
-			{ institution, inferred, role, department } = affiliation
-			emailData.affiliation = { institution, inferred, role, department }
-		else
-			emailsData.affiliation = null
+    const affiliation = affiliationsData.find(aff => aff.email === emailData.email);
+    if (affiliation != null) {
+        const { institution, inferred, role, department } = affiliation;
+        emailData.affiliation = { institution, inferred, role, department };
+    } else {
+        emailsData.affiliation = null;
+    }
 
-		emailData
+    return emailData;
+});
 
 [
 	'getUser',
@@ -120,5 +169,4 @@ decorateFullEmails = (defaultEmail, emailsData, affiliationsData) ->
 	'getUsers',
 	'getUserOrUserStubById',
 	'ensureUniqueEmailAddress',
-].map (method) ->
-	metrics.timeAsyncMethod UserGetter, method, 'mongo.UserGetter', logger
+].map(method => metrics.timeAsyncMethod(UserGetter, method, 'mongo.UserGetter', logger));

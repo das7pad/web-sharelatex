@@ -1,131 +1,184 @@
-logger = require('logger-sharelatex')
-async = require("async")
-metrics = require('metrics-sharelatex')
-Settings = require('settings-sharelatex')
-ObjectId = require('mongoose').Types.ObjectId
-Project = require('../../models/Project').Project
-Folder = require('../../models/Folder').Folder
-ProjectEntityUpdateHandler = require('./ProjectEntityUpdateHandler')
-ProjectDetailsHandler = require('./ProjectDetailsHandler')
-HistoryManager = require('../History/HistoryManager')
-User = require('../../models/User').User
-fs = require('fs')
-Path = require "path"
-_ = require "underscore"
-AnalyticsManger = require("../Analytics/AnalyticsManager")
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS103: Rewrite code to no longer use __guard__
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let ProjectCreationHandler;
+const logger = require('logger-sharelatex');
+const async = require("async");
+const metrics = require('metrics-sharelatex');
+const Settings = require('settings-sharelatex');
+const {
+    ObjectId
+} = require('mongoose').Types;
+const {
+    Project
+} = require('../../models/Project');
+const {
+    Folder
+} = require('../../models/Folder');
+const ProjectEntityUpdateHandler = require('./ProjectEntityUpdateHandler');
+const ProjectDetailsHandler = require('./ProjectDetailsHandler');
+const HistoryManager = require('../History/HistoryManager');
+const {
+    User
+} = require('../../models/User');
+const fs = require('fs');
+const Path = require("path");
+const _ = require("underscore");
+const AnalyticsManger = require("../Analytics/AnalyticsManager");
 
-module.exports = ProjectCreationHandler =
+module.exports = (ProjectCreationHandler = {
 
-	createBlankProject : (owner_id, projectName, attributes, callback = (error, project) ->)->
-		metrics.inc("project-creation")
-		if arguments.length == 3
-			callback = attributes
-			attributes = null
+	createBlankProject(owner_id, projectName, attributes, callback){
+		if (callback == null) { callback = function(error, project) {}; }
+		metrics.inc("project-creation");
+		if (arguments.length === 3) {
+			callback = attributes;
+			attributes = null;
+		}
 
-		ProjectDetailsHandler.validateProjectName projectName, (error) ->
-			return callback(error) if error?
-			logger.log owner_id:owner_id, projectName:projectName, "creating blank project"
-			if attributes?
-				ProjectCreationHandler._createBlankProject owner_id, projectName, attributes, (error, project) ->
-					return callback(error) if error?
+		return ProjectDetailsHandler.validateProjectName(projectName, function(error) {
+			if (error != null) { return callback(error); }
+			logger.log({owner_id, projectName}, "creating blank project");
+			if (attributes != null) {
+				return ProjectCreationHandler._createBlankProject(owner_id, projectName, attributes, function(error, project) {
+					if (error != null) { return callback(error); }
 					AnalyticsManger.recordEvent(
-						owner_id, 'project-imported', { projectId: project._id, attributes: attributes }
-					)
-					callback(error, project)
-			else
-				HistoryManager.initializeProject (error, history) ->
-					return callback(error) if error?
-					attributes = overleaf: history: id: history?.overleaf_id
-					ProjectCreationHandler._createBlankProject owner_id, projectName, attributes, (error, project) ->
-						return callback(error) if error?
+						owner_id, 'project-imported', { projectId: project._id, attributes }
+					);
+					return callback(error, project);
+				});
+			} else {
+				return HistoryManager.initializeProject(function(error, history) {
+					if (error != null) { return callback(error); }
+					attributes = {overleaf: {history: {id: (history != null ? history.overleaf_id : undefined)}}};
+					return ProjectCreationHandler._createBlankProject(owner_id, projectName, attributes, function(error, project) {
+						if (error != null) { return callback(error); }
 						AnalyticsManger.recordEvent(
 							owner_id, 'project-created', { projectId: project._id }
-						)
-						callback(error, project)
+						);
+						return callback(error, project);
+					});
+				});
+			}
+		});
+	},
 
-	_createBlankProject : (owner_id, projectName, attributes, callback = (error, project) ->)->
-		rootFolder = new Folder {'name':'rootFolder'}
+	_createBlankProject(owner_id, projectName, attributes, callback){
+		if (callback == null) { callback = function(error, project) {}; }
+		const rootFolder = new Folder({'name':'rootFolder'});
 
-		attributes.owner_ref = new ObjectId(owner_id)
-		attributes.name = projectName
-		project = new Project attributes
+		attributes.owner_ref = new ObjectId(owner_id);
+		attributes.name = projectName;
+		const project = new Project(attributes);
 
-		Object.assign(project, attributes)
+		Object.assign(project, attributes);
 
-		if Settings.apis?.project_history?.displayHistoryForNewProjects
-			project.overleaf.history.display = true
-		if Settings.currentImageName?
-			# avoid clobbering any imageName already set in attributes (e.g. importedImageName)
-			project.imageName ?= Settings.currentImageName
-		project.rootFolder[0] = rootFolder
-		User.findById owner_id, "ace.spellCheckLanguage", (err, user)->
-			if user? # It's possible the owner_id is a UserStub
-				project.spellCheckLanguage = user.ace.spellCheckLanguage
-			project.save (err)->
-				return callback(err) if err?
-				callback err, project
+		if (__guard__(Settings.apis != null ? Settings.apis.project_history : undefined, x => x.displayHistoryForNewProjects)) {
+			project.overleaf.history.display = true;
+		}
+		if (Settings.currentImageName != null) {
+			// avoid clobbering any imageName already set in attributes (e.g. importedImageName)
+			if (project.imageName == null) { project.imageName = Settings.currentImageName; }
+		}
+		project.rootFolder[0] = rootFolder;
+		return User.findById(owner_id, "ace.spellCheckLanguage", function(err, user){
+			if (user != null) { // It's possible the owner_id is a UserStub
+				project.spellCheckLanguage = user.ace.spellCheckLanguage;
+			}
+			return project.save(function(err){
+				if (err != null) { return callback(err); }
+				return callback(err, project);
+			});
+		});
+	},
 
-	createProjectFromSnippet : (owner_id, projectName, docLines, callback = (error, project) ->)->
-		@createBlankProject owner_id, projectName, (error, project)->
-			return callback(error) if error?
-			ProjectCreationHandler._createRootDoc project, owner_id, docLines, callback
+	createProjectFromSnippet(owner_id, projectName, docLines, callback){
+		if (callback == null) { callback = function(error, project) {}; }
+		return this.createBlankProject(owner_id, projectName, function(error, project){
+			if (error != null) { return callback(error); }
+			return ProjectCreationHandler._createRootDoc(project, owner_id, docLines, callback);
+		});
+	},
 
-	createBasicProject :  (owner_id, projectName, callback = (error, project) ->)->
-		self = @
-		@createBlankProject owner_id, projectName, (error, project)->
-			return callback(error) if error?
-			self._buildTemplate "mainbasic.tex", owner_id, projectName, (error, docLines)->
-				return callback(error) if error?
-				ProjectCreationHandler._createRootDoc project, owner_id, docLines, callback
+	createBasicProject(owner_id, projectName, callback){
+		if (callback == null) { callback = function(error, project) {}; }
+		const self = this;
+		return this.createBlankProject(owner_id, projectName, function(error, project){
+			if (error != null) { return callback(error); }
+			return self._buildTemplate("mainbasic.tex", owner_id, projectName, function(error, docLines){
+				if (error != null) { return callback(error); }
+				return ProjectCreationHandler._createRootDoc(project, owner_id, docLines, callback);
+			});
+		});
+	},
 
-	createExampleProject: (owner_id, projectName, callback = (error, project) ->)->
-		self = @
-		@createBlankProject owner_id, projectName, (error, project)->
-			return callback(error) if error?
-			async.series [
-				(callback) ->
-					self._buildTemplate "main.tex", owner_id, projectName, (error, docLines)->
-						return callback(error) if error?
-						ProjectCreationHandler._createRootDoc project, owner_id, docLines, callback
-				(callback) ->
-					self._buildTemplate "references.bib", owner_id, projectName, (error, docLines)->
-						return callback(error) if error?
-						ProjectEntityUpdateHandler.addDoc project._id, project.rootFolder[0]._id, "references.bib", docLines, owner_id, (error, doc)->
-							callback(error)
-				(callback) ->
-					universePath = Path.resolve(__dirname + "/../../../templates/project_files/universe.jpg")
-					ProjectEntityUpdateHandler.addFile project._id, project.rootFolder[0]._id, "universe.jpg", universePath, null, owner_id, callback
-			], (error) ->
-				callback(error, project)
+	createExampleProject(owner_id, projectName, callback){
+		if (callback == null) { callback = function(error, project) {}; }
+		const self = this;
+		return this.createBlankProject(owner_id, projectName, function(error, project){
+			if (error != null) { return callback(error); }
+			return async.series([
+				callback => self._buildTemplate("main.tex", owner_id, projectName, function(error, docLines){
+                    if (error != null) { return callback(error); }
+                    return ProjectCreationHandler._createRootDoc(project, owner_id, docLines, callback);
+                }),
+				callback => self._buildTemplate("references.bib", owner_id, projectName, function(error, docLines){
+                    if (error != null) { return callback(error); }
+                    return ProjectEntityUpdateHandler.addDoc(project._id, project.rootFolder[0]._id, "references.bib", docLines, owner_id, (error, doc) => callback(error));
+                }),
+				function(callback) {
+					const universePath = Path.resolve(__dirname + "/../../../templates/project_files/universe.jpg");
+					return ProjectEntityUpdateHandler.addFile(project._id, project.rootFolder[0]._id, "universe.jpg", universePath, null, owner_id, callback);
+				}
+			], error => callback(error, project));
+		});
+	},
 
-	_createRootDoc: (project, owner_id, docLines, callback = (error, project) ->)->
-		ProjectEntityUpdateHandler.addDoc project._id, project.rootFolder[0]._id, "main.tex", docLines, owner_id, (error, doc)->
-			if error?
-				logger.err err:error, "error adding root doc when creating project"
-				return callback(error)
-			ProjectEntityUpdateHandler.setRootDoc project._id, doc._id, (error) ->
-				callback(error, project)
+	_createRootDoc(project, owner_id, docLines, callback){
+		if (callback == null) { callback = function(error, project) {}; }
+		return ProjectEntityUpdateHandler.addDoc(project._id, project.rootFolder[0]._id, "main.tex", docLines, owner_id, function(error, doc){
+			if (error != null) {
+				logger.err({err:error}, "error adding root doc when creating project");
+				return callback(error);
+			}
+			return ProjectEntityUpdateHandler.setRootDoc(project._id, doc._id, error => callback(error, project));
+		});
+	},
 
-	_buildTemplate: (template_name, user_id, project_name, callback = (error, output) ->)->
-		User.findById user_id, "first_name last_name", (error, user)->
-			return callback(error) if error?
-			monthNames = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ]
+	_buildTemplate(template_name, user_id, project_name, callback){
+		if (callback == null) { callback = function(error, output) {}; }
+		return User.findById(user_id, "first_name last_name", function(error, user){
+			if (error != null) { return callback(error); }
+			const monthNames = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
 
-			templatePath = Path.resolve(__dirname + "/../../../templates/project_files/#{template_name}")
-			fs.readFile templatePath, (error, template) ->
-				return callback(error) if error?
-				data =
-					project_name: project_name
-					user: user
-					year: new Date().getUTCFullYear()
+			const templatePath = Path.resolve(__dirname + `/../../../templates/project_files/${template_name}`);
+			return fs.readFile(templatePath, function(error, template) {
+				if (error != null) { return callback(error); }
+				const data = {
+					project_name,
+					user,
+					year: new Date().getUTCFullYear(),
 					month: monthNames[new Date().getUTCMonth()]
-				output = _.template(template.toString(), data)
-				callback null, output.split("\n")
+				};
+				const output = _.template(template.toString(), data);
+				return callback(null, output.split("\n"));
+			});
+		});
+	}
+});
 
 metrics.timeAsyncMethod(
 	ProjectCreationHandler, 'createBlankProject',
 	'mongo.ProjectCreationHandler',
 	logger
-)
+);
 
 
+
+function __guard__(value, transform) {
+  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+}

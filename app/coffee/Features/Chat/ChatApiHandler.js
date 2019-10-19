@@ -1,82 +1,111 @@
-request = require("request")
-settings = require("settings-sharelatex")
-logger = require("logger-sharelatex")
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let ChatApiHandler;
+const request = require("request");
+const settings = require("settings-sharelatex");
+const logger = require("logger-sharelatex");
 
-module.exports = ChatApiHandler =
-	_apiRequest: (opts, callback = (error, data) ->) ->
-		request opts, (error, response, data) ->
-			return callback(error) if error?
-			if 200 <= response.statusCode < 300
-				return callback null, data
-			else
-				error = new Error("chat api returned non-success code: #{response.statusCode}")
-				error.statusCode = response.statusCode
-				logger.error {err: error, opts}, "error sending request to chat api"
-				return callback error
+module.exports = (ChatApiHandler = {
+	_apiRequest(opts, callback) {
+		if (callback == null) { callback = function(error, data) {}; }
+		return request(opts, function(error, response, data) {
+			if (error != null) { return callback(error); }
+			if (200 <= response.statusCode && response.statusCode < 300) {
+				return callback(null, data);
+			} else {
+				error = new Error(`chat api returned non-success code: ${response.statusCode}`);
+				error.statusCode = response.statusCode;
+				logger.error({err: error, opts}, "error sending request to chat api");
+				return callback(error);
+			}
+		});
+	},
 
-	sendGlobalMessage: (project_id, user_id, content, callback)->
-		ChatApiHandler._apiRequest {
-			url:    "#{settings.apis.chat.internal_url}/project/#{project_id}/messages"
-			method: "POST"
+	sendGlobalMessage(project_id, user_id, content, callback){
+		return ChatApiHandler._apiRequest({
+			url:    `${settings.apis.chat.internal_url}/project/${project_id}/messages`,
+			method: "POST",
 			json:   {user_id, content}
-		}, callback
+		}, callback);
+	},
 
-	getGlobalMessages: (project_id, limit, before, callback)->
-		qs = {}
-		qs.limit = limit if limit?
-		qs.before = before if before?
+	getGlobalMessages(project_id, limit, before, callback){
+		const qs = {};
+		if (limit != null) { qs.limit = limit; }
+		if (before != null) { qs.before = before; }
 		
-		ChatApiHandler._apiRequest {
-			url:    "#{settings.apis.chat.internal_url}/project/#{project_id}/messages"
-			method: "GET"
-			qs:     qs
+		return ChatApiHandler._apiRequest({
+			url:    `${settings.apis.chat.internal_url}/project/${project_id}/messages`,
+			method: "GET",
+			qs,
 			json:   true
-		}, callback
+		}, callback);
+	},
 	
-	sendComment: (project_id, thread_id, user_id, content, callback = (error) ->) ->
-		ChatApiHandler._apiRequest {
-			url:    "#{settings.apis.chat.internal_url}/project/#{project_id}/thread/#{thread_id}/messages"
-			method: "POST"
+	sendComment(project_id, thread_id, user_id, content, callback) {
+		if (callback == null) { callback = function(error) {}; }
+		return ChatApiHandler._apiRequest({
+			url:    `${settings.apis.chat.internal_url}/project/${project_id}/thread/${thread_id}/messages`,
+			method: "POST",
 			json:   {user_id, content}
-		}, callback
+		}, callback);
+	},
 	
-	getThreads: (project_id, callback = (error) ->) ->
-		ChatApiHandler._apiRequest {
-			url:    "#{settings.apis.chat.internal_url}/project/#{project_id}/threads"
-			method: "GET"
+	getThreads(project_id, callback) {
+		if (callback == null) { callback = function(error) {}; }
+		return ChatApiHandler._apiRequest({
+			url:    `${settings.apis.chat.internal_url}/project/${project_id}/threads`,
+			method: "GET",
 			json:   true
-		}, callback
+		}, callback);
+	},
 	
-	resolveThread: (project_id, thread_id, user_id, callback = (error) ->) ->
-		ChatApiHandler._apiRequest {
-			url:    "#{settings.apis.chat.internal_url}/project/#{project_id}/thread/#{thread_id}/resolve"
-			method: "POST"
+	resolveThread(project_id, thread_id, user_id, callback) {
+		if (callback == null) { callback = function(error) {}; }
+		return ChatApiHandler._apiRequest({
+			url:    `${settings.apis.chat.internal_url}/project/${project_id}/thread/${thread_id}/resolve`,
+			method: "POST",
 			json:   {user_id}
-		}, callback
+		}, callback);
+	},
 	
-	reopenThread: (project_id, thread_id, callback = (error) ->) ->
-		ChatApiHandler._apiRequest {
-			url:    "#{settings.apis.chat.internal_url}/project/#{project_id}/thread/#{thread_id}/reopen"
+	reopenThread(project_id, thread_id, callback) {
+		if (callback == null) { callback = function(error) {}; }
+		return ChatApiHandler._apiRequest({
+			url:    `${settings.apis.chat.internal_url}/project/${project_id}/thread/${thread_id}/reopen`,
 			method: "POST"
-		}, callback
+		}, callback);
+	},
 	
-	deleteThread: (project_id, thread_id, callback = (error) ->) ->
-		ChatApiHandler._apiRequest {
-			url:    "#{settings.apis.chat.internal_url}/project/#{project_id}/thread/#{thread_id}"
+	deleteThread(project_id, thread_id, callback) {
+		if (callback == null) { callback = function(error) {}; }
+		return ChatApiHandler._apiRequest({
+			url:    `${settings.apis.chat.internal_url}/project/${project_id}/thread/${thread_id}`,
 			method: "DELETE"
-		}, callback
+		}, callback);
+	},
 	
-	editMessage: (project_id, thread_id, message_id, content, callback = (error) ->) ->
-		ChatApiHandler._apiRequest {
-			url:    "#{settings.apis.chat.internal_url}/project/#{project_id}/thread/#{thread_id}/messages/#{message_id}/edit"
-			method: "POST"
-			json:
-				content: content
-		}, callback
+	editMessage(project_id, thread_id, message_id, content, callback) {
+		if (callback == null) { callback = function(error) {}; }
+		return ChatApiHandler._apiRequest({
+			url:    `${settings.apis.chat.internal_url}/project/${project_id}/thread/${thread_id}/messages/${message_id}/edit`,
+			method: "POST",
+			json: {
+				content
+			}
+		}, callback);
+	},
 	
-	deleteMessage: (project_id, thread_id, message_id, callback = (error) ->) ->
-		ChatApiHandler._apiRequest {
-			url:    "#{settings.apis.chat.internal_url}/project/#{project_id}/thread/#{thread_id}/messages/#{message_id}"
+	deleteMessage(project_id, thread_id, message_id, callback) {
+		if (callback == null) { callback = function(error) {}; }
+		return ChatApiHandler._apiRequest({
+			url:    `${settings.apis.chat.internal_url}/project/${project_id}/thread/${thread_id}/messages/${message_id}`,
 			method: "DELETE"
-		}, callback
+		}, callback);
+	}
+});
 		

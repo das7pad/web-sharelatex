@@ -1,343 +1,424 @@
-logger = require 'logger-sharelatex'
-Settings = require('settings-sharelatex')
-SubscriptionFormatters = require('../Features/Subscription/SubscriptionFormatters')
-querystring = require('querystring')
-SystemMessageManager = require("../Features/SystemMessages/SystemMessageManager")
-AuthenticationController = require("../Features/Authentication/AuthenticationController")
-_ = require("underscore")
-Url = require "url"
-PackageVersions = require "./PackageVersions"
-htmlEncoder = new require("node-html-encoder").Encoder("numerical")
-hashedFiles = require "./HashedFiles"
-Path = require 'path'
-Features = require "./Features"
-Modules = require "./Modules"
-moment = require 'moment'
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS103: Rewrite code to no longer use __guard__
+ * DS205: Consider reworking code to avoid use of IIFEs
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const logger = require('logger-sharelatex');
+const Settings = require('settings-sharelatex');
+const SubscriptionFormatters = require('../Features/Subscription/SubscriptionFormatters');
+const querystring = require('querystring');
+const SystemMessageManager = require("../Features/SystemMessages/SystemMessageManager");
+const AuthenticationController = require("../Features/Authentication/AuthenticationController");
+const _ = require("underscore");
+const Url = require("url");
+const PackageVersions = require("./PackageVersions");
+const htmlEncoder = new require("node-html-encoder").Encoder("numerical");
+const hashedFiles = require("./HashedFiles");
+const Path = require('path');
+const Features = require("./Features");
+const Modules = require("./Modules");
+const moment = require('moment');
 
-jsPath =
-	if Settings.useMinifiedJs
+const jsPath =
+	Settings.useMinifiedJs ?
 		"/minjs/"
-	else
-		"/js/"
+	:
+		"/js/";
 
-ace = PackageVersions.lib('ace')
-pdfjs = PackageVersions.lib('pdfjs')
-fineuploader = PackageVersions.lib('fineuploader')
+const ace = PackageVersions.lib('ace');
+const pdfjs = PackageVersions.lib('pdfjs');
+const fineuploader = PackageVersions.lib('fineuploader');
 
-cdnAvailable = Settings.cdn?.web?.host?
-darkCdnAvailable = Settings.cdn?.web?.darkHost?
+const cdnAvailable = (__guard__(Settings.cdn != null ? Settings.cdn.web : undefined, x => x.host) != null);
+const darkCdnAvailable = (__guard__(Settings.cdn != null ? Settings.cdn.web : undefined, x1 => x1.darkHost) != null);
 
-module.exports = (app, webRouter, privateApiRouter, publicApiRouter)->
-	webRouter.use (req, res, next)->
-		res.locals.session = req.session
-		next()
+module.exports = function(app, webRouter, privateApiRouter, publicApiRouter){
+	webRouter.use(function(req, res, next){
+		res.locals.session = req.session;
+		return next();
+	});
 
-	addSetContentDisposition = (req, res, next) ->
-		res.setContentDisposition = (type, opts) ->
-			directives = for k, v of opts
-				"#{k}=\"#{encodeURIComponent(v)}\""
-			contentDispositionValue = "#{type}; #{directives.join('; ')}"
-			res.setHeader(
+	const addSetContentDisposition = function(req, res, next) {
+		res.setContentDisposition = function(type, opts) {
+			const directives = (() => {
+				const result = [];
+				for (let k in opts) {
+					const v = opts[k];
+					result.push(`${k}=\"${encodeURIComponent(v)}\"`);
+				}
+				return result;
+			})();
+			const contentDispositionValue = `${type}; ${directives.join('; ')}`;
+			return res.setHeader(
 				'Content-Disposition',
 				contentDispositionValue
-			)
-		next()
-	webRouter.use addSetContentDisposition
-	privateApiRouter.use addSetContentDisposition
-	publicApiRouter.use addSetContentDisposition
+			);
+		};
+		return next();
+	};
+	webRouter.use(addSetContentDisposition);
+	privateApiRouter.use(addSetContentDisposition);
+	publicApiRouter.use(addSetContentDisposition);
 
-	webRouter.use (req, res, next)->
-		req.externalAuthenticationSystemUsed = Features.externalAuthenticationSystemUsed
-		res.locals.externalAuthenticationSystemUsed = Features.externalAuthenticationSystemUsed
-		req.hasFeature = res.locals.hasFeature = Features.hasFeature
-		res.locals.userIsFromOLv1 = (user) ->
-			user.overleaf?.id?
-		res.locals.userIsFromSL = (user) ->
-			!user.overleaf?.id?
-		next()
+	webRouter.use(function(req, res, next){
+		req.externalAuthenticationSystemUsed = Features.externalAuthenticationSystemUsed;
+		res.locals.externalAuthenticationSystemUsed = Features.externalAuthenticationSystemUsed;
+		req.hasFeature = (res.locals.hasFeature = Features.hasFeature);
+		res.locals.userIsFromOLv1 = user => (user.overleaf != null ? user.overleaf.id : undefined) != null;
+		res.locals.userIsFromSL = user => (user.overleaf != null ? user.overleaf.id : undefined) == null;
+		return next();
+	});
 
-	webRouter.use (req, res, next)->
+	webRouter.use(function(req, res, next){
 
-		cdnBlocked = req.query.nocdn == 'true' or req.session.cdnBlocked
-		user_id = AuthenticationController.getLoggedInUserId(req)
+		let staticFilesBase;
+		const cdnBlocked = (req.query.nocdn === 'true') || req.session.cdnBlocked;
+		const user_id = AuthenticationController.getLoggedInUserId(req);
 
-		if cdnBlocked and !req.session.cdnBlocked?
-			logger.log user_id:user_id, ip:req?.ip, "cdnBlocked for user, not using it and turning it off for future requets"
-			req.session.cdnBlocked = true
+		if (cdnBlocked && (req.session.cdnBlocked == null)) {
+			logger.log({user_id, ip:(req != null ? req.ip : undefined)}, "cdnBlocked for user, not using it and turning it off for future requets");
+			req.session.cdnBlocked = true;
+		}
 
-		isDark = req.headers?.host?.slice(0,7)?.toLowerCase().indexOf("dark") != -1
-		isSmoke = req.headers?.host?.slice(0,5)?.toLowerCase() == "smoke"
-		isLive = !isDark and !isSmoke
+		const isDark = __guard__(__guard__(req.headers != null ? req.headers.host : undefined, x3 => x3.slice(0,7)), x2 => x2.toLowerCase().indexOf("dark")) !== -1;
+		const isSmoke = __guard__(__guard__(req.headers != null ? req.headers.host : undefined, x5 => x5.slice(0,5)), x4 => x4.toLowerCase()) === "smoke";
+		const isLive = !isDark && !isSmoke;
 
-		if cdnAvailable and isLive and !cdnBlocked
-			staticFilesBase = Settings.cdn?.web?.host
-		else if darkCdnAvailable and isDark
-			staticFilesBase = Settings.cdn?.web?.darkHost
-		else
-			staticFilesBase = ""
+		if (cdnAvailable && isLive && !cdnBlocked) {
+			staticFilesBase = __guard__(Settings.cdn != null ? Settings.cdn.web : undefined, x6 => x6.host);
+		} else if (darkCdnAvailable && isDark) {
+			staticFilesBase = __guard__(Settings.cdn != null ? Settings.cdn.web : undefined, x7 => x7.darkHost);
+		} else {
+			staticFilesBase = "";
+		}
 
-		res.locals.staticPath = (path) ->
-			if staticFilesBase and path.indexOf('/') == 0
-				# preserve the path component of the base url
-				path = path.substring(1)
-			return Url.resolve(staticFilesBase, path)
+		res.locals.staticPath = function(path) {
+			if (staticFilesBase && (path.indexOf('/') === 0)) {
+				// preserve the path component of the base url
+				path = path.substring(1);
+			}
+			return Url.resolve(staticFilesBase, path);
+		};
 
-		res.locals.jsPath = jsPath
-		res.locals.fullJsPath = res.locals.staticPath(jsPath)
-		res.locals.lib = PackageVersions.lib
+		res.locals.jsPath = jsPath;
+		res.locals.fullJsPath = res.locals.staticPath(jsPath);
+		res.locals.lib = PackageVersions.lib;
 
-		res.locals.moment = moment
+		res.locals.moment = moment;
 
-		res.locals.buildJsPath = (jsFile, opts = {})->
-			path = Path.join(jsPath, jsFile)
+		res.locals.buildJsPath = function(jsFile, opts){
+			if (opts == null) { opts = {}; }
+			let path = Path.join(jsPath, jsFile);
 
-			if opts.hashedPath && !Settings.cdn.hasUniqueURI && hashedFiles[path]?
-				path = hashedFiles[path]
+			if (opts.hashedPath && !Settings.cdn.hasUniqueURI && (hashedFiles[path] != null)) {
+				path = hashedFiles[path];
+			}
 
-			if !opts.qs?
-				opts.qs = {}
+			if ((opts.qs == null)) {
+				opts.qs = {};
+			}
 
-			if opts.cdn != false
-				path = res.locals.staticPath(path)
+			if (opts.cdn !== false) {
+				path = res.locals.staticPath(path);
+			}
 
-			qs = querystring.stringify(opts.qs)
+			const qs = querystring.stringify(opts.qs);
 
-			if opts.removeExtension == true
-				path = path.slice(0,-3)
+			if (opts.removeExtension === true) {
+				path = path.slice(0,-3);
+			}
 
-			if qs? and qs.length > 0
-				path = path + "?" + qs
-			return path
+			if ((qs != null) && (qs.length > 0)) {
+				path = path + "?" + qs;
+			}
+			return path;
+		};
 
-		res.locals.buildWebpackPath = (jsFile, opts = {}) ->
-			if Settings.webpack? and !Settings.useMinifiedJs
-				path = Path.join(jsPath, jsFile)
-				if opts.removeExtension == true
-					path = path.slice(0,-3)
-				return "#{Settings.webpack.url}/public#{path}"
-			else
-				return res.locals.buildJsPath(jsFile, opts)
+		res.locals.buildWebpackPath = function(jsFile, opts) {
+			if (opts == null) { opts = {}; }
+			if ((Settings.webpack != null) && !Settings.useMinifiedJs) {
+				let path = Path.join(jsPath, jsFile);
+				if (opts.removeExtension === true) {
+					path = path.slice(0,-3);
+				}
+				return `${Settings.webpack.url}/public${path}`;
+			} else {
+				return res.locals.buildJsPath(jsFile, opts);
+			}
+		};
 
 
-		IEEE_BRAND_ID = 15
-		res.locals.isIEEE = (brandVariation) ->
-			brandVariation?.brand_id == IEEE_BRAND_ID
+		const IEEE_BRAND_ID = 15;
+		res.locals.isIEEE = brandVariation => (brandVariation != null ? brandVariation.brand_id : undefined) === IEEE_BRAND_ID;
 
-		_buildCssFileName = (themeModifier) ->
-			return "/" + Settings.brandPrefix + (if themeModifier then themeModifier else "") + "style.css"
+		const _buildCssFileName = themeModifier => "/" + Settings.brandPrefix + (themeModifier ? themeModifier : "") + "style.css";
 
-		res.locals.getCssThemeModifier = (userSettings, brandVariation) ->
-			# Themes only exist in OL v2
-			if Settings.hasThemes?
-				# The IEEE theme takes precedence over the user personal setting, i.e. a user with
-				# a theme setting of "light" will still get the IEE theme in IEEE branded projects.
-				if res.locals.isIEEE(brandVariation)
-					themeModifier = "ieee-"
-				else if userSettings?.overallTheme?
-					themeModifier = userSettings.overallTheme
-			return themeModifier
+		res.locals.getCssThemeModifier = function(userSettings, brandVariation) {
+			// Themes only exist in OL v2
+			let themeModifier;
+			if (Settings.hasThemes != null) {
+				// The IEEE theme takes precedence over the user personal setting, i.e. a user with
+				// a theme setting of "light" will still get the IEE theme in IEEE branded projects.
+				if (res.locals.isIEEE(brandVariation)) {
+					themeModifier = "ieee-";
+				} else if ((userSettings != null ? userSettings.overallTheme : undefined) != null) {
+					themeModifier = userSettings.overallTheme;
+				}
+			}
+			return themeModifier;
+		};
 
-		res.locals.buildCssPath = (themeModifier, buildOpts) ->
-			cssFileName = _buildCssFileName themeModifier
-			path = Path.join("/stylesheets/", cssFileName)
-			if buildOpts?.hashedPath && !Settings.cdn.hasUniqueURI && hashedFiles[path]?
-				hashedPath = hashedFiles[path]
-				return res.locals.staticPath(hashedPath)
-			return res.locals.staticPath(path)
+		res.locals.buildCssPath = function(themeModifier, buildOpts) {
+			const cssFileName = _buildCssFileName(themeModifier);
+			const path = Path.join("/stylesheets/", cssFileName);
+			if ((buildOpts != null ? buildOpts.hashedPath : undefined) && !Settings.cdn.hasUniqueURI && (hashedFiles[path] != null)) {
+				const hashedPath = hashedFiles[path];
+				return res.locals.staticPath(hashedPath);
+			}
+			return res.locals.staticPath(path);
+		};
 
-		res.locals.buildImgPath = (imgFile)->
-			path = Path.join("/img/", imgFile)
-			return res.locals.staticPath(path)
+		res.locals.buildImgPath = function(imgFile){
+			const path = Path.join("/img/", imgFile);
+			return res.locals.staticPath(path);
+		};
 
 		res.locals.mathJaxPath = res.locals.buildJsPath(
 			'libs/mathjax/MathJax.js',
 			{cdn:Settings.cdn.ServeMathJax, qs:{config:'TeX-AMS_HTML,Safe'}}
-		)
+		);
 
-		next()
+		return next();
+	});
 
-	webRouter.use (req, res, next)->
-		res.locals.settings = Settings
-		next()
+	webRouter.use(function(req, res, next){
+		res.locals.settings = Settings;
+		return next();
+	});
 
-	webRouter.use (req, res, next)->
-		res.locals.translate = (key, vars = {}, htmlEncode = false) ->
-			vars.appName = Settings.appName
-			str = req.i18n.translate(key, vars)
-			if htmlEncode then htmlEncoder.htmlEncode(str) else str
-		# Don't include the query string parameters, otherwise Google
-		# treats ?nocdn=true as the canonical version
-		res.locals.currentUrl = Url.parse(req.originalUrl).pathname
-		res.locals.getTranslationUrl = (spec) ->
-			# see settings.i18n.subdomainLang
-			return spec.url + res.locals.currentUrl + '?setGlobalLng=' + spec.lngCode
-		res.locals.capitalize = (string) ->
-			return "" if string.length == 0
-			return string.charAt(0).toUpperCase() + string.slice(1)
-		next()
+	webRouter.use(function(req, res, next){
+		res.locals.translate = function(key, vars, htmlEncode) {
+			if (vars == null) { vars = {}; }
+			if (htmlEncode == null) { htmlEncode = false; }
+			vars.appName = Settings.appName;
+			const str = req.i18n.translate(key, vars);
+			if (htmlEncode) { return htmlEncoder.htmlEncode(str); } else { return str; }
+		};
+		// Don't include the query string parameters, otherwise Google
+		// treats ?nocdn=true as the canonical version
+		res.locals.currentUrl = Url.parse(req.originalUrl).pathname;
+		res.locals.getTranslationUrl = spec => // see settings.i18n.subdomainLang
+        spec.url + res.locals.currentUrl + '?setGlobalLng=' + spec.lngCode;
+		res.locals.capitalize = function(string) {
+			if (string.length === 0) { return ""; }
+			return string.charAt(0).toUpperCase() + string.slice(1);
+		};
+		return next();
+	});
 
-	webRouter.use (req, res, next)->
-		res.locals.getSiteHost = ->
-			Settings.siteUrl.substring(Settings.siteUrl.indexOf("//")+2)
-		next()
+	webRouter.use(function(req, res, next){
+		res.locals.getSiteHost = () => Settings.siteUrl.substring(Settings.siteUrl.indexOf("//")+2);
+		return next();
+	});
 
-	webRouter.use (req, res, next) ->
-		res.locals.getUserEmail = ->
-			user = AuthenticationController.getSessionUser(req)
-			email = user?.email or ""
-			return email
-		next()
+	webRouter.use(function(req, res, next) {
+		res.locals.getUserEmail = function() {
+			const user = AuthenticationController.getSessionUser(req);
+			const email = (user != null ? user.email : undefined) || "";
+			return email;
+		};
+		return next();
+	});
 
-	webRouter.use (req, res, next) ->
-		res.locals.StringHelper = require('../Features/Helpers/StringHelper')
-		next()
+	webRouter.use(function(req, res, next) {
+		res.locals.StringHelper = require('../Features/Helpers/StringHelper');
+		return next();
+	});
 
-	webRouter.use (req, res, next)->
-		res.locals.formatProjectPublicAccessLevel = (privilegeLevel)->
-			formatedPrivileges = private:"Private", readOnly:"Public: Read Only", readAndWrite:"Public: Read and Write"
-			return formatedPrivileges[privilegeLevel] || "Private"
-		next()
+	webRouter.use(function(req, res, next){
+		res.locals.formatProjectPublicAccessLevel = function(privilegeLevel){
+			const formatedPrivileges = {private:"Private", readOnly:"Public: Read Only", readAndWrite:"Public: Read and Write"};
+			return formatedPrivileges[privilegeLevel] || "Private";
+		};
+		return next();
+	});
 
-	webRouter.use (req, res, next)->
-		res.locals.buildReferalUrl = (referal_medium) ->
-			url = Settings.siteUrl
-			currentUser = AuthenticationController.getSessionUser(req)
-			if currentUser? and currentUser?.referal_id?
-				url+="?r=#{currentUser.referal_id}&rm=#{referal_medium}&rs=b" # Referal source = bonus
-			return url
-		res.locals.getReferalId = ->
-			currentUser = AuthenticationController.getSessionUser(req)
-			if currentUser? and currentUser?.referal_id?
-				return currentUser.referal_id
-		res.locals.getReferalTagLine = ->
-			tagLines = [
-				"Roar!"
-				"Shout about us!"
-				"Please recommend us"
-				"Tell the world!"
+	webRouter.use(function(req, res, next){
+		res.locals.buildReferalUrl = function(referal_medium) {
+			let url = Settings.siteUrl;
+			const currentUser = AuthenticationController.getSessionUser(req);
+			if ((currentUser != null) && ((currentUser != null ? currentUser.referal_id : undefined) != null)) {
+				url+=`?r=${currentUser.referal_id}&rm=${referal_medium}&rs=b`; // Referal source = bonus
+			}
+			return url;
+		};
+		res.locals.getReferalId = function() {
+			const currentUser = AuthenticationController.getSessionUser(req);
+			if ((currentUser != null) && ((currentUser != null ? currentUser.referal_id : undefined) != null)) {
+				return currentUser.referal_id;
+			}
+		};
+		res.locals.getReferalTagLine = function() {
+			const tagLines = [
+				"Roar!",
+				"Shout about us!",
+				"Please recommend us",
+				"Tell the world!",
 				"Thanks for using ShareLaTeX"
-			]
-			return tagLines[Math.floor(Math.random()*tagLines.length)]
-		res.locals.getRedirAsQueryString = ->
-			if req.query.redir?
-				return "?#{querystring.stringify({redir:req.query.redir})}"
-			return ""
+			];
+			return tagLines[Math.floor(Math.random()*tagLines.length)];
+		};
+		res.locals.getRedirAsQueryString = function() {
+			if (req.query.redir != null) {
+				return `?${querystring.stringify({redir:req.query.redir})}`;
+			}
+			return "";
+		};
 
-		res.locals.getLoggedInUserId = ->
-			return AuthenticationController.getLoggedInUserId(req)
-		res.locals.isUserLoggedIn = ->
-			return AuthenticationController.isUserLoggedIn(req)
-		res.locals.getSessionUser = ->
-			return AuthenticationController.getSessionUser(req)
+		res.locals.getLoggedInUserId = () => AuthenticationController.getLoggedInUserId(req);
+		res.locals.isUserLoggedIn = () => AuthenticationController.isUserLoggedIn(req);
+		res.locals.getSessionUser = () => AuthenticationController.getSessionUser(req);
 
-		next()
+		return next();
+	});
 
-	webRouter.use (req, res, next) ->
-		res.locals.csrfToken = req?.csrfToken()
-		next()
+	webRouter.use(function(req, res, next) {
+		res.locals.csrfToken = req != null ? req.csrfToken() : undefined;
+		return next();
+	});
 
-	webRouter.use (req, res, next) ->
-		res.locals.getReqQueryParam = (field)->
-			return req.query?[field]
-		next()
+	webRouter.use(function(req, res, next) {
+		res.locals.getReqQueryParam = field => req.query != null ? req.query[field] : undefined;
+		return next();
+	});
 
-	webRouter.use (req, res, next)->
-		res.locals.formatPrice = SubscriptionFormatters.formatPrice
-		next()
+	webRouter.use(function(req, res, next){
+		res.locals.formatPrice = SubscriptionFormatters.formatPrice;
+		return next();
+	});
 
-	webRouter.use (req, res, next)->
-		currentUser = AuthenticationController.getSessionUser(req)
-		if currentUser?
-			res.locals.user =
-				email: currentUser.email
-				first_name: currentUser.first_name
+	webRouter.use(function(req, res, next){
+		const currentUser = AuthenticationController.getSessionUser(req);
+		if (currentUser != null) {
+			res.locals.user = {
+				email: currentUser.email,
+				first_name: currentUser.first_name,
 				last_name: currentUser.last_name
-			if req.session.justRegistered
-				res.locals.justRegistered = true
-				delete req.session.justRegistered
-			if req.session.justLoggedIn
-				res.locals.justLoggedIn = true
-				delete req.session.justLoggedIn
-		res.locals.gaToken       = Settings.analytics?.ga?.token
-		res.locals.tenderUrl     = Settings.tenderUrl
-		res.locals.sentrySrc     = Settings.sentry?.src
-		res.locals.sentryPublicDSN = Settings.sentry?.publicDSN
-		res.locals.sentrySampleRate = Settings.sentry?.sampleRate or 0.01
-		res.locals.sentryCommit = Settings.sentry?.commit or '@@COMMIT@@'
-		res.locals.sentryRelease = Settings.sentry?.release or '@@RELEASE@@'
-		next()
+			};
+			if (req.session.justRegistered) {
+				res.locals.justRegistered = true;
+				delete req.session.justRegistered;
+			}
+			if (req.session.justLoggedIn) {
+				res.locals.justLoggedIn = true;
+				delete req.session.justLoggedIn;
+			}
+		}
+		res.locals.gaToken       = __guard__(Settings.analytics != null ? Settings.analytics.ga : undefined, x2 => x2.token);
+		res.locals.tenderUrl     = Settings.tenderUrl;
+		res.locals.sentrySrc     = Settings.sentry != null ? Settings.sentry.src : undefined;
+		res.locals.sentryPublicDSN = Settings.sentry != null ? Settings.sentry.publicDSN : undefined;
+		res.locals.sentrySampleRate = (Settings.sentry != null ? Settings.sentry.sampleRate : undefined) || 0.01;
+		res.locals.sentryCommit = (Settings.sentry != null ? Settings.sentry.commit : undefined) || '@@COMMIT@@';
+		res.locals.sentryRelease = (Settings.sentry != null ? Settings.sentry.release : undefined) || '@@RELEASE@@';
+		return next();
+	});
 
-	webRouter.use (req, res, next) ->
-		if req.query? and req.query.scribtex_path?
-			res.locals.lookingForScribtex = true
-			res.locals.scribtexPath = req.query.scribtex_path
-		next()
+	webRouter.use(function(req, res, next) {
+		if ((req.query != null) && (req.query.scribtex_path != null)) {
+			res.locals.lookingForScribtex = true;
+			res.locals.scribtexPath = req.query.scribtex_path;
+		}
+		return next();
+	});
 
-	webRouter.use (req, res, next) ->
-		# Clone the nav settings so they can be modified for each request
-		res.locals.nav = {}
-		for key, value of Settings.nav
-			res.locals.nav[key] = _.clone(Settings.nav[key])
-		res.locals.templates = Settings.templateLinks
-		if res.locals.nav.header
-			console.error {}, "The `nav.header` setting is no longer supported, use `nav.header_extras` instead"
-		next()
+	webRouter.use(function(req, res, next) {
+		// Clone the nav settings so they can be modified for each request
+		res.locals.nav = {};
+		for (let key in Settings.nav) {
+			const value = Settings.nav[key];
+			res.locals.nav[key] = _.clone(Settings.nav[key]);
+		}
+		res.locals.templates = Settings.templateLinks;
+		if (res.locals.nav.header) {
+			console.error({}, "The `nav.header` setting is no longer supported, use `nav.header_extras` instead");
+		}
+		return next();
+	});
 
-	webRouter.use (req, res, next) ->
-		SystemMessageManager.getMessages (error, messages = []) ->
-			res.locals.systemMessages = messages
-			next()
+	webRouter.use((req, res, next) => SystemMessageManager.getMessages(function(error, messages) {
+        if (messages == null) { messages = []; }
+        res.locals.systemMessages = messages;
+        return next();
+    }));
 
-	webRouter.use (req, res, next)->
-		res.locals.query = req.query
-		next()
+	webRouter.use(function(req, res, next){
+		res.locals.query = req.query;
+		return next();
+	});
 
-	webRouter.use (req, res, next)->
-		subdomain = _.find Settings.i18n.subdomainLang, (subdomain)->
-			subdomain.lngCode == req.showUserOtherLng and !subdomain.hide
-		res.locals.recomendSubdomain = subdomain
-		res.locals.currentLngCode = req.lng
-		next()
+	webRouter.use(function(req, res, next){
+		const subdomain = _.find(Settings.i18n.subdomainLang, subdomain => (subdomain.lngCode === req.showUserOtherLng) && !subdomain.hide);
+		res.locals.recomendSubdomain = subdomain;
+		res.locals.currentLngCode = req.lng;
+		return next();
+	});
 
-	webRouter.use (req, res, next) ->
-		if Settings.reloadModuleViewsOnEachRequest
-			Modules.loadViewIncludes()
-		res.locals.moduleIncludes = Modules.moduleIncludes
-		res.locals.moduleIncludesAvailable = Modules.moduleIncludesAvailable
-		next()
+	webRouter.use(function(req, res, next) {
+		if (Settings.reloadModuleViewsOnEachRequest) {
+			Modules.loadViewIncludes();
+		}
+		res.locals.moduleIncludes = Modules.moduleIncludes;
+		res.locals.moduleIncludesAvailable = Modules.moduleIncludesAvailable;
+		return next();
+	});
 
-	webRouter.use (req, res, next) ->
-		isSl = (Settings.brandPrefix == 'sl-')
-		res.locals.uiConfig =
-			defaultResizerSizeOpen     : if isSl then 24 else 7
-			defaultResizerSizeClosed   : if isSl then 24 else 7
-			eastResizerCursor          : if isSl then null else "ew-resize"
-			westResizerCursor          : if isSl then null else "ew-resize"
-			chatResizerSizeOpen        : if isSl then 12 else 7
-			chatResizerSizeClosed      : 0
-			chatMessageBorderSaturation: if isSl then "70%" else "85%"
-			chatMessageBorderLightness : if isSl then "70%" else "40%"
-			chatMessageBgSaturation    : if isSl then "60%" else "85%"
-			chatMessageBgLightness     : if isSl then "97%" else "40%"
-			defaultFontFamily          : if isSl then 'monaco' else 'lucida'
-			defaultLineHeight          : if isSl then 'compact' else 'normal'
+	webRouter.use(function(req, res, next) {
+		const isSl = (Settings.brandPrefix === 'sl-');
+		res.locals.uiConfig = {
+			defaultResizerSizeOpen     : isSl ? 24 : 7,
+			defaultResizerSizeClosed   : isSl ? 24 : 7,
+			eastResizerCursor          : isSl ? null : "ew-resize",
+			westResizerCursor          : isSl ? null : "ew-resize",
+			chatResizerSizeOpen        : isSl ? 12 : 7,
+			chatResizerSizeClosed      : 0,
+			chatMessageBorderSaturation: isSl ? "70%" : "85%",
+			chatMessageBorderLightness : isSl ? "70%" : "40%",
+			chatMessageBgSaturation    : isSl ? "60%" : "85%",
+			chatMessageBgLightness     : isSl ? "97%" : "40%",
+			defaultFontFamily          : isSl ? 'monaco' : 'lucida',
+			defaultLineHeight          : isSl ? 'compact' : 'normal',
 			renderAnnouncements        : isSl
-		next()
+		};
+		return next();
+	});
 
-	webRouter.use (req, res, next) ->
-		#TODO
-		if Settings.hasThemes?
+	webRouter.use(function(req, res, next) {
+		//TODO
+		if (Settings.hasThemes != null) {
 			res.locals.overallThemes = [
-				{ name: "Default", val: "",       path: res.locals.buildCssPath(null,     { hashedPath: true }) }
+				{ name: "Default", val: "",       path: res.locals.buildCssPath(null,     { hashedPath: true }) },
 				{ name: "Light",   val: "light-", path: res.locals.buildCssPath("light-", { hashedPath: true }) }
-			]
-		next()
+			];
+		}
+		return next();
+	});
 
-	webRouter.use (req, res, next) ->
-		res.locals.ExposedSettings =
-			isOverleaf: Settings.overleaf?
-			appName: Settings.appName
-			siteUrl: Settings.siteUrl
-			recaptchaSiteKeyV3: Settings.recaptcha?.siteKeyV3
-			recaptchaDisabled: Settings.recaptcha?.disabled
-		next()
+	return webRouter.use(function(req, res, next) {
+		res.locals.ExposedSettings = {
+			isOverleaf: (Settings.overleaf != null),
+			appName: Settings.appName,
+			siteUrl: Settings.siteUrl,
+			recaptchaSiteKeyV3: (Settings.recaptcha != null ? Settings.recaptcha.siteKeyV3 : undefined),
+			recaptchaDisabled: (Settings.recaptcha != null ? Settings.recaptcha.disabled : undefined)
+		};
+		return next();
+	});
+};
+
+function __guard__(value, transform) {
+  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+}

@@ -1,12 +1,22 @@
-logger = require("logger-sharelatex")
-User = require('../../models/User').User
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const logger = require("logger-sharelatex");
+const {
+    User
+} = require('../../models/User');
 
-module.exports =
-	updateFeatures: (user_id, features, callback = (err, features, featuresChanged)->)->
-		conditions = _id:user_id
-		update = {}
-		logger.log user_id:user_id, features:features, "updating users features"
-		update["features.#{key}"] = value for key, value of features
-		User.update conditions, update, (err, result)->
-			callback err, features, result?.nModified == 1
+module.exports = {
+	updateFeatures(user_id, features, callback){
+		if (callback == null) { callback = function(err, features, featuresChanged){}; }
+		const conditions = {_id:user_id};
+		const update = {};
+		logger.log({user_id, features}, "updating users features");
+		for (let key in features) { const value = features[key]; update[`features.${key}`] = value; }
+		return User.update(conditions, update, (err, result) => callback(err, features, (result != null ? result.nModified : undefined) === 1));
+	}
+};
 

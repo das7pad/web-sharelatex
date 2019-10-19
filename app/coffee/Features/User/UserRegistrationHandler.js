@@ -1,83 +1,113 @@
-User = require("../../models/User").User
-UserCreator = require("./UserCreator")
-UserGetter = require("./UserGetter")
-AuthenticationManager = require("../Authentication/AuthenticationManager")
-NewsLetterManager = require("../Newsletter/NewsletterManager")
-async = require("async")
-logger = require("logger-sharelatex")
-crypto = require("crypto")
-EmailHandler = require("../Email/EmailHandler")
-OneTimeTokenHandler = require "../Security/OneTimeTokenHandler"
-Analytics = require "../Analytics/AnalyticsManager"
-settings = require "settings-sharelatex"
-EmailHelper = require("../Helpers/EmailHelper")
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let UserRegistrationHandler;
+const {
+    User
+} = require("../../models/User");
+const UserCreator = require("./UserCreator");
+const UserGetter = require("./UserGetter");
+const AuthenticationManager = require("../Authentication/AuthenticationManager");
+const NewsLetterManager = require("../Newsletter/NewsletterManager");
+const async = require("async");
+const logger = require("logger-sharelatex");
+const crypto = require("crypto");
+const EmailHandler = require("../Email/EmailHandler");
+const OneTimeTokenHandler = require("../Security/OneTimeTokenHandler");
+const Analytics = require("../Analytics/AnalyticsManager");
+const settings = require("settings-sharelatex");
+const EmailHelper = require("../Helpers/EmailHelper");
 
-module.exports = UserRegistrationHandler =
-	_registrationRequestIsValid : (body, callback)->
-		invalidEmail = AuthenticationManager.validateEmail(body.email or '')
-		invalidPassword = AuthenticationManager.validatePassword(body.password or '')
-		if invalidEmail? or invalidPassword?
-			return false
-		else
-			return true
+module.exports = (UserRegistrationHandler = {
+	_registrationRequestIsValid(body, callback){
+		const invalidEmail = AuthenticationManager.validateEmail(body.email || '');
+		const invalidPassword = AuthenticationManager.validatePassword(body.password || '');
+		if ((invalidEmail != null) || (invalidPassword != null)) {
+			return false;
+		} else {
+			return true;
+		}
+	},
 
-	_createNewUserIfRequired: (user, userDetails, callback)->
-		if !user?
-			userDetails.holdingAccount = false
-			UserCreator.createNewUser {holdingAccount:false, email:userDetails.email, first_name:userDetails.first_name, last_name:userDetails.last_name}, callback
-		else
-			callback null, user
+	_createNewUserIfRequired(user, userDetails, callback){
+		if ((user == null)) {
+			userDetails.holdingAccount = false;
+			return UserCreator.createNewUser({holdingAccount:false, email:userDetails.email, first_name:userDetails.first_name, last_name:userDetails.last_name}, callback);
+		} else {
+			return callback(null, user);
+		}
+	},
 
-	registerNewUser: (userDetails, callback)->
-		self = @
-		requestIsValid = @_registrationRequestIsValid userDetails
-		if !requestIsValid
-			return callback(new Error("request is not valid"))
-		userDetails.email = EmailHelper.parseEmail(userDetails.email)
-		UserGetter.getUserByAnyEmail userDetails.email, (err, user) =>
-			if err?
-				return callback err
-			if user?.holdingAccount == false
-				return callback(new Error("EmailAlreadyRegistered"), user)
-			self._createNewUserIfRequired user, userDetails, (err, user)->
-				if err?
-					return callback(err)
-				async.series [
-					(cb)-> User.update {_id: user._id}, {"$set":{holdingAccount:false}}, cb
-					(cb)-> AuthenticationManager.setUserPassword user._id, userDetails.password, cb
-					(cb)->
-						if userDetails.subscribeToNewsletter == "true"
-							NewsLetterManager.subscribe user, ->
-						cb() #this can be slow, just fire it off
-				], (err)->
-					logger.log user: user, "registered"
-					Analytics.recordEvent user._id, "user-registered"
-					callback(err, user)
+	registerNewUser(userDetails, callback){
+		const self = this;
+		const requestIsValid = this._registrationRequestIsValid(userDetails);
+		if (!requestIsValid) {
+			return callback(new Error("request is not valid"));
+		}
+		userDetails.email = EmailHelper.parseEmail(userDetails.email);
+		return UserGetter.getUserByAnyEmail(userDetails.email, (err, user) => {
+			if (err != null) {
+				return callback(err);
+			}
+			if ((user != null ? user.holdingAccount : undefined) === false) {
+				return callback(new Error("EmailAlreadyRegistered"), user);
+			}
+			return self._createNewUserIfRequired(user, userDetails, function(err, user){
+				if (err != null) {
+					return callback(err);
+				}
+				return async.series([
+					cb => User.update({_id: user._id}, {"$set":{holdingAccount:false}}, cb),
+					cb => AuthenticationManager.setUserPassword(user._id, userDetails.password, cb),
+					function(cb){
+						if (userDetails.subscribeToNewsletter === "true") {
+							NewsLetterManager.subscribe(user, function() {});
+						}
+						return cb();
+					} //this can be slow, just fire it off
+				], function(err){
+					logger.log({user}, "registered");
+					Analytics.recordEvent(user._id, "user-registered");
+					return callback(err, user);
+				});
+			});
+		});
+	},
 	
-	registerNewUserAndSendActivationEmail: (email, callback = (error, user, setNewPasswordUrl) ->) ->
-		logger.log {email}, "registering new user"
-		UserRegistrationHandler.registerNewUser {
-			email: email
+	registerNewUserAndSendActivationEmail(email, callback) {
+		if (callback == null) { callback = function(error, user, setNewPasswordUrl) {}; }
+		logger.log({email}, "registering new user");
+		return UserRegistrationHandler.registerNewUser({
+			email,
 			password: crypto.randomBytes(32).toString("hex")
-		}, (err, user)->
-			if err? and err?.message != "EmailAlreadyRegistered"
-				return callback(err)
+		}, function(err, user){
+			if ((err != null) && ((err != null ? err.message : undefined) !== "EmailAlreadyRegistered")) {
+				return callback(err);
+			}
 			
-			if err?.message == "EmailAlreadyRegistered"
-				logger.log {email}, "user already exists, resending welcome email"
+			if ((err != null ? err.message : undefined) === "EmailAlreadyRegistered") {
+				logger.log({email}, "user already exists, resending welcome email");
+			}
 
-			ONE_WEEK = 7 * 24 * 60 * 60 # seconds
-			OneTimeTokenHandler.getNewToken 'password', user._id, { expiresIn: ONE_WEEK }, (err, token)->
-				return callback(err) if err?
+			const ONE_WEEK = 7 * 24 * 60 * 60; // seconds
+			return OneTimeTokenHandler.getNewToken('password', user._id, { expiresIn: ONE_WEEK }, function(err, token){
+				if (err != null) { return callback(err); }
 				
-				setNewPasswordUrl = "#{settings.siteUrl}/user/activate?token=#{token}&user_id=#{user._id}"
+				const setNewPasswordUrl = `${settings.siteUrl}/user/activate?token=${token}&user_id=${user._id}`;
 
-				EmailHandler.sendEmail "registered", {
-					to: user.email
-					setNewPasswordUrl: setNewPasswordUrl
-				}, () ->
+				EmailHandler.sendEmail("registered", {
+					to: user.email,
+					setNewPasswordUrl
+				}, function() {});
 				
-				callback null, user, setNewPasswordUrl
+				return callback(null, user, setNewPasswordUrl);
+			});
+		});
+	}
+});
 
 
 

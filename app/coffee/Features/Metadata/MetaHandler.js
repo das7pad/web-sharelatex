@@ -1,66 +1,111 @@
-ProjectEntityHandler = require "../Project/ProjectEntityHandler"
-DocumentUpdaterHandler = require '../DocumentUpdater/DocumentUpdaterHandler'
-packageMapping = require "./packageMapping"
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let MetaHandler;
+const ProjectEntityHandler = require("../Project/ProjectEntityHandler");
+const DocumentUpdaterHandler = require('../DocumentUpdater/DocumentUpdaterHandler');
+const packageMapping = require("./packageMapping");
 
 
-module.exports = MetaHandler =
+module.exports = (MetaHandler = {
 
-	labelRegex: () ->
-		/\\label{(.{0,80}?)}/g
+	labelRegex() {
+		return /\\label{(.{0,80}?)}/g;
+	},
 
-	usepackageRegex: () ->
-		/^\\usepackage(?:\[.{0,80}?])?{(.{0,80}?)}/g
+	usepackageRegex() {
+		return /^\\usepackage(?:\[.{0,80}?])?{(.{0,80}?)}/g;
+	},
 
-	ReqPackageRegex: () ->
-		/^\\RequirePackage(?:\[.{0,80}?])?{(.{0,80}?)}/g
+	ReqPackageRegex() {
+		return /^\\RequirePackage(?:\[.{0,80}?])?{(.{0,80}?)}/g;
+	},
 
-	getAllMetaForProject: (projectId, callback=(err, projectMeta)->) ->
-		DocumentUpdaterHandler.flushProjectToMongo projectId, (err) ->
-			if err?
-				return callback err
-			ProjectEntityHandler.getAllDocs projectId, (err, docs) ->
-				if err?
-					return callback err
-				projectMeta = MetaHandler.extractMetaFromProjectDocs docs
-				callback null, projectMeta
+	getAllMetaForProject(projectId, callback) {
+		if (callback == null) { callback = function(err, projectMeta){}; }
+		return DocumentUpdaterHandler.flushProjectToMongo(projectId, function(err) {
+			if (err != null) {
+				return callback(err);
+			}
+			return ProjectEntityHandler.getAllDocs(projectId, function(err, docs) {
+				if (err != null) {
+					return callback(err);
+				}
+				const projectMeta = MetaHandler.extractMetaFromProjectDocs(docs);
+				return callback(null, projectMeta);
+			});
+		});
+	},
 
-	getMetaForDoc: (projectId, docId, callback=(err, docMeta)->) ->
-		DocumentUpdaterHandler.flushDocToMongo projectId, docId, (err) ->
-			if err?
-				return callback err
-			ProjectEntityHandler.getDoc projectId, docId, (err, lines) ->
-				if err?
-					return callback err
-				docMeta = MetaHandler.extractMetaFromDoc lines
-				callback null, docMeta
+	getMetaForDoc(projectId, docId, callback) {
+		if (callback == null) { callback = function(err, docMeta){}; }
+		return DocumentUpdaterHandler.flushDocToMongo(projectId, docId, function(err) {
+			if (err != null) {
+				return callback(err);
+			}
+			return ProjectEntityHandler.getDoc(projectId, docId, function(err, lines) {
+				if (err != null) {
+					return callback(err);
+				}
+				const docMeta = MetaHandler.extractMetaFromDoc(lines);
+				return callback(null, docMeta);
+			});
+		});
+	},
 
-	extractMetaFromDoc: (lines) ->
-		docMeta = {labels: [], packages: {}}
-		packages = []
-		label_re = MetaHandler.labelRegex()
-		package_re = MetaHandler.usepackageRegex()
-		req_package_re = MetaHandler.ReqPackageRegex()
-		for line in lines
-			while labelMatch = label_re.exec line
-				if label = labelMatch[1]
-					docMeta.labels.push label
-			while packageMatch = package_re.exec line
-				if messy = packageMatch[1]
-					for pkg in messy.split ','
-						if clean = pkg.trim()
-							packages.push clean
-			while packageMatch = req_package_re.exec line
-				if messy = packageMatch[1]
-					for pkg in messy.split ','
-						if clean = pkg.trim()
-							packages.push clean
-		for pkg in packages
-			if packageMapping[pkg]?
-				docMeta.packages[pkg] = packageMapping[pkg]
-		return docMeta
+	extractMetaFromDoc(lines) {
+		let pkg;
+		const docMeta = {labels: [], packages: {}};
+		const packages = [];
+		const label_re = MetaHandler.labelRegex();
+		const package_re = MetaHandler.usepackageRegex();
+		const req_package_re = MetaHandler.ReqPackageRegex();
+		for (let line of Array.from(lines)) {
+			var labelMatch;
+			var clean, messy, packageMatch;
+			while ((labelMatch = label_re.exec(line))) {
+				var label;
+				if (label = labelMatch[1]) {
+					docMeta.labels.push(label);
+				}
+			}
+			while ((packageMatch = package_re.exec(line))) {
+				if (messy = packageMatch[1]) {
+					for (pkg of Array.from(messy.split(','))) {
+						if (clean = pkg.trim()) {
+							packages.push(clean);
+						}
+					}
+				}
+			}
+			while ((packageMatch = req_package_re.exec(line))) {
+				if (messy = packageMatch[1]) {
+					for (pkg of Array.from(messy.split(','))) {
+						if (clean = pkg.trim()) {
+							packages.push(clean);
+						}
+					}
+				}
+			}
+		}
+		for (pkg of Array.from(packages)) {
+			if (packageMapping[pkg] != null) {
+				docMeta.packages[pkg] = packageMapping[pkg];
+			}
+		}
+		return docMeta;
+	},
 
-	extractMetaFromProjectDocs: (projectDocs) ->
-		projectMeta = {}
-		for _path, doc of projectDocs
-			projectMeta[doc._id] = MetaHandler.extractMetaFromDoc doc.lines
-		return projectMeta
+	extractMetaFromProjectDocs(projectDocs) {
+		const projectMeta = {};
+		for (let _path in projectDocs) {
+			const doc = projectDocs[_path];
+			projectMeta[doc._id] = MetaHandler.extractMetaFromDoc(doc.lines);
+		}
+		return projectMeta;
+	}
+});

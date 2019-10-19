@@ -1,94 +1,146 @@
-async = require "async"
-fs    = require "fs"
-_     = require "underscore"
-FileTypeManager  = require "./FileTypeManager"
-EditorController = require "../Editor/EditorController"
-logger = require("logger-sharelatex")
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let FileSystemImportManager;
+const async = require("async");
+const fs    = require("fs");
+const _     = require("underscore");
+const FileTypeManager  = require("./FileTypeManager");
+const EditorController = require("../Editor/EditorController");
+const logger = require("logger-sharelatex");
 
-module.exports = FileSystemImportManager =
-	addDoc: (user_id, project_id, folder_id, name, path, charset, replace, callback = (error, doc)-> )->
-		FileSystemImportManager._isSafeOnFileSystem path, (err, isSafe)->
-			if !isSafe
-				logger.log user_id:user_id, project_id:project_id, folder_id:folder_id, docName:name, path:path, "add doc is from symlink, stopping process"
-				return callback("path is symlink")
-			fs.readFile path, charset, (error, content) ->
-				return callback(error) if error?
-				content = content.replace(/\r\n?/g, "\n") # convert Windows line endings to unix. very old macs also created \r-separated lines
-				lines = content.split("\n")
-				if replace
-					EditorController.upsertDoc project_id, folder_id, name, lines, "upload", user_id, callback
-				else
-					EditorController.addDoc project_id, folder_id, name, lines, "upload", user_id, callback
+module.exports = (FileSystemImportManager = {
+	addDoc(user_id, project_id, folder_id, name, path, charset, replace, callback ){
+		if (callback == null) { callback = function(error, doc){}; }
+		return FileSystemImportManager._isSafeOnFileSystem(path, function(err, isSafe){
+			if (!isSafe) {
+				logger.log({user_id, project_id, folder_id, docName:name, path}, "add doc is from symlink, stopping process");
+				return callback("path is symlink");
+			}
+			return fs.readFile(path, charset, function(error, content) {
+				if (error != null) { return callback(error); }
+				content = content.replace(/\r\n?/g, "\n"); // convert Windows line endings to unix. very old macs also created \r-separated lines
+				const lines = content.split("\n");
+				if (replace) {
+					return EditorController.upsertDoc(project_id, folder_id, name, lines, "upload", user_id, callback);
+				} else {
+					return EditorController.addDoc(project_id, folder_id, name, lines, "upload", user_id, callback);
+				}
+			});
+		});
+	},
 
-	addFile: (user_id, project_id, folder_id, name, path, replace, callback = (error, file)-> )->
-		FileSystemImportManager._isSafeOnFileSystem path, (err, isSafe)->
-			if !isSafe
-				logger.log user_id:user_id, project_id:project_id, folder_id:folder_id, fileName:name, path:path, "add file is from symlink, stopping insert"
-				return callback("path is symlink")
+	addFile(user_id, project_id, folder_id, name, path, replace, callback ){
+		if (callback == null) { callback = function(error, file){}; }
+		return FileSystemImportManager._isSafeOnFileSystem(path, function(err, isSafe){
+			if (!isSafe) {
+				logger.log({user_id, project_id, folder_id, fileName:name, path}, "add file is from symlink, stopping insert");
+				return callback("path is symlink");
+			}
 
-			if replace
-				EditorController.upsertFile project_id, folder_id, name, path, null, "upload", user_id, callback
-			else
-				EditorController.addFile project_id, folder_id, name, path, null, "upload", user_id, callback
+			if (replace) {
+				return EditorController.upsertFile(project_id, folder_id, name, path, null, "upload", user_id, callback);
+			} else {
+				return EditorController.addFile(project_id, folder_id, name, path, null, "upload", user_id, callback);
+			}
+		});
+	},
 
-	addFolder: (user_id, project_id, folder_id, name, path, replace, callback = (error)-> ) ->
-		FileSystemImportManager._isSafeOnFileSystem path, (err, isSafe)->
-			if !isSafe
-				logger.log user_id:user_id, project_id:project_id, folder_id:folder_id, path:path, "add folder is from symlink, stopping insert"
-				return callback("path is symlink")
-			EditorController.addFolder project_id, folder_id, name, "upload", (error, new_folder) =>
-				return callback(error) if error?
-				FileSystemImportManager.addFolderContents user_id, project_id, new_folder._id, path, replace, (error) ->
-					return callback(error) if error?
-					callback null, new_folder
+	addFolder(user_id, project_id, folder_id, name, path, replace, callback ) {
+		if (callback == null) { callback = function(error){}; }
+		return FileSystemImportManager._isSafeOnFileSystem(path, function(err, isSafe){
+			if (!isSafe) {
+				logger.log({user_id, project_id, folder_id, path}, "add folder is from symlink, stopping insert");
+				return callback("path is symlink");
+			}
+			return EditorController.addFolder(project_id, folder_id, name, "upload", (error, new_folder) => {
+				if (error != null) { return callback(error); }
+				return FileSystemImportManager.addFolderContents(user_id, project_id, new_folder._id, path, replace, function(error) {
+					if (error != null) { return callback(error); }
+					return callback(null, new_folder);
+				});
+			});
+		});
+	},
 
-	addFolderContents: (user_id, project_id, parent_folder_id, folderPath, replace, callback = (error)-> ) ->
-		FileSystemImportManager._isSafeOnFileSystem folderPath, (err, isSafe)->
-			if !isSafe
-				logger.log user_id:user_id, project_id:project_id, parent_folder_id:parent_folder_id, folderPath:folderPath, "add folder contents is from symlink, stopping insert"
-				return callback("path is symlink")
-			fs.readdir folderPath, (error, entries = []) =>
-				return callback(error) if error?
-				async.eachSeries(
+	addFolderContents(user_id, project_id, parent_folder_id, folderPath, replace, callback ) {
+		if (callback == null) { callback = function(error){}; }
+		return FileSystemImportManager._isSafeOnFileSystem(folderPath, function(err, isSafe){
+			if (!isSafe) {
+				logger.log({user_id, project_id, parent_folder_id, folderPath}, "add folder contents is from symlink, stopping insert");
+				return callback("path is symlink");
+			}
+			return fs.readdir(folderPath, (error, entries) => {
+				if (entries == null) { entries = []; }
+				if (error != null) { return callback(error); }
+				return async.eachSeries(
 					entries,
-					(entry, callback) =>
-						FileTypeManager.shouldIgnore entry, (error, ignore) =>
-							return callback(error) if error?
-							if !ignore
-								FileSystemImportManager.addEntity user_id, project_id, parent_folder_id, entry, "#{folderPath}/#{entry}", replace, callback
-							else
-								callback()
+					(entry, callback) => {
+						return FileTypeManager.shouldIgnore(entry, (error, ignore) => {
+							if (error != null) { return callback(error); }
+							if (!ignore) {
+								return FileSystemImportManager.addEntity(user_id, project_id, parent_folder_id, entry, `${folderPath}/${entry}`, replace, callback);
+							} else {
+								return callback();
+							}
+						});
+					},
 					callback
-				)
+				);
+			});
+		});
+	},
 
-	addEntity: (user_id, project_id, folder_id, name, path, replace, callback = (error, entity)-> ) ->
-		FileSystemImportManager._isSafeOnFileSystem path, (err, isSafe)->
-			if !isSafe
-				logger.log user_id:user_id, project_id:project_id, folder_id:folder_id, path:path, "add entry is from symlink, stopping insert"
-				return callback("path is symlink")
+	addEntity(user_id, project_id, folder_id, name, path, replace, callback ) {
+		if (callback == null) { callback = function(error, entity){}; }
+		return FileSystemImportManager._isSafeOnFileSystem(path, function(err, isSafe){
+			if (!isSafe) {
+				logger.log({user_id, project_id, folder_id, path}, "add entry is from symlink, stopping insert");
+				return callback("path is symlink");
+			}
 
-			FileTypeManager.isDirectory path, (error, isDirectory) =>
-				return callback(error) if error?
-				if isDirectory
-					FileSystemImportManager.addFolder user_id, project_id, folder_id, name, path, replace, callback
-				else
-					FileTypeManager.getType name, path, (error, isBinary, charset) =>
-						return callback(error) if error?
-						if isBinary
-							FileSystemImportManager.addFile user_id, project_id, folder_id, name, path, replace, (err, entity) ->
-								entity?.type = 'file'
-								callback(err, entity)
-						else
-							FileSystemImportManager.addDoc user_id, project_id, folder_id, name, path, charset, replace, (err, entity) ->
-								entity?.type = 'doc'
-								callback(err, entity)
+			return FileTypeManager.isDirectory(path, (error, isDirectory) => {
+				if (error != null) { return callback(error); }
+				if (isDirectory) {
+					return FileSystemImportManager.addFolder(user_id, project_id, folder_id, name, path, replace, callback);
+				} else {
+					return FileTypeManager.getType(name, path, (error, isBinary, charset) => {
+						if (error != null) { return callback(error); }
+						if (isBinary) {
+							return FileSystemImportManager.addFile(user_id, project_id, folder_id, name, path, replace, function(err, entity) {
+								if (entity != null) {
+									entity.type = 'file';
+								}
+								return callback(err, entity);
+							});
+						} else {
+							return FileSystemImportManager.addDoc(user_id, project_id, folder_id, name, path, charset, replace, function(err, entity) {
+								if (entity != null) {
+									entity.type = 'doc';
+								}
+								return callback(err, entity);
+							});
+						}
+					});
+				}
+			});
+		});
+	},
 
 
-	_isSafeOnFileSystem: (path, callback = (err, isSafe)->)->
-		fs.lstat path, (err, stat)->
-			if err?
-				logger.err err:err, "error with path symlink check"
-				return callback(err)
-			isSafe = stat.isFile() or stat.isDirectory()
-			callback(err, isSafe)
+	_isSafeOnFileSystem(path, callback){
+		if (callback == null) { callback = function(err, isSafe){}; }
+		return fs.lstat(path, function(err, stat){
+			if (err != null) {
+				logger.err({err}, "error with path symlink check");
+				return callback(err);
+			}
+			const isSafe = stat.isFile() || stat.isDirectory();
+			return callback(err, isSafe);
+		});
+	}
+});
 

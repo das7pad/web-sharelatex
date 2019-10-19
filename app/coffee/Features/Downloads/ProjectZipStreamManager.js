@@ -1,80 +1,109 @@
-archiver = require "archiver"
-async    = require "async"
-logger   = require "logger-sharelatex"
-ProjectEntityHandler = require "../Project/ProjectEntityHandler"
-ProjectGetter = require('../Project/ProjectGetter')
-FileStoreHandler = require("../FileStore/FileStoreHandler")
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let ProjectZipStreamManager;
+const archiver = require("archiver");
+const async    = require("async");
+const logger   = require("logger-sharelatex");
+const ProjectEntityHandler = require("../Project/ProjectEntityHandler");
+const ProjectGetter = require('../Project/ProjectGetter');
+const FileStoreHandler = require("../FileStore/FileStoreHandler");
 
-module.exports = ProjectZipStreamManager =
-	createZipStreamForMultipleProjects: (project_ids, callback = (error, stream) ->) ->
-		# We'll build up a zip file that contains multiple zip files
+module.exports = (ProjectZipStreamManager = {
+	createZipStreamForMultipleProjects(project_ids, callback) {
+		// We'll build up a zip file that contains multiple zip files
 
-		archive = archiver("zip")
-		archive.on "error", (err)->
-			logger.err err:err, project_ids:project_ids, "something went wrong building archive of project"
-		callback null, archive
+		if (callback == null) { callback = function(error, stream) {}; }
+		const archive = archiver("zip");
+		archive.on("error", err => logger.err({err, project_ids}, "something went wrong building archive of project"));
+		callback(null, archive);
 
-		logger.log project_ids: project_ids, "creating zip stream of multiple projects"
+		logger.log({project_ids}, "creating zip stream of multiple projects");
 
-		jobs = []
-		for project_id in project_ids or []
-			do (project_id) ->
-				jobs.push (callback) ->
-					ProjectGetter.getProject project_id, name: true, (error, project) ->
-						return callback(error) if error?
-						logger.log project_id: project_id, projectName: project.name, "appending project to zip stream"
-						ProjectZipStreamManager.createZipStreamForProject project_id, (error, stream) ->
-							return callback(error) if error?
-							archive.append stream, name: "#{project.name}.zip"
-							stream.on "end", () ->
-								logger.log project_id: project_id, projectName: project.name, "zip stream ended"
-								callback()
+		const jobs = [];
+		for (let project_id of Array.from(project_ids || [])) {
+			((project_id => jobs.push(callback => ProjectGetter.getProject(project_id, {name: true}, function(error, project) {
+                if (error != null) { return callback(error); }
+                logger.log({project_id, projectName: project.name}, "appending project to zip stream");
+                return ProjectZipStreamManager.createZipStreamForProject(project_id, function(error, stream) {
+                    if (error != null) { return callback(error); }
+                    archive.append(stream, {name: `${project.name}.zip`});
+                    return stream.on("end", function() {
+                        logger.log({project_id, projectName: project.name}, "zip stream ended");
+                        return callback();
+                    });
+                });
+            }))))(project_id);
+		}
 
-		async.series jobs, () ->
-			logger.log project_ids: project_ids, "finished creating zip stream of multiple projects"
-			archive.finalize()
+		return async.series(jobs, function() {
+			logger.log({project_ids}, "finished creating zip stream of multiple projects");
+			return archive.finalize();
+		});
+	},
 
-	createZipStreamForProject: (project_id, callback = (error, stream) ->) ->
-		archive = archiver("zip")
-		# return stream immediately before we start adding things to it
-		archive.on "error", (err)->
-			logger.err err:err, project_id:project_id, "something went wrong building archive of project"
-		callback(null, archive)
-		@addAllDocsToArchive project_id, archive, (error) =>
-			if error?
-				logger.error err: error, project_id: project_id, "error adding docs to zip stream"
-			@addAllFilesToArchive project_id, archive, (error) =>
-				if error?
-					logger.error err: error, project_id: project_id, "error adding files to zip stream"
-				archive.finalize()
+	createZipStreamForProject(project_id, callback) {
+		if (callback == null) { callback = function(error, stream) {}; }
+		const archive = archiver("zip");
+		// return stream immediately before we start adding things to it
+		archive.on("error", err => logger.err({err, project_id}, "something went wrong building archive of project"));
+		callback(null, archive);
+		return this.addAllDocsToArchive(project_id, archive, error => {
+			if (error != null) {
+				logger.error({err: error, project_id}, "error adding docs to zip stream");
+			}
+			return this.addAllFilesToArchive(project_id, archive, error => {
+				if (error != null) {
+					logger.error({err: error, project_id}, "error adding files to zip stream");
+				}
+				return archive.finalize();
+			});
+		});
+	},
 	
 
-	addAllDocsToArchive: (project_id, archive, callback = (error) ->) ->
-		ProjectEntityHandler.getAllDocs project_id, (error, docs) ->
-			return callback(error) if error?
-			jobs = []
-			for path, doc of docs
-				do (path, doc) ->
-					path = path.slice(1) if path[0] == "/"
-					jobs.push (callback) ->
-						logger.log project_id: project_id, "Adding doc"
-						archive.append doc.lines.join("\n"), name: path
-						callback()
-			async.series jobs, callback
+	addAllDocsToArchive(project_id, archive, callback) {
+		if (callback == null) { callback = function(error) {}; }
+		return ProjectEntityHandler.getAllDocs(project_id, function(error, docs) {
+			if (error != null) { return callback(error); }
+			const jobs = [];
+			for (let path in docs) {
+				const doc = docs[path];
+				(function(path, doc) {
+					if (path[0] === "/") { path = path.slice(1); }
+					return jobs.push(function(callback) {
+						logger.log({project_id}, "Adding doc");
+						archive.append(doc.lines.join("\n"), {name: path});
+						return callback();
+					});
+				})(path, doc);
+			}
+			return async.series(jobs, callback);
+		});
+	},
 
-	addAllFilesToArchive: (project_id, archive, callback = (error) ->) ->
-		ProjectEntityHandler.getAllFiles project_id, (error, files) ->
-			return callback(error) if error?
-			jobs = []
-			for path, file of files
-				do (path, file) ->
-					jobs.push (callback) ->
-						FileStoreHandler.getFileStream  project_id, file._id, {}, (error, stream) ->
-							if error?
-								logger.err err:error, project_id:project_id, file_id:file._id, "something went wrong adding file to zip archive"
-								return callback(err)
-							path = path.slice(1) if path[0] == "/"
-							archive.append stream, name: path
-							stream.on "end", () ->
-								callback()
-			async.parallelLimit jobs, 5, callback
+	addAllFilesToArchive(project_id, archive, callback) {
+		if (callback == null) { callback = function(error) {}; }
+		return ProjectEntityHandler.getAllFiles(project_id, function(error, files) {
+			if (error != null) { return callback(error); }
+			const jobs = [];
+			for (let path in files) {
+				const file = files[path];
+				(((path, file) => jobs.push(callback => FileStoreHandler.getFileStream(project_id, file._id, {}, function(error, stream) {
+                    if (error != null) {
+                        logger.err({err:error, project_id, file_id:file._id}, "something went wrong adding file to zip archive");
+                        return callback(err);
+                    }
+                    if (path[0] === "/") { path = path.slice(1); }
+                    archive.append(stream, {name: path});
+                    return stream.on("end", () => callback());
+                }))))(path, file);
+			}
+			return async.parallelLimit(jobs, 5, callback);
+		});
+	}
+});

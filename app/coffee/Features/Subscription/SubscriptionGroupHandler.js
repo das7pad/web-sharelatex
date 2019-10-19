@@ -1,59 +1,86 @@
-async = require("async")
-_ = require("underscore")
-SubscriptionUpdater = require("./SubscriptionUpdater")
-SubscriptionLocator = require("./SubscriptionLocator")
-UserGetter = require("../User/UserGetter")
-Subscription = require("../../models/Subscription").Subscription
-LimitationsManager = require("./LimitationsManager")
-logger = require("logger-sharelatex")
-OneTimeTokenHandler = require("../Security/OneTimeTokenHandler")
-EmailHandler = require("../Email/EmailHandler")
-settings = require("settings-sharelatex")
-NotificationsBuilder = require("../Notifications/NotificationsBuilder")
-UserMembershipViewModel = require("../UserMembership/UserMembershipViewModel")
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS103: Rewrite code to no longer use __guard__
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let SubscriptionGroupHandler;
+const async = require("async");
+const _ = require("underscore");
+const SubscriptionUpdater = require("./SubscriptionUpdater");
+const SubscriptionLocator = require("./SubscriptionLocator");
+const UserGetter = require("../User/UserGetter");
+const {
+    Subscription
+} = require("../../models/Subscription");
+const LimitationsManager = require("./LimitationsManager");
+const logger = require("logger-sharelatex");
+const OneTimeTokenHandler = require("../Security/OneTimeTokenHandler");
+const EmailHandler = require("../Email/EmailHandler");
+const settings = require("settings-sharelatex");
+const NotificationsBuilder = require("../Notifications/NotificationsBuilder");
+const UserMembershipViewModel = require("../UserMembership/UserMembershipViewModel");
 
-module.exports = SubscriptionGroupHandler =
+module.exports = (SubscriptionGroupHandler = {
 
-	removeUserFromGroup: (subscriptionId, userToRemove_id, callback)->
-		SubscriptionUpdater.removeUserFromGroup subscriptionId, userToRemove_id, callback
+	removeUserFromGroup(subscriptionId, userToRemove_id, callback){
+		return SubscriptionUpdater.removeUserFromGroup(subscriptionId, userToRemove_id, callback);
+	},
 
-	replaceUserReferencesInGroups: (oldId, newId, callback) ->
-		logger.log old_id: oldId, new_id: newId, "replacing user reference in groups"
-		Subscription.update {admin_id: oldId}, {admin_id: newId}, (error) ->
-			return callback(error) if error?
+	replaceUserReferencesInGroups(oldId, newId, callback) {
+		logger.log({old_id: oldId, new_id: newId}, "replacing user reference in groups");
+		return Subscription.update({admin_id: oldId}, {admin_id: newId}, function(error) {
+			if (error != null) { return callback(error); }
 
-			replaceInArray Subscription, "manager_ids", oldId, newId, (error) ->
-				return callback(error) if error?
+			return replaceInArray(Subscription, "manager_ids", oldId, newId, function(error) {
+				if (error != null) { return callback(error); }
 
-				replaceInArray Subscription, "member_ids", oldId, newId, callback
+				return replaceInArray(Subscription, "member_ids", oldId, newId, callback);
+			});
+		});
+	},
 
-	isUserPartOfGroup: (user_id, subscription_id, callback=(err, partOfGroup)->)->
-		SubscriptionLocator.getSubscriptionByMemberIdAndId user_id, subscription_id, (err, subscription)->
-			if subscription?
-				partOfGroup = true
-			else
-				partOfGroup = false
-			logger.log user_id:user_id, subscription_id:subscription_id, partOfGroup:partOfGroup, "checking if user is part of a group"
-			callback(err, partOfGroup)
+	isUserPartOfGroup(user_id, subscription_id, callback){
+		if (callback == null) { callback = function(err, partOfGroup){}; }
+		return SubscriptionLocator.getSubscriptionByMemberIdAndId(user_id, subscription_id, function(err, subscription){
+			let partOfGroup;
+			if (subscription != null) {
+				partOfGroup = true;
+			} else {
+				partOfGroup = false;
+			}
+			logger.log({user_id, subscription_id, partOfGroup}, "checking if user is part of a group");
+			return callback(err, partOfGroup);
+		});
+	},
 
-	getTotalConfirmedUsersInGroup: (subscription_id, callback=(err, totalUsers)->)->
-		SubscriptionLocator.getSubscription subscription_id, (err, subscription)->
-			callback(err, subscription?.member_ids?.length)
+	getTotalConfirmedUsersInGroup(subscription_id, callback){
+		if (callback == null) { callback = function(err, totalUsers){}; }
+		return SubscriptionLocator.getSubscription(subscription_id, (err, subscription) => callback(err, __guard__(subscription != null ? subscription.member_ids : undefined, x => x.length)));
+	}
+});
 
-replaceInArray = (model, property, oldValue, newValue, callback) ->
-	logger.log "Replacing #{oldValue} with #{newValue} in #{property} of #{model}"
+var replaceInArray = function(model, property, oldValue, newValue, callback) {
+	logger.log(`Replacing ${oldValue} with ${newValue} in ${property} of ${model}`);
 
-	# Mongo won't let us pull and addToSet in the same query, so do it in
-	# two. Note we need to add first, since the query is based on the old user.
-	query = {}
-	query[property] = oldValue
+	// Mongo won't let us pull and addToSet in the same query, so do it in
+	// two. Note we need to add first, since the query is based on the old user.
+	const query = {};
+	query[property] = oldValue;
 
-	setNewValue = {}
-	setNewValue[property] = newValue
+	const setNewValue = {};
+	setNewValue[property] = newValue;
 
-	setOldValue = {}
-	setOldValue[property] = oldValue
+	const setOldValue = {};
+	setOldValue[property] = oldValue;
 
-	model.update query, { $addToSet: setNewValue }, { multi: true }, (error) ->
-		return callback(error) if error?
-		model.update query, { $pull: setOldValue }, { multi: true }, callback
+	return model.update(query, { $addToSet: setNewValue }, { multi: true }, function(error) {
+		if (error != null) { return callback(error); }
+		return model.update(query, { $pull: setOldValue }, { multi: true }, callback);
+	});
+};
+
+function __guard__(value, transform) {
+  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+}

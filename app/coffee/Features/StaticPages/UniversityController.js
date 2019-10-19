@@ -1,16 +1,25 @@
-settings = require("settings-sharelatex")
-logger = require("logger-sharelatex")
-Settings = require("settings-sharelatex")
-sixpack = require("../../infrastructure/Sixpack")
+/*
+ * decaffeinate suggestions:
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let UniversityController;
+const settings = require("settings-sharelatex");
+const logger = require("logger-sharelatex");
+const Settings = require("settings-sharelatex");
+const sixpack = require("../../infrastructure/Sixpack");
 
 
 
-module.exports = UniversityController =
+module.exports = (UniversityController = {
 
-	getPage: (req, res, next)->
-		url = req.url?.toLowerCase().replace(".html","")
-		return res.redirect("/i#{url}")
+	getPage(req, res, next){
+		const url = req.url != null ? req.url.toLowerCase().replace(".html","") : undefined;
+		return res.redirect(`/i${url}`);
+	},
 
-	getIndexPage: (req, res)->
-		return res.redirect("/i/university")
+	getIndexPage(req, res){
+		return res.redirect("/i/university");
+	}
+});
 

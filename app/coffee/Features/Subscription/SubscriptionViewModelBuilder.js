@@ -1,67 +1,90 @@
-Settings = require('settings-sharelatex')
-RecurlyWrapper = require("./RecurlyWrapper")
-PlansLocator = require("./PlansLocator")
-SubscriptionFormatters = require("./SubscriptionFormatters")
-LimitationsManager = require("./LimitationsManager")
-SubscriptionLocator = require("./SubscriptionLocator")
-V1SubscriptionManager = require("./V1SubscriptionManager")
-InstitutionsGetter = require("../Institutions/InstitutionsGetter")
-PublishersGetter = require("../Publishers/PublishersGetter")
-sanitizeHtml = require 'sanitize-html'
-logger = require('logger-sharelatex')
-_ = require("underscore")
-async = require('async')
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS103: Rewrite code to no longer use __guard__
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const Settings = require('settings-sharelatex');
+const RecurlyWrapper = require("./RecurlyWrapper");
+const PlansLocator = require("./PlansLocator");
+const SubscriptionFormatters = require("./SubscriptionFormatters");
+const LimitationsManager = require("./LimitationsManager");
+const SubscriptionLocator = require("./SubscriptionLocator");
+const V1SubscriptionManager = require("./V1SubscriptionManager");
+const InstitutionsGetter = require("../Institutions/InstitutionsGetter");
+const PublishersGetter = require("../Publishers/PublishersGetter");
+const sanitizeHtml = require('sanitize-html');
+const logger = require('logger-sharelatex');
+const _ = require("underscore");
+const async = require('async');
 
 
-buildBillingDetails = (recurlySubscription) ->
-	hostedLoginToken = recurlySubscription?.account?.hosted_login_token
-	recurlySubdomain = Settings?.apis?.recurly?.subdomain
-	if hostedLoginToken? && recurlySubdomain?
+const buildBillingDetails = function(recurlySubscription) {
+	const hostedLoginToken = __guard__(recurlySubscription != null ? recurlySubscription.account : undefined, x => x.hosted_login_token);
+	const recurlySubdomain = __guard__(__guard__(Settings != null ? Settings.apis : undefined, x2 => x2.recurly), x1 => x1.subdomain);
+	if ((hostedLoginToken != null) && (recurlySubdomain != null)) {
 		return [
 			"https://",
 			recurlySubdomain,
 			".recurly.com/account/billing_info/edit?ht=",
 			hostedLoginToken
-		].join("")
+		].join("");
+	}
+};
 
-module.exports =
-	buildUsersSubscriptionViewModel: (user, callback = (error, data) ->) ->
-		async.auto {
-			personalSubscription: (cb) ->
-				SubscriptionLocator.getUsersSubscription user, cb
-			recurlySubscription: ['personalSubscription', (cb, {personalSubscription}) ->
-				if !personalSubscription?.recurlySubscription_id? or personalSubscription?.recurlySubscription_id == ''
-					return cb(null, null) 
-				RecurlyWrapper.getSubscription personalSubscription.recurlySubscription_id, includeAccount: true, cb
-			]
-			recurlyCoupons: ['recurlySubscription', (cb, {recurlySubscription}) ->
-				return cb(null, null) if !recurlySubscription
-				accountId = recurlySubscription.account.account_code
-				RecurlyWrapper.getAccountActiveCoupons accountId, cb
-			]
-			plan: ['personalSubscription', (cb, {personalSubscription}) ->
-				return cb() if !personalSubscription?
-				plan = PlansLocator.findLocalPlanInSettings(personalSubscription.planCode)
-				return cb(new Error("No plan found for planCode '#{personalSubscription.planCode}'")) if !plan?
-				cb(null, plan)
-			]
-			memberGroupSubscriptions: (cb) ->
-				SubscriptionLocator.getMemberSubscriptions user, cb
-			managedGroupSubscriptions: (cb) ->
-				SubscriptionLocator.getManagedGroupSubscriptions user, cb
-			confirmedMemberInstitutions: (cb) ->
-				InstitutionsGetter.getConfirmedInstitutions user._id, cb
-			managedInstitutions: (cb) ->
-				InstitutionsGetter.getManagedInstitutions user._id, cb
-			managedPublishers: (cb) ->
-				PublishersGetter.getManagedPublishers user._id, cb
-			v1SubscriptionStatus: (cb) ->
-				V1SubscriptionManager.getSubscriptionStatusFromV1 user._id, (error, status, v1Id) ->
-					return cb(error) if error?
-					cb(null, status)
-		}, (err, results) ->
-			return callback(err) if err?
-			{
+module.exports = {
+	buildUsersSubscriptionViewModel(user, callback) {
+		if (callback == null) { callback = function(error, data) {}; }
+		return async.auto({
+			personalSubscription(cb) {
+				return SubscriptionLocator.getUsersSubscription(user, cb);
+			},
+			recurlySubscription: ['personalSubscription', function(cb, {personalSubscription}) {
+				if (((personalSubscription != null ? personalSubscription.recurlySubscription_id : undefined) == null) || ((personalSubscription != null ? personalSubscription.recurlySubscription_id : undefined) === '')) {
+					return cb(null, null); 
+				}
+				return RecurlyWrapper.getSubscription(personalSubscription.recurlySubscription_id, {includeAccount: true}, cb);
+			}
+			],
+			recurlyCoupons: ['recurlySubscription', function(cb, {recurlySubscription}) {
+				if (!recurlySubscription) { return cb(null, null); }
+				const accountId = recurlySubscription.account.account_code;
+				return RecurlyWrapper.getAccountActiveCoupons(accountId, cb);
+			}
+			],
+			plan: ['personalSubscription', function(cb, {personalSubscription}) {
+				if ((personalSubscription == null)) { return cb(); }
+				const plan = PlansLocator.findLocalPlanInSettings(personalSubscription.planCode);
+				if ((plan == null)) { return cb(new Error(`No plan found for planCode '${personalSubscription.planCode}'`)); }
+				return cb(null, plan);
+			}
+			],
+			memberGroupSubscriptions(cb) {
+				return SubscriptionLocator.getMemberSubscriptions(user, cb);
+			},
+			managedGroupSubscriptions(cb) {
+				return SubscriptionLocator.getManagedGroupSubscriptions(user, cb);
+			},
+			confirmedMemberInstitutions(cb) {
+				return InstitutionsGetter.getConfirmedInstitutions(user._id, cb);
+			},
+			managedInstitutions(cb) {
+				return InstitutionsGetter.getManagedInstitutions(user._id, cb);
+			},
+			managedPublishers(cb) {
+				return PublishersGetter.getManagedPublishers(user._id, cb);
+			},
+			v1SubscriptionStatus(cb) {
+				return V1SubscriptionManager.getSubscriptionStatusFromV1(user._id, function(error, status, v1Id) {
+					if (error != null) { return cb(error); }
+					return cb(null, status);
+				});
+			}
+		}, function(err, results) {
+			if (err != null) { return callback(err); }
+			let {
 				personalSubscription,
 				memberGroupSubscriptions,
 				managedGroupSubscriptions,
@@ -72,42 +95,47 @@ module.exports =
 				recurlySubscription,
 				recurlyCoupons,
 				plan
-			} = results
-			memberGroupSubscriptions ?= []
-			managedGroupSubscriptions ?= []
-			confirmedMemberInstitutions ?= []
-			managedInstitutions ?= []
-			v1SubscriptionStatus ?= {}
-			recurlyCoupons ?= []
+			} = results;
+			if (memberGroupSubscriptions == null) { memberGroupSubscriptions = []; }
+			if (managedGroupSubscriptions == null) { managedGroupSubscriptions = []; }
+			if (confirmedMemberInstitutions == null) { confirmedMemberInstitutions = []; }
+			if (managedInstitutions == null) { managedInstitutions = []; }
+			if (v1SubscriptionStatus == null) { v1SubscriptionStatus = {}; }
+			if (recurlyCoupons == null) { recurlyCoupons = []; }
 
 
-			if personalSubscription?.toObject?
-				# Downgrade from Mongoose object, so we can add a recurly and plan attribute
-				personalSubscription = personalSubscription.toObject()
+			if ((personalSubscription != null ? personalSubscription.toObject : undefined) != null) {
+				// Downgrade from Mongoose object, so we can add a recurly and plan attribute
+				personalSubscription = personalSubscription.toObject();
+			}
 
-			if plan?
-				personalSubscription.plan = plan
+			if (plan != null) {
+				personalSubscription.plan = plan;
+			}
 
-			if personalSubscription? and recurlySubscription?
-				tax = recurlySubscription?.tax_in_cents || 0
+			if ((personalSubscription != null) && (recurlySubscription != null)) {
+				const tax = (recurlySubscription != null ? recurlySubscription.tax_in_cents : undefined) || 0;
 				personalSubscription.recurly = {
-					tax: tax
-					taxRate: parseFloat(recurlySubscription?.tax_rate?._)
-					billingDetailsLink: buildBillingDetails(recurlySubscription)
-					price: SubscriptionFormatters.formatPrice (recurlySubscription?.unit_amount_in_cents + tax), recurlySubscription?.currency
-					nextPaymentDueAt: SubscriptionFormatters.formatDate(recurlySubscription?.current_period_ends_at)
-					currency: recurlySubscription.currency
-					state: recurlySubscription.state
-					trialEndsAtFormatted: SubscriptionFormatters.formatDate(recurlySubscription?.trial_ends_at)
-					trial_ends_at: recurlySubscription.trial_ends_at
+					tax,
+					taxRate: parseFloat(__guard__(recurlySubscription != null ? recurlySubscription.tax_rate : undefined, x => x._)),
+					billingDetailsLink: buildBillingDetails(recurlySubscription),
+					price: SubscriptionFormatters.formatPrice(((recurlySubscription != null ? recurlySubscription.unit_amount_in_cents : undefined) + tax), recurlySubscription != null ? recurlySubscription.currency : undefined),
+					nextPaymentDueAt: SubscriptionFormatters.formatDate(recurlySubscription != null ? recurlySubscription.current_period_ends_at : undefined),
+					currency: recurlySubscription.currency,
+					state: recurlySubscription.state,
+					trialEndsAtFormatted: SubscriptionFormatters.formatDate(recurlySubscription != null ? recurlySubscription.trial_ends_at : undefined),
+					trial_ends_at: recurlySubscription.trial_ends_at,
 					activeCoupons: recurlyCoupons
+				};
+			}
+
+			for (let memberGroupSubscription of Array.from(memberGroupSubscriptions)) {
+				if (memberGroupSubscription.teamNotice) {
+					memberGroupSubscription.teamNotice = sanitizeHtml(memberGroupSubscription.teamNotice);
 				}
+			}
 
-			for memberGroupSubscription in memberGroupSubscriptions
-				if memberGroupSubscription.teamNotice
-					memberGroupSubscription.teamNotice = sanitizeHtml(memberGroupSubscription.teamNotice)
-
-			callback null, {
+			return callback(null, {
 				personalSubscription,
 				managedGroupSubscriptions,
 				memberGroupSubscriptions,
@@ -115,35 +143,38 @@ module.exports =
 				managedInstitutions,
 				managedPublishers,
 				v1SubscriptionStatus
-			}
+			});
+	});
+	},
 
-	buildViewModel : ->
-		plans = Settings.plans
+	buildViewModel() {
+		const {
+            plans
+        } = Settings;
 
-		allPlans = {}
-		plans.forEach (plan)->
-			allPlans[plan.planCode] = plan
+		const allPlans = {};
+		plans.forEach(plan => allPlans[plan.planCode] = plan);
 
-		result =
-			allPlans: allPlans
+		const result =
+			{allPlans};
 
 
-		result.personalAccount = _.find plans, (plan)->
-			plan.planCode == "personal"
+		result.personalAccount = _.find(plans, plan => plan.planCode === "personal");
 
-		result.studentAccounts = _.filter plans, (plan)->
-			plan.planCode.indexOf("student") != -1
+		result.studentAccounts = _.filter(plans, plan => plan.planCode.indexOf("student") !== -1);
 
-		result.groupMonthlyPlans = _.filter plans, (plan)->
-			plan.groupPlan and !plan.annual
+		result.groupMonthlyPlans = _.filter(plans, plan => plan.groupPlan && !plan.annual);
 
-		result.groupAnnualPlans = _.filter plans, (plan)->
-			plan.groupPlan and plan.annual
+		result.groupAnnualPlans = _.filter(plans, plan => plan.groupPlan && plan.annual);
 
-		result.individualMonthlyPlans = _.filter plans, (plan)->
-			!plan.groupPlan and !plan.annual and plan.planCode != "personal" and plan.planCode.indexOf("student") == -1
+		result.individualMonthlyPlans = _.filter(plans, plan => !plan.groupPlan && !plan.annual && (plan.planCode !== "personal") && (plan.planCode.indexOf("student") === -1));
 
-		result.individualAnnualPlans = _.filter plans, (plan)->
-			!plan.groupPlan and plan.annual and plan.planCode.indexOf("student") == -1
+		result.individualAnnualPlans = _.filter(plans, plan => !plan.groupPlan && plan.annual && (plan.planCode.indexOf("student") === -1));
 
-		return result
+		return result;
+	}
+};
+
+function __guard__(value, transform) {
+  return (typeof value !== 'undefined' && value !== null) ? transform(value) : undefined;
+}

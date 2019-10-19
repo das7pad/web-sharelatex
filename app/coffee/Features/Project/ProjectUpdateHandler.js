@@ -1,37 +1,58 @@
-Project = require('../../models/Project').Project
-logger = require('logger-sharelatex')
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const {
+    Project
+} = require('../../models/Project');
+const logger = require('logger-sharelatex');
 
-module.exports = 
-	markAsUpdated : (projectId, lastUpdatedAt, lastUpdatedBy, callback = () ->)->
-		lastUpdatedAt ?= new Date()
+module.exports = { 
+	markAsUpdated(projectId, lastUpdatedAt, lastUpdatedBy, callback){
+		if (callback == null) { callback = function() {}; }
+		if (lastUpdatedAt == null) { lastUpdatedAt = new Date(); }
 
-		conditions =
-			_id: projectId
+		const conditions = {
+			_id: projectId,
 			lastUpdated: { $lt: lastUpdatedAt }
+		};
 
-		update = {
-			lastUpdated: lastUpdatedAt or (new Date()).getTime()
-			lastUpdatedBy: lastUpdatedBy
-		}
-		Project.update conditions, update, {}, callback
+		const update = {
+			lastUpdated: lastUpdatedAt || (new Date()).getTime(),
+			lastUpdatedBy
+		};
+		return Project.update(conditions, update, {}, callback);
+	},
 
-	markAsOpened : (project_id, callback)->
-		conditions = {_id:project_id}
-		update = {lastOpened:Date.now()}
-		Project.update conditions, update, {}, (err)->
-			if callback?
-				callback()
+	markAsOpened(project_id, callback){
+		const conditions = {_id:project_id};
+		const update = {lastOpened:Date.now()};
+		return Project.update(conditions, update, {}, function(err){
+			if (callback != null) {
+				return callback();
+			}
+		});
+	},
 
-	markAsInactive: (project_id, callback)->
-		conditions = {_id:project_id}
-		update = {active:false}
-		Project.update conditions, update, {}, (err)->
-			if callback?
-				callback()
+	markAsInactive(project_id, callback){
+		const conditions = {_id:project_id};
+		const update = {active:false};
+		return Project.update(conditions, update, {}, function(err){
+			if (callback != null) {
+				return callback();
+			}
+		});
+	},
 
-	markAsActive: (project_id, callback)->
-		conditions = {_id:project_id}
-		update = {active:true}
-		Project.update conditions, update, {}, (err)->
-			if callback?
-				callback()
+	markAsActive(project_id, callback){
+		const conditions = {_id:project_id};
+		const update = {active:true};
+		return Project.update(conditions, update, {}, function(err){
+			if (callback != null) {
+				return callback();
+			}
+		});
+	}
+};

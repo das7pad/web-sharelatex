@@ -1,108 +1,144 @@
-async = require("async")
-_ = require("underscore")
-Subscription = require('../../models/Subscription').Subscription
-SubscriptionLocator = require("./SubscriptionLocator")
-UserGetter = require("../User/UserGetter")
-PlansLocator = require("./PlansLocator")
-Settings = require("settings-sharelatex")
-logger = require("logger-sharelatex")
-ObjectId = require('mongoose').Types.ObjectId
-FeaturesUpdater = require('./FeaturesUpdater')
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let SubscriptionUpdater;
+const async = require("async");
+const _ = require("underscore");
+const {
+    Subscription
+} = require('../../models/Subscription');
+const SubscriptionLocator = require("./SubscriptionLocator");
+const UserGetter = require("../User/UserGetter");
+const PlansLocator = require("./PlansLocator");
+const Settings = require("settings-sharelatex");
+const logger = require("logger-sharelatex");
+const {
+    ObjectId
+} = require('mongoose').Types;
+const FeaturesUpdater = require('./FeaturesUpdater');
 
-oneMonthInSeconds = 60 * 60 * 24 * 30
+const oneMonthInSeconds = 60 * 60 * 24 * 30;
 
-module.exports = SubscriptionUpdater =
-	syncSubscription: (recurlySubscription, adminUser_id, callback) ->
-		logger.log adminUser_id:adminUser_id, recurlySubscription:recurlySubscription, "syncSubscription, creating new if subscription does not exist"
-		SubscriptionLocator.getUsersSubscription adminUser_id, (err, subscription)->
-			return callback(err) if err?
-			if subscription?
-				logger.log  adminUser_id:adminUser_id, recurlySubscription:recurlySubscription, "subscription does exist"
-				SubscriptionUpdater._updateSubscriptionFromRecurly recurlySubscription, subscription, callback
-			else
-				logger.log  adminUser_id:adminUser_id, recurlySubscription:recurlySubscription, "subscription does not exist, creating a new one"
-				SubscriptionUpdater._createNewSubscription adminUser_id, (err, subscription)->
-					return callback(err) if err?
-					SubscriptionUpdater._updateSubscriptionFromRecurly recurlySubscription, subscription, callback
+module.exports = (SubscriptionUpdater = {
+	syncSubscription(recurlySubscription, adminUser_id, callback) {
+		logger.log({adminUser_id, recurlySubscription}, "syncSubscription, creating new if subscription does not exist");
+		return SubscriptionLocator.getUsersSubscription(adminUser_id, function(err, subscription){
+			if (err != null) { return callback(err); }
+			if (subscription != null) {
+				logger.log({adminUser_id, recurlySubscription}, "subscription does exist");
+				return SubscriptionUpdater._updateSubscriptionFromRecurly(recurlySubscription, subscription, callback);
+			} else {
+				logger.log({adminUser_id, recurlySubscription}, "subscription does not exist, creating a new one");
+				return SubscriptionUpdater._createNewSubscription(adminUser_id, function(err, subscription){
+					if (err != null) { return callback(err); }
+					return SubscriptionUpdater._updateSubscriptionFromRecurly(recurlySubscription, subscription, callback);
+				});
+			}
+		});
+	},
 
-	addUserToGroup: (subscriptionId, userId, callback)->
-		@addUsersToGroup(subscriptionId, [userId], callback)
+	addUserToGroup(subscriptionId, userId, callback){
+		return this.addUsersToGroup(subscriptionId, [userId], callback);
+	},
 
-	addUsersToGroup: (subscriptionId, memberIds, callback)->
-		@addUsersToGroupWithoutFeaturesRefresh subscriptionId, memberIds, (err) ->
-			return callback(err) if err?
+	addUsersToGroup(subscriptionId, memberIds, callback){
+		return this.addUsersToGroupWithoutFeaturesRefresh(subscriptionId, memberIds, function(err) {
+			if (err != null) { return callback(err); }
 
-			# Only apply features updates to users, not user stubs
-			UserGetter.getUsers memberIds, { _id: 1 }, (err, users) ->
-				return callback(err) if err?
+			// Only apply features updates to users, not user stubs
+			return UserGetter.getUsers(memberIds, { _id: 1 }, function(err, users) {
+				if (err != null) { return callback(err); }
 
-				userIds = users.map (u) -> u._id.toString()
-				async.map userIds, FeaturesUpdater.refreshFeatures, callback
+				const userIds = users.map(u => u._id.toString());
+				return async.map(userIds, FeaturesUpdater.refreshFeatures, callback);
+			});
+		});
+	},
 
-	addUsersToGroupWithoutFeaturesRefresh: (subscriptionId, memberIds, callback)->
-		logger.log subscriptionId: subscriptionId, memberIds: memberIds, "adding members into mongo subscription"
-		searchOps =
-			_id: subscriptionId
-		insertOperation =
-			{ $addToSet: { member_ids: { $each: memberIds } } }
+	addUsersToGroupWithoutFeaturesRefresh(subscriptionId, memberIds, callback){
+		logger.log({subscriptionId, memberIds}, "adding members into mongo subscription");
+		const searchOps =
+			{_id: subscriptionId};
+		const insertOperation =
+			{ $addToSet: { member_ids: { $each: memberIds } } };
 
-		Subscription.findAndModify searchOps, insertOperation, callback
+		return Subscription.findAndModify(searchOps, insertOperation, callback);
+	},
 
-	removeUserFromGroups: (filter, user_id, callback)->
-		removeOperation =
-			"$pull": {member_ids:user_id}
-		Subscription.updateMany filter, removeOperation, (err)->
-			if err?
-				logger.err err:err, searchOps:searchOps, removeOperation:removeOperation, "error removing user from groups"
-				return callback(err)
-			UserGetter.getUserOrUserStubById user_id, {}, (error, user, isStub) ->
-				return callback(error) if error
-				return callback() if isStub
-				FeaturesUpdater.refreshFeatures user_id, callback
+	removeUserFromGroups(filter, user_id, callback){
+		const removeOperation =
+			{"$pull": {member_ids:user_id}};
+		return Subscription.updateMany(filter, removeOperation, function(err){
+			if (err != null) {
+				logger.err({err, searchOps, removeOperation}, "error removing user from groups");
+				return callback(err);
+			}
+			return UserGetter.getUserOrUserStubById(user_id, {}, function(error, user, isStub) {
+				if (error) { return callback(error); }
+				if (isStub) { return callback(); }
+				return FeaturesUpdater.refreshFeatures(user_id, callback);
+			});
+		});
+	},
 
-	removeUserFromGroup: (subscriptionId, user_id, callback)->
-		SubscriptionUpdater.removeUserFromGroups { _id: subscriptionId }, user_id, callback
+	removeUserFromGroup(subscriptionId, user_id, callback){
+		return SubscriptionUpdater.removeUserFromGroups({ _id: subscriptionId }, user_id, callback);
+	},
 
-	removeUserFromAllGroups: (user_id, callback) ->
-		SubscriptionLocator.getMemberSubscriptions user_id, (error, subscriptions) ->
-			return callback(error) if error
-			return callback() unless subscriptions
-			subscriptionIds = subscriptions.map (sub) -> sub._id
-			SubscriptionUpdater.removeUserFromGroups { _id: subscriptionIds }, user_id, callback
+	removeUserFromAllGroups(user_id, callback) {
+		return SubscriptionLocator.getMemberSubscriptions(user_id, function(error, subscriptions) {
+			if (error) { return callback(error); }
+			if (!subscriptions) { return callback(); }
+			const subscriptionIds = subscriptions.map(sub => sub._id);
+			return SubscriptionUpdater.removeUserFromGroups({ _id: subscriptionIds }, user_id, callback);
+		});
+	},
 
-	deleteWithV1Id: (v1TeamId, callback)->
-		Subscription.deleteOne { "overleaf.id": v1TeamId }, callback
+	deleteWithV1Id(v1TeamId, callback){
+		return Subscription.deleteOne({ "overleaf.id": v1TeamId }, callback);
+	},
 
-	deleteSubscription: (subscription_id, callback = (error) ->) ->
-		SubscriptionLocator.getSubscription subscription_id, (err, subscription) ->
-			return callback(err) if err?
-			affected_user_ids = [subscription.admin_id].concat(subscription.member_ids or [])
-			logger.log {subscription_id, affected_user_ids}, "deleting subscription and downgrading users"
-			Subscription.remove {_id: ObjectId(subscription_id)}, (err) ->
-				return callback(err) if err?
-				async.mapSeries affected_user_ids, FeaturesUpdater.refreshFeatures, callback
+	deleteSubscription(subscription_id, callback) {
+		if (callback == null) { callback = function(error) {}; }
+		return SubscriptionLocator.getSubscription(subscription_id, function(err, subscription) {
+			if (err != null) { return callback(err); }
+			const affected_user_ids = [subscription.admin_id].concat(subscription.member_ids || []);
+			logger.log({subscription_id, affected_user_ids}, "deleting subscription and downgrading users");
+			return Subscription.remove({_id: ObjectId(subscription_id)}, function(err) {
+				if (err != null) { return callback(err); }
+				return async.mapSeries(affected_user_ids, FeaturesUpdater.refreshFeatures, callback);
+			});
+		});
+	},
 
-	_createNewSubscription: (adminUser_id, callback)->
-		logger.log adminUser_id:adminUser_id, "creating new subscription"
-		subscription = new Subscription(admin_id:adminUser_id, manager_ids: [adminUser_id])
-		subscription.save (err)->
-			callback err, subscription
+	_createNewSubscription(adminUser_id, callback){
+		logger.log({adminUser_id}, "creating new subscription");
+		const subscription = new Subscription({admin_id:adminUser_id, manager_ids: [adminUser_id]});
+		return subscription.save(err => callback(err, subscription));
+	},
 
-	_updateSubscriptionFromRecurly: (recurlySubscription, subscription, callback)->
-		logger.log recurlySubscription:recurlySubscription, subscription:subscription, "updaing subscription"
-		if recurlySubscription.state == "expired"
-			return SubscriptionUpdater.deleteSubscription subscription._id, callback
-		subscription.recurlySubscription_id = recurlySubscription.uuid
-		subscription.planCode = recurlySubscription.plan.plan_code
-		plan = PlansLocator.findLocalPlanInSettings(subscription.planCode)
-		if !plan?
-			return callback(new Error("plan code not found: #{subscription.planCode}"))
-		if plan.groupPlan
-			subscription.groupPlan = true
-			subscription.membersLimit = plan.membersLimit
-		subscription.save ->
-			allIds = _.union subscription.member_ids, [subscription.admin_id]
-			jobs = allIds.map (user_id)->
-				return (cb)->
-					FeaturesUpdater.refreshFeatures user_id, cb
-			async.series jobs, callback
+	_updateSubscriptionFromRecurly(recurlySubscription, subscription, callback){
+		logger.log({recurlySubscription, subscription}, "updaing subscription");
+		if (recurlySubscription.state === "expired") {
+			return SubscriptionUpdater.deleteSubscription(subscription._id, callback);
+		}
+		subscription.recurlySubscription_id = recurlySubscription.uuid;
+		subscription.planCode = recurlySubscription.plan.plan_code;
+		const plan = PlansLocator.findLocalPlanInSettings(subscription.planCode);
+		if ((plan == null)) {
+			return callback(new Error(`plan code not found: ${subscription.planCode}`));
+		}
+		if (plan.groupPlan) {
+			subscription.groupPlan = true;
+			subscription.membersLimit = plan.membersLimit;
+		}
+		return subscription.save(function() {
+			const allIds = _.union(subscription.member_ids, [subscription.admin_id]);
+			const jobs = allIds.map(user_id => cb => FeaturesUpdater.refreshFeatures(user_id, cb));
+			return async.series(jobs, callback);
+		});
+	}
+});

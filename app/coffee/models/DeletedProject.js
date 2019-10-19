@@ -1,27 +1,33 @@
-mongoose = require('mongoose')
-Settings = require 'settings-sharelatex'
-ProjectSchema = require('./Project.js').ProjectSchema
+const mongoose = require('mongoose');
+const Settings = require('settings-sharelatex');
+const {
+    ProjectSchema
+} = require('./Project.js');
 
-Schema = mongoose.Schema
-ObjectId = Schema.ObjectId
+const {
+    Schema
+} = mongoose;
+const {
+    ObjectId
+} = Schema;
 
-DeleterDataSchema = new Schema
-	deleterId: {type: ObjectId, ref: 'User'}
-	deleterIpAddress: { type: String }
-	deletedAt: { type: Date }
+const DeleterDataSchema = new Schema({
+	deleterId: {type: ObjectId, ref: 'User'},
+	deleterIpAddress: { type: String },
+	deletedAt: { type: Date }});
 
-DeletedProjectSchema = new Schema({
-	deleterData : [DeleterDataSchema]
+const DeletedProjectSchema = new Schema({
+	deleterData : [DeleterDataSchema],
 	project: [ProjectSchema]
-}, collection: 'deletedProjects')
+}, {collection: 'deletedProjects'});
 
-conn = mongoose.createConnection(Settings.mongo.url, {
+const conn = mongoose.createConnection(Settings.mongo.url, {
 	server: {poolSize: Settings.mongo.poolSize || 10},
 	config: {autoIndex: false}
-})
+});
 
-DeletedProject = conn.model('DeletedProject', DeletedProjectSchema)
+const DeletedProject = conn.model('DeletedProject', DeletedProjectSchema);
 
-mongoose.model 'DeletedProject', DeletedProjectSchema
-exports.DeletedProject = DeletedProject
-exports.DeletedProjectSchema = DeletedProjectSchema
+mongoose.model('DeletedProject', DeletedProjectSchema);
+exports.DeletedProject = DeletedProject;
+exports.DeletedProjectSchema = DeletedProjectSchema;

@@ -1,103 +1,137 @@
-async = require("async")
-PlansLocator = require("./PlansLocator")
-_ = require("underscore")
-SubscriptionLocator = require("./SubscriptionLocator")
-UserFeaturesUpdater = require("./UserFeaturesUpdater")
-Settings = require("settings-sharelatex")
-logger = require("logger-sharelatex")
-ReferalFeatures = require("../Referal/ReferalFeatures")
-V1SubscriptionManager = require("./V1SubscriptionManager")
-InstitutionsFeatures = require '../Institutions/InstitutionsFeatures'
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let FeaturesUpdater;
+const async = require("async");
+const PlansLocator = require("./PlansLocator");
+const _ = require("underscore");
+const SubscriptionLocator = require("./SubscriptionLocator");
+const UserFeaturesUpdater = require("./UserFeaturesUpdater");
+const Settings = require("settings-sharelatex");
+const logger = require("logger-sharelatex");
+const ReferalFeatures = require("../Referal/ReferalFeatures");
+const V1SubscriptionManager = require("./V1SubscriptionManager");
+const InstitutionsFeatures = require('../Institutions/InstitutionsFeatures');
 
-oneMonthInSeconds = 60 * 60 * 24 * 30
+const oneMonthInSeconds = 60 * 60 * 24 * 30;
 
-module.exports = FeaturesUpdater =
-	refreshFeatures: (user_id, notifyV1 = true, callback = (error, features, featuresChanged) ->)->
-		if typeof notifyV1 == 'function'
-			callback = notifyV1
-			notifyV1 = true
+module.exports = (FeaturesUpdater = {
+	refreshFeatures(user_id, notifyV1, callback){
+		if (notifyV1 == null) { notifyV1 = true; }
+		if (callback == null) { callback = function(error, features, featuresChanged) {}; }
+		if (typeof notifyV1 === 'function') {
+			callback = notifyV1;
+			notifyV1 = true;
+		}
 
-		if notifyV1
-			V1SubscriptionManager.notifyV1OfFeaturesChange user_id, (error) ->
-				if error?
-					logger.err {err: error, user_id}, "error notifying v1 about updated features"
+		if (notifyV1) {
+			V1SubscriptionManager.notifyV1OfFeaturesChange(user_id, function(error) {
+				if (error != null) {
+					return logger.err({err: error, user_id}, "error notifying v1 about updated features");
+				}
+			});
+		}
 
 
-		jobs =
-			individualFeatures: (cb) -> FeaturesUpdater._getIndividualFeatures user_id, cb
-			groupFeatureSets:   (cb) -> FeaturesUpdater._getGroupFeatureSets user_id, cb
-			institutionFeatures:(cb) -> InstitutionsFeatures.getInstitutionsFeatures user_id, cb
-			v1Features:         (cb) -> FeaturesUpdater._getV1Features user_id, cb
-			bonusFeatures:      (cb) -> ReferalFeatures.getBonusFeatures user_id, cb
-		async.series jobs, (err, results)->
-			if err?
-				logger.err err:err, user_id:user_id,
-					"error getting subscription or group for refreshFeatures"
-				return callback(err)
+		const jobs = {
+			individualFeatures(cb) { return FeaturesUpdater._getIndividualFeatures(user_id, cb); },
+			groupFeatureSets(cb) { return FeaturesUpdater._getGroupFeatureSets(user_id, cb); },
+			institutionFeatures(cb) { return InstitutionsFeatures.getInstitutionsFeatures(user_id, cb); },
+			v1Features(cb) { return FeaturesUpdater._getV1Features(user_id, cb); },
+			bonusFeatures(cb) { return ReferalFeatures.getBonusFeatures(user_id, cb); }
+		};
+		async.series(jobs, function(err, results){
+			if (err != null) {
+				logger.err({err, user_id},
+					"error getting subscription or group for refreshFeatures");
+				return callback(err);
+			}
 
-			{individualFeatures, groupFeatureSets, institutionFeatures, v1Features, bonusFeatures} = results
-			logger.log {user_id, individualFeatures, groupFeatureSets, institutionFeatures, v1Features, bonusFeatures}, 'merging user features'
-			featureSets = groupFeatureSets.concat [individualFeatures, institutionFeatures, v1Features, bonusFeatures]
-			features = _.reduce(featureSets, FeaturesUpdater._mergeFeatures, Settings.defaultFeatures)
+			const {individualFeatures, groupFeatureSets, institutionFeatures, v1Features, bonusFeatures} = results;
+			logger.log({user_id, individualFeatures, groupFeatureSets, institutionFeatures, v1Features, bonusFeatures}, 'merging user features');
+			const featureSets = groupFeatureSets.concat([individualFeatures, institutionFeatures, v1Features, bonusFeatures]);
+			const features = _.reduce(featureSets, FeaturesUpdater._mergeFeatures, Settings.defaultFeatures);
 
-			logger.log {user_id, features}, 'updating user features'
-			UserFeaturesUpdater.updateFeatures user_id, features, callback
-		return null
+			logger.log({user_id, features}, 'updating user features');
+			return UserFeaturesUpdater.updateFeatures(user_id, features, callback);
+		});
+		return null;
+	},
 
-	_getIndividualFeatures: (user_id, callback = (error, features) ->) ->
-		SubscriptionLocator.getUsersSubscription user_id, (err, sub)->
-			callback err, FeaturesUpdater._subscriptionToFeatures(sub)
+	_getIndividualFeatures(user_id, callback) {
+		if (callback == null) { callback = function(error, features) {}; }
+		return SubscriptionLocator.getUsersSubscription(user_id, (err, sub) => callback(err, FeaturesUpdater._subscriptionToFeatures(sub)));
+	},
 
-	_getGroupFeatureSets: (user_id, callback = (error, featureSets) ->) ->
-		SubscriptionLocator.getGroupSubscriptionsMemberOf user_id, (err, subs) ->
-			callback err, (subs or []).map FeaturesUpdater._subscriptionToFeatures
+	_getGroupFeatureSets(user_id, callback) {
+		if (callback == null) { callback = function(error, featureSets) {}; }
+		return SubscriptionLocator.getGroupSubscriptionsMemberOf(user_id, (err, subs) => callback(err, (subs || []).map(FeaturesUpdater._subscriptionToFeatures)));
+	},
 
-	_getV1Features: (user_id, callback = (error, features) ->) ->
-		V1SubscriptionManager.getPlanCodeFromV1 user_id, (err, planCode, v1Id) ->
-			if err?
-				return callback(null, []) if err?.name == 'NotFoundError'
-				return callback(err)
+	_getV1Features(user_id, callback) {
+		if (callback == null) { callback = function(error, features) {}; }
+		return V1SubscriptionManager.getPlanCodeFromV1(user_id, function(err, planCode, v1Id) {
+			if (err != null) {
+				if ((err != null ? err.name : undefined) === 'NotFoundError') { return callback(null, []); }
+				return callback(err);
+			}
 
-			callback(err, FeaturesUpdater._mergeFeatures(
-				V1SubscriptionManager.getGrandfatheredFeaturesForV1User(v1Id) or {},
+			return callback(err, FeaturesUpdater._mergeFeatures(
+				V1SubscriptionManager.getGrandfatheredFeaturesForV1User(v1Id) || {},
 				FeaturesUpdater._planCodeToFeatures(planCode)
-			))
+			));
+		});
+	},
 
-	_mergeFeatures: (featuresA, featuresB) ->
-		features = Object.assign({}, featuresA)
-		for key, value of featuresB
-			# Special merging logic for non-boolean features
-			if key == 'compileGroup'
-				if features['compileGroup'] == 'priority' or featuresB['compileGroup'] == 'priority'
-					features['compileGroup'] = 'priority'
-				else
-					features['compileGroup'] = 'standard'
-			else if key == 'collaborators'
-				if features['collaborators'] == -1 or featuresB['collaborators'] == -1
-					features['collaborators'] = -1
-				else
+	_mergeFeatures(featuresA, featuresB) {
+		const features = Object.assign({}, featuresA);
+		for (let key in featuresB) {
+			// Special merging logic for non-boolean features
+			const value = featuresB[key];
+			if (key === 'compileGroup') {
+				if ((features['compileGroup'] === 'priority') || (featuresB['compileGroup'] === 'priority')) {
+					features['compileGroup'] = 'priority';
+				} else {
+					features['compileGroup'] = 'standard';
+				}
+			} else if (key === 'collaborators') {
+				if ((features['collaborators'] === -1) || (featuresB['collaborators'] === -1)) {
+					features['collaborators'] = -1;
+				} else {
 					features['collaborators'] = Math.max(
-						features['collaborators'] or 0,
-						featuresB['collaborators'] or 0
-					)
-			else if key == 'compileTimeout'
+						features['collaborators'] || 0,
+						featuresB['collaborators'] || 0
+					);
+				}
+			} else if (key === 'compileTimeout') {
 				features['compileTimeout'] = Math.max(
-					features['compileTimeout'] or 0,
-					featuresB['compileTimeout'] or 0
-				)
-			else
-				# Boolean keys, true is better
-				features[key] = features[key] or featuresB[key]
-		return features
+					features['compileTimeout'] || 0,
+					featuresB['compileTimeout'] || 0
+				);
+			} else {
+				// Boolean keys, true is better
+				features[key] = features[key] || featuresB[key];
+			}
+		}
+		return features;
+	},
 
-	_subscriptionToFeatures: (subscription) ->
-		FeaturesUpdater._planCodeToFeatures(subscription?.planCode)
+	_subscriptionToFeatures(subscription) {
+		return FeaturesUpdater._planCodeToFeatures(subscription != null ? subscription.planCode : undefined);
+	},
 
-	_planCodeToFeatures: (planCode) ->
-		if !planCode?
-			return {}
-		plan = PlansLocator.findLocalPlanInSettings planCode
-		if !plan?
-			return {}
-		else
-			return plan.features
+	_planCodeToFeatures(planCode) {
+		if ((planCode == null)) {
+			return {};
+		}
+		const plan = PlansLocator.findLocalPlanInSettings(planCode);
+		if ((plan == null)) {
+			return {};
+		} else {
+			return plan.features;
+		}
+	}
+});

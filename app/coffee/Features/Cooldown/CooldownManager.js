@@ -1,23 +1,38 @@
-RedisWrapper = require('../../infrastructure/RedisWrapper')
-rclient = RedisWrapper.client('cooldown')
-logger = require('logger-sharelatex')
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let CooldownManager;
+const RedisWrapper = require('../../infrastructure/RedisWrapper');
+const rclient = RedisWrapper.client('cooldown');
+const logger = require('logger-sharelatex');
 
 
-COOLDOWN_IN_SECONDS = 60 * 10
+const COOLDOWN_IN_SECONDS = 60 * 10;
 
 
-module.exports = CooldownManager =
+module.exports = (CooldownManager = {
 
-	_buildKey: (projectId) ->
-		"Cooldown:{#{projectId}}"
+	_buildKey(projectId) {
+		return `Cooldown:{${projectId}}`;
+	},
 
-	putProjectOnCooldown: (projectId, callback=(err)->) ->
-		logger.log {projectId}, "[Cooldown] putting project on cooldown for #{COOLDOWN_IN_SECONDS} seconds"
-		rclient.set(CooldownManager._buildKey(projectId), '1', 'EX', COOLDOWN_IN_SECONDS, callback)
+	putProjectOnCooldown(projectId, callback) {
+		if (callback == null) { callback = function(err){}; }
+		logger.log({projectId}, `[Cooldown] putting project on cooldown for ${COOLDOWN_IN_SECONDS} seconds`);
+		return rclient.set(CooldownManager._buildKey(projectId), '1', 'EX', COOLDOWN_IN_SECONDS, callback);
+	},
 
-	isProjectOnCooldown: (projectId, callback=(err, isOnCooldown)->) ->
-		rclient.get CooldownManager._buildKey(projectId), (err, result) ->
-			if err?
-				return callback(err)
-			callback(null, result == "1")
+	isProjectOnCooldown(projectId, callback) {
+		if (callback == null) { callback = function(err, isOnCooldown){}; }
+		return rclient.get(CooldownManager._buildKey(projectId), function(err, result) {
+			if (err != null) {
+				return callback(err);
+			}
+			return callback(null, result === "1");
+		});
+	}
+});
 

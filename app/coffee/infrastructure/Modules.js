@@ -1,82 +1,151 @@
-fs   = require "fs"
-Path = require "path"
-pug = require "pug"
-async = require "async"
+/*
+ * decaffeinate suggestions:
+ * DS101: Remove unnecessary use of Array.from
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS103: Rewrite code to no longer use __guard__
+ * DS201: Simplify complex destructure assignments
+ * DS205: Consider reworking code to avoid use of IIFEs
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let Modules;
+const fs   = require("fs");
+const Path = require("path");
+const pug = require("pug");
+const async = require("async");
 
-MODULE_BASE_PATH = Path.resolve(__dirname + "/../../../modules")
+const MODULE_BASE_PATH = Path.resolve(__dirname + "/../../../modules");
 
-module.exports = Modules =
-	modules: []
-	loadModules: () ->
-		for moduleName in fs.readdirSync(MODULE_BASE_PATH)
-			modulePath = Path.join(MODULE_BASE_PATH, moduleName)
-			if fs.existsSync(Path.join(modulePath, "index.js")) || fs.existsSync(Path.join(modulePath, "index.coffee"))
-				loadedModule = require(Path.join(MODULE_BASE_PATH, moduleName, "index"))
-				loadedModule.name = moduleName
-				@modules.push loadedModule
-		Modules.attachHooks()
+module.exports = (Modules = {
+	modules: [],
+	loadModules() {
+		for (let moduleName of Array.from(fs.readdirSync(MODULE_BASE_PATH))) {
+			const modulePath = Path.join(MODULE_BASE_PATH, moduleName);
+			if (fs.existsSync(Path.join(modulePath, "index.js")) || fs.existsSync(Path.join(modulePath, "index.coffee"))) {
+				const loadedModule = require(Path.join(MODULE_BASE_PATH, moduleName, "index"));
+				loadedModule.name = moduleName;
+				this.modules.push(loadedModule);
+			}
+		}
+		return Modules.attachHooks();
+	},
 
-	applyRouter: (webRouter, privateApiRouter, publicApiRouter) ->
-		for module in @modules
-			module.router?.apply?(webRouter, privateApiRouter, publicApiRouter)
+	applyRouter(webRouter, privateApiRouter, publicApiRouter) {
+		return Array.from(this.modules).map((module) =>
+			__guardMethod__(module.router, 'apply', o => o.apply(webRouter, privateApiRouter, publicApiRouter)));
+	},
 
-	applyNonCsrfRouter: (webRouter, privateApiRouter, publicApiRouter) ->
-		for module in @modules
-			module.nonCsrfRouter?.apply(webRouter, privateApiRouter, publicApiRouter)
-			module.router?.applyNonCsrfRouter?(webRouter, privateApiRouter, publicApiRouter)
+	applyNonCsrfRouter(webRouter, privateApiRouter, publicApiRouter) {
+		return (() => {
+			const result = [];
+			for (let module of Array.from(this.modules)) {
+				if (module.nonCsrfRouter != null) {
+					module.nonCsrfRouter.apply(webRouter, privateApiRouter, publicApiRouter);
+				}
+				result.push(__guardMethod__(module.router, 'applyNonCsrfRouter', o => o.applyNonCsrfRouter(webRouter, privateApiRouter, publicApiRouter)));
+			}
+			return result;
+		})();
+	},
 
-	viewIncludes: {}
-	loadViewIncludes: (app) ->
-		@viewIncludes = {}
-		for module in @modules
-			for view, partial of module.viewIncludes or {}
-				@viewIncludes[view] ||= []
-				filePath = Path.join(MODULE_BASE_PATH, module.name, "app/views", partial + ".pug")
-				@viewIncludes[view].push pug.compileFile(filePath, doctype: "html")
+	viewIncludes: {},
+	loadViewIncludes(app) {
+		this.viewIncludes = {};
+		return Array.from(this.modules).map((module) =>
+			(() => {
+				const result = [];
+				const object = module.viewIncludes || {};
+				for (let view in object) {
+					const partial = object[view];
+					if (!this.viewIncludes[view]) { this.viewIncludes[view] = []; }
+					const filePath = Path.join(MODULE_BASE_PATH, module.name, "app/views", partial + ".pug");
+					result.push(this.viewIncludes[view].push(pug.compileFile(filePath, {doctype: "html"})));
+				}
+				return result;
+			})());
+	},
 
-	moduleIncludes: (view, locals) ->
-		compiledPartials = Modules.viewIncludes[view] or []
-		html = ""
-		for compiledPartial in compiledPartials
-			d = new Date()
-			html += compiledPartial(locals)
-		return html
+	moduleIncludes(view, locals) {
+		const compiledPartials = Modules.viewIncludes[view] || [];
+		let html = "";
+		for (let compiledPartial of Array.from(compiledPartials)) {
+			const d = new Date();
+			html += compiledPartial(locals);
+		}
+		return html;
+	},
 
-	moduleIncludesAvailable: (view) ->
-		return (Modules.viewIncludes[view] or []).length > 0
+	moduleIncludesAvailable(view) {
+		return (Modules.viewIncludes[view] || []).length > 0;
+	},
 
-	moduleAssetFiles: (pathPrefix) ->
-		assetFiles = []
-		for module in @modules
-			for assetFile in module.assetFiles or []
-				assetFiles.push "#{pathPrefix}#{assetFile}"
-		return assetFiles
+	moduleAssetFiles(pathPrefix) {
+		const assetFiles = [];
+		for (let module of Array.from(this.modules)) {
+			for (let assetFile of Array.from(module.assetFiles || [])) {
+				assetFiles.push(`${pathPrefix}${assetFile}`);
+			}
+		}
+		return assetFiles;
+	},
 
-	linkedFileAgentsIncludes: () ->
-		agents = {}
-		for module in @modules
-			for name, agentFunction of module.linkedFileAgents
-				agents[name] = agentFunction()
-		return agents
+	linkedFileAgentsIncludes() {
+		const agents = {};
+		for (let module of Array.from(this.modules)) {
+			for (let name in module.linkedFileAgents) {
+				const agentFunction = module.linkedFileAgents[name];
+				agents[name] = agentFunction();
+			}
+		}
+		return agents;
+	},
 
-	attachHooks: () ->
-		for module in @modules
-			if module.hooks?
-				for hook, method of module.hooks
-					Modules.hooks.attach hook, method
+	attachHooks() {
+		return (() => {
+			const result = [];
+			for (var module of Array.from(this.modules)) {
+				if (module.hooks != null) {
+					result.push((() => {
+						const result1 = [];
+						for (let hook in module.hooks) {
+							const method = module.hooks[hook];
+							result1.push(Modules.hooks.attach(hook, method));
+						}
+						return result1;
+					})());
+				} else {
+					result.push(undefined);
+				}
+			}
+			return result;
+		})();
+	},
 
-	hooks:
-		_hooks: {}
-		attach: (name, method) ->
-			@_hooks[name] ?= []
-			@_hooks[name].push method
+	hooks: {
+		_hooks: {},
+		attach(name, method) {
+			if (this._hooks[name] == null) { this._hooks[name] = []; }
+			return this._hooks[name].push(method);
+		},
 
-		fire: (name, args..., callback) ->
-			methods = @_hooks[name] or []
-			call_methods = methods.map (method) ->
-				return (cb) -> method(args..., cb)
-			async.series call_methods, (error, results) ->
-				return callback(error) if error?
-				return callback null, results
+		fire(name, ...rest) {
+			const adjustedLength = Math.max(rest.length, 1), args = rest.slice(0, adjustedLength - 1), callback = rest[adjustedLength - 1];
+			const methods = this._hooks[name] || [];
+			const call_methods = methods.map(method => cb => method(...Array.from(args), cb));
+			return async.series(call_methods, function(error, results) {
+				if (error != null) { return callback(error); }
+				return callback(null, results);
+			});
+		}
+	}
+});
 
-Modules.loadModules()
+Modules.loadModules();
+
+function __guardMethod__(obj, methodName, transform) {
+  if (typeof obj !== 'undefined' && obj !== null && typeof obj[methodName] === 'function') {
+    return transform(obj, methodName);
+  } else {
+    return undefined;
+  }
+}

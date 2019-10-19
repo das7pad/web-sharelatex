@@ -1,35 +1,48 @@
-crypto = require "crypto"
-logger = require("logger-sharelatex")
-fs = require("fs")
-_ = require("underscore")
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let FileHashManager;
+const crypto = require("crypto");
+const logger = require("logger-sharelatex");
+const fs = require("fs");
+const _ = require("underscore");
 
-module.exports = FileHashManager =
+module.exports = (FileHashManager = {
 
-	computeHash: (filePath, callback = (error, hashValue) ->) ->
-		callback = _.once(callback) # avoid double callbacks
+	computeHash(filePath, callback) {
+		if (callback == null) { callback = function(error, hashValue) {}; }
+		callback = _.once(callback); // avoid double callbacks
 
-		# taken from v1/history/storage/lib/blob_hash.js
-		getGitBlobHeader = (byteLength) ->
-			return 'blob ' + byteLength + '\x00'
+		// taken from v1/history/storage/lib/blob_hash.js
+		const getGitBlobHeader = byteLength => 'blob ' + byteLength + '\x00';
 
-		getByteLengthOfFile = (cb) ->
-			fs.stat filePath, (err, stats) ->
-				return cb(err) if err?
-				cb(null, stats.size)
+		const getByteLengthOfFile = cb => fs.stat(filePath, function(err, stats) {
+            if (err != null) { return cb(err); }
+            return cb(null, stats.size);
+        });
 
-		getByteLengthOfFile (err, byteLength) ->
-			return callback(err) if err?
+		return getByteLengthOfFile(function(err, byteLength) {
+			if (err != null) { return callback(err); }
 
-			input = fs.createReadStream(filePath)
-			input.on 'error', (err) ->
-				logger.err {filePath: filePath, err:err}, "error opening file in computeHash"
-				return callback(err)
+			const input = fs.createReadStream(filePath);
+			input.on('error', function(err) {
+				logger.err({filePath, err}, "error opening file in computeHash");
+				return callback(err);
+			});
 
-			hash = crypto.createHash("sha1")
-			hash.setEncoding('hex')
-			hash.update(getGitBlobHeader(byteLength))
-			hash.on 'readable', () ->
-				result = hash.read()
-				if result?
-					callback(null, result.toString('hex'))
-			input.pipe(hash)
+			const hash = crypto.createHash("sha1");
+			hash.setEncoding('hex');
+			hash.update(getGitBlobHeader(byteLength));
+			hash.on('readable', function() {
+				const result = hash.read();
+				if (result != null) {
+					return callback(null, result.toString('hex'));
+				}
+			});
+			return input.pipe(hash);
+		});
+	}
+});

@@ -1,35 +1,55 @@
-_ = require("underscore")
-logger = require('logger-sharelatex')
-User = require('../../models/User').User
-Settings = require "settings-sharelatex"
-FeaturesUpdater = require "../Subscription/FeaturesUpdater"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let ReferalAllocator;
+const _ = require("underscore");
+const logger = require('logger-sharelatex');
+const {
+    User
+} = require('../../models/User');
+const Settings = require("settings-sharelatex");
+const FeaturesUpdater = require("../Subscription/FeaturesUpdater");
 
-module.exports = ReferalAllocator =
-	allocate: (referal_id, new_user_id, referal_source, referal_medium, callback = ->)->
-		if !referal_id?
-			logger.log new_user_id:new_user_id, "no referal for user"
-			return callback(null)
+module.exports = (ReferalAllocator = {
+	allocate(referal_id, new_user_id, referal_source, referal_medium, callback){
+		if (callback == null) { callback = function() {}; }
+		if ((referal_id == null)) {
+			logger.log({new_user_id}, "no referal for user");
+			return callback(null);
+		}
 
-		logger.log referal_id:referal_id, new_user_id:new_user_id, referal_source:referal_source, referal_medium:referal_medium, "allocating users referal"
+		logger.log({referal_id, new_user_id, referal_source, referal_medium}, "allocating users referal");
 
-		query = {"referal_id":referal_id}
-		User.findOne query, (error, user) ->
-			return callback(error) if error?
-			if !user? or !user._id?
-				logger.log new_user_id:new_user_id, referal_id:referal_id, "no user found for referal id"
-				return callback(null)
+		const query = {"referal_id":referal_id};
+		return User.findOne(query, function(error, user) {
+			if (error != null) { return callback(error); }
+			if ((user == null) || (user._id == null)) {
+				logger.log({new_user_id, referal_id}, "no user found for referal id");
+				return callback(null);
+			}
 
-			if referal_source == "bonus"
-				User.update query, {
-					$push:
+			if (referal_source === "bonus") {
+				return User.update(query, {
+					$push: {
 						refered_users: new_user_id
-					$inc:
+					},
+					$inc: {
 						refered_user_count: 1
-				}, {}, (err)->
-					if err?
-						logger.err err:err, referal_id:referal_id, new_user_id:new_user_id, "something went wrong allocating referal"
-						return callback(err)
+					}
+				}, {}, function(err){
+					if (err != null) {
+						logger.err({err, referal_id, new_user_id}, "something went wrong allocating referal");
+						return callback(err);
+					}
 
-					FeaturesUpdater.refreshFeatures user._id, callback
-			else
-				callback()
+					return FeaturesUpdater.refreshFeatures(user._id, callback);
+				});
+			} else {
+				return callback();
+			}
+		});
+	}
+});

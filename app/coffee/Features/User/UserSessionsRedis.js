@@ -1,9 +1,13 @@
-RedisWrapper = require("../../infrastructure/RedisWrapper")
-rclient = RedisWrapper.client("websessions")
+let Redis;
+const RedisWrapper = require("../../infrastructure/RedisWrapper");
+const rclient = RedisWrapper.client("websessions");
 
-module.exports = Redis =
-	client: () ->
-		return rclient
+module.exports = (Redis = {
+	client() {
+		return rclient;
+	},
 
-	sessionSetKey: (user) ->
-		return "UserSessions:{#{user._id}}"
+	sessionSetKey(user) {
+		return `UserSessions:{${user._id}}`;
+	}
+});

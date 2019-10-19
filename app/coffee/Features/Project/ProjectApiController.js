@@ -1,12 +1,21 @@
-ProjectDetailsHandler = require("./ProjectDetailsHandler")
-logger = require("logger-sharelatex")
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+const ProjectDetailsHandler = require("./ProjectDetailsHandler");
+const logger = require("logger-sharelatex");
 
 
-module.exports = 
+module.exports = { 
 
-	getProjectDetails : (req, res, next)->
-		{project_id} = req.params
-		ProjectDetailsHandler.getDetails project_id, (err, projDetails)->
-			return next(err) if err?
-			res.json(projDetails)
+	getProjectDetails(req, res, next){
+		const {project_id} = req.params;
+		return ProjectDetailsHandler.getDetails(project_id, function(err, projDetails){
+			if (err != null) { return next(err); }
+			return res.json(projDetails);
+		});
+	}
+};
 

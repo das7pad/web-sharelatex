@@ -1,7 +1,7 @@
-_ = require("underscore")
+const _ = require("underscore");
 
   
-module.exports = _.template '''
+module.exports = _.template(`\
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 	<head>
@@ -14,5 +14,6 @@ module.exports = _.template '''
 		<%= body %>
 	</body>
 </html>
-
-'''
+\
+`
+);

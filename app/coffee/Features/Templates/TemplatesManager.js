@@ -1,70 +1,96 @@
-Project = require('../../../js/models/Project').Project
-ProjectDetailsHandler = require "../../../js/Features/Project/ProjectDetailsHandler"
-ProjectOptionsHandler = require "../../../js/Features/Project/ProjectOptionsHandler"
-ProjectRootDocManager = require "../../../js/Features/Project/ProjectRootDocManager"
-ProjectUploadManager = require "../../../js/Features/Uploads/ProjectUploadManager"
-FileWriter = require "../../infrastructure/FileWriter"
-async = require "async"
-fs = require "fs"
-logger = require "logger-sharelatex"
-request = require "request"
-settings = require "settings-sharelatex"
-uuid = require "uuid"
+/*
+ * decaffeinate suggestions:
+ * DS102: Remove unnecessary code created because of implicit returns
+ * DS207: Consider shorter variations of null checks
+ * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
+ */
+let TemplatesManager;
+const {
+    Project
+} = require('../../../js/models/Project');
+const ProjectDetailsHandler = require("../../../js/Features/Project/ProjectDetailsHandler");
+const ProjectOptionsHandler = require("../../../js/Features/Project/ProjectOptionsHandler");
+const ProjectRootDocManager = require("../../../js/Features/Project/ProjectRootDocManager");
+const ProjectUploadManager = require("../../../js/Features/Uploads/ProjectUploadManager");
+const FileWriter = require("../../infrastructure/FileWriter");
+const async = require("async");
+const fs = require("fs");
+const logger = require("logger-sharelatex");
+const request = require("request");
+const settings = require("settings-sharelatex");
+const uuid = require("uuid");
 
-module.exports = TemplatesManager =
-	createProjectFromV1Template: (brandVariationId, compiler, mainFile, templateId, templateName, templateVersionId, user_id, imageName, callback) ->
-		zipUrl = "#{settings.apis.v1.url}/api/v1/sharelatex/templates/#{templateVersionId}"
-		zipReq = request zipUrl, {
-			auth:
-				user: settings.apis.v1.user
+module.exports = (TemplatesManager = {
+	createProjectFromV1Template(brandVariationId, compiler, mainFile, templateId, templateName, templateVersionId, user_id, imageName, callback) {
+		const zipUrl = `${settings.apis.v1.url}/api/v1/sharelatex/templates/${templateVersionId}`;
+		const zipReq = request(zipUrl, {
+			auth: {
+				user: settings.apis.v1.user,
 				pass: settings.apis.v1.pass
-		}
-		zipReq.on "error", (err) ->
-			logger.error { err }, "error getting zip from template API"
-			callback err
-		FileWriter.ensureDumpFolderExists (err) ->
-			return callback(err) if err?
+			}
+		});
+		zipReq.on("error", function(err) {
+			logger.error({ err }, "error getting zip from template API");
+			return callback(err);
+		});
+		return FileWriter.ensureDumpFolderExists(function(err) {
+			if (err != null) { return callback(err); }
 
-			projectName = ProjectDetailsHandler.fixProjectName templateName
-			dumpPath = "#{settings.path.dumpFolder}/#{uuid.v4()}"
-			writeStream = fs.createWriteStream dumpPath
-			writeStream.on "close", ->
-				if zipReq.response.statusCode != 200
-					logger.err { uri: zipUrl, statusCode: zipReq.response.statusCode }, "non-success code getting zip from template API"
-					return callback new Error("get zip failed")
-				ProjectUploadManager.createProjectFromZipArchiveWithName user_id, projectName, dumpPath, (err, project) ->
-					if err?
-						logger.err { err, zipReq }, "problem building project from zip"
-						return callback err
-					async.series [
-						(cb) -> TemplatesManager._setCompiler project._id, compiler, cb
-						(cb) -> TemplatesManager._setImage project._id, imageName, cb
-						(cb) -> TemplatesManager._setMainFile project._id, mainFile, cb
-						(cb) -> TemplatesManager._setBrandVariationId project._id, brandVariationId, cb
-					], (err) ->
-						return callback err if err?
-						fs.unlink dumpPath, (err) ->
-							logger.err {err}, "error unlinking template zip" if err?
-						update =
+			const projectName = ProjectDetailsHandler.fixProjectName(templateName);
+			const dumpPath = `${settings.path.dumpFolder}/${uuid.v4()}`;
+			const writeStream = fs.createWriteStream(dumpPath);
+			writeStream.on("close", function() {
+				if (zipReq.response.statusCode !== 200) {
+					logger.err({ uri: zipUrl, statusCode: zipReq.response.statusCode }, "non-success code getting zip from template API");
+					return callback(new Error("get zip failed"));
+				}
+				return ProjectUploadManager.createProjectFromZipArchiveWithName(user_id, projectName, dumpPath, function(err, project) {
+					if (err != null) {
+						logger.err({ err, zipReq }, "problem building project from zip");
+						return callback(err);
+					}
+					return async.series([
+						cb => TemplatesManager._setCompiler(project._id, compiler, cb),
+						cb => TemplatesManager._setImage(project._id, imageName, cb),
+						cb => TemplatesManager._setMainFile(project._id, mainFile, cb),
+						cb => TemplatesManager._setBrandVariationId(project._id, brandVariationId, cb)
+					], function(err) {
+						if (err != null) { return callback(err); }
+						fs.unlink(dumpPath, function(err) {
+							if (err != null) { return logger.err({err}, "error unlinking template zip"); }
+						});
+						const update = {
 							fromV1TemplateId: templateId,
 							fromV1TemplateVersionId: templateVersionId
-						Project.update { _id: project._id }, update, {}, (err) ->
-							return callback err if err?
-							callback null, project
-			zipReq.pipe(writeStream)
+						};
+						return Project.update({ _id: project._id }, update, {}, function(err) {
+							if (err != null) { return callback(err); }
+							return callback(null, project);
+						});
+					});
+				});
+			});
+			return zipReq.pipe(writeStream);
+		});
+	},
 
-	_setCompiler: (project_id, compiler, callback) ->
-		return callback() unless compiler?
-		ProjectOptionsHandler.setCompiler project_id, compiler, callback
+	_setCompiler(project_id, compiler, callback) {
+		if (compiler == null) { return callback(); }
+		return ProjectOptionsHandler.setCompiler(project_id, compiler, callback);
+	},
 
-	_setImage: (project_id, imageName, callback) ->
-		imageName ||= "wl_texlive:2018.1"
-		ProjectOptionsHandler.setImageName project_id, imageName, callback
+	_setImage(project_id, imageName, callback) {
+		if (!imageName) { imageName = "wl_texlive:2018.1"; }
+		return ProjectOptionsHandler.setImageName(project_id, imageName, callback);
+	},
 
-	_setMainFile: (project_id, mainFile, callback) ->
-		return callback() unless mainFile?
-		ProjectRootDocManager.setRootDocFromName project_id, mainFile, callback
+	_setMainFile(project_id, mainFile, callback) {
+		if (mainFile == null) { return callback(); }
+		return ProjectRootDocManager.setRootDocFromName(project_id, mainFile, callback);
+	},
 
-	_setBrandVariationId: (project_id, brandVariationId, callback) ->
-		return callback() unless brandVariationId?
-		ProjectOptionsHandler.setBrandVariationId project_id, brandVariationId, callback
+	_setBrandVariationId(project_id, brandVariationId, callback) {
+		if (brandVariationId == null) { return callback(); }
+		return ProjectOptionsHandler.setBrandVariationId(project_id, brandVariationId, callback);
+	}
+});
