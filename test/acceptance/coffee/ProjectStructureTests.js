@@ -1,3 +1,12 @@
+/* eslint-disable
+    camelcase,
+    max-len,
+    no-path-concat,
+    no-return-assign,
+    no-unused-vars,
+*/
+// TODO: This file was created by bulk-decaffeinate.
+// Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
@@ -457,7 +466,7 @@ describe("ProjectStructureChanges", function() {
 				let update = updates[0];
 				expect(update.userId).to.equal(this.owner._id);
 				expect(update.pathname).to.equal("/1pixel.png");
-				//expect(update.url).to.be.a('string');
+				// expect(update.url).to.be.a('string');
 				update = updates[1];
 				expect(update.userId).to.equal(this.owner._id);
 				expect(update.pathname).to.equal("/1pixel.png");
@@ -906,7 +915,7 @@ describe("ProjectStructureChanges", function() {
 				let update = updates[0];
 				expect(update.userId).to.equal(this.owner._id);
 				expect(update.pathname).to.equal("/1pixel.png");
-				//expect(update.url).to.be.a('string');
+				// expect(update.url).to.be.a('string');
 				update = updates[1];
 				expect(update.userId).to.equal(this.owner._id);
 				expect(update.pathname).to.equal("/1pixel.png");
