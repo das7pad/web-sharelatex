@@ -91,6 +91,8 @@
 public/stylesheets/*.css
 public/stylesheets/*.map
 
+!/migrations
+
 !/test/acceptance/config
 !/test/acceptance/files
 !/test/acceptance/src
