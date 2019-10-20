@@ -6,17 +6,21 @@ require('logger-sharelatex').logger.level('error')
 
 before(function(done) {
   this.timeout(10000)
-  exec('bin/east migrate', (error, stdout, stderr) => {
-    console.log(stdout)
-    console.error(stderr)
-    if (error) {
-      throw error
-    }
-    App.listen(3000, 'localhost', done)
+  clearDB(() => {
+    exec('bin/east migrate', (error, stdout, stderr) => {
+      console.log(stdout)
+      console.error(stderr)
+      if (error) {
+        throw error
+      }
+      App.listen(3000, 'localhost', done)
+    })
   })
 })
 
-afterEach(function(done) {
+afterEach(clearDB)
+
+function clearDB(done) {
   db.getCollectionNames((error, names) => {
     if (error) {
       throw error
@@ -40,4 +44,4 @@ afterEach(function(done) {
       }
     )
   })
-})
+}
