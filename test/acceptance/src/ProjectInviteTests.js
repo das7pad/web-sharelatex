@@ -104,7 +104,7 @@ const tryAcceptInvite = (user, invite, callback) => {
 }
 
 const tryRegisterUser = (user, email, callback) => {
-  user.fetchCsrfToken('/register', error => {
+  user.getCsrfToken(error => {
     if (error != null) {
       return callback(error)
     }
@@ -131,7 +131,7 @@ const tryFollowLoginLink = (user, loginLink, callback) => {
 }
 
 const tryLoginUser = (user, callback) => {
-  user.fetchCsrfToken('/login', error => {
+  user.getCsrfToken(error => {
     if (error != null) {
       return callback(error)
     }
@@ -164,7 +164,7 @@ const tryGetInviteList = (user, projectId, callback) => {
 }
 
 const tryJoinProject = (user, projectId, callback) => {
-  return user.fetchCsrfToken('/project', error => {
+  return user.getCsrfToken(error => {
     if (error != null) {
       return callback(error)
     }

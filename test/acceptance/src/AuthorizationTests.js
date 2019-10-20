@@ -274,7 +274,7 @@ describe('Authorization', function() {
         cb => this.owner.login(cb),
         cb => this.other1.login(cb),
         cb => this.other2.login(cb),
-        cb => this.anon.fetchCsrfToken('/register', cb),
+        cb => this.anon.getCsrfToken(cb),
         cb => {
           this.site_admin.login(err => {
             if (err != null) {

@@ -91,25 +91,33 @@ describe('Registration', function() {
     })
 
     it('should rate limit login attempts after 10 within two minutes', function(done) {
-      return this.user.fetchCsrfToken('/login', error => {
+      return this.user.request.get('/login', (err, res, body) => {
         return async.timesSeries(
           15,
           (n, cb) => {
-            return this.user.request.post(
-            {
-              url: '/login',
-              json: {
-                email: this.badEmail,
-                password: this.badPassword
+            return this.user.getCsrfToken(error => {
+              if (error != null) {
+                return cb(error)
               }
-            },
-            (err, response, body) => {
-              return cb(
-                null,
-                __guard__(body != null ? body.message : undefined, x => x.text)
+              return this.user.request.post(
+                {
+                  url: '/login',
+                  json: {
+                    email: this.badEmail,
+                    password: this.badPassword
+                  }
+                },
+                (err, response, body) => {
+                  return cb(
+                    null,
+                    __guard__(
+                      body != null ? body.message : undefined,
+                      x => x.text
+                    )
+                  )
+                }
               )
-              }
-            )
+            })
           },
           (err, results) => {
             // ten incorrect-credentials messages, then five rate-limit messages
@@ -148,54 +156,57 @@ describe('Registration', function() {
     })
 
     it('should register with the csrf token', function(done) {
-      return this.user.fetchCsrfToken('/register', error => {
-        expect(error != null).to.equal(false)
-      return this.user.request.post(
-        {
-          url: '/register',
-          json: {
-            email: this.email,
-            password: this.password
-          },
-          headers: {
-            'x-csrf-token': this.user.csrfToken
-          }
-        },
-        (error, response, body) => {
-          expect(error != null).to.equal(false)
-          expect(response.statusCode).to.equal(200)
-          return done()
-        }
-      )
+      return this.user.request.get('/login', (err, res, body) => {
+        return this.user.getCsrfToken(error => {
+          return this.user.request.post(
+            {
+              url: '/register',
+              json: {
+                email: this.email,
+                password: this.password
+              },
+              headers: {
+                'x-csrf-token': this.user.csrfToken
+              }
+            },
+            (error, response, body) => {
+              expect(err != null).to.equal(false)
+              expect(response.statusCode).to.equal(200)
+              return done()
+            }
+          )
+        })
+      })
     })
-  })
 
     it('should fail with no csrf token', function(done) {
-      return this.user.fetchCsrfToken('/register', error => {
-      return this.user.request.post(
-        {
-          url: '/register',
-          json: {
-            email: this.email,
-            password: this.password
-          },
-          headers: {
-            'x-csrf-token': ''
-          }
-        },
-        (error, response, body) => {
-          expect(response.statusCode).to.equal(403)
-          return done()
-        }
-      )
+      return this.user.request.get('/login', (err, res, body) => {
+        return this.user.getCsrfToken(error => {
+          return this.user.request.post(
+            {
+              url: '/register',
+              json: {
+                email: this.email,
+                password: this.password
+              },
+              headers: {
+                'x-csrf-token': ''
+              }
+            },
+            (error, response, body) => {
+              expect(response.statusCode).to.equal(403)
+              return done()
+            }
+          )
+        })
+      })
     })
-  })
 
     it('should fail with a stale csrf token', function(done) {
-      return request.get('/register', (err, res, body) => {
-        return this.user.parseCsrfToken(body, error => {
+      return this.user.request.get('/login', (err, res, body) => {
+        return this.user.getCsrfToken(error => {
           const oldCsrfToken = this.user.csrfToken
-          return this.user.request.get('/register', (err, res, body) => {
+          return this.user.logout(err => {
             return this.user.request.post(
               {
                 url: '/register',
