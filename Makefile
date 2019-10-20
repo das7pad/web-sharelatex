@@ -27,13 +27,9 @@ LESS_FILES := $(shell find public/stylesheets -name '*.less')
 LESSC_COMMON_FLAGS := --source-map --autoprefix="last 2 versions, ie >= 10" --relative-urls
 CLEANCSS_FLAGS := --s0 --source-map
 
-LESS_SL_FILE := public/stylesheets/sl-style.less
 CSS_SL_FILE := public/stylesheets/sl-style.css
-LESS_OL_FILE := public/stylesheets/style.less
 CSS_OL_FILE := public/stylesheets/style.css
-LESS_OL_LIGHT_FILE := public/stylesheets/light-style.less
 CSS_OL_LIGHT_FILE := public/stylesheets/light-style.css
-LESS_OL_IEEE_FILE := public/stylesheets/ieee-style.less
 CSS_OL_IEEE_FILE := public/stylesheets/ieee-style.css
 
 CSS_FILES := $(CSS_SL_FILE) $(CSS_OL_FILE) $(CSS_OL_LIGHT_FILE) $(CSS_OL_IEEE_FILE)
@@ -58,8 +54,14 @@ public/src/ide.js public/src/main.js:
 public/stylesheets/%.css: $(LESS_FILES)
 	$(LESSC) $(LESSC_COMMON_FLAGS) $(@D)/$*.less $(@D)/$*.css
 
+clean: clean_css
+clean_css:
+	rm -f public/stylesheets/*.css*
+
+compile_full: css_full
 css_full: $(CSS_FILES)
 
+compile: css
 css: $(CSS_OL_FILE)
 
 minify: $(CSS_FILES)
@@ -68,79 +70,66 @@ minify: $(CSS_FILES)
 	$(CLEANCSS) $(CLEANCSS_FLAGS) -o $(CSS_OL_LIGHT_FILE) $(CSS_OL_LIGHT_FILE)
 	$(CLEANCSS) $(CLEANCSS_FLAGS) -o $(CSS_OL_IEEE_FILE) $(CSS_OL_IEEE_FILE)
 
-compile: css
-
-compile_full: css_full
-
 $(MODULE_MAKEFILES): Makefile.module
 	cp Makefile.module $@
 
+clean: clean_Makefiles
+clean_ci: clean_Makefiles
 clean_Makefiles:
 	rm -f $(MODULE_MAKEFILES)
 
-clean_css:
-	rm -f public/stylesheets/*.css*
-
-clean: clean_css
-clean: clean_Makefiles
-
-clean_test_acceptance: clean_test_acceptance_app
-clean_test_acceptance: clean_test_acceptance_modules
-clean_test_acceptance: clean_test_frontend
-
-clean_ci: clean_build
-clean_ci: clean_test_acceptance
-clean_ci: clean_Makefiles
-
-test: test_unit test_frontend test_acceptance
-
+test: test_unit
 test_unit:
 	COMPOSE_PROJECT_NAME=unit_test_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) run --rm test_unit
 
-test_unit_app:
-	npm -q run test:unit:app -- ${MOCHA_ARGS}
+build_test_frontend:
+	COMPOSE_PROJECT_NAME=frontend_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) build test_frontend
 
-test_frontend: compile build_test_frontend test_frontend_run
+clean_test_acceptance: clean_test_frontend
+clean_test_frontend:
+	COMPOSE_PROJECT_NAME=frontend_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) down -v -t 0
+	docker rmi -f frontend_$(BUILD_DIR_NAME)_test_frontend
+
+test: test_frontend
+test_frontend: compile
+test_frontend: test_frontend_build_run
+test_frontend_build_run: build_test_frontend
+	$(MAKE) test_frontend_run
 
 test_frontend_run:
 	COMPOSE_PROJECT_NAME=frontend_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) down -v -t 0
 	COMPOSE_PROJECT_NAME=frontend_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) run --rm test_frontend
 	COMPOSE_PROJECT_NAME=frontend_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) down -v -t 0
 
-test_frontend_build_run: build_test_frontend test_frontend_run
-
-test_acceptance: test_acceptance_app_run test_acceptance_modules_run
-
+test: test_acceptance
+test_acceptance: test_acceptance_app
+test_acceptance_run: test_acceptance_app_run
 test_acceptance_app: test_acceptance_app_run
-
-test_acceptance_run: test_acceptance_app_run test_acceptance_modules_run
-
 test_acceptance_app_run:
 	COMPOSE_PROJECT_NAME=acceptance_test_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) down -v -t 0
 	COMPOSE_PROJECT_NAME=acceptance_test_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) run --rm test_acceptance
 	COMPOSE_PROJECT_NAME=acceptance_test_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) down -v -t 0
 
+clean_ci: clean_test_acceptance
+clean_test_acceptance: clean_test_acceptance_app
 clean_test_acceptance_app:
 	COMPOSE_PROJECT_NAME=acceptance_test_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) down -v -t 0
 
+test_acceptance: test_acceptance_modules
+test_acceptance_run: test_acceptance_modules_run
+test_acceptance_modules: test_acceptance_modules_run
 TEST_ACCEPTANCE_MODULES = $(addsuffix /test_acceptance,$(MODULE_DIRS))
 test_acceptance_modules_run: $(TEST_ACCEPTANCE_MODULES)
 
 TEST_ACCEPTANCE_CI_MODULES = $(addsuffix /test_acceptance_ci,$(MODULE_DIRS))
 test_acceptance_modules_run_ci: $(TEST_ACCEPTANCE_CI_MODULES)
 
+clean_test_acceptance: clean_test_acceptance_modules
 CLEAN_TEST_ACCEPTANCE_MODULES = $(addsuffix /clean_test_acceptance,$(MODULE_DIRS))
 clean_test_acceptance_modules: $(CLEAN_TEST_ACCEPTANCE_MODULES)
 
 build_app: compile_full clean_Makefiles
-	WEBPACK_ENV=production $(MAKE) minify
-
-install_translations:
-	npm install git+https://github.com/sharelatex/translations-sharelatex.git#master
-
-ci:
-	MOCHA_ARGS="--reporter tap" \
-	$(MAKE) test
+	WEBPACK_ENV=production npm run webpack:production
 
 format:
 	npm -q run format
@@ -158,20 +147,11 @@ build:
 		--build-arg COMMIT=$(COMMIT) \
 		.
 
+clean_ci: clean_build
 clean_build:
 	docker rmi -f \
 		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER) \
 		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-cache \
-
-build_test_frontend:
-	COMPOSE_PROJECT_NAME=frontend_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) build test_frontend
-
-clean_test_frontend:
-	COMPOSE_PROJECT_NAME=frontend_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) down -v -t 0
-	docker rmi -f frontend_$(BUILD_DIR_NAME)_test_frontend
-
-publish:
-	docker push $(DOCKER_REPO)/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)
 
 tar:
 	COMPOSE_PROJECT_NAME=tar_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) run --rm tar

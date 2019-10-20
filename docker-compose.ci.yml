@@ -13,12 +13,12 @@ services:
       - mocha
       - --exit
       - --recursive
+      - --require
+      - test/unit/bootstrap.js
       - --reporter
       - xunit
       - --reporter-options
       - output=/home/node/unit.xml,suiteName='Unit Tests'
-      - --require
-      - test/unit/bootstrap.js
       - test/unit/src
       - modules/*/test/unit/src/**.js
     volumes:
@@ -76,7 +76,7 @@ services:
         BRANCH_NAME: $BRANCH_NAME
         BUILD_NUMBER: $BUILD_NUMBER
     working_dir: /app
-    command: npm run test:frontend -- --single-run
+    command: npm run test:frontend:single
     user: node
     volumes:
       - ./output:/home/node:z
