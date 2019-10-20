@@ -56,10 +56,7 @@ define([
   'services/validateCaptchaV3',
   'filters/formatDate',
   'components/inputSuggestions',
-  // OPTIONAL MODULE INCLUDES
-  /* INJECTED BY MAKEFILE */ 'main/admin-panel/index',
-  /* INJECTED BY MAKEFILE */ 'main/open-in-overleaf/index',
-  /* INJECTED BY MAKEFILE */ 'main/launchpad/index'
+  '../../modules/modules-main'
 ], function() {
   angular.module('SharelatexApp').config(function($locationProvider) {
     try {

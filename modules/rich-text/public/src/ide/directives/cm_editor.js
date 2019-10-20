@@ -12,14 +12,14 @@
  */
 define([
   'base',
-  'ide/rich-text/rich_text_adapter',
+  '../rich_text_adapter',
   'ide/editor/directives/aceEditor/spell-check/SpellCheckManager',
-  'ide/rich-text/directives/spell_check/spell_check_adapter',
-  'ide/rich-text/autocomplete_adapter',
+  './spell_check/spell_check_adapter',
+  '../autocomplete_adapter',
   'ide/editor/directives/aceEditor/cursor-position/CursorPositionManager',
-  'ide/rich-text/directives/cursor_position/cursor_position_adapter',
+  './cursor_position/cursor_position_adapter',
   'ide/editor/directives/aceEditor/track-changes/TrackChangesManager',
-  'ide/rich-text/directives/track_changes/track_changes_adapter'
+  './track_changes/track_changes_adapter'
 ], (
   App,
   RichTextAdapter,
