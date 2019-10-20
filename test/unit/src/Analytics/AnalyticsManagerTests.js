@@ -13,7 +13,7 @@ describe('AnalyticsManager', function() {
     this.fakeUserId = '123abc'
     this.settings = {
       overleaf: true,
-      apis: { analytics: { url: 'analytics.test' } }
+      apis: { analytics: { url: 'analytics.test', enabled: true } }
     }
     this.backgroundRequest = sinon.stub().yields()
     this.request = sinon.stub().yields()
@@ -29,7 +29,8 @@ describe('AnalyticsManager', function() {
         '../Errors/Errors': Errors,
         request: this.request,
         'logger-sharelatex': {
-          log() {}
+          log() {},
+          warn() {}
         }
       }
     })
