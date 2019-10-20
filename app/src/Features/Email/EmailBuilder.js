@@ -32,8 +32,8 @@ ${content.message(opts).trim()}
 ${content.ctaText(opts)}: ${content.ctaURL(opts)}
 
 ${(typeof content.secondaryMessage === 'function'
-  ? content.secondaryMessage(opts).trim()
-  : undefined) || ''}
+        ? content.secondaryMessage(opts).trim()
+        : undefined) || ''}
 
 Regards,
 The ${settings.appName} Team - ${settings.siteUrl}\
@@ -440,8 +440,8 @@ https://www.overleaf.com/user/password/reset
 
 Once you have downloaded your projects, you may wish to delete your
 ${
-  opts.poached
-} Overleaf account, which you can do from your account settings. You will then be able to add
+      opts.poached
+    } Overleaf account, which you can do from your account settings. You will then be able to add
 ${opts.poached} as a secondary email address on your ${opts.to} account again.
 
 \

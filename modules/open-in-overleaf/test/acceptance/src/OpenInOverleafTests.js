@@ -156,7 +156,7 @@ I have a bad name
           this.uri_regex
         )[1]
         expect(projectId).to.exist
-        return ProjectGetter.getProject(projectId, function(error, project) {
+        return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
             return done(error)
           }
@@ -199,7 +199,7 @@ I have a bad name
       return it('should create a project with the returned id', function(done) {
         const projectId = this.res.headers['location'].match(this.uri_regex)[1]
         expect(projectId).to.exist
-        return ProjectGetter.getProject(projectId, function(error, project) {
+        return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
             return done(error)
           }
@@ -239,7 +239,7 @@ I have a bad name
           this.uri_regex
         )[1]
         expect(projectId).to.exist
-        return ProjectGetter.getProject(projectId, function(error, project) {
+        return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
             return done(error)
           }
@@ -280,7 +280,7 @@ I have a bad name
           this.uri_regex
         )[1]
         expect(projectId).to.exist
-        return ProjectGetter.getProject(projectId, function(error, project) {
+        return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
             return done(error)
           }
@@ -365,8 +365,8 @@ I have a bad name
       })
     })
 
-    describe('when POSTing a snippet for a non-logged-in user', () =>
-      it('should render the gateway page', function(done) {
+    describe('when POSTing a snippet for a non-logged-in user', function() {
+      return it('should render the gateway page', function(done) {
         const guest = new User()
         return guest.request.post(
           {
@@ -382,10 +382,11 @@ I have a bad name
             return done()
           }
         )
-      }))
+      })
+    })
 
-    describe('when POSTing without a snippet', () =>
-      it('should render an error page', function(done) {
+    describe('when POSTing without a snippet', function() {
+      return it('should render an error page', function(done) {
         return this.user.request.post(
           {
             url: '/docs',
@@ -399,7 +400,8 @@ I have a bad name
             return done()
           }
         )
-      }))
+      })
+    })
 
     describe('when POSTing an encoded snippet with valid csrf', function() {
       beforeEach(function(done) {
@@ -438,7 +440,7 @@ I have a bad name
           this.uri_regex
         )[1]
         expect(projectId).to.exist
-        return ProjectGetter.getProject(projectId, function(error, project) {
+        return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
             return done(error)
           }
@@ -447,7 +449,7 @@ I have a bad name
           return ProjectEntityHandler.getDoc(
             project._id,
             project.rootDoc_id,
-            function(error, lines) {
+            (error, lines) => {
               if (error != null) {
                 return done(error)
               }
@@ -498,7 +500,7 @@ I have a bad name
           this.uri_regex
         )[1]
         expect(projectId).to.exist
-        return ProjectGetter.getProject(projectId, function(error, project) {
+        return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
             return done(error)
           }
@@ -507,7 +509,7 @@ I have a bad name
           return ProjectEntityHandler.getDoc(
             project._id,
             project.rootDoc_id,
-            function(error, lines) {
+            (error, lines) => {
               if (error != null) {
                 return done(error)
               }
@@ -552,7 +554,7 @@ I have a bad name
       return it('should create a project containing the retrieved snippet', function(done) {
         const projectId = this.res.headers.location.match(this.uri_regex)[1]
         expect(projectId).to.exist
-        return ProjectGetter.getProject(projectId, function(error, project) {
+        return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
             return done(error)
           }
@@ -561,7 +563,7 @@ I have a bad name
           return ProjectEntityHandler.getDoc(
             project._id,
             project.rootDoc_id,
-            function(error, lines) {
+            (error, lines) => {
               if (error != null) {
                 return done(error)
               }
@@ -606,7 +608,7 @@ I have a bad name
       it('should create a project containing the retrieved snippet', function(done) {
         const projectId = this.res.headers.location.match(this.uri_regex)[1]
         expect(projectId).to.exist
-        return ProjectGetter.getProject(projectId, function(error, project) {
+        return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
             return done(error)
           }
@@ -615,7 +617,7 @@ I have a bad name
           return ProjectEntityHandler.getDoc(
             project._id,
             project.rootDoc_id,
-            function(error, lines) {
+            (error, lines) => {
               if (error != null) {
                 return done(error)
               }
@@ -631,7 +633,7 @@ I have a bad name
       return it("should read the name from the zip's main.tex file", function(done) {
         const projectId = this.res.headers.location.match(this.uri_regex)[1]
         expect(projectId).to.exist
-        return ProjectGetter.getProject(projectId, function(error, project) {
+        return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
             return done(error)
           }
@@ -675,7 +677,7 @@ I have a bad name
       return it('should create a project with the correct brand variation id', function(done) {
         const projectId = this.res.headers.location.match(this.uri_regex)[1]
         expect(projectId).to.exist
-        return ProjectGetter.getProject(projectId, function(error, project) {
+        return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
             return done(error)
           }
@@ -719,7 +721,7 @@ I have a bad name
       return it('should create a project with the correct brand variation id', function(done) {
         const projectId = this.res.headers.location.match(this.uri_regex)[1]
         expect(projectId).to.exist
-        return ProjectGetter.getProject(projectId, function(error, project) {
+        return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
             return done(error)
           }
@@ -782,7 +784,7 @@ I have a bad name
       return it('should not create a project with an invalid name', function(done) {
         const projectId = this.res.headers.location.match(this.uri_regex)[1]
         expect(projectId).to.exist
-        return ProjectGetter.getProject(projectId, function(error, project) {
+        return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
             return done(error)
           }
@@ -884,7 +886,7 @@ I have a bad name
       return it('should not create a project with an invalid name', function(done) {
         const projectId = this.res.headers.location.match(this.uri_regex)[1]
         expect(projectId).to.exist
-        return ProjectGetter.getProject(projectId, function(error, project) {
+        return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
             return done(error)
           }
@@ -991,7 +993,7 @@ I have a bad name
       return it("should use the partner's brand variation", function(done) {
         const projectId = this.res.headers.location.match(this.uri_regex)[1]
         expect(projectId).to.exist
-        return ProjectGetter.getProject(projectId, function(error, project) {
+        return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
             return done(error)
           }
@@ -1065,7 +1067,7 @@ I have a bad name
       return it('should have a null brand variation', function(done) {
         const projectId = this.res.headers.location.match(this.uri_regex)[1]
         expect(projectId).to.exist
-        return ProjectGetter.getProject(projectId, function(error, project) {
+        return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
             return done(error)
           }
@@ -1104,7 +1106,7 @@ I have a bad name
           this.uri_regex
         )[1]
         expect(projectId).to.exist
-        return ProjectGetter.getProject(projectId, function(error, project) {
+        return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
             return done(error)
           }
@@ -1137,10 +1139,7 @@ I have a bad name
             )[1]
             expect(newProjectId).to.exist
 
-            return ProjectGetter.getProject(newProjectId, function(
-              error,
-              project
-            ) {
+            return ProjectGetter.getProject(newProjectId, (error, project) => {
               if (error != null) {
                 return done(error)
               }
@@ -1181,7 +1180,7 @@ I have a bad name
           this.uri_regex
         )[1]
         expect(projectId).to.exist
-        return ProjectGetter.getProject(projectId, function(error, project) {
+        return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
             return done(error)
           }
@@ -1215,10 +1214,7 @@ I have a bad name
             )[1]
             expect(newProjectId).to.exist
 
-            return ProjectGetter.getProject(newProjectId, function(
-              error,
-              project
-            ) {
+            return ProjectGetter.getProject(newProjectId, (error, project) => {
               if (error != null) {
                 return done(error)
               }
@@ -1263,7 +1259,7 @@ I have a bad name
           )[1]
           expect(projectId).to.exist
 
-          return ProjectGetter.getProject(projectId, function(error, project) {
+          return ProjectGetter.getProject(projectId, (error, project) => {
             if (error != null) {
               return done(error)
             }
@@ -1281,7 +1277,7 @@ I have a bad name
           )[1]
           expect(projectId).to.exist
 
-          return ProjectGetter.getProject(projectId, function(error, project) {
+          return ProjectGetter.getProject(projectId, (error, project) => {
             if (error != null) {
               return done(error)
             }
@@ -1298,7 +1294,7 @@ I have a bad name
           )[1]
           expect(projectId).to.exist
 
-          return ProjectGetter.getProject(projectId, function(error, project) {
+          return ProjectGetter.getProject(projectId, (error, project) => {
             if (error != null) {
               return done(error)
             }
@@ -1344,7 +1340,7 @@ I have a bad name
           )[1]
           expect(projectId).to.exist
 
-          return ProjectGetter.getProject(projectId, function(error, project) {
+          return ProjectGetter.getProject(projectId, (error, project) => {
             if (error != null) {
               return done(error)
             }
@@ -1392,7 +1388,7 @@ I have a bad name
           )[1]
           expect(projectId).to.exist
 
-          return ProjectGetter.getProject(projectId, function(error, project) {
+          return ProjectGetter.getProject(projectId, (error, project) => {
             if (error != null) {
               return done(error)
             }

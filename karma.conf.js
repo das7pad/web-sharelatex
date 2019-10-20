@@ -1,10 +1,10 @@
 const webpackConfig = require('./webpack.config.test')
-let junit_dest;
-let reporters = ['mocha'];
+let junitDest
+let reporters = ['mocha']
 if (process.env.HOME === '/home/node') {
   // assume CI
-  junit_dest = '/home/node/frontend.xml';
-  reporters.push('junit');
+  junitDest = '/home/node/frontend.xml'
+  reporters.push('junit')
 }
 
 module.exports = function(config) {
@@ -59,8 +59,8 @@ module.exports = function(config) {
     ],
     reporters: reporters,
     junitReporter: {
-      outputFile: junit_dest,
-    },
+      outputFile: junitDest
+    }
   })
 }
 

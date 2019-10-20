@@ -145,11 +145,11 @@ describe('Registration', function() {
   describe('CSRF protection', function() {
     this.timeout(5000)
 
-  beforeEach(function() {
-    this.user = new User()
-    this.email = `test+${Math.random()}@example.com`
-    return (this.password = 'password11')
-  })
+    beforeEach(function() {
+      this.user = new User()
+      this.email = `test+${Math.random()}@example.com`
+      return (this.password = 'password11')
+    })
 
     afterEach(function(done) {
       return this.user.fullDeleteUser(this.email, done)

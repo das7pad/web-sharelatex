@@ -166,7 +166,6 @@ var decorateFullEmails = (defaultEmail, emailsData, affiliationsData) =>
 
     return emailData
   })
-
 ;[
   'getUser',
   'getUserEmail',

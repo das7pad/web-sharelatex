@@ -48,10 +48,10 @@ define(['base'], function(App) {
         meta = {}
       }
       if (this.socket != null) {
-          const engine = this.socket.io.engine
+        const engine = this.socket.io.engine
         meta.client_id = engine.id
-          meta.transport =
-            engine.transport != null ? engine.transport.name : undefined
+        meta.transport =
+          engine.transport != null ? engine.transport.name : undefined
       }
       meta.client_now = new Date()
       meta.recent_events = this.recentEvents

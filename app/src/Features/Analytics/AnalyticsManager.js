@@ -16,9 +16,8 @@ const checkAnalyticsRequest = function(userId) {
     return { error: null, skip: true }
   }
   if (settings.apis.analytics && !settings.apis.analytics.enabled) {
-    return { error: new Errors.ServiceDisabledError(
-        'Analytics service is disabled'
-      ),
+    return {
+      error: new Errors.ServiceDisabledError('Analytics service is disabled'),
       skip: true
     }
   }

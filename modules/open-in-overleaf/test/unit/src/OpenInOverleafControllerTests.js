@@ -234,8 +234,8 @@ describe('OpenInOverleafController', function() {
       })
     })
 
-    describe('when there is no snippet', () =>
-      it('should send a missing parameters error', function(done) {
+    describe('when there is no snippet', function() {
+      return it('should send a missing parameters error', function(done) {
         this.OpenInOverleafController._populateSnippetFromRequest = sinon.stub()
         delete this.req.body.snip
         return this.OpenInOverleafController.openInOverleaf(
@@ -249,7 +249,8 @@ describe('OpenInOverleafController', function() {
             return done()
           }
         )
-      }))
+      })
+    })
 
     describe('when there is an encoded snippet', function() {
       beforeEach(function() {
@@ -621,8 +622,8 @@ describe('OpenInOverleafController', function() {
       })
     })
 
-    return describe('when there are multiple types of snippet requested', () =>
-      it("should return an 'ambiguous parameters' error", function() {
+    return describe('when there are multiple types of snippet requested', function() {
+      return it("should return an 'ambiguous parameters' error", function() {
         this.req.body.snip_uri = this.snip_uri
         this.req.body.snip = 'foo'
         const next = sinon.stub()
@@ -631,7 +632,8 @@ describe('OpenInOverleafController', function() {
           next,
           new OpenInOverleafErrors.AmbiguousParametersError()
         )
-      }))
+      })
+    })
   })
 
   describe('_populateSnippetFromRequest', function() {

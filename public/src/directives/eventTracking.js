@@ -69,34 +69,33 @@ define(['base'], App =>
         }
       }
 
-        if (attrs.eventTrackingTrigger === 'load') {
-          return sendEvent()
-        } else if (attrs.eventTrackingTrigger === 'click') {
-          return element.on('click', e => sendEvent())
-        } else if (attrs.eventTrackingTrigger === 'hover') {
-          let timer = null
-          let timeoutAmt = 500
-          if (attrs.eventHoverAmt) {
-            timeoutAmt = parseInt(attrs.eventHoverAmt, 10)
-          }
-          return element
-            .on('mouseenter', function() {
-              timer = setTimeout(() => sendEvent(), timeoutAmt)
-            })
-            .on('mouseleave', () => clearTimeout(timer))
-        } else if (attrs.eventTrackingTrigger === 'scroll') {
-          if (!event_tracking.eventInCache(scope.eventTracking)) {
-            return $(window).on('resize scroll', () =>
-              _.throttle(
-                isInViewport(element) &&
-                  !event_tracking.eventInCache(scope.eventTracking)
-                  ? sendEvent(true)
-                  : undefined,
-                500
-              )
+      if (attrs.eventTrackingTrigger === 'load') {
+        return sendEvent()
+      } else if (attrs.eventTrackingTrigger === 'click') {
+        return element.on('click', e => sendEvent())
+      } else if (attrs.eventTrackingTrigger === 'hover') {
+        let timer = null
+        let timeoutAmt = 500
+        if (attrs.eventHoverAmt) {
+          timeoutAmt = parseInt(attrs.eventHoverAmt, 10)
+        }
+        return element
+          .on('mouseenter', function() {
+            timer = setTimeout(() => sendEvent(), timeoutAmt)
+          })
+          .on('mouseleave', () => clearTimeout(timer))
+      } else if (attrs.eventTrackingTrigger === 'scroll') {
+        if (!event_tracking.eventInCache(scope.eventTracking)) {
+          return $(window).on('resize scroll', () =>
+            _.throttle(
+              isInViewport(element) &&
+              !event_tracking.eventInCache(scope.eventTracking)
+                ? sendEvent(true)
+                : undefined,
+              500
             )
-          }
+          )
         }
       }
-    })
-  ))
+    }
+  })))

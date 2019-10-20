@@ -40,10 +40,11 @@ module.exports = InstitutionsGetter = {
               x => x.confirmed
             )
         )
-        .map(emailData =>
-          emailData.affiliation != null
-            ? emailData.affiliation.institution
-            : undefined
+        .map(
+          emailData =>
+            emailData.affiliation != null
+              ? emailData.affiliation.institution
+              : undefined
         )
 
       return callback(null, confirmedInstitutions)

@@ -11,7 +11,6 @@
 let trackOpenSockets
 const _ = require('underscore')
 const metrics = require('metrics-sharelatex')
-
 ;(trackOpenSockets = function() {
   metrics.gauge(
     'http.open-sockets',

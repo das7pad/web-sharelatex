@@ -58,7 +58,8 @@ describe('ClsiManager', function() {
             }
           }
         }),
-        '../../models/Project': { Project: this.Project
+        '../../models/Project': {
+          Project: this.Project
         },
         '../Project/ProjectEntityHandler': this.ProjectEntityHandler,
         '../Project/ProjectGetter': this.ProjectGetter,

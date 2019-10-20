@@ -16,11 +16,11 @@ define([
   'ide/rich-text/directives/cm_editor',
   'ide/rich-text/rich_text_adapter',
   'utils/EventEmitter'
-], function(cmEditor, RichTextAdapter, EventEmitter) {
+], (cmEditor, RichTextAdapter, EventEmitter) => {
   let stubSharejsDoc
   describe('cmEditor', function() {
     beforeEach(
-      module('SharelatexApp', function($provide) {
+      module('SharelatexApp', $provide => {
         $provide.factory('ide', () => ({ fileTreeManager: sinon.stub() }))
         $provide.factory('metadata', () => ({}))
       })
@@ -43,7 +43,7 @@ define([
         disable: sinon.stub(),
         disableAutocomplete: sinon.stub()
       })
-      return inject(function($compile, $rootScope) {
+      return inject(($compile, $rootScope) => {
         $rootScope.sharejsDoc = stubSharejsDoc()
         $rootScope.bundle = { Editor: editorStub }
         $rootScope.formattingEvents = new EventEmitter()
@@ -62,7 +62,7 @@ define([
       const { getCodeMirror } = Editor.prototype
       const { openDoc } = Editor.prototype
       const { enable } = Editor.prototype
-      return inject(function($compile, $rootScope, $browser) {
+      return inject(($compile, $rootScope, $browser) => {
         let attachToCM, getSnapshot, snapshot
         $rootScope.sharejsDoc = stubSharejsDoc({
           getSnapshot: (getSnapshot = sinon.stub().returns((snapshot = {}))),
@@ -88,7 +88,7 @@ define([
     it('calls Editor.update when remoteop event is trigger', function() {
       const Editor = stubEditor()
       const { update } = Editor.prototype
-      return inject(function($compile, $rootScope) {
+      return inject(($compile, $rootScope) => {
         $rootScope.sharejsDoc = stubSharejsDoc()
         $rootScope.bundle = { Editor }
         $rootScope.formattingEvents = new EventEmitter()
@@ -108,7 +108,7 @@ define([
       const Editor = stubEditor(
         stubCodeMirror({ clearHistory: (clearHistory = sinon.stub()) })
       )
-      return inject(function($compile, $rootScope) {
+      return inject(($compile, $rootScope) => {
         $rootScope.sharejsDoc = stubSharejsDoc()
         $rootScope.bundle = { Editor }
         $rootScope.formattingEvents = new EventEmitter()
@@ -125,7 +125,7 @@ define([
     return it('detaches from CM when destroyed', function() {
       const Editor = stubEditor()
       const { disable } = Editor.prototype
-      return inject(function($compile, $rootScope) {
+      return inject(($compile, $rootScope) => {
         let detachFromCM
         $rootScope.sharejsDoc = stubSharejsDoc({
           detachFromCM: (detachFromCM = sinon.stub())

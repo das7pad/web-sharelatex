@@ -36,8 +36,12 @@ define(['ide/rich-text/rich_text_adapter'], RichTextAdapter =>
     })
 
     return describe('getPreviewUrlForPath', function() {
-      beforeEach(() => (window.project_id = 'project_id'))
-      afterEach(() => (window.project_id = null))
+      beforeEach(function() {
+        window.project_id = 'project_id'
+      })
+      afterEach(function() {
+        window.project_id = null
+      })
 
       it('returns url for valid path', function() {
         this.findEntityByPath.returns({

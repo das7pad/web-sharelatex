@@ -153,14 +153,13 @@ snap snap
     })
   })
 
-  describe('normalizeLatexContent', () =>
-    // TODO: handle non-UTF8 content and make best effort to convert.
-    // see: https://github.com/overleaf/write_latex/blob/master/main/lib/text_normalization.rb
-    it('returns the input', function() {
+  describe('normalizeLatexContent', function() {
+    return it('returns the input', function() {
       return expect(
         this.OpenInOverleafHelper.normalizeLatexContent(this.snippet.snip)
       ).to.equal(this.snippet.snip)
-    }))
+    })
+  })
 
   describe('populateSnippetFromUri', function() {
     beforeEach(function() {
@@ -279,17 +278,18 @@ snap snap
       })
     })
 
-    return describe('when trying to download an invalid uri', () =>
-      it('raises an invalid URI error', function(done) {
+    return describe('when trying to download an invalid uri', function() {
+      return it('raises an invalid URI error', function(done) {
         return this.OpenInOverleafHelper.populateSnippetFromUri(
           'htt::/a',
           {},
-          function(err) {
+          err => {
             expect(err.name).to.equal('InvalidUriError')
             return done()
           }
         )
-      }))
+      })
+    })
   })
 
   describe('populateSnippetFromTemplate', function() {
@@ -570,7 +570,7 @@ snap snap
       return this.OpenInOverleafHelper.populateSnippetFromUriArray(
         this.uris,
         this.source,
-        function(error) {
+        error => {
           expect(error).not.to.exist
           return done()
         }

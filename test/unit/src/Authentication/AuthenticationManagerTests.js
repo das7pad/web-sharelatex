@@ -615,13 +615,13 @@ describe('AuthenticationManager', function() {
         expect(args[0]).to.deep.equal({
           _id: ObjectId(this.user_id.toString())
         })
-         expect(args[1]).to.deep.equal({
-            $set: {
-              hashedPassword: this.hashedPassword
-            },
-            $unset: { password: true }
-          })
+        expect(args[1]).to.deep.equal({
+          $set: {
+            hashedPassword: this.hashedPassword
+          },
+          $unset: { password: true }
         })
+      })
 
       it('should hash the password', function() {
         this.bcrypt.genSalt.calledWith(12).should.equal(true)

@@ -269,8 +269,8 @@ describe('UserAdminController', function() {
     })
   })
 
-  describe('delete', () =>
-    it('should delete the user', function(done) {
+  describe('delete', function() {
+    return it('should delete the user', function(done) {
       this.req = {
         params: {
           user_id: 'user_id_here'
@@ -284,7 +284,8 @@ describe('UserAdminController', function() {
         return done()
       }
       return this.UserAdminController.delete(this.req, this.res)
-    }))
+    })
+  })
 
   describe('update', function() {
     beforeEach(function() {

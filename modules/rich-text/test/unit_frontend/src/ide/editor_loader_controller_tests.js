@@ -20,12 +20,14 @@ define([
     let origRequireJsFn = null
     beforeEach(function() {
       origRequireJsFn = window.requirejs
-      return (window.requirejs = this.requirejs = sinon.stub())
+      window.requirejs = this.requirejs = sinon.stub()
     })
 
-    afterEach(() => (window.requirejs = origRequireJsFn))
+    afterEach(function() {
+      window.requirejs = origRequireJsFn
+    })
 
-    it('inits richText scope', () =>
+    it('inits richText scope', function() {
       inject(($rootScope, $controller) => {
         const $scope = $rootScope.$new()
         $controller('EditorLoaderController', { $scope })
@@ -34,7 +36,8 @@ define([
         return expect($scope.richText.formattingEvents).to.be.an.instanceof(
           EventEmitter
         )
-      }))
+      })
+    })
 
     it('watches showRichText and loads bundle if true', function() {
       return inject(($rootScope, $controller) => {

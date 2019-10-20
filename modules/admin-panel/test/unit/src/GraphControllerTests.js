@@ -166,7 +166,7 @@ describe('GraphController', function() {
         this.projects,
         [this.users[0]._id.toString()],
         this.SigmaJSGraph,
-        function(err, graph) {
+        (err, graph) => {
           graph.nodes.should.exists
           return done()
         }
@@ -178,7 +178,7 @@ describe('GraphController', function() {
         this.projects,
         [this.users[0]._id.toString()],
         this.SigmaJSGraph,
-        function(err, graph) {
+        (err, graph) => {
           graph.edges.should.exists
           return done()
         }
@@ -206,7 +206,7 @@ describe('GraphController', function() {
         [this.users[0]._id.toString()],
         this.emptyGraph,
         1,
-        function(err, graph) {
+        (err, graph) => {
           assert.equal(graph.nodes.length, 3)
           return done()
         }
@@ -214,16 +214,17 @@ describe('GraphController', function() {
     })
   })
 
-  return describe('_getNames', () =>
-    it('should add name to nodes', function(done) {
+  return describe('_getNames', function() {
+    return it('should add name to nodes', function(done) {
       return this.GraphController._getNames(
         { nodes: this.nodes, edges: [] },
-        function(err, graph) {
+        (err, graph) => {
           for (let node of Array.from(graph.nodes)) {
             node.label.should.not.equal('')
           }
           return done()
         }
       )
-    }))
+    })
+  })
 })

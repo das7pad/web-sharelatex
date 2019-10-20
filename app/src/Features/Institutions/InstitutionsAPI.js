@@ -230,7 +230,6 @@ var makeAffiliationRequest = function(requestOptions, callback) {
     }
   )
 }
-
 ;[
   'getInstitutionAffiliations',
   'getUserAffiliations',

@@ -155,13 +155,13 @@ const AuthenticationManager = {
       db.users.update(
         {
           _id: ObjectId(userId.toString())
-          },
-          {
-            $set: { hashedPassword: hash },
-            $unset: { password: true }
-          },
-          function(updateError, result) {
-            if (updateError ) {
+        },
+        {
+          $set: { hashedPassword: hash },
+          $unset: { password: true }
+        },
+        function(updateError, result) {
+          if (updateError) {
             return callback(updateError)
           }
           _checkWriteResult(result, callback)

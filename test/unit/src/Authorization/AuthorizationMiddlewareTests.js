@@ -34,8 +34,10 @@ describe('AuthorizationMiddleware', function() {
       requires: {
         './AuthorizationManager': this.AuthorizationManager,
         'logger-sharelatex': { log() {} },
-        mongojs: { ObjectId: this.ObjectId
-        },'@overleaf/o-error/http': HttpErrors,
+        mongojs: {
+          ObjectId: this.ObjectId
+        },
+        '@overleaf/o-error/http': HttpErrors,
         '../Errors/Errors': Errors,
         '../Authentication/AuthenticationController': this
           .AuthenticationController,

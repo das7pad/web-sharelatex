@@ -489,7 +489,6 @@ define(['base', 'pdfjs-dist/webpack'], (App, PDFJS) =>
                     typeof self.errorCallback === 'function'
                       ? self.errorCallback(error)
                       : undefined
-
                 )
             })
             .catch(function(error) {
