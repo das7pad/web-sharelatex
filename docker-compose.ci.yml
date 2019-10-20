@@ -55,6 +55,8 @@ services:
       - mocha
       - --exit
       - --recursive
+      - --require
+      - test/acceptance/bootstrap.js
       - --reporter
       - xunit
       - --reporter-options

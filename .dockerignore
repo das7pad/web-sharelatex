@@ -96,8 +96,9 @@ public/stylesheets/*.map
 !/test/acceptance/src
 !/test/smoke/src
 !/test/unit/src
-!/test/unit/bootstrap.js
+!/test/*/bootstrap.js
 !/test/unit_frontend/es
+!/test/unit_frontend/import_tests.js
 !/test/unit_frontend/src
 # app #
 #######
