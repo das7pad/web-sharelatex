@@ -2,6 +2,9 @@ v1Api =
 	url: "http://#{process.env['V1_HOST'] or 'localhost'}:5000"
 
 module.exports =
+	mongo:
+		url: process.env['MONGO_CONNECTION_STRING'] || process.env['MONGO_URL'] || "mongodb://#{process.env['MONGO_HOST'] or '127.0.0.1'}/sharelatex_dev"
+
 	enableSubscriptions: true
 	allowPublicAccess: true
 
