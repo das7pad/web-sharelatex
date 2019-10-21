@@ -11,7 +11,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 define([
-  'ide/rich-text/controllers/editor_loader_controller',
+  '../../../../public/src/ide/controllers/editor_loader_controller',
   'utils/EventEmitter'
 ], (EditorLoaderController, EventEmitter) =>
   describe('EditorLoaderController', function() {

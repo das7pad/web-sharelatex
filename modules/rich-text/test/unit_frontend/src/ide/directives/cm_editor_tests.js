@@ -13,8 +13,8 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 define([
-  'ide/rich-text/directives/cm_editor',
-  'ide/rich-text/rich_text_adapter',
+  '../../../../../public/src/ide/directives/cm_editor',
+  '../../../../../public/src/ide/rich_text_adapter',
   'utils/EventEmitter'
 ], (cmEditor, RichTextAdapter, EventEmitter) => {
   let stubSharejsDoc
