@@ -117,6 +117,7 @@ const ProjectCreationHandler = {
       err,
       user
     ) {
+      if (err) return callback(err)
       project.spellCheckLanguage = user.ace.spellCheckLanguage
       return project.save(function(err) {
         if (err != null) {
