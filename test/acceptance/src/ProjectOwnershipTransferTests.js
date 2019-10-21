@@ -2,6 +2,8 @@ const { expect } = require('chai')
 const User = require('./helpers/User').promises
 
 describe('Project ownership transfer', function() {
+  this.timeout(10000)
+
   beforeEach(async function() {
     this.ownerSession = new User()
     this.collaboratorSession = new User()
