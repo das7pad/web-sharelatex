@@ -42,6 +42,14 @@ module.exports = merge(base, {
         to: 'libs/jquery-1.11.1.min.js.map'
       },
       {
+        from: 'public/js/libs/socket.io-2.2.0/socket.io.js',
+        to: 'libs/socket.io-2.2.0/socket.io.js'
+      },
+      {
+        from: 'public/js/libs/socket.io-2.2.0/socket.io.js.map',
+        to: 'libs/socket.io-2.2.0/socket.io.js.map'
+      },
+      {
         from: 'public/js/libs/mathjax',
         to: 'libs/mathjax'
       },
