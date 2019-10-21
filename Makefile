@@ -109,7 +109,7 @@ clean_test_acceptance: clean_test_acceptance_modules
 CLEAN_TEST_ACCEPTANCE_MODULES = $(addsuffix /clean_test_acceptance,$(MODULE_DIRS))
 clean_test_acceptance_modules: $(CLEAN_TEST_ACCEPTANCE_MODULES)
 
-build_app: compile_full clean_Makefiles
+build_app: compile_full minify clean_Makefiles
 	WEBPACK_ENV=production npm run webpack:production
 
 format:
