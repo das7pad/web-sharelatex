@@ -2,6 +2,8 @@ const { expect } = require('chai')
 const User = require('./helpers/User').promises
 
 describe('Sharing', function() {
+  this.timeout(50000)
+
   beforeEach(async function() {
     this.ownerSession = new User()
     this.collaboratorSession = new User()
