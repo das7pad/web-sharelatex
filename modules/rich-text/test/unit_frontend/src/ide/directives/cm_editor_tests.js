@@ -20,7 +20,7 @@ define([
   let stubSharejsDoc
   describe('cmEditor', function() {
     beforeEach(
-      module('SharelatexApp', $provide => {
+      window.module('SharelatexApp', $provide => {
         $provide.factory('ide', () => ({ fileTreeManager: sinon.stub() }))
         $provide.factory('metadata', () => ({}))
       })

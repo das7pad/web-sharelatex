@@ -15,7 +15,7 @@ define([
   'utils/EventEmitter'
 ], (EditorLoaderController, EventEmitter) =>
   describe('EditorLoaderController', function() {
-    beforeEach(module('SharelatexApp'))
+    beforeEach(window.module('SharelatexApp'))
 
     let origRequireJsFn = null
     beforeEach(function() {
