@@ -6,10 +6,7 @@
 const Features = require('../../app/src/infrastructure/Features')
 
 module.exports = {
-  assetFiles: ['es/rich-text.js'],
-
   viewIncludes: {
-    'editor:script': 'script',
     'editor:main': 'main'
   }
 }
