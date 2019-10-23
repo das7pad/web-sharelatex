@@ -17,7 +17,6 @@ define([
   '../../../../../public/src/ide/rich_text_adapter',
   'utils/EventEmitter'
 ], (cmEditor, RichTextAdapter, EventEmitter) => {
-  let stubSharejsDoc
   describe('cmEditor', function() {
     beforeEach(
       window.module('SharelatexApp', $provide => {
@@ -63,11 +62,11 @@ define([
       const { openDoc } = Editor.prototype
       const { enable } = Editor.prototype
       return inject(($compile, $rootScope, $browser) => {
-        let attachToCM, getSnapshot, snapshot
+        let getSnapshot, snapshot
         $rootScope.sharejsDoc = stubSharejsDoc({
-          getSnapshot: (getSnapshot = sinon.stub().returns((snapshot = {}))),
-          attachToCM: (attachToCM = sinon.stub())
+          getSnapshot: (getSnapshot = sinon.stub().returns((snapshot = {})))
         })
+        sinon.spy($rootScope.sharejsDoc, 'attachToCM')
         $rootScope.bundle = { Editor }
         $rootScope.formattingEvents = new EventEmitter()
 
@@ -80,7 +79,7 @@ define([
         expect(getSnapshot).to.have.been.called
         expect(openDoc).to.have.been.called
         expect(openDoc.firstCall.args[0]).to.equal(snapshot)
-        expect(attachToCM).to.have.been.called
+        expect($rootScope.sharejsDoc.attachToCM).to.have.been.called
         return expect(enable).to.have.been.called
       })
     })
@@ -187,18 +186,25 @@ define([
   }
 
   // Stub the ShareJS Doc that is created by editor internals
-  return (stubSharejsDoc = function(overrides) {
+  const stubSharejsDoc = function(overrides) {
     if (overrides == null) {
       overrides = {}
     }
     return _.extend(
       EventEmitter.prototype,
       {
-        attachToCM: sinon.stub(),
+        ranges: {
+          changes: [],
+          comments: []
+        },
+        attachToCM: function(cm) {
+          cm.doc = this
+        },
+        getAllMarks: sinon.stub().returns([]),
         getSnapshot: sinon.stub(),
         detachFromCM: sinon.stub()
       },
       overrides
     )
-  })
+  }
 })
