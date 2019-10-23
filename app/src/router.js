@@ -288,6 +288,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
       maxRequests: 15,
       timeInterval: 60
     }),
+    AuthenticationController.validateUserSession(),
     AuthorizationMiddleware.ensureUserCanReadProject,
     ProjectController.loadEditor
   )
@@ -494,11 +495,6 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     AuthenticationController.requireLogin(),
     AuthorizationMiddleware.ensureUserCanAdminProject,
     ProjectController.renameProject
-  )
-  webRouter.post(
-    '/project/:Project_id/transfer-ownership',
-    AuthorizationMiddleware.ensureUserCanAdminProject,
-    ProjectController.transferOwnership
   )
   webRouter.get(
     '/project/:Project_id/updates',

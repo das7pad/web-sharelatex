@@ -3,13 +3,9 @@ const fs = require('fs')
 const crypto = require('crypto')
 const async = require('async')
 const logger = require('logger-sharelatex')
-const HttpErrors = require('@overleaf/o-error/http')
-const { ObjectId } = require('mongodb')
-const Errors = require('../Errors/Errors')
 const ProjectDeleter = require('./ProjectDeleter')
 const ProjectDuplicator = require('./ProjectDuplicator')
 const ProjectCreationHandler = require('./ProjectCreationHandler')
-const ProjectDetailsHandler = require('./ProjectDetailsHandler')
 const EditorController = require('../Editor/EditorController')
 const ProjectHelper = require('./ProjectHelper')
 const metrics = require('metrics-sharelatex')
@@ -412,7 +408,7 @@ const ProjectController = {
         user(cb) {
           User.findById(
             userId,
-            'featureSwitches overleaf awareOfV2 features lastLoginIp',
+            'emails featureSwitches overleaf awareOfV2 features lastLoginIp',
             cb
           )
         },
@@ -428,27 +424,92 @@ const ProjectController = {
           logger.warn({ err }, 'error getting data for project list page')
           return next(err)
         }
+        const { notifications, user, userAffiliations } = results
         const v1Tags =
           (results.v1Projects != null ? results.v1Projects.tags : undefined) ||
           []
         const tags = results.tags.concat(v1Tags)
-        const notifications = results.notifications
         for (const notification of notifications) {
           notification.html = req.i18n.translate(
             notification.templateKey,
             notification.messageOpts
           )
         }
+
+        // Institution SSO Notifications
+        if (Features.hasFeature('saml') || req.session.samlBeta) {
+          const samlSession = req.session.saml
+          // Notification: SSO Available
+          // Could have multiple emails at the same institution, and if any are
+          // linked to the institution then do not show notification for others
+          const linkedInstitutionIds = []
+          const linkedInstitutionEmails = []
+          user.emails.forEach(email => {
+            if (email.samlProviderId) {
+              linkedInstitutionEmails.push(email.email)
+              linkedInstitutionIds.push(email.samlProviderId)
+            }
+          })
+          if (Array.isArray(userAffiliations)) {
+            userAffiliations.forEach(affiliation => {
+              if (
+                affiliation.institution &&
+                affiliation.institution.ssoEnabled &&
+                linkedInstitutionEmails.indexOf(affiliation.email) === -1 &&
+                linkedInstitutionIds.indexOf(
+                  affiliation.institution.id.toString()
+                ) === -1
+              ) {
+                notifications.push({
+                  email: affiliation.email,
+                  institutionId: affiliation.institution.id,
+                  institutionName: affiliation.institution.name,
+                  templateKey: 'notification_institution_sso_available'
+                })
+              }
+            })
+          }
+
+          if (samlSession) {
+            // Notification: After SSO Linked
+            if (samlSession.linked) {
+              notifications.push({
+                email: samlSession.institutionEmail,
+                institutionName: samlSession.linked.universityName,
+                templateKey: 'notification_institution_sso_linked'
+              })
+            }
+
+            // Notification: After SSO Linked or Logging in
+            // The requested email does not match primary email returned from
+            // the institution
+            if (samlSession.emailNonCanonical) {
+              notifications.push({
+                institutionEmail: samlSession.emailNonCanonical,
+                requestedEmail: samlSession.requestedEmail,
+                templateKey: 'notification_institution_sso_non_canonical'
+              })
+            }
+
+            // Notification: Tried to register, but account already existed
+            if (samlSession.registerIntercept) {
+              notifications.push({
+                email: samlSession.institutionEmail,
+                templateKey: 'notification_institution_sso_already_registered'
+              })
+            }
+          }
+          delete req.session.saml
+        }
+
         const portalTemplates = ProjectController._buildPortalTemplatesList(
-          results.userAffiliations
+          userAffiliations
         )
         const projects = ProjectController._buildProjectList(
           results.projects,
           userId,
           results.v1Projects != null ? results.v1Projects.projects : undefined
         )
-        const { user } = results
-        const { userAffiliations } = results
         const warnings = ProjectController._buildWarningsList(
           results.v1Projects
         )
@@ -744,75 +805,6 @@ const ProjectController = {
             timer.done()
           }
         )
-      }
-    )
-  },
-
-  transferOwnership(req, res, next) {
-    const sessionUser = AuthenticationController.getSessionUser(req)
-    if (req.body.user_id == null) {
-      return next(
-        new HttpErrors.BadRequestError({
-          info: { public: { message: 'Missing parameter: user_id' } }
-        })
-      )
-    }
-    let projectId
-    try {
-      projectId = ObjectId(req.params.Project_id)
-    } catch (err) {
-      return next(
-        new HttpErrors.BadRequestError({
-          info: {
-            public: { message: `Invalid project id: ${req.params.Project_id}` }
-          }
-        })
-      )
-    }
-    let toUserId
-    try {
-      toUserId = ObjectId(req.body.user_id)
-    } catch (err) {
-      return next(
-        new HttpErrors.BadRequestError({
-          info: { public: { message: `Invalid user id: ${req.body.user_id}` } }
-        })
-      )
-    }
-    ProjectDetailsHandler.transferOwnership(
-      projectId,
-      toUserId,
-      { allowTransferToNonCollaborators: sessionUser.isAdmin },
-      err => {
-        if (err != null) {
-          if (err instanceof Errors.ProjectNotFoundError) {
-            next(
-              new HttpErrors.NotFoundError({
-                info: { public: { message: `project not found: ${projectId}` } }
-              })
-            )
-          } else if (err instanceof Errors.UserNotFoundError) {
-            next(
-              new HttpErrors.NotFoundError({
-                info: { public: { message: `user not found: ${toUserId}` } }
-              })
-            )
-          } else if (err instanceof Errors.UserNotCollaboratorError) {
-            next(
-              new HttpErrors.ForbiddenError({
-                info: {
-                  public: {
-                    message: `user ${toUserId} should be a collaborator in project ${projectId} prior to ownership transfer`
-                  }
-                }
-              })
-            )
-          } else {
-            next(err)
-          }
-        } else {
-          res.sendStatus(204)
-        }
       }
     )
   },

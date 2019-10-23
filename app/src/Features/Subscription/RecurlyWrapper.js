@@ -516,14 +516,13 @@ module.exports = RecurlyWrapper = {
     )
   },
 
-  getAccounts(callback) {
+  getAccounts(queryParams, callback) {
+    queryParams.per_page = queryParams.per_page || 200
     let allAccounts = []
     var getPageOfAccounts = (cursor = null) => {
       const opts = {
         url: 'accounts',
-        qs: {
-          per_page: 200
-        }
+        qs: queryParams
       }
       if (cursor != null) {
         opts.qs.cursor = cursor
@@ -545,11 +544,12 @@ module.exports = RecurlyWrapper = {
           )
           cursor = __guard__(
             response.headers.link != null
-              ? response.headers.link.match(/cursor=([0-9]+)&/)
+              ? response.headers.link.match(/cursor=([0-9]+%3A[0-9]+)&/)
               : undefined,
             x1 => x1[1]
           )
           if (cursor != null) {
+            cursor = decodeURIComponent(cursor)
             return getPageOfAccounts(cursor)
           } else {
             return callback(err, allAccounts)

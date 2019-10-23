@@ -255,9 +255,6 @@ const AuthenticationController = (module.exports = {
   },
 
   getSessionUser(req) {
-    if (!SessionStoreManager.checkValidationToken(req)) {
-      return null
-    }
     const sessionUser = _.get(req, ['session', 'user'])
     const sessionPassportUser = _.get(req, ['session', 'passport', 'user'])
     return sessionUser || sessionPassportUser || null
@@ -310,6 +307,29 @@ const AuthenticationController = (module.exports = {
         req.oauth_user = token.user
         return next()
       })
+    }
+  },
+
+  validateUserSession: function() {
+    // Middleware to check that the user's session is still good on key actions,
+    // such as opening a a project. Could be used to check that session has not
+    // exceeded a maximum lifetime (req.session.session_created), or for session
+    // hijacking checks (e.g. change of ip address, req.session.ip_address). For
+    // now, just check that the session has been loaded from the session store
+    // correctly.
+    return function(req, res, next) {
+      // check that the session store is returning valid results
+      if (req.session && !SessionStoreManager.hasValidationToken(req)) {
+        // force user to update session
+        req.session.regenerate(() => {
+          // need to destroy the existing session and generate a new one
+          // otherwise they will already be logged in when they are redirected
+          // to the login page
+          AuthenticationController._redirectToLoginOrRegisterPage(req, res)
+        })
+      } else {
+        next()
+      }
     }
   },
 

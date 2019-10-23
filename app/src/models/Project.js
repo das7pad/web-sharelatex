@@ -35,6 +35,14 @@ const DeletedFileSchema = new Schema({
   deletedAt: { type: Date }
 })
 
+const AuditLogEntrySchema = new Schema({
+  _id: false,
+  operation: { type: String },
+  initiatorId: { type: Schema.Types.ObjectId },
+  timestamp: { type: Date },
+  info: { type: Object }
+})
+
 const ProjectSchema = new Schema({
   name: { type: String, default: 'new project' },
   lastUpdated: {
@@ -116,7 +124,8 @@ const ProjectSchema = new Schema({
         }
       }
     }
-  ]
+  ],
+  auditLog: [AuditLogEntrySchema]
 })
 
 ProjectSchema.statics.getProject = function(project_or_id, fields, callback) {

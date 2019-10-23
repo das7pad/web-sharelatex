@@ -33,6 +33,7 @@ describe('AuthenticationController', function() {
         '../Analytics/AnalyticsManager': (this.AnalyticsManager = {
           recordEvent: sinon.stub()
         }),
+        '../../infrastructure/SessionStoreManager': (this.SessionStoreManager = {}),
         'logger-sharelatex': (this.logger = {
           log: sinon.stub(),
           warn: sinon.stub(),
@@ -47,9 +48,6 @@ describe('AuthenticationController', function() {
           trackSession: sinon.stub(),
           untrackSession: sinon.stub(),
           revokeAllUserSessions: sinon.stub().callsArgWith(1, null)
-        }),
-        '../../infrastructure/SessionStoreManager': (this.SessionStoreManager = {
-          checkValidationToken: sinon.stub().returns(true)
         }),
         '../../infrastructure/Modules': (this.Modules = {
           hooks: { fire: sinon.stub().callsArgWith(2, null, []) }
@@ -320,32 +318,6 @@ describe('AuthenticationController', function() {
     })
   })
 
-  describe('getSessionUser', function() {
-    it('should accept a valid session', function() {
-      this.req.session = {
-        passport: {
-          user: { _id: 'one' }
-        }
-      }
-      this.SessionStoreManager.checkValidationToken = sinon.stub().returns(true)
-      const user = this.AuthenticationController.getSessionUser(this.req)
-      expect(user).to.deep.equal({ _id: 'one' })
-    })
-
-    it('should reject an invalid session', function() {
-      this.req.session = {
-        passport: {
-          user: { _id: 'two' }
-        }
-      }
-      this.SessionStoreManager.checkValidationToken = sinon
-        .stub()
-        .returns(false)
-      const user = this.AuthenticationController.getSessionUser(this.req)
-      expect(user).to.be.null
-    })
-  })
-
   describe('doPassportLogin', function() {
     beforeEach(function() {
       this.AuthenticationController._recordFailedLogin = sinon.stub()
@@ -599,6 +571,54 @@ describe('AuthenticationController', function() {
         this.AuthenticationController._redirectToLoginOrRegisterPage = sinon.stub()
         this.req.query = {}
         this.middleware(this.req, this.res, this.next)
+      })
+
+      it('should redirect to the register or login page', function() {
+        this.AuthenticationController._redirectToLoginOrRegisterPage
+          .calledWith(this.req, this.res)
+          .should.equal(true)
+      })
+    })
+  })
+
+  describe('validateUserSession', function() {
+    beforeEach(function() {
+      this.user = {
+        _id: 'user-id-123',
+        email: 'user@sharelatex.com'
+      }
+      this.middleware = this.AuthenticationController.validateUserSession()
+    })
+
+    describe('when the user has a session token', function() {
+      beforeEach(function() {
+        this.req.user = this.user
+        this.SessionStoreManager.hasValidationToken = sinon.stub().returns(true)
+        this.middleware(this.req, this.res, this.next)
+      })
+
+      it('should call the next method in the chain', function() {
+        this.next.called.should.equal(true)
+      })
+    })
+
+    describe('when the user does not have a session token', function() {
+      beforeEach(function() {
+        this.req.session = {
+          user: this.user,
+          regenerate: sinon.stub().yields()
+        }
+        this.req.user = this.user
+        this.AuthenticationController._redirectToLoginOrRegisterPage = sinon.stub()
+        this.req.query = {}
+        this.SessionStoreManager.hasValidationToken = sinon
+          .stub()
+          .returns(false)
+        this.middleware(this.req, this.res, this.next)
+      })
+
+      it('should destroy the current session', function() {
+        this.req.session.regenerate.called.should.equal(true)
       })
 
       it('should redirect to the register or login page', function() {
