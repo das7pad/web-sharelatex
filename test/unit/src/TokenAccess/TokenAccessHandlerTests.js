@@ -39,6 +39,7 @@ describe('TokenAccessHandler', function() {
       },
       requires: {
         '../../models/Project': { Project: (this.Project = {}) },
+        'logger-sharelatex': { err: sinon.stub() },
         'settings-sharelatex': (this.settings = {}),
         '../Collaborators/CollaboratorsGetter': (this.CollaboratorsGetter = {}),
         '../User/UserGetter': (this.UserGetter = {}),
