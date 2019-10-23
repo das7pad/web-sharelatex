@@ -1,5 +1,3 @@
-/* global _ */
-
 export default class HighlightedWordManager {
   constructor(editor) {
     this.editor = editor

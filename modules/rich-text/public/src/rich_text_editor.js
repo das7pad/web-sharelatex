@@ -42,7 +42,11 @@ export class Editor {
 
     this.adapter = richTextAdapter
     this.autocompleteAdapter = autocompleteAdapter
-    this.highlightedWordManager = new HighlightedWordManager(this.codeMirror)
+
+    if (!getSetting('readOnly')) {
+      this.highlightedWordManager = new HighlightedWordManager(this.codeMirror)
+    }
+
     makeKeyUpHandler(this.codeMirror)
   }
 
@@ -73,6 +77,9 @@ export class Editor {
 
   setReadOnly(readOnly) {
     this.codeMirror.setOption('readOnly', readOnly)
+    if (!readOnly && !this.highlightedWordManager) {
+      this.highlightedWordManager = new HighlightedWordManager(this.codeMirror)
+    }
   }
 
   wrapBold() {

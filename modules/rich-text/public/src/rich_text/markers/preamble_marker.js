@@ -1,5 +1,3 @@
-/* global $ */
-
 import { deTex, splitAuthors, clearOnMouseDown } from '../utils'
 import { makePreambleMark } from '../preamble_mark'
 

@@ -1,5 +1,3 @@
-/* global $ */
-
 import { makeSingleMark } from '../single_mark'
 
 const ListItemsMarker = {

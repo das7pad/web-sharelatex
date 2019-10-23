@@ -1,5 +1,3 @@
-/* global $ */
-
 import { makeSingleMark } from '../single_mark'
 import { makeGroup } from '../utils'
 

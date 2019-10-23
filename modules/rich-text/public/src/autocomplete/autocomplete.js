@@ -1,5 +1,3 @@
-/* global _ */
-
 import { Pos } from 'codemirror'
 import Fuse from 'fuse.js'
 

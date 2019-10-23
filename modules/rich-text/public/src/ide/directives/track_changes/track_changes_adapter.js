@@ -4,36 +4,43 @@
 define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
   class TrackChangesAdapter {
     constructor(editor) {
+      this.findTrackChangesMarker = this.findTrackChangesMarker.bind(this)
+      this.getTrackChangesMarkers = this.getTrackChangesMarkers.bind(this)
       this.onInsertAdded = this.onInsertAdded.bind(this)
       this.shareJsOffsetToRowColumn = this.shareJsOffsetToRowColumn.bind(this)
       this.onDeleteAdded = this.onDeleteAdded.bind(this)
       this.onChangeMoved = this.onChangeMoved.bind(this)
-      this.changeMarkerPositions = this.changeMarkerPositions.bind(this)
       this.editor = editor
       this.cm = this.editor.getCodeMirror()
     }
 
-    clearAnnotations() {
-      const markers = this.cm.doc.getAllMarks()
+    getTrackChangesMarkers() {
+      return this.cm.doc.getAllMarks().filter(marker => {
+        const isInsertOrCommentMarker =
+          marker.className &&
+          marker.className.indexOf('track-changes-marker') !== -1
+        const isDeleteMarker =
+          marker.type === 'bookmark' &&
+          marker.replacedWith &&
+          marker.replacedWith.className.indexOf('track-changes-marker') !== -1
 
-      for (let marker of markers) {
-        marker.clear()
-      }
+        return isInsertOrCommentMarker || isDeleteMarker
+      })
+    }
+
+    findTrackChangesMarker(markerId) {
+      return this.getTrackChangesMarkers().find(
+        marker => marker.id === markerId
+      )
+    }
+
+    clearAnnotations() {
+      this.getTrackChangesMarkers().forEach(marker => marker.clear())
+
       this.changeIdToMarkerIdMap = {}
     }
 
     tearDown() {
-      // Clear html-node based markers
-      const markers = Object.values(this.changeIdToMarkerIdMap).filter(
-        marker => typeof marker === 'object'
-      )
-
-      const markerNodes = markers.map(marker => marker.marker)
-
-      for (let marker of markerNodes) {
-        marker.parentNode.removeChild(marker)
-      }
-
       this.changeIdToMarkerIdMap = {}
     }
 
@@ -50,23 +57,40 @@ define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
     }
 
     onDeleteAdded(change) {
-      let position, markerNode
-      position = this.shareJsOffsetToRowColumn(change.op.p)
+      const position = this.shareJsOffsetToRowColumn(change.op.p)
 
-      markerNode = document.createElement('div')
-      markerNode.className = 'track-changes-deleted-marker-callout'
+      const el = document.createElement('span')
+      el.className = 'track-changes-marker track-changes-deleted-marker'
 
-      this.cm.addWidget(
+      const marker = this.cm.setBookmark(
         { line: position.row, ch: position.column },
-        markerNode,
-        false
+        {
+          widget: el,
+          insertLeft: true
+        }
       )
-      this.changeIdToMarkerIdMap[change.id] = {
-        position: position,
-        marker: markerNode
-      }
 
-      // this.clearOverlappingDeleteMarkers(markerNode)
+      this.changeIdToMarkerIdMap[change.id] = marker.id
+    }
+
+    onInsertRemoved(change) {
+      const markerId = this.changeIdToMarkerIdMap[change.id]
+      delete this.changeIdToMarkerIdMap[change.id]
+
+      const marker = this.findTrackChangesMarker(markerId)
+      if (!marker) return
+
+      marker.clear()
+    }
+
+    onDeleteRemoved(change) {
+      const markerId = this.changeIdToMarkerIdMap[change.id]
+      delete this.changeIdToMarkerIdMap[change.id]
+
+      const marker = this.findTrackChangesMarker(markerId)
+      if (!marker) return
+
+      marker.clear()
     }
 
     onChangeMoved(change) {
@@ -77,36 +101,59 @@ define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
       } else {
         end = start
       }
-      this.updateMarker(change.id, start, end)
+      this.updateMarker(change, start, end)
     }
 
-    updateMarker(change_id, start, end) {
-      // If it's not a delete
-      if (typeof this.changeIdToMarkerIdMap[change_id] === 'number') {
-        const markers = this.cm.doc.getAllMarks()
-        const markerId = this.changeIdToMarkerIdMap[change_id]
-        for (let marker of markers) {
-          if (marker.id === markerId) {
-            marker.clear()
-            let updatedMarker = this.cm.doc.markText(
-              { line: start.row, ch: start.column },
-              { line: end.row, ch: end.column },
-              { className: 'track-changes-marker track-changes-added-marker' }
-            )
+    onCommentAdded(comment) {
+      let start, end, marker
+      start = this.shareJsOffsetToRowColumn(comment.op.p)
+      end = this.shareJsOffsetToRowColumn(comment.op.p + comment.op.c.length)
+      marker = this.cm.doc.markText(
+        { line: start.row, ch: start.column },
+        { line: end.row, ch: end.column },
+        { className: 'track-changes-marker track-changes-comment-marker' }
+      )
+      this.changeIdToMarkerIdMap[comment.id] = marker.id
+    }
 
-            this.changeIdToMarkerIdMap[change_id] = updatedMarker.id
-          }
-        }
-      } else if (typeof this.changeIdToMarkerIdMap[change_id] === 'object') {
-        const markerNode = this.changeIdToMarkerIdMap[change_id].marker
+    onCommentMoved(comment) {
+      const start = this.shareJsOffsetToRowColumn(comment.op.p)
+      const end = this.shareJsOffsetToRowColumn(
+        comment.op.p + comment.op.c.length
+      )
+      this.updateMarker(comment, start, end)
+    }
 
-        this.cm.addWidget(
+    onCommentRemoved(comment) {
+      // Resolved comments may not have marker ids
+      if (!this.changeIdToMarkerIdMap[comment.id]) return
+
+      const markerId = this.changeIdToMarkerIdMap[comment.id]
+      delete this.changeIdToMarkerIdMap[comment.id]
+
+      const marker = this.findTrackChangesMarker(markerId)
+      if (!marker) return
+
+      marker.clear()
+    }
+
+    updateMarker(change, start, end) {
+      const markerId = this.changeIdToMarkerIdMap[change.id]
+
+      if (change.op.i || change.op.c) {
+        const marker = this.findTrackChangesMarker(markerId)
+        if (!marker) return
+
+        marker.clear()
+
+        const type = change.op.i ? 'added' : 'comment'
+        const updatedMarker = this.cm.doc.markText(
           { line: start.row, ch: start.column },
-          markerNode,
-          false
+          { line: end.row, ch: end.column },
+          { className: `track-changes-marker track-changes-${type}-marker` }
         )
 
-        // this.clearOverlappingDeleteMarkers(markerNode)
+        this.changeIdToMarkerIdMap[change.id] = updatedMarker.id
       }
     }
 
@@ -140,31 +187,6 @@ define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
     //     }
     //   }
     // }
-
-    changeMarkerPositions() {
-      const markers = Object.values(this.changeIdToMarkerIdMap).filter(
-        marker => typeof marker === 'object'
-      )
-
-      for (let marker of markers) {
-        const newCoords = this.cm.charCoords(
-          {
-            line: marker.position.row,
-            ch: marker.position.column
-          },
-          'local'
-        )
-
-        const excess = (newCoords.bottom - newCoords.top) / 3
-
-        marker.marker.style.top = newCoords.bottom + 'px'
-        marker.marker.style.left = newCoords.left + 'px'
-        marker.marker.style.marginTop =
-          0 - (newCoords.bottom - newCoords.top) + 'px'
-        marker.marker.style.height =
-          newCoords.bottom - newCoords.top - excess + 'px'
-      }
-    }
 
     shareJsOffsetToRowColumn(offset) {
       const lines = this.cm.doc.getValue().split('\n')

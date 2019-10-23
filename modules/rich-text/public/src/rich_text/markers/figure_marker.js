@@ -1,5 +1,3 @@
-/* global $ */
-
 import { makeSingleMark } from '../single_mark'
 import { markCoversWholeLines, deTex, clearOnMouseDown } from '../utils'
 
@@ -24,12 +22,16 @@ const FigureMarker = {
         wrapperDiv.append(makeCaptionDiv(cm, region))
       } else if (mark.kind === 'includegraphics') {
         const path = cm.getRange(region.from, region.to).replace(/"/g, '')
-        const previewUrl = rtAdapter.getPreviewUrlForPath(path)
+        const entity = rtAdapter.getEntityForPath(path)
 
-        if (previewUrl) {
-          wrapperDiv.append(makeImg(previewUrl)).append(makeFileNameSpan(path))
-        } else {
+        if (!entity) {
           wrapperDiv.append(makeNotFoundSpan(path))
+        } else if (rtAdapter.isPreviewableEntity(entity)) {
+          wrapperDiv
+            .append(makeImg(rtAdapter.getPreviewUrlForEntity(entity)))
+            .append(makeFileNameSpan(path))
+        } else {
+          wrapperDiv.append(makeFileNameSpan(path))
         }
       }
     })

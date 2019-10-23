@@ -1,5 +1,3 @@
-/* global _ */
-
 import CodeMirror from 'codemirror'
 
 import Mark from './mark'

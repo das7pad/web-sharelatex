@@ -2,8 +2,8 @@
 
 import CodeMirror from 'codemirror'
 
-import fixture from '../../../../../../test/unit_frontend/es/support/fixture'
-import { Editor } from '../../../../public/es/index'
+import fixture from '../../../../../../test/unit_frontend/src/support/fixture'
+import { Editor } from '../../../../public/src/index'
 
 const FIXTURE_HTML = `<div class="rich-text">
 <link rel="stylesheet" href="base/public/stylesheets/style.css">

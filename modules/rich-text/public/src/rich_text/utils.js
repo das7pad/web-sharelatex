@@ -1,5 +1,3 @@
-/* global $ */
-
 /**
  * We want to parse quite a bit past the viewport, because otherwise the
  * scrolling is quite jerky as we pause to re-render a lot of mathematics.

@@ -1,5 +1,3 @@
-/* global _ */
-
 import { rangesEqual } from './utils'
 
 const INDENTED_ENVIROMENTS = ['itemize', 'enumerate']

@@ -1,5 +1,3 @@
-/* global _ */
-
 import { focus } from '../utils/focus'
 import {
   markEntirelyWithinSelection,

@@ -1,4 +1,4 @@
-/* global MathJax, _ */
+/* global MathJax */
 
 import { ignoreErrors, lastRenderedLine, getMarks } from './utils'
 import MathMarker from './markers/math_marker'

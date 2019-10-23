@@ -1,5 +1,3 @@
-/* global _ */
-
 /**
  * A mark identifies a range of source code that may be replaced with a
  * CodeMirror TextMarker.

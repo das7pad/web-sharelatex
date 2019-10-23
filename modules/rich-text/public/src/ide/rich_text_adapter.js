@@ -22,38 +22,35 @@ define([], function() {
       return !!entity
     }
 
-    getPreviewUrlForPath(path) {
+    getEntityForPath(path) {
       // Handle paths that are missing
       let entity
-      for (let extension of ['', '.png', '.pdf', '.jpg', '.jpeg']) {
+      for (let extension of ['', '.png', '.pdf', '.jpg', '.jpeg', '.eps']) {
         entity = this.fileTreeManager.findEntityByPath(`${path}${extension}`)
         if (entity) {
           break
         }
       }
-      if (!entity) {
-        return null
-      }
-      const queryString = isPreviewable(entity) ? '?format=png' : ''
-      return `/project/${window.project_id}/file/${entity.id}${queryString}`
+      return entity
+    }
+
+    getPreviewUrlForEntity(entity) {
+      return `/project/${window.project_id}/file/${entity.id}`
+    }
+
+    isPreviewableEntity(entity) {
+      return !['eps', 'pdf'].includes(getExtension(entity))
     }
   }
 
-  var isPreviewable = entity => ['eps', 'pdf'].includes(getExtension(entity))
-
-  var getExtension = entity =>
-    __guard__(
-      __guard__(entity != null ? entity.name : undefined, x1 =>
-        x1.split('.').pop()
-      ),
-      x => x.toLowerCase()
-    )
+  function getExtension(entity) {
+    if (entity && entity.name) {
+      const extension = entity.name.split('.').pop()
+      return extension ? extension.toLowerCase() : null
+    } else {
+      return null
+    }
+  }
 
   return RichTextAdapter
 })
-
-function __guard__(value, transform) {
-  return typeof value !== 'undefined' && value !== null
-    ? transform(value)
-    : undefined
-}
