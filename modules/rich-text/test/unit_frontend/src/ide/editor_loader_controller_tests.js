@@ -17,16 +17,6 @@ define([
   describe('EditorLoaderController', function() {
     beforeEach(window.module('SharelatexApp'))
 
-    let origRequireJsFn = null
-    beforeEach(function() {
-      origRequireJsFn = window.requirejs
-      window.requirejs = this.requirejs = sinon.stub()
-    })
-
-    afterEach(function() {
-      window.requirejs = origRequireJsFn
-    })
-
     it('inits richText scope', function() {
       inject(($rootScope, $controller) => {
         const $scope = $rootScope.$new()
@@ -39,19 +29,25 @@ define([
       })
     })
 
-    it('watches showRichText and loads bundle if true', function() {
+    it('watches showRichText and loads bundle if true', function(done) {
       return inject(($rootScope, $controller) => {
         const $scope = $rootScope.$new()
         $scope.editor = { showRichText: false }
-
-        expect(this.requirejs).to.not.have.been.called
 
         $controller('EditorLoaderController', { $scope })
 
         $scope.editor.showRichText = true
         $rootScope.$digest()
 
-        return expect(this.requirejs).to.have.been.called
+        expect($scope.richText.bundleLoading).to.not.equal(null)
+        $scope.richText.bundleLoading
+          .then(() => {
+            expect($scope.richText.bundle).to.not.equal(null)
+          })
+          .finally(() => {
+            expect($scope.richText.bundleLoading).to.equal(null)
+            done()
+          })
       })
     })
 
@@ -65,7 +61,8 @@ define([
         $scope.editor.showRichText = false
         $rootScope.$digest()
 
-        return expect(this.requirejs).to.not.have.been.called
+        expect($scope.richText.bundleLoading).to.equal(null)
+        expect($scope.richText.bundle).to.equal(null)
       })
     })
   }))
