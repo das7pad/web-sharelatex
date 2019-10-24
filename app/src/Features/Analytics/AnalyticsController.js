@@ -6,6 +6,8 @@ const GeoIpLookup = require('../../infrastructure/GeoIpLookup')
 
 module.exports = {
   updateEditingSession(req, res, next) {
+    if (!AnalyticsManager.enabled) return res.sendStatus(204)
+
     const userId = AuthenticationController.getLoggedInUserId(req)
     const { projectId } = req.params
     let countryCode = null

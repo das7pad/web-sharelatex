@@ -11,6 +11,7 @@ describe('AnalyticsController', function() {
     this.AuthenticationController = { getLoggedInUserId: sinon.stub() }
 
     this.AnalyticsManager = {
+      enabled: true,
       updateEditingSession: sinon.stub().callsArgWith(3),
       recordEvent: sinon.stub().callsArgWith(3)
     }

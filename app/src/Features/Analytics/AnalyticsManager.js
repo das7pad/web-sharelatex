@@ -80,6 +80,8 @@ const makeAnalyticsRequest = function(userId, options, callback) {
 }
 
 module.exports = {
+  enabled: settings.apis.analytics && settings.apis.analytics.enabled,
+
   identifyUser(userId, oldUserId, callback) {
     if (!callback) {
       // callback is optional
