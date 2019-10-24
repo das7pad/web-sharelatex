@@ -66,6 +66,9 @@ const cdnAvailable = Settings.cdn && Settings.cdn.web && !!Settings.cdn.web.host
 const darkCdnAvailable =
   Settings.cdn && Settings.cdn.web && !!Settings.cdn.web.darkHost
 
+const sentryEnabled =
+  Settings.sentry && Settings.sentry.frontend && !!Settings.sentry.frontend.dsn
+
 module.exports = function(app, webRouter, privateApiRouter, publicApiRouter) {
   webRouter.use(function(req, res, next) {
     res.locals.session = req.session
@@ -366,16 +369,14 @@ module.exports = function(app, webRouter, privateApiRouter, publicApiRouter) {
     }
     res.locals.gaToken = Settings.analytics && Settings.analytics.ga.token
     res.locals.tenderUrl = Settings.tenderUrl
-    res.locals.sentryPublicDSN =
-      Settings.sentry != null ? Settings.sentry.publicDSN : undefined
-    res.locals.sentrySampleRate =
-      (Settings.sentry != null ? Settings.sentry.sampleRate : undefined) || 0.01
-    res.locals.sentryCommit =
-      (Settings.sentry != null ? Settings.sentry.commit : undefined) ||
-      '@@COMMIT@@'
-    res.locals.sentryRelease =
-      (Settings.sentry != null ? Settings.sentry.release : undefined) ||
-      '@@RELEASE@@'
+    res.locals.sentryEnabled = sentryEnabled
+    if (sentryEnabled) {
+      res.locals.sentrySRC =
+        Settings.sentry.src ||
+        res.locals.buildJsPath(
+          `libs/${PackageVersions.lib('sentry')}/bundle.min.js`
+        )
+    }
     return next()
   })
 

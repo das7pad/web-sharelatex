@@ -7,6 +7,7 @@
  */
 // when updating ace, do not forged /test/unit_frontend/src/test-main.js
 const version = {
+  sentry: '5.7.1',
   'socket.io': '2.2.0',
   pdfjs: '2.0.943',
   moment: '2.9.0',

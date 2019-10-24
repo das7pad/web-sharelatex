@@ -27,12 +27,8 @@ app.config([
           ) {
             return
           }
-          if (
-            (typeof Raven !== 'undefined' && Raven !== null
-              ? Raven.captureException
-              : undefined) != null
-          ) {
-            Raven.captureException(exception)
+          if (typeof Sentry !== 'undefined') {
+            Sentry.captureException(exception)
           }
           return $delegate(exception, cause)
         }

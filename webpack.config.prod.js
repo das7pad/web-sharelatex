@@ -50,6 +50,16 @@ module.exports = merge(base, {
         to: 'libs/socket.io-2.2.0/socket.io.js.map'
       },
       {
+        from: `public/js/libs/${PackageVersions.lib('sentry')}/bundle.min.js`,
+        to: `libs/${PackageVersions.lib('sentry')}/bundle.min.js`
+      },
+      {
+        from: `public/js/libs/${PackageVersions.lib(
+          'sentry'
+        )}/bundle.min.js.map`,
+        to: `libs/${PackageVersions.lib('sentry')}/bundle.min.js.map`
+      },
+      {
         from: 'public/js/libs/mathjax',
         to: 'libs/mathjax'
       },

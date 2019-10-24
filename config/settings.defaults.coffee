@@ -380,15 +380,16 @@ module.exports = settings =
 	# tenderUrl: ""
 	#
 	# Client-side error logging is provided by getsentry.com
-	# sentry:
-	#   sampleRate: 0.01
-	#   src: ""
-	#   publicDSN: ""
-	#
-	# src should be either a remote url like
-	#    //cdn.ravenjs.com/1.1.22/jquery,native/raven.min.js
-	# or a local file in the js/libs directory.
-	# The publicDSN is the token for the client-side getSentry service.
+	sentry:
+#		custom uri of the browser sentry sdk - defaults to the local copy in /js/libs
+#		src: 'https://browser.sentry-cdn.com/5.7.1/bundle.min.js'
+		frontend:
+			commit: process.env.COMMIT
+			release: process.env.RELEASE
+			environment: process.env.NODE_ENV
+			dsn: process.env.SENTRY_DSN_FRONTEND
+			# For all options see
+			# https://docs.sentry.io/error-reporting/configuration/?platform=javascript
 
 	# Production Settings
 	# -------------------

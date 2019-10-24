@@ -224,8 +224,8 @@ define([
           } else {
             this.ide.socket.disconnect()
             this.ide.reportError(error, meta)
-            if (window.Raven != null) {
-              window.Raven.captureException(new Error(message), {
+            if (typeof Sentry !== 'undefined') {
+              Sentry.captureException(new Error(message), {
                 extra: { error: error, meta: meta }
               })
             }
