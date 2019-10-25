@@ -249,6 +249,12 @@ module.exports = RecurlyWrapper = {
           account_code: user._id
         }
       }
+      const customFields = getCustomFieldsFromSubscriptionDetails(
+        subscriptionDetails
+      )
+      if (customFields) {
+        data.custom_fields = customFields
+      }
       const requestBody = RecurlyWrapper._buildXml('subscription', data)
 
       return RecurlyWrapper.apiRequest(
@@ -354,6 +360,12 @@ module.exports = RecurlyWrapper = {
     if (recurlyTokenIds.threeDSecureActionResult) {
       data.account.billing_info.three_d_secure_action_result_token_id =
         recurlyTokenIds.threeDSecureActionResult
+    }
+    const customFields = getCustomFieldsFromSubscriptionDetails(
+      subscriptionDetails
+    )
+    if (customFields) {
+      data.custom_fields = customFields
     }
     const requestBody = RecurlyWrapper._buildXml('subscription', data)
 
@@ -993,6 +1005,26 @@ module.exports = RecurlyWrapper = {
     const builder = new xml2js.Builder(options)
     return builder.buildObject(data)
   }
+}
+
+function getCustomFieldsFromSubscriptionDetails(subscriptionDetails) {
+  if (!subscriptionDetails.ITMCampaign) {
+    return null
+  }
+
+  const customFields = [
+    {
+      name: 'itm_campaign',
+      value: subscriptionDetails.ITMCampaign
+    }
+  ]
+  if (subscriptionDetails.ITMContent) {
+    customFields.push({
+      name: 'itm_content',
+      value: subscriptionDetails.ITMContent
+    })
+  }
+  return { custom_field: customFields }
 }
 
 function __guard__(value, transform) {
