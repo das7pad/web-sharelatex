@@ -17,6 +17,7 @@ const SandboxedModule = require('sandboxed-module')
 const assert = require('assert')
 const path = require('path')
 const sinon = require('sinon')
+const MockResponse = require('../helpers/MockResponse')
 const modulePath = path.join(
   __dirname,
   '../../../../app/src/Features/PasswordReset/PasswordResetController'
@@ -76,7 +77,7 @@ describe('PasswordResetController', function() {
       query: {}
     }
 
-    this.res = {}
+    this.res = new MockResponse()
   })
 
   describe('requestReset', function() {
@@ -87,8 +88,8 @@ describe('PasswordResetController', function() {
         'primary'
       )
       this.RateLimiter.addCount.callsArgWith(1, null, false)
-      this.res.sendStatus = code => {
-        code.should.equal(429)
+      this.res.callback = () => {
+        this.res.statusCode.should.equal(429)
         this.PasswordResetHandler.generateAndEmailResetToken
           .calledWith(this.email.trim())
           .should.equal(false)
@@ -104,8 +105,8 @@ describe('PasswordResetController', function() {
         null,
         'primary'
       )
-      this.res.sendStatus = code => {
-        code.should.equal(200)
+      this.res.callback = () => {
+        this.res.statusCode.should.equal(200)
         this.PasswordResetHandler.generateAndEmailResetToken
           .calledWith(this.email.trim())
           .should.equal(true)
@@ -120,8 +121,8 @@ describe('PasswordResetController', function() {
         1,
         'error'
       )
-      this.res.sendStatus = code => {
-        code.should.equal(500)
+      this.res.callback = () => {
+        this.res.statusCode.should.equal(500)
         return done()
       }
       return this.PasswordResetController.requestReset(this.req, this.res)
@@ -134,8 +135,8 @@ describe('PasswordResetController', function() {
         null,
         null
       )
-      this.res.sendStatus = code => {
-        code.should.equal(404)
+      this.res.callback = () => {
+        this.res.statusCode.should.equal(404)
         return done()
       }
       return this.PasswordResetController.requestReset(this.req, this.res)
@@ -148,8 +149,8 @@ describe('PasswordResetController', function() {
         null,
         'secondary'
       )
-      this.res.sendStatus = code => {
-        code.should.equal(404)
+      this.res.callback = () => {
+        this.res.statusCode.should.equal(404)
         return done()
       }
       return this.PasswordResetController.requestReset(this.req, this.res)
@@ -164,8 +165,8 @@ describe('PasswordResetController', function() {
         null,
         'primary'
       )
-      this.res.sendStatus = code => {
-        code.should.equal(200)
+      this.res.callback = () => {
+        this.res.statusCode.should.equal(200)
         this.PasswordResetHandler.generateAndEmailResetToken
           .calledWith(this.email.toLowerCase())
           .should.equal(true)
@@ -187,8 +188,8 @@ describe('PasswordResetController', function() {
         true,
         this.user_id
       )
-      this.res.sendStatus = code => {
-        code.should.equal(200)
+      this.res.callback = () => {
+        this.res.statusCode.should.equal(200)
         this.PasswordResetHandler.setNewUserPassword
           .calledWith(this.token, this.password)
           .should.equal(true)
@@ -204,8 +205,8 @@ describe('PasswordResetController', function() {
         false,
         this.user_id
       )
-      this.res.status = code => {
-        code.should.equal(404)
+      this.res.callback = () => {
+        this.res.statusCode.should.equal(404)
         done()
       }
       return this.PasswordResetController.setNewUserPassword(this.req, this.res)
@@ -214,8 +215,8 @@ describe('PasswordResetController', function() {
     it('should return 400 (Bad Request) if there is no password', function(done) {
       this.req.body.password = ''
       this.PasswordResetHandler.setNewUserPassword.callsArgWith(2)
-      this.res.sendStatus = code => {
-        code.should.equal(400)
+      this.res.callback = () => {
+        this.res.statusCode.should.equal(400)
         this.PasswordResetHandler.setNewUserPassword.called.should.equal(false)
         return done()
       }
@@ -225,8 +226,8 @@ describe('PasswordResetController', function() {
     it('should return 400 (Bad Request) if there is no passwordResetToken', function(done) {
       this.req.body.passwordResetToken = ''
       this.PasswordResetHandler.setNewUserPassword.callsArgWith(2)
-      this.res.sendStatus = code => {
-        code.should.equal(400)
+      this.res.callback = () => {
+        this.res.statusCode.should.equal(400)
         this.PasswordResetHandler.setNewUserPassword.called.should.equal(false)
         return done()
       }
@@ -239,8 +240,8 @@ describe('PasswordResetController', function() {
         .stub()
         .returns({ message: 'password contains invalid characters' })
       this.PasswordResetHandler.setNewUserPassword.callsArgWith(2)
-      this.res.sendStatus = code => {
-        code.should.equal(400)
+      this.res.callback = () => {
+        this.res.statusCode.should.equal(400)
         this.PasswordResetHandler.setNewUserPassword.called.should.equal(false)
         return done()
       }
@@ -254,8 +255,8 @@ describe('PasswordResetController', function() {
         true,
         this.user_id
       )
-      this.res.sendStatus = code => {
-        code.should.equal(200)
+      this.res.callback = () => {
+        this.res.statusCode.should.equal(200)
         this.req.session.should.not.have.property('resetToken')
         return done()
       }
@@ -269,7 +270,7 @@ describe('PasswordResetController', function() {
         true,
         this.user_id
       )
-      this.res.sendStatus = code => {
+      this.res.callback = () => {
         this.UserSessionsManager.revokeAllUserSessions.callCount.should.equal(1)
         return done()
       }
@@ -283,7 +284,7 @@ describe('PasswordResetController', function() {
         true,
         this.user_id
       )
-      this.res.sendStatus = code => {
+      this.res.callback = () => {
         this.UserUpdater.removeReconfirmFlag.callCount.should.equal(1)
         return done()
       }
