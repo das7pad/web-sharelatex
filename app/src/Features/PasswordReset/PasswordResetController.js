@@ -26,7 +26,7 @@ module.exports = {
         res.send(500, { message: err.message })
       }
       if (!canContinue) {
-        return res.sendStatus(429, {
+        return res.send(429, {
           message: req.i18n.translate('rate_limit_hit_wait')
         })
       }
@@ -36,17 +36,17 @@ module.exports = {
             { err },
             'failed to generate and email password reset token'
           )
-          res.sendStatus(500, { message: err.message })
+          res.send(500, { message: err.message })
         } else if (status === 'primary') {
-          res.sendStatus(200, {
+          res.send(200, {
             message: { text: req.i18n.translate('password_reset_email_sent') }
           })
         } else if (status === 'secondary') {
-          res.sendStatus(404, {
+          res.send(404, {
             message: req.i18n.translate('secondary_email_password_reset')
           })
         } else {
-          res.sendStatus(404, {
+          res.send(404, {
             message: req.i18n.translate('cant_find_email')
           })
         }
