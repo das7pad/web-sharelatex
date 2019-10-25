@@ -72,7 +72,7 @@ class MockResponse {
     if (arguments.length < 2) {
       if (typeof status !== 'number') {
         body = status
-        status = 200
+        status = this.statusCode || 200
       }
     }
     this.statusCode = status
