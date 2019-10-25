@@ -129,7 +129,7 @@ module.exports = CollaboratorsInviteController = {
             { projectId, email, sendingUserId },
             'invalid email address'
           )
-          return res.status(400).send({ errorReason: 'invalid_email' })
+          return res.status(400).json({ errorReason: 'invalid_email' })
         }
         return CollaboratorsInviteController._checkRateLimit(
           sendingUserId,

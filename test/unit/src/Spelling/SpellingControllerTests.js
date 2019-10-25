@@ -109,9 +109,7 @@ describe('SpellingController', function() {
         })
 
         it('should return an empty misspellings array', function() {
-          this.res.send
-            .calledWith(JSON.stringify({ misspellings: [] }))
-            .should.equal(true)
+          this.res.json.calledWith({ misspellings: [] }).should.equal(true)
         })
 
         it('should return a 422 status', function() {
@@ -147,9 +145,7 @@ describe('SpellingController', function() {
         })
 
         it('should return an empty misspellings array', function() {
-          this.res.send
-            .calledWith(JSON.stringify({ misspellings: [] }))
-            .should.equal(true)
+          this.res.json.calledWith({ misspellings: [] }).should.equal(true)
         })
 
         it('should return a 422 status', function() {

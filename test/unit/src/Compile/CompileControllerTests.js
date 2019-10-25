@@ -120,9 +120,7 @@ describe('CompileController', function() {
       })
 
       it('should set the content-type of the response to application/json', function() {
-        return this.res.contentType
-          .calledWith('application/json')
-          .should.equal(true)
+        return this.res.type.should.equal('application/json')
       })
 
       it('should send a successful response reporting the status and files', function() {
@@ -185,9 +183,7 @@ describe('CompileController', function() {
 
     it('should set the content-type of the response to application/json', function() {
       this.CompileController.compileSubmission(this.req, this.res, this.next)
-      return this.res.contentType
-        .calledWith('application/json')
-        .should.equal(true)
+      return this.res.type.should.equal('application/json')
     })
 
     it('should send a successful response reporting the status and files', function() {

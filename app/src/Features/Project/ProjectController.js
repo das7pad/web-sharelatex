@@ -249,7 +249,7 @@ const ProjectController = {
     const { projectName } = req.body
     logger.log({ projectId, projectName }, 'cloning project')
     if (!AuthenticationController.isUserLoggedIn(req)) {
-      return res.send({ redir: '/register' })
+      return res.json({ redir: '/register' })
     }
     const currentUser = AuthenticationController.getSessionUser(req)
     ProjectDuplicator.duplicate(
@@ -264,7 +264,7 @@ const ProjectController = {
           )
           return next(err)
         }
-        res.send({
+        res.json({
           name: project.name,
           project_id: project._id,
           owner_ref: project.owner_ref
@@ -300,7 +300,7 @@ const ProjectController = {
           { project, userId, projectName, templateType: template },
           'created project'
         )
-        res.send({ project_id: project._id })
+        res.json({ project_id: project._id })
       }
     )
   },

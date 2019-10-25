@@ -86,17 +86,14 @@ module.exports = CompileController = {
       if (error != null) {
         return next(error)
       }
-      res.contentType('application/json')
-      return res.status(200).send(
-        JSON.stringify({
-          status,
-          outputFiles,
-          compileGroup: limits != null ? limits.compileGroup : undefined,
-          clsiServerId,
-          validationProblems,
-          pdfDownloadDomain: Settings.pdfDownloadDomain
-        })
-      )
+      return res.json({
+        status,
+        outputFiles,
+        compileGroup: limits != null ? limits.compileGroup : undefined,
+        clsiServerId,
+        validationProblems,
+        pdfDownloadDomain: Settings.pdfDownloadDomain
+      })
     })
   },
 
@@ -158,15 +155,12 @@ module.exports = CompileController = {
           { submission_id, files: outputFiles },
           'compileSubmission output files'
         )
-        res.contentType('application/json')
-        return res.status(200).send(
-          JSON.stringify({
-            status,
-            outputFiles,
-            clsiServerId,
-            validationProblems
-          })
-        )
+        return res.json({
+          status,
+          outputFiles,
+          clsiServerId,
+          validationProblems
+        })
       }
     )
   },

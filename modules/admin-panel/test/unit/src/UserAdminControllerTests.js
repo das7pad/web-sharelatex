@@ -23,6 +23,7 @@ const events = require('events')
 const { ObjectId } = require('mongojs')
 const assert = require('assert')
 const Path = require('path')
+const MockResponse = require('../../../../../test/unit/src/helpers/MockResponse')
 
 describe('UserAdminController', function() {
   beforeEach(function() {
@@ -119,13 +120,10 @@ describe('UserAdminController', function() {
       }
     }
 
-    return (this.res = {
-      locals: {
-        jsPath: 'js path here'
-      },
-      send: sinon.stub(),
-      sendStatus: sinon.stub()
-    })
+    this.res = new MockResponse()
+    this.res.locals = {
+      jsPath: 'js path here'
+    }
   })
 
   describe('index', function() {
@@ -167,18 +165,20 @@ describe('UserAdminController', function() {
     })
 
     it('should send the users', function(done) {
-      this.res.send = (code, json) => {
-        code.should.equal(200)
-        json.users.should.deep.equal(this.users)
+      this.res.callback = () => {
+        this.res.statusCode.should.equal(200)
+        JSON.parse(this.res.body).users.should.deep.equal(this.users)
         return done()
       }
       return this.UserAdminController.search(this.req, this.res)
     })
 
     return it('should send the pages', function(done) {
-      this.res.send = (code, json) => {
-        code.should.equal(200)
-        json.pages.should.equal(Math.ceil(this.user_count / this.perPage))
+      this.res.callback = () => {
+        this.res.statusCode.should.equal(200)
+        JSON.parse(this.res.body).pages.should.equal(
+          Math.ceil(this.user_count / this.perPage)
+        )
         return done()
       }
       return this.UserAdminController.search(this.req, this.res)
@@ -395,20 +395,21 @@ describe('UserAdminController', function() {
       })
 
       return it('should return 204', function() {
-        return this.res.sendStatus.calledWith(204).should.equal(true)
+        return this.res.statusCode.should.equal(204)
       })
     })
 
     return describe('with existing email', function() {
       beforeEach(function() {
         this.UserUpdater.changeEmailAddress.yields({ message: 'alread_exists' })
-        return this.UserAdminController.updateEmail(this.req, this.res)
+        this.UserAdminController.updateEmail(this.req, this.res)
       })
 
       return it('should return 400 with a message', function() {
-        return this.res.send
-          .calledWith(400, { message: 'Email is in use by another user' })
-          .should.equal(true)
+        this.res.statusCode.should.equal(400)
+        this.res.body.should.equal(
+          JSON.stringify({ message: 'Email is in use by another user' })
+        )
       })
     })
   })

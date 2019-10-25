@@ -57,7 +57,7 @@ module.exports = ErrorController = {
         'missing SAML session data error'
       )
       res.status(400)
-      res.send({ accountLinkingError: error.message })
+      res.json({ accountLinkingError: error.message })
     } else {
       logger.error(
         { err: error, url: req.url, method: req.method, user },

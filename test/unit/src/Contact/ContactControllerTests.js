@@ -16,6 +16,8 @@ const chai = require('chai')
 const should = chai.should()
 const { assert } = chai
 const { expect } = chai
+const MockRequest = require('../helpers/MockRequest')
+const MockResponse = require('../helpers/MockResponse')
 const modulePath = '../../../../app/src/Features/Contacts/ContactController.js'
 const SandboxedModule = require('sandboxed-module')
 
@@ -41,10 +43,8 @@ describe('ContactController', function() {
     })
 
     this.next = sinon.stub()
-    this.req = {}
-    this.res = {}
-    this.res.status = sinon.stub().returns(this.req)
-    return (this.res.send = sinon.stub())
+    this.req = new MockRequest()
+    this.res = new MockResponse()
   })
 
   describe('getContacts', function() {
@@ -119,7 +119,7 @@ describe('ContactController', function() {
     })
 
     it('should return a formatted list of contacts in contact list order, without holding accounts', function() {
-      return this.res.send.args[0][0].contacts.should.deep.equal([
+      return JSON.parse(this.res.body).contacts.should.deep.equal([
         {
           id: 'contact-1',
           email: 'joe@example.com',

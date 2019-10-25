@@ -59,7 +59,7 @@ module.exports = UserAdminController = {
       if (err != null) {
         return next(err)
       }
-      return res.send(200, { users, pages })
+      return res.status(200).json({ users, pages })
     })
   },
 
@@ -311,7 +311,9 @@ module.exports = UserAdminController = {
     return UserUpdater.changeEmailAddress(user_id, email, function(err) {
       if (err != null) {
         if ((err.message = 'alread_exists')) {
-          return res.send(400, { message: 'Email is in use by another user' })
+          return res
+            .status(400)
+            .json({ message: 'Email is in use by another user' })
         } else {
           return next(err)
         }
