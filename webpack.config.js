@@ -169,6 +169,13 @@ module.exports = {
     // Generate a manifest.json file which is used by the backend to map the
     // base filenames to the generated output filenames
     new ManifestPlugin({
+      filter: function(spec) {
+        if (/cmaps/.test(spec.path)) {
+          // omit the vendored cmaps
+          return
+        }
+        return spec
+      },
       // Always write the manifest file to disk (even if in dev mode, where
       // files are held in memory). This is needed because the server will read
       // this file (from disk) when building the script's url
