@@ -34,7 +34,7 @@ const moment = require('moment')
 const lodash = require('lodash')
 const chokidar = require('chokidar')
 
-const jsPath = Settings.useMinifiedJs ? '/minjs/' : '/js/'
+const jsPath = '/js/'
 
 const webpackManifestPath = Path.join(
   __dirname,

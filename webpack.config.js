@@ -35,6 +35,7 @@ module.exports = {
   // kept in memory for speed
   output: {
     path: path.join(__dirname, '/public/js'),
+    publicPath: '/js/',
 
     filename: '[name].js',
 
