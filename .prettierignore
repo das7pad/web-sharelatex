@@ -2,4 +2,5 @@ node_modules
 modules/**/scripts
 public/js
 public/minjs
+public/vendor
 modules/**/public/js

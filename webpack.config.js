@@ -7,6 +7,7 @@ const ManifestPlugin = require('webpack-manifest-plugin')
 const PackageVersions = require('./app/src/infrastructure/PackageVersions')
 
 const MODULES_PATH = path.join(__dirname, '/modules')
+const VENDOR_PATH = path.join(__dirname, 'public', 'vendor')
 
 // Generate a hash of entry points, including modules
 const entryPoints = {
@@ -189,7 +190,12 @@ module.exports = {
 
     // Copy CMap files from pdfjs-dist package to build output. These are used
     // to provide support for non-Latin characters
-    new CopyPlugin([{ from: 'node_modules/pdfjs-dist/cmaps', to: 'cmaps' }])
+    new CopyPlugin([
+      {
+        from: 'node_modules/pdfjs-dist/cmaps',
+        to: `${VENDOR_PATH}/pdfjs-dist/cmaps`
+      }
+    ])
   ],
 
   // If jquery or underscore is required by another dependency *don't* include

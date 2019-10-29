@@ -51,6 +51,8 @@ public/stylesheets/light-style*.css
 public/stylesheets/ieee-style*.css
 public/stylesheets/*.map
 
+public/vendor
+
 Gemfile.lock
 
 *.swp
