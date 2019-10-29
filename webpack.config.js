@@ -189,14 +189,15 @@ module.exports = {
     // as we don't want to load the large amount of locale data from moment)
     new webpack.IgnorePlugin(/^\.\/locale$/, /public\/js\/libs/),
 
-    // Copy CMap files from pdfjs-dist package to build output. These are used
-    // to provide support for non-Latin characters
-    new CopyPlugin([
-      {
-        from: 'node_modules/pdfjs-dist/cmaps',
-        to: `${VENDOR_PATH}/pdfjs-dist/cmaps`
-      }
-    ])
+    new CopyPlugin(
+      [
+        // Copy CMap files from pdfjs-dist package to build output. These are used
+        // to provide support for non-Latin characters
+        'pdfjs-dist/cmaps'
+      ].map(path => {
+        return { from: `node_modules/${path}`, to: `${VENDOR_PATH}/${path}` }
+      })
+    )
   ],
 
   // If jquery or underscore is required by another dependency *don't* include
