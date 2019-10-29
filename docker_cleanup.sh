@@ -10,6 +10,7 @@ find /usr/local/lib/node_modules/npm/node_modules/node-gyp/gyp/pylib/gyp/ \
 
 if [[ -d /app/node_modules ]]; then
     rm -rf /app/node_modules/.bin/.cache
+    rm -rf /app/node_modules/.cache
 
     find /app/node_modules -type f \
         -name '.*' \
