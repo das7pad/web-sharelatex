@@ -114,6 +114,7 @@
     "yauzl": "^2.10.0"
   },
   "devDependencies": {
+    "ace-builds": "https://github.com/das7pad/ace-builds/archive/v1.4.5-20191029.tar.gz",
     "acorn": "^6.1.0",
     "acorn-walk": "^6.1.1",
     "babel-eslint": "^10.0.2",

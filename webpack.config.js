@@ -134,7 +134,7 @@ module.exports = {
         `public/js/libs/${PackageVersions.lib('moment')}`
       ),
       // Enables ace/ace shortcut
-      ace: path.join(__dirname, `public/js/${PackageVersions.lib('ace')}`),
+      ace: 'ace-builds/src-noconflict',
       // fineupload vendored dependency (which we're aliasing to fineuploadER
       // for some reason)
       fineuploader: path.join(
@@ -193,7 +193,9 @@ module.exports = {
       [
         // Copy CMap files from pdfjs-dist package to build output. These are used
         // to provide support for non-Latin characters
-        'pdfjs-dist/cmaps'
+        'pdfjs-dist/cmaps',
+        // optional package ace files - minified: keymaps, modes, themes, worker
+        'ace-builds/src-min-noconflict'
       ].map(path => {
         return { from: `node_modules/${path}`, to: `${VENDOR_PATH}/${path}` }
       })

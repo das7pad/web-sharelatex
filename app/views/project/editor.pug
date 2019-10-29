@@ -137,7 +137,7 @@ block content
 		window.wikiEnabled = #{!!(settings.apis.wiki && settings.apis.wiki.url)};
 		window.gitBridgePublicBaseUrl = '#{gitBridgePublicBaseUrl}'
 		//- Set base path for Ace scripts loaded on demand/workers and don't use cdn
-		window.aceBasePath = "#{buildJsPath(lib('ace'), {cdn:settings.cdn.ServeACE})}"
+		window.aceBasePath = "#{staticPath('/vendor/ace-builds/src-min-noconflict')}"
 		//- Set path for PDFjs CMaps
 		window.pdfCMapsPath = "#{staticPath('vendor/pdfjs-dist/cmaps/')}"
 		window.uiConfig = JSON.parse('!{StringHelper.stringifyJsonForScript(uiConfig)}');
