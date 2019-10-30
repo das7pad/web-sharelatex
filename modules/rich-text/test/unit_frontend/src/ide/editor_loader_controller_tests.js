@@ -12,7 +12,8 @@
  */
 define([
   '../../../../public/src/ide/controllers/editor_loader_controller',
-  'utils/EventEmitter'
+  'utils/EventEmitter',
+  'libs/angular-mocks'
 ], (EditorLoaderController, EventEmitter) =>
   describe('EditorLoaderController', function() {
     beforeEach(window.module('SharelatexApp'))

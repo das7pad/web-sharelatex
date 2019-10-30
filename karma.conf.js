@@ -21,12 +21,6 @@ module.exports = function(config) {
     browsers: ['ChromeCustom'],
     files: [
       'test/unit_frontend/bootstrap.js',
-      // Include scripts that are injected into the page outside of webpack
-      'public/js/libs/angular-1.6.4.min.js',
-      'public/js/libs/jquery-1.11.1.min.js',
-
-      // Allow mocking of angular
-      'public/js/libs/angular-mocks.js',
 
       // Import all tests (see comment in the file for why this is necessary)
       'test/unit_frontend/import_tests.js',

@@ -10,7 +10,7 @@
 
 /* global io */
 
-define([], function() {
+define(['libs/jquery'], function() {
   let ConnectionManager
   const ONEHOUR = 1000 * 60 * 60
 

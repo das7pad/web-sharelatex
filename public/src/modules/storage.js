@@ -1,4 +1,4 @@
-define([], function() {
+define(['libs/angular'], function() {
   const module = angular.module('storage', [])
   module.value('localStorage', factory(localStorage))
   module.value('sessionStorage', factory(sessionStorage))

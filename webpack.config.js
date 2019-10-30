@@ -200,12 +200,5 @@ module.exports = {
         return { from: `node_modules/${path}`, to: `${VENDOR_PATH}/${path}` }
       })
     )
-  ],
-
-  // If jquery or underscore is required by another dependency *don't* include
-  // in the bundle and use the relevant global variable instead
-  externals: {
-    jquery: '$',
-    underscore: '_'
-  }
+  ]
 }

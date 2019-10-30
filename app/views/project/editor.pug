@@ -148,7 +148,7 @@ block content
 			window.overallThemes = JSON.parse('!{StringHelper.stringifyJsonForScript(overallThemes)}');
 
 block foot-scripts
-	script(type="text/javascript" src=buildJsPath('/libs/' + lib('socket.io') + '/socket.io.js', {cdn:settings.cdn.ServeSocketIO}))
-	script(src=mathJaxPath)
-	script(src=buildJsPath('libraries.js'))
-	script(src=buildJsPath('ide.js'))
+	script(src=buildJsPath('/libs/' + lib('socket.io') + '/socket.io.js', {cdn:settings.cdn.ServeSocketIO}), onerror='disableCDN()')
+	script(src=mathJaxPath, onerror='disableCDN()')
+	script(src=buildJsPath('libraries.js'), onerror='disableCDN()')
+	script(src=buildJsPath('ide.js'), onerror='disableCDN()')

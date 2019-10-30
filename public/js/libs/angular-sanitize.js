@@ -3,7 +3,7 @@
  * (c) 2010-2017 Google, Inc. http://angularjs.org
  * License: MIT
  */
-(function(window, angular) {'use strict';
+define(['libs/angular'], function() {'use strict';
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *     Any commits to this file should be reviewed with security in mind.  *
@@ -751,6 +751,4 @@ angular.module('ngSanitize').filter('linky', ['$sanitize', function($sanitize) {
     }
   };
 }]);
-
-
-})(window, window.angular);
+})

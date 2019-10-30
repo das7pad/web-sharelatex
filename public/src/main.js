@@ -10,6 +10,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 define([
+  'libs/angular',
   'main/project-list/index',
   'main/user-details',
   'main/account-settings',

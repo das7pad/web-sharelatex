@@ -7,7 +7,7 @@
  *
  * Generated at 2015-07-13 02:08:11 -0300
  */
-(function() {
+define(['libs/angular'], function() {
 'use strict';
 
 var KEYS = {
@@ -1148,4 +1148,4 @@ tagsInput.run(["$templateCache", function($templateCache) {
   );
 }]);
 
-}());
+})

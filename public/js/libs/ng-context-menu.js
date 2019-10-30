@@ -3,6 +3,7 @@
  *
  * @author Ian Kennington Walter (http://ianvonwalter.com)
  */
+define(['libs/angular'], function() {
 angular
   .module('ng-context-menu', [])
   .factory('ContextMenuService', function() {
@@ -106,3 +107,4 @@ angular
       }
     };
   }]);
+})
