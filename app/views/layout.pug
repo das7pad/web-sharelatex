@@ -42,6 +42,7 @@ html(
 				window.ga = function() { console.log("would send to GA", arguments) };
 
 		script(type="text/javascript").
+			window.__webpack_public_path__ = "#{buildJsPath('/')}";
 			window.csrfToken = "#{csrfToken}";
 
 		block head-scripts

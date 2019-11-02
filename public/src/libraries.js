@@ -17,6 +17,8 @@ define([
   'libs/ng-tags-input',
   'libs/select/select'
 ], function(_, jQuery) {
+  // eslint-disable-next-line camelcase
+  __webpack_public_path__ = window.__webpack_public_path__
   window._ = _
   window.$ = jQuery
   window.jQuery = jQuery
