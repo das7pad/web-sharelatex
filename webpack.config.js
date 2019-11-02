@@ -178,6 +178,10 @@ module.exports = {
           // omit the vendored cmaps
           return
         }
+        if (/ace-builds/.test(spec.path)) {
+          // omit minified ace source, they are loaded via ace internals
+          return
+        }
         return spec
       },
       // Always write the manifest file to disk (even if in dev mode, where
