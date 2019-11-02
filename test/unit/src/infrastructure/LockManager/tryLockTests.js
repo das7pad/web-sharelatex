@@ -24,6 +24,7 @@ describe('LockManager - trying the lock', function() {
   beforeEach(function() {
     this.LockManager = SandboxedModule.require(modulePath, {
       globals: {
+        process: process,
         console: console
       },
       requires: {

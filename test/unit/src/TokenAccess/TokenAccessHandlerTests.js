@@ -35,6 +35,7 @@ describe('TokenAccessHandler', function() {
     this.req = {}
     return (this.TokenAccessHandler = SandboxedModule.require(modulePath, {
       globals: {
+        Buffer: Buffer,
         console: console
       },
       requires: {
