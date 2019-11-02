@@ -37,7 +37,10 @@ describe('LockManager - releasing the lock', function() {
     }
   }
 
-  const LockManager = SandboxedModule.require(modulePath, { requires: mocks })
+  const LockManager = SandboxedModule.require(modulePath, {
+    requires: mocks,
+    globals: { process }
+  })
   LockManager.unlockScript = 'this is the unlock script'
 
   it('should put a all data into memory', function(done) {

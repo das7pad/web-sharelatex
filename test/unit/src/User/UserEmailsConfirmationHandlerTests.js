@@ -27,6 +27,7 @@ describe('UserEmailsConfirmationHandler', function() {
   beforeEach(function() {
     this.UserEmailsConfirmationHandler = SandboxedModule.require(modulePath, {
       globals: {
+        process: process,
         console: console
       },
       requires: {
