@@ -15,6 +15,7 @@ describe('FaultTolerantRequest', function() {
     }
     this.FaultTolerantRequest = SandboxedModule.require(modulePath, {
       globals: {
+        process: process,
         console: console
       },
       requires: {
