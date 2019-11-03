@@ -159,6 +159,13 @@ module.exports = {
   optimization: {
     splitChunks: {
       cacheGroups: {
+        ideLibraries: {
+          test: /(?!public\/js\/libs\/platform)(pdfjsBundle|node_modules\/(ace-builds|pdfjs-dist)|public\/js\/libs)/,
+          name: 'ideLibraries',
+          chunks: 'initial',
+          reuseExistingChunk: true,
+          enforce: true
+        },
         libraries: {
           test: /[\\/]node_modules[\\/]|[\\/]public[\\/]js[\\/]libs[\\/]/,
           name: 'libraries',
