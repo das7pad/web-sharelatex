@@ -6,6 +6,7 @@ const ManifestPlugin = require('webpack-manifest-plugin')
 
 const PackageVersions = require('./app/src/infrastructure/PackageVersions')
 
+const NODE_MODULES = path.join(__dirname, 'node_modules')
 const MODULES_PATH = path.join(__dirname, '/modules')
 const VENDOR_PATH = path.join(__dirname, 'public', 'vendor')
 
@@ -48,6 +49,7 @@ module.exports = {
 
   // Define how file types are handled by webpack
   module: {
+    noParse: [path.join(NODE_MODULES, 'pdfjs-dist/build/pdf.js')],
     rules: [
       {
         // Pass application JS files through babel-loader, compiling to ES5
