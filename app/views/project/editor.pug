@@ -134,11 +134,6 @@ block content
 		window.trackChangesState = data.trackChangesState;
 		window.wikiEnabled = #{!!(settings.apis.wiki && settings.apis.wiki.url)};
 		window.gitBridgePublicBaseUrl = '#{gitBridgePublicBaseUrl}'
-		//- Set base path for Ace scripts loaded on demand/workers and don't use cdn
-		window.aceBasePath = "#{staticPath('/vendor/ace-builds/src-min-noconflict')}"
-		//- Set path for PDFjs CMaps
-		window.pdfCMapsPath = "#{staticPath('vendor/pdfjs-dist/cmaps/')}"
-		window.pdfjsWorkerSrc = "#{staticPath('vendor/pdfjs-dist/build/pdf.worker.min.js')}"
 		window.uiConfig = JSON.parse('!{StringHelper.stringifyJsonForScript(uiConfig)}');
 		//- enable doc hash checking for all projects
 		//- used in public/js/libs/sharejs.js

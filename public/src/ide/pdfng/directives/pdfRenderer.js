@@ -59,7 +59,7 @@ define(['base', '../../../pdfjsBundle'], (App, PDFJS) =>
           }
           this.pdfjs = PDFJS.getDocument({
             url: this.url,
-            cMapUrl: window.pdfCMapsPath,
+            cMapUrl: `${window.staticPath}/vendor/pdfjs-dist/cmaps/`,
             cMapPacked: true,
             disableFontFace,
             // Enable fetching with Range headers to restrict individual
