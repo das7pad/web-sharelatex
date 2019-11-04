@@ -56,16 +56,6 @@ define([
   // By default, don't use workers - enable them per-session as required
   ace.config.setDefaultValue('session', 'useWorker', false)
 
-  // Ace loads its script itself, so we need to hook in to be able to clear
-  // the cache.
-  if (ace.config._moduleUrl == null) {
-    ace.config._moduleUrl = ace.config.moduleUrl
-    ace.config.moduleUrl = function(...args) {
-      const url = ace.config._moduleUrl(...Array.from(args || []))
-      return url
-    }
-  }
-
   App.directive('aceEditor', function(
     $timeout,
     $compile,
