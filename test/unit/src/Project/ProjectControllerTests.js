@@ -2,6 +2,7 @@ const SandboxedModule = require('sandboxed-module')
 const path = require('path')
 const sinon = require('sinon')
 const { expect } = require('chai')
+require('chai').should()
 const HttpErrors = require('@overleaf/o-error/http')
 const { ObjectId } = require('mongodb')
 const Errors = require('../../../../app/src/Features/Errors/Errors')
@@ -875,6 +876,17 @@ describe('ProjectController', function() {
       this.InactiveProjectManager.reactivateProjectIfRequired.callsArgWith(1)
       this.AnalyticsManager.getLastOccurrence.yields(null, { mock: 'event' })
       this.ProjectUpdateHandler.markAsOpened.callsArgWith(1)
+
+      // resource hints
+      for (let fn of [
+        'preloadCss',
+        'getCssThemeModifier',
+        'preloadFont',
+        'preloadImg',
+        'finishPreloading'
+      ]) {
+        this.res.locals[fn] = sinon.stub()
+      }
     })
 
     it('should render the project/editor page', function(done) {
@@ -989,6 +1001,68 @@ describe('ProjectController', function() {
         done()
       }
       this.ProjectController.loadEditor(this.req, this.res)
+    })
+
+    describe('resource hints', function() {
+      it('should query for a branded css theme', function(done) {
+        this.ProjectGetter.getProject.callsArgWith(2, null, this.brandedProject)
+
+        this.res.render = (pageName, opts) => {
+          this.res.locals.getCssThemeModifier
+            .calledWith(opts.userSettings, this.brandVariationDetails)
+            .should.equal(true)
+          done()
+        }
+        this.ProjectController.loadEditor(this.req, this.res)
+      })
+
+      it('should preload the branded css theme', function(done) {
+        const modifier = 'BRAND-'
+        this.res.locals.getCssThemeModifier.returns(modifier)
+
+        this.res.render = () => {
+          this.res.locals.preloadCss.calledWith(modifier).should.equal(true)
+          done()
+        }
+        this.ProjectController.loadEditor(this.req, this.res)
+      })
+
+      it('should preload the loading screen font', function(done) {
+        this.res.render = () => {
+          this.res.locals.preloadFont.callCount.should.equal(1)
+          done()
+        }
+        this.ProjectController.loadEditor(this.req, this.res)
+      })
+
+      it('should preload the overleaf-o for the default brand', function(done) {
+        this.res.render = () => {
+          this.res.locals.preloadImg.callCount.should.equal(2)
+          this.res.locals.preloadImg
+            .calledWith('ol-brand/overleaf-o.svg')
+            .should.equal(true)
+          this.res.locals.preloadImg
+            .calledWith('ol-brand/overleaf-o-grey.svg')
+            .should.equal(true)
+          done()
+        }
+        this.ProjectController.loadEditor(this.req, this.res)
+      })
+
+      it('should preload the lion for the sl- brand', function(done) {
+        this.settings.brandPrefix = 'sl-'
+        this.res.render = () => {
+          this.res.locals.preloadImg.callCount.should.equal(2)
+          this.res.locals.preloadImg
+            .calledWith('brand/lion.svg')
+            .should.equal(true)
+          this.res.locals.preloadImg
+            .calledWith('brand/lion-grey.svg')
+            .should.equal(true)
+          done()
+        }
+        this.ProjectController.loadEditor(this.req, this.res)
+      })
     })
   })
 

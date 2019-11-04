@@ -133,6 +133,76 @@ module.exports = function(app, webRouter, privateApiRouter, publicApiRouter) {
       staticFilesBase = ''
     }
 
+    const resourceHints = []
+    res.locals.finishPreloading = function() {
+      if (!Settings.addResourceHints) {
+        // refuse to add the Link header
+        return
+      }
+      if (!resourceHints.length) {
+        // do not set an empty header
+        return
+      }
+
+      function crossorigin(resource) {
+        if (!resource.crossorigin) return ''
+        return staticFilesBase ? ';crossorigin' : ''
+      }
+      res.setHeader(
+        'Link',
+        resourceHints
+          .map(r => `<${r.uri}>;rel=${r.rel};as=${r.as}${crossorigin(r)}`)
+          .join(',')
+      )
+    }
+
+    res.locals.preload = function(uri, as, crossorigin) {
+      resourceHints.push({ rel: 'preload', uri, as, crossorigin })
+    }
+    res.locals.preloadCss = function(themeModifier) {
+      res.locals.preload(res.locals.buildCssPath(themeModifier), 'style')
+    }
+    res.locals.preloadFont = function(name) {
+      // IE11 and Opera Mini are the only browsers that do not support WOFF 2.0
+      //  https://caniuse.com/#search=woff2
+      // They both ignore the preload header, so this is OK
+      //  https://caniuse.com/#search=preload
+      const uri = res.locals.staticPath(`/font/${name}.woff2`)
+      res.locals.preload(uri, 'font', true)
+    }
+    res.locals.preloadImg = function(path) {
+      res.locals.preload(res.locals.buildImgPath(path), 'image')
+    }
+
+    res.locals.preloadCommonResources = function() {
+      res.locals.preloadCss()
+      if (Settings.brandPrefix === 'sl-') {
+        ;[
+          'font-awesome-v470',
+          'merriweather-v21-latin-regular',
+          'open-sans-v17-latin-regular',
+          'open-sans-v17-latin-700'
+        ].forEach(res.locals.preloadFont)
+      } else {
+        ;[
+          'font-awesome-v470',
+          'lato-v16-latin-ext-regular',
+          'lato-v16-latin-ext-700',
+          'merriweather-v21-latin-regular'
+        ].forEach(res.locals.preloadFont)
+      }
+      res.locals.preloadImg('sprite.png')
+    }
+
+    const actualRender = res.render
+    res.render = function() {
+      if (Settings.addResourceHints && !resourceHints.length) {
+        res.locals.preloadCommonResources()
+        res.locals.finishPreloading()
+      }
+      actualRender.apply(res, arguments)
+    }
+
     res.locals.staticPath = function(path) {
       if (staticFilesBase && path.indexOf('/') === 0) {
         // preserve the path component of the base url

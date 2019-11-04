@@ -742,8 +742,7 @@ const ProjectController = {
               allowedFreeTrial = !!subscription.freeTrial.allowed || true
             }
 
-            logger.log({ projectId }, 'rendering editor page')
-            res.render('project/editor', {
+            const params = {
               title: project.name,
               priority_title: true,
               bodyClasses: ['editor'],
@@ -799,7 +798,27 @@ const ProjectController = {
               brandVariation,
               allowedImageNames: Settings.allowedImageNames || [],
               gitBridgePublicBaseUrl: Settings.gitBridgePublicBaseUrl
-            })
+            }
+
+            // add resource hints for the loading screen only
+            res.locals.preloadCss(
+              res.locals.getCssThemeModifier(
+                params.userSettings,
+                brandVariation
+              )
+            )
+            res.locals.preloadFont('merriweather-v21-latin-regular')
+
+            const brandImages =
+              Settings.brandPrefix === 'sl-'
+                ? ['brand/lion.svg', 'brand/lion-grey.svg']
+                : ['ol-brand/overleaf-o.svg', 'ol-brand/overleaf-o-grey.svg']
+            brandImages.forEach(res.locals.preloadImg)
+
+            res.locals.finishPreloading()
+
+            logger.log({ projectId }, 'rendering editor page')
+            res.render('project/editor', params)
             timer.done()
           }
         )
