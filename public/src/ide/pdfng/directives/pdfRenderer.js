@@ -59,6 +59,8 @@ define(['base', '../../../pdfjsBundle'], (App, PDFJS) =>
           }
           this.pdfjs = PDFJS.getDocument({
             url: this.url,
+            // lazy loaded worker
+            worker: PDFJS.worker,
             cMapUrl: `${window.staticPath}/vendor/pdfjs-dist/cmaps/`,
             cMapPacked: true,
             disableFontFace,
