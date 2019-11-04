@@ -116,20 +116,13 @@ module.exports = function(app, webRouter, privateApiRouter, publicApiRouter) {
       req.session.cdnBlocked = true
     }
 
+    const host = req.headers.host || ''
     const isDark =
-      __guard__(
-        __guard__(req.headers != null ? req.headers.host : undefined, x3 =>
-          x3.slice(0, 7)
-        ),
-        x2 => x2.toLowerCase().indexOf('dark')
-      ) !== -1
-    const isSmoke =
-      __guard__(
-        __guard__(req.headers != null ? req.headers.host : undefined, x5 =>
-          x5.slice(0, 5)
-        ),
-        x4 => x4.toLowerCase()
-      ) === 'smoke'
+      host
+        .slice(0, 7)
+        .toLowerCase()
+        .indexOf('dark') !== -1
+    const isSmoke = host.slice(0, 5).toLowerCase() === 'smoke'
     const isLive = !isDark && !isSmoke
 
     if (cdnAvailable && isLive && !cdnBlocked) {
