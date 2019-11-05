@@ -8,9 +8,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 
-/* global io */
-
-define(['libs/jquery'], function() {
+define(['socket.io-client', 'libs/jquery'], function(io) {
   let ConnectionManager
   const ONEHOUR = 1000 * 60 * 60
 
@@ -34,21 +32,6 @@ define(['libs/jquery'], function() {
         this.ide = ide
         this.$scope = $scope
         this.wsUrl = ide.wsUrl || null // websocket url (if defined)
-        if (typeof io === 'undefined' || io === null) {
-          console.error(
-            'Socket.io javascript not loaded. Please check that the real-time service is running and accessible.'
-          )
-          this.ide.socket = {
-            on() {},
-            connect() {},
-            disconnect() {}
-          }
-          this.$scope.$apply(() => {
-            return (this.$scope.state.error =
-              'Could not connect to websocket server :(')
-          })
-          return
-        }
 
         setInterval(() => {
           return this.disconnectIfInactive()

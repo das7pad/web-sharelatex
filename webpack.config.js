@@ -127,6 +127,10 @@ module.exports = {
   resolve: {
     alias: {
       // Aliases for AMD modules
+      'socket.io-client': path.join(
+        __dirname,
+        `public/js/libs/${PackageVersions.lib('socket.io')}/socket.io`
+      ),
 
       // Vendored dependencies in public/js/libs (e.g. angular)
       libs: path.join(__dirname, 'public/js/libs'),
