@@ -230,10 +230,6 @@ module.exports = function(app, webRouter, privateApiRouter, publicApiRouter) {
         path = res.locals.staticPath(path)
       }
 
-      if (opts.qs) {
-        path = path + '?' + querystring.stringify(opts.qs)
-      }
-
       return path
     }
 
