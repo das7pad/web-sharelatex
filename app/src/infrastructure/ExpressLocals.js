@@ -239,7 +239,7 @@ module.exports = function(app, webRouter, privateApiRouter, publicApiRouter) {
       IEEE_BRAND_ID
 
     const _buildCssFileName = themeModifier =>
-      `/${Settings.brandPrefix}${themeModifier || ''}style.css`
+      `${Settings.brandPrefix}${themeModifier || ''}style.css`
 
     res.locals.getCssThemeModifier = function(userSettings, brandVariation) {
       // Themes only exist in OL v2
@@ -260,7 +260,10 @@ module.exports = function(app, webRouter, privateApiRouter, publicApiRouter) {
 
     res.locals.buildCssPath = function(themeModifier, buildOpts) {
       const cssFileName = _buildCssFileName(themeModifier)
-      const path = Path.join('/stylesheets/', cssFileName)
+      let path = webpackManifest[cssFileName]
+      if (!path) {
+        path = Path.join('/stylesheets/', cssFileName)
+      }
       return res.locals.staticPath(path)
     }
 

@@ -1,8 +1,12 @@
 const fs = require('fs')
+const glob = require('glob').sync
 const path = require('path')
 const webpack = require('webpack')
+const CleanCSSPlugin = require('less-plugin-clean-css')
 const CopyPlugin = require('copy-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const AutoPrefixer = require('autoprefixer')
 
 const PackageVersions = require('./app/src/infrastructure/PackageVersions')
 
@@ -15,6 +19,9 @@ const entryPoints = {
   main: './public/src/main.js',
   ide: './public/src/ide.js'
 }
+glob('./public/stylesheets/*style.less').forEach(style => {
+  entryPoints[path.basename(style, '.less')] = style
+})
 
 if (fs.existsSync(MODULES_PATH)) {
   fs.readdirSync(MODULES_PATH).reduce((acc, module) => {
@@ -63,6 +70,53 @@ module.exports = {
               // Configure babel-loader to cache compiled output so that
               // subsequent compile runs are much faster
               cacheDirectory: true
+            }
+          }
+        ]
+      },
+      {
+        test: /stylesheetsBundle/,
+        exclude: /stylesheets/
+      },
+      {
+        test: /\.(woff|woff2|gif|jpg|png|svg)$/,
+        loader: 'file-loader',
+        options: {
+          // use the file inplace
+          context: 'public',
+          name: '[path][name].[ext]',
+          emitFile: false
+        }
+      },
+      {
+        test: /\.less$/,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              // filename is set to `../stylesheets/[name]-[hash].css` below
+              publicPath: '../'
+            }
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true
+            }
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              plugins: [AutoPrefixer]
+            }
+          },
+          {
+            loader: 'less-loader',
+            options: {
+              sourceMap: true,
+              rewriteUrls: 'all',
+              paths: [path.join(__dirname, 'public', 'stylesheets')],
+              plugins: [new CleanCSSPlugin({ advanced: true })]
             }
           }
         ]
@@ -164,7 +218,7 @@ module.exports = {
     splitChunks: {
       cacheGroups: {
         ideLibraries: {
-          test: /(?!public\/js\/libs\/platform)(pdfjsBundle|node_modules\/(ace-builds|pdfjs-dist)|public\/js\/libs)/,
+          test: /(?!public\/js\/libs\/(platform|pdfListView|select\/select\.css))(pdfjsBundle|node_modules\/(ace-builds|pdfjs-dist)|public\/js\/libs)/,
           name: 'ideLibraries',
           chunks: 'initial',
           reuseExistingChunk: true,
@@ -181,6 +235,9 @@ module.exports = {
   },
 
   plugins: [
+    new MiniCssExtractPlugin({
+      filename: '../stylesheets/[name]-[hash].css'
+    }),
     // Generate a manifest.json file which is used by the backend to map the
     // base filenames to the generated output filenames
     new ManifestPlugin({
