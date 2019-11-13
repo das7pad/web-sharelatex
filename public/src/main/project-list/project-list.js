@@ -264,13 +264,10 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
         }
       }
 
-      localStorage(
-        'project_list',
-        JSON.stringify({
-          filter: $scope.filter,
-          selectedTagId: selectedTag != null ? selectedTag._id : undefined
-        })
-      )
+      localStorage('project_list', {
+        filter: $scope.filter,
+        selectedTagId: selectedTag != null ? selectedTag._id : undefined
+      })
       $scope.updateSelectedProjects()
     }
 
@@ -709,7 +706,7 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
       }
     }
 
-    const storedUIOpts = JSON.parse(localStorage('project_list'))
+    const storedUIOpts = localStorage('project_list')
 
     if (storedUIOpts && storedUIOpts.filter) {
       if (storedUIOpts.filter === 'tag' && storedUIOpts.selectedTagId) {

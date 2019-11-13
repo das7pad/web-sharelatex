@@ -1,18 +1,27 @@
 const fs = require('fs')
+const glob = require('glob').sync
 const path = require('path')
 const webpack = require('webpack')
+const CleanCSSPlugin = require('less-plugin-clean-css')
 const CopyPlugin = require('copy-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const AutoPrefixer = require('autoprefixer')
 
 const PackageVersions = require('./app/src/infrastructure/PackageVersions')
 
+const NODE_MODULES = path.join(__dirname, 'node_modules')
 const MODULES_PATH = path.join(__dirname, '/modules')
+const VENDOR_PATH = path.join(__dirname, 'public', 'vendor')
 
 // Generate a hash of entry points, including modules
 const entryPoints = {
   main: './public/src/main.js',
   ide: './public/src/ide.js'
 }
+glob('./public/stylesheets/*style.less').forEach(style => {
+  entryPoints[path.basename(style, '.less')] = style
+})
 
 if (fs.existsSync(MODULES_PATH)) {
   fs.readdirSync(MODULES_PATH).reduce((acc, module) => {
@@ -34,6 +43,7 @@ module.exports = {
   // kept in memory for speed
   output: {
     path: path.join(__dirname, '/public/js'),
+    publicPath: '/js/',
 
     filename: '[name].js',
 
@@ -46,6 +56,7 @@ module.exports = {
 
   // Define how file types are handled by webpack
   module: {
+    noParse: [path.join(NODE_MODULES, 'pdfjs-dist/build/pdf.js')],
     rules: [
       {
         // Pass application JS files through babel-loader, compiling to ES5
@@ -59,6 +70,53 @@ module.exports = {
               // Configure babel-loader to cache compiled output so that
               // subsequent compile runs are much faster
               cacheDirectory: true
+            }
+          }
+        ]
+      },
+      {
+        test: /stylesheetsBundle/,
+        exclude: /stylesheets/
+      },
+      {
+        test: /\.(woff|woff2|gif|jpg|png|svg)$/,
+        loader: 'file-loader',
+        options: {
+          // use the file inplace
+          context: 'public',
+          name: '[path][name].[ext]',
+          emitFile: false
+        }
+      },
+      {
+        test: /\.less$/,
+        use: [
+          {
+            loader: MiniCssExtractPlugin.loader,
+            options: {
+              // filename is set to `../stylesheets/[name]-[hash].css` below
+              publicPath: '../'
+            }
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true
+            }
+          },
+          {
+            loader: 'postcss-loader',
+            options: {
+              plugins: [AutoPrefixer]
+            }
+          },
+          {
+            loader: 'less-loader',
+            options: {
+              sourceMap: true,
+              rewriteUrls: 'all',
+              paths: [path.join(__dirname, 'public', 'stylesheets')],
+              plugins: [new CleanCSSPlugin({ advanced: true })]
             }
           }
         ]
@@ -123,6 +181,10 @@ module.exports = {
   resolve: {
     alias: {
       // Aliases for AMD modules
+      'socket.io-client': path.join(
+        __dirname,
+        `public/js/libs/${PackageVersions.lib('socket.io')}/socket.io`
+      ),
 
       // Vendored dependencies in public/js/libs (e.g. angular)
       libs: path.join(__dirname, 'public/js/libs'),
@@ -132,7 +194,7 @@ module.exports = {
         `public/js/libs/${PackageVersions.lib('moment')}`
       ),
       // Enables ace/ace shortcut
-      ace: path.join(__dirname, `public/js/${PackageVersions.lib('ace')}`),
+      ace: 'ace-builds/src-noconflict',
       // fineupload vendored dependency (which we're aliasing to fineuploadER
       // for some reason)
       fineuploader: path.join(
@@ -155,6 +217,13 @@ module.exports = {
   optimization: {
     splitChunks: {
       cacheGroups: {
+        ideLibraries: {
+          test: /(?!public\/js\/libs\/(platform|pdfListView|select\/select\.css))(pdfjsBundle|node_modules\/(ace-builds|pdfjs-dist)|public\/js\/libs)/,
+          name: 'ideLibraries',
+          chunks: 'initial',
+          reuseExistingChunk: true,
+          enforce: true
+        },
         libraries: {
           test: /[\\/]node_modules[\\/]|[\\/]public[\\/]js[\\/]libs[\\/]/,
           name: 'libraries',
@@ -166,9 +235,23 @@ module.exports = {
   },
 
   plugins: [
+    new MiniCssExtractPlugin({
+      filename: '../stylesheets/[name]-[hash].css'
+    }),
     // Generate a manifest.json file which is used by the backend to map the
     // base filenames to the generated output filenames
     new ManifestPlugin({
+      filter: function(spec) {
+        if (/cmaps/.test(spec.path)) {
+          // omit the vendored cmaps
+          return
+        }
+        if (/ace-builds/.test(spec.path)) {
+          // omit minified ace source, they are loaded via ace internals
+          return
+        }
+        return spec
+      },
       // Always write the manifest file to disk (even if in dev mode, where
       // files are held in memory). This is needed because the server will read
       // this file (from disk) when building the script's url
@@ -180,15 +263,17 @@ module.exports = {
     // as we don't want to load the large amount of locale data from moment)
     new webpack.IgnorePlugin(/^\.\/locale$/, /public\/js\/libs/),
 
-    // Copy CMap files from pdfjs-dist package to build output. These are used
-    // to provide support for non-Latin characters
-    new CopyPlugin([{ from: 'node_modules/pdfjs-dist/cmaps', to: 'cmaps' }])
-  ],
-
-  // If jquery or underscore is required by another dependency *don't* include
-  // in the bundle and use the relevant global variable instead
-  externals: {
-    jquery: '$',
-    underscore: '_'
-  }
+    new CopyPlugin(
+      [
+        'pdfjs-dist/build/pdf.worker.min.js',
+        // Copy CMap files from pdfjs-dist package to build output. These are used
+        // to provide support for non-Latin characters
+        'pdfjs-dist/cmaps',
+        // optional package ace files - minified: keymaps, modes, themes, worker
+        'ace-builds/src-min-noconflict'
+      ].map(path => {
+        return { from: `node_modules/${path}`, to: `${VENDOR_PATH}/${path}` }
+      })
+    )
+  ]
 }

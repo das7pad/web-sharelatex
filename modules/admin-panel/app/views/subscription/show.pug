@@ -5,7 +5,7 @@ block content
 		!{JSON.stringify({subscription: subscription, user_id: user_id}).replace(/\//g, '\\/')}
 
 	script(type="text/javascript").
-		window.data = JSON.parse($("#data").text());
+		window.data = JSON.parse(window.document.getElementById("data").text);
 
 	.content.content-alt(ng-controller="AdminSubscriptionController")
 		.container(ng-cloak)

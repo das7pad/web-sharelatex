@@ -119,10 +119,8 @@ block content
 		!{StringHelper.stringifyJsonForScript({ userSettings: userSettings, user: user, trackChangesState: trackChangesState, useV2History: useV2History, enabledLinkedFileTypes: settings.enabledLinkedFileTypes, brandVariation: brandVariation })}
 
 	script(type="text/javascript").
-		window.data = JSON.parse($("#data").text());
-	script(type='text/javascript').
+		var data = window.data = JSON.parse(window.document.getElementById("data").text);
 		window.project_id = "!{project_id}";
-		var data = JSON.parse($("#data").text());
 		window.userSettings = data.userSettings;
 		window.user = data.user;
 		window.enabledLinkedFiles = data.enabledLinkedFiles;
@@ -136,10 +134,6 @@ block content
 		window.trackChangesState = data.trackChangesState;
 		window.wikiEnabled = #{!!(settings.apis.wiki && settings.apis.wiki.url)};
 		window.gitBridgePublicBaseUrl = '#{gitBridgePublicBaseUrl}'
-		//- Set base path for Ace scripts loaded on demand/workers and don't use cdn
-		window.aceBasePath = "#{buildJsPath(lib('ace'), {cdn:settings.cdn.ServeACE})}"
-		//- Set path for PDFjs CMaps
-		window.pdfCMapsPath = "#{buildJsPath('cmaps/', {cdn:settings.cdn.ServePDFjs})}"
 		window.uiConfig = JSON.parse('!{StringHelper.stringifyJsonForScript(uiConfig)}');
 		//- enable doc hash checking for all projects
 		//- used in public/js/libs/sharejs.js
@@ -150,7 +144,6 @@ block content
 			window.overallThemes = JSON.parse('!{StringHelper.stringifyJsonForScript(overallThemes)}');
 
 block foot-scripts
-	script(type="text/javascript" src=buildJsPath('/libs/' + lib('socket.io') + '/socket.io.js', {cdn:settings.cdn.ServeSocketIO}))
-	script(src=mathJaxPath)
-	script(src=buildJsPath('libraries.js'))
-	script(src=buildJsPath('ide.js'))
+	script(src=buildJsPath('libraries.js'), onerror='disableCDN()')
+	script(src=buildJsPath('ideLibraries.js'), onerror='disableCDN()')
+	script(src=buildJsPath('ide.js'), onerror='disableCDN()')

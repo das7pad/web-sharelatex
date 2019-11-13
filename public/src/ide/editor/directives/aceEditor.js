@@ -46,25 +46,14 @@ define([
   const SearchBox = ace.require('ace/ext/searchbox')
 
   // Set the base path that ace will fetch modes/snippets/workers from
-  if (window.aceBasePath !== '') {
-    syntaxValidationEnabled = true
-    ace.config.set('basePath', `${window.aceBasePath}`)
-  } else {
-    syntaxValidationEnabled = false
-  }
+  syntaxValidationEnabled = true
+  ace.config.set(
+    'basePath',
+    `${window.staticPath}/vendor/ace-builds/src-min-noconflict`
+  )
 
   // By default, don't use workers - enable them per-session as required
   ace.config.setDefaultValue('session', 'useWorker', false)
-
-  // Ace loads its script itself, so we need to hook in to be able to clear
-  // the cache.
-  if (ace.config._moduleUrl == null) {
-    ace.config._moduleUrl = ace.config.moduleUrl
-    ace.config.moduleUrl = function(...args) {
-      const url = ace.config._moduleUrl(...Array.from(args || []))
-      return url
-    }
-  }
 
   App.directive('aceEditor', function(
     $timeout,

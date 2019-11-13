@@ -5,13 +5,11 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-// when updating ace, do not forged /test/unit_frontend/src/test-main.js
 const version = {
   sentry: '5.7.1',
   'socket.io': '2.2.0',
   pdfjs: '2.0.943',
   moment: '2.9.0',
-  ace: '1.4.5', // Upgrade instructions: https://github.com/overleaf/write_latex/wiki/Upgrading-Ace
   fineuploader: '5.15.4',
   // For frontend. Backend has a different version defined in package.json
   underscore: '1.9.1',

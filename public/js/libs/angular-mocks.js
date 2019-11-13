@@ -1,3 +1,4 @@
+define(['libs/angular'], function () {
 'use strict';
 
 /**
@@ -3195,3 +3196,5 @@ angular.mock.$RootScopeDecorator = ['$delegate', function($delegate) {
     };
   }
 })(window.jasmine || window.mocha);
+
+});

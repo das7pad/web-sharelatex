@@ -1,5 +1,3 @@
-const Path = require('path')
-const fs = require('fs')
 const crypto = require('crypto')
 const async = require('async')
 const logger = require('logger-sharelatex')
@@ -21,7 +19,6 @@ const ProjectUpdateHandler = require('./ProjectUpdateHandler')
 const ProjectGetter = require('./ProjectGetter')
 const PrivilegeLevels = require('../Authorization/PrivilegeLevels')
 const AuthenticationController = require('../Authentication/AuthenticationController')
-const PackageVersions = require('../../infrastructure/PackageVersions')
 const Sources = require('../Authorization/Sources')
 const TokenAccessHandler = require('../TokenAccess/TokenAccessHandler')
 const CollaboratorsGetter = require('../Collaborators/CollaboratorsGetter')
@@ -745,8 +742,7 @@ const ProjectController = {
               allowedFreeTrial = !!subscription.freeTrial.allowed || true
             }
 
-            logger.log({ projectId }, 'rendering editor page')
-            res.render('project/editor', {
+            const params = {
               title: project.name,
               priority_title: true,
               bodyClasses: ['editor'],
@@ -791,7 +787,7 @@ const ProjectController = {
                 isTokenMember
               ),
               languages: Settings.languages,
-              editorThemes: THEME_LIST,
+              editorThemes: Settings.editorThemes,
               maxDocLength: Settings.max_doc_length,
               useV2History:
                 project.overleaf &&
@@ -802,7 +798,27 @@ const ProjectController = {
               brandVariation,
               allowedImageNames: Settings.allowedImageNames || [],
               gitBridgePublicBaseUrl: Settings.gitBridgePublicBaseUrl
-            })
+            }
+
+            // add resource hints for the loading screen only
+            res.locals.preloadCss(
+              res.locals.getCssThemeModifier(
+                params.userSettings,
+                brandVariation
+              )
+            )
+            res.locals.preloadFont('merriweather-v21-latin-regular')
+
+            const brandImages =
+              Settings.brandPrefix === 'sl-'
+                ? ['brand/lion.svg', 'brand/lion-grey.svg']
+                : ['ol-brand/overleaf-o.svg', 'ol-brand/overleaf-o-grey.svg']
+            brandImages.forEach(res.locals.preloadImg)
+
+            res.locals.finishPreloading()
+
+            logger.log({ projectId }, 'rendering editor page')
+            res.render('project/editor', params)
             timer.done()
           }
         )
@@ -1048,22 +1064,5 @@ var defaultSettingsForAnonymousUser = userId => ({
     github: false
   }
 })
-
-var THEME_LIST = []
-function generateThemeList() {
-  const files = fs.readdirSync(
-    Path.join(__dirname, '/../../../../public/js/', PackageVersions.lib('ace'))
-  )
-  const result = []
-  for (let file of files) {
-    if (file.slice(-2) === 'js' && /^theme-/.test(file)) {
-      const cleanName = file.slice(0, -3).slice(6)
-      result.push(THEME_LIST.push(cleanName))
-    } else {
-      result.push(undefined)
-    }
-  }
-}
-generateThemeList()
 
 module.exports = ProjectController

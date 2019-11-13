@@ -394,6 +394,36 @@ module.exports = settings =
 	# Production Settings
 	# -------------------
 
+	# add resource hints for css, fonts, images and java script files
+	#
+	# this enables the early fetching of (in)direct resources as shown below
+	#
+	# notation of the examples
+	#        | /login    |
+	# time = 1   2   3   4
+	#
+	#  1 /login request start
+	#  2 http header received
+	#  3 html head received
+	#  4 done
+	#
+	#- example request sequence with resource hints disabled
+	#  | /login    |
+	#          | /stylesheets/style.css        |
+	#                                            | /font/some-font.woff2    |
+	#  the download of the css file can start as soon as the html head is
+	#   parsed.
+	#  once all the css rules are parsed and partially applied, the need for
+	#   an additional font file arises and its download is scheduled
+	#
+	#- example request with resource hints enabled
+	#  | /login     |
+	#      | /stylesheets/style.css        |
+	#      | /font/some-font.woff2    |
+	#  the download of the css file AND the font file can start as soon as
+	#   the http headers are downloaded
+	addResourceHints: process.env['ADD_RESOURCE_HINTS'] == 'true'
+
 	# Should javascript assets be served minified or not. Note that you will
 	# need to run `grunt compile:minify` within the web-sharelatex directory
 	# to generate these.
@@ -502,6 +532,47 @@ module.exports = settings =
 #		disabled:
 #			invite: true
 #			register: true
+
+	editorThemes: [
+		'ambiance',
+		'chaos',
+		'chrome',
+		'clouds',
+		'clouds_midnight',
+		'cobalt',
+		'crimson_editor',
+		'dawn',
+		'dracula',
+		'dreamweaver',
+		'eclipse',
+		'github',
+		'gob',
+		'gruvbox',
+		'idle_fingers',
+		'iplastic',
+		'katzenmilch',
+		'kr_theme',
+		'kuroir',
+		'merbivore',
+		'merbivore_soft',
+		'mono_industrial',
+		'monokai',
+		'overleaf',
+		'pastel_on_dark',
+		'solarized_dark',
+		'solarized_light',
+		'sqlserver',
+		'terminal',
+		'textmate',
+		'tomorrow',
+		'tomorrow_night',
+		'tomorrow_night_blue',
+		'tomorrow_night_bright',
+		'tomorrow_night_eighties',
+		'twilight',
+		'vibrant_ink',
+		'xcode',
+	]
 
 	hasThemes: false
 	customisation: {}

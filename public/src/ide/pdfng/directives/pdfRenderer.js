@@ -18,7 +18,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['base', 'pdfjs-dist/webpack'], (App, PDFJS) =>
+define(['base', '../../../pdfjsBundle'], (App, PDFJS) =>
   // App = angular.module 'PDFRenderer', ['pdfAnnotations', 'pdfTextLayer']
 
   App.factory('PDFRenderer', function(
@@ -59,7 +59,9 @@ define(['base', 'pdfjs-dist/webpack'], (App, PDFJS) =>
           }
           this.pdfjs = PDFJS.getDocument({
             url: this.url,
-            cMapUrl: window.pdfCMapsPath,
+            // lazy loaded worker
+            worker: PDFJS.worker,
+            cMapUrl: `${window.staticPath}/vendor/pdfjs-dist/cmaps/`,
             cMapPacked: true,
             disableFontFace,
             // Enable fetching with Range headers to restrict individual
