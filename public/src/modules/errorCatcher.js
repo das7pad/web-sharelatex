@@ -10,42 +10,36 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const app = angular.module('ErrorCatcher', [])
-const UNHANDLED_REJECTION_ERR_MSG = 'Possibly unhandled rejection: canceled'
+define(['libs/angular'], function() {
+  const app = angular.module('ErrorCatcher', [])
+  const UNHANDLED_REJECTION_ERR_MSG = 'Possibly unhandled rejection: canceled'
 
-app.config([
-  '$provide',
-  $provide =>
-    $provide.decorator('$exceptionHandler', [
-      '$log',
-      '$delegate',
-      ($log, $delegate) =>
-        function(exception, cause) {
-          if (
-            exception === UNHANDLED_REJECTION_ERR_MSG &&
-            cause === undefined
-          ) {
-            return
+  app.config([
+    '$provide',
+    $provide =>
+      $provide.decorator('$exceptionHandler', [
+        '$log',
+        '$delegate',
+        ($log, $delegate) =>
+          function(exception, cause) {
+            if (
+              exception === UNHANDLED_REJECTION_ERR_MSG &&
+              cause === undefined
+            ) {
+              return
+            }
+            if (typeof Sentry !== 'undefined') {
+              Sentry.captureException(exception)
+            }
+            return $delegate(exception, cause)
           }
-          if (
-            (typeof Raven !== 'undefined' && Raven !== null
-              ? Raven.captureException
-              : undefined) != null
-          ) {
-            Raven.captureException(exception)
-          }
-          return $delegate(exception, cause)
-        }
-    ])
-])
+      ])
+  ])
 
-// Interceptor to check auth failures in all $http requests
-// http://bahmutov.calepin.co/catch-all-errors-in-angular-app.html
+  // Interceptor to check auth failures in all $http requests
+  // http://bahmutov.calepin.co/catch-all-errors-in-angular-app.html
 
-app.factory('unAuthHttpResponseInterceptor', [
-  '$q',
-  '$location',
-  ($q, $location) => ({
+  app.factory('unAuthHttpResponseInterceptor', ($q, $location) => ({
     responseError(response) {
       // redirect any unauthorised or forbidden responses back to /login
       //
@@ -70,11 +64,11 @@ app.factory('unAuthHttpResponseInterceptor', [
       // pass the response back to the original requester
       return $q.reject(response)
     }
-  })
-])
+  }))
 
-app.config([
-  '$httpProvider',
-  $httpProvider =>
-    $httpProvider.interceptors.push('unAuthHttpResponseInterceptor')
-])
+  app.config([
+    '$httpProvider',
+    $httpProvider =>
+      $httpProvider.interceptors.push('unAuthHttpResponseInterceptor')
+  ])
+})

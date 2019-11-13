@@ -12,7 +12,7 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['base', 'libs/md5'], function(App, md5) {
+define(['base', 'crypto-js/md5'], function(App, CryptoJSmd5) {
   App.controller('AdminGraphController', function(
     $scope,
     $timeout,
@@ -20,7 +20,7 @@ define(['base', 'libs/md5'], function(App, md5) {
     $modal
   ) {
     $scope.user = window.data.user
-    $scope.user.gravatar = CryptoJS.MD5($scope.user.email).toString()
+    $scope.user.gravatar = CryptoJSmd5($scope.user.email).toString()
     const url = $location.absUrl()
     $scope.level = url.substr(url.indexOf('level=') + 6, 1)
 

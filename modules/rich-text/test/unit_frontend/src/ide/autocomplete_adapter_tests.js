@@ -10,7 +10,9 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['ide/rich-text/autocomplete_adapter'], AutocompleteAdapter =>
+define([
+  '../../../../public/src/ide/autocomplete_adapter'
+], AutocompleteAdapter =>
   describe('AutocompleteAdapter', function() {
     beforeEach(function() {
       this.metadata = {}

@@ -10,6 +10,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 define([
+  'libs/angular',
   'main/project-list/index',
   'main/user-details',
   'main/account-settings',
@@ -30,10 +31,10 @@ define([
   'main/subscription/team-invite-controller',
   'main/contact-us',
   'main/learn',
+  'main/exposed-settings',
   'main/affiliations/components/affiliationForm',
   'main/affiliations/controllers/UserAffiliationsController',
   'main/affiliations/factories/UserAffiliationsDataService',
-  'main/oauth/factories/UserOauthDataService',
   'main/oauth/controllers/UserOauthController',
   'main/keys',
   'main/importing',
@@ -56,10 +57,7 @@ define([
   'services/validateCaptchaV3',
   'filters/formatDate',
   'components/inputSuggestions',
-  // OPTIONAL MODULE INCLUDES
-  /* INJECTED BY MAKEFILE */ 'main/admin-panel/index',
-  /* INJECTED BY MAKEFILE */ 'main/open-in-overleaf/index',
-  /* INJECTED BY MAKEFILE */ 'main/launchpad/index'
+  '../../modules/modules-main'
 ], function() {
   angular.module('SharelatexApp').config(function($locationProvider) {
     try {

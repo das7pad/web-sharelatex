@@ -36,45 +36,25 @@ Thumbs.db
 node_modules/*
 data/*
 
-app.js
-*.js.map
-app/js/*
-test/unit/js/*
-test/unit_frontend/js/*
-test/smoke/js/*
-test/acceptance/js/*
 cookies.txt
 requestQueueWorker.js
 TpdsWorker.js
 BackgroundJobsWorker.js
 UserAndProjectPopulator.coffee
 
-public/es/modules
-
 public/js/*.js
-public/js/*.map
-public/js/analytics/
-public/js/directives/
-public/js/components/
-public/js/es/
-public/js/filters/
-public/js/ide/
-public/js/main/
-public/js/modules/
-public/js/services/
-public/js/utils/
+public/js/*.js.map
+public/js/manifest.json
 
 public/stylesheets/style*.css
 public/stylesheets/sl-style*.css
 public/stylesheets/light-style*.css
 public/stylesheets/ieee-style*.css
 public/stylesheets/*.map
-public/minjs/
+
+public/vendor
 
 Gemfile.lock
-
-public/js/libs/require*.js
-
 
 *.swp
 .DS_Store
@@ -84,8 +64,3 @@ docker-shared.yml
 config/*.coffee
 
 modules/**/Makefile
-
-modules/*/index.js
-modules/**/app/js/*
-modules/**/test/unit/js/*
-modules/**/test/acceptance/js/*

@@ -21,4 +21,5 @@ block content
 				.col-xs-12.col-sm-3.col-sm-pull-9.contents(ng-non-bindable)
 					| !{contents.content}
 
-	script(src=mathJaxPath)
+	script(type="text/javascript").
+		window.preLoadMathJax = true

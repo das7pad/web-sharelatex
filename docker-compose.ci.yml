@@ -13,12 +13,14 @@ services:
       - mocha
       - --exit
       - --recursive
+      - --require
+      - test/unit/bootstrap.js
       - --reporter
       - xunit
       - --reporter-options
       - output=/home/node/unit.xml,suiteName='Unit Tests'
-      - test/unit/js
-      - modules/*/test/unit/js/**.js
+      - test/unit/src
+      - modules/*/test/unit/src/**.js
     volumes:
       - ./output:/home/node:z
 
@@ -39,7 +41,7 @@ services:
       ENABLED_LINKED_FILE_TYPES: 'url,project_file,project_output_file,mendeley,zotero'
       LINKED_URL_PROXY: 'http://localhost:6543'
       SHARELATEX_CONFIG: /app/test/acceptance/config/settings.test.coffee
-      NODE_ENV: production
+      NODE_ENV: test
     depends_on:
       - mongo
       - redis_api
@@ -53,13 +55,15 @@ services:
       - mocha
       - --exit
       - --recursive
+      - --require
+      - test/acceptance/bootstrap.js
       - --reporter
       - xunit
       - --reporter-options
     command:
       - output=/home/node/acceptance.xml,suiteName='App Acceptance Tests'
-      - test/acceptance/js/Init.js
-      - test/acceptance/js
+      - test/acceptance/src/Init.js
+      - test/acceptance/src
     volumes:
       - ./output:/home/node:z
 
@@ -72,7 +76,7 @@ services:
         BRANCH_NAME: $BRANCH_NAME
         BUILD_NUMBER: $BUILD_NUMBER
     working_dir: /app
-    command: npm run test:frontend -- --single-run
+    command: npm run test:frontend:single
     user: node
     volumes:
       - ./output:/home/node:z

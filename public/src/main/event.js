@@ -13,7 +13,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['moment', 'base', 'modules/localStorage'], function(moment, App) {
+define(['moment', 'base'], function(moment, App) {
   const CACHE_KEY = 'mbEvents'
 
   // keep track of how many heartbeats we've sent so we can calculate how
@@ -32,7 +32,7 @@ define(['moment', 'base', 'modules/localStorage'], function(moment, App) {
       : undefined
   }
 
-  App.factory('event_tracking', function($http, localStorage) {
+  App.factory('eventTracking', function($http, localStorage) {
     const _getEventCache = function() {
       let eventCache = localStorage(CACHE_KEY)
 
@@ -93,8 +93,8 @@ define(['moment', 'base', 'modules/localStorage'], function(moment, App) {
           heartbeatsSent <= 2
             ? 30
             : heartbeatsSent <= 6
-            ? (heartbeatsSent - 2) * 60
-            : 300
+              ? (heartbeatsSent - 2) * 60
+              : 300
 
         return (nextHeartbeat = moment()
           .add(backoffSecs, 'seconds')

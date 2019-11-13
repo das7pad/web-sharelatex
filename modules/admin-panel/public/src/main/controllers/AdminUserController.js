@@ -15,7 +15,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['base', 'libs/md5'], function(App) {
+define(['base'], function(App) {
   App.controller('AdminUserController', function(
     $scope,
     $timeout,

@@ -1,8 +1,8 @@
 /* global sinon */
 
-import fixture from '../../../../../../test/unit_frontend/es/support/fixture'
+import fixture from '../../../../../../test/unit_frontend/src/support/fixture'
 import { stubMathJax, teardownMathJax } from '../support/stub_mathjax'
-import { Editor } from '../../../../public/es/index'
+import { Editor } from '../../../../public/src/index'
 
 const FIXTURE_HTML = '<div></div>'
 

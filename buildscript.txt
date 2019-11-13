@@ -1,7 +1,10 @@
 web
---language=coffeescript
---node-version=10.16.3
+--language=es
+--src-dir=src
+--node-version=12.13.0
 --acceptance-creds=None
 --dependencies=mongo,redis_api,redis_lock,redis_realtime,redis_web,redis_websessions
 --docker-repos=gcr.io/overleaf-ops
 --build-target=docker
+--has_webpack_css_processing=true
+--uses_ace_builds=true

@@ -12,13 +12,9 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 define(['base'], App =>
-  App.controller('HistoryV2ToolbarController', [
-    '$scope',
-    '$modal',
-    'ide',
-    'event_tracking',
-    'waitFor',
-    ($scope, $modal, ide, event_tracking, waitFor) => {
+  App.controller(
+    'HistoryV2ToolbarController',
+    ($scope, $modal, ide, eventTracking, waitFor) => {
       let openEntity
 
       $scope.currentUpdate = null
@@ -79,7 +75,7 @@ define(['base'], App =>
           return
         }
 
-        event_tracking.sendMB('history-v2-restore-deleted')
+        eventTracking.sendMB('history-v2-restore-deleted')
         $scope.restoreState.inflight = true
         return ide.historyManager
           .restoreFile(deletedAtV, pathname)
@@ -126,4 +122,4 @@ define(['base'], App =>
           .catch(err => console.warn(err))
       }
     }
-  ]))
+  ))

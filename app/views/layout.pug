@@ -1,8 +1,6 @@
 doctype html
 html(
-	lang=(currentLngCode || 'en'),
-	itemscope,
-	itemtype='http://schema.org/Product'
+	lang=(currentLngCode || 'en')
 )
 	- metadata = metadata || {}
 	block vars
@@ -44,39 +42,27 @@ html(
 				window.ga = function() { console.log("would send to GA", arguments) };
 
 		script(type="text/javascript").
+			window.staticPath = "#{staticPath('/').slice(0, -1)}";
 			window.csrfToken = "#{csrfToken}";
 
-		script(src=buildJsPath("libs/jquery-1.11.1.min.js"))
-		script(type="text/javascript").
-			var noCdnKey = "nocdn=true"
-			var cdnBlocked = typeof jQuery === 'undefined'
-			var noCdnAlreadyInUrl = window.location.href.indexOf(noCdnKey) != -1 //prevent loops
-			if (cdnBlocked && !noCdnAlreadyInUrl && navigator.userAgent.indexOf("Googlebot") == -1) {
-				window.location.search += '&'+noCdnKey;
-			}
-
-		block scripts
-
-		script(src=buildJsPath("libs/angular-1.6.4.min.js"))
+		block head-scripts
 
 		script.
 			window.sharelatex = {
 				siteUrl: '#{settings.siteUrl}',
 				wsUrl: '#{settings.wsUrl}',
-				jsPath:  '#{jsPath}',
-				sixpackDomain: '#{settings.sixpack.domain}'
 			};
-			window.systemMessages = !{JSON.stringify(systemMessages).replace(/\//g, '\\/')};
+			window.systemMessages = !{StringHelper.stringifyJsonForScript(systemMessages)};
 			window.ab = {};
 			window.user_id = '#{getLoggedInUserId()}';
-			window.ExposedSettings = JSON.parse('!{JSON.stringify(ExposedSettings).replace(/\//g, "\\/")}');
+			window.ExposedSettings = JSON.parse('!{StringHelper.stringifyJsonForScript(ExposedSettings)}');
 
 		- if (typeof(settings.algolia) != "undefined")
 			script.
 				window.sharelatex.algolia = {
 					app_id:'#{settings.algolia.app_id}',
 					api_key:'#{settings.algolia.read_only_api_key}',
-					indexes:!{JSON.stringify(settings.algolia.indexes)}
+					indexes:!{StringHelper.stringifyJsonForScript(settings.algolia.indexes)}
 				}
 
 		- if (typeof(settings.templates) != "undefined")
@@ -86,10 +72,6 @@ html(
 					cdnDomain : '!{settings.templates.cdnDomain}',
 					indexName : '!{settings.templates.indexName}'
 				}
-
-		- if (settings.overleaf && settings.overleaf.useOLFreeTrial)
-			script.
-				window.useV2TrialUrl = true
 
 
 	body
@@ -119,30 +101,18 @@ html(
 			span(ng-controller="ScribtexPopupController")
 			include scribtex-modal
 
-		block requirejs
-			script(type='text/javascript').
-				// minimal requirejs configuration (can be extended/overridden)
-				window.requirejs = {
-					"paths" : {
-						"moment": "libs/#{lib('moment')}",
-						"fineuploader": "libs/#{lib('fineuploader')}",
-						"main": "#{buildJsPath('main.js', {hashedPath:settings.useMinifiedJs, removeExtension:true})}",
-						"libraries": "#{buildJsPath('libraries.js', {hashedPath:settings.useMinifiedJs, removeExtension:true})}",
-					},
-					"config":{
-						"moment":{
-							"noGlobal": true
-						}
-					}
-				};
-			script(
-				data-main=buildJsPath('main.js', {hashedPath:false}),
-				baseurl=fullJsPath,
-				src=buildJsPath('libs/require.js', {hashedPath:true})
-			)
-
 		!= moduleIncludes("contactModal", locals)
 		include v1-tooltip
 		include sentry
-		
 
+		script(type="text/javascript").
+			function disableCDN() {
+				//- do not redirect the crawler
+				if (navigator.userAgent.indexOf("Googlebot") === -1
+					//- prevent loops
+					&& window.location.href.indexOf("nocdn=true") === -1) {
+					window.location.search += '&nocdn=true'}}
+
+		block foot-scripts
+			script(src=buildJsPath('libraries.js'), onerror='disableCDN()')
+			script(src=buildJsPath('main.js'), onerror='disableCDN()')

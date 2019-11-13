@@ -1,4 +1,3 @@
-/* global _ */
 /* eslint-disable
     camelcase,
     max-len
@@ -46,32 +45,21 @@ define([
   const { Vim } = ace.require('ace/keyboard/vim')
   const SearchBox = ace.require('ace/ext/searchbox')
 
-  // set the path for ace workers if using a CDN (from editor.pug)
-  if (window.aceWorkerPath !== '') {
-    syntaxValidationEnabled = true
-    ace.config.set('workerPath', `${window.aceWorkerPath}`)
-  } else {
-    syntaxValidationEnabled = false
-  }
+  // Set the base path that ace will fetch modes/snippets/workers from
+  syntaxValidationEnabled = true
+  ace.config.set(
+    'basePath',
+    `${window.staticPath}/vendor/ace-builds/src-min-noconflict`
+  )
 
   // By default, don't use workers - enable them per-session as required
   ace.config.setDefaultValue('session', 'useWorker', false)
-
-  // Ace loads its script itself, so we need to hook in to be able to clear
-  // the cache.
-  if (ace.config._moduleUrl == null) {
-    ace.config._moduleUrl = ace.config.moduleUrl
-    ace.config.moduleUrl = function(...args) {
-      const url = ace.config._moduleUrl(...Array.from(args || []))
-      return url
-    }
-  }
 
   App.directive('aceEditor', function(
     $timeout,
     $compile,
     $rootScope,
-    event_tracking,
+    eventTracking,
     localStorage,
     $cacheFactory,
     metadata,
@@ -197,6 +185,38 @@ define([
           preamble,
           files
         )
+
+        // prevent user entering null and non-BMP unicode characters in Ace
+        const BAD_CHARS_REGEXP = /[\0\uD800-\uDFFF]/g
+        const BAD_CHARS_REPLACEMENT_CHAR = '\uFFFD'
+        // the 'exec' event fires for ace functions before they are executed.
+        // you can modify the input or reject the event with e.preventDefault()
+        editor.commands.on('exec', function(e) {
+          // replace bad characters in paste content
+          if (
+            e.command &&
+            e.command.name === 'paste' &&
+            e.args &&
+            BAD_CHARS_REGEXP.test(e.args.text)
+          ) {
+            e.args.text = e.args.text.replace(
+              BAD_CHARS_REGEXP,
+              BAD_CHARS_REPLACEMENT_CHAR
+            )
+          }
+          // replace bad characters in keyboard input
+          if (
+            e.command &&
+            e.command.name === 'insertstring' &&
+            e.args &&
+            BAD_CHARS_REGEXP.test(e.args)
+          ) {
+            e.args = e.args.replace(
+              BAD_CHARS_REGEXP,
+              BAD_CHARS_REPLACEMENT_CHAR
+            )
+          }
+        })
 
         /* eslint-enable no-unused-vars */
 
@@ -544,7 +564,7 @@ define([
           updateCount++
 
           if (updateCount === 100) {
-            event_tracking.send('editor-interaction', 'multi-doc-update')
+            eventTracking.send('editor-interaction', 'multi-doc-update')
           }
           return scope.$emit(`${scope.name}:change`)
         }
@@ -756,7 +776,11 @@ define([
           // respect the readOnly setting, normally false
           editor.setReadOnly(scope.readOnly)
           triggerEditorInitEvent()
-          initSpellCheck()
+
+          if (!scope.readOnly) {
+            initSpellCheck()
+          }
+
           initTrackChanges()
           initUndo()
 
@@ -766,16 +790,16 @@ define([
           // deletes and then inserts document content
           session.setAnnotations(scope.annotations)
 
-          session.on('changeScrollTop', event_tracking.editingSessionHeartbeat)
+          session.on('changeScrollTop', eventTracking.editingSessionHeartbeat)
 
           angular
             .element($window)
-            .on('click', event_tracking.editingSessionHeartbeat)
+            .on('click', eventTracking.editingSessionHeartbeat)
 
           scope.$on('$destroy', () =>
             angular
               .element($window)
-              .off('click', event_tracking.editingSessionHeartbeat)
+              .off('click', eventTracking.editingSessionHeartbeat)
           )
 
           if (scope.eventsBridge != null) {

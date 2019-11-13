@@ -16,13 +16,17 @@ define(['base'], function(App) {
     $scope => ($scope.messages = window.systemMessages)
   )
 
-  return App.controller('SystemMessageController', function($scope, $sce) {
-    $scope.hidden = $.localStorage(`systemMessage.hide.${$scope.message._id}`)
+  return App.controller('SystemMessageController', function(
+    $scope,
+    $sce,
+    localStorage
+  ) {
+    $scope.hidden = localStorage(`systemMessage.hide.${$scope.message._id}`)
     $scope.htmlContent = $scope.message.content
 
     return ($scope.hide = function() {
       $scope.hidden = true
-      return $.localStorage(`systemMessage.hide.${$scope.message._id}`, true)
+      return localStorage(`systemMessage.hide.${$scope.message._id}`, true)
     })
   })
 })

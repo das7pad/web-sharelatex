@@ -81,6 +81,9 @@
 	color: #FFF;
 	padding: 5px 10px;
 	line-height: 1;
+	position: sticky;
+	top: 0;
+	z-index: 3;
 }
 
 .history-entry-toV-handle,
@@ -246,7 +249,7 @@
 		margin-bottom: 3px;
 	}
 		.history-entry-change {
-
+			word-break: break-all;
 		}
 			.history-entry-change-action {
 				margin-right: 0.5em;
@@ -255,7 +258,7 @@
 			.history-entry-change-doc {
 				color: @history-highlight-color;
 				font-weight: bold;
-				word-break: break-all;
+
 				.history-entry-selected &,
 				.history-entry-hover-selected &,
 				.history-version-with-label-selected & {

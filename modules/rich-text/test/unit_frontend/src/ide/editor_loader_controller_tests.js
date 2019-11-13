@@ -11,21 +11,14 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 define([
-  'ide/rich-text/controllers/editor_loader_controller',
-  'utils/EventEmitter'
+  '../../../../public/src/ide/controllers/editor_loader_controller',
+  'utils/EventEmitter',
+  'libs/angular-mocks'
 ], (EditorLoaderController, EventEmitter) =>
   describe('EditorLoaderController', function() {
-    beforeEach(module('SharelatexApp'))
+    beforeEach(window.module('SharelatexApp'))
 
-    let origRequireJsFn = null
-    beforeEach(function() {
-      origRequireJsFn = window.requirejs
-      return (window.requirejs = this.requirejs = sinon.stub())
-    })
-
-    afterEach(() => (window.requirejs = origRequireJsFn))
-
-    it('inits richText scope', () =>
+    it('inits richText scope', function() {
       inject(($rootScope, $controller) => {
         const $scope = $rootScope.$new()
         $controller('EditorLoaderController', { $scope })
@@ -34,21 +27,28 @@ define([
         return expect($scope.richText.formattingEvents).to.be.an.instanceof(
           EventEmitter
         )
-      }))
+      })
+    })
 
-    it('watches showRichText and loads bundle if true', function() {
+    it('watches showRichText and loads bundle if true', function(done) {
       return inject(($rootScope, $controller) => {
         const $scope = $rootScope.$new()
         $scope.editor = { showRichText: false }
-
-        expect(this.requirejs).to.not.have.been.called
 
         $controller('EditorLoaderController', { $scope })
 
         $scope.editor.showRichText = true
         $rootScope.$digest()
 
-        return expect(this.requirejs).to.have.been.called
+        expect($scope.richText.bundleLoading).to.not.equal(null)
+        $scope.richText.bundleLoading
+          .then(() => {
+            expect($scope.richText.bundle).to.not.equal(null)
+          })
+          .finally(() => {
+            expect($scope.richText.bundleLoading).to.equal(null)
+            done()
+          })
       })
     })
 
@@ -62,7 +62,8 @@ define([
         $scope.editor.showRichText = false
         $rootScope.$digest()
 
-        return expect(this.requirejs).to.not.have.been.called
+        expect($scope.richText.bundleLoading).to.equal(null)
+        expect($scope.richText.bundle).to.equal(null)
       })
     })
   }))

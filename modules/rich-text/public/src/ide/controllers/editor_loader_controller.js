@@ -1,31 +1,32 @@
-/* eslint-disable
-    no-return-assign,
-    no-undef,
-*/
-// TODO: This file was created by bulk-decaffeinate.
-// Fix any style issues and re-enable lint.
-/*
- * decaffeinate suggestions:
- * DS102: Remove unnecessary code created because of implicit returns
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
-define(['base', 'utils/EventEmitter'], (App, EventEmitter) =>
-  App.controller('EditorLoaderController', function($scope, localStorage) {
-    $scope.richText = {
-      bundle: null,
-      formattingEvents: new EventEmitter()
-    }
+import App from 'base'
+import EventEmitter from 'utils/EventEmitter'
 
-    return $scope.$watch('editor.showRichText', function(val) {
-      localStorage(
-        `editor.mode.${$scope.project_id}`,
-        val === true ? 'rich-text' : 'source'
-      )
+App.controller('EditorLoaderController', function($scope, localStorage) {
+  $scope.richText = {
+    bundle: null,
+    bundleLoading: null,
+    formattingEvents: new EventEmitter()
+  }
 
-      if (val && !$scope.richText.bundle) {
-        return requirejs(['rich-text'], bundle =>
-          $scope.$applyAsync(() => ($scope.richText.bundle = bundle))
+  $scope.$watch('editor.showRichText', function(val) {
+    localStorage(
+      `editor.mode.${$scope.project_id}`,
+      val === true ? 'rich-text' : 'source'
+    )
+
+    if (val && !$scope.richText.bundle && !$scope.richText.bundleLoading) {
+      const MathJaxLoading = import('../../../../../../public/src/MathJaxBundle')
+      const richTextLoading = import(/* webpackChunkName: "rich-text" */ '../../rich_text_editor')
+      $scope.richText.bundleLoading = Promise.all([
+        richTextLoading,
+        MathJaxLoading
+      ])
+        .then(() =>
+          richTextLoading.then(bundle =>
+            $scope.$applyAsync(() => ($scope.richText.bundle = bundle))
+          )
         )
-      }
-    })
-  }))
+        .finally(() => ($scope.richText.bundleLoading = null))
+    }
+  })
+})

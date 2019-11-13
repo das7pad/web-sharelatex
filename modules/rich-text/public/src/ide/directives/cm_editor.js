@@ -1,4 +1,3 @@
-/* global _ */
 /* eslint-disable
     no-use-before-define
 */
@@ -12,14 +11,14 @@
  */
 define([
   'base',
-  'ide/rich-text/rich_text_adapter',
+  '../rich_text_adapter',
   'ide/editor/directives/aceEditor/spell-check/SpellCheckManager',
-  'ide/rich-text/directives/spell_check/spell_check_adapter',
-  'ide/rich-text/autocomplete_adapter',
+  './spell_check/spell_check_adapter',
+  '../autocomplete_adapter',
   'ide/editor/directives/aceEditor/cursor-position/CursorPositionManager',
-  'ide/rich-text/directives/cursor_position/cursor_position_adapter',
+  './cursor_position/cursor_position_adapter',
   'ide/editor/directives/aceEditor/track-changes/TrackChangesManager',
-  'ide/rich-text/directives/track_changes/track_changes_adapter'
+  './track_changes/track_changes_adapter'
 ], (
   App,
   RichTextAdapter,
@@ -135,6 +134,39 @@ define([
           return scope.formattingEvents.off('bulletList')
         }
 
+        // prevent user entering null and non-BMP unicode characters
+        const BAD_CHARS_REGEXP = /[\0\uD800-\uDFFF]/g
+        const BAD_CHARS_REPLACEMENT_CHAR = '\uFFFD'
+        // the 'beforeChange' event fires for changes before they are executed.
+        // you can modify the input with event.update() or reject the event with
+        // event.cancel().
+        const handleBeforeChangeEvent = function(cm, event) {
+          if (event.update) {
+            let originalText = event.text.join('\n')
+            if (BAD_CHARS_REGEXP.test(originalText)) {
+              let filteredText = []
+              for (let i = 0; i < event.text.length; i++) {
+                let newEntry = event.text[i].replace(
+                  BAD_CHARS_REGEXP,
+                  BAD_CHARS_REPLACEMENT_CHAR
+                )
+                filteredText.push(newEntry)
+              }
+              event.update(event.from, event.to, filteredText)
+            }
+          }
+        }
+
+        const setUpChangeFilter = function() {
+          const codeMirror = editor.getCodeMirror()
+          codeMirror.on('beforeChange', handleBeforeChangeEvent)
+        }
+
+        const tearDownChangeFilter = function() {
+          const codeMirror = editor.getCodeMirror()
+          codeMirror.off('beforeChange', handleBeforeChangeEvent)
+        }
+
         // Trigger the event once *only* - this is called after CM is connected
         // to the ShareJs instance but this event should only be triggered the
         // first time the editor is opened. Not every time the docs opened
@@ -150,20 +182,20 @@ define([
             sharejsDoc.on('remoteop.richtext', () => editor.update())
             // Clear undo history so that attaching to ShareJS isn't included
             editor.getCodeMirror().clearHistory()
+            setUpChangeFilter()
             triggerEditorInitEvent()
-            initSpellCheck()
-            if (window.richTextTrackChangesEnabled) {
-              initTrackChanges()
+            if (!scope.readOnly) {
+              initSpellCheck()
             }
+            initTrackChanges()
             return setUpMetadataEventListener()
           })
 
         var detachFromCM = function(sharejsDoc) {
           tearDownSpellCheck()
-          if (window.richTextTrackChangesEnabled) {
-            tearDownTrackChanges()
-          }
+          tearDownTrackChanges()
           tearDownMetadataEventListener()
+          tearDownChangeFilter()
           sharejsDoc.detachFromCM()
           return sharejsDoc.off('remoteop.richtext')
         }
@@ -196,11 +228,13 @@ define([
         var tearDownSpellCheck = function() {
           const codeMirror = editor.getCodeMirror()
           codeMirror.off('change', handleChangeForSpellCheck)
-          $(codeMirror.getWrapperElement()).off(
-            'contextmenu',
-            this.spellCheckManager.onContextMenu
-          )
-          return codeMirror.off('scroll', this.spellCheckManager.onScroll)
+          if (this.spellCheckManager) {
+            $(codeMirror.getWrapperElement()).off(
+              'contextmenu',
+              this.spellCheckManager.onContextMenu
+            )
+            codeMirror.off('scroll', this.spellCheckManager.onScroll)
+          }
         }
 
         const initTrackChanges = function() {
@@ -219,10 +253,6 @@ define([
           this.trackChangesManager.onChangeSession()
 
           codeMirror.on('swapDoc', this.trackChangesManager.onChangeSession)
-          codeMirror.on(
-            'viewportChange',
-            this.trackChangesManager.onViewportChange
-          )
         }
 
         const tearDownTrackChanges = function() {

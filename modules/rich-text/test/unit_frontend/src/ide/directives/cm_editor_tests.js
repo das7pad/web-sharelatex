@@ -13,14 +13,14 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 define([
-  'ide/rich-text/directives/cm_editor',
-  'ide/rich-text/rich_text_adapter',
-  'utils/EventEmitter'
-], function(cmEditor, RichTextAdapter, EventEmitter) {
-  let stubSharejsDoc
+  '../../../../../public/src/ide/directives/cm_editor',
+  '../../../../../public/src/ide/rich_text_adapter',
+  'utils/EventEmitter',
+  'libs/angular-mocks'
+], (cmEditor, RichTextAdapter, EventEmitter) => {
   describe('cmEditor', function() {
     beforeEach(
-      module('SharelatexApp', function($provide) {
+      window.module('SharelatexApp', $provide => {
         $provide.factory('ide', () => ({ fileTreeManager: sinon.stub() }))
         $provide.factory('metadata', () => ({}))
       })
@@ -43,7 +43,7 @@ define([
         disable: sinon.stub(),
         disableAutocomplete: sinon.stub()
       })
-      return inject(function($compile, $rootScope) {
+      return inject(($compile, $rootScope) => {
         $rootScope.sharejsDoc = stubSharejsDoc()
         $rootScope.bundle = { Editor: editorStub }
         $rootScope.formattingEvents = new EventEmitter()
@@ -62,12 +62,12 @@ define([
       const { getCodeMirror } = Editor.prototype
       const { openDoc } = Editor.prototype
       const { enable } = Editor.prototype
-      return inject(function($compile, $rootScope, $browser) {
-        let attachToCM, getSnapshot, snapshot
+      return inject(($compile, $rootScope, $browser) => {
+        let getSnapshot, snapshot
         $rootScope.sharejsDoc = stubSharejsDoc({
-          getSnapshot: (getSnapshot = sinon.stub().returns((snapshot = {}))),
-          attachToCM: (attachToCM = sinon.stub())
+          getSnapshot: (getSnapshot = sinon.stub().returns((snapshot = {})))
         })
+        sinon.spy($rootScope.sharejsDoc, 'attachToCM')
         $rootScope.bundle = { Editor }
         $rootScope.formattingEvents = new EventEmitter()
 
@@ -80,7 +80,7 @@ define([
         expect(getSnapshot).to.have.been.called
         expect(openDoc).to.have.been.called
         expect(openDoc.firstCall.args[0]).to.equal(snapshot)
-        expect(attachToCM).to.have.been.called
+        expect($rootScope.sharejsDoc.attachToCM).to.have.been.called
         return expect(enable).to.have.been.called
       })
     })
@@ -88,7 +88,7 @@ define([
     it('calls Editor.update when remoteop event is trigger', function() {
       const Editor = stubEditor()
       const { update } = Editor.prototype
-      return inject(function($compile, $rootScope) {
+      return inject(($compile, $rootScope) => {
         $rootScope.sharejsDoc = stubSharejsDoc()
         $rootScope.bundle = { Editor }
         $rootScope.formattingEvents = new EventEmitter()
@@ -108,7 +108,7 @@ define([
       const Editor = stubEditor(
         stubCodeMirror({ clearHistory: (clearHistory = sinon.stub()) })
       )
-      return inject(function($compile, $rootScope) {
+      return inject(($compile, $rootScope) => {
         $rootScope.sharejsDoc = stubSharejsDoc()
         $rootScope.bundle = { Editor }
         $rootScope.formattingEvents = new EventEmitter()
@@ -125,7 +125,7 @@ define([
     return it('detaches from CM when destroyed', function() {
       const Editor = stubEditor()
       const { disable } = Editor.prototype
-      return inject(function($compile, $rootScope) {
+      return inject(($compile, $rootScope) => {
         let detachFromCM
         $rootScope.sharejsDoc = stubSharejsDoc({
           detachFromCM: (detachFromCM = sinon.stub())
@@ -187,18 +187,25 @@ define([
   }
 
   // Stub the ShareJS Doc that is created by editor internals
-  return (stubSharejsDoc = function(overrides) {
+  const stubSharejsDoc = function(overrides) {
     if (overrides == null) {
       overrides = {}
     }
     return _.extend(
       EventEmitter.prototype,
       {
-        attachToCM: sinon.stub(),
+        ranges: {
+          changes: [],
+          comments: []
+        },
+        attachToCM: function(cm) {
+          cm.doc = this
+        },
+        getAllMarks: sinon.stub().returns([]),
         getSnapshot: sinon.stub(),
         detachFromCM: sinon.stub()
       },
       overrides
     )
-  })
+  }
 })

@@ -1,12 +1,5 @@
-app/js
-modules/**/app/js
+node_modules
 modules/**/scripts
-modules/*/index.js
 public/js
-public/minjs
+public/vendor
 modules/**/public/js
-test/**/js
-modules/**/test/**/js
-app.js
-webpack.config.*
-karma.conf.js

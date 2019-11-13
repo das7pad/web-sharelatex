@@ -26,7 +26,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['ace/ace','libs/sha1'], function () {
+define(['ace/ace','crypto-js/sha1'], function (_ignore, CryptoJSSHA1) {
   var append = void 0,
       bootstrapTransform = void 0,
       exports = void 0,
@@ -226,9 +226,6 @@ define(['ace/ace','libs/sha1'], function () {
     };
   };
 
-  if (typeof WEB === 'undefined') {
-    exports.bootstrapTransform = bootstrapTransform;
-  }
   // A simple text implementation
   //
   // Operations are lists of components.
@@ -673,20 +670,9 @@ define(['ace/ace','libs/sha1'], function () {
 
     // [] is used to prevent closure from renaming types.text
     exports.types.text = text;
-  } else {
-    module.exports = text;
-
-    // The text type really shouldn't need this - it should be possible to define
-    // an efficient transform function by making a sort of transform map and passing each
-    // op component through it.
-    require('./helpers').bootstrapTransform(text, transformComponent, checkValidOp, append);
   }
 
   // Text document API for text
-
-  if (typeof WEB === 'undefined') {
-    text = require('./text');
-  }
 
   text.api = {
     provides: { text: true },
@@ -876,10 +862,6 @@ define(['ace/ace','libs/sha1'], function () {
 
   if (WEB == null) {
     module.exports = MicroEvent;
-  }
-
-  if (WEB == null) {
-    types = require('../types');
   }
 
   if (WEB != null) {
@@ -1303,9 +1285,17 @@ define(['ace/ace','libs/sha1'], function () {
 
         this.emit('flipped_pending_to_inflight');
 
-        if (window.sl_debugging) {
-          // send git hash of current snapshot when debugging
-          var sha1 = CryptoJS.SHA1("blob " + this.snapshot.length + "\x00" + this.snapshot).toString()
+        if (window.useShareJsHash || window.sl_debugging) {
+          var now = Date.now()
+          var age = this.__lastSubmitTimestamp && (now - this.__lastSubmitTimestamp)
+          var RECOMPUTE_HASH_INTERVAL = 5000
+          // check the document hash regularly (but not if we have checked in the last 5 seconds)
+          var needToRecomputeHash = !this.__lastSubmitTimestamp || (age > RECOMPUTE_HASH_INTERVAL) || (age < 0) 
+          if (needToRecomputeHash || window.sl_debugging) {
+            // send git hash of current snapshot
+            var sha1 = CryptoJSSHA1("blob " + this.snapshot.length + "\x00" + this.snapshot).toString()
+            this.__lastSubmitTimestamp = now;
+          }
         }
 
         // console.log "SENDING OP TO SERVER", @inflightOp, @version
@@ -1427,10 +1417,6 @@ define(['ace/ace','libs/sha1'], function () {
   // Make documents event emitters
 
 
-  if (WEB == null) {
-    MicroEvent = require('./microevent');
-  }
-
   MicroEvent.mixin(Doc);
 
   exports.Doc = Doc;
@@ -1497,6 +1483,7 @@ define(['ace/ace','libs/sha1'], function () {
         var otText = doc.getText();
 
         if (editorText !== otText) {
+          doc.emit('error','Text does not match in ace')
           console.error('Text does not match!');
           console.error('editor: ' + editorText);
           return console.error('ot:     ' + otText);
@@ -1620,23 +1607,25 @@ define(['ace/ace','libs/sha1'], function () {
   // It is heavily inspired from the Ace editor hook.
 
   // Convert a CodeMirror delta into an op understood by share.js
-  var applyCMToShareJS = function applyCMToShareJS(editorDoc, delta, doc) {
+  var applyCMToShareJS = function applyCMToShareJS(editorDoc, delta, doc, fromUndo) {
     // CodeMirror deltas give a text replacement.
     // I tuned this operation a little bit, for speed.
     var startPos = 0; // Get character position from # of chars in each line.
     var i = 0; // i goes through all lines.
-
+    // Compute the position from the shareJS snapshot because we are in the CodeMirror
+    // change event, where the change has already been applied to the editorDoc
+    var docLines = doc.snapshot.split('\n', delta.from.line) // only split the document as far as we need to
     while (i < delta.from.line) {
-      startPos += editorDoc.lineInfo(i).text.length + 1; // Add 1 for '\n'
+      startPos += docLines[i].length + 1; // Add 1 for '\n'
       i++;
     }
     startPos += delta.from.ch;
 
     if (delta.removed) {
-      doc.del(startPos, delta.removed.join('\n').length);
+      doc.del(startPos, delta.removed.join('\n').length, fromUndo);
     }
     if (delta.text) {
-      return doc.insert(startPos, delta.text.join('\n'));
+      return doc.insert(startPos, delta.text.join('\n'), fromUndo);
     }
   };
 
@@ -1657,6 +1646,7 @@ define(['ace/ace','libs/sha1'], function () {
         var otText = sharedoc.getText();
 
         if (editorText !== otText) {
+          sharedoc.emit('error','Text does not match in CodeMirror')
           console.error('Text does not match!');
           console.error('editor: ' + editorText);
           return console.error('ot:     ' + otText);
@@ -1686,7 +1676,8 @@ define(['ace/ace','libs/sha1'], function () {
       if (suppress) {
         return;
       }
-      applyCMToShareJS(editorDoc, change, sharedoc);
+      var fromUndo = (change.origin === 'undo')
+      applyCMToShareJS(editorDoc, change, sharedoc, fromUndo);
       return check();
     };
 

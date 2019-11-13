@@ -2,16 +2,15 @@ v1Api =
 	url: "http://#{process.env['V1_HOST'] or 'localhost'}:5000"
 
 module.exports =
+	mongo:
+		url: process.env['MONGO_CONNECTION_STRING'] || process.env['MONGO_URL'] || "mongodb://#{process.env['MONGO_HOST'] or '127.0.0.1'}/sharelatex_dev"
+
 	enableSubscriptions: true
 	allowPublicAccess: true
 
 	enabledLinkedFileTypes: 'url,project_file,project_output_file,mendeley,zotero'.split(',')
 
 	apis:
-		analytics:
-			enabled: false
-			url: undefined
-
 		linkedUrlProxy:
 			url: 'http://localhost:6543'
 
@@ -159,6 +158,19 @@ module.exports =
 		},
 		'/redirect/qs': '/destination/qs'
 		'/docs_v1': {
-			authWithV1: true
 			url: '/docs'
 		}
+
+	oauthProviders:
+		'provider': {
+			name: 'provider'
+		},
+		'collabratec': {
+			name: 'collabratec'
+		}
+		'google': {
+			name: 'google'
+		},
+  # setting to true since many features are enabled/disabled after availability of this
+  # property (check Features.js)
+	overleaf: true

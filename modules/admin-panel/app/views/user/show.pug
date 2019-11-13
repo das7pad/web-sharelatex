@@ -5,7 +5,7 @@ block content
 		!{JSON.stringify({user: user, projects: projects}).replace(/\//g, '\\/')}
 
 	script(type="text/javascript").
-		window.data = JSON.parse($("#data").text());
+		window.data = JSON.parse(window.document.getElementById("data").text);
 
 	.content.content-alt(ng-controller="AdminUserController")
 		.container(ng-cloak)

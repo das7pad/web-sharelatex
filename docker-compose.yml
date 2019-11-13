@@ -6,7 +6,7 @@ version: "3.1"
 
 services:
   test_unit:
-    image: node:10.16.3
+    image: node:12.13.0
     volumes:
       - .:/app
     working_dir: /app
@@ -16,7 +16,7 @@ services:
     user: node
 
   test_acceptance:
-    image: node:10.16.3
+    image: node:12.13.0
     volumes:
       - .:/app
     working_dir: /app
@@ -34,7 +34,7 @@ services:
       ENABLED_LINKED_FILE_TYPES: 'url,project_file,project_output_file,mendeley,zotero'
       LINKED_URL_PROXY: 'http://localhost:6543'
       SHARELATEX_CONFIG: /app/test/acceptance/config/settings.test.coffee
-      NODE_ENV: production
+      NODE_ENV: test
     user: node
     depends_on:
       - mongo
@@ -43,7 +43,7 @@ services:
       - redis_realtime
       - redis_web
       - redis_websessions
-    command: npm run test:acceptance:run_dir test/acceptance/js
+    command: npm run test:acceptance:run_dir test/acceptance/src
 
   test_frontend:
     build:
@@ -52,7 +52,7 @@ services:
     volumes:
       - .:/app
     working_dir: /app
-    command: npm run test:frontend -- --single-run
+    command: npm run test:frontend:single
 
   tar:
     build: .
