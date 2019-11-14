@@ -1,8 +1,8 @@
 extends ../../../../app/views/layout
 
 block head-scripts
-	link(rel='stylesheet' href='https://production-overleaf-static.s3.amazonaws.com/assets/highlight-github.css')
-	script(type='text/javascript' src='https://production-overleaf-static.s3.amazonaws.com/assets/highlight.pack.js')
+	link(rel='stylesheet' href=staticPath('/stylesheets/vendor/highlight-github.css'))
+	script(type='text/javascript' src=staticPath('/js/libs/highlight.pack.js'))
 	script(type='text/javascript').
 		hljs.initHighlightingOnLoad();
 	script(type='text/javascript').
