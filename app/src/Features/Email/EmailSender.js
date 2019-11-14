@@ -2,10 +2,6 @@ const { callbackify } = require('util')
 const logger = require('logger-sharelatex')
 const metrics = require('metrics-sharelatex')
 const Settings = require('settings-sharelatex')
-const nodemailer = require('nodemailer')
-const sesTransport = require('nodemailer-ses-transport')
-const sgTransport = require('nodemailer-sendgrid')
-const mandrillTransport = require('nodemailer-mandrill-transport')
 const OError = require('@overleaf/o-error')
 const RateLimiter = require('../../infrastructure/RateLimiter')
 const _ = require('underscore')
@@ -24,19 +20,25 @@ const client = getClient()
 function getClient() {
   let client
   if (EMAIL_SETTINGS.parameters) {
+    const nodemailer = require('nodemailer')
+
     const emailParameters = EMAIL_SETTINGS.parameters
     if (emailParameters.AWSAccessKeyID || EMAIL_SETTINGS.driver === 'ses') {
       logger.log('using aws ses for email')
-      client = nodemailer.createTransport(sesTransport(emailParameters))
+      client = nodemailer.createTransport(
+        require('nodemailer-ses-transport')(emailParameters)
+      )
     } else if (emailParameters.sendgridApiKey) {
       logger.log('using sendgrid for email')
       client = nodemailer.createTransport(
-        sgTransport({ apiKey: emailParameters.sendgridApiKey })
+        require('nodemailer-sendgrid')({
+          apiKey: emailParameters.sendgridApiKey
+        })
       )
     } else if (emailParameters.MandrillApiKey) {
       logger.log('using mandril for email')
       client = nodemailer.createTransport(
-        mandrillTransport({
+        require('nodemailer-mandrill-transport')({
           auth: {
             apiKey: emailParameters.MandrillApiKey
           }
