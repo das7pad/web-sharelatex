@@ -20,6 +20,7 @@ describe('AuthenticationController', function() {
     }
     this.AuthenticationController = SandboxedModule.require(modulePath, {
       globals: {
+        Buffer: Buffer,
         console: console
       },
       requires: {
