@@ -170,7 +170,8 @@ describe('TokenAccess', function() {
               this.other1,
               this.projectId,
               (response, body) => {
-                expect(body.privilegeLevel).to.equal(false)
+                expect(response.statusCode).to.equal(403)
+                expect(body).to.equal('Forbidden')
               },
               cb
             )
@@ -288,7 +289,8 @@ describe('TokenAccess', function() {
                 this.other1,
                 this.projectId,
                 (response, body) => {
-                  expect(body.privilegeLevel).to.equal(false)
+                  expect(response.statusCode).to.equal(403)
+                  expect(body).to.equal('Forbidden')
                 },
                 cb
               )
@@ -403,7 +405,8 @@ describe('TokenAccess', function() {
                 this.projectId,
                 this.tokens.readOnly,
                 (response, body) => {
-                  expect(body.privilegeLevel).to.equal(false)
+                  expect(response.statusCode).to.equal(403)
+                  expect(body).to.equal('Forbidden')
                 },
                 cb
               )
@@ -520,7 +523,8 @@ describe('TokenAccess', function() {
                 this.other1,
                 this.projectId,
                 (response, body) => {
-                  expect(body.privilegeLevel).to.equal(false)
+                  expect(response.statusCode).to.equal(403)
+                  expect(body).to.equal('Forbidden')
                 },
                 cb
               )
@@ -587,7 +591,8 @@ describe('TokenAccess', function() {
                 this.projectId,
                 this.tokens.readAndWrite,
                 (response, body) => {
-                  expect(body.privilegeLevel).to.equal(false)
+                  expect(response.statusCode).to.equal(403)
+                  expect(body).to.equal('Forbidden')
                 },
                 cb
               )
@@ -692,7 +697,8 @@ describe('TokenAccess', function() {
                   this.projectId,
                   this.tokens.readAndWrite,
                   (response, body) => {
-                    expect(body.privilegeLevel).to.equal(false)
+                    expect(response.statusCode).to.equal(403)
+                    expect(body).to.equal('Forbidden')
                   },
                   cb
                 )
@@ -773,7 +779,8 @@ describe('TokenAccess', function() {
               this.other2,
               this.projectId,
               (response, body) => {
-                expect(body.privilegeLevel).to.equal(false)
+                expect(response.statusCode).to.equal(403)
+                expect(body).to.equal('Forbidden')
               },
               cb
             )
@@ -867,7 +874,8 @@ describe('TokenAccess', function() {
               this.other2,
               this.projectId,
               (response, body) => {
-                expect(body.privilegeLevel).to.equal(false)
+                expect(response.statusCode).to.equal(403)
+                expect(body).to.equal('Forbidden')
               },
               cb
             )

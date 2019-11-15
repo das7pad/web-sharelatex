@@ -1,3 +1,4 @@
+const { callbackify, promisify } = require('util')
 const metrics = require('metrics-sharelatex')
 const RedisWrapper = require('./RedisWrapper')
 const rclient = RedisWrapper.client('lock')
@@ -184,3 +185,11 @@ const LockManager = {
 }
 
 module.exports = LockManager
+
+const promisifiedRunWithLock = promisify(LockManager.runWithLock)
+LockManager.promises = {
+  runWithLock(namespace, id, runner) {
+    const cbRunner = callbackify(runner)
+    return promisifiedRunWithLock(namespace, id, cbRunner)
+  }
+}

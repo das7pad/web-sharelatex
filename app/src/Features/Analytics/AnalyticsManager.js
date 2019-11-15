@@ -163,7 +163,6 @@ module.exports = {
         if ((err.name != null) === 'ServiceDisabledError') {
           return callback(err)
         }
-        console.log(response, opts)
         logger.warn({ userId, err }, 'error getting last occurance of event')
         callback(err)
       } else {

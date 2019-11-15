@@ -33,6 +33,12 @@ describe('SAMLIdentityManager', function() {
     this.institution = {
       name: 'Overleaf University'
     }
+    this.InstitutionsAPI = {
+      promises: {
+        addEntitlement: sinon.stub().resolves(),
+        removeEntitlement: sinon.stub().resolves()
+      }
+    }
     this.SAMLIdentityManager = SandboxedModule.require(modulePath, {
       requires: {
         '../Institutions/InstitutionsAPI': {
@@ -65,7 +71,8 @@ describe('SAMLIdentityManager', function() {
         }),
         '../User/UserUpdater': (this.UserUpdater = {
           addEmailAddress: sinon.stub()
-        })
+        }),
+        '../Institutions/InstitutionsAPI': this.InstitutionsAPI
       }
     })
   })
