@@ -18,7 +18,7 @@ const htmlEncoder = new NodeHtmlEncoder('numerical')
 
 const jsPath = '/js/'
 
-let webpackManifest
+let webpackManifest = {}
 if (!IS_DEV_ENV) {
   // Only load webpack manifest file in production. In dev, the web and webpack
   // containers can't coordinate, so there no guarantee that the manifest file

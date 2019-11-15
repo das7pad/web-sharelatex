@@ -155,7 +155,7 @@ describe('ExpressLocalsTests', function() {
           this.res.render('template', {})
           expect(this.res.headers.Link).to.exist
           const Link = this.res.headers.Link
-          expect(Link).to.include('stylesheets/style.css')
+          expect(Link).to.include('stylesheets/style')
           expect(Link).to.include('font/lato')
         })
 
@@ -164,7 +164,7 @@ describe('ExpressLocalsTests', function() {
           this.res.render('template', {})
           expect(this.res.headers.Link).to.exist
           const Link = this.res.headers.Link
-          expect(Link).to.include('stylesheets/sl-style.css')
+          expect(Link).to.include('stylesheets/sl-style')
           expect(Link).to.include('font/open-sans')
         })
       })
