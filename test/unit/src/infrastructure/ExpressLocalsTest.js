@@ -31,7 +31,6 @@ describe('ExpressLocalsTests', function() {
     }
     this.requires[MANIFEST] = {}
 
-    this.app = {}
     this.webRouter = {
       use: sinon.stub()
     }
@@ -58,7 +57,6 @@ describe('ExpressLocalsTests', function() {
         requires: this.requires
       })
       this.ExpressLocals(
-        this.app,
         this.webRouter,
         this.privateApiRouter,
         this.publicApiRouter
