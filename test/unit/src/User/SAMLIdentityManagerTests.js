@@ -41,12 +41,6 @@ describe('SAMLIdentityManager', function() {
     }
     this.SAMLIdentityManager = SandboxedModule.require(modulePath, {
       requires: {
-        '../Institutions/InstitutionsAPI': {
-          promises: {
-            addEntitlement: sinon.stub().resolves(),
-            removeEntitlement: sinon.stub().resolves()
-          }
-        },
         '../Email/EmailHandler': (this.EmailHandler = {
           sendEmail: sinon.stub().yields()
         }),
