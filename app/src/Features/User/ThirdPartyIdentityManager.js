@@ -1,86 +1,59 @@
-const EmailHandler = require('../../../../app/src/Features/Email/EmailHandler')
+const APP_ROOT = '../../../../app/src'
+const EmailHandler = require(`${APP_ROOT}/Features/Email/EmailHandler`)
 const Errors = require('../Errors/Errors')
-const logger = require('logger-sharelatex')
-const { User } = require('../../models/User')
-const settings = require('settings-sharelatex')
 const _ = require('lodash')
+const logger = require('logger-sharelatex')
+const settings = require('settings-sharelatex')
+const { User } = require(`${APP_ROOT}/models/User`)
+const { promisifyAll } = require(`${APP_ROOT}/util/promises`)
 
 const oauthProviders = settings.oauthProviders || {}
 
-const ThirdPartyIdentityManager = (module.exports = {
-  getUser(providerId, externalUserId, callback) {
-    if (providerId == null || externalUserId == null) {
-      return callback(new Error('invalid arguments'))
+function getUser(providerId, externalUserId, callback) {
+  if (providerId == null || externalUserId == null) {
+    return callback(new Error('invalid arguments'))
+  }
+  const query = _getUserQuery(providerId, externalUserId)
+  User.findOne(query, function(err, user) {
+    if (err != null) {
+      return callback(err)
     }
-    const query = ThirdPartyIdentityManager._getUserQuery(
+    if (!user) {
+      return callback(new Errors.ThirdPartyUserNotFoundError())
+    }
+    callback(null, user)
+  })
+}
+
+function login(providerId, externalUserId, externalData, callback) {
+  ThirdPartyIdentityManager.getUser(providerId, externalUserId, function(
+    err,
+    user
+  ) {
+    if (err != null) {
+      return callback(err)
+    }
+    if (!externalData) {
+      return callback(null, user)
+    }
+    const query = _getUserQuery(providerId, externalUserId)
+    const update = _thirdPartyIdentifierUpdate(
+      user,
       providerId,
-      externalUserId
+      externalUserId,
+      externalData
     )
-    User.findOne(query, function(err, user) {
-      if (err != null) {
-        return callback(err)
-      }
-      if (!user) {
-        return callback(new Errors.ThirdPartyUserNotFoundError())
-      }
-      callback(null, user)
-    })
-  },
+    User.findOneAndUpdate(query, update, { new: true }, callback)
+  })
+}
 
-  login(providerId, externalUserId, externalData, callback) {
-    ThirdPartyIdentityManager.getUser(providerId, externalUserId, function(
-      err,
-      user
-    ) {
-      if (err != null) {
-        return callback(err)
-      }
-      if (!externalData) {
-        return callback(null, user)
-      }
-      const query = ThirdPartyIdentityManager._getUserQuery(
-        providerId,
-        externalUserId
-      )
-      const update = ThirdPartyIdentityManager._thirdPartyIdentifierUpdate(
-        user,
-        providerId,
-        externalUserId,
-        externalData
-      )
-      User.findOneAndUpdate(query, update, { new: true }, callback)
-    })
-  },
-
-  _getUserQuery(providerId, externalUserId) {
-    externalUserId = externalUserId.toString()
-    providerId = providerId.toString()
-    const query = {
-      'thirdPartyIdentifiers.externalUserId': externalUserId,
-      'thirdPartyIdentifiers.providerId': providerId
-    }
-    return query
-  },
-
-  _thirdPartyIdentifierUpdate(user, providerId, externalUserId, externalData) {
-    providerId = providerId.toString()
-    // get third party identifier object from array
-    const thirdPartyIdentifier = user.thirdPartyIdentifiers.find(
-      tpi =>
-        tpi.externalUserId === externalUserId && tpi.providerId === providerId
-    )
-    // do recursive merge of new data over existing data
-    _.merge(thirdPartyIdentifier.externalData, externalData)
-    const update = { 'thirdPartyIdentifiers.$': thirdPartyIdentifier }
-    return update
-  },
-
-  // register: () ->
-  // this should be implemented once we move to having v2 as the master
-  // but for now we need to register with v1 then call link once that
-  // is complete
-
-  link(userId, providerId, externalUserId, externalData, callback, retry) {
+function link(
+  userId,
+  providerId,
+  externalUserId,
+  externalData,
+  callback,
+   retry) {
     if (!oauthProviders[providerId]) {
       return callback(new Error('Not a valid provider'))
     }
@@ -139,44 +112,82 @@ const ThirdPartyIdentityManager = (module.exports = {
         })
       }
     })
-  },
-
-  unlink(userId, providerId, callback) {
-    if (!oauthProviders[providerId]) {
-      return callback(new Error('Not a valid provider'))
-    }
-    const query = {
-      _id: userId
-    }
-    const update = {
-      $pull: {
-        thirdPartyIdentifiers: {
-          providerId
-        }
-      }
-    }
-    // projection includes thirdPartyIdentifiers for tests
-    User.findOneAndUpdate(query, update, { new: 1 }, (err, res) => {
-      if (err != null) {
-        callback(err)
-      } else if (!res) {
-        callback(new Error('update failed'))
-      } else {
-        const emailOptions = {
-          to: res.email,
-          provider: oauthProviders[providerId].name
-        }
-        EmailHandler.sendEmail(
-          'emailThirdPartyIdentifierUnlinked',
-          emailOptions,
-          error => {
-            if (error != null) {
-              logger.warn(error)
-            }
-            return callback(null, res)
-          }
-        )
-      }
-    })
   }
-})
+
+function unlink(userId, providerId, callback) {
+  if (!oauthProviders[providerId]) {
+    return callback(new Error('Not a valid provider'))
+  }
+  const query = {
+    _id: userId
+  }
+  const update = {
+    $pull: {
+      thirdPartyIdentifiers: {
+        providerId
+      }
+    }
+  }
+  // projection includes thirdPartyIdentifiers for tests
+  User.findOneAndUpdate(query, update, { new: 1 }, (err, res) => {
+    if (err != null) {
+      callback(err)
+    } else if (!res) {
+      callback(new Error('update failed'))
+    } else {
+      const emailOptions = {
+        to: res.email,
+        provider: oauthProviders[providerId].name
+      }
+      EmailHandler.sendEmail(
+        'emailThirdPartyIdentifierUnlinked',
+        emailOptions,
+        error => {
+          if (error != null) {
+            logger.warn(error)
+          }
+          return callback(null, res)
+        }
+      )
+    }
+  })
+}
+
+function _getUserQuery(providerId, externalUserId) {
+  externalUserId = externalUserId.toString()
+  providerId = providerId.toString()
+  const query = {
+    'thirdPartyIdentifiers.externalUserId': externalUserId,
+    'thirdPartyIdentifiers.providerId': providerId
+  }
+  return query
+}
+
+function _thirdPartyIdentifierUpdate(
+  user,
+  providerId,
+  externalUserId,
+  externalData
+) {
+  providerId = providerId.toString()
+  // get third party identifier object from array
+  const thirdPartyIdentifier = user.thirdPartyIdentifiers.find(
+    tpi =>
+      tpi.externalUserId === externalUserId && tpi.providerId === providerId
+  )
+  // do recursive merge of new data over existing data
+  _.merge(thirdPartyIdentifier.externalData, externalData)
+  const update = { 'thirdPartyIdentifiers.$': thirdPartyIdentifier }
+  return update
+}
+
+const ThirdPartyIdentityManager = {
+  getUser,
+  login,
+  link,
+  unlink
+}
+
+ThirdPartyIdentityManager.promises = promisifyAll(ThirdPartyIdentityManager)
+
+module.exports = ThirdPartyIdentityManager
