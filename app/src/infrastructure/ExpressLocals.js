@@ -174,9 +174,6 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
       return Url.resolve(staticFilesBase, path)
     }
 
-    res.locals.jsPath = jsPath
-    res.locals.fullJsPath = res.locals.staticPath(jsPath)
-
     res.locals.buildJsPath = function(jsFile, opts = {}) {
       // Resolve path from webpack manifest file
       let path = webpackManifest[jsFile]

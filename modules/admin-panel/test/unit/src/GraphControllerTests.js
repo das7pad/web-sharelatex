@@ -115,11 +115,7 @@ describe('GraphController', function() {
       }
     }
 
-    this.res = {
-      locals: {
-        jsPath: 'js path here'
-      }
-    }
+    this.res = {}
 
     return (this.callback = sinon.stub())
   })

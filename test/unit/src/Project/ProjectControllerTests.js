@@ -205,9 +205,7 @@ describe('ProjectController', function() {
       ip: '192.170.18.1'
     }
     this.res = {
-      locals: {
-        jsPath: 'js path here'
-      },
+      locals: {},
       setTimeout: sinon.stub()
     }
   })

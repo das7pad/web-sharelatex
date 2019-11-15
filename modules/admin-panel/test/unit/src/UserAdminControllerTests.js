@@ -121,9 +121,6 @@ describe('UserAdminController', function() {
     }
 
     this.res = new MockResponse()
-    this.res.locals = {
-      jsPath: 'js path here'
-    }
   })
 
   describe('index', function() {
