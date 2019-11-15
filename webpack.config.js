@@ -152,19 +152,6 @@ module.exports = {
         ]
       },
       {
-        // Expose underscore global variable
-        test: path.join(
-          __dirname,
-          `frontend/js/vendor/libs/${PackageVersions.lib('underscore')}.js`
-        ),
-        use: [
-          {
-            loader: 'expose-loader',
-            options: '_'
-          }
-        ]
-      },
-      {
         // Expose Algolia global variable
         test: path.join(
           __dirname,
@@ -236,6 +223,13 @@ module.exports = {
   },
 
   plugins: [
+    new webpack.ProvidePlugin({
+      _: path.join(
+        __dirname,
+        `frontend/js/vendor/libs/${PackageVersions.lib('underscore')}`
+      )
+    }),
+
     new MiniCssExtractPlugin({
       filename: '../stylesheets/[name]-[hash].css'
     }),
