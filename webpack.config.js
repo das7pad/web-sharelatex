@@ -266,9 +266,22 @@ module.exports = {
         'pdfjs-dist/cmaps',
         // optional package ace files - minified: keymaps, modes, themes, worker
         'ace-builds/src-min-noconflict'
-      ].map(path => {
-        return { from: `node_modules/${path}`, to: `${VENDOR_PATH}/${path}` }
-      })
+      ]
+        .map(path => {
+          return { from: `node_modules/${path}`, to: `${VENDOR_PATH}/${path}` }
+        })
+        .concat(
+          [
+            // sentry sdk
+            `${PackageVersions.lib('sentry')}/bundle.min.js`,
+            `${PackageVersions.lib('sentry')}/bundle.min.js.map`
+          ].map(path => {
+            return {
+              from: `frontend/js/vendor/libs/${path}`,
+              to: `${VENDOR_PATH}/${path}`
+            }
+          })
+        )
     )
   ]
 }

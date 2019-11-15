@@ -334,8 +334,8 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
     if (sentryEnabled) {
       res.locals.sentrySRC =
         Settings.sentry.src ||
-        res.locals.buildJsPath(
-          `libs/${PackageVersions.lib('sentry')}/bundle.min.js`
+        res.locals.staticPath(
+          `/vendor/${PackageVersions.lib('sentry')}/bundle.min.js`
         )
     }
     next()
