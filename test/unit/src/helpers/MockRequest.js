@@ -9,7 +9,9 @@ class MockRequest {
   static initClass() {
     this.prototype.session = { destroy() {} }
 
-    this.prototype.headers = {}
+    this.prototype.headers = {
+      host: 'www.overleaf.com'
+    }
     this.prototype.params = {}
     this.prototype.query = {}
     this.prototype.body = {}
