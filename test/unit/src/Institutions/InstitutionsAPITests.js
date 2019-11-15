@@ -21,6 +21,7 @@ const modulePath = path.join(
   '../../../../app/src/Features/Institutions/InstitutionsAPI'
 )
 ;({ expect } = require('chai'))
+const Errors = require('../../../../app/src/Features/Errors/Errors')
 
 describe('InstitutionsAPI', function() {
   beforeEach(function() {
@@ -44,7 +45,8 @@ describe('InstitutionsAPI', function() {
         },
         '../../../../../app/src/Features/V1/V1Api': {
           request: sinon.stub()
-        }
+        },
+        '../Errors/Errors': Errors
       }
     })
 
@@ -156,9 +158,7 @@ describe('InstitutionsAPI', function() {
       return this.InstitutionsAPI.getUserAffiliations(
         this.stubbedUser._id,
         err => {
-          should.exist(err)
-          err.message.should.have.string(503)
-          err.message.should.have.string(body.errors)
+          expect(err).to.be.instanceof(Errors.V1ConnectionError)
           return done()
         }
       )
@@ -297,9 +297,7 @@ describe('InstitutionsAPI', function() {
       return this.InstitutionsAPI.deleteAffiliations(
         this.stubbedUser._id,
         err => {
-          should.exist(err)
-          err.message.should.have.string(518)
-          err.message.should.have.string(body.errors)
+          expect(err).to.be.instanceof(Errors.V1ConnectionError)
           return done()
         }
       )

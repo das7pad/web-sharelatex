@@ -25,9 +25,8 @@ module.exports = function(config) {
       // Import all tests (see comment in the file for why this is necessary)
       'test/unit_frontend/import_tests.js',
 
-      // Include CSS (there is some in js/libs dir)
-      'public/stylesheets/**/*.css',
-      'public/js/libs/**/*.css'
+      // Include CSS
+      'public/stylesheets/**/*.css'
     ],
     middleware: ['fake-img'],
     preprocessors: {

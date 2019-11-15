@@ -154,7 +154,7 @@ module.exports = {
         // Expose underscore global variable
         test: path.join(
           __dirname,
-          `public/js/libs/${PackageVersions.lib('underscore')}.js`
+          `public/src/vendor/libs/${PackageVersions.lib('underscore')}.js`
         ),
         use: [
           {
@@ -167,7 +167,7 @@ module.exports = {
         // Expose Algolia global variable
         test: path.join(
           __dirname,
-          `public/js/libs/${PackageVersions.lib('algolia')}.js`
+          `public/src/vendor/libs/${PackageVersions.lib('algolia')}.js`
         ),
         use: [
           {
@@ -183,15 +183,15 @@ module.exports = {
       // Aliases for AMD modules
       'socket.io-client': path.join(
         __dirname,
-        `public/js/libs/${PackageVersions.lib('socket.io')}/socket.io`
+        `public/src/vendor/libs/${PackageVersions.lib('socket.io')}/socket.io`
       ),
 
-      // Vendored dependencies in public/js/libs (e.g. angular)
-      libs: path.join(__dirname, 'public/js/libs'),
+      // Vendored dependencies in public/src/vendor/libs (e.g. angular)
+      libs: path.join(__dirname, 'public/src/vendor/libs'),
       // Use vendored moment (with correct version)
       moment: path.join(
         __dirname,
-        `public/js/libs/${PackageVersions.lib('moment')}`
+        `public/src/vendor/libs/${PackageVersions.lib('moment')}`
       ),
       // Enables ace/ace shortcut
       ace: 'ace-builds/src-noconflict',
@@ -199,7 +199,7 @@ module.exports = {
       // for some reason)
       fineuploader: path.join(
         __dirname,
-        `public/js/libs/${PackageVersions.lib('fineuploader')}`
+        `public/src/vendor/libs/${PackageVersions.lib('fineuploader')}`
       )
     },
     // Define what can be imported with out an absolute or relative path. This
@@ -218,14 +218,14 @@ module.exports = {
     splitChunks: {
       cacheGroups: {
         ideLibraries: {
-          test: /(?!public\/js\/libs\/(platform|pdfListView|select\/select\.css))(pdfjsBundle|node_modules\/(ace-builds|pdfjs-dist)|public\/js\/libs)/,
+          test: /(?!public\/src\/vendor\/libs\/platform)(pdfjsBundle|node_modules\/(ace-builds|pdfjs-dist)|public\/src\/vendor\/libs)/,
           name: 'ideLibraries',
           chunks: 'initial',
           reuseExistingChunk: true,
           enforce: true
         },
         libraries: {
-          test: /[\\/]node_modules[\\/]|[\\/]public[\\/]js[\\/]libs[\\/]/,
+          test: /[\\/]node_modules[\\/]|[\\/]public[\\/]src[\\/]vendor[\\/]libs[\\/]/,
           name: 'libraries',
           chunks: 'initial',
           minChunks: 2
@@ -261,7 +261,7 @@ module.exports = {
     // Silence warning when loading moment from vendored dependencies as it
     // attempts to load locales.js file which does not exist (but this is fine
     // as we don't want to load the large amount of locale data from moment)
-    new webpack.IgnorePlugin(/^\.\/locale$/, /public\/js\/libs/),
+    new webpack.IgnorePlugin(/^\.\/locale$/, /public\/src\/vendor\/libs/),
 
     new CopyPlugin(
       [
