@@ -319,7 +319,12 @@ describe('RichText', function() {
 
   describe('Figures', function() {
     beforeEach(function() {
-      this.rtAdapter.getPreviewUrlForPath = sinon
+      this.rtAdapter.getEntityForPath = sinon.stub().returns({
+        id: 'entity_id',
+        name: 'watermelon-1600x1200.jpg'
+      })
+      this.rtAdapter.isPreviewableEntity = sinon.stub().returns(true)
+      this.rtAdapter.getPreviewUrlForEntity = sinon
         .stub()
         .returns('/fake/project/project_id/file/entity_id')
     })
@@ -446,7 +451,7 @@ describe('RichText', function() {
     describe('image not found', function() {
       beforeEach(function() {
         // Stub previewUrl to be null
-        this.rtAdapter.getPreviewUrlForPath = sinon.stub().returns(null)
+        this.rtAdapter.getEntityForPath = sinon.stub().returns(null)
       })
 
       it('should not show an image tag when the image is not found', function() {
