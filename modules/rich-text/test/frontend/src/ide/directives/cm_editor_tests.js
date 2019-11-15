@@ -13,8 +13,8 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 define([
-  '../../../../../public/src/ide/directives/cm_editor',
-  '../../../../../public/src/ide/rich_text_adapter',
+  '../../../../../frontend/js/ide/directives/cm_editor',
+  '../../../../../frontend/js/ide/rich_text_adapter',
   'utils/EventEmitter',
   'libs/angular-mocks'
 ], (cmEditor, RichTextAdapter, EventEmitter) => {

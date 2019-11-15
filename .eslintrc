@@ -79,8 +79,8 @@
     {
       // Frontend test specific rules
       "files": [
-        "**/test/unit_frontend/{src,es}/**/*.js",
-        "test/unit_frontend/import_tests.js"
+        "**/test/frontend/**/*.js",
+        "test/frontend/import_tests.js"
       ],
       "globals": {
         "expect": true,
@@ -98,7 +98,7 @@
     },
     {
       // Frontend specific rules
-      "files": ["**/public/{src,es}/**/*.js"],
+      "files": ["**/frontend/js/**/*.js"],
       "globals": {
         "define": true,
         "$": true,

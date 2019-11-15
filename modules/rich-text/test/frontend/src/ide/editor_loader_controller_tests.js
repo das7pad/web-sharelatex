@@ -11,7 +11,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 define([
-  '../../../../public/src/ide/controllers/editor_loader_controller',
+  '../../../../frontend/js/ide/controllers/editor_loader_controller',
   'utils/EventEmitter',
   'libs/angular-mocks'
 ], (EditorLoaderController, EventEmitter) =>

@@ -1,6 +1,6 @@
 import CodeMirror from 'codemirror'
 
-import LatexMode from '../../../../public/src/latex_mode/latex_mode'
+import LatexMode from '../../../../frontend/js/latex_mode/latex_mode'
 
 describe('LatexMode', function() {
   var _mode

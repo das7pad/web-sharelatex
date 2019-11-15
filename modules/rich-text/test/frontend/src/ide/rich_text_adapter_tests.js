@@ -10,7 +10,7 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../../public/src/ide/rich_text_adapter'], RichTextAdapter =>
+define(['../../../../frontend/js/ide/rich_text_adapter'], RichTextAdapter =>
   describe('RichTextAdapter', function() {
     beforeEach(function() {
       this.fileTreeManager = {

@@ -11,7 +11,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 define([
-  '../../../../public/src/ide/autocomplete_adapter'
+  '../../../../frontend/js/ide/autocomplete_adapter'
 ], AutocompleteAdapter =>
   describe('AutocompleteAdapter', function() {
     beforeEach(function() {

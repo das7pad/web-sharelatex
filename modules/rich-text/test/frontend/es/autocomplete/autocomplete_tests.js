@@ -1,7 +1,7 @@
 /* global sinon */
 
-import fixture from '../../../../../../test/unit_frontend/src/support/fixture'
-import { Editor } from '../../../../public/src/index'
+import fixture from '../../../../../../test/frontend/support/fixture'
+import { Editor } from '../../../../frontend/js/rich_text_editor'
 
 const FIXTURE_HTML = '<div></div>'
 

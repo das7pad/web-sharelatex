@@ -20,10 +20,10 @@ module.exports = function(config) {
     },
     browsers: ['ChromeCustom'],
     files: [
-      'test/unit_frontend/bootstrap.js',
+      'test/frontend/bootstrap.js',
 
       // Import all tests (see comment in the file for why this is necessary)
-      'test/unit_frontend/import_tests.js',
+      'test/frontend/import_tests.js',
 
       // Include CSS
       'public/stylesheets/**/*.css'
@@ -31,7 +31,7 @@ module.exports = function(config) {
     middleware: ['fake-img'],
     preprocessors: {
       // Run files through webpack
-      'test/unit_frontend/import_tests.js': ['webpack']
+      'test/frontend/import_tests.js': ['webpack']
     },
     frameworks: ['mocha', 'chai-sinon'],
     // Configure webpack in the tests

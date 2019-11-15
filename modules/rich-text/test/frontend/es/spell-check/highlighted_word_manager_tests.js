@@ -1,6 +1,6 @@
 /* global sinon */
 
-import HighlightedWordManager from '../../../../public/src/spell_check/highlighted_word_manager'
+import HighlightedWordManager from '../../../../frontend/js/spell_check/highlighted_word_manager'
 
 describe('HighlightedWordManager', function() {
   beforeEach(function() {

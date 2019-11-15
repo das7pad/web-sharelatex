@@ -1,8 +1,8 @@
 /* global sinon */
 
-import fixture from '../../../../../../test/unit_frontend/src/support/fixture'
-import { Editor } from '../../../../public/src/index'
-import * as TextWrapping from '../../../../public/src/key_bindings/text_wrapping'
+import fixture from '../../../../../../test/frontend/support/fixture'
+import { Editor } from '../../../../frontend/js/rich_text_editor'
+import * as TextWrapping from '../../../../frontend/js/key_bindings/text_wrapping'
 
 const TEXTAREA_HTML = '<textarea></textarea>'
 

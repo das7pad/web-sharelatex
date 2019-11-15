@@ -1,4 +1,4 @@
-const deps = require('glob').sync(`${__dirname}/**/main/index.js`)
+const deps = require('glob').sync(`${__dirname}/*/frontend/js/main/index.js`)
 
 module.exports = function() {
   return {
