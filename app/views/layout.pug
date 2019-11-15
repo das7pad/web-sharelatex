@@ -62,7 +62,6 @@ html(
 				siteUrl: '#{settings.siteUrl}',
 				wsUrl: '#{settings.wsUrl}',
 			};
-			window.systemMessages = !{StringHelper.stringifyJsonForScript(systemMessages)};
 			window.ab = {};
 			window.user_id = '#{getLoggedInUserId()}';
 			window.ExposedSettings = JSON.parse('!{StringHelper.stringifyJsonForScript(ExposedSettings)}');
