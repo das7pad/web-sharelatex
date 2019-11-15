@@ -160,7 +160,7 @@ module.exports = {
     }
     makeAnalyticsRequest(userId, opts, function(err, response, body) {
       if (err != null) {
-        if ((err.name != null) === 'ServiceDisabledError') {
+        if (err.name === 'ServiceDisabledError') {
           return callback(err)
         }
         logger.warn({ userId, err }, 'error getting last occurance of event')
