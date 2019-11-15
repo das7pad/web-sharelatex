@@ -808,8 +808,6 @@ const ProjectController = {
                 project.overleaf &&
                 project.overleaf.history &&
                 Boolean(project.overleaf.history.display),
-              showTestControls:
-                (req.query && req.query.tc === 'true') || user.isAdmin,
               brandVariation,
               allowedImageNames: Settings.allowedImageNames || [],
               gitBridgePublicBaseUrl: Settings.gitBridgePublicBaseUrl
