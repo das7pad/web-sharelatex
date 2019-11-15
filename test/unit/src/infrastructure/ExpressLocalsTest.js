@@ -18,9 +18,12 @@ describe('ExpressLocalsTests', function() {
     }
     this.user_id = '386010482601212345061012'
 
+    this.manifest = {}
+
     this.requires = {
       'logger-sharelatex': { log: function() {} },
       'settings-sharelatex': this.settings,
+      '../../../public/js/manifest.json': this.manifest,
       '../Features/Subscription/SubscriptionFormatters': {},
       '../Features/SystemMessages/SystemMessageManager': {},
       '../Features/Authentication/AuthenticationController': {
