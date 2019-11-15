@@ -77,10 +77,9 @@
 !/public/font
 !/public/img
 
-!/public/js/libs
+!/frontend/js
 
 !/public/recurly
-!/public/src
 !/public/static
 
 !/public/stylesheets/
