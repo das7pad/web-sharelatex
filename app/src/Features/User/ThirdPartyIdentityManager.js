@@ -53,66 +53,67 @@ function link(
   externalUserId,
   externalData,
   callback,
-   retry) {
-    if (!oauthProviders[providerId]) {
-      return callback(new Error('Not a valid provider'))
+  retry
+) {
+  if (!oauthProviders[providerId]) {
+    return callback(new Error('Not a valid provider'))
+  }
+  const query = {
+    _id: userId,
+    'thirdPartyIdentifiers.providerId': { $ne: providerId }
+  }
+  const update = {
+    $push: {
+      thirdPartyIdentifiers: {
+        externalUserId,
+        externalData,
+        providerId
+      }
     }
-    const query = {
-      _id: userId,
-      'thirdPartyIdentifiers.providerId': { $ne: providerId }
-    }
-    const update = {
-      $push: {
-        thirdPartyIdentifiers: {
+  }
+  // add new tpi only if an entry for the provider does not exist
+  // projection includes thirdPartyIdentifiers for tests
+  User.findOneAndUpdate(query, update, { new: 1 }, (err, res) => {
+    if (err && err.code === 11000) {
+      callback(new Errors.ThirdPartyIdentityExistsError())
+    } else if (err != null) {
+      callback(err)
+    } else if (res) {
+      const emailOptions = {
+        to: res.email,
+        provider: oauthProviders[providerId].name
+      }
+      EmailHandler.sendEmail(
+        'emailThirdPartyIdentifierLinked',
+        emailOptions,
+        error => {
+          if (error != null) {
+            logger.warn(error)
+          }
+          return callback(null, res)
+        }
+      )
+    } else if (retry) {
+      // if already retried then throw error
+      callback(new Error('update failed'))
+    } else {
+      // attempt to clear existing entry then retry
+      ThirdPartyIdentityManager.unlink(userId, providerId, function(err) {
+        if (err != null) {
+          return callback(err)
+        }
+        ThirdPartyIdentityManager.link(
+          userId,
+          providerId,
           externalUserId,
           externalData,
-          providerId
-        }
-      }
-    }
-    // add new tpi only if an entry for the provider does not exist
-    // projection includes thirdPartyIdentifiers for tests
-    User.findOneAndUpdate(query, update, { new: 1 }, (err, res) => {
-      if (err && err.code === 11000) {
-        callback(new Errors.ThirdPartyIdentityExistsError())
-      } else if (err != null) {
-        callback(err)
-      } else if (res) {
-        const emailOptions = {
-          to: res.email,
-          provider: oauthProviders[providerId].name
-        }
-        EmailHandler.sendEmail(
-          'emailThirdPartyIdentifierLinked',
-          emailOptions,
-          error => {
-            if (error != null) {
-              logger.warn(error)
-            }
-            return callback(null, res)
-          }
+          callback,
+          true
         )
-      } else if (retry) {
-        // if already retried then throw error
-        callback(new Error('update failed'))
-      } else {
-        // attempt to clear existing entry then retry
-        ThirdPartyIdentityManager.unlink(userId, providerId, function(err) {
-          if (err != null) {
-            return callback(err)
-          }
-          ThirdPartyIdentityManager.link(
-            userId,
-            providerId,
-            externalUserId,
-            externalData,
-            callback,
-            true
-          )
-        })
-      }
-    })
-  }
+      })
+    }
+  })
+}
 
 function unlink(userId, providerId, callback) {
   if (!oauthProviders[providerId]) {
