@@ -271,9 +271,8 @@ snap snap
       })
 
       return it('raises an error', function() {
-        return sinon.assert.calledWith(
-          this.cb,
-          new OpenInOverleafErrors.InvalidFileTypeError()
+        this.cb.calledWith(
+          sinon.match.instanceOf(OpenInOverleafErrors.InvalidFileTypeError)
         )
       })
     })
@@ -792,7 +791,7 @@ snap snap
       })
 
       it('calls the callback without error', function() {
-        return expect(this.err).to.be.falsey
+        return expect(this.err).to.not.exist
       })
 
       return it('sets the brand variation for the project', function() {
@@ -860,7 +859,7 @@ snap snap
       })
 
       it('calls the callback without error', function() {
-        return expect(this.err).to.be.falsey
+        return expect(this.err).to.not.exist
       })
 
       return it('sets the brand variation for the project', function() {

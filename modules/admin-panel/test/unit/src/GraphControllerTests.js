@@ -163,7 +163,7 @@ describe('GraphController', function() {
         [this.users[0]._id.toString()],
         this.SigmaJSGraph,
         (err, graph) => {
-          graph.nodes.should.exists
+          graph.nodes.should.exist
           return done()
         }
       )
@@ -175,7 +175,7 @@ describe('GraphController', function() {
         [this.users[0]._id.toString()],
         this.SigmaJSGraph,
         (err, graph) => {
-          graph.edges.should.exists
+          graph.edges.should.exist
           return done()
         }
       )

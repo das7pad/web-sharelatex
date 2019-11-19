@@ -628,9 +628,9 @@ describe('OpenInOverleafController', function() {
         this.req.body.snip = 'foo'
         const next = sinon.stub()
         this.OpenInOverleafController.openInOverleaf(this.req, this.res, next)
-        return sinon.assert.calledWith(
+        next.calledWith(
           next,
-          new OpenInOverleafErrors.AmbiguousParametersError()
+          sinon.match.instanceOf(OpenInOverleafErrors.AmbiguousParametersError)
         )
       })
     })
