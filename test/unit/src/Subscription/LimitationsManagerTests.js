@@ -156,13 +156,14 @@ describe('LimitationsManager', function() {
           project_id,
           callback
         ) => callback(null, this.invite_count)
-        sinon.stub(
-          this.LimitationsManager,
-          'allowedNumberOfCollaboratorsInProject',
-          (project_id, callback) => {
+        sinon
+          .stub(
+            this.LimitationsManager,
+            'allowedNumberOfCollaboratorsInProject'
+          )
+          .callsFake((project_id, callback) => {
             return callback(null, this.allowed_number)
-          }
-        )
+          })
         this.callback = sinon.stub()
         return this.LimitationsManager.canAddXCollaborators(
           this.project_id,
@@ -189,13 +190,14 @@ describe('LimitationsManager', function() {
           project_id,
           callback
         ) => callback(null, this.invite_count)
-        sinon.stub(
-          this.LimitationsManager,
-          'allowedNumberOfCollaboratorsInProject',
-          (project_id, callback) => {
+        sinon
+          .stub(
+            this.LimitationsManager,
+            'allowedNumberOfCollaboratorsInProject'
+          )
+          .callsFake((project_id, callback) => {
             return callback(null, this.allowed_number)
-          }
-        )
+          })
         this.callback = sinon.stub()
         return this.LimitationsManager.canAddXCollaborators(
           this.project_id,
@@ -222,13 +224,14 @@ describe('LimitationsManager', function() {
           project_id,
           callback
         ) => callback(null, this.invite_count)
-        sinon.stub(
-          this.LimitationsManager,
-          'allowedNumberOfCollaboratorsInProject',
-          (project_id, callback) => {
+        sinon
+          .stub(
+            this.LimitationsManager,
+            'allowedNumberOfCollaboratorsInProject'
+          )
+          .callsFake((project_id, callback) => {
             return callback(null, this.allowed_number)
-          }
-        )
+          })
         this.callback = sinon.stub()
         return this.LimitationsManager.canAddXCollaborators(
           this.project_id,
@@ -255,13 +258,14 @@ describe('LimitationsManager', function() {
           project_id,
           callback
         ) => callback(null, this.invite_count)
-        sinon.stub(
-          this.LimitationsManager,
-          'allowedNumberOfCollaboratorsInProject',
-          (project_id, callback) => {
+        sinon
+          .stub(
+            this.LimitationsManager,
+            'allowedNumberOfCollaboratorsInProject'
+          )
+          .callsFake((project_id, callback) => {
             return callback(null, this.allowed_number)
-          }
-        )
+          })
         this.callback = sinon.stub()
         return this.LimitationsManager.canAddXCollaborators(
           this.project_id,
@@ -288,13 +292,14 @@ describe('LimitationsManager', function() {
           project_id,
           callback
         ) => callback(null, this.invite_count)
-        sinon.stub(
-          this.LimitationsManager,
-          'allowedNumberOfCollaboratorsInProject',
-          (project_id, callback) => {
+        sinon
+          .stub(
+            this.LimitationsManager,
+            'allowedNumberOfCollaboratorsInProject'
+          )
+          .callsFake((project_id, callback) => {
             return callback(null, this.allowed_number)
-          }
-        )
+          })
         this.callback = sinon.stub()
         return this.LimitationsManager.canAddXCollaborators(
           this.project_id,
@@ -321,13 +326,14 @@ describe('LimitationsManager', function() {
           project_id,
           callback
         ) => callback(null, this.invite_count)
-        sinon.stub(
-          this.LimitationsManager,
-          'allowedNumberOfCollaboratorsInProject',
-          (project_id, callback) => {
+        sinon
+          .stub(
+            this.LimitationsManager,
+            'allowedNumberOfCollaboratorsInProject'
+          )
+          .callsFake((project_id, callback) => {
             return callback(null, this.allowed_number)
-          }
-        )
+          })
         this.callback = sinon.stub()
         return this.LimitationsManager.canAddXCollaborators(
           this.project_id,
@@ -354,13 +360,14 @@ describe('LimitationsManager', function() {
           project_id,
           callback
         ) => callback(null, this.invite_count)
-        sinon.stub(
-          this.LimitationsManager,
-          'allowedNumberOfCollaboratorsInProject',
-          (project_id, callback) => {
+        sinon
+          .stub(
+            this.LimitationsManager,
+            'allowedNumberOfCollaboratorsInProject'
+          )
+          .callsFake((project_id, callback) => {
             return callback(null, this.allowed_number)
-          }
-        )
+          })
         this.callback = sinon.stub()
         return this.LimitationsManager.canAddXCollaborators(
           this.project_id,

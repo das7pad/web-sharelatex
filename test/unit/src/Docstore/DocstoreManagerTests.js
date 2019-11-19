@@ -37,7 +37,8 @@ describe('DocstoreManager', function() {
           warn: sinon.stub(),
           error: sinon.stub(),
           err() {}
-        })
+        }),
+        '../Errors/Errors': Errors
       }
     })
 
@@ -92,7 +93,14 @@ describe('DocstoreManager', function() {
       it('should call the callback with an error', function() {
         return this.callback
           .calledWith(
-            new Error('docstore api responded with non-success code: 500')
+            sinon.match
+              .instanceOf(Error)
+              .and(
+                sinon.match.has(
+                  'message',
+                  'docstore api responded with non-success code: 500'
+                )
+              )
           )
           .should.equal(true)
       })
@@ -101,9 +109,14 @@ describe('DocstoreManager', function() {
         return this.logger.warn
           .calledWith(
             {
-              err: new Error(
-                'docstore api responded with a non-success code: 500'
-              ),
+              err: sinon.match
+                .instanceOf(Error)
+                .and(
+                  sinon.match.has(
+                    'message',
+                    'docstore api responded with non-success code: 500'
+                  )
+                ),
               project_id: this.project_id,
               doc_id: this.doc_id
             },
@@ -126,9 +139,16 @@ describe('DocstoreManager', function() {
       })
 
       it('should call the callback with an error', function() {
-        return this.callback
+        this.callback
           .calledWith(
-            new Errors.NotFoundError('tried to delete doc not in docstore')
+            sinon.match
+              .instanceOf(Errors.NotFoundError)
+              .and(
+                sinon.match.has(
+                  'message',
+                  'tried to delete doc not in docstore'
+                )
+              )
           )
           .should.equal(true)
       })
@@ -137,9 +157,14 @@ describe('DocstoreManager', function() {
         return this.logger.warn
           .calledWith(
             {
-              err: new Errors.NotFoundError(
-                'tried to delete doc not in docstore'
-              ),
+              err: sinon.match
+                .instanceOf(Errors.NotFoundError)
+                .and(
+                  sinon.match.has(
+                    'message',
+                    'tried to delete doc not in docstore'
+                  )
+                ),
               project_id: this.project_id,
               doc_id: this.doc_id
             },
@@ -220,7 +245,14 @@ describe('DocstoreManager', function() {
       it('should call the callback with an error', function() {
         return this.callback
           .calledWith(
-            new Error('docstore api responded with non-success code: 500')
+            sinon.match
+              .instanceOf(Error)
+              .and(
+                sinon.match.has(
+                  'message',
+                  'docstore api responded with non-success code: 500'
+                )
+              )
           )
           .should.equal(true)
       })
@@ -229,9 +261,14 @@ describe('DocstoreManager', function() {
         return this.logger.warn
           .calledWith(
             {
-              err: new Error(
-                'docstore api responded with a non-success code: 500'
-              ),
+              err: sinon.match
+                .instanceOf(Error)
+                .and(
+                  sinon.match.has(
+                    'message',
+                    'docstore api responded with non-success code: 500'
+                  )
+                ),
               project_id: this.project_id,
               doc_id: this.doc_id
             },
@@ -298,7 +335,14 @@ describe('DocstoreManager', function() {
       it('should call the callback with an error', function() {
         return this.callback
           .calledWith(
-            new Error('docstore api responded with non-success code: 500')
+            sinon.match
+              .instanceOf(Error)
+              .and(
+                sinon.match.has(
+                  'message',
+                  'docstore api responded with non-success code: 500'
+                )
+              )
           )
           .should.equal(true)
       })
@@ -307,9 +351,14 @@ describe('DocstoreManager', function() {
         return this.logger.warn
           .calledWith(
             {
-              err: new Error(
-                'docstore api responded with a non-success code: 500'
-              ),
+              err: sinon.match
+                .instanceOf(Error)
+                .and(
+                  sinon.match.has(
+                    'message',
+                    'docstore api responded with non-success code: 500'
+                  )
+                ),
               project_id: this.project_id,
               doc_id: this.doc_id
             },
@@ -365,7 +414,11 @@ describe('DocstoreManager', function() {
 
       it('should call the callback with an error', function() {
         return this.callback
-          .calledWith(new Errors.NotFoundError('doc not found in docstore'))
+          .calledWith(
+            sinon.match
+              .instanceOf(Errors.NotFoundError)
+              .and(sinon.match.has('message', 'doc not found in docstore'))
+          )
           .should.equal(true)
       })
 
@@ -373,7 +426,9 @@ describe('DocstoreManager', function() {
         return this.logger.warn
           .calledWith(
             {
-              err: new Errors.NotFoundError('doc not found in docstore'),
+              err: sinon.match
+                .instanceOf(Errors.NotFoundError)
+                .and(sinon.match.has('message', 'doc not found in docstore')),
               project_id: this.project_id,
               doc_id: this.doc_id
             },
@@ -426,7 +481,14 @@ describe('DocstoreManager', function() {
       it('should call the callback with an error', function() {
         return this.callback
           .calledWith(
-            new Error('docstore api responded with non-success code: 500')
+            sinon.match
+              .instanceOf(Error)
+              .and(
+                sinon.match.has(
+                  'message',
+                  'docstore api responded with non-success code: 500'
+                )
+              )
           )
           .should.equal(true)
       })
@@ -435,9 +497,14 @@ describe('DocstoreManager', function() {
         return this.logger.warn
           .calledWith(
             {
-              err: new Error(
-                'docstore api responded with a non-success code: 500'
-              ),
+              err: sinon.match
+                .instanceOf(Error)
+                .and(
+                  sinon.match.has(
+                    'message',
+                    'docstore api responded with non-success code: 500'
+                  )
+                ),
               project_id: this.project_id
             },
             'error getting all docs from docstore'
@@ -489,7 +556,14 @@ describe('DocstoreManager', function() {
       it('should call the callback with an error', function() {
         return this.callback
           .calledWith(
-            new Error('docstore api responded with non-success code: 500')
+            sinon.match
+              .instanceOf(Error)
+              .and(
+                sinon.match.has(
+                  'message',
+                  'docstore api responded with non-success code: 500'
+                )
+              )
           )
           .should.equal(true)
       })
@@ -498,9 +572,14 @@ describe('DocstoreManager', function() {
         return this.logger.warn
           .calledWith(
             {
-              err: new Error(
-                'docstore api responded with a non-success code: 500'
-              ),
+              err: sinon.match
+                .instanceOf(Error)
+                .and(
+                  sinon.match.has(
+                    'message',
+                    'docstore api responded with non-success code: 500'
+                  )
+                ),
               project_id: this.project_id
             },
             'error getting all doc ranges from docstore'
@@ -541,7 +620,14 @@ describe('DocstoreManager', function() {
       it('should call the callback with an error', function() {
         return this.callback
           .calledWith(
-            new Error('docstore api responded with non-success code: 500')
+            sinon.match
+              .instanceOf(Error)
+              .and(
+                sinon.match.has(
+                  'message',
+                  'docstore api responded with non-success code: 500'
+                )
+              )
           )
           .should.equal(true)
       })
@@ -579,7 +665,14 @@ describe('DocstoreManager', function() {
       it('should call the callback with an error', function() {
         return this.callback
           .calledWith(
-            new Error('docstore api responded with non-success code: 500')
+            sinon.match
+              .instanceOf(Error)
+              .and(
+                sinon.match.has(
+                  'message',
+                  'docstore api responded with non-success code: 500'
+                )
+              )
           )
           .should.equal(true)
       })
@@ -617,7 +710,14 @@ describe('DocstoreManager', function() {
       it('should call the callback with an error', function() {
         return this.callback
           .calledWith(
-            new Error('docstore api responded with non-success code: 500')
+            sinon.match
+              .instanceOf(Error)
+              .and(
+                sinon.match.has(
+                  'message',
+                  'docstore api responded with non-success code: 500'
+                )
+              )
           )
           .should.equal(true)
       })
