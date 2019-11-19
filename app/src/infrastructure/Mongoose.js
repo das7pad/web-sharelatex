@@ -9,7 +9,6 @@ mongoose.connect(
   {
     poolSize: POOL_SIZE,
     config: { autoIndex: false },
-    useMongoClient: true,
     appname: 'web'
   }
 )
