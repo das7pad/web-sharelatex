@@ -13,7 +13,7 @@ services:
       - mocha
       - --exit
       - --recursive
-      - --require
+      - --file
       - test/unit/bootstrap.js
       - --reporter
       - xunit
@@ -55,7 +55,7 @@ services:
       - mocha
       - --exit
       - --recursive
-      - --require
+      - --file
       - test/acceptance/bootstrap.js
       - --reporter
       - xunit
