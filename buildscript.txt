@@ -6,5 +6,4 @@ web
 --dependencies=mongo,redis_api,redis_lock,redis_realtime,redis_web,redis_websessions
 --docker-repos=gcr.io/overleaf-ops
 --build-target=docker
---has_webpack_css_processing=true
---uses_ace_builds=true
+--mocha_6=true

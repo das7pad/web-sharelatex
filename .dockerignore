@@ -65,6 +65,8 @@
 !/app.js
 !/app
 
+!/frontend/js
+
 !/modules
 /modules/*/Makefile
 
@@ -76,9 +78,6 @@
 !/public/brand
 !/public/font
 !/public/img
-
-!/frontend/js
-
 !/public/recurly
 !/public/static
 
@@ -94,7 +93,6 @@ public/stylesheets/*.map
 !/test/acceptance/src
 !/test/smoke/src
 !/test/unit/src
-!/test/unit/bootstrap.js
 !/test/frontend
 # app #
 #######
