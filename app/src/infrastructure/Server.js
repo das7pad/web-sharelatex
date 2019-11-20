@@ -30,7 +30,6 @@ const RedirectManager = require('./RedirectManager')
 const ProxyManager = require('./ProxyManager')
 const translations = require('translations-sharelatex').setup(Settings.i18n)
 const Modules = require('./Modules')
-const Views = require('./Views')
 
 const ErrorController = require('../Features/Errors/ErrorController')
 const HttpErrorController = require('../Features/Errors/HttpErrorController')
@@ -170,7 +169,6 @@ expressLocals(webRouter, privateApiRouter, publicApiRouter)
 if (app.get('env') === 'production') {
   logger.info('Production Enviroment')
   app.enable('view cache')
-  Views.precompileViews(app) // precompile templates
 }
 
 webRouter.use(function(req, res, next) {
