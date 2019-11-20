@@ -188,6 +188,9 @@ module.exports = settings =
 			user: process.env['V1_HISTORY_USER'] or 'staging'
 			pass: process.env['V1_HISTORY_PASSWORD'] or 'password'
 
+	web:
+		web_router_port: process.env.WEB_ROUTER_PORT
+
 	templates:
 		user_id: process.env.TEMPLATES_USER_ID or "5395eb7aad1f29a88756c7f2"
 		showSocialButtons: false
