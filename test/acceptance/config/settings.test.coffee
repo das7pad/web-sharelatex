@@ -1,5 +1,7 @@
 v1Api =
-	url: "http://#{process.env['V1_HOST'] or 'localhost'}:5000"
+	url: "http://localhost:5000"
+	user: 'overleaf'
+	pass: 'password'
 
 module.exports =
 	mongo:
@@ -11,6 +13,11 @@ module.exports =
 	enabledLinkedFileTypes: 'url,project_file,project_output_file,mendeley,zotero'.split(',')
 
 	apis:
+		v1:
+			url: v1Api.url
+			user: v1Api.user
+			pass: v1Api.pass
+
 		linkedUrlProxy:
 			url: 'http://localhost:6543'
 

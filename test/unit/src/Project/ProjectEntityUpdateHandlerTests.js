@@ -128,7 +128,7 @@ describe('ProjectEntityUpdateHandler', function() {
       this.oldFileRef = { name: this.fileName, _id: 'oldFileRef' }
       this.ProjectEntityMongoUpdateHandler._confirmFolder = sinon
         .stub()
-        .yields(folder_id)
+        .returns(folder_id)
       this.ProjectEntityMongoUpdateHandler._putElement = sinon
         .stub()
         .yields(null, { path: { fileSystem: this.fileSystemPath } })
@@ -215,7 +215,7 @@ describe('ProjectEntityUpdateHandler', function() {
       }
       this.ProjectEntityMongoUpdateHandler._confirmFolder = sinon
         .stub()
-        .yields(folder_id)
+        .returns(folder_id)
       this.ProjectEntityMongoUpdateHandler._putElement = sinon
         .stub()
         .yields(null, { path: { fileSystem: this.fileSystemPath } })
