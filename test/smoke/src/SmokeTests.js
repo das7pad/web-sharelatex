@@ -57,7 +57,9 @@ describe('Opening', function() {
                   { err },
                   'smoke test: error recording successful login'
                 )
-                return done(err)
+                return done(
+                  new Failure('error clearing login failure rate limit')
+                )
               }
               done()
             }
@@ -73,7 +75,9 @@ describe('Opening', function() {
                   { err },
                   'smoke test: error clearing open-project rate limit'
                 )
-                return done(err)
+                return done(
+                  new Failure('error clearing open-project rate limit')
+                )
               }
               done()
             }
@@ -89,7 +93,9 @@ describe('Opening', function() {
                   { err },
                   'smoke test: error clearing overleaf-login rate limit'
                 )
-                return done(err)
+                return done(
+                  new Failure('error clearing overleaf login rate limit')
+                )
               }
               done()
             }
