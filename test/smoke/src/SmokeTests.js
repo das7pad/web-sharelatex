@@ -1,3 +1,4 @@
+const async = require('async')
 const Settings = require('settings-sharelatex')
 let ownPort = Settings.internal.web.port || Settings.port || 3000
 const port = Settings.web.web_router_port || ownPort // send requests to web router if this is the api process
@@ -43,25 +44,43 @@ const request = require('request').defaults({
 })
 
 describe('Opening', function() {
-  before(function(done) {
+  before(function(outerDone) {
     logger.log('smoke test: setup')
-    LoginRateLimiter.recordSuccessfulLogin(Settings.smokeTest.user, err => {
-      if (err != null) {
-        logger.err({ err }, 'smoke test: error recoring successful login')
-        return done(err)
-      }
-      return RateLimiter.clearRateLimit(
-        'open-project',
-        `${Settings.smokeTest.projectId}:${Settings.smokeTest.userId}`,
-        err => {
-          if (err != null) {
-            logger.err(
-              { err },
-              'smoke test: error clearing open-project rate limit'
-            )
-            return done(err)
-          }
-          return RateLimiter.clearRateLimit(
+    async.parallel(
+      {
+        clearLoginFailureRateLimit(done) {
+          LoginRateLimiter.recordSuccessfulLogin(
+            Settings.smokeTest.user,
+            err => {
+              if (err != null) {
+                logger.err(
+                  { err },
+                  'smoke test: error recording successful login'
+                )
+                return done(err)
+              }
+              done()
+            }
+          )
+        },
+        clearOpenProjectRateLimit(done) {
+          RateLimiter.clearRateLimit(
+            'open-project',
+            `${Settings.smokeTest.projectId}:${Settings.smokeTest.userId}`,
+            err => {
+              if (err != null) {
+                logger.err(
+                  { err },
+                  'smoke test: error clearing open-project rate limit'
+                )
+                return done(err)
+              }
+              done()
+            }
+          )
+        },
+        clearOverleafLoginRateLimit(done) {
+          RateLimiter.clearRateLimit(
             'overleaf-login',
             Settings.smokeTest.rateLimitSubject,
             err => {
@@ -72,12 +91,13 @@ describe('Opening', function() {
                 )
                 return done(err)
               }
-              return done()
+              done()
             }
           )
         }
-      )
-    })
+      },
+      outerDone
+    )
   })
 
   before(function(done) {
