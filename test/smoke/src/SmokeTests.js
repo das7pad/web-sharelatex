@@ -1,11 +1,19 @@
-const chai = require('chai')
-const { expect } = chai
 const Settings = require('settings-sharelatex')
 let ownPort = Settings.internal.web.port || Settings.port || 3000
 const port = Settings.web.web_router_port || ownPort // send requests to web router if this is the api process
 const logger = require('logger-sharelatex')
+const OError = require('@overleaf/o-error')
 const LoginRateLimiter = require('../../../app/src/Features/Security/LoginRateLimiter')
 const RateLimiter = require('../../../app/src/infrastructure/RateLimiter')
+
+class SmokeTestFailure extends OError {
+  constructor(message, info = {}) {
+    // include the message in JSON serialized strings (log and http response)
+    info.message = message
+    super({ message, info })
+  }
+}
+const Failure = SmokeTestFailure
 
 const agent = require('http').Agent()
 // like the curl option `--resolve DOMAIN:PORT:127.0.0.1`
@@ -118,18 +126,32 @@ describe('Opening', function() {
     this.timeout(4000)
     const uri = `project/${Settings.smokeTest.projectId}`
     request.get(uri, {}, (error, response, body) => {
-      expect(error, 'smoke test: error in getting project').to.not.exist
+      if (error != null) {
+        return done(new Failure('error in getting project').withCause(error))
+      }
 
-      expect(response.statusCode).to.equal(
-        200,
-        'smoke test: response code is not 200 getting project'
-      )
+      if (response.statusCode !== 200) {
+        return done(
+          new Failure('response code is not 200 getting project', {
+            statusCode: response.statusCode
+          })
+        )
+      }
+
+      if (typeof body !== 'string') {
+        return done(
+          new Failure('body is not of type string', { bodyType: typeof body })
+        )
+      }
 
       // Check that the project id is present in the javascript that loads up the project
-      expect(body).to.include(
-        `window.project_id = "${Settings.smokeTest.projectId}"`,
-        'smoke test: project page html does not have project_id'
-      )
+      if (
+        body.indexOf(
+          `window.project_id = "${Settings.smokeTest.projectId}"`
+        ) === -1
+      ) {
+        return done(new Failure('project page html does not have project_id'))
+      }
       done()
     })
   })
@@ -138,20 +160,37 @@ describe('Opening', function() {
     logger.log('smoke test: Checking can load project list')
     this.timeout(4000)
     request.get('project', {}, (error, response, body) => {
-      expect(error, 'smoke test: error returned in getting project list').to.not
-        .exist
-      expect(response.statusCode).to.equal(
-        200,
-        'smoke test: response code is not 200 getting project list'
-      )
-      expect(body).to.match(
-        /<title>Your Projects - .*, Online LaTeX Editor<\/title>/,
-        'smoke test: body does not have correct title'
-      )
-      expect(body).to.include(
-        'ProjectPageController',
-        'smoke test: body does not have correct angular controller'
-      )
+      if (error != null) {
+        return done(
+          new Failure('error returned in getting project list').withCause(error)
+        )
+      }
+
+      if (response.statusCode !== 200) {
+        return done(
+          new Failure('response code is not 200 getting project list', {
+            statusCode: response.statusCode
+          })
+        )
+      }
+
+      if (typeof body !== 'string') {
+        return done(
+          new Failure('body is not of type string', { bodyType: typeof body })
+        )
+      }
+
+      if (
+        !/<title>Your Projects - .*, Online LaTeX Editor<\/title>/.test(body)
+      ) {
+        return done(new Failure('body does not have correct title'))
+      }
+
+      if (body.indexOf('ProjectPageController') === -1) {
+        return done(
+          new Failure('body does not have correct angular controller')
+        )
+      }
       done()
     })
   })
