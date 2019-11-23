@@ -33,27 +33,19 @@ module.exports = HealthCheckController = {
     return d.run(function() {
       const mocha = new Mocha({ reporter: Reporter(res), timeout: 10000 })
       mocha.addFile('test/smoke/src/SmokeTests.js')
-      return mocha.run(function() {
-        // TODO: combine this with the smoke-test-sharelatex module
-        // we need to clean up all references to the smokeTest module
-        // so it can be garbage collected.  The only reference should
-        // be in its parent, when it is loaded by mocha.addFile.
-        const path = require.resolve(
-          __dirname + '/../../../../test/smoke/src/SmokeTests.js'
-        )
-        const smokeTestModule = require.cache[path]
-        if (smokeTestModule != null) {
-          let idx
-          const { parent } = smokeTestModule
-          while ((idx = parent.children.indexOf(smokeTestModule)) !== -1) {
-            parent.children.splice(idx, 1)
-          }
-        } else {
-          logger.warn({ path }, 'smokeTestModule not defined')
-        }
-        // remove the smokeTest from the module cache
-        return delete require.cache[path]
-      })
+
+      // there is a race between loading, executing and unloading of the test
+      //  module: the module registers its suites only once during its lifecycle
+      // running health checks in parallel could result in the loading of a
+      //  cached copy of the module and mocha would see 0 (new) test suites.
+      // here is a hack to evict the cache immediately after loading.
+      mocha.loadFiles()
+      evictSmokeTestsModule()
+      mocha.loadFiles = function(fn) {
+        return fn && fn()
+      }
+
+      mocha.run()
     })
   },
 
@@ -91,6 +83,24 @@ module.exports = HealthCheckController = {
   }
 }
 
+function evictSmokeTestsModule() {
+  const path = require.resolve(
+    __dirname + '/../../../../test/smoke/src/SmokeTests.js'
+  )
+  const smokeTestModule = require.cache[path]
+  if (!smokeTestModule) {
+    return logger.warn({ path }, 'smokeTestModule not defined')
+  }
+
+  let idx
+  const { parent } = smokeTestModule
+  while ((idx = parent.children.indexOf(smokeTestModule)) !== -1) {
+    parent.children.splice(idx, 1)
+  }
+  // remove the smokeTest from the module cache
+  delete require.cache[path]
+}
+
 var Reporter = res =>
   function(runner) {
     Base.call(this, runner)
@@ -98,7 +108,9 @@ var Reporter = res =>
     const tests = []
     const passes = []
     const failures = []
+    let runnerProcessedAnyTestSuite = false
 
+    runner.on('suite', () => (runnerProcessedAnyTestSuite = true))
     runner.on('test end', test => tests.push(test))
     runner.on('pass', test => passes.push(test))
     runner.on('fail', test => failures.push(test))
@@ -121,6 +133,10 @@ var Reporter = res =>
       if (failures.length > 0) {
         logger.err({ failures }, 'health check failed')
         return res.status(500).send(JSON.stringify(results, null, 2))
+      } else if (!runnerProcessedAnyTestSuite) {
+        const err = 'no test suites were processed'
+        logger.err({ err }, 'health check failed soft')
+        return res.status(500).send({ err })
       } else {
         return res.status(200).send(JSON.stringify(results, null, 2))
       }
