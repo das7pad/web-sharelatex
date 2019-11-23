@@ -6,7 +6,10 @@ module.exports =
 			enabled: false
 			url: undefined
 		v1:
-			host: "http://localhost:5000"
+			url: "http://localhost:5000"
+			user: 'overleaf'
+			pass: 'password'
+
 	collabratec:
 		oauth:
 			client_id: "mock-collabratec-oauth-client-id"
