@@ -33,7 +33,7 @@ mongoose.connection.on('disconnected', () =>
 
 if (process.env.MONGOOSE_DEBUG) {
   mongoose.set('debug', (collectionName, method, query, doc) =>
-    logger.debug('mongoose debug', { collectionName, method, query, doc })
+    logger.debug({ collectionName, method, query, doc }, 'mongoose debug')
   )
 }
 
