@@ -22,6 +22,7 @@ const request = require('./helpers/request')
 const settings = require('settings-sharelatex')
 const redis = require('./helpers/redis')
 const _ = require('lodash')
+const Features = require('../../../app/src/infrastructure/Features')
 
 require('./helpers/MockDocstoreApi')
 require('./helpers/MockDocUpdaterApi')
@@ -145,6 +146,12 @@ describe('Registration', function() {
   describe('CSRF protection', function() {
     this.timeout(5000)
 
+    before(function() {
+      if (!Features.hasFeature('public-registration')) {
+        this.skip()
+      }
+    })
+
     beforeEach(function() {
       this.user = new User()
       this.email = `test+${Math.random()}@example.com`
@@ -230,6 +237,12 @@ describe('Registration', function() {
   })
 
   describe('Register', function() {
+    before(function() {
+      if (!Features.hasFeature('public-registration')) {
+        this.skip()
+      }
+    })
+
     beforeEach(function() {
       return (this.user = new User())
     })
@@ -248,6 +261,12 @@ describe('Registration', function() {
   })
 
   describe('Register with bonus referal id', function() {
+    before(function() {
+      if (!Features.hasFeature('public-registration')) {
+        this.skip()
+      }
+    })
+
     beforeEach(function(done) {
       this.user1 = new User()
       this.user2 = new User()
@@ -296,6 +315,12 @@ describe('Registration', function() {
     })
 
     describe('[Security] Trying to register/login as another user', function() {
+      before(function() {
+        if (!Features.hasFeature('public-registration')) {
+          this.skip()
+        }
+      })
+
       it('should not allow sign in with secondary email', function(done) {
         const secondaryEmail = 'acceptance-test-secondary@example.com'
         return this.user1.addEmail(secondaryEmail, err => {

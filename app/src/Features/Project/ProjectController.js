@@ -24,6 +24,7 @@ const TokenAccessHandler = require('../TokenAccess/TokenAccessHandler')
 const CollaboratorsGetter = require('../Collaborators/CollaboratorsGetter')
 const Modules = require('../../infrastructure/Modules')
 const ProjectEntityHandler = require('./ProjectEntityHandler')
+const TpdsProjectFlusher = require('../ThirdPartyDataStore/TpdsProjectFlusher')
 const UserGetter = require('../User/UserGetter')
 const NotificationsBuilder = require('../Notifications/NotificationsBuilder')
 const { V1ConnectionError } = require('../Errors/Errors')
@@ -31,7 +32,6 @@ const Features = require('../../infrastructure/Features')
 const BrandVariationsHandler = require('../BrandVariations/BrandVariationsHandler')
 const { getUserAffiliations } = require('../Institutions/InstitutionsAPI')
 const V1Handler = require('../V1/V1Handler')
-const { Project } = require('../../models/Project')
 const SystemMessageManager = require('../SystemMessages/SystemMessageManager')
 
 const ProjectController = {
@@ -143,11 +143,10 @@ const ProjectController = {
 
   archiveProject(req, res, next) {
     const projectId = req.params.Project_id
+    const userId = AuthenticationController.getLoggedInUserId(req)
     logger.log({ projectId }, 'received request to archive project')
 
-    const user = AuthenticationController.getSessionUser(req)
-
-    ProjectDeleter.archiveProject(projectId, user._id, function(err) {
+    ProjectDeleter.archiveProject(projectId, userId, function(err) {
       if (err != null) {
         return next(err)
       } else {
@@ -158,11 +157,38 @@ const ProjectController = {
 
   unarchiveProject(req, res, next) {
     const projectId = req.params.Project_id
+    const userId = AuthenticationController.getLoggedInUserId(req)
     logger.log({ projectId }, 'received request to unarchive project')
 
-    const user = AuthenticationController.getSessionUser(req)
+    ProjectDeleter.unarchiveProject(projectId, userId, function(err) {
+      if (err != null) {
+        return next(err)
+      } else {
+        return res.sendStatus(200)
+      }
+    })
+  },
 
-    ProjectDeleter.unarchiveProject(projectId, user._id, function(err) {
+  trashProject(req, res, next) {
+    const projectId = req.params.project_id
+    const userId = AuthenticationController.getLoggedInUserId(req)
+    logger.log({ projectId }, 'received request to trash project')
+
+    ProjectDeleter.trashProject(projectId, userId, function(err) {
+      if (err != null) {
+        return next(err)
+      } else {
+        return res.sendStatus(200)
+      }
+    })
+  },
+
+  untrashProject(req, res, next) {
+    const projectId = req.params.project_id
+    const userId = AuthenticationController.getLoggedInUserId(req)
+    logger.log({ projectId }, 'received request to untrash project')
+
+    ProjectDeleter.untrashProject(projectId, userId, function(err) {
       if (err != null) {
         return next(err)
       } else {
@@ -206,38 +232,6 @@ const ProjectController = {
         res.sendStatus(200)
       }
     })
-  },
-
-  trashProject(req, res, next) {
-    const projectId = req.params.project_id
-    const userId = AuthenticationController.getLoggedInUserId(req)
-
-    Project.update(
-      { _id: projectId },
-      { $addToSet: { trashed: userId } },
-      error => {
-        if (error) {
-          return next(error)
-        }
-        res.sendStatus(200)
-      }
-    )
-  },
-
-  untrashProject(req, res, next) {
-    const projectId = req.params.project_id
-    const userId = AuthenticationController.getLoggedInUserId(req)
-
-    Project.update(
-      { _id: projectId },
-      { $pull: { trashed: userId } },
-      error => {
-        if (error) {
-          return next(error)
-        }
-        res.sendStatus(200)
-      }
-    )
   },
 
   cloneProject(req, res, next) {
@@ -378,7 +372,7 @@ const ProjectController = {
         projects(cb) {
           ProjectGetter.findAllUsersProjects(
             userId,
-            'name lastUpdated lastUpdatedBy publicAccesLevel archived owner_ref tokens',
+            'name lastUpdated lastUpdatedBy publicAccesLevel archived trashed owner_ref tokens',
             cb
           )
         },
@@ -730,7 +724,10 @@ const ProjectController = {
               (error, brandVariationDetails) => cb(error, brandVariationDetails)
             )
           }
-        ]
+        ],
+        flushToTpds: cb => {
+          TpdsProjectFlusher.flushProjectToTpdsIfNeeded(projectId, cb)
+        }
       },
       (err, results) => {
         if (err != null) {
@@ -947,6 +944,10 @@ const ProjectController = {
   },
 
   _buildProjectViewModel(project, accessLevel, source, userId) {
+    const archived = ProjectHelper.isArchived(project, userId)
+    // If a project is simultaneously trashed and archived, we will consider it archived but not trashed.
+    const trashed = ProjectHelper.isTrashed(project, userId) && !archived
+
     TokenAccessHandler.protectTokens(project, accessLevel)
     const model = {
       id: project._id,
@@ -956,7 +957,8 @@ const ProjectController = {
       publicAccessLevel: project.publicAccesLevel,
       accessLevel,
       source,
-      archived: ProjectHelper.isArchived(project, userId),
+      archived,
+      trashed,
       owner_ref: project.owner_ref,
       tokens: project.tokens,
       isV1Project: false
@@ -969,11 +971,16 @@ const ProjectController = {
   },
 
   _buildV1ProjectViewModel(project) {
+    const archived = project.archived
+    // If a project is simultaneously trashed and archived, we will consider it archived but not trashed.
+    const trashed = project.removed && !archived
+
     const projectViewModel = {
       id: project.id,
       name: project.title,
       lastUpdated: new Date(project.updated_at * 1000), // Convert from epoch
-      archived: project.removed || project.archived,
+      archived: archived,
+      trashed: trashed,
       isV1Project: true
     }
     if (

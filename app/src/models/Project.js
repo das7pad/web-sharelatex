@@ -110,7 +110,8 @@ const ProjectSchema = new Schema({
       }
     }
   ],
-  auditLog: [AuditLogEntrySchema]
+  auditLog: [AuditLogEntrySchema],
+  deferredTpdsFlushCounter: { type: Number }
 })
 
 ProjectSchema.statics.getProject = function(projectOrId, fields, callback) {
