@@ -6,6 +6,8 @@ const Subscription = require('./helpers/Subscription')
 const Publisher = require('./helpers/Publisher')
 
 describe('UserMembershipAuthorization', function() {
+  this.timeout(5000)
+
   beforeEach(function(done) {
     this.user = new User()
     async.series([this.user.ensureUserExists.bind(this.user)], done)
