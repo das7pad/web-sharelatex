@@ -1,6 +1,4 @@
-const _ = require('underscore')
 const path = require('path')
-const logger = require('logger-sharelatex')
 const DocstoreManager = require('../Docstore/DocstoreManager')
 const Errors = require('../Errors/Errors')
 const ProjectGetter = require('./ProjectGetter')
@@ -8,8 +6,6 @@ const { promisifyAll } = require('../../util/promises')
 
 const ProjectEntityHandler = {
   getAllDocs(projectId, callback) {
-    logger.log({ projectId }, 'getting all docs for project')
-
     // We get the path and name info from the project, and the lines and
     // version info from the doc store.
     DocstoreManager.getAllDocs(projectId, (error, docContentsArray) => {
@@ -45,17 +41,13 @@ const ProjectEntityHandler = {
             }
           }
         }
-        logger.log(
-          { count: _.keys(docs).length, projectId },
-          'returning docs for project'
-        )
+
         callback(null, docs)
       })
     })
   },
 
   getAllFiles(projectId, callback) {
-    logger.log({ projectId }, 'getting all files for project')
     ProjectEntityHandler._getAllFolders(projectId, (err, folders) => {
       if (folders == null) {
         folders = {}
@@ -90,7 +82,6 @@ const ProjectEntityHandler = {
   },
 
   getAllEntitiesFromProject(project, callback) {
-    logger.log({ project }, 'getting all entities for project')
     ProjectEntityHandler._getAllFoldersFromProject(project, (err, folders) => {
       if (folders == null) {
         folders = {}
@@ -130,7 +121,6 @@ const ProjectEntityHandler = {
   },
 
   getAllDocPathsFromProject(project, callback) {
-    logger.log({ project }, 'getting all docs for project')
     ProjectEntityHandler._getAllFoldersFromProject(project, (err, folders) => {
       if (folders == null) {
         folders = {}
@@ -145,10 +135,6 @@ const ProjectEntityHandler = {
           docPath[doc._id] = path.join(folderPath, doc.name)
         }
       }
-      logger.log(
-        { count: _.keys(docPath).length, projectId: project._id },
-        'returning docPaths for project'
-      )
       callback(null, docPath)
     })
   },
@@ -166,7 +152,6 @@ const ProjectEntityHandler = {
   },
 
   getDocPathByProjectIdAndDocId(projectId, docId, callback) {
-    logger.log({ projectId, docId }, 'getting path for doc and project')
     ProjectGetter.getProjectWithoutDocLines(projectId, (err, project) => {
       if (err != null) {
         return callback(err)
@@ -208,7 +193,6 @@ const ProjectEntityHandler = {
   },
 
   _getAllFolders(projectId, callback) {
-    logger.log({ projectId }, 'getting all folders for project')
     ProjectGetter.getProjectWithoutDocLines(projectId, (err, project) => {
       if (err != null) {
         return callback(err)

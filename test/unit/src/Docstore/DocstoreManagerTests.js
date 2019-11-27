@@ -104,26 +104,6 @@ describe('DocstoreManager', function() {
           )
           .should.equal(true)
       })
-
-      it('should log the error', function() {
-        return this.logger.warn
-          .calledWith(
-            {
-              err: sinon.match
-                .instanceOf(Error)
-                .and(
-                  sinon.match.has(
-                    'message',
-                    'docstore api responded with non-success code: 500'
-                  )
-                ),
-              project_id: this.project_id,
-              doc_id: this.doc_id
-            },
-            'error deleting doc in docstore'
-          )
-          .should.equal(true)
-      })
     })
 
     describe('with a missing (404) response code', function() {
@@ -149,26 +129,6 @@ describe('DocstoreManager', function() {
                   'tried to delete doc not in docstore'
                 )
               )
-          )
-          .should.equal(true)
-      })
-
-      it('should log the error', function() {
-        return this.logger.warn
-          .calledWith(
-            {
-              err: sinon.match
-                .instanceOf(Errors.NotFoundError)
-                .and(
-                  sinon.match.has(
-                    'message',
-                    'tried to delete doc not in docstore'
-                  )
-                ),
-              project_id: this.project_id,
-              doc_id: this.doc_id
-            },
-            'tried to delete doc not in docstore'
           )
           .should.equal(true)
       })
@@ -256,26 +216,6 @@ describe('DocstoreManager', function() {
           )
           .should.equal(true)
       })
-
-      it('should log the error', function() {
-        return this.logger.warn
-          .calledWith(
-            {
-              err: sinon.match
-                .instanceOf(Error)
-                .and(
-                  sinon.match.has(
-                    'message',
-                    'docstore api responded with non-success code: 500'
-                  )
-                ),
-              project_id: this.project_id,
-              doc_id: this.doc_id
-            },
-            'error updating doc in docstore'
-          )
-          .should.equal(true)
-      })
     })
   })
 
@@ -346,26 +286,6 @@ describe('DocstoreManager', function() {
           )
           .should.equal(true)
       })
-
-      it('should log the error', function() {
-        return this.logger.warn
-          .calledWith(
-            {
-              err: sinon.match
-                .instanceOf(Error)
-                .and(
-                  sinon.match.has(
-                    'message',
-                    'docstore api responded with non-success code: 500'
-                  )
-                ),
-              project_id: this.project_id,
-              doc_id: this.doc_id
-            },
-            'error getting doc from docstore'
-          )
-          .should.equal(true)
-      })
     })
 
     describe('with include_deleted=true', function() {
@@ -418,21 +338,6 @@ describe('DocstoreManager', function() {
             sinon.match
               .instanceOf(Errors.NotFoundError)
               .and(sinon.match.has('message', 'doc not found in docstore'))
-          )
-          .should.equal(true)
-      })
-
-      it('should log the error', function() {
-        return this.logger.warn
-          .calledWith(
-            {
-              err: sinon.match
-                .instanceOf(Errors.NotFoundError)
-                .and(sinon.match.has('message', 'doc not found in docstore')),
-              project_id: this.project_id,
-              doc_id: this.doc_id
-            },
-            'doc not found in docstore'
           )
           .should.equal(true)
       })
@@ -492,25 +397,6 @@ describe('DocstoreManager', function() {
           )
           .should.equal(true)
       })
-
-      it('should log the error', function() {
-        return this.logger.warn
-          .calledWith(
-            {
-              err: sinon.match
-                .instanceOf(Error)
-                .and(
-                  sinon.match.has(
-                    'message',
-                    'docstore api responded with non-success code: 500'
-                  )
-                ),
-              project_id: this.project_id
-            },
-            'error getting all docs from docstore'
-          )
-          .should.equal(true)
-      })
     })
   })
 
@@ -564,25 +450,6 @@ describe('DocstoreManager', function() {
                   'docstore api responded with non-success code: 500'
                 )
               )
-          )
-          .should.equal(true)
-      })
-
-      it('should log the error', function() {
-        return this.logger.warn
-          .calledWith(
-            {
-              err: sinon.match
-                .instanceOf(Error)
-                .and(
-                  sinon.match.has(
-                    'message',
-                    'docstore api responded with non-success code: 500'
-                  )
-                ),
-              project_id: this.project_id
-            },
-            'error getting all doc ranges from docstore'
           )
           .should.equal(true)
       })

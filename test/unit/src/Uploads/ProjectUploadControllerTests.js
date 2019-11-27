@@ -121,12 +121,6 @@ describe('ProjectUploadController', function() {
         return this.metrics.Timer.prototype.done.called.should.equal(true)
       })
 
-      it('should output a log line', function() {
-        return this.logger.log
-          .calledWith(sinon.match.any, 'uploaded project')
-          .should.equal(true)
-      })
-
       it('should remove the uploaded file', function() {
         return this.fs.unlink.calledWith(this.path).should.equal(true)
       })
@@ -144,12 +138,6 @@ describe('ProjectUploadController', function() {
         return expect(this.res.body).to.deep.equal(
           JSON.stringify({ success: false, error: 'upload_failed' })
         )
-      })
-
-      it('should output an error log line', function() {
-        return this.logger.error
-          .calledWith(sinon.match.any, 'error uploading project')
-          .should.equal(true)
       })
     })
 
@@ -174,12 +162,6 @@ describe('ProjectUploadController', function() {
 
       it("should return an 'unprocessable entity' status code", function() {
         return expect(this.res.statusCode).to.equal(422)
-      })
-
-      it('should output an error log line', function() {
-        return this.logger.error
-          .calledWith(sinon.match.any, 'error uploading project')
-          .should.equal(true)
       })
     })
   })
@@ -238,12 +220,6 @@ describe('ProjectUploadController', function() {
         )
       })
 
-      it('should output a log line', function() {
-        return this.logger.log
-          .calledWith(sinon.match.any, 'uploaded file')
-          .should.equal(true)
-      })
-
       it('should time the request', function() {
         return this.metrics.Timer.prototype.done.called.should.equal(true)
       })
@@ -267,12 +243,6 @@ describe('ProjectUploadController', function() {
             success: false
           })
         )
-      })
-
-      it('should output an error log line', function() {
-        return this.logger.error
-          .calledWith(sinon.match.any, 'error uploading file')
-          .should.equal(true)
       })
     })
 
