@@ -2,10 +2,10 @@ extends ../../../../../app/views/layout
 
 block head-scripts
 	//sigma does not play well with requirejs, just hard linking it #HO
-	script(src=buildJsPath("libs/sigma-master/sigma.min.js"))
-	script(src=buildJsPath("libs/sigma-master/plugins/sigma.layout.forceAtlas2.min.js"))
-	script(src=buildJsPath("libs/sigma-master/plugins/sigma.renderers.edgeLabels.min.js"))
-	script(src=buildJsPath("libs/sigma-master/plugins/sigma.renderers.parallelEdges.min.js"))
+	script(src=staticPath("/vendor/sigma-master/sigma.min.js"))
+	script(src=staticPath("/vendor/sigma-master/plugins/sigma.layout.forceAtlas2.min.js"))
+	script(src=staticPath("/vendor/sigma-master/plugins/sigma.renderers.edgeLabels.min.js"))
+	script(src=staticPath("/vendor/sigma-master/plugins/sigma.renderers.parallelEdges.min.js"))
 
 block content
 

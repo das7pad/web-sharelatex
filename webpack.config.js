@@ -274,6 +274,9 @@ module.exports = {
         })
         .concat(
           [
+            'mathjax',
+            'sigma-master',
+
             // sentry sdk
             `${PackageVersions.lib('sentry')}/bundle.min.js`,
             `${PackageVersions.lib('sentry')}/bundle.min.js.map`
