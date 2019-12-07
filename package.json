@@ -65,7 +65,6 @@
     "fuse.js": "^3.0.0",
     "globby": "^6.1.0",
     "helmet": "^3.8.1",
-    "http-proxy": "^1.8.1",
     "is-utf8": "^0.2.1",
     "joi-mongodb-objectid": "^0.1.0",
     "json2csv": "^4.3.3",
