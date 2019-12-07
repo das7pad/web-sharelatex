@@ -166,6 +166,16 @@ pipeline {
         timeout(time: 30, unit: 'MINUTES')
       }
       stages {
+        stage('Build production') {
+          when {
+            expression {
+              env.SHARELATEX_DOCKER_REPOS != null
+            }
+          }
+          steps {
+            sh 'make build_prod'
+          }
+        }
         stage('docker push') {
           when {
             expression {
@@ -177,7 +187,7 @@ pipeline {
             IMAGE_BRANCH = "$SHARELATEX_DOCKER_REPOS/web:$BRANCH_NAME"
           }
           steps {
-            sh 'docker tag $IMAGE_CI $IMAGE'
+            sh 'docker tag $IMAGE_CI-prod $IMAGE'
             sh 'docker push $IMAGE'
             sh 'docker tag $IMAGE $IMAGE_BRANCH'
             sh 'docker push $IMAGE_BRANCH'
