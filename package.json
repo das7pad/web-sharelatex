@@ -120,7 +120,6 @@
     "dom-testing-library": "^3.19.4",
     "east": "^1.1.0",
     "east-mongo": "^0.3.6",
-    "es6-promise": "^4.0.5",
     "eslint": "^4.18.1",
     "eslint-config-prettier": "^3.1.0",
     "eslint-config-standard": "^11.0.0",
