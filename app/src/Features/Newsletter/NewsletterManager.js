@@ -2,7 +2,6 @@ const { callbackify } = require('util')
 const logger = require('logger-sharelatex')
 const Settings = require('settings-sharelatex')
 const crypto = require('crypto')
-const Mailchimp = require('mailchimp-api-v3')
 const OError = require('@overleaf/o-error')
 
 const provider = getProvider()
@@ -29,6 +28,7 @@ function mailchimpIsConfigured() {
 }
 
 function makeMailchimpProvider() {
+  const Mailchimp = require('mailchimp-api-v3')
   const mailchimp = new Mailchimp(Settings.mailchimp.api_key)
   const MAILCHIMP_LIST_ID = Settings.mailchimp.list_id
 
