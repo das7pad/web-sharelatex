@@ -64,7 +64,6 @@
     "helmet": "^3.8.1",
     "is-utf8": "^0.2.1",
     "joi-mongodb-objectid": "^0.1.0",
-    "jsonwebtoken": "^8.0.1",
     "lodash": "^4.17.15",
     "logger-sharelatex": "git+https://github.com/das7pad/logger-sharelatex.git#c9e043041b1f6a4c76ce36a3642cef64483e99f3",
     "mailchimp-api-v3": "^1.12.0",
