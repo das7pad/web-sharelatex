@@ -82,9 +82,6 @@
     "multer": "git+https://github.com/overleaf/multer.git",
     "node-html-encoder": "0.0.2",
     "nodemailer": "2.1.0",
-    "nodemailer-mandrill-transport": "^1.2.0",
-    "nodemailer-sendgrid": "^1.0.3",
-    "nodemailer-ses-transport": "^1.3.0",
     "p-limit": "^2.2.1",
     "passport": "^0.3.2",
     "passport-local": "^1.0.0",
@@ -112,6 +109,11 @@
     "xml2js": "^0.4.22",
     "xregexp": "^4.2.4",
     "yauzl": "^2.10.0"
+  },
+  "optionalDependencies": {
+    "nodemailer-mandrill-transport": "^1.2.0",
+    "nodemailer-sendgrid": "^1.0.3",
+    "nodemailer-ses-transport": "^1.3.0"
   },
   "devDependencies": {
     "ace-builds": "https://github.com/das7pad/ace-builds/archive/v1.4.5-20191029.tar.gz",
