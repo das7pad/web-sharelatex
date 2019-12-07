@@ -117,7 +117,6 @@
     "copy-webpack-plugin": "^5.0.4",
     "crypto-js": "^3.1.9-1",
     "css-loader": "^3.2.0",
-    "dom-testing-library": "^3.19.4",
     "east": "^1.1.0",
     "east-mongo": "^0.3.6",
     "eslint": "^4.18.1",
