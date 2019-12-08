@@ -113,7 +113,7 @@ build_prod: clean_build_artifacts
 			app/src \
 			app/templates \
 			app/views \
-			public \
+			public/js/manifest.json \
 			setup_env.sh \
 		> build_artifacts.tar.gz
 
