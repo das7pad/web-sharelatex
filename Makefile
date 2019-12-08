@@ -113,6 +113,7 @@ build_prod: clean_build_artifacts
 			app/src \
 			app/templates \
 			app/views \
+			config \
 			modules/*/app/ \
 			modules/*/index.js \
 			public/js/manifest.json \
