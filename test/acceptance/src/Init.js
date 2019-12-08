@@ -5,7 +5,7 @@ const { db } = require('../../../app/src/infrastructure/mongojs')
 require('logger-sharelatex').logger.level('error')
 
 before(function(done) {
-  this.timeout(10000)
+  this.timeout(20000)
   clearDB(() => {
     exec('bin/east migrate', (error, stdout, stderr) => {
       console.log(stdout)

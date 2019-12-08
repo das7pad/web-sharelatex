@@ -125,17 +125,6 @@ module.exports = {
           }
         ]
       },
-      {
-        // These options are necessary for handlebars to have access to helper
-        // methods
-        test: /\.handlebars$/,
-        loader: 'handlebars-loader',
-        options: {
-          compat: true,
-          knownHelpersOnly: false,
-          runtimePath: 'handlebars/runtime'
-        }
-      },
       // Allow for injection of modules dependencies by reading contents of
       // modules directory and adding necessary dependencies
       {

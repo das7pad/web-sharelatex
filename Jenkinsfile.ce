@@ -25,11 +25,6 @@ pipeline {
                 sh 'docker pull $DOCKER_REGISTRY/$IMAGE_NODE'
                 sh 'docker tag $DOCKER_REGISTRY/$IMAGE_NODE $IMAGE_NODE'
             }
-            post {
-                cleanup {
-                    sh 'docker rmi --force $DOCKER_REGISTRY/$IMAGE_NODE'
-                }
-            }
         }
         stage('Pull Cache') {
           when {
@@ -166,6 +161,16 @@ pipeline {
         timeout(time: 30, unit: 'MINUTES')
       }
       stages {
+        stage('Build production') {
+          when {
+            expression {
+              env.SHARELATEX_DOCKER_REPOS != null
+            }
+          }
+          steps {
+            sh 'make build_prod'
+          }
+        }
         stage('docker push') {
           when {
             expression {
@@ -177,7 +182,7 @@ pipeline {
             IMAGE_BRANCH = "$SHARELATEX_DOCKER_REPOS/web:$BRANCH_NAME"
           }
           steps {
-            sh 'docker tag $IMAGE_CI $IMAGE'
+            sh 'docker tag $IMAGE_CI-prod $IMAGE'
             sh 'docker push $IMAGE'
             sh 'docker tag $IMAGE $IMAGE_BRANCH'
             sh 'docker push $IMAGE_BRANCH'
@@ -220,7 +225,6 @@ pipeline {
   post {
     cleanup {
       sh 'make clean_ci'
-      sh 'docker rmi --force $IMAGE_NODE'
     }
   }
 }

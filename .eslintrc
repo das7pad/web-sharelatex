@@ -1,49 +1,12 @@
 {
-  "extends": [
-    "standard",
-    "standard-jsx",
-    "standard-react",
-    "prettier",
-    "prettier/react",
-    "prettier/standard",
-    "plugin:jsx-a11y/recommended"
-  ],
-  "plugins": [
-    "jsx-a11y",
-    "mocha",
-    "chai-expect",
-    "chai-friendly"
-  ],
+  "extends": ["standard", "prettier", "prettier/standard"],
+  "plugins": ["mocha", "chai-expect", "chai-friendly"],
   "parser": "babel-eslint",
   "env": {
     "browser": true,
     "mocha": true
   },
-  "settings": {
-    // Tell eslint-plugin-react to detect which version of React we are using
-    "react": {
-      "version": "detect"
-    }
-  },
   "rules": {
-    // Fix conflict between prettier & standard by overriding to prefer
-    // double quotes
-    "jsx-quotes": ["error", "prefer-double"],
-
-    // Override weird behaviour of jsx-a11y label-has-for (says labels must be
-    // nested *and* have for/id attributes)
-    "jsx-a11y/label-has-for": [
-      "error",
-      {
-        "required": {
-          "some": [
-            "nesting",
-            "id"
-          ]
-        }
-      }
-    ],
-
     // Swap the no-unused-expressions rule with a more chai-friendly one
     "no-unused-expressions": 0,
     "chai-friendly/no-unused-expressions": "error"
@@ -78,10 +41,7 @@
     },
     {
       // Frontend test specific rules
-      "files": [
-        "**/test/frontend/**/*.js",
-        "test/frontend/import_tests.js"
-      ],
+      "files": ["**/test/frontend/**/*.js", "test/frontend/import_tests.js"],
       "globals": {
         "expect": true,
         "define": true,

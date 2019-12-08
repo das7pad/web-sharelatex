@@ -1,0 +1,28 @@
+# This file was auto-generated, do not edit it directly.
+# Instead run bin/update_build_scripts from
+# https://github.com/das7pad/sharelatex-dev-env
+
+ARG BASE
+FROM $BASE
+
+# monkey patch npm ci --only=prod
+# npm tries to update the _from field of dev-only/optional dependencies
+RUN sed -i -E \
+      's/(updateFromField .+)/\1\n    return Promise.resolve()/' \
+      /usr/local/lib/node_modules/npm/node_modules/libcipm/index.js
+
+RUN /docker_cleanup.sh npm ci --only=prod
+
+ADD build_artifacts.tar.gz /app
+
+RUN /app/setup_env.sh
+
+USER node
+
+ARG RELEASE
+ARG COMMIT
+ENV \
+    SERVICE_NAME="web" \
+    RELEASE=${RELEASE} \
+    SENTRY_RELEASE=${RELEASE} \
+    COMMIT=${COMMIT}

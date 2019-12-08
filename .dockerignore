@@ -98,3 +98,9 @@ public/stylesheets/*.map
 !/test/frontend
 # app #
 #######
+
+###################
+# build artifacts #
+!/build_artifacts.tar.gz
+# build artifacts #
+###################
