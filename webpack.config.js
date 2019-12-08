@@ -209,7 +209,7 @@ module.exports = {
     splitChunks: {
       cacheGroups: {
         ideLibraries: {
-          test: /(?!public\/src\/vendor\/libs\/platform)(pdfjsBundle|node_modules\/(ace-builds|pdfjs-dist)|public\/src\/vendor\/libs)/,
+          test: /(?!frontend\/js\/vendor\/libs\/platform)(pdfjsBundle|node_modules\/(ace-builds|pdfjs-dist)|frontend\/js\/vendor\/libs)/,
           name: 'ideLibraries',
           chunks: 'initial',
           reuseExistingChunk: true,
