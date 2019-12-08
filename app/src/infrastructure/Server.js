@@ -19,12 +19,10 @@ const bodyParser = require('body-parser')
 const methodOverride = require('method-override')
 const cookieParser = require('cookie-parser')
 const bearerToken = require('express-bearer-token')
-const serveStatic = require('serve-static')
 
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
 
-const oneDayInMilliseconds = 86400000
 const ReferalConnect = require('../Features/Referal/ReferalConnect')
 const RedirectManager = require('./RedirectManager')
 const ProxyManager = require('./ProxyManager')
@@ -36,10 +34,6 @@ const ErrorController = require('../Features/Errors/ErrorController')
 const HttpErrorController = require('../Features/Errors/HttpErrorController')
 const UserSessionsManager = require('../Features/User/UserSessionsManager')
 const AuthenticationController = require('../Features/Authentication/AuthenticationController')
-
-const STATIC_CACHE_AGE = Settings.cacheStaticAssets
-  ? oneDayInMilliseconds * 365
-  : 0
 
 // Init the session store
 const sessionStore = new RedisStore({ client: sessionsRedisClient })
@@ -73,11 +67,6 @@ if (Settings.behindProxy) {
   })
 }
 
-webRouter.use(
-  serveStatic(Path.join(__dirname, '/../../../public'), {
-    maxAge: STATIC_CACHE_AGE
-  })
-)
 app.set('views', Path.join(__dirname, '/../../views'))
 app.set('view engine', 'pug')
 Modules.loadViewIncludes(app)
