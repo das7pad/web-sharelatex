@@ -9,6 +9,8 @@ module.exports =
 			url: "http://localhost:5000"
 			user: 'overleaf'
 			pass: 'password'
+		linkedUrlProxy:
+			url: 'http://localhost:6543'
 
 	collabratec:
 		oauth:
