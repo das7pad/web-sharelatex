@@ -39,7 +39,6 @@ clean_test_frontend:
 	docker rmi -f frontend_$(BUILD_DIR_NAME)_test_frontend
 
 test: test_frontend
-test_frontend: compile
 test_frontend: test_frontend_build_run
 test_frontend_build_run: build_test_frontend
 	$(MAKE) test_frontend_run
@@ -143,10 +142,6 @@ clean_build:
 		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-prod \
 		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-cache \
 
-tar:
-	COMPOSE_PROJECT_NAME=tar_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) run --rm tar
-	COMPOSE_PROJECT_NAME=tar_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE) down -v -t 0
-
 MODULE_TARGETS = \
 	$(TEST_ACCEPTANCE_MODULES) \
 	$(TEST_ACCEPTANCE_CI_MODULES) \
@@ -155,8 +150,6 @@ MODULE_TARGETS = \
 $(MODULE_TARGETS): $(MODULE_MAKEFILES)
 	$(MAKE) -C $(dir $@) $(notdir $@)
 
-.PHONY:
-	$(MODULE_TARGETS) \
-	all add install update test test_unit test_frontend test_acceptance \
-	test_acceptance_start_service test_acceptance_stop_service \
-	test_acceptance_run ci ci_clean compile clean css
+.PHONY: $(MODULE_TARGETS) \
+	all test test_unit test_frontend test_acceptance \
+	test_acceptance_run clean
