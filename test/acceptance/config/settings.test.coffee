@@ -21,9 +21,6 @@ module.exports =
 		linkedUrlProxy:
 			url: 'http://localhost:6543'
 
-		notifications:
-			url: undefined
-
 		project_history:
 			sendProjectStructureOps: true
 			initializeHistoryForNewProjects: true
