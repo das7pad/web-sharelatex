@@ -195,6 +195,8 @@ module.exports = settings =
 			pass: process.env['V1_HISTORY_PASSWORD'] or 'password'
 
 	web:
+		enableWApiRouter: process.env.ENABLE_API_ROUTER
+		enableWebRouter: process.env.ENABLE_WEB_ROUTER
 		web_router_port: process.env.WEB_ROUTER_PORT
 
 	templates:
