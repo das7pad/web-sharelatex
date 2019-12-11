@@ -19,6 +19,9 @@ const User = require('./helpers/User')
 const ProjectGetter = require('../../../app/src/Features/Project/ProjectGetter')
 const ExportsHandler = require('../../../app/src/Features/Exports/ExportsHandler')
 
+require('./helpers/MockDocstoreApi')
+require('./helpers/MockDocUpdaterApi')
+require('./helpers/MockFileStoreApi')
 const MockProjectHistoryApi = require('./helpers/MockProjectHistoryApi')
 const MockV1Api = require('./helpers/MockV1Api')
 

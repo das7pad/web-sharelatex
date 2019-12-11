@@ -1,6 +1,10 @@
 const { expect } = require('chai')
 const User = require('./helpers/User').promises
 
+require('./helpers/MockDocstoreApi')
+require('./helpers/MockDocUpdaterApi')
+require('./helpers/MockProjectHistoryApi')
+
 describe('Project ownership transfer', function() {
   this.timeout(10000)
 

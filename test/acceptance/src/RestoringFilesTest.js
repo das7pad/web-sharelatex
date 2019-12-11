@@ -20,6 +20,8 @@ const Path = require('path')
 const ProjectGetter = require('../../../app/src/Features/Project/ProjectGetter')
 
 const User = require('./helpers/User')
+
+require('./helpers/MockDocUpdaterApi')
 const MockProjectHistoryApi = require('./helpers/MockProjectHistoryApi')
 const MockDocstoreApi = require('./helpers/MockDocstoreApi')
 const MockFileStoreApi = require('./helpers/MockFileStoreApi')

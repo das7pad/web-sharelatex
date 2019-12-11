@@ -27,6 +27,9 @@ const _ = require('underscore')
 
 const ProjectGetter = require('../../../app/src/Features/Project/ProjectGetter')
 
+require('./helpers/MockDocUpdaterApi')
+require('./helpers/MockProjectHistoryApi')
+
 const MockDocStoreApi = require('./helpers/MockDocstoreApi')
 const MockFileStoreApi = require('./helpers/MockFileStoreApi')
 const request = require('./helpers/request')

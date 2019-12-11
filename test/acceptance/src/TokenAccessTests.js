@@ -6,6 +6,10 @@ const request = require('./helpers/request')
 const settings = require('settings-sharelatex')
 const { db, ObjectId } = require('../../../app/src/infrastructure/mongojs')
 
+require('./helpers/MockDocstoreApi')
+require('./helpers/MockDocUpdaterApi')
+require('./helpers/MockProjectHistoryApi')
+
 const tryReadAccess = (user, projectId, test, callback) =>
   async.series(
     [

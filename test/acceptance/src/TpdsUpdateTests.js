@@ -16,6 +16,11 @@ const ProjectGetter = require('../../../app/src/Features/Project/ProjectGetter')
 const request = require('./helpers/request')
 const User = require('./helpers/User')
 
+require('./helpers/MockDocstoreApi')
+require('./helpers/MockDocUpdaterApi')
+require('./helpers/MockFileStoreApi')
+require('./helpers/MockProjectHistoryApi')
+
 describe('TpdsUpdateTests', function() {
   beforeEach(function(done) {
     this.owner = new User()

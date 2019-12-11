@@ -7,6 +7,8 @@ const { db, ObjectId } = require('../../../app/src/infrastructure/mongojs')
 const { Subscription } = require('../../../app/src/models/Subscription')
 const SubscriptionViewModelBuilder = require('../../../app/src/Features/Subscription/SubscriptionViewModelBuilder')
 const MockDocstoreApi = require('./helpers/MockDocstoreApi')
+require('./helpers/MockDocUpdaterApi')
+require('./helpers/MockProjectHistoryApi')
 require('./helpers/MockTagsApi')
 require('./helpers/MockV1Api')
 

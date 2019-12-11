@@ -16,6 +16,9 @@ const { expect } = require('chai')
 const { ObjectId } = require('mongojs')
 const request = require('./helpers/request')
 
+require('./helpers/MockDocstoreApi')
+require('./helpers/MockDocUpdaterApi')
+require('./helpers/MockFileStoreApi')
 const MockProjectHistoryApi = require('./helpers/MockProjectHistoryApi')
 const User = require('./helpers/User')
 
