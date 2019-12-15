@@ -78,10 +78,6 @@ module.exports = {
         ]
       },
       {
-        test: /stylesheetsBundle/,
-        exclude: /stylesheets/
-      },
-      {
         // preserve assets that are already in the output directory
         test: new RegExp(`^${path.join(__dirname, 'public')}`),
         loader: 'file-loader',
@@ -119,7 +115,6 @@ module.exports = {
             loader: 'less-loader',
             options: {
               sourceMap: true,
-              rewriteUrls: 'all',
               paths: [path.join(__dirname, 'public', 'stylesheets')],
               plugins: [new CleanCSSPlugin({ advanced: true })]
             }
