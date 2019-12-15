@@ -82,7 +82,8 @@ module.exports = {
         exclude: /stylesheets/
       },
       {
-        test: /\.(woff|woff2|gif|jpg|png|svg)$/,
+        // preserve assets that are already in the output directory
+        test: new RegExp(`^${path.join(__dirname, 'public')}`),
         loader: 'file-loader',
         options: {
           // use the file inplace
