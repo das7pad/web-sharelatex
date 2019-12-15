@@ -143,7 +143,12 @@ block content
 		script(type='text/javascript').
 			window.overallThemes = JSON.parse('!{StringHelper.stringifyJsonForScript(overallThemes)}');
 
+block link-preload
+	link(rel="preload" as="script" href=buildJsPath('libraries.js'))
+	link(rel="preload" as="script" href=buildJsPath('ideLibraries.js'))
+	link(rel="preload" as="script" href=buildJsPath('ide.js'))
+
 block foot-scripts
-	script(src=buildJsPath('libraries.js'), onerror='disableCDN()')
-	script(src=buildJsPath('ideLibraries.js'), onerror='disableCDN()')
-	script(src=buildJsPath('ide.js'), onerror='disableCDN()')
+	script(async defer src=buildJsPath('libraries.js'), onerror='disableCDN()')
+	script(async defer src=buildJsPath('ideLibraries.js'), onerror='disableCDN()')
+	script(async defer src=buildJsPath('ide.js'), onerror='disableCDN()')

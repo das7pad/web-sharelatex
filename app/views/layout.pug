@@ -27,6 +27,9 @@ html(
 					link(rel="alternate", href=getTranslationUrl(subdomainDetails), hreflang=subdomainDetails.lngCode)
 
 		//- Scripts
+		block link-preload
+			link(rel="preload" as="script" href=buildJsPath('libraries.js'))
+			link(rel="preload" as="script" href=buildJsPath('main.js'))
 
 		//- Google Analytics
 		- if (typeof(gaToken) != "undefined")
@@ -109,5 +112,5 @@ html(
 					window.location.search += '&nocdn=true'}}
 
 		block foot-scripts
-			script(src=buildJsPath('libraries.js'), onerror='disableCDN()')
-			script(src=buildJsPath('main.js'), onerror='disableCDN()')
+			script(async defer src=buildJsPath('libraries.js'))
+			script(async defer src=buildJsPath('main.js'))
