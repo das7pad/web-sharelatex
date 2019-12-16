@@ -579,6 +579,11 @@ const ProjectController = {
                 : undefined
           }
 
+          res.locals.preloadCommonResources()
+          // additional font for the (i) tooltip
+          res.locals.preloadFont('merriweather-v21-latin-700italic')
+          res.locals.finishPreloading()
+
           res.render('project/list', viewModel)
           timer.done()
         })

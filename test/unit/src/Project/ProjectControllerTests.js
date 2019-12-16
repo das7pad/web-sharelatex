@@ -217,6 +217,18 @@ describe('ProjectController', function() {
       locals: {},
       setTimeout: sinon.stub()
     }
+
+    // resource hints
+    for (let fn of [
+      'preloadCommonResources',
+      'preloadCss',
+      'getCssThemeModifier',
+      'preloadFont',
+      'preloadImg',
+      'finishPreloading'
+    ]) {
+      this.res.locals[fn] = sinon.stub()
+    }
   })
 
   describe('updateProjectSettings', function() {
@@ -863,6 +875,24 @@ describe('ProjectController', function() {
         this.ProjectController.projectListPage(this.req, this.res)
       })
     })
+
+    describe('resource hints', function() {
+      it('should preload the common sub resources', function(done) {
+        this.res.render = () => {
+          this.res.locals.preloadCommonResources.callCount.should.equal(1)
+          done()
+        }
+        this.ProjectController.projectListPage(this.req, this.res)
+      })
+
+      it('should preload the tooltip font', function(done) {
+        this.res.render = () => {
+          this.res.locals.preloadFont.callCount.should.equal(1)
+          done()
+        }
+        this.ProjectController.projectListPage(this.req, this.res)
+      })
+    })
   })
 
   describe('projectListPage with duplicate projects', function() {
@@ -1012,17 +1042,6 @@ describe('ProjectController', function() {
       this.InactiveProjectManager.reactivateProjectIfRequired.callsArgWith(1)
       this.AnalyticsManager.getLastOccurrence.yields(null, { mock: 'event' })
       this.ProjectUpdateHandler.markAsOpened.callsArgWith(1)
-
-      // resource hints
-      for (let fn of [
-        'preloadCss',
-        'getCssThemeModifier',
-        'preloadFont',
-        'preloadImg',
-        'finishPreloading'
-      ]) {
-        this.res.locals[fn] = sinon.stub()
-      }
     })
 
     it('should render the project/editor page', function(done) {
