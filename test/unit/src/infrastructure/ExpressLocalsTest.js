@@ -14,6 +14,12 @@ const MANIFEST = Path.join(__dirname, '../../../../public/js/manifest.json')
 describe('ExpressLocalsTests', function() {
   beforeEach(function() {
     this.settings = {
+      i18n: {
+        subdomainLang: {
+          fr: { lngCode: 'fr', url: 'http://localhost:3000' },
+          www: { lngCode: 'en', url: 'http://localhost:3000' }
+        }
+      },
       brandPrefix: ''
     }
     this.user_id = '386010482601212345061012'
@@ -202,6 +208,46 @@ describe('ExpressLocalsTests', function() {
             Link:
               '<https://example.com/img/some/image.png>;rel=preload;as=image'
           })
+        })
+      })
+    })
+  })
+
+  describe('with only one language', function() {
+    middlewareCounter = -1
+    beforeEach(function() {
+      this.settings.i18n = {
+        subdomainLang: {
+          www: { lngCode: 'en', url: 'http://localhost:3000' }
+        }
+      }
+
+      this.require()
+    })
+    // session
+    middlewareCounter += 1
+    // addSetContentDisposition
+    middlewareCounter += 1
+    // externalAuthenticationSystemUser + hasFeature
+    middlewareCounter += 1
+
+    describe('resource middleware', function() {
+      middlewareCounter += 1
+      const middlewareId = middlewareCounter
+
+      beforeEach(function() {
+        this.loadMiddleware(middlewareId)
+      })
+
+      describe('resource hints', function() {
+        beforeEach(function() {
+          this.settings.addResourceHints = true
+        })
+
+        it('should not inject the flags sprite', function() {
+          this.res.render('template', {})
+          expect(this.res.headers.Link).to.exist
+          expect(this.res.headers.Link).to.not.include('img/sprite.png')
         })
       })
     })

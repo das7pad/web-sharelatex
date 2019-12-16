@@ -7,6 +7,7 @@ const Path = require('path')
 const moment = require('moment')
 
 const IS_DEV_ENV = ['development', 'test'].includes(process.env.NODE_ENV)
+const HAS_MULTIPLE_LANG = Object.keys(Settings.i18n.subdomainLang).length > 1
 
 const Features = require('./Features')
 const AuthenticationController = require('../Features/Authentication/AuthenticationController')
@@ -135,7 +136,9 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
           'merriweather-v21-latin-regular'
         ].forEach(res.locals.preloadFont)
       }
-      res.locals.preloadImg('sprite.png')
+      if (HAS_MULTIPLE_LANG) {
+        res.locals.preloadImg('sprite.png')
+      }
     }
 
     const actualRender = res.render
