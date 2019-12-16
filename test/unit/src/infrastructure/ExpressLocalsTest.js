@@ -18,12 +18,9 @@ describe('ExpressLocalsTests', function() {
     }
     this.user_id = '386010482601212345061012'
 
-    this.manifest = {}
-
     this.requires = {
       'logger-sharelatex': { log: function() {} },
       'settings-sharelatex': this.settings,
-      '../../../public/js/manifest.json': this.manifest,
       '../Features/Subscription/SubscriptionFormatters': {},
       '../Features/SystemMessages/SystemMessageManager': {},
       '../Features/Authentication/AuthenticationController': {
@@ -55,7 +52,7 @@ describe('ExpressLocalsTests', function() {
       this.ExpressLocals = SandboxedModule.require(MODULE_PATH, {
         globals: {
           console,
-          process: { env: { NODE_ENV: 'not_test_or_development' } }
+          process: { env: { NODE_ENV: 'test' } }
         },
         requires: this.requires
       })
@@ -155,7 +152,7 @@ describe('ExpressLocalsTests', function() {
           this.res.render('template', {})
           expect(this.res.headers.Link).to.exist
           const Link = this.res.headers.Link
-          expect(Link).to.include('stylesheets/style')
+          expect(Link).to.include('stylesheets/style.css')
           expect(Link).to.include('font/lato')
         })
 
@@ -164,7 +161,7 @@ describe('ExpressLocalsTests', function() {
           this.res.render('template', {})
           expect(this.res.headers.Link).to.exist
           const Link = this.res.headers.Link
-          expect(Link).to.include('stylesheets/sl-style')
+          expect(Link).to.include('stylesheets/sl-style.css')
           expect(Link).to.include('font/open-sans')
         })
       })
