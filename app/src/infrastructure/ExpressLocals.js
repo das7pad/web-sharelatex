@@ -90,8 +90,7 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
       }
 
       function crossorigin(resource) {
-        if (!resource.crossorigin) return ''
-        return staticFilesBase ? ';crossorigin' : ''
+        return resource.crossorigin ? ';crossorigin' : ''
       }
       res.setHeader(
         'Link',

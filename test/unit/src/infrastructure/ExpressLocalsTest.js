@@ -134,11 +134,11 @@ describe('ExpressLocalsTests', function() {
           })
         })
 
-        it('should set the header for fonts', function() {
+        it('should set the crossorigin flag for a font', function() {
           this.res.locals.preloadFont('arbitrary')
           this.res.locals.finishPreloading()
           expect(this.res.headers).to.deep.equal({
-            Link: '</font/arbitrary.woff2>;rel=preload;as=font'
+            Link: '</font/arbitrary.woff2>;rel=preload;as=font;crossorigin'
           })
         })
 
@@ -204,16 +204,6 @@ describe('ExpressLocalsTests', function() {
           expect(this.res.headers).to.deep.equal({
             Link:
               '<https://example.com/img/some/image.png>;rel=preload;as=image'
-          })
-        })
-
-        it('should set the crossorigin for a font', function() {
-          this.res.locals.preloadFont('arbitrary')
-          this.res.locals.finishPreloading()
-          expect(this.res.headers).to.deep.equal({
-            Link:
-              '<https://example.com/font/arbitrary.woff2>;' +
-              'rel=preload;as=font;crossorigin'
           })
         })
       })
