@@ -15,10 +15,19 @@ const UrlHelper = {
   getSafeRedirectPath,
   wrapUrlWithProxy(url) {
     // TODO: Consider what to do for Community and Enterprise edition?
-    if (!Settings.apis.linkedUrlProxy.url) {
+    if (
+      !Settings.apis.linkedUrlProxy.url &&
+      !Settings.apis.linkedUrlProxy.chain
+    ) {
       throw new Error('no linked url proxy configured')
     }
-    return `${Settings.apis.linkedUrlProxy.url}?url=${encodeURIComponent(url)}`
+    const chain = Settings.apis.linkedUrlProxy.chain || [
+      Settings.apis.linkedUrlProxy.url
+    ]
+    return chain.reduce(
+      (url, proxy) => `${proxy}?url=${encodeURIComponent(url)}`,
+      url
+    )
   },
 
   prependHttpIfNeeded(url) {
