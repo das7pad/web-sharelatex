@@ -1,10 +1,10 @@
 web
 --language=es
 --src-dir=src
---node-version=12.13.1
+--node-version=12.14.0
 --acceptance-creds=None
 --dependencies=mongo,redis_api,redis_lock,redis_realtime,redis_web,redis_websessions
 --docker-repos=gcr.io/overleaf-ops
 --build-target=docker
 --mocha-6=true
---monkey-patch-npm-ci-_from=true
+--monkey-patch-npm-ci--from=true
