@@ -279,5 +279,9 @@ module.exports = {
           })
         )
     )
-  ]
+  ],
+
+  stats: {
+    excludeAssets: /^vendor\//
+  }
 }
