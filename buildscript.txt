@@ -8,3 +8,4 @@ web
 --build-target=docker
 --mocha-6=true
 --monkey-patch-npm-ci--from=true
+--webpack-public-path=public
