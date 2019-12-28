@@ -115,7 +115,7 @@ build_prod: clean_build_artifacts
 			config \
 			modules/*/app/ \
 			modules/*/index.js \
-			public/js/manifest.json \
+			public/manifest.json \
 			setup_env.sh \
 			test/smoke/src \
 		> build_artifacts.tar.gz

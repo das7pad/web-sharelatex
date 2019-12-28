@@ -1,8 +1,6 @@
 const fs = require('fs')
-const glob = require('glob').sync
 const path = require('path')
 const webpack = require('webpack')
-const CleanCSSPlugin = require('less-plugin-clean-css')
 const CopyPlugin = require('copy-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
@@ -17,11 +15,12 @@ const VENDOR_PATH = path.join(__dirname, 'public', 'vendor')
 // Generate a hash of entry points, including modules
 const entryPoints = {
   main: './frontend/js/main.js',
-  ide: './frontend/js/ide.js'
+  ide: './frontend/js/ide.js',
+  style: './frontend/stylesheets/style.less',
+  'ieee-style': './frontend/stylesheets/ieee-style.less',
+  'light-style': './frontend/stylesheets/light-style.less',
+  'sl-style': './frontend/stylesheets/sl-style.less'
 }
-glob('./public/stylesheets/*style.less').forEach(style => {
-  entryPoints[path.basename(style, '.less')] = style
-})
 
 // Attempt to load frontend entry-points from modules, if they exist
 if (fs.existsSync(MODULES_PATH)) {
@@ -43,12 +42,13 @@ module.exports = {
   // Note: webpack-dev-server does not write the bundle to disk, instead it is
   // kept in memory for speed
   output: {
-    path: path.join(__dirname, '/public/js'),
+    path: path.join(__dirname, '/public'),
 
-    // Serve from /js
-    publicPath: '/js/',
+    // Serve from the root of public directory
+    publicPath: '/',
 
-    filename: '[name].js',
+    // By default write into js directory
+    filename: 'js/[name].js',
 
     // Output as UMD bundle (allows main JS to import with CJS, AMD or global
     // style code bundles
@@ -94,7 +94,7 @@ module.exports = {
           {
             loader: MiniCssExtractPlugin.loader,
             options: {
-              // filename is set to `../stylesheets/[name]-[hash].css` below
+              // filename is set to `stylesheets/[name]-[hash].css` downstream
               publicPath: '../'
             }
           },
@@ -114,9 +114,7 @@ module.exports = {
           {
             loader: 'less-loader',
             options: {
-              sourceMap: true,
-              paths: [path.join(__dirname, 'public', 'stylesheets')],
-              plugins: [new CleanCSSPlugin({ advanced: true })]
+              sourceMap: true
             }
           }
         ]
@@ -217,10 +215,6 @@ module.exports = {
         `frontend/js/vendor/libs/${PackageVersions.lib('underscore')}`
       )
     }),
-
-    new MiniCssExtractPlugin({
-      filename: '../stylesheets/[name]-[hash].css'
-    }),
     // Generate a manifest.json file which is used by the backend to map the
     // base filenames to the generated output filenames
     new ManifestPlugin({
@@ -270,6 +264,17 @@ module.exports = {
             return {
               from: `frontend/js/vendor/libs/${path}`,
               to: `${VENDOR_PATH}/${path}`
+            }
+          })
+        )
+        .concat(
+          [
+            // open-in-overleaf
+            'highlight-github.css'
+          ].map(path => {
+            return {
+              from: `frontend/stylesheets/vendor/${path}`,
+              to: `${VENDOR_PATH}/stylesheets/${path}`
             }
           })
         )

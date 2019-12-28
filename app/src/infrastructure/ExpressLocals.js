@@ -22,7 +22,7 @@ if (!IS_DEV_ENV) {
   // containers can't coordinate, so there no guarantee that the manifest file
   // exists when the web server boots. We therefore ignore the manifest file in
   // dev reload
-  webpackManifest = require(`../../../public/js/manifest.json`)
+  webpackManifest = require(`../../../public/manifest.json`)
 }
 
 const cdnAvailable = Settings.cdn && Settings.cdn.web && !!Settings.cdn.web.host
@@ -158,13 +158,32 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
       return Url.resolve(staticFilesBase, path)
     }
 
-    res.locals.buildJsPath = function(jsFile, opts = {}) {
+    res.locals.buildJsPath = function(jsFile) {
       let path
       if (IS_DEV_ENV) {
         // In dev: resolve path within JS asset directory
         // We are *not* guaranteed to have a manifest file when the server
         // starts up
         path = Path.join('/js', jsFile)
+      } else {
+        // In production: resolve path from webpack manifest file
+        // We are guaranteed to have a manifest file since webpack compiles in
+        // the build
+        path = webpackManifest[jsFile]
+      }
+
+      return res.locals.staticPath(path)
+    }
+
+    // Temporary hack while jQuery/Angular dependencies are *not* bundled,
+    // instead copied into output directory
+    res.locals.buildCopiedJsAssetPath = function(jsFile, opts = {}) {
+      let path
+      if (IS_DEV_ENV) {
+        // In dev: resolve path to root directory
+        // We are *not* guaranteed to have a manifest file when the server
+        // starts up
+        path = Path.join('/', jsFile)
       } else {
         // In production: resolve path from webpack manifest file
         // We are guaranteed to have a manifest file since webpack compiles in
@@ -188,32 +207,39 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
       (brandVariation != null ? brandVariation.brand_id : undefined) ===
       IEEE_BRAND_ID
 
-    const _buildCssFileName = themeModifier =>
-      `${Settings.brandPrefix}${themeModifier || ''}style.css`
-
     res.locals.getCssThemeModifier = function(userSettings, brandVariation) {
       // Themes only exist in OL v2
-      let themeModifier
       if (Settings.hasThemes != null) {
         // The IEEE theme takes precedence over the user personal setting, i.e. a user with
         // a theme setting of "light" will still get the IEE theme in IEEE branded projects.
         if (res.locals.isIEEE(brandVariation)) {
-          themeModifier = 'ieee-'
-        } else if (
-          (userSettings != null ? userSettings.overallTheme : undefined) != null
-        ) {
-          themeModifier = userSettings.overallTheme
+          return 'ieee-'
+        } else if (userSettings && userSettings.overallTheme != null) {
+          return userSettings.overallTheme
         }
       }
-      return themeModifier
     }
 
-    res.locals.buildCssPath = function(themeModifier, buildOpts) {
+    function _buildCssFileName(themeModifier) {
+      return `${Settings.brandPrefix}${themeModifier || ''}style.css`
+    }
+
+    res.locals.buildCssPath = function(themeModifier) {
       const cssFileName = _buildCssFileName(themeModifier)
-      let path = webpackManifest[cssFileName]
-      if (!path) {
+
+      let path
+      if (IS_DEV_ENV) {
+        // In dev: resolve path within CSS asset directory
+        // We are *not* guaranteed to have a manifest file when the server
+        // starts up
         path = Path.join('/stylesheets/', cssFileName)
+      } else {
+        // In production: resolve path from webpack manifest file
+        // We are guaranteed to have a manifest file since webpack compiles in
+        // the build
+        path = webpackManifest[cssFileName]
       }
+
       return res.locals.staticPath(path)
     }
 

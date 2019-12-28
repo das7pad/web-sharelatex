@@ -68,6 +68,7 @@
 !/app
 
 !/frontend/js
+!/frontend/stylesheets
 
 !/modules
 /modules/*/Makefile
@@ -82,10 +83,6 @@
 !/public/img
 !/public/recurly
 !/public/static
-
-!/public/stylesheets/
-public/stylesheets/*.css
-public/stylesheets/*.map
 
 !/migrations
 

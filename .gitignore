@@ -1,4 +1,4 @@
-Compiled source #
+# Compiled source #
 ###################
 *.com
 *.class
@@ -42,16 +42,10 @@ TpdsWorker.js
 BackgroundJobsWorker.js
 UserAndProjectPopulator.coffee
 
-public/js/*.js
-public/js/*.js.map
-public/js/manifest.json
+public/manifest.json
 
-public/stylesheets/style*.css
-public/stylesheets/sl-style*.css
-public/stylesheets/light-style*.css
-public/stylesheets/ieee-style*.css
-public/stylesheets/*.map
-
+public/js
+public/stylesheets
 public/vendor
 
 Gemfile.lock
