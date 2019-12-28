@@ -76,7 +76,6 @@ CLEAN_TEST_ACCEPTANCE_MODULES = $(addsuffix /clean_test_acceptance,$(MODULE_DIRS
 clean_test_acceptance_modules: $(CLEAN_TEST_ACCEPTANCE_MODULES)
 
 build_app:
-	WEBPACK_ENV=production npm run webpack:production
 
 format:
 	npm -q run format
@@ -104,8 +103,12 @@ build: clean_build_artifacts
 build_prod: clean_build_artifacts
 	docker run \
 		--rm \
-		--entrypoint tar \
+		--entrypoint sh \
+		--user root \
 		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-dev \
+		-c '\
+		npm run webpack:production >&2 \
+		&& tar \
 			--create \
 			--gzip \
 			app.js \
@@ -118,6 +121,7 @@ build_prod: clean_build_artifacts
 			public/manifest.json \
 			setup_env.sh \
 			test/smoke/src \
+		' \
 		> build_artifacts.tar.gz
 
 	docker build \
