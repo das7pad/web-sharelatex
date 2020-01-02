@@ -3,6 +3,11 @@ v1Api =
 	user: 'overleaf'
 	pass: 'password'
 
+httpAuthUser = "sharelatex"
+httpAuthPass = "password"
+httpAuthUsers = {}
+httpAuthUsers[httpAuthUser] = httpAuthPass
+
 module.exports =
 	mongo:
 		url: process.env['MONGO_CONNECTION_STRING'] || process.env['MONGO_URL'] || "mongodb://#{process.env['MONGO_HOST'] or '127.0.0.1'}/sharelatex_dev"
@@ -12,7 +17,12 @@ module.exports =
 
 	enabledLinkedFileTypes: 'url,project_file,project_output_file,mendeley,zotero'.split(',')
 
+	httpAuthUsers: httpAuthUsers
+
 	apis:
+		web:
+			user: httpAuthUser
+			pass: httpAuthPass
 		v1:
 			url: v1Api.url
 			user: v1Api.user
