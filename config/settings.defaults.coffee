@@ -387,7 +387,8 @@ module.exports = settings =
 	# analytics:
 	# 	ga:
 	# 		token: ""
-	#
+	# 	gaOptimize:
+	# 		id: ""
 	# ShareLaTeX's help desk is provided by tenderapp.com
 	# tenderUrl: ""
 	#

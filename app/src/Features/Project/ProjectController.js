@@ -300,8 +300,10 @@ const ProjectController = {
         if (err != null) {
           return next(err)
         }
+
+        // _buildProjectList already converts archived/trashed to booleans so isArchivedOrTrashed should not be used here
         projects = ProjectController._buildProjectList(projects, userId)
-          .filter(p => !ProjectHelper.isArchivedOrTrashed(p, userId))
+          .filter(p => !(p.archived || p.trashed))
           .filter(p => !p.isV1Project)
           .map(p => ({ _id: p.id, name: p.name, accessLevel: p.accessLevel }))
 
@@ -807,7 +809,8 @@ const ProjectController = {
                 Boolean(project.overleaf.history.display),
               brandVariation,
               allowedImageNames: Settings.allowedImageNames || [],
-              gitBridgePublicBaseUrl: Settings.gitBridgePublicBaseUrl
+              gitBridgePublicBaseUrl: Settings.gitBridgePublicBaseUrl,
+              showSupport: Features.hasFeature('support')
             }
 
             // add resource hints for the loading screen only
