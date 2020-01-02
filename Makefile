@@ -101,14 +101,16 @@ build: clean_build_artifacts
 		.
 
 build_prod: clean_build_artifacts
+	docker build \
+		--cache-from ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-dev \
+		--tag ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-webpack \
+		--target webpack \
+		.
+
 	docker run \
 		--rm \
-		--entrypoint sh \
-		--user root \
-		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-dev \
-		-c '\
-		npm run webpack:production >&2 \
-		&& tar \
+		--entrypoint tar \
+		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-webpack \
 			--create \
 			--gzip \
 			app.js \
@@ -121,7 +123,6 @@ build_prod: clean_build_artifacts
 			public/manifest.json \
 			setup_env.sh \
 			test/smoke/src \
-		' \
 		> build_artifacts.tar.gz
 
 	docker build \
@@ -144,6 +145,7 @@ clean_build:
 		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-base \
 		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-dev \
 		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-prod \
+		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-webpack \
 		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-cache \
 
 MODULE_TARGETS = \

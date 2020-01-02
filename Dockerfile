@@ -22,3 +22,7 @@ RUN /docker_cleanup.sh make build_app
 
 RUN /app/setup_env.sh
 USER node
+
+FROM dev as webpack
+USER root
+RUN /docker_cleanup.sh npm run webpack:production
