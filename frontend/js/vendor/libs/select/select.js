@@ -6,7 +6,7 @@
  */
 
 
-define(['libs/angular'], function () {
+define(['angular'], function () {
 "use strict";
 var KEY = {
     TAB: 9,

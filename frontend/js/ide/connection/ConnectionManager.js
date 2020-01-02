@@ -8,7 +8,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 
-define(['socket.io-client', 'libs/jquery'], function(io) {
+define(['socket.io-client', 'jquery'], function(io) {
   let ConnectionManager
   const ONEHOUR = 1000 * 60 * 60
 

@@ -7,7 +7,7 @@
  *
  * Generated at 2015-07-13 02:08:11 -0300
  */
-define(['libs/angular'], function() {
+define(['angular'], function() {
 'use strict';
 
 var KEYS = {

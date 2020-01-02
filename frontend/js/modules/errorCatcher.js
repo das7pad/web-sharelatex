@@ -10,7 +10,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['libs/angular'], function() {
+define(['angular'], function() {
   const app = angular.module('ErrorCatcher', [])
   const UNHANDLED_REJECTION_ERR_MSG = 'Possibly unhandled rejection: canceled'
 

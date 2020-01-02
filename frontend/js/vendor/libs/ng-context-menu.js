@@ -3,7 +3,7 @@
  *
  * @author Ian Kennington Walter (http://ianvonwalter.com)
  */
-define(['libs/angular'], function() {
+define(['angular'], function() {
 angular
   .module('ng-context-menu', [])
   .factory('ContextMenuService', function() {

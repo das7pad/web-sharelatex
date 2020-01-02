@@ -135,6 +135,43 @@ module.exports = {
         ]
       },
       {
+        // Expose jQuery and $ global variables
+        test: require.resolve('jquery'),
+        use: [
+          {
+            loader: 'expose-loader',
+            options: 'jQuery'
+          },
+          {
+            loader: 'expose-loader',
+            options: '$'
+          }
+        ]
+      },
+      {
+        // Expose angular global variable
+        test: require.resolve('angular'),
+        use: [
+          {
+            loader: 'expose-loader',
+            options: 'angular'
+          }
+        ]
+      },
+      {
+        // Expose underscore global variable
+        test: path.join(
+          __dirname,
+          `frontend/js/vendor/libs/${PackageVersions.lib('underscore')}.js`
+        ),
+        use: [
+          {
+            loader: 'expose-loader',
+            options: '_'
+          }
+        ]
+      },
+      {
         // Expose Algolia global variable
         test: path.join(
           __dirname,

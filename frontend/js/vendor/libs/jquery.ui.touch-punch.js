@@ -8,7 +8,7 @@
  *  jquery.ui.widget.js
  *  jquery.ui.mouse.js
  */
-define(['libs/jquery', 'libs/jquery-layout'], function () {
+define(['jquery', 'libs/jquery-layout'], function () {
 
   // Detect touch support
   $.support.touch = 'ontouchend' in document;

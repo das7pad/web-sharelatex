@@ -1,6 +1,6 @@
 /* --- Made by justgoscha and licensed under MIT license --- */
 
-define(['libs/angular'], function () {
+define(['angular'], function () {
 var app = angular.module('autocomplete', []);
 
 app.directive('autocomplete', function() {

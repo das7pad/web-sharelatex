@@ -15,7 +15,7 @@
 // * @license MIT
 //
 // From: https://github.com/marklagendijk/angular-recursion
-define(['libs/angular'], function() {
+define(['angular'], function() {
   angular.module('RecursionHelper', []).factory('RecursionHelper', [
     '$compile',
     function($compile) {

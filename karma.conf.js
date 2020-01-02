@@ -20,13 +20,8 @@ module.exports = function(config) {
     },
     browsers: ['ChromeCustom'],
     files: [
-      'test/frontend/bootstrap.js',
-
       // Import all tests (see comment in the file for why this is necessary)
-      'test/frontend/import_tests.js',
-
-      // Include CSS
-      'public/stylesheets/**/*.css'
+      'test/frontend/import_tests.js'
     ],
     middleware: ['fake-img'],
     preprocessors: {

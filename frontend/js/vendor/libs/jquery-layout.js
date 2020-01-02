@@ -13,7 +13,7 @@
  *
  * http://api.jqueryui.com/category/ui-core/
  */
-define(['libs/jquery'], function() {
+define(['jquery'], function() {
 
 // $.ui might exist from components with no dependencies, e.g., $.ui.position
 $.ui = $.ui || {};
