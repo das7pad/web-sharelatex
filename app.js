@@ -36,9 +36,11 @@ const host = Settings.internal.web.host || 'localhost'
 if (!module.parent) {
   // Called directly
 
-  // We want to make sure that we provided a password through the environment.
-  if (!process.env['WEB_API_USER'] || !process.env['WEB_API_PASSWORD']) {
-    throw new Error('No API user and password provided')
+  if (Settings.overleaf != null) {
+    // We want to make sure that we provided a password through the environment.
+    if (!process.env['WEB_API_USER'] || !process.env['WEB_API_PASSWORD']) {
+      throw new Error('No API user and password provided')
+    }
   }
   Server.server.listen(port, host, function() {
     logger.info(`web starting up, listening on ${host}:${port}`)
