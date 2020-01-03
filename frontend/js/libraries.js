@@ -1,5 +1,6 @@
 // eslint-disable-next-line camelcase, no-undef
-__webpack_public_path__ = `${window.staticPath}${__webpack_public_path__}`
+__webpack_public_path__ = `${window.staticPath}${__webpack_public_path__ ||
+  '/'}`
 
 define([
   'jquery',
