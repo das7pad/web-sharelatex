@@ -1,6 +1,5 @@
 /* --- Made by justgoscha and licensed under MIT license --- */
 
-define(['angular'], function () {
 var app = angular.module('autocomplete', []);
 
 app.directive('autocomplete', function() {
@@ -257,4 +256,3 @@ app.directive('suggestion', function(){
     }
   };
 });
-})

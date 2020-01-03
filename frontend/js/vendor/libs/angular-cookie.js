@@ -4,7 +4,6 @@
  *   Matjaz Lipus
  */
  //https://github.com/ivpusic/angular-cookie/blob/master/angular-cookie.js
-define(['angular'], function () {
 angular.module('ivpusic.cookie', ['ipCookie']);
 angular.module('ipCookie', ['ng']).
 factory('ipCookie', ['$document',
@@ -111,4 +110,3 @@ factory('ipCookie', ['$document',
     }());
   }
 ]);
-})
