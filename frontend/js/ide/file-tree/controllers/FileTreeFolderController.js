@@ -25,10 +25,16 @@ define(['base'], App =>
 
     $scope.toggleExpanded = function() {
       $scope.expanded = !$scope.expanded
-      return localStorage(
-        `folder.${$scope.entity.id}.expanded`,
-        $scope.expanded
-      )
+      $scope._storeCurrentStateInLocalStorage()
+    }
+
+    $scope.$on('entity-file:selected', function() {
+      $scope.expanded = true
+      $scope._storeCurrentStateInLocalStorage()
+    })
+
+    $scope._storeCurrentStateInLocalStorage = function() {
+      localStorage(`folder.${$scope.entity.id}.expanded`, $scope.expanded)
     }
 
     $scope.onDrop = function(events, ui) {
@@ -39,7 +45,19 @@ define(['base'], App =>
         entities = [$(ui.draggable).scope().entity]
       }
       for (let dropped_entity of Array.from(entities)) {
-        ide.fileTreeManager.moveEntity(dropped_entity, $scope.entity)
+        try {
+          ide.fileTreeManager.moveEntity(dropped_entity, $scope.entity)
+        } catch (err) {
+          $modal.open({
+            templateUrl: 'duplicateFileModalTemplate',
+            controller: 'DuplicateFileModalController',
+            resolve: {
+              fileName() {
+                return dropped_entity.name
+              }
+            }
+          })
+        }
       }
       $scope.$digest()
       // clear highlight explicitly
