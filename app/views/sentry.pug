@@ -1,7 +1,9 @@
 - if (sentryEnabled)
-	script(src=sentrySRC, crossorigin="anonymous")
 	script(type="text/javascript").
-		if (typeof(Sentry) != "undefined") {
-			Sentry.init(JSON.parse('!{JSON.stringify(settings.sentry.frontend)}'))
-			Sentry.setUser({id:'#{getLoggedInUserId()}'})
+		function initSentry() {
+			if (typeof Sentry !== "undefined") {
+				Sentry.init(JSON.parse('!{JSON.stringify(settings.sentry.frontend)}'))
+				Sentry.setUser({id:'#{getLoggedInUserId()}'})
+			}
 		}
+	script(async defer src=sentrySRC, crossorigin="anonymous" onload='initSentry()')
