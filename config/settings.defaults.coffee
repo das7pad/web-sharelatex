@@ -459,6 +459,12 @@ module.exports = settings =
 	# Cookie max age (in milliseconds). Set to false for a browser session.
 	cookieSessionLength: 5 * 24 * 60 * 60 * 1000 # 5 days
 
+	precompileViews: (
+		if process.env.PRECOMPILE_VIEWS != undefined
+		then process.env.PRECOMPILE_VIEWS == 'true'
+		else process.env.NODE_ENV == 'production'
+	)
+
 	# When true, only allow invites to be sent to email addresses that
 	# already have user accounts
 	restrictInvitesToExistingAccounts: false

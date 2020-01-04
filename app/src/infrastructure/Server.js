@@ -225,6 +225,8 @@ if (enableWebRouter || notDefined(enableWebRouter)) {
   if (app.get('env') === 'production') {
     logger.info('Production Enviroment')
     app.enable('view cache')
+  }
+  if (Settings.precompileViews) {
     Views.precompileViews(app)
   }
 }
