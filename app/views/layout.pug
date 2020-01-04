@@ -27,10 +27,6 @@ html(
 					link(rel="alternate", href=getTranslationUrl(subdomainDetails), hreflang=subdomainDetails.lngCode)
 
 		//- Scripts
-		block link-preload
-			link(rel="preload" as="script" href=buildJsPath('libraries.js'))
-			link(rel="preload" as="script" href=buildJsPath('main.js'))
-
 		//- Google Analytics
 		- if (typeof(gaToken) != "undefined")
 			script(type='text/javascript').
