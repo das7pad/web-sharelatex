@@ -116,5 +116,5 @@ html(
 					window.location.search += '&nocdn=true'}}
 
 		block foot-scripts
-			script(async defer src=buildJsPath('libraries.js'))
-			script(async defer src=buildJsPath('main.js'))
+			script(async defer src=buildJsPath('libraries.js'), onerror='disableCDN()')
+			script(async defer src=buildJsPath('main.js'), onerror='disableCDN()')
