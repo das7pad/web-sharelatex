@@ -14,7 +14,7 @@ define(['pdfjs-dist/build/pdf.js'], function(pdfjsBundle) {
     link.onload = () => {
       pdfjsBundle.worker = new pdfjsBundle.PDFWorker()
     }
-    document.head.append(link)
+    document.head.appendChild(link)
   }
   return pdfjsBundle
 })
