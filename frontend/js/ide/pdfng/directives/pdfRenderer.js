@@ -61,7 +61,7 @@ define(['base', '../../../pdfjsBundle'], (App, PDFJS) =>
             url: this.url,
             // lazy loaded worker
             worker: PDFJS.worker,
-            cMapUrl: `${window.staticPath}/vendor/pdfjs-dist/cmaps/`,
+            cMapUrl: `${window.staticPath}vendor/pdfjs-dist/cmaps/`,
             cMapPacked: true,
             disableFontFace,
             // Enable fetching with Range headers to restrict individual

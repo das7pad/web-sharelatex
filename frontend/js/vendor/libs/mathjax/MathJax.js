@@ -26,6 +26,6 @@ if(document.getElementById&&document.childNodes&&document.createElement){if(!(wi
 // note: changing the base url invalidates the cache of preloaded sub resources.
 //       we are required to change it here - before any dependent
 //       is loaded.
-window.MathJax.Ajax.config.root = `${window.staticPath}/vendor/mathjax`
+window.MathJax.Ajax.config.root = `${window.staticPath}vendor/mathjax`
 return window.MathJax
 })

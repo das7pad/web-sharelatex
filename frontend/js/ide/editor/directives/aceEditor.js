@@ -49,7 +49,7 @@ define([
   syntaxValidationEnabled = true
   ace.config.set(
     'basePath',
-    `${window.staticPath}/vendor/ace-builds/src-min-noconflict`
+    `${window.staticPath}vendor/ace-builds/src-min-noconflict`
   )
 
   // By default, don't use workers - enable them per-session as required

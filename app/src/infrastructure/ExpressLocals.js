@@ -76,7 +76,7 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
     if (cdnAvailable && !isSmoke && !cdnBlocked) {
       staticFilesBase = Settings.cdn.web.host
     } else {
-      staticFilesBase = ''
+      staticFilesBase = '/'
     }
 
     const resourceHints = []

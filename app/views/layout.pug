@@ -45,7 +45,7 @@ html(
 				window.ga = function() { console.log("would send to GA", arguments) };
 
 		script(type="text/javascript").
-			window.staticPath = "#{staticPath('/').slice(0, -1)}";
+			window.staticPath = "#{staticPath('/')}";
 			window.csrfToken = "#{csrfToken}";
 
 		block head-scripts
