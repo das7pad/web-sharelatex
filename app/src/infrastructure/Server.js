@@ -222,8 +222,7 @@ if (enableWebRouter || notDefined(enableWebRouter)) {
   app.use(HttpErrorController.handleError)
   app.use(ErrorController.handleError)
 
-  if (app.get('env') === 'production') {
-    logger.info('Production Enviroment')
+  if (app.get('env') === 'test') {
     app.enable('view cache')
   }
   if (Settings.precompileViews) {
