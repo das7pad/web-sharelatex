@@ -191,13 +191,8 @@ module.exports = {
         `frontend/js/vendor/libs/${PackageVersions.lib('socket.io')}/socket.io`
       ),
 
-      // Vendored dependencies in public/src/vendor/libs (e.g. angular)
+      // Shortcut to vendored dependencies in frontend/js/vendor/libs
       libs: path.join(__dirname, 'frontend/js/vendor/libs'),
-      // Use vendored moment (with correct version)
-      moment: path.join(
-        __dirname,
-        `frontend/js/vendor/libs/${PackageVersions.lib('moment')}`
-      ),
       // Enables ace/ace shortcut
       ace: 'ace-builds/src-noconflict',
       // fineupload vendored dependency (which we're aliasing to fineuploadER
@@ -263,10 +258,11 @@ module.exports = {
       writeToFileEmit: true
     }),
 
-    // Silence warning when loading moment from vendored dependencies as it
-    // attempts to load locales.js file which does not exist (but this is fine
-    // as we don't want to load the large amount of locale data from moment)
-    new webpack.IgnorePlugin(/^\.\/locale$/, /frontend\/js\/vendor\/libs/),
+    // Prevent moment from loading (very large) locale files that aren't used
+    new webpack.IgnorePlugin({
+      resourceRegExp: /^\.\/locale$/,
+      contextRegExp: /moment$/
+    }),
 
     new CopyPlugin(
       [

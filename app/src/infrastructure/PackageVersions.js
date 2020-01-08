@@ -8,7 +8,6 @@
 const version = {
   sentry: '5.7.1',
   'socket.io': '2.2.0',
-  moment: '2.9.0',
   fineuploader: '5.15.4'
 }
 
