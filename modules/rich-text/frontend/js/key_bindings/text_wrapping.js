@@ -43,7 +43,7 @@ function selectLine(cm) {
   const lastOpenMark = _.last(state.openMarks)
 
   const withinUnhandledMark =
-    lastOpenMark && !_.contains(MARKS_WITH_SPECIAL_HANDLING, lastOpenMark.kind)
+    lastOpenMark && !_.includes(MARKS_WITH_SPECIAL_HANDLING, lastOpenMark.kind)
 
   // If outside of mark or within a mark which has no special handling, select
   // the whole line which the cursor is on
@@ -70,7 +70,7 @@ function removeInnerMarks(cm, preText, selection) {
 
   // Find marks that are within the selection of the same kind and remove them
   _.filter(state.marks, mark => {
-    const isRemovableMark = _.contains(MARKS_WITH_SPECIAL_HANDLING, mark.kind)
+    const isRemovableMark = _.includes(MARKS_WITH_SPECIAL_HANDLING, mark.kind)
     const isMarkSameKindAsWrap = preText.match(mark.kind)
     const withinSelection = markEntirelyWithinSelection(mark, selection)
 
@@ -122,7 +122,7 @@ function withinNestedBoldOrItalicMark(openMarks, preText) {
 
   return Boolean(
     _.find(openMarks, mark => {
-      const isWithinBoldOrItalic = _.contains(BOLD_OR_ITALIC_MARKS, mark.kind)
+      const isWithinBoldOrItalic = _.includes(BOLD_OR_ITALIC_MARKS, mark.kind)
       if (!isWithinBoldOrItalic) return false
 
       // Determine if attempting to wrap in \textbf or \textit
@@ -180,7 +180,7 @@ function withinBoldOrItalicMarkContent(cm, preText, postText, selection) {
 
   // If not within an bold or italic mark, return false to perform normal
   // wrapping
-  if (!(mark && _.contains(BOLD_OR_ITALIC_MARKS, mark.kind))) return false
+  if (!(mark && _.includes(BOLD_OR_ITALIC_MARKS, mark.kind))) return false
   // If not attempting to wrap with bold or italics, return false to perform
   // normal wrapping
 

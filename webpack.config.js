@@ -159,11 +159,8 @@ module.exports = {
         ]
       },
       {
-        // Expose underscore global variable
-        test: path.join(
-          __dirname,
-          `frontend/js/vendor/libs/${PackageVersions.lib('underscore')}.js`
-        ),
+        // Expose lodash global variable
+        test: require.resolve('lodash'),
         use: [
           {
             loader: 'expose-loader',
@@ -244,10 +241,7 @@ module.exports = {
 
   plugins: [
     new webpack.ProvidePlugin({
-      _: path.join(
-        __dirname,
-        `frontend/js/vendor/libs/${PackageVersions.lib('underscore')}`
-      )
+      _: 'lodash'
     }),
     // Generate a manifest.json file which is used by the backend to map the
     // base filenames to the generated output filenames

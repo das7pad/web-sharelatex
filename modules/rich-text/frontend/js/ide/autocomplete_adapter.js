@@ -35,7 +35,7 @@ define([
     }
 
     getCommandCompletionsFromMetadata() {
-      return _.flatten(this.metadata.getAllPackages())
+      return _.flattenDeep(this.metadata.getAllPackages())
     }
 
     getBeginCommandArguments() {
