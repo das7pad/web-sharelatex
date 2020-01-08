@@ -89,13 +89,13 @@ pipeline {
           parallel {
             stage('Lint') {
               steps {
-                sh 'docker run --rm $IMAGE_CI make lint'
+                sh 'make lint'
               }
             }
 
             stage('Prettier') {
               steps {
-                sh 'docker run --rm $IMAGE_CI make format'
+                sh 'make format'
               }
             }
           }
