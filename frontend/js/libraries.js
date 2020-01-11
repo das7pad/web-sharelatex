@@ -9,7 +9,6 @@ define([
   'libs/angular-autocomplete/angular-autocomplete',
   'libs/ui-bootstrap',
   'libs/ng-context-menu',
-  'libs/algolia',
   'libs/angular-cookie',
   'libs/passfield',
   'libs/ng-tags-input',

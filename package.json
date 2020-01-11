@@ -101,6 +101,7 @@
     "ace-builds": "https://github.com/das7pad/ace-builds/archive/v1.4.5-20191029.tar.gz",
     "acorn": "^6.1.0",
     "acorn-walk": "^6.1.1",
+    "algoliasearch": "^3.35.1",
     "angular": "~1.6.10",
     "angular-mocks": "~1.6.10",
     "angular-sanitize": "~1.6.10",
