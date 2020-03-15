@@ -2,7 +2,7 @@
 # Instead run bin/update_build_scripts from
 # https://github.com/das7pad/sharelatex-dev-env
 
-FROM node:12.15.0
+FROM node:12.16.1
 
 RUN curl -sS https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
 
