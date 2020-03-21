@@ -33,6 +33,10 @@ define([
         openDoc: sinon.stub(),
         enable: sinon.stub(),
         getCodeMirror: sinon.stub().returns({
+          lineCount: sinon.stub().returns(1),
+          getViewport: sinon.stub().returns({ from: 0, to: 1 }),
+          getLine: sinon.stub().returns('some text'),
+          getSelection: sinon.stub().returns('some text'),
           getValue: sinon.stub().returns('some text'),
           on: sinon.stub(),
           off: sinon.stub(),
@@ -155,6 +159,10 @@ define([
     return _.extend(
       EventEmitter.prototype,
       {
+        lineCount: sinon.stub().returns(1),
+        getViewport: sinon.stub().returns({ from: 0, to: 1 }),
+        getLine: sinon.stub().returns('some text'),
+        getSelection: sinon.stub().returns('some text'),
         getValue: sinon.stub().returns('some text'),
         getWrapperElement: sinon.stub().returns({ off: sinon.stub() }),
         refresh: sinon.stub(),

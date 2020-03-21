@@ -27,6 +27,27 @@ define([], function() {
         .split('\n')
     }
 
+    getLineCount() {
+      return this.editor.getCodeMirror().lineCount()
+    }
+
+    getFirstVisibleRowNum() {
+      return this.editor.getCodeMirror().getViewport().from
+    }
+
+    getLastVisibleRowNum() {
+      return this.editor.getCodeMirror().getViewport().to
+    }
+
+    getLinesByRows(rows) {
+      const doc = this.editor.getCodeMirror()
+      return rows.map(rowIdx => doc.getLine(rowIdx))
+    }
+
+    getSelectionContents() {
+      return this.editor.getCodeMirror().getSelection()
+    }
+
     normalizeChangeEvent(e) {
       return {
         start: { row: e.from.line },
