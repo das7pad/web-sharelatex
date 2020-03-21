@@ -23,3 +23,6 @@ process.on('unhandledRejection', err => {
 afterEach(function() {
   sinon.restore()
 })
+
+// used by -> app/src/infrastructure/Mongoose.js
+process.env.OL_MOCHA_UNIT_TEST_ARE_RUNNING = 'true'

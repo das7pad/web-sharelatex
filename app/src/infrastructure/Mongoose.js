@@ -4,10 +4,8 @@ const logger = require('logger-sharelatex')
 
 const POOL_SIZE = Settings.mongo.poolSize
 
-if (
-  typeof global.beforeEach === 'function' &&
-  process.argv.join(' ').match(/unit/)
-) {
+if (process.env.OL_MOCHA_UNIT_TEST_ARE_RUNNING) {
+  // set by -> test/unit/bootstrap.js
   throw new Error(
     'It looks like unit tests are running, but you are connecting to Mongo. Missing a stub?'
   )
