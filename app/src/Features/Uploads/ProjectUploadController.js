@@ -120,7 +120,7 @@ module.exports = ProjectUploadController = {
               error: req.i18n.translate('project_has_too_many_files')
             })
           } else {
-            return res.send({ success: false })
+            return res.json({ success: false })
           }
         } else {
           return res.json({

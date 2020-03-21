@@ -255,10 +255,12 @@ describe('ProjectUploadController', function() {
       })
 
       it('should return an unsuccessful response to the FileUploader client', function() {
-        return expect(this.res.body).to.deep.equal({
-          success: false,
-          error: 'project_has_too_many_files'
-        })
+        return expect(this.res.body).to.equal(
+          JSON.stringify({
+            success: false,
+            error: 'project_has_too_many_files'
+          })
+        )
       })
     })
 
