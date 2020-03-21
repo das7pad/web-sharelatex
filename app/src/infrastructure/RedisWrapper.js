@@ -1,10 +1,8 @@
 const Settings = require('settings-sharelatex')
 const redis = require('redis-sharelatex')
 
-if (
-  typeof global.beforeEach === 'function' &&
-  process.argv.join(' ').match(/unit/)
-) {
+if (process.env.OL_MOCHA_UNIT_TEST_ARE_RUNNING) {
+  // set by -> test/unit/bootstrap.js
   throw new Error(
     'It looks like unit tests are running, but you are connecting to Redis. Missing a stub?'
   )
