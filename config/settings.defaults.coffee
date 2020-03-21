@@ -451,6 +451,11 @@ module.exports = settings =
 	# cookie with a secure flag (recommended).
 	secureCookie: false
 
+	# 'SameSite' cookie setting. Can be set to 'lax', 'none' or 'strict'
+	# 'lax' is recommended, as 'strict' will prevent people linking to projects
+	# https://tools.ietf.org/html/draft-ietf-httpbis-rfc6265bis-03#section-4.1.2.7
+	sameSiteCookie: 'lax'
+
 	# If you are running ShareLaTeX behind a proxy (like Apache, Nginx, etc)
 	# then set this to true to allow it to correctly detect the forwarded IP
 	# address and http/https protocol information.
@@ -490,6 +495,17 @@ module.exports = settings =
 
 	# Maximum size of text documents in the real-time editing system.
 	max_doc_length: 2 * 1024 * 1024 # 2mb
+
+	# Maximum JSON size in HTTP requests
+  # We should be able to process twice the max doc length, to allow for
+  #   - the doc content
+  #   - text ranges spanning the whole doc
+	#
+  # There's also overhead required for the JSON encoding and the UTF-8 encoding,
+	# theoretically up to 3 times the max doc length. On the other hand, we don't
+	# want to block the event loop with JSON parsing, so we try to find a
+	# practical compromise.
+	max_json_request_size: parseInt(process.env["MAX_JSON_REQUEST_SIZE"]) || 6 * 1024 * 1024  # 6 MB
 
 	# Internal configs
 	# ----------------
@@ -550,10 +566,10 @@ module.exports = settings =
 		# Example:
 		#   header_extras: [{text: "Some Page", url: "http://example.com/some/page", class: "subdued"}]
 
-#	recaptcha:
-#		disabled:
-#			invite: true
-#			register: true
+	recaptcha:
+		disabled:
+			invite: true
+			register: true
 
 	editorThemes: [
 		'ambiance',

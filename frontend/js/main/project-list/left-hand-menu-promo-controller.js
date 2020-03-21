@@ -1,10 +1,19 @@
 define(['base'], App =>
   App.controller('LeftHandMenuPromoController', function(
     $scope,
-    UserAffiliationsDataService
+    UserAffiliationsDataService,
+    eventTracking
   ) {
     $scope.hasProjects = window.data.projects.length > 0
     $scope.userHasNoSubscription = window.userHasNoSubscription
+
+    $scope.upgradeSubscription = function() {
+      eventTracking.send('subscription-funnel', 'project-page', 'upgrade')
+    }
+
+    $scope.share = function() {
+      eventTracking.send('subscription-funnel', 'project-page', 'sharing')
+    }
 
     const _userHasNoAffiliation = function() {
       $scope.userEmails = []
@@ -15,7 +24,7 @@ define(['base'], App =>
           .filter(email => email.affiliation)
           .map(email => email.affiliation)
         $scope.userOnPayingUniversity = $scope.userAffiliations.some(
-          affiliation => affiliation.institution.licence !== 'free'
+          affiliation => affiliation.licence && affiliation.licence !== 'free'
         )
       })
     }

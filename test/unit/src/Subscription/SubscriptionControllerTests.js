@@ -76,7 +76,7 @@ describe('SubscriptionController', function() {
 
     this.SubscriptionViewModelBuilder = {
       buildUsersSubscriptionViewModel: sinon.stub().callsArgWith(1, null, {}),
-      buildViewModel: sinon.stub()
+      buildPlansList: sinon.stub()
     }
     this.settings = {
       coupon_codes: {
@@ -115,7 +115,9 @@ describe('SubscriptionController', function() {
         },
         'settings-sharelatex': this.settings,
         '../User/UserGetter': this.UserGetter,
-        './RecurlyWrapper': (this.RecurlyWrapper = {}),
+        './RecurlyWrapper': (this.RecurlyWrapper = {
+          updateAccountEmailAddress: sinon.stub().yields()
+        }),
         './FeaturesUpdater': (this.FeaturesUpdater = {}),
         './GroupPlansData': (this.GroupPlansData = {}),
         './V1SubscriptionManager': (this.V1SubscriptionManager = {}),
@@ -339,7 +341,7 @@ describe('SubscriptionController', function() {
           })
         }
       )
-      this.SubscriptionViewModelBuilder.buildViewModel.returns(
+      this.SubscriptionViewModelBuilder.buildPlansList.returns(
         (this.plans = { plans: 'mock' })
       )
       this.LimitationsManager.userHasV1OrV2Subscription.callsArgWith(
@@ -417,6 +419,18 @@ describe('SubscriptionController', function() {
   })
 
   describe('createSubscription with errors', function() {
+    it('should handle users with subscription', function(done) {
+      this.LimitationsManager.userHasV1OrV2Subscription.yields(null, true)
+      this.SubscriptionController.createSubscription(this.req, {
+        sendStatus: status => {
+          expect(status).to.equal(409)
+          this.SubscriptionHandler.createSubscription.called.should.equal(false)
+
+          done()
+        }
+      })
+    })
+
     it('should handle 3DSecure errors', function(done) {
       this.next = sinon.stub()
       this.LimitationsManager.userHasV1OrV2Subscription.yields(null, false)
@@ -474,6 +488,28 @@ describe('SubscriptionController', function() {
     it('should redurect to the subscription page', function(done) {
       this.res.redirect.calledWith('/user/subscription').should.equal(true)
       return done()
+    })
+  })
+
+  describe('updateAccountEmailAddress via put', function() {
+    beforeEach(function(done) {
+      this.res = {
+        sendStatus() {
+          return done()
+        }
+      }
+      sinon.spy(this.res, 'sendStatus')
+      this.SubscriptionController.updateAccountEmailAddress(this.req, this.res)
+    })
+
+    it('should send the user and subscriptionId to RecurlyWrapper', function() {
+      this.RecurlyWrapper.updateAccountEmailAddress
+        .calledWith(this.user._id, this.user.email)
+        .should.equal(true)
+    })
+
+    it('shouldrespond with 200', function() {
+      this.res.sendStatus.calledWith(200).should.equal(true)
     })
   })
 

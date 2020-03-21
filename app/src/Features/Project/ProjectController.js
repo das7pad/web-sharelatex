@@ -33,7 +33,6 @@ const BrandVariationsHandler = require('../BrandVariations/BrandVariationsHandle
 const { getUserAffiliations } = require('../Institutions/InstitutionsAPI')
 const V1Handler = require('../V1/V1Handler')
 const UserController = require('../User/UserController')
-const SystemMessageManager = require('../SystemMessages/SystemMessageManager')
 
 const _ssoAvailable = (affiliation, session, linkedInstitutionIds) => {
   if (!affiliation.institution) return false
@@ -135,7 +134,6 @@ const ProjectController = {
 
   deleteProject(req, res) {
     const projectId = req.params.Project_id
-    const forever = (req.query != null ? req.query.forever : undefined) != null
     const user = AuthenticationController.getSessionUser(req)
     const cb = err => {
       if (err != null) {
@@ -144,16 +142,11 @@ const ProjectController = {
         res.sendStatus(200)
       }
     }
-
-    if (forever) {
-      ProjectDeleter.deleteProject(
-        projectId,
-        { deleterUser: user, ipAddress: req.ip },
-        cb
-      )
-    } else {
-      ProjectDeleter.legacyArchiveProject(projectId, cb)
-    }
+    ProjectDeleter.deleteProject(
+      projectId,
+      { deleterUser: user, ipAddress: req.ip },
+      cb
+    )
   },
 
   archiveProject(req, res, next) {
@@ -359,11 +352,9 @@ const ProjectController = {
     const userId = AuthenticationController.getLoggedInUserId(req)
     const currentUser = AuthenticationController.getSessionUser(req)
     let noV1Connection = false
+    let institutionLinkingError
     async.parallel(
       {
-        systemMessages(cb) {
-          SystemMessageManager.getMessages(cb)
-        },
         tags(cb) {
           TagsHandler.getAllTags(userId, cb)
         },
@@ -523,6 +514,16 @@ const ProjectController = {
                 templateKey: 'notification_institution_sso_linked_by_another'
               })
             }
+
+            // Notification: When there is a session error
+            if (samlSession.error) {
+              institutionLinkingError = samlSession.error
+              notificationsInstitution.push({
+                message: samlSession.error.message,
+                templateKey: 'notification_institution_sso_error',
+                tryAgain: samlSession.error.tryAgain
+              })
+            }
           }
           delete req.session.saml
         }
@@ -551,7 +552,6 @@ const ProjectController = {
           const viewModel = {
             title: 'your_projects',
             priority_title: true,
-            systemMessages: results.systemMessages,
             projects,
             tags,
             notifications: notifications || [],
@@ -560,7 +560,10 @@ const ProjectController = {
             user,
             userAffiliations,
             hasSubscription: results.hasSubscription,
-            isShowingV1Projects: results.v1Projects != null,
+            institutionLinkingError,
+            isShowingV1Projects:
+              results.v1Projects != null &&
+              results.v1Projects.projects.length > 0,
             warnings,
             zipFileSizeLimit: Settings.maxUploadSize
           }
@@ -743,12 +746,15 @@ const ProjectController = {
         const { subscription } = results
         const { brandVariation } = results
 
-        const token = TokenAccessHandler.getRequestToken(req, projectId)
+        const anonRequestToken = TokenAccessHandler.getRequestToken(
+          req,
+          projectId
+        )
         const { isTokenMember } = results
         AuthorizationManager.getPrivilegeLevelForProject(
           userId,
           projectId,
-          token,
+          anonRequestToken,
           (error, privilegeLevel) => {
             let allowedFreeTrial
             if (error != null) {
@@ -811,7 +817,7 @@ const ProjectController = {
               privilegeLevel,
               chatUrl: Settings.apis.chat.url,
               anonymous,
-              anonymousAccessToken: req._anonymousAccessToken,
+              anonymousAccessToken: anonymous ? anonRequestToken : null,
               isTokenMember,
               isRestrictedTokenMember: AuthorizationManager.isRestrictedUser(
                 userId,
@@ -957,7 +963,6 @@ const ProjectController = {
       archived,
       trashed,
       owner_ref: project.owner_ref,
-      tokens: project.tokens,
       isV1Project: false
     }
     if (accessLevel === PrivilegeLevels.READ_ONLY && source === Sources.TOKEN) {

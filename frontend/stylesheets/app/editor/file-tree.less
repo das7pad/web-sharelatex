@@ -81,6 +81,8 @@
     margin: 0;
     overflow-x: hidden;
     height: 100%;
+    position: relative;
+    overflow-y: auto;
 
     ul {
       margin-left: (@line-height-computed / 2);
@@ -335,4 +337,14 @@
 
 .modal-new-file--body-upload {
   padding-top: 20px;
+}
+
+.modal-footer {
+  .approaching-file-limit {
+    font-weight: bold;
+  }
+
+  .at-file-limit {
+    text-align: left;
+  }
 }

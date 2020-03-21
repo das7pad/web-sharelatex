@@ -2,18 +2,22 @@ doctype html
 html.full-height(itemscope, itemtype='http://schema.org/Product')
 	head
 		title Something went wrong
-		link(rel="icon", href=staticPath("/" + (settings.brandPrefix || '') + "favicon.ico"))
+		if staticPath
+			link(rel="icon", href=staticPath("/" + (settings.brandPrefix || '') + "favicon.ico"))
 		if buildCssPath
 			link(rel="stylesheet", href=buildCssPath(null, { hashedPath: true }))
-		else
-			link(href=staticPath("/font/font-awesome.css"), rel="stylesheet")
+
 	body.full-height
 		.content.content-alt.full-height
 			.container.full-height
 				.error-container.full-height
 					.error-figure.error-figure-500
+						if buildImgPath
+							- var img = buildImgPath("brand/500-visual-socket.svg")
+						else
+							- var img = "/img/brand/500-visual-socket.svg"
 						img.error-img(
-							src=buildImgPath("brand/500-visual-socket.svg")
+							src=img
 							alt="Error"
 						)
 					.error-details

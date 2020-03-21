@@ -42,7 +42,6 @@ const BetaProgramController = require('./Features/BetaProgram/BetaProgramControl
 const SudoModeController = require('./Features/SudoMode/SudoModeController')
 const SudoModeMiddleware = require('./Features/SudoMode/SudoModeMiddleware')
 const AnalyticsRouter = require('./Features/Analytics/AnalyticsRouter')
-const AnnouncementsController = require('./Features/Announcements/AnnouncementsController')
 const MetaController = require('./Features/Metadata/MetaController')
 const TokenAccessController = require('./Features/TokenAccess/TokenAccessController')
 const Features = require('./infrastructure/Features')
@@ -50,6 +49,7 @@ const LinkedFilesRouter = require('./Features/LinkedFiles/LinkedFilesRouter')
 const TemplatesRouter = require('./Features/Templates/TemplatesRouter')
 const InstitutionsController = require('./Features/Institutions/InstitutionsController')
 const UserMembershipRouter = require('./Features/UserMembership/UserMembershipRouter')
+const SystemMessageController = require('./Features/SystemMessages/SystemMessageController')
 
 const logger = require('logger-sharelatex')
 const _ = require('underscore')
@@ -110,6 +110,12 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
   AuthenticationController.addEndpointToLoginWhitelist('/user/activate')
 
   webRouter.get(
+    '/system/messages',
+    AuthenticationController.requireLogin(),
+    SystemMessageController.getMessages
+  )
+
+  webRouter.get(
     '/user/settings',
     AuthenticationController.requireLogin(),
     SudoModeMiddleware.protectPage,
@@ -133,6 +139,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
   webRouter.get(
     '/user/emails',
     AuthenticationController.requireLogin(),
+    UserController.promises.ensureAffiliationMiddleware,
     UserEmailsController.list
   )
   webRouter.get('/user/emails/confirm', UserEmailsController.showConfirm)
@@ -688,12 +695,6 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     NotificationsController.markNotificationAsRead
   )
 
-  webRouter.get(
-    '/announcements',
-    AuthenticationController.requireLogin(),
-    AnnouncementsController.getUndreadAnnouncements
-  )
-
   // Deprecated in favour of /internal/project/:project_id but still used by versioning
   privateApiRouter.get(
     '/project/:project_id/details',
@@ -969,7 +970,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
   AuthenticationController.addEndpointToLoginWhitelist('/dev/csrf')
 
   publicApiRouter.get('/health_check', HealthCheckController.check)
-  privateApiRouter.get('/health_check', HealthCheckController.check)
+  privateApiRouter.get('/health_check', HealthCheckController.checkApi)
 
   publicApiRouter.get('/health_check/redis', HealthCheckController.checkRedis)
   privateApiRouter.get('/health_check/redis', HealthCheckController.checkRedis)
@@ -1045,23 +1046,43 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
   })
 
   webRouter.get(
-    '/read/:read_only_token([a-z]+)',
+    `/read/:token(${TokenAccessController.READ_ONLY_TOKEN_PATTERN})`,
     RateLimiterMiddleware.rateLimit({
       endpointName: 'read-only-token',
       maxRequests: 15,
       timeInterval: 60
     }),
-    TokenAccessController.readOnlyToken
+    TokenAccessController.tokenAccessPage
   )
 
   webRouter.get(
-    '/:read_and_write_token([0-9]+[a-z]+)',
+    `/:token(${TokenAccessController.READ_AND_WRITE_TOKEN_PATTERN})`,
     RateLimiterMiddleware.rateLimit({
       endpointName: 'read-and-write-token',
       maxRequests: 15,
       timeInterval: 60
     }),
-    TokenAccessController.readAndWriteToken
+    TokenAccessController.tokenAccessPage
+  )
+
+  webRouter.post(
+    `/:token(${TokenAccessController.READ_AND_WRITE_TOKEN_PATTERN})/grant`,
+    RateLimiterMiddleware.rateLimit({
+      endpointName: 'grant-token-access-read-write',
+      maxRequests: 10,
+      timeInterval: 60
+    }),
+    TokenAccessController.grantTokenAccessReadAndWrite
+  )
+
+  webRouter.post(
+    `/read/:token(${TokenAccessController.READ_ONLY_TOKEN_PATTERN})/grant`,
+    RateLimiterMiddleware.rateLimit({
+      endpointName: 'grant-token-access-read-only',
+      maxRequests: 10,
+      timeInterval: 60
+    }),
+    TokenAccessController.grantTokenAccessReadOnly
   )
 
   webRouter.get('*', ErrorController.notFound)

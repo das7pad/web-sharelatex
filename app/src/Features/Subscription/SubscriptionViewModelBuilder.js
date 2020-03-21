@@ -113,8 +113,8 @@ module.exports = {
         managedGroupSubscriptions(cb) {
           return SubscriptionLocator.getManagedGroupSubscriptions(user, cb)
         },
-        confirmedMemberInstitutions(cb) {
-          return InstitutionsGetter.getConfirmedInstitutions(user._id, cb)
+        confirmedMemberAffiliations(cb) {
+          return InstitutionsGetter.getConfirmedAffiliations(user._id, cb)
         },
         managedInstitutions(cb) {
           return InstitutionsGetter.getManagedInstitutions(user._id, cb)
@@ -142,7 +142,7 @@ module.exports = {
           personalSubscription,
           memberGroupSubscriptions,
           managedGroupSubscriptions,
-          confirmedMemberInstitutions,
+          confirmedMemberAffiliations,
           managedInstitutions,
           managedPublishers,
           v1SubscriptionStatus,
@@ -156,8 +156,8 @@ module.exports = {
         if (managedGroupSubscriptions == null) {
           managedGroupSubscriptions = []
         }
-        if (confirmedMemberInstitutions == null) {
-          confirmedMemberInstitutions = []
+        if (confirmedMemberAffiliations == null) {
+          confirmedMemberAffiliations = []
         }
         if (managedInstitutions == null) {
           managedInstitutions = []
@@ -223,7 +223,8 @@ module.exports = {
                 : undefined
             ),
             trial_ends_at: recurlySubscription.trial_ends_at,
-            activeCoupons: recurlyCoupons
+            activeCoupons: recurlyCoupons,
+            account: recurlySubscription.account
           }
         }
 
@@ -241,7 +242,7 @@ module.exports = {
           personalSubscription,
           managedGroupSubscriptions,
           memberGroupSubscriptions,
-          confirmedMemberInstitutions,
+          confirmedMemberAffiliations,
           managedInstitutions,
           managedPublishers,
           v1SubscriptionStatus
@@ -250,7 +251,7 @@ module.exports = {
     )
   },
 
-  buildViewModel() {
+  buildPlansList() {
     const { plans } = Settings
 
     const allPlans = {}
@@ -278,6 +279,7 @@ module.exports = {
       plan =>
         !plan.groupPlan &&
         !plan.annual &&
+        plan.planCode !== 'personal' && // Prevent the personal plan from appearing on the change-plans page
         plan.planCode.indexOf('student') === -1
     )
 

@@ -1,9 +1,30 @@
 const logger = require('logger-sharelatex')
 const util = require('util')
 const { User } = require('../../models/User')
-const { addAffiliation } = require('../Institutions/InstitutionsAPI')
+const Features = require('../../infrastructure/Features')
+const UserUpdater = require('./UserUpdater')
+const UserGetter = require('./UserGetter')
 
-async function createNewUser(attributes, options = {}) {
+async function _addAffiliation(user) {
+  try {
+    await UserUpdater.promises.addAffiliationForNewUser(user._id, user.email)
+  } catch (error) {
+    // do not pass error back during registration
+    // errors are logged in UserUpdater and InstitutionsAPI
+  }
+
+  try {
+    user = await UserGetter.promises.getUser(user._id)
+  } catch (error) {
+    logger.error(
+      { userId: user._id, email: user.email },
+      'could not get fresh user data'
+    )
+  }
+  return user
+}
+
+async function createNewUser(attributes) {
   let user = new User()
 
   if (attributes.first_name == null || attributes.first_name === '') {
@@ -28,6 +49,9 @@ async function createNewUser(attributes, options = {}) {
     createdAt: new Date(),
     reversedHostname
   }
+  if (Features.hasFeature('affiliations')) {
+    emailData.affiliationUnchecked = true
+  }
   if (
     attributes.samlIdentifiers &&
     attributes.samlIdentifiers[0] &&
@@ -40,16 +64,8 @@ async function createNewUser(attributes, options = {}) {
 
   user = await user.save()
 
-  if (!options.skip_affiliation) {
-    // There is no guarantee this will complete so we must not rely on it
-    addAffiliation(user._id, user.email, err => {
-      if (err) {
-        logger.error(
-          { userId: user._id, email: user.email },
-          "couldn't add affiliation for user on create"
-        )
-      }
-    })
+  if (Features.hasFeature('affiliations')) {
+    user = await _addAffiliation(user)
   }
 
   return user

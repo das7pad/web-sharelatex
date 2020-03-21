@@ -44,6 +44,7 @@ UserAndProjectPopulator.coffee
 
 public/manifest.json
 
+public/fonts
 public/js
 public/stylesheets
 public/vendor

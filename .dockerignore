@@ -67,6 +67,7 @@
 !/app.js
 !/app
 
+!/frontend/fonts
 !/frontend/js
 !/frontend/stylesheets
 
@@ -79,7 +80,6 @@
 !/public/*.txt
 
 !/public/brand
-!/public/font
 !/public/img
 !/public/recurly
 !/public/static

@@ -57,7 +57,7 @@ module.exports = ProjectUploadController = {
         timer.done()
         if (error != null) {
           logger.error(
-            { err: error, file_path: path, file_name: name },
+            { err: error, filePath: path, fileName: name },
             'error uploading project'
           )
           if (error instanceof InvalidZipFileError) {
@@ -86,7 +86,7 @@ module.exports = ProjectUploadController = {
     const { folder_id } = req.query
     if (name == null || name.length === 0 || name.length > 150) {
       logger.err(
-        { project_id, originalName: name },
+        { projectId: project_id, fileName: name },
         'bad name when trying to upload file'
       )
       return res.json({ success: false })
@@ -107,14 +107,21 @@ module.exports = ProjectUploadController = {
           logger.error(
             {
               err: error,
-              project_id,
-              file_path: path,
-              file_name: name,
-              folder_id
+              projectId: project_id,
+              filePath: path,
+              fileName: name,
+              folderId: folder_id
             },
             'error uploading file'
           )
-          return res.json({ success: false })
+          if (error.message === 'project_has_too_many_files') {
+            return res.json({
+              success: false,
+              error: req.i18n.translate('project_has_too_many_files')
+            })
+          } else {
+            return res.send({ success: false })
+          }
         } else {
           return res.json({
             success: true,

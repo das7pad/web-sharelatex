@@ -1,6 +1,6 @@
 const mockModel = require('../MockModel')
 
 module.exports = mockModel('Folder', {
-  './File': require('./File'),
-  './Doc': require('./Doc')
+  './Doc': require('./Doc'),
+  './File': require('./File')
 })

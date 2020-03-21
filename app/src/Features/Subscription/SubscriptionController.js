@@ -35,7 +35,7 @@ const HttpErrors = require('@overleaf/o-error/http')
 
 module.exports = SubscriptionController = {
   plansPage(req, res, next) {
-    const plans = SubscriptionViewModelBuilder.buildViewModel()
+    const plans = SubscriptionViewModelBuilder.buildPlansList()
     let viewName = 'subscriptions/plans'
     if (req.query.v != null) {
       viewName = `${viewName}_${req.query.v}`
@@ -154,7 +154,7 @@ module.exports = SubscriptionController = {
           personalSubscription,
           memberGroupSubscriptions,
           managedGroupSubscriptions,
-          confirmedMemberInstitutions,
+          confirmedMemberAffiliations,
           managedInstitutions,
           managedPublishers,
           v1SubscriptionStatus
@@ -167,7 +167,7 @@ module.exports = SubscriptionController = {
             return next(error)
           }
           const fromPlansPage = req.query.hasSubscription
-          const plans = SubscriptionViewModelBuilder.buildViewModel()
+          const plans = SubscriptionViewModelBuilder.buildPlansList()
           const data = {
             title: 'your_subscription',
             plans,
@@ -177,7 +177,7 @@ module.exports = SubscriptionController = {
             personalSubscription,
             memberGroupSubscriptions,
             managedGroupSubscriptions,
-            confirmedMemberInstitutions,
+            confirmedMemberAffiliations,
             managedInstitutions,
             managedPublishers,
             v1SubscriptionStatus
@@ -206,7 +206,7 @@ module.exports = SubscriptionController = {
       }
       if (hasSubscription) {
         logger.warn({ user_id: user._id }, 'user already has subscription')
-        res.sendStatus(409) // conflict
+        return res.sendStatus(409) // conflict
       }
       return SubscriptionHandler.createSubscription(
         user,
@@ -324,6 +324,18 @@ module.exports = SubscriptionController = {
         return res.redirect('/user/subscription')
       }
     )
+  },
+
+  updateAccountEmailAddress(req, res, next) {
+    const user = AuthenticationController.getSessionUser(req)
+    RecurlyWrapper.updateAccountEmailAddress(user._id, user.email, function(
+      error
+    ) {
+      if (error) {
+        return next(new HttpErrors.InternalServerError({}).withCause(error))
+      }
+      res.sendStatus(200)
+    })
   },
 
   reactivateSubscription(req, res, next) {

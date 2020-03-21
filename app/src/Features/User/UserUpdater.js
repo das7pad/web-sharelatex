@@ -10,12 +10,36 @@ const {
   addAffiliation,
   removeAffiliation
 } = require('../Institutions/InstitutionsAPI')
+const Features = require('../../infrastructure/Features')
 const FeaturesUpdater = require('../Subscription/FeaturesUpdater')
 const EmailHelper = require('../Helpers/EmailHelper')
 const Errors = require('../Errors/Errors')
 const NewsletterManager = require('../Newsletter/NewsletterManager')
+const RecurlyWrapper = require('../Subscription/RecurlyWrapper')
 
 const UserUpdater = {
+  addAffiliationForNewUser(userId, email, callback) {
+    addAffiliation(userId, email, error => {
+      if (error) {
+        return callback(error)
+      }
+      UserUpdater.updateUser(
+        { _id: userId, 'emails.email': email },
+        { $unset: { 'emails.$.affiliationUnchecked': 1 } },
+        (error, updated) => {
+          if (error || (updated && updated.nModified === 0)) {
+            logger.error(
+              { userId, email },
+              'could not remove affiliationUnchecked flag for user on create'
+            )
+            return callback(error)
+          }
+          return callback(error, updated)
+        }
+      )
+    })
+  },
+
   updateUser(query, update, callback) {
     if (callback == null) {
       callback = () => {}
@@ -180,6 +204,9 @@ const UserUpdater = {
             )
           }
         })
+        RecurlyWrapper.updateAccountEmailAddress(user._id, email, _error => {
+          // errors are ignored
+        })
         callback()
       })
     })
@@ -211,6 +238,11 @@ const UserUpdater = {
       const update = {
         $set: {
           'emails.$.confirmedAt': confirmedAt
+        }
+      }
+      if (Features.hasFeature('affiliations')) {
+        update['$unset'] = {
+          'emails.$.affiliationUnchecked': 1
         }
       }
       UserUpdater.updateUser(query, update, (error, res) => {
@@ -249,6 +281,7 @@ const UserUpdater = {
 )
 
 const promises = {
+  addAffiliationForNewUser: promisify(UserUpdater.addAffiliationForNewUser),
   addEmailAddress: promisify(UserUpdater.addEmailAddress),
   confirmEmail: promisify(UserUpdater.confirmEmail),
   updateUser: promisify(UserUpdater.updateUser)

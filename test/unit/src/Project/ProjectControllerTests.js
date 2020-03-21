@@ -41,7 +41,6 @@ describe('ProjectController', function() {
     }
     this.token = 'some-token'
     this.ProjectDeleter = {
-      legacyArchiveProject: sinon.stub().callsArg(1),
       deleteProject: sinon.stub().callsArg(2),
       restoreProject: sinon.stub().callsArg(1),
       findArchivedProjects: sinon.stub()
@@ -88,7 +87,6 @@ describe('ProjectController', function() {
     this.UserController = {
       logout: sinon.stub()
     }
-    this.AnalyticsManager = { getLastOccurrence: sinon.stub() }
     this.TokenAccessHandler = {
       getRequestToken: sinon.stub().returns(this.token),
       protectTokens: sinon.stub()
@@ -133,10 +131,6 @@ describe('ProjectController', function() {
       }
     ])
 
-    this.SystemMessageManager = {
-      getMessages: sinon.stub().callsArgWith(0, null, [])
-    }
-
     this.ProjectController = SandboxedModule.require(MODULE_PATH, {
       globals: {
         console: console
@@ -154,7 +148,6 @@ describe('ProjectController', function() {
           inc() {}
         },
         '@overleaf/o-error/http': HttpErrors,
-        '../SystemMessages/SystemMessageManager': this.SystemMessageManager,
         './ProjectDeleter': this.ProjectDeleter,
         './ProjectDuplicator': this.ProjectDuplicator,
         './ProjectCreationHandler': this.ProjectCreationHandler,
@@ -175,7 +168,6 @@ describe('ProjectController', function() {
         './ProjectDetailsHandler': this.ProjectDetailsHandler,
         '../Authentication/AuthenticationController': this
           .AuthenticationController,
-        '../Analytics/AnalyticsManager': this.AnalyticsManager,
         '../TokenAccess/TokenAccessHandler': this.TokenAccessHandler,
         '../Collaborators/CollaboratorsGetter': this.CollaboratorsGetter,
         '../../infrastructure/Modules': this.Modules,
@@ -318,19 +310,7 @@ describe('ProjectController', function() {
   })
 
   describe('deleteProject', function() {
-    it('should tell the project deleter to archive when forever=false', function(done) {
-      this.res.sendStatus = code => {
-        this.ProjectDeleter.legacyArchiveProject
-          .calledWith(this.project_id)
-          .should.equal(true)
-        code.should.equal(200)
-        done()
-      }
-      this.ProjectController.deleteProject(this.req, this.res)
-    })
-
-    it('should tell the project deleter to delete when forever=true', function(done) {
-      this.req.query = { forever: 'true' }
+    it('should call the project deleter', function(done) {
       this.res.sendStatus = code => {
         this.ProjectDeleter.deleteProject
           .calledWith(this.project_id, {
@@ -403,14 +383,6 @@ describe('ProjectController', function() {
 
   describe('projectListPage', function() {
     beforeEach(function() {
-      this.systemMessages = [
-        { _id: '42', content: 'Hello from the other side!' },
-        { _id: '1337', content: 'Can you read this?' }
-      ]
-      this.SystemMessageManager.getMessages = sinon
-        .stub()
-        .callsArgWith(0, null, this.systemMessages)
-
       this.tags = [
         { name: 1, project_ids: ['1', '2', '3'] },
         { name: 2, project_ids: ['a', '1'] },
@@ -477,14 +449,6 @@ describe('ProjectController', function() {
     it('should send the tags', function(done) {
       this.res.render = (pageName, opts) => {
         opts.tags.length.should.equal(this.tags.length)
-        done()
-      }
-      this.ProjectController.projectListPage(this.req, this.res)
-    })
-
-    it('should send the systemMessages', function(done) {
-      this.res.render = (pageName, opts) => {
-        opts.systemMessages.should.deep.equal(this.systemMessages)
         done()
       }
       this.ProjectController.projectListPage(this.req, this.res)
@@ -1084,7 +1048,6 @@ describe('ProjectController', function() {
       )
       this.ProjectDeleter.unmarkAsDeletedByExternalSource = sinon.stub()
       this.InactiveProjectManager.reactivateProjectIfRequired.callsArgWith(1)
-      this.AnalyticsManager.getLastOccurrence.yields(null, { mock: 'event' })
       this.ProjectUpdateHandler.markAsOpened.callsArgWith(1)
     })
 
@@ -1430,11 +1393,6 @@ describe('ProjectController', function() {
           archived: false,
           trashed: false,
           owner_ref: 'defg',
-          tokens: {
-            readAndWrite: '1abcd',
-            readAndWritePrefix: '1',
-            readOnly: 'neiotsranteoia'
-          },
           isV1Project: false
         })
       })
@@ -1466,11 +1424,6 @@ describe('ProjectController', function() {
           archived: true,
           trashed: false,
           owner_ref: 'defg',
-          tokens: {
-            readAndWrite: '1abcd',
-            readAndWritePrefix: '1',
-            readOnly: 'neiotsranteoia'
-          },
           isV1Project: false
         })
       })
@@ -1497,11 +1450,6 @@ describe('ProjectController', function() {
           archived: false,
           trashed: false,
           owner_ref: null,
-          tokens: {
-            readAndWrite: '1abcd',
-            readAndWritePrefix: '1',
-            readOnly: 'neiotsranteoia'
-          },
           isV1Project: false
         })
       })

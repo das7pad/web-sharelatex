@@ -108,6 +108,7 @@ describe('ProjectCreationHandler', function() {
             }
             project.name.should.equal(projectName)
             expect(project.owner_ref + '').to.equal(ownerId)
+            expect(project.lastUpdatedBy + '').to.equal(ownerId)
             done()
           }
         )

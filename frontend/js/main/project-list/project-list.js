@@ -783,7 +783,7 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
     const _deleteProject = function(project) {
       return queuedHttp({
         method: 'DELETE',
-        url: `/project/${project.id}?forever=true`,
+        url: `/project/${project.id}`,
         headers: {
           'X-CSRF-Token': window.csrfToken
         }
@@ -862,19 +862,7 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
     ProjectListService
   ) {
     $scope.projectLink = function(project) {
-      if (
-        project.accessLevel === 'readAndWrite' &&
-        project.source === 'token'
-      ) {
-        return `/${project.tokens.readAndWrite}`
-      } else if (
-        project.accessLevel === 'readOnly' &&
-        project.source === 'token'
-      ) {
-        return `/read/${project.tokens.readOnly}`
-      } else {
-        return `/project/${project.id}`
-      }
+      return `/project/${project.id}`
     }
 
     $scope.isLinkSharingProject = project => project.source === 'token'

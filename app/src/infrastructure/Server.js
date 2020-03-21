@@ -12,10 +12,11 @@ const Csrf = require('./Csrf')
 
 const sessionsRedisClient = UserSessionsRedis.client()
 
+const SessionAutostartMiddleware = require('./SessionAutostartMiddleware')
 const SessionStoreManager = require('./SessionStoreManager')
 const session = require('express-session')
 const RedisStore = require('connect-redis')(session)
-const bodyParser = require('body-parser')
+const bodyParser = require('./BodyParserWrapper')
 const methodOverride = require('method-override')
 const cookieParser = require('cookie-parser')
 const bearerToken = require('express-bearer-token')
@@ -72,11 +73,7 @@ app.set('view engine', 'pug')
 Modules.loadViewIncludes(app)
 
 app.use(bodyParser.urlencoded({ extended: true, limit: '2mb' }))
-// Make sure we can process twice the max doc length, to allow for
-// - the doc content
-// - text ranges spanning the whole doc
-// Also allow some overhead for JSON encoding
-app.use(bodyParser.json({ limit: 2 * Settings.max_doc_length + 64 * 1024 })) // 64kb overhead
+app.use(bodyParser.json({ limit: Settings.max_json_request_size }))
 app.use(methodOverride())
 app.use(bearerToken())
 
@@ -85,6 +82,7 @@ RedirectManager.apply(webRouter)
 ProxyManager.apply(publicApiRouter)
 
 webRouter.use(cookieParser(Settings.security.sessionSecret))
+SessionAutostartMiddleware.applyInitialMiddleware(webRouter)
 webRouter.use(
   session({
     resave: false,
@@ -94,7 +92,8 @@ webRouter.use(
     cookie: {
       domain: Settings.cookieDomain,
       maxAge: Settings.cookieSessionLength, // in milliseconds, see https://github.com/expressjs/session#cookiemaxage
-      secure: Settings.secureCookie
+      secure: Settings.secureCookie,
+      sameSite: Settings.sameSiteCookie
     },
     store: sessionStore,
     key: Settings.cookieName,
@@ -139,16 +138,18 @@ webRouter.use(translations.setLangBasedOnDomainMiddlewear)
 
 // Measure expiry from last request, not last login
 webRouter.use(function(req, res, next) {
-  req.session.touch()
-  if (AuthenticationController.isUserLoggedIn(req)) {
-    UserSessionsManager.touch(
-      AuthenticationController.getSessionUser(req),
-      err => {
-        if (err) {
-          logger.err({ err }, 'error extending user session')
+  if (!req.session.noSessionCallback) {
+    req.session.touch()
+    if (AuthenticationController.isUserLoggedIn(req)) {
+      UserSessionsManager.touch(
+        AuthenticationController.getSessionUser(req),
+        err => {
+          if (err) {
+            logger.err({ err }, 'error extending user session')
+          }
         }
-      }
-    )
+      )
+    }
   }
   next()
 })
@@ -156,8 +157,15 @@ webRouter.use(function(req, res, next) {
 webRouter.use(ReferalConnect.use)
 expressLocals(webRouter, privateApiRouter, publicApiRouter)
 
+webRouter.use(SessionAutostartMiddleware.invokeCallbackMiddleware)
+
 webRouter.use(function(req, res, next) {
   if (Settings.siteIsOpen) {
+    next()
+  } else if (
+    AuthenticationController.getSessionUser(req) &&
+    AuthenticationController.getSessionUser(req).isAdmin
+  ) {
     next()
   } else {
     res.status(503)
@@ -212,6 +220,11 @@ const enableWebRouter =
 if (enableWebRouter || notDefined(enableWebRouter)) {
   logger.info('providing web router')
 
+  if (app.get('env') === 'production') {
+    logger.info('precompiling views for web in production environment')
+    Views.precompileViews(app)
+  }
+
   app.use(publicApiRouter) // public API goes with web router for public access
   app.use(Validation.errorMiddleware)
   app.use(HttpErrorController.handleError)
@@ -225,12 +238,10 @@ if (enableWebRouter || notDefined(enableWebRouter)) {
   if (app.get('env') === 'test') {
     app.enable('view cache')
   }
-  if (Settings.precompileViews) {
-    Views.precompileViews(app)
-  }
 }
 
 metrics.injectMetricsRoute(webRouter)
+
 Router.initialize(webRouter, privateApiRouter, publicApiRouter)
 
 module.exports = {

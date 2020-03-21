@@ -16,9 +16,6 @@
  */
 define([
   'libraries',
-  'libs/polyfills/symbol',
-  'libs/polyfills/array-fill',
-  'libs/polyfills/array-includes',
   'modules/recursionHelper',
   'modules/errorCatcher',
   'modules/storage',

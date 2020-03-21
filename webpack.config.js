@@ -116,6 +116,20 @@ module.exports = {
           }
         ]
       },
+      {
+        // Load fonts
+        test: /\.(woff|woff2)$/,
+        use: [
+          {
+            loader: 'file-loader',
+            options: {
+              // Output to public/font, relative to stylesheets/style.css
+              publicPath: '../',
+              name: 'fonts/[name].[ext]'
+            }
+          }
+        ]
+      },
       // Allow for injection of modules dependencies by reading contents of
       // modules directory and adding necessary dependencies
       {

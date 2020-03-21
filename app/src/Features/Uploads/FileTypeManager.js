@@ -20,7 +20,16 @@ const FileTypeManager = {
     '.lbx',
     '.bbx',
     '.cbx',
-    '.m'
+    '.m',
+    '.lco',
+    '.dtx',
+    '.ins',
+    '.ist',
+    '.def',
+    '.clo',
+    '.ldf',
+    '.rmd',
+    '.lua'
   ],
 
   IGNORE_EXTENSIONS: [
@@ -90,6 +99,27 @@ const FileTypeManager = {
         callback(null, { binary: false, encoding })
       })
     })
+  },
+
+  getStrictTypeFromContent(name, contents) {
+    const isText = _isTextFilename(name)
+
+    if (!isText) {
+      return false
+    }
+    if (
+      Buffer.byteLength(contents, 'utf8') > FileTypeManager.MAX_TEXT_FILE_SIZE
+    ) {
+      return false
+    }
+    if (contents.indexOf('\x00') !== -1) {
+      return false
+    }
+    if (/[\uD800-\uDFFF]/.test(contents)) {
+      // non-BMP characters (high and low surrogate characters)
+      return false
+    }
+    return true
   },
 
   shouldIgnore(path, callback) {

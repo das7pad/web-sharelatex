@@ -11,6 +11,7 @@ require('./helpers/MockDocUpdaterApi')
 require('./helpers/MockProjectHistoryApi')
 require('./helpers/MockTagsApi')
 require('./helpers/MockV1Api')
+require('./helpers/MockProjectHistoryApi')
 
 describe('Deleting a user', function() {
   beforeEach(function(done) {

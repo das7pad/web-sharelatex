@@ -8,10 +8,10 @@ const mongojs = require('mongojs')
 const db = mongojs(Settings.mongo.url, [
   'projects',
   'users',
-  'userstubs',
   'tokens',
   'docSnapshots',
-  'projectHistoryFailures'
+  'projectHistoryFailures',
+  'deletedProjects'
 ])
 module.exports = {
   db,

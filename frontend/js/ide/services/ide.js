@@ -47,6 +47,8 @@ define(['base'], function(App) {
       if (meta == null) {
         meta = {}
       }
+      meta.user_id = window.user_id
+      meta.project_id = window.project_id
       if (this.socket != null) {
         const engine = this.socket.io.engine
         meta.client_id = engine.id
