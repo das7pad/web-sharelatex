@@ -205,12 +205,9 @@ define([
         }
 
         var initSpellCheck = function() {
-          const spellCheckCache =
-            $cacheFactory.get(`spellCheck-${scope.name}`) ||
-            $cacheFactory(`spellCheck-${scope.name}`, { capacity: 1000 })
           this.spellCheckManager = new SpellCheckManager(
             scope,
-            spellCheckCache,
+            $cacheFactory,
             $http,
             $q,
             new SpellCheckAdapter(editor)
