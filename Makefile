@@ -76,6 +76,7 @@ FILES_FOR_LINT ?= \
 			| grep \
 				-e .js \
 				-e .less \
+			| sed 's|^|/app/|' \
 	)
 
 lint_partial:
@@ -103,9 +104,9 @@ FORMAT_DOCKER_COMPOSE ?= \
 	COMPOSE_PROJECT_NAME=format_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE)
 RUN_FORMAT ?= $(FORMAT_DOCKER_COMPOSE) run --rm test_unit npx prettier-eslint
 format_full:
-	$(RUN_FORMAT) '**/*.{js,less}' --list-different
+	$(RUN_FORMAT) '/app/**/*.{js,less}' --list-different
 format_fix_full:
-	$(RUN_FORMAT) '**/*.{js,less}' --write
+	$(RUN_FORMAT) '/app/**/*.{js,less}' --write
 
 format_partial:
 ifneq (,$(FILES_FOR_LINT))
