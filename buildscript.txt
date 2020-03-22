@@ -7,6 +7,7 @@ web
 --docker-repos=gcr.io/overleaf-ops
 --build-target=docker
 --data-dirs=data/dumpFolder,data/logs,data/pdf,data/uploads,data/zippedProjects
+--volumes=data,
 --mocha-6=true
 --monkey-patch-npm-ci--from=true
 --webpack-public-path=public

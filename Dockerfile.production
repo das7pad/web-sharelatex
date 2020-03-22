@@ -19,7 +19,7 @@ RUN DATA_DIRS="data/dumpFolder data/logs data/pdf data/uploads data/zippedProjec
 &&  mkdir -p ${DATA_DIRS} \
 &&  chown node:node ${DATA_DIRS}
 
-VOLUME /app/data/dumpFolder /app/data/logs /app/data/pdf /app/data/uploads /app/data/zippedProjects
+VOLUME /app/data
 
 USER node
 
