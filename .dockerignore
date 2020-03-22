@@ -25,7 +25,6 @@
 ###########
 # scripts #
 !/docker_cleanup.sh
-!/setup_env.sh
 
 !/bin/east
 !/bin/run

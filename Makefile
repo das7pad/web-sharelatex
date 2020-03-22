@@ -217,7 +217,6 @@ build_prod: clean_build_artifacts
 			modules/*/app/ \
 			modules/*/index.js \
 			public/manifest.json \
-			setup_env.sh \
 			test/smoke/src \
 		> build_artifacts.tar.gz
 

@@ -6,6 +6,7 @@ web
 --dependencies=mongo,redis_api,redis_lock,redis_realtime,redis_web,redis_websessions
 --docker-repos=gcr.io/overleaf-ops
 --build-target=docker
+--data-dirs=data/dumpFolder,data/logs,data/pdf,data/uploads,data/zippedProjects
 --mocha-6=true
 --monkey-patch-npm-ci--from=true
 --webpack-public-path=public

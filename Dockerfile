@@ -20,7 +20,9 @@ FROM dev-deps as dev
 
 COPY . /app
 
-RUN /app/setup_env.sh
+RUN DATA_DIRS="data/dumpFolder data/logs data/pdf data/uploads data/zippedProjects" \
+&&  mkdir -p ${DATA_DIRS} \
+&&  chown node:node ${DATA_DIRS}
 
 USER node
 
