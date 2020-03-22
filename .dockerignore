@@ -58,7 +58,7 @@
 
 ##############
 # app config #
-!/config/settings.defaults.coffee
+!/config/settings.defaults.*
 # app config #
 ##############
 

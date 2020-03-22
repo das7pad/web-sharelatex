@@ -2,10 +2,17 @@
 # Instead run bin/update_build_scripts from
 # https://github.com/das7pad/sharelatex-dev-env
 
+ifneq (,$(wildcard .git))
+git = git
+else
+# we are in docker, without the .git directory
+git = sh -c 'false'
+endif
+
 BUILD_NUMBER ?= local
-BRANCH_NAME ?= $(shell git rev-parse --abbrev-ref HEAD)
-COMMIT ?= $(shell git rev-parse HEAD)
-RELEASE ?= $(shell git describe --tags | sed 's/-g/+/;s/^v//')
+BRANCH_NAME ?= $(shell $(git) rev-parse --abbrev-ref HEAD || echo master)
+COMMIT ?= $(shell $(git) rev-parse HEAD || echo HEAD)
+RELEASE ?= $(shell $(git) describe --tags || echo v0.0.0 | sed 's/-g/+/;s/^v//')
 PROJECT_NAME = web
 BUILD_DIR_NAME = $(shell pwd | xargs basename | tr -cd '[a-zA-Z0-9_.\-]')
 DOCKER_COMPOSE_FLAGS ?= -f docker-compose.yml
@@ -22,22 +29,28 @@ clean_build:
 	docker rmi \
 		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER) \
 		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-base \
+		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-dev-deps \
 		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-dev \
 		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-prod \
 		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-webpack \
-		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-cache \
+		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-dev-deps-cache \
+		ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-prod-cache \
 		--force
 
 clean:
 
 test: lint
+lint:
+test: format
+format:
+
 GIT_PREVIOUS_SUCCESSFUL_COMMIT ?= $(shell \
-	git rev-parse --abbrev-ref --symbolic-full-name dev@{u} 2>/dev/null \
+	$(git) rev-parse --abbrev-ref --symbolic-full-name dev@{u} 2>/dev/null \
 	| grep -e /dev \
 	|| echo origin/dev)
 
 NEED_FULL_LINT ?= \
-	$(shell git diff $(GIT_PREVIOUS_SUCCESSFUL_COMMIT) --name-only \
+	$(shell $(git) diff $(GIT_PREVIOUS_SUCCESSFUL_COMMIT) --name-only \
 			| grep --max-count=1 \
 				-e .eslintignore \
 				-e .eslintrc \
@@ -50,12 +63,14 @@ else
 lint: lint_full
 endif
 
-RUN_LINT ?= $(DOCKER_COMPOSE) run --rm test_unit npx eslint
+LINT_DOCKER_COMPOSE ?= \
+	COMPOSE_PROJECT_NAME=lint_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE)
+RUN_LINT ?= $(LINT_DOCKER_COMPOSE) run --rm test_unit npx eslint
 lint_full:
 	$(RUN_LINT) .
 
 FILES_FOR_LINT ?= \
-	$(shell git diff $(GIT_PREVIOUS_SUCCESSFUL_COMMIT) --name-only \
+	$(shell $(git) diff $(GIT_PREVIOUS_SUCCESSFUL_COMMIT) --name-only \
 			| grep --invert-match \
 				-e vendor \
 			| grep \
@@ -69,7 +84,7 @@ ifneq (,$(FILES_FOR_LINT))
 endif
 
 NEED_FULL_FORMAT ?= \
-	$(shell git diff $(GIT_PREVIOUS_SUCCESSFUL_COMMIT) --name-only \
+	$(shell $(git) diff $(GIT_PREVIOUS_SUCCESSFUL_COMMIT) --name-only \
 			| grep --max-count=1 \
 				-e .prettierignore \
 				-e .prettierrc \
@@ -84,7 +99,9 @@ format: format_full
 format_fix: format_fix_full
 endif
 
-RUN_FORMAT ?= $(DOCKER_COMPOSE) run --rm test_unit npx prettier-eslint
+FORMAT_DOCKER_COMPOSE ?= \
+	COMPOSE_PROJECT_NAME=format_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE)
+RUN_FORMAT ?= $(FORMAT_DOCKER_COMPOSE) run --rm test_unit npx prettier-eslint
 format_full:
 	$(RUN_FORMAT) '**/*.{js,less}' --list-different
 format_fix_full:
@@ -152,24 +169,39 @@ build_app:
 
 build: clean_build_artifacts
 	docker build \
-		--cache-from ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-cache \
+		--cache-from ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-dev-deps-cache \
 		--tag ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-base \
 		--target base \
 		.
 
 	docker build \
 		--cache-from ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-base \
+		--cache-from ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-dev-deps-cache \
+		--tag ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-dev-deps \
+		--target dev-deps \
+		.
+
+	docker build \
+		--cache-from ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-dev-deps \
 		--tag ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER) \
 		--tag ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-dev \
 		--target dev \
 		.
 
-build_prod: clean_build_artifacts
+build_webpack: clean_build_artifacts
 	docker build \
 		--cache-from ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-dev \
 		--tag ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-webpack \
 		--target webpack \
 		.
+
+build_prod: clean_build_artifacts
+	docker build \
+		--cache-from ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-dev \
+		--tag ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-base \
+		--target base \
+		.
+
 	docker run \
 		--rm \
 		--entrypoint tar \
@@ -192,7 +224,8 @@ build_prod: clean_build_artifacts
 		--build-arg RELEASE=$(RELEASE) \
 		--build-arg COMMIT=$(COMMIT) \
 		--build-arg BASE=ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-base \
-		--cache-from ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-cache \
+		--cache-from ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-base \
+		--cache-from ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-prod-cache \
 		--tag ci/$(PROJECT_NAME):$(BRANCH_NAME)-$(BUILD_NUMBER)-prod \
 		--file=Dockerfile.production \
 		.
