@@ -1,3 +1,6 @@
+// This file was auto-generated, do not edit it directly.
+// Instead run bin/update_build_scripts from
+// https://github.com/das7pad/sharelatex-dev-env
 {
   "extends": ["standard", "prettier", "prettier/standard"],
   "plugins": ["mocha", "chai-expect", "chai-friendly"],
@@ -6,12 +9,15 @@
     "browser": true,
     "mocha": true
   },
-  "rules": {
-    // Swap the no-unused-expressions rule with a more chai-friendly one
-    "no-unused-expressions": 0,
-    "chai-friendly/no-unused-expressions": "error"
-  },
   "overrides": [
+    {
+      "files": ["**/test/**/*.js"],
+      "rules": {
+        // Swap the no-unused-expressions rule with a more chai-friendly one
+        "no-unused-expressions": "off",
+        "chai-friendly/no-unused-expressions": "error"
+      }
+    },
     {
       // Test specific rules
       "files": ["**/test/*/src/**/*.js"],
@@ -41,7 +47,7 @@
     },
     {
       // Frontend test specific rules
-      "files": ["**/test/frontend/**/*.js", "test/frontend/import_tests.js"],
+      "files": ["**/test/frontend/**/*.js", "**/test/frontend/import_tests.js"],
       "globals": {
         "expect": true,
         "define": true,

@@ -44,6 +44,18 @@ lint:
 test: format
 format:
 
+SHARELATEX_DOCKER_REPOS ?= local/sharelatex
+LINT_RUNNER_IMAGE ?= \
+	$(SHARELATEX_DOCKER_REPOS)/lint-runner:1.0.0
+LINT_RUNNER = \
+	docker run \
+		--rm \
+		--tty \
+		--volume $(PWD):$(PWD) \
+		--workdir $(PWD) \
+		--user $(shell id -u):$(shell id -g) \
+		$(LINT_RUNNER_IMAGE)
+
 GIT_PREVIOUS_SUCCESSFUL_COMMIT ?= $(shell \
 	$(git) rev-parse --abbrev-ref --symbolic-full-name dev@{u} 2>/dev/null \
 	| grep -e /dev \
@@ -54,7 +66,7 @@ NEED_FULL_LINT ?= \
 			| grep --max-count=1 \
 				-e .eslintignore \
 				-e .eslintrc \
-				-e package-lock.json \
+				-e buildscript.txt \
 	)
 
 ifeq (,$(NEED_FULL_LINT))
@@ -63,9 +75,7 @@ else
 lint: lint_full
 endif
 
-LINT_DOCKER_COMPOSE ?= \
-	COMPOSE_PROJECT_NAME=lint_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE)
-RUN_LINT ?= $(LINT_DOCKER_COMPOSE) run --rm test_unit npx eslint
+RUN_LINT ?= $(LINT_RUNNER) eslint
 lint_full:
 	$(RUN_LINT) .
 
@@ -76,7 +86,7 @@ FILES_FOR_LINT ?= \
 			| grep \
 				-e .js \
 				-e .less \
-			| sed 's|^|/app/|' \
+			| sed 's|^|$(PWD)/|' \
 	)
 
 lint_partial:
@@ -89,7 +99,7 @@ NEED_FULL_FORMAT ?= \
 			| grep --max-count=1 \
 				-e .prettierignore \
 				-e .prettierrc \
-				-e package-lock.json \
+				-e buildscript.txt \
 	)
 
 ifeq (,$(NEED_FULL_FORMAT))
@@ -100,13 +110,11 @@ format: format_full
 format_fix: format_fix_full
 endif
 
-FORMAT_DOCKER_COMPOSE ?= \
-	COMPOSE_PROJECT_NAME=format_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE)
-RUN_FORMAT ?= $(FORMAT_DOCKER_COMPOSE) run --rm test_unit npx prettier-eslint
+RUN_FORMAT ?= $(LINT_RUNNER) prettier-eslint
 format_full:
-	$(RUN_FORMAT) '/app/**/*.{js,less}' --list-different
+	$(RUN_FORMAT) '$(PWD)/**/*.{js,less}' --list-different
 format_fix_full:
-	$(RUN_FORMAT) '/app/**/*.{js,less}' --write
+	$(RUN_FORMAT) '$(PWD)/**/*.{js,less}' --write
 
 format_partial:
 ifneq (,$(FILES_FOR_LINT))
