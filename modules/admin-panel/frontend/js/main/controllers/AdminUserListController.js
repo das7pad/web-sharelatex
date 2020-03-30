@@ -27,7 +27,6 @@ define(['base'], function(App) {
     $scope.pages = window.data.pages
     $scope.allSelected = false
     $scope.selectedUsers = []
-    $scope.timer
     $scope.pageSelected = 1
 
     const recalculateUserListHeight = function() {

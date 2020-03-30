@@ -1,7 +1,8 @@
 import App from '../base'
 
 if (window.preLoadMathJax) {
-  // e.g. learn
+  // preload mathJax for e.g. /learn pages
+  // eslint-disable-next-line no-unused-expressions
   import(/* webpackChunkName: "MathJaxBundle" */ '../MathJaxBundle')
 }
 App.directive('mathjax', function($compile, $parse) {

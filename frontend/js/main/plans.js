@@ -198,7 +198,6 @@ define(['base'], function(App) {
     ipCookie,
     $location
   ) {
-    let switchEvent
     $scope.showPlans = true
 
     $scope.plans = MultiCurrencyPricing.plans
@@ -296,7 +295,7 @@ define(['base'], function(App) {
 
     var eventLabel = (label, location) => label
 
-    switchEvent = function(e, label, location) {
+    function switchEvent(e, label, location) {
       e.preventDefault()
       const gaLabel = eventLabel(label, location)
       eventTracking.send('subscription-funnel', 'plans-page', gaLabel)

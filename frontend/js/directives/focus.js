@@ -11,7 +11,6 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 define(['base'], function(App) {
-  let selectName
   App.directive('focusWhen', $timeout => ({
     restrict: 'A',
     link(scope, element, attr) {
@@ -80,7 +79,7 @@ define(['base'], function(App) {
     }
   }))
 
-  selectName = function(element) {
+  function selectName(element) {
     // Select up to last '.'. I.e. everything except the file extension
     element.focus()
     const name = element.val()

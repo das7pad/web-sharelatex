@@ -110,7 +110,6 @@ define(['base'], function(App) {
         }
       })
       return modalInstance.result.then(function() {
-        console.log
         return queuedHttp({
           method: 'DELETE',
           url: `/admin/user/${$scope.user._id}/secondaryemail`,

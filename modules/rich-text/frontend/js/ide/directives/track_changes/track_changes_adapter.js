@@ -45,10 +45,11 @@ define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
     }
 
     onInsertAdded(change) {
-      let start, end, marker
-      start = this.shareJsOffsetToRowColumn(change.op.p)
-      end = this.shareJsOffsetToRowColumn(change.op.p + change.op.i.length)
-      marker = this.cm.doc.markText(
+      const start = this.shareJsOffsetToRowColumn(change.op.p)
+      const end = this.shareJsOffsetToRowColumn(
+        change.op.p + change.op.i.length
+      )
+      const marker = this.cm.doc.markText(
         { line: start.row, ch: start.column },
         { line: end.row, ch: end.column },
         { className: 'track-changes-marker track-changes-added-marker' }
@@ -105,10 +106,11 @@ define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
     }
 
     onCommentAdded(comment) {
-      let start, end, marker
-      start = this.shareJsOffsetToRowColumn(comment.op.p)
-      end = this.shareJsOffsetToRowColumn(comment.op.p + comment.op.c.length)
-      marker = this.cm.doc.markText(
+      const start = this.shareJsOffsetToRowColumn(comment.op.p)
+      const end = this.shareJsOffsetToRowColumn(
+        comment.op.p + comment.op.c.length
+      )
+      const marker = this.cm.doc.markText(
         { line: start.row, ch: start.column },
         { line: end.row, ch: end.column },
         { className: 'track-changes-marker track-changes-comment-marker' }

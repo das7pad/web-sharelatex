@@ -64,6 +64,7 @@ App.factory('chatMessages', function($http, ide) {
 
   chat.loadMoreMessages = function() {
     // trigger preloading of MathJax
+    // eslint-disable-next-line no-unused-expressions
     import('../../../MathJaxBundle')
     if (chat.state.atEnd) {
       return

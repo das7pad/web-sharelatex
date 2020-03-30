@@ -15,8 +15,6 @@ define(['base'], App =>
   App.controller(
     'HistoryV2ToolbarController',
     ($scope, $modal, ide, eventTracking, waitFor) => {
-      let openEntity
-
       $scope.currentUpdate = null
       $scope.currentLabel = null
 
@@ -103,7 +101,7 @@ define(['base'], App =>
         })
       }
 
-      openEntity = function(data) {
+      function openEntity(data) {
         const { id, type } = data
         return waitFor(() => ide.fileTreeManager.findEntityById(id), 3000)
           .then(function(entity) {

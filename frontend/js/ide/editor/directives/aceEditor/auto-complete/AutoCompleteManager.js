@@ -424,7 +424,6 @@ define([
         Autocomplete.startCommand = {
           name: 'startAutocomplete',
           exec: editor => {
-            let filtered
             if (!editor.completer) {
               editor.completer = new Autocomplete()
             }
@@ -439,7 +438,7 @@ define([
             )
             container.css({ 'font-size': this.$scope.fontSize + 'px' })
             // Dynamically set width of autocomplete popup
-            filtered =
+            const filtered =
               editor.completer.completions &&
               editor.completer.completions.filtered
             if (filtered) {

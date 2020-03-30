@@ -27,7 +27,7 @@ define(['base', 'ide/file-tree/util/iconTypeFromName'], function(
       if (e.ctrlKey || e.metaKey) {
         e.stopPropagation()
         const initialMultiSelectCount = ide.fileTreeManager.multiSelectedCount()
-        ide.fileTreeManager.toggleMultiSelectEntity($scope.entity) === 0
+        ide.fileTreeManager.toggleMultiSelectEntity($scope.entity)
         if (initialMultiSelectCount === 0) {
           // On first multi selection, also include the current active/open file.
           return ide.fileTreeManager.multiSelectSelectedEntity()

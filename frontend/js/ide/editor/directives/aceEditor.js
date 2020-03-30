@@ -39,14 +39,13 @@ define([
   TrackChangesAdapter,
   MetadataManager
 ) {
-  let syntaxValidationEnabled
   const { EditSession } = ace.require('ace/edit_session')
   const ModeList = ace.require('ace/ext/modelist')
   const { Vim } = ace.require('ace/keyboard/vim')
   const SearchBox = ace.require('ace/ext/searchbox')
 
   // Set the base path that ace will fetch modes/snippets/workers from
-  syntaxValidationEnabled = true
+  const syntaxValidationEnabled = true
   ace.config.set(
     'basePath',
     `${window.staticPath}vendor/ace-builds/src-min-noconflict`
