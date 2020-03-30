@@ -1,7 +1,7 @@
 const logger = require('logger-sharelatex')
 const Settings = require('settings-sharelatex')
 const _ = require('lodash')
-const Url = require('url')
+const { URL } = require('url')
 const NodeHtmlEncoder = require('node-html-encoder').Encoder
 const Path = require('path')
 const moment = require('moment')
@@ -153,15 +153,18 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
     res.locals.buildBaseAssetPath = function() {
       // Return the base asset path (including the CDN url) so that webpack can
       // use this to dynamically fetch scripts (e.g. PDFjs worker)
-      return Url.resolve(staticFilesBase, '/')
+      return res.locals.staticPath('/')
     }
 
     res.locals.staticPath = function(path) {
-      if (staticFilesBase && path.indexOf('/') === 0) {
+      if (staticFilesBase === '/') {
+        return path.indexOf('/') === 0 ? path : '/' + path
+      }
+      if (path.indexOf('/') === 0) {
         // preserve the path component of the base url
         path = path.substring(1)
       }
-      return Url.resolve(staticFilesBase, path)
+      return new URL(path, staticFilesBase).href
     }
 
     res.locals.buildJsPath = function(jsFile) {
@@ -197,7 +200,7 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
         path = `/${webpackManifest[jsFile]}`
       }
 
-      return Url.resolve(staticFilesBase, path)
+      return res.locals.staticPath(path)
     }
 
     res.locals.lib = PackageVersions.lib
@@ -271,7 +274,8 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
     }
     // Don't include the query string parameters, otherwise Google
     // treats ?nocdn=true as the canonical version
-    res.locals.currentUrl = Url.parse(req.originalUrl).pathname
+    // ExpressLocals are mounted on top level, its OK to use just .path
+    res.locals.currentUrl = req.path
     res.locals.getTranslationUrl = (
       spec // see settings.i18n.subdomainLang
     ) => spec.url + res.locals.currentUrl + '?setGlobalLng=' + spec.lngCode

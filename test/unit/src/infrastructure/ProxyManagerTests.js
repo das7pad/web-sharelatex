@@ -89,7 +89,7 @@ describe('ProxyManager', function() {
     })
 
     it('does not calls next when match', function() {
-      const target = '/'
+      const target = 'http://localhost/'
       this.settings.proxyUrls[this.proxyPath] = target
       this.proxyManager.createProxy(target)(this.req, this.res, this.next)
       sinon.assert.notCalled(this.next)
@@ -104,31 +104,24 @@ describe('ProxyManager', function() {
     })
 
     it('overwrite query', function() {
-      const targetUrl = 'foo.bar/baz?query'
+      const targetUrl = 'http://foo.bar/baz?query'
       this.req.query = { requestQuery: 'important' }
       this.settings.proxyUrls[this.proxyPath] = targetUrl
       this.proxyManager.createProxy(targetUrl)(this.req)
-      const newTargetUrl = 'foo.bar/baz?requestQuery=important'
+      const newTargetUrl = 'http://foo.bar/baz?requestQuery=important'
       return assertCalledWith(this.request, { url: newTargetUrl })
     })
 
     it('handles target objects', function() {
-      const target = { baseUrl: 'api.v1', path: '/pa/th' }
+      const target = { baseUrl: 'http://api.v1', path: '/pa/th' }
       this.settings.proxyUrls[this.proxyPath] = target
       this.proxyManager.createProxy(target)(this.req, this.res, this.next)
-      return assertCalledWith(this.request, { url: 'api.v1/pa/th' })
-    })
-
-    it('handles missing baseUrl', function() {
-      const target = { path: '/pa/th' }
-      this.settings.proxyUrls[this.proxyPath] = target
-      this.proxyManager.createProxy(target)(this.req, this.res, this.next)
-      return assertCalledWith(this.request, { url: 'undefined/pa/th' })
+      return assertCalledWith(this.request, { url: 'http://api.v1/pa/th' })
     })
 
     it('handles dynamic path', function() {
       const target = {
-        baseUrl: 'api.v1',
+        baseUrl: 'http://api.v1',
         path(params) {
           return `/resource/${params.id}`
         }
@@ -138,12 +131,14 @@ describe('ProxyManager', function() {
       this.req.route.path = '/res/:id'
       this.req.params = { id: 123 }
       this.proxyManager.createProxy(target)(this.req, this.res, this.next)
-      return assertCalledWith(this.request, { url: 'api.v1/resource/123' })
+      return assertCalledWith(this.request, {
+        url: 'http://api.v1/resource/123'
+      })
     })
 
     it('set arbitrary options on request', function() {
       const target = {
-        baseUrl: 'api.v1',
+        baseUrl: 'http://api.v1',
         path: '/foo',
         options: { foo: 'bar' }
       }
@@ -152,25 +147,25 @@ describe('ProxyManager', function() {
       this.proxyManager.createProxy(target)(this.req, this.res, this.next)
       return assertCalledWith(this.request, {
         foo: 'bar',
-        url: 'api.v1/foo'
+        url: 'http://api.v1/foo'
       })
     })
 
     it('passes cookies', function() {
-      const target = { baseUrl: 'api.v1', path: '/foo' }
+      const target = { baseUrl: 'http://api.v1', path: '/foo' }
       this.req.url = '/foo'
       this.req.route.path = '/foo'
       this.req.headers = { cookie: 'cookie' }
       this.proxyManager.createProxy(target)(this.req, this.res, this.next)
       return assertCalledWith(this.request, {
         headers: { Cookie: 'cookie' },
-        url: 'api.v1/foo'
+        url: 'http://api.v1/foo'
       })
     })
 
     it('passes body for post', function() {
       const target = {
-        baseUrl: 'api.v1',
+        baseUrl: 'http://api.v1',
         path: '/foo',
         options: { method: 'post' }
       }
@@ -181,13 +176,13 @@ describe('ProxyManager', function() {
       return assertCalledWith(this.request, {
         form: { foo: 'bar' },
         method: 'post',
-        url: 'api.v1/foo'
+        url: 'http://api.v1/foo'
       })
     })
 
     it('passes body for put', function() {
       const target = {
-        baseUrl: 'api.v1',
+        baseUrl: 'http://api.v1',
         path: '/foo',
         options: { method: 'put' }
       }
@@ -198,7 +193,7 @@ describe('ProxyManager', function() {
       return assertCalledWith(this.request, {
         form: { foo: 'bar' },
         method: 'put',
-        url: 'api.v1/foo'
+        url: 'http://api.v1/foo'
       })
     })
   })

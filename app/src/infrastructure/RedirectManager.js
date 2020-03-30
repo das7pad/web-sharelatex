@@ -15,7 +15,6 @@
 let RedirectManager
 const settings = require('settings-sharelatex')
 const logger = require('logger-sharelatex')
-const URL = require('url')
 const querystring = require('querystring')
 
 module.exports = RedirectManager = {
@@ -76,9 +75,9 @@ module.exports = RedirectManager = {
 // have differences between Express and Rails, so safer to just pass the raw
 // string
 var getQueryString = function(req) {
-  const { search } = URL.parse(req.url)
-  if (search) {
-    return search
+  const qsStart = req.originalUrl.indexOf('?')
+  if (qsStart !== -1) {
+    return req.originalUrl.slice(qsStart)
   } else {
     return ''
   }

@@ -16,6 +16,7 @@ const SandboxedModule = require('sandboxed-module')
 const assert = require('assert')
 const path = require('path')
 const sinon = require('sinon')
+const { URL } = require('url')
 const modulePath = path.join(
   __dirname,
   '../../../../app/src/infrastructure/GeoIpLookup'
@@ -71,7 +72,9 @@ describe('GeoIpLookup', function() {
       return this.GeoIpLookup.getDetails(this.ipAddress, err => {
         this.request.get
           .calledWith({
-            url: this.settings.apis.geoIpLookup.url + '/' + this.ipAddress,
+            url: new URL(
+              this.settings.apis.geoIpLookup.url + '/' + this.ipAddress
+            ),
             timeout: 1000,
             json: true
           })
@@ -96,7 +99,9 @@ describe('GeoIpLookup', function() {
         err => {
           this.request.get
             .calledWith({
-              url: this.settings.apis.geoIpLookup.url + '/' + this.ipAddress,
+              url: new URL(
+                this.settings.apis.geoIpLookup.url + '/' + this.ipAddress
+              ),
               timeout: 1000,
               json: true
             })

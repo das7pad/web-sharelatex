@@ -16,7 +16,7 @@ const request = require('request')
 const settings = require('settings-sharelatex')
 const _ = require('underscore')
 const logger = require('logger-sharelatex')
-const URL = require('url')
+const { URL } = require('url')
 
 const currencyMappings = {
   GB: 'GBP',
@@ -69,7 +69,7 @@ module.exports = GeoIpLookup = {
     }
     ip = ip.trim().split(' ')[0]
     const opts = {
-      url: URL.resolve(settings.apis.geoIpLookup.url, ip),
+      url: new URL(ip, settings.apis.geoIpLookup.url),
       timeout: 1000,
       json: true
     }

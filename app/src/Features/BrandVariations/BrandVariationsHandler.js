@@ -13,7 +13,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 let BrandVariationsHandler
-const url = require('url')
+const { URL } = require('url')
 const settings = require('settings-sharelatex')
 const logger = require('logger-sharelatex')
 const V1Api = require('../V1/V1Api')
@@ -79,8 +79,8 @@ var _formatBrandVariationDetails = function(details) {
 }
 
 var _setV1AsHostIfRelativeURL = urlString =>
-  // The first argument is the base URL to resolve against if the second argument is not absolute.
-  // As it only applies if the second argument is not absolute, we can use it to transform relative URLs into
+  // The 2nd argument is the base URL to resolve against if the 1st argument is not absolute.
+  // As it only applies if the 1st argument is not absolute, we can use it to transform relative URLs into
   // absolute ones using v1 as the host. If the URL is absolute (e.g. a filepicker one), then the base
   // argument is just ignored
-  url.resolve(settings.apis.v1.url, urlString)
+  new URL(urlString, settings.apis.v1.url).href

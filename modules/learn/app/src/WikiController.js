@@ -26,7 +26,6 @@ const metrics = require('metrics-sharelatex')
 const async = require('async')
 const other_lngs = ['es']
 const path = require('path')
-const Url = require('url')
 
 const baseWikiUrl =
   (settings.apis.wiki != null ? settings.apis.wiki.url : undefined) ||
@@ -36,7 +35,7 @@ module.exports = WikiController = {
   getPage(req, res, next) {
     let lngPage
     metrics.inc('wiki.getPage')
-    let page = Url.parse(req.url).pathname
+    let page = req.baseUrl + req.path
     page = page
       .replace(/^\/learn/, '')
       .replace(/^\//, '')
