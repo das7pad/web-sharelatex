@@ -40,19 +40,11 @@ EmailBuilder.templates.welcome = EmailBuilder.CTAEmailTemplate({
   },
   message(opts) {
     return `\
-Thanks for signing up to ${
-      settings.appName
-    }! If you ever get lost, you can [log in again](${
-      settings.siteUrl
-    }/login) with the email address '${opts.to}'.
+Thanks for signing up to ${settings.appName}! If you ever get lost, you can [log in again](${settings.siteUrl}/login) with the email address '${opts.to}'.
 
-If you're new to LaTeX, take a look at our [Help Guides](${
-      settings.siteUrl
-    }/learn) and [Templates](${settings.siteUrl}/templates).
+If you're new to LaTeX, take a look at our [Help Guides](${settings.siteUrl}/learn) and [Templates](${settings.siteUrl}/templates).
 
-Please also take a moment to confirm your email address for ${
-      settings.appName
-    }:\
+Please also take a moment to confirm your email address for ${settings.appName}:\
 `
   },
   secondaryMessage() {

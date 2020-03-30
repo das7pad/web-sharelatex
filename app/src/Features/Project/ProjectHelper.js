@@ -103,7 +103,7 @@ const ProjectHelper = {
       return callback(null, name)
     }
     // the name already exists, try adding the user-supplied suffixes to generate a unique name
-    for (let suffix of Array.from(suffixes)) {
+    for (const suffix of Array.from(suffixes)) {
       const candidateName = ProjectHelper._addSuffixToProjectName(
         name,
         suffix,

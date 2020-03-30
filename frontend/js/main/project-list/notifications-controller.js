@@ -2,7 +2,7 @@ const ExposedSettings = window.ExposedSettings
 
 define(['base'], function(App) {
   App.controller('NotificationsController', function($scope, $http) {
-    for (let notification of $scope.notifications || []) {
+    for (const notification of $scope.notifications || []) {
       notification.hide = false
     }
 
@@ -29,9 +29,7 @@ define(['base'], function(App) {
     $scope.accept = function() {
       $scope.notification.inflight = true
       return $http({
-        url: `/project/${
-          $scope.notification.messageOpts.projectId
-        }/invite/token/${$scope.notification.messageOpts.token}/accept`,
+        url: `/project/${$scope.notification.messageOpts.projectId}/invite/token/${$scope.notification.messageOpts.token}/accept`,
         method: 'POST',
         headers: {
           'X-Csrf-Token': window.csrfToken,
@@ -87,7 +85,7 @@ define(['base'], function(App) {
       }
       return false
     }
-    for (let userEmail of $scope.userEmails) {
+    for (const userEmail of $scope.userEmails) {
       userEmail.hide = false
     }
 

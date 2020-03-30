@@ -141,8 +141,8 @@ const FeaturesUpdater = {
       ) {
         return callback(null, {})
       }
-      let activeFeaturesOverrides = []
-      for (let featuresOverride of user.featuresOverrides) {
+      const activeFeaturesOverrides = []
+      for (const featuresOverride of user.featuresOverrides) {
         if (
           !featuresOverride.expiresAt ||
           featuresOverride.expiresAt > new Date()
@@ -184,33 +184,30 @@ const FeaturesUpdater = {
 
   _mergeFeatures(featuresA, featuresB) {
     const features = Object.assign({}, featuresA)
-    for (let key in featuresB) {
+    for (const key in featuresB) {
       // Special merging logic for non-boolean features
       if (key === 'compileGroup') {
         if (
-          features['compileGroup'] === 'priority' ||
-          featuresB['compileGroup'] === 'priority'
+          features.compileGroup === 'priority' ||
+          featuresB.compileGroup === 'priority'
         ) {
-          features['compileGroup'] = 'priority'
+          features.compileGroup = 'priority'
         } else {
-          features['compileGroup'] = 'standard'
+          features.compileGroup = 'standard'
         }
       } else if (key === 'collaborators') {
-        if (
-          features['collaborators'] === -1 ||
-          featuresB['collaborators'] === -1
-        ) {
-          features['collaborators'] = -1
+        if (features.collaborators === -1 || featuresB.collaborators === -1) {
+          features.collaborators = -1
         } else {
-          features['collaborators'] = Math.max(
-            features['collaborators'] || 0,
-            featuresB['collaborators'] || 0
+          features.collaborators = Math.max(
+            features.collaborators || 0,
+            featuresB.collaborators || 0
           )
         }
       } else if (key === 'compileTimeout') {
-        features['compileTimeout'] = Math.max(
-          features['compileTimeout'] || 0,
-          featuresB['compileTimeout'] || 0
+        features.compileTimeout = Math.max(
+          features.compileTimeout || 0,
+          featuresB.compileTimeout || 0
         )
       } else {
         // Boolean keys, true is better
@@ -245,7 +242,7 @@ const FeaturesUpdater = {
       return {}
     }
 
-    let mismatchReasons = {}
+    const mismatchReasons = {}
     const featureKeys = [
       ...new Set([
         ...Object.keys(currentFeatures),

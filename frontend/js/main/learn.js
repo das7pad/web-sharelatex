@@ -61,7 +61,7 @@ define(['base', 'directives/mathjax', 'services/algolia-search'], function(
       const lines = content.split('\n')
       // Only show the lines that have a highlighted match
       const matching_lines = []
-      for (let line of Array.from(lines)) {
+      for (const line of Array.from(lines)) {
         if (!/^\[edit\]/.test(line)) {
           content += line + '\n'
           if (/<em>/.test(line)) {

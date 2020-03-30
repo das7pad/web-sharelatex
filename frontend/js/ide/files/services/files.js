@@ -2,7 +2,7 @@ define(['base'], App =>
   App.factory('files', function(ide) {
     const Files = {
       getTeXFiles() {
-        let texFiles = []
+        const texFiles = []
         ide.fileTreeManager.forEachEntity(function(entity, _folder, path) {
           if (
             entity.type === 'doc' &&

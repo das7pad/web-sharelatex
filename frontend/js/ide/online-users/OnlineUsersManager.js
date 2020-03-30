@@ -43,7 +43,7 @@ define([
             'clientTracking.getConnectedUsers',
             (error, connectedUsers) => {
               this.$scope.onlineUsers = {}
-              for (let user of Array.from(connectedUsers || [])) {
+              for (const user of Array.from(connectedUsers || [])) {
                 if (user.client_id === this.ide.socket.io.engine.id) {
                   // Don't store myself
                   continue

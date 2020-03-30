@@ -46,7 +46,7 @@ module.exports = DocumentUpdaterHandler = {
       callback = function(error) {}
     }
     const jobs = []
-    for (let project_id of Array.from(project_ids)) {
+    for (const project_id of Array.from(project_ids)) {
       ;(project_id =>
         jobs.push(callback =>
           DocumentUpdaterHandler.flushProjectToMongo(project_id, callback)
@@ -150,9 +150,7 @@ module.exports = DocumentUpdaterHandler = {
       callback = function(error, docs) {}
     }
     const timer = new metrics.Timer('get-project-docs')
-    const url = `${
-      settings.apis.documentupdater.url
-    }/project/${project_id}/get_and_flush_if_old?state=${projectStateHash}`
+    const url = `${settings.apis.documentupdater.url}/project/${project_id}/get_and_flush_if_old?state=${projectStateHash}`
     return request.post(url, function(error, res, body) {
       timer.done()
       if (error != null) {

@@ -144,7 +144,7 @@ async function getUser(providerId, externalUserId) {
   providerId = providerId.toString()
   externalUserId = externalUserId.toString()
   const query = _getUserQuery(providerId, externalUserId)
-  let user = await User.findOne(query).exec()
+  const user = await User.findOne(query).exec()
   if (!user) {
     throw new Errors.SAMLUserNotFoundError()
   }

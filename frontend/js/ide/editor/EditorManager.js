@@ -27,6 +27,7 @@ define([
       static initClass() {
         this.prototype._syncTimeout = null
       }
+
       constructor(ide, $scope, localStorage) {
         this.ide = ide
         this.$scope = $scope
@@ -288,6 +289,7 @@ define([
       stopIgnoringExternalUpdates() {
         return (this._ignoreExternalUpdates = false)
       }
+
       _syncTrackChangesState(doc) {
         let tryToggle
         if (doc == null) {

@@ -97,7 +97,7 @@ define(['base'], function(App) {
 
     $scope.updateVisibleUsers = function() {
       $scope.visibleUsers = []
-      for (let user of Array.from($scope.users)) {
+      for (const user of Array.from($scope.users)) {
         const visible = true
 
         if (visible) {
@@ -145,7 +145,7 @@ define(['base'], function(App) {
     $scope.DeleteSelectedUsers = function() {
       const selected_users = $scope.getSelectedUsers()
 
-      for (let user of Array.from(selected_users)) {
+      for (const user of Array.from(selected_users)) {
         $scope._removeUserFromList(user)
         queuedHttp({
           method: 'DELETE',
@@ -222,9 +222,9 @@ define(['base'], function(App) {
   })
 })
 function __range__(left, right, inclusive) {
-  let range = []
-  let ascending = left < right
-  let end = !inclusive ? right : ascending ? right + 1 : right - 1
+  const range = []
+  const ascending = left < right
+  const end = !inclusive ? right : ascending ? right + 1 : right - 1
   for (let i = left; ascending ? i < end : i > end; ascending ? i++ : i--) {
     range.push(i)
   }

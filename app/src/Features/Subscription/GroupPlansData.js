@@ -34,13 +34,13 @@ const capitalize = string => string.charAt(0).toUpperCase() + string.slice(1)
 // a particularly clean pattern, since it's a little surprising that settings
 // are modified at boot-time, but I think it's a better option than trying to
 // keep two sources of data in sync.
-for (let usage in groups) {
+for (const usage in groups) {
   const plan_data = groups[usage]
-  for (let plan_code in plan_data) {
+  for (const plan_code in plan_data) {
     const currency_data = plan_data[plan_code]
-    for (let currency in currency_data) {
+    for (const currency in currency_data) {
       const price_data = currency_data[currency]
-      for (let size in price_data) {
+      for (const size in price_data) {
         const price = price_data[size]
         Settings.plans.push({
           planCode: `group_${plan_code}_${size}_${usage}`,

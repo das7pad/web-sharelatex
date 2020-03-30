@@ -73,7 +73,7 @@ define(['crypto-js/md5'], function(CryptoJS) {
 
     getHueForId(id) {
       const hash = CryptoJS(id)
-      let hue = parseInt(hash.toString().slice(0, 8), 16) % 320
+      const hue = parseInt(hash.toString().slice(0, 8), 16) % 320
       return hue
     }
   })

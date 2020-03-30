@@ -98,7 +98,7 @@ const UserController = {
           { deleterUser: user, ipAddress: req.ip },
           err => {
             if (err) {
-              let errorData = {
+              const errorData = {
                 message: 'error while deleting user account',
                 info: { userId }
               }
@@ -233,7 +233,7 @@ const UserController = {
           // update the user email
           UserUpdater.changeEmailAddress(userId, newEmail, err => {
             if (err) {
-              let errorData = {
+              const errorData = {
                 message: 'problem updaing users email address',
                 info: { userId, newEmail, public: {} }
               }

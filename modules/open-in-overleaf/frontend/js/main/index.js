@@ -8,7 +8,7 @@ define(['base'], App =>
     $scope.error = false
 
     $scope.handleGateway = function() {
-      let input = JSON.parse($('#overleaf-gateway-data').text())
+      const input = JSON.parse($('#overleaf-gateway-data').text())
       _addReferrer(input.params)
 
       if (!_validateInput(input)) {

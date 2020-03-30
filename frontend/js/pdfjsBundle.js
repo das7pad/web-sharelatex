@@ -2,9 +2,7 @@
   Inject the worker path and load the worker with a low priority
  */
 define(['pdfjs-dist/build/pdf.js'], function(pdfjsBundle) {
-  pdfjsBundle.GlobalWorkerOptions.workerSrc = `${
-    window.staticPath
-  }vendor/pdfjs-dist/build/pdf.worker.min.js`
+  pdfjsBundle.GlobalWorkerOptions.workerSrc = `${window.staticPath}vendor/pdfjs-dist/build/pdf.worker.min.js`
   if (typeof window !== 'undefined' && 'Worker' in window) {
     // preload the worker with a low priority
     const link = document.createElement('link')

@@ -167,8 +167,8 @@ function cannotNestMarks(cm, preText, selection) {
  * @returns {boolean}
  */
 function withinBoldOrItalicMarkContent(cm, preText, postText, selection) {
-  let selectionStart = _.clone(selection.from())
-  let selectionEnd = _.clone(selection.to())
+  const selectionStart = _.clone(selection.from())
+  const selectionEnd = _.clone(selection.to())
   let selectedText = cm.getRange(selectionStart, selectionEnd)
 
   // Get state precisely up to where the selection ends, resolving recent edits

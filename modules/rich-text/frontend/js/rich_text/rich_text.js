@@ -76,7 +76,7 @@ export default function RichText(_cm, rtAdapter) {
     const newMathMarks = []
     let titleMark, authorMark, maketitleMark
     // Create new editor marks for unmatched source marks
-    for (let sourceMark of sourceMarks) {
+    for (const sourceMark of sourceMarks) {
       if (!sourceMark) continue
 
       if (MathMarker.matcher(_cm, sourceMark)) {

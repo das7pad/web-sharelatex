@@ -121,15 +121,15 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
 
     // Allow tags to be accessed on projects as well
     const projectsById = {}
-    for (let project of $scope.projects) {
+    for (const project of $scope.projects) {
       projectsById[project.id] = project
     }
 
     $scope.getProjectById = id => projectsById[id]
 
-    for (let tag of $scope.tags) {
-      for (let projectId of tag.project_ids || []) {
-        let project = projectsById[projectId]
+    for (const tag of $scope.tags) {
+      for (const projectId of tag.project_ids || []) {
+        const project = projectsById[projectId]
         if (project) {
           if (!project.tags) {
             project.tags = []
@@ -205,7 +205,7 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
     $scope.updateVisibleProjects = function() {
       $scope.visibleProjects = []
       const selectedTag = $scope.getSelectedTag()
-      for (let project of $scope.projects) {
+      for (const project of $scope.projects) {
         let visible = true
         // Only show if it matches any search text
         if ($scope.searchText.value !== '') {
@@ -293,7 +293,7 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
     }
 
     $scope.getSelectedTag = function() {
-      for (let tag of $scope.tags) {
+      for (const tag of $scope.tags) {
         if (tag.selected) {
           return tag
         }
@@ -305,7 +305,7 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
       // Remove project_id from tag.project_ids
       const remainingProjectIds = []
       const removedProjectIds = []
-      for (let projectId of tag.project_ids) {
+      for (const projectId of tag.project_ids) {
         if (!removeProjectIds.includes(projectId)) {
           remainingProjectIds.push(projectId)
         } else {
@@ -335,7 +335,7 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
       )
 
       // Remove tag from project.tags
-      for (let project of selectedProjects) {
+      for (const project of selectedProjects) {
         if (!project.tags) {
           project.tags = []
         }
@@ -345,7 +345,7 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
         }
       }
 
-      for (let projectId of removedProjectIds) {
+      for (const projectId of removedProjectIds) {
         queuedHttp({
           method: 'DELETE',
           url: `/tag/${tag._id}/project/${projectId}`,
@@ -392,7 +392,7 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
 
       // Add project_ids into tag.project_ids
       const addedProjectIds = []
-      for (let projectId of $scope.getSelectedProjectIds()) {
+      for (const projectId of $scope.getSelectedProjectIds()) {
         if (!tag.project_ids.includes(projectId)) {
           tag.project_ids.push(projectId)
           addedProjectIds.push(projectId)
@@ -400,7 +400,7 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
       }
 
       // Add tag into each project.tags
-      for (let project of selectedProjects) {
+      for (const project of selectedProjects) {
         if (!project.tags) {
           project.tags = []
         }
@@ -409,7 +409,7 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
         }
       }
 
-      for (let projectId of addedProjectIds) {
+      for (const projectId of addedProjectIds) {
         queuedHttp.post(`/tag/${tag._id}/project/${projectId}`, {
           _csrf: window.csrfToken
         })
@@ -494,7 +494,7 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
         .then(() => (project.name = newName))
 
     $scope.openRenameProjectModal = function() {
-      let project = $scope.getFirstSelectedProject()
+      const project = $scope.getFirstSelectedProject()
       if (!project || project.accessLevel !== 'owner') {
         return
       }
@@ -543,7 +543,7 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
     }
 
     $scope.openCloneProjectModal = function() {
-      let project = $scope.getFirstSelectedProject()
+      const project = $scope.getFirstSelectedProject()
       if (!project) {
         return
       }
@@ -668,7 +668,7 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
 
     //
     $scope.archiveProjects = function(projects) {
-      for (let project of projects) {
+      for (const project of projects) {
         project.archived = true
         project.trashed = false
         _archiveProject(project)
@@ -677,7 +677,7 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
     }
 
     $scope.unarchiveProjects = function(projects) {
-      for (let project of projects) {
+      for (const project of projects) {
         project.archived = false
         _unarchiveProject(project)
       }
@@ -685,7 +685,7 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
     }
 
     $scope.trashProjects = function(projects) {
-      for (let project of projects) {
+      for (const project of projects) {
         project.trashed = true
         project.archived = false
         _trashProject(project)
@@ -694,7 +694,7 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
     }
 
     $scope.untrashProjects = function(projects) {
-      for (let project of projects) {
+      for (const project of projects) {
         project.trashed = false
         _untrashProject(project)
       }
@@ -703,7 +703,7 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
 
     $scope.leaveProjects = function(projects) {
       _deleteOrLeaveProjectsLocally(projects)
-      for (let project of projects) {
+      for (const project of projects) {
         _leaveProject(project)
       }
       $scope.updateVisibleProjects()
@@ -711,7 +711,7 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
 
     $scope.deleteProjects = function(projects) {
       _deleteOrLeaveProjectsLocally(projects)
-      for (let project of projects) {
+      for (const project of projects) {
         _deleteProject(project)
       }
       $scope.updateVisibleProjects()
@@ -719,7 +719,7 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
 
     $scope.leaveOrDeleteProjects = function(projects) {
       _deleteOrLeaveProjectsLocally(projects)
-      for (let project of projects) {
+      for (const project of projects) {
         if (project.accessLevel === 'owner') {
           _deleteProject(project)
         } else {
@@ -792,10 +792,10 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
 
     const _deleteOrLeaveProjectsLocally = function(projects) {
       const projectIds = projects.map(p => p.id)
-      for (let tag of $scope.tags || []) {
+      for (const tag of $scope.tags || []) {
         $scope._removeProjectIdsFromTagArray(tag, projectIds)
       }
-      for (let project of projects || []) {
+      for (const project of projects || []) {
         $scope._removeProjectFromList(project)
       }
     }
@@ -834,7 +834,7 @@ define(['base', 'main/project-list/services/project-list'], function(App) {
     }
 
     const markTagAsSelected = id => {
-      for (let tag of $scope.tags) {
+      for (const tag of $scope.tags) {
         if (tag._id === id) {
           tag.selected = true
         } else {

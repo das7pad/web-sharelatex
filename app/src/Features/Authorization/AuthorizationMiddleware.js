@@ -72,7 +72,7 @@ module.exports = AuthorizationMiddleware = {
             { userId, projectId },
             'denying user read access to project'
           )
-          const acceptHeader = req.headers && req.headers['accept']
+          const acceptHeader = req.headers && req.headers.accept
           if (acceptHeader && acceptHeader.match(/^application\/json.*$/)) {
             return res.sendStatus(403)
           }

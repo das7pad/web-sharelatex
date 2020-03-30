@@ -26,7 +26,7 @@ const UserMembershipsHandler = {
       callback = function(error) {}
     }
     const entityConfigs = []
-    for (let key in UserMembershipEntityConfigs) {
+    for (const key in UserMembershipEntityConfigs) {
       const entityConfig = UserMembershipEntityConfigs[key]
       if (entityConfig.fields && entityConfig.fields.write != null) {
         entityConfigs.push(entityConfig)
@@ -51,7 +51,7 @@ const UserMembershipsHandler = {
       callback = function(error) {}
     }
     const removeOperation = { $pull: {} }
-    removeOperation['$pull'][entityConfig.fields.write] = userId
+    removeOperation.$pull[entityConfig.fields.write] = userId
     return EntityModels[entityConfig.modelName].updateMany(
       {},
       removeOperation,

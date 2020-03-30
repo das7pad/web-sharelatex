@@ -2,13 +2,9 @@ const _ = require('underscore')
 const settings = require('settings-sharelatex')
 const marked = require('marked')
 const StringHelper = require('../Helpers/StringHelper')
-const BaseWithHeaderEmailLayout = require(`./Layouts/${
-  settings.brandPrefix
-}BaseWithHeaderEmailLayout`)
+const BaseWithHeaderEmailLayout = require(`./Layouts/${settings.brandPrefix}BaseWithHeaderEmailLayout`)
 const SpamSafe = require('./SpamSafe')
-const SingleCTAEmailBody = require(`./Bodies/${
-  settings.brandPrefix
-}SingleCTAEmailBody`)
+const SingleCTAEmailBody = require(`./Bodies/${settings.brandPrefix}SingleCTAEmailBody`)
 const NoCTAEmailBody = require(`./Bodies/NoCTAEmailBody`)
 
 function CTAEmailTemplate(content) {
@@ -32,8 +28,8 @@ ${content.message(opts).trim()}
 ${content.ctaText(opts)}: ${content.ctaURL(opts)}
 
 ${(typeof content.secondaryMessage === 'function'
-        ? content.secondaryMessage(opts).trim()
-        : undefined) || ''}
+  ? content.secondaryMessage(opts).trim()
+  : undefined) || ''}
 
 Regards,
 The ${settings.appName} Team - ${settings.siteUrl}\
@@ -75,8 +71,8 @@ function NoCTAEmailTemplate(content) {
 ${content.greeting(opts)}
 ${content.message(opts).trim()}
 ${(typeof content.secondaryMessage === 'function'
-        ? content.secondaryMessage(opts).trim()
-        : undefined) || ''}
+  ? content.secondaryMessage(opts).trim()
+  : undefined) || ''}
 Regards,
 The ${settings.appName} Team - ${settings.siteUrl}\
 `
@@ -157,9 +153,7 @@ Click here to set your password and log in:\
 `
   },
   secondaryMessage() {
-    return `If you have any questions or problems, please contact ${
-      settings.adminEmail
-    }`
+    return `If you have any questions or problems, please contact ${settings.adminEmail}`
   },
   ctaText() {
     return 'Set password'
@@ -175,9 +169,7 @@ templates.canceledSubscription = CTAEmailTemplate({
   },
   message() {
     return `\
-I'm sorry to see you cancelled your ${
-      settings.appName
-    } premium account. Would you mind giving us some feedback on what the site is lacking at the moment via this quick survey?\
+I'm sorry to see you cancelled your ${settings.appName} premium account. Would you mind giving us some feedback on what the site is lacking at the moment via this quick survey?\
 `
   },
   secondaryMessage() {
@@ -316,9 +308,7 @@ templates.verifyEmailToJoinTeam = CTAEmailTemplate({
     )} has invited you to join a team on ${settings.appName}`
   },
   message(opts) {
-    return `Please click the button below to join the team and enjoy the benefits of an upgraded ${
-      settings.appName
-    } account.`
+    return `Please click the button below to join the team and enjoy the benefits of an upgraded ${settings.appName} account.`
   },
   ctaText(opts) {
     return 'Join now'
@@ -380,9 +370,7 @@ templates.projectsTransferredFromSharelatex = CTAEmailTemplate({
 We are writing with important information about your Overleaf and ShareLaTeX accounts.
 
 As part of our ongoing work to [integrate Overleaf and ShareLaTeX](https://www.overleaf.com/blog/518-exciting-news-sharelatex-is-joining-overleaf),
-we found a ShareLaTeX account with the email address ${
-      opts.to
-    } that matches your Overleaf account.
+we found a ShareLaTeX account with the email address ${opts.to} that matches your Overleaf account.
 
 We have now transferred the projects from this ShareLaTeX account into your Overleaf account, so you may notice some new
 projects on your Overleaf projects page.
@@ -401,62 +389,40 @@ If you have any questions, please contact our support team by reply.\
 
 templates.emailAddressPoachedEmail = CTAEmailTemplate({
   subject() {
-    return `One of your email addresses has been moved to another ${
-      settings.appName
-    } account`
+    return `One of your email addresses has been moved to another ${settings.appName} account`
   },
   title() {
-    return `One of your email addresses has been moved to another ${
-      settings.appName
-    } account`
+    return `One of your email addresses has been moved to another ${settings.appName} account`
   },
   message(opts) {
     let message = `\
 We are writing with important information about your Overleaf account.
 
-You added the email address ${opts.poached} to your ${
-      opts.to
-    } Overleaf account as a secondary (or affiliation)
+You added the email address ${opts.poached} to your ${opts.to} Overleaf account as a secondary (or affiliation)
 email address, but we have had to remove it.
 
-This is because your ${
-      opts.poached
-    } email address was also in use as the primary email address for an older Overleaf
+This is because your ${opts.poached} email address was also in use as the primary email address for an older Overleaf
 account from before our [integration with ShareLaTeX to create Overleaf v2](https://www.overleaf.com/blog/518-exciting-news-sharelatex-is-joining-overleaf).
 
 ### What do I need to do?
 
-You now have two Overleaf accounts, one under ${opts.poached} and one under ${
-      opts.to
-    }.
+You now have two Overleaf accounts, one under ${opts.poached} and one under ${opts.to}.
 
-You may wish to log in to Overleaf as ${
-      opts.poached
-    } to check whether you have projects there that you would like to
-keep. If you are not sure of the password, you can send yourself a password reset email to ${
-      opts.poached
-    }, via
+You may wish to log in to Overleaf as ${opts.poached} to check whether you have projects there that you would like to
+keep. If you are not sure of the password, you can send yourself a password reset email to ${opts.poached}, via
 https://www.overleaf.com/user/password/reset
 
 Once you have downloaded your projects, you may wish to delete your
-${
-      opts.poached
-    } Overleaf account, which you can do from your account settings. You will then be able to add
+${opts.poached} Overleaf account, which you can do from your account settings. You will then be able to add
 ${opts.poached} as a secondary email address on your ${opts.to} account again.
 
 \
 `
     if (opts.proFeatures) {
       message += `\
-Because your ${
-        opts.poached
-      } email address was an institutional affiliation through which you had Pro features. Your Pro
-features have been transferred to your ${
-        opts.poached
-      } account. If you would like to transfer them back to your
-${opts.to} account, you will need to delete the ${
-        opts.poached
-      } account and re-add it as a secondary email address,
+Because your ${opts.poached} email address was an institutional affiliation through which you had Pro features. Your Pro
+features have been transferred to your ${opts.poached} account. If you would like to transfer them back to your
+${opts.to} account, you will need to delete the ${opts.poached} account and re-add it as a secondary email address,
 as described above.
 
 \
@@ -478,15 +444,13 @@ If you have any questions, you can contact our support team by reply.\
 
 templates.emailThirdPartyIdentifierLinked = NoCTAEmailTemplate({
   subject(opts) {
-    return `Your ${settings.appName} account is now linked with ${
-      opts.provider
-    }`
+    return `Your ${settings.appName} account is now linked with ${opts.provider}`
   },
   title(opts) {
     return `Accounts Linked`
   },
   message(opts) {
-    let message = `We're contacting you to notify you that your ${opts.provider}
+    const message = `We're contacting you to notify you that your ${opts.provider}
     account is now linked to your ${settings.appName} account.`
     return message
   }
@@ -494,15 +458,13 @@ templates.emailThirdPartyIdentifierLinked = NoCTAEmailTemplate({
 
 templates.emailThirdPartyIdentifierUnlinked = NoCTAEmailTemplate({
   subject(opts) {
-    return `Your ${settings.appName} account is no longer linked with ${
-      opts.provider
-    }`
+    return `Your ${settings.appName} account is no longer linked with ${opts.provider}`
   },
   title(opts) {
     return `Accounts No Longer Linked`
   },
   message(opts) {
-    let message = `We're contacting you to notify you that your ${opts.provider}
+    const message = `We're contacting you to notify you that your ${opts.provider}
     account is no longer linked with your ${settings.appName} account.`
     return message
   }

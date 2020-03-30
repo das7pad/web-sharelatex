@@ -199,7 +199,7 @@ module.exports = MockV1Api = {
     })
 
     app.post('/api/v1/sharelatex/login', (req, res, next) => {
-      for (let id in this.users) {
+      for (const id in this.users) {
         const user = this.users[id]
         if (
           user != null &&

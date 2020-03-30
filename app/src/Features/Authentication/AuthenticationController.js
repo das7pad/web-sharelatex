@@ -67,7 +67,7 @@ const AuthenticationController = (module.exports = {
         req.sessionStore.generate(req)
         // Note: the validation token is not writable, so it does not get
         // transferred to the new session below.
-        for (let key in oldSession) {
+        for (const key in oldSession) {
           const value = oldSession[key]
           if (key !== '__tmp') {
             req.session[key] = value
@@ -224,7 +224,7 @@ const AuthenticationController = (module.exports = {
     if (!sessionUser) {
       return
     }
-    for (let key in props) {
+    for (const key in props) {
       const value = props[key]
       sessionUser[key] = value
     }
@@ -348,7 +348,7 @@ const AuthenticationController = (module.exports = {
       return next()
     }
 
-    if (req.headers['authorization'] != null) {
+    if (req.headers.authorization != null) {
       AuthenticationController.httpAuth(req, res, next)
     } else if (AuthenticationController.isUserLoggedIn(req)) {
       next()
@@ -363,7 +363,7 @@ const AuthenticationController = (module.exports = {
   },
 
   httpAuth: basicAuth(function(user, pass) {
-    let expectedPassword = Settings.httpAuthUsers[user]
+    const expectedPassword = Settings.httpAuthUsers[user]
     const isValid =
       expectedPassword &&
       expectedPassword.length === pass.length &&

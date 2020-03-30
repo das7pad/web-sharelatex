@@ -124,7 +124,7 @@ const FileTypeManager = {
 
   shouldIgnore(path, callback) {
     const name = Path.basename(path)
-    let extension = Path.extname(name).toLowerCase()
+    const extension = Path.extname(name).toLowerCase()
     let ignore = false
     if (name.startsWith('.') && name !== '.latexmkrc') {
       ignore = true

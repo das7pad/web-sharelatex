@@ -394,8 +394,8 @@ define(['base'], function(App) {
     '126'
   ]
 
-  for (let domain of commonDomains) {
-    for (let tld of commonTLDs) {
+  for (const domain of commonDomains) {
+    for (const tld of commonTLDs) {
       domainsBlackList[`${domain}.${tld}`] = true
     }
   }

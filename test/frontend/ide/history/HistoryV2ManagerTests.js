@@ -168,7 +168,7 @@ define(['ide/history/HistoryV2Manager'], HistoryV2Manager =>
     })
 
     it('should keep history updates after performing a soft reset', function() {
-      let historyScopeWithUpdates = Object.assign(
+      const historyScopeWithUpdates = Object.assign(
         {},
         this.defaultHistoryScope,
         {

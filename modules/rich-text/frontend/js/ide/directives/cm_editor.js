@@ -142,11 +142,11 @@ define([
         // event.cancel().
         const handleBeforeChangeEvent = function(cm, event) {
           if (event.update) {
-            let originalText = event.text.join('\n')
+            const originalText = event.text.join('\n')
             if (BAD_CHARS_REGEXP.test(originalText)) {
-              let filteredText = []
+              const filteredText = []
               for (let i = 0; i < event.text.length; i++) {
-                let newEntry = event.text[i].replace(
+                const newEntry = event.text[i].replace(
                   BAD_CHARS_REGEXP,
                   BAD_CHARS_REPLACEMENT_CHAR
                 )
@@ -301,7 +301,7 @@ define([
         init()
 
         if (attrs.resizeOn != null) {
-          for (let event of Array.from(attrs.resizeOn.split(','))) {
+          for (const event of Array.from(attrs.resizeOn.split(','))) {
             scope.$on(event, () =>
               __guard__(
                 editor != null ? editor.getCodeMirror() : undefined,

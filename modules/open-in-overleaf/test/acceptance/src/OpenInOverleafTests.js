@@ -83,7 +83,7 @@ I have a bad name
 
     LinkedUrlProxy.listen(6543, done)
 
-    MockV1Api.brands['OSF'] = {
+    MockV1Api.brands.OSF = {
       id: 176,
       name: 'Open Science Framework',
       partner: null,
@@ -95,13 +95,13 @@ I have a bad name
     MockV1Api.brand_variations[6789] = { id: 6789 }
     MockV1Api.brand_variations[69] = { id: 69 }
 
-    MockV1Api.validation_clients['ieee_latexqc'] = {
+    MockV1Api.validation_clients.ieee_latexqc = {
       brand_variation_id: '1234',
       conversions: {
         conversion_foo: 'http://example.org/project.zip'
       }
     }
-    return (MockV1Api.validation_clients['wombat_university'] = {
+    return (MockV1Api.validation_clients.wombat_university = {
       brand_variation_id: null,
       conversions: {
         conversion_bar: 'http://example.org/project.zip'
@@ -193,11 +193,11 @@ I have a bad name
 
       it('should redirect to a project', function() {
         expect(this.res.statusCode).to.equal(302)
-        return expect(this.res.headers['location']).to.match(this.uri_regex)
+        return expect(this.res.headers.location).to.match(this.uri_regex)
       })
 
       return it('should create a project with the returned id', function(done) {
-        const projectId = this.res.headers['location'].match(this.uri_regex)[1]
+        const projectId = this.res.headers.location.match(this.uri_regex)[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {

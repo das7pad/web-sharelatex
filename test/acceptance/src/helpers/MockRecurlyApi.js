@@ -54,12 +54,8 @@ module.exports = MockRecurlyApi = {
 	<state>${subscription.state}</state>
 	<tax_in_cents type="integer">${subscription.tax_in_cents}</tax_in_cents>
 	<tax_rate type="float">${subscription.tax_rate}</tax_rate>
-	<current_period_ends_at type="datetime">${
-    subscription.current_period_ends_at
-  }</current_period_ends_at>
-	<unit_amount_in_cents type="integer">${
-    subscription.unit_amount_in_cents
-  }</unit_amount_in_cents>
+	<current_period_ends_at type="datetime">${subscription.current_period_ends_at}</current_period_ends_at>
+	<unit_amount_in_cents type="integer">${subscription.unit_amount_in_cents}</unit_amount_in_cents>
 	<account href="accounts/${subscription.account.id}" />
 	<trial_ends_at type="datetime">${subscription.trial_ends_at}</trial_ends_at>
 </subscription>\
@@ -75,9 +71,7 @@ module.exports = MockRecurlyApi = {
         return res.send(`\
 <account>
 	<account_code>${req.params.id}</account_code>
-	<hosted_login_token>${
-    subscription.account.hosted_login_token
-  }</hosted_login_token>
+	<hosted_login_token>${subscription.account.hosted_login_token}</hosted_login_token>
 	<email>${subscription.account.email}</email>
 </account>\
 `)
@@ -121,7 +115,7 @@ module.exports = MockRecurlyApi = {
     app.get('/accounts/:id/redemptions', (req, res, next) => {
       const redemptions = this.redemptions[req.params.id] || []
       let redemptionsListXml = ''
-      for (let redemption of Array.from(redemptions)) {
+      for (const redemption of Array.from(redemptions)) {
         redemptionsListXml += `\
 <redemption>
 	<state>${redemption.state}</state>

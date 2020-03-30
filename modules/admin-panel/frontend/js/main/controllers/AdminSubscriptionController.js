@@ -40,9 +40,7 @@ define(['base'], function(App) {
 
     return ($scope.onSuccess = function(result) {
       const { subscription } = result.data
-      const location = `/admin/user/${subscription.admin_id}/subscription/${
-        subscription._id
-      }`
+      const location = `/admin/user/${subscription.admin_id}/subscription/${subscription._id}`
       return (window.location = location)
     })
   })

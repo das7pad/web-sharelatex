@@ -100,9 +100,7 @@ module.exports = ProjectOutputFileAgent = {
                 ) // Created
               } else {
                 err = new OutputFileFetchFailedError(
-                  `Output file fetch failed: ${linkedFileData.build_id}, ${
-                    linkedFileData.source_output_file_path
-                  }`
+                  `Output file fetch failed: ${linkedFileData.build_id}, ${linkedFileData.source_output_file_path}`
                 )
                 err.statusCode = response.statusCode
                 return callback(err)
@@ -158,9 +156,7 @@ module.exports = ProjectOutputFileAgent = {
                 ) // Created
               } else {
                 err = new OutputFileFetchFailedError(
-                  `Output file fetch failed: ${linkedFileData.build_id}, ${
-                    linkedFileData.source_output_file_path
-                  }`
+                  `Output file fetch failed: ${linkedFileData.build_id}, ${linkedFileData.source_output_file_path}`
                 )
                 err.statusCode = response.statusCode
                 return callback(err)

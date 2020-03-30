@@ -25,7 +25,7 @@ define([], function() {
     getEntityForPath(path) {
       // Handle paths that are missing
       let entity
-      for (let extension of ['', '.png', '.pdf', '.jpg', '.jpeg', '.eps']) {
+      for (const extension of ['', '.png', '.pdf', '.jpg', '.jpeg', '.eps']) {
         entity = this.fileTreeManager.findEntityByPath(`${path}${extension}`)
         if (entity) {
           break

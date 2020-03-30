@@ -1,6 +1,6 @@
 const webpackConfig = require('./webpack.config.test')
 let junitDest
-let reporters = ['mocha']
+const reporters = ['mocha']
 if (process.env.HOME === '/home/node') {
   // assume CI
   junitDest = '/home/node/frontend.xml'

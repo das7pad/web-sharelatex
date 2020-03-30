@@ -338,9 +338,7 @@ describe('ProjectDuplicateNames', function() {
         beforeEach(function(done) {
           return this.owner.request.post(
             {
-              uri: `/project/${this.example_project_id}/doc/${
-                this.refBibDoc._id
-              }/rename`,
+              uri: `/project/${this.example_project_id}/doc/${this.refBibDoc._id}/rename`,
               json: {
                 name: 'main.tex'
               }
@@ -361,9 +359,7 @@ describe('ProjectDuplicateNames', function() {
         beforeEach(function(done) {
           return this.owner.request.post(
             {
-              uri: `/project/${this.example_project_id}/folder/${
-                this.testFolderId
-              }/rename`,
+              uri: `/project/${this.example_project_id}/folder/${this.testFolderId}/rename`,
               json: {
                 name: 'main.tex'
               }
@@ -384,9 +380,7 @@ describe('ProjectDuplicateNames', function() {
         beforeEach(function(done) {
           return this.owner.request.post(
             {
-              uri: `/project/${this.example_project_id}/file/${
-                this.imageFile._id
-              }/rename`,
+              uri: `/project/${this.example_project_id}/file/${this.imageFile._id}/rename`,
               json: {
                 name: 'main.tex'
               }
@@ -409,9 +403,7 @@ describe('ProjectDuplicateNames', function() {
         beforeEach(function(done) {
           return this.owner.request.post(
             {
-              uri: `/project/${this.example_project_id}/doc/${
-                this.refBibDoc._id
-              }/rename`,
+              uri: `/project/${this.example_project_id}/doc/${this.refBibDoc._id}/rename`,
               json: {
                 name: 'universe.jpg'
               }
@@ -432,9 +424,7 @@ describe('ProjectDuplicateNames', function() {
         beforeEach(function(done) {
           return this.owner.request.post(
             {
-              uri: `/project/${this.example_project_id}/folder/${
-                this.testFolderId
-              }/rename`,
+              uri: `/project/${this.example_project_id}/folder/${this.testFolderId}/rename`,
               json: {
                 name: 'universe.jpg'
               }
@@ -455,9 +445,7 @@ describe('ProjectDuplicateNames', function() {
         beforeEach(function(done) {
           return this.owner.request.post(
             {
-              uri: `/project/${this.example_project_id}/file/${
-                this.imageFile._id
-              }/rename`,
+              uri: `/project/${this.example_project_id}/file/${this.imageFile._id}/rename`,
               json: {
                 name: 'universe.jpg'
               }
@@ -480,9 +468,7 @@ describe('ProjectDuplicateNames', function() {
         beforeEach(function(done) {
           return this.owner.request.post(
             {
-              uri: `/project/${this.example_project_id}/doc/${
-                this.refBibDoc._id
-              }/rename`,
+              uri: `/project/${this.example_project_id}/doc/${this.refBibDoc._id}/rename`,
               json: {
                 name: 'testfolder'
               }
@@ -503,9 +489,7 @@ describe('ProjectDuplicateNames', function() {
         beforeEach(function(done) {
           return this.owner.request.post(
             {
-              uri: `/project/${this.example_project_id}/folder/${
-                this.testFolderId
-              }/rename`,
+              uri: `/project/${this.example_project_id}/folder/${this.testFolderId}/rename`,
               json: {
                 name: 'testfolder'
               }
@@ -526,9 +510,7 @@ describe('ProjectDuplicateNames', function() {
         beforeEach(function(done) {
           return this.owner.request.post(
             {
-              uri: `/project/${this.example_project_id}/file/${
-                this.imageFile._id
-              }/rename`,
+              uri: `/project/${this.example_project_id}/file/${this.imageFile._id}/rename`,
               json: {
                 name: 'testfolder'
               }
@@ -601,9 +583,7 @@ describe('ProjectDuplicateNames', function() {
         beforeEach(function(done) {
           return this.owner.request.post(
             {
-              uri: `/project/${this.example_project_id}/doc/${
-                this.mainTexDoc._id
-              }/move`,
+              uri: `/project/${this.example_project_id}/doc/${this.mainTexDoc._id}/move`,
               json: {
                 folder_id: this.testFolderId
               }
@@ -624,9 +604,7 @@ describe('ProjectDuplicateNames', function() {
         beforeEach(function(done) {
           return this.owner.request.post(
             {
-              uri: `/project/${this.example_project_id}/file/${
-                this.imageFile._id
-              }/move`,
+              uri: `/project/${this.example_project_id}/file/${this.imageFile._id}/move`,
               json: {
                 folder_id: this.testFolderId
               }
@@ -647,9 +625,7 @@ describe('ProjectDuplicateNames', function() {
         beforeEach(function(done) {
           return this.owner.request.post(
             {
-              uri: `/project/${this.example_project_id}/folder/${
-                this.otherFolderId
-              }/move`,
+              uri: `/project/${this.example_project_id}/folder/${this.otherFolderId}/move`,
               json: {
                 folder_id: this.testFolderId
               }
@@ -670,9 +646,7 @@ describe('ProjectDuplicateNames', function() {
         beforeEach(function(done) {
           return this.owner.request.post(
             {
-              uri: `/project/${this.example_project_id}/folder/${
-                this.testFolderId
-              }/move`,
+              uri: `/project/${this.example_project_id}/folder/${this.testFolderId}/move`,
               json: {
                 folder_id: this.subFolderId
               }

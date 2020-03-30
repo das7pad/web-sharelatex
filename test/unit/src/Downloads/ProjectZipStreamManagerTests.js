@@ -326,7 +326,7 @@ describe('ProjectZipStreamManager', function() {
       )
       return (() => {
         const result = []
-        for (let path in this.streams) {
+        for (const path in this.streams) {
           const stream = this.streams[path]
           result.push(stream.emit('end'))
         }
@@ -343,7 +343,7 @@ describe('ProjectZipStreamManager', function() {
     it('should get a stream for each file', function() {
       return (() => {
         const result = []
-        for (let path in this.files) {
+        for (const path in this.files) {
           const file = this.files[path]
           result.push(
             this.FileStoreHandler.getFileStream

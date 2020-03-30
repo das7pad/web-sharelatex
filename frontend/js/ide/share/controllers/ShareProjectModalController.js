@@ -59,7 +59,7 @@ define(['base'], App => {
     $http.get('/user/contacts').then(function(response) {
       const { data } = response
       $scope.autocompleteContacts = data.contacts || []
-      for (let contact of $scope.autocompleteContacts) {
+      for (const contact of $scope.autocompleteContacts) {
         if (contact.type === 'user') {
           if (
             contact.first_name === contact.email.split('@')[0] &&
@@ -93,7 +93,7 @@ define(['base'], App => {
         ) {
           return false
         }
-        for (let text of [contact.name, contact.email]) {
+        for (const text of [contact.name, contact.email]) {
           if (
             text != null &&
             text.toLowerCase().indexOf($query.toLowerCase()) > -1
@@ -149,59 +149,62 @@ define(['base'], App => {
           validateCaptchaV3('invite')
           // do v2 captcha
           const ExposedSettings = window.ExposedSettings
-          validateCaptcha(function(response) {
-            $scope.grecaptchaResponse = response
-            const invites = $scope.project.invites || []
-            const invite = _.find(invites, invite => invite.email === email)
-            let request
-            if (currentInviteEmails.includes(email) && invite) {
-              request = projectInvites.resendInvite(invite._id)
-            } else {
-              request = projectInvites.sendInvite(
-                email,
-                $scope.inputs.privileges,
-                $scope.grecaptchaResponse
-              )
-            }
+          validateCaptcha(
+            function(response) {
+              $scope.grecaptchaResponse = response
+              const invites = $scope.project.invites || []
+              const invite = _.find(invites, invite => invite.email === email)
+              let request
+              if (currentInviteEmails.includes(email) && invite) {
+                request = projectInvites.resendInvite(invite._id)
+              } else {
+                request = projectInvites.sendInvite(
+                  email,
+                  $scope.inputs.privileges,
+                  $scope.grecaptchaResponse
+                )
+              }
 
-            request
-              .then(function(response) {
-                const { data } = response
-                if (data.error) {
-                  $scope.setError(data.error)
-                  $scope.state.inflight = false
-                } else {
-                  if (data.invite) {
-                    const { invite } = data
-                    $scope.project.invites.push(invite)
+              request
+                .then(function(response) {
+                  const { data } = response
+                  if (data.error) {
+                    $scope.setError(data.error)
+                    $scope.state.inflight = false
                   } else {
-                    const users =
-                      data.users != null
-                        ? data.users
-                        : data.user != null
+                    if (data.invite) {
+                      const { invite } = data
+                      $scope.project.invites.push(invite)
+                    } else {
+                      const users =
+                        data.users != null
+                          ? data.users
+                          : data.user != null
                           ? [data.user]
                           : []
-                    $scope.project.members.push(...users)
+                      $scope.project.members.push(...users)
+                    }
                   }
-                }
 
-                setTimeout(
-                  () =>
-                    // Give $scope a chance to update $scope.canAddCollaborators
-                    // with new collaborator information.
-                    addNextMember(),
+                  setTimeout(
+                    () =>
+                      // Give $scope a chance to update $scope.canAddCollaborators
+                      // with new collaborator information.
+                      addNextMember(),
 
-                  0
-                )
-              })
-              .catch(function(httpResponse) {
-                const { data } = httpResponse
-                $scope.state.inflight = false
-                $scope.setError(data.errorReason)
-              })
-          }, ExposedSettings.recaptchaDisabled != null
-            ? ExposedSettings.recaptchaDisabled.invite
-            : true)
+                    0
+                  )
+                })
+                .catch(function(httpResponse) {
+                  const { data } = httpResponse
+                  $scope.state.inflight = false
+                  $scope.setError(data.errorReason)
+                })
+            },
+            ExposedSettings.recaptchaDisabled != null
+              ? ExposedSettings.recaptchaDisabled.invite
+              : true
+          )
         }
       }
 

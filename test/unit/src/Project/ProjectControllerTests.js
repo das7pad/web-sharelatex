@@ -213,7 +213,7 @@ describe('ProjectController', function() {
     }
 
     // resource hints
-    for (let fn of [
+    for (const fn of [
       'preloadCommonResources',
       'preloadCss',
       'getCssThemeModifier',

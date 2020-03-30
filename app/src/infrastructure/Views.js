@@ -20,12 +20,12 @@ const viewList = globby
 
 module.exports = {
   precompileViews(app) {
-    let startTime = Date.now()
+    const startTime = Date.now()
     let success = 0
     let failures = 0
     viewList.forEach(view => {
       try {
-        let filename = app.get('views') + '/' + view + '.pug'
+        const filename = app.get('views') + '/' + view + '.pug'
         pug.compileFile(filename, { cache: true })
         logger.log({ view }, 'compiled')
         success++

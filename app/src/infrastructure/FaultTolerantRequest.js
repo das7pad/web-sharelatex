@@ -1,9 +1,8 @@
 const logger = require('logger-sharelatex')
 const request = require('requestretry')
 
-const isProduction =
-  (process.env['NODE_ENV'] || '').toLowerCase() === 'production'
-const isTest = process.env['MOCHA_GREP'] !== undefined
+const isProduction = (process.env.NODE_ENV || '').toLowerCase() === 'production'
+const isTest = process.env.MOCHA_GREP !== undefined
 
 const BACKOFF_MAX_TRIES = 3
 const BACKOFF_BASE = 500

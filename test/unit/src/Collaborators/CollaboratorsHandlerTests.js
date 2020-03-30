@@ -126,7 +126,7 @@ describe('CollaboratorsHandler', function() {
 
     describe('an archived project, archived with a boolean value', function() {
       beforeEach(function() {
-        let archived = [ObjectId(this.userId)]
+        const archived = [ObjectId(this.userId)]
         this.ProjectHelper.calculateArchivedArray.returns(archived)
 
         this.ProjectMock.expects('findOne')

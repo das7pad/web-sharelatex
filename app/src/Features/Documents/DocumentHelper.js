@@ -20,7 +20,7 @@ module.exports = DocumentHelper = {
     }
     const TITLE_WITH_CURLY_BRACES = /\\[tT]itle\*?\s*{([^}]+)}/
     const TITLE_WITH_SQUARE_BRACES = /\\[tT]itle\s*\[([^\]]+)\]/
-    for (let line of Array.from(
+    for (const line of Array.from(
       DocumentHelper._getLinesFromContent(content, maxContentToScan)
     )) {
       var match
@@ -40,7 +40,7 @@ module.exports = DocumentHelper = {
     if (maxContentToScan == null) {
       maxContentToScan = 30000
     }
-    for (let line of Array.from(
+    for (const line of Array.from(
       DocumentHelper._getLinesFromContent(content, maxContentToScan)
     )) {
       // We've had problems with this regex locking up CPU.

@@ -27,7 +27,7 @@ describe('Subscriptions', function() {
     })
 
     it('updates the email address for the account', function(done) {
-      let url = '/user/subscription/account/email'
+      const url = '/user/subscription/account/email'
 
       this.recurlyUser.request.post({ url }, (error, { statusCode }) => {
         if (error) {

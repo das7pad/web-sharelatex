@@ -75,27 +75,21 @@ function updateTagUserIds(oldUserId, newUserId, callback) {
 }
 
 function removeProjectFromTag(userId, tagId, projectId, callback) {
-  const url = `${
-    settings.apis.tags.url
-  }/user/${userId}/tag/${tagId}/project/${projectId}`
+  const url = `${settings.apis.tags.url}/user/${userId}/tag/${tagId}/project/${projectId}`
   request.del({ url, timeout: TIMEOUT }, (err, res, body) =>
     _handleResponse(err, res, { url, userId, tagId, projectId }, callback)
   )
 }
 
 function addProjectToTag(userId, tagId, projectId, callback) {
-  const url = `${
-    settings.apis.tags.url
-  }/user/${userId}/tag/${tagId}/project/${projectId}`
+  const url = `${settings.apis.tags.url}/user/${userId}/tag/${tagId}/project/${projectId}`
   request.post({ url, timeout: TIMEOUT }, (err, res, body) =>
     _handleResponse(err, res, { url, userId, tagId, projectId }, callback)
   )
 }
 
 function addProjectToTagName(userId, name, projectId, callback) {
-  const url = `${
-    settings.apis.tags.url
-  }/user/${userId}/tag/project/${projectId}`
+  const url = `${settings.apis.tags.url}/user/${userId}/tag/project/${projectId}`
   const opts = {
     json: { name },
     timeout: TIMEOUT,

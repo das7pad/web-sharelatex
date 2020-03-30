@@ -29,7 +29,7 @@ define(['base'], App =>
         showOnlyLabels: false
       }
 
-      let _deregistershowOnlyLabelsWatcher = $scope.$watch(
+      const _deregistershowOnlyLabelsWatcher = $scope.$watch(
         'history.showOnlyLabels',
         showOnlyLabels => {
           if (showOnlyLabels != null) {

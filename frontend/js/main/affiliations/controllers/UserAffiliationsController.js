@@ -105,9 +105,7 @@ define(['base'], App =>
       _resetMakingRequestType()
       $scope.ui.isMakingRequest = true
       $scope.ui.isProcessing = true
-      $window.location.href = `${
-        $scope.samlInitPath
-      }?university_id=${institutionId}&auto=/user/settings&email=${email}`
+      $window.location.href = `${$scope.samlInitPath}?university_id=${institutionId}&auto=/user/settings&email=${email}`
     }
 
     $scope.selectUniversityManually = function() {
@@ -190,7 +188,7 @@ define(['base'], App =>
       _monitorRequest(
         UserAffiliationsDataService.setDefaultUserEmail(userEmail.email)
       ).then(function() {
-        for (let email of $scope.userEmails || []) {
+        for (const email of $scope.userEmails || []) {
           email.default = false
         }
         userEmail.default = true

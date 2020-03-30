@@ -9,7 +9,7 @@ const Settings = require('settings-sharelatex')
 
 module.exports = {
   findLocalPlanInSettings(planCode) {
-    for (let plan of Array.from(Settings.plans)) {
+    for (const plan of Array.from(Settings.plans)) {
       if (plan.planCode === planCode) {
         return plan
       }

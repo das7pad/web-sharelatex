@@ -26,9 +26,7 @@ module.exports = MockV1HistoryApi = {
         res.header('content-disposition', 'attachment; name=project.zip')
         res.header('content-type', 'application/octet-stream')
         return res.send(
-          `Mock zip for ${req.params.project_id} at version ${
-            req.params.version
-          }`
+          `Mock zip for ${req.params.project_id} at version ${req.params.version}`
         )
       }
     )
@@ -42,9 +40,7 @@ module.exports = MockV1HistoryApi = {
         res.header('content-disposition', 'attachment; name=project.zip')
         res.header('content-type', 'application/octet-stream')
         return res.send(
-          `Mock zip for ${req.params.project_id} at version ${
-            req.params.version
-          }`
+          `Mock zip for ${req.params.project_id} at version ${req.params.version}`
         )
       }
     )
@@ -53,9 +49,7 @@ module.exports = MockV1HistoryApi = {
       '/api/projects/:project_id/version/:version/zip',
       (req, res, next) => {
         return res.json({
-          zipUrl: `http://localhost:3100/fake-zip-download/${
-            req.params.project_id
-          }/version/${req.params.version}`
+          zipUrl: `http://localhost:3100/fake-zip-download/${req.params.project_id}/version/${req.params.version}`
         })
       }
     )

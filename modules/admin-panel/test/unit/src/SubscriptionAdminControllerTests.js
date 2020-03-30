@@ -48,6 +48,7 @@ describe('SubscriptionAdminController', function() {
                 this.findAndModify = sinon.stub().yields()
                 createSubscription = sinon.stub()
               }
+
               constructor() {
                 return createSubscription.apply(this, arguments)
               }

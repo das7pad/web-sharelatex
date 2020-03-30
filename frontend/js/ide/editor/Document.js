@@ -28,6 +28,7 @@ define([
       static initClass() {
         this.prototype.MAX_PENDING_OP_SIZE = 64
       }
+
       static getDocument(ide, doc_id) {
         if (!this.openDocs) {
           this.openDocs = {}
@@ -47,7 +48,7 @@ define([
 
       static hasUnsavedChanges() {
         const object = this.openDocs || {}
-        for (let doc_id in object) {
+        for (const doc_id in object) {
           const doc = object[doc_id]
           if (doc.hasBufferedOps()) {
             return true
@@ -59,7 +60,7 @@ define([
       static flushAll() {
         return (() => {
           const result = []
-          for (let doc_id in this.openDocs) {
+          for (const doc_id in this.openDocs) {
             const doc = this.openDocs[doc_id]
             result.push(doc.flush())
           }
@@ -446,7 +447,7 @@ define([
       }
 
       _callJoinCallbacks() {
-        for (let callback of Array.from(this._joinCallbacks || [])) {
+        for (const callback of Array.from(this._joinCallbacks || [])) {
           callback()
         }
         return delete this._joinCallbacks
@@ -518,7 +519,7 @@ define([
       _decodeRanges(ranges) {
         const decodeFromWebsockets = text => decodeURIComponent(escape(text))
         try {
-          for (let change of Array.from(ranges.changes || [])) {
+          for (const change of Array.from(ranges.changes || [])) {
             if (change.op.i != null) {
               change.op.i = decodeFromWebsockets(change.op.i)
             }
@@ -528,7 +529,7 @@ define([
           }
           return (() => {
             const result = []
-            for (let comment of Array.from(ranges.comments || [])) {
+            for (const comment of Array.from(ranges.comments || [])) {
               if (comment.op.c != null) {
                 result.push((comment.op.c = decodeFromWebsockets(comment.op.c)))
               } else {
@@ -689,7 +690,7 @@ define([
           ;({ track_changes_as } = this)
         }
         this.ranges.track_changes = track_changes_as != null
-        for (let op of Array.from(ops)) {
+        for (const op of Array.from(ops)) {
           this.ranges.applyOp(op, { user_id: track_changes_as })
         }
         if (old_id_seed != null) {

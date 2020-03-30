@@ -200,9 +200,7 @@ module.exports = ExportsHandler = self = {
     }
     return request.get(
       {
-        url: `${
-          settings.apis.project_history.url
-        }/project/${project_id}/version`,
+        url: `${settings.apis.project_history.url}/project/${project_id}/version`,
         json: true
       },
       function(err, res, body) {
@@ -216,15 +214,11 @@ module.exports = ExportsHandler = self = {
           return callback(null, body.version)
         } else {
           err = new Error(
-            `project history version returned a failure status code: ${
-              res.statusCode
-            }`
+            `project history version returned a failure status code: ${res.statusCode}`
           )
           logger.warn(
             { err, project_id },
-            `project history version returned failure status code: ${
-              res.statusCode
-            }`
+            `project history version returned failure status code: ${res.statusCode}`
           )
           return callback(err)
         }
@@ -270,9 +264,7 @@ module.exports = ExportsHandler = self = {
     }
     return request.get(
       {
-        url: `${
-          settings.apis.v1.url
-        }/api/v1/sharelatex/exports/${export_id}/${type}_url`,
+        url: `${settings.apis.v1.url}/api/v1/sharelatex/exports/${export_id}/${type}_url`,
         auth: { user: settings.apis.v1.user, pass: settings.apis.v1.pass }
       },
       function(err, res, body) {
@@ -290,9 +282,7 @@ module.exports = ExportsHandler = self = {
           )
           logger.warn(
             { err, export: export_id },
-            `v1 export zip fetch returned failure status code: ${
-              res.statusCode
-            }`
+            `v1 export zip fetch returned failure status code: ${res.statusCode}`
           )
           return callback(err)
         }

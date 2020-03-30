@@ -581,7 +581,7 @@ snap snap
         this.uris,
         this.source,
         () => {
-          for (let u of Array.from(this.uris)) {
+          for (const u of Array.from(this.uris)) {
             sinon.assert.calledWith(
               this.FileWriter.writeUrlToDisk,
               sinon.match.any,

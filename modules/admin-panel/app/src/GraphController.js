@@ -31,7 +31,7 @@ module.exports = GraphController = {
     const idsToSearch = []
     if (graphPrev.nodes.length > 0) {
       // create a list with nodes not searched
-      for (let node of Array.from(graphPrev.nodes)) {
+      for (const node of Array.from(graphPrev.nodes)) {
         if (usersObjId.indexOf(node.id) === -1) {
           idsToSearch.push(ObjectId(node.id))
           usersObjId.push(node.id)
@@ -89,7 +89,7 @@ module.exports = GraphController = {
     }
 
     // create the node and edge list
-    for (let edge of Array.from(relations)) {
+    for (const edge of Array.from(relations)) {
       var ref
       const projectNodes = []
 
@@ -120,9 +120,9 @@ module.exports = GraphController = {
 
       // generate a complete graph for this project
       const projectNodesT = projectNodes.slice(0)
-      for (let nodeS of Array.from(projectNodes)) {
+      for (const nodeS of Array.from(projectNodes)) {
         projectNodesT.shift()
-        for (let nodeT of Array.from(projectNodesT)) {
+        for (const nodeT of Array.from(projectNodesT)) {
           graph.addEdge(nodeS, nodeT, edge)
         }
       }
@@ -150,7 +150,7 @@ module.exports = GraphController = {
           return cb(err)
         }
 
-        for (let user of Array.from(users)) {
+        for (const user of Array.from(users)) {
           for (node of Array.from(graph.nodes)) {
             if (node.id === user._id.toString()) {
               node.label = user.first_name

@@ -104,7 +104,7 @@ module.exports = TrackChangesController = {
         if (typeof track_changes_state === 'boolean') {
           track_changes_state = {}
         }
-        for (let key in req.body.on_for) {
+        for (const key in req.body.on_for) {
           const value = req.body.on_for[key]
           if (
             key.match == null ||
@@ -121,9 +121,9 @@ module.exports = TrackChangesController = {
           }
         }
         if (req.body.on_for_guests === true) {
-          track_changes_state['__guests__'] = true
+          track_changes_state.__guests__ = true
         } else {
-          delete track_changes_state['__guests__']
+          delete track_changes_state.__guests__
         }
       } else {
         return res.sendStatus(400) // bad request

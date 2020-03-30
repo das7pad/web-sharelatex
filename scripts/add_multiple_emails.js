@@ -55,7 +55,7 @@ var run = () =>
 
 let FETCH_LIMIT, ASYNC_LIMIT
 var setup = function() {
-  let args = minilist(process.argv.slice(2))
+  const args = minilist(process.argv.slice(2))
   FETCH_LIMIT = args.fetch ? args.fetch : 100
   ASYNC_LIMIT = args.async ? args.async : 10
 }

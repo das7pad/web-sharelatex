@@ -237,7 +237,7 @@ module.exports = ProjectDuplicator = {
       originalRootDoc = originalRootDoc != null ? originalRootDoc[0] : undefined
 
       const docContents = {}
-      for (let docContent of Array.from(docContentsArray)) {
+      for (const docContent of Array.from(docContentsArray)) {
         docContents[docContent._id] = docContent
       }
 

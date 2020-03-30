@@ -868,7 +868,7 @@ describe('ProjectStructureChanges', function() {
                     exampleProjectId
                   )
                   expect(updates.length).to.equal(1)
-                  let update = updates[0]
+                  const update = updates[0]
                   expect(update.userId).to.equal(owner._id)
                   expect(update.pathname).to.equal('/foo/new.tex')
                   expect(update.newPathname).to.equal('/bar/foo/new.tex')

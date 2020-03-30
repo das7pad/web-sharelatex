@@ -28,7 +28,7 @@ const MODULE_BASE_PATH = Path.resolve(__dirname + '/../../../modules')
 module.exports = Modules = {
   modules: [],
   loadModules() {
-    for (let moduleName of Array.from(fs.readdirSync(MODULE_BASE_PATH))) {
+    for (const moduleName of Array.from(fs.readdirSync(MODULE_BASE_PATH))) {
       const modulePath = Path.join(MODULE_BASE_PATH, moduleName)
       if (
         fs.existsSync(Path.join(modulePath, 'index.js')) ||
@@ -57,7 +57,7 @@ module.exports = Modules = {
   applyNonCsrfRouter(webRouter, privateApiRouter, publicApiRouter) {
     return (() => {
       const result = []
-      for (let module of Array.from(this.modules)) {
+      for (const module of Array.from(this.modules)) {
         if (module.nonCsrfRouter != null) {
           module.nonCsrfRouter.apply(
             webRouter,
@@ -82,7 +82,7 @@ module.exports = Modules = {
       (() => {
         const result = []
         const object = module.viewIncludes || {}
-        for (let view in object) {
+        for (const view in object) {
           const partial = object[view]
           if (!this.viewIncludes[view]) {
             this.viewIncludes[view] = []
@@ -107,7 +107,7 @@ module.exports = Modules = {
   moduleIncludes(view, locals) {
     const compiledPartials = Modules.viewIncludes[view] || []
     let html = ''
-    for (let compiledPartial of Array.from(compiledPartials)) {
+    for (const compiledPartial of Array.from(compiledPartials)) {
       const d = new Date()
       html += compiledPartial(locals)
     }
@@ -120,8 +120,8 @@ module.exports = Modules = {
 
   linkedFileAgentsIncludes() {
     const agents = {}
-    for (let module of Array.from(this.modules)) {
-      for (let name in module.linkedFileAgents) {
+    for (const module of Array.from(this.modules)) {
+      for (const name in module.linkedFileAgents) {
         const agentFunction = module.linkedFileAgents[name]
         agents[name] = agentFunction()
       }
@@ -137,7 +137,7 @@ module.exports = Modules = {
           result.push(
             (() => {
               const result1 = []
-              for (let hook in module.hooks) {
+              for (const hook in module.hooks) {
                 const method = module.hooks[hook]
                 result1.push(Modules.hooks.attach(hook, method))
               }

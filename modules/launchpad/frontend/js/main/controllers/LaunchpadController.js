@@ -92,14 +92,11 @@ define(['base'], App =>
       $scope.statusChecks.websocket.status = 'inflight'
       return $timeout(function() {
         require(['socket.io-client'], function(io) {
-          const socket = io.connect(
-            window.sharelatex.wsUrl || null,
-            {
-              reconnect: false,
-              'connect timeout': 30 * 1000,
-              'force new connection': true
-            }
-          )
+          const socket = io.connect(window.sharelatex.wsUrl || null, {
+            reconnect: false,
+            'connect timeout': 30 * 1000,
+            'force new connection': true
+          })
 
           socket.on('connectionAccepted', function() {
             $scope.statusChecks.websocket.status = 'ok'

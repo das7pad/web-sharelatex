@@ -172,7 +172,7 @@ define(['base', 'libs/jquery-layout', 'libs/jquery.ui.touch-punch'], App =>
           element.layout().resizeAll()
 
           if (attrs.resizeOn != null) {
-            for (let event of Array.from(attrs.resizeOn.split(','))) {
+            for (const event of Array.from(attrs.resizeOn.split(','))) {
               scope.$on(event, () => onExternalResize())
             }
           }

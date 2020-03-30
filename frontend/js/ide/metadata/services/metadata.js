@@ -41,7 +41,7 @@ define(['base'], App =>
       _.flattenDeep(
         (() => {
           const result = []
-          for (let docId in state.documents) {
+          for (const docId in state.documents) {
             const meta = state.documents[docId]
             result.push(meta.labels)
           }
@@ -51,9 +51,9 @@ define(['base'], App =>
 
     metadata.getAllPackages = function() {
       const packageCommandMapping = {}
-      for (let _docId in state.documents) {
+      for (const _docId in state.documents) {
         const meta = state.documents[_docId]
-        for (let packageName in meta.packages) {
+        for (const packageName in meta.packages) {
           const commandSnippets = meta.packages[packageName]
           packageCommandMapping[packageName] = commandSnippets
         }
@@ -69,7 +69,7 @@ define(['base'], App =>
           if (data.projectMeta) {
             return (() => {
               const result = []
-              for (let docId in data.projectMeta) {
+              for (const docId in data.projectMeta) {
                 const docMeta = data.projectMeta[docId]
                 result.push((state.documents[docId] = docMeta))
               }

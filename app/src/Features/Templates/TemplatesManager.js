@@ -40,9 +40,7 @@ const TemplatesManager = {
     _callback
   ) {
     const callback = _.once(_callback)
-    const zipUrl = `${
-      settings.apis.v1.url
-    }/api/v1/sharelatex/templates/${templateVersionId}`
+    const zipUrl = `${settings.apis.v1.url}/api/v1/sharelatex/templates/${templateVersionId}`
     const zipReq = request(zipUrl, {
       auth: {
         user: settings.apis.v1.user,
@@ -167,7 +165,7 @@ const TemplatesManager = {
 
   promises: {
     async fetchFromV1(templateId) {
-      let { body, statusCode } = await requestPromise({
+      const { body, statusCode } = await requestPromise({
         baseUrl: settings.apis.v1.url,
         url: `/api/v2/templates/${templateId}`,
         method: 'GET',

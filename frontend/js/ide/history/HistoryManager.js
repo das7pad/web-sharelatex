@@ -29,6 +29,7 @@ define([
       static initClass() {
         this.prototype.BATCH_SIZE = 10
       }
+
       constructor(ide, $scope) {
         this.ide = ide
         this.$scope = $scope
@@ -110,10 +111,9 @@ define([
           indexOfLastUpdateNotByMe
         ].selectedFrom = true)
       }
+
       fetchNextBatchOfUpdates() {
-        let url = `/project/${this.ide.project_id}/updates?min_count=${
-          this.BATCH_SIZE
-        }`
+        let url = `/project/${this.ide.project_id}/updates?min_count=${this.BATCH_SIZE}`
         if (this.$scope.history.nextBeforeTimestamp != null) {
           url += `&before=${this.$scope.history.nextBeforeTimestamp}`
         }
@@ -199,9 +199,7 @@ define([
       }
 
       restoreDiff(diff) {
-        const url = `/project/${this.$scope.project_id}/doc/${
-          diff.doc.id
-        }/version/${diff.fromV}/restore`
+        const url = `/project/${this.$scope.project_id}/doc/${diff.doc.id}/version/${diff.fromV}/restore`
         return this.ide.$http.post(url, { _csrf: window.csrfToken })
       }
 
@@ -277,10 +275,10 @@ define([
           this.$scope.history.updates.length - 1
         ]
 
-        for (let update of Array.from(updates)) {
+        for (const update of Array.from(updates)) {
           update.pathnames = [] // Used for display
           const object = update.docs || {}
-          for (let doc_id in object) {
+          for (const doc_id in object) {
             const doc = object[doc_id]
             doc.entity = this.ide.fileTreeManager.findEntityById(doc_id, {
               includeDeleted: true
@@ -288,7 +286,7 @@ define([
             update.pathnames.push(doc.entity.name)
           }
 
-          for (let user of Array.from(update.meta.users || [])) {
+          for (const user of Array.from(update.meta.users || [])) {
             if (user != null) {
               user.hue = ColorManager.getHueForUserId(user.id)
             }
@@ -331,10 +329,10 @@ define([
             ? this.$scope.history.selection.doc.id
             : undefined
 
-        for (let update of Array.from(
+        for (const update of Array.from(
           this.$scope.history.selection.updates || []
         )) {
-          for (let doc_id in update.docs) {
+          for (const doc_id in update.docs) {
             const doc = update.docs[doc_id]
             if (doc_id === selected_doc_id) {
               if (fromV != null && toV != null) {
@@ -362,7 +360,9 @@ define([
       _selectDocFromUpdates() {
         let doc, doc_id
         const affected_docs = {}
-        for (let update of Array.from(this.$scope.history.selection.updates)) {
+        for (const update of Array.from(
+          this.$scope.history.selection.updates
+        )) {
           for (doc_id in update.docs) {
             doc = update.docs[doc_id]
             affected_docs[doc_id] = doc.entity
@@ -385,7 +385,7 @@ define([
       }
 
       _updateContainsUserId(update, user_id) {
-        for (let user of Array.from(update.meta.users)) {
+        for (const user of Array.from(update.meta.users)) {
           if ((user != null ? user.id : undefined) === user_id) {
             return true
           }

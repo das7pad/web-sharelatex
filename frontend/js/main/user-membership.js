@@ -73,7 +73,7 @@ define(['base'], function(App) {
     $scope.removeMembers = function() {
       $scope.inputs.removeMembers.error = false
       $scope.inputs.removeMembers.errorMessage = null
-      for (let user of Array.from($scope.selectedUsers)) {
+      for (const user of Array.from($scope.selectedUsers)) {
         ;(function(user) {
           let url
           if (paths.removeInvite && user.invite && user._id == null) {

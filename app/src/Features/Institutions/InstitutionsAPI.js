@@ -234,9 +234,7 @@ var makeAffiliationRequest = function(requestOptions, callback) {
         if (body != null ? body.errors : undefined) {
           errorMessage = `${response.statusCode}: ${body.errors}`
         } else {
-          errorMessage = `${requestOptions.defaultErrorMessage}: ${
-            response.statusCode
-          }`
+          errorMessage = `${requestOptions.defaultErrorMessage}: ${response.statusCode}`
         }
 
         logger.warn(

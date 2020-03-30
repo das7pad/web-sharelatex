@@ -98,9 +98,7 @@ module.exports = {
             if (plan == null) {
               return cb(
                 new Error(
-                  `No plan found for planCode '${
-                    personalSubscription.planCode
-                  }'`
+                  `No plan found for planCode '${personalSubscription.planCode}'`
                 )
               )
             }
@@ -228,7 +226,7 @@ module.exports = {
           }
         }
 
-        for (let memberGroupSubscription of Array.from(
+        for (const memberGroupSubscription of Array.from(
           memberGroupSubscriptions
         )) {
           if (memberGroupSubscription.teamNotice) {

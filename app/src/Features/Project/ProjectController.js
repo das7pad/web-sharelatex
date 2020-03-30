@@ -1073,7 +1073,7 @@ const ProjectController = {
       affiliations = []
     }
     const portalTemplates = []
-    for (let aff of affiliations) {
+    for (const aff of affiliations) {
       if (
         aff.portal &&
         aff.portal.slug &&

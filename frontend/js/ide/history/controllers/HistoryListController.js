@@ -63,7 +63,7 @@ define(['base', 'ide/history/util/displayNameForUser'], function(
       $scope.history.selection.updates = []
       return (() => {
         const result = []
-        for (let update of Array.from($scope.history.updates)) {
+        for (const update of Array.from($scope.history.updates)) {
           var inSelection
           if (update.selectedTo) {
             inSelection = true
@@ -142,7 +142,7 @@ define(['base', 'ide/history/util/displayNameForUser'], function(
     $scope.resetHoverState = () =>
       (() => {
         const result = []
-        for (let update of Array.from($scope.history.updates)) {
+        for (const update of Array.from($scope.history.updates)) {
           delete update.hoverSelectedFrom
           delete update.hoverSelectedTo
           result.push(delete update.inHoverSelection)
@@ -164,7 +164,7 @@ define(['base', 'ide/history/util/displayNameForUser'], function(
       oldSelectedFrom
     ) {
       if (selectedFrom) {
-        for (let update of Array.from($scope.history.updates)) {
+        for (const update of Array.from($scope.history.updates)) {
           if (update !== $scope.update) {
             update.selectedFrom = false
           }
@@ -175,7 +175,7 @@ define(['base', 'ide/history/util/displayNameForUser'], function(
 
     $scope.$watch('update.selectedTo', function(selectedTo, oldSelectedTo) {
       if (selectedTo) {
-        for (let update of Array.from($scope.history.updates)) {
+        for (const update of Array.from($scope.history.updates)) {
           if (update !== $scope.update) {
             update.selectedTo = false
           }

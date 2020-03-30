@@ -156,9 +156,7 @@ module.exports = LinkedFilesController = {
       return res
         .status(422)
         .send(
-          `Your URL could not be reached (${
-            error.statusCode
-          } status code). Please check it and try again.`
+          `Your URL could not be reached (${error.statusCode} status code). Please check it and try again.`
         )
     } else if (error instanceof InvalidUrlError) {
       return res

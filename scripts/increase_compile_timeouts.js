@@ -68,7 +68,7 @@ var run = () =>
 
 let FETCH_LIMIT, ASYNC_LIMIT, DO_ALL
 var setup = function() {
-  let args = minilist(process.argv.slice(2))
+  const args = minilist(process.argv.slice(2))
   // --fetch N  get N users each time
   FETCH_LIMIT = args.fetch ? args.fetch : 100
   // --async M  run M updates in parallel

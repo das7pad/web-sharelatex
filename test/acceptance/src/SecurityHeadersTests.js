@@ -35,16 +35,16 @@ const assert_has_cache_headers = function(response) {
     headers['cache-control'],
     'no-store, no-cache, must-revalidate, proxy-revalidate'
   )
-  assert.equal(headers['pragma'], 'no-cache')
-  return assert.equal(headers['expires'], '0')
+  assert.equal(headers.pragma, 'no-cache')
+  return assert.equal(headers.expires, '0')
 }
 
 const assert_has_no_cache_headers = function(response) {
   const { headers } = response
   assert.isUndefined(headers['surrogate-control'])
   assert.isUndefined(headers['cache-control'])
-  assert.isUndefined(headers['pragma'])
-  return assert.isUndefined(headers['expires'])
+  assert.isUndefined(headers.pragma)
+  return assert.isUndefined(headers.expires)
 }
 
 describe('SecurityHeaders', function() {

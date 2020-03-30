@@ -37,7 +37,7 @@ define(['base', 'ide/editor/Document'], (App, Document) =>
       let newUnsavedCount = 0
       let maxUnsavedSeconds = 0
 
-      for (let doc_id in Document.openDocs) {
+      for (const doc_id in Document.openDocs) {
         const doc = Document.openDocs[doc_id]
         const saving = doc.pollSavedStatus()
         if (!saving) {

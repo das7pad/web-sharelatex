@@ -98,7 +98,7 @@ async function restoreProject(projectId) {
 
 async function archiveProject(projectId, userId) {
   try {
-    let project = await Project.findOne({ _id: projectId }).exec()
+    const project = await Project.findOne({ _id: projectId }).exec()
     if (!project) {
       throw new Errors.NotFoundError('project not found')
     }
@@ -120,7 +120,7 @@ async function archiveProject(projectId, userId) {
 
 async function unarchiveProject(projectId, userId) {
   try {
-    let project = await Project.findOne({ _id: projectId }).exec()
+    const project = await Project.findOne({ _id: projectId }).exec()
     if (!project) {
       throw new Errors.NotFoundError('project not found')
     }
@@ -140,7 +140,7 @@ async function unarchiveProject(projectId, userId) {
 
 async function trashProject(projectId, userId) {
   try {
-    let project = await Project.findOne({ _id: projectId }).exec()
+    const project = await Project.findOne({ _id: projectId }).exec()
     if (!project) {
       throw new Errors.NotFoundError('project not found')
     }
@@ -166,7 +166,7 @@ async function trashProject(projectId, userId) {
 
 async function untrashProject(projectId, userId) {
   try {
-    let project = await Project.findOne({ _id: projectId }).exec()
+    const project = await Project.findOne({ _id: projectId }).exec()
     if (!project) {
       throw new Errors.NotFoundError('project not found')
     }
@@ -212,8 +212,8 @@ async function deleteProject(projectId, options = {}) {
       deletedProjectLastUpdatedAt: project.lastUpdated
     }
 
-    Object.keys(deleterData).forEach(
-      key => (deleterData[key] === undefined ? delete deleterData[key] : '')
+    Object.keys(deleterData).forEach(key =>
+      deleterData[key] === undefined ? delete deleterData[key] : ''
     )
 
     await DeletedProject.update(
@@ -250,7 +250,7 @@ async function deleteProject(projectId, options = {}) {
 }
 
 async function undeleteProject(projectId) {
-  let deletedProject = await DeletedProject.findOne({
+  const deletedProject = await DeletedProject.findOne({
     'deleterData.deletedProjectId': projectId
   }).exec()
 
@@ -262,7 +262,7 @@ async function undeleteProject(projectId) {
     throw new Errors.NotFoundError('project_too_old_to_restore')
   }
 
-  let restored = new Project(deletedProject.project)
+  const restored = new Project(deletedProject.project)
 
   // if we're undeleting, we want the document to show up
   restored.name = await ProjectDetailsHandler.promises.generateUniqueName(

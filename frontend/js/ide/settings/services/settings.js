@@ -15,7 +15,7 @@ define(['base'], App =>
   App.factory('settings', (ide, eventTracking) => ({
     saveSettings(data) {
       // Tracking code.
-      for (let key of Array.from(Object.keys(data))) {
+      for (const key of Array.from(Object.keys(data))) {
         const changedSetting = key
         const changedSettingVal = data[key]
         eventTracking.sendMB('setting-changed', {
@@ -31,7 +31,7 @@ define(['base'], App =>
 
     saveProjectSettings(data) {
       // Tracking code.
-      for (let key of Array.from(Object.keys(data))) {
+      for (const key of Array.from(Object.keys(data))) {
         const changedSetting = key
         const changedSettingVal = data[key]
         eventTracking.sendMB('project-setting-changed', {
@@ -47,7 +47,7 @@ define(['base'], App =>
 
     saveProjectAdminSettings(data) {
       // Tracking code.
-      for (let key of Array.from(Object.keys(data))) {
+      for (const key of Array.from(Object.keys(data))) {
         const changedSetting = key
         const changedSettingVal = data[key]
         eventTracking.sendMB('project-admin-setting-changed', {

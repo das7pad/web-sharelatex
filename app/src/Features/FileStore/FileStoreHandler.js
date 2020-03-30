@@ -95,9 +95,7 @@ const FileStoreHandler = {
         writeStream.on('response', function(response) {
           if (![200, 201].includes(response.statusCode)) {
             err = new Error(
-              `non-ok response from filestore for upload: ${
-                response.statusCode
-              }`
+              `non-ok response from filestore for upload: ${response.statusCode}`
             )
             logger.warn(
               { err, statusCode: response.statusCode },
@@ -114,8 +112,8 @@ const FileStoreHandler = {
 
   getFileStream(projectId, fileId, query, callback) {
     let queryString = ''
-    if (query != null && query['format'] != null) {
-      queryString = `?format=${query['format']}`
+    if (query != null && query.format != null) {
+      queryString = `?format=${query.format}`
     }
     const opts = {
       method: 'get',
@@ -123,10 +121,10 @@ const FileStoreHandler = {
       timeout: FIVE_MINS_IN_MS,
       headers: {}
     }
-    if (query != null && query['range'] != null) {
-      const rangeText = query['range']
+    if (query != null && query.range != null) {
+      const rangeText = query.range
       if (rangeText && rangeText.match != null && rangeText.match(/\d+-\d+/)) {
-        opts.headers['range'] = `bytes=${query['range']}`
+        opts.headers.range = `bytes=${query.range}`
       }
     }
     const readStream = request(opts)

@@ -215,7 +215,7 @@ describe('GraphController', function() {
       return this.GraphController._getNames(
         { nodes: this.nodes, edges: [] },
         (err, graph) => {
-          for (let node of Array.from(graph.nodes)) {
+          for (const node of Array.from(graph.nodes)) {
             node.label.should.not.equal('')
           }
           return done()

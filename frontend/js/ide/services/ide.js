@@ -59,7 +59,7 @@ define(['base'], function(App) {
       meta.recent_events = this.recentEvents
       const errorObj = {}
       if (typeof error === 'object') {
-        for (let key of Array.from(Object.getOwnPropertyNames(error))) {
+        for (const key of Array.from(Object.getOwnPropertyNames(error))) {
           errorObj[key] = error[key]
         }
       } else if (typeof error === 'string') {

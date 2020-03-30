@@ -74,7 +74,7 @@ module.exports = CompileManager = {
                     if (error != null) {
                       return callback(error)
                     }
-                    for (let key in limits) {
+                    for (const key in limits) {
                       const value = limits[key]
                       options[key] = value
                     }

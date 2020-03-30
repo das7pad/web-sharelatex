@@ -88,18 +88,15 @@ define(['socket.io-client'], function(io) {
 
         // initial connection attempt
         this.updateConnectionManagerState('connecting')
-        this.ide.socket = io.connect(
-          this.wsUrl,
-          {
-            reconnect: false,
-            'connect timeout': 30 * 1000,
-            'force new connection': true
-          }
-        )
+        this.ide.socket = io.connect(this.wsUrl, {
+          reconnect: false,
+          'connect timeout': 30 * 1000,
+          'force new connection': true
+        })
 
         // handle network-level websocket errors (e.g. failed dns lookups)
 
-        let connectionErrorHandler = err => {
+        const connectionErrorHandler = err => {
           this.updateConnectionManagerState('error')
           sl_console.log('socket.io error', err)
           if (this.wsUrl && !window.location.href.match(/ws=fallback/)) {
@@ -147,7 +144,7 @@ define(['socket.io-client'], function(io) {
           })
 
           // we have passed authentication so we can now join the project
-          let connectionJobId = this.$scope.connection.jobId
+          const connectionJobId = this.$scope.connection.jobId
           setTimeout(() => {
             this.joinProject(connectionJobId)
           }, 100)
@@ -227,11 +224,9 @@ The editor will refresh in automatically in 10 seconds.\
       updateConnectionManagerState(state) {
         this.$scope.$apply(() => {
           this.$scope.connection.jobId += 1
-          let jobId = this.$scope.connection.jobId
+          const jobId = this.$scope.connection.jobId
           sl_console.log(
-            `[updateConnectionManagerState ${jobId}] from ${
-              this.$scope.connection.state
-            } to ${state}`
+            `[updateConnectionManagerState ${jobId}] from ${this.$scope.connection.state} to ${state}`
           )
           this.$scope.connection.state = state
 
@@ -404,7 +399,7 @@ Something went wrong connecting to your project. Please refresh if this continue
 
       startAutoReconnectCountdown() {
         this.updateConnectionManagerState('waitingCountdown')
-        let connectionId = this.$scope.connection.jobId
+        const connectionId = this.$scope.connection.jobId
         let countdown
         sl_console.log('[ConnectionManager] starting autoreconnect countdown')
         const twoMinutes = 2 * 60 * 1000
@@ -540,6 +535,7 @@ Something went wrong connecting to your project. Please refresh if this continue
           }) // 5 minutes
         }
       }
+
       reconnectGracefully(force) {
         if (this.reconnectGracefullyStarted == null) {
           this.reconnectGracefullyStarted = new Date()

@@ -135,7 +135,7 @@ class User {
 
   setFeatures(features, callback) {
     const update = {}
-    for (let key in features) {
+    for (const key in features) {
       const value = features[key]
       update[`features.${key}`] = value
     }
@@ -346,7 +346,7 @@ class User {
               name,
               options,
               response.statusCode,
-              response.headers['location'],
+              response.headers.location,
               body
             ])
           )
@@ -634,9 +634,7 @@ class User {
       } else {
         callback(
           new Error(
-            `unexpected status code from /user/personal_info: ${
-              response.statusCode
-            }`
+            `unexpected status code from /user/personal_info: ${response.statusCode}`
           )
         )
       }

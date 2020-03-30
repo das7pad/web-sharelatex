@@ -11,14 +11,11 @@ if (process.env.OL_MOCHA_UNIT_TEST_ARE_RUNNING) {
   )
 }
 
-mongoose.connect(
-  Settings.mongo.url,
-  {
-    poolSize: POOL_SIZE,
-    config: { autoIndex: false },
-    appname: 'web'
-  }
-)
+mongoose.connect(Settings.mongo.url, {
+  poolSize: POOL_SIZE,
+  config: { autoIndex: false },
+  appname: 'web'
+})
 
 mongoose.connection.on('connected', () =>
   logger.log(

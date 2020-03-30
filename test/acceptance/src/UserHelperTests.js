@@ -175,7 +175,7 @@ describe('UserHelper', function() {
 
     describe('when the csrfToken is cached', function() {
       it('should return cached csrfToken', async function() {
-        let userHelper = new UserHelper()
+        const userHelper = new UserHelper()
         await userHelper.getCsrfToken()
         const csrfToken = userHelper._csrfToken
         await userHelper.getCsrfToken()

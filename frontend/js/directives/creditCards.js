@@ -80,8 +80,8 @@ define(['base'], function(App) {
 
     const cardFromNumber = function(num) {
       num = (num + '').replace(/\D/g, '')
-      for (let card of Array.from(cards)) {
-        for (let pattern of Array.from(card.patterns)) {
+      for (const card of Array.from(cards)) {
+        for (const pattern of Array.from(card.patterns)) {
           const p = pattern + ''
           if (num.substr(0, p.length) === p) {
             return card
@@ -91,7 +91,7 @@ define(['base'], function(App) {
     }
 
     const cardFromType = function(type) {
-      for (let card of Array.from(cards)) {
+      for (const card of Array.from(cards)) {
         if (card.type === type) {
           return card
         }

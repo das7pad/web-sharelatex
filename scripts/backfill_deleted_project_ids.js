@@ -13,7 +13,7 @@ DeletedProject.find({}, (error, deletedProjects) => {
       if (deletedProject.project) {
         const src = deletedProject.project
 
-        let values = {
+        const values = {
           'deleterData.deletedProjectId': src._id,
           'deleterData.deletedProjectOwnerId': src.owner_ref,
           'deleterData.deletedProjectCollaboratorIds': src.collaberator_refs,
@@ -38,8 +38,8 @@ DeletedProject.find({}, (error, deletedProjects) => {
           'deleterData.deletedProjectLastUpdatedAt': src.lastUpdated
         }
 
-        Object.keys(values).forEach(
-          key => (values[key] === undefined ? delete values[key] : '')
+        Object.keys(values).forEach(key =>
+          values[key] === undefined ? delete values[key] : ''
         )
 
         DeletedProject.findOneAndUpdate(

@@ -335,7 +335,7 @@ module.exports = UserAdminController = {
 
   _reqToMongoUpdate(body, attributes, booleans) {
     const update = {}
-    for (let attribute of Array.from(attributes)) {
+    for (const attribute of Array.from(attributes)) {
       if (body[attribute] == null && Array.from(booleans).includes(attribute)) {
         // Unticked checkboxes are not submitted
         update[attribute] = false

@@ -142,7 +142,7 @@ module.exports = {
         return next(error)
       }
       let csvOutput = ''
-      for (let user of Array.from(users)) {
+      for (const user of Array.from(users)) {
         csvOutput += user.email + '\n'
       }
       res.header('Content-Disposition', 'attachment; filename=Group.csv')

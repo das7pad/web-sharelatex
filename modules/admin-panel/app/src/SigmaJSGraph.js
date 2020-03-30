@@ -23,7 +23,7 @@ module.exports = SigmaJSGraph = {
   addNode(ref, label, color) {
     // avoid duplicate nodes
     let exists = false
-    for (let node of Array.from(this.nodes)) {
+    for (const node of Array.from(this.nodes)) {
       if (node.id === ref.toString()) {
         exists = true
         break
@@ -53,7 +53,7 @@ module.exports = SigmaJSGraph = {
 
     // avoid duplicate edges
     let exists = false
-    for (let edge of Array.from(this.edges)) {
+    for (const edge of Array.from(this.edges)) {
       if (edge.hash === hash) {
         exists = true
         break

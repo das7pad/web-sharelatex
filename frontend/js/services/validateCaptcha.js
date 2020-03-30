@@ -12,7 +12,7 @@ define(['base'], App =>
   App.factory('validateCaptcha', function() {
     let _recaptchaCallbacks = []
     const onRecaptchaSubmit = function(token) {
-      for (let cb of _recaptchaCallbacks) {
+      for (const cb of _recaptchaCallbacks) {
         cb(token)
       }
       _recaptchaCallbacks = []

@@ -33,9 +33,7 @@ define(['base'], App =>
         email: $scope.form.email,
         labels: `${$scope.form.source} accounts`,
         message: 'Please contact me with more details',
-        subject: `${$scope.form.name} - Group Enquiry - ${
-          $scope.form.position
-        } - ${$scope.form.university}`,
+        subject: `${$scope.form.name} - Group Enquiry - ${$scope.form.position} - ${$scope.form.university}`,
         inbox: 'accounts'
       }
 

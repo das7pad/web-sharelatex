@@ -34,11 +34,7 @@ define(['base', 'directives/creditCards'], App =>
         'subscription-form-switch-to-student',
         window.plan_code
       )
-      window.location = `/user/subscription/new?planCode=${planCode}&currency=${
-        $scope.currencyCode
-      }&cc=${$scope.data.coupon}&itm_campaign=${
-        window.ITMCampaign
-      }&itm_content=${window.ITMContent}`
+      window.location = `/user/subscription/new?planCode=${planCode}&currency=${$scope.currencyCode}&cc=${$scope.data.coupon}&itm_campaign=${window.ITMCampaign}&itm_content=${window.ITMContent}`
     }
 
     eventTracking.sendMB('subscription-form', { plan: window.plan_code })
@@ -114,7 +110,7 @@ define(['base', 'directives/creditCards'], App =>
       $scope.monthlyBilling = pricing.items.plan.period.length === 1
 
       $scope.availableCurrencies = {}
-      for (let currencyCode in pricing.items.plan.price) {
+      for (const currencyCode in pricing.items.plan.price) {
         if (MultiCurrencyPricing.plans[currencyCode]) {
           $scope.availableCurrencies[currencyCode] =
             MultiCurrencyPricing.plans[currencyCode]

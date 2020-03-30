@@ -479,7 +479,7 @@ ${content}
   _setSnippetRootDocAndTitleFromFileArray(snippet) {
     return (() => {
       const result = []
-      for (let file of Array.from(snippet.files)) {
+      for (const file of Array.from(snippet.files)) {
         if (file.content != null) {
           if (
             snippet.rootDoc == null &&

@@ -404,7 +404,7 @@ define(['base'], function(App) {
     }
 
     $scope.recalculatePrice = function() {
-      let { usage, plan_code, currency, size } = $scope.selected
+      const { usage, plan_code, currency, size } = $scope.selected
       const price = $scope.prices[usage][plan_code][currency][size]
       const currencySymbol = $scope.options.currencySymbols[currency]
       $scope.displayPrice = `${currencySymbol}${price}`

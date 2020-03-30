@@ -44,8 +44,8 @@ module.exports = RangesManager = {
         return callback(error)
       }
       const jobs = []
-      for (let doc of Array.from(docs)) {
-        for (let change of Array.from(
+      for (const doc of Array.from(docs)) {
+        for (const change of Array.from(
           (doc.ranges != null ? doc.ranges.changes : undefined) || []
         )) {
           user_ids[change.metadata.user_id] = true

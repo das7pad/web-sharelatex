@@ -70,12 +70,12 @@ define([
             )
             if (match) {
               // eslint-disable-next-line no-unused-vars
-              let commandName = match[1]
+              const commandName = match[1]
               const graphicsPaths = Preamble.getGraphicsPaths()
               const result = []
-              for (let graphic of Graphics.getGraphicsFiles()) {
+              for (const graphic of Graphics.getGraphicsFiles()) {
                 let { path } = graphic
-                for (let graphicsPath of graphicsPaths) {
+                for (const graphicsPath of graphicsPaths) {
                   if (path.indexOf(graphicsPath) === 0) {
                     path = path.slice(graphicsPath.length)
                     break
@@ -104,14 +104,14 @@ define([
               // eslint-disable-next-line no-unused-vars
               const commandName = match[1]
               const result = []
-              for (let file of Files.getTeXFiles()) {
+              for (const file of Files.getTeXFiles()) {
                 if (
                   file.id !== this.$scope.docId &&
                   !file.deleted &&
                   file.path
                 ) {
                   const { path } = file
-                  let cleanPath = path.replace(/(.+)\.tex$/i, '$1')
+                  const cleanPath = path.replace(/(.+)\.tex$/i, '$1')
                   result.push({
                     caption: `\\${commandName}{${path}}`,
                     value: `\\${commandName}{${cleanPath}}`,
@@ -146,7 +146,7 @@ define([
                   score: 60
                 })
               }
-              for (let label of metadataManager.getAllLabels()) {
+              for (const label of metadataManager.getAllLabels()) {
                 result.push({
                   caption: `\\${commandName}{${label}}`,
                   value: `\\${commandName}{${label}}`,
@@ -266,7 +266,8 @@ define([
       const match = change.lines[0].match(/\\(\w+){}/)
       if (
         change.action === 'insert' &&
-        (match && match[1]) &&
+        match &&
+        match[1] &&
         // eslint-disable-next-line max-len
         /(begin|end|[a-zA-Z]*ref|usepackage|[a-z]*cite[a-z]*|input|include)/.test(
           match[1]

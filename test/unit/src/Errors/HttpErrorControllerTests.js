@@ -37,7 +37,7 @@ describe('HttpErrorController', function() {
     beforeEach(function() {})
 
     it('logs and return status code', function() {
-      let error = new HttpErrors.UnprocessableEntityError()
+      const error = new HttpErrors.UnprocessableEntityError()
 
       this.ErrorController.handleError(error, this.req, this.res)
       expect(this.res.statusCode).to.equal(422)
@@ -50,7 +50,7 @@ describe('HttpErrorController', function() {
     })
 
     it('logs url method and userId', function() {
-      let error = new HttpErrors.UnprocessableEntityError()
+      const error = new HttpErrors.UnprocessableEntityError()
       this.AuthenticationController.getLoggedInUserId.returns('123abc')
       this.req.url = 'overleaf.url'
       this.req.method = 'GET'
@@ -64,8 +64,8 @@ describe('HttpErrorController', function() {
     })
 
     it('logs and return status code when wrapped', function() {
-      let cause = new Errors.SubscriptionAdminDeletionError()
-      let error = new HttpErrors.UnprocessableEntityError({}).withCause(cause)
+      const cause = new Errors.SubscriptionAdminDeletionError()
+      const error = new HttpErrors.UnprocessableEntityError({}).withCause(cause)
 
       this.ErrorController.handleError(error, this.req, this.res)
       expect(this.res.statusCode).to.equal(422)
@@ -73,12 +73,12 @@ describe('HttpErrorController', function() {
     })
 
     it('renders JSON with info', function() {
-      let cause = new Errors.SubscriptionAdminDeletionError({
+      const cause = new Errors.SubscriptionAdminDeletionError({
         info: {
           public: { some: 'data' }
         }
       })
-      let error = new HttpErrors.UnprocessableEntityError({
+      const error = new HttpErrors.UnprocessableEntityError({
         info: { public: { overwrite: 'data' } }
       }).withCause(cause)
       this.req.accepts = () => 'json'
@@ -93,8 +93,8 @@ describe('HttpErrorController', function() {
     })
 
     it('renders HTML with info', function() {
-      let cause = new Errors.SubscriptionAdminDeletionError()
-      let error = new HttpErrors.UnprocessableEntityError({}).withCause(cause)
+      const cause = new Errors.SubscriptionAdminDeletionError()
+      const error = new HttpErrors.UnprocessableEntityError({}).withCause(cause)
       this.req.accepts = () => 'html'
 
       this.ErrorController.handleError(error, this.req, this.res)

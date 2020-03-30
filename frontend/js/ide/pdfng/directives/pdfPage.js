@@ -134,7 +134,7 @@ define(['base'], App =>
         scope.document.getPdfViewport(scope.page.pageNum).then(viewport =>
           (() => {
             const result1 = []
-            for (let hl of Array.from(pageHighlights)) {
+            for (const hl of Array.from(pageHighlights)) {
               // console.log 'adding highlight', h, viewport
               const top = viewport.viewBox[3] - hl.v
               result1.push(
