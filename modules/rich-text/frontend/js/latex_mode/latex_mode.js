@@ -621,7 +621,7 @@ export default function LatexMode() {
   //
   function _buildEnvironmentBeginAndEndPatterns(environments) {
     for (var env in environments) {
-      if (environments.hasOwnProperty(env)) {
+      if (Object.prototype.hasOwnProperty.call(environments, env)) {
         var end = environments[env].matchOnSingleLine ? '$' : ''
         environments[env].beginPattern = new RegExp(
           '^\\\\begin\\s*{' + env + '}' + end
@@ -785,7 +785,7 @@ export default function LatexMode() {
     matcher
   ) {
     for (var env in environments) {
-      if (environments.hasOwnProperty(env)) {
+      if (Object.prototype.hasOwnProperty.call(environments, env)) {
         var envConfig = environments[env]
         if (stream.match(envConfig.beginPattern, false)) {
           return matcher(stream, state, envConfig)
@@ -802,7 +802,7 @@ export default function LatexMode() {
     ) {
       var mark, markOpenPos, markClosePos
 
-      mark = envConfig.hasOwnProperty('kind')
+      mark = Object.prototype.hasOwnProperty.call(envConfig, 'kind')
       if (mark) {
         markOpenPos = _startPos(stream, state)
       }

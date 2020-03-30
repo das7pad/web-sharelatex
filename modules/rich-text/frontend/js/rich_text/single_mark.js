@@ -19,7 +19,9 @@ function _valueIsCurrent(cm, editorMark, range) {
 
 function _propertiesCheck(sourceMark, editorMark) {
   for (var property in editorMark.wlProperties) {
-    if (editorMark.wlProperties.hasOwnProperty(property)) {
+    if (
+      Object.prototype.hasOwnProperty.call(editorMark.wlProperties, property)
+    ) {
       if (
         sourceMark.checkedProperties[property] !==
         editorMark.wlProperties[property]

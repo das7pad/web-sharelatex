@@ -122,8 +122,12 @@ module.exports = Modules = {
     const agents = {}
     for (const module of Array.from(this.modules)) {
       for (const name in module.linkedFileAgents) {
-        const agentFunction = module.linkedFileAgents[name]
-        agents[name] = agentFunction()
+        if (
+          Object.prototype.hasOwnProperty.call(module.linkedFileAgents, name)
+        ) {
+          const agentFunction = module.linkedFileAgents[name]
+          agents[name] = agentFunction()
+        }
       }
     }
     return agents
