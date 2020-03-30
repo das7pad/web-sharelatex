@@ -28,6 +28,7 @@ describe('BodyParserErrors', function() {
 
     describe('urlencoded', function() {
       it('return 413', function(done) {
+        this.timeout(4000)
         request.post(
           {
             url: '/login',
