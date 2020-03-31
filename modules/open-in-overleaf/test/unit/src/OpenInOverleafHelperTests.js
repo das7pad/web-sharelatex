@@ -25,6 +25,8 @@ const OpenInOverleafErrors = require('../../../app/src/OpenInOverleafErrors')
 const mmmagic = { Magic: sinon.stub() }
 
 describe('OpenInOverleafHelper', function() {
+  this.timeout(3000)
+
   beforeEach(function() {
     this.snip = 'snippety snip\nsnap snap'
     this.tmpfile = '/tmp/wombat.foo'
