@@ -2,8 +2,6 @@ const App = require('../../../app.js')
 const { exec } = require('child_process')
 const { db } = require('../../../app/src/infrastructure/mongojs')
 
-require('logger-sharelatex').logger.level('error')
-
 before(function(done) {
   this.timeout(30000)
   clearDB(() => {

@@ -1,6 +1,5 @@
 const { User } = require('../app/src/models/User')
 const UserController = require('../app/src/Features/User/UserController')
-require('logger-sharelatex').logger.level('error')
 const pLimit = require('p-limit')
 const CONCURRENCY = 10
 const failure = []

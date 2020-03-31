@@ -1,6 +1,5 @@
 const { db } = require('../app/src/infrastructure/mongojs')
 const logger = require('logger-sharelatex')
-logger.logger.level('error')
 
 logger.log({}, 'Updating users in mongo')
 
