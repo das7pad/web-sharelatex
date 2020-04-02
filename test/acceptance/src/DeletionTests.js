@@ -9,7 +9,6 @@ const SubscriptionViewModelBuilder = require('../../../app/src/Features/Subscrip
 const MockDocstoreApi = require('./helpers/MockDocstoreApi')
 require('./helpers/MockDocUpdaterApi')
 require('./helpers/MockProjectHistoryApi')
-require('./helpers/MockTagsApi')
 require('./helpers/MockV1Api')
 require('./helpers/MockProjectHistoryApi')
 

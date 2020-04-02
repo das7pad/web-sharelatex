@@ -96,7 +96,7 @@ class SAMLSessionDataMissing extends BackwardCompatibleError {
       samlSession.userEmailAttributeUnreliable
     ) {
       this.tryAgain = false
-      this.message = `Your account settings at your institution prevent us from accessing your email. You will need to make your email public at your institution in order to link with ${settings.appName}. Please contact your IT department if you have any questions.`
+      this.message = `Your account settings at your institution prevent us from accessing your email address. You will need to make your email address public at your institution in order to link with ${settings.appName}. Please contact your IT department if you have any questions.`
     } else if (!institutionEmail) {
       this.message = 'Unable to confirm your institution email.'
     }

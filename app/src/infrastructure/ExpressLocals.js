@@ -278,7 +278,11 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
     res.locals.currentUrl = req.path
     res.locals.getTranslationUrl = (
       spec // see settings.i18n.subdomainLang
-    ) => spec.url + res.locals.currentUrl + '?setGlobalLng=' + spec.lngCode
+    ) => {
+      const url = new URL(req.originalUrl, spec.url)
+      url.searchParams.append('setGlobalLng', spec.lngCode)
+      return url.href
+    }
     res.locals.capitalize = function(string) {
       if (string.length === 0) {
         return ''
@@ -411,9 +415,7 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
       chatMessageBorderSaturation: '85%',
       chatMessageBorderLightness: '40%',
       chatMessageBgSaturation: '85%',
-      chatMessageBgLightness: '40%',
-      defaultFontFamily: 'lucida',
-      defaultLineHeight: 'normal'
+      chatMessageBgLightness: '40%'
     }
     next()
   })
@@ -455,7 +457,8 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
         Settings.recaptcha != null ? Settings.recaptcha.siteKeyV3 : undefined,
       recaptchaDisabled:
         Settings.recaptcha != null ? Settings.recaptcha.disabled : undefined,
-      validRootDocExtensions: Settings.validRootDocExtensions
+      validRootDocExtensions: Settings.validRootDocExtensions,
+      sentryDsn: Settings.sentry != null ? Settings.sentry.publicDSN : undefined
     }
     next()
   })
