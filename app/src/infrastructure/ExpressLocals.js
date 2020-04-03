@@ -265,13 +265,6 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
     // treats ?nocdn=true as the canonical version
     // ExpressLocals are mounted on top level, its OK to use just .path
     res.locals.currentUrl = req.path
-    res.locals.getTranslationUrl = (
-      spec // see settings.i18n.subdomainLang
-    ) => {
-      const url = new URL(req.originalUrl, spec.url)
-      url.searchParams.append('setGlobalLng', spec.lngCode)
-      return url.href
-    }
     res.locals.capitalize = function(string) {
       if (string.length === 0) {
         return ''

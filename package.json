@@ -78,7 +78,7 @@
     "sanitize-html": "^1.20.1",
     "sanitizer": "0.1.1",
     "settings-sharelatex": "^1.1.0",
-    "translations-sharelatex": "git+https://github.com/das7pad/translations-sharelatex.git#9a4754c4a4baa260a130f4530d5c4352fa330833",
+    "translations-sharelatex": "git+https://github.com/das7pad/translations-sharelatex.git#df2935e1bb5897d0a761f598d3c79de05499d407",
     "underscore": "1.6.0",
     "url-parse": "^1.4.7",
     "utf-8-validate": "^5.0.2",
