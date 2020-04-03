@@ -63,7 +63,6 @@
     "mongojs": "2.4.0",
     "mongoose": "^5.6.10",
     "multer": "git+https://github.com/overleaf/multer.git",
-    "node-html-encoder": "0.0.2",
     "nodemailer": "2.1.0",
     "p-limit": "^2.2.1",
     "passport": "^0.3.2",

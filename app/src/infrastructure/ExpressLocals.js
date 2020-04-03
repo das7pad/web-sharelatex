@@ -2,7 +2,6 @@ const logger = require('logger-sharelatex')
 const Settings = require('settings-sharelatex')
 const _ = require('lodash')
 const { URL } = require('url')
-const NodeHtmlEncoder = require('node-html-encoder').Encoder
 const Path = require('path')
 const moment = require('moment')
 
@@ -13,8 +12,6 @@ const Features = require('./Features')
 const AuthenticationController = require('../Features/Authentication/AuthenticationController')
 const PackageVersions = require('./PackageVersions')
 const Modules = require('./Modules')
-
-const htmlEncoder = new NodeHtmlEncoder('numerical')
 
 let webpackManifest = {}
 if (!IS_DEV_ENV) {
@@ -257,20 +254,12 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
   })
 
   webRouter.use(function(req, res, next) {
-    res.locals.translate = function(key, vars, htmlEncode) {
+    res.locals.translate = function(key, vars) {
       if (vars == null) {
         vars = {}
       }
-      if (htmlEncode == null) {
-        htmlEncode = false
-      }
       vars.appName = Settings.appName
-      const str = req.i18n.translate(key, vars)
-      if (htmlEncode) {
-        return htmlEncoder.htmlEncode(str)
-      } else {
-        return str
-      }
+      return req.i18n.translate(key, vars)
     }
     // Don't include the query string parameters, otherwise Google
     // treats ?nocdn=true as the canonical version
