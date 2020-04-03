@@ -63,10 +63,7 @@ module.exports = merge.smart(
  */
 function generateSentryConfig() {
   // Only upload if the Sentry secrets file is available and on master branch
-  if (
-    fs.existsSync('./.sentryclirc') &&
-    process.env.BRANCH_NAME === 'master'
-  ) {
+  if (fs.existsSync('./.sentryclirc') && process.env.BRANCH_NAME === 'master') {
     console.log('Sentry secrets file found. Uploading source maps to Sentry')
     const SentryPlugin = require('@sentry/webpack-plugin')
     const RemoveFilesPlugin = require('remove-files-webpack-plugin')
