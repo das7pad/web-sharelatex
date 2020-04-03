@@ -66,12 +66,12 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
     const userId = AuthenticationController.getLoggedInUserId(req)
     if (cdnBlocked && req.session.cdnBlocked == null) {
       logger.log(
-        { user_id: userId, ip: req != null ? req.ip : undefined },
+        { user_id: userId, ip: req.ip },
         'cdnBlocked for user, not using it and turning it off for future requets'
       )
       req.session.cdnBlocked = true
     }
-    const host = req.headers && req.headers.host
+    const host = req.headers.host
     const isSmoke = host.slice(0, 5).toLowerCase() === 'smoke'
     if (cdnAvailable && !isSmoke && !cdnBlocked) {
       staticFilesBase = Settings.cdn.web.host
@@ -209,12 +209,11 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
 
     const IEEE_BRAND_ID = 15
     res.locals.isIEEE = brandVariation =>
-      (brandVariation != null ? brandVariation.brand_id : undefined) ===
-      IEEE_BRAND_ID
+      brandVariation && brandVariation.brand_id === IEEE_BRAND_ID
 
     res.locals.getCssThemeModifier = function(userSettings, brandVariation) {
       // Themes only exist in OL v2
-      if (Settings.hasThemes != null) {
+      if (Settings.hasThemes) {
         // The IEEE theme takes precedence over the user personal setting, i.e. a user with
         // a theme setting of "light" will still get the IEE theme in IEEE branded projects.
         if (res.locals.isIEEE(brandVariation)) {
@@ -286,8 +285,7 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
   webRouter.use(function(req, res, next) {
     res.locals.getUserEmail = function() {
       const user = AuthenticationController.getSessionUser(req)
-      const email = (user != null ? user.email : undefined) || ''
-      return email
+      return (user && user.email) || ''
     }
     next()
   })
@@ -300,29 +298,21 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
   webRouter.use(function(req, res, next) {
     res.locals.buildReferalUrl = function(referalMedium) {
       let url = Settings.siteUrl
-      const currentUser = AuthenticationController.getSessionUser(req)
-      if (
-        currentUser != null &&
-        (currentUser != null ? currentUser.referal_id : undefined) != null
-      ) {
-        url += `?r=${currentUser.referal_id}&rm=${referalMedium}&rs=b` // Referal source = bonus
+      const referralId = res.locals.getReferalId()
+      if (referralId) {
+        url += `?r=${referralId}&rm=${referalMedium}&rs=b` // Referal source = bonus
       }
       return url
     }
     res.locals.getReferalId = function() {
       const currentUser = AuthenticationController.getSessionUser(req)
-      if (
-        currentUser != null &&
-        (currentUser != null ? currentUser.referal_id : undefined) != null
-      ) {
-        return currentUser.referal_id
-      }
+      return currentUser && currentUser.referal_id
     }
     next()
   })
 
   webRouter.use(function(req, res, next) {
-    res.locals.csrfToken = req != null ? req.csrfToken() : undefined
+    res.locals.csrfToken = req.csrfToken()
     next()
   })
 
@@ -333,14 +323,13 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
   })
 
   webRouter.use(function(req, res, next) {
-    res.locals.getReqQueryParam = field =>
-      req.query != null ? req.query[field] : undefined
+    res.locals.getReqQueryParam = field => req.query[field]
     next()
   })
 
   webRouter.use(function(req, res, next) {
     const currentUser = AuthenticationController.getSessionUser(req)
-    if (currentUser != null) {
+    if (currentUser) {
       res.locals.user = {
         email: currentUser.email,
         first_name: currentUser.first_name,
@@ -403,7 +392,7 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
 
   webRouter.use(function(req, res, next) {
     // TODO
-    if (Settings.hasThemes != null) {
+    if (Settings.hasThemes) {
       res.locals.overallThemes = [
         {
           name: 'Default',
@@ -427,19 +416,17 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
 
   webRouter.use(function(req, res, next) {
     res.locals.ExposedSettings = {
-      isOverleaf: Settings.overleaf != null,
+      isOverleaf: !!Settings.overleaf,
       appName: Settings.appName,
       hasSamlBeta: req.session.samlBeta,
       hasSamlFeature: Features.hasFeature('saml'),
       samlInitPath: _.get(Settings, ['saml', 'ukamf', 'initPath']),
       siteUrl: Settings.siteUrl,
       emailConfirmationDisabled: Settings.emailConfirmationDisabled,
-      recaptchaSiteKeyV3:
-        Settings.recaptcha != null ? Settings.recaptcha.siteKeyV3 : undefined,
-      recaptchaDisabled:
-        Settings.recaptcha != null ? Settings.recaptcha.disabled : undefined,
+      recaptchaSiteKeyV3: Settings.recaptcha && Settings.recaptcha.siteKeyV3,
+      recaptchaDisabled: Settings.recaptcha && Settings.recaptcha.disabled,
       validRootDocExtensions: Settings.validRootDocExtensions,
-      sentryDsn: Settings.sentry != null ? Settings.sentry.publicDSN : undefined
+      sentryDsn: Settings.sentry && Settings.sentry.publicDSN
     }
     next()
   })
