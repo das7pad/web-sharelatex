@@ -15,7 +15,6 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 define([
-  'utils/sentry',
   'libraries',
   'modules/recursionHelper',
   'modules/errorCatcher',
