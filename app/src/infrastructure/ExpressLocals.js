@@ -263,10 +263,6 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
       vars.appName = Settings.appName
       return req.i18n.translate(key, vars)
     }
-    // Don't include the query string parameters, otherwise Google
-    // treats ?nocdn=true as the canonical version
-    // ExpressLocals are mounted on top level, its OK to use just .path
-    res.locals.currentUrl = req.path
     next()
   })
 
