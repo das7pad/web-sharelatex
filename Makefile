@@ -85,15 +85,17 @@ RUN_LINT ?= $(LINT_RUNNER) eslint
 lint_full:
 	$(RUN_LINT) .
 
-FILES_FOR_LINT ?= \
-	$(shell $(git) diff $(GIT_PREVIOUS_SUCCESSFUL_COMMIT) --name-only \
-			| grep --invert-match \
-				-e vendor \
-			| grep \
-				-e .js \
-				-e .less \
-			| sed 's|^|$(PWD)/|' \
-	)
+GIT_DIFF_CMD_FORMAT ?= \
+	$(git) diff $(GIT_PREVIOUS_SUCCESSFUL_COMMIT) --name-only \
+	| grep --invert-match \
+		-e vendor \
+	| grep \
+		-e '\.js$$' \
+		-e '\.less$$' \
+	| sed 's|^|$(PWD)/|'
+
+FILES_FOR_FORMAT ?= $(wildcard $(shell $(GIT_DIFF_CMD_FORMAT)))
+FILES_FOR_LINT ?= $(wildcard $(shell $(GIT_DIFF_CMD_FORMAT) | grep -e '\.js$$'))
 
 lint_partial:
 ifneq (,$(FILES_FOR_LINT))
@@ -124,11 +126,11 @@ format_fix_full:
 
 format_partial:
 ifneq (,$(FILES_FOR_LINT))
-	$(RUN_FORMAT) $(FILES_FOR_LINT) --list-different
+	$(RUN_FORMAT) $(FILES_FOR_FORMAT) --list-different
 endif
 format_fix_partial:
 ifneq (,$(FILES_FOR_LINT))
-	$(RUN_FORMAT) $(FILES_FOR_LINT) --write
+	$(RUN_FORMAT) $(FILES_FOR_FORMAT) --write
 endif
 
 UNIT_TEST_DOCKER_COMPOSE ?= \
