@@ -169,8 +169,8 @@ aside#left-menu.full-size(
 					name="fontFamily"
 					ng-model="settings.fontFamily"
 				)
-					each fontFamily in ['monaco', 'lucida']
-						option(value=fontFamily) #{capitalize(fontFamily)}
+					each fontFamily in ['Monaco', 'Lucida']
+						option(value=fontFamily.toLowerCase()) #{fontFamily}
 
 			.form-controls
 				label(for="lineHeight") #{translate("line_height")}

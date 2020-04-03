@@ -267,12 +267,6 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
     // treats ?nocdn=true as the canonical version
     // ExpressLocals are mounted on top level, its OK to use just .path
     res.locals.currentUrl = req.path
-    res.locals.capitalize = function(string) {
-      if (string.length === 0) {
-        return ''
-      }
-      return string.charAt(0).toUpperCase() + string.slice(1)
-    }
     next()
   })
 
