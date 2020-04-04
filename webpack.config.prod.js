@@ -21,24 +21,6 @@ module.exports = merge.smart(
       filename: 'js/[name]-[chunkhash].js'
     },
 
-    module: {
-      rules: [
-        {
-          // Override base font loading to add hash to filename so that we can
-          // use "immutable" caching
-          test: /\.(woff|woff2)$/,
-          use: [
-            {
-              loader: 'file-loader',
-              options: {
-                name: 'fonts/[name]-[hash].[ext]'
-              }
-            }
-          ]
-        }
-      ]
-    },
-
     optimization: {
       // Minify JS (with Terser) and CSS (with cssnano)
       minimizer: [new TerserPlugin(), new OptimizeCssAssetsPlugin()]

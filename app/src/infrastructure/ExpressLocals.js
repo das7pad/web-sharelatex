@@ -112,7 +112,7 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
       //  https://caniuse.com/#search=woff2
       // They both ignore the preload header, so this is OK
       //  https://caniuse.com/#search=preload
-      const uri = res.locals.staticPath(`/font/${name}.woff2`)
+      const uri = res.locals.staticPath(`/fonts/${name}.woff2`)
       res.locals.preload(uri, 'font', true)
     }
     res.locals.preloadImg = function(path) {

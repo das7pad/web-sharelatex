@@ -424,7 +424,7 @@ module.exports = settings =
 	#- example request sequence with resource hints disabled
 	#  | /login    |
 	#          | /stylesheets/style.css        |
-	#                                            | /font/some-font.woff2    |
+	#                                            | /fonts/some-font.woff2    |
 	#  the download of the css file can start as soon as the html head is
 	#   parsed.
 	#  once all the css rules are parsed and partially applied, the need for
@@ -433,7 +433,7 @@ module.exports = settings =
 	#- example request with resource hints enabled
 	#  | /login     |
 	#      | /stylesheets/style.css        |
-	#      | /font/some-font.woff2    |
+	#      | /fonts/some-font.woff2    |
 	#  the download of the css file AND the font file can start as soon as
 	#   the http headers are downloaded
 	addResourceHints: process.env['ADD_RESOURCE_HINTS'] == 'true'

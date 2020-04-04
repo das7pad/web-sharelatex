@@ -141,7 +141,7 @@ describe('ExpressLocalsTests', function() {
           this.res.locals.preloadFont('arbitrary')
           this.res.locals.finishPreloading()
           expect(this.res.headers).to.deep.equal({
-            Link: '</font/arbitrary.woff2>;rel=preload;as=font;crossorigin'
+            Link: '</fonts/arbitrary.woff2>;rel=preload;as=font;crossorigin'
           })
         })
 
@@ -149,8 +149,8 @@ describe('ExpressLocalsTests', function() {
           this.res.render('template', {})
           expect(this.res.headers.Link).to.exist
           const Link = this.res.headers.Link
-          expect(Link).to.include('font/font-awesome')
-          expect(Link).to.include('font/merriweather')
+          expect(Link).to.include('fonts/font-awesome')
+          expect(Link).to.include('fonts/merriweather')
           expect(Link).to.include('img/sprite.png')
         })
 
@@ -159,7 +159,7 @@ describe('ExpressLocalsTests', function() {
           expect(this.res.headers.Link).to.exist
           const Link = this.res.headers.Link
           expect(Link).to.include('stylesheets/style.css')
-          expect(Link).to.include('font/lato')
+          expect(Link).to.include('fonts/lato')
         })
 
         it('should inject sl- brand specific resources', function() {
@@ -168,7 +168,7 @@ describe('ExpressLocalsTests', function() {
           expect(this.res.headers.Link).to.exist
           const Link = this.res.headers.Link
           expect(Link).to.include('stylesheets/sl-style.css')
-          expect(Link).to.include('font/open-sans')
+          expect(Link).to.include('fonts/open-sans')
         })
       })
     })
