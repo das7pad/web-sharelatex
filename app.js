@@ -18,19 +18,10 @@ logger.logger.serializers.user = require('./app/src/infrastructure/LoggerSeriali
 logger.logger.serializers.docs = require('./app/src/infrastructure/LoggerSerializers').docs
 logger.logger.serializers.files = require('./app/src/infrastructure/LoggerSerializers').files
 logger.logger.serializers.project = require('./app/src/infrastructure/LoggerSerializers').project
-if ((Settings.sentry != null ? Settings.sentry.dsn : undefined) != null) {
-  logger.initializeErrorReporting(Settings.sentry.dsn, Settings.sentry.options)
-}
 
 metrics.memory.monitor(logger)
 const Server = require('./app/src/infrastructure/Server')
 
-if (Settings.catchErrors) {
-  process.removeAllListeners('uncaughtException')
-  process.on('uncaughtException', error =>
-    logger.error({ err: error }, 'uncaughtException')
-  )
-}
 const port = Settings.port || Settings.internal.web.port || 3000
 const host = Settings.internal.web.host || 'localhost'
 if (!module.parent) {
