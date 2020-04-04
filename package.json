@@ -69,7 +69,7 @@
     "passport-local": "^1.0.0",
     "pug": "^2.0.0-beta6",
     "querystring": "^0.2.0",
-    "redis-sharelatex": "git+https://github.com/das7pad/redis-sharelatex.git#ebedde93447c6d6ad826e8950760f76ec2df95bb",
+    "redis-sharelatex": "git+https://github.com/das7pad/redis-sharelatex.git#1612a8c833517ec4bc3384c53617e4f7aa351230",
     "request": "^2.69.0",
     "request-promise-native": "^1.0.7",
     "requestretry": "^1.13.0",
