@@ -88,7 +88,18 @@ define(['socket.io-client'], function(io) {
 
         // initial connection attempt
         this.updateConnectionManagerState('connecting')
-        this.ide.socket = io.connect(this.wsUrl, {
+        let parsedURL
+        try {
+          parsedURL = new URL(this.wsUrl || '/socket.io', window.location)
+        } catch (e) {
+          // hello IE11
+          parsedURL = {
+            origin: null,
+            pathname: '/socket.io'
+          }
+        }
+        this.ide.socket = io.connect(parsedURL.origin, {
+          resource: parsedURL.pathname.slice(1),
           reconnect: false,
           'connect timeout': 30 * 1000,
           'force new connection': true
