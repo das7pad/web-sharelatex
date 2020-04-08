@@ -6,7 +6,7 @@ version: "3.1"
 
 services:
   test_unit:
-    image: ci/$PROJECT_NAME:$BRANCH_NAME-$BUILD_NUMBER
+    image: ${IMAGE_CI}-dev
     user: node
     command:
       - npx
@@ -25,8 +25,7 @@ services:
       - ./output:/home/node:z
 
   test_acceptance:
-    build: .
-    image: ci/$PROJECT_NAME:$BRANCH_NAME-$BUILD_NUMBER
+    image: ${IMAGE_CI}-dev
     environment:
       LOG_LEVEL: fatal
       MONGO_HOST: mongo
@@ -72,9 +71,7 @@ services:
       context: .
       dockerfile: Dockerfile.frontend.ci
       args:
-        PROJECT_NAME: $PROJECT_NAME
-        BRANCH_NAME: $BRANCH_NAME
-        BUILD_NUMBER: $BUILD_NUMBER
+        IMAGE_CI
     working_dir: /app
     command: npm run test:frontend:single
     user: node

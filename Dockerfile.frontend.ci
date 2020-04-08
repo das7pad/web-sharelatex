@@ -2,11 +2,9 @@
 # Instead run bin/update_build_scripts from
 # https://github.com/das7pad/sharelatex-dev-env
 
-ARG PROJECT_NAME
-ARG BRANCH_NAME
-ARG BUILD_NUMBER
+ARG IMAGE_CI
 
-FROM ci/$PROJECT_NAME:$BRANCH_NAME-$BUILD_NUMBER
+FROM ${IMAGE_CI}-dev
 
 USER root
 
