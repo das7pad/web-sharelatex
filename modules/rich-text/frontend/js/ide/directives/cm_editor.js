@@ -10,14 +10,14 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 define([
-  'base',
+  '../../../../../../frontend/js/base',
   '../rich_text_adapter',
-  'ide/editor/directives/aceEditor/spell-check/SpellCheckManager',
+  '../../../../../../frontend/js/ide/editor/directives/aceEditor/spell-check/SpellCheckManager',
   './spell_check/spell_check_adapter',
   '../autocomplete_adapter',
-  'ide/editor/directives/aceEditor/cursor-position/CursorPositionManager',
+  '../../../../../../frontend/js/ide/editor/directives/aceEditor/cursor-position/CursorPositionManager',
   './cursor_position/cursor_position_adapter',
-  'ide/editor/directives/aceEditor/track-changes/TrackChangesManager',
+  '../../../../../../frontend/js/ide/editor/directives/aceEditor/track-changes/TrackChangesManager',
   './track_changes/track_changes_adapter'
 ], (
   App,

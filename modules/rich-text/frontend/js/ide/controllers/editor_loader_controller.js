@@ -1,5 +1,5 @@
-import App from 'base'
-import EventEmitter from 'utils/EventEmitter'
+import App from '../../../../../../frontend/js/base'
+import EventEmitter from '../../../../../../frontend/js/utils/EventEmitter'
 
 App.controller('EditorLoaderController', function($scope, localStorage) {
   $scope.richText = {

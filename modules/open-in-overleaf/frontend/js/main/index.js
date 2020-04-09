@@ -1,4 +1,4 @@
-define(['base'], App =>
+define(['../../../../../frontend/js/base'], App =>
   // For integration-module
   App.controller('OpenInOverleafGatewayController', function(
     $scope,

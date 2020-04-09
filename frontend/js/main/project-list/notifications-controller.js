@@ -1,6 +1,6 @@
 const ExposedSettings = window.ExposedSettings
 
-define(['base'], function(App) {
+define(['../../base'], function(App) {
   App.controller('NotificationsController', function($scope, $http) {
     for (const notification of $scope.notifications || []) {
       notification.hide = false

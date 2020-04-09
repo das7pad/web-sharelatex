@@ -29,12 +29,10 @@ function getClient() {
         require('nodemailer-ses-transport')(emailParameters)
       )
     } else if (emailParameters.sendgridApiKey) {
-      logger.log('using sendgrid for email')
-      client = nodemailer.createTransport(
-        require('nodemailer-sendgrid')({
-          apiKey: emailParameters.sendgridApiKey
-        })
-      )
+      throw new OError({
+        message:
+          'sendgridApiKey configuration option is deprecated, use SMTP instead'
+      })
     } else if (emailParameters.MandrillApiKey) {
       logger.log('using mandril for email')
       client = nodemailer.createTransport(

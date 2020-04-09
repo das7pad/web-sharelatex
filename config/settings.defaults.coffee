@@ -253,6 +253,10 @@ module.exports = settings =
 
 	httpAuthUsers: httpAuthUsers
 
+	twoFactorAuthentication:
+		enabled: false
+		requiredForStaff: false
+
 	# Default features
 	# ----------------
 	#
@@ -732,7 +736,7 @@ module.exports = settings =
 					'source': [ 'src', 'type' ]
 					'span': [ 'class', 'id', 'style' ]
 					'table': [ 'border', 'class', 'id', 'style' ]
-					'td': [ 'colspan', 'rowspan', 'headers' ]
+					'td': [ 'colspan', 'rowspan', 'headers', 'style' ]
 					'th': [ 'abbr', 'headers', 'colspan', 'rowspan', 'scope', 'sorted', 'style' ]
 					'tr': [ 'class' ]
 					'video': [ 'alt', 'class', 'controls', 'height', 'width' ]

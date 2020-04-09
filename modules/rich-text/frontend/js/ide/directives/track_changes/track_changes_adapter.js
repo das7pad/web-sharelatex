@@ -1,7 +1,9 @@
 /* eslint-disable
     camelcase
  */
-define(['ide/editor/EditorShareJsCodec'], function(EditorShareJsCodec) {
+define([
+  '../../../../../../../frontend/js/ide/editor/EditorShareJsCodec'
+], function(EditorShareJsCodec) {
   class TrackChangesAdapter {
     constructor(editor) {
       this.findTrackChangesMarker = this.findTrackChangesMarker.bind(this)

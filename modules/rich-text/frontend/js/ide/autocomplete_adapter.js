@@ -11,8 +11,8 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 define([
-  'ide/editor/directives/aceEditor/auto-complete/snippets/TopHundredSnippets',
-  'ide/editor/directives/aceEditor/auto-complete/snippets/Environments'
+  '../../../../../frontend/js/ide/editor/directives/aceEditor/auto-complete/snippets/TopHundredSnippets',
+  '../../../../../frontend/js/ide/editor/directives/aceEditor/auto-complete/snippets/Environments'
 ], function(TopHundredCommands, Environments) {
   let AutocompleteAdapter
   return (AutocompleteAdapter = class AutocompleteAdapter {

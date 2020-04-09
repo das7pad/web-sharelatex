@@ -15,11 +15,11 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 define([
-  'libraries',
-  'modules/recursionHelper',
-  'modules/errorCatcher',
-  'modules/storage',
-  'utils/underscore'
+  './libraries',
+  './modules/recursionHelper',
+  './modules/errorCatcher',
+  './modules/storage',
+  './utils/underscore'
 ], function() {
   const App = angular
     .module('SharelatexApp', [

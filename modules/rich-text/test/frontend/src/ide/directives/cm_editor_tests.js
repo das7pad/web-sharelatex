@@ -15,7 +15,7 @@
 define([
   '../../../../../frontend/js/ide/directives/cm_editor',
   '../../../../../frontend/js/ide/rich_text_adapter',
-  'utils/EventEmitter',
+  '../../../../../../../frontend/js/utils/EventEmitter',
   'angular-mocks'
 ], (cmEditor, RichTextAdapter, EventEmitter) => {
   describe('cmEditor', function() {

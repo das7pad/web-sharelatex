@@ -12,7 +12,7 @@
  */
 define([
   '../../../../frontend/js/ide/controllers/editor_loader_controller',
-  'utils/EventEmitter',
+  '../../../../../../frontend/js/utils/EventEmitter',
   'angular-mocks'
 ], (EditorLoaderController, EventEmitter) =>
   describe('EditorLoaderController', function() {

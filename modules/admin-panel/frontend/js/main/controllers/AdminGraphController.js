@@ -12,7 +12,10 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['base', 'crypto-js/md5'], function(App, CryptoJSmd5) {
+define(['../../../../../../frontend/js/base', 'crypto-js/md5'], function(
+  App,
+  CryptoJSmd5
+) {
   App.controller('AdminGraphController', function(
     $scope,
     $timeout,

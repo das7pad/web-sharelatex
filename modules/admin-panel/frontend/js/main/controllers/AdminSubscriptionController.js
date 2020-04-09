@@ -10,7 +10,7 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['base'], function(App) {
+define(['../../../../../../frontend/js/base'], function(App) {
   App.controller('AdminSubscriptionController', function($scope, $http) {
     $scope.subscription = window.data.subscription
     $scope.user_id = window.data.user_id

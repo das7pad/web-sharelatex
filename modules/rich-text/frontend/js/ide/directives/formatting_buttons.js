@@ -12,7 +12,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['base'], function(App) {
+define(['../../../../../../frontend/js/base'], function(App) {
   const BUTTON_WIDTH = 33
   const OVERFLOWED_BUTTON_WIDTH = 70
 
