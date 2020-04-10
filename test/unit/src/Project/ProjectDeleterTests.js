@@ -310,9 +310,10 @@ describe('ProjectDeleter', function() {
         deleterUser: this.user,
         ipAddress: this.ip
       })
-      this.DocumentUpdaterHandler.promises.flushProjectToMongoAndDelete
-        .calledWith(this.project._id)
-        .should.equal(true)
+      sinon.assert.calledWith(
+        this.DocumentUpdaterHandler.promises.flushProjectToMongoAndDelete,
+        this.project._id
+      )
     })
 
     it('should removeProjectFromAllTags', async function() {
