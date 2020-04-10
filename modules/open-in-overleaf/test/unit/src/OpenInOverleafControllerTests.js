@@ -23,6 +23,8 @@ const Errors = require('../../../../../app/src/Features/Errors/Errors')
 const OpenInOverleafErrors = require('../../../app/src/OpenInOverleafErrors')
 
 describe('OpenInOverleafController', function() {
+  this.timeout(4000)
+
   beforeEach(function() {
     this.project_id = '123213jlkj9kdlsaj'
     this.user = {
