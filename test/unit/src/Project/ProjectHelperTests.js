@@ -30,7 +30,9 @@ describe('ProjectHelper', function() {
       features: {}
     }
 
-    return (this.ProjectHelper = SandboxedModule.require(modulePath))
+    this.ProjectHelper = SandboxedModule.require(modulePath, {
+      requires: { '../../infrastructure/mongojs': { ObjectId } }
+    })
   })
 
   describe('isArchived', function() {
