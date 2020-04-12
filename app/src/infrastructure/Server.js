@@ -133,6 +133,13 @@ Modules.applyNonCsrfRouter(webRouter, privateApiRouter, publicApiRouter)
 
 webRouter.csrf = new Csrf()
 webRouter.use(webRouter.csrf.middleware)
+
+if (app.get('env') === 'test') {
+  // PERF: speedup acceptance tests in skipping all the other middlewares
+  logger.info('mounting /dev/csrf early for acceptance tests')
+  webRouter.get('/dev/csrf', (req, res) => res.send(req.csrfToken()))
+}
+
 webRouter.use(translations.expressMiddlewear)
 webRouter.use(translations.setLangBasedOnDomainMiddlewear)
 
