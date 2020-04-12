@@ -28,6 +28,7 @@ const Path = require('path')
 const { promisify } = require('util')
 const _ = require('underscore')
 const AnalyticsManger = require('../Analytics/AnalyticsManager')
+const Errors = require('../Errors/Errors')
 
 const ProjectCreationHandler = {
   createBlankProject(owner_id, projectName, attributes, callback) {
@@ -117,6 +118,10 @@ const ProjectCreationHandler = {
       user
     ) {
       if (err) return callback(err)
+      if (!user)
+        return callback(
+          new Errors.UserNotFoundError({ info: { userId: owner_id } })
+        )
       project.spellCheckLanguage = user.ace.spellCheckLanguage
       return project.save(function(err) {
         if (err != null) {
