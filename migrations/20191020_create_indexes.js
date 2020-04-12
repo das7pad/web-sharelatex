@@ -18,7 +18,7 @@ exports.migrate = function(client, done) {
       logger.info({ modelName }, 'started')
 
       const model = require(Path.join(modelsSrcPath, modelName))[modelName]
-      model.ensureIndexes(function(err) {
+      model.createIndexes(function(err) {
         if (err) {
           logger.error({ modelName, err }, 'failed')
         } else {
