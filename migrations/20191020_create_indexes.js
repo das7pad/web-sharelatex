@@ -12,7 +12,7 @@ exports.migrate = function(client, done) {
     return name.slice(0, -3)
   })
   logger.info({ models }, 'queue')
-  async.map(
+  async.eachSeries(
     models,
     function(modelName, cb) {
       logger.info({ modelName }, 'started')
