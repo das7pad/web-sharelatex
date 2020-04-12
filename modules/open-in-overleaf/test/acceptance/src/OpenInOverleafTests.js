@@ -30,6 +30,8 @@ const MockFileStoreApi = require('../../../../../test/acceptance/src/helpers/Moc
 const MockDocstoreApi = require('../../../../../test/acceptance/src/helpers/MockDocstoreApi')
 const MockV1Api = require('../../../../../test/acceptance/src/helpers/MockV1Api')
 
+const PROJECT_URI_REGEX = /^\/project\/([0-9a-fA-F]{24})$/
+
 describe('Open In Overleaf', function() {
   this.timeout(25000)
 
@@ -115,10 +117,6 @@ I have a bad name
   })
 
   return describe('when creating a project from a snippet', function() {
-    before(function() {
-      return (this.uri_regex = /^\/project\/([0-9a-fA-F]{24})$/)
-    })
-
     describe('when POSTing a snippet with a valid csrf token via xhr', function() {
       beforeEach(function(done) {
         return this.user.request.post(
@@ -148,12 +146,14 @@ I have a bad name
       it('should redirect to a project', function() {
         expect(this.res.statusCode).to.equal(200)
         expect(this.res.headers['content-type']).to.match(/^application\/json/)
-        return expect(JSON.parse(this.body).redirect).to.match(this.uri_regex)
+        return expect(JSON.parse(this.body).redirect).to.match(
+          PROJECT_URI_REGEX
+        )
       })
 
       return it('should create a project with the returned id', function(done) {
         const projectId = JSON.parse(this.body).redirect.match(
-          this.uri_regex
+          PROJECT_URI_REGEX
         )[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
@@ -193,11 +193,11 @@ I have a bad name
 
       it('should redirect to a project', function() {
         expect(this.res.statusCode).to.equal(302)
-        return expect(this.res.headers.location).to.match(this.uri_regex)
+        return expect(this.res.headers.location).to.match(PROJECT_URI_REGEX)
       })
 
       return it('should create a project with the returned id', function(done) {
-        const projectId = this.res.headers.location.match(this.uri_regex)[1]
+        const projectId = this.res.headers.location.match(PROJECT_URI_REGEX)[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
@@ -236,7 +236,7 @@ I have a bad name
 
       return it('should create a project with the requested compiler', function(done) {
         const projectId = JSON.parse(this.body).redirect.match(
-          this.uri_regex
+          PROJECT_URI_REGEX
         )[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
@@ -277,7 +277,7 @@ I have a bad name
 
       return it('should create a project with the requested brand variation', function(done) {
         const projectId = JSON.parse(this.body).redirect.match(
-          this.uri_regex
+          PROJECT_URI_REGEX
         )[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
@@ -432,12 +432,14 @@ I have a bad name
       it('should send a json response to redirect to a project', function() {
         expect(this.res.statusCode).to.equal(200)
         expect(this.res.headers['content-type']).to.match(/application\/json/)
-        return expect(JSON.parse(this.body).redirect).to.match(this.uri_regex)
+        return expect(JSON.parse(this.body).redirect).to.match(
+          PROJECT_URI_REGEX
+        )
       })
 
       return it('should create a project containing the decoded snippet', function(done) {
         const projectId = JSON.parse(this.body).redirect.match(
-          this.uri_regex
+          PROJECT_URI_REGEX
         )[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
@@ -492,12 +494,14 @@ I have a bad name
       it('should send a json response to redirect to a project', function() {
         expect(this.res.statusCode).to.equal(200)
         expect(this.res.headers['content-type']).to.match(/application\/json/)
-        return expect(JSON.parse(this.body).redirect).to.match(this.uri_regex)
+        return expect(JSON.parse(this.body).redirect).to.match(
+          PROJECT_URI_REGEX
+        )
       })
 
       return it('should create a project containing the retrieved snippet', function(done) {
         const projectId = JSON.parse(this.body).redirect.match(
-          this.uri_regex
+          PROJECT_URI_REGEX
         )[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
@@ -548,11 +552,11 @@ I have a bad name
 
       it('should redirect to a project', function() {
         expect(this.res.statusCode).to.equal(302)
-        return expect(this.res.headers.location).to.match(this.uri_regex)
+        return expect(this.res.headers.location).to.match(PROJECT_URI_REGEX)
       })
 
       return it('should create a project containing the retrieved snippet', function(done) {
-        const projectId = this.res.headers.location.match(this.uri_regex)[1]
+        const projectId = this.res.headers.location.match(PROJECT_URI_REGEX)[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
@@ -602,11 +606,11 @@ I have a bad name
 
       it('should redirect to a project', function() {
         expect(this.res.statusCode).to.equal(302)
-        return expect(this.res.headers.location).to.match(this.uri_regex)
+        return expect(this.res.headers.location).to.match(PROJECT_URI_REGEX)
       })
 
       it('should create a project containing the retrieved snippet', function(done) {
-        const projectId = this.res.headers.location.match(this.uri_regex)[1]
+        const projectId = this.res.headers.location.match(PROJECT_URI_REGEX)[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
@@ -631,7 +635,7 @@ I have a bad name
       })
 
       return it("should read the name from the zip's main.tex file", function(done) {
-        const projectId = this.res.headers.location.match(this.uri_regex)[1]
+        const projectId = this.res.headers.location.match(PROJECT_URI_REGEX)[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
@@ -671,11 +675,11 @@ I have a bad name
 
       it('should redirect to a project', function() {
         expect(this.res.statusCode).to.equal(302)
-        return expect(this.res.headers.location).to.match(this.uri_regex)
+        return expect(this.res.headers.location).to.match(PROJECT_URI_REGEX)
       })
 
       return it('should create a project with the correct brand variation id', function(done) {
-        const projectId = this.res.headers.location.match(this.uri_regex)[1]
+        const projectId = this.res.headers.location.match(PROJECT_URI_REGEX)[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
@@ -715,11 +719,11 @@ I have a bad name
 
       it('should redirect to a project', function() {
         expect(this.res.statusCode).to.equal(302)
-        return expect(this.res.headers.location).to.match(this.uri_regex)
+        return expect(this.res.headers.location).to.match(PROJECT_URI_REGEX)
       })
 
       return it('should create a project with the correct brand variation id', function(done) {
-        const projectId = this.res.headers.location.match(this.uri_regex)[1]
+        const projectId = this.res.headers.location.match(PROJECT_URI_REGEX)[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
@@ -782,7 +786,7 @@ I have a bad name
       })
 
       return it('should not create a project with an invalid name', function(done) {
-        const projectId = this.res.headers.location.match(this.uri_regex)[1]
+        const projectId = this.res.headers.location.match(PROJECT_URI_REGEX)[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
@@ -851,7 +855,7 @@ I have a bad name
 
       return it('should redirect to a project', function() {
         expect(this.res.statusCode).to.equal(302)
-        return expect(this.res.headers.location).to.match(this.uri_regex)
+        return expect(this.res.headers.location).to.match(PROJECT_URI_REGEX)
       })
     })
 
@@ -880,11 +884,11 @@ I have a bad name
 
       it('should redirect to a project', function() {
         expect(this.res.statusCode).to.equal(302)
-        return expect(this.res.headers.location).to.match(this.uri_regex)
+        return expect(this.res.headers.location).to.match(PROJECT_URI_REGEX)
       })
 
       return it('should not create a project with an invalid name', function(done) {
-        const projectId = this.res.headers.location.match(this.uri_regex)[1]
+        const projectId = this.res.headers.location.match(PROJECT_URI_REGEX)[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
@@ -987,11 +991,11 @@ I have a bad name
 
       it('should redirect to a project', function() {
         expect(this.res.statusCode).to.equal(302)
-        return expect(this.res.headers.location).to.match(this.uri_regex)
+        return expect(this.res.headers.location).to.match(PROJECT_URI_REGEX)
       })
 
       return it("should use the partner's brand variation", function(done) {
-        const projectId = this.res.headers.location.match(this.uri_regex)[1]
+        const projectId = this.res.headers.location.match(PROJECT_URI_REGEX)[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
@@ -1061,11 +1065,11 @@ I have a bad name
 
       it('should redirect to a project', function() {
         expect(this.res.statusCode).to.equal(302)
-        return expect(this.res.headers.location).to.match(this.uri_regex)
+        return expect(this.res.headers.location).to.match(PROJECT_URI_REGEX)
       })
 
       return it('should have a null brand variation', function(done) {
-        const projectId = this.res.headers.location.match(this.uri_regex)[1]
+        const projectId = this.res.headers.location.match(PROJECT_URI_REGEX)[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
           if (error != null) {
@@ -1103,7 +1107,7 @@ I have a bad name
 
       it('should create a project with the correct name', function(done) {
         const projectId = JSON.parse(this.body).redirect.match(
-          this.uri_regex
+          PROJECT_URI_REGEX
         )[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
@@ -1118,7 +1122,7 @@ I have a bad name
 
       return it('should ensure that the project name is unique', function(done) {
         const projectId = JSON.parse(this.body).redirect.match(
-          this.uri_regex
+          PROJECT_URI_REGEX
         )[1]
         expect(projectId).to.exist
         return this.user.request.post(
@@ -1135,7 +1139,7 @@ I have a bad name
           (err, res, body) => {
             expect(err).not.to.exist
             const newProjectId = JSON.parse(body).redirect.match(
-              this.uri_regex
+              PROJECT_URI_REGEX
             )[1]
             expect(newProjectId).to.exist
 
@@ -1177,7 +1181,7 @@ I have a bad name
 
       it('should create a project with the correct name', function(done) {
         const projectId = JSON.parse(this.body).redirect.match(
-          this.uri_regex
+          PROJECT_URI_REGEX
         )[1]
         expect(projectId).to.exist
         return ProjectGetter.getProject(projectId, (error, project) => {
@@ -1192,7 +1196,7 @@ I have a bad name
 
       return it('should ensure that the project name is unique', function(done) {
         const projectId = JSON.parse(this.body).redirect.match(
-          this.uri_regex
+          PROJECT_URI_REGEX
         )[1]
         expect(projectId).to.exist
         return this.user.request.post(
@@ -1210,7 +1214,7 @@ I have a bad name
           (err, res, body) => {
             expect(err).not.to.exist
             const newProjectId = JSON.parse(body).redirect.match(
-              this.uri_regex
+              PROJECT_URI_REGEX
             )[1]
             expect(newProjectId).to.exist
 
@@ -1255,7 +1259,7 @@ I have a bad name
 
         it('should create a project with the default project name', function(done) {
           const projectId = JSON.parse(this.body).redirect.match(
-            this.uri_regex
+            PROJECT_URI_REGEX
           )[1]
           expect(projectId).to.exist
 
@@ -1273,7 +1277,7 @@ I have a bad name
 
         it('should add the .tex file as a document', function(done) {
           const projectId = JSON.parse(this.body).redirect.match(
-            this.uri_regex
+            PROJECT_URI_REGEX
           )[1]
           expect(projectId).to.exist
 
@@ -1290,7 +1294,7 @@ I have a bad name
 
         return it('should add the .zip file as a file', function(done) {
           const projectId = JSON.parse(this.body).redirect.match(
-            this.uri_regex
+            PROJECT_URI_REGEX
           )[1]
           expect(projectId).to.exist
 
@@ -1336,7 +1340,7 @@ I have a bad name
 
         return it('should use the supplied filenames', function(done) {
           const projectId = JSON.parse(this.body).redirect.match(
-            this.uri_regex
+            PROJECT_URI_REGEX
           )[1]
           expect(projectId).to.exist
 
@@ -1384,7 +1388,7 @@ I have a bad name
 
         return it('should use the supplied brand variation id', function(done) {
           const projectId = JSON.parse(this.body).redirect.match(
-            this.uri_regex
+            PROJECT_URI_REGEX
           )[1]
           expect(projectId).to.exist
 
