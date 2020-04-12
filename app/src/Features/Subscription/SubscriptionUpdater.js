@@ -1,4 +1,3 @@
-const { db } = require('../../infrastructure/mongojs')
 const async = require('async')
 const { promisifyAll } = require('../../util/promises')
 const { Subscription } = require('../../models/Subscription')
@@ -176,41 +175,6 @@ const SubscriptionUpdater = {
       ],
       callback
     )
-  },
-
-  restoreSubscription(subscriptionId, callback) {
-    SubscriptionLocator.getDeletedSubscription(subscriptionId, function(
-      err,
-      deletedSubscription
-    ) {
-      if (err) {
-        return callback(err)
-      }
-      const subscription = deletedSubscription.subscription
-      async.series(
-        [
-          cb =>
-            // 1. upsert subscription
-            db.subscriptions.update(
-              { _id: subscription._id },
-              subscription,
-              { upsert: true },
-              cb
-            ),
-          cb =>
-            // 2. refresh users features. Do this before removing the
-            //    subscription so the restore can be retried if this fails
-            SubscriptionUpdater._refreshUsersFeatures(subscription, cb),
-          cb =>
-            // 3. remove deleted subscription
-            DeletedSubscription.deleteOne(
-              { 'subscription._id': subscription._id },
-              callback
-            )
-        ],
-        callback
-      )
-    })
   },
 
   _refreshUsersFeatures(subscription, callback) {
