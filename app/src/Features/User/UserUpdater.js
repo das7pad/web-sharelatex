@@ -1,9 +1,7 @@
 const logger = require('logger-sharelatex')
-const mongojs = require('../../infrastructure/mongojs')
 const metrics = require('metrics-sharelatex')
-const { db } = mongojs
 const async = require('async')
-const { ObjectId } = mongojs
+const { db, ObjectId } = require('../../infrastructure/mongojs')
 const { promisify } = require('util')
 const UserGetter = require('./UserGetter')
 const {

@@ -15,7 +15,6 @@
 let InstitutionsManager
 const logger = require('logger-sharelatex')
 const async = require('async')
-const { db } = require('../../infrastructure/mongojs')
 const _ = require('underscore')
 const { ObjectId } = require('../../infrastructure/mongojs')
 const { getInstitutionAffiliations } = require('./InstitutionsAPI')
