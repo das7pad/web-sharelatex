@@ -3,7 +3,7 @@ const { exec } = require('child_process')
 const { db } = require('../../../app/src/infrastructure/mongojs')
 
 before(function(done) {
-  this.timeout(30000)
+  this.timeout(60000)
   clearDB(() => {
     exec('bin/east migrate', (error, stdout, stderr) => {
       console.log(stdout)
