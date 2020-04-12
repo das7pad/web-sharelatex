@@ -1,13 +1,15 @@
 #!/bin/sh
 
+set -e
+
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 
 if [ -f /.dockerenv ]; then
   # I'm running inside docker
-  npm run migrations -- "$@"
+  exec npx east "$@"
 elif [ -e "$SCRIPTPATH/../migrations" ]; then
   # Hello OSS Developer!
-  npm run migrations -- "$@"
+  exec npx east "$@"
 else
-  ${SCRIPTPATH}/run web_v2 bin/east "$@"
+  exec ${SCRIPTPATH}/run web_v2 bin/east "$@"
 fi
