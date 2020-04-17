@@ -1,13 +1,13 @@
 const sinon = require('sinon')
 const modulePath = '../../../../app/src/Features/User/UserHandler.js'
 const SandboxedModule = require('sandboxed-module')
+require('chai').should()
 
 describe('UserHandler', function() {
   beforeEach(function() {
     this.user = {
       _id: '12390i',
-      email: 'bob@bob.com',
-      remove: sinon.stub().callsArgWith(0)
+      email: 'bob@bob.com'
     }
 
     this.TeamInvitesHandler = {

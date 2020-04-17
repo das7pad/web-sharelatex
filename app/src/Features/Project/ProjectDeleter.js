@@ -240,7 +240,7 @@ async function deleteProject(projectId, options = {}) {
         })
     }
 
-    await Project.remove({ _id: projectId }).exec()
+    await Project.deleteOne({ _id: projectId }).exec()
   } catch (err) {
     logger.warn({ err }, 'problem deleting project')
     throw err

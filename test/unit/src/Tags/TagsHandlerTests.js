@@ -221,7 +221,7 @@ describe('TagsHandler', function() {
   describe('deleteTag', function() {
     describe('with a valid tag_id', function() {
       it('should call remove in mongo', function(done) {
-        this.TagMock.expects('remove')
+        this.TagMock.expects('deleteOne')
           .once()
           .withArgs({ _id: this.tagId, user_id: this.userId })
           .yields()

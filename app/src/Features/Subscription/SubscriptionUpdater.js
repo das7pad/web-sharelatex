@@ -168,7 +168,7 @@ const SubscriptionUpdater = {
           ),
         cb =>
           // 2. remove subscription
-          Subscription.remove({ _id: subscription._id }, cb),
+          Subscription.deleteOne({ _id: subscription._id }, cb),
         cb =>
           // 3. refresh users features
           SubscriptionUpdater._refreshUsersFeatures(subscription, cb)

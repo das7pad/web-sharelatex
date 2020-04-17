@@ -215,7 +215,7 @@ describe('ProjectDeleter', function() {
           .withArgs({ _id: project._id })
           .chain('exec')
           .resolves(project)
-        this.ProjectMock.expects('remove')
+        this.ProjectMock.expects('deleteOne')
           .withArgs({ _id: project._id })
           .chain('exec')
           .resolves()
@@ -279,7 +279,7 @@ describe('ProjectDeleter', function() {
       this.deleterData.deleterIpAddress = this.ip
       this.deleterData.deleterId = this.user._id
 
-      this.ProjectMock.expects('remove')
+      this.ProjectMock.expects('deleteOne')
         .chain('exec')
         .resolves()
       this.DeletedProjectMock.expects('update')
@@ -301,7 +301,7 @@ describe('ProjectDeleter', function() {
     })
 
     it('should flushProjectToMongoAndDelete in doc updater', async function() {
-      this.ProjectMock.expects('remove')
+      this.ProjectMock.expects('deleteOne')
         .chain('exec')
         .resolves()
       this.DeletedProjectMock.expects('update').resolves()
@@ -317,7 +317,7 @@ describe('ProjectDeleter', function() {
     })
 
     it('should removeProjectFromAllTags', async function() {
-      this.ProjectMock.expects('remove')
+      this.ProjectMock.expects('deleteOne')
         .chain('exec')
         .resolves()
       this.DeletedProjectMock.expects('update').resolves()
@@ -336,7 +336,7 @@ describe('ProjectDeleter', function() {
     })
 
     it('should remove the project from Mongo', async function() {
-      this.ProjectMock.expects('remove')
+      this.ProjectMock.expects('deleteOne')
         .withArgs({ _id: this.project._id })
         .chain('exec')
         .resolves()

@@ -56,7 +56,7 @@ describe('SubscriptionUpdater', function() {
         return subscription
       }
     }
-    this.SubscriptionModel.remove = sinon.stub().yields()
+    this.SubscriptionModel.deleteOne = sinon.stub().yields()
     this.SubscriptionModel.update = this.updateStub
     this.SubscriptionModel.updateMany = this.updateManyStub
     this.SubscriptionModel.findAndModify = this.findAndModifyStub
@@ -477,7 +477,7 @@ describe('SubscriptionUpdater', function() {
     })
 
     it('should remove the subscription', function() {
-      this.SubscriptionModel.remove
+      this.SubscriptionModel.deleteOne
         .calledWith({ _id: this.subscription._id })
         .should.equal(true)
     })

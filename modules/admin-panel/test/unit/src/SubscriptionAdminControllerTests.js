@@ -44,7 +44,7 @@ describe('SubscriptionAdminController', function() {
             Subscription = class Subscription {
               static initClass() {
                 this.prototype.save = sinon.stub().yields()
-                this.remove = sinon.stub().yields()
+                this.deleteOne = sinon.stub().yields()
                 this.findAndModify = sinon.stub().yields()
                 createSubscription = sinon.stub()
               }

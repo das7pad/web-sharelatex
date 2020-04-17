@@ -40,7 +40,7 @@ function deleteTag(userId, tagId, callback) {
   if (!callback) {
     callback = function() {}
   }
-  Tag.remove(
+  Tag.deleteOne(
     {
       _id: tagId,
       user_id: userId

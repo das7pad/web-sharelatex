@@ -199,7 +199,7 @@ const CollaboratorsInviteHandler = {
       callback = function(err) {}
     }
     logger.log({ projectId, inviteId }, 'removing invite')
-    return ProjectInvite.remove({ projectId, _id: inviteId }, function(err) {
+    return ProjectInvite.deleteOne({ projectId, _id: inviteId }, function(err) {
       if (err != null) {
         logger.warn({ err, projectId, inviteId }, 'error removing invite')
         return callback(err)
@@ -308,7 +308,7 @@ const CollaboratorsInviteHandler = {
             }
             // Remove invite
             logger.log({ projectId, inviteId }, 'removing invite')
-            return ProjectInvite.remove({ _id: inviteId }, function(err) {
+            return ProjectInvite.deleteOne({ _id: inviteId }, function(err) {
               if (err != null) {
                 logger.warn(
                   { err, projectId, inviteId },
