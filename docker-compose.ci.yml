@@ -65,6 +65,8 @@ services:
       - test/acceptance/src
     volumes:
       - ./output:/home/node:z
+    tmpfs:
+      - /app/data:uid=1000,gid=1000
 
   test_frontend:
     build:
@@ -79,18 +81,24 @@ services:
       - ./output:/home/node:z
   mongo:
     image: mongo
+    tmpfs: /data
 
   redis_api:
     image: redis
+    tmpfs: /data
 
   redis_lock:
     image: redis
+    tmpfs: /data
 
   redis_realtime:
     image: redis
+    tmpfs: /data
 
   redis_web:
     image: redis
+    tmpfs: /data
 
   redis_websessions:
     image: redis
+    tmpfs: /data

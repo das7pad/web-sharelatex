@@ -44,6 +44,8 @@ services:
       - redis_web
       - redis_websessions
     command: npm run test:acceptance:run_dir test/acceptance/src
+    tmpfs:
+      - /app/data:uid=1000,gid=1000
 
   test_frontend:
     build:
@@ -55,18 +57,24 @@ services:
     command: npm run test:frontend:single
   mongo:
     image: mongo
+    tmpfs: /data
 
   redis_api:
     image: redis
+    tmpfs: /data
 
   redis_lock:
     image: redis
+    tmpfs: /data
 
   redis_realtime:
     image: redis
+    tmpfs: /data
 
   redis_web:
     image: redis
+    tmpfs: /data
 
   redis_websessions:
     image: redis
+    tmpfs: /data

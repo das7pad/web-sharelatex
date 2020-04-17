@@ -24,6 +24,8 @@ RUN DATA_DIRS="data/dumpFolder data/logs data/pdf data/uploads data/zippedProjec
 &&  mkdir -p ${DATA_DIRS} \
 &&  chown node:node ${DATA_DIRS}
 
+VOLUME /app/data
+
 USER node
 
 FROM dev as webpack
