@@ -116,6 +116,10 @@ I have a bad name
     return this.user.login(done)
   })
 
+  it('should warm caches', function() {
+    expect(true).to.equal(true)
+  })
+
   return describe('when creating a project from a snippet', function() {
     describe('when POSTing a snippet with a valid csrf token via xhr', function() {
       beforeEach(function(done) {
