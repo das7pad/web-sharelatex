@@ -51,7 +51,7 @@ describe('UserAdminController', function() {
         static initClass() {
           this.update = sinon.stub().yields()
           this.find = sinon.stub().yields(null, users)
-          this.count = sinon.stub().yields(null, user_count)
+          this.countDocuments = sinon.stub().yields(null, user_count)
         }
       }
       User.initClass()

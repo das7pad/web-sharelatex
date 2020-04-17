@@ -10,7 +10,7 @@ if (!commit) {
 
 function main(callback) {
   const query = { 'overleaf.id': { $exists: true } }
-  db.users.count(query, (err, result) => {
+  db.users.countDocuments(query, (err, result) => {
     if (err) {
       return callback(err)
     }

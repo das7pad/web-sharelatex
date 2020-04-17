@@ -102,7 +102,7 @@ module.exports = UserAdminController = {
           { opts, q, users_length: users != null ? users.length : undefined },
           'found users for admin search'
         )
-        return User.count(q, function(err, count) {
+        return User.countDocuments(q, function(err, count) {
           if (err != null) {
             return cb(err)
           }
