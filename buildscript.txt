@@ -8,4 +8,4 @@ web
 --mocha-6=true
 --monkey-patch-npm-ci--from=true
 --webpack-public-path=public
---lint-runner-version=1.0.0
+--lint-runner-version=1.0.1
