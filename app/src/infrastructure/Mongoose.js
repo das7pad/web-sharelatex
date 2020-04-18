@@ -14,6 +14,8 @@ if (process.env.OL_MOCHA_UNIT_TEST_ARE_RUNNING) {
 mongoose.connect(Settings.mongo.url, {
   poolSize: POOL_SIZE,
   config: { autoIndex: false },
+  useUnifiedTopology: true,
+  useNewUrlParser: true,
   appname: 'web'
 })
 
