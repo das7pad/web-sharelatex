@@ -106,13 +106,35 @@ pipeline {
           }
           steps {
             sh 'make prepare_ci_stage'
-            sh 'make test_unit'
+            sh 'make test_unit_app'
           }
           post {
             always {
               xunit(tools: [JUnit(pattern: 'output/unit.xml')])
             }
             cleanup {
+              sh 'make clean_ci_stage'
+            }
+          }
+        }
+
+        stage('Module Unit Tests') {
+          agent {
+            label 'sharelatex'
+          }
+          environment {
+            SUFFIX = '-test-unit-modules'
+          }
+          steps {
+            sh 'make prepare_ci_stage'
+            sh 'make test_unit_modules_run_ci'
+          }
+          post {
+            always {
+              xunit(tools: [JUnit(pattern: 'output/unit_module_*.xml')])
+            }
+            cleanup {
+              sh 'make clean_test_unit_modules'
               sh 'make clean_ci_stage'
             }
           }
@@ -167,7 +189,7 @@ pipeline {
             label 'sharelatex'
           }
           environment {
-            SUFFIX = '-test-modules'
+            SUFFIX = '-test-acceptance-modules'
           }
           steps {
             sh 'make prepare_ci_stage'
@@ -175,7 +197,7 @@ pipeline {
           }
           post {
             always {
-              xunit(tools: [JUnit(pattern: 'output/module_*.xml')])
+              xunit(tools: [JUnit(pattern: 'output/acceptance_module_*.xml')])
             }
             cleanup {
               sh 'make clean_test_acceptance_modules'

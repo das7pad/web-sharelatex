@@ -145,11 +145,13 @@ UNIT_TEST_DOCKER_COMPOSE ?= \
 	COMPOSE_PROJECT_NAME=unit_test_$(BUILD_DIR_NAME) $(DOCKER_COMPOSE)
 
 test: test_unit
-test_unit:
+test_unit: test_unit_app
+test_unit_app:
 	$(UNIT_TEST_DOCKER_COMPOSE) run --rm test_unit
 
 clean_ci: clean_test_unit
-clean_test_unit:
+clean_test_unit: clean_test_unit_app
+clean_test_unit_app:
 	$(UNIT_TEST_DOCKER_COMPOSE) down --timeout 0
 
 ACCEPTANCE_TEST_DOCKER_COMPOSE ?= \
@@ -357,10 +359,26 @@ clean_test_acceptance: clean_test_acceptance_modules
 CLEAN_TEST_ACCEPTANCE_MODULES = $(addsuffix /clean_test_acceptance,$(MODULE_DIRS))
 clean_test_acceptance_modules: $(CLEAN_TEST_ACCEPTANCE_MODULES)
 
+test_unit: test_unit_modules
+test_unit_run: test_unit_modules_run
+test_unit_modules: test_unit_modules_run
+TEST_UNIT_MODULES = $(addsuffix /test_unit,$(MODULE_DIRS))
+test_unit_modules_run: $(TEST_UNIT_MODULES)
+
+TEST_UNIT_CI_MODULES = $(addsuffix /test_unit_ci,$(MODULE_DIRS))
+test_unit_modules_run_ci: $(TEST_UNIT_CI_MODULES)
+
+clean_test_unit: clean_test_unit_modules
+CLEAN_TEST_UNIT_MODULES = $(addsuffix /clean_test_unit,$(MODULE_DIRS))
+clean_test_unit_modules: $(CLEAN_TEST_UNIT_MODULES)
+
 MODULE_TARGETS = \
 	$(TEST_ACCEPTANCE_MODULES) \
 	$(TEST_ACCEPTANCE_CI_MODULES) \
 	$(CLEAN_TEST_ACCEPTANCE_MODULES) \
+	$(TEST_UNIT_MODULES) \
+	$(TEST_UNIT_CI_MODULES) \
+	$(CLEAN_TEST_UNIT_MODULES) \
 
 $(MODULE_TARGETS): $(MODULE_MAKEFILES)
 	$(MAKE) -C $(dir $@) $(notdir $@)
