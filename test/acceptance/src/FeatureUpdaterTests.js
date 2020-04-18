@@ -119,7 +119,7 @@ describe('FeatureUpdater.refreshFeatures', function() {
 
   describe('when the user has bonus features', function() {
     beforeEach(function() {
-      return User.update(
+      return User.updateOne(
         {
           _id: this.user._id
         },
@@ -191,7 +191,7 @@ describe('FeatureUpdater.refreshFeatures', function() {
 
   describe('when the user is due bonus features and has extra features that no longer apply', function() {
     beforeEach(function() {
-      return User.update(
+      return User.updateOne(
         {
           _id: this.user._id
         },
@@ -222,7 +222,7 @@ describe('FeatureUpdater.refreshFeatures', function() {
   describe('when the user has a v1 plan', function() {
     beforeEach(function() {
       MockV1Api.setUser(42, { plan_name: 'free' })
-      return User.update(
+      return User.updateOne(
         {
           _id: this.user._id
         },
@@ -249,7 +249,7 @@ describe('FeatureUpdater.refreshFeatures', function() {
   describe('when the user has a v1 plan and bonus features', function() {
     beforeEach(function() {
       MockV1Api.setUser(42, { plan_name: 'free' })
-      return User.update(
+      return User.updateOne(
         {
           _id: this.user._id
         },
@@ -325,7 +325,7 @@ describe('FeatureUpdater.refreshFeatures', function() {
 
   describe('when the notifyV1Flag is passed', function() {
     beforeEach(function() {
-      return User.update(
+      return User.updateOne(
         {
           _id: this.user._id
         },
@@ -342,7 +342,7 @@ describe('FeatureUpdater.refreshFeatures', function() {
     beforeEach(function() {
       const futureDate = new Date()
       futureDate.setDate(futureDate.getDate() + 1)
-      return User.update(
+      return User.updateOne(
         {
           _id: this.user._id
         },

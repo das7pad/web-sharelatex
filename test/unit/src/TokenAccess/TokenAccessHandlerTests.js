@@ -124,23 +124,23 @@ describe('TokenAccessHandler', function() {
 
   describe('addReadOnlyUserToProject', function() {
     beforeEach(function() {
-      return (this.Project.update = sinon.stub().callsArgWith(2, null))
+      return (this.Project.updateOne = sinon.stub().callsArgWith(2, null))
     })
 
-    it('should call Project.update', function(done) {
+    it('should call Project.updateOne', function(done) {
       return this.TokenAccessHandler.addReadOnlyUserToProject(
         this.userId,
         this.projectId,
         err => {
-          expect(this.Project.update.callCount).to.equal(1)
+          expect(this.Project.updateOne.callCount).to.equal(1)
           expect(
-            this.Project.update.calledWith({
+            this.Project.updateOne.calledWith({
               _id: this.projectId
             })
           ).to.equal(true)
-          expect(this.Project.update.lastCall.args[1].$addToSet).to.have.keys(
-            'tokenAccessReadOnly_refs'
-          )
+          expect(
+            this.Project.updateOne.lastCall.args[1].$addToSet
+          ).to.have.keys('tokenAccessReadOnly_refs')
           return done()
         }
       )
@@ -157,9 +157,9 @@ describe('TokenAccessHandler', function() {
       )
     })
 
-    describe('when Project.update produces an error', function() {
+    describe('when Project.updateOne produces an error', function() {
       beforeEach(function() {
-        return (this.Project.update = sinon
+        return (this.Project.updateOne = sinon
           .stub()
           .callsArgWith(2, new Error('woops')))
       })
@@ -179,23 +179,23 @@ describe('TokenAccessHandler', function() {
 
   describe('addReadAndWriteUserToProject', function() {
     beforeEach(function() {
-      return (this.Project.update = sinon.stub().callsArgWith(2, null))
+      return (this.Project.updateOne = sinon.stub().callsArgWith(2, null))
     })
 
-    it('should call Project.update', function(done) {
+    it('should call Project.updateOne', function(done) {
       return this.TokenAccessHandler.addReadAndWriteUserToProject(
         this.userId,
         this.projectId,
         err => {
-          expect(this.Project.update.callCount).to.equal(1)
+          expect(this.Project.updateOne.callCount).to.equal(1)
           expect(
-            this.Project.update.calledWith({
+            this.Project.updateOne.calledWith({
               _id: this.projectId
             })
           ).to.equal(true)
-          expect(this.Project.update.lastCall.args[1].$addToSet).to.have.keys(
-            'tokenAccessReadAndWrite_refs'
-          )
+          expect(
+            this.Project.updateOne.lastCall.args[1].$addToSet
+          ).to.have.keys('tokenAccessReadAndWrite_refs')
           return done()
         }
       )
@@ -212,9 +212,9 @@ describe('TokenAccessHandler', function() {
       )
     })
 
-    describe('when Project.update produces an error', function() {
+    describe('when Project.updateOne produces an error', function() {
       beforeEach(function() {
-        return (this.Project.update = sinon
+        return (this.Project.updateOne = sinon
           .stub()
           .callsArgWith(2, new Error('woops')))
       })

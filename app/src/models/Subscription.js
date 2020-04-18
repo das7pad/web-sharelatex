@@ -43,7 +43,7 @@ const SubscriptionSchema = new Schema({
 
 SubscriptionSchema.statics.findAndModify = function(query, update, callback) {
   const self = this
-  return this.update(query, update, () => self.findOne(query, callback))
+  return this.updateOne(query, update, () => self.findOne(query, callback))
 }
 
 // Subscriptions have no v1 data to fetch

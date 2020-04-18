@@ -21,7 +21,7 @@ module.exports = TrackChangesManager = {
     if (callback == null) {
       callback = function(error) {}
     }
-    return Project.update(
+    return Project.updateOne(
       { _id: project_id },
       { track_changes: track_changes_state },
       callback

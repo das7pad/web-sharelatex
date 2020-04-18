@@ -297,7 +297,7 @@ module.exports = UserAdminController = {
       UserAdminController.BOOLEAN_ATTRIBUTES
     )
     logger.log({ user_id, update }, 'updating user via admin panel')
-    return User.update({ _id: user_id }, { $set: update }, function(err) {
+    return User.updateOne({ _id: user_id }, { $set: update }, function(err) {
       if (err != null) {
         return next(err)
       }

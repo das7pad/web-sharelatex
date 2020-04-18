@@ -37,7 +37,7 @@ const SubscriptionUpdater = {
     } else {
       update.$set.manager_ids = [ObjectId(adminId)]
     }
-    Subscription.update(query, update, callback)
+    Subscription.updateOne(query, update, callback)
   },
 
   syncSubscription(recurlySubscription, adminUserId, requesterData, callback) {

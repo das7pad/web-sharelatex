@@ -55,7 +55,7 @@ describe('SAMLIdentityManager', function() {
             findOne: sinon.stub().returns({
               exec: sinon.stub().resolves()
             }),
-            update: sinon.stub().returns({
+            updateOne: sinon.stub().returns({
               exec: sinon.stub().resolves()
             })
           })
@@ -162,7 +162,7 @@ describe('SAMLIdentityManager', function() {
         '1',
         'Overleaf University',
         () => {
-          expect(this.User.update).to.have.been.called
+          expect(this.User.updateOne).to.have.been.called
           expect(this.EmailHandler.sendEmail).to.have.been.called
         }
       )

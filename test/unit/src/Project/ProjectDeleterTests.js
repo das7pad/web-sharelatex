@@ -157,7 +157,7 @@ describe('ProjectDeleter', function() {
 
   describe('mark as deleted by external source', function() {
     beforeEach(function() {
-      this.ProjectMock.expects('update')
+      this.ProjectMock.expects('updateOne')
         .withArgs(
           { _id: this.project._id },
           { deletedByExternalDataSource: true }
@@ -186,7 +186,7 @@ describe('ProjectDeleter', function() {
 
   describe('unmarkAsDeletedByExternalSource', function() {
     beforeEach(async function() {
-      this.ProjectMock.expects('update')
+      this.ProjectMock.expects('updateOne')
         .withArgs(
           { _id: this.project._id },
           { deletedByExternalDataSource: false }
@@ -219,7 +219,7 @@ describe('ProjectDeleter', function() {
           .withArgs({ _id: project._id })
           .chain('exec')
           .resolves()
-        this.DeletedProjectMock.expects('update')
+        this.DeletedProjectMock.expects('updateOne')
           .withArgs(
             { 'deleterData.deletedProjectId': project._id },
             {
@@ -282,7 +282,7 @@ describe('ProjectDeleter', function() {
       this.ProjectMock.expects('deleteOne')
         .chain('exec')
         .resolves()
-      this.DeletedProjectMock.expects('update')
+      this.DeletedProjectMock.expects('updateOne')
         .withArgs(
           { 'deleterData.deletedProjectId': this.project._id },
           {
@@ -304,7 +304,7 @@ describe('ProjectDeleter', function() {
       this.ProjectMock.expects('deleteOne')
         .chain('exec')
         .resolves()
-      this.DeletedProjectMock.expects('update').resolves()
+      this.DeletedProjectMock.expects('updateOne').resolves()
 
       await this.ProjectDeleter.promises.deleteProject(this.project._id, {
         deleterUser: this.user,
@@ -320,7 +320,7 @@ describe('ProjectDeleter', function() {
       this.ProjectMock.expects('deleteOne')
         .chain('exec')
         .resolves()
-      this.DeletedProjectMock.expects('update').resolves()
+      this.DeletedProjectMock.expects('updateOne').resolves()
 
       await this.ProjectDeleter.promises.deleteProject(this.project._id)
       sinon.assert.calledWith(
@@ -340,7 +340,7 @@ describe('ProjectDeleter', function() {
         .withArgs({ _id: this.project._id })
         .chain('exec')
         .resolves()
-      this.DeletedProjectMock.expects('update').resolves()
+      this.DeletedProjectMock.expects('updateOne').resolves()
 
       await this.ProjectDeleter.promises.deleteProject(this.project._id)
       this.ProjectMock.verify()
@@ -368,7 +368,7 @@ describe('ProjectDeleter', function() {
           })
           .chain('exec')
           .resolves(deletedProject)
-        this.DeletedProjectMock.expects('update')
+        this.DeletedProjectMock.expects('updateOne')
           .withArgs(
             {
               _id: deletedProject._id
@@ -394,7 +394,7 @@ describe('ProjectDeleter', function() {
 
   describe('expireDeletedProject', function() {
     beforeEach(async function() {
-      this.DeletedProjectMock.expects('update')
+      this.DeletedProjectMock.expects('updateOne')
         .withArgs(
           {
             _id: this.deletedProjects[0]._id
@@ -448,7 +448,7 @@ describe('ProjectDeleter', function() {
         .chain('exec')
         .resolves(this.project)
 
-      this.ProjectMock.expects('update')
+      this.ProjectMock.expects('updateOne')
         .withArgs(
           { _id: this.project._id },
           {
@@ -490,7 +490,7 @@ describe('ProjectDeleter', function() {
         .chain('exec')
         .resolves(this.project)
 
-      this.ProjectMock.expects('update')
+      this.ProjectMock.expects('updateOne')
         .withArgs({ _id: this.project._id }, { $set: { archived: archived } })
         .resolves()
     })
@@ -526,7 +526,7 @@ describe('ProjectDeleter', function() {
         .chain('exec')
         .resolves(this.project)
 
-      this.ProjectMock.expects('update')
+      this.ProjectMock.expects('updateOne')
         .withArgs(
           { _id: this.project._id },
           {
@@ -565,7 +565,7 @@ describe('ProjectDeleter', function() {
         .chain('exec')
         .resolves(this.project)
 
-      this.ProjectMock.expects('update')
+      this.ProjectMock.expects('updateOne')
         .withArgs(
           { _id: this.project._id },
           { $pull: { trashed: ObjectId(this.user._id) } }
@@ -584,7 +584,7 @@ describe('ProjectDeleter', function() {
 
   describe('restoreProject', function() {
     beforeEach(function() {
-      this.ProjectMock.expects('update')
+      this.ProjectMock.expects('updateOne')
         .withArgs(
           {
             _id: this.project._id

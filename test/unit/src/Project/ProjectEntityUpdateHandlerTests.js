@@ -96,7 +96,7 @@ describe('ProjectEntityUpdateHandler', function() {
       )
     }
     this.ProjectModel = {
-      update: sinon.stub()
+      updateOne: sinon.stub()
     }
     this.ProjectGetter = {
       getProject: sinon.stub(),
@@ -504,7 +504,7 @@ describe('ProjectEntityUpdateHandler', function() {
       this.rootDocId = 'root-doc-id-123123'
     })
 
-    it('should call Project.update when the doc exists and has a valid extension', function() {
+    it('should call Project.updateOne when the doc exists and has a valid extension', function() {
       this.ProjectEntityHandler.getDocPathByProjectIdAndDocId.yields(
         null,
         `/main.tex`
@@ -515,12 +515,12 @@ describe('ProjectEntityUpdateHandler', function() {
         this.rootDocId,
         () => {}
       )
-      this.ProjectModel.update
+      this.ProjectModel.updateOne
         .calledWith({ _id: projectId }, { rootDoc_id: this.rootDocId })
         .should.equal(true)
     })
 
-    it("should not call Project.update when the doc doesn't exist", function() {
+    it("should not call Project.updateOne when the doc doesn't exist", function() {
       this.ProjectEntityHandler.getDocPathByProjectIdAndDocId.yields(
         Errors.NotFoundError
       )
@@ -530,7 +530,7 @@ describe('ProjectEntityUpdateHandler', function() {
         this.rootDocId,
         () => {}
       )
-      this.ProjectModel.update
+      this.ProjectModel.updateOne
         .calledWith({ _id: projectId }, { rootDoc_id: this.rootDocId })
         .should.equal(false)
     })
@@ -553,9 +553,9 @@ describe('ProjectEntityUpdateHandler', function() {
   })
 
   describe('unsetRootDoc', function() {
-    it('should call Project.update', function() {
+    it('should call Project.updateOne', function() {
       this.ProjectEntityUpdateHandler.unsetRootDoc(projectId)
-      this.ProjectModel.update
+      this.ProjectModel.updateOne
         .calledWith({ _id: projectId }, { $unset: { rootDoc_id: true } })
         .should.equal(true)
     })

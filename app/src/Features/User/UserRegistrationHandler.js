@@ -63,7 +63,7 @@ const UserRegistrationHandler = {
         async.series(
           [
             cb =>
-              User.update(
+              User.updateOne(
                 { _id: user._id },
                 { $set: { holdingAccount: false } },
                 cb

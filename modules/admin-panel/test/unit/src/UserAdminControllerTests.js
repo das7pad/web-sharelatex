@@ -49,7 +49,7 @@ describe('UserAdminController', function() {
     this.User = User = (function() {
       User = class User {
         static initClass() {
-          this.update = sinon.stub().yields()
+          this.updateOne = sinon.stub().yields()
           this.find = sinon.stub().yields(null, users)
           this.countDocuments = sinon.stub().yields(null, user_count)
         }
@@ -300,9 +300,9 @@ describe('UserAdminController', function() {
         return this.UserAdminController.update(this.req, this.res)
       })
 
-      return it('should call User.update with the updated attributes', function() {
-        this.User.update.calledWith({ _id: this.user_id }).should.equal(true)
-        const updateQuery = this.User.update.args[0][1]
+      it('should call User.updateOne with the updated attributes', function() {
+        this.User.updateOne.calledWith({ _id: this.user_id }).should.equal(true)
+        const updateQuery = this.User.updateOne.args[0][1]
         return updateQuery.$set.first_name.should.equal('James')
       })
     })
@@ -314,8 +314,8 @@ describe('UserAdminController', function() {
       })
 
       return it('should ignore the attribute', function() {
-        this.User.update.calledWith({ _id: this.user_id }).should.equal(true)
-        const updateQuery = this.User.update.args[0][1]
+        this.User.updateOne.calledWith({ _id: this.user_id }).should.equal(true)
+        const updateQuery = this.User.updateOne.args[0][1]
         return expect(updateQuery.$set.foo_bar).to.equal(undefined)
       })
     })
@@ -327,7 +327,7 @@ describe('UserAdminController', function() {
       })
 
       return it('should set the attribute to true', function() {
-        const updateQuery = this.User.update.args[0][1]
+        const updateQuery = this.User.updateOne.args[0][1]
         return expect(updateQuery.$set['features.versioning']).to.equal(true)
       })
     })
@@ -339,7 +339,7 @@ describe('UserAdminController', function() {
       })
 
       return it('should set the attribute to false', function() {
-        const updateQuery = this.User.update.args[0][1]
+        const updateQuery = this.User.updateOne.args[0][1]
         return expect(updateQuery.$set['features.versioning']).to.equal(false)
       })
     })
@@ -351,7 +351,7 @@ describe('UserAdminController', function() {
       })
 
       return it('should ignore the attribute', function() {
-        const updateQuery = this.User.update.args[0][1]
+        const updateQuery = this.User.updateOne.args[0][1]
         return expect(updateQuery.$set.isAdmin).to.equal(undefined)
       })
     })
@@ -367,7 +367,7 @@ describe('UserAdminController', function() {
       })
 
       return it('should ignore the attribute', function() {
-        const updateQuery = this.User.update.args[0][1]
+        const updateQuery = this.User.updateOne.args[0][1]
         return expect(updateQuery.$set.isAdmin).to.equal(true)
       })
     })

@@ -57,7 +57,7 @@ describe('SubscriptionUpdater', function() {
       }
     }
     this.SubscriptionModel.deleteOne = sinon.stub().yields()
-    this.SubscriptionModel.update = this.updateStub
+    this.SubscriptionModel.updateOne = this.updateStub
     this.SubscriptionModel.updateMany = this.updateManyStub
     this.SubscriptionModel.findAndModify = this.findAndModifyStub
     this.SubscriptionModel.findOneAndUpdate = this.findOneAndUpdateStub
@@ -134,8 +134,8 @@ describe('SubscriptionUpdater', function() {
             $set: { admin_id: ObjectId(this.otherUserId) },
             $addToSet: { manager_ids: ObjectId(this.otherUserId) }
           }
-          this.SubscriptionModel.update.should.have.been.calledOnce
-          this.SubscriptionModel.update.should.have.been.calledWith(
+          this.SubscriptionModel.updateOne.should.have.been.calledOnce
+          this.SubscriptionModel.updateOne.should.have.been.calledWith(
             query,
             update
           )
@@ -162,8 +162,8 @@ describe('SubscriptionUpdater', function() {
               manager_ids: [ObjectId(this.otherUserId)]
             }
           }
-          this.SubscriptionModel.update.should.have.been.calledOnce
-          this.SubscriptionModel.update.should.have.been.calledWith(
+          this.SubscriptionModel.updateOne.should.have.been.calledOnce
+          this.SubscriptionModel.updateOne.should.have.been.calledWith(
             query,
             update
           )

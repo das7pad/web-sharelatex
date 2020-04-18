@@ -54,7 +54,7 @@ async function markAsDeletedByExternalSource(projectId) {
     { project_id: projectId },
     'marking project as deleted by external data source'
   )
-  await Project.update(
+  await Project.updateOne(
     { _id: projectId },
     { deletedByExternalDataSource: true }
   ).exec()
@@ -65,7 +65,7 @@ async function markAsDeletedByExternalSource(projectId) {
 }
 
 async function unmarkAsDeletedByExternalSource(projectId) {
-  await Project.update(
+  await Project.updateOne(
     { _id: projectId },
     { deletedByExternalDataSource: false }
   ).exec()
@@ -90,7 +90,7 @@ async function expireDeletedProjectsAfterDuration() {
 }
 
 async function restoreProject(projectId) {
-  await Project.update(
+  await Project.updateOne(
     { _id: projectId },
     { $unset: { archived: true } }
   ).exec()
@@ -108,7 +108,7 @@ async function archiveProject(projectId, userId) {
       'ARCHIVE'
     )
 
-    await Project.update(
+    await Project.updateOne(
       { _id: projectId },
       { $set: { archived: archived }, $pull: { trashed: ObjectId(userId) } }
     )
@@ -131,7 +131,10 @@ async function unarchiveProject(projectId, userId) {
       'UNARCHIVE'
     )
 
-    await Project.update({ _id: projectId }, { $set: { archived: archived } })
+    await Project.updateOne(
+      { _id: projectId },
+      { $set: { archived: archived } }
+    )
   } catch (err) {
     logger.warn({ err }, 'problem unarchiving project')
     throw err
@@ -151,7 +154,7 @@ async function trashProject(projectId, userId) {
       'UNARCHIVE'
     )
 
-    await Project.update(
+    await Project.updateOne(
       { _id: projectId },
       {
         $addToSet: { trashed: ObjectId(userId) },
@@ -171,7 +174,7 @@ async function untrashProject(projectId, userId) {
       throw new Errors.NotFoundError('project not found')
     }
 
-    await Project.update(
+    await Project.updateOne(
       { _id: projectId },
       { $pull: { trashed: ObjectId(userId) } }
     )
@@ -216,7 +219,7 @@ async function deleteProject(projectId, options = {}) {
       deleterData[key] === undefined ? delete deleterData[key] : ''
     )
 
-    await DeletedProject.update(
+    await DeletedProject.updateOne(
       { 'deleterData.deletedProjectId': projectId },
       { project, deleterData },
       { upsert: true }
@@ -309,7 +312,7 @@ async function expireDeletedProject(projectId) {
     await DocstoreManager.promises.destroyProject(deletedProject.project._id)
     await HistoryManager.promises.deleteProject(deletedProject.project._id)
 
-    await DeletedProject.update(
+    await DeletedProject.updateOne(
       {
         _id: deletedProject._id
       },

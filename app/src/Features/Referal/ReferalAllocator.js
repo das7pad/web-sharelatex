@@ -37,7 +37,7 @@ module.exports = ReferalAllocator = {
       }
 
       if (referal_source === 'bonus') {
-        return User.update(
+        return User.updateOne(
           query,
           {
             $push: {

@@ -53,7 +53,7 @@ describe('mongoose', function() {
         })
       ).to.be.fulfilled
       await expect(
-        Subscription.update(
+        Subscription.updateOne(
           { admin_id: user._id },
           { $push: { manager_ids: otherUser._id } }
         )
