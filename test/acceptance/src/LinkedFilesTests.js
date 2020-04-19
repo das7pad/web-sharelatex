@@ -1,9 +1,6 @@
 const { expect } = require('chai')
 const _ = require('underscore')
-const mkdirp = require('mkdirp')
-const { promisify } = require('util')
 
-const Settings = require('settings-sharelatex')
 const User = require('./helpers/User').promises
 require('./helpers/MockFileStoreApi')
 require('./helpers/MockClsiApi')
@@ -36,7 +33,6 @@ describe('LinkedFiles', function() {
   beforeEach(async function() {
     owner = new User()
     await owner.login()
-    await promisify(mkdirp)(Settings.path.dumpFolder)
   })
 
   describe('creating a project linked file', function() {

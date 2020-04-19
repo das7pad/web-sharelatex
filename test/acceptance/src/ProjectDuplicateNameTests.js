@@ -15,14 +15,10 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const async = require('async')
 const { expect } = require('chai')
 const sinon = require('sinon')
-const mkdirp = require('mkdirp')
-const { ObjectId } = require('mongojs')
 const Path = require('path')
 const fs = require('fs')
-const Settings = require('settings-sharelatex')
 const _ = require('underscore')
 
 const ProjectGetter = require('../../../app/src/Features/Project/ProjectGetter')

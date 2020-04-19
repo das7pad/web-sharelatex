@@ -1,5 +1,4 @@
 const { expect } = require('chai')
-const mkdirp = require('mkdirp')
 const { ObjectId } = require('mongojs')
 const Path = require('path')
 const fs = require('fs')
@@ -1210,16 +1209,14 @@ describe('ProjectStructureChanges', function() {
           throw error
         }
         exampleProjectId = projectId
-        mkdirp(Settings.path.dumpFolder, () => {
-          ProjectGetter.getProject(exampleProjectId, (error, project) => {
-            if (error) {
-              throw error
-            }
-            MockDocUpdaterApi.clearProjectStructureUpdates()
-            rootFolderId = project.rootFolder[0]._id.toString()
-            oldVersion = project.version
-            done()
-          })
+        ProjectGetter.getProject(exampleProjectId, (error, project) => {
+          if (error) {
+            throw error
+          }
+          MockDocUpdaterApi.clearProjectStructureUpdates()
+          rootFolderId = project.rootFolder[0]._id.toString()
+          oldVersion = project.version
+          done()
         })
       })
     })
