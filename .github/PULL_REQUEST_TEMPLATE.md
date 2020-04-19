@@ -1,3 +1,7 @@
+<!-- ** This is an Overleaf public repository ** -->
+
+<!-- Please review https://github.com/overleaf/overleaf/blob/master/CONTRIBUTING.md for guidance on what is expected of a contribution. -->
+
 ### Description
 
 #### Screenshots
