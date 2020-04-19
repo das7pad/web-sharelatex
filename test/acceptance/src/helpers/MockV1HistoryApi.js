@@ -49,7 +49,10 @@ module.exports = MockV1HistoryApi = {
       '/api/projects/:project_id/version/:version/zip',
       (req, res, next) => {
         return res.json({
-          zipUrl: `http://localhost:3100/fake-zip-download/${req.params.project_id}/version/${req.params.version}`
+          zipUrl: `http://${process.env.V1_HISTORY_HOST ||
+            'localhost'}:3100/fake-zip-download/${
+            req.params.project_id
+          }/version/${req.params.version}`
         })
       }
     )

@@ -1,5 +1,5 @@
 v1Api =
-	url: "http://localhost:5000"
+	url: "http://#{process.env['V1_HOST'] || 'localhost'}:5000"
 	user: 'overleaf'
 	pass: 'password'
 
@@ -29,7 +29,7 @@ module.exports =
 			pass: v1Api.pass
 
 		linkedUrlProxy:
-			url: 'http://localhost:6543'
+			url: "http://#{process.env['LINKED_URL_PROXY_HOST'] || 'localhost'}:6543"
 
 		project_history:
 			sendProjectStructureOps: true
@@ -38,7 +38,7 @@ module.exports =
 
 		recurly:
 			# Set up our own mock recurly server
-			url: 'http://localhost:6034'
+			url: "http://#{process.env['RECURLY_HOST'] || 'localhost'}:6034"
 			subdomain: 'test'
 
 	# for registration via SL, set enableLegacyRegistration to true
