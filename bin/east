@@ -4,7 +4,9 @@ set -e
 
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 
-if [ -f /.dockerenv ]; then
+if [ -d /runner ]; then
+  exec east "$@"
+elif [ -f /.dockerenv ]; then
   # I'm running inside docker
   exec npx east "$@"
 elif [ -e "$SCRIPTPATH/../migrations" ]; then
