@@ -1,4 +1,3 @@
-const App = require('../../../app.js')
 const { exec } = require('child_process')
 const { db } = require('../../../app/src/infrastructure/mongojs')
 
@@ -11,7 +10,11 @@ before(function(done) {
       if (error) {
         throw error
       }
-      App.listen(3000, 'localhost', done)
+      if (process.env.HTTP_TEST_HOST) {
+        done()
+      } else {
+        require('../../../app.js').listen(3000, 'localhost', done)
+      }
     })
   })
 })
