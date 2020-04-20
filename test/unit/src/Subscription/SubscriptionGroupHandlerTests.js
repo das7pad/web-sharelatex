@@ -19,8 +19,8 @@ const { assert } = require('chai')
 const modulePath =
   '../../../../app/src/Features/Subscription/SubscriptionGroupHandler'
 
-describe('SubscriptionGroupHandler', function() {
-  beforeEach(function() {
+describe('SubscriptionGroupHandler', function () {
+  beforeEach(function () {
     this.adminUser_id = '12321'
     this.newEmail = 'bob@smith.com'
     this.user_id = '3121321'
@@ -112,12 +112,12 @@ describe('SubscriptionGroupHandler', function() {
     }))
   })
 
-  describe('removeUserFromGroup', function() {
-    it('should call the subscription updater to remove the user', function(done) {
+  describe('removeUserFromGroup', function () {
+    it('should call the subscription updater to remove the user', function (done) {
       return this.Handler.removeUserFromGroup(
         this.adminUser_id,
         this.user._id,
-        err => {
+        (err) => {
           this.SubscriptionUpdater.removeUserFromGroup
             .calledWith(this.adminUser_id, this.user._id)
             .should.equal(true)
@@ -127,8 +127,8 @@ describe('SubscriptionGroupHandler', function() {
     })
   })
 
-  describe('replaceUserReferencesInGroups', function() {
-    beforeEach(function(done) {
+  describe('replaceUserReferencesInGroups', function () {
+    beforeEach(function (done) {
       this.oldId = 'ba5eba11'
       this.newId = '5ca1ab1e'
       return this.Handler.replaceUserReferencesInGroups(
@@ -138,13 +138,13 @@ describe('SubscriptionGroupHandler', function() {
       )
     })
 
-    it('replaces the admin_id', function() {
+    it('replaces the admin_id', function () {
       return this.Subscription.updateMany
         .calledWith({ admin_id: this.oldId }, { admin_id: this.newId })
         .should.equal(true)
     })
 
-    it('replaces the manager_ids', function() {
+    it('replaces the manager_ids', function () {
       this.Subscription.updateMany
         .calledWith(
           { manager_ids: 'ba5eba11' },
@@ -160,7 +160,7 @@ describe('SubscriptionGroupHandler', function() {
         .should.equal(true)
     })
 
-    it('replaces the member ids', function() {
+    it('replaces the member ids', function () {
       this.Subscription.updateMany
         .calledWith(
           { member_ids: this.oldId },
@@ -177,12 +177,12 @@ describe('SubscriptionGroupHandler', function() {
     })
   })
 
-  describe('isUserPartOfGroup', function() {
-    beforeEach(function() {
+  describe('isUserPartOfGroup', function () {
+    beforeEach(function () {
       return (this.subscription_id = '123ed13123')
     })
 
-    it('should return true when user is part of subscription', function(done) {
+    it('should return true when user is part of subscription', function (done) {
       this.SubscriptionLocator.getSubscriptionByMemberIdAndId.callsArgWith(
         2,
         null,
@@ -198,7 +198,7 @@ describe('SubscriptionGroupHandler', function() {
       )
     })
 
-    it('should return false when no subscription is found', function(done) {
+    it('should return false when no subscription is found', function (done) {
       this.SubscriptionLocator.getSubscriptionByMemberIdAndId.callsArgWith(
         2,
         null
@@ -214,12 +214,12 @@ describe('SubscriptionGroupHandler', function() {
     })
   })
 
-  describe('getTotalConfirmedUsersInGroup', function() {
-    describe('for existing subscriptions', function() {
-      beforeEach(function() {
+  describe('getTotalConfirmedUsersInGroup', function () {
+    describe('for existing subscriptions', function () {
+      beforeEach(function () {
         return (this.subscription.member_ids = ['12321', '3121321'])
       })
-      it('should call the subscription locator and return 2 users', function(done) {
+      it('should call the subscription locator and return 2 users', function (done) {
         return this.Handler.getTotalConfirmedUsersInGroup(
           this.subscription_id,
           (err, count) => {
@@ -232,8 +232,8 @@ describe('SubscriptionGroupHandler', function() {
         )
       })
     })
-    describe('for nonexistent subscriptions', function() {
-      it('should return undefined', function(done) {
+    describe('for nonexistent subscriptions', function () {
+      it('should return undefined', function (done) {
         return this.Handler.getTotalConfirmedUsersInGroup(
           'fake-id',
           (err, count) => {

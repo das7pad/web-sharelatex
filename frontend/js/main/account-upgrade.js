@@ -1,12 +1,12 @@
-define(['../base'], App =>
-  App.controller('FreeTrialModalController', function($scope, eventTracking) {
+define(['../base'], (App) =>
+  App.controller('FreeTrialModalController', function ($scope, eventTracking) {
     $scope.buttonClass = 'btn-primary'
 
-    $scope.startFreeTrial = function(source, version) {
+    $scope.startFreeTrial = function (source, version) {
       const plan = 'collaborator_free_trial_7_days'
 
       const w = window.open()
-      const go = function() {
+      const go = function () {
         let url
         if (typeof ga === 'function') {
           ga(

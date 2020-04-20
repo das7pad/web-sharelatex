@@ -10,8 +10,8 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base'], function(App) {
-  const historyLabelController = function(
+define(['../../../base'], function (App) {
+  const historyLabelController = function (
     $scope,
     $element,
     $attrs,

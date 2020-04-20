@@ -11,7 +11,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define([], function() {
+define([], function () {
   let PermissionsManager
   return (PermissionsManager = class PermissionsManager {
     constructor(ide, $scope) {
@@ -23,7 +23,7 @@ define([], function() {
         admin: false,
         comment: false
       }
-      this.$scope.$watch('permissionsLevel', permissionsLevel => {
+      this.$scope.$watch('permissionsLevel', (permissionsLevel) => {
         if (permissionsLevel != null) {
           if (permissionsLevel === 'readOnly') {
             this.$scope.permissions.read = true

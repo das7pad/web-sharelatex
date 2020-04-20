@@ -26,7 +26,7 @@ const settings = require('settings-sharelatex')
 module.exports = ProjectAdminController = {
   show(req, res, next) {
     logger.log('getting admin request for list of users')
-    return ProjectGetter.getProject(req.params.Project_id, function(
+    return ProjectGetter.getProject(req.params.Project_id, function (
       err,
       project
     ) {

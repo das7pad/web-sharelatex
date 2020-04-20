@@ -11,8 +11,8 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base'], App =>
-  App.directive('fileEntity', RecursionHelper => ({
+define(['../../../base'], (App) =>
+  App.directive('fileEntity', (RecursionHelper) => ({
     restrict: 'E',
     scope: {
       entity: '=',
@@ -20,7 +20,7 @@ define(['../../../base'], App =>
     },
     templateUrl: 'entityListItemTemplate',
     compile(element) {
-      return RecursionHelper.compile(element, function(
+      return RecursionHelper.compile(element, function (
         scope,
         element,
         attrs,
@@ -28,9 +28,9 @@ define(['../../../base'], App =>
       ) {
         // Don't freak out if we're already in an apply callback
         scope.$originalApply = scope.$apply
-        return (scope.$apply = function(fn) {
+        return (scope.$apply = function (fn) {
           if (fn == null) {
-            fn = function() {}
+            fn = function () {}
           }
           const phase = this.$root.$$phase
           if (phase === '$apply' || phase === '$digest') {

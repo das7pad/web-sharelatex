@@ -12,7 +12,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 define(['../../../base', '../../colors/ColorManager'], (App, ColorManager) =>
-  App.controller('ChatMessageController', function($scope, ide) {
+  App.controller('ChatMessageController', function ($scope, ide) {
     const hslColorConfigs = {
       borderSaturation:
         (window.uiConfig != null
@@ -32,7 +32,7 @@ define(['../../../base', '../../colors/ColorManager'], (App, ColorManager) =>
           : undefined) || '97%'
     }
 
-    const hue = function(user) {
+    const hue = function (user) {
       if (user == null) {
         return 0
       } else {
@@ -40,7 +40,7 @@ define(['../../../base', '../../colors/ColorManager'], (App, ColorManager) =>
       }
     }
 
-    $scope.getMessageStyle = user => ({
+    $scope.getMessageStyle = (user) => ({
       'border-color': `hsl(${hue(user)}, ${hslColorConfigs.borderSaturation}, ${
         hslColorConfigs.borderLightness
       })`,
@@ -49,7 +49,7 @@ define(['../../../base', '../../colors/ColorManager'], (App, ColorManager) =>
       })`
     })
 
-    return ($scope.getArrowStyle = user => ({
+    return ($scope.getArrowStyle = (user) => ({
       'border-color': `hsl(${hue(user)}, ${hslColorConfigs.borderSaturation}, ${
         hslColorConfigs.borderLightness
       })`

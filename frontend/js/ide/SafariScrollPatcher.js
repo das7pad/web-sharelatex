@@ -12,7 +12,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define([], function() {
+define([], function () {
   let SafariScrollPatcher
   return (SafariScrollPatcher = class SafariScrollPatcher {
     constructor($scope) {
@@ -77,7 +77,7 @@ define([], function() {
       // Handler for wheel events on the PDF.
       // If the pointer is over Ace, grab the event, prevent default behaviour
       // and dispatch it to Ace.
-      this.dispatchToAce = e => {
+      this.dispatchToAce = (e) => {
         if (this.isOverAce) {
           // If this is logged, the problem just happened: the event arrived
           // here (the PDF wheel handler), but it should've gone to Ace.

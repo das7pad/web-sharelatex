@@ -12,7 +12,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 define(['../base', 'algoliasearch'], (App, AlgoliaSearch) =>
-  App.factory('algoliaSearch', function() {
+  App.factory('algoliaSearch', function () {
     let kbIdx, wikiIdx
     if (
       (window.sharelatex != null ? window.sharelatex.algolia : undefined) !=
@@ -21,7 +21,7 @@ define(['../base', 'algoliasearch'], (App, AlgoliaSearch) =>
         window.sharelatex.algolia != null
           ? window.sharelatex.algolia.indexes
           : undefined,
-        x => x.wiki
+        (x) => x.wiki
       ) != null
     ) {
       const client = AlgoliaSearch(
@@ -37,7 +37,7 @@ define(['../base', 'algoliasearch'], (App, AlgoliaSearch) =>
           window.sharelatex.algolia != null
             ? window.sharelatex.algolia.indexes
             : undefined,
-          x1 => x1.wiki
+          (x1) => x1.wiki
         )
       )
       kbIdx = client.initIndex(
@@ -45,7 +45,7 @@ define(['../base', 'algoliasearch'], (App, AlgoliaSearch) =>
           window.sharelatex.algolia != null
             ? window.sharelatex.algolia.indexes
             : undefined,
-          x2 => x2.kb
+          (x2) => x2.kb
         )
       )
     }

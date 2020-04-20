@@ -9,8 +9,8 @@ const modulePath = require('path').join(
   '../../../../app/src/Features/Tags/TagsHandler'
 )
 
-describe('TagsHandler', function() {
-  beforeEach(function() {
+describe('TagsHandler', function () {
+  beforeEach(function () {
     this.userId = ObjectId().toString()
     this.callback = sinon.stub()
 
@@ -29,8 +29,8 @@ describe('TagsHandler', function() {
     })
   })
 
-  describe('finding users tags', function() {
-    it('should find all the documents with that user id', function(done) {
+  describe('finding users tags', function () {
+    it('should find all the documents with that user id', function (done) {
       const stubbedTags = [{ name: 'tag1' }, { name: 'tag2' }, { name: 'tag3' }]
       this.TagMock.expects('find')
         .once()
@@ -45,9 +45,9 @@ describe('TagsHandler', function() {
     })
   })
 
-  describe('createTag', function() {
-    describe('when insert succeeds', function() {
-      it('should call insert in mongo', function(done) {
+  describe('createTag', function () {
+    describe('when insert succeeds', function () {
+      it('should call insert in mongo', function (done) {
         this.TagMock.expects('create')
           .withArgs(this.tag)
           .once()
@@ -66,13 +66,13 @@ describe('TagsHandler', function() {
       })
     })
 
-    describe('when insert has duplicate key error error', function() {
-      beforeEach(function() {
+    describe('when insert has duplicate key error error', function () {
+      beforeEach(function () {
         this.duplicateKeyError = new Error('Duplicate')
         this.duplicateKeyError.code = 11000
       })
 
-      it('should get tag with findOne and return that tag', function(done) {
+      it('should get tag with findOne and return that tag', function (done) {
         this.TagMock.expects('create')
           .withArgs(this.tag)
           .once()
@@ -96,11 +96,11 @@ describe('TagsHandler', function() {
     })
   })
 
-  describe('addProjectToTag', function() {
-    describe('with a valid tag_id', function() {
-      beforeEach(function() {})
+  describe('addProjectToTag', function () {
+    describe('with a valid tag_id', function () {
+      beforeEach(function () {})
 
-      it('should call update in mongo', function(done) {
+      it('should call update in mongo', function (done) {
         this.TagMock.expects('findOneAndUpdate')
           .once()
           .withArgs(
@@ -112,7 +112,7 @@ describe('TagsHandler', function() {
           this.userId,
           this.tagId,
           this.projectId,
-          err => {
+          (err) => {
             expect(err).to.not.exist
             this.TagMock.verify()
             done()
@@ -122,8 +122,8 @@ describe('TagsHandler', function() {
     })
   })
 
-  describe('addProjectToTagName', function() {
-    it('should call update in mongo', function(done) {
+  describe('addProjectToTagName', function () {
+    it('should call update in mongo', function (done) {
       this.TagMock.expects('updateOne')
         .once()
         .withArgs(
@@ -136,7 +136,7 @@ describe('TagsHandler', function() {
         this.tag.userId,
         this.tag.name,
         this.projectId,
-        err => {
+        (err) => {
           expect(err).to.not.exist
           this.TagMock.verify()
           done()
@@ -145,8 +145,8 @@ describe('TagsHandler', function() {
     })
   })
 
-  describe('updateTagUserIds', function() {
-    it('should call update in mongo', function(done) {
+  describe('updateTagUserIds', function () {
+    it('should call update in mongo', function (done) {
       this.newUserId = ObjectId().toString()
       this.TagMock.expects('updateMany')
         .once()
@@ -155,7 +155,7 @@ describe('TagsHandler', function() {
           { $set: { user_id: this.newUserId } }
         )
         .yields()
-      this.TagsHandler.updateTagUserIds(this.userId, this.newUserId, err => {
+      this.TagsHandler.updateTagUserIds(this.userId, this.newUserId, (err) => {
         expect(err).to.not.exist
         this.TagMock.verify()
         done()
@@ -163,9 +163,9 @@ describe('TagsHandler', function() {
     })
   })
 
-  describe('removeProjectFromTag', function() {
-    describe('with a valid tag_id', function() {
-      it('should call update in mongo', function(done) {
+  describe('removeProjectFromTag', function () {
+    describe('with a valid tag_id', function () {
+      it('should call update in mongo', function (done) {
         this.TagMock.expects('updateOne')
           .once()
           .withArgs(
@@ -182,7 +182,7 @@ describe('TagsHandler', function() {
           this.userId,
           this.tagId,
           this.projectId,
-          err => {
+          (err) => {
             expect(err).to.not.exist
             this.TagMock.verify()
             done()
@@ -192,8 +192,8 @@ describe('TagsHandler', function() {
     })
   })
 
-  describe('removeProjectFromAllTags', function() {
-    it('should pull the project id from the tag', function(done) {
+  describe('removeProjectFromAllTags', function () {
+    it('should pull the project id from the tag', function (done) {
       this.TagMock.expects('updateMany')
         .once()
         .withArgs(
@@ -208,7 +208,7 @@ describe('TagsHandler', function() {
       this.TagsHandler.removeProjectFromAllTags(
         this.userId,
         this.projectId,
-        err => {
+        (err) => {
           expect(err).to.not.exist
           this.TagMock.verify()
           done()
@@ -217,14 +217,14 @@ describe('TagsHandler', function() {
     })
   })
 
-  describe('deleteTag', function() {
-    describe('with a valid tag_id', function() {
-      it('should call remove in mongo', function(done) {
+  describe('deleteTag', function () {
+    describe('with a valid tag_id', function () {
+      it('should call remove in mongo', function (done) {
         this.TagMock.expects('deleteOne')
           .once()
           .withArgs({ _id: this.tagId, user_id: this.userId })
           .yields()
-        this.TagsHandler.deleteTag(this.userId, this.tagId, err => {
+        this.TagsHandler.deleteTag(this.userId, this.tagId, (err) => {
           expect(err).to.not.exist
           this.TagMock.verify()
           done()
@@ -233,9 +233,9 @@ describe('TagsHandler', function() {
     })
   })
 
-  describe('renameTag', function() {
-    describe('with a valid tag_id', function() {
-      it('should call remove in mongo', function(done) {
+  describe('renameTag', function () {
+    describe('with a valid tag_id', function () {
+      it('should call remove in mongo', function (done) {
         this.newName = 'new name'
         this.TagMock.expects('updateOne')
           .once()
@@ -248,7 +248,7 @@ describe('TagsHandler', function() {
           this.userId,
           this.tagId,
           this.newName,
-          err => {
+          (err) => {
             expect(err).to.not.exist
             this.TagMock.verify()
             done()

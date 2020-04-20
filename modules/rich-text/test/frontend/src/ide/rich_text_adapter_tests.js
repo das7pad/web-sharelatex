@@ -10,23 +10,23 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../../frontend/js/ide/rich_text_adapter'], RichTextAdapter =>
-  describe('RichTextAdapter', function() {
-    beforeEach(function() {
+define(['../../../../frontend/js/ide/rich_text_adapter'], (RichTextAdapter) =>
+  describe('RichTextAdapter', function () {
+    beforeEach(function () {
       this.fileTreeManager = {
         findEntityByPath: (this.findEntityByPath = sinon.stub())
       }
       return (this.RichTextAdapter = new RichTextAdapter(this.fileTreeManager))
     })
 
-    describe('fileExistsForPath', function() {
-      it('returns true if entity found', function() {
+    describe('fileExistsForPath', function () {
+      it('returns true if entity found', function () {
         this.findEntityByPath.returns({ id: 'entity_id' })
         return expect(this.RichTextAdapter.fileExistsForPath('path/to/entity'))
           .to.be.true
       })
 
-      return it('returns false if entity not found', function() {
+      return it('returns false if entity not found', function () {
         this.findEntityByPath.returns(null)
         const result = this.RichTextAdapter.fileExistsForPath(
           '/path/to/non-existent-entity'
@@ -35,8 +35,8 @@ define(['../../../../frontend/js/ide/rich_text_adapter'], RichTextAdapter =>
       })
     })
 
-    describe('getEntityForPath', function() {
-      it('returns url for valid path', function() {
+    describe('getEntityForPath', function () {
+      it('returns url for valid path', function () {
         this.findEntityByPath.returns({
           id: 'entity_id',
           name: 'entity.png'
@@ -50,14 +50,14 @@ define(['../../../../frontend/js/ide/rich_text_adapter'], RichTextAdapter =>
         return expect(entity.id).to.equal('entity_id')
       })
 
-      it('returns undefined if entity not found', function() {
+      it('returns undefined if entity not found', function () {
         const entity = this.RichTextAdapter.getEntityForPath(
           'path/to/non-existent-entity'
         )
         return expect(entity).to.be.undefined
       })
 
-      it('returns any matching entry', function() {
+      it('returns any matching entry', function () {
         this.findEntityByPath.returns({
           id: 'entity_id',
           name: 'entity.eps'
@@ -68,13 +68,13 @@ define(['../../../../frontend/js/ide/rich_text_adapter'], RichTextAdapter =>
         return expect(entity.id).to.equal('entity_id')
       })
 
-      return describe('with no extension', function() {
-        beforeEach(function() {
+      return describe('with no extension', function () {
+        beforeEach(function () {
           // No exact match
           return this.findEntityByPath.withArgs('path/to/entity').returns(null)
         })
 
-        it('returns entry for exact match before extension', function() {
+        it('returns entry for exact match before extension', function () {
           this.findEntityByPath.withArgs('path/to/entity').returns({
             id: 'no_extension_file_id',
             name: 'entity'
@@ -87,7 +87,7 @@ define(['../../../../frontend/js/ide/rich_text_adapter'], RichTextAdapter =>
           return expect(entity.id).to.equal('no_extension_file_id')
         })
 
-        it('returns entry for pdf', function() {
+        it('returns entry for pdf', function () {
           this.findEntityByPath.withArgs('path/to/entity.pdf').returns({
             id: 'pdf_file_id',
             name: 'entity.pdf'
@@ -96,7 +96,7 @@ define(['../../../../frontend/js/ide/rich_text_adapter'], RichTextAdapter =>
           return expect(entity.id).to.equal('pdf_file_id')
         })
 
-        it('returns entry for png', function() {
+        it('returns entry for png', function () {
           this.findEntityByPath.withArgs('path/to/entity.png').returns({
             id: 'png_file_id',
             name: 'entity.png'
@@ -105,7 +105,7 @@ define(['../../../../frontend/js/ide/rich_text_adapter'], RichTextAdapter =>
           return expect(entry.id).to.equal('png_file_id')
         })
 
-        it('returns entry for jpg', function() {
+        it('returns entry for jpg', function () {
           this.findEntityByPath.withArgs('path/to/entity.jpg').returns({
             id: 'jpg_file_id',
             name: 'entity.jpg'
@@ -114,7 +114,7 @@ define(['../../../../frontend/js/ide/rich_text_adapter'], RichTextAdapter =>
           return expect(entry.id).to.equal('jpg_file_id')
         })
 
-        it('returns entry for jpeg', function() {
+        it('returns entry for jpeg', function () {
           this.findEntityByPath.withArgs('path/to/entity.jpeg').returns({
             id: 'jpeg_file_id',
             name: 'entity.jpeg'
@@ -123,7 +123,7 @@ define(['../../../../frontend/js/ide/rich_text_adapter'], RichTextAdapter =>
           return expect(entry.id).to.equal('jpeg_file_id')
         })
 
-        it('handles paths with dots', function() {
+        it('handles paths with dots', function () {
           this.findEntityByPath.withArgs('path/to/entity.foo.png').returns({
             id: 'png_file_id',
             name: 'entity.png'
@@ -134,7 +134,7 @@ define(['../../../../frontend/js/ide/rich_text_adapter'], RichTextAdapter =>
           return expect(entry.id).to.equal('png_file_id')
         })
 
-        it('returns entry for extension in order', function() {
+        it('returns entry for extension in order', function () {
           // Extensions are picked in order: [exact match], png, pdf, jpg, jpeg
           this.findEntityByPath.withArgs('path/to/entity.jpg').returns({
             id: 'jpg_file_id',
@@ -162,7 +162,7 @@ define(['../../../../frontend/js/ide/rich_text_adapter'], RichTextAdapter =>
           return expect(entry.id).to.equal('png_file_id')
         })
 
-        return it('returns correct entry for similarly named files', function() {
+        return it('returns correct entry for similarly named files', function () {
           this.findEntityByPath.withArgs('path/to/entity.png').returns({
             id: 'base_file_id',
             name: 'entity.png'
@@ -177,22 +177,22 @@ define(['../../../../frontend/js/ide/rich_text_adapter'], RichTextAdapter =>
       })
     })
 
-    describe('isPreviewableEntity', function() {
-      it('rejects PDF files for inline previews', function() {
+    describe('isPreviewableEntity', function () {
+      it('rejects PDF files for inline previews', function () {
         const previewable = this.RichTextAdapter.isPreviewableEntity({
           id: 'entity_id',
           name: 'entity.pdf'
         })
         return expect(previewable).to.be.false
       })
-      it('allows PNG files for inline previews', function() {
+      it('allows PNG files for inline previews', function () {
         const previewable = this.RichTextAdapter.isPreviewableEntity({
           id: 'entity_id',
           name: 'entity.png'
         })
         return expect(previewable).to.be.true
       })
-      it('ignores capitalization', function() {
+      it('ignores capitalization', function () {
         const previewable = this.RichTextAdapter.isPreviewableEntity({
           id: 'entity_id',
           name: 'entity.PNG'
@@ -201,15 +201,15 @@ define(['../../../../frontend/js/ide/rich_text_adapter'], RichTextAdapter =>
       })
     })
 
-    describe('getPreviewUrlForEntity', function() {
-      beforeEach(function() {
+    describe('getPreviewUrlForEntity', function () {
+      beforeEach(function () {
         window.project_id = 'project_id'
       })
-      afterEach(function() {
+      afterEach(function () {
         window.project_id = null
       })
 
-      it('reads the global context', function() {
+      it('reads the global context', function () {
         const url = this.RichTextAdapter.getPreviewUrlForEntity({
           id: 'entity_id',
           name: 'entity.png'

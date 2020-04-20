@@ -14,16 +14,16 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base', '../util/displayNameForUser'], function(
+define(['../../../base', '../util/displayNameForUser'], function (
   App,
   displayNameForUser
 ) {
-  App.controller('HistoryListController', function($scope, $modal, ide) {
+  App.controller('HistoryListController', function ($scope, $modal, ide) {
     $scope.hoveringOverListSelectors = false
 
     $scope.projectUsers = []
 
-    $scope.$watch('project.members', function(newVal) {
+    $scope.$watch('project.members', function (newVal) {
       if (newVal != null) {
         return ($scope.projectUsers = newVal.concat($scope.project.owner))
       }
@@ -32,17 +32,17 @@ define(['../../../base', '../util/displayNameForUser'], function(
     // This method (and maybe the one below) will be removed soon. User details data will be
     // injected into the history API responses, so we won't need to fetch user data from other
     // local data structures.
-    const _getUserById = id =>
-      _.find($scope.projectUsers, function(user) {
+    const _getUserById = (id) =>
+      _.find($scope.projectUsers, function (user) {
         const curUserId =
           (user != null ? user._id : undefined) ||
           (user != null ? user.id : undefined)
         return curUserId === id
       })
 
-    $scope.getDisplayNameById = id => displayNameForUser(_getUserById(id))
+    $scope.getDisplayNameById = (id) => displayNameForUser(_getUserById(id))
 
-    $scope.deleteLabel = labelDetails =>
+    $scope.deleteLabel = (labelDetails) =>
       $modal.open({
         templateUrl: 'historyV2DeleteLabelModalTemplate',
         controller: 'HistoryV2DeleteLabelModalController',
@@ -57,7 +57,7 @@ define(['../../../base', '../util/displayNameForUser'], function(
       return ide.historyManager.fetchNextBatchOfUpdates()
     }
 
-    $scope.recalculateSelectedUpdates = function() {
+    $scope.recalculateSelectedUpdates = function () {
       let beforeSelection = true
       let afterSelection = false
       $scope.history.selection.updates = []
@@ -89,7 +89,7 @@ define(['../../../base', '../util/displayNameForUser'], function(
       })()
     }
 
-    $scope.recalculateHoveredUpdates = function() {
+    $scope.recalculateHoveredUpdates = function () {
       let inHoverSelection
       let hoverSelectedFrom = false
       let hoverSelectedTo = false
@@ -155,11 +155,11 @@ define(['../../../base', '../util/displayNameForUser'], function(
     )
   })
 
-  return App.controller('HistoryListItemController', function(
+  return App.controller('HistoryListItemController', function (
     $scope,
     eventTracking
   ) {
-    $scope.$watch('update.selectedFrom', function(
+    $scope.$watch('update.selectedFrom', function (
       selectedFrom,
       oldSelectedFrom
     ) {
@@ -173,7 +173,7 @@ define(['../../../base', '../util/displayNameForUser'], function(
       }
     })
 
-    $scope.$watch('update.selectedTo', function(selectedTo, oldSelectedTo) {
+    $scope.$watch('update.selectedTo', function (selectedTo, oldSelectedTo) {
       if (selectedTo) {
         for (const update of Array.from($scope.history.updates)) {
           if (update !== $scope.update) {
@@ -184,30 +184,30 @@ define(['../../../base', '../util/displayNameForUser'], function(
       }
     })
 
-    $scope.select = function() {
+    $scope.select = function () {
       eventTracking.sendMB('history-view-change')
       $scope.update.selectedTo = true
       return ($scope.update.selectedFrom = true)
     }
 
-    $scope.mouseOverSelectedFrom = function() {
+    $scope.mouseOverSelectedFrom = function () {
       $scope.history.hoveringOverListSelectors = true
       $scope.update.hoverSelectedFrom = true
       return $scope.recalculateHoveredUpdates()
     }
 
-    $scope.mouseOutSelectedFrom = function() {
+    $scope.mouseOutSelectedFrom = function () {
       $scope.history.hoveringOverListSelectors = false
       return $scope.resetHoverState()
     }
 
-    $scope.mouseOverSelectedTo = function() {
+    $scope.mouseOverSelectedTo = function () {
       $scope.history.hoveringOverListSelectors = true
       $scope.update.hoverSelectedTo = true
       return $scope.recalculateHoveredUpdates()
     }
 
-    $scope.mouseOutSelectedTo = function() {
+    $scope.mouseOutSelectedTo = function () {
       $scope.history.hoveringOverListSelectors = false
       return $scope.resetHoverState()
     }

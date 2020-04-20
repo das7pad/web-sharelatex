@@ -15,13 +15,13 @@ define(['../../../base', '../util/displayNameForUser'], (
   App,
   displayNameForUser
 ) =>
-  App.controller('HistoryV2ListController', function($scope, $modal, ide) {
+  App.controller('HistoryV2ListController', function ($scope, $modal, ide) {
     $scope.hoveringOverListSelectors = false
     $scope.listConfig = { showOnlyLabelled: false }
 
     $scope.projectUsers = []
 
-    $scope.$watch('project.members', function(newVal) {
+    $scope.$watch('project.members', function (newVal) {
       if (newVal != null) {
         return ($scope.projectUsers = newVal.concat($scope.project.owner))
       }
@@ -31,7 +31,7 @@ define(['../../../base', '../util/displayNameForUser'], (
       return ide.historyManager.fetchNextBatchOfUpdates()
     }
 
-    $scope.handleVersionSelect = version =>
+    $scope.handleVersionSelect = (version) =>
       $scope.$applyAsync(() =>
         ide.historyManager.selectVersionForPointInTime(version)
       )
@@ -41,7 +41,7 @@ define(['../../../base', '../util/displayNameForUser'], (
         ide.historyManager.selectVersionsForCompare(selectedToV, selectedFromV)
       )
 
-    return ($scope.handleLabelDelete = labelDetails =>
+    return ($scope.handleLabelDelete = (labelDetails) =>
       $modal.open({
         templateUrl: 'historyV2DeleteLabelModalTemplate',
         controller: 'HistoryV2DeleteLabelModalController',

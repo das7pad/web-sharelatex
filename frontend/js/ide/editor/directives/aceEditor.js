@@ -22,7 +22,7 @@ define([
   '../../graphics/services/graphics',
   '../../preamble/services/preamble',
   '../../files/services/files'
-], function(
+], function (
   App,
   Ace,
   _ignore1,
@@ -54,7 +54,7 @@ define([
   // By default, don't use workers - enable them per-session as required
   ace.config.setDefaultValue('session', 'useWorker', false)
 
-  App.directive('aceEditor', function(
+  App.directive('aceEditor', function (
     $timeout,
     $compile,
     $rootScope,
@@ -106,9 +106,9 @@ define([
         // Don't freak out if we're already in an apply callback
         let spellCheckManager
         scope.$originalApply = scope.$apply
-        scope.$apply = function(fn) {
+        scope.$apply = function (fn) {
           if (fn == null) {
-            fn = function() {}
+            fn = function () {}
           }
           const phase = this.$root.$$phase
           if (phase === '$apply' || phase === '$digest') {
@@ -125,7 +125,7 @@ define([
         editor.setOption('behavioursEnabled', scope.autoPairDelimiters || false)
         editor.setOption('wrapBehavioursEnabled', false)
 
-        scope.$watch('autoPairDelimiters', autoPairDelimiters => {
+        scope.$watch('autoPairDelimiters', (autoPairDelimiters) => {
           if (autoPairDelimiters) {
             return editor.setOption('behavioursEnabled', true)
           } else {
@@ -187,7 +187,7 @@ define([
         const BAD_CHARS_REPLACEMENT_CHAR = '\uFFFD'
         // the 'exec' event fires for ace functions before they are executed.
         // you can modify the input or reject the event with e.preventDefault()
-        editor.commands.on('exec', function(e) {
+        editor.commands.on('exec', function (e) {
           // replace bad characters in paste content
           if (e.command && e.command.name === 'paste') {
             BAD_CHARS_REGEXP.lastIndex = 0 // reset stateful regexp for this usage
@@ -212,7 +212,7 @@ define([
 
         /* eslint-enable no-unused-vars */
 
-        scope.$watch('onSave', function(callback) {
+        scope.$watch('onSave', function (callback) {
           if (callback != null) {
             Vim.defineEx('write', 'w', callback)
             editor.commands.addCommand({
@@ -316,7 +316,7 @@ define([
           readOnly: false
         })
 
-        scope.$watch('onCtrlEnter', function(callback) {
+        scope.$watch('onCtrlEnter', function (callback) {
           if (callback != null) {
             return editor.commands.addCommand({
               name: 'compile',
@@ -324,7 +324,7 @@ define([
                 win: 'Ctrl-Enter',
                 mac: 'Command-Enter'
               },
-              exec: editor => {
+              exec: (editor) => {
                 return callback()
               },
               readOnly: true
@@ -332,7 +332,7 @@ define([
           }
         })
 
-        scope.$watch('onCtrlJ', function(callback) {
+        scope.$watch('onCtrlJ', function (callback) {
           if (callback != null) {
             return editor.commands.addCommand({
               name: 'toggle-review-panel',
@@ -340,7 +340,7 @@ define([
                 win: 'Ctrl-J',
                 mac: 'Command-J'
               },
-              exec: editor => {
+              exec: (editor) => {
                 return callback()
               },
               readOnly: true
@@ -348,7 +348,7 @@ define([
           }
         })
 
-        scope.$watch('onCtrlShiftC', function(callback) {
+        scope.$watch('onCtrlShiftC', function (callback) {
           if (callback != null) {
             return editor.commands.addCommand({
               name: 'add-new-comment',
@@ -356,7 +356,7 @@ define([
                 win: 'Ctrl-Shift-C',
                 mac: 'Command-Shift-C'
               },
-              exec: editor => {
+              exec: (editor) => {
                 return callback()
               },
               readOnly: true
@@ -364,7 +364,7 @@ define([
           }
         })
 
-        scope.$watch('onCtrlShiftA', function(callback) {
+        scope.$watch('onCtrlShiftA', function (callback) {
           if (callback != null) {
             return editor.commands.addCommand({
               name: 'toggle-track-changes',
@@ -372,7 +372,7 @@ define([
                 win: 'Ctrl-Shift-A',
                 mac: 'Command-Shift-A'
               },
-              exec: editor => {
+              exec: (editor) => {
                 return callback()
               },
               readOnly: true
@@ -381,13 +381,13 @@ define([
         })
 
         // Make '/' work for search in vim mode.
-        editor.showCommandLine = arg => {
+        editor.showCommandLine = (arg) => {
           if (arg === '/') {
             return SearchBox.Search(editor, true)
           }
         }
 
-        const getCursorScreenPosition = function() {
+        const getCursorScreenPosition = function () {
           const session = editor.getSession()
           const cursorPosition = session.selection.getCursor()
           const sessionPos = session.documentToScreenPosition(
@@ -401,7 +401,7 @@ define([
 
         if (attrs.resizeOn != null) {
           for (const event of Array.from(attrs.resizeOn.split(','))) {
-            scope.$on(event, function() {
+            scope.$on(event, function () {
               scope.$applyAsync(() => {
                 const previousScreenPosition = getCursorScreenPosition()
                 editor.resize()
@@ -418,7 +418,7 @@ define([
           }
         }
 
-        scope.$on(`${scope.name}:set-scroll-size`, function(e, size) {
+        scope.$on(`${scope.name}:set-scroll-size`, function (e, size) {
           // Make sure that the editor has enough scroll margin above and below
           // to scroll the review panel with the given size
           const marginTop = size.overflowTop
@@ -427,7 +427,7 @@ define([
           return setScrollMargins(marginTop, marginBottom)
         })
 
-        var setScrollMargins = function(marginTop, marginBottom) {
+        var setScrollMargins = function (marginTop, marginBottom) {
           let marginChanged = false
           if (editor.renderer.scrollMargin.top !== marginTop) {
             editor.renderer.scrollMargin.top = marginTop
@@ -444,13 +444,13 @@ define([
 
         const resetScrollMargins = () => setScrollMargins(0, 0)
 
-        scope.$watch('theme', value => editor.setTheme(`ace/theme/${value}`))
+        scope.$watch('theme', (value) => editor.setTheme(`ace/theme/${value}`))
 
-        scope.$watch('showPrintMargin', value =>
+        scope.$watch('showPrintMargin', (value) =>
           editor.setShowPrintMargin(value)
         )
 
-        scope.$watch('keybindings', function(value) {
+        scope.$watch('keybindings', function (value) {
           if (['vim', 'emacs'].includes(value)) {
             return editor.setKeyboardHandler(`ace/keyboard/${value}`)
           } else {
@@ -458,13 +458,13 @@ define([
           }
         })
 
-        scope.$watch('fontSize', value =>
+        scope.$watch('fontSize', (value) =>
           element.find('.ace_editor, .ace_content').css({
             'font-size': value + 'px'
           })
         )
 
-        scope.$watch('fontFamily', function(value) {
+        scope.$watch('fontFamily', function (value) {
           const monospaceFamilies = [
             'Monaco',
             'Menlo',
@@ -492,7 +492,7 @@ define([
           }
         })
 
-        scope.$watch('lineHeight', function(value) {
+        scope.$watch('lineHeight', function (value) {
           if (value != null) {
             switch (value) {
               case 'compact':
@@ -511,7 +511,7 @@ define([
           }
         })
 
-        scope.$watch('sharejsDoc', function(sharejs_doc, old_sharejs_doc) {
+        scope.$watch('sharejsDoc', function (sharejs_doc, old_sharejs_doc) {
           if (old_sharejs_doc != null) {
             scope.$broadcast('beforeChangeDocument')
             detachFromAce(old_sharejs_doc)
@@ -524,7 +524,7 @@ define([
           }
         })
 
-        scope.$watch('text', function(text) {
+        scope.$watch('text', function (text) {
           if (text != null) {
             editor.setValue(text, -1)
             const session = editor.getSession()
@@ -532,14 +532,14 @@ define([
           }
         })
 
-        scope.$watch('annotations', function(annotations) {
+        scope.$watch('annotations', function (annotations) {
           const session = editor.getSession()
           return session.setAnnotations(annotations)
         })
 
-        scope.$watch('readOnly', value => editor.setReadOnly(!!value))
+        scope.$watch('readOnly', (value) => editor.setReadOnly(!!value))
 
-        scope.$watch('syntaxValidation', function(value) {
+        scope.$watch('syntaxValidation', function (value) {
           // ignore undefined settings here
           // only instances of ace with an explicit value should set useWorker
           // the history instance will have syntaxValidation undefined
@@ -552,7 +552,7 @@ define([
         editor.setOption('scrollPastEnd', true)
 
         let updateCount = 0
-        const onChange = function() {
+        const onChange = function () {
           updateCount++
 
           if (updateCount === 100) {
@@ -561,7 +561,7 @@ define([
           return scope.$emit(`${scope.name}:change`)
         }
 
-        const onScroll = function(scrollTop) {
+        const onScroll = function (scrollTop) {
           if (scope.eventsBridge == null) {
             return
           }
@@ -569,7 +569,7 @@ define([
           return scope.eventsBridge.emit('aceScroll', scrollTop, height)
         }
 
-        const onScrollbarVisibilityChanged = function(event, vRenderer) {
+        const onScrollbarVisibilityChanged = function (event, vRenderer) {
           if (scope.eventsBridge == null) {
             return
           }
@@ -586,17 +586,17 @@ define([
             onScrollbarVisibilityChanged
           )
 
-          scope.eventsBridge.on('externalScroll', position =>
+          scope.eventsBridge.on('externalScroll', (position) =>
             editor.getSession().setScrollTop(position)
           )
-          scope.eventsBridge.on('refreshScrollPosition', function() {
+          scope.eventsBridge.on('refreshScrollPosition', function () {
             const session = editor.getSession()
             session.setScrollTop(session.getScrollTop() + 1)
             return session.setScrollTop(session.getScrollTop() - 1)
           })
         }
 
-        const onSessionChangeForSpellCheck = function(e) {
+        const onSessionChangeForSpellCheck = function (e) {
           spellCheckManager.onSessionChange()
           if (e.oldSession != null) {
             e.oldSession.getDocument().off('change', spellCheckManager.onChange)
@@ -608,7 +608,7 @@ define([
           return e.session.on('changeScrollTop', spellCheckManager.onScroll)
         }
 
-        const initSpellCheck = function() {
+        const initSpellCheck = function () {
           if (!spellCheckManager) return
           spellCheckManager.init()
           editor.on('changeSession', onSessionChangeForSpellCheck)
@@ -618,7 +618,7 @@ define([
           return editor.on('nativecontextmenu', spellCheckManager.onContextMenu)
         }
 
-        const tearDownSpellCheck = function() {
+        const tearDownSpellCheck = function () {
           if (!spellCheckManager) return
           editor.off('changeSession', onSessionChangeForSpellCheck)
           return editor.off(
@@ -627,7 +627,7 @@ define([
           )
         }
 
-        const initTrackChanges = function() {
+        const initTrackChanges = function () {
           trackChangesManager.rangesTracker = scope.sharejsDoc.ranges
 
           // Force onChangeSession in order to set up highlights etc.
@@ -645,7 +645,7 @@ define([
           editor.renderer.on('resize', trackChangesManager.onResize)
         }
 
-        const tearDownTrackChanges = function() {
+        const tearDownTrackChanges = function () {
           if (!trackChangesManager) return
           this.trackChangesManager.tearDown()
           editor.off('changeSelection', trackChangesManager.onChangeSelection)
@@ -657,7 +657,7 @@ define([
           editor.renderer.off('resize', trackChangesManager.onResize)
         }
 
-        const initUndo = function() {
+        const initUndo = function () {
           // Emulate onChangeSession event. Note: listening to changeSession
           // event is unnecessary since this method is called when we switch
           // sessions (via ShareJS changing) anyway
@@ -665,11 +665,11 @@ define([
           editor.on('change', undoManager.onChange)
         }
 
-        const tearDownUndo = function() {
+        const tearDownUndo = function () {
           editor.off('change', undoManager.onChange)
         }
 
-        const onSessionChangeForCursorPosition = function(e) {
+        const onSessionChangeForCursorPosition = function (e) {
           if (e.oldSession != null) {
             e.oldSession.selection.off(
               'changeCursor',
@@ -685,7 +685,7 @@ define([
         const onUnloadForCursorPosition = () =>
           cursorPositionManager.onUnload(editor.getSession())
 
-        const initCursorPosition = function() {
+        const initCursorPosition = function () {
           editor.on('changeSession', onSessionChangeForCursorPosition)
 
           // Force initial setup
@@ -694,7 +694,7 @@ define([
           return $(window).on('unload', onUnloadForCursorPosition)
         }
 
-        const tearDownCursorPosition = function() {
+        const tearDownCursorPosition = function () {
           editor.off('changeSession', onSessionChangeForCursorPosition)
           return $(window).off('unload', onUnloadForCursorPosition)
         }
@@ -708,7 +708,7 @@ define([
           scope.$broadcast('editorInit')
         )
 
-        var attachToAce = function(sharejs_doc) {
+        var attachToAce = function (sharejs_doc) {
           let mode
           const lines = sharejs_doc.getSnapshot().split('\n')
           let session = editor.getSession()
@@ -799,7 +799,7 @@ define([
           }
 
           $rootScope.hasLintingError = false
-          session.on('changeAnnotation', function() {
+          session.on('changeAnnotation', function () {
             // Both linter errors and compile logs are set as error annotations,
             // however when the user types something, the compile logs are
             // replaced with linter errors. When we check for lint errors before
@@ -807,7 +807,7 @@ define([
             const hasErrors =
               session
                 .getAnnotations()
-                .filter(annotation => annotation.type !== 'info').length > 0
+                .filter((annotation) => annotation.type !== 'info').length > 0
 
             if ($rootScope.hasLintingError !== hasErrors) {
               return ($rootScope.hasLintingError = hasErrors)
@@ -822,7 +822,7 @@ define([
           return editor.focus()
         }
 
-        var detachFromAce = function(sharejs_doc) {
+        var detachFromAce = function (sharejs_doc) {
           tearDownSpellCheck()
           tearDownTrackChanges()
           tearDownUndo()
@@ -844,13 +844,13 @@ define([
           })
         }
 
-        scope.$watch('rendererData', function(rendererData) {
+        scope.$watch('rendererData', function (rendererData) {
           if (rendererData != null) {
             return (rendererData.lineHeight = editor.renderer.lineHeight)
           }
         })
 
-        scope.$on('$destroy', function() {
+        scope.$on('$destroy', function () {
           if (scope.sharejsDoc != null) {
             scope.$broadcast('changeEditor')
             tearDownSpellCheck()
@@ -978,7 +978,7 @@ define([
 
     const SB = SearchBox.SearchBox
     const { $init } = SB.prototype
-    SB.prototype.$init = function() {
+    SB.prototype.$init = function () {
       this.element = $compile(searchHtml)($rootScope.$new())[0]
       return $init.apply(this)
     }

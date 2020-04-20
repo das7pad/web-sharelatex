@@ -11,8 +11,8 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base'], function(App) {
-  const affiliationFormController = function(
+define(['../../../base'], function (App) {
+  const affiliationFormController = function (
     $scope,
     $element,
     $attrs,
@@ -25,11 +25,11 @@ define(['../../../base'], function(App) {
     ctrl.universities = []
     let _defaultDepartments = []
 
-    ctrl.addUniversityToSelection = universityName => ({
+    ctrl.addUniversityToSelection = (universityName) => ({
       name: universityName,
       isUserSuggested: true
     })
-    ctrl.handleFreeformInputChange = function($select, propertyToMatch) {
+    ctrl.handleFreeformInputChange = function ($select, propertyToMatch) {
       if ($select.search == null || $select.search === '') {
         return
       }
@@ -40,7 +40,7 @@ define(['../../../base'], function(App) {
       if (propertyToMatch != null) {
         const matchingItem = _.find(
           $select.items,
-          item => item[propertyToMatch] === $select.search
+          (item) => item[propertyToMatch] === $select.search
         )
         if (matchingItem != null) {
           resultingItem = matchingItem
@@ -51,18 +51,18 @@ define(['../../../base'], function(App) {
 
     // Populates the countries dropdown
     UserAffiliationsDataService.getCountries().then(
-      countries => (ctrl.countries = countries)
+      (countries) => (ctrl.countries = countries)
     )
     // Populates the roles dropdown
     UserAffiliationsDataService.getDefaultRoleHints().then(
-      roles => (ctrl.roles = roles)
+      (roles) => (ctrl.roles = roles)
     )
     // Fetches the default department hints
     UserAffiliationsDataService.getDefaultDepartmentHints().then(
-      departments => (_defaultDepartments = departments)
+      (departments) => (_defaultDepartments = departments)
     )
     // Populates the universities dropdown (after selecting a country)
-    $scope.$watch('$ctrl.affiliationData.country', function(
+    $scope.$watch('$ctrl.affiliationData.country', function (
       newSelectedCountry,
       prevSelectedCountry
     ) {
@@ -75,11 +75,11 @@ define(['../../../base'], function(App) {
         ctrl.affiliationData.department = null
         return UserAffiliationsDataService.getUniversitiesFromCountry(
           newSelectedCountry
-        ).then(universities => (ctrl.universities = universities))
+        ).then((universities) => (ctrl.universities = universities))
       }
     })
     // Populates the departments dropdown (after selecting a university)
-    $scope.$watch('$ctrl.affiliationData.university', function(
+    $scope.$watch('$ctrl.affiliationData.university', function (
       newSelectedUniversity,
       prevSelectedUniversity
     ) {

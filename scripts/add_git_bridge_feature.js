@@ -10,7 +10,7 @@ db.users.update(
   {
     $set: { 'features.gitBridge': true }
   },
-  function(err, result) {
+  function (err, result) {
     if (err) {
       logger.err({ err: err, result: result }, 'Error updating users in mongo')
       return

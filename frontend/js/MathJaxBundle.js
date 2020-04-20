@@ -6,7 +6,7 @@ define([
   'libs/mathjax/jax/output/HTML-CSS/jax'
   // fontdata has a circular dependency on jax internals, skip bundling
   // 'libs/mathjax/jax/output/HTML-CSS/fonts/TeX/fontdata'
-], function(MathJax) {
+], function (MathJax) {
   MathJax.Hub.Config({
     messageStyle: 'none',
     imageFont: null,

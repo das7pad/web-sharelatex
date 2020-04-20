@@ -36,11 +36,11 @@ module.exports = ChatController = {
       project_id,
       user_id,
       content,
-      function(err, message) {
+      function (err, message) {
         if (err != null) {
           return next(err)
         }
-        return UserInfoManager.getPersonalInfo(message.user_id, function(
+        return UserInfoManager.getPersonalInfo(message.user_id, function (
           err,
           user
         ) {
@@ -66,13 +66,13 @@ module.exports = ChatController = {
       project_id,
       query.limit,
       query.before,
-      function(err, messages) {
+      function (err, messages) {
         if (err != null) {
           return next(err)
         }
         return ChatController._injectUserInfoIntoThreads(
           { global: { messages } },
-          function(err) {
+          function (err) {
             if (err != null) {
               return next(err)
             }
@@ -89,7 +89,7 @@ module.exports = ChatController = {
     // user fields
     let message, thread, thread_id, user_id
     if (callback == null) {
-      callback = function(error, threads) {}
+      callback = function (error, threads) {}
     }
     const user_ids = {}
     for (thread_id in threads) {
@@ -106,9 +106,9 @@ module.exports = ChatController = {
     const users = {}
     for (user_id in user_ids) {
       const _ = user_ids[user_id]
-      ;(user_id =>
-        jobs.push(cb =>
-          UserInfoManager.getPersonalInfo(user_id, function(error, user) {
+      ;((user_id) =>
+        jobs.push((cb) =>
+          UserInfoManager.getPersonalInfo(user_id, function (error, user) {
             if (error != null) return cb(error)
             user = UserInfoController.formatPersonalInfo(user)
             users[user_id] = user
@@ -117,7 +117,7 @@ module.exports = ChatController = {
         ))(user_id)
     }
 
-    return async.series(jobs, function(error) {
+    return async.series(jobs, function (error) {
       if (error != null) {
         return callback(error)
       }

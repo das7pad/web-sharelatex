@@ -20,7 +20,7 @@ module.exports = MetaController = {
   getMetadata(req, res, next) {
     const { project_id } = req.params
     logger.log({ project_id }, 'getting all labels for project')
-    return MetaHandler.getAllMetaForProject(project_id, function(
+    return MetaHandler.getAllMetaForProject(project_id, function (
       err,
       projectMeta
     ) {
@@ -39,7 +39,7 @@ module.exports = MetaController = {
     const { project_id } = req.params
     const { doc_id } = req.params
     logger.log({ project_id, doc_id }, 'getting labels for doc')
-    return MetaHandler.getMetaForDoc(project_id, doc_id, function(
+    return MetaHandler.getMetaForDoc(project_id, doc_id, function (
       err,
       docMeta
     ) {

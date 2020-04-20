@@ -5,4 +5,4 @@ define([
   './directives/formatting_buttons',
   './controllers/editor_loader_controller',
   './controllers/editor_toolbar_controller'
-], function() {})
+], function () {})

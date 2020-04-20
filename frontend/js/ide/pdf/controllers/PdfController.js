@@ -3,7 +3,7 @@ define([
   'ace/ace',
   '../../human-readable-logs/HumanReadableLogs',
   'libs/bib-log-parser'
-], function(App, Ace, HumanReadableLogs, BibLogParser) {
+], function (App, Ace, HumanReadableLogs, BibLogParser) {
   const AUTO_COMPILE_MAX_WAIT = 5000
   // We add a 1 second debounce to sending user changes to server if they aren't
   // collaborating with anyone. This needs to be higher than that, and allow for
@@ -11,9 +11,9 @@ define([
   // and then again on ack.
   const AUTO_COMPILE_DEBOUNCE = 2000
 
-  App.filter('trusted', $sce => url => $sce.trustAsResourceUrl(url))
+  App.filter('trusted', ($sce) => (url) => $sce.trustAsResourceUrl(url))
 
-  App.controller('PdfController', function(
+  App.controller('PdfController', function (
     $scope,
     $http,
     ide,
@@ -48,7 +48,7 @@ define([
       )
     }
 
-    $scope.$watch('shouldShowLogs', shouldShow => {
+    $scope.$watch('shouldShowLogs', (shouldShow) => {
       if (shouldShow) {
         $scope.$applyAsync(() => {
           $scope.shouldDropUp = getFilesDropdownTopCoordAsRatio() > 0.65
@@ -56,7 +56,7 @@ define([
       }
     })
 
-    $scope.trackLogHintsLearnMore = function() {
+    $scope.trackLogHintsLearnMore = function () {
       eventTracking.sendMB('logs-hints-learn-more')
     }
 
@@ -80,7 +80,7 @@ define([
       }
     }
 
-    $scope.stripHTMLFromString = function(htmlStr) {
+    $scope.stripHTMLFromString = function (htmlStr) {
       const tmp = document.createElement('DIV')
       tmp.innerHTML = htmlStr
       return tmp.textContent || tmp.innerText || ''
@@ -96,7 +96,7 @@ define([
         $scope.project.features.compileGroup === 'priority'
     })
 
-    $scope.$on('pdf:error:display', function() {
+    $scope.$on('pdf:error:display', function () {
       $scope.pdf.view = 'errors'
       $scope.pdf.renderingError = true
     })
@@ -172,7 +172,7 @@ define([
     }
 
     $scope.changesToAutoCompile = false
-    $scope.$watch('pdf.uncompiled', uncompiledChanges => {
+    $scope.$watch('pdf.uncompiled', (uncompiledChanges) => {
       // don't autocompile if disabled or the pdf is not visible
       if (
         $scope.pdf.uncompiled &&
@@ -641,7 +641,7 @@ define([
       // retrieve the logfile and process it
       let response
       if (logFile != null) {
-        response = getFile('output.log', logFile).then(response =>
+        response = getFile('output.log', logFile).then((response) =>
           processLog(response.data)
         )
 
@@ -649,7 +649,7 @@ define([
           // retrieve the blg file if present
           response = response.then(() =>
             getFile('output.blg', blgFile).then(
-              response => processBiber(response.data),
+              (response) => processBiber(response.data),
               () => true
             )
           )
@@ -664,7 +664,7 @@ define([
 
       if (chktexFile != null) {
         const getChkTex = () =>
-          getFile('output.chktex', chktexFile).then(response =>
+          getFile('output.chktex', chktexFile).then((response) =>
             processChkTex(response.data)
           )
         // always retrieve the chktex file if present
@@ -709,7 +709,7 @@ define([
       return path
     }
 
-    $scope.recompile = function(options) {
+    $scope.recompile = function (options) {
       if (options == null) {
         options = {}
       }
@@ -741,13 +741,13 @@ define([
       options.rootDocOverride_id = getRootDocOverrideId()
 
       sendCompileRequest(options)
-        .then(function(response) {
+        .then(function (response) {
           const { data } = response
           $scope.pdf.view = 'pdf'
           $scope.pdf.compiling = false
           parseCompileResponse(data)
         })
-        .catch(function(response) {
+        .catch(function (response) {
           const { status } = response
           if (status === 429) {
             $scope.pdf.rateLimited = true
@@ -765,11 +765,11 @@ define([
     // This needs to be public.
     ide.$scope.recompile = $scope.recompile
     // This method is a simply wrapper and exists only for tracking purposes.
-    ide.$scope.recompileViaKey = function() {
+    ide.$scope.recompileViaKey = function () {
       $scope.recompile({ keyShortcut: true })
     }
 
-    $scope.stop = function() {
+    $scope.stop = function () {
       if (!$scope.pdf.compiling) {
         return
       }
@@ -786,7 +786,7 @@ define([
       })
     }
 
-    $scope.clearCache = function() {
+    $scope.clearCache = function () {
       return $http({
         url: `/project/${$scope.project_id}/output`,
         method: 'DELETE',
@@ -799,26 +799,26 @@ define([
       })
     }
 
-    $scope.toggleLogs = function() {
+    $scope.toggleLogs = function () {
       $scope.shouldShowLogs = !$scope.shouldShowLogs
       if ($scope.shouldShowLogs) {
         eventTracking.sendMBOnce('ide-open-logs-once')
       }
     }
 
-    $scope.showPdf = function() {
+    $scope.showPdf = function () {
       $scope.pdf.view = 'pdf'
       $scope.shouldShowLogs = false
     }
 
-    $scope.toggleRawLog = function() {
+    $scope.toggleRawLog = function () {
       $scope.pdf.showRawLog = !$scope.pdf.showRawLog
       if ($scope.pdf.showRawLog) {
         eventTracking.sendMB('logs-view-raw')
       }
     }
 
-    $scope.openClearCacheModal = function() {
+    $scope.openClearCacheModal = function () {
       $modal.open({
         templateUrl: 'clearCacheModalTemplate',
         controller: 'ClearCacheModalController',
@@ -826,15 +826,15 @@ define([
       })
     }
 
-    $scope.syncToCode = function(position) {
-      synctex.syncToCode(position).then(function(data) {
+    $scope.syncToCode = function (position) {
+      synctex.syncToCode(position).then(function (data) {
         const { doc, line } = data
         ide.editorManager.openDoc(doc, { gotoLine: line })
       })
     }
   })
 
-  App.factory('synctex', function(ide, $http, $q) {
+  App.factory('synctex', function (ide, $http, $q) {
     const synctex = {
       syncToPdf(cursorPosition) {
         const deferred = $q.defer()
@@ -877,11 +877,11 @@ define([
             clsiserverid: ide.clsiServerId
           }
         })
-          .then(function(response) {
+          .then(function (response) {
             const { data } = response
             return deferred.resolve(data.pdf || [])
           })
-          .catch(function(response) {
+          .catch(function (response) {
             const error = response.data
             return deferred.reject(error)
           })
@@ -938,7 +938,7 @@ define([
             clsiserverid: ide.clsiServerId
           }
         })
-          .then(function(response) {
+          .then(function (response) {
             const { data } = response
             if (
               data.code != null &&
@@ -957,7 +957,7 @@ define([
               setTimeout(() => (ide.$scope.sync_tex_error = false), 4000)
             }
           })
-          .catch(function(response) {
+          .catch(function (response) {
             const error = response.data
             return deferred.reject(error)
           })
@@ -969,7 +969,7 @@ define([
     return synctex
   })
 
-  App.controller('PdfSynctexController', function($scope, synctex, ide) {
+  App.controller('PdfSynctexController', function ($scope, synctex, ide) {
     this.cursorPosition = null
     ide.$scope.$on('cursor:editor:update', (event, cursorPosition) => {
       this.cursorPosition = cursorPosition
@@ -979,28 +979,32 @@ define([
       if (this.cursorPosition == null) {
         return
       }
-      synctex.syncToPdf(this.cursorPosition).then(highlights => {
+      synctex.syncToPdf(this.cursorPosition).then((highlights) => {
         $scope.pdf.highlights = highlights
       })
     }
 
     ide.$scope.$on('cursor:editor:syncToPdf', $scope.syncToPdf)
 
-    $scope.syncToCode = function() {
+    $scope.syncToCode = function () {
       synctex
         .syncToCode($scope.pdf.position, {
           includeVisualOffset: true,
           fromPdfPosition: true
         })
-        .then(function(data) {
+        .then(function (data) {
           const { doc, line } = data
           ide.editorManager.openDoc(doc, { gotoLine: line })
         })
     }
   })
 
-  App.controller('PdfLogEntryController', function($scope, ide, eventTracking) {
-    $scope.openInEditor = function(entry) {
+  App.controller('PdfLogEntryController', function (
+    $scope,
+    ide,
+    eventTracking
+  ) {
+    $scope.openInEditor = function (entry) {
       let column, line
       eventTracking.sendMBOnce('logs-jump-to-location-once')
       const entity = ide.fileTreeManager.findEntityByPath(entry.file)
@@ -1020,12 +1024,15 @@ define([
     }
   })
 
-  App.controller('ClearCacheModalController', function($scope, $modalInstance) {
+  App.controller('ClearCacheModalController', function (
+    $scope,
+    $modalInstance
+  ) {
     $scope.state = { inflight: false }
 
-    $scope.clear = function() {
+    $scope.clear = function () {
       $scope.state.inflight = true
-      $scope.clearCache().then(function() {
+      $scope.clearCache().then(function () {
         $scope.state.inflight = false
         $modalInstance.close()
       })

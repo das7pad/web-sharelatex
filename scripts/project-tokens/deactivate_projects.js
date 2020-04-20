@@ -16,14 +16,14 @@ Async.eachLimit(
         $unset: { tokens: 1 },
         $set: { publicAccesLevel: 'private' }
       },
-      err => {
+      (err) => {
         if (err) return cb(err)
         console.log(`Deactivated tokens for ${projectId}`)
         cb()
       }
     )
   },
-  err => {
+  (err) => {
     if (err) throw err
     console.log('>> Done')
     process.exit(0)

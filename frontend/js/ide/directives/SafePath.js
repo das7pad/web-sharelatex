@@ -17,7 +17,7 @@
 //   app/coffee/Features/Project/SafePath.coffee
 //   public/coffee/ide/directives/SafePath.coffee
 
-const load = function() {
+const load = function () {
   let SafePath
   const BADCHAR_RX = new RegExp(
     `\
@@ -75,7 +75,7 @@ prototype\
     clean(filename) {
       filename = filename.replace(BADCHAR_RX, '_')
       // for BADFILE_RX replace any matches with an equal number of underscores
-      filename = filename.replace(BADFILE_RX, match =>
+      filename = filename.replace(BADFILE_RX, (match) =>
         new Array(match.length + 1).join('_')
       )
       // replace blocked filenames 'prototype' with '@prototype'

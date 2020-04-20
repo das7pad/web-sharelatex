@@ -28,7 +28,7 @@ const { promisifyAll } = require('../../util/promises')
 module.exports = DocumentUpdaterHandler = {
   flushProjectToMongo(project_id, callback) {
     if (callback == null) {
-      callback = function(error) {}
+      callback = function (error) {}
     }
     return DocumentUpdaterHandler._makeRequest(
       {
@@ -43,12 +43,12 @@ module.exports = DocumentUpdaterHandler = {
 
   flushMultipleProjectsToMongo(project_ids, callback) {
     if (callback == null) {
-      callback = function(error) {}
+      callback = function (error) {}
     }
     const jobs = []
     for (const project_id of Array.from(project_ids)) {
-      ;(project_id =>
-        jobs.push(callback =>
+      ;((project_id) =>
+        jobs.push((callback) =>
           DocumentUpdaterHandler.flushProjectToMongo(project_id, callback)
         ))(project_id)
     }
@@ -57,7 +57,7 @@ module.exports = DocumentUpdaterHandler = {
 
   flushProjectToMongoAndDelete(project_id, callback) {
     if (callback == null) {
-      callback = function() {}
+      callback = function () {}
     }
     const timer = new metrics.Timer('delete.mongo.project')
     const url = `${settings.apis.documentupdater.url}`
@@ -74,7 +74,7 @@ module.exports = DocumentUpdaterHandler = {
 
   flushDocToMongo(project_id, doc_id, callback) {
     if (callback == null) {
-      callback = function(error) {}
+      callback = function (error) {}
     }
     return DocumentUpdaterHandler._makeRequest(
       {
@@ -89,7 +89,7 @@ module.exports = DocumentUpdaterHandler = {
 
   deleteDoc(project_id, doc_id, callback) {
     if (callback == null) {
-      callback = function() {}
+      callback = function () {}
     }
     return DocumentUpdaterHandler._makeRequest(
       {
@@ -104,7 +104,7 @@ module.exports = DocumentUpdaterHandler = {
 
   getDocument(project_id, doc_id, fromVersion, callback) {
     if (callback == null) {
-      callback = function(error, doclines, version, ranges, ops) {}
+      callback = function (error, doclines, version, ranges, ops) {}
     }
     return DocumentUpdaterHandler._makeRequest(
       {
@@ -113,7 +113,7 @@ module.exports = DocumentUpdaterHandler = {
       },
       project_id,
       'get-document',
-      function(error, doc) {
+      function (error, doc) {
         if (error != null) {
           return callback(error)
         }
@@ -124,7 +124,7 @@ module.exports = DocumentUpdaterHandler = {
 
   setDocument(project_id, doc_id, user_id, docLines, source, callback) {
     if (callback == null) {
-      callback = function(error) {}
+      callback = function (error) {}
     }
     return DocumentUpdaterHandler._makeRequest(
       {
@@ -147,11 +147,11 @@ module.exports = DocumentUpdaterHandler = {
     // docs from redis via the docupdater. Otherwise we will need to
     // fall back to getting them from mongo.
     if (callback == null) {
-      callback = function(error, docs) {}
+      callback = function (error, docs) {}
     }
     const timer = new metrics.Timer('get-project-docs')
     const url = `${settings.apis.documentupdater.url}/project/${project_id}/get_and_flush_if_old?state=${projectStateHash}`
-    return request.post(url, function(error, res, body) {
+    return request.post(url, function (error, res, body) {
       timer.done()
       if (error != null) {
         logger.warn(
@@ -193,7 +193,7 @@ module.exports = DocumentUpdaterHandler = {
 
   clearProjectState(project_id, callback) {
     if (callback == null) {
-      callback = function(error) {}
+      callback = function (error) {}
     }
     return DocumentUpdaterHandler._makeRequest(
       {
@@ -211,7 +211,7 @@ module.exports = DocumentUpdaterHandler = {
       change_ids = []
     }
     if (callback == null) {
-      callback = function(error) {}
+      callback = function (error) {}
     }
     return DocumentUpdaterHandler._makeRequest(
       {
@@ -229,7 +229,7 @@ module.exports = DocumentUpdaterHandler = {
 
   deleteThread(project_id, doc_id, thread_id, callback) {
     if (callback == null) {
-      callback = function(error) {}
+      callback = function (error) {}
     }
     const timer = new metrics.Timer('delete-thread')
     return DocumentUpdaterHandler._makeRequest(
@@ -264,7 +264,7 @@ module.exports = DocumentUpdaterHandler = {
     callback
   ) {
     if (callback == null) {
-      callback = function(error) {}
+      callback = function (error) {}
     }
     if (
       !(settings.apis.project_history != null
@@ -286,7 +286,7 @@ module.exports = DocumentUpdaterHandler = {
     )
     const projectVersion = __guard__(
       changes != null ? changes.newProject : undefined,
-      x => x.version
+      (x) => x.version
     )
 
     if (docUpdates.length + fileUpdates.length < 1) {
@@ -327,7 +327,7 @@ module.exports = DocumentUpdaterHandler = {
         json: options.json,
         method: options.method || 'GET'
       },
-      function(error, res, body) {
+      function (error, res, body) {
         timer.done()
         if (error != null) {
           logger.warn(
@@ -361,10 +361,10 @@ module.exports = DocumentUpdaterHandler = {
     }
     const updates = []
 
-    const oldEntitiesHash = _.indexBy(oldEntities, entity =>
+    const oldEntitiesHash = _.indexBy(oldEntities, (entity) =>
       entity[entityType]._id.toString()
     )
-    const newEntitiesHash = _.indexBy(newEntities, entity =>
+    const newEntitiesHash = _.indexBy(newEntities, (entity) =>
       entity[entityType]._id.toString()
     )
 

@@ -23,8 +23,8 @@ const modulePath = path.join(
 )
 const { expect } = require('chai')
 
-describe('TrackChanges RangesManager', function() {
-  beforeEach(function() {
+describe('TrackChanges RangesManager', function () {
+  beforeEach(function () {
     return (this.RangesManager = SandboxedModule.require(modulePath, {
       requires: {
         '../../../../../app/src/Features/DocumentUpdater/DocumentUpdaterHandler': (this.DocumentUpdaterHandler = {}),
@@ -34,8 +34,8 @@ describe('TrackChanges RangesManager', function() {
     }))
   })
 
-  return describe('getAllChangesUsers', function() {
-    beforeEach(function() {
+  return describe('getAllChangesUsers', function () {
+    beforeEach(function () {
       this.project_id = 'mock-project-id'
       this.user_id1 = 'mock-user-id-1'
       this.user_id1 = 'mock-user-id-2'
@@ -82,7 +82,7 @@ describe('TrackChanges RangesManager', function() {
         .yields(null, this.docs))
     })
 
-    it('should return an array of unique users', function(done) {
+    it('should return an array of unique users', function (done) {
       return this.RangesManager.getAllChangesUsers(
         this.project_id,
         (error, users) => {
@@ -92,7 +92,7 @@ describe('TrackChanges RangesManager', function() {
       )
     })
 
-    return it('should only call getPersonalInfo once for each user', function(done) {
+    return it('should only call getPersonalInfo once for each user', function (done) {
       return this.RangesManager.getAllChangesUsers(
         this.project_id,
         (error, users) => {

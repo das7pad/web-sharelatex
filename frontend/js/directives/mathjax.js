@@ -5,10 +5,10 @@ if (window.preLoadMathJax) {
   // eslint-disable-next-line no-unused-expressions
   import(/* webpackChunkName: "MathJaxBundle" */ '../MathJaxBundle')
 }
-App.directive('mathjax', function($compile, $parse) {
+App.directive('mathjax', function ($compile, $parse) {
   return {
     link(scope, element, attrs) {
-      import('../MathJaxBundle').then(MathJax => {
+      import('../MathJaxBundle').then((MathJax) => {
         // Allowing HTML can be unsafe unless using something like
         // `ng-bind-html` because of potential Angular XSS via {{/}}
         if (!$parse(attrs.mathjaxAllowHtml)(scope)) {
@@ -23,7 +23,7 @@ App.directive('mathjax', function($compile, $parse) {
             MathJax.Hub.config && MathJax.Hub.config.tex2jax.inlineMath
           const alreadyConfigured = _.find(
             inlineMathConfig,
-            c => c[0] === '$' && c[1] === '$'
+            (c) => c[0] === '$' && c[1] === '$'
           )
 
           if (!alreadyConfigured) {

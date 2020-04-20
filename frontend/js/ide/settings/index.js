@@ -7,4 +7,4 @@ define([
   './services/settings',
   './controllers/SettingsController',
   './controllers/ProjectNameController'
-], function() {})
+], function () {})

@@ -33,7 +33,7 @@ const ProjectTokenGenerator = {
     const result = crypto
       .randomBytes(length)
       .toJSON()
-      .data.map(b => alphabet[b % alphabet.length])
+      .data.map((b) => alphabet[b % alphabet.length])
       .join('')
     return result
   },
@@ -64,11 +64,11 @@ const ProjectTokenGenerator = {
 
   generateUniqueReadOnlyToken(callback) {
     if (callback == null) {
-      callback = function(err, token) {}
+      callback = function (err, token) {}
     }
     return Async.retry(
       10,
-      function(cb) {
+      function (cb) {
         const token = ProjectTokenGenerator.readOnlyToken()
 
         if (!Features.hasFeature('overleaf-integration')) {
@@ -80,7 +80,7 @@ const ProjectTokenGenerator = {
             url: `/api/v1/sharelatex/docs/read_token/${token}/exists`,
             json: true
           },
-          function(err, response, body) {
+          function (err, response, body) {
             if (err != null) {
               return cb(err)
             }

@@ -23,10 +23,10 @@ const TIMEOUT = 30 * 1000 // request timeout
 const DocstoreManager = {
   deleteDoc(project_id, doc_id, callback) {
     if (callback == null) {
-      callback = function(error) {}
+      callback = function (error) {}
     }
     const url = `${settings.apis.docstore.url}/project/${project_id}/doc/${doc_id}`
-    return request.del({ url: url, timeout: TIMEOUT }, function(
+    return request.del({ url: url, timeout: TIMEOUT }, function (
       error,
       res,
       body
@@ -58,7 +58,7 @@ const DocstoreManager = {
 
   getAllDocs(project_id, callback) {
     if (callback == null) {
-      callback = function(error) {}
+      callback = function (error) {}
     }
     const url = `${settings.apis.docstore.url}/project/${project_id}/doc`
     return request.get(
@@ -67,7 +67,7 @@ const DocstoreManager = {
         timeout: TIMEOUT,
         json: true
       },
-      function(error, res, docs) {
+      function (error, res, docs) {
         if (error != null) {
           return callback(error)
         }
@@ -89,7 +89,7 @@ const DocstoreManager = {
 
   getAllRanges(project_id, callback) {
     if (callback == null) {
-      callback = function(error) {}
+      callback = function (error) {}
     }
     const url = `${settings.apis.docstore.url}/project/${project_id}/ranges`
     return request.get(
@@ -98,7 +98,7 @@ const DocstoreManager = {
         timeout: TIMEOUT,
         json: true
       },
-      function(error, res, docs) {
+      function (error, res, docs) {
         if (error != null) {
           return callback(error)
         }
@@ -123,7 +123,7 @@ const DocstoreManager = {
       options = {}
     }
     if (callback == null) {
-      callback = function(error, lines, rev, version) {}
+      callback = function (error, lines, rev, version) {}
     }
     if (typeof options === 'function') {
       callback = options
@@ -139,7 +139,7 @@ const DocstoreManager = {
         timeout: TIMEOUT,
         json: true
       },
-      function(error, res, doc) {
+      function (error, res, doc) {
         if (error != null) {
           return callback(error)
         }
@@ -172,7 +172,7 @@ const DocstoreManager = {
 
   updateDoc(project_id, doc_id, lines, version, ranges, callback) {
     if (callback == null) {
-      callback = function(error, modified, rev) {}
+      callback = function (error, modified, rev) {}
     }
     const url = `${settings.apis.docstore.url}/project/${project_id}/doc/${doc_id}`
     return request.post(
@@ -185,7 +185,7 @@ const DocstoreManager = {
           ranges
         }
       },
-      function(error, res, result) {
+      function (error, res, result) {
         if (error != null) {
           return callback(error)
         }
@@ -225,7 +225,7 @@ const DocstoreManager = {
     const url = `${settings.apis.docstore.url}/project/${project_id}/${method}`
     logger.log({ project_id }, `calling ${method} for project in docstore`)
     // use default timeout for archiving/unarchiving/destroying
-    request.post(url, function(err, res, docs) {
+    request.post(url, function (err, res, docs) {
       if (err != null) {
         logger.warn(
           { err, project_id },

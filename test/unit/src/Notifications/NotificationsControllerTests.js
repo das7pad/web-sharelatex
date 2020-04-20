@@ -20,11 +20,11 @@ const modulePath = require('path').join(
   '../../../../app/src/Features/Notifications/NotificationsController'
 )
 
-describe('NotificationsController', function() {
+describe('NotificationsController', function () {
   const user_id = '123nd3ijdks'
   const notification_id = '123njdskj9jlk'
 
-  beforeEach(function() {
+  beforeEach(function () {
     this.handler = {
       getUserNotifications: sinon.stub().callsArgWith(1),
       markAsRead: sinon.stub().callsArgWith(2)
@@ -66,13 +66,13 @@ describe('NotificationsController', function() {
     }))
   })
 
-  it('should ask the handler for all unread notifications', function(done) {
+  it('should ask the handler for all unread notifications', function (done) {
     const allNotifications = [{ _id: notification_id, user_id }]
     this.handler.getUserNotifications = sinon
       .stub()
       .callsArgWith(1, null, allNotifications)
     return this.controller.getAllUnreadNotifications(this.req, {
-      send: body => {
+      send: (body) => {
         body.should.equal(allNotifications)
         this.handler.getUserNotifications.calledWith(user_id).should.equal(true)
         return done()
@@ -80,7 +80,7 @@ describe('NotificationsController', function() {
     })
   })
 
-  it('should send a delete request when a delete has been received to mark a notification', function(done) {
+  it('should send a delete request when a delete has been received to mark a notification', function (done) {
     return this.controller.markNotificationAsRead(this.req, {
       send: () => {
         this.handler.markAsRead

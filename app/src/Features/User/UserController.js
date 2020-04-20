@@ -32,7 +32,9 @@ async function ensureAffiliation(user) {
     return
   }
 
-  const flaggedEmails = user.emails.filter(email => email.affiliationUnchecked)
+  const flaggedEmails = user.emails.filter(
+    (email) => email.affiliationUnchecked
+  )
   if (flaggedEmails.length === 0) {
     return
   }
@@ -96,7 +98,7 @@ const UserController = {
         UserDeleter.deleteUser(
           userId,
           { deleterUser: user, ipAddress: req.ip },
-          err => {
+          (err) => {
             if (err) {
               const errorData = {
                 message: 'error while deleting user account',
@@ -121,7 +123,7 @@ const UserController = {
             if (typeof req.logout === 'function') {
               req.logout()
             }
-            req.session.destroy(err => {
+            req.session.destroy((err) => {
               if (err != null) {
                 logger.warn({ err }, 'error destorying session')
                 return next(err)
@@ -141,7 +143,7 @@ const UserController = {
       if (err != null) {
         return next(err)
       }
-      NewsletterManager.unsubscribe(user, err => {
+      NewsletterManager.unsubscribe(user, (err) => {
         if (err != null) {
           logger.warn(
             { err, user },
@@ -207,7 +209,7 @@ const UserController = {
         user.ace.lineHeight = req.body.lineHeight
       }
 
-      user.save(err => {
+      user.save((err) => {
         if (err != null) {
           return next(err)
         }
@@ -231,7 +233,7 @@ const UserController = {
           res.sendStatus(400)
         } else {
           // update the user email
-          UserUpdater.changeEmailAddress(userId, newEmail, err => {
+          UserUpdater.changeEmailAddress(userId, newEmail, (err) => {
             if (err) {
               const errorData = {
                 message: 'problem updaing users email address',
@@ -266,7 +268,7 @@ const UserController = {
                 first_name: user.first_name,
                 last_name: user.last_name
               })
-              UserHandler.populateTeamInvites(user, err => {
+              UserHandler.populateTeamInvites(user, (err) => {
                 // need to refresh this in the background
                 if (err != null) {
                   logger.err({ err }, 'error populateTeamInvites')
@@ -288,7 +290,7 @@ const UserController = {
     if (typeof req.logout === 'function') {
       req.logout()
     } // passport logout
-    req.session.destroy(err => {
+    req.session.destroy((err) => {
       if (err) {
         logger.warn({ err }, 'error destorying session')
         return cb(err)
@@ -307,7 +309,7 @@ const UserController = {
       : undefined
     const redirectUrl = requestedRedirect || '/login'
 
-    UserController.doLogout(req, err => {
+    UserController.doLogout(req, (err) => {
       if (err != null) {
         return next(err)
       }
@@ -317,7 +319,7 @@ const UserController = {
 
   expireDeletedUser(req, res, next) {
     const userId = req.params.userId
-    UserDeleter.expireDeletedUser(userId, error => {
+    UserDeleter.expireDeletedUser(userId, (error) => {
       if (error) {
         return next(error)
       }
@@ -327,7 +329,7 @@ const UserController = {
   },
 
   expireDeletedUsersAfterDuration(req, res, next) {
-    UserDeleter.expireDeletedUsersAfterDuration(error => {
+    UserDeleter.expireDeletedUsersAfterDuration((error) => {
       if (error) {
         return next(error)
       }
@@ -358,7 +360,7 @@ const UserController = {
   clearSessions(req, res, next) {
     metrics.inc('user.clear-sessions')
     const user = AuthenticationController.getSessionUser(req)
-    UserSessionsManager.revokeAllUserSessions(user, [req.sessionID], err => {
+    UserSessionsManager.revokeAllUserSessions(user, [req.sessionID], (err) => {
       if (err != null) {
         return next(err)
       }
@@ -409,7 +411,7 @@ const UserController = {
         AuthenticationManager.setUserPassword(
           user._id,
           req.body.newPassword1,
-          err => {
+          (err) => {
             if (err) {
               return res.status(500).json(internalError)
             }
@@ -417,7 +419,7 @@ const UserController = {
             EmailHandler.sendEmail(
               'passwordChanged',
               { to: user.email },
-              err => {
+              (err) => {
                 if (err) {
                   logger.warn(err)
                 }
@@ -426,7 +428,7 @@ const UserController = {
             UserSessionsManager.revokeAllUserSessions(
               user,
               [req.sessionID],
-              err => {
+              (err) => {
                 if (err != null) {
                   return res.status(500).json(internalError)
                 }

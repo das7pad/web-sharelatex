@@ -41,7 +41,7 @@ module.exports = LimitationsManager = {
   },
 
   allowedNumberOfCollaboratorsForUser(user_id, callback) {
-    return UserGetter.getUser(user_id, { features: 1 }, function(error, user) {
+    return UserGetter.getUser(user_id, { features: 1 }, function (error, user) {
       if (error != null) {
         return callback(error)
       }
@@ -55,7 +55,7 @@ module.exports = LimitationsManager = {
 
   canAddXCollaborators(project_id, x_collaborators, callback) {
     if (callback == null) {
-      callback = function(error, allowed) {}
+      callback = function (error, allowed) {}
     }
     return this.allowedNumberOfCollaboratorsInProject(
       project_id,
@@ -94,7 +94,7 @@ module.exports = LimitationsManager = {
 
   hasPaidSubscription(user, callback) {
     if (callback == null) {
-      callback = function(err, hasSubscriptionOrIsMember) {}
+      callback = function (err, hasSubscriptionOrIsMember) {}
     }
     return this.userHasV2Subscription(
       user,
@@ -132,9 +132,9 @@ module.exports = LimitationsManager = {
 
   userHasV2Subscription(user, callback) {
     if (callback == null) {
-      callback = function(err, hasSubscription, subscription) {}
+      callback = function (err, hasSubscription, subscription) {}
     }
-    return SubscriptionLocator.getUsersSubscription(user._id, function(
+    return SubscriptionLocator.getUsersSubscription(user._id, function (
       err,
       subscription
     ) {
@@ -152,7 +152,7 @@ module.exports = LimitationsManager = {
 
   userHasV1OrV2Subscription(user, callback) {
     if (callback == null) {
-      callback = function(err, hasSubscription) {}
+      callback = function (err, hasSubscription) {}
     }
     return this.userHasV2Subscription(user, (err, hasV2Subscription) => {
       if (err != null) {
@@ -175,9 +175,9 @@ module.exports = LimitationsManager = {
 
   userIsMemberOfGroupSubscription(user, callback) {
     if (callback == null) {
-      callback = function(error, isMember, subscriptions) {}
+      callback = function (error, isMember, subscriptions) {}
     }
-    return SubscriptionLocator.getMemberSubscriptions(user._id, function(
+    return SubscriptionLocator.getMemberSubscriptions(user._id, function (
       err,
       subscriptions
     ) {
@@ -193,9 +193,9 @@ module.exports = LimitationsManager = {
 
   userHasV1Subscription(user, callback) {
     if (callback == null) {
-      callback = function(error, hasV1Subscription) {}
+      callback = function (error, hasV1Subscription) {}
     }
-    return V1SubscriptionManager.getSubscriptionsFromV1(user._id, function(
+    return V1SubscriptionManager.getSubscriptionsFromV1(user._id, function (
       err,
       v1Subscription
     ) {
@@ -217,9 +217,9 @@ module.exports = LimitationsManager = {
 
   hasGroupMembersLimitReached(subscriptionId, callback) {
     if (callback == null) {
-      callback = function(err, limitReached, subscription) {}
+      callback = function (err, limitReached, subscription) {}
     }
-    return SubscriptionLocator.getSubscription(subscriptionId, function(
+    return SubscriptionLocator.getSubscription(subscriptionId, function (
       err,
       subscription
     ) {

@@ -10,8 +10,8 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['./snippets/Environments'], function(Environments) {
-  let staticSnippets = Array.from(Environments.withoutSnippets).map(env => ({
+define(['./snippets/Environments'], function (Environments) {
+  let staticSnippets = Array.from(Environments.withoutSnippets).map((env) => ({
     caption: `\\begin{${env}}...`,
     snippet: `\
 \\begin{${env}}
@@ -129,7 +129,7 @@ $3
   }
   staticSnippets.push(documentSnippet)
 
-  const parseCustomEnvironments = function(text) {
+  const parseCustomEnvironments = function (text) {
     let match
     const re = /^\\newenvironment{(\w+)}.*$/gm
     const result = []
@@ -144,7 +144,7 @@ $3
     return result
   }
 
-  const parseBeginCommands = function(text) {
+  const parseBeginCommands = function (text) {
     let match
     const re = /^\\begin{(\w+)}.*\n([\t ]*).*$/gm
     const result = []
@@ -164,12 +164,12 @@ $3
     return result
   }
 
-  const hasDocumentEnvironment = function(text) {
+  const hasDocumentEnvironment = function (text) {
     const re = /^\\begin{document}/m
     return re.exec(text) !== null
   }
 
-  const hasBibliographyEnvironment = function(text) {
+  const hasBibliographyEnvironment = function (text) {
     const re = /^\\begin{thebibliography}/m
     return re.exec(text) !== null
   }
@@ -208,7 +208,7 @@ $3
       const parsedItems = _.values(parsedItemsMap)
       const snippets = staticSnippets
         .concat(
-          parsedItems.map(item => ({
+          parsedItems.map((item) => ({
             caption: `\\begin{${item.name}}...`,
             snippet: `\
 \\begin{${item.name}}
@@ -222,7 +222,7 @@ ${item.whitespace || ''}$0
           // arguably these `end` commands shouldn't be here, as they're not snippets
           // but this is where we have access to the `begin` environment names
           // *shrug*
-          parsedItems.map(item => ({
+          parsedItems.map((item) => ({
             caption: `\\end{${item.name}}`,
             value: `\\end{${item.name}}`,
             meta: 'env'

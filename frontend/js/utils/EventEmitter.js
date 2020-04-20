@@ -14,7 +14,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define([], function() {
+define([], function () {
   // Simple event emitter implementation, but has a slightly unusual API for
   // removing specific listeners. If a specific listener needs to be removed
   // (instead of all listeners), then it needs to use a "namespace":
@@ -69,7 +69,7 @@ define([], function() {
       if (!this.events) {
         this.events = {}
       }
-      return Array.from(this.events[event] || []).map(callback =>
+      return Array.from(this.events[event] || []).map((callback) =>
         callback.callback(...Array.from(args || []))
       )
     }

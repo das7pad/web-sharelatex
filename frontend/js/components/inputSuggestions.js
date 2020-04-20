@@ -11,22 +11,22 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../base'], function(App) {
-  const inputSuggestionsController = function($scope, $element, $attrs, Keys) {
+define(['../base'], function (App) {
+  const inputSuggestionsController = function ($scope, $element, $attrs, Keys) {
     const ctrl = this
     ctrl.showHint = false
     ctrl.hasFocus = false
-    ctrl.handleFocus = function() {
+    ctrl.handleFocus = function () {
       ctrl.hasFocus = true
       return (ctrl.suggestion = null)
     }
-    ctrl.handleBlur = function() {
+    ctrl.handleBlur = function () {
       ctrl.showHint = false
       ctrl.hasFocus = false
       ctrl.suggestion = null
       return ctrl.onBlur()
     }
-    ctrl.handleKeyDown = function($event) {
+    ctrl.handleKeyDown = function ($event) {
       if (
         ($event.which === Keys.TAB || $event.which === Keys.ENTER) &&
         ctrl.suggestion != null &&
@@ -38,13 +38,13 @@ define(['../base'], function(App) {
       ctrl.suggestion = null
       return (ctrl.showHint = false)
     }
-    $scope.$watch('$ctrl.localNgModel', function(newVal, oldVal) {
+    $scope.$watch('$ctrl.localNgModel', function (newVal, oldVal) {
       if (ctrl.hasFocus && newVal !== oldVal) {
         ctrl.suggestion = null
         ctrl.showHint = false
         return ctrl
           .getSuggestion({ userInput: newVal })
-          .then(function(suggestion) {
+          .then(function (suggestion) {
             if (suggestion != null && newVal === ctrl.localNgModel) {
               ctrl.showHint = true
               return (ctrl.suggestion = suggestion.replace(newVal, ''))

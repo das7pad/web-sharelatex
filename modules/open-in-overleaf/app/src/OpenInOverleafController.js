@@ -53,14 +53,14 @@ module.exports = OpenInOverleafController = {
     logger.log({ user: user_id }, 'creating project from snippet')
     var user_id = AuthenticationController.getLoggedInUserId(req)
 
-    const sendResponse = function(error, project) {
+    const sendResponse = function (error, project) {
       if (error != null) {
         return next(error)
       }
       return OpenInOverleafController._sendResponse(req, res, project)
     }
 
-    return OpenInOverleafController._populateSnippetFromRequest(req, function(
+    return OpenInOverleafController._populateSnippetFromRequest(req, function (
       err,
       snippet
     ) {
@@ -93,12 +93,12 @@ module.exports = OpenInOverleafController = {
 
   _createProjectFromPostedSnippet(user_id, snippet, callback) {
     if (callback == null) {
-      callback = function(error, project) {}
+      callback = function (error, project) {}
     }
     const content = OpenInOverleafHelper.getDocumentLinesFromSnippet(snippet)
     return async.waterfall(
       [
-        function(cb) {
+        function (cb) {
           const projectName =
             typeof snippet.snip_name === 'string'
               ? snippet.snip_name
@@ -121,14 +121,14 @@ module.exports = OpenInOverleafController = {
           OpenInOverleafHelper.setCompilerForProject(
             project,
             snippet.engine,
-            err => cb(err, project)
+            (err) => cb(err, project)
           ),
-        function(project, cb) {
+        function (project, cb) {
           if (snippet.brandVariationId != null) {
             return OpenInOverleafHelper.setProjectBrandVariationFromId(
               project,
               snippet.brandVariationId,
-              function(err) {
+              function (err) {
                 if (err != null) {
                   return cb(err)
                 }
@@ -146,11 +146,11 @@ module.exports = OpenInOverleafController = {
 
   _createProjectFromFileList(user_id, snippet, callback) {
     if (callback == null) {
-      callback = function(error, project) {}
+      callback = function (error, project) {}
     }
     return async.waterfall(
       [
-        cb =>
+        (cb) =>
           ProjectDetailsHandler.generateUniqueName(
             user_id,
             ProjectDetailsHandler.fixProjectName(
@@ -168,14 +168,14 @@ module.exports = OpenInOverleafController = {
           OpenInOverleafHelper.populateProjectFromFileList(
             project,
             snippet,
-            err => cb(err, project)
+            (err) => cb(err, project)
           ),
-        function(project, cb) {
+        function (project, cb) {
           if (snippet.brandVariationId != null) {
             return OpenInOverleafHelper.setProjectBrandVariationFromId(
               project,
               snippet.brandVariationId,
-              function(err) {
+              function (err) {
                 if (err != null) {
                   return cb(err)
                 }
@@ -193,11 +193,11 @@ module.exports = OpenInOverleafController = {
 
   _createProjectFromZipArchive(user_id, snippet, callback) {
     if (callback == null) {
-      callback = function(error, project) {}
+      callback = function (error, project) {}
     }
     return async.waterfall(
       [
-        function(cb) {
+        function (cb) {
           const projectName =
             typeof snippet.snip_name === 'string'
               ? snippet.snip_name
@@ -206,7 +206,7 @@ module.exports = OpenInOverleafController = {
             user_id,
             projectName,
             snippet.projectFile,
-            function(err, project) {
+            function (err, project) {
               if (err != null) {
                 return cb(new OpenInOverleafErrors.ZipExtractError())
               }
@@ -214,12 +214,12 @@ module.exports = OpenInOverleafController = {
             }
           )
         },
-        function(project, cb) {
+        function (project, cb) {
           if (snippet.publisherSlug != null) {
             return OpenInOverleafHelper.setProjectBrandVariationFromSlug(
               project,
               snippet.publisherSlug,
-              function(err) {
+              function (err) {
                 if (err != null) {
                   return cb(err)
                 }
@@ -230,7 +230,7 @@ module.exports = OpenInOverleafController = {
             return OpenInOverleafHelper.setProjectBrandVariationFromId(
               project,
               snippet.brandVariationId,
-              function(err) {
+              function (err) {
                 if (err != null) {
                   return cb(err)
                 }
@@ -248,14 +248,14 @@ module.exports = OpenInOverleafController = {
 
   _populateSnippetFromRequest(req, cb) {
     if (cb == null) {
-      cb = function(error, result) {}
+      cb = function (error, result) {}
     }
     const comment = OpenInOverleafController._getMainFileCommentFromSnipRequest(
       req
     )
     return OpenInOverleafController._getSnippetContentsFromRequest(
       req,
-      function(error, snippet) {
+      function (error, snippet) {
         if (error != null) {
           return cb(error)
         }
@@ -284,7 +284,7 @@ module.exports = OpenInOverleafController = {
 
   _getSnippetContentsFromRequest(req, cb) {
     if (cb == null) {
-      cb = function(error, snippet) {}
+      cb = function (error, snippet) {}
     }
     const snippet = {}
     if (req.body.snip_name != null) {

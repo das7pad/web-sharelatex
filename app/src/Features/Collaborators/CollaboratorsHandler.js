@@ -39,7 +39,7 @@ async function removeUserFromProject(projectId, userId) {
         'ARCHIVE'
       )
 
-      archived = archived.filter(id => id.toString() !== userId.toString())
+      archived = archived.filter((id) => id.toString() !== userId.toString())
 
       await Project.updateOne(
         { _id: projectId },
@@ -108,7 +108,7 @@ async function addUserIdToProject(
   let level
   let existingUsers = project.collaberator_refs || []
   existingUsers = existingUsers.concat(project.readOnly_refs || [])
-  existingUsers = existingUsers.map(u => u.toString())
+  existingUsers = existingUsers.map((u) => u.toString())
   if (existingUsers.includes(userId.toString())) {
     return // User already in Project
   }
@@ -129,7 +129,7 @@ async function addUserIdToProject(
   await Project.updateOne({ _id: projectId }, { $addToSet: level }).exec()
 
   // Flush to TPDS in background to add files to collaborator's Dropbox
-  TpdsProjectFlusher.promises.flushProjectToTpds(projectId).catch(err => {
+  TpdsProjectFlusher.promises.flushProjectToTpds(projectId).catch((err) => {
     logger.error(
       { err, projectId, userId },
       'error flushing to TPDS after adding collaborator'
@@ -149,7 +149,7 @@ async function transferProjects(fromUserId, toUserId) {
     },
     { _id: 1 }
   ).exec()
-  const projectIds = projects.map(p => p._id)
+  const projectIds = projects.map((p) => p._id)
   logger.log({ projectIds, fromUserId, toUserId }, 'transferring projects')
 
   await Project.updateMany(
@@ -184,7 +184,7 @@ async function transferProjects(fromUserId, toUserId) {
   ).exec()
 
   // Flush in background, no need to block on this
-  _flushProjects(projectIds).catch(err => {
+  _flushProjects(projectIds).catch((err) => {
     logger.err(
       { err, projectIds, fromUserId, toUserId },
       'error flushing tranferred projects to TPDS'

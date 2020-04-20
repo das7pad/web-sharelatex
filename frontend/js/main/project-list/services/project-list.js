@@ -1,7 +1,7 @@
 /* eslint-disable
     camelcase
 */
-define(['../../../base'], App =>
+define(['../../../base'], (App) =>
   App.service('ProjectListService', () => ({
     getOwnerName(project) {
       if (project.accessLevel === 'owner') {
@@ -19,7 +19,7 @@ define(['../../../base'], App =>
       } else if (user) {
         const { first_name, last_name, email } = user
         if (first_name || last_name) {
-          return [first_name, last_name].filter(n => n != null).join(' ')
+          return [first_name, last_name].filter((n) => n != null).join(' ')
         } else if (email) {
           return email
         } else {

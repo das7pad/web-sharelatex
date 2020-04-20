@@ -41,45 +41,45 @@ module.exports = ReferencesHandler = {
 
   _findBibFileIds(project) {
     const ids = []
-    var _process = function(folder) {
-      _.each(folder.fileRefs || [], function(file) {
+    var _process = function (folder) {
+      _.each(folder.fileRefs || [], function (file) {
         if (
-          __guard__(file != null ? file.name : undefined, x1 =>
+          __guard__(file != null ? file.name : undefined, (x1) =>
             x1.match(/^.*\.bib$/)
           )
         ) {
           return ids.push(file._id)
         }
       })
-      return _.each(folder.folders || [], folder => _process(folder))
+      return _.each(folder.folders || [], (folder) => _process(folder))
     }
-    _.each(project.rootFolder || [], rootFolder => _process(rootFolder))
+    _.each(project.rootFolder || [], (rootFolder) => _process(rootFolder))
     return ids
   },
 
   _findBibDocIds(project) {
     const ids = []
-    var _process = function(folder) {
-      _.each(folder.docs || [], function(doc) {
+    var _process = function (folder) {
+      _.each(folder.docs || [], function (doc) {
         if (
-          __guard__(doc != null ? doc.name : undefined, x1 =>
+          __guard__(doc != null ? doc.name : undefined, (x1) =>
             x1.match(/^.*\.bib$/)
           )
         ) {
           return ids.push(doc._id)
         }
       })
-      return _.each(folder.folders || [], folder => _process(folder))
+      return _.each(folder.folders || [], (folder) => _process(folder))
     }
-    _.each(project.rootFolder || [], rootFolder => _process(rootFolder))
+    _.each(project.rootFolder || [], (rootFolder) => _process(rootFolder))
     return ids
   },
 
   _isFullIndex(project, callback) {
     if (callback == null) {
-      callback = function(err, result) {}
+      callback = function (err, result) {}
     }
-    return UserGetter.getUser(project.owner_ref, { features: true }, function(
+    return UserGetter.getUser(project.owner_ref, { features: true }, function (
       err,
       owner
     ) {
@@ -97,12 +97,12 @@ module.exports = ReferencesHandler = {
 
   indexAll(projectId, callback) {
     if (callback == null) {
-      callback = function(err, data) {}
+      callback = function (err, data) {}
     }
     return ProjectGetter.getProject(
       projectId,
       { rootFolder: true, owner_ref: 1 },
-      function(err, project) {
+      function (err, project) {
         if (err) {
           logger.warn({ err, projectId }, 'error finding project')
           return callback(err)
@@ -123,12 +123,12 @@ module.exports = ReferencesHandler = {
 
   index(projectId, docIds, callback) {
     if (callback == null) {
-      callback = function(err, data) {}
+      callback = function (err, data) {}
     }
     return ProjectGetter.getProject(
       projectId,
       { rootFolder: true, owner_ref: 1 },
-      function(err, project) {
+      function (err, project) {
         if (err) {
           logger.warn({ err, projectId }, 'error finding project')
           return callback(err)
@@ -148,7 +148,7 @@ module.exports = ReferencesHandler = {
     if (!Features.hasFeature('references')) {
       return callback()
     }
-    return ReferencesHandler._isFullIndex(project, function(err, isFullIndex) {
+    return ReferencesHandler._isFullIndex(project, function (err, isFullIndex) {
       if (err) {
         logger.warn(
           { err, projectId },
@@ -161,10 +161,10 @@ module.exports = ReferencesHandler = {
         'flushing docs to mongo before calling references service'
       )
       return Async.series(
-        docIds.map(docId => cb =>
+        docIds.map((docId) => (cb) =>
           DocumentUpdaterHandler.flushDocToMongo(projectId, docId, cb)
         ),
-        function(err) {
+        function (err) {
           // continue
           if (err) {
             logger.warn(
@@ -173,10 +173,10 @@ module.exports = ReferencesHandler = {
             )
             return callback(err)
           }
-          const bibDocUrls = docIds.map(docId =>
+          const bibDocUrls = docIds.map((docId) =>
             ReferencesHandler._buildDocUrl(projectId, docId)
           )
-          const bibFileUrls = fileIds.map(fileId =>
+          const bibFileUrls = fileIds.map((fileId) =>
             ReferencesHandler._buildFileUrl(projectId, fileId)
           )
           const allUrls = bibDocUrls.concat(bibFileUrls)
@@ -188,7 +188,7 @@ module.exports = ReferencesHandler = {
                 fullIndex: isFullIndex
               }
             },
-            function(err, res, data) {
+            function (err, res, data) {
               if (err) {
                 logger.warn(
                   { err, projectId },

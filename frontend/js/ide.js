@@ -61,7 +61,7 @@ define([
   './main/exposed-settings',
   './main/system-messages',
   '../../modules/modules-ide'
-], function(
+], function (
   App,
   FileTreeManager,
   ConnectionManager,
@@ -77,7 +77,7 @@ define([
   ReviewPanelManager,
   SafariScrollPatcher
 ) {
-  App.controller('IdeController', function(
+  App.controller('IdeController', function (
     $scope,
     $timeout,
     ide,
@@ -90,9 +90,9 @@ define([
     // Don't freak out if we're already in an apply callback
     let err, pdfLayout, userAgent
     $scope.$originalApply = $scope.$apply
-    $scope.$apply = function(fn) {
+    $scope.$apply = function (fn) {
       if (fn == null) {
-        fn = function() {}
+        fn = function () {}
       }
       const phase = this.$root.$$phase
       if (phase === '$apply' || phase === '$digest') {
@@ -136,7 +136,7 @@ define([
 
     $scope.chat = {}
 
-    ide.toggleReviewPanel = $scope.toggleReviewPanel = function() {
+    ide.toggleReviewPanel = $scope.toggleReviewPanel = function () {
       if (!$scope.project.features.trackChangesVisible) {
         return
       }
@@ -146,18 +146,18 @@ define([
       })
     }
 
-    $scope.$watch('ui.reviewPanelOpen', function(value) {
+    $scope.$watch('ui.reviewPanelOpen', function (value) {
       if (value != null) {
         return localStorage(`ui.reviewPanelOpen.${window.project_id}`, value)
       }
     })
 
-    $scope.$on('layout:pdf:resize', function(_, layoutState) {
+    $scope.$on('layout:pdf:resize', function (_, layoutState) {
       $scope.ui.pdfHidden = layoutState.east.initClosed
       return ($scope.ui.pdfWidth = layoutState.east.size)
     })
 
-    $scope.$watch('ui.view', function(newView, oldView) {
+    $scope.$watch('ui.view', function (newView, oldView) {
       if (newView !== oldView) {
         $scope.$broadcast('layout:flat-screen:toggle')
       }
@@ -166,19 +166,19 @@ define([
       }
     })
 
-    $scope.$watch('ui.chatOpen', function(isOpen) {
+    $scope.$watch('ui.chatOpen', function (isOpen) {
       if (isOpen) {
         return eventTracking.sendMBOnce('ide-open-chat-once')
       }
     })
 
-    $scope.$watch('ui.leftMenuShown', function(isOpen) {
+    $scope.$watch('ui.leftMenuShown', function (isOpen) {
       if (isOpen) {
         return eventTracking.sendMBOnce('ide-open-left-menu-once')
       }
     })
 
-    $scope.trackHover = feature =>
+    $scope.trackHover = (feature) =>
       eventTracking.sendMBOnce(`ide-hover-${feature}-once`)
     // End of tracking code.
 
@@ -212,7 +212,7 @@ define([
     ide.metadataManager = new MetadataManager(ide, $scope, metadata)
 
     let inited = false
-    $scope.$on('project:joined', function() {
+    $scope.$on('project:joined', function () {
       if (inited) {
         return
       }
@@ -220,7 +220,7 @@ define([
       if (
         __guard__(
           $scope != null ? $scope.project : undefined,
-          x => x.deletedByExternalDataSource
+          (x) => x.deletedByExternalDataSource
         )
       ) {
         ide.showGenericMessageModal(
@@ -232,7 +232,7 @@ If the project has been renamed please look in your project list for a new proje
 `
         )
       }
-      return $timeout(function() {
+      return $timeout(function () {
         if ($scope.permissions.write) {
           let _labelsInitialLoadDone
           ide.metadataManager.loadProjectMetaFromServer()
@@ -245,7 +245,7 @@ If the project has been renamed please look in your project list for a new proje
     // and broadcast a message. This is a good event to listen for
     // if you want to wait until the ide is fully loaded and initialized
     let _loaded = false
-    $scope.$on('doc:opened', function() {
+    $scope.$on('doc:opened', function () {
       if (_loaded) {
         return
       }
@@ -276,7 +276,7 @@ If the project has been renamed please look in your project list for a new proje
       'vibrant_ink'
     ]
     $scope.darkTheme = false
-    $scope.$watch('settings.editorTheme', function(theme) {
+    $scope.$watch('settings.editorTheme', function (theme) {
       if (Array.from(DARK_THEMES).includes(theme)) {
         return ($scope.darkTheme = true)
       } else {
@@ -288,13 +288,13 @@ If the project has been renamed please look in your project list for a new proje
 
     ide.browserIsSafari = false
 
-    $scope.switchToFlatLayout = function(view) {
+    $scope.switchToFlatLayout = function (view) {
       $scope.ui.pdfLayout = 'flat'
       $scope.ui.view = view
       return ide.localStorage('pdf.layout', 'flat')
     }
 
-    $scope.switchToSideBySideLayout = function(view) {
+    $scope.switchToSideBySideLayout = function (view) {
       $scope.ui.pdfLayout = 'sideBySide'
       $scope.ui.view = view
       return localStorage('pdf.layout', 'split')
@@ -350,12 +350,12 @@ If the project has been renamed please look in your project list for a new proje
         typeof location !== 'undefined' && location !== null
           ? location.search
           : undefined,
-        x1 => x1.match(/^\?ft=(\w+)$/)
+        (x1) => x1.match(/^\?ft=(\w+)$/)
       ),
-      x => x[1]
+      (x) => x[1]
     )
 
-    return ide.socket.on('project:publicAccessLevel:changed', data => {
+    return ide.socket.on('project:publicAccessLevel:changed', (data) => {
       if (data.newAccessLevel != null) {
         ide.$scope.project.publicAccesLevel = data.newAccessLevel
         return $scope.$digest()

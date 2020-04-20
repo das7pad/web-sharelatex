@@ -69,7 +69,7 @@ function removeInnerMarks(cm, preText, selection) {
   const { state } = cm.getTokenAt(selectionEnd, true)
 
   // Find marks that are within the selection of the same kind and remove them
-  _.filter(state.marks, mark => {
+  _.filter(state.marks, (mark) => {
     const isRemovableMark = _.includes(MARKS_WITH_SPECIAL_HANDLING, mark.kind)
     const isMarkSameKindAsWrap = preText.match(mark.kind)
     const withinSelection = markEntirelyWithinSelection(mark, selection)
@@ -79,7 +79,7 @@ function removeInnerMarks(cm, preText, selection) {
     // Marks must be removed in reverse order so that character positions are
     // updated correctly for each removal
     .reverse()
-    .forEach(mark => removeMark(cm, mark))
+    .forEach((mark) => removeMark(cm, mark))
 }
 
 /**
@@ -92,14 +92,16 @@ function removeInnerMarks(cm, preText, selection) {
  */
 function withinHeaderMark(openMarks, preText) {
   return Boolean(
-    _.find(openMarks, mark => {
+    _.find(openMarks, (mark) => {
       // Determine if the open mark is a header & can have nested inner marks
       const marksDisallowedInHeaders = HEADER_MARKS[mark.kind]
       if (!marksDisallowedInHeaders) return false
 
       // Determine if attempting to wrap in a mark which is un-nestable
       return Boolean(
-        _.find(marksDisallowedInHeaders, innerMark => preText.match(innerMark))
+        _.find(marksDisallowedInHeaders, (innerMark) =>
+          preText.match(innerMark)
+        )
       )
     })
   )
@@ -121,7 +123,7 @@ function withinNestedBoldOrItalicMark(openMarks, preText) {
   openMarks.pop()
 
   return Boolean(
-    _.find(openMarks, mark => {
+    _.find(openMarks, (mark) => {
       const isWithinBoldOrItalic = _.includes(BOLD_OR_ITALIC_MARKS, mark.kind)
       if (!isWithinBoldOrItalic) return false
 
@@ -364,7 +366,7 @@ function wrap(cm, pre, post, wrapWholeLine = false) {
  */
 function prependLinesWithItem(cm) {
   const selectedLines = cm.getSelection().split('\n')
-  const prependedLines = _.map(selectedLines, line => `\\item ${line}`)
+  const prependedLines = _.map(selectedLines, (line) => `\\item ${line}`)
 
   // +wrap argument used by CM to merge any following replaceRange with
   // same +wrap argument into one history change. Note: The next history

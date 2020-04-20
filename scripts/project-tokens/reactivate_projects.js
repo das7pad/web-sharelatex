@@ -9,27 +9,34 @@ Async.eachLimit(
   projectIds,
   5,
   (projectId, cb) => {
-    ProjectDetailsHandler.setPublicAccessLevel(projectId, 'tokenBased', err => {
-      if (err) {
-        return cb(err)
-      }
-      console.log(
-        `>> Set public-access-level to tokenBased for project ${projectId}`
-      )
-      ProjectDetailsHandler.ensureTokensArePresent(projectId, (err, tokens) => {
+    ProjectDetailsHandler.setPublicAccessLevel(
+      projectId,
+      'tokenBased',
+      (err) => {
         if (err) {
           return cb(err)
         }
         console.log(
-          `>> Re-generated tokens for project ${projectId}, ${JSON.stringify(
-            tokens
-          )}`
+          `>> Set public-access-level to tokenBased for project ${projectId}`
         )
-        cb()
-      })
-    })
+        ProjectDetailsHandler.ensureTokensArePresent(
+          projectId,
+          (err, tokens) => {
+            if (err) {
+              return cb(err)
+            }
+            console.log(
+              `>> Re-generated tokens for project ${projectId}, ${JSON.stringify(
+                tokens
+              )}`
+            )
+            cb()
+          }
+        )
+      }
+    )
   },
-  err => {
+  (err) => {
     if (err) {
       throw err
     }

@@ -10,8 +10,8 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../base'], App =>
-  App.controller('TeamInviteController', function($scope, $http) {
+define(['../../base'], (App) =>
+  App.controller('TeamInviteController', function ($scope, $http) {
     $scope.inflight = false
 
     if (hasIndividualRecurlySubscription) {
@@ -22,12 +22,12 @@ define(['../../base'], App =>
 
     $scope.keepPersonalSubscription = () => ($scope.view = 'teamInvite')
 
-    $scope.cancelPersonalSubscription = function() {
+    $scope.cancelPersonalSubscription = function () {
       $scope.inflight = true
       const request = $http.post('/user/subscription/cancel', {
         _csrf: window.csrfToken
       })
-      request.then(function() {
+      request.then(function () {
         $scope.inflight = false
         return ($scope.view = 'teamInvite')
       })
@@ -38,13 +38,13 @@ define(['../../base'], App =>
       })
     }
 
-    return ($scope.joinTeam = function() {
+    return ($scope.joinTeam = function () {
       $scope.inflight = true
       const request = $http.put(
         `/subscription/invites/${window.inviteToken}/`,
         { _csrf: window.csrfToken }
       )
-      request.then(function(response) {
+      request.then(function (response) {
         const { status } = response
         $scope.inflight = false
         $scope.view = 'inviteAccepted'

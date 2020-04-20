@@ -22,25 +22,25 @@ const logger = require('logger-sharelatex')
 module.exports = InstitutionsGetter = {
   getConfirmedAffiliations(userId, callback) {
     if (callback == null) {
-      callback = function(error, institutions) {}
+      callback = function (error, institutions) {}
     }
-    return UserGetter.getUserFullEmails(userId, function(error, emailsData) {
+    return UserGetter.getUserFullEmails(userId, function (error, emailsData) {
       if (error != null) {
         return callback(error)
       }
 
       const confirmedAffiliations = emailsData
         .filter(
-          emailData =>
+          (emailData) =>
             emailData.confirmedAt != null &&
             __guard__(
               emailData.affiliation != null
                 ? emailData.affiliation.institution
                 : undefined,
-              x => x.confirmed
+              (x) => x.confirmed
             )
         )
-        .map(emailData => emailData.affiliation)
+        .map((emailData) => emailData.affiliation)
 
       return callback(null, confirmedAffiliations)
     })
@@ -48,7 +48,7 @@ module.exports = InstitutionsGetter = {
 
   getConfirmedInstitutions(userId, callback) {
     if (callback == null) {
-      callback = function(error, institutions) {}
+      callback = function (error, institutions) {}
     }
     InstitutionsGetter.getConfirmedAffiliations(
       userId,
@@ -58,7 +58,7 @@ module.exports = InstitutionsGetter = {
         }
 
         const confirmedInstitutions = confirmedAffiliations.map(
-          confirmedAffiliation =>
+          (confirmedAffiliation) =>
             confirmedAffiliation != null
               ? confirmedAffiliation.institution
               : undefined
@@ -71,7 +71,7 @@ module.exports = InstitutionsGetter = {
 
   getManagedInstitutions(user_id, callback) {
     if (callback == null) {
-      callback = function(error, managedInstitutions) {}
+      callback = function (error, managedInstitutions) {}
     }
     return UserMembershipsHandler.getEntitiesByUser(
       UserMembershipEntityConfigs.institution,

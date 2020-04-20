@@ -25,8 +25,8 @@ const modulePath = Path.join(
   '../../../../app/src/Features/Project/ProjectCollabratecDetailsHandler'
 )
 
-describe('ProjectCollabratecDetailsHandler', function() {
-  beforeEach(function() {
+describe('ProjectCollabratecDetailsHandler', function () {
+  beforeEach(function () {
     this.projectId = ObjectId('5bea8747c7bba6012fcaceb3')
     this.userId = ObjectId('5be316a9c7f6aa03802ea8fb')
     this.userId2 = ObjectId('5c1794b3f0e89b1d1c577eca')
@@ -45,9 +45,9 @@ describe('ProjectCollabratecDetailsHandler', function() {
     return (this.callback = sinon.stub())
   })
 
-  describe('initializeCollabratecProject', function() {
-    describe('when update succeeds', function() {
-      beforeEach(function() {
+  describe('initializeCollabratecProject', function () {
+    describe('when update succeeds', function () {
+      beforeEach(function () {
         this.ProjectModel.updateOne = sinon.stub().yields()
         return this.ProjectCollabratecDetailsHandler.initializeCollabratecProject(
           this.projectId,
@@ -58,7 +58,7 @@ describe('ProjectCollabratecDetailsHandler', function() {
         )
       })
 
-      it('should update project model', function() {
+      it('should update project model', function () {
         const update = {
           $set: {
             collabratecUsers: [
@@ -78,8 +78,8 @@ describe('ProjectCollabratecDetailsHandler', function() {
       })
     })
 
-    describe('when update has error', function() {
-      beforeEach(function() {
+    describe('when update has error', function () {
+      beforeEach(function () {
         this.ProjectModel.updateOne = sinon.stub().yields('error')
         return this.ProjectCollabratecDetailsHandler.initializeCollabratecProject(
           this.projectId,
@@ -90,13 +90,13 @@ describe('ProjectCollabratecDetailsHandler', function() {
         )
       })
 
-      it('should callback with error', function() {
+      it('should callback with error', function () {
         return expect(this.callback).to.have.been.calledWith('error')
       })
     })
 
-    describe('with invalid args', function() {
-      beforeEach(function() {
+    describe('with invalid args', function () {
+      beforeEach(function () {
         this.ProjectModel.updateOne = sinon.stub()
         return this.ProjectCollabratecDetailsHandler.initializeCollabratecProject(
           'bad-project-id',
@@ -107,24 +107,24 @@ describe('ProjectCollabratecDetailsHandler', function() {
         )
       })
 
-      it('should not update', function() {
+      it('should not update', function () {
         return expect(this.ProjectModel.updateOne).not.to.have.been.called
       })
 
-      it('should callback with error', function() {
+      it('should callback with error', function () {
         return expect(this.callback.firstCall.args[0]).to.be.instanceOf(Error)
       })
     })
   })
 
-  describe('isLinkedCollabratecUserProject', function() {
-    beforeEach(function() {
+  describe('isLinkedCollabratecUserProject', function () {
+    beforeEach(function () {
       return (this.ProjectModel.findOne = sinon.stub().yields())
     })
 
-    describe('when find succeeds', function() {
-      describe('when user project found', function() {
-        beforeEach(function() {
+    describe('when find succeeds', function () {
+      describe('when user project found', function () {
+        beforeEach(function () {
           this.ProjectModel.findOne = sinon.stub().yields(null, 'project')
           return this.ProjectCollabratecDetailsHandler.isLinkedCollabratecUserProject(
             this.projectId,
@@ -133,7 +133,7 @@ describe('ProjectCollabratecDetailsHandler', function() {
           )
         })
 
-        it('should call find with project and user id', function() {
+        it('should call find with project and user id', function () {
           return expect(this.ProjectModel.findOne).to.have.been.calledWithMatch(
             {
               _id: ObjectId(this.projectId),
@@ -146,13 +146,13 @@ describe('ProjectCollabratecDetailsHandler', function() {
           )
         })
 
-        it('should callback with true', function() {
+        it('should callback with true', function () {
           return expect(this.callback).to.have.been.calledWith(null, true)
         })
       })
 
-      describe('when user project found', function() {
-        beforeEach(function() {
+      describe('when user project found', function () {
+        beforeEach(function () {
           this.ProjectModel.findOne = sinon.stub().yields(null, null)
           return this.ProjectCollabratecDetailsHandler.isLinkedCollabratecUserProject(
             this.projectId,
@@ -161,14 +161,14 @@ describe('ProjectCollabratecDetailsHandler', function() {
           )
         })
 
-        it('should callback with false', function() {
+        it('should callback with false', function () {
           return expect(this.callback).to.have.been.calledWith(null, false)
         })
       })
     })
 
-    describe('when find has error', function() {
-      beforeEach(function() {
+    describe('when find has error', function () {
+      beforeEach(function () {
         this.ProjectModel.findOne = sinon.stub().yields('error')
         return this.ProjectCollabratecDetailsHandler.isLinkedCollabratecUserProject(
           this.projectId,
@@ -177,13 +177,13 @@ describe('ProjectCollabratecDetailsHandler', function() {
         )
       })
 
-      it('should callback with error', function() {
+      it('should callback with error', function () {
         return expect(this.callback).to.have.been.calledWith('error')
       })
     })
 
-    describe('with invalid args', function() {
-      beforeEach(function() {
+    describe('with invalid args', function () {
+      beforeEach(function () {
         this.ProjectModel.findOne = sinon.stub()
         return this.ProjectCollabratecDetailsHandler.isLinkedCollabratecUserProject(
           'bad-project-id',
@@ -192,19 +192,19 @@ describe('ProjectCollabratecDetailsHandler', function() {
         )
       })
 
-      it('should not update', function() {
+      it('should not update', function () {
         return expect(this.ProjectModel.findOne).not.to.have.been.called
       })
 
-      it('should callback with error', function() {
+      it('should callback with error', function () {
         return expect(this.callback.firstCall.args[0]).to.be.instanceOf(Error)
       })
     })
   })
 
-  describe('linkCollabratecUserProject', function() {
-    describe('when update succeeds', function() {
-      beforeEach(function() {
+  describe('linkCollabratecUserProject', function () {
+    describe('when update succeeds', function () {
+      beforeEach(function () {
         this.ProjectModel.updateOne = sinon.stub().yields()
         return this.ProjectCollabratecDetailsHandler.linkCollabratecUserProject(
           this.projectId,
@@ -214,7 +214,7 @@ describe('ProjectCollabratecDetailsHandler', function() {
         )
       })
 
-      it('should update project model', function() {
+      it('should update project model', function () {
         const query = {
           _id: this.projectId,
           collabratecUsers: {
@@ -242,8 +242,8 @@ describe('ProjectCollabratecDetailsHandler', function() {
       })
     })
 
-    describe('when update has error', function() {
-      beforeEach(function() {
+    describe('when update has error', function () {
+      beforeEach(function () {
         this.ProjectModel.updateOne = sinon.stub().yields('error')
         return this.ProjectCollabratecDetailsHandler.linkCollabratecUserProject(
           this.projectId,
@@ -253,13 +253,13 @@ describe('ProjectCollabratecDetailsHandler', function() {
         )
       })
 
-      it('should callback with error', function() {
+      it('should callback with error', function () {
         return expect(this.callback).to.have.been.calledWith('error')
       })
     })
 
-    describe('with invalid args', function() {
-      beforeEach(function() {
+    describe('with invalid args', function () {
+      beforeEach(function () {
         this.ProjectModel.updateOne = sinon.stub()
         return this.ProjectCollabratecDetailsHandler.linkCollabratecUserProject(
           'bad-project-id',
@@ -269,18 +269,18 @@ describe('ProjectCollabratecDetailsHandler', function() {
         )
       })
 
-      it('should not update', function() {
+      it('should not update', function () {
         return expect(this.ProjectModel.updateOne).not.to.have.been.called
       })
 
-      it('should callback with error', function() {
+      it('should callback with error', function () {
         return expect(this.callback.firstCall.args[0]).to.be.instanceOf(Error)
       })
     })
   })
 
-  describe('setCollabratecUsers', function() {
-    beforeEach(function() {
+  describe('setCollabratecUsers', function () {
+    beforeEach(function () {
       return (this.collabratecUsers = [
         {
           user_id: this.userId,
@@ -295,8 +295,8 @@ describe('ProjectCollabratecDetailsHandler', function() {
       ])
     })
 
-    describe('when update succeeds', function() {
-      beforeEach(function() {
+    describe('when update succeeds', function () {
+      beforeEach(function () {
         this.ProjectModel.updateOne = sinon.stub().yields()
         return this.ProjectCollabratecDetailsHandler.setCollabratecUsers(
           this.projectId,
@@ -305,7 +305,7 @@ describe('ProjectCollabratecDetailsHandler', function() {
         )
       })
 
-      it('should update project model', function() {
+      it('should update project model', function () {
         const update = {
           $set: {
             collabratecUsers: this.collabratecUsers
@@ -319,8 +319,8 @@ describe('ProjectCollabratecDetailsHandler', function() {
       })
     })
 
-    describe('when update has error', function() {
-      beforeEach(function() {
+    describe('when update has error', function () {
+      beforeEach(function () {
         this.ProjectModel.updateOne = sinon.stub().yields('error')
         return this.ProjectCollabratecDetailsHandler.setCollabratecUsers(
           this.projectId,
@@ -329,13 +329,13 @@ describe('ProjectCollabratecDetailsHandler', function() {
         )
       })
 
-      it('should callback with error', function() {
+      it('should callback with error', function () {
         return expect(this.callback).to.have.been.calledWith('error')
       })
     })
 
-    describe('with invalid project_id', function() {
-      beforeEach(function() {
+    describe('with invalid project_id', function () {
+      beforeEach(function () {
         this.ProjectModel.updateOne = sinon.stub()
         return this.ProjectCollabratecDetailsHandler.setCollabratecUsers(
           'bad-project-id',
@@ -344,17 +344,17 @@ describe('ProjectCollabratecDetailsHandler', function() {
         )
       })
 
-      it('should not update', function() {
+      it('should not update', function () {
         return expect(this.ProjectModel.updateOne).not.to.have.been.called
       })
 
-      it('should callback with error', function() {
+      it('should callback with error', function () {
         return expect(this.callback.firstCall.args[0]).to.be.instanceOf(Error)
       })
     })
 
-    describe('with invalid user_id', function() {
-      beforeEach(function() {
+    describe('with invalid user_id', function () {
+      beforeEach(function () {
         this.collabratecUsers[1].user_id = 'bad-user-id'
         this.ProjectModel.updateOne = sinon.stub()
         return this.ProjectCollabratecDetailsHandler.setCollabratecUsers(
@@ -364,19 +364,19 @@ describe('ProjectCollabratecDetailsHandler', function() {
         )
       })
 
-      it('should not update', function() {
+      it('should not update', function () {
         return expect(this.ProjectModel.updateOne).not.to.have.been.called
       })
 
-      it('should callback with error', function() {
+      it('should callback with error', function () {
         return expect(this.callback.firstCall.args[0]).to.be.instanceOf(Error)
       })
     })
   })
 
-  describe('unlinkCollabratecUserProject', function() {
-    describe('when update succeeds', function() {
-      beforeEach(function() {
+  describe('unlinkCollabratecUserProject', function () {
+    describe('when update succeeds', function () {
+      beforeEach(function () {
         this.ProjectModel.updateOne = sinon.stub().yields()
         return this.ProjectCollabratecDetailsHandler.unlinkCollabratecUserProject(
           this.projectId,
@@ -385,7 +385,7 @@ describe('ProjectCollabratecDetailsHandler', function() {
         )
       })
 
-      it('should update project model', function() {
+      it('should update project model', function () {
         const query = { _id: this.projectId }
         const update = {
           $pull: {
@@ -402,8 +402,8 @@ describe('ProjectCollabratecDetailsHandler', function() {
       })
     })
 
-    describe('when update has error', function() {
-      beforeEach(function() {
+    describe('when update has error', function () {
+      beforeEach(function () {
         this.ProjectModel.updateOne = sinon.stub().yields('error')
         return this.ProjectCollabratecDetailsHandler.unlinkCollabratecUserProject(
           this.projectId,
@@ -412,13 +412,13 @@ describe('ProjectCollabratecDetailsHandler', function() {
         )
       })
 
-      it('should callback with error', function() {
+      it('should callback with error', function () {
         return expect(this.callback).to.have.been.calledWith('error')
       })
     })
 
-    describe('with invalid args', function() {
-      beforeEach(function() {
+    describe('with invalid args', function () {
+      beforeEach(function () {
         this.ProjectModel.updateOne = sinon.stub()
         return this.ProjectCollabratecDetailsHandler.unlinkCollabratecUserProject(
           'bad-project-id',
@@ -427,19 +427,19 @@ describe('ProjectCollabratecDetailsHandler', function() {
         )
       })
 
-      it('should not update', function() {
+      it('should not update', function () {
         return expect(this.ProjectModel.updateOne).not.to.have.been.called
       })
 
-      it('should callback with error', function() {
+      it('should callback with error', function () {
         return expect(this.callback.firstCall.args[0]).to.be.instanceOf(Error)
       })
     })
   })
 
-  describe('updateCollabratecUserIds', function() {
-    describe('when update succeeds', function() {
-      beforeEach(function() {
+  describe('updateCollabratecUserIds', function () {
+    describe('when update succeeds', function () {
+      beforeEach(function () {
         this.ProjectModel.updateMany = sinon.stub().yields()
         return this.ProjectCollabratecDetailsHandler.updateCollabratecUserIds(
           this.userId,
@@ -448,7 +448,7 @@ describe('ProjectCollabratecDetailsHandler', function() {
         )
       })
 
-      it('should update project model', function() {
+      it('should update project model', function () {
         return expect(this.ProjectModel.updateMany).to.have.been.calledWith(
           { 'collabratecUsers.user_id': this.userId },
           { $set: { 'collabratecUsers.$.user_id': this.userId2 } },
@@ -457,8 +457,8 @@ describe('ProjectCollabratecDetailsHandler', function() {
       })
     })
 
-    describe('when update has error', function() {
-      beforeEach(function() {
+    describe('when update has error', function () {
+      beforeEach(function () {
         this.ProjectModel.updateMany = sinon.stub().yields('error')
         return this.ProjectCollabratecDetailsHandler.updateCollabratecUserIds(
           this.userId,
@@ -467,13 +467,13 @@ describe('ProjectCollabratecDetailsHandler', function() {
         )
       })
 
-      it('should callback with error', function() {
+      it('should callback with error', function () {
         return expect(this.callback).to.have.been.calledWith('error')
       })
     })
 
-    describe('with invalid old_user_id', function() {
-      beforeEach(function() {
+    describe('with invalid old_user_id', function () {
+      beforeEach(function () {
         this.ProjectModel.updateOne = sinon.stub()
         return this.ProjectCollabratecDetailsHandler.updateCollabratecUserIds(
           'bad-user-id',
@@ -482,17 +482,17 @@ describe('ProjectCollabratecDetailsHandler', function() {
         )
       })
 
-      it('should not update', function() {
+      it('should not update', function () {
         return expect(this.ProjectModel.updateOne).not.to.have.been.called
       })
 
-      it('should callback with error', function() {
+      it('should callback with error', function () {
         return expect(this.callback.firstCall.args[0]).to.be.instanceOf(Error)
       })
     })
 
-    describe('with invalid new_user_id', function() {
-      beforeEach(function() {
+    describe('with invalid new_user_id', function () {
+      beforeEach(function () {
         this.ProjectModel.updateOne = sinon.stub()
         return this.ProjectCollabratecDetailsHandler.updateCollabratecUserIds(
           this.userId,
@@ -501,11 +501,11 @@ describe('ProjectCollabratecDetailsHandler', function() {
         )
       })
 
-      it('should not update', function() {
+      it('should not update', function () {
         return expect(this.ProjectModel.updateOne).not.to.have.been.called
       })
 
-      it('should callback with error', function() {
+      it('should callback with error', function () {
         return expect(this.callback.firstCall.args[0]).to.be.instanceOf(Error)
       })
     })

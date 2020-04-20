@@ -15,7 +15,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../base'], function(App) {
+define(['../base'], function (App) {
   const SUBSCRIPTION_URL = '/user/subscription/update'
 
   const ensureRecurlyIsSetup = _.once(() => {
@@ -26,9 +26,9 @@ define(['../base'], function(App) {
     return true
   })
 
-  App.controller('MetricsEmailController', function($scope, $http) {
-    $scope.institutionEmailSubscription = function(institutionId) {
-      var inst = _.find(window.managedInstitutions, function(institution) {
+  App.controller('MetricsEmailController', function ($scope, $http) {
+    $scope.institutionEmailSubscription = function (institutionId) {
+      var inst = _.find(window.managedInstitutions, function (institution) {
         return institution.v1Id === parseInt(institutionId)
       })
       if (inst.metricsEmail.optedOutUserIds.includes(window.user_id)) {
@@ -38,7 +38,7 @@ define(['../base'], function(App) {
       }
     }
 
-    $scope.changeInstitutionalEmailSubscription = function(institutionId) {
+    $scope.changeInstitutionalEmailSubscription = function (institutionId) {
       $scope.subscriptionChanging = true
       return $http({
         method: 'POST',
@@ -47,30 +47,31 @@ define(['../base'], function(App) {
           'X-CSRF-Token': window.csrfToken
         }
       }).then(function successCallback(response) {
-        window.managedInstitutions = _.map(window.managedInstitutions, function(
-          institution
-        ) {
-          if (institution.v1Id === parseInt(institutionId)) {
-            institution.metricsEmail.optedOutUserIds = response.data
+        window.managedInstitutions = _.map(
+          window.managedInstitutions,
+          function (institution) {
+            if (institution.v1Id === parseInt(institutionId)) {
+              institution.metricsEmail.optedOutUserIds = response.data
+            }
+            return institution
           }
-          return institution
-        })
+        )
         $scope.subscriptionChanging = false
       })
     }
   })
 
-  App.factory('RecurlyPricing', function($q, MultiCurrencyPricing) {
+  App.factory('RecurlyPricing', function ($q, MultiCurrencyPricing) {
     return {
-      loadDisplayPriceWithTax: function(planCode, currency, taxRate) {
+      loadDisplayPriceWithTax: function (planCode, currency, taxRate) {
         if (!ensureRecurlyIsSetup()) return
         const currencySymbol = MultiCurrencyPricing.plans[currency].symbol
         const pricing = recurly.Pricing()
-        return $q(function(resolve, reject) {
+        return $q(function (resolve, reject) {
           pricing
             .plan(planCode, { quantity: 1 })
             .currency(currency)
-            .done(function(price) {
+            .done(function (price) {
               const totalPriceExTax = parseFloat(price.next.total)
               let taxAmmount = totalPriceExTax * taxRate
               if (isNaN(taxAmmount)) {
@@ -87,7 +88,7 @@ define(['../base'], function(App) {
     }
   })
 
-  App.controller('ChangePlanFormController', function(
+  App.controller('ChangePlanFormController', function (
     $scope,
     $modal,
     RecurlyPricing
@@ -101,25 +102,25 @@ define(['../base'], function(App) {
         scope: $scope
       })
 
-    $scope.$watch('plan', function(plan) {
+    $scope.$watch('plan', function (plan) {
       if (!plan) return
       const planCode = plan.planCode
       const { currency, taxRate } = window.subscription.recurly
       $scope.price = '...' // Placeholder while we talk to recurly
       RecurlyPricing.loadDisplayPriceWithTax(planCode, currency, taxRate).then(
-        price => {
+        (price) => {
           $scope.price = price
         }
       )
     })
   })
 
-  App.controller('ConfirmChangePlanController', function(
+  App.controller('ConfirmChangePlanController', function (
     $scope,
     $modalInstance,
     $http
   ) {
-    $scope.confirmChangePlan = function() {
+    $scope.confirmChangePlan = function () {
       const body = {
         plan_code: $scope.plan.planCode,
         _csrf: window.csrfToken
@@ -136,12 +137,12 @@ define(['../base'], function(App) {
     return ($scope.cancel = () => $modalInstance.dismiss('cancel'))
   })
 
-  App.controller('LeaveGroupModalController', function(
+  App.controller('LeaveGroupModalController', function (
     $scope,
     $modalInstance,
     $http
   ) {
-    $scope.confirmLeaveGroup = function() {
+    $scope.confirmLeaveGroup = function () {
       $scope.inflight = true
       return $http({
         url: '/subscription/group/user',
@@ -155,8 +156,8 @@ define(['../base'], function(App) {
     return ($scope.cancel = () => $modalInstance.dismiss('cancel'))
   })
 
-  App.controller('GroupMembershipController', function($scope, $modal) {
-    $scope.removeSelfFromGroup = function(admin_id) {
+  App.controller('GroupMembershipController', function ($scope, $modal) {
+    $scope.removeSelfFromGroup = function (admin_id) {
       $scope.admin_id = admin_id
       return $modal.open({
         templateUrl: 'LeaveGroupModalTemplate',
@@ -166,7 +167,7 @@ define(['../base'], function(App) {
     }
   })
 
-  App.controller('RecurlySubscriptionController', function($scope) {
+  App.controller('RecurlySubscriptionController', function ($scope) {
     const recurlyIsSetup = ensureRecurlyIsSetup()
     $scope.showChangePlanButton = recurlyIsSetup && !subscription.groupPlan
     $scope.recurlyLoadError = !recurlyIsSetup
@@ -188,7 +189,7 @@ define(['../base'], function(App) {
     }
   })
 
-  App.controller('RecurlyCancellationController', function(
+  App.controller('RecurlyCancellationController', function (
     $scope,
     RecurlyPricing,
     $http
@@ -218,12 +219,12 @@ define(['../base'], function(App) {
     const { currency, taxRate } = window.subscription.recurly
     $scope.studentPrice = '...' // Placeholder while we talk to recurly
     RecurlyPricing.loadDisplayPriceWithTax('student', currency, taxRate).then(
-      price => {
+      (price) => {
         $scope.studentPrice = price
       }
     )
 
-    $scope.downgradeToStudent = function() {
+    $scope.downgradeToStudent = function () {
       const body = {
         plan_code: 'student',
         _csrf: window.csrfToken
@@ -235,7 +236,7 @@ define(['../base'], function(App) {
         .catch(() => console.log('something went wrong changing plan'))
     }
 
-    $scope.cancelSubscription = function() {
+    $scope.cancelSubscription = function () {
       const body = { _csrf: window.csrfToken }
 
       $scope.inflight = true
@@ -245,7 +246,7 @@ define(['../base'], function(App) {
         .catch(() => console.log('something went wrong changing plan'))
     }
 
-    $scope.extendTrial = function() {
+    $scope.extendTrial = function () {
       const body = { _csrf: window.csrfToken }
       $scope.inflight = true
       return $http

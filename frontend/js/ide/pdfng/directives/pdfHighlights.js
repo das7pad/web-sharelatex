@@ -16,7 +16,7 @@
 define(['../../../base', '../../../pdfjsBundle'], (App, PDFJS) =>
   // app = angular.module 'pdfHighlights', []
 
-  App.factory('pdfHighlights', function() {
+  App.factory('pdfHighlights', function () {
     let pdfHighlights
     return (pdfHighlights = class pdfHighlights {
       constructor(options) {

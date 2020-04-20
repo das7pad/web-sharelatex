@@ -5,8 +5,8 @@
     no-useless-escape,
 */
 
-define(['../../../base'], App =>
-  App.controller('UserAffiliationsController', function(
+define(['../../../base'], (App) =>
+  App.controller('UserAffiliationsController', function (
     $scope,
     UserAffiliationsDataService,
     $q,
@@ -16,7 +16,7 @@ define(['../../../base'], App =>
     $scope.userEmails = []
     $scope.linkedInstitutionIds = []
     $scope.hideInstitutionNotifications = {}
-    $scope.closeInstitutionNotification = type => {
+    $scope.closeInstitutionNotification = (type) => {
       $scope.hideInstitutionNotifications[type] = true
     }
     $scope.samlBetaSession = ExposedSettings.hasSamlBeta
@@ -25,7 +25,7 @@ define(['../../../base'], App =>
     const LOCAL_AND_DOMAIN_REGEX = /([^@]+)@(.+)/
     const EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\ ".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA -Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
 
-    const _matchLocalAndDomain = function(userEmailInput) {
+    const _matchLocalAndDomain = function (userEmailInput) {
       const match = userEmailInput
         ? userEmailInput.match(LOCAL_AND_DOMAIN_REGEX)
         : undefined
@@ -35,7 +35,7 @@ define(['../../../base'], App =>
         return { local: null, domain: null }
       }
     }
-    const _ssoAvailable = affiliation => {
+    const _ssoAvailable = (affiliation) => {
       if (!ExposedSettings.hasSamlFeature) return false
 
       if (!affiliation) {
@@ -59,7 +59,7 @@ define(['../../../base'], App =>
       return false
     }
 
-    $scope.getEmailSuggestion = function(userInput) {
+    $scope.getEmailSuggestion = function (userInput) {
       const userInputLocalAndDomain = _matchLocalAndDomain(userInput)
       $scope.ui.isValidEmail = EMAIL_REGEX.test(userInput)
       $scope.ui.isBlacklistedEmail = false
@@ -71,7 +71,7 @@ define(['../../../base'], App =>
         return UserAffiliationsDataService.getUniversityDomainFromPartialDomainInput(
           userInputLocalAndDomain.domain
         )
-          .then(function(universityDomain) {
+          .then(function (universityDomain) {
             const currentUserInputLocalAndDomain = _matchLocalAndDomain(
               $scope.newAffiliation.email
             )
@@ -91,7 +91,7 @@ define(['../../../base'], App =>
               `${userInputLocalAndDomain.local}@${universityDomain.hostname}`
             )
           })
-          .catch(function() {
+          .catch(function () {
             _resetAffiliationSuggestion()
             return $q.reject(null)
           })
@@ -101,24 +101,24 @@ define(['../../../base'], App =>
       }
     }
 
-    $scope.linkInstitutionAcct = function(email, institutionId) {
+    $scope.linkInstitutionAcct = function (email, institutionId) {
       _resetMakingRequestType()
       $scope.ui.isMakingRequest = true
       $scope.ui.isProcessing = true
       $window.location.href = `${$scope.samlInitPath}?university_id=${institutionId}&auto=/user/settings&email=${email}`
     }
 
-    $scope.selectUniversityManually = function() {
+    $scope.selectUniversityManually = function () {
       _resetAffiliationSuggestion()
       $scope.ui.showManualUniversitySelectionUI = true
     }
 
-    $scope.changeAffiliation = function(userEmail) {
+    $scope.changeAffiliation = function (userEmail) {
       if (_.get(userEmail, ['affiliation', 'institution', 'id'])) {
         UserAffiliationsDataService.getUniversityDetails(
           userEmail.affiliation.institution.id
         ).then(
-          universityDetails =>
+          (universityDetails) =>
             ($scope.affiliationToChange.university = universityDetails)
         )
       }
@@ -128,7 +128,7 @@ define(['../../../base'], App =>
       $scope.affiliationToChange.department = userEmail.affiliation.department
     }
 
-    $scope.saveAffiliationChange = function(userEmail) {
+    $scope.saveAffiliationChange = function (userEmail) {
       userEmail.affiliation.role = $scope.affiliationToChange.role
       userEmail.affiliation.department = $scope.affiliationToChange.department
       _resetAffiliationToChange()
@@ -141,14 +141,14 @@ define(['../../../base'], App =>
       ).then(() => setTimeout(() => _getUserEmails()))
     }
 
-    $scope.cancelAffiliationChange = email => _resetAffiliationToChange()
+    $scope.cancelAffiliationChange = (email) => _resetAffiliationToChange()
 
-    $scope.isChangingAffiliation = email =>
+    $scope.isChangingAffiliation = (email) =>
       $scope.affiliationToChange.email === email
 
     $scope.showAddEmailForm = () => ($scope.ui.showAddEmailUI = true)
 
-    $scope.addNewEmail = function() {
+    $scope.addNewEmail = function () {
       let addEmailPromise
       if (!$scope.newAffiliation.university) {
         addEmailPromise = UserAffiliationsDataService.addUserEmail(
@@ -176,7 +176,7 @@ define(['../../../base'], App =>
       $scope.ui.isAddingNewEmail = true
       $scope.ui.showAddEmailUI = false
       return _monitorRequest(addEmailPromise)
-        .then(function() {
+        .then(function () {
           _resetNewAffiliation()
           _resetAddingEmail()
           setTimeout(() => _getUserEmails())
@@ -184,24 +184,24 @@ define(['../../../base'], App =>
         .finally(() => ($scope.ui.isAddingNewEmail = false))
     }
 
-    $scope.setDefaultUserEmail = userEmail =>
+    $scope.setDefaultUserEmail = (userEmail) =>
       _monitorRequest(
         UserAffiliationsDataService.setDefaultUserEmail(userEmail.email)
-      ).then(function() {
+      ).then(function () {
         for (const email of $scope.userEmails || []) {
           email.default = false
         }
         userEmail.default = true
       })
 
-    $scope.removeUserEmail = function(userEmail) {
-      $scope.userEmails = $scope.userEmails.filter(ue => ue !== userEmail)
+    $scope.removeUserEmail = function (userEmail) {
+      $scope.userEmails = $scope.userEmails.filter((ue) => ue !== userEmail)
       return _monitorRequest(
         UserAffiliationsDataService.removeUserEmail(userEmail.email)
       )
     }
 
-    $scope.resendConfirmationEmail = function(userEmail) {
+    $scope.resendConfirmationEmail = function (userEmail) {
       _resetMakingRequestType()
       $scope.ui.isResendingConfirmation = true
       return _monitorRequest(
@@ -209,7 +209,7 @@ define(['../../../base'], App =>
       ).finally(() => ($scope.ui.isResendingConfirmation = false))
     }
 
-    $scope.acknowledgeError = function() {
+    $scope.acknowledgeError = function () {
       _reset()
       return _getUserEmails()
     }
@@ -231,7 +231,7 @@ define(['../../../base'], App =>
         department: null
       })
 
-    var _resetAddingEmail = function() {
+    var _resetAddingEmail = function () {
       $scope.ui.showAddEmailUI = false
       $scope.ui.isValidEmail = false
       $scope.ui.isBlacklistedEmail = false
@@ -244,13 +244,13 @@ define(['../../../base'], App =>
       }
     }
 
-    var _resetMakingRequestType = function() {
+    var _resetMakingRequestType = function () {
       $scope.ui.isLoadingEmails = false
       $scope.ui.isProcessing = false
       $scope.ui.isResendingConfirmation = false
     }
 
-    var _reset = function() {
+    var _reset = function () {
       $scope.ui = {
         hasError: false,
         errorMessage: '',
@@ -265,11 +265,11 @@ define(['../../../base'], App =>
     }
     _reset()
 
-    var _monitorRequest = function(promise) {
+    var _monitorRequest = function (promise) {
       $scope.ui.hasError = false
       $scope.ui.isMakingRequest = true
       promise
-        .catch(function(response) {
+        .catch(function (response) {
           $scope.ui.hasError = true
           $scope.ui.errorMessage = _.get(response, ['data', 'message'])
         })
@@ -277,7 +277,7 @@ define(['../../../base'], App =>
       return promise
     }
 
-    $scope.institutionAlreadyLinked = function(emailData) {
+    $scope.institutionAlreadyLinked = function (emailData) {
       const institutionId =
         emailData.affiliation &&
         emailData.affiliation.institution &&
@@ -289,24 +289,24 @@ define(['../../../base'], App =>
     }
 
     // Populates the emails table
-    var _getUserEmails = function() {
+    var _getUserEmails = function () {
       _resetMakingRequestType()
       $scope.ui.isLoadingEmails = true
       _monitorRequest(
         UserAffiliationsDataService.getUserEmailsEnsureAffiliation()
       )
-        .then(emails => {
-          $scope.userEmails = emails.map(email => {
+        .then((emails) => {
+          $scope.userEmails = emails.map((email) => {
             email.ssoAvailable = _ssoAvailable(email.affiliation)
             return email
           })
           $scope.linkedInstitutionIds = emails
-            .filter(email => {
+            .filter((email) => {
               if (email.samlProviderId) {
                 return email.samlProviderId
               }
             })
-            .map(email => email.samlProviderId)
+            .map((email) => email.samlProviderId)
         })
         .finally(() => ($scope.ui.isLoadingEmails = false))
     }

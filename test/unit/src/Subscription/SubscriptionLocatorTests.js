@@ -19,8 +19,8 @@ const modulePath =
 const { assert } = require('chai')
 const { ObjectId } = require('mongoose').Types
 
-describe('Subscription Locator Tests', function() {
-  beforeEach(function() {
+describe('Subscription Locator Tests', function () {
+  beforeEach(function () {
     this.user = { _id: '5208dd34438842e2db333333' }
     this.subscription = { hello: 'world' }
     this.Subscription = {
@@ -45,8 +45,8 @@ describe('Subscription Locator Tests', function() {
     }))
   })
 
-  describe('finding users subscription', function() {
-    it('should send the users features', function(done) {
+  describe('finding users subscription', function () {
+    it('should send the users features', function (done) {
       this.Subscription.findOne.callsArgWith(1, null, this.subscription)
       return this.SubscriptionLocator.getUsersSubscription(
         this.user,
@@ -60,7 +60,7 @@ describe('Subscription Locator Tests', function() {
       )
     })
 
-    it('should error if not found', function(done) {
+    it('should error if not found', function (done) {
       this.Subscription.findOne.callsArgWith(1, 'not found')
       return this.SubscriptionLocator.getUsersSubscription(
         this.user,
@@ -71,7 +71,7 @@ describe('Subscription Locator Tests', function() {
       )
     })
 
-    it('should take a user id rather than the user object', function(done) {
+    it('should take a user id rather than the user object', function (done) {
       this.Subscription.findOne.callsArgWith(1, null, this.subscription)
       return this.SubscriptionLocator.getUsersSubscription(
         this.user._id,
@@ -85,8 +85,8 @@ describe('Subscription Locator Tests', function() {
       )
     })
 
-    describe('finding managed subscription', function() {
-      it('should query the database', function(done) {
+    describe('finding managed subscription', function () {
+      it('should query the database', function (done) {
         this.Subscription.findOne.callsArgWith(1, null, this.subscription)
         return this.SubscriptionLocator.findManagedSubscription(
           this.user._id,

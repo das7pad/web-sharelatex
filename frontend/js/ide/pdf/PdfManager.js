@@ -13,7 +13,7 @@ define([
   './controllers/PdfController',
   './controllers/PdfViewToggleController',
   '../pdfng/directives/pdfJs'
-], function() {
+], function () {
   let PdfManager
   return (PdfManager = class PdfManager {
     constructor(ide, $scope) {

@@ -223,7 +223,7 @@ module.exports = MockV1Api = {
       const partner = this.validation_clients[req.params.partner]
       const conversion = __guard__(
         partner != null ? partner.conversions : undefined,
-        x => x[req.params.id]
+        (x) => x[req.params.id]
       )
       if (conversion != null) {
         return res.status(200).json({
@@ -285,12 +285,12 @@ module.exports = MockV1Api = {
     })
 
     return app
-      .listen(5000, error => {
+      .listen(5000, (error) => {
         if (error != null) {
           throw error
         }
       })
-      .on('error', error => {
+      .on('error', (error) => {
         console.error('error starting MockV1Api:', error.message)
         return process.exit(1)
       })

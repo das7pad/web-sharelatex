@@ -20,4 +20,4 @@ define([
   './filters/notEmpty',
   './filters/numKeys',
   './filters/orderOverviewEntries'
-], function() {})
+], function () {})

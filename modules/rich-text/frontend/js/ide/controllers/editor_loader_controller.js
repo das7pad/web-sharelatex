@@ -1,14 +1,14 @@
 import App from '../../../../../../frontend/js/base'
 import EventEmitter from '../../../../../../frontend/js/utils/EventEmitter'
 
-App.controller('EditorLoaderController', function($scope, localStorage) {
+App.controller('EditorLoaderController', function ($scope, localStorage) {
   $scope.richText = {
     bundle: null,
     bundleLoading: null,
     formattingEvents: new EventEmitter()
   }
 
-  $scope.$watch('editor.showRichText', function(val) {
+  $scope.$watch('editor.showRichText', function (val) {
     localStorage(
       `editor.mode.${$scope.project_id}`,
       val === true ? 'rich-text' : 'source'
@@ -26,7 +26,7 @@ App.controller('EditorLoaderController', function($scope, localStorage) {
         MathJaxLoading
       ])
         .then(() =>
-          richTextLoading.then(bundle =>
+          richTextLoading.then((bundle) =>
             $scope.$applyAsync(() => ($scope.richText.bundle = bundle))
           )
         )

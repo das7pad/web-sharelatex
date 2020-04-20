@@ -26,7 +26,7 @@ const commitMessage = 'Before update from Dropbox'
 
 module.exports = {
   newUpdate(user_id, projectName, path, updateRequest, source, callback) {
-    const getOrCreateProject = cb => {
+    const getOrCreateProject = (cb) => {
       return projectLocator.findUsersProjectByName(
         user_id,
         projectName,
@@ -52,11 +52,11 @@ module.exports = {
         }
       )
     }
-    return getOrCreateProject(function(err, project) {
+    return getOrCreateProject(function (err, project) {
       if (err != null) {
         return callback(err)
       }
-      return CooldownManager.isProjectOnCooldown(project._id, function(
+      return CooldownManager.isProjectOnCooldown(project._id, function (
         err,
         projectIsOnCooldown
       ) {
@@ -68,7 +68,7 @@ module.exports = {
             new Errors.TooManyRequestsError('project on cooldown')
           )
         }
-        return FileTypeManager.shouldIgnore(path, function(err, shouldIgnore) {
+        return FileTypeManager.shouldIgnore(path, function (err, shouldIgnore) {
           if (shouldIgnore) {
             return callback()
           }
@@ -87,36 +87,37 @@ module.exports = {
 
   deleteUpdate(user_id, projectName, path, source, callback) {
     logger.log({ user_id, filePath: path }, 'handling delete update from tpds')
-    return projectLocator.findUsersProjectByName(user_id, projectName, function(
-      err,
-      project
-    ) {
-      if (project == null) {
-        logger.log(
-          { user_id, filePath: path, projectName },
-          'project not found from tpds update, ignoring folder or project'
-        )
-        return callback()
+    return projectLocator.findUsersProjectByName(
+      user_id,
+      projectName,
+      function (err, project) {
+        if (project == null) {
+          logger.log(
+            { user_id, filePath: path, projectName },
+            'project not found from tpds update, ignoring folder or project'
+          )
+          return callback()
+        }
+        if (path === '/') {
+          logger.log(
+            { user_id, filePath: path, projectName, project_id: project._id },
+            'project found for delete update, path is root so marking project as deleted'
+          )
+          return projectDeleter.markAsDeletedByExternalSource(
+            project._id,
+            callback
+          )
+        } else {
+          return updateMerger.deleteUpdate(
+            user_id,
+            project._id,
+            path,
+            source,
+            (err) => callback(err)
+          )
+        }
       }
-      if (path === '/') {
-        logger.log(
-          { user_id, filePath: path, projectName, project_id: project._id },
-          'project found for delete update, path is root so marking project as deleted'
-        )
-        return projectDeleter.markAsDeletedByExternalSource(
-          project._id,
-          callback
-        )
-      } else {
-        return updateMerger.deleteUpdate(
-          user_id,
-          project._id,
-          path,
-          source,
-          err => callback(err)
-        )
-      }
-    })
+    )
   },
 
   _rootDocTimeoutLength: 30 * 1000

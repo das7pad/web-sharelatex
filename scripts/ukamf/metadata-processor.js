@@ -16,7 +16,7 @@ const moment = require('moment')
 
 const UKAMFDB = require('./ukamf-db')
 
-main().catch(err => {
+main().catch((err) => {
   console.error(err.stack)
 })
 

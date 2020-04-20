@@ -11,8 +11,8 @@ const MODULE_PATH = Path.join(
 )
 const MANIFEST = Path.join(__dirname, '../../../../public/js/manifest.json')
 
-describe('ExpressLocalsTests', function() {
-  beforeEach(function() {
+describe('ExpressLocalsTests', function () {
+  beforeEach(function () {
     this.settings = {
       i18n: {
         subdomainLang: {
@@ -25,7 +25,7 @@ describe('ExpressLocalsTests', function() {
     this.user_id = '386010482601212345061012'
 
     this.requires = {
-      'logger-sharelatex': { log: function() {} },
+      'logger-sharelatex': { log: function () {} },
       'settings-sharelatex': this.settings,
       '../Features/Subscription/SubscriptionFormatters': {},
       '../Features/SystemMessages/SystemMessageManager': {},
@@ -68,16 +68,16 @@ describe('ExpressLocalsTests', function() {
         this.publicApiRouter
       )
     }
-    this.loadMiddleware = id => {
+    this.loadMiddleware = (id) => {
       this.webRouter.use.args[id][0](this.req, this.res, this.next)
     }
   })
 
   let middlewareCounter
 
-  describe('without a cdn', function() {
+  describe('without a cdn', function () {
     middlewareCounter = -1
-    beforeEach(function() {
+    beforeEach(function () {
       this.require()
     })
     // session
@@ -87,26 +87,26 @@ describe('ExpressLocalsTests', function() {
     // externalAuthenticationSystemUser + hasFeature
     middlewareCounter += 1
 
-    describe('resource middleware', function() {
+    describe('resource middleware', function () {
       middlewareCounter += 1
       const middlewareId = middlewareCounter
 
-      beforeEach(function() {
+      beforeEach(function () {
         this.loadMiddleware(middlewareId)
       })
-      it('should set basic functions', function() {
+      it('should set basic functions', function () {
         expect(this.res.locals.staticPath).to.exist
         expect(this.res.locals.buildJsPath).to.exist
         expect(this.res.locals.buildCssPath).to.exist
         expect(this.res.locals.buildImgPath).to.exist
       })
 
-      describe('resource hints', function() {
-        beforeEach(function() {
+      describe('resource hints', function () {
+        beforeEach(function () {
           this.settings.addResourceHints = true
         })
 
-        it('should expose the preload helpers', function() {
+        it('should expose the preload helpers', function () {
           expect(this.res.locals.preloadCss).to.exist
           expect(this.res.locals.preloadFont).to.exist
           expect(this.res.locals.preloadImg).to.exist
@@ -114,14 +114,14 @@ describe('ExpressLocalsTests', function() {
           expect(this.res.locals.finishPreloading).to.exist
         })
 
-        it('should not set a header when disabled', function() {
+        it('should not set a header when disabled', function () {
           this.settings.addResourceHints = false
           this.res.locals.preloadCommonResources()
           this.res.locals.finishPreloading()
           expect(this.res.headers).to.deep.equal({})
         })
 
-        it('should set the header for css', function() {
+        it('should set the header for css', function () {
           this.res.locals.preloadCss('MODIFIER-')
           this.res.locals.finishPreloading()
           expect(this.res.headers).to.deep.equal({
@@ -129,7 +129,7 @@ describe('ExpressLocalsTests', function() {
           })
         })
 
-        it('should set the header for images', function() {
+        it('should set the header for images', function () {
           this.res.locals.preloadImg('/some/image.png')
           this.res.locals.finishPreloading()
           expect(this.res.headers).to.deep.equal({
@@ -137,7 +137,7 @@ describe('ExpressLocalsTests', function() {
           })
         })
 
-        it('should set the crossorigin flag for a font', function() {
+        it('should set the crossorigin flag for a font', function () {
           this.res.locals.preloadFont('arbitrary')
           this.res.locals.finishPreloading()
           expect(this.res.headers).to.deep.equal({
@@ -145,7 +145,7 @@ describe('ExpressLocalsTests', function() {
           })
         })
 
-        it('should inject common resources for user pages', function() {
+        it('should inject common resources for user pages', function () {
           this.res.render('template', {})
           expect(this.res.headers.Link).to.exist
           const Link = this.res.headers.Link
@@ -154,7 +154,7 @@ describe('ExpressLocalsTests', function() {
           expect(Link).to.include('img/sprite.png')
         })
 
-        it('should inject default brand specific resources', function() {
+        it('should inject default brand specific resources', function () {
           this.res.render('template', {})
           expect(this.res.headers.Link).to.exist
           const Link = this.res.headers.Link
@@ -162,7 +162,7 @@ describe('ExpressLocalsTests', function() {
           expect(Link).to.include('fonts/lato')
         })
 
-        it('should inject sl- brand specific resources', function() {
+        it('should inject sl- brand specific resources', function () {
           this.settings.brandPrefix = 'sl-'
           this.res.render('template', {})
           expect(this.res.headers.Link).to.exist
@@ -174,9 +174,9 @@ describe('ExpressLocalsTests', function() {
     })
   })
 
-  describe('with a cdn', function() {
+  describe('with a cdn', function () {
     middlewareCounter = -1
-    beforeEach(function() {
+    beforeEach(function () {
       this.settings.cdn = { web: { host: 'https://example.com/' } }
 
       this.require()
@@ -188,20 +188,20 @@ describe('ExpressLocalsTests', function() {
     // externalAuthenticationSystemUser + hasFeature
     middlewareCounter += 1
 
-    describe('resource middleware', function() {
+    describe('resource middleware', function () {
       middlewareCounter += 1
       const middlewareId = middlewareCounter
 
-      beforeEach(function() {
+      beforeEach(function () {
         this.loadMiddleware(middlewareId)
       })
 
-      describe('resource hints', function() {
-        beforeEach(function() {
+      describe('resource hints', function () {
+        beforeEach(function () {
           this.settings.addResourceHints = true
         })
 
-        it('should set the header for images', function() {
+        it('should set the header for images', function () {
           this.res.locals.preloadImg('/some/image.png')
           this.res.locals.finishPreloading()
           expect(this.res.headers).to.deep.equal({
@@ -213,9 +213,9 @@ describe('ExpressLocalsTests', function() {
     })
   })
 
-  describe('with only one language', function() {
+  describe('with only one language', function () {
     middlewareCounter = -1
-    beforeEach(function() {
+    beforeEach(function () {
       this.settings.i18n = {
         subdomainLang: {
           www: { lngCode: 'en', url: 'http://localhost:3000' }
@@ -231,20 +231,20 @@ describe('ExpressLocalsTests', function() {
     // externalAuthenticationSystemUser + hasFeature
     middlewareCounter += 1
 
-    describe('resource middleware', function() {
+    describe('resource middleware', function () {
       middlewareCounter += 1
       const middlewareId = middlewareCounter
 
-      beforeEach(function() {
+      beforeEach(function () {
         this.loadMiddleware(middlewareId)
       })
 
-      describe('resource hints', function() {
-        beforeEach(function() {
+      describe('resource hints', function () {
+        beforeEach(function () {
           this.settings.addResourceHints = true
         })
 
-        it('should not inject the flags sprite', function() {
+        it('should not inject the flags sprite', function () {
           this.res.render('template', {})
           expect(this.res.headers.Link).to.exist
           expect(this.res.headers.Link).to.not.include('img/sprite.png')

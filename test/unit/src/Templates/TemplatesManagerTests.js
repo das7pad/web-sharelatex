@@ -19,8 +19,8 @@ const should = require('chai').should()
 
 const modulePath = '../../../../app/src/Features/Templates/TemplatesManager'
 
-describe('TemplatesManager', function() {
-  beforeEach(function() {
+describe('TemplatesManager', function () {
+  beforeEach(function () {
     this.project_id = 'project-id'
     this.brandVariationId = 'brand-variation-id'
     this.compiler = 'pdflatex'
@@ -106,9 +106,9 @@ describe('TemplatesManager', function() {
       '%2Ftemplates%2F52fb86a81ae1e566597a25f6%2Fv%2F4%2Fzip&templateName=Moderncv%20Banking&compiler=pdflatex')
   })
 
-  describe('createProjectFromV1Template', function() {
-    describe('when all options passed', function() {
-      beforeEach(function() {
+  describe('createProjectFromV1Template', function () {
+    describe('when all options passed', function () {
+      beforeEach(function () {
         return this.TemplatesManager.createProjectFromV1Template(
           this.brandVariationId,
           this.compiler,
@@ -122,19 +122,19 @@ describe('TemplatesManager', function() {
         )
       })
 
-      it('should fetch zip from v1 based on template id', function() {
+      it('should fetch zip from v1 based on template id', function () {
         return this.request.should.have.been.calledWith(
           `${this.v1Url}/api/v1/sharelatex/templates/${this.templateVersionId}`
         )
       })
 
-      it('should save temporary file', function() {
+      it('should save temporary file', function () {
         return this.fs.createWriteStream.should.have.been.calledWith(
           this.dumpPath
         )
       })
 
-      it('should create project', function() {
+      it('should create project', function () {
         return this.ProjectUploadManager.createProjectFromZipArchiveWithName.should.have.been.calledWithMatch(
           this.user_id,
           this.templateName,
@@ -146,11 +146,11 @@ describe('TemplatesManager', function() {
         )
       })
 
-      it('should unlink file', function() {
+      it('should unlink file', function () {
         return this.fs.unlink.should.have.been.calledWith(this.dumpPath)
       })
 
-      it('should set project options when passed', function() {
+      it('should set project options when passed', function () {
         this.ProjectOptionsHandler.setCompiler.should.have.been.calledWithMatch(
           this.project_id,
           this.compiler
@@ -169,7 +169,7 @@ describe('TemplatesManager', function() {
         )
       })
 
-      it('should update project', function() {
+      it('should update project', function () {
         return this.Project.updateOne.should.have.been.calledWithMatch(
           { _id: this.project_id },
           {
@@ -179,13 +179,13 @@ describe('TemplatesManager', function() {
         )
       })
 
-      it('should ensure that the dump folder exists', function() {
+      it('should ensure that the dump folder exists', function () {
         return sinon.assert.called(this.FileWriter.ensureDumpFolderExists)
       })
     })
 
-    describe('when some options not set', function() {
-      beforeEach(function() {
+    describe('when some options not set', function () {
+      beforeEach(function () {
         return this.TemplatesManager.createProjectFromV1Template(
           null,
           null,
@@ -199,7 +199,7 @@ describe('TemplatesManager', function() {
         )
       })
 
-      it('should not set missing project options', function() {
+      it('should not set missing project options', function () {
         this.ProjectOptionsHandler.setCompiler.called.should.equal(false)
         this.ProjectRootDocManager.setRootDocFromName.called.should.equal(false)
         this.ProjectOptionsHandler.setBrandVariationId.called.should.equal(

@@ -17,14 +17,14 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../utils/EventEmitter', 'libs/sharejs'], function(
+define(['../../utils/EventEmitter', 'libs/sharejs'], function (
   EventEmitter,
   ShareJs
 ) {
   let ShareJsDoc
   const SINGLE_USER_FLUSH_DELAY = 1000 // ms
 
-  return (ShareJsDoc = (function() {
+  return (ShareJsDoc = (function () {
     ShareJsDoc = class ShareJsDoc extends EventEmitter {
       static initClass() {
         this.prototype.INFLIGHT_OP_TIMEOUT = 5000 // Retry sending ops after 5 seconds without an ack
@@ -40,14 +40,14 @@ define(['../../utils/EventEmitter', 'libs/sharejs'], function(
         this.doc_id = doc_id
         this.socket = socket
         this.type = 'text'
-        docLines = Array.from(docLines).map(line =>
+        docLines = Array.from(docLines).map((line) =>
           decodeURIComponent(escape(line))
         )
         const snapshot = docLines.join('\n')
         this.track_changes = false
 
         this.connection = {
-          send: update => {
+          send: (update) => {
             this._startInflightOpTimeout(update)
             if (
               window.disconnectOnUpdate != null &&
@@ -73,7 +73,7 @@ define(['../../utils/EventEmitter', 'libs/sharejs'], function(
               'applyOtUpdate',
               this.doc_id,
               update,
-              error => {
+              (error) => {
                 if (error != null) {
                   return this._handleError(error)
                 }
@@ -107,7 +107,7 @@ define(['../../utils/EventEmitter', 'libs/sharejs'], function(
         this._doc.on('saved', () => {
           return this.trigger('saved')
         })
-        this._doc.on('error', e => {
+        this._doc.on('error', (e) => {
           return this._handleError(e)
         })
 
@@ -147,7 +147,7 @@ define(['../../utils/EventEmitter', 'libs/sharejs'], function(
         }
         this.queuedMessages.push(message)
         // keep the queue in order, lowest version first
-        this.queuedMessages.sort(function(a, b) {
+        this.queuedMessages.sort(function (a, b) {
           return a.v - b.v
         })
       }
@@ -217,8 +217,10 @@ define(['../../utils/EventEmitter', 'libs/sharejs'], function(
         }
 
         if (
-          __guard__(message != null ? message.meta : undefined, x => x.type) ===
-          'external'
+          __guard__(
+            message != null ? message.meta : undefined,
+            (x) => x.type
+          ) === 'external'
         ) {
           return this.trigger('externalUpdate', message)
         }

@@ -22,8 +22,8 @@ const modulePath = path.join(
 )
 const { expect } = require('chai')
 
-describe('InactiveProjectManager', function() {
-  beforeEach(function() {
+describe('InactiveProjectManager', function () {
+  beforeEach(function () {
     this.settings = {}
     this.DocstoreManager = {
       unarchiveProject: sinon.stub(),
@@ -56,18 +56,18 @@ describe('InactiveProjectManager', function() {
     return (this.project_id = '1234')
   })
 
-  describe('reactivateProjectIfRequired', function() {
-    beforeEach(function() {
+  describe('reactivateProjectIfRequired', function () {
+    beforeEach(function () {
       this.project = { active: false }
       this.ProjectGetter.getProject.callsArgWith(2, null, this.project)
       return this.ProjectUpdateHandler.markAsActive.callsArgWith(1)
     })
 
-    it('should call unarchiveProject', function(done) {
+    it('should call unarchiveProject', function (done) {
       this.DocstoreManager.unarchiveProject.callsArgWith(1)
       return this.InactiveProjectManager.reactivateProjectIfRequired(
         this.project_id,
-        err => {
+        (err) => {
           this.DocstoreManager.unarchiveProject
             .calledWith(this.project_id)
             .should.equal(true)
@@ -79,11 +79,11 @@ describe('InactiveProjectManager', function() {
       )
     })
 
-    it('should not mark project as active if error with unarchinging', function(done) {
+    it('should not mark project as active if error with unarchinging', function (done) {
       this.DocstoreManager.unarchiveProject.callsArgWith(1, 'error')
       return this.InactiveProjectManager.reactivateProjectIfRequired(
         this.project_id,
-        err => {
+        (err) => {
           err.should.equal('error')
           this.DocstoreManager.unarchiveProject
             .calledWith(this.project_id)
@@ -96,12 +96,12 @@ describe('InactiveProjectManager', function() {
       )
     })
 
-    it('should not call unarchiveProject if it is active', function(done) {
+    it('should not call unarchiveProject if it is active', function (done) {
       this.project.active = true
       this.DocstoreManager.unarchiveProject.callsArgWith(1)
       return this.InactiveProjectManager.reactivateProjectIfRequired(
         this.project_id,
-        err => {
+        (err) => {
           this.DocstoreManager.unarchiveProject
             .calledWith(this.project_id)
             .should.equal(false)
@@ -114,8 +114,8 @@ describe('InactiveProjectManager', function() {
     })
   })
 
-  describe('deactivateProject', function() {
-    it('should call unarchiveProject and markAsInactive', function(done) {
+  describe('deactivateProject', function () {
+    it('should call unarchiveProject and markAsInactive', function (done) {
       this.DocstoreManager.archiveProject.callsArgWith(1)
       this.TrackChangesManager.archiveProject.callsArgWith(1)
 
@@ -123,7 +123,7 @@ describe('InactiveProjectManager', function() {
 
       return this.InactiveProjectManager.deactivateProject(
         this.project_id,
-        err => {
+        (err) => {
           this.DocstoreManager.archiveProject
             .calledWith(this.project_id)
             .should.equal(true)
@@ -136,7 +136,7 @@ describe('InactiveProjectManager', function() {
       )
     })
 
-    it('should not call markAsInactive if there was a problem archiving in docstore', function(done) {
+    it('should not call markAsInactive if there was a problem archiving in docstore', function (done) {
       this.DocstoreManager.archiveProject.callsArgWith(1, 'errorrr')
       this.TrackChangesManager.archiveProject.callsArgWith(1)
 
@@ -144,7 +144,7 @@ describe('InactiveProjectManager', function() {
 
       return this.InactiveProjectManager.deactivateProject(
         this.project_id,
-        err => {
+        (err) => {
           err.should.equal('errorrr')
           this.DocstoreManager.archiveProject
             .calledWith(this.project_id)

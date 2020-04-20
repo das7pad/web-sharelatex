@@ -21,14 +21,14 @@ const FeaturesUpdater = require('../Subscription/FeaturesUpdater')
 module.exports = ReferalAllocator = {
   allocate(referal_id, new_user_id, referal_source, referal_medium, callback) {
     if (callback == null) {
-      callback = function() {}
+      callback = function () {}
     }
     if (referal_id == null) {
       return callback(null)
     }
 
     const query = { referal_id: referal_id }
-    return User.findOne(query, function(error, user) {
+    return User.findOne(query, function (error, user) {
       if (error != null) {
         return callback(error)
       }
@@ -48,7 +48,7 @@ module.exports = ReferalAllocator = {
             }
           },
           {},
-          function(err) {
+          function (err) {
             if (err != null) {
               logger.warn(
                 { err, referal_id, new_user_id },

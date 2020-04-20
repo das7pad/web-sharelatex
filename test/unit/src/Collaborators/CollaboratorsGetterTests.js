@@ -11,8 +11,8 @@ const MODULE_PATH = Path.join(
   '../../../../app/src/Features/Collaborators/CollaboratorsGetter'
 )
 
-describe('CollaboratorsGetter', function() {
-  beforeEach(function() {
+describe('CollaboratorsGetter', function () {
+  beforeEach(function () {
     this.userId = 'mock-user-id'
     this.ownerRef = ObjectId()
     this.readOnlyRef1 = ObjectId()
@@ -60,13 +60,13 @@ describe('CollaboratorsGetter', function() {
     })
   })
 
-  afterEach(function() {
+  afterEach(function () {
     this.ProjectMock.verify()
   })
 
-  describe('getMemberIdsWithPrivilegeLevels', function() {
-    describe('with project', function() {
-      it('should return an array of member ids with their privilege levels', async function() {
+  describe('getMemberIdsWithPrivilegeLevels', function () {
+    describe('with project', function () {
+      it('should return an array of member ids with their privilege levels', async function () {
         const result = await this.CollaboratorsGetter.promises.getMemberIdsWithPrivilegeLevels(
           this.project._id
         )
@@ -110,12 +110,12 @@ describe('CollaboratorsGetter', function() {
       })
     })
 
-    describe('with a missing project', function() {
-      beforeEach(function() {
+    describe('with a missing project', function () {
+      beforeEach(function () {
         this.ProjectGetter.promises.getProject.resolves(null)
       })
 
-      it('should return a NotFoundError', async function() {
+      it('should return a NotFoundError', async function () {
         await expect(
           this.CollaboratorsGetter.promises.getMemberIdsWithPrivilegeLevels(
             this.project._id
@@ -125,8 +125,8 @@ describe('CollaboratorsGetter', function() {
     })
   })
 
-  describe('getMemberIds', function() {
-    it('should return the ids', async function() {
+  describe('getMemberIds', function () {
+    it('should return the ids', async function () {
       const memberIds = await this.CollaboratorsGetter.promises.getMemberIds(
         this.project._id
       )
@@ -142,8 +142,8 @@ describe('CollaboratorsGetter', function() {
     })
   })
 
-  describe('getInvitedMemberIds', function() {
-    it('should return the invited ids', async function() {
+  describe('getInvitedMemberIds', function () {
+    it('should return the invited ids', async function () {
       const memberIds = await this.CollaboratorsGetter.promises.getInvitedMemberIds(
         this.project._id
       )
@@ -157,8 +157,8 @@ describe('CollaboratorsGetter', function() {
     })
   })
 
-  describe('getInvitedMembersWithPrivilegeLevels', function() {
-    beforeEach(function() {
+  describe('getInvitedMembersWithPrivilegeLevels', function () {
+    beforeEach(function () {
       this.UserGetter.promises.getUser
         .withArgs(this.readOnlyRef1.toString())
         .resolves({ _id: this.readOnlyRef1 })
@@ -173,7 +173,7 @@ describe('CollaboratorsGetter', function() {
         .resolves({ _id: this.readWriteTokenRef })
     })
 
-    it('should return an array of invited members with their privilege levels', async function() {
+    it('should return an array of invited members with their privilege levels', async function () {
       const result = await this.CollaboratorsGetter.promises.getInvitedMembersWithPrivilegeLevels(
         this.project._id
       )
@@ -184,8 +184,8 @@ describe('CollaboratorsGetter', function() {
     })
   })
 
-  describe('getMemberIdPrivilegeLevel', function() {
-    it('should return the privilege level if it exists', async function() {
+  describe('getMemberIdPrivilegeLevel', function () {
+    it('should return the privilege level if it exists', async function () {
       const level = await this.CollaboratorsGetter.promises.getMemberIdPrivilegeLevel(
         this.readOnlyRef1,
         this.project._id
@@ -193,7 +193,7 @@ describe('CollaboratorsGetter', function() {
       expect(level).to.equal('readOnly')
     })
 
-    it('should return false if the member has no privilege level', async function() {
+    it('should return false if the member has no privilege level', async function () {
       const level = await this.CollaboratorsGetter.promises.getMemberIdPrivilegeLevel(
         this.nonMemberRef,
         this.project._id
@@ -202,9 +202,9 @@ describe('CollaboratorsGetter', function() {
     })
   })
 
-  describe('isUserInvitedMemberOfProject', function() {
-    describe('when user is a member of the project', function() {
-      it('should return true and the privilegeLevel', async function() {
+  describe('isUserInvitedMemberOfProject', function () {
+    describe('when user is a member of the project', function () {
+      it('should return true and the privilegeLevel', async function () {
         const isMember = await this.CollaboratorsGetter.promises.isUserInvitedMemberOfProject(
           this.readOnlyRef1
         )
@@ -212,8 +212,8 @@ describe('CollaboratorsGetter', function() {
       })
     })
 
-    describe('when user is not a member of the project', function() {
-      it('should return false', async function() {
+    describe('when user is not a member of the project', function () {
+      it('should return false', async function () {
         const isMember = await this.CollaboratorsGetter.promises.isUserInvitedMemberOfProject(
           this.nonMemberRef
         )
@@ -222,8 +222,8 @@ describe('CollaboratorsGetter', function() {
     })
   })
 
-  describe('getProjectsUserIsMemberOf', function() {
-    beforeEach(function() {
+  describe('getProjectsUserIsMemberOf', function () {
+    beforeEach(function () {
       this.fields = 'mock fields'
       this.ProjectMock.expects('find')
         .withArgs({ collaberator_refs: this.userId }, this.fields)
@@ -262,7 +262,7 @@ describe('CollaboratorsGetter', function() {
         ])
     })
 
-    it('should call the callback with the projects', async function() {
+    it('should call the callback with the projects', async function () {
       const projects = await this.CollaboratorsGetter.promises.getProjectsUserIsMemberOf(
         this.userId,
         this.fields
@@ -285,8 +285,8 @@ describe('CollaboratorsGetter', function() {
     })
   })
 
-  describe('getAllInvitedMembers', function() {
-    beforeEach(async function() {
+  describe('getAllInvitedMembers', function () {
+    beforeEach(async function () {
       this.owningUser = {
         _id: this.ownerRef,
         email: 'owner@example.com',
@@ -319,11 +319,11 @@ describe('CollaboratorsGetter', function() {
       )
     })
 
-    it('should produce a list of members', function() {
+    it('should produce a list of members', function () {
       expect(this.result).to.deep.equal(this.views.members)
     })
 
-    it('should call ProjectEditorHandler.buildOwnerAndMembersViews', function() {
+    it('should call ProjectEditorHandler.buildOwnerAndMembersViews', function () {
       expect(this.ProjectEditorHandler.buildOwnerAndMembersViews).to.have.been
         .calledOnce
       expect(
@@ -332,11 +332,9 @@ describe('CollaboratorsGetter', function() {
     })
   })
 
-  describe('userIsTokenMember', function() {
-    it('should return true when the project is found', async function() {
-      this.ProjectMock.expects('findOne')
-        .chain('exec')
-        .resolves(this.project)
+  describe('userIsTokenMember', function () {
+    it('should return true when the project is found', async function () {
+      this.ProjectMock.expects('findOne').chain('exec').resolves(this.project)
       const isMember = await this.CollaboratorsGetter.promises.userIsTokenMember(
         this.userId,
         this.project._id
@@ -344,10 +342,8 @@ describe('CollaboratorsGetter', function() {
       expect(isMember).to.be.true
     })
 
-    it('should return false when the project is not found', async function() {
-      this.ProjectMock.expects('findOne')
-        .chain('exec')
-        .resolves(null)
+    it('should return false when the project is not found', async function () {
+      this.ProjectMock.expects('findOne').chain('exec').resolves(null)
       const isMember = await this.CollaboratorsGetter.promises.userIsTokenMember(
         this.userId,
         this.project._id

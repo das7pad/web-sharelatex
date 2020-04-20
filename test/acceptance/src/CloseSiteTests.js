@@ -14,9 +14,9 @@ const Settings = require('settings-sharelatex')
 const chai = require('chai')
 const request = require('./helpers/request')
 
-describe('siteIsOpen', function() {
-  describe('when siteIsOpen is default (true)', function() {
-    it('should get page', function(done) {
+describe('siteIsOpen', function () {
+  describe('when siteIsOpen is default (true)', function () {
+    it('should get page', function (done) {
       return request.get('/login', (error, response, body) => {
         response.statusCode.should.equal(200)
         return done()
@@ -24,16 +24,16 @@ describe('siteIsOpen', function() {
     })
   })
 
-  describe('when siteIsOpen is false', function() {
-    beforeEach(function() {
+  describe('when siteIsOpen is false', function () {
+    beforeEach(function () {
       return (Settings.siteIsOpen = false)
     })
 
-    afterEach(function() {
+    afterEach(function () {
       return (Settings.siteIsOpen = true)
     })
 
-    it('should return maintenance page', function(done) {
+    it('should return maintenance page', function (done) {
       return request.get('/login', (error, response) => {
         response.statusCode.should.equal(503)
         return done()

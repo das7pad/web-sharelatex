@@ -12,8 +12,8 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base'], App =>
-  App.factory('pdfSpinner', function() {
+define(['../../../base'], (App) =>
+  App.factory('pdfSpinner', function () {
     let pdfSpinner
     return (pdfSpinner = class pdfSpinner {
       constructor() {}

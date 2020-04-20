@@ -11,8 +11,8 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base', '../services/chatMessages'], App =>
-  App.controller('ChatController', function(
+define(['../../../base', '../services/chatMessages'], (App) =>
+  App.controller('ChatController', function (
     $scope,
     chatMessages,
     ide,
@@ -22,7 +22,7 @@ define(['../../../base', '../services/chatMessages'], App =>
 
     $scope.$watch(
       'chat.messages',
-      function(messages) {
+      function (messages) {
         if (messages != null) {
           return $scope.$emit('updateScrollPosition')
         }
@@ -32,7 +32,7 @@ define(['../../../base', '../services/chatMessages'], App =>
 
     $scope.$on('layout:chat:resize', () => $scope.$emit('updateScrollPosition'))
 
-    $scope.$watch('chat.newMessage', function(message) {
+    $scope.$watch('chat.newMessage', function (message) {
       if (message != null) {
         return ide.$scope.$broadcast('chat:newMessage', message)
       }
@@ -41,7 +41,7 @@ define(['../../../base', '../services/chatMessages'], App =>
     $scope.resetUnreadMessages = () =>
       ide.$scope.$broadcast('chat:resetUnreadMessages')
 
-    $scope.sendMessage = function() {
+    $scope.sendMessage = function () {
       const message = $scope.newMessageContent
       $scope.newMessageContent = ''
       return chatMessages.sendMessage(message)

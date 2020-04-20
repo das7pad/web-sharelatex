@@ -12,9 +12,9 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base'], function(App) {
+define(['../../../base'], function (App) {
   const MAX_PROJECT_NAME_LENGTH = 150
-  return App.controller('ProjectNameController', function(
+  return App.controller('ProjectNameController', function (
     $scope,
     $element,
     settings,
@@ -29,13 +29,13 @@ define(['../../../base'], function(App) {
 
     $scope.inputs = {}
 
-    $scope.startRenaming = function() {
+    $scope.startRenaming = function () {
       $scope.inputs.name = $scope.project.name
       $scope.state.renaming = true
       return $scope.$emit('project:rename:start')
     }
 
-    $scope.finishRenaming = function() {
+    $scope.finishRenaming = function () {
       $scope.state.renaming = false
       const newName = $scope.inputs.name
       if ($scope.project.name === newName) {
@@ -45,7 +45,7 @@ define(['../../../base'], function(App) {
       $scope.project.name = newName
       return settings
         .saveProjectSettings({ name: $scope.project.name })
-        .catch(function(response) {
+        .catch(function (response) {
           const { data, status } = response
           $scope.project.name = oldName
           if (status === 400) {
@@ -59,11 +59,11 @@ define(['../../../base'], function(App) {
         })
     }
 
-    ide.socket.on('projectNameUpdated', name =>
+    ide.socket.on('projectNameUpdated', (name) =>
       $scope.$apply(() => ($scope.project.name = name))
     )
 
-    return $scope.$watch('project.name', function(name) {
+    return $scope.$watch('project.name', function (name) {
       if (name != null) {
         window.document.title =
           name + ` - Online LaTeX Editor ${ExposedSettings.appName}`

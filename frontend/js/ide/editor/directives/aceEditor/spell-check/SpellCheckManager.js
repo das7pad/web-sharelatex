@@ -1,4 +1,4 @@
-define([], function() {
+define([], function () {
   const BLACKLISTED_COMMAND_REGEX = new RegExp(
     `\
 \\\\\
@@ -58,7 +58,7 @@ define([], function() {
 
       this.selectedHighlightContents = null
 
-      $(document).on('click', e => {
+      $(document).on('click', (e) => {
         if (e.which !== 3) {
           this.closeContextMenu()
         } // Ignore if right click
@@ -249,16 +249,16 @@ define([], function() {
       words = newWords
       positions = newPositions
 
-      const displayResult = highlights => {
+      const displayResult = (highlights) => {
         if (this.timeoutId != null) {
           return
         }
         this.firstCheck = false
-        rowNumsToCheck.forEach(row => {
+        rowNumsToCheck.forEach((row) => {
           this.changedLines[row] = false
           this.adapter.highlightedWordManager.clearRow(row)
         })
-        highlights.map(highlight =>
+        highlights.map((highlight) =>
           this.adapter.highlightedWordManager.addHighlight(highlight)
         )
       }
@@ -313,7 +313,7 @@ define([], function() {
 
     apiRequest(endpoint, data, callback) {
       if (callback == null) {
-        callback = function(error, result) {
+        callback = function (error, result) {
           console.error(error)
         }
       }
@@ -324,10 +324,10 @@ define([], function() {
       const options = { timeout: requestHandler.promise }
       this.$http
         .post(`/spelling${endpoint}`, data, options)
-        .then(response => {
+        .then((response) => {
           return callback(null, response.data)
         })
-        .catch(response => {
+        .catch((response) => {
           return callback(new Error('api failure'))
         })
       // provide a method to cancel the request
@@ -408,7 +408,7 @@ define([], function() {
     }
 
     blankOutBlacklistedCommands(line) {
-      return line.replace(BLACKLISTED_COMMAND_REGEX, command =>
+      return line.replace(BLACKLISTED_COMMAND_REGEX, (command) =>
         Array(command.length + 1).join('.')
       )
     }

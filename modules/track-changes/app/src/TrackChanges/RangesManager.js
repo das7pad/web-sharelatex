@@ -22,9 +22,9 @@ const async = require('async')
 module.exports = RangesManager = {
   getAllRanges(project_id, callback) {
     if (callback == null) {
-      callback = function(error, docs) {}
+      callback = function (error, docs) {}
     }
-    return DocumentUpdaterHandler.flushProjectToMongo(project_id, function(
+    return DocumentUpdaterHandler.flushProjectToMongo(project_id, function (
       error
     ) {
       if (error != null) {
@@ -36,10 +36,10 @@ module.exports = RangesManager = {
 
   getAllChangesUsers(project_id, callback) {
     if (callback == null) {
-      callback = function(error, users) {}
+      callback = function (error, users) {}
     }
     const user_ids = {}
-    return RangesManager.getAllRanges(project_id, function(error, docs) {
+    return RangesManager.getAllRanges(project_id, function (error, docs) {
       if (error != null) {
         return callback(error)
       }

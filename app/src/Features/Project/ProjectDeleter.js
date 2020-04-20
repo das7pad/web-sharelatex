@@ -73,7 +73,9 @@ async function unmarkAsDeletedByExternalSource(projectId) {
 
 async function deleteUsersProjects(userId) {
   const projects = await Project.find({ owner_ref: userId }).exec()
-  await promiseMapWithLimit(5, projects, project => deleteProject(project._id))
+  await promiseMapWithLimit(5, projects, (project) =>
+    deleteProject(project._id)
+  )
   await CollaboratorsHandler.promises.removeUserFromAllProjects(userId)
 }
 
@@ -215,7 +217,7 @@ async function deleteProject(projectId, options = {}) {
       deletedProjectLastUpdatedAt: project.lastUpdated
     }
 
-    Object.keys(deleterData).forEach(key =>
+    Object.keys(deleterData).forEach((key) =>
       deleterData[key] === undefined ? delete deleterData[key] : ''
     )
 
@@ -235,7 +237,7 @@ async function deleteProject(projectId, options = {}) {
     for (const memberId of memberIds) {
       TagsHandler.promises
         .removeProjectFromAllTags(memberId, projectId)
-        .catch(err => {
+        .catch((err) => {
           logger.err(
             { err, memberId, projectId },
             'failed to remove project from tags'
@@ -280,7 +282,7 @@ async function undeleteProject(projectId) {
 
   // db.projects.insert doesn't work with promisify
   await new Promise((resolve, reject) => {
-    db.projects.insert(restored, err => {
+    db.projects.insert(restored, (err) => {
       if (err) {
         reject(err)
       } else {

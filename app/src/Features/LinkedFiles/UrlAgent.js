@@ -30,7 +30,7 @@ module.exports = UrlAgent = {
     callback
   ) {
     linkedFileData = this._sanitizeData(linkedFileData)
-    return this._getUrlStream(project_id, linkedFileData, user_id, function(
+    return this._getUrlStream(project_id, linkedFileData, user_id, function (
       err,
       readStream
     ) {
@@ -38,7 +38,7 @@ module.exports = UrlAgent = {
         return callback(err)
       }
       readStream.on('error', callback)
-      return readStream.on('response', function(response) {
+      return readStream.on('response', function (response) {
         if (response.statusCode >= 200 && response.statusCode < 300) {
           readStream.resume()
           return LinkedFilesHandler.importFromStream(
@@ -48,7 +48,7 @@ module.exports = UrlAgent = {
             name,
             parent_folder_id,
             user_id,
-            function(err, file) {
+            function (err, file) {
               if (err != null) {
                 return callback(err)
               }
@@ -93,7 +93,7 @@ module.exports = UrlAgent = {
 
   _getUrlStream(project_id, data, current_user_id, callback) {
     if (callback == null) {
-      callback = function(error, fsPath) {}
+      callback = function (error, fsPath) {}
     }
     callback = _.once(callback)
     let { url } = data

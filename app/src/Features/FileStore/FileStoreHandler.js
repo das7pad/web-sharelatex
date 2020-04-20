@@ -15,7 +15,7 @@ const FileStoreHandler = {
   RETRY_ATTEMPTS: 3,
 
   uploadFileFromDisk(projectId, fileArgs, fsPath, callback) {
-    fs.lstat(fsPath, function(err, stat) {
+    fs.lstat(fsPath, function (err, stat) {
       if (err) {
         logger.warn({ err, projectId, fileArgs, fsPath }, 'error stating file')
         callback(err)
@@ -43,7 +43,7 @@ const FileStoreHandler = {
             fsPath,
             cb
           ),
-        function(err, result) {
+        function (err, result) {
           if (err) {
             logger.warn(
               { err, projectId, fileArgs },
@@ -60,21 +60,21 @@ const FileStoreHandler = {
   _doUploadFileFromDisk(projectId, fileArgs, fsPath, callback) {
     const callbackOnce = _.once(callback)
 
-    FileHashManager.computeHash(fsPath, function(err, hashValue) {
+    FileHashManager.computeHash(fsPath, function (err, hashValue) {
       if (err) {
         return callbackOnce(err)
       }
       const fileRef = new File(Object.assign({}, fileArgs, { hash: hashValue }))
       const fileId = fileRef._id
       const readStream = fs.createReadStream(fsPath)
-      readStream.on('error', function(err) {
+      readStream.on('error', function (err) {
         logger.warn(
           { err, projectId, fileId, fsPath },
           'something went wrong on the read stream of uploadFileFromDisk'
         )
         callbackOnce(err)
       })
-      readStream.on('open', function() {
+      readStream.on('open', function () {
         const url = FileStoreHandler._buildUrl(projectId, fileId)
         const opts = {
           method: 'post',
@@ -85,14 +85,14 @@ const FileStoreHandler = {
           } // send the hash to the filestore as a custom header so it can be checked
         }
         const writeStream = request(opts)
-        writeStream.on('error', function(err) {
+        writeStream.on('error', function (err) {
           logger.warn(
             { err, projectId, fileId, fsPath },
             'something went wrong on the write stream of uploadFileFromDisk'
           )
           callbackOnce(err)
         })
-        writeStream.on('response', function(response) {
+        writeStream.on('response', function (response) {
           if (![200, 201].includes(response.statusCode)) {
             err = new Error(
               `non-ok response from filestore for upload: ${response.statusCode}`
@@ -128,7 +128,7 @@ const FileStoreHandler = {
       }
     }
     const readStream = request(opts)
-    readStream.on('error', err =>
+    readStream.on('error', (err) =>
       logger.err(
         { err, projectId, fileId, query, opts },
         'error in file stream'
@@ -169,7 +169,7 @@ const FileStoreHandler = {
       uri: this._buildUrl(projectId, fileId),
       timeout: FIVE_MINS_IN_MS
     }
-    return request(opts, function(err, response) {
+    return request(opts, function (err, response) {
       if (err) {
         logger.warn(
           { err, projectId, fileId },
@@ -196,7 +196,7 @@ const FileStoreHandler = {
       uri: this._buildUrl(newProjectId, newFileId),
       timeout: FIVE_MINS_IN_MS
     }
-    return request(opts, function(err, response) {
+    return request(opts, function (err, response) {
       if (err) {
         logger.warn(
           { err, oldProjectId, oldFileId, newProjectId, newFileId },

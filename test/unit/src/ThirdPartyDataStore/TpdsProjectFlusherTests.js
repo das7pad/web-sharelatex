@@ -7,8 +7,8 @@ const { Project } = require('../helpers/models/Project')
 const MODULE_PATH =
   '../../../../app/src/Features/ThirdPartyDataStore/TpdsProjectFlusher'
 
-describe('TpdsProjectFlusher', function() {
-  beforeEach(function() {
+describe('TpdsProjectFlusher', function () {
+  beforeEach(function () {
     this.project = { _id: ObjectId() }
     this.docs = {
       '/doc/one': { _id: 'mock-doc-1', lines: ['one'], rev: 5 },
@@ -30,10 +30,7 @@ describe('TpdsProjectFlusher', function() {
     }
     this.ProjectEntityHandler = {
       promises: {
-        getAllDocs: sinon
-          .stub()
-          .withArgs(this.project._id)
-          .resolves(this.docs),
+        getAllDocs: sinon.stub().withArgs(this.project._id).resolves(this.docs),
         getAllFiles: sinon
           .stub()
           .withArgs(this.project._id)
@@ -61,25 +58,25 @@ describe('TpdsProjectFlusher', function() {
     })
   })
 
-  afterEach(function() {
+  afterEach(function () {
     this.ProjectMock.restore()
   })
 
-  describe('flushProjectToTpds', function() {
-    describe('usually', function() {
-      beforeEach(async function() {
+  describe('flushProjectToTpds', function () {
+    describe('usually', function () {
+      beforeEach(async function () {
         await this.TpdsProjectFlusher.promises.flushProjectToTpds(
           this.project._id
         )
       })
 
-      it('should flush the project from the doc updater', function() {
+      it('should flush the project from the doc updater', function () {
         expect(
           this.DocumentUpdaterHandler.promises.flushProjectToMongo
         ).to.have.been.calledWith(this.project._id)
       })
 
-      it('should flush each doc to the TPDS', function() {
+      it('should flush each doc to the TPDS', function () {
         for (const [path, doc] of Object.entries(this.docs)) {
           expect(this.TpdsUpdateSender.promises.addDoc).to.have.been.calledWith(
             {
@@ -93,7 +90,7 @@ describe('TpdsProjectFlusher', function() {
         }
       })
 
-      it('should flush each file to the TPDS', function() {
+      it('should flush each file to the TPDS', function () {
         for (const [path, file] of Object.entries(this.files)) {
           expect(
             this.TpdsUpdateSender.promises.addFile
@@ -108,8 +105,8 @@ describe('TpdsProjectFlusher', function() {
       })
     })
 
-    describe('when a TPDS flush is pending', function() {
-      beforeEach(async function() {
+    describe('when a TPDS flush is pending', function () {
+      beforeEach(async function () {
         this.project.deferredTpdsFlushCounter = 2
         this.ProjectMock.expects('updateOne')
           .withArgs(
@@ -126,14 +123,14 @@ describe('TpdsProjectFlusher', function() {
         )
       })
 
-      it('resets the deferred flush counter', function() {
+      it('resets the deferred flush counter', function () {
         this.ProjectMock.verify()
       })
     })
   })
 
-  describe('deferProjectFlushToTpds', function() {
-    beforeEach(async function() {
+  describe('deferProjectFlushToTpds', function () {
+    beforeEach(async function () {
       this.ProjectMock.expects('updateOne')
         .withArgs(
           {
@@ -148,41 +145,41 @@ describe('TpdsProjectFlusher', function() {
       )
     })
 
-    it('increments the deferred flush counter', function() {
+    it('increments the deferred flush counter', function () {
       this.ProjectMock.verify()
     })
   })
 
-  describe('flushProjectToTpdsIfNeeded', function() {
+  describe('flushProjectToTpdsIfNeeded', function () {
     let cases = [0, undefined]
-    cases.forEach(counterValue => {
-      describe(`when the deferred flush counter is ${counterValue}`, function() {
-        beforeEach(async function() {
+    cases.forEach((counterValue) => {
+      describe(`when the deferred flush counter is ${counterValue}`, function () {
+        beforeEach(async function () {
           this.project.deferredTpdsFlushCounter = counterValue
           await this.TpdsProjectFlusher.promises.flushProjectToTpdsIfNeeded(
             this.project._id
           )
         })
 
-        it("doesn't flush the project from the doc updater", function() {
+        it("doesn't flush the project from the doc updater", function () {
           expect(this.DocumentUpdaterHandler.promises.flushProjectToMongo).not
             .to.have.been.called
         })
 
-        it("doesn't flush any doc", function() {
+        it("doesn't flush any doc", function () {
           expect(this.TpdsUpdateSender.promises.addDoc).not.to.have.been.called
         })
 
-        it("doesn't flush any file", function() {
+        it("doesn't flush any file", function () {
           expect(this.TpdsUpdateSender.promises.addFile).not.to.have.been.called
         })
       })
     })
 
     cases = [1, 2]
-    cases.forEach(counterValue => {
-      describe(`when the deferred flush counter is ${counterValue}`, function() {
-        beforeEach(async function() {
+    cases.forEach((counterValue) => {
+      describe(`when the deferred flush counter is ${counterValue}`, function () {
+        beforeEach(async function () {
           this.project.deferredTpdsFlushCounter = counterValue
           this.ProjectMock.expects('updateOne')
             .withArgs(
@@ -199,13 +196,13 @@ describe('TpdsProjectFlusher', function() {
           )
         })
 
-        it('flushes the project from the doc updater', function() {
+        it('flushes the project from the doc updater', function () {
           expect(
             this.DocumentUpdaterHandler.promises.flushProjectToMongo
           ).to.have.been.calledWith(this.project._id)
         })
 
-        it('flushes each doc to the TPDS', function() {
+        it('flushes each doc to the TPDS', function () {
           for (const [path, doc] of Object.entries(this.docs)) {
             expect(
               this.TpdsUpdateSender.promises.addDoc
@@ -219,7 +216,7 @@ describe('TpdsProjectFlusher', function() {
           }
         })
 
-        it('flushes each file to the TPDS', function() {
+        it('flushes each file to the TPDS', function () {
           for (const [path, file] of Object.entries(this.files)) {
             expect(
               this.TpdsUpdateSender.promises.addFile
@@ -233,7 +230,7 @@ describe('TpdsProjectFlusher', function() {
           }
         })
 
-        it('resets the deferred flush counter', function() {
+        it('resets the deferred flush counter', function () {
           this.ProjectMock.verify()
         })
       })

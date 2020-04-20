@@ -33,13 +33,15 @@ module.exports = MetaHandler = {
 
   getAllMetaForProject(projectId, callback) {
     if (callback == null) {
-      callback = function(err, projectMeta) {}
+      callback = function (err, projectMeta) {}
     }
-    return DocumentUpdaterHandler.flushProjectToMongo(projectId, function(err) {
+    return DocumentUpdaterHandler.flushProjectToMongo(projectId, function (
+      err
+    ) {
       if (err != null) {
         return callback(err)
       }
-      return ProjectEntityHandler.getAllDocs(projectId, function(err, docs) {
+      return ProjectEntityHandler.getAllDocs(projectId, function (err, docs) {
         if (err != null) {
           return callback(err)
         }
@@ -51,15 +53,15 @@ module.exports = MetaHandler = {
 
   getMetaForDoc(projectId, docId, callback) {
     if (callback == null) {
-      callback = function(err, docMeta) {}
+      callback = function (err, docMeta) {}
     }
-    return DocumentUpdaterHandler.flushDocToMongo(projectId, docId, function(
+    return DocumentUpdaterHandler.flushDocToMongo(projectId, docId, function (
       err
     ) {
       if (err != null) {
         return callback(err)
       }
-      return ProjectEntityHandler.getDoc(projectId, docId, function(
+      return ProjectEntityHandler.getDoc(projectId, docId, function (
         err,
         lines
       ) {

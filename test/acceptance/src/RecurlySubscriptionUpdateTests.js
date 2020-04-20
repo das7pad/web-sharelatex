@@ -4,14 +4,14 @@ const User = require('./helpers/User')
 const RecurlySubscription = require('./helpers/RecurlySubscription')
 require('./helpers/MockV1Api')
 
-describe('Subscriptions', function() {
-  describe('update', function() {
-    beforeEach(function(done) {
+describe('Subscriptions', function () {
+  describe('update', function () {
+    beforeEach(function (done) {
       this.recurlyUser = new User()
       async.series(
         [
-          cb => this.recurlyUser.ensureUserExists(cb),
-          cb => {
+          (cb) => this.recurlyUser.ensureUserExists(cb),
+          (cb) => {
             this.recurlySubscription = new RecurlySubscription({
               adminId: this.recurlyUser._id,
               account: {
@@ -20,13 +20,13 @@ describe('Subscriptions', function() {
             })
             this.recurlySubscription.ensureExists(cb)
           },
-          cb => this.recurlyUser.login(cb)
+          (cb) => this.recurlyUser.login(cb)
         ],
         done
       )
     })
 
-    it('updates the email address for the account', function(done) {
+    it('updates the email address for the account', function (done) {
       const url = '/user/subscription/account/email'
 
       this.recurlyUser.request.post({ url }, (error, { statusCode }) => {

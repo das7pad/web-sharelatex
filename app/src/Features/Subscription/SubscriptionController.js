@@ -44,7 +44,7 @@ module.exports = SubscriptionController = {
 
     return GeoIpLookup.getCurrencyCode(
       (req.query != null ? req.query.ip : undefined) || req.ip,
-      function(err, recomendedCurrency) {
+      function (err, recomendedCurrency) {
         if (err != null) {
           return next(err)
         }
@@ -60,7 +60,7 @@ module.exports = SubscriptionController = {
           })
         const user_id = AuthenticationController.getLoggedInUserId(req)
         if (user_id != null) {
-          return UserGetter.getUser(user_id, { signUpDate: 1 }, function(
+          return UserGetter.getUser(user_id, { signUpDate: 1 }, function (
             err,
             user
           ) {
@@ -88,7 +88,7 @@ module.exports = SubscriptionController = {
         })
       )
     }
-    return LimitationsManager.userHasV1OrV2Subscription(user, function(
+    return LimitationsManager.userHasV1OrV2Subscription(user, function (
       err,
       hasSubscription
     ) {
@@ -102,7 +102,7 @@ module.exports = SubscriptionController = {
         // Recurly as well at this point (we don't do this most places for speed).
         return SubscriptionHandler.validateNoSubscriptionInRecurly(
           user._id,
-          function(error, valid) {
+          function (error, valid) {
             if (error != null) {
               return next(error)
             }
@@ -115,7 +115,7 @@ module.exports = SubscriptionController = {
                   : undefined
               return GeoIpLookup.getCurrencyCode(
                 (req.query != null ? req.query.ip : undefined) || req.ip,
-                function(err, recomendedCurrency, countryCode) {
+                function (err, recomendedCurrency, countryCode) {
                   if (err != null) {
                     return next(err)
                   }
@@ -153,7 +153,7 @@ module.exports = SubscriptionController = {
     const user = AuthenticationController.getSessionUser(req)
     return SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel(
       user,
-      function(error, results) {
+      function (error, results) {
         if (error != null) {
           return next(error)
         }
@@ -166,7 +166,7 @@ module.exports = SubscriptionController = {
           managedPublishers,
           v1SubscriptionStatus
         } = results
-        return LimitationsManager.userHasV1OrV2Subscription(user, function(
+        return LimitationsManager.userHasV1OrV2Subscription(user, function (
           err,
           hasSubscription
         ) {
@@ -204,7 +204,7 @@ module.exports = SubscriptionController = {
     }
     const { subscriptionDetails } = req.body
 
-    return LimitationsManager.userHasV1OrV2Subscription(user, function(
+    return LimitationsManager.userHasV1OrV2Subscription(user, function (
       err,
       hasSubscription
     ) {
@@ -219,7 +219,7 @@ module.exports = SubscriptionController = {
         user,
         subscriptionDetails,
         recurlyTokenIds,
-        function(err) {
+        function (err) {
           if (!err) {
             return res.sendStatus(201)
           }
@@ -248,7 +248,7 @@ module.exports = SubscriptionController = {
     const user = AuthenticationController.getSessionUser(req)
     return SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel(
       user,
-      function(error, { personalSubscription }) {
+      function (error, { personalSubscription }) {
         if (error != null) {
           return next(error)
         }
@@ -266,7 +266,7 @@ module.exports = SubscriptionController = {
   cancelSubscription(req, res, next) {
     const user = AuthenticationController.getSessionUser(req)
     logger.log({ user_id: user._id }, 'canceling subscription')
-    return SubscriptionHandler.cancelSubscription(user, function(err) {
+    return SubscriptionHandler.cancelSubscription(user, function (err) {
       if (err != null) {
         logger.warn(
           { err, user_id: user._id },
@@ -290,7 +290,7 @@ module.exports = SubscriptionController = {
   cancelV1Subscription(req, res, next) {
     const user_id = AuthenticationController.getLoggedInUserId(req)
     logger.log({ user_id }, 'canceling v1 subscription')
-    return V1SubscriptionManager.cancelV1Subscription(user_id, function(err) {
+    return V1SubscriptionManager.cancelV1Subscription(user_id, function (err) {
       if (err != null) {
         logger.warn(
           { err, user_id },
@@ -304,7 +304,7 @@ module.exports = SubscriptionController = {
 
   updateSubscription(req, res, next) {
     const _origin =
-      __guard__(req != null ? req.query : undefined, x => x.origin) || null
+      __guard__(req != null ? req.query : undefined, (x) => x.origin) || null
     const user = AuthenticationController.getSessionUser(req)
     const planCode = req.body.plan_code
     if (planCode == null) {
@@ -320,7 +320,7 @@ module.exports = SubscriptionController = {
       user,
       planCode,
       null,
-      function(err) {
+      function (err) {
         if (err != null) {
           logger.warn(
             { err, user_id: user._id },
@@ -335,7 +335,7 @@ module.exports = SubscriptionController = {
 
   updateAccountEmailAddress(req, res, next) {
     const user = AuthenticationController.getSessionUser(req)
-    RecurlyWrapper.updateAccountEmailAddress(user._id, user.email, function(
+    RecurlyWrapper.updateAccountEmailAddress(user._id, user.email, function (
       error
     ) {
       if (error) {
@@ -348,7 +348,7 @@ module.exports = SubscriptionController = {
   reactivateSubscription(req, res, next) {
     const user = AuthenticationController.getSessionUser(req)
     logger.log({ user_id: user._id }, 'reactivating subscription')
-    return SubscriptionHandler.reactivateSubscription(user, function(err) {
+    return SubscriptionHandler.reactivateSubscription(user, function (err) {
       if (err != null) {
         logger.warn(
           { err, user_id: user._id },
@@ -375,7 +375,7 @@ module.exports = SubscriptionController = {
       return SubscriptionHandler.syncSubscription(
         recurlySubscription,
         { ip: req.ip },
-        function(err) {
+        function (err) {
           if (err != null) {
             return next(err)
           }
@@ -386,7 +386,7 @@ module.exports = SubscriptionController = {
       const recurlyAccountCode = eventData.account.account_code
       return SubscriptionHandler.attemptPaypalInvoiceCollection(
         recurlyAccountCode,
-        function(err) {
+        function (err) {
           if (err) {
             return next(err)
           }
@@ -400,7 +400,7 @@ module.exports = SubscriptionController = {
 
   renderUpgradeToAnnualPlanPage(req, res, next) {
     const user = AuthenticationController.getSessionUser(req)
-    return LimitationsManager.userHasV2Subscription(user, function(
+    return LimitationsManager.userHasV2Subscription(user, function (
       err,
       hasSubscription,
       subscription
@@ -445,7 +445,7 @@ module.exports = SubscriptionController = {
       user,
       annualPlanName,
       coupon_code,
-      function(err) {
+      function (err) {
         if (err != null) {
           logger.warn({ err, user_id: user._id }, 'error updating subscription')
           return next(err)
@@ -457,7 +457,7 @@ module.exports = SubscriptionController = {
 
   extendTrial(req, res, next) {
     const user = AuthenticationController.getSessionUser(req)
-    return LimitationsManager.userHasV2Subscription(user, function(
+    return LimitationsManager.userHasV2Subscription(user, function (
       err,
       hasSubscription,
       subscription
@@ -465,7 +465,7 @@ module.exports = SubscriptionController = {
       if (err != null) {
         return next(err)
       }
-      return SubscriptionHandler.extendTrial(subscription, 14, function(err) {
+      return SubscriptionHandler.extendTrial(subscription, 14, function (err) {
         if (err != null) {
           return res.sendStatus(500)
         } else {
@@ -477,9 +477,9 @@ module.exports = SubscriptionController = {
 
   recurlyNotificationParser(req, res, next) {
     let xml = ''
-    req.on('data', chunk => (xml += chunk))
+    req.on('data', (chunk) => (xml += chunk))
     return req.on('end', () =>
-      RecurlyWrapper._parseXml(xml, function(error, body) {
+      RecurlyWrapper._parseXml(xml, function (error, body) {
         if (error != null) {
           return next(error)
         }
@@ -491,7 +491,7 @@ module.exports = SubscriptionController = {
 
   refreshUserFeatures(req, res, next) {
     const { user_id } = req.params
-    return FeaturesUpdater.refreshFeatures(user_id, function(error) {
+    return FeaturesUpdater.refreshFeatures(user_id, function (error) {
       if (error != null) {
         return next(error)
       }

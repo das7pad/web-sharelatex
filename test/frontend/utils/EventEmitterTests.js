@@ -10,13 +10,13 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../frontend/js/utils/EventEmitter'], EventEmitter =>
-  describe('EventEmitter', function() {
-    beforeEach(function() {
+define(['../../../frontend/js/utils/EventEmitter'], (EventEmitter) =>
+  describe('EventEmitter', function () {
+    beforeEach(function () {
       return (this.eventEmitter = new EventEmitter())
     })
 
-    it('calls listeners', function() {
+    it('calls listeners', function () {
       const cb1 = sinon.stub()
       const cb2 = sinon.stub()
       this.eventEmitter.on('foo', cb1)
@@ -28,7 +28,7 @@ define(['../../../frontend/js/utils/EventEmitter'], EventEmitter =>
       return expect(cb2).to.not.have.been.called
     })
 
-    it('calls multiple listeners', function() {
+    it('calls multiple listeners', function () {
       const cb1 = sinon.stub()
       const cb2 = sinon.stub()
       this.eventEmitter.on('foo', cb1)
@@ -40,7 +40,7 @@ define(['../../../frontend/js/utils/EventEmitter'], EventEmitter =>
       return expect(cb2).to.have.been.called
     })
 
-    it('calls listeners with namespace', function() {
+    it('calls listeners with namespace', function () {
       const cb1 = sinon.stub()
       const cb2 = sinon.stub()
       this.eventEmitter.on('foo', cb1)
@@ -52,7 +52,7 @@ define(['../../../frontend/js/utils/EventEmitter'], EventEmitter =>
       return expect(cb2).to.have.been.called
     })
 
-    it('removes listeners', function() {
+    it('removes listeners', function () {
       const cb = sinon.stub()
       this.eventEmitter.on('foo', cb)
       this.eventEmitter.off('foo')
@@ -62,7 +62,7 @@ define(['../../../frontend/js/utils/EventEmitter'], EventEmitter =>
       return expect(cb).to.not.have.been.called
     })
 
-    it('removes namespaced listeners', function() {
+    it('removes namespaced listeners', function () {
       const cb = sinon.stub()
       this.eventEmitter.on('foo.bar', cb)
       this.eventEmitter.off('foo.bar')
@@ -72,7 +72,7 @@ define(['../../../frontend/js/utils/EventEmitter'], EventEmitter =>
       return expect(cb).to.not.have.been.called
     })
 
-    it('does not remove unnamespaced listeners if off called with namespace', function() {
+    it('does not remove unnamespaced listeners if off called with namespace', function () {
       const cb1 = sinon.stub()
       const cb2 = sinon.stub()
       this.eventEmitter.on('foo', cb1)

@@ -1,4 +1,4 @@
-define(['ace/ace'], function() {
+define(['ace/ace'], function () {
   const BuiltInUndoManager = ace.require('ace/undomanager').UndoManager
 
   class UndoManager {
@@ -22,10 +22,7 @@ define(['ace/ace'], function() {
       // To hack around this we queue the undo stack clear so that it applies
       // after the change is applied
       setTimeout(() => {
-        this.editor
-          .getSession()
-          .getUndoManager()
-          .reset()
+        this.editor.getSession().getUndoManager().reset()
       })
     }
   }

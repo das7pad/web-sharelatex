@@ -9,4 +9,4 @@ define([
   './controllers/ChatMessageController',
   '../../directives/mathjax',
   '../../filters/wrapLongWords'
-], function() {})
+], function () {})

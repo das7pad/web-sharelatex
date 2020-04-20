@@ -21,13 +21,10 @@ const modulePath = path.join(
 )
 const { expect } = require('chai')
 
-describe('InstitutionsController', function() {
-  beforeEach(function() {
+describe('InstitutionsController', function () {
+  beforeEach(function () {
     this.logger = { err: sinon.stub(), warn: sinon.stub(), log() {} }
-    this.host = 'mit.edu'
-      .split('')
-      .reverse()
-      .join('')
+    this.host = 'mit.edu'.split('').reverse().join('')
     this.stubbedUser1 = {
       _id: '3131231',
       name: 'bob',
@@ -77,9 +74,9 @@ describe('InstitutionsController', function() {
     return (this.next = sinon.stub())
   })
 
-  describe('affiliateUsers', function() {
-    it('should add affiliations for matching users', function(done) {
-      this.res.sendStatus = code => {
+  describe('affiliateUsers', function () {
+    it('should add affiliations for matching users', function (done) {
+      this.res.sendStatus = (code) => {
         code.should.equal(200)
         this.getUsersByHostname.calledOnce.should.equal(true)
         this.addAffiliation.calledThrice.should.equal(true)
@@ -107,9 +104,9 @@ describe('InstitutionsController', function() {
       )
     })
 
-    it('should return errors if last affiliation cannot be added', function(done) {
+    it('should return errors if last affiliation cannot be added', function (done) {
       this.addAffiliation.onCall(2).callsArgWith(3, new Error('error'))
-      this.next = error => {
+      this.next = (error) => {
         expect(error).to.exist
         this.getUsersByHostname.calledOnce.should.equal(true)
         return done()

@@ -17,7 +17,7 @@ const BACKOFF_RANDOM_FACTOR = 0.5
 //
 let FaultTolerantRequest
 module.exports = FaultTolerantRequest = {
-  request: function(options, callback) {
+  request: function (options, callback) {
     options = Object.assign(
       {
         maxAttempts: BACKOFF_MAX_TRIES,
@@ -37,8 +37,8 @@ module.exports = FaultTolerantRequest = {
     request(options, callback)
   },
 
-  backgroundRequest: function(options, callback) {
-    FaultTolerantRequest.request(options, function(err) {
+  backgroundRequest: function (options, callback) {
+    FaultTolerantRequest.request(options, function (err) {
       if (err) {
         return logger.err(
           { err, url: options.url, query: options.qs, body: options.body },
@@ -50,14 +50,14 @@ module.exports = FaultTolerantRequest = {
     callback() // Do not wait for all the attempts
   },
 
-  exponentialDelayStrategy: function(
+  exponentialDelayStrategy: function (
     backoffBase,
     backoffMultiplier,
     backoffRandomFactor
   ) {
     let backoff = backoffBase
 
-    return function() {
+    return function () {
       const delay = exponentialDelay(backoff, backoffRandomFactor)
       backoff *= backoffMultiplier
       return delay

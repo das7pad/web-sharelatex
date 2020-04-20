@@ -10,8 +10,8 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../base'], App =>
-  App.controller('AnnualUpgradeController', function($scope, $http, $modal) {
+define(['../base'], (App) =>
+  App.controller('AnnualUpgradeController', function ($scope, $http, $modal) {
     const MESSAGES_URL = '/user/subscription/upgrade-annual'
 
     $scope.upgradeComplete = false
@@ -19,13 +19,13 @@ define(['../base'], App =>
       student: '19.2',
       collaborator: '36'
     }
-    $scope.$watch($scope.planName, function() {
+    $scope.$watch($scope.planName, function () {
       $scope.yearlySaving = savings[$scope.planName]
       if ($scope.planName === 'annual') {
         return ($scope.upgradeComplete = true)
       }
     })
-    return ($scope.completeAnnualUpgrade = function() {
+    return ($scope.completeAnnualUpgrade = function () {
       const body = {
         planName: $scope.planName,
         _csrf: window.csrfToken

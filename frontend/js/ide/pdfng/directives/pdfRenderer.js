@@ -21,14 +21,14 @@
 define(['../../../base', '../../../pdfjsBundle'], (App, PDFJS) =>
   // App = angular.module 'PDFRenderer', ['pdfAnnotations', 'pdfTextLayer']
 
-  App.factory('PDFRenderer', function(
+  App.factory('PDFRenderer', function (
     $timeout,
     pdfAnnotations,
     pdfTextLayer,
     pdfSpinner
   ) {
     let PDFRenderer
-    return (PDFRenderer = (function() {
+    return (PDFRenderer = (function () {
       PDFRenderer = class PDFRenderer {
         static initClass() {
           this.prototype.JOB_QUEUE_INTERVAL = 25
@@ -49,7 +49,7 @@ define(['../../../base', '../../../pdfjsBundle'], (App, PDFJS) =>
           if (
             __guard__(
               window.location != null ? window.location.search : undefined,
-              x => x.indexOf('disable-font-face=true')
+              (x) => x.indexOf('disable-font-face=true')
             ) >= 0
           ) {
             disableFontFace = true
@@ -81,14 +81,14 @@ define(['../../../base', '../../../pdfjsBundle'], (App, PDFJS) =>
           this.navigateFn = this.options.navigateFn
           this.spinner = new pdfSpinner()
           this.resetState()
-          this.document.promise.then(pdfDocument => {
+          this.document.promise.then((pdfDocument) => {
             return pdfDocument.getDownloadInfo().then(() => {
               return this.options.loadedCallback()
             })
           })
           this.errorCallback = this.options.errorCallback
           this.pageSizeChangeCallback = this.options.pageSizeChangeCallback
-          this.pdfjs.promise.catch(exception => {
+          this.pdfjs.promise.catch((exception) => {
             // error getting document
             return this.errorCallback(exception)
           })
@@ -104,8 +104,10 @@ define(['../../../base', '../../../pdfjsBundle'], (App, PDFJS) =>
             clearTimeout(timer)
           }
           for (const page of Array.from(this.pageState || [])) {
-            __guard__(page != null ? page.loadTask : undefined, x => x.cancel())
-            __guard__(page != null ? page.renderTask : undefined, x1 =>
+            __guard__(page != null ? page.loadTask : undefined, (x) =>
+              x.cancel()
+            )
+            __guard__(page != null ? page.renderTask : undefined, (x1) =>
               x1.cancel()
             )
           }
@@ -117,11 +119,13 @@ define(['../../../base', '../../../pdfjsBundle'], (App, PDFJS) =>
         }
 
         getNumPages() {
-          return this.document.promise.then(pdfDocument => pdfDocument.numPages)
+          return this.document.promise.then(
+            (pdfDocument) => pdfDocument.numPages
+          )
         }
 
         getPage(pageNum) {
-          return this.document.promise.then(pdfDocument =>
+          return this.document.promise.then((pdfDocument) =>
             pdfDocument.getPage(pageNum)
           )
         }
@@ -130,13 +134,13 @@ define(['../../../base', '../../../pdfjsBundle'], (App, PDFJS) =>
           if (scale == null) {
             ;({ scale } = this)
           }
-          return this.document.promise.then(pdfDocument => {
+          return this.document.promise.then((pdfDocument) => {
             return pdfDocument.getPage(pageNum).then(
-              function(page) {
+              function (page) {
                 let viewport
                 return (viewport = page.getViewport({ scale: scale }))
               },
-              error => {
+              (error) => {
                 return typeof this.errorCallback === 'function'
                   ? this.errorCallback(error)
                   : undefined
@@ -146,15 +150,15 @@ define(['../../../base', '../../../pdfjsBundle'], (App, PDFJS) =>
         }
 
         getDestinations() {
-          return this.document.promise.then(pdfDocument =>
+          return this.document.promise.then((pdfDocument) =>
             pdfDocument.getDestinations()
           )
         }
 
         getDestination(dest) {
           return this.document.promise.then(
-            pdfDocument => pdfDocument.getDestination(dest),
-            error => {
+            (pdfDocument) => pdfDocument.getDestination(dest),
+            (error) => {
               return typeof this.errorCallback === 'function'
                 ? this.errorCallback(error)
                 : undefined
@@ -163,10 +167,10 @@ define(['../../../base', '../../../pdfjsBundle'], (App, PDFJS) =>
         }
 
         getPageIndex(ref) {
-          return this.document.promise.then(pdfDocument => {
+          return this.document.promise.then((pdfDocument) => {
             return pdfDocument.getPageIndex(ref).then(
-              idx => idx,
-              error => {
+              (idx) => idx,
+              (error) => {
                 return typeof this.errorCallback === 'function'
                   ? this.errorCallback(error)
                   : undefined
@@ -206,7 +210,7 @@ define(['../../../base', '../../../pdfjsBundle'], (App, PDFJS) =>
           if (this.shuttingDown) {
             return
           }
-          this.renderQueue = Array.from(pages).map(page => ({
+          this.renderQueue = Array.from(pages).map((page) => ({
             element: page.elementChildren,
             pagenum: page.pageNum
           }))
@@ -339,7 +343,7 @@ define(['../../../base', '../../../pdfjsBundle'], (App, PDFJS) =>
             if (loadTask.cancelled) {
               return
             } // return from cancelled page load
-            __guardMethod__(window.Raven, 'captureMessage', o =>
+            __guardMethod__(window.Raven, 'captureMessage', (o) =>
               o.captureMessage(
                 `pdfng page load timed out after ${this.PAGE_LOAD_TIMEOUT}ms`
               )
@@ -355,14 +359,14 @@ define(['../../../base', '../../../pdfjsBundle'], (App, PDFJS) =>
 
           var loadTask = this.getPage(pagenum)
 
-          loadTask.cancel = function() {
+          loadTask.cancel = function () {
             return (this.cancelled = true)
           }
 
           this.pageState[pagenum] = pageState = { loadTask }
 
           return loadTask
-            .then(pageObject => {
+            .then((pageObject) => {
               // page load success
               $timeout.cancel(timer)
               if (loadTask.cancelled) {
@@ -386,7 +390,7 @@ define(['../../../base', '../../../pdfjsBundle'], (App, PDFJS) =>
                 }
               )
             })
-            .catch(error => {
+            .catch((error) => {
               // page load error
               $timeout.cancel(timer)
               return this.clearIndicator(page)
@@ -471,28 +475,28 @@ define(['../../../base', '../../../pdfjsBundle'], (App, PDFJS) =>
           const textLayerTimeout = this.TEXTLAYER_TIMEOUT
 
           result.promise
-            .then(function() {
+            .then(function () {
               // page render success
               canvas.removeClass('pdfng-rendering')
               page.getTextContent({ normalizeWhitespace: true }).then(
-                function(textContent) {
+                function (textContent) {
                   textLayer.setTextContent(textContent)
                   return textLayer.render(textLayerTimeout)
                 },
-                error =>
+                (error) =>
                   typeof self.errorCallback === 'function'
                     ? self.errorCallback(error)
                     : undefined
               )
               return page.getAnnotations().then(
-                annotations => annotationsLayer.setAnnotations(annotations),
-                error =>
+                (annotations) => annotationsLayer.setAnnotations(annotations),
+                (error) =>
                   typeof self.errorCallback === 'function'
                     ? self.errorCallback(error)
                     : undefined
               )
             })
-            .catch(function(error) {
+            .catch(function (error) {
               // page render failed
               if (error.name === 'RenderingCancelledException') {
                 // do nothing when cancelled
@@ -509,7 +513,7 @@ define(['../../../base', '../../../pdfjsBundle'], (App, PDFJS) =>
         destroy() {
           this.shuttingDown = true
           this.resetState()
-          return this.pdfjs.promise.then(function(document) {
+          return this.pdfjs.promise.then(function (document) {
             document.cleanup()
             return document.destroy()
           })

@@ -15,8 +15,8 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../../../../frontend/js/base'], function(App) {
-  App.controller('AdminUserController', function(
+define(['../../../../../../frontend/js/base'], function (App) {
+  App.controller('AdminUserController', function (
     $scope,
     $timeout,
     $modal,
@@ -36,7 +36,7 @@ define(['../../../../../../frontend/js/base'], function(App) {
       project.accessLevel = 'owner'
     }
 
-    $scope.clearSearchText = function() {
+    $scope.clearSearchText = function () {
       $scope.searchText.value = ''
       return $scope.updateVisibleProjects()
     }
@@ -45,12 +45,12 @@ define(['../../../../../../frontend/js/base'], function(App) {
 
     $scope.updateSelectedProjects = () =>
       ($scope.selectedProjects = $scope.projects.filter(
-        project => project.selected
+        (project) => project.selected
       ))
 
     $scope.getSelectedProjects = () => $scope.selectedProjects
 
-    $scope.openArchiveProjectsModal = function() {
+    $scope.openArchiveProjectsModal = function () {
       const modalInstance = $modal.open({
         templateUrl: 'deleteProjectsModalTemplate',
         controller: 'AdminDeleteProjectsModalController',
@@ -65,7 +65,7 @@ define(['../../../../../../frontend/js/base'], function(App) {
       )
     }
 
-    $scope.archiveOrLeaveSelectedProjects = function() {
+    $scope.archiveOrLeaveSelectedProjects = function () {
       const selected_projects = $scope.getSelectedProjects()
 
       for (project of Array.from(selected_projects)) {
@@ -82,14 +82,14 @@ define(['../../../../../../frontend/js/base'], function(App) {
       return $scope.updateVisibleProjects()
     }
 
-    $scope.changePredicate = function(newPredicate) {
+    $scope.changePredicate = function (newPredicate) {
       if ($scope.predicate === newPredicate) {
         $scope.reverse = !$scope.reverse
       }
       return ($scope.predicate = newPredicate)
     }
 
-    $scope.getSortIconClass = function(column) {
+    $scope.getSortIconClass = function (column) {
       if (column === $scope.predicate && $scope.reverse) {
         return 'fa-caret-down'
       } else if (column === $scope.predicate && !$scope.reverse) {
@@ -99,7 +99,7 @@ define(['../../../../../../frontend/js/base'], function(App) {
       }
     }
 
-    $scope.openDeleteSecondaryEmailModal = function(emailToRemove) {
+    $scope.openDeleteSecondaryEmailModal = function (emailToRemove) {
       const modalInstance = $modal.open({
         templateUrl: 'deleteSecondaryEmailModalTemplate',
         controller: 'DeleteSecondaryEmailModalController',
@@ -109,7 +109,7 @@ define(['../../../../../../frontend/js/base'], function(App) {
           }
         }
       })
-      return modalInstance.result.then(function() {
+      return modalInstance.result.then(function () {
         return queuedHttp({
           method: 'DELETE',
           url: `/admin/user/${$scope.user._id}/secondaryemail`,
@@ -130,7 +130,7 @@ define(['../../../../../../frontend/js/base'], function(App) {
       })
     }
 
-    $scope.openUnlinkOlModal = function() {
+    $scope.openUnlinkOlModal = function () {
       const modalInstance = $modal.open({
         templateUrl: 'unlinkOlModalTemplate',
         controller: 'UnlinkOlModalController',
@@ -157,7 +157,7 @@ define(['../../../../../../frontend/js/base'], function(App) {
     }
 
     // delete user
-    $scope.openDeleteUserModal = function() {
+    $scope.openDeleteUserModal = function () {
       const modalInstance = $modal.open({
         templateUrl: 'deleteUsersModalTemplate',
         controller: 'DeleteUsersModalController',
@@ -170,7 +170,7 @@ define(['../../../../../../frontend/js/base'], function(App) {
       return modalInstance.result.then(() => $scope.DeleteUser())
     }
 
-    $scope.DeleteUser = function() {
+    $scope.DeleteUser = function () {
       const { user } = $scope
       return queuedHttp({
         method: 'DELETE',
@@ -183,7 +183,7 @@ define(['../../../../../../frontend/js/base'], function(App) {
       )
     }
 
-    $scope.refreshFeatures = function() {
+    $scope.refreshFeatures = function () {
       const { user } = $scope
       $scope.refreshingFeatures = true
       return queuedHttp({
@@ -195,7 +195,7 @@ define(['../../../../../../frontend/js/base'], function(App) {
       }).then(() => location.reload())
     }
 
-    $scope.updateVisibleProjects = function() {
+    $scope.updateVisibleProjects = function () {
       $scope.visibleProjects = []
 
       return (() => {
@@ -230,15 +230,15 @@ define(['../../../../../../frontend/js/base'], function(App) {
     return $scope.updateVisibleProjects()
   })
 
-  App.controller('AdminProjectListItemController', $scope =>
-    $scope.$watch('project.selected', function(value) {
+  App.controller('AdminProjectListItemController', ($scope) =>
+    $scope.$watch('project.selected', function (value) {
       if (value != null) {
         return $scope.updateSelectedProjects()
       }
     })
   )
 
-  App.controller('AdminDeleteProjectsModalController', function(
+  App.controller('AdminDeleteProjectsModalController', function (
     $scope,
     $modalInstance,
     $timeout,
@@ -253,7 +253,7 @@ define(['../../../../../../frontend/js/base'], function(App) {
     return ($scope.cancel = () => $modalInstance.dismiss('cancel'))
   })
 
-  App.controller('UnlinkOlModalController', function(
+  App.controller('UnlinkOlModalController', function (
     $scope,
     $modalInstance,
     $timeout,
@@ -266,7 +266,7 @@ define(['../../../../../../frontend/js/base'], function(App) {
     return ($scope.cancel = () => $modalInstance.dismiss('cancel'))
   })
 
-  return App.controller('DeleteSecondaryEmailModalController', function(
+  return App.controller('DeleteSecondaryEmailModalController', function (
     $scope,
     $modalInstance,
     $timeout,

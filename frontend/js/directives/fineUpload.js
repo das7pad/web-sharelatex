@@ -10,7 +10,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 define(['../base', 'fineuploader'], (App, qq) =>
-  App.directive('fineUpload', $timeout => ({
+  App.directive('fineUpload', ($timeout) => ({
     scope: {
       multiple: '=',
       endpoint: '@',
@@ -41,12 +41,12 @@ define(['../base', 'fineuploader'], (App, qq) =>
         validation.sizeLimit = scope.sizeLimit
       }
       const maxConnections = scope.maxConnections || 1
-      const onComplete = scope.onCompleteCallback || function() {}
-      const onUpload = scope.onUploadCallback || function() {}
-      const onError = scope.onErrorCallback || function() {}
-      const onValidateBatch = scope.onValidateBatch || function() {}
-      const onSubmit = scope.onSubmitCallback || function() {}
-      const onCancel = scope.onCancelCallback || function() {}
+      const onComplete = scope.onCompleteCallback || function () {}
+      const onUpload = scope.onUploadCallback || function () {}
+      const onError = scope.onErrorCallback || function () {}
+      const onValidateBatch = scope.onValidateBatch || function () {}
+      const onSubmit = scope.onSubmitCallback || function () {}
+      const onCancel = scope.onCancelCallback || function () {}
       if (scope.autoUpload == null) {
         autoUpload = true
       } else {

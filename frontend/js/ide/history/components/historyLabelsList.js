@@ -14,12 +14,12 @@ define([
   '../../../base',
   '../../colors/ColorManager',
   '../util/displayNameForUser'
-], function(App, ColorManager, displayNameForUser) {
-  const historyLabelsListController = function($scope, $element, $attrs, _) {
+], function (App, ColorManager, displayNameForUser) {
+  const historyLabelsListController = function ($scope, $element, $attrs, _) {
     const ctrl = this
     ctrl.isDragging = false
     ctrl.versionsWithLabels = []
-    $scope.$watchCollection('$ctrl.labels', function(labels) {
+    $scope.$watchCollection('$ctrl.labels', function (labels) {
       if (labels != null && labels.length > 0) {
         const groupedLabelsHash = _.groupBy(labels, 'version')
         ctrl.versionsWithLabels = _.map(
@@ -42,18 +42,18 @@ define([
     ctrl.resetHoveredRange = () => {
       ctrl.hoveredHistoryRange = { toV: null, fromV: null }
     }
-    ctrl.setHoveredRangeToV = toV => {
+    ctrl.setHoveredRangeToV = (toV) => {
       if (toV >= ctrl.hoveredHistoryRange.fromV) {
         ctrl.hoveredHistoryRange.toV = toV
       }
     }
-    ctrl.setHoveredRangeFromV = fromV => {
+    ctrl.setHoveredRangeFromV = (fromV) => {
       if (fromV <= ctrl.hoveredHistoryRange.toV) {
         ctrl.hoveredHistoryRange.fromV = fromV
       }
     }
 
-    ctrl.isVersionSelected = function(version) {
+    ctrl.isVersionSelected = function (version) {
       if (ctrl.rangeSelectionEnabled) {
         return (
           version <= ctrl.selectedHistoryRange.toV &&
@@ -63,7 +63,7 @@ define([
         return version === ctrl.selectedHistoryVersion
       }
     }
-    ctrl.isVersionHoverSelected = function(version) {
+    ctrl.isVersionHoverSelected = function (version) {
       return (
         ctrl.rangeSelectionEnabled &&
         version <= ctrl.hoveredHistoryRange.toV &&
@@ -107,7 +107,7 @@ define([
         )
       }
     }
-    ctrl.handleVersionSelect = versionWithLabel => {
+    ctrl.handleVersionSelect = (versionWithLabel) => {
       if (ctrl.rangeSelectionEnabled) {
         // TODO
         ctrl.onRangeSelect({
@@ -118,7 +118,7 @@ define([
         ctrl.onVersionSelect({ version: versionWithLabel.version })
       }
     }
-    ctrl.setRangeToV = version => {
+    ctrl.setRangeToV = (version) => {
       if (version >= ctrl.selectedHistoryRange.fromV) {
         ctrl.onRangeSelect({
           selectedToV: version,
@@ -126,7 +126,7 @@ define([
         })
       }
     }
-    ctrl.setRangeFromV = version => {
+    ctrl.setRangeFromV = (version) => {
       if (version <= ctrl.selectedHistoryRange.toV) {
         ctrl.onRangeSelect({
           selectedToV: ctrl.selectedHistoryRange.toV,
@@ -137,15 +137,15 @@ define([
     // This method (and maybe the one below) will be removed soon. User details data will be
     // injected into the history API responses, so we won't need to fetch user data from other
     // local data structures.
-    ctrl.getUserById = id =>
-      _.find(ctrl.users, function(user) {
+    ctrl.getUserById = (id) =>
+      _.find(ctrl.users, function (user) {
         const curUserId =
           (user != null ? user._id : undefined) ||
           (user != null ? user.id : undefined)
         return curUserId === id
       })
     ctrl.displayName = displayNameForUser
-    ctrl.getUserCSSStyle = function(user, versionWithLabel) {
+    ctrl.getUserCSSStyle = function (user, versionWithLabel) {
       const curUserId =
         (user != null ? user._id : undefined) ||
         (user != null ? user.id : undefined)

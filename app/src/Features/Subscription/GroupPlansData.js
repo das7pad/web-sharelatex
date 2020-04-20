@@ -25,7 +25,7 @@ const data = fs.readFileSync(
 )
 const groups = JSON.parse(data.toString())
 
-const capitalize = string => string.charAt(0).toUpperCase() + string.slice(1)
+const capitalize = (string) => string.charAt(0).toUpperCase() + string.slice(1)
 
 // With group accounts in Recurly, we end up with a lot of plans to manage.
 // Rather than hand coding them in the settings file, and then needing to keep

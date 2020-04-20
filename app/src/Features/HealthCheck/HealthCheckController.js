@@ -26,11 +26,11 @@ const UserGetter = require('../User/UserGetter')
 module.exports = HealthCheckController = {
   check(req, res, next) {
     if (next == null) {
-      next = function(error) {}
+      next = function (error) {}
     }
     const d = domain.create()
-    d.on('error', error => logger.err({ err: error }, 'error in mocha'))
-    return d.run(function() {
+    d.on('error', (error) => logger.err({ err: error }, 'error in mocha'))
+    return d.run(function () {
       const mocha = new Mocha({ reporter: Reporter(res), timeout: 10000 })
       mocha.addFile('test/smoke/src/SmokeTests.js')
 
@@ -41,7 +41,7 @@ module.exports = HealthCheckController = {
       // here is a hack to evict the cache immediately after loading.
       mocha.loadFiles()
       evictSmokeTestsModule()
-      mocha.loadFiles = function(fn) {
+      mocha.loadFiles = function (fn) {
         return fn && fn()
       }
 
@@ -50,7 +50,7 @@ module.exports = HealthCheckController = {
   },
 
   checkApi(req, res, next) {
-    rclient.healthCheck(err => {
+    rclient.healthCheck((err) => {
       if (err) {
         logger.err({ err }, 'failed api redis health check')
         return res.sendStatus(500)
@@ -70,7 +70,7 @@ module.exports = HealthCheckController = {
   },
 
   checkRedis(req, res, next) {
-    return rclient.healthCheck(function(error) {
+    return rclient.healthCheck(function (error) {
       if (error != null) {
         logger.err({ err: error }, 'failed redis health check')
         return res.sendStatus(500)
@@ -81,7 +81,7 @@ module.exports = HealthCheckController = {
   },
 
   checkMongo(req, res, next) {
-    return UserGetter.getUserEmail(settings.smokeTest.userId, function(
+    return UserGetter.getUserEmail(settings.smokeTest.userId, function (
       err,
       email
     ) {
@@ -119,8 +119,8 @@ function evictSmokeTestsModule() {
   delete require.cache[path]
 }
 
-var Reporter = res =>
-  function(runner) {
+var Reporter = (res) =>
+  function (runner) {
     Base.call(this, runner)
 
     const tests = []
@@ -129,12 +129,12 @@ var Reporter = res =>
     let runnerProcessedAnyTestSuite = false
 
     runner.on('suite', () => (runnerProcessedAnyTestSuite = true))
-    runner.on('test end', test => tests.push(test))
-    runner.on('pass', test => passes.push(test))
-    runner.on('fail', test => failures.push(test))
+    runner.on('test end', (test) => tests.push(test))
+    runner.on('pass', (test) => passes.push(test))
+    runner.on('fail', (test) => failures.push(test))
 
     return runner.on('end', () => {
-      const clean = test => ({
+      const clean = (test) => ({
         title: test.fullTitle(),
         duration: test.duration,
         err: test.err,

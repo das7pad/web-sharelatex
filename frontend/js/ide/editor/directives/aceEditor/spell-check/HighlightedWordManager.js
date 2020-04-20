@@ -12,7 +12,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['ace/ace'], function() {
+define(['ace/ace'], function () {
   let HighlightedWordManager
   const { Range } = ace.require('ace/range')
 
@@ -33,7 +33,7 @@ define(['ace/ace'], function() {
 
     reset() {
       if (this.highlights != null) {
-        this.highlights.forEach(highlight => {
+        this.highlights.forEach((highlight) => {
           return this.editor.getSession().removeMarker(highlight.markerId)
         })
       }
@@ -71,27 +71,29 @@ define(['ace/ace'], function() {
 
     removeHighlight(highlight) {
       this.editor.getSession().removeMarker(highlight.markerId)
-      return (this.highlights = this.highlights.filter(hl => hl !== highlight))
+      return (this.highlights = this.highlights.filter(
+        (hl) => hl !== highlight
+      ))
     }
 
     removeWord(word) {
       return this.highlights
-        .filter(highlight => highlight.word === word)
-        .forEach(highlight => {
+        .filter((highlight) => highlight.word === word)
+        .forEach((highlight) => {
           return this.removeHighlight(highlight)
         })
     }
 
     clearRow(row) {
       return this.highlights
-        .filter(highlight => highlight.range.start.row === row)
-        .forEach(highlight => {
+        .filter((highlight) => highlight.range.start.row === row)
+        .forEach((highlight) => {
           return this.removeHighlight(highlight)
         })
     }
 
     findHighlightWithinRange(range) {
-      return _.find(this.highlights, highlight => {
+      return _.find(this.highlights, (highlight) => {
         return this._doesHighlightOverlapRange(
           highlight,
           range.start,
@@ -115,7 +117,7 @@ define(['ace/ace'], function() {
     }
 
     clearHighlightTouchingRange(range) {
-      const highlight = _.find(this.highlights, hl => {
+      const highlight = _.find(this.highlights, (hl) => {
         return this._doesHighlightTouchRange(hl, range.start, range.end)
       })
       if (highlight) {

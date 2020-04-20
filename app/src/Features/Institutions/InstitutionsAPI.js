@@ -22,7 +22,7 @@ const { V1ConnectionError } = require('../Errors/Errors')
 const InstitutionsAPI = {
   getInstitutionAffiliations(institutionId, callback) {
     if (callback == null) {
-      callback = function(error, body) {}
+      callback = function (error, body) {}
     }
     return makeAffiliationRequest(
       {
@@ -36,7 +36,7 @@ const InstitutionsAPI = {
 
   getInstitutionLicences(institutionId, startDate, endDate, lag, callback) {
     if (callback == null) {
-      callback = function(error, body) {}
+      callback = function (error, body) {}
     }
     return makeAffiliationRequest(
       {
@@ -51,7 +51,7 @@ const InstitutionsAPI = {
 
   getInstitutionNewLicences(institutionId, startDate, endDate, lag, callback) {
     if (callback == null) {
-      callback = function(error, body) {}
+      callback = function (error, body) {}
     }
     return makeAffiliationRequest(
       {
@@ -66,7 +66,7 @@ const InstitutionsAPI = {
 
   getUserAffiliations(userId, callback) {
     if (callback == null) {
-      callback = function(error, body) {}
+      callback = function (error, body) {}
     }
     return makeAffiliationRequest(
       {
@@ -93,14 +93,14 @@ const InstitutionsAPI = {
         body: { email, university, department, role, confirmedAt },
         defaultErrorMessage: "Couldn't create affiliation"
       },
-      function(error, body) {
+      function (error, body) {
         if (error) {
           return callback(error, body)
         }
         // have notifications delete any ip matcher notifications for this university
         return NotificationsBuilder.ipMatcherAffiliation(userId).read(
           university != null ? university.id : undefined,
-          function(err) {
+          function (err) {
             if (err) {
               // log and ignore error
               logger.err(
@@ -117,7 +117,7 @@ const InstitutionsAPI = {
 
   removeAffiliation(userId, email, callback) {
     if (callback == null) {
-      callback = function(error) {}
+      callback = function (error) {}
     }
     return makeAffiliationRequest(
       {
@@ -133,7 +133,7 @@ const InstitutionsAPI = {
 
   endorseAffiliation(userId, email, role, department, callback) {
     if (callback == null) {
-      callback = function(error) {}
+      callback = function (error) {}
     }
     return makeAffiliationRequest(
       {
@@ -148,7 +148,7 @@ const InstitutionsAPI = {
 
   deleteAffiliations(userId, callback) {
     if (callback == null) {
-      callback = function(error) {}
+      callback = function (error) {}
     }
     return makeAffiliationRequest(
       {
@@ -185,9 +185,9 @@ const InstitutionsAPI = {
   }
 }
 
-var makeAffiliationRequest = function(requestOptions, callback) {
+var makeAffiliationRequest = function (requestOptions, callback) {
   if (callback == null) {
-    callback = function(error) {}
+    callback = function (error) {}
   }
   if (!settings.apis.v1.url) {
     return callback(null)
@@ -204,7 +204,7 @@ var makeAffiliationRequest = function(requestOptions, callback) {
       json: true,
       timeout: 20 * 1000
     },
-    function(error, response, body) {
+    function (error, response, body) {
       if (error != null) {
         return callback(
           new V1ConnectionError('error getting affiliations from v1').withCause(
@@ -253,7 +253,7 @@ var makeAffiliationRequest = function(requestOptions, callback) {
   'getUserAffiliations',
   'addAffiliation',
   'removeAffiliation'
-].map(method =>
+].map((method) =>
   metrics.timeAsyncMethod(
     InstitutionsAPI,
     method,

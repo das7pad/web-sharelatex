@@ -24,7 +24,7 @@
 //   has been sent
 // event-tracking-trigger attribute is required to send event
 
-const isInViewport = function(element) {
+const isInViewport = function (element) {
   const elTop = element.offset().top
   const elBtm = elTop + element.outerHeight()
 
@@ -34,8 +34,8 @@ const isInViewport = function(element) {
   return elBtm > viewportTop && elTop < viewportBtm
 }
 
-define(['../base'], App =>
-  App.directive('eventTracking', eventTracking => ({
+define(['../base'], (App) =>
+  App.directive('eventTracking', (eventTracking) => ({
     scope: {
       eventTracking: '@',
       eventSegmentation: '=?'
@@ -50,7 +50,7 @@ define(['../base'], App =>
       const segmentation = scope.eventSegmentation || {}
       segmentation.page = window.location.pathname
 
-      const sendEvent = function(scrollEvent) {
+      const sendEvent = function (scrollEvent) {
         /*
 						@param {boolean}		scrollEvent		Use to unbind scroll event
 					*/
@@ -72,7 +72,7 @@ define(['../base'], App =>
       if (attrs.eventTrackingTrigger === 'load') {
         return sendEvent()
       } else if (attrs.eventTrackingTrigger === 'click') {
-        return element.on('click', e => sendEvent())
+        return element.on('click', (e) => sendEvent())
       } else if (attrs.eventTrackingTrigger === 'hover') {
         let timer = null
         let timeoutAmt = 500
@@ -80,7 +80,7 @@ define(['../base'], App =>
           timeoutAmt = parseInt(attrs.eventHoverAmt, 10)
         }
         return element
-          .on('mouseenter', function() {
+          .on('mouseenter', function () {
             timer = setTimeout(() => sendEvent(), timeoutAmt)
           })
           .on('mouseleave', () => clearTimeout(timer))

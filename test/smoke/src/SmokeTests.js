@@ -43,15 +43,15 @@ const request = require('request').defaults({
   }
 })
 
-describe('Opening', function() {
-  before(function(outerDone) {
+describe('Opening', function () {
+  before(function (outerDone) {
     logger.log('smoke test: setup')
     async.parallel(
       {
         clearLoginFailureRateLimit(done) {
           LoginRateLimiter.recordSuccessfulLogin(
             Settings.smokeTest.user,
-            err => {
+            (err) => {
               if (err != null) {
                 logger.err(
                   { err },
@@ -69,7 +69,7 @@ describe('Opening', function() {
           RateLimiter.clearRateLimit(
             'open-project',
             `${Settings.smokeTest.projectId}:${Settings.smokeTest.userId}`,
-            err => {
+            (err) => {
               if (err != null) {
                 logger.err(
                   { err },
@@ -87,7 +87,7 @@ describe('Opening', function() {
           RateLimiter.clearRateLimit(
             'overleaf-login',
             Settings.smokeTest.rateLimitSubject,
-            err => {
+            (err) => {
               if (err != null) {
                 logger.err(
                   { err },
@@ -106,7 +106,7 @@ describe('Opening', function() {
     )
   })
 
-  before(function(done) {
+  before(function (done) {
     logger.log('smoke test: hitting dev/csrf')
     request.get('dev/csrf', {}, (err, response, body) => {
       if (err != null) {
@@ -136,7 +136,7 @@ describe('Opening', function() {
     })
   })
 
-  after(function(done) {
+  after(function (done) {
     logger.log('smoke test: cleaning up')
     request.get('dev/csrf', {}, (err, response, body) => {
       if (err != null) {
@@ -147,7 +147,7 @@ describe('Opening', function() {
     })
   })
 
-  it('a project', function(done) {
+  it('a project', function (done) {
     logger.log('smoke test: Checking can load a project')
     this.timeout(4000)
     const uri = `project/${Settings.smokeTest.projectId}`
@@ -182,7 +182,7 @@ describe('Opening', function() {
     })
   })
 
-  it('the project list', function(done) {
+  it('the project list', function (done) {
     logger.log('smoke test: Checking can load project list')
     this.timeout(4000)
     request.get('project', {}, (error, response, body) => {

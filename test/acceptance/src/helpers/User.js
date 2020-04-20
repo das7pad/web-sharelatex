@@ -54,7 +54,7 @@ class User {
     if (this._id != null) {
       return callback(new Error('User already registered'))
     }
-    this.getCsrfToken(error => {
+    this.getCsrfToken((error) => {
       if (error != null) {
         return callback(error)
       }
@@ -84,11 +84,11 @@ class User {
   }
 
   loginWith(email, callback) {
-    this.ensureUserExists(error => {
+    this.ensureUserExists((error) => {
       if (error != null) {
         return callback(error)
       }
-      this.getCsrfToken(error => {
+      this.getCsrfToken((error) => {
         if (error != null) {
           return callback(error)
         }
@@ -113,14 +113,14 @@ class User {
       AuthenticationManager.setUserPasswordInV2(
         user._id,
         this.password,
-        error => {
+        (error) => {
           if (error != null) {
             return callback(error)
           }
           UserUpdater.updateUser(
             user._id,
             { $set: { emails: this.emails } },
-            error => {
+            (error) => {
               if (error != null) {
                 return callback(error)
               }
@@ -156,7 +156,7 @@ class User {
   }
 
   logout(callback) {
-    this.getCsrfToken(error => {
+    this.getCsrfToken((error) => {
       if (error != null) {
         return callback(error)
       }
@@ -284,7 +284,7 @@ class User {
       db.projects.remove(
         { owner_ref: ObjectId(userId) },
         { multi: true },
-        err => {
+        (err) => {
           if (err != null) {
             callback(err)
           }
@@ -295,7 +295,7 @@ class User {
   }
 
   deleteUser(callback) {
-    this.getCsrfToken(error => {
+    this.getCsrfToken((error) => {
       if (error) {
         return callback(error)
       }
@@ -377,8 +377,10 @@ class User {
   }
 
   deleteProjects(callback) {
-    db.projects.remove({ owner_ref: ObjectId(this.id) }, { multi: true }, err =>
-      callback(err)
+    db.projects.remove(
+      { owner_ref: ObjectId(this.id) },
+      { multi: true },
+      (err) => callback(err)
     )
   }
 
@@ -403,7 +405,7 @@ class User {
   }
 
   createDocInProject(projectId, parentFolderId, name, callback) {
-    this.getCsrfToken(error => {
+    this.getCsrfToken((error) => {
       if (error != null) {
         return callback(error)
       }
@@ -432,7 +434,7 @@ class User {
     } else if (privileges === 'readOnly') {
       updateOp = { $addToSet: { readOnly_refs: user._id } }
     }
-    db.projects.update({ _id: db.ObjectId(projectId) }, updateOp, err =>
+    db.projects.update({ _id: db.ObjectId(projectId) }, updateOp, (err) =>
       callback(err)
     )
   }
@@ -509,7 +511,7 @@ class User {
   }
 
   changePassword(callback) {
-    this.getCsrfToken(error => {
+    this.getCsrfToken((error) => {
       if (error != null) {
         return callback(error)
       }
@@ -538,7 +540,7 @@ class User {
   }
 
   reconfirmAccountRequest(userEmail, callback) {
-    this.getCsrfToken(error => {
+    this.getCsrfToken((error) => {
       if (error != null) {
         return callback(error)
       }
@@ -557,7 +559,7 @@ class User {
   }
 
   getUserSettingsPage(callback) {
-    this.getCsrfToken(error => {
+    this.getCsrfToken((error) => {
       if (error != null) {
         return callback(error)
       }
@@ -576,7 +578,7 @@ class User {
   }
 
   activateSudoMode(callback) {
-    this.getCsrfToken(error => {
+    this.getCsrfToken((error) => {
       if (error != null) {
         return callback(error)
       }
@@ -593,7 +595,7 @@ class User {
   }
 
   updateSettings(newSettings, callback) {
-    this.getCsrfToken(error => {
+    this.getCsrfToken((error) => {
       if (error != null) {
         return callback(error)
       }
@@ -608,7 +610,7 @@ class User {
   }
 
   getProjectListPage(callback) {
-    this.getCsrfToken(error => {
+    this.getCsrfToken((error) => {
       if (error != null) {
         return callback(error)
       }
@@ -646,7 +648,7 @@ class User {
   }
 
   transferProjectOwnership(projectId, userId, callback) {
-    this.getCsrfToken(err => {
+    this.getCsrfToken((err) => {
       if (err != null) {
         return callback(err)
       }
@@ -687,7 +689,7 @@ class User {
   }
 
   setCollaboratorInfo(projectId, userId, info, callback) {
-    this.getCsrfToken(err => {
+    this.getCsrfToken((err) => {
       if (err != null) {
         return callback(err)
       }
@@ -729,7 +731,7 @@ User.promises = class extends User {
 // promisify User class methods - works for methods with 0-1 output parameters,
 // otherwise we will need to implement the method manually instead
 const nonPromiseMethods = ['constructor', 'setExtraAttributes']
-Object.getOwnPropertyNames(User.prototype).forEach(methodName => {
+Object.getOwnPropertyNames(User.prototype).forEach((methodName) => {
   const method = User.prototype[methodName]
   if (typeof method === 'function' && !nonPromiseMethods.includes(methodName)) {
     User.promises.prototype[methodName] = promisify(method)

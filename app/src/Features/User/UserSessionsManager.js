@@ -25,7 +25,7 @@ const UserSessionsManager = {
       .multi()
       .sadd(sessionSetKey, value)
       .pexpire(sessionSetKey, `${Settings.cookieSessionLength}`) // in milliseconds
-      .exec(function(err, response) {
+      .exec(function (err, response) {
         if (err) {
           logger.warn(
             { err, user_id: user._id, sessionSetKey },
@@ -33,14 +33,14 @@ const UserSessionsManager = {
           )
           return callback(err)
         }
-        UserSessionsManager._checkSessions(user, function() {})
+        UserSessionsManager._checkSessions(user, function () {})
         callback()
       })
   },
 
   untrackSession(user, sessionId, callback) {
     if (!callback) {
-      callback = function() {}
+      callback = function () {}
     }
     if (!user) {
       return callback(null)
@@ -54,7 +54,7 @@ const UserSessionsManager = {
       .multi()
       .srem(sessionSetKey, value)
       .pexpire(sessionSetKey, `${Settings.cookieSessionLength}`) // in milliseconds
-      .exec(function(err, response) {
+      .exec(function (err, response) {
         if (err) {
           logger.warn(
             { err, user_id: user._id, sessionSetKey },
@@ -62,7 +62,7 @@ const UserSessionsManager = {
           )
           return callback(err)
         }
-        UserSessionsManager._checkSessions(user, function() {})
+        UserSessionsManager._checkSessions(user, function () {})
         callback()
       })
   },
@@ -70,7 +70,7 @@ const UserSessionsManager = {
   getAllUserSessions(user, exclude, callback) {
     exclude = _.map(exclude, UserSessionsManager._sessionKey)
     const sessionSetKey = UserSessionsRedis.sessionSetKey(user)
-    rclient.smembers(sessionSetKey, function(err, sessionKeys) {
+    rclient.smembers(sessionSetKey, function (err, sessionKeys) {
       if (err) {
         logger.warn(
           { user_id: user._id },
@@ -78,7 +78,7 @@ const UserSessionsManager = {
         )
         return callback(err)
       }
-      sessionKeys = _.filter(sessionKeys, k => !_.contains(exclude, k))
+      sessionKeys = _.filter(sessionKeys, (k) => !_.contains(exclude, k))
       if (sessionKeys.length === 0) {
         logger.log({ user_id: user._id }, 'no other sessions found, returning')
         return callback(null, [])
@@ -87,7 +87,7 @@ const UserSessionsManager = {
       Async.mapSeries(
         sessionKeys,
         (k, cb) => rclient.get(k, cb),
-        function(err, sessions) {
+        function (err, sessions) {
           if (err) {
             logger.warn(
               { user_id: user._id },
@@ -123,12 +123,12 @@ const UserSessionsManager = {
     if (!retain) {
       retain = []
     }
-    retain = retain.map(i => UserSessionsManager._sessionKey(i))
+    retain = retain.map((i) => UserSessionsManager._sessionKey(i))
     if (!user) {
       return callback(null)
     }
     const sessionSetKey = UserSessionsRedis.sessionSetKey(user)
-    rclient.smembers(sessionSetKey, function(err, sessionKeys) {
+    rclient.smembers(sessionSetKey, function (err, sessionKeys) {
       if (err) {
         logger.warn(
           { err, user_id: user._id, sessionSetKey },
@@ -138,7 +138,7 @@ const UserSessionsManager = {
       }
       const keysToDelete = _.filter(
         sessionKeys,
-        k => !Array.from(retain).includes(k)
+        (k) => !Array.from(retain).includes(k)
       )
       if (keysToDelete.length === 0) {
         logger.log(
@@ -152,9 +152,9 @@ const UserSessionsManager = {
         'deleting sessions for user'
       )
 
-      const deletions = keysToDelete.map(k => cb => rclient.del(k, cb))
+      const deletions = keysToDelete.map((k) => (cb) => rclient.del(k, cb))
 
-      Async.series(deletions, function(err, _result) {
+      Async.series(deletions, function (err, _result) {
         if (err) {
           logger.warn(
             { err, user_id: user._id, sessionSetKey },
@@ -162,7 +162,7 @@ const UserSessionsManager = {
           )
           return callback(err)
         }
-        rclient.srem(sessionSetKey, keysToDelete, function(err) {
+        rclient.srem(sessionSetKey, keysToDelete, function (err) {
           if (err) {
             logger.warn(
               { err, user_id: user._id, sessionSetKey },
@@ -184,7 +184,7 @@ const UserSessionsManager = {
     rclient.pexpire(
       sessionSetKey,
       `${Settings.cookieSessionLength}`, // in milliseconds
-      function(err, response) {
+      function (err, response) {
         if (err) {
           logger.warn(
             { err, user_id: user._id },
@@ -202,7 +202,7 @@ const UserSessionsManager = {
       return callback(null)
     }
     const sessionSetKey = UserSessionsRedis.sessionSetKey(user)
-    rclient.smembers(sessionSetKey, function(err, sessionKeys) {
+    rclient.smembers(sessionSetKey, function (err, sessionKeys) {
       if (err) {
         logger.warn(
           { err, user_id: user._id, sessionSetKey },
@@ -211,13 +211,13 @@ const UserSessionsManager = {
         return callback(err)
       }
       Async.series(
-        sessionKeys.map(key => next =>
-          rclient.get(key, function(err, val) {
+        sessionKeys.map((key) => (next) =>
+          rclient.get(key, function (err, val) {
             if (err) {
               return next(err)
             }
             if (!val) {
-              rclient.srem(sessionSetKey, key, function(err, result) {
+              rclient.srem(sessionSetKey, key, function (err, result) {
                 return next(err)
               })
             } else {
@@ -225,7 +225,7 @@ const UserSessionsManager = {
             }
           })
         ),
-        function(err, results) {
+        function (err, results) {
           callback(err)
         }
       )

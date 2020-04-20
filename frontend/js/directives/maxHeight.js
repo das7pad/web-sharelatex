@@ -9,11 +9,11 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../base'], App =>
+define(['../base'], (App) =>
   App.directive('maxHeight', () => ({
     restrict: 'A',
     link(scope, element, attrs) {
-      return scope.$watch(attrs.maxHeight, function(value) {
+      return scope.$watch(attrs.maxHeight, function (value) {
         if (value != null) {
           return element.css({ 'max-height': value })
         }

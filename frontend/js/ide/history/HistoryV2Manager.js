@@ -36,9 +36,9 @@ define([
   './components/historyLabel',
   './components/historyFileTree',
   './components/historyFileEntity'
-], function(moment, ColorManager, displayNameForUser, HistoryViewModes) {
+], function (moment, ColorManager, displayNameForUser, HistoryViewModes) {
   let HistoryManager
-  return (HistoryManager = (function() {
+  return (HistoryManager = (function () {
     HistoryManager = class HistoryManager {
       static initClass() {
         this.prototype.MAX_RECENT_UPDATES_TO_SELECT = 5
@@ -157,7 +157,7 @@ define([
         }
         const _deregisterFeatureWatcher = this.$scope.$watch(
           'project.features.versioning',
-          hasVersioning => {
+          (hasVersioning) => {
             if (hasVersioning != null) {
               this.$scope.history.userHasFullFeature = hasVersioning
               if (this.$scope.user.isAdmin) {
@@ -300,7 +300,7 @@ define([
 
         return this.ide.$http
           .get(url, { timeout: this._loadFileTreeRequestCanceller.promise })
-          .then(response => {
+          .then((response) => {
             this.$scope.history.selection.files = response.data.diff
             for (const file of this.$scope.history.selection.files) {
               if (file.newPathname != null) {
@@ -313,7 +313,7 @@ define([
             this.$scope.history.loadingFileTree = false
             this.autoSelectFile()
           })
-          .catch(err => {
+          .catch((err) => {
             if (err.status !== -1) {
               this._loadFileTreeRequestCanceller = null
             } else {
@@ -370,13 +370,13 @@ define([
             if (previouslySelectedFile != null) {
               fileToSelect = previouslySelectedFile
             } else {
-              const mainFile = _.find(files, function(file) {
+              const mainFile = _.find(files, function (file) {
                 return /main\.tex$/.test(file.pathname)
               })
               if (mainFile != null) {
                 fileToSelect = mainFile
               } else {
-                const anyTeXFile = _.find(files, function(file) {
+                const anyTeXFile = _.find(files, function (file) {
                   return /\.tex$/.test(file.pathname)
                 })
                 if (anyTeXFile != null) {
@@ -620,7 +620,7 @@ define([
 
         return this.ide.$q
           .all(requests)
-          .then(response => {
+          .then((response) => {
             const updatesData = response.updates.data
             let lastUpdateToV = null
 
@@ -647,7 +647,7 @@ define([
               this.$scope.history.loadingFileTree = false
             }
           })
-          .catch(error => {
+          .catch((error) => {
             const { status, statusText } = error
             this.$scope.history.error = { status, statusText }
             this.$scope.history.atEnd = true
@@ -712,13 +712,13 @@ define([
         this.$scope.history.selection.file.loading = true
         return this.ide.$http
           .get(url)
-          .then(response => {
+          .then((response) => {
             const { text, binary } = this._parseDiff(response.data.diff)
             this.$scope.history.selection.file.binary = binary
             this.$scope.history.selection.file.text = text
             this.$scope.history.selection.file.loading = false
           })
-          .catch(function() {})
+          .catch(function () {})
       }
 
       reloadDiff() {
@@ -756,7 +756,7 @@ define([
         url += `?${query.join('&')}`
         return this.ide.$http
           .get(url)
-          .then(response => {
+          .then((response) => {
             const { data } = response
             diff.loading = false
             const { text, highlights, binary } = this._parseDiff(data.diff)
@@ -764,7 +764,7 @@ define([
             diff.text = text
             diff.highlights = highlights
           })
-          .catch(function() {
+          .catch(function () {
             diff.loading = false
             diff.error = true
           })
@@ -788,7 +788,7 @@ define([
               'X-CSRF-Token': window.csrfToken
             }
           })
-          .then(response => {
+          .then((response) => {
             return this._deleteLabelLocally(label)
           })
       }
@@ -799,7 +799,7 @@ define([
           if (update.toV === labelToDelete.version) {
             update.labels = _.filter(
               update.labels,
-              label => label.id !== labelToDelete.id
+              (label) => label.id !== labelToDelete.id
             )
             break
           }
@@ -807,7 +807,7 @@ define([
         this.$scope.history.labels = this._loadLabels(
           _.filter(
             this.$scope.history.labels,
-            label => label.id !== labelToDelete.id
+            (label) => label.id !== labelToDelete.id
           ),
           this.$scope.history.updates[0].toV
         )
@@ -969,7 +969,7 @@ define([
             version,
             _csrf: window.csrfToken
           })
-          .then(response => {
+          .then((response) => {
             return this._addLabelLocally(response.data)
           })
       }
@@ -977,7 +977,7 @@ define([
       _addLabelLocally(label) {
         const localUpdate = _.find(
           this.$scope.history.updates,
-          update => update.toV === label.version
+          (update) => update.toV === label.version
         )
         if (localUpdate != null) {
           localUpdate.labels = localUpdate.labels.concat(label)

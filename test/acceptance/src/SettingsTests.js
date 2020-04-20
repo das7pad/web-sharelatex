@@ -13,8 +13,8 @@ const async = require('async')
 const User = require('./helpers/User')
 const MockV1Api = require('./helpers/MockV1Api')
 
-describe('SettingsPage', function() {
-  beforeEach(function(done) {
+describe('SettingsPage', function () {
+  beforeEach(function (done) {
     this.user = new User()
     this.v1Id = 1234
     this.v1User = {
@@ -30,8 +30,9 @@ describe('SettingsPage', function() {
       [
         this.user.ensureUserExists.bind(this.user),
         this.user.login.bind(this.user),
-        cb => this.user.mongoUpdate({ $set: { 'overleaf.id': this.v1Id } }, cb),
-        cb => {
+        (cb) =>
+          this.user.mongoUpdate({ $set: { 'overleaf.id': this.v1Id } }, cb),
+        (cb) => {
           MockV1Api.setUser(this.v1Id, this.v1User)
           return cb()
         },
@@ -41,16 +42,16 @@ describe('SettingsPage', function() {
     )
   })
 
-  it('load settings page', function(done) {
+  it('load settings page', function (done) {
     return this.user.getUserSettingsPage((err, statusCode) => {
       statusCode.should.equal(200)
       return done()
     })
   })
 
-  it('update main email address', function(done) {
+  it('update main email address', function (done) {
     const newEmail = `foo${Math.random()}@bar.com`
-    return this.user.updateSettings({ email: newEmail }, error => {
+    return this.user.updateSettings({ email: newEmail }, (error) => {
       should.not.exist(error)
       return this.user.get((error, user) => {
         user.email.should.equal(newEmail)

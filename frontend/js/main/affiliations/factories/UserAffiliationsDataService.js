@@ -1,4 +1,4 @@
-define(['../../../base'], function(App) {
+define(['../../../base'], function (App) {
   const countriesList = [
     { code: 'af', name: 'Afghanistan' },
     { code: 'ax', name: 'Åland Islands' },
@@ -400,7 +400,7 @@ define(['../../../base'], function(App) {
     }
   }
 
-  App.factory('UserAffiliationsDataService', function($http, $q, _) {
+  App.factory('UserAffiliationsDataService', function ($http, $q, _) {
     const getCountries = () => $q.resolve(countriesList)
 
     const getDefaultRoleHints = () => $q.resolve(defaultRoleHints)
@@ -408,19 +408,19 @@ define(['../../../base'], function(App) {
     const getDefaultDepartmentHints = () => $q.resolve(defaultDepartmentHints)
 
     const getUserEmails = () =>
-      $http.get('/user/emails').then(response => response.data)
+      $http.get('/user/emails').then((response) => response.data)
 
     const getUserEmailsEnsureAffiliation = () =>
       $http
         .get('/user/emails?ensureAffiliation=true')
-        .then(response => response.data)
+        .then((response) => response.data)
 
     const getUserDefaultEmail = () =>
-      getUserEmails().then(userEmails =>
-        _.find(userEmails, userEmail => userEmail.default)
+      getUserEmails().then((userEmails) =>
+        _.find(userEmails, (userEmail) => userEmail.default)
       )
 
-    const getUniversitiesFromCountry = function(country) {
+    const getUniversitiesFromCountry = function (country) {
       let universitiesFromCountry
       if (universities[country.code] != null) {
         universitiesFromCountry = universities[country.code]
@@ -429,12 +429,12 @@ define(['../../../base'], function(App) {
           .get('/institutions/list', {
             params: { country_code: country.code }
           })
-          .then(response => (universities[country.code] = response.data))
+          .then((response) => (universities[country.code] = response.data))
       }
       return $q.resolve(universitiesFromCountry)
     }
 
-    const getUniversityDomainFromPartialDomainInput = function(
+    const getUniversityDomainFromPartialDomainInput = function (
       partialDomainInput
     ) {
       if (universitiesByDomain[partialDomainInput] != null) {
@@ -444,7 +444,7 @@ define(['../../../base'], function(App) {
           .get('/institutions/domains', {
             params: { hostname: partialDomainInput, limit: 1 }
           })
-          .then(function(response) {
+          .then(function (response) {
             const university = response.data[0]
             if (
               university != null &&
@@ -459,12 +459,12 @@ define(['../../../base'], function(App) {
       }
     }
 
-    const getUniversityDetails = universityId =>
+    const getUniversityDetails = (universityId) =>
       $http
         .get(`/institutions/list/${universityId}`)
-        .then(response => response.data)
+        .then((response) => response.data)
 
-    const addUserEmail = email =>
+    const addUserEmail = (email) =>
       $http.post('/user/emails', {
         email,
         _csrf: window.csrfToken
@@ -507,25 +507,26 @@ define(['../../../base'], function(App) {
         _csrf: window.csrfToken
       })
 
-    const setDefaultUserEmail = email =>
+    const setDefaultUserEmail = (email) =>
       $http.post('/user/emails/default', {
         email,
         _csrf: window.csrfToken
       })
 
-    const removeUserEmail = email =>
+    const removeUserEmail = (email) =>
       $http.post('/user/emails/delete', {
         email,
         _csrf: window.csrfToken
       })
 
-    const resendConfirmationEmail = email =>
+    const resendConfirmationEmail = (email) =>
       $http.post('/user/emails/resend_confirmation', {
         email,
         _csrf: window.csrfToken
       })
 
-    var isDomainBlacklisted = domain => domain.toLowerCase() in domainsBlackList
+    var isDomainBlacklisted = (domain) =>
+      domain.toLowerCase() in domainsBlackList
 
     return {
       getCountries,

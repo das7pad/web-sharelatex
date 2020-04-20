@@ -1,30 +1,30 @@
-define(['../../base', '../../ide/colors/ColorManager'], function(
+define(['../../base', '../../ide/colors/ColorManager'], function (
   App,
   ColorManager
 ) {
-  App.controller('TagListController', function($scope, $modal) {
-    $scope.filterProjects = function(filter = 'all') {
+  App.controller('TagListController', function ($scope, $modal) {
+    $scope.filterProjects = function (filter = 'all') {
       $scope._clearTags()
       $scope.setFilter(filter)
     }
 
     $scope._clearTags = () =>
-      $scope.tags.forEach(tag => {
+      $scope.tags.forEach((tag) => {
         tag.selected = false
       })
 
-    $scope.selectTag = function(tag) {
+    $scope.selectTag = function (tag) {
       $scope._clearTags()
       tag.selected = true
       $scope.setFilter('tag')
     }
 
-    $scope.selectUntagged = function() {
+    $scope.selectUntagged = function () {
       $scope._clearTags()
       $scope.setFilter('untagged')
     }
 
-    $scope.countProjectsForTag = function(tag) {
+    $scope.countProjectsForTag = function (tag) {
       return tag.project_ids.reduce((acc, projectId) => {
         const project = $scope.getProjectById(projectId)
 
@@ -42,9 +42,9 @@ define(['../../base', '../../ide/colors/ColorManager'], function(
       }, 0)
     }
 
-    $scope.getHueForTagId = tagId => ColorManager.getHueForTagId(tagId)
+    $scope.getHueForTagId = (tagId) => ColorManager.getHueForTagId(tagId)
 
-    $scope.deleteTag = function(tag) {
+    $scope.deleteTag = function (tag) {
       const modalInstance = $modal.open({
         templateUrl: 'deleteTagModalTemplate',
         controller: 'DeleteTagModalController',
@@ -54,7 +54,7 @@ define(['../../base', '../../ide/colors/ColorManager'], function(
           }
         }
       })
-      modalInstance.result.then(function() {
+      modalInstance.result.then(function () {
         // Remove tag from projects
         for (const project of $scope.projects) {
           if (!project.tags) {
@@ -66,11 +66,11 @@ define(['../../base', '../../ide/colors/ColorManager'], function(
           }
         }
         // Remove tag
-        $scope.tags = $scope.tags.filter(t => t !== tag)
+        $scope.tags = $scope.tags.filter((t) => t !== tag)
       })
     }
 
-    $scope.renameTag = function(tag) {
+    $scope.renameTag = function (tag) {
       const modalInstance = $modal.open({
         templateUrl: 'renameTagModalTemplate',
         controller: 'RenameTagModalController',
@@ -80,12 +80,12 @@ define(['../../base', '../../ide/colors/ColorManager'], function(
           }
         }
       })
-      modalInstance.result.then(newName => (tag.name = newName))
+      modalInstance.result.then((newName) => (tag.name = newName))
     }
   })
 
-  App.controller('TagDropdownItemController', function($scope) {
-    $scope.recalculateProjectsInTag = function() {
+  App.controller('TagDropdownItemController', function ($scope) {
+    $scope.recalculateProjectsInTag = function () {
       let partialSelection
       $scope.areSelectedProjectsInTag = false
       for (const projectId of $scope.getSelectedProjectIds()) {
@@ -101,7 +101,7 @@ define(['../../base', '../../ide/colors/ColorManager'], function(
       }
     }
 
-    $scope.addOrRemoveProjectsFromTag = function() {
+    $scope.addOrRemoveProjectsFromTag = function () {
       if ($scope.areSelectedProjectsInTag === true) {
         $scope.removeSelectedProjectsFromTag($scope.tag)
         $scope.areSelectedProjectsInTag = false
@@ -118,7 +118,7 @@ define(['../../base', '../../ide/colors/ColorManager'], function(
     $scope.recalculateProjectsInTag()
   })
 
-  App.controller('NewTagModalController', function(
+  App.controller('NewTagModalController', function (
     $scope,
     $modalInstance,
     $timeout,
@@ -135,7 +135,7 @@ define(['../../base', '../../ide/colors/ColorManager'], function(
       $timeout(() => $scope.$broadcast('open'), 200)
     )
 
-    $scope.create = function() {
+    $scope.create = function () {
       const name = $scope.inputs.newTagName
       $scope.state.inflight = true
       $scope.state.error = false
@@ -144,12 +144,12 @@ define(['../../base', '../../ide/colors/ColorManager'], function(
           _csrf: window.csrfToken,
           name
         })
-        .then(function(response) {
+        .then(function (response) {
           const { data } = response
           $scope.state.inflight = false
           $modalInstance.close(data)
         })
-        .catch(function() {
+        .catch(function () {
           $scope.state.inflight = false
           $scope.state.error = true
         })
@@ -158,7 +158,7 @@ define(['../../base', '../../ide/colors/ColorManager'], function(
     $scope.cancel = () => $modalInstance.dismiss('cancel')
   })
 
-  App.controller('RenameTagModalController', function(
+  App.controller('RenameTagModalController', function (
     $scope,
     $modalInstance,
     $timeout,
@@ -176,7 +176,7 @@ define(['../../base', '../../ide/colors/ColorManager'], function(
       $timeout(() => $scope.$broadcast('open'), 200)
     )
 
-    $scope.rename = function() {
+    $scope.rename = function () {
       const name = $scope.inputs.tagName
       $scope.state.inflight = true
       $scope.state.error = false
@@ -185,11 +185,11 @@ define(['../../base', '../../ide/colors/ColorManager'], function(
           _csrf: window.csrfToken,
           name
         })
-        .then(function() {
+        .then(function () {
           $scope.state.inflight = false
           $modalInstance.close(name)
         })
-        .catch(function() {
+        .catch(function () {
           $scope.state.inflight = false
           $scope.state.error = true
         })
@@ -198,7 +198,7 @@ define(['../../base', '../../ide/colors/ColorManager'], function(
     $scope.cancel = () => $modalInstance.dismiss('cancel')
   })
 
-  return App.controller('DeleteTagModalController', function(
+  return App.controller('DeleteTagModalController', function (
     $scope,
     $modalInstance,
     $http,
@@ -210,7 +210,7 @@ define(['../../base', '../../ide/colors/ColorManager'], function(
       error: false
     }
 
-    $scope.delete = function() {
+    $scope.delete = function () {
       $scope.state.inflight = true
       $scope.state.error = false
       return $http({
@@ -220,11 +220,11 @@ define(['../../base', '../../ide/colors/ColorManager'], function(
           'X-CSRF-Token': window.csrfToken
         }
       })
-        .then(function() {
+        .then(function () {
           $scope.state.inflight = false
           $modalInstance.close()
         })
-        .catch(function() {
+        .catch(function () {
           $scope.state.inflight = false
           $scope.state.error = true
         })

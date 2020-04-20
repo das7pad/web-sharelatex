@@ -16,7 +16,7 @@ const MockNotificationsApi = {
       res.send()
     })
 
-    app.listen(3042, error => {
+    app.listen(3042, (error) => {
       if (!error) return
       console.error('error starting MockNotificationsApi:', error.message)
       process.exit(1)

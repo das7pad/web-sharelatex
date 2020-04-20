@@ -21,8 +21,8 @@ class UKAMFDB {
   findByEntityID(matcher) {
     const entity = this.entities.find(
       matcher instanceof RegExp
-        ? e => e.$.entityID.match(matcher)
-        : e => e.$.entityID.includes(matcher)
+        ? (e) => e.$.entityID.match(matcher)
+        : (e) => e.$.entityID.includes(matcher)
     )
     return entity ? new UKAMFEntity(entity) : null
   }

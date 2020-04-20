@@ -13,10 +13,10 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../base'], function(App) {
+define(['../../base'], function (App) {
   // We create and provide this as service so that we can access the global ide
   // from within other parts of the angular app.
-  App.factory('ide', function(
+  App.factory('ide', function (
     $http,
     queuedHttp,
     $modal,
@@ -107,7 +107,7 @@ define(['../../base'], function(App) {
     return ide
   })
 
-  return App.controller('GenericMessageModalController', function(
+  return App.controller('GenericMessageModalController', function (
     $scope,
     $modalInstance,
     title,

@@ -19,8 +19,8 @@ const modulePath = path.join(
 )
 const { expect } = require('chai')
 
-describe('InstitutionsManager', function() {
-  beforeEach(function() {
+describe('InstitutionsManager', function () {
+  beforeEach(function () {
     this.institutionId = 123
     this.logger = { log() {} }
     this.user = {}
@@ -89,8 +89,8 @@ describe('InstitutionsManager', function() {
     }))
   })
 
-  describe('upgradeInstitutionUsers', function() {
-    beforeEach(function() {
+  describe('upgradeInstitutionUsers', function () {
+    beforeEach(function () {
       this.user1Id = '123abc123abc123abc123abc'
       this.user2Id = '456def456def456def456def'
       this.affiliations = [{ user_id: this.user1Id }, { user_id: this.user2Id }]
@@ -113,10 +113,10 @@ describe('InstitutionsManager', function() {
       return this.getInstitutionAffiliations.yields(null, this.affiliations)
     })
 
-    it('refresh all users Features', function(done) {
+    it('refresh all users Features', function (done) {
       return this.InstitutionsManager.upgradeInstitutionUsers(
         this.institutionId,
-        error => {
+        (error) => {
           should.not.exist(error)
           sinon.assert.calledTwice(this.refreshFeatures)
           return done()
@@ -124,10 +124,10 @@ describe('InstitutionsManager', function() {
       )
     })
 
-    it('notifies users if their features have been upgraded', function(done) {
+    it('notifies users if their features have been upgraded', function (done) {
       return this.InstitutionsManager.upgradeInstitutionUsers(
         this.institutionId,
-        error => {
+        (error) => {
           should.not.exist(error)
           sinon.assert.calledOnce(
             this.NotificationsBuilder.featuresUpgradedByAffiliation
@@ -142,10 +142,10 @@ describe('InstitutionsManager', function() {
       )
     })
 
-    it('notifies users if they have a subscription that should be cancelled', function(done) {
+    it('notifies users if they have a subscription that should be cancelled', function (done) {
       return this.InstitutionsManager.upgradeInstitutionUsers(
         this.institutionId,
-        error => {
+        (error) => {
           should.not.exist(error)
           sinon.assert.calledOnce(
             this.NotificationsBuilder.redundantPersonalSubscription
@@ -161,8 +161,8 @@ describe('InstitutionsManager', function() {
     })
   })
 
-  describe('checkInstitutionUsers', function() {
-    it('check all users Features', function(done) {
+  describe('checkInstitutionUsers', function () {
+    it('check all users Features', function (done) {
       const affiliations = [{ email: 'foo@bar.com' }, { email: 'baz@boo.edu' }]
       const stubbedUsers = [
         {
@@ -208,8 +208,8 @@ describe('InstitutionsManager', function() {
     })
   })
 
-  describe('getInstitutionUsersSubscriptions', function() {
-    it('returns all institution users subscriptions', function(done) {
+  describe('getInstitutionUsersSubscriptions', function () {
+    it('returns all institution users subscriptions', function (done) {
       const stubbedUsers = [
         { user_id: '123abc123abc123abc123abc' },
         { user_id: '456def456def456def456def' },

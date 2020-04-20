@@ -2,11 +2,11 @@ import CodeMirror from 'codemirror'
 
 import LatexMode from '../../../../frontend/js/latex_mode/latex_mode'
 
-describe('LatexMode', function() {
+describe('LatexMode', function () {
   var _mode
   var _state
 
-  beforeEach(function() {
+  beforeEach(function () {
     startParse()
   })
 
@@ -36,11 +36,11 @@ describe('LatexMode', function() {
     return new CodeMirror.Pos(line, ch)
   }
 
-  it('highlights a command', function() {
+  it('highlights a command', function () {
     expect(parseLine('\\foo')).to.deep.equal(['tag'])
   })
 
-  it('marks long title when there is a short one', function() {
+  it('marks long title when there is a short one', function () {
     expect(parseLine('\\title[Short Title]{Long Title}')).to.deep.equal([
       'tag',
       'bracket',
@@ -57,7 +57,7 @@ describe('LatexMode', function() {
     expect(_state.marks[0].contentTo).to.deep.equal(pos(0, 30))
   })
 
-  it('marks long title alone', function() {
+  it('marks long title alone', function () {
     parseLine('\\title{A Title}')
     expect(_state.marks.length).to.equal(1)
     expect(_state.marks[0].from).to.deep.equal(pos(0, 0))
@@ -66,7 +66,7 @@ describe('LatexMode', function() {
     expect(_state.marks[0].contentTo).to.deep.equal(pos(0, 14))
   })
 
-  it('marks dollar inline math', function() {
+  it('marks dollar inline math', function () {
     parseLine('foo $x$ bar')
     expect(_state.marks.length).to.equal(1)
     expect(_state.marks[0].from).to.deep.equal(pos(0, 4))
@@ -75,7 +75,7 @@ describe('LatexMode', function() {
     expect(_state.marks[0].contentTo).to.deep.equal(pos(0, 6))
   })
 
-  it('handles unbalanced dollar math with open mark', function() {
+  it('handles unbalanced dollar math with open mark', function () {
     parseLine('foo $x bar')
     expect(_state.marks.length).to.equal(0)
     expect(_state.openMarks.length).to.equal(1)
@@ -85,7 +85,7 @@ describe('LatexMode', function() {
     expect(_state.openMarks[0].contentTo).to.deep.equal(undefined)
   })
 
-  it('handles multi-line inline math', function() {
+  it('handles multi-line inline math', function () {
     parseLine('foo $x')
     expect(_state.marks.length).to.equal(0)
     expect(_state.openMarks.length).to.equal(1)
@@ -104,7 +104,7 @@ describe('LatexMode', function() {
     expect(_state.marks[0].contentTo).to.deep.equal(pos(2, 0))
   })
 
-  it('gives up on unbalanced dollar math at paragraph end', function() {
+  it('gives up on unbalanced dollar math at paragraph end', function () {
     parseLine('foo $x bar')
     expect(_state.marks.length).to.equal(0)
     expect(_state.openMarks.length).to.equal(1)
@@ -113,7 +113,7 @@ describe('LatexMode', function() {
     expect(_state.openMarks.length).to.equal(0)
   })
 
-  it('abandons unbalanced dollar before display math', function() {
+  it('abandons unbalanced dollar before display math', function () {
     parseLine('foo $x bar $$x$$')
     expect(_state.marks.length).to.equal(1)
     expect(_state.openMarks.length).to.equal(0)
@@ -124,7 +124,7 @@ describe('LatexMode', function() {
     expect(_state.marks[0].contentTo).to.deep.equal(pos(0, 14))
   })
 
-  it('parses a section tag as it is typed', function() {
+  it('parses a section tag as it is typed', function () {
     expect(parseLine('\\sectio')).to.deep.equal(['tag'])
     restartParse()
     expect(parseLine('\\section')).to.deep.equal(['tag'])
@@ -149,7 +149,7 @@ describe('LatexMode', function() {
     expect(_state.marks.length).to.equal(1)
   })
 
-  it('handles inline math in section heading', function() {
+  it('handles inline math in section heading', function () {
     parseLine('\\section{test $x$}')
     expect(_state.marks.length).to.equal(2)
     expect(_state.openMarks.length).to.equal(0)
@@ -165,7 +165,7 @@ describe('LatexMode', function() {
     expect(_state.marks[1].contentTo).to.deep.equal(pos(0, 17))
   })
 
-  it('abandons outer mark when it is incomplete', function() {
+  it('abandons outer mark when it is incomplete', function () {
     parseLine('\\section{test $x$')
     expect(_state.marks.length).to.equal(1)
     expect(_state.openMarks.length).to.equal(1)
@@ -177,7 +177,7 @@ describe('LatexMode', function() {
     expect(_state.marks[0].kind).to.equal('inline-math')
   })
 
-  it('abandons inner outer mark when it is incomplete', function() {
+  it('abandons inner outer mark when it is incomplete', function () {
     parseLine('\\section{test $x')
     expect(_state.marks.length).to.equal(0)
     expect(_state.openMarks.length).to.equal(2)
@@ -188,14 +188,14 @@ describe('LatexMode', function() {
     expect(_state.openMarks.length).to.equal(0)
   })
 
-  it('ignores comments', function() {
+  it('ignores comments', function () {
     expect(parseLine('% $x$')).to.deep.equal(['comment'])
     expect(parseLine('%')).to.deep.equal(['comment'])
     expect(parseLine('abc %')).to.deep.equal([undefined, 'comment'])
     expect(parseLine('abc % def')).to.deep.equal([undefined, 'comment'])
   })
 
-  it('finds maketitle only when it ends the line', function() {
+  it('finds maketitle only when it ends the line', function () {
     // this avoids a bug in the rich text display to do with trailing characters
     // after the hidden preamble end
     expect(parseLine('\\maketitle')).to.deep.equal(['tag'])
@@ -208,7 +208,7 @@ describe('LatexMode', function() {
     expect(_state.marks.length).to.equal(0)
   })
 
-  it('abandons equation environments after blank line', function() {
+  it('abandons equation environments after blank line', function () {
     parseLine('\\begin{equation}')
     parseLine('\\alpha')
     parseLine('')
@@ -216,7 +216,7 @@ describe('LatexMode', function() {
     expect(_state.marks.length).to.equal(0)
   })
 
-  it('highlights non-breaking space', function() {
+  it('highlights non-breaking space', function () {
     expect(parseLine('a~b')).to.deep.equal([undefined, 'tag', undefined])
     expect(parseLine('$a~b$')).to.deep.equal([
       'keyword',
@@ -227,13 +227,13 @@ describe('LatexMode', function() {
     ])
   })
 
-  it('highlights comment in math mode', function() {
+  it('highlights comment in math mode', function () {
     parseLine('\\begin{equation}')
     expect(parseLine('\\alpha % comment')).to.deep.equal(['tag', 'comment'])
     parseLine('\\end{equation}')
   })
 
-  it('highlights arbitrary environments', function() {
+  it('highlights arbitrary environments', function () {
     expect(parseLine('\\begin{foo}')).to.deep.equal([
       'tag',
       'bracket',
@@ -249,7 +249,7 @@ describe('LatexMode', function() {
     ])
   })
 
-  it('highlights itemize and item', function() {
+  it('highlights itemize and item', function () {
     expect(parseLine('\\begin{itemize}')).to.deep.equal([
       'tag',
       'bracket',
@@ -265,7 +265,7 @@ describe('LatexMode', function() {
     ])
   })
 
-  it('highlights enumerate and item', function() {
+  it('highlights enumerate and item', function () {
     expect(parseLine('\\begin{enumerate}')).to.deep.equal([
       'tag',
       'bracket',
@@ -281,7 +281,7 @@ describe('LatexMode', function() {
     ])
   })
 
-  it('detects comment environment as comment', function() {
+  it('detects comment environment as comment', function () {
     expect(parseLine('\\begin{comment}')).to.deep.equal([
       'tag',
       'bracket',
@@ -297,7 +297,7 @@ describe('LatexMode', function() {
     ])
   })
 
-  it('detects figure environment correctly', function() {
+  it('detects figure environment correctly', function () {
     expect(parseLine('\\begin{figure}')).to.deep.equal([
       'tag',
       'bracket',
@@ -312,7 +312,7 @@ describe('LatexMode', function() {
     ])
   })
 
-  it('detects includegraphics command inside figure', function() {
+  it('detects includegraphics command inside figure', function () {
     expect(parseLine('\\begin{figure}')).to.deep.equal([
       'tag',
       'bracket',
@@ -335,7 +335,7 @@ describe('LatexMode', function() {
     ])
   })
 
-  it('detects caption command inside figure', function() {
+  it('detects caption command inside figure', function () {
     expect(parseLine('\\begin{figure}')).to.deep.equal([
       'tag',
       'bracket',
@@ -356,7 +356,7 @@ describe('LatexMode', function() {
     ])
   })
 
-  it('detects label command inside figure', function() {
+  it('detects label command inside figure', function () {
     expect(parseLine('\\begin{figure}')).to.deep.equal([
       'tag',
       'bracket',
@@ -377,7 +377,7 @@ describe('LatexMode', function() {
     ])
   })
 
-  it('highlights \\verb', function() {
+  it('highlights \\verb', function () {
     // in math mode
     expect(parseLine('$\\verb|x|$')).to.deep.equal([
       'keyword',
@@ -394,7 +394,7 @@ describe('LatexMode', function() {
     expect(parseLine('\\verb*+x+')).to.deep.equal(['tag', 'string', 'tag'])
   })
 
-  it('treat a tab as a single character when marking text', function() {
+  it('treat a tab as a single character when marking text', function () {
     expect(parseLine('\t\\textbf{foo}')).to.deep.equal([
       undefined,
       'tag',
@@ -422,7 +422,7 @@ describe('LatexMode', function() {
     expect(_state.marks[1].to).to.deep.equal(pos(1, 15))
   })
 
-  it('correctly identifies enumerate environments', function() {
+  it('correctly identifies enumerate environments', function () {
     parseLine('\\begin{enumerate}')
     var supposedOpenParent = _state.openMarks[_state.openMarks.length - 1]
     parseLine('\\item okok')
@@ -434,7 +434,7 @@ describe('LatexMode', function() {
     expect(_state.marks.length).to.equal(2)
   })
 
-  it('correctly identifies itemize environments', function() {
+  it('correctly identifies itemize environments', function () {
     parseLine('\\begin{itemize}')
     var supposedOpenParent = _state.openMarks[_state.openMarks.length - 1]
     parseLine('\\item okok')
@@ -446,14 +446,14 @@ describe('LatexMode', function() {
     expect(_state.marks.length).to.equal(2)
   })
 
-  it('correctly matches a blank line when parsing an optional argument', function() {
+  it('correctly matches a blank line when parsing an optional argument', function () {
     parseLine('\\title[')
     parseLine('\n')
     parseLine(']{}')
     expect(_state.marks.length).to.equal(0)
   })
 
-  it('highlights if command has a marked command as a prefix', function() {
+  it('highlights if command has a marked command as a prefix', function () {
     expect(parseLine('\\authorblockN{Name}')).to.deep.equal([
       'tag',
       'bracket',
@@ -470,7 +470,7 @@ describe('LatexMode', function() {
     expect(_state.marks.length).to.equal(0)
   })
 
-  it('matches \\section with space between command and arg', function() {
+  it('matches \\section with space between command and arg', function () {
     expect(parseLine('\\section {foo}')).to.deep.equal([
       'tag',
       'bracket',
@@ -485,7 +485,7 @@ describe('LatexMode', function() {
     expect(_state.marks[0].to).to.deep.equal(pos(0, 14))
   })
 
-  it('matches section* commands', function() {
+  it('matches section* commands', function () {
     expect(parseLine('\\section*{foo}')).to.deep.equal([
       'tag',
       'bracket',
@@ -500,7 +500,7 @@ describe('LatexMode', function() {
     expect(_state.marks[0].to).to.deep.equal(pos(0, 14))
   })
 
-  it('handles a trailing space in math mode', function() {
+  it('handles a trailing space in math mode', function () {
     // regression: this was incorrectly picking up the trailing space as a blank
     // line and abandoning the mark
     parseLine('$')
@@ -510,7 +510,7 @@ describe('LatexMode', function() {
     expect(_state.marks.length).to.equal(1)
   })
 
-  it('abandons nested marks', function() {
+  it('abandons nested marks', function () {
     parseLine('\\textit{\\begin{equation}')
     parseLine('')
     parseLine('\\end{equation}}')
@@ -518,7 +518,7 @@ describe('LatexMode', function() {
     expect(_state.marks.length).to.equal(0)
   })
 
-  it('marks short abstract', function() {
+  it('marks short abstract', function () {
     parseLine('\\begin{abstract}')
     parseLine('test')
     parseLine('\\end{abstract}')
@@ -526,7 +526,7 @@ describe('LatexMode', function() {
     expect(_state.marks.length).to.equal(1)
   })
 
-  it('marks long abstract', function() {
+  it('marks long abstract', function () {
     parseLine('\\begin{abstract}')
     parseLine('test')
     parseLine('')
@@ -536,7 +536,7 @@ describe('LatexMode', function() {
     expect(_state.marks.length).to.equal(1)
   })
 
-  it('marks math in abstract', function() {
+  it('marks math in abstract', function () {
     parseLine('\\begin{abstract}')
     parseLine('test $x$ test')
     parseLine('test')
@@ -545,7 +545,7 @@ describe('LatexMode', function() {
     expect(_state.marks.length).to.equal(2)
   })
 
-  it('marks a number in math', function() {
+  it('marks a number in math', function () {
     expect(parseLine('$1024.00$')).to.deep.equal([
       'keyword',
       'number',
@@ -553,12 +553,12 @@ describe('LatexMode', function() {
     ])
   })
 
-  it('marks everything after end as comment', function() {
+  it('marks everything after end as comment', function () {
     parseLine('\\end{document}')
     expect(parseLine('\\textbf{abc}')).to.deep.equal(['comment'])
   })
 
-  it('marks verbatim command correctly', function() {
+  it('marks verbatim command correctly', function () {
     expect(parseLine('\\verb+my text akfdnakfnaf')).to.deep.equal([
       'tag',
       'string'
@@ -572,7 +572,7 @@ describe('LatexMode', function() {
     expect(_state.marks.length).to.equal(0)
   })
 
-  it('marks verbatim env', function() {
+  it('marks verbatim env', function () {
     expect(parseLine('\\begin{verbatim}')).to.deep.equal([
       'tag',
       'bracket',
@@ -591,7 +591,7 @@ describe('LatexMode', function() {
     expect(_state.marks.length).to.equal(0)
   })
 
-  it('marks tikzpicture env', function() {
+  it('marks tikzpicture env', function () {
     expect(parseLine('\\begin{tikzpicture}')).to.deep.equal([
       'tag',
       'bracket',
@@ -614,7 +614,7 @@ describe('LatexMode', function() {
     expect(_state.marks.length).to.equal(0)
   })
 
-  it('marks begin keywords inside an equation', function() {
+  it('marks begin keywords inside an equation', function () {
     expect(parseLine('\\begin{equation}')).to.deep.equal([
       'tag',
       'bracket',

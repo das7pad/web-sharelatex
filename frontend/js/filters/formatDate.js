@@ -9,7 +9,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../base', 'moment'], function(App, moment) {
+define(['../base', 'moment'], function (App, moment) {
   moment.updateLocale('en', {
     calendar: {
       lastDay: '[Yesterday]',
@@ -24,7 +24,7 @@ define(['../base', 'moment'], function(App, moment) {
   App.filter(
     'formatDate',
     () =>
-      function(date, format) {
+      function (date, format) {
         if (!date) return 'N/A'
         if (format == null) {
           format = 'Do MMM YYYY, h:mm a'
@@ -33,7 +33,7 @@ define(['../base', 'moment'], function(App, moment) {
       }
   )
 
-  App.filter('relativeDate', () => date => moment(date).calendar())
+  App.filter('relativeDate', () => (date) => moment(date).calendar())
 
-  App.filter('fromNowDate', () => date => moment(date).fromNow())
+  App.filter('fromNowDate', () => (date) => moment(date).fromNow())
 })

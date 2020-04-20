@@ -10,11 +10,11 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../base'], function(App) {
-  App.directive('focusWhen', $timeout => ({
+define(['../base'], function (App) {
+  App.directive('focusWhen', ($timeout) => ({
     restrict: 'A',
     link(scope, element, attr) {
-      return scope.$watch(attr.focusWhen, function(value) {
+      return scope.$watch(attr.focusWhen, function (value) {
         if (value) {
           return $timeout(() => element.focus())
         }
@@ -22,17 +22,17 @@ define(['../base'], function(App) {
     }
   }))
 
-  App.directive('focusOn', $timeout => ({
+  App.directive('focusOn', ($timeout) => ({
     restrict: 'A',
     link(scope, element, attrs) {
       return scope.$on(attrs.focusOn, () => element.focus())
     }
   }))
 
-  App.directive('selectWhen', $timeout => ({
+  App.directive('selectWhen', ($timeout) => ({
     restrict: 'A',
     link(scope, element, attr) {
-      return scope.$watch(attr.selectWhen, function(value) {
+      return scope.$watch(attr.selectWhen, function (value) {
         if (value) {
           return $timeout(() => element.select())
         }
@@ -40,17 +40,17 @@ define(['../base'], function(App) {
     }
   }))
 
-  App.directive('selectOn', $timeout => ({
+  App.directive('selectOn', ($timeout) => ({
     restrict: 'A',
     link(scope, element, attrs) {
       return scope.$on(attrs.selectOn, () => element.select())
     }
   }))
 
-  App.directive('selectNameWhen', $timeout => ({
+  App.directive('selectNameWhen', ($timeout) => ({
     restrict: 'A',
     link(scope, element, attrs) {
-      return scope.$watch(attrs.selectNameWhen, function(value) {
+      return scope.$watch(attrs.selectNameWhen, function (value) {
         if (value) {
           return $timeout(() => selectName(element))
         }
@@ -65,13 +65,13 @@ define(['../base'], function(App) {
     }
   }))
 
-  App.directive('focus', $timeout => ({
+  App.directive('focus', ($timeout) => ({
     scope: {
       trigger: '@focus'
     },
 
     link(scope, element) {
-      return scope.$watch('trigger', function(value) {
+      return scope.$watch('trigger', function (value) {
         if (value === 'true') {
           return $timeout(() => element[0].focus())
         }

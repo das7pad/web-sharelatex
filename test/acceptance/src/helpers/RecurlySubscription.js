@@ -24,7 +24,7 @@ class RecurlySubscription {
   }
 
   ensureExists(callback) {
-    this.subscription.ensureExists(error => {
+    this.subscription.ensureExists((error) => {
       if (error) {
         return callback(error)
       }

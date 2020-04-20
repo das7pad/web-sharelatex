@@ -11,27 +11,27 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base'], App =>
-  App.factory('metadata', function($http, ide) {
+define(['../../../base'], (App) =>
+  App.factory('metadata', function ($http, ide) {
     const debouncer = {} // DocId => Timeout
 
     const state = { documents: {} }
 
     const metadata = { state }
 
-    metadata.onBroadcastDocMeta = function(data) {
+    metadata.onBroadcastDocMeta = function (data) {
       if (data.docId != null && data.meta != null) {
         return (state.documents[data.docId] = data.meta)
       }
     }
 
-    metadata.onEntityDeleted = function(e, entity) {
+    metadata.onEntityDeleted = function (e, entity) {
       if (entity.type === 'doc') {
         return delete state.documents[entity.id]
       }
     }
 
-    metadata.onFileUploadComplete = function(e, upload) {
+    metadata.onFileUploadComplete = function (e, upload) {
       if (upload.entity_type === 'doc') {
         return metadata.loadDocMetaFromServer(upload.entity_id)
       }
@@ -49,7 +49,7 @@ define(['../../../base'], App =>
         })()
       )
 
-    metadata.getAllPackages = function() {
+    metadata.getAllPackages = function () {
       const packageCommandMapping = {}
       for (const _docId in state.documents) {
         const meta = state.documents[_docId]
@@ -64,7 +64,7 @@ define(['../../../base'], App =>
     metadata.loadProjectMetaFromServer = () =>
       $http
         .get(`/project/${window.project_id}/metadata`)
-        .then(function(response) {
+        .then(function (response) {
           const { data } = response
           if (data.projectMeta) {
             return (() => {
@@ -78,12 +78,12 @@ define(['../../../base'], App =>
           }
         })
 
-    metadata.loadDocMetaFromServer = docId =>
+    metadata.loadDocMetaFromServer = (docId) =>
       $http.post(`/project/${window.project_id}/doc/${docId}/metadata`, {
         _csrf: window.csrfToken
       })
 
-    metadata.scheduleLoadDocMetaFromServer = function(docId) {
+    metadata.scheduleLoadDocMetaFromServer = function (docId) {
       // De-bounce loading labels with a timeout
       const existingTimeout = debouncer[docId]
 

@@ -10,8 +10,8 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base'], App =>
-  App.controller('HistoryV2DeleteLabelModalController', function(
+define(['../../../base'], (App) =>
+  App.controller('HistoryV2DeleteLabelModalController', function (
     $scope,
     $modalInstance,
     ide,
@@ -23,15 +23,15 @@ define(['../../../base'], App =>
       error: false
     }
 
-    return ($scope.deleteLabel = function() {
+    return ($scope.deleteLabel = function () {
       $scope.state.inflight = true
       return ide.historyManager
         .deleteLabel(labelDetails)
-        .then(function(response) {
+        .then(function (response) {
           $scope.state.inflight = false
           return $modalInstance.close()
         })
-        .catch(function(response) {
+        .catch(function (response) {
           const { data, status } = response
           $scope.state.inflight = false
           if (status === 400) {

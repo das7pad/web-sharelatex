@@ -128,7 +128,7 @@ export function updateMarkWithClosingPosition(cm, mark) {
   )
 
   // Search through the marks to find the one that matches exactly
-  return _.find(state.marks, m => {
+  return _.find(state.marks, (m) => {
     return (
       m.kind === mark.kind &&
       _.isEqual(m.contentFrom, mark.contentFrom) &&

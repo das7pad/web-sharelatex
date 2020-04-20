@@ -18,7 +18,7 @@
 // This file is shared between document-updater and web, so that the server and client share
 // an identical track changes implementation. Do not edit it directly in web or document-updater,
 // instead edit it at https://github.com/sharelatex/ranges-tracker, where it has a suite of tests
-const load = function() {
+const load = function () {
   let RangesTracker
   return (RangesTracker = class RangesTracker {
     // The purpose of this class is to track a set of inserts and deletes to a document, like
@@ -121,7 +121,7 @@ const load = function() {
       if (comment == null) {
         return
       }
-      this.comments = this.comments.filter(c => c.id !== comment_id)
+      this.comments = this.comments.filter((c) => c.id !== comment_id)
       return this._markAsDirty(comment, 'comment', 'removed')
     }
 
@@ -258,7 +258,7 @@ const load = function() {
       if (metadata == null) {
         metadata = {}
       }
-      return Array.from(ops).map(op => this.applyOp(op, metadata))
+      return Array.from(ops).map((op) => this.applyOp(op, metadata))
     }
 
     addComment(op, metadata) {
@@ -678,7 +678,7 @@ const load = function() {
         moved_changes = moved_changes.concat(results.moved_changes)
         for (change of Array.from(results.remove_changes)) {
           this._removeChange(change)
-          moved_changes = moved_changes.filter(c => c !== change)
+          moved_changes = moved_changes.filter((c) => c !== change)
         }
       }
 
@@ -700,7 +700,7 @@ const load = function() {
       this.changes.push(change)
 
       // Keep ops in order of offset, with deletes before inserts
-      this.changes.sort(function(c1, c2) {
+      this.changes.sort(function (c1, c2) {
         const result = c1.op.p - c2.op.p
         if (result !== 0) {
           return result
@@ -715,14 +715,14 @@ const load = function() {
     }
 
     _removeChange(change) {
-      this.changes = this.changes.filter(c => c.id !== change.id)
+      this.changes = this.changes.filter((c) => c.id !== change.id)
       return this._markAsDirty(change, 'change', 'removed')
     }
 
     _applyOpModifications(content, op_modifications) {
       // Put in descending position order, with deleting first if at the same offset
       // (Inserting first would modify the content that the delete will delete)
-      op_modifications.sort(function(a, b) {
+      op_modifications.sort(function (a, b) {
         const result = b.p - a.p
         if (result !== 0) {
           return result

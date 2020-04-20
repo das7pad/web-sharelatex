@@ -30,11 +30,14 @@ const RestoreManager = require('./RestoreManager')
 module.exports = HistoryController = {
   selectHistoryApi(req, res, next) {
     if (next == null) {
-      next = function(error) {}
+      next = function (error) {}
     }
     const project_id = req.params != null ? req.params.Project_id : undefined
     // find out which type of history service this project uses
-    return ProjectDetailsHandler.getDetails(project_id, function(err, project) {
+    return ProjectDetailsHandler.getDetails(project_id, function (
+      err,
+      project
+    ) {
       if (err != null) {
         return next(err)
       }
@@ -54,7 +57,7 @@ module.exports = HistoryController = {
 
   ensureProjectHistoryEnabled(req, res, next) {
     if (next == null) {
-      next = function(error) {}
+      next = function (error) {}
     }
     if (req.useProjectHistory != null) {
       return next()
@@ -65,7 +68,7 @@ module.exports = HistoryController = {
 
   proxyToHistoryApi(req, res, next) {
     if (next == null) {
-      next = function(error) {}
+      next = function (error) {}
     }
     const user_id = AuthenticationController.getLoggedInUserId(req)
     const url =
@@ -79,7 +82,7 @@ module.exports = HistoryController = {
       }
     })
     getReq.pipe(res)
-    return getReq.on('error', function(error) {
+    return getReq.on('error', function (error) {
       logger.warn({ url, err: error }, 'history API error')
       return next(error)
     })
@@ -87,7 +90,7 @@ module.exports = HistoryController = {
 
   proxyToHistoryApiAndInjectUserDetails(req, res, next) {
     if (next == null) {
-      next = function(error) {}
+      next = function (error) {}
     }
     const user_id = AuthenticationController.getLoggedInUserId(req)
     const url =
@@ -101,11 +104,11 @@ module.exports = HistoryController = {
           'X-User-Id': user_id
         }
       },
-      function(error, body) {
+      function (error, body) {
         if (error != null) {
           return next(error)
         }
-        return HistoryManager.injectUserDetails(body, function(error, data) {
+        return HistoryManager.injectUserDetails(body, function (error, data) {
           if (error != null) {
             return next(error)
           }
@@ -127,20 +130,21 @@ module.exports = HistoryController = {
 
   resyncProjectHistory(req, res, next) {
     if (next == null) {
-      next = function(error) {}
+      next = function (error) {}
     }
     const project_id = req.params.Project_id
-    return ProjectEntityUpdateHandler.resyncProjectHistory(project_id, function(
-      error
-    ) {
-      if (error instanceof Errors.ProjectHistoryDisabledError) {
-        return res.sendStatus(404)
+    return ProjectEntityUpdateHandler.resyncProjectHistory(
+      project_id,
+      function (error) {
+        if (error instanceof Errors.ProjectHistoryDisabledError) {
+          return res.sendStatus(404)
+        }
+        if (error != null) {
+          return next(error)
+        }
+        return res.sendStatus(204)
       }
-      if (error != null) {
-        return next(error)
-      }
-      return res.sendStatus(204)
-    })
+    )
   },
 
   restoreFileFromV2(req, res, next) {
@@ -152,7 +156,7 @@ module.exports = HistoryController = {
       project_id,
       version,
       pathname,
-      function(error, entity) {
+      function (error, entity) {
         if (error != null) {
           return next(error)
         }
@@ -194,7 +198,7 @@ module.exports = HistoryController = {
         url: `${settings.apis.project_history.url}/project/${project_id}/labels`,
         json: true
       },
-      function(error, labels) {
+      function (error, labels) {
         if (error != null) {
           return next(error)
         }
@@ -213,7 +217,7 @@ module.exports = HistoryController = {
         url: `${settings.apis.project_history.url}/project/${project_id}/user/${user_id}/labels`,
         json: { comment, version }
       },
-      function(error, label) {
+      function (error, label) {
         if (error != null) {
           return next(error)
         }
@@ -231,7 +235,7 @@ module.exports = HistoryController = {
         method: 'DELETE',
         url: `${settings.apis.project_history.url}/project/${project_id}/user/${user_id}/labels/${label_id}`
       },
-      function(error) {
+      function (error) {
         if (error != null) {
           return next(error)
         }
@@ -241,7 +245,7 @@ module.exports = HistoryController = {
   },
 
   _makeRequest(options, callback) {
-    return request(options, function(error, response, body) {
+    return request(options, function (error, response, body) {
       if (error != null) {
         return callback(error)
       }
@@ -262,13 +266,16 @@ module.exports = HistoryController = {
 
   downloadZipOfVersion(req, res, next) {
     const { project_id, version } = req.params
-    return ProjectDetailsHandler.getDetails(project_id, function(err, project) {
+    return ProjectDetailsHandler.getDetails(project_id, function (
+      err,
+      project
+    ) {
       if (err != null) {
         return next(err)
       }
       const v1_id = __guard__(
         project.overleaf != null ? project.overleaf.history : undefined,
-        x => x.id
+        (x) => x.id
       )
       if (v1_id == null) {
         logger.err(
@@ -300,7 +307,7 @@ module.exports = HistoryController = {
       method: 'post',
       url
     }
-    return request(options, function(err, response, body) {
+    return request(options, function (err, response, body) {
       if (err) {
         logger.warn({ err, v1_project_id, version }, 'history API error')
         return next(err)
@@ -310,8 +317,8 @@ module.exports = HistoryController = {
       // retry for about 6 minutes starting with short delay
       return async.retry(
         40,
-        callback =>
-          setTimeout(function() {
+        (callback) =>
+          setTimeout(function () {
             // increase delay by 1 second up to 10
             if (retryDelay < 10000) {
               retryDelay += 1000
@@ -321,7 +328,7 @@ module.exports = HistoryController = {
               url: body.zipUrl,
               sendImmediately: true
             })
-            getReq.on('response', function(response) {
+            getReq.on('response', function (response) {
               if (response.statusCode !== 200) {
                 return callback(new Error('invalid response'))
               }
@@ -336,7 +343,7 @@ module.exports = HistoryController = {
               getReq.pipe(res)
               return callback()
             })
-            return getReq.on('error', function(err) {
+            return getReq.on('error', function (err) {
               logger.warn(
                 { err, v1_project_id, version, retryAttempt },
                 'history s3 download error'
@@ -344,7 +351,7 @@ module.exports = HistoryController = {
               return callback(err)
             })
           }, retryDelay),
-        function(err) {
+        function (err) {
           if (err) {
             logger.warn(
               { err, v1_project_id, version, retryAttempt },

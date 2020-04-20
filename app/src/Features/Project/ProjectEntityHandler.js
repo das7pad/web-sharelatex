@@ -161,7 +161,7 @@ const ProjectEntityHandler = {
       }
       function recursivelyFindDocInFolder(basePath, docId, folder) {
         const docInCurrentFolder = (folder.docs || []).find(
-          currentDoc => currentDoc._id.toString() === docId.toString()
+          (currentDoc) => currentDoc._id.toString() === docId.toString()
         )
         if (docInCurrentFolder != null) {
           return path.join(basePath, docInCurrentFolder.name)

@@ -3,7 +3,7 @@ const { db } = mongojs
 const async = require('async')
 const minilist = require('minimist')
 
-const updateUser = function(user, callback) {
+const updateUser = function (user, callback) {
   console.log(`Updating user ${user._id}`)
   const update = {
     $set: {
@@ -19,7 +19,7 @@ const updateUser = function(user, callback) {
 }
 
 const updateUsers = (users, callback) =>
-  async.eachLimit(users, ASYNC_LIMIT, updateUser, function(error) {
+  async.eachLimit(users, ASYNC_LIMIT, updateUser, function (error) {
     if (error) {
       callback(error)
       return
@@ -29,10 +29,10 @@ const updateUsers = (users, callback) =>
     loopForUsers(callback)
   })
 
-var loopForUsers = callback =>
+var loopForUsers = (callback) =>
   db.users
     .find({ emails: { $exists: false } }, { email: 1 })
-    .limit(FETCH_LIMIT, function(error, users) {
+    .limit(FETCH_LIMIT, function (error, users) {
       if (error) {
         callback(error)
         return
@@ -46,7 +46,7 @@ var loopForUsers = callback =>
 
 var counter = 0
 var run = () =>
-  loopForUsers(function(error) {
+  loopForUsers(function (error) {
     if (error) {
       throw error
     }
@@ -54,7 +54,7 @@ var run = () =>
   })
 
 let FETCH_LIMIT, ASYNC_LIMIT
-var setup = function() {
+var setup = function () {
   const args = minilist(process.argv.slice(2))
   FETCH_LIMIT = args.fetch ? args.fetch : 100
   ASYNC_LIMIT = args.async ? args.async : 10

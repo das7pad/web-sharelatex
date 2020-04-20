@@ -108,7 +108,7 @@ export default function makeAutocomplete(adapter, getSetting) {
 
   function getBibtexArgumentCompletions() {
     const { keys: references } = adapter.getBibtexArguments()
-    return references.map(ref => {
+    return references.map((ref) => {
       return {
         text: ref,
         displayText: ref
@@ -117,7 +117,7 @@ export default function makeAutocomplete(adapter, getSetting) {
   }
 
   function getReferenceArgumentCompletions() {
-    return adapter.getReferenceArguments().map(ref => {
+    return adapter.getReferenceArguments().map((ref) => {
       return {
         text: ref,
         displayText: ref
@@ -127,7 +127,7 @@ export default function makeAutocomplete(adapter, getSetting) {
 
   function getCommandArgumentCompletions(command) {
     const argumentsForCommand = ARGUMENTS[command.string] || []
-    return argumentsForCommand.map(arg => {
+    return argumentsForCommand.map((arg) => {
       return {
         text: arg,
         displayText: arg,
@@ -248,7 +248,7 @@ export default function makeAutocomplete(adapter, getSetting) {
   /*
    * Memoize building up Fuse fuzzy search as it is somewhat expensive
    */
-  const makeFuzzySearch = _.memoize(list => {
+  const makeFuzzySearch = _.memoize((list) => {
     return new Fuse(list, {
       threshold: 0.3,
       keys: ['text']

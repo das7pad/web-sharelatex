@@ -31,9 +31,7 @@ const AbstractMarker = {
 }
 
 function makeDiv(text, className) {
-  const el = $('<div>')
-    .text(text)
-    .addClass(className)
+  const el = $('<div>').text(text).addClass(className)
   return el[0]
 }
 

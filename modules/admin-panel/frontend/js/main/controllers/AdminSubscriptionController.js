@@ -10,12 +10,12 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../../../../frontend/js/base'], function(App) {
-  App.controller('AdminSubscriptionController', function($scope, $http) {
+define(['../../../../../../frontend/js/base'], function (App) {
+  App.controller('AdminSubscriptionController', function ($scope, $http) {
     $scope.subscription = window.data.subscription
     $scope.user_id = window.data.user_id
 
-    return ($scope.deleteSubscription = function() {
+    return ($scope.deleteSubscription = function () {
       $scope.deleteError = false
       return $http({
         url: `/admin/subscription/${$scope.subscription._id}`,
@@ -29,7 +29,7 @@ define(['../../../../../../frontend/js/base'], function(App) {
     })
   })
 
-  return App.controller('AdminCreateSubscriptionController', function($scope) {
+  return App.controller('AdminCreateSubscriptionController', function ($scope) {
     $scope.subscription = {
       customAccount: true,
       groupPlan: true,
@@ -38,7 +38,7 @@ define(['../../../../../../frontend/js/base'], function(App) {
       admin_id: window.data.admin_id
     }
 
-    return ($scope.onSuccess = function(result) {
+    return ($scope.onSuccess = function (result) {
       const { subscription } = result.data
       const location = `/admin/user/${subscription.admin_id}/subscription/${subscription._id}`
       return (window.location = location)

@@ -5,7 +5,10 @@ const _ = require('lodash')
 const request = require('./helpers/request')
 
 const _initUser = (user, callback) => {
-  async.series([cb => user.login(cb), cb => user.getCsrfToken(cb)], callback)
+  async.series(
+    [(cb) => user.login(cb), (cb) => user.getCsrfToken(cb)],
+    callback
+  )
 }
 
 const _initUsers = (users, callback) => {
@@ -29,14 +32,14 @@ const _createTag = (user, name, callback) => {
 const _createTags = (user, tagNames, callback) => {
   const tags = []
   async.series(
-    tagNames.map(tagName => cb =>
+    tagNames.map((tagName) => (cb) =>
       _createTag(user, tagName, (err, response, body) => {
         _expect200(err, response)
         tags.push(body)
         cb()
       })
     ),
-    err => {
+    (err) => {
       callback(err, tags)
     }
   )
@@ -46,15 +49,15 @@ const _getTags = (user, callback) => {
   user.request.get({ url: `/tag`, json: true }, callback)
 }
 
-const _names = tags => {
-  return tags.map(tag => tag.name)
+const _names = (tags) => {
+  return tags.map((tag) => tag.name)
 }
 
-const _ids = tags => {
-  return tags.map(tag => tag._id)
+const _ids = (tags) => {
+  return tags.map((tag) => tag._id)
 }
 
-const _expectTagStructure = tag => {
+const _expectTagStructure = (tag) => {
   expect(tag).to.have.keys('_id', 'user_id', 'name', 'project_ids', '__v')
   expect(typeof tag._id).to.equal('string')
   expect(typeof tag.user_id).to.equal('string')
@@ -62,16 +65,16 @@ const _expectTagStructure = tag => {
   expect(tag.project_ids).to.deep.equal([])
 }
 
-describe('Tags', function() {
-  beforeEach(function(done) {
+describe('Tags', function () {
+  beforeEach(function (done) {
     this.user = new User()
     this.otherUser = new User()
     _initUsers([this.user, this.otherUser], done)
   })
 
-  describe('get tags, anonymous', function() {
-    it('should refuse to get user tags', function(done) {
-      this.user.logout(err => {
+  describe('get tags, anonymous', function () {
+    it('should refuse to get user tags', function (done) {
+      this.user.logout((err) => {
         if (err) {
           return done(err)
         }
@@ -85,8 +88,8 @@ describe('Tags', function() {
     })
   })
 
-  describe('get tags, none', function() {
-    it('should get user tags', function(done) {
+  describe('get tags, none', function () {
+    it('should get user tags', function (done) {
       _getTags(this.user, (err, response, body) => {
         _expect200(err, response)
         expect(body).to.deep.equal([])
@@ -95,8 +98,8 @@ describe('Tags', function() {
     })
   })
 
-  describe('create some tags, then get', function() {
-    it('should get tags only for that user', function(done) {
+  describe('create some tags, then get', function () {
+    it('should get tags only for that user', function (done) {
       // Create a few tags
       _createTags(this.user, ['one', 'two', 'three'], (err, tags) => {
         expect(err).to.not.exist
@@ -130,7 +133,7 @@ describe('Tags', function() {
     })
   })
 
-  describe('get tags via api', function() {
+  describe('get tags via api', function () {
     const auth = Buffer.from('sharelatex:password').toString('base64')
     const authedRequest = request.defaults({
       headers: {
@@ -138,7 +141,7 @@ describe('Tags', function() {
       }
     })
 
-    it('should disallow without appropriate auth headers', function(done) {
+    it('should disallow without appropriate auth headers', function (done) {
       _createTags(this.user, ['one', 'two', 'three'], (err, tags) => {
         expect(err).to.not.exist
         // Get the tags, but with a regular request, not authorized
@@ -154,7 +157,7 @@ describe('Tags', function() {
       })
     })
 
-    it('should get the tags from api endpoint', function(done) {
+    it('should get the tags from api endpoint', function (done) {
       _createTags(this.user, ['one', 'two', 'three'], (err, tags) => {
         expect(err).to.not.exist
         // Get tags for user
@@ -178,8 +181,8 @@ describe('Tags', function() {
     })
   })
 
-  describe('rename tag', function() {
-    it('should reject malformed tag id', function(done) {
+  describe('rename tag', function () {
+    it('should reject malformed tag id', function (done) {
       this.user.request.post(
         { url: `/tag/lol/rename`, json: { name: 'five' } },
         (err, response) => {
@@ -190,7 +193,7 @@ describe('Tags', function() {
       )
     })
 
-    it('should allow user to rename a tag', function(done) {
+    it('should allow user to rename a tag', function (done) {
       _createTags(this.user, ['one', 'two'], (err, tags) => {
         expect(err).to.not.exist
         // Pick out the first tag
@@ -210,7 +213,7 @@ describe('Tags', function() {
                 _.sortBy(['five', 'two'])
               )
               // Check the id is the same
-              const tagWithNameFive = _.find(body, t => t.name === 'five')
+              const tagWithNameFive = _.find(body, (t) => t.name === 'five')
               expect(tagWithNameFive._id).to.equal(firstTagId)
               done()
             })
@@ -219,7 +222,7 @@ describe('Tags', function() {
       })
     })
 
-    it('should not allow other user to change name', function(done) {
+    it('should not allow other user to change name', function (done) {
       const initialTagNames = ['one', 'two']
       _createTags(this.user, initialTagNames, (err, tags) => {
         expect(err).to.not.exist
@@ -246,8 +249,8 @@ describe('Tags', function() {
     })
   })
 
-  describe('delete tag', function() {
-    it('should reject malformed tag id', function(done) {
+  describe('delete tag', function () {
+    it('should reject malformed tag id', function (done) {
       this.user.request.delete(
         { url: `/tag/lol`, json: { name: 'five' } },
         (err, response) => {
@@ -258,7 +261,7 @@ describe('Tags', function() {
       )
     })
 
-    it('should delete a tag', function(done) {
+    it('should delete a tag', function (done) {
       const initialTagNames = ['one', 'two', 'three']
       _createTags(this.user, initialTagNames, (err, tags) => {
         expect(err).to.not.exist
@@ -281,8 +284,8 @@ describe('Tags', function() {
     })
   })
 
-  describe('add project to tag', function() {
-    beforeEach(function(done) {
+  describe('add project to tag', function () {
+    beforeEach(function (done) {
       this.user.createProject('test 1', (err, projectId) => {
         if (err) {
           return done(err)
@@ -292,7 +295,7 @@ describe('Tags', function() {
       })
     })
 
-    it('should reject malformed tag id', function(done) {
+    it('should reject malformed tag id', function (done) {
       this.user.request.post(
         { url: `/tag/lol/project/bad` },
         (err, response) => {
@@ -303,7 +306,7 @@ describe('Tags', function() {
       )
     })
 
-    it('should allow the user to add a project to a tag, and remove it', function(done) {
+    it('should allow the user to add a project to a tag, and remove it', function (done) {
       _createTags(this.user, ['one', 'two'], (err, tags) => {
         expect(err).to.not.exist
         const firstTagId = tags[0]._id
@@ -311,7 +314,7 @@ describe('Tags', function() {
           _expect200(err, response)
           // Confirm that project_ids is empty for this tag
           expect(
-            _.find(body, tag => tag.name === 'one').project_ids
+            _.find(body, (tag) => tag.name === 'one').project_ids
           ).to.deep.equal([])
           // Add the project to the tag
           this.user.request.post(
@@ -323,7 +326,7 @@ describe('Tags', function() {
                 _expect200(err, response)
                 // Check the project has been added to project_ids
                 expect(
-                  _.find(body, tag => tag.name === 'one').project_ids
+                  _.find(body, (tag) => tag.name === 'one').project_ids
                 ).to.deep.equal([this.projectId])
                 // Remove the project from the tag
                 this.user.request.delete(
@@ -335,7 +338,7 @@ describe('Tags', function() {
                       _expect200(err, response)
                       // Check the project has been removed from project_ids
                       expect(
-                        _.find(body, tag => tag.name === 'one').project_ids
+                        _.find(body, (tag) => tag.name === 'one').project_ids
                       ).to.deep.equal([])
                       done()
                     })
@@ -348,7 +351,7 @@ describe('Tags', function() {
       })
     })
 
-    it('should not allow another user to add a project to the tag', function(done) {
+    it('should not allow another user to add a project to the tag', function (done) {
       _createTags(this.user, ['one', 'two'], (err, tags) => {
         expect(err).to.not.exist
         const firstTagId = tags[0]._id
@@ -356,7 +359,7 @@ describe('Tags', function() {
           _expect200(err, response)
           // Confirm that project_ids is empty for this tag
           expect(
-            _.find(body, tag => tag.name === 'one').project_ids
+            _.find(body, (tag) => tag.name === 'one').project_ids
           ).to.deep.equal([])
           // Have the other user try to add their own project to the tag
           this.otherUser.createProject(
@@ -372,7 +375,7 @@ describe('Tags', function() {
                     _expect200(err, response)
                     // Check the rogue project has not been added to project_ids
                     expect(
-                      _.find(body, tag => tag.name === 'one').project_ids
+                      _.find(body, (tag) => tag.name === 'one').project_ids
                     ).to.deep.equal([])
                     done()
                   })

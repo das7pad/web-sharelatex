@@ -13,11 +13,9 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define([
-  '../../base',
-  'libs/jquery-layout',
-  'libs/jquery.ui.touch-punch'
-], App =>
+define(['../../base', 'libs/jquery-layout', 'libs/jquery.ui.touch-punch'], (
+  App
+) =>
   App.directive('layout', ($parse, $compile, ide) => ({
     compile() {
       return {
@@ -50,10 +48,10 @@ define([
             spacing_closed: spacingClosed,
             slidable: false,
             enableCursorHotkey: false,
-            onopen: pane => {
+            onopen: (pane) => {
               return onPaneOpen(pane)
             },
-            onclose: pane => {
+            onclose: (pane) => {
               return onPaneClose(pane)
             },
             onresize: () => {
@@ -102,7 +100,7 @@ define([
             options.west.resizerCursor = window.uiConfig.westResizerCursor
           }
 
-          const repositionControls = function() {
+          const repositionControls = function () {
             state = element.layout().readState()
             if (state.east != null) {
               const controls = element.find('> .ui-layout-resizer-controls')
@@ -117,7 +115,7 @@ define([
             }
           }
 
-          const repositionCustomToggler = function() {
+          const repositionCustomToggler = function () {
             if (customTogglerEl == null) {
               return
             }
@@ -133,7 +131,7 @@ define([
             }
           }
 
-          const resetOpenStates = function() {
+          const resetOpenStates = function () {
             state = element.layout().readState()
             if (attrs.openEast != null && state.east != null) {
               const openEast = $parse(attrs.openEast)
@@ -142,7 +140,7 @@ define([
           }
 
           // Someone moved the resizer
-          var onInternalResize = function() {
+          var onInternalResize = function () {
             state = element.layout().readState()
             scope.$broadcast(`layout:${name}:resize`, state)
             repositionControls()
@@ -154,7 +152,7 @@ define([
 
           let oldWidth = element.width()
           // Something resized our parent element
-          const onExternalResize = function() {
+          const onExternalResize = function () {
             if (
               attrs.resizeProportionally != null &&
               scope.$eval(attrs.resizeProportionally)
@@ -201,7 +199,7 @@ define([
 
             customTogglerScope.tooltipPlacement =
               customTogglerPane === 'east' ? 'left' : 'right'
-            customTogglerScope.handleClick = function() {
+            customTogglerScope.handleClick = function () {
               element.layout().toggle(customTogglerPane)
               return repositionCustomToggler()
             }
@@ -217,7 +215,7 @@ ng-click=\"handleClick()\">\
             element.append(customTogglerEl)
           }
 
-          var onPaneOpen = function(pane) {
+          var onPaneOpen = function (pane) {
             if (!hasCustomToggler && pane !== customTogglerPane) {
               return
             }
@@ -226,7 +224,7 @@ ng-click=\"handleClick()\">\
               .$applyAsync(() => (customTogglerEl.scope().isOpen = true))
           }
 
-          var onPaneClose = function(pane) {
+          var onPaneClose = function (pane) {
             if (!hasCustomToggler && pane !== customTogglerPane) {
               return
             }
@@ -241,7 +239,7 @@ ng-click=\"handleClick()\">\
           )
 
           if (attrs.openEast != null) {
-            scope.$watch(attrs.openEast, function(value, oldValue) {
+            scope.$watch(attrs.openEast, function (value, oldValue) {
               if (value != null && value !== oldValue) {
                 if (value) {
                   element.layout().open('east')
@@ -268,14 +266,14 @@ ng-click=\"handleClick()\">\
           onInternalResize()
 
           if (attrs.layoutDisabled != null) {
-            return scope.$watch(attrs.layoutDisabled, function(value) {
+            return scope.$watch(attrs.layoutDisabled, function (value) {
               if (value) {
                 element.layout().hide('east')
               } else {
                 element.layout().show('east')
               }
               if (hasCustomToggler) {
-                return customTogglerEl.scope().$applyAsync(function() {
+                return customTogglerEl.scope().$applyAsync(function () {
                   customTogglerEl.scope().isOpen = !value
                   return (customTogglerEl.scope().isVisible = !value)
                 })

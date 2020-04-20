@@ -11,7 +11,7 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base'], App =>
+define(['../../../base'], (App) =>
   App.controller(
     'HistoryV2ToolbarController',
     ($scope, $modal, ide, eventTracking, waitFor) => {
@@ -29,7 +29,7 @@ define(['../../../base'], App =>
 
       const _deregistershowOnlyLabelsWatcher = $scope.$watch(
         'history.showOnlyLabels',
-        showOnlyLabels => {
+        (showOnlyLabels) => {
           if (showOnlyLabels != null) {
             $scope.toolbarUIConfig.showOnlyLabels = showOnlyLabels
             _deregistershowOnlyLabelsWatcher()
@@ -67,7 +67,7 @@ define(['../../../base'], App =>
         ide.historyManager.toggleHistoryViewMode()
       }
 
-      $scope.restoreDeletedFile = function() {
+      $scope.restoreDeletedFile = function () {
         const { pathname, deletedAtV } = $scope.history.selection.file
         if (pathname == null || deletedAtV == null) {
           return
@@ -77,7 +77,7 @@ define(['../../../base'], App =>
         $scope.restoreState.inflight = true
         return ide.historyManager
           .restoreFile(deletedAtV, pathname)
-          .then(function(response) {
+          .then(function (response) {
             const { data } = response
             return openEntity(data)
           })
@@ -104,7 +104,7 @@ define(['../../../base'], App =>
       function openEntity(data) {
         const { id, type } = data
         return waitFor(() => ide.fileTreeManager.findEntityById(id), 3000)
-          .then(function(entity) {
+          .then(function (entity) {
             if (type === 'doc') {
               ide.editorManager.openDoc(entity)
               this.ide.$timeout(() => {
@@ -117,7 +117,7 @@ define(['../../../base'], App =>
               }, 0)
             }
           })
-          .catch(err => console.warn(err))
+          .catch((err) => console.warn(err))
       }
     }
   ))

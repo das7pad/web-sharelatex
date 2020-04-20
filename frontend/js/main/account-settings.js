@@ -1,5 +1,5 @@
-define(['../base'], function(App) {
-  App.controller('AccountSettingsController', function(
+define(['../base'], function (App) {
+  App.controller('AccountSettingsController', function (
     $scope,
     $http,
     $modal,
@@ -9,7 +9,7 @@ define(['../base'], function(App) {
   ) {
     $scope.subscribed = true
 
-    $scope.unsubscribe = function() {
+    $scope.unsubscribe = function () {
       $scope.unsubscribing = true
       return $http({
         method: 'DELETE',
@@ -18,14 +18,14 @@ define(['../base'], function(App) {
           'X-CSRF-Token': window.csrfToken
         }
       })
-        .then(function() {
+        .then(function () {
           $scope.unsubscribing = false
           $scope.subscribed = false
         })
         .catch(() => ($scope.unsubscribing = true))
     }
 
-    $scope.deleteAccount = function() {
+    $scope.deleteAccount = function () {
       $modal.open({
         templateUrl: 'deleteAccountModalTemplate',
         controller: 'DeleteAccountModalController',
@@ -33,7 +33,7 @@ define(['../base'], function(App) {
           userDefaultEmail() {
             return UserAffiliationsDataService.getUserDefaultEmail()
               .then(
-                defaultEmailDetails =>
+                (defaultEmailDetails) =>
                   (defaultEmailDetails != null
                     ? defaultEmailDetails.email
                     : undefined) || null
@@ -44,11 +44,11 @@ define(['../base'], function(App) {
       })
     }
 
-    $scope.upgradeIntegration = service =>
+    $scope.upgradeIntegration = (service) =>
       eventTracking.send('subscription-funnel', 'settings-page', service)
   })
 
-  App.controller('DeleteAccountModalController', function(
+  App.controller('DeleteAccountModalController', function (
     $scope,
     $modalInstance,
     $timeout,
@@ -80,7 +80,7 @@ define(['../base'], function(App) {
         $scope.state.confirmV1Purge &&
         $scope.state.confirmSharelatexDelete)
 
-    $scope.delete = function() {
+    $scope.delete = function () {
       $scope.state.inflight = true
       $scope.state.error = null
       return $http({
@@ -95,13 +95,13 @@ define(['../base'], function(App) {
         },
         disableAutoLoginRedirect: true // we want to handle errors ourselves
       })
-        .then(function() {
+        .then(function () {
           $modalInstance.close()
           $scope.state.inflight = false
           $scope.state.error = null
           setTimeout(() => (window.location = '/login'), 1000)
         })
-        .catch(function(response) {
+        .catch(function (response) {
           const { data, status } = response
           $scope.state.inflight = false
           if (status === 403) {

@@ -4,8 +4,8 @@
     no-return-assign
 */
 /* global recurly */
-define(['../base', '../directives/creditCards'], App =>
-  App.controller('NewSubscriptionController', function(
+define(['../base', '../directives/creditCards'], (App) =>
+  App.controller('NewSubscriptionController', function (
     $scope,
     MultiCurrencyPricing,
     $http,
@@ -23,7 +23,7 @@ define(['../base', '../directives/creditCards'], App =>
     $scope.availableCurrencies = {}
     $scope.planCode = window.plan_code
 
-    $scope.switchToStudent = function() {
+    $scope.switchToStudent = function () {
       const currentPlanCode = window.plan_code
       const planCode = currentPlanCode.replace('collaborator', 'student')
       eventTracking.sendMB('subscription-form-switch-to-student', {
@@ -148,12 +148,12 @@ define(['../base', '../directives/creditCards'], App =>
         .tax({ tax_code: 'digital', vat_number: $scope.data.vat_number })
         .done()
 
-    $scope.changeCurrency = function(newCurrency) {
+    $scope.changeCurrency = function (newCurrency) {
       $scope.currencyCode = newCurrency
       return pricing.currency(newCurrency).done()
     }
 
-    $scope.inputHasError = function(formItem) {
+    $scope.inputHasError = function (formItem) {
       if (formItem == null) {
         return false
       }
@@ -161,7 +161,7 @@ define(['../base', '../directives/creditCards'], App =>
       return formItem.$touched && formItem.$invalid
     }
 
-    $scope.isFormValid = function(form) {
+    $scope.isFormValid = function (form) {
       if ($scope.paymentMethod.value === 'paypal') {
         return $scope.data.country !== ''
       } else {
@@ -172,14 +172,14 @@ define(['../base', '../directives/creditCards'], App =>
     $scope.updateCountry = () =>
       pricing.address({ country: $scope.data.country }).done()
 
-    $scope.setPaymentMethod = function(method) {
+    $scope.setPaymentMethod = function (method) {
       $scope.paymentMethod.value = method
       $scope.validation.errorFields = {}
       $scope.genericError = ''
     }
 
     let cachedRecurlyBillingToken
-    const completeSubscription = function(
+    const completeSubscription = function (
       err,
       recurlyBillingToken,
       recurly3DSecureResultToken
@@ -195,12 +195,12 @@ define(['../base', '../directives/creditCards'], App =>
         eventTracking.send('subscription-funnel', 'subscription-error')
         // We may or may not be in a digest loop here depending on
         // whether recurly could do validation locally, so do it async
-        $scope.$evalAsync(function() {
+        $scope.$evalAsync(function () {
           $scope.processing = false
           $scope.genericError = err.message
           _.each(
             err.fields,
-            field => ($scope.validation.errorFields[field] = true)
+            (field) => ($scope.validation.errorFields[field] = true)
           )
         })
       } else {
@@ -243,7 +243,7 @@ define(['../base', '../directives/creditCards'], App =>
 
         return $http
           .post('/user/subscription/create', postData)
-          .then(function() {
+          .then(function () {
             eventTracking.sendMB('subscription-submission-success')
             eventTracking.send(
               'subscription-funnel',
@@ -252,7 +252,7 @@ define(['../base', '../directives/creditCards'], App =>
             )
             window.location.href = '/user/subscription/thank-you'
           })
-          .catch(response => {
+          .catch((response) => {
             $scope.processing = false
             const { data } = response
             $scope.genericError =
@@ -266,7 +266,7 @@ define(['../base', '../directives/creditCards'], App =>
       }
     }
 
-    $scope.submit = function() {
+    $scope.submit = function () {
       $scope.processing = true
       if ($scope.paymentMethod.value === 'paypal') {
         const opts = { description: $scope.planName }
@@ -276,7 +276,7 @@ define(['../base', '../directives/creditCards'], App =>
       }
     }
 
-    const initThreeDSecure = function(threeDSecureActionTokenId) {
+    const initThreeDSecure = function (threeDSecureActionTokenId) {
       // instanciate and configure Recurly 3DSecure flow
       const risk = recurly.Risk()
       const threeDSecure = risk.ThreeDSecure({
@@ -284,7 +284,7 @@ define(['../base', '../directives/creditCards'], App =>
       })
 
       // on SCA verification error: show payment UI with the error message
-      threeDSecure.on('error', error => {
+      threeDSecure.on('error', (error) => {
         $scope.genericError = `Error: ${error.message}`
         $scope.threeDSecureFlow = false
         $scope.$apply()
@@ -293,7 +293,7 @@ define(['../base', '../directives/creditCards'], App =>
       // on SCA verification success: show payment UI in processing mode and
       // resubmit the payment with the new token final success or error will be
       // handled by `completeSubscription`
-      threeDSecure.on('token', recurly3DSecureResultToken => {
+      threeDSecure.on('token', (recurly3DSecureResultToken) => {
         completeSubscription(null, null, recurly3DSecureResultToken)
         $scope.genericError = null
         $scope.threeDSecureFlow = false

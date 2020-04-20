@@ -144,10 +144,10 @@ const ClsiManager = {
       url: compilerUrl,
       method: 'DELETE'
     }
-    ClsiManager._makeRequest(projectId, opts, clsiErr => {
+    ClsiManager._makeRequest(projectId, opts, (clsiErr) => {
       // always clear the project state from the docupdater, even if there
       // was a problem with the request to the clsi
-      DocumentUpdaterHandler.clearProjectState(projectId, docUpdaterErr => {
+      DocumentUpdaterHandler.clearProjectState(projectId, (docUpdaterErr) => {
         if (clsiErr != null) {
           return callback(
             new OError({
@@ -266,7 +266,7 @@ const ClsiManager = {
               Metrics.inc(
                 `compile.currentBackend.response.${response.statusCode}`
               )
-              ClsiCookieManager.setServerId(projectId, response, err => {
+              ClsiCookieManager.setServerId(projectId, response, (err) => {
                 if (err != null) {
                   callback(
                     new OError({
@@ -372,7 +372,7 @@ const ClsiManager = {
         NewBackendCloudClsiCookieManager.setServerId(
           projectId,
           response,
-          err => {
+          (err) => {
             if (err != null) {
               return callback(
                 new OError({
@@ -693,7 +693,7 @@ const ClsiManager = {
   },
 
   _getContentFromMongo(projectId, callback) {
-    DocumentUpdaterHandler.flushProjectToMongo(projectId, err => {
+    DocumentUpdaterHandler.flushProjectToMongo(projectId, (err) => {
       if (err != null) {
         return callback(
           new OError({

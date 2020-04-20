@@ -34,7 +34,7 @@ function main(callback) {
 }
 
 if (require.main === module) {
-  main(err => {
+  main((err) => {
     if (err) {
       console.error(err)
       return process.exit(1)

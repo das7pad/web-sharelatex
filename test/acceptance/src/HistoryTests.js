@@ -21,16 +21,16 @@ require('./helpers/MockDocstoreApi')
 require('./helpers/MockDocUpdaterApi')
 require('./helpers/MockProjectHistoryApi')
 
-describe('History', function() {
+describe('History', function () {
   this.timeout(10000)
 
-  beforeEach(function(done) {
+  beforeEach(function (done) {
     this.owner = new User()
     return this.owner.login(done)
   })
 
-  describe('zip download of version', function() {
-    it('should stream the zip file of a version', function(done) {
+  describe('zip download of version', function () {
+    it('should stream the zip file of a version', function (done) {
       return this.owner.createProject(
         'example-project',
         (error, project_id) => {
@@ -48,7 +48,7 @@ describe('History', function() {
                 'overleaf.history.id': this.v1_history_id
               }
             },
-            error => {
+            (error) => {
               if (error != null) {
                 return done(error)
               }
@@ -77,7 +77,7 @@ describe('History', function() {
       )
     })
 
-    it('should return 402 for non-v2-history project', function(done) {
+    it('should return 402 for non-v2-history project', function (done) {
       return this.owner.createProject('non-v2-project', (error, project_id) => {
         this.project_id = project_id
         if (error != null) {
@@ -92,7 +92,7 @@ describe('History', function() {
               'overleaf.history.id': true
             }
           },
-          error => {
+          (error) => {
             if (error != null) {
               return done(error)
             }

@@ -15,7 +15,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['./snippets/TopHundredSnippets'], function(topHundred) {
+define(['./snippets/TopHundredSnippets'], function (topHundred) {
   let CommandManager
   class Parser {
     static initClass() {
@@ -38,7 +38,7 @@ define(['./snippets/TopHundredSnippets'], function(topHundred) {
           typeof window !== 'undefined' && window !== null
             ? window._ide
             : undefined,
-          x => x.browserIsSafari
+          (x) => x.browserIsSafari
         )
       ) {
         limit = 5000
@@ -170,12 +170,12 @@ define(['./snippets/TopHundredSnippets'], function(topHundred) {
           const score = caption === prefix ? 99 : 50
           snippet = caption
           var i = 1
-          _.times(command[1], function() {
+          _.times(command[1], function () {
             snippet += `[\${${i}}]`
             caption += '[]'
             return i++
           })
-          _.times(command[2], function() {
+          _.times(command[2], function () {
             snippet += `{\${${i}}}`
             caption += '{}'
             return i++
@@ -201,11 +201,11 @@ define(['./snippets/TopHundredSnippets'], function(topHundred) {
     getSuggestions(commandFragment) {
       const matchingCommands = _.filter(
         this.commands,
-        command =>
+        (command) =>
           command[0].slice(0, commandFragment.length) === commandFragment
       )
 
-      return _.map(matchingCommands, function(command) {
+      return _.map(matchingCommands, function (command) {
         let completionAfterCursor, completionBeforeCursor
         const base = `\\${commandFragment}`
 

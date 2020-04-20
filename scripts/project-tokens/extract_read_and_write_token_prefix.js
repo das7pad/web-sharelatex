@@ -32,7 +32,7 @@ db.projects.find(
           cb
         )
       },
-      err => {
+      (err) => {
         if (err) {
           throw err
         }

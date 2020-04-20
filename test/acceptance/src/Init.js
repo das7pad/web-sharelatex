@@ -1,7 +1,7 @@
 const { exec } = require('child_process')
 const { db } = require('../../../app/src/infrastructure/mongojs')
 
-before(function(done) {
+before(function (done) {
   this.timeout(60000)
   clearDB(() => {
     exec('bin/east migrate', (error, stdout, stderr) => {
@@ -27,9 +27,9 @@ function clearDB(done) {
       throw error
     }
     Promise.all(
-      names.map(name => {
+      names.map((name) => {
         return new Promise((resolve, reject) => {
-          db[name].remove({}, err => {
+          db[name].remove({}, (err) => {
             if (err) {
               reject(err)
             } else {
@@ -40,7 +40,7 @@ function clearDB(done) {
       })
     ).then(
       () => done(),
-      err => {
+      (err) => {
         throw err
       }
     )

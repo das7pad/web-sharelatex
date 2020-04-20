@@ -7,8 +7,8 @@ const modulePath = path.join(
 const sinon = require('sinon')
 const { expect } = require('chai')
 
-describe('FaultTolerantRequest', function() {
-  beforeEach(function() {
+describe('FaultTolerantRequest', function () {
+  beforeEach(function () {
     this.request = sinon.stub().yields()
     this.logger = {
       err: sinon.stub()
@@ -25,8 +25,8 @@ describe('FaultTolerantRequest', function() {
     })
   })
 
-  describe('exponentialBackoffStrategy', function() {
-    it('returns delays within expected range with default options', function() {
+  describe('exponentialBackoffStrategy', function () {
+    it('returns delays within expected range with default options', function () {
       this.FaultTolerantRequest.request({}, () => {})
       const delayStrategy = this.request.lastCall.args[0].delayStrategy
       expect(delayStrategy()).to.be.closeTo(500, 250) // attempt 1
@@ -41,7 +41,7 @@ describe('FaultTolerantRequest', function() {
       expect(delayStrategy()).to.be.closeTo(19222, 9610) // attempt 10
     })
 
-    it('returns delays within expected range with custom options', function() {
+    it('returns delays within expected range with custom options', function () {
       const delayStrategy = this.FaultTolerantRequest.exponentialDelayStrategy(
         3000,
         3,
@@ -60,9 +60,9 @@ describe('FaultTolerantRequest', function() {
     })
   })
 
-  describe('request', function() {
-    it('sets retry options', function(done) {
-      this.FaultTolerantRequest.request({}, error => {
+  describe('request', function () {
+    it('sets retry options', function (done) {
+      this.FaultTolerantRequest.request({}, (error) => {
         expect(error).to.not.exist
         sinon.assert.calledOnce(this.request)
 
@@ -73,7 +73,7 @@ describe('FaultTolerantRequest', function() {
       })
     })
 
-    it("don't overwrite retry options", function(done) {
+    it("don't overwrite retry options", function (done) {
       const customMaxAttempts = Math.random()
       const customBase = Math.random()
       const customMultiplier = Math.random()
@@ -85,7 +85,7 @@ describe('FaultTolerantRequest', function() {
           backoffMultiplier: customMultiplier,
           backoffRandomFactor: customRandomFactor
         },
-        error => {
+        (error) => {
           expect(error).to.not.exist
 
           const {
@@ -104,8 +104,8 @@ describe('FaultTolerantRequest', function() {
     })
   })
 
-  describe('backgroundRequest', function() {
-    it('logs error in the background', function(done) {
+  describe('backgroundRequest', function () {
+    it('logs error in the background', function (done) {
       this.request.yields(new Error('Nope'))
       this.logger.err = (options, message) => {
         expect(options.url).to.equal('test.url')
@@ -113,7 +113,7 @@ describe('FaultTolerantRequest', function() {
       }
       this.FaultTolerantRequest.backgroundRequest(
         { url: 'test.url' },
-        error => {
+        (error) => {
           expect(error).to.not.exist
         }
       )

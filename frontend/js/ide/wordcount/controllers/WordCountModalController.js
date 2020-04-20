@@ -10,8 +10,8 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base'], App =>
-  App.controller('WordCountModalController', function(
+define(['../../../base'], (App) =>
+  App.controller('WordCountModalController', function (
     $scope,
     $modalInstance,
     ide,
@@ -27,7 +27,7 @@ define(['../../../base'], App =>
       }
     }
     $http(opts)
-      .then(function(response) {
+      .then(function (response) {
         const { data } = response
         $scope.status.loading = false
         return ($scope.data = data.texcount)

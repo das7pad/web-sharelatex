@@ -22,7 +22,7 @@ const ASYNC_AFFILIATIONS_LIMIT = 10
 module.exports = InstitutionsController = {
   confirmDomain(req, res, next) {
     const { hostname } = req.body
-    return affiliateUsers(hostname, function(error) {
+    return affiliateUsers(hostname, function (error) {
       if (error != null) {
         return next(error)
       }
@@ -31,19 +31,15 @@ module.exports = InstitutionsController = {
   }
 }
 
-var affiliateUsers = function(hostname, callback) {
+var affiliateUsers = function (hostname, callback) {
   if (callback == null) {
-    callback = function(error) {}
+    callback = function (error) {}
   }
-  const reversedHostname = hostname
-    .trim()
-    .split('')
-    .reverse()
-    .join('')
+  const reversedHostname = hostname.trim().split('').reverse().join('')
   return UserGetter.getUsersByHostname(
     hostname,
     { _id: 1, emails: 1 },
-    function(error, users) {
+    function (error, users) {
       if (error != null) {
         logger.warn({ error }, 'problem fetching users by hostname')
         return callback(error)
@@ -64,13 +60,13 @@ var affiliateUsers = function(hostname, callback) {
   )
 }
 
-var affiliateUserByReversedHostname = function(
+var affiliateUserByReversedHostname = function (
   user,
   reversedHostname,
   callback
 ) {
   const matchingEmails = user.emails.filter(
-    email => email.reversedHostname === reversedHostname
+    (email) => email.reversedHostname === reversedHostname
   )
   return async.mapSeries(
     matchingEmails,
@@ -79,7 +75,7 @@ var affiliateUserByReversedHostname = function(
         user._id,
         email.email,
         { confirmedAt: email.confirmedAt },
-        error => {
+        (error) => {
           if (error != null) {
             logger.warn(
               { error },

@@ -8,10 +8,10 @@
  * decaffeinate suggestions:
  * DS102: Remove unnecessary code created because of implicit returns
  */
-define(['../base'], App =>
-  App.factory('validateCaptcha', function() {
+define(['../base'], (App) =>
+  App.factory('validateCaptcha', function () {
     let _recaptchaCallbacks = []
-    const onRecaptchaSubmit = function(token) {
+    const onRecaptchaSubmit = function (token) {
       for (const cb of _recaptchaCallbacks) {
         cb(token)
       }
@@ -21,7 +21,7 @@ define(['../base'], App =>
     let recaptchaId = null
     const validateCaptcha = (callback, captchaDisabled) => {
       if (callback == null) {
-        callback = function(response) {}
+        callback = function (response) {}
       }
       if (
         typeof grecaptcha === 'undefined' ||

@@ -11,10 +11,10 @@
  * DS103: Rewrite code to no longer use __guard__
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define([], function() {
+define([], function () {
   let iconTypeFromName
-  return (iconTypeFromName = function(name) {
-    const ext = __guard__(name.split('.').pop(), x => x.toLowerCase())
+  return (iconTypeFromName = function (name) {
+    const ext = __guard__(name.split('.').pop(), (x) => x.toLowerCase())
     if (['png', 'pdf', 'jpg', 'jpeg', 'gif'].includes(ext)) {
       return 'image'
     } else if (['csv', 'xls', 'xlsx'].includes(ext)) {

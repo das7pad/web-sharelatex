@@ -23,7 +23,7 @@ define(['libs/latex-log-parser', './HumanReadableLogsRules'], (
       parsedLogEntries = rawLog
     }
 
-    const _getRule = function(logMessage) {
+    const _getRule = function (logMessage) {
       for (const rule of Array.from(ruleset)) {
         if (rule.regexToMatch.test(logMessage)) {
           return rule
@@ -81,7 +81,7 @@ define(['libs/latex-log-parser', './HumanReadableLogsRules'], (
       const errors = parsedLogEntries[key]
       if (typeof errors === 'object' && errors.length > 0) {
         parsedLogEntries[key] = Array.from(errors).filter(
-          err => !err.suppressed
+          (err) => !err.suppressed
         )
       }
     }

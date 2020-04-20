@@ -62,21 +62,21 @@ const UserRegistrationHandler = {
         }
         async.series(
           [
-            cb =>
+            (cb) =>
               User.updateOne(
                 { _id: user._id },
                 { $set: { holdingAccount: false } },
                 cb
               ),
-            cb =>
+            (cb) =>
               AuthenticationManager.setUserPassword(
                 user._id,
                 userDetails.password,
                 cb
               ),
-            cb => {
+            (cb) => {
               if (userDetails.subscribeToNewsletter === 'true') {
-                NewsletterManager.subscribe(user, err => {
+                NewsletterManager.subscribe(user, (err) => {
                   if (err != null) {
                     logger.warn(
                       { err, user },
@@ -88,7 +88,7 @@ const UserRegistrationHandler = {
               cb()
             } // this can be slow, just fire it off
           ],
-          err => {
+          (err) => {
             Analytics.recordEvent(user._id, 'user-registered')
             callback(err, user)
           }
@@ -135,7 +135,7 @@ const UserRegistrationHandler = {
                 to: user.email,
                 setNewPasswordUrl
               },
-              err => {
+              (err) => {
                 if (err != null) {
                   logger.warn({ err }, 'failed to send activation email')
                 }

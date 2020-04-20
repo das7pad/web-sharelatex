@@ -27,7 +27,7 @@ define([
   './controllers/FileTreeEntityController',
   './controllers/FileTreeFolderController',
   './controllers/FileTreeRootFolderController'
-], function() {
+], function () {
   let FileTreeManager
   return (FileTreeManager = class FileTreeManager {
     constructor(ide, $scope) {
@@ -39,7 +39,7 @@ define([
         return this.$scope.$emit('file-tree:initialized')
       })
 
-      this.$scope.$watch('rootFolder', rootFolder => {
+      this.$scope.$watch('rootFolder', (rootFolder) => {
         if (rootFolder != null) {
           return this.recalculateDocList()
         }
@@ -112,7 +112,7 @@ define([
         })
       })
 
-      this.ide.socket.on('removeEntity', entity_id => {
+      this.ide.socket.on('removeEntity', (entity_id) => {
         const entity = this.findEntityById(entity_id)
         if (entity == null) {
           return
@@ -137,7 +137,7 @@ define([
     selectEntity(entity) {
       this.selected_entity_id = entity.id // For reselecting after a reconnect
       this.ide.fileTreeManager.forEachEntity(
-        entity => (entity.selected = false)
+        (entity) => (entity.selected = false)
       )
       return (entity.selected = true)
     }
@@ -149,7 +149,7 @@ define([
 
     multiSelectedCount() {
       let count = 0
-      this.forEachEntity(function(entity) {
+      this.forEachEntity(function (entity) {
         if (entity.multiSelected) {
           return count++
         }
@@ -159,7 +159,7 @@ define([
 
     getMultiSelectedEntities() {
       const entities = []
-      this.forEachEntity(function(e) {
+      this.forEachEntity(function (e) {
         if (e.multiSelected) {
           return entities.push(e)
         }
@@ -169,7 +169,7 @@ define([
 
     getFullCount() {
       const entities = []
-      this.forEachEntity(function(e) {
+      this.forEachEntity(function (e) {
         return entities.push(e)
       })
       return entities.length
@@ -216,7 +216,7 @@ define([
       if (this.$scope.multiSelectedCount === 0) {
         return
       } // Be efficient, this is called a lot on 'click'
-      this.forEachEntity(entity => (entity.multiSelected = false))
+      this.forEachEntity((entity) => (entity.multiSelected = false))
       return (this.$scope.multiSelectedCount = 0)
     }
 
@@ -239,7 +239,7 @@ define([
 
     findSelectedEntity() {
       let selected = null
-      this.forEachEntity(function(entity) {
+      this.forEachEntity(function (entity) {
         if (entity.selected) {
           return (selected = entity)
         }
@@ -320,7 +320,7 @@ define([
 
     forEachEntity(callback) {
       if (callback == null) {
-        callback = function(entity, parent_folder, path) {}
+        callback = function (entity, parent_folder, path) {}
       }
       this._forEachEntityInFolder(this.$scope.rootFolder, null, callback)
 
@@ -387,10 +387,7 @@ define([
       if (path == null) {
         return
       }
-      return path
-        .split('/')
-        .slice(0, -1)
-        .join('/')
+      return path.split('/').slice(0, -1).join('/')
     }
 
     _findParentFolder(entity) {
@@ -405,7 +402,7 @@ define([
       return (this.$scope.rootFolder = this._parseFolder(
         __guard__(
           this.$scope != null ? this.$scope.project : undefined,
-          x => x.rootFolder[0]
+          (x) => x.rootFolder[0]
         )
       ))
     }
@@ -448,7 +445,7 @@ define([
 
     loadDeletedDocs() {
       this.$scope.deletedDocs = []
-      return Array.from(this.$scope.project.deletedDocs || []).map(doc =>
+      return Array.from(this.$scope.project.deletedDocs || []).map((doc) =>
         this.$scope.deletedDocs.push({
           name: doc.name,
           id: doc._id,
@@ -469,7 +466,7 @@ define([
         }
       })
       // Keep list ordered by folders, then name
-      return this.$scope.docs.sort(function(a, b) {
+      return this.$scope.docs.sort(function (a, b) {
         const aDepth = (a.path.match(/\//g) || []).length
         const bDepth = (b.path.match(/\//g) || []).length
         if (aDepth - bDepth !== 0) {
@@ -643,7 +640,7 @@ define([
 
     renameEntity(entity, name, callback) {
       if (callback == null) {
-        callback = function(error) {}
+        callback = function (error) {}
       }
       if (entity.name === name) {
         return
@@ -673,7 +670,7 @@ define([
       // We'll wait for the socket.io notification to
       // delete from scope.
       if (callback == null) {
-        callback = function(error) {}
+        callback = function (error) {}
       }
       return this.ide.queuedHttp({
         method: 'DELETE',
@@ -723,7 +720,7 @@ define([
         return
       }
       let parent_folder = null
-      this.forEachEntity(function(possible_entity, folder) {
+      this.forEachEntity(function (possible_entity, folder) {
         if (possible_entity === entity) {
           return (parent_folder = folder)
         }

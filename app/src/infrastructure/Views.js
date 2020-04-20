@@ -11,10 +11,10 @@ const viewList = globby
     ignore: '**/_*.pug',
     cwd: 'app/views'
   })
-  .map(x => {
+  .map((x) => {
     return x.replace(/\.pug$/, '') // strip trailing .pug extension
   })
-  .filter(x => {
+  .filter((x) => {
     return !/^_/.test(x)
   })
 
@@ -23,7 +23,7 @@ module.exports = {
     const startTime = Date.now()
     let success = 0
     let failures = 0
-    viewList.forEach(view => {
+    viewList.forEach((view) => {
       try {
         const filename = app.get('views') + '/' + view + '.pug'
         pug.compileFile(filename, { cache: true })

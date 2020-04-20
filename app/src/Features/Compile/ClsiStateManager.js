@@ -33,26 +33,25 @@ const ProjectEntityHandler = require('../Project/ProjectEntityHandler')
 // The docupdater is responsible for setting the key in redis, and
 // unsetting it if it removes any documents from the doc updater.
 
-const buildState = s =>
-  crypto
-    .createHash('sha1')
-    .update(s, 'utf8')
-    .digest('hex')
+const buildState = (s) =>
+  crypto.createHash('sha1').update(s, 'utf8').digest('hex')
 
 module.exports = ClsiStateManager = {
   computeHash(project, options, callback) {
     if (callback == null) {
-      callback = function(err, hash) {}
+      callback = function (err, hash) {}
     }
-    return ProjectEntityHandler.getAllEntitiesFromProject(project, function(
+    return ProjectEntityHandler.getAllEntitiesFromProject(project, function (
       err,
       docs,
       files
     ) {
       const fileList = Array.from(files || []).map(
-        f => `${f.file._id}:${f.file.rev}:${f.file.created}:${f.path}`
+        (f) => `${f.file._id}:${f.file.rev}:${f.file.created}:${f.path}`
       )
-      const docList = Array.from(docs || []).map(d => `${d.doc._id}:${d.path}`)
+      const docList = Array.from(docs || []).map(
+        (d) => `${d.doc._id}:${d.path}`
+      )
       const sortedEntityList = [
         ...Array.from(docList),
         ...Array.from(fileList)

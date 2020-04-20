@@ -17,7 +17,7 @@ const RecurlyWrapper = require('../Subscription/RecurlyWrapper')
 
 const UserUpdater = {
   addAffiliationForNewUser(userId, email, callback) {
-    addAffiliation(userId, email, error => {
+    addAffiliation(userId, email, (error) => {
       if (error) {
         return callback(error)
       }
@@ -69,14 +69,14 @@ const UserUpdater = {
     let oldEmail = null
     async.series(
       [
-        cb =>
+        (cb) =>
           UserGetter.getUserEmail(userId, (error, email) => {
             oldEmail = email
             cb(error)
           }),
-        cb => UserUpdater.addEmailAddress(userId, newEmail, cb),
-        cb => UserUpdater.setDefaultEmailAddress(userId, newEmail, true, cb),
-        cb => UserUpdater.removeEmailAddress(userId, oldEmail, cb)
+        (cb) => UserUpdater.addEmailAddress(userId, newEmail, cb),
+        (cb) => UserUpdater.setDefaultEmailAddress(userId, newEmail, true, cb),
+        (cb) => UserUpdater.removeEmailAddress(userId, oldEmail, cb)
       ],
       callback
     )
@@ -95,12 +95,12 @@ const UserUpdater = {
       return callback(new Error('invalid email'))
     }
 
-    UserGetter.ensureUniqueEmailAddress(newEmail, error => {
+    UserGetter.ensureUniqueEmailAddress(newEmail, (error) => {
       if (error != null) {
         return callback(error)
       }
 
-      addAffiliation(userId, newEmail, affiliationOptions, error => {
+      addAffiliation(userId, newEmail, affiliationOptions, (error) => {
         if (error != null) {
           logger.warn(
             { error },
@@ -119,7 +119,7 @@ const UserUpdater = {
             emails: { email: newEmail, createdAt: new Date(), reversedHostname }
           }
         }
-        UserUpdater.updateUser(userId, update, error => {
+        UserUpdater.updateUser(userId, update, (error) => {
           if (error != null) {
             logger.warn({ error }, 'problem updating users emails')
             return callback(error)
@@ -137,7 +137,7 @@ const UserUpdater = {
     if (email == null) {
       return callback(new Error('invalid email'))
     }
-    removeAffiliation(userId, email, error => {
+    removeAffiliation(userId, email, (error) => {
       if (error != null) {
         logger.warn({ error }, 'problem removing affiliation')
         return callback(error)
@@ -177,7 +177,7 @@ const UserUpdater = {
         return callback(new Error('invalid userId'))
       }
       const oldEmail = user.email
-      const userEmail = user.emails.find(e => e.email === email)
+      const userEmail = user.emails.find((e) => e.email === email)
       if (!userEmail) {
         return callback(new Error('Default email does not belong to user'))
       }
@@ -194,7 +194,7 @@ const UserUpdater = {
         if (res.n === 0) {
           return callback(new Error('email update error'))
         }
-        NewsletterManager.changeEmail(user, email, err => {
+        NewsletterManager.changeEmail(user, email, (err) => {
           if (err != null) {
             logger.warn(
               { err, oldEmail, newEmail: email },
@@ -202,7 +202,7 @@ const UserUpdater = {
             )
           }
         })
-        RecurlyWrapper.updateAccountEmailAddress(user._id, email, _error => {
+        RecurlyWrapper.updateAccountEmailAddress(user._id, email, (_error) => {
           // errors are ignored
         })
         callback()
@@ -220,7 +220,7 @@ const UserUpdater = {
       return callback(new Error('invalid email'))
     }
     logger.log({ userId, email }, 'confirming user email')
-    addAffiliation(userId, email, { confirmedAt }, error => {
+    addAffiliation(userId, email, { confirmedAt }, (error) => {
       if (error != null) {
         logger.warn(
           { error },
@@ -263,7 +263,7 @@ const UserUpdater = {
       {
         $set: { must_reconfirm: false }
       },
-      error => callback(error)
+      (error) => callback(error)
     )
   }
 }
@@ -274,7 +274,7 @@ const UserUpdater = {
   'addEmailAddress',
   'removeEmailAddress',
   'removeReconfirmFlag'
-].map(method =>
+].map((method) =>
   metrics.timeAsyncMethod(UserUpdater, method, 'mongo.UserUpdater', logger)
 )
 

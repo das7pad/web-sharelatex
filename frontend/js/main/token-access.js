@@ -1,4 +1,4 @@
-define(['../base'], App => {
+define(['../base'], (App) => {
   App.controller(
     'TokenAccessPageController',
     ($scope, $http, $location, localStorage) => {
@@ -15,11 +15,11 @@ define(['../base'], App => {
         return $location.path()
       }
 
-      $scope.buildFormImportPath = projectId => {
+      $scope.buildFormImportPath = (projectId) => {
         return `/overleaf/project/${projectId}/import`
       }
 
-      $scope.buildZipDownloadPath = projectId => {
+      $scope.buildZipDownloadPath = (projectId) => {
         return `/overleaf/project/${projectId}/download/zip`
       }
 

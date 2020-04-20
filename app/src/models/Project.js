@@ -114,7 +114,7 @@ const ProjectSchema = new Schema({
   deferredTpdsFlushCounter: { type: Number }
 })
 
-ProjectSchema.statics.getProject = function(projectOrId, fields, callback) {
+ProjectSchema.statics.getProject = function (projectOrId, fields, callback) {
   if (projectOrId._id != null) {
     callback(null, projectOrId)
   } else {
@@ -128,8 +128,8 @@ ProjectSchema.statics.getProject = function(projectOrId, fields, callback) {
 }
 
 function applyToAllFilesRecursivly(folder, fun) {
-  _.each(folder.fileRefs, file => fun(file))
-  _.each(folder.folders, folder => applyToAllFilesRecursivly(folder, fun))
+  _.each(folder.fileRefs, (file) => fun(file))
+  _.each(folder.folders, (folder) => applyToAllFilesRecursivly(folder, fun))
 }
 ProjectSchema.statics.applyToAllFilesRecursivly = applyToAllFilesRecursivly
 

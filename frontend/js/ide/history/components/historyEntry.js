@@ -14,22 +14,22 @@ define([
   '../../../base',
   '../../colors/ColorManager',
   '../util/displayNameForUser'
-], function(App, ColorManager, displayNameForUser) {
-  const historyEntryController = function($scope, $element, $attrs, _) {
+], function (App, ColorManager, displayNameForUser) {
+  const historyEntryController = function ($scope, $element, $attrs, _) {
     const ctrl = this
     // This method (and maybe the one below) will be removed soon. User details data will be
     // injected into the history API responses, so we won't need to fetch user data from other
     // local data structures.
-    const _getUserById = id =>
-      _.find(ctrl.users, function(user) {
+    const _getUserById = (id) =>
+      _.find(ctrl.users, function (user) {
         const curUserId =
           (user != null ? user._id : undefined) ||
           (user != null ? user.id : undefined)
         return curUserId === id
       })
     ctrl.displayName = displayNameForUser
-    ctrl.displayNameById = id => displayNameForUser(_getUserById(id))
-    ctrl.getProjectOpDoc = function(projectOp) {
+    ctrl.displayNameById = (id) => displayNameForUser(_getUserById(id))
+    ctrl.getProjectOpDoc = function (projectOp) {
       if (projectOp.rename != null) {
         return `${projectOp.rename.pathname} → ${projectOp.rename.newPathname}`
       } else if (projectOp.add != null) {
@@ -38,7 +38,7 @@ define([
         return `${projectOp.remove.pathname}`
       }
     }
-    ctrl.getUserCSSStyle = function(user) {
+    ctrl.getUserCSSStyle = function (user) {
       const curUserId =
         (user != null ? user._id : undefined) ||
         (user != null ? user.id : undefined)
@@ -49,7 +49,7 @@ define([
         return { color: `hsl(${hue}, 70%, 50%)` }
       }
     }
-    ctrl.isEntrySelected = function() {
+    ctrl.isEntrySelected = function () {
       if (ctrl.rangeSelectionEnabled) {
         return (
           ctrl.entry.toV <= ctrl.selectedHistoryRange.toV &&
@@ -60,7 +60,7 @@ define([
       }
     }
 
-    ctrl.isEntryHoverSelected = function() {
+    ctrl.isEntryHoverSelected = function () {
       return (
         ctrl.rangeSelectionEnabled &&
         ctrl.entry.toV <= ctrl.hoveredHistoryRange.toV &&
@@ -74,7 +74,7 @@ define([
     ctrl.onDraggingStop = (isValidDrop, boundary) =>
       ctrl.historyEntriesList.onDraggingStop(isValidDrop, boundary)
 
-    ctrl.onDrop = boundary => {
+    ctrl.onDrop = (boundary) => {
       if (boundary === 'toV') {
         $scope.$applyAsync(() =>
           ctrl.historyEntriesList.setRangeToV(ctrl.entry.toV)
@@ -85,7 +85,7 @@ define([
         )
       }
     }
-    ctrl.onOver = boundary => {
+    ctrl.onOver = (boundary) => {
       if (boundary === 'toV') {
         $scope.$applyAsync(() =>
           ctrl.historyEntriesList.setHoveredRangeToV(ctrl.entry.toV)

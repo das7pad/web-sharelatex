@@ -30,7 +30,7 @@ async function run() {
   const users = await getUsers()
   console.log(`Found ${users.length} users`)
   await Promise.all(
-    users.map(user => limit(() => _handleEnsureAffiliation(user)))
+    users.map((user) => limit(() => _handleEnsureAffiliation(user)))
   )
 
   console.log(`${success.length} successes`)
@@ -44,7 +44,7 @@ run()
   .then(() => {
     process.exit()
   })
-  .catch(error => {
+  .catch((error) => {
     console.log(error)
     process.exit(1)
   })

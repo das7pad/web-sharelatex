@@ -34,24 +34,27 @@ const SystemMessageManager = require('../SystemMessages/SystemMessageManager')
 
 const oneMinInMs = 60 * 1000
 
-var updateOpenConnetionsMetrics = function() {
+var updateOpenConnetionsMetrics = function () {
   metrics.gauge(
     'open_connections.socketio',
     __guard__(
       __guard__(
-        __guard__(require('../../infrastructure/Server').io, x2 => x2.sockets),
-        x1 => x1.clients()
+        __guard__(
+          require('../../infrastructure/Server').io,
+          (x2) => x2.sockets
+        ),
+        (x1) => x1.clients()
       ),
-      x => x.length
+      (x) => x.length
     )
   )
   metrics.gauge(
     'open_connections.http',
-    _.size(__guard__(require('http').globalAgent, x3 => x3.sockets))
+    _.size(__guard__(require('http').globalAgent, (x3) => x3.sockets))
   )
   metrics.gauge(
     'open_connections.https',
-    _.size(__guard__(require('https').globalAgent, x4 => x4.sockets))
+    _.size(__guard__(require('https').globalAgent, (x4) => x4.sockets))
   )
   return setTimeout(updateOpenConnetionsMetrics, oneMinInMs)
 }
@@ -87,7 +90,7 @@ module.exports = AdminController = {
       })()
     }
 
-    return SystemMessageManager.getMessagesFromDB(function(
+    return SystemMessageManager.getMessagesFromDB(function (
       error,
       systemMessages
     ) {
@@ -124,14 +127,14 @@ module.exports = AdminController = {
   writeAllToMongo(req, res) {
     logger.log('writing all docs to mongo')
     Settings.mongo.writeAll = true
-    return DocumentUpdaterHandler.flushAllDocsToMongo(function() {
+    return DocumentUpdaterHandler.flushAllDocsToMongo(function () {
       logger.log('all docs have been saved to mongo')
       return res.send()
     })
   },
 
   flushProjectToTpds(req, res) {
-    return TpdsProjectFlusher.flushProjectToTpds(req.body.project_id, err =>
+    return TpdsProjectFlusher.flushProjectToTpds(req.body.project_id, (err) =>
       res.sendStatus(200)
     )
   },
@@ -144,7 +147,7 @@ module.exports = AdminController = {
   },
 
   createMessage(req, res, next) {
-    return SystemMessageManager.createMessage(req.body.content, function(
+    return SystemMessageManager.createMessage(req.body.content, function (
       error
     ) {
       if (error != null) {
@@ -155,7 +158,7 @@ module.exports = AdminController = {
   },
 
   clearMessages(req, res, next) {
-    return SystemMessageManager.clearMessages(function(error) {
+    return SystemMessageManager.clearMessages(function (error) {
       if (error != null) {
         return next(error)
       }

@@ -19,8 +19,8 @@ const modulePath = require('path').join(
   '../../../../app/src/Features/Referal/ReferalConnect'
 )
 
-describe('Referal connect middle wear', function() {
-  beforeEach(function() {
+describe('Referal connect middle wear', function () {
+  beforeEach(function () {
     return (this.connect = SandboxedModule.require(modulePath, {
       globals: {
         console: console
@@ -34,7 +34,7 @@ describe('Referal connect middle wear', function() {
     }))
   })
 
-  it('should take a referal query string and put it on the session if it exists', function(done) {
+  it('should take a referal query string and put it on the session if it exists', function (done) {
     const req = {
       query: { referal: '12345' },
       session: {}
@@ -45,7 +45,7 @@ describe('Referal connect middle wear', function() {
     })
   })
 
-  it('should not change the referal_id on the session if not in query', function(done) {
+  it('should not change the referal_id on the session if not in query', function (done) {
     const req = {
       query: {},
       session: { referal_id: 'same' }
@@ -56,7 +56,7 @@ describe('Referal connect middle wear', function() {
     })
   })
 
-  it('should take a facebook referal query string and put it on the session if it exists', function(done) {
+  it('should take a facebook referal query string and put it on the session if it exists', function (done) {
     const req = {
       query: { fb_ref: '12345' },
       session: {}
@@ -67,7 +67,7 @@ describe('Referal connect middle wear', function() {
     })
   })
 
-  it('should map the facebook medium into the session', function(done) {
+  it('should map the facebook medium into the session', function (done) {
     const req = {
       query: { rm: 'fb' },
       session: {}
@@ -78,7 +78,7 @@ describe('Referal connect middle wear', function() {
     })
   })
 
-  it('should map the twitter medium into the session', function(done) {
+  it('should map the twitter medium into the session', function (done) {
     const req = {
       query: { rm: 't' },
       session: {}
@@ -89,7 +89,7 @@ describe('Referal connect middle wear', function() {
     })
   })
 
-  it('should map the google plus medium into the session', function(done) {
+  it('should map the google plus medium into the session', function (done) {
     const req = {
       query: { rm: 'gp' },
       session: {}
@@ -100,7 +100,7 @@ describe('Referal connect middle wear', function() {
     })
   })
 
-  it('should map the email medium into the session', function(done) {
+  it('should map the email medium into the session', function (done) {
     const req = {
       query: { rm: 'e' },
       session: {}
@@ -111,7 +111,7 @@ describe('Referal connect middle wear', function() {
     })
   })
 
-  it('should map the direct medium into the session', function(done) {
+  it('should map the direct medium into the session', function (done) {
     const req = {
       query: { rm: 'd' },
       session: {}
@@ -122,7 +122,7 @@ describe('Referal connect middle wear', function() {
     })
   })
 
-  it('should map the bonus source into the session', function(done) {
+  it('should map the bonus source into the session', function (done) {
     const req = {
       query: { rs: 'b' },
       session: {}
@@ -133,7 +133,7 @@ describe('Referal connect middle wear', function() {
     })
   })
 
-  it('should map the public share source into the session', function(done) {
+  it('should map the public share source into the session', function (done) {
     const req = {
       query: { rs: 'ps' },
       session: {}
@@ -144,7 +144,7 @@ describe('Referal connect middle wear', function() {
     })
   })
 
-  it('should map the collaborator invite into the session', function(done) {
+  it('should map the collaborator invite into the session', function (done) {
     const req = {
       query: { rs: 'ci' },
       session: {}

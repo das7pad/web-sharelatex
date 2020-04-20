@@ -7,8 +7,8 @@ const MockRequest = require('../helpers/MockRequest')
 const Errors = require('../../../../app/src/Features/Errors/Errors')
 const HttpErrors = require('@overleaf/o-error/http')
 
-describe('HttpErrorController', function() {
-  beforeEach(function() {
+describe('HttpErrorController', function () {
+  beforeEach(function () {
     this.req = new MockRequest()
     this.res = new MockResponse()
 
@@ -33,10 +33,10 @@ describe('HttpErrorController', function() {
     })
   })
 
-  describe('handleError', function() {
-    beforeEach(function() {})
+  describe('handleError', function () {
+    beforeEach(function () {})
 
-    it('logs and return status code', function() {
+    it('logs and return status code', function () {
       const error = new HttpErrors.UnprocessableEntityError()
 
       this.ErrorController.handleError(error, this.req, this.res)
@@ -49,7 +49,7 @@ describe('HttpErrorController', function() {
       expect(url).not.to.exist
     })
 
-    it('logs url method and userId', function() {
+    it('logs url method and userId', function () {
       const error = new HttpErrors.UnprocessableEntityError()
       this.AuthenticationController.getLoggedInUserId.returns('123abc')
       this.req.url = 'overleaf.url'
@@ -63,7 +63,7 @@ describe('HttpErrorController', function() {
       expect(url).to.equal('overleaf.url')
     })
 
-    it('logs and return status code when wrapped', function() {
+    it('logs and return status code when wrapped', function () {
       const cause = new Errors.SubscriptionAdminDeletionError()
       const error = new HttpErrors.UnprocessableEntityError({}).withCause(cause)
 
@@ -72,7 +72,7 @@ describe('HttpErrorController', function() {
       sinon.assert.calledOnce(this.logger.warn)
     })
 
-    it('renders JSON with info', function() {
+    it('renders JSON with info', function () {
       const cause = new Errors.SubscriptionAdminDeletionError({
         info: {
           public: { some: 'data' }
@@ -92,7 +92,7 @@ describe('HttpErrorController', function() {
       )
     })
 
-    it('renders HTML with info', function() {
+    it('renders HTML with info', function () {
       const cause = new Errors.SubscriptionAdminDeletionError()
       const error = new HttpErrors.UnprocessableEntityError({
         info: { public: { message: 'some public message' } }

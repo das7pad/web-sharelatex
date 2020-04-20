@@ -44,11 +44,11 @@ const ScriptLogger = {
     )
     console.log(
       'Recent Logged In (Last 7 Days):',
-      _.filter(ScriptLogger.allDaysSinceLastLoggedIn, a => a < 7).length
+      _.filter(ScriptLogger.allDaysSinceLastLoggedIn, (a) => a < 7).length
     )
     console.log(
       'Recent Logged In (Last 30 Days):',
-      _.filter(ScriptLogger.allDaysSinceLastLoggedIn, a => a < 30).length
+      _.filter(ScriptLogger.allDaysSinceLastLoggedIn, (a) => a < 30).length
     )
   }
 }
@@ -96,7 +96,7 @@ const loopForUsers = (skip, callback) => {
         return callback()
       }
 
-      checkAndUpdateUsers(users, error => {
+      checkAndUpdateUsers(users, (error) => {
         if (error) {
           return callback(error)
         }
@@ -111,7 +111,7 @@ const loopForUsers = (skip, callback) => {
 
 let retryCounter = 0
 const run = () =>
-  loopForUsers(MONGO_SKIP + ScriptLogger.checkedUsersCount, error => {
+  loopForUsers(MONGO_SKIP + ScriptLogger.checkedUsersCount, (error) => {
     if (error) {
       if (retryCounter < 3) {
         console.error(error)

@@ -80,7 +80,7 @@ module.exports = LinkedFilesController = {
       name,
       parent_folder_id,
       user_id,
-      function(err, newFileId) {
+      function (err, newFileId) {
         if (err != null) {
           return LinkedFilesController.handleError(err, req, res, next)
         }
@@ -93,7 +93,7 @@ module.exports = LinkedFilesController = {
     const { project_id, file_id } = req.params
     const user_id = AuthenticationController.getLoggedInUserId(req)
 
-    return LinkedFilesHandler.getFileById(project_id, file_id, function(
+    return LinkedFilesHandler.getFileById(project_id, file_id, function (
       err,
       file,
       path,
@@ -126,7 +126,7 @@ module.exports = LinkedFilesController = {
         name,
         parent_folder_id,
         user_id,
-        function(err, newFileId) {
+        function (err, newFileId) {
           if (err != null) {
             return LinkedFilesController.handleError(err, req, res, next)
           }

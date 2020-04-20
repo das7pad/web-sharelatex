@@ -32,12 +32,12 @@ const ONE_MEG = 1024 * 1024
 const ArchiveManager = {
   _isZipTooLarge(source, callback) {
     if (callback == null) {
-      callback = function(err, isTooLarge) {}
+      callback = function (err, isTooLarge) {}
     }
     callback = _.once(callback)
 
     let totalSizeInBytes = null
-    return yauzl.open(source, { lazyEntries: true }, function(err, zipfile) {
+    return yauzl.open(source, { lazyEntries: true }, function (err, zipfile) {
       if (err != null) {
         return callback(new InvalidZipFileError().withCause(err))
       }
@@ -53,13 +53,13 @@ const ArchiveManager = {
 
       // read all the entries
       zipfile.readEntry()
-      zipfile.on('entry', function(entry) {
+      zipfile.on('entry', function (entry) {
         totalSizeInBytes += entry.uncompressedSize
         return zipfile.readEntry()
       }) // get the next entry
 
       // no more entries to read
-      return zipfile.on('end', function() {
+      return zipfile.on('end', function () {
         if (totalSizeInBytes == null || isNaN(totalSizeInBytes)) {
           logger.warn(
             { source, totalSizeInBytes },
@@ -78,7 +78,7 @@ const ArchiveManager = {
   _checkFilePath(entry, destination, callback) {
     // transform backslashes to forwardslashes to accommodate badly-behaved zip archives
     if (callback == null) {
-      callback = function(err, destFile) {}
+      callback = function (err, destFile) {}
     }
     const transformedFilename = entry.fileName.replace(/\\/g, '/')
     // check if the entry is a directory
@@ -103,25 +103,25 @@ const ArchiveManager = {
 
   _writeFileEntry(zipfile, entry, destFile, callback) {
     if (callback == null) {
-      callback = function(err) {}
+      callback = function (err) {}
     }
     callback = _.once(callback)
 
-    return zipfile.openReadStream(entry, function(err, readStream) {
+    return zipfile.openReadStream(entry, function (err, readStream) {
       if (err != null) {
         return callback(err)
       }
       readStream.on('error', callback)
       readStream.on('end', callback)
 
-      const errorHandler = function(err) {
+      const errorHandler = function (err) {
         // clean up before calling callback
         readStream.unpipe()
         readStream.destroy()
         return callback(err)
       }
 
-      return fse.ensureDir(Path.dirname(destFile), function(err) {
+      return fse.ensureDir(Path.dirname(destFile), function (err) {
         if (err != null) {
           return errorHandler(err)
         }
@@ -134,11 +134,11 @@ const ArchiveManager = {
 
   _extractZipFiles(source, destination, callback) {
     if (callback == null) {
-      callback = function(err) {}
+      callback = function (err) {}
     }
     callback = _.once(callback)
 
-    return yauzl.open(source, { lazyEntries: true }, function(err, zipfile) {
+    return yauzl.open(source, { lazyEntries: true }, function (err, zipfile) {
       if (err != null) {
         return callback(err)
       }
@@ -147,8 +147,8 @@ const ArchiveManager = {
       zipfile.readEntry()
 
       let entryFileCount = 0
-      zipfile.on('entry', function(entry) {
-        return ArchiveManager._checkFilePath(entry, destination, function(
+      zipfile.on('entry', function (entry) {
+        return ArchiveManager._checkFilePath(entry, destination, function (
           err,
           destFile
         ) {
@@ -163,7 +163,7 @@ const ArchiveManager = {
               zipfile,
               entry,
               destFile,
-              function(err) {
+              function (err) {
                 if (err != null) {
                   logger.warn(
                     { err, source, destFile },
@@ -196,14 +196,14 @@ const ArchiveManager = {
 
   extractZipArchive(source, destination, _callback) {
     if (_callback == null) {
-      _callback = function(err) {}
+      _callback = function (err) {}
     }
-    const callback = function(...args) {
+    const callback = function (...args) {
       _callback(...Array.from(args || []))
-      return (_callback = function() {})
+      return (_callback = function () {})
     }
 
-    return ArchiveManager._isZipTooLarge(source, function(err, isTooLarge) {
+    return ArchiveManager._isZipTooLarge(source, function (err, isTooLarge) {
       if (err != null) {
         logger.warn({ err }, 'error checking size of zip file')
         return callback(err)
@@ -216,7 +216,7 @@ const ArchiveManager = {
       const timer = new metrics.Timer('unzipDirectory')
       logger.log({ source, destination }, 'unzipping file')
 
-      return ArchiveManager._extractZipFiles(source, destination, function(
+      return ArchiveManager._extractZipFiles(source, destination, function (
         err
       ) {
         timer.done()
@@ -232,15 +232,15 @@ const ArchiveManager = {
 
   findTopLevelDirectory(directory, callback) {
     if (callback == null) {
-      callback = function(error, topLevelDir) {}
+      callback = function (error, topLevelDir) {}
     }
-    return fs.readdir(directory, function(error, files) {
+    return fs.readdir(directory, function (error, files) {
       if (error != null) {
         return callback(error)
       }
       if (files.length === 1) {
         const childPath = Path.join(directory, files[0])
-        return fs.stat(childPath, function(error, stat) {
+        return fs.stat(childPath, function (error, stat) {
           if (error != null) {
             return callback(error)
           }

@@ -22,9 +22,9 @@ define([
   './controllers/HistoryListController',
   './controllers/HistoryDiffController',
   './directives/infiniteScroll'
-], function(moment, ColorManager, displayNameForUser) {
+], function (moment, ColorManager, displayNameForUser) {
   let HistoryManager
-  return (HistoryManager = (function() {
+  return (HistoryManager = (function () {
     HistoryManager = class HistoryManager {
       static initClass() {
         this.prototype.BATCH_SIZE = 10
@@ -43,7 +43,7 @@ define([
           }
         }
 
-        this.$scope.$watch('history.selection.updates', updates => {
+        this.$scope.$watch('history.selection.updates', (updates) => {
           if (updates != null && updates.length > 0) {
             this._selectDocFromUpdates()
             return this.reloadDiff()
@@ -118,7 +118,7 @@ define([
           url += `&before=${this.$scope.history.nextBeforeTimestamp}`
         }
         this.$scope.history.loading = true
-        return this.ide.$http.get(url).then(response => {
+        return this.ide.$http.get(url).then((response) => {
           const { data } = response
           this._loadUpdates(data.updates)
           this.$scope.history.nextBeforeTimestamp = data.nextBeforeTimestamp
@@ -171,14 +171,14 @@ define([
 
           return this.ide.$http
             .get(url)
-            .then(response => {
+            .then((response) => {
               const { data } = response
               diff.loading = false
               const { text, highlights } = this._parseDiff(data)
               diff.text = text
               return (diff.highlights = highlights)
             })
-            .catch(function() {
+            .catch(function () {
               diff.loading = false
               return (diff.error = true)
             })

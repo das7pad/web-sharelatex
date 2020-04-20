@@ -33,7 +33,7 @@ const Errors = require('../Errors/Errors')
 const ProjectCreationHandler = {
   createBlankProject(owner_id, projectName, attributes, callback) {
     if (callback == null) {
-      callback = function(error, project) {}
+      callback = function (error, project) {}
     }
     metrics.inc('project-creation')
     if (arguments.length === 3) {
@@ -41,7 +41,7 @@ const ProjectCreationHandler = {
       attributes = {}
     }
 
-    return ProjectDetailsHandler.validateProjectName(projectName, function(
+    return ProjectDetailsHandler.validateProjectName(projectName, function (
       error
     ) {
       if (error != null) {
@@ -52,7 +52,7 @@ const ProjectCreationHandler = {
           owner_id,
           projectName,
           attributes,
-          function(error, project) {
+          function (error, project) {
             if (error != null) {
               return callback(error)
             }
@@ -64,7 +64,7 @@ const ProjectCreationHandler = {
           }
         )
       } else {
-        return HistoryManager.initializeProject(function(error, history) {
+        return HistoryManager.initializeProject(function (error, history) {
           if (error != null) {
             return callback(error)
           }
@@ -75,7 +75,7 @@ const ProjectCreationHandler = {
             owner_id,
             projectName,
             attributes,
-            function(error, project) {
+            function (error, project) {
               if (error != null) {
                 return callback(error)
               }
@@ -93,7 +93,7 @@ const ProjectCreationHandler = {
 
   _createBlankProject(owner_id, projectName, attributes, callback) {
     if (callback == null) {
-      callback = function(error, project) {}
+      callback = function (error, project) {}
     }
     const rootFolder = new Folder({ name: 'rootFolder' })
 
@@ -113,7 +113,7 @@ const ProjectCreationHandler = {
       }
     }
     project.rootFolder[0] = rootFolder
-    return User.findById(owner_id, 'ace.spellCheckLanguage', function(
+    return User.findById(owner_id, 'ace.spellCheckLanguage', function (
       err,
       user
     ) {
@@ -123,7 +123,7 @@ const ProjectCreationHandler = {
           new Errors.UserNotFoundError({ info: { userId: owner_id } })
         )
       project.spellCheckLanguage = user.ace.spellCheckLanguage
-      return project.save(function(err) {
+      return project.save(function (err) {
         if (err != null) {
           return callback(err)
         }
@@ -134,12 +134,12 @@ const ProjectCreationHandler = {
 
   createProjectFromSnippet(owner_id, projectName, docLines, callback) {
     if (callback == null) {
-      callback = function(error, project) {}
+      callback = function (error, project) {}
     }
     return ProjectCreationHandler.createBlankProject(
       owner_id,
       projectName,
-      function(error, project) {
+      function (error, project) {
         if (error != null) {
           return callback(error)
         }
@@ -155,12 +155,12 @@ const ProjectCreationHandler = {
 
   createBasicProject(owner_id, projectName, callback) {
     if (callback == null) {
-      callback = function(error, project) {}
+      callback = function (error, project) {}
     }
     return ProjectCreationHandler.createBlankProject(
       owner_id,
       projectName,
-      function(error, project) {
+      function (error, project) {
         if (error != null) {
           return callback(error)
         }
@@ -168,7 +168,7 @@ const ProjectCreationHandler = {
           'mainbasic.tex',
           owner_id,
           projectName,
-          function(error, docLines) {
+          function (error, docLines) {
             if (error != null) {
               return callback(error)
             }
@@ -186,23 +186,23 @@ const ProjectCreationHandler = {
 
   createExampleProject(owner_id, projectName, callback) {
     if (callback == null) {
-      callback = function(error, project) {}
+      callback = function (error, project) {}
     }
     return ProjectCreationHandler.createBlankProject(
       owner_id,
       projectName,
-      function(error, project) {
+      function (error, project) {
         if (error != null) {
           return callback(error)
         }
         return async.series(
           [
-            callback =>
+            (callback) =>
               ProjectCreationHandler._buildTemplate(
                 'main.tex',
                 owner_id,
                 projectName,
-                function(error, docLines) {
+                function (error, docLines) {
                   if (error != null) {
                     return callback(error)
                   }
@@ -214,12 +214,12 @@ const ProjectCreationHandler = {
                   )
                 }
               ),
-            callback =>
+            (callback) =>
               ProjectCreationHandler._buildTemplate(
                 'references.bib',
                 owner_id,
                 projectName,
-                function(error, docLines) {
+                function (error, docLines) {
                   if (error != null) {
                     return callback(error)
                   }
@@ -233,7 +233,7 @@ const ProjectCreationHandler = {
                   )
                 }
               ),
-            function(callback) {
+            function (callback) {
               const universePath = Path.resolve(
                 __dirname + '/../../../templates/project_files/universe.jpg'
               )
@@ -248,7 +248,7 @@ const ProjectCreationHandler = {
               )
             }
           ],
-          error => callback(error, project)
+          (error) => callback(error, project)
         )
       }
     )
@@ -256,7 +256,7 @@ const ProjectCreationHandler = {
 
   _createRootDoc(project, owner_id, docLines, callback) {
     if (callback == null) {
-      callback = function(error, project) {}
+      callback = function (error, project) {}
     }
     return ProjectEntityUpdateHandler.addDoc(
       project._id,
@@ -264,7 +264,7 @@ const ProjectCreationHandler = {
       'main.tex',
       docLines,
       owner_id,
-      function(error, doc) {
+      function (error, doc) {
         if (error != null) {
           logger.warn(
             { err: error },
@@ -275,7 +275,7 @@ const ProjectCreationHandler = {
         return ProjectEntityUpdateHandler.setRootDoc(
           project._id,
           doc._id,
-          error => callback(error, project)
+          (error) => callback(error, project)
         )
       }
     )
@@ -283,9 +283,9 @@ const ProjectCreationHandler = {
 
   _buildTemplate(template_name, user_id, project_name, callback) {
     if (callback == null) {
-      callback = function(error, output) {}
+      callback = function (error, output) {}
     }
-    return User.findById(user_id, 'first_name last_name', function(
+    return User.findById(user_id, 'first_name last_name', function (
       error,
       user
     ) {
@@ -310,7 +310,7 @@ const ProjectCreationHandler = {
       const templatePath = Path.resolve(
         __dirname + `/../../../templates/project_files/${template_name}`
       )
-      return fs.readFile(templatePath, function(error, template) {
+      return fs.readFile(templatePath, function (error, template) {
         if (error != null) {
           return callback(error)
         }

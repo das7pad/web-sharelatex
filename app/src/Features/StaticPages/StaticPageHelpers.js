@@ -24,7 +24,7 @@ module.exports = {
   shouldProxy(url) {
     const shouldProxy = _.find(
       extensionsToProxy,
-      extension => url.indexOf(extension) !== -1
+      (extension) => url.indexOf(extension) !== -1
     )
     return shouldProxy
   }

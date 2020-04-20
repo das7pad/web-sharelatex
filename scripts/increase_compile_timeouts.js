@@ -6,7 +6,7 @@ const minilist = require('minimist')
 const newTimeout = 240
 const oldTimeoutLimits = { $gt: 60, $lt: 240 }
 
-const updateUser = function(user, callback) {
+const updateUser = function (user, callback) {
   console.log(`Updating user ${user._id}`)
   const update = {
     $set: {
@@ -24,7 +24,7 @@ const updateUser = function(user, callback) {
 }
 
 const updateUsers = (users, callback) =>
-  async.eachLimit(users, ASYNC_LIMIT, updateUser, function(error) {
+  async.eachLimit(users, ASYNC_LIMIT, updateUser, function (error) {
     if (error) {
       callback(error)
       return
@@ -39,13 +39,13 @@ const updateUsers = (users, callback) =>
     }
   })
 
-var loopForUsers = callback =>
+var loopForUsers = (callback) =>
   db.users
     .find(
       { 'features.compileTimeout': oldTimeoutLimits },
       { 'features.compileTimeout': 1 }
     )
-    .limit(FETCH_LIMIT, function(error, users) {
+    .limit(FETCH_LIMIT, function (error, users) {
       if (error) {
         callback(error)
         return
@@ -59,7 +59,7 @@ var loopForUsers = callback =>
 
 var counter = 0
 var run = () =>
-  loopForUsers(function(error) {
+  loopForUsers(function (error) {
     if (error) {
       throw error
     }
@@ -67,7 +67,7 @@ var run = () =>
   })
 
 let FETCH_LIMIT, ASYNC_LIMIT, DO_ALL
-var setup = function() {
+var setup = function () {
   const args = minilist(process.argv.slice(2))
   // --fetch N  get N users each time
   FETCH_LIMIT = args.fetch ? args.fetch : 100

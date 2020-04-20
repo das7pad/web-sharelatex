@@ -52,7 +52,7 @@ async function createProjectFromZipArchive(ownerId, defaultName, zipPath) {
     // no need to wait for the cleanup here
     ProjectDeleter.promises
       .deleteProject(project._id)
-      .catch(err =>
+      .catch((err) =>
         logger.error(
           { err, projectId: project._id },
           'there was an error cleaning up project after importing a zip failed'
@@ -89,7 +89,7 @@ async function createProjectFromZipArchiveWithName(
     // no need to wait for the cleanup here
     ProjectDeleter.promises
       .deleteProject(project._id)
-      .catch(err =>
+      .catch((err) =>
         logger.error(
           { err, projectId: project._id },
           'there was an error cleaning up project after importing a zip failed'

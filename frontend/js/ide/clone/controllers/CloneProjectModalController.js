@@ -10,8 +10,8 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base'], App =>
-  App.controller('CloneProjectModalController', function(
+define(['../../../base'], (App) =>
+  App.controller('CloneProjectModalController', function (
     $scope,
     $modalInstance,
     $timeout,
@@ -28,21 +28,21 @@ define(['../../../base'], App =>
       $timeout(() => $scope.$broadcast('open'), 200)
     )
 
-    const cloneProject = cloneName =>
+    const cloneProject = (cloneName) =>
       $http.post(`/project/${ide.$scope.project._id}/clone`, {
         _csrf: window.csrfToken,
         projectName: cloneName
       })
 
-    $scope.clone = function() {
+    $scope.clone = function () {
       $scope.state.inflight = true
       $scope.state.error = false
       return cloneProject($scope.inputs.projectName)
-        .then(function(response) {
+        .then(function (response) {
           const { data } = response
           return (window.location = `/project/${data.project_id}`)
         })
-        .catch(function(response) {
+        .catch(function (response) {
           const { data, status } = response
           $scope.state.inflight = false
           if (status === 400) {

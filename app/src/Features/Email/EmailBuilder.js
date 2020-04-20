@@ -27,9 +27,11 @@ ${content.message(opts).trim()}
 
 ${content.ctaText(opts)}: ${content.ctaURL(opts)}
 
-${(typeof content.secondaryMessage === 'function'
-  ? content.secondaryMessage(opts).trim()
-  : undefined) || ''}
+${
+  (typeof content.secondaryMessage === 'function'
+    ? content.secondaryMessage(opts).trim()
+    : undefined) || ''
+}
 
 Regards,
 The ${settings.appName} Team - ${settings.siteUrl}\
@@ -70,9 +72,11 @@ function NoCTAEmailTemplate(content) {
       return `\
 ${content.greeting(opts)}
 ${content.message(opts).trim()}
-${(typeof content.secondaryMessage === 'function'
-  ? content.secondaryMessage(opts).trim()
-  : undefined) || ''}
+${
+  (typeof content.secondaryMessage === 'function'
+    ? content.secondaryMessage(opts).trim()
+    : undefined) || ''
+}
 Regards,
 The ${settings.appName} Team - ${settings.siteUrl}\
 `

@@ -1,4 +1,4 @@
-define(['../../../base'], App =>
+define(['../../../base'], (App) =>
   App.directive('historyDroppableArea', () => ({
     scope: {
       historyDroppableAreaOnDrop: '&',
@@ -8,7 +8,7 @@ define(['../../../base'], App =>
     restrict: 'A',
     link(scope, element, attrs) {
       element.droppable({
-        accept: e => '.history-entry-toV-handle, .history-entry-fromV-handle',
+        accept: (e) => '.history-entry-toV-handle, .history-entry-fromV-handle',
         drop: (e, ui) => {
           const draggedBoundary = ui.draggable.data('selectionBoundary')
             .boundary

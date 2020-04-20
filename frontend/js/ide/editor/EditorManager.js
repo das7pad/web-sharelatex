@@ -20,9 +20,9 @@ define([
   './directives/aceEditor',
   './directives/toggleSwitch',
   './controllers/SavingNotificationController'
-], function(Document) {
+], function (Document) {
   let EditorManager
-  return (EditorManager = (function() {
+  return (EditorManager = (function () {
     EditorManager = class EditorManager {
       static initClass() {
         this.prototype._syncTimeout = null
@@ -77,7 +77,7 @@ define([
           return Document.flushAll()
         })
 
-        this.$scope.$watch('editor.wantTrackChanges', value => {
+        this.$scope.$watch('editor.wantTrackChanges', (value) => {
           if (value == null) {
             return
           }
@@ -189,7 +189,7 @@ define([
 
       _openNewDocument(doc, callback) {
         if (callback == null) {
-          callback = function(error, sharejs_doc) {}
+          callback = function (error, sharejs_doc) {}
         }
         sl_console.log('[_openNewDocument] Opening...')
         const current_sharejs_doc = this.$scope.editor.sharejs_doc
@@ -206,7 +206,7 @@ define([
           this._unbindFromDocumentEvents(current_sharejs_doc)
         }
 
-        return new_sharejs_doc.join(error => {
+        return new_sharejs_doc.join((error) => {
           if (error != null) {
             return callback(error)
           }
@@ -254,7 +254,7 @@ define([
           })
         })
 
-        return sharejs_doc.on('externalUpdate', update => {
+        return sharejs_doc.on('externalUpdate', (update) => {
           if (this._ignoreExternalUpdates) {
             return
           }

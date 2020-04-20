@@ -40,7 +40,7 @@ module.exports = LaunchpadController = {
     //   * how does all this work with ldap and saml?
     const sessionUser = AuthenticationController.getSessionUser(req)
     const authMethod = LaunchpadController._getAuthMethod()
-    return LaunchpadController._atLeastOneAdminExists(function(
+    return LaunchpadController._atLeastOneAdminExists(function (
       err,
       adminUserExists
     ) {
@@ -57,7 +57,7 @@ module.exports = LaunchpadController = {
           return AuthenticationController._redirectToLoginPage(req, res)
         }
       } else {
-        return UserGetter.getUser(sessionUser._id, { isAdmin: 1 }, function(
+        return UserGetter.getUser(sessionUser._id, { isAdmin: 1 }, function (
           err,
           user
         ) {
@@ -80,12 +80,12 @@ module.exports = LaunchpadController = {
 
   _atLeastOneAdminExists(callback) {
     if (callback == null) {
-      callback = function(err, exists) {}
+      callback = function (err, exists) {}
     }
     return UserGetter.getUser(
       { isAdmin: true },
       { _id: 1, isAdmin: 1 },
-      function(err, user) {
+      function (err, user) {
         if (err != null) {
           return callback(err)
         }
@@ -102,7 +102,7 @@ module.exports = LaunchpadController = {
     }
     logger.log({ email }, 'sending test email')
     const emailOptions = { to: email }
-    return EmailHandler.sendEmail('testEmail', emailOptions, function(err) {
+    return EmailHandler.sendEmail('testEmail', emailOptions, function (err) {
       if (err != null) {
         logger.err({ email }, 'error sending test email')
         return next(err)
@@ -113,7 +113,7 @@ module.exports = LaunchpadController = {
   },
 
   registerExternalAuthAdmin(authMethod) {
-    return function(req, res, next) {
+    return function (req, res, next) {
       if (LaunchpadController._getAuthMethod() !== authMethod) {
         logger.log(
           { authMethod },
@@ -128,7 +128,7 @@ module.exports = LaunchpadController = {
       }
 
       logger.log({ email }, 'attempted register first admin user')
-      return LaunchpadController._atLeastOneAdminExists(function(err, exists) {
+      return LaunchpadController._atLeastOneAdminExists(function (err, exists) {
         if (err != null) {
           return next(err)
         }
@@ -152,7 +152,7 @@ module.exports = LaunchpadController = {
           'creating admin account for specified external-auth user'
         )
 
-        return UserRegistrationHandler.registerNewUser(body, function(
+        return UserRegistrationHandler.registerNewUser(body, function (
           err,
           user
         ) {
@@ -167,7 +167,7 @@ module.exports = LaunchpadController = {
               $set: { isAdmin: true },
               emails: [{ email }]
             },
-            function(err) {
+            function (err) {
               if (err != null) {
                 logger.err(
                   { user_id: user._id, err },
@@ -199,7 +199,7 @@ module.exports = LaunchpadController = {
     }
 
     logger.log({ email }, 'attempted register first admin user')
-    return LaunchpadController._atLeastOneAdminExists(function(err, exists) {
+    return LaunchpadController._atLeastOneAdminExists(function (err, exists) {
       if (err != null) {
         return next(err)
       }
@@ -213,7 +213,10 @@ module.exports = LaunchpadController = {
       }
 
       const body = { email, password }
-      return UserRegistrationHandler.registerNewUser(body, function(err, user) {
+      return UserRegistrationHandler.registerNewUser(body, function (
+        err,
+        user
+      ) {
         if (err != null) {
           return next(err)
         }
@@ -227,7 +230,7 @@ module.exports = LaunchpadController = {
               emails: [{ email }]
             }
           },
-          function(err) {
+          function (err) {
             if (err != null) {
               logger.err(
                 { user_id: user._id, err },

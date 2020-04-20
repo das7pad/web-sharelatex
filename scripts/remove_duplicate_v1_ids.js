@@ -16,10 +16,10 @@ db.users.aggregate(
     { $match: { count: { $gt: 1 } } }
   ],
   { allowDiskUse: true },
-  function(err, results) {
+  function (err, results) {
     if (err) throw err
     console.log('FOUND ' + results.length + ' DUPLICATES')
-    async.mapSeries(results, removeDuplicates, function(err) {
+    async.mapSeries(results, removeDuplicates, function (err) {
       if (err) throw err
       console.log('DONE')
       process.exit()
@@ -28,16 +28,16 @@ db.users.aggregate(
 )
 
 function removeDuplicates(duplicate, callback) {
-  db.users.findOne({ 'overleaf.id': duplicate._id }, function(err, keepUser) {
+  db.users.findOne({ 'overleaf.id': duplicate._id }, function (err, keepUser) {
     if (err) throw err
     console.log('KEEPING USER ' + keepUser._id + ' FOR OL ' + duplicate._id)
     db.users.find(
       { 'overleaf.id': duplicate._id, _id: { $ne: keepUser._id } },
-      function(err, duplicateUsers) {
+      function (err, duplicateUsers) {
         if (err) throw err
         async.mapSeries(
           duplicateUsers,
-          function(user, cb) {
+          function (user, cb) {
             console.log(
               'UNLINKING USER ' + user._id + ' FOR OL ' + duplicate._id
             )
@@ -48,7 +48,7 @@ function removeDuplicates(duplicate, callback) {
               cb
             )
           },
-          function(err) {
+          function (err) {
             if (err) throw err
             callback()
           }

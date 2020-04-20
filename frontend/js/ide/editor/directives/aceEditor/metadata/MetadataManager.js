@@ -12,11 +12,11 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['ace/ace'], function() {
+define(['ace/ace'], function () {
   let MetadataManager
   const { Range } = ace.require('ace/range')
 
-  const getLastCommandFragment = function(lineUpToCursor) {
+  const getLastCommandFragment = function (lineUpToCursor) {
     let m
     if ((m = lineUpToCursor.match(/(\\[^\\]+)$/))) {
       return m[1]
@@ -33,7 +33,7 @@ define(['ace/ace'], function() {
       this.Metadata = Metadata
       this.debouncer = {} // DocId => Timeout
 
-      const onChange = change => {
+      const onChange = (change) => {
         if (change.remote) {
           return
         }
@@ -53,13 +53,13 @@ define(['ace/ace'], function() {
         }
         const commandFragment = getLastCommandFragment(lineUpToCursor)
 
-        const linesContainPackage = _.some(change.lines, line =>
+        const linesContainPackage = _.some(change.lines, (line) =>
           line.match(/^\\usepackage(?:\[.{0,80}?])?{(.{0,80}?)}/)
         )
-        const linesContainReqPackage = _.some(change.lines, line =>
+        const linesContainReqPackage = _.some(change.lines, (line) =>
           line.match(/^\\RequirePackage(?:\[.{0,80}?])?{(.{0,80}?)}/)
         )
-        const linesContainLabel = _.some(change.lines, line =>
+        const linesContainLabel = _.some(change.lines, (line) =>
           line.match(/\\label{(.{0,80}?)}/)
         )
         const linesContainMeta =
@@ -87,7 +87,7 @@ define(['ace/ace'], function() {
         }
       }
 
-      this.editor.on('changeSession', e => {
+      this.editor.on('changeSession', (e) => {
         e.oldSession.off('change', onChange)
         return e.session.on('change', onChange)
       })

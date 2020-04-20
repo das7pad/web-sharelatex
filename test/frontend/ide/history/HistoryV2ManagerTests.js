@@ -10,11 +10,11 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define([
-  '../../../../frontend/js/ide/history/HistoryV2Manager'
-], HistoryV2Manager =>
-  describe('HistoryV2Manager', function() {
-    beforeEach(function(done) {
+define(['../../../../frontend/js/ide/history/HistoryV2Manager'], (
+  HistoryV2Manager
+) =>
+  describe('HistoryV2Manager', function () {
+    beforeEach(function (done) {
       this.defaultHistoryScope = {
         isV2: true,
         updates: [],
@@ -165,11 +165,11 @@ define([
       })
     })
 
-    it('should setup the history scope on initialization', function() {
+    it('should setup the history scope on initialization', function () {
       expect(this.$scope.history).to.deep.equal(this.defaultHistoryScope)
     })
 
-    it('should keep history updates after performing a soft reset', function() {
+    it('should keep history updates after performing a soft reset', function () {
       const historyScopeWithUpdates = Object.assign(
         {},
         this.defaultHistoryScope,
@@ -182,18 +182,18 @@ define([
       expect(this.$scope.history).to.deep.equal(historyScopeWithUpdates)
     })
 
-    it('should discard history updates after performing a hard reset', function() {
+    it('should discard history updates after performing a hard reset', function () {
       this.$scope.history.updates = this.sampleUpdates
       this.historyManager.hardReset()
       expect(this.$scope.history).to.deep.equal(this.defaultHistoryScope)
     })
 
-    it('should setup history with full access to the feature if the project has versioning', function() {
+    it('should setup history with full access to the feature if the project has versioning', function () {
       this.$scope.$digest()
       expect(this.$scope.history.userHasFullFeature).to.equal(true)
     })
 
-    it('should setup history without full access to the feature if the project does not have versioning', function() {
+    it('should setup history without full access to the feature if the project does not have versioning', function () {
       this.$scope.project.features.versioning = false
       this.historyManager = new HistoryV2Manager(
         this.ide,
@@ -204,7 +204,7 @@ define([
       expect(this.$scope.history.userHasFullFeature).to.equal(false)
     })
 
-    it('should setup history with full access to the feature for admin users even if the project does not have versioning', function() {
+    it('should setup history with full access to the feature for admin users even if the project does not have versioning', function () {
       this.$scope.project.features.versioning = false
       this.$scope.user.isAdmin = true
       this.historyManager = new HistoryV2Manager(
@@ -216,9 +216,9 @@ define([
       expect(this.$scope.history.userHasFullFeature).to.equal(true)
     })
 
-    describe('autoSelectFile', function() {
-      describe('for compare mode', function() {
-        beforeEach(function() {
+    describe('autoSelectFile', function () {
+      describe('for compare mode', function () {
+        beforeEach(function () {
           this.mockedFilesList = [
             {
               pathname: 'main.tex'
@@ -262,8 +262,8 @@ define([
           this.$scope.history.selection.files = this.mockedFilesList
         })
 
-        describe('with a previously selected file', function() {
-          it('should prefer the previously selected file if it is available and has operations', function() {
+        describe('with a previously selected file', function () {
+          it('should prefer the previously selected file if it is available and has operations', function () {
             this.historyManager._previouslySelectedPathname = this.mockedAddedFile.pathname
             this.historyManager.autoSelectFile()
             expect(this.$scope.history.selection.file).to.deep.equal(
@@ -271,13 +271,13 @@ define([
             )
           })
 
-          it('should prefer a file with ops if the previously selected file is available but has no operations', function() {
+          it('should prefer a file with ops if the previously selected file is available but has no operations', function () {
             this.historyManager._previouslySelectedPathname = this.mockedReferencesFile.pathname
             this.historyManager.autoSelectFile()
             expect(this.$scope.history.selection.file.operation).to.exist
           })
 
-          it('should ignore the previously selected file if it is not available', function() {
+          it('should ignore the previously selected file if it is not available', function () {
             this.historyManager._previouslySelectedPathname =
               'non/existent.file'
             this.historyManager.autoSelectFile()
@@ -287,15 +287,15 @@ define([
           })
         })
 
-        describe('without a previously selected file, with a list of files containing operations', function() {
-          it('should prefer edited files', function() {
+        describe('without a previously selected file, with a list of files containing operations', function () {
+          it('should prefer edited files', function () {
             this.historyManager.autoSelectFile()
             expect(this.$scope.history.selection.file).to.deep.equal(
               this.mockedEditedFile
             )
           })
 
-          it('should prefer added files if no edited files are present', function() {
+          it('should prefer added files if no edited files are present', function () {
             const indexOfEditedFile = this.$scope.history.selection.files.indexOf(
               this.mockedEditedFile
             )
@@ -306,7 +306,7 @@ define([
             )
           })
 
-          it('should prefer renamed files if no edited or added files are present', function() {
+          it('should prefer renamed files if no edited or added files are present', function () {
             const indexOfEditedFile = this.$scope.history.selection.files.indexOf(
               this.mockedEditedFile
             )
@@ -321,7 +321,7 @@ define([
             )
           })
 
-          it('should prefer removed files if no edited, added or renamed files are present', function() {
+          it('should prefer removed files if no edited, added or renamed files are present', function () {
             const indexOfEditedFile = this.$scope.history.selection.files.indexOf(
               this.mockedEditedFile
             )
@@ -341,8 +341,8 @@ define([
           })
         })
 
-        describe('without a previously selected file, with a list of files without operations', function() {
-          beforeEach(function() {
+        describe('without a previously selected file, with a list of files without operations', function () {
+          beforeEach(function () {
             this.mockedFilesListWithNoOps = [
               {
                 pathname: 'main.tex'
@@ -364,14 +364,14 @@ define([
             this.$scope.history.selection.files = this.mockedFilesListWithNoOps
           })
 
-          it('should prefer main.tex if it exists', function() {
+          it('should prefer main.tex if it exists', function () {
             this.historyManager.autoSelectFile()
             expect(this.$scope.history.selection.file).to.deep.equal(
               this.mockedMainTex
             )
           })
 
-          it('should prefer another tex file if main.tex does not exist', function() {
+          it('should prefer another tex file if main.tex does not exist', function () {
             const indexOfMainTex = this.$scope.history.selection.files.indexOf(
               this.mockedMainTex
             )
@@ -382,7 +382,7 @@ define([
             )
           })
 
-          it('should pick the first available file if no tex files are available', function() {
+          it('should pick the first available file if no tex files are available', function () {
             const indexOfMainTex = this.$scope.history.selection.files.indexOf(
               this.mockedMainTex
             )
@@ -399,8 +399,8 @@ define([
         })
       })
 
-      describe('for point-in-time mode', function() {
-        beforeEach(function() {
+      describe('for point-in-time mode', function () {
+        beforeEach(function () {
           this.$scope.history.viewMode = 'point_in_time'
           this.sampleUpdates[0] = {
             fromV: 4,
@@ -471,8 +471,8 @@ define([
           this.$scope.history.selection.files = this.mockedFilesList
         })
 
-        describe('with a previously selected file', function() {
-          it('should prefer the previously selected file if it is available and has operations', function() {
+        describe('with a previously selected file', function () {
+          it('should prefer the previously selected file if it is available and has operations', function () {
             this.historyManager._previouslySelectedPathname = 'main.tex'
             this.historyManager.autoSelectFile()
             expect(this.$scope.history.selection.file.pathname).to.equal(
@@ -480,7 +480,7 @@ define([
             )
           })
 
-          it('should prefer a file with ops if the previously selected file is available but has no operations', function() {
+          it('should prefer a file with ops if the previously selected file is available but has no operations', function () {
             this.historyManager._previouslySelectedPathname = 'main.tex'
             this.sampleUpdates[0].pathnames = []
             this.historyManager.autoSelectFile()
@@ -489,7 +489,7 @@ define([
             )
           })
 
-          it('should ignore the previously selected file if it is not available', function() {
+          it('should ignore the previously selected file if it is not available', function () {
             this.historyManager._previouslySelectedPathname =
               'non/existent.file'
             this.historyManager.autoSelectFile()
@@ -499,15 +499,15 @@ define([
           })
         })
 
-        describe('without a previously selected file, with a list of files containing operations', function() {
-          it('should prefer edited files', function() {
+        describe('without a previously selected file, with a list of files containing operations', function () {
+          it('should prefer edited files', function () {
             this.historyManager.autoSelectFile()
             expect(this.$scope.history.selection.file.pathname).to.equal(
               this.sampleUpdateEditedFile
             )
           })
 
-          it('should prefer added files if no edited files are present', function() {
+          it('should prefer added files if no edited files are present', function () {
             this.sampleUpdates[0].pathnames = []
             this.historyManager.autoSelectFile()
             expect(this.$scope.history.selection.file.pathname).to.equal(
@@ -515,7 +515,7 @@ define([
             )
           })
 
-          it('should prefer renamed files if no edited or added files are present', function() {
+          it('should prefer renamed files if no edited or added files are present', function () {
             this.sampleUpdates[0].pathnames = []
             this.sampleUpdates[0].project_ops.shift()
             this.historyManager.autoSelectFile()
@@ -525,22 +525,22 @@ define([
           })
         })
 
-        describe('without a previously selected file, with a list of files without operations', function() {
-          beforeEach(function() {
+        describe('without a previously selected file, with a list of files without operations', function () {
+          beforeEach(function () {
             this.sampleUpdates[0].pathnames = []
             this.sampleUpdates[0].project_ops = []
             this.mockedMainTex = this.mockedFilesList[0]
             this.mockedReferencesFile = this.mockedFilesList[1]
           })
 
-          it('should prefer main.tex if it exists', function() {
+          it('should prefer main.tex if it exists', function () {
             this.historyManager.autoSelectFile()
             expect(this.$scope.history.selection.file.pathname).to.equal(
               this.mockedMainTex.pathname
             )
           })
 
-          it('should prefer another tex file if main.tex does not exist', function() {
+          it('should prefer another tex file if main.tex does not exist', function () {
             const indexOfMainTex = this.$scope.history.selection.files.indexOf(
               this.mockedMainTex
             )

@@ -22,8 +22,8 @@ const { ObjectId } = require('mongojs')
 const assert = require('assert')
 const Path = require('path')
 
-describe('SubscriptionAdminController', function() {
-  beforeEach(function() {
+describe('SubscriptionAdminController', function () {
+  beforeEach(function () {
     let Subscription
     this.SubscriptionAdminController = SandboxedModule.require(modulePath, {
       requires: {
@@ -39,7 +39,7 @@ describe('SubscriptionAdminController', function() {
           refreshFeatures: sinon.stub().yields()
         }),
         '../../../../app/src/models/Subscription': {
-          Subscription: (this.Subscription = Subscription = (function() {
+          Subscription: (this.Subscription = Subscription = (function () {
             let createSubscription
             Subscription = class Subscription {
               static initClass() {
@@ -78,8 +78,8 @@ describe('SubscriptionAdminController', function() {
     return (this.user_id = ObjectId().toString())
   })
 
-  describe('show', function() {
-    beforeEach(function() {
+  describe('show', function () {
+    beforeEach(function () {
       this.SubscriptionLocator.getSubscription = sinon.stub()
       this.UserGetter.getUsers = sinon.stub()
       return (this.req.params = {
@@ -88,8 +88,8 @@ describe('SubscriptionAdminController', function() {
       })
     })
 
-    describe('successfully', function() {
-      beforeEach(function() {
+    describe('successfully', function () {
+      beforeEach(function () {
         this.subscription = {
           mock: 'subscription',
           member_ids: [ObjectId(), ObjectId(), ObjectId()]
@@ -104,19 +104,19 @@ describe('SubscriptionAdminController', function() {
         return this.SubscriptionAdminController.show(this.req, this.res)
       })
 
-      it('should look up the subscription', function() {
+      it('should look up the subscription', function () {
         return this.SubscriptionLocator.getSubscription
           .calledWith(this.subscription_id)
           .should.equal(true)
       })
 
-      it('should look up the member_ids', function() {
+      it('should look up the member_ids', function () {
         return this.UserGetter.getUsers
           .calledWith(this.subscription.member_ids, { email: 1 })
           .should.equal(true)
       })
 
-      return it('should render the subscription page', function() {
+      return it('should render the subscription page', function () {
         return this.res.render
           .calledWith(
             Path.resolve(__dirname, '../../../app/views/subscription/show'),
@@ -131,13 +131,13 @@ describe('SubscriptionAdminController', function() {
       })
     })
 
-    return describe('when subscription is not found', function() {
-      beforeEach(function() {
+    return describe('when subscription is not found', function () {
+      beforeEach(function () {
         this.SubscriptionLocator.getSubscription.yields(null, null)
         return this.SubscriptionAdminController.show(this.req, this.res)
       })
 
-      return it('should render the 404 page', function() {
+      return it('should render the 404 page', function () {
         return this.ErrorController.notFound
           .calledWith(this.req, this.res)
           .should.equal(true)
@@ -145,16 +145,16 @@ describe('SubscriptionAdminController', function() {
     })
   })
 
-  describe('update', function() {
-    beforeEach(function() {
+  describe('update', function () {
+    beforeEach(function () {
       this.req.params = { subscription_id: this.subscription_id }
       return (this.req.body = {
         mock: 'data for subscription'
       })
     })
 
-    return describe('successfully', function() {
-      beforeEach(function() {
+    return describe('successfully', function () {
+      beforeEach(function () {
         this.subscription = {
           mock: 'subscription',
           admin_id: 'admin-id',
@@ -167,7 +167,7 @@ describe('SubscriptionAdminController', function() {
         return this.SubscriptionAdminController.update(this.req, this.res)
       })
 
-      it('should convert the body params to an update', function() {
+      it('should convert the body params to an update', function () {
         return this.UserAdminController._reqToMongoUpdate
           .calledWith(
             this.req.body,
@@ -176,23 +176,23 @@ describe('SubscriptionAdminController', function() {
           .should.equal(true)
       })
 
-      it('should update the subscription', function() {
+      it('should update the subscription', function () {
         return this.Subscription.findAndModify
           .calledWith({ _id: this.subscription_id }, { $set: this.update })
           .should.equal(true)
       })
 
-      it('should refresh features', function() {
+      it('should refresh features', function () {
         return this.FeaturesUpdater.refreshFeatures.callCount.should.equal(3)
       })
 
-      it('should refresh features for admin', function() {
+      it('should refresh features for admin', function () {
         return this.FeaturesUpdater.refreshFeatures
           .calledWith('admin-id')
           .should.equal(true)
       })
 
-      it('should refresh features for members', function() {
+      it('should refresh features for members', function () {
         this.FeaturesUpdater.refreshFeatures
           .calledWith('member-id-1')
           .should.equal(true)
@@ -201,14 +201,14 @@ describe('SubscriptionAdminController', function() {
           .should.equal(true)
       })
 
-      return it('should return 204', function() {
+      return it('should return 204', function () {
         return this.res.sendStatus.calledWith(204).should.equal(true)
       })
     })
   })
 
-  describe('create', function() {
-    beforeEach(function() {
+  describe('create', function () {
+    beforeEach(function () {
       this.req.body = {
         mock: 'data for subscription',
         admin_id: (this.admin_id = 'mock-admin-id')
@@ -219,15 +219,15 @@ describe('SubscriptionAdminController', function() {
       )
     })
 
-    return describe('successfully', function() {
-      beforeEach(function() {
+    return describe('successfully', function () {
+      beforeEach(function () {
         this.UserAdminController._reqToMongoUpdate = sinon
           .stub()
           .returns((this.update = { mock: 'update' }))
         return this.SubscriptionAdminController.create(this.req, this.res)
       })
 
-      it('should convert the body params to an update', function() {
+      it('should convert the body params to an update', function () {
         return this.UserAdminController._reqToMongoUpdate
           .calledWith(
             this.req.body,
@@ -236,17 +236,17 @@ describe('SubscriptionAdminController', function() {
           .should.equal(true)
       })
 
-      it('should create the subscription', function() {
+      it('should create the subscription', function () {
         // @Subscription::constructor.calledWith(@update).should.equal true
         return this.Subscription.prototype.save.called.should.equal(true)
       })
 
-      it('should add the admin_id and manager_ids to the update', function() {
+      it('should add the admin_id and manager_ids to the update', function () {
         expect(this.update.admin_id).to.equal(this.admin_id)
         return expect(this.update.manager_ids).to.deep.equal([this.admin_id])
       })
 
-      return it('should return the subscription as json', function() {
+      return it('should return the subscription as json', function () {
         return this.res.json
           .calledWith({ subscription: this.new_subscription })
           .should.equal(true)
@@ -254,14 +254,14 @@ describe('SubscriptionAdminController', function() {
     })
   })
 
-  return describe('delete', function() {
-    beforeEach(function() {
+  return describe('delete', function () {
+    beforeEach(function () {
       this.SubscriptionUpdater.deleteSubscription = sinon.stub().yields()
       this.req.params = { subscription_id: this.subscription_id }
       return this.SubscriptionAdminController.delete(this.req, this.res)
     })
 
-    return it('should remove the subscription', function() {
+    return it('should remove the subscription', function () {
       return this.SubscriptionUpdater.deleteSubscription
         .calledWith(this.subscription_id)
         .should.equal(true)

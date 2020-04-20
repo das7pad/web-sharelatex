@@ -59,7 +59,7 @@ const isAccountUsingPaypal = (invoice, callback) => {
   })
 }
 
-const attemptInvoicesCollection = callback => {
+const attemptInvoicesCollection = (callback) => {
   RecurlyWrapper.getPaginatedEndpoint(
     'invoices',
     { state: 'past_due' },
@@ -78,7 +78,7 @@ const DRY_RUN = argv.n !== undefined
 const INVOICES_COLLECTED = []
 const INVOICES_COLLECTED_SUCCESS = []
 const USERS_COLLECTED = []
-attemptInvoicesCollection(error => {
+attemptInvoicesCollection((error) => {
   if (error) {
     throw error
   }

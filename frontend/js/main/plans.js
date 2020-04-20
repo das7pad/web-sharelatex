@@ -2,8 +2,8 @@
     camelcase,
     max-len
 */
-define(['../base'], function(App) {
-  App.factory('MultiCurrencyPricing', function() {
+define(['../base'], function (App) {
+  App.factory('MultiCurrencyPricing', function () {
     const currencyCode = window.recomendedCurrency
 
     return {
@@ -188,7 +188,7 @@ define(['../base'], function(App) {
     }
   })
 
-  App.controller('PlansController', function(
+  App.controller('PlansController', function (
     $scope,
     $modal,
     eventTracking,
@@ -210,13 +210,13 @@ define(['../base'], function(App) {
 
     $scope.ui = { view: 'monthly' }
 
-    $scope.changeCurreny = function(e, newCurrency) {
+    $scope.changeCurreny = function (e, newCurrency) {
       e.preventDefault()
       $scope.currencyCode = newCurrency
     }
 
     // because ternary logic in angular bindings is hard
-    $scope.getCollaboratorPlanCode = function() {
+    $scope.getCollaboratorPlanCode = function () {
       const { view } = $scope.ui
       if (view === 'annual') {
         return 'collaborator-annual'
@@ -225,7 +225,7 @@ define(['../base'], function(App) {
       }
     }
 
-    $scope.signUpNowClicked = function(plan, location) {
+    $scope.signUpNowClicked = function (plan, location) {
       if ($scope.ui.view === 'annual') {
         plan = `${plan}_annual`
       }
@@ -234,25 +234,25 @@ define(['../base'], function(App) {
       eventTracking.send('subscription-funnel', 'sign_up_now_button', plan)
     }
 
-    $scope.switchToMonthly = function(e, location) {
+    $scope.switchToMonthly = function (e, location) {
       const uiView = 'monthly'
       switchEvent(e, uiView + '-prices', location)
       $scope.ui.view = uiView
     }
 
-    $scope.switchToStudent = function(e, location) {
+    $scope.switchToStudent = function (e, location) {
       const uiView = 'student'
       switchEvent(e, uiView + '-prices', location)
       $scope.ui.view = uiView
     }
 
-    $scope.switchToAnnual = function(e, location) {
+    $scope.switchToAnnual = function (e, location) {
       const uiView = 'annual'
       switchEvent(e, uiView + '-prices', location)
       $scope.ui.view = uiView
     }
 
-    $scope.openGroupPlanModal = function() {
+    $scope.openGroupPlanModal = function () {
       const path = `${window.location.pathname}${window.location.search}`
       history.replaceState(null, document.title, path + '#groups')
       $modal
@@ -273,7 +273,7 @@ define(['../base'], function(App) {
       $scope.openGroupPlanModal()
     }
 
-    $scope.openPayByInvoiceModal = function() {
+    $scope.openPayByInvoiceModal = function () {
       const path = `${window.location.pathname}${window.location.search}`
       history.replaceState(null, document.title, path + '#pay-by-invoice')
       $modal
@@ -302,7 +302,7 @@ define(['../base'], function(App) {
     }
   })
 
-  App.controller('GroupPlansModalPurchaseController', function(
+  App.controller('GroupPlansModalPurchaseController', function (
     $scope,
     $modal,
     $location
@@ -368,7 +368,7 @@ define(['../base'], function(App) {
     if ($location.search()) {
       // usage
       if ($location.search().usage) {
-        $scope.options.usages.forEach(usage => {
+        $scope.options.usages.forEach((usage) => {
           if (usage.code === $location.search().usage) {
             $scope.selected.usage = usage.code
           }
@@ -376,7 +376,7 @@ define(['../base'], function(App) {
       }
       // plan
       if ($location.search().plan) {
-        $scope.options.plan_codes.forEach(plan => {
+        $scope.options.plan_codes.forEach((plan) => {
           if (plan.code === $location.search().plan) {
             $scope.selected.plan_code = plan.code
           }
@@ -394,7 +394,7 @@ define(['../base'], function(App) {
       }
       // currency
       if ($location.search().currency) {
-        $scope.options.currencies.forEach(currency => {
+        $scope.options.currencies.forEach((currency) => {
           if (currency.code === $location.search().currency) {
             $scope.selected.currency = currency.code
           }
@@ -402,7 +402,7 @@ define(['../base'], function(App) {
       }
     }
 
-    $scope.recalculatePrice = function() {
+    $scope.recalculatePrice = function () {
       const { usage, plan_code, currency, size } = $scope.selected
       const price = $scope.prices[usage][plan_code][currency][size]
       const currencySymbol = $scope.options.currencySymbols[currency]
@@ -412,13 +412,13 @@ define(['../base'], function(App) {
     $scope.$watch('selected', $scope.recalculatePrice, true)
     $scope.recalculatePrice()
 
-    $scope.purchase = function() {
+    $scope.purchase = function () {
       let { plan_code, size, usage, currency } = $scope.selected
       plan_code = `group_${plan_code}_${size}_${usage}`
       window.location = `/user/subscription/new?planCode=${plan_code}&currency=${currency}&itm_campaign=groups`
     }
 
-    $scope.payByInvoice = function() {
+    $scope.payByInvoice = function () {
       $modal.open({
         templateUrl: 'groupPlanModalInquiryTemplate'
       })

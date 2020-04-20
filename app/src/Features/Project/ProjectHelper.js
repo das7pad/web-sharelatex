@@ -31,7 +31,7 @@ const ProjectHelper = {
     userId = ObjectId(userId)
 
     if (Array.isArray(project.archived)) {
-      return project.archived.find(id => id.equals(userId)) !== undefined
+      return project.archived.find((id) => id.equals(userId)) !== undefined
     } else {
       return !!project.archived
     }
@@ -41,7 +41,7 @@ const ProjectHelper = {
     userId = ObjectId(userId)
 
     if (project.trashed) {
-      return project.trashed.find(id => id.equals(userId)) !== undefined
+      return project.trashed.find((id) => id.equals(userId)) !== undefined
     } else {
       return false
     }
@@ -79,7 +79,7 @@ const ProjectHelper = {
       archived = _.unionWith(archived, [userId], ProjectHelper._objectIdEquals)
     } else if (action === 'UNARCHIVE') {
       archived = archived.filter(
-        id => !ProjectHelper._objectIdEquals(id, userId)
+        (id) => !ProjectHelper._objectIdEquals(id, userId)
       )
     } else {
       throw new Error('Unrecognised action')
@@ -94,10 +94,10 @@ const ProjectHelper = {
       suffixes = []
     }
     if (callback == null) {
-      callback = function(error, name) {}
+      callback = function (error, name) {}
     }
     const allNames = new Set(nameList)
-    const isUnique = x => !allNames.has(x)
+    const isUnique = (x) => !allNames.has(x)
     // check if the supplied name is already unique
     if (isUnique(name)) {
       return callback(null, name)
@@ -144,7 +144,7 @@ const ProjectHelper = {
 
   _addNumericSuffixToProjectName(name, allProjectNames, maxLength) {
     const NUMERIC_SUFFIX_MATCH = /\ \((\d+)\)$/
-    const suffixedName = function(basename, number) {
+    const suffixedName = function (basename, number) {
       const suffix = ` (${number})`
       return basename.substr(0, maxLength - suffix.length) + suffix
     }

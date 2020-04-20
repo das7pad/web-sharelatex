@@ -24,7 +24,7 @@ module.exports = StringHelper = {
   stringifyJsonForScript(object) {
     return JSON.stringify(object).replace(
       JSON_ESCAPE_REGEXP,
-      match => JSON_ESCAPE[match]
+      (match) => JSON_ESCAPE[match]
     )
   }
 }

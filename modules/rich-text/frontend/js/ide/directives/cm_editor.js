@@ -68,7 +68,7 @@ define([
         // `editor:` will listened for by the rich text editor
         scope.name = 'editor'
 
-        const init = function() {
+        const init = function () {
           editor = new scope.bundle.Editor(
             bodyEl[0],
             new RichTextAdapter(ide.fileTreeManager),
@@ -81,7 +81,7 @@ define([
           return setUpFormattingEventListeners()
         }
 
-        var switchAttachment = function(sharejsDoc, oldSharejsDoc) {
+        var switchAttachment = function (sharejsDoc, oldSharejsDoc) {
           if (sharejsDoc === oldSharejsDoc) {
             return
           }
@@ -100,13 +100,13 @@ define([
         // If doc is changed, switch the CodeMirror/ShareJS attachment
         scope.$watch('sharejsDoc', switchAttachment)
 
-        scope.$watch('readOnly', function(value) {
+        scope.$watch('readOnly', function (value) {
           if (value != null) {
             return editor.setReadOnly(value)
           }
         })
 
-        var setUpFormattingEventListeners = function() {
+        var setUpFormattingEventListeners = function () {
           scope.formattingEvents.on('section', () => editor.wrapSection())
           scope.formattingEvents.on('subsection', () => editor.wrapSubsection())
           scope.formattingEvents.on('bold', () => editor.wrapBold())
@@ -123,7 +123,7 @@ define([
           )
         }
 
-        const tearDownFormattingEventListeners = function() {
+        const tearDownFormattingEventListeners = function () {
           scope.formattingEvents.off('section')
           scope.formattingEvents.off('subsection')
           scope.formattingEvents.off('bold')
@@ -140,7 +140,7 @@ define([
         // the 'beforeChange' event fires for changes before they are executed.
         // you can modify the input with event.update() or reject the event with
         // event.cancel().
-        const handleBeforeChangeEvent = function(cm, event) {
+        const handleBeforeChangeEvent = function (cm, event) {
           if (event.update) {
             const originalText = event.text.join('\n')
             if (BAD_CHARS_REGEXP.test(originalText)) {
@@ -157,12 +157,12 @@ define([
           }
         }
 
-        const setUpChangeFilter = function() {
+        const setUpChangeFilter = function () {
           const codeMirror = editor.getCodeMirror()
           codeMirror.on('beforeChange', handleBeforeChangeEvent)
         }
 
-        const tearDownChangeFilter = function() {
+        const tearDownChangeFilter = function () {
           const codeMirror = editor.getCodeMirror()
           codeMirror.off('beforeChange', handleBeforeChangeEvent)
         }
@@ -174,8 +174,8 @@ define([
           scope.$broadcast('editorInit')
         )
 
-        var attachToCM = sharejsDoc =>
-          scope.$applyAsync(function() {
+        var attachToCM = (sharejsDoc) =>
+          scope.$applyAsync(function () {
             editor.openDoc(sharejsDoc.getSnapshot())
             sharejsDoc.attachToCM(editor.getCodeMirror())
             editor.enable()
@@ -191,7 +191,7 @@ define([
             return setUpMetadataEventListener()
           })
 
-        var detachFromCM = function(sharejsDoc) {
+        var detachFromCM = function (sharejsDoc) {
           tearDownSpellCheck()
           tearDownTrackChanges()
           tearDownMetadataEventListener()
@@ -200,11 +200,11 @@ define([
           return sharejsDoc.off('remoteop.richtext')
         }
 
-        const handleChangeForSpellCheck = function(_, event) {
+        const handleChangeForSpellCheck = function (_, event) {
           return this.spellCheckManager.onChange(event)
         }
 
-        var initSpellCheck = function() {
+        var initSpellCheck = function () {
           this.spellCheckManager = new SpellCheckManager(
             scope,
             $cacheFactory,
@@ -222,7 +222,7 @@ define([
           return codeMirror.on('scroll', this.spellCheckManager.onScroll)
         }
 
-        var tearDownSpellCheck = function() {
+        var tearDownSpellCheck = function () {
           const codeMirror = editor.getCodeMirror()
           codeMirror.off('change', handleChangeForSpellCheck)
           if (this.spellCheckManager) {
@@ -234,7 +234,7 @@ define([
           }
         }
 
-        const initTrackChanges = function() {
+        const initTrackChanges = function () {
           const codeMirror = editor.getCodeMirror()
 
           this.trackChangesManager = new TrackChangesManager(
@@ -252,14 +252,14 @@ define([
           codeMirror.on('swapDoc', this.trackChangesManager.onChangeSession)
         }
 
-        const tearDownTrackChanges = function() {
+        const tearDownTrackChanges = function () {
           const codeMirror = editor.getCodeMirror()
 
           this.trackChangesManager.tearDown()
           codeMirror.off('swapDoc', this.trackChangesManager.onChangeSession)
         }
 
-        var initCursorPosition = function() {
+        var initCursorPosition = function () {
           cursorPositionManager = new CursorPositionManager(
             scope,
             new CursorPositionAdapter(editor),
@@ -271,7 +271,7 @@ define([
           return $(window).on('unload', cursorPositionManager.onUnload)
         }
 
-        const tearDownCursorPosition = function() {
+        const tearDownCursorPosition = function () {
           editor
             .getCodeMirror()
             .off('cursorActivity', cursorPositionManager.onCursorChange)
@@ -286,9 +286,9 @@ define([
         var tearDownMetadataEventListener = () =>
           editor.getCodeMirror().off('change', autocompleteAdapter.onChange)
 
-        var getSetting = key => scope[key]
+        var getSetting = (key) => scope[key]
 
-        scope.$on('$destroy', function() {
+        scope.$on('$destroy', function () {
           scope.$broadcast('changeEditor')
           tearDownSpellCheck()
           tearDownCursorPosition()
@@ -305,21 +305,21 @@ define([
             scope.$on(event, () =>
               __guard__(
                 editor != null ? editor.getCodeMirror() : undefined,
-                x => x.refresh()
+                (x) => x.refresh()
               )
             )
           }
         }
 
-        scope.$watch('fontSize', function(value) {
+        scope.$watch('fontSize', function (value) {
           bodyEl.css({ 'font-size': `${value}px` })
           return __guard__(
             editor != null ? editor.getCodeMirror() : undefined,
-            x => x.refresh()
+            (x) => x.refresh()
           )
         })
 
-        return scope.$watch('lineHeight', function(value) {
+        return scope.$watch('lineHeight', function (value) {
           let lineHeight
           if (!value) {
             return
@@ -340,7 +340,7 @@ define([
           bodyEl.css({ 'line-height': lineHeight })
           return __guard__(
             editor != null ? editor.getCodeMirror() : undefined,
-            x => x.refresh()
+            (x) => x.refresh()
           )
         })
       },

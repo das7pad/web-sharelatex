@@ -4,7 +4,7 @@ web
 --node-version=12.16.2
 --dependencies=mongo,redis_api,redis_lock,redis_realtime,redis_web,redis_websessions
 --data-dirs=data/dumpFolder,data/logs,data/pdf,data/uploads,data/zippedProjects
---lint-runner-version=1.0.1
+--lint-runner-version=2.0.0
 --mocha-6=true
 --monkey-patch-npm-ci--from=true
 --volumes=data,

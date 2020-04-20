@@ -21,7 +21,7 @@ const logger = require('logger-sharelatex')
 module.exports = V1Handler = {
   authWithV1(email, password, callback) {
     if (callback == null) {
-      callback = function(err, isValid, v1Profile) {}
+      callback = function (err, isValid, v1Profile) {}
     }
     return V1Api.request(
       {
@@ -30,7 +30,7 @@ module.exports = V1Handler = {
         json: { email, password },
         expectedStatusCodes: [403]
       },
-      function(err, response, body) {
+      function (err, response, body) {
         if (err != null) {
           logger.warn(
             { email, err },
@@ -47,7 +47,7 @@ module.exports = V1Handler = {
               isValid,
               v1UserId: __guard__(
                 body != null ? body.user_profile : undefined,
-                x => x.id
+                (x) => x.id
               )
             },
             '[V1Handler] got response from v1 login api'
@@ -65,7 +65,7 @@ module.exports = V1Handler = {
 
   doPasswordReset(v1_user_id, password, callback) {
     if (callback == null) {
-      callback = function(err, created) {}
+      callback = function (err, created) {}
     }
 
     return V1Api.request(
@@ -78,7 +78,7 @@ module.exports = V1Handler = {
         },
         expectedStatusCodes: [200]
       },
-      function(err, response, body) {
+      function (err, response, body) {
         if (err != null) {
           logger.warn(
             { v1_user_id, err },
@@ -105,7 +105,7 @@ module.exports = V1Handler = {
   getDocExported(token, callback) {
     // default to not exported
     if (callback == null) {
-      callback = function(err, info) {}
+      callback = function (err, info) {}
     }
     if ((Settings.apis != null ? Settings.apis.v1 : undefined) == null) {
       return callback(null, {
@@ -116,7 +116,7 @@ module.exports = V1Handler = {
 
     return V1Api.request(
       { url: `/api/v1/sharelatex/docs/${token}/exported_to_v2` },
-      function(err, response, body) {
+      function (err, response, body) {
         if (err != null) {
           return callback(err)
         }

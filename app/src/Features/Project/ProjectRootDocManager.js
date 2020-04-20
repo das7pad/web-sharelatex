@@ -28,9 +28,9 @@ const _ = require('underscore')
 module.exports = ProjectRootDocManager = {
   setRootDocAutomatically(project_id, callback) {
     if (callback == null) {
-      callback = function(error) {}
+      callback = function (error) {}
     }
-    return ProjectEntityHandler.getAllDocs(project_id, function(error, docs) {
+    return ProjectEntityHandler.getAllDocs(project_id, function (error, docs) {
       if (error != null) {
         return callback(error)
       }
@@ -38,23 +38,23 @@ module.exports = ProjectRootDocManager = {
       const jobs = _.map(
         docs,
         (doc, path) =>
-          function(cb) {
+          function (cb) {
             if (
               ProjectEntityUpdateHandler.isPathValidForRootDoc(path) &&
               DocumentHelper.contentHasDocumentclass(doc.lines)
             ) {
-              async.setImmediate(function() {
+              async.setImmediate(function () {
                 cb(doc._id)
               })
             } else {
-              async.setImmediate(function() {
+              async.setImmediate(function () {
                 cb(null)
               })
             }
           }
       )
 
-      return async.series(jobs, function(root_doc_id) {
+      return async.series(jobs, function (root_doc_id) {
         if (root_doc_id != null) {
           return ProjectEntityUpdateHandler.setRootDoc(
             project_id,
@@ -70,7 +70,7 @@ module.exports = ProjectRootDocManager = {
 
   findRootDocFileFromDirectory(directoryPath, callback) {
     if (callback == null) {
-      callback = function(error, path, content) {}
+      callback = function (error, path, content) {}
     }
     const filePathsPromise = globby(['**/*.{tex,Rtex}'], {
       cwd: directoryPath,
@@ -84,11 +84,11 @@ module.exports = ProjectRootDocManager = {
     // file that just includes a bunch of other files; then we go by name, in
     // order to be deterministic
     filePathsPromise.then(
-      unsortedFiles =>
+      (unsortedFiles) =>
         ProjectRootDocManager._sortFileList(
           unsortedFiles,
           directoryPath,
-          function(err, files) {
+          function (err, files) {
             if (err != null) {
               return callback(err)
             }
@@ -96,12 +96,12 @@ module.exports = ProjectRootDocManager = {
 
             return async.until(
               () => doc != null || files.length === 0,
-              function(cb) {
+              function (cb) {
                 const file = files.shift()
                 return fs.readFile(
                   Path.join(directoryPath, file),
                   'utf8',
-                  function(error, content) {
+                  function (error, content) {
                     if (error != null) {
                       return cb(error)
                     }
@@ -113,7 +113,7 @@ module.exports = ProjectRootDocManager = {
                   }
                 )
               },
-              err =>
+              (err) =>
                 callback(
                   err,
                   doc != null ? doc.path : undefined,
@@ -122,7 +122,7 @@ module.exports = ProjectRootDocManager = {
             )
           }
         ),
-      err => callback(err)
+      (err) => callback(err)
     )
 
     // coffeescript's implicit-return mechanism returns filePathsPromise from this method, which confuses mocha
@@ -131,11 +131,11 @@ module.exports = ProjectRootDocManager = {
 
   setRootDocFromName(project_id, rootDocName, callback) {
     if (callback == null) {
-      callback = function(error) {}
+      callback = function (error) {}
     }
     return ProjectEntityHandler.getAllDocPathsFromProjectById(
       project_id,
-      function(error, docPaths) {
+      function (error, docPaths) {
         let doc_id, path
         if (error != null) {
           return callback(error)
@@ -180,9 +180,9 @@ module.exports = ProjectRootDocManager = {
 
   ensureRootDocumentIsSet(project_id, callback) {
     if (callback == null) {
-      callback = function(error) {}
+      callback = function (error) {}
     }
-    return ProjectGetter.getProject(project_id, { rootDoc_id: 1 }, function(
+    return ProjectGetter.getProject(project_id, { rootDoc_id: 1 }, function (
       error,
       project
     ) {
@@ -206,9 +206,9 @@ module.exports = ProjectRootDocManager = {
 
   ensureRootDocumentIsValid(project_id, callback) {
     if (callback == null) {
-      callback = function(error) {}
+      callback = function (error) {}
     }
-    return ProjectGetter.getProject(project_id, { rootDoc_id: 1 }, function(
+    return ProjectGetter.getProject(project_id, { rootDoc_id: 1 }, function (
       error,
       project
     ) {
@@ -222,7 +222,7 @@ module.exports = ProjectRootDocManager = {
       if (project.rootDoc_id != null) {
         return ProjectEntityHandler.getAllDocPathsFromProjectById(
           project_id,
-          function(error, docPaths) {
+          function (error, docPaths) {
             if (error != null) {
               return callback(error)
             }
@@ -256,13 +256,13 @@ module.exports = ProjectRootDocManager = {
 
   _sortFileList(listToSort, rootDirectory, callback) {
     if (callback == null) {
-      callback = function(error, result) {}
+      callback = function (error, result) {}
     }
     return async.mapLimit(
       listToSort,
       5,
       (filePath, cb) =>
-        fs.stat(Path.join(rootDirectory, filePath), function(err, stat) {
+        fs.stat(Path.join(rootDirectory, filePath), function (err, stat) {
           if (err != null) {
             return cb(err)
           }
@@ -273,7 +273,7 @@ module.exports = ProjectRootDocManager = {
             name: Path.basename(filePath)
           })
         }),
-      function(err, files) {
+      function (err, files) {
         if (err != null) {
           return callback(err)
         }
@@ -282,7 +282,7 @@ module.exports = ProjectRootDocManager = {
           null,
           _.map(
             files.sort(ProjectRootDocManager._rootDocSort),
-            file => file.path
+            (file) => file.path
           )
         )
       }
@@ -315,7 +315,7 @@ const promises = {
     ProjectRootDocManager.setRootDocAutomatically
   ),
 
-  findRootDocFileFromDirectory: directoryPath =>
+  findRootDocFileFromDirectory: (directoryPath) =>
     new Promise((resolve, reject) => {
       ProjectRootDocManager.findRootDocFileFromDirectory(
         directoryPath,

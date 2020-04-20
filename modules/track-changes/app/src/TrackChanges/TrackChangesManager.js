@@ -19,7 +19,7 @@ const ProjectGetter = require('../../../../../app/src/Features/Project/ProjectGe
 module.exports = TrackChangesManager = {
   setTrackChangesState(project_id, track_changes_state, callback) {
     if (callback == null) {
-      callback = function(error) {}
+      callback = function (error) {}
     }
     return Project.updateOne(
       { _id: project_id },
@@ -30,12 +30,12 @@ module.exports = TrackChangesManager = {
 
   getTrackChangesState(project_id, callback) {
     if (callback == null) {
-      callback = function(error) {}
+      callback = function (error) {}
     }
     return ProjectGetter.getProject(
       project_id,
       { track_changes: true },
-      function(error, project) {
+      function (error, project) {
         if (error != null) {
           return callback(error)
         }

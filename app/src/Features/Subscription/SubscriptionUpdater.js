@@ -45,7 +45,7 @@ const SubscriptionUpdater = {
       callback = requesterData
       requesterData = {}
     }
-    SubscriptionLocator.getUsersSubscription(adminUserId, function(
+    SubscriptionLocator.getUsersSubscription(adminUserId, function (
       err,
       subscription
     ) {
@@ -60,7 +60,7 @@ const SubscriptionUpdater = {
           callback
         )
       } else {
-        SubscriptionUpdater._createNewSubscription(adminUserId, function(
+        SubscriptionUpdater._createNewSubscription(adminUserId, function (
           err,
           subscription
         ) {
@@ -86,7 +86,7 @@ const SubscriptionUpdater = {
     SubscriptionUpdater.addUsersToGroupWithoutFeaturesRefresh(
       subscriptionId,
       memberIds,
-      function(err) {
+      function (err) {
         if (err != null) {
           return callback(err)
         }
@@ -104,7 +104,7 @@ const SubscriptionUpdater = {
 
   removeUserFromGroups(filter, userId, callback) {
     const removeOperation = { $pull: { member_ids: userId } }
-    Subscription.updateMany(filter, removeOperation, function(err) {
+    Subscription.updateMany(filter, removeOperation, function (err) {
       if (err != null) {
         logger.warn(
           { err, filter, removeOperation },
@@ -112,7 +112,7 @@ const SubscriptionUpdater = {
         )
         return callback(err)
       }
-      UserGetter.getUser(userId, function(error, user) {
+      UserGetter.getUser(userId, function (error, user) {
         if (error) {
           return callback(error)
         }
@@ -130,7 +130,7 @@ const SubscriptionUpdater = {
   },
 
   removeUserFromAllGroups(userId, callback) {
-    SubscriptionLocator.getMemberSubscriptions(userId, function(
+    SubscriptionLocator.getMemberSubscriptions(userId, function (
       error,
       subscriptions
     ) {
@@ -140,7 +140,7 @@ const SubscriptionUpdater = {
       if (!subscriptions) {
         return callback()
       }
-      const subscriptionIds = subscriptions.map(sub => sub._id)
+      const subscriptionIds = subscriptions.map((sub) => sub._id)
       SubscriptionUpdater.removeUserFromGroups(
         { _id: subscriptionIds },
         userId,
@@ -155,21 +155,21 @@ const SubscriptionUpdater = {
 
   deleteSubscription(subscription, deleterData, callback) {
     if (callback == null) {
-      callback = function() {}
+      callback = function () {}
     }
     async.series(
       [
-        cb =>
+        (cb) =>
           // 1. create deletedSubscription
           SubscriptionUpdater._createDeletedSubscription(
             subscription,
             deleterData,
             cb
           ),
-        cb =>
+        (cb) =>
           // 2. remove subscription
           Subscription.deleteOne({ _id: subscription._id }, cb),
-        cb =>
+        (cb) =>
           // 3. refresh users features
           SubscriptionUpdater._refreshUsersFeatures(subscription, cb)
       ],
@@ -204,7 +204,7 @@ const SubscriptionUpdater = {
       admin_id: adminUserId,
       manager_ids: [adminUserId]
     })
-    subscription.save(err => callback(err, subscription))
+    subscription.save((err) => callback(err, subscription))
   },
 
   _updateSubscriptionFromRecurly(
@@ -232,7 +232,7 @@ const SubscriptionUpdater = {
       subscription.groupPlan = true
       subscription.membersLimit = plan.membersLimit
     }
-    subscription.save(function(error) {
+    subscription.save(function (error) {
       if (error) {
         return callback(error)
       }

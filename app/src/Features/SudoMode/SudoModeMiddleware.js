@@ -31,7 +31,7 @@ module.exports = SudoModeMiddleware = {
       { userId },
       '[SudoMode] protecting endpoint, checking if sudo mode is active'
     )
-    return SudoModeHandler.isSudoModeActive(userId, function(err, isActive) {
+    return SudoModeHandler.isSudoModeActive(userId, function (err, isActive) {
       if (err != null) {
         logger.warn(
           { err, userId },

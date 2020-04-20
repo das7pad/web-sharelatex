@@ -37,7 +37,7 @@ module.exports = {
       teamManagerId,
       subscription,
       email,
-      function(err, inviteUserData) {
+      function (err, inviteUserData) {
         if (err != null) {
           if (err.alreadyInTeam) {
             return res.status(400).json({
@@ -66,7 +66,7 @@ module.exports = {
     const { token } = req.params
     const userId = AuthenticationController.getLoggedInUserId(req)
 
-    return TeamInvitesHandler.getInvite(token, function(
+    return TeamInvitesHandler.getInvite(token, function (
       err,
       invite,
       teamSubscription
@@ -79,7 +79,7 @@ module.exports = {
         return ErrorController.notFound(req, res, next)
       }
 
-      return SubscriptionLocator.getUsersSubscription(userId, function(
+      return SubscriptionLocator.getUsersSubscription(userId, function (
         err,
         personalSubscription
       ) {
@@ -109,7 +109,7 @@ module.exports = {
     const { token } = req.params
     const userId = AuthenticationController.getLoggedInUserId(req)
 
-    return TeamInvitesHandler.acceptInvite(token, userId, function(
+    return TeamInvitesHandler.acceptInvite(token, userId, function (
       err,
       results
     ) {
@@ -132,7 +132,7 @@ module.exports = {
       teamManagerId,
       subscription,
       email,
-      function(err, results) {
+      function (err, results) {
         if (err != null) {
           return next(err)
         }

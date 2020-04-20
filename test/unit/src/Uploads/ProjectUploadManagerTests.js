@@ -6,8 +6,8 @@ const SandboxedModule = require('sandboxed-module')
 const MODULE_PATH =
   '../../../../app/src/Features/Uploads/ProjectUploadManager.js'
 
-describe('ProjectUploadManager', function() {
-  beforeEach(function() {
+describe('ProjectUploadManager', function () {
+  beforeEach(function () {
     this.now = Date.now()
     timekeeper.freeze(this.now)
     this.project_id = 'project-id-123'
@@ -85,13 +85,13 @@ describe('ProjectUploadManager', function() {
     })
   })
 
-  afterEach(function() {
+  afterEach(function () {
     timekeeper.reset()
   })
 
-  describe('createProjectFromZipArchive', function() {
-    describe('when the title can be read from the root document', function() {
-      beforeEach(async function() {
+  describe('createProjectFromZipArchive', function () {
+    describe('when the title can be read from the root document', function () {
+      beforeEach(async function () {
         await this.ProjectUploadManager.promises.createProjectFromZipArchive(
           this.owner_id,
           this.name,
@@ -99,20 +99,20 @@ describe('ProjectUploadManager', function() {
         )
       })
 
-      it('should extract the archive', function() {
+      it('should extract the archive', function () {
         this.ArchiveManager.promises.extractZipArchive.should.have.been.calledWith(
           this.source,
           this.destination
         )
       })
 
-      it('should find the top level directory', function() {
+      it('should find the top level directory', function () {
         this.ArchiveManager.promises.findTopLevelDirectory.should.have.been.calledWith(
           this.destination
         )
       })
 
-      it('should insert the extracted archive into the folder', function() {
+      it('should insert the extracted archive into the folder', function () {
         this.FileSystemImportManager.promises.addFolderContents.should.have.been.calledWith(
           this.owner_id,
           this.project_id,
@@ -122,37 +122,37 @@ describe('ProjectUploadManager', function() {
         )
       })
 
-      it('should create a project owned by the owner_id', function() {
+      it('should create a project owned by the owner_id', function () {
         this.ProjectCreationHandler.promises.createBlankProject.should.have.been.calledWith(
           this.owner_id
         )
       })
 
-      it('should create a project with the correct name', function() {
+      it('should create a project with the correct name', function () {
         this.ProjectCreationHandler.promises.createBlankProject.should.have.been.calledWith(
           sinon.match.any,
           this.othername
         )
       })
 
-      it('should read the title from the tex contents', function() {
+      it('should read the title from the tex contents', function () {
         this.DocumentHelper.getTitleFromTexContent.should.have.been.called
       })
 
-      it('should set the root document', function() {
+      it('should set the root document', function () {
         this.ProjectRootDocManager.promises.setRootDocFromName.should.have.been.calledWith(
           this.project_id,
           'main.tex'
         )
       })
 
-      it('should ensure the name is valid', function() {
+      it('should ensure the name is valid', function () {
         this.ProjectDetailsHandler.fixProjectName.should.have.been.called
       })
     })
 
-    describe("when the root document can't be determined", function() {
-      beforeEach(async function() {
+    describe("when the root document can't be determined", function () {
+      beforeEach(async function () {
         this.ProjectRootDocManager.promises.findRootDocFileFromDirectory.resolves(
           {}
         )
@@ -163,15 +163,15 @@ describe('ProjectUploadManager', function() {
         )
       })
 
-      it('should not try to set the root doc', function() {
+      it('should not try to set the root doc', function () {
         this.ProjectRootDocManager.promises.setRootDocFromName.should.not.have
           .been.called
       })
     })
   })
 
-  describe('createProjectFromZipArchiveWithName', function() {
-    beforeEach(async function() {
+  describe('createProjectFromZipArchiveWithName', function () {
+    beforeEach(async function () {
       await this.ProjectUploadManager.promises.createProjectFromZipArchiveWithName(
         this.owner_id,
         this.name,
@@ -179,39 +179,39 @@ describe('ProjectUploadManager', function() {
       )
     })
 
-    it('should create a project owned by the owner_id', function() {
+    it('should create a project owned by the owner_id', function () {
       this.ProjectCreationHandler.promises.createBlankProject.should.have.been.calledWith(
         this.owner_id
       )
     })
 
-    it('should create a project with the correct name', function() {
+    it('should create a project with the correct name', function () {
       this.ProjectCreationHandler.promises.createBlankProject.should.have.been.calledWith(
         sinon.match.any,
         this.othername
       )
     })
 
-    it('should automatically set the root doc', function() {
+    it('should automatically set the root doc', function () {
       this.ProjectRootDocManager.promises.setRootDocAutomatically.should.have.been.calledWith(
         this.project_id
       )
     })
 
-    it('should extract the archive', function() {
+    it('should extract the archive', function () {
       this.ArchiveManager.promises.extractZipArchive.should.have.been.calledWith(
         this.source,
         this.destination
       )
     })
 
-    it('should find the top level directory', function() {
+    it('should find the top level directory', function () {
       this.ArchiveManager.promises.findTopLevelDirectory.should.have.been.calledWith(
         this.destination
       )
     })
 
-    it('should insert the extracted archive into the folder', function() {
+    it('should insert the extracted archive into the folder', function () {
       this.FileSystemImportManager.promises.addFolderContents.should.have.been.calledWith(
         this.owner_id,
         this.project_id,
@@ -221,12 +221,12 @@ describe('ProjectUploadManager', function() {
       )
     })
 
-    it('should remove the destination directory afterwards', function() {
+    it('should remove the destination directory afterwards', function () {
       this.fs.remove.should.have.been.calledWith(this.destination)
     })
 
-    describe('when inserting the zip file contents into the root folder fails', function() {
-      beforeEach(async function() {
+    describe('when inserting the zip file contents into the root folder fails', function () {
+      beforeEach(async function () {
         this.FileSystemImportManager.promises.addFolderContents.rejects()
         await expect(
           this.ProjectUploadManager.promises.createProjectFromZipArchiveWithName(
@@ -237,15 +237,15 @@ describe('ProjectUploadManager', function() {
         ).to.be.rejected
       })
 
-      it('should cleanup the blank project created', async function() {
+      it('should cleanup the blank project created', async function () {
         this.ProjectDeleter.promises.deleteProject.should.have.been.calledWith(
           this.project_id
         )
       })
     })
 
-    describe('when setting automatically the root doc fails', function() {
-      beforeEach(async function() {
+    describe('when setting automatically the root doc fails', function () {
+      beforeEach(async function () {
         this.ProjectRootDocManager.promises.setRootDocAutomatically.rejects()
         await expect(
           this.ProjectUploadManager.promises.createProjectFromZipArchiveWithName(
@@ -256,7 +256,7 @@ describe('ProjectUploadManager', function() {
         ).to.be.rejected
       })
 
-      it('should cleanup the blank project created', function() {
+      it('should cleanup the blank project created', function () {
         this.ProjectDeleter.promises.deleteProject.should.have.been.calledWith(
           this.project_id
         )

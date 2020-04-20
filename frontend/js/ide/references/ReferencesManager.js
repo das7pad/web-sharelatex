@@ -13,7 +13,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['crypto-js/sha1'], function(CryptoJSSHA1) {
+define(['crypto-js/sha1'], function (CryptoJSSHA1) {
   let ReferencesManager
   return (ReferencesManager = class ReferencesManager {
     constructor(ide, $scope) {
@@ -28,7 +28,7 @@ define(['crypto-js/sha1'], function(CryptoJSSHA1) {
           entity = this.ide.fileTreeManager.findEntityById(doc.doc_id)
         }
         if (
-          __guard__(entity != null ? entity.name : undefined, x =>
+          __guard__(entity != null ? entity.name : undefined, (x) =>
             x.match(/.*\.bib$/)
           )
         ) {
@@ -44,7 +44,7 @@ define(['crypto-js/sha1'], function(CryptoJSSHA1) {
       //   index all references files
       //   and don't broadcast to all clients
       this.inited = false
-      this.$scope.$on('project:joined', e => {
+      this.$scope.$on('project:joined', (e) => {
         // We only need to grab the references when the editor first loads,
         // not on every reconnect
         if (!this.inited) {
@@ -54,8 +54,8 @@ define(['crypto-js/sha1'], function(CryptoJSSHA1) {
       })
 
       setTimeout(
-        self =>
-          self.ide.socket.on('references:keys:updated', keys =>
+        (self) =>
+          self.ide.socket.on('references:keys:updated', (keys) =>
             // console.log '>> got keys from socket'
             self._storeReferencesKeys(keys)
           ),
@@ -100,7 +100,7 @@ define(['crypto-js/sha1'], function(CryptoJSSHA1) {
       }
       return this.ide.$http
         .post(`/project/${this.$scope.project_id}/references/index`, opts)
-        .then(response => {
+        .then((response) => {
           return this._storeReferencesKeys(response.data.keys)
         })
     }
@@ -112,7 +112,7 @@ define(['crypto-js/sha1'], function(CryptoJSSHA1) {
       }
       return this.ide.$http
         .post(`/project/${this.$scope.project_id}/references/indexAll`, opts)
-        .then(response => {
+        .then((response) => {
           return this._storeReferencesKeys(response.data.keys)
         })
     }

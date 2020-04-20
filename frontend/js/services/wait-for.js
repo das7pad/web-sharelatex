@@ -10,17 +10,17 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../base'], App =>
-  App.factory('waitFor', function($q) {
-    const waitFor = function(testFunction, timeout, pollInterval) {
+define(['../base'], (App) =>
+  App.factory('waitFor', function ($q) {
+    const waitFor = function (testFunction, timeout, pollInterval) {
       if (pollInterval == null) {
         pollInterval = 500
       }
       const iterationLimit = Math.floor(timeout / pollInterval)
       let iterations = 0
-      return $q(function(resolve, reject) {
+      return $q(function (resolve, reject) {
         let tryIteration
-        return (tryIteration = function() {
+        return (tryIteration = function () {
           if (iterations > iterationLimit) {
             return reject(
               new Error(

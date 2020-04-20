@@ -19,7 +19,7 @@ async function _addIdentifier(
   const user = await UserGetter.promises.getUserByAnyEmail(institutionEmail)
   if (user && user._id.toString() !== userId.toString()) {
     const existingEmailData = user.emails.find(
-      emailData => emailData.email === institutionEmail
+      (emailData) => emailData.email === institutionEmail
     )
     if (existingEmailData && existingEmailData.samlProviderId) {
       // email exists and institution link.
@@ -87,7 +87,7 @@ async function _addInstitutionEmail(userId, email, providerId) {
   if (user == null) {
     throw new Errors.NotFoundError('user not found')
   }
-  const emailAlreadyAssociated = user.emails.find(e => e.email === email)
+  const emailAlreadyAssociated = user.emails.find((e) => e.email === email)
   if (emailAlreadyAssociated && emailAlreadyAssociated.confirmedAt) {
     await UserUpdater.promises.updateUser(query, update)
   } else if (emailAlreadyAssociated) {
@@ -111,7 +111,7 @@ async function _sendLinkedEmail(userId, providerName) {
   EmailHandler.sendEmail(
     'emailThirdPartyIdentifierLinked',
     emailOptions,
-    error => {
+    (error) => {
       if (error != null) {
         logger.warn(error)
       }
@@ -127,7 +127,7 @@ function _sendUnlinkedEmail(primaryEmail, providerName) {
   EmailHandler.sendEmail(
     'emailThirdPartyIdentifierUnlinked',
     emailOptions,
-    error => {
+    (error) => {
       if (error != null) {
         logger.warn(error)
       }

@@ -24,7 +24,7 @@ module.exports = BetaProgramController = {
     if (user_id == null) {
       return next(new Error('no user id in session'))
     }
-    return BetaProgramHandler.optIn(user_id, function(err) {
+    return BetaProgramHandler.optIn(user_id, function (err) {
       if (err) {
         return next(err)
       }
@@ -38,7 +38,7 @@ module.exports = BetaProgramController = {
     if (user_id == null) {
       return next(new Error('no user id in session'))
     }
-    return BetaProgramHandler.optOut(user_id, function(err) {
+    return BetaProgramHandler.optOut(user_id, function (err) {
       if (err) {
         return next(err)
       }
@@ -49,7 +49,7 @@ module.exports = BetaProgramController = {
   optInPage(req, res, next) {
     const user_id = AuthenticationController.getLoggedInUserId(req)
     logger.log({ user_id }, 'showing beta participation page for user')
-    return UserGetter.getUser(user_id, function(err, user) {
+    return UserGetter.getUser(user_id, function (err, user) {
       if (err) {
         logger.warn({ err, user_id }, 'error fetching user')
         return next(err)

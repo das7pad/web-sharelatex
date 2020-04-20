@@ -219,7 +219,7 @@ async function mkdirp(projectId, path, options = {}) {
   // defaults to case insensitive paths, use options {exactCaseMatch:true}
   // to make matching case-sensitive
   let folders = path.split('/')
-  folders = _.select(folders, folder => folder.length !== 0)
+  folders = _.select(folders, (folder) => folder.length !== 0)
 
   const project = await ProjectGetter.promises.getProjectWithOnlyFolders(
     projectId

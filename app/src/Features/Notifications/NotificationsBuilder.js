@@ -22,7 +22,7 @@ module.exports = {
       key: `features-updated-by=${affiliation.institutionId}`,
       create(callback) {
         if (callback == null) {
-          callback = function() {}
+          callback = function () {}
         }
         const messageOpts = { institutionName: affiliation.institutionName }
         return NotificationsHandler.createNotification(
@@ -37,7 +37,7 @@ module.exports = {
       },
       read(callback) {
         if (callback == null) {
-          callback = function() {}
+          callback = function () {}
         }
         return NotificationsHandler.markAsRead(this.key, callback)
       }
@@ -49,7 +49,7 @@ module.exports = {
       key: `redundant-personal-subscription-${affiliation.institutionId}`,
       create(callback) {
         if (callback == null) {
-          callback = function() {}
+          callback = function () {}
         }
         const messageOpts = { institutionName: affiliation.institutionName }
         return NotificationsHandler.createNotification(
@@ -64,7 +64,7 @@ module.exports = {
       },
       read(callback) {
         if (callback == null) {
-          callback = function() {}
+          callback = function () {}
         }
         return NotificationsHandler.markAsRead(this.key, callback)
       }
@@ -76,7 +76,7 @@ module.exports = {
       key: `project-invite-${invite._id}`,
       create(callback) {
         if (callback == null) {
-          callback = function() {}
+          callback = function () {}
         }
         const messageOpts = {
           userName: sendingUser.first_name,
@@ -95,7 +95,7 @@ module.exports = {
       },
       read(callback) {
         if (callback == null) {
-          callback = function() {}
+          callback = function () {}
         }
         return NotificationsHandler.markAsReadByKeyOnly(this.key, callback)
       }
@@ -106,7 +106,7 @@ module.exports = {
     return {
       create(ip, callback) {
         if (callback == null) {
-          callback = function() {}
+          callback = function () {}
         }
         if (!settings.apis.v1.url) {
           return null
@@ -120,7 +120,7 @@ module.exports = {
             json: true,
             timeout: 20 * 1000
           },
-          function(error, response, body) {
+          function (error, response, body) {
             if (error != null) {
               return error
             }
@@ -148,7 +148,7 @@ module.exports = {
 
       read(university_id, callback) {
         if (callback == null) {
-          callback = function() {}
+          callback = function () {}
         }
         const key = `ip-matched-affiliation-${university_id}`
         return NotificationsHandler.markAsReadWithKey(userId, key, callback)
@@ -161,7 +161,7 @@ module.exports = {
       key: `tpdsFileLimit-${user_id}`,
       create(projectName, callback) {
         if (callback == null) {
-          callback = function() {}
+          callback = function () {}
         }
         const messageOpts = {
           projectName: projectName
@@ -178,7 +178,7 @@ module.exports = {
       },
       read(callback) {
         if (callback == null) {
-          callback = function() {}
+          callback = function () {}
         }
         return NotificationsHandler.markAsReadByKeyOnly(this.key, callback)
       }

@@ -11,7 +11,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define([], function() {
+define([], function () {
   let SpellCheckAdapter
   return (SpellCheckAdapter = class SpellCheckAdapter {
     constructor(editor) {
@@ -21,10 +21,7 @@ define([], function() {
     }
 
     getLines() {
-      return this.editor
-        .getCodeMirror()
-        .getValue()
-        .split('\n')
+      return this.editor.getCodeMirror().getValue().split('\n')
     }
 
     getLineCount() {
@@ -41,7 +38,7 @@ define([], function() {
 
     getLinesByRows(rows) {
       const doc = this.editor.getCodeMirror()
-      return rows.map(rowIdx => doc.getLine(rowIdx))
+      return rows.map((rowIdx) => doc.getLine(rowIdx))
     }
 
     getSelectionContents() {

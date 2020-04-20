@@ -35,7 +35,7 @@ function getRelativePath(importPath, filePath) {
   }
 }
 
-export default function(file, api) {
+export default function (file, api) {
   const j = api.jscodeshift
   const filePath = file.path
 
@@ -43,7 +43,7 @@ export default function(file, api) {
     .find(j.CallExpression, {
       callee: { name: 'define' }
     })
-    .replaceWith(node => {
+    .replaceWith((node) => {
       const defineArgs = node.get('arguments', 0)
 
       const deps = defineArgs.get('elements')
@@ -53,7 +53,7 @@ export default function(file, api) {
         return node.value
       }
 
-      const elems = deps.map(e => {
+      const elems = deps.map((e) => {
         return j.literal(getRelativePath(e.node.value, filePath))
       })
       const newDeps = j.arrayExpression(elems)

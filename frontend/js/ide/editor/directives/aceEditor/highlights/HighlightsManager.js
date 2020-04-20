@@ -16,7 +16,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['ace/ace', '../../../../colors/ColorManager'], function(
+define(['ace/ace', '../../../../colors/ColorManager'], function (
   _,
   ColorManager
 ) {
@@ -46,15 +46,15 @@ define(['ace/ace', '../../../../colors/ColorManager'], function(
         updatesBelow: 0
       }
 
-      this.$scope.$watch('highlights', value => {
+      this.$scope.$watch('highlights', (value) => {
         return this.redrawAnnotations()
       })
 
-      this.$scope.$watch('theme', value => {
+      this.$scope.$watch('theme', (value) => {
         return this.redrawAnnotations()
       })
 
-      this.editor.on('mousemove', e => {
+      this.editor.on('mousemove', (e) => {
         const position = this.editor.renderer.screenToTextCoordinates(
           e.clientX,
           e.clientY
@@ -77,7 +77,7 @@ define(['ace/ace', '../../../../colors/ColorManager'], function(
         }
       })
 
-      this.editor.on('changeSession', e => {
+      this.editor.on('changeSession', (e) => {
         if (e.oldSession != null) {
           e.oldSession.off('changeScrollTop', onChangeScrollTop)
         }
@@ -113,7 +113,7 @@ define(['ace/ace', '../../../../colors/ColorManager'], function(
       this._clearLabels()
 
       for (const annotation of Array.from(this.$scope.highlights || [])) {
-        ;(annotation => {
+        ;((annotation) => {
           const colorScheme = ColorManager.getColorScheme(
             annotation.hue,
             this.element
@@ -176,7 +176,7 @@ define(['ace/ace', '../../../../colors/ColorManager'], function(
         if (
           __guard__(
             this.$scope != null ? this.$scope.annotationLabel : undefined,
-            x => x.show
+            (x) => x.show
           ) !== false
         ) {
           return this.$scope.$apply(() => {
@@ -372,7 +372,7 @@ define(['ace/ace', '../../../../colors/ColorManager'], function(
         this.editor.getSession().addMarker(
           range,
           klass,
-          function(html, range, left, top, config) {
+          function (html, range, left, top, config) {
             if (range.isMultiLine()) {
               return markerLayer.drawTextMarker(
                 html,

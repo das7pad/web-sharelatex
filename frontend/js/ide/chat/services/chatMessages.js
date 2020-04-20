@@ -18,7 +18,7 @@
 import App from '../../../base'
 import CryptoJSMD5 from 'crypto-js/md5'
 
-App.factory('chatMessages', function($http, ide) {
+App.factory('chatMessages', function ($http, ide) {
   const MESSAGES_URL = `/project/${ide.project_id}/messages`
   const MESSAGE_LIMIT = 50
   const CONNECTED_USER_URL = `/project/${ide.project_id}/connected_users`
@@ -35,9 +35,9 @@ App.factory('chatMessages', function($http, ide) {
   }
 
   let justSent = false
-  ide.socket.on('new-chat-message', message => {
+  ide.socket.on('new-chat-message', (message) => {
     if (
-      __guard__(message != null ? message.user : undefined, x => x.id) ===
+      __guard__(message != null ? message.user : undefined, (x) => x.id) ===
         ide.$scope.user.id &&
       justSent
     ) {
@@ -48,7 +48,7 @@ App.factory('chatMessages', function($http, ide) {
     return (justSent = false)
   })
 
-  chat.sendMessage = function(message) {
+  chat.sendMessage = function (message) {
     const body = {
       content: message,
       _csrf: window.csrfToken
@@ -62,7 +62,7 @@ App.factory('chatMessages', function($http, ide) {
     return $http.post(MESSAGES_URL, body)
   }
 
-  chat.loadMoreMessages = function() {
+  chat.loadMoreMessages = function () {
     // trigger preloading of MathJax
     // eslint-disable-next-line no-unused-expressions
     import('../../../MathJaxBundle')
@@ -77,7 +77,7 @@ App.factory('chatMessages', function($http, ide) {
       url += `&before=${chat.state.nextBeforeTimestamp}`
     }
     chat.state.loading = true
-    return $http.get(url).then(function(response) {
+    return $http.get(url).then(function (response) {
       const messages = response.data != null ? response.data : []
       chat.state.loading = false
       if (messages.length < MESSAGE_LIMIT) {
@@ -112,12 +112,12 @@ App.factory('chatMessages', function($http, ide) {
 
   const TIMESTAMP_GROUP_SIZE = 5 * 60 * 1000 // 5 minutes
 
-  const prependMessage = function(message) {
+  const prependMessage = function (message) {
     const firstMessage = chat.state.messages[0]
     const shouldGroup =
       firstMessage != null &&
       firstMessage.user.id ===
-        __guard__(message != null ? message.user : undefined, x => x.id) &&
+        __guard__(message != null ? message.user : undefined, (x) => x.id) &&
       firstMessage.timestamp - message.timestamp < TIMESTAMP_GROUP_SIZE
     if (shouldGroup) {
       firstMessage.timestamp = message.timestamp
@@ -131,19 +131,19 @@ App.factory('chatMessages', function($http, ide) {
     }
   }
 
-  var prependMessages = messages =>
-    Array.from(messages.slice(0).reverse()).map(message =>
+  var prependMessages = (messages) =>
+    Array.from(messages.slice(0).reverse()).map((message) =>
       prependMessage(message)
     )
 
-  var appendMessage = function(message) {
+  var appendMessage = function (message) {
     chat.state.newMessage = message
 
     const lastMessage = chat.state.messages[chat.state.messages.length - 1]
     const shouldGroup =
       lastMessage != null &&
       lastMessage.user.id ===
-        __guard__(message != null ? message.user : undefined, x => x.id) &&
+        __guard__(message != null ? message.user : undefined, (x) => x.id) &&
       message.timestamp - lastMessage.timestamp < TIMESTAMP_GROUP_SIZE
     if (shouldGroup) {
       lastMessage.timestamp = message.timestamp
@@ -157,7 +157,7 @@ App.factory('chatMessages', function($http, ide) {
     }
   }
 
-  var formatUser = function(user) {
+  var formatUser = function (user) {
     const hash = CryptoJSMD5(user.email.toLowerCase())
     user.gravatar_url = `//www.gravatar.com/avatar/${hash}`
     return user

@@ -25,14 +25,14 @@ module.exports = SudoModeHandler = {
 
   authenticate(email, password, callback) {
     if (callback == null) {
-      callback = function() {}
+      callback = function () {}
     }
     AuthenticationManager.authenticate({ email }, password, callback)
   },
 
   activateSudoMode(userId, callback) {
     if (callback == null) {
-      callback = function(err) {}
+      callback = function (err) {}
     }
     if (userId == null) {
       return callback(new Error('[SudoMode] user must be supplied'))
@@ -50,7 +50,7 @@ module.exports = SudoModeHandler = {
 
   clearSudoMode(userId, callback) {
     if (callback == null) {
-      callback = function(err) {}
+      callback = function (err) {}
     }
     if (userId == null) {
       return callback(new Error('[SudoMode] user must be supplied'))
@@ -61,12 +61,12 @@ module.exports = SudoModeHandler = {
 
   isSudoModeActive(userId, callback) {
     if (callback == null) {
-      callback = function(err, isActive) {}
+      callback = function (err, isActive) {}
     }
     if (userId == null) {
       return callback(new Error('[SudoMode] user must be supplied'))
     }
-    return rclient.get(SudoModeHandler._buildKey(userId), function(
+    return rclient.get(SudoModeHandler._buildKey(userId), function (
       err,
       result
     ) {

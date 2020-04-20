@@ -7,4 +7,4 @@ define([
   './controllers/AdminGraphController',
   './controllers/AdminGraphController',
   './controllers/AdminProjectController'
-], function() {})
+], function () {})

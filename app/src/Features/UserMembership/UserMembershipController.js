@@ -18,11 +18,11 @@ const EmailHelper = require('../Helpers/EmailHelper')
 module.exports = {
   index(req, res, next) {
     const { entity, entityConfig } = req
-    return entity.fetchV1Data(function(error, entity) {
+    return entity.fetchV1Data(function (error, entity) {
       if (error != null) {
         return next(error)
       }
-      return UserMembershipHandler.getUsers(entity, entityConfig, function(
+      return UserMembershipHandler.getUsers(entity, entityConfig, function (
         error,
         users
       ) {
@@ -65,7 +65,7 @@ module.exports = {
       return next(new Errors.NotFoundError('Cannot add users to entity'))
     }
 
-    return UserMembershipHandler.addUser(entity, entityConfig, email, function(
+    return UserMembershipHandler.addUser(entity, entityConfig, email, function (
       error,
       user
     ) {
@@ -114,7 +114,7 @@ module.exports = {
       entity,
       entityConfig,
       userId,
-      function(error, user) {
+      function (error, user) {
         if (error != null ? error.isAdmin : undefined) {
           return res.status(400).json({
             error: {
@@ -134,7 +134,7 @@ module.exports = {
   exportCsv(req, res, next) {
     const { entity, entityConfig } = req
 
-    return UserMembershipHandler.getUsers(entity, entityConfig, function(
+    return UserMembershipHandler.getUsers(entity, entityConfig, function (
       error,
       users
     ) {
@@ -162,7 +162,7 @@ module.exports = {
     const entityId = req.params.id
     const entityConfig = req.entityConfig
 
-    return UserMembershipHandler.createEntity(entityId, entityConfig, function(
+    return UserMembershipHandler.createEntity(entityId, entityConfig, function (
       error,
       entity
     ) {

@@ -21,14 +21,14 @@ require('./helpers/MockDocstoreApi')
 require('./helpers/MockDocUpdaterApi')
 require('./helpers/MockProjectHistoryApi')
 
-const assert_has_common_headers = function(response) {
+const assert_has_common_headers = function (response) {
   const { headers } = response
   assert.equal(headers['x-download-options'], 'noopen')
   assert.equal(headers['x-xss-protection'], '1; mode=block')
   return assert.equal(headers['referrer-policy'], 'origin-when-cross-origin')
 }
 
-const assert_has_cache_headers = function(response) {
+const assert_has_cache_headers = function (response) {
   const { headers } = response
   assert.equal(headers['surrogate-control'], 'no-store')
   assert.equal(
@@ -39,7 +39,7 @@ const assert_has_cache_headers = function(response) {
   return assert.equal(headers.expires, '0')
 }
 
-const assert_has_no_cache_headers = function(response) {
+const assert_has_no_cache_headers = function (response) {
   const { headers } = response
   assert.isUndefined(headers['surrogate-control'])
   assert.isUndefined(headers['cache-control'])
@@ -47,39 +47,39 @@ const assert_has_no_cache_headers = function(response) {
   return assert.isUndefined(headers.expires)
 }
 
-describe('SecurityHeaders', function() {
-  beforeEach(function() {
+describe('SecurityHeaders', function () {
+  beforeEach(function () {
     return (this.user = new User())
   })
 
-  it('should not have x-powered-by header', function(done) {
+  it('should not have x-powered-by header', function (done) {
     return request.get('/', (err, res, body) => {
       assert.isUndefined(res.headers['x-powered-by'])
       return done()
     })
   })
 
-  it('should have all common headers', function(done) {
+  it('should have all common headers', function (done) {
     return request.get('/', (err, res, body) => {
       assert_has_common_headers(res)
       return done()
     })
   })
 
-  it('should not have cache headers on public pages', function(done) {
+  it('should not have cache headers on public pages', function (done) {
     return request.get('/', (err, res, body) => {
       assert_has_no_cache_headers(res)
       return done()
     })
   })
 
-  it('should have cache headers when user is logged in', function(done) {
+  it('should have cache headers when user is logged in', function (done) {
     this.timeout(5000)
     return async.series(
       [
-        cb => this.user.login(cb),
-        cb => this.user.request.get('/', cb),
-        cb => this.user.logout(cb)
+        (cb) => this.user.login(cb),
+        (cb) => this.user.request.get('/', cb),
+        (cb) => this.user.logout(cb)
       ],
       (err, results) => {
         const main_response = results[1][0]
@@ -89,12 +89,12 @@ describe('SecurityHeaders', function() {
     )
   })
 
-  it('should have cache headers on project page', function(done) {
+  it('should have cache headers on project page', function (done) {
     this.timeout(5000)
     return async.series(
       [
-        cb => this.user.login(cb),
-        cb => {
+        (cb) => this.user.login(cb),
+        (cb) => {
           return this.user.createProject(
             'public-project',
             (error, project_id) => {
@@ -106,7 +106,7 @@ describe('SecurityHeaders', function() {
             }
           )
         },
-        cb => this.user.logout(cb)
+        (cb) => this.user.logout(cb)
       ],
       (err, results) => {
         return request.get(`/project/${this.project_id}`, (err, res, body) => {

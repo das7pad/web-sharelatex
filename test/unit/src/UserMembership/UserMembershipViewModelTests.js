@@ -22,8 +22,8 @@ const modulePath =
   '../../../../app/src/Features/UserMembership/UserMembershipViewModel'
 const SandboxedModule = require('sandboxed-module')
 
-describe('UserMembershipViewModel', function() {
-  beforeEach(function() {
+describe('UserMembershipViewModel', function () {
+  beforeEach(function () {
     this.UserGetter = { getUser: sinon.stub() }
     this.UserMembershipViewModel = SandboxedModule.require(modulePath, {
       globals: {
@@ -42,8 +42,8 @@ describe('UserMembershipViewModel', function() {
     }
   })
 
-  describe('build', function() {
-    it('build email', function() {
+  describe('build', function () {
+    it('build email', function () {
       const viewModel = this.UserMembershipViewModel.build(this.email)
       return expect(viewModel).to.deep.equal({
         email: this.email,
@@ -54,7 +54,7 @@ describe('UserMembershipViewModel', function() {
       })
     })
 
-    it('build user', function() {
+    it('build user', function () {
       const viewModel = this.UserMembershipViewModel.build(this.user)
       expect(viewModel._id).to.equal(this.user._id)
       expect(viewModel.email).to.equal(this.user.email)
@@ -62,12 +62,12 @@ describe('UserMembershipViewModel', function() {
     })
   })
 
-  describe('build async', function() {
-    beforeEach(function() {
+  describe('build async', function () {
+    beforeEach(function () {
       return (this.UserMembershipViewModel.build = sinon.stub())
     })
 
-    it('build email', function(done) {
+    it('build email', function (done) {
       return this.UserMembershipViewModel.buildAsync(
         this.email,
         (error, viewModel) => {
@@ -77,7 +77,7 @@ describe('UserMembershipViewModel', function() {
       )
     })
 
-    it('build user', function(done) {
+    it('build user', function (done) {
       return this.UserMembershipViewModel.buildAsync(
         this.user,
         (error, viewModel) => {
@@ -87,7 +87,7 @@ describe('UserMembershipViewModel', function() {
       )
     })
 
-    it('build user id', function(done) {
+    it('build user id', function (done) {
       this.UserGetter.getUser.yields(null, this.user)
       return this.UserMembershipViewModel.buildAsync(
         ObjectId(),
@@ -104,7 +104,7 @@ describe('UserMembershipViewModel', function() {
       )
     })
 
-    it('build user id with error', function(done) {
+    it('build user id with error', function (done) {
       this.UserGetter.getUser.yields(new Error('nope'))
       const userId = ObjectId()
       return this.UserMembershipViewModel.buildAsync(

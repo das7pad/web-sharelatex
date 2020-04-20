@@ -20,7 +20,7 @@ const Errors = require('../Errors/Errors')
 
 module.exports = TeamInvitesHandler = {
   getInvite(token, callback) {
-    return Subscription.findOne({ 'teamInvites.token': token }, function(
+    return Subscription.findOne({ 'teamInvites.token': token }, function (
       err,
       subscription
     ) {
@@ -31,7 +31,7 @@ module.exports = TeamInvitesHandler = {
         return callback(new Errors.NotFoundError('team not found'))
       }
 
-      const invite = subscription.teamInvites.find(i => i.token === token)
+      const invite = subscription.teamInvites.find((i) => i.token === token)
       callback(null, invite, subscription)
     })
   },
@@ -41,12 +41,12 @@ module.exports = TeamInvitesHandler = {
     if (!email) {
       return callback(new Error('invalid email'))
     }
-    return UserGetter.getUser(teamManagerId, function(error, teamManager) {
+    return UserGetter.getUser(teamManagerId, function (error, teamManager) {
       if (error) {
         return callback(error)
       }
 
-      removeLegacyInvite(subscription.id, email, function(error) {
+      removeLegacyInvite(subscription.id, email, function (error) {
         if (error) {
           return callback(error)
         }
@@ -56,7 +56,7 @@ module.exports = TeamInvitesHandler = {
   },
 
   importInvite(subscription, inviterName, email, token, sentAt, callback) {
-    checkIfInviteIsPossible(subscription, email, function(
+    checkIfInviteIsPossible(subscription, email, function (
       error,
       possible,
       reason
@@ -80,7 +80,7 @@ module.exports = TeamInvitesHandler = {
   },
 
   acceptInvite(token, userId, callback) {
-    TeamInvitesHandler.getInvite(token, function(err, invite, subscription) {
+    TeamInvitesHandler.getInvite(token, function (err, invite, subscription) {
       if (err) {
         return callback(err)
       }
@@ -88,7 +88,7 @@ module.exports = TeamInvitesHandler = {
         return callback(new Errors.NotFoundError('invite not found'))
       }
 
-      SubscriptionUpdater.addUserToGroup(subscription._id, userId, function(
+      SubscriptionUpdater.addUserToGroup(subscription._id, userId, function (
         err
       ) {
         if (err) {
@@ -112,7 +112,7 @@ module.exports = TeamInvitesHandler = {
   // email is in Subscription.invited_emails when they join. We'll remove this
   // after a short while.
   createTeamInvitesForLegacyInvitedEmail(email, callback) {
-    SubscriptionLocator.getGroupsWithEmailInvite(email, function(err, teams) {
+    SubscriptionLocator.getGroupsWithEmailInvite(email, function (err, teams) {
       if (err) {
         return callback(err)
       }
@@ -127,8 +127,8 @@ module.exports = TeamInvitesHandler = {
   }
 }
 
-var createInvite = function(subscription, email, inviter, callback) {
-  checkIfInviteIsPossible(subscription, email, function(
+var createInvite = function (subscription, email, inviter, callback) {
+  checkIfInviteIsPossible(subscription, email, function (
     error,
     possible,
     reason
@@ -142,19 +142,19 @@ var createInvite = function(subscription, email, inviter, callback) {
 
     // don't send invites when inviting self; add user directly to the group
     const isInvitingSelf = inviter.emails.some(
-      emailData => emailData.email === email
+      (emailData) => emailData.email === email
     )
     if (isInvitingSelf) {
       return SubscriptionUpdater.addUserToGroup(
         subscription._id,
         inviter._id,
-        err => {
+        (err) => {
           if (err) {
             return callback(err)
           }
 
           // legacy: remove any invite that might have been created in the past
-          removeInviteFromTeam(subscription._id, email, error => {
+          removeInviteFromTeam(subscription._id, email, (error) => {
             const inviteUserData = {
               email: inviter.email,
               first_name: inviter.first_name,
@@ -168,7 +168,9 @@ var createInvite = function(subscription, email, inviter, callback) {
     }
 
     const inviterName = getInviterName(inviter)
-    let invite = subscription.teamInvites.find(invite => invite.email === email)
+    let invite = subscription.teamInvites.find(
+      (invite) => invite.email === email
+    )
 
     if (invite) {
       invite.sentAt = new Date()
@@ -182,7 +184,7 @@ var createInvite = function(subscription, email, inviter, callback) {
       subscription.teamInvites.push(invite)
     }
 
-    subscription.save(function(error) {
+    subscription.save(function (error) {
       if (error) {
         return callback(error)
       }
@@ -193,7 +195,7 @@ var createInvite = function(subscription, email, inviter, callback) {
         acceptInviteUrl: `${settings.siteUrl}/subscription/invites/${invite.token}/`,
         appName: settings.appName
       }
-      EmailHandler.sendEmail('verifyEmailToJoinTeam', opts, error => {
+      EmailHandler.sendEmail('verifyEmailToJoinTeam', opts, (error) => {
         Object.assign(invite, { invite: true })
         callback(error, invite)
       })
@@ -201,14 +203,14 @@ var createInvite = function(subscription, email, inviter, callback) {
   })
 }
 
-var removeInviteFromTeam = function(subscriptionId, email, callback) {
+var removeInviteFromTeam = function (subscriptionId, email, callback) {
   const searchConditions = { _id: new ObjectId(subscriptionId.toString()) }
   const removeInvite = { $pull: { teamInvites: { email } } }
 
   async.series(
     [
-      cb => Subscription.updateOne(searchConditions, removeInvite, cb),
-      cb => removeLegacyInvite(subscriptionId, email, cb)
+      (cb) => Subscription.updateOne(searchConditions, removeInvite, cb),
+      (cb) => removeLegacyInvite(subscriptionId, email, cb)
     ],
     callback
   )
@@ -227,7 +229,7 @@ var removeLegacyInvite = (subscriptionId, email, callback) =>
     callback
   )
 
-var checkIfInviteIsPossible = function(subscription, email, callback) {
+var checkIfInviteIsPossible = function (subscription, email, callback) {
   if (!subscription.groupPlan) {
     logger.log(
       { subscriptionId: subscription.id },
@@ -244,7 +246,7 @@ var checkIfInviteIsPossible = function(subscription, email, callback) {
     return callback(null, false, { limitReached: true })
   }
 
-  UserGetter.getUserByAnyEmail(email, function(error, existingUser) {
+  UserGetter.getUserByAnyEmail(email, function (error, existingUser) {
     if (error) {
       return callback(error)
     }
@@ -253,7 +255,7 @@ var checkIfInviteIsPossible = function(subscription, email, callback) {
     }
 
     const existingMember = subscription.member_ids.find(
-      memberId => memberId.toString() === existingUser._id.toString()
+      (memberId) => memberId.toString() === existingUser._id.toString()
     )
 
     if (existingMember) {
@@ -268,7 +270,7 @@ var checkIfInviteIsPossible = function(subscription, email, callback) {
   })
 }
 
-var getInviterName = function(inviter) {
+var getInviterName = function (inviter) {
   let inviterName
   if (inviter.first_name && inviter.last_name) {
     inviterName = `${inviter.first_name} ${inviter.last_name} (${inviter.email})`

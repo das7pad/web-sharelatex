@@ -5,35 +5,35 @@ const Institution = require('./helpers/Institution')
 const Subscription = require('./helpers/Subscription')
 const Publisher = require('./helpers/Publisher')
 
-describe('UserMembershipAuthorization', function() {
+describe('UserMembershipAuthorization', function () {
   this.timeout(5000)
 
-  beforeEach(function(done) {
+  beforeEach(function (done) {
     this.user = new User()
     async.series([this.user.ensureUserExists.bind(this.user)], done)
   })
 
-  describe('group', function() {
-    beforeEach(function(done) {
+  describe('group', function () {
+    beforeEach(function (done) {
       this.subscription = new Subscription({
         groupPlan: true
       })
       async.series(
         [
           this.subscription.ensureExists.bind(this.subscription),
-          cb => this.user.login(cb)
+          (cb) => this.user.login(cb)
         ],
         done
       )
     })
 
-    describe('users management', function() {
-      it('should allow managers only', function(done) {
+    describe('users management', function () {
+      it('should allow managers only', function (done) {
         const url = `/manage/groups/${this.subscription._id}/members`
         async.series(
           [
             expectAccess(this.user, url, 403),
-            cb => this.subscription.setManagerIds([this.user._id], cb),
+            (cb) => this.subscription.setManagerIds([this.user._id], cb),
             expectAccess(this.user, url, 200)
           ],
           done
@@ -41,13 +41,13 @@ describe('UserMembershipAuthorization', function() {
       })
     })
 
-    describe('managers management', function() {
-      it('should allow managers only', function(done) {
+    describe('managers management', function () {
+      it('should allow managers only', function (done) {
         const url = `/manage/groups/${this.subscription._id}/managers`
         async.series(
           [
             expectAccess(this.user, url, 403),
-            cb => this.subscription.setManagerIds([this.user._id], cb),
+            (cb) => this.subscription.setManagerIds([this.user._id], cb),
             expectAccess(this.user, url, 200)
           ],
           done
@@ -56,20 +56,20 @@ describe('UserMembershipAuthorization', function() {
     })
   })
 
-  describe('institution', function() {
-    beforeEach(function(done) {
+  describe('institution', function () {
+    beforeEach(function (done) {
       this.institution = new Institution()
       async.series([this.institution.ensureExists.bind(this.institution)], done)
     })
 
-    describe('users management', function() {
-      it('should allow managers only', function(done) {
+    describe('users management', function () {
+      it('should allow managers only', function (done) {
         const url = `/manage/institutions/${this.institution.v1Id}/managers`
         async.series(
           [
             this.user.login.bind(this.user),
             expectAccess(this.user, url, 403),
-            cb => this.institution.setManagerIds([this.user._id], cb),
+            (cb) => this.institution.setManagerIds([this.user._id], cb),
             expectAccess(this.user, url, 200)
           ],
           done
@@ -77,14 +77,14 @@ describe('UserMembershipAuthorization', function() {
       })
     })
 
-    describe('creation', function() {
-      it('should allow staff only', function(done) {
+    describe('creation', function () {
+      it('should allow staff only', function (done) {
         const url = `/entities/institution/create/foo`
         async.series(
           [
             this.user.login.bind(this.user),
             expectAccess(this.user, url, 403),
-            cb => this.user.ensureStaffAccess('institutionManagement', cb),
+            (cb) => this.user.ensureStaffAccess('institutionManagement', cb),
             this.user.login.bind(this.user),
             expectAccess(this.user, url, 200)
           ],
@@ -94,25 +94,25 @@ describe('UserMembershipAuthorization', function() {
     })
   })
 
-  describe('publisher', function() {
-    beforeEach(function(done) {
+  describe('publisher', function () {
+    beforeEach(function (done) {
       this.publisher = new Publisher({})
       async.series(
         [
           this.publisher.ensureExists.bind(this.publisher),
-          cb => this.user.login(cb)
+          (cb) => this.user.login(cb)
         ],
         done
       )
     })
 
-    describe('managers management', function() {
-      it('should allow managers only', function(done) {
+    describe('managers management', function () {
+      it('should allow managers only', function (done) {
         const url = `/manage/publishers/${this.publisher.slug}/managers`
         async.series(
           [
             expectAccess(this.user, url, 403),
-            cb => this.publisher.setManagerIds([this.user._id], cb),
+            (cb) => this.publisher.setManagerIds([this.user._id], cb),
             expectAccess(this.user, url, 200)
           ],
           done
@@ -120,14 +120,14 @@ describe('UserMembershipAuthorization', function() {
       })
     })
 
-    describe('creation', function() {
-      it('should redirect staff only', function(done) {
+    describe('creation', function () {
+      it('should redirect staff only', function (done) {
         const url = `/manage/publishers/foo/managers`
         async.series(
           [
             this.user.login.bind(this.user),
             expectAccess(this.user, url, 404),
-            cb => this.user.ensureStaffAccess('publisherManagement', cb),
+            (cb) => this.user.ensureStaffAccess('publisherManagement', cb),
             this.user.login.bind(this.user),
             expectAccess(this.user, url, 302, /\/create/)
           ],
@@ -135,12 +135,12 @@ describe('UserMembershipAuthorization', function() {
         )
       })
 
-      it('should allow staff only', function(done) {
+      it('should allow staff only', function (done) {
         const url = `/entities/publisher/create/foo`
         async.series(
           [
             expectAccess(this.user, url, 403),
-            cb => this.user.ensureStaffAccess('publisherManagement', cb),
+            (cb) => this.user.ensureStaffAccess('publisherManagement', cb),
             this.user.login.bind(this.user),
             expectAccess(this.user, url, 200)
           ],
@@ -152,7 +152,7 @@ describe('UserMembershipAuthorization', function() {
 })
 
 function expectAccess(user, url, status, pattern) {
-  return callback => {
+  return (callback) => {
     user.request.get({ url }, (error, response, body) => {
       if (error) {
         return callback(error)

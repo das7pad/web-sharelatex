@@ -31,13 +31,13 @@ module.exports = MockRecurlyApi = {
 
   getMockSubscriptionByAccountId(accountId) {
     return this.mockSubscriptions.find(
-      mockSubscription => mockSubscription.account.id === accountId
+      (mockSubscription) => mockSubscription.account.id === accountId
     )
   },
 
   getMockSubscriptionById(uuid) {
     return this.mockSubscriptions.find(
-      mockSubscription => mockSubscription.uuid === uuid
+      (mockSubscription) => mockSubscription.uuid === uuid
     )
   },
 
@@ -131,7 +131,7 @@ module.exports = MockRecurlyApi = {
 `)
     })
 
-    return app.listen(6034, error => {
+    return app.listen(6034, (error) => {
       if (error != null) {
         throw error
       }

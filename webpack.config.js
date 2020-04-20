@@ -237,7 +237,7 @@ module.exports = {
     // Generate a manifest.json file which is used by the backend to map the
     // base filenames to the generated output filenames
     new ManifestPlugin({
-      filter: function(spec) {
+      filter: function (spec) {
         if (/cmaps/.test(spec.path)) {
           // omit the vendored cmaps
           return
@@ -269,7 +269,7 @@ module.exports = {
         // optional package ace files - minified: keymaps, modes, themes, worker
         'ace-builds/src-min-noconflict'
       ]
-        .map(path => {
+        .map((path) => {
           return { from: `node_modules/${path}`, to: `${VENDOR_PATH}/${path}` }
         })
         .concat(
@@ -280,7 +280,7 @@ module.exports = {
             // sentry sdk
             `${PackageVersions.lib('sentry')}/bundle.min.js`,
             `${PackageVersions.lib('sentry')}/bundle.min.js.map`
-          ].map(path => {
+          ].map((path) => {
             return {
               from: `frontend/js/vendor/libs/${path}`,
               to: `${VENDOR_PATH}/${path}`
@@ -291,7 +291,7 @@ module.exports = {
           [
             // open-in-overleaf
             'highlight-github.css'
-          ].map(path => {
+          ].map((path) => {
             return {
               from: `frontend/stylesheets/vendor/${path}`,
               to: `${VENDOR_PATH}/stylesheets/${path}`

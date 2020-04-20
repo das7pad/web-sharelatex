@@ -21,11 +21,12 @@ const ProjectLocator = {
     const elementType = sanitizeTypeOfElement(type)
 
     let count = 0
-    const endOfBranch = function() {
+    const endOfBranch = function () {
       if (--count === 0) {
         logger.warn(
-          `element ${elementId} could not be found for project ${projectId ||
-            project._id}`
+          `element ${elementId} could not be found for project ${
+            projectId || project._id
+          }`
         )
         callback(new Errors.NotFoundError('entity not found'))
       }
@@ -35,7 +36,7 @@ const ProjectLocator = {
       count++
       const element = _.find(
         searchFolder[elementType],
-        el => (el != null ? el._id : undefined) + '' === elementId + ''
+        (el) => (el != null ? el._id : undefined) + '' === elementId + ''
       ) // need to ToString both id's for robustness
       if (
         element == null &&
@@ -71,7 +72,7 @@ const ProjectLocator = {
 
     const path = { fileSystem: '', mongo: 'rootFolder.0' }
 
-    const startSearch = project => {
+    const startSearch = (project) => {
       if (elementId + '' === project.rootFolder[0]._id + '') {
         callback(null, project.rootFolder[0], path, null)
       } else {
@@ -99,7 +100,7 @@ const ProjectLocator = {
   },
 
   findRootDoc(opts, callback) {
-    const getRootDoc = project => {
+    const getRootDoc = (project) => {
       if (project.rootDoc_id != null) {
         this.findElement(
           { project, element_id: project.rootDoc_id, type: 'docs' },
@@ -259,7 +260,7 @@ const ProjectLocator = {
     const rootFolder = project.rootFolder[0]
 
     const jobs = []
-    jobs.push(cb => getParentFolder(rootFolder, foldersList, 0, cb))
+    jobs.push((cb) => getParentFolder(rootFolder, foldersList, 0, cb))
     jobs.push((folder, cb) => getEntity(folder, needleName, cb))
     async.waterfall(jobs, callback)
   },
@@ -277,7 +278,7 @@ const ProjectLocator = {
         projectName = projectName.toLowerCase()
         const project = _.find(
           projects,
-          project =>
+          (project) =>
             project.name.toLowerCase() === projectName &&
             !ProjectHelper.isArchivedOrTrashed(project, userId)
         )

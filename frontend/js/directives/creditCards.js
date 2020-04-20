@@ -13,8 +13,8 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../base'], function(App) {
-  App.factory('ccUtils', function() {
+define(['../base'], function (App) {
+  App.factory('ccUtils', function () {
     const defaultFormat = /(\d{1,4})/g
     const defaultInputFormat = /(?:^|\s)(\d{4})$/
 
@@ -78,7 +78,7 @@ define(['../base'], function(App) {
       }
     ]
 
-    const cardFromNumber = function(num) {
+    const cardFromNumber = function (num) {
       num = (num + '').replace(/\D/g, '')
       for (const card of Array.from(cards)) {
         for (const pattern of Array.from(card.patterns)) {
@@ -90,7 +90,7 @@ define(['../base'], function(App) {
       }
     }
 
-    const cardFromType = function(type) {
+    const cardFromType = function (type) {
       for (const card of Array.from(cards)) {
         if (card.type === type) {
           return card
@@ -98,14 +98,14 @@ define(['../base'], function(App) {
       }
     }
 
-    const cardType = function(num) {
+    const cardType = function (num) {
       if (!num) {
         return null
       }
-      return __guard__(cardFromNumber(num), x => x.type) || null
+      return __guard__(cardFromNumber(num), (x) => x.type) || null
     }
 
-    const formatCardNumber = function(num) {
+    const formatCardNumber = function (num) {
       num = num.replace(/\D/g, '')
       const card = cardFromNumber(num)
       if (!card) {
@@ -116,19 +116,19 @@ define(['../base'], function(App) {
       num = num.slice(0, upperLength)
 
       if (card.format.global) {
-        return __guard__(num.match(card.format), x => x.join(' '))
+        return __guard__(num.match(card.format), (x) => x.join(' '))
       } else {
         let groups = card.format.exec(num)
         if (groups == null) {
           return
         }
         groups.shift()
-        groups = $.grep(groups, n => n) // Filter empty groups
+        groups = $.grep(groups, (n) => n) // Filter empty groups
         return groups.join(' ')
       }
     }
 
-    const formatExpiry = function(expiry) {
+    const formatExpiry = function (expiry) {
       const parts = expiry.match(/^\D*(\d{1,2})(\D+)?(\d{1,4})?/)
       if (!parts) {
         return ''
@@ -153,7 +153,7 @@ define(['../base'], function(App) {
       return mon + sep + year
     }
 
-    const parseExpiry = function(value) {
+    const parseExpiry = function (value) {
       if (value == null) {
         value = ''
       }
@@ -191,8 +191,8 @@ define(['../base'], function(App) {
     }
   })
 
-  App.factory('ccFormat', function(ccUtils, $filter) {
-    const hasTextSelected = function($target) {
+  App.factory('ccFormat', function (ccUtils, $filter) {
+    const hasTextSelected = function ($target) {
       // If some text is selected
       if (
         $target.prop('selectionStart') != null &&
@@ -207,7 +207,7 @@ define(['../base'], function(App) {
           typeof document !== 'undefined' && document !== null
             ? document.selection
             : undefined,
-          x => x.createRange
+          (x) => x.createRange
         ) != null
       ) {
         if (document.selection.createRange().text) {
@@ -218,7 +218,7 @@ define(['../base'], function(App) {
       return false
     }
 
-    const safeVal = function(value, $target) {
+    const safeVal = function (value, $target) {
       let cursor
       try {
         cursor = $target.prop('selectionStart')
@@ -270,7 +270,7 @@ define(['../base'], function(App) {
     }
 
     // Replace Full-Width Chars
-    const replaceFullWidthChars = function(str) {
+    const replaceFullWidthChars = function (str) {
       if (str == null) {
         str = ''
       }
@@ -294,9 +294,9 @@ define(['../base'], function(App) {
     }
 
     // Format Numeric
-    const reFormatNumeric = function(e) {
+    const reFormatNumeric = function (e) {
       const $target = $(e.currentTarget)
-      return setTimeout(function() {
+      return setTimeout(function () {
         let value = $target.val()
         value = replaceFullWidthChars(value)
         value = value.replace(/\D/g, '')
@@ -305,9 +305,9 @@ define(['../base'], function(App) {
     }
 
     // Format Card Number
-    const reFormatCardNumber = function(e) {
+    const reFormatCardNumber = function (e) {
       const $target = $(e.currentTarget)
-      return setTimeout(function() {
+      return setTimeout(function () {
         let value = $target.val()
         value = replaceFullWidthChars(value)
         value = ccUtils.formatCardNumber(value)
@@ -315,7 +315,7 @@ define(['../base'], function(App) {
       })
     }
 
-    const formatCardNumber = function(e) {
+    const formatCardNumber = function (e) {
       // Only format if input is a number
       let re
       const digit = String.fromCharCode(e.which)
@@ -363,7 +363,7 @@ define(['../base'], function(App) {
       }
     }
 
-    const formatBackCardNumber = function(e) {
+    const formatBackCardNumber = function (e) {
       const $target = $(e.currentTarget)
       const value = $target.val()
 
@@ -391,7 +391,7 @@ define(['../base'], function(App) {
       }
     }
 
-    const getFormattedCardNumber = function(num) {
+    const getFormattedCardNumber = function (num) {
       num = num.replace(/\D/g, '')
       const card = ccUtils.fromNumber(num)
       if (!card) {
@@ -402,19 +402,19 @@ define(['../base'], function(App) {
       num = num.slice(0, upperLength)
 
       if (card.format.global) {
-        return __guard__(num.match(card.format), x => x.join(' '))
+        return __guard__(num.match(card.format), (x) => x.join(' '))
       } else {
         let groups = card.format.exec(num)
         if (groups == null) {
           return
         }
         groups.shift()
-        groups = $.grep(groups, n => n) // Filter empty groups
+        groups = $.grep(groups, (n) => n) // Filter empty groups
         return groups.join(' ')
       }
     }
 
-    const parseCardNumber = function(value) {
+    const parseCardNumber = function (value) {
       if (value != null) {
         return value.replace(/\s/g, '')
       } else {
@@ -423,9 +423,9 @@ define(['../base'], function(App) {
     }
 
     // Format Expiry
-    const reFormatExpiry = function(e) {
+    const reFormatExpiry = function (e) {
       const $target = $(e.currentTarget)
-      return setTimeout(function() {
+      return setTimeout(function () {
         let value = $target.val()
         value = replaceFullWidthChars(value)
         value = ccUtils.formatExpiry(value)
@@ -433,7 +433,7 @@ define(['../base'], function(App) {
       })
     }
 
-    const formatExpiry = function(e) {
+    const formatExpiry = function (e) {
       // Only format if input is a number
       const digit = String.fromCharCode(e.which)
       if (!/^\d+$/.test(digit)) {
@@ -448,7 +448,7 @@ define(['../base'], function(App) {
         return setTimeout(() => $target.val(`0${val} / `))
       } else if (/^\d\d$/.test(val)) {
         e.preventDefault()
-        return setTimeout(function() {
+        return setTimeout(function () {
           // Split for months where we have the second digit > 2 (past 12) and turn
           // that into (m1)(m2) => 0(m1) / (m2)
           const m1 = parseInt(val[0], 10)
@@ -462,7 +462,7 @@ define(['../base'], function(App) {
       }
     }
 
-    const formatForwardExpiry = function(e) {
+    const formatForwardExpiry = function (e) {
       const digit = String.fromCharCode(e.which)
       if (!/^\d+$/.test(digit)) {
         return
@@ -476,7 +476,7 @@ define(['../base'], function(App) {
       }
     }
 
-    const formatForwardSlash = function(e) {
+    const formatForwardSlash = function (e) {
       const which = String.fromCharCode(e.which)
       if (which !== '/' && which !== ' ') {
         return
@@ -490,7 +490,7 @@ define(['../base'], function(App) {
       }
     }
 
-    const formatBackExpiry = function(e) {
+    const formatBackExpiry = function (e) {
       const $target = $(e.currentTarget)
       const value = $target.val()
 
@@ -514,7 +514,7 @@ define(['../base'], function(App) {
       }
     }
 
-    const parseExpiry = function(value) {
+    const parseExpiry = function (value) {
       if (value != null) {
         const dateAsObj = ccUtils.parseExpiry(value)
 
@@ -529,9 +529,9 @@ define(['../base'], function(App) {
     }
 
     // Format CVC
-    const reFormatCVC = function(e) {
+    const reFormatCVC = function (e) {
       const $target = $(e.currentTarget)
-      return setTimeout(function() {
+      return setTimeout(function () {
         let value = $target.val()
         value = replaceFullWidthChars(value)
         value = value.replace(/\D/g, '').slice(0, 4)
@@ -540,7 +540,7 @@ define(['../base'], function(App) {
     }
 
     // Restrictions
-    const restrictNumeric = function(e) {
+    const restrictNumeric = function (e) {
       // Key event is for a browser shortcut
       if (e.metaKey || e.ctrlKey) {
         return true
@@ -567,7 +567,7 @@ define(['../base'], function(App) {
       return !!/[\d\s]/.test(input)
     }
 
-    const restrictCardNumber = function(e) {
+    const restrictCardNumber = function (e) {
       const $target = $(e.currentTarget)
       const digit = String.fromCharCode(e.which)
       if (!/^\d+$/.test(digit)) {
@@ -590,7 +590,7 @@ define(['../base'], function(App) {
       }
     }
 
-    const restrictExpiry = function(e) {
+    const restrictExpiry = function (e) {
       const $target = $(e.currentTarget)
       const digit = String.fromCharCode(e.which)
       if (!/^\d+$/.test(digit)) {
@@ -609,7 +609,7 @@ define(['../base'], function(App) {
       }
     }
 
-    const restrictCVC = function(e) {
+    const restrictCVC = function (e) {
       const $target = $(e.currentTarget)
       const digit = String.fromCharCode(e.which)
       if (!/^\d+$/.test(digit)) {
@@ -624,13 +624,13 @@ define(['../base'], function(App) {
       return val.length <= 4
     }
 
-    const setCardType = function(e) {
+    const setCardType = function (e) {
       const $target = $(e.currentTarget)
       const val = $target.val()
       const cardType = ccUtils.cardType(val) || 'unknown'
 
       if (!$target.hasClass(cardType)) {
-        const allTypes = Array.from(cards).map(card => card.type)
+        const allTypes = Array.from(cards).map((card) => card.type)
 
         $target.removeClass('unknown')
         $target.removeClass(allTypes.join(' '))
@@ -665,7 +665,7 @@ define(['../base'], function(App) {
     }
   })
 
-  App.directive('ccFormatExpiry', ccFormat => ({
+  App.directive('ccFormatExpiry', (ccFormat) => ({
     restrict: 'A',
     require: 'ngModel',
     link(scope, el, attrs, ngModel) {
@@ -684,7 +684,7 @@ define(['../base'], function(App) {
     }
   }))
 
-  App.directive('ccFormatCardNumber', ccFormat => ({
+  App.directive('ccFormatCardNumber', (ccFormat) => ({
     restrict: 'A',
     require: 'ngModel',
     link(scope, el, attrs, ngModel) {
@@ -699,7 +699,7 @@ define(['../base'], function(App) {
     }
   }))
 
-  return App.directive('ccFormatSecCode', ccFormat => ({
+  return App.directive('ccFormatSecCode', (ccFormat) => ({
     restrict: 'A',
     require: 'ngModel',
     link(scope, el, attrs, ngModel) {

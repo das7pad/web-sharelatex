@@ -29,7 +29,7 @@ module.exports = {
     return SubscriptionGroupHandler.removeUserFromGroup(
       subscription._id,
       userToRemove_id,
-      function(err) {
+      function (err) {
         if (err != null) {
           logger.warn(
             { err, subscriptionId: subscription._id, userToRemove_id },
@@ -45,7 +45,7 @@ module.exports = {
   removeSelfFromGroup(req, res, next) {
     const adminUserId = req.query.admin_user_id
     const userToRemove_id = AuthenticationController.getLoggedInUserId(req)
-    return getManagedSubscription(adminUserId, function(error, subscription) {
+    return getManagedSubscription(adminUserId, function (error, subscription) {
       if (error != null) {
         return next(error)
       }
@@ -53,7 +53,7 @@ module.exports = {
       return SubscriptionGroupHandler.removeUserFromGroup(
         subscription._id,
         userToRemove_id,
-        function(err) {
+        function (err) {
           if (err != null) {
             logger.err(
               { err, userToRemove_id, adminUserId },
@@ -70,7 +70,7 @@ module.exports = {
   // legacy route
   redirectToSubscriptionGroupAdminPage(req, res, next) {
     const user_id = AuthenticationController.getLoggedInUserId(req)
-    return getManagedSubscription(user_id, function(error, subscription) {
+    return getManagedSubscription(user_id, function (error, subscription) {
       if (error != null) {
         return next(error)
       }
@@ -83,7 +83,7 @@ module.exports = {
 }
 
 var getManagedSubscription = (managerId, callback) =>
-  SubscriptionLocator.findManagedSubscription(managerId, function(
+  SubscriptionLocator.findManagedSubscription(managerId, function (
     err,
     subscription
   ) {

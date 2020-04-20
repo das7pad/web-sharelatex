@@ -21,10 +21,10 @@ const modulePath =
   '../../../../app/src/Features/Project/ProjectOptionsHandler.js'
 const SandboxedModule = require('sandboxed-module')
 
-describe('ProjectOptionsHandler', function() {
+describe('ProjectOptionsHandler', function () {
   const project_id = '4eecaffcbffa66588e000008'
 
-  beforeEach(function() {
+  beforeEach(function () {
     let Project
     this.projectModel = Project = class Project {
       constructor(options) {}
@@ -56,9 +56,9 @@ describe('ProjectOptionsHandler', function() {
     })
   })
 
-  describe('Setting the compiler', function() {
-    it('should perform and update on mongo', function(done) {
-      this.handler.setCompiler(project_id, 'xeLaTeX', err => {
+  describe('Setting the compiler', function () {
+    it('should perform and update on mongo', function (done) {
+      this.handler.setCompiler(project_id, 'xeLaTeX', (err) => {
         const args = this.projectModel.updateOne.args[0]
         args[0]._id.should.equal(project_id)
         args[1].compiler.should.equal('xelatex')
@@ -66,16 +66,16 @@ describe('ProjectOptionsHandler', function() {
       })
     })
 
-    it('should not perform and update on mongo if it is not a recognised compiler', function(done) {
-      this.handler.setCompiler(project_id, 'something', err => {
+    it('should not perform and update on mongo if it is not a recognised compiler', function (done) {
+      this.handler.setCompiler(project_id, 'something', (err) => {
         this.projectModel.updateOne.called.should.equal(false)
         done()
       })
     })
 
-    describe('when called without arg', function() {
-      it('should callback with null', function(done) {
-        this.handler.setCompiler(project_id, null, err => {
+    describe('when called without arg', function () {
+      it('should callback with null', function (done) {
+        this.handler.setCompiler(project_id, null, (err) => {
           expect(err).to.be.undefined
           this.projectModel.updateOne.callCount.should.equal(0)
           done()
@@ -83,13 +83,13 @@ describe('ProjectOptionsHandler', function() {
       })
     })
 
-    describe('when mongo update error occurs', function() {
-      beforeEach(function() {
+    describe('when mongo update error occurs', function () {
+      beforeEach(function () {
         this.projectModel.updateOne = sinon.stub().yields('error')
       })
 
-      it('should callback with error', function(done) {
-        this.handler.setCompiler(project_id, 'xeLaTeX', err => {
+      it('should callback with error', function (done) {
+        this.handler.setCompiler(project_id, 'xeLaTeX', (err) => {
           err.should.equal('error')
           done()
         })
@@ -97,9 +97,9 @@ describe('ProjectOptionsHandler', function() {
     })
   })
 
-  describe('Setting the imageName', function() {
-    it('should perform and update on mongo', function(done) {
-      this.handler.setImageName(project_id, 'texlive-1234.5', err => {
+  describe('Setting the imageName', function () {
+    it('should perform and update on mongo', function (done) {
+      this.handler.setImageName(project_id, 'texlive-1234.5', (err) => {
         const args = this.projectModel.updateOne.args[0]
         args[0]._id.should.equal(project_id)
         args[1].imageName.should.equal('docker-repo/subdir/texlive-1234.5')
@@ -107,16 +107,16 @@ describe('ProjectOptionsHandler', function() {
       })
     })
 
-    it('should not perform and update on mongo if it is not a reconised compiler', function(done) {
-      this.handler.setImageName(project_id, 'something', err => {
+    it('should not perform and update on mongo if it is not a reconised compiler', function (done) {
+      this.handler.setImageName(project_id, 'something', (err) => {
         this.projectModel.updateOne.called.should.equal(false)
         done()
       })
     })
 
-    describe('when called without arg', function() {
-      it('should callback with null', function(done) {
-        this.handler.setImageName(project_id, null, err => {
+    describe('when called without arg', function () {
+      it('should callback with null', function (done) {
+        this.handler.setImageName(project_id, null, (err) => {
           expect(err).to.be.undefined
           this.projectModel.updateOne.callCount.should.equal(0)
           done()
@@ -124,13 +124,13 @@ describe('ProjectOptionsHandler', function() {
       })
     })
 
-    describe('when mongo update error occurs', function() {
-      beforeEach(function() {
+    describe('when mongo update error occurs', function () {
+      beforeEach(function () {
         this.projectModel.updateOne = sinon.stub().yields('error')
       })
 
-      it('should callback with error', function(done) {
-        this.handler.setImageName(project_id, 'texlive-1234.5', err => {
+      it('should callback with error', function (done) {
+        this.handler.setImageName(project_id, 'texlive-1234.5', (err) => {
           err.should.equal('error')
           done()
         })
@@ -138,9 +138,9 @@ describe('ProjectOptionsHandler', function() {
     })
   })
 
-  describe('setting the spellCheckLanguage', function() {
-    it('should perform and update on mongo', function(done) {
-      this.handler.setSpellCheckLanguage(project_id, 'fr', err => {
+  describe('setting the spellCheckLanguage', function () {
+    it('should perform and update on mongo', function (done) {
+      this.handler.setSpellCheckLanguage(project_id, 'fr', (err) => {
         const args = this.projectModel.updateOne.args[0]
         args[0]._id.should.equal(project_id)
         args[1].spellCheckLanguage.should.equal('fr')
@@ -148,27 +148,27 @@ describe('ProjectOptionsHandler', function() {
       })
     })
 
-    it('should not perform and update on mongo if it is not a reconised compiler', function(done) {
-      this.handler.setSpellCheckLanguage(project_id, 'no a lang', err => {
+    it('should not perform and update on mongo if it is not a reconised compiler', function (done) {
+      this.handler.setSpellCheckLanguage(project_id, 'no a lang', (err) => {
         this.projectModel.updateOne.called.should.equal(false)
         done()
       })
     })
 
-    it('should perform and update on mongo if the language is blank (means turn it off)', function(done) {
-      this.handler.setSpellCheckLanguage(project_id, '', err => {
+    it('should perform and update on mongo if the language is blank (means turn it off)', function (done) {
+      this.handler.setSpellCheckLanguage(project_id, '', (err) => {
         this.projectModel.updateOne.called.should.equal(true)
         done()
       })
     })
 
-    describe('when mongo update error occurs', function() {
-      beforeEach(function() {
+    describe('when mongo update error occurs', function () {
+      beforeEach(function () {
         this.projectModel.updateOne = sinon.stub().yields('error')
       })
 
-      it('should callback with error', function(done) {
-        this.handler.setSpellCheckLanguage(project_id, 'fr', err => {
+      it('should callback with error', function (done) {
+        this.handler.setSpellCheckLanguage(project_id, 'fr', (err) => {
           err.should.equal('error')
           done()
         })
@@ -176,9 +176,9 @@ describe('ProjectOptionsHandler', function() {
     })
   })
 
-  describe('setting the brandVariationId', function() {
-    it('should perform and update on mongo', function(done) {
-      this.handler.setBrandVariationId(project_id, '123', err => {
+  describe('setting the brandVariationId', function () {
+    it('should perform and update on mongo', function (done) {
+      this.handler.setBrandVariationId(project_id, '123', (err) => {
         const args = this.projectModel.updateOne.args[0]
         args[0]._id.should.equal(project_id)
         args[1].brandVariationId.should.equal('123')
@@ -186,27 +186,27 @@ describe('ProjectOptionsHandler', function() {
       })
     })
 
-    it('should not perform and update on mongo if there is no brand variation', function(done) {
-      this.handler.setBrandVariationId(project_id, null, err => {
+    it('should not perform and update on mongo if there is no brand variation', function (done) {
+      this.handler.setBrandVariationId(project_id, null, (err) => {
         this.projectModel.updateOne.called.should.equal(false)
         done()
       })
     })
 
-    it('should not perform and update on mongo if brand variation is an empty string', function(done) {
-      this.handler.setBrandVariationId(project_id, '', err => {
+    it('should not perform and update on mongo if brand variation is an empty string', function (done) {
+      this.handler.setBrandVariationId(project_id, '', (err) => {
         this.projectModel.updateOne.called.should.equal(false)
         done()
       })
     })
 
-    describe('when mongo update error occurs', function() {
-      beforeEach(function() {
+    describe('when mongo update error occurs', function () {
+      beforeEach(function () {
         this.projectModel.updateOne = sinon.stub().yields('error')
       })
 
-      it('should callback with error', function(done) {
-        this.handler.setBrandVariationId(project_id, '123', err => {
+      it('should callback with error', function (done) {
+        this.handler.setBrandVariationId(project_id, '123', (err) => {
           err.should.equal('error')
           done()
         })
@@ -214,9 +214,9 @@ describe('ProjectOptionsHandler', function() {
     })
   })
 
-  describe('unsetting the brandVariationId', function() {
-    it('should perform and update on mongo', function(done) {
-      this.handler.unsetBrandVariationId(project_id, err => {
+  describe('unsetting the brandVariationId', function () {
+    it('should perform and update on mongo', function (done) {
+      this.handler.unsetBrandVariationId(project_id, (err) => {
         const args = this.projectModel.updateOne.args[0]
         args[0]._id.should.equal(project_id)
         expect(args[1]).to.deep.equal({ $unset: { brandVariationId: 1 } })
@@ -224,13 +224,13 @@ describe('ProjectOptionsHandler', function() {
       })
     })
 
-    describe('when mongo update error occurs', function() {
-      beforeEach(function() {
+    describe('when mongo update error occurs', function () {
+      beforeEach(function () {
         this.projectModel.updateOne = sinon.stub().yields('error')
       })
 
-      it('should callback with error', function(done) {
-        this.handler.unsetBrandVariationId(project_id, err => {
+      it('should callback with error', function (done) {
+        this.handler.unsetBrandVariationId(project_id, (err) => {
           err.should.equal('error')
           done()
         })

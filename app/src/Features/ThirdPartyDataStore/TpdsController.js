@@ -34,7 +34,7 @@ module.exports = {
       filePath,
       req,
       source,
-      function(err) {
+      function (err) {
         if (err != null) {
           if (err.name === 'TooManyRequestsError') {
             logger.warn(
@@ -72,7 +72,7 @@ module.exports = {
       projectName,
       filePath,
       source,
-      function(err) {
+      function (err) {
         if (err != null) {
           logger.err(
             { err, user_id, filePath },
@@ -92,7 +92,7 @@ module.exports = {
   // want in git.
   updateProjectContents(req, res, next) {
     if (next == null) {
-      next = function(error) {}
+      next = function (error) {}
     }
     const { project_id } = req.params
     const path = `/${req.params[0]}` // UpdateMerger expects leading slash
@@ -103,7 +103,7 @@ module.exports = {
       path,
       req,
       source,
-      function(error) {
+      function (error) {
         if (error != null) {
           return next(error)
         }
@@ -114,13 +114,13 @@ module.exports = {
 
   deleteProjectContents(req, res, next) {
     if (next == null) {
-      next = function(error) {}
+      next = function (error) {}
     }
     const { project_id } = req.params
     const path = `/${req.params[0]}` // UpdateMerger expects leading slash
     const source = req.headers['x-sl-update-source'] || 'unknown'
 
-    return UpdateMerger.deleteUpdate(null, project_id, path, source, function(
+    return UpdateMerger.deleteUpdate(null, project_id, path, source, function (
       error
     ) {
       if (error != null) {
@@ -130,7 +130,7 @@ module.exports = {
     })
   },
 
-  parseParams: (parseParams = function(req) {
+  parseParams: (parseParams = function (req) {
     let filePath, projectName
     let path = req.params[0]
     const { user_id } = req.params

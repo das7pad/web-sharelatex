@@ -47,9 +47,9 @@ const AuthenticationController = (module.exports = {
 
   afterLoginSessionSetup(req, user, callback) {
     if (callback == null) {
-      callback = function() {}
+      callback = function () {}
     }
-    req.login(user, function(err) {
+    req.login(user, function (err) {
       if (err) {
         logger.warn({ user_id: user._id, err }, 'error from req.login')
         return callback(err)
@@ -57,7 +57,7 @@ const AuthenticationController = (module.exports = {
       // Regenerate the session to get a new sessionID (cookie value) to
       // protect against session fixation attacks
       const oldSession = req.session
-      req.session.destroy(function(err) {
+      req.session.destroy(function (err) {
         if (err) {
           logger.warn(
             { user_id: user._id, err },
@@ -74,7 +74,7 @@ const AuthenticationController = (module.exports = {
             req.session[key] = value
           }
         }
-        req.session.save(function(err) {
+        req.session.save(function (err) {
           if (err) {
             logger.warn(
               { user_id: user._id },
@@ -82,7 +82,7 @@ const AuthenticationController = (module.exports = {
             )
             return callback(err)
           }
-          UserSessionsManager.trackSession(user, req.sessionID, function() {})
+          UserSessionsManager.trackSession(user, req.sessionID, function () {})
           callback(null)
         })
       })
@@ -93,7 +93,7 @@ const AuthenticationController = (module.exports = {
     // This function is middleware which wraps the passport.authenticate middleware,
     // so we can send back our custom `{message: {text: "", type: ""}}` responses on failure,
     // and send a `{redir: ""}` response on success
-    passport.authenticate('local', function(err, user, info) {
+    passport.authenticate('local', function (err, user, info) {
       if (err) {
         return next(err)
       }
@@ -116,14 +116,14 @@ const AuthenticationController = (module.exports = {
     } // OAuth2 'state' mismatch
 
     const Modules = require('../../infrastructure/Modules')
-    Modules.hooks.fire('preFinishLogin', req, res, user, function(
+    Modules.hooks.fire('preFinishLogin', req, res, user, function (
       error,
       results
     ) {
       if (error) {
         return next(error)
       }
-      if (results.some(result => result && result.doNotFinish)) {
+      if (results.some((result) => result && result.doNotFinish)) {
         return next()
       }
 
@@ -134,11 +134,13 @@ const AuthenticationController = (module.exports = {
       const redir =
         AuthenticationController._getRedirectFromSession(req) || '/project'
       AuthenticationController._loginAsyncHandlers(req, user)
-      AuthenticationController.afterLoginSessionSetup(req, user, function(err) {
+      AuthenticationController.afterLoginSessionSetup(req, user, function (
+        err
+      ) {
         if (err) {
           return next(err)
         }
-        SudoModeHandler.activateSudoMode(user._id, function(err) {
+        SudoModeHandler.activateSudoMode(user._id, function (err) {
           if (err) {
             logger.err(
               { err, user_id: user._id },
@@ -155,18 +157,18 @@ const AuthenticationController = (module.exports = {
   doPassportLogin(req, username, password, done) {
     const email = username.toLowerCase()
     const Modules = require('../../infrastructure/Modules')
-    Modules.hooks.fire('preDoPassportLogin', req, email, function(
+    Modules.hooks.fire('preDoPassportLogin', req, email, function (
       err,
       infoList
     ) {
       if (err) {
         return done(err)
       }
-      const info = infoList.find(i => i != null)
+      const info = infoList.find((i) => i != null)
       if (info != null) {
         return done(null, false, info)
       }
-      LoginRateLimiter.processLoginRequest(email, function(err, isAllowed) {
+      LoginRateLimiter.processLoginRequest(email, function (err, isAllowed) {
         if (err) {
           return done(err)
         }
@@ -177,7 +179,7 @@ const AuthenticationController = (module.exports = {
             type: 'error'
           })
         }
-        AuthenticationManager.authenticate({ email }, password, function(
+        AuthenticationManager.authenticate({ email }, password, function (
           error,
           user
         ) {
@@ -201,7 +203,7 @@ const AuthenticationController = (module.exports = {
   },
 
   _loginAsyncHandlers(req, user) {
-    UserHandler.setupLoginData(user, err => {
+    UserHandler.setupLoginData(user, (err) => {
       if (err != null) {
         logger.warn({ err }, 'error setting up login data')
       }
@@ -272,9 +274,9 @@ const AuthenticationController = (module.exports = {
   },
 
   requireLogin() {
-    const doRequest = function(req, res, next) {
+    const doRequest = function (req, res, next) {
       if (next == null) {
-        next = function() {}
+        next = function () {}
       }
       if (!AuthenticationController.isUserLoggedIn(req)) {
         return AuthenticationController._redirectToLoginOrRegisterPage(req, res)
@@ -290,13 +292,13 @@ const AuthenticationController = (module.exports = {
   requireOauth() {
     // require this here because module may not be included in some versions
     const Oauth2Server = require('../../../../modules/oauth2-server/app/src/Oauth2Server')
-    return function(req, res, next) {
+    return function (req, res, next) {
       if (next == null) {
-        next = function() {}
+        next = function () {}
       }
       const request = new Oauth2Server.Request(req)
       const response = new Oauth2Server.Response(res)
-      return Oauth2Server.server.authenticate(request, response, {}, function(
+      return Oauth2Server.server.authenticate(request, response, {}, function (
         err,
         token
       ) {
@@ -321,14 +323,14 @@ const AuthenticationController = (module.exports = {
     }
   },
 
-  validateUserSession: function() {
+  validateUserSession: function () {
     // Middleware to check that the user's session is still good on key actions,
     // such as opening a a project. Could be used to check that session has not
     // exceeded a maximum lifetime (req.session.session_created), or for session
     // hijacking checks (e.g. change of ip address, req.session.ip_address). For
     // now, just check that the session has been loaded from the session store
     // correctly.
-    return function(req, res, next) {
+    return function (req, res, next) {
       // check that the session store is returning valid results
       if (req.session && !SessionStoreManager.hasValidationToken(req)) {
         // force user to update session
@@ -372,7 +374,7 @@ const AuthenticationController = (module.exports = {
     }
   },
 
-  httpAuth: basicAuth(function(user, pass) {
+  httpAuth: basicAuth(function (user, pass) {
     const expectedPassword = Settings.httpAuthUsers[user]
     const isValid =
       expectedPassword &&
@@ -447,7 +449,7 @@ const AuthenticationController = (module.exports = {
 
   _recordSuccessfulLogin(userId, callback) {
     if (callback == null) {
-      callback = function() {}
+      callback = function () {}
     }
     UserUpdater.updateUser(
       userId.toString(),
@@ -455,7 +457,7 @@ const AuthenticationController = (module.exports = {
         $set: { lastLoggedIn: new Date() },
         $inc: { loginCount: 1 }
       },
-      function(error) {
+      function (error) {
         if (error != null) {
           callback(error)
         }

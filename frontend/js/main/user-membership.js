@@ -12,8 +12,8 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../base'], function(App) {
-  App.controller('UserMembershipController', function($scope, queuedHttp) {
+define(['../base'], function (App) {
+  App.controller('UserMembershipController', function ($scope, queuedHttp) {
     $scope.users = window.users
     $scope.groupSize = window.groupSize
     $scope.paths = window.paths
@@ -32,27 +32,27 @@ define(['../base'], function(App) {
       }
     }
 
-    const parseEmails = function(emailsString) {
+    const parseEmails = function (emailsString) {
       const regexBySpaceOrComma = /[\s,]+/
       let emails = emailsString.split(regexBySpaceOrComma)
-      emails = _.map(emails, email => (email = email.trim()))
-      emails = _.filter(emails, email => email.indexOf('@') !== -1)
+      emails = _.map(emails, (email) => (email = email.trim()))
+      emails = _.filter(emails, (email) => email.indexOf('@') !== -1)
       return emails
     }
 
-    $scope.addMembers = function() {
+    $scope.addMembers = function () {
       $scope.inputs.addMembers.error = false
       $scope.inputs.addMembers.errorMessage = null
       $scope.inputs.addMembers.inflightCount = 0
       const emails = parseEmails($scope.inputs.addMembers.content)
-      return Array.from(emails).map(email => {
+      return Array.from(emails).map((email) => {
         $scope.inputs.addMembers.inflightCount += 1
         return queuedHttp
           .post(paths.addMember, {
             email,
             _csrf: window.csrfToken
           })
-          .then(function(response) {
+          .then(function (response) {
             $scope.inputs.addMembers.inflightCount -= 1
             const { data } = response
             if (data.user != null) {
@@ -60,7 +60,7 @@ define(['../base'], function(App) {
             }
             return ($scope.inputs.addMembers.content = '')
           })
-          .catch(function(response) {
+          .catch(function (response) {
             $scope.inputs.addMembers.inflightCount -= 1
             const { data } = response
             $scope.inputs.addMembers.error = true
@@ -70,11 +70,11 @@ define(['../base'], function(App) {
       })
     }
 
-    $scope.removeMembers = function() {
+    $scope.removeMembers = function () {
       $scope.inputs.removeMembers.error = false
       $scope.inputs.removeMembers.errorMessage = null
       for (const user of Array.from($scope.selectedUsers)) {
-        ;(function(user) {
+        ;(function (user) {
           let url
           if (paths.removeInvite && user.invite && user._id == null) {
             url = `${paths.removeInvite}/${encodeURIComponent(user.email)}`
@@ -90,14 +90,14 @@ define(['../base'], function(App) {
               'X-Csrf-Token': window.csrfToken
             }
           })
-            .then(function() {
+            .then(function () {
               const index = $scope.users.indexOf(user)
               if (index === -1) {
                 return
               }
               return $scope.users.splice(index, 1)
             })
-            .catch(function(response) {
+            .catch(function (response) {
               const { data } = response
               $scope.inputs.removeMembers.error = true
               return ($scope.inputs.removeMembers.errorMessage =
@@ -109,11 +109,11 @@ define(['../base'], function(App) {
     }
 
     return ($scope.updateSelectedUsers = () =>
-      ($scope.selectedUsers = $scope.users.filter(user => user.selected)))
+      ($scope.selectedUsers = $scope.users.filter((user) => user.selected)))
   })
 
-  return App.controller('UserMembershipListItemController', $scope =>
-    $scope.$watch('user.selected', function(value) {
+  return App.controller('UserMembershipListItemController', ($scope) =>
+    $scope.$watch('user.selected', function (value) {
       if (value != null) {
         return $scope.updateSelectedUsers()
       }

@@ -13,7 +13,7 @@
 define([
   '../../../../../frontend/js/ide/editor/directives/aceEditor/auto-complete/snippets/TopHundredSnippets',
   '../../../../../frontend/js/ide/editor/directives/aceEditor/auto-complete/snippets/Environments'
-], function(TopHundredCommands, Environments) {
+], function (TopHundredCommands, Environments) {
   let AutocompleteAdapter
   return (AutocompleteAdapter = class AutocompleteAdapter {
     constructor($scope, metadata, bibtexReferences) {
@@ -27,7 +27,7 @@ define([
     getCommandCompletions(handleCompletionPicked) {
       return []
         .concat(TopHundredCommands, this.getCommandCompletionsFromMetadata())
-        .map(snippet => ({
+        .map((snippet) => ({
           text: snippet.caption,
           displayText: snippet.caption,
           hint: handleCompletionPicked

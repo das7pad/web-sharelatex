@@ -6,7 +6,7 @@ if (!/^(?=[a-f\d]{24}$)(\d+[a-f]|[a-f]+\d)/.test(projectId)) {
   process.exit(1)
 }
 
-ProjectDetailsHandler.clearTokens(projectId, err => {
+ProjectDetailsHandler.clearTokens(projectId, (err) => {
   if (err) {
     console.error(
       `Error clearing project tokens from project ${projectId}`,

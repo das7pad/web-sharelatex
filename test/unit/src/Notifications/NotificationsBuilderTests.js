@@ -20,10 +20,10 @@ const modulePath = require('path').join(
   '../../../../app/src/Features/Notifications/NotificationsBuilder'
 )
 
-describe('NotificationsBuilder', function() {
+describe('NotificationsBuilder', function () {
   const user_id = '123nd3ijdks'
 
-  beforeEach(function() {
+  beforeEach(function () {
     this.handler = { createNotification: sinon.stub().callsArgWith(6) }
 
     this.settings = { apis: { v1: { url: 'v1.url', user: '', pass: '' } } }
@@ -49,11 +49,11 @@ describe('NotificationsBuilder', function() {
     }))
   })
 
-  it('should call v1 and create affiliation notifications', function(done) {
+  it('should call v1 and create affiliation notifications', function (done) {
     const ip = '192.168.0.1'
     return this.controller
       .ipMatcherAffiliation(user_id)
-      .create(ip, callback => {
+      .create(ip, (callback) => {
         this.request.calledOnce.should.equal(true)
         const expectedOpts = {
           university_name: this.body.name,

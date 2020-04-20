@@ -13,7 +13,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../base', 'crypto-js/md5'], function(App, CryptoJS) {
+define(['../base', 'crypto-js/md5'], function (App, CryptoJS) {
   const oldKeys = [
     'sl_abt_multi_currency_editor_eu-eu',
     'sl_abt_multi_currency_eu-eu',
@@ -27,22 +27,22 @@ define(['../base', 'crypto-js/md5'], function(App, CryptoJS) {
     'sl_utt_multi_currency'
   ]
 
-  App.factory('abTestManager', function($http, ipCookie) {
+  App.factory('abTestManager', function ($http, ipCookie) {
     let getABTestBucket, processTestWithStep
-    _.each(oldKeys, oldKey => ipCookie.remove(oldKey))
+    _.each(oldKeys, (oldKey) => ipCookie.remove(oldKey))
 
-    const _buildCookieKey = function(testName, bucket) {
+    const _buildCookieKey = function (testName, bucket) {
       const key = `sl_abt_${testName}_${bucket}`
       return key
     }
 
-    const _getTestCookie = function(testName, bucket) {
+    const _getTestCookie = function (testName, bucket) {
       const cookieKey = _buildCookieKey(testName, bucket)
       const cookie = ipCookie(cookieKey)
       return cookie
     }
 
-    const _persistCookieStep = function(testName, bucket, newStep) {
+    const _persistCookieStep = function (testName, bucket, newStep) {
       const cookieKey = _buildCookieKey(testName, bucket)
       ipCookie(cookieKey, { step: newStep }, { expires: 100, path: '/' })
       return ga(
@@ -54,7 +54,7 @@ define(['../base', 'crypto-js/md5'], function(App, CryptoJS) {
       )
     }
 
-    const _checkIfStepIsNext = function(cookieStep, newStep) {
+    const _checkIfStepIsNext = function (cookieStep, newStep) {
       if (cookieStep == null && newStep !== 0) {
         return false
       } else if (newStep === 0) {
@@ -66,7 +66,7 @@ define(['../base', 'crypto-js/md5'], function(App, CryptoJS) {
       }
     }
 
-    const _getUsersHash = function(testName) {
+    const _getUsersHash = function (testName) {
       const sl_user_test_token = `sl_utt_${testName}`
       let user_uuid = ipCookie(sl_user_test_token)
       if (user_uuid == null) {
@@ -78,21 +78,21 @@ define(['../base', 'crypto-js/md5'], function(App, CryptoJS) {
     }
 
     return {
-      processTestWithStep: (processTestWithStep = function(
+      processTestWithStep: (processTestWithStep = function (
         testName,
         bucket,
         newStep
       ) {
         const currentCookieStep = __guard__(
           _getTestCookie(testName, bucket),
-          x => x.step
+          (x) => x.step
         )
         if (_checkIfStepIsNext(currentCookieStep, newStep)) {
           return _persistCookieStep(testName, bucket, newStep)
         }
       }),
 
-      getABTestBucket: (getABTestBucket = function(test_name, buckets) {
+      getABTestBucket: (getABTestBucket = function (test_name, buckets) {
         const hash = _getUsersHash(test_name)
         const bucketIndex =
           parseInt(hash.toString().slice(0, 2), 16) %
@@ -102,10 +102,10 @@ define(['../base', 'crypto-js/md5'], function(App, CryptoJS) {
     }
   })
 
-  return App.controller('AbTestController', function($scope, abTestManager) {
+  return App.controller('AbTestController', function ($scope, abTestManager) {
     const testKeys = _.keys(window.ab)
 
-    return _.each(window.ab, event =>
+    return _.each(window.ab, (event) =>
       abTestManager.processTestWithStep(
         event.testName,
         event.bucket,

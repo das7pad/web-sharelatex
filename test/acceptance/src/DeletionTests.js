@@ -12,8 +12,8 @@ require('./helpers/MockProjectHistoryApi')
 require('./helpers/MockV1Api')
 require('./helpers/MockProjectHistoryApi')
 
-describe('Deleting a user', function() {
-  beforeEach(function(done) {
+describe('Deleting a user', function () {
+  beforeEach(function (done) {
     this.user = new User()
     async.series(
       [
@@ -25,11 +25,11 @@ describe('Deleting a user', function() {
     )
   })
 
-  it('Should remove the user from active users', function(done) {
+  it('Should remove the user from active users', function (done) {
     this.user.get((error, user) => {
       expect(error).not.to.exist
       expect(user).to.exist
-      this.user.deleteUser(error => {
+      this.user.deleteUser((error) => {
         expect(error).not.to.exist
         this.user.get((error, user) => {
           expect(error).not.to.exist
@@ -40,10 +40,10 @@ describe('Deleting a user', function() {
     })
   })
 
-  it('Should create a soft-deleted user', function(done) {
+  it('Should create a soft-deleted user', function (done) {
     this.user.get((error, user) => {
       expect(error).not.to.exist
-      this.user.deleteUser(error => {
+      this.user.deleteUser((error) => {
         expect(error).not.to.exist
         db.deletedUsers.findOne(
           { 'user._id': user._id },
@@ -72,20 +72,20 @@ describe('Deleting a user', function() {
     })
   })
 
-  it('Should fail if the user has a subscription', function(done) {
+  it('Should fail if the user has a subscription', function (done) {
     Subscription.create(
       {
         admin_id: this.user._id,
         manager_ids: [this.user._id],
         planCode: 'collaborator'
       },
-      error => {
+      (error) => {
         expect(error).not.to.exist
         SubscriptionViewModelBuilder.buildUsersSubscriptionViewModel(
           this.user,
-          error => {
+          (error) => {
             expect(error).not.to.exist
-            this.user.deleteUser(error => {
+            this.user.deleteUser((error) => {
               expect(error).to.exist
               done()
             })
@@ -95,14 +95,14 @@ describe('Deleting a user', function() {
     )
   })
 
-  it("Should delete the user's projects", function(done) {
+  it("Should delete the user's projects", function (done) {
     this.user.createProject('wombat', (error, projectId) => {
       expect(error).not.to.exist
       this.user.getProject(projectId, (error, project) => {
         expect(error).not.to.exist
         expect(project).to.exist
 
-        this.user.deleteUser(error => {
+        this.user.deleteUser((error) => {
           expect(error).not.to.exist
           this.user.getProject(projectId, (error, project) => {
             expect(error).not.to.exist
@@ -114,8 +114,8 @@ describe('Deleting a user', function() {
     })
   })
 
-  describe('when scrubbing the user', function() {
-    beforeEach(function(done) {
+  describe('when scrubbing the user', function () {
+    beforeEach(function (done) {
       this.user.get((error, user) => {
         if (error) {
           throw error
@@ -125,7 +125,7 @@ describe('Deleting a user', function() {
       })
     })
 
-    it('Should remove the user data from mongo', function(done) {
+    it('Should remove the user data from mongo', function (done) {
       db.deletedUsers.findOne(
         { 'deleterData.deletedUserId': this.userId },
         (error, deletedUser) => {
@@ -165,8 +165,8 @@ describe('Deleting a user', function() {
   })
 })
 
-describe('Deleting a project', function() {
-  beforeEach(function(done) {
+describe('Deleting a project', function () {
+  beforeEach(function (done) {
     this.user = new User()
     this.projectName = 'wombat'
     this.user.ensureUserExists(() => {
@@ -179,12 +179,12 @@ describe('Deleting a project', function() {
     })
   })
 
-  it('Should remove the project from active projects', function(done) {
+  it('Should remove the project from active projects', function (done) {
     this.user.getProject(this.projectId, (error, project) => {
       expect(error).not.to.exist
       expect(project).to.exist
 
-      this.user.deleteProject(this.projectId, error => {
+      this.user.deleteProject(this.projectId, (error) => {
         expect(error).not.to.exist
 
         this.user.getProject(this.projectId, (error, project) => {
@@ -196,14 +196,14 @@ describe('Deleting a project', function() {
     })
   })
 
-  it('Should create a soft-deleted project', function(done) {
+  it('Should create a soft-deleted project', function (done) {
     this.user.getProject(this.projectId, (error, project) => {
       expect(error).not.to.exist
 
       this.user.get((error, user) => {
         expect(error).not.to.exist
 
-        this.user.deleteProject(this.projectId, error => {
+        this.user.deleteProject(this.projectId, (error) => {
           expect(error).not.to.exist
 
           db.deletedProjects.findOne(
@@ -236,8 +236,8 @@ describe('Deleting a project', function() {
     })
   })
 
-  describe('When the project has docs', function() {
-    beforeEach(function(done) {
+  describe('When the project has docs', function () {
+    beforeEach(function (done) {
       this.user.getProject(this.projectId, (error, project) => {
         if (error) {
           throw error
@@ -257,9 +257,9 @@ describe('Deleting a project', function() {
       })
     })
 
-    describe('When the deleted project is expired', function() {
-      beforeEach(function(done) {
-        this.user.deleteProject(this.projectId, error => {
+    describe('When the deleted project is expired', function () {
+      beforeEach(function (done) {
+        this.user.deleteProject(this.projectId, (error) => {
           if (error) {
             throw error
           }
@@ -267,7 +267,7 @@ describe('Deleting a project', function() {
         })
       })
 
-      it('Should destroy the docs', function(done) {
+      it('Should destroy the docs', function (done) {
         expect(
           MockDocstoreApi.docs[this.projectId.toString()][this.docId.toString()]
         ).to.exist
@@ -291,7 +291,7 @@ describe('Deleting a project', function() {
         )
       })
 
-      it('Should remove the project data from mongo', function(done) {
+      it('Should remove the project data from mongo', function (done) {
         db.deletedProjects.findOne(
           { 'deleterData.deletedProjectId': ObjectId(this.projectId) },
           (error, deletedProject) => {

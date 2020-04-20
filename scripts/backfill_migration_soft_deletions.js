@@ -19,7 +19,7 @@ function getCollectionContents(collection) {
 
 function deleteCollectionItem(collection, id) {
   return new Promise((resolve, reject) => {
-    collection.remove({ _id: id }, error => {
+    collection.remove({ _id: id }, (error) => {
       if (error) {
         reject(error)
       } else {
@@ -76,7 +76,9 @@ async function backfillUsers() {
 
   const migrationUsers = await getCollectionContents(db.usersDeletedByMigration)
   console.log('Found ' + migrationUsers.length + ' users')
-  await Promise.all(migrationUsers.map(user => limit(() => backfillUser(user))))
+  await Promise.all(
+    migrationUsers.map((user) => limit(() => backfillUser(user)))
+  )
 }
 
 async function backfillProjects() {
@@ -87,7 +89,7 @@ async function backfillProjects() {
   )
   console.log('Found ' + migrationProjects.length + ' projects')
   await Promise.all(
-    migrationProjects.map(project => limit(() => backfillProject(project)))
+    migrationProjects.map((project) => limit(() => backfillProject(project)))
   )
 }
 

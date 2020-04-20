@@ -22,7 +22,7 @@ const { Project } = require('../../models/Project')
 const MILISECONDS_IN_DAY = 86400000
 module.exports = InactiveProjectManager = {
   reactivateProjectIfRequired(project_id, callback) {
-    return ProjectGetter.getProject(project_id, { active: true }, function(
+    return ProjectGetter.getProject(project_id, { active: true }, function (
       err,
       project
     ) {
@@ -39,7 +39,7 @@ module.exports = InactiveProjectManager = {
         return callback()
       }
 
-      return DocstoreManager.unarchiveProject(project_id, function(err) {
+      return DocstoreManager.unarchiveProject(project_id, function (err) {
         if (err != null) {
           logger.warn(
             { err, project_id },
@@ -67,18 +67,18 @@ module.exports = InactiveProjectManager = {
       .equals(true)
       .select('_id')
       .limit(limit)
-      .exec(function(err, projects) {
+      .exec(function (err, projects) {
         if (err != null) {
           logger.err({ err }, 'could not get projects for deactivating')
         }
-        const jobs = _.map(projects, project => cb =>
+        const jobs = _.map(projects, (project) => (cb) =>
           InactiveProjectManager.deactivateProject(project._id, cb)
         )
         logger.log(
           { numberOfProjects: projects != null ? projects.length : undefined },
           'deactivating projects'
         )
-        return async.series(jobs, function(err) {
+        return async.series(jobs, function (err) {
           if (err != null) {
             logger.warn({ err }, 'error deactivating projects')
           }
@@ -90,10 +90,10 @@ module.exports = InactiveProjectManager = {
   deactivateProject(project_id, callback) {
     logger.log({ project_id }, 'deactivating inactive project')
     const jobs = [
-      cb => DocstoreManager.archiveProject(project_id, cb),
-      cb => ProjectUpdateHandler.markAsInactive(project_id, cb)
+      (cb) => DocstoreManager.archiveProject(project_id, cb),
+      (cb) => ProjectUpdateHandler.markAsInactive(project_id, cb)
     ]
-    return async.series(jobs, function(err) {
+    return async.series(jobs, function (err) {
       if (err != null) {
         logger.warn({ err, project_id }, 'error deactivating project')
       }

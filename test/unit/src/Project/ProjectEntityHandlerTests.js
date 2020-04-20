@@ -23,20 +23,20 @@ const SandboxedModule = require('sandboxed-module')
 const { ObjectId } = require('mongoose').Types
 const Errors = require('../../../../app/src/Features/Errors/Errors')
 
-describe('ProjectEntityHandler', function() {
+describe('ProjectEntityHandler', function () {
   const project_id = '4eecb1c1bffa66588e0000a1'
   const doc_id = '4eecb1c1bffa66588e0000a2'
   const folder_id = '4eecaffcbffa66588e000008'
   const rootFolderId = '4eecaffcbffa66588e000007'
   const userId = 1234
 
-  beforeEach(function() {
+  beforeEach(function () {
     let Project
     this.TpdsUpdateSender = {
       addDoc: sinon.stub().callsArg(1),
       addFile: sinon.stub().callsArg(1)
     }
-    this.ProjectModel = Project = (function() {
+    this.ProjectModel = Project = (function () {
       Project = class Project {
         static initClass() {
           this.prototype.rootFolder = [this.rootFolder]
@@ -82,8 +82,8 @@ describe('ProjectEntityHandler', function() {
     }))
   })
 
-  describe('getting folders, docs and files', function() {
-    beforeEach(function() {
+  describe('getting folders, docs and files', function () {
+    beforeEach(function () {
       this.project.rootFolder = [
         {
           docs: [
@@ -125,8 +125,8 @@ describe('ProjectEntityHandler', function() {
         .yields(null, this.project)
     })
 
-    describe('getAllDocs', function() {
-      beforeEach(function() {
+    describe('getAllDocs', function () {
+      beforeEach(function () {
         this.docs = [
           {
             _id: this.doc1._id,
@@ -145,13 +145,13 @@ describe('ProjectEntityHandler', function() {
         this.ProjectEntityHandler.getAllDocs(project_id, this.callback)
       })
 
-      it('should get the doc lines and rev from the docstore', function() {
+      it('should get the doc lines and rev from the docstore', function () {
         this.DocstoreManager.getAllDocs
           .calledWith(project_id)
           .should.equal(true)
       })
 
-      it('should call the callback with the docs with the lines and rev included', function() {
+      it('should call the callback with the docs with the lines and rev included', function () {
         this.callback
           .calledWith(null, {
             '/doc1': {
@@ -171,13 +171,13 @@ describe('ProjectEntityHandler', function() {
       })
     })
 
-    describe('getAllFiles', function() {
-      beforeEach(function() {
+    describe('getAllFiles', function () {
+      beforeEach(function () {
         this.callback = sinon.stub()
         this.ProjectEntityHandler.getAllFiles(project_id, this.callback)
       })
 
-      it('should call the callback with the files', function() {
+      it('should call the callback with the files', function () {
         this.callback
           .calledWith(null, {
             '/file1': this.file1,
@@ -187,8 +187,8 @@ describe('ProjectEntityHandler', function() {
       })
     })
 
-    describe('getAllDocPathsFromProject', function() {
-      beforeEach(function() {
+    describe('getAllDocPathsFromProject', function () {
+      beforeEach(function () {
         this.docs = [
           {
             _id: this.doc1._id,
@@ -208,7 +208,7 @@ describe('ProjectEntityHandler', function() {
         )
       })
 
-      it('should call the callback with the path for each doc_id', function() {
+      it('should call the callback with the path for each doc_id', function () {
         this.expected = {}
         this.expected[this.doc1._id] = `/${this.doc1.name}`
         this.expected[this.doc2._id] = `/folder1/${this.doc2.name}`
@@ -216,11 +216,11 @@ describe('ProjectEntityHandler', function() {
       })
     })
 
-    describe('getDocPathByProjectIdAndDocId', function() {
-      beforeEach(function() {
+    describe('getDocPathByProjectIdAndDocId', function () {
+      beforeEach(function () {
         this.callback = sinon.stub()
       })
-      it('should call the callback with the path for an existing doc id at the root level', function() {
+      it('should call the callback with the path for an existing doc id at the root level', function () {
         this.ProjectEntityHandler.getDocPathByProjectIdAndDocId(
           project_id,
           this.doc1._id,
@@ -229,7 +229,7 @@ describe('ProjectEntityHandler', function() {
         this.callback.calledWith(null, `/${this.doc1.name}`).should.equal(true)
       })
 
-      it('should call the callback with the path for an existing doc id nested within a folder', function() {
+      it('should call the callback with the path for an existing doc id nested within a folder', function () {
         this.ProjectEntityHandler.getDocPathByProjectIdAndDocId(
           project_id,
           this.doc2._id,
@@ -240,7 +240,7 @@ describe('ProjectEntityHandler', function() {
           .should.equal(true)
       })
 
-      it('should call the callback with a NotFoundError for a non-existing doc', function() {
+      it('should call the callback with a NotFoundError for a non-existing doc', function () {
         this.ProjectEntityHandler.getDocPathByProjectIdAndDocId(
           project_id,
           'non-existing-id',
@@ -251,7 +251,7 @@ describe('ProjectEntityHandler', function() {
         )
       })
 
-      it('should call the callback with a NotFoundError for an existing file', function() {
+      it('should call the callback with a NotFoundError for an existing file', function () {
         this.ProjectEntityHandler.getDocPathByProjectIdAndDocId(
           project_id,
           this.file1._id,
@@ -263,19 +263,19 @@ describe('ProjectEntityHandler', function() {
       })
     })
 
-    describe('_getAllFolders', function() {
-      beforeEach(function() {
+    describe('_getAllFolders', function () {
+      beforeEach(function () {
         this.callback = sinon.stub()
         this.ProjectEntityHandler._getAllFolders(project_id, this.callback)
       })
 
-      it('should get the project without the docs lines', function() {
+      it('should get the project without the docs lines', function () {
         this.ProjectGetter.getProjectWithoutDocLines
           .calledWith(project_id)
           .should.equal(true)
       })
 
-      it('should call the callback with the folders', function() {
+      it('should call the callback with the folders', function () {
         this.callback
           .calledWith(null, {
             '/': this.project.rootFolder[0],
@@ -285,8 +285,8 @@ describe('ProjectEntityHandler', function() {
       })
     })
 
-    describe('_getAllFoldersFromProject', function() {
-      beforeEach(function() {
+    describe('_getAllFoldersFromProject', function () {
+      beforeEach(function () {
         this.callback = sinon.stub()
         this.ProjectEntityHandler._getAllFoldersFromProject(
           this.project,
@@ -294,7 +294,7 @@ describe('ProjectEntityHandler', function() {
         )
       })
 
-      it('should call the callback with the folders', function() {
+      it('should call the callback with the folders', function () {
         this.callback
           .calledWith(null, {
             '/': this.project.rootFolder[0],
@@ -305,8 +305,8 @@ describe('ProjectEntityHandler', function() {
     })
   })
 
-  describe('getDoc', function() {
-    beforeEach(function() {
+  describe('getDoc', function () {
+    beforeEach(function () {
       this.lines = ['mock', 'doc', 'lines']
       this.rev = 5
       this.version = 42
@@ -318,23 +318,23 @@ describe('ProjectEntityHandler', function() {
       this.ProjectEntityHandler.getDoc(project_id, doc_id, this.callback)
     })
 
-    it('should call the docstore', function() {
+    it('should call the docstore', function () {
       this.DocstoreManager.getDoc
         .calledWith(project_id, doc_id)
         .should.equal(true)
     })
 
-    it('should call the callback with the lines, version and rev', function() {
+    it('should call the callback with the lines, version and rev', function () {
       this.callback
         .calledWith(null, this.lines, this.rev, this.version, this.ranges)
         .should.equal(true)
     })
   })
 
-  describe('promises.getDoc', function() {
+  describe('promises.getDoc', function () {
     let result
 
-    beforeEach(async function() {
+    beforeEach(async function () {
       this.lines = ['mock', 'doc', 'lines']
       this.rev = 5
       this.version = 42
@@ -349,13 +349,13 @@ describe('ProjectEntityHandler', function() {
       )
     })
 
-    it('should call the docstore', function() {
+    it('should call the docstore', function () {
       this.DocstoreManager.getDoc
         .calledWith(project_id, doc_id)
         .should.equal(true)
     })
 
-    it('should return the lines, rev, version and ranges', function() {
+    it('should return the lines, rev, version and ranges', function () {
       expect(result.lines).to.equal(this.lines)
       expect(result.rev).to.equal(this.rev)
       expect(result.version).to.equal(this.version)

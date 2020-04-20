@@ -9,13 +9,13 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base'], App =>
-  App.directive('reviewPanelCollapseHeight', $parse => ({
+define(['../../../base'], (App) =>
+  App.directive('reviewPanelCollapseHeight', ($parse) => ({
     restrict: 'A',
     link(scope, element, attrs) {
       return scope.$watch(
         () => $parse(attrs.reviewPanelCollapseHeight)(scope),
-        function(shouldCollapse) {
+        function (shouldCollapse) {
           const neededHeight = element.prop('scrollHeight')
           if (neededHeight > 0) {
             if (shouldCollapse) {

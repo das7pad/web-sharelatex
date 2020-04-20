@@ -61,7 +61,7 @@ const LockManager = {
       )
 
       runner((error1, ...values) =>
-        LockManager._releaseLock(key, lockValue, error2 => {
+        LockManager._releaseLock(key, lockValue, (error2) => {
           clearTimeout(exceededLockTimeout)
 
           const timeTaken = new Date() - timer.start
@@ -112,7 +112,7 @@ const LockManager = {
   // it's sufficient to serialize within a process because that is where the parallel operations occur
   _getLock(key, namespace, callback) {
     // this is what we need to do for each lock we want to request
-    const task = next =>
+    const task = (next) =>
       LockManager._getLockByPolling(key, namespace, (error, lockValue) => {
         // tell the queue to start trying to get the next lock (if any)
         next()

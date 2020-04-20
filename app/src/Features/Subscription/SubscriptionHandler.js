@@ -28,9 +28,9 @@ const Analytics = require('../Analytics/AnalyticsManager')
 const SubscriptionHandler = {
   validateNoSubscriptionInRecurly(user_id, callback) {
     if (callback == null) {
-      callback = function(error, valid) {}
+      callback = function (error, valid) {}
     }
-    return RecurlyWrapper.listAccountActiveSubscriptions(user_id, function(
+    return RecurlyWrapper.listAccountActiveSubscriptions(user_id, function (
       error,
       subscriptions
     ) {
@@ -44,7 +44,7 @@ const SubscriptionHandler = {
         return SubscriptionUpdater.syncSubscription(
           subscriptions[0],
           user_id,
-          function(error) {
+          function (error) {
             if (error != null) {
               return callback(error)
             }
@@ -61,7 +61,7 @@ const SubscriptionHandler = {
     const clientTokenId = ''
     return SubscriptionHandler.validateNoSubscriptionInRecurly(
       user._id,
-      function(error, valid) {
+      function (error, valid) {
         if (error != null) {
           return callback(error)
         }
@@ -72,14 +72,14 @@ const SubscriptionHandler = {
           user,
           subscriptionDetails,
           recurlyTokenIds,
-          function(error, recurlySubscription) {
+          function (error, recurlySubscription) {
             if (error != null) {
               return callback(error)
             }
             return SubscriptionUpdater.syncSubscription(
               recurlySubscription,
               user._id,
-              function(error) {
+              function (error) {
                 if (error != null) {
                   return callback(error)
                 }
@@ -93,7 +93,7 @@ const SubscriptionHandler = {
   },
 
   updateSubscription(user, plan_code, coupon_code, callback) {
-    return LimitationsManager.userHasV2Subscription(user, function(
+    return LimitationsManager.userHasV2Subscription(user, function (
       err,
       hasSubscription,
       subscription
@@ -103,14 +103,14 @@ const SubscriptionHandler = {
       } else {
         return async.series(
           [
-            function(cb) {
+            function (cb) {
               if (coupon_code == null) {
                 return cb()
               }
               return RecurlyWrapper.getSubscription(
                 subscription.recurlySubscription_id,
                 { includeAccount: true },
-                function(err, usersSubscription) {
+                function (err, usersSubscription) {
                   if (err != null) {
                     return callback(err)
                   }
@@ -123,11 +123,11 @@ const SubscriptionHandler = {
                 }
               )
             },
-            cb =>
+            (cb) =>
               RecurlyWrapper.updateSubscription(
                 subscription.recurlySubscription_id,
                 { plan_code, timeframe: 'now' },
-                function(error, recurlySubscription) {
+                function (error, recurlySubscription) {
                   if (error != null) {
                     return callback(error)
                   }
@@ -146,7 +146,7 @@ const SubscriptionHandler = {
   },
 
   cancelSubscription(user, callback) {
-    return LimitationsManager.userHasV2Subscription(user, function(
+    return LimitationsManager.userHasV2Subscription(user, function (
       err,
       hasSubscription,
       subscription
@@ -154,7 +154,7 @@ const SubscriptionHandler = {
       if (hasSubscription) {
         return RecurlyWrapper.cancelSubscription(
           subscription.recurlySubscription_id,
-          function(error) {
+          function (error) {
             if (error != null) {
               return callback(error)
             }
@@ -168,7 +168,7 @@ const SubscriptionHandler = {
                 EmailHandler.sendEmail(
                   'canceledSubscription',
                   emailOpts,
-                  err => {
+                  (err) => {
                     if (err != null) {
                       logger.warn(
                         { err },
@@ -191,7 +191,7 @@ const SubscriptionHandler = {
   },
 
   reactivateSubscription(user, callback) {
-    return LimitationsManager.userHasV2Subscription(user, function(
+    return LimitationsManager.userHasV2Subscription(user, function (
       err,
       hasSubscription,
       subscription
@@ -199,14 +199,14 @@ const SubscriptionHandler = {
       if (hasSubscription) {
         return RecurlyWrapper.reactivateSubscription(
           subscription.recurlySubscription_id,
-          function(error) {
+          function (error) {
             if (error != null) {
               return callback(error)
             }
             EmailHandler.sendEmail(
               'reactivatedSubscription',
               { to: user.email },
-              err => {
+              (err) => {
                 if (err != null) {
                   logger.warn(
                     { err },
@@ -229,27 +229,27 @@ const SubscriptionHandler = {
     return RecurlyWrapper.getSubscription(
       recurlySubscription.uuid,
       { includeAccount: true },
-      function(error, recurlySubscription) {
+      function (error, recurlySubscription) {
         if (error != null) {
           return callback(error)
         }
-        return User.findById(recurlySubscription.account.account_code, function(
-          error,
-          user
-        ) {
-          if (error != null) {
-            return callback(error)
+        return User.findById(
+          recurlySubscription.account.account_code,
+          function (error, user) {
+            if (error != null) {
+              return callback(error)
+            }
+            if (user == null) {
+              return callback(new Error('no user found'))
+            }
+            return SubscriptionUpdater.syncSubscription(
+              recurlySubscription,
+              user != null ? user._id : undefined,
+              requesterData,
+              callback
+            )
           }
-          if (user == null) {
-            return callback(new Error('no user found'))
-          }
-          return SubscriptionUpdater.syncSubscription(
-            recurlySubscription,
-            user != null ? user._id : undefined,
-            requesterData,
-            callback
-          )
-        })
+        )
       }
     )
   },

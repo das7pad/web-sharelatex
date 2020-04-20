@@ -34,13 +34,13 @@ module.exports = ProjectDuplicator = {
     docContents,
     callback
   ) {
-    const setRootDoc = _.once(doc_id =>
+    const setRootDoc = _.once((doc_id) =>
       ProjectEntityUpdateHandler.setRootDoc(newProject._id, doc_id, () => {})
     )
     const docs = originalFolder.docs || []
     const jobs = docs.map(
-      doc =>
-        function(cb) {
+      (doc) =>
+        function (cb) {
           if ((doc != null ? doc._id : undefined) == null) {
             return callback()
           }
@@ -51,7 +51,7 @@ module.exports = ProjectDuplicator = {
             doc.name,
             content.lines,
             owner_id,
-            function(err, newDoc) {
+            function (err, newDoc) {
               if (err != null) {
                 logger.warn({ err }, 'error copying doc')
                 return callback(err)
@@ -82,8 +82,8 @@ module.exports = ProjectDuplicator = {
     const fileRefs = originalFolder.fileRefs || []
     let firstError = null // track first error to exit gracefully from parallel copy
     const jobs = fileRefs.map(
-      file =>
-        function(cb) {
+      (file) =>
+        function (cb) {
           if (firstError != null) {
             return async.setImmediate(cb)
           } // skip further copies if an error has occurred
@@ -94,7 +94,7 @@ module.exports = ProjectDuplicator = {
             originalProject_id,
             file,
             owner_id,
-            function(err) {
+            function (err) {
               if (err != null) {
                 if (!firstError) {
                   firstError = err
@@ -109,7 +109,7 @@ module.exports = ProjectDuplicator = {
     // finished, skipping those which have not started yet. We need to wait
     // for all the copy jobs to finish to avoid them writing to the project
     // entry in the background while we are deleting it.
-    return async.parallelLimit(jobs, 5, function(err) {
+    return async.parallelLimit(jobs, 5, function (err) {
       if (firstError != null) {
         return callback(firstError)
       }
@@ -133,7 +133,7 @@ module.exports = ProjectDuplicator = {
     return ProjectGetter.getProject(
       newProject_id,
       { rootFolder: true, name: true },
-      function(err, newProject) {
+      function (err, newProject) {
         if (err != null) {
           logger.warn({ project_id: newProject_id }, 'could not get project')
           return callback(err)
@@ -142,8 +142,8 @@ module.exports = ProjectDuplicator = {
         const folders = originalFolder.folders || []
 
         const jobs = folders.map(
-          childFolder =>
-            function(cb) {
+          (childFolder) =>
+            function (cb) {
               if ((childFolder != null ? childFolder._id : undefined) == null) {
                 return cb()
               }
@@ -151,7 +151,7 @@ module.exports = ProjectDuplicator = {
                 newProject._id,
                 desFolder != null ? desFolder._id : undefined,
                 childFolder.name,
-                function(err, newFolder) {
+                function (err, newFolder) {
                   if (err != null) {
                     return cb(err)
                   }
@@ -170,7 +170,7 @@ module.exports = ProjectDuplicator = {
             }
         )
 
-        jobs.push(cb =>
+        jobs.push((cb) =>
           ProjectDuplicator._copyFiles(
             owner_id,
             newProject,
@@ -180,7 +180,7 @@ module.exports = ProjectDuplicator = {
             cb
           )
         )
-        jobs.push(cb =>
+        jobs.push((cb) =>
           ProjectDuplicator._copyDocs(
             owner_id,
             newProject,
@@ -224,7 +224,7 @@ module.exports = ProjectDuplicator = {
     }
 
     // Get the contents of the original project first
-    return async.series(jobs, function(err, results) {
+    return async.series(jobs, function (err, results) {
       if (err != null) {
         logger.warn(
           { err, originalProject_id },
@@ -245,7 +245,7 @@ module.exports = ProjectDuplicator = {
       return projectCreationHandler.createBlankProject(
         owner._id,
         newProjectName,
-        function(err, newProject) {
+        function (err, newProject) {
           if (err != null) {
             logger.warn(
               { err, originalProject_id },
@@ -277,7 +277,7 @@ module.exports = ProjectDuplicator = {
           }
 
           // Copy the contents of the original project into the new project
-          return async.series(copyJobs, function(err) {
+          return async.series(copyJobs, function (err) {
             if (err != null) {
               logger.warn(
                 {
@@ -290,7 +290,7 @@ module.exports = ProjectDuplicator = {
               )
               // Clean up broken clone on error.
               // Make sure we delete the new failed project, not the original one!
-              return projectDeleter.deleteProject(newProject._id, function(
+              return projectDeleter.deleteProject(newProject._id, function (
                 delete_err
               ) {
                 if (delete_err != null) {

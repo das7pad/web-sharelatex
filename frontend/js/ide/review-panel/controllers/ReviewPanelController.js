@@ -21,7 +21,7 @@ define([
   '../../colors/ColorManager',
   '../RangesTracker'
 ], (App, EventEmitter, ColorManager, RangesTracker) =>
-  App.controller('ReviewPanelController', function(
+  App.controller('ReviewPanelController', function (
     $scope,
     $element,
     ide,
@@ -40,7 +40,7 @@ define([
       ANONYMOUS: 'anonymous' // No user_id
     }
 
-    const currentUserType = function() {
+    const currentUserType = function () {
       if ((ide.$scope.user != null ? ide.$scope.user.id : undefined) == null) {
         return UserTypes.ANONYMOUS
       } else {
@@ -104,7 +104,7 @@ define([
       nVisibleSelectedChanges: 0
     }
 
-    window.addEventListener('beforeunload', function() {
+    window.addEventListener('beforeunload', function () {
       const collapsedStates = {}
       for (const doc in $scope.reviewPanel.overview.docsCollapsedState) {
         const state = $scope.reviewPanel.overview.docsCollapsedState[doc]
@@ -130,7 +130,7 @@ define([
       $scope.$broadcast('review-panel:layout', false)
     )
 
-    $scope.$on('expandable-text-area:resize', event =>
+    $scope.$on('expandable-text-area:resize', (event) =>
       $timeout(() => $scope.$broadcast('review-panel:layout'))
     )
 
@@ -138,7 +138,7 @@ define([
       $scope.$broadcast('editor:set-scroll-size', sizes)
     )
 
-    $scope.$watch('project.features.trackChangesVisible', function(visible) {
+    $scope.$watch('project.features.trackChangesVisible', function (visible) {
       if (visible == null) {
         return
       }
@@ -147,7 +147,7 @@ define([
       }
     })
 
-    $scope.$watch('project.members', function(members) {
+    $scope.$watch('project.members', function (members) {
       $scope.reviewPanel.formattedProjectMembers = {}
       if (($scope.project != null ? $scope.project.owner : undefined) != null) {
         $scope.reviewPanel.formattedProjectMembers[
@@ -184,7 +184,7 @@ define([
 
     $scope.reviewPanelEventsBridge = new EventEmitter()
 
-    ide.socket.on('new-comment', function(thread_id, comment) {
+    ide.socket.on('new-comment', function (thread_id, comment) {
       const thread = getThread(thread_id)
       delete thread.submitting
       thread.messages.push(formatComment(comment))
@@ -192,61 +192,61 @@ define([
       return $timeout(() => $scope.$broadcast('review-panel:layout'))
     })
 
-    ide.socket.on('accept-changes', function(doc_id, change_ids) {
+    ide.socket.on('accept-changes', function (doc_id, change_ids) {
       if (doc_id !== $scope.editor.open_doc_id) {
         getChangeTracker(doc_id).removeChangeIds(change_ids)
       } else {
         $scope.$broadcast('changes:accept', change_ids)
       }
       updateEntries(doc_id)
-      return $scope.$apply(function() {})
+      return $scope.$apply(function () {})
     })
 
     ide.socket.on('resolve-thread', (thread_id, user) =>
       _onCommentResolved(thread_id, user)
     )
 
-    ide.socket.on('reopen-thread', thread_id => _onCommentReopened(thread_id))
+    ide.socket.on('reopen-thread', (thread_id) => _onCommentReopened(thread_id))
 
-    ide.socket.on('delete-thread', function(thread_id) {
+    ide.socket.on('delete-thread', function (thread_id) {
       _onThreadDeleted(thread_id)
-      return $scope.$apply(function() {})
+      return $scope.$apply(function () {})
     })
 
-    ide.socket.on('edit-message', function(thread_id, message_id, content) {
+    ide.socket.on('edit-message', function (thread_id, message_id, content) {
       _onCommentEdited(thread_id, message_id, content)
-      return $scope.$apply(function() {})
+      return $scope.$apply(function () {})
     })
 
-    ide.socket.on('delete-message', function(thread_id, message_id) {
+    ide.socket.on('delete-message', function (thread_id, message_id) {
       _onCommentDeleted(thread_id, message_id)
-      return $scope.$apply(function() {})
+      return $scope.$apply(function () {})
     })
 
     const rangesTrackers = {}
 
-    const getDocEntries = function(doc_id) {
+    const getDocEntries = function (doc_id) {
       if ($scope.reviewPanel.entries[doc_id] == null) {
         $scope.reviewPanel.entries[doc_id] = {}
       }
       return $scope.reviewPanel.entries[doc_id]
     }
 
-    const getDocResolvedComments = function(doc_id) {
+    const getDocResolvedComments = function (doc_id) {
       if ($scope.reviewPanel.resolvedComments[doc_id] == null) {
         $scope.reviewPanel.resolvedComments[doc_id] = {}
       }
       return $scope.reviewPanel.resolvedComments[doc_id]
     }
 
-    var getThread = function(thread_id) {
+    var getThread = function (thread_id) {
       if ($scope.reviewPanel.commentThreads[thread_id] == null) {
         $scope.reviewPanel.commentThreads[thread_id] = { messages: [] }
       }
       return $scope.reviewPanel.commentThreads[thread_id]
     }
 
-    var getChangeTracker = function(doc_id) {
+    var getChangeTracker = function (doc_id) {
       if (rangesTrackers[doc_id] == null) {
         rangesTrackers[doc_id] = new RangesTracker()
         rangesTrackers[doc_id].resolvedThreadIds =
@@ -256,15 +256,15 @@ define([
     }
 
     let scrollbar = {}
-    $scope.reviewPanelEventsBridge.on('aceScrollbarVisibilityChanged', function(
-      isVisible,
-      scrollbarWidth
-    ) {
-      scrollbar = { isVisible, scrollbarWidth }
-      return updateScrollbar()
-    })
+    $scope.reviewPanelEventsBridge.on(
+      'aceScrollbarVisibilityChanged',
+      function (isVisible, scrollbarWidth) {
+        scrollbar = { isVisible, scrollbarWidth }
+        return updateScrollbar()
+      }
+    )
 
-    var updateScrollbar = function() {
+    var updateScrollbar = function () {
       if (
         scrollbar.isVisible &&
         $scope.reviewPanel.subView === $scope.SubViews.CUR_FILE &&
@@ -276,7 +276,7 @@ define([
       }
     }
 
-    $scope.$watch('!ui.reviewPanelOpen && reviewPanel.hasEntries', function(
+    $scope.$watch('!ui.reviewPanelOpen && reviewPanel.hasEntries', function (
       open,
       prevVal
     ) {
@@ -289,7 +289,7 @@ define([
       }
     })
 
-    $scope.$watch('ui.reviewPanelOpen', function(open) {
+    $scope.$watch('ui.reviewPanelOpen', function (open) {
       if (open == null) {
         return
       }
@@ -301,13 +301,13 @@ define([
         // Reset back to what we had when previously open
         $scope.reviewPanel.subView = $scope.reviewPanel.openSubView
       }
-      return $timeout(function() {
+      return $timeout(function () {
         $scope.$broadcast('review-panel:toggle')
         return $scope.$broadcast('review-panel:layout', false)
       })
     })
 
-    $scope.$watch('reviewPanel.subView', function(view) {
+    $scope.$watch('reviewPanel.subView', function (view) {
       if (view == null) {
         return
       }
@@ -317,7 +317,7 @@ define([
       }
     })
 
-    $scope.$watch('editor.sharejs_doc', function(doc, old_doc) {
+    $scope.$watch('editor.sharejs_doc', function (doc, old_doc) {
       if (doc == null) {
         return
       }
@@ -335,7 +335,7 @@ define([
     })
 
     $scope.$watch(
-      function() {
+      function () {
         const entries =
           $scope.reviewPanel.entries[$scope.editor.open_doc_id] || {}
         const permEntries = {}
@@ -347,12 +347,12 @@ define([
         }
         return Object.keys(permEntries).length
       },
-      nEntries =>
+      (nEntries) =>
         ($scope.reviewPanel.hasEntries =
           nEntries > 0 && $scope.project.features.trackChangesVisible)
     )
 
-    var regenerateTrackChangesId = function(doc) {
+    var regenerateTrackChangesId = function (doc) {
       const old_id = getChangeTracker(doc.doc_id).getIdSeed()
       const new_id = RangesTracker.generateIdSeed()
       getChangeTracker(doc.doc_id).setIdSeed(new_id)
@@ -362,7 +362,7 @@ define([
     const refreshRanges = () =>
       $http
         .get(`/project/${$scope.project_id}/ranges`)
-        .then(function(response) {
+        .then(function (response) {
           const docs = response.data
           return (() => {
             const result = []
@@ -386,14 +386,14 @@ define([
           })()
         })
 
-    var refreshOverviewPanel = function() {
+    var refreshOverviewPanel = function () {
       $scope.reviewPanel.overview.loading = true
       return refreshRanges()
         .then(() => ($scope.reviewPanel.overview.loading = false))
         .catch(() => ($scope.reviewPanel.overview.loading = false))
     }
 
-    $scope.refreshResolvedCommentsDropdown = function() {
+    $scope.refreshResolvedCommentsDropdown = function () {
       $scope.reviewPanel.dropdown.loading = true
       const q = refreshRanges()
       q.then(() => ($scope.reviewPanel.dropdown.loading = false))
@@ -401,7 +401,7 @@ define([
       return q
     }
 
-    var updateEntries = function(doc_id) {
+    var updateEntries = function (doc_id) {
       let change, entry_id, key, new_entry, value
       const rangesTracker = getChangeTracker(doc_id)
       const entries = getDocEntries(doc_id)
@@ -519,7 +519,7 @@ define([
       }
     }
 
-    $scope.$on('editor:track-changes:changed', function() {
+    $scope.$on('editor:track-changes:changed', function () {
       const doc_id = $scope.editor.open_doc_id
       updateEntries(doc_id)
 
@@ -534,7 +534,7 @@ define([
       $timeout(() => $scope.$broadcast('review-panel:layout', false))
     )
 
-    $scope.$on('editor:focus:changed', function(
+    $scope.$on('editor:focus:changed', function (
       e,
       selection_offset_start,
       selection_offset_end,
@@ -610,21 +610,21 @@ define([
       return $scope.$broadcast('review-panel:layout')
     })
 
-    $scope.acceptChanges = function(change_ids) {
+    $scope.acceptChanges = function (change_ids) {
       _doAcceptChanges(change_ids)
       return eventTracking.sendMB('rp-changes-accepted', {
         view: $scope.ui.reviewPanelOpen ? $scope.reviewPanel.subView : 'mini'
       })
     }
 
-    $scope.rejectChanges = function(change_ids) {
+    $scope.rejectChanges = function (change_ids) {
       _doRejectChanges(change_ids)
       return eventTracking.sendMB('rp-changes-rejected', {
         view: $scope.ui.reviewPanelOpen ? $scope.reviewPanel.subView : 'mini'
       })
     }
 
-    var _doAcceptChanges = function(change_ids) {
+    var _doAcceptChanges = function (change_ids) {
       $http.post(
         `/project/${$scope.project_id}/doc/${$scope.editor.open_doc_id}/changes/accept`,
         { change_ids, _csrf: window.csrfToken }
@@ -632,10 +632,10 @@ define([
       return $scope.$broadcast('changes:accept', change_ids)
     }
 
-    var _doRejectChanges = change_ids =>
+    var _doRejectChanges = (change_ids) =>
       $scope.$broadcast('changes:reject', change_ids)
 
-    const bulkAccept = function() {
+    const bulkAccept = function () {
       _doAcceptChanges($scope.reviewPanel.selectedEntryIds.slice())
       return eventTracking.sendMB('rp-bulk-accept', {
         view: $scope.ui.reviewPanelOpen ? $scope.reviewPanel.subView : 'mini',
@@ -643,7 +643,7 @@ define([
       })
     }
 
-    const bulkReject = function() {
+    const bulkReject = function () {
       _doRejectChanges($scope.reviewPanel.selectedEntryIds.slice())
       return eventTracking.sendMB('rp-bulk-reject', {
         view: $scope.ui.reviewPanelOpen ? $scope.reviewPanel.subView : 'mini',
@@ -655,7 +655,7 @@ define([
 
     $scope.showBulkRejectDialog = () => showBulkActionsDialog(false)
 
-    var showBulkActionsDialog = isAccept =>
+    var showBulkActionsDialog = (isAccept) =>
       $modal
         .open({
           templateUrl: 'bulkActionsModalTemplate',
@@ -670,7 +670,7 @@ define([
           },
           scope: $scope.$new()
         })
-        .result.then(function(isAccept) {
+        .result.then(function (isAccept) {
           if (isAccept) {
             return bulkAccept()
           } else {
@@ -678,17 +678,17 @@ define([
           }
         })
 
-    $scope.handleTogglerClick = function(e) {
+    $scope.handleTogglerClick = function (e) {
       e.target.blur()
       return $scope.toggleReviewPanel()
     }
 
-    $scope.addNewComment = function() {
+    $scope.addNewComment = function () {
       $scope.$broadcast('comment:start_adding')
       return $scope.toggleReviewPanel()
     }
 
-    $scope.addNewCommentFromKbdShortcut = function() {
+    $scope.addNewCommentFromKbdShortcut = function () {
       if (!$scope.project.features.trackChangesVisible) {
         return
       }
@@ -696,18 +696,18 @@ define([
       if (!$scope.ui.reviewPanelOpen) {
         $scope.toggleReviewPanel()
       }
-      return $timeout(function() {
+      return $timeout(function () {
         $scope.$broadcast('review-panel:layout')
         return $scope.$broadcast('comment:start_adding')
       })
     }
 
-    $scope.startNewComment = function() {
+    $scope.startNewComment = function () {
       $scope.$broadcast('comment:select_line')
       return $timeout(() => $scope.$broadcast('review-panel:layout'))
     }
 
-    $scope.submitNewComment = function(content) {
+    $scope.submitNewComment = function (content) {
       if (content == null || content === '') {
         return
       }
@@ -737,15 +737,15 @@ define([
       return eventTracking.sendMB('rp-new-comment', { size: content.length })
     }
 
-    $scope.cancelNewComment = entry =>
+    $scope.cancelNewComment = (entry) =>
       $timeout(() => $scope.$broadcast('review-panel:layout'))
 
-    $scope.startReply = function(entry) {
+    $scope.startReply = function (entry) {
       entry.replying = true
       return $timeout(() => $scope.$broadcast('review-panel:layout'))
     }
 
-    $scope.submitReply = function(entry, entry_id) {
+    $scope.submitReply = function (entry, entry_id) {
       const { thread_id } = entry
       const content = entry.replyContent
       $http
@@ -774,13 +774,13 @@ define([
       return eventTracking.sendMB('rp-comment-reply', trackingMetadata)
     }
 
-    $scope.cancelReply = function(entry) {
+    $scope.cancelReply = function (entry) {
       entry.replying = false
       entry.replyContent = ''
       return $scope.$broadcast('review-panel:layout')
     }
 
-    $scope.resolveComment = function(entry, entry_id) {
+    $scope.resolveComment = function (entry, entry_id) {
       entry.focused = false
       $http.post(
         `/project/${$scope.project_id}/thread/${entry.thread_id}/resolve`,
@@ -792,7 +792,7 @@ define([
       })
     }
 
-    $scope.unresolveComment = function(thread_id) {
+    $scope.unresolveComment = function (thread_id) {
       _onCommentReopened(thread_id)
       $http.post(`/project/${$scope.project_id}/thread/${thread_id}/reopen`, {
         _csrf: window.csrfToken
@@ -800,7 +800,7 @@ define([
       return eventTracking.sendMB('rp-comment-reopen')
     }
 
-    var _onCommentResolved = function(thread_id, user) {
+    var _onCommentResolved = function (thread_id, user) {
       const thread = getThread(thread_id)
       if (thread == null) {
         return
@@ -812,7 +812,7 @@ define([
       return $scope.$broadcast('comment:resolve_threads', [thread_id])
     }
 
-    var _onCommentReopened = function(thread_id) {
+    var _onCommentReopened = function (thread_id) {
       const thread = getThread(thread_id)
       if (thread == null) {
         return
@@ -824,13 +824,13 @@ define([
       return $scope.$broadcast('comment:unresolve_thread', thread_id)
     }
 
-    var _onThreadDeleted = function(thread_id) {
+    var _onThreadDeleted = function (thread_id) {
       delete $scope.reviewPanel.resolvedThreadIds[thread_id]
       delete $scope.reviewPanel.commentThreads[thread_id]
       return $scope.$broadcast('comment:remove', thread_id)
     }
 
-    var _onCommentEdited = function(thread_id, comment_id, content) {
+    var _onCommentEdited = function (thread_id, comment_id, content) {
       const thread = getThread(thread_id)
       if (thread == null) {
         return
@@ -843,16 +843,16 @@ define([
       return updateEntries()
     }
 
-    var _onCommentDeleted = function(thread_id, comment_id) {
+    var _onCommentDeleted = function (thread_id, comment_id) {
       const thread = getThread(thread_id)
       if (thread == null) {
         return
       }
-      thread.messages = thread.messages.filter(m => m.id !== comment_id)
+      thread.messages = thread.messages.filter((m) => m.id !== comment_id)
       return updateEntries()
     }
 
-    $scope.deleteThread = function(entry_id, doc_id, thread_id) {
+    $scope.deleteThread = function (entry_id, doc_id, thread_id) {
       _onThreadDeleted(thread_id)
       $http({
         method: 'DELETE',
@@ -864,7 +864,7 @@ define([
       return eventTracking.sendMB('rp-comment-delete')
     }
 
-    $scope.saveEdit = function(thread_id, comment) {
+    $scope.saveEdit = function (thread_id, comment) {
       $http.post(
         `/project/${$scope.project_id}/thread/${thread_id}/messages/${comment.id}/edit`,
         {
@@ -875,7 +875,7 @@ define([
       return $timeout(() => $scope.$broadcast('review-panel:layout'))
     }
 
-    $scope.deleteComment = function(thread_id, comment) {
+    $scope.deleteComment = function (thread_id, comment) {
       _onCommentDeleted(thread_id, comment.id)
       $http({
         method: 'DELETE',
@@ -887,7 +887,7 @@ define([
       return $timeout(() => $scope.$broadcast('review-panel:layout'))
     }
 
-    $scope.setSubView = function(subView) {
+    $scope.setSubView = function (subView) {
       $scope.reviewPanel.subView = subView
       return eventTracking.sendMB('rp-subview-change', { subView })
     }
@@ -895,7 +895,7 @@ define([
     $scope.gotoEntry = (doc_id, entry) =>
       ide.editorManager.openDocId(doc_id, { gotoOffset: entry.offset })
 
-    $scope.toggleFullTCStateCollapse = function() {
+    $scope.toggleFullTCStateCollapse = function () {
       if ($scope.project.features.trackChanges) {
         return ($scope.reviewPanel.fullTCStateCollapsed = !$scope.reviewPanel
           .fullTCStateCollapsed)
@@ -913,7 +913,7 @@ define([
       )
     }
 
-    const _setUserTCState = function(userId, newValue, isLocal) {
+    const _setUserTCState = function (userId, newValue, isLocal) {
       if (isLocal == null) {
         isLocal = false
       }
@@ -943,7 +943,7 @@ define([
       }
     }
 
-    const _setEveryoneTCState = function(newValue, isLocal) {
+    const _setEveryoneTCState = function (newValue, isLocal) {
       if (isLocal == null) {
         isLocal = false
       }
@@ -956,7 +956,7 @@ define([
       return _setUserTCState(project.owner._id, newValue, isLocal)
     }
 
-    var _setGuestsTCState = function(newValue, isLocal) {
+    var _setGuestsTCState = function (newValue, isLocal) {
       if (isLocal == null) {
         isLocal = false
       }
@@ -969,7 +969,7 @@ define([
       }
     }
 
-    const applyClientTrackChangesStateToServer = function() {
+    const applyClientTrackChangesStateToServer = function () {
       const data = {}
       if ($scope.reviewPanel.trackChangesOnForEveryone) {
         data.on = true
@@ -987,7 +987,7 @@ define([
       return $http.post(`/project/${$scope.project_id}/track_changes`, data)
     }
 
-    const applyTrackChangesStateToClient = function(state) {
+    const applyTrackChangesStateToClient = function (state) {
       if (typeof state === 'boolean') {
         _setEveryoneTCState(state)
         return _setGuestsTCState(state)
@@ -1010,27 +1010,27 @@ define([
       }
     }
 
-    $scope.toggleTrackChangesForEveryone = function(onForEveryone) {
+    $scope.toggleTrackChangesForEveryone = function (onForEveryone) {
       _setEveryoneTCState(onForEveryone, true)
       _setGuestsTCState(onForEveryone, true)
       return applyClientTrackChangesStateToServer()
     }
 
-    $scope.toggleTrackChangesForGuests = function(onForGuests) {
+    $scope.toggleTrackChangesForGuests = function (onForGuests) {
       _setGuestsTCState(onForGuests, true)
       return applyClientTrackChangesStateToServer()
     }
 
-    $scope.toggleTrackChangesForUser = function(onForUser, userId) {
+    $scope.toggleTrackChangesForUser = function (onForUser, userId) {
       _setUserTCState(userId, onForUser, true)
       return applyClientTrackChangesStateToServer()
     }
 
-    ide.socket.on('toggle-track-changes', state =>
+    ide.socket.on('toggle-track-changes', (state) =>
       $scope.$apply(() => applyTrackChangesStateToClient(state))
     )
 
-    $scope.toggleTrackChangesFromKbdShortcut = function() {
+    $scope.toggleTrackChangesFromKbdShortcut = function () {
       if (
         !(
           $scope.project.features.trackChangesVisible &&
@@ -1045,11 +1045,13 @@ define([
       )
     }
 
-    const setGuestFeatureBasedOnProjectAccessLevel = projectPublicAccessLevel =>
+    const setGuestFeatureBasedOnProjectAccessLevel = (
+      projectPublicAccessLevel
+    ) =>
       ($scope.reviewPanel.trackChangesForGuestsAvailable =
         projectPublicAccessLevel === 'tokenBased')
 
-    const onToggleTrackChangesForGuestsAvailability = function(available) {
+    const onToggleTrackChangesForGuestsAvailability = function (available) {
       // If the feature is no longer available we need to turn off the guest flag
       if (available) {
         return
@@ -1068,7 +1070,7 @@ define([
       setGuestFeatureBasedOnProjectAccessLevel
     )
 
-    $scope.$watch('reviewPanel.trackChangesForGuestsAvailable', function(
+    $scope.$watch('reviewPanel.trackChangesForGuestsAvailable', function (
       available
     ) {
       if (available != null) {
@@ -1077,7 +1079,7 @@ define([
     })
 
     let _inited = false
-    ide.$scope.$on('project:joined', function() {
+    ide.$scope.$on('project:joined', function () {
       if (_inited) {
         return
       }
@@ -1096,7 +1098,7 @@ define([
 
     let _refreshingRangeUsers = false
     const _refreshedForUserIds = {}
-    var refreshChangeUsers = function(refresh_for_user_id) {
+    var refreshChangeUsers = function (refresh_for_user_id) {
       if (refresh_for_user_id != null) {
         if (_refreshedForUserIds[refresh_for_user_id] != null) {
           // We've already tried to refresh to get this user id, so stop it looping
@@ -1113,7 +1115,7 @@ define([
 
       return $http
         .get(`/project/${$scope.project_id}/changes/users`)
-        .then(function(response) {
+        .then(function (response) {
           const users = response.data
           _refreshingRangeUsers = false
           $scope.users = {}
@@ -1140,7 +1142,7 @@ define([
     }
 
     let _threadsLoaded = false
-    var ensureThreadsAreLoaded = function() {
+    var ensureThreadsAreLoaded = function () {
       if (_threadsLoaded) {
         // We get any updates in real time so only need to load them once.
         return
@@ -1149,7 +1151,7 @@ define([
       $scope.reviewPanel.loadingThreads = true
       return $http
         .get(`/project/${$scope.project_id}/threads`)
-        .then(function(response) {
+        .then(function (response) {
           const threads = response.data
           $scope.reviewPanel.loadingThreads = false
           for (var thread_id in $scope.reviewPanel.resolvedThreadIds) {
@@ -1172,13 +1174,13 @@ define([
         })
     }
 
-    var formatComment = function(comment) {
+    var formatComment = function (comment) {
       comment.user = formatUser(comment.user)
       comment.timestamp = new Date(comment.timestamp)
       return comment
     }
 
-    var formatUser = function(user) {
+    var formatUser = function (user) {
       let isSelf, name
       const id =
         (user != null ? user._id : undefined) ||
@@ -1198,7 +1200,7 @@ define([
         isSelf = true
       } else {
         name = [user.first_name, user.last_name]
-          .filter(n => n != null && n !== '')
+          .filter((n) => n != null && n !== '')
           .join(' ')
         if (name === '') {
           name =
@@ -1214,8 +1216,8 @@ define([
         isSelf,
         hue: ColorManager.getHueForUserId(id),
         avatar_text: [user.first_name, user.last_name]
-          .filter(n => n != null)
-          .map(n => n[0])
+          .filter((n) => n != null)
+          .map((n) => n[0])
           .join('')
       }
     }

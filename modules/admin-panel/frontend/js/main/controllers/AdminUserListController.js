@@ -14,8 +14,8 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../../../../frontend/js/base'], function(App) {
-  App.controller('AdminUserListController', function(
+define(['../../../../../../frontend/js/base'], function (App) {
+  App.controller('AdminUserListController', function (
     $scope,
     $http,
     $timeout,
@@ -29,7 +29,7 @@ define(['../../../../../../frontend/js/base'], function(App) {
     $scope.selectedUsers = []
     $scope.pageSelected = 1
 
-    const recalculateUserListHeight = function() {
+    const recalculateUserListHeight = function () {
       const topOffset = $('.user-list-card').offset().top
       const bottomOffset = $('footer').outerHeight() + 25
       const sideBarHeight = $('aside').height() - 56
@@ -49,12 +49,12 @@ define(['../../../../../../frontend/js/base'], function(App) {
     }
 
     $timeout(() => recalculateUserListHeight(), 0)
-    angular.element($window).bind('resize', function() {
+    angular.element($window).bind('resize', function () {
       recalculateUserListHeight()
       return $scope.$apply()
     })
 
-    const sendSearch = function() {
+    const sendSearch = function () {
       $scope.isLoading = true
       data._csrf = window.csrfToken
       data.query = $scope.searchText
@@ -62,39 +62,39 @@ define(['../../../../../../frontend/js/base'], function(App) {
       data.secondaryEmailSearch = $scope.secondaryEmailSearch
       data.page = $scope.pageSelected
       const request = $http.post('/admin/user/search', data)
-      request.then(function(response) {
+      request.then(function (response) {
         const { data } = response
         $scope.users = data.users
         $scope.pages = data.pages
         $scope.updateVisibleUsers()
         return ($scope.isLoading = false)
       })
-      return request.catch(function() {
+      return request.catch(function () {
         console.log('the request failed')
         return ($scope.isLoading = false)
       })
     }
 
-    $scope.clearSearchText = function() {
+    $scope.clearSearchText = function () {
       $scope.searchText = ''
       $scope.$emit('search:clear')
       return sendSearch()
     }
 
-    $scope.searchUsers = function() {
+    $scope.searchUsers = function () {
       $scope.pageSelected = 1
       return sendSearch()
     }
 
-    $scope.changePage = function(page) {
+    $scope.changePage = function (page) {
       $scope.pageSelected = page
       return sendSearch()
     }
 
     $scope.updateSelectedUsers = () =>
-      ($scope.selectedUsers = $scope.users.filter(user => user.selected))
+      ($scope.selectedUsers = $scope.users.filter((user) => user.selected))
 
-    $scope.updateVisibleUsers = function() {
+    $scope.updateVisibleUsers = function () {
       $scope.visibleUsers = []
       for (const user of Array.from($scope.users)) {
         const visible = true
@@ -112,23 +112,23 @@ define(['../../../../../../frontend/js/base'], function(App) {
 
     $scope.getFirstSelectedUser = () => $scope.selectedUsers[0]
 
-    $scope.updatePages = function() {
+    $scope.updatePages = function () {
       $scope.pagesList = []
       if ($scope.pages > 1) {
-        return __range__(1, Math.min(100, $scope.pages), true).map(i =>
+        return __range__(1, Math.min(100, $scope.pages), true).map((i) =>
           $scope.pagesList.push(i)
         )
       }
     }
 
-    $scope._removeUserFromList = function(user) {
+    $scope._removeUserFromList = function (user) {
       const index = $scope.users.indexOf(user)
       if (index > -1) {
         return $scope.users.splice(index, 1)
       }
     }
 
-    $scope.openDeleteUsersModal = function() {
+    $scope.openDeleteUsersModal = function () {
       const modalInstance = $modal.open({
         templateUrl: 'deleteUsersModalTemplate',
         controller: 'DeleteUsersModalController',
@@ -141,7 +141,7 @@ define(['../../../../../../frontend/js/base'], function(App) {
       return modalInstance.result.then(() => $scope.DeleteSelectedUsers())
     }
 
-    $scope.DeleteSelectedUsers = function() {
+    $scope.DeleteSelectedUsers = function () {
       const selected_users = $scope.getSelectedUsers()
 
       for (const user of Array.from(selected_users)) {
@@ -158,7 +158,7 @@ define(['../../../../../../frontend/js/base'], function(App) {
       return $scope.searchUsers()
     }
 
-    $scope.openSetPasswordModal = function() {
+    $scope.openSetPasswordModal = function () {
       const modalInstance = $modal.open({
         templateUrl: 'setPasswordModalTemplate',
         controller: 'SetPasswordModalController',
@@ -168,12 +168,12 @@ define(['../../../../../../frontend/js/base'], function(App) {
           }
         }
       })
-      return modalInstance.result.then(newPassword =>
+      return modalInstance.result.then((newPassword) =>
         $scope.SetUserPassword(newPassword)
       )
     }
 
-    $scope.SetUserPassword = function(newPassword) {
+    $scope.SetUserPassword = function (newPassword) {
       const selected_user = $scope.getFirstSelectedUser()
 
       return queuedHttp.post(`/admin/user/${selected_user._id}/setPassword`, {
@@ -185,15 +185,15 @@ define(['../../../../../../frontend/js/base'], function(App) {
     return $scope.updateVisibleUsers()
   })
 
-  App.controller('UserListItemController', $scope =>
-    $scope.$watch('user.selected', function(value) {
+  App.controller('UserListItemController', ($scope) =>
+    $scope.$watch('user.selected', function (value) {
       if (value != null) {
         return $scope.updateSelectedUsers()
       }
     })
   )
 
-  App.controller('DeleteUsersModalController', function(
+  App.controller('DeleteUsersModalController', function (
     $scope,
     $modalInstance,
     $timeout,
@@ -206,7 +206,7 @@ define(['../../../../../../frontend/js/base'], function(App) {
     return ($scope.cancel = () => $modalInstance.dismiss('cancel'))
   })
 
-  return App.controller('SetPasswordModalController', function(
+  return App.controller('SetPasswordModalController', function (
     $scope,
     $modalInstance,
     $timeout,

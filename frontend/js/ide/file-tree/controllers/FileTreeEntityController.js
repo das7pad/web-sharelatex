@@ -13,17 +13,17 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base', '../util/iconTypeFromName'], function(
+define(['../../../base', '../util/iconTypeFromName'], function (
   App,
   iconTypeFromName
 ) {
-  App.controller('FileTreeEntityController', function(
+  App.controller('FileTreeEntityController', function (
     $scope,
     ide,
     $modal,
     $element
   ) {
-    $scope.select = function(e) {
+    $scope.select = function (e) {
       if (e.ctrlKey || e.metaKey) {
         e.stopPropagation()
         const initialMultiSelectCount = ide.fileTreeManager.multiSelectedCount()
@@ -39,11 +39,11 @@ define(['../../../base', '../util/iconTypeFromName'], function(
     }
 
     if ($scope.entity.type === 'doc') {
-      $scope.$watch('entity.selected', function(isSelected) {
+      $scope.$watch('entity.selected', function (isSelected) {
         if (isSelected) {
           $scope.$emit('entity-file:selected', $scope.entity)
           if (!_isEntryElVisible($element)) {
-            $scope.$applyAsync(function() {
+            $scope.$applyAsync(function () {
               $element[0].scrollIntoView()
             })
           }
@@ -65,7 +65,7 @@ define(['../../../base', '../util/iconTypeFromName'], function(
       )
     }
 
-    $scope.draggableHelper = function() {
+    $scope.draggableHelper = function () {
       if (ide.fileTreeManager.multiSelectedCount() > 0) {
         return $(
           `<strong style='z-index:100'>${ide.fileTreeManager.multiSelectedCount()} Files</strong>`
@@ -80,7 +80,7 @@ define(['../../../base', '../util/iconTypeFromName'], function(
     $scope.startRenaming = () => ($scope.entity.renaming = true)
 
     let invalidModalShowing = false
-    $scope.finishRenaming = function() {
+    $scope.finishRenaming = function () {
       // avoid double events when blur and on-enter fire together
       if (!$scope.entity.renaming) {
         return
@@ -111,13 +111,13 @@ define(['../../../base', '../util/iconTypeFromName'], function(
       return ide.fileTreeManager.renameEntity($scope.entity, name)
     }
 
-    $scope.$on('rename:selected', function() {
+    $scope.$on('rename:selected', function () {
       if ($scope.entity.selected) {
         return $scope.startRenaming()
       }
     })
 
-    $scope.openDeleteModal = function() {
+    $scope.openDeleteModal = function () {
       let entities
       if (ide.fileTreeManager.multiSelectedCount() > 0) {
         entities = ide.fileTreeManager.getMultiSelectedEntityChildNodes()
@@ -135,7 +135,7 @@ define(['../../../base', '../util/iconTypeFromName'], function(
       })
     }
 
-    $scope.$on('delete:selected', function() {
+    $scope.$on('delete:selected', function () {
       if ($scope.entity.selected) {
         return $scope.openDeleteModal()
       }
@@ -144,7 +144,7 @@ define(['../../../base', '../util/iconTypeFromName'], function(
     return ($scope.iconTypeFromName = iconTypeFromName)
   })
 
-  return App.controller('DeleteEntityModalController', function(
+  return App.controller('DeleteEntityModalController', function (
     $scope,
     ide,
     $modalInstance,
@@ -154,7 +154,7 @@ define(['../../../base', '../util/iconTypeFromName'], function(
 
     $scope.entities = entities
 
-    $scope.delete = function() {
+    $scope.delete = function () {
       $scope.state.inflight = true
       for (const entity of Array.from($scope.entities)) {
         ide.fileTreeManager.deleteEntity(entity)

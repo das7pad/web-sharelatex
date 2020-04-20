@@ -19,37 +19,37 @@ const settings = require('settings-sharelatex')
 const redis = require('./helpers/redis')
 const MockV1Api = require('./helpers/MockV1Api')
 
-describe('Sessions', function() {
+describe('Sessions', function () {
   this.timeout(20000)
 
-  beforeEach(function(done) {
+  beforeEach(function (done) {
     this.timeout(20000)
     this.user1 = new User()
     this.site_admin = new User({ email: `admin${Math.random()}@example.com` })
     return async.series(
-      [cb => this.user1.login(cb), cb => this.user1.logout(cb)],
+      [(cb) => this.user1.login(cb), (cb) => this.user1.logout(cb)],
       done
     )
   })
 
-  afterEach(function(done) {
+  afterEach(function (done) {
     return this.user1.logout(() => done())
   })
 
-  describe('one session', function() {
-    it('should have one session in UserSessions set', function(done) {
+  describe('one session', function () {
+    it('should have one session in UserSessions set', function (done) {
       return async.series(
         [
-          next => {
+          (next) => {
             return redis.clearUserSessions(this.user1, next)
           },
 
           // login, should add session to set
-          next => {
-            return this.user1.login(err => next(err))
+          (next) => {
+            return this.user1.login((err) => next(err))
           },
 
-          next => {
+          (next) => {
             return redis.getUserSessions(this.user1, (err, sessions) => {
               expect(sessions.length).to.equal(1)
               expect(sessions[0].slice(0, 5)).to.equal('sess:')
@@ -58,7 +58,7 @@ describe('Sessions', function() {
           },
 
           // should be able to access project list page
-          next => {
+          (next) => {
             return this.user1.getProjectListPage((err, statusCode) => {
               expect(err).to.equal(null)
               expect(statusCode).to.equal(200)
@@ -67,11 +67,11 @@ describe('Sessions', function() {
           },
 
           // logout, should remove session from set
-          next => {
-            return this.user1.logout(err => next(err))
+          (next) => {
+            return this.user1.logout((err) => next(err))
           },
 
-          next => {
+          (next) => {
             return redis.getUserSessions(this.user1, (err, sessions) => {
               expect(sessions.length).to.equal(0)
               return next()
@@ -88,27 +88,27 @@ describe('Sessions', function() {
     })
   })
 
-  describe('two sessions', function() {
-    beforeEach(function() {
+  describe('two sessions', function () {
+    beforeEach(function () {
       // set up second session for this user
       this.user2 = new User()
       this.user2.email = this.user1.email
       return (this.user2.password = this.user1.password)
     })
 
-    it('should have two sessions in UserSessions set', function(done) {
+    it('should have two sessions in UserSessions set', function (done) {
       return async.series(
         [
-          next => {
+          (next) => {
             return redis.clearUserSessions(this.user1, next)
           },
 
           // login, should add session to set
-          next => {
-            return this.user1.login(err => next(err))
+          (next) => {
+            return this.user1.login((err) => next(err))
           },
 
-          next => {
+          (next) => {
             return redis.getUserSessions(this.user1, (err, sessions) => {
               expect(sessions.length).to.equal(1)
               expect(sessions[0].slice(0, 5)).to.equal('sess:')
@@ -117,11 +117,11 @@ describe('Sessions', function() {
           },
 
           // login again, should add the second session to set
-          next => {
-            return this.user2.login(err => next(err))
+          (next) => {
+            return this.user2.login((err) => next(err))
           },
 
-          next => {
+          (next) => {
             return redis.getUserSessions(this.user1, (err, sessions) => {
               expect(sessions.length).to.equal(2)
               expect(sessions[0].slice(0, 5)).to.equal('sess:')
@@ -131,7 +131,7 @@ describe('Sessions', function() {
           },
 
           // both should be able to access project list page
-          next => {
+          (next) => {
             return this.user1.getProjectListPage((err, statusCode) => {
               expect(err).to.equal(null)
               expect(statusCode).to.equal(200)
@@ -139,7 +139,7 @@ describe('Sessions', function() {
             })
           },
 
-          next => {
+          (next) => {
             return this.user2.getProjectListPage((err, statusCode) => {
               expect(err).to.equal(null)
               expect(statusCode).to.equal(200)
@@ -148,11 +148,11 @@ describe('Sessions', function() {
           },
 
           // logout first session, should remove session from set
-          next => {
-            return this.user1.logout(err => next(err))
+          (next) => {
+            return this.user1.logout((err) => next(err))
           },
 
-          next => {
+          (next) => {
             return redis.getUserSessions(this.user1, (err, sessions) => {
               expect(sessions.length).to.equal(1)
               return next()
@@ -160,7 +160,7 @@ describe('Sessions', function() {
           },
 
           // first session should not have access to project list page
-          next => {
+          (next) => {
             return this.user1.getProjectListPage((err, statusCode) => {
               expect(err).to.equal(null)
               expect(statusCode).to.equal(302)
@@ -169,7 +169,7 @@ describe('Sessions', function() {
           },
 
           // second session should still have access to settings
-          next => {
+          (next) => {
             return this.user2.getProjectListPage((err, statusCode) => {
               expect(err).to.equal(null)
               expect(statusCode).to.equal(200)
@@ -178,11 +178,11 @@ describe('Sessions', function() {
           },
 
           // logout second session, should remove last session from set
-          next => {
-            return this.user2.logout(err => next(err))
+          (next) => {
+            return this.user2.logout((err) => next(err))
           },
 
-          next => {
+          (next) => {
             return redis.getUserSessions(this.user1, (err, sessions) => {
               expect(sessions.length).to.equal(0)
               return next()
@@ -190,7 +190,7 @@ describe('Sessions', function() {
           },
 
           // second session should not have access to project list page
-          next => {
+          (next) => {
             return this.user2.getProjectListPage((err, statusCode) => {
               expect(err).to.equal(null)
               expect(statusCode).to.equal(302)
@@ -208,8 +208,8 @@ describe('Sessions', function() {
     })
   })
 
-  describe('three sessions, password reset', function() {
-    beforeEach(function() {
+  describe('three sessions, password reset', function () {
+    beforeEach(function () {
       // set up second session for this user
       this.user2 = new User()
       this.user2.email = this.user1.email
@@ -219,19 +219,19 @@ describe('Sessions', function() {
       return (this.user3.password = this.user1.password)
     })
 
-    it('should erase both sessions when password is reset', function(done) {
+    it('should erase both sessions when password is reset', function (done) {
       return async.series(
         [
-          next => {
+          (next) => {
             return redis.clearUserSessions(this.user1, next)
           },
 
           // login, should add session to set
-          next => {
-            return this.user1.login(err => next(err))
+          (next) => {
+            return this.user1.login((err) => next(err))
           },
 
-          next => {
+          (next) => {
             return redis.getUserSessions(this.user1, (err, sessions) => {
               expect(sessions.length).to.equal(1)
               expect(sessions[0].slice(0, 5)).to.equal('sess:')
@@ -240,11 +240,11 @@ describe('Sessions', function() {
           },
 
           // login again, should add the second session to set
-          next => {
-            return this.user2.login(err => next(err))
+          (next) => {
+            return this.user2.login((err) => next(err))
           },
 
-          next => {
+          (next) => {
             return redis.getUserSessions(this.user1, (err, sessions) => {
               expect(sessions.length).to.equal(2)
               expect(sessions[0].slice(0, 5)).to.equal('sess:')
@@ -254,11 +254,11 @@ describe('Sessions', function() {
           },
 
           // login third session, should add the second session to set
-          next => {
-            return this.user3.login(err => next(err))
+          (next) => {
+            return this.user3.login((err) => next(err))
           },
 
-          next => {
+          (next) => {
             return redis.getUserSessions(this.user1, (err, sessions) => {
               expect(sessions.length).to.equal(3)
               expect(sessions[0].slice(0, 5)).to.equal('sess:')
@@ -268,11 +268,11 @@ describe('Sessions', function() {
           },
 
           // password reset from second session, should erase two of the three sessions
-          next => {
-            return this.user2.changePassword(err => next(err))
+          (next) => {
+            return this.user2.changePassword((err) => next(err))
           },
 
-          next => {
+          (next) => {
             return redis.getUserSessions(this.user2, (err, sessions) => {
               expect(sessions.length).to.equal(1)
               return next()
@@ -280,7 +280,7 @@ describe('Sessions', function() {
           },
 
           // users one and three should not be able to access project list page
-          next => {
+          (next) => {
             return this.user1.getProjectListPage((err, statusCode) => {
               expect(err).to.equal(null)
               expect(statusCode).to.equal(302)
@@ -288,7 +288,7 @@ describe('Sessions', function() {
             })
           },
 
-          next => {
+          (next) => {
             return this.user3.getProjectListPage((err, statusCode) => {
               expect(err).to.equal(null)
               expect(statusCode).to.equal(302)
@@ -297,7 +297,7 @@ describe('Sessions', function() {
           },
 
           // user two should still be logged in, and able to access project list page
-          next => {
+          (next) => {
             return this.user2.getProjectListPage((err, statusCode) => {
               expect(err).to.equal(null)
               expect(statusCode).to.equal(200)
@@ -306,11 +306,11 @@ describe('Sessions', function() {
           },
 
           // logout second session, should remove last session from set
-          next => {
-            return this.user2.logout(err => next(err))
+          (next) => {
+            return this.user2.logout((err) => next(err))
           },
 
-          next => {
+          (next) => {
             return redis.getUserSessions(this.user1, (err, sessions) => {
               expect(sessions.length).to.equal(0)
               return next()
@@ -327,8 +327,8 @@ describe('Sessions', function() {
     })
   })
 
-  describe('three sessions, sessions page', function() {
-    beforeEach(function() {
+  describe('three sessions, sessions page', function () {
+    beforeEach(function () {
       // set up second session for this user
       this.user2 = new User()
       this.user2.email = this.user1.email
@@ -338,19 +338,19 @@ describe('Sessions', function() {
       return (this.user3.password = this.user1.password)
     })
 
-    it('should allow the user to erase the other two sessions', function(done) {
+    it('should allow the user to erase the other two sessions', function (done) {
       return async.series(
         [
-          next => {
+          (next) => {
             return redis.clearUserSessions(this.user1, next)
           },
 
           // login, should add session to set
-          next => {
-            return this.user1.login(err => next(err))
+          (next) => {
+            return this.user1.login((err) => next(err))
           },
 
-          next => {
+          (next) => {
             return redis.getUserSessions(this.user1, (err, sessions) => {
               expect(sessions.length).to.equal(1)
               expect(sessions[0].slice(0, 5)).to.equal('sess:')
@@ -359,11 +359,11 @@ describe('Sessions', function() {
           },
 
           // login again, should add the second session to set
-          next => {
-            return this.user2.login(err => next(err))
+          (next) => {
+            return this.user2.login((err) => next(err))
           },
 
-          next => {
+          (next) => {
             return redis.getUserSessions(this.user1, (err, sessions) => {
               expect(sessions.length).to.equal(2)
               expect(sessions[0].slice(0, 5)).to.equal('sess:')
@@ -373,11 +373,11 @@ describe('Sessions', function() {
           },
 
           // login third session, should add the second session to set
-          next => {
-            return this.user3.login(err => next(err))
+          (next) => {
+            return this.user3.login((err) => next(err))
           },
 
-          next => {
+          (next) => {
             return redis.getUserSessions(this.user1, (err, sessions) => {
               expect(sessions.length).to.equal(3)
               expect(sessions[0].slice(0, 5)).to.equal('sess:')
@@ -387,8 +387,8 @@ describe('Sessions', function() {
           },
 
           // enter sudo-mode
-          next => {
-            return this.user2.getCsrfToken(err => {
+          (next) => {
+            return this.user2.getCsrfToken((err) => {
               expect(err).to.be.oneOf([null, undefined])
               return this.user2.request.post(
                 {
@@ -407,7 +407,7 @@ describe('Sessions', function() {
           },
 
           // check the sessions page
-          next => {
+          (next) => {
             return this.user2.request.get(
               {
                 uri: '/user/sessions'
@@ -421,19 +421,19 @@ describe('Sessions', function() {
           },
 
           // clear sessions from second session, should erase two of the three sessions
-          next => {
-            return this.user2.getCsrfToken(err => {
+          (next) => {
+            return this.user2.getCsrfToken((err) => {
               expect(err).to.be.oneOf([null, undefined])
               return this.user2.request.post(
                 {
                   uri: '/user/sessions/clear'
                 },
-                err => next(err)
+                (err) => next(err)
               )
             })
           },
 
-          next => {
+          (next) => {
             return redis.getUserSessions(this.user2, (err, sessions) => {
               expect(sessions.length).to.equal(1)
               return next()
@@ -441,7 +441,7 @@ describe('Sessions', function() {
           },
 
           // users one and three should not be able to access project list page
-          next => {
+          (next) => {
             return this.user1.getProjectListPage((err, statusCode) => {
               expect(err).to.equal(null)
               expect(statusCode).to.equal(302)
@@ -449,7 +449,7 @@ describe('Sessions', function() {
             })
           },
 
-          next => {
+          (next) => {
             return this.user3.getProjectListPage((err, statusCode) => {
               expect(err).to.equal(null)
               expect(statusCode).to.equal(302)
@@ -458,7 +458,7 @@ describe('Sessions', function() {
           },
 
           // user two should still be logged in, and able to access project list page
-          next => {
+          (next) => {
             return this.user2.getProjectListPage((err, statusCode) => {
               expect(err).to.equal(null)
               expect(statusCode).to.equal(200)
@@ -467,11 +467,11 @@ describe('Sessions', function() {
           },
 
           // logout second session, should remove last session from set
-          next => {
-            return this.user2.logout(err => next(err))
+          (next) => {
+            return this.user2.logout((err) => next(err))
           },
 
-          next => {
+          (next) => {
             return redis.getUserSessions(this.user1, (err, sessions) => {
               expect(sessions.length).to.equal(0)
               return next()

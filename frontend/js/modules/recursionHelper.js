@@ -17,7 +17,7 @@
 // From: https://github.com/marklagendijk/angular-recursion
 angular.module('RecursionHelper', []).factory('RecursionHelper', [
   '$compile',
-  function($compile) {
+  function ($compile) {
     /*
     Manually compiles the element, fixing the recursion loop.
     @param element
@@ -47,7 +47,7 @@ angular.module('RecursionHelper', []).factory('RecursionHelper', [
             }
 
             // Re-add the compiled contents to the element
-            compiledContents(scope, function(clone) {
+            compiledContents(scope, function (clone) {
               element.append(clone)
             })
 

@@ -28,7 +28,7 @@ db.users.find(
           cb
         )
       },
-      err => {
+      (err) => {
         if (err) {
           throw err
         }
