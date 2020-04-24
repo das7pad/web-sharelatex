@@ -156,6 +156,7 @@ block content
 			window.overallThemes = JSON.parse('!{StringHelper.stringifyJsonForScript(overallThemes)}');
 
 block foot-scripts
+	script(async defer src=(wsUrl || '/socket.io') + '/socket.io.js')
 	script(async defer src=buildJsPath('libraries.js'), onerror='disableCDN()')
 	script(async defer src=buildJsPath('ideLibraries.js'), onerror='disableCDN()')
 	script(async defer src=buildJsPath('ide.js'), onerror='disableCDN()')

@@ -44,7 +44,7 @@ define([
             (error, connectedUsers) => {
               this.$scope.onlineUsers = {}
               for (const user of Array.from(connectedUsers || [])) {
-                if (user.client_id === this.ide.socket.io.engine.id) {
+                if (user.client_id === this.ide.socket.socket.sessionid) {
                   // Don't store myself
                   continue
                 }
@@ -71,7 +71,7 @@ define([
         })
 
         this.ide.socket.on('clientTracking.clientUpdated', client => {
-          if (client.id !== this.ide.socket.io.engine.id) {
+          if (client.id !== this.ide.socket.socket.sessionid) {
             // Check it's not me!
             return this.$scope.$apply(() => {
               this.$scope.onlineUsers[client.id] = client
