@@ -131,6 +131,7 @@
     "mini-css-extract-plugin": "^0.8.0",
     "minimist": "1.2.0",
     "mkdirp": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.1.tgz",
+    "mock-fs": "^4.11.0",
     "optimize-css-assets-webpack-plugin": "^5.0.3",
     "pdfjs-dist": "^2.2.228",
     "postcss-loader": "^3.0.0",
