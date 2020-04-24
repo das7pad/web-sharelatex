@@ -8,11 +8,11 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 
-define(['socket.io-client'], function (io) {
+define(['socket.io-client'], function(io) {
   let ConnectionManager
   const ONEHOUR = 1000 * 60 * 60
 
-  return (ConnectionManager = (function () {
+  return (ConnectionManager = (function() {
     ConnectionManager = class ConnectionManager {
       static initClass() {
         this.prototype.disconnectAfterMs = ONEHOUR * 24
@@ -79,7 +79,7 @@ define(['socket.io-client'], function (io) {
           }
         })
 
-        document.querySelector('body').addEventListener('click', (e) => {
+        document.querySelector('body').addEventListener('click', e => {
           if (!this.connected && e.target.id !== 'try-reconnect-now-button') {
             // user is editing, try to reconnect
             return this.tryReconnectWithRateLimit()
@@ -107,7 +107,7 @@ define(['socket.io-client'], function (io) {
 
         // handle network-level websocket errors (e.g. failed dns lookups)
 
-        const connectionErrorHandler = (err) => {
+        const connectionErrorHandler = err => {
           this.updateConnectionManagerState('error')
           sl_console.log('socket.io error', err)
           if (this.wsUrl && !window.location.href.match(/ws=fallback/)) {
@@ -140,7 +140,7 @@ define(['socket.io-client'], function (io) {
         // from the server, either "connectionAccepted" or
         // "connectionRejected".
 
-        this.ide.socket.on('connectionAccepted', (message) => {
+        this.ide.socket.on('connectionAccepted', message => {
           // state should be 'authenticating'...
           sl_console.log('[socket.io connectionAccepted] allowed to connect')
           this.connected = true
@@ -161,7 +161,7 @@ define(['socket.io-client'], function (io) {
           }, 100)
         })
 
-        this.ide.socket.on('connectionRejected', (err) => {
+        this.ide.socket.on('connectionRejected', err => {
           // state should be 'authenticating'...
           sl_console.log(
             '[socket.io connectionRejected] session not valid or other connection error'
@@ -208,7 +208,7 @@ define(['socket.io-client'], function (io) {
 
         // Site administrators can send the forceDisconnect event to all users
 
-        this.ide.socket.on('forceDisconnect', (message) => {
+        this.ide.socket.on('forceDisconnect', message => {
           this.updateConnectionManagerState('inactive')
           this.$scope.$apply(() => {
             this.$scope.permissions.write = false

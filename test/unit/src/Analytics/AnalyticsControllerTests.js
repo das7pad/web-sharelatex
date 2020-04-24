@@ -6,8 +6,8 @@ const modulePath = path.join(
 )
 const sinon = require('sinon')
 
-describe('AnalyticsController', function () {
-  beforeEach(function () {
+describe('AnalyticsController', function() {
+  beforeEach(function() {
     this.AuthenticationController = { getLoggedInUserId: sinon.stub() }
 
     this.AnalyticsManager = {
@@ -49,8 +49,8 @@ describe('AnalyticsController', function () {
     }
   })
 
-  describe('updateEditingSession', function () {
-    beforeEach(function () {
+  describe('updateEditingSession', function() {
+    beforeEach(function() {
       this.req = {
         params: {
           projectId: 'a project id'
@@ -61,7 +61,7 @@ describe('AnalyticsController', function () {
         .callsArgWith(1, null, { country_code: 'XY' })
     })
 
-    it('delegates to the AnalyticsManager', function (done) {
+    it('delegates to the AnalyticsManager', function(done) {
       this.AuthenticationController.getLoggedInUserId.returns('1234')
       this.controller.updateEditingSession(this.req, this.res)
 
@@ -72,8 +72,8 @@ describe('AnalyticsController', function () {
     })
   })
 
-  describe('recordEvent', function () {
-    beforeEach(function () {
+  describe('recordEvent', function() {
+    beforeEach(function() {
       this.req = {
         params: {
           event: 'i_did_something'
@@ -84,7 +84,7 @@ describe('AnalyticsController', function () {
       }
     })
 
-    it('should use the user_id', function (done) {
+    it('should use the user_id', function(done) {
       this.AuthenticationController.getLoggedInUserId.returns('1234')
       this.controller.recordEvent(this.req, this.res)
       this.AnalyticsManager.recordEvent
@@ -93,7 +93,7 @@ describe('AnalyticsController', function () {
       done()
     })
 
-    it('should use the session id', function (done) {
+    it('should use the session id', function(done) {
       this.controller.recordEvent(this.req, this.res)
       this.AnalyticsManager.recordEvent
         .calledWith(this.req.sessionID, this.req.params.event, this.req.body)
@@ -102,8 +102,8 @@ describe('AnalyticsController', function () {
     })
   })
 
-  describe('licences', function () {
-    beforeEach(function () {
+  describe('licences', function() {
+    beforeEach(function() {
       this.req = {
         query: {
           resource_id: 1,
@@ -116,7 +116,7 @@ describe('AnalyticsController', function () {
       }
     })
 
-    it('should trigger institutions api to fetch licences graph data', function (done) {
+    it('should trigger institutions api to fetch licences graph data', function(done) {
       this.controller.licences(this.req, this.res)
       this.InstitutionsAPI.getInstitutionLicences
         .calledWith(

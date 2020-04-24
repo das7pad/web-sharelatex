@@ -15,7 +15,7 @@ function log(providerId, sessionId, data) {
         'SamlLog JSON.stringify Error'
       )
     }
-    samlLog.save((err) => {
+    samlLog.save(err => {
       if (err) {
         logger.error({ err, sessionId, providerId }, 'SamlLog Error')
       }

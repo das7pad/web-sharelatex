@@ -26,16 +26,12 @@ const PasswordResetHandler = {
             email
           )}`
         }
-        EmailHandler.sendEmail(
-          'passwordResetRequested',
-          emailOptions,
-          (err) => {
-            if (err) {
-              return callback(err)
-            }
-            callback(null, 'primary')
+        EmailHandler.sendEmail('passwordResetRequested', emailOptions, err => {
+          if (err) {
+            return callback(err)
           }
-        )
+          callback(null, 'primary')
+        })
       })
     })
   },

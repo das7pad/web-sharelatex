@@ -4,8 +4,8 @@ const { expect } = chai
 const SandboxedModule = require('sandboxed-module')
 const modulePath = '../../../../app/src/Features/User/SAMLIdentityManager.js'
 
-describe('SAMLIdentityManager', function () {
-  beforeEach(function () {
+describe('SAMLIdentityManager', function() {
+  beforeEach(function() {
     this.Errors = {
       EmailExistsError: sinon.stub(),
       NotFoundError: sinon.stub(),
@@ -76,8 +76,8 @@ describe('SAMLIdentityManager', function () {
     })
   })
 
-  describe('getUser', function () {
-    it('should throw an error if missing provider ID and/or external user ID', async function () {
+  describe('getUser', function() {
+    it('should throw an error if missing provider ID and/or external user ID', async function() {
       let error
       try {
         await this.SAMLIdentityManager.getUser(null, null)
@@ -89,8 +89,8 @@ describe('SAMLIdentityManager', function () {
     })
   })
 
-  describe('linkAccounts', function () {
-    it('should throw an error if missing data', async function () {
+  describe('linkAccounts', function() {
+    it('should throw an error if missing data', async function() {
       let error
       try {
         await this.SAMLIdentityManager.linkAccounts(null, null, null, null)
@@ -101,14 +101,14 @@ describe('SAMLIdentityManager', function () {
       }
     })
 
-    describe('when email is already associated with another Overleaf account', function () {
-      beforeEach(function () {
+    describe('when email is already associated with another Overleaf account', function() {
+      beforeEach(function() {
         this.UserGetter.promises.getUserByAnyEmail.resolves(
           this.userEmailExists
         )
       })
 
-      it('should throw an EmailExistsError error', async function () {
+      it('should throw an EmailExistsError error', async function() {
         let error
         try {
           await this.SAMLIdentityManager.linkAccounts(
@@ -127,14 +127,14 @@ describe('SAMLIdentityManager', function () {
       })
     })
 
-    describe('when institution identifier is already associated with another Overleaf account', function () {
-      beforeEach(function () {
+    describe('when institution identifier is already associated with another Overleaf account', function() {
+      beforeEach(function() {
         this.UserGetter.promises.getUserByAnyEmail.resolves(
           this.userAlreadyLinked
         )
       })
 
-      it('should throw an SAMLIdentityExistsError error', async function () {
+      it('should throw an SAMLIdentityExistsError error', async function() {
         let error
         try {
           await this.SAMLIdentityManager.linkAccounts(
@@ -154,8 +154,8 @@ describe('SAMLIdentityManager', function () {
     })
   })
 
-  describe('unlinkAccounts', function () {
-    it('should send an email notification email', function () {
+  describe('unlinkAccounts', function() {
+    it('should send an email notification email', function() {
       this.SAMLIdentityManager.unlinkAccounts(
         this.user._id,
         this.user.email,
@@ -169,43 +169,43 @@ describe('SAMLIdentityManager', function () {
     })
   })
 
-  describe('entitlementAttributeMatches', function () {
-    it('should return true when entitlement matches on string', function () {
+  describe('entitlementAttributeMatches', function() {
+    it('should return true when entitlement matches on string', function() {
       this.SAMLIdentityManager.entitlementAttributeMatches(
         'foo bar',
         'bar'
       ).should.equal(true)
     })
 
-    it('should return false when entitlement does not match on string', function () {
+    it('should return false when entitlement does not match on string', function() {
       this.SAMLIdentityManager.entitlementAttributeMatches(
         'foo bar',
         'bam'
       ).should.equal(false)
     })
 
-    it('should return false on an invalid matcher', function () {
+    it('should return false on an invalid matcher', function() {
       this.SAMLIdentityManager.entitlementAttributeMatches(
         'foo bar',
         '('
       ).should.equal(false)
     })
 
-    it('should log error on an invalid matcher', function () {
+    it('should log error on an invalid matcher', function() {
       this.SAMLIdentityManager.entitlementAttributeMatches('foo bar', '(')
       this.logger.error.firstCall.args[0].err.message.should.equal(
         'Invalid regular expression: /(/: Unterminated group'
       )
     })
 
-    it('should return true when entitlement matches on array', function () {
+    it('should return true when entitlement matches on array', function() {
       this.SAMLIdentityManager.entitlementAttributeMatches(
         ['foo', 'bar'],
         'bar'
       ).should.equal(true)
     })
 
-    it('should return false when entitlement does not match array', function () {
+    it('should return false when entitlement does not match array', function() {
       this.SAMLIdentityManager.entitlementAttributeMatches(
         ['foo', 'bar'],
         'bam'

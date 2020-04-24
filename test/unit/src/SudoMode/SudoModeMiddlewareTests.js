@@ -20,8 +20,8 @@ const modulePath = require('path').join(
   '../../../../app/src/Features/SudoMode/SudoModeMiddleware'
 )
 
-describe('SudoModeMiddleware', function () {
-  beforeEach(function () {
+describe('SudoModeMiddleware', function() {
+  beforeEach(function() {
     this.userId = 'some_user_id'
     this.SudoModeHandler = { isSudoModeActive: sinon.stub() }
     this.AuthenticationController = {
@@ -46,10 +46,10 @@ describe('SudoModeMiddleware', function () {
     }))
   })
 
-  describe('protectPage', function () {
-    beforeEach(function () {
+  describe('protectPage', function() {
+    beforeEach(function() {
       this.externalAuth = false
-      return (this.call = (cb) => {
+      return (this.call = cb => {
         this.req = {
           externalAuthenticationSystemUsed: sinon
             .stub()
@@ -62,8 +62,8 @@ describe('SudoModeMiddleware', function () {
       })
     })
 
-    describe('when sudo mode is active', function () {
-      beforeEach(function () {
+    describe('when sudo mode is active', function() {
+      beforeEach(function() {
         this.AuthenticationController.getLoggedInUserId = sinon
           .stub()
           .returns(this.userId)
@@ -72,7 +72,7 @@ describe('SudoModeMiddleware', function () {
           .callsArgWith(1, null, true))
       })
 
-      it('should get the current user id', function (done) {
+      it('should get the current user id', function(done) {
         return this.call(() => {
           this.AuthenticationController.getLoggedInUserId.callCount.should.equal(
             1
@@ -81,7 +81,7 @@ describe('SudoModeMiddleware', function () {
         })
       })
 
-      it('should check if sudo-mode is active', function (done) {
+      it('should check if sudo-mode is active', function(done) {
         return this.call(() => {
           this.SudoModeHandler.isSudoModeActive.callCount.should.equal(1)
           this.SudoModeHandler.isSudoModeActive
@@ -91,7 +91,7 @@ describe('SudoModeMiddleware', function () {
         })
       })
 
-      it('should call next', function (done) {
+      it('should call next', function(done) {
         return this.call(() => {
           this.next.callCount.should.equal(1)
           expect(this.next.lastCall.args[0]).to.equal(undefined)
@@ -100,8 +100,8 @@ describe('SudoModeMiddleware', function () {
       })
     })
 
-    describe('when sudo mode is not active', function () {
-      beforeEach(function () {
+    describe('when sudo mode is not active', function() {
+      beforeEach(function() {
         this.AuthenticationController.setRedirectInSession = sinon.stub()
         this.AuthenticationController.getLoggedInUserId = sinon
           .stub()
@@ -111,7 +111,7 @@ describe('SudoModeMiddleware', function () {
           .callsArgWith(1, null, false))
       })
 
-      it('should get the current user id', function (done) {
+      it('should get the current user id', function(done) {
         return this.call(() => {
           this.AuthenticationController.getLoggedInUserId.callCount.should.equal(
             1
@@ -120,7 +120,7 @@ describe('SudoModeMiddleware', function () {
         })
       })
 
-      it('should check if sudo-mode is active', function (done) {
+      it('should check if sudo-mode is active', function(done) {
         return this.call(() => {
           this.SudoModeHandler.isSudoModeActive.callCount.should.equal(1)
           this.SudoModeHandler.isSudoModeActive
@@ -130,7 +130,7 @@ describe('SudoModeMiddleware', function () {
         })
       })
 
-      it('should set redirect in session', function (done) {
+      it('should set redirect in session', function(done) {
         return this.call(() => {
           this.AuthenticationController.setRedirectInSession.callCount.should.equal(
             1
@@ -142,7 +142,7 @@ describe('SudoModeMiddleware', function () {
         })
       })
 
-      it('should redirect to the password-prompt page', function (done) {
+      it('should redirect to the password-prompt page', function(done) {
         return this.call(() => {
           this.res.redirect.callCount.should.equal(1)
           this.res.redirect.calledWith('/confirm-password').should.equal(true)
@@ -151,8 +151,8 @@ describe('SudoModeMiddleware', function () {
       })
     })
 
-    describe('when isSudoModeActive produces an error', function () {
-      beforeEach(function () {
+    describe('when isSudoModeActive produces an error', function() {
+      beforeEach(function() {
         this.AuthenticationController.getLoggedInUserId = sinon
           .stub()
           .returns(this.userId)
@@ -161,7 +161,7 @@ describe('SudoModeMiddleware', function () {
           .callsArgWith(1, new Error('woops')))
       })
 
-      it('should get the current user id', function (done) {
+      it('should get the current user id', function(done) {
         return this.call(() => {
           this.AuthenticationController.getLoggedInUserId.callCount.should.equal(
             1
@@ -170,7 +170,7 @@ describe('SudoModeMiddleware', function () {
         })
       })
 
-      it('should check if sudo-mode is active', function (done) {
+      it('should check if sudo-mode is active', function(done) {
         return this.call(() => {
           this.SudoModeHandler.isSudoModeActive.callCount.should.equal(1)
           this.SudoModeHandler.isSudoModeActive
@@ -180,7 +180,7 @@ describe('SudoModeMiddleware', function () {
         })
       })
 
-      it('should call next with an error', function (done) {
+      it('should call next with an error', function(done) {
         return this.call(() => {
           this.next.callCount.should.equal(1)
           expect(this.next.lastCall.args[0]).to.be.instanceof(Error)
@@ -189,10 +189,10 @@ describe('SudoModeMiddleware', function () {
       })
     })
 
-    describe('when external auth is being used', function () {
-      beforeEach(function () {
+    describe('when external auth is being used', function() {
+      beforeEach(function() {
         this.externalAuth = true
-        return (this.call = (cb) => {
+        return (this.call = cb => {
           this.req = {
             externalAuthenticationSystemUsed: sinon
               .stub()
@@ -205,7 +205,7 @@ describe('SudoModeMiddleware', function () {
         })
       })
 
-      it('should immediately return next with no args', function (done) {
+      it('should immediately return next with no args', function(done) {
         return this.call(() => {
           this.next.callCount.should.equal(1)
           expect(this.next.lastCall.args[0]).to.not.exist
@@ -213,7 +213,7 @@ describe('SudoModeMiddleware', function () {
         })
       })
 
-      it('should not get the current user id', function (done) {
+      it('should not get the current user id', function(done) {
         return this.call(() => {
           this.AuthenticationController.getLoggedInUserId.callCount.should.equal(
             0
@@ -222,7 +222,7 @@ describe('SudoModeMiddleware', function () {
         })
       })
 
-      it('should not check if sudo-mode is active', function (done) {
+      it('should not check if sudo-mode is active', function(done) {
         return this.call(() => {
           this.SudoModeHandler.isSudoModeActive.callCount.should.equal(0)
           return done()

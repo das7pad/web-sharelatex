@@ -6,16 +6,16 @@ const RecurlySubscription = require('./helpers/RecurlySubscription')
 const SubscriptionUpdater = require('../../../app/src/Features/Subscription/SubscriptionUpdater')
 require('./helpers/MockV1Api')
 
-describe('Subscriptions', function () {
-  describe('deletion', function () {
-    beforeEach(function (done) {
+describe('Subscriptions', function() {
+  describe('deletion', function() {
+    beforeEach(function(done) {
       this.adminUser = new User()
       this.memberUser = new User()
       async.series(
         [
-          (cb) => this.adminUser.ensureUserExists(cb),
-          (cb) => this.memberUser.ensureUserExists(cb),
-          (cb) => {
+          cb => this.adminUser.ensureUserExists(cb),
+          cb => this.memberUser.ensureUserExists(cb),
+          cb => {
             this.recurlySubscription = new RecurlySubscription({
               adminId: this.adminUser._id,
               memberIds: [this.memberUser._id],
@@ -28,13 +28,13 @@ describe('Subscriptions', function () {
             this.subscription = this.recurlySubscription.subscription
             this.recurlySubscription.ensureExists(cb)
           },
-          (cb) => this.subscription.refreshUsersFeatures(cb)
+          cb => this.subscription.refreshUsersFeatures(cb)
         ],
         done
       )
     })
 
-    it('deletes via Recurly callback', function (done) {
+    it('deletes via Recurly callback', function(done) {
       const url = '/user/subscription/callback'
       const body = this.recurlySubscription.buildCallbackXml()
 
@@ -47,7 +47,7 @@ describe('Subscriptions', function () {
       })
     })
 
-    it('refresh features', function (done) {
+    it('refresh features', function(done) {
       const url = '/user/subscription/callback'
       const body = this.recurlySubscription.buildCallbackXml()
 
@@ -62,7 +62,7 @@ describe('Subscriptions', function () {
       })
     })
 
-    it('allows deletion when deletedSubscription exists', function (done) {
+    it('allows deletion when deletedSubscription exists', function(done) {
       const url = '/user/subscription/callback'
       const body = this.recurlySubscription.buildCallbackXml()
 
@@ -70,7 +70,7 @@ describe('Subscriptions', function () {
       SubscriptionUpdater._createDeletedSubscription(
         this.subscription,
         {},
-        (error) => {
+        error => {
           if (error) {
             return done(error)
           }

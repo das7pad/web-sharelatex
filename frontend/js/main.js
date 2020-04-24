@@ -58,8 +58,8 @@ define([
   './filters/formatDate',
   './components/inputSuggestions',
   '../../modules/modules-main'
-], function () {
-  angular.module('SharelatexApp').config(function ($locationProvider) {
+], function() {
+  angular.module('SharelatexApp').config(function($locationProvider) {
     try {
       return $locationProvider.html5Mode({
         enabled: true,

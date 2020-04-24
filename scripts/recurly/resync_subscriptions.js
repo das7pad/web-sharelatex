@@ -55,7 +55,7 @@ const ScriptLogger = {
   }
 }
 
-const slowCallback = (callback) => setTimeout(callback, 80)
+const slowCallback = callback => setTimeout(callback, 80)
 
 const handleSyncSubscriptionError = (subscription, error, callback) => {
   console.warn(`Errors with subscription id=${subscription._id}:`, error)
@@ -88,7 +88,7 @@ const syncSubscription = (subscription, callback) => {
         recurlySubscription,
         subscription,
         {},
-        (error) => {
+        error => {
           if (error) {
             return handleSyncSubscriptionError(subscription, error, callback)
           }
@@ -120,7 +120,7 @@ const loopForSubscriptions = (skip, callback) => {
         return callback()
       }
 
-      syncSubscriptions(subscriptions, (error) => {
+      syncSubscriptions(subscriptions, error => {
         if (error) {
           return callback(error)
         }
@@ -140,7 +140,7 @@ let retryCounter = 0
 const run = () =>
   loopForSubscriptions(
     MONGO_SKIP + ScriptLogger.checkedSubscriptionsCount,
-    (error) => {
+    error => {
       if (error) {
         if (retryCounter < 3) {
           console.error(error)

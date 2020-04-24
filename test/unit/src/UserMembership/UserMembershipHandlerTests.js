@@ -24,8 +24,8 @@ const SandboxedModule = require('sandboxed-module')
 const Errors = require('../../../../app/src/Features/Errors/Errors')
 const EntityConfigs = require('../../../../app/src/Features/UserMembership/UserMembershipEntityConfigs')
 
-describe('UserMembershipHandler', function () {
-  beforeEach(function () {
+describe('UserMembershipHandler', function() {
+  beforeEach(function() {
     this.user = { _id: ObjectId() }
     this.newUser = { _id: ObjectId(), email: 'new-user-email@foo.bar' }
     this.fakeEntityId = ObjectId()
@@ -86,8 +86,8 @@ describe('UserMembershipHandler', function () {
     }))
   })
 
-  describe('getEntityWithoutAuthorizationCheck', function () {
-    it('get publisher', function (done) {
+  describe('getEntityWithoutAuthorizationCheck', function() {
+    it('get publisher', function(done) {
       return this.UserMembershipHandler.getEntityWithoutAuthorizationCheck(
         this.fakeEntityId,
         EntityConfigs.publisher,
@@ -102,9 +102,9 @@ describe('UserMembershipHandler', function () {
     })
   })
 
-  describe('getUsers', function () {
-    describe('group', function () {
-      it('build view model for all users', function (done) {
+  describe('getUsers', function() {
+    describe('group', function() {
+      it('build view model for all users', function(done) {
         return this.UserMembershipHandler.getUsers(
           this.subscription,
           EntityConfigs.group,
@@ -122,8 +122,8 @@ describe('UserMembershipHandler', function () {
       })
     })
 
-    describe('group mamagers', function () {
-      it('build view model for all managers', function (done) {
+    describe('group mamagers', function() {
+      it('build view model for all managers', function(done) {
         return this.UserMembershipHandler.getUsers(
           this.subscription,
           EntityConfigs.groupManagers,
@@ -138,8 +138,8 @@ describe('UserMembershipHandler', function () {
       })
     })
 
-    describe('institution', function () {
-      it('build view model for all managers', function (done) {
+    describe('institution', function() {
+      it('build view model for all managers', function(done) {
         return this.UserMembershipHandler.getUsers(
           this.institution,
           EntityConfigs.institution,
@@ -155,8 +155,8 @@ describe('UserMembershipHandler', function () {
     })
   })
 
-  describe('createEntity', function () {
-    it('creates publisher', function (done) {
+  describe('createEntity', function() {
+    it('creates publisher', function(done) {
       return this.UserMembershipHandler.createEntity(
         this.fakeEntityId,
         EntityConfigs.publisher,
@@ -169,13 +169,13 @@ describe('UserMembershipHandler', function () {
     })
   })
 
-  describe('addUser', function () {
-    beforeEach(function () {
+  describe('addUser', function() {
+    beforeEach(function() {
       return (this.email = this.newUser.email)
     })
 
-    describe('institution', function () {
-      it('get user', function (done) {
+    describe('institution', function() {
+      it('get user', function(done) {
         return this.UserMembershipHandler.addUser(
           this.institution,
           EntityConfigs.institution,
@@ -187,13 +187,13 @@ describe('UserMembershipHandler', function () {
         )
       })
 
-      it('handle user not found', function (done) {
+      it('handle user not found', function(done) {
         this.UserGetter.getUserByAnyEmail.yields(null, null)
         return this.UserMembershipHandler.addUser(
           this.institution,
           EntityConfigs.institution,
           this.email,
-          (error) => {
+          error => {
             expect(error).to.exist
             expect(error.userNotFound).to.equal(true)
             return done()
@@ -201,7 +201,7 @@ describe('UserMembershipHandler', function () {
         )
       })
 
-      it('handle user already added', function (done) {
+      it('handle user already added', function(done) {
         this.institution.managerIds.push(this.newUser._id)
         return this.UserMembershipHandler.addUser(
           this.institution,
@@ -215,7 +215,7 @@ describe('UserMembershipHandler', function () {
         )
       })
 
-      it('add user to institution', function (done) {
+      it('add user to institution', function(done) {
         return this.UserMembershipHandler.addUser(
           this.institution,
           EntityConfigs.institution,
@@ -229,7 +229,7 @@ describe('UserMembershipHandler', function () {
         )
       })
 
-      it('return user view', function (done) {
+      it('return user view', function(done) {
         return this.UserMembershipHandler.addUser(
           this.institution,
           EntityConfigs.institution,
@@ -243,9 +243,9 @@ describe('UserMembershipHandler', function () {
     })
   })
 
-  describe('removeUser', function () {
-    describe('institution', function () {
-      it('remove user from institution', function (done) {
+  describe('removeUser', function() {
+    describe('institution', function() {
+      it('remove user from institution', function(done) {
         return this.UserMembershipHandler.removeUser(
           this.institution,
           EntityConfigs.institution,
@@ -260,7 +260,7 @@ describe('UserMembershipHandler', function () {
         )
       })
 
-      it('handle admin', function (done) {
+      it('handle admin', function(done) {
         this.subscription.admin_id = this.newUser._id
         return this.UserMembershipHandler.removeUser(
           this.subscription,

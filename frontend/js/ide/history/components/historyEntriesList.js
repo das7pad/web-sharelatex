@@ -10,13 +10,13 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base'], function (App) {
-  const historyEntriesListController = function ($scope, $element, $attrs, _) {
+define(['../../../base'], function(App) {
+  const historyEntriesListController = function($scope, $element, $attrs, _) {
     const ctrl = this
     ctrl.$entryListViewportEl = null
     ctrl.isDragging = false
 
-    const _isEntryElVisible = function ($entryEl) {
+    const _isEntryElVisible = function($entryEl) {
       const entryElTop = $entryEl.offset().top
       const entryElBottom = entryElTop + $entryEl.outerHeight()
       const entryListViewportElTop = ctrl.$entryListViewportEl.offset().top
@@ -28,11 +28,11 @@ define(['../../../base'], function (App) {
         entryElBottom <= entryListViewportElBottom
       )
     }
-    const _getScrollTopPosForEntry = function ($entryEl) {
+    const _getScrollTopPosForEntry = function($entryEl) {
       const halfViewportElHeight = ctrl.$entryListViewportEl.height() / 2
       return $entryEl.offset().top - halfViewportElHeight
     }
-    ctrl.onEntryLinked = function (entry, $entryEl) {
+    ctrl.onEntryLinked = function(entry, $entryEl) {
       if (
         !ctrl.rangeSelectionEnabled &&
         entry.toV === ctrl.selectedHistoryVersion
@@ -46,7 +46,7 @@ define(['../../../base'], function (App) {
         })
       }
     }
-    ctrl.handleEntrySelect = (entry) => {
+    ctrl.handleEntrySelect = entry => {
       if (ctrl.rangeSelectionEnabled) {
         ctrl.onRangeSelect({
           selectedToV: entry.toV,
@@ -56,7 +56,7 @@ define(['../../../base'], function (App) {
         ctrl.onVersionSelect({ version: entry.toV })
       }
     }
-    ctrl.setRangeToV = (toV) => {
+    ctrl.setRangeToV = toV => {
       if (toV > ctrl.selectedHistoryRange.fromV) {
         ctrl.onRangeSelect({
           selectedToV: toV,
@@ -64,7 +64,7 @@ define(['../../../base'], function (App) {
         })
       }
     }
-    ctrl.setRangeFromV = (fromV) => {
+    ctrl.setRangeFromV = fromV => {
       if (fromV < ctrl.selectedHistoryRange.toV) {
         ctrl.onRangeSelect({
           selectedToV: ctrl.selectedHistoryRange.toV,
@@ -81,12 +81,12 @@ define(['../../../base'], function (App) {
     ctrl.resetHoveredRange = () => {
       ctrl.hoveredHistoryRange = { toV: null, fromV: null }
     }
-    ctrl.setHoveredRangeToV = (toV) => {
+    ctrl.setHoveredRangeToV = toV => {
       if (toV > ctrl.hoveredHistoryRange.fromV) {
         $scope.$applyAsync(() => (ctrl.hoveredHistoryRange.toV = toV))
       }
     }
-    ctrl.setHoveredRangeFromV = (fromV) => {
+    ctrl.setHoveredRangeFromV = fromV => {
       if (fromV < ctrl.hoveredHistoryRange.toV) {
         $scope.$applyAsync(() => (ctrl.hoveredHistoryRange.fromV = fromV))
       }

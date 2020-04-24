@@ -38,10 +38,10 @@ db.users.aggregate(
     }
   ],
   { allowDiskUse: true },
-  function (error, results) {
+  function(error, results) {
     if (error) throw error
     console.log('FOUND ' + results.length + ' DUPLICATES')
-    async.mapSeries(results, removeDuplicates, function (error) {
+    async.mapSeries(results, removeDuplicates, function(error) {
       if (error) throw error
       console.log('DONE')
       process.exit()
@@ -50,17 +50,17 @@ db.users.aggregate(
 )
 
 function removeDuplicates(duplicate, callback) {
-  async.mapSeries(duplicate._ids, unlinkUser, function (error) {
+  async.mapSeries(duplicate._ids, unlinkUser, function(error) {
     callback(error)
   })
 }
 
 function unlinkUser(_id, callback) {
-  db.users.findOne({ _id: _id }, function (error, user) {
+  db.users.findOne({ _id: _id }, function(error, user) {
     if (error) return callback(error)
     console.log('UNLINKING USER ' + _id + ' (' + user.email + ')')
     if (!commit) return callback()
-    DropboxHandler.unlinkAccount(_id, function (error) {
+    DropboxHandler.unlinkAccount(_id, function(error) {
       if (error) return callback(error)
       EmailHandler.sendEmail(
         'dropboxUnlinkedDuplicate',

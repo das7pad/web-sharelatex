@@ -15,7 +15,7 @@ module.exports = {
     let countryCode = null
 
     if (userId) {
-      GeoIpLookup.getDetails(req.ip, function (err, geoDetails) {
+      GeoIpLookup.getDetails(req.ip, function(err, geoDetails) {
         if (!err && geoDetails && geoDetails.country_code) {
           countryCode = geoDetails.country_code
         }
@@ -23,7 +23,7 @@ module.exports = {
           userId,
           projectId,
           countryCode,
-          (error) => respondWith(error, res, next)
+          error => respondWith(error, res, next)
         )
       })
     } else {
@@ -37,7 +37,7 @@ module.exports = {
     }
     const userId =
       AuthenticationController.getLoggedInUserId(req) || req.sessionID
-    AnalyticsManager.recordEvent(userId, req.params.event, req.body, (error) =>
+    AnalyticsManager.recordEvent(userId, req.params.event, req.body, error =>
       respondWith(error, res, next)
     )
   },
@@ -48,7 +48,7 @@ module.exports = {
       req.query.start_date,
       req.query.end_date,
       req.query.lag,
-      function (error, licences) {
+      function(error, licences) {
         if (error) {
           return next(error)
         }
@@ -63,7 +63,7 @@ module.exports = {
       req.query.start_date,
       req.query.end_date,
       req.query.lag,
-      function (error, licences) {
+      function(error, licences) {
         if (error) {
           return next(error)
         }
@@ -73,7 +73,7 @@ module.exports = {
   }
 }
 
-var respondWith = function (error, res, next) {
+var respondWith = function(error, res, next) {
   if (error instanceof Errors.ServiceNotConfiguredError) {
     // ignore, no-op
     res.sendStatus(204)

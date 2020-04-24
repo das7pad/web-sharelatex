@@ -11,7 +11,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define([], function () {
+define([], function() {
   class RichTextAdapter {
     constructor(fileTreeManager) {
       this.fileTreeManager = fileTreeManager

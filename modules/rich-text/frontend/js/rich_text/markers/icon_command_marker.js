@@ -42,7 +42,9 @@ function makeOpenSpan(sourceMark) {
   const iconClass = sourceMark.kind.match(/cite/) ? 'fa-book' : 'fa-tag'
 
   const icon = $('<span>').addClass(`fa fa-fw ${iconClass}`)
-  const bracket = $('<span>').text('{').addClass('wl-label-bracket')
+  const bracket = $('<span>')
+    .text('{')
+    .addClass('wl-label-bracket')
 
   const span = $('<span>')
     .addClass('wl-label-open')
@@ -53,7 +55,9 @@ function makeOpenSpan(sourceMark) {
 }
 
 function makeClosingSpan() {
-  const span = $('<span>').text('}').addClass('wl-label-bracket')
+  const span = $('<span>')
+    .text('}')
+    .addClass('wl-label-bracket')
 
   return span[0]
 }

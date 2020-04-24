@@ -55,7 +55,10 @@ const ProjectController = {
       return true
     }
     const data = `${rolloutName}:${objectId.toString()}`
-    const md5hash = crypto.createHash('md5').update(data).digest('hex')
+    const md5hash = crypto
+      .createHash('md5')
+      .update(data)
+      .digest('hex')
     const counter = parseInt(md5hash.slice(26, 32), 16)
     return counter % 100 < percentage
   },
@@ -66,25 +69,25 @@ const ProjectController = {
     const jobs = []
 
     if (req.body.compiler != null) {
-      jobs.push((callback) =>
+      jobs.push(callback =>
         EditorController.setCompiler(projectId, req.body.compiler, callback)
       )
     }
 
     if (req.body.imageName != null) {
-      jobs.push((callback) =>
+      jobs.push(callback =>
         EditorController.setImageName(projectId, req.body.imageName, callback)
       )
     }
 
     if (req.body.name != null) {
-      jobs.push((callback) =>
+      jobs.push(callback =>
         EditorController.renameProject(projectId, req.body.name, callback)
       )
     }
 
     if (req.body.spellCheckLanguage != null) {
-      jobs.push((callback) =>
+      jobs.push(callback =>
         EditorController.setSpellCheckLanguage(
           projectId,
           req.body.spellCheckLanguage,
@@ -94,12 +97,12 @@ const ProjectController = {
     }
 
     if (req.body.rootDocId != null) {
-      jobs.push((callback) =>
+      jobs.push(callback =>
         EditorController.setRootDoc(projectId, req.body.rootDocId, callback)
       )
     }
 
-    async.series(jobs, (error) => {
+    async.series(jobs, error => {
       if (error != null) {
         return next(error)
       }
@@ -112,7 +115,7 @@ const ProjectController = {
 
     const jobs = []
     if (req.body.publicAccessLevel != null) {
-      jobs.push((callback) =>
+      jobs.push(callback =>
         EditorController.setPublicAccessLevel(
           projectId,
           req.body.publicAccessLevel,
@@ -121,7 +124,7 @@ const ProjectController = {
       )
     }
 
-    async.series(jobs, (error) => {
+    async.series(jobs, error => {
       if (error != null) {
         return next(error)
       }
@@ -132,7 +135,7 @@ const ProjectController = {
   deleteProject(req, res) {
     const projectId = req.params.Project_id
     const user = AuthenticationController.getSessionUser(req)
-    const cb = (err) => {
+    const cb = err => {
       if (err != null) {
         res.sendStatus(500)
       } else {
@@ -150,7 +153,7 @@ const ProjectController = {
     const projectId = req.params.Project_id
     const userId = AuthenticationController.getLoggedInUserId(req)
 
-    ProjectDeleter.archiveProject(projectId, userId, function (err) {
+    ProjectDeleter.archiveProject(projectId, userId, function(err) {
       if (err != null) {
         return next(err)
       } else {
@@ -163,7 +166,7 @@ const ProjectController = {
     const projectId = req.params.Project_id
     const userId = AuthenticationController.getLoggedInUserId(req)
 
-    ProjectDeleter.unarchiveProject(projectId, userId, function (err) {
+    ProjectDeleter.unarchiveProject(projectId, userId, function(err) {
       if (err != null) {
         return next(err)
       } else {
@@ -176,7 +179,7 @@ const ProjectController = {
     const projectId = req.params.project_id
     const userId = AuthenticationController.getLoggedInUserId(req)
 
-    ProjectDeleter.trashProject(projectId, userId, function (err) {
+    ProjectDeleter.trashProject(projectId, userId, function(err) {
       if (err != null) {
         return next(err)
       } else {
@@ -189,7 +192,7 @@ const ProjectController = {
     const projectId = req.params.project_id
     const userId = AuthenticationController.getLoggedInUserId(req)
 
-    ProjectDeleter.untrashProject(projectId, userId, function (err) {
+    ProjectDeleter.untrashProject(projectId, userId, function(err) {
       if (err != null) {
         return next(err)
       } else {
@@ -199,7 +202,7 @@ const ProjectController = {
   },
 
   expireDeletedProjectsAfterDuration(req, res) {
-    ProjectDeleter.expireDeletedProjectsAfterDuration((err) => {
+    ProjectDeleter.expireDeletedProjectsAfterDuration(err => {
       if (err != null) {
         res.sendStatus(500)
       } else {
@@ -210,7 +213,7 @@ const ProjectController = {
 
   expireDeletedProject(req, res, next) {
     const { projectId } = req.params
-    ProjectDeleter.expireDeletedProject(projectId, (err) => {
+    ProjectDeleter.expireDeletedProject(projectId, err => {
       if (err != null) {
         next(err)
       } else {
@@ -221,7 +224,7 @@ const ProjectController = {
 
   restoreProject(req, res) {
     const projectId = req.params.Project_id
-    ProjectDeleter.restoreProject(projectId, (err) => {
+    ProjectDeleter.restoreProject(projectId, err => {
       if (err != null) {
         res.sendStatus(500)
       } else {
@@ -269,7 +272,7 @@ const ProjectController = {
 
     async.waterfall(
       [
-        (cb) => {
+        cb => {
           if (template === 'example') {
             ProjectCreationHandler.createExampleProject(userId, projectName, cb)
           } else {
@@ -289,7 +292,7 @@ const ProjectController = {
   renameProject(req, res, next) {
     const projectId = req.params.Project_id
     const newName = req.body.newProjectName
-    EditorController.renameProject(projectId, newName, (err) => {
+    EditorController.renameProject(projectId, newName, err => {
       if (err != null) {
         return next(err)
       }
@@ -309,9 +312,9 @@ const ProjectController = {
 
         // _buildProjectList already converts archived/trashed to booleans so isArchivedOrTrashed should not be used here
         projects = ProjectController._buildProjectList(projects, userId)
-          .filter((p) => !(p.archived || p.trashed))
-          .filter((p) => !p.isV1Project)
-          .map((p) => ({ _id: p.id, name: p.name, accessLevel: p.accessLevel }))
+          .filter(p => !(p.archived || p.trashed))
+          .filter(p => !p.isV1Project)
+          .map(p => ({ _id: p.id, name: p.name, accessLevel: p.accessLevel }))
 
         res.json({ projects })
       }
@@ -334,7 +337,7 @@ const ProjectController = {
             .concat(files)
             // Sort by path ascending
             .sort((a, b) => (a.path > b.path ? 1 : -1))
-            .map((e) => ({
+            .map(e => ({
               path: e.path,
               type: e.doc != null ? 'doc' : 'file'
             }))
@@ -445,13 +448,13 @@ const ProjectController = {
           const samlSession = req.session.saml
           // Notification: SSO Available
           const linkedInstitutionIds = []
-          user.emails.forEach((email) => {
+          user.emails.forEach(email => {
             if (email.samlProviderId) {
               linkedInstitutionIds.push(email.samlProviderId)
             }
           })
           if (Array.isArray(userAffiliations)) {
-            userAffiliations.forEach((affiliation) => {
+            userAffiliations.forEach(affiliation => {
               if (
                 _ssoAvailable(affiliation, req.session, linkedInstitutionIds)
               ) {
@@ -724,7 +727,7 @@ const ProjectController = {
             )
           }
         ],
-        flushToTpds: (cb) => {
+        flushToTpds: cb => {
           TpdsProjectFlusher.flushProjectToTpdsIfNeeded(projectId, cb)
         }
       },
@@ -924,7 +927,7 @@ const ProjectController = {
     //   from 'owner' => 'token-read-only'
     for (project of tokenReadAndWrite) {
       if (
-        projects.filter((p) => p.id.toString() === project._id.toString())
+        projects.filter(p => p.id.toString() === project._id.toString())
           .length === 0
       ) {
         projects.push(
@@ -939,7 +942,7 @@ const ProjectController = {
     }
     for (project of tokenReadOnly) {
       if (
-        projects.filter((p) => p.id.toString() === project._id.toString())
+        projects.filter(p => p.id.toString() === project._id.toString())
           .length === 0
       ) {
         projects.push(
@@ -1042,7 +1045,7 @@ const ProjectController = {
           }
         )
       },
-      (error) => {
+      error => {
         if (error != null) {
           return callback(error)
         }
@@ -1101,7 +1104,7 @@ const ProjectController = {
   }
 }
 
-var defaultSettingsForAnonymousUser = (userId) => ({
+var defaultSettingsForAnonymousUser = userId => ({
   id: userId,
   ace: {
     mode: 'none',

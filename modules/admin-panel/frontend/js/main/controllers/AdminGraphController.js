@@ -12,11 +12,11 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../../../../frontend/js/base', 'crypto-js/md5'], function (
+define(['../../../../../../frontend/js/base', 'crypto-js/md5'], function(
   App,
   CryptoJSmd5
 ) {
-  App.controller('AdminGraphController', function (
+  App.controller('AdminGraphController', function(
     $scope,
     $timeout,
     $location,
@@ -49,7 +49,7 @@ define(['../../../../../../frontend/js/base', 'crypto-js/md5'], function (
     $scope.sGraph.refresh()
 
     // Bind the events:
-    $scope.sGraph.bind('clickNode', function (e) {
+    $scope.sGraph.bind('clickNode', function(e) {
       $scope.selectedElement = {
         name: e.data.node.label,
         id: e.data.node.id,
@@ -59,7 +59,7 @@ define(['../../../../../../frontend/js/base', 'crypto-js/md5'], function (
       return $scope.openGraphModal()
     })
 
-    $scope.sGraph.bind('clickEdge', function (e) {
+    $scope.sGraph.bind('clickEdge', function(e) {
       $scope.selectedElement = {
         name: e.data.edge.label,
         id: e.data.edge.projectId,
@@ -71,7 +71,7 @@ define(['../../../../../../frontend/js/base', 'crypto-js/md5'], function (
 
     $timeout(() => $scope.sGraph.stopForceAtlas2(), 500)
 
-    return ($scope.openGraphModal = function () {
+    return ($scope.openGraphModal = function() {
       let modalInstance
       return (modalInstance = $modal.open({
         templateUrl: 'graphModalTemplate',
@@ -85,7 +85,7 @@ define(['../../../../../../frontend/js/base', 'crypto-js/md5'], function (
     })
   })
 
-  return App.controller('GraphModalController', function (
+  return App.controller('GraphModalController', function(
     $scope,
     $modalInstance,
     element

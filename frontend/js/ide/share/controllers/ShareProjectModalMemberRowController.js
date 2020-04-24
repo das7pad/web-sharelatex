@@ -1,5 +1,5 @@
-define(['../../../base'], (App) => {
-  App.controller('ShareProjectModalMemberRowController', function (
+define(['../../../base'], App => {
+  App.controller('ShareProjectModalMemberRowController', function(
     $scope,
     $modal,
     projectMembers

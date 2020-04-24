@@ -34,4 +34,4 @@ define([
   'libs/passfield',
   'libs/ng-tags-input',
   'libs/select/select'
-], function () {})
+], function() {})

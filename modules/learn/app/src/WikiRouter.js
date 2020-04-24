@@ -100,30 +100,28 @@ module.exports = {
       // Check if a `/learn` link exists in header_extras, either under the `Help` menu
       // or on it's own. If not, add it, either on it's own or in the `Help` menu,
       // whichever is most appropriate.
-      const _getHelp = (someList) =>
+      const _getHelp = someList =>
         _.find(
           someList,
-          (e) =>
-            __guardMethod__(
-              e != null ? e.text : undefined,
-              'toLowerCase',
-              (o) => o.toLowerCase()
+          e =>
+            __guardMethod__(e != null ? e.text : undefined, 'toLowerCase', o =>
+              o.toLowerCase()
             ) === 'help' && e.dropdown != null
         )
-      const _getLearn = (someList) =>
-        _.find(someList, (element) => element.url === '/learn')
+      const _getLearn = someList =>
+        _.find(someList, element => element.url === '/learn')
       const _addLearn = (targetList, optionalClass) =>
         targetList.unshift({
           url: '/learn',
           text: 'documentation',
           class: optionalClass
         })
-      return webRouter.use(function (req, res, next) {
+      return webRouter.use(function(req, res, next) {
         try {
           if (
             __guard__(
               res.locals != null ? res.locals.nav : undefined,
-              (x) => x.header_extras
+              x => x.header_extras
             ) != null
           ) {
             let help

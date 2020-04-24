@@ -5,4 +5,4 @@ define([
   './controllers/OwnershipTransferConfirmModalController',
   './services/projectMembers',
   './services/projectInvites'
-], function () {})
+], function() {})

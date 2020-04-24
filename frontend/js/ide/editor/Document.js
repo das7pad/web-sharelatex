@@ -21,9 +21,9 @@ define([
   '../../utils/EventEmitter',
   './ShareJsDoc',
   '../review-panel/RangesTracker'
-], function (EventEmitter, ShareJsDoc, RangesTracker) {
+], function(EventEmitter, ShareJsDoc, RangesTracker) {
   let Document
-  return (Document = (function () {
+  return (Document = (function() {
     Document = class Document extends EventEmitter {
       static initClass() {
         this.prototype.MAX_PENDING_OP_SIZE = 64
@@ -193,16 +193,16 @@ define([
       }
 
       _bindToSocketEvents() {
-        this._onUpdateAppliedHandler = (update) => this._onUpdateApplied(update)
+        this._onUpdateAppliedHandler = update => this._onUpdateApplied(update)
         this.ide.socket.on('otUpdateApplied', this._onUpdateAppliedHandler)
         this._onErrorHandler = (error, update) => this._onError(error, update)
         this.ide.socket.on('otUpdateError', this._onErrorHandler)
-        this._onDisconnectHandler = (error) => this._onDisconnect(error)
+        this._onDisconnectHandler = error => this._onDisconnect(error)
         return this.ide.socket.on('disconnect', this._onDisconnectHandler)
       }
 
       _bindToEditorEvents() {
-        const onReconnectHandler = (update) => {
+        const onReconnectHandler = update => {
           return this._onReconnect(update)
         }
         return (this._unsubscribeReconnectHandler = this.ide.$scope.$on(
@@ -228,14 +228,14 @@ define([
       }
 
       leaveAndCleanUp() {
-        return this.leave((error) => {
+        return this.leave(error => {
           return this._cleanUp()
         })
       }
 
       join(callback) {
         if (callback == null) {
-          callback = function (error) {}
+          callback = function(error) {}
         }
         this.wantToBeJoined = true
         this._cancelLeave()
@@ -251,7 +251,7 @@ define([
 
       leave(callback) {
         if (callback == null) {
-          callback = function (error) {}
+          callback = function(error) {}
         }
         this.wantToBeJoined = false
         this._cancelJoin()
@@ -346,9 +346,8 @@ define([
           // In any other situation, assume the document is unsaved.
           saved = false
           sl_console.log(
-            `[pollSavedStatus] assuming not saved (inflightOp?: ${
-              inflightOp != null
-            }, pendingOp?: ${pendingOp != null})`
+            `[pollSavedStatus] assuming not saved (inflightOp?: ${inflightOp !=
+              null}, pendingOp?: ${pendingOp != null})`
           )
         }
 
@@ -436,7 +435,7 @@ define([
               this.doc != null ? this.doc.hasBufferedOps() : undefined
             })`
           )
-          return this._joinDoc((error) => {
+          return this._joinDoc(error => {
             if (error != null) {
               return this._onError(error)
             }
@@ -456,7 +455,7 @@ define([
 
       _joinDoc(callback) {
         if (callback == null) {
-          callback = function (error) {}
+          callback = function(error) {}
         }
         if (this.doc != null) {
           this.ide.pushEvent('joinDoc:existing', {
@@ -518,7 +517,7 @@ define([
       }
 
       _decodeRanges(ranges) {
-        const decodeFromWebsockets = (text) => decodeURIComponent(escape(text))
+        const decodeFromWebsockets = text => decodeURIComponent(escape(text))
         try {
           for (const change of Array.from(ranges.changes || [])) {
             if (change.op.i != null) {
@@ -546,10 +545,10 @@ define([
 
       _leaveDoc(callback) {
         if (callback == null) {
-          callback = function (error) {}
+          callback = function(error) {}
         }
         sl_console.log('[_leaveDoc] Sending leaveDoc request')
-        return this.ide.socket.emit('leaveDoc', this.doc_id, (error) => {
+        return this.ide.socket.emit('leaveDoc', this.doc_id, error => {
           if (error != null) {
             return callback(error)
           }
@@ -583,7 +582,7 @@ define([
 
       _bindToShareJsDocEvents() {
         this.doc.on('error', (error, meta) => this._onError(error, meta))
-        this.doc.on('externalUpdate', (update) => {
+        this.doc.on('externalUpdate', update => {
           this.ide.pushEvent('externalUpdate', { doc_id: this.doc_id })
           return this.trigger('externalUpdate', update)
         })
@@ -591,14 +590,14 @@ define([
           this.ide.pushEvent('remoteop', { doc_id: this.doc_id })
           return this.trigger('remoteop', ...Array.from(args))
         })
-        this.doc.on('op:sent', (op) => {
+        this.doc.on('op:sent', op => {
           this.ide.pushEvent('op:sent', {
             doc_id: this.doc_id,
             op
           })
           return this.trigger('op:sent')
         })
-        this.doc.on('op:acknowledged', (op) => {
+        this.doc.on('op:acknowledged', op => {
           this.ide.pushEvent('op:acknowledged', {
             doc_id: this.doc_id,
             op
@@ -609,7 +608,7 @@ define([
           })
           return this.trigger('op:acknowledged')
         })
-        this.doc.on('op:timeout', (op) => {
+        this.doc.on('op:timeout', op => {
           this.ide.pushEvent('op:timeout', {
             doc_id: this.doc_id,
             op
@@ -681,9 +680,7 @@ define([
         }
         let track_changes_as = null
         const remote_op = msg != null
-        if (
-          __guard__(msg != null ? msg.meta : undefined, (x) => x.tc) != null
-        ) {
+        if (__guard__(msg != null ? msg.meta : undefined, x => x.tc) != null) {
           old_id_seed = this.ranges.getIdSeed()
           this.ranges.setIdSeed(msg.meta.tc)
         }

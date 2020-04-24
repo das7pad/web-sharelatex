@@ -16,8 +16,8 @@ const chai = require('chai').should()
 const modulePath = '../../../../app/src/Features/Project/ProjectDuplicator.js'
 const SandboxedModule = require('sandboxed-module')
 
-describe('ProjectDuplicator', function () {
-  beforeEach(function () {
+describe('ProjectDuplicator', function() {
+  beforeEach(function() {
     this.level2folder = {
       name: 'level2folderName',
       _id: 'level2folderId',
@@ -171,8 +171,8 @@ describe('ProjectDuplicator', function () {
     }))
   })
 
-  describe('when the copy succeeds', function () {
-    it('should look up the original project', function (done) {
+  describe('when the copy succeeds', function() {
+    it('should look up the original project', function(done) {
       const newProjectName = 'someProj'
       return this.duplicator.duplicate(
         this.owner,
@@ -187,7 +187,7 @@ describe('ProjectDuplicator', function () {
       )
     })
 
-    it('should flush the original project to mongo', function (done) {
+    it('should flush the original project to mongo', function(done) {
       const newProjectName = 'someProj'
       return this.duplicator.duplicate(
         this.owner,
@@ -202,7 +202,7 @@ describe('ProjectDuplicator', function () {
       )
     })
 
-    it('should create a blank project', function (done) {
+    it('should create a blank project', function(done) {
       const newProjectName = 'someProj'
       return this.duplicator.duplicate(
         this.owner,
@@ -218,7 +218,7 @@ describe('ProjectDuplicator', function () {
       )
     })
 
-    it('should use the same compiler', function (done) {
+    it('should use the same compiler', function(done) {
       this.ProjectEntityUpdateHandler.addDoc.callsArgWith(
         5,
         null,
@@ -238,7 +238,7 @@ describe('ProjectDuplicator', function () {
       )
     })
 
-    it('should use the same root doc', function (done) {
+    it('should use the same root doc', function(done) {
       this.ProjectEntityUpdateHandler.addDoc.callsArgWith(
         5,
         null,
@@ -258,7 +258,7 @@ describe('ProjectDuplicator', function () {
       )
     })
 
-    it('should not copy the collaberators or read only refs', function (done) {
+    it('should not copy the collaberators or read only refs', function(done) {
       return this.duplicator.duplicate(
         this.owner,
         this.old_project_id,
@@ -271,7 +271,7 @@ describe('ProjectDuplicator', function () {
       )
     })
 
-    it('should copy all the folders', function (done) {
+    it('should copy all the folders', function(done) {
       return this.duplicator.duplicate(
         this.owner,
         this.old_project_id,
@@ -297,7 +297,7 @@ describe('ProjectDuplicator', function () {
       )
     })
 
-    it('should copy all the docs', function (done) {
+    it('should copy all the docs', function(done) {
       return this.duplicator.duplicate(
         this.owner,
         this.old_project_id,
@@ -338,7 +338,7 @@ describe('ProjectDuplicator', function () {
       )
     })
 
-    it('should copy all the files', function (done) {
+    it('should copy all the files', function(done) {
       return this.duplicator.duplicate(
         this.owner,
         this.old_project_id,
@@ -380,8 +380,8 @@ describe('ProjectDuplicator', function () {
     })
   })
 
-  describe('when there is an error', function () {
-    beforeEach(function () {
+  describe('when there is an error', function() {
+    beforeEach(function() {
       return (this.rootFolder.fileRefs = [
         { name: 'file0', _id: 'file0' },
         'BROKEN-FILE',
@@ -390,7 +390,7 @@ describe('ProjectDuplicator', function () {
       ])
     })
 
-    it('should delete the broken cloned project', function (done) {
+    it('should delete the broken cloned project', function(done) {
       return this.duplicator.duplicate(
         this.owner,
         this.old_project_id,
@@ -404,7 +404,7 @@ describe('ProjectDuplicator', function () {
       )
     })
 
-    it('should not delete the original project', function (done) {
+    it('should not delete the original project', function(done) {
       return this.duplicator.duplicate(
         this.owner,
         this.old_project_id,
@@ -418,7 +418,7 @@ describe('ProjectDuplicator', function () {
       )
     })
 
-    it('should return an error', function (done) {
+    it('should return an error', function(done) {
       return this.duplicator.duplicate(
         this.owner,
         this.old_project_id,

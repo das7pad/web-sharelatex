@@ -1,5 +1,5 @@
-define(['../../../base'], (App) => {
-  App.controller('ShareController', function (
+define(['../../../base'], App => {
+  App.controller('ShareController', function(
     $scope,
     $modal,
     ide,
@@ -8,7 +8,7 @@ define(['../../../base'], (App) => {
     // eslint-disable-next-line camelcase
     eventTracking
   ) {
-    $scope.openShareProjectModal = function (isAdmin) {
+    $scope.openShareProjectModal = function(isAdmin) {
       $scope.isAdmin = isAdmin
       eventTracking.sendMBOnce('ide-open-share-modal-once')
 
@@ -19,18 +19,18 @@ define(['../../../base'], (App) => {
       })
     }
 
-    ide.socket.on('project:tokens:changed', (data) => {
+    ide.socket.on('project:tokens:changed', data => {
       if (data.tokens != null) {
         ide.$scope.project.tokens = data.tokens
         $scope.$digest()
       }
     })
 
-    ide.socket.on('project:membership:changed', (data) => {
+    ide.socket.on('project:membership:changed', data => {
       if (data.members) {
         projectMembers
           .getMembers()
-          .then((response) => {
+          .then(response => {
             if (response.data.members) {
               $scope.project.members = response.data.members
             }
@@ -42,7 +42,7 @@ define(['../../../base'], (App) => {
       if (data.invites) {
         projectInvites
           .getInvites()
-          .then((response) => {
+          .then(response => {
             if (response.data.invites) {
               $scope.project.invites = response.data.invites
             }

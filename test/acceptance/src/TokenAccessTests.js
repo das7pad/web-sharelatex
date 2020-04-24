@@ -13,7 +13,7 @@ require('./helpers/MockProjectHistoryApi')
 const tryEditorAccess = (user, projectId, test, callback) =>
   async.series(
     [
-      (cb) =>
+      cb =>
         user.request.get(`/project/${projectId}`, (error, response, body) => {
           if (error != null) {
             return cb(error)
@@ -21,7 +21,7 @@ const tryEditorAccess = (user, projectId, test, callback) =>
           test(response, body)
           cb()
         }),
-      (cb) =>
+      cb =>
         user.request.get(
           `/project/${projectId}/download/zip`,
           (error, response, body) => {
@@ -165,10 +165,10 @@ const tryAnonContentAccess = (user, projectId, token, test, callback) => {
   )
 }
 
-describe('TokenAccess', function () {
+describe('TokenAccess', function() {
   this.timeout(90000)
 
-  beforeEach(function (done) {
+  beforeEach(function(done) {
     this.timeout(90000)
     this.owner = new User()
     this.other1 = new User()
@@ -177,24 +177,24 @@ describe('TokenAccess', function () {
     this.siteAdmin = new User({ email: 'admin@example.com' })
     async.parallel(
       [
-        (cb) =>
-          this.siteAdmin.login((err) => {
+        cb =>
+          this.siteAdmin.login(err => {
             if (err) {
               return cb(err)
             }
             this.siteAdmin.ensureAdmin(cb)
           }),
-        (cb) => this.owner.login(cb),
-        (cb) => this.other1.login(cb),
-        (cb) => this.other2.login(cb),
-        (cb) => this.anon.getCsrfToken(cb)
+        cb => this.owner.login(cb),
+        cb => this.other1.login(cb),
+        cb => this.other2.login(cb),
+        cb => this.anon.getCsrfToken(cb)
       ],
       done
     )
   })
 
-  describe('no token-access', function () {
-    beforeEach(function (done) {
+  describe('no token-access', function() {
+    beforeEach(function(done) {
       this.owner.createProject(
         `token-ro-test${Math.random()}`,
         (err, projectId) => {
@@ -209,10 +209,10 @@ describe('TokenAccess', function () {
       )
     })
 
-    it('should deny access ', function (done) {
+    it('should deny access ', function(done) {
       async.series(
         [
-          (cb) => {
+          cb => {
             tryEditorAccess(
               this.other1,
               this.projectId,
@@ -223,7 +223,7 @@ describe('TokenAccess', function () {
               cb
             )
           },
-          (cb) => {
+          cb => {
             tryContentAccess(
               this.other1,
               this.projectId,
@@ -240,8 +240,8 @@ describe('TokenAccess', function () {
     })
   })
 
-  describe('read-only token', function () {
-    beforeEach(function (done) {
+  describe('read-only token', function() {
+    beforeEach(function(done) {
       this.owner.createProject(
         `token-ro-test${Math.random()}`,
         (err, projectId) => {
@@ -249,7 +249,7 @@ describe('TokenAccess', function () {
             return done(err)
           }
           this.projectId = projectId
-          this.owner.makeTokenBased(this.projectId, (err) => {
+          this.owner.makeTokenBased(this.projectId, err => {
             if (err != null) {
               return done(err)
             }
@@ -265,10 +265,10 @@ describe('TokenAccess', function () {
       )
     })
 
-    it('allow the user read-only access to the project', function (done) {
+    it('allow the user read-only access to the project', function(done) {
       async.series(
         [
-          (cb) => {
+          cb => {
             // deny access before token is used
             tryEditorAccess(
               this.other1,
@@ -280,7 +280,7 @@ describe('TokenAccess', function () {
               cb
             )
           },
-          (cb) => {
+          cb => {
             // use token
             tryReadOnlyTokenAccess(
               this.other1,
@@ -296,7 +296,7 @@ describe('TokenAccess', function () {
               cb
             )
           },
-          (cb) => {
+          cb => {
             // allow content access read-only
             tryContentAccess(
               this.other1,
@@ -314,7 +314,7 @@ describe('TokenAccess', function () {
               cb
             )
           },
-          (cb) => {
+          cb => {
             tryEditorAccess(
               this.other1,
               this.projectId,
@@ -329,10 +329,10 @@ describe('TokenAccess', function () {
       )
     })
 
-    it('should redirect the admin to the project (with rw access)', function (done) {
+    it('should redirect the admin to the project (with rw access)', function(done) {
       async.series(
         [
-          (cb) => {
+          cb => {
             // use token
             tryReadOnlyTokenAccess(
               this.siteAdmin,
@@ -347,7 +347,7 @@ describe('TokenAccess', function () {
               cb
             )
           },
-          (cb) => {
+          cb => {
             // allow content access read-and-write
             tryContentAccess(
               this.siteAdmin,
@@ -364,16 +364,16 @@ describe('TokenAccess', function () {
       )
     })
 
-    describe('made private again', function () {
-      beforeEach(function (done) {
+    describe('made private again', function() {
+      beforeEach(function(done) {
         this.owner.makePrivate(this.projectId, () => setTimeout(done, 1000))
       })
 
-      it('should not allow the user to access the project', function (done) {
+      it('should not allow the user to access the project', function(done) {
         async.series(
           [
             // no access before token is used
-            (cb) =>
+            cb =>
               tryEditorAccess(
                 this.other1,
                 this.projectId,
@@ -384,7 +384,7 @@ describe('TokenAccess', function () {
                 cb
               ),
             // token goes nowhere
-            (cb) =>
+            cb =>
               tryReadOnlyTokenAccess(
                 this.other1,
                 this.tokens.readOnly,
@@ -397,7 +397,7 @@ describe('TokenAccess', function () {
                 cb
               ),
             // still no access
-            (cb) =>
+            cb =>
               tryEditorAccess(
                 this.other1,
                 this.projectId,
@@ -407,7 +407,7 @@ describe('TokenAccess', function () {
                 },
                 cb
               ),
-            (cb) =>
+            cb =>
               tryContentAccess(
                 this.other1,
                 this.projectId,
@@ -424,8 +424,8 @@ describe('TokenAccess', function () {
     })
   })
 
-  describe('anonymous read-only token', function () {
-    beforeEach(function (done) {
+  describe('anonymous read-only token', function() {
+    beforeEach(function(done) {
       this.owner.createProject(
         `token-anon-ro-test${Math.random()}`,
         (err, projectId) => {
@@ -433,7 +433,7 @@ describe('TokenAccess', function () {
             return done(err)
           }
           this.projectId = projectId
-          this.owner.makeTokenBased(this.projectId, (err) => {
+          this.owner.makeTokenBased(this.projectId, err => {
             if (err != null) {
               return done(err)
             }
@@ -449,10 +449,10 @@ describe('TokenAccess', function () {
       )
     })
 
-    it('should allow the user to access project via read-only token url', function (done) {
+    it('should allow the user to access project via read-only token url', function(done) {
       async.series(
         [
-          (cb) =>
+          cb =>
             tryEditorAccess(
               this.anon,
               this.projectId,
@@ -462,7 +462,7 @@ describe('TokenAccess', function () {
               },
               cb
             ),
-          (cb) =>
+          cb =>
             tryReadOnlyTokenAccess(
               this.anon,
               this.tokens.readOnly,
@@ -476,7 +476,7 @@ describe('TokenAccess', function () {
               },
               cb
             ),
-          (cb) =>
+          cb =>
             tryEditorAccess(
               this.anon,
               this.projectId,
@@ -485,7 +485,7 @@ describe('TokenAccess', function () {
               },
               cb
             ),
-          (cb) =>
+          cb =>
             tryAnonContentAccess(
               this.anon,
               this.projectId,
@@ -507,15 +507,15 @@ describe('TokenAccess', function () {
       )
     })
 
-    describe('made private again', function () {
-      beforeEach(function (done) {
+    describe('made private again', function() {
+      beforeEach(function(done) {
         this.owner.makePrivate(this.projectId, () => setTimeout(done, 1000))
       })
 
-      it('should deny access to project', function (done) {
+      it('should deny access to project', function(done) {
         async.series(
           [
-            (cb) =>
+            cb =>
               tryEditorAccess(
                 this.anon,
                 this.projectId,
@@ -526,7 +526,7 @@ describe('TokenAccess', function () {
                 cb
               ),
             // should not allow the user to access read-only token
-            (cb) =>
+            cb =>
               tryReadOnlyTokenAccess(
                 this.anon,
                 this.tokens.readOnly,
@@ -539,7 +539,7 @@ describe('TokenAccess', function () {
                 cb
               ),
             // still no access
-            (cb) =>
+            cb =>
               tryEditorAccess(
                 this.anon,
                 this.projectId,
@@ -550,7 +550,7 @@ describe('TokenAccess', function () {
                 cb
               ),
             // should not allow the user to join the project
-            (cb) =>
+            cb =>
               tryAnonContentAccess(
                 this.anon,
                 this.projectId,
@@ -568,8 +568,8 @@ describe('TokenAccess', function () {
     })
   })
 
-  describe('read-and-write token', function () {
-    beforeEach(function (done) {
+  describe('read-and-write token', function() {
+    beforeEach(function(done) {
       this.owner.createProject(
         `token-rw-test${Math.random()}`,
         (err, projectId) => {
@@ -577,7 +577,7 @@ describe('TokenAccess', function () {
             return done(err)
           }
           this.projectId = projectId
-          this.owner.makeTokenBased(this.projectId, (err) => {
+          this.owner.makeTokenBased(this.projectId, err => {
             if (err != null) {
               return done(err)
             }
@@ -593,11 +593,11 @@ describe('TokenAccess', function () {
       )
     })
 
-    it('should allow the user to access project via read-and-write token url', function (done) {
+    it('should allow the user to access project via read-and-write token url', function(done) {
       async.series(
         [
           // deny access before the token is used
-          (cb) =>
+          cb =>
             tryEditorAccess(
               this.other1,
               this.projectId,
@@ -608,7 +608,7 @@ describe('TokenAccess', function () {
               },
               cb
             ),
-          (cb) =>
+          cb =>
             tryReadAndWriteTokenAccess(
               this.other1,
               this.tokens.readAndWrite,
@@ -622,7 +622,7 @@ describe('TokenAccess', function () {
               },
               cb
             ),
-          (cb) =>
+          cb =>
             tryEditorAccess(
               this.other1,
               this.projectId,
@@ -631,7 +631,7 @@ describe('TokenAccess', function () {
               },
               cb
             ),
-          (cb) =>
+          cb =>
             tryContentAccess(
               this.other1,
               this.projectId,
@@ -654,8 +654,8 @@ describe('TokenAccess', function () {
       )
     })
 
-    describe('upgrading from a read-only token', function () {
-      beforeEach(function (done) {
+    describe('upgrading from a read-only token', function() {
+      beforeEach(function(done) {
         this.owner.createProject(
           `token-rw-upgrade-test${Math.random()}`,
           (err, projectId) => {
@@ -663,7 +663,7 @@ describe('TokenAccess', function () {
               return done(err)
             }
             this.projectId = projectId
-            this.owner.makeTokenBased(this.projectId, (err) => {
+            this.owner.makeTokenBased(this.projectId, err => {
               if (err != null) {
                 return done(err)
               }
@@ -679,11 +679,11 @@ describe('TokenAccess', function () {
         )
       })
 
-      it('should allow user to access project via read-only, then upgrade to read-write', function (done) {
+      it('should allow user to access project via read-only, then upgrade to read-write', function(done) {
         async.series(
           [
             // deny access before the token is used
-            (cb) =>
+            cb =>
               tryEditorAccess(
                 this.other1,
                 this.projectId,
@@ -694,7 +694,7 @@ describe('TokenAccess', function () {
                 },
                 cb
               ),
-            (cb) => {
+            cb => {
               // use read-only token
               tryReadOnlyTokenAccess(
                 this.other1,
@@ -710,7 +710,7 @@ describe('TokenAccess', function () {
                 cb
               )
             },
-            (cb) => {
+            cb => {
               tryEditorAccess(
                 this.other1,
                 this.projectId,
@@ -720,7 +720,7 @@ describe('TokenAccess', function () {
                 cb
               )
             },
-            (cb) => {
+            cb => {
               // allow content access read-only
               tryContentAccess(
                 this.other1,
@@ -741,7 +741,7 @@ describe('TokenAccess', function () {
             //
             // Then switch to read-write token
             //
-            (cb) =>
+            cb =>
               tryReadAndWriteTokenAccess(
                 this.other1,
                 this.tokens.readAndWrite,
@@ -755,7 +755,7 @@ describe('TokenAccess', function () {
                 },
                 cb
               ),
-            (cb) =>
+            cb =>
               tryEditorAccess(
                 this.other1,
                 this.projectId,
@@ -764,7 +764,7 @@ describe('TokenAccess', function () {
                 },
                 cb
               ),
-            (cb) =>
+            cb =>
               tryContentAccess(
                 this.other1,
                 this.projectId,
@@ -788,15 +788,15 @@ describe('TokenAccess', function () {
       })
     })
 
-    describe('made private again', function () {
-      beforeEach(function (done) {
+    describe('made private again', function() {
+      beforeEach(function(done) {
         this.owner.makePrivate(this.projectId, () => setTimeout(done, 1000))
       })
 
-      it('should deny access to project', function (done) {
+      it('should deny access to project', function(done) {
         async.series(
           [
-            (cb) => {
+            cb => {
               tryEditorAccess(
                 this.other1,
                 this.projectId,
@@ -807,7 +807,7 @@ describe('TokenAccess', function () {
                 cb
               )
             },
-            (cb) => {
+            cb => {
               tryReadAndWriteTokenAccess(
                 this.other1,
                 this.tokens.readAndWrite,
@@ -820,7 +820,7 @@ describe('TokenAccess', function () {
                 cb
               )
             },
-            (cb) => {
+            cb => {
               tryEditorAccess(
                 this.other1,
                 this.projectId,
@@ -831,7 +831,7 @@ describe('TokenAccess', function () {
                 cb
               )
             },
-            (cb) => {
+            cb => {
               tryContentAccess(
                 this.other1,
                 this.projectId,
@@ -850,8 +850,8 @@ describe('TokenAccess', function () {
   })
 
   if (!settings.allowAnonymousReadAndWriteSharing) {
-    describe('anonymous read-and-write token, disabled', function () {
-      beforeEach(function (done) {
+    describe('anonymous read-and-write token, disabled', function() {
+      beforeEach(function(done) {
         this.owner.createProject(
           `token-anon-rw-test${Math.random()}`,
           (err, projectId) => {
@@ -859,7 +859,7 @@ describe('TokenAccess', function () {
               return done(err)
             }
             this.projectId = projectId
-            this.owner.makeTokenBased(this.projectId, (err) => {
+            this.owner.makeTokenBased(this.projectId, err => {
               if (err != null) {
                 return done(err)
               }
@@ -875,10 +875,10 @@ describe('TokenAccess', function () {
         )
       })
 
-      it('should not allow the user to access read-and-write token', function (done) {
+      it('should not allow the user to access read-and-write token', function(done) {
         async.series(
           [
-            (cb) =>
+            cb =>
               tryEditorAccess(
                 this.anon,
                 this.projectId,
@@ -888,7 +888,7 @@ describe('TokenAccess', function () {
                 },
                 cb
               ),
-            (cb) =>
+            cb =>
               tryReadAndWriteTokenAccess(
                 this.anon,
                 this.tokens.readAndWrite,
@@ -904,7 +904,7 @@ describe('TokenAccess', function () {
                 },
                 cb
               ),
-            (cb) =>
+            cb =>
               tryAnonContentAccess(
                 this.anon,
                 this.projectId,
@@ -915,7 +915,7 @@ describe('TokenAccess', function () {
                 },
                 cb
               ),
-            (cb) =>
+            cb =>
               this.anon.login((err, response, body) => {
                 expect(err).to.not.exist
                 expect(response.statusCode).to.equal(200)
@@ -928,8 +928,8 @@ describe('TokenAccess', function () {
       })
     })
   } else {
-    describe('anonymous read-and-write token, enabled', function () {
-      beforeEach(function (done) {
+    describe('anonymous read-and-write token, enabled', function() {
+      beforeEach(function(done) {
         this.owner.createProject(
           `token-anon-rw-test${Math.random()}`,
           (err, projectId) => {
@@ -937,7 +937,7 @@ describe('TokenAccess', function () {
               return done(err)
             }
             this.projectId = projectId
-            this.owner.makeTokenBased(this.projectId, (err) => {
+            this.owner.makeTokenBased(this.projectId, err => {
               if (err != null) {
                 return done(err)
               }
@@ -953,10 +953,10 @@ describe('TokenAccess', function () {
         )
       })
 
-      it('should allow the user to access project via read-and-write token url', function (done) {
+      it('should allow the user to access project via read-and-write token url', function(done) {
         async.series(
           [
-            (cb) =>
+            cb =>
               tryEditorAccess(
                 this.anon,
                 this.projectId,
@@ -966,7 +966,7 @@ describe('TokenAccess', function () {
                 },
                 cb
               ),
-            (cb) =>
+            cb =>
               tryReadAndWriteTokenAccess(
                 this.anon,
                 this.tokens.readAndWrite,
@@ -980,7 +980,7 @@ describe('TokenAccess', function () {
                 },
                 cb
               ),
-            (cb) =>
+            cb =>
               tryEditorAccess(
                 this.anon,
                 this.projectId,
@@ -989,7 +989,7 @@ describe('TokenAccess', function () {
                 },
                 cb
               ),
-            (cb) =>
+            cb =>
               tryAnonContentAccess(
                 this.anon,
                 this.projectId,
@@ -1004,15 +1004,15 @@ describe('TokenAccess', function () {
         )
       })
 
-      describe('made private again', function () {
-        beforeEach(function (done) {
+      describe('made private again', function() {
+        beforeEach(function(done) {
           this.owner.makePrivate(this.projectId, () => setTimeout(done, 1000))
         })
 
-        it('should not allow the user to access read-and-write token', function (done) {
+        it('should not allow the user to access read-and-write token', function(done) {
           async.series(
             [
-              (cb) =>
+              cb =>
                 tryEditorAccess(
                   this.anon,
                   this.projectId,
@@ -1022,7 +1022,7 @@ describe('TokenAccess', function () {
                   },
                   cb
                 ),
-              (cb) =>
+              cb =>
                 tryReadAndWriteTokenAccess(
                   this.anon,
                   this.tokens.readAndWrite,
@@ -1034,7 +1034,7 @@ describe('TokenAccess', function () {
                   },
                   cb
                 ),
-              (cb) =>
+              cb =>
                 tryEditorAccess(
                   this.anon,
                   this.projectId,
@@ -1044,7 +1044,7 @@ describe('TokenAccess', function () {
                   },
                   cb
                 ),
-              (cb) =>
+              cb =>
                 tryAnonContentAccess(
                   this.anon,
                   this.projectId,
@@ -1063,12 +1063,12 @@ describe('TokenAccess', function () {
     })
   }
 
-  describe('private overleaf project', function () {
-    beforeEach(function (done) {
+  describe('private overleaf project', function() {
+    beforeEach(function(done) {
       this.owner.createProject('overleaf-import', (err, projectId) => {
         expect(err).not.to.exist
         this.projectId = projectId
-        this.owner.makeTokenBased(this.projectId, (err) => {
+        this.owner.makeTokenBased(this.projectId, err => {
           expect(err).not.to.exist
           this.owner.getProject(this.projectId, (err, project) => {
             expect(err).not.to.exist
@@ -1081,7 +1081,7 @@ describe('TokenAccess', function () {
                     overleaf: { id: 1234 }
                   }
                 },
-                (err) => {
+                err => {
                   expect(err).not.to.exist
                   done()
                 }
@@ -1092,11 +1092,11 @@ describe('TokenAccess', function () {
       })
     })
 
-    it('should only allow the owner access to the project', function (done) {
+    it('should only allow the owner access to the project', function(done) {
       async.series(
         [
           // should redirect to canonical path, when owner uses read-write token
-          (cb) =>
+          cb =>
             tryReadAndWriteTokenAccess(
               this.owner,
               this.tokens.readAndWrite,
@@ -1112,7 +1112,7 @@ describe('TokenAccess', function () {
               },
               cb
             ),
-          (cb) =>
+          cb =>
             tryEditorAccess(
               this.owner,
               this.projectId,
@@ -1121,7 +1121,7 @@ describe('TokenAccess', function () {
               },
               cb
             ),
-          (cb) =>
+          cb =>
             tryContentAccess(
               this.owner,
               this.projectId,
@@ -1131,7 +1131,7 @@ describe('TokenAccess', function () {
               cb
             ),
           // non-owner should be denied access
-          (cb) =>
+          cb =>
             tryContentAccess(
               this.other2,
               this.projectId,
@@ -1147,8 +1147,8 @@ describe('TokenAccess', function () {
     })
   })
 
-  describe('private project, with higher access', function () {
-    beforeEach(function (done) {
+  describe('private project, with higher access', function() {
+    beforeEach(function(done) {
       this.owner.createProject(
         `higher-access-test-${Math.random()}`,
         (err, projectId) => {
@@ -1158,9 +1158,9 @@ describe('TokenAccess', function () {
             this.projectId,
             this.other1,
             'readAndWrite',
-            (err) => {
+            err => {
               expect(err).not.to.exist
-              this.owner.makeTokenBased(this.projectId, (err) => {
+              this.owner.makeTokenBased(this.projectId, err => {
                 expect(err).not.to.exist
                 this.owner.getProject(this.projectId, (err, project) => {
                   expect(err).not.to.exist
@@ -1176,11 +1176,11 @@ describe('TokenAccess', function () {
       )
     })
 
-    it('should allow the user access to the project', function (done) {
+    it('should allow the user access to the project', function(done) {
       async.series(
         [
           // should redirect to canonical path, when user uses read-write token
-          (cb) =>
+          cb =>
             tryReadAndWriteTokenAccess(
               this.other1,
               this.tokens.readAndWrite,
@@ -1197,7 +1197,7 @@ describe('TokenAccess', function () {
               cb
             ),
           // should redirect to canonical path, when user uses read-only token
-          (cb) =>
+          cb =>
             tryReadOnlyTokenAccess(
               this.other1,
               this.tokens.readOnly,
@@ -1214,7 +1214,7 @@ describe('TokenAccess', function () {
               cb
             ),
           // should allow the user access to the project
-          (cb) =>
+          cb =>
             tryEditorAccess(
               this.other1,
               this.projectId,
@@ -1224,7 +1224,7 @@ describe('TokenAccess', function () {
               cb
             ),
           // should allow user to join the project
-          (cb) =>
+          cb =>
             tryContentAccess(
               this.other1,
               this.projectId,
@@ -1234,7 +1234,7 @@ describe('TokenAccess', function () {
               cb
             ),
           // should not allow a different user to join the project
-          (cb) =>
+          cb =>
             tryEditorAccess(
               this.other2,
               this.projectId,
@@ -1244,7 +1244,7 @@ describe('TokenAccess', function () {
               },
               cb
             ),
-          (cb) =>
+          cb =>
             tryContentAccess(
               this.other2,
               this.projectId,
@@ -1260,16 +1260,16 @@ describe('TokenAccess', function () {
     })
   })
 
-  describe('unimported v1 project', function () {
-    beforeEach(function () {
+  describe('unimported v1 project', function() {
+    beforeEach(function() {
       settings.overleaf = { host: 'http://localhost:5000' }
     })
 
-    afterEach(function () {
+    afterEach(function() {
       delete settings.overleaf
     })
 
-    it('should show error page for read and write token', function (done) {
+    it('should show error page for read and write token', function(done) {
       const unimportedV1Token = '123abcdefabcdef'
       tryReadAndWriteTokenAccess(
         this.owner,
@@ -1285,7 +1285,7 @@ describe('TokenAccess', function () {
       )
     })
 
-    it('should show error page for read only token to v1', function (done) {
+    it('should show error page for read only token to v1', function(done) {
       const unimportedV1Token = 'aaaaaabbbbbb'
       tryReadOnlyTokenAccess(
         this.owner,
@@ -1302,8 +1302,8 @@ describe('TokenAccess', function () {
     })
   })
 
-  describe('importing v1 project', function () {
-    beforeEach(function (done) {
+  describe('importing v1 project', function() {
+    beforeEach(function(done) {
       settings.projectImportingCheckMaxCreateDelta = 3600
       settings.overleaf = { host: 'http://localhost:5000' }
       this.owner.createProject(
@@ -1316,18 +1316,18 @@ describe('TokenAccess', function () {
           db.users.update(
             { _id: ObjectId(this.owner._id.toString()) },
             { $set: { 'overleaf.id': 321321 } },
-            (err) => {
+            err => {
               if (err) {
                 return done(err)
               }
-              this.owner.makeTokenBased(this.projectId, (err) => {
+              this.owner.makeTokenBased(this.projectId, err => {
                 if (err != null) {
                   return done(err)
                 }
                 db.projects.update(
                   { _id: ObjectId(projectId) },
                   { $set: { overleaf: { id: 1234 } } },
-                  (err) => {
+                  err => {
                     if (err != null) {
                       return done(err)
                     }
@@ -1355,15 +1355,15 @@ describe('TokenAccess', function () {
       )
     })
 
-    afterEach(function () {
+    afterEach(function() {
       delete settings.projectImportingCheckMaxCreateDelta
       delete settings.overleaf
     })
 
-    it('should show importing page for read, and read-write tokens', function (done) {
+    it('should show importing page for read, and read-write tokens', function(done) {
       async.series(
         [
-          (cb) =>
+          cb =>
             tryReadAndWriteTokenAccess(
               this.owner,
               this.tokens.readAndWrite,
@@ -1383,7 +1383,7 @@ describe('TokenAccess', function () {
               },
               cb
             ),
-          (cb) =>
+          cb =>
             tryReadOnlyTokenAccess(
               this.owner,
               this.tokens.readOnly,
@@ -1403,7 +1403,7 @@ describe('TokenAccess', function () {
               },
               cb
             ),
-          (cb) =>
+          cb =>
             tryEditorAccess(
               this.owner,
               this.projectId,
@@ -1412,7 +1412,7 @@ describe('TokenAccess', function () {
               },
               cb
             ),
-          (cb) =>
+          cb =>
             tryContentAccess(
               this.other2,
               this.projectId,
@@ -1426,18 +1426,18 @@ describe('TokenAccess', function () {
       )
     })
 
-    describe('when the v1 doc does not exist', function (done) {
-      beforeEach(function (done) {
+    describe('when the v1 doc does not exist', function(done) {
+      beforeEach(function(done) {
         const docInfo = null
         MockV1Api.setDocInfo(this.tokens.readAndWrite, docInfo)
         MockV1Api.setDocInfo(this.tokens.readOnly, docInfo)
         done()
       })
 
-      it('should get a 404 response on the post endpoint', function (done) {
+      it('should get a 404 response on the post endpoint', function(done) {
         async.series(
           [
-            (cb) =>
+            cb =>
               tryReadAndWriteTokenAccess(
                 this.owner,
                 this.tokens.readAndWrite,
@@ -1449,7 +1449,7 @@ describe('TokenAccess', function () {
                 },
                 cb
               ),
-            (cb) =>
+            cb =>
               tryReadOnlyTokenAccess(
                 this.owner,
                 this.tokens.readOnly,
@@ -1461,7 +1461,7 @@ describe('TokenAccess', function () {
                 },
                 cb
               ),
-            (cb) =>
+            cb =>
               tryEditorAccess(
                 this.owner,
                 this.projectId,
@@ -1470,7 +1470,7 @@ describe('TokenAccess', function () {
                 },
                 cb
               ),
-            (cb) =>
+            cb =>
               tryContentAccess(
                 this.other2,
                 this.projectId,

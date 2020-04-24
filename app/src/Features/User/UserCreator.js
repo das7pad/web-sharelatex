@@ -38,7 +38,11 @@ async function createNewUser(attributes) {
     user.featureSwitches.pdfng = true
   }
 
-  const reversedHostname = user.email.split('@')[1].split('').reverse().join('')
+  const reversedHostname = user.email
+    .split('@')[1]
+    .split('')
+    .reverse()
+    .join('')
 
   const emailData = {
     email: user.email,

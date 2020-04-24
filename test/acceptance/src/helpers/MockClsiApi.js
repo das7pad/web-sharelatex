@@ -69,12 +69,12 @@ module.exports = MockClsiApi = {
     })
 
     return app
-      .listen(3013, (error) => {
+      .listen(3013, error => {
         if (error != null) {
           throw error
         }
       })
-      .on('error', (error) => {
+      .on('error', error => {
         console.error('error starting MockClsiApi:', error.message)
         return process.exit(1)
       })

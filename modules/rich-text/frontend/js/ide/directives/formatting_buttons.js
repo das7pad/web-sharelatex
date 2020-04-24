@@ -12,7 +12,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../../../../frontend/js/base'], function (App) {
+define(['../../../../../../frontend/js/base'], function(App) {
   const BUTTON_WIDTH = 33
   const OVERFLOWED_BUTTON_WIDTH = 70
 
@@ -30,7 +30,7 @@ define(['../../../../../../frontend/js/base'], function (App) {
 
       // Wait until the editor is not "opening" anymore (i.e. it's fully
       // loaded). This means we can acurately measure the element width
-      var unbindOpeningWatcher = scope.$watch('opening', function (isOpening) {
+      var unbindOpeningWatcher = scope.$watch('opening', function(isOpening) {
         if (!isOpening) {
           measure()
           setUpWindowResizeListeners()
@@ -38,7 +38,7 @@ define(['../../../../../../frontend/js/base'], function (App) {
         }
       })
 
-      var measure = function () {
+      var measure = function() {
         let availableSpace = element.width()
         let noOfShowableButtons = Math.floor(availableSpace / BUTTON_WIDTH)
 
@@ -55,18 +55,18 @@ define(['../../../../../../frontend/js/base'], function (App) {
         }
       }
 
-      var split = (splitIndex) =>
-        scope.$applyAsync(function () {
+      var split = splitIndex =>
+        scope.$applyAsync(function() {
           scope.shownButtons = scope.buttons.slice(0, splitIndex)
           return (scope.overflowedButtons = scope.buttons.slice(splitIndex))
         })
 
       const debouncedMeasure = _.debounce(measure, 300)
 
-      var setUpWindowResizeListeners = function () {
+      var setUpWindowResizeListeners = function() {
         $(window).on('resize', debouncedMeasure)
         if (attrs.resizeOn != null) {
-          return Array.from(attrs.resizeOn.split(',')).map((event) =>
+          return Array.from(attrs.resizeOn.split(',')).map(event =>
             scope.$on(event, debouncedMeasure)
           )
         }
@@ -77,7 +77,7 @@ define(['../../../../../../frontend/js/base'], function (App) {
 
       scope.$watch('$destroy', () => tearDownResizeListeners())
 
-      return scope.$watch('isFullscreenEditor', function (oldVal, newVal) {
+      return scope.$watch('isFullscreenEditor', function(oldVal, newVal) {
         if (oldVal === newVal) {
           return
         }

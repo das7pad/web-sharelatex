@@ -21,10 +21,10 @@ require('./helpers/MockDocUpdaterApi')
 require('./helpers/MockFileStoreApi')
 require('./helpers/MockProjectHistoryApi')
 
-describe('TpdsUpdateTests', function () {
-  beforeEach(function (done) {
+describe('TpdsUpdateTests', function() {
+  beforeEach(function(done) {
     this.owner = new User()
-    return this.owner.login((error) => {
+    return this.owner.login(error => {
       if (error != null) {
         throw error
       }
@@ -42,8 +42,8 @@ describe('TpdsUpdateTests', function () {
     })
   })
 
-  describe('deleting a file', function () {
-    beforeEach(function (done) {
+  describe('deleting a file', function() {
+    beforeEach(function(done) {
       return request(
         {
           method: 'DELETE',
@@ -64,7 +64,7 @@ describe('TpdsUpdateTests', function () {
       )
     })
 
-    it('should have deleted the file', function (done) {
+    it('should have deleted the file', function(done) {
       return ProjectGetter.getProject(this.project_id, (error, project) => {
         if (error != null) {
           throw error

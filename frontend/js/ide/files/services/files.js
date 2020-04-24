@@ -1,9 +1,9 @@
-define(['../../../base'], (App) =>
-  App.factory('files', function (ide) {
+define(['../../../base'], App =>
+  App.factory('files', function(ide) {
     const Files = {
       getTeXFiles() {
         const texFiles = []
-        ide.fileTreeManager.forEachEntity(function (entity, _folder, path) {
+        ide.fileTreeManager.forEachEntity(function(entity, _folder, path) {
           if (
             entity.type === 'doc' &&
             /.*\.(tex|md|txt|tikz)/.test(entity.name)

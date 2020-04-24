@@ -30,7 +30,7 @@ const { promisifyAll } = require('../../util/promises')
 const EditorController = {
   addDoc(project_id, folder_id, docName, docLines, source, user_id, callback) {
     if (callback == null) {
-      callback = function (error, doc) {}
+      callback = function(error, doc) {}
     }
     return EditorController.addDocWithRanges(
       project_id,
@@ -55,7 +55,7 @@ const EditorController = {
     callback
   ) {
     if (callback == null) {
-      callback = function (error, doc) {}
+      callback = function(error, doc) {}
     }
     docName = docName.trim()
     Metrics.inc('editor.add-doc')
@@ -97,7 +97,7 @@ const EditorController = {
     callback
   ) {
     if (callback == null) {
-      callback = function (error, file) {}
+      callback = function(error, file) {}
     }
     fileName = fileName.trim()
     Metrics.inc('editor.add-file')
@@ -139,7 +139,7 @@ const EditorController = {
     callback
   ) {
     if (callback == null) {
-      callback = function (err) {}
+      callback = function(err) {}
     }
     return ProjectEntityUpdateHandler.upsertDoc(
       project_id,
@@ -148,7 +148,7 @@ const EditorController = {
       docLines,
       source,
       user_id,
-      function (err, doc, didAddNewDoc) {
+      function(err, doc, didAddNewDoc) {
         if (didAddNewDoc) {
           EditorRealTimeController.emitToRoom(
             project_id,
@@ -174,7 +174,7 @@ const EditorController = {
     callback
   ) {
     if (callback == null) {
-      callback = function (err, file) {}
+      callback = function(err, file) {}
     }
     return ProjectEntityUpdateHandler.upsertFile(
       project_id,
@@ -183,7 +183,7 @@ const EditorController = {
       fsPath,
       linkedFileData,
       user_id,
-      function (err, newFile, didAddFile, existingFile) {
+      function(err, newFile, didAddFile, existingFile) {
         if (err != null) {
           return callback(err)
         }
@@ -224,14 +224,14 @@ const EditorController = {
       docLines,
       source,
       user_id,
-      function (err, doc, didAddNewDoc, newFolders, lastFolder) {
+      function(err, doc, didAddNewDoc, newFolders, lastFolder) {
         if (err != null) {
           return callback(err)
         }
         return EditorController._notifyProjectUsersOfNewFolders(
           project_id,
           newFolders,
-          function (err) {
+          function(err) {
             if (err != null) {
               return callback(err)
             }
@@ -266,21 +266,14 @@ const EditorController = {
       fsPath,
       linkedFileData,
       user_id,
-      function (
-        err,
-        newFile,
-        didAddFile,
-        existingFile,
-        newFolders,
-        lastFolder
-      ) {
+      function(err, newFile, didAddFile, existingFile, newFolders, lastFolder) {
         if (err != null) {
           return callback(err)
         }
         return EditorController._notifyProjectUsersOfNewFolders(
           project_id,
           newFolders,
-          function (err) {
+          function(err) {
             if (err != null) {
               return callback(err)
             }
@@ -311,7 +304,7 @@ const EditorController = {
 
   addFolder(project_id, folder_id, folderName, source, callback) {
     if (callback == null) {
-      callback = function (error, folder) {}
+      callback = function(error, folder) {}
     }
     folderName = folderName.trim()
     Metrics.inc('editor.add-folder')
@@ -331,7 +324,7 @@ const EditorController = {
           project_id,
           folder_id,
           folder,
-          function (err) {
+          function(err) {
             if (err != null) {
               return callback(err)
             }
@@ -344,7 +337,7 @@ const EditorController = {
 
   mkdirp(project_id, path, callback) {
     if (callback == null) {
-      callback = function (error, newFolders, lastFolder) {}
+      callback = function(error, newFolders, lastFolder) {}
     }
     logger.log({ project_id, path }, "making directories if they don't exist")
     return ProjectEntityUpdateHandler.mkdirp(
@@ -359,7 +352,7 @@ const EditorController = {
         return EditorController._notifyProjectUsersOfNewFolders(
           project_id,
           newFolders,
-          function (err) {
+          function(err) {
             if (err != null) {
               return callback(err)
             }
@@ -372,7 +365,7 @@ const EditorController = {
 
   deleteEntity(project_id, entity_id, entityType, source, userId, callback) {
     if (callback == null) {
-      callback = function (error) {}
+      callback = function(error) {}
     }
     Metrics.inc('editor.delete-entity')
     return ProjectEntityUpdateHandler.deleteEntity(
@@ -380,7 +373,7 @@ const EditorController = {
       entity_id,
       entityType,
       userId,
-      function (err) {
+      function(err) {
         if (err != null) {
           logger.warn(
             { err, project_id, entity_id, entityType },
@@ -408,7 +401,7 @@ const EditorController = {
       project_id,
       path,
       user_id,
-      function (err, entity_id) {
+      function(err, entity_id) {
         if (err != null) {
           return callback(err)
         }
@@ -425,13 +418,13 @@ const EditorController = {
 
   updateProjectDescription(project_id, description, callback) {
     if (callback == null) {
-      callback = function () {}
+      callback = function() {}
     }
     logger.log({ project_id, description }, 'updating project description')
     return ProjectDetailsHandler.setProjectDescription(
       project_id,
       description,
-      function (err) {
+      function(err) {
         if (err != null) {
           logger.warn(
             { err, project_id, description },
@@ -456,7 +449,7 @@ const EditorController = {
 
   renameEntity(project_id, entity_id, entityType, newName, userId, callback) {
     if (callback == null) {
-      callback = function (error) {}
+      callback = function(error) {}
     }
     newName = sanitize.escape(newName)
     Metrics.inc('editor.rename-entity')
@@ -466,7 +459,7 @@ const EditorController = {
       entityType,
       newName,
       userId,
-      function (err) {
+      function(err) {
         if (err != null) {
           logger.warn(
             { err, project_id, entity_id, entityType, newName },
@@ -489,7 +482,7 @@ const EditorController = {
 
   moveEntity(project_id, entity_id, folder_id, entityType, userId, callback) {
     if (callback == null) {
-      callback = function (error) {}
+      callback = function(error) {}
     }
     Metrics.inc('editor.move-entity')
     return ProjectEntityUpdateHandler.moveEntity(
@@ -498,7 +491,7 @@ const EditorController = {
       folder_id,
       entityType,
       userId,
-      function (err) {
+      function(err) {
         if (err != null) {
           logger.warn(
             { err, project_id, entity_id, folder_id },
@@ -519,9 +512,9 @@ const EditorController = {
 
   renameProject(project_id, newName, callback) {
     if (callback == null) {
-      callback = function (err) {}
+      callback = function(err) {}
     }
-    return ProjectDetailsHandler.renameProject(project_id, newName, function (
+    return ProjectDetailsHandler.renameProject(project_id, newName, function(
       err
     ) {
       if (err != null) {
@@ -539,9 +532,9 @@ const EditorController = {
 
   setCompiler(project_id, compiler, callback) {
     if (callback == null) {
-      callback = function (err) {}
+      callback = function(err) {}
     }
-    return ProjectOptionsHandler.setCompiler(project_id, compiler, function (
+    return ProjectOptionsHandler.setCompiler(project_id, compiler, function(
       err
     ) {
       if (err != null) {
@@ -558,9 +551,9 @@ const EditorController = {
 
   setImageName(project_id, imageName, callback) {
     if (callback == null) {
-      callback = function (err) {}
+      callback = function(err) {}
     }
-    return ProjectOptionsHandler.setImageName(project_id, imageName, function (
+    return ProjectOptionsHandler.setImageName(project_id, imageName, function(
       err
     ) {
       if (err != null) {
@@ -577,12 +570,12 @@ const EditorController = {
 
   setSpellCheckLanguage(project_id, languageCode, callback) {
     if (callback == null) {
-      callback = function (err) {}
+      callback = function(err) {}
     }
     return ProjectOptionsHandler.setSpellCheckLanguage(
       project_id,
       languageCode,
-      function (err) {
+      function(err) {
         if (err != null) {
           return callback(err)
         }
@@ -598,12 +591,12 @@ const EditorController = {
 
   setPublicAccessLevel(project_id, newAccessLevel, callback) {
     if (callback == null) {
-      callback = function (err) {}
+      callback = function(err) {}
     }
     return ProjectDetailsHandler.setPublicAccessLevel(
       project_id,
       newAccessLevel,
-      function (err) {
+      function(err) {
         if (err != null) {
           return callback(err)
         }
@@ -615,7 +608,7 @@ const EditorController = {
         if (newAccessLevel === PublicAccessLevels.TOKEN_BASED) {
           return ProjectDetailsHandler.ensureTokensArePresent(
             project_id,
-            function (err, tokens) {
+            function(err, tokens) {
               if (err != null) {
                 return callback(err)
               }
@@ -636,12 +629,12 @@ const EditorController = {
 
   setRootDoc(project_id, newRootDocID, callback) {
     if (callback == null) {
-      callback = function (err) {}
+      callback = function(err) {}
     }
     return ProjectEntityUpdateHandler.setRootDoc(
       project_id,
       newRootDocID,
-      function (err) {
+      function(err) {
         if (err != null) {
           return callback(err)
         }
@@ -657,7 +650,7 @@ const EditorController = {
 
   _notifyProjectUsersOfNewFolders(project_id, folders, callback) {
     if (callback == null) {
-      callback = function (error) {}
+      callback = function(error) {}
     }
     return async.eachSeries(
       folders,
@@ -674,7 +667,7 @@ const EditorController = {
 
   _notifyProjectUsersOfNewFolder(project_id, folder_id, folder, callback) {
     if (callback == null) {
-      callback = function (error) {}
+      callback = function(error) {}
     }
     EditorRealTimeController.emitToRoom(
       project_id,

@@ -14,11 +14,11 @@ define([
   '../../../base',
   '../../file-tree/util/iconTypeFromName',
   '../../file-tree/util/fileOperationI18nNames'
-], function (App, iconTypeFromName, fileOperationI18nNames) {
-  const historyFileEntityController = function ($scope, $element, $attrs) {
+], function(App, iconTypeFromName, fileOperationI18nNames) {
+  const historyFileEntityController = function($scope, $element, $attrs) {
     const ctrl = this
     ctrl.hasOperation = false
-    ctrl.getRenameTooltip = (i18nRenamedStr) => {
+    ctrl.getRenameTooltip = i18nRenamedStr => {
       const [simplifiedOldPathname, simplifiedPathname] = _getSimplifiedPaths(
         ctrl.fileEntity.oldPathname,
         ctrl.fileEntity.pathname
@@ -57,21 +57,21 @@ define([
       return [path1Parts.join('/'), path2Parts.join('/')]
     }
 
-    const _handleFolderClick = function () {
+    const _handleFolderClick = function() {
       ctrl.isOpen = !ctrl.isOpen
       ctrl.entityTypeIconClass = _getFolderIcon()
     }
 
     const _handleFileClick = () =>
       ctrl.historyFileTreeController.handleEntityClick(ctrl.fileEntity)
-    var _getFolderIcon = function () {
+    var _getFolderIcon = function() {
       if (ctrl.isOpen) {
         return 'fa-folder-open'
       } else {
         return 'fa-folder'
       }
     }
-    ctrl.$onInit = function () {
+    ctrl.$onInit = function() {
       if (ctrl.fileEntity.type === 'folder') {
         ctrl.isOpen = true
         ctrl.entityTypeIconClass = _getFolderIcon()
@@ -89,7 +89,7 @@ define([
         ctrl.handleClick = _handleFileClick
         $scope.$watch(
           () => ctrl.historyFileTreeController.selectedPathname,
-          (selectedPathname) =>
+          selectedPathname =>
             (ctrl.isSelected = ctrl.fileEntity.pathname === selectedPathname)
         )
       }

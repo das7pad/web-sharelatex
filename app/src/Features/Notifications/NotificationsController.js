@@ -17,11 +17,11 @@ const _ = require('underscore')
 module.exports = {
   getAllUnreadNotifications(req, res) {
     const user_id = AuthenticationController.getLoggedInUserId(req)
-    return NotificationsHandler.getUserNotifications(user_id, function (
+    return NotificationsHandler.getUserNotifications(user_id, function(
       err,
       unreadNotifications
     ) {
-      unreadNotifications = _.map(unreadNotifications, function (notification) {
+      unreadNotifications = _.map(unreadNotifications, function(notification) {
         notification.html = req.i18n.translate(
           notification.templateKey,
           notification.messageOpts

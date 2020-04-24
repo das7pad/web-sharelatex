@@ -7,18 +7,18 @@ logger.initialize(`migration:${Path.basename(__filename, '.js')}`)
 
 const modelsSrcPath = Path.join(__dirname, '../app/src/models')
 
-exports.migrate = function (client, done) {
-  const models = fs.readdirSync(modelsSrcPath).map(function (name) {
+exports.migrate = function(client, done) {
+  const models = fs.readdirSync(modelsSrcPath).map(function(name) {
     return name.slice(0, -3)
   })
   logger.info({ models }, 'queue')
   async.eachSeries(
     models,
-    function (modelName, cb) {
+    function(modelName, cb) {
       logger.info({ modelName }, 'started')
 
       const model = require(Path.join(modelsSrcPath, modelName))[modelName]
-      model.createIndexes(function (err) {
+      model.createIndexes(function(err) {
         if (err) {
           logger.error({ modelName, err }, 'failed')
         } else {
@@ -27,14 +27,14 @@ exports.migrate = function (client, done) {
         cb(err)
       })
     },
-    function () {
+    function() {
       logger.info({ models }, 'done')
       done()
     }
   )
 }
 
-exports.rollback = function (client, done) {
+exports.rollback = function(client, done) {
   logger.warn('refusing to delete indexes')
   done()
 }

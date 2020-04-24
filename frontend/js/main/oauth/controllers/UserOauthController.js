@@ -1,6 +1,6 @@
-define(['../../../base'], (App) =>
-  App.controller('UserOauthController', function ($http, $scope, $q) {
-    const _reset = function () {
+define(['../../../base'], App =>
+  App.controller('UserOauthController', function($http, $scope, $q) {
+    const _reset = function() {
       $scope.ui = {
         hasError: false,
         errorMessage: ''
@@ -14,7 +14,7 @@ define(['../../../base'], (App) =>
         err && err.data && err.data.message ? err.data.message : 'error'
     }
 
-    $scope.unlink = (providerId) => {
+    $scope.unlink = providerId => {
       if (window.ExposedSettings.isOverleaf) {
         // UI
         $scope.providers[providerId].ui = {
@@ -29,11 +29,11 @@ define(['../../../base'], (App) =>
         }
         $http
           .post('/user/oauth-unlink', data)
-          .catch((error) => {
+          .catch(error => {
             $scope.providers[providerId].ui.isProcessing = false
             _unlinkError(providerId, error)
           })
-          .then((response) => {
+          .then(response => {
             $scope.providers[providerId].ui.isProcessing = false
             if (response.status === 200) {
               $scope.thirdPartyIds[providerId] = null

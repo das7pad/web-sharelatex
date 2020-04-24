@@ -25,14 +25,14 @@ module.exports = TrackChangesController = {
   getAllRanges(req, res, next) {
     const { project_id } = req.params
     logger.log({ project_id }, 'request for project ranges')
-    return RangesManager.getAllRanges(project_id, function (error, docs) {
+    return RangesManager.getAllRanges(project_id, function(error, docs) {
       if (docs == null) {
         docs = []
       }
       if (error != null) {
         return next(error)
       }
-      docs = Array.from(docs).map((d) => ({ id: d._id, ranges: d.ranges }))
+      docs = Array.from(docs).map(d => ({ id: d._id, ranges: d.ranges }))
       return res.json(docs)
     })
   },
@@ -40,18 +40,15 @@ module.exports = TrackChangesController = {
   getAllChangesUsers(req, res, next) {
     const { project_id } = req.params
     logger.log({ project_id }, 'request for project range users')
-    return RangesManager.getAllChangesUsers(project_id, function (
-      error,
-      users
-    ) {
+    return RangesManager.getAllChangesUsers(project_id, function(error, users) {
       if (error != null) {
         return next(error)
       }
-      users = Array.from(users).map((user) =>
+      users = Array.from(users).map(user =>
         UserInfoController.formatPersonalInfo(user)
       )
       // Get rid of any anonymous/deleted user objects
-      users = users.filter((u) => (u != null ? u.id : undefined) != null)
+      users = users.filter(u => (u != null ? u.id : undefined) != null)
       return res.json(users)
     })
   },
@@ -70,7 +67,7 @@ module.exports = TrackChangesController = {
       project_id,
       doc_id,
       change_ids,
-      function (error) {
+      function(error) {
         if (error != null) {
           return next(error)
         }
@@ -79,7 +76,7 @@ module.exports = TrackChangesController = {
           'accept-changes',
           doc_id,
           change_ids,
-          function (err) {}
+          function(err) {}
         )
         return res.sendStatus(204)
       }
@@ -89,7 +86,7 @@ module.exports = TrackChangesController = {
   setTrackChangesState(req, res, next) {
     const { project_id } = req.params
     logger.log({ project_id }, 'request to toggle track changes')
-    return TrackChangesManager.getTrackChangesState(project_id, function (
+    return TrackChangesManager.getTrackChangesState(project_id, function(
       error,
       track_changes_state
     ) {
@@ -146,7 +143,7 @@ module.exports = TrackChangesController = {
       return TrackChangesManager.setTrackChangesState(
         project_id,
         track_changes_state,
-        function (error) {
+        function(error) {
           if (error != null) {
             return next(error)
           }
@@ -154,7 +151,7 @@ module.exports = TrackChangesController = {
             project_id,
             'toggle-track-changes',
             track_changes_state,
-            function (err) {}
+            function(err) {}
           )
           return res.sendStatus(204)
         }

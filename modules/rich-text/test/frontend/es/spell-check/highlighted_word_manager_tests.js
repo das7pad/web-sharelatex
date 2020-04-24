@@ -2,15 +2,15 @@
 
 import HighlightedWordManager from '../../../../frontend/js/spell_check/highlighted_word_manager'
 
-describe('HighlightedWordManager', function () {
-  beforeEach(function () {
+describe('HighlightedWordManager', function() {
+  beforeEach(function() {
     this.editor = {
       markText: sinon.stub().returns({ clear: sinon.stub() })
     }
     this.highlightedWordManager = new HighlightedWordManager(this.editor)
   })
 
-  it('has no highlights after resetting', function () {
+  it('has no highlights after resetting', function() {
     this.highlightedWordManager.addHighlight({
       row: 0,
       column: 0,
@@ -23,7 +23,7 @@ describe('HighlightedWordManager', function () {
     expect(this.highlightedWordManager.highlights).to.be.empty
   })
 
-  it('clearRow removes highlights on the given row', function () {
+  it('clearRow removes highlights on the given row', function() {
     this.editor.markText.returns({
       clear: sinon.stub(),
       find: sinon.stub().returns({ from: { line: 0 } })
@@ -52,7 +52,7 @@ describe('HighlightedWordManager', function () {
     expect(this.highlightedWordManager.highlights[0].word).to.equal('row1')
   })
 
-  it('addHighlight adds highlight', function () {
+  it('addHighlight adds highlight', function() {
     const markerStub = { clear: sinon.stub() }
     this.editor.markText.returns(markerStub)
 
@@ -69,7 +69,7 @@ describe('HighlightedWordManager', function () {
     expect(highlight.suggestions).to.deep.equal(['bar', 'baz'])
   })
 
-  it('removeHighlight removes a given highlight', function () {
+  it('removeHighlight removes a given highlight', function() {
     this.highlightedWordManager.addHighlight({
       row: 0,
       column: 0,
@@ -83,7 +83,7 @@ describe('HighlightedWordManager', function () {
     expect(this.highlightedWordManager.highlights).to.be.empty
   })
 
-  it('removeWord removes highlights for a given word', function () {
+  it('removeWord removes highlights for a given word', function() {
     this.highlightedWordManager.addHighlight({
       row: 0,
       column: 0,
@@ -96,7 +96,7 @@ describe('HighlightedWordManager', function () {
     expect(this.highlightedWordManager.highlights).to.be.empty
   })
 
-  it('findHighlightAtPosition finds a highlight from a given position', function () {
+  it('findHighlightAtPosition finds a highlight from a given position', function() {
     this.editor.markText.returns({
       clear: sinon.stub(),
       find: sinon.stub().returns({
@@ -119,7 +119,7 @@ describe('HighlightedWordManager', function () {
     expect(found.word).to.equal('foo')
   })
 
-  it('clearHighlightTouchingRange removes highlight where selection range intersects', function () {
+  it('clearHighlightTouchingRange removes highlight where selection range intersects', function() {
     const clear = sinon.stub()
     this.editor.markText.returns({
       clear,

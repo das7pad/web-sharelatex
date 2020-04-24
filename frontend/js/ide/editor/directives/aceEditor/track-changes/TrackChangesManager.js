@@ -7,7 +7,7 @@ define([
   '../../../../../utils/EventEmitter',
   '../../../../colors/ColorManager',
   '../../../EditorShareJsCodec'
-], function (_ignore, EventEmitter, ColorManager, EditorShareJsCodec) {
+], function(_ignore, EventEmitter, ColorManager, EditorShareJsCodec) {
   const { Range } = ace.require('ace/range')
   class TrackChangesManager {
     constructor($scope, editor, element, adapter) {
@@ -32,7 +32,7 @@ define([
         window.trackChangesManager = this
       }
 
-      this.$scope.$watch('trackChanges', (track_changes) => {
+      this.$scope.$watch('trackChanges', track_changes => {
         if (track_changes == null) {
           return
         }
@@ -54,7 +54,7 @@ define([
         this.addCommentToSelection(thread_id, offset, length)
       })
 
-      this.$scope.$on('comment:select_line', (e) => {
+      this.$scope.$on('comment:select_line', e => {
         this.selectLineIfNoSelection()
       })
 
@@ -175,7 +175,7 @@ define([
         }
       }
 
-      Array.from(this.rangesTracker.comments).map((comment) => {
+      Array.from(this.rangesTracker.comments).map(comment => {
         if (!this.isCommentResolved(comment)) {
           this.adapter.onCommentAdded(comment)
         }
@@ -457,7 +457,7 @@ define([
     }
 
     onPaste() {
-      this.editor.once('change', (change) => {
+      this.editor.once('change', change => {
         if (change.action !== 'insert') {
           return
         }

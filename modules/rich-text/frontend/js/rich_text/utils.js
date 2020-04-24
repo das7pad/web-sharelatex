@@ -101,7 +101,7 @@ export function deTex(string) {
 
 export function splitAuthors(string) {
   string = string.replace(/\\and|\n/g, '\\\\')
-  return string.split('\\\\').map((s) => s.trim())
+  return string.split('\\\\').map(s => s.trim())
 }
 
 /**
@@ -118,7 +118,7 @@ export function splitAuthors(string) {
  * @param {CodeMirror.TextMarker} mark
  */
 export function clearOnMouseDown(cm, element, mark) {
-  $(element).on('mousedown', function () {
+  $(element).on('mousedown', function() {
     var markPos = mark.find()
     if (markPos) {
       cm.setCursor(markPos.from)
@@ -142,7 +142,7 @@ export function clearOnMouseDown(cm, element, mark) {
  * @return {CodeMirror.TextMarker[]} marks with group data attached
  */
 export function makeGroup(marks) {
-  const clearAll = () => marks.forEach((mark) => mark.clear())
+  const clearAll = () => marks.forEach(mark => mark.clear())
 
   marks.forEach((mark, markIndex) => {
     mark.on('clear', clearAll)

@@ -8,7 +8,7 @@ chai.use(require('chaid'))
 chai.config.truncateThreshold = 0
 
 // Crash the process on an unhandled promise rejection
-process.on('unhandledRejection', (err) => {
+process.on('unhandledRejection', err => {
   console.error('Unhandled promise rejection:', err)
   process.exit(1)
 })

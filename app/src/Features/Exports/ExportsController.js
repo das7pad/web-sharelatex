@@ -49,7 +49,7 @@ module.exports = {
       }
     }
 
-    return ExportsHandler.exportProject(export_params, function (
+    return ExportsHandler.exportProject(export_params, function(
       err,
       export_data
     ) {
@@ -83,7 +83,7 @@ module.exports = {
 
   exportStatus(req, res) {
     const { export_id } = req.params
-    return ExportsHandler.fetchExport(export_id, function (err, export_json) {
+    return ExportsHandler.fetchExport(export_id, function(err, export_json) {
       let json
       if (err != null) {
         json = {
@@ -112,7 +112,7 @@ module.exports = {
     const { type, export_id } = req.params
 
     AuthenticationController.getLoggedInUserId(req)
-    return ExportsHandler.fetchDownload(export_id, type, function (
+    return ExportsHandler.fetchDownload(export_id, type, function(
       err,
       export_file_url
     ) {

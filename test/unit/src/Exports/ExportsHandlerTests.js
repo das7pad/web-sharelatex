@@ -18,8 +18,8 @@ const { expect } = chai
 const modulePath = '../../../../app/src/Features/Exports/ExportsHandler'
 const SandboxedModule = require('sandboxed-module')
 
-describe('ExportsHandler', function () {
-  beforeEach(function () {
+describe('ExportsHandler', function() {
+  beforeEach(function() {
     this.stubRequest = {}
     this.request = {
       defaults: () => {
@@ -67,8 +67,8 @@ describe('ExportsHandler', function () {
     return (this.callback = sinon.stub())
   })
 
-  describe('exportProject', function () {
-    beforeEach(function () {
+  describe('exportProject', function() {
+    beforeEach(function() {
       this.export_data = { iAmAnExport: true }
       this.response_body = { iAmAResponseBody: true }
       this.ExportsHandler._buildExport = sinon
@@ -79,8 +79,8 @@ describe('ExportsHandler', function () {
         .yields(null, this.response_body))
     })
 
-    describe('when all goes well', function () {
-      beforeEach(function (done) {
+    describe('when all goes well', function() {
+      beforeEach(function(done) {
         return this.ExportsHandler.exportProject(
           this.export_params,
           (error, export_data) => {
@@ -90,27 +90,27 @@ describe('ExportsHandler', function () {
         )
       })
 
-      it('should build the export', function () {
+      it('should build the export', function() {
         return this.ExportsHandler._buildExport
           .calledWith(this.export_params)
           .should.equal(true)
       })
 
-      it('should request the export', function () {
+      it('should request the export', function() {
         return this.ExportsHandler._requestExport
           .calledWith(this.export_data)
           .should.equal(true)
       })
 
-      it('should return the export', function () {
+      it('should return the export', function() {
         return this.callback
           .calledWith(null, this.export_data)
           .should.equal(true)
       })
     })
 
-    describe("when request can't be built", function () {
-      beforeEach(function (done) {
+    describe("when request can't be built", function() {
+      beforeEach(function(done) {
         this.ExportsHandler._buildExport = sinon
           .stub()
           .yields(new Error('cannot export project without root doc'))
@@ -123,13 +123,13 @@ describe('ExportsHandler', function () {
         )
       })
 
-      it('should return an error', function () {
+      it('should return an error', function() {
         return (this.callback.args[0][0] instanceof Error).should.equal(true)
       })
     })
 
-    describe('when export request returns an error to forward to the user', function () {
-      beforeEach(function (done) {
+    describe('when export request returns an error to forward to the user', function() {
+      beforeEach(function(done) {
         this.error_json = { status: 422, message: 'nope' }
         this.ExportsHandler._requestExport = sinon
           .stub()
@@ -143,7 +143,7 @@ describe('ExportsHandler', function () {
         )
       })
 
-      it('should return success and the response to forward', function () {
+      it('should return success and the response to forward', function() {
         ;(this.callback.args[0][0] instanceof Error).should.equal(false)
         return this.callback.calledWith(null, {
           forwardResponse: this.error_json
@@ -152,8 +152,8 @@ describe('ExportsHandler', function () {
     })
   })
 
-  describe('_buildExport', function () {
-    beforeEach(function (done) {
+  describe('_buildExport', function() {
+    beforeEach(function(done) {
       this.project = {
         id: this.project_id,
         rootDoc_id: 'doc1_id',
@@ -194,8 +194,8 @@ describe('ExportsHandler', function () {
       return done()
     })
 
-    describe('when all goes well', function () {
-      beforeEach(function (done) {
+    describe('when all goes well', function() {
+      beforeEach(function(done) {
         return this.ExportsHandler._buildExport(
           this.export_params,
           (error, export_data) => {
@@ -205,17 +205,17 @@ describe('ExportsHandler', function () {
         )
       })
 
-      it('should ensure the project has history', function () {
+      it('should ensure the project has history', function() {
         return this.ProjectHistoryHandler.ensureHistoryExistsForProject.called.should.equal(
           true
         )
       })
 
-      it('should request the project history version', function () {
+      it('should request the project history version', function() {
         return this.ExportsHandler._requestVersion.called.should.equal(true)
       })
 
-      it('should return export data', function () {
+      it('should return export data', function() {
         const expected_export_data = {
           project: {
             id: this.project_id,
@@ -254,8 +254,8 @@ describe('ExportsHandler', function () {
       })
     })
 
-    describe('when we send replacement user first and last name', function () {
-      beforeEach(function (done) {
+    describe('when we send replacement user first and last name', function() {
+      beforeEach(function(done) {
         this.custom_first_name = 'FIRST'
         this.custom_last_name = 'LAST'
         this.export_params.first_name = this.custom_first_name
@@ -269,7 +269,7 @@ describe('ExportsHandler', function () {
         )
       })
 
-      it('should send the data from the user input', function () {
+      it('should send the data from the user input', function() {
         const expected_export_data = {
           project: {
             id: this.project_id,
@@ -308,8 +308,8 @@ describe('ExportsHandler', function () {
       })
     })
 
-    describe('when project is not found', function () {
-      beforeEach(function (done) {
+    describe('when project is not found', function() {
+      beforeEach(function(done) {
         this.ProjectGetter.getProject = sinon
           .stub()
           .yields(new Error('project not found'))
@@ -322,14 +322,14 @@ describe('ExportsHandler', function () {
         )
       })
 
-      it('should return an error', function () {
+      it('should return an error', function() {
         return (this.callback.args[0][0] instanceof Error).should.equal(true)
       })
     })
 
-    describe('when project has no root doc', function () {
-      describe('when a root doc can be set automatically', function () {
-        beforeEach(function (done) {
+    describe('when project has no root doc', function() {
+      describe('when a root doc can be set automatically', function() {
+        beforeEach(function(done) {
           this.project.rootDoc_id = null
           this.ProjectLocator.findRootDoc = sinon
             .stub()
@@ -343,13 +343,13 @@ describe('ExportsHandler', function () {
           )
         })
 
-        it('should set a root doc', function () {
+        it('should set a root doc', function() {
           return this.ProjectRootDocManager.ensureRootDocumentIsValid.called.should.equal(
             true
           )
         })
 
-        it('should return export data', function () {
+        it('should return export data', function() {
           const expected_export_data = {
             project: {
               id: this.project_id,
@@ -389,9 +389,9 @@ describe('ExportsHandler', function () {
       })
     })
 
-    describe('when project has an invalid root doc', function () {
-      describe('when a new root doc can be set automatically', function () {
-        beforeEach(function (done) {
+    describe('when project has an invalid root doc', function() {
+      describe('when a new root doc can be set automatically', function() {
+        beforeEach(function(done) {
           this.fakeDoc_id = '1a2b3c4d5e6f'
           this.project.rootDoc_id = this.fakeDoc_id
           this.ProjectLocator.findRootDoc = sinon
@@ -406,13 +406,13 @@ describe('ExportsHandler', function () {
           )
         })
 
-        it('should set a valid root doc', function () {
+        it('should set a valid root doc', function() {
           return this.ProjectRootDocManager.ensureRootDocumentIsValid.called.should.equal(
             true
           )
         })
 
-        it('should return export data', function () {
+        it('should return export data', function() {
           const expected_export_data = {
             project: {
               id: this.project_id,
@@ -451,8 +451,8 @@ describe('ExportsHandler', function () {
         })
       })
 
-      describe('when no root doc can be identified', function () {
-        beforeEach(function (done) {
+      describe('when no root doc can be identified', function() {
+        beforeEach(function(done) {
           this.ProjectLocator.findRootDoc = sinon
             .stub()
             .yields(null, [null, null])
@@ -465,14 +465,14 @@ describe('ExportsHandler', function () {
           )
         })
 
-        it('should return an error', function () {
+        it('should return an error', function() {
           return (this.callback.args[0][0] instanceof Error).should.equal(true)
         })
       })
     })
 
-    describe('when user is not found', function () {
-      beforeEach(function (done) {
+    describe('when user is not found', function() {
+      beforeEach(function(done) {
         this.UserGetter.getUser = sinon
           .stub()
           .yields(new Error('user not found'))
@@ -485,13 +485,13 @@ describe('ExportsHandler', function () {
         )
       })
 
-      it('should return an error', function () {
+      it('should return an error', function() {
         return (this.callback.args[0][0] instanceof Error).should.equal(true)
       })
     })
 
-    describe('when project history request fails', function () {
-      beforeEach(function (done) {
+    describe('when project history request fails', function() {
+      beforeEach(function(done) {
         this.ExportsHandler._requestVersion = sinon
           .stub()
           .yields(new Error('project history call failed'))
@@ -504,14 +504,14 @@ describe('ExportsHandler', function () {
         )
       })
 
-      it('should return an error', function () {
+      it('should return an error', function() {
         return (this.callback.args[0][0] instanceof Error).should.equal(true)
       })
     })
   })
 
-  describe('_requestExport', function () {
-    beforeEach(function (done) {
+  describe('_requestExport', function() {
+    beforeEach(function(done) {
       this.settings.apis = {
         v1: {
           url: 'http://localhost:5000',
@@ -527,8 +527,8 @@ describe('ExportsHandler', function () {
       return done()
     })
 
-    describe('when all goes well', function () {
-      beforeEach(function (done) {
+    describe('when all goes well', function() {
+      beforeEach(function(done) {
         this.stubRequest.post = this.stubPost
         return this.ExportsHandler._requestExport(
           this.export_data,
@@ -539,7 +539,7 @@ describe('ExportsHandler', function () {
         )
       })
 
-      it('should issue the request', function () {
+      it('should issue the request', function() {
         return expect(this.stubPost.getCall(0).args[0]).to.deep.equal({
           url: this.settings.apis.v1.url + '/api/v1/sharelatex/exports',
           auth: {
@@ -550,15 +550,15 @@ describe('ExportsHandler', function () {
         })
       })
 
-      it('should return the body with v1 export id', function () {
+      it('should return the body with v1 export id', function() {
         return this.callback
           .calledWith(null, { exportId: this.export_id })
           .should.equal(true)
       })
     })
 
-    describe('when the request fails', function () {
-      beforeEach(function (done) {
+    describe('when the request fails', function() {
+      beforeEach(function(done) {
         this.stubRequest.post = sinon
           .stub()
           .yields(new Error('export request failed'))
@@ -571,13 +571,13 @@ describe('ExportsHandler', function () {
         )
       })
 
-      it('should return an error', function () {
+      it('should return an error', function() {
         return (this.callback.args[0][0] instanceof Error).should.equal(true)
       })
     })
 
-    describe('when the request returns an error response to forward', function () {
-      beforeEach(function (done) {
+    describe('when the request returns an error response to forward', function() {
+      beforeEach(function(done) {
         this.error_code = 422
         this.error_json = { status: this.error_code, message: 'nope' }
         this.stubRequest.post = sinon
@@ -592,7 +592,7 @@ describe('ExportsHandler', function () {
         )
       })
 
-      it('should return success and the response to forward', function () {
+      it('should return success and the response to forward', function() {
         ;(this.callback.args[0][0] instanceof Error).should.equal(false)
         return this.callback.calledWith(null, {
           forwardResponse: this.error_json
@@ -601,8 +601,8 @@ describe('ExportsHandler', function () {
     })
   })
 
-  describe('fetchExport', function () {
-    beforeEach(function (done) {
+  describe('fetchExport', function() {
+    beforeEach(function(done) {
       this.settings.apis = {
         v1: {
           url: 'http://localhost:5000',
@@ -618,8 +618,8 @@ describe('ExportsHandler', function () {
       return done()
     })
 
-    describe('when all goes well', function () {
-      beforeEach(function (done) {
+    describe('when all goes well', function() {
+      beforeEach(function(done) {
         this.stubRequest.get = this.stubGet
         return this.ExportsHandler.fetchExport(
           this.export_id,
@@ -630,7 +630,7 @@ describe('ExportsHandler', function () {
         )
       })
 
-      it('should issue the request', function () {
+      it('should issue the request', function() {
         return expect(this.stubGet.getCall(0).args[0]).to.deep.equal({
           url:
             this.settings.apis.v1.url +
@@ -643,7 +643,7 @@ describe('ExportsHandler', function () {
         })
       })
 
-      it('should return the v1 export id', function () {
+      it('should return the v1 export id', function() {
         return this.callback
           .calledWith(null, { body: this.body })
           .should.equal(true)
@@ -651,8 +651,8 @@ describe('ExportsHandler', function () {
     })
   })
 
-  describe('fetchDownload', function () {
-    beforeEach(function (done) {
+  describe('fetchDownload', function() {
+    beforeEach(function(done) {
       this.settings.apis = {
         v1: {
           url: 'http://localhost:5000',
@@ -669,8 +669,8 @@ describe('ExportsHandler', function () {
       return done()
     })
 
-    describe('when all goes well', function () {
-      beforeEach(function (done) {
+    describe('when all goes well', function() {
+      beforeEach(function(done) {
         this.stubRequest.get = this.stubGet
         return this.ExportsHandler.fetchDownload(
           this.export_id,
@@ -682,7 +682,7 @@ describe('ExportsHandler', function () {
         )
       })
 
-      it('should issue the request', function () {
+      it('should issue the request', function() {
         return expect(this.stubGet.getCall(0).args[0]).to.deep.equal({
           url:
             this.settings.apis.v1.url +
@@ -696,7 +696,7 @@ describe('ExportsHandler', function () {
         })
       })
 
-      it('should return the v1 export id', function () {
+      it('should return the v1 export id', function() {
         return this.callback
           .calledWith(null, { body: this.body })
           .should.equal(true)

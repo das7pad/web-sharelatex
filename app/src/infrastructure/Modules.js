@@ -47,8 +47,8 @@ module.exports = Modules = {
   },
 
   applyRouter(webRouter, privateApiRouter, publicApiRouter) {
-    return Array.from(this.modules).map((module) =>
-      __guardMethod__(module.router, 'apply', (o) =>
+    return Array.from(this.modules).map(module =>
+      __guardMethod__(module.router, 'apply', o =>
         o.apply(webRouter, privateApiRouter, publicApiRouter)
       )
     )
@@ -66,7 +66,7 @@ module.exports = Modules = {
           )
         }
         result.push(
-          __guardMethod__(module.router, 'applyNonCsrfRouter', (o) =>
+          __guardMethod__(module.router, 'applyNonCsrfRouter', o =>
             o.applyNonCsrfRouter(webRouter, privateApiRouter, publicApiRouter)
           )
         )
@@ -78,7 +78,7 @@ module.exports = Modules = {
   viewIncludes: {},
   loadViewIncludes(app) {
     this.viewIncludes = {}
-    return Array.from(this.modules).map((module) =>
+    return Array.from(this.modules).map(module =>
       (() => {
         const result = []
         const object = module.viewIncludes || {}
@@ -170,10 +170,10 @@ module.exports = Modules = {
         args = rest.slice(0, adjustedLength - 1),
         callback = rest[adjustedLength - 1]
       const methods = this._hooks[name] || []
-      const call_methods = methods.map((method) => (cb) =>
+      const call_methods = methods.map(method => cb =>
         method(...Array.from(args), cb)
       )
-      return async.series(call_methods, function (error, results) {
+      return async.series(call_methods, function(error, results) {
         if (error != null) {
           return callback(error)
         }

@@ -9,8 +9,8 @@ const { Project } = require('../helpers/models/Project')
 const MODULE_PATH =
   '../../../../app/src/Features/Project/ProjectEntityMongoUpdateHandler'
 
-describe('ProjectEntityMongoUpdateHandler', function () {
-  beforeEach(function () {
+describe('ProjectEntityMongoUpdateHandler', function() {
+  beforeEach(function() {
     this.doc = {
       _id: ObjectId(),
       name: 'test-doc.txt',
@@ -202,20 +202,20 @@ describe('ProjectEntityMongoUpdateHandler', function () {
     })
   })
 
-  afterEach(function () {
+  afterEach(function() {
     this.ProjectMock.restore()
   })
 
-  beforeEach(function () {
+  beforeEach(function() {
     tk.freeze(Date.now())
   })
 
-  afterEach(function () {
+  afterEach(function() {
     tk.reset()
   })
 
-  describe('addDoc', function () {
-    beforeEach(async function () {
+  describe('addDoc', function() {
+    beforeEach(async function() {
       const doc = { _id: ObjectId(), name: 'other.txt' }
       this.ProjectMock.expects('findOneAndUpdate')
         .withArgs(
@@ -234,11 +234,11 @@ describe('ProjectEntityMongoUpdateHandler', function () {
       )
     })
 
-    it('adds the document in Mongo', function () {
+    it('adds the document in Mongo', function() {
       this.ProjectMock.verify()
     })
 
-    it('returns path info and the project', function () {
+    it('returns path info and the project', function() {
       expect(this.result).to.deep.equal({
         result: {
           path: {
@@ -251,8 +251,8 @@ describe('ProjectEntityMongoUpdateHandler', function () {
     })
   })
 
-  describe('addFile', function () {
-    beforeEach(function () {
+  describe('addFile', function() {
+    beforeEach(function() {
       this.newFile = { _id: ObjectId(), name: 'picture.jpg' }
       this.ProjectMock.expects('findOneAndUpdate')
         .withArgs(
@@ -266,8 +266,8 @@ describe('ProjectEntityMongoUpdateHandler', function () {
         .resolves(this.project)
     })
 
-    describe('happy path', function () {
-      beforeEach(async function () {
+    describe('happy path', function() {
+      beforeEach(async function() {
         this.result = await this.subject.promises.addFile(
           this.project._id,
           this.folder._id,
@@ -275,11 +275,11 @@ describe('ProjectEntityMongoUpdateHandler', function () {
         )
       })
 
-      it('adds the file in Mongo', function () {
+      it('adds the file in Mongo', function() {
         this.ProjectMock.verify()
       })
 
-      it('returns path info and the project', function () {
+      it('returns path info and the project', function() {
         expect(this.result).to.deep.equal({
           result: {
             path: {
@@ -292,17 +292,17 @@ describe('ProjectEntityMongoUpdateHandler', function () {
       })
     })
 
-    describe('when entity limit is reached', function () {
-      beforeEach(function () {
+    describe('when entity limit is reached', function() {
+      beforeEach(function() {
         this.savedMaxEntities = this.Settings.maxEntitiesPerProject
         this.Settings.maxEntitiesPerProject = 3
       })
 
-      afterEach(function () {
+      afterEach(function() {
         this.Settings.maxEntitiesPerProject = this.savedMaxEntities
       })
 
-      it('should throw an error', async function () {
+      it('should throw an error', async function() {
         await expect(
           this.subject.promises.addFile(
             this.project._id,
@@ -314,8 +314,8 @@ describe('ProjectEntityMongoUpdateHandler', function () {
     })
   })
 
-  describe('addFolder', function () {
-    beforeEach(async function () {
+  describe('addFolder', function() {
+    beforeEach(async function() {
       const folderName = 'New folder'
       this.FolderModel.withArgs({ name: folderName }).returns({
         _id: ObjectId(),
@@ -342,13 +342,13 @@ describe('ProjectEntityMongoUpdateHandler', function () {
       )
     })
 
-    it('adds the folder in Mongo', function () {
+    it('adds the folder in Mongo', function() {
       this.ProjectMock.verify()
     })
   })
 
-  describe('replaceFileWithNew', function () {
-    beforeEach(async function () {
+  describe('replaceFileWithNew', function() {
+    beforeEach(async function() {
       const newFile = {
         _id: ObjectId(),
         name: 'some-other-file.png',
@@ -399,55 +399,55 @@ describe('ProjectEntityMongoUpdateHandler', function () {
       )
     })
 
-    it('updates the database', function () {
+    it('updates the database', function() {
       this.ProjectMock.verify()
     })
   })
 
-  describe('mkdirp', function () {
-    describe('when the path is just a slash', function () {
-      beforeEach(async function () {
+  describe('mkdirp', function() {
+    describe('when the path is just a slash', function() {
+      beforeEach(async function() {
         this.result = await this.subject.promises.mkdirp(this.project._id, '/')
       })
 
-      it('should return the root folder', function () {
+      it('should return the root folder', function() {
         expect(this.result.folder).to.deep.equal(this.rootFolder)
       })
 
-      it('should not report a parent folder', function () {
+      it('should not report a parent folder', function() {
         expect(this.result.folder.parentFolder_id).not.to.exist
       })
 
-      it('should not return new folders', function () {
+      it('should not return new folders', function() {
         expect(this.result.newFolders).to.have.length(0)
       })
     })
 
-    describe('when the folder already exists', function () {
-      beforeEach(async function () {
+    describe('when the folder already exists', function() {
+      beforeEach(async function() {
         this.result = await this.subject.promises.mkdirp(
           this.project._id,
           '/test-folder'
         )
       })
 
-      it('should return the existing folder', function () {
+      it('should return the existing folder', function() {
         expect(this.result.folder).to.deep.equal(this.folder)
       })
 
-      it('should report the parent folder', function () {
+      it('should report the parent folder', function() {
         expect(this.result.folder.parentFolder_id).not.equal(
           this.rootFolder._id
         )
       })
 
-      it('should not return new folders', function () {
+      it('should not return new folders', function() {
         expect(this.result.newFolders).to.have.length(0)
       })
     })
 
-    describe('when the path is a new folder at the top level', function () {
-      beforeEach(async function () {
+    describe('when the path is a new folder at the top level', function() {
+      beforeEach(async function() {
         this.newFolder = { _id: ObjectId(), name: 'new-folder' }
         this.FolderModel.returns(this.newFolder)
         this.exactCaseMatch = false
@@ -467,31 +467,31 @@ describe('ProjectEntityMongoUpdateHandler', function () {
           { exactCaseMatch: this.exactCaseMatch }
         )
       })
-      it('should update the database', function () {
+      it('should update the database', function() {
         this.ProjectMock.verify()
       })
 
-      it('should make just one folder', function () {
+      it('should make just one folder', function() {
         expect(this.result.newFolders).to.have.length(1)
       })
 
-      it('should return the new folder', function () {
+      it('should return the new folder', function() {
         expect(this.result.folder.name).to.equal('new-folder')
       })
 
-      it('should return the parent folder', function () {
+      it('should return the parent folder', function() {
         expect(this.result.folder.parentFolder_id).to.equal(this.rootFolder._id)
       })
 
-      it('should pass the exactCaseMatch option to ProjectLocator', function () {
+      it('should pass the exactCaseMatch option to ProjectLocator', function() {
         expect(
           this.ProjectLocator.promises.findElementByPath
         ).to.have.been.calledWithMatch({ exactCaseMatch: this.exactCaseMatch })
       })
     })
 
-    describe('adding a subfolder', function () {
-      beforeEach(async function () {
+    describe('adding a subfolder', function() {
+      beforeEach(async function() {
         this.newFolder = { _id: ObjectId(), name: 'new-folder' }
         this.FolderModel.returns(this.newFolder)
         this.ProjectMock.expects('findOneAndUpdate')
@@ -514,25 +514,25 @@ describe('ProjectEntityMongoUpdateHandler', function () {
         )
       })
 
-      it('should update the database', function () {
+      it('should update the database', function() {
         this.ProjectMock.verify()
       })
 
-      it('should create one folder', function () {
+      it('should create one folder', function() {
         expect(this.result.newFolders).to.have.length(1)
       })
 
-      it('should return the new folder', function () {
+      it('should return the new folder', function() {
         expect(this.result.folder.name).to.equal('new-folder')
       })
 
-      it('should return the parent folder', function () {
+      it('should return the parent folder', function() {
         expect(this.result.folder.parentFolder_id).to.equal(this.folder._id)
       })
     })
 
-    describe('when mutliple folders are missing', async function () {
-      beforeEach(function () {
+    describe('when mutliple folders are missing', async function() {
+      beforeEach(function() {
         this.folder1 = { _id: ObjectId(), name: 'folder1' }
         this.folder1Path = {
           fileSystem: '/test-folder/folder1',
@@ -604,30 +604,30 @@ describe('ProjectEntityMongoUpdateHandler', function () {
           path: '/test-folder/folder1/folder2/'
         }
       ].forEach(({ description, path }) => {
-        describe(description, function () {
-          beforeEach(async function () {
+        describe(description, function() {
+          beforeEach(async function() {
             this.result = await this.subject.promises.mkdirp(
               this.project._id,
               path
             )
           })
 
-          it('should update the database', function () {
+          it('should update the database', function() {
             this.ProjectMock.verify()
           })
 
-          it('should add multiple folders', function () {
+          it('should add multiple folders', function() {
             const newFolders = this.result.newFolders
             expect(newFolders).to.have.length(2)
             expect(newFolders[0].name).to.equal('folder1')
             expect(newFolders[1].name).to.equal('folder2')
           })
 
-          it('should return the last folder', function () {
+          it('should return the last folder', function() {
             expect(this.result.folder.name).to.equal('folder2')
           })
 
-          it('should return the parent folder', function () {
+          it('should return the parent folder', function() {
             expect(this.result.folder.parentFolder_id).to.equal(
               this.folder1._id
             )
@@ -637,9 +637,9 @@ describe('ProjectEntityMongoUpdateHandler', function () {
     })
   })
 
-  describe('moveEntity', function () {
-    describe('moving a doc into a different folder', function () {
-      beforeEach(async function () {
+  describe('moveEntity', function() {
+    describe('moving a doc into a different folder', function() {
+      beforeEach(async function() {
         this.pathAfterMove = {
           fileSystem: '/somewhere/else.txt'
         }
@@ -683,11 +683,11 @@ describe('ProjectEntityMongoUpdateHandler', function () {
         )
       })
 
-      it('should update the database', function () {
+      it('should update the database', function() {
         this.ProjectMock.verify()
       })
 
-      it('should report what changed', function () {
+      it('should report what changed', function() {
         expect(this.result).to.deep.equal({
           project: this.project,
           startPath: '/test-doc.txt',
@@ -704,8 +704,8 @@ describe('ProjectEntityMongoUpdateHandler', function () {
       })
     })
 
-    describe('when moving a folder inside itself', function () {
-      it('throws an error', async function () {
+    describe('when moving a folder inside itself', function() {
+      it('throws an error', async function() {
         await expect(
           this.subject.promises.moveEntity(
             this.project._id,
@@ -717,8 +717,8 @@ describe('ProjectEntityMongoUpdateHandler', function () {
       })
     })
 
-    describe('when moving a folder to a subfolder of itself', function () {
-      it('throws an error', async function () {
+    describe('when moving a folder to a subfolder of itself', function() {
+      it('throws an error', async function() {
         await expect(
           this.subject.promises.moveEntity(
             this.project._id,
@@ -731,8 +731,8 @@ describe('ProjectEntityMongoUpdateHandler', function () {
     })
   })
 
-  describe('deleteEntity', function () {
-    beforeEach(async function () {
+  describe('deleteEntity', function() {
+    beforeEach(async function() {
       this.ProjectMock.expects('findOneAndUpdate')
         .withArgs(
           { _id: this.project._id },
@@ -750,14 +750,14 @@ describe('ProjectEntityMongoUpdateHandler', function () {
       )
     })
 
-    it('should update the database', function () {
+    it('should update the database', function() {
       this.ProjectMock.verify()
     })
   })
 
-  describe('renameEntity', function () {
-    describe('happy path', function () {
-      beforeEach(async function () {
+  describe('renameEntity', function() {
+    describe('happy path', function() {
+      beforeEach(async function() {
         this.newName = 'new.tex'
         this.oldDocs = ['old-doc']
         this.oldFiles = ['old-file']
@@ -789,11 +789,11 @@ describe('ProjectEntityMongoUpdateHandler', function () {
         )
       })
 
-      it('should update the database', function () {
+      it('should update the database', function() {
         this.ProjectMock.verify()
       })
 
-      it('returns info', function () {
+      it('returns info', function() {
         expect(this.result).to.deep.equal({
           project: this.project,
           startPath: '/test-doc.txt',
@@ -810,8 +810,8 @@ describe('ProjectEntityMongoUpdateHandler', function () {
       })
     })
 
-    describe('name already exists', function () {
-      it('should throw an error', async function () {
+    describe('name already exists', function() {
+      it('should throw an error', async function() {
         await expect(
           this.subject.promises.renameEntity(
             this.project._id,
@@ -824,10 +824,10 @@ describe('ProjectEntityMongoUpdateHandler', function () {
     })
   })
 
-  describe('_putElement', function () {
-    describe('updating the project', function () {
-      describe('when the parent folder is given', function () {
-        beforeEach(function () {
+  describe('_putElement', function() {
+    describe('updating the project', function() {
+      describe('when the parent folder is given', function() {
+        beforeEach(function() {
           this.newFile = { _id: ObjectId(), name: 'new file.png' }
           this.ProjectMock.expects('findOneAndUpdate')
             .withArgs(
@@ -841,7 +841,7 @@ describe('ProjectEntityMongoUpdateHandler', function () {
             .resolves(this.project)
         })
 
-        it('should update the database', async function () {
+        it('should update the database', async function() {
           await this.subject.promises._putElement(
             this.project,
             this.folder._id,
@@ -851,7 +851,7 @@ describe('ProjectEntityMongoUpdateHandler', function () {
           this.ProjectMock.verify()
         })
 
-        it('should add an s onto the type if not included', async function () {
+        it('should add an s onto the type if not included', async function() {
           await this.subject.promises._putElement(
             this.project,
             this.folder._id,
@@ -862,8 +862,8 @@ describe('ProjectEntityMongoUpdateHandler', function () {
         })
       })
 
-      describe('error cases', function () {
-        it('should throw an error if element is null', async function () {
+      describe('error cases', function() {
+        it('should throw an error if element is null', async function() {
           await expect(
             this.subject.promises._putElement(
               this.project,
@@ -874,7 +874,7 @@ describe('ProjectEntityMongoUpdateHandler', function () {
           ).to.be.rejected
         })
 
-        it('should error if the element has no _id', async function () {
+        it('should error if the element has no _id', async function() {
           const file = { name: 'something' }
           await expect(
             this.subject.promises._putElement(
@@ -886,7 +886,7 @@ describe('ProjectEntityMongoUpdateHandler', function () {
           ).to.be.rejected
         })
 
-        it('should error if element name contains invalid characters', async function () {
+        it('should error if element name contains invalid characters', async function() {
           const file = { _id: ObjectId(), name: 'something*bad' }
           await expect(
             this.subject.promises._putElement(
@@ -898,7 +898,7 @@ describe('ProjectEntityMongoUpdateHandler', function () {
           ).to.be.rejected
         })
 
-        it('should error if element name is too long', async function () {
+        it('should error if element name is too long', async function() {
           const file = {
             _id: ObjectId(),
             name: 'long-'.repeat(1000) + 'something'
@@ -913,7 +913,7 @@ describe('ProjectEntityMongoUpdateHandler', function () {
           ).to.be.rejectedWith(Errors.InvalidNameError)
         })
 
-        it('should error if the folder name is too long', async function () {
+        it('should error if the folder name is too long', async function() {
           const file = {
             _id: ObjectId(),
             name: 'something'
@@ -937,8 +937,8 @@ describe('ProjectEntityMongoUpdateHandler', function () {
             )
           ).to.be.rejectedWith(Errors.InvalidNameError)
         })
-        ;['file', 'doc', 'folder'].forEach((entityType) => {
-          it(`should error if a ${entityType} already exists with the same name`, async function () {
+        ;['file', 'doc', 'folder'].forEach(entityType => {
+          it(`should error if a ${entityType} already exists with the same name`, async function() {
             const file = {
               _id: ObjectId(),
               name: this[entityType].name
@@ -956,8 +956,8 @@ describe('ProjectEntityMongoUpdateHandler', function () {
       })
     })
 
-    describe('when the parent folder is not given', function () {
-      it('should default to root folder insert', async function () {
+    describe('when the parent folder is not given', function() {
+      it('should default to root folder insert', async function() {
         this.newFile = { _id: ObjectId(), name: 'new file.png' }
         this.ProjectMock.expects('findOneAndUpdate')
           .withArgs(
@@ -979,8 +979,8 @@ describe('ProjectEntityMongoUpdateHandler', function () {
     })
   })
 
-  describe('_insertDeletedDocReference', function () {
-    beforeEach(async function () {
+  describe('_insertDeletedDocReference', function() {
+    beforeEach(async function() {
       this.ProjectMock.expects('updateOne')
         .withArgs(
           { _id: this.project._id },
@@ -1002,13 +1002,13 @@ describe('ProjectEntityMongoUpdateHandler', function () {
       )
     })
 
-    it('should update the database', function () {
+    it('should update the database', function() {
       this.ProjectMock.verify()
     })
   })
 
-  describe('_insertDeletedFileReference', function () {
-    beforeEach(async function () {
+  describe('_insertDeletedFileReference', function() {
+    beforeEach(async function() {
       this.ProjectMock.expects('updateOne')
         .withArgs(
           { _id: this.project._id },
@@ -1032,13 +1032,13 @@ describe('ProjectEntityMongoUpdateHandler', function () {
       )
     })
 
-    it('should update the database', function () {
+    it('should update the database', function() {
       this.ProjectMock.verify()
     })
   })
 
-  describe('createNewFolderStructure', function () {
-    beforeEach(function () {
+  describe('createNewFolderStructure', function() {
+    beforeEach(function() {
       this.mockRootFolder = 'MOCK_ROOT_FOLDER'
       this.docUploads = ['MOCK_DOC_UPLOAD']
       this.fileUploads = ['MOCK_FILE_UPLOAD']
@@ -1058,8 +1058,8 @@ describe('ProjectEntityMongoUpdateHandler', function () {
         .chain('exec')
     })
 
-    describe('happy path', function () {
-      beforeEach(async function () {
+    describe('happy path', function() {
+      beforeEach(async function() {
         this.updateExpectation.resolves({ n: 1 })
         await this.subject.promises.createNewFolderStructure(
           this.project._id,
@@ -1068,17 +1068,17 @@ describe('ProjectEntityMongoUpdateHandler', function () {
         )
       })
 
-      it('updates the database', function () {
+      it('updates the database', function() {
         this.ProjectMock.verify()
       })
     })
 
-    describe("when the update doesn't find a matching document", function () {
-      beforeEach(async function () {
+    describe("when the update doesn't find a matching document", function() {
+      beforeEach(async function() {
         this.updateExpectation.resolves({ n: 0 })
       })
 
-      it('throws an error', async function () {
+      it('throws an error', async function() {
         await expect(
           this.subject.promises.createNewFolderStructure(
             this.project._id,
@@ -1090,8 +1090,8 @@ describe('ProjectEntityMongoUpdateHandler', function () {
     })
   })
 
-  describe('replaceDocWithFile', function () {
-    it('should simultaneously remove the doc and add the file', async function () {
+  describe('replaceDocWithFile', function() {
+    it('should simultaneously remove the doc and add the file', async function() {
       this.ProjectMock.expects('findOneAndUpdate')
         .withArgs(
           { _id: this.project._id },

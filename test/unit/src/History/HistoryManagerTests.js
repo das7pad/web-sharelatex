@@ -5,8 +5,8 @@ const { ObjectId } = require('mongodb')
 
 const MODULE_PATH = '../../../../app/src/Features/History/HistoryManager'
 
-describe('HistoryManager', function () {
-  beforeEach(function () {
+describe('HistoryManager', function() {
+  beforeEach(function() {
     this.user_id = 'user-id-123'
     this.AuthenticationController = {
       getLoggedInUserId: sinon.stub().returns(this.user_id)
@@ -47,14 +47,14 @@ describe('HistoryManager', function () {
     })
   })
 
-  describe('initializeProject', function () {
-    describe('with project history enabled', function () {
-      beforeEach(function () {
+  describe('initializeProject', function() {
+    describe('with project history enabled', function() {
+      beforeEach(function() {
         this.settings.apis.project_history.initializeHistoryForNewProjects = true
       })
 
-      describe('project history returns a successful response', function () {
-        beforeEach(async function () {
+      describe('project history returns a successful response', function() {
+        beforeEach(async function() {
           this.overleaf_id = 1234
           this.request.post.resolves(
             JSON.stringify({ project: { id: this.overleaf_id } })
@@ -62,7 +62,7 @@ describe('HistoryManager', function () {
           this.result = await this.HistoryManager.promises.initializeProject()
         })
 
-        it('should call the project history api', function () {
+        it('should call the project history api', function() {
           this.request.post
             .calledWith({
               url: `${this.settings.apis.project_history.url}/project`
@@ -70,21 +70,21 @@ describe('HistoryManager', function () {
             .should.equal(true)
         })
 
-        it('should return the overleaf id', function () {
+        it('should return the overleaf id', function() {
           expect(this.result).to.deep.equal({ overleaf_id: this.overleaf_id })
         })
       })
 
-      describe('project history returns a response without the project id', function () {
-        it('should throw an error', async function () {
+      describe('project history returns a response without the project id', function() {
+        it('should throw an error', async function() {
           this.request.post.resolves(JSON.stringify({ project: {} }))
           await expect(this.HistoryManager.promises.initializeProject()).to.be
             .rejected
         })
       })
 
-      describe('project history errors', function () {
-        it('should propagate the error', async function () {
+      describe('project history errors', function() {
+        it('should propagate the error', async function() {
           this.request.post.rejects(new Error('problem connecting'))
           await expect(this.HistoryManager.promises.initializeProject()).to.be
             .rejected
@@ -92,8 +92,8 @@ describe('HistoryManager', function () {
       })
     })
 
-    describe('with project history disabled', function () {
-      it('should return without errors', async function () {
+    describe('with project history disabled', function() {
+      it('should return without errors', async function() {
         this.settings.apis.project_history.initializeHistoryForNewProjects = false
         await expect(this.HistoryManager.promises.initializeProject()).to.be
           .fulfilled
@@ -101,8 +101,8 @@ describe('HistoryManager', function () {
     })
   })
 
-  describe('injectUserDetails', function () {
-    beforeEach(function () {
+  describe('injectUserDetails', function() {
+    beforeEach(function() {
       this.user1 = {
         _id: (this.user_id1 = '123456'),
         first_name: 'Jane',
@@ -132,8 +132,8 @@ describe('HistoryManager', function () {
       this.UserGetter.promises.getUsers.resolves([this.user1, this.user2])
     })
 
-    describe('with a diff', function () {
-      it('should turn user_ids into user objects', async function () {
+    describe('with a diff', function() {
+      it('should turn user_ids into user objects', async function() {
         const diff = await this.HistoryManager.promises.injectUserDetails({
           diff: [
             {
@@ -154,7 +154,7 @@ describe('HistoryManager', function () {
         expect(diff.diff[1].meta.users).to.deep.equal([this.user2_view])
       })
 
-      it('should handle v1 user ids', async function () {
+      it('should handle v1 user ids', async function() {
         const diff = await this.HistoryManager.promises.injectUserDetails({
           diff: [
             {
@@ -175,7 +175,7 @@ describe('HistoryManager', function () {
         expect(diff.diff[1].meta.users).to.deep.equal([this.user2_view])
       })
 
-      it('should leave user objects', async function () {
+      it('should leave user objects', async function() {
         const diff = await this.HistoryManager.promises.injectUserDetails({
           diff: [
             {
@@ -196,7 +196,7 @@ describe('HistoryManager', function () {
         expect(diff.diff[1].meta.users).to.deep.equal([this.user2_view])
       })
 
-      it('should handle a binary diff marker', async function () {
+      it('should handle a binary diff marker', async function() {
         const diff = await this.HistoryManager.promises.injectUserDetails({
           diff: { binary: true }
         })
@@ -204,8 +204,8 @@ describe('HistoryManager', function () {
       })
     })
 
-    describe('with a list of updates', function () {
-      it('should turn user_ids into user objects', async function () {
+    describe('with a list of updates', function() {
+      it('should turn user_ids into user objects', async function() {
         const updates = await this.HistoryManager.promises.injectUserDetails({
           updates: [
             {
@@ -228,7 +228,7 @@ describe('HistoryManager', function () {
         expect(updates.updates[1].meta.users).to.deep.equal([this.user2_view])
       })
 
-      it('should leave user objects', async function () {
+      it('should leave user objects', async function() {
         const updates = await this.HistoryManager.promises.injectUserDetails({
           updates: [
             {
@@ -253,8 +253,8 @@ describe('HistoryManager', function () {
     })
   })
 
-  describe('deleteProject', function () {
-    it('should call the project-history service', async function () {
+  describe('deleteProject', function() {
+    it('should call the project-history service', async function() {
       const projectId = new ObjectId()
       await this.HistoryManager.promises.deleteProject(projectId)
       expect(this.request.delete).to.have.been.calledWith(

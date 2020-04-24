@@ -145,15 +145,13 @@ async function injectUserDetails(data) {
   }
   for (const entry of entries) {
     if (entry.meta != null) {
-      entry.meta.users = ((entry.meta && entry.meta.users) || []).map(
-        (user) => {
-          if (typeof user === 'string' || typeof user === 'number') {
-            return users[user]
-          } else {
-            return user
-          }
+      entry.meta.users = ((entry.meta && entry.meta.users) || []).map(user => {
+        if (typeof user === 'string' || typeof user === 'number') {
+          return users[user]
+        } else {
+          return user
         }
-      )
+      })
     }
   }
   return data

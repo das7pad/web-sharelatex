@@ -20,7 +20,7 @@ define([
   './modules/errorCatcher',
   './modules/storage',
   './utils/underscore'
-], function () {
+], function() {
   const App = angular
     .module('SharelatexApp', [
       'ui.bootstrap',
@@ -35,12 +35,12 @@ define([
       'ngTagsInput',
       'ui.select'
     ])
-    .config(function ($qProvider, $httpProvider, uiSelectConfig) {
+    .config(function($qProvider, $httpProvider, uiSelectConfig) {
       $qProvider.errorOnUnhandledRejections(false)
       uiSelectConfig.spinnerClass = 'fa fa-refresh ui-select-spin'
     })
 
-  App.run(($templateCache) =>
+  App.run($templateCache =>
     // UI Select templates are hard-coded and use Glyphicon icons (which we don't import).
     // The line below simply overrides the hard-coded template with our own, which is
     // basically the same but using Font Awesome icons.
@@ -51,9 +51,8 @@ define([
   )
 
   const sl_debugging =
-    __guard__(
-      window.location != null ? window.location.search : undefined,
-      (x) => x.match(/debug=true/)
+    __guard__(window.location != null ? window.location.search : undefined, x =>
+      x.match(/debug=true/)
     ) != null
   var sl_console_last_log = null
   window.sl_debugging = sl_debugging // make a global flag for debugging code

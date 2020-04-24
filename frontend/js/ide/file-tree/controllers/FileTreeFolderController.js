@@ -13,8 +13,8 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base'], (App) =>
-  App.controller('FileTreeFolderController', function (
+define(['../../../base'], App =>
+  App.controller('FileTreeFolderController', function(
     $scope,
     ide,
     $modal,
@@ -23,21 +23,21 @@ define(['../../../base'], (App) =>
     $scope.expanded =
       localStorage(`folder.${$scope.entity.id}.expanded`) || false
 
-    $scope.toggleExpanded = function () {
+    $scope.toggleExpanded = function() {
       $scope.expanded = !$scope.expanded
       $scope._storeCurrentStateInLocalStorage()
     }
 
-    $scope.$on('entity-file:selected', function () {
+    $scope.$on('entity-file:selected', function() {
       $scope.expanded = true
       $scope._storeCurrentStateInLocalStorage()
     })
 
-    $scope._storeCurrentStateInLocalStorage = function () {
+    $scope._storeCurrentStateInLocalStorage = function() {
       localStorage(`folder.${$scope.entity.id}.expanded`, $scope.expanded)
     }
 
-    $scope.onDrop = function (events, ui) {
+    $scope.onDrop = function(events, ui) {
       let entities
       if (ide.fileTreeManager.multiSelectedCount()) {
         entities = ide.fileTreeManager.getMultiSelectedEntityChildNodes()
@@ -45,7 +45,7 @@ define(['../../../base'], (App) =>
         entities = [$(ui.draggable).scope().entity]
       }
 
-      const ids = $scope.entity.children.map((entity) => entity.id)
+      const ids = $scope.entity.children.map(entity => entity.id)
 
       for (const dropped_entity of Array.from(entities)) {
         if (!ids.includes(dropped_entity.id)) {
@@ -71,7 +71,7 @@ define(['../../../base'], (App) =>
       )
     }
 
-    $scope.orderByFoldersFirst = function (entity) {
+    $scope.orderByFoldersFirst = function(entity) {
       // We need this here as well as in FileTreeController
       // since the file-entity diretive creates a new scope
       // that doesn't inherit from previous scopes.

@@ -24,7 +24,7 @@ module.exports = RedirectManager = {
       for (var redirectUrl in settings.redirects) {
         var target = settings.redirects[redirectUrl]
         result.push(
-          Array.from(target.methods || ['get']).map((method) =>
+          Array.from(target.methods || ['get']).map(method =>
             webRouter[method](
               redirectUrl,
               RedirectManager.createRedirect(target)
@@ -37,7 +37,7 @@ module.exports = RedirectManager = {
   },
 
   createRedirect(target) {
-    return function (req, res, next) {
+    return function(req, res, next) {
       let url
       if (
         (req.headers != null ? req.headers['x-skip-redirects'] : undefined) !=
@@ -74,7 +74,7 @@ module.exports = RedirectManager = {
 // Naively get the query params string. Stringifying the req.query object may
 // have differences between Express and Rails, so safer to just pass the raw
 // string
-var getQueryString = function (req) {
+var getQueryString = function(req) {
   const qsStart = req.originalUrl.indexOf('?')
   if (qsStart !== -1) {
     return req.originalUrl.slice(qsStart)

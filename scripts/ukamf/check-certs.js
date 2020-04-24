@@ -17,7 +17,7 @@ const { db } = require('../../app/src/infrastructure/mongojs')
 const moment = require('moment')
 
 main()
-  .catch((err) => {
+  .catch(err => {
     console.error(err.stack)
   })
   .then(() => process.exit())

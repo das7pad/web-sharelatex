@@ -26,12 +26,12 @@ const MockProjectHistoryApi = require('./helpers/MockProjectHistoryApi')
 const MockDocstoreApi = require('./helpers/MockDocstoreApi')
 const MockFileStoreApi = require('./helpers/MockFileStoreApi')
 
-describe('RestoringFiles', function () {
+describe('RestoringFiles', function() {
   this.timeout(5000)
 
-  beforeEach(function (done) {
+  beforeEach(function(done) {
     this.owner = new User()
-    return this.owner.login((error) => {
+    return this.owner.login(error => {
       if (error != null) {
         throw error
       }
@@ -49,15 +49,15 @@ describe('RestoringFiles', function () {
     })
   })
 
-  describe('restoring a deleted doc', function () {
-    beforeEach(function (done) {
+  describe('restoring a deleted doc', function() {
+    beforeEach(function(done) {
       return this.owner.getProject(this.project_id, (error, project) => {
         if (error != null) {
           throw error
         }
         this.doc = _.find(
           project.rootFolder[0].docs,
-          (doc) => doc.name === 'main.tex'
+          doc => doc.name === 'main.tex'
         )
         return this.owner.request(
           {
@@ -92,14 +92,14 @@ describe('RestoringFiles', function () {
       })
     })
 
-    it('should have restored the doc', function (done) {
+    it('should have restored the doc', function(done) {
       return this.owner.getProject(this.project_id, (error, project) => {
         if (error != null) {
           throw error
         }
         const restored_doc = _.find(
           project.rootFolder[0].docs,
-          (doc) => doc.name === 'main.tex'
+          doc => doc.name === 'main.tex'
         )
         expect(restored_doc._id.toString()).to.equal(this.restored_doc_id)
         expect(this.doc._id).to.not.equal(this.restored_doc_id)
@@ -114,9 +114,9 @@ describe('RestoringFiles', function () {
     })
   })
 
-  describe('restoring from v2 history', function () {
-    describe('restoring a text file', function () {
-      beforeEach(function (done) {
+  describe('restoring from v2 history', function() {
+    describe('restoring a text file', function() {
+      beforeEach(function(done) {
         MockProjectHistoryApi.addOldFile(
           this.project_id,
           42,
@@ -142,14 +142,14 @@ describe('RestoringFiles', function () {
         )
       })
 
-      it('should have created a doc', function (done) {
+      it('should have created a doc', function(done) {
         return this.owner.getProject(this.project_id, (error, project) => {
           if (error != null) {
             throw error
           }
           let doc = _.find(
             project.rootFolder[0].docs,
-            (doc) => doc.name === 'foo.tex'
+            doc => doc.name === 'foo.tex'
           )
           doc = MockDocstoreApi.docs[this.project_id][doc._id]
           expect(doc.lines).to.deep.equal(['hello world, this is foo.tex!'])
@@ -158,8 +158,8 @@ describe('RestoringFiles', function () {
       })
     })
 
-    describe('restoring a binary file', function () {
-      beforeEach(function (done) {
+    describe('restoring a binary file', function() {
+      beforeEach(function(done) {
         this.pngData = fs.readFileSync(
           Path.resolve(__dirname, '../files/1pixel.png'),
           'binary'
@@ -189,14 +189,14 @@ describe('RestoringFiles', function () {
         )
       })
 
-      it('should have created a file', function (done) {
+      it('should have created a file', function(done) {
         return this.owner.getProject(this.project_id, (error, project) => {
           if (error != null) {
             throw error
           }
           let file = _.find(
             project.rootFolder[0].fileRefs,
-            (file) => file.name === 'image.png'
+            file => file.name === 'image.png'
           )
           file = MockFileStoreApi.files[this.project_id][file._id]
           expect(file.content).to.equal(this.pngData)
@@ -205,8 +205,8 @@ describe('RestoringFiles', function () {
       })
     })
 
-    describe('restoring to a directory that exists', function () {
-      beforeEach(function (done) {
+    describe('restoring to a directory that exists', function() {
+      beforeEach(function(done) {
         MockProjectHistoryApi.addOldFile(
           this.project_id,
           42,
@@ -246,16 +246,16 @@ describe('RestoringFiles', function () {
         )
       })
 
-      it('should have created the doc in the named folder', function (done) {
+      it('should have created the doc in the named folder', function(done) {
         return this.owner.getProject(this.project_id, (error, project) => {
           if (error != null) {
             throw error
           }
           const folder = _.find(
             project.rootFolder[0].folders,
-            (folder) => folder.name === 'foldername'
+            folder => folder.name === 'foldername'
           )
-          let doc = _.find(folder.docs, (doc) => doc.name === 'foo2.tex')
+          let doc = _.find(folder.docs, doc => doc.name === 'foo2.tex')
           doc = MockDocstoreApi.docs[this.project_id][doc._id]
           expect(doc.lines).to.deep.equal(['hello world, this is foo-2.tex!'])
           return done()
@@ -263,8 +263,8 @@ describe('RestoringFiles', function () {
       })
     })
 
-    describe('restoring to a directory that no longer exists', function () {
-      beforeEach(function (done) {
+    describe('restoring to a directory that no longer exists', function() {
+      beforeEach(function(done) {
         MockProjectHistoryApi.addOldFile(
           this.project_id,
           42,
@@ -290,17 +290,17 @@ describe('RestoringFiles', function () {
         )
       })
 
-      it('should have created the folder and restored the doc to it', function (done) {
+      it('should have created the folder and restored the doc to it', function(done) {
         return this.owner.getProject(this.project_id, (error, project) => {
           if (error != null) {
             throw error
           }
           const folder = _.find(
             project.rootFolder[0].folders,
-            (folder) => folder.name === 'nothere'
+            folder => folder.name === 'nothere'
           )
           expect(folder).to.exist
-          let doc = _.find(folder.docs, (doc) => doc.name === 'foo3.tex')
+          let doc = _.find(folder.docs, doc => doc.name === 'foo3.tex')
           doc = MockDocstoreApi.docs[this.project_id][doc._id]
           expect(doc.lines).to.deep.equal(['hello world, this is foo-3.tex!'])
           return done()
@@ -308,8 +308,8 @@ describe('RestoringFiles', function () {
       })
     })
 
-    describe('restoring to a filename that already exists', function () {
-      beforeEach(function (done) {
+    describe('restoring to a filename that already exists', function() {
+      beforeEach(function(done) {
         MockProjectHistoryApi.addOldFile(
           this.project_id,
           42,
@@ -335,12 +335,12 @@ describe('RestoringFiles', function () {
         )
       })
 
-      it('should have created the doc in the root folder', function (done) {
+      it('should have created the doc in the root folder', function(done) {
         return this.owner.getProject(this.project_id, (error, project) => {
           if (error != null) {
             throw error
           }
-          let doc = _.find(project.rootFolder[0].docs, (doc) =>
+          let doc = _.find(project.rootFolder[0].docs, doc =>
             doc.name.match(/main \(Restored on/)
           )
           expect(doc).to.exist

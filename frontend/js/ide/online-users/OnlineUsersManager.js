@@ -19,9 +19,9 @@ define([
   '../colors/ColorManager',
   'crypto-js/md5',
   './controllers/OnlineUsersController'
-], function (ColorManager) {
+], function(ColorManager) {
   let OnlineUsersManager
-  return (OnlineUsersManager = (function () {
+  return (OnlineUsersManager = (function() {
     OnlineUsersManager = class OnlineUsersManager {
       static initClass() {
         this.prototype.cursorUpdateInterval = 500
@@ -70,7 +70,7 @@ define([
           )
         })
 
-        this.ide.socket.on('clientTracking.clientUpdated', (client) => {
+        this.ide.socket.on('clientTracking.clientUpdated', client => {
           if (client.id !== this.ide.socket.io.engine.id) {
             // Check it's not me!
             return this.$scope.$apply(() => {
@@ -80,14 +80,14 @@ define([
           }
         })
 
-        this.ide.socket.on('clientTracking.clientDisconnected', (client_id) => {
+        this.ide.socket.on('clientTracking.clientDisconnected', client_id => {
           return this.$scope.$apply(() => {
             delete this.$scope.onlineUsers[client_id]
             return this.refreshOnlineUsers()
           })
         })
 
-        this.$scope.getHueForUserId = (user_id) => {
+        this.$scope.getHueForUserId = user_id => {
           return ColorManager.getHueForUserId(user_id)
         }
       }

@@ -8,13 +8,13 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base'], function (App) {
-  const historyFileTreeController = function ($scope, $element, $attrs, _) {
+define(['../../../base'], function(App) {
+  const historyFileTreeController = function($scope, $element, $attrs, _) {
     const ctrl = this
-    ctrl.handleEntityClick = (file) => ctrl.onSelectedFileChange({ file })
+    ctrl.handleEntityClick = file => ctrl.onSelectedFileChange({ file })
     ctrl._fileTree = []
 
-    $scope.$watch('$ctrl.files', function (files) {
+    $scope.$watch('$ctrl.files', function(files) {
       if (files != null && files.length > 0) {
         ctrl._fileTree = _.reduce(files, _reducePathsToTree, [])
       }
@@ -35,7 +35,7 @@ define(['../../../base'], function (App) {
         } else {
           fileTreeEntity = _.find(
             currentFileTreeLocation,
-            (entity) => entity.name === pathPart
+            entity => entity.name === pathPart
           )
           if (fileTreeEntity == null) {
             fileTreeEntity = {

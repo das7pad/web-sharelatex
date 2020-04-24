@@ -25,8 +25,8 @@ const { ObjectId } = require('mongojs')
 const assert = require('assert')
 const Path = require('path')
 
-describe('GraphController', function () {
-  beforeEach(function () {
+describe('GraphController', function() {
+  beforeEach(function() {
     this.UserGetter = { getUser: sinon.stub() }
 
     this.SigmaJSGraph = {
@@ -120,14 +120,14 @@ describe('GraphController', function () {
     return (this.callback = sinon.stub())
   })
 
-  describe('userGraph', function () {
-    beforeEach(function () {
+  describe('userGraph', function() {
+    beforeEach(function() {
       return (this.GraphController._nextLevel = sinon
         .stub()
         .callsArgWith(3, null, this.SigmaJSGraph))
     })
 
-    it('should render the graph page', function (done) {
+    it('should render the graph page', function(done) {
       this.res.render = (pageName, opts) => {
         pageName.should.equal(
           Path.resolve(__dirname + '/../../../') + '/app/views/user/graph'
@@ -137,7 +137,7 @@ describe('GraphController', function () {
       return this.GraphController.userGraph(this.req, this.res)
     })
 
-    it('should send the user', function (done) {
+    it('should send the user', function(done) {
       this.res.render = (pageName, opts) => {
         opts.user.should.deep.equal(this.users[0])
         return done()
@@ -145,7 +145,7 @@ describe('GraphController', function () {
       return this.GraphController.userGraph(this.req, this.res)
     })
 
-    return it('should send the user graph', function (done) {
+    return it('should send the user graph', function(done) {
       this.res.render = (pageName, opts) => {
         opts.graph.should.deep.equal(this.SigmaJSGraph)
         return done()
@@ -154,10 +154,10 @@ describe('GraphController', function () {
     })
   })
 
-  describe('_genGraph', function () {
-    beforeEach(function () {})
+  describe('_genGraph', function() {
+    beforeEach(function() {})
 
-    it('should create graph with nodes', function (done) {
+    it('should create graph with nodes', function(done) {
       return this.GraphController._genGraph(
         this.projects,
         [this.users[0]._id.toString()],
@@ -169,7 +169,7 @@ describe('GraphController', function () {
       )
     })
 
-    return it('should create graph with edges', function (done) {
+    return it('should create graph with edges', function(done) {
       return this.GraphController._genGraph(
         this.projects,
         [this.users[0]._id.toString()],
@@ -182,8 +182,8 @@ describe('GraphController', function () {
     })
   })
 
-  describe('_nextLevel', function () {
-    beforeEach(function () {
+  describe('_nextLevel', function() {
+    beforeEach(function() {
       this.OneLevelGraph = {
         nodes: this.nodes,
         edges: [1, 2, 3, 4]
@@ -197,7 +197,7 @@ describe('GraphController', function () {
         .callsArgWith(1, null, this.OneLevelGraph))
     })
 
-    return it('should create 1-level graph', function (done) {
+    return it('should create 1-level graph', function(done) {
       return this.GraphController._nextLevel(
         [this.users[0]._id.toString()],
         this.emptyGraph,
@@ -210,8 +210,8 @@ describe('GraphController', function () {
     })
   })
 
-  return describe('_getNames', function () {
-    return it('should add name to nodes', function (done) {
+  return describe('_getNames', function() {
+    return it('should add name to nodes', function(done) {
       return this.GraphController._getNames(
         { nodes: this.nodes, edges: [] },
         (err, graph) => {

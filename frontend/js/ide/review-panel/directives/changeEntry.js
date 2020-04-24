@@ -10,8 +10,8 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base'], (App) =>
-  App.directive('changeEntry', ($timeout) => ({
+define(['../../../base'], App =>
+  App.directive('changeEntry', $timeout => ({
     restrict: 'E',
     templateUrl: 'changeEntryTemplate',
     scope: {
@@ -28,7 +28,7 @@ define(['../../../base'], (App) =>
       scope.isCollapsed = true
       scope.needsCollapsing = false
 
-      element.on('click', function (e) {
+      element.on('click', function(e) {
         if (
           $(e.target).is(
             '.rp-entry, .rp-entry-description, .rp-entry-body, .rp-entry-action-icon i'
@@ -38,14 +38,14 @@ define(['../../../base'], (App) =>
         }
       })
 
-      scope.toggleCollapse = function () {
+      scope.toggleCollapse = function() {
         scope.isCollapsed = !scope.isCollapsed
         return $timeout(() => scope.$emit('review-panel:layout'))
       }
 
       return scope.$watch(
         'entry.content.length',
-        (contentLength) =>
+        contentLength =>
           (scope.needsCollapsing = contentLength > scope.contentLimit)
       )
     }

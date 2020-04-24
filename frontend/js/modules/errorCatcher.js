@@ -15,12 +15,12 @@ const UNHANDLED_REJECTION_ERR_MSG = 'Possibly unhandled rejection: canceled'
 
 app.config([
   '$provide',
-  ($provide) =>
+  $provide =>
     $provide.decorator('$exceptionHandler', [
       '$log',
       '$delegate',
       ($log, $delegate) =>
-        function (exception, cause) {
+        function(exception, cause) {
           if (
             exception === UNHANDLED_REJECTION_ERR_MSG &&
             cause === undefined
@@ -65,6 +65,6 @@ app.factory('unAuthHttpResponseInterceptor', ($q, $location) => ({
 
 app.config([
   '$httpProvider',
-  ($httpProvider) =>
+  $httpProvider =>
     $httpProvider.interceptors.push('unAuthHttpResponseInterceptor')
 ])

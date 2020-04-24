@@ -7,16 +7,16 @@ require('./helpers/MockDocstoreApi')
 require('./helpers/MockDocUpdaterApi')
 require('./helpers/MockProjectHistoryApi')
 
-describe('Project CRUD', function () {
-  beforeEach(async function () {
+describe('Project CRUD', function() {
+  beforeEach(async function() {
     this.user = new User()
     await this.user.login()
 
     this.projectId = await this.user.createProject('example-project')
   })
 
-  describe("when project doesn't exist", function () {
-    it('should return 404', async function () {
+  describe("when project doesn't exist", function() {
+    it('should return 404', async function() {
       const { response } = await this.user.doRequest(
         'GET',
         '/project/aaaaaaaaaaaaaaaaaaaaaaaa'
@@ -25,15 +25,15 @@ describe('Project CRUD', function () {
     })
   })
 
-  describe('when project has malformed id', function () {
-    it('should return 404', async function () {
+  describe('when project has malformed id', function() {
+    it('should return 404', async function() {
       const { response } = await this.user.doRequest('GET', '/project/blah')
       expect(response.statusCode).to.equal(404)
     })
   })
 
-  describe('when trashing a project', function () {
-    it('should mark the project as trashed for the user', async function () {
+  describe('when trashing a project', function() {
+    it('should mark the project as trashed for the user', async function() {
       const { response } = await this.user.doRequest(
         'POST',
         `/project/${this.projectId}/trash`
@@ -44,7 +44,7 @@ describe('Project CRUD', function () {
       expectObjectIdArrayEqual(trashedProject.trashed, [this.user._id])
     })
 
-    it('does nothing if the user has already trashed the project', async function () {
+    it('does nothing if the user has already trashed the project', async function() {
       // Mark as trashed the first time
       await this.user.doRequest('POST', `/project/${this.projectId}/trash`)
 
@@ -55,8 +55,8 @@ describe('Project CRUD', function () {
       expectObjectIdArrayEqual(trashedProject.trashed, [this.user._id])
     })
 
-    describe('with an array archived state', function () {
-      it('should mark the project as not archived for the user', async function () {
+    describe('with an array archived state', function() {
+      it('should mark the project as not archived for the user', async function() {
         await Project.updateOne(
           { _id: this.projectId },
           { $set: { archived: [ObjectId(this.user._id)] } }
@@ -74,8 +74,8 @@ describe('Project CRUD', function () {
       })
     })
 
-    describe('with a legacy boolean state', function () {
-      it('should mark the project as not archived for the user', async function () {
+    describe('with a legacy boolean state', function() {
+      it('should mark the project as not archived for the user', async function() {
         await Project.updateOne(
           { _id: this.projectId },
           { $set: { archived: true } }
@@ -94,8 +94,8 @@ describe('Project CRUD', function () {
     })
   })
 
-  describe('when untrashing a project', function () {
-    it('should mark the project as untrashed for the user', async function () {
+  describe('when untrashing a project', function() {
+    it('should mark the project as untrashed for the user', async function() {
       await Project.updateOne(
         { _id: this.projectId },
         { trashed: [ObjectId(this.user._id)] }
@@ -110,7 +110,7 @@ describe('Project CRUD', function () {
       expectObjectIdArrayEqual(trashedProject.trashed, [])
     })
 
-    it('does nothing if the user has already untrashed the project', async function () {
+    it('does nothing if the user has already untrashed the project', async function() {
       await Project.updateOne(
         { _id: this.projectId },
         { trashed: [ObjectId(this.user._id)] }
@@ -125,7 +125,7 @@ describe('Project CRUD', function () {
       expectObjectIdArrayEqual(trashedProject.trashed, [])
     })
 
-    it('sets trashed to an empty array if not set', async function () {
+    it('sets trashed to an empty array if not set', async function() {
       await this.user.doRequest('DELETE', `/project/${this.projectId}/trash`)
 
       const trashedProject = await Project.findById(this.projectId).exec()
@@ -135,6 +135,6 @@ describe('Project CRUD', function () {
 })
 
 function expectObjectIdArrayEqual(objectIdArray, stringArray) {
-  const stringifiedArray = objectIdArray.map((id) => id.toString())
+  const stringifiedArray = objectIdArray.map(id => id.toString())
   expect(stringifiedArray).to.deep.equal(stringArray)
 }

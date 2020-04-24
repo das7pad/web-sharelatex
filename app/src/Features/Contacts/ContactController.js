@@ -22,7 +22,7 @@ const Modules = require('../../infrastructure/Modules')
 module.exports = ContactsController = {
   getContacts(req, res, next) {
     const user_id = AuthenticationController.getLoggedInUserId(req)
-    return ContactManager.getContactIds(user_id, { limit: 50 }, function (
+    return ContactManager.getContactIds(user_id, { limit: 50 }, function(
       error,
       contact_ids
     ) {
@@ -37,7 +37,7 @@ module.exports = ContactsController = {
           last_name: 1,
           holdingAccount: 1
         },
-        function (error, contacts) {
+        function(error, contacts) {
           if (error != null) {
             return next(error)
           }
@@ -55,11 +55,11 @@ module.exports = ContactsController = {
           )
 
           // Don't count holding accounts to discourage users from repeating mistakes (mistyped or wrong emails, etc)
-          contacts = contacts.filter((c) => !c.holdingAccount)
+          contacts = contacts.filter(c => !c.holdingAccount)
 
           contacts = contacts.map(ContactsController._formatContact)
 
-          return Modules.hooks.fire('getContacts', user_id, contacts, function (
+          return Modules.hooks.fire('getContacts', user_id, contacts, function(
             error,
             additional_contacts
           ) {

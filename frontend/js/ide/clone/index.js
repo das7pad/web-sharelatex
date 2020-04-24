@@ -6,4 +6,4 @@
 define([
   './controllers/CloneProjectController',
   './controllers/CloneProjectModalController'
-], function () {})
+], function() {})

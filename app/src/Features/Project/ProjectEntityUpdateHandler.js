@@ -42,7 +42,7 @@ function wrapWithLock(methodWithoutLock) {
       LockManager.runWithLock(
         LOCK_NAMESPACE,
         projectId,
-        (cb) => methodWithoutLock(projectId, ...args, cb),
+        cb => methodWithoutLock(projectId, ...args, cb),
         callback
       )
     }
@@ -59,7 +59,7 @@ function wrapWithLock(methodWithoutLock) {
       LockManager.runWithLock(
         LOCK_NAMESPACE,
         projectId,
-        (cb) => mainTask(projectId, ...args, cb),
+        cb => mainTask(projectId, ...args, cb),
         callback
       )
     })
@@ -73,7 +73,7 @@ function wrapWithLock(methodWithoutLock) {
 const ProjectEntityUpdateHandler = {
   copyFileFromExistingProjectWithProject: wrapWithLock({
     beforeLock(next) {
-      return function (
+      return function(
         projectId,
         project,
         folderId,
@@ -178,7 +178,7 @@ const ProjectEntityUpdateHandler = {
               rev: fileRef.rev,
               project_name: project.name
             },
-            (err) => {
+            err => {
               if (err != null) {
                 logger.err(
                   {
@@ -203,7 +203,7 @@ const ProjectEntityUpdateHandler = {
                 projectHistoryId,
                 userId,
                 { newFiles, newProject },
-                (error) => {
+                error => {
                   if (error != null) {
                     return callback(error)
                   }
@@ -247,7 +247,7 @@ const ProjectEntityUpdateHandler = {
               isDeletedDoc = true
               doc = _.find(
                 project.deletedDocs,
-                (doc) => doc._id.toString() === docId.toString()
+                doc => doc._id.toString() === docId.toString()
               )
             } else {
               return callback(err)
@@ -382,7 +382,7 @@ const ProjectEntityUpdateHandler = {
             project_name: project.name,
             rev: 0
           },
-          (err) => {
+          err => {
             if (err != null) {
               return callback(err)
             }
@@ -407,7 +407,7 @@ const ProjectEntityUpdateHandler = {
 
   addDocWithRanges: wrapWithLock({
     beforeLock(next) {
-      return function (
+      return function(
         projectId,
         folderId,
         docName,
@@ -481,7 +481,7 @@ const ProjectEntityUpdateHandler = {
             projectHistoryId,
             userId,
             { newDocs, newProject: project },
-            (error) => {
+            error => {
               if (error != null) {
                 return callback(error)
               }
@@ -539,7 +539,7 @@ const ProjectEntityUpdateHandler = {
             project_name: project.name,
             rev: fileRef.rev
           },
-          (err) => {
+          err => {
             if (err != null) {
               return callback(err)
             }
@@ -552,7 +552,7 @@ const ProjectEntityUpdateHandler = {
 
   addFile: wrapWithLock({
     beforeLock(next) {
-      return function (
+      return function(
         projectId,
         folderId,
         fileName,
@@ -624,7 +624,7 @@ const ProjectEntityUpdateHandler = {
             projectHistoryId,
             userId,
             { newFiles, newProject: project },
-            (error) => {
+            error => {
               if (error != null) {
                 return callback(error)
               }
@@ -638,7 +638,7 @@ const ProjectEntityUpdateHandler = {
 
   replaceFile: wrapWithLock({
     beforeLock(next) {
-      return function (
+      return function(
         projectId,
         fileId,
         fsPath,
@@ -722,7 +722,7 @@ const ProjectEntityUpdateHandler = {
               rev: oldFileRef.rev + 1,
               project_name: project.name
             },
-            (err) => {
+            err => {
               if (err != null) {
                 return callback(err)
               }
@@ -740,7 +740,7 @@ const ProjectEntityUpdateHandler = {
     }
   }),
 
-  upsertDoc: wrapWithLock(function (
+  upsertDoc: wrapWithLock(function(
     projectId,
     folderId,
     docName,
@@ -775,7 +775,7 @@ const ProjectEntityUpdateHandler = {
             userId,
             docLines,
             source,
-            (err) => {
+            err => {
               if (err != null) {
                 return callback(err)
               }
@@ -786,7 +786,7 @@ const ProjectEntityUpdateHandler = {
               DocumentUpdaterHandler.flushDocToMongo(
                 projectId,
                 existingDoc._id,
-                (err) => {
+                err => {
                   if (err != null) {
                     return callback(err)
                   }
@@ -817,7 +817,7 @@ const ProjectEntityUpdateHandler = {
 
   upsertFile: wrapWithLock({
     beforeLock(next) {
-      return function (
+      return function(
         projectId,
         folderId,
         fileName,
@@ -913,7 +913,7 @@ const ProjectEntityUpdateHandler = {
                         rev: newFileRef.rev,
                         project_name: project.name
                       },
-                      (err) => {
+                      err => {
                         if (err) {
                           return callback(err)
                         }
@@ -935,7 +935,7 @@ const ProjectEntityUpdateHandler = {
                             ],
                             newProject: project
                           },
-                          (err) => {
+                          err => {
                             if (err) {
                               return callback(err)
                             }
@@ -964,7 +964,7 @@ const ProjectEntityUpdateHandler = {
               userId,
               newFileRef,
               fileStoreUrl,
-              (err) => {
+              err => {
                 if (err != null) {
                   return callback(err)
                 }
@@ -982,7 +982,7 @@ const ProjectEntityUpdateHandler = {
               userId,
               newFileRef,
               fileStoreUrl,
-              (err) => {
+              err => {
                 if (err != null) {
                   return callback(err)
                 }
@@ -995,7 +995,7 @@ const ProjectEntityUpdateHandler = {
     }
   }),
 
-  upsertDocWithPath: wrapWithLock(function (
+  upsertDocWithPath: wrapWithLock(function(
     projectId,
     elementPath,
     docLines,
@@ -1035,7 +1035,7 @@ const ProjectEntityUpdateHandler = {
 
   upsertFileWithPath: wrapWithLock({
     beforeLock(next) {
-      return function (
+      return function(
         projectId,
         elementPath,
         fsPath,
@@ -1123,7 +1123,7 @@ const ProjectEntityUpdateHandler = {
     }
   }),
 
-  deleteEntity: wrapWithLock(function (
+  deleteEntity: wrapWithLock(function(
     projectId,
     entityId,
     entityType,
@@ -1151,7 +1151,7 @@ const ProjectEntityUpdateHandler = {
           entityType,
           path.fileSystem,
           userId,
-          (error) => {
+          error => {
             if (error != null) {
               return callback(error)
             }
@@ -1161,7 +1161,7 @@ const ProjectEntityUpdateHandler = {
                 path: path.fileSystem,
                 project_name: projectBeforeDeletion.name
               },
-              (error) => {
+              error => {
                 if (error != null) {
                   return callback(error)
                 }
@@ -1195,7 +1195,7 @@ const ProjectEntityUpdateHandler = {
     )
   ),
 
-  mkdirp: wrapWithLock(function (projectId, path, callback) {
+  mkdirp: wrapWithLock(function(projectId, path, callback) {
     for (const folder of path.split('/')) {
       if (folder.length > 0 && !SafePath.isCleanFilename(folder)) {
         return callback(new Errors.InvalidNameError('invalid element name'))
@@ -1209,7 +1209,7 @@ const ProjectEntityUpdateHandler = {
     )
   }),
 
-  mkdirpWithExactCase: wrapWithLock(function (projectId, path, callback) {
+  mkdirpWithExactCase: wrapWithLock(function(projectId, path, callback) {
     for (const folder of path.split('/')) {
       if (folder.length > 0 && !SafePath.isCleanFilename(folder)) {
         return callback(new Errors.InvalidNameError('invalid element name'))
@@ -1223,7 +1223,7 @@ const ProjectEntityUpdateHandler = {
     )
   }),
 
-  addFolder: wrapWithLock(function (
+  addFolder: wrapWithLock(function(
     projectId,
     parentFolderId,
     folderName,
@@ -1240,7 +1240,7 @@ const ProjectEntityUpdateHandler = {
     )
   }),
 
-  moveEntity: wrapWithLock(function (
+  moveEntity: wrapWithLock(function(
     projectId,
     entityId,
     destFolderId,
@@ -1288,7 +1288,7 @@ const ProjectEntityUpdateHandler = {
     )
   }),
 
-  renameEntity: wrapWithLock(function (
+  renameEntity: wrapWithLock(function(
     projectId,
     entityId,
     entityType,
@@ -1367,12 +1367,12 @@ const ProjectEntityUpdateHandler = {
               return callback(error)
             }
 
-            docs = _.map(docs, (doc) => ({
+            docs = _.map(docs, doc => ({
               doc: doc.doc._id,
               path: doc.path
             }))
 
-            files = _.map(files, (file) => ({
+            files = _.map(files, file => ({
               file: file.file._id,
               path: file.path,
               url: FileStoreHandler._buildUrl(projectId, file.file._id)
@@ -1412,7 +1412,7 @@ const ProjectEntityUpdateHandler = {
       entityType,
       path,
       userId,
-      (error) => {
+      error => {
         if (error != null) {
           return callback(error)
         }
@@ -1503,7 +1503,7 @@ const ProjectEntityUpdateHandler = {
   _cleanUpDoc(project, doc, path, userId, callback) {
     const projectId = project._id.toString()
     const docId = doc._id.toString()
-    const unsetRootDocIfRequired = (callback) => {
+    const unsetRootDocIfRequired = callback => {
       if (
         project.rootDoc_id != null &&
         project.rootDoc_id.toString() === docId
@@ -1514,18 +1514,18 @@ const ProjectEntityUpdateHandler = {
       }
     }
 
-    unsetRootDocIfRequired((error) => {
+    unsetRootDocIfRequired(error => {
       if (error != null) {
         return callback(error)
       }
       ProjectEntityMongoUpdateHandler._insertDeletedDocReference(
         project._id,
         doc,
-        (error) => {
+        error => {
           if (error != null) {
             return callback(error)
           }
-          DocumentUpdaterHandler.deleteDoc(projectId, docId, (error) => {
+          DocumentUpdaterHandler.deleteDoc(projectId, docId, error => {
             if (error != null) {
               return callback(error)
             }
@@ -1546,9 +1546,9 @@ const ProjectEntityUpdateHandler = {
 
   _cleanUpFolder(project, folder, folderPath, userId, callback) {
     const jobs = []
-    folder.docs.forEach((doc) => {
+    folder.docs.forEach(doc => {
       const docPath = Path.join(folderPath, doc.name)
-      jobs.push((callback) =>
+      jobs.push(callback =>
         ProjectEntityUpdateHandler._cleanUpDoc(
           project,
           doc,
@@ -1559,9 +1559,9 @@ const ProjectEntityUpdateHandler = {
       )
     })
 
-    folder.fileRefs.forEach((file) => {
+    folder.fileRefs.forEach(file => {
       const filePath = Path.join(folderPath, file.name)
-      jobs.push((callback) =>
+      jobs.push(callback =>
         ProjectEntityUpdateHandler._cleanUpFile(
           project,
           file,
@@ -1572,9 +1572,9 @@ const ProjectEntityUpdateHandler = {
       )
     })
 
-    folder.folders.forEach((childFolder) => {
+    folder.folders.forEach(childFolder => {
       folderPath = Path.join(folderPath, childFolder.name)
-      jobs.push((callback) =>
+      jobs.push(callback =>
         ProjectEntityUpdateHandler._cleanUpFolder(
           project,
           childFolder,
@@ -1590,8 +1590,8 @@ const ProjectEntityUpdateHandler = {
 
   convertDocToFile: wrapWithLock({
     beforeLock(next) {
-      return function (projectId, docId, userId, callback) {
-        DocumentUpdaterHandler.flushDocToMongo(projectId, docId, (err) => {
+      return function(projectId, docId, userId, callback) {
+        DocumentUpdaterHandler.flushDocToMongo(projectId, docId, err => {
           if (err) {
             return callback(err)
           }
@@ -1612,7 +1612,7 @@ const ProjectEntityUpdateHandler = {
                   if (!_.isEmpty(ranges)) {
                     return callback(new Errors.DocHasRangesError({}))
                   }
-                  DocumentUpdaterHandler.deleteDoc(projectId, docId, (err) => {
+                  DocumentUpdaterHandler.deleteDoc(projectId, docId, err => {
                     if (err) {
                       return callback(err)
                     }
@@ -1631,7 +1631,7 @@ const ProjectEntityUpdateHandler = {
                             if (err) {
                               return callback(err)
                             }
-                            fs.unlink(fsPath, (err) => {
+                            fs.unlink(fsPath, err => {
                               if (err) {
                                 logger.warn(
                                   { err, path: fsPath },
@@ -1682,7 +1682,7 @@ const ProjectEntityUpdateHandler = {
               newFiles: [{ file: fileRef, path, url: fileStoreUrl }],
               newProject: project
             },
-            (err) => {
+            err => {
               if (err) {
                 return callback(err)
               }

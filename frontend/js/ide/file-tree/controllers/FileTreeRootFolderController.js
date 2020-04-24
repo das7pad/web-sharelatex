@@ -12,14 +12,10 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base'], (App) =>
-  App.controller('FileTreeRootFolderController', function (
-    $scope,
-    $modal,
-    ide
-  ) {
+define(['../../../base'], App =>
+  App.controller('FileTreeRootFolderController', function($scope, $modal, ide) {
     const { rootFolder } = $scope
-    return ($scope.onDrop = function (events, ui) {
+    return ($scope.onDrop = function(events, ui) {
       let entities
       if (ide.fileTreeManager.multiSelectedCount()) {
         entities = ide.fileTreeManager.getMultiSelectedEntityChildNodes()
@@ -27,7 +23,7 @@ define(['../../../base'], (App) =>
         entities = [$(ui.draggable).scope().entity]
       }
 
-      const ids = rootFolder.children.map((entity) => entity.id)
+      const ids = rootFolder.children.map(entity => entity.id)
 
       for (const dropped_entity of Array.from(entities)) {
         if (!ids.includes(dropped_entity.id)) {

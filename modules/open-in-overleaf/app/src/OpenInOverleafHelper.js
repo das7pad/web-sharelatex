@@ -55,7 +55,7 @@ module.exports = OpenInOverleafHelper = {
   populateSnippetFromUriArray(uris, source_snippet, callback) {
     // add names to uris, if present
     if (callback == null) {
-      callback = function (error, results) {}
+      callback = function(error, results) {}
     }
     let names = source_snippet.snip_name || []
     if (typeof names === 'string') {
@@ -72,20 +72,20 @@ module.exports = OpenInOverleafHelper = {
       (uri, mapcb) =>
         async.waterfall(
           [
-            (cb) =>
+            cb =>
               FileWriter.writeUrlToDisk(
                 'open_in_overleaf_snippet',
                 UrlHelper.wrapUrlWithProxy(uri.uri),
-                function (error, fspath) {
+                function(error, fspath) {
                   if (error != null) {
                     return cb(new Errors.NotFoundError())
                   }
                   return cb(null, { uri: uri.uri, fspath })
                 }
               ),
-            function (file, cb) {
+            function(file, cb) {
               const magic = new mmm.Magic(mmm.MAGIC_MIME_TYPE)
-              return magic.detectFile(file.fspath, function (error, ctype) {
+              return magic.detectFile(file.fspath, function(error, ctype) {
                 if (error != null) {
                   return cb(error)
                 }
@@ -93,9 +93,9 @@ module.exports = OpenInOverleafHelper = {
                 return cb(null, file)
               })
             },
-            function (file, cb) {
+            function(file, cb) {
               if (file.ctype.match(/^text\//)) {
-                return fs.readFile(file.fspath, { encoding: 'utf8' }, function (
+                return fs.readFile(file.fspath, { encoding: 'utf8' }, function(
                   error,
                   content
                 ) {
@@ -109,44 +109,41 @@ module.exports = OpenInOverleafHelper = {
                 return cb(null, file)
               }
             },
-            function (file, cb) {
+            function(file, cb) {
               file.name = SafePath.clean(uri.name || path.basename(uri.uri))
               return cb(null, file)
             }
           ],
           mapcb
         ),
-      function (error, files) {
+      function(error, files) {
         if (error != null) {
           return callback(error)
         }
 
         // sort files based on the order supplied so that the user can control project name if more than one .tex document has a documentclass
-        const groups = _.groupBy(files, (file) => file.uri)
-        files = _.map(uris, (uri) => groups[uri].shift())
+        const groups = _.groupBy(files, file => file.uri)
+        files = _.map(uris, uri => groups[uri].shift())
 
-        return OpenInOverleafHelper._ensureFilesHaveUniqueNames(
-          files,
-          function (err) {
-            if (err != null) {
-              return callback(err)
-            }
-
-            const snippet = OpenInOverleafHelper._cloneSnippet(source_snippet)
-            snippet.files = files
-            OpenInOverleafHelper._setSnippetRootDocAndTitleFromFileArray(
-              snippet
-            )
-            return callback(null, snippet)
+        return OpenInOverleafHelper._ensureFilesHaveUniqueNames(files, function(
+          err
+        ) {
+          if (err != null) {
+            return callback(err)
           }
-        )
+
+          const snippet = OpenInOverleafHelper._cloneSnippet(source_snippet)
+          snippet.files = files
+          OpenInOverleafHelper._setSnippetRootDocAndTitleFromFileArray(snippet)
+          return callback(null, snippet)
+        })
       }
     )
   },
 
   populateSnippetFromUri(uri, source_snippet, cb) {
     if (cb == null) {
-      cb = function (error, result) {}
+      cb = function(error, result) {}
     }
     if (!urlValidator.isWebUri(uri)) {
       return cb(new OpenInOverleafErrors.InvalidUriError())
@@ -154,7 +151,7 @@ module.exports = OpenInOverleafHelper = {
     uri = UrlHelper.wrapUrlWithProxy(uri)
 
     // TODO: Implement a file size limit here to prevent shenanigans
-    return FileWriter.writeUrlToDisk('open_in_overleaf_snippet', uri, function (
+    return FileWriter.writeUrlToDisk('open_in_overleaf_snippet', uri, function(
       error,
       fspath
     ) {
@@ -163,7 +160,7 @@ module.exports = OpenInOverleafHelper = {
       }
 
       const magic = new mmm.Magic(mmm.MAGIC_MIME_TYPE)
-      return magic.detectFile(fspath, function (error, ctype) {
+      return magic.detectFile(fspath, function(error, ctype) {
         if (error != null) {
           return cb(error)
         }
@@ -175,7 +172,7 @@ module.exports = OpenInOverleafHelper = {
           return cb(null, snippet)
         } else if (ctype.match(/^text\//)) {
           // TODO: handle non-UTF8 properly
-          return fs.readFile(fspath, { encoding: 'utf8' }, function (
+          return fs.readFile(fspath, { encoding: 'utf8' }, function(
             error,
             data
           ) {
@@ -198,7 +195,7 @@ module.exports = OpenInOverleafHelper = {
 
   populateSnippetFromTemplate(template, source_snippet, cb) {
     if (cb == null) {
-      cb = function (error, result) {}
+      cb = function(error, result) {}
     }
     const templateData = OpenInOverleafHelper.TEMPLATE_DATA[template]
     if (templateData == null) {
@@ -223,7 +220,7 @@ module.exports = OpenInOverleafHelper = {
 
   populateSnippetFromConversionJob(partner, clientMediaId, source_snippet, cb) {
     if (cb == null) {
-      cb = function (error, result) {}
+      cb = function(error, result) {}
     }
     return V1Api.request(
       {
@@ -231,7 +228,7 @@ module.exports = OpenInOverleafHelper = {
           partner
         )}/conversions/${encodeURIComponent(clientMediaId)}`
       },
-      function (err, response, body) {
+      function(err, response, body) {
         if (
           (err != null ? err.statusCode : undefined) === 404 ||
           (response != null ? response.statusCode : undefined) === 404 ||
@@ -258,12 +255,12 @@ module.exports = OpenInOverleafHelper = {
 
   populateProjectFromFileList(project, snippet, callback) {
     if (callback == null) {
-      callback = function (error) {}
+      callback = function(error) {}
     }
     return async.eachLimit(
       snippet.files,
       5,
-      function (file, cb) {
+      function(file, cb) {
         if (file.content != null) {
           return ProjectEntityUpdateHandler.addDoc(
             project._id,
@@ -288,7 +285,7 @@ module.exports = OpenInOverleafHelper = {
           )
         }
       },
-      function (error) {
+      function(error) {
         if (error != null) {
           return callback(error)
         }
@@ -307,7 +304,7 @@ module.exports = OpenInOverleafHelper = {
 
   setCompilerForProject(project, engine, callback) {
     if (callback == null) {
-      callback = function (error) {}
+      callback = function(error) {}
     }
     const compiler = ProjectHelper.compilerFromV1Engine(engine)
 
@@ -320,14 +317,14 @@ module.exports = OpenInOverleafHelper = {
 
   setProjectBrandVariationFromSlug(project, publisherSlug, callback) {
     if (callback == null) {
-      callback = function (error) {}
+      callback = function(error) {}
     }
     return async.waterfall(
       [
-        (cb) =>
+        cb =>
           V1Api.request(
             { uri: `/api/v2/brands/${encodeURIComponent(publisherSlug)}` },
-            function (err, response, body) {
+            function(err, response, body) {
               if (
                 (err != null ? err.statusCode : undefined) === 404 ||
                 (response != null ? response.statusCode : undefined) === 404 ||
@@ -346,7 +343,7 @@ module.exports = OpenInOverleafHelper = {
           ProjectOptionsHandler.setBrandVariationId(
             project._id,
             brandVariationId,
-            (err) => cb(err)
+            err => cb(err)
           )
       ],
       callback
@@ -355,7 +352,7 @@ module.exports = OpenInOverleafHelper = {
 
   setProjectBrandVariationFromId(project, brandVariationId, callback) {
     if (callback == null) {
-      callback = function (error) {}
+      callback = function(error) {}
     }
     return async.waterfall(
       [
@@ -368,7 +365,7 @@ module.exports = OpenInOverleafHelper = {
                 brandVariationId
               )}`
             },
-            function (err, response, body) {
+            function(err, response, body) {
               if (
                 (err != null ? err.statusCode : undefined) === 404 ||
                 (response != null ? response.statusCode : undefined) === 404
@@ -378,11 +375,11 @@ module.exports = OpenInOverleafHelper = {
               return cb(err)
             }
           ),
-        (cb) =>
+        cb =>
           ProjectOptionsHandler.setBrandVariationId(
             project._id,
             brandVariationId,
-            (err) => cb(err)
+            err => cb(err)
           )
       ],
       callback
@@ -467,7 +464,7 @@ ${content}
         base,
         [],
         100,
-        function (error, name) {
+        function(error, name) {
           if (error != null) {
             return callback(error)
           }

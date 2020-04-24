@@ -57,7 +57,9 @@ const FormattingMarker = {
 }
 
 function makeSpan(text, kind) {
-  var el = $('<span>').text(text).addClass(`wl-${kind}-open`)
+  var el = $('<span>')
+    .text(text)
+    .addClass(`wl-${kind}-open`)
 
   return el[0]
 }

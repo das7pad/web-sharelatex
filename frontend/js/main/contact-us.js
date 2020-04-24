@@ -12,17 +12,13 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../base'], (App) =>
-  App.controller('GroupPlanContactController', function (
-    $scope,
-    $modal,
-    $http
-  ) {
+define(['../base'], App =>
+  App.controller('GroupPlanContactController', function($scope, $modal, $http) {
     $scope.form = {}
     $scope.sent = false
     $scope.sending = false
     $scope.error = false
-    return ($scope.contactUs = function () {
+    return ($scope.contactUs = function() {
       if ($scope.form.email == null) {
         console.log('email not set')
         return
@@ -43,12 +39,12 @@ define(['../base'], (App) =>
 
       const request = $http.post('/support', data)
 
-      request.catch(function () {
+      request.catch(function() {
         $scope.error = true
         return $scope.$apply()
       })
 
-      return request.then(function (response) {
+      return request.then(function(response) {
         $scope.sent = true
         eventTracking.send(
           'subscription-funnel',

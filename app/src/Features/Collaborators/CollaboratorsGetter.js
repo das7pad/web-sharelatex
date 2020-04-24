@@ -67,17 +67,17 @@ async function getMemberIdsWithPrivilegeLevels(projectId) {
 
 async function getMemberIds(projectId) {
   const members = await getMemberIdsWithPrivilegeLevels(projectId)
-  return members.map((m) => m.id)
+  return members.map(m => m.id)
 }
 
 async function getInvitedMemberIds(projectId) {
   const members = await getMemberIdsWithPrivilegeLevels(projectId)
-  return members.filter((m) => m.source !== Sources.TOKEN).map((m) => m.id)
+  return members.filter(m => m.source !== Sources.TOKEN).map(m => m.id)
 }
 
 async function getInvitedMembersWithPrivilegeLevels(projectId) {
   let members = await getMemberIdsWithPrivilegeLevels(projectId)
-  members = members.filter((m) => m.source !== Sources.TOKEN)
+  members = members.filter(m => m.source !== Sources.TOKEN)
   return _loadMembers(members)
 }
 
@@ -197,7 +197,7 @@ async function userIsTokenMember(userId, projectId) {
 
 async function _getInvitedMemberCount(projectId) {
   const members = await getMemberIdsWithPrivilegeLevels(projectId)
-  return members.filter((m) => m.source !== Sources.TOKEN).length
+  return members.filter(m => m.source !== Sources.TOKEN).length
 }
 
 function _getMemberIdsWithPrivilegeLevelsFromFields(
@@ -250,7 +250,7 @@ function _getMemberIdsWithPrivilegeLevelsFromFields(
 async function _loadMembers(members) {
   const limit = pLimit(3)
   const results = await Promise.all(
-    members.map((member) =>
+    members.map(member =>
       limit(async () => {
         const user = await UserGetter.promises.getUser(member.id, {
           _id: 1,
@@ -268,5 +268,5 @@ async function _loadMembers(members) {
       })
     )
   )
-  return results.filter((r) => r != null)
+  return results.filter(r => r != null)
 }

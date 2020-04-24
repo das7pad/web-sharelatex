@@ -21,9 +21,9 @@ const { promisifyAll } = require('../util/promises')
 const FileWriter = {
   ensureDumpFolderExists(callback) {
     if (callback == null) {
-      callback = function (error) {}
+      callback = function(error) {}
     }
-    return fs.mkdir(Settings.path.dumpFolder, function (error) {
+    return fs.mkdir(Settings.path.dumpFolder, function(error) {
       if (error != null && error.code !== 'EEXIST') {
         // Ignore error about already existing
         return callback(error)
@@ -34,22 +34,22 @@ const FileWriter = {
 
   writeLinesToDisk(identifier, lines, callback) {
     if (callback == null) {
-      callback = function (error, fsPath) {}
+      callback = function(error, fsPath) {}
     }
     return FileWriter.writeContentToDisk(identifier, lines.join('\n'), callback)
   },
 
   writeContentToDisk(identifier, content, callback) {
     if (callback == null) {
-      callback = function (error, fsPath) {}
+      callback = function(error, fsPath) {}
     }
     callback = _.once(callback)
     const fsPath = `${Settings.path.dumpFolder}/${identifier}_${uuid.v4()}`
-    return FileWriter.ensureDumpFolderExists(function (error) {
+    return FileWriter.ensureDumpFolderExists(function(error) {
       if (error != null) {
         return callback(error)
       }
-      return fs.writeFile(fsPath, content, function (error) {
+      return fs.writeFile(fsPath, content, function(error) {
         if (error != null) {
           return callback(error)
         }
@@ -60,13 +60,13 @@ const FileWriter = {
 
   writeStreamToDisk(identifier, stream, callback) {
     if (callback == null) {
-      callback = function (error, fsPath) {}
+      callback = function(error, fsPath) {}
     }
     callback = _.once(callback)
     const fsPath = `${Settings.path.dumpFolder}/${identifier}_${uuid.v4()}`
 
     stream.pause()
-    return FileWriter.ensureDumpFolderExists(function (error) {
+    return FileWriter.ensureDumpFolderExists(function(error) {
       if (error != null) {
         return callback(error)
       }
@@ -75,21 +75,21 @@ const FileWriter = {
       const writeStream = fs.createWriteStream(fsPath)
       stream.pipe(writeStream)
 
-      stream.on('error', function (err) {
+      stream.on('error', function(err) {
         logger.warn(
           { err, identifier, fsPath },
           '[writeStreamToDisk] something went wrong with incoming stream'
         )
         return callback(err)
       })
-      writeStream.on('error', function (err) {
+      writeStream.on('error', function(err) {
         logger.warn(
           { err, identifier, fsPath },
           '[writeStreamToDisk] something went wrong with writing to disk'
         )
         return callback(err)
       })
-      return writeStream.on('finish', function () {
+      return writeStream.on('finish', function() {
         logger.log(
           { identifier, fsPath },
           '[writeStreamToDisk] write stream finished'
@@ -101,18 +101,18 @@ const FileWriter = {
 
   writeUrlToDisk(identifier, url, callback) {
     if (callback == null) {
-      callback = function (error, fsPath) {}
+      callback = function(error, fsPath) {}
     }
     callback = _.once(callback)
     const stream = request.get(url)
-    stream.on('error', function (err) {
+    stream.on('error', function(err) {
       logger.warn(
         { err, identifier, url },
         '[writeUrlToDisk] something went wrong with writing to disk'
       )
       callback(err)
     })
-    stream.on('response', function (response) {
+    stream.on('response', function(response) {
       if (response.statusCode >= 200 && response.statusCode < 300) {
         return FileWriter.writeStreamToDisk(identifier, stream, callback)
       } else {

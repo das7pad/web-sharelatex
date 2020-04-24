@@ -20,8 +20,8 @@ const modulePath = '../../../../app/src/Features/Compile/ClsiCookieManager.js'
 const SandboxedModule = require('sandboxed-module')
 const realRequst = require('request')
 
-describe('ClsiCookieManager', function () {
-  beforeEach(function () {
+describe('ClsiCookieManager', function() {
+  beforeEach(function() {
     const self = this
     this.redisMulti = {
       set: sinon.stub(),
@@ -77,8 +77,8 @@ describe('ClsiCookieManager', function () {
     })())
   })
 
-  describe('getServerId', function () {
-    it('should call get for the key', function (done) {
+  describe('getServerId', function() {
+    it('should call get for the key', function(done) {
       this.redis.get.callsArgWith(1, null, 'clsi-7')
       return this.ClsiCookieManager._getServerId(
         this.project_id,
@@ -92,7 +92,7 @@ describe('ClsiCookieManager', function () {
       )
     })
 
-    it('should _populateServerIdViaRequest if no key is found', function (done) {
+    it('should _populateServerIdViaRequest if no key is found', function(done) {
       this.ClsiCookieManager._populateServerIdViaRequest = sinon
         .stub()
         .callsArgWith(1)
@@ -108,7 +108,7 @@ describe('ClsiCookieManager', function () {
       )
     })
 
-    it('should _populateServerIdViaRequest if no key is blank', function (done) {
+    it('should _populateServerIdViaRequest if no key is blank', function(done) {
       this.ClsiCookieManager._populateServerIdViaRequest = sinon
         .stub()
         .callsArgWith(1)
@@ -125,8 +125,8 @@ describe('ClsiCookieManager', function () {
     })
   })
 
-  describe('_populateServerIdViaRequest', function () {
-    beforeEach(function () {
+  describe('_populateServerIdViaRequest', function() {
+    beforeEach(function() {
       this.response = 'some data'
       this.request.get.callsArgWith(1, null, this.response)
       return (this.ClsiCookieManager.setServerId = sinon
@@ -134,7 +134,7 @@ describe('ClsiCookieManager', function () {
         .callsArgWith(2, null, 'clsi-9'))
     })
 
-    it('should make a request to the clsi', function (done) {
+    it('should make a request to the clsi', function(done) {
       return this.ClsiCookieManager._populateServerIdViaRequest(
         this.project_id,
         (err, serverId) => {
@@ -146,7 +146,7 @@ describe('ClsiCookieManager', function () {
       )
     })
 
-    it('should return the server id', function (done) {
+    it('should return the server id', function(done) {
       return this.ClsiCookieManager._populateServerIdViaRequest(
         this.project_id,
         (err, serverId) => {
@@ -157,8 +157,8 @@ describe('ClsiCookieManager', function () {
     })
   })
 
-  describe('setServerId', function () {
-    beforeEach(function () {
+  describe('setServerId', function() {
+    beforeEach(function() {
       this.response = 'dsadsakj'
       this.ClsiCookieManager._parseServerIdFromResponse = sinon
         .stub()
@@ -166,11 +166,11 @@ describe('ClsiCookieManager', function () {
       return this.redisMulti.exec.callsArgWith(0)
     })
 
-    it('should set the server id with a ttl', function (done) {
+    it('should set the server id with a ttl', function(done) {
       return this.ClsiCookieManager.setServerId(
         this.project_id,
         this.response,
-        (err) => {
+        err => {
           this.redisMulti.set
             .calledWith(`clsiserver:${this.project_id}`, 'clsi-8')
             .should.equal(true)
@@ -185,7 +185,7 @@ describe('ClsiCookieManager', function () {
       )
     })
 
-    it('should return the server id', function (done) {
+    it('should return the server id', function(done) {
       return this.ClsiCookieManager.setServerId(
         this.project_id,
         this.response,
@@ -196,7 +196,7 @@ describe('ClsiCookieManager', function () {
       )
     })
 
-    it('should not set the server id if clsiCookies are not enabled', function (done) {
+    it('should not set the server id if clsiCookies are not enabled', function(done) {
       delete this.settings.clsiCookie.key
       this.ClsiCookieManager = SandboxedModule.require(modulePath, {
         globals: {
@@ -214,7 +214,7 @@ describe('ClsiCookieManager', function () {
       )
     })
 
-    it('should not set the server id there is no server id in the response', function (done) {
+    it('should not set the server id there is no server id in the response', function(done) {
       this.ClsiCookieManager._parseServerIdFromResponse = sinon
         .stub()
         .returns(null)
@@ -228,7 +228,7 @@ describe('ClsiCookieManager', function () {
       )
     })
 
-    it('should also set in the secondary if secondary redis is enabled', function (done) {
+    it('should also set in the secondary if secondary redis is enabled', function(done) {
       this.redisSecondaryMulti = {
         set: sinon.stub(),
         expire: sinon.stub(),
@@ -269,14 +269,14 @@ describe('ClsiCookieManager', function () {
     })
   })
 
-  describe('getCookieJar', function () {
-    beforeEach(function () {
+  describe('getCookieJar', function() {
+    beforeEach(function() {
       return (this.ClsiCookieManager._getServerId = sinon
         .stub()
         .callsArgWith(1, null, 'clsi-11'))
     })
 
-    it('should return a jar with the cookie set populated from redis', function (done) {
+    it('should return a jar with the cookie set populated from redis', function(done) {
       return this.ClsiCookieManager.getCookieJar(
         this.project_id,
         (err, jar) => {
@@ -291,7 +291,7 @@ describe('ClsiCookieManager', function () {
       )
     })
 
-    it('should return empty cookie jar if clsiCookies are not enabled', function (done) {
+    it('should return empty cookie jar if clsiCookies are not enabled', function(done) {
       delete this.settings.clsiCookie.key
       this.ClsiCookieManager = SandboxedModule.require(modulePath, {
         globals: {

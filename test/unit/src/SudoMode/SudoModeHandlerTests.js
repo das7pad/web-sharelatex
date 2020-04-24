@@ -21,8 +21,8 @@ const modulePath = require('path').join(
   '../../../../app/src/Features/SudoMode/SudoModeHandler'
 )
 
-describe('SudoModeHandler', function () {
-  beforeEach(function () {
+describe('SudoModeHandler', function() {
+  beforeEach(function() {
     this.userId = 'some_user_id'
     this.email = 'someuser@example.com'
     this.user = {
@@ -49,35 +49,35 @@ describe('SudoModeHandler', function () {
     }))
   })
 
-  describe('_buildKey', function () {
-    it('should build a properly formed key', function () {
+  describe('_buildKey', function() {
+    it('should build a properly formed key', function() {
       return expect(this.SudoModeHandler._buildKey('123')).to.equal(
         'SudoMode:{123}'
       )
     })
   })
 
-  describe('activateSudoMode', function () {
-    beforeEach(function () {
-      return (this.call = (cb) => {
+  describe('activateSudoMode', function() {
+    beforeEach(function() {
+      return (this.call = cb => {
         return this.SudoModeHandler.activateSudoMode(this.userId, cb)
       })
     })
 
-    describe('when all goes well', function () {
-      beforeEach(function () {
+    describe('when all goes well', function() {
+      beforeEach(function() {
         return (this.rclient.set = sinon.stub().callsArgWith(4, null))
       })
 
-      it('should not produce an error', function (done) {
-        return this.call((err) => {
+      it('should not produce an error', function(done) {
+        return this.call(err => {
           expect(err).to.equal(null)
           return done()
         })
       })
 
-      it('should set a value in redis', function (done) {
-        return this.call((err) => {
+      it('should set a value in redis', function(done) {
+        return this.call(err => {
           expect(this.rclient.set.callCount).to.equal(1)
           expect(
             this.rclient.set.calledWith(
@@ -92,38 +92,38 @@ describe('SudoModeHandler', function () {
       })
     })
 
-    describe('when user id is not supplied', function () {
-      beforeEach(function () {
-        return (this.call = (cb) => {
+    describe('when user id is not supplied', function() {
+      beforeEach(function() {
+        return (this.call = cb => {
           return this.SudoModeHandler.activateSudoMode(null, cb)
         })
       })
 
-      it('should produce an error', function (done) {
-        return this.call((err) => {
+      it('should produce an error', function(done) {
+        return this.call(err => {
           expect(err).to.not.equal(null)
           expect(err).to.be.instanceof(Error)
           return done()
         })
       })
 
-      it('should not set value in redis', function (done) {
-        return this.call((err) => {
+      it('should not set value in redis', function(done) {
+        return this.call(err => {
           expect(this.rclient.set.callCount).to.equal(0)
           return done()
         })
       })
     })
 
-    describe('when rclient.set produces an error', function () {
-      beforeEach(function () {
+    describe('when rclient.set produces an error', function() {
+      beforeEach(function() {
         return (this.rclient.set = sinon
           .stub()
           .callsArgWith(4, new Error('woops')))
       })
 
-      it('should produce an error', function (done) {
-        return this.call((err) => {
+      it('should produce an error', function(done) {
+        return this.call(err => {
           expect(err).to.not.equal(null)
           expect(err).to.be.instanceof(Error)
           return done()
@@ -132,23 +132,23 @@ describe('SudoModeHandler', function () {
     })
   })
 
-  describe('clearSudoMode', function () {
-    beforeEach(function () {
+  describe('clearSudoMode', function() {
+    beforeEach(function() {
       this.rclient.del = sinon.stub().callsArgWith(1, null)
-      return (this.call = (cb) => {
+      return (this.call = cb => {
         return this.SudoModeHandler.clearSudoMode(this.userId, cb)
       })
     })
 
-    it('should not produce an error', function (done) {
-      return this.call((err) => {
+    it('should not produce an error', function(done) {
+      return this.call(err => {
         expect(err).to.equal(null)
         return done()
       })
     })
 
-    it('should delete key from redis', function (done) {
-      return this.call((err) => {
+    it('should delete key from redis', function(done) {
+      return this.call(err => {
         expect(this.rclient.del.callCount).to.equal(1)
         expect(this.rclient.del.calledWith('SudoMode:{some_user_id}')).to.equal(
           true
@@ -157,15 +157,15 @@ describe('SudoModeHandler', function () {
       })
     })
 
-    describe('when rclient.del produces an error', function () {
-      beforeEach(function () {
+    describe('when rclient.del produces an error', function() {
+      beforeEach(function() {
         return (this.rclient.del = sinon
           .stub()
           .callsArgWith(1, new Error('woops')))
       })
 
-      it('should produce an error', function (done) {
-        return this.call((err) => {
+      it('should produce an error', function(done) {
+        return this.call(err => {
           expect(err).to.not.equal(null)
           expect(err).to.be.instanceof(Error)
           return done()
@@ -173,23 +173,23 @@ describe('SudoModeHandler', function () {
       })
     })
 
-    describe('when user id is not supplied', function () {
-      beforeEach(function () {
-        return (this.call = (cb) => {
+    describe('when user id is not supplied', function() {
+      beforeEach(function() {
+        return (this.call = cb => {
           return this.SudoModeHandler.clearSudoMode(null, cb)
         })
       })
 
-      it('should produce an error', function (done) {
-        return this.call((err) => {
+      it('should produce an error', function(done) {
+        return this.call(err => {
           expect(err).to.not.equal(null)
           expect(err).to.be.instanceof(Error)
           return done()
         })
       })
 
-      it('should not delete value in redis', function (done) {
-        return this.call((err) => {
+      it('should not delete value in redis', function(done) {
+        return this.call(err => {
           expect(this.rclient.del.callCount).to.equal(0)
           return done()
         })
@@ -197,14 +197,14 @@ describe('SudoModeHandler', function () {
     })
   })
 
-  describe('authenticate', function () {
-    beforeEach(function () {
+  describe('authenticate', function() {
+    beforeEach(function() {
       return (this.AuthenticationManager.authenticate = sinon
         .stub()
         .callsArgWith(2, null, this.user))
     })
 
-    it('should call AuthenticationManager.authenticate', function (done) {
+    it('should call AuthenticationManager.authenticate', function(done) {
       return this.SudoModeHandler.authenticate(
         this.email,
         'password',
@@ -219,26 +219,26 @@ describe('SudoModeHandler', function () {
     })
   })
 
-  describe('isSudoModeActive', function () {
-    beforeEach(function () {
-      return (this.call = (cb) => {
+  describe('isSudoModeActive', function() {
+    beforeEach(function() {
+      return (this.call = cb => {
         return this.SudoModeHandler.isSudoModeActive(this.userId, cb)
       })
     })
 
-    describe('when sudo-mode is active for that user', function () {
-      beforeEach(function () {
+    describe('when sudo-mode is active for that user', function() {
+      beforeEach(function() {
         return (this.rclient.get = sinon.stub().callsArgWith(1, null, '1'))
       })
 
-      it('should not produce an error', function (done) {
+      it('should not produce an error', function(done) {
         return this.call((err, isActive) => {
           expect(err).to.equal(null)
           return done()
         })
       })
 
-      it('should get the value from redis', function (done) {
+      it('should get the value from redis', function(done) {
         return this.call((err, isActive) => {
           expect(this.rclient.get.callCount).to.equal(1)
           expect(
@@ -248,7 +248,7 @@ describe('SudoModeHandler', function () {
         })
       })
 
-      it('should produce a true result', function (done) {
+      it('should produce a true result', function(done) {
         return this.call((err, isActive) => {
           expect(isActive).to.equal(true)
           return done()
@@ -256,19 +256,19 @@ describe('SudoModeHandler', function () {
       })
     })
 
-    describe('when sudo-mode is not active for that user', function () {
-      beforeEach(function () {
+    describe('when sudo-mode is not active for that user', function() {
+      beforeEach(function() {
         return (this.rclient.get = sinon.stub().callsArgWith(1, null, null))
       })
 
-      it('should not produce an error', function (done) {
+      it('should not produce an error', function(done) {
         return this.call((err, isActive) => {
           expect(err).to.equal(null)
           return done()
         })
       })
 
-      it('should get the value from redis', function (done) {
+      it('should get the value from redis', function(done) {
         return this.call((err, isActive) => {
           expect(this.rclient.get.callCount).to.equal(1)
           expect(
@@ -278,7 +278,7 @@ describe('SudoModeHandler', function () {
         })
       })
 
-      it('should produce a false result', function (done) {
+      it('should produce a false result', function(done) {
         return this.call((err, isActive) => {
           expect(isActive).to.equal(false)
           return done()
@@ -286,14 +286,14 @@ describe('SudoModeHandler', function () {
       })
     })
 
-    describe('when rclient.get produces an error', function () {
-      beforeEach(function () {
+    describe('when rclient.get produces an error', function() {
+      beforeEach(function() {
         return (this.rclient.get = sinon
           .stub()
           .callsArgWith(1, new Error('woops')))
       })
 
-      it('should produce an error', function (done) {
+      it('should produce an error', function(done) {
         return this.call((err, isActive) => {
           expect(err).to.not.equal(null)
           expect(err).to.be.instanceof(Error)
@@ -303,23 +303,23 @@ describe('SudoModeHandler', function () {
       })
     })
 
-    describe('when user id is not supplied', function () {
-      beforeEach(function () {
-        return (this.call = (cb) => {
+    describe('when user id is not supplied', function() {
+      beforeEach(function() {
+        return (this.call = cb => {
           return this.SudoModeHandler.isSudoModeActive(null, cb)
         })
       })
 
-      it('should produce an error', function (done) {
-        return this.call((err) => {
+      it('should produce an error', function(done) {
+        return this.call(err => {
           expect(err).to.not.equal(null)
           expect(err).to.be.instanceof(Error)
           return done()
         })
       })
 
-      it('should not get value in redis', function (done) {
-        return this.call((err) => {
+      it('should not get value in redis', function(done) {
+        return this.call(err => {
           expect(this.rclient.get.callCount).to.equal(0)
           return done()
         })

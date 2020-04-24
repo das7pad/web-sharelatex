@@ -39,7 +39,7 @@ function processRemovals(err, projects) {
   async.eachLimit(
     projects,
     maxParallel,
-    function (project, cb) {
+    function(project, cb) {
       count += 1
       console.log(
         (commit ? 'Removing' : 'Would remove') +
@@ -59,7 +59,7 @@ function processRemovals(err, projects) {
         async.setImmediate(cb)
       }
     },
-    function (err) {
+    function(err) {
       if (err) {
         console.log('There was a problem: ', err)
       }

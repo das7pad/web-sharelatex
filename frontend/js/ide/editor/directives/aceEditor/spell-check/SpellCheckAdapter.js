@@ -1,4 +1,4 @@
-define(['ace/ace', './HighlightedWordManager'], function (
+define(['ace/ace', './HighlightedWordManager'], function(
   Ace,
   HighlightedWordManager
 ) {
@@ -28,7 +28,7 @@ define(['ace/ace', './HighlightedWordManager'], function (
     }
 
     getLinesByRows(rows) {
-      return rows.map((rowIdx) => this.editor.session.doc.getLine(rowIdx))
+      return rows.map(rowIdx => this.editor.session.doc.getLine(rowIdx))
     }
 
     getSelectionContents() {

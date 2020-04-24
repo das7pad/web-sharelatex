@@ -5,7 +5,7 @@ define([
   './Helpers',
   'ace/ace',
   'ace/ext-language_tools'
-], function (CommandManager, EnvironmentManager, PackageManager, Helpers) {
+], function(CommandManager, EnvironmentManager, PackageManager, Helpers) {
   const { Range } = ace.require('ace/range')
   const aceSnippetManager = ace.require('ace/snippets').snippetManager
 
@@ -28,7 +28,7 @@ define([
       this.files = files
       this.monkeyPatchAutocomplete()
 
-      this.$scope.$watch('autoComplete', (autocomplete) => {
+      this.$scope.$watch('autoComplete', autocomplete => {
         if (autocomplete) {
           this.enable()
         } else {
@@ -36,11 +36,11 @@ define([
         }
       })
 
-      const onChange = (change) => {
+      const onChange = change => {
         this.onChange(change)
       }
 
-      this.editor.on('changeSession', (e) => {
+      this.editor.on('changeSession', e => {
         e.oldSession.off('change', onChange)
         e.session.on('change', onChange)
       })
@@ -184,7 +184,7 @@ define([
                 score: 60
               })
               if (references.keys && references.keys.length > 0) {
-                references.keys.forEach(function (key) {
+                references.keys.forEach(function(key) {
                   if (key != null) {
                     result.push({
                       caption: `\\${commandName}{${previousArgsCaption}${key}}`,
@@ -287,7 +287,7 @@ define([
         // Only override this once since it's global but we may create multiple
         // autocomplete handlers
         Autocomplete.prototype._insertMatch = Autocomplete.prototype.insertMatch
-        Autocomplete.prototype.insertMatch = function (data) {
+        Autocomplete.prototype.insertMatch = function(data) {
           const { editor } = this
 
           const pos = editor.getCursorPosition()
@@ -423,7 +423,7 @@ define([
         // Overwrite this to set autoInsert = false and set font size
         Autocomplete.startCommand = {
           name: 'startAutocomplete',
-          exec: (editor) => {
+          exec: editor => {
             if (!editor.completer) {
               editor.completer = new Autocomplete()
             }
@@ -442,10 +442,8 @@ define([
               editor.completer.completions &&
               editor.completer.completions.filtered
             if (filtered) {
-              const longestCaption = _.max(
-                filtered.map((c) => c.caption.length)
-              )
-              const longestMeta = _.max(filtered.map((c) => c.meta.length))
+              const longestCaption = _.max(filtered.map(c => c.caption.length))
+              const longestMeta = _.max(filtered.map(c => c.meta.length))
               const charWidth = editor.renderer.characterWidth
               // between 280 and 700 px
               const width = Math.max(
@@ -469,7 +467,7 @@ define([
         }
       }
 
-      Util.retrievePrecedingIdentifier = function (text, pos, regex) {
+      Util.retrievePrecedingIdentifier = function(text, pos, regex) {
         let currentLineOffset = 0
         for (let i = pos - 1; i <= 0; i++) {
           if (text[i] === '\n') {

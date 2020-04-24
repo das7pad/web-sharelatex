@@ -1,13 +1,13 @@
-define(['../../../../../frontend/js/base'], (App) =>
+define(['../../../../../frontend/js/base'], App =>
   // For integration-module
-  App.controller('OpenInOverleafGatewayController', function (
+  App.controller('OpenInOverleafGatewayController', function(
     $scope,
     $http,
     localStorage
   ) {
     $scope.error = false
 
-    $scope.handleGateway = function () {
+    $scope.handleGateway = function() {
       const input = JSON.parse($('#overleaf-gateway-data').text())
       _addReferrer(input.params)
 
@@ -48,7 +48,7 @@ define(['../../../../../frontend/js/base'], (App) =>
     }
 
     function _retrieveParamsIfMissing(params) {
-      if (Object.keys(params).filter((k) => k !== 'referrer').length === 0) {
+      if (Object.keys(params).filter(k => k !== 'referrer').length === 0) {
         return JSON.parse(window.sessionStorage.getItem('openInOverleaf')) || {}
       }
       return params

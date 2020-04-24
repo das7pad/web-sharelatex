@@ -14,8 +14,8 @@ const MODULE_PATH = path.join(
 
 const sleep = promisify(setTimeout)
 
-describe('CollaboratorsHandler', function () {
-  beforeEach(function () {
+describe('CollaboratorsHandler', function() {
+  beforeEach(function() {
     this.logger = {
       log: sinon.stub(),
       warn: sinon.stub(),
@@ -83,13 +83,13 @@ describe('CollaboratorsHandler', function () {
     })
   })
 
-  afterEach(function () {
+  afterEach(function() {
     this.ProjectMock.verify()
   })
 
-  describe('removeUserFromProject', function () {
-    describe('a non-archived project', function () {
-      beforeEach(function () {
+  describe('removeUserFromProject', function() {
+    describe('a non-archived project', function() {
+      beforeEach(function() {
         this.ProjectMock.expects('findOne')
           .withArgs({
             _id: this.project._id
@@ -98,7 +98,7 @@ describe('CollaboratorsHandler', function () {
           .resolves(this.project)
       })
 
-      it('should remove the user from mongo', async function () {
+      it('should remove the user from mongo', async function() {
         this.ProjectMock.expects('updateOne')
           .withArgs(
             {
@@ -124,8 +124,8 @@ describe('CollaboratorsHandler', function () {
       })
     })
 
-    describe('an archived project, archived with a boolean value', function () {
-      beforeEach(function () {
+    describe('an archived project, archived with a boolean value', function() {
+      beforeEach(function() {
         const archived = [ObjectId(this.userId)]
         this.ProjectHelper.calculateArchivedArray.returns(archived)
 
@@ -137,7 +137,7 @@ describe('CollaboratorsHandler', function () {
           .resolves(this.oldArchivedProject)
       })
 
-      it('should remove the user from mongo', async function () {
+      it('should remove the user from mongo', async function() {
         this.ProjectMock.expects('updateOne')
           .withArgs(
             {
@@ -164,8 +164,8 @@ describe('CollaboratorsHandler', function () {
       })
     })
 
-    describe('an archived project, archived with an array value', function () {
-      beforeEach(function () {
+    describe('an archived project, archived with an array value', function() {
+      beforeEach(function() {
         this.ProjectMock.expects('findOne')
           .withArgs({
             _id: this.archivedProject._id
@@ -174,7 +174,7 @@ describe('CollaboratorsHandler', function () {
           .resolves(this.archivedProject)
       })
 
-      it('should remove the user from mongo', async function () {
+      it('should remove the user from mongo', async function() {
         this.ProjectMock.expects('updateOne')
           .withArgs(
             {
@@ -200,9 +200,9 @@ describe('CollaboratorsHandler', function () {
     })
   })
 
-  describe('addUserIdToProject', function () {
-    describe('as readOnly', function () {
-      beforeEach(async function () {
+  describe('addUserIdToProject', function() {
+    describe('as readOnly', function() {
+      beforeEach(async function() {
         this.ProjectMock.expects('updateOne')
           .withArgs(
             {
@@ -222,13 +222,13 @@ describe('CollaboratorsHandler', function () {
         )
       })
 
-      it('should flush the project to the TPDS', function () {
+      it('should flush the project to the TPDS', function() {
         expect(
           this.TpdsProjectFlusher.promises.flushProjectToTpds
         ).to.have.been.calledWith(this.project._id)
       })
 
-      it('should add the user as a contact for the adding user', function () {
+      it('should add the user as a contact for the adding user', function() {
         expect(this.ContactManager.addContact).to.have.been.calledWith(
           this.addingUserId,
           this.userId
@@ -236,8 +236,8 @@ describe('CollaboratorsHandler', function () {
       })
     })
 
-    describe('as readAndWrite', function () {
-      beforeEach(async function () {
+    describe('as readAndWrite', function() {
+      beforeEach(async function() {
         this.ProjectMock.expects('updateOne')
           .withArgs(
             {
@@ -257,15 +257,15 @@ describe('CollaboratorsHandler', function () {
         )
       })
 
-      it('should flush the project to the TPDS', function () {
+      it('should flush the project to the TPDS', function() {
         expect(
           this.TpdsProjectFlusher.promises.flushProjectToTpds
         ).to.have.been.calledWith(this.project._id)
       })
     })
 
-    describe('with invalid privilegeLevel', function () {
-      it('should call the callback with an error', async function () {
+    describe('with invalid privilegeLevel', function() {
+      it('should call the callback with an error', async function() {
         await expect(
           this.CollaboratorsHandler.promises.addUserIdToProject(
             this.project._id,
@@ -277,12 +277,12 @@ describe('CollaboratorsHandler', function () {
       })
     })
 
-    describe('when user already exists as a collaborator', function () {
-      beforeEach(function () {
+    describe('when user already exists as a collaborator', function() {
+      beforeEach(function() {
         this.project.collaberator_refs = [this.userId]
       })
 
-      it('should not add the user again', async function () {
+      it('should not add the user again', async function() {
         await this.CollaboratorsHandler.promises.addUserIdToProject(
           this.project._id,
           this.addingUserId,
@@ -294,8 +294,8 @@ describe('CollaboratorsHandler', function () {
       })
     })
 
-    describe('with null addingUserId', function () {
-      beforeEach(function () {
+    describe('with null addingUserId', function() {
+      beforeEach(function() {
         this.CollaboratorsHandler.promises.addUserIdToProject(
           this.project._id,
           null,
@@ -305,14 +305,14 @@ describe('CollaboratorsHandler', function () {
         )
       })
 
-      it('should not add the adding user as a contact', function () {
+      it('should not add the adding user as a contact', function() {
         expect(this.ContactManager.addContact).not.to.have.been.called
       })
     })
   })
 
-  describe('removeUserFromAllProjects', function () {
-    it('should remove the user from each project', async function () {
+  describe('removeUserFromAllProjects', function() {
+    it('should remove the user from each project', async function() {
       this.CollaboratorsGetter.promises.getProjectsUserIsMemberOf
         .withArgs(this.userId, { _id: 1 })
         .resolves({
@@ -372,8 +372,8 @@ describe('CollaboratorsHandler', function () {
     })
   })
 
-  describe('transferProjects', function () {
-    beforeEach(function () {
+  describe('transferProjects', function() {
+    beforeEach(function() {
       this.fromUserId = ObjectId()
       this.toUserId = ObjectId()
       this.projects = [
@@ -439,8 +439,8 @@ describe('CollaboratorsHandler', function () {
         .resolves()
     })
 
-    describe('successfully', function () {
-      it('should flush each project to the TPDS', async function () {
+    describe('successfully', function() {
+      it('should flush each project to the TPDS', async function() {
         await this.CollaboratorsHandler.promises.transferProjects(
           this.fromUserId,
           this.toUserId
@@ -454,8 +454,8 @@ describe('CollaboratorsHandler', function () {
       })
     })
 
-    describe('when flushing to TPDS fails', function () {
-      it('should log an error but not fail', async function () {
+    describe('when flushing to TPDS fails', function() {
+      it('should log an error but not fail', async function() {
         this.TpdsProjectFlusher.promises.flushProjectToTpds.rejects(
           new Error('oops')
         )
@@ -469,8 +469,8 @@ describe('CollaboratorsHandler', function () {
     })
   })
 
-  describe('setCollaboratorPrivilegeLevel', function () {
-    it('sets a collaborator to read-only', async function () {
+  describe('setCollaboratorPrivilegeLevel', function() {
+    it('sets a collaborator to read-only', async function() {
       this.ProjectMock.expects('updateOne')
         .withArgs(
           {
@@ -494,7 +494,7 @@ describe('CollaboratorsHandler', function () {
       )
     })
 
-    it('sets a collaborator to read-write', async function () {
+    it('sets a collaborator to read-write', async function() {
       this.ProjectMock.expects('updateOne')
         .withArgs(
           {
@@ -518,8 +518,10 @@ describe('CollaboratorsHandler', function () {
       )
     })
 
-    it('throws a NotFoundError if the project or collaborator does not exist', async function () {
-      this.ProjectMock.expects('updateOne').chain('exec').resolves({ n: 0 })
+    it('throws a NotFoundError if the project or collaborator does not exist', async function() {
+      this.ProjectMock.expects('updateOne')
+        .chain('exec')
+        .resolves({ n: 0 })
       await expect(
         this.CollaboratorsHandler.promises.setCollaboratorPrivilegeLevel(
           this.projectId,

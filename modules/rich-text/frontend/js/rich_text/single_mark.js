@@ -97,7 +97,7 @@ export function makeSingleMark(cm, sourceMark, region, staticMark, options) {
   const mark = cm.markText(from, to, options)
 
   if (INDENTED_ENVIROMENTS.includes(sourceMark.kind)) {
-    _.range(from.line, to.line + 1).forEach((i) => {
+    _.range(from.line, to.line + 1).forEach(i => {
       const openMarksCount =
         sourceMark.checkedProperties.openMarksCount > 4
           ? 4

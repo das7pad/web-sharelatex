@@ -20,22 +20,20 @@ function add(req, res, next) {
     role: req.body.role,
     department: req.body.department
   }
-  UserUpdater.addEmailAddress(userId, email, affiliationOptions, function (
+  UserUpdater.addEmailAddress(userId, email, affiliationOptions, function(
     error
   ) {
     if (error) {
       return UserEmailsController._handleEmailError(error, req, res, next)
     }
-    UserEmailsConfirmationHandler.sendConfirmationEmail(
-      userId,
-      email,
-      function (error) {
-        if (error) {
-          return next(error)
-        }
-        res.sendStatus(204)
+    UserEmailsConfirmationHandler.sendConfirmationEmail(userId, email, function(
+      error
+    ) {
+      if (error) {
+        return next(error)
       }
-    )
+      res.sendStatus(204)
+    })
   })
 }
 
@@ -45,30 +43,28 @@ function resendConfirmation(req, res, next) {
   if (!email) {
     return res.sendStatus(422)
   }
-  UserGetter.getUserByAnyEmail(email, { _id: 1 }, function (error, user) {
+  UserGetter.getUserByAnyEmail(email, { _id: 1 }, function(error, user) {
     if (error) {
       return next(error)
     }
     if (!user || user._id.toString() !== userId) {
       return res.sendStatus(422)
     }
-    UserEmailsConfirmationHandler.sendConfirmationEmail(
-      userId,
-      email,
-      function (error) {
-        if (error) {
-          return next(error)
-        }
-        res.sendStatus(200)
+    UserEmailsConfirmationHandler.sendConfirmationEmail(userId, email, function(
+      error
+    ) {
+      if (error) {
+        return next(error)
       }
-    )
+      res.sendStatus(200)
+    })
   })
 }
 
 module.exports = UserEmailsController = {
   list(req, res, next) {
     const userId = AuthenticationController.getLoggedInUserId(req)
-    UserGetter.getUserFullEmails(userId, function (error, fullEmails) {
+    UserGetter.getUserFullEmails(userId, function(error, fullEmails) {
       if (error) {
         return next(error)
       }
@@ -85,7 +81,7 @@ module.exports = UserEmailsController = {
       return res.sendStatus(422)
     }
 
-    UserUpdater.removeEmailAddress(userId, email, function (error) {
+    UserUpdater.removeEmailAddress(userId, email, function(error) {
       if (error) {
         return next(error)
       }
@@ -99,7 +95,7 @@ module.exports = UserEmailsController = {
     if (!email) {
       return res.sendStatus(422)
     }
-    UserUpdater.setDefaultEmailAddress(userId, email, (err) => {
+    UserUpdater.setDefaultEmailAddress(userId, email, err => {
       if (err) {
         return UserEmailsController._handleEmailError(err, req, res, next)
       }
@@ -120,7 +116,7 @@ module.exports = UserEmailsController = {
       email,
       req.body.role,
       req.body.department,
-      function (error) {
+      function(error) {
         if (error) {
           return next(error)
         }
@@ -145,9 +141,7 @@ module.exports = UserEmailsController = {
         message: req.i18n.translate('confirmation_link_broken')
       })
     }
-    UserEmailsConfirmationHandler.confirmEmailFromToken(token, function (
-      error
-    ) {
+    UserEmailsConfirmationHandler.confirmEmailFromToken(token, function(error) {
       if (error) {
         if (error instanceof Errors.NotFoundError) {
           res.status(404).json({

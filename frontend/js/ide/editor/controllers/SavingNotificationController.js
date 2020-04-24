@@ -13,7 +13,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 define(['../../../base', '../Document'], (App, Document) =>
-  App.controller('SavingNotificationController', function (
+  App.controller('SavingNotificationController', function(
     $scope,
     $interval,
     ide
@@ -29,7 +29,7 @@ define(['../../../base', '../Document'], (App, Document) =>
     const MAX_UNSAVED_SECONDS = 15 // lock the editor after this time if unsaved
 
     $scope.docSavingStatus = {}
-    var pollSavedStatus = function () {
+    var pollSavedStatus = function() {
       let t
       const oldStatus = $scope.docSavingStatus
       const oldUnsavedCount = $scope.docSavingStatusCount
@@ -80,7 +80,7 @@ define(['../../../base', '../Document'], (App, Document) =>
       }
     }
 
-    return (warnAboutUnsavedChanges = function () {
+    return (warnAboutUnsavedChanges = function() {
       if (Document.hasUnsavedChanges()) {
         return 'You have unsaved changes. If you leave now they will not be saved.'
       }

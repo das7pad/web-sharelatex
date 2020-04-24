@@ -18,8 +18,8 @@ const { expect } = chai
 const modulePath = '../../../../app/src/Features/Compile/ClsiFormatChecker.js'
 const SandboxedModule = require('sandboxed-module')
 
-describe('ClsiFormatChecker', function () {
-  beforeEach(function () {
+describe('ClsiFormatChecker', function() {
+  beforeEach(function() {
     this.ClsiFormatChecker = SandboxedModule.require(modulePath, {
       globals: {
         console: console
@@ -36,8 +36,8 @@ describe('ClsiFormatChecker', function () {
     return (this.project_id = 'project-id')
   })
 
-  describe('checkRecoursesForProblems', function () {
-    beforeEach(function () {
+  describe('checkRecoursesForProblems', function() {
+    beforeEach(function() {
       return (this.resources = [
         {
           path: 'main.tex',
@@ -55,7 +55,7 @@ describe('ClsiFormatChecker', function () {
       ])
     })
 
-    it('should call _checkForDuplicatePaths and _checkForConflictingPaths', function (done) {
+    it('should call _checkForDuplicatePaths and _checkForConflictingPaths', function(done) {
       this.ClsiFormatChecker._checkForConflictingPaths = sinon
         .stub()
         .callsArgWith(1, null)
@@ -76,7 +76,7 @@ describe('ClsiFormatChecker', function () {
       )
     })
 
-    it('should remove undefined errors', function (done) {
+    it('should remove undefined errors', function(done) {
       this.ClsiFormatChecker._checkForConflictingPaths = sinon
         .stub()
         .callsArgWith(1, null, [])
@@ -93,7 +93,7 @@ describe('ClsiFormatChecker', function () {
       )
     })
 
-    it('should keep populated arrays', function (done) {
+    it('should keep populated arrays', function(done) {
       this.ClsiFormatChecker._checkForConflictingPaths = sinon
         .stub()
         .callsArgWith(1, null, [{ path: 'somewhere/main.tex' }])
@@ -110,7 +110,7 @@ describe('ClsiFormatChecker', function () {
       )
     })
 
-    it('should keep populated object', function (done) {
+    it('should keep populated object', function(done) {
       this.ClsiFormatChecker._checkForConflictingPaths = sinon
         .stub()
         .callsArgWith(1, null, [])
@@ -131,8 +131,8 @@ describe('ClsiFormatChecker', function () {
       )
     })
 
-    describe('_checkForConflictingPaths', function () {
-      beforeEach(function () {
+    describe('_checkForConflictingPaths', function() {
+      beforeEach(function() {
         this.resources.push({
           path: 'chapters/chapter1.tex',
           content: 'other stuff'
@@ -144,7 +144,7 @@ describe('ClsiFormatChecker', function () {
         })
       })
 
-      it('should flag up when a nested file has folder with same subpath as file elsewhere', function (done) {
+      it('should flag up when a nested file has folder with same subpath as file elsewhere', function(done) {
         this.resources.push({
           path: 'stuff/image',
           url: 'http://somwhere.com'
@@ -160,7 +160,7 @@ describe('ClsiFormatChecker', function () {
         )
       })
 
-      it('should flag up when a root level file has folder with same subpath as file elsewhere', function (done) {
+      it('should flag up when a root level file has folder with same subpath as file elsewhere', function(done) {
         this.resources.push({
           path: 'stuff',
           content: 'other stuff'
@@ -176,7 +176,7 @@ describe('ClsiFormatChecker', function () {
         )
       })
 
-      it('should not flag up when the file is a substring of a path', function (done) {
+      it('should not flag up when the file is a substring of a path', function(done) {
         this.resources.push({
           path: 'stuf',
           content: 'other stuff'
@@ -192,8 +192,8 @@ describe('ClsiFormatChecker', function () {
       })
     })
 
-    describe('_checkDocsAreUnderSizeLimit', function () {
-      it('should error when there is more than 5mb of data', function (done) {
+    describe('_checkDocsAreUnderSizeLimit', function() {
+      it('should error when there is more than 5mb of data', function(done) {
         this.resources.push({
           path: 'massive.tex',
           content: require('crypto')
@@ -220,7 +220,7 @@ describe('ClsiFormatChecker', function () {
         )
       })
 
-      it('should return nothing when project is correct size', function (done) {
+      it('should return nothing when project is correct size', function(done) {
         this.resources.push({
           path: 'massive.tex',
           content: require('crypto')

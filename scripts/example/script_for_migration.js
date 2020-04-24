@@ -19,7 +19,7 @@ if (!module.parent) {
   // we are in the root module, which means that we're running as a script
   runScript()
     .then(() => process.exit())
-    .catch((err) => {
+    .catch(err => {
       console.error(err)
       process.exit(1)
     })

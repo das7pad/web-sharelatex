@@ -14,7 +14,7 @@ const COMMA_KEY = 188
 export function makeKeyBindings(getSetting, keyBindingsAdapter) {
   // Override CM save command to be a no-op. No sense in bringing up the
   // browser's save dialog
-  CodeMirror.commands.save = function () {}
+  CodeMirror.commands.save = function() {}
 
   return Object.assign(
     {},
@@ -53,7 +53,7 @@ function makeAutoCloseCharHandlers(getSetting) {
 
   return Object.keys(autoCloseChars).reduce((acc, key) => {
     const { openChar, closeChar, typedChar } = autoCloseChars[key]
-    acc[key] = function (cm) {
+    acc[key] = function(cm) {
       return autoCloseChar(cm, getSetting, openChar, closeChar, typedChar)
     }
     return acc
@@ -212,7 +212,7 @@ function handleEnter(cm) {
         // Get the state at the end of the line below the cursor
         var stateAfter = cm.getStateAfter(cursor.line + 1, true)
         // Determine if the line below the cursor is an \item or \end{...}
-        var check = _.find(stateAfter.marks, function (m) {
+        var check = _.find(stateAfter.marks, function(m) {
           return (
             m.from.line >= cursor.line &&
             (m.kind === 'enumerate-item' ||
@@ -249,7 +249,7 @@ function handleEnter(cm) {
 
         // Find if the current open environment is nested within another (list)
         // environment
-        var isNestedList = _.find(currentState.openMarks, function (m) {
+        var isNestedList = _.find(currentState.openMarks, function(m) {
           return (
             m !== lastOpenMark &&
             (m.kind === 'enumerate' || m.kind === 'itemize')
@@ -279,11 +279,11 @@ function handleEnter(cm) {
         ) {
           if (!isNestedList) {
             // If not within a nested list
-            cm.operation(function () {
+            cm.operation(function() {
               // Hack used to set the cursor after the refresh
               // it seems that this is the only way to get it working
               // at the moment
-              _.delay(function () {
+              _.delay(function() {
                 cm.setCursor({ line: envClosed.to.line, ch: 0 })
               }, 20)
               // Delete the blank line that the cursor is on
@@ -296,11 +296,11 @@ function handleEnter(cm) {
             // If within a nested list
             // "Move" the current (blank) line out of the nested list. This
             // makes it appear as if a blank \item is being un-indented
-            cm.operation(function () {
+            cm.operation(function() {
               // Hack used to set the cursor after the refresh
               // it seems that this is the only way to get it working
               // at the moment
-              _.delay(function () {
+              _.delay(function() {
                 cm.setCursor({ line: envClosed.to.line, ch: 0 })
               }, 20)
               // Remove the blank line that the cursor is on
@@ -347,11 +347,11 @@ function handleEnter(cm) {
         return null
       }
       // If the cursor is not at the start of the section argument
-      cm.operation(function () {
+      cm.operation(function() {
         // Hack used to set the cursor after the refresh
         // it seems that this is the only way to get it working
         // at the moment
-        _.delay(function () {
+        _.delay(function() {
           cm.setCursor({ line: cursor.line + 1, ch: 0 })
         }, 20)
         // Insert a newline below the \section{...}
@@ -417,7 +417,7 @@ function autoCloseChar(cm, getSetting, openChar, closeChar, typedChar) {
   }
 
   // For each cursor, insert the closing char
-  _.forEach(cm.listSelections(), function (selection, idx) {
+  _.forEach(cm.listSelections(), function(selection, idx) {
     // Because we pass if something is selected (i.e. multiple chars are
     // selected from a single cursor), we know that from() & to() are the same
     var pos = selection.from()
@@ -459,7 +459,7 @@ function handleBackspaceListEnvs(cm) {
       // state at the end of the document
       var closedEnvironment = _.find(
         cm.getStateAfter(cm.doc.lineCount(), true).marks,
-        function (m) {
+        function(m) {
           return (
             (m.kind === 'itemize' || m.kind === 'enumerate') &&
             m.from.line === lastOpenMark.from.line &&
@@ -475,7 +475,7 @@ function handleBackspaceListEnvs(cm) {
         // There are still items in the list, so we need to move the current
         // \item outside of the env. To do this, we need to fire up an
         // operation in CM
-        cm.operation(function () {
+        cm.operation(function() {
           // Retrieve the text for the line above the \begin{..}
           var lineBefore = cm.getLine(currentPos.line - 2)
           // Get text from where cursor is to the end of the line
@@ -517,7 +517,7 @@ function handleBackspaceListEnvs(cm) {
             }
             // Place the cursor at the beginning of the text that we moved out
             // of the env
-            _.delay(function () {
+            _.delay(function() {
               cm.setCursor({ line: currentPos.line - 1, ch: 0 })
             }, 20)
           } else {
@@ -589,7 +589,7 @@ function handleBackspaceListEnvs(cm) {
 
               // Place the cursor at the beginning of the text that we moved
               // of the env
-              _.delay(function () {
+              _.delay(function() {
                 cm.setCursor({ line: currentPos.line - 1, ch: 0 })
               }, 20)
 
@@ -610,7 +610,7 @@ function handleBackspaceListEnvs(cm) {
 
       // Attempt to find a closed list environment on the line above the
       // current line - this would be closing a nested list env
-      var closedEnvLineBefore = _.find(token.state.marks, function (m) {
+      var closedEnvLineBefore = _.find(token.state.marks, function(m) {
         return (
           (m.kind === 'itemize' || m.kind === 'enumerate') &&
           m.to.line === currentPos.line - 1
@@ -635,7 +635,7 @@ function handleBackspaceListEnvs(cm) {
           return true
         } else if (currentPos.ch === 6) {
           // If the cursor is after a \item
-          cm.operation(function () {
+          cm.operation(function() {
             // Get the length of the line above the \end{..}
             var lineBeforeLength = cm.getLine(currentPos.line - 2).length
             // Get the text from the cursor to the end of the current line
@@ -691,7 +691,7 @@ function handleBackspaceListEnvs(cm) {
   ) {
     // If at the begining of the line immediately after the list
     if (currentPos.line === lastClosedMark.to.line + 1 && currentPos.ch === 0) {
-      cm.operation(function () {
+      cm.operation(function() {
         // delete the line if it's blank
         if (line === '') {
           cm.execCommand('deleteLine')
@@ -766,7 +766,7 @@ function handleBackspaceAbstract(cm) {
       // don't have a to object)
       var closedMark = _.find(
         cm.getStateAfter(cm.doc.lineCount(), true).marks,
-        function (m) {
+        function(m) {
           return (
             m.kind === 'abstract' &&
             m.from.line === lastOpenMark.from.line &&
@@ -803,7 +803,7 @@ function handleBackspaceAbstract(cm) {
     // The cursor is on the line below the abstract env and at the beginning
     // of the line
     if (currentPos.line === lastClosedMark.to.line + 1 && currentPos.ch === 0) {
-      cm.operation(function () {
+      cm.operation(function() {
         // delete the line if it's blank
         if (line === '') {
           cm.execCommand('deleteLine')
@@ -825,7 +825,7 @@ function handleDeleteAbstract(cm) {
   var lastOpenMark = _.last(token.state.openMarks)
   var line = cm.getLine(currentPos.line)
 
-  var openAbstractAfter = (function () {
+  var openAbstractAfter = (function() {
     var lineAfter = cm.getLine(currentPos.line + 1)
     if (!lineAfter) return
 
@@ -839,7 +839,7 @@ function handleDeleteAbstract(cm) {
     )
 
     // Find the first open abstract env on the line below
-    return _.find(token.state.openMarks, function (m) {
+    return _.find(token.state.openMarks, function(m) {
       return m.kind === 'abstract' && m.from.line === currentPos.line + 1
     })
   })()
@@ -859,7 +859,7 @@ function handleDeleteAbstract(cm) {
       // don't have a to object)
       var closedMark = _.find(
         cm.getStateAfter(cm.doc.lineCount(), true).marks,
-        function (m) {
+        function(m) {
           return (
             m.kind === 'abstract' &&
             m.from.line === lastOpenMark.from.line &&
@@ -884,7 +884,7 @@ function handleDeleteAbstract(cm) {
   } else if (openAbstractAfter) {
     // If the cursor is at the end of the line
     if (currentPos.ch === line.length) {
-      cm.operation(function () {
+      cm.operation(function() {
         // Remove the entire line if it is blank
         if (line === '') {
           cm.execCommand('deleteLine')
@@ -1020,7 +1020,7 @@ function handleDeleteCommandsSingleLine(cm) {
   // intention of the code is not clear to me
   // Find the first section command mark on the lines on the current line or
   // below the current line
-  var cmdSingleLineAfter = _.find(_.union(marksAfter, marksEol), function (m) {
+  var cmdSingleLineAfter = _.find(_.union(marksAfter, marksEol), function(m) {
     return COMMANDS_ON_SINGLE_LINE[m.kind]
   })
 
@@ -1112,7 +1112,7 @@ function deleteClosingCharForSelection(cm) {
   // subsequent cursor positions
   cm.listSelections()
     .reverse()
-    .forEach(function (selection) {
+    .forEach(function(selection) {
       // Because we pass if something is selected (i.e. multiple chars are
       // selected from a single cursor), we know that from() & to() are the same
       var pos = selection.from()
@@ -1129,7 +1129,7 @@ function filterMarksInRange(cm, from, to) {
     var line = cm.getLine(from.line)
     to = { line: from.line, ch: line.length }
   }
-  return _.filter(cm.getTokenAt(to).state.marks, function (m) {
+  return _.filter(cm.getTokenAt(to).state.marks, function(m) {
     return (
       m.from.line >= from.line &&
       m.from.ch >= from.ch &&
@@ -1147,7 +1147,7 @@ function findClosedMark(cm, openMark) {
   var lastLine = { line: cm.doc.lineCount(), ch: 0 }
   var stateAfter = cm.getTokenAt(lastLine, true).state
 
-  return _.find(stateAfter.marks, function (i) {
+  return _.find(stateAfter.marks, function(i) {
     return (
       i.kind === openMark.kind &&
       _.isEqual(i.contentFrom, openMark.contentFrom) &&
@@ -1163,7 +1163,7 @@ function findClosedMark(cm, openMark) {
 function checkItemsAfter(cm, mark, to) {
   var state = cm.getTokenAt(to, true).state
 
-  return _.find(state.marks, function (m) {
+  return _.find(state.marks, function(m) {
     return (
       (m.kind === 'item' || m.kind === 'enumerate-item') &&
       m.from.line > mark.from.line &&

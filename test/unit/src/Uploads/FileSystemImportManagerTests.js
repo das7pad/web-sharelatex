@@ -6,8 +6,8 @@ const { ObjectId } = require('mongodb')
 const MODULE_PATH =
   '../../../../app/src/Features/Uploads/FileSystemImportManager.js'
 
-describe('FileSystemImportManager', function () {
-  beforeEach(function () {
+describe('FileSystemImportManager', function() {
+  beforeEach(function() {
     this.projectId = new ObjectId()
     this.folderId = new ObjectId()
     this.newFolderId = new ObjectId()
@@ -102,9 +102,9 @@ describe('FileSystemImportManager', function () {
     })
   })
 
-  describe('addFolderContents', function () {
-    describe('successfully', function () {
-      beforeEach(async function () {
+  describe('addFolderContents', function() {
+    describe('successfully', function() {
+      beforeEach(async function() {
         await this.FileSystemImportManager.promises.addFolderContents(
           this.userId,
           this.projectId,
@@ -114,7 +114,7 @@ describe('FileSystemImportManager', function () {
         )
       })
 
-      it('should add each file in the folder which is not ignored', function () {
+      it('should add each file in the folder which is not ignored', function() {
         this.EditorController.promises.addDoc.should.have.been.calledWith(
           this.projectId,
           this.folderId,
@@ -135,8 +135,8 @@ describe('FileSystemImportManager', function () {
       })
     })
 
-    describe('with symlink', function () {
-      it('should stop with an error', async function () {
+    describe('with symlink', function() {
+      it('should stop with an error', async function() {
         await expect(
           this.FileSystemImportManager.promises.addFolderContents(
             this.userId,
@@ -153,10 +153,10 @@ describe('FileSystemImportManager', function () {
     })
   })
 
-  describe('addEntity', function () {
-    describe('with directory', function () {
-      describe('successfully', function () {
-        beforeEach(async function () {
+  describe('addEntity', function() {
+    describe('with directory', function() {
+      describe('successfully', function() {
+        beforeEach(async function() {
           await this.FileSystemImportManager.promises.addEntity(
             this.userId,
             this.projectId,
@@ -167,7 +167,7 @@ describe('FileSystemImportManager', function () {
           )
         })
 
-        it('should add a folder to the project', function () {
+        it('should add a folder to the project', function() {
           this.EditorController.promises.addFolder.should.have.been.calledWith(
             this.projectId,
             this.folderId,
@@ -176,7 +176,7 @@ describe('FileSystemImportManager', function () {
           )
         })
 
-        it("should add the folder's contents", function () {
+        it("should add the folder's contents", function() {
           this.EditorController.promises.addDoc.should.have.been.calledWith(
             this.projectId,
             this.newFolderId,
@@ -198,9 +198,9 @@ describe('FileSystemImportManager', function () {
       })
     })
 
-    describe('with binary file', function () {
-      describe('with replace set to false', function () {
-        beforeEach(async function () {
+    describe('with binary file', function() {
+      describe('with replace set to false', function() {
+        beforeEach(async function() {
           await this.FileSystemImportManager.promises.addEntity(
             this.userId,
             this.projectId,
@@ -211,7 +211,7 @@ describe('FileSystemImportManager', function () {
           )
         })
 
-        it('should add the file', function () {
+        it('should add the file', function() {
           this.EditorController.promises.addFile.should.have.been.calledWith(
             this.projectId,
             this.folderId,
@@ -224,8 +224,8 @@ describe('FileSystemImportManager', function () {
         })
       })
 
-      describe('with replace set to true', function () {
-        beforeEach(async function () {
+      describe('with replace set to true', function() {
+        beforeEach(async function() {
           await this.FileSystemImportManager.promises.addEntity(
             this.userId,
             this.projectId,
@@ -236,7 +236,7 @@ describe('FileSystemImportManager', function () {
           )
         })
 
-        it('should add the file', function () {
+        it('should add the file', function() {
           this.EditorController.promises.upsertFile.should.have.been.calledWith(
             this.projectId,
             this.folderId,
@@ -249,9 +249,9 @@ describe('FileSystemImportManager', function () {
         })
       })
 
-      describe('with text file', function () {
-        describe('with replace set to false', function () {
-          beforeEach(async function () {
+      describe('with text file', function() {
+        describe('with replace set to false', function() {
+          beforeEach(async function() {
             await this.FileSystemImportManager.promises.addEntity(
               this.userId,
               this.projectId,
@@ -262,7 +262,7 @@ describe('FileSystemImportManager', function () {
             )
           })
 
-          it('should insert the doc', function () {
+          it('should insert the doc', function() {
             this.EditorController.promises.addDoc.should.have.been.calledWith(
               this.projectId,
               this.folderId,
@@ -274,8 +274,8 @@ describe('FileSystemImportManager', function () {
           })
         })
 
-        describe('with windows line ending', function () {
-          beforeEach(async function () {
+        describe('with windows line ending', function() {
+          beforeEach(async function() {
             this.docContent = 'one\r\ntwo\r\nthree'
             this.docLines = ['one', 'two', 'three']
             this.fs.promises.readFile
@@ -291,7 +291,7 @@ describe('FileSystemImportManager', function () {
             )
           })
 
-          it('should strip the \\r characters before adding', function () {
+          it('should strip the \\r characters before adding', function() {
             this.EditorController.promises.addDoc.should.have.been.calledWith(
               this.projectId,
               this.folderId,
@@ -303,8 +303,8 @@ describe('FileSystemImportManager', function () {
           })
         })
 
-        describe('with \r line endings', function () {
-          beforeEach(async function () {
+        describe('with \r line endings', function() {
+          beforeEach(async function() {
             this.docContent = 'one\rtwo\rthree'
             this.docLines = ['one', 'two', 'three']
             this.fs.promises.readFile
@@ -320,7 +320,7 @@ describe('FileSystemImportManager', function () {
             )
           })
 
-          it('should treat the \\r characters as newlines', function () {
+          it('should treat the \\r characters as newlines', function() {
             this.EditorController.promises.addDoc.should.have.been.calledWith(
               this.projectId,
               this.folderId,
@@ -332,8 +332,8 @@ describe('FileSystemImportManager', function () {
           })
         })
 
-        describe('with replace set to true', function () {
-          beforeEach(async function () {
+        describe('with replace set to true', function() {
+          beforeEach(async function() {
             await this.FileSystemImportManager.promises.addEntity(
               this.userId,
               this.projectId,
@@ -344,7 +344,7 @@ describe('FileSystemImportManager', function () {
             )
           })
 
-          it('should upsert the doc', function () {
+          it('should upsert the doc', function() {
             this.EditorController.promises.upsertDoc.should.have.been.calledWith(
               this.projectId,
               this.folderId,
@@ -358,8 +358,8 @@ describe('FileSystemImportManager', function () {
       })
     })
 
-    describe('with symlink', function () {
-      it('should stop with an error', async function () {
+    describe('with symlink', function() {
+      it('should stop with an error', async function() {
         await expect(
           this.FileSystemImportManager.promises.addEntity(
             this.userId,

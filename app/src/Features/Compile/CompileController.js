@@ -93,11 +93,11 @@ module.exports = CompileController = {
 
   stopCompile(req, res, next) {
     if (next == null) {
-      next = function (error) {}
+      next = function(error) {}
     }
     const project_id = req.params.Project_id
     const user_id = AuthenticationController.getLoggedInUserId(req)
-    return CompileManager.stopCompile(project_id, user_id, function (error) {
+    return CompileManager.stopCompile(project_id, user_id, function(error) {
       if (error != null) {
         return next(error)
       }
@@ -108,7 +108,7 @@ module.exports = CompileController = {
   // Used for submissions through the public API
   compileSubmission(req, res, next) {
     if (next == null) {
-      next = function (error) {}
+      next = function(error) {}
     }
     res.setTimeout(COMPILE_TIMEOUT_MS)
     const { submission_id } = req.params
@@ -139,7 +139,7 @@ module.exports = CompileController = {
       submission_id,
       req.body,
       options,
-      function (error, status, outputFiles, clsiServerId, validationProblems) {
+      function(error, status, outputFiles, clsiServerId, validationProblems) {
         if (error != null) {
           return next(error)
         }
@@ -175,13 +175,13 @@ module.exports = CompileController = {
 
   downloadPdf(req, res, next) {
     if (next == null) {
-      next = function (error) {}
+      next = function(error) {}
     }
     Metrics.inc('pdf-downloads')
     const project_id = req.params.Project_id
     const isPdfjsPartialDownload =
       req.query != null ? req.query.pdfng : undefined
-    const rateLimit = function (callback) {
+    const rateLimit = function(callback) {
       if (isPdfjsPartialDownload) {
         return callback(null, true)
       } else {
@@ -195,7 +195,7 @@ module.exports = CompileController = {
       }
     }
 
-    return ProjectGetter.getProject(project_id, { name: 1 }, function (
+    return ProjectGetter.getProject(project_id, { name: 1 }, function(
       err,
       project
     ) {
@@ -208,7 +208,7 @@ module.exports = CompileController = {
         res.setContentDisposition('', { filename })
       }
 
-      return rateLimit(function (err, canContinue) {
+      return rateLimit(function(err, canContinue) {
         if (err != null) {
           logger.err({ err }, 'error checking rate limit for pdf download')
           return res.sendStatus(500)
@@ -219,7 +219,7 @@ module.exports = CompileController = {
           )
           return res.sendStatus(500)
         } else {
-          return CompileController._downloadAsUser(req, function (
+          return CompileController._downloadAsUser(req, function(
             error,
             user_id
           ) {
@@ -249,11 +249,11 @@ module.exports = CompileController = {
 
   deleteAuxFiles(req, res, next) {
     const project_id = req.params.Project_id
-    return CompileController._compileAsUser(req, function (error, user_id) {
+    return CompileController._compileAsUser(req, function(error, user_id) {
       if (error != null) {
         return next(error)
       }
-      return CompileManager.deleteAuxFiles(project_id, user_id, function (
+      return CompileManager.deleteAuxFiles(project_id, user_id, function(
         error
       ) {
         if (error != null) {
@@ -268,7 +268,7 @@ module.exports = CompileController = {
   compileAndDownloadPdf(req, res, next) {
     const { project_id } = req.params
     // pass user_id as null, since templates are an "anonymous" compile
-    return CompileManager.compile(project_id, null, {}, function (err) {
+    return CompileManager.compile(project_id, null, {}, function(err) {
       if (err != null) {
         logger.err(
           { err, project_id },
@@ -283,10 +283,10 @@ module.exports = CompileController = {
 
   getFileFromClsi(req, res, next) {
     if (next == null) {
-      next = function (error) {}
+      next = function(error) {}
     }
     const project_id = req.params.Project_id
-    return CompileController._downloadAsUser(req, function (error, user_id) {
+    return CompileController._downloadAsUser(req, function(error, user_id) {
       if (error != null) {
         return next(error)
       }
@@ -302,7 +302,7 @@ module.exports = CompileController = {
 
   getFileFromClsiWithoutUser(req, res, next) {
     if (next == null) {
-      next = function (error) {}
+      next = function(error) {}
     }
     const { submission_id } = req.params
     const url = CompileController._getFileUrl(
@@ -352,7 +352,7 @@ module.exports = CompileController = {
 
   proxySyncPdf(req, res, next) {
     if (next == null) {
-      next = function (error) {}
+      next = function(error) {}
     }
     const project_id = req.params.Project_id
     const { page, h, v } = req.query
@@ -366,7 +366,7 @@ module.exports = CompileController = {
       return next(new Error('invalid v parameter'))
     }
     // whether this request is going to a per-user container
-    return CompileController._compileAsUser(req, function (error, user_id) {
+    return CompileController._compileAsUser(req, function(error, user_id) {
       if (error != null) {
         return next(error)
       }
@@ -384,7 +384,7 @@ module.exports = CompileController = {
 
   proxySyncCode(req, res, next) {
     if (next == null) {
-      next = function (error) {}
+      next = function(error) {}
     }
     const project_id = req.params.Project_id
     const { file, line, column } = req.query
@@ -406,7 +406,7 @@ module.exports = CompileController = {
     if (!(column != null ? column.match(/^\d+$/) : undefined)) {
       return next(new Error('invalid column parameter'))
     }
-    return CompileController._compileAsUser(req, function (error, user_id) {
+    return CompileController._compileAsUser(req, function(error, user_id) {
       if (error != null) {
         return next(error)
       }
@@ -424,7 +424,7 @@ module.exports = CompileController = {
 
   proxyToClsi(project_id, url, req, res, next) {
     if (next == null) {
-      next = function (error) {}
+      next = function(error) {}
     }
     if (req.query != null ? req.query.compileGroup : undefined) {
       return CompileController.proxyToClsiWithLimits(
@@ -436,7 +436,7 @@ module.exports = CompileController = {
         next
       )
     } else {
-      return CompileManager.getProjectCompileLimits(project_id, function (
+      return CompileManager.getProjectCompileLimits(project_id, function(
         error,
         limits
       ) {
@@ -457,9 +457,9 @@ module.exports = CompileController = {
 
   proxyToClsiWithLimits(project_id, url, limits, req, res, next) {
     if (next == null) {
-      next = function (error) {}
+      next = function(error) {}
     }
-    return ClsiCookieManager.getCookieJar(project_id, function (err, jar) {
+    return ClsiCookieManager.getCookieJar(project_id, function(err, jar) {
       let qs
       if (err != null) {
         logger.warn({ err }, 'error getting cookie jar for clsi request')
@@ -503,7 +503,7 @@ module.exports = CompileController = {
       }
       const proxy = request(options)
       proxy.pipe(res)
-      return proxy.on('error', (error) =>
+      return proxy.on('error', error =>
         logger.warn({ err: error, url }, 'CLSI proxy error')
       )
     })
@@ -512,11 +512,11 @@ module.exports = CompileController = {
   wordCount(req, res, next) {
     const project_id = req.params.Project_id
     const file = req.query.file || false
-    return CompileController._compileAsUser(req, function (error, user_id) {
+    return CompileController._compileAsUser(req, function(error, user_id) {
       if (error != null) {
         return next(error)
       }
-      return CompileManager.wordCount(project_id, user_id, file, function (
+      return CompileManager.wordCount(project_id, user_id, file, function(
         error,
         body
       ) {

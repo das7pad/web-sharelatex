@@ -38,7 +38,7 @@ const UserGetter = {
   },
 
   getUserFullEmails(userId, callback) {
-    this.getUser(userId, { email: 1, emails: 1 }, function (error, user) {
+    this.getUser(userId, { email: 1, emails: 1 }, function(error, user) {
       if (error) {
         return callback(error)
       }
@@ -50,7 +50,7 @@ const UserGetter = {
         return callback(null, decorateFullEmails(user.email, user.emails, []))
       }
 
-      getUserAffiliations(userId, function (error, affiliationsData) {
+      getUserAffiliations(userId, function(error, affiliationsData) {
         if (error) {
           return callback(error)
         }
@@ -115,7 +115,11 @@ const UserGetter = {
   },
 
   getUsersByHostname(hostname, projection, callback) {
-    const reversedHostname = hostname.trim().split('').reverse().join('')
+    const reversedHostname = hostname
+      .trim()
+      .split('')
+      .reverse()
+      .join('')
     const query = {
       emails: { $exists: true },
       'emails.reversedHostname': reversedHostname
@@ -125,7 +129,7 @@ const UserGetter = {
 
   getUsers(userIds, projection, callback) {
     try {
-      userIds = userIds.map((u) => ObjectId(u.toString()))
+      userIds = userIds.map(u => ObjectId(u.toString()))
     } catch (error) {
       return callback(error)
     }
@@ -135,7 +139,7 @@ const UserGetter = {
 
   // check for duplicate email address. This is also enforced at the DB level
   ensureUniqueEmailAddress(newEmail, callback) {
-    this.getUserByAnyEmail(newEmail, function (error, user) {
+    this.getUserByAnyEmail(newEmail, function(error, user) {
       if (user) {
         return callback(new Errors.EmailExistsError())
       }
@@ -145,11 +149,11 @@ const UserGetter = {
 }
 
 var decorateFullEmails = (defaultEmail, emailsData, affiliationsData) =>
-  emailsData.map(function (emailData) {
+  emailsData.map(function(emailData) {
     emailData.default = emailData.email === defaultEmail
 
     const affiliation = affiliationsData.find(
-      (aff) => aff.email === emailData.email
+      aff => aff.email === emailData.email
     )
     if (affiliation) {
       const { institution, inferred, role, department, licence } = affiliation
@@ -173,7 +177,7 @@ var decorateFullEmails = (defaultEmail, emailsData, affiliationsData) =>
   'getUserByAnyEmail',
   'getUsers',
   'ensureUniqueEmailAddress'
-].map((method) =>
+].map(method =>
   metrics.timeAsyncMethod(UserGetter, method, 'mongo.UserGetter', logger)
 )
 

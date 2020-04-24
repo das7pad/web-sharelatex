@@ -14,7 +14,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base'], (App) =>
+define(['../../../base'], App =>
   // App = angular.module 'pdfPage', ['pdfHighlights']
 
   App.directive('pdfPage', ($timeout, pdfHighlights, pdfSpinner) => ({
@@ -33,7 +33,7 @@ define(['../../../base'], (App) =>
       const annotationsElement = $(element).find('.annotations-layer')
       const highlightsElement = $(element).find('.highlights-layer')
 
-      const updatePageSize = function (size) {
+      const updatePageSize = function(size) {
         const h = Math.floor(size[0])
         const w = Math.floor(size[1])
         element.height(h)
@@ -61,7 +61,7 @@ define(['../../../base'], (App) =>
         } else {
           // shouldn't get here - the default page size should now
           // always be set before redraw is called
-          var handler = scope.$watch('defaultPageSize', function (
+          var handler = scope.$watch('defaultPageSize', function(
             defaultPageSize
           ) {
             if (defaultPageSize == null) {
@@ -81,13 +81,15 @@ define(['../../../base'], (App) =>
         ctrl.setPdfPosition(scope.page, scope.page.position)
       }
 
-      element.on('dblclick', function (e) {
-        const offset = $(element).find('.pdf-canvas').offset()
+      element.on('dblclick', function(e) {
+        const offset = $(element)
+          .find('.pdf-canvas')
+          .offset()
         const dx = e.pageX - offset.left
         const dy = e.pageY - offset.top
         return scope.document
           .getPdfViewport(scope.page.pageNum)
-          .then(function (viewport) {
+          .then(function(viewport) {
             const pdfPoint = viewport.convertToPdfPoint(dx, dy)
             const event = {
               page: scope.page.pageNum,
@@ -102,7 +104,7 @@ define(['../../../base'], (App) =>
         highlights: highlightsElement
       })
 
-      scope.$on('pdf:highlights', function (event, highlights) {
+      scope.$on('pdf:highlights', function(event, highlights) {
         let h
         if (highlights == null) {
           return
@@ -129,7 +131,7 @@ define(['../../../base'], (App) =>
         if (!pageHighlights.length) {
           return
         }
-        scope.document.getPdfViewport(scope.page.pageNum).then((viewport) =>
+        scope.document.getPdfViewport(scope.page.pageNum).then(viewport =>
           (() => {
             const result1 = []
             for (const hl of Array.from(pageHighlights)) {
@@ -148,13 +150,13 @@ define(['../../../base'], (App) =>
             return result1
           })()
         )
-        return (scope.timeoutHandler = $timeout(function () {
+        return (scope.timeoutHandler = $timeout(function() {
           highlightsLayer.clearHighlights()
           return (scope.timeoutHandler = null)
         }, 1000))
       })
 
-      return scope.$on('$destroy', function () {
+      return scope.$on('$destroy', function() {
         if (scope.timeoutHandler != null) {
           $timeout.cancel(scope.timeoutHandler)
           return highlightsLayer.clearHighlights()

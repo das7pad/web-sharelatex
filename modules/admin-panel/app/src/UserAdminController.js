@@ -38,7 +38,7 @@ module.exports = UserAdminController = {
 
   index(req, res, next) {
     logger.log('getting admin request for list of users')
-    return UserAdminController._userFind(null, 1, function (err, users, pages) {
+    return UserAdminController._userFind(null, 1, function(err, users, pages) {
       if (err != null) {
         return next(err)
       }
@@ -51,7 +51,7 @@ module.exports = UserAdminController = {
 
   search(req, res, next) {
     logger.log({ body: req.body }, 'getting admin request for search users')
-    return UserAdminController._userFind(req.body, req.body.page, function (
+    return UserAdminController._userFind(req.body, req.body.page, function(
       err,
       users,
       pages
@@ -66,7 +66,7 @@ module.exports = UserAdminController = {
   _userFind(params, page, cb) {
     let q, query
     if (cb == null) {
-      cb = function () {}
+      cb = function() {}
     }
     if (params != null ? params.regexp : undefined) {
       query = new RegExp(params != null ? params.query : undefined)
@@ -93,7 +93,7 @@ module.exports = UserAdminController = {
       q,
       { first_name: 1, email: 1, lastLoggedIn: 1, loginCount: 1 },
       opts,
-      function (err, users) {
+      function(err, users) {
         if (err != null) {
           logger.err({ err }, 'error getting admin data for users list page')
           return cb(err)
@@ -102,7 +102,7 @@ module.exports = UserAdminController = {
           { opts, q, users_length: users != null ? users.length : undefined },
           'found users for admin search'
         )
-        return User.countDocuments(q, function (err, count) {
+        return User.countDocuments(q, function(err, count) {
           if (err != null) {
             return cb(err)
           }
@@ -152,13 +152,13 @@ module.exports = UserAdminController = {
               archived: 1,
               owner_ref: 1
             },
-            function (err, projects) {
+            function(err, projects) {
               const { owned, readAndWrite, readOnly } = projects
               if (err != null) {
                 return cb(err)
               }
               let allProjects = owned.concat(readAndWrite).concat(readOnly)
-              allProjects = _.map(allProjects, function (project) {
+              allProjects = _.map(allProjects, function(project) {
                 const projectTimestamp = project._id.toString().substring(0, 8)
                 project.createdAt = new Date(
                   parseInt(projectTimestamp, 16) * 1000
@@ -180,7 +180,7 @@ module.exports = UserAdminController = {
           return SubscriptionLocator.getMemberSubscriptions(user_id, cb)
         }
       },
-      function (err, data) {
+      function(err, data) {
         if (err != null) {
           return next(err)
         }
@@ -193,7 +193,7 @@ module.exports = UserAdminController = {
   delete(req, res, next) {
     const { user_id } = req.params
     logger.log({ user_id }, 'received admin request to delete user')
-    return UserDeleter.deleteUser(user_id, function (err) {
+    return UserDeleter.deleteUser(user_id, function(err) {
       if (err != null) {
         return next(err)
       }
@@ -208,7 +208,7 @@ module.exports = UserAdminController = {
       'received admin request to unlink account from v1 Overleaf'
     )
     const update = { $unset: { overleaf: '' } }
-    return UserUpdater.updateUser(user_id, update, function (err) {
+    return UserUpdater.updateUser(user_id, update, function(err) {
       if (err != null) {
         return next(err)
       }
@@ -223,7 +223,7 @@ module.exports = UserAdminController = {
       { user_id, emailToRemove },
       'received request to delete secondary email'
     )
-    return UserUpdater.removeEmailAddress(user_id, emailToRemove, function (
+    return UserUpdater.removeEmailAddress(user_id, emailToRemove, function(
       err
     ) {
       if (err != null) {
@@ -297,7 +297,7 @@ module.exports = UserAdminController = {
       UserAdminController.BOOLEAN_ATTRIBUTES
     )
     logger.log({ user_id, update }, 'updating user via admin panel')
-    return User.updateOne({ _id: user_id }, { $set: update }, function (err) {
+    return User.updateOne({ _id: user_id }, { $set: update }, function(err) {
       if (err != null) {
         return next(err)
       }
@@ -308,7 +308,7 @@ module.exports = UserAdminController = {
   updateEmail(req, res, next) {
     const { user_id } = req.params
     const { email } = req.body
-    return UserUpdater.changeEmailAddress(user_id, email, function (err) {
+    return UserUpdater.changeEmailAddress(user_id, email, function(err) {
       if (err != null) {
         if ((err.message = 'alread_exists')) {
           return res
@@ -325,7 +325,7 @@ module.exports = UserAdminController = {
 
   refreshFeatures(req, res, next) {
     const { user_id } = req.params
-    return FeaturesUpdater.refreshFeatures(user_id, true, function (err) {
+    return FeaturesUpdater.refreshFeatures(user_id, true, function(err) {
       if (err != null) {
         return next(err)
       }

@@ -75,9 +75,7 @@ async function _getUser(userId) {
 
 function _userIsCollaborator(user, project) {
   const collaboratorIds = project.collaberator_refs || []
-  return collaboratorIds.some((collaboratorId) =>
-    collaboratorId.equals(user._id)
-  )
+  return collaboratorIds.some(collaboratorId => collaboratorId.equals(user._id))
 }
 
 async function _transferOwnership(projectId, previousOwnerId, newOwnerId) {

@@ -1,6 +1,6 @@
 const UserMembershipAuthorization = {
   hasStaffAccess(requiredStaffAccess) {
-    return (req) => {
+    return req => {
       if (!req.user) {
         return false
       }
@@ -16,11 +16,11 @@ const UserMembershipAuthorization = {
   },
 
   hasEntityAccess() {
-    return (req) => {
+    return req => {
       if (!req.entity) {
         return false
       }
-      return req.entity[req.entityConfig.fields.access].some((accessUserId) =>
+      return req.entity[req.entityConfig.fields.access].some(accessUserId =>
         accessUserId.equals(req.user._id)
       )
     }

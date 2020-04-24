@@ -39,7 +39,7 @@ module.exports = {
     if ((docs != null ? docs.map : undefined) == null) {
       return
     }
-    return docs.map((doc) => ({
+    return docs.map(doc => ({
       path: doc.path,
       id: doc.doc
     }))
@@ -49,7 +49,7 @@ module.exports = {
     if ((files != null ? files.map : undefined) == null) {
       return
     }
-    return files.map((file) => ({
+    return files.map(file => ({
       path: file.path,
       id: file.file
     }))

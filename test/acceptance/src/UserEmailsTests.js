@@ -20,21 +20,21 @@ const settings = require('settings-sharelatex')
 const { db, ObjectId } = require('../../../app/src/infrastructure/mongojs')
 const MockV1Api = require('./helpers/MockV1Api')
 
-describe('UserEmails', function () {
+describe('UserEmails', function() {
   this.timeout(20000)
 
-  beforeEach(function (done) {
+  beforeEach(function(done) {
     this.user = new User()
     this.user.login(done)
     return (this.newEmail = `newly-added-email${Math.random()}@example.com`)
   })
 
-  describe('confirming an email', function () {
-    it('should confirm the email', function (done) {
+  describe('confirming an email', function() {
+    it('should confirm the email', function(done) {
       let token = null
       return async.series(
         [
-          (cb) => {
+          cb => {
             return this.user.request(
               {
                 method: 'POST',
@@ -52,7 +52,7 @@ describe('UserEmails', function () {
               }
             )
           },
-          (cb) => {
+          cb => {
             return this.user.request(
               { url: '/user/emails', json: true },
               (error, response, body) => {
@@ -63,7 +63,7 @@ describe('UserEmails', function () {
               }
             )
           },
-          (cb) => {
+          cb => {
             return db.tokens.find(
               {
                 use: 'email_confirmation',
@@ -80,7 +80,7 @@ describe('UserEmails', function () {
               }
             )
           },
-          (cb) => {
+          cb => {
             return this.user.request(
               {
                 method: 'POST',
@@ -98,7 +98,7 @@ describe('UserEmails', function () {
               }
             )
           },
-          (cb) => {
+          cb => {
             return this.user.request(
               { url: '/user/emails', json: true },
               (error, response, body) => {
@@ -109,7 +109,7 @@ describe('UserEmails', function () {
               }
             )
           },
-          (cb) => {
+          cb => {
             return db.tokens.find(
               {
                 use: 'email_confirmation',
@@ -128,15 +128,15 @@ describe('UserEmails', function () {
       )
     })
 
-    it('should not allow confirmation of the email if the user has changed', function (done) {
+    it('should not allow confirmation of the email if the user has changed', function(done) {
       let token1 = null
       let token2 = null
       this.user2 = new User()
       this.email = `duplicate-email${Math.random()}@example.com`
       return async.series(
         [
-          (cb) => this.user2.login(cb),
-          (cb) => {
+          cb => this.user2.login(cb),
+          cb => {
             // Create email for first user
             return this.user.request(
               {
@@ -147,7 +147,7 @@ describe('UserEmails', function () {
               cb
             )
           },
-          (cb) => {
+          cb => {
             return db.tokens.find(
               {
                 use: 'email_confirmation',
@@ -164,7 +164,7 @@ describe('UserEmails', function () {
               }
             )
           },
-          (cb) => {
+          cb => {
             // Delete the email from the first user
             return this.user.request(
               {
@@ -175,7 +175,7 @@ describe('UserEmails', function () {
               cb
             )
           },
-          (cb) => {
+          cb => {
             // Create email for second user
             return this.user2.request(
               {
@@ -186,7 +186,7 @@ describe('UserEmails', function () {
               cb
             )
           },
-          (cb) => {
+          cb => {
             // Original confirmation token should no longer work
             return this.user.request(
               {
@@ -205,7 +205,7 @@ describe('UserEmails', function () {
               }
             )
           },
-          (cb) => {
+          cb => {
             return db.tokens.find(
               {
                 use: 'email_confirmation',
@@ -222,7 +222,7 @@ describe('UserEmails', function () {
               }
             )
           },
-          (cb) => {
+          cb => {
             // Second user should be able to confirm the email
             return this.user2.request(
               {
@@ -241,7 +241,7 @@ describe('UserEmails', function () {
               }
             )
           },
-          (cb) => {
+          cb => {
             return this.user2.request(
               { url: '/user/emails', json: true },
               (error, response, body) => {
@@ -258,12 +258,12 @@ describe('UserEmails', function () {
     })
   })
 
-  describe('with an expired token', function () {
-    it('should not confirm the email', function (done) {
+  describe('with an expired token', function() {
+    it('should not confirm the email', function(done) {
       let token = null
       return async.series(
         [
-          (cb) => {
+          cb => {
             return this.user.request(
               {
                 method: 'POST',
@@ -281,7 +281,7 @@ describe('UserEmails', function () {
               }
             )
           },
-          (cb) => {
+          cb => {
             return db.tokens.find(
               {
                 use: 'email_confirmation',
@@ -298,7 +298,7 @@ describe('UserEmails', function () {
               }
             )
           },
-          (cb) => {
+          cb => {
             return db.tokens.update(
               {
                 token
@@ -311,7 +311,7 @@ describe('UserEmails', function () {
               cb
             )
           },
-          (cb) => {
+          cb => {
             return this.user.request(
               {
                 method: 'POST',
@@ -335,11 +335,11 @@ describe('UserEmails', function () {
     })
   })
 
-  describe('resending the confirmation', function () {
-    it('should generate a new token', function (done) {
+  describe('resending the confirmation', function() {
+    it('should generate a new token', function(done) {
       return async.series(
         [
-          (cb) => {
+          cb => {
             return this.user.request(
               {
                 method: 'POST',
@@ -357,7 +357,7 @@ describe('UserEmails', function () {
               }
             )
           },
-          (cb) => {
+          cb => {
             return db.tokens.find(
               {
                 use: 'email_confirmation',
@@ -373,7 +373,7 @@ describe('UserEmails', function () {
               }
             )
           },
-          (cb) => {
+          cb => {
             return this.user.request(
               {
                 method: 'POST',
@@ -391,7 +391,7 @@ describe('UserEmails', function () {
               }
             )
           },
-          (cb) => {
+          cb => {
             return db.tokens.find(
               {
                 use: 'email_confirmation',
@@ -414,12 +414,12 @@ describe('UserEmails', function () {
       )
     })
 
-    it('should create a new token if none exists', function (done) {
+    it('should create a new token if none exists', function(done) {
       // This should only be for users that have sign up with their main
       // emails before the confirmation system existed
       return async.series(
         [
-          (cb) => {
+          cb => {
             return db.tokens.remove(
               {
                 use: 'email_confirmation',
@@ -429,7 +429,7 @@ describe('UserEmails', function () {
               cb
             )
           },
-          (cb) => {
+          cb => {
             return this.user.request(
               {
                 method: 'POST',
@@ -447,7 +447,7 @@ describe('UserEmails', function () {
               }
             )
           },
-          (cb) => {
+          cb => {
             return db.tokens.find(
               {
                 use: 'email_confirmation',
@@ -468,10 +468,10 @@ describe('UserEmails', function () {
       )
     })
 
-    it("should not allow reconfirmation if the email doesn't match the user", function (done) {
+    it("should not allow reconfirmation if the email doesn't match the user", function(done) {
       return async.series(
         [
-          (cb) => {
+          cb => {
             return this.user.request(
               {
                 method: 'POST',
@@ -489,7 +489,7 @@ describe('UserEmails', function () {
               }
             )
           },
-          (cb) => {
+          cb => {
             return db.tokens.find(
               {
                 use: 'email_confirmation',
@@ -508,12 +508,12 @@ describe('UserEmails', function () {
     })
   })
 
-  describe('setting a default email', function () {
-    it('should update confirmed emails for users not in v1', function (done) {
+  describe('setting a default email', function() {
+    it('should update confirmed emails for users not in v1', function(done) {
       const token = null
       return async.series(
         [
-          (cb) => {
+          cb => {
             return this.user.request(
               {
                 method: 'POST',
@@ -531,7 +531,7 @@ describe('UserEmails', function () {
               }
             )
           },
-          (cb) => {
+          cb => {
             // Mark the email as confirmed
             return db.users.update(
               {
@@ -545,7 +545,7 @@ describe('UserEmails', function () {
               cb
             )
           },
-          (cb) => {
+          cb => {
             return this.user.request(
               {
                 method: 'POST',
@@ -563,7 +563,7 @@ describe('UserEmails', function () {
               }
             )
           },
-          (cb) => {
+          cb => {
             return this.user.request(
               { url: '/user/emails', json: true },
               (error, response, body) => {
@@ -581,11 +581,11 @@ describe('UserEmails', function () {
       )
     })
 
-    it('should not allow changing unconfirmed emails in v1', function (done) {
+    it('should not allow changing unconfirmed emails in v1', function(done) {
       const token = null
       return async.series(
         [
-          (cb) => {
+          cb => {
             return db.users.update(
               {
                 _id: ObjectId(this.user._id)
@@ -598,7 +598,7 @@ describe('UserEmails', function () {
               cb
             )
           },
-          (cb) => {
+          cb => {
             return this.user.request(
               {
                 method: 'POST',
@@ -616,7 +616,7 @@ describe('UserEmails', function () {
               }
             )
           },
-          (cb) => {
+          cb => {
             return this.user.request(
               {
                 method: 'POST',
@@ -634,7 +634,7 @@ describe('UserEmails', function () {
               }
             )
           },
-          (cb) => {
+          cb => {
             return this.user.request(
               { url: '/user/emails', json: true },
               (error, response, body) => {
@@ -649,11 +649,11 @@ describe('UserEmails', function () {
       )
     })
 
-    it('should not update the email in v1', function (done) {
+    it('should not update the email in v1', function(done) {
       const token = null
       return async.series(
         [
-          (cb) => {
+          cb => {
             return db.users.update(
               {
                 _id: ObjectId(this.user._id)
@@ -666,7 +666,7 @@ describe('UserEmails', function () {
               cb
             )
           },
-          (cb) => {
+          cb => {
             return this.user.request(
               {
                 method: 'POST',
@@ -684,7 +684,7 @@ describe('UserEmails', function () {
               }
             )
           },
-          (cb) => {
+          cb => {
             // Mark the email as confirmed
             return db.users.update(
               {
@@ -698,7 +698,7 @@ describe('UserEmails', function () {
               cb
             )
           },
-          (cb) => {
+          cb => {
             return this.user.request(
               {
                 method: 'POST',
@@ -717,7 +717,7 @@ describe('UserEmails', function () {
             )
           }
         ],
-        (error) => {
+        error => {
           if (error != null) {
             return done(error)
           }
@@ -727,13 +727,13 @@ describe('UserEmails', function () {
       )
     })
 
-    it('should not return an error if the email exists in v1', function (done) {
+    it('should not return an error if the email exists in v1', function(done) {
       MockV1Api.existingEmails.push(
         (this.email = `exists-in-v1${Math.random()}@example.com`)
       )
       return async.series(
         [
-          (cb) => {
+          cb => {
             return db.users.update(
               {
                 _id: ObjectId(this.user._id)
@@ -746,7 +746,7 @@ describe('UserEmails', function () {
               cb
             )
           },
-          (cb) => {
+          cb => {
             return this.user.request(
               {
                 method: 'POST',
@@ -764,7 +764,7 @@ describe('UserEmails', function () {
               }
             )
           },
-          (cb) => {
+          cb => {
             // Mark the email as confirmed
             return db.users.update(
               {
@@ -778,7 +778,7 @@ describe('UserEmails', function () {
               cb
             )
           },
-          (cb) => {
+          cb => {
             return this.user.request(
               {
                 method: 'POST',
@@ -796,7 +796,7 @@ describe('UserEmails', function () {
               }
             )
           },
-          (cb) => {
+          cb => {
             return this.user.request(
               { url: '/user/emails', json: true },
               (error, response, body) => {

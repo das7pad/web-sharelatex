@@ -5,7 +5,7 @@
 // TODO: This file was created by bulk-decaffeinate.
 // Fix any style issues and re-enable lint.
 let OpenInOverleafErrors
-var MissingParametersError = function (message) {
+var MissingParametersError = function(message) {
   const error = new Error(message)
   error.name = 'MissingParametersError'
   error.__proto__ = MissingParametersError.prototype
@@ -13,7 +13,7 @@ var MissingParametersError = function (message) {
 }
 MissingParametersError.prototype.__proto__ = Error.prototype
 
-var AmbiguousParametersError = function (message) {
+var AmbiguousParametersError = function(message) {
   const error = new Error(message)
   error.name = 'AmbiguousParametersError'
   error.__proto__ = AmbiguousParametersError.prototype
@@ -21,7 +21,7 @@ var AmbiguousParametersError = function (message) {
 }
 AmbiguousParametersError.prototype.__proto__ = Error.prototype
 
-var ZipExtractError = function (message) {
+var ZipExtractError = function(message) {
   const error = new Error(message)
   error.name = 'ZipExtractError'
   error.__proto__ = ZipExtractError.prototype
@@ -29,7 +29,7 @@ var ZipExtractError = function (message) {
 }
 ZipExtractError.prototype.__proto__ = Error.prototype
 
-var InvalidFileTypeError = function (message) {
+var InvalidFileTypeError = function(message) {
   const error = new Error(message)
   error.name = 'InvalidFileTypeError'
   error.__proto__ = InvalidFileTypeError.prototype
@@ -37,7 +37,7 @@ var InvalidFileTypeError = function (message) {
 }
 InvalidFileTypeError.prototype.__proto__ = Error.prototype
 
-var InvalidUriError = function (message) {
+var InvalidUriError = function(message) {
   const error = new Error(message)
   error.name = 'InvalidUriError'
   error.__proto__ = InvalidUriError.prototype
@@ -45,7 +45,7 @@ var InvalidUriError = function (message) {
 }
 InvalidUriError.prototype.__proto__ = Error.prototype
 
-var PublisherNotFoundError = function (message) {
+var PublisherNotFoundError = function(message) {
   const error = new Error(message)
   error.name = 'PublisherNotFoundError'
   error.__proto__ = PublisherNotFoundError.prototype
@@ -53,7 +53,7 @@ var PublisherNotFoundError = function (message) {
 }
 PublisherNotFoundError.prototype.__proto__ = Error.prototype
 
-var TemplateNotFoundError = function (message) {
+var TemplateNotFoundError = function(message) {
   const error = new Error(message)
   error.name = 'TemplateNotFoundError'
   error.__proto__ = TemplateNotFoundError.prototype
@@ -61,7 +61,7 @@ var TemplateNotFoundError = function (message) {
 }
 TemplateNotFoundError.prototype.__proto__ = Error.prototype
 
-var ConversionNotFoundError = function (message) {
+var ConversionNotFoundError = function(message) {
   const error = new Error(message)
   error.name = 'ConversionNotFoundError'
   error.__proto__ = ConversionNotFoundError.prototype

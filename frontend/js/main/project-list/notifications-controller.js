@@ -1,14 +1,14 @@
 const ExposedSettings = window.ExposedSettings
 
-define(['../../base'], function (App) {
-  App.controller('NotificationsController', function ($scope, $http) {
+define(['../../base'], function(App) {
+  App.controller('NotificationsController', function($scope, $http) {
     for (const notification of $scope.notifications || []) {
       notification.hide = false
     }
 
     $scope.samlInitPath = ExposedSettings.samlInitPath
 
-    $scope.dismiss = (notification) =>
+    $scope.dismiss = notification =>
       $http({
         url: `/notifications/${notification._id}`,
         method: 'DELETE',
@@ -18,7 +18,7 @@ define(['../../base'], function (App) {
       }).then(() => (notification.hide = true))
   })
 
-  App.controller('ProjectInviteNotificationController', function (
+  App.controller('ProjectInviteNotificationController', function(
     $scope,
     $http
   ) {
@@ -26,7 +26,7 @@ define(['../../base'], function (App) {
     $scope.projectName = $scope.notification.messageOpts.projectName
     $scope.userName = $scope.notification.messageOpts.userName
 
-    $scope.accept = function () {
+    $scope.accept = function() {
       $scope.notification.inflight = true
       return $http({
         url: `/project/${$scope.notification.messageOpts.projectId}/invite/token/${$scope.notification.messageOpts.token}/accept`,
@@ -54,13 +54,13 @@ define(['../../base'], function (App) {
     }
   })
 
-  App.controller('EmailNotificationController', function (
+  App.controller('EmailNotificationController', function(
     $scope,
     $http,
     UserAffiliationsDataService
   ) {
     $scope.userEmails = []
-    const _ssoAvailable = (email) => {
+    const _ssoAvailable = email => {
       if (!ExposedSettings.hasSamlFeature) return false
       if (email.samlProviderId) return true
       if (!email.affiliation || !email.affiliation.institution) return false
@@ -73,7 +73,7 @@ define(['../../base'], function (App) {
       }
       return false
     }
-    $scope.showConfirmEmail = (email) => {
+    $scope.showConfirmEmail = email => {
       if (ExposedSettings.emailConfirmationDisabled) {
         return false
       }
@@ -90,17 +90,17 @@ define(['../../base'], function (App) {
     }
 
     const _getUserEmails = () =>
-      UserAffiliationsDataService.getUserEmails().then(function (emails) {
+      UserAffiliationsDataService.getUserEmails().then(function(emails) {
         $scope.userEmails = emails
         $scope.$emit('project-list:notifications-received')
       })
     _getUserEmails()
 
-    $scope.resendConfirmationEmail = function (userEmail) {
+    $scope.resendConfirmationEmail = function(userEmail) {
       userEmail.confirmationInflight = true
       return UserAffiliationsDataService.resendConfirmationEmail(
         userEmail.email
-      ).then(function () {
+      ).then(function() {
         userEmail.hide = true
         userEmail.confirmationInflight = false
         $scope.$emit('project-list:notifications-received')

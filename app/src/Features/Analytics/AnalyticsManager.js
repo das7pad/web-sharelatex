@@ -4,7 +4,7 @@ const Errors = require('../Errors/Errors')
 
 // check that the request should be made: ignore smoke test user and ensure the
 // analytics service is configured
-const checkAnalyticsRequest = function (userId) {
+const checkAnalyticsRequest = function(userId) {
   if (
     settings.smokeTest &&
     settings.smokeTest.userId &&
@@ -33,7 +33,7 @@ const checkAnalyticsRequest = function (userId) {
 }
 
 // prepare the request: set `fromv2` param and full URL
-const prepareAnalyticsRequest = function (options) {
+const prepareAnalyticsRequest = function(options) {
   if (settings.overleaf != null) {
     options.qs = Object.assign({}, options.qs, { fromV2: 1 })
   }
@@ -48,7 +48,7 @@ const prepareAnalyticsRequest = function (options) {
 
 // make the request to analytics after checking and preparing it.
 // request happens asynchronously in the background and will be retried on error
-const makeAnalyticsBackgroundRequest = function (userId, options, callback) {
+const makeAnalyticsBackgroundRequest = function(userId, options, callback) {
   const { error, skip } = checkAnalyticsRequest(userId)
   if (error || skip) {
     return callback(error)

@@ -27,7 +27,7 @@ const ProjectGetter = {
 
   getProjectWithoutDocLines(project_id, callback) {
     if (callback == null) {
-      callback = function (error, project) {}
+      callback = function(error, project) {}
     }
     const excludes = {}
     for (
@@ -42,7 +42,7 @@ const ProjectGetter = {
 
   getProjectWithOnlyFolders(project_id, callback) {
     if (callback == null) {
-      callback = function (error, project) {}
+      callback = function(error, project) {}
     }
     const excludes = {}
     for (
@@ -76,7 +76,7 @@ const ProjectGetter = {
       return LockManager.runWithLock(
         ProjectEntityMongoUpdateHandler.LOCK_NAMESPACE,
         project_id,
-        (cb) => ProjectGetter.getProjectWithoutLock(project_id, projection, cb),
+        cb => ProjectGetter.getProjectWithoutLock(project_id, projection, cb),
         callback
       )
     } else {
@@ -115,7 +115,7 @@ const ProjectGetter = {
       return callback(err)
     }
 
-    return db.projects.find(query, projection, function (err, project) {
+    return db.projects.find(query, projection, function(err, project) {
       if (err != null) {
         logger.warn({ err, query, projection }, 'error getting project')
         return callback(err)
@@ -126,12 +126,12 @@ const ProjectGetter = {
 
   getProjectIdByReadAndWriteToken(token, callback) {
     if (callback == null) {
-      callback = function (err, project_id) {}
+      callback = function(err, project_id) {}
     }
     return Project.findOne(
       { 'tokens.readAndWrite': token },
       { _id: 1 },
-      function (err, project) {
+      function(err, project) {
         if (err != null) {
           return callback(err)
         }
@@ -145,9 +145,9 @@ const ProjectGetter = {
 
   getProjectByV1Id(v1_id, callback) {
     if (callback == null) {
-      callback = function (err, v1_id) {}
+      callback = function(err, v1_id) {}
     }
-    return Project.findOne({ 'overleaf.id': v1_id }, { _id: 1 }, function (
+    return Project.findOne({ 'overleaf.id': v1_id }, { _id: 1 }, function(
       err,
       project
     ) {
@@ -163,7 +163,7 @@ const ProjectGetter = {
 
   findAllUsersProjects(user_id, fields, callback) {
     if (callback == null) {
-      callback = function (error, projects) {
+      callback = function(error, projects) {
         if (projects == null) {
           projects = {
             owned: [],
@@ -176,7 +176,7 @@ const ProjectGetter = {
       }
     }
     const CollaboratorsGetter = require('../Collaborators/CollaboratorsGetter')
-    return Project.find({ owner_ref: user_id }, fields, function (
+    return Project.find({ owner_ref: user_id }, fields, function(
       error,
       ownedProjects
     ) {
@@ -186,7 +186,7 @@ const ProjectGetter = {
       return CollaboratorsGetter.getProjectsUserIsMemberOf(
         user_id,
         fields,
-        function (error, projects) {
+        function(error, projects) {
           if (error != null) {
             return callback(error)
           }
@@ -212,7 +212,7 @@ const ProjectGetter = {
     )
   }
 }
-;['getProject', 'getProjectWithoutDocLines'].map((method) =>
+;['getProject', 'getProjectWithoutDocLines'].map(method =>
   metrics.timeAsyncMethod(ProjectGetter, method, 'mongo.ProjectGetter', logger)
 )
 

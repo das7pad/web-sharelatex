@@ -24,7 +24,7 @@ const request = require('request')
 const CollaboratorsGetter = require('../Collaborators/CollaboratorsGetter')
 const { promisifyAll } = require('../../util/promises')
 
-const buildPath = function (user_id, project_name, filePath) {
+const buildPath = function(user_id, project_name, filePath) {
   let projectPath = path.join(project_name, '/', filePath)
   projectPath = encodeURIComponent(projectPath)
   const fullPath = path.join('/user/', `${user_id}`, '/entity/', projectPath)
@@ -60,7 +60,7 @@ const TpdsUpdateSender = {
       method: 'post',
       timeout: 5 * 1000
     }
-    return request(opts, function (err) {
+    return request(opts, function(err) {
       if (err != null) {
         logger.err(
           { err },
@@ -75,9 +75,9 @@ const TpdsUpdateSender = {
 
   _addEntity(options, callback) {
     if (callback == null) {
-      callback = function (err) {}
+      callback = function(err) {}
     }
-    return getProjectsUsersIds(options.project_id, function (
+    return getProjectsUsersIds(options.project_id, function(
       err,
       user_id,
       allUserIds
@@ -115,7 +115,7 @@ const TpdsUpdateSender = {
         options.project_id,
         'pipeStreamFrom',
         postOptions,
-        function (err) {
+        function(err) {
           if (err != null) {
             logger.warn(
               {
@@ -148,7 +148,7 @@ const TpdsUpdateSender = {
 
   addFile(options, callback) {
     if (callback == null) {
-      callback = function (err) {}
+      callback = function(err) {}
     }
     metrics.inc('tpds.add-file')
     options.streamOrigin =
@@ -159,7 +159,7 @@ const TpdsUpdateSender = {
 
   addDoc(options, callback) {
     if (callback == null) {
-      callback = function (err) {}
+      callback = function(err) {}
     }
     metrics.inc('tpds.add-doc')
     options.streamOrigin =
@@ -170,7 +170,7 @@ const TpdsUpdateSender = {
   moveEntity(options, callback) {
     let endPath, startPath
     if (callback == null) {
-      callback = function (err) {}
+      callback = function(err) {}
     }
     metrics.inc('tpds.move-entity')
     if (options.newProjectName != null) {
@@ -183,7 +183,7 @@ const TpdsUpdateSender = {
       )
       endPath = mergeProjectNameAndPath(options.project_name, options.endPath)
     }
-    return getProjectsUsersIds(options.project_id, function (
+    return getProjectsUsersIds(options.project_id, function(
       err,
       user_id,
       allUserIds
@@ -214,10 +214,10 @@ const TpdsUpdateSender = {
 
   deleteEntity(options, callback) {
     if (callback == null) {
-      callback = function (err) {}
+      callback = function(err) {}
     }
     metrics.inc('tpds.delete-entity')
-    return getProjectsUsersIds(options.project_id, function (
+    return getProjectsUsersIds(options.project_id, function(
       err,
       user_id,
       allUserIds
@@ -247,7 +247,7 @@ const TpdsUpdateSender = {
 
   pollDropboxForUser(user_id, callback) {
     if (callback == null) {
-      callback = function (err) {}
+      callback = function(err) {}
     }
     metrics.inc('tpds.poll-dropbox')
     const options = {
@@ -266,18 +266,18 @@ const TpdsUpdateSender = {
   }
 }
 
-var getProjectsUsersIds = function (project_id, callback) {
+var getProjectsUsersIds = function(project_id, callback) {
   if (callback == null) {
-    callback = function (err, owner_id, allUserIds) {}
+    callback = function(err, owner_id, allUserIds) {}
   }
   return ProjectGetter.getProject(
     project_id,
     { _id: true, owner_ref: true },
-    function (err, project) {
+    function(err, project) {
       if (err != null) {
         return callback(err)
       }
-      return CollaboratorsGetter.getInvitedMemberIds(project_id, function (
+      return CollaboratorsGetter.getInvitedMemberIds(project_id, function(
         err,
         member_ids
       ) {
@@ -294,7 +294,7 @@ var getProjectsUsersIds = function (project_id, callback) {
   )
 }
 
-var mergeProjectNameAndPath = function (project_name, path) {
+var mergeProjectNameAndPath = function(project_name, path) {
   if (path.indexOf('/') === 0) {
     path = path.substring(1)
   }

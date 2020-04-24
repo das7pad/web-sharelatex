@@ -65,7 +65,7 @@ function generateSentryConfig() {
             test: [
               {
                 folder: './public/js',
-                method: (filePath) => /\.map$/.test(filePath)
+                method: filePath => /\.map$/.test(filePath)
               }
             ]
           }

@@ -1,4 +1,4 @@
-define([], function () {
+define([], function() {
   if (window.fileActionI18n !== undefined) {
     return window.fileActionI18n
   }

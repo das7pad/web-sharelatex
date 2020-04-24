@@ -22,7 +22,7 @@ function printUsage() {
 }
 
 function parseImage(image) {
-  const allowedImageNames = Settings.allowedImageNames.map((x) => x.imageName)
+  const allowedImageNames = Settings.allowedImageNames.map(x => x.imageName)
   if (!allowedImageNames.includes(image)) {
     console.error(`Unknown image: ${image}`)
     console.error('Please use one of:')
@@ -62,7 +62,7 @@ main()
   .then(() => {
     process.exit()
   })
-  .catch((err) => {
+  .catch(err => {
     console.error(err)
     process.exit(1)
   })

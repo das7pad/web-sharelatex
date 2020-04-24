@@ -31,7 +31,7 @@ console.log('Loading Data')
 let idx = 0
 let processed = 0
 
-rl.on('line', async (line) => {
+rl.on('line', async line => {
   if (offset && idx++ < offset) {
     return
   }

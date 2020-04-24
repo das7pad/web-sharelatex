@@ -31,10 +31,10 @@ module.exports = CompileManager = {
       options = {}
     }
     if (_callback == null) {
-      _callback = function (error) {}
+      _callback = function(error) {}
     }
     const timer = new Metrics.Timer('editor.compile')
-    const callback = function (...args) {
+    const callback = function(...args) {
       timer.done()
       return _callback(...Array.from(args || []))
     }
@@ -42,7 +42,7 @@ module.exports = CompileManager = {
     return CompileManager._checkIfRecentlyCompiled(
       project_id,
       user_id,
-      function (error, recentlyCompiled) {
+      function(error, recentlyCompiled) {
         if (error != null) {
           return callback(error)
         }
@@ -57,20 +57,20 @@ module.exports = CompileManager = {
         return CompileManager._checkIfAutoCompileLimitHasBeenHit(
           options.isAutoCompile,
           'everyone',
-          function (err, canCompile) {
+          function(err, canCompile) {
             if (!canCompile) {
               return callback(null, 'autocompile-backoff', [])
             }
 
             return ProjectRootDocManager.ensureRootDocumentIsSet(
               project_id,
-              function (error) {
+              function(error) {
                 if (error != null) {
                   return callback(error)
                 }
                 return CompileManager.getProjectCompileLimits(
                   project_id,
-                  function (error, limits) {
+                  function(error, limits) {
                     if (error != null) {
                       return callback(error)
                     }
@@ -82,7 +82,7 @@ module.exports = CompileManager = {
                     return CompileManager._checkCompileGroupAutoCompileLimit(
                       options.isAutoCompile,
                       limits.compileGroup,
-                      function (err, canCompile) {
+                      function(err, canCompile) {
                         if (!canCompile) {
                           return callback(null, 'autocompile-backoff', [])
                         }
@@ -94,7 +94,7 @@ module.exports = CompileManager = {
                           project_id,
                           compileAsUser,
                           options,
-                          function (
+                          function(
                             error,
                             status,
                             outputFiles,
@@ -128,9 +128,9 @@ module.exports = CompileManager = {
 
   stopCompile(project_id, user_id, callback) {
     if (callback == null) {
-      callback = function (error) {}
+      callback = function(error) {}
     }
-    return CompileManager.getProjectCompileLimits(project_id, function (
+    return CompileManager.getProjectCompileLimits(project_id, function(
       error,
       limits
     ) {
@@ -143,9 +143,9 @@ module.exports = CompileManager = {
 
   deleteAuxFiles(project_id, user_id, callback) {
     if (callback == null) {
-      callback = function (error) {}
+      callback = function(error) {}
     }
-    return CompileManager.getProjectCompileLimits(project_id, function (
+    return CompileManager.getProjectCompileLimits(project_id, function(
       error,
       limits
     ) {
@@ -158,16 +158,16 @@ module.exports = CompileManager = {
 
   getProjectCompileLimits(project_id, callback) {
     if (callback == null) {
-      callback = function (error, limits) {}
+      callback = function(error, limits) {}
     }
-    return ProjectGetter.getProject(project_id, { owner_ref: 1 }, function (
+    return ProjectGetter.getProject(project_id, { owner_ref: 1 }, function(
       error,
       project
     ) {
       if (error != null) {
         return callback(error)
       }
-      return UserGetter.getUser(project.owner_ref, { features: 1 }, function (
+      return UserGetter.getUser(project.owner_ref, { features: 1 }, function(
         err,
         owner
       ) {
@@ -178,12 +178,12 @@ module.exports = CompileManager = {
           timeout:
             __guard__(
               owner != null ? owner.features : undefined,
-              (x) => x.compileTimeout
+              x => x.compileTimeout
             ) || Settings.defaultFeatures.compileTimeout,
           compileGroup:
             __guard__(
               owner != null ? owner.features : undefined,
-              (x1) => x1.compileGroup
+              x1 => x1.compileGroup
             ) || Settings.defaultFeatures.compileGroup
         })
       })
@@ -193,10 +193,10 @@ module.exports = CompileManager = {
   COMPILE_DELAY: 1, // seconds
   _checkIfRecentlyCompiled(project_id, user_id, callback) {
     if (callback == null) {
-      callback = function (error, recentlyCompiled) {}
+      callback = function(error, recentlyCompiled) {}
     }
     const key = `compile:${project_id}:${user_id}`
-    return rclient.set(key, true, 'EX', this.COMPILE_DELAY, 'NX', function (
+    return rclient.set(key, true, 'EX', this.COMPILE_DELAY, 'NX', function(
       error,
       ok
     ) {
@@ -213,7 +213,7 @@ module.exports = CompileManager = {
 
   _checkCompileGroupAutoCompileLimit(isAutoCompile, compileGroup, callback) {
     if (callback == null) {
-      callback = function (err, canCompile) {}
+      callback = function(err, canCompile) {}
     }
     if (!isAutoCompile) {
       return callback(null, true)
@@ -233,7 +233,7 @@ module.exports = CompileManager = {
 
   _checkIfAutoCompileLimitHasBeenHit(isAutoCompile, compileGroup, callback) {
     if (callback == null) {
-      callback = function (err, canCompile) {}
+      callback = function(err, canCompile) {}
     }
     if (!isAutoCompile) {
       return callback(null, true)
@@ -245,7 +245,7 @@ module.exports = CompileManager = {
       subjectName: compileGroup,
       throttle: Settings.rateLimit.autoCompile[compileGroup] || 25
     }
-    return rateLimiter.addCount(opts, function (err, canCompile) {
+    return rateLimiter.addCount(opts, function(err, canCompile) {
       if (err != null) {
         canCompile = false
       }
@@ -258,9 +258,9 @@ module.exports = CompileManager = {
 
   wordCount(project_id, user_id, file, callback) {
     if (callback == null) {
-      callback = function (error) {}
+      callback = function(error) {}
     }
-    return CompileManager.getProjectCompileLimits(project_id, function (
+    return CompileManager.getProjectCompileLimits(project_id, function(
       error,
       limits
     ) {

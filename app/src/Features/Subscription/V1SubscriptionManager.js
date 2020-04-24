@@ -26,7 +26,7 @@ module.exports = V1SubscriptionManager = {
   //   - 'v1_free'
   getPlanCodeFromV1(userId, callback) {
     if (callback == null) {
-      callback = function (err, planCode, v1Id) {}
+      callback = function(err, planCode, v1Id) {}
     }
     return V1SubscriptionManager._v1Request(
       userId,
@@ -36,7 +36,7 @@ module.exports = V1SubscriptionManager = {
           return `/api/v1/sharelatex/users/${v1Id}/plan_code`
         }
       },
-      function (error, body, v1Id) {
+      function(error, body, v1Id) {
         if (error != null) {
           return callback(error)
         }
@@ -54,7 +54,7 @@ module.exports = V1SubscriptionManager = {
 
   getSubscriptionsFromV1(userId, callback) {
     if (callback == null) {
-      callback = function (err, subscriptions, v1Id) {}
+      callback = function(err, subscriptions, v1Id) {}
     }
     return V1SubscriptionManager._v1Request(
       userId,
@@ -70,7 +70,7 @@ module.exports = V1SubscriptionManager = {
 
   getSubscriptionStatusFromV1(userId, callback) {
     if (callback == null) {
-      callback = function (err, status) {}
+      callback = function(err, status) {}
     }
     return V1SubscriptionManager._v1Request(
       userId,
@@ -86,7 +86,7 @@ module.exports = V1SubscriptionManager = {
 
   cancelV1Subscription(userId, callback) {
     if (callback == null) {
-      callback = function (err) {}
+      callback = function(err) {}
     }
     return V1SubscriptionManager._v1Request(
       userId,
@@ -102,9 +102,9 @@ module.exports = V1SubscriptionManager = {
 
   v1IdForUser(userId, callback) {
     if (callback == null) {
-      callback = function (err, v1Id) {}
+      callback = function(err, v1Id) {}
     }
-    return UserGetter.getUser(userId, { 'overleaf.id': 1 }, function (
+    return UserGetter.getUser(userId, { 'overleaf.id': 1 }, function(
       err,
       user
     ) {
@@ -113,7 +113,7 @@ module.exports = V1SubscriptionManager = {
       }
       const v1Id = __guard__(
         user != null ? user.overleaf : undefined,
-        (x) => x.id
+        x => x.id
       )
 
       return callback(null, v1Id)
@@ -140,13 +140,13 @@ module.exports = V1SubscriptionManager = {
 
   _v1Request(userId, options, callback) {
     if (callback == null) {
-      callback = function (err, body, v1Id) {}
+      callback = function(err, body, v1Id) {}
     }
     if (!settings.apis.v1.url) {
       return callback(null, null)
     }
 
-    return V1SubscriptionManager.v1IdForUser(userId, function (err, v1Id) {
+    return V1SubscriptionManager.v1IdForUser(userId, function(err, v1Id) {
       if (err != null) {
         return callback(err)
       }
@@ -166,7 +166,7 @@ module.exports = V1SubscriptionManager = {
           json: true,
           timeout: 15 * 1000
         },
-        function (error, response, body) {
+        function(error, response, body) {
           if (error != null) {
             return callback(
               new V1ConnectionError('no v1 connection').withCause(error)

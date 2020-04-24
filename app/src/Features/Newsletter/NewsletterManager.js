@@ -149,7 +149,7 @@ function makeMailchimpProvider() {
       }
 
       // look through expected mailchimp errors and log if we find one
-      Object.keys(errors).forEach((key) => {
+      Object.keys(errors).forEach(key => {
         if (err.message.includes(key)) {
           const message = `unable to change email in newsletter, ${errors[key]}`
 
@@ -177,7 +177,10 @@ function makeMailchimpProvider() {
   }
 
   function hashEmail(email) {
-    return crypto.createHash('md5').update(email.toLowerCase()).digest('hex')
+    return crypto
+      .createHash('md5')
+      .update(email.toLowerCase())
+      .digest('hex')
   }
 
   function getMergeFields(user) {

@@ -57,15 +57,15 @@ export default function RichText(_cm, rtAdapter) {
 
     // Prepare "editor" marks - TextMarkers used in the DOM that must be matched
     // up with parser marks
-    const editorMarks = _cm.getAllMarks().filter((editorMark) => {
+    const editorMarks = _cm.getAllMarks().filter(editorMark => {
       return typeof editorMark.wlClearMatch === 'function'
     })
     // Reset any existing editor marks
-    editorMarks.forEach((editorMark) => editorMark.wlClearMatch())
+    editorMarks.forEach(editorMark => editorMark.wlClearMatch())
     // Attempt to match up parser marks with existing editor marks
-    editorMarks.forEach((editorMark) => editorMark.wlMatch(_cm, sourceMarks))
+    editorMarks.forEach(editorMark => editorMark.wlMatch(_cm, sourceMarks))
     // Remove editor marks that don't match any source marks
-    editorMarks.forEach((editorMark) => {
+    editorMarks.forEach(editorMark => {
       if (editorMark.wlIsMatched()) return
       const pos = editorMark.find()
       if (pos && pos.to.line < lastRenderedLine(_cm)) {
@@ -120,7 +120,7 @@ export default function RichText(_cm, rtAdapter) {
     }
 
     if (newMathMarks.length > 0) {
-      const mathEls = newMathMarks.map((mark) => mark.replacedWith)
+      const mathEls = newMathMarks.map(mark => mark.replacedWith)
       // Note: see http://docs.mathjax.org/en/latest/advanced/typeset.html for
       // why we have to reset MathJax's equation numbers when re-rendering an
       // equation with a label.
@@ -137,7 +137,7 @@ export default function RichText(_cm, rtAdapter) {
             // important that we do so by passing a callback function rather
             // than passing a second callback spec to Queue. I want my afternoon
             // back. JLM 20161222
-            newMathMarks.forEach((mark) => mark.changed())
+            newMathMarks.forEach(mark => mark.changed())
           }
         ]
       )
@@ -156,7 +156,7 @@ export default function RichText(_cm, rtAdapter) {
     attemptUpdate(false)
   }
 
-  this.enable = function () {
+  this.enable = function() {
     if (!_enabled) {
       _cm.on('cursorActivity', _cursorActivity)
       _cm.on('viewportChange', _viewportChange)
@@ -166,13 +166,13 @@ export default function RichText(_cm, rtAdapter) {
       _enabled = true
       _cm.refresh()
       _cm.scrollIntoView(null, 100)
-      ignoreErrors(function () {
+      ignoreErrors(function() {
         _cm.focus() // can get errors due to popup blockers
       })
     }
   }
 
-  this.disable = function () {
+  this.disable = function() {
     if (_enabled) {
       _cm.off('cursorActivity', _cursorActivity)
       _cm.off('viewportChange', _viewportChange)
@@ -183,13 +183,13 @@ export default function RichText(_cm, rtAdapter) {
       }
 
       // Remove every line class when disabling richText
-      _.forEach(_.range(0, _cm.doc.lineCount()), function (x) {
+      _.forEach(_.range(0, _cm.doc.lineCount()), function(x) {
         _cm.doc.removeLineClass(x, 'text')
       })
 
       _enabled = false
       _cm.refresh()
-      ignoreErrors(function () {
+      ignoreErrors(function() {
         _cm.focus() // can get errors due to popup blockers
       })
     }
@@ -203,11 +203,11 @@ export default function RichText(_cm, rtAdapter) {
 
   this.update = _updateIfEnabled
 
-  this.cmRefresh = function () {
+  this.cmRefresh = function() {
     _cm.refresh()
   }
 
-  this.isEnabled = function () {
+  this.isEnabled = function() {
     return _enabled
   }
 }

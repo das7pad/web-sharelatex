@@ -5,8 +5,8 @@ const AuthenticationController = require('../Authentication/AuthenticationContro
 
 const TEN_SECONDS = 1000 * 10
 
-const languageCodeIsSupported = (code) =>
-  Settings.languages.some((lang) => lang.code === code)
+const languageCodeIsSupported = code =>
+  Settings.languages.some(lang => lang.code === code)
 
 module.exports = {
   proxyRequestToSpellingApi(req, res) {
@@ -38,7 +38,7 @@ module.exports = {
       json: req.body,
       timeout: TEN_SECONDS
     })
-      .on('error', function (error) {
+      .on('error', function(error) {
         logger.error({ err: error }, 'Spelling API error')
         return res.status(500).end()
       })

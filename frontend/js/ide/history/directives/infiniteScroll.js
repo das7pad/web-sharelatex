@@ -10,13 +10,13 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base'], (App) =>
+define(['../../../base'], App =>
   App.directive('infiniteScroll', () => ({
     link(scope, element, attrs, ctrl) {
       const innerElement = element.find('.infinite-scroll-inner')
       element.css({ 'overflow-y': 'auto' })
 
-      const atEndOfListView = function () {
+      const atEndOfListView = function() {
         if (attrs.infiniteScrollUpwards != null) {
           return atTopOfListView()
         } else {
@@ -32,7 +32,7 @@ define(['../../../base'], (App) =>
       const listShorterThanContainer = () =>
         element.height() > innerElement.height()
 
-      var loadUntilFull = function () {
+      var loadUntilFull = function() {
         if (
           (listShorterThanContainer() || atEndOfListView()) &&
           !scope.$eval(attrs.infiniteScrollDisabled)
@@ -42,9 +42,9 @@ define(['../../../base'], (App) =>
         }
       }
 
-      element.on('scroll', (event) => loadUntilFull())
+      element.on('scroll', event => loadUntilFull())
 
-      return scope.$watch(attrs.infiniteScrollInitialize, function (value) {
+      return scope.$watch(attrs.infiniteScrollInitialize, function(value) {
         if (value) {
           return loadUntilFull()
         }

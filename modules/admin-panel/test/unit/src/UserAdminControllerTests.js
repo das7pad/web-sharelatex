@@ -25,8 +25,8 @@ const assert = require('assert')
 const Path = require('path')
 const MockResponse = require('../../../../../test/unit/src/helpers/MockResponse')
 
-describe('UserAdminController', function () {
-  beforeEach(function () {
+describe('UserAdminController', function() {
+  beforeEach(function() {
     let User, user_count, users
     this.user = { user_id: 1, first_name: 'James' }
     this.users = users = [{ first_name: 'James' }, { first_name: 'Henry' }]
@@ -46,7 +46,7 @@ describe('UserAdminController', function () {
 
     this.UserUpdater = { changeEmailAddress: sinon.stub() }
 
-    this.User = User = (function () {
+    this.User = User = (function() {
       User = class User {
         static initClass() {
           this.updateOne = sinon.stub().yields()
@@ -123,8 +123,8 @@ describe('UserAdminController', function () {
     this.res = new MockResponse()
   })
 
-  describe('index', function () {
-    it('should render the admin/index page', function (done) {
+  describe('index', function() {
+    it('should render the admin/index page', function(done) {
       this.res.render = (pageName, opts) => {
         pageName.should.equal(
           Path.resolve(__dirname + '/../../../') + '/app/views/user/index'
@@ -134,7 +134,7 @@ describe('UserAdminController', function () {
       return this.UserAdminController.index(this.req, this.res)
     })
 
-    it('should send the users', function (done) {
+    it('should send the users', function(done) {
       this.res.render = (pageName, opts) => {
         opts.users.should.deep.equal(this.users)
         return done()
@@ -142,7 +142,7 @@ describe('UserAdminController', function () {
       return this.UserAdminController.index(this.req, this.res)
     })
 
-    return it('should send the pages', function (done) {
+    return it('should send the pages', function(done) {
       this.res.render = (pageName, opts) => {
         opts.pages.should.equal(Math.ceil(this.user_count / this.perPage))
         return done()
@@ -151,8 +151,8 @@ describe('UserAdminController', function () {
     })
   })
 
-  describe('search', function () {
-    beforeEach(function () {
+  describe('search', function() {
+    beforeEach(function() {
       return (this.req = {
         body: {
           query: '',
@@ -161,7 +161,7 @@ describe('UserAdminController', function () {
       })
     })
 
-    it('should send the users', function (done) {
+    it('should send the users', function(done) {
       this.res.callback = () => {
         this.res.statusCode.should.equal(200)
         JSON.parse(this.res.body).users.should.deep.equal(this.users)
@@ -170,7 +170,7 @@ describe('UserAdminController', function () {
       return this.UserAdminController.search(this.req, this.res)
     })
 
-    return it('should send the pages', function (done) {
+    return it('should send the pages', function(done) {
       this.res.callback = () => {
         this.res.statusCode.should.equal(200)
         JSON.parse(this.res.body).pages.should.equal(
@@ -182,8 +182,8 @@ describe('UserAdminController', function () {
     })
   })
 
-  describe('show', function () {
-    beforeEach(function () {
+  describe('show', function() {
+    beforeEach(function() {
       this.UserAdminController._isSuperAdmin = sinon
         .stub()
         .withArgs(this.req)
@@ -195,7 +195,7 @@ describe('UserAdminController', function () {
       })
     })
 
-    it('should render the admin/userInfo page', function (done) {
+    it('should render the admin/userInfo page', function(done) {
       this.res.render = (pageName, opts) => {
         pageName.should.equal(
           Path.resolve(__dirname + '/../../../') + '/app/views/user/show'
@@ -205,7 +205,7 @@ describe('UserAdminController', function () {
       return this.UserAdminController.show(this.req, this.res)
     })
 
-    it('should send the user', function (done) {
+    it('should send the user', function(done) {
       this.res.render = (pageName, opts) => {
         opts.user.should.deep.equal(this.user)
         return done()
@@ -213,7 +213,7 @@ describe('UserAdminController', function () {
       return this.UserAdminController.show(this.req, this.res)
     })
 
-    it('should send the user projects', function (done) {
+    it('should send the user projects', function(done) {
       this.res.render = (pageName, opts) => {
         opts.projects.should.deep.equal(this.projects.owned)
         return done()
@@ -221,7 +221,7 @@ describe('UserAdminController', function () {
       return this.UserAdminController.show(this.req, this.res)
     })
 
-    it("should send the user's subscription", function (done) {
+    it("should send the user's subscription", function(done) {
       this.res.render = (pageName, opts) => {
         opts.adminSubscription.should.deep.equal(this.adminSubscription)
         return done()
@@ -229,7 +229,7 @@ describe('UserAdminController', function () {
       return this.UserAdminController.show(this.req, this.res)
     })
 
-    it("should send the user's member subscriptions", function (done) {
+    it("should send the user's member subscriptions", function(done) {
       this.res.render = (pageName, opts) => {
         opts.memberSubscriptions.should.deep.equal(this.memberSubscriptions)
         return done()
@@ -237,7 +237,7 @@ describe('UserAdminController', function () {
       return this.UserAdminController.show(this.req, this.res)
     })
 
-    it("should send the user's managed subscription", function (done) {
+    it("should send the user's managed subscription", function(done) {
       this.res.render = (pageName, opts) => {
         opts.managedSubscription.should.deep.equal(this.managedSubscription)
         return done()
@@ -245,7 +245,7 @@ describe('UserAdminController', function () {
       return this.UserAdminController.show(this.req, this.res)
     })
 
-    it('should set the super admin state', function (done) {
+    it('should set the super admin state', function(done) {
       this.res.render = (pageName, opts) => {
         expect(opts.isSuperAdmin).to.equal(false)
         return done()
@@ -253,7 +253,7 @@ describe('UserAdminController', function () {
       return this.UserAdminController.show(this.req, this.res)
     })
 
-    return it('should set the super admin state to true when super admin', function (done) {
+    return it('should set the super admin state to true when super admin', function(done) {
       this.UserAdminController._isSuperAdmin = sinon
         .stub()
         .withArgs(this.req)
@@ -266,14 +266,14 @@ describe('UserAdminController', function () {
     })
   })
 
-  describe('delete', function () {
-    return it('should delete the user', function (done) {
+  describe('delete', function() {
+    return it('should delete the user', function(done) {
       this.req = {
         params: {
           user_id: 'user_id_here'
         }
       }
-      this.res.sendStatus = (code) => {
+      this.res.sendStatus = code => {
         this.UserDeleter.deleteUser
           .calledWith('user_id_here')
           .should.equal(true)
@@ -284,8 +284,8 @@ describe('UserAdminController', function () {
     })
   })
 
-  describe('update', function () {
-    beforeEach(function () {
+  describe('update', function() {
+    beforeEach(function() {
       this.UserAdminController._isSuperAdmin = sinon
         .stub()
         .withArgs(this.req)
@@ -294,70 +294,70 @@ describe('UserAdminController', function () {
       return (this.res.sendStatus = sinon.stub())
     })
 
-    describe('successfully', function () {
-      beforeEach(function () {
+    describe('successfully', function() {
+      beforeEach(function() {
         this.req.body = { first_name: 'James' }
         return this.UserAdminController.update(this.req, this.res)
       })
 
-      it('should call User.updateOne with the updated attributes', function () {
+      it('should call User.updateOne with the updated attributes', function() {
         this.User.updateOne.calledWith({ _id: this.user_id }).should.equal(true)
         const updateQuery = this.User.updateOne.args[0][1]
         return updateQuery.$set.first_name.should.equal('James')
       })
     })
 
-    describe('with unknown attribute', function () {
-      beforeEach(function () {
+    describe('with unknown attribute', function() {
+      beforeEach(function() {
         this.req.body = { foo_bar: 100 }
         return this.UserAdminController.update(this.req, this.res)
       })
 
-      return it('should ignore the attribute', function () {
+      return it('should ignore the attribute', function() {
         this.User.updateOne.calledWith({ _id: this.user_id }).should.equal(true)
         const updateQuery = this.User.updateOne.args[0][1]
         return expect(updateQuery.$set.foo_bar).to.equal(undefined)
       })
     })
 
-    describe("with boolean attribute set to 'on'", function () {
-      beforeEach(function () {
+    describe("with boolean attribute set to 'on'", function() {
+      beforeEach(function() {
         this.req.body = { 'features.versioning': 'on' }
         return this.UserAdminController.update(this.req, this.res)
       })
 
-      return it('should set the attribute to true', function () {
+      return it('should set the attribute to true', function() {
         const updateQuery = this.User.updateOne.args[0][1]
         return expect(updateQuery.$set['features.versioning']).to.equal(true)
       })
     })
 
-    describe('with missing boolean attribute', function () {
-      beforeEach(function () {
+    describe('with missing boolean attribute', function() {
+      beforeEach(function() {
         this.req.body = {}
         return this.UserAdminController.update(this.req, this.res)
       })
 
-      return it('should set the attribute to false', function () {
+      return it('should set the attribute to false', function() {
         const updateQuery = this.User.updateOne.args[0][1]
         return expect(updateQuery.$set['features.versioning']).to.equal(false)
       })
     })
 
-    describe('with super admin only attribute', function () {
-      beforeEach(function () {
+    describe('with super admin only attribute', function() {
+      beforeEach(function() {
         this.req.body = { isAdmin: true }
         return this.UserAdminController.update(this.req, this.res)
       })
 
-      return it('should ignore the attribute', function () {
+      return it('should ignore the attribute', function() {
         const updateQuery = this.User.updateOne.args[0][1]
         return expect(updateQuery.$set.isAdmin).to.equal(undefined)
       })
     })
 
-    return describe('with super admin only attribute when a super admin', function () {
-      beforeEach(function () {
+    return describe('with super admin only attribute when a super admin', function() {
+      beforeEach(function() {
         this.UserAdminController._isSuperAdmin = sinon
           .stub()
           .withArgs(this.req)
@@ -366,43 +366,43 @@ describe('UserAdminController', function () {
         return this.UserAdminController.update(this.req, this.res)
       })
 
-      return it('should ignore the attribute', function () {
+      return it('should ignore the attribute', function() {
         const updateQuery = this.User.updateOne.args[0][1]
         return expect(updateQuery.$set.isAdmin).to.equal(true)
       })
     })
   })
 
-  describe('updateEmail', function () {
-    beforeEach(function () {
+  describe('updateEmail', function() {
+    beforeEach(function() {
       this.req.params = { user_id: (this.user_id = ObjectId().toString()) }
       return (this.req.body = { email: (this.email = 'jane@example.com') })
     })
 
-    describe('successfully', function () {
-      beforeEach(function () {
+    describe('successfully', function() {
+      beforeEach(function() {
         this.UserUpdater.changeEmailAddress.yields(null)
         return this.UserAdminController.updateEmail(this.req, this.res)
       })
 
-      it('should update the email', function () {
+      it('should update the email', function() {
         return this.UserUpdater.changeEmailAddress
           .calledWith(this.user_id, this.email)
           .should.equal(true)
       })
 
-      return it('should return 204', function () {
+      return it('should return 204', function() {
         return this.res.statusCode.should.equal(204)
       })
     })
 
-    return describe('with existing email', function () {
-      beforeEach(function () {
+    return describe('with existing email', function() {
+      beforeEach(function() {
         this.UserUpdater.changeEmailAddress.yields({ message: 'alread_exists' })
         this.UserAdminController.updateEmail(this.req, this.res)
       })
 
-      return it('should return 400 with a message', function () {
+      return it('should return 400 with a message', function() {
         this.res.statusCode.should.equal(400)
         this.res.body.should.equal(
           JSON.stringify({ message: 'Email is in use by another user' })
@@ -411,8 +411,8 @@ describe('UserAdminController', function () {
     })
   })
 
-  return describe('_isSuperAdmin', function () {
-    beforeEach(function () {
+  return describe('_isSuperAdmin', function() {
+    beforeEach(function() {
       this.current_user_id = 'current_user_id-123'
       return (this.AuthenticationController.getLoggedInUserId = sinon
         .stub()
@@ -420,21 +420,21 @@ describe('UserAdminController', function () {
         .returns(this.current_user_id))
     })
 
-    it('should return false if no super admin setting is set', function () {
+    it('should return false if no super admin setting is set', function() {
       delete this.settings.superAdminUserIds
       return expect(this.UserAdminController._isSuperAdmin(this.req)).to.equal(
         false
       )
     })
 
-    it('should return false if user is not in super admins', function () {
+    it('should return false if user is not in super admins', function() {
       this.settings.superAdminUserIds = ['not-current-user']
       return expect(this.UserAdminController._isSuperAdmin(this.req)).to.equal(
         false
       )
     })
 
-    return it('should return true if user is in super admins', function () {
+    return it('should return true if user is in super admins', function() {
       this.settings.superAdminUserIds = [this.current_user_id]
       return expect(this.UserAdminController._isSuperAdmin(this.req)).to.equal(
         true

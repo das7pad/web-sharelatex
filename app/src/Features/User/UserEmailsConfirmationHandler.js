@@ -30,7 +30,7 @@ const UserEmailsConfirmationHandler = {
       'email_confirmation',
       data,
       { expiresIn: ONE_YEAR_IN_S },
-      function (err, token) {
+      function(err, token) {
         if (err) {
           return callback(err)
         }
@@ -48,7 +48,7 @@ const UserEmailsConfirmationHandler = {
     OneTimeTokenHandler.getValueFromTokenAndExpire(
       'email_confirmation',
       token,
-      function (error, data) {
+      function(error, data) {
         if (error) {
           return callback(error)
         }
@@ -61,7 +61,7 @@ const UserEmailsConfirmationHandler = {
         if (!userId || email !== EmailHelper.parseEmail(email)) {
           return callback(new Errors.NotFoundError('invalid data'))
         }
-        UserGetter.getUser(userId, {}, function (error, user) {
+        UserGetter.getUser(userId, {}, function(error, user) {
           if (error) {
             return callback(error)
           }
@@ -69,7 +69,7 @@ const UserEmailsConfirmationHandler = {
             return callback(new Errors.NotFoundError('user not found'))
           }
           const emailExists = user.emails.some(
-            (emailData) => emailData.email === email
+            emailData => emailData.email === email
           )
           if (!emailExists) {
             return callback(new Errors.NotFoundError('email missing for user'))

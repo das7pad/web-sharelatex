@@ -35,7 +35,7 @@ async function _userAlreadyHasHigherPrivilege(
   )
 }
 
-const makePostUrl = (token) => {
+const makePostUrl = token => {
   if (TokenAccessHandler.isReadAndWriteToken(token)) {
     return `/${token}/grant`
   } else if (TokenAccessHandler.isReadOnlyToken(token)) {

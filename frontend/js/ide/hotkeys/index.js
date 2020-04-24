@@ -6,4 +6,4 @@
 define([
   './BackspaceHighjack',
   './controllers/HotkeysController'
-], function () {})
+], function() {})

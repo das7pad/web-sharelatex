@@ -54,7 +54,7 @@ module.exports = Csrf = class Csrf {
         : undefined) === 1
     ) {
       // ignore the error if it's due to a bad csrf token, and continue
-      return csrf(req, res, (err) => {
+      return csrf(req, res, err => {
         if (err && err.code !== 'EBADCSRFTOKEN') {
           return next(err)
         } else {
@@ -69,14 +69,14 @@ module.exports = Csrf = class Csrf {
   static validateRequest(req, cb) {
     // run a dummy csrf check to see if it returns an error
     if (cb == null) {
-      cb = function (valid) {}
+      cb = function(valid) {}
     }
-    return csrf(req, null, (err) => cb(err == null))
+    return csrf(req, null, err => cb(err == null))
   }
 
   static validateToken(token, session, cb) {
     if (cb == null) {
-      cb = function (valid) {}
+      cb = function(valid) {}
     }
     if (token == null) {
       return cb(false)

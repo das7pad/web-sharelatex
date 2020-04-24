@@ -1,5 +1,5 @@
-define(['../../../base'], (App) =>
-  App.controller('BinaryFileController', function (
+define(['../../../base'], App =>
+  App.controller('BinaryFileController', function(
     $scope,
     $rootScope,
     $http,
@@ -46,7 +46,11 @@ define(['../../../base'], (App) =>
     const imageExtensions = ['png', 'jpg', 'jpeg', 'gif']
     const previewableExtensions = []
 
-    const extension = (file) => file.name.split('.').pop().toLowerCase()
+    const extension = file =>
+      file.name
+        .split('.')
+        .pop()
+        .toLowerCase()
 
     $scope.isTextFile = () =>
       textExtensions.indexOf(extension($scope.openFile)) > -1
@@ -69,7 +73,7 @@ define(['../../../base'], (App) =>
     $scope.refreshing = false
     $scope.refreshError = null
 
-    $scope.displayUrl = function (url) {
+    $scope.displayUrl = function(url) {
       if (url == null) {
         return
       }
@@ -81,25 +85,25 @@ define(['../../../base'], (App) =>
       return url
     }
 
-    $scope.refreshFile = function (file) {
+    $scope.refreshFile = function(file) {
       $scope.refreshing = true
       $scope.refreshError = null
       ide.fileTreeManager
         .refreshLinkedFile(file)
-        .then(function (response) {
+        .then(function(response) {
           const { data } = response
           const newFileId = data.new_file_id
           $timeout(
             () =>
               waitFor(() => ide.fileTreeManager.findEntityById(newFileId), 5000)
-                .then((newFile) => ide.binaryFilesManager.openFile(newFile))
-                .catch((err) => console.warn(err)),
+                .then(newFile => ide.binaryFilesManager.openFile(newFile))
+                .catch(err => console.warn(err)),
 
             0
           )
           $scope.refreshError = null
         })
-        .catch((response) => ($scope.refreshError = response.data))
+        .catch(response => ($scope.refreshError = response.data))
         .finally(() => {
           $scope.refreshing = false
           const provider = file.linkedFileData.provider
@@ -138,7 +142,7 @@ define(['../../../base'], (App) =>
       let truncated = false
       displayPreviewLoading()
       getFileSize(url)
-        .then((fileSize) => {
+        .then(fileSize => {
           const opts = {}
           if (fileSize > MAX_FILE_SIZE) {
             truncated = true
@@ -146,20 +150,20 @@ define(['../../../base'], (App) =>
           }
           return getFileContents(url, opts)
         })
-        .then((contents) => {
+        .then(contents => {
           const displayedContents = truncated
             ? truncateFileContents(contents)
             : contents
           displayPreview(displayedContents, truncated)
         })
-        .catch((err) => {
+        .catch(err => {
           console.error(err)
           displayPreviewError()
         })
     }
 
     function getFileSize(url) {
-      return $http.head(url).then((response) => {
+      return $http.head(url).then(response => {
         const size = parseInt(response.headers('Content-Length'), 10)
         if (isNaN(size)) {
           throw new Error('Could not parse Content-Length header')
@@ -177,7 +181,7 @@ define(['../../../base'], (App) =>
         .get(url, {
           transformResponse: null // Don't parse JSON
         })
-        .then((response) => {
+        .then(response => {
           return response.data
         })
     }

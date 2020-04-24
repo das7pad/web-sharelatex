@@ -86,46 +86,42 @@ module.exports = {
         } else if (err) {
           return res.status(500)
         }
-        UserSessionsManager.revokeAllUserSessions(
-          { _id: userId },
-          [],
-          (err) => {
+        UserSessionsManager.revokeAllUserSessions({ _id: userId }, [], err => {
+          if (err != null) {
+            return next(err)
+          }
+          UserUpdater.removeReconfirmFlag(userId, err => {
             if (err != null) {
               return next(err)
             }
-            UserUpdater.removeReconfirmFlag(userId, (err) => {
+            if (!req.body.login_after) {
+              return res.sendStatus(200)
+            }
+            UserGetter.getUser(userId, { email: 1 }, (err, user) => {
               if (err != null) {
                 return next(err)
               }
-              if (!req.body.login_after) {
-                return res.sendStatus(200)
-              }
-              UserGetter.getUser(userId, { email: 1 }, (err, user) => {
-                if (err != null) {
-                  return next(err)
-                }
-                AuthenticationController.afterLoginSessionSetup(
-                  req,
-                  user,
-                  (err) => {
-                    if (err != null) {
-                      logger.err(
-                        { err, email: user.email },
-                        'Error setting up session after setting password'
-                      )
-                      return next(err)
-                    }
-                    res.json({
-                      redir:
-                        AuthenticationController._getRedirectFromSession(req) ||
-                        '/project'
-                    })
+              AuthenticationController.afterLoginSessionSetup(
+                req,
+                user,
+                err => {
+                  if (err != null) {
+                    logger.err(
+                      { err, email: user.email },
+                      'Error setting up session after setting password'
+                    )
+                    return next(err)
                   }
-                )
-              })
+                  res.json({
+                    redir:
+                      AuthenticationController._getRedirectFromSession(req) ||
+                      '/project'
+                  })
+                }
+              )
             })
-          }
-        )
+          })
+        })
       }
     )
   }

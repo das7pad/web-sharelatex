@@ -18,15 +18,15 @@ define([
   '../../../../../../../frontend/js/utils/EventEmitter',
   'angular-mocks'
 ], (cmEditor, RichTextAdapter, EventEmitter) => {
-  describe('cmEditor', function () {
+  describe('cmEditor', function() {
     beforeEach(
-      window.module('SharelatexApp', ($provide) => {
+      window.module('SharelatexApp', $provide => {
         $provide.factory('ide', () => ({ fileTreeManager: sinon.stub() }))
         $provide.factory('metadata', () => ({}))
       })
     )
 
-    it('inits Rich Text', function () {
+    it('inits Rich Text', function() {
       // Sinon doesn't really seem to like spying on a class, so we have to make
       // a custom one
       const editorStub = sinon.stub().returns({
@@ -61,7 +61,7 @@ define([
       })
     })
 
-    it('attaches to CM', function () {
+    it('attaches to CM', function() {
       const Editor = stubEditor()
       const { getCodeMirror } = Editor.prototype
       const { openDoc } = Editor.prototype
@@ -89,7 +89,7 @@ define([
       })
     })
 
-    it('calls Editor.update when remoteop event is trigger', function () {
+    it('calls Editor.update when remoteop event is trigger', function() {
       const Editor = stubEditor()
       const { update } = Editor.prototype
       return inject(($compile, $rootScope) => {
@@ -107,7 +107,7 @@ define([
       })
     })
 
-    it('calls clearHistory when attaching to CM', function () {
+    it('calls clearHistory when attaching to CM', function() {
       let clearHistory
       const Editor = stubEditor(
         stubCodeMirror({ clearHistory: (clearHistory = sinon.stub()) })
@@ -126,7 +126,7 @@ define([
       })
     })
 
-    return it('detaches from CM when destroyed', function () {
+    return it('detaches from CM when destroyed', function() {
       const Editor = stubEditor()
       const { disable } = Editor.prototype
       return inject(($compile, $rootScope) => {
@@ -149,7 +149,7 @@ define([
     })
   })
 
-  var stubCodeMirror = function (overrides) {
+  var stubCodeMirror = function(overrides) {
     // Should note that we're extending our EventEmitter implementation that
     // is different from CodeMirror's built-in implementation. However the top-
     // level api is the same
@@ -173,12 +173,12 @@ define([
   }
 
   // Stub the Editor class that is returned as the root of the rich text bundle
-  var stubEditor = function (codeMirror) {
+  var stubEditor = function(codeMirror) {
     let Editor
     if (codeMirror == null) {
       codeMirror = stubCodeMirror()
     }
-    return (Editor = (function () {
+    return (Editor = (function() {
       Editor = class Editor {
         static initClass() {
           this.prototype.getCodeMirror = sinon.stub().returns(codeMirror)
@@ -195,7 +195,7 @@ define([
   }
 
   // Stub the ShareJS Doc that is created by editor internals
-  const stubSharejsDoc = function (overrides) {
+  const stubSharejsDoc = function(overrides) {
     if (overrides == null) {
       overrides = {}
     }
@@ -206,7 +206,7 @@ define([
           changes: [],
           comments: []
         },
-        attachToCM: function (cm) {
+        attachToCM: function(cm) {
           cm.doc = this
         },
         getAllMarks: sinon.stub().returns([]),

@@ -12,8 +12,8 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../base'], function (App) {
-  App.controller('RenameProjectModalController', function (
+define(['../../base'], function(App) {
+  App.controller('RenameProjectModalController', function(
     $scope,
     $modalInstance,
     $timeout,
@@ -31,17 +31,17 @@ define(['../../base'], function (App) {
       $timeout(() => $scope.$broadcast('open'), 200)
     )
 
-    $scope.rename = function () {
+    $scope.rename = function() {
       $scope.state.inflight = true
       $scope.state.error = false
       return $scope
         .renameProject(project, $scope.inputs.projectName)
-        .then(function () {
+        .then(function() {
           $scope.state.inflight = false
           $scope.state.error = false
           return $modalInstance.close()
         })
-        .catch(function (response) {
+        .catch(function(response) {
           const { data, status } = response
           $scope.state.inflight = false
           if (status === 400) {
@@ -55,7 +55,7 @@ define(['../../base'], function (App) {
     return ($scope.cancel = () => $modalInstance.dismiss('cancel'))
   })
 
-  App.controller('CloneProjectModalController', function (
+  App.controller('CloneProjectModalController', function(
     $scope,
     $modalInstance,
     $timeout,
@@ -71,16 +71,16 @@ define(['../../base'], function (App) {
       $timeout(() => $scope.$broadcast('open'), 200)
     )
 
-    $scope.clone = function () {
+    $scope.clone = function() {
       $scope.state.inflight = true
       return $scope
         .cloneProject(project, $scope.inputs.projectName)
-        .then(function () {
+        .then(function() {
           $scope.state.inflight = false
           $scope.state.error = false
           return $modalInstance.close()
         })
-        .catch(function (response) {
+        .catch(function(response) {
           const { data, status } = response
           $scope.state.inflight = false
           if (status === 400) {
@@ -94,7 +94,7 @@ define(['../../base'], function (App) {
     return ($scope.cancel = () => $modalInstance.dismiss('cancel'))
   })
 
-  App.controller('NewProjectModalController', function (
+  App.controller('NewProjectModalController', function(
     $scope,
     $modalInstance,
     $timeout,
@@ -110,18 +110,18 @@ define(['../../base'], function (App) {
       $timeout(() => $scope.$broadcast('open'), 200)
     )
 
-    $scope.create = function () {
+    $scope.create = function() {
       $scope.state.inflight = true
       $scope.state.error = false
       return $scope
         .createProject($scope.inputs.projectName, template)
-        .then(function (response) {
+        .then(function(response) {
           const { data } = response
           $scope.state.inflight = false
           $scope.state.error = false
           return $modalInstance.close(data.project_id)
         })
-        .catch(function (response) {
+        .catch(function(response) {
           const { data, status } = response
           $scope.state.inflight = false
           if (status === 400) {
@@ -135,7 +135,7 @@ define(['../../base'], function (App) {
     return ($scope.cancel = () => $modalInstance.dismiss('cancel'))
   })
 
-  App.controller('ArchiveTrashLeaveOrDeleteProjectsModalController', function (
+  App.controller('ArchiveTrashLeaveOrDeleteProjectsModalController', function(
     $scope,
     $modalInstance,
     $timeout,
@@ -151,21 +151,21 @@ define(['../../base'], function (App) {
     $scope.cancel = () => $modalInstance.dismiss('cancel')
   })
 
-  App.controller('UploadProjectModalController', function (
+  App.controller('UploadProjectModalController', function(
     $scope,
     $modalInstance,
     $timeout
   ) {
     $scope.cancel = () => $modalInstance.dismiss('cancel')
 
-    return ($scope.onComplete = function (error, name, response) {
+    return ($scope.onComplete = function(error, name, response) {
       if (response.project_id != null) {
         return (window.location = `/project/${response.project_id}`)
       }
     })
   })
 
-  App.controller('V1ImportModalController', function (
+  App.controller('V1ImportModalController', function(
     $scope,
     $modalInstance,
     project
@@ -175,7 +175,7 @@ define(['../../base'], function (App) {
     return ($scope.dismiss = () => $modalInstance.dismiss('cancel'))
   })
 
-  return App.controller('ShowErrorModalController', function (
+  return App.controller('ShowErrorModalController', function(
     $scope,
     $modalInstance,
     error

@@ -26,15 +26,19 @@ function makePreambleDiv(cm, titleMark) {
     .addClass('title')
     .text(deTex(titleMark.getContent(cm)))
 
-  return $('<div>').addClass('preamble').append(title)
+  return $('<div>')
+    .addClass('preamble')
+    .append(title)
 }
 
 function makeAuthors(cm, authorMark) {
-  const authorEls = splitAuthors(authorMark.getContent(cm)).map((author) =>
+  const authorEls = splitAuthors(authorMark.getContent(cm)).map(author =>
     $('<li>').text(deTex(author))
   )
 
-  return $('<ul>').addClass('authors').append(authorEls)
+  return $('<ul>')
+    .addClass('authors')
+    .append(authorEls)
 }
 
 export default PreambleMarker

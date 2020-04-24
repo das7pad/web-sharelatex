@@ -20,10 +20,10 @@ const Settings = require('settings-sharelatex')
 module.exports = ReferalFeatures = {
   getBonusFeatures(user_id, callback) {
     if (callback == null) {
-      callback = function (error) {}
+      callback = function(error) {}
     }
     const query = { _id: user_id }
-    return User.findOne(query, function (error, user) {
+    return User.findOne(query, function(error, user) {
       if (error) {
         return callback(error)
       }
@@ -50,7 +50,7 @@ module.exports = ReferalFeatures = {
 
   _getBonusLevel(user) {
     let highestBonusLevel = 0
-    _.each(_.keys(Settings.bonus_features), function (level) {
+    _.each(_.keys(Settings.bonus_features), function(level) {
       const levelIsLessThanUser = level <= user.refered_user_count
       const levelIsMoreThanCurrentHighest = level >= highestBonusLevel
       if (levelIsLessThanUser && levelIsMoreThanCurrentHighest) {

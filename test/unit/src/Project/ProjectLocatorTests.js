@@ -38,8 +38,8 @@ const rootFolder = {
 project.rootFolder[0] = rootFolder
 project.rootDoc_id = rootDoc._id
 
-describe('ProjectLocator', function () {
-  beforeEach(function () {
+describe('ProjectLocator', function() {
+  beforeEach(function() {
     Project.findById = (projectId, callback) => {
       callback(null, project)
     }
@@ -70,8 +70,8 @@ describe('ProjectLocator', function () {
     })
   })
 
-  describe('finding a doc', function () {
-    it('finds one at the root level', function (done) {
+  describe('finding a doc', function() {
+    it('finds one at the root level', function(done) {
       this.locator.findElement(
         { project_id: project._id, element_id: doc2._id, type: 'docs' },
         (err, foundElement, path, parentFolder) => {
@@ -87,7 +87,7 @@ describe('ProjectLocator', function () {
       )
     })
 
-    it('when it is nested', function (done) {
+    it('when it is nested', function(done) {
       this.locator.findElement(
         { project_id: project._id, element_id: subSubDoc._id, type: 'doc' },
         (err, foundElement, path, parentFolder) => {
@@ -105,7 +105,7 @@ describe('ProjectLocator', function () {
       )
     })
 
-    it('should give error if element could not be found', function (done) {
+    it('should give error if element could not be found', function(done) {
       this.locator.findElement(
         { project_id: project._id, element_id: 'ddsd432nj42', type: 'docs' },
         (err, foundElement, path, parentFolder) => {
@@ -117,8 +117,8 @@ describe('ProjectLocator', function () {
     })
   })
 
-  describe('finding a folder', function () {
-    it('should return root folder when looking for root folder', function (done) {
+  describe('finding a folder', function() {
+    it('should return root folder when looking for root folder', function(done) {
       this.locator.findElement(
         { project_id: project._id, element_id: rootFolder._id, type: 'folder' },
         (err, foundElement, path, parentFolder) => {
@@ -131,7 +131,7 @@ describe('ProjectLocator', function () {
       )
     })
 
-    it('when at root', function (done) {
+    it('when at root', function(done) {
       this.locator.findElement(
         { project_id: project._id, element_id: subFolder._id, type: 'folder' },
         (err, foundElement, path, parentFolder) => {
@@ -147,7 +147,7 @@ describe('ProjectLocator', function () {
       )
     })
 
-    it('when deeply nested', function (done) {
+    it('when deeply nested', function(done) {
       this.locator.findElement(
         {
           project_id: project._id,
@@ -170,8 +170,8 @@ describe('ProjectLocator', function () {
     })
   })
 
-  describe('finding a file', function () {
-    it('when at root', function (done) {
+  describe('finding a file', function() {
+    it('when at root', function(done) {
       this.locator.findElement(
         { project_id: project._id, element_id: file1._id, type: 'fileRefs' },
         (err, foundElement, path, parentFolder) => {
@@ -187,7 +187,7 @@ describe('ProjectLocator', function () {
       )
     })
 
-    it('when deeply nested', function (done) {
+    it('when deeply nested', function(done) {
       this.locator.findElement(
         {
           project_id: project._id,
@@ -210,8 +210,8 @@ describe('ProjectLocator', function () {
     })
   })
 
-  describe('finding an element with wrong element type', function () {
-    it('should add an s onto the element type', function (done) {
+  describe('finding an element with wrong element type', function() {
+    it('should add an s onto the element type', function(done) {
       this.locator.findElement(
         { project_id: project._id, element_id: subSubDoc._id, type: 'doc' },
         (err, foundElement, path, parentFolder) => {
@@ -224,7 +224,7 @@ describe('ProjectLocator', function () {
       )
     })
 
-    it('should convert file to fileRefs', function (done) {
+    it('should convert file to fileRefs', function(done) {
       this.locator.findElement(
         { project_id: project._id, element_id: file1._id, type: 'fileRefs' },
         (err, foundElement, path, parentFolder) => {
@@ -238,7 +238,7 @@ describe('ProjectLocator', function () {
     })
   })
 
-  describe('should be able to take actual project as well as id', function () {
+  describe('should be able to take actual project as well as id', function() {
     const doc3 = {
       _id: '123dsdj3',
       name: 'doc3'
@@ -251,7 +251,7 @@ describe('ProjectLocator', function () {
       _id: '1234566',
       rootFolder: [rootFolder2]
     }
-    it('should find doc in project', function (done) {
+    it('should find doc in project', function(done) {
       this.locator.findElement(
         { project: project2, element_id: doc3._id, type: 'docs' },
         (err, foundElement, path, parentFolder) => {
@@ -268,8 +268,8 @@ describe('ProjectLocator', function () {
     })
   })
 
-  describe('finding root doc', function () {
-    it('should return root doc when passed project', function (done) {
+  describe('finding root doc', function() {
+    it('should return root doc when passed project', function(done) {
       this.locator.findRootDoc(project, (err, doc) => {
         if (err != null) {
           return done(err)
@@ -279,7 +279,7 @@ describe('ProjectLocator', function () {
       })
     })
 
-    it('should return root doc when passed project_id', function (done) {
+    it('should return root doc when passed project_id', function(done) {
       this.locator.findRootDoc(project._id, (err, doc) => {
         if (err != null) {
           return done(err)
@@ -289,7 +289,7 @@ describe('ProjectLocator', function () {
       })
     })
 
-    it('should return null when the project has no rootDoc', function (done) {
+    it('should return null when the project has no rootDoc', function(done) {
       project.rootDoc_id = null
       this.locator.findRootDoc(project, (err, doc) => {
         if (err != null) {
@@ -300,7 +300,7 @@ describe('ProjectLocator', function () {
       })
     })
 
-    it('should return null when the rootDoc_id no longer exists', function (done) {
+    it('should return null when the rootDoc_id no longer exists', function(done) {
       project.rootDoc_id = 'doesntexist'
       this.locator.findRootDoc(project, (err, doc) => {
         if (err != null) {
@@ -312,8 +312,8 @@ describe('ProjectLocator', function () {
     })
   })
 
-  describe('findElementByPath', function () {
-    it('should take a doc path and return the element for a root level document', function (done) {
+  describe('findElementByPath', function() {
+    it('should take a doc path and return the element for a root level document', function(done) {
       const path = `${doc1.name}`
       this.locator.findElementByPath(
         { project, path },
@@ -328,7 +328,7 @@ describe('ProjectLocator', function () {
       )
     })
 
-    it('should take a doc path and return the element for a root level document with a starting slash', function (done) {
+    it('should take a doc path and return the element for a root level document with a starting slash', function(done) {
       const path = `/${doc1.name}`
       this.locator.findElementByPath(
         { project, path },
@@ -343,7 +343,7 @@ describe('ProjectLocator', function () {
       )
     })
 
-    it('should take a doc path and return the element for a nested document', function (done) {
+    it('should take a doc path and return the element for a nested document', function(done) {
       const path = `${subFolder.name}/${secondSubFolder.name}/${subSubDoc.name}`
       this.locator.findElementByPath(
         { project, path },
@@ -358,7 +358,7 @@ describe('ProjectLocator', function () {
       )
     })
 
-    it('should take a file path and return the element for a root level document', function (done) {
+    it('should take a file path and return the element for a root level document', function(done) {
       const path = `${file1.name}`
       this.locator.findElementByPath(
         { project, path },
@@ -373,7 +373,7 @@ describe('ProjectLocator', function () {
       )
     })
 
-    it('should take a file path and return the element for a nested document', function (done) {
+    it('should take a file path and return the element for a nested document', function(done) {
       const path = `${subFolder.name}/${secondSubFolder.name}/${subSubFile.name}`
       this.locator.findElementByPath(
         { project, path },
@@ -388,7 +388,7 @@ describe('ProjectLocator', function () {
       )
     })
 
-    it('should take a file path and return the element for a nested document case insenstive', function (done) {
+    it('should take a file path and return the element for a nested document case insenstive', function(done) {
       const path = `${subFolder.name.toUpperCase()}/${secondSubFolder.name.toUpperCase()}/${subSubFile.name.toUpperCase()}`
       this.locator.findElementByPath(
         { project, path },
@@ -403,7 +403,7 @@ describe('ProjectLocator', function () {
       )
     })
 
-    it('should take a file path and return the element for a nested folder', function (done) {
+    it('should take a file path and return the element for a nested folder', function(done) {
       const path = `${subFolder.name}/${secondSubFolder.name}`
       this.locator.findElementByPath(
         { project, path },
@@ -418,7 +418,7 @@ describe('ProjectLocator', function () {
       )
     })
 
-    it('should take a file path and return the root folder', function (done) {
+    it('should take a file path and return the root folder', function(done) {
       const path = '/'
       this.locator.findElementByPath(
         { project, path },
@@ -433,7 +433,7 @@ describe('ProjectLocator', function () {
       )
     })
 
-    it('should return an error if the file can not be found inside know folder', function (done) {
+    it('should return an error if the file can not be found inside know folder', function(done) {
       const path = `${subFolder.name}/${secondSubFolder.name}/exist.txt`
       this.locator.findElementByPath(
         { project, path },
@@ -446,7 +446,7 @@ describe('ProjectLocator', function () {
       )
     })
 
-    it('should return an error if the file can not be found inside unknown folder', function (done) {
+    it('should return an error if the file can not be found inside unknown folder', function(done) {
       const path = 'this/does/not/exist.txt'
       this.locator.findElementByPath(
         { project, path },
@@ -459,8 +459,8 @@ describe('ProjectLocator', function () {
       )
     })
 
-    describe('where duplicate folder exists', function () {
-      beforeEach(function () {
+    describe('where duplicate folder exists', function() {
+      beforeEach(function() {
         this.duplicateFolder = {
           name: 'duplicate1',
           _id: '1234',
@@ -486,14 +486,14 @@ describe('ProjectLocator', function () {
         }
       })
 
-      it('should not call the callback more than once', function (done) {
+      it('should not call the callback more than once', function(done) {
         const path = `${this.duplicateFolder.name}/${this.doc.name}`
         this.locator.findElementByPath({ project: this.project, path }, () =>
           done()
         )
       }) // mocha will throw exception if done called multiple times
 
-      it('should not call the callback more than once when the path is longer than 1 level below the duplicate level', function (done) {
+      it('should not call the callback more than once when the path is longer than 1 level below the duplicate level', function(done) {
         const path = `${this.duplicateFolder.name}/1/main.tex`
         this.locator.findElementByPath({ project: this.project, path }, () =>
           done()
@@ -501,8 +501,8 @@ describe('ProjectLocator', function () {
       })
     }) // mocha will throw exception if done called multiple times
 
-    describe('with a null doc', function () {
-      beforeEach(function () {
+    describe('with a null doc', function() {
+      beforeEach(function() {
         this.project = {
           rootFolder: [
             {
@@ -514,7 +514,7 @@ describe('ProjectLocator', function () {
         }
       })
 
-      it('should not crash with a null', function (done) {
+      it('should not crash with a null', function(done) {
         const path = '/other.tex'
         this.locator.findElementByPath(
           { project: this.project, path },
@@ -529,12 +529,12 @@ describe('ProjectLocator', function () {
       })
     })
 
-    describe('with a null project', function () {
-      beforeEach(function () {
+    describe('with a null project', function() {
+      beforeEach(function() {
         this.ProjectGetter = { getProject: sinon.stub().callsArg(2) }
       })
 
-      it('should not crash with a null', function (done) {
+      it('should not crash with a null', function(done) {
         const path = '/other.tex'
         this.locator.findElementByPath(
           { project_id: project._id, path },
@@ -546,8 +546,8 @@ describe('ProjectLocator', function () {
       })
     })
 
-    describe('with a project_id', function () {
-      it('should take a doc path and return the element for a root level document', function (done) {
+    describe('with a project_id', function() {
+      it('should take a doc path and return the element for a root level document', function(done) {
         const path = `${doc1.name}`
         this.locator.findElementByPath(
           { project_id: project._id, path },
@@ -567,8 +567,8 @@ describe('ProjectLocator', function () {
     })
   })
 
-  describe('findUsersProjectByName finding a project by user_id and project name', function () {
-    it('should return the project from an array case insenstive', function (done) {
+  describe('findUsersProjectByName finding a project by user_id and project name', function() {
+    it('should return the project from an array case insenstive', function(done) {
       const userId = '123jojoidns'
       const stubbedProject = { name: 'findThis' }
       const projects = {
@@ -595,7 +595,7 @@ describe('ProjectLocator', function () {
       )
     })
 
-    it('should return the project which is not archived', function (done) {
+    it('should return the project which is not archived', function(done) {
       const userId = '123jojoidns'
       const stubbedProject = { name: 'findThis', _id: 12331321 }
       const projects = {
@@ -644,7 +644,7 @@ describe('ProjectLocator', function () {
       )
     })
 
-    it('should search collab projects as well', function (done) {
+    it('should search collab projects as well', function(done) {
       const userId = '123jojoidns'
       const stubbedProject = { name: 'findThis' }
       const projects = {

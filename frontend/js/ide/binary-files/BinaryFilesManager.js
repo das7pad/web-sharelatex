@@ -10,7 +10,7 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['./controllers/BinaryFileController'], function () {
+define(['./controllers/BinaryFileController'], function() {
   let BinaryFilesManager
   return (BinaryFilesManager = class BinaryFilesManager {
     constructor(ide, $scope) {

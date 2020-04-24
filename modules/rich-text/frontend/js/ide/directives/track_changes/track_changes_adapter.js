@@ -3,7 +3,7 @@
  */
 define([
   '../../../../../../../frontend/js/ide/editor/EditorShareJsCodec'
-], function (EditorShareJsCodec) {
+], function(EditorShareJsCodec) {
   class TrackChangesAdapter {
     constructor(editor) {
       this.findTrackChangesMarker = this.findTrackChangesMarker.bind(this)
@@ -17,7 +17,7 @@ define([
     }
 
     getTrackChangesMarkers() {
-      return this.cm.doc.getAllMarks().filter((marker) => {
+      return this.cm.doc.getAllMarks().filter(marker => {
         const isInsertOrCommentMarker =
           marker.className &&
           marker.className.indexOf('track-changes-marker') !== -1
@@ -32,12 +32,12 @@ define([
 
     findTrackChangesMarker(markerId) {
       return this.getTrackChangesMarkers().find(
-        (marker) => marker.id === markerId
+        marker => marker.id === markerId
       )
     }
 
     clearAnnotations() {
-      this.getTrackChangesMarkers().forEach((marker) => marker.clear())
+      this.getTrackChangesMarkers().forEach(marker => marker.clear())
 
       this.changeIdToMarkerIdMap = {}
     }

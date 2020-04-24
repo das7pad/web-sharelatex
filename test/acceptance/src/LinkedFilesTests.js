@@ -20,23 +20,23 @@ LinkedUrlProxy.get('/', (req, res, next) => {
   }
 })
 
-describe('LinkedFiles', function () {
+describe('LinkedFiles', function() {
   let projectOne, projectOneId, projectOneRootFolderId
   let projectTwo, projectTwoId, projectTwoRootFolderId
   const sourceDocName = 'test.txt'
   let owner
 
-  before(function (done) {
+  before(function(done) {
     LinkedUrlProxy.listen(6543, done)
   })
 
-  beforeEach(async function () {
+  beforeEach(async function() {
     owner = new User()
     await owner.login()
   })
 
-  describe('creating a project linked file', function () {
-    beforeEach(async function () {
+  describe('creating a project linked file', function() {
+    beforeEach(async function() {
       projectOneId = await owner.createProject('plf-test-one', {
         template: 'blank'
       })
@@ -61,7 +61,7 @@ describe('LinkedFiles', function () {
       )
     })
 
-    it('should produce a list of the users projects and their entities', async function () {
+    it('should produce a list of the users projects and their entities', async function() {
       let { body } = await owner.doRequest('get', {
         url: '/user/projects',
         json: true
@@ -95,7 +95,7 @@ describe('LinkedFiles', function () {
       })
     })
 
-    it('should import a file and refresh it if there is no v1 id', async function () {
+    it('should import a file and refresh it if there is no v1 id', async function() {
       // import the file from the source project
       let { response, body } = await owner.doRequest('post', {
         url: `/project/${projectOneId}/linked_file`,
@@ -157,8 +157,8 @@ describe('LinkedFiles', function () {
     })
   })
 
-  describe('with a linked project_file from a v1 project that has not been imported', function () {
-    beforeEach(async function () {
+  describe('with a linked project_file from a v1 project that has not been imported', function() {
+    beforeEach(async function() {
       projectOneId = await owner.createProject('plf-v1-test-one', {
         template: 'blank'
       })
@@ -178,7 +178,7 @@ describe('LinkedFiles', function () {
       await owner.saveProject(projectOne)
     })
 
-    it('should refuse to refresh', async function () {
+    it('should refuse to refresh', async function() {
       const { response, body } = await owner.doRequest('post', {
         url: `/project/${projectOneId}/linked_file/abcd/refresh`,
         json: true
@@ -190,8 +190,8 @@ describe('LinkedFiles', function () {
     })
   })
 
-  describe('creating a URL based linked file', function () {
-    beforeEach(async function () {
+  describe('creating a URL based linked file', function() {
+    beforeEach(async function() {
       projectOneId = await owner.createProject('url-linked-files-project', {
         template: 'blank'
       })
@@ -199,7 +199,7 @@ describe('LinkedFiles', function () {
       projectOneRootFolderId = projectOne.rootFolder[0]._id.toString()
     })
 
-    it('should download, create and replace a file', async function () {
+    it('should download, create and replace a file', async function() {
       // downloading the initial file
       let { response, body } = await owner.doRequest('post', {
         url: `/project/${projectOneId}/linked_file`,
@@ -267,7 +267,7 @@ describe('LinkedFiles', function () {
       expect(body).to.equal('bar bar bar')
     })
 
-    it("should return an error if the file can't be downloaded", async function () {
+    it("should return an error if the file can't be downloaded", async function() {
       // download does not succeed
       let { response, body } = await owner.doRequest('post', {
         url: `/project/${projectOneId}/linked_file`,
@@ -320,7 +320,7 @@ describe('LinkedFiles', function () {
       )
     })
 
-    it('should accept a URL withuot a leading http://, and add it', async function () {
+    it('should accept a URL withuot a leading http://, and add it', async function() {
       let { response, body } = await owner.doRequest('post', {
         url: `/project/${projectOneId}/linked_file`,
         json: {
@@ -338,7 +338,7 @@ describe('LinkedFiles', function () {
 
       const file = _.find(
         updatedProject.rootFolder[0].fileRefs,
-        (file) => file.name === 'url-test-file-6'
+        file => file.name === 'url-test-file-6'
       )
       expect(file.linkedFileData).to.deep.equal({
         provider: 'url',
@@ -356,8 +356,8 @@ describe('LinkedFiles', function () {
   // TODO: Add test for asking for host that return ENOTFOUND
   // (This will probably end up handled by the proxy)
 
-  describe('creating a linked output file', function () {
-    beforeEach(async function () {
+  describe('creating a linked output file', function() {
+    beforeEach(async function() {
       projectOneId = await owner.createProject('output-test-one', {
         template: 'blank'
       })
@@ -371,7 +371,7 @@ describe('LinkedFiles', function () {
       projectTwoRootFolderId = projectTwo.rootFolder[0]._id.toString()
     })
 
-    it('should import the project.pdf file from the source project and refresh it', async function () {
+    it('should import the project.pdf file from the source project and refresh it', async function() {
       // import the file
       let { response, body } = await owner.doRequest('post', {
         url: `/project/${projectOneId}/linked_file`,
@@ -418,8 +418,8 @@ describe('LinkedFiles', function () {
     })
   })
 
-  describe('with a linked project_output_file from a v1 project that has not been imported', function () {
-    beforeEach(async function () {
+  describe('with a linked project_output_file from a v1 project that has not been imported', function() {
+    beforeEach(async function() {
       projectOneId = await owner.createProject('output-v1-test-one', {
         template: 'blank'
       })
@@ -440,7 +440,7 @@ describe('LinkedFiles', function () {
       await owner.saveProject(projectOne)
     })
 
-    it('should refuse to refresh', async function () {
+    it('should refuse to refresh', async function() {
       const { response, body } = await owner.doRequest('post', {
         url: `/project/${projectOneId}/linked_file/abcdef/refresh`,
         json: true

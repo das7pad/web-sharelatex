@@ -14,7 +14,7 @@ console.log(
   `>> Creating index on ${JSON.stringify(keys)}, ${JSON.stringify(opts)}`
 )
 
-db.projects.createIndex(keys, opts, (err) => {
+db.projects.createIndex(keys, opts, err => {
   if (err) {
     throw err
   }

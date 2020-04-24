@@ -11,12 +11,12 @@ module.exports = MockAnalyticsApi = {
     })
 
     app
-      .listen(3050, (error) => {
+      .listen(3050, error => {
         if (error) {
           throw error
         }
       })
-      .on('error', (error) => {
+      .on('error', error => {
         console.error('error starting MockAnalyticsApi:', error.message)
         return process.exit(1)
       })

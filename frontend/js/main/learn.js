@@ -18,8 +18,8 @@ define([
   '../base',
   '../directives/mathjax',
   '../services/algolia-search'
-], function (App) {
-  App.controller('SearchWikiController', function (
+], function(App) {
+  App.controller('SearchWikiController', function(
     $scope,
     algoliaSearch,
     _,
@@ -30,12 +30,12 @@ define([
     $scope.config_hits_per_page = 20
     $scope.processingSearch = false
 
-    $scope.clearSearchText = function () {
+    $scope.clearSearchText = function() {
       $scope.searchQueryText = ''
       return updateHits([])
     }
 
-    $scope.safeApply = function (fn) {
+    $scope.safeApply = function(fn) {
       const phase = $scope.$root.$$phase
       if (phase === '$apply' || phase === '$digest') {
         return $scope.$eval(fn)
@@ -44,7 +44,7 @@ define([
       }
     }
 
-    const buildHitViewModel = function (hit) {
+    const buildHitViewModel = function(hit) {
       const pagePath = hit.kb ? 'how-to/' : 'latex/'
       const pageSlug = encodeURIComponent(hit.pageName.replace(/\s/g, '_'))
       let section_underscored = ''
@@ -87,7 +87,7 @@ define([
       })
     }
 
-    $scope.search = function () {
+    $scope.search = function() {
       $scope.processingSearch = true
       const query = $scope.searchQueryText
       if (query == null || query.length === 0) {
@@ -100,7 +100,7 @@ define([
         {
           hitsPerPage: $scope.config_hits_per_page
         },
-        function (err, response) {
+        function(err, response) {
           $scope.processingSearch = false
           if (response.hits.length === 0) {
             return updateHits([])
@@ -113,5 +113,5 @@ define([
     }
   })
 
-  return App.controller('LearnController', function () {})
+  return App.controller('LearnController', function() {})
 })

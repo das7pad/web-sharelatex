@@ -4,7 +4,7 @@ const institutionId = parseInt(process.argv[2])
 if (isNaN(institutionId)) throw new Error('No institution id')
 console.log('Checking users of institution', institutionId)
 
-InstitutionsManager.checkInstitutionUsers(institutionId, function (
+InstitutionsManager.checkInstitutionUsers(institutionId, function(
   error,
   usersSummary
 ) {

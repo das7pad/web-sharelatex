@@ -18,7 +18,7 @@ const userEntitlements = loadUserEntitlements(argv['user-entitlements'])
 const cachedEntitlements = loadCachedEntitlements(argv['cached-entitlements'])
 
 syncUserEntitlements(userEntitlements, cachedEntitlements)
-  .catch((err) => console.error(err.stack))
+  .catch(err => console.error(err.stack))
   .then(() => process.exit())
 
 async function syncUserEntitlements(userEntitlements, cachedEntitlements) {
@@ -31,7 +31,7 @@ async function syncUserEntitlements(userEntitlements, cachedEntitlements) {
       }
       // get samlIdentifiers entry for email
       const samlIdentifier = userEntitlement.samlIdentifiers.find(
-        (samlIdentifier) => samlIdentifier.providerId === email.samlProviderId
+        samlIdentifier => samlIdentifier.providerId === email.samlProviderId
       )
       // validate that entitlement is cached
       if (samlIdentifier) {
@@ -72,7 +72,7 @@ async function syncUserEntitlements(userEntitlements, cachedEntitlements) {
     // find any samlIdentifier records missing email entry
     for (const samlIdentifier of userEntitlement.samlIdentifiers) {
       const email = userEntitlement.emails.find(
-        (email) => email.samlProviderId === samlIdentifier.providerId
+        email => email.samlProviderId === samlIdentifier.providerId
       )
       if (!email) {
         console.log(
@@ -92,7 +92,7 @@ async function syncUserEntitlements(userEntitlements, cachedEntitlements) {
     if (userEntitlement) {
       // find samlIdentifier for provider
       const samlIdentifier = userEntitlement.samlIdentifiers.find(
-        (samlIdentifier) =>
+        samlIdentifier =>
           samlIdentifier.providerId === cachedEntitlment.providerId
       )
       if (!samlIdentifier || !samlIdentifier.hasEntitlement) {

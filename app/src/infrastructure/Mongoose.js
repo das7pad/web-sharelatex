@@ -29,7 +29,7 @@ mongoose.connection.on('connected', () =>
   )
 )
 
-mongoose.connection.on('error', (err) =>
+mongoose.connection.on('error', err =>
   logger.err({ err }, 'mongoose error on default connection')
 )
 
@@ -43,7 +43,7 @@ if (process.env.MONGOOSE_DEBUG) {
   )
 }
 
-mongoose.plugin((schema) => {
+mongoose.plugin(schema => {
   schema.options.usePushEach = true
 })
 

@@ -21,7 +21,7 @@ const V1Api = require('../V1/V1Api')
 module.exports = BrandVariationsHandler = {
   getBrandVariationById(brandVariationId, callback) {
     if (callback == null) {
-      callback = function (error, brandVariationDetails) {}
+      callback = function(error, brandVariationDetails) {}
     }
     if (brandVariationId == null || brandVariationId === '') {
       return callback(new Error('Branding variation id not provided'))
@@ -31,7 +31,7 @@ module.exports = BrandVariationsHandler = {
       {
         uri: `/api/v2/brand_variations/${brandVariationId}`
       },
-      function (error, response, brandVariationDetails) {
+      function(error, response, brandVariationDetails) {
         if (error != null) {
           logger.warn(
             { brandVariationId, error },
@@ -46,7 +46,7 @@ module.exports = BrandVariationsHandler = {
   }
 }
 
-var _formatBrandVariationDetails = function (details) {
+var _formatBrandVariationDetails = function(details) {
   if (details.export_url != null) {
     details.export_url = _setV1AsHostIfRelativeURL(details.export_url)
   }
@@ -78,7 +78,7 @@ var _formatBrandVariationDetails = function (details) {
   }
 }
 
-var _setV1AsHostIfRelativeURL = (urlString) =>
+var _setV1AsHostIfRelativeURL = urlString =>
   // The 2nd argument is the base URL to resolve against if the 1st argument is not absolute.
   // As it only applies if the 1st argument is not absolute, we can use it to transform relative URLs into
   // absolute ones using v1 as the host. If the URL is absolute (e.g. a filepicker one), then the base

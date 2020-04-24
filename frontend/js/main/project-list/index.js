@@ -10,4 +10,4 @@ define([
   './notifications-controller',
   './left-hand-menu-promo-controller',
   '../../services/queued-http'
-], function () {})
+], function() {})

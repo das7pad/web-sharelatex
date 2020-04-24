@@ -12,7 +12,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['ace/ace', 'ace/ext-language_tools'], function () {
+define(['ace/ace', 'ace/ext-language_tools'], function() {
   const { Range } = ace.require('ace/range')
 
   var Helpers = {
@@ -31,7 +31,7 @@ define(['ace/ace', 'ace/ext-language_tools'], function () {
       //    \includegraphics[width=\textwidth]{..
       // should not match the \textwidth.
       let m
-      const blankArguments = lineUpToCursor.replace(/\[([^\]]*)\]/g, (args) =>
+      const blankArguments = lineUpToCursor.replace(/\[([^\]]*)\]/g, args =>
         Array(args.length + 1).join('.')
       )
       if ((m = blankArguments.match(/(\\[^\\]*)$/))) {
@@ -46,7 +46,7 @@ define(['ace/ace', 'ace/ext-language_tools'], function () {
         commandFragment != null
           ? commandFragment.match(/\\(\w+)\{/)
           : undefined,
-        (x) => x[1]
+        x => x[1]
       )
     },
 

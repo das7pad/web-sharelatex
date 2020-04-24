@@ -11,8 +11,8 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../../../../frontend/js/base'], (App) =>
-  App.controller('LaunchpadController', function ($scope, $http, $timeout) {
+define(['../../../../../../frontend/js/base'], App =>
+  App.controller('LaunchpadController', function($scope, $http, $timeout) {
     $scope.adminUserExists = window.data.adminUserExists
     $scope.ideJsPath = window.data.ideJsPath
     $scope.authMethod = window.data.authMethod
@@ -34,7 +34,7 @@ define(['../../../../../../frontend/js/base'], (App) =>
 
     $scope.shouldShowAdminForm = () => !$scope.adminUserExists
 
-    $scope.onCreateAdminSuccess = function (response) {
+    $scope.onCreateAdminSuccess = function(response) {
       const { status } = response
       if (status >= 200 && status < 300) {
         return ($scope.createAdminSuccess = true)
@@ -43,7 +43,7 @@ define(['../../../../../../frontend/js/base'], (App) =>
 
     $scope.onCreateAdminError = () => ($scope.createAdminError = true)
 
-    $scope.sendTestEmail = function () {
+    $scope.sendTestEmail = function() {
       $scope.testEmail.inflight = true
       $scope.testEmail.status = null
       return $http
@@ -51,32 +51,32 @@ define(['../../../../../../frontend/js/base'], (App) =>
           email: $scope.testEmail.emailAddress,
           _csrf: window.csrfToken
         })
-        .then(function (response) {
+        .then(function(response) {
           const { status } = response
           $scope.testEmail.inflight = false
           if (status >= 200 && status < 300) {
             return ($scope.testEmail.status = 'ok')
           }
         })
-        .catch(function () {
+        .catch(function() {
           $scope.testEmail.inflight = false
           return ($scope.testEmail.status = 'error')
         })
     }
 
-    $scope.tryFetchIdeJs = function () {
+    $scope.tryFetchIdeJs = function() {
       $scope.statusChecks.ideJs.status = 'inflight'
       return $timeout(
         () =>
           $http
             .get($scope.ideJsPath)
-            .then(function (response) {
+            .then(function(response) {
               const { status } = response
               if (status >= 200 && status < 300) {
                 return ($scope.statusChecks.ideJs.status = 'ok')
               }
             })
-            .catch(function (response) {
+            .catch(function(response) {
               const { status } = response
               $scope.statusChecks.ideJs.status = 'error'
               return ($scope.statusChecks.ideJs.error = new Error(
@@ -88,50 +88,50 @@ define(['../../../../../../frontend/js/base'], (App) =>
       )
     }
 
-    $scope.tryOpenWebSocket = function () {
+    $scope.tryOpenWebSocket = function() {
       $scope.statusChecks.websocket.status = 'inflight'
-      return $timeout(function () {
-        require(['socket.io-client'], function (io) {
+      return $timeout(function() {
+        require(['socket.io-client'], function(io) {
           const socket = io.connect(window.sharelatex.wsUrl || null, {
             reconnect: false,
             'connect timeout': 30 * 1000,
             'force new connection': true
           })
 
-          socket.on('connectionAccepted', function () {
+          socket.on('connectionAccepted', function() {
             $scope.statusChecks.websocket.status = 'ok'
-            return $scope.$apply(function () {})
+            return $scope.$apply(function() {})
           })
 
-          socket.on('connectionRejected', function (err) {
+          socket.on('connectionRejected', function(err) {
             $scope.statusChecks.websocket.status = 'error'
             $scope.statusChecks.websocket.error = err
-            return $scope.$apply(function () {})
+            return $scope.$apply(function() {})
           })
 
-          return socket.on('connect_failed', function (err) {
+          return socket.on('connect_failed', function(err) {
             $scope.statusChecks.websocket.status = 'error'
             $scope.statusChecks.websocket.error = err
-            return $scope.$apply(function () {})
+            return $scope.$apply(function() {})
           })
-        }, function (error) {
+        }, function(error) {
           $scope.statusChecks.websocket.status = 'error'
           $scope.statusChecks.websocket.error = error.message
         })
       }, 1000)
     }
 
-    $scope.tryHealthCheck = function () {
+    $scope.tryHealthCheck = function() {
       $scope.statusChecks.healthCheck.status = 'inflight'
       return $http
         .get('/health_check')
-        .then(function (response) {
+        .then(function(response) {
           const { status } = response
           if (status >= 200 && status < 300) {
             return ($scope.statusChecks.healthCheck.status = 'ok')
           }
         })
-        .catch(function (response) {
+        .catch(function(response) {
           const { status } = response
           $scope.statusChecks.healthCheck.status = 'error'
           return ($scope.statusChecks.healthCheck.error = new Error(
@@ -140,7 +140,7 @@ define(['../../../../../../frontend/js/base'], (App) =>
         })
     }
 
-    $scope.runStatusChecks = function () {
+    $scope.runStatusChecks = function() {
       $timeout(() => $scope.tryFetchIdeJs(), 1000)
       return $timeout(() => $scope.tryOpenWebSocket(), 2000)
     }

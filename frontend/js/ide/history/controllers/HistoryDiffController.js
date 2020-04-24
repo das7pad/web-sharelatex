@@ -11,19 +11,19 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base'], function (App) {
-  App.controller('HistoryDiffController', function (
+define(['../../../base'], function(App) {
+  App.controller('HistoryDiffController', function(
     $scope,
     $modal,
     ide,
     eventTracking
   ) {
-    $scope.restoreDeletedDoc = function () {
+    $scope.restoreDeletedDoc = function() {
       eventTracking.sendMB('history-restore-deleted')
       $scope.history.diff.restoreInProgress = true
       return ide.historyManager
         .restoreDeletedDoc($scope.history.diff.doc)
-        .then(function (response) {
+        .then(function(response) {
           const { data } = response
           $scope.history.diff.restoredDocNewId = data.doc_id
           $scope.history.diff.restoreInProgress = false
@@ -31,7 +31,7 @@ define(['../../../base'], function (App) {
         })
     }
 
-    $scope.openRestoreDiffModal = function () {
+    $scope.openRestoreDiffModal = function() {
       eventTracking.sendMB('history-restore-modal')
       return $modal.open({
         templateUrl: 'historyRestoreDiffModalTemplate',
@@ -48,7 +48,7 @@ define(['../../../base'], function (App) {
       ide.editorManager.openDoc({ id: $scope.history.diff.restoredDocNewId }))
   })
 
-  return App.controller('HistoryRestoreDiffModalController', function (
+  return App.controller('HistoryRestoreDiffModalController', function(
     $scope,
     $modalInstance,
     diff,
@@ -59,10 +59,10 @@ define(['../../../base'], function (App) {
 
     $scope.diff = diff
 
-    $scope.restore = function () {
+    $scope.restore = function() {
       eventTracking.sendMB('history-restored')
       $scope.state.inflight = true
-      return ide.historyManager.restoreDiff(diff).then(function () {
+      return ide.historyManager.restoreDiff(diff).then(function() {
         $scope.state.inflight = false
         $modalInstance.close()
         return ide.editorManager.openDoc(diff.doc)

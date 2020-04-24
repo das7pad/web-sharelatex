@@ -21,13 +21,13 @@ const modulePath = '../../../../app/src/Features/Project/ProjectHistoryHandler'
 const SandboxedModule = require('sandboxed-module')
 const { ObjectId } = require('mongoose').Types
 
-describe('ProjectHistoryHandler', function () {
+describe('ProjectHistoryHandler', function() {
   const project_id = '4eecb1c1bffa66588e0000a1'
   const userId = 1234
 
-  beforeEach(function () {
+  beforeEach(function() {
     let Project
-    this.ProjectModel = Project = (function () {
+    this.ProjectModel = Project = (function() {
       Project = class Project {
         static initClass() {
           this.prototype.rootFolder = [this.rootFolder]
@@ -65,8 +65,8 @@ describe('ProjectHistoryHandler', function () {
     }))
   })
 
-  describe('starting history for an existing project', function () {
-    beforeEach(function () {
+  describe('starting history for an existing project', function() {
+    beforeEach(function() {
       this.newHistoryId = 123456789
       this.HistoryManager.initializeProject = sinon
         .stub()
@@ -77,8 +77,8 @@ describe('ProjectHistoryHandler', function () {
         .callsArg(1))
     })
 
-    describe('when the history does not already exist', function () {
-      beforeEach(function () {
+    describe('when the history does not already exist', function() {
+      beforeEach(function() {
         this.ProjectDetailsHandler.getDetails = sinon
           .stub()
           .withArgs(project_id)
@@ -92,17 +92,17 @@ describe('ProjectHistoryHandler', function () {
         )
       })
 
-      it('should get any existing history id for the project', function () {
+      it('should get any existing history id for the project', function() {
         return this.ProjectDetailsHandler.getDetails
           .calledWith(project_id)
           .should.equal(true)
       })
 
-      it('should initialize a new history in the v1 history service', function () {
+      it('should initialize a new history in the v1 history service', function() {
         return this.HistoryManager.initializeProject.called.should.equal(true)
       })
 
-      it('should set the new history id on the project', function () {
+      it('should set the new history id on the project', function() {
         return this.ProjectModel.updateOne
           .calledWith(
             { _id: project_id, 'overleaf.history.id': { $exists: false } },
@@ -111,25 +111,25 @@ describe('ProjectHistoryHandler', function () {
           .should.equal(true)
       })
 
-      it('should resync the project history', function () {
+      it('should resync the project history', function() {
         return this.ProjectEntityUpdateHandler.resyncProjectHistory
           .calledWith(project_id)
           .should.equal(true)
       })
 
-      it('should flush the project history', function () {
+      it('should flush the project history', function() {
         return this.HistoryManager.flushProject
           .calledWith(project_id)
           .should.equal(true)
       })
 
-      it('should call the callback without an error', function () {
+      it('should call the callback without an error', function() {
         return this.callback.called.should.equal(true)
       })
     })
 
-    describe('when the history already exists', function () {
-      beforeEach(function () {
+    describe('when the history already exists', function() {
+      beforeEach(function() {
         this.project.overleaf = { history: { id: 1234 } }
         this.ProjectDetailsHandler.getDetails = sinon
           .stub()
@@ -142,31 +142,31 @@ describe('ProjectHistoryHandler', function () {
         )
       })
 
-      it('should get any existing history id for the project', function () {
+      it('should get any existing history id for the project', function() {
         return this.ProjectDetailsHandler.getDetails
           .calledWith(project_id)
           .should.equal(true)
       })
 
-      it('should not initialize a new history in the v1 history service', function () {
+      it('should not initialize a new history in the v1 history service', function() {
         return this.HistoryManager.initializeProject.called.should.equal(false)
       })
 
-      it('should not set the new history id on the project', function () {
+      it('should not set the new history id on the project', function() {
         return this.ProjectModel.updateOne.called.should.equal(false)
       })
 
-      it('should not resync the project history', function () {
+      it('should not resync the project history', function() {
         return this.ProjectEntityUpdateHandler.resyncProjectHistory.called.should.equal(
           false
         )
       })
 
-      it('should not flush the project history', function () {
+      it('should not flush the project history', function() {
         return this.HistoryManager.flushProject.called.should.equal(false)
       })
 
-      it('should call the callback', function () {
+      it('should call the callback', function() {
         return this.callback.calledWith().should.equal(true)
       })
     })

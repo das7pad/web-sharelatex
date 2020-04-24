@@ -8,7 +8,7 @@ const moment = require('moment')
 const IS_DEV_ENV = ['development', 'test'].includes(process.env.NODE_ENV)
 const HAS_MULTIPLE_LANG = Object.keys(Settings.i18n.subdomainLang).length > 1
 const LNG_TO_SPEC = new Map(
-  Object.entries(Settings.i18n.subdomainLang).filter((entry) => !entry[1].hide)
+  Object.entries(Settings.i18n.subdomainLang).filter(entry => !entry[1].hide)
 )
 
 const Features = require('./Features')
@@ -30,14 +30,14 @@ const cdnAvailable = Settings.cdn && Settings.cdn.web && !!Settings.cdn.web.host
 const sentryEnabled =
   Settings.sentry && Settings.sentry.frontend && !!Settings.sentry.frontend.dsn
 
-module.exports = function (webRouter, privateApiRouter, publicApiRouter) {
-  webRouter.use(function (req, res, next) {
+module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
+  webRouter.use(function(req, res, next) {
     res.locals.session = req.session
     next()
   })
 
   function addSetContentDisposition(req, res, next) {
-    res.setContentDisposition = function (type, opts) {
+    res.setContentDisposition = function(type, opts) {
       const directives = _.map(
         opts,
         (v, k) => `${k}="${encodeURIComponent(v)}"`
@@ -51,7 +51,7 @@ module.exports = function (webRouter, privateApiRouter, publicApiRouter) {
   privateApiRouter.use(addSetContentDisposition)
   publicApiRouter.use(addSetContentDisposition)
 
-  webRouter.use(function (req, res, next) {
+  webRouter.use(function(req, res, next) {
     req.externalAuthenticationSystemUsed =
       Features.externalAuthenticationSystemUsed
     res.locals.externalAuthenticationSystemUsed =
@@ -60,7 +60,7 @@ module.exports = function (webRouter, privateApiRouter, publicApiRouter) {
     next()
   })
 
-  webRouter.use(function (req, res, next) {
+  webRouter.use(function(req, res, next) {
     let staticFilesBase
     const cdnBlocked = req.query.nocdn === 'true' || req.session.cdnBlocked
     const userId = AuthenticationController.getLoggedInUserId(req)
@@ -80,7 +80,7 @@ module.exports = function (webRouter, privateApiRouter, publicApiRouter) {
     }
 
     const resourceHints = []
-    res.locals.finishPreloading = function () {
+    res.locals.finishPreloading = function() {
       if (!Settings.addResourceHints) {
         // refuse to add the Link header
         return
@@ -96,18 +96,18 @@ module.exports = function (webRouter, privateApiRouter, publicApiRouter) {
       res.setHeader(
         'Link',
         resourceHints
-          .map((r) => `<${r.uri}>;rel=${r.rel};as=${r.as}${crossorigin(r)}`)
+          .map(r => `<${r.uri}>;rel=${r.rel};as=${r.as}${crossorigin(r)}`)
           .join(',')
       )
     }
 
-    res.locals.preload = function (uri, as, crossorigin) {
+    res.locals.preload = function(uri, as, crossorigin) {
       resourceHints.push({ rel: 'preload', uri, as, crossorigin })
     }
-    res.locals.preloadCss = function (themeModifier) {
+    res.locals.preloadCss = function(themeModifier) {
       res.locals.preload(res.locals.buildCssPath(themeModifier), 'style')
     }
-    res.locals.preloadFont = function (name) {
+    res.locals.preloadFont = function(name) {
       // IE11 and Opera Mini are the only browsers that do not support WOFF 2.0
       //  https://caniuse.com/#search=woff2
       // They both ignore the preload header, so this is OK
@@ -115,11 +115,11 @@ module.exports = function (webRouter, privateApiRouter, publicApiRouter) {
       const uri = res.locals.staticPath(`/fonts/${name}.woff2`)
       res.locals.preload(uri, 'font', true)
     }
-    res.locals.preloadImg = function (path) {
+    res.locals.preloadImg = function(path) {
       res.locals.preload(res.locals.buildImgPath(path), 'image')
     }
 
-    res.locals.preloadCommonResources = function () {
+    res.locals.preloadCommonResources = function() {
       res.locals.preloadCss()
       if (Settings.brandPrefix === 'sl-') {
         ;[
@@ -142,7 +142,7 @@ module.exports = function (webRouter, privateApiRouter, publicApiRouter) {
     }
 
     const actualRender = res.render
-    res.render = function () {
+    res.render = function() {
       if (Settings.addResourceHints && !resourceHints.length) {
         res.locals.preloadCommonResources()
         res.locals.finishPreloading()
@@ -150,13 +150,13 @@ module.exports = function (webRouter, privateApiRouter, publicApiRouter) {
       actualRender.apply(res, arguments)
     }
 
-    res.locals.buildBaseAssetPath = function () {
+    res.locals.buildBaseAssetPath = function() {
       // Return the base asset path (including the CDN url) so that webpack can
       // use this to dynamically fetch scripts (e.g. PDFjs worker)
       return res.locals.staticPath('/')
     }
 
-    res.locals.staticPath = function (path) {
+    res.locals.staticPath = function(path) {
       if (staticFilesBase === '/') {
         return path.indexOf('/') === 0 ? path : '/' + path
       }
@@ -167,7 +167,7 @@ module.exports = function (webRouter, privateApiRouter, publicApiRouter) {
       return new URL(path, staticFilesBase).href
     }
 
-    res.locals.buildJsPath = function (jsFile) {
+    res.locals.buildJsPath = function(jsFile) {
       let path
       if (IS_DEV_ENV) {
         // In dev: resolve path within JS asset directory
@@ -186,7 +186,7 @@ module.exports = function (webRouter, privateApiRouter, publicApiRouter) {
 
     // Temporary hack while jQuery/Angular dependencies are *not* bundled,
     // instead copied into output directory
-    res.locals.buildCopiedJsAssetPath = function (jsFile) {
+    res.locals.buildCopiedJsAssetPath = function(jsFile) {
       let path
       if (IS_DEV_ENV) {
         // In dev: resolve path to root directory
@@ -208,10 +208,10 @@ module.exports = function (webRouter, privateApiRouter, publicApiRouter) {
     res.locals.moment = moment
 
     const IEEE_BRAND_ID = 15
-    res.locals.isIEEE = (brandVariation) =>
+    res.locals.isIEEE = brandVariation =>
       brandVariation && brandVariation.brand_id === IEEE_BRAND_ID
 
-    res.locals.getCssThemeModifier = function (userSettings, brandVariation) {
+    res.locals.getCssThemeModifier = function(userSettings, brandVariation) {
       // Themes only exist in OL v2
       if (Settings.hasThemes) {
         // The IEEE theme takes precedence over the user personal setting, i.e. a user with
@@ -228,7 +228,7 @@ module.exports = function (webRouter, privateApiRouter, publicApiRouter) {
       return `${Settings.brandPrefix}${themeModifier || ''}style.css`
     }
 
-    res.locals.buildCssPath = function (themeModifier) {
+    res.locals.buildCssPath = function(themeModifier) {
       const cssFileName = _buildCssFileName(themeModifier)
 
       let path
@@ -247,7 +247,7 @@ module.exports = function (webRouter, privateApiRouter, publicApiRouter) {
       return res.locals.staticPath(path)
     }
 
-    res.locals.buildImgPath = function (imgFile) {
+    res.locals.buildImgPath = function(imgFile) {
       const path = Path.join('/img/', imgFile)
       return res.locals.staticPath(path)
     }
@@ -255,8 +255,8 @@ module.exports = function (webRouter, privateApiRouter, publicApiRouter) {
     next()
   })
 
-  webRouter.use(function (req, res, next) {
-    res.locals.translate = function (key, vars) {
+  webRouter.use(function(req, res, next) {
+    res.locals.translate = function(key, vars) {
       if (vars == null) {
         vars = {}
       }
@@ -266,27 +266,27 @@ module.exports = function (webRouter, privateApiRouter, publicApiRouter) {
     next()
   })
 
-  webRouter.use(function (req, res, next) {
+  webRouter.use(function(req, res, next) {
     res.locals.recomendSubdomain = LNG_TO_SPEC.get(req.showUserOtherLng)
     res.locals.currentLngCode = req.lng
     next()
   })
 
-  webRouter.use(function (req, res, next) {
-    res.locals.getUserEmail = function () {
+  webRouter.use(function(req, res, next) {
+    res.locals.getUserEmail = function() {
       const user = AuthenticationController.getSessionUser(req)
       return (user && user.email) || ''
     }
     next()
   })
 
-  webRouter.use(function (req, res, next) {
+  webRouter.use(function(req, res, next) {
     res.locals.StringHelper = require('../Features/Helpers/StringHelper')
     next()
   })
 
-  webRouter.use(function (req, res, next) {
-    res.locals.buildReferalUrl = function (referalMedium) {
+  webRouter.use(function(req, res, next) {
+    res.locals.buildReferalUrl = function(referalMedium) {
       let url = Settings.siteUrl
       const referralId = res.locals.getReferalId()
       if (referralId) {
@@ -294,30 +294,30 @@ module.exports = function (webRouter, privateApiRouter, publicApiRouter) {
       }
       return url
     }
-    res.locals.getReferalId = function () {
+    res.locals.getReferalId = function() {
       const currentUser = AuthenticationController.getSessionUser(req)
       return currentUser && currentUser.referal_id
     }
     next()
   })
 
-  webRouter.use(function (req, res, next) {
+  webRouter.use(function(req, res, next) {
     res.locals.csrfToken = req.csrfToken()
     next()
   })
 
-  webRouter.use(function (req, res, next) {
+  webRouter.use(function(req, res, next) {
     res.locals.gaToken = Settings.analytics && Settings.analytics.ga.token
     res.locals.gaOptimizeId = _.get(Settings, ['analytics', 'gaOptimize', 'id'])
     next()
   })
 
-  webRouter.use(function (req, res, next) {
-    res.locals.getReqQueryParam = (field) => req.query[field]
+  webRouter.use(function(req, res, next) {
+    res.locals.getReqQueryParam = field => req.query[field]
     next()
   })
 
-  webRouter.use(function (req, res, next) {
+  webRouter.use(function(req, res, next) {
     const currentUser = AuthenticationController.getSessionUser(req)
     if (currentUser) {
       res.locals.user = {
@@ -337,7 +337,7 @@ module.exports = function (webRouter, privateApiRouter, publicApiRouter) {
     next()
   })
 
-  webRouter.use(function (req, res, next) {
+  webRouter.use(function(req, res, next) {
     res.locals.getLoggedInUserId = () =>
       AuthenticationController.getLoggedInUserId(req)
     res.locals.getSessionUser = () =>
@@ -345,7 +345,7 @@ module.exports = function (webRouter, privateApiRouter, publicApiRouter) {
     next()
   })
 
-  webRouter.use(function (req, res, next) {
+  webRouter.use(function(req, res, next) {
     // Clone the nav settings so they can be modified for each request
     res.locals.nav = {}
     for (const key in Settings.nav) {
@@ -355,7 +355,7 @@ module.exports = function (webRouter, privateApiRouter, publicApiRouter) {
     next()
   })
 
-  webRouter.use(function (req, res, next) {
+  webRouter.use(function(req, res, next) {
     if (Settings.reloadModuleViewsOnEachRequest) {
       Modules.loadViewIncludes()
     }
@@ -364,7 +364,7 @@ module.exports = function (webRouter, privateApiRouter, publicApiRouter) {
     next()
   })
 
-  webRouter.use(function (req, res, next) {
+  webRouter.use(function(req, res, next) {
     res.locals.uiConfig = {
       defaultResizerSizeOpen: 7,
       defaultResizerSizeClosed: 7,
@@ -380,7 +380,7 @@ module.exports = function (webRouter, privateApiRouter, publicApiRouter) {
     next()
   })
 
-  webRouter.use(function (req, res, next) {
+  webRouter.use(function(req, res, next) {
     // TODO
     if (Settings.hasThemes) {
       res.locals.overallThemes = [
@@ -399,12 +399,12 @@ module.exports = function (webRouter, privateApiRouter, publicApiRouter) {
     next()
   })
 
-  webRouter.use(function (req, res, next) {
+  webRouter.use(function(req, res, next) {
     res.locals.settings = Settings
     next()
   })
 
-  webRouter.use(function (req, res, next) {
+  webRouter.use(function(req, res, next) {
     res.locals.ExposedSettings = {
       isOverleaf: !!Settings.overleaf,
       appName: Settings.appName,

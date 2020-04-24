@@ -6,4 +6,4 @@
 define([
   './controllers/WordCountController',
   './controllers/WordCountModalController'
-], function () {})
+], function() {})

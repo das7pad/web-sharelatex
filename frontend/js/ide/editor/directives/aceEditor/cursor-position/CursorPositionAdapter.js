@@ -10,7 +10,7 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../EditorShareJsCodec'], function (EditorShareJsCodec) {
+define(['../../../EditorShareJsCodec'], function(EditorShareJsCodec) {
   let CursorPositionAdapter
   return (CursorPositionAdapter = class CursorPositionAdapter {
     constructor(editor) {
@@ -46,7 +46,10 @@ define(['../../../EditorShareJsCodec'], function (EditorShareJsCodec) {
     }
 
     gotoOffset(offset) {
-      const lines = this.editor.getSession().getDocument().getAllLines()
+      const lines = this.editor
+        .getSession()
+        .getDocument()
+        .getAllLines()
       const position = EditorShareJsCodec.shareJsOffsetToRowColumn(
         offset,
         lines

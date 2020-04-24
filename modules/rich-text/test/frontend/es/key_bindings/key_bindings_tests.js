@@ -15,8 +15,8 @@ const autocompleteAdapterStub = {
   getBeginCommandArguments: () => ['environmentName']
 }
 
-describe('Key bindings', function () {
-  beforeEach(function () {
+describe('Key bindings', function() {
+  beforeEach(function() {
     const html = fixture.load(FIXTURE_HTML)
 
     this.getSetting = sinon.stub()
@@ -31,7 +31,7 @@ describe('Key bindings', function () {
     this.cm = this.editor.getCodeMirror()
   })
 
-  afterEach(function () {
+  afterEach(function() {
     fixture.cleanUp()
     this.editor.disable()
   })
@@ -48,7 +48,7 @@ describe('Key bindings', function () {
    */
   function fakeNamedKey(cm, keyName) {
     var ctrl, shift, alt
-    var key = keyName.replace(/\w+-/g, function (type) {
+    var key = keyName.replace(/\w+-/g, function(type) {
       if (type === 'Ctrl-') ctrl = true
       else if (type === 'Alt-') alt = true
       else if (type === 'Shift-') shift = true
@@ -71,8 +71,8 @@ describe('Key bindings', function () {
       ctrlKey: ctrl,
       shiftKey: shift,
       altKey: alt,
-      preventDefault: function () {},
-      stopPropagation: function () {}
+      preventDefault: function() {},
+      stopPropagation: function() {}
     })
   }
 
@@ -103,12 +103,12 @@ describe('Key bindings', function () {
     expect(cursor.ch).to.equal(ch)
   }
 
-  describe('Auto close braces and quotes', function () {
-    beforeEach(function () {
+  describe('Auto close braces and quotes', function() {
+    beforeEach(function() {
       this.getSetting.withArgs('autoCloseBrackets').returns(true)
     })
 
-    it('works', function () {
+    it('works', function() {
       // match braces
       expect(fakeExtraKey(this.cm, '{')).to.be.undefined
       expect(this.cm.getValue()).to.equal('{}')
@@ -183,7 +183,7 @@ describe('Key bindings', function () {
       expect(this.cm.getValue()).to.equal('xy')
     })
 
-    it('works with multiple cursors', function () {
+    it('works with multiple cursors', function() {
       function expectRangesMatch(expectedRange, actualRange) {
         expect(expectedRange[0].anchor).to.deep.equal(actualRange[0].anchor)
         expect(expectedRange[0].head).to.deep.equal(actualRange[0].head)
@@ -245,8 +245,8 @@ describe('Key bindings', function () {
     })
   })
 
-  describe('Enter key', function () {
-    it('should add a new item on a list', function () {
+  describe('Enter key', function() {
+    it('should add a new item on a list', function() {
       this.cm.setValue(
         '\\begin{enumerate}\n' +
           '\\item FIRST\n' +
@@ -277,7 +277,7 @@ describe('Key bindings', function () {
       expect(lastClosedMark.checkedProperties.number).to.equal(2)
     })
 
-    it('should move a list to a new line when the cursor is before begin{...}', function () {
+    it('should move a list to a new line when the cursor is before begin{...}', function() {
       this.cm.setValue(
         '\n\\begin{enumerate}\n' +
           '\\item FIRST\n' +
@@ -297,7 +297,7 @@ describe('Key bindings', function () {
       expect(newCursor.ch).to.equal(0)
     })
 
-    it('should remove the last empty item pressing enter two times', function () {
+    it('should remove the last empty item pressing enter two times', function() {
       this.cm.setValue(
         '\\begin{enumerate}\n' +
           '\\item FIRST\n' +
@@ -325,7 +325,7 @@ describe('Key bindings', function () {
       expect(this.cm.getLine(8)).to.equal('')
     })
 
-    it('should place the last empty of nested list as item of the outer list', function () {
+    it('should place the last empty of nested list as item of the outer list', function() {
       this.cm.setValue(
         '\\begin{enumerate}\n' +
           '\\item FIRST\n' +
@@ -352,7 +352,7 @@ describe('Key bindings', function () {
       expect(this.cm.getLine(6)).to.equal('\\item ')
     })
 
-    it('should not insert an item when inside an open mark', function () {
+    it('should not insert an item when inside an open mark', function() {
       this.cm.setValue(
         '\\begin{itemize}\n' + '\\item \\textbf{abcabc}\n' + '\\end{itemize}'
       )
@@ -364,7 +364,7 @@ describe('Key bindings', function () {
       expect(this.cm.getLine(2)).to.equal('cabc}')
     })
 
-    it('should not insert a new item if begin{..} is not alone on the line', function () {
+    it('should not insert a new item if begin{..} is not alone on the line', function() {
       this.cm.setValue(
         '\\DeclareDocumentCommand\\ben{ O{1.)} }{\\begin{enumerate}[#1]}\n' +
           '\\DeclareDocumentCommand\\ben{ O{1.)} }' +
@@ -378,8 +378,8 @@ describe('Key bindings', function () {
     })
   })
 
-  describe('Up key', function () {
-    it('should go up in rich text mode even if there are no marks', function () {
+  describe('Up key', function() {
+    it('should go up in rich text mode even if there are no marks', function() {
       this.cm.setValue(
         '\\documentclass{minimal}\n' +
           '\\usepackage{pgf}\n' +
@@ -400,8 +400,8 @@ describe('Key bindings', function () {
     })
   })
 
-  describe('Backspace key', function () {
-    it('should delete the inner environment pressing backspace on the item', function () {
+  describe('Backspace key', function() {
+    it('should delete the inner environment pressing backspace on the item', function() {
       this.cm.setValue(
         '\\begin{enumerate}\n' +
           '\\item FIRST\n' +
@@ -420,7 +420,7 @@ describe('Key bindings', function () {
       expect(this.cm.getLine(4)).to.equal('\\item THIRD')
     })
 
-    it('should place the first item before begin pressing backspace', function () {
+    it('should place the first item before begin pressing backspace', function() {
       this.cm.setValue(
         '\\begin{enumerate}\n' +
           '\\item FIRST\n' +
@@ -440,7 +440,7 @@ describe('Key bindings', function () {
       expect(this.cm.getLine(0)).to.equal('FIRST')
     })
 
-    it('should be able to delete a character immediately after a section', function () {
+    it('should be able to delete a character immediately after a section', function() {
       this.cm.setValue('\\section{foo\n' + '}\n' + 'x')
 
       var linesBeforeDelete = this.cm.getValue().split('\n')
@@ -455,7 +455,7 @@ describe('Key bindings', function () {
       expect(linesAfterDelete).to.deep.equal(['\\section{foo', '}', ''])
     })
 
-    it('should go back one line before section, if that line is blank', function () {
+    it('should go back one line before section, if that line is blank', function() {
       this.cm.setValue('\n' + '\\section{a}')
       // Place cursor before "a"
       // \section{|a}
@@ -466,7 +466,7 @@ describe('Key bindings', function () {
       expect(this.cm.getLine(0)).to.equal('\\section{a}')
     })
 
-    it('should place cursor back one line, if the line before is not empty', function () {
+    it('should place cursor back one line, if the line before is not empty', function() {
       this.cm.setValue('abc\n' + '\\section{a}')
       // Place cursor before "a"
       // \section{|a}
@@ -478,7 +478,7 @@ describe('Key bindings', function () {
       expectCursorAt(this.cm, 0, 3)
     })
 
-    it('should place cursor in the section, after pressing backspace at the line after (with contents)', function () {
+    it('should place cursor in the section, after pressing backspace at the line after (with contents)', function() {
       this.cm.setValue('abc\n' + '\\section{a}\n' + 'aaa')
       // Place cursor before "aaa"
       // |aaa
@@ -490,7 +490,7 @@ describe('Key bindings', function () {
       expectCursorAt(this.cm, 1, 10)
     })
 
-    it('should place cursor in the section and remove the ling, after pressing backspace at the line after (without contents)', function () {
+    it('should place cursor in the section and remove the ling, after pressing backspace at the line after (without contents)', function() {
       this.cm.setValue('abc\n' + '\\section{a}\n' + 'b\n')
       // Place cursor before "b"
       // |b
@@ -503,7 +503,7 @@ describe('Key bindings', function () {
       expect(this.cm.getLine(2)).to.equal('b')
     })
 
-    it('should delete an abstract if empty', function () {
+    it('should delete an abstract if empty', function() {
       this.cm.setValue('\\begin{abstract}\n' + '\n' + '\\end{abstract}')
       // Place cursor on line between \begin and \end
       this.cm.setCursor({ line: 1, ch: 0 })
@@ -513,7 +513,7 @@ describe('Key bindings', function () {
       expect(this.cm.getLine(0)).to.equal('')
     })
 
-    it('should skip when pressing backspace after an abstract', function () {
+    it('should skip when pressing backspace after an abstract', function() {
       this.cm.setValue(
         '\\begin{abstract}\n' + '\n' + '\\end{abstract}\n' + 'aa'
       )
@@ -527,7 +527,7 @@ describe('Key bindings', function () {
       expectCursorAt(this.cm, 1, 0)
     })
 
-    it('should delete a section command if empty and surrounded by text', function () {
+    it('should delete a section command if empty and surrounded by text', function() {
       this.cm.setValue('abc\n' + 'te\\section{}xt\n' + 'b\n')
       // Place cursor within section argument
       // te\section{|}xt
@@ -539,7 +539,7 @@ describe('Key bindings', function () {
       expectCursorAt(this.cm, 1, 2)
     })
 
-    it('should not delete the bracket after a section command if empty', function () {
+    it('should not delete the bracket after a section command if empty', function() {
       this.cm.setValue('abc\n' + '\\section{}\n' + 'b\n')
       // Place cursor after section argument
       // \section{}|
@@ -551,7 +551,7 @@ describe('Key bindings', function () {
       expectCursorAt(this.cm, 1, 9)
     })
 
-    it('should delete the text before the section pressing backspace', function () {
+    it('should delete the text before the section pressing backspace', function() {
       this.cm.setValue('abc\n' + 'tex\\section{section}\n' + 'b\n')
       // Place cursor at beginning of section argument, before "section" text
       // tex\section{|section}
@@ -563,7 +563,7 @@ describe('Key bindings', function () {
       expectCursorAt(this.cm, 1, 11)
     })
 
-    it('should delete a section command if empty', function () {
+    it('should delete a section command if empty', function() {
       this.cm.setValue('abc\n' + '\\section{}\n' + 'b\n')
       // Place cursor within section argument
       // \section{|}
@@ -575,7 +575,7 @@ describe('Key bindings', function () {
       expectCursorAt(this.cm, 1, 0)
     })
 
-    it('should do nothing pressing backspace at the end of a section', function () {
+    it('should do nothing pressing backspace at the end of a section', function() {
       this.cm.setValue('abc\n' + 'tex\\section{section}abc\n' + 'b\n')
       // Place cursor at end of section argument, after "section" text
       // tex\section{section|}abc
@@ -586,7 +586,7 @@ describe('Key bindings', function () {
       expect(this.cm.getLine(1)).to.equal('tex\\section{section}abc')
     })
 
-    it('should delete a subsection command if empty', function () {
+    it('should delete a subsection command if empty', function() {
       this.cm.setValue('abc\n' + '\\subsection{}\n' + 'b\n')
       // Place cursor inside subsection argument
       // \subsection{|}
@@ -598,7 +598,7 @@ describe('Key bindings', function () {
       expectCursorAt(this.cm, 1, 0)
     })
 
-    it('should delete a subsection command if empty and surrounded by text', function () {
+    it('should delete a subsection command if empty and surrounded by text', function() {
       this.cm.setValue('abc\n' + 'te\\subsection{}xt\n' + 'b\n')
       // Place cursor inside subsection argument
       // te\subsection{|}xt
@@ -610,7 +610,7 @@ describe('Key bindings', function () {
       expectCursorAt(this.cm, 1, 2)
     })
 
-    it('should not delete the bracket after a subsection command if empty', function () {
+    it('should not delete the bracket after a subsection command if empty', function() {
       this.cm.setValue('abc\n' + '\\subsection{}\n' + 'b\n')
       // Place cursor after subsection argument
       // \subsection{}|
@@ -622,7 +622,7 @@ describe('Key bindings', function () {
       expectCursorAt(this.cm, 1, 12)
     })
 
-    it('should delete the text before the subsection pressing backspace', function () {
+    it('should delete the text before the subsection pressing backspace', function() {
       this.cm.setValue('abc\n' + 'tex\\subsection{subsection}\n' + 'b\n')
       // Place cursor at start of \subsection argument, before "subsection" text
       // tex\subsection{|subsection}
@@ -634,7 +634,7 @@ describe('Key bindings', function () {
       expectCursorAt(this.cm, 1, 14)
     })
 
-    it('should do nothing pressing backspace at the end of a subsection', function () {
+    it('should do nothing pressing backspace at the end of a subsection', function() {
       this.cm.setValue('abc\n' + 'tex\\subsection{subsection}abc\n' + 'b\n')
       // Place cursor at end of subsection argument, after "subsection" text
       // tex\subsection{subsection|}abc
@@ -645,7 +645,7 @@ describe('Key bindings', function () {
       expect(this.cm.getLine(1)).to.equal('tex\\subsection{subsection}abc')
     })
 
-    it('should delete a subsubsection command if empty', function () {
+    it('should delete a subsubsection command if empty', function() {
       this.cm.setValue('abc\n' + '\\subsubsection{}\n' + 'b\n')
       // Place cursor inside subsubsection argument
       // \subsubsection{|}
@@ -657,7 +657,7 @@ describe('Key bindings', function () {
       expectCursorAt(this.cm, 1, 0)
     })
 
-    it('should delete a subsubsection command if empty and surrounded by text', function () {
+    it('should delete a subsubsection command if empty and surrounded by text', function() {
       this.cm.setValue('abc\n' + 'te\\subsubsection{}xt\n' + 'b\n')
       // Place cursor inside subsubsection argument
       // tx\subsubsection{|}
@@ -669,7 +669,7 @@ describe('Key bindings', function () {
       expectCursorAt(this.cm, 1, 2)
     })
 
-    it('should not delete the bracket after a subsubsection command if empty', function () {
+    it('should not delete the bracket after a subsubsection command if empty', function() {
       this.cm.setValue('abc\n' + '\\subsubsection{}\n' + 'b\n')
       // Place cursor after subsubsection argument
       // \subsubsection{}|
@@ -681,7 +681,7 @@ describe('Key bindings', function () {
       expectCursorAt(this.cm, 1, 15)
     })
 
-    it('should delete the text before the subsubsection pressing backspace', function () {
+    it('should delete the text before the subsubsection pressing backspace', function() {
       this.cm.setValue('abc\n' + 'tex\\subsubsection{subsubsection}\n' + 'b\n')
       // Place cursor at start of subsubsection argument, before "subsubsection"
       // text
@@ -694,7 +694,7 @@ describe('Key bindings', function () {
       expectCursorAt(this.cm, 1, 17)
     })
 
-    it('should do nothing pressing backspace at the end of a subsubsection', function () {
+    it('should do nothing pressing backspace at the end of a subsubsection', function() {
       this.cm.setValue(
         'abc\n' + 'tex\\subsubsection{subsubsection}abc\n' + 'b\n'
       )
@@ -709,7 +709,7 @@ describe('Key bindings', function () {
       )
     })
 
-    it('should delete a chapter command if empty', function () {
+    it('should delete a chapter command if empty', function() {
       this.cm.setValue('abc\n' + '\\chapter{}\n' + 'b\n')
       // Place cursor inside chapter argument
       // \chapter{|}
@@ -721,7 +721,7 @@ describe('Key bindings', function () {
       expectCursorAt(this.cm, 1, 0)
     })
 
-    it('should delete a chapter command if empty and surrounded by text', function () {
+    it('should delete a chapter command if empty and surrounded by text', function() {
       this.cm.setValue('abc\n' + 'te\\chapter{}xt\n' + 'b\n')
       // Place cursor inside chapter argument
       // te\chapter{|}xt
@@ -733,7 +733,7 @@ describe('Key bindings', function () {
       expectCursorAt(this.cm, 1, 2)
     })
 
-    it('should not delete the bracket after a chapter command if empty', function () {
+    it('should not delete the bracket after a chapter command if empty', function() {
       this.cm.setValue('abc\n' + '\\chapter{}\n' + 'b\n')
       // Place cursor after chapter argument
       // \chapter{}|
@@ -745,7 +745,7 @@ describe('Key bindings', function () {
       expectCursorAt(this.cm, 1, 9)
     })
 
-    it('should delete the text before the chapter pressing backspace', function () {
+    it('should delete the text before the chapter pressing backspace', function() {
       this.cm.setValue('abc\n' + 'tex\\chapter{chapter}\n' + 'b\n')
       // Place cursor at start of chapter argument, before "chapter" text
       // tex\chapter{|chapter}
@@ -757,7 +757,7 @@ describe('Key bindings', function () {
       expectCursorAt(this.cm, 1, 11)
     })
 
-    it('should do nothing pressing backspace at the end of a chapter', function () {
+    it('should do nothing pressing backspace at the end of a chapter', function() {
       this.cm.setValue('abc\n' + 'tex\\chapter{chapter}abc\n' + 'b\n')
       // Place cursor after chapter argument
       // tex\chapter{chapter}|abc
@@ -769,8 +769,8 @@ describe('Key bindings', function () {
     })
   })
 
-  describe('Delete key', function () {
-    it('should delete a char before the list', function () {
+  describe('Delete key', function() {
+    it('should delete a char before the list', function() {
       this.cm.setValue(
         'a\n' +
           '\\begin{enumerate}\n' +
@@ -788,7 +788,7 @@ describe('Key bindings', function () {
       expect(this.cm.getLine(0)).to.equal('')
     })
 
-    it('should correctly delete the chars inside the last item in a list', function () {
+    it('should correctly delete the chars inside the last item in a list', function() {
       this.cm.setValue(
         '\\begin{enumerate}\n' +
           '\\item a\n' +
@@ -804,14 +804,14 @@ describe('Key bindings', function () {
       expect(this.cm.getLine(5)).to.equal('\\item tet')
     })
 
-    it("doesn't error if pressing delete on last character with default keymap", function () {
+    it("doesn't error if pressing delete on last character with default keymap", function() {
       this.cm.setValue('foo\n' + 'bar')
       this.cm.setCursor({ line: 1, ch: 3 })
 
       expect(() => fakeNamedKey(this.cm, 'Delete')).not.to.throw()
     })
 
-    it('should do nothing pressing delete before begin', function () {
+    it('should do nothing pressing delete before begin', function() {
       this.cm.setValue(
         '\n' +
           '\\begin{enumerate}\n' +
@@ -833,7 +833,7 @@ describe('Key bindings', function () {
       expect(this.cm.getLine(1)).to.equal('\\begin{enumerate}')
     })
 
-    it('should do nothing pressing delete before end', function () {
+    it('should do nothing pressing delete before end', function() {
       this.cm.setValue(
         '\n' +
           '\\begin{enumerate}\n' +
@@ -855,7 +855,7 @@ describe('Key bindings', function () {
       expect(this.cm.getLine(6)).to.equal('\\end{enumerate}')
     })
 
-    it('should skip when pressing before an abstract', function () {
+    it('should skip when pressing before an abstract', function() {
       this.cm.setValue(
         'aa\n' + '\\begin{abstract}\n' + '\n' + '\\end{abstract}'
       )
@@ -869,7 +869,7 @@ describe('Key bindings', function () {
       expectCursorAt(this.cm, 2, 0)
     })
 
-    it('should delete an abstract if empty (with delete key)', function () {
+    it('should delete an abstract if empty (with delete key)', function() {
       this.cm.setValue('\\begin{abstract}\n' + '\n' + '\\end{abstract}')
       // Place cursor between \begin and \end
       this.cm.setCursor({ line: 1, ch: 0 })
@@ -879,7 +879,7 @@ describe('Key bindings', function () {
       expect(this.cm.getLine(0)).to.equal('')
     })
 
-    it('should do nothing pressing delete at the end of a section', function () {
+    it('should do nothing pressing delete at the end of a section', function() {
       this.cm.setValue('abc\n' + 'tex\\section{section}abc\n' + 'b\n')
       // Place cursor at end of section argument, after "section" text
       // tex\section{section|}
@@ -890,7 +890,7 @@ describe('Key bindings', function () {
       expect(this.cm.getLine(1)).to.equal('tex\\section{section}abc')
     })
 
-    it('should do nothing pressing delete at the end of a subsection', function () {
+    it('should do nothing pressing delete at the end of a subsection', function() {
       this.cm.setValue('abc\n' + 'tex\\subsection{subsection}abc\n' + 'b\n')
       // Place cursor at end of subsection argument, after "subsection" text
       // tex\subsection{subsection|}
@@ -901,7 +901,7 @@ describe('Key bindings', function () {
       expect(this.cm.getLine(1)).to.equal('tex\\subsection{subsection}abc')
     })
 
-    it('should do nothing pressing delete at the end of a subsubsection', function () {
+    it('should do nothing pressing delete at the end of a subsubsection', function() {
       this.cm.setValue(
         'abc\n' + 'tex\\subsubsection{subsubsection}abc\n' + 'b\n'
       )
@@ -917,7 +917,7 @@ describe('Key bindings', function () {
       )
     })
 
-    it('should do nothing pressing delete at the end of a chapter', function () {
+    it('should do nothing pressing delete at the end of a chapter', function() {
       this.cm.setValue('abc\n' + 'tex\\chapter{chapter}abc\n' + 'b\n')
       // Place cursor at end of chapter argument, after "chapter" text
       // tex\chapter{chapter|}abc

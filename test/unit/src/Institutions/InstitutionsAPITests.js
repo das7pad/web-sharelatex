@@ -23,8 +23,8 @@ const modulePath = path.join(
 ;({ expect } = require('chai'))
 const Errors = require('../../../../app/src/Features/Errors/Errors')
 
-describe('InstitutionsAPI', function () {
-  beforeEach(function () {
+describe('InstitutionsAPI', function() {
+  beforeEach(function() {
     this.logger = { warn: sinon.stub(), err: sinon.stub(), log() {} }
     this.settings = { apis: { v1: { url: 'v1.url', user: '', pass: '' } } }
     this.request = sinon.stub()
@@ -58,8 +58,8 @@ describe('InstitutionsAPI', function () {
     return (this.newEmail = 'bob@bob.com')
   })
 
-  describe('getInstitutionAffiliations', function () {
-    it('get affiliations', function (done) {
+  describe('getInstitutionAffiliations', function() {
+    it('get affiliations', function(done) {
       this.institutionId = 123
       const responseBody = ['123abc', '456def']
       this.request.yields(null, { statusCode: 200 }, responseBody)
@@ -79,7 +79,7 @@ describe('InstitutionsAPI', function () {
       )
     })
 
-    it('handle empty response', function (done) {
+    it('handle empty response', function(done) {
       this.settings.apis.v1.url = ''
 
       return this.InstitutionsAPI.getInstitutionAffiliations(
@@ -94,8 +94,8 @@ describe('InstitutionsAPI', function () {
     })
   })
 
-  describe('getInstitutionLicences', function () {
-    it('get licences', function (done) {
+  describe('getInstitutionLicences', function() {
+    it('get licences', function(done) {
       this.institutionId = 123
       const responseBody = {
         lag: 'monthly',
@@ -126,8 +126,8 @@ describe('InstitutionsAPI', function () {
     })
   })
 
-  describe('getUserAffiliations', function () {
-    it('get affiliations', function (done) {
+  describe('getUserAffiliations', function() {
+    it('get affiliations', function(done) {
       const responseBody = [{ foo: 'bar' }]
       this.request.callsArgWith(1, null, { statusCode: 201 }, responseBody)
       return this.InstitutionsAPI.getUserAffiliations(
@@ -146,19 +146,19 @@ describe('InstitutionsAPI', function () {
       )
     })
 
-    it('handle error', function (done) {
+    it('handle error', function(done) {
       const body = { errors: 'affiliation error message' }
       this.request.callsArgWith(1, null, { statusCode: 503 }, body)
       return this.InstitutionsAPI.getUserAffiliations(
         this.stubbedUser._id,
-        (err) => {
+        err => {
           expect(err).to.be.instanceof(Errors.V1ConnectionError)
           return done()
         }
       )
     })
 
-    it('handle empty response', function (done) {
+    it('handle empty response', function(done) {
       this.settings.apis.v1.url = ''
       return this.InstitutionsAPI.getUserAffiliations(
         this.stubbedUser._id,
@@ -172,12 +172,12 @@ describe('InstitutionsAPI', function () {
     })
   })
 
-  describe('addAffiliation', function () {
-    beforeEach(function () {
+  describe('addAffiliation', function() {
+    beforeEach(function() {
       return this.request.callsArgWith(1, null, { statusCode: 201 })
     })
 
-    it('add affiliation', function (done) {
+    it('add affiliation', function(done) {
       const affiliationOptions = {
         university: { id: 1 },
         role: 'Prof',
@@ -188,7 +188,7 @@ describe('InstitutionsAPI', function () {
         this.stubbedUser._id,
         this.newEmail,
         affiliationOptions,
-        (err) => {
+        err => {
           should.not.exist(err)
           this.request.calledOnce.should.equal(true)
           const requestOptions = this.request.lastCall.args[0]
@@ -209,14 +209,14 @@ describe('InstitutionsAPI', function () {
       )
     })
 
-    it('handle error', function (done) {
+    it('handle error', function(done) {
       const body = { errors: 'affiliation error message' }
       this.request.callsArgWith(1, null, { statusCode: 422 }, body)
       return this.InstitutionsAPI.addAffiliation(
         this.stubbedUser._id,
         this.newEmail,
         {},
-        (err) => {
+        err => {
           should.exist(err)
           err.message.should.have.string(422)
           err.message.should.have.string(body.errors)
@@ -226,16 +226,16 @@ describe('InstitutionsAPI', function () {
     })
   })
 
-  describe('removeAffiliation', function () {
-    beforeEach(function () {
+  describe('removeAffiliation', function() {
+    beforeEach(function() {
       return this.request.callsArgWith(1, null, { statusCode: 404 })
     })
 
-    it('remove affiliation', function (done) {
+    it('remove affiliation', function(done) {
       return this.InstitutionsAPI.removeAffiliation(
         this.stubbedUser._id,
         this.newEmail,
-        (err) => {
+        err => {
           should.not.exist(err)
           this.request.calledOnce.should.equal(true)
           const requestOptions = this.request.lastCall.args[0]
@@ -248,12 +248,12 @@ describe('InstitutionsAPI', function () {
       )
     })
 
-    it('handle error', function (done) {
+    it('handle error', function(done) {
       this.request.callsArgWith(1, null, { statusCode: 500 })
       return this.InstitutionsAPI.removeAffiliation(
         this.stubbedUser._id,
         this.newEmail,
-        (err) => {
+        err => {
           should.exist(err)
           err.message.should.exist
           return done()
@@ -262,12 +262,12 @@ describe('InstitutionsAPI', function () {
     })
   })
 
-  describe('deleteAffiliations', function () {
-    it('delete affiliations', function (done) {
+  describe('deleteAffiliations', function() {
+    it('delete affiliations', function(done) {
       this.request.callsArgWith(1, null, { statusCode: 200 })
       return this.InstitutionsAPI.deleteAffiliations(
         this.stubbedUser._id,
-        (err) => {
+        err => {
           should.not.exist(err)
           this.request.calledOnce.should.equal(true)
           const requestOptions = this.request.lastCall.args[0]
@@ -279,12 +279,12 @@ describe('InstitutionsAPI', function () {
       )
     })
 
-    it('handle error', function (done) {
+    it('handle error', function(done) {
       const body = { errors: 'affiliation error message' }
       this.request.callsArgWith(1, null, { statusCode: 518 }, body)
       return this.InstitutionsAPI.deleteAffiliations(
         this.stubbedUser._id,
-        (err) => {
+        err => {
           expect(err).to.be.instanceof(Errors.V1ConnectionError)
           return done()
         }
@@ -292,18 +292,18 @@ describe('InstitutionsAPI', function () {
     })
   })
 
-  describe('endorseAffiliation', function () {
-    beforeEach(function () {
+  describe('endorseAffiliation', function() {
+    beforeEach(function() {
       return this.request.callsArgWith(1, null, { statusCode: 204 })
     })
 
-    it('endorse affiliation', function (done) {
+    it('endorse affiliation', function(done) {
       return this.InstitutionsAPI.endorseAffiliation(
         this.stubbedUser._id,
         this.newEmail,
         'Student',
         'Physics',
-        (err) => {
+        err => {
           should.not.exist(err)
           this.request.calledOnce.should.equal(true)
           const requestOptions = this.request.lastCall.args[0]

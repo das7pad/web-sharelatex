@@ -20,16 +20,16 @@ const metrics = require('metrics-sharelatex')
 module.exports = BetaProgramHandler = {
   optIn(user_id, callback) {
     if (callback == null) {
-      callback = function (err) {}
+      callback = function(err) {}
     }
-    return User.findById(user_id, function (err, user) {
+    return User.findById(user_id, function(err, user) {
       if (err) {
         logger.warn({ err, user_id }, 'problem adding user to beta')
         return callback(err)
       }
       metrics.inc('beta-program.opt-in')
       user.betaProgram = true
-      return user.save(function (err) {
+      return user.save(function(err) {
         if (err) {
           logger.warn({ err, user_id }, 'problem adding user to beta')
           return callback(err)
@@ -41,16 +41,16 @@ module.exports = BetaProgramHandler = {
 
   optOut(user_id, callback) {
     if (callback == null) {
-      callback = function (err) {}
+      callback = function(err) {}
     }
-    return User.findById(user_id, function (err, user) {
+    return User.findById(user_id, function(err, user) {
       if (err) {
         logger.warn({ err, user_id }, 'problem removing user from beta')
         return callback(err)
       }
       metrics.inc('beta-program.opt-out')
       user.betaProgram = false
-      return user.save(function (err) {
+      return user.save(function(err) {
         if (err) {
           logger.warn({ err, user_id }, 'problem removing user from beta')
           return callback(err)

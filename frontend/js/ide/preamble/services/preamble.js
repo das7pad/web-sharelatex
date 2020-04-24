@@ -10,14 +10,13 @@
  * DS103: Rewrite code to no longer use __guard__
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base'], (App) =>
-  App.factory('preamble', function (ide) {
+define(['../../../base'], App =>
+  App.factory('preamble', function(ide) {
     var Preamble = {
       getPreambleText() {
         const text = ide.editorManager.getCurrentDocValue().slice(0, 5000)
         const preamble =
-          __guard__(text.match(/([^]*)^\\begin\{document\}/m), (x) => x[1]) ||
-          ''
+          __guard__(text.match(/([^]*)^\\begin\{document\}/m), x => x[1]) || ''
         return preamble
       },
 
@@ -25,7 +24,7 @@ define(['../../../base'], (App) =>
         let match
         const preamble = Preamble.getPreambleText()
         const graphicsPathsArgs =
-          __guard__(preamble.match(/\\graphicspath\{(.*)\}/), (x) => x[1]) || ''
+          __guard__(preamble.match(/\\graphicspath\{(.*)\}/), x => x[1]) || ''
         const paths = []
         const re = /\{([^}]*)\}/g
         while ((match = re.exec(graphicsPathsArgs))) {

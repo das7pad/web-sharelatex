@@ -8,20 +8,20 @@ function functionBodyProcessor(j, path) {
   j(path)
     // look for if statements
     .find(j.IfStatement)
-    .filter((path) => {
+    .filter(path => {
       let hasReturnError = false
       j(path)
         // find returns inside the if statement where the error from
         // the args is explicitly returned
         .find(j.ReturnStatement)
         .forEach(
-          (path) =>
+          path =>
             (hasReturnError =
               path.value.argument.arguments[0].name === errorVarName)
         )
       return hasReturnError
     })
-    .forEach((path) => {
+    .forEach(path => {
       j(path)
         // within the selected if blocks find calls to logger
         .find(j.CallExpression, {
@@ -30,13 +30,13 @@ function functionBodyProcessor(j, path) {
           }
         })
         // handle logger.warn, logger.error and logger.err
-        .filter((path) =>
+        .filter(path =>
           ['warn', 'error', 'err'].includes(
             path.get('callee').get('property').value.name
           )
         )
         // replace the logger call with the constructed OError wrapper
-        .replaceWith((path) => {
+        .replaceWith(path => {
           // extract the error message which is the second arg for logger
           const message =
             path.value.arguments.length >= 2
@@ -74,7 +74,7 @@ function functionBodyProcessor(j, path) {
                         path
                           .get('arguments')
                           .value[0].properties.filter(
-                            (property) => property.key.name !== errorVarName
+                            property => property.key.name !== errorVarName
                           )
                       )
                     )
@@ -97,20 +97,20 @@ export default function transformer(file, api) {
   // apply transformer to declared functions
   source = j(source)
     .find(j.FunctionDeclaration)
-    .filter((path) => functionArgsFilter(j, path))
-    .forEach((path) => functionBodyProcessor(j, path))
+    .filter(path => functionArgsFilter(j, path))
+    .forEach(path => functionBodyProcessor(j, path))
     .toSource()
   // apply transformer to inline-functions
   source = j(source)
     .find(j.FunctionExpression)
-    .filter((path) => functionArgsFilter(j, path))
-    .forEach((path) => functionBodyProcessor(j, path))
+    .filter(path => functionArgsFilter(j, path))
+    .forEach(path => functionBodyProcessor(j, path))
     .toSource()
   // apply transformer to inline-arrow-functions
   source = j(source)
     .find(j.ArrowFunctionExpression)
-    .filter((path) => functionArgsFilter(j, path))
-    .forEach((path) => functionBodyProcessor(j, path))
+    .filter(path => functionArgsFilter(j, path))
+    .forEach(path => functionBodyProcessor(j, path))
     .toSource()
   // do a plain text search to see if OError is used but not imported
   if (source.includes('OError') && !source.includes('@overleaf/o-error')) {

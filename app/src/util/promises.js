@@ -104,11 +104,11 @@ function callbackifyMultiResult(fn, resultNames) {
   function callbackified(...args) {
     const [callback] = args.splice(-1)
     fn(...args)
-      .then((result) => {
-        const cbResults = resultNames.map((resultName) => result[resultName])
+      .then(result => {
+        const cbResults = resultNames.map(resultName => result[resultName])
         callback(null, ...cbResults)
       })
-      .catch((err) => {
+      .catch(err => {
         callback(err)
       })
   }
@@ -133,5 +133,5 @@ function expressify(fn) {
  */
 function promiseMapWithLimit(concurrency, array, fn) {
   const limit = pLimit(concurrency)
-  return Promise.all(array.map((x) => limit(() => fn(x))))
+  return Promise.all(array.map(x => limit(() => fn(x))))
 }

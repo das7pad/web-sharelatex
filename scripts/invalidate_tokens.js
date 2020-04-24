@@ -3,7 +3,7 @@ const minimist = require('minimist')
 const _ = require('lodash')
 const argv = minimist(process.argv.slice(2))
 const commit = argv.commit !== undefined
-const projectIds = argv._.map((x) => {
+const projectIds = argv._.map(x => {
   return ObjectId(x)
 })
 
@@ -20,7 +20,7 @@ db.projects.find(
       throw err
     }
     console.log('Found ' + affectedProjects.length + ' affected projects')
-    affectedProjects.forEach((x) => {
+    affectedProjects.forEach(x => {
       console.log(
         JSON.stringify(
           _.pick(x, [
@@ -39,7 +39,7 @@ db.projects.find(
       db.projects.update(
         {
           _id: {
-            $in: affectedProjects.map((x) => {
+            $in: affectedProjects.map(x => {
               return x._id
             })
           }

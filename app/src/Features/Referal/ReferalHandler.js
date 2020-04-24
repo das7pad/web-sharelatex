@@ -14,7 +14,7 @@ const { User } = require('../../models/User')
 
 module.exports = {
   getReferedUsers(user_id, callback) {
-    return User.findById(user_id, function (err, user) {
+    return User.findById(user_id, function(err, user) {
       const refered_users = user.refered_users || []
       const refered_user_count = user.refered_user_count || refered_users.length
       return callback(null, refered_users, refered_user_count)

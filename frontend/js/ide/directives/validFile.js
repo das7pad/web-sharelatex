@@ -14,7 +14,7 @@ define(['../../base', './SafePath'], (App, SafePath) =>
   App.directive('validFile', () => ({
     require: 'ngModel',
     link(scope, element, attrs, ngModelCtrl) {
-      return (ngModelCtrl.$validators.validFile = (filename) =>
+      return (ngModelCtrl.$validators.validFile = filename =>
         SafePath.isCleanFilename(filename))
     }
   })))

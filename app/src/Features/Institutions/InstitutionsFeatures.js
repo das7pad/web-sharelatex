@@ -20,9 +20,9 @@ const logger = require('logger-sharelatex')
 module.exports = InstitutionsFeatures = {
   getInstitutionsFeatures(userId, callback) {
     if (callback == null) {
-      callback = function (error, features) {}
+      callback = function(error, features) {}
     }
-    return InstitutionsFeatures.getInstitutionsPlan(userId, function (
+    return InstitutionsFeatures.getInstitutionsPlan(userId, function(
       error,
       plan
     ) {
@@ -36,12 +36,9 @@ module.exports = InstitutionsFeatures = {
 
   getInstitutionsPlan(userId, callback) {
     if (callback == null) {
-      callback = function (error, plan) {}
+      callback = function(error, plan) {}
     }
-    return InstitutionsFeatures.hasLicence(userId, function (
-      error,
-      hasLicence
-    ) {
+    return InstitutionsFeatures.hasLicence(userId, function(error, hasLicence) {
       if (error != null) {
         return callback(error)
       }
@@ -54,9 +51,9 @@ module.exports = InstitutionsFeatures = {
 
   hasLicence(userId, callback) {
     if (callback == null) {
-      callback = function (error, hasLicence) {}
+      callback = function(error, hasLicence) {}
     }
-    return InstitutionsGetter.getConfirmedAffiliations(userId, function (
+    return InstitutionsGetter.getConfirmedAffiliations(userId, function(
       error,
       affiliations
     ) {
@@ -65,7 +62,7 @@ module.exports = InstitutionsFeatures = {
       }
 
       const hasLicence = affiliations.some(
-        (affiliation) => affiliation.licence && affiliation.licence !== 'free'
+        affiliation => affiliation.licence && affiliation.licence !== 'free'
       )
 
       return callback(null, hasLicence)

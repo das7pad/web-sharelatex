@@ -24,7 +24,7 @@ const ProjectOptionsHandler = {
     }
     imageName = imageName.toLowerCase()
     const isAllowed = settings.allowedImageNames.find(
-      (allowed) => imageName === allowed.imageName
+      allowed => imageName === allowed.imageName
     )
     if (!isAllowed) {
       return callback(new Error(`invalid imageName: ${imageName}`))
@@ -39,7 +39,7 @@ const ProjectOptionsHandler = {
       return callback()
     }
     const language = settings.languages.find(
-      (language) => language.code === languageCode
+      language => language.code === languageCode
     )
     if (languageCode && !language) {
       return callback(new Error(`invalid languageCode: ${languageCode}`))

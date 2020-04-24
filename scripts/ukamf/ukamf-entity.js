@@ -13,7 +13,7 @@ class UKAMFEntity {
     const signingKey =
       keys.length === 1
         ? keys[0]
-        : keys.find((key) => _.get(key, ['$', 'use']) === 'signing')
+        : keys.find(key => _.get(key, ['$', 'use']) === 'signing')
     const entityId = this.data.$.entityID
 
     let cert = _.get(signingKey, [
@@ -30,7 +30,7 @@ class UKAMFEntity {
     cert = cert.replace(/\s/g, '')
 
     let entryPoint = idp.SingleSignOnService.find(
-      (sso) =>
+      sso =>
         _.get(sso, ['$', 'Binding']) ===
         'urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect'
     )

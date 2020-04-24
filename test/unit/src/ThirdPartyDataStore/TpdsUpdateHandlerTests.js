@@ -20,8 +20,8 @@ const modulePath = require('path').join(
   '../../../../app/src/Features/ThirdPartyDataStore/TpdsUpdateHandler'
 )
 
-describe('TpdsUpdateHandler', function () {
-  beforeEach(function () {
+describe('TpdsUpdateHandler', function() {
+  beforeEach(function() {
     this.requestQueuer = {}
     this.updateMerger = {
       deleteUpdate(user_id, project_id, path, source, cb) {
@@ -70,8 +70,8 @@ describe('TpdsUpdateHandler', function () {
     return (this.source = 'dropbox')
   })
 
-  describe('getting an update', function () {
-    it('should send the update to the update merger', function (done) {
+  describe('getting an update', function() {
+    it('should send the update to the update merger', function(done) {
       const path = '/path/here'
       const update = {}
       this.updateMerger.mergeUpdate = sinon.stub()
@@ -93,7 +93,7 @@ describe('TpdsUpdateHandler', function () {
       )
     })
 
-    it('should create a new project if one does not already exit', function (done) {
+    it('should create a new project if one does not already exit', function(done) {
       this.projectLocator.findUsersProjectByName = sinon.stub().callsArgWith(2)
       const path = '/'
       return this.handler.newUpdate(
@@ -111,7 +111,7 @@ describe('TpdsUpdateHandler', function () {
       )
     })
 
-    it('should set the root doc automatically if a new project is created', function (done) {
+    it('should set the root doc automatically if a new project is created', function(done) {
       this.projectLocator.findUsersProjectByName = sinon.stub().callsArgWith(2)
       this.handler._rootDocTimeoutLength = 0
       const path = '/'
@@ -132,7 +132,7 @@ describe('TpdsUpdateHandler', function () {
       )
     })
 
-    it('should not update files that should be ignored', function (done) {
+    it('should not update files that should be ignored', function(done) {
       this.FileTypeManager.shouldIgnore = sinon
         .stub()
         .callsArgWith(1, null, true)
@@ -152,7 +152,7 @@ describe('TpdsUpdateHandler', function () {
       )
     })
 
-    it('should check if the project is on cooldown', function (done) {
+    it('should check if the project is on cooldown', function(done) {
       this.CooldownManager.isProjectOnCooldown = sinon
         .stub()
         .callsArgWith(1, null, false)
@@ -169,7 +169,7 @@ describe('TpdsUpdateHandler', function () {
         path,
         update,
         this.source,
-        (err) => {
+        err => {
           expect(err).to.be.oneOf([null, undefined])
           this.CooldownManager.isProjectOnCooldown.callCount.should.equal(1)
           this.CooldownManager.isProjectOnCooldown
@@ -182,7 +182,7 @@ describe('TpdsUpdateHandler', function () {
       )
     })
 
-    it('should return error and not proceed with update if project is on cooldown', function (done) {
+    it('should return error and not proceed with update if project is on cooldown', function(done) {
       this.CooldownManager.isProjectOnCooldown = sinon
         .stub()
         .callsArgWith(1, null, true)
@@ -202,7 +202,7 @@ describe('TpdsUpdateHandler', function () {
         path,
         update,
         this.source,
-        (err) => {
+        err => {
           expect(err).to.not.be.oneOf([null, undefined])
           expect(err).to.be.instanceof(Error)
           this.CooldownManager.isProjectOnCooldown.callCount.should.equal(1)
@@ -217,8 +217,8 @@ describe('TpdsUpdateHandler', function () {
     })
   })
 
-  describe('getting a delete :', function () {
-    it('should call deleteEntity in the collaberation manager', function (done) {
+  describe('getting a delete :', function() {
+    it('should call deleteEntity in the collaberation manager', function(done) {
       const path = '/delete/this'
       const update = {}
       this.updateMerger.deleteUpdate = sinon.stub().callsArg(4)
@@ -240,7 +240,7 @@ describe('TpdsUpdateHandler', function () {
       )
     })
 
-    it('should mark the project as deleted by external source if path is a single slash', function (done) {
+    it('should mark the project as deleted by external source if path is a single slash', function(done) {
       const path = '/'
       return this.handler.deleteUpdate(
         this.user_id,

@@ -11,7 +11,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define([], function () {
+define([], function() {
   let CursorPositionManager
   return (CursorPositionManager = class CursorPositionManager {
     constructor($scope, adapter, localStorage) {
@@ -47,7 +47,7 @@ define([], function () {
         }
       }) // Hack: Must happen after @gotoStoredPosition
 
-      this.$scope.$on(`${this.$scope.name}:clearSelection`, (e) => {
+      this.$scope.$on(`${this.$scope.name}:clearSelection`, e => {
         return this.adapter.clearSelection()
       })
     }

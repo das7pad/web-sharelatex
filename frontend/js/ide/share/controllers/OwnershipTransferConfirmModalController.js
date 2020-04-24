@@ -1,5 +1,5 @@
-define(['../../../base'], (App) => {
-  App.controller('OwnershipTransferConfirmModalController', function (
+define(['../../../base'], App => {
+  App.controller('OwnershipTransferConfirmModalController', function(
     $scope,
     $window,
     $modalInstance,
@@ -10,12 +10,12 @@ define(['../../../base'], (App) => {
       error: false
     }
 
-    $scope.confirm = function () {
+    $scope.confirm = function() {
       const userId = $scope.member._id
       transferOwnership(userId)
     }
 
-    $scope.cancel = function () {
+    $scope.cancel = function() {
       $modalInstance.dismiss()
     }
 

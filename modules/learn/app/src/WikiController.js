@@ -63,7 +63,7 @@ module.exports = WikiController = {
     const mediaWikiPages = ['help:', 'special:', 'template:']
     const isMediaWikiPage = _.some(
       mediaWikiPages,
-      (substring) => page.toLowerCase().indexOf(substring) !== -1
+      substring => page.toLowerCase().indexOf(substring) !== -1
     )
 
     if (isMediaWikiPage) {
@@ -91,7 +91,7 @@ module.exports = WikiController = {
       }
     }
 
-    return async.parallel(jobs, function (error, results) {
+    return async.parallel(jobs, function(error, results) {
       if (error != null) {
         return next(error)
       }
@@ -114,7 +114,7 @@ module.exports = WikiController = {
 
         return WikiController._renderPage(pageData, contents, preview, res)
       } else {
-        return WikiController._getPageContent(page, function (error, pageData) {
+        return WikiController._getPageContent(page, function(error, pageData) {
           if (error != null) {
             return next(error)
           }
@@ -132,7 +132,7 @@ module.exports = WikiController = {
     const oneMinute = 1000 * 60
     const urlStream = request.get({ url, timeout: oneMinute })
 
-    urlStream.on('error', (error) => next(error))
+    urlStream.on('error', error => next(error))
 
     return urlStream.pipe(res)
   },
@@ -141,7 +141,7 @@ module.exports = WikiController = {
     // the callback parameter `data` has a signature of `{content: "", title: ""}`
     // @param {string} page
     if (callback == null) {
-      callback = function (error, data) {}
+      callback = function(error, data) {}
     }
     return request(
       {
@@ -153,7 +153,7 @@ module.exports = WikiController = {
           redirects: true
         }
       },
-      function (err, response, data) {
+      function(err, response, data) {
         if (err != null) {
           return callback(err)
         }
@@ -165,24 +165,24 @@ module.exports = WikiController = {
         }
 
         const result = {
-          categories: __guard__(data != null ? data.parse : undefined, (x) =>
-            x.categories.map((category) => category['*'])
+          categories: __guard__(data != null ? data.parse : undefined, x =>
+            x.categories.map(category => category['*'])
           ),
           content: __guard__(
-            __guard__(data != null ? data.parse : undefined, (x2) => x2.text),
-            (x1) => x1['*']
+            __guard__(data != null ? data.parse : undefined, x2 => x2.text),
+            x1 => x1['*']
           ),
           title: __guard__(
             data != null ? data.parse : undefined,
-            (x3) => x3.title
+            x3 => x3.title
           ),
           revid: __guard__(
             data != null ? data.parse : undefined,
-            (x4) => x4.revid
+            x4 => x4.revid
           ),
           redirects: __guard__(
             data != null ? data.parse : undefined,
-            (x5) => x5.redirects
+            x5 => x5.redirects
           )
         }
         return callback(null, result)
@@ -232,24 +232,24 @@ module.exports = WikiController = {
     if (
       __guard__(
         settings.cdn != null ? settings.cdn.wiki : undefined,
-        (x) => x.host
+        x => x.host
       ) != null
     ) {
-      page.content = __guard__(page != null ? page.content : undefined, (x1) =>
+      page.content = __guard__(page != null ? page.content : undefined, x1 =>
         x1.replace(
           /src="(\/[^"]+)"/g,
           `src='${__guard__(
             settings.cdn != null ? settings.cdn.web : undefined,
-            (x2) => x2.host
+            x2 => x2.host
           )}$1'`
         )
       )
     }
     // width and alt below are Linked_images, but we are not using this and causes a JS error
-    page.content = __guard__(page != null ? page.content : undefined, (x3) =>
+    page.content = __guard__(page != null ? page.content : undefined, x3 =>
       x3.replace(/width='{{{width}}}'/g, '')
     )
-    page.content = __guard__(page != null ? page.content : undefined, (x4) =>
+    page.content = __guard__(page != null ? page.content : undefined, x4 =>
       x4.replace(/alt='{{{alt}}}'/g, '')
     )
     return res.render(viewPath, {

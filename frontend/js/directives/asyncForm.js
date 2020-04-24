@@ -13,11 +13,11 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../base', 'libs/passfield'], function (App) {
+define(['../base', 'libs/passfield'], function(App) {
   App.directive('asyncForm', ($http, validateCaptcha, validateCaptchaV3) => ({
     controller: [
       '$scope',
-      function ($scope) {
+      function($scope) {
         this.getEmail = () => $scope.email
         return this
       }
@@ -29,9 +29,9 @@ define(['../base', 'libs/passfield'], function (App) {
       scope[attrs.name].response = response = {}
       scope[attrs.name].inflight = false
 
-      const validateCaptchaIfEnabled = function (callback) {
+      const validateCaptchaIfEnabled = function(callback) {
         if (callback == null) {
-          callback = function (response) {}
+          callback = function(response) {}
         }
         if (attrs.captchaActionName) {
           validateCaptchaV3(attrs.captchaActionName)
@@ -43,7 +43,7 @@ define(['../base', 'libs/passfield'], function (App) {
         }
       }
 
-      const submitRequest = function (grecaptchaResponse) {
+      const submitRequest = function(grecaptchaResponse) {
         const formData = {}
         for (var data of Array.from(element.serializeArray())) {
           formData[data.name] = data.value
@@ -61,7 +61,7 @@ define(['../base', 'libs/passfield'], function (App) {
         return httpRequestFn(element.attr('action'), formData, {
           disableAutoLoginRedirect: true
         })
-          .then(function (httpResponse) {
+          .then(function(httpResponse) {
             const { data, headers } = httpResponse
             scope[attrs.name].inflight = false
             response.success = true
@@ -93,7 +93,7 @@ define(['../base', 'libs/passfield'], function (App) {
               location.href = URL.createObjectURL(blob) // Trigger file save
             }
           })
-          .catch(function (httpResponse) {
+          .catch(function(httpResponse) {
             let config, headers, status
             ;({ data, status, headers, config } = httpResponse)
             scope[attrs.name].inflight = false
@@ -147,7 +147,7 @@ define(['../base', 'libs/passfield'], function (App) {
       }
 
       const submit = () =>
-        validateCaptchaIfEnabled((response) => submitRequest(response))
+        validateCaptchaIfEnabled(response => submitRequest(response))
 
       const _httpRequestFn = (method = 'post') => {
         const $HTTP_FNS = {
@@ -157,7 +157,7 @@ define(['../base', 'libs/passfield'], function (App) {
         return $HTTP_FNS[method.toLowerCase()]
       }
 
-      element.on('submit', function (e) {
+      element.on('submit', function(e) {
         e.preventDefault()
         return submit()
       })

@@ -9,9 +9,9 @@
  * DS102: Remove unnecessary code created because of implicit returns
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base'], (App) =>
-  App.controller('PdfViewToggleController', function ($scope) {
-    $scope.togglePdfView = function () {
+define(['../../../base'], App =>
+  App.controller('PdfViewToggleController', function($scope) {
+    $scope.togglePdfView = function() {
       if ($scope.ui.view === 'pdf') {
         return ($scope.ui.view = 'editor')
       } else {
@@ -20,7 +20,7 @@ define(['../../../base'], (App) =>
     }
 
     $scope.fileTreeClosed = false
-    return $scope.$on('layout:main:resize', function (e, state) {
+    return $scope.$on('layout:main:resize', function(e, state) {
       if (state.west.initClosed) {
         $scope.fileTreeClosed = true
       } else {

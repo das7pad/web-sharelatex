@@ -16,7 +16,7 @@ export default class HighlightedWordManager {
         if (!pos) return false
         return pos.from.line === lineNo
       })
-      .forEach((highlight) => this.removeHighlight(highlight))
+      .forEach(highlight => this.removeHighlight(highlight))
   }
 
   addHighlight(highlight) {
@@ -37,13 +37,13 @@ export default class HighlightedWordManager {
 
   removeHighlight(highlight) {
     highlight.marker.clear()
-    this.highlights = this.highlights.filter((hl) => hl !== highlight)
+    this.highlights = this.highlights.filter(hl => hl !== highlight)
   }
 
   removeWord(word) {
     this.highlights
-      .filter((highlight) => highlight.word === word)
-      .forEach((highlight) => this.removeHighlight(highlight))
+      .filter(highlight => highlight.word === word)
+      .forEach(highlight => this.removeHighlight(highlight))
   }
 
   findHighlightAtPosition(position) {
@@ -60,7 +60,7 @@ export default class HighlightedWordManager {
   }
 
   clearHighlightTouchingRange(e) {
-    const highlight = _.find(this.highlights, (hl) => {
+    const highlight = _.find(this.highlights, hl => {
       return this.isHighlightTouchingSelection(hl, e.from, e.to)
     })
 

@@ -107,11 +107,11 @@ module.exports = ProjectEditorHandler = {
 
   buildFolderModelView(folder) {
     let file
-    const fileRefs = _.filter(folder.fileRefs || [], (file) => file != null)
+    const fileRefs = _.filter(folder.fileRefs || [], file => file != null)
     return {
       _id: folder._id,
       name: folder.name,
-      folders: Array.from(folder.folders || []).map((childFolder) =>
+      folders: Array.from(folder.folders || []).map(childFolder =>
         this.buildFolderModelView(childFolder)
       ),
       fileRefs: (() => {
@@ -121,7 +121,7 @@ module.exports = ProjectEditorHandler = {
         }
         return result
       })(),
-      docs: Array.from(folder.docs || []).map((doc) =>
+      docs: Array.from(folder.docs || []).map(doc =>
         this.buildDocModelView(doc)
       )
     }

@@ -22,13 +22,13 @@ module.exports = ProjectDownloadsController = {
   downloadProject(req, res, next) {
     const project_id = req.params.Project_id
     Metrics.inc('zip-downloads')
-    return DocumentUpdaterHandler.flushProjectToMongo(project_id, function (
+    return DocumentUpdaterHandler.flushProjectToMongo(project_id, function(
       error
     ) {
       if (error != null) {
         return next(error)
       }
-      return ProjectGetter.getProject(project_id, { name: true }, function (
+      return ProjectGetter.getProject(project_id, { name: true }, function(
         error,
         project
       ) {
@@ -37,7 +37,7 @@ module.exports = ProjectDownloadsController = {
         }
         return ProjectZipStreamManager.createZipStreamForProject(
           project_id,
-          function (error, stream) {
+          function(error, stream) {
             if (error != null) {
               return next(error)
             }
@@ -57,13 +57,13 @@ module.exports = ProjectDownloadsController = {
     Metrics.inc('zip-downloads-multiple')
     return DocumentUpdaterHandler.flushMultipleProjectsToMongo(
       project_ids,
-      function (error) {
+      function(error) {
         if (error != null) {
           return next(error)
         }
         return ProjectZipStreamManager.createZipStreamForMultipleProjects(
           project_ids,
-          function (error, stream) {
+          function(error, stream) {
             if (error != null) {
               return next(error)
             }

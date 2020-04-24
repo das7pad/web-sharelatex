@@ -10,11 +10,11 @@ const text = fs.readFileSync(path.join(__dirname, 'beta-users.txt'))
 const textByLine = text
   .toString()
   .split('\n')
-  .map(function (stringId) {
+  .map(function(stringId) {
     return ObjectId(stringId)
   })
 
-db.users.find({ _id: { $in: textByLine } }, function (err, users) {
+db.users.find({ _id: { $in: textByLine } }, function(err, users) {
   if (err) throw err
 
   if (users.length) {
@@ -22,7 +22,7 @@ db.users.find({ _id: { $in: textByLine } }, function (err, users) {
 
     async.each(
       users,
-      function (user, callback) {
+      function(user, callback) {
         console.log('setting betaProgram==true for: ' + user._id)
         db.users.update(
           {
@@ -36,7 +36,7 @@ db.users.find({ _id: { $in: textByLine } }, function (err, users) {
           callback
         )
       },
-      function (result, err) {
+      function(result, err) {
         if (err) {
           console.log(err)
         }

@@ -20,7 +20,7 @@ module.exports = CooldownMiddleware = {
     if (projectId == null) {
       return next(new Error('[Cooldown] No projectId parameter on route'))
     }
-    return CooldownManager.isProjectOnCooldown(projectId, function (
+    return CooldownManager.isProjectOnCooldown(projectId, function(
       err,
       projectIsOnCooldown
     ) {

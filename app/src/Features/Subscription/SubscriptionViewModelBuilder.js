@@ -28,7 +28,7 @@ const logger = require('logger-sharelatex')
 const _ = require('underscore')
 const async = require('async')
 
-const buildHostedLink = function (recurlySubscription, type) {
+const buildHostedLink = function(recurlySubscription, type) {
   const recurlySubdomain = Settings.apis.recurly.subdomain
   const hostedLoginToken = recurlySubscription.account.hosted_login_token
   let path = ''
@@ -49,7 +49,7 @@ const buildHostedLink = function (recurlySubscription, type) {
 module.exports = {
   buildUsersSubscriptionViewModel(user, callback) {
     if (callback == null) {
-      callback = function (error, data) {}
+      callback = function(error, data) {}
     }
     return async.auto(
       {
@@ -58,7 +58,7 @@ module.exports = {
         },
         recurlySubscription: [
           'personalSubscription',
-          function (cb, { personalSubscription }) {
+          function(cb, { personalSubscription }) {
             if (
               (personalSubscription != null
                 ? personalSubscription.recurlySubscription_id
@@ -78,7 +78,7 @@ module.exports = {
         ],
         recurlyCoupons: [
           'recurlySubscription',
-          function (cb, { recurlySubscription }) {
+          function(cb, { recurlySubscription }) {
             if (!recurlySubscription) {
               return cb(null, null)
             }
@@ -88,7 +88,7 @@ module.exports = {
         ],
         plan: [
           'personalSubscription',
-          function (cb, { personalSubscription }) {
+          function(cb, { personalSubscription }) {
             if (personalSubscription == null) {
               return cb()
             }
@@ -123,7 +123,7 @@ module.exports = {
         v1SubscriptionStatus(cb) {
           return V1SubscriptionManager.getSubscriptionStatusFromV1(
             user._id,
-            function (error, status, v1Id) {
+            function(error, status, v1Id) {
               if (error != null) {
                 return cb(error)
               }
@@ -132,7 +132,7 @@ module.exports = {
           )
         }
       },
-      function (err, results) {
+      function(err, results) {
         if (err != null) {
           return callback(err)
         }
@@ -192,7 +192,7 @@ module.exports = {
                 recurlySubscription != null
                   ? recurlySubscription.tax_rate
                   : undefined,
-                (x) => x._
+                x => x._
               )
             ),
             billingDetailsLink: buildHostedLink(
@@ -253,28 +253,28 @@ module.exports = {
     const { plans } = Settings
 
     const allPlans = {}
-    plans.forEach((plan) => (allPlans[plan.planCode] = plan))
+    plans.forEach(plan => (allPlans[plan.planCode] = plan))
 
     const result = { allPlans }
 
     result.studentAccounts = _.filter(
       plans,
-      (plan) => plan.planCode.indexOf('student') !== -1
+      plan => plan.planCode.indexOf('student') !== -1
     )
 
     result.groupMonthlyPlans = _.filter(
       plans,
-      (plan) => plan.groupPlan && !plan.annual
+      plan => plan.groupPlan && !plan.annual
     )
 
     result.groupAnnualPlans = _.filter(
       plans,
-      (plan) => plan.groupPlan && plan.annual
+      plan => plan.groupPlan && plan.annual
     )
 
     result.individualMonthlyPlans = _.filter(
       plans,
-      (plan) =>
+      plan =>
         !plan.groupPlan &&
         !plan.annual &&
         plan.planCode !== 'personal' && // Prevent the personal plan from appearing on the change-plans page
@@ -283,7 +283,7 @@ module.exports = {
 
     result.individualAnnualPlans = _.filter(
       plans,
-      (plan) =>
+      plan =>
         !plan.groupPlan &&
         plan.annual &&
         plan.planCode.indexOf('student') === -1

@@ -15,7 +15,7 @@ const FigureMarker = {
 
     const wrapperDiv = makeWrapperDiv()
 
-    getInnerMarks(cm, sourceMark).forEach((mark) => {
+    getInnerMarks(cm, sourceMark).forEach(mark => {
       const region = mark.rangeForRegion('inner')
 
       if (mark.kind === 'caption') {
@@ -53,7 +53,7 @@ const FigureMarker = {
 function getInnerMarks(cm, sourceMark) {
   const marks = cm.getTokenAt(sourceMark.to, true).state.marks
 
-  return marks.filter((mark) => {
+  return marks.filter(mark => {
     return (
       mark.from.line >= sourceMark.from.line &&
       mark.to.line <= sourceMark.to.line &&
@@ -74,11 +74,15 @@ function makeCaptionDiv(cm, region) {
   const { from, to } = region
   const caption = deTex(cm.getRange(from, to))
 
-  return $('<div>').text(caption).addClass('wl-figure-caption')
+  return $('<div>')
+    .text(caption)
+    .addClass('wl-figure-caption')
 }
 
 function makeImg(previewUrl) {
-  return $('<img>').attr('src', previewUrl).addClass('img-responsive wl-figure')
+  return $('<img>')
+    .attr('src', previewUrl)
+    .addClass('img-responsive wl-figure')
 }
 
 function makeNotFoundSpan(path) {

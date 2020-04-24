@@ -49,22 +49,21 @@ module.exports = MockV1HistoryApi = {
       '/api/projects/:project_id/version/:version/zip',
       (req, res, next) => {
         return res.json({
-          zipUrl: `http://${
-            process.env.V1_HISTORY_HOST || 'localhost'
-          }:3100/fake-zip-download/${req.params.project_id}/version/${
-            req.params.version
-          }`
+          zipUrl: `http://${process.env.V1_HISTORY_HOST ||
+            'localhost'}:3100/fake-zip-download/${
+            req.params.project_id
+          }/version/${req.params.version}`
         })
       }
     )
 
     return app
-      .listen(3100, (error) => {
+      .listen(3100, error => {
         if (error != null) {
           throw error
         }
       })
-      .on('error', (error) => {
+      .on('error', error => {
         console.error('error starting MockV1HistoryApi:', error.message)
         return process.exit(1)
       })

@@ -11,7 +11,7 @@ const TokenAccessHandler = require('../TokenAccess/TokenAccessHandler')
 module.exports = AuthorizationMiddleware = {
   ensureUserCanReadMultipleProjects(req, res, next) {
     const projectIds = (req.query.project_ids || '').split(',')
-    AuthorizationMiddleware._getUserId(req, function (error, userId) {
+    AuthorizationMiddleware._getUserId(req, function(error, userId) {
       if (error) {
         return next(error)
       }
@@ -19,13 +19,13 @@ module.exports = AuthorizationMiddleware = {
       // errors in callbacks
       async.rejectSeries(
         projectIds,
-        function (projectId, cb) {
+        function(projectId, cb) {
           const token = TokenAccessHandler.getRequestToken(req, projectId)
           AuthorizationManager.canUserReadProject(
             userId,
             projectId,
             token,
-            function (error, canRead) {
+            function(error, canRead) {
               if (error) {
                 return next(error)
               }
@@ -33,7 +33,7 @@ module.exports = AuthorizationMiddleware = {
             }
           )
         },
-        function (unauthorizedProjectIds) {
+        function(unauthorizedProjectIds) {
           if (unauthorizedProjectIds.length > 0) {
             return AuthorizationMiddleware.redirectToRestricted(req, res, next)
           }
@@ -44,7 +44,7 @@ module.exports = AuthorizationMiddleware = {
   },
 
   ensureUserCanReadProject(req, res, next) {
-    AuthorizationMiddleware._getUserAndProjectId(req, function (
+    AuthorizationMiddleware._getUserAndProjectId(req, function(
       error,
       userId,
       projectId
@@ -57,7 +57,7 @@ module.exports = AuthorizationMiddleware = {
         userId,
         projectId,
         token,
-        function (error, canRead) {
+        function(error, canRead) {
           if (error) {
             return next(error)
           }
@@ -83,7 +83,7 @@ module.exports = AuthorizationMiddleware = {
   },
 
   ensureUserCanWriteProjectSettings(req, res, next) {
-    AuthorizationMiddleware._getUserAndProjectId(req, function (
+    AuthorizationMiddleware._getUserAndProjectId(req, function(
       error,
       userId,
       projectId
@@ -96,7 +96,7 @@ module.exports = AuthorizationMiddleware = {
         userId,
         projectId,
         token,
-        function (error, canWrite) {
+        function(error, canWrite) {
           if (error) {
             return next(error)
           }
@@ -118,7 +118,7 @@ module.exports = AuthorizationMiddleware = {
   },
 
   ensureUserCanWriteProjectContent(req, res, next) {
-    AuthorizationMiddleware._getUserAndProjectId(req, function (
+    AuthorizationMiddleware._getUserAndProjectId(req, function(
       error,
       userId,
       projectId
@@ -131,7 +131,7 @@ module.exports = AuthorizationMiddleware = {
         userId,
         projectId,
         token,
-        function (error, canWrite) {
+        function(error, canWrite) {
           if (error) {
             return next(error)
           }
@@ -153,7 +153,7 @@ module.exports = AuthorizationMiddleware = {
   },
 
   ensureUserCanAdminProject(req, res, next) {
-    AuthorizationMiddleware._getUserAndProjectId(req, function (
+    AuthorizationMiddleware._getUserAndProjectId(req, function(
       error,
       userId,
       projectId
@@ -166,7 +166,7 @@ module.exports = AuthorizationMiddleware = {
         userId,
         projectId,
         token,
-        function (error, canAdmin) {
+        function(error, canAdmin) {
           if (error) {
             return next(error)
           }
@@ -188,11 +188,11 @@ module.exports = AuthorizationMiddleware = {
   },
 
   ensureUserIsSiteAdmin(req, res, next) {
-    AuthorizationMiddleware._getUserId(req, function (error, userId) {
+    AuthorizationMiddleware._getUserId(req, function(error, userId) {
       if (error) {
         return next(error)
       }
-      AuthorizationManager.isUserSiteAdmin(userId, function (error, isAdmin) {
+      AuthorizationManager.isUserSiteAdmin(userId, function(error, isAdmin) {
         if (error) {
           return next(error)
         }
@@ -216,7 +216,7 @@ module.exports = AuthorizationMiddleware = {
         new Errors.NotFoundError(`invalid projectId: ${projectId}`)
       )
     }
-    AuthorizationMiddleware._getUserId(req, function (error, userId) {
+    AuthorizationMiddleware._getUserId(req, function(error, userId) {
       if (error) {
         return callback(error)
       }

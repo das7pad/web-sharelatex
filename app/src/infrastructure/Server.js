@@ -123,7 +123,7 @@ passport.use(
 passport.serializeUser(AuthenticationController.serializeUser)
 passport.deserializeUser(AuthenticationController.deserializeUser)
 
-Modules.hooks.fire('passportSetup', passport, function (err) {
+Modules.hooks.fire('passportSetup', passport, function(err) {
   if (err != null) {
     logger.err({ err }, 'error setting up passport in modules')
   }
@@ -144,13 +144,13 @@ webRouter.use(translations.expressMiddlewear)
 webRouter.use(translations.setLangBasedOnDomainMiddlewear)
 
 // Measure expiry from last request, not last login
-webRouter.use(function (req, res, next) {
+webRouter.use(function(req, res, next) {
   if (!req.session.noSessionCallback) {
     req.session.touch()
     if (AuthenticationController.isUserLoggedIn(req)) {
       UserSessionsManager.touch(
         AuthenticationController.getSessionUser(req),
-        (err) => {
+        err => {
           if (err) {
             logger.err({ err }, 'error extending user session')
           }
@@ -166,7 +166,7 @@ expressLocals(webRouter, privateApiRouter, publicApiRouter)
 
 webRouter.use(SessionAutostartMiddleware.invokeCallbackMiddleware)
 
-webRouter.use(function (req, res, next) {
+webRouter.use(function(req, res, next) {
   if (Settings.siteIsOpen) {
     next()
   } else if (
@@ -180,7 +180,7 @@ webRouter.use(function (req, res, next) {
   }
 })
 
-webRouter.use(function (req, res, next) {
+webRouter.use(function(req, res, next) {
   if (Settings.editorIsOpen) {
     next()
   } else if (req.url.indexOf('/admin') === 0) {
@@ -192,7 +192,7 @@ webRouter.use(function (req, res, next) {
 })
 
 // add security headers using Helmet
-webRouter.use(function (req, res, next) {
+webRouter.use(function(req, res, next) {
   const isLoggedIn = AuthenticationController.isUserLoggedIn(req)
   const isProjectPage = !!req.path.match('^/project/[a-f0-9]{24}$')
 
@@ -211,7 +211,7 @@ const server = require('http').createServer(app)
 // provide settings for separate web and api processes
 // if enableApiRouter and enableWebRouter are not defined they default
 // to true.
-const notDefined = (x) => x == null
+const notDefined = x => x == null
 const enableApiRouter =
   Settings.web != null ? Settings.web.enableApiRouter : undefined
 if (enableApiRouter || notDefined(enableApiRouter)) {

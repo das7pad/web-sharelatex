@@ -11,8 +11,8 @@ const modulePath = path.join(
 const { expect } = require('chai')
 const Errors = require('../../../../app/src/Features/Errors/Errors')
 
-describe('UserGetter', function () {
-  beforeEach(function () {
+describe('UserGetter', function() {
+  beforeEach(function() {
     this.fakeUser = {
       _id: '12390i',
       email: 'email2@foo.bar',
@@ -55,8 +55,8 @@ describe('UserGetter', function () {
     })
   })
 
-  describe('getUser', function () {
-    it('should get user', function (done) {
+  describe('getUser', function() {
+    it('should get user', function(done) {
       const query = { _id: 'foo' }
       const projection = { email: 1 }
       this.UserGetter.getUser(query, projection, (error, user) => {
@@ -68,7 +68,7 @@ describe('UserGetter', function () {
       })
     })
 
-    it('should not allow null query', function (done) {
+    it('should not allow null query', function(done) {
       this.UserGetter.getUser(null, {}, (error, user) => {
         error.should.exist
         done()
@@ -76,8 +76,8 @@ describe('UserGetter', function () {
     })
   })
 
-  describe('getUserFullEmails', function () {
-    it('should get user', function (done) {
+  describe('getUserFullEmails', function() {
+    it('should get user', function(done) {
       this.UserGetter.getUser = sinon
         .stub()
         .callsArgWith(2, null, this.fakeUser)
@@ -95,7 +95,7 @@ describe('UserGetter', function () {
       )
     })
 
-    it('should fetch emails data', function (done) {
+    it('should fetch emails data', function(done) {
       this.UserGetter.getUser = sinon
         .stub()
         .callsArgWith(2, null, this.fakeUser)
@@ -120,7 +120,7 @@ describe('UserGetter', function () {
       )
     })
 
-    it('should merge affiliation data', function (done) {
+    it('should merge affiliation data', function(done) {
       this.UserGetter.getUser = sinon
         .stub()
         .callsArgWith(2, null, this.fakeUser)
@@ -163,7 +163,7 @@ describe('UserGetter', function () {
       )
     })
 
-    it('should get user when it has no emails field', function (done) {
+    it('should get user when it has no emails field', function(done) {
       this.fakeUser = {
         _id: '12390i',
         email: 'email2@foo.bar'
@@ -187,8 +187,8 @@ describe('UserGetter', function () {
     })
   })
 
-  describe('getUserbyMainEmail', function () {
-    it('query user by main email', function (done) {
+  describe('getUserbyMainEmail', function() {
+    it('query user by main email', function(done) {
       const email = 'hello@world.com'
       const projection = { emails: 1 }
       this.UserGetter.getUserByMainEmail(email, projection, (error, user) => {
@@ -199,7 +199,7 @@ describe('UserGetter', function () {
       })
     })
 
-    it('return user if found', function (done) {
+    it('return user if found', function(done) {
       const email = 'hello@world.com'
       this.UserGetter.getUserByMainEmail(email, (error, user) => {
         expect(error).to.not.exist
@@ -208,7 +208,7 @@ describe('UserGetter', function () {
       })
     })
 
-    it('trim email', function (done) {
+    it('trim email', function(done) {
       const email = 'hello@world.com'
       this.UserGetter.getUserByMainEmail(` ${email} `, (error, user) => {
         expect(error).to.not.exist
@@ -219,8 +219,8 @@ describe('UserGetter', function () {
     })
   })
 
-  describe('getUserByAnyEmail', function () {
-    it('query user for any email', function (done) {
+  describe('getUserByAnyEmail', function() {
+    it('query user for any email', function(done) {
       const email = 'hello@world.com'
       const expectedQuery = {
         emails: { $exists: true },
@@ -239,7 +239,7 @@ describe('UserGetter', function () {
       )
     })
 
-    it('query contains $exists:true so partial index is used', function (done) {
+    it('query contains $exists:true so partial index is used', function(done) {
       const expectedQuery = {
         emails: { $exists: true },
         'emails.email': ''
@@ -251,7 +251,7 @@ describe('UserGetter', function () {
       })
     })
 
-    it('checks main email as well', function (done) {
+    it('checks main email as well', function(done) {
       this.findOne.callsArgWith(2, null, null)
       const email = 'hello@world.com'
       const projection = { emails: 1 }
@@ -268,12 +268,15 @@ describe('UserGetter', function () {
     })
   })
 
-  describe('getUsersByHostname', function () {
-    it('should find user by hostname', function (done) {
+  describe('getUsersByHostname', function() {
+    it('should find user by hostname', function(done) {
       const hostname = 'bar.foo'
       const expectedQuery = {
         emails: { $exists: true },
-        'emails.reversedHostname': hostname.split('').reverse().join('')
+        'emails.reversedHostname': hostname
+          .split('')
+          .reverse()
+          .join('')
       }
       const projection = { emails: 1 }
       this.UserGetter.getUsersByHostname(
@@ -289,8 +292,8 @@ describe('UserGetter', function () {
     })
   })
 
-  describe('getUsersByV1Id', function () {
-    it('should find users by list of v1 ids', function (done) {
+  describe('getUsersByV1Id', function() {
+    it('should find users by list of v1 ids', function(done) {
       const v1Ids = [501]
       const expectedQuery = {
         'overleaf.id': { $in: v1Ids }
@@ -305,23 +308,23 @@ describe('UserGetter', function () {
     })
   })
 
-  describe('ensureUniqueEmailAddress', function () {
-    beforeEach(function () {
+  describe('ensureUniqueEmailAddress', function() {
+    beforeEach(function() {
       this.UserGetter.getUserByAnyEmail = sinon.stub()
     })
 
-    it('should return error if existing user is found', function (done) {
+    it('should return error if existing user is found', function(done) {
       this.UserGetter.getUserByAnyEmail.callsArgWith(1, null, this.fakeUser)
-      this.UserGetter.ensureUniqueEmailAddress(this.newEmail, (err) => {
+      this.UserGetter.ensureUniqueEmailAddress(this.newEmail, err => {
         should.exist(err)
         expect(err).to.be.an.instanceof(Errors.EmailExistsError)
         done()
       })
     })
 
-    it('should return null if no user is found', function (done) {
+    it('should return null if no user is found', function(done) {
       this.UserGetter.getUserByAnyEmail.callsArgWith(1)
-      this.UserGetter.ensureUniqueEmailAddress(this.newEmail, (err) => {
+      this.UserGetter.ensureUniqueEmailAddress(this.newEmail, err => {
         should.not.exist(err)
         done()
       })

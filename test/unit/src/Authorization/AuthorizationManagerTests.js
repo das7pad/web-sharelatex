@@ -20,8 +20,8 @@ const modulePath =
 const SandboxedModule = require('sandboxed-module')
 const Errors = require('../../../../app/src/Features/Errors/Errors')
 
-describe('AuthorizationManager', function () {
-  beforeEach(function () {
+describe('AuthorizationManager', function() {
+  beforeEach(function() {
     this.AuthorizationManager = SandboxedModule.require(modulePath, {
       globals: {
         console: console
@@ -46,8 +46,8 @@ describe('AuthorizationManager', function () {
     return (this.callback = sinon.stub())
   })
 
-  describe('isRestrictedUser', function () {
-    it('should produce the correct values', function () {
+  describe('isRestrictedUser', function() {
+    it('should produce the correct values', function() {
       const notRestrictedScenarios = [
         [null, 'readAndWrite', false],
         ['id', 'readAndWrite', true],
@@ -74,22 +74,22 @@ describe('AuthorizationManager', function () {
     })
   })
 
-  describe('getPrivilegeLevelForProject', function () {
-    beforeEach(function () {
+  describe('getPrivilegeLevelForProject', function() {
+    beforeEach(function() {
       this.ProjectGetter.getProject = sinon.stub()
       this.AuthorizationManager.isUserSiteAdmin = sinon.stub()
       return (this.CollaboratorsGetter.getMemberIdPrivilegeLevel = sinon.stub())
     })
 
-    describe('with a token-based project', function () {
-      beforeEach(function () {
+    describe('with a token-based project', function() {
+      beforeEach(function() {
         return this.ProjectGetter.getProject
           .withArgs(this.project_id, { publicAccesLevel: 1 })
           .yields(null, { publicAccesLevel: 'tokenBased' })
       })
 
-      describe('with a user_id with a privilege level', function () {
-        beforeEach(function () {
+      describe('with a user_id with a privilege level', function() {
+        beforeEach(function() {
           this.AuthorizationManager.isUserSiteAdmin
             .withArgs(this.user_id)
             .yields(null, false)
@@ -104,15 +104,15 @@ describe('AuthorizationManager', function () {
           )
         })
 
-        it("should return the user's privilege level", function () {
+        it("should return the user's privilege level", function() {
           return this.callback
             .calledWith(null, 'readOnly', false, false)
             .should.equal(true)
         })
       })
 
-      describe('with a user_id with no privilege level', function () {
-        beforeEach(function () {
+      describe('with a user_id with no privilege level', function() {
+        beforeEach(function() {
           this.AuthorizationManager.isUserSiteAdmin
             .withArgs(this.user_id)
             .yields(null, false)
@@ -127,15 +127,15 @@ describe('AuthorizationManager', function () {
           )
         })
 
-        it('should return false', function () {
+        it('should return false', function() {
           return this.callback
             .calledWith(null, false, false, false)
             .should.equal(true)
         })
       })
 
-      describe('with a user_id who is an admin', function () {
-        beforeEach(function () {
+      describe('with a user_id who is an admin', function() {
+        beforeEach(function() {
           this.AuthorizationManager.isUserSiteAdmin
             .withArgs(this.user_id)
             .yields(null, true)
@@ -150,16 +150,16 @@ describe('AuthorizationManager', function () {
           )
         })
 
-        it('should return the user as an owner', function () {
+        it('should return the user as an owner', function() {
           return this.callback
             .calledWith(null, 'owner', false, true)
             .should.equal(true)
         })
       })
 
-      describe('with no user (anonymous)', function () {
-        describe('when the token is not valid', function () {
-          beforeEach(function () {
+      describe('with no user (anonymous)', function() {
+        describe('when the token is not valid', function() {
+          beforeEach(function() {
             this.TokenAccessHandler.validateTokenForAnonymousAccess = sinon
               .stub()
               .withArgs(this.project_id, this.token)
@@ -172,33 +172,33 @@ describe('AuthorizationManager', function () {
             )
           })
 
-          it('should not call CollaboratorsGetter.getMemberIdPrivilegeLevel', function () {
+          it('should not call CollaboratorsGetter.getMemberIdPrivilegeLevel', function() {
             return this.CollaboratorsGetter.getMemberIdPrivilegeLevel.called.should.equal(
               false
             )
           })
 
-          it('should not call AuthorizationManager.isUserSiteAdmin', function () {
+          it('should not call AuthorizationManager.isUserSiteAdmin', function() {
             return this.AuthorizationManager.isUserSiteAdmin.called.should.equal(
               false
             )
           })
 
-          it('should check if the token is valid', function () {
+          it('should check if the token is valid', function() {
             return this.TokenAccessHandler.validateTokenForAnonymousAccess
               .calledWith(this.project_id, this.token)
               .should.equal(true)
           })
 
-          it('should return false', function () {
+          it('should return false', function() {
             return this.callback
               .calledWith(null, false, false, false)
               .should.equal(true)
           })
         })
 
-        describe('when the token is valid for read-and-write', function () {
-          beforeEach(function () {
+        describe('when the token is valid for read-and-write', function() {
+          beforeEach(function() {
             this.TokenAccessHandler.validateTokenForAnonymousAccess = sinon
               .stub()
               .withArgs(this.project_id, this.token)
@@ -211,33 +211,33 @@ describe('AuthorizationManager', function () {
             )
           })
 
-          it('should not call CollaboratorsGetter.getMemberIdPrivilegeLevel', function () {
+          it('should not call CollaboratorsGetter.getMemberIdPrivilegeLevel', function() {
             return this.CollaboratorsGetter.getMemberIdPrivilegeLevel.called.should.equal(
               false
             )
           })
 
-          it('should not call AuthorizationManager.isUserSiteAdmin', function () {
+          it('should not call AuthorizationManager.isUserSiteAdmin', function() {
             return this.AuthorizationManager.isUserSiteAdmin.called.should.equal(
               false
             )
           })
 
-          it('should check if the token is valid', function () {
+          it('should check if the token is valid', function() {
             return this.TokenAccessHandler.validateTokenForAnonymousAccess
               .calledWith(this.project_id, this.token)
               .should.equal(true)
           })
 
-          it('should give read-write access', function () {
+          it('should give read-write access', function() {
             return this.callback
               .calledWith(null, 'readAndWrite', false)
               .should.equal(true)
           })
         })
 
-        describe('when the token is valid for read-only', function () {
-          beforeEach(function () {
+        describe('when the token is valid for read-only', function() {
+          beforeEach(function() {
             this.TokenAccessHandler.validateTokenForAnonymousAccess = sinon
               .stub()
               .withArgs(this.project_id, this.token)
@@ -250,25 +250,25 @@ describe('AuthorizationManager', function () {
             )
           })
 
-          it('should not call CollaboratorsGetter.getMemberIdPrivilegeLevel', function () {
+          it('should not call CollaboratorsGetter.getMemberIdPrivilegeLevel', function() {
             return this.CollaboratorsGetter.getMemberIdPrivilegeLevel.called.should.equal(
               false
             )
           })
 
-          it('should not call AuthorizationManager.isUserSiteAdmin', function () {
+          it('should not call AuthorizationManager.isUserSiteAdmin', function() {
             return this.AuthorizationManager.isUserSiteAdmin.called.should.equal(
               false
             )
           })
 
-          it('should check if the token is valid', function () {
+          it('should check if the token is valid', function() {
             return this.TokenAccessHandler.validateTokenForAnonymousAccess
               .calledWith(this.project_id, this.token)
               .should.equal(true)
           })
 
-          it('should give read-only access', function () {
+          it('should give read-only access', function() {
             return this.callback
               .calledWith(null, 'readOnly', false)
               .should.equal(true)
@@ -277,15 +277,15 @@ describe('AuthorizationManager', function () {
       })
     })
 
-    describe('with a private project', function () {
-      beforeEach(function () {
+    describe('with a private project', function() {
+      beforeEach(function() {
         return this.ProjectGetter.getProject
           .withArgs(this.project_id, { publicAccesLevel: 1 })
           .yields(null, { publicAccesLevel: 'private' })
       })
 
-      describe('with a user_id with a privilege level', function () {
-        beforeEach(function () {
+      describe('with a user_id with a privilege level', function() {
+        beforeEach(function() {
           this.AuthorizationManager.isUserSiteAdmin
             .withArgs(this.user_id)
             .yields(null, false)
@@ -300,15 +300,15 @@ describe('AuthorizationManager', function () {
           )
         })
 
-        it("should return the user's privilege level", function () {
+        it("should return the user's privilege level", function() {
           return this.callback
             .calledWith(null, 'readOnly', false, false)
             .should.equal(true)
         })
       })
 
-      describe('with a user_id with no privilege level', function () {
-        beforeEach(function () {
+      describe('with a user_id with no privilege level', function() {
+        beforeEach(function() {
           this.AuthorizationManager.isUserSiteAdmin
             .withArgs(this.user_id)
             .yields(null, false)
@@ -323,15 +323,15 @@ describe('AuthorizationManager', function () {
           )
         })
 
-        it('should return false', function () {
+        it('should return false', function() {
           return this.callback
             .calledWith(null, false, false, false)
             .should.equal(true)
         })
       })
 
-      describe('with a user_id who is an admin', function () {
-        beforeEach(function () {
+      describe('with a user_id who is an admin', function() {
+        beforeEach(function() {
           this.AuthorizationManager.isUserSiteAdmin
             .withArgs(this.user_id)
             .yields(null, true)
@@ -346,15 +346,15 @@ describe('AuthorizationManager', function () {
           )
         })
 
-        it('should return the user as an owner', function () {
+        it('should return the user as an owner', function() {
           return this.callback
             .calledWith(null, 'owner', false, true)
             .should.equal(true)
         })
       })
 
-      describe('with no user (anonymous)', function () {
-        beforeEach(function () {
+      describe('with no user (anonymous)', function() {
+        beforeEach(function() {
           return this.AuthorizationManager.getPrivilegeLevelForProject(
             null,
             this.project_id,
@@ -363,19 +363,19 @@ describe('AuthorizationManager', function () {
           )
         })
 
-        it('should not call CollaboratorsGetter.getMemberIdPrivilegeLevel', function () {
+        it('should not call CollaboratorsGetter.getMemberIdPrivilegeLevel', function() {
           return this.CollaboratorsGetter.getMemberIdPrivilegeLevel.called.should.equal(
             false
           )
         })
 
-        it('should not call AuthorizationManager.isUserSiteAdmin', function () {
+        it('should not call AuthorizationManager.isUserSiteAdmin', function() {
           return this.AuthorizationManager.isUserSiteAdmin.called.should.equal(
             false
           )
         })
 
-        it('should return false', function () {
+        it('should return false', function() {
           return this.callback
             .calledWith(null, false, false, false)
             .should.equal(true)
@@ -383,15 +383,15 @@ describe('AuthorizationManager', function () {
       })
     })
 
-    describe('with a public project', function () {
-      beforeEach(function () {
+    describe('with a public project', function() {
+      beforeEach(function() {
         return this.ProjectGetter.getProject
           .withArgs(this.project_id, { publicAccesLevel: 1 })
           .yields(null, { publicAccesLevel: 'readAndWrite' })
       })
 
-      describe('with a user_id with a privilege level', function () {
-        beforeEach(function () {
+      describe('with a user_id with a privilege level', function() {
+        beforeEach(function() {
           this.AuthorizationManager.isUserSiteAdmin
             .withArgs(this.user_id)
             .yields(null, false)
@@ -406,15 +406,15 @@ describe('AuthorizationManager', function () {
           )
         })
 
-        it("should return the user's privilege level", function () {
+        it("should return the user's privilege level", function() {
           return this.callback
             .calledWith(null, 'readOnly', false)
             .should.equal(true)
         })
       })
 
-      describe('with a user_id with no privilege level', function () {
-        beforeEach(function () {
+      describe('with a user_id with no privilege level', function() {
+        beforeEach(function() {
           this.AuthorizationManager.isUserSiteAdmin
             .withArgs(this.user_id)
             .yields(null, false)
@@ -429,15 +429,15 @@ describe('AuthorizationManager', function () {
           )
         })
 
-        it('should return the public privilege level', function () {
+        it('should return the public privilege level', function() {
           return this.callback
             .calledWith(null, 'readAndWrite', true)
             .should.equal(true)
         })
       })
 
-      describe('with a user_id who is an admin', function () {
-        beforeEach(function () {
+      describe('with a user_id who is an admin', function() {
+        beforeEach(function() {
           this.AuthorizationManager.isUserSiteAdmin
             .withArgs(this.user_id)
             .yields(null, true)
@@ -452,15 +452,15 @@ describe('AuthorizationManager', function () {
           )
         })
 
-        it('should return the user as an owner', function () {
+        it('should return the user as an owner', function() {
           return this.callback
             .calledWith(null, 'owner', false)
             .should.equal(true)
         })
       })
 
-      describe('with no user (anonymous)', function () {
-        beforeEach(function () {
+      describe('with no user (anonymous)', function() {
+        beforeEach(function() {
           return this.AuthorizationManager.getPrivilegeLevelForProject(
             null,
             this.project_id,
@@ -469,19 +469,19 @@ describe('AuthorizationManager', function () {
           )
         })
 
-        it('should not call CollaboratorsGetter.getMemberIdPrivilegeLevel', function () {
+        it('should not call CollaboratorsGetter.getMemberIdPrivilegeLevel', function() {
           return this.CollaboratorsGetter.getMemberIdPrivilegeLevel.called.should.equal(
             false
           )
         })
 
-        it('should not call AuthorizationManager.isUserSiteAdmin', function () {
+        it('should not call AuthorizationManager.isUserSiteAdmin', function() {
           return this.AuthorizationManager.isUserSiteAdmin.called.should.equal(
             false
           )
         })
 
-        it('should return the public privilege level', function () {
+        it('should return the public privilege level', function() {
           return this.callback
             .calledWith(null, 'readAndWrite', true)
             .should.equal(true)
@@ -489,25 +489,25 @@ describe('AuthorizationManager', function () {
       })
     })
 
-    describe("when the project doesn't exist", function () {
-      beforeEach(function () {
+    describe("when the project doesn't exist", function() {
+      beforeEach(function() {
         return this.ProjectGetter.getProject
           .withArgs(this.project_id, { publicAccesLevel: 1 })
           .yields(null, null)
       })
 
-      it('should return a NotFoundError', function () {
+      it('should return a NotFoundError', function() {
         return this.AuthorizationManager.getPrivilegeLevelForProject(
           this.user_id,
           this.project_id,
           this.token,
-          (error) => error.should.be.instanceof(Errors.NotFoundError)
+          error => error.should.be.instanceof(Errors.NotFoundError)
         )
       })
     })
 
-    describe('when the project id is not valid', function () {
-      beforeEach(function () {
+    describe('when the project id is not valid', function() {
+      beforeEach(function() {
         this.AuthorizationManager.isUserSiteAdmin
           .withArgs(this.user_id)
           .yields(null, false)
@@ -516,12 +516,12 @@ describe('AuthorizationManager', function () {
           .yields(null, 'readOnly')
       })
 
-      it('should return a error', function (done) {
+      it('should return a error', function(done) {
         return this.AuthorizationManager.getPrivilegeLevelForProject(
           undefined,
           'not project id',
           this.token,
-          (err) => {
+          err => {
             this.ProjectGetter.getProject.called.should.equal(false)
             expect(err).to.exist
             return done()
@@ -531,19 +531,19 @@ describe('AuthorizationManager', function () {
     })
   })
 
-  describe('canUserReadProject', function () {
-    beforeEach(function () {
+  describe('canUserReadProject', function() {
+    beforeEach(function() {
       return (this.AuthorizationManager.getPrivilegeLevelForProject = sinon.stub())
     })
 
-    describe('when user is owner', function () {
-      beforeEach(function () {
+    describe('when user is owner', function() {
+      beforeEach(function() {
         return this.AuthorizationManager.getPrivilegeLevelForProject
           .withArgs(this.user_id, this.project_id, this.token)
           .yields(null, 'owner', false)
       })
 
-      it('should return true', function (done) {
+      it('should return true', function(done) {
         return this.AuthorizationManager.canUserReadProject(
           this.user_id,
           this.project_id,
@@ -556,14 +556,14 @@ describe('AuthorizationManager', function () {
       })
     })
 
-    describe('when user has read-write access', function () {
-      beforeEach(function () {
+    describe('when user has read-write access', function() {
+      beforeEach(function() {
         return this.AuthorizationManager.getPrivilegeLevelForProject
           .withArgs(this.user_id, this.project_id, this.token)
           .yields(null, 'readAndWrite', false)
       })
 
-      it('should return true', function (done) {
+      it('should return true', function(done) {
         return this.AuthorizationManager.canUserReadProject(
           this.user_id,
           this.project_id,
@@ -576,14 +576,14 @@ describe('AuthorizationManager', function () {
       })
     })
 
-    describe('when user has read-only access', function () {
-      beforeEach(function () {
+    describe('when user has read-only access', function() {
+      beforeEach(function() {
         return this.AuthorizationManager.getPrivilegeLevelForProject
           .withArgs(this.user_id, this.project_id, this.token)
           .yields(null, 'readOnly', false)
       })
 
-      it('should return true', function (done) {
+      it('should return true', function(done) {
         return this.AuthorizationManager.canUserReadProject(
           this.user_id,
           this.project_id,
@@ -596,14 +596,14 @@ describe('AuthorizationManager', function () {
       })
     })
 
-    describe('when user has no access', function () {
-      beforeEach(function () {
+    describe('when user has no access', function() {
+      beforeEach(function() {
         return this.AuthorizationManager.getPrivilegeLevelForProject
           .withArgs(this.user_id, this.project_id, this.token)
           .yields(null, false, false)
       })
 
-      it('should return false', function (done) {
+      it('should return false', function(done) {
         return this.AuthorizationManager.canUserReadProject(
           this.user_id,
           this.project_id,
@@ -617,19 +617,19 @@ describe('AuthorizationManager', function () {
     })
   })
 
-  describe('canUserWriteProjectContent', function () {
-    beforeEach(function () {
+  describe('canUserWriteProjectContent', function() {
+    beforeEach(function() {
       return (this.AuthorizationManager.getPrivilegeLevelForProject = sinon.stub())
     })
 
-    describe('when user is owner', function () {
-      beforeEach(function () {
+    describe('when user is owner', function() {
+      beforeEach(function() {
         return this.AuthorizationManager.getPrivilegeLevelForProject
           .withArgs(this.user_id, this.project_id, this.token)
           .yields(null, 'owner', false)
       })
 
-      it('should return true', function (done) {
+      it('should return true', function(done) {
         return this.AuthorizationManager.canUserWriteProjectContent(
           this.user_id,
           this.project_id,
@@ -642,14 +642,14 @@ describe('AuthorizationManager', function () {
       })
     })
 
-    describe('when user has read-write access', function () {
-      beforeEach(function () {
+    describe('when user has read-write access', function() {
+      beforeEach(function() {
         return this.AuthorizationManager.getPrivilegeLevelForProject
           .withArgs(this.user_id, this.project_id, this.token)
           .yields(null, 'readAndWrite', false)
       })
 
-      it('should return true', function (done) {
+      it('should return true', function(done) {
         return this.AuthorizationManager.canUserWriteProjectContent(
           this.user_id,
           this.project_id,
@@ -662,14 +662,14 @@ describe('AuthorizationManager', function () {
       })
     })
 
-    describe('when user has read-only access', function () {
-      beforeEach(function () {
+    describe('when user has read-only access', function() {
+      beforeEach(function() {
         return this.AuthorizationManager.getPrivilegeLevelForProject
           .withArgs(this.user_id, this.project_id, this.token)
           .yields(null, 'readOnly', false)
       })
 
-      it('should return false', function (done) {
+      it('should return false', function(done) {
         return this.AuthorizationManager.canUserWriteProjectContent(
           this.user_id,
           this.project_id,
@@ -682,14 +682,14 @@ describe('AuthorizationManager', function () {
       })
     })
 
-    describe('when user has no access', function () {
-      beforeEach(function () {
+    describe('when user has no access', function() {
+      beforeEach(function() {
         return this.AuthorizationManager.getPrivilegeLevelForProject
           .withArgs(this.user_id, this.project_id, this.token)
           .yields(null, false, false)
       })
 
-      it('should return false', function (done) {
+      it('should return false', function(done) {
         return this.AuthorizationManager.canUserWriteProjectContent(
           this.user_id,
           this.project_id,
@@ -703,19 +703,19 @@ describe('AuthorizationManager', function () {
     })
   })
 
-  describe('canUserWriteProjectSettings', function () {
-    beforeEach(function () {
+  describe('canUserWriteProjectSettings', function() {
+    beforeEach(function() {
       return (this.AuthorizationManager.getPrivilegeLevelForProject = sinon.stub())
     })
 
-    describe('when user is owner', function () {
-      beforeEach(function () {
+    describe('when user is owner', function() {
+      beforeEach(function() {
         return this.AuthorizationManager.getPrivilegeLevelForProject
           .withArgs(this.user_id, this.project_id, this.token)
           .yields(null, 'owner', false)
       })
 
-      it('should return true', function (done) {
+      it('should return true', function(done) {
         return this.AuthorizationManager.canUserWriteProjectSettings(
           this.user_id,
           this.project_id,
@@ -728,14 +728,14 @@ describe('AuthorizationManager', function () {
       })
     })
 
-    describe('when user has read-write access as a collaborator', function () {
-      beforeEach(function () {
+    describe('when user has read-write access as a collaborator', function() {
+      beforeEach(function() {
         return this.AuthorizationManager.getPrivilegeLevelForProject
           .withArgs(this.user_id, this.project_id, this.token)
           .yields(null, 'readAndWrite', false)
       })
 
-      it('should return true', function (done) {
+      it('should return true', function(done) {
         return this.AuthorizationManager.canUserWriteProjectSettings(
           this.user_id,
           this.project_id,
@@ -748,14 +748,14 @@ describe('AuthorizationManager', function () {
       })
     })
 
-    describe('when user has read-write access as the public', function () {
-      beforeEach(function () {
+    describe('when user has read-write access as the public', function() {
+      beforeEach(function() {
         return this.AuthorizationManager.getPrivilegeLevelForProject
           .withArgs(this.user_id, this.project_id, this.token)
           .yields(null, 'readAndWrite', true)
       })
 
-      it('should return false', function (done) {
+      it('should return false', function(done) {
         return this.AuthorizationManager.canUserWriteProjectSettings(
           this.user_id,
           this.project_id,
@@ -768,14 +768,14 @@ describe('AuthorizationManager', function () {
       })
     })
 
-    describe('when user has read-only access', function () {
-      beforeEach(function () {
+    describe('when user has read-only access', function() {
+      beforeEach(function() {
         return this.AuthorizationManager.getPrivilegeLevelForProject
           .withArgs(this.user_id, this.project_id, this.token)
           .yields(null, 'readOnly', false)
       })
 
-      it('should return false', function (done) {
+      it('should return false', function(done) {
         return this.AuthorizationManager.canUserWriteProjectSettings(
           this.user_id,
           this.project_id,
@@ -788,14 +788,14 @@ describe('AuthorizationManager', function () {
       })
     })
 
-    describe('when user has no access', function () {
-      beforeEach(function () {
+    describe('when user has no access', function() {
+      beforeEach(function() {
         return this.AuthorizationManager.getPrivilegeLevelForProject
           .withArgs(this.user_id, this.project_id, this.token)
           .yields(null, false, false)
       })
 
-      it('should return false', function (done) {
+      it('should return false', function(done) {
         return this.AuthorizationManager.canUserWriteProjectSettings(
           this.user_id,
           this.project_id,
@@ -809,19 +809,19 @@ describe('AuthorizationManager', function () {
     })
   })
 
-  describe('canUserAdminProject', function () {
-    beforeEach(function () {
+  describe('canUserAdminProject', function() {
+    beforeEach(function() {
       return (this.AuthorizationManager.getPrivilegeLevelForProject = sinon.stub())
     })
 
-    describe('when user is owner', function () {
-      beforeEach(function () {
+    describe('when user is owner', function() {
+      beforeEach(function() {
         return this.AuthorizationManager.getPrivilegeLevelForProject
           .withArgs(this.user_id, this.project_id, this.token)
           .yields(null, 'owner', false)
       })
 
-      it('should return true', function (done) {
+      it('should return true', function(done) {
         return this.AuthorizationManager.canUserAdminProject(
           this.user_id,
           this.project_id,
@@ -834,14 +834,14 @@ describe('AuthorizationManager', function () {
       })
     })
 
-    describe('when user has read-write access', function () {
-      beforeEach(function () {
+    describe('when user has read-write access', function() {
+      beforeEach(function() {
         return this.AuthorizationManager.getPrivilegeLevelForProject
           .withArgs(this.user_id, this.project_id, this.token)
           .yields(null, 'readAndWrite', false)
       })
 
-      it('should return false', function (done) {
+      it('should return false', function(done) {
         return this.AuthorizationManager.canUserAdminProject(
           this.user_id,
           this.project_id,
@@ -854,14 +854,14 @@ describe('AuthorizationManager', function () {
       })
     })
 
-    describe('when user has read-only access', function () {
-      beforeEach(function () {
+    describe('when user has read-only access', function() {
+      beforeEach(function() {
         return this.AuthorizationManager.getPrivilegeLevelForProject
           .withArgs(this.user_id, this.project_id, this.token)
           .yields(null, 'readOnly', false)
       })
 
-      it('should return false', function (done) {
+      it('should return false', function(done) {
         return this.AuthorizationManager.canUserAdminProject(
           this.user_id,
           this.project_id,
@@ -874,14 +874,14 @@ describe('AuthorizationManager', function () {
       })
     })
 
-    describe('when user has no access', function () {
-      beforeEach(function () {
+    describe('when user has no access', function() {
+      beforeEach(function() {
         return this.AuthorizationManager.getPrivilegeLevelForProject
           .withArgs(this.user_id, this.project_id, this.token)
           .yields(null, false, false)
       })
 
-      it('should return false', function (done) {
+      it('should return false', function(done) {
         return this.AuthorizationManager.canUserAdminProject(
           this.user_id,
           this.project_id,
@@ -895,19 +895,19 @@ describe('AuthorizationManager', function () {
     })
   })
 
-  describe('isUserSiteAdmin', function () {
-    beforeEach(function () {
+  describe('isUserSiteAdmin', function() {
+    beforeEach(function() {
       return (this.User.findOne = sinon.stub())
     })
 
-    describe('when user is admin', function () {
-      beforeEach(function () {
+    describe('when user is admin', function() {
+      beforeEach(function() {
         return this.User.findOne
           .withArgs({ _id: this.user_id }, { isAdmin: 1 })
           .yields(null, { isAdmin: true })
       })
 
-      it('should return true', function (done) {
+      it('should return true', function(done) {
         return this.AuthorizationManager.isUserSiteAdmin(
           this.user_id,
           (error, isAdmin) => {
@@ -918,14 +918,14 @@ describe('AuthorizationManager', function () {
       })
     })
 
-    describe('when user is not admin', function () {
-      beforeEach(function () {
+    describe('when user is not admin', function() {
+      beforeEach(function() {
         return this.User.findOne
           .withArgs({ _id: this.user_id }, { isAdmin: 1 })
           .yields(null, { isAdmin: false })
       })
 
-      it('should return false', function (done) {
+      it('should return false', function(done) {
         return this.AuthorizationManager.isUserSiteAdmin(
           this.user_id,
           (error, isAdmin) => {
@@ -936,14 +936,14 @@ describe('AuthorizationManager', function () {
       })
     })
 
-    describe('when user is not found', function () {
-      beforeEach(function () {
+    describe('when user is not found', function() {
+      beforeEach(function() {
         return this.User.findOne
           .withArgs({ _id: this.user_id }, { isAdmin: 1 })
           .yields(null, null)
       })
 
-      it('should return false', function (done) {
+      it('should return false', function(done) {
         return this.AuthorizationManager.isUserSiteAdmin(
           this.user_id,
           (error, isAdmin) => {
@@ -954,8 +954,8 @@ describe('AuthorizationManager', function () {
       })
     })
 
-    describe('when no user is passed', function () {
-      it('should return false', function (done) {
+    describe('when no user is passed', function() {
+      it('should return false', function(done) {
         return this.AuthorizationManager.isUserSiteAdmin(
           null,
           (error, isAdmin) => {

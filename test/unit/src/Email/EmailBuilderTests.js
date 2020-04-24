@@ -9,8 +9,8 @@ const MODULE_PATH = path.join(
   '../../../../app/src/Features/Email/EmailBuilder'
 )
 
-describe('EmailBuilder', function () {
-  beforeEach(function () {
+describe('EmailBuilder', function() {
+  beforeEach(function() {
     this.settings = {
       appName: 'testApp',
       brandPrefix: ''
@@ -26,8 +26,8 @@ describe('EmailBuilder', function () {
     })
   })
 
-  describe('projectInvite', function () {
-    beforeEach(function () {
+  describe('projectInvite', function() {
+    beforeEach(function() {
       this.opts = {
         to: 'bob@bob.com',
         first_name: 'bob',
@@ -42,41 +42,41 @@ describe('EmailBuilder', function () {
       }
     })
 
-    describe('when sending a normal email', function () {
-      beforeEach(function () {
+    describe('when sending a normal email', function() {
+      beforeEach(function() {
         this.email = this.EmailBuilder.buildEmail('projectInvite', this.opts)
       })
 
-      it('should have html and text properties', function () {
+      it('should have html and text properties', function() {
         expect(this.email.html != null).to.equal(true)
         expect(this.email.text != null).to.equal(true)
       })
 
-      it('should not have undefined in it', function () {
+      it('should not have undefined in it', function() {
         this.email.html.indexOf('undefined').should.equal(-1)
         this.email.subject.indexOf('undefined').should.equal(-1)
       })
     })
 
-    describe('when someone is up to no good', function () {
-      beforeEach(function () {
+    describe('when someone is up to no good', function() {
+      beforeEach(function() {
         this.opts.project.name = "<img src='http://evilsite.com/evil.php'>"
         this.email = this.EmailBuilder.buildEmail('projectInvite', this.opts)
       })
 
-      it('should not contain unescaped html in the html part', function () {
+      it('should not contain unescaped html in the html part', function() {
         expect(this.email.html).to.contain('New Project')
       })
 
-      it('should not have undefined in it', function () {
+      it('should not have undefined in it', function() {
         this.email.html.indexOf('undefined').should.equal(-1)
         this.email.subject.indexOf('undefined').should.equal(-1)
       })
     })
   })
 
-  describe('SpamSafe', function () {
-    beforeEach(function () {
+  describe('SpamSafe', function() {
+    beforeEach(function() {
       this.opts = {
         to: 'bob@joe.com',
         first_name: 'bob',
@@ -92,7 +92,7 @@ describe('EmailBuilder', function () {
       this.email = this.EmailBuilder.buildEmail('projectInvite', this.opts)
     })
 
-    it('should replace spammy project name', function () {
+    it('should replace spammy project name', function() {
       this.email.html.indexOf('a new project').should.not.equal(-1)
       this.email.subject.indexOf('New Project').should.not.equal(-1)
     })

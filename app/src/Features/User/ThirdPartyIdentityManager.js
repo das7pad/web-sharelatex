@@ -14,7 +14,7 @@ function getUser(providerId, externalUserId, callback) {
     return callback(new Error('invalid arguments'))
   }
   const query = _getUserQuery(providerId, externalUserId)
-  User.findOne(query, function (err, user) {
+  User.findOne(query, function(err, user) {
     if (err != null) {
       return callback(err)
     }
@@ -26,7 +26,7 @@ function getUser(providerId, externalUserId, callback) {
 }
 
 function login(providerId, externalUserId, externalData, callback) {
-  ThirdPartyIdentityManager.getUser(providerId, externalUserId, function (
+  ThirdPartyIdentityManager.getUser(providerId, externalUserId, function(
     err,
     user
   ) {
@@ -86,7 +86,7 @@ function link(
       EmailHandler.sendEmail(
         'emailThirdPartyIdentifierLinked',
         emailOptions,
-        (error) => {
+        error => {
           if (error != null) {
             logger.warn(error)
           }
@@ -98,7 +98,7 @@ function link(
       callback(new Error('update failed'))
     } else {
       // attempt to clear existing entry then retry
-      ThirdPartyIdentityManager.unlink(userId, providerId, function (err) {
+      ThirdPartyIdentityManager.unlink(userId, providerId, function(err) {
         if (err != null) {
           return callback(err)
         }
@@ -143,7 +143,7 @@ function unlink(userId, providerId, callback) {
       EmailHandler.sendEmail(
         'emailThirdPartyIdentifierUnlinked',
         emailOptions,
-        (error) => {
+        error => {
           if (error != null) {
             logger.warn(error)
           }
@@ -173,7 +173,7 @@ function _thirdPartyIdentifierUpdate(
   providerId = providerId.toString()
   // get third party identifier object from array
   const thirdPartyIdentifier = user.thirdPartyIdentifiers.find(
-    (tpi) =>
+    tpi =>
       tpi.externalUserId === externalUserId && tpi.providerId === providerId
   )
   // do recursive merge of new data over existing data

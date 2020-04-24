@@ -80,7 +80,7 @@ module.exports = PublicRegistrationController = {
 
   register(req, res, next) {
     logger.log({ email: req.body.email }, 'attempted register')
-    return UserRegistrationHandler.registerNewUser(req.body, function (
+    return UserRegistrationHandler.registerNewUser(req.body, function(
       err,
       user
     ) {
@@ -91,8 +91,7 @@ module.exports = PublicRegistrationController = {
         (err != null ? err.message : undefined) === 'EmailAlreadyRegistered'
       ) {
         if (
-          __guard__(user != null ? user.overleaf : undefined, (x) => x.id) !=
-          null
+          __guard__(user != null ? user.overleaf : undefined, x => x.id) != null
         ) {
           return res.json({
             message: {
@@ -113,10 +112,10 @@ module.exports = PublicRegistrationController = {
           user._id,
           user.email,
           'welcome',
-          function () {}
+          function() {}
         )
 
-        return req.login(user, function (err) {
+        return req.login(user, function(err) {
           if (err != null) {
             return callback(err)
           }

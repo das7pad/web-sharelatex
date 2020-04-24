@@ -25,7 +25,7 @@ module.exports = UserMembershipViewModel = {
 
   buildAsync(userOrIdOrEmail, callback) {
     if (callback == null) {
-      callback = function (error, viewModel) {}
+      callback = function(error, viewModel) {}
     }
     if (!(userOrIdOrEmail instanceof ObjectId)) {
       // userOrIdOrEmail is a user or an email and can be parsed by #build
@@ -34,7 +34,7 @@ module.exports = UserMembershipViewModel = {
 
     const userId = userOrIdOrEmail
     const projection = { email: 1, first_name: 1, last_name: 1 }
-    return UserGetter.getUser(userId, projection, function (error, user) {
+    return UserGetter.getUser(userId, projection, function(error, user) {
       if (error != null || user == null) {
         return callback(null, buildUserViewModelWithId(userId.toString()))
       }
@@ -43,7 +43,7 @@ module.exports = UserMembershipViewModel = {
   }
 }
 
-var buildUserViewModel = function (user, isInvite) {
+var buildUserViewModel = function(user, isInvite) {
   if (isInvite == null) {
     isInvite = false
   }
@@ -56,6 +56,6 @@ var buildUserViewModel = function (user, isInvite) {
   }
 }
 
-var buildUserViewModelWithEmail = (email) => buildUserViewModel({ email }, true)
+var buildUserViewModelWithEmail = email => buildUserViewModel({ email }, true)
 
-var buildUserViewModelWithId = (id) => buildUserViewModel({ _id: id }, false)
+var buildUserViewModelWithId = id => buildUserViewModel({ _id: id }, false)

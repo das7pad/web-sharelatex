@@ -37,16 +37,16 @@ const joinProject = (user_id, project_id, callback) =>
     callback
   )
 
-describe('ProjectFeatures', function () {
+describe('ProjectFeatures', function() {
   this.timeout(90000)
 
-  beforeEach(function (done) {
+  beforeEach(function(done) {
     this.owner = new User()
-    return async.series([(cb) => this.owner.login(cb)], done)
+    return async.series([cb => this.owner.login(cb)], done)
   })
 
-  describe('with private project', function () {
-    beforeEach(function (done) {
+  describe('with private project', function() {
+    beforeEach(function(done) {
       return this.owner.createProject(
         'private-project',
         (error, project_id) => {
@@ -59,15 +59,15 @@ describe('ProjectFeatures', function () {
       )
     })
 
-    describe('with an upgraded account', function () {
-      beforeEach(function (done) {
+    describe('with an upgraded account', function() {
+      beforeEach(function(done) {
         return this.owner.upgradeFeatures(done)
       })
-      after(function (done) {
+      after(function(done) {
         return this.owner.defaultFeatures(done)
       })
 
-      it('should have premium features', function (done) {
+      it('should have premium features', function(done) {
         return joinProject(
           this.owner._id,
           this.project_id,
@@ -82,15 +82,15 @@ describe('ProjectFeatures', function () {
       })
     })
 
-    describe('with an basic account', function () {
-      beforeEach(function (done) {
+    describe('with an basic account', function() {
+      beforeEach(function(done) {
         return this.owner.downgradeFeatures(done)
       })
-      after(function (done) {
+      after(function(done) {
         return this.owner.defaultFeatures(done)
       })
 
-      it('should have basic features', function (done) {
+      it('should have basic features', function(done) {
         return joinProject(
           this.owner._id,
           this.project_id,

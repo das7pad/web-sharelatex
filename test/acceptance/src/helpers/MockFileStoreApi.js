@@ -21,7 +21,7 @@ module.exports = MockFileStoreApi = {
   run() {
     app.post('/project/:project_id/file/:file_id', (req, res, next) => {
       const chunks = []
-      req.on('data', (chunk) => chunks.push(chunk))
+      req.on('data', chunk => chunks.push(chunk))
 
       return req.on('end', () => {
         const content = Buffer.concat(chunks).toString()
@@ -64,12 +64,12 @@ module.exports = MockFileStoreApi = {
     )
 
     return app
-      .listen(3009, (error) => {
+      .listen(3009, error => {
         if (error != null) {
           throw error
         }
       })
-      .on('error', (error) => {
+      .on('error', error => {
         console.error('error starting MockFileStoreApi:', error.message)
         return process.exit(1)
       })

@@ -24,9 +24,9 @@ const ProjectEntityHandler = require('../Project/ProjectEntityHandler')
 module.exports = UpdateMerger = {
   mergeUpdate(user_id, project_id, path, updateRequest, source, callback) {
     if (callback == null) {
-      callback = function (error) {}
+      callback = function(error) {}
     }
-    return FileWriter.writeStreamToDisk(project_id, updateRequest, function (
+    return FileWriter.writeStreamToDisk(project_id, updateRequest, function(
       err,
       fsPath
     ) {
@@ -39,8 +39,8 @@ module.exports = UpdateMerger = {
         path,
         fsPath,
         source,
-        (mergeErr) =>
-          fs.unlink(fsPath, function (deleteErr) {
+        mergeErr =>
+          fs.unlink(fsPath, function(deleteErr) {
             if (deleteErr != null) {
               logger.err({ project_id, fsPath }, 'error deleting file')
             }
@@ -51,19 +51,15 @@ module.exports = UpdateMerger = {
   },
 
   _findExistingFileType(project_id, path, callback) {
-    ProjectEntityHandler.getAllEntities(project_id, function (
-      err,
-      docs,
-      files
-    ) {
+    ProjectEntityHandler.getAllEntities(project_id, function(err, docs, files) {
       if (err != null) {
         return callback(err)
       }
       var existingFileType = null
-      if (_.some(files, (f) => f.path === path)) {
+      if (_.some(files, f => f.path === path)) {
         existingFileType = 'file'
       }
-      if (_.some(docs, (d) => d.path === path)) {
+      if (_.some(docs, d => d.path === path)) {
         existingFileType = 'doc'
       }
       callback(null, existingFileType)
@@ -72,11 +68,11 @@ module.exports = UpdateMerger = {
 
   _determineFileType(project_id, path, fsPath, callback) {
     if (callback == null) {
-      callback = function (err, fileType) {}
+      callback = function(err, fileType) {}
     }
     // check if there is an existing file with the same path (we either need
     // to overwrite it or delete it)
-    UpdateMerger._findExistingFileType(project_id, path, function (
+    UpdateMerger._findExistingFileType(project_id, path, function(
       err,
       existingFileType
     ) {
@@ -84,7 +80,7 @@ module.exports = UpdateMerger = {
         return callback(err)
       }
       // determine whether the update should create a doc or binary file
-      FileTypeManager.getType(path, fsPath, function (
+      FileTypeManager.getType(path, fsPath, function(
         err,
         { binary, encoding }
       ) {
@@ -129,9 +125,9 @@ module.exports = UpdateMerger = {
 
   _mergeUpdate(user_id, project_id, path, fsPath, source, callback) {
     if (callback == null) {
-      callback = function (error) {}
+      callback = function(error) {}
     }
-    return UpdateMerger._determineFileType(project_id, path, fsPath, function (
+    return UpdateMerger._determineFileType(project_id, path, fsPath, function(
       err,
       fileType,
       deleteOriginalEntity
@@ -141,7 +137,7 @@ module.exports = UpdateMerger = {
       }
       async.series(
         [
-          function (cb) {
+          function(cb) {
             if (deleteOriginalEntity) {
               // currently we only delete docs
               UpdateMerger.deleteUpdate(user_id, project_id, path, source, cb)
@@ -149,7 +145,7 @@ module.exports = UpdateMerger = {
               cb()
             }
           },
-          function (cb) {
+          function(cb) {
             if (['existing-file', 'new-file'].includes(fileType)) {
               return UpdateMerger.p.processFile(
                 project_id,
@@ -180,14 +176,14 @@ module.exports = UpdateMerger = {
 
   deleteUpdate(user_id, project_id, path, source, callback) {
     if (callback == null) {
-      callback = function () {}
+      callback = function() {}
     }
     return EditorController.deleteEntityWithPath(
       project_id,
       path,
       source,
       user_id,
-      function () {
+      function() {
         return callback()
       }
     )
@@ -195,7 +191,7 @@ module.exports = UpdateMerger = {
 
   p: {
     processDoc(project_id, user_id, fsPath, path, source, callback) {
-      return UpdateMerger.p.readFileIntoTextArray(fsPath, function (
+      return UpdateMerger.p.readFileIntoTextArray(fsPath, function(
         err,
         docLines
       ) {
@@ -213,7 +209,7 @@ module.exports = UpdateMerger = {
           docLines,
           source,
           user_id,
-          function (err) {
+          function(err) {
             return callback(err)
           }
         )
@@ -228,14 +224,14 @@ module.exports = UpdateMerger = {
         null,
         source,
         user_id,
-        function (err) {
+        function(err) {
           return callback(err)
         }
       )
     },
 
     readFileIntoTextArray(path, callback) {
-      return fs.readFile(path, 'utf8', function (error, content) {
+      return fs.readFile(path, 'utf8', function(error, content) {
         if (content == null) {
           content = ''
         }

@@ -11,9 +11,9 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define([], function () {
+define([], function() {
   let displayNameForUser
-  return (displayNameForUser = function (user) {
+  return (displayNameForUser = function(user) {
     if (user == null) {
       return 'Anonymous'
     }
@@ -24,7 +24,7 @@ define([], function () {
       return user.name
     }
     let name = [user.first_name, user.last_name]
-      .filter((n) => n != null)
+      .filter(n => n != null)
       .join(' ')
       .trim()
     if (name === '') {

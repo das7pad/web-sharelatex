@@ -12,8 +12,8 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define(['../../../base'], (App) =>
-  App.controller('SettingsController', function (
+define(['../../../base'], App =>
+  App.controller('SettingsController', function(
     $scope,
     ExposedSettings,
     settings,
@@ -29,12 +29,12 @@ define(['../../../base'], (App) =>
     $scope.overallThemesList = window.overallThemes
     $scope.ui = { loadingStyleSheet: false }
 
-    const _updateCSSFile = function (theme) {
+    const _updateCSSFile = function(theme) {
       $scope.ui.loadingStyleSheet = true
       const docHeadEl = document.querySelector('head')
       const oldStyleSheetEl = document.getElementById('main-stylesheet')
       const newStyleSheetEl = document.createElement('link')
-      newStyleSheetEl.addEventListener('load', (e) => {
+      newStyleSheetEl.addEventListener('load', e => {
         return $scope.$applyAsync(() => {
           $scope.ui.loadingStyleSheet = false
           return docHeadEl.removeChild(oldStyleSheetEl)
@@ -68,7 +68,7 @@ define(['../../../base'], (App) =>
       delete $scope.settings.lineHeight
     }
 
-    $scope.fontSizeAsStr = function (newVal) {
+    $scope.fontSizeAsStr = function(newVal) {
       if (newVal != null) {
         $scope.settings.fontSize = newVal
       }
@@ -82,7 +82,7 @@ define(['../../../base'], (App) =>
         // It's possible that an existing project has an invalid file selected as the main one.
         // To gracefully handle that case, make sure we also show the current main file (ignoring extension).
         filteredDocs = $scope.docs.filter(
-          (doc) =>
+          doc =>
             validRootDocRegExp.test(doc.doc.name) ||
             $scope.project.rootDoc_id === doc.doc.id
         )
@@ -100,7 +100,7 @@ define(['../../../base'], (App) =>
       if (overallTheme !== oldOverallTheme) {
         const chosenTheme = _.find(
           $scope.overallThemesList,
-          (theme) => theme.val === overallTheme
+          theme => theme.val === overallTheme
         )
         if (chosenTheme != null) {
           _updateCSSFile(chosenTheme)
@@ -212,7 +212,7 @@ define(['../../../base'], (App) =>
       }
     })
 
-    ide.socket.on('compilerUpdated', (compiler) => {
+    ide.socket.on('compilerUpdated', compiler => {
       this.ignoreUpdates = true
       $scope.$apply(() => {
         return ($scope.project.compiler = compiler)
@@ -220,7 +220,7 @@ define(['../../../base'], (App) =>
       return delete this.ignoreUpdates
     })
 
-    ide.socket.on('imageNameUpdated', (imageName) => {
+    ide.socket.on('imageNameUpdated', imageName => {
       this.ignoreUpdates = true
       $scope.$apply(() => {
         return ($scope.project.imageName = imageName)
@@ -228,7 +228,7 @@ define(['../../../base'], (App) =>
       return delete this.ignoreUpdates
     })
 
-    return ide.socket.on('spellCheckLanguageUpdated', (languageCode) => {
+    return ide.socket.on('spellCheckLanguageUpdated', languageCode => {
       this.ignoreUpdates = true
       $scope.$apply(() => {
         return ($scope.project.spellCheckLanguage = languageCode)

@@ -22,12 +22,12 @@ require('./helpers/MockFileStoreApi')
 const MockProjectHistoryApi = require('./helpers/MockProjectHistoryApi')
 const User = require('./helpers/User')
 
-describe('Labels', function () {
+describe('Labels', function() {
   this.timeout(5000)
 
-  beforeEach(function (done) {
+  beforeEach(function(done) {
     this.owner = new User()
-    return this.owner.login((error) => {
+    return this.owner.login(error => {
       if (error != null) {
         throw error
       }
@@ -45,11 +45,11 @@ describe('Labels', function () {
     })
   })
 
-  afterEach(function () {
+  afterEach(function() {
     return MockProjectHistoryApi.reset()
   })
 
-  it('getting labels', function (done) {
+  it('getting labels', function(done) {
     const label_id = new ObjectId().toString()
     const comment = 'a label comment'
     const version = 3
@@ -77,7 +77,7 @@ describe('Labels', function () {
     return null
   })
 
-  it('creating a label', function (done) {
+  it('creating a label', function(done) {
     const comment = 'a label comment'
     const version = 3
 
@@ -102,7 +102,7 @@ describe('Labels', function () {
     return null
   })
 
-  it('deleting a label', function (done) {
+  it('deleting a label', function(done) {
     const label_id = new ObjectId().toString()
     const comment = 'a label comment'
     const version = 3
