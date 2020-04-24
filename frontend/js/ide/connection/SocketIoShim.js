@@ -52,12 +52,7 @@ define([], function() {
 
   class SocketShimV0 extends SocketShimBase {
     static connect(url, options) {
-      return new SocketShimV0(
-        io.connect(
-          url,
-          options
-        )
-      )
+      return new SocketShimV0(io.connect(url, options))
     }
     constructor(socket) {
       super(socket)
