@@ -31,6 +31,9 @@ module.exports = CollaboratorsEmailHandler = {
       .select('name owner_ref')
       .populate('owner_ref')
       .exec(function(err, project) {
+        if (err) {
+          return callback(err)
+        }
         const emailOptions = {
           to: email,
           replyTo: project.owner_ref.email,
