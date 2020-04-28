@@ -96,23 +96,16 @@ module.exports = {
             }
           },
           {
-            loader: 'css-loader',
-            options: {
-              sourceMap: true
-            }
+            loader: 'css-loader'
           },
           {
             loader: 'postcss-loader',
             options: {
-              sourceMap: true,
               plugins: [AutoPrefixer]
             }
           },
           {
-            loader: 'less-loader',
-            options: {
-              sourceMap: true
-            }
+            loader: 'less-loader'
           }
         ]
       },
