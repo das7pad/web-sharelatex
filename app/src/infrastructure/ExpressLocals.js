@@ -307,8 +307,8 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
   })
 
   webRouter.use(function(req, res, next) {
-    res.locals.gaToken = Settings.analytics && Settings.analytics.ga.token
-    res.locals.gaOptimizeId = _.get(Settings, ['analytics', 'gaOptimize', 'id'])
+    res.locals.gaToken = Settings.analytics.ga.token
+    res.locals.gaOptimizeId = Settings.analytics.gaOptimize.id
     next()
   })
 
@@ -410,7 +410,7 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
       appName: Settings.appName,
       hasSamlBeta: req.session.samlBeta,
       hasSamlFeature: Features.hasFeature('saml'),
-      samlInitPath: _.get(Settings, ['saml', 'ukamf', 'initPath']),
+      samlInitPath: Settings.saml.ukamf.initPath,
       siteUrl: Settings.siteUrl,
       emailConfirmationDisabled: Settings.emailConfirmationDisabled,
       recaptchaSiteKeyV3: Settings.recaptcha && Settings.recaptcha.siteKeyV3,

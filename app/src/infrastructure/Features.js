@@ -29,7 +29,7 @@ module.exports = Features = {
   externalAuthenticationSystemUsed() {
     return (
       Settings.ldap != null ||
-      Settings.saml != null ||
+      Settings.enableSaml ||
       (Settings.overleaf != null ? Settings.overleaf.oauth : undefined) != null
     )
   },

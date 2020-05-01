@@ -17,7 +17,6 @@ const ProjectLocator = require('../Project/ProjectLocator')
 const ProjectEntityHandler = require('../Project/ProjectEntityHandler')
 const ProjectEntityUpdateHandler = require('../Project/ProjectEntityUpdateHandler')
 const logger = require('logger-sharelatex')
-const _ = require('lodash')
 
 module.exports = {
   getDocument(req, res, next) {
@@ -66,11 +65,10 @@ module.exports = {
                 res.type('text/plain')
                 return res.send(lines.join('\n'))
               } else {
-                const projectHistoryId = _.get(project, 'overleaf.history.id')
-                const projectHistoryType = _.get(
-                  project,
-                  'overleaf.history.display'
-                )
+                const projectHistory =
+                  (project.overleaf && project.overleaf.history) || {}
+                const projectHistoryId = projectHistory.id
+                const projectHistoryType = projectHistory.display
                   ? 'project-history'
                   : undefined // for backwards compatibility, don't send anything if the project is still on track-changes
                 return res.json({

@@ -16,7 +16,6 @@ const NotificationsBuilder = require('../Notifications/NotificationsBuilder')
 const UrlHelper = require('../Helpers/UrlHelper')
 const AsyncFormHelper = require('../Helpers/AsyncFormHelper')
 const SudoModeHandler = require('../SudoMode/SudoModeHandler')
-const _ = require('lodash')
 
 const AuthenticationController = (module.exports = {
   serializeUser(user, callback) {
@@ -275,9 +274,9 @@ const AuthenticationController = (module.exports = {
   },
 
   getSessionUser(req) {
-    const sessionUser = _.get(req, ['session', 'user'])
-    const sessionPassportUser = _.get(req, ['session', 'passport', 'user'])
-    return sessionUser || sessionPassportUser || null
+    if (!req.session) return null
+    if (req.session.user) return req.session.user
+    return (req.session.passport && req.session.passport.user) || null
   },
 
   requireLogin() {
@@ -481,7 +480,7 @@ const AuthenticationController = (module.exports = {
 
   _getRedirectFromSession(req) {
     let safePath
-    const value = _.get(req, ['session', 'postLoginRedirect'])
+    const value = req.session && req.session.postLoginRedirect
     if (value) {
       safePath = UrlHelper.getSafeRedirectPath(value)
     }

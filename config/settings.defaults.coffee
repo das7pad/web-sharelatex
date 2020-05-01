@@ -257,6 +257,10 @@ module.exports = settings =
 		enabled: false
 		requiredForStaff: false
 
+	saml:
+		ukamf:
+			initPath: process.env['SAML_UKAMF_INIT_PATH']
+
 	# Default features
 	# ----------------
 	#
@@ -390,11 +394,11 @@ module.exports = settings =
 	#
 	# Fill in your unique token from various analytics services to enable
 	# them.
-	# analytics:
-	# 	ga:
-	# 		token: ""
-	# 	gaOptimize:
-	# 		id: ""
+	analytics:
+		ga:
+			token: process.env['ANALYTICS_GA_TOKEN']
+		gaOptimize:
+			id: process.env['ANALYTICS_GA_OPTIMIZE_ID']
 	# ShareLaTeX's help desk is provided by tenderapp.com
 	# tenderUrl: ""
 	#

@@ -4,7 +4,6 @@ const ErrorController = require('../Errors/ErrorController')
 const logger = require('logger-sharelatex')
 const Settings = require('settings-sharelatex')
 const AuthenticationController = require('../Authentication/AuthenticationController')
-const _ = require('lodash')
 
 const UserPagesController = {
   registerPage(req, res) {
@@ -108,30 +107,22 @@ const UserPagesController = {
     if (ssoError) {
       delete req.session.ssoError
     }
+    const saml = (req.session && req.session.saml) || {}
     // Institution SSO
-    let institutionLinked = _.get(req.session, ['saml', 'linked'])
+    let institutionLinked = saml.linked
     if (institutionLinked) {
-      // copy object if exists because _.get does not
+      // copy object if exists
       institutionLinked = Object.assign(
         {
-          hasEntitlement: _.get(req.session, ['saml', 'hasEntitlement'])
+          hasEntitlement: saml.hasEntitlement
         },
         institutionLinked
       )
     }
-    const institutionLinkedToAnother = _.get(req.session, [
-      'saml',
-      'linkedToAnother'
-    ])
-    const institutionEmailNonCanonical = _.get(req.session, [
-      'saml',
-      'emailNonCanonical'
-    ])
-    const institutionRequestedEmail = _.get(req.session, [
-      'saml',
-      'requestedEmail'
-    ])
-    const institutionLinkingError = _.get(req.session, ['saml', 'error'])
+    const institutionLinkedToAnother = saml.linkedToAnother
+    const institutionEmailNonCanonical = saml.emailNonCanonical
+    const institutionRequestedEmail = saml.requestedEmail
+    const institutionLinkingError = saml.error
     delete req.session.saml
     let shouldAllowEditingDetails = true
     if (Settings.ldap && Settings.ldap.updateUserDetailsOnLogin) {
