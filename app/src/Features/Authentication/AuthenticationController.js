@@ -38,13 +38,13 @@ const AuthenticationController = (module.exports = {
       _id: user._id,
       first_name: user.first_name,
       last_name: user.last_name,
-      isAdmin: user.isAdmin,
+      isAdmin: user.isAdmin || undefined,
       staffAccess,
       email: user.email,
       referal_id: user.referal_id,
       session_created: new Date().toISOString(),
       ip_address: user._login_req_ip,
-      must_reconfirm: user.must_reconfirm,
+      must_reconfirm: user.must_reconfirm || undefined,
       v1_id: user.overleaf != null ? user.overleaf.id : undefined
     }
     callback(null, lightUser)
