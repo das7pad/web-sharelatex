@@ -25,12 +25,21 @@ const AuthenticationController = (module.exports = {
       logger.warn({ user }, err.message)
       return callback(err)
     }
+    let staffAccess
+    if (user.staffAccess) {
+      const enabledStaffAccess = Object.entries(user.staffAccess).filter(
+        entry => entry[1]
+      )
+      if (enabledStaffAccess.length) {
+        staffAccess = Object.fromEntries(enabledStaffAccess)
+      }
+    }
     const lightUser = {
       _id: user._id,
       first_name: user.first_name,
       last_name: user.last_name,
       isAdmin: user.isAdmin,
-      staffAccess: user.staffAccess,
+      staffAccess,
       email: user.email,
       referal_id: user.referal_id,
       session_created: new Date().toISOString(),
