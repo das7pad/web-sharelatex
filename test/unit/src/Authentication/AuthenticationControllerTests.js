@@ -1235,12 +1235,11 @@ describe('AuthenticationController', function() {
           this.user,
           this.req,
           this.res,
-          error => {
-            expect(error).to.not.exist
-            expect(this.res.json.callCount).to.equal(0)
-            done()
-          }
+          this.next
         )
+        expect(this.next.callCount).to.equal(0)
+        expect(this.res.json.callCount).to.equal(0)
+        done()
       })
 
       it('call next with hook errors', function(done) {

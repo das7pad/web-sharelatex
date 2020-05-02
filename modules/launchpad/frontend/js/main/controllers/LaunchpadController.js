@@ -91,32 +91,32 @@ define(['../../../../../../frontend/js/base'], App =>
     $scope.tryOpenWebSocket = function() {
       $scope.statusChecks.websocket.status = 'inflight'
       return $timeout(function() {
-        require(['socket.io-client'], function(io) {
-          const socket = io.connect(window.sharelatex.wsUrl || null, {
-            reconnect: false,
-            'connect timeout': 30 * 1000,
-            'force new connection': true
-          })
-
-          socket.on('connectionAccepted', function() {
-            $scope.statusChecks.websocket.status = 'ok'
-            return $scope.$apply(function() {})
-          })
-
-          socket.on('connectionRejected', function(err) {
-            $scope.statusChecks.websocket.status = 'error'
-            $scope.statusChecks.websocket.error = err
-            return $scope.$apply(function() {})
-          })
-
-          return socket.on('connect_failed', function(err) {
-            $scope.statusChecks.websocket.status = 'error'
-            $scope.statusChecks.websocket.error = err
-            return $scope.$apply(function() {})
-          })
-        }, function(error) {
+        if (typeof io === 'undefined' || io === null) {
           $scope.statusChecks.websocket.status = 'error'
-          $scope.statusChecks.websocket.error = error.message
+          $scope.statusChecks.websocket.error = 'socket.io not loaded'
+          return
+        }
+        const socket = io.connect(null, {
+          reconnect: false,
+          'connect timeout': 30 * 1000,
+          'force new connection': true
+        })
+
+        socket.on('connectionAccepted', function() {
+          $scope.statusChecks.websocket.status = 'ok'
+          return $scope.$apply(function() {})
+        })
+
+        socket.on('connectionRejected', function(err) {
+          $scope.statusChecks.websocket.status = 'error'
+          $scope.statusChecks.websocket.error = err
+          return $scope.$apply(function() {})
+        })
+
+        return socket.on('connect_failed', function(err) {
+          $scope.statusChecks.websocket.status = 'error'
+          $scope.statusChecks.websocket.error = err
+          return $scope.$apply(function() {})
         })
       }, 1000)
     }

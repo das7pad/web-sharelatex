@@ -180,10 +180,6 @@ module.exports = {
   resolve: {
     alias: {
       // Aliases for AMD modules
-      'socket.io-client': path.join(
-        __dirname,
-        `frontend/js/vendor/libs/${PackageVersions.lib('socket.io')}/socket.io`
-      ),
 
       // Shortcut to vendored dependencies in frontend/js/vendor/libs
       libs: path.join(__dirname, 'frontend/js/vendor/libs'),

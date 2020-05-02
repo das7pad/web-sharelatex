@@ -49,12 +49,17 @@ define(['../../base'], function(App) {
       }
       meta.user_id = window.user_id
       meta.project_id = window.project_id
-      if (this.socket != null) {
-        const engine = this.socket.io.engine
-        meta.client_id = engine.id
-        meta.transport =
-          engine.transport != null ? engine.transport.name : undefined
-      }
+      meta.client_id = __guard__(
+        ide.socket != null ? ide.socket.socket : undefined,
+        x => x.sessionid
+      )
+      meta.transport = __guard__(
+        __guard__(
+          ide.socket != null ? ide.socket.socket : undefined,
+          x2 => x2.transport
+        ),
+        x1 => x1.name
+      )
       meta.client_now = new Date()
       meta.recent_events = this.recentEvents
       const errorObj = {}
@@ -119,3 +124,9 @@ define(['../../base'], function(App) {
     return ($scope.done = () => $modalInstance.close())
   })
 })
+
+function __guard__(value, transform) {
+  return typeof value !== 'undefined' && value !== null
+    ? transform(value)
+    : undefined
+}

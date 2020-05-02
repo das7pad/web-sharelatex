@@ -72,7 +72,7 @@ define([
         super()
         this.ide = ide
         this.doc_id = doc_id
-        this.connected = this.ide.socket.connected
+        this.connected = this.ide.socket.socket.connected
         this.joined = false
         this.wantToBeJoined = false
         this._checkAceConsistency = _.bind(
@@ -381,7 +381,7 @@ define([
           Math.random() < window.disconnectOnAck
         ) {
           sl_console.log('Disconnecting on ack', update)
-          window._ide.socket.disconnect()
+          window._ide.socket.socket.disconnect()
           // Pretend we never received the ack
           return
         }
@@ -659,7 +659,7 @@ define([
             'event',
             'error',
             'shareJsError',
-            `${message} - ${this.ide.socket.io.engine.transport.name}`
+            `${message} - ${this.ide.socket.socket.transport.name}`
           )
         }
         if (this.doc != null) {

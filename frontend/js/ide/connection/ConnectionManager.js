@@ -8,7 +8,9 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 
-define(['socket.io-client'], function(io) {
+/* global io */
+
+define(['./SocketIoShim'], function(SocketIoShim) {
   let ConnectionManager
   const ONEHOUR = 1000 * 60 * 60
 
@@ -32,6 +34,22 @@ define(['socket.io-client'], function(io) {
         this.ide = ide
         this.$scope = $scope
         this.wsUrl = ide.wsUrl || null // websocket url (if defined)
+        if (typeof io === 'undefined' || io === null) {
+          if (this.wsUrl && !window.location.href.match(/ws=fallback/)) {
+            // if we tried to boot from a custom real-time backend and failed,
+            // try reloading and falling back to the siteUrl
+            window.location = window.location.href + '?ws=fallback'
+          }
+          console.error(
+            'Socket.io javascript not loaded. Please check that the real-time service is running and accessible.'
+          )
+          this.ide.socket = SocketIoShim.stub()
+          this.$scope.$apply(() => {
+            return (this.$scope.state.error =
+              'Could not connect to websocket server :(')
+          })
+          return
+        }
 
         setInterval(() => {
           return this.disconnectIfInactive()
@@ -98,7 +116,7 @@ define(['socket.io-client'], function(io) {
             pathname: '/socket.io'
           }
         }
-        this.ide.socket = io.connect(parsedURL.origin, {
+        this.ide.socket = SocketIoShim.connect(parsedURL.origin, {
           resource: parsedURL.pathname.slice(1),
           reconnect: false,
           'connect timeout': 30 * 1000,
@@ -522,7 +540,7 @@ Something went wrong connecting to your project. Please refresh if this continue
 
         // use socket.io connect() here to make a single attempt, the
         // reconnect() method makes multiple attempts
-        this.ide.socket.connect()
+        this.ide.socket.socket.connect()
         // record the time of the last attempt to connect
         this.lastConnectionAttempt = new Date()
       }
