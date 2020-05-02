@@ -16,6 +16,7 @@
  */
 define([
   './libraries',
+  './utils/sentry',
   './modules/recursionHelper',
   './modules/errorCatcher',
   './modules/storage',

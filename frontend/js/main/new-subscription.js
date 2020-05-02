@@ -17,6 +17,10 @@ define(['../base', '../directives/creditCards'], App =>
       return
     }
 
+    $scope.ui = {
+      addCompanyDetails: false
+    }
+
     $scope.recurlyLoadError = false
     $scope.currencyCode = MultiCurrencyPricing.currencyCode
     $scope.allCurrencies = MultiCurrencyPricing.plans
@@ -54,6 +58,8 @@ define(['../base', '../directives/creditCards'], App =>
       address2: '',
       state: '',
       city: '',
+      company: '',
+      vat_number: '',
       country: window.countryCode,
       coupon: window.couponCode
     }
@@ -95,7 +101,9 @@ define(['../base', '../directives/creditCards'], App =>
 
     pricing
       .plan(window.plan_code, { quantity: 1 })
-      .address({ country: $scope.data.country })
+      .address({
+        country: $scope.data.country
+      })
       .tax({ tax_code: 'digital', vat_number: '' })
       .currency($scope.currencyCode)
       .coupon($scope.data.coupon)
@@ -215,7 +223,6 @@ define(['../base', '../directives/creditCards'], App =>
             coupon_code: pricing.items.coupon ? pricing.items.coupon.code : '',
             first_name: $scope.data.first_name,
             last_name: $scope.data.last_name,
-
             isPaypal: $scope.paymentMethod.value === 'paypal',
             address: {
               address1: $scope.data.address1,
@@ -226,6 +233,21 @@ define(['../base', '../directives/creditCards'], App =>
             },
             ITMCampaign: window.ITMCampaign,
             ITMContent: window.ITMContent
+          }
+        }
+
+        if (
+          postData.subscriptionDetails.isPaypal &&
+          $scope.ui.addCompanyDetails
+        ) {
+          postData.subscriptionDetails.billing_info = {}
+          if ($scope.data.company && $scope.data.company !== '') {
+            postData.subscriptionDetails.billing_info.company =
+              $scope.data.company
+          }
+          if ($scope.data.vat_number && $scope.data.vat_number !== '') {
+            postData.subscriptionDetails.billing_info.vat_number =
+              $scope.data.vat_number
           }
         }
 
@@ -240,7 +262,6 @@ define(['../base', '../directives/creditCards'], App =>
           'subscription-form-submitted',
           postData.subscriptionDetails.plan_code
         )
-
         return $http
           .post('/user/subscription/create', postData)
           .then(function() {
@@ -270,9 +291,14 @@ define(['../base', '../directives/creditCards'], App =>
       $scope.processing = true
       if ($scope.paymentMethod.value === 'paypal') {
         const opts = { description: $scope.planName }
-        return recurly.paypal(opts, completeSubscription)
+        recurly.paypal(opts, completeSubscription)
       } else {
-        return recurly.token($scope.data, completeSubscription)
+        const tokenData = _.cloneDeep($scope.data)
+        if (!$scope.ui.addCompanyDetails) {
+          delete tokenData.company
+          delete tokenData.vat_number
+        }
+        recurly.token(tokenData, completeSubscription)
       }
     }
 
