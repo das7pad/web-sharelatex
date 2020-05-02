@@ -12,12 +12,15 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 let parseParams
+
 const tpdsUpdateHandler = require('./TpdsUpdateHandler')
 const UpdateMerger = require('./UpdateMerger')
 const logger = require('logger-sharelatex')
 const Path = require('path')
 const metrics = require('metrics-sharelatex')
 const NotificationsBuilder = require('../Notifications/NotificationsBuilder')
+const AuthenticationController = require('../Authentication/AuthenticationController')
+const TpdsQueueManager = require('./TpdsQueueManager').promises
 
 module.exports = {
   // mergeUpdate and deleteUpdate are used by Dropbox, where the project is only passed as the name, as the
@@ -128,6 +131,15 @@ module.exports = {
       }
       return res.sendStatus(200)
     })
+  },
+
+  async getQueues(req, res, next) {
+    const userId = AuthenticationController.getLoggedInUserId(req)
+    try {
+      res.json(await TpdsQueueManager.getQueues(userId))
+    } catch (err) {
+      next(err)
+    }
   },
 
   parseParams: (parseParams = function(req) {
