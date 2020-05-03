@@ -55,3 +55,6 @@ module.exports =
 
 	openInOverleaf:
 	  templateUriPrefix: "https://production-overleaf-static.s3.amazonaws.com/v1templates/"
+
+	security:
+		bcryptRounds: 1
