@@ -16,6 +16,7 @@ mongoose.connect(Settings.mongo.url, {
   config: { autoIndex: false },
   useUnifiedTopology: true,
   useNewUrlParser: true,
+  useFindAndModify: false,
   appname: 'web'
 })
 
