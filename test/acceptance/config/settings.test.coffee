@@ -41,6 +41,9 @@ module.exports =
 			url: "http://#{process.env['RECURLY_HOST'] || 'localhost'}:6034"
 			subdomain: 'test'
 
+	security:
+		bcryptRounds: 1
+
 	# for registration via SL, set enableLegacyRegistration to true
 	# for registration via Overleaf v1, set enableLegacyLogin to true
 
