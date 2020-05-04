@@ -56,7 +56,7 @@
     "logger-sharelatex": "git+https://github.com/das7pad/logger-sharelatex.git#bef2078daae2433a43e61db306e301398199daa0",
     "marked": "^0.7.0",
     "method-override": "^2.3.3",
-    "metrics-sharelatex": "git+https://github.com/das7pad/metrics-sharelatex.git#3aa1de4fba521fc0e7969e619dec8f169f0d889f",
+    "metrics-sharelatex": "git+https://github.com/das7pad/metrics-sharelatex.git#471b0a35d8125818393738cb95702367add6d203",
     "mmmagic": "^0.5.3",
     "mocha": "^6.2.2",
     "moment": "^2.24.0",
