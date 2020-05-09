@@ -229,6 +229,10 @@ const SubscriptionUpdater = {
       )
     }
     if (plan.groupPlan) {
+      if (!subscription.groupPlan) {
+        subscription.member_ids = subscription.member_ids || []
+        subscription.member_ids.push(subscription.admin_id)
+      }
       subscription.groupPlan = true
       subscription.membersLimit = plan.membersLimit
     }

@@ -148,7 +148,7 @@ const UserController = {
             'Failed to unsubscribe user from newsletter'
           )
         }
-        res.send()
+        res.sendStatus(200)
       })
     })
   },

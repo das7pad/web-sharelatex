@@ -33,7 +33,7 @@ module.exports = {
 
   recordEvent(req, res, next) {
     if (!Features.hasFeature('analytics')) {
-      return res.send(204)
+      return res.sendStatus(204)
     }
     const userId =
       AuthenticationController.getLoggedInUserId(req) || req.sessionID

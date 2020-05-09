@@ -53,10 +53,10 @@ describe('ChatController', function() {
         project_id: this.project_id
       }
     }
-    return (this.res = {
+    this.res = {
       json: sinon.stub(),
       sendStatus: sinon.stub()
-    })
+    }
   })
 
   describe('sendMessage', function() {

@@ -79,7 +79,7 @@ describe('SubscriptionGroupController', function() {
       this.req.entity = this.subscription
 
       const res = {
-        send: () => {
+        sendStatus: () => {
           this.GroupHandler.removeUserFromGroup
             .calledWith(this.subscriptionId, userIdToRemove)
             .should.equal(true)

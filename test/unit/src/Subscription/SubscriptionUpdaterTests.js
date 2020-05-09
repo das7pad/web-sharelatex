@@ -23,7 +23,7 @@ describe('SubscriptionUpdater', function() {
       _id: '111111111111111111111111',
       admin_id: this.adminUser._id,
       manager_ids: [this.adminUser._id],
-      member_ids: this.allUserIds,
+      member_ids: [],
       save: sinon.stub().callsArgWith(0),
       planCode: 'student_or_something'
     }
@@ -239,6 +239,10 @@ describe('SubscriptionUpdater', function() {
       this.SubscriptionUpdater.deleteSubscription = sinon.stub().yields()
     })
 
+    afterEach(function() {
+      this.subscription.member_ids = []
+    })
+
     it('should update the subscription with token etc when not expired', function(done) {
       this.SubscriptionUpdater._updateSubscriptionFromRecurly(
         this.recurlySubscription,
@@ -282,6 +286,7 @@ describe('SubscriptionUpdater', function() {
     })
 
     it('should update all the users features', function(done) {
+      this.subscription.member_ids = this.allUserIds
       this.SubscriptionUpdater._updateSubscriptionFromRecurly(
         this.recurlySubscription,
         this.subscription,
@@ -321,6 +326,9 @@ describe('SubscriptionUpdater', function() {
           }
           this.subscription.membersLimit.should.equal(5)
           this.subscription.groupPlan.should.equal(true)
+          this.subscription.member_ids.should.deep.equal([
+            this.subscription.admin_id
+          ])
           done()
         }
       )
