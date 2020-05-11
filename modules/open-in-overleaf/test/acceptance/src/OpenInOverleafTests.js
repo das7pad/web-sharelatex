@@ -15,7 +15,12 @@ const { expect } = require('chai')
 const async = require('async')
 const express = require('express')
 const path = require('path')
-const translations = require('translations-sharelatex').setup()
+const translations = {
+  i18n: {
+    translate: key =>
+      require('translations-sharelatex/locales/en.json')[key] || key
+  }
+}
 const {
   db,
   ObjectId
