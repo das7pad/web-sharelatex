@@ -72,10 +72,13 @@
         "_": true,
         "ace": true,
         "ga": true,
+        "Raven": true, // Backwards compat for Sentry reporting
+        "Sentry": true,
         "sl_console": true,
         "sl_debugging": true,
         // Injected in layout.pug
-        "user_id": true
+        "user_id": true,
+        "ExposedSettings": true
       }
     }
   ]

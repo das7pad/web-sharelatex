@@ -247,6 +247,8 @@ const ProjectController = {
       return res.json({ redir: '/register' })
     }
     const currentUser = AuthenticationController.getSessionUser(req)
+    // eslint-disable-next-line camelcase
+    const { first_name, last_name, email } = currentUser
     ProjectDuplicator.duplicate(
       currentUser,
       projectId,
@@ -262,7 +264,9 @@ const ProjectController = {
         res.json({
           name: project.name,
           project_id: project._id,
-          owner_ref: project.owner_ref
+          owner_ref: project.owner_ref,
+          // eslint-disable-next-line camelcase
+          owner: { first_name, last_name, email, _id: currentUser._id }
         })
       }
     )

@@ -4,7 +4,6 @@
     max-len,
     no-dupe-class-members,
     no-return-assign,
-    no-undef,
     no-unused-vars,
 */
 // TODO: This file was created by bulk-decaffeinate.
@@ -170,7 +169,7 @@ define([
     getFullCount() {
       const entities = []
       this.forEachEntity(function(e) {
-        return entities.push(e)
+        if (!e.deleted) entities.push(e)
       })
       return entities.length
     }
