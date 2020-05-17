@@ -75,6 +75,7 @@ describe('UserController', function() {
         console: console
       },
       requires: {
+        '../Helpers/UrlHelper': { getSafeRedirectPath: url => url },
         './UserGetter': this.UserGetter,
         './UserDeleter': this.UserDeleter,
         './UserUpdater': this.UserUpdater,
