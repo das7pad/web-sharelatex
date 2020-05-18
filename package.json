@@ -80,7 +80,7 @@
     "sanitize-html": "^1.20.1",
     "sanitizer": "0.1.1",
     "settings-sharelatex": "git+https://github.com/das7pad/settings-sharelatex.git#d0797834438df2d102798a64602adf2f71ac8e48",
-    "translations-sharelatex": "git+https://github.com/das7pad/translations-sharelatex.git#3977e16bfa3d9dc77a5d7c4a11b89b967529ac4a",
+    "translations-sharelatex": "git+https://github.com/das7pad/translations-sharelatex.git#2d10918994936549f37084409d5d1277214d4597",
     "underscore": "1.6.0",
     "url-parse": "^1.4.7",
     "utf-8-validate": "^5.0.2",
