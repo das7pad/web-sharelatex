@@ -17,7 +17,6 @@
  */
 
 import App from '../../../base'
-import CryptoJSMD5 from 'crypto-js/md5'
 
 App.factory('chatMessages', function($http, ide) {
   const MESSAGES_URL = `/project/${ide.project_id}/messages`
@@ -125,7 +124,7 @@ App.factory('chatMessages', function($http, ide) {
       return firstMessage.contents.unshift(message.content)
     } else {
       return chat.state.messages.unshift({
-        user: formatUser(message.user),
+        user: message.user,
         timestamp: message.timestamp,
         contents: [message.content]
       })
@@ -151,17 +150,11 @@ App.factory('chatMessages', function($http, ide) {
       return lastMessage.contents.push(message.content)
     } else {
       return chat.state.messages.push({
-        user: formatUser(message.user),
+        user: message.user,
         timestamp: message.timestamp,
         contents: [message.content]
       })
     }
-  }
-
-  var formatUser = function(user) {
-    const hash = CryptoJSMD5(user.email.toLowerCase())
-    user.gravatar_url = `//www.gravatar.com/avatar/${hash}`
-    return user
   }
 
   return chat
