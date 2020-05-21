@@ -12,208 +12,205 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define([
-  '../../../../../frontend/js/ide/directives/cm_editor',
-  '../../../../../frontend/js/ide/rich_text_adapter',
-  '../../../../../../../frontend/js/utils/EventEmitter',
-  'angular-mocks'
-], (cmEditor, RichTextAdapter, EventEmitter) => {
-  describe('cmEditor', function() {
-    beforeEach(
-      window.module('SharelatexApp', $provide => {
-        $provide.factory('ide', () => ({ fileTreeManager: sinon.stub() }))
-        $provide.factory('metadata', () => ({}))
-      })
-    )
+import '../../../../../frontend/js/ide/directives/cm_editor'
+import EventEmitter from '../../../../../../../frontend/js/utils/EventEmitter'
+import 'angular-mocks'
 
-    it('inits Rich Text', function() {
-      // Sinon doesn't really seem to like spying on a class, so we have to make
-      // a custom one
-      const editorStub = sinon.stub().returns({
-        openDoc: sinon.stub(),
-        enable: sinon.stub(),
-        getCodeMirror: sinon.stub().returns({
-          lineCount: sinon.stub().returns(1),
-          getViewport: sinon.stub().returns({ from: 0, to: 1 }),
-          getLine: sinon.stub().returns('some text'),
-          getSelection: sinon.stub().returns('some text'),
-          getValue: sinon.stub().returns('some text'),
-          on: sinon.stub(),
-          off: sinon.stub(),
-          getWrapperElement: sinon.stub().returns({ off: sinon.stub() }),
-          refresh: sinon.stub(),
-          clearHistory: sinon.stub()
-        }),
-        disable: sinon.stub(),
-        disableAutocomplete: sinon.stub()
-      })
-      return inject(($compile, $rootScope) => {
-        $rootScope.sharejsDoc = stubSharejsDoc()
-        $rootScope.bundle = { Editor: editorStub }
-        $rootScope.formattingEvents = new EventEmitter()
-
-        $compile(
-          '<div cm-editor sharejs-doc="sharejsDoc" bundle="bundle" formatting-events="formattingEvents"></div>'
-        )($rootScope)
-        $rootScope.$digest()
-
-        return expect(editorStub).to.have.been.called
-      })
+describe('cmEditor', function() {
+  beforeEach(
+    window.module('SharelatexApp', $provide => {
+      $provide.factory('ide', () => ({ fileTreeManager: sinon.stub() }))
+      $provide.factory('metadata', () => ({}))
     })
+  )
 
-    it('attaches to CM', function() {
-      const Editor = stubEditor()
-      const { getCodeMirror } = Editor.prototype
-      const { openDoc } = Editor.prototype
-      const { enable } = Editor.prototype
-      return inject(($compile, $rootScope, $browser) => {
-        let getSnapshot, snapshot
-        $rootScope.sharejsDoc = stubSharejsDoc({
-          getSnapshot: (getSnapshot = sinon.stub().returns((snapshot = {})))
-        })
-        sinon.spy($rootScope.sharejsDoc, 'attachToCM')
-        $rootScope.bundle = { Editor }
-        $rootScope.formattingEvents = new EventEmitter()
-
-        $compile(
-          '<div cm-editor sharejs-doc="sharejsDoc" bundle="bundle" formatting-events="formattingEvents"></div>'
-        )($rootScope)
-        $rootScope.$digest()
-
-        expect(getCodeMirror).to.have.been.called
-        expect(getSnapshot).to.have.been.called
-        expect(openDoc).to.have.been.called
-        expect(openDoc.firstCall.args[0]).to.equal(snapshot)
-        expect($rootScope.sharejsDoc.attachToCM).to.have.been.called
-        return expect(enable).to.have.been.called
-      })
-    })
-
-    it('calls Editor.update when remoteop event is trigger', function() {
-      const Editor = stubEditor()
-      const { update } = Editor.prototype
-      return inject(($compile, $rootScope) => {
-        $rootScope.sharejsDoc = stubSharejsDoc()
-        $rootScope.bundle = { Editor }
-        $rootScope.formattingEvents = new EventEmitter()
-
-        $compile(
-          '<div cm-editor sharejs-doc="sharejsDoc" bundle="bundle" formatting-events="formattingEvents"></div>'
-        )($rootScope)
-        $rootScope.$digest()
-
-        $rootScope.sharejsDoc.trigger('remoteop')
-        return expect(update).to.have.been.called
-      })
-    })
-
-    it('calls clearHistory when attaching to CM', function() {
-      let clearHistory
-      const Editor = stubEditor(
-        stubCodeMirror({ clearHistory: (clearHistory = sinon.stub()) })
-      )
-      return inject(($compile, $rootScope) => {
-        $rootScope.sharejsDoc = stubSharejsDoc()
-        $rootScope.bundle = { Editor }
-        $rootScope.formattingEvents = new EventEmitter()
-
-        $compile(
-          '<div cm-editor sharejs-doc="sharejsDoc" bundle="bundle" formatting-events="formattingEvents"></div>'
-        )($rootScope)
-        $rootScope.$digest()
-
-        return expect(clearHistory).to.have.been.called
-      })
-    })
-
-    return it('detaches from CM when destroyed', function() {
-      const Editor = stubEditor()
-      const { disable } = Editor.prototype
-      return inject(($compile, $rootScope) => {
-        let detachFromCM
-        $rootScope.sharejsDoc = stubSharejsDoc({
-          detachFromCM: (detachFromCM = sinon.stub())
-        })
-        $rootScope.bundle = { Editor }
-        $rootScope.formattingEvents = new EventEmitter()
-
-        $compile(
-          '<div cm-editor sharejs-doc="sharejsDoc" bundle="bundle" formatting-events="formattingEvents"></div>'
-        )($rootScope)
-        $rootScope.$digest()
-        $rootScope.$broadcast('$destroy')
-
-        expect(detachFromCM).to.have.been.called
-        return expect(disable).to.have.been.called
-      })
-    })
-  })
-
-  var stubCodeMirror = function(overrides) {
-    // Should note that we're extending our EventEmitter implementation that
-    // is different from CodeMirror's built-in implementation. However the top-
-    // level api is the same
-    if (overrides == null) {
-      overrides = {}
-    }
-    return _.extend(
-      EventEmitter.prototype,
-      {
+  it('inits Rich Text', function() {
+    // Sinon doesn't really seem to like spying on a class, so we have to make
+    // a custom one
+    const editorStub = sinon.stub().returns({
+      openDoc: sinon.stub(),
+      enable: sinon.stub(),
+      getCodeMirror: sinon.stub().returns({
         lineCount: sinon.stub().returns(1),
         getViewport: sinon.stub().returns({ from: 0, to: 1 }),
         getLine: sinon.stub().returns('some text'),
         getSelection: sinon.stub().returns('some text'),
         getValue: sinon.stub().returns('some text'),
+        on: sinon.stub(),
+        off: sinon.stub(),
         getWrapperElement: sinon.stub().returns({ off: sinon.stub() }),
         refresh: sinon.stub(),
         clearHistory: sinon.stub()
-      },
-      overrides
-    )
-  }
+      }),
+      disable: sinon.stub(),
+      disableAutocomplete: sinon.stub()
+    })
+    return inject(($compile, $rootScope) => {
+      $rootScope.sharejsDoc = stubSharejsDoc()
+      $rootScope.bundle = { Editor: editorStub }
+      $rootScope.formattingEvents = new EventEmitter()
 
-  // Stub the Editor class that is returned as the root of the rich text bundle
-  var stubEditor = function(codeMirror) {
-    let Editor
-    if (codeMirror == null) {
-      codeMirror = stubCodeMirror()
-    }
-    return (Editor = (function() {
-      Editor = class Editor {
-        static initClass() {
-          this.prototype.getCodeMirror = sinon.stub().returns(codeMirror)
-          this.prototype.openDoc = sinon.stub()
-          this.prototype.enable = sinon.stub()
-          this.prototype.disable = sinon.stub()
-          this.prototype.update = sinon.stub()
-          this.prototype.disableAutocomplete = sinon.stub()
-        }
-      }
-      Editor.initClass()
-      return Editor
-    })())
-  }
+      $compile(
+        '<div cm-editor sharejs-doc="sharejsDoc" bundle="bundle" formatting-events="formattingEvents"></div>'
+      )($rootScope)
+      $rootScope.$digest()
 
-  // Stub the ShareJS Doc that is created by editor internals
-  const stubSharejsDoc = function(overrides) {
-    if (overrides == null) {
-      overrides = {}
-    }
-    return _.extend(
-      EventEmitter.prototype,
-      {
-        ranges: {
-          changes: [],
-          comments: []
-        },
-        attachToCM: function(cm) {
-          cm.doc = this
-        },
-        getAllMarks: sinon.stub().returns([]),
-        getSnapshot: sinon.stub(),
-        detachFromCM: sinon.stub()
-      },
-      overrides
+      return expect(editorStub).to.have.been.called
+    })
+  })
+
+  it('attaches to CM', function() {
+    const Editor = stubEditor()
+    const { getCodeMirror } = Editor.prototype
+    const { openDoc } = Editor.prototype
+    const { enable } = Editor.prototype
+    return inject(($compile, $rootScope, $browser) => {
+      let getSnapshot, snapshot
+      $rootScope.sharejsDoc = stubSharejsDoc({
+        getSnapshot: (getSnapshot = sinon.stub().returns((snapshot = {})))
+      })
+      sinon.spy($rootScope.sharejsDoc, 'attachToCM')
+      $rootScope.bundle = { Editor }
+      $rootScope.formattingEvents = new EventEmitter()
+
+      $compile(
+        '<div cm-editor sharejs-doc="sharejsDoc" bundle="bundle" formatting-events="formattingEvents"></div>'
+      )($rootScope)
+      $rootScope.$digest()
+
+      expect(getCodeMirror).to.have.been.called
+      expect(getSnapshot).to.have.been.called
+      expect(openDoc).to.have.been.called
+      expect(openDoc.firstCall.args[0]).to.equal(snapshot)
+      expect($rootScope.sharejsDoc.attachToCM).to.have.been.called
+      return expect(enable).to.have.been.called
+    })
+  })
+
+  it('calls Editor.update when remoteop event is trigger', function() {
+    const Editor = stubEditor()
+    const { update } = Editor.prototype
+    return inject(($compile, $rootScope) => {
+      $rootScope.sharejsDoc = stubSharejsDoc()
+      $rootScope.bundle = { Editor }
+      $rootScope.formattingEvents = new EventEmitter()
+
+      $compile(
+        '<div cm-editor sharejs-doc="sharejsDoc" bundle="bundle" formatting-events="formattingEvents"></div>'
+      )($rootScope)
+      $rootScope.$digest()
+
+      $rootScope.sharejsDoc.trigger('remoteop')
+      return expect(update).to.have.been.called
+    })
+  })
+
+  it('calls clearHistory when attaching to CM', function() {
+    let clearHistory
+    const Editor = stubEditor(
+      stubCodeMirror({ clearHistory: (clearHistory = sinon.stub()) })
     )
-  }
+    return inject(($compile, $rootScope) => {
+      $rootScope.sharejsDoc = stubSharejsDoc()
+      $rootScope.bundle = { Editor }
+      $rootScope.formattingEvents = new EventEmitter()
+
+      $compile(
+        '<div cm-editor sharejs-doc="sharejsDoc" bundle="bundle" formatting-events="formattingEvents"></div>'
+      )($rootScope)
+      $rootScope.$digest()
+
+      return expect(clearHistory).to.have.been.called
+    })
+  })
+
+  return it('detaches from CM when destroyed', function() {
+    const Editor = stubEditor()
+    const { disable } = Editor.prototype
+    return inject(($compile, $rootScope) => {
+      let detachFromCM
+      $rootScope.sharejsDoc = stubSharejsDoc({
+        detachFromCM: (detachFromCM = sinon.stub())
+      })
+      $rootScope.bundle = { Editor }
+      $rootScope.formattingEvents = new EventEmitter()
+
+      $compile(
+        '<div cm-editor sharejs-doc="sharejsDoc" bundle="bundle" formatting-events="formattingEvents"></div>'
+      )($rootScope)
+      $rootScope.$digest()
+      $rootScope.$broadcast('$destroy')
+
+      expect(detachFromCM).to.have.been.called
+      return expect(disable).to.have.been.called
+    })
+  })
 })
+
+var stubCodeMirror = function(overrides) {
+  // Should note that we're extending our EventEmitter implementation that
+  // is different from CodeMirror's built-in implementation. However the top-
+  // level api is the same
+  if (overrides == null) {
+    overrides = {}
+  }
+  return _.extend(
+    EventEmitter.prototype,
+    {
+      lineCount: sinon.stub().returns(1),
+      getViewport: sinon.stub().returns({ from: 0, to: 1 }),
+      getLine: sinon.stub().returns('some text'),
+      getSelection: sinon.stub().returns('some text'),
+      getValue: sinon.stub().returns('some text'),
+      getWrapperElement: sinon.stub().returns({ off: sinon.stub() }),
+      refresh: sinon.stub(),
+      clearHistory: sinon.stub()
+    },
+    overrides
+  )
+}
+
+// Stub the Editor class that is returned as the root of the rich text bundle
+var stubEditor = function(codeMirror) {
+  let Editor
+  if (codeMirror == null) {
+    codeMirror = stubCodeMirror()
+  }
+  return (Editor = (function() {
+    Editor = class Editor {
+      static initClass() {
+        this.prototype.getCodeMirror = sinon.stub().returns(codeMirror)
+        this.prototype.openDoc = sinon.stub()
+        this.prototype.enable = sinon.stub()
+        this.prototype.disable = sinon.stub()
+        this.prototype.update = sinon.stub()
+        this.prototype.disableAutocomplete = sinon.stub()
+      }
+    }
+    Editor.initClass()
+    return Editor
+  })())
+}
+
+// Stub the ShareJS Doc that is created by editor internals
+const stubSharejsDoc = function(overrides) {
+  if (overrides == null) {
+    overrides = {}
+  }
+  return _.extend(
+    EventEmitter.prototype,
+    {
+      ranges: {
+        changes: [],
+        comments: []
+      },
+      attachToCM: function(cm) {
+        cm.doc = this
+      },
+      getAllMarks: sinon.stub().returns([]),
+      getSnapshot: sinon.stub(),
+      detachFromCM: sinon.stub()
+    },
+    overrides
+  )
+}

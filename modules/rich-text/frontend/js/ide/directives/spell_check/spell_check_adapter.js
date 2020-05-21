@@ -11,90 +11,87 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define([], function() {
-  let SpellCheckAdapter
-  return (SpellCheckAdapter = class SpellCheckAdapter {
-    constructor(editor) {
-      this.replaceWord = this.replaceWord.bind(this)
-      this.editor = editor
-      this.highlightedWordManager = this.editor.highlightedWordManager
-    }
+let SpellCheckAdapter
 
-    getLines() {
-      return this.editor
-        .getCodeMirror()
-        .getValue()
-        .split('\n')
-    }
+export default SpellCheckAdapter = class SpellCheckAdapter {
+  constructor(editor) {
+    this.replaceWord = this.replaceWord.bind(this)
+    this.editor = editor
+    this.highlightedWordManager = this.editor.highlightedWordManager
+  }
 
-    getLineCount() {
-      return this.editor.getCodeMirror().lineCount()
-    }
+  getLines() {
+    return this.editor
+      .getCodeMirror()
+      .getValue()
+      .split('\n')
+  }
 
-    getFirstVisibleRowNum() {
-      return this.editor.getCodeMirror().getViewport().from
-    }
+  getLineCount() {
+    return this.editor.getCodeMirror().lineCount()
+  }
 
-    getLastVisibleRowNum() {
-      return this.editor.getCodeMirror().getViewport().to
-    }
+  getFirstVisibleRowNum() {
+    return this.editor.getCodeMirror().getViewport().from
+  }
 
-    getLinesByRows(rows) {
-      const doc = this.editor.getCodeMirror()
-      return rows.map(rowIdx => doc.getLine(rowIdx))
-    }
+  getLastVisibleRowNum() {
+    return this.editor.getCodeMirror().getViewport().to
+  }
 
-    getSelectionContents() {
-      return this.editor.getCodeMirror().getSelection()
-    }
+  getLinesByRows(rows) {
+    const doc = this.editor.getCodeMirror()
+    return rows.map(rowIdx => doc.getLine(rowIdx))
+  }
 
-    normalizeChangeEvent(e) {
-      return {
-        start: { row: e.from.line },
-        end: { row: e.to.line },
-        action: e.removed != null ? 'remove' : 'insert'
-      }
-    }
+  getSelectionContents() {
+    return this.editor.getCodeMirror().getSelection()
+  }
 
-    getCoordsFromContextMenuEvent(e) {
-      e.stopPropagation()
-      return {
-        x: e.pageX,
-        y: e.pageY
-      }
+  normalizeChangeEvent(e) {
+    return {
+      start: { row: e.from.line },
+      end: { row: e.to.line },
+      action: e.removed != null ? 'remove' : 'insert'
     }
+  }
 
-    isContextMenuEventOnBottomHalf(e) {
-      const { clientY } = e
-      const editorBoundingRect = e.currentTarget.getBoundingClientRect()
-      const relativeYPos =
-        (clientY - editorBoundingRect.top) / editorBoundingRect.height
-      return relativeYPos > 0.5
+  getCoordsFromContextMenuEvent(e) {
+    e.stopPropagation()
+    return {
+      x: e.pageX,
+      y: e.pageY
     }
+  }
 
-    preventContextMenuEventDefault(e) {
-      return e.preventDefault()
-    }
+  isContextMenuEventOnBottomHalf(e) {
+    const { clientY } = e
+    const editorBoundingRect = e.currentTarget.getBoundingClientRect()
+    const relativeYPos =
+      (clientY - editorBoundingRect.top) / editorBoundingRect.height
+    return relativeYPos > 0.5
+  }
 
-    getHighlightFromCoords(coords) {
-      const position = this.editor.getCodeMirror().coordsChar({
-        left: coords.x,
-        top: coords.y
-      })
-      return this.highlightedWordManager.findHighlightAtPosition(position)
-    }
+  preventContextMenuEventDefault(e) {
+    return e.preventDefault()
+  }
 
-    selectHighlightedWord(highlight) {
-      const position = highlight.marker.find()
-      return this.editor
-        .getCodeMirror()
-        .setSelection(position.from, position.to)
-    }
+  getHighlightFromCoords(coords) {
+    const position = this.editor.getCodeMirror().coordsChar({
+      left: coords.x,
+      top: coords.y
+    })
+    return this.highlightedWordManager.findHighlightAtPosition(position)
+  }
 
-    replaceWord(highlight, newWord) {
-      const codeMirror = this.editor.getCodeMirror()
-      codeMirror.replaceSelection(newWord)
-      return codeMirror.focus()
-    }
-  })
-})
+  selectHighlightedWord(highlight) {
+    const position = highlight.marker.find()
+    return this.editor.getCodeMirror().setSelection(position.from, position.to)
+  }
+
+  replaceWord(highlight, newWord) {
+    const codeMirror = this.editor.getCodeMirror()
+    codeMirror.replaceSelection(newWord)
+    return codeMirror.focus()
+  }
+}
