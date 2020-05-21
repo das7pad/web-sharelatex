@@ -43,6 +43,8 @@ export default App.directive(
       const bodyEl = element.find('.cm-editor-body')
       let editor = null
       let cursorPositionManager = null
+      let spellCheckManager
+      let trackChangesManager
       const autocompleteAdapter = new AutocompleteAdapter(
         scope,
         metadata,
@@ -188,62 +190,62 @@ export default App.directive(
       }
 
       const handleChangeForSpellCheck = function(_, event) {
-        return this.spellCheckManager.onChange(event)
+        return spellCheckManager.onChange(event)
       }
 
       var initSpellCheck = function() {
-        this.spellCheckManager = new SpellCheckManager(
+        spellCheckManager = new SpellCheckManager(
           scope,
           $cacheFactory,
           $http,
           $q,
           new SpellCheckAdapter(editor)
         )
-        this.spellCheckManager.init()
+        spellCheckManager.init()
         const codeMirror = editor.getCodeMirror()
         codeMirror.on('change', handleChangeForSpellCheck)
         $(codeMirror.getWrapperElement()).on(
           'contextmenu',
-          this.spellCheckManager.onContextMenu
+          spellCheckManager.onContextMenu
         )
-        return codeMirror.on('scroll', this.spellCheckManager.onScroll)
+        return codeMirror.on('scroll', spellCheckManager.onScroll)
       }
 
       var tearDownSpellCheck = function() {
         const codeMirror = editor.getCodeMirror()
         codeMirror.off('change', handleChangeForSpellCheck)
-        if (this.spellCheckManager) {
+        if (spellCheckManager) {
           $(codeMirror.getWrapperElement()).off(
             'contextmenu',
-            this.spellCheckManager.onContextMenu
+            spellCheckManager.onContextMenu
           )
-          codeMirror.off('scroll', this.spellCheckManager.onScroll)
+          codeMirror.off('scroll', spellCheckManager.onScroll)
         }
       }
 
       const initTrackChanges = function() {
         const codeMirror = editor.getCodeMirror()
 
-        this.trackChangesManager = new TrackChangesManager(
+        trackChangesManager = new TrackChangesManager(
           scope,
           null,
           element,
           new TrackChangesAdapter(editor)
         )
 
-        this.trackChangesManager.rangesTracker = scope.sharejsDoc.ranges
+        trackChangesManager.rangesTracker = scope.sharejsDoc.ranges
 
         // Call this initially because swapDoc doesn't occur on load
-        this.trackChangesManager.onChangeSession()
+        trackChangesManager.onChangeSession()
 
-        codeMirror.on('swapDoc', this.trackChangesManager.onChangeSession)
+        codeMirror.on('swapDoc', trackChangesManager.onChangeSession)
       }
 
       const tearDownTrackChanges = function() {
         const codeMirror = editor.getCodeMirror()
 
-        this.trackChangesManager.tearDown()
-        codeMirror.off('swapDoc', this.trackChangesManager.onChangeSession)
+        trackChangesManager.tearDown()
+        codeMirror.off('swapDoc', trackChangesManager.onChangeSession)
       }
 
       var initCursorPosition = function() {
