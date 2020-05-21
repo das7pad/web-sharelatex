@@ -11,46 +11,44 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-define([], function() {
-  class RichTextAdapter {
-    constructor(fileTreeManager) {
-      this.fileTreeManager = fileTreeManager
-    }
+class RichTextAdapter {
+  constructor(fileTreeManager) {
+    this.fileTreeManager = fileTreeManager
+  }
 
-    fileExistsForPath(path) {
-      const entity = this.fileTreeManager.findEntityByPath(path)
-      return !!entity
-    }
+  fileExistsForPath(path) {
+    const entity = this.fileTreeManager.findEntityByPath(path)
+    return !!entity
+  }
 
-    getEntityForPath(path) {
-      // Handle paths that are missing
-      let entity
-      for (const extension of ['', '.png', '.pdf', '.jpg', '.jpeg', '.eps']) {
-        entity = this.fileTreeManager.findEntityByPath(`${path}${extension}`)
-        if (entity) {
-          break
-        }
+  getEntityForPath(path) {
+    // Handle paths that are missing
+    let entity
+    for (const extension of ['', '.png', '.pdf', '.jpg', '.jpeg', '.eps']) {
+      entity = this.fileTreeManager.findEntityByPath(`${path}${extension}`)
+      if (entity) {
+        break
       }
-      return entity
     }
-
-    getPreviewUrlForEntity(entity) {
-      return `/project/${window.project_id}/file/${entity.id}`
-    }
-
-    isPreviewableEntity(entity) {
-      return !['eps', 'pdf'].includes(getExtension(entity))
-    }
+    return entity
   }
 
-  function getExtension(entity) {
-    if (entity && entity.name) {
-      const extension = entity.name.split('.').pop()
-      return extension ? extension.toLowerCase() : null
-    } else {
-      return null
-    }
+  getPreviewUrlForEntity(entity) {
+    return `/project/${window.project_id}/file/${entity.id}`
   }
 
-  return RichTextAdapter
-})
+  isPreviewableEntity(entity) {
+    return !['eps', 'pdf'].includes(getExtension(entity))
+  }
+}
+
+function getExtension(entity) {
+  if (entity && entity.name) {
+    const extension = entity.name.split('.').pop()
+    return extension ? extension.toLowerCase() : null
+  } else {
+    return null
+  }
+}
+
+export default RichTextAdapter
