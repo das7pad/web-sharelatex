@@ -18,7 +18,7 @@
 
 import App from '../../../base'
 
-App.factory('chatMessages', function($http, ide) {
+export default App.factory('chatMessages', function($http, ide) {
   const MESSAGES_URL = `/project/${ide.project_id}/messages`
   const MESSAGE_LIMIT = 50
   const CONNECTED_USER_URL = `/project/${ide.project_id}/connected_users`

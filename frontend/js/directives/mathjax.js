@@ -5,7 +5,7 @@ if (window.preLoadMathJax) {
   // eslint-disable-next-line no-unused-expressions
   import(/* webpackChunkName: "MathJaxBundle" */ '../MathJaxBundle')
 }
-App.directive('mathjax', function($compile, $parse) {
+export default App.directive('mathjax', function($compile, $parse) {
   return {
     link(scope, element, attrs) {
       import('../MathJaxBundle').then(MathJax => {
