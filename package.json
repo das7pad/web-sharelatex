@@ -52,7 +52,6 @@
     "fs-extra": "^4.0.2",
     "globby": "^6.1.0",
     "helmet": "^3.22.0",
-    "joi-mongodb-objectid": "^0.1.0",
     "lodash": "^4.17.15",
     "logger-sharelatex": "git+https://github.com/das7pad/logger-sharelatex.git#bef2078daae2433a43e61db306e301398199daa0",
     "marked": "^0.7.0",

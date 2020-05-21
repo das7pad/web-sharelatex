@@ -1374,7 +1374,7 @@ describe('TokenAccess', function() {
                 expect(response.statusCode).to.equal(200)
                 expect(body).to.deep.equal({
                   v1Import: {
-                    status: 'canImport',
+                    status: 'canDownloadZip',
                     projectId: this.tokens.readAndWrite,
                     hasOwner: true,
                     name: 'Test Project Import Example'
@@ -1394,7 +1394,7 @@ describe('TokenAccess', function() {
                 expect(response.statusCode).to.equal(200)
                 expect(body).to.deep.equal({
                   v1Import: {
-                    status: 'canImport',
+                    status: 'canDownloadZip',
                     projectId: this.tokens.readOnly,
                     hasOwner: true,
                     name: 'Test Project Import Example'
