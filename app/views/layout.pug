@@ -56,7 +56,7 @@ html(
 
 		block head-scripts
 
-		script.
+		script(type="text/javascript").
 			window.sharelatex = {
 				siteUrl: '#{settings.siteUrl}',
 				wsUrl: '#{wsUrl}',
@@ -66,7 +66,7 @@ html(
 			window.ExposedSettings = JSON.parse('!{StringHelper.stringifyJsonForScript(ExposedSettings)}');
 
 		- if (typeof(settings.algolia) != "undefined")
-			script.
+			script(type="text/javascript").
 				window.sharelatex.algolia = {
 					app_id:'#{settings.algolia.app_id}',
 					api_key:'#{settings.algolia.read_only_api_key}',
@@ -74,7 +74,7 @@ html(
 				}
 
 		- if (typeof(settings.templates) != "undefined")
-			script.
+			script(type="text/javascript").
 				window.sharelatex.templates = {
 					user_id : '!{settings.templates.user_id}',
 					cdnDomain : '!{settings.templates.cdnDomain}',
@@ -84,7 +84,7 @@ html(
 
 	body
 		if(settings.recaptcha && settings.recaptcha.siteKeyV3)
-			script(src="https://www.google.com/recaptcha/api.js?render="+settings.recaptcha.siteKeyV3)
+			script(type="text/javascript", src="https://www.google.com/recaptcha/api.js?render="+settings.recaptcha.siteKeyV3)
 
 
 		- if(typeof(suppressNavbar) == "undefined")
@@ -108,5 +108,5 @@ html(
 					window.location.search += '&nocdn=true'}}
 
 		block foot-scripts
-			script(async defer src=buildJsPath('libraries.js'), onerror='disableCDN()')
-			script(async defer src=buildJsPath('main.js'), onerror='disableCDN()')
+			script(type='text/javascript', async, defer, src=buildJsPath('libraries.js'), onerror='disableCDN()')
+			script(type='text/javascript', async, defer, src=buildJsPath('main.js'), onerror='disableCDN()')

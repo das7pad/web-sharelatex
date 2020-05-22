@@ -4,7 +4,7 @@ block vars
 	- var suppressNavContentLinks = true
 
 block content
-	script#data(type="application/json").
+	script(type="application/json", id="data").
 		!{StringHelper.stringifyJsonForScript({ projects, tags, notifications, notificationsInstitution })}
 
 	script(type="text/javascript").

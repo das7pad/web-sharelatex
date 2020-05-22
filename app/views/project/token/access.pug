@@ -5,7 +5,8 @@ block vars
 
 block content
 
-	script(type="template", id="overleaf-token-access-data")!= StringHelper.stringifyJsonForScript({ postUrl: postUrl, csrfToken: csrfToken})
+	script(type="application/json", id="overleaf-token-access-data").
+		!{StringHelper.stringifyJsonForScript({ postUrl: postUrl, csrfToken: csrfToken})}
 
 	div(
 		ng-controller="TokenAccessPageController",
@@ -92,7 +93,7 @@ block content
 
 
 block append foot-scripts
-	script.
+	script(type="text/javascript").
 		$(document).ready(function () {
 			setTimeout(function() {
 				$('.loading-screen-brand').css('height', '20%')

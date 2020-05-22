@@ -152,7 +152,7 @@ block content
 
 	//- We need to do .replace(/\//g, '\\/') do that '</script>' -> '<\/script>'
 	//- and doesn't prematurely end the script tag.
-	script#data(type="application/json").
+	script(type="application/json", id="data").
 		!{StringHelper.stringifyJsonForScript({ userSettings: userSettings, user: user, trackChangesState: trackChangesState, useV2History: useV2History, enabledLinkedFileTypes: settings.enabledLinkedFileTypes, brandVariation: brandVariation })}
 
 	script(type='text/javascript').
@@ -181,7 +181,7 @@ block content
 			window.overallThemes = JSON.parse('!{StringHelper.stringifyJsonForScript(overallThemes)}');
 
 block foot-scripts
-	script(defer src=(wsUrl || '/socket.io') + '/socket.io.js')
-	script(defer src=buildJsPath('libraries.js'), onerror='disableCDN()')
-	script(defer src=buildJsPath('ideLibraries.js'), onerror='disableCDN()')
-	script(defer src=buildJsPath('ide.js'), onerror='disableCDN()')
+	script(type='text/javascript', defer, src=(wsUrl || '/socket.io') + '/socket.io.js')
+	script(type='text/javascript', defer, src=buildJsPath('libraries.js'), onerror='disableCDN()')
+	script(type='text/javascript', defer, src=buildJsPath('ideLibraries.js'), onerror='disableCDN()')
+	script(type='text/javascript', defer, src=buildJsPath('ide.js'), onerror='disableCDN()')

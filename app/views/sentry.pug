@@ -6,4 +6,4 @@
 				Sentry.setUser({id:'#{getLoggedInUserId()}'})
 			}
 		}
-	script(async defer src=sentrySRC, crossorigin="anonymous" onload='initSentry()')
+	script(type='text/javascript', async, defer, src=sentrySRC, crossorigin="anonymous", onload='initSentry()')
