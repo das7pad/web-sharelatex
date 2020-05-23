@@ -173,8 +173,6 @@ module.exports = settings =
 			url: "http://#{process.env['REALTIME_HOST'] or 'localhost'}:3026"
 		contacts:
 			url: "http://#{process.env['CONTACTS_HOST'] or 'localhost'}:3036"
-		sixpack:
-			url: ""
 		references:
 			url: if process.env['REFERENCES_HOST']? then "http://#{process.env['REFERENCES_HOST']}:3040" else undefined
 		notifications:
@@ -657,8 +655,6 @@ module.exports = settings =
 
 	]
 
-	sixpack:
-		domain:""
 	# ShareLaTeX Server Pro options (https://www.sharelatex.com/university/onsite.html)
 	# ----------
 
