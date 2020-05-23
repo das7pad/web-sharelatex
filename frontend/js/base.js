@@ -28,7 +28,6 @@ const App = angular
     'ng-context-menu',
     'underscore',
     'ngSanitize',
-    'ipCookie',
     'ErrorCatcher',
     'storage',
     'ngTagsInput',
