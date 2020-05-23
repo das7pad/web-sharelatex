@@ -30,6 +30,7 @@ import 'libs/ng-context-menu'
 import 'libs/passfield'
 import 'libs/ng-tags-input'
 import 'libs/select/select'
+import staticPath from './utils/staticPath'
 
 // eslint-disable-next-line camelcase, no-undef
-__webpack_public_path__ = `${window.staticPath}${__webpack_public_path__}`
+__webpack_public_path__ = staticPath(__webpack_public_path__)
