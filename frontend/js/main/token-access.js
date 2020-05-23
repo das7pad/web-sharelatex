@@ -2,7 +2,6 @@ import App from '../base'
 App.controller(
   'TokenAccessPageController',
   ($scope, $http, $location, localStorage) => {
-    window.S = $scope
     $scope.mode = 'accessAttempt' // 'accessAttempt' | 'v1Import'
 
     $scope.v1ImportData = null

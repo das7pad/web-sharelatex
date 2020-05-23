@@ -26,10 +26,6 @@ class TrackChangesManager {
     this._scrollTimeout = null
     this.changingSelection = false
 
-    if (window.trackChangesManager == null) {
-      window.trackChangesManager = this
-    }
-
     this.$scope.$watch('trackChanges', track_changes => {
       if (track_changes == null) {
         return

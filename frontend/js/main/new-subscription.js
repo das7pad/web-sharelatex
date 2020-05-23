@@ -99,7 +99,6 @@ export default App.controller('NewSubscriptionController', function(
   })
 
   const pricing = recurly.Pricing()
-  window.pricing = pricing
 
   pricing
     .plan(window.plan_code, { quantity: 1 })
