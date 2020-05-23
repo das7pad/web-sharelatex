@@ -17,6 +17,7 @@ const Path = require('path')
 const Url = require('url')
 const logger = require('logger-sharelatex')
 const metrics = require('metrics-sharelatex')
+const Features = require('../../../../app/src/infrastructure/Features')
 const UserRegistrationHandler = require('../../../../app/src/Features/User/UserRegistrationHandler')
 const EmailHandler = require('../../../../app/src/Features/Email/EmailHandler')
 const _ = require('underscore')
@@ -28,7 +29,7 @@ module.exports = LaunchpadController = {
   _getAuthMethod() {
     if (Settings.ldap) {
       return 'ldap'
-    } else if (Settings.saml) {
+    } else if (Features.hasFeature('saml')) {
       return 'saml'
     } else {
       return 'local'
