@@ -293,10 +293,6 @@ block content
 
 							p.small.text-center(ng-non-bindable) We're confident that you'll love #{settings.appName}, but if not you can cancel anytime. We'll give you your money back, no questions asked, if you let us know within 30 days.
 
-
-	script(type="text/javascript").
-		ga('send', 'event', 'pageview', 'payment_form', "#{plan_code}")
-
 	script(type="text/ng-template", id="cvv-tooltip-tpl.html")
 		p For #[strong Visa, MasterCard and Discover], the #[strong 3 digits] on the #[strong back] of your card.
 		p For #[strong American Express], the #[strong 4 digits] on the #[strong front] of your card.

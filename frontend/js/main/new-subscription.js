@@ -29,6 +29,8 @@ export default App.controller('NewSubscriptionController', function(
   $scope.availableCurrencies = {}
   $scope.planCode = window.plan_code
 
+  eventTracking.send('pageview', 'payment_form', $scope.planCode)
+
   $scope.switchToStudent = function() {
     const currentPlanCode = window.plan_code
     const planCode = currentPlanCode.replace('collaborator', 'student')
