@@ -434,7 +434,7 @@ function cspMiddleware() {
   const csp = Settings.security.csp
   const scriptSrc = ["'self'"]
   const styleSrc = ["'self'", "'unsafe-inline'"]
-  const fontSrc = ["'self'"]
+  const fontSrc = ["'self'", 'about:']
   const connectSrc = ["'self'"]
   const imgSrc = ["'self'", 'data:', 'blob:']
   const workerSrc = ["'self'"]
