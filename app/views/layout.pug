@@ -90,14 +90,6 @@ html(
 		!= moduleIncludes("contactModal", locals)
 		include sentry
 
-		script(type="text/javascript").
-			function disableCDN() {
-				//- do not redirect the crawler
-				if (navigator.userAgent.indexOf("Googlebot") === -1
-					//- prevent loops
-					&& window.location.href.indexOf("nocdn=true") === -1) {
-					window.location.search += '&nocdn=true'}}
-
 		block foot-scripts
-			script(type='text/javascript', async, defer, src=buildJsPath('libraries.js'), onerror='disableCDN()')
-			script(type='text/javascript', async, defer, src=buildJsPath('main.js'), onerror='disableCDN()')
+			script(type='text/javascript', async, defer, src=buildJsPath('libraries.js'))
+			script(type='text/javascript', async, defer, src=buildJsPath('main.js'))
