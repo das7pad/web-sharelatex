@@ -414,7 +414,11 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
     }
     next()
   })
-  if (Settings.security.csp.reportOnly || Settings.security.csp.enforce) {
+  if (
+    Settings.security &&
+    Settings.security.csp &&
+    (Settings.security.csp.reportOnly || Settings.security.csp.enforce)
+  ) {
     webRouter.use(cspMiddleware())
   }
   webRouter.use('/generate/worker', function(req, res, next) {
