@@ -12,7 +12,9 @@ block content
 			}, 500);
 		});
 
-	script(type="template", id="overleaf-gateway-data")!= StringHelper.stringifyJsonForScript({params: form_data, action: action, target: target, csrfToken: csrfToken, error: error})
+	meta(id="ol-oio-gateway-data" data-json content={
+			params: form_data, action: action, target: target, csrfToken: csrfToken, error: error
+		})
 
 	.editor.full-size(
 			ng-controller="OpenInOverleafGatewayController",
