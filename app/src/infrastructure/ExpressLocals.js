@@ -327,13 +327,6 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
       }
     }
     res.locals.sentryEnabled = sentryEnabled
-    if (sentryEnabled) {
-      res.locals.sentrySRC =
-        Settings.sentry.src ||
-        res.locals.staticPath(
-          `/vendor/${PackageVersions.lib('sentry')}/bundle.min.js`
-        )
-    }
     next()
   })
 

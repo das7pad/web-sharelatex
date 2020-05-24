@@ -6,8 +6,6 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 const version = {
-  sentry: '5.7.1',
-  'socket.io': '2.2.0',
   fineuploader: '5.15.4'
 }
 

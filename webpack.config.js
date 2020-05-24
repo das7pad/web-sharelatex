@@ -261,14 +261,7 @@ module.exports = {
           return { from: `node_modules/${path}`, to: `${VENDOR_PATH}/${path}` }
         })
         .concat(
-          [
-            'mathjax',
-            'sigma-master',
-
-            // sentry sdk
-            `${PackageVersions.lib('sentry')}/bundle.min.js`,
-            `${PackageVersions.lib('sentry')}/bundle.min.js.map`
-          ].map(path => {
+          ['mathjax', 'sigma-master'].map(path => {
             return {
               from: `frontend/js/vendor/libs/${path}`,
               to: `${VENDOR_PATH}/${path}`

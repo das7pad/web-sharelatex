@@ -93,6 +93,7 @@
   "devDependencies": {
     "@babel/core": "^7.9.0",
     "@babel/preset-env": "^7.9.5",
+    "@sentry/browser": "^5.15.5",
     "ace-builds": "https://jenkins.das7pad.de/artifacts/ace/release/3/builds/1.4.10-1569158423e5c95c792917922d1b7d7bae4a9e26.tar.gz",
     "acorn": "^7.1.1",
     "acorn-walk": "^7.1.1",

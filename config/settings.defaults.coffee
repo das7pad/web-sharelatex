@@ -402,8 +402,6 @@ module.exports = settings =
 	#
 	# Client-side error logging is provided by getsentry.com
 	sentry:
-#		custom uri of the browser sentry sdk - defaults to the local copy in /js/libs
-#		src: 'https://browser.sentry-cdn.com/5.7.1/bundle.min.js'
 		frontend:
 			commit: process.env.COMMIT
 			release: process.env.RELEASE
