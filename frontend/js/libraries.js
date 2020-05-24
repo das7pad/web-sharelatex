@@ -30,6 +30,7 @@ import 'libs/ng-context-menu'
 import 'libs/passfield'
 import 'libs/ng-tags-input'
 import 'libs/select/select'
+import './misc/ga'
 import './utils/meta'
 import staticPath from './utils/staticPath'
 
