@@ -1,5 +1,6 @@
 import App from '../base'
 import showFakeProgress from '../utils/loadingScreen'
+import getMeta from '../utils/meta'
 App.controller(
   'TokenAccessPageController',
   ($scope, $http, $location, localStorage) => {
@@ -29,8 +30,7 @@ App.controller(
 
     $scope.post = () => {
       $scope.mode = 'accessAttempt'
-      const textData = $('#overleaf-token-access-data').text()
-      const parsedData = JSON.parse(textData)
+      const parsedData = getMeta('ol-token-access-data')
       const { postUrl, csrfToken } = parsedData
       $scope.accessInFlight = true
 

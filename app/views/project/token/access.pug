@@ -5,8 +5,7 @@ block vars
 
 block content
 
-	script(type="application/json", id="overleaf-token-access-data").
-		!{StringHelper.stringifyJsonForScript({ postUrl: postUrl, csrfToken: csrfToken})}
+	meta(id="ol-token-access-data" data-json content={ postUrl, csrfToken})
 
 	div(
 		ng-controller="TokenAccessPageController",
