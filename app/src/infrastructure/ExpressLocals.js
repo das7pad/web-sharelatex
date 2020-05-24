@@ -1,5 +1,6 @@
 const logger = require('logger-sharelatex')
-const Settings = require('settings-sharelatex')
+const Settings =
+  require('settings-sharelatex') || require('../../../config/settings.defaults')
 const _ = require('lodash')
 const { URL } = require('url')
 const Path = require('path')
@@ -413,4 +414,106 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
     }
     next()
   })
+  if (Settings.security.csp.reportOnly || Settings.security.csp.enforce) {
+    webRouter.use(cspMiddleware())
+  }
+}
+
+function cspMiddleware() {
+  const csp = Settings.security.csp
+  const scriptSrc = ["'self'"]
+  const styleSrc = ["'self'", "'unsafe-inline'"]
+  const fontSrc = ["'self'"]
+  const connectSrc = ["'self'"]
+  const imgSrc = ["'self'", 'data:']
+  const workerSrc = ["'self'"]
+
+  if (Settings.analytics.ga.token) {
+    // TODO: add ga and stuffs
+  }
+
+  let frontSrc = []
+  if (Settings.overleaf && Settings.overleaf.front_chat_widget_room_id) {
+    // frontSrc = [
+    //   'frontapp.com',
+    //   '*.frontapp.com',
+    //   'pusher.com',
+    //   '*.pusher.com',
+    //   'pusherapp.com',
+    //   '*.pusherapp.com',
+    //   'fonts.googleapis.com',
+    //   '*.bugsnag.com'
+    // ]
+  }
+  if (cdnAvailable) {
+    const cdn = new URL(Settings.cdn.web.host).origin
+    fontSrc.push(cdn)
+    imgSrc.push(cdn)
+    scriptSrc.push(cdn)
+    styleSrc.push(cdn)
+    workerSrc.push(cdn)
+  }
+  function addSocketIO(url) {
+    const wsUrl = new URL(url, Settings.siteUrl).origin
+    if (scriptSrc.indexOf(wsUrl) === -1) scriptSrc.push(wsUrl)
+    if (connectSrc.indexOf(wsUrl) === -1) connectSrc.push(wsUrl)
+    const wsUrlWS = wsUrl.replace(/^http/, 'ws')
+    if (connectSrc.indexOf(wsUrlWS) === -1) connectSrc.push(wsUrlWS)
+  }
+  if (Settings.wsUrl) {
+    addSocketIO(Settings.wsUrl)
+  }
+  if (Settings.wsUrlBeta) {
+    addSocketIO(Settings.wsUrlBeta)
+  }
+  const policy = {
+    'base-uri': ["'self'"],
+    'connect-src': connectSrc,
+    'default-src': ["'none'"],
+    'font-src': fontSrc,
+    'form-action': ["'self'"],
+    'frame-ancestors': ["'none'"],
+    'img-src': imgSrc,
+    'manifest-src': ["'self'"],
+    'script-src': scriptSrc,
+    'style-src': styleSrc,
+    'worker-src': workerSrc
+  }
+  const policyAmend = ['block-all-mixed-content']
+  if (csp.reportURL) {
+    policyAmend.push(`report-uri ${csp.reportURL}`)
+  }
+  const renderedPolicy = Object.entries(policy)
+    .map(([key, value]) => {
+      return `${key} ${value.join(' ')}`
+    })
+    .concat(policyAmend)
+    .join('; ')
+
+  function getHeader(needsRecurly, needsFront) {
+    if (needsRecurly) {
+      // recurly needs all the unsafe inline stuffs
+      return ''
+    }
+    if (needsFront && frontSrc.length) {
+      // not finished yet
+      return ''
+    }
+    return renderedPolicy
+  }
+  return function(req, res, next) {
+    const headerValue = getHeader(
+      req.path === '/user/subscription/new' ||
+        req.path === '/user/subscription',
+      req.path === '/project'
+    )
+    if (!headerValue) {
+      // there is no need to set an empty header
+    } else if (csp.enforce) {
+      res.setHeader('Content-Security-Policy', headerValue)
+    } else {
+      res.setHeader('Content-Security-Policy-Report-Only', headerValue)
+    }
+    next()
+  }
 }

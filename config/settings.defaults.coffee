@@ -246,6 +246,11 @@ module.exports = settings =
 	# Security
 	# --------
 	security:
+		csp:
+			allowCookieDomain: process.env['']
+			reportURL: process.env['CSP_REPORT_URL']
+			reportOnly: process.env['CSP_REPORT_ONLY']
+			enforce: process.env['CSP_ENFORCE']
 		sessionSecret: sessionSecret
 		bcryptRounds: (parseInt(process.env['BCRYPT_ROUNDS'], 10) || 12) # number of rounds used to hash user passwords (raised to power 2)
 

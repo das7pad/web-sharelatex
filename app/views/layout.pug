@@ -74,7 +74,7 @@ html(
 				})
 
 
-	body
+	body(ng-csp="no-unsafe-eval")
 		if(settings.recaptcha && settings.recaptcha.siteKeyV3)
 			script(type="text/javascript", src="https://www.google.com/recaptcha/api.js?render="+settings.recaptcha.siteKeyV3)
 
