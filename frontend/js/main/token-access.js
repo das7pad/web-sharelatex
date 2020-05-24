@@ -1,4 +1,5 @@
 import App from '../base'
+import showFakeProgress from '../utils/loadingScreen'
 App.controller(
   'TokenAccessPageController',
   ($scope, $http, $location, localStorage) => {
@@ -32,6 +33,8 @@ App.controller(
       const parsedData = JSON.parse(textData)
       const { postUrl, csrfToken } = parsedData
       $scope.accessInFlight = true
+
+      showFakeProgress()
 
       $http({
         method: 'POST',

@@ -22,7 +22,7 @@ block content
 				ng-show="mode == 'accessAttempt'"
 			)
 				.loading-screen-brand-container
-					.loading-screen-brand()
+					div#loadingScreen.loading-screen-brand()
 
 				h3.loading-screen-label.text-center
 					| #{translate('join_project')}
@@ -90,13 +90,3 @@ block content
 								.row-spaced.text-center
 									a.btn.btn-primary(href="{{ buildZipDownloadPath(v1ImportData.projectId) }}")
 										| Download project zip file
-
-
-block append foot-scripts
-	script(type="text/javascript").
-		$(document).ready(function () {
-			setTimeout(function() {
-				$('.loading-screen-brand').css('height', '20%')
-			}, 500);
-		});
-
