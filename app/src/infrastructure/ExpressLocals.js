@@ -436,7 +436,7 @@ function cspMiddleware() {
   const styleSrc = ["'self'", "'unsafe-inline'"]
   const fontSrc = ["'self'"]
   const connectSrc = ["'self'"]
-  const imgSrc = ["'self'", 'data:']
+  const imgSrc = ["'self'", 'data:', 'blob:']
   const workerSrc = ["'self'"]
 
   if (Settings.analytics.ga.token) {
