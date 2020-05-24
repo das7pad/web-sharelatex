@@ -5,15 +5,16 @@
 import pdfjsBundle from 'pdfjs-dist'
 import staticPath from './utils/staticPath'
 
-pdfjsBundle.GlobalWorkerOptions.workerSrc = staticPath(
-  'vendor/pdfjs-dist/build/pdf.worker.min.js'
-)
+// load worker from same origin and prefetch from the cdn
+pdfjsBundle.GlobalWorkerOptions.workerSrc =
+  '/generate/worker/vendor/pdfjs-dist/build/pdf.worker.min.js'
+
 if (typeof window !== 'undefined' && 'Worker' in window) {
   // preload the worker with a low priority
   const link = document.createElement('link')
   link.rel = 'prefetch'
   link.as = 'script'
-  link.href = pdfjsBundle.GlobalWorkerOptions.workerSrc
+  link.href = staticPath('vendor/pdfjs-dist/build/pdf.worker.min.js')
   link.onload = () => {
     pdfjsBundle.worker = new pdfjsBundle.PDFWorker()
   }

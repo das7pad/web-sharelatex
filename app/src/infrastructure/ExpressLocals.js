@@ -417,6 +417,13 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
   if (Settings.security.csp.reportOnly || Settings.security.csp.enforce) {
     webRouter.use(cspMiddleware())
   }
+  webRouter.use('/generate/worker', function(req, res, next) {
+    const workerPath = req.path
+    if (workerPath.indexOf('/vendor') !== 0) {
+      return res.sendStatus(404)
+    }
+    res.send(`importScripts('${res.locals.staticPath(workerPath)}');`)
+  })
 }
 
 function cspMiddleware() {
