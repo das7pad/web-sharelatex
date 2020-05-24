@@ -1,11 +1,8 @@
 extends ../../../../../app/views/layout
 
 block content
-	script#data(type="application/json").
-		!{JSON.stringify({subscription: subscription, user_id: user_id}).replace(/\//g, '\\/')}
-
-	script(type="text/javascript").
-		window.data = JSON.parse(window.document.getElementById("data").text);
+	meta(id="ol-subscription" data-json content=subscription)
+	meta(id="ol-user_id" content=user_id)
 
 	.content.content-alt(ng-controller="AdminSubscriptionController")
 		.container(ng-cloak)

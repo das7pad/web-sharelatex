@@ -51,34 +51,30 @@ html(
 				window.ga = function() { console.log("would send to GA", arguments) };
 
 		meta(id="ol-staticPath", content=staticPath('/'))
-		script(type="text/javascript").
-			window.csrfToken = "#{csrfToken}";
+		meta(id="ol-csrfToken" content=csrfToken)
 
 		block head-scripts
 
-		script(type="text/javascript").
-			window.sharelatex = {
-				siteUrl: '#{settings.siteUrl}',
-				wsUrl: '#{wsUrl}',
-			};
-			window.user_id = '#{getLoggedInUserId()}';
-			window.ExposedSettings = JSON.parse('!{StringHelper.stringifyJsonForScript(ExposedSettings)}');
+		meta(id="ol-sharelatex" data-json content={
+				siteUrl: settings.siteUrl,
+				wsUrl: settings.wsUrl,
+			})
+		meta(id="ol-user_id" content=getLoggedInUserId())
+		meta(id="ol-ExposedSettings" data-json content=ExposedSettings)
 
 		- if (typeof(settings.algolia) != "undefined")
-			script(type="text/javascript").
-				window.sharelatex.algolia = {
-					app_id:'#{settings.algolia.app_id}',
-					api_key:'#{settings.algolia.read_only_api_key}',
-					indexes:!{StringHelper.stringifyJsonForScript(settings.algolia.indexes)}
-				}
+			meta(id="ol-sharelatex.algolia" data-json content={
+					app_id: settings.algolia.app_id,
+					api_key: settings.algolia.read_only_api_key,
+					indexes: settings.algolia.indexes
+				})
 
 		- if (typeof(settings.templates) != "undefined")
-			script(type="text/javascript").
-				window.sharelatex.templates = {
-					user_id : '!{settings.templates.user_id}',
-					cdnDomain : '!{settings.templates.cdnDomain}',
-					indexName : '!{settings.templates.indexName}'
-				}
+			meta(id="ol-sharelatex.templates" data-json content={
+					user_id : settings.templates.user_id,
+					cdnDomain : settings.templates.cdnDomain,
+					indexName : settings.templates.indexName
+				})
 
 
 	body

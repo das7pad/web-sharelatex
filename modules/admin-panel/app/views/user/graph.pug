@@ -8,12 +8,8 @@ block head-scripts
 	script(src=staticPath("/vendor/sigma-master/plugins/sigma.renderers.parallelEdges.min.js"))
 
 block content
-
-	script(type="text/javascript").
-		window.data = {
-			user: !{JSON.stringify(user).replace(/\//g, '\\/')},
-			graph: !{JSON.stringify(graph).replace(/\//g, '\\/')}
-		};
+	meta(id="ol-user" data-json content=user)
+	meta(id="ol-graph" data-json content=graph)
 
 	.content.content-alt(ng-controller="AdminGraphController")
 		.container(ng-cloak)

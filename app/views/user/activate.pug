@@ -59,5 +59,4 @@ block content
 									span(ng-show="!activationForm.inflight") #{translate("activate")}
 									span(ng-show="activationForm.inflight") #{translate("activating")}…
 
-	script(type='text/javascript').
-		window.passwordStrengthOptions = !{StringHelper.stringifyJsonForScript(settings.passwordStrengthOptions || {})}
+	meta(id="ol-passwordStrengthOptions" data-json content=(settings.passwordStrengthOptions || {}))

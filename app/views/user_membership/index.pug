@@ -103,8 +103,6 @@ block content
 								.col-xs-2.col-xs-offset-10(ng-if="paths.exportMembers", ng-cloak)
 									a(href=paths.exportMembers) #{translate('export_csv')}
 									
-
-	script(type="text/javascript").
-		window.users = !{StringHelper.stringifyJsonForScript(users)};
-		window.paths = !{StringHelper.stringifyJsonForScript(paths)};
-		window.groupSize = #{groupSize || 'null'};
+	meta(id="ol-users" data-json content=users)
+	meta(id="ol-paths" data-json content=paths)
+	meta(id="ol-groupSize" data-json content=groupSize)

@@ -2,14 +2,13 @@ extends ../layout
 
 block head-scripts
 	script(type="text/javascript", src="https://js.recurly.com/v4/recurly.js")
-	script(type='text/javascript').
-		window.countryCode = '#{countryCode}'
-		window.plan_code = '#{plan_code}'
-		window.recurlyApiKey = "!{settings.apis.recurly.publicKey}"
-		window.couponCode = !{StringHelper.stringifyJsonForScript(couponCode)}
-		window.recomendedCurrency = !{StringHelper.stringifyJsonForScript(currency.slice(0,3))}
-		window.ITMCampaign = '#{ITMCampaign}'
-		window.ITMContent = '#{ITMContent}'
+	meta(id="ol-countryCode" content=countryCode)
+	meta(id="ol-plan_code" content=plan_code)
+	meta(id="ol-recurlyApiKey" content=settings.apis.recurly.publicKey)
+	meta(id="ol-couponCode" data-json content=couponCode)
+	meta(id="ol-recomendedCurrency" content=currency.slice(0,3))
+	meta(id="ol-ITMCampaign" content=ITMCampaign)
+	meta(id="ol-ITMContent" content=ITMContent)
 
 block content
 	.content.content-alt

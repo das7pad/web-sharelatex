@@ -1,5 +1,4 @@
-script(type='text/javascript').
-	window.managedInstitutions = !{StringHelper.stringifyJsonForScript(managedInstitutions)}
+meta(id="ol-managedInstitutions" data-json content=managedInstitutions)
 
 each institution in managedInstitutions
 	p

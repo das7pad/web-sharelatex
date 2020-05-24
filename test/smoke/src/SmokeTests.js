@@ -173,7 +173,7 @@ describe('Opening', function() {
       // Check that the project id is present in the javascript that loads up the project
       if (
         body.indexOf(
-          `window.project_id = "${Settings.smokeTest.projectId}"`
+          `<meta id="ol-project_id" content="${Settings.smokeTest.projectId}">`
         ) === -1
       ) {
         return done(new Failure('project page html does not have project_id'))

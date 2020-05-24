@@ -150,33 +150,22 @@ block content
 			h3 {{ title }}
 		.modal-body(ng-bind-html="message")
 
-	//- We need to do .replace(/\//g, '\\/') do that '</script>' -> '<\/script>'
-	//- and doesn't prematurely end the script tag.
-	script(type="application/json", id="data").
-		!{StringHelper.stringifyJsonForScript({ userSettings: userSettings, user: user, trackChangesState: trackChangesState, useV2History: useV2History, brandVariation: brandVariation })}
-
-	script(type='text/javascript').
-		window.data = JSON.parse(document.getElementById("data").text);
-		window.project_id = "!{project_id}";
-		window.userSettings = window.data.userSettings;
-		window.user = window.data.user;
-		window.anonymous = #{anonymous};
-		window.brandVariation = window.data.brandVariation;
-		window.anonymousAccessToken = "#{anonymousAccessToken}";
-		window.isTokenMember = #{!!isTokenMember};
-		window.isRestrictedTokenMember = #{!!isRestrictedTokenMember};
-		window.maxDocLength = #{maxDocLength};
-		window.trackChangesState = window.data.trackChangesState;
-		window.wikiEnabled = #{!!(settings.apis.wiki && settings.apis.wiki.url)};
-		window.gitBridgePublicBaseUrl = '#{gitBridgePublicBaseUrl}'
-		window.uiConfig = JSON.parse('!{StringHelper.stringifyJsonForScript(uiConfig)}');
-		//- enable doc hash checking for all projects
-		//- used in public/js/libs/sharejs.js
-		window.useShareJsHash = true
-
-	- if (settings.hasThemes)
-		script(type='text/javascript').
-			window.overallThemes = JSON.parse('!{StringHelper.stringifyJsonForScript(overallThemes)}');
+	meta(id="ol-useV2History" data-boolean content=useV2History)
+	meta(id="ol-project_id" content=project_id)
+	meta(id="ol-userSettings" data-json content=userSettings)
+	meta(id="ol-user" data-json content=user)
+	meta(id="ol-anonymous" content=anonymous)
+	meta(id="ol-brandVariation" content=brandVariation)
+	meta(id="ol-anonymousAccessToken" content=anonymousAccessToken)
+	meta(id="ol-isTokenMember" data-boolean content=!!isTokenMember)
+	meta(id="ol-isRestrictedTokenMember" data-boolean content=!!isRestrictedTokenMember)
+	meta(id="ol-maxDocLength" content=maxDocLength)
+	meta(id="ol-trackChangesState" data-json content=trackChangesState)
+	meta(id="ol-wikiEnabled" data-boolean content=!!(settings.apis.wiki && settings.apis.wiki.url))
+	meta(id="ol-gitBridgePublicBaseUrl" content=gitBridgePublicBaseUrl)
+	meta(id="ol-uiConfig" data-json content=uiConfig)
+	meta(id="ol-useShareJsHash" data-boolean content=true)
+	meta(id="ol-overallThemes" data-json content=overallThemes)
 
 block foot-scripts
 	script(type='text/javascript', defer, src=(wsUrl || '/socket.io') + '/socket.io.js')
