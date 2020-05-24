@@ -153,7 +153,7 @@ block content
 	//- We need to do .replace(/\//g, '\\/') do that '</script>' -> '<\/script>'
 	//- and doesn't prematurely end the script tag.
 	script(type="application/json", id="data").
-		!{StringHelper.stringifyJsonForScript({ userSettings: userSettings, user: user, trackChangesState: trackChangesState, useV2History: useV2History, enabledLinkedFileTypes: settings.enabledLinkedFileTypes, brandVariation: brandVariation })}
+		!{StringHelper.stringifyJsonForScript({ userSettings: userSettings, user: user, trackChangesState: trackChangesState, useV2History: useV2History, brandVariation: brandVariation })}
 
 	script(type='text/javascript').
 		window.data = JSON.parse(document.getElementById("data").text);
