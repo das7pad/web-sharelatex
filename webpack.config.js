@@ -234,6 +234,14 @@ module.exports = {
           // omit minified ace source, they are loaded via ace internals
           return
         }
+        if (/sigma-master/.test(spec.path)) {
+          // loaded via staticPath
+          return
+        }
+        if (/vendor\/mathjax/.test(spec.path)) {
+          // booted via MathJaxBundle and then loaded via staticPath
+          return
+        }
         return spec
       },
       // Always write the manifest file to disk (even if in dev mode, where
