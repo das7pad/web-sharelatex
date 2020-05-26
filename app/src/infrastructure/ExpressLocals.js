@@ -439,6 +439,10 @@ function cspMiddleware() {
   const imgSrc = ["'self'", 'data:', 'blob:']
   const workerSrc = ["'self'"]
 
+  if (sentryEnabled) {
+    connectSrc.push(new URL(Settings.sentry.frontend.dsn).origin)
+  }
+
   if (Settings.analytics.ga.token) {
     // TODO: add ga and stuffs
   }
