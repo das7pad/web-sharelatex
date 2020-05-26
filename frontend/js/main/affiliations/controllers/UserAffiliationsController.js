@@ -11,6 +11,7 @@ export default App.controller('UserAffiliationsController', function(
   UserAffiliationsDataService,
   $q,
   $window,
+  ExposedSettings,
   _
 ) {
   $scope.userEmails = []

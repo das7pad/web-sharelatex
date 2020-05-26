@@ -17,6 +17,7 @@ const MAX_PROJECT_NAME_LENGTH = 150
 export default App.controller('ProjectNameController', function(
   $scope,
   $element,
+  ExposedSettings,
   settings,
   ide
 ) {
