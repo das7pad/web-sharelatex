@@ -517,6 +517,10 @@ function cspMiddleware() {
     return renderedPolicy
   }
   return function(req, res, next) {
+    if (req.accepts(['html', 'json']) !== 'html') {
+      // do not emit the CSP header for non top-level requests
+      return next()
+    }
     const headerValue = getHeader(
       req.path === '/user/subscription/new' ||
         req.path === '/user/subscription',
