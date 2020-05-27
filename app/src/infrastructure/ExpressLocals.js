@@ -506,7 +506,11 @@ function cspMiddleware() {
     .concat(policyAmend)
     .join('; ')
 
-  function getHeader(needsRecurly, needsFront) {
+  function getHeader(isWorker, needsRecurly, needsFront) {
+    if (isWorker) {
+      // javascript response, no need to set a CSP
+      return ''
+    }
     if (needsRecurly) {
       // recurly needs all the unsafe inline stuffs
       return ''
@@ -523,6 +527,7 @@ function cspMiddleware() {
       return next()
     }
     const headerValue = getHeader(
+      req.baseUrl === '/generate/worker',
       req.path === '/user/subscription/new' ||
         req.path === '/user/subscription',
       req.path === '/project'
