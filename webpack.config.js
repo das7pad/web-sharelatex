@@ -44,13 +44,7 @@ module.exports = {
     path: path.join(__dirname, '/public'),
 
     // By default write into js directory
-    filename: 'js/[name].js',
-
-    // Output as UMD bundle (allows main JS to import with CJS, AMD or global
-    // style code bundles
-    libraryTarget: 'umd',
-    // Name the exported variable from output bundle
-    library: ['Frontend', '[name]']
+    filename: 'js/[name].js'
   },
 
   // Define how file types are handled by webpack
