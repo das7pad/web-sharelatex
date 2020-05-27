@@ -211,29 +211,14 @@ pipeline {
             label 'sharelatex && docker_builder'
           }
           stages {
-            stage('Webpack'){
-              stages {
-                stage('Build webpack') {
-                  steps {
-                    sh 'make prepare_ci_stage'
-                    sh 'make build_webpack'
-                  }
-                  post {
-                    cleanup {
-                      sh 'make clean_stage_images'
-                    }
-                  }
-                }
-                stage('archive public') {
-                  steps {
-                    sh 'make public.tar.xz'
-                    archiveArtifacts(artifacts: 'public.tar.xz')
-                  }
-                  post {
-                    cleanup {
-                      sh 'rm -f public.tar.xz'
-                    }
-                  }
+            stage('Build webpack') {
+              steps {
+                sh 'make prepare_ci_stage'
+                sh 'make build_webpack'
+              }
+              post {
+                cleanup {
+                  sh 'make clean_stage_images'
                 }
               }
             }
@@ -274,6 +259,18 @@ pipeline {
                       sh 'make clean_push'
                     }
                   }
+                }
+              }
+            }
+
+            stage('archive public') {
+              steps {
+                sh 'make public.tar.xz'
+                archiveArtifacts(artifacts: 'public.tar.xz')
+              }
+              post {
+                cleanup {
+                  sh 'rm -f public.tar.xz'
                 }
               }
             }
