@@ -426,6 +426,7 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
     if (workerPath.indexOf('/vendor') !== 0) {
       return res.sendStatus(404)
     }
+    res.contentType('application/javascript')
     res.send(`importScripts('${res.locals.staticPath(workerPath)}');`)
   })
 }
