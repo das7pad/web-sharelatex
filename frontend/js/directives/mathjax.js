@@ -8,7 +8,7 @@ if (window.preLoadMathJax) {
 export default App.directive('mathjax', function($compile, $parse) {
   return {
     link(scope, element, attrs) {
-      import('../MathJaxBundle').then(MathJax => {
+      import('../MathJaxBundle').then(({ MathJax }) => {
         // Allowing HTML can be unsafe unless using something like
         // `ng-bind-html` because of potential Angular XSS via {{/}}
         if (!$parse(attrs.mathjaxAllowHtml)(scope)) {
