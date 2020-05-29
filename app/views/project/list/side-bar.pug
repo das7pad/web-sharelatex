@@ -165,5 +165,4 @@
 				a(href="https://forms.gle/zWrVdF3GdoWovjd66").btn.btn-primary Request Upgrade
 
 			
-script(type="text/javascript").
-	window.userHasNoSubscription = #{!!(settings.enableSubscriptions && !hasSubscription)}
+meta(id="ol-userHasNoSubscription" data-boolean content=!!(settings.enableSubscriptions && !hasSubscription))

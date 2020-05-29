@@ -1,7 +1,6 @@
-script(type='text/javascript').
-	window.recurlyApiKey = "!{settings.apis.recurly.publicKey}"
-	window.subscription = !{StringHelper.stringifyJsonForScript(personalSubscription)}
-	window.recomendedCurrency = "#{personalSubscription.recurly.currency}"
+meta(id="ol-recurlyApiKey" content=settings.apis.recurly.publicKey)
+meta(id="ol-subscription" data-json content=personalSubscription)
+meta(id="ol-recomendedCurrency" content=personalSubscription.recurly.currency)
 
 div(ng-controller="RecurlySubscriptionController")
 	div(ng-show="!showCancellation")

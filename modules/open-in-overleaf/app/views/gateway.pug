@@ -5,14 +5,9 @@ block vars
 	- var suppressFooter = true
 
 block content
-	script.
-		$(document).ready(function () {
-			setTimeout(function() {
-				$('.loading-screen-brand').css('height', '20%')
-			}, 500);
-		});
-
-	script(type="template", id="overleaf-gateway-data")!= StringHelper.stringifyJsonForScript({params: form_data, action: action, target: target, csrfToken: csrfToken, error: error})
+	meta(id="ol-oio-gateway-data" data-json content={
+			params: form_data, action: action, target: target, csrfToken: csrfToken, error: error
+		})
 
 	.editor.full-size(
 			ng-controller="OpenInOverleafGatewayController",
@@ -20,7 +15,7 @@ block content
 		)
 		.loading-screen(ng-hide="error || serverError")
 			.loading-screen-brand-container
-				.loading-screen-brand
+				div#loadingScreen.loading-screen-brand()
 			h3.loading-screen-label() #{translate('loading_content')}
 				span.loading-screen-ellip .
 				span.loading-screen-ellip .

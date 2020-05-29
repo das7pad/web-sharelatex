@@ -196,7 +196,7 @@ module.exports = {
     splitChunks: {
       cacheGroups: {
         ideLibraries: {
-          test: /(?!frontend\/js\/vendor\/libs\/platform)(pdfjsBundle|node_modules\/(ace-builds|pdfjs-dist)|frontend\/js\/vendor\/libs)/,
+          test: /(pdfjsBundle|node_modules\/(ace-builds|pdfjs-dist)|frontend\/js\/vendor\/libs)/,
           name: 'ideLibraries',
           chunks: 'initial',
           reuseExistingChunk: true,
@@ -228,6 +228,14 @@ module.exports = {
           // omit minified ace source, they are loaded via ace internals
           return
         }
+        if (/sigma-master/.test(spec.path)) {
+          // loaded via staticPath
+          return
+        }
+        if (/vendor\/mathjax/.test(spec.path)) {
+          // booted via MathJaxBundle and then loaded via staticPath
+          return
+        }
         return spec
       },
       // Always write the manifest file to disk (even if in dev mode, where
@@ -255,14 +263,7 @@ module.exports = {
           return { from: `node_modules/${path}`, to: `${VENDOR_PATH}/${path}` }
         })
         .concat(
-          [
-            'mathjax',
-            'sigma-master',
-
-            // sentry sdk
-            `${PackageVersions.lib('sentry')}/bundle.min.js`,
-            `${PackageVersions.lib('sentry')}/bundle.min.js.map`
-          ].map(path => {
+          ['mathjax', 'sigma-master'].map(path => {
             return {
               from: `frontend/js/vendor/libs/${path}`,
               to: `${VENDOR_PATH}/${path}`

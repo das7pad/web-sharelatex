@@ -1,3 +1,5 @@
+import './utils/staticPath'
+import './utils/sentry'
 import 'core-js/stable/symbol'
 import 'core-js/stable/symbol/async-iterator'
 import 'core-js/stable/symbol/description'
@@ -30,6 +32,5 @@ import 'libs/ng-context-menu'
 import 'libs/passfield'
 import 'libs/ng-tags-input'
 import 'libs/select/select'
-
-// eslint-disable-next-line camelcase, no-undef
-__webpack_public_path__ = `${window.staticPath}${__webpack_public_path__}`
+import './misc/ga'
+import './utils/meta'

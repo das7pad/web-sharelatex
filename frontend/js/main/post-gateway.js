@@ -1,8 +1,9 @@
 import App from '../base'
+import getMeta from '../utils/meta'
 
 export default App.controller('PostGatewayController', function($scope) {
   $scope.handleGateway = function() {
-    const { params } = JSON.parse($('#gateway-data').text())
+    const { params } = getMeta('ol-gateway-data')
     params.viaGateway = 'true'
     Object.keys(params).forEach(param => {
       $('<input>')

@@ -2,8 +2,7 @@ extends ../layout
 
 
 block head-scripts
-	script(type='text/javascript').
-		window.otherSessions = !{StringHelper.stringifyJsonForScript(sessions)}
+	meta(id="ol-otherSessions" data-json content=sessions)
 
 
 block content

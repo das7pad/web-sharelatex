@@ -4,17 +4,16 @@ block vars
 	- var suppressNavContentLinks = true
 
 block content
-	script(type="application/json", id="data").
-		!{StringHelper.stringifyJsonForScript({ projects, tags, notifications, notificationsInstitution })}
-
-	script(type="text/javascript").
-		window.data = JSON.parse(window.document.getElementById("data").text);
-		window.algolia = {
+	meta(id="ol-projects" data-json content=projects)
+	meta(id="ol-tags" data-json content=tags)
+	meta(id="ol-notifications" data-json content=notifications)
+	meta(id="ol-notificationsInstitution" data-json content=notificationsInstitution)
+	meta(id="ol-algolia" data-json content={
 			institutions: {
-				app_id:  '#{algolia_app_id}',
-				api_key: '#{algolia_api_key}'
+				app_id:  algolia_app_id,
+				api_key: algolia_api_key
 			}
-		};
+		})
 
 	main.content.content-alt.project-list-page(
 		ng-controller="ProjectPageController"

@@ -1,10 +1,7 @@
 extends ../../../../../app/views/layout
 
 block content
-	script(type="text/javascript").
-		window.data = {
-			admin_id: "#{admin_id}"
-		}
+	meta(id="ol-admin_id" content=admin_id)
 
 	.content.content-alt(ng-controller="AdminCreateSubscriptionController")
 		.container(ng-cloak)

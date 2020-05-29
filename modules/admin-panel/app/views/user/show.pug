@@ -1,11 +1,8 @@
 extends ../../../../../app/views/layout
 
 block content
-	script#data(type="application/json").
-		!{JSON.stringify({user: user, projects: projects}).replace(/\//g, '\\/')}
-
-	script(type="text/javascript").
-		window.data = JSON.parse(window.document.getElementById("data").text);
+	meta(id="ol-user" data-json content=user)
+	meta(id="ol-projects" data-json content=projects)
 
 	.content.content-alt(ng-controller="AdminUserController")
 		.container(ng-cloak)

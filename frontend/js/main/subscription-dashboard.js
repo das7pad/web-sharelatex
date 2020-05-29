@@ -28,8 +28,10 @@ const ensureRecurlyIsSetup = _.once(() => {
 })
 
 App.controller('MetricsEmailController', function($scope, $http) {
+  let managedInstitutions = window.managedInstitutions
+
   $scope.institutionEmailSubscription = function(institutionId) {
-    var inst = _.find(window.managedInstitutions, function(institution) {
+    var inst = _.find(managedInstitutions, function(institution) {
       return institution.v1Id === parseInt(institutionId)
     })
     if (inst.metricsEmail.optedOutUserIds.includes(window.user_id)) {
@@ -48,9 +50,7 @@ App.controller('MetricsEmailController', function($scope, $http) {
         'X-CSRF-Token': window.csrfToken
       }
     }).then(function successCallback(response) {
-      window.managedInstitutions = _.map(window.managedInstitutions, function(
-        institution
-      ) {
+      managedInstitutions = _.map(managedInstitutions, function(institution) {
         if (institution.v1Id === parseInt(institutionId)) {
           institution.metricsEmail.optedOutUserIds = response.data
         }

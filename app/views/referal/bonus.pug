@@ -111,21 +111,3 @@ block content
 									ng-click="cancel()",
 								)
 									span #{translate("close")}
-
-
-block append foot-scripts
-	script(type="text/javascript").
-		$(function() {
-			$(".twitter").click(function() {
-				ga('send', 'event', 'referal-button', 'clicked', "twitter")
-			});
-			$(".email").click(function() {
-				ga('send', 'event', 'referal-button', 'clicked', "email")
-			});
-			$(".facebook").click(function() {
-				ga('send', 'event', 'referal-button', 'clicked', "facebook")
-			});
-			$(".link").click(function() {
-				ga('send', 'event', 'referal-button', 'clicked', "direct-link")
-			});
-		});

@@ -1,4 +1,6 @@
 import App from '../../../../../frontend/js/base'
+import getMeta from '../../../../../frontend/js/utils/meta'
+import showFakeProgress from '../../../../../frontend/js/utils/loadingScreen'
 
 // For integration-module
 export default App.controller('OpenInOverleafGatewayController', function(
@@ -9,7 +11,9 @@ export default App.controller('OpenInOverleafGatewayController', function(
   $scope.error = false
 
   $scope.handleGateway = function() {
-    const input = JSON.parse($('#overleaf-gateway-data').text())
+    showFakeProgress()
+
+    const input = getMeta('ol-oio-gateway-data')
     _addReferrer(input.params)
 
     if (!_validateInput(input)) {

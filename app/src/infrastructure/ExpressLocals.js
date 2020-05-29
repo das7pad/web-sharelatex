@@ -1,5 +1,6 @@
 const logger = require('logger-sharelatex')
-const Settings = require('settings-sharelatex')
+const Settings =
+  require('settings-sharelatex') || require('../../../config/settings.defaults')
 const _ = require('lodash')
 const { URL } = require('url')
 const Path = require('path')
@@ -327,13 +328,6 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
       }
     }
     res.locals.sentryEnabled = sentryEnabled
-    if (sentryEnabled) {
-      res.locals.sentrySRC =
-        Settings.sentry.src ||
-        res.locals.staticPath(
-          `/vendor/${PackageVersions.lib('sentry')}/bundle.min.js`
-        )
-    }
     next()
   })
 
@@ -420,4 +414,175 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
     }
     next()
   })
+  if (
+    Settings.security &&
+    Settings.security.csp &&
+    (Settings.security.csp.reportOnly || Settings.security.csp.enforce)
+  ) {
+    webRouter.use(cspMiddleware())
+  }
+  webRouter.use('/generate/worker', function(req, res, next) {
+    const workerPath = req.path
+    if (workerPath.indexOf('/vendor') !== 0) {
+      return res.sendStatus(404)
+    }
+    res.contentType('application/javascript')
+    res.send(`importScripts('${res.locals.staticPath(workerPath)}');`)
+  })
+}
+
+function cspMiddleware() {
+  const csp = Settings.security.csp
+  const cdnOrigin = cdnAvailable
+    ? new URL(Settings.cdn.web.host).origin
+    : undefined
+  const compilesOrigin = Settings.pdfDownloadDomain
+    ? new URL(Settings.pdfDownloadDomain).origin
+    : undefined
+  const sentryOrigin = sentryEnabled
+    ? new URL(Settings.sentry.frontend.dsn).origin
+    : undefined
+
+  const uniqueWsUrlOrigins = Array.from(
+    new Set(
+      [Settings.wsUrl, Settings.wsUrlBeta, Settings.wsUrlV2]
+        .filter(Boolean)
+        .map(url => new URL(url, Settings.siteUrl).origin)
+    )
+  )
+
+  function generateCSP(cfg) {
+    const scriptSrc = ["'self'"]
+    const styleSrc = ["'self'", "'unsafe-inline'"]
+    const fontSrc = ["'self'", 'about:']
+    const connectSrc = ["'self'"]
+    const imgSrc = ["'self'", 'data:', 'blob:']
+    const workerSrc = ["'self'"]
+    const frameSrc = []
+
+    if (sentryEnabled) {
+      connectSrc.push(sentryOrigin)
+    }
+
+    if (Settings.analytics.ga.token) {
+      // NOT TESTED -- needs nonce for i-s-o-g-r-a-m
+      // https://developers.google.com/tag-manager/web/csp
+      ;[connectSrc, imgSrc, scriptSrc].forEach(src =>
+        src.push('https://www.google-analytics.com')
+      )
+      scriptSrc.push('https://ssl.google-analytics.com')
+    }
+
+    if (Settings.recaptcha && Settings.recaptcha.siteKeyV3) {
+      // NOT TESTED
+      frameSrc.push('https://www.google.com/recaptcha')
+      imgSrc.push('https://www.gstatic.com/recaptcha')
+      scriptSrc.push('https://www.google.com/recaptcha')
+    }
+
+    if (
+      cfg.needsFront &&
+      Settings.overleaf &&
+      Settings.overleaf.front_chat_widget_room_id
+    ) {
+      // NOT TESTED
+      // very broad addition, but I do not have any token at hand for testing.
+      ;[connectSrc, fontSrc, imgSrc, scriptSrc, styleSrc].forEach(src =>
+        src.push('frontapp.com', '*.frontapp.com')
+      )
+      connectSrc.push(
+        'pusher.com',
+        '*.pusher.com',
+        'pusherapp.com',
+        '*.pusherapp.com',
+        '*.bugsnag.com'
+      )
+      fontSrc.push('fonts.googleapis.com')
+    }
+
+    if (cdnAvailable) {
+      if (cfg.connectCDN) {
+        // e.g. pdfjs cmaps or /launchpad for ide blob check
+        connectSrc.push(cdnOrigin)
+      }
+      // assets
+      fontSrc.push(cdnOrigin)
+      imgSrc.push(cdnOrigin)
+      scriptSrc.push(cdnOrigin)
+      styleSrc.push(cdnOrigin)
+      workerSrc.push(cdnOrigin)
+    }
+
+    if (cfg.needsCompilesAccess && compilesOrigin) {
+      connectSrc.push(compilesOrigin)
+    }
+
+    if (cfg.needsSocketIo) {
+      uniqueWsUrlOrigins.map(wsUrl => {
+        scriptSrc.push(wsUrl)
+        connectSrc.push(wsUrl)
+        // websocket support: http:// -> ws:// and https:// -> wss://
+        connectSrc.push('ws' + wsUrl.slice(4))
+      })
+    }
+    let policyAmend = ''
+    if (csp.reportURL) {
+      policyAmend += `; report-uri ${csp.reportURL}`
+    }
+    return `base-uri 'self'; block-all-mixed-content; connect-src ${connectSrc.join(
+      ' '
+    )}; default-src 'none'; font-src ${fontSrc.join(
+      ' '
+    )}; form-action 'self'; frame-ancestors 'none'; frame-src ${frameSrc.join(
+      ' '
+    ) || "'none'"}; img-src ${imgSrc.join(
+      ' '
+    )}; manifest-src 'self'; script-src ${scriptSrc.join(
+      ' '
+    )}; style-src ${styleSrc.join(' ')}; worker-src ${workerSrc.join(
+      ' '
+    )}${policyAmend}`
+  }
+
+  const CSP_DEFAULT = generateCSP({})
+  const CSP_DASHBOARD = generateCSP({ needsFront: true })
+  const CSP_EDITOR = generateCSP({
+    connectCDN: true,
+    needsCompilesAccess: true,
+    needsSocketIo: true
+  })
+  const CSP_LAUNCHPAD = generateCSP({
+    connectCDN: true,
+    needsSocketIo: true
+  })
+  const CSP_SUBSCRIPTION = generateCSP({ needsRecurly: true })
+
+  return function(req, res, next) {
+    const actualRender = res.render
+    res.render = function() {
+      const endpoint = req.route.path
+      let headerValue
+      if (endpoint === '/project') {
+        headerValue = CSP_DASHBOARD
+      } else if (endpoint === '/Project/:Project_id') {
+        headerValue = CSP_EDITOR
+      } else if (
+        endpoint === '/user/subscription/new' ||
+        endpoint === '/user/subscription'
+      ) {
+        headerValue = CSP_SUBSCRIPTION
+      } else if (endpoint === '/launchpad') {
+        headerValue = CSP_LAUNCHPAD
+      } else {
+        headerValue = CSP_DEFAULT
+      }
+      if (csp.enforce) {
+        res.setHeader('Content-Security-Policy', headerValue)
+      } else {
+        res.setHeader('Content-Security-Policy-Report-Only', headerValue)
+      }
+      actualRender.apply(res, arguments)
+    }
+    next()
+  }
 }

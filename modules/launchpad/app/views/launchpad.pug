@@ -1,13 +1,9 @@
 extends ../../../../app/views/layout
 
 block content
-
-	script(type="text/javascript").
-		window.data = {
-			adminUserExists: !{adminUserExists == true},
-			ideJsPath: "!{buildJsPath('ide.js')}",
-			authMethod: "!{authMethod}"
-		}
+	meta(id="ol-adminUserExists" data-boolean content=adminUserExists)
+	meta(id="ol-ideJsPath" content=buildJsPath('ide.js'))
+	meta(id="ol-authMethod" content=authMethod)
 
 	style.
 		hr { margin-bottom: 5px; }

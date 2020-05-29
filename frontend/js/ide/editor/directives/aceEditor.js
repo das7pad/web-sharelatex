@@ -3,6 +3,7 @@
     max-len
  */
 import App from '../../../base'
+import staticPath from '../../../utils/staticPath'
 import UndoManager from './aceEditor/undo/UndoManager'
 import AutoCompleteManager from './aceEditor/auto-complete/AutoCompleteManager'
 import SpellCheckManager from './aceEditor/spell-check/SpellCheckManager'
@@ -28,13 +29,17 @@ const SearchBox = ace.require('ace/ext/searchbox')
 
 // Set the base path that ace will fetch modes/snippets/workers from
 const syntaxValidationEnabled = true
-ace.config.set(
-  'basePath',
-  `${window.staticPath}vendor/ace-builds/src-min-noconflict`
-)
+ace.config.set('basePath', staticPath('vendor/ace-builds/src-min-noconflict'))
 
 // By default, don't use workers - enable them per-session as required
 ace.config.setDefaultValue('session', 'useWorker', false)
+
+// CSP compat, we do not want to allow arbitrary blobs
+ace.config.set('loadWorkerFromBlob', false)
+ace.config.set(
+  'workerPath',
+  '/generate/worker/vendor/ace-builds/src-min-noconflict'
+)
 
 App.directive('aceEditor', function(
   $timeout,

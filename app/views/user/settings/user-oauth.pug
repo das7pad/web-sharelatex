@@ -1,7 +1,6 @@
 block head-scripts
-	script(type='text/javascript').
-		window.oauthProviders = !{StringHelper.stringifyJsonForScript(oauthProviders)}
-		window.thirdPartyIds = !{StringHelper.stringifyJsonForScript(thirdPartyIds)}
+	meta(id="ol-oauthProviders" data-json content=oauthProviders)
+	meta(id="ol-thirdPartyIds" data-json content=thirdPartyIds)
 
 mixin providerList()
 	ul.list-like-table

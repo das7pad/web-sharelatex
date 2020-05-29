@@ -7,10 +7,9 @@ block vars
 	- metadata = { viewport: true }
 
 block head-scripts
-	script(type='text/javascript').
-		window.recomendedCurrency = '#{recomendedCurrency}';
-		window.abCurrencyFlag = '#{abCurrencyFlag}';
-		window.groupPlans = !{StringHelper.stringifyJsonForScript(groupPlans)};
+	meta(id="ol-recomendedCurrency" content=recomendedCurrency)
+	meta(id="ol-abCurrencyFlag" content=abCurrencyFlag)
+	meta(id="ol-groupPlans" data-json content=groupPlans)
 
 block content
 	.content.content-alt.content-page

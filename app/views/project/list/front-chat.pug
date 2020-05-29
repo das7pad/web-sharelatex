@@ -1,4 +1,3 @@
 - if (frontChatWidgetRoomId)
-	script(type="text/javascript").
-		window.FCSP = '#{frontChatWidgetRoomId}';
+	meta(id="ol-FCSP" content=frontChatWidgetRoomId)
 	script(type="text/javascript", src="https://chat-assets.frontapp.com/v1/chat.bundle.js")

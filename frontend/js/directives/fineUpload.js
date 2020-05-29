@@ -81,7 +81,6 @@ export default App.directive('fineUpload', $timeout => ({
         responseProperty: 'error'
       }
     })
-    window.q = q
     if (scope.control != null) {
       scope.control.q = q
     }
