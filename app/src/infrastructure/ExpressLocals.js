@@ -433,111 +433,155 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
 
 function cspMiddleware() {
   const csp = Settings.security.csp
-  const scriptSrc = ["'self'"]
-  const styleSrc = ["'self'", "'unsafe-inline'"]
-  const fontSrc = ["'self'", 'about:']
-  const connectSrc = ["'self'"]
-  const imgSrc = ["'self'", 'data:', 'blob:']
-  const workerSrc = ["'self'"]
+  const cdnOrigin = cdnAvailable
+    ? new URL(Settings.cdn.web.host).origin
+    : undefined
+  const compilesOrigin = Settings.pdfDownloadDomain
+    ? new URL(Settings.pdfDownloadDomain).origin
+    : undefined
+  const sentryOrigin = sentryEnabled
+    ? new URL(Settings.sentry.frontend.dsn).origin
+    : undefined
 
-  if (sentryEnabled) {
-    connectSrc.push(new URL(Settings.sentry.frontend.dsn).origin)
-  }
-
-  if (Settings.analytics.ga.token) {
-    // TODO: add ga and stuffs
-  }
-
-  let frontSrc = []
-  if (Settings.overleaf && Settings.overleaf.front_chat_widget_room_id) {
-    // frontSrc = [
-    //   'frontapp.com',
-    //   '*.frontapp.com',
-    //   'pusher.com',
-    //   '*.pusher.com',
-    //   'pusherapp.com',
-    //   '*.pusherapp.com',
-    //   'fonts.googleapis.com',
-    //   '*.bugsnag.com'
-    // ]
-  }
-  if (cdnAvailable) {
-    const cdn = new URL(Settings.cdn.web.host).origin
-    fontSrc.push(cdn)
-    imgSrc.push(cdn)
-    scriptSrc.push(cdn)
-    styleSrc.push(cdn)
-    workerSrc.push(cdn)
-  }
-  function addSocketIO(url) {
-    const wsUrl = new URL(url, Settings.siteUrl).origin
-    if (scriptSrc.indexOf(wsUrl) === -1) scriptSrc.push(wsUrl)
-    if (connectSrc.indexOf(wsUrl) === -1) connectSrc.push(wsUrl)
-    const wsUrlWS = wsUrl.replace(/^http/, 'ws')
-    if (connectSrc.indexOf(wsUrlWS) === -1) connectSrc.push(wsUrlWS)
-  }
-  if (Settings.wsUrl) {
-    addSocketIO(Settings.wsUrl)
-  }
-  if (Settings.wsUrlBeta) {
-    addSocketIO(Settings.wsUrlBeta)
-  }
-  const policy = {
-    'base-uri': ["'self'"],
-    'connect-src': connectSrc,
-    'default-src': ["'none'"],
-    'font-src': fontSrc,
-    'form-action': ["'self'"],
-    'frame-ancestors': ["'none'"],
-    'img-src': imgSrc,
-    'manifest-src': ["'self'"],
-    'script-src': scriptSrc,
-    'style-src': styleSrc,
-    'worker-src': workerSrc
-  }
-  const policyAmend = ['block-all-mixed-content']
-  if (csp.reportURL) {
-    policyAmend.push(`report-uri ${csp.reportURL}`)
-  }
-  const renderedPolicy = Object.entries(policy)
-    .map(([key, value]) => {
-      return `${key} ${value.join(' ')}`
-    })
-    .concat(policyAmend)
-    .join('; ')
-
-  function getHeader(isWorker, needsRecurly, needsFront) {
-    if (isWorker) {
-      // javascript response, no need to set a CSP
-      return ''
-    }
-    if (needsRecurly) {
-      // recurly needs all the unsafe inline stuffs
-      return ''
-    }
-    if (needsFront && frontSrc.length) {
-      // not finished yet
-      return ''
-    }
-    return renderedPolicy
-  }
-  return function(req, res, next) {
-    if (req.accepts(['html', 'json']) !== 'html') {
-      // do not emit the CSP header for non top-level requests
-      return next()
-    }
-    const headerValue = getHeader(
-      req.baseUrl === '/generate/worker',
-      req.path === '/user/subscription/new' ||
-        req.path === '/user/subscription',
-      req.path === '/project'
+  const uniqueWsUrlOrigins = Array.from(
+    new Set(
+      [Settings.wsUrl, Settings.wsUrlBeta, Settings.wsUrlV2]
+        .filter(Boolean)
+        .map(url => new URL(url, Settings.siteUrl).origin)
     )
-    if (!headerValue) {
-      // there is no need to set an empty header
-    } else if (csp.enforce) {
-      res.setHeader('Content-Security-Policy', headerValue)
-    } else {
-      res.setHeader('Content-Security-Policy-Report-Only', headerValue)
+  )
+
+  function generateCSP(cfg) {
+    const scriptSrc = ["'self'"]
+    const styleSrc = ["'self'", "'unsafe-inline'"]
+    const fontSrc = ["'self'", 'about:']
+    const connectSrc = ["'self'"]
+    const imgSrc = ["'self'", 'data:', 'blob:']
+    const workerSrc = ["'self'"]
+    const frameSrc = []
+
+    if (sentryEnabled) {
+      connectSrc.push(sentryOrigin)
+    }
+
+    if (Settings.analytics.ga.token) {
+      // NOT TESTED -- needs nonce for i-s-o-g-r-a-m
+      // https://developers.google.com/tag-manager/web/csp
+      ;[connectSrc, imgSrc, scriptSrc].forEach(src =>
+        src.push('https://www.google-analytics.com')
+      )
+      scriptSrc.push('https://ssl.google-analytics.com')
+    }
+
+    if (Settings.recaptcha && Settings.recaptcha.siteKeyV3) {
+      // NOT TESTED
+      frameSrc.push('https://www.google.com/recaptcha')
+      imgSrc.push('https://www.gstatic.com/recaptcha')
+      scriptSrc.push('https://www.google.com/recaptcha')
+    }
+
+    if (
+      cfg.needsFront &&
+      Settings.overleaf &&
+      Settings.overleaf.front_chat_widget_room_id
+    ) {
+      // NOT TESTED
+      // very broad addition, but I do not have any token at hand for testing.
+      ;[connectSrc, fontSrc, imgSrc, scriptSrc, styleSrc].forEach(src =>
+        src.push('frontapp.com', '*.frontapp.com')
+      )
+      connectSrc.push(
+        'pusher.com',
+        '*.pusher.com',
+        'pusherapp.com',
+        '*.pusherapp.com',
+        '*.bugsnag.com'
+      )
+      fontSrc.push('fonts.googleapis.com')
+    }
+
+    if (cdnAvailable) {
+      if (cfg.connectCDN) {
+        // e.g. pdfjs cmaps or /launchpad for ide blob check
+        connectSrc.push(cdnOrigin)
+      }
+      // assets
+      fontSrc.push(cdnOrigin)
+      imgSrc.push(cdnOrigin)
+      scriptSrc.push(cdnOrigin)
+      styleSrc.push(cdnOrigin)
+      workerSrc.push(cdnOrigin)
+    }
+
+    if (cfg.needsCompilesAccess && compilesOrigin) {
+      connectSrc.push(compilesOrigin)
+    }
+
+    if (cfg.needsSocketIo) {
+      uniqueWsUrlOrigins.map(wsUrl => {
+        scriptSrc.push(wsUrl)
+        connectSrc.push(wsUrl)
+        // websocket support: http:// -> ws:// and https:// -> wss://
+        connectSrc.push('ws' + wsUrl.slice(4))
+      })
+    }
+    let policyAmend = ''
+    if (csp.reportURL) {
+      policyAmend += `; report-uri ${csp.reportURL}`
+    }
+    return `base-uri 'self'; block-all-mixed-content; connect-src ${connectSrc.join(
+      ' '
+    )}; default-src 'none'; font-src ${fontSrc.join(
+      ' '
+    )}; form-action 'self'; frame-ancestors 'none'; frame-src ${frameSrc.join(
+      ' '
+    ) || "'none'"}; img-src ${imgSrc.join(
+      ' '
+    )}; manifest-src 'self'; script-src ${scriptSrc.join(
+      ' '
+    )}; style-src ${styleSrc.join(' ')}; worker-src ${workerSrc.join(
+      ' '
+    )}${policyAmend}`
+  }
+
+  const CSP_DEFAULT = generateCSP({})
+  const CSP_DASHBOARD = generateCSP({ needsFront: true })
+  const CSP_EDITOR = generateCSP({
+    connectCDN: true,
+    needsCompilesAccess: true,
+    needsSocketIo: true
+  })
+  const CSP_LAUNCHPAD = generateCSP({
+    connectCDN: true,
+    needsSocketIo: true
+  })
+  const CSP_SUBSCRIPTION = generateCSP({ needsRecurly: true })
+
+  return function(req, res, next) {
+    const actualRender = res.render
+    res.render = function() {
+      const endpoint = req.route.path
+      let headerValue
+      if (endpoint === '/project') {
+        headerValue = CSP_DASHBOARD
+      } else if (endpoint === '/Project/:Project_id') {
+        headerValue = CSP_EDITOR
+      } else if (
+        endpoint === '/user/subscription/new' ||
+        endpoint === '/user/subscription'
+      ) {
+        headerValue = CSP_SUBSCRIPTION
+      } else if (endpoint === '/launchpad') {
+        headerValue = CSP_LAUNCHPAD
+      } else {
+        headerValue = CSP_DEFAULT
+      }
+      if (csp.enforce) {
+        res.setHeader('Content-Security-Policy', headerValue)
+      } else {
+        res.setHeader('Content-Security-Policy-Report-Only', headerValue)
+      }
+      actualRender.apply(res, arguments)
     }
     next()
   }
