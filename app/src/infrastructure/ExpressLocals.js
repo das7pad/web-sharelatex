@@ -457,6 +457,7 @@ function cspMiddleware() {
     const fontSrc = ["'self'", 'about:']
     const connectSrc = ["'self'"]
     const imgSrc = ["'self'", 'data:', 'blob:']
+    const prefetchSrc = ["'self'"]
     const workerSrc = ["'self'"]
     const frameSrc = []
 
@@ -508,6 +509,7 @@ function cspMiddleware() {
       // assets
       fontSrc.push(cdnOrigin)
       imgSrc.push(cdnOrigin)
+      prefetchSrc.push(cdnOrigin)
       scriptSrc.push(cdnOrigin)
       styleSrc.push(cdnOrigin)
       workerSrc.push(cdnOrigin)
@@ -537,11 +539,11 @@ function cspMiddleware() {
       ' '
     ) || "'none'"}; img-src ${imgSrc.join(
       ' '
-    )}; manifest-src 'self'; script-src ${scriptSrc.join(
+    )}; manifest-src 'self'; prefetch-src ${prefetchSrc.join(
       ' '
-    )}; style-src ${styleSrc.join(' ')}; worker-src ${workerSrc.join(
+    )};  script-src ${scriptSrc.join(' ')}; style-src ${styleSrc.join(
       ' '
-    )}${policyAmend}`
+    )}; worker-src ${workerSrc.join(' ')}${policyAmend}`
   }
 
   const CSP_DEFAULT = generateCSP({})
