@@ -11,9 +11,15 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import App from '../../../base'
+import getMeta from '../../../utils/meta'
 
 export default App.factory('settings', (ide, eventTracking) => ({
   saveSettings(data) {
+    if (!getMeta('ol-user_id')) {
+      // we do not persist settings for anonymous users
+      return
+    }
+
     // Tracking code.
     for (const key of Array.from(Object.keys(data))) {
       const changedSetting = key
