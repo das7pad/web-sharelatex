@@ -17,7 +17,6 @@ const entryPoints = {
   main: './frontend/js/main.js',
   ide: './frontend/js/ide.js',
   style: './frontend/stylesheets/style.less',
-  'ieee-style': './frontend/stylesheets/ieee-style.less',
   'light-style': './frontend/stylesheets/light-style.less'
 }
 
