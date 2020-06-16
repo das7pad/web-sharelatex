@@ -109,11 +109,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
   webRouter.get('/user/activate', UserPagesController.activateAccountPage)
   AuthenticationController.addEndpointToLoginWhitelist('/user/activate')
 
-  webRouter.get(
-    '/system/messages',
-    AuthenticationController.requireLogin(),
-    SystemMessageController.getMessages
-  )
+  webRouter.get('/system/messages', SystemMessageController.getMessages)
 
   webRouter.get(
     '/user/settings',
