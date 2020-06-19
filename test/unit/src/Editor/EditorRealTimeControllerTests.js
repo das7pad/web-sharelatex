@@ -33,7 +33,10 @@ describe('EditorRealTimeController', function() {
         '../../infrastructure/Server': {
           io: (this.io = {})
         },
-        'settings-sharelatex': { redis: {} },
+        'settings-sharelatex': {
+          redis: {},
+          security: { bootstrapSecret: 'foo' }
+        },
         'metrics-sharelatex': this.Metrics,
         crypto: (this.crypto = {
           randomBytes: sinon

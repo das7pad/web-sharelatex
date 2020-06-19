@@ -7,6 +7,19 @@ const { Joi, validate } = require('../../infrastructure/Validation')
 module.exports = {
   apply(webRouter, apiRouter) {
     webRouter.post(
+      '/project/:Project_id/ws/bootstrap',
+      RateLimiterMiddleware.rateLimit({
+        endpointName: 'editor-ws-bootstrap',
+        params: ['Project_id'],
+        maxRequests: 60,
+        timeInterval: 60
+      }),
+      AuthenticationController.validateUserSession(),
+      AuthorizationMiddleware.ensureUserCanReadProject,
+      EditorHttpController.wsBootstrap
+    )
+
+    webRouter.post(
       '/project/:Project_id/doc',
       AuthorizationMiddleware.ensureUserCanWriteProjectContent,
       RateLimiterMiddleware.rateLimit({

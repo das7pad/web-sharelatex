@@ -92,6 +92,11 @@ describe('EditorHttpController', function() {
         deleteEntity: sinon.stub().resolves()
       }
     }
+    this.EditorRealTimeController = {
+      generateWSBootstrapBlob: sinon
+        .stub()
+        .yields(null, 'v1:token:project_id.hmac')
+    }
     this.ProjectDeleter = {
       promises: {
         unmarkAsDeletedByExternalSource: sinon.stub().resolves()
@@ -133,6 +138,7 @@ describe('EditorHttpController', function() {
         '../Project/ProjectEditorHandler': this.ProjectEditorHandler,
         'logger-sharelatex': this.logger,
         './EditorController': this.EditorController,
+        './EditorRealTimeController': this.EditorRealTimeController,
         'metrics-sharelatex': this.Metrics,
         '../Collaborators/CollaboratorsGetter': this.CollaboratorsGetter,
         '../Collaborators/CollaboratorsHandler': this.CollaboratorsHandler,

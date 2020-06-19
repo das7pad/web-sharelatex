@@ -14,6 +14,7 @@ httpAuthUsers = {}
 if httpAuthUser and httpAuthPass
 	httpAuthUsers[httpAuthUser] = httpAuthPass
 
+bootstrapSecret = process.env['BOOTSTRAP_SECRET'] or "yet-another-secret"
 sessionSecret = process.env['SESSION_SECRET'] or "secret-please-change"
 
 if process.env['V1_API_URL'] or process.env['V1_HOST']
@@ -212,6 +213,7 @@ module.exports = settings =
 
 	wsUrlV2Percentage: parseInt(process.env['WEBSOCKET_URL_V2_PERCENTAGE'] || '0', 10)
 	wsRetryHandshake: parseInt(process.env['WEBSOCKET_RETRY_HANDSHAKE'] || '5', 10)
+	wsBootstrapExpireAfter: parseInt(process.env['WEBSOCKET_BOOTSTRAP_EXPIRE_AFTER'] || '60', 10)
 
 	# cookie domain
 	# use full domain for cookies to only be accessible from that domain,
@@ -234,6 +236,7 @@ module.exports = settings =
 	# Security
 	# --------
 	security:
+		bootstrapSecret: bootstrapSecret
 		sessionSecret: sessionSecret
 		bcryptRounds: (parseInt(process.env['BCRYPT_ROUNDS'], 10) || 12) # number of rounds used to hash user passwords (raised to power 2)
 

@@ -12,6 +12,7 @@ const ProjectDeleter = require('./ProjectDeleter')
 const ProjectDuplicator = require('./ProjectDuplicator')
 const ProjectCreationHandler = require('./ProjectCreationHandler')
 const EditorController = require('../Editor/EditorController')
+const EditorRealTimeController = require('../Editor/EditorRealTimeController')
 const ProjectHelper = require('./ProjectHelper')
 const metrics = require('metrics-sharelatex')
 const { User } = require('../../models/User')
@@ -623,6 +624,9 @@ const ProjectController = {
             }
           )
         },
+        wsBootstrap(cb) {
+          EditorRealTimeController.generateWSBootstrapBlob(req, projectId, cb)
+        },
         user(cb) {
           if (userId == null) {
             cb(null, defaultSettingsForAnonymousUser(userId))
@@ -688,6 +692,7 @@ const ProjectController = {
         const { user } = results
         const { subscription } = results
         const { brandVariation } = results
+        const { wsBootstrap } = results
 
         const anonRequestToken = TokenAccessHandler.getRequestToken(
           req,
@@ -799,6 +804,7 @@ const ProjectController = {
               allowedImageNames: Settings.allowedImageNames || [],
               gitBridgePublicBaseUrl: Settings.gitBridgePublicBaseUrl,
               wsUrl,
+              wsBootstrap,
               showSupport: Features.hasFeature('support')
             })
             timer.done()

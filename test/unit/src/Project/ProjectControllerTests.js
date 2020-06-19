@@ -65,6 +65,11 @@ describe('ProjectController', function() {
       isRestrictedUser: sinon.stub().returns(false)
     }
     this.EditorController = { renameProject: sinon.stub() }
+    this.EditorRealTimeController = {
+      generateWSBootstrapBlob: sinon
+        .stub()
+        .yields(null, 'v1:token:project_id.hmac')
+    }
     this.InactiveProjectManager = { reactivateProjectIfRequired: sinon.stub() }
     this.ProjectUpdateHandler = { markAsOpened: sinon.stub() }
     this.ReferencesSearchHandler = { indexProjectReferences: sinon.stub() }
@@ -148,6 +153,7 @@ describe('ProjectController', function() {
         './ProjectDuplicator': this.ProjectDuplicator,
         './ProjectCreationHandler': this.ProjectCreationHandler,
         '../Editor/EditorController': this.EditorController,
+        '../Editor/EditorRealTimeController': this.EditorRealTimeController,
         '../User/UserController': this.UserController,
         './ProjectHelper': this.ProjectHelper,
         '../Subscription/SubscriptionLocator': this.SubscriptionLocator,

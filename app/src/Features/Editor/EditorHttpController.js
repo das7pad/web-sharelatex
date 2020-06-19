@@ -1,6 +1,7 @@
 const HttpErrors = require('@overleaf/o-error/http')
 const ProjectDeleter = require('../Project/ProjectDeleter')
 const EditorController = require('./EditorController')
+const EditorRealTimeController = require('./EditorRealTimeController')
 const ProjectGetter = require('../Project/ProjectGetter')
 const AuthorizationManager = require('../Authorization/AuthorizationManager')
 const ProjectEditorHandler = require('../Project/ProjectEditorHandler')
@@ -17,6 +18,7 @@ const { expressify } = require('../../util/promises')
 
 module.exports = {
   joinProject: expressify(joinProject),
+  wsBootstrap: expressify(wsBootstrap),
   addDoc: expressify(addDoc),
   addFolder: expressify(addFolder),
   renameEntity: expressify(renameEntity),
@@ -88,6 +90,15 @@ async function joinProject(req, res, next) {
     privilegeLevel,
     isRestrictedUser
   })
+}
+
+async function wsBootstrap(req, res) {
+  const projectId = req.params.Project_id
+  const blob = await EditorRealTimeController.promises.generateWSBootstrapBlob(
+    req,
+    projectId
+  )
+  res.json(blob)
 }
 
 async function _buildJoinProjectView(req, projectId, userId) {

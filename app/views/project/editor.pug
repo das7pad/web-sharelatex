@@ -180,6 +180,7 @@ block content
 		//- used in public/js/libs/sharejs.js
 		window.useShareJsHash = true
 		window.wsRetryHandshake = #{settings.wsRetryHandshake}
+		window.wsBootstrap = JSON.parse(JSON.stringify(wsBootstrap))
 
 	- if (settings.overleaf != null)
 		script(type='text/javascript').
