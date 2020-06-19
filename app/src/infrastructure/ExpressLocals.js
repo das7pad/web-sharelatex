@@ -198,7 +198,7 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
         // In production: resolve path from webpack manifest file
         // We are guaranteed to have a manifest file since webpack compiles in
         // the build
-        path = `/${webpackManifest[jsFile]}`
+        path = webpackManifest[jsFile]
       }
 
       return res.locals.staticPath(path)
