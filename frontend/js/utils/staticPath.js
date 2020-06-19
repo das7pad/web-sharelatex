@@ -1,6 +1,6 @@
-import meta from './meta'
+import getMeta from './meta'
 
-const base = meta('ol-staticPath', '/')
+const base = getMeta('ol-staticPath', '/')
 
 export default function staticPath(path) {
   return base + path
