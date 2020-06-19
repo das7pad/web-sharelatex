@@ -1,4 +1,3 @@
-const logger = require('logger-sharelatex')
 const Settings =
   require('settings-sharelatex') || require('../../../config/settings.defaults')
 const _ = require('lodash')
@@ -27,6 +26,7 @@ if (!IS_DEV_ENV) {
 }
 
 const cdnAvailable = Settings.cdn && Settings.cdn.web && !!Settings.cdn.web.host
+const staticFilesBase = cdnAvailable ? Settings.cdn.web.host : '/'
 
 const sentryEnabled =
   Settings.sentry && Settings.sentry.frontend && !!Settings.sentry.frontend.dsn
@@ -62,24 +62,6 @@ module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
   })
 
   webRouter.use(function(req, res, next) {
-    let staticFilesBase
-    const cdnBlocked = req.query.nocdn === 'true' || req.session.cdnBlocked
-    const userId = AuthenticationController.getLoggedInUserId(req)
-    if (cdnBlocked && req.session.cdnBlocked == null) {
-      logger.log(
-        { user_id: userId, ip: req.ip },
-        'cdnBlocked for user, not using it and turning it off for future requets'
-      )
-      req.session.cdnBlocked = true
-    }
-    const host = req.headers.host
-    const isSmoke = host.slice(0, 5).toLowerCase() === 'smoke'
-    if (cdnAvailable && !isSmoke && !cdnBlocked) {
-      staticFilesBase = Settings.cdn.web.host
-    } else {
-      staticFilesBase = '/'
-    }
-
     const resourceHints = []
     res.locals.finishPreloading = function() {
       if (!Settings.addResourceHints) {
