@@ -7,7 +7,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import App from '../base'
-import qq from 'fineuploader'
+import qq from '../vendor/libs/fineuploader'
 
 export default App.directive('fineUpload', $timeout => ({
   scope: {

@@ -6,8 +6,6 @@ const ManifestPlugin = require('webpack-manifest-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
 const AutoPrefixer = require('autoprefixer')
 
-const PackageVersions = require('./app/src/infrastructure/PackageVersions')
-
 const NODE_MODULES = path.join(__dirname, 'node_modules')
 const MODULES_PATH = path.join(__dirname, '/modules')
 const VENDOR_PATH = path.join(__dirname, 'public', 'vendor')
@@ -178,13 +176,7 @@ module.exports = {
       // Shortcut to vendored dependencies in frontend/js/vendor/libs
       libs: path.join(__dirname, 'frontend/js/vendor/libs'),
       // Enables ace/ace shortcut
-      ace: 'ace-builds/src-noconflict',
-      // fineupload vendored dependency (which we're aliasing to fineuploadER
-      // for some reason)
-      fineuploader: path.join(
-        __dirname,
-        `frontend/js/vendor/libs/${PackageVersions.lib('fineuploader')}`
-      )
+      ace: 'ace-builds/src-noconflict'
     }
   },
 

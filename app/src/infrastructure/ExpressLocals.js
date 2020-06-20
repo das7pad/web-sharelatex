@@ -13,7 +13,6 @@ const LNG_TO_SPEC = new Map(
 
 const Features = require('./Features')
 const AuthenticationController = require('../Features/Authentication/AuthenticationController')
-const PackageVersions = require('./PackageVersions')
 const Modules = require('./Modules')
 const StringHelper = require('../Features/Helpers/StringHelper')
 
@@ -165,8 +164,6 @@ module.exports = function(webRouter) {
 
       return res.locals.staticPath(path)
     }
-
-    res.locals.lib = PackageVersions.lib
 
     res.locals.moment = moment
 
