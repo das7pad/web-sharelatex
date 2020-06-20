@@ -32,6 +32,7 @@ const sentryEnabled =
 
 module.exports = function(webRouter) {
   webRouter.use(function(req, res, next) {
+    const currentUser = AuthenticationController.getSessionUser(req)
     res.locals.session = req.session
 
     req.externalAuthenticationSystemUsed =
@@ -221,8 +222,7 @@ module.exports = function(webRouter) {
     res.locals.currentLngCode = req.lng
 
     res.locals.getUserEmail = function() {
-      const user = AuthenticationController.getSessionUser(req)
-      return (user && user.email) || ''
+      return (currentUser && currentUser.email) || ''
     }
 
     res.locals.StringHelper = StringHelper
@@ -236,7 +236,6 @@ module.exports = function(webRouter) {
       return url
     }
     res.locals.getReferalId = function() {
-      const currentUser = AuthenticationController.getSessionUser(req)
       return currentUser && currentUser.referal_id
     }
 
@@ -247,7 +246,6 @@ module.exports = function(webRouter) {
 
     res.locals.getReqQueryParam = field => req.query[field]
 
-    const currentUser = AuthenticationController.getSessionUser(req)
     if (currentUser) {
       res.locals.user = {
         email: currentUser.email,
@@ -259,8 +257,7 @@ module.exports = function(webRouter) {
 
     res.locals.getLoggedInUserId = () =>
       AuthenticationController.getLoggedInUserId(req)
-    res.locals.getSessionUser = () =>
-      AuthenticationController.getSessionUser(req)
+    res.locals.getSessionUser = () => currentUser
 
     // Clone the nav settings so they can be modified for each request
     res.locals.nav = {}
