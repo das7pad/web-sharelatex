@@ -36,10 +36,10 @@
 										ng-click="openUploadProjectModal()"
 									) #{translate("upload_project")}
 								!= moduleIncludes("newProjectMenu", locals)
-								if (templates)
+								if (settings.templateLinks)
 									li.divider
 									li.dropdown-header #{translate("templates")}
-									each item in templates
+									each item in settings.templateLinks
 										li
 											a.menu-indent(href=item.url) #{translate(item.name)}
 

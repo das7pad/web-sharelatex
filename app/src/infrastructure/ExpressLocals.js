@@ -241,8 +241,6 @@ module.exports = function(webRouter) {
       AuthenticationController.getLoggedInUserId(req)
     res.locals.getSessionUser = () => currentUser
 
-    res.locals.templates = Settings.templateLinks
-
     if (Settings.reloadModuleViewsOnEachRequest) {
       Modules.loadViewIncludes()
     }
