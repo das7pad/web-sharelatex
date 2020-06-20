@@ -5,8 +5,8 @@ nav.navbar.navbar-default.navbar-main
 				i.fa.fa-bars(aria-hidden="true")
 			if settings.nav.custom_logo
 				a(href='/', aria-label=settings.appName, style='background-image:url("'+settings.nav.custom_logo+'")').navbar-brand
-			else if (nav.title)
-				a(href='/', aria-label=settings.appName, ng-non-bindable).navbar-title #{nav.title}
+			else if (settings.nav.title)
+				a(href='/', aria-label=settings.appName, ng-non-bindable).navbar-title #{settings.nav.title}
 			else
 				a(href='/', aria-label=settings.appName).navbar-brand
 
@@ -26,7 +26,7 @@ nav.navbar.navbar-default.navbar-main
 
 
 				// loop over header_extras
-				each item in nav.header_extras
+				each item in settings.nav.header_extras
 					-
 						if ((item.only_when_logged_in && getSessionUser())
 							|| (item.only_when_logged_out && (!getSessionUser()))
@@ -86,7 +86,7 @@ nav.navbar.navbar-default.navbar-main
 							li.divider.hidden-xs.hidden-sm
 							li
 								a(href="/user/settings") #{translate('Account Settings')}
-							if nav.showSubscriptionLink
+							if settings.nav.showSubscriptionLink
 								li
 									a(href="/user/subscription") #{translate('subscription')}
 							li.divider.hidden-xs.hidden-sm
