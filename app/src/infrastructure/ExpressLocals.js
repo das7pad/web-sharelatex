@@ -25,9 +25,6 @@ if (!IS_DEV_ENV) {
 const cdnAvailable = Settings.cdn && Settings.cdn.web && !!Settings.cdn.web.host
 const staticFilesBase = cdnAvailable ? Settings.cdn.web.host : '/'
 
-const sentryEnabled =
-  Settings.sentry && Settings.sentry.frontend && !!Settings.sentry.frontend.dsn
-
 module.exports = function(webRouter) {
   webRouter.use(function(req, res, next) {
     const currentUser = AuthenticationController.getSessionUser(req)
@@ -198,8 +195,6 @@ module.exports = function(webRouter) {
     res.locals.gaToken = Settings.analytics.ga.token
     res.locals.gaOptimizeId = Settings.analytics.gaOptimize.id
 
-    res.locals.sentryEnabled = sentryEnabled
-
     res.locals.getLoggedInUserId = () =>
       AuthenticationController.getLoggedInUserId(req)
     res.locals.getSessionUser = () => currentUser
@@ -250,7 +245,7 @@ function cspMiddleware() {
   const compilesOrigin = Settings.pdfDownloadDomain
     ? new URL(Settings.pdfDownloadDomain).origin
     : undefined
-  const sentryOrigin = sentryEnabled
+  const sentryOrigin = Settings.sentry.frontend.dsn
     ? new URL(Settings.sentry.frontend.dsn).origin
     : undefined
 
@@ -272,7 +267,7 @@ function cspMiddleware() {
     const workerSrc = ["'self'"]
     const frameSrc = []
 
-    if (sentryEnabled) {
+    if (sentryOrigin) {
       connectSrc.push(sentryOrigin)
     }
 
