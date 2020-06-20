@@ -144,25 +144,6 @@ module.exports = function(webRouter) {
       return res.locals.staticPath(path)
     }
 
-    // Temporary hack while jQuery/Angular dependencies are *not* bundled,
-    // instead copied into output directory
-    res.locals.buildCopiedJsAssetPath = function(jsFile) {
-      let path
-      if (IS_DEV_ENV) {
-        // In dev: resolve path to root directory
-        // We are *not* guaranteed to have a manifest file when the server
-        // starts up
-        path = Path.join('/', jsFile)
-      } else {
-        // In production: resolve path from webpack manifest file
-        // We are guaranteed to have a manifest file since webpack compiles in
-        // the build
-        path = webpackManifest[jsFile]
-      }
-
-      return res.locals.staticPath(path)
-    }
-
     const IEEE_BRAND_ID = 15
     res.locals.isIEEE = brandVariation =>
       brandVariation && brandVariation.brand_id === IEEE_BRAND_ID
