@@ -244,8 +244,6 @@ module.exports = function(webRouter) {
     res.locals.gaToken = Settings.analytics.ga.token
     res.locals.gaOptimizeId = Settings.analytics.gaOptimize.id
 
-    res.locals.getReqQueryParam = field => req.query[field]
-
     if (currentUser) {
       res.locals.user = {
         email: currentUser.email,

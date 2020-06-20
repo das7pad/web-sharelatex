@@ -63,6 +63,7 @@ module.exports = {
     }
     res.render('user/setPassword', {
       title: 'set_password',
+      email: req.query.email,
       passwordResetToken: req.session.resetToken
     })
   },
