@@ -2,7 +2,7 @@ extends ../../../../../app/views/layout
 
 block content
 
-	script(type="template", id="admin-project-data")!= StringHelper.stringifyJsonForScript({project: project})
+	meta(id="ol-admin-project-data" data-json content=project)
 
 	.content.content-alt(ng-controller="AdminProjectController")
 		.container(ng-cloak)
