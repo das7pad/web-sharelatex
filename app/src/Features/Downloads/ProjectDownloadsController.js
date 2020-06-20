@@ -41,10 +41,7 @@ module.exports = ProjectDownloadsController = {
             if (error != null) {
               return next(error)
             }
-            res.setContentDisposition('attachment', {
-              filename: `${project.name}.zip`
-            })
-            res.contentType('application/zip')
+            res.attachment(`${project.name}.zip`)
             return stream.pipe(res)
           }
         )
@@ -67,10 +64,9 @@ module.exports = ProjectDownloadsController = {
             if (error != null) {
               return next(error)
             }
-            res.setContentDisposition('attachment', {
-              filename: `Overleaf Projects (${project_ids.length} items).zip`
-            })
-            res.contentType('application/zip')
+            res.attachment(
+              `Overleaf Projects (${project_ids.length} items).zip`
+            )
             return stream.pipe(res)
           }
         )

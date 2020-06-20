@@ -63,7 +63,7 @@ describe('History', function() {
                     'application/zip'
                   )
                   expect(response.headers['content-disposition']).to.equal(
-                    'attachment; filename="example-project%20(Version%2042).zip"'
+                    'attachment; filename="example-project (Version 42).zip"'
                   )
                   expect(body).to.equal(
                     `Mock zip for ${this.v1_history_id} at version 42`

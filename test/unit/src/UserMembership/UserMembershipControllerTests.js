@@ -296,16 +296,8 @@ describe('UserMembershipController', function() {
       )
     })
 
-    it('should set the correct content type on the request', function() {
-      return assertCalledWith(this.res.contentType, 'text/csv')
-    })
-
-    it('should name the exported csv file', function() {
-      return assertCalledWith(
-        this.res.header,
-        'Content-Disposition',
-        'attachment; filename=Group.csv'
-      )
+    it('should flag the response body as attached csv file', function() {
+      return assertCalledWith(this.res.attachment, 'Group.csv')
     })
 
     it('should export the correct csv', function() {

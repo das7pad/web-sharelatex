@@ -79,12 +79,6 @@ describe('ProjectDownloadsController', function() {
       return this.stream.pipe.calledWith(this.res).should.equal(true)
     })
 
-    it('should set the correct content type on the request', function() {
-      return this.res.contentType
-        .calledWith('application/zip')
-        .should.equal(true)
-    })
-
     it('should flush the project to mongo', function() {
       return this.DocumentUpdaterHandler.flushProjectToMongo
         .calledWith(this.project_id)
@@ -98,8 +92,8 @@ describe('ProjectDownloadsController', function() {
     })
 
     it('should name the downloaded file after the project', function() {
-      return this.res.setContentDisposition
-        .calledWith('attachment', { filename: `${this.project_name}.zip` })
+      return this.res.attachment
+        .calledWith(`${this.project_name}.zip`)
         .should.equal(true)
     })
 
@@ -139,12 +133,6 @@ describe('ProjectDownloadsController', function() {
       return this.stream.pipe.calledWith(this.res).should.equal(true)
     })
 
-    it('should set the correct content type on the request', function() {
-      return this.res.contentType
-        .calledWith('application/zip')
-        .should.equal(true)
-    })
-
     it('should flush the projects to mongo', function() {
       return this.DocumentUpdaterHandler.flushMultipleProjectsToMongo
         .calledWith(this.project_ids)
@@ -152,10 +140,8 @@ describe('ProjectDownloadsController', function() {
     })
 
     it('should name the downloaded file after the project', function() {
-      return this.res.setContentDisposition
-        .calledWith('attachment', {
-          filename: 'Overleaf Projects (2 items).zip'
-        })
+      return this.res.attachment
+        .calledWith('Overleaf Projects (2 items).zip')
         .should.equal(true)
     })
 

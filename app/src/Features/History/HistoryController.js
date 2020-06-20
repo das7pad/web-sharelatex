@@ -329,10 +329,7 @@ module.exports = HistoryController = {
               delete response.headers['content-disposition']
               delete response.headers['content-type']
               res.status(response.statusCode)
-              res.setContentDisposition('attachment', {
-                filename: `${name}.zip`
-              })
-              res.contentType('application/zip')
+              res.attachment(`${name}.zip`)
               getReq.pipe(res)
               return callback()
             })

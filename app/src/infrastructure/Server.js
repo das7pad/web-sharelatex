@@ -162,7 +162,7 @@ webRouter.use(function(req, res, next) {
 })
 
 webRouter.use(ReferalConnect.use)
-expressLocals(webRouter, privateApiRouter, publicApiRouter)
+expressLocals(webRouter)
 
 webRouter.use(SessionAutostartMiddleware.invokeCallbackMiddleware)
 

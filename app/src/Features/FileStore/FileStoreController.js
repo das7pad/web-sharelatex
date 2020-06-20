@@ -35,7 +35,7 @@ module.exports = {
           if (isMobileSafari(userAgent) && isHtml(file)) {
             res.setHeader('Content-Type', 'text/plain')
           }
-          res.setContentDisposition('attachment', { filename: file.name })
+          res.attachment(file.name)
           stream.pipe(res)
         })
       }

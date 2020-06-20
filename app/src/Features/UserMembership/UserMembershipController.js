@@ -145,8 +145,7 @@ module.exports = {
       for (const user of Array.from(users)) {
         csvOutput += user.email + '\n'
       }
-      res.header('Content-Disposition', 'attachment; filename=Group.csv')
-      res.contentType('text/csv')
+      res.attachment('Group.csv')
       return res.send(csvOutput)
     })
   },

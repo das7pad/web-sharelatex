@@ -31,26 +31,11 @@ const staticFilesBase = cdnAvailable ? Settings.cdn.web.host : '/'
 const sentryEnabled =
   Settings.sentry && Settings.sentry.frontend && !!Settings.sentry.frontend.dsn
 
-module.exports = function(webRouter, privateApiRouter, publicApiRouter) {
+module.exports = function(webRouter) {
   webRouter.use(function(req, res, next) {
     res.locals.session = req.session
     next()
   })
-
-  function addSetContentDisposition(req, res, next) {
-    res.setContentDisposition = function(type, opts) {
-      const directives = _.map(
-        opts,
-        (v, k) => `${k}="${encodeURIComponent(v)}"`
-      )
-      const contentDispositionValue = `${type}; ${directives.join('; ')}`
-      res.setHeader('Content-Disposition', contentDispositionValue)
-    }
-    next()
-  }
-  webRouter.use(addSetContentDisposition)
-  privateApiRouter.use(addSetContentDisposition)
-  publicApiRouter.use(addSetContentDisposition)
 
   webRouter.use(function(req, res, next) {
     req.externalAuthenticationSystemUsed =

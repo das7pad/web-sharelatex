@@ -15,7 +15,7 @@ const sinon = require('sinon')
 
 class MockResponse {
   static initClass() {
-    this.prototype.setContentDisposition = sinon.stub()
+    this.prototype.attachment = sinon.stub()
 
     this.prototype.header = sinon.stub()
 

@@ -44,7 +44,7 @@ describe('FileStoreController', function() {
     this.res = {
       set: sinon.stub().returnsThis(),
       setHeader: sinon.stub(),
-      setContentDisposition: sinon.stub(),
+      attachment: sinon.stub(),
       status: sinon.stub().returnsThis()
     }
     this.file = { name: 'myfile.png' }
@@ -91,11 +91,9 @@ describe('FileStoreController', function() {
       this.controller.getFile(this.req, this.res)
     })
 
-    it('should set the Content-Disposition header', function(done) {
+    it('should flag the response body as attachment', function(done) {
       this.stream.pipe = des => {
-        this.res.setContentDisposition
-          .calledWith('attachment', { filename: this.file.name })
-          .should.equal(true)
+        this.res.attachment.calledWith(this.file.name).should.equal(true)
         done()
       }
       this.controller.getFile(this.req, this.res)

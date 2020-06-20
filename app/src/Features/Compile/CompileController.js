@@ -14,6 +14,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 let CompileController
+const contentDisposition = require('content-disposition')
 const Metrics = require('metrics-sharelatex')
 const ProjectGetter = require('../Project/ProjectGetter')
 const CompileManager = require('./CompileManager')
@@ -202,11 +203,12 @@ module.exports = CompileController = {
       res.contentType('application/pdf')
       const filename = `${CompileController._getSafeProjectName(project)}.pdf`
 
-      if (req.query.popupDownload) {
-        res.setContentDisposition('attachment', { filename })
-      } else {
-        res.setContentDisposition('', { filename })
-      }
+      res.setHeader(
+        'Content-Disposition',
+        contentDisposition(filename, {
+          type: req.query.popupDownload ? 'attachment' : 'inline'
+        })
+      )
 
       return rateLimit(function(err, canContinue) {
         if (err != null) {

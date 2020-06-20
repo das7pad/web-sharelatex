@@ -40,12 +40,6 @@ describe('ExpressLocalsTests', function() {
     this.webRouter = {
       use: sinon.stub()
     }
-    this.privateApiRouter = {
-      use: sinon.stub()
-    }
-    this.publicApiRouter = {
-      use: sinon.stub()
-    }
 
     this.req = new MockRequest()
     this.res = new MockResponse()
@@ -62,11 +56,7 @@ describe('ExpressLocalsTests', function() {
         },
         requires: this.requires
       })
-      this.ExpressLocals(
-        this.webRouter,
-        this.privateApiRouter,
-        this.publicApiRouter
-      )
+      this.ExpressLocals(this.webRouter)
     }
     this.loadMiddleware = id => {
       this.webRouter.use.args[id][0](this.req, this.res, this.next)
@@ -81,8 +71,6 @@ describe('ExpressLocalsTests', function() {
       this.require()
     })
     // session
-    middlewareCounter += 1
-    // addSetContentDisposition
     middlewareCounter += 1
     // externalAuthenticationSystemUser + hasFeature
     middlewareCounter += 1
@@ -183,8 +171,6 @@ describe('ExpressLocalsTests', function() {
     })
     // session
     middlewareCounter += 1
-    // addSetContentDisposition
-    middlewareCounter += 1
     // externalAuthenticationSystemUser + hasFeature
     middlewareCounter += 1
 
@@ -225,8 +211,6 @@ describe('ExpressLocalsTests', function() {
       this.require()
     })
     // session
-    middlewareCounter += 1
-    // addSetContentDisposition
     middlewareCounter += 1
     // externalAuthenticationSystemUser + hasFeature
     middlewareCounter += 1
