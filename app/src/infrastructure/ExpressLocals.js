@@ -287,12 +287,10 @@ module.exports = function(webRouter) {
       hasSamlBeta: req.session.samlBeta,
       hasSamlFeature: Features.hasFeature('saml'),
       samlInitPath: Settings.saml.ukamf.initPath,
-      siteUrl: Settings.siteUrl,
       emailConfirmationDisabled: Settings.emailConfirmationDisabled,
       recaptchaSiteKeyV3: Settings.recaptcha && Settings.recaptcha.siteKeyV3,
       recaptchaDisabled: Settings.recaptcha && Settings.recaptcha.disabled,
-      validRootDocExtensions: Settings.validRootDocExtensions,
-      sentryDsn: Settings.sentry && Settings.sentry.publicDSN
+      validRootDocExtensions: Settings.validRootDocExtensions
     }
     next()
   })
