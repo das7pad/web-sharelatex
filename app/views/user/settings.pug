@@ -22,7 +22,7 @@ block content
 									form(async-form="settings", name="settingsForm", method="POST", action="/user/settings", novalidate)
 										input(type="hidden", name="_csrf", value=csrfToken)
 										if !hasFeature('affiliations')
-											if !externalAuthenticationSystemUsed() 
+											if !EXTERNAL_AUTHENTICATION_SYSTEM_USED 
 												.form-group
 													label(for='email')  #{translate("email")}
 													input.form-control(
@@ -90,7 +90,7 @@ block content
 
 								.col-md-5.col-md-offset-1
 									h3 #{translate("change_password")}
-									if externalAuthenticationSystemUsed() && !settings.overleaf
+									if EXTERNAL_AUTHENTICATION_SYSTEM_USED && !settings.overleaf
 										p
 											Password settings are managed externally
 									else if !hasPassword
@@ -180,7 +180,7 @@ block content
 
 							hr
 
-							if !externalAuthenticationSystemUsed() || (settings.createV1AccountOnLogin && settings.overleaf)
+							if !EXTERNAL_AUTHENTICATION_SYSTEM_USED || (settings.createV1AccountOnLogin && settings.overleaf)
 
 								p.small
 									| #{translate("newsletter_info_and_unsubscribe")} 

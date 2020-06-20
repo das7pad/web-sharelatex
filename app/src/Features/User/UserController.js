@@ -218,7 +218,7 @@ const UserController = {
         if (
           newEmail == null ||
           newEmail === user.email ||
-          req.externalAuthenticationSystemUsed()
+          Features.EXTERNAL_AUTHENTICATION_SYSTEM_USED
         ) {
           // end here, don't update email
           AuthenticationController.setInSessionUser(req, {

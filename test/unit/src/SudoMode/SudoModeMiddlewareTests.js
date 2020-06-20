@@ -41,6 +41,7 @@ describe('SudoModeMiddleware', function() {
           warn: sinon.stub(),
           err: sinon.stub()
         },
+        '../../infrastructure/Features': (this.Features = {}),
         'settings-sharelatex': (this.Settings = {})
       }
     }))
@@ -48,13 +49,8 @@ describe('SudoModeMiddleware', function() {
 
   describe('protectPage', function() {
     beforeEach(function() {
-      this.externalAuth = false
       return (this.call = cb => {
-        this.req = {
-          externalAuthenticationSystemUsed: sinon
-            .stub()
-            .returns(this.externalAuth)
-        }
+        this.Features.EXTERNAL_AUTHENTICATION_SYSTEM_USED = false
         this.res = { redirect: sinon.stub() }
         this.next = sinon.stub()
         this.SudoModeMiddleware.protectPage(this.req, this.res, this.next)
@@ -191,13 +187,8 @@ describe('SudoModeMiddleware', function() {
 
     describe('when external auth is being used', function() {
       beforeEach(function() {
-        this.externalAuth = true
         return (this.call = cb => {
-          this.req = {
-            externalAuthenticationSystemUsed: sinon
-              .stub()
-              .returns(this.externalAuth)
-          }
+          this.Features.EXTERNAL_AUTHENTICATION_SYSTEM_USED = true
           this.res = { redirect: sinon.stub() }
           this.next = sinon.stub()
           this.SudoModeMiddleware.protectPage(this.req, this.res, this.next)

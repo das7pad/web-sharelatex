@@ -33,10 +33,8 @@ module.exports = function(webRouter) {
     const currentUser = AuthenticationController.getSessionUser(req)
     res.locals.session = req.session
 
-    req.externalAuthenticationSystemUsed =
-      Features.externalAuthenticationSystemUsed
-    res.locals.externalAuthenticationSystemUsed =
-      Features.externalAuthenticationSystemUsed
+    res.locals.EXTERNAL_AUTHENTICATION_SYSTEM_USED =
+      Features.EXTERNAL_AUTHENTICATION_SYSTEM_USED
     req.hasFeature = res.locals.hasFeature = Features.hasFeature
 
     const resourceHints = []

@@ -53,6 +53,7 @@ describe('SudoModeController', function() {
             return 'some_object_id'
           }
         },
+        '../../infrastructure/Features': (this.Features = {}),
         '../User/UserGetter': this.UserGetter,
         'settings-sharelatex': (this.Settings = {})
       }
@@ -64,9 +65,6 @@ describe('SudoModeController', function() {
       this.SudoModeHandler.isSudoModeActive = sinon
         .stub()
         .callsArgWith(1, null, false)
-      this.req = {
-        externalAuthenticationSystemUsed: sinon.stub().returns(false)
-      }
       this.res = { redirect: sinon.stub(), render: sinon.stub() }
       return (this.next = sinon.stub())
     })
@@ -129,9 +127,7 @@ describe('SudoModeController', function() {
 
     describe('when external auth system is used', function() {
       beforeEach(function() {
-        return (this.req.externalAuthenticationSystemUsed = sinon
-          .stub()
-          .returns(true))
+        this.Features.EXTERNAL_AUTHENTICATION_SYSTEM_USED = true
       })
 
       it('should redirect', function() {

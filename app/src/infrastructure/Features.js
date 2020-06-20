@@ -25,13 +25,15 @@ const trackChangesModuleAvailable = fs.existsSync(
   `${__dirname}/../../../modules/track-changes`
 )
 
+const EXTERNAL_AUTHENTICATION_SYSTEM_USED =
+  Settings.ldap != null ||
+  Settings.enableSaml ||
+  (Settings.overleaf != null ? Settings.overleaf.oauth : undefined) != null
+
 module.exports = Features = {
+  EXTERNAL_AUTHENTICATION_SYSTEM_USED,
   externalAuthenticationSystemUsed() {
-    return (
-      Settings.ldap != null ||
-      Settings.enableSaml ||
-      (Settings.overleaf != null ? Settings.overleaf.oauth : undefined) != null
-    )
+    return EXTERNAL_AUTHENTICATION_SYSTEM_USED
   },
 
   hasFeature(feature) {
@@ -40,7 +42,7 @@ module.exports = Features = {
         return Settings.enableHomepage
       case 'registration':
         return (
-          !Features.externalAuthenticationSystemUsed() ||
+          !Features.EXTERNAL_AUTHENTICATION_SYSTEM_USED ||
           Settings.overleaf != null
         )
       case 'github-sync':

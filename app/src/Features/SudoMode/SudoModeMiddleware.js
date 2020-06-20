@@ -16,10 +16,14 @@ const logger = require('logger-sharelatex')
 const SudoModeHandler = require('./SudoModeHandler')
 const AuthenticationController = require('../Authentication/AuthenticationController')
 const Settings = require('settings-sharelatex')
+const Features = require('../../infrastructure/Features')
 
 module.exports = SudoModeMiddleware = {
   protectPage(req, res, next) {
-    if (req.externalAuthenticationSystemUsed() && Settings.overleaf == null) {
+    if (
+      Features.EXTERNAL_AUTHENTICATION_SYSTEM_USED &&
+      Settings.overleaf == null
+    ) {
       logger.log(
         { userId },
         '[SudoMode] using external auth, skipping sudo-mode check'

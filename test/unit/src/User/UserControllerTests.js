@@ -86,6 +86,7 @@ describe('UserController', function() {
           .AuthenticationController,
         '../Authentication/AuthenticationManager': this.AuthenticationManager,
         '../../infrastructure/Features': (this.Features = {
+          EXTERNAL_AUTHENTICATION_SYSTEM_USED: false,
           hasFeature: sinon.stub()
         }),
         '../Referal/ReferalAllocator': this.ReferalAllocator,
@@ -277,7 +278,7 @@ describe('UserController', function() {
   describe('updateUserSettings', function() {
     beforeEach(function() {
       this.newEmail = 'hello@world.com'
-      this.req.externalAuthenticationSystemUsed = sinon.stub().returns(false)
+      this.Features.EXTERNAL_AUTHENTICATION_SYSTEM_USED = false
     })
 
     it('should call save', function(done) {
@@ -425,7 +426,7 @@ describe('UserController', function() {
       beforeEach(function() {
         this.UserUpdater.changeEmailAddress.callsArgWith(2)
         this.newEmail = 'someone23@example.com'
-        this.req.externalAuthenticationSystemUsed = sinon.stub().returns(true)
+        this.Features.EXTERNAL_AUTHENTICATION_SYSTEM_USED = true
       })
 
       it('should not set a new email', function(done) {
