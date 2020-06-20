@@ -116,16 +116,11 @@ module.exports = {
           text: 'documentation',
           class: optionalClass
         })
-      return webRouter.use(function(req, res, next) {
+      if (settings.nav) {
         try {
-          if (
-            __guard__(
-              res.locals != null ? res.locals.nav : undefined,
-              x => x.header_extras
-            ) != null
-          ) {
+          if (settings.nav.header_extras) {
             let help
-            const { header_extras } = res.locals.nav
+            const { header_extras } = settings.nav
             if ((help = _getHelp(header_extras))) {
               if (!_getLearn(help.dropdown)) {
                 _addLearn(help.dropdown)
@@ -142,8 +137,7 @@ module.exports = {
             'could not automatically add `/learn` link to header'
           )
         }
-        return next()
-      })
+      }
     }
   }
 }
@@ -158,9 +152,4 @@ function __guardMethod__(obj, methodName, transform) {
   } else {
     return undefined
   }
-}
-function __guard__(value, transform) {
-  return typeof value !== 'undefined' && value !== null
-    ? transform(value)
-    : undefined
 }
