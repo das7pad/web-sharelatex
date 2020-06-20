@@ -1,6 +1,5 @@
 const Settings =
   require('settings-sharelatex') || require('../../../config/settings.defaults')
-const _ = require('lodash')
 const { URL } = require('url')
 const Path = require('path')
 
@@ -242,11 +241,7 @@ module.exports = function(webRouter) {
       AuthenticationController.getLoggedInUserId(req)
     res.locals.getSessionUser = () => currentUser
 
-    // Clone the nav settings so they can be modified for each request
-    res.locals.nav = {}
-    for (const key in Settings.nav) {
-      res.locals.nav[key] = _.clone(Settings.nav[key])
-    }
+    res.locals.nav = Settings.nav
     res.locals.templates = Settings.templateLinks
 
     if (Settings.reloadModuleViewsOnEachRequest) {
