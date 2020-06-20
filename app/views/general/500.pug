@@ -5,7 +5,7 @@ html.full-height(itemscope, itemtype='http://schema.org/Product')
 		if staticPath
 			link(rel="icon", href=staticPath("/" + (settings.brandPrefix || '') + "favicon.ico"))
 		if buildCssPath
-			link(rel="stylesheet", href=buildCssPath(null, { hashedPath: true }))
+			link(rel="stylesheet", href=buildCssPath(null))
 
 	body.full-height
 		.content.content-alt.full-height

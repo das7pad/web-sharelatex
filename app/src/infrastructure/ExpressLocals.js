@@ -300,12 +300,12 @@ module.exports = function(webRouter) {
         {
           name: 'Default',
           val: '',
-          path: res.locals.buildCssPath(null, { hashedPath: true })
+          path: res.locals.buildCssPath(null)
         },
         {
           name: 'Light',
           val: 'light-',
-          path: res.locals.buildCssPath('light-', { hashedPath: true })
+          path: res.locals.buildCssPath('light-')
         }
       ]
     }
