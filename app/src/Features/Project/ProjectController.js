@@ -750,7 +750,7 @@ const ProjectController = {
                 {
                   name: 'Default',
                   val: '',
-                  path: res.locals.buildCssPath(null)
+                  path: res.locals.buildCssPath('')
                 },
                 {
                   name: 'Light',

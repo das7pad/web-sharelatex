@@ -78,7 +78,7 @@ module.exports = function(webRouter) {
     }
 
     res.locals.preloadCommonResources = function() {
-      res.locals.preloadCss()
+      res.locals.preloadCss('')
       if (Settings.brandPrefix === 'sl-') {
         ;[
           'font-awesome-v470',
@@ -151,14 +151,11 @@ module.exports = function(webRouter) {
           return userSettings.overallTheme
         }
       }
-    }
-
-    function _buildCssFileName(themeModifier) {
-      return `${Settings.brandPrefix}${themeModifier || ''}style.css`
+      return ''
     }
 
     res.locals.buildCssPath = function(themeModifier) {
-      const cssFileName = _buildCssFileName(themeModifier)
+      const cssFileName = `${Settings.brandPrefix}${themeModifier}style.css`
 
       let path
       if (IS_DEV_ENV) {
