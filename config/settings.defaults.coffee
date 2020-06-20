@@ -561,6 +561,19 @@ module.exports = settings =
 
 	brandPrefix: process.env['BRAND_PREFIX'] or "sl-" # Set to 'ol-' for overleaf styles
 
+	uiConfig: {
+		defaultResizerSizeOpen: 7,
+		defaultResizerSizeClosed: 7,
+		eastResizerCursor: 'ew-resize',
+		westResizerCursor: 'ew-resize',
+		chatResizerSizeOpen: 7,
+		chatResizerSizeClosed: 0,
+		chatMessageBorderSaturation: '85%',
+		chatMessageBorderLightness: '40%',
+		chatMessageBgSaturation: '85%',
+		chatMessageBgLightness: '40%'
+	}
+
 	nav:
 		title: "ShareLaTeX Community Edition"
 

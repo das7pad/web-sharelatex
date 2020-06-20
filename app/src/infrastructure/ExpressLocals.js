@@ -250,19 +250,6 @@ module.exports = function(webRouter) {
     res.locals.moduleIncludes = Modules.moduleIncludes
     res.locals.moduleIncludesAvailable = Modules.moduleIncludesAvailable
 
-    res.locals.uiConfig = {
-      defaultResizerSizeOpen: 7,
-      defaultResizerSizeClosed: 7,
-      eastResizerCursor: 'ew-resize',
-      westResizerCursor: 'ew-resize',
-      chatResizerSizeOpen: 7,
-      chatResizerSizeClosed: 0,
-      chatMessageBorderSaturation: '85%',
-      chatMessageBorderLightness: '40%',
-      chatMessageBgSaturation: '85%',
-      chatMessageBgLightness: '40%'
-    }
-
     // TODO
     if (Settings.hasThemes) {
       res.locals.overallThemes = [
