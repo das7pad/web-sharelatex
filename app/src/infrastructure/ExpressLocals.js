@@ -108,12 +108,6 @@ module.exports = function(webRouter) {
       actualRender.apply(res, arguments)
     }
 
-    res.locals.buildBaseAssetPath = function() {
-      // Return the base asset path (including the CDN url) so that webpack can
-      // use this to dynamically fetch scripts (e.g. PDFjs worker)
-      return res.locals.staticPath('/')
-    }
-
     res.locals.staticPath = function(path) {
       if (staticFilesBase === '/') {
         return path.indexOf('/') === 0 ? path : '/' + path
