@@ -20,7 +20,9 @@ describe('ExpressLocalsTests', function() {
           www: { lngCode: 'en', url: 'http://localhost:3000' }
         }
       },
-      brandPrefix: ''
+      brandPrefix: '',
+      analytics: { ga: { token: '' }, gaOptimize: { id: '' } },
+      saml: { ukamf: { initPath: '/' } }
     }
     this.user_id = '386010482601212345061012'
 
@@ -30,10 +32,11 @@ describe('ExpressLocalsTests', function() {
       '../Features/Subscription/SubscriptionFormatters': {},
       '../Features/SystemMessages/SystemMessageManager': {},
       '../Features/Authentication/AuthenticationController': {
-        getLoggedInUserId: sinon.stub().returns(this.user_id)
+        getLoggedInUserId: sinon.stub().returns(this.user_id),
+        getSessionUser: sinon.stub()
       },
       './Modules': {},
-      './Features': {}
+      './Features': { hasFeature: sinon.stub().returns(false) }
     }
     this.requires[MANIFEST] = {}
 
@@ -63,24 +66,14 @@ describe('ExpressLocalsTests', function() {
     }
   })
 
-  let middlewareCounter
-
   describe('without a cdn', function() {
-    middlewareCounter = -1
     beforeEach(function() {
       this.require()
     })
-    // session
-    middlewareCounter += 1
-    // externalAuthenticationSystemUser + hasFeature
-    middlewareCounter += 1
 
     describe('resource middleware', function() {
-      middlewareCounter += 1
-      const middlewareId = middlewareCounter
-
       beforeEach(function() {
-        this.loadMiddleware(middlewareId)
+        this.loadMiddleware(0)
       })
       it('should set basic functions', function() {
         expect(this.res.locals.staticPath).to.exist
@@ -163,23 +156,15 @@ describe('ExpressLocalsTests', function() {
   })
 
   describe('with a cdn', function() {
-    middlewareCounter = -1
     beforeEach(function() {
       this.settings.cdn = { web: { host: 'https://example.com/' } }
 
       this.require()
     })
-    // session
-    middlewareCounter += 1
-    // externalAuthenticationSystemUser + hasFeature
-    middlewareCounter += 1
 
     describe('resource middleware', function() {
-      middlewareCounter += 1
-      const middlewareId = middlewareCounter
-
       beforeEach(function() {
-        this.loadMiddleware(middlewareId)
+        this.loadMiddleware(0)
       })
 
       describe('resource hints', function() {
@@ -200,7 +185,6 @@ describe('ExpressLocalsTests', function() {
   })
 
   describe('with only one language', function() {
-    middlewareCounter = -1
     beforeEach(function() {
       this.settings.i18n = {
         subdomainLang: {
@@ -210,17 +194,10 @@ describe('ExpressLocalsTests', function() {
 
       this.require()
     })
-    // session
-    middlewareCounter += 1
-    // externalAuthenticationSystemUser + hasFeature
-    middlewareCounter += 1
 
     describe('resource middleware', function() {
-      middlewareCounter += 1
-      const middlewareId = middlewareCounter
-
       beforeEach(function() {
-        this.loadMiddleware(middlewareId)
+        this.loadMiddleware(0)
       })
 
       describe('resource hints', function() {

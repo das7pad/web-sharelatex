@@ -35,19 +35,13 @@ const sentryEnabled =
 module.exports = function(webRouter) {
   webRouter.use(function(req, res, next) {
     res.locals.session = req.session
-    next()
-  })
 
-  webRouter.use(function(req, res, next) {
     req.externalAuthenticationSystemUsed =
       Features.externalAuthenticationSystemUsed
     res.locals.externalAuthenticationSystemUsed =
       Features.externalAuthenticationSystemUsed
     req.hasFeature = res.locals.hasFeature = Features.hasFeature
-    next()
-  })
 
-  webRouter.use(function(req, res, next) {
     const resourceHints = []
     res.locals.finishPreloading = function() {
       if (!Settings.addResourceHints) {
@@ -221,10 +215,6 @@ module.exports = function(webRouter) {
       return res.locals.staticPath(path)
     }
 
-    next()
-  })
-
-  webRouter.use(function(req, res, next) {
     res.locals.translate = function(key, vars) {
       if (vars == null) {
         vars = {}
@@ -232,29 +222,17 @@ module.exports = function(webRouter) {
       vars.appName = Settings.appName
       return req.i18n.translate(key, vars)
     }
-    next()
-  })
 
-  webRouter.use(function(req, res, next) {
     res.locals.recomendSubdomain = LNG_TO_SPEC.get(req.showUserOtherLng)
     res.locals.currentLngCode = req.lng
-    next()
-  })
 
-  webRouter.use(function(req, res, next) {
     res.locals.getUserEmail = function() {
       const user = AuthenticationController.getSessionUser(req)
       return (user && user.email) || ''
     }
-    next()
-  })
 
-  webRouter.use(function(req, res, next) {
     res.locals.StringHelper = StringHelper
-    next()
-  })
 
-  webRouter.use(function(req, res, next) {
     res.locals.buildReferalUrl = function(referalMedium) {
       let url = Settings.siteUrl
       const referralId = res.locals.getReferalId()
@@ -267,26 +245,14 @@ module.exports = function(webRouter) {
       const currentUser = AuthenticationController.getSessionUser(req)
       return currentUser && currentUser.referal_id
     }
-    next()
-  })
 
-  webRouter.use(function(req, res, next) {
     res.locals.csrfToken = req.csrfToken()
-    next()
-  })
 
-  webRouter.use(function(req, res, next) {
     res.locals.gaToken = Settings.analytics.ga.token
     res.locals.gaOptimizeId = Settings.analytics.gaOptimize.id
-    next()
-  })
 
-  webRouter.use(function(req, res, next) {
     res.locals.getReqQueryParam = field => req.query[field]
-    next()
-  })
 
-  webRouter.use(function(req, res, next) {
     const currentUser = AuthenticationController.getSessionUser(req)
     if (currentUser) {
       res.locals.user = {
@@ -296,37 +262,25 @@ module.exports = function(webRouter) {
       }
     }
     res.locals.sentryEnabled = sentryEnabled
-    next()
-  })
 
-  webRouter.use(function(req, res, next) {
     res.locals.getLoggedInUserId = () =>
       AuthenticationController.getLoggedInUserId(req)
     res.locals.getSessionUser = () =>
       AuthenticationController.getSessionUser(req)
-    next()
-  })
 
-  webRouter.use(function(req, res, next) {
     // Clone the nav settings so they can be modified for each request
     res.locals.nav = {}
     for (const key in Settings.nav) {
       res.locals.nav[key] = _.clone(Settings.nav[key])
     }
     res.locals.templates = Settings.templateLinks
-    next()
-  })
 
-  webRouter.use(function(req, res, next) {
     if (Settings.reloadModuleViewsOnEachRequest) {
       Modules.loadViewIncludes()
     }
     res.locals.moduleIncludes = Modules.moduleIncludes
     res.locals.moduleIncludesAvailable = Modules.moduleIncludesAvailable
-    next()
-  })
 
-  webRouter.use(function(req, res, next) {
     res.locals.uiConfig = {
       defaultResizerSizeOpen: 7,
       defaultResizerSizeClosed: 7,
@@ -339,10 +293,7 @@ module.exports = function(webRouter) {
       chatMessageBgSaturation: '85%',
       chatMessageBgLightness: '40%'
     }
-    next()
-  })
 
-  webRouter.use(function(req, res, next) {
     // TODO
     if (Settings.hasThemes) {
       res.locals.overallThemes = [
@@ -358,15 +309,9 @@ module.exports = function(webRouter) {
         }
       ]
     }
-    next()
-  })
 
-  webRouter.use(function(req, res, next) {
     res.locals.settings = Settings
-    next()
-  })
 
-  webRouter.use(function(req, res, next) {
     res.locals.ExposedSettings = {
       isOverleaf: !!Settings.overleaf,
       appName: Settings.appName,

@@ -29,6 +29,9 @@ class MockRequest {
   param(param) {
     return this.params[param]
   }
+  csrfToken() {
+    return ''
+  }
 }
 MockRequest.initClass()
 
