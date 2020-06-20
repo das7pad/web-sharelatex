@@ -13,7 +13,6 @@ const LNG_TO_SPEC = new Map(
 const Features = require('./Features')
 const AuthenticationController = require('../Features/Authentication/AuthenticationController')
 const Modules = require('./Modules')
-const StringHelper = require('../Features/Helpers/StringHelper')
 
 let webpackManifest = {}
 if (!IS_DEV_ENV) {
@@ -224,8 +223,6 @@ module.exports = function(webRouter) {
     res.locals.getUserEmail = function() {
       return (currentUser && currentUser.email) || ''
     }
-
-    res.locals.StringHelper = StringHelper
 
     res.locals.csrfToken = req.csrfToken()
 
