@@ -247,22 +247,6 @@ module.exports = function(webRouter) {
     res.locals.moduleIncludes = Modules.moduleIncludes
     res.locals.moduleIncludesAvailable = Modules.moduleIncludesAvailable
 
-    // TODO
-    if (Settings.hasThemes) {
-      res.locals.overallThemes = [
-        {
-          name: 'Default',
-          val: '',
-          path: res.locals.buildCssPath(null)
-        },
-        {
-          name: 'Light',
-          val: 'light-',
-          path: res.locals.buildCssPath('light-')
-        }
-      ]
-    }
-
     res.locals.settings = Settings
 
     res.locals.ExposedSettings = {

@@ -744,6 +744,22 @@ const ProjectController = {
             }
             metrics.inc(metricName)
 
+            let overallThemes = []
+            if (Settings.hasThemes) {
+              overallThemes = [
+                {
+                  name: 'Default',
+                  val: '',
+                  path: res.locals.buildCssPath(null)
+                },
+                {
+                  name: 'Light',
+                  val: 'light-',
+                  path: res.locals.buildCssPath('light-')
+                }
+              ]
+            }
+
             const params = {
               title: project.name,
               priority_title: true,
@@ -796,6 +812,7 @@ const ProjectController = {
                 project.overleaf.history &&
                 Boolean(project.overleaf.history.display),
               brandVariation,
+              overallThemes,
               allowedImageNames: Settings.allowedImageNames || [],
               gitBridgePublicBaseUrl: Settings.gitBridgePublicBaseUrl,
               wsUrl,
