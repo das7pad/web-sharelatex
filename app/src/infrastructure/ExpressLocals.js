@@ -15,6 +15,7 @@ const Features = require('./Features')
 const AuthenticationController = require('../Features/Authentication/AuthenticationController')
 const PackageVersions = require('./PackageVersions')
 const Modules = require('./Modules')
+const StringHelper = require('../Features/Helpers/StringHelper')
 
 let webpackManifest = {}
 if (!IS_DEV_ENV) {
@@ -249,7 +250,7 @@ module.exports = function(webRouter) {
   })
 
   webRouter.use(function(req, res, next) {
-    res.locals.StringHelper = require('../Features/Helpers/StringHelper')
+    res.locals.StringHelper = StringHelper
     next()
   })
 
