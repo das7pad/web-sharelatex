@@ -198,13 +198,6 @@ module.exports = function(webRouter) {
     res.locals.gaToken = Settings.analytics.ga.token
     res.locals.gaOptimizeId = Settings.analytics.gaOptimize.id
 
-    if (currentUser) {
-      res.locals.user = {
-        email: currentUser.email,
-        first_name: currentUser.first_name,
-        last_name: currentUser.last_name
-      }
-    }
     res.locals.sentryEnabled = sentryEnabled
 
     res.locals.getLoggedInUserId = () =>
