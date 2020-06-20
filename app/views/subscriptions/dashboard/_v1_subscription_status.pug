@@ -6,7 +6,7 @@
     p
       | Your current group licence ends on
       |
-      strong= moment(v1SubscriptionStatus['team']['will_end_at']).format('Do MMM YY')
+      strong= v1SubscriptionStatus['team']['will_end_at_formatted']
       |
       | and will
       |
@@ -39,7 +39,7 @@
   p
     | Your plan ends on
     |
-    strong= moment(v1SubscriptionStatus['product']['will_end_at']).format('Do MMM YY')
+    strong= v1SubscriptionStatus['product']['will_end_at_formatted']
     |
     | and will
     |

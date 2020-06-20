@@ -27,6 +27,15 @@ const sanitizeHtml = require('sanitize-html')
 const logger = require('logger-sharelatex')
 const _ = require('underscore')
 const async = require('async')
+const moment = require('moment')
+
+function formatWillEndAt(section) {
+  if (section && section.will_end_at) {
+    section.will_end_at_formatted = moment(section.will_end_at).format(
+      'Do MMM YY'
+    )
+  }
+}
 
 const buildHostedLink = function(recurlySubscription, type) {
   const recurlySubdomain = Settings.apis.recurly.subdomain
@@ -126,6 +135,10 @@ module.exports = {
             function(error, status, v1Id) {
               if (error != null) {
                 return cb(error)
+              }
+              if (status) {
+                formatWillEndAt(status.product)
+                formatWillEndAt(status.team)
               }
               return cb(null, status)
             }

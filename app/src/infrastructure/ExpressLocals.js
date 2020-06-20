@@ -3,7 +3,6 @@ const Settings =
 const _ = require('lodash')
 const { URL } = require('url')
 const Path = require('path')
-const moment = require('moment')
 
 const IS_DEV_ENV = ['development', 'test'].includes(process.env.NODE_ENV)
 const HAS_MULTIPLE_LANG = Object.keys(Settings.i18n.subdomainLang).length > 1
@@ -164,8 +163,6 @@ module.exports = function(webRouter) {
 
       return res.locals.staticPath(path)
     }
-
-    res.locals.moment = moment
 
     const IEEE_BRAND_ID = 15
     res.locals.isIEEE = brandVariation =>
