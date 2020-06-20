@@ -227,18 +227,6 @@ module.exports = function(webRouter) {
 
     res.locals.StringHelper = StringHelper
 
-    res.locals.buildReferalUrl = function(referalMedium) {
-      let url = Settings.siteUrl
-      const referralId = res.locals.getReferalId()
-      if (referralId) {
-        url += `?r=${referralId}&rm=${referalMedium}&rs=b` // Referal source = bonus
-      }
-      return url
-    }
-    res.locals.getReferalId = function() {
-      return currentUser && currentUser.referal_id
-    }
-
     res.locals.csrfToken = req.csrfToken()
 
     res.locals.gaToken = Settings.analytics.ga.token
