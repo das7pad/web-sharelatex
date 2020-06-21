@@ -62,7 +62,7 @@ module.exports = function(webRouter) {
       //  https://caniuse.com/#search=woff2
       // They both ignore the preload header, so this is OK
       //  https://caniuse.com/#search=preload
-      const uri = res.locals.staticPath(`/fonts/${name}.woff2`)
+      const uri = `${staticFilesBase}/fonts/${name}.woff2`
       res.locals.preload(uri, 'font', true)
     }
     res.locals.preloadImg = function(path) {
@@ -96,16 +96,16 @@ module.exports = function(webRouter) {
     }
 
     res.locals.buildJsPath = function(jsFile) {
-      return res.locals.staticPath(webpackManifest[jsFile])
+      return staticFilesBase + webpackManifest[jsFile]
     }
 
     res.locals.buildCssPath = function(themeModifier = '') {
       const cssFileName = `${themeModifier}style.css`
-      return res.locals.staticPath(webpackManifest[cssFileName])
+      return staticFilesBase + webpackManifest[cssFileName]
     }
 
     res.locals.buildImgPath = function(imgFile) {
-      return res.locals.staticPath('/img/' + imgFile)
+      return staticFilesBase + '/img/' + imgFile
     }
 
     res.locals.translate = function(key, vars) {
@@ -154,7 +154,7 @@ module.exports = function(webRouter) {
       return res.sendStatus(404)
     }
     res.contentType('application/javascript')
-    res.send(`importScripts('${res.locals.staticPath(workerPath)}');`)
+    res.send(`importScripts('${staticFilesBase}${workerPath}');`)
   })
 }
 
