@@ -57,7 +57,6 @@ html(
 				wsUrl: settings.wsUrl,
 			})
 		meta(id="ol-user_id" content=getLoggedInUserId())
-		meta(id="ol-ExposedSettings" data-json content=ExposedSettings)
 
 		- if (typeof(settings.algolia) != "undefined")
 			meta(id="ol-sharelatex.algolia" data-json content={
@@ -76,6 +75,7 @@ html(
 
 	body(ng-csp="no-unsafe-eval")
 		if(settings.recaptcha && settings.recaptcha.siteKeyV3)
+			meta(id='ol-recaptchaSiteKeyV3' content=settings.recaptcha.siteKeyV3)
 			script(type="text/javascript", src="https://www.google.com/recaptcha/api.js?render="+settings.recaptcha.siteKeyV3)
 
 

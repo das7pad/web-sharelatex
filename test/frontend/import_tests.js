@@ -22,9 +22,6 @@ chai.Assertion.addMethod('equalPos', function(expectedPos) {
   )
 })
 
-// Mock ExposedSettings
-window.ExposedSettings = {}
-
 /*
  * Bundle all test files together into a single bundle, and run tests against
  * this single bundle.

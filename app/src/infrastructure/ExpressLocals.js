@@ -170,8 +170,6 @@ module.exports = function(webRouter) {
     res.locals.moduleIncludesAvailable = Modules.moduleIncludesAvailable
 
     res.locals.settings = Settings
-
-    res.locals.ExposedSettings = {}
     next()
   })
   if (

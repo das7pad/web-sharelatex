@@ -55,7 +55,6 @@ import './services/wait-for'
 import './filters/formatDate'
 import './main/event'
 import './main/account-upgrade'
-import './main/exposed-settings'
 import './main/system-messages'
 import '../../modules/modules-ide'
 App.controller('IdeController', function(
