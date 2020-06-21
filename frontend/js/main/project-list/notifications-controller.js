@@ -1,7 +1,6 @@
 import App from '../../base'
 import getMeta from '../../utils/meta'
 
-const ExposedSettings = window.ExposedSettings
 App.controller('NotificationsController', function($scope, $http) {
   for (const notification of $scope.notifications || []) {
     notification.hide = false
@@ -87,9 +86,6 @@ App.controller('EmailNotificationController', function(
     return false
   }
   $scope.showConfirmEmail = email => {
-    if (ExposedSettings.emailConfirmationDisabled) {
-      return false
-    }
     if (!email.confirmedAt && !email.hide) {
       if (_ssoAvailable(email)) {
         return false

@@ -173,7 +173,6 @@ module.exports = function(webRouter) {
 
     res.locals.ExposedSettings = {
       appName: Settings.appName,
-      emailConfirmationDisabled: Settings.emailConfirmationDisabled,
       recaptchaSiteKeyV3: Settings.recaptcha && Settings.recaptcha.siteKeyV3,
       recaptchaDisabled: Settings.recaptcha && Settings.recaptcha.disabled,
       validRootDocExtensions: Settings.validRootDocExtensions
