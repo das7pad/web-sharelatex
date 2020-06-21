@@ -12,8 +12,7 @@ const MODULE_PATH = path.join(
 describe('EmailBuilder', function() {
   beforeEach(function() {
     this.settings = {
-      appName: 'testApp',
-      brandPrefix: ''
+      appName: 'testApp'
     }
     this.EmailBuilder = SandboxedModule.require(MODULE_PATH, {
       globals: {

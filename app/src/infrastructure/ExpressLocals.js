@@ -76,21 +76,12 @@ module.exports = function(webRouter) {
 
     res.locals.preloadCommonResources = function() {
       res.locals.preloadCss('')
-      if (Settings.brandPrefix === 'sl-') {
-        ;[
-          'font-awesome-v470',
-          'merriweather-v21-latin-regular',
-          'open-sans-v17-latin-regular',
-          'open-sans-v17-latin-700'
-        ].forEach(res.locals.preloadFont)
-      } else {
-        ;[
-          'font-awesome-v470',
-          'lato-v16-latin-ext-regular',
-          'lato-v16-latin-ext-700',
-          'merriweather-v21-latin-regular'
-        ].forEach(res.locals.preloadFont)
-      }
+      ;[
+        'font-awesome-v470',
+        'lato-v16-latin-ext-regular',
+        'lato-v16-latin-ext-700',
+        'merriweather-v21-latin-regular'
+      ].forEach(res.locals.preloadFont)
       if (HAS_MULTIPLE_LANG) {
         res.locals.preloadImg('sprite.png')
       }
@@ -134,7 +125,7 @@ module.exports = function(webRouter) {
     }
 
     res.locals.buildCssPath = function(themeModifier = '') {
-      const cssFileName = `${Settings.brandPrefix}${themeModifier}style.css`
+      const cssFileName = `${themeModifier}style.css`
 
       let path
       if (IS_DEV_ENV) {

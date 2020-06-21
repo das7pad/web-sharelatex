@@ -1163,21 +1163,6 @@ describe('ProjectController', function() {
         }
         this.ProjectController.loadEditor(this.req, this.res)
       })
-
-      it('should preload the lion for the sl- brand', function(done) {
-        this.settings.brandPrefix = 'sl-'
-        this.res.render = () => {
-          this.res.locals.preloadImg.callCount.should.equal(2)
-          this.res.locals.preloadImg
-            .calledWith('brand/lion.svg')
-            .should.equal(true)
-          this.res.locals.preloadImg
-            .calledWith('brand/lion-grey.svg')
-            .should.equal(true)
-          done()
-        }
-        this.ProjectController.loadEditor(this.req, this.res)
-      })
     })
 
     describe('wsUrl', function() {

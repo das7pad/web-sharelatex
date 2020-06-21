@@ -559,8 +559,6 @@ module.exports = settings =
 
 	statusPageUrl: process.env['OVERLEAF_STATUS_URL'] or "status.overleaf.com"
 
-	brandPrefix: process.env['BRAND_PREFIX'] or "sl-" # Set to 'ol-' for overleaf styles
-
 	uiConfig: {
 		defaultResizerSizeOpen: 7,
 		defaultResizerSizeClosed: 7,

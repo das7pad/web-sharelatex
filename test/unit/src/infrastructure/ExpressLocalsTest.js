@@ -20,7 +20,6 @@ describe('ExpressLocalsTests', function() {
           www: { lngCode: 'en', url: 'http://localhost:3000' }
         }
       },
-      brandPrefix: '',
       analytics: { ga: { token: '' }, gaOptimize: { id: '' } },
       saml: { ukamf: { initPath: '/' } }
     }
@@ -141,15 +140,6 @@ describe('ExpressLocalsTests', function() {
           const Link = this.res.headers.Link
           expect(Link).to.include('stylesheets/style.css')
           expect(Link).to.include('fonts/lato')
-        })
-
-        it('should inject sl- brand specific resources', function() {
-          this.settings.brandPrefix = 'sl-'
-          this.res.render('template', {})
-          expect(this.res.headers.Link).to.exist
-          const Link = this.res.headers.Link
-          expect(Link).to.include('stylesheets/sl-style.css')
-          expect(Link).to.include('fonts/open-sans')
         })
       })
     })

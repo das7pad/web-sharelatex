@@ -828,12 +828,10 @@ const ProjectController = {
             // add resource hints for the loading screen only
             res.locals.preloadCss(themeModifier)
             res.locals.preloadFont('merriweather-v21-latin-regular')
-
-            const brandImages =
-              Settings.brandPrefix === 'sl-'
-                ? ['brand/lion.svg', 'brand/lion-grey.svg']
-                : ['ol-brand/overleaf-o.svg', 'ol-brand/overleaf-o-grey.svg']
-            brandImages.forEach(res.locals.preloadImg)
+            ;[
+              'ol-brand/overleaf-o.svg',
+              'ol-brand/overleaf-o-grey.svg'
+            ].forEach(res.locals.preloadImg)
 
             res.locals.finishPreloading()
 
