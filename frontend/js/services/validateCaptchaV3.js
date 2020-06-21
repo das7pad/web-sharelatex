@@ -1,18 +1,19 @@
 import App from '../base'
+import getMeta from '../utils/meta'
 
 export default App.factory('validateCaptchaV3', function() {
   const grecaptcha = window.grecaptcha
-  const ExposedSettings = window.ExposedSettings
   return function validateCaptchaV3(actionName, callback = () => {}) {
     if (!grecaptcha) {
       return
     }
-    if (!ExposedSettings || !ExposedSettings.recaptchaSiteKeyV3) {
+    const recaptchaSiteKeyV3 = getMeta('ol-recaptchaSiteKeyV3')
+    if (!recaptchaSiteKeyV3) {
       return
     }
     grecaptcha.ready(function() {
       grecaptcha
-        .execute(ExposedSettings.recaptchaSiteKeyV3, { action: actionName })
+        .execute(recaptchaSiteKeyV3, { action: actionName })
         .then(callback)
     })
   }

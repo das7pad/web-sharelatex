@@ -171,10 +171,7 @@ module.exports = function(webRouter) {
 
     res.locals.settings = Settings
 
-    res.locals.ExposedSettings = {
-      recaptchaSiteKeyV3: Settings.recaptcha && Settings.recaptcha.siteKeyV3,
-      recaptchaDisabled: Settings.recaptcha && Settings.recaptcha.disabled
-    }
+    res.locals.ExposedSettings = {}
     next()
   })
   if (

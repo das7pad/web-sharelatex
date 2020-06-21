@@ -1,4 +1,5 @@
 import App from '../../../base'
+import getMeta from '../../../utils/meta'
 App.controller('ShareProjectModalController', function(
   $scope,
   $modalInstance,
@@ -148,7 +149,6 @@ App.controller('ShareProjectModalController', function(
         // do v3 captcha to collect data only
         validateCaptchaV3('invite')
         // do v2 captcha
-        const ExposedSettings = window.ExposedSettings
         validateCaptcha(
           function(response) {
             $scope.grecaptchaResponse = response
@@ -201,8 +201,8 @@ App.controller('ShareProjectModalController', function(
                 $scope.setError(data.errorReason)
               })
           },
-          ExposedSettings.recaptchaDisabled != null
-            ? ExposedSettings.recaptchaDisabled.invite
+          getMeta('ol-recaptchaDisabled') != null
+            ? getMeta('ol-recaptchaDisabled').invite
             : true
         )
       }
