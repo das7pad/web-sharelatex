@@ -110,7 +110,7 @@ describe('ExpressLocalsTests', function() {
         })
 
         it('should set the header for images', function() {
-          this.res.locals.preloadImg('/some/image.png')
+          this.res.locals.preloadImg('some/image.png')
           this.res.locals.finishPreloading()
           expect(this.res.headers).to.deep.equal({
             Link: '</img/some/image.png>;rel=preload;as=image'
@@ -163,7 +163,7 @@ describe('ExpressLocalsTests', function() {
         })
 
         it('should set the header for images', function() {
-          this.res.locals.preloadImg('/some/image.png')
+          this.res.locals.preloadImg('some/image.png')
           this.res.locals.finishPreloading()
           expect(this.res.headers).to.deep.equal({
             Link:

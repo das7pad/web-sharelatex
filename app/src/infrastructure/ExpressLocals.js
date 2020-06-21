@@ -114,8 +114,7 @@ module.exports = function(webRouter) {
     }
 
     res.locals.buildImgPath = function(imgFile) {
-      const path = Path.join('/img/', imgFile)
-      return res.locals.staticPath(path)
+      return res.locals.staticPath('/img/' + imgFile)
     }
 
     res.locals.translate = function(key, vars) {
