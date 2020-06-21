@@ -1,0 +1,15 @@
+{
+  "MathJaxBundle.js": "/js/MathJaxBundle.js",
+  "libraries.js": "/js/libraries.js",
+  "ide.js": "/js/ide.js",
+  "ideLibraries.js": "/js/ideLibraries.js",
+  "ieee-style.css": "/stylesheets/iee-style.css",
+  "light-style.css": "/stylesheets/light-style.css",
+  "main.js": "/js/main.js",
+  "rich-text.js": "/js/rich-text.js",
+  "style.css": "/stylesheets/style.css",
+  "vendors~rich-text.js": "/js/vendors~rich-text.js",
+  "vendors~sentry.js": "/js/vendors~sentry.js",
+  "vendor/pdfjs-dist/build/pdf.worker.min.js": "/vendor/pdfjs-dist/build/pdf.worker.min.js",
+  "vendor/stylesheets/highlight-github.css": "/vendor/stylesheets/highlight-github.css"
+}

@@ -3,7 +3,6 @@ const Settings =
 const { URL } = require('url')
 const Path = require('path')
 
-const IS_DEV_ENV = ['development', 'test'].includes(process.env.NODE_ENV)
 const HAS_MULTIPLE_LANG = Object.keys(Settings.i18n.subdomainLang).length > 1
 const LNG_TO_SPEC = new Map(
   Object.entries(Settings.i18n.subdomainLang).filter(entry => !entry[1].hide)
@@ -14,30 +13,10 @@ const AuthenticationController = require('../Features/Authentication/Authenticat
 const Modules = require('./Modules')
 
 let webpackManifest = {}
-if (!IS_DEV_ENV) {
-  // Only load webpack manifest file in production. In dev, the web and webpack
-  // containers can't coordinate, so there no guarantee that the manifest file
-  // exists when the web server boots. We therefore ignore the manifest file in
-  // dev reload
-  webpackManifest = require(`../../../public/manifest.json`)
+if (['development', 'test'].includes(process.env.NODE_ENV)) {
+  webpackManifest = require('../../../public/manifest-dev.json')
 } else {
-  Object.assign(webpackManifest, {
-    'MathJaxBundle.js': '/js/MathJaxBundle.js',
-    'libraries.js': '/js/libraries.js',
-    'ide.js': '/js/ide.js',
-    'ideLibraries.js': '/js/ideLibraries.js',
-    'ieee-style.css': '/stylesheets/iee-style.css',
-    'light-style.css': '/stylesheets/light-style.css',
-    'main.js': '/js/main.js',
-    'rich-text.js': '/js/rich-text.js',
-    'style.css': '/stylesheets/style.css',
-    'vendors~rich-text.js': '/js/vendors~rich-text.js',
-    'vendors~sentry.js': '/js/vendors~sentry.js',
-    'vendor/pdfjs-dist/build/pdf.worker.min.js':
-      '/vendor/pdfjs-dist/build/pdf.worker.min.js',
-    'vendor/stylesheets/highlight-github.css':
-      '/vendor/stylesheets/highlight-github.css'
-  })
+  webpackManifest = require('../../../public/manifest.json')
 }
 
 const cdnAvailable = Settings.cdn && Settings.cdn.web && !!Settings.cdn.web.host
