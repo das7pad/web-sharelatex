@@ -744,8 +744,13 @@ const ProjectController = {
             }
             metrics.inc(metricName)
 
+            const IS_IEEE = brandVariation && brandVariation.brand_id === 15
             let overallThemes = []
-            if (Settings.hasThemes) {
+            let themeModifier = ''
+            if (IS_IEEE) {
+              themeModifier = 'ieee-'
+            } else if (Settings.hasThemes) {
+              themeModifier = user.ace.overallTheme
               overallThemes = [
                 {
                   name: 'Default',
@@ -813,6 +818,7 @@ const ProjectController = {
                 Boolean(project.overleaf.history.display),
               brandVariation,
               overallThemes,
+              themeModifier,
               allowedImageNames: Settings.allowedImageNames || [],
               gitBridgePublicBaseUrl: Settings.gitBridgePublicBaseUrl,
               wsUrl,
@@ -820,12 +826,7 @@ const ProjectController = {
             }
 
             // add resource hints for the loading screen only
-            res.locals.preloadCss(
-              res.locals.getCssThemeModifier(
-                params.userSettings,
-                brandVariation
-              )
-            )
+            res.locals.preloadCss(themeModifier)
             res.locals.preloadFont('merriweather-v21-latin-regular')
 
             const brandImages =

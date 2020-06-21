@@ -133,25 +133,7 @@ module.exports = function(webRouter) {
       return res.locals.staticPath(path)
     }
 
-    const IEEE_BRAND_ID = 15
-    res.locals.isIEEE = brandVariation =>
-      brandVariation && brandVariation.brand_id === IEEE_BRAND_ID
-
-    res.locals.getCssThemeModifier = function(userSettings, brandVariation) {
-      // Themes only exist in OL v2
-      if (Settings.hasThemes) {
-        // The IEEE theme takes precedence over the user personal setting, i.e. a user with
-        // a theme setting of "light" will still get the IEE theme in IEEE branded projects.
-        if (res.locals.isIEEE(brandVariation)) {
-          return 'ieee-'
-        } else if (userSettings && userSettings.overallTheme != null) {
-          return userSettings.overallTheme
-        }
-      }
-      return ''
-    }
-
-    res.locals.buildCssPath = function(themeModifier) {
+    res.locals.buildCssPath = function(themeModifier = '') {
       const cssFileName = `${Settings.brandPrefix}${themeModifier}style.css`
 
       let path

@@ -29,15 +29,24 @@ describe('ProjectController', function() {
           url: 'chat.com'
         }
       },
+      hasThemes: true,
       siteUrl: 'mysite.com',
       algolia: {}
     }
     this.brandVariationDetails = {
       id: '12',
       active: true,
+      brand_id: 12,
       brand_name: 'The journal',
       home_url: 'http://www.thejournal.com/',
       publish_menu_link_html: 'Submit your paper to the <em>The Journal</em>'
+    }
+    this.ieeeBrandVariationDetails = {
+      id: '15',
+      active: true,
+      brand_id: 15,
+      brand_name: 'IEEE',
+      home_url: 'https://www.ieee.org/'
     }
     this.token = 'some-token'
     this.ProjectDeleter = {
@@ -107,10 +116,14 @@ describe('ProjectController', function() {
       hasFeature: sinon.stub()
     }
     this.BrandVariationsHandler = {
-      getBrandVariationById: sinon
-        .stub()
-        .callsArgWith(1, null, this.brandVariationDetails)
+      getBrandVariationById: sinon.stub()
     }
+    this.BrandVariationsHandler.getBrandVariationById
+      .withArgs('12')
+      .callsArgWith(1, null, this.brandVariationDetails)
+    this.BrandVariationsHandler.getBrandVariationById
+      .withArgs('15')
+      .callsArgWith(1, null, this.ieeeBrandVariationDetails)
     this.TpdsProjectFlusher = {
       flushProjectToTpdsIfNeeded: sinon.stub().yields()
     }
@@ -203,7 +216,11 @@ describe('ProjectController', function() {
       ip: '192.170.18.1'
     }
     this.res = {
-      locals: {},
+      locals: {
+        buildCssPath(themeModifier) {
+          return `/stylesheets/${themeModifier}style.css`
+        }
+      },
       setTimeout: sinon.stub()
     }
 
@@ -211,7 +228,6 @@ describe('ProjectController', function() {
     for (const fn of [
       'preloadCommonResources',
       'preloadCss',
-      'getCssThemeModifier',
       'preloadFont',
       'preloadImg',
       'finishPreloading'
@@ -956,6 +972,12 @@ describe('ProjectController', function() {
         owner_ref: '59fc84d5fbea77482d436e1b',
         brandVariationId: '12'
       }
+      this.ieeeProject = {
+        name: 'ieee branded proj',
+        _id: '000000000000000000001337',
+        owner_ref: '59fc84d5fbea77482d436e1b',
+        brandVariationId: '15'
+      }
       this.user = {
         _id: '588f3ddae8ebc1bac07c9fa4',
         ace: {
@@ -1102,24 +1124,19 @@ describe('ProjectController', function() {
     })
 
     describe('resource hints', function() {
-      it('should query for a branded css theme', function(done) {
-        this.ProjectGetter.getProject.callsArgWith(2, null, this.brandedProject)
-
-        this.res.render = (pageName, opts) => {
-          this.res.locals.getCssThemeModifier
-            .calledWith(opts.userSettings, this.brandVariationDetails)
-            .should.equal(true)
+      it('should preload the branded css theme', function(done) {
+        this.ProjectGetter.getProject.callsArgWith(2, null, this.ieeeProject)
+        this.res.render = () => {
+          this.res.locals.preloadCss.calledWith('ieee-').should.equal(true)
           done()
         }
         this.ProjectController.loadEditor(this.req, this.res)
       })
 
-      it('should preload the branded css theme', function(done) {
-        const modifier = 'BRAND-'
-        this.res.locals.getCssThemeModifier.returns(modifier)
-
+      it('should preload the user defined css theme', function(done) {
+        this.user.ace.overallTheme = 'light-'
         this.res.render = () => {
-          this.res.locals.preloadCss.calledWith(modifier).should.equal(true)
+          this.res.locals.preloadCss.calledWith('light-').should.equal(true)
           done()
         }
         this.ProjectController.loadEditor(this.req, this.res)
