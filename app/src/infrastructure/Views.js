@@ -9,7 +9,7 @@ const viewList = globby
   .sync('app/views/**/*.pug', {
     onlyFiles: true,
     concurrency: 1,
-    ignore: '**/_*.pug'
+    ignore: ['**/_*.pug', '**/_*/*.pug']
   })
   .concat(
     globby.sync('modules/*/app/views/**/*.pug', {
