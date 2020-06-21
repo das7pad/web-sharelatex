@@ -12,12 +12,12 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import App from '../../../base'
+import getMeta from '../../../utils/meta'
 const MAX_PROJECT_NAME_LENGTH = 150
 
 export default App.controller('ProjectNameController', function(
   $scope,
   $element,
-  ExposedSettings,
   settings,
   ide
 ) {
@@ -67,7 +67,7 @@ export default App.controller('ProjectNameController', function(
   return $scope.$watch('project.name', function(name) {
     if (name != null) {
       window.document.title =
-        name + ` - Online LaTeX Editor ${ExposedSettings.appName}`
+        name + ` - Online LaTeX Editor ${getMeta('ol-appName')}`
       return $scope.$applyAsync(
         () =>
           // This ensures that the element is measured *after* the binding is done (i.e. project name is rendered).

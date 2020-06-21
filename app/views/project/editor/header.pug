@@ -37,6 +37,7 @@ header.toolbar.toolbar-header.toolbar-with-labels(
 		)
 			i.fa.fa-file-pdf-o
 
+	meta(id="ol-appName" content=settings.appName)
 	.toolbar-center.project-name(ng-controller="ProjectNameController")
 		span.name(
 			ng-dblclick="!permissions.admin || startRenaming()",
