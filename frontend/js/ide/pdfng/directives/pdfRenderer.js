@@ -60,7 +60,7 @@ export default App.factory('PDFRenderer', function(
           url: this.url,
           // lazy loaded worker
           worker: PDFJS.worker,
-          cMapUrl: staticPath('vendor/pdfjs-dist/cmaps/'),
+          cMapUrl: staticPath('/vendor/pdfjs-dist/cmaps/'),
           cMapPacked: true,
           disableFontFace,
           // Enable fetching with Range headers to restrict individual

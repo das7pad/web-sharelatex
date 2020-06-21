@@ -1,7 +1,6 @@
 const Settings =
   require('settings-sharelatex') || require('../../../config/settings.defaults')
 const { URL } = require('url')
-const Path = require('path')
 
 const HAS_MULTIPLE_LANG = Object.keys(Settings.i18n.subdomainLang).length > 1
 const LNG_TO_SPEC = new Map(
@@ -19,8 +18,7 @@ if (['development', 'test'].includes(process.env.NODE_ENV)) {
   webpackManifest = require('../../../public/manifest.json')
 }
 
-const cdnAvailable = Settings.cdn && Settings.cdn.web && !!Settings.cdn.web.host
-const staticFilesBase = cdnAvailable ? Settings.cdn.web.host : '/'
+const staticFilesBase = Settings.cdn.web.host.replace(/\/$/, '')
 
 module.exports = function(webRouter) {
   webRouter.use(function(req, res, next) {
@@ -94,14 +92,7 @@ module.exports = function(webRouter) {
     }
 
     res.locals.staticPath = function(path) {
-      if (staticFilesBase === '/') {
-        return path.indexOf('/') === 0 ? path : '/' + path
-      }
-      if (path.indexOf('/') === 0) {
-        // preserve the path component of the base url
-        path = path.substring(1)
-      }
-      return new URL(path, staticFilesBase).href
+      return staticFilesBase + path
     }
 
     res.locals.buildJsPath = function(jsFile) {
@@ -169,8 +160,8 @@ module.exports = function(webRouter) {
 
 function cspMiddleware() {
   const csp = Settings.security.csp
-  const cdnOrigin = cdnAvailable
-    ? new URL(Settings.cdn.web.host).origin
+  const cdnOrigin = staticFilesBase.startsWith('http')
+    ? new URL(staticFilesBase).origin
     : undefined
   const compilesOrigin = Settings.pdfDownloadDomain
     ? new URL(Settings.pdfDownloadDomain).origin
@@ -237,7 +228,7 @@ function cspMiddleware() {
       fontSrc.push('fonts.googleapis.com')
     }
 
-    if (cdnAvailable) {
+    if (cdnOrigin) {
       if (cfg.connectCDN) {
         // e.g. pdfjs cmaps or /launchpad for ide blob check
         connectSrc.push(cdnOrigin)

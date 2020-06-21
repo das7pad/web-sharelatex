@@ -21,6 +21,7 @@ describe('ExpressLocalsTests', function() {
         }
       },
       analytics: { ga: { token: '' }, gaOptimize: { id: '' } },
+      cdn: { web: { host: '' } },
       saml: { ukamf: { initPath: '/' } }
     }
     this.user_id = '386010482601212345061012'

@@ -9,7 +9,7 @@ const base = getMeta(
     if (url === '/') return component + '/'
     return component + '/' + url
   }, '')
-)
+).replace(/\/$/, '')
 
 export default function staticPath(path) {
   return base + path

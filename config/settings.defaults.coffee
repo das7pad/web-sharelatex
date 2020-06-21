@@ -203,8 +203,9 @@ module.exports = settings =
 		showSocialButtons: false
 		showComments: false
 
-	# cdn:
-	# 	web:
+	cdn:
+		web:
+			host: process.env.CDN_WEB_HOST || ''
 	# 		host:"http://nowhere.sharelatex.dev"
 	#		darkHost:"http://cdn.sharelatex.dev:3000"
 

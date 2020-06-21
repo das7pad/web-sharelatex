@@ -29,7 +29,7 @@ const SearchBox = ace.require('ace/ext/searchbox')
 
 // Set the base path that ace will fetch modes/snippets/workers from
 const syntaxValidationEnabled = true
-ace.config.set('basePath', staticPath('vendor/ace-builds/src-min-noconflict'))
+ace.config.set('basePath', staticPath('/vendor/ace-builds/src-min-noconflict'))
 
 // By default, don't use workers - enable them per-session as required
 ace.config.setDefaultValue('session', 'useWorker', false)

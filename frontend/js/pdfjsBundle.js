@@ -14,7 +14,7 @@ if (typeof window !== 'undefined' && 'Worker' in window) {
   const link = document.createElement('link')
   link.rel = 'prefetch'
   link.as = 'script'
-  link.href = staticPath('vendor/pdfjs-dist/build/pdf.worker.min.js')
+  link.href = staticPath('/vendor/pdfjs-dist/build/pdf.worker.min.js')
   link.onload = () => {
     pdfjsBundle.worker = new pdfjsBundle.PDFWorker()
   }
