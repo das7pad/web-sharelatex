@@ -1,4 +1,4 @@
-extends ../layout
+extends ../_layout
 
 block content
 	.content.content-alt
@@ -14,7 +14,7 @@ block content
 						.account-settings(ng-controller="AccountSettingsController", ng-cloak)
 
 							if hasFeature('affiliations')
-								include settings/user-affiliations
+								include settings/_user-affiliations
 
 							.row
 								.col-md-5
@@ -176,7 +176,7 @@ block content
 
 							if hasFeature('oauth')
 								hr
-								include settings/user-oauth
+								include settings/_user-oauth
 
 							hr
 

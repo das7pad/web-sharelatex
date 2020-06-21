@@ -82,11 +82,11 @@ div.full-size(
 		)
 
 		if !isRestrictedTokenMember
-			include ./review-panel
+			include ./_review-panel
 
 	.ui-layout-east
 		div(ng-if="ui.pdfLayout == 'sideBySide'")
-			include ./pdf
+			include ./_pdf
 
 	.ui-layout-resizer-controls.synctex-controls(
 		ng-show="!!pdf.url && settings.pdfViewer == 'pdfjs'"
@@ -111,7 +111,7 @@ div.full-size(
 	ng-if="ui.pdfLayout == 'flat'"
 	ng-show="ui.view == 'pdf'"
 )
-	include ./pdf
+	include ./_pdf
 
 // fallback, shown when no file/view is selected
 div.full-size.no-file-selection(

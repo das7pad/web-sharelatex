@@ -80,15 +80,15 @@ html(
 
 
 		- if(typeof(suppressNavbar) == "undefined")
-			include layout/navbar
+			include layout/_navbar
 
 		block content
 
 		- if(typeof(suppressFooter) == "undefined")
-			include layout/footer
+			include layout/_footer
 
 		!= moduleIncludes("contactModal", locals)
-		include sentry
+		include _sentry
 
 		block foot-scripts
 			script(type='text/javascript', async, defer, src=buildJsPath('libraries.js'))

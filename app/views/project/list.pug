@@ -1,4 +1,4 @@
-extends ../layout
+extends ../_layout
 
 block vars
 	- var suppressNavContentLinks = true
@@ -33,26 +33,26 @@ block content
 					span.sr-only #{translate("close")}
 				.system-message-content(ng-bind-html="htmlContent")
 
-			include ../translations/translation_message
+			include ../translations/_translation_message
 
 		.project-list-content(event-tracking=settings.overleaf ? "loads_v2_dash" : "", onboard=settings.overleaf ? "true" : "", event-tracking-trigger=settings.overleaf ? "load" : "", event-tracking-mb="true", event-segmentation="{location: 'dash', v2_onboard: true}")
 			.project-list-row(ng-cloak)
 				.project-list-container.row(ng-if="projects.length > 0")
 					.project-list-sidebar-wrapper.col-md-2.col-xs-3
 						aside.project-list-sidebar
-							include ./list/side-bar
+							include ./list/_side-bar
 
 					.project-list-main.col-md-10.col-xs-9
-						include ./list/notifications
-						include ./list/project-list
+						include ./list/_notifications
+						include ./list/_project-list
 
 				.project-list-empty.row(ng-if="projects.length === 0")
 					.project-list-empty-col.col-md-offset-2.col-md-8.col-md-offset-2.col-xs-8.col-xs-offset-2
-						include ./list/empty-project-list
+						include ./list/_empty-project-list
 						.row.row-spaced
 							.col-sm-12
-								include ./list/notifications
+								include ./list/_notifications
 
-		include ./list/modals
+		include ./list/_modals
 
-	//- include ./list/front-chat
+	//- include ./list/_front-chat

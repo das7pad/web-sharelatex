@@ -1,4 +1,4 @@
-extends ../layout
+extends ../_layout
 
 block vars
 	- var suppressNavbar = true
@@ -59,7 +59,7 @@ block content
 						span.sr-only #{translate("close")}
 					.system-message-content(ng-bind-html="htmlContent")
 
-		include ./editor/left-menu
+		include ./editor/_left-menu
 
 		#chat-wrapper.full-size(
 			layout="chat",
@@ -72,12 +72,12 @@ block content
 			ng-cloak
 		)
 			.ui-layout-center
-				include ./editor/header
+				include ./editor/_header
 
-				include ./editor/share
+				include ./editor/_share
 				!= moduleIncludes("publish:body", locals)
 
-				include ./editor/history/toolbarV2.pug
+				include ./editor/history/_toolbarV2.pug
 
 				main#ide-body(
 					ng-cloak,
@@ -92,19 +92,19 @@ block content
 					custom-toggler-msg-when-closed=hasFeature('custom-togglers') ? translate("tooltip_show_filetree") : false
 				)
 					.ui-layout-west
-						include ./editor/file-tree
-						include ./editor/history/fileTreeV2
+						include ./editor/_file-tree
+						include ./editor/history/_fileTreeV2
 
 					.ui-layout-center
-						include ./editor/editor
-						include ./editor/binary-file
-						include ./editor/history
+						include ./editor/_editor
+						include ./editor/_binary-file
+						include ./editor/_history
 
 			.ui-layout-east
 				if !isRestrictedTokenMember
-					include ./editor/chat
+					include ./editor/_chat
 
-	include ./editor/hotkeys
+	include ./editor/_hotkeys
 
 	script(type="text/ng-template", id="genericMessageModalTemplate")
 		.modal-header

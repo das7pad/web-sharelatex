@@ -1,4 +1,4 @@
-extends ../../../../../app/views/layout
+extends ../../../../../app/views/_layout
 
 block content
 	meta(id="ol-user" data-json content=user)
@@ -20,5 +20,5 @@ block content
 					tab(heading="Subscriptions")
 						include ./_subscription-list
 
-		include ../../../../../app/views/project/list/modals
+		include ../../../../../app/views/project/list/_modals
 		include ./_modals
