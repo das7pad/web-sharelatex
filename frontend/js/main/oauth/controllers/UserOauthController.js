@@ -1,4 +1,5 @@
 import App from '../../../base'
+import getMeta from '../../../utils/meta'
 
 export default App.controller('UserOauthController', function(
   $http,
@@ -20,7 +21,7 @@ export default App.controller('UserOauthController', function(
   }
 
   $scope.unlink = providerId => {
-    if (window.ExposedSettings.isOverleaf) {
+    if (getMeta('ol-isOverleaf')) {
       // UI
       $scope.providers[providerId].ui = {
         hasError: false,

@@ -172,7 +172,6 @@ module.exports = function(webRouter) {
     res.locals.settings = Settings
 
     res.locals.ExposedSettings = {
-      isOverleaf: !!Settings.overleaf,
       appName: Settings.appName,
       hasSamlBeta: req.session.samlBeta,
       hasSamlFeature: Features.hasFeature('saml'),
