@@ -12,15 +12,15 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import App from '../../../base'
+import getMeta from '../../../utils/meta'
 
 export default App.controller('SettingsController', function(
   $scope,
-  ExposedSettings,
   settings,
   ide,
   _
 ) {
-  const validRootDocExtensions = ExposedSettings.validRootDocExtensions
+  const validRootDocExtensions = getMeta('ol-validRootDocExtensions')
   const validRootDocRegExp = new RegExp(
     `\\.(${validRootDocExtensions.join('|')})$`,
     'i'

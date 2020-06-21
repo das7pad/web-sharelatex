@@ -62,6 +62,7 @@ aside#left-menu.full-size(
 			!= moduleIncludes("editorLeftMenu:editing_services", locals)
 
 	h4(ng-show="!anonymous") #{translate("settings")}
+	meta(id='ol-validRootDocExtensions' data-json content=settings.validRootDocExtensions)
 	form.settings(ng-controller="SettingsController", ng-show="!anonymous")
 		.containter-fluid
 			.form-controls(ng-show="permissions.write")
