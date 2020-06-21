@@ -102,10 +102,10 @@ describe('ExpressLocalsTests', function() {
         })
 
         it('should set the header for css', function() {
-          this.res.locals.preloadCss('MODIFIER-')
+          this.res.locals.preloadCss('light-')
           this.res.locals.finishPreloading()
           expect(this.res.headers).to.deep.equal({
-            Link: '</stylesheets/MODIFIER-style.css>;rel=preload;as=style'
+            Link: '</stylesheets/light-style.css>;rel=preload;as=style'
           })
         })
 

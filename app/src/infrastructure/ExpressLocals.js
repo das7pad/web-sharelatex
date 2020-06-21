@@ -20,6 +20,24 @@ if (!IS_DEV_ENV) {
   // exists when the web server boots. We therefore ignore the manifest file in
   // dev reload
   webpackManifest = require(`../../../public/manifest.json`)
+} else {
+  Object.assign(webpackManifest, {
+    'MathJaxBundle.js': '/js/MathJaxBundle.js',
+    'libraries.js': '/js/libraries.js',
+    'ide.js': '/js/ide.js',
+    'ideLibraries.js': '/js/ideLibraries.js',
+    'ieee-style.css': '/stylesheets/iee-style.css',
+    'light-style.css': '/stylesheets/light-style.css',
+    'main.js': '/js/main.js',
+    'rich-text.js': '/js/rich-text.js',
+    'style.css': '/stylesheets/style.css',
+    'vendors~rich-text.js': '/js/vendors~rich-text.js',
+    'vendors~sentry.js': '/js/vendors~sentry.js',
+    'vendor/pdfjs-dist/build/pdf.worker.min.js':
+      '/vendor/pdfjs-dist/build/pdf.worker.min.js',
+    'vendor/stylesheets/highlight-github.css':
+      '/vendor/stylesheets/highlight-github.css'
+  })
 }
 
 const cdnAvailable = Settings.cdn && Settings.cdn.web && !!Settings.cdn.web.host
@@ -108,39 +126,12 @@ module.exports = function(webRouter) {
     }
 
     res.locals.buildJsPath = function(jsFile) {
-      let path
-      if (IS_DEV_ENV) {
-        // In dev: resolve path within JS asset directory
-        // We are *not* guaranteed to have a manifest file when the server
-        // starts up
-        path = Path.join('/js', jsFile)
-      } else {
-        // In production: resolve path from webpack manifest file
-        // We are guaranteed to have a manifest file since webpack compiles in
-        // the build
-        path = webpackManifest[jsFile]
-      }
-
-      return res.locals.staticPath(path)
+      return res.locals.staticPath(webpackManifest[jsFile])
     }
 
     res.locals.buildCssPath = function(themeModifier = '') {
       const cssFileName = `${themeModifier}style.css`
-
-      let path
-      if (IS_DEV_ENV) {
-        // In dev: resolve path within CSS asset directory
-        // We are *not* guaranteed to have a manifest file when the server
-        // starts up
-        path = Path.join('/stylesheets/', cssFileName)
-      } else {
-        // In production: resolve path from webpack manifest file
-        // We are guaranteed to have a manifest file since webpack compiles in
-        // the build
-        path = webpackManifest[cssFileName]
-      }
-
-      return res.locals.staticPath(path)
+      return res.locals.staticPath(webpackManifest[cssFileName])
     }
 
     res.locals.buildImgPath = function(imgFile) {
