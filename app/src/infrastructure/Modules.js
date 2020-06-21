@@ -1,198 +1,115 @@
-/* eslint-disable
-    camelcase,
-    max-len,
-    no-path-concat,
-    no-unused-vars,
-    one-var,
-*/
-// TODO: This file was created by bulk-decaffeinate.
-// Fix any style issues and re-enable lint.
-/*
- * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
- * DS102: Remove unnecessary code created because of implicit returns
- * DS103: Rewrite code to no longer use __guard__
- * DS201: Simplify complex destructure assignments
- * DS205: Consider reworking code to avoid use of IIFEs
- * DS207: Consider shorter variations of null checks
- * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
- */
 let Modules
-const fs = require('fs')
 const Path = require('path')
+const glob = require('glob')
 const pug = require('pug')
 const async = require('async')
-
-const MODULE_BASE_PATH = Path.resolve(__dirname + '/../../../modules')
 
 module.exports = Modules = {
   modules: [],
   loadModules() {
-    for (const moduleName of Array.from(fs.readdirSync(MODULE_BASE_PATH))) {
-      const modulePath = Path.join(MODULE_BASE_PATH, moduleName)
-      if (
-        fs.existsSync(Path.join(modulePath, 'index.js')) ||
-        fs.existsSync(Path.join(modulePath, 'index.coffee'))
-      ) {
-        const loadedModule = require(Path.join(
-          MODULE_BASE_PATH,
-          moduleName,
-          'index'
-        ))
-        loadedModule.name = moduleName
+    glob
+      .sync(`${__dirname}/../../../modules/*/index.js`)
+      .map(Path.dirname)
+      .forEach(modulePath => {
+        const loadedModule = require(modulePath)
+        loadedModule.path = modulePath
         this.modules.push(loadedModule)
-      }
-    }
-    return Modules.attachHooks()
+      })
+    Modules.attachHooks()
   },
 
   applyRouter(webRouter, privateApiRouter, publicApiRouter) {
-    return Array.from(this.modules).map(module =>
-      __guardMethod__(module.router, 'apply', o =>
-        o.apply(webRouter, privateApiRouter, publicApiRouter)
-      )
-    )
+    for (const module of this.modules) {
+      if (module.router && typeof module.router.apply === 'function') {
+        module.router.apply(webRouter, privateApiRouter, publicApiRouter)
+      }
+    }
   },
 
   applyNonCsrfRouter(webRouter, privateApiRouter, publicApiRouter) {
-    return (() => {
-      const result = []
-      for (const module of Array.from(this.modules)) {
-        if (module.nonCsrfRouter != null) {
-          module.nonCsrfRouter.apply(
-            webRouter,
-            privateApiRouter,
-            publicApiRouter
-          )
-        }
-        result.push(
-          __guardMethod__(module.router, 'applyNonCsrfRouter', o =>
-            o.applyNonCsrfRouter(webRouter, privateApiRouter, publicApiRouter)
-          )
+    for (const module of this.modules) {
+      if (module.nonCsrfRouter) {
+        module.nonCsrfRouter.apply(webRouter, privateApiRouter, publicApiRouter)
+      }
+      if (
+        module.router &&
+        typeof module.router.applyNonCsrfRouter === 'function'
+      ) {
+        module.router.applyNonCsrfRouter(
+          webRouter,
+          privateApiRouter,
+          publicApiRouter
         )
       }
-      return result
-    })()
+    }
   },
 
-  viewIncludes: {},
-  loadViewIncludes(app) {
-    this.viewIncludes = {}
-    return Array.from(this.modules).map(module =>
-      (() => {
-        const result = []
-        const object = module.viewIncludes || {}
-        for (const view in object) {
-          const partial = object[view]
-          if (!this.viewIncludes[view]) {
-            this.viewIncludes[view] = []
-          }
-          const filePath = Path.join(
-            MODULE_BASE_PATH,
-            module.name,
-            'app/views',
-            partial + '.pug'
-          )
-          result.push(
-            this.viewIncludes[view].push(
-              pug.compileFile(filePath, { doctype: 'html' })
-            )
-          )
+  viewIncludes: new Map(),
+  loadViewIncludes() {
+    this.viewIncludes.clear()
+    for (const module of this.modules) {
+      Object.entries(module.viewIncludes || {}).forEach(([view, partial]) => {
+        if (!this.viewIncludes.has(view)) {
+          this.viewIncludes.set(view, [])
         }
-        return result
-      })()
-    )
+        const filePath = Path.join(module.path, 'app/views', partial + '.pug')
+        this.viewIncludes
+          .get(view)
+          .push(pug.compileFile(filePath, { doctype: 'html' }))
+      })
+    }
   },
 
   moduleIncludes(view, locals) {
-    const compiledPartials = Modules.viewIncludes[view] || []
-    let html = ''
-    for (const compiledPartial of Array.from(compiledPartials)) {
-      const d = new Date()
-      html += compiledPartial(locals)
-    }
-    return html
+    const compiledPartials = Modules.viewIncludes.get(view) || []
+    return compiledPartials.reduce(
+      (html, compiledPartial) => html + compiledPartial(locals),
+      ''
+    )
   },
 
   moduleIncludesAvailable(view) {
-    return (Modules.viewIncludes[view] || []).length > 0
+    return Modules.viewIncludes.has(view)
   },
 
   linkedFileAgentsIncludes() {
     const agents = {}
-    for (const module of Array.from(this.modules)) {
-      for (const name in module.linkedFileAgents) {
-        if (
-          Object.prototype.hasOwnProperty.call(module.linkedFileAgents, name)
-        ) {
-          const agentFunction = module.linkedFileAgents[name]
+    for (const module of this.modules) {
+      Object.entries(module.linkedFileAgents || {}).forEach(
+        ([name, agentFunction]) => {
           agents[name] = agentFunction()
         }
-      }
+      )
     }
     return agents
   },
 
   attachHooks() {
-    return (() => {
-      const result = []
-      for (var module of Array.from(this.modules)) {
-        if (module.hooks != null) {
-          result.push(
-            (() => {
-              const result1 = []
-              for (const hook in module.hooks) {
-                const method = module.hooks[hook]
-                result1.push(Modules.hooks.attach(hook, method))
-              }
-              return result1
-            })()
-          )
-        } else {
-          result.push(undefined)
-        }
-      }
-      return result
-    })()
+    for (const module of this.modules) {
+      Object.entries(module.hooks || {}).forEach(([hook, method]) => {
+        Modules.hooks.attach(hook, method)
+      })
+    }
   },
 
   hooks: {
-    _hooks: {},
+    _hooks: new Map(),
     attach(name, method) {
-      if (this._hooks[name] == null) {
-        this._hooks[name] = []
+      if (!this._hooks.has(name)) {
+        this._hooks.set(name, [])
       }
-      return this._hooks[name].push(method)
+      this._hooks.get(name).push(method)
     },
 
-    fire(name, ...rest) {
-      const adjustedLength = Math.max(rest.length, 1),
-        args = rest.slice(0, adjustedLength - 1),
-        callback = rest[adjustedLength - 1]
-      const methods = this._hooks[name] || []
-      const call_methods = methods.map(method => cb =>
-        method(...Array.from(args), cb)
-      )
-      return async.series(call_methods, function(error, results) {
-        if (error != null) {
-          return callback(error)
-        }
-        return callback(null, results)
-      })
+    fire(name, ...args) {
+      const callback = args.pop()
+      const methods = this._hooks.get(name) || []
+      function fanOut(method, cb) {
+        method(...args, cb)
+      }
+      async.mapSeries(methods, fanOut, callback)
     }
   }
 }
 
 Modules.loadModules()
-
-function __guardMethod__(obj, methodName, transform) {
-  if (
-    typeof obj !== 'undefined' &&
-    obj !== null &&
-    typeof obj[methodName] === 'function'
-  ) {
-    return transform(obj, methodName)
-  } else {
-    return undefined
-  }
-}
