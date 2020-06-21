@@ -5,13 +5,13 @@
 */
 
 import App from '../../../base'
+import getMeta from '../../../utils/meta'
 
 export default App.controller('UserAffiliationsController', function(
   $scope,
   UserAffiliationsDataService,
   $q,
   $window,
-  ExposedSettings,
   _
 ) {
   $scope.userEmails = []
@@ -20,8 +20,8 @@ export default App.controller('UserAffiliationsController', function(
   $scope.closeInstitutionNotification = type => {
     $scope.hideInstitutionNotifications[type] = true
   }
-  $scope.samlBetaSession = ExposedSettings.hasSamlBeta
-  $scope.samlInitPath = ExposedSettings.samlInitPath
+  $scope.samlBetaSession = getMeta('ol-hasSamlBeta')
+  $scope.samlInitPath = getMeta('ol-samlInitPath')
 
   const LOCAL_AND_DOMAIN_REGEX = /([^@]+)@(.+)/
   const EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\ ".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA -Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
@@ -54,7 +54,7 @@ export default App.controller('UserAffiliationsController', function(
   }
 
   const _ssoAvailableForInstitution = institution => {
-    if (!ExposedSettings.hasSamlFeature) return false
+    if (!getMeta('ol-hasSamlFeature')) return false
     if (!institution) return false
     if (institution.ssoEnabled) return true
     if ($scope.samlBetaSession && institution.ssoBeta) return true

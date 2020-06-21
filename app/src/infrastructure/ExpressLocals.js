@@ -173,9 +173,6 @@ module.exports = function(webRouter) {
 
     res.locals.ExposedSettings = {
       appName: Settings.appName,
-      hasSamlBeta: req.session.samlBeta,
-      hasSamlFeature: Features.hasFeature('saml'),
-      samlInitPath: Settings.saml.ukamf.initPath,
       emailConfirmationDisabled: Settings.emailConfirmationDisabled,
       recaptchaSiteKeyV3: Settings.recaptcha && Settings.recaptcha.siteKeyV3,
       recaptchaDisabled: Settings.recaptcha && Settings.recaptcha.disabled,

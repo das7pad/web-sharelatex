@@ -1,4 +1,5 @@
 import App from '../../base'
+import getMeta from '../../utils/meta'
 
 const ExposedSettings = window.ExposedSettings
 App.controller('NotificationsController', function($scope, $http) {
@@ -6,7 +7,7 @@ App.controller('NotificationsController', function($scope, $http) {
     notification.hide = false
   }
 
-  $scope.samlInitPath = ExposedSettings.samlInitPath
+  $scope.samlInitPath = getMeta('ol-samlInitPath')
 
   $scope.dismiss = notification => {
     if (!notification._id) {
@@ -76,11 +77,11 @@ App.controller('EmailNotificationController', function(
 ) {
   $scope.userEmails = []
   const _ssoAvailable = email => {
-    if (!ExposedSettings.hasSamlFeature) return false
+    if (!getMeta('ol-hasSamlFeature')) return false
     if (email.samlProviderId) return true
     if (!email.affiliation || !email.affiliation.institution) return false
     if (email.affiliation.institution.ssoEnabled) return true
-    if (ExposedSettings.hasSamlBeta && email.affiliation.institution.ssoBeta) {
+    if (getMeta('ol-hasSamlBeta') && email.affiliation.institution.ssoBeta) {
       return true
     }
     return false
