@@ -479,6 +479,7 @@ module.exports = settings =
 		else process.env.NODE_ENV == 'production'
 	)
 	debugPugTemplates: process.env.DEBUG_PUG_TEMPLATES == 'true'
+	loadPrecompiledPugViews: process.env.NODE_ENV == 'production'
 
 	# When true, only allow invites to be sent to email addresses that
 	# already have user accounts

@@ -244,6 +244,7 @@ build_prod: clean_build_artifacts
 			app/templates \
 			app/views \
 			config \
+			generated/views/ \
 			modules/*/app/ \
 			modules/*/index.js \
 			public/manifest.json \

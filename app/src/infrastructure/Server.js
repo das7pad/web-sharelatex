@@ -226,7 +226,9 @@ const enableWebRouter =
 if (enableWebRouter || notDefined(enableWebRouter)) {
   logger.info('providing web router')
 
-  if (app.get('env') === 'production') {
+  if (Settings.loadPrecompiledPugViews) {
+    Views.loadPrecompiledViews(app)
+  } else if (app.get('env') === 'production') {
     logger.info('precompiling views for web in production environment')
     Views.precompileViews(app)
   }

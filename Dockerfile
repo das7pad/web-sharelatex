@@ -31,3 +31,6 @@ USER node
 FROM dev as webpack
 USER root
 RUN /docker_cleanup.sh npm run webpack:production
+
+# precompile views
+RUN /docker_cleanup.sh node app/src/infrastructure/Views.js

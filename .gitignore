@@ -60,5 +60,7 @@ config/*.coffee
 
 modules/**/Makefile
 
+/generated/
+
 # Sentry secrets file (injected by CI)
 .sentryclirc

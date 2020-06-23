@@ -1,7 +1,7 @@
 let Modules
 const Path = require('path')
 const glob = require('glob')
-const pug = require('pug')
+const Views = require('./Views')
 const async = require('async')
 const Settings = require('settings-sharelatex')
 
@@ -54,12 +54,15 @@ module.exports = Modules = {
           this.viewIncludes.set(view, [])
         }
         const filePath = Path.join(module.path, 'app/views', partial + '.pug')
-        this.viewIncludes.get(view).push(
-          pug.compileFile(filePath, {
+        let template = Views.getTemplate(filePath)
+        if (!template) {
+          const pug = require('pug')
+          template = pug.compileFile(filePath, {
             doctype: 'html',
             compileDebug: Settings.debugPugTemplates
           })
-        )
+        }
+        this.viewIncludes.get(view).push(template)
       })
     }
   },
