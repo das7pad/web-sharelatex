@@ -70,7 +70,6 @@ if (Settings.behindProxy) {
 
 app.set('views', Path.join(__dirname, '/../../views'))
 app.set('view engine', 'pug')
-Modules.loadViewIncludes(app)
 
 app.use(bodyParser.urlencoded({ extended: true, limit: '2mb' }))
 app.use(bodyParser.json({ limit: Settings.max_json_request_size }))
@@ -249,6 +248,8 @@ if (enableWebRouter || notDefined(enableWebRouter)) {
   if (app.get('env') === 'test') {
     app.enable('view cache')
   }
+
+  Modules.loadViewIncludes(app)
 }
 
 metrics.injectMetricsRoute(webRouter)
