@@ -325,7 +325,7 @@ class User {
   }
 
   saveProject(project, callback) {
-    db.projects.update({ _id: project._id }, project, callback)
+    db.projects.update({ _id: project._id }, { $set: project }, callback)
   }
 
   createProject(name, options, callback) {
