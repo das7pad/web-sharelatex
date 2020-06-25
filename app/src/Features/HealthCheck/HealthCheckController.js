@@ -64,7 +64,7 @@ module.exports = {
 
 const smokeTests = require('./../../../../test/smoke/src/SmokeTests')
 function prettyJSON(blob) {
-  return JSON.stringify(blob, null, 2)
+  return JSON.stringify(blob, null, 2) + '\n'
 }
 function runSmokeTest(res) {
   res.contentType('application/json')
