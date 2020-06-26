@@ -80,14 +80,6 @@ async function runSmokeTest(stats) {
           'error clearing open-project rate limit',
           stats
         ).withCause(err)
-      }),
-    RateLimiter.promises
-      .clearRateLimit('overleaf-login', Settings.smokeTest.rateLimitSubject)
-      .catch(err => {
-        throw new Failure(
-          'error clearing overleaf-login rate limit',
-          stats
-        ).withCause(err)
       })
   ]).finally(() => {
     step = Date.now()
