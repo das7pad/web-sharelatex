@@ -60,27 +60,36 @@ async function runSmokeTest(stats) {
   steps.push({ init: step - lastStep })
   lastStep = step
 
-  // TODO(das7pad): timeouts for redis calls
-  await Promise.all([
-    LoginRateLimiter.promises
-      .recordSuccessfulLogin(Settings.smokeTest.user)
-      .catch(err => {
-        throw new Failure(
-          'error clearing login failure rate limit',
-          stats
-        ).withCause(err)
-      }),
-    RateLimiter.promises
-      .clearRateLimit(
-        'open-project',
-        `${Settings.smokeTest.projectId}:${Settings.smokeTest.userId}`
+  let timeoutCleanupRateLimits
+  await Promise.race([
+    new Promise((resolve, reject) => {
+      timeoutCleanupRateLimits = setTimeout(
+        reject,
+        4000,
+        new Failure('cleanupRateLimits timed out', stats)
       )
-      .catch(err => {
-        throw new Failure(
-          'error clearing open-project rate limit',
-          stats
-        ).withCause(err)
-      })
+    }),
+    Promise.all([
+      LoginRateLimiter.promises
+        .recordSuccessfulLogin(Settings.smokeTest.user)
+        .catch(err => {
+          throw new Failure(
+            'error clearing login failure rate limit',
+            stats
+          ).withCause(err)
+        }),
+      RateLimiter.promises
+        .clearRateLimit(
+          'open-project',
+          `${Settings.smokeTest.projectId}:${Settings.smokeTest.userId}`
+        )
+        .catch(err => {
+          throw new Failure(
+            'error clearing open-project rate limit',
+            stats
+          ).withCause(err)
+        })
+    ]).finally(() => clearTimeout(timeoutCleanupRateLimits))
   ]).finally(() => {
     step = Date.now()
     steps.push({ cleanupRateLimits: step - lastStep })
