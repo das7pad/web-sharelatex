@@ -5,7 +5,9 @@ const OError = require('@overleaf/o-error')
 const LoginRateLimiter = require('../../../app/src/Features/Security/LoginRateLimiter')
 const RateLimiter = require('../../../app/src/infrastructure/RateLimiter')
 const requestModule = require('request')
+const { createConnection } = require('net')
 const { promisify } = require('util')
+const { Agent } = require('http')
 
 class SmokeTestFailure extends OError {
   constructor(message, stats) {
@@ -15,10 +17,20 @@ class SmokeTestFailure extends OError {
 }
 const Failure = SmokeTestFailure
 
-const agent = require('http').Agent()
 // like the curl option `--resolve DOMAIN:PORT:127.0.0.1`
-agent.createConnection = function alwaysConnectToLocalhost(options, callback) {
-  return require('net').createConnection(port, '127.0.0.1', callback)
+class LocalhostAgent extends Agent {
+  createConnection(options, callback) {
+    return createConnection(port, '127.0.0.1', callback)
+  }
+}
+// degrade the 'HttpOnly; Secure;' flags of the cookie
+class InsecureCookieJar extends requestModule.jar().constructor {
+  setCookie(...args) {
+    const cookie = super.setCookie(...args)
+    cookie.secure = false
+    cookie.httpOnly = false
+    return cookie
+  }
 }
 
 module.exports = runSmokeTest
@@ -29,23 +41,14 @@ async function runSmokeTest(stats) {
   const steps = []
   stats.steps = steps
 
-  const jar = require('request').jar()
-  const actualJarSetCookie = jar.setCookie
-  jar.setCookie = function degradeCookieSecurity() {
-    const cookie = actualJarSetCookie.apply(this, arguments)
-    cookie.secure = false
-    cookie.httpOnly = false
-    return cookie
-  }
-
   const request = promisify(
     requestModule.defaults({
+      agent: new LocalhostAgent(),
       baseUrl: `http://smoke${Settings.cookieDomain}/`,
-      jar: jar,
-      agent: agent,
       headers: {
         'X-Forwarded-Proto': 'https'
       },
+      jar: new InsecureCookieJar(),
       qs: {
         setLng: 'en'
       },
