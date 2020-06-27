@@ -157,11 +157,10 @@ async function runSmokeTest(stats) {
         throw new Error('body is not of type string')
       }
 
-      // Check that the project id is present in the javascript that loads up the project
       if (
-        body.indexOf(
+        !body.includes(
           `<meta id="ol-project_id" content="${Settings.smokeTest.projectId}">`
-        ) === -1
+        )
       ) {
         throw new Error('project page html does not have project_id')
       }
@@ -193,7 +192,7 @@ async function runSmokeTest(stats) {
         throw new Error('body does not have correct title')
       }
 
-      if (body.indexOf('ProjectPageController') === -1) {
+      if (!body.includes('ProjectPageController')) {
         throw new Error('body does not have correct angular controller')
       }
     })
