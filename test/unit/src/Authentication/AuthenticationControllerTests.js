@@ -769,8 +769,7 @@ describe('AuthenticationController', function() {
 
   describe('_redirectToRegisterPage', function() {
     beforeEach(function() {
-      this.req.path = '/target/url'
-      this.req.query = { extra_query: 'foo' }
+      this.req.originalUrl = '/target/url?extra_query=foo'
       this.AuthenticationController._redirectToRegisterPage(this.req, this.res)
     })
 
@@ -793,8 +792,7 @@ describe('AuthenticationController', function() {
 
   describe('_redirectToLoginPage', function() {
     beforeEach(function() {
-      this.req.path = '/target/url'
-      this.req.query = { extra_query: 'foo' }
+      this.req.originalUrl = '/target/url?extra_query=foo'
       this.AuthenticationController._redirectToLoginPage(this.req, this.res)
     })
 
@@ -849,7 +847,7 @@ describe('AuthenticationController', function() {
     beforeEach(function() {
       this.req = { session: {} }
       this.req.path = '/somewhere'
-      this.req.query = { one: '1' }
+      this.req.originalUrl = '/somewhere?one=1'
     })
 
     it('should set redirect property on session', function() {
