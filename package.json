@@ -62,7 +62,6 @@
     "multer": "https://github.com/overleaf/multer/archive/7a2928d7ea2da02dd92888ea1c9ba5704e07aeeb.tar.gz",
     "nodemailer": "2.1.0",
     "p-limit": "^2.3.0",
-    "parse-data-url": "^2.0.0",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "pug-runtime": "^2.0.4",
