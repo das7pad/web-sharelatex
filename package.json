@@ -49,6 +49,7 @@
     "express-http-proxy": "^1.6.0",
     "express-session": "^1.17.1",
     "fs-extra": "^4.0.2",
+    "glob": "^7.0.0",
     "globby": "^6.1.0",
     "helmet": "^3.22.0",
     "lodash": "^4.17.15",
