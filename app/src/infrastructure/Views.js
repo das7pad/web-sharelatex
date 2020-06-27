@@ -1,30 +1,16 @@
 const logger = require('logger-sharelatex')
-const globby = require('globby')
+const glob = require('glob')
 const Settings = require('settings-sharelatex')
 const fs = require('fs')
 const Path = require('path')
 
 // Generate list of view names from app/views
 
-const viewList = globby
-  .sync('app/views/**/*.pug', {
-    onlyFiles: true,
-    concurrency: 1,
-    ignore: ['**/_*.pug', '**/_*/*.pug']
+const viewList = glob
+  .sync('{,modules/*/}app/views/**/*.pug', {
+    ignore: ['**/_*.pug', '**/_*/**/*.pug']
   })
-  .concat(
-    globby.sync('modules/*/app/views/**/*.pug', {
-      onlyFiles: true,
-      concurrency: 1,
-      ignore: '**/_*.pug'
-    })
-  )
-  .map(x => {
-    return x.replace(/\.pug$/, '') // strip trailing .pug extension
-  })
-  .filter(x => {
-    return !/^_/.test(x)
-  })
+  .map(x => x.replace(/\.pug$/, '')) // strip trailing .pug extension
 
 const GENERATED_VIEWS = Path.join(__dirname, '../../../generated/views')
 
