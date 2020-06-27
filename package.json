@@ -77,7 +77,6 @@
     "url-parse": "^1.4.7",
     "utf-8-validate": "^5.0.2",
     "uuid": "^3.0.1",
-    "valid-data-url": "^2.0.0",
     "valid-url": "^1.0.9",
     "xml2js": "^0.4.22",
     "xregexp": "^4.3.0",
