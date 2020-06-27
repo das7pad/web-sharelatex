@@ -1,6 +1,4 @@
 const Settings = require('settings-sharelatex')
-const ownPort = Settings.internal.web.port || Settings.port || 3000
-const port = Settings.web.web_router_port || ownPort // send requests to web router if this is the api process
 const OError = require('@overleaf/o-error')
 const LoginRateLimiter = require('../../../app/src/Features/Security/LoginRateLimiter')
 const RateLimiter = require('../../../app/src/infrastructure/RateLimiter')
@@ -17,12 +15,17 @@ class SmokeTestFailure extends OError {
 }
 const Failure = SmokeTestFailure
 
+// send requests to web router if this is the api process
+const OWN_PORT = Settings.port || Settings.internal.web.port || 3000
+const PORT = Settings.web.web_router_port || OWN_PORT
+
 // like the curl option `--resolve DOMAIN:PORT:127.0.0.1`
 class LocalhostAgent extends Agent {
   createConnection(options, callback) {
-    return createConnection(port, '127.0.0.1', callback)
+    return createConnection(PORT, '127.0.0.1', callback)
   }
 }
+
 // degrade the 'HttpOnly; Secure;' flags of the cookie
 class InsecureCookieJar extends requestModule.jar().constructor {
   setCookie(...args) {
