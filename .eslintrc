@@ -50,7 +50,6 @@
       "files": ["**/test/frontend/**/*.js", "**/test/frontend/import_tests.js"],
       "globals": {
         "expect": true,
-        "define": true,
         "$": true
       }
     },
@@ -66,10 +65,8 @@
       // Frontend specific rules
       "files": ["**/frontend/js/**/*.js"],
       "globals": {
-        "define": true,
         "$": true,
         "angular": true,
-        "_": true,
         "ace": true,
         "ga": true,
         "Raven": true, // Backwards compat for Sentry reporting

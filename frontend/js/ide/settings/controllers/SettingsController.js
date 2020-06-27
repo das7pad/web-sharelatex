@@ -1,3 +1,4 @@
+import _ from 'lodash'
 /* eslint-disable
     camelcase,
     max-len,
@@ -17,8 +18,7 @@ import getMeta from '../../../utils/meta'
 export default App.controller('SettingsController', function(
   $scope,
   settings,
-  ide,
-  _
+  ide
 ) {
   const validRootDocExtensions = getMeta('ol-validRootDocExtensions')
   const validRootDocRegExp = new RegExp(

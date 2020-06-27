@@ -77,9 +77,11 @@ module.exports = CompileController = {
         validationProblems
       ) => {
         if (error) {
+          Metrics.inc('compile-error')
           return next(error)
         }
-        return res.json({
+        Metrics.inc('compile-status', 1, { status: status })
+        res.json({
           status,
           outputFiles,
           compileGroup: limits != null ? limits.compileGroup : undefined,

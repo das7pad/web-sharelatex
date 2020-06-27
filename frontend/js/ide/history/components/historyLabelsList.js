@@ -1,3 +1,4 @@
+import _ from 'lodash'
 /* eslint-disable
     max-len,
 */
@@ -12,12 +13,12 @@
 import App from '../../../base'
 import ColorManager from '../../colors/ColorManager'
 import displayNameForUser from '../util/displayNameForUser'
-const historyLabelsListController = function($scope, $element, $attrs, _) {
+const historyLabelsListController = function($scope, $element, $attrs) {
   const ctrl = this
   ctrl.isDragging = false
   ctrl.versionsWithLabels = []
   $scope.$watchCollection('$ctrl.labels', function(labels) {
-    if (labels != null && labels.length > 0) {
+    if (labels) {
       const groupedLabelsHash = _.groupBy(labels, 'version')
       ctrl.versionsWithLabels = _.map(groupedLabelsHash, (labels, version) => {
         return {

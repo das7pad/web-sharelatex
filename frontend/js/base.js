@@ -18,7 +18,6 @@ import './libraries'
 import './modules/recursionHelper'
 import './modules/errorCatcher'
 import './modules/storage'
-import './utils/underscore'
 
 const App = angular
   .module('SharelatexApp', [
@@ -26,7 +25,6 @@ const App = angular
     'autocomplete',
     'RecursionHelper',
     'ng-context-menu',
-    'underscore',
     'ngSanitize',
     'ErrorCatcher',
     'storage',

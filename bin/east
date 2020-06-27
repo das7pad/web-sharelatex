@@ -13,5 +13,5 @@ elif [ -e "$SCRIPTPATH/../migrations" ]; then
   # Hello OSS Developer!
   exec npx east "$@"
 else
-  exec ${SCRIPTPATH}/run web_v2 bin/east "$@"
+  exec ${SCRIPTPATH}/run web bin/east "$@"
 fi

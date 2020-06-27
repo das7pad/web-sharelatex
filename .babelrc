@@ -1,4 +1,7 @@
 {
-  "presets": [["@babel/env", { "modules": false }]],
+  "presets": [["@babel/env", { "modules": false ,
+      "useBuiltIns": "usage",
+      "corejs": { "version": 3 }
+    }]],
   "plugins": ["angularjs-annotate"]
 }

@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import App from '../../../base'
 import getMeta from '../../../utils/meta'
 App.controller('ShareProjectModalController', function(

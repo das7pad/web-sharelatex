@@ -1,12 +1,13 @@
 import getMeta from './meta'
-import staticPath from './staticPath'
 
 if (getMeta('ol-sentry')) {
   import(/* webpackChunkName: "sentry" */ '@sentry/browser').then(Sentry => {
     let eventCount = 0
 
     const baseConfig = {
-      whitelistUrls: [window.location.origin, staticPath('/')],
+      // Ignore errors unless they come from our origins
+      // Adapted from: https://docs.sentry.io/platforms/javascript/#decluttering-sentry
+      whitelistUrls: [new RegExp(getMeta('ol-sentry').allowedOriginRegex)],
 
       ignoreErrors: [
         // Ignore very noisy error

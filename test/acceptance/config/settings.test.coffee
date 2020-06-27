@@ -12,6 +12,7 @@ module.exports =
 	mongo:
 		url: process.env['MONGO_CONNECTION_STRING'] || process.env['MONGO_URL'] || "mongodb://#{process.env['MONGO_HOST'] or '127.0.0.1'}/sharelatex_dev"
 
+	cacheStaticAssets: true
 	enableSubscriptions: true
 	allowPublicAccess: true
 

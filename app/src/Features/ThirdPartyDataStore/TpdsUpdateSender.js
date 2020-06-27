@@ -1,3 +1,4 @@
+const { ObjectId } = require('../../infrastructure/mongojs')
 const _ = require('lodash')
 const { callbackify } = require('util')
 const logger = require('logger-sharelatex')
@@ -8,6 +9,7 @@ const settings = require('settings-sharelatex')
 
 const CollaboratorsGetter = require('../Collaborators/CollaboratorsGetter')
   .promises
+const UserGetter = require('../User/UserGetter.js').promises
 
 const tpdsUrl = _.get(settings, ['apis', 'thirdPartyDataStore', 'url'])
 
@@ -27,23 +29,22 @@ async function addDoc(options) {
 
 async function addEntity(options) {
   const projectUserIds = await getProjectUsersIds(options.project_id)
-  if (!projectUserIds.length) {
-    return
-  }
 
-  const job = {
-    method: 'post',
-    headers: {
-      sl_entity_rev: options.rev,
-      sl_project_id: options.project_id,
-      sl_all_user_ids: JSON.stringify(projectUserIds)
-    },
-    uri: buildTpdsUrl(projectUserIds[0], options.project_name, options.path),
-    title: 'addFile',
-    streamOrigin: options.streamOrigin
-  }
+  for (const userId of projectUserIds) {
+    const job = {
+      method: 'post',
+      headers: {
+        sl_entity_rev: options.rev,
+        sl_project_id: options.project_id,
+        sl_all_user_ids: JSON.stringify([userId])
+      },
+      uri: buildTpdsUrl(userId, options.project_name, options.path),
+      title: 'addFile',
+      streamOrigin: options.streamOrigin
+    }
 
-  return enqueue(options.project_id, 'pipeStreamFrom', job)
+    await enqueue(userId, 'pipeStreamFrom', job)
+  }
 }
 
 async function addFile(options) {
@@ -79,22 +80,21 @@ async function deleteEntity(options) {
   metrics.inc('tpds.delete-entity')
 
   const projectUserIds = await getProjectUsersIds(options.project_id)
-  if (!projectUserIds.length) {
-    return
-  }
 
-  const job = {
-    method: 'delete',
-    headers: {
-      sl_project_id: options.project_id,
-      sl_all_user_ids: JSON.stringify(projectUserIds)
-    },
-    uri: buildTpdsUrl(projectUserIds[0], options.project_name, options.path),
-    title: 'deleteEntity',
-    sl_all_user_ids: JSON.stringify(projectUserIds)
-  }
+  for (const userId of projectUserIds) {
+    const job = {
+      method: 'delete',
+      headers: {
+        sl_project_id: options.project_id,
+        sl_all_user_ids: JSON.stringify([userId])
+      },
+      uri: buildTpdsUrl(userId, options.project_name, options.path),
+      title: 'deleteEntity',
+      sl_all_user_ids: JSON.stringify([userId])
+    }
 
-  return enqueue(options.project_id, 'standardHttpRequest', job)
+    await enqueue(userId, 'standardHttpRequest', job)
+  }
 }
 
 async function enqueue(group, method, job) {
@@ -104,12 +104,13 @@ async function enqueue(group, method, job) {
     return
   }
   try {
-    await request({
+    const response = await request({
       uri: `${tpdsWorkerUrl}/enqueue/web_to_tpds_http_requests`,
       json: { group, job, method },
       method: 'post',
       timeout: 5 * 1000
     })
+    return response
   } catch (err) {
     // log error and continue
     logger.error({ err, group, job, method }, 'error enqueueing tpdsworker job')
@@ -119,36 +120,53 @@ async function enqueue(group, method, job) {
 async function getProjectUsersIds(projectId) {
   // get list of all user ids with access to project. project owner
   // will always be the first entry in the list.
-  // TODO: filter this list to only return users with dropbox linked
-  return CollaboratorsGetter.getInvitedMemberIds(projectId)
+  const [
+    ownerUserId,
+    ...invitedUserIds
+  ] = await CollaboratorsGetter.getInvitedMemberIds(projectId)
+  // if there are no invited users, always return the owner
+  if (!invitedUserIds.length) {
+    return [ownerUserId]
+  }
+  // filter invited users to only return those with dropbox linked
+  const dropboxUsers = await UserGetter.getUsers(
+    {
+      _id: { $in: invitedUserIds.map(id => ObjectId(id)) },
+      'dropbox.access_token.uid': { $ne: null }
+    },
+    {
+      _id: 1
+    }
+  )
+  const dropboxUserIds = dropboxUsers.map(user => user._id)
+  return [ownerUserId, ...dropboxUserIds]
 }
 
 async function moveEntity(options) {
   metrics.inc('tpds.move-entity')
 
   const projectUserIds = await getProjectUsersIds(options.project_id)
-  if (!projectUserIds.length) {
-    return
-  }
   const { endPath, startPath } = buildMovePaths(options)
 
-  const job = {
-    method: 'put',
-    title: 'moveEntity',
-    uri: `${tpdsUrl}/user/${projectUserIds[0]}/entity`,
-    headers: {
-      sl_project_id: options.project_id,
-      sl_entity_rev: options.rev,
-      sl_all_user_ids: JSON.stringify(projectUserIds)
-    },
-    json: {
-      user_id: projectUserIds[0],
-      endPath,
-      startPath
+  for (const userId of projectUserIds) {
+    const job = {
+      method: 'put',
+      title: 'moveEntity',
+      uri: `${tpdsUrl}/user/${userId}/entity`,
+      headers: {
+        sl_project_id: options.project_id,
+        sl_entity_rev: options.rev,
+        sl_all_user_ids: JSON.stringify([userId])
+      },
+      json: {
+        user_id: userId,
+        endPath,
+        startPath
+      }
     }
-  }
 
-  return enqueue(options.project_id, 'standardHttpRequest', job)
+    await enqueue(userId, 'standardHttpRequest', job)
+  }
 }
 
 async function pollDropboxForUser(userId) {

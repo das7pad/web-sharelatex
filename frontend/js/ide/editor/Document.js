@@ -1,3 +1,4 @@
+import _ from 'lodash'
 /* eslint-disable
     camelcase,
     handle-callback-err,
@@ -541,6 +542,9 @@ export default Document = (function() {
       if (callback == null) {
         callback = function(error) {}
       }
+      this.ide.pushEvent('leaveDoc', {
+        doc_id: this.doc_id
+      })
       sl_console.log('[_leaveDoc] Sending leaveDoc request')
       return this.ide.socket.emit('leaveDoc', this.doc_id, error => {
         if (error != null) {

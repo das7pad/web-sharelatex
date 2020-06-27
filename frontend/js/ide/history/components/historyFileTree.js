@@ -1,3 +1,6 @@
+import _ from 'lodash'
+/* eslint-disable
+ */
 // TODO: This file was created by bulk-decaffeinate.
 // Fix any style issues and re-enable lint.
 /*
@@ -6,7 +9,7 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 import App from '../../../base'
-const historyFileTreeController = function($scope, $element, $attrs, _) {
+const historyFileTreeController = function($scope, $element, $attrs) {
   const ctrl = this
   ctrl.handleEntityClick = file => ctrl.onSelectedFileChange({ file })
   ctrl._fileTree = []

@@ -53,8 +53,12 @@ module.exports = {
       {
         // Pass application JS files through babel-loader, compiling to ES5
         test: /\.js$/,
-        // Only compile application files (dependencies are in ES5 already)
-        exclude: /node_modules/,
+        // Only compile application files (npm and vendored dependencies are in
+        // ES5 already)
+        exclude: [
+          /node_modules/,
+          path.resolve(__dirname, 'frontend/js/vendor')
+        ],
         use: [
           {
             loader: 'babel-loader',
@@ -156,16 +160,6 @@ module.exports = {
             options: 'angular'
           }
         ]
-      },
-      {
-        // Expose lodash global variable
-        test: require.resolve('lodash'),
-        use: [
-          {
-            loader: 'expose-loader',
-            options: '_'
-          }
-        ]
       }
     ]
   },
@@ -206,9 +200,6 @@ module.exports = {
   },
 
   plugins: [
-    new webpack.ProvidePlugin({
-      _: 'lodash'
-    }),
     // Generate a manifest.json file which is used by the backend to map the
     // base filenames to the generated output filenames
     new ManifestPlugin({

@@ -1,4 +1,5 @@
-/* global sinon, _ */
+import _ from 'lodash'
+/* global sinon */
 
 import CodeMirror from 'codemirror'
 

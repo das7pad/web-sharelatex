@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { Pos } from 'codemirror'
 import Fuse from 'fuse.js'
 

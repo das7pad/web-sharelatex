@@ -11,6 +11,7 @@
 /* global io */
 
 import SocketIoShim from './SocketIoShim'
+
 let ConnectionManager
 const ONEHOUR = 1000 * 60 * 60
 
@@ -133,7 +134,14 @@ export default ConnectionManager = (function() {
 
       // handle network-level websocket errors (e.g. failed dns lookups)
 
+      let connectionAttempt = 1
       const connectionErrorHandler = err => {
+        if (
+          window.wsRetryHandshake &&
+          connectionAttempt++ < window.wsRetryHandshake
+        ) {
+          return setTimeout(() => this.ide.socket.socket.connect(), 100)
+        }
         this.updateConnectionManagerState('error')
         sl_console.log('socket.io error', err)
         if (this.wsUrl && !window.location.href.match(/ws=fallback/)) {

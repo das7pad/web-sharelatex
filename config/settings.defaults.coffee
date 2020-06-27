@@ -27,6 +27,11 @@ else
 		user: undefined
 		pass: undefined
 
+intFromEnv = (name, defaultValue) ->
+	if defaultValue in [null, undefined] or typeof defaultValue != 'number'
+		throw new Error("Bad default integer value for setting: #{name}, #{defaultValue}")
+	parseInt(process.env[name], 10) || defaultValue
+
 module.exports = settings =
 	enableLegacyRegistration: true
 
@@ -205,7 +210,7 @@ module.exports = settings =
 
 	cdn:
 		web:
-			host: process.env.CDN_WEB_HOST || ''
+			host: cdnUrl = process.env.CDN_WEB_HOST || ''
 	# 		host:"http://nowhere.sharelatex.dev"
 	#		darkHost:"http://cdn.sharelatex.dev:3000"
 
@@ -213,6 +218,12 @@ module.exports = settings =
 	# that are sent out, generated links, etc.
 	siteUrl : siteUrl = process.env['PUBLIC_URL'] or 'http://localhost:3000'
 
+	lockManager:
+		lockTestInterval: intFromEnv('LOCK_MANAGER_LOCK_TEST_INTERVAL', 50)
+		maxTestInterval: intFromEnv('LOCK_MANAGER_MAX_TEST_INTERVAL', 1000)
+		maxLockWaitTime: intFromEnv('LOCK_MANAGER_MAX_LOCK_WAIT_TIME', 10000)
+		redisLockExpiry: intFromEnv('LOCK_MANAGER_REDIS_LOCK_EXPIRY', 30)
+		slowExecutionThreshold: intFromEnv('LOCK_MANAGER_SLOW_EXECUTION_THRESHOLD', 5000)
 
 	# Used to close the editor off to users
 	editorIsOpen: process.env['EDITOR_IS_OPEN'] or true
@@ -223,6 +234,7 @@ module.exports = settings =
 	wsUrlBeta: process.env['WEBSOCKET_URL_BETA']
 
 	wsUrlV2Percentage: parseInt(process.env['WEBSOCKET_URL_V2_PERCENTAGE'] || '0', 10)
+	wsRetryHandshake: parseInt(process.env['WEBSOCKET_RETRY_HANDSHAKE'] || '5', 10)
 
 	# cookie domain
 	# use full domain for cookies to only be accessible from that domain,
@@ -256,8 +268,8 @@ module.exports = settings =
 	httpAuthUsers: httpAuthUsers
 
 	twoFactorAuthentication:
-		enabled: false
-		requiredForStaff: false
+		enabled: process.env['TWO_FACTOR_AUTHENTICATION_ENABLED'] == 'true'
+		requiredForStaff: process.env['TWO_FACTOR_AUTHENTICATION_REQUIRED_FOR_STAFF'] == 'true'
 
 	saml:
 		ukamf:
@@ -407,15 +419,19 @@ module.exports = settings =
 	# Client-side error logging is provided by getsentry.com
 	sentry:
 		frontend:
+			# overleaf
+			allowedOriginRegex: "^(#{siteUrl}#{cdnUrl and '|' + cdnUrl})/"
+			# official
 			commit: process.env.COMMIT
-			release: process.env.RELEASE
-			environment: process.env.NODE_ENV
+			release: process.env.SENTRY_RELEASE || process.env.RELEASE
+			environment: process.env.SENTRY_ENVIRONMENT || process.env.NODE_ENV
 			dsn: process.env.SENTRY_DSN_FRONTEND
 			# For all options see
 			# https://docs.sentry.io/error-reporting/configuration/?platform=javascript
 
 	# Production Settings
 	# -------------------
+	debugPugTemplates: process.env['DEBUG_PUG_TEMPLATES'] == 'true'
 
 	# add resource hints for css, fonts, images and java script files
 	#
@@ -478,7 +494,6 @@ module.exports = settings =
 		then process.env.PRECOMPILE_VIEWS == 'true'
 		else process.env.NODE_ENV == 'production'
 	)
-	debugPugTemplates: process.env.DEBUG_PUG_TEMPLATES == 'true'
 	loadPrecompiledPugViews: process.env.NODE_ENV == 'production'
 
 	# When true, only allow invites to be sent to email addresses that

@@ -1,3 +1,4 @@
+import _ from 'lodash'
 /* eslint-disable
     max-len,
     no-return-assign,
@@ -11,8 +12,7 @@ export default App.controller('UserAffiliationsController', function(
   $scope,
   UserAffiliationsDataService,
   $q,
-  $window,
-  _
+  $window
 ) {
   $scope.userEmails = []
   $scope.linkedInstitutionIds = []

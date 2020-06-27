@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import { rangesEqual } from './utils'
 
 const INDENTED_ENVIROMENTS = ['itemize', 'enumerate']

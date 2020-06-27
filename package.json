@@ -12,8 +12,9 @@
     "public": "./public"
   },
   "browserslist": [
-    "last 2 versions",
-    "ie >= 10"
+    "last 1 year",
+    "ie 11",
+    "firefox esr"
   ],
   "scripts": {
     "test:acceptance:run_dir": "mocha --recursive --reporter spec --timeout 25000 --exit --grep=$MOCHA_GREP --require test/acceptance/bootstrap.js",
@@ -38,7 +39,7 @@
     "async": "0.6.2",
     "basic-auth-connect": "^1.0.0",
     "bcrypt": "^3.0.6",
-    "body-parser": "^1.13.1",
+    "body-parser": "^1.19.0",
     "celebrate": "^10.0.1",
     "connect-redis": "^3.1.0",
     "cookie": "^0.2.3",
@@ -60,6 +61,7 @@
     "mongojs": "https://github.com/das7pad/mongojs/archive/e39e97bf289435e2d111c6201d3306b6b776d31e.tar.gz",
     "mongoose": "^5.9.20",
     "multer": "https://github.com/overleaf/multer/archive/7a2928d7ea2da02dd92888ea1c9ba5704e07aeeb.tar.gz",
+    "nocache": "^2.1.0",
     "nodemailer": "2.1.0",
     "p-limit": "^2.3.0",
     "passport": "^0.4.1",
@@ -98,7 +100,7 @@
     "chai-as-promised": "^7.1.1",
     "chaid": "^1.0.2",
     "codemirror": "^5.33.0",
-    "copy-webpack-plugin": "^5.0.4",
+    "copy-webpack-plugin": "^5.1.1",
     "core-js": "^3.6.2",
     "crypto-js": "^3.1.9-1",
     "css-loader": "^3.5.2",
@@ -107,7 +109,6 @@
     "expose-loader": "^0.7.5",
     "file-loader": "^5.0.2",
     "fuse.js": "^3.0.0",
-    "glob": "^7.1.6",
     "jquery": "^2.2.4",
     "karma": "^5.0.2",
     "karma-chai-sinon": "^0.1.5",
@@ -135,7 +136,7 @@
     "val-loader": "^1.1.1",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.10.3",
+    "webpack-dev-server": "^3.11.0",
     "webpack-manifest-plugin": "^2.2.0",
     "webpack-merge": "^4.2.2"
   }

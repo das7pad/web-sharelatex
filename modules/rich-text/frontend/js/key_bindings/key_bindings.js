@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import CodeMirror from 'codemirror'
 
 import { mac } from '../utils/browser'

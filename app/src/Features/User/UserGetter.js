@@ -9,27 +9,16 @@ const Features = require('../../infrastructure/Features')
 
 const UserGetter = {
   getUser(query, projection, callback) {
-    if (!query) {
-      return callback(new Error('no query provided'))
-    }
     if (arguments.length === 2) {
       callback = projection
       projection = {}
     }
-    if (typeof query === 'string') {
-      try {
-        query = { _id: ObjectId(query) }
-      } catch (e) {
-        return callback(null, null)
-      }
-    } else if (
-      query instanceof ObjectId ||
-      (query != null ? query._bsontype : undefined) === 'ObjectID'
-    ) {
-      query = { _id: query }
+    try {
+      query = normalizeQuery(query)
+      db.users.findOne(query, projection, callback)
+    } catch (err) {
+      callback(err)
     }
-
-    db.users.findOne(query, projection, callback)
   },
 
   getUserEmail(userId, callback) {
@@ -139,14 +128,13 @@ const UserGetter = {
     db.users.find(query, projection, callback)
   },
 
-  getUsers(userIds, projection, callback) {
+  getUsers(query, projection, callback) {
     try {
-      userIds = userIds.map(u => ObjectId(u.toString()))
-    } catch (error) {
-      return callback(error)
+      query = normalizeQuery(query)
+      db.users.find(query, projection, callback)
+    } catch (err) {
+      callback(err)
     }
-
-    db.users.find({ _id: { $in: userIds } }, projection, callback)
   },
 
   // check for duplicate email address. This is also enforced at the DB level
@@ -157,6 +145,22 @@ const UserGetter = {
       }
       callback(error)
     })
+  }
+}
+
+function normalizeQuery(query) {
+  if (!query) {
+    throw new Error('no query provided')
+  }
+  if (typeof query === 'string') {
+    return { _id: ObjectId(query) }
+  } else if (query instanceof ObjectId) {
+    return { _id: query }
+  } else if (Array.isArray(query)) {
+    const userIds = query.map(u => ObjectId(u.toString()))
+    return { _id: { $in: userIds } }
+  } else {
+    return query
   }
 }
 
