@@ -9,7 +9,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-const dateformat = require('dateformat')
+const moment = require('moment')
 const settings = require('settings-sharelatex')
 
 const currenySymbols = {
@@ -51,6 +51,6 @@ module.exports = {
     if (date == null) {
       return null
     }
-    return dateformat(date, 'dS mmmm yyyy')
+    return moment(date).format('Do MMM YY')
   }
 }

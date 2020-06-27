@@ -27,12 +27,11 @@ const sanitizeHtml = require('sanitize-html')
 const logger = require('logger-sharelatex')
 const _ = require('underscore')
 const async = require('async')
-const moment = require('moment')
 
 function formatWillEndAt(section) {
   if (section && section.will_end_at) {
-    section.will_end_at_formatted = moment(section.will_end_at).format(
-      'Do MMM YY'
+    section.will_end_at_formatted = SubscriptionFormatters.formatDate(
+      section.will_end_at
     )
   }
 }
