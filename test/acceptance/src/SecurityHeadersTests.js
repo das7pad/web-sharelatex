@@ -46,10 +46,6 @@ const assert_has_no_cache_headers = function(response) {
   assert.isUndefined(headers.pragma)
   return assert.isUndefined(headers.expires)
 }
-const assert_has_asset_caching_headers = function(response) {
-  const { headers } = response
-  assert.equal(headers['cache-control'], 'public, max-age=31536000')
-}
 
 describe('SecurityHeaders', function() {
   beforeEach(function() {
@@ -74,13 +70,6 @@ describe('SecurityHeaders', function() {
     return request.get('/', (err, res, body) => {
       assert_has_no_cache_headers(res)
       return done()
-    })
-  })
-
-  it('should have caching headers on static assets', function(done) {
-    request.get('/favicon.ico', (err, res) => {
-      assert_has_asset_caching_headers(res)
-      done(err)
     })
   })
 
@@ -124,21 +113,6 @@ describe('SecurityHeaders', function() {
           assert_has_cache_headers(res)
           return done()
         })
-      }
-    )
-  })
-
-  it('should have caching headers on static assets when user is logged in', function(done) {
-    async.series(
-      [
-        cb => this.user.login(cb),
-        cb => this.user.request.get('/favicon.ico', cb),
-        cb => this.user.logout(cb)
-      ],
-      (err, results) => {
-        const res = results[1][0]
-        assert_has_asset_caching_headers(res)
-        done()
       }
     )
   })
