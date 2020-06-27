@@ -97,7 +97,7 @@ async function runSmokeTest(stats) {
   })
 
   const _csrf = await request({ url: 'dev/csrf' })
-    .then(async response => {
+    .then(response => {
       if (response.statusCode !== 200) {
         throw new Error(`unexpected response code: ${response.statusCode}`)
       }
@@ -125,7 +125,7 @@ async function runSmokeTest(stats) {
       password: Settings.smokeTest.password
     }
   })
-    .then(async response => {
+    .then(response => {
       const body = response.body
       // login success and login failure both receive a status code of 200
       // see the frontend logic on how to handle the response:
@@ -147,7 +147,7 @@ async function runSmokeTest(stats) {
     })
 
   await request({ uri: `project/${Settings.smokeTest.projectId}` })
-    .then(async response => {
+    .then(response => {
       if (response.statusCode !== 200) {
         throw new Error(`unexpected response code: ${response.statusCode}`)
       }
@@ -177,7 +177,7 @@ async function runSmokeTest(stats) {
     })
 
   await request({ uri: 'project' })
-    .then(async response => {
+    .then(response => {
       if (response.statusCode !== 200) {
         throw new Error(`unexpected response code: ${response.statusCode}`)
       }
