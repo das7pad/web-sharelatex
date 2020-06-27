@@ -1,11 +1,11 @@
-const Settings = require('settings-sharelatex')
-const OError = require('@overleaf/o-error')
-const LoginRateLimiter = require('../../../app/src/Features/Security/LoginRateLimiter')
-const RateLimiter = require('../../../app/src/infrastructure/RateLimiter')
-const requestModule = require('request')
+const { Agent } = require('http')
 const { createConnection } = require('net')
 const { promisify } = require('util')
-const { Agent } = require('http')
+const OError = require('@overleaf/o-error')
+const requestModule = require('request')
+const Settings = require('settings-sharelatex')
+const LoginRateLimiter = require('../../../app/src/Features/Security/LoginRateLimiter')
+const RateLimiter = require('../../../app/src/infrastructure/RateLimiter')
 
 class SmokeTestFailure extends OError {
   constructor(message, stats) {
