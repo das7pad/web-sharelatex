@@ -30,7 +30,7 @@ describe('Features', function() {
     })
     describe('with saml setting', function() {
       beforeEach(function() {
-        this.settings.saml = true
+        this.settings.enableSaml = true
       })
       it('should return true', function() {
         expect(this.Features.externalAuthenticationSystemUsed()).to.be.true
@@ -47,6 +47,15 @@ describe('Features', function() {
   })
 
   describe('hasFeature', function() {
+    const defaults = SandboxedModule.require('settings-sharelatex', {
+      globals: {
+        process: { env: {} }
+      }
+    })
+    beforeEach(function() {
+      Object.assign(this.settings, defaults)
+    })
+
     describe('without any settings', function() {
       it('should return true', function() {
         expect(this.Features.hasFeature('registration')).to.be.true
@@ -57,22 +66,19 @@ describe('Features', function() {
         expect(this.Features.hasFeature('oauth')).to.be.false
         expect(this.Features.hasFeature('overleaf-integration')).to.be.false
         expect(this.Features.hasFeature('references')).to.be.false
-      })
-      it('should return undefined', function() {
-        expect(this.Features.hasFeature('affiliations')).to.be.undefined
-        expect(this.Features.hasFeature('analytics')).to.be.undefined
-        expect(this.Features.hasFeature('github-sync')).to.be.undefined
-        expect(this.Features.hasFeature('git-bridge')).to.be.undefined
-        expect(this.Features.hasFeature('homepage')).to.be.undefined
-        expect(this.Features.hasFeature('link-url')).to.be.undefined
-        expect(this.Features.hasFeature('saml')).to.be.undefined
+        expect(this.Features.hasFeature('affiliations')).to.be.false
+        expect(this.Features.hasFeature('analytics')).to.be.false
+        expect(this.Features.hasFeature('github-sync')).to.be.false
+        expect(this.Features.hasFeature('git-bridge')).to.be.false
+        expect(this.Features.hasFeature('homepage')).to.be.false
+        expect(this.Features.hasFeature('link-url')).to.be.false
+        expect(this.Features.hasFeature('saml')).to.be.false
       })
     })
     describe('with settings', function() {
       describe('empty overleaf object', function() {
         beforeEach(function() {
           this.settings.overleaf = {}
-          this.settings.apis = {}
         })
         it('should return true', function() {
           expect(this.Features.hasFeature('custom-togglers')).to.be.true
@@ -83,15 +89,13 @@ describe('Features', function() {
           expect(this.Features.hasFeature('oauth')).to.be.false
           expect(this.Features.hasFeature('references')).to.be.false
           expect(this.Features.hasFeature('templates-server-pro')).to.be.false
-        })
-        it('should return undefined', function() {
-          expect(this.Features.hasFeature('affiliations')).to.be.undefined
-          expect(this.Features.hasFeature('analytics')).to.be.undefined
-          expect(this.Features.hasFeature('github-sync')).to.be.undefined
-          expect(this.Features.hasFeature('git-bridge')).to.be.undefined
-          expect(this.Features.hasFeature('homepage')).to.be.undefined
-          expect(this.Features.hasFeature('link-url')).to.be.undefined
-          expect(this.Features.hasFeature('saml')).to.be.undefined
+          expect(this.Features.hasFeature('affiliations')).to.be.false
+          expect(this.Features.hasFeature('analytics')).to.be.false
+          expect(this.Features.hasFeature('github-sync')).to.be.false
+          expect(this.Features.hasFeature('git-bridge')).to.be.false
+          expect(this.Features.hasFeature('homepage')).to.be.false
+          expect(this.Features.hasFeature('link-url')).to.be.false
+          expect(this.Features.hasFeature('saml')).to.be.false
         })
         describe('with APIs', function() {
           beforeEach(function() {
@@ -111,9 +115,7 @@ describe('Features', function() {
             expect(this.Features.hasFeature('affiliations')).to.be.true
             expect(this.Features.hasFeature('analytics')).to.be.true
             expect(this.Features.hasFeature('custom-togglers')).to.be.true
-            expect(this.Features.hasFeature('link-url')).to.equal(
-              'https://www.overleaf.com'
-            )
+            expect(this.Features.hasFeature('link-url')).to.be.true
             expect(this.Features.hasFeature('overleaf-integration')).to.be.true
             expect(this.Features.hasFeature('references')).to.be.true
             expect(this.Features.hasFeature('registration')).to.be.true
@@ -121,12 +123,10 @@ describe('Features', function() {
           it('should return false', function() {
             expect(this.Features.hasFeature('oauth')).to.be.false
             expect(this.Features.hasFeature('templates-server-pro')).to.be.false
-          })
-          it('should return undefined', function() {
-            expect(this.Features.hasFeature('github-sync')).to.be.undefined
-            expect(this.Features.hasFeature('git-bridge')).to.be.undefined
-            expect(this.Features.hasFeature('homepage')).to.be.undefined
-            expect(this.Features.hasFeature('saml')).to.be.undefined
+            expect(this.Features.hasFeature('github-sync')).to.be.false
+            expect(this.Features.hasFeature('git-bridge')).to.be.false
+            expect(this.Features.hasFeature('homepage')).to.be.false
+            expect(this.Features.hasFeature('saml')).to.be.false
           })
           describe('with all other settings flags', function() {
             beforeEach(function() {
@@ -136,16 +136,14 @@ describe('Features', function() {
               this.settings.enableSaml = true
               this.settings.oauth = true
             })
-            it('should return true or return value', function() {
+            it('should return true', function() {
               expect(this.Features.hasFeature('affiliations')).to.be.true
               expect(this.Features.hasFeature('analytics')).to.be.true
               expect(this.Features.hasFeature('custom-togglers')).to.be.true
               expect(this.Features.hasFeature('github-sync')).to.be.true
               expect(this.Features.hasFeature('git-bridge')).to.be.true
               expect(this.Features.hasFeature('homepage')).to.be.true
-              expect(this.Features.hasFeature('link-url')).to.equal(
-                'https://www.overleaf.com'
-              )
+              expect(this.Features.hasFeature('link-url')).to.be.true
               expect(this.Features.hasFeature('oauth')).to.be.true
               expect(this.Features.hasFeature('overleaf-integration')).to.be
                 .true

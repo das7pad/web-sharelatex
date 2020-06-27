@@ -271,6 +271,9 @@ module.exports = settings =
 		enabled: process.env['TWO_FACTOR_AUTHENTICATION_ENABLED'] == 'true'
 		requiredForStaff: process.env['TWO_FACTOR_AUTHENTICATION_REQUIRED_FOR_STAFF'] == 'true'
 
+	enableGitBridge: false
+	enableGithubSync: false
+	enableSaml: !!process.env['SAML_UKAMF_INIT_PATH']
 	saml:
 		ukamf:
 			initPath: process.env['SAML_UKAMF_INIT_PATH']

@@ -13,16 +13,17 @@ const trackChangesModuleAvailable = fs.existsSync(
   `${__dirname}/../../../modules/track-changes`
 )
 
-const EXTERNAL_AUTHENTICATION_SYSTEM_USED =
-  Settings.ldap != null ||
-  Settings.enableSaml ||
-  (Settings.overleaf != null ? Settings.overleaf.oauth : undefined) != null
+function externalAuthenticationSystemUsed() {
+  return (
+    Settings.ldap != null ||
+    Settings.enableSaml ||
+    (Settings.overleaf != null ? Settings.overleaf.oauth : undefined) != null
+  )
+}
 
 const Features = {
-  EXTERNAL_AUTHENTICATION_SYSTEM_USED,
-  externalAuthenticationSystemUsed() {
-    return EXTERNAL_AUTHENTICATION_SYSTEM_USED
-  },
+  EXTERNAL_AUTHENTICATION_SYSTEM_USED: externalAuthenticationSystemUsed(),
+  externalAuthenticationSystemUsed,
 
   hasFeature(feature) {
     switch (feature) {
@@ -30,7 +31,7 @@ const Features = {
         return Settings.enableHomepage
       case 'registration':
         return (
-          !Features.EXTERNAL_AUTHENTICATION_SYSTEM_USED || Settings.overleaf
+          !Features.EXTERNAL_AUTHENTICATION_SYSTEM_USED || !!Settings.overleaf
         )
       case 'github-sync':
         return Settings.enableGithubSync
@@ -41,13 +42,13 @@ const Features = {
       case 'oauth':
         return !!Settings.oauth
       case 'templates-server-pro':
-        return Settings.overleaf == null
+        return !Settings.overleaf
       case 'affiliations':
       case 'analytics':
         // Checking both properties is needed for the time being to allow
         // enabling the feature in web-api and disabling in Server Pro
         // see https://github.com/overleaf/web-internal/pull/2127
-        return Settings.apis && Settings.apis.v1 && !!Settings.apis.v1.url
+        return !!(Settings.apis && Settings.apis.v1 && Settings.apis.v1.url)
       case 'overleaf-integration':
         return !!Settings.overleaf
       case 'references':
@@ -55,7 +56,9 @@ const Features = {
       case 'saml':
         return Settings.enableSaml
       case 'link-url':
-        return Settings.apis.linkedUrlProxy && Settings.apis.linkedUrlProxy.url
+        return !!(
+          Settings.apis.linkedUrlProxy && Settings.apis.linkedUrlProxy.url
+        )
       case 'public-registration':
         return publicRegistrationModuleAvailable
       case 'support':
