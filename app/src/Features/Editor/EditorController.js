@@ -15,7 +15,6 @@
  */
 const logger = require('logger-sharelatex')
 const Metrics = require('metrics-sharelatex')
-const sanitize = require('sanitizer')
 const ProjectEntityUpdateHandler = require('../Project/ProjectEntityUpdateHandler')
 const ProjectOptionsHandler = require('../Project/ProjectOptionsHandler')
 const ProjectDetailsHandler = require('../Project/ProjectDetailsHandler')
@@ -451,7 +450,6 @@ const EditorController = {
     if (callback == null) {
       callback = function(error) {}
     }
-    newName = sanitize.escape(newName)
     Metrics.inc('editor.rename-entity')
     return ProjectEntityUpdateHandler.renameEntity(
       project_id,

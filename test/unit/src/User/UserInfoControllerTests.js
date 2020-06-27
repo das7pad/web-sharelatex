@@ -26,12 +26,6 @@ describe('UserInfoController', function() {
   beforeEach(function() {
     this.UserDeleter = { deleteUser: sinon.stub().callsArgWith(1) }
     this.UserUpdater = { updatePersonalInfo: sinon.stub() }
-    this.sanitizer = {
-      escape(v) {
-        return v
-      }
-    }
-    sinon.spy(this.sanitizer, 'escape')
     this.UserGetter = {}
 
     this.UserInfoController = SandboxedModule.require(modulePath, {
@@ -43,7 +37,6 @@ describe('UserInfoController', function() {
         './UserUpdater': this.UserUpdater,
         './UserDeleter': this.UserDeleter,
         'logger-sharelatex': { log() {} },
-        sanitizer: this.sanitizer,
         '../Authentication/AuthenticationController': (this.AuthenticationController = {
           getLoggedInUserId: sinon.stub()
         })

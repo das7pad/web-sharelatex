@@ -21,7 +21,6 @@ const CompileManager = require('./CompileManager')
 const ClsiManager = require('./ClsiManager')
 const logger = require('logger-sharelatex')
 const request = require('request')
-const sanitize = require('sanitizer')
 const Settings = require('settings-sharelatex')
 const AuthenticationController = require('../Authentication/AuthenticationController')
 const UserGetter = require('../User/UserGetter')
@@ -245,8 +244,7 @@ module.exports = CompileController = {
   },
 
   _getSafeProjectName(project) {
-    const safeProjectName = project.name.replace(new RegExp('\\W', 'g'), '_')
-    return sanitize.escape(safeProjectName)
+    return project.name.replace(new RegExp('\\W', 'g'), '_')
   },
 
   deleteAuxFiles(req, res, next) {
