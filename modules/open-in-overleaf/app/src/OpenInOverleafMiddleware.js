@@ -13,7 +13,6 @@
 let OpenInOverleafMiddleware
 const Csrf = require('../../../../app/src/infrastructure/Csrf')
 const Path = require('path')
-const querystring = require('querystring')
 const AuthenticationController = require('../../../../app/src/Features/Authentication/AuthenticationController')
 
 // middleware to accept an external request and redirect to it via a gateway that adds a csrf token. Will also

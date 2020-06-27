@@ -13,7 +13,6 @@
 const SandboxedModule = require('sandboxed-module')
 const should = require('chai').should()
 const sinon = require('sinon')
-const querystring = require('querystring')
 const modulePath =
   '../../../../app/src/Features/Subscription/SubscriptionHandler'
 

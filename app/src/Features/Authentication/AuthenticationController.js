@@ -3,7 +3,6 @@ const LoginRateLimiter = require('../Security/LoginRateLimiter')
 const UserUpdater = require('../User/UserUpdater')
 const Metrics = require('metrics-sharelatex')
 const logger = require('logger-sharelatex')
-const querystring = require('querystring')
 const Settings = require('settings-sharelatex')
 const basicAuth = require('basic-auth-connect')
 const crypto = require('crypto')
@@ -14,6 +13,7 @@ const Analytics = require('../Analytics/AnalyticsManager')
 const passport = require('passport')
 const NotificationsBuilder = require('../Notifications/NotificationsBuilder')
 const UrlHelper = require('../Helpers/UrlHelper')
+const RedirectManager = require('../../infrastructure/RedirectManager')
 const AsyncFormHelper = require('../Helpers/AsyncFormHelper')
 const SudoModeHandler = require('../SudoMode/SudoModeHandler')
 
@@ -330,10 +330,7 @@ const AuthenticationController = (module.exports = {
 
   setRedirectInSession(req, value) {
     if (value == null) {
-      value =
-        Object.keys(req.query).length > 0
-          ? `${req.path}?${querystring.stringify(req.query)}`
-          : `${req.path}`
+      value = req.originalUrl
     }
     if (
       req.session != null &&
@@ -363,7 +360,7 @@ const AuthenticationController = (module.exports = {
       'user not logged in so redirecting to login page'
     )
     AuthenticationController.setRedirectInSession(req)
-    const url = `/login?${querystring.stringify(req.query)}`
+    const url = `/login${RedirectManager.getQueryString(req)}`
     res.redirect(url)
     Metrics.inc('security.login-redirect')
   },
@@ -384,7 +381,7 @@ const AuthenticationController = (module.exports = {
       'user not logged in so redirecting to register page'
     )
     AuthenticationController.setRedirectInSession(req)
-    const url = `/register?${querystring.stringify(req.query)}`
+    const url = `/register${RedirectManager.getQueryString(req)}`
     res.redirect(url)
     Metrics.inc('security.login-redirect')
   },

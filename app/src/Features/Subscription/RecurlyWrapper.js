@@ -16,7 +16,6 @@
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 let RecurlyWrapper
-const querystring = require('querystring')
 const crypto = require('crypto')
 const request = require('request')
 const Settings = require('settings-sharelatex')
