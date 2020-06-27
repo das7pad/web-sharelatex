@@ -18,7 +18,6 @@ const session = require('express-session')
 const RedisStore = require('connect-redis')(session)
 const bodyParser = require('./BodyParserWrapper')
 const cookieParser = require('cookie-parser')
-const bearerToken = require('express-bearer-token')
 
 const passport = require('passport')
 const LocalStrategy = require('passport-local').Strategy
@@ -72,7 +71,6 @@ app.set('view engine', 'pug')
 
 app.use(bodyParser.urlencoded({ extended: true, limit: '2mb' }))
 app.use(bodyParser.json({ limit: Settings.max_json_request_size }))
-app.use(bearerToken())
 
 app.use(metrics.http.monitor(logger))
 RedirectManager.apply(webRouter)

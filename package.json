@@ -46,7 +46,6 @@
     "csurf": "^1.11.0",
     "dateformat": "1.0.4-1.2.3",
     "express": "^4.17.1",
-    "express-bearer-token": "^2.4.0",
     "express-http-proxy": "^1.6.0",
     "express-session": "^1.17.1",
     "fs-extra": "^4.0.2",
