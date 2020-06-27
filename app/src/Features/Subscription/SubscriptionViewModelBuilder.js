@@ -23,7 +23,6 @@ const SubscriptionLocator = require('./SubscriptionLocator')
 const V1SubscriptionManager = require('./V1SubscriptionManager')
 const InstitutionsGetter = require('../Institutions/InstitutionsGetter')
 const PublishersGetter = require('../Publishers/PublishersGetter')
-const sanitizeHtml = require('sanitize-html')
 const logger = require('logger-sharelatex')
 const _ = require('underscore')
 const async = require('async')
@@ -235,16 +234,6 @@ module.exports = {
             trial_ends_at: recurlySubscription.trial_ends_at,
             activeCoupons: recurlyCoupons,
             account: recurlySubscription.account
-          }
-        }
-
-        for (const memberGroupSubscription of Array.from(
-          memberGroupSubscriptions
-        )) {
-          if (memberGroupSubscription.teamNotice) {
-            memberGroupSubscription.teamNotice = sanitizeHtml(
-              memberGroupSubscription.teamNotice
-            )
           }
         }
 
