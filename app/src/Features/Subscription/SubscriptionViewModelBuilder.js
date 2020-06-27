@@ -30,7 +30,8 @@ const async = require('async')
 function formatWillEndAt(section) {
   if (section && section.will_end_at) {
     section.will_end_at_formatted = SubscriptionFormatters.formatDate(
-      section.will_end_at
+      section.will_end_at,
+      false
     )
   }
 }

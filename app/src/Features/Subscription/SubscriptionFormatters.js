@@ -47,10 +47,10 @@ module.exports = {
     return `${symbol}${dollars}.${cents}`
   },
 
-  formatDate(date) {
+  formatDate(date, full = true) {
     if (date == null) {
       return null
     }
-    return moment(date).format('Do MMM YY')
+    return moment(date).format(full ? 'Do MMMM YYYY' : 'Do MMM YY')
   }
 }
