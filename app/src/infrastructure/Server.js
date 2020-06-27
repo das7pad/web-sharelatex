@@ -17,7 +17,6 @@ const SessionStoreManager = require('./SessionStoreManager')
 const session = require('express-session')
 const RedisStore = require('connect-redis')(session)
 const bodyParser = require('./BodyParserWrapper')
-const methodOverride = require('method-override')
 const cookieParser = require('cookie-parser')
 const bearerToken = require('express-bearer-token')
 
@@ -73,7 +72,6 @@ app.set('view engine', 'pug')
 
 app.use(bodyParser.urlencoded({ extended: true, limit: '2mb' }))
 app.use(bodyParser.json({ limit: Settings.max_json_request_size }))
-app.use(methodOverride())
 app.use(bearerToken())
 
 app.use(metrics.http.monitor(logger))
