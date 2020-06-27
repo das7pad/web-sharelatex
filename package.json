@@ -120,7 +120,6 @@
     "less-loader": "^6.0.0",
     "less-plugin-clean-css": "^1.5.1",
     "mini-css-extract-plugin": "^0.8.0",
-    "minimist": "1.2.5",
     "mkdirp": "https://registry.npmjs.org/mkdirp/-/mkdirp-0.5.1.tgz",
     "mocha": "^6.2.2",
     "mock-fs": "^4.11.0",
