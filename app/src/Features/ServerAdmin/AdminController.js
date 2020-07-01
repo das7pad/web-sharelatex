@@ -36,16 +36,6 @@ const oneMinInMs = 60 * 1000
 
 var updateOpenConnetionsMetrics = function() {
   metrics.gauge(
-    'open_connections.socketio',
-    __guard__(
-      __guard__(
-        __guard__(require('../../infrastructure/Server').io, x2 => x2.sockets),
-        x1 => x1.clients()
-      ),
-      x => x.length
-    )
-  )
-  metrics.gauge(
     'open_connections.http',
     _.size(__guard__(require('http').globalAgent, x3 => x3.sockets))
   )
