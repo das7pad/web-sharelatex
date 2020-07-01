@@ -1,81 +1,50 @@
 /* eslint-disable
     camelcase,
     handle-callback-err,
-    max-len,
     no-unused-vars,
 */
 // TODO: This file was created by bulk-decaffeinate.
 // Fix any style issues and re-enable lint.
 /*
  * decaffeinate suggestions:
- * DS101: Remove unnecessary use of Array.from
  * DS102: Remove unnecessary code created because of implicit returns
- * DS103: Rewrite code to no longer use __guard__
- * DS205: Consider reworking code to avoid use of IIFEs
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
 let AdminController
 const metrics = require('metrics-sharelatex')
 const logger = require('logger-sharelatex')
-const _ = require('underscore')
-const { User } = require('../../models/User')
-const { Project } = require('../../models/Project')
 const DocumentUpdaterHandler = require('../DocumentUpdater/DocumentUpdaterHandler')
 const Settings = require('settings-sharelatex')
-const util = require('util')
-const RecurlyWrapper = require('../Subscription/RecurlyWrapper')
-const SubscriptionHandler = require('../Subscription/SubscriptionHandler')
-const projectEntityHandler = require('../Project/ProjectEntityHandler')
 const TpdsUpdateSender = require('../ThirdPartyDataStore/TpdsUpdateSender')
 const TpdsProjectFlusher = require('../ThirdPartyDataStore/TpdsProjectFlusher')
 const EditorRealTimeController = require('../Editor/EditorRealTimeController')
 const SystemMessageManager = require('../SystemMessages/SystemMessageManager')
 
-const oneMinInMs = 60 * 1000
-
-var updateOpenConnetionsMetrics = function() {
-  metrics.gauge(
-    'open_connections.http',
-    _.size(__guard__(require('http').globalAgent, x3 => x3.sockets))
-  )
-  metrics.gauge(
-    'open_connections.https',
-    _.size(__guard__(require('https').globalAgent, x4 => x4.sockets))
-  )
-  return setTimeout(updateOpenConnetionsMetrics, oneMinInMs)
+const httpSockets = require('http').globalAgent.sockets
+const httpsSockets = require('https').globalAgent.sockets
+function getTotalSocketCount(tracking) {
+  return Object.values(tracking).reduce((n, sockets) => n + sockets.length, 0)
 }
-
-setTimeout(updateOpenConnetionsMetrics, oneMinInMs)
+function serializeTracking(tracking, prefix) {
+  return Object.fromEntries(
+    Object.entries(tracking).map(([host, sockets]) => {
+      // this will produce: ['http://1.2.3.4:8080:', ['/path', '/other/path']]
+      return [prefix + host, sockets.map(socket => socket._httpMessage.path)]
+    })
+  )
+}
+function updateOpenConnectionsMetrics() {
+  metrics.gauge('open_connections.http', getTotalSocketCount(httpSockets))
+  metrics.gauge('open_connections.https', getTotalSocketCount(httpsSockets))
+}
+setInterval(updateOpenConnectionsMetrics, Settings.prometheusScrapeInterval)
 
 module.exports = AdminController = {
   index: (req, res, next) => {
-    let agents, url
-    let agent
-    const http = require('http')
     const openSockets = {}
-    const object = require('http').globalAgent.sockets
-    for (url in object) {
-      agents = object[url]
-      openSockets[`http://${url}`] = (() => {
-        const result = []
-        for (agent of Array.from(agents)) {
-          result.push(agent._httpMessage.path)
-        }
-        return result
-      })()
-    }
-    const object1 = require('https').globalAgent.sockets
-    for (url in object1) {
-      agents = object1[url]
-      openSockets[`https://${url}`] = (() => {
-        const result1 = []
-        for (agent of Array.from(agents)) {
-          result1.push(agent._httpMessage.path)
-        }
-        return result1
-      })()
-    }
+    Object.assign(openSockets, serializeTracking(httpSockets, 'http://'))
+    Object.assign(openSockets, serializeTracking(httpsSockets, 'https://'))
 
     return SystemMessageManager.getMessagesFromDB(function(
       error,
@@ -152,10 +121,4 @@ module.exports = AdminController = {
       return res.sendStatus(200)
     })
   }
-}
-
-function __guard__(value, transform) {
-  return typeof value !== 'undefined' && value !== null
-    ? transform(value)
-    : undefined
 }

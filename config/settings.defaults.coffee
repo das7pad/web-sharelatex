@@ -492,6 +492,11 @@ module.exports = settings =
 	# Cookie max age (in milliseconds). Set to false for a browser session.
 	cookieSessionLength: 5 * 24 * 60 * 60 * 1000 # 5 days
 
+
+	# Prometheus metrics scraping interval
+	# internal gathering must produce updated metrics by then
+	prometheusScrapeInterval: parseInt(process.env.PROMETHEUS_SCRAPE_INTERVAL, 10) || '60000'
+
 	precompileViews: (
 		if process.env.PRECOMPILE_VIEWS != undefined
 		then process.env.PRECOMPILE_VIEWS == 'true'
