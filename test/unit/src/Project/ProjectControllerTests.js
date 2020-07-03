@@ -216,11 +216,14 @@ describe('ProjectController', function() {
       ip: '192.170.18.1'
     }
     this.res = {
-      locals: {
-        buildCssPath(themeModifier) {
-          return `/stylesheets/${themeModifier}style.css`
+      app: {
+        locals: {
+          buildCssPath(themeModifier) {
+            return `/stylesheets/${themeModifier}style.css`
+          }
         }
       },
+      locals: {},
       setTimeout: sinon.stub()
     }
 

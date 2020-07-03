@@ -30,6 +30,12 @@ module.exports = function(app, webRouter) {
   app.locals.moduleIncludesAvailable = Modules.moduleIncludesAvailable
   app.locals.settings = Settings
 
+  app.locals.buildCssPath = themeModifier =>
+    staticFilesBase + webpackManifest[`${themeModifier || ''}style.css`]
+  app.locals.buildImgPath = path => staticFilesBase + '/img/' + path
+  app.locals.buildJsPath = path => staticFilesBase + webpackManifest[path]
+  app.locals.staticPath = path => staticFilesBase + path
+
   webRouter.use(function(req, res, next) {
     const currentUser = AuthenticationController.getSessionUser(req)
     res.locals.session = req.session
@@ -60,7 +66,7 @@ module.exports = function(app, webRouter) {
       resourceHints.push({ rel: 'preload', uri, as, crossorigin })
     }
     res.locals.preloadCss = function(themeModifier) {
-      res.locals.preload(res.locals.buildCssPath(themeModifier), 'style')
+      res.locals.preload(app.locals.buildCssPath(themeModifier), 'style')
     }
     res.locals.preloadFont = function(name) {
       // IE11 and Opera Mini are the only browsers that do not support WOFF 2.0
@@ -71,7 +77,7 @@ module.exports = function(app, webRouter) {
       res.locals.preload(uri, 'font', true)
     }
     res.locals.preloadImg = function(path) {
-      res.locals.preload(res.locals.buildImgPath(path), 'image')
+      res.locals.preload(app.locals.buildImgPath(path), 'image')
     }
 
     res.locals.preloadCommonResources = function() {
@@ -94,23 +100,6 @@ module.exports = function(app, webRouter) {
         res.locals.finishPreloading()
       }
       actualRender.apply(res, arguments)
-    }
-
-    res.locals.staticPath = function(path) {
-      return staticFilesBase + path
-    }
-
-    res.locals.buildJsPath = function(jsFile) {
-      return staticFilesBase + webpackManifest[jsFile]
-    }
-
-    res.locals.buildCssPath = function(themeModifier) {
-      const cssFileName = `${themeModifier || ''}style.css`
-      return staticFilesBase + webpackManifest[cssFileName]
-    }
-
-    res.locals.buildImgPath = function(imgFile) {
-      return staticFilesBase + '/img/' + imgFile
     }
 
     res.locals.translate = function(key, vars) {

@@ -79,10 +79,10 @@ describe('ExpressLocalsTests', function() {
         this.loadMiddleware(0)
       })
       it('should set basic functions', function() {
-        expect(this.res.locals.staticPath).to.exist
-        expect(this.res.locals.buildJsPath).to.exist
-        expect(this.res.locals.buildCssPath).to.exist
-        expect(this.res.locals.buildImgPath).to.exist
+        expect(this.app.locals.staticPath).to.exist
+        expect(this.app.locals.buildJsPath).to.exist
+        expect(this.app.locals.buildCssPath).to.exist
+        expect(this.app.locals.buildImgPath).to.exist
       })
 
       describe('resource hints', function() {

@@ -755,12 +755,12 @@ const ProjectController = {
                 {
                   name: 'Default',
                   val: '',
-                  path: res.locals.buildCssPath('')
+                  path: res.app.locals.buildCssPath('')
                 },
                 {
                   name: 'Light',
                   val: 'light-',
-                  path: res.locals.buildCssPath('light-')
+                  path: res.app.locals.buildCssPath('light-')
                 }
               ]
             }
