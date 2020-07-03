@@ -157,7 +157,7 @@ webRouter.use(function(req, res, next) {
 })
 
 webRouter.use(ReferalConnect.use)
-expressLocals(webRouter)
+expressLocals(app, webRouter)
 
 webRouter.use(SessionAutostartMiddleware.invokeCallbackMiddleware)
 

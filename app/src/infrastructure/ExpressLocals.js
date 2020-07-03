@@ -20,14 +20,19 @@ if (['development', 'test'].includes(process.env.NODE_ENV)) {
 
 const staticFilesBase = Settings.cdn.web.host.replace(/\/$/, '')
 
-module.exports = function(webRouter) {
+module.exports = function(app, webRouter) {
+  app.locals.EXTERNAL_AUTHENTICATION_SYSTEM_USED =
+    Features.EXTERNAL_AUTHENTICATION_SYSTEM_USED
+  app.locals.gaToken = Settings.analytics.ga.token
+  app.locals.gaOptimizeId = Settings.analytics.gaOptimize.id
+  app.locals.hasFeature = Features.hasFeature
+  app.locals.moduleIncludes = Modules.moduleIncludes
+  app.locals.moduleIncludesAvailable = Modules.moduleIncludesAvailable
+  app.locals.settings = Settings
+
   webRouter.use(function(req, res, next) {
     const currentUser = AuthenticationController.getSessionUser(req)
     res.locals.session = req.session
-
-    res.locals.EXTERNAL_AUTHENTICATION_SYSTEM_USED =
-      Features.EXTERNAL_AUTHENTICATION_SYSTEM_USED
-    res.locals.hasFeature = Features.hasFeature
 
     const resourceHints = []
     res.locals.finishPreloading = function() {
@@ -125,9 +130,6 @@ module.exports = function(webRouter) {
 
     res.locals.csrfToken = req.csrfToken()
 
-    res.locals.gaToken = Settings.analytics.ga.token
-    res.locals.gaOptimizeId = Settings.analytics.gaOptimize.id
-
     res.locals.getLoggedInUserId = () =>
       AuthenticationController.getLoggedInUserId(req)
     res.locals.getSessionUser = () => currentUser
@@ -135,10 +137,6 @@ module.exports = function(webRouter) {
     if (Settings.reloadModuleViewsOnEachRequest) {
       Modules.loadViewIncludes()
     }
-    res.locals.moduleIncludes = Modules.moduleIncludes
-    res.locals.moduleIncludesAvailable = Modules.moduleIncludesAvailable
-
-    res.locals.settings = Settings
     next()
   })
   if (

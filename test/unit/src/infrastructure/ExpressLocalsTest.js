@@ -44,6 +44,9 @@ describe('ExpressLocalsTests', function() {
       use: sinon.stub()
     }
 
+    this.app = {
+      locals: {}
+    }
     this.req = new MockRequest()
     this.res = new MockResponse()
     this.res.locals = {}
@@ -59,7 +62,7 @@ describe('ExpressLocalsTests', function() {
         },
         requires: this.requires
       })
-      this.ExpressLocals(this.webRouter)
+      this.ExpressLocals(this.app, this.webRouter)
     }
     this.loadMiddleware = id => {
       this.webRouter.use.args[id][0](this.req, this.res, this.next)
