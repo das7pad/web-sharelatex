@@ -27,7 +27,7 @@ module.exports = function(webRouter) {
 
     res.locals.EXTERNAL_AUTHENTICATION_SYSTEM_USED =
       Features.EXTERNAL_AUTHENTICATION_SYSTEM_USED
-    req.hasFeature = res.locals.hasFeature = Features.hasFeature
+    res.locals.hasFeature = Features.hasFeature
 
     const resourceHints = []
     res.locals.finishPreloading = function() {
