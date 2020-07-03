@@ -104,8 +104,8 @@ module.exports = function(app, webRouter) {
       return staticFilesBase + webpackManifest[jsFile]
     }
 
-    res.locals.buildCssPath = function(themeModifier = '') {
-      const cssFileName = `${themeModifier}style.css`
+    res.locals.buildCssPath = function(themeModifier) {
+      const cssFileName = `${themeModifier || ''}style.css`
       return staticFilesBase + webpackManifest[cssFileName]
     }
 
