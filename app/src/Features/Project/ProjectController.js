@@ -573,11 +573,6 @@ const ProjectController = {
                 : undefined
           }
 
-          res.locals.preloadCommonResources()
-          // additional font for the (i) tooltip
-          res.locals.preloadFont('merriweather-v21-latin-700italic')
-          res.locals.finishPreloading()
-
           res.render('project/list', viewModel)
           timer.done()
         })
@@ -824,17 +819,6 @@ const ProjectController = {
               wsUrl,
               showSupport: Features.hasFeature('support')
             }
-
-            // add resource hints for the loading screen only
-            res.locals.preloadCss(themeModifier)
-            res.locals.preloadFont('merriweather-v21-latin-regular')
-            ;[
-              'ol-brand/overleaf-o.svg',
-              'ol-brand/overleaf-o-grey.svg'
-            ].forEach(res.locals.preloadImg)
-
-            res.locals.finishPreloading()
-
             res.render('project/editor', params)
             timer.done()
           }

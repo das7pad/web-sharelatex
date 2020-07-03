@@ -226,17 +226,6 @@ describe('ProjectController', function() {
       locals: {},
       setTimeout: sinon.stub()
     }
-
-    // resource hints
-    for (const fn of [
-      'preloadCommonResources',
-      'preloadCss',
-      'preloadFont',
-      'preloadImg',
-      'finishPreloading'
-    ]) {
-      this.res.locals[fn] = sinon.stub()
-    }
   })
 
   describe('updateProjectSettings', function() {
@@ -831,24 +820,6 @@ describe('ProjectController', function() {
         this.ProjectController.projectListPage(this.req, this.res)
       })
     })
-
-    describe('resource hints', function() {
-      it('should preload the common sub resources', function(done) {
-        this.res.render = () => {
-          this.res.locals.preloadCommonResources.callCount.should.equal(1)
-          done()
-        }
-        this.ProjectController.projectListPage(this.req, this.res)
-      })
-
-      it('should preload the tooltip font', function(done) {
-        this.res.render = () => {
-          this.res.locals.preloadFont.callCount.should.equal(1)
-          done()
-        }
-        this.ProjectController.projectListPage(this.req, this.res)
-      })
-    })
   })
 
   describe('projectListPage with duplicate projects', function() {
@@ -1124,48 +1095,6 @@ describe('ProjectController', function() {
         done()
       }
       this.ProjectController.loadEditor(this.req, this.res)
-    })
-
-    describe('resource hints', function() {
-      it('should preload the branded css theme', function(done) {
-        this.ProjectGetter.getProject.callsArgWith(2, null, this.ieeeProject)
-        this.res.render = () => {
-          this.res.locals.preloadCss.calledWith('ieee-').should.equal(true)
-          done()
-        }
-        this.ProjectController.loadEditor(this.req, this.res)
-      })
-
-      it('should preload the user defined css theme', function(done) {
-        this.user.ace.overallTheme = 'light-'
-        this.res.render = () => {
-          this.res.locals.preloadCss.calledWith('light-').should.equal(true)
-          done()
-        }
-        this.ProjectController.loadEditor(this.req, this.res)
-      })
-
-      it('should preload the loading screen font', function(done) {
-        this.res.render = () => {
-          this.res.locals.preloadFont.callCount.should.equal(1)
-          done()
-        }
-        this.ProjectController.loadEditor(this.req, this.res)
-      })
-
-      it('should preload the overleaf-o for the default brand', function(done) {
-        this.res.render = () => {
-          this.res.locals.preloadImg.callCount.should.equal(2)
-          this.res.locals.preloadImg
-            .calledWith('ol-brand/overleaf-o.svg')
-            .should.equal(true)
-          this.res.locals.preloadImg
-            .calledWith('ol-brand/overleaf-o-grey.svg')
-            .should.equal(true)
-          done()
-        }
-        this.ProjectController.loadEditor(this.req, this.res)
-      })
     })
 
     describe('wsUrl', function() {

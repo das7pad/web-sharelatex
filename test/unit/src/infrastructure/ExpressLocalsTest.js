@@ -64,69 +64,91 @@ describe('ExpressLocalsTests', function() {
       })
       this.ExpressLocals(this.app, this.webRouter)
     }
-    this.loadMiddleware = id => {
-      this.webRouter.use.args[id][0](this.req, this.res, this.next)
+
+    const getMiddlewareByName = name =>
+      this.webRouter.use.args
+        .map(args => args[args.length - 1])
+        .filter(mw => mw.name === name)
+        .pop()
+    this.loadMiddleware = name => {
+      this.shouldHaveLoadedMiddleware(name)
+      getMiddlewareByName(name)(this.req, this.res, this.next)
+    }
+    this.shouldHaveLoadedMiddleware = name => {
+      expect(getMiddlewareByName(name)).to.exist
+    }
+    this.shouldNotHaveLoadedMiddleware = name => {
+      expect(getMiddlewareByName(name)).to.not.exist
     }
   })
 
-  describe('without a cdn', function() {
+  describe('app.locals', function() {
     beforeEach(function() {
       this.require()
     })
 
+    it('should set basic functions', function() {
+      expect(this.app.locals.staticPath).to.exist
+      expect(this.app.locals.buildJsPath).to.exist
+      expect(this.app.locals.buildCssPath).to.exist
+      expect(this.app.locals.buildImgPath).to.exist
+    })
+  })
+
+  describe('without a cdn', function() {
     describe('resource middleware', function() {
-      beforeEach(function() {
-        this.loadMiddleware(0)
-      })
-      it('should set basic functions', function() {
-        expect(this.app.locals.staticPath).to.exist
-        expect(this.app.locals.buildJsPath).to.exist
-        expect(this.app.locals.buildCssPath).to.exist
-        expect(this.app.locals.buildImgPath).to.exist
+      describe('resource hints disabled', function() {
+        beforeEach(function() {
+          this.settings.addResourceHints = false
+          this.require()
+        })
+
+        it('should not load the preloadMiddleware', function() {
+          this.shouldNotHaveLoadedMiddleware('preloadMiddleware')
+        })
       })
 
-      describe('resource hints', function() {
+      describe('resource hints enabled', function() {
         beforeEach(function() {
           this.settings.addResourceHints = true
+          this.require()
+          this.loadMiddleware('preloadMiddleware')
         })
 
-        it('should expose the preload helpers', function() {
-          expect(this.res.locals.preloadCss).to.exist
-          expect(this.res.locals.preloadFont).to.exist
-          expect(this.res.locals.preloadImg).to.exist
-          expect(this.res.locals.preloadCommonResources).to.exist
-          expect(this.res.locals.finishPreloading).to.exist
+        it('should load the preloadMiddleware', function() {
+          this.shouldHaveLoadedMiddleware('preloadMiddleware')
         })
 
-        it('should not set a header when disabled', function() {
-          this.settings.addResourceHints = false
-          this.res.locals.preloadCommonResources()
-          this.res.locals.finishPreloading()
-          expect(this.res.headers).to.deep.equal({})
-        })
-
-        it('should set the header for css', function() {
-          this.res.locals.preloadCss('light-')
-          this.res.locals.finishPreloading()
-          expect(this.res.headers).to.deep.equal({
-            Link: '</stylesheets/light-style.css>;rel=preload;as=style'
-          })
+        it('should set the header for custom css', function() {
+          this.req.route.path = '/Project/:Project_id'
+          this.res.render('template', { themeModifier: 'light-' })
+          expect(this.res.headers.Link).to.include(
+            '</stylesheets/light-style.css>;rel=preload;as=style'
+          )
         })
 
         it('should set the header for images', function() {
-          this.res.locals.preloadImg('some/image.png')
-          this.res.locals.finishPreloading()
-          expect(this.res.headers).to.deep.equal({
-            Link: '</img/some/image.png>;rel=preload;as=image'
-          })
+          this.req.route.path = '/Project/:Project_id'
+          this.res.render('template', {})
+          expect(this.res.headers.Link).to.include(
+            '</img/ol-brand/overleaf-o.svg>;rel=preload;as=image'
+          )
         })
 
         it('should set the crossorigin flag for a font', function() {
-          this.res.locals.preloadFont('arbitrary')
-          this.res.locals.finishPreloading()
-          expect(this.res.headers).to.deep.equal({
-            Link: '</fonts/arbitrary.woff2>;rel=preload;as=font;crossorigin'
-          })
+          this.res.render('template', {})
+          expect(this.res.headers.Link).to.include(
+            '.woff2>;rel=preload;as=font;crossorigin'
+          )
+        })
+
+        it('should inject the tooltip font on the dashboard', function() {
+          const tooltipFont = 'merriweather-v21-latin-700italic'
+          this.req.route.path = '/project'
+          this.res.render('template', {})
+          expect(this.res.headers.Link).to.include(
+            `</fonts/${tooltipFont}.woff2>;rel=preload;as=font;crossorigin`
+          )
         })
 
         it('should inject common resources for user pages', function() {
@@ -152,27 +174,22 @@ describe('ExpressLocalsTests', function() {
   describe('with a cdn', function() {
     beforeEach(function() {
       this.settings.cdn = { web: { host: 'https://example.com/' } }
-
-      this.require()
     })
 
     describe('resource middleware', function() {
-      beforeEach(function() {
-        this.loadMiddleware(0)
-      })
-
       describe('resource hints', function() {
         beforeEach(function() {
           this.settings.addResourceHints = true
+          this.require()
+          this.loadMiddleware('preloadMiddleware')
         })
 
         it('should set the header for images', function() {
-          this.res.locals.preloadImg('some/image.png')
-          this.res.locals.finishPreloading()
-          expect(this.res.headers).to.deep.equal({
-            Link:
-              '<https://example.com/img/some/image.png>;rel=preload;as=image'
-          })
+          this.req.route.path = '/Project/:Project_id'
+          this.res.render('template', {})
+          expect(this.res.headers.Link).to.include(
+            '<https://example.com/img/ol-brand/overleaf-o.svg>'
+          )
         })
       })
     })
@@ -185,18 +202,14 @@ describe('ExpressLocalsTests', function() {
           www: { lngCode: 'en', url: 'http://localhost:3000' }
         }
       }
-
-      this.require()
     })
 
     describe('resource middleware', function() {
-      beforeEach(function() {
-        this.loadMiddleware(0)
-      })
-
       describe('resource hints', function() {
         beforeEach(function() {
           this.settings.addResourceHints = true
+          this.require()
+          this.loadMiddleware('preloadMiddleware')
         })
 
         it('should not inject the flags sprite', function() {

@@ -40,68 +40,6 @@ module.exports = function(app, webRouter) {
     const currentUser = AuthenticationController.getSessionUser(req)
     res.locals.session = req.session
 
-    const resourceHints = []
-    res.locals.finishPreloading = function() {
-      if (!Settings.addResourceHints) {
-        // refuse to add the Link header
-        return
-      }
-      if (!resourceHints.length) {
-        // do not set an empty header
-        return
-      }
-
-      function crossorigin(resource) {
-        return resource.crossorigin ? ';crossorigin' : ''
-      }
-      res.setHeader(
-        'Link',
-        resourceHints
-          .map(r => `<${r.uri}>;rel=${r.rel};as=${r.as}${crossorigin(r)}`)
-          .join(',')
-      )
-    }
-
-    res.locals.preload = function(uri, as, crossorigin) {
-      resourceHints.push({ rel: 'preload', uri, as, crossorigin })
-    }
-    res.locals.preloadCss = function(themeModifier) {
-      res.locals.preload(app.locals.buildCssPath(themeModifier), 'style')
-    }
-    res.locals.preloadFont = function(name) {
-      // IE11 and Opera Mini are the only browsers that do not support WOFF 2.0
-      //  https://caniuse.com/#search=woff2
-      // They both ignore the preload header, so this is OK
-      //  https://caniuse.com/#search=preload
-      const uri = `${staticFilesBase}/fonts/${name}.woff2`
-      res.locals.preload(uri, 'font', true)
-    }
-    res.locals.preloadImg = function(path) {
-      res.locals.preload(app.locals.buildImgPath(path), 'image')
-    }
-
-    res.locals.preloadCommonResources = function() {
-      res.locals.preloadCss('')
-      ;[
-        'font-awesome-v470',
-        'lato-v16-latin-ext-regular',
-        'lato-v16-latin-ext-700',
-        'merriweather-v21-latin-regular'
-      ].forEach(res.locals.preloadFont)
-      if (HAS_MULTIPLE_LANG) {
-        res.locals.preloadImg('sprite.png')
-      }
-    }
-
-    const actualRender = res.render
-    res.render = function() {
-      if (Settings.addResourceHints && !resourceHints.length) {
-        res.locals.preloadCommonResources()
-        res.locals.finishPreloading()
-      }
-      actualRender.apply(res, arguments)
-    }
-
     res.locals.translate = function(key, vars) {
       if (vars == null) {
         vars = {}
@@ -128,6 +66,11 @@ module.exports = function(app, webRouter) {
     }
     next()
   })
+
+  if (Settings.addResourceHints) {
+    webRouter.use(getPreloadMiddleware(app))
+  }
+
   if (
     Settings.security &&
     Settings.security.csp &&
@@ -143,6 +86,99 @@ module.exports = function(app, webRouter) {
     res.contentType('application/javascript')
     res.send(`importScripts('${staticFilesBase}${workerPath}');`)
   })
+}
+
+function getPreloadMiddleware(app) {
+  function generatePreloadLink(cfg) {
+    const resourceHints = []
+    function preload(uri, as, crossorigin) {
+      resourceHints.push({ rel: 'preload', uri, as, crossorigin })
+    }
+    function preloadCss(themeModifier) {
+      preload(app.locals.buildCssPath(themeModifier), 'style')
+    }
+    function preloadFont(name) {
+      // IE11 and Opera Mini are the only browsers that do not support WOFF 2.0
+      //  https://caniuse.com/#search=woff2
+      // They both ignore the preload header, so this is OK
+      //  https://caniuse.com/#search=preload
+      const uri = `${staticFilesBase}/fonts/${name}.woff2`
+      preload(uri, 'font', true)
+    }
+    function preloadImg(path) {
+      preload(app.locals.buildImgPath(path), 'image')
+    }
+
+    if (cfg.hasTooltip) {
+      // additional font for the (i) tooltip
+      preloadFont('merriweather-v21-latin-700italic')
+    }
+
+    if (cfg.isEditor) {
+      preloadCss(cfg.themeModifier)
+      preloadFont('merriweather-v21-latin-regular')
+      ;['ol-brand/overleaf-o.svg', 'ol-brand/overleaf-o-grey.svg'].forEach(
+        preloadImg
+      )
+    } else {
+      preloadCss('')
+      ;[
+        'font-awesome-v470',
+        'lato-v16-latin-ext-regular',
+        'lato-v16-latin-ext-700',
+        'merriweather-v21-latin-regular'
+      ].forEach(preloadFont)
+      if (HAS_MULTIPLE_LANG) {
+        preloadImg('sprite.png')
+      }
+    }
+
+    function crossorigin(resource) {
+      return resource.crossorigin ? ';crossorigin' : ''
+    }
+    return resourceHints
+      .map(r => `<${r.uri}>;rel=${r.rel};as=${r.as}${crossorigin(r)}`)
+      .join(',')
+  }
+
+  const PRELOAD_DEFAULT = generatePreloadLink({})
+  const PRELOAD_DASHBOARD = generatePreloadLink({ hasTooltip: true })
+  const PRELOAD_EDITOR_DEFAULT = generatePreloadLink({
+    isEditor: true,
+    themeModifier: ''
+  })
+  const PRELOAD_EDITOR_IEEE = generatePreloadLink({
+    isEditor: true,
+    themeModifier: 'ieee-'
+  })
+  const PRELOAD_EDITOR_LIGHT = generatePreloadLink({
+    isEditor: true,
+    themeModifier: 'light-'
+  })
+
+  return function preloadMiddleware(req, res, next) {
+    const actualRender = res.render
+    res.render = function(view, locals, cb) {
+      const endpoint = req.route.path
+      let headerValue
+      if (endpoint === '/project') {
+        headerValue = PRELOAD_DASHBOARD
+      } else if (endpoint === '/Project/:Project_id') {
+        if (locals.themeModifier === 'ieee-') {
+          headerValue = PRELOAD_EDITOR_IEEE
+        } else if (locals.themeModifier === 'light-') {
+          headerValue = PRELOAD_EDITOR_LIGHT
+        } else {
+          headerValue = PRELOAD_EDITOR_DEFAULT
+        }
+      } else {
+        headerValue = PRELOAD_DEFAULT
+      }
+      res.setHeader('Link', headerValue)
+      actualRender.call(res, view, locals, cb)
+    }
+    next()
+  }
 }
 
 function cspMiddleware() {
