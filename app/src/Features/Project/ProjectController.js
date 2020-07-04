@@ -760,7 +760,7 @@ const ProjectController = {
               ]
             }
 
-            const params = {
+            res.render('project/editor', {
               title: project.name,
               priority_title: true,
               bodyClasses: ['editor'],
@@ -818,8 +818,7 @@ const ProjectController = {
               gitBridgePublicBaseUrl: Settings.gitBridgePublicBaseUrl,
               wsUrl,
               showSupport: Features.hasFeature('support')
-            }
-            res.render('project/editor', params)
+            })
             timer.done()
           }
         )
