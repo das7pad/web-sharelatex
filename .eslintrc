@@ -2,8 +2,21 @@
 // Instead run bin/update_build_scripts from
 // https://github.com/das7pad/sharelatex-dev-env
 {
-  "extends": ["standard", "prettier", "prettier/standard"],
-  "plugins": ["mocha", "chai-expect", "chai-friendly"],
+  "extends": [
+    "standard",
+    "standard-jsx",
+    "standard-react",
+    "prettier",
+    "prettier/react",
+    "prettier/standard",
+    "plugin:jsx-a11y/recommended"
+  ],
+  "plugins": [
+    "jsx-a11y",
+    "mocha",
+    "chai-expect",
+    "chai-friendly"
+  ],
   "parser": "babel-eslint",
   "env": {
     "browser": true,
@@ -73,6 +86,25 @@
         "Sentry": true,
         "sl_console": true,
         "sl_debugging": true
+      },
+      "rules": {
+        // Fix conflict between prettier & standard by overriding to prefer
+        // double quotes
+        "jsx-quotes": ["error", "prefer-double"],
+
+        // Override weird behaviour of jsx-a11y label-has-for (says labels must be
+        // nested *and* have for/id attributes)
+        "jsx-a11y/label-has-for": [
+          "error",
+          {
+            "required": {
+              "some": [
+                "nesting",
+                "id"
+              ]
+            }
+          }
+        ]
       }
     }
   ]
