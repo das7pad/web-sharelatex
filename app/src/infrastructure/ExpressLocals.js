@@ -48,8 +48,7 @@ module.exports = function(app, webRouter) {
     res.locals.csrfToken = req.csrfToken()
 
     const currentUser = AuthenticationController.getSessionUser(req)
-    res.locals.getLoggedInUserId = () =>
-      AuthenticationController.getLoggedInUserId(req)
+    res.locals.getLoggedInUserId = () => currentUser && currentUser._id
     res.locals.getSessionUser = () => currentUser
     next()
   })
