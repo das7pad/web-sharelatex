@@ -80,7 +80,7 @@
     "uuid": "^3.0.1",
     "valid-url": "^1.0.9",
     "xml2js": "^0.4.22",
-    "xregexp": "^4.3.0",
+    "xregexp": "4.2.0",
     "yauzl": "^2.10.0"
   },
   "devDependencies": {
