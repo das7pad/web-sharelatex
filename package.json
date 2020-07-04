@@ -11,11 +11,6 @@
   "directories": {
     "public": "./public"
   },
-  "browserslist": [
-    "last 1 year",
-    "ie 11",
-    "firefox esr"
-  ],
   "scripts": {
     "test:acceptance:run_dir": "mocha --recursive --reporter spec --timeout 25000 --exit --grep=$MOCHA_GREP --require test/acceptance/bootstrap.js",
     "test:acceptance:app": "npm run test:acceptance:run_dir -- test/acceptance/src",
@@ -33,6 +28,11 @@
     "format:fix": "prettier-eslint '**/*.{js,less}' --write",
     "migrations": "east"
   },
+  "browserslist": [
+    "last 1 year",
+    "ie 11",
+    "firefox esr"
+  ],
   "dependencies": {
     "@overleaf/o-error": "^2.1.0",
     "archiver": "4.0.1",
