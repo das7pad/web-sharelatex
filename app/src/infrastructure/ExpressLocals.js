@@ -51,7 +51,6 @@ module.exports = function(app, webRouter) {
     res.locals.getLoggedInUserId = () =>
       AuthenticationController.getLoggedInUserId(req)
     res.locals.getSessionUser = () => currentUser
-    res.locals.session = req.session
     next()
   })
 

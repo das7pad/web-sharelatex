@@ -540,6 +540,7 @@ const ProjectController = {
             user,
             userAffiliations,
             hasSubscription: results.hasSubscription,
+            samlBeta: req.session.samlBeta,
             institutionLinkingError,
             warnings,
             zipFileSizeLimit: Settings.maxUploadSize
