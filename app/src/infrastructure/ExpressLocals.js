@@ -38,9 +38,7 @@ module.exports = function(app, webRouter) {
 
   webRouter.use(function(req, res, next) {
     res.locals.translate = function(key, vars) {
-      if (vars == null) {
-        vars = {}
-      }
+      vars = vars || {}
       vars.appName = Settings.appName
       return req.i18n.translate(key, vars)
     }
