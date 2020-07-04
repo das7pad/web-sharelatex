@@ -51,10 +51,6 @@ module.exports = function(app, webRouter) {
     res.locals.recomendSubdomain = LNG_TO_SPEC.get(req.showUserOtherLng)
     res.locals.currentLngCode = req.lng
 
-    res.locals.getUserEmail = function() {
-      return (currentUser && currentUser.email) || ''
-    }
-
     res.locals.csrfToken = req.csrfToken()
 
     res.locals.getLoggedInUserId = () =>
