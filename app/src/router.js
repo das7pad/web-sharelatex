@@ -60,6 +60,7 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
   if (!Settings.allowPublicAccess) {
     webRouter.all('*', AuthenticationController.requireGlobalLogin)
   }
+  Modules.attachViewIncludesReloadMiddleware(webRouter)
 
   webRouter.get('/login', UserPagesController.loginPage)
   AuthenticationController.addEndpointToLoginWhitelist('/login')

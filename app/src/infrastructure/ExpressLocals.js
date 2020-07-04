@@ -56,10 +56,6 @@ module.exports = function(app, webRouter) {
     res.locals.getLoggedInUserId = () =>
       AuthenticationController.getLoggedInUserId(req)
     res.locals.getSessionUser = () => currentUser
-
-    if (Settings.reloadModuleViewsOnEachRequest) {
-      Modules.loadViewIncludes()
-    }
     next()
   })
 

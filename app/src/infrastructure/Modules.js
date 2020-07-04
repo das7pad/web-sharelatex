@@ -45,6 +45,19 @@ module.exports = Modules = {
     }
   },
 
+  attachViewIncludesReloadMiddleware(webRouter) {
+    if (Settings.reloadModuleViewsOnEachRequest) {
+      webRouter.use((req, res, next) => {
+        const actualRender = res.render
+        res.render = function() {
+          Modules.loadViewIncludes()
+          actualRender.apply(res, arguments)
+        }
+        next()
+      })
+    }
+  },
+
   viewIncludes: new Map(),
   loadViewIncludes() {
     this.viewIncludes.clear()
