@@ -247,7 +247,7 @@ const ProjectController = {
     }
     const currentUser = AuthenticationController.getSessionUser(req)
     // eslint-disable-next-line camelcase
-    const { first_name, last_name, email } = currentUser
+    const { first_name: firstName, last_name: lastName, email } = currentUser
     ProjectDuplicator.duplicate(
       currentUser,
       projectId,
@@ -265,14 +265,25 @@ const ProjectController = {
           project_id: project._id,
           owner_ref: project.owner_ref,
           // eslint-disable-next-line camelcase
-          owner: { first_name, last_name, email, _id: currentUser._id }
+          owner: {
+            first_name: firstName,
+            last_name: lastName,
+            email,
+            _id: currentUser._id
+          }
         })
       }
     )
   },
 
   newProject(req, res, next) {
-    const userId = AuthenticationController.getLoggedInUserId(req)
+    const currentUser = AuthenticationController.getSessionUser(req)
+    const {
+      first_name: firstName,
+      last_name: lastName,
+      email,
+      _id: userId
+    } = currentUser
     const projectName =
       req.body.projectName != null ? req.body.projectName.trim() : undefined
     const { template } = req.body
@@ -291,7 +302,16 @@ const ProjectController = {
         if (err != null) {
           return next(err)
         }
-        res.json({ project_id: project._id })
+        res.json({
+          project_id: project._id,
+          owner_ref: project.owner_ref,
+          owner: {
+            first_name: firstName,
+            last_name: lastName,
+            email,
+            _id: userId
+          }
+        })
       }
     )
   },
@@ -582,16 +602,18 @@ const ProjectController = {
   },
 
   loadEditor(req, res, next) {
-    let anonymous, userId
     const timer = new metrics.Timer('load-editor')
     if (!Settings.editorIsOpen) {
       return res.render('general/closed', { title: 'updating_site' })
     }
 
+    let anonymous, userId, sessionUser
     if (AuthenticationController.isUserLoggedIn(req)) {
+      sessionUser = AuthenticationController.getSessionUser(req)
       userId = AuthenticationController.getLoggedInUserId(req)
       anonymous = false
     } else {
+      sessionUser = null
       anonymous = true
       userId = null
     }
@@ -691,6 +713,9 @@ const ProjectController = {
           projectId
         )
         const { isTokenMember } = results
+        const allowedImageNames = ProjectHelper.getAllowedImagesForUser(
+          sessionUser
+        )
         AuthorizationManager.getPrivilegeLevelForProject(
           userId,
           projectId,
@@ -779,6 +804,7 @@ const ProjectController = {
                 featureSwitches: user.featureSwitches,
                 features: user.features,
                 refProviders: user.refProviders,
+                alphaProgram: user.alphaProgram,
                 betaProgram: user.betaProgram,
                 isAdmin: user.isAdmin
               },
@@ -815,7 +841,7 @@ const ProjectController = {
               brandVariation,
               overallThemes,
               themeModifier,
-              allowedImageNames: Settings.allowedImageNames || [],
+              allowedImageNames,
               gitBridgePublicBaseUrl: Settings.gitBridgePublicBaseUrl,
               wsUrl,
               showSupport: Features.hasFeature('support')

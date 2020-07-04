@@ -29,6 +29,7 @@ import BinaryFilesManager from './ide/binary-files/BinaryFilesManager'
 import ReferencesManager from './ide/references/ReferencesManager'
 import MetadataManager from './ide/metadata/MetadataManager'
 import ReviewPanelManager from './ide/review-panel/ReviewPanelManager'
+import OutlineManager from './ide/outline/OutlineManager'
 import SafariScrollPatcher from './ide/SafariScrollPatcher'
 import './ide/cobranding/CobrandingDataService'
 import './ide/settings/index'
@@ -177,7 +178,7 @@ App.controller('IdeController', function(
   ide.$scope = $scope
 
   ide.referencesSearchManager = new ReferencesManager(ide, $scope)
-  ide.connectionManager = new ConnectionManager(ide, $scope)
+  ide.connectionManager = new ConnectionManager(ide, $scope, eventTracking)
   ide.fileTreeManager = new FileTreeManager(ide, $scope)
   ide.editorManager = new EditorManager(ide, $scope, localStorage)
   ide.onlineUsersManager = new OnlineUsersManager(ide, $scope)
@@ -190,6 +191,7 @@ App.controller('IdeController', function(
   ide.permissionsManager = new PermissionsManager(ide, $scope)
   ide.binaryFilesManager = new BinaryFilesManager(ide, $scope)
   ide.metadataManager = new MetadataManager(ide, $scope, metadata)
+  ide.outlineManager = new OutlineManager(ide, $scope)
 
   let inited = false
   $scope.$on('project:joined', function() {

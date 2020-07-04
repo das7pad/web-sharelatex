@@ -1,7 +1,6 @@
 /* eslint-disable
     camelcase,
     handle-callback-err,
-    no-unused-vars,
 */
 // TODO: This file was created by bulk-decaffeinate.
 // Fix any style issues and re-enable lint.
@@ -11,7 +10,7 @@
  * DS207: Consider shorter variations of null checks
  * Full docs: https://github.com/decaffeinate/decaffeinate/blob/master/docs/suggestions.md
  */
-let AdminController
+
 const metrics = require('metrics-sharelatex')
 const logger = require('logger-sharelatex')
 const DocumentUpdaterHandler = require('../DocumentUpdater/DocumentUpdaterHandler')
@@ -40,7 +39,7 @@ function updateOpenConnectionsMetrics() {
 }
 setInterval(updateOpenConnectionsMetrics, Settings.prometheusScrapeInterval)
 
-module.exports = AdminController = {
+const AdminController = {
   index: (req, res, next) => {
     const openSockets = {}
     Object.assign(openSockets, serializeTracking(httpSockets, 'http://'))
@@ -122,3 +121,5 @@ module.exports = AdminController = {
     })
   }
 }
+
+module.exports = AdminController
