@@ -37,9 +37,6 @@ module.exports = function(app, webRouter) {
   app.locals.staticPath = path => staticFilesBase + path
 
   webRouter.use(function(req, res, next) {
-    const currentUser = AuthenticationController.getSessionUser(req)
-    res.locals.session = req.session
-
     res.locals.translate = function(key, vars) {
       if (vars == null) {
         vars = {}
@@ -47,15 +44,16 @@ module.exports = function(app, webRouter) {
       vars.appName = Settings.appName
       return req.i18n.translate(key, vars)
     }
-
     res.locals.recomendSubdomain = LNG_TO_SPEC.get(req.showUserOtherLng)
     res.locals.currentLngCode = req.lng
 
     res.locals.csrfToken = req.csrfToken()
 
+    const currentUser = AuthenticationController.getSessionUser(req)
     res.locals.getLoggedInUserId = () =>
       AuthenticationController.getLoggedInUserId(req)
     res.locals.getSessionUser = () => currentUser
+    res.locals.session = req.session
     next()
   })
 
