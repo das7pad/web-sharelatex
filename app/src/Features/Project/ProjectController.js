@@ -712,13 +712,14 @@ const ProjectController = {
           logger.warn({ err }, 'error getting details for project page')
           return next(err)
         }
-        const { project } = results
-        const { user } = results
-        const { subscription } = results
-        const { brandVariation } = results
-
-        const { isTokenMember } = results
-        const { privilegeLevel } = results
+        const {
+          project,
+          user,
+          subscription,
+          brandVariation,
+          isTokenMember,
+          privilegeLevel
+        } = results
         const allowedImageNames = ProjectHelper.getAllowedImagesForUser(
           sessionUser
         )
