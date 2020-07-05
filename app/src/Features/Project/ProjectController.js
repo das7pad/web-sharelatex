@@ -619,6 +619,7 @@ const ProjectController = {
     }
 
     const projectId = req.params.Project_id
+    const anonRequestToken = TokenAccessHandler.getRequestToken(req, projectId)
 
     async.auto(
       {
@@ -678,6 +679,14 @@ const ProjectController = {
           }
           CollaboratorsGetter.userIsTokenMember(userId, projectId, cb)
         },
+        privilegeLevel(cb) {
+          AuthorizationManager.getPrivilegeLevelForProject(
+            userId,
+            projectId,
+            anonRequestToken,
+            cb
+          )
+        },
         brandVariation: [
           'project',
           (cb, results) => {
@@ -708,23 +717,14 @@ const ProjectController = {
         const { subscription } = results
         const { brandVariation } = results
 
-        const anonRequestToken = TokenAccessHandler.getRequestToken(
-          req,
-          projectId
-        )
         const { isTokenMember } = results
+        const { privilegeLevel } = results
         const allowedImageNames = ProjectHelper.getAllowedImagesForUser(
           sessionUser
         )
-        AuthorizationManager.getPrivilegeLevelForProject(
-          userId,
-          projectId,
-          anonRequestToken,
-          (error, privilegeLevel) => {
+        if (projectId) {
+          if (project) {
             let allowedFreeTrial
-            if (error != null) {
-              return next(error)
-            }
             if (
               privilegeLevel == null ||
               privilegeLevel === PrivilegeLevels.NONE
@@ -848,7 +848,7 @@ const ProjectController = {
             })
             timer.done()
           }
-        )
+        }
       }
     )
   },
