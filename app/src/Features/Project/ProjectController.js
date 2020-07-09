@@ -32,6 +32,7 @@ const Features = require('../../infrastructure/Features')
 const BrandVariationsHandler = require('../BrandVariations/BrandVariationsHandler')
 const { getUserAffiliations } = require('../Institutions/InstitutionsAPI')
 const UserController = require('../User/UserController')
+const SpellingHandler = require('../Spelling/SpellingHandler')
 
 const _ssoAvailable = (affiliation, session, linkedInstitutionIds) => {
   if (!affiliation.institution) return false
@@ -659,6 +660,13 @@ const ProjectController = {
             })
           }
         },
+        jwtSpelling(cb) {
+          if (!userId || !Settings.apis.spelling.publicUrl) {
+            cb(null, undefined)
+          } else {
+            SpellingHandler.getJWT(userId, cb)
+          }
+        },
         subscription(cb) {
           if (userId == null) {
             return cb()
@@ -715,6 +723,7 @@ const ProjectController = {
         const {
           project,
           user,
+          jwtSpelling,
           subscription,
           brandVariation,
           isTokenMember,
@@ -835,6 +844,7 @@ const ProjectController = {
                 privilegeLevel,
                 isTokenMember
               ),
+              jwtSpelling,
               languages: Settings.languages,
               editorThemes: Settings.editorThemes,
               maxDocLength: Settings.max_doc_length,

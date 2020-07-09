@@ -27,6 +27,9 @@ describe('ProjectController', function() {
       apis: {
         chat: {
           url: 'chat.com'
+        },
+        spelling: {
+          publicUrl: undefined
         }
       },
       hasThemes: true,
@@ -128,6 +131,9 @@ describe('ProjectController', function() {
     this.TpdsProjectFlusher = {
       flushProjectToTpdsIfNeeded: sinon.stub().yields()
     }
+    this.SpellingHandler = {
+      getJWT: sinon.stub().yields(null, 'some-jwt')
+    }
     this.getUserAffiliations = sinon.stub().callsArgWith(1, null, [
       {
         email: 'test@overleaf.com',
@@ -192,6 +198,7 @@ describe('ProjectController', function() {
           getUserAffiliations: this.getUserAffiliations
         },
         '../ThirdPartyDataStore/TpdsProjectFlusher': this.TpdsProjectFlusher,
+        '../Spelling/SpellingHandler': this.SpellingHandler,
         '../../models/Project': {}
       }
     })
@@ -988,6 +995,28 @@ describe('ProjectController', function() {
         done()
       }
       this.ProjectController.loadEditor(this.req, this.res)
+    })
+
+    describe('jwtSpelling', function() {
+      it('should generate a jwt when the publicUrl exists', function(done) {
+        this.settings.apis.spelling.publicUrl = 'http://spelling.test'
+        this.res.render = (pageName, opts) => {
+          expect(this.SpellingHandler.getJWT.called).to.equal(true)
+          expect(opts.jwtSpelling).to.equal('some-jwt')
+          done()
+        }
+        this.ProjectController.loadEditor(this.req, this.res)
+      })
+
+      it('should not generate a jwt when no publicUrl exists', function(done) {
+        this.settings.apis.spelling.publicUrl = undefined
+        this.res.render = (pageName, opts) => {
+          expect(this.SpellingHandler.getJWT.called).to.equal(false)
+          expect(opts.jwtSpelling).to.equal(undefined)
+          done()
+        }
+        this.ProjectController.loadEditor(this.req, this.res)
+      })
     })
 
     it('should add on userSettings', function(done) {

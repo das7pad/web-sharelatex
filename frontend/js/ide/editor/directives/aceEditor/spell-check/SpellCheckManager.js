@@ -1,3 +1,5 @@
+import getMeta from '../../../../../utils/meta'
+
 const BLACKLISTED_COMMAND_REGEX = new RegExp(
   `\
 \\\\\
@@ -340,8 +342,19 @@ class SpellCheckManager {
     // use angular timeout option to cancel request if doc is changed
     const requestHandler = this.$q.defer()
     const options = { timeout: requestHandler.promise }
+
+    let path = `/spelling${endpoint}`
+    const jwtSpelling = getMeta('ol-jwtSpelling')
+    if (jwtSpelling) {
+      const publicUrlSpelling = getMeta('ol-publicUrlSpelling') || ''
+      path = publicUrlSpelling + '/jwt' + path
+      options.headers = { Authorization: 'Bearer ' + jwtSpelling }
+      delete data.token
+      delete data._csrf
+    }
+
     this.$http
-      .post(`/spelling${endpoint}`, data, options)
+      .post(path, data, options)
       .then(response => {
         return callback(null, response.data)
       })

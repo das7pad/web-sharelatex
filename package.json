@@ -52,6 +52,7 @@
     "glob": "^7.0.0",
     "globby": "^6.1.0",
     "helmet": "^3.22.0",
+    "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",
     "logger-sharelatex": "https://github.com/das7pad/logger-sharelatex/archive/9517d83da189fd80f8a70d4f90619c0a08ff5b12.tar.gz",
     "marked": "^0.7.0",

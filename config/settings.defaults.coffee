@@ -139,6 +139,7 @@ module.exports = settings =
 		spelling:
 			url : "http://#{process.env['SPELLING_HOST'] or 'localhost'}:3005"
 			host: process.env['SPELLING_HOST']
+			publicUrl: process.env['SPELLING_PUBLIC_URL']
 		trackchanges:
 			url : "http://#{process.env['TRACK_CHANGES_HOST'] or 'localhost'}:3015"
 		project_history:
@@ -269,6 +270,14 @@ module.exports = settings =
 		bcryptRounds: (parseInt(process.env['BCRYPT_ROUNDS'], 10) || 12) # number of rounds used to hash user passwords (raised to power 2)
 
 	httpAuthUsers: httpAuthUsers
+
+	jwt:
+		spelling:
+			sign:
+				options:
+					algorithm: 'HS512'
+					expiresIn: '30d'
+				secret: process.env.JWT_SPELLING_SIGN_SECRET || 'jwt-spelling-secret'
 
 	twoFactorAuthentication:
 		enabled: process.env['TWO_FACTOR_AUTHENTICATION_ENABLED'] == 'true'

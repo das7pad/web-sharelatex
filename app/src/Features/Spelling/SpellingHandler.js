@@ -1,3 +1,4 @@
+const jwt = require('jsonwebtoken')
 const request = require('request')
 const Settings = require('settings-sharelatex')
 const OError = require('@overleaf/o-error')
@@ -5,6 +6,15 @@ const OError = require('@overleaf/o-error')
 const TIMEOUT = 10 * 1000
 
 module.exports = {
+  getJWT(userId, callback) {
+    jwt.sign(
+      { userId },
+      Settings.jwt.spelling.sign.secret,
+      Settings.jwt.spelling.sign.options,
+      callback
+    )
+  },
+
   getUserDictionary(userId, callback) {
     const url = `${Settings.apis.spelling.url}/user/${userId}`
     request.get({ url: url, timeout: TIMEOUT }, (error, response) => {
