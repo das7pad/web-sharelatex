@@ -65,6 +65,13 @@ if (Settings.behindProxy) {
     next()
   })
 }
+if (Settings.exposeHostname) {
+  const HOSTNAME = require('os').hostname()
+  app.use((req, res, next) => {
+    res.setHeader('X-Served-By', HOSTNAME)
+    next()
+  })
+}
 
 app.set('views', Path.join(__dirname, '/../../views'))
 app.set('view engine', 'pug')
