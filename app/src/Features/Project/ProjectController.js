@@ -766,6 +766,9 @@ const ProjectController = {
             }
             metrics.inc(metricName)
 
+            const enableOptimize =
+              !!Settings.experimentId && !user.features.zotero
+
             const IS_IEEE = brandVariation && brandVariation.brand_id === 15
             let overallThemes = []
             let themeModifier = ''
@@ -845,7 +848,8 @@ const ProjectController = {
               allowedImageNames,
               gitBridgePublicBaseUrl: Settings.gitBridgePublicBaseUrl,
               wsUrl,
-              showSupport: Features.hasFeature('support')
+              showSupport: Features.hasFeature('support'),
+              gaOptimize: enableOptimize
             })
             timer.done()
           }
