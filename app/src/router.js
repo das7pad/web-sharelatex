@@ -979,8 +979,16 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
   webRouter.get('/dev/csrf', (req, res) => res.send(req.csrfToken()))
   AuthenticationController.addEndpointToLoginWhitelist('/dev/csrf')
 
-  publicApiRouter.get('/health_check', HealthCheckController.check)
-  privateApiRouter.get('/health_check', HealthCheckController.checkApi)
+  publicApiRouter.get(
+    '/health_check',
+    HealthCheckController.checkActiveHandles,
+    HealthCheckController.check
+  )
+  privateApiRouter.get(
+    '/health_check',
+    HealthCheckController.checkActiveHandles,
+    HealthCheckController.checkApi
+  )
 
   publicApiRouter.get('/health_check/redis', HealthCheckController.checkRedis)
   privateApiRouter.get('/health_check/redis', HealthCheckController.checkRedis)
