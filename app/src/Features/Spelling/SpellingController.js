@@ -30,11 +30,15 @@ module.exports = {
 
     const userId = AuthenticationController.getLoggedInUserId(req)
     url = `/user/${userId}${url}`
-    req.headers.Host = Settings.apis.spelling.host
+    const headers = Object.assign(
+      { host: Settings.apis.spelling.host },
+      req.headers
+    )
+    delete headers['content-length']
     return request({
       url: Settings.apis.spelling.url + url,
       method: req.method,
-      headers: req.headers,
+      headers,
       json: req.body,
       timeout: TEN_SECONDS
     })

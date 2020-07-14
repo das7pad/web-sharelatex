@@ -54,7 +54,7 @@ describe('SpellingController', function() {
           _id: userId
         }
       },
-      headers: { Host: SPELLING_HOST }
+      headers: { host: SPELLING_HOST }
     }
 
     this.res = {}
