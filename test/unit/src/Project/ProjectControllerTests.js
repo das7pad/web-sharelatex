@@ -132,6 +132,7 @@ describe('ProjectController', function() {
       flushProjectToTpdsIfNeeded: sinon.stub().yields()
     }
     this.SpellingHandler = {
+      getUserDictionary: sinon.stub().yields(null, ['word']),
       getJWT: sinon.stub().yields(null, 'some-jwt')
     }
     this.getUserAffiliations = sinon.stub().callsArgWith(1, null, [
@@ -1013,6 +1014,27 @@ describe('ProjectController', function() {
         this.res.render = (pageName, opts) => {
           expect(this.SpellingHandler.getJWT.called).to.equal(false)
           expect(opts.jwtSpelling).to.equal(undefined)
+          done()
+        }
+        this.ProjectController.loadEditor(this.req, this.res)
+      })
+    })
+
+    describe('spellingDict', function() {
+      it('should request the users dic when logged in', function(done) {
+        this.res.render = (pageName, opts) => {
+          expect(this.SpellingHandler.getUserDictionary.called).to.equal(true)
+          expect(opts.spellingDict).to.deep.equal(['word'])
+          done()
+        }
+        this.ProjectController.loadEditor(this.req, this.res)
+      })
+
+      it('should not get the dict for anonymous users', function(done) {
+        this.AuthenticationController.isUserLoggedIn.returns(false)
+        this.res.render = (pageName, opts) => {
+          expect(this.SpellingHandler.getUserDictionary.called).to.equal(false)
+          expect(opts.spellingDict).to.deep.equal([])
           done()
         }
         this.ProjectController.loadEditor(this.req, this.res)

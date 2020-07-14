@@ -41,6 +41,43 @@ const MockSpellingApi = {
       res.sendStatus(200)
     })
 
+    // /v20200714
+    app.delete('/v20200714/user/:userId', (req, res) => {
+      const { userId } = req.params
+      this.words.delete(userId)
+      res.sendStatus(200)
+    })
+
+    app.get('/v20200714/user/:userId', (req, res) => {
+      const { userId } = req.params
+      const words = this.words[userId] || []
+      res.json(words)
+    })
+
+    app.post('/v20200714/user/:userId/learn', (req, res) => {
+      const word = req.body.word
+      const { userId } = req.params
+      if (word) {
+        this.words[userId] = this.words[userId] || []
+        if (!this.words[userId].includes(word)) {
+          this.words[userId].push(word)
+        }
+      }
+      res.sendStatus(200)
+    })
+
+    app.post('/v20200714/user/:userId/unlearn', (req, res) => {
+      const word = req.body.word
+      const { userId } = req.params
+      if (word && this.words[userId]) {
+        const wordIndex = this.words[userId].indexOf(word)
+        if (wordIndex !== -1) {
+          this.words[userId].splice(wordIndex, 1)
+        }
+      }
+      res.sendStatus(200)
+    })
+
     app
       .listen(3005, error => {
         if (error) {

@@ -53,7 +53,7 @@ export default describe('SpellCheckManager', function() {
   })
 
   it('adds an highlight when a misspelling is found', function() {
-    this.$httpBackend.when('POST', '/spelling/check').respond({
+    this.$httpBackend.when('POST', '/spelling/v20200714/check').respond({
       misspellings: [
         {
           index: 0,
@@ -78,7 +78,7 @@ export default describe('SpellCheckManager', function() {
         'consectetur adipisicing elit',
         'sed do eiusmod'
       ])
-      this.$httpBackend.when('POST', '/spelling/check').respond({
+      this.$httpBackend.when('POST', '/spelling/v20200714/check').respond({
         misspellings: [
           {
             index: 0,
@@ -168,7 +168,7 @@ export default describe('SpellCheckManager', function() {
       this.adapter.getFirstVisibleRowNum.returns(1)
       this.adapter.getLastVisibleRowNum.returns(1)
       this.adapter.getLinesByRows.returns(['Lorem ipsum dolor'])
-      this.$httpBackend.when('POST', '/spelling/check').respond({
+      this.$httpBackend.when('POST', '/spelling/v20200714/check').respond({
         misspellings: [
           {
             index: 0,
@@ -220,7 +220,7 @@ export default describe('SpellCheckManager', function() {
 
     it('hits the backend with all words at startup', function() {
       this.$httpBackend
-        .expect('POST', '/spelling/check', {
+        .expect('POST', '/spelling/v20200714/check', {
           language: this.scope.spellCheckLanguage,
           words: ['Lorem', 'ipsum', 'dolor'],
           token: window.user.id,
@@ -241,7 +241,7 @@ export default describe('SpellCheckManager', function() {
 
     it('does not hit the backend when all words are already in the cache', function() {
       this.$httpBackend
-        .expect('POST', '/spelling/check', {
+        .expect('POST', '/spelling/v20200714/check', {
           language: this.scope.spellCheckLanguage,
           words: ['Lorem', 'ipsum', 'dolor'],
           token: window.user.id,
@@ -264,7 +264,7 @@ export default describe('SpellCheckManager', function() {
 
     it('hits the backend only with non-cached words', function() {
       this.$httpBackend
-        .expect('POST', '/spelling/check', {
+        .expect('POST', '/spelling/v20200714/check', {
           language: this.scope.spellCheckLanguage,
           words: ['Lorem', 'ipsum', 'dolor'],
           token: window.user.id,
@@ -284,7 +284,7 @@ export default describe('SpellCheckManager', function() {
 
       this.adapter.getLinesByRows.returns(['Lorem ipsum dolor sit amet'])
       this.$httpBackend
-        .expect('POST', '/spelling/check', {
+        .expect('POST', '/spelling/v20200714/check', {
           language: this.scope.spellCheckLanguage,
           words: ['sit', 'amet'],
           token: window.user.id,

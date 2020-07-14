@@ -16,7 +16,7 @@ module.exports = {
   },
 
   getUserDictionary(userId, callback) {
-    const url = `${Settings.apis.spelling.url}/user/${userId}`
+    const url = `${Settings.apis.spelling.url}/v20200714/user/${userId}`
     request.get({ url: url, timeout: TIMEOUT }, (error, response) => {
       if (error) {
         return callback(
@@ -42,7 +42,7 @@ module.exports = {
   },
 
   deleteWordFromUserDictionary(userId, word, callback) {
-    const url = `${Settings.apis.spelling.url}/user/${userId}/unlearn`
+    const url = `${Settings.apis.spelling.url}/v20200714/user/${userId}/unlearn`
     request.post(
       {
         url: url,
@@ -77,7 +77,7 @@ module.exports = {
   },
 
   deleteUserDictionary(userId, callback) {
-    const url = `${Settings.apis.spelling.url}/user/${userId}`
+    const url = `${Settings.apis.spelling.url}/v20200714/user/${userId}`
     request.delete({ url: url, timeout: TIMEOUT }, (error, response) => {
       if (error) {
         return callback(

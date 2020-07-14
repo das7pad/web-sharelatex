@@ -13,8 +13,11 @@ module.exports = {
     const { language } = req.body
 
     let url = req.url.slice('/spelling'.length)
+    const action = url.split('/').pop()
+    const isVersioned = url.indexOf('/v') === 0
+    const vPrefix = isVersioned ? url.slice(0, 10) : ''
 
-    if (url === '/check') {
+    if (action === 'check') {
       if (!language) {
         logger.error('"language" field should be included for spell checking')
         return res.status(422).json({ misspellings: [] })
@@ -29,7 +32,11 @@ module.exports = {
     }
 
     const userId = AuthenticationController.getLoggedInUserId(req)
-    url = `/user/${userId}${url}`
+    if (isVersioned && vPrefix >= '/v20200714' && action === 'check') {
+      // from v20200714 on, spelling results are no longer personalized
+    } else {
+      url = `${vPrefix}/user/${userId}/${action}`
+    }
     const headers = Object.assign(
       { host: Settings.apis.spelling.host },
       req.headers

@@ -46,7 +46,7 @@ describe('SpellingHandler', function() {
     it('calls the spelling API', function(done) {
       SpellingHandler.getUserDictionary(userId, () => {
         expect(request.get).to.have.been.calledWith({
-          url: 'http://spelling.service.test/user/wombat',
+          url: 'http://spelling.service.test/v20200714/user/wombat',
           timeout: TIMEOUT
         })
         done()
@@ -74,7 +74,7 @@ describe('SpellingHandler', function() {
     it('calls the spelling API', function(done) {
       SpellingHandler.deleteWordFromUserDictionary(userId, word, () => {
         expect(request.post).to.have.been.calledWith({
-          url: 'http://spelling.service.test/user/wombat/unlearn',
+          url: 'http://spelling.service.test/v20200714/user/wombat/unlearn',
           json: {
             word: word
           },
@@ -104,7 +104,7 @@ describe('SpellingHandler', function() {
     it('calls the spelling API', function(done) {
       SpellingHandler.deleteUserDictionary(userId, () => {
         expect(request.delete).to.have.been.calledWith({
-          url: 'http://spelling.service.test/user/wombat',
+          url: 'http://spelling.service.test/v20200714/user/wombat',
           timeout: TIMEOUT
         })
         done()

@@ -795,6 +795,16 @@ function initialize(webRouter, privateApiRouter, publicApiRouter) {
     AuthenticationController.requireLogin(),
     SpellingController.proxyRequestToSpellingApi
   )
+  webRouter.post(
+    '/spelling/v20200714/check',
+    AuthenticationController.requireLogin(),
+    SpellingController.proxyRequestToSpellingApi
+  )
+  webRouter.post(
+    '/spelling/v20200714/learn',
+    AuthenticationController.requireLogin(),
+    SpellingController.proxyRequestToSpellingApi
+  )
 
   webRouter.get(
     '/project/:project_id/messages',
