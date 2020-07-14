@@ -61,9 +61,9 @@ aside#left-menu.full-size(
 			h4 #{translate("services")}
 			!= moduleIncludes("editorLeftMenu:editing_services", locals)
 
-	h4(ng-show="!anonymous") #{translate("settings")}
+	h4 #{translate("settings")}
 	meta(id='ol-validRootDocExtensions' data-json content=settings.validRootDocExtensions)
-	form.settings(ng-controller="SettingsController", ng-show="!anonymous")
+	form.settings(ng-controller="SettingsController")
 		.containter-fluid
 			.form-controls(ng-show="permissions.write")
 				label(for="compiler") #{translate("compiler")}
@@ -94,7 +94,7 @@ aside#left-menu.full-size(
 					ng-options="doc.doc.id as doc.path for doc in getValidMainDocs()"
 				)
 
-			.form-controls
+			.form-controls(ng-show="!anonymous")
 				label(for="spellCheckLanguage") #{translate("spell_check")}
 				select(
 					name="spellCheckLanguage"
@@ -107,7 +107,7 @@ aside#left-menu.full-size(
 								value=language.code
 							)= language.name
 
-			.form-controls
+			.form-controls(ng-show="!anonymous")
 				label(for="autoComplete") #{translate("auto_complete")}
 				select(
 					name="autoComplete"
@@ -115,7 +115,7 @@ aside#left-menu.full-size(
 					ng-options="o.v as o.n for o in [{ n: 'On', v: true }, { n: 'Off', v: false }]"
 				)
 
-			.form-controls
+			.form-controls(ng-show="!anonymous")
 				label(for="autoPairDelimiters") #{translate("auto_close_brackets")}
 				select(
 					name="autoPairDelimiters"
@@ -123,7 +123,7 @@ aside#left-menu.full-size(
 					ng-options="o.v as o.n for o in [{ n: 'On', v: true }, { n: 'Off', v: false }]"
 				)
 
-			.form-controls.code-check-setting
+			.form-controls.code-check-setting(ng-show="!anonymous")
 				label(for="syntaxValidation") #{translate("syntax_validation")}
 				select(
 					name="syntaxValidation"
@@ -154,7 +154,7 @@ aside#left-menu.full-size(
 					)
 						i.fa.fa-fw.fa-spin.fa-refresh
 
-			.form-controls(ng-show="!anonymous")
+			.form-controls
 				label(for="mode") #{translate("keybindings")}
 				select(
 					name="mode"

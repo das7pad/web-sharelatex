@@ -1064,7 +1064,9 @@ var defaultSettingsForAnonymousUser = userId => ({
     theme: 'textmate',
     fontSize: '12',
     autoComplete: true,
+    autoPairDelimiters: true,
     spellCheckLanguage: '',
+    overallTheme: '',
     pdfViewer: '',
     syntaxValidation: true
   },
