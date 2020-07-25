@@ -17,8 +17,10 @@ import 'libs/passfield'
 App.directive('asyncForm', ($http, validateCaptcha, validateCaptchaV3) => ({
   controller: [
     '$scope',
-    function($scope) {
-      this.getEmail = () => $scope.email
+    '$location',
+    function($scope, $location) {
+      this.getEmail = $scope.getEmail = () =>
+        $scope.email || $location.search().email
       return this
     }
   ],

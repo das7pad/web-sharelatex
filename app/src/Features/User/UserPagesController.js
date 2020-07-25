@@ -74,8 +74,7 @@ const UserPagesController = {
       AuthenticationController.setRedirectInSession(req, req.query.redir)
     }
     res.render('user/login', {
-      title: 'login',
-      email: req.query.email
+      title: 'login'
     })
   },
 
