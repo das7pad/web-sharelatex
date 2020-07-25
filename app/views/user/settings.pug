@@ -20,7 +20,6 @@ block content
 								.col-md-5
 									h3 #{translate("update_account_info")}
 									form(async-form="settings", name="settingsForm", method="POST", action="/user/settings", novalidate)
-										input(type="hidden", name="_csrf", value=csrfToken)
 										if !hasFeature('affiliations')
 											if !EXTERNAL_AUTHENTICATION_SYSTEM_USED 
 												.form-group
@@ -106,7 +105,6 @@ block content
 											method="POST"
 											novalidate
 										)
-											input(type="hidden", name="_csrf", value=csrfToken)
 											.form-group
 												label(for='currentPassword') #{translate("current_password")}
 												input.form-control(

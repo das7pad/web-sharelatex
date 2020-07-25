@@ -17,7 +17,6 @@ block content
 							auto-submit="true",
 							ng-cloak
 						)
-							input(type="hidden", name="_csrf", value=csrfToken)
 							input(type="hidden", name="token", value=token)
 							form-messages(for="confirmEmailForm")
 								.alert.alert-success(ng-show="confirmEmailForm.response.success")

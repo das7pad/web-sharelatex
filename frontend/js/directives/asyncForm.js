@@ -65,6 +65,7 @@ App.directive('asyncForm', ($http, validateCaptcha, validateCaptchaV3) => ({
         method: 'POST',
         url: element.attr('action'),
         data: formData,
+        headers: { 'X-CSRF-Token': window.csrfToken },
         disableAutoLoginRedirect: true
       })
         .then(function(httpResponse) {
