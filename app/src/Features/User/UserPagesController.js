@@ -93,11 +93,8 @@ const UserPagesController = {
   },
 
   renderReconfirmAccountPage(req, res) {
-    const pageData = {
-      reconfirm_email: req.session.reconfirm_email
-    }
     // when a user must reconfirm their account
-    res.render('user/reconfirm', pageData)
+    res.render('user/reconfirm')
   },
 
   settingsPage(req, res, next) {

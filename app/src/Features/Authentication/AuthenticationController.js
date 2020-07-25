@@ -370,8 +370,7 @@ const AuthenticationController = (module.exports = {
       { url: req.url },
       'user needs to reconfirm so redirecting to reconfirm page'
     )
-    req.session.reconfirm_email = user != null ? user.email : undefined
-    const redir = '/user/reconfirm'
+    const redir = `/user/reconfirm?email=${user.email}`
     AsyncFormHelper.redirect(req, res, redir)
   },
 

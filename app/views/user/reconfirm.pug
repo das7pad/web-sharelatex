@@ -1,7 +1,6 @@
 extends ../_layout
 
 block content
-	- var email = reconfirm_email ? reconfirm_email : ""
 	.content.content-alt
 		.container
 			.row
@@ -17,7 +16,7 @@ block content
 							action="/user/reconfirm",
 							method="POST",
 							ng-cloak
-							ng-init="email='"+email+"'"
+							ng-init="email=getEmail()"
 							aria-label=translate('request_reconfirmation_email')
 						)
 							input(type="hidden", name="_csrf", value=csrfToken)
