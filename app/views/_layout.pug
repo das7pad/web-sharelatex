@@ -93,5 +93,6 @@ html(
 		include _sentry
 
 		block foot-scripts
+			script(type='text/javascript', async, defer, src=buildJsPath(`t/${currentLngCode}.js`))
 			script(type='text/javascript', async, defer, src=buildJsPath('libraries.js'))
 			script(type='text/javascript', async, defer, src=buildJsPath('main.js'))

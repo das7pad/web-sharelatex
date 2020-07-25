@@ -18,6 +18,13 @@ const entryPoints = {
   'light-style': './frontend/stylesheets/light-style.less'
 }
 
+require('glob')
+  .sync(`${NODE_MODULES}/translations-sharelatex/lng/*.js`)
+  .map(file => file.replace(NODE_MODULES + '/', ''))
+  .forEach(file => {
+    entryPoints[`t/${path.basename(file, '.js')}`] = file
+  })
+
 // Attempt to load frontend entry-points from modules, if they exist
 if (fs.existsSync(MODULES_PATH)) {
   fs.readdirSync(MODULES_PATH).reduce((acc, module) => {

@@ -173,6 +173,7 @@ block content
 
 block foot-scripts
 	script(type='text/javascript', defer, src=(wsUrl || '/socket.io') + '/socket.io.js')
+	script(type='text/javascript', defer, src=buildJsPath(`t/${currentLngCode}.js`))
 	script(type='text/javascript', defer, src=buildJsPath('libraries.js'))
 	script(type='text/javascript', defer, src=buildJsPath('ideLibraries.js'))
 	script(type='text/javascript', defer, src=buildJsPath('ide.js'))
