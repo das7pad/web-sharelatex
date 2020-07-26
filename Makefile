@@ -198,6 +198,21 @@ clean_test_frontend:
 
 build_app:
 
+# GNU Makes wildcard pattern '**' does not match empty or deep components
+VIEW_FILES:=$(shell \
+	find app/views modules/*/app/views -name '*.pug' \
+	| grep -v -e '/_' \
+	| sed 's|^|generated/views/|;s/.pug/.js/' \
+)
+
+build_views_full:
+	node app/src/infrastructure/Views.js
+
+build_views: $(VIEW_FILES)
+.PHONY: $(VIEW_FILES)
+$(VIEW_FILES): generated/views/%.js:
+	node app/src/infrastructure/Views.js $*
+
 build_dev_deps: clean_build_artifacts
 	docker build \
 		--cache-from $(IMAGE_CI)-dev-deps-cache \

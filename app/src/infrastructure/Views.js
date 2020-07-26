@@ -31,14 +31,14 @@ module.exports = {
       compileFile(filename).toString()
     )
   },
-  _persistGeneratedTemplate(view) {
+  persistGeneratedTemplate(view) {
     const body = this._generateTemplateModule(view)
     const dest = Path.join(GENERATED_VIEWS, view + '.js')
     fs.mkdirSync(Path.dirname(dest), { recursive: true, mode: 0o755 })
     fs.writeFileSync(dest, body, { mode: 0o644 })
   },
   persistGeneratedTemplates() {
-    viewList.forEach(this._persistGeneratedTemplate.bind(this))
+    viewList.forEach(this.persistGeneratedTemplate.bind(this))
   },
   getTemplate(path) {
     return templates.get(path)
@@ -59,15 +59,18 @@ module.exports = {
     })
   },
 
+  precompileView(view) {
+    const filename = view + '.pug'
+    compileFile(filename)
+    logger.log({ view }, 'compiled')
+  },
   precompileViews(app) {
     const startTime = Date.now()
     let success = 0
     let failures = 0
     viewList.forEach(view => {
       try {
-        const filename = view + '.pug'
-        compileFile(filename)
-        logger.log({ view }, 'compiled')
+        this.precompileView(view)
         success++
       } catch (err) {
         logger.error({ view, err: err.message }, 'error compiling')
@@ -83,6 +86,22 @@ module.exports = {
 }
 
 if (!module.parent) {
+  if (process.argv.length === 3) {
+    try {
+      module.exports.precompileView(process.argv[2])
+    } catch (err) {
+      logger.fatal({ err }, 'compile failed')
+      process.exit(1)
+    }
+    try {
+      module.exports.persistGeneratedTemplate(process.argv[2])
+    } catch (err) {
+      logger.fatal({ err }, 'persisting failing')
+      process.exit(2)
+    }
+    process.exit(0)
+  }
+
   if (module.exports.precompileViews()) {
     logger.fatal({}, 'compile failed')
     process.exit(1)
