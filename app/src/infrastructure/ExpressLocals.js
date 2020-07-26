@@ -193,6 +193,7 @@ function cspMiddleware() {
   )
 
   function generateCSP(cfg) {
+    const defaultSrc = []
     const scriptSrc = ["'self'"]
     const styleSrc = ["'self'", "'unsafe-inline'"]
     const fontSrc = ["'self'", 'about:']
@@ -268,13 +269,25 @@ function cspMiddleware() {
         connectSrc.push('ws' + wsUrl.slice(4))
       })
     }
+
+    if (cfg.needsPrefetch) {
+      // backwards compatibility
+      defaultSrc.push(...prefetchSrc)
+    } else {
+      prefetchSrc.length = 0
+      prefetchSrc.push("'none'")
+    }
+    if (!defaultSrc.length) {
+      defaultSrc.push("'none'")
+    }
+
     let policyAmend = ''
     if (csp.reportURL) {
       policyAmend += `; report-uri ${csp.reportURL}`
     }
     return `base-uri 'self'; block-all-mixed-content; connect-src ${connectSrc.join(
       ' '
-    )}; default-src 'none'; font-src ${fontSrc.join(
+    )}; default-src ${defaultSrc.join(' ')}; font-src ${fontSrc.join(
       ' '
     )}; form-action 'self'; frame-ancestors 'none'; frame-src ${frameSrc.join(
       ' '
@@ -292,6 +305,7 @@ function cspMiddleware() {
   const CSP_EDITOR = generateCSP({
     connectCDN: true,
     needsCompilesAccess: true,
+    needsPrefetch: true,
     needsSocketIo: true
   })
   const CSP_LAUNCHPAD = generateCSP({
