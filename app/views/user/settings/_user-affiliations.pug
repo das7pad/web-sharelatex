@@ -79,7 +79,7 @@ form.row(
 										ng-disabled="!(affiliationToChange.role && affiliationToChange.department)"
 										type="button"
 									) {{translate("save_or_cancel-save")}}
-									| &emsp;#{translate("save_or_cancel-or" )}&emsp;
+									| &emsp;{{translate("save_or_cancel-or")}}&emsp;
 									a(
 										href
 										ng-click="cancelAffiliationChange();"
@@ -92,7 +92,7 @@ form.row(
 						.affiliations-table-inline-action-disabled-wrapper(ng-if="!userEmail.ssoAvailable")
 							+btnMakePrimaryDisabled(translate("please_confirm_your_email_before_making_it_default"))
 						button.btn.btn-sm.btn-success.affiliations-table-inline-action(
-							tooltip=translate("make_email_primary_description")
+							tooltip="{{translate('make_email_primary_description')}}"
 							ng-if="!userEmail.default && (userEmail.confirmedAt && !ui.isMakingRequest)"
 							ng-click="setDefaultUserEmail(userEmail)"
 							type="button"
@@ -102,7 +102,7 @@ form.row(
 							ng-if="!userEmail.default"
 							ng-click="removeUserEmail(userEmail)"
 							ng-disabled="ui.isMakingRequest"
-							tooltip=translate("remove")
+							tooltip="{{translate('remove')}}"
 							type="button"
 						)
 							i.fa.fa-fw.fa-trash(aria-hidden="true")
@@ -111,13 +111,13 @@ form.row(
 					td
 					td(ng-attr-colspan="{{userEmail.samlProviderId ? '2' : '1'}}" ng-class="institutionAlreadyLinked(userEmail) ? '' : 'with-border'")
 						p.small(ng-if="userEmail.samlProviderId")
-							| !{translate("acct_linked_to_institution_acct", {institutionName: '{{userEmail.affiliation.institution.name}}'})}
+							| {{translate("acct_linked_to_institution_acct", {institutionName: userEmail.affiliation.institution.name})}}
 						div(ng-if="!userEmail.samlProviderId && !institutionAlreadyLinked(userEmail)")
 							//- this email is not linked to institution login but
 							//- cannot have multiple emails at same institution linked for "institution login"
 							//- so check if institution is already linked
 							p.small
-								| !{translate("can_link_your_institution_acct", {institutionName: '{{userEmail.affiliation.institution.name}}'})}
+								| {{translate("can_link_your_institution_acct", {institutionName: userEmail.affiliation.institution.name})}}
 							p.small
 								| {{translate("doing_this_allow_log_in_through_institution")}}&nbsp;
 								+aboutInstitutionLink()
@@ -158,8 +158,8 @@ form.row(
 						ng-if="newAffiliation.ssoAvailable"
 					)
 						p.affiliations-table-label {{ newAffiliation.university.name }}
-						p !{translate("to_add_email_accounts_need_to_be_linked", {institutionName: "{{newAffiliation.university.name}}"})}
-						p !{translate("doing_this_will_verify_affiliation_and_allow_log_in", {institutionName: "{{newAffiliation.university.name}}"})}&nbsp;
+						p {{translate("to_add_email_accounts_need_to_be_linked", {institutionName: newAffiliation.university.name})}}
+						p {{translate("doing_this_will_verify_affiliation_and_allow_log_in", {institutionName: newAffiliation.university.name})}}&nbsp;
 							+aboutInstitutionLink()
 						button.btn-sm.btn.btn-primary.btn-link-accounts(
 							ng-click="linkInstitutionAcct(newAffiliation.email, newAffiliation.university.id)"
@@ -236,10 +236,11 @@ form.row(
 								type="button"
 								data-dismiss="modal"
 								ng-click="closeInstitutionNotification('info')"
-								aria-label=translate("close")
+								aria-label="{{translate('close')}}"
 							)
 								span(aria-hidden="true") &times;
-							.small !{translate("institution_acct_successfully_linked", {institutionName: institutionLinked.universityName})}
+							meta(id="ol-institutionName" content=institutionLinked.universityName)
+							.small {{translate("institution_acct_successfully_linked", {institutionName: getMeta("ol-institutionName")})}}
 							if institutionLinked.hasEntitlement
 								.small {{translate("this_grants_access_to_features", {featureType: translate("professional")})}
 					if institutionEmailNonCanonical
@@ -249,13 +250,14 @@ form.row(
 									type="button"
 									data-dismiss="modal"
 									ng-click="closeInstitutionNotification('warning')"
-									aria-label=translate("close")
+									aria-label="{{translate('close')}}"
 								)
 									span(aria-hidden="true") &times;
+								meta(id="ol-institutionEmailNonCanonical" content=institutionEmailNonCanonical)
 								.small
 									i.fa.fa-exclamation-triangle(aria-hidden="true")
 									| &nbsp;
-									| {{translate("in_order_to_match_institutional_metadata", {email: "#{institutionEmailNonCanonical}"})}}
+									| {{translate("in_order_to_match_institutional_metadata", {email: getMeta("ol-institutionEmailNonCanonical")})}}
 				if institutionLinkedToAnother
 					tr.affiliations-table-error-row(ng-if="!hideInstitutionNotifications.error")
 						td.text-center(aria-live="assertive" colspan="3")
@@ -263,7 +265,7 @@ form.row(
 								type="button"
 								data-dismiss="modal"
 								ng-click="closeInstitutionNotification('error')"
-								aria-label=translate("close")
+								aria-label="{{translate('close')}}"
 							)
 								span(aria-hidden="true") &times;
 							.small
@@ -277,7 +279,7 @@ form.row(
 								type="button"
 								data-dismiss="modal"
 								ng-click="closeInstitutionNotification('linkError')"
-								aria-label=translate("close")
+								aria-label="{{translate('close')}}"
 							)
 								span(aria-hidden="true") &times;
 							.small

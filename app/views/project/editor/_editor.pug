@@ -93,14 +93,14 @@ div.full-size(
 		ng-controller="PdfSynctexController"
 	)
 		a.btn.btn-default.btn-xs.synctex-control.synctex-control-goto-pdf(
-			tooltip=translate('go_to_code_location_in_pdf')
+			tooltip="{{translate('go_to_code_location_in_pdf')}}"
 			tooltip-placement="right"
 			tooltip-append-to-body="true"
 			ng-click="syncToPdf()"
 		)
 			i.synctex-control-icon
 		a.btn.btn-default.btn-xs.synctex-control.synctex-control-goto-code(
-			tooltip=translate('go_to_pdf_location_in_code')
+			tooltip="{{translate('go_to_pdf_location_in_code')}}"
 			tooltip-placement="right"
 			tooltip-append-to-body="true"
 			ng-click="syncToCode()"

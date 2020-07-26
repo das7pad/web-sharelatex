@@ -61,7 +61,7 @@ header.toolbar.toolbar-header.toolbar-with-labels(
 			ng-if="permissions.admin",
 			href='#',
 			tooltip-placement="bottom",
-			tooltip=translate('rename'),
+			tooltip="{{translate('rename')}}",
 			tooltip-append-to-body="true",
 			ng-click="startRenaming()",
 			ng-show="!state.renaming"
@@ -90,7 +90,7 @@ header.toolbar.toolbar-header.toolbar-with-labels(
 		)
 			span.online-user.online-user-multi(
 				dropdown-toggle,
-				tooltip=translate('connected_users'),
+				tooltip="{{translate('connected_users')}}",
 				tooltip-placement="left"
 			)
 				strong {{ onlineUsersArray.length }}

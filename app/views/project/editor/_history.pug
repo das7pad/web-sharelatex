@@ -20,7 +20,7 @@ script(type="text/ng-template", id="historyRestoreDiffModalTemplate")
 			span(aria-hidden="true") &times;
 		h3 {{translate("restore")}} {{diff.doc.name}}
 	.modal-body.modal-body-share
-		p !{translate("sure_you_want_to_restore_before", {filename:"<strong>{{diff.doc.name}}</strong>", date:"{{diff.start_ts | formatDate}}"})}
+		p {{translate("sure_you_want_to_restore_before", {filename: String(diff.doc.name).bold(), date: (diff.start_ts | formatDate)})}}
 	.modal-footer
 		button.btn.btn-default(
 			ng-click="cancel()",
@@ -53,7 +53,7 @@ script(type="text/ng-template", id="historyLabelTpl")
 			ng-if="$ctrl.isOwnedByCurrentUser && !$ctrl.isPseudoCurrentStateLabel"
 			stop-propagation="click"
 			ng-click="$ctrl.onLabelDelete()"
-			aria-label=translate("delete")
+			aria-label="{{translate('delete')}}"
 		)
 			span(aria-hidden="true") &times;
 

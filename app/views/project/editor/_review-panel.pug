@@ -64,7 +64,7 @@
 		)
 			li.rp-tc-state-item.rp-tc-state-item-everyone
 				span.rp-tc-state-item-name(
-					tooltip=translate('tc_switch_everyone_tip')
+					tooltip="{{translate('tc_switch_everyone_tip')}}"
 					tooltip-placement="left"
 					tooltip-append-to-body="true"
 					tooltip-popup-delay="1000"
@@ -81,7 +81,7 @@
 				span.rp-tc-state-item-name(
 					ng-class="{ 'rp-tc-state-item-name-disabled' : reviewPanel.trackChangesOnForEveryone}"
 					style="color: hsl({{ member.hue }}, 70%, 40%);"
-					tooltip=translate('tc_switch_user_tip')
+					tooltip="{{translate('tc_switch_user_tip')}}"
 					tooltip-placement="left"
 					tooltip-append-to-body="true"
 					tooltip-popup-delay="1000"
@@ -97,7 +97,7 @@
 			li.rp-tc-state-item.rp-tc-state-item-guests
 				span.rp-tc-state-item-name(
 					ng-class="{ 'rp-tc-state-item-name-disabled' : reviewPanel.trackChangesOnForEveryone}"
-					tooltip=translate('tc_switch_guests_tip')
+					tooltip="{{translate('tc_switch_guests_tip')}}"
 					tooltip-placement="left"
 					tooltip-append-to-body="true"
 					tooltip-popup-delay="1000"
@@ -394,7 +394,7 @@ script(type='text/ng-template', id='commentEntryTemplate')
 					ng-model="entry.replyContent"
 					ng-keypress="handleCommentReplyKeyPress($event);"
 					stop-propagation="click"
-					placeholder=translate("hit_enter_to_reply")
+					placeholder="{{translate('hit_enter_to_reply')}}"
 				)
 			.rp-entry-actions
 				button.rp-entry-button(
@@ -476,7 +476,7 @@ script(type='text/ng-template', id='addCommentEntryTemplate')
 						expandable-text-area
 						ng-model="state.content"
 						ng-keypress="handleCommentKeyPress($event);"
-						placeholder=translate("add_your_comment_here")
+						placeholder="{{translate('add_your_comment_here')}}"
 						focus-on="comment:new:open"
 					)
 				.rp-entry-actions
@@ -520,7 +520,7 @@ script(type='text/ng-template', id='resolvedCommentsDropdownTemplate')
 		a.resolved-comments-toggle(
 			href
 			ng-click="toggleOpenState();"
-			tooltip=translate("resolved_comments")
+			tooltip="{{translate('resolved_comments')}}"
 			tooltip-placement="bottom"
 			tooltip-append-to-body="true"
 		)
@@ -600,8 +600,8 @@ script(type="text/ng-template", id="bulkActionsModalTemplate")
 			span(aria-hidden="true") &times;
 		h3 {{ isAccept ? '{{translate("accept_all")}}' : '{{translate("reject_all")}}' }}
 	.modal-body
-		p(ng-if="isAccept") #{translate("bulk_accept_confirm", { nChanges: "{{ nChanges }}"})}
-		p(ng-if="!isAccept") #{translate("bulk_reject_confirm", { nChanges: "{{ nChanges }}"})}
+		p(ng-if="isAccept") {{translate("bulk_accept_confirm", {nChanges})}}
+		p(ng-if="!isAccept") {{translate("bulk_reject_confirm", {nChanges})}}
 	.modal-footer()
 		button.btn.btn-default(
 			ng-click="cancel()"

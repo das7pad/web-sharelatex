@@ -5,7 +5,7 @@ td.project-list-table-name-cell
 			type="checkbox",
 			ng-model="project.selected"
 			stop-propagation="click"
-			aria-label=translate('select_project') + " '{{ project.name }}'"
+			aria-label="{{translate('select_project')}} '{{ project.name }}'"
 		)
 		span.project-list-table-name
 			a.project-list-table-name-link(
@@ -46,10 +46,10 @@ td.project-list-table-owner-cell
 	span(ng-if="isLinkSharingProject(project)")
 		| &nbsp;
 		i.fa.fa-link.small(
-			tooltip=translate("link_sharing")
+			tooltip="{{translate('link_sharing')}}"
 			tooltip-placement="right"
 			tooltip-append-to-body="true"
-			aria-label=translate("link_sharing")
+			aria-label="{{translate('link_sharing')}}"
 		)
 
 td.project-list-table-lastupdated-cell
@@ -67,16 +67,16 @@ td.project-list-table-actions-cell
 	)
 		button.btn.btn-link.action-btn(
 			ng-if="!(project.archived || project.trashed)"
-			aria-label=translate('copy'),
-			tooltip=translate('copy'),
+			aria-label="{{translate('copy')}}",
+			tooltip="{{translate('copy')}}",
 			tooltip-placement="top",
 			tooltip-append-to-body="true",
 			ng-click="clone($event)"
 		)
 			i.icon.fa.fa-files-o(aria-hidden="true")
 		button.btn.btn-link.action-btn(
-			aria-label=translate('download'),
-			tooltip=translate('download'),
+			aria-label="{{translate('download')}}",
+			tooltip="{{translate('download')}}",
 			tooltip-placement="top",
 			tooltip-append-to-body="true",
 			ng-click="download($event)"
@@ -84,8 +84,8 @@ td.project-list-table-actions-cell
 			i.icon.fa.fa-cloud-download(aria-hidden="true")
 		button.btn.btn-link.action-btn(
 			ng-if="!project.archived"
-			aria-label=translate('archive'),
-			tooltip=translate('archive'),
+			aria-label="{{translate('archive')}}",
+			tooltip="{{translate('archive')}}",
 			tooltip-placement="top",
 			tooltip-append-to-body="true",
 			ng-click="archive($event)"
@@ -93,8 +93,8 @@ td.project-list-table-actions-cell
 			i.icon.fa.fa-inbox(aria-hidden="true")
 		button.btn.btn-link.action-btn(
 			ng-if="!project.trashed"
-			aria-label=translate('trash'),
-			tooltip=translate('trash'),
+			aria-label="{{translate('trash')}}",
+			tooltip="{{translate('trash')}}",
 			tooltip-placement="top",
 			tooltip-append-to-body="true",
 			ng-click="trash($event)"
@@ -102,8 +102,8 @@ td.project-list-table-actions-cell
 			i.icon.fa.fa-trash(aria-hidden="true")
 		button.btn.btn-link.action-btn(
 			ng-if="project.archived && !project.trashed"
-			aria-label=translate('unarchive'),
-			tooltip=translate('unarchive'),
+			aria-label="{{translate('unarchive')}}",
+			tooltip="{{translate('unarchive')}}",
 			tooltip-placement="top",
 			tooltip-append-to-body="true",
 			ng-click="unarchive($event)"
@@ -111,8 +111,8 @@ td.project-list-table-actions-cell
 			i.icon.fa.fa-reply(aria-hidden="true")
 		button.btn.btn-link.action-btn(
 			ng-if="project.trashed && !project.archived"
-			aria-label=translate('untrash'),
-			tooltip=translate('untrash'),
+			aria-label="{{translate('untrash')}}",
+			tooltip="{{translate('untrash')}}",
 			tooltip-placement="top",
 			tooltip-append-to-body="true",
 			ng-click="untrash($event)"
@@ -120,8 +120,8 @@ td.project-list-table-actions-cell
 			i.icon.fa.fa-reply(aria-hidden="true")
 		button.btn.btn-link.action-btn(
 			ng-if="project.trashed && !project.archived && !isOwner()"
-			aria-label=translate('leave'),
-			tooltip=translate('leave'),
+			aria-label="{{translate('leave')}}",
+			tooltip="{{translate('leave')}}",
 			tooltip-placement="top",
 			tooltip-append-to-body="true",
 			ng-click="leave($event)"
@@ -129,8 +129,8 @@ td.project-list-table-actions-cell
 			i.icon.fa.fa-sign-out(aria-hidden="true")
 		button.btn.btn-link.action-btn(
 			ng-if="project.trashed && !project.archived && isOwner()"
-			aria-label=translate('delete'),
-			tooltip=translate('delete'),
+			aria-label="{{translate('delete')}}",
+			tooltip="{{translate('delete')}}",
 			tooltip-placement="top",
 			tooltip-append-to-body="true",
 			ng-click="delete($event)"
@@ -138,6 +138,6 @@ td.project-list-table-actions-cell
 			i.icon.fa.fa-ban(aria-hidden="true")
 	div(
 		ng-if="project.isTableActionInflight"
-		aria-label=translate('processing')
+		aria-label="{{translate('processing')}}"
 	)
 		i.fa.fa-spinner.fa-spin(aria-hidden="true")

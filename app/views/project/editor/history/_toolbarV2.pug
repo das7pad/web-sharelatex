@@ -95,9 +95,9 @@
 	)
 		toggle-switch(
 			ng-model="toolbarUIConfig.showOnlyLabels"
-			label-true=translate("history_view_labels")
-			label-false=translate("history_view_all")
-			description=translate("history_view_a11y_description")
+			label-true="{{translate('history_view_labels')}}"
+			label-false="{{translate('history_view_all')}}"
+			description="{{translate('history_view_a11y_description')}}"
 		)
 
 script(type="text/ng-template", id="historyV2AddLabelModalTemplate")
@@ -114,7 +114,7 @@ script(type="text/ng-template", id="historyV2AddLabelModalTemplate")
 			.form-group
 				input.form-control(
 					type="text"
-					placeholder=translate("history_new_label_name")
+					placeholder="{{translate('history_new_label_name')}}"
 					ng-model="inputs.labelName"
 					focus-on="open"
 					required

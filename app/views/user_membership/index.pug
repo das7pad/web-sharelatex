@@ -5,17 +5,20 @@ block content
 		.container
 			.row
 				.col-md-10.col-md-offset-1
-					h1(ng-non-bindable) #{name || translate(translations.title)}
+					meta(id="ol-userMembershipName" content=name)
+					h1 {{getMeta("ol-userMembershipName") || translate("#{translations.title}")}}
 					.card(ng-controller="UserMembershipController")
 						.page-header
 							.pull-right(ng-cloak)
-								small(ng-show="groupSize && selectedUsers.length == 0") !{translate("you_have_added_x_of_group_size_y", {addedUsersSize:"<strong>{{ users.length }}</strong>", groupSize:"<strong>{{ groupSize }}</strong>"})}
+								meta(id="ol-addedUsersSize" content='')
+								small(ng-show="groupSize && selectedUsers.length == 0")
+									| {{translate("you_have_added_x_of_group_size_y", {addedUsersSize: String(users.length).bold(), groupSize: String(groupSize).bold()})}}
 								a.btn.btn-danger(
 									href,
 									ng-show="selectedUsers.length > 0"
 									ng-click="removeMembers()"
-								) #{translate(translations.remove)}
-							h3 #{translate(translations.subtitle)}
+								) {{translate("#{translations.remove}")}}
+							h3 {{translate("#{translations.subtitle}")}}
 
 						.row-spaced-small
 							div(ng-if="inputs.removeMembers.error", ng-cloak)

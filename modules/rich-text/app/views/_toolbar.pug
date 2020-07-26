@@ -22,7 +22,7 @@
         href,
         ng-click="switchToFlatLayout('editor')"
         ng-show="ui.pdfLayout == 'sideBySide'"
-        tooltip=translate('full_screen')
+        tooltip="{{translate('full_screen')}}"
         tooltip-placement="bottom"
         tooltip-append-to-body="true"
       )
@@ -32,7 +32,7 @@
         href,
         ng-click="switchToSideBySideLayout('editor')"
         ng-show="ui.pdfLayout == 'flat'"
-        tooltip=translate('split_screen')
+        tooltip="{{translate('split_screen')}}"
         tooltip-placement="bottom"
         tooltip-append-to-body="true"
       )

@@ -62,7 +62,7 @@ script(type="text/ng-template", id="historyEntriesListTpl")
 				ng-controller="FreeTrialModalController"
 			)
 				p {{translate("currently_seeing_only_24_hrs_history")}}
-				p: strong #{translate("upgrade_to_get_feature", {feature:"full Project History"})}
+				p: strong {{translate("upgrade_to_get_feature", {feature: "full Project History"})}}
 				ul.list-unstyled
 					li 
 						i.fa.fa-check &nbsp;
@@ -70,7 +70,7 @@ script(type="text/ng-template", id="historyEntriesListTpl")
 					
 					li
 						i.fa.fa-check &nbsp;
-						| #{translate("collabs_per_proj", {collabcount:'Multiple'})}
+						| {{translate("collabs_per_proj", {collabcount: 'Multiple'})}}
 					
 					li 
 						i.fa.fa-check &nbsp;

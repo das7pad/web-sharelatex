@@ -19,6 +19,7 @@ import './modules/recursionHelper'
 import './modules/errorCatcher'
 import './modules/storage'
 import t from './misc/t'
+import getMeta from './utils/meta'
 
 const App = angular
   .module('SharelatexApp', [
@@ -40,6 +41,8 @@ const App = angular
 App.run(($rootScope, $templateCache) => {
   // expose t and translate to all views -- without explicit import
   $rootScope.t = $rootScope.translate = t
+  // expose getMeta without explicit import
+  $rootScope.getMeta = getMeta
   // UI Select templates are hard-coded and use Glyphicon icons (which we don't import).
   // The line below simply overrides the hard-coded template with our own, which is
   // basically the same but using Font Awesome icons.

@@ -17,7 +17,7 @@ block content
 							method="POST",
 							ng-cloak
 							ng-init="email=getEmail()"
-							aria-label=translate('request_reconfirmation_email')
+							aria-label="{{translate('request_reconfirmation_email')}}"
 						)
 							form-messages(for="reconfirmAccountForm" role="alert")
 							.form-group
@@ -38,5 +38,5 @@ block content
 								button.btn.btn-primary(
 									type='submit',
 									ng-disabled="reconfirmAccountForm.$invalid"
-									aria-label=translate('request_reconfirmation_email')
+									aria-label="{{translate('request_reconfirmation_email')}}"
 								) {{translate('request_reconfirmation_email')}}

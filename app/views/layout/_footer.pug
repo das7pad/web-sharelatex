@@ -16,7 +16,7 @@ footer.site-footer
 							aria-label="Select {{translate('language')}}"
 							tooltip="{{translate('language')}}"
 						)
-							figure(class="sprite-icon sprite-icon-lang sprite-icon-"+currentLngCode alt=translate(currentLngCode))
+							figure(class="sprite-icon sprite-icon-lang sprite-icon-"+currentLngCode alt="{{translate('#{currentLngCode}')}}")
 
 						ul.dropdown-menu(role="menu")
 							li.dropdown-header {{translate("language")}}
@@ -24,7 +24,7 @@ footer.site-footer
 								if !subdomainDetails.hide
 									li.lngOption
 										a.menu-indent(href=getTranslationUrl(subdomainDetails))
-											figure(class="sprite-icon sprite-icon-lang sprite-icon-"+subdomainDetails.lngCode alt=translate(subdomainDetails.lngCode))
+											figure(class="sprite-icon sprite-icon-lang sprite-icon-"+subdomainDetails.lngCode alt="{{translate('#{subdomainDetails.lngCode}')}}")
 											| &nbsp;{{translate('#{subdomainDetails.lngCode}')}}
 										//- img(src=buildImgPath("flags/24/.png"))
 				each item in settings.nav.left_footer

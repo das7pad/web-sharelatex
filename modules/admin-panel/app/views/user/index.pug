@@ -45,7 +45,7 @@ block content
 								.btn-group(ng-hide="selectedUsers.length < 1")
 									a.btn.btn-default(
 										href='#',
-										tooltip=translate('delete'),
+										tooltip="{{translate('delete')}}",
 										tooltip-placement="bottom",
 										tooltip-append-to-body="true",
 										ng-click="openDeleteUsersModal()"

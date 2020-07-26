@@ -4,7 +4,7 @@
 			div.welcome.text-centered(ng-cloak)
 				h2 {{translate("welcome_to_sl")}}
 				p {{translate("new_to_latex_look_at")}} 
-					a(href="/templates") #{translate("templates").toLowerCase()}
+					a(href="/templates") {{translate("templates").toLowerCase()}}
 					|   {{translate("or")}}
 					a(href="/learn")  {{translate("latex_help_guide")}}
 
@@ -41,6 +41,6 @@
 									li.dropdown-header {{translate("templates")}}
 									each item in settings.templateLinks
 										li
-											a.menu-indent(href=item.url) #{translate(item.name)}
+											a.menu-indent(href=item.url) {{translate("#{item.name}")}}
 
 							

@@ -62,7 +62,7 @@ div.full-size.pdf(ng-controller="PdfController")
 			href
 			ng-click="stop()"
 			ng-show="pdf.compiling",
-			tooltip=translate('stop_compile')
+			tooltip="{{translate('stop_compile')}}"
 			tooltip-placement="bottom"
 		)
 			i.fa.fa-fw.fa-stop()
@@ -70,7 +70,7 @@ div.full-size.pdf(ng-controller="PdfController")
 			href
 			ng-click="toggleLogs()"
 			ng-class="{ 'active': shouldShowLogs == true }"
-			tooltip=translate('logs_and_output_files')
+			tooltip="{{translate('logs_and_output_files')}}"
 			tooltip-placement="bottom"
 		)
 			i.fa.fa-fw.fa-file-text-o
@@ -86,7 +86,7 @@ div.full-size.pdf(ng-controller="PdfController")
 			ng-href="{{pdf.downloadUrl || pdf.url}}"
 			target="_blank"
 			ng-if="pdf.url"
-			tooltip=translate('download_pdf')
+			tooltip="{{translate('download_pdf')}}"
 			tooltip-placement="bottom"
 		)
 			i.fa.fa-fw.fa-download
@@ -98,7 +98,7 @@ div.full-size.pdf(ng-controller="PdfController")
 			span.auto-compile-status.auto-compile-error.small(
 				ng-show="autoCompileLintingError"
 				tooltip-placement="bottom"
-				tooltip=translate("code_check_failed_explanation")
+				tooltip="{{translate('code_check_failed_explanation')}}"
 				tooltip-append-to-body="true"
 			)
 				i.fa.fa-fw.fa-exclamation-triangle
@@ -108,7 +108,7 @@ div.full-size.pdf(ng-controller="PdfController")
 				href,
 				ng-click="switchToFlatLayout('pdf')"
 				ng-show="ui.pdfLayout == 'sideBySide'"
-				tooltip=translate('full_screen')
+				tooltip="{{translate('full_screen')}}"
 				tooltip-placement="bottom"
 				tooltip-append-to-body="true"
 			)
@@ -117,7 +117,7 @@ div.full-size.pdf(ng-controller="PdfController")
 				href,
 				ng-click="switchToSideBySideLayout('editor')"
 				ng-show="ui.pdfLayout == 'flat'"
-				tooltip=translate('split_screen')
+				tooltip="{{translate('split_screen')}}"
 				tooltip-placement="bottom"
 				tooltip-append-to-body="true"
 			)
@@ -191,7 +191,7 @@ div.full-size.pdf(ng-controller="PdfController")
 			.files-dropdown-container
 				a.btn.btn-default.btn-sm(
 					href,
-					tooltip=translate('clear_cached_files'),
+					tooltip="{{translate('clear_cached_files')}}",
 					tooltip-placement="top",
 					tooltip-append-to-body="true",
 					ng-click="openClearCacheModal()"
@@ -325,7 +325,7 @@ div.full-size.pdf(ng-controller="PdfController")
 								| {{translate("unlimited_projects")}}
 							li
 								i.fa.fa-check &nbsp;
-								| #{translate("collabs_per_proj", {collabcount:'Multiple'})}
+								| {{translate("collabs_per_proj", {collabcount: 'Multiple'})}}
 							li
 								i.fa.fa-check &nbsp;
 								| {{translate("full_doc_history")}}

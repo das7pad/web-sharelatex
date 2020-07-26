@@ -3,8 +3,8 @@
 		form.project-search.form-horizontal(role="form")
 			.form-group.has-feedback.has-feedback-left.col-md-7.col-xs-12
 				input.form-control.col-md-7.col-xs-12(
-					placeholder=translate('search_projects')+"…",
-					aria-label=translate('search_projects')+"…",
+					placeholder="{{translate('search_projects')}}…",
+					aria-label="{{translate('search_projects')}}…",
 					autofocus='autofocus',
 					ng-model="searchText.value",
 					focus-on='search:clear',
@@ -28,8 +28,8 @@
 				.btn-group(ng-hide="selectedProjects.length < 1")
 					a.btn.btn-default(
 						href,
-						aria-label=translate('download'),
-						tooltip=translate('download'),
+						aria-label="{{translate('download')}}",
+						tooltip="{{translate('download')}}",
 						tooltip-placement="bottom",
 						tooltip-append-to-body="true",
 						ng-click="downloadSelectedProjects()"
@@ -38,8 +38,8 @@
 					a.btn.btn-default(
 						href,
 						ng-if="filter !== 'archived'"
-						aria-label=translate("archive"),
-						tooltip=translate("archive"),
+						aria-label="{{translate('archive')}}",
+						tooltip="{{translate('archive')}}",
 						tooltip-placement="bottom",
 						tooltip-append-to-body="true",
 						ng-click="openArchiveProjectsModal()"
@@ -48,8 +48,8 @@
 					a.btn.btn-default(
 						href,
 						ng-if="filter !== 'trashed'"
-						aria-label=translate("trash"),
-						tooltip=translate("trash"),
+						aria-label="{{translate('trash')}}",
+						tooltip="{{translate('trash')}}",
 						tooltip-placement="bottom",
 						tooltip-append-to-body="true",
 						ng-click="openTrashProjectsModal()"
@@ -63,7 +63,7 @@
 						href,
 						data-toggle="dropdown",
 						dropdown-toggle,
-						tooltip=translate('add_to_folders'),
+						tooltip="{{translate('add_to_folders')}}",
 						tooltip-append-to-body="true",
 						tooltip-placement="bottom"
 					)
@@ -119,7 +119,7 @@
 				.btn-group(ng-show="filter === 'archived' && selectedProjects.length > 0")
 					a.btn.btn-default(
 						href,
-						data-original-title=translate("unarchive"),
+						data-original-title="{{translate('unarchive')}}",
 						data-toggle="tooltip",
 						data-placement="bottom",
 						ng-click="unarchiveProjects(selectedProjects)"
@@ -128,7 +128,7 @@
 				.btn-group(ng-show="filter === 'trashed' && selectedProjects.length > 0")
 					a.btn.btn-default(
 						href,
-						data-original-title=translate("untrash"),
+						data-original-title="{{translate('untrash')}}",
 						data-toggle="tooltip",
 						data-placement="bottom",
 						ng-click="untrashProjects(selectedProjects)"
@@ -138,7 +138,7 @@
 					a.btn.btn-danger(
 						href,
 						ng-if="hasLeavableProjectsSelected() && !hasDeletableProjectsSelected()",
-						data-original-title=translate('leave'),
+						data-original-title="{{translate('leave')}}",
 						data-toggle="tooltip",
 						data-placement="bottom",
 						ng-click="openLeaveProjectsModal()"
@@ -147,7 +147,7 @@
 					a.btn.btn-danger(
 						href,
 						ng-if="hasDeletableProjectsSelected() && !hasLeavableProjectsSelected()",
-						data-original-title=translate('delete'),
+						data-original-title="{{translate('delete')}}",
 						data-toggle="tooltip",
 						data-placement="bottom",
 						ng-click="openDeleteProjectsModal()"
@@ -156,7 +156,7 @@
 					a.btn.btn-danger(
 						href,
 						ng-if="hasDeletableProjectsSelected() && hasLeavableProjectsSelected()",
-						data-original-title=translate('delete_and_leave'),
+						data-original-title="{{translate('delete_and_leave')}}",
 						data-toggle="tooltip",
 						data-placement="bottom",
 						ng-click="openLeaveOrDeleteProjectsModal()"
@@ -182,7 +182,7 @@
 								input.project-list-table-select-item(
 									select-all,
 									type="checkbox"
-									aria-label=translate('select_all_projects')
+									aria-label="{{translate('select_all_projects')}}"
 								)
 								span.header.clickable.project-list-table-name(ng-click="changePredicate('name')") {{translate("title")}}
 									i.tablesort.fa(ng-class="getSortIconClass('name')" aria-hidden="true")
@@ -213,7 +213,7 @@
 			div.welcome.text-centered(ng-if="projects.length == 0", ng-cloak)
 				h2 {{translate("welcome_to_sl")}}
 				p {{translate("new_to_latex_look_at")}} 
-					a(href="/templates") #{translate("templates").toLowerCase()}
+					a(href="/templates") {{translate("templates").toLowerCase()}}
 					|   {{translate("or")}}
 					a(href="/learn")  {{translate("latex_help_guide")}}
 					| ,

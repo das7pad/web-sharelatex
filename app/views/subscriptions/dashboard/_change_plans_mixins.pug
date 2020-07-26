@@ -14,7 +14,7 @@ mixin printPlan(plan)
 				-else
 					form
 						input(type="hidden", ng-model="plan_code", name="plan_code", value=plan.planCode)
-						input(type="submit", ng-click="changePlan()", value=translate("change_to_this_plan")).btn.btn-success
+						input(type="submit", ng-click="changePlan()", value="{{translate('change_to_this_plan')}}").btn.btn-success
 
 mixin printPlans(plans)
 	each plan in plans

@@ -35,7 +35,7 @@ script(type='text/ng-template', id='shareProjectModalTemplate')
 							target="_blank"
 						)
 							i.fa.fa-question-circle(
-								tooltip=translate('learn_more_about_link_sharing')
+								tooltip="{{translate('learn_more_about_link_sharing')}}"
 							)
 
 				//- Token-based access
@@ -54,7 +54,7 @@ script(type='text/ng-template', id='shareProjectModalTemplate')
 							target="_blank"
 						)
 							i.fa.fa-question-circle(
-								tooltip=translate('learn_more_about_link_sharing')
+								tooltip="{{translate('learn_more_about_link_sharing')}}"
 							)
 
 					.col-xs-12.access-token-display-area
@@ -96,10 +96,10 @@ script(type='text/ng-template', id='shareProjectModalTemplate')
 						.col-xs-2.form-control-static.text-center(ng-hide="form.isModified()")
 							a(
 								href
-								tooltip=translate('remove_collaborator')
+								tooltip="{{translate('remove_collaborator')}}"
 								tooltip-placement="bottom"
 								ng-click="removeMember(member)"
-								aria-label=translate('remove_collaborator')
+								aria-label="{{translate('remove_collaborator')}}"
 							)
 								i.fa.fa-times
 						.col-xs-2.text-center(ng-show="form.isModified()")
@@ -110,7 +110,7 @@ script(type='text/ng-template', id='shareProjectModalTemplate')
 							.text-sm
 								| {{translate("or")}}
 								|
-								button.btn.btn-inline-link(ng-click="form.reset()") #{translate("cancel").toLowerCase()}
+								button.btn.btn-inline-link(ng-click="form.reset()") {{translate("cancel").toLowerCase()}}
 
 				.row.project-member(ng-if="!isAdmin" ng-repeat="member in project.members")
 					.col-xs-7 {{ member.email }}
@@ -132,7 +132,7 @@ script(type='text/ng-template', id='shareProjectModalTemplate')
 					.col-xs-2.text-center(ng-if="isAdmin")
 						a(
 							href
-							tooltip=translate('revoke_invite')
+							tooltip="{{translate('revoke_invite')}}"
 							tooltip-placement="bottom"
 							ng-click="revokeInvite(invite)"
 						)
@@ -186,7 +186,7 @@ script(type='text/ng-template', id='shareProjectModalTemplate')
 
 									li
 										i.fa.fa-check &nbsp;
-										| #{translate("collabs_per_proj", {collabcount:'Multiple'})}
+										| {{translate("collabs_per_proj", {collabcount: 'Multiple'})}}
 
 									li
 										i.fa.fa-check &nbsp;

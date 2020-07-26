@@ -32,7 +32,7 @@
 	.diff-deleted.text-centered(
 		ng-show="history.diff.deleted && !history.diff.restoreDeletedSuccess"
 	)
-		p.text-serif #{translate("file_has_been_deleted", {filename:"{{ history.diff.doc.name }} "})}
+		p.text-serif {{translate("file_has_been_deleted", {filename: history.diff.doc.name})}}
 		p
 			a.btn.btn-primary.btn-lg(
 				href,
@@ -43,7 +43,7 @@
 	.diff-deleted.text-centered(
 		ng-show="history.diff.deleted && history.diff.restoreDeletedSuccess"
 	)
-		p.text-serif  #{translate("file_restored", {filename:"{{ history.diff.doc.name }} "})}
+		p.text-serif  {{translate("file_restored", {filename: history.diff.doc.name})}}
 		p.text-serif  {{translate("file_restored_back_to_editor")}}
 		p
 			a.btn.btn-default(
